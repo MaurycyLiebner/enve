@@ -67,6 +67,7 @@ public:
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
+    void selectOnlyLastPressedBone();
     void connectPointsFromDifferentPaths(NodePoint *pointSrc,
                                          NodePoint *pointDest);
 
@@ -106,6 +107,8 @@ public:
     void moveSelectedPointsByAbs(const QPointF &by,
                                  const bool &startTransform);
     void moveSelectedBoxesByAbs(const QPointF &by,
+                                const bool &startTransform);
+    void moveSelectedBonesByAbs(const QPointF &by,
                                 const bool &startTransform);
     void groupSelectedBoxes();
 
@@ -210,10 +213,14 @@ public:
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
     void clearBoxesSelection();
+    void clearBonesSelection();
     void removePointFromSelection(MovablePoint *point);
     void removeBoxFromSelection(BoundingBox *box);
     void addPointToSelection(MovablePoint *point);
     void addBoxToSelection(BoundingBox *box);
+    void removeBoneFromSelection(Bone *bone);
+    void addBoneToSelection(Bone *bone);
+
     void clearPointsSelection();
     void raiseSelectedBoxesToTop();
     void lowerSelectedBoxesToBottom();
@@ -394,6 +401,7 @@ public:
 
     void setBonesSelectionEnabled(const bool &bT) {
         mBonesSelectionEnabled = bT;
+        clearBonesSelection();
         updatePivot();
     }
 
@@ -509,6 +517,7 @@ protected:
     MovablePoint *mHoveredPoint = NULL;
     BoundingBox *mHoveredBox = NULL;
     VectorPathEdge *mHoveredEdge = NULL;
+    Bone *mHoveredBone = NULL;
 
     QList<Bone*> mSelectedBones;
     QList<MovablePoint*> mSelectedPoints;
@@ -584,6 +593,7 @@ protected:
     MovablePoint *mLastPressedPoint = NULL;
     NodePoint *mCurrentEndPoint = NULL;
     BoundingBox *mLastPressedBox = NULL;
+    Bone *mLastPressedBone = NULL;
     void setCtrlPointsEnabled(bool enabled);
     PathPivot *mRotPivot;
     void handleMovePointMouseMove();

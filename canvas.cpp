@@ -112,6 +112,7 @@ void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
 void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     mCurrentBoxesGroup->setIsCurrentGroup(false);
     clearBoxesSelection();
+    clearBonesSelection();
     clearPointsSelection();
     clearCurrentEndPoint();
     clearLastPressedPoint();
@@ -142,9 +143,16 @@ void Canvas::drawSelectedSk(SkCanvas *canvas,
         box->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }
 }
-
+#include "Boxes/bone.h"
 void Canvas::updateHoveredBox() {
     mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
+    mHoveredBone = NULL;
+    if(mHoveredBox != NULL && mBonesSelectionEnabled) {
+        if(mHoveredBox->SWT_isBonesBox()) {
+            mHoveredBone = ((BonesBox*)mHoveredBox)->getBoneAtAbsPos(
+                        mCurrentMouseEventPosRel);
+        }
+    }
 }
 
 void Canvas::updateHoveredPoint() {
@@ -305,6 +313,8 @@ void Canvas::renderSk(SkCanvas *canvas) {
             mHoveredPoint->drawHovered(canvas, invScale);
         } else if(mHoveredEdge != NULL) {
             mHoveredEdge->drawHoveredSk(canvas, invScale);
+        } else if(mHoveredBone != NULL) {
+            mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invScale);
         } else if(mHoveredBox != NULL) {
             if(mCurrentEdge == NULL) {
                 mHoveredBox->drawHoveredSk(canvas, invScale);
@@ -867,6 +877,7 @@ void Canvas::clearSelectionAction() {
         clearPointsSelection();
     } else if(mCurrentMode == MOVE_PATH) {
         clearBoxesSelection();
+        clearBonesSelection();
     }
 }
 
@@ -903,10 +914,19 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         deleteAction();
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_P) {
-        if(mSelectedBoxes.count() > 1) {
-            BoundingBox *parentBox = mSelectedBoxes.last();
+        if(!mSelectedBones.isEmpty()) {
+            Bone *bone = mSelectedBones.last();
+            BasicTransformAnimator *trans = bone->getTransformAnimator();
+            BoundingBox *box = bone->getParentBox();
+            foreach(BoundingBox *boxT, mSelectedBoxes) {
+                if(boxT == box) continue;
+                boxT->setParent(trans);
+            }
+        } else if(mSelectedBoxes.count() > 1) {
+            BasicTransformAnimator *trans = mSelectedBoxes.last()->
+                    getTransformAnimator();
             for(int i = 0; i < mSelectedBoxes.count() - 1; i++) {
-                mSelectedBoxes.at(i)->setParent(parentBox->getTransformAnimator());
+                mSelectedBoxes.at(i)->setParent(trans);
             }
         }
     } else if(event->modifiers() & Qt::AltModifier &&
@@ -1047,6 +1067,14 @@ void Canvas::setCurrentEndPoint(NodePoint *point) {
         point->select();
     }
     mCurrentEndPoint = point;
+}
+
+void Canvas::selectOnlyLastPressedBone() {
+    clearBonesSelection();
+    if(mLastPressedBone == NULL) {
+        return;
+    }
+    addBoneToSelection(mLastPressedBone);
 }
 
 void Canvas::selectOnlyLastPressedBox() {

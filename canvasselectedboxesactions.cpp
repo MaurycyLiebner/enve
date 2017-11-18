@@ -1,6 +1,7 @@
 #include "canvas.h"
 #include "mainwindow.h"
 #include "pathpivot.h"
+#include "Boxes/bone.h"
 
 int Canvas::nextRelFrameWithKey(const int &relFrame) {
     int minNextFrame = INT_MAX;
@@ -365,28 +366,56 @@ void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {
 void Canvas::rotateSelectedBy(const qreal &rotBy,
                               const QPointF &absOrigin,
                               const bool &startTrans) {
-    if(mLocalPivot) {
-        if(startTrans) {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->startRotTransform();
-                box->rotateBy(rotBy);
+    if(mSelectedBones.isEmpty()) {
+        if(mLocalPivot) {
+            if(startTrans) {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->startRotTransform();
+                    box->rotateBy(rotBy);
+                }
+            } else {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->rotateBy(rotBy);
+                }
             }
         } else {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->rotateBy(rotBy);
+            if(startTrans) {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->startRotTransform();
+                    box->startPosTransform();
+                    box->saveTransformPivotAbsPos(absOrigin);
+                    box->rotateRelativeToSavedPivot(rotBy);
+                }
+            } else {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->rotateRelativeToSavedPivot(rotBy);
+                }
             }
         }
     } else {
-        if(startTrans) {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->startRotTransform();
-                box->startPosTransform();
-                box->saveTransformPivotAbsPos(absOrigin);
-                box->rotateRelativeToSavedPivot(rotBy);
+        if(mLocalPivot) {
+            if(startTrans) {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->startRotTransform();
+                    bone->rotateBy(rotBy);
+                }
+            } else {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->rotateBy(rotBy);
+                }
             }
         } else {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->rotateRelativeToSavedPivot(rotBy);
+            if(startTrans) {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->startRotTransform();
+                    bone->startPosTransform();
+                    bone->saveTransformPivotAbsPos(absOrigin);
+                    bone->rotateRelativeToSavedPivot(rotBy);
+                }
+            } else {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->rotateRelativeToSavedPivot(rotBy);
+                }
             }
         }
     }
@@ -402,30 +431,60 @@ void Canvas::scaleSelectedBy(qreal scaleBy,
 void Canvas::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
                                  QPointF absOrigin,
                                  bool startTrans) {
-    if(mLocalPivot) {
-        if(startTrans) {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->startScaleTransform();
-                box->scale(scaleXBy, scaleYBy);
+    if(mSelectedBones.isEmpty()) {
+        if(mLocalPivot) {
+            if(startTrans) {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->startScaleTransform();
+                    box->scale(scaleXBy, scaleYBy);
+                }
+            } else {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->scale(scaleXBy, scaleYBy);
+                }
             }
         } else {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->scale(scaleXBy, scaleYBy);
+            if(startTrans) {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->startScaleTransform();
+                    box->startPosTransform();
+                    box->saveTransformPivotAbsPos(absOrigin);
+                    box->scaleRelativeToSavedPivot(scaleXBy,
+                                                   scaleYBy);
+                }
+            } else {
+                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                    box->scaleRelativeToSavedPivot(scaleXBy,
+                                                   scaleYBy);
+                }
             }
         }
     } else {
-        if(startTrans) {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->startScaleTransform();
-                box->startPosTransform();
-                box->saveTransformPivotAbsPos(absOrigin);
-                box->scaleRelativeToSavedPivot(scaleXBy,
-                                               scaleYBy);
+        if(mLocalPivot) {
+            if(startTrans) {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->startScaleTransform();
+                    bone->scale(scaleXBy, scaleYBy);
+                }
+            } else {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->scale(scaleXBy, scaleYBy);
+                }
             }
         } else {
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                box->scaleRelativeToSavedPivot(scaleXBy,
-                                               scaleYBy);
+            if(startTrans) {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->startScaleTransform();
+                    bone->startPosTransform();
+                    bone->saveTransformPivotAbsPos(absOrigin);
+                    bone->scaleRelativeToSavedPivot(scaleXBy,
+                                                    scaleYBy);
+                }
+            } else {
+                Q_FOREACH(Bone *bone, mSelectedBones) {
+                    bone->scaleRelativeToSavedPivot(scaleXBy,
+                                                    scaleYBy);
+                }
             }
         }
     }
@@ -486,6 +545,27 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
     } else {
         mMainWindow->setCurrentBox(mSelectedBoxes.last());
     }
+}
+
+void Canvas::addBoneToSelection(Bone *bone) {
+    if(bone->isSelected()) {
+        return;
+    }
+    bone->select();
+    mSelectedBones.append(bone); schedulePivotUpdate();
+    //sortSelectedBonesByZAscending();
+}
+
+void Canvas::removeBoneFromSelection(Bone *bone) {
+    bone->deselect();
+    mSelectedBones.removeOne(bone); schedulePivotUpdate();
+}
+
+void Canvas::clearBonesSelection() {
+    Q_FOREACH(Bone *bone, mSelectedBones) {
+        bone->deselect();
+    }
+    mSelectedBones.clear(); schedulePivotUpdate();
 }
 
 void Canvas::clearBoxesSelection() {
@@ -586,14 +666,26 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
 }
 
 void Canvas::finishSelectedBoxesTransform() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->finishTransform();
+    if(mSelectedBones.isEmpty()) {
+        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+            box->finishTransform();
+        }
+    } else {
+        Q_FOREACH(Bone *bone, mSelectedBones) {
+            bone->finishTransform();
+        }
     }
 }
 
 void Canvas::cancelSelectedBoxesTransform() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->cancelTransform();
+    if(mSelectedBones.isEmpty()) {
+        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+            box->cancelTransform();
+        }
+    } else {
+        Q_FOREACH(Bone *bone, mSelectedBones) {
+            bone->cancelTransform();
+        }
     }
 }
 
@@ -610,6 +702,21 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
         }
     }
 }
+
+void Canvas::moveSelectedBonesByAbs(const QPointF &by,
+                                    const bool &startTransform) {
+    if(startTransform) {
+        Q_FOREACH(Bone *bone, mSelectedBones) {
+            bone->startPosTransform();
+            bone->moveByAbs(by);
+        }
+    } else {
+        Q_FOREACH(Bone *bone, mSelectedBones) {
+            bone->moveByAbs(by);
+        }
+    }
+}
+
 
 //QPointF BoxesGroup::getRelCenterPosition() {
 //    QPointF posSum = QPointF(0., 0.);

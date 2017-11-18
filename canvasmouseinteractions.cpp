@@ -22,11 +22,22 @@
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
+    mLastPressedBone = NULL;
     if(mLastPressedBox == NULL) {
         if(!isShiftPressed() ) {
             clearBoxesSelection();
         }
     } else {
+        if(mLastPressedBox->SWT_isBonesBox()) {
+            if(mBonesSelectionEnabled) {
+                mLastPressedBone = ((BonesBox*)mLastPressedBox)->
+                        getBoneAtAbsPos(mLastMouseEventPosRel);
+                if(!isShiftPressed()) {
+                    clearBonesSelection();
+                }
+                return;
+            }
+        }
         if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
             clearBoxesSelection();
         }
@@ -735,13 +746,28 @@ void Canvas::handleMovePathMouseRelease() {
     } else if(mFirstMouseMove) {
         mSelecting = false;
         if(isShiftPressed() && mLastPressedBox != NULL) {
-            if(mLastPressedBox->isSelected()) {
-                removeBoxFromSelection(mLastPressedBox);
+            if(mLastPressedBone != NULL) {
+                if(mLastPressedBone->isSelected()) {
+                    removeBoneFromSelection(mLastPressedBone);
+                } else {
+                    addBoneToSelection(mLastPressedBone);
+                }
             } else {
-                addBoxToSelection(mLastPressedBox);
+                if(mLastPressedBox->isSelected()) {
+                    removeBoxFromSelection(mLastPressedBox);
+                } else {
+                    addBoxToSelection(mLastPressedBox);
+                }
             }
         } else {
-            selectOnlyLastPressedBox();
+            if(mLastPressedBone != NULL) {
+                if(!mLastPressedBox->isSelected()) {
+                    addBoxToSelection(mLastPressedBox);
+                }
+                selectOnlyLastPressedBone();
+            } else {
+                selectOnlyLastPressedBox();
+            }
         }
     } else if(mSelecting) {
         moveSecondSelectionPoint(mCurrentMouseEventPosRel);
@@ -946,6 +972,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     } else {
         handleMouseRelease();
     }
+    mLastPressedBone = NULL;
     mLastPressedBox = NULL;
     mHoveredPoint = mLastPressedPoint;
     mLastPressedPoint = NULL;
@@ -1028,12 +1055,23 @@ void Canvas::handleMovePathMouseMove() {
         if(mLastPressedBox != NULL) {
             addBoxToSelection(mLastPressedBox);
             mLastPressedBox = NULL;
+            if(mLastPressedBone != NULL) {
+                addBoneToSelection(mLastPressedBone);
+                mLastPressedBone = NULL;
+            }
         }
 
-        moveSelectedBoxesByAbs(
-                    getMoveByValueForEventPos(
-                        mCurrentMouseEventPosRel),
-                    mFirstMouseMove);
+        if(mSelectedBones.isEmpty()) {
+            moveSelectedBoxesByAbs(
+                        getMoveByValueForEventPos(
+                            mCurrentMouseEventPosRel),
+                        mFirstMouseMove);
+        } else {
+            moveSelectedBonesByAbs(
+                        getMoveByValueForEventPos(
+                            mCurrentMouseEventPosRel),
+                        mFirstMouseMove);
+        }
     }
 }
 

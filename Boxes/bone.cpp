@@ -20,6 +20,25 @@ bool BonesBox::relPointInsidePath(const QPointF &relPos) {
     return false;
 }
 
+bool BonesBox::SWT_isBonesBox() { return true; }
+
+void BonesBox::selectAndAddContainedPointsToList(const QRectF &absRect,
+                                                 QList<MovablePoint *> *list) {
+    foreach(Bone *bone, mBones) {
+            bone->selectAndAddContainedPointsToList(absRect, list);
+        }
+}
+
+void BonesBox::addBone(Bone *bone) {
+    mBones << bone;
+        ca_addChildAnimator(bone);
+}
+
+void BonesBox::removeBone(Bone *bone) {
+    mBones.removeOne(bone);
+        ca_removeChildAnimator(bone);
+}
+
 void BonesBox::drawPixmapSk(SkCanvas *canvas) {
     foreach(Bone *bone, mBones) {
         bone->drawOnCanvas(canvas);
@@ -62,6 +81,20 @@ MovablePoint *BonesBox::getPointAtAbsPos(
     return pointToReturn;
 }
 
+BoundingBox *BonesBox::createNewDuplicate() { return NULL; }
+
+Bone *BonesBox::getBoneAtAbsPos(const QPointF &absPos) {
+    return getBoneAtRelPos(mapAbsPosToRel(absPos));
+}
+
+Bone *BonesBox::getBoneAtRelPos(const QPointF &relPos) {
+    foreach(Bone *bone, mBones) {
+        Bone *boneT = bone->getBoneAtRelPos(relPos);
+        if(boneT != NULL) { return boneT; }
+    }
+    return NULL;
+}
+
 Bone::Bone(BonesBox *boneBox) {
     prp_setName("bone");
     mTransformAnimator =
@@ -84,6 +117,102 @@ Bone::Bone(Bone *parentBone) {
     ca_addChildAnimator(mTransformAnimator.data());
 }
 
+void Bone::deselect() {
+    mSelected = false;
+
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
+}
+
+void Bone::select() {
+    mSelected = true;
+
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
+}
+
+const bool &Bone::isSelected() { return mSelected; }
+
+void Bone::startPosTransform() {
+    mTransformAnimator->startPosTransform();
+}
+
+void Bone::startRotTransform() {
+    mTransformAnimator->startRotTransform();
+}
+
+void Bone::startScaleTransform() {
+    mTransformAnimator->startScaleTransform();
+}
+
+void Bone::startTransform() {
+    mTransformAnimator->prp_startTransform();
+}
+
+void Bone::finishTransform() {
+    mTransformAnimator->prp_finishTransform();
+}
+
+void Bone::moveByAbs(const QPointF &trans) {
+    mTransformAnimator->moveByAbs(trans);
+    //    QPointF by = mParent->mapAbsPosToRel(trans) -
+    //                 mParent->mapAbsPosToRel(QPointF(0., 0.));
+    // //    QPointF by = mapAbsPosToRel(
+    // //                trans - mapRelativeToAbsolute(QPointF(0., 0.)));
+
+    //    moveByRel(by);
+}
+
+void Bone::moveByRel(const QPointF &trans) {
+    mTransformAnimator->moveRelativeToSavedValue(trans.x(), trans.y());
+}
+
+void Bone::setAbsolutePos(const QPointF &pos, const bool &saveUndoRedo) {
+    setRelativePos(mParentBone->mapAbsPosToRel(pos), saveUndoRedo);
+}
+
+void Bone::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo) {
+    mTransformAnimator->setPosition(relPos.x(), relPos.y(), saveUndoRedo);
+}
+
+void Bone::saveTransformPivotAbsPos(const QPointF &absPivot) {
+    if(mParentBone == NULL) {
+        mSavedTransformPivot =
+                mParentBonesBox->mapAbsPosToRel(absPivot);
+    } else {
+        mSavedTransformPivot =
+                mParentBone->mapAbsPosToRel(absPivot);
+    }
+}
+
+QPointF Bone::mapAbsPosToRel(const QPointF &absPos) {
+    return mTransformAnimator->mapAbsPosToRel(absPos);
+}
+
+QPointF Bone::mapRelPosToAbs(const QPointF &relPos) {
+    return mTransformAnimator->mapRelPosToAbs(relPos);
+}
+
+void Bone::scale(const qreal &scaleBy) {
+    scale(scaleBy, scaleBy);
+}
+
+void Bone::scale(const qreal &scaleXBy, const qreal &scaleYBy) {
+    mTransformAnimator->scale(scaleXBy, scaleYBy);
+}
+
+void Bone::rotateBy(const qreal &rot) {
+    mTransformAnimator->rotateRelativeToSavedValue(rot);
+}
+
+void Bone::rotateRelativeToSavedPivot(const qreal &rot) {
+    mTransformAnimator->rotateRelativeToSavedValue(rot,
+                                                   mSavedTransformPivot);
+}
+
+void Bone::scaleRelativeToSavedPivot(const qreal &scaleXBy, const qreal &scaleYBy) {
+    mTransformAnimator->scaleRelativeToSavedValue(scaleXBy, scaleYBy,
+                                                  mSavedTransformPivot);
+}
+
 Bone *Bone::getBoneAtRelPos(const QPointF &relPos) {
     QPointF realRelPos = mTransformAnimator->mapFromParent(relPos);
     foreach(Bone *boneT, mChildBones) {
@@ -91,7 +220,7 @@ Bone *Bone::getBoneAtRelPos(const QPointF &relPos) {
         if(boneTT != NULL) return boneTT;
     }
     //if(QRectF(mRelRootPos, mRelTipPos).contains(realRelPos)) {
-        if(getCurrentRelPath().contains(realRelPos.x(), realRelPos.y())) {
+    if(getCurrentRelPath().contains(realRelPos.x(), realRelPos.y())) {
             return this;
         }
     //}
@@ -238,7 +367,7 @@ void Bone::drawSelectedSk(SkCanvas *canvas,
         SkPaint paintT;
 
         paintT.setColor(SK_ColorRED);
-        paintT.setStyle(SkPaint::kStroke_Style);
+        paintT.setStyle(SkPaint::kFill_Style);
         paintT.setAntiAlias(true);
         canvas->drawPath(path, paintT);
     }
@@ -252,6 +381,16 @@ void Bone::drawSelectedSk(SkCanvas *canvas,
         boneT->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }
     canvas->restore();
+}
+
+void Bone::addChildBone(Bone *child) {
+    mChildBones << child;
+    ca_addChildAnimator(child);
+}
+
+void Bone::removeChildBone(Bone *child) {
+    mChildBones.removeOne(child);
+    ca_removeChildAnimator(child);
 }
 
 void Bone::selectAndAddContainedPointsToList(const QRectF &absRect,
@@ -310,7 +449,7 @@ void Bone::setParentBonesBox(BonesBox *bonesBox) {
     mParentBonesBox->addBone(this);
 }
 
-void Bone::drawHoveredPathSk(SkCanvas *canvas, const qreal &invScale) {
+void Bone::drawHoveredOnlyThisPathSk(SkCanvas *canvas, const qreal &invScale) {
     canvas->save();
     SkPath mappedPath = getCurrentRelPath();
     mappedPath.transform(QMatrixToSkMatrix(
@@ -326,6 +465,10 @@ void Bone::drawHoveredPathSk(SkCanvas *canvas, const qreal &invScale) {
     paint.setStrokeWidth(invScale);
     canvas->drawPath(mappedPath, paint);
     canvas->restore();
+}
+
+void Bone::drawHoveredPathSk(SkCanvas *canvas, const qreal &invScale) {
+    drawHoveredOnlyThisPathSk(canvas, invScale);
     foreach(Bone *bone, mChildBones) {
         bone->drawHoveredPathSk(canvas, invScale);
     }
