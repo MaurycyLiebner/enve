@@ -146,10 +146,21 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mLocalPivot = new ActionButton(
                 ":/icons/globalPivot.png",
                 "", this);
-
+    mLocalPivot->setToolTip("P");
     mLocalPivot->setCheckable(":/icons/localPivot.png");
     connect(mLocalPivot, SIGNAL(toggled(bool)),
             this, SLOT(setLocalPivot(bool)) );
+
+    mBonesSelection = new ActionButton(
+                ":/icons/bonesSelectionEnabled.png",
+                "", this);
+    mBonesSelection->setToolTip("U");
+
+    mBonesSelection->setCheckable(":/icons/bonesSelectionDisabled.png");
+    mBonesSelection->setChecked(false);
+    connect(mBonesSelection, SIGNAL(toggled(bool)),
+            this, SLOT(setBonesSelectionEnabled(bool)) );
+
 
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
@@ -173,6 +184,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar->addSeparator();
     mToolBar->addWidget(mLocalPivot);
     mLocalPivot->setFocusPolicy(Qt::NoFocus);
+    mToolBar->addWidget(mBonesSelection);
+    mBonesSelection->setFocusPolicy(Qt::NoFocus);
     mToolBar->addSeparator();
 
     QWidget *spacerWidget = new QWidget(this);
@@ -312,6 +325,10 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
               !(event->modifiers() & Qt::ControlModifier) &&
               !(event->modifiers() & Qt::AltModifier)) {
         mLocalPivot->toggle();
+    } else if(event->key() == Qt::Key_U &&
+              !(event->modifiers() & Qt::ControlModifier) &&
+              !(event->modifiers() & Qt::AltModifier)) {
+        mBonesSelection->toggle();
     } else {
         return false;
     }
@@ -377,6 +394,11 @@ void BoxesListAnimationDockWidget::interruptPreview() {
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {
     mMainWindow->getCanvasWindow()->setLocalPivot(bT);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListAnimationDockWidget::setBonesSelectionEnabled(const bool &bT) {
+    mMainWindow->getCanvasWindow()->setBonesSelectionEnabled(bT);
     mMainWindow->callUpdateSchedulers();
 }
 

@@ -57,6 +57,11 @@ public:
         return getCombinedTransform().map(relPos);
     }
 
+    QPointF mapFromParent(const QPointF &parentRelPos) const {
+        return mapAbsPosToRel(
+                    mParentTransformAnimator->mapRelPosToAbs(parentRelPos));
+    }
+
     void duplicatePosAnimatorFrom(QPointFAnimator *source);
     void duplicateScaleAnimatorFrom(QPointFAnimator *source);
     void duplicateRotAnimatorFrom(QrealAnimator *source);

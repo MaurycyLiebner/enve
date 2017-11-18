@@ -95,9 +95,8 @@ public:
     SingleSound *createSoundForPath(const QString &path);
     void updateHoveredElements();
 
-    void switchLocalPivot();
-    bool getLocalPivot();
     void setLocalPivot(const bool &bT);
+    void setBonesSelectionEnabled(const bool &bT);
 
     void importFile(const QString &path,
                     const QPointF &relDropPos = QPointF(0., 0.));

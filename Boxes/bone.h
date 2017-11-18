@@ -2,9 +2,10 @@
 #define BONE_H
 #include "boundingbox.h"
 class BonePt;
+class BonesBox;
 class Bone : public ComplexAnimator {
 public:
-    Bone(BasicTransformAnimator *parentAnimator);
+    Bone(BonesBox *boneBox);
     Bone(Bone *parentBone);
 
     Bone *getBoneAtRelPos(const QPointF &relPos);
@@ -45,17 +46,21 @@ public:
 
     void addChildBone(Bone *child) {
         mChildBones << child;
+        ca_addChildAnimator(child);
     }
 
     void removeChildBone(Bone *child) {
         mChildBones.removeOne(child);
+        ca_removeChildAnimator(child);
     }
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
     void setParentBone(Bone *parentBone);
-    void clearParentBoneAndSetParentTransformAnimator(
-            BasicTransformAnimator *trans);
+    void setParentBonesBox(BonesBox *bonesBox);
+
+    void drawHoveredPathSk(SkCanvas *canvas,
+                           const qreal &invScale);
 protected:
     bool mSelected = false;
     BonePt *mTipPt = NULL;
@@ -64,9 +69,10 @@ protected:
     bool mConnectedToParent = true;
     QPointF mRelRootPos;
     QPointF mRelTipPos;
-    BasicTransformAnimator *mTransformAnimator = NULL;
+    QSharedPointer<BoneTransformAnimator> mTransformAnimator;
     QList<Bone*> mChildBones;
     Bone *mParentBone = NULL;
+    BonesBox *mParentBonesBox = NULL;
 };
 
 class BonePt : public NonAnimatedMovablePoint {
@@ -153,19 +159,40 @@ public:
 
     BoundingBox *createNewDuplicate() { return NULL; }
 
+    Bone *getBoneAtAbsPos(const QPointF &absPos) {
+        return getBoneAtRelPos(mapAbsPosToRel(absPos));
+    }
+
+    Bone *getBoneAtRelPos(const QPointF &relPos) {
+        foreach(Bone *bone, mBones) {
+            if(bone->getBoneAtRelPos(relPos) != NULL) { return bone; }
+        }
+        return NULL;
+    }
+
     bool relPointInsidePath(const QPointF &relPos);
 
     bool SWT_isBonesBox() { return true; }
-    Bone *getMainBone() {
-        return mMainBone;
-    }
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list) {
-        mMainBone->selectAndAddContainedPointsToList(absRect, list);
+        foreach(Bone *bone, mBones) {
+            bone->selectAndAddContainedPointsToList(absRect, list);
+        }
     }
+
+    void addBone(Bone *bone) {
+        mBones << bone;
+        ca_addChildAnimator(bone);
+    }
+
+    void removeBone(Bone *bone) {
+        mBones.removeOne(bone);
+        ca_removeChildAnimator(bone);
+    }
+    void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
-    Bone *mMainBone = NULL;
+    QList<Bone*> mBones;
 };
 
 #endif // BONE_H

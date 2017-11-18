@@ -1022,18 +1022,14 @@ void CanvasWindow::updateHoveredElements() {
     mCurrentCanvas->updateHoveredElements();
 }
 
-void CanvasWindow::switchLocalPivot() {
-    setLocalPivot(!mCurrentCanvas->getPivotLocal());
-}
-
-bool CanvasWindow::getLocalPivot() {
-    if(hasNoCanvas()) return false;
-    return mCurrentCanvas->getPivotLocal();
-}
-
 void CanvasWindow::setLocalPivot(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setLocalPivot(bT);
+}
+
+void CanvasWindow::setBonesSelectionEnabled(const bool &bT) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setBonesSelectionEnabled(bT);
 }
 
 const int BufferSize = 32768;

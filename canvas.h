@@ -392,6 +392,11 @@ public:
         updatePivot();
     }
 
+    void setBonesSelectionEnabled(const bool &bT) {
+        mBonesSelectionEnabled = bT;
+        updatePivot();
+    }
+
     const bool &getPivotLocal() {
         return mLocalPivot;
     }
@@ -505,10 +510,12 @@ protected:
     BoundingBox *mHoveredBox = NULL;
     VectorPathEdge *mHoveredEdge = NULL;
 
+    QList<Bone*> mSelectedBones;
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;
 
     bool mLocalPivot = false;
+    bool mBonesSelectionEnabled = false;
     bool mIsCurrentCanvas = true;
     int mMaxFrame = 0;
 

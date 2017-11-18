@@ -86,6 +86,7 @@ private slots:
     void interruptPreview();
 
     void setLocalPivot(const bool &bT);
+    void setBonesSelectionEnabled(const bool &bT);
 
     void setTimelineMode();
     void setRenderMode();
@@ -120,6 +121,7 @@ private:
     ActionButton *mStopButton;
 
     ActionButton *mLocalPivot;
+    ActionButton *mBonesSelection;
 
     AnimationDockWidget *mAnimationDockWidget;
 

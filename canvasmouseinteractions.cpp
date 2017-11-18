@@ -526,6 +526,7 @@ void Canvas::handleLeftButtonMousePress() {
         } else if(mCurrentMode == CanvasMode::ADD_BONE) {
             //setCanvasMode(CanvasMode::MOVE_POINT);
             BonePt *bonePt = NULL;
+
             if(mLastPressedPoint != NULL) {
                 if(mLastPressedPoint->isBonePoint()) {
                     bonePt = (BonePt*)mLastPressedPoint;
@@ -537,12 +538,28 @@ void Canvas::handleLeftButtonMousePress() {
             }
             Bone *newBone = NULL;
             if(bonePt == NULL) {
-                QSharedPointer<BonesBox> boneBox = (new BonesBox())->ref<BonesBox>();
-                mCurrentBoxesGroup->addContainedBox(boneBox.data());
-                boneBox->setAbsolutePos(mLastMouseEventPosRel, false);
-                clearBoxesSelection();
-                addBoxToSelection(boneBox.data());
-                newBone = boneBox->getMainBone();
+                QSharedPointer<BonesBox> boneBox;
+                if(mSelectedBoxes.count() > 0) {
+                    BoundingBox *lastSelected = mSelectedBoxes.last();
+                    if(lastSelected->SWT_isBonesBox()) {
+                        boneBox = ((BonesBox*)lastSelected)->ref<BonesBox>();
+
+                        newBone = new Bone(boneBox.data());
+
+                        newBone->getRootPt()->setAbsolutePos(
+                                    mLastMouseEventPosRel);
+                        newBone->getTipPt()->setAbsolutePos(
+                                    mLastMouseEventPosRel);
+                    }
+                }
+                if(boneBox == NULL) {
+                    boneBox = (new BonesBox())->ref<BonesBox>();
+                    mCurrentBoxesGroup->addContainedBox(boneBox.data());
+                    boneBox->setAbsolutePos(mLastMouseEventPosRel, false);
+                    clearBoxesSelection();
+                    addBoxToSelection(boneBox.data());
+                    newBone = new Bone(boneBox.data());
+                }
             } else {
                 Bone *boneT = bonePt->getTipBone();
                 newBone = new Bone(boneT);
