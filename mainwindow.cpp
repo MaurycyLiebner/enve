@@ -1086,11 +1086,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             return processKeyEvent(keyEvent);
         }
         if(isCtrlPressed()) {
-            if(keyEvent->key() == Qt::Key_X) {
+            if(keyEvent->key() == Qt::Key_C ||
+                keyEvent->key() == Qt::Key_V ||
+                keyEvent->key() == Qt::Key_X ||
+                keyEvent->key() == Qt::Key_D) {
                 return processKeyEvent(keyEvent);
             }
-        } else if(keyEvent->key() == Qt::Key_C ||
-             keyEvent->key() == Qt::Key_V ||
+        } else if(
              keyEvent->key() == Qt::Key_A ||
              keyEvent->key() == Qt::Key_I ||
              keyEvent->key() == Qt::Key_Delete) {

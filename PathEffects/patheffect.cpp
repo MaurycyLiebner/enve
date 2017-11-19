@@ -394,6 +394,7 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     prp_setName("solidify effect");
 
     mDisplacement->prp_setName("displacement");
+    mDisplacement->qra_setValueRange(0., 999.999);
     mDisplacement->qra_setCurrentValue(10.);
 
     ca_addChildAnimator(mDisplacement.data());
@@ -424,10 +425,65 @@ void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
                                                SkPath *dst) {
     SkStroke strokerSk;
-    strokerSk.setWidth(mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame));
-    SkPath outline = SkPath();
+    qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame);
+    if(widthT < 0.001) {
+        *dst = src;
+        return;
+    }
+    strokerSk.setWidth(widthT);
+    SkPath outline;
     strokerSk.strokePath(src, &outline);
+    SkPath extOutlineOnly;
+    SkPath::Iter iter(outline, false);
 
+    int i = 0;
+    bool isOuter = false;
+    for(;;) {
+        SkPoint  pts[4];
+        switch (iter.next(pts, false)) {
+            case SkPath::kLine_Verb:
+                if(isOuter) {
+                    extOutlineOnly.lineTo(pts[1]);
+                }
+                break;
+            case SkPath::kQuad_Verb:
+                if(isOuter) {
+                    extOutlineOnly.quadTo(pts[1], pts[2]);
+                }
+                break;
+            case SkPath::kConic_Verb: {
+                if(isOuter) {
+                    extOutlineOnly.conicTo(pts[1], pts[2], iter.conicWeight());
+                }
+                break;
+            } break;
+            case SkPath::kCubic_Verb:
+                if(isOuter) {
+                    extOutlineOnly.cubicTo(pts[1], pts[2], pts[3]);
+                }
+                break;
+            case SkPath::kClose_Verb:
+                if(isOuter) {
+                    extOutlineOnly.close();
+                }
+                break;
+            case SkPath::kMove_Verb:
+                if(i % 2 == 0) {
+                    i++;
+                    isOuter = false;
+                } else {
+                    isOuter = true;
+                    i++;
+                    extOutlineOnly.moveTo(pts[0]);
+                }
+                break;
+            case SkPath::kDone_Verb:
+                goto DONE;
+        }
+    }
+DONE:
+    *dst = extOutlineOnly;
+    return;
     FullVectorPath addToPath;
     addToPath.generateFromPath(outline);
     FullVectorPath addedPath;
