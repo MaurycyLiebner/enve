@@ -20,6 +20,7 @@ VectorPath::VectorPath() :
     mPathAnimator->prp_setUpdater(new NodePointUpdater(this));
     mPathAnimator->prp_blockUpdater();
     ca_addChildAnimator(mPathAnimator.data());
+    ca_moveChildBelow(mPathAnimator.data(), mEffectsAnimators.data());
 }
 
 void VectorPath::shiftAllPointsForAllKeys(const int &by) {

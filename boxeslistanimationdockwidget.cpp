@@ -151,15 +151,15 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mLocalPivot, SIGNAL(toggled(bool)),
             this, SLOT(setLocalPivot(bool)) );
 
-    mBonesSelection = new ActionButton(
-                ":/icons/bonesSelectionEnabled.png",
-                "", this);
-    mBonesSelection->setToolTip("U");
+//    mBonesSelection = new ActionButton(
+//                ":/icons/bonesSelectionEnabled.png",
+//                "", this);
+//    mBonesSelection->setToolTip("U");
 
-    mBonesSelection->setCheckable(":/icons/bonesSelectionDisabled.png");
-    mBonesSelection->setChecked(false);
-    connect(mBonesSelection, SIGNAL(toggled(bool)),
-            this, SLOT(setBonesSelectionEnabled(bool)) );
+//    mBonesSelection->setCheckable(":/icons/bonesSelectionDisabled.png");
+//    mBonesSelection->setChecked(false);
+//    connect(mBonesSelection, SIGNAL(toggled(bool)),
+//            this, SLOT(setBonesSelectionEnabled(bool)) );
 
 
     mToolBar = new QToolBar(this);
@@ -184,8 +184,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar->addSeparator();
     mToolBar->addWidget(mLocalPivot);
     mLocalPivot->setFocusPolicy(Qt::NoFocus);
-    mToolBar->addWidget(mBonesSelection);
-    mBonesSelection->setFocusPolicy(Qt::NoFocus);
+//    mToolBar->addWidget(mBonesSelection);
+//    mBonesSelection->setFocusPolicy(Qt::NoFocus);
     mToolBar->addSeparator();
 
     QWidget *spacerWidget = new QWidget(this);
@@ -314,12 +314,12 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
     } else if(event->key() == Qt::Key_Down) {
         Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(currCanvas == NULL) return false;
-        setCurrentFrame(currCanvas->prevRelFrameWithKey(
+        setCurrentFrame(currCanvas->prp_prevRelFrameWithKey(
                         mMainWindow->getCurrentFrame()));
     } else if(event->key() == Qt::Key_Up) {
         Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(currCanvas == NULL) return false;
-        setCurrentFrame(currCanvas->nextRelFrameWithKey(
+        setCurrentFrame(currCanvas->prp_nextRelFrameWithKey(
                         mMainWindow->getCurrentFrame()));
     } else if(event->key() == Qt::Key_P &&
               !(event->modifiers() & Qt::ControlModifier) &&
@@ -328,7 +328,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
     } else if(event->key() == Qt::Key_U &&
               !(event->modifiers() & Qt::ControlModifier) &&
               !(event->modifiers() & Qt::AltModifier)) {
-        mBonesSelection->toggle();
+        //mBonesSelection->toggle();
     } else {
         return false;
     }

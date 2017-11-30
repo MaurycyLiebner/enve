@@ -20,16 +20,20 @@ void EffectAnimators::applyEffectsSk(const SkBitmap &imgPtr,
                                      const fmt_filters::image &img,
                                      const qreal &scale) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PixmapEffect*)effect.data())->applySk(imgPtr,
-                                                img, scale);
+        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        if(pixmapEffect->isVisible()) {
+            pixmapEffect->applySk(imgPtr, img, scale);
+        }
     }
 }
 
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        qreal effectMargin = ((PixmapEffect*)effect.data())->getMargin();
-        newMargin += effectMargin;
+        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        if(pixmapEffect->isVisible()) {
+            newMargin += pixmapEffect->getMargin();
+        }
     }
     return newMargin;
 }
@@ -37,9 +41,10 @@ qreal EffectAnimators::getEffectsMargin() const {
 qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
     qreal newMargin = 0.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        qreal effectMargin = ((PixmapEffect*)effect.data())->
-                getMarginAtRelFrame(relFrame);
-        newMargin += effectMargin;
+        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        if(pixmapEffect->isVisible()) {
+            newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
+        }
     }
     return newMargin;
 }
@@ -48,9 +53,11 @@ void EffectAnimators::addEffectRenderDataToList(
         const int &relFrame,
         QList<PixmapEffectRenderData *> *pixmapEffects) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        pixmapEffects->append(
-                    ((PixmapEffect*)effect.data())->
-                     getPixmapEffectRenderDataForRelFrame(relFrame) );
+        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        if(pixmapEffect->isVisible()) {
+            pixmapEffects->append(pixmapEffect->
+                         getPixmapEffectRenderDataForRelFrame(relFrame) );
+        }
     }
 }
 

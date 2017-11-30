@@ -468,8 +468,8 @@ public:
     QRectF getRelBoundingRectAtRelFrame(const int &);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
-    int prevRelFrameWithKey(const int &relFrame);
-    int nextRelFrameWithKey(const int &relFrame);
+    int prp_prevRelFrameWithKey(const int &relFrame);
+    int prp_nextRelFrameWithKey(const int &relFrame);
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         Q_UNUSED(relFrame);
         return QMatrix();

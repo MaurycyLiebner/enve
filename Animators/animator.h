@@ -132,6 +132,8 @@ public:
 
     void disableFakeComplexAnimator();
     void disableFakeComplexAnimatrIfNotNeeded();
+    int anim_getPrevKeyRelFrame(const int &relFrame);
+    int anim_getNextKeyRelFrame(const int &relFrame);
 protected:
     int anim_getKeyIndex(Key *key);
 

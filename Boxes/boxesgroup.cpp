@@ -13,6 +13,9 @@
 #include "Boxes/particlebox.h"
 #include "durationrectangle.h"
 #include "linkbox.h"
+#include "Animators/animatorupdater.h"
+#include "PathEffects/patheffectanimators.h"
+#include "PathEffects/patheffect.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -25,11 +28,179 @@ BoxesGroup::BoxesGroup() :
     BoundingBox(BoundingBoxType::TYPE_GROUP) {
     setName("Group");
     mFillStrokeSettingsWidget = getMainWindow()->getFillStrokeSettings();
+    iniPathEffects();
 }
 
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     BoundingBox(BoundingBoxType::TYPE_CANVAS) {
     mFillStrokeSettingsWidget = fillStrokeSetting;
+    iniPathEffects();
+}
+
+int BoxesGroup::prp_nextRelFrameWithKey(const int &relFrame) {
+    int thisMinNextFrame = BoundingBox::prp_nextRelFrameWithKey(relFrame);
+    return thisMinNextFrame;
+    int minNextFrame = INT_MAX;
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
+        int boxNext = box->prp_nextRelFrameWithKey(boxRelFrame);
+        int absNext = box->prp_relFrameToAbsFrame(boxNext);
+        if(minNextFrame > absNext) {
+            minNextFrame = absNext;
+        }
+    }
+
+    return qMin(minNextFrame, thisMinNextFrame);
+}
+
+int BoxesGroup::prp_prevRelFrameWithKey(const int &relFrame) {
+    int thisMaxPrevFrame = BoundingBox::prp_nextRelFrameWithKey(relFrame);
+    return thisMaxPrevFrame;
+    int maxPrevFrame = INT_MIN;
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
+        int boxPrev = box->prp_prevRelFrameWithKey(boxRelFrame);
+        int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
+        if(maxPrevFrame < absPrev) {
+            maxPrevFrame = absPrev;
+        }
+    }
+    return qMax(maxPrevFrame, thisMaxPrevFrame);
+}
+
+void BoxesGroup::iniPathEffects() {
+    mPathEffectsAnimators =
+            (new PathEffectAnimators(false, false, this))->
+            ref<PathEffectAnimators>();
+    mPathEffectsAnimators->prp_setName("path effects");
+    mPathEffectsAnimators->prp_setBlockedUpdater(
+                new GroupAllPathsUpdater(this));
+    ca_addChildAnimator(mPathEffectsAnimators.data());
+    mPathEffectsAnimators->SWT_hide();
+
+    mFillPathEffectsAnimators =
+            (new PathEffectAnimators(false, true, this))->
+            ref<PathEffectAnimators>();
+    mFillPathEffectsAnimators->prp_setName("fill effects");
+    mFillPathEffectsAnimators->prp_setBlockedUpdater(
+                new GroupAllPathsUpdater(this));
+    ca_addChildAnimator(mFillPathEffectsAnimators.data());
+    mFillPathEffectsAnimators->SWT_hide();
+
+    mOutlinePathEffectsAnimators =
+            (new PathEffectAnimators(true, false, this))->
+            ref<PathEffectAnimators>();
+    mOutlinePathEffectsAnimators->prp_setName("outline effects");
+    mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
+                new GroupAllPathsUpdater(this));
+    ca_addChildAnimator(mOutlinePathEffectsAnimators.data());
+    mOutlinePathEffectsAnimators->SWT_hide();
+}
+
+void BoxesGroup::addPathEffect(PathEffect *effect) {
+    //effect->setUpdater(new PixmapEffectUpdater(this));
+
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        incReasonsNotToApplyUglyTransform();
+    }
+    if(!mPathEffectsAnimators->hasChildAnimators()) {
+        mPathEffectsAnimators->SWT_show();
+    }
+    mPathEffectsAnimators->ca_addChildAnimator(effect);
+    effect->setParentEffectAnimators(mPathEffectsAnimators.data());
+
+    clearAllCache();
+    updateAllChildPathBoxes();
+}
+
+void BoxesGroup::addFillPathEffect(PathEffect *effect) {
+    //effect->setUpdater(new PixmapEffectUpdater(this));
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        incReasonsNotToApplyUglyTransform();
+    }
+    if(!mFillPathEffectsAnimators->hasChildAnimators()) {
+        mFillPathEffectsAnimators->SWT_show();
+    }
+    mFillPathEffectsAnimators->ca_addChildAnimator(effect);
+    effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
+
+    clearAllCache();
+    updateAllChildPathBoxes();
+}
+
+void BoxesGroup::addOutlinePathEffect(PathEffect *effect) {
+    //effect->setUpdater(new PixmapEffectUpdater(this));
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        incReasonsNotToApplyUglyTransform();
+    }
+    if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
+        mOutlinePathEffectsAnimators->SWT_show();
+    }
+    mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
+    effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
+
+    clearAllCache();
+    updateAllChildPathBoxes();
+}
+
+void BoxesGroup::removePathEffect(PathEffect *effect) {
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        decReasonsNotToApplyUglyTransform();
+    }
+    mPathEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mPathEffectsAnimators->hasChildAnimators()) {
+        mPathEffectsAnimators->SWT_hide();
+    }
+
+    clearAllCache();
+    updateAllChildPathBoxes();
+}
+
+void BoxesGroup::removeFillPathEffect(PathEffect *effect) {
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        decReasonsNotToApplyUglyTransform();
+    }
+    mFillPathEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mFillPathEffectsAnimators->hasChildAnimators()) {
+        mFillPathEffectsAnimators->SWT_hide();
+    }
+
+    clearAllCache();
+    updateAllChildPathBoxes();
+}
+
+void BoxesGroup::removeOutlinePathEffect(PathEffect *effect) {
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        decReasonsNotToApplyUglyTransform();
+    }
+    mOutlinePathEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
+        mOutlinePathEffectsAnimators->SWT_hide();
+    }
+
+    clearAllCache();
+    updateAllChildPathBoxes();
+}
+
+void BoxesGroup::filterPathForRelFrame(const int &relFrame,
+                                       SkPath *srcDstPath) {
+    mPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
+}
+
+void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
+        const int &relFrame, SkPath *srcDstPath) {
+    mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThickness(relFrame,
+                                                                       srcDstPath);
+}
+
+void BoxesGroup::filterOutlinePathForRelFrame(const int &relFrame,
+                                              SkPath *srcDstPath) {
+    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
+}
+
+void BoxesGroup::filterFillPathForRelFrame(const int &relFrame,
+                                           SkPath *srcDstPath) {
+    mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
 }
 
 void BoxesGroup::prp_setParentFrameShift(const int &shift,

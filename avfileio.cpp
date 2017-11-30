@@ -347,9 +347,15 @@ void QStringAnimator::readProperty(QIODevice *target) {
 
 void PixmapEffect::writeProperty(QIODevice *target) {
     target->write((char*)&mType, sizeof(PixmapEffectType));
+    target->write((char*)&mVisible, sizeof(bool));
+}
+
+void PixmapEffect::readProperty(QIODevice *target) {
+    target->read((char*)&mVisible, sizeof(bool));
 }
 
 void BlurEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
     mHighQuality->readProperty(target);
     mBlurRadius->readProperty(target);
 }
@@ -361,6 +367,7 @@ void BlurEffect::writeProperty(QIODevice *target) {
 }
 
 void ShadowEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
     mHighQuality->readProperty(target);
     mBlurRadius->readProperty(target);
     mOpacity->readProperty(target);
@@ -378,6 +385,7 @@ void ShadowEffect::writeProperty(QIODevice *target) {
 }
 
 void DesaturateEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
     mInfluenceAnimator->readProperty(target);
 }
 
@@ -387,6 +395,7 @@ void DesaturateEffect::writeProperty(QIODevice *target) {
 }
 
 void ColorizeEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
     mHueAnimator->readProperty(target);
     mSaturationAnimator->readProperty(target);
     mLightnessAnimator->readProperty(target);
@@ -402,6 +411,7 @@ void ColorizeEffect::writeProperty(QIODevice *target) {
 }
 
 void ReplaceColorEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
     mFromColor->readProperty(target);
     mToColor->readProperty(target);
     mToleranceAnimator->readProperty(target);
@@ -623,6 +633,11 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
 
 void PathEffect::writeProperty(QIODevice *target) {
     target->write((char*)&mPathEffectType, sizeof(PathEffectType));
+    target->write((char*)mVisible, sizeof(bool));
+}
+
+void PathEffect::readProperty(QIODevice *target) {
+    target->read((char*)mVisible, sizeof(bool));
 }
 
 void DisplacePathEffect::writeProperty(QIODevice *target) {
@@ -633,6 +648,7 @@ void DisplacePathEffect::writeProperty(QIODevice *target) {
 }
 
 void DisplacePathEffect::readProperty(QIODevice *target) {
+    PathEffect::readProperty(target);
     mSegLength->readProperty(target);
     mMaxDev->readProperty(target);
     mSmoothness->readProperty(target);
@@ -644,6 +660,7 @@ void DuplicatePathEffect::writeProperty(QIODevice *target) {
 }
 
 void DuplicatePathEffect::readProperty(QIODevice *target) {
+    PathEffect::readProperty(target);
     mTranslation->readProperty(target);
 }
 
@@ -681,6 +698,7 @@ void SumPathEffect::writeProperty(QIODevice *target) {
 }
 
 void SumPathEffect::readProperty(QIODevice *target) {
+    PathEffect::readProperty(target);
     mBoxTarget->readProperty(target);
 }
 

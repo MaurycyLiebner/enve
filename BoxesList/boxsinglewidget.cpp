@@ -406,7 +406,12 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mContentButton->show();
 
-        mVisibleButton->hide();
+        if(target->SWT_isPixmapEffect() ||
+            target->SWT_isPathEffect()) {
+            mVisibleButton->show();
+        } else {
+            mVisibleButton->hide();
+        }
 
         mLockedButton->hide();
         mPropertyComboBox->hide();
@@ -999,6 +1004,24 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         }
 
+        if(target->SWT_isPixmapEffect()) {
+            if(((PixmapEffect*)target)->isVisible()) {
+                drawPixmapCentered(&p, mVisibleButton->geometry(),
+                                   *BoxSingleWidget::VISIBLE_PIXMAP);
+            } else {
+                drawPixmapCentered(&p, mVisibleButton->geometry(),
+                                   *BoxSingleWidget::INVISIBLE_PIXMAP);
+            }
+        } else if(target->SWT_isPathEffect()) {
+            if(((PathEffect*)target)->isVisible()) {
+                drawPixmapCentered(&p, mVisibleButton->geometry(),
+                                   *BoxSingleWidget::VISIBLE_PIXMAP);
+            } else {
+                drawPixmapCentered(&p, mVisibleButton->geometry(),
+                                   *BoxSingleWidget::INVISIBLE_PIXMAP);
+            }
+        }
+
         if(mTarget->contentVisible()) {
             drawPixmapCentered(&p, mContentButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
@@ -1064,7 +1087,14 @@ void BoxSingleWidget::switchRecordingAction() {
 }
 
 void BoxSingleWidget::switchBoxVisibleAction() {
-    ((BoundingBox*)mTarget->getTarget())->switchVisible();
+    SingleWidgetTarget *target = mTarget->getTarget();
+    if(target->SWT_isBoundingBox()) {
+        ((BoundingBox*)target)->switchVisible();
+    } else if(target->SWT_isPixmapEffect()) {
+        ((PixmapEffect*)target)->switchVisible();
+    } else if(target->SWT_isPathEffect()) {
+        ((PathEffect*)target)->switchVisible();
+    }
     MainWindow::getInstance()->callUpdateSchedulers();
     update();
 }

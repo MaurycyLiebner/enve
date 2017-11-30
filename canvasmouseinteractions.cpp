@@ -121,7 +121,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
     effectsMenu->addAction("Replace Color")->setObjectName(
                 "canvas_effects_replace_color");
 
-    if(hasPathBox) {
+    if(hasPathBox || hasGroups) {
         QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
         pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
                     "canvas_path_effects_discrete");
@@ -232,31 +232,19 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     } else if(selectedAction->objectName() == "canvas_setup_animation_frames") {
         PaintBoxSettingsDialog dialog;
         PaintBox *firstPaintBox = (PaintBox*)mSelectedBoxes.first();
-        int firstFrame = firstPaintBox->getFirstFrame();
         int frameStep = firstPaintBox->getFrameStep();
-        int frameCount = firstPaintBox->getFrameCount();
         int overlapFrames = firstPaintBox->getOverlapFrames();
-        dialog.setFirstFrame(firstFrame);
         dialog.setOverlapFrames(overlapFrames);
         dialog.setFrameStep(frameStep);
-        dialog.setFrameCount(frameCount);
         dialog.exec();
         if(dialog.result() == QDialog::Rejected) return true;
-        firstFrame = dialog.getFirstFrame();
         frameStep = dialog.getFrameStep();
-        frameCount = dialog.getFrameCount();
         overlapFrames = dialog.getOverlapFrames();
         foreach(BoundingBox *box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = (PaintBox*)box;
                 paintBox->setOverlapFrames(overlapFrames);
-                paintBox->setFirstFrame(firstFrame);
                 paintBox->setFrameStep(frameStep);
-                paintBox->setFrameCount(frameCount);
-                for(int i = firstFrame;
-                    i < frameCount*frameStep; i += frameStep) {
-                    paintBox->newEmptyPaintFrameAtFrame(i);
-                }
             }
         }
     } else if(selectedAction->objectName() == "canvas_load_from_img") {
@@ -282,7 +270,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     }
     return true;
 }
-
+#include "PathEffects/patheffect.h"
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
@@ -327,6 +315,30 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             effectsMenu->addAction("Oil");
             effectsMenu->addAction("Implode");
             effectsMenu->addAction("Desaturate");
+            QMenu *pathEffectsMenu = menu.addMenu("Path Effects");
+            pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                        "canvas_path_effects_discrete");
+            pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                        "canvas_path_effects_duplicate");
+            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+                        "canvas_path_effects_solidify");
+
+            QMenu *fillPathEffectsMenu = menu.addMenu("Fill Effects");
+            fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                        "canvas_fill_effects_discrete");
+            fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                        "canvas_fill_effects_duplicate");
+            fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
+                        "canvas_fill_effect_sum");
+
+            QMenu *outlinePathEffectsMenu = menu.addMenu("Outline Effects");
+            outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                        "canvas_outline_effects_discrete");
+            outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                        "canvas_outline_effects_duplicate");
+            outlinePathEffectsMenu->addAction("Operation Effect")->setObjectName(
+                        "canvas_outline_effect_sum");
+
 
             menu.addAction("Settings...");
 
@@ -352,6 +364,20 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     addEffect(new ImplodeEffect());
                 } else if(selectedAction->text() == "Desaturate") {
                     addEffect(new DesaturateEffect());
+                } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
+                    addPathEffect(new DisplacePathEffect(false));
+                } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
+                    addPathEffect(new DuplicatePathEffect(false));
+                } else if(selectedAction->objectName() == "canvas_path_effects_solidify") {
+                    addPathEffect(new SolidifyPathEffect(false));
+                } else if(selectedAction->objectName() == "canvas_fill_effects_discrete") {
+                    addFillPathEffect(new DisplacePathEffect(false));
+                } else if(selectedAction->objectName() == "canvas_fill_effects_duplicate") {
+                    addFillPathEffect(new DuplicatePathEffect(false));
+                } else if(selectedAction->objectName() == "canvas_outline_effects_discrete") {
+                    addOutlinePathEffect(new DisplacePathEffect(false));
+                } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
+                    addOutlinePathEffect(new DuplicatePathEffect(false));
                 } else { // link canvas
                     const QList<QAction*> &canvasActions =
                             linkCanvasMenu->actions();
@@ -972,6 +998,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     } else {
         handleMouseRelease();
     }
+    if(mIsMouseGrabbing) {
+        releaseMouseAndDontTrack();
+    }
     mLastPressedBone = NULL;
     mLastPressedBox = NULL;
     mHoveredPoint = mLastPressedPoint;
@@ -1142,9 +1171,9 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         callUpdateSchedulers();
         return;
     }
-    if(!(event->buttons() & Qt::MiddleButton) &&
+    if((!(event->buttons() & Qt::MiddleButton) &&
        !(event->buttons() & Qt::RightButton) &&
-       !(event->buttons() & Qt::LeftButton) &&
+       !(event->buttons() & Qt::LeftButton)) &&
        !mIsMouseGrabbing) {
         MovablePoint *lastHoveredPoint = mHoveredPoint;
         updateHoveredPoint();

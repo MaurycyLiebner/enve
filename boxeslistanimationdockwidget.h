@@ -121,7 +121,7 @@ private:
     ActionButton *mStopButton;
 
     ActionButton *mLocalPivot;
-    ActionButton *mBonesSelection;
+//    ActionButton *mBonesSelection;
 
     AnimationDockWidget *mAnimationDockWidget;
 

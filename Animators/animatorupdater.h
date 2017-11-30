@@ -7,6 +7,7 @@ class BoundingBox;
 class Gradient;
 class PathBox;
 class BasicTransformAnimator;
+class BoxesGroup;
 
 class AnimatorUpdater : public StdSelfRef
 {
@@ -42,6 +43,17 @@ public:
     void frameChangeUpdate();
 private:
     PathBox *mTarget;
+};
+
+class GroupAllPathsUpdater : public AnimatorUpdater {
+public:
+    GroupAllPathsUpdater(BoxesGroup *boxesGroup);
+
+    void update();
+
+    void frameChangeUpdate();
+private:
+    BoxesGroup *mTarget;
 };
 
 class GradientUpdater : public AnimatorUpdater

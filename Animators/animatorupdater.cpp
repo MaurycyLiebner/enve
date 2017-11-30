@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "Boxes/pathbox.h"
 #include "mainwindow.h"
+#include "Boxes/boxesgroup.h"
 
 TransformUpdater::TransformUpdater(BasicTransformAnimator *transformAnimator) {
     mTarget = transformAnimator;
@@ -189,4 +190,16 @@ RandomQrealGeneratorUpdater::RandomQrealGeneratorUpdater(
 #include "randomqrealgenerator.h"
 void RandomQrealGeneratorUpdater::update() {
     mTarget->generateData();
+}
+
+GroupAllPathsUpdater::GroupAllPathsUpdater(BoxesGroup *boxesGroup) {
+    mTarget = boxesGroup;
+}
+
+void GroupAllPathsUpdater::update() {
+    mTarget->updateAllChildPathBoxes();
+}
+
+void GroupAllPathsUpdater::frameChangeUpdate() {
+    mTarget->updateAllChildPathBoxes();
 }

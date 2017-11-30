@@ -1,6 +1,7 @@
 #ifndef PATHEFFECTANIMATORS_H
 #define PATHEFFECTANIMATORS_H
 class PathEffect;
+class BoundingBox;
 #include "Animators/complexanimator.h"
 #include "skiaincludes.h"
 class PathBox;
@@ -10,7 +11,7 @@ class PathEffectAnimators : public ComplexAnimator
 public:
     PathEffectAnimators(const bool &isOutline,
                         const bool &isFill,
-                        PathBox *parentPath);
+                        BoundingBox *parentPath);
     void addEffect(PathEffect *effect);
     bool hasEffects();
 
@@ -28,7 +29,7 @@ public:
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath);
     void removeEffect(PathEffect *effect);
-    PathBox *getParentBox() {
+    BoundingBox *getParentBox() {
         return mParentPath;
     }
     const bool &isOutline() const {
@@ -41,7 +42,7 @@ public:
 protected:
     bool mIsOutline;
     bool mIsFill;
-    PathBox *mParentPath = NULL;
+    BoundingBox *mParentPath = NULL;
 };
 
 

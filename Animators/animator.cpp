@@ -70,7 +70,27 @@ int Animator::anim_getNextKeyRelFrame(Key *key) {
     return nextKey->getRelFrame();
 }
 
+int Animator::anim_getNextKeyRelFrame(const int &relFrame) {
+    Key *key = anim_getNextKey(relFrame);
+    if(key == NULL) return INT_MAX;
+    Key *nextKey = key->getNextKey();
+    if(nextKey == NULL) {
+        return INT_MAX;
+    }
+    return nextKey->getRelFrame();
+}
+
 int Animator::anim_getPrevKeyRelFrame(Key *key) {
+    if(key == NULL) return INT_MIN;
+    Key *prevKey = key->getPrevKey();
+    if(prevKey == NULL) {
+        return INT_MIN;
+    }
+    return prevKey->getRelFrame();
+}
+
+int Animator::anim_getPrevKeyRelFrame(const int &relFrame) {
+    Key *key = anim_getPrevKey(relFrame);
     if(key == NULL) return INT_MIN;
     Key *prevKey = key->getPrevKey();
     if(prevKey == NULL) {
@@ -209,9 +229,14 @@ int Animator::anim_getClosestsKeyOccupiedRelFrame(const int &frame) {
     if(anim_mKeys.isEmpty()) return 0;
     int firstFrame = anim_mKeys.first()->getRelFrame();
     int lastFrame = anim_mKeys.last()->getRelFrame();
-    if(frame < firstFrame) return firstFrame;
-    if(frame > lastFrame) return lastFrame;
-    return frame;
+    if(frame <= firstFrame) return firstFrame;
+    if(frame >= lastFrame) return lastFrame;
+    Key *nextKey = anim_getNextKey(frame);
+    Key *prevKey = anim_getPrevKey(frame);
+    int nextDist = nextKey->getRelFrame() - frame;
+    int prevDist = frame - prevKey->getRelFrame();
+    if(nextDist > prevDist) prevKey->getRelFrame();
+    return nextKey->getRelFrame();
 }
 
 Key *Animator::anim_getKeyAtRelFrame(const int &frame) {

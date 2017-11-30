@@ -304,8 +304,8 @@ public:
     void resetTranslation();
     void resetRotation();
     BoxTransformAnimator *getTransformAnimator();
-    virtual VectorPath *objectToPath() { return NULL; }
-    virtual VectorPath *strokeToPath() { return NULL; }
+    virtual VectorPath *objectToVectorPathBox() { return NULL; }
+    virtual VectorPath *strokeToVectorPathBox() { return NULL; }
 
     void updatePrettyPixmap();
 
@@ -589,6 +589,7 @@ public:
         mPivotAutoAdjust = bT;
     }
 protected:
+    int mExpiredPixmap = 0;
     QPointF mSavedTransformPivot;
     bool mSelected = false;
     int mNReasonsNotToApplyUglyTransform = 0;
@@ -622,11 +623,9 @@ protected:
     BoxesGroup *mParentGroup = NULL;
     BasicTransformAnimator *mParentTransform = NULL;
 
-    QSharedPointer<EffectAnimators> mEffectsAnimators =
-            (new EffectAnimators())->ref<EffectAnimators>();
+    QSharedPointer<EffectAnimators> mEffectsAnimators;
 
-    QSharedPointer<BoxTransformAnimator> mTransformAnimator =
-                (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
+    QSharedPointer<BoxTransformAnimator> mTransformAnimator;
 
     int mZListIndex = 0;
     bool mPivotAutoAdjust = true;

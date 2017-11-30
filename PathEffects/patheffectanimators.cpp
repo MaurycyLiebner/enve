@@ -1,11 +1,12 @@
 #include "patheffectanimators.h"
 #include "patheffect.h"
 #include "Boxes/pathbox.h"
+#include "Boxes/boxesgroup.h"
 #include <QDebug>
 
 PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
                                          const bool &isFill,
-                                         PathBox *parentPath) :
+                                         BoundingBox *parentPath) :
     ComplexAnimator() {
     mIsOutline = isOutline;
     mIsFill = isFill;
@@ -13,22 +14,46 @@ PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
 }
 
 void PathEffectAnimators::addEffect(PathEffect *effect) {
-    if(mIsOutline) {
-        mParentPath->addOutlinePathEffect(effect);
-    } else if(mIsFill) {
-        mParentPath->addFillPathEffect(effect);
-    } else {
-        mParentPath->addPathEffect(effect);
+    if(mParentPath->SWT_isPathBox()) {
+        PathBox *pathBox = (PathBox*)mParentPath;
+        if(mIsOutline) {
+            pathBox->addOutlinePathEffect(effect);
+        } else if(mIsFill) {
+            pathBox->addFillPathEffect(effect);
+        } else {
+            pathBox->addPathEffect(effect);
+        }
+    } else if(mParentPath->SWT_isPathBox()) {
+        BoxesGroup *groupBox = (BoxesGroup*)mParentPath;
+        if(mIsOutline) {
+            groupBox->addOutlinePathEffect(effect);
+        } else if(mIsFill) {
+            groupBox->addFillPathEffect(effect);
+        } else {
+            groupBox->addPathEffect(effect);
+        }
     }
 }
 
 void PathEffectAnimators::removeEffect(PathEffect *effect) {
-    if(mIsOutline) {
-        mParentPath->removeOutlinePathEffect(effect);
-    } else if(mIsFill) {
-        mParentPath->removeFillPathEffect(effect);
-    } else {
-        mParentPath->removePathEffect(effect);
+    if(mParentPath->SWT_isPathBox()) {
+        PathBox *pathBox = (PathBox*)mParentPath;
+        if(mIsOutline) {
+            pathBox->removeOutlinePathEffect(effect);
+        } else if(mIsFill) {
+            pathBox->removeFillPathEffect(effect);
+        } else {
+            pathBox->removePathEffect(effect);
+        }
+    } else if(mParentPath->SWT_isPathBox()) {
+        BoxesGroup *groupBox = (BoxesGroup*)mParentPath;
+        if(mIsOutline) {
+            groupBox->removeOutlinePathEffect(effect);
+        } else if(mIsFill) {
+            groupBox->removeFillPathEffect(effect);
+        } else {
+            groupBox->removePathEffect(effect);
+        }
     }
 }
 
@@ -39,8 +64,11 @@ bool PathEffectAnimators::hasEffects() {
 void PathEffectAnimators::filterPath(SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        SkPath srcPath = dstPath;
-        ((PathEffect*)effect.data())->filterPath(srcPath, &dstPath);
+        PathEffect *pathEffect = ((PathEffect*)effect.data());
+        if(pathEffect->isVisible()) {
+            SkPath srcPath = dstPath;
+            pathEffect->filterPath(srcPath, &dstPath);
+        }
     }
     *srcDstPath = dstPath;
 }

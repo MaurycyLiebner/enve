@@ -47,9 +47,12 @@ PathBox::PathBox(const BoundingBoxType &type) :
             (new GradientPoints)->ref<GradientPoints>();
     mFillSettings->setTargetPathBox(this);
     mStrokeSettings->setTargetPathBox(this);
-
     ca_addChildAnimator(mFillSettings.data());
     ca_addChildAnimator(mStrokeSettings.data());
+    ca_moveChildAbove(mEffectsAnimators.data(), mStrokeSettings.data());
+    ca_addChildAnimator(mPathEffectsAnimators.data());
+    ca_addChildAnimator(mFillPathEffectsAnimators.data());
+    ca_addChildAnimator(mOutlinePathEffectsAnimators.data());
 
     mFillGradientPoints->initialize(this);
     mStrokeGradientPoints->initialize(this);
@@ -116,12 +119,16 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     pathData->editPath = getPathAtRelFrame(relFrame);
     pathData->path = pathData->editPath;
     mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+    mParentGroup->filterPathForRelFrame(relFrame, &pathData->path);
     //prp_thisRelFrameToParentRelFrame(relFrame);
 
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {
         SkPath outlineBase = pathData->path;
-        mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThickness(relFrame, &outlineBase);
+        mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThickness(
+                    relFrame, &outlineBase);
+        mParentGroup->filterOutlinePathBeforeThicknessForRelFrame(
+                    relFrame, &outlineBase);
         SkStroke strokerSk;
         mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
         outline = SkPath();
@@ -130,10 +137,13 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
         outline = SkPath();
     }
     mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
+    mParentGroup->filterOutlinePathForRelFrame(relFrame, &outline);
+
     pathData->outlinePath = outline;
     outline.addPath(pathData->path);
 
     mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+    mParentGroup->filterFillPathForRelFrame(relFrame, &pathData->path);
 
     UpdatePaintSettings *fillSettings = &pathData->paintSettings;
 
@@ -198,7 +208,7 @@ void PathBox::addPathEffect(PathEffect *effect) {
         incReasonsNotToApplyUglyTransform();
     }
     if(!mPathEffectsAnimators->hasChildAnimators()) {
-        ca_addChildAnimator(mPathEffectsAnimators.data());
+        mPathEffectsAnimators->SWT_show();
     }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mPathEffectsAnimators.data());
@@ -212,7 +222,7 @@ void PathBox::addFillPathEffect(PathEffect *effect) {
         incReasonsNotToApplyUglyTransform();
     }
     if(!mFillPathEffectsAnimators->hasChildAnimators()) {
-        ca_addChildAnimator(mFillPathEffectsAnimators.data());
+        mFillPathEffectsAnimators->SWT_show();
     }
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
@@ -226,7 +236,7 @@ void PathBox::addOutlinePathEffect(PathEffect *effect) {
         incReasonsNotToApplyUglyTransform();
     }
     if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
-        ca_addChildAnimator(mOutlinePathEffectsAnimators.data());
+        mOutlinePathEffectsAnimators->SWT_show();
     }
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
@@ -240,7 +250,7 @@ void PathBox::removePathEffect(PathEffect *effect) {
     }
     mPathEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mPathEffectsAnimators->hasChildAnimators()) {
-        ca_removeChildAnimator(mPathEffectsAnimators.data());
+        mPathEffectsAnimators->SWT_hide();
     }
 
     clearAllCache();
@@ -252,7 +262,7 @@ void PathBox::removeFillPathEffect(PathEffect *effect) {
     }
     mFillPathEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mFillPathEffectsAnimators->hasChildAnimators()) {
-        ca_removeChildAnimator(mFillPathEffectsAnimators.data());
+        mFillPathEffectsAnimators->SWT_hide();
     }
 
     clearAllCache();
@@ -264,7 +274,7 @@ void PathBox::removeOutlinePathEffect(PathEffect *effect) {
     }
     mOutlinePathEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
-        ca_removeChildAnimator(mOutlinePathEffectsAnimators.data());
+        mOutlinePathEffectsAnimators->SWT_hide();
     }
 
     clearAllCache();
@@ -424,8 +434,9 @@ void PathBox::setFillColorMode(const ColorMode &colorMode) {
 void PathBox::setStrokeColorMode(const ColorMode &colorMode) {
     mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
+
 #include "circle.h"
-VectorPath *PathBox::objectToPath() {
+VectorPath *PathBox::objectToVectorPathBox() {
     VectorPath *newPath = new VectorPath();
     if(SWT_isCircle()) {
         QPainterPath pathT;
@@ -446,7 +457,7 @@ VectorPath *PathBox::objectToPath() {
     return newPath;
 }
 
-VectorPath *PathBox::strokeToPath() {
+VectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return NULL;
     VectorPath *newPath = new VectorPath();
     newPath->loadPathFromSkPath(mOutlinePathSk);

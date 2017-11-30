@@ -96,7 +96,7 @@ public:
                      const bool &erase,
                      Brush *brush);
     void tabletReleaseEvent();
-    void tabletPressEvent(const qreal &xT,
+    virtual void tabletPressEvent(const qreal &xT,
                           const qreal &yT,
                           const ulong &time_stamp,
                           const qreal &pressure,

@@ -23,7 +23,10 @@ public:
     int getMinValue();
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+    void prp_startTransform();
+    void prp_finishTransform();
 protected:
+    bool mTransformed = false;
     int mMinValue = 0;
     int mMaxValue = 9999;
     int mValue = 0;

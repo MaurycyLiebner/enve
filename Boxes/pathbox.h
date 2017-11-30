@@ -86,8 +86,8 @@ public:
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
-    VectorPath *objectToPath();
-    VectorPath *strokeToPath();
+    VectorPath *objectToVectorPathBox();
+    VectorPath *strokeToVectorPathBox();
 
     const SkPath &getRelativePath() const;
     bool relPointInsidePath(const QPointF &relPos);
@@ -118,10 +118,6 @@ public:
 
     bool SWT_isPathBox() { return true; }
 
-    void addPathEffect(PathEffect *effect);
-    void addFillPathEffect(PathEffect *effect);
-    void addOutlinePathEffect(PathEffect *effect);
-
     void setupBoundingBoxRenderDataForRelFrame(
                                 const int &relFrame,
                                 BoundingBoxRenderData *data);
@@ -147,6 +143,9 @@ public:
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
+    void addPathEffect(PathEffect *effect);
+    void addFillPathEffect(PathEffect *effect);
+    void addOutlinePathEffect(PathEffect *effect);
     void removePathEffect(PathEffect *effect);
     void removeFillPathEffect(PathEffect *effect);
     void removeOutlinePathEffect(PathEffect *effect);

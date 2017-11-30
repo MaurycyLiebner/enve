@@ -3,7 +3,7 @@
 #include "pathpivot.h"
 #include "Boxes/bone.h"
 
-int Canvas::nextRelFrameWithKey(const int &relFrame) {
+int Canvas::prp_nextRelFrameWithKey(const int &relFrame) {
     int minNextFrame = INT_MAX;
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
@@ -19,7 +19,7 @@ int Canvas::nextRelFrameWithKey(const int &relFrame) {
     return minNextFrame;
 }
 
-int Canvas::prevRelFrameWithKey(const int &relFrame) {
+int Canvas::prp_prevRelFrameWithKey(const int &relFrame) {
     int maxPrevFrame = INT_MIN;
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
@@ -83,13 +83,13 @@ void Canvas::flipSelectedBoxesVertically() {
 
 void Canvas::convertSelectedBoxesToPath() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->objectToPath();
+        box->objectToVectorPathBox();
     }
 }
 
 void Canvas::convertSelectedPathStrokesToPath() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->strokeToPath();
+        box->strokeToVectorPathBox();
     }
 }
 
@@ -174,22 +174,25 @@ void Canvas::applyColorizeEffectToSelected() {
 #include "PathEffects/patheffect.h"
 void Canvas::applyDiscretePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addPathEffect(new DisplacePathEffect(false));
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addPathEffect(new DisplacePathEffect(false));
+        }
     }
 }
 
 void Canvas::applyDuplicatePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addPathEffect(new DuplicatePathEffect(false));
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addPathEffect(new DuplicatePathEffect(false));
+        }
     }
 }
 
 void Canvas::applySolidifyPathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addPathEffect(new SolidifyPathEffect(false));
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addPathEffect(new SolidifyPathEffect(false));
+        }
     }
 }
 
@@ -202,15 +205,17 @@ void Canvas::applySumPathEffectToSelected() {
 
 void Canvas::applyDiscreteFillPathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addFillPathEffect(new DisplacePathEffect(false));
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addFillPathEffect(new DisplacePathEffect(false));
+        }
     }
 }
 
 void Canvas::applyDuplicateFillPathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addFillPathEffect(new DuplicatePathEffect(false));
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addFillPathEffect(new DuplicatePathEffect(false));
+        }
     }
 }
 
@@ -224,15 +229,17 @@ void Canvas::applySumFillPathEffectToSelected() {
 
 void Canvas::applyDiscreteOutlinePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addOutlinePathEffect(new DisplacePathEffect(true));
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addOutlinePathEffect(new DisplacePathEffect(false));
+        }
     }
 }
 
 void Canvas::applyDuplicateOutlinePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addOutlinePathEffect(new DuplicatePathEffect(true));
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addOutlinePathEffect(new DuplicatePathEffect(false));
+        }
     }
 }
 
@@ -871,7 +878,7 @@ void Canvas::selectedPathsCombine() {
                         addAllSinglePathsToAnimator(
                             firstVectorPath->getPathAnimator());
             } else {
-                VectorPath *boxPath = ((VectorPath*)box)->objectToPath();
+                VectorPath *boxPath = ((VectorPath*)box)->objectToVectorPathBox();
                 QMatrix relTransf = boxPath->getCombinedTransform()*
                         firstTranf.inverted();
                 boxPath->getPathAnimator()->applyTransformToPoints(relTransf);

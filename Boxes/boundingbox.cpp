@@ -20,12 +20,17 @@ QList<FunctionWaitingForBoxLoad*> BoundingBox::mFunctionsWaitingForBoxLoad;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator() {
+    mTransformAnimator =
+            (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
+    ca_addChildAnimator(mTransformAnimator.data());
+
+    mEffectsAnimators = (new EffectAnimators())->ref<EffectAnimators>();
     mEffectsAnimators->prp_setName("effects");
     mEffectsAnimators->setParentBox(this);
     mEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
     mEffectsAnimators->prp_blockUpdater();
-
-    ca_addChildAnimator(mTransformAnimator.data());
+    ca_addChildAnimator(mEffectsAnimators.data());
+    mEffectsAnimators->SWT_hide();
 
     mType = type;
 
@@ -363,6 +368,7 @@ void BoundingBox::scheduleUpdate() {
         return;
     }
     mRedoUpdate = false;
+    mExpiredPixmap++;
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
@@ -671,7 +677,7 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
 
     if(!mEffectsAnimators->hasChildAnimators()) {
-        ca_addChildAnimator(mEffectsAnimators.data());
+        mEffectsAnimators->SWT_show();
     }
     mEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mEffectsAnimators.data());
@@ -682,7 +688,7 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
 void BoundingBox::removeEffect(PixmapEffect *effect) {
     mEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mEffectsAnimators->hasChildAnimators()) {
-        ca_removeChildAnimator(mEffectsAnimators.data());
+        mEffectsAnimators->SWT_hide();
     }
 
     clearAllCache();
@@ -1107,6 +1113,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
+    mExpiredPixmap--;
     if(mRedoUpdate) {
         scheduleUpdate();
     }

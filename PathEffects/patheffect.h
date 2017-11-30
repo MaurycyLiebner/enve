@@ -51,6 +51,8 @@ public:
                                        const SkPath &,
                                        SkPath *) = 0;
     virtual void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
+
     bool applyBeforeThickness() {
         if(mApplyBeforeThickness == NULL) return false;
         return mApplyBeforeThickness->getValue();
@@ -82,8 +84,14 @@ public:
         }
     }
 
+    void switchVisible() {
+        setVisible(!mVisible);
+    }
+
     void setVisible(const bool &bT) {
+        if(bT == mVisible) return;
         mVisible = bT;
+        prp_updateInfluenceRangeAfterChanged();
     }
 
     const bool &isVisible() {

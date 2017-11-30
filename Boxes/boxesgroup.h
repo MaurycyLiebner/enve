@@ -217,7 +217,40 @@ public:
     }
     BoundingBox *createLink();
     void readChildBoxes(QIODevice *target);
+
+    void addPathEffect(PathEffect *effect);
+    void addFillPathEffect(PathEffect *effect);
+    void addOutlinePathEffect(PathEffect *effect);
+    void removePathEffect(PathEffect *effect);
+    void removeFillPathEffect(PathEffect *effect);
+    void removeOutlinePathEffect(PathEffect *effect);
+
+    void updateAllChildPathBoxes() {
+        foreach(const QSharedPointer<BoundingBox> &box,
+                mContainedBoxes) {
+            if(box->SWT_isPathBox()) {
+                box->scheduleUpdate();
+            } else if(box->SWT_isBoxesGroup()) {
+                ((BoxesGroup*)box.data())->updateAllChildPathBoxes();
+            }
+        }
+    }
+
+    void filterPathForRelFrame(const int &relFrame,
+                               SkPath *srcDstPath);
+    void filterOutlinePathBeforeThicknessForRelFrame(
+            const int &relFrame, SkPath *srcDstPath);
+    void filterOutlinePathForRelFrame(const int &relFrame,
+                               SkPath *srcDstPath);
+    void filterFillPathForRelFrame(const int &relFrame,
+                                   SkPath *srcDstPath);
+    int prp_nextRelFrameWithKey(const int &relFrame);
+    int prp_prevRelFrameWithKey(const int &relFrame);
 protected:
+    PathEffectAnimatorsQSPtr mPathEffectsAnimators;
+    PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
+    PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
+
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
@@ -226,6 +259,7 @@ protected:
 
     //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getChildBoxIndex(BoundingBox *child);
+    void iniPathEffects();
 signals:
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);

@@ -294,8 +294,7 @@ void replaceColor(const image &im,
 //}
 
 // brightness tool
-void brightness(const image &im, s32 bn)
-{
+void anim_brightness(const image &im, qreal bn) {
     // check if all parameters are good
     if(!checkImage(im))
     return;
@@ -304,28 +303,50 @@ void brightness(const image &im, s32 bn)
     s32 val;
 
     // add to all color components 'bn' value, and check if the result is out of bounds.
-    for(s32 y = 0;y < im.h;++y)
-    {
+    for(s32 y = 0; y < im.h; ++y) {
         bits = im.data + im.rw * y * sizeof(rgba);
 
-        for(s32 x = 0;x < im.w;x++)
-        {
-            for(s32 v = 0;v < 3;v++)
-            {
+        for(s32 x = 0; x < im.w; x++) {
+            for(s32 v = 0; v < 3; v++) {
                 val = bn + *bits;
-            *bits = val < 0 ? 0 : (val > 255 ? 255 : val);
+                *bits = val < 0 ? 0 : (val > 255 ? 255 : (u8)val);
 
                 bits++;
             }
 
-        bits++;
+            bits++;
+        }
+    }
+}
+
+// brightness tool
+void brightness(const image &im, s32 bn) {
+    // check if all parameters are good
+    if(!checkImage(im))
+    return;
+
+    u8 *bits;
+    s32 val;
+
+    // add to all color components 'bn' value, and check if the result is out of bounds.
+    for(s32 y = 0; y < im.h; ++y) {
+        bits = im.data + im.rw * y * sizeof(rgba);
+
+        for(s32 x = 0; x < im.w; x++) {
+            for(s32 v = 0; v < 3; v++) {
+                val = bn + *bits;
+                *bits = val < 0 ? 0 : (val > 255 ? 255 : val);
+
+                bits++;
+            }
+
+            bits++;
         }
     }
 }
 
 // gamma tool
-void gamma(const image &im, qreal L)
-{
+void gamma(const image &im, qreal L) {
     // check if all parameters are good
     if(!checkImage(im))
     return;
@@ -343,15 +364,13 @@ void gamma(const image &im, qreal L)
     GT[x] = (u8)round(255 * pow((double)x / 255.0, 1.0 / L));
 
     // now change gamma
-    for(s32 y = 0;y < im.h;++y)
-    {
+    for(s32 y = 0;y < im.h;++y) {
         _rgba = (rgba *)im.data + im.rw * y;
 
-        for(s32 x = 0;x < im.w;x++)
-        {
-        R = _rgba[x].r;
-        G = _rgba[x].g;
-        B = _rgba[x].b;
+        for(s32 x = 0;x < im.w;x++) {
+            R = _rgba[x].r;
+            G = _rgba[x].g;
+            B = _rgba[x].b;
 
             _rgba[x].r = GT[R];
             _rgba[x].g = GT[G];
@@ -360,11 +379,8 @@ void gamma(const image &im, qreal L)
     }
 }
 
-// contrast tool
-void contrast(const image &im, s32 contrast)
-{
-    if(!checkImage(im) || !contrast)
-        return;
+void anim_contrast(const image &im, qreal contrast) {
+    if(!checkImage(im) || !contrast) return;
 
     if(contrast < -255) contrast = -255;
     if(contrast >  255) contrast = 255;
@@ -375,8 +391,55 @@ void contrast(const image &im, s32 contrast)
 
     // calculate the average values for RED, GREEN and BLUE
     // color components
-    for(s32 y = 0;y < im.h;y++)
-    {
+    for(s32 y = 0; y < im.h; y++) {
+        bits = (rgba *)im.data + im.rw * y;
+
+        for(s32 x = 0;x < im.w;x++) {
+            Ra += bits->r;
+            Ga += bits->g;
+            Ba += bits->b;
+
+            bits++;
+        }
+    }
+
+    s32 S = im.w * im.h;
+
+    Ravg = Ra / S;
+    Gavg = Ga / S;
+    Bavg = Ba / S;
+
+    for(s32 y = 0;y < im.h;y++) {
+        bits = (rgba *)im.data + im.rw * y;
+
+        for(s32 x = 0; x < im.w; x++) {
+            Rn = (contrast > 0) ? ((bits->r - Ravg) * 256 / (256 - contrast) + Ravg) : ((bits->r - Ravg) * (256 + contrast) / 256 + Ravg);
+            Gn = (contrast > 0) ? ((bits->g - Gavg) * 256 / (256 - contrast) + Gavg) : ((bits->g - Gavg) * (256 + contrast) / 256 + Gavg);
+            Bn = (contrast > 0) ? ((bits->b - Bavg) * 256 / (256 - contrast) + Bavg) : ((bits->b - Bavg) * (256 + contrast) / 256 + Bavg);
+
+            bits->r = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
+            bits->g = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
+            bits->b = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
+
+            bits++;
+        }
+    }
+}
+
+// contrast tool
+void contrast(const image &im, s32 contrast) {
+    if(!checkImage(im) || !contrast) return;
+
+    if(contrast < -255) contrast = -255;
+    if(contrast >  255) contrast = 255;
+
+    rgba *bits;
+    u8 Ravg, Gavg, Bavg;
+    s32 Ra = 0, Ga = 0, Ba = 0, Rn, Gn, Bn;
+
+    // calculate the average values for RED, GREEN and BLUE
+    // color components
+    for(s32 y = 0; y < im.h; y++) {
         bits = (rgba *)im.data + im.rw * y;
 
         for(s32 x = 0;x < im.w;x++)
@@ -405,21 +468,19 @@ void contrast(const image &im, s32 contrast)
     //   I - current color component value
     //   Avg - average value of this component (Ravg, Gavg or Bavg)
     //
-    for(s32 y = 0;y < im.h;y++)
-    {
+    for(s32 y = 0;y < im.h;y++) {
         bits = (rgba *)im.data + im.rw * y;
 
-        for(s32 x = 0;x < im.w;x++)
-        {
-        Rn = (contrast > 0) ? ((bits->r - Ravg) * 256 / (256 - contrast) + Ravg) : ((bits->r - Ravg) * (256 + contrast) / 256 + Ravg);
-        Gn = (contrast > 0) ? ((bits->g - Gavg) * 256 / (256 - contrast) + Gavg) : ((bits->g - Gavg) * (256 + contrast) / 256 + Gavg);
-        Bn = (contrast > 0) ? ((bits->b - Bavg) * 256 / (256 - contrast) + Bavg) : ((bits->b - Bavg) * (256 + contrast) / 256 + Bavg);
+        for(s32 x = 0; x < im.w; x++) {
+            Rn = (contrast > 0) ? ((bits->r - Ravg) * 256 / (256 - contrast) + Ravg) : ((bits->r - Ravg) * (256 + contrast) / 256 + Ravg);
+            Gn = (contrast > 0) ? ((bits->g - Gavg) * 256 / (256 - contrast) + Gavg) : ((bits->g - Gavg) * (256 + contrast) / 256 + Gavg);
+            Bn = (contrast > 0) ? ((bits->b - Bavg) * 256 / (256 - contrast) + Bavg) : ((bits->b - Bavg) * (256 + contrast) / 256 + Bavg);
 
-        bits->r = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
-        bits->g = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
-        bits->b = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
+            bits->r = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
+            bits->g = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
+            bits->b = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
 
-        bits++;
+            bits++;
         }
     }
 }

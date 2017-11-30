@@ -254,15 +254,27 @@ void Canvas::renderSk(SkCanvas *canvas) {
                                                 getMaxBoundsRect())),
                              paint);
         }
-
+        bool drawCanvas =
+                mEffectsAnimators->hasEffects() &&
+                mCurrentPreviewContainer != NULL &&
+                mExpiredPixmap == 0;
         drawTransparencyMesh(canvas, viewRect);
-        paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
-        canvas->drawRect(viewRect, paint);
+        if(!drawCanvas) {
+            paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
+            canvas->drawRect(viewRect, paint);
+        }
 
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         canvas->saveLayer(NULL, NULL);
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes){
-            box->drawPixmapSk(canvas);
+        if(!mClipToCanvasSize || !drawCanvas) {
+            Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes){
+                box->drawPixmapSk(canvas);
+            }
+        }
+        if(drawCanvas) {
+            SkScalar reversedRes = 1./mResolutionFraction;
+            canvas->scale(reversedRes, reversedRes);
+            mCurrentPreviewContainer->drawSk(canvas);
         }
         canvas->restore();
 #endif
@@ -511,6 +523,7 @@ void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
+    mExpiredPixmap--;
     if(mRedoUpdate) {
         scheduleUpdate();
     }
@@ -671,8 +684,11 @@ void Canvas::updatePivot() {
 }
 
 void Canvas::setCanvasMode(const CanvasMode &mode) {
-    mCurrentMode = mode;
+    if(mIsMouseGrabbing) {
+        handleMouseRelease();
+    }
 
+    mCurrentMode = mode;
     mSelecting = false;
     mHoveredPoint = NULL;
     clearHoveredEdge();
@@ -1255,7 +1271,7 @@ CanvasRenderData::CanvasRenderData(BoundingBox *parentBoxT) :
     BoxesGroupRenderData(parentBoxT) {
 
 }
-
+#include "PixmapEffects/fmt_filters.h"
 void CanvasRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
@@ -1272,6 +1288,17 @@ void CanvasRenderData::renderToImage() {
 
     drawSk(rasterCanvas);
     rasterCanvas->flush();
+
+    if(!pixmapEffects.isEmpty()) {
+        SkPixmap pixmap;
+        bitmap.peekPixels(&pixmap);
+        fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
+                               pixmap.width(), pixmap.height());
+        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+            effect->applyEffectsSk(bitmap, img, resolution);
+        }
+        clearPixmapEffects();
+    }
 
     renderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();

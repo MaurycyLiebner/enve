@@ -247,8 +247,7 @@ bool ComplexAnimator::hasChildAnimators() {
     return !ca_mChildAnimators.isEmpty();
 }
 
-void ComplexAnimator::prp_startTransform()
-{
+void ComplexAnimator::prp_startTransform() {
     Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_startTransform();
     }

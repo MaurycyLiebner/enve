@@ -117,32 +117,20 @@ public:
     const int &getFrameStep() {
         return mFrameStep;
     }
-    void setFrameCount(const int &frameCount) {
-        mFrameCount = frameCount;
-    }
 
-    const int &getFrameCount() {
-        return mFrameCount;
-    }
-    void setFirstFrame(const int &firstFrame) {
-        mFirstFrame = firstFrame;
-    }
-
-    const int &getFirstFrame() {
-        return mFirstFrame;
-    }
     void finishSizeAndPosSetup();
     void scheduleFinishSizeSetup();
     void scheduleFinishSizeAndPosSetup();
     void loadFromImage(const QImage &img);
+    int prp_nextRelFrameWithKey(const int &relFrame);
+    int prp_prevRelFrameWithKey(const int &relFrame);
+    int anim_getClosestsKeyOccupiedRelFrame(const int &frame);
 private:
     bool mFinishSizeAndPosSetupScheduled = false;
     bool mFinishSizeSetupScheduled = false;
 
-    int mOverlapFrames = INT_MIN;
-    int mFrameStep = INT_MIN;
-    int mFrameCount = INT_MIN;
-    int mFirstFrame = INT_MIN;
+    int mOverlapFrames = 1;
+    int mFrameStep = 1;
     PointAnimator *mTopLeftPoint = NULL;
     PointAnimator *mBottomRightPoint = NULL;
     ushort mWidth = 0;

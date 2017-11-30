@@ -103,13 +103,27 @@ public:
 
     bool SWT_isPixmapEffect() { return true; }
 
-
     virtual void writeProperty(QIODevice *target);
+    void switchVisible() {
+        setVisible(!mVisible);
+    }
+
+    void setVisible(const bool &visible) {
+        if(visible == mVisible) return;
+        mVisible = visible;
+        prp_updateInfluenceRangeAfterChanged();
+    }
+
+    const bool &isVisible() {
+        return mVisible;
+    }
+    void readProperty(QIODevice *target);
 public slots:
     void interrupt() {
         mInterrupted = true;
     }
 protected:
+    bool mVisible = true;
     EffectAnimators *mParentEffects = NULL;
     PixmapEffectType mType;
     bool mInterrupted = false;

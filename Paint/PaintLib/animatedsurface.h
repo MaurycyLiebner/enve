@@ -81,6 +81,13 @@ public:
     }
     Key *readKey(QIODevice *target);
     void move(const int &xT, const int &yT);
+
+    void tabletPressEvent(const qreal &xT,
+                          const qreal &yT,
+                          const ulong &time_stamp,
+                          const qreal &pressure,
+                          const bool &erase,
+                          Brush *brush);
 protected:
     PaintBox *mParentBox = NULL;
 

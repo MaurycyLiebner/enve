@@ -151,7 +151,7 @@ void AnimatedSurface::updateTargetTiles() {
     mCurrentTiles->setCurrentlyUsed(true);
 }
 
-void AnimatedSurface::setCurrentRelFrame(const int &relFrame) {
+void AnimatedSurface::setCurrentRelFtilesDatarame(const int &relFrame) {
     anim_mCurrentRelFrame = relFrame;
     updateTargetTiles();
 }
@@ -165,6 +165,8 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
     } else {
         int countT = mDrawTilesFrames.count();
         int prevRelFrame = INT_MIN;
+        qreal hueStep = 1./countT;
+        qreal hueChange = 0.;
         for(int i = 0; i < countT; i++) {
             const int &relFrame = mDrawTilesFrames.at(i);
             std::shared_ptr<TilesData> tilesData = mDrawTilesData.at(i);
@@ -179,6 +181,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
             } else {
                 neighRelFrame = prevRelFrame;
             }
+            tilesData-
             ::getTileDrawers(tilesData, relFrame,
                              neighRelFrame, anim_mCurrentRelFrame,
                              mOverlapFrames,
@@ -241,6 +244,16 @@ void AnimatedSurface::move(const int &xT, const int &yT) {
     } else {
         Surface::move(xT, yT);
     }
+}
+
+void AnimatedSurface::tabletPressEvent(const qreal &xT, const qreal &yT,
+                                       const ulong &time_stamp,
+                                       const qreal &pressure,
+                                       const bool &erase, Brush *brush) {
+    if(prp_isRecording()) {
+        newEmptyPaintFrame();
+    }
+    Surface::tabletPressEvent(xT, yT, time_stamp, pressure, erase, brush);
 }
 
 bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,

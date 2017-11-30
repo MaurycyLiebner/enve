@@ -29,11 +29,30 @@ void IntProperty::setCurrentValue(const int &value,
     mValue = newValue;
     if(finish) {
         prp_updateInfluenceRangeAfterChanged();
+        prp_callFinishUpdater();
     }
 
     emit valueChangedSignal(mValue);
     if(callUpdater) {
         prp_callUpdater();
+    }
+}
+
+void IntProperty::prp_startTransform() {
+    if(mTransformed) return;
+
+    //mSavedCurrentValue = mCurrentValue;
+    mTransformed = true;
+}
+
+void IntProperty::prp_finishTransform() {
+    if(mTransformed) {
+//        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
+//                                                 mCurrentValue,
+//                                                 this) );
+        mTransformed = false;
+
+        prp_callFinishUpdater();
     }
 }
 
