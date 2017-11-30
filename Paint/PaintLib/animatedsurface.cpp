@@ -6,7 +6,7 @@ void getTileDrawers(const std::shared_ptr<TilesData> &drawTilesData,
                     const int &neighDrawerRelFrame,
                     const int &currRelFrame,
                     const int &additionalFrames,
-                    QList<TileSkDrawer*> *tileDrawers) {
+                    QList<TileSkDrawerCollection> *tileDrawers) {
     int alpha;
     if(neighDrawerRelFrame == INT_MIN ||
        neighDrawerRelFrame == INT_MAX) {
@@ -17,7 +17,10 @@ void getTileDrawers(const std::shared_ptr<TilesData> &drawTilesData,
         qreal alphaT = dFrame*1./dR;
         alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
     }
-    drawTilesData->getTileDrawers(tileDrawers, alpha);
+    TileSkDrawerCollection coll;
+    coll.alpha = alpha;
+    drawTilesData->getTileDrawers(&coll.drawers);
+    tileDrawers->append(coll);
 }
 
 AnimatedSurface::AnimatedSurface(const ushort &widthT,
@@ -151,22 +154,21 @@ void AnimatedSurface::updateTargetTiles() {
     mCurrentTiles->setCurrentlyUsed(true);
 }
 
-void AnimatedSurface::setCurrentRelFtilesDatarame(const int &relFrame) {
+void AnimatedSurface::setCurrentRelFrame(const int &relFrame) {
     anim_mCurrentRelFrame = relFrame;
     updateTargetTiles();
 }
 
-void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
+void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers) {
     if(mDrawTilesFrames.isEmpty()) {
-        ::getTileDrawers(mCurrentTiles, 0,
-                         INT_MIN, anim_mCurrentRelFrame,
-                         mOverlapFrames,
-                         tileDrawers);
+        TileSkDrawerCollection coll;
+        mCurrentTiles->getTileDrawers(&coll.drawers);
+        tileDrawers->append(coll);
     } else {
         int countT = mDrawTilesFrames.count();
         int prevRelFrame = INT_MIN;
         qreal hueStep = 1./countT;
-        qreal hueChange = 0.;
+        qreal hueT = 0.;
         for(int i = 0; i < countT; i++) {
             const int &relFrame = mDrawTilesFrames.at(i);
             std::shared_ptr<TilesData> tilesData = mDrawTilesData.at(i);
@@ -181,11 +183,33 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
             } else {
                 neighRelFrame = prevRelFrame;
             }
-            tilesData-
-            ::getTileDrawers(tilesData, relFrame,
-                             neighRelFrame, anim_mCurrentRelFrame,
-                             mOverlapFrames,
-                             tileDrawers);
+//            ::getTileDrawers(tilesData, relFrame,
+//                             neighRelFrame, anim_mCurrentRelFrame,
+//                             mOverlapFrames,
+//                             tileDrawers);
+
+            int alpha;
+            if(neighRelFrame == INT_MIN ||
+               neighRelFrame == INT_MAX) {
+                alpha = 255;
+            } else {
+                int dR = qAbs(relFrame - neighRelFrame) + mOverlapFrames;
+                int dFrame = qAbs(relFrame - anim_mCurrentRelFrame);
+                qreal alphaT = dFrame*1./dR;
+                alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
+            }
+            TileSkDrawerCollection coll;
+            coll.alpha = alpha;
+            tilesData->getTileDrawers(&coll.drawers);
+            bool hueChange = tilesData.get() != mCurrentTiles.get();
+            coll.setHueChangeEnabled(hueChange);
+
+            if(hueChange) {
+                coll.setHue(hueT);
+                hueT += hueStep;
+            }
+
+            tileDrawers->append(coll);
 
             prevRelFrame = relFrame;
         }

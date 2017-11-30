@@ -71,6 +71,56 @@ struct TileSkDrawer : public Updatable {
     ushort posY;
     ushort maxPaintY = 0;
     ushort maxPaintX = 0;
+};
+#include "Colors/color.h"
+struct TileSkDrawerCollection {
+    TileSkDrawerCollection() {}
+//    ~TileSkDrawerCollection();
+
+    void drawSk(SkCanvas *canvas) const {
+        if(hueChange) {
+            SkPaint paint;
+            paint.setAlpha(alpha);
+            paint.setBlendMode(SkBlendMode::kDstIn);
+            canvas->saveLayer(NULL, NULL);
+            canvas->clear(hueCol);
+            foreach(TileSkDrawer *drawer, drawers) {
+                drawer->drawSk(canvas, &paint);
+            }
+            canvas->restore();
+        } else {
+            SkPaint paint;
+            paint.setAlpha(alpha);
+            foreach(TileSkDrawer *drawer, drawers) {
+                drawer->drawSk(canvas, &paint);
+            }
+        }
+    }
+
+    void addTileSkDrawer(TileSkDrawer *drawer) {
+        drawers << drawer;
+    }
+
+    void setHueChangeEnabled(const bool &bT) {
+        hueChange = bT;
+    }
+
+    void setHue(const qreal &hueT) {
+        Color col;
+        col.setHSV(hueT, 1., 1.);
+        hueCol = col.getSkColor();
+    }
+//    void processUpdate();
+
+//    void schedulerProccessed();
+
+//    void afterUpdate();
+
+//    void clearImg();
+
+    QList<TileSkDrawer*> drawers;
+    bool hueChange = false;
+    SkColor hueCol;
     uchar alpha = 255;
 };
 

@@ -59,18 +59,6 @@ void TilesData::getTileDrawers(QList<TileSkDrawer *> *tileDrawers) {
     }
 }
 
-void TilesData::getTileDrawers(QList<TileSkDrawer *> *tileDrawers,
-                               const int &alpha) {
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            TileSkDrawer *tileDrawer =
-                    mTiles[j][i]->getTexTileDrawer();
-            tileDrawer->alpha = alpha;
-            tileDrawers->append(tileDrawer);
-        }
-    }
-}
-
 void TilesData::saveToTmp() {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {

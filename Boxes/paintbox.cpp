@@ -274,9 +274,11 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrame(
     PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
     if(mMainHandler == NULL) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
-    foreach(TileSkDrawer *drawer, paintData->tileDrawers) {
-        if(!drawer->finished()) {
-            drawer->addDependent(paintData);
+    foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
+        foreach(TileSkDrawer *drawerT, drawer.drawers) {
+            if(!drawerT->finished()) {
+                drawerT->addDependent(paintData);
+            }
         }
     }
     QPointF topLeft;
@@ -410,7 +412,7 @@ void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
     SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->translate(trans.x(), trans.y());
-    foreach(TileSkDrawer *tile, tileDrawers) {
-        tile->drawSk(canvas, &paint);
+    foreach(const TileSkDrawerCollection &tile, tileDrawers) {
+        tile.drawSk(canvas);
     }
 }

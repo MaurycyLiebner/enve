@@ -47,7 +47,7 @@ public:
     Tile ***getTilesAfterRelFrame(const int &relFrame,
                                   int *foundAtRelFrame = NULL);
     bool getSurfaceFrameIdAfterRelFrame(const int &relFrame, int *id);
-    void getTileDrawers(QList<TileSkDrawer *> *tileDrawers);
+    void getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers);
     void setSize(const ushort &width_t,
                  const ushort &height_t);
 

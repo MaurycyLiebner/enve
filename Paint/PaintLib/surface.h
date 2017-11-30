@@ -73,7 +73,7 @@ public:
 
     void clear();
 
-    virtual void getTileDrawers(QList<TileSkDrawer *> *tileDrawers);
+    virtual void getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers);
 
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
         canvas->scale(1./mScale, 1./mScale);

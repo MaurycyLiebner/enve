@@ -398,7 +398,6 @@ TileSkDrawer::~TileSkDrawer() {
 }
 
 void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
-    paint->setAlpha(alpha);
     canvas->drawImage(tileImg, posX, posY, paint);
 }
 

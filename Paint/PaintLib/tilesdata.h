@@ -6,6 +6,7 @@
 #include <QTemporaryFile>
 class Tile;
 struct TileSkDrawer;
+struct TileSkDrawerCollection;
 
 class TilesData : public MinimalCacheContainer {
 public:
@@ -22,9 +23,6 @@ public:
     void clearTmp();
 
     void getTileDrawers(QList<TileSkDrawer*> *tileDrawers);
-
-    void getTileDrawers(QList<TileSkDrawer*> *tileDrawers,
-                        const int &alpha);
 
     void saveToTmp();
 

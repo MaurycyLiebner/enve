@@ -1,6 +1,7 @@
 #ifndef PAINTBOX_H
 #define PAINTBOX_H
 #include "boundingbox.h"
+#include "Paint/PaintLib/tile.h"
 struct TileSkDrawer;
 class Surface;
 class Brush;
@@ -15,7 +16,7 @@ struct PaintBoxRenderData : public BoundingBoxRenderData {
 
     void drawSk(SkCanvas *canvas);
 
-    QList<TileSkDrawer*> tileDrawers;
+    QList<TileSkDrawerCollection> tileDrawers;
 
     SkPoint trans;
 };

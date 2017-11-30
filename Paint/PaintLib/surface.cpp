@@ -131,8 +131,10 @@ void Surface::clear() {
     mCurrentTiles->clearTiles();
 }
 
-void Surface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
-    mCurrentTiles->getTileDrawers(tileDrawers);
+void Surface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers) {
+    TileSkDrawerCollection coll;
+    mCurrentTiles->getTileDrawers(&coll.drawers);
+    tileDrawers->append(coll);
 }
 
 void Surface::clearTmp() {
