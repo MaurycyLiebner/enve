@@ -72,6 +72,7 @@ struct TileSkDrawer : public Updatable {
     ushort maxPaintY = 0;
     ushort maxPaintX = 0;
 };
+#include <SkColorMatrixFilter.h>
 #include "Colors/color.h"
 struct TileSkDrawerCollection {
     TileSkDrawerCollection() {}
@@ -81,13 +82,22 @@ struct TileSkDrawerCollection {
         if(hueChange) {
             SkPaint paint;
             paint.setAlpha(alpha);
-            paint.setBlendMode(SkBlendMode::kDstIn);
-            canvas->saveLayer(NULL, NULL);
-            canvas->clear(hueCol);
+            paint.setColorFilter(SkColorMatrixFilter::MakeLightingFilter(
+                                     SkColorSetARGBInline(255,
+                                                          SkColorGetR(hueCol)*0.7,
+                                                          SkColorGetG(hueCol)*0.7,
+                                                          SkColorGetB(hueCol)*0.7),
+                                     SkColorSetARGBInline(255,
+                                                          SkColorGetR(hueCol)*0.3,
+                                                          SkColorGetG(hueCol)*0.3,
+                                                          SkColorGetB(hueCol)*0.3)));
+//            paint.setBlendMode(SkBlendMode::kDstIn);
+//            canvas->saveLayer(NULL, NULL);
+//            canvas->clear(hueCol);
             foreach(TileSkDrawer *drawer, drawers) {
                 drawer->drawSk(canvas, &paint);
             }
-            canvas->restore();
+            //canvas->restore();
         } else {
             SkPaint paint;
             paint.setAlpha(alpha);

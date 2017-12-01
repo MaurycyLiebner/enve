@@ -46,7 +46,7 @@ int PaintBox::prp_nextRelFrameWithKey(const int &relFrame) {
             int paintMin = clostestFrame +
                     (relFrame - clostestFrame)/mFrameStep*mFrameStep;
             paintMin = qMin(paintMin, bbNext);
-            if(paintMin == relFrame) paintMin += mFrameStep;
+            if(paintMin <= relFrame) paintMin += mFrameStep;
             return paintMin;
         }
     }
@@ -62,7 +62,7 @@ int PaintBox::prp_prevRelFrameWithKey(const int &relFrame) {
             int paintMin = clostestFrame +
                     (relFrame - clostestFrame)/mFrameStep*mFrameStep;
             paintMin = qMax(paintMin, bbPrev);
-            if(paintMin == relFrame) paintMin -= mFrameStep;
+            if(paintMin >= relFrame) paintMin -= mFrameStep;
             return paintMin;
         }
     }
@@ -78,7 +78,7 @@ void PaintBox::prp_setAbsFrame(const int &frame) {
 
 MovablePoint *PaintBox::getPointAtAbsPos(const QPointF &absPtPos,
                                          const CanvasMode &currentCanvasMode,
-                                      const qreal &canvasScaleInv) {
+                                         const qreal &canvasScaleInv) {
     if(currentCanvasMode == MOVE_POINT) {
         if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return mTopLeftPoint;

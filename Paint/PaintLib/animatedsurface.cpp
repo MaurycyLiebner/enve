@@ -70,6 +70,11 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
     if(!anim_mIsRecording) {
         anim_setRecordingValue(true);
     }
+    Key *keyAtFrame = anim_getKeyAtRelFrame(relFrame);
+    if(keyAtFrame != NULL) {
+        ((SurfaceKey*)keyAtFrame)->getTilesData()->clearTiles();
+        return;
+    }
 
     SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(relFrame);
     if(prevKey != NULL) {
@@ -167,8 +172,6 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
     } else {
         int countT = mDrawTilesFrames.count();
         int prevRelFrame = INT_MIN;
-        qreal hueStep = 1./countT;
-        qreal hueT = 0.;
         for(int i = 0; i < countT; i++) {
             const int &relFrame = mDrawTilesFrames.at(i);
             std::shared_ptr<TilesData> tilesData = mDrawTilesData.at(i);
@@ -193,20 +196,29 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
                neighRelFrame == INT_MAX) {
                 alpha = 255;
             } else {
-                int dR = qAbs(relFrame - neighRelFrame) + mOverlapFrames;
-                int dFrame = qAbs(relFrame - anim_mCurrentRelFrame);
-                qreal alphaT = dFrame*1./dR;
+//                int dR = qAbs(relFrame - neighRelFrame) + mOverlapFrames;
+//                int dFrame = qAbs(relFrame - anim_mCurrentRelFrame);
+//                qreal alphaT = dFrame*1./dR;
+//                alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
+                qreal alphaT = 0.;
+                if((relFrame < neighRelFrame &&
+                    anim_mCurrentRelFrame >= neighRelFrame) ||
+                    (relFrame > neighRelFrame &&
+                     anim_mCurrentRelFrame <= neighRelFrame)) {
+                    alphaT = (qAbs(anim_mCurrentRelFrame - neighRelFrame) + 1)*1./(mOverlapFrames + 1);
+                }
                 alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
             }
             TileSkDrawerCollection coll;
             coll.alpha = alpha;
             tilesData->getTileDrawers(&coll.drawers);
-            bool hueChange = tilesData.get() != mCurrentTiles.get();
-            coll.setHueChangeEnabled(hueChange);
+            if(mIsDraft) {
+                bool hueChange = relFrame != anim_mCurrentRelFrame;
+                coll.setHueChangeEnabled(hueChange);
 
-            if(hueChange) {
-                coll.setHue(hueT);
-                hueT += hueStep;
+                if(hueChange) {
+                    coll.setHue(relFrame > anim_mCurrentRelFrame ? 0. : 0.5);
+                }
             }
 
             tileDrawers->append(coll);
@@ -274,7 +286,7 @@ void AnimatedSurface::tabletPressEvent(const qreal &xT, const qreal &yT,
                                        const ulong &time_stamp,
                                        const qreal &pressure,
                                        const bool &erase, Brush *brush) {
-    if(prp_isRecording()) {
+    if(prp_isRecording() && !prp_isKeyOnCurrentFrame()) {
         newEmptyPaintFrame();
     }
     Surface::tabletPressEvent(xT, yT, time_stamp, pressure, erase, brush);

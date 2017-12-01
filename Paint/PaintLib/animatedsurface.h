@@ -94,6 +94,7 @@ protected:
     QList<std::shared_ptr<TilesData>> mDrawTilesData;
     QList<int> mDrawTilesFrames;
     int mOverlapFrames = 2;
+    bool mIsDraft = true;
 };
 
 #endif // ANIMATEDSURFACE_H
