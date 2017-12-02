@@ -124,12 +124,18 @@ public:
         Q_UNUSED(relFrame);
     }
 
-    virtual int prp_nextRelFrameWithKey(const int &relFrame) {
-        return relFrame;
+    virtual bool prp_nextRelFrameWithKey(const int &relFrame,
+                                         int &nextRelFrame) {
+        Q_UNUSED(relFrame);
+        Q_UNUSED(nextRelFrame);
+        return false;
     }
 
-    virtual int prp_prevRelFrameWithKey(const int &relFrame) {
-        return relFrame;
+    virtual bool prp_prevRelFrameWithKey(const int &relFrame,
+                                         int &prevRelFrame) {
+        Q_UNUSED(relFrame);
+        Q_UNUSED(prevRelFrame);
+        return false;
     }
 
     virtual void readProperty(QIODevice *device) {
@@ -162,7 +168,6 @@ public:
 
     int getCurrentFrameFromMainWindow();
     int getFrameCount();
-    bool isRecordingAllPoints();
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
     bool isShiftPressed(QKeyEvent *event);

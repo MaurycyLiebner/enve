@@ -30,43 +30,48 @@ PaintBox::PaintBox(const ushort &canvasWidthT,
     finishSizeSetup();
 }
 
-int PaintBox::anim_getClosestsKeyOccupiedRelFrame(const int &frame) {
-    int nextT = prp_nextRelFrameWithKey(frame);
-    int prevT = prp_prevRelFrameWithKey(frame);
-    if(nextT - frame > frame - prevT) return prevT;
-    return nextT;
-}
-
-int PaintBox::prp_nextRelFrameWithKey(const int &relFrame) {
-    int bbNext = BoundingBox::prp_nextRelFrameWithKey(relFrame);
+bool PaintBox::prp_nextRelFrameWithKey(const int &relFrame,
+                                       int &nextRelFrame) {
+    int bbNext;
+    bool bbHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
+                                                          bbNext);
     if(mMainHandler != NULL) {
         if(mMainHandler->prp_hasKeys()) {
-            int clostestFrame =
-                    mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame);
+            int clostestFrame;
+            mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
+                                                              clostestFrame);
             int paintMin = clostestFrame +
                     (relFrame - clostestFrame)/mFrameStep*mFrameStep;
-            paintMin = qMin(paintMin, bbNext);
+            if(bbNext) paintMin = qMin(paintMin, bbNext);
             if(paintMin <= relFrame) paintMin += mFrameStep;
-            return paintMin;
+            nextRelFrame = paintMin;
+            return true;
         }
     }
-    return bbNext;
+    nextRelFrame = bbNext;
+    return bbHasNext;
 }
 
-int PaintBox::prp_prevRelFrameWithKey(const int &relFrame) {
-    int bbPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame);
+bool PaintBox::prp_prevRelFrameWithKey(const int &relFrame,
+                                       int &prevRelFrame) {
+    int bbPrev;
+    bool bbHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
+                                                          bbPrev);
     if(mMainHandler != NULL) {
         if(mMainHandler->prp_hasKeys()) {
-            int clostestFrame =
-                    mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame);
+            int clostestFrame;
+            mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
+                                                              clostestFrame);
             int paintMin = clostestFrame +
                     (relFrame - clostestFrame)/mFrameStep*mFrameStep;
-            paintMin = qMax(paintMin, bbPrev);
+            if(bbHasPrev) paintMin = qMax(paintMin, bbPrev);
             if(paintMin >= relFrame) paintMin -= mFrameStep;
-            return paintMin;
+            prevRelFrame = paintMin;
+            return true;
         }
     }
-    return bbPrev;
+    prevRelFrame = bbPrev;
+    return bbHasPrev;
 }
 
 void PaintBox::prp_setAbsFrame(const int &frame) {

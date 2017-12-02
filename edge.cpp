@@ -239,21 +239,18 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
 }
 
 void VectorPathEdge::finishPassThroughTransform() {
-    if(MainWindow::getInstance()->isRecordingAllPoints()) {
-        mPoint1->getParentPath()->finishAllPointsTransform();
-    } else {
-        mPoint1EndPt->finishTransform();
-        mPoint2StartPt->finishTransform();
-    }
+    mPoint1EndPt->finishTransform();
+    mPoint2StartPt->finishTransform();
 }
 
 void VectorPathEdge::startPassThroughTransform() {
-    if(MainWindow::getInstance()->isRecordingAllPoints()) {
-        mPoint1->getParentPath()->startAllPointsTransform();
-    } else {
-        mPoint1EndPt->startTransform();
-        mPoint2StartPt->startTransform();
-    }
+    mPoint1EndPt->startTransform();
+    mPoint2StartPt->startTransform();
+}
+
+void VectorPathEdge::cancelPassThroughTransform() {
+    mPoint1EndPt->cancelTransform();
+    mPoint2StartPt->cancelTransform();
 }
 
 void VectorPathEdge::setEditPath(const bool &bT) {

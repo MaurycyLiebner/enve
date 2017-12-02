@@ -120,6 +120,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_effects_colorize");
     effectsMenu->addAction("Replace Color")->setObjectName(
                 "canvas_effects_replace_color");
+    effectsMenu->addAction("Painting")->setObjectName(
+                "canvas_effects_brush");
 
     if(hasPathBox || hasGroups) {
         QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
@@ -168,6 +170,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
 #include <QFileDialog>
 #include "Paint/paintboxsettingsdialog.h"
 #include "customfpsdialog.h"
+#include "PixmapEffects/brusheffect.h"
 bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "canvas_copy") {
         copyAction();
@@ -195,6 +198,8 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDesaturateEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_colorize") {
         applyColorizeEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_effects_brush") {
+        applyBrushEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_replace_color") {
         applyReplaceColorEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
@@ -308,7 +313,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
             QMenu *effectsMenu = menu.addMenu("Effects");
             effectsMenu->addAction("Blur");
-//            effectsMenu->addAction("Brush");
+            effectsMenu->addAction("Brush");
             effectsMenu->addAction("Lines");
             effectsMenu->addAction("Circles");
             effectsMenu->addAction("Swirl");
@@ -350,9 +355,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     mCanvasWindow->openSettingsWindowForCurrentCanvas();
                 } else if(selectedAction->text() == "Blur") {
                     addEffect(new BlurEffect());
-                } /*else if(selectedAction->text() == "Brush") {
+                } else if(selectedAction->text() == "Brush") {
                     addEffect(new BrushEffect());
-                }*/ else if(selectedAction->text() == "Lines") {
+                } else if(selectedAction->text() == "Lines") {
                     addEffect(new LinesEffect());
                 } else if(selectedAction->text() == "Circles") {
                     addEffect(new CirclesEffect());
@@ -669,9 +674,13 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
 void Canvas::cancelCurrentTransform() {
     mTransformationFinishedBeforeMouseRelease = true;
     if(mCurrentMode == CanvasMode::MOVE_POINT) {
-        cancelSelectedPointsTransform();
-        if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
-            mRotPivot->handleMouseRelease();
+        if(mCurrentEdge != NULL) {
+            mCurrentEdge->cancelPassThroughTransform();
+        } else {
+            cancelSelectedPointsTransform();
+            if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
+                mRotPivot->handleMouseRelease();
+            }
         }
     } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
         if(mRotPivot->isSelected()) {

@@ -1,70 +1,82 @@
 #ifndef BRUSHEFFECT_H
 #define BRUSHEFFECT_H
-//#include "pixmapeffect.h"
+#include "pixmapeffect.h"
+class BoundingBox;
+class QrealAnimator;
+typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
 
-//class BrushStroke {
-//public:
-//    BrushStroke(QPointF startPos,
-//                QPointF startCtrlPos,
-//                QPointF endCtrlPos,
-//                QPointF endPos,
-//                qreal radius,
-//                QColor color);
+struct BrushEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+    qreal minBrushRadius;
+    qreal maxBrushRadius;
+    qreal strokeMaxLength;
+    qreal strokeMinDirectionAngle;
+    qreal strokeMaxDirectionAngle;
+    qreal strokeCurvature;
+    qreal numberStrokes;
+};
+class Dab;
+class Brush;
+class BrushStroke {
+public:
+    BrushStroke(const QPointF &startPos,
+                const QPointF &startCtrlPos,
+                const QPointF &endCtrlPos,
+                const QPointF &endPos,
+                const qreal &radius,
+                const QColor &color);
 
-//    void drawOnImage(QImage *img) const;
 
-//    void prepareToDrawOnImage(QImage *img);
+    void prepareToDrawOnImage(const SkBitmap &img);
+    void drawOnImage(unsigned char *data,
+                     const int &width, const int &height);
+private:
+    Brush *mBrush = NULL;
+    QList<Dab> mDabs;
 
-//    static void loadStrokePixmaps();
-//private:
-//    static bool mBrushPixmapsLoaded;
-//    static QList<QPixmap*> mStrokeTexPixmaps;
-//    static QPixmap *mEndPix;
+    QPainterPath mStrokePath;
+    QPainterPath mWholeStrokePath;
+    QRectF mBoundingRect;
 
-//    QPixmap mTexPix;
-//    qreal mStrokeTexHeight;
-//    qreal mStrokeTexWidth;
-//    int mMaxTexDabs;
-//    int mMaxStrokeDabs;
-//    int mNDabs;
-//    QPainter::PixmapFragment *mFragments;
+    QPointF mStartPos;
+    QPointF mStartCtrlPos;
+    QPointF mEndCtrlPos;
+    QPointF mEndPos;
+    qreal mRadius;
+    QColor mColor;
+};
 
-//    QPainterPath mStrokePath;
-//    QPainterPath mWholeStrokePath;
-//    QRectF mBoundingRect;
+class BrushEffect : public PixmapEffect {
+public:
+    BrushEffect(qreal numberStrokes = 100.,
+                qreal brushMinRadius = 20.,
+                qreal brushMaxRadius = 30.,
+                qreal strokeMaxLength = 200.,
+                qreal strokeMinDirectionAngle = 0.,
+                qreal strokeMaxDirectionAngle = 360.,
+                qreal strokeCurvature = 0.5);
 
-//    QPointF mStartPos;
-//    QPointF mStartCtrlPos;
-//    QPointF mEndCtrlPos;
-//    QPointF mEndPos;
-//    qreal mRadius;
-//    QColor mColor;
-//};
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale);
 
-//class BrushEffect : public PixmapEffect {
-//public:
-//    BrushEffect(qreal numberStrokes = 100.,
-//                qreal brushMinRadius = 20.,
-//                qreal brushMaxRadius = 30.,
-//                qreal strokeMaxLength = 200.,
-//                qreal strokeMinDirectionAngle = 0.,
-//                qreal strokeMaxDirectionAngle = 360.,
-//                qreal strokeCurvature = 0.5);
+    void makeDuplicate(Property *) {}
+    Property *makeDuplicate() { return NULL; }
 
-//    void apply(BoundingBox *target,
-//               QImage *imgPtr,
-//               const fmt_filters::image &img,
-//               qreal scale);
-
-//    qreal getMargin();
-//private:
-//    QrealAnimator mMinBrushRadius;
-//    QrealAnimator mMaxBrushRadius;
-//    QrealAnimator mStrokeMaxLength;
-//    QrealAnimator mStrokeMinDirectionAngle;
-//    QrealAnimator mStrokeMaxDirectionAngle;
-//    QrealAnimator mStrokeCurvature;
-//    QrealAnimator mNumberStrokes;
-//};
+    qreal getMargin();
+    qreal getMarginAtRelFrame(const int &relFrame);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(const int &relFrame);
+private:
+    QrealAnimatorQSPtr mMinBrushRadius;
+    QrealAnimatorQSPtr mMaxBrushRadius;
+    QrealAnimatorQSPtr mStrokeMaxLength;
+    QrealAnimatorQSPtr mStrokeMinDirectionAngle;
+    QrealAnimatorQSPtr mStrokeMaxDirectionAngle;
+    QrealAnimatorQSPtr mStrokeCurvature;
+    QrealAnimatorQSPtr mNumberStrokes;
+};
 
 #endif // BRUSHEFFECT_H

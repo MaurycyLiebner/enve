@@ -865,7 +865,7 @@ void Canvas::selectAllAction() {
         foreach(BoundingBox *box, mSelectedBoxes) {
             box->selectAllPoints(this);
         }
-    } else if(mCurrentMode == MOVE_PATH) {
+    } else {//if(mCurrentMode == MOVE_PATH) {
         selectAllBoxesFromBoxesGroup();
     }
 }
@@ -879,7 +879,7 @@ void Canvas::invertSelectionAction() {
         foreach(MovablePoint *pt, selectedPts) {
             removePointFromSelection(pt);
         }
-    } else if(mCurrentMode == MOVE_PATH) {
+    } else {//if(mCurrentMode == MOVE_PATH) {
         QList<BoundingBox*> boxes = mSelectedBoxes;
         selectAllBoxesFromBoxesGroup();
         foreach(BoundingBox *box, boxes) {
@@ -890,10 +890,11 @@ void Canvas::invertSelectionAction() {
 
 void Canvas::clearSelectionAction() {
     if(mCurrentMode == MOVE_POINT) {
-        clearPointsSelection();
-    } else if(mCurrentMode == MOVE_PATH) {
-        clearBoxesSelection();
+        clearPointsSelection(); 
+    } else {//if(mCurrentMode == MOVE_PATH) {
         clearBonesSelection();
+        clearPointsSelection();
+        clearBoxesSelection();
     }
 }
 

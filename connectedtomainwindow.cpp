@@ -72,10 +72,6 @@ int ConnectedToMainWindow::getFrameCount() {
     return mMainWindow->getFrameCount();
 }
 
-bool ConnectedToMainWindow::isRecordingAllPoints() {
-    return mMainWindow->isRecordingAllPoints();
-}
-
 void ConnectedToMainWindow::graphUpdateAfterKeysChanged()
 {
     //mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();

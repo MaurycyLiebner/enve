@@ -47,6 +47,13 @@ struct Dab {
         erase = eraseT;
     }
 };
+
+extern void processPaintDabs(const QList<Dab> &dabs,
+                             const ushort &maxPaintX,
+                             const ushort &maxPaintY,
+                             const ushort &dataWidth,
+                             uchar *data);
+
 class Tile;
 struct TileSkDrawer : public Updatable {
     TileSkDrawer(Tile *parentTileT,

@@ -359,6 +359,8 @@ public slots:
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
     void setClipToCanvas(const bool &bT) { mClipToCanvasSize = bT; }
+    void setRasterEffectsVisible(const bool &bT) { mRasterEffectsVisible = bT; }
+    void setPathEffectsVisible(const bool &bT) { mPathEffectsVisible = bT; }
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -468,8 +470,8 @@ public:
     QRectF getRelBoundingRectAtRelFrame(const int &);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
-    int prp_prevRelFrameWithKey(const int &relFrame);
-    int prp_nextRelFrameWithKey(const int &relFrame);
+    bool prp_prevRelFrameWithKey(const int &relFrame, int &prevRelFrame);
+    bool prp_nextRelFrameWithKey(const int &relFrame, int &nextRelFrame);
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         Q_UNUSED(relFrame);
         return QMatrix();
@@ -492,6 +494,14 @@ public:
     void selectedPathsCombine();
     void selectedPathsBreakApart();
     void invertSelectionAction();
+
+    const bool &getRasterEffectsVisible() const {
+        return mRasterEffectsVisible;
+    }
+
+    const bool &getPathEffectsVisible() const {
+        return mPathEffectsVisible;
+    }
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;
@@ -555,6 +565,8 @@ protected:
     int mMaxPreviewFrameId = 0;
 
     bool mClipToCanvasSize = false;
+    bool mRasterEffectsVisible = true;
+    bool mPathEffectsVisible = true;
 
     bool mIsMouseGrabbing = false;
 

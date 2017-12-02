@@ -123,9 +123,10 @@ public:
     void scheduleFinishSizeSetup();
     void scheduleFinishSizeAndPosSetup();
     void loadFromImage(const QImage &img);
-    int prp_nextRelFrameWithKey(const int &relFrame);
-    int prp_prevRelFrameWithKey(const int &relFrame);
-    int anim_getClosestsKeyOccupiedRelFrame(const int &frame);
+    bool prp_nextRelFrameWithKey(const int &relFrame,
+                                 int &nextRelFrame);
+    bool prp_prevRelFrameWithKey(const int &relFrame,
+                                 int &prevRelFrame);
 private:
     bool mFinishSizeAndPosSetupScheduled = false;
     bool mFinishSizeSetupScheduled = false;

@@ -571,13 +571,18 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->transform = mTransformAnimator->getCombinedTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
-    data->effectsMargin =
-            getEffectsMarginAtRelFrame(relFrame)*data->resolution + 2.;
+    bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
+    if(effectsVisible) {
+        data->effectsMargin = getEffectsMarginAtRelFrame(relFrame)*
+                data->resolution + 2.;
+    } else {
+        data->effectsMargin = 2.;
+    }
     data->blendMode = getBlendMode();
 
     Canvas *parentCanvas = getParentCanvas();
     data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
-    if(data->opacity > 0.001) {
+    if(data->opacity > 0.001 && effectsVisible) {
         setupEffects(relFrame, data);
     }
 }

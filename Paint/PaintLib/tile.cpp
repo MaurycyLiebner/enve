@@ -7,6 +7,7 @@
 void processPaintDabs(const QList<Dab> &dabs,
                       const ushort &maxPaintX,
                       const ushort &maxPaintY,
+                      const ushort &dataWidth,
                       uchar *data) {
 
     foreach(const Dab &dab_t, dabs) {
@@ -42,7 +43,7 @@ void processPaintDabs(const QList<Dab> &dabs,
         #pragma omp parallel for
         for(int i = x_min; i < x_max; i++) {
             for(int j = y_min; j < y_max; j++) {
-                GLuint id_t = ( j*TILE_DIM + i)*4;
+                GLuint id_t = ( j*dataWidth + i)*4;
                 qreal dx = i - dab_t.cx;
                 qreal dy = j - dab_t.cy;
                 qreal dyr = (dy*cs - dx*sn)*dab_t.aspect_ratio;
@@ -178,7 +179,7 @@ void Tile::addScheduler() {
         mDrawer->addScheduler();
     } else {
         processPaintDabs(mDabsToPaint,
-                         mMaxPaintX, mMaxPaintY,
+                         mMaxPaintX, mMaxPaintY, TILE_DIM,
                          (uchar*)mDataTileImage.getPixels());
         mDabsToPaint.clear();
     }
@@ -410,7 +411,7 @@ void TileSkDrawer::schedulerProccessed() {
 
 void TileSkDrawer::processUpdate() {
     processPaintDabs(dabsToPaint,
-                     maxPaintX, maxPaintY,
+                     maxPaintX, maxPaintY, TILE_DIM,
                      data);
     dabsToPaint.clear();
 }

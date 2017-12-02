@@ -379,9 +379,21 @@ void MainWindow::setupMenuBar() {
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);
     mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
-
     connect(mClipViewToCanvas, SIGNAL(toggled(bool)),
             mCanvasWindow, SLOT(setClipToCanvas(bool)));
+
+    mRasterEffectsVisible = mViewMenu->addAction("Raster Effects");
+    mRasterEffectsVisible->setCheckable(true);
+    mRasterEffectsVisible->setChecked(true);
+    connect(mRasterEffectsVisible, SIGNAL(toggled(bool)),
+            mCanvasWindow, SLOT(setRasterEffectsVisible(bool)));
+
+    mPathEffectsVisible = mViewMenu->addAction("Path Effects");
+    mPathEffectsVisible->setCheckable(true);
+    mPathEffectsVisible->setChecked(true);
+    connect(mPathEffectsVisible, SIGNAL(toggled(bool)),
+            mCanvasWindow, SLOT(setPathEffectsVisible(bool)));
+
 
     mPanelsMenu = mViewMenu->addMenu("Docks");
 
@@ -452,6 +464,8 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     }
     Canvas *canvas = mCanvasWindow->getCurrentCanvas();
     mClipViewToCanvas->setChecked(canvas->clipToCanvas());
+    mRasterEffectsVisible->setChecked(canvas->getRasterEffectsVisible());
+    mPathEffectsVisible->setChecked(canvas->getPathEffectsVisible());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(canvas->getCurrentBoxesGroup());
     mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
@@ -1044,10 +1058,6 @@ int MainWindow::getCurrentFrame() {
     return mCanvasWindow->getCurrentFrame();
 }
 
-bool MainWindow::isRecordingAllPoints() {
-    return mAllPointsRecording;
-}
-
 int MainWindow::getFrameCount() {
     return mCanvasWindow->getMaxFrame();
 }
@@ -1057,10 +1067,6 @@ void MainWindow::setCurrentFrame(int frame) {
     mCanvasWindow->updateAfterFrameChanged(frame);
 
     callUpdateSchedulers();
-}
-
-void MainWindow::setAllPointsRecord(bool allPointsRecord) {
-    mAllPointsRecording = allPointsRecord;
 }
 
 void MainWindow::newFile() {

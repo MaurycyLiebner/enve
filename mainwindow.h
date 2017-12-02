@@ -93,8 +93,6 @@ public:
 
     int getCurrentFrame();
 
-    bool isRecordingAllPoints();
-
     int getFrameCount();
 
     void previewFinished();
@@ -142,7 +140,6 @@ public:
     void addFileUpdateScheduler(Updatable *scheduler);
 public slots:
     void setCurrentFrame(int frame);
-    void setAllPointsRecord(bool allPointsRecord);
     //void playPreview();
    // void stopPreview();
     void setResolutionFractionValue(const qreal &value);
@@ -221,6 +218,8 @@ private:
     ActionButton *mActionCurve;
 //
     QAction *mClipViewToCanvas;
+    QAction *mRasterEffectsVisible;
+    QAction *mPathEffectsVisible;
     QAction *mCurrentObjectDock;
     QAction *mFilesDock;
     QAction *mObjectsAndAnimationsDock;
@@ -257,7 +256,6 @@ private:
     bool mEventFilterDisabled = true;
     bool isEnabled();
     QWidget *mGrayOutWidget = NULL;
-    bool mAllPointsRecording = false;
     bool mDisplayedFillStrokeSettingsUpdateNeeded = false;
 
     BoxScrollWidget *mObjectSettingsWidget = NULL;

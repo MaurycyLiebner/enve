@@ -3,36 +3,64 @@
 #include "pathpivot.h"
 #include "Boxes/bone.h"
 
-int Canvas::prp_nextRelFrameWithKey(const int &relFrame) {
+bool Canvas::prp_nextRelFrameWithKey(const int &relFrame,
+                                     int &nextRelFrame) {
+    int thisNext;
+    bool thisHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
+                                                            thisNext);
     int minNextFrame = INT_MAX;
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
-        int boxNext = box->prp_nextRelFrameWithKey(boxRelFrame);
-        int absNext = box->prp_relFrameToAbsFrame(boxNext);
-        if(minNextFrame > absNext) {
-            minNextFrame = absNext;
+        int boxNext;
+        if(box->prp_nextRelFrameWithKey(boxRelFrame, boxNext)) {
+            int absNext = box->prp_relFrameToAbsFrame(boxNext);
+            if(minNextFrame > absNext) {
+                minNextFrame = absNext;
+            }
         }
     }
     if(minNextFrame == INT_MAX) {
-        return relFrame;
+        if(thisHasNext) {
+            nextRelFrame = thisNext;
+        }
+        return thisHasNext;
     }
-    return minNextFrame;
+    if(thisHasNext) {
+        nextRelFrame = qMin(minNextFrame, thisNext);
+    } else {
+        nextRelFrame = minNextFrame;
+    }
+    return true;
 }
 
-int Canvas::prp_prevRelFrameWithKey(const int &relFrame) {
-    int maxPrevFrame = INT_MIN;
+bool Canvas::prp_prevRelFrameWithKey(const int &relFrame,
+                                     int &prevRelFrame) {
+    int thisPrev;
+    bool thisHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
+                                                            thisPrev);
+    int minPrevFrame = INT_MIN;
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
-        int boxPrev = box->prp_prevRelFrameWithKey(boxRelFrame);
-        int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
-        if(maxPrevFrame < absPrev) {
-            maxPrevFrame = absPrev;
+        int boxPrev;
+        if(box->prp_prevRelFrameWithKey(boxRelFrame, boxPrev)) {
+            int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
+            if(minPrevFrame < absPrev) {
+                minPrevFrame = absPrev;
+            }
         }
     }
-    if(maxPrevFrame == INT_MIN) {
-        return relFrame;
+    if(minPrevFrame == INT_MIN) {
+        if(thisHasPrev) {
+            prevRelFrame = thisPrev;
+        }
+        return thisHasPrev;
     }
-    return maxPrevFrame;
+    if(thisHasPrev) {
+        prevRelFrame = qMax(minPrevFrame, thisPrev);
+    } else {
+        prevRelFrame = minPrevFrame;
+    }
+    return true;
 }
 
 void Canvas::shiftAllPointsForAllKeys(const int &by) {
@@ -116,11 +144,11 @@ void Canvas::applyShadowToSelected() {
         box->addEffect(new ShadowEffect());
     }
 }
-
+#include "PixmapEffects/brusheffect.h"
 void Canvas::applyBrushEffectToSelected() {
-    //Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        //box->addEffect(new BrushEffect());
-    //}
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new BrushEffect());
+    }
 }
 
 void Canvas::applyLinesEffectToSelected() {

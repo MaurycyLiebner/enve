@@ -37,7 +37,6 @@ public:
 
     int getCurrentFrameFromMainWindow();
     int getFrameCount();
-    bool isRecordingAllPoints();
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
     bool isShiftPressed(QKeyEvent *event);

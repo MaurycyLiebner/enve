@@ -32,7 +32,8 @@ public:
 
     void anim_updateRelFrame();
     virtual void anim_mergeKeysIfNeeded();
-    int anim_getClosestsKeyOccupiedRelFrame(const int &frame);
+    bool anim_getClosestsKeyOccupiedRelFrame(const int &frame,
+                                             int &closest);
     Key *anim_getKeyAtRelFrame(const int &frame);
     bool anim_hasPrevKey(Key *key);
     bool anim_hasNextKey(Key *key);
@@ -113,8 +114,10 @@ public:
     Key *anim_getNextKey(const int &relFrame);
     void anim_shiftAllKeys(const int &shift);
 
-    int prp_nextRelFrameWithKey(const int &relFrame);
-    int prp_prevRelFrameWithKey(const int &relFrame);
+    bool prp_nextRelFrameWithKey(const int &relFrame,
+                                 int &nextRelFrame);
+    bool prp_prevRelFrameWithKey(const int &relFrame,
+                                 int &prevRelFrame);
     virtual Key *readKey(QIODevice *target) {
         Q_UNUSED(target);
         return NULL;

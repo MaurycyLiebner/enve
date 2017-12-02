@@ -118,9 +118,12 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     PathBoxRenderData *pathData = (PathBoxRenderData*)data;
     pathData->editPath = getPathAtRelFrame(relFrame);
     pathData->path = pathData->editPath;
-    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
-    mParentGroup->filterPathForRelFrame(relFrame, &pathData->path);
-    //prp_thisRelFrameToParentRelFrame(relFrame);
+    if(getParentCanvas()->getPathEffectsVisible()) {
+        mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+        int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
+                    prp_relFrameToAbsFrame(relFrame));
+        mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->path);
+    }
 
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {

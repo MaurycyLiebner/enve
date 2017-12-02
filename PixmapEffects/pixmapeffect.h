@@ -49,7 +49,8 @@ enum PixmapEffectType : short {
     EFFECT_OIL,
     EFFECT_IMPLODE,
     EFFECT_COLORIZE,
-    EFFECT_REPLACE_COLOR
+    EFFECT_REPLACE_COLOR,
+    EFFECT_BRUSH
 };
 
 class EffectAnimators;

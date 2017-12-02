@@ -146,10 +146,6 @@ int Property::getFrameCount() {
     return mMainWindow->getFrameCount();
 }
 
-bool Property::isRecordingAllPoints() {
-    return mMainWindow->isRecordingAllPoints();
-}
-
 void Property::graphUpdateAfterKeysChanged()
 {
     //mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();

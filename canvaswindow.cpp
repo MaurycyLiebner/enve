@@ -634,6 +634,20 @@ void CanvasWindow::setClipToCanvas(const bool &bT) {
     callUpdateSchedulers();
 }
 
+void CanvasWindow::setRasterEffectsVisible(const bool &bT) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setRasterEffectsVisible(bT);
+    mCurrentCanvas->updateAllBoxes();
+    callUpdateSchedulers();
+}
+
+void CanvasWindow::setPathEffectsVisible(const bool &bT) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setPathEffectsVisible(bT);
+    mCurrentCanvas->updateAllBoxes();
+    callUpdateSchedulers();
+}
+
 void CanvasWindow::setResolutionFraction(const qreal &percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionFraction(percent);

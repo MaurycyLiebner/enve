@@ -258,6 +258,8 @@ public slots:
     void setCurrentCanvas(const int &id);
 
     void setClipToCanvas(const bool &bT);
+    void setRasterEffectsVisible(const bool &bT);
+    void setPathEffectsVisible(const bool &bT);
 
     void interruptPreview();
     void outOfMemory();

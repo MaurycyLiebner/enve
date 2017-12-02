@@ -244,8 +244,10 @@ public:
                                SkPath *srcDstPath);
     void filterFillPathForRelFrame(const int &relFrame,
                                    SkPath *srcDstPath);
-    int prp_nextRelFrameWithKey(const int &relFrame);
-    int prp_prevRelFrameWithKey(const int &relFrame);
+//    bool prp_nextRelFrameWithKey(const int &relFrame,
+//                                 int &nextRelFrame);
+//    bool prp_prevRelFrameWithKey(const int &relFrame,
+//                                 int &prevRelFrame);
 protected:
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;

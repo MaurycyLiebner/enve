@@ -58,8 +58,8 @@ public:
     void makePassThrough(const QPointF &absPos);
 
     void finishPassThroughTransform();
-
     void startPassThroughTransform();
+    void cancelPassThroughTransform();
 
     void setEditPath(const bool &bT);
 
