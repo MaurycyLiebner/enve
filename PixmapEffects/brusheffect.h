@@ -4,6 +4,10 @@
 class BoundingBox;
 class QrealAnimator;
 typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
+class IntAnimator;
+typedef QSharedPointer<IntAnimator> IntAnimatorQSPtr;
+class BoolProperty;
+typedef QSharedPointer<BoolProperty> BoolPropertyQSPtr;
 
 struct BrushEffectRenderData : public PixmapEffectRenderData {
     void applyEffectsSk(const SkBitmap &imgPtr,
@@ -16,6 +20,10 @@ struct BrushEffectRenderData : public PixmapEffectRenderData {
     qreal strokeMaxDirectionAngle;
     qreal strokeCurvature;
     qreal numberStrokes;
+    bool smooth;
+    int randStep;
+    int relFrame;
+    int seed;
 };
 class Dab;
 class Brush;
@@ -27,6 +35,14 @@ public:
                 const QPointF &endPos,
                 const qreal &radius,
                 const QColor &color);
+
+    void interpolateWith(const QPointF &startPos,
+                         const QPointF &startCtrlPos,
+                         const QPointF &endCtrlPos,
+                         const QPointF &endPos,
+                         const qreal &radius,
+                         const QColor &color,
+                         const qreal &weight);
 
 
     void prepareToDrawOnImage(const SkBitmap &img);
@@ -69,6 +85,20 @@ public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(const int &relFrame);
+
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                              int *lastIdentical,
+                                              const int &relFrame);
+
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2);
+
+    void prp_setAbsFrame(const int &frame) {
+        ComplexAnimator::prp_setAbsFrame(frame);
+        if(mRandomize->getValue()) {
+            prp_callUpdater();
+        }
+    }
 private:
     QrealAnimatorQSPtr mMinBrushRadius;
     QrealAnimatorQSPtr mMaxBrushRadius;
@@ -77,6 +107,11 @@ private:
     QrealAnimatorQSPtr mStrokeMaxDirectionAngle;
     QrealAnimatorQSPtr mStrokeCurvature;
     QrealAnimatorQSPtr mNumberStrokes;
+    QrealAnimatorQSPtr mSmoothness;
+    BoolPropertyQSPtr mRandomize;
+    IntAnimatorQSPtr mRandomizeStep;
+    BoolPropertyQSPtr mSmoothTransform;
+    IntAnimatorQSPtr mSeed;
 };
 
 #endif // BRUSHEFFECT_H

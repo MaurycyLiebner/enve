@@ -51,6 +51,32 @@ BrushEffect::BrushEffect(qreal numberStrokes,
     mStrokeCurvature->prp_setName("curvature");
     mStrokeCurvature->qra_setValueRange(0., 1.);
     ca_addChildAnimator(mStrokeCurvature.data());
+
+    mSmoothness = (new QrealAnimator())->ref<QrealAnimator>();
+    mRandomize = (new BoolProperty())->ref<BoolProperty>();
+    mRandomizeStep = (new IntAnimator())->ref<IntAnimator>();
+    mSmoothTransform = (new BoolProperty())->ref<BoolProperty>();
+    mSeed = (new IntAnimator())->ref<IntAnimator>();
+
+    mSmoothness->prp_setName("smoothness");
+    mSmoothness->qra_setValueRange(0., 1.);
+
+    mRandomize->prp_setName("randomize");
+
+    mRandomizeStep->prp_setName("rand frame step");
+    mRandomizeStep->setIntValueRange(1, 99);
+
+    mSmoothTransform->prp_setName("smooth progression");
+
+    mSeed->prp_setName("seed");
+    mSeed->setIntValueRange(0, 9999);
+    mSeed->setCurrentIntValue(qrand() % 9999, false);
+
+    ca_addChildAnimator(mSmoothness.data());
+    ca_addChildAnimator(mRandomize.data());
+    ca_addChildAnimator(mRandomizeStep.data());
+    ca_addChildAnimator(mSmoothTransform.data());
+    ca_addChildAnimator(mSeed.data());
 }
 
 PixmapEffectRenderData *BrushEffect::getPixmapEffectRenderDataForRelFrame(
@@ -70,7 +96,41 @@ PixmapEffectRenderData *BrushEffect::getPixmapEffectRenderDataForRelFrame(
             mStrokeMaxLength->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->strokeMinDirectionAngle =
             mStrokeMinDirectionAngle->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->smooth =
+            mSmoothTransform->getValue();
+    renderData->randStep =
+            mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+    renderData->relFrame = relFrame;
+    renderData->seed = mSeed->getCurrentEffectiveValueAtRelFrame(relFrame);
     return renderData;
+}
+
+void BrushEffect::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical, int *lastIdentical, const int &relFrame) {
+    if(mRandomize->getValue()) {
+        if(mSmoothTransform->getValue()) {
+            *firstIdentical = relFrame;
+            *lastIdentical = relFrame;
+        } else {
+            int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+            *firstIdentical = relFrame - relFrame % frameStep;
+            *lastIdentical = *firstIdentical + frameStep;
+        }
+    } else {
+        PixmapEffect::prp_getFirstAndLastIdenticalRelFrame(firstIdentical,
+                                                           lastIdentical,
+                                                           relFrame);
+    }
+}
+
+bool BrushEffect::prp_differencesBetweenRelFrames(const int &relFrame1, const int &relFrame2) {
+    if(mRandomize->getValue()) {
+        int frameStep1 = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame1);
+        int frameStep2 = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame2);
+        return relFrame1 - relFrame1 % frameStep1 ==
+                relFrame2 - relFrame2 % frameStep2;
+    }
+    return PixmapEffect::prp_differencesBetweenRelFrames(relFrame1,
+                                                         relFrame2);
 }
 
 qreal BrushEffect::getMargin() {
@@ -93,16 +153,19 @@ BrushStroke::BrushStroke(const QPointF &startPos,
     mEndPos = endPos;
     mRadius = radius;
     mColor = color;
+}
 
-    mStrokePath = QPainterPath(mStartPos);
-    mStrokePath.cubicTo(mStartCtrlPos, mEndCtrlPos, mEndPos);
-
-    QPainterPathStroker stroker;
-    stroker.setCapStyle(Qt::RoundCap);
-    stroker.setJoinStyle(Qt::RoundJoin);
-    stroker.setWidth(2*mRadius);
-    mWholeStrokePath = stroker.createStroke(mStrokePath);
-    mBoundingRect = mWholeStrokePath.boundingRect();
+void BrushStroke::interpolateWith(const QPointF &startPos, const QPointF &startCtrlPos, const QPointF &endCtrlPos, const QPointF &endPos, const qreal &radius, const QColor &color, const qreal &weight) {
+    mStartPos = mStartPos*(1. - weight) + startPos*weight;
+    mStartCtrlPos = mStartCtrlPos*(1. - weight) + startCtrlPos*weight;
+    mEndCtrlPos = mEndCtrlPos*(1. - weight) + endCtrlPos*weight;
+    mEndPos = mEndPos*(1. - weight) + endPos*weight;
+    mRadius = mRadius*(1. - weight) + radius*weight;
+    qreal red = mColor.redF()*(1. - weight) + color.redF()*weight;
+    qreal green = mColor.greenF()*(1. - weight) + color.greenF()*weight;
+    qreal blue = mColor.blueF()*(1. - weight) + color.blueF()*weight;
+    qreal alpha = mColor.alphaF()*(1. - weight) + color.alphaF()*weight;
+    mColor.setRgbF(red, green, blue, alpha);
 }
 
 QColor colorMix(QColor col1, QColor col2) {
@@ -125,6 +188,16 @@ bool isTooDifferent(const QColor &col1, const QColor &col2) {
 
 #include <QDebug>
 void BrushStroke::prepareToDrawOnImage(const SkBitmap &img) {
+    mStrokePath = QPainterPath(mStartPos);
+    mStrokePath.cubicTo(mStartCtrlPos, mEndCtrlPos, mEndPos);
+
+    QPainterPathStroker stroker;
+    stroker.setCapStyle(Qt::RoundCap);
+    stroker.setJoinStyle(Qt::RoundJoin);
+    stroker.setWidth(2*mRadius);
+    mWholeStrokePath = stroker.createStroke(mStrokePath);
+    mBoundingRect = mWholeStrokePath.boundingRect();
+
     qreal currLen = 0.;
     qreal lastRadAngle = 0.;
     qreal maxLen = mStrokePath.length();
@@ -158,13 +231,13 @@ void BrushStroke::prepareToDrawOnImage(const SkBitmap &img) {
         qreal hardness = 0.5; //mBrush->getHardness()
         qreal opacity = 0.5; //mBrush->getOpacity()
         qreal aspectRatio = 1.; //mBrush->getAspectRatio()
-        qreal radius = 10.; //mBrush->getRadius()
+        //qreal radius = 10.; //mBrush->getRadius()
         mDabs << Dab(colPos.x(), colPos.y(),
                      hardness, opacity,
-                     aspectRatio, radius,
+                     aspectRatio, mRadius,
                      degAngle, col.redF(), col.greenF(), col.blueF(),
                      false);
-        currLen += 5.;//mBrush->getDistBetweenDabsPx();
+        currLen += mRadius*0.5;//mBrush->getDistBetweenDabsPx();
     }
 }
 
@@ -182,12 +255,18 @@ void BrushEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
     int width = imgPtr.width();
     int height = imgPtr.height();
     QList<BrushStroke*> strokes;
+    qsrand(seed);
+    int seedAssist = qrand() % 999999;
+    if(smooth) {
+        seedAssist += relFrame / randStep;
+    }
+    qsrand(seedAssist);
     for(int i = 0; i < numberStrokes; i++) {
         qreal radius = qRandF(minBrushRadius,
                               maxBrushRadius)*scale;
-        QPointF startPos = QPointF(qrand() % width, qrand() % height);
+        QPointF startPos = QPointF(qRandF() * width, qRandF() * height);
         qreal angle;
-        if(qrand() % 2 == 1) {
+        if(qRandF() > .5) {
             angle = qRandF(strokeMinDirectionAngle,
                            strokeMaxDirectionAngle);
         } else {
@@ -247,7 +326,77 @@ void BrushEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                            radius,
                            strokeColor);
         strokes << stroke;
-        stroke->prepareToDrawOnImage(imgPtr);
+        if(!smooth || relFrame % randStep == 0) {
+            stroke->prepareToDrawOnImage(imgPtr);
+        }
+    }
+
+    if(smooth && relFrame % randStep != 0) {
+        qsrand(seedAssist + 1);
+        qreal weight = qAbs(relFrame % randStep)*1./randStep;
+        foreach(BrushStroke *stroke, strokes) {
+            qreal radius = qRandF(minBrushRadius,
+                                  maxBrushRadius)*scale;
+            QPointF startPos = QPointF(qRandF() * width, qRandF() * height);
+            qreal angle;
+            if(qRandF() > .5) {
+                angle = qRandF(strokeMinDirectionAngle,
+                               strokeMaxDirectionAngle);
+            } else {
+                angle = qRandF(strokeMinDirectionAngle + 180,
+                               strokeMaxDirectionAngle + 180);
+            }
+            qreal length = qRandF(2*radius,
+                                  strokeMaxLength*scale);
+            QLineF line = QLineF(startPos,
+                                 QPointF(startPos.x() + length,
+                                         startPos.y()));
+            line.setAngle(angle);
+            QPointF endPos = line.p2();
+            QPointF point;
+            if(line.intersect(QLineF(0., 0., 0., height - 1),
+                              &point) == QLineF::BoundedIntersection) {
+                endPos = point;
+            } else if(line.intersect(QLineF(width - 1, 0.,
+                                            width - 1, height - 1),
+                                     &point) == QLineF::BoundedIntersection) {
+                endPos = point;
+            } else if(line.intersect(QLineF(0., 0.,
+                                            width - 1, 0.),
+                                     &point) == QLineF::BoundedIntersection) {
+                endPos = point;
+            } else if(line.intersect(QLineF(0., height - 1,
+                                            width - 1, height - 1),
+                                     &point) == QLineF::BoundedIntersection) {
+                endPos = point;
+            }
+            line = line.normalVector().translated((endPos - startPos)*0.5);
+            line.setLength(line.length()*qRandF(-strokeCurvature,
+                                                strokeCurvature));
+            QPointF ctrls = line.p2();
+            if(ctrls.x() >= width) {
+                ctrls.setX(width - 2);
+            }
+            if(ctrls.x() < 0) {
+                ctrls.setX(2);
+            }
+            if(ctrls.y() >= height) {
+                ctrls.setY(height - 2);
+            }
+            if(ctrls.y() < 0) {
+                ctrls.setY(2);
+            }
+            QColor strokeColor = imgPtr.getColor(startPos.x(), startPos.y());
+            strokeColor.setHslF(qclamp(strokeColor.hueF() +
+                                       qRandF(-0.05, 0.05), 0., 1.),
+                                strokeColor.saturationF(),
+                                strokeColor.lightnessF(),
+                                strokeColor.alphaF());
+
+            stroke->interpolateWith(startPos, ctrls, ctrls, endPos,
+                                    radius, strokeColor, weight);
+            stroke->prepareToDrawOnImage(imgPtr);
+        }
     }
 
     unsigned char *data = img.data;

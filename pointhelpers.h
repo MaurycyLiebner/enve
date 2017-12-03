@@ -12,7 +12,7 @@ enum CtrlsMode : short {
     CTRLS_CORNER
 };
 
-extern qreal qRandF(const qreal &fMin, const qreal &fMax);
+extern qreal qRandF(const qreal &fMin = 0., const qreal &fMax = 1.);
 
 extern QPointF symmetricToPos(QPointF toMirror,
                               QPointF mirrorCenter);

@@ -328,11 +328,11 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
         SkPath path2;
         qsrand(mSeed->getCurrentIntValue());
         displaceFilterPath(&path2, src,
-                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
+                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
+                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
                            nextSeed);
-        qreal weight = (relFrame % randStep)*1./randStep;
+        qreal weight = qAbs(relFrame % randStep)*1./randStep;
         path1.interpolate(path2, weight, dst);
     } else {
         displaceFilterPath(dst, src,
