@@ -62,10 +62,6 @@ public:
                     mParentTransformAnimator->mapRelPosToAbs(parentRelPos));
     }
 
-    void duplicatePosAnimatorFrom(QPointFAnimator *source);
-    void duplicateScaleAnimatorFrom(QPointFAnimator *source);
-    void duplicateRotAnimatorFrom(QrealAnimator *source);
-
     void scaleRelativeToSavedValue(const qreal &sx,
                                    const qreal &sy,
                                    const QPointF &pivot);
@@ -77,7 +73,6 @@ public:
     const QMatrix &getRelativeTransform() const;
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
-    void makeDuplicate(BasicTransformAnimator *target);
 
     bool SWT_isBasicTransformAnimator() { return true; }
 
@@ -154,14 +149,6 @@ public:
 
     void startOpacityTransform();
     void setOpacity(const qreal &newOpacity);
-
-    void makeDuplicate(BoxTransformAnimator *target);
-    Property *makeDuplicate() {
-        return NULL;
-    }
-
-    void duplicatePivotAnimatorFrom(QPointFAnimator *source);
-    void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 
     MovablePoint *getPivotMovablePoint();
     void startPivotTransform();

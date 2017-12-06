@@ -39,15 +39,6 @@ Circle::Circle() :
                 new NodePointUpdater(this));
 }
 
-void Circle::duplicateCirclePointsFrom(
-        CircleCenterPoint *center,
-        CircleRadiusPoint *horizontalRadiusPoint,
-        CircleRadiusPoint *verticalRadiusPoint) {
-    center->makeDuplicate(mCenter);
-    horizontalRadiusPoint->makeDuplicate(mHorizontalRadiusPoint);
-    verticalRadiusPoint->makeDuplicate(mVerticalRadiusPoint);
-}
-
 void Circle::startAllPointsTransform() {
     mVerticalRadiusPoint->startTransform();
     mHorizontalRadiusPoint->startTransform();

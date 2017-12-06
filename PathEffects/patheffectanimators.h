@@ -21,7 +21,6 @@ public:
         return true;
     }
 
-    void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
 
     void readProperty(QIODevice *target);

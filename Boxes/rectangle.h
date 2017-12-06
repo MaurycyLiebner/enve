@@ -30,18 +30,6 @@ public:
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
 
-    void makeDuplicate(Property *targetBox) {
-        PathBox::makeDuplicate(targetBox);
-        Rectangle *rectTarget = (Rectangle*)targetBox;
-        rectTarget->duplicateRectanglePointsFrom(
-                    mTopLeftPoint,
-                    mBottomRightPoint,
-                    mRadiusPoint);
-    }
-    void duplicateRectanglePointsFrom(RectangleTopLeftPoint *topLeftPoint,
-                        RectangleBottomRightPoint *bottomRightPoint,
-                        QPointFAnimator *radiusPoint);
-    BoundingBox *createNewDuplicate();
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
 

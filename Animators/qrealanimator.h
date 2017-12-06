@@ -149,7 +149,7 @@ public:
     void setNumberDecimals(const int &decimals) { mDecimals = decimals; }
 
     void makeDuplicate(Property *target);
-    Property *makeDuplicate();
+    Property *makeDuplicateT();
 
     qreal getCurrentValueAtAbsFrame(const int &frame);
     qreal getCurrentValueAtRelFrame(const int &frame) const;

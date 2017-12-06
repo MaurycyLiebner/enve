@@ -92,12 +92,8 @@ public:
     const SkPath &getRelativePath() const;
     bool relPointInsidePath(const QPointF &relPos);
 
-    void duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
-                                     GradientPoints *strokeGradientPoints);
     void duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                     StrokeSettings *strokeSettings);
-
-    void makeDuplicate(Property *targetBox);
 
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 
@@ -131,10 +127,7 @@ public:
             StrokeSettings *strokeSettings);
     void duplicateFillSettingsFrom(
             PaintSettings *fillSettings);
-    void duplicateStrokeGradientPointsFrom(
-            GradientPoints *strokeGradientPoints);
-    void duplicateFillGradientPointsFrom(
-            GradientPoints *fillGradientPoints);
+
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
@@ -159,6 +152,7 @@ public:
     PathEffectAnimators *getOutlinePathEffectsAnimators() {
         return mOutlinePathEffectsAnimators.data();
     }
+    void copyPathBoxDataTo(PathBox *targetBox);
 protected:
 
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;

@@ -26,17 +26,10 @@ public:
 //    QRectF getTextRect();
     void setPathText(bool pathText);
 
-    BoundingBox *createNewDuplicate() {
-        return new TextBox();
-    }
-
     void setTextAlignment(const Qt::Alignment &alignment) {
         mAlignment = alignment;
         scheduleUpdate();
     }
-
-    void makeDuplicate(Property *targetBox);
-    void duplicateQStringAnimatorFrom(QStringAnimator *anim);
 
     bool SWT_isTextBox() { return true; }
     void addActionsToMenu(QMenu *menu);

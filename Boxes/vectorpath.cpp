@@ -43,7 +43,7 @@ void VectorPath::breakPathsApart() {
     QList<VectorPathAnimator*> pathsList = mPathAnimator->getSinglePathsList();
     foreach(VectorPathAnimator *path, pathsList) {
         VectorPath *newPath = new VectorPath();
-        newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
+        copyPathBoxDataTo(newPath);
         mParentGroup->addContainedBox(newPath);
         newPath->getPathAnimator()->addSinglePathAnimator(path, false);
     }
@@ -155,19 +155,4 @@ void VectorPath::selectAndAddContainedPointsToList(const QRectF &absRect,
 
 SkPath VectorPath::getPathAtRelFrame(const int &relFrame) {
      return mPathAnimator->getPathAtRelFrame(relFrame);
-}
-
-void VectorPath::duplicatePathAnimatorFrom(
-        PathAnimator *source) {
-    source->duplicatePathsTo(mPathAnimator.data());
-}
-
-void VectorPath::makeDuplicate(Property *targetBox) {
-    PathBox::makeDuplicate(targetBox);
-    ((VectorPath*)targetBox)->
-            duplicatePathAnimatorFrom(mPathAnimator.data());
-}
-
-BoundingBox *VectorPath::createNewDuplicate() {
-    return new VectorPath();
 }

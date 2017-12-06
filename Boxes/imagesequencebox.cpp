@@ -17,13 +17,6 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     reloadCacheHandler();
 }
 
-void ImageSequenceBox::makeDuplicate(Property *targetBox) {
-    AnimationBox::makeDuplicate(targetBox);
-    ImageSequenceBox *animationBoxTarget = (ImageSequenceBox*)targetBox;
-    animationBoxTarget->setListOfFrames(mListOfFrames);
-    animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
-                mTimeScaleAnimator.data());
-}
 #include "mainwindow.h"
 #include <QFileDialog>
 void ImageSequenceBox::changeSourceFile() {
@@ -35,8 +28,4 @@ void ImageSequenceBox::changeSourceFile() {
     if(!importPaths.isEmpty()) {
         setListOfFrames(importPaths);
     }
-}
-
-BoundingBox *ImageSequenceBox::createNewDuplicate() {
-    return new ImageSequenceBox();
 }

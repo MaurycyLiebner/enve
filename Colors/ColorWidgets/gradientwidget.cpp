@@ -68,7 +68,14 @@ void GradientWidget::newGradient(const Color &color1,
 
 void GradientWidget::newGradient(const int &fromGradientId) {
     Gradient *fromGradient = mGradients.at(fromGradientId).data();
-    Gradient *newGradient = (Gradient*)fromGradient->makeDuplicate();
+    Gradient *newGradient = new Gradient();
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    fromGradient->writeProperty(&buffer);
+    if(buffer.reset() ) {
+        newGradient->readProperty(&buffer);
+    }
+    buffer.close();
     addGradientToList(newGradient);
     setCurrentGradient(mGradients.last().data());
     updateAll();

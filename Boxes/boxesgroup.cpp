@@ -354,30 +354,16 @@ void BoxesGroup::startSelectedStrokeWidthTransform() {
     }
 }
 
-void BoxesGroup::startSelectedStrokeColorTransform()
-{
+void BoxesGroup::startSelectedStrokeColorTransform() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
         box->startSelectedStrokeColorTransform();
     }
 }
 
-void BoxesGroup::startSelectedFillColorTransform()
-{
+void BoxesGroup::startSelectedFillColorTransform() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
         box->startSelectedFillColorTransform();
     }
-}
-
-void BoxesGroup::makeDuplicate(Property *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
-    BoxesGroup *boxesGroupTarget = (BoxesGroup*)targetBox;
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
-        boxesGroupTarget->addContainedBox(child->createDuplicate());
-    }
-}
-
-BoundingBox *BoxesGroup::createNewDuplicate() {
-    return new BoxesGroup();
 }
 
 void BoxesGroup::shiftAll(const int &shift) {
@@ -393,7 +379,7 @@ void BoxesGroup::shiftAll(const int &shift) {
 
 BoundingBox *BoxesGroup::createLink() {
     InternalLinkGroupBox *linkBox = new InternalLinkGroupBox(this);
-    BoundingBox::makeDuplicate(linkBox);
+    copyBoundingBoxDataTo(linkBox);
     return linkBox;
 }
 

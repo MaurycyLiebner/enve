@@ -88,9 +88,6 @@ public:
         return new PixmapEffectMimeData(this);
     }
 
-    virtual Property *makeDuplicate() = 0;
-    virtual void makeDuplicate(Property *target) = 0;
-
     EffectAnimators *getParentEffectAnimators() {
         return mParentEffects;
     }
@@ -150,9 +147,6 @@ public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
@@ -188,12 +182,6 @@ public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateTranslationAnimatorFrom(QPointFAnimator *source);
-    void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
-    void duplicateColorAnimatorFrom(ColorAnimator *source);
-    void duplicateOpacityAnimatorFrom(QrealAnimator *source);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
     void readProperty(QIODevice *target);
@@ -224,10 +212,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateDistanceAnimatorFrom(QrealAnimator *source);
-    void duplicateWidthAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<QrealAnimator> mLinesDistance =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -248,10 +232,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateDistanceAnimatorFrom(QrealAnimator *source);
-    void duplicateRadiusAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<QrealAnimator> mCirclesDistance =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -269,9 +249,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateDegreesAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<QrealAnimator> mDegreesAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -287,9 +264,7 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateRadiusAnimatorFrom(QrealAnimator *source);
+
 private:
     QSharedPointer<QrealAnimator> mRadiusAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -305,9 +280,7 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateFactorAnimatorFrom(QrealAnimator *source);
+
 private:
     QSharedPointer<QrealAnimator> mFactorAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -327,9 +300,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
-    void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
     void writeProperty(QIODevice *target);
@@ -357,14 +327,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
-    void duplicateAnimatorsFrom(QrealAnimator *hue,
-                                QrealAnimator *saturation,
-                                QrealAnimator *lightness,
-                                QrealAnimator *alpha);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -397,14 +361,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    Property *makeDuplicate();
-    void makeDuplicate(Property *target);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
-    void duplicateAnimatorsFrom(ColorAnimator *fromColor,
-                                ColorAnimator *toColor,
-                                QrealAnimator *tolerance,
-                                QrealAnimator *smoothness);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:

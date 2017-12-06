@@ -35,16 +35,12 @@ public:
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();
-    void makeDuplicate(Property *target);
-    Property *makeDuplicate();
 
     void multSavedValueToCurrentValue(const qreal &sx,
                                       const qreal &sy);
     void incSavedValueToCurrentValue(const qreal &incXBy,
                                      const qreal &incYBy);
 
-    void duplicateYAnimatorFrom(QrealAnimator *source);
-    void duplicateXAnimatorFrom(QrealAnimator *source);
     void setValuesRange(const qreal &minVal,
                         const qreal &maxVal);
     QPointF getCurrentPointValue() const;

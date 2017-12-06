@@ -77,18 +77,6 @@ MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
                                      canvasScaleInv);
 }
 
-void TextBox::makeDuplicate(Property *targetBox) {
-    PathBox::makeDuplicate(targetBox);
-    TextBox *textTarget = (TextBox*)targetBox;
-    textTarget->duplicateQStringAnimatorFrom(mText.data());
-    textTarget->setFont(mFont);
-    textTarget->setTextAlignment(mAlignment);
-}
-
-void TextBox::duplicateQStringAnimatorFrom(QStringAnimator *anim) {
-    anim->makeDuplicate(mText.data());
-}
-
 qreal textForQPainterPath(const Qt::Alignment &alignment,
                           const qreal &lineWidth,
                           const qreal &maxWidth) {

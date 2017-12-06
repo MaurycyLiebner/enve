@@ -269,15 +269,6 @@ BoundingBox *PathAnimator::getParentBox() {
     return mParentBox;
 }
 
-void PathAnimator::makeDuplicate(Property *property) {
-    duplicatePathsTo((PathAnimator*)property);
-}
-
-Property *PathAnimator::makeDuplicate() {
-    PathAnimator *newAnimator = new PathAnimator();
-    makeDuplicate(newAnimator);
-    return newAnimator;
-}
 
 void PathAnimator::duplicatePathsTo(PathAnimator *target) {
     Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {

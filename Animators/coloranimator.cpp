@@ -257,38 +257,3 @@ void ColorAnimator::prp_openContextMenu(const QPoint &pos) {
 
     }
 }
-
-void ColorAnimator::makeDuplicate(Property *target) {
-    ColorAnimator *colorTarget = (ColorAnimator*)target;
-
-    colorTarget->duplicateVal1AnimatorFrom(mVal1Animator.data());
-    colorTarget->duplicateVal2AnimatorFrom(mVal2Animator.data());
-    colorTarget->duplicateVal3AnimatorFrom(mVal3Animator.data());
-    colorTarget->duplicateAlphaAnimatorFrom(mAlphaAnimator.data());
-}
-
-Property *ColorAnimator::makeDuplicate() {
-    ColorAnimator *colorAnimator = new ColorAnimator();
-    makeDuplicate(colorAnimator);
-    return colorAnimator;
-}
-
-void ColorAnimator::duplicateVal1AnimatorFrom(
-        QrealAnimator *source) {
-    source->makeDuplicate(mVal1Animator.data());
-}
-
-void ColorAnimator::duplicateVal2AnimatorFrom(
-        QrealAnimator *source) {
-    source->makeDuplicate(mVal2Animator.data());
-}
-
-void ColorAnimator::duplicateVal3AnimatorFrom(
-        QrealAnimator *source) {
-    source->makeDuplicate(mVal3Animator.data());
-}
-
-void ColorAnimator::duplicateAlphaAnimatorFrom(
-        QrealAnimator *source) {
-    source->makeDuplicate(mAlphaAnimator.data());
-}

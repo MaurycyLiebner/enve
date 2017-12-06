@@ -44,9 +44,6 @@ public:
     PathEffect(const PathEffectType &type,
                const bool &outlinePathEffect);
 
-    virtual Property *makeDuplicate() = 0;
-    virtual void makeDuplicate(Property *target) = 0;
-    virtual void filterPath(const SkPath &, SkPath *) = 0;
     virtual void filterPathForRelFrame(const int &,
                                        const SkPath &,
                                        SkPath *) = 0;
@@ -112,14 +109,6 @@ class DisplacePathEffect : public PathEffect {
 public:
     DisplacePathEffect(const bool &outlinePathEffect);
 
-    Property *makeDuplicate();
-
-    void makeDuplicate(Property *target);
-
-    void duplicateAnimatorsFrom(QrealAnimator *segLen,
-                                QrealAnimator *maxDev);
-
-    void filterPath(const SkPath &src, SkPath *dst);
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
     void writeProperty(QIODevice *target);
@@ -185,14 +174,6 @@ class DuplicatePathEffect : public PathEffect {
 public:
     DuplicatePathEffect(const bool &outlinePathEffect);
 
-    Property *makeDuplicate();
-
-    void makeDuplicate(Property *target);
-
-    void duplicateAnimatorsFrom(QPointFAnimator *trans);
-
-    void filterPath(const SkPath &src, SkPath *dst);
-
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
     void writeProperty(QIODevice *target);
@@ -206,14 +187,6 @@ class SolidifyPathEffect : public PathEffect {
     Q_OBJECT
 public:
     SolidifyPathEffect(const bool &outlinePathEffect);
-
-    Property *makeDuplicate();
-
-    void makeDuplicate(Property *target);
-
-    void duplicateAnimatorsFrom(QrealAnimator *trans);
-
-    void filterPath(const SkPath &src, SkPath *dst);
 
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
@@ -232,11 +205,6 @@ public:
     SumPathEffect(PathBox *parentPath,
                   const bool &outlinePathEffect);
 
-    Property *makeDuplicate() {}
-
-    void makeDuplicate(Property *target) {}
-
-    void filterPath(const SkPath &src, SkPath *dst) {}
 
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);

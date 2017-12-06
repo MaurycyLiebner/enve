@@ -30,11 +30,6 @@ public:
 
     bool hasEffects();
 
-    void makeDuplicate(Property *target);
-    Property *makeDuplicate() {
-        return NULL;
-    }
-
     bool SWT_isPixmapEffectAnimators() { return true; }
     qreal getEffectsMarginAtRelFrame(const int &relFrame) const;
 

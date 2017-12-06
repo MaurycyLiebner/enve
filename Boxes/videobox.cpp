@@ -33,18 +33,6 @@ void VideoBox::setParentGroup(BoxesGroup *parent) {
     }
 }
 
-void VideoBox::makeDuplicate(Property *targetBox) {
-    AnimationBox::makeDuplicate(targetBox);
-    VideoBox *animationBoxTarget = (VideoBox*)targetBox;
-    animationBoxTarget->setFilePath(mSrcFilePath);
-    animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
-                mTimeScaleAnimator.data());
-}
-
-BoundingBox *VideoBox::createNewDuplicate() {
-    return new VideoBox(mSrcFilePath);
-}
-
 #include <QFileDialog>
 void VideoBox::changeSourceFile() {
     MainWindow::getInstance()->disableEventFilter();

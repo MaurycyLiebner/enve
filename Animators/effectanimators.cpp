@@ -69,11 +69,3 @@ void EffectAnimators::ca_removeAllChildAnimators() {
 bool EffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }
-
-void EffectAnimators::makeDuplicate(Property *target) {
-    EffectAnimators *eaTarget = ((EffectAnimators*)target);
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        eaTarget->addEffect((PixmapEffect*)
-                    ((PixmapEffect*)effect.data())->makeDuplicate());
-    }
-}

@@ -354,8 +354,6 @@ public:
     virtual Canvas *getParentCanvas();
     virtual void reloadCacheHandler() { clearAllCache(); }
 
-    void duplicateTransformAnimatorFrom(BoxTransformAnimator *source);
-
     bool SWT_isBoundingBox() { return true; }
 
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
@@ -381,11 +379,7 @@ public:
     void removeFromParent();
     void removeFromSelection();
     virtual void moveByAbs(const QPointF &trans);
-    virtual void makeDuplicate(Property *property);
-    Property *makeDuplicate();
-    BoundingBox *createDuplicate();
-    virtual BoundingBox *createNewDuplicate() = 0;
-    BoundingBox *createDuplicateWithSameParent();
+    void copyBoundingBoxDataTo(BoundingBox *targetBox);
 
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const SkScalar &invScale) {
@@ -588,6 +582,8 @@ public:
     void setPivotAutoAdjust(const bool &bT) {
         mPivotAutoAdjust = bT;
     }
+
+    const BoundingBoxType &getBoxType() { return mType; }
 protected:
     int mExpiredPixmap = 0;
     QPointF mSavedTransformPivot;

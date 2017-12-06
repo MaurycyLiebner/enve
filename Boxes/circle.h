@@ -61,26 +61,9 @@ public:
                                            QList<MovablePoint *> *list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
-    BoundingBox *createNewDuplicate() {
-        return new Circle();
-    }
-
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
-
-    void makeDuplicate(Property *targetBox) {
-        PathBox::makeDuplicate(targetBox);
-        Circle *circleTarget = (Circle*)targetBox;
-        circleTarget->duplicateCirclePointsFrom(
-                    mCenter,
-                    mHorizontalRadiusPoint,
-                    mVerticalRadiusPoint);
-    }
-    void duplicateCirclePointsFrom(
-                        CircleCenterPoint *center,
-                        CircleRadiusPoint *horizontalRadiusPoint,
-                        CircleRadiusPoint *verticalRadiusPoint);
 
     bool SWT_isCircle() { return true; }
 

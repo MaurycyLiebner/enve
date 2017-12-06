@@ -81,7 +81,7 @@ public:
                qreal scale);
 
     void makeDuplicate(Property *) {}
-    Property *makeDuplicate() { return NULL; }
+    Property *makeDuplicateT() { return NULL; }
 
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);

@@ -22,18 +22,6 @@ void GradientPoints::initialize(PathBox *parentT)
     enabled = false;
 }
 
-void GradientPoints::duplicatePointsFrom(GradientPoint *startPointT,
-                                         GradientPoint *endPointT) {
-    startPointT->makeDuplicate(startPoint);
-    endPointT->makeDuplicate(endPoint);
-}
-
-void GradientPoints::makeDuplicate(Property *target) {
-    GradientPoints *gradientPointsTarget = (GradientPoints*)target;
-    gradientPointsTarget->duplicatePointsFrom(startPoint,
-                                              endPoint);
-}
-
 void GradientPoints::enable() {
     if(enabled) {
         return;

@@ -623,27 +623,6 @@ void QrealAnimator::prp_cancelTransform() {
     }
 }
 
-void QrealAnimator::makeDuplicate(Property *target) {
-    QrealAnimator *qa_target = (QrealAnimator*)target;
-    qa_target->prp_setName(prp_mName);
-    qa_target->prp_setRecording(false);
-    qa_target->qra_setCurrentValue(mCurrentValue, false);
-    if(anim_mIsRecording) {
-        qa_target->anim_setRecordingWithoutChangingKeys(anim_mIsRecording);
-    }
-    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
-        QrealKey *duplicate =
-                ((QrealKey*)key.get())->makeQrealKeyDuplicate(qa_target);
-        qa_target->anim_appendKey(duplicate);
-    }
-}
-
-Property *QrealAnimator::makeDuplicate() {
-    QrealAnimator *target = new QrealAnimator();
-    makeDuplicate(target);
-    return target;
-}
-
 void QrealAnimator::qra_multCurrentValue(const qreal &mult) {
     qra_setCurrentValue(mCurrentValue*mult);
 }

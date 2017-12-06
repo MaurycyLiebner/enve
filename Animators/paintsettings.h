@@ -116,7 +116,7 @@ public:
     void setPaintPathTarget(PathBox *path);
 
     void makeDuplicate(Property *target);
-    Property *makeDuplicate() {
+    Property *makeDuplicateT() {
         return NULL;
     }
 
@@ -200,7 +200,6 @@ public:
                         const bool &saveUndoRedo = true);
     ColorAnimator *getColorAnimatorAt(const int &id);
     void removeColor(const int &id);
-    Property *makeDuplicate();
 
     void updateQGradientStopsFinal();
     bool isEmpty() const;
@@ -303,10 +302,6 @@ public:
 
     void setLineWidthUpdaterTarget(PathBox *path);
     bool nonZeroLineWidth();
-
-    void makeDuplicate(Property *target);
-
-    void duplicateLineWidthFrom(QrealAnimator *source);
 
     QrealAnimator *getLineWidthAnimator();
 

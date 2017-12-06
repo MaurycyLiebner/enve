@@ -28,22 +28,6 @@ AnimationBox::~AnimationBox() {
     mAnimationCacheHandler = NULL;
 }
 
-void AnimationBox::makeDuplicate(Property *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
-    AnimationBox *animationBoxTarget = (AnimationBox*)targetBox;
-    animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
-                mTimeScaleAnimator.data());
-}
-
-void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
-        QrealAnimator *timeScaleAnimator) {
-    timeScaleAnimator->makeDuplicate(mTimeScaleAnimator.data());
-}
-
-//BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
-//    return new AnimationBox(parent);
-//}
-
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
     return ((FixedLenAnimationRect*)mDurationRectangle);
 }

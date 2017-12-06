@@ -29,7 +29,7 @@ public:
 
     void makeDuplicate(Property *property);
 
-    Property *makeDuplicate();
+    Property *makeDuplicateT();
 
 
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,

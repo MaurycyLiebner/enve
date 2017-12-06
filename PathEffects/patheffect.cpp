@@ -44,25 +44,6 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mSeed.data());
 }
 
-Property *DisplacePathEffect::makeDuplicate() {
-    DisplacePathEffect *newEffect = new DisplacePathEffect(mOutlineEffect);
-    makeDuplicate(newEffect);
-    return newEffect;
-}
-
-void DisplacePathEffect::makeDuplicate(Property *target) {
-    DisplacePathEffect *effectTarget = (DisplacePathEffect*)target;
-
-    effectTarget->duplicateAnimatorsFrom(mSegLength.data(),
-                                         mMaxDev.data());
-}
-
-void DisplacePathEffect::duplicateAnimatorsFrom(QrealAnimator *segLen,
-                                                QrealAnimator *maxDev) {
-    segLen->makeDuplicate(mSegLength.data());
-    maxDev->makeDuplicate(mMaxDev.data());
-}
-
 static void Perterb(SkPoint* p,
                     const SkVector& tangent,
                     SkScalar scale) {
@@ -294,20 +275,6 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
     return true;
 }
 
-void DisplacePathEffect::filterPath(const SkPath &src,
-                                    SkPath *dst) {
-    qsrand(mSeed->getCurrentIntValue());
-    mSeedAssist = qrand() % 999999;
-    if(mRandomize->getValue()) {
-        mSeedAssist += anim_mCurrentRelFrame / mRandomizeStep->getCurrentIntValue();
-    }
-    displaceFilterPath(dst, src,
-                       mMaxDev->qra_getCurrentValue(),
-                       mSegLength->qra_getCurrentValue(),
-                       mSmoothness->qra_getCurrentValue(),
-                       mSeedAssist);
-}
-
 void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
                                                SkPath *dst) {
@@ -354,29 +321,6 @@ DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mTranslation.data());
 }
 
-Property *DuplicatePathEffect::makeDuplicate() {
-    DuplicatePathEffect *newEffect = new DuplicatePathEffect(mOutlineEffect);
-    makeDuplicate(newEffect);
-    return newEffect;
-}
-
-void DuplicatePathEffect::makeDuplicate(Property *target) {
-    DuplicatePathEffect *effectTarget = (DuplicatePathEffect*)target;
-
-    effectTarget->duplicateAnimatorsFrom(mTranslation.data());
-}
-
-void DuplicatePathEffect::duplicateAnimatorsFrom(QPointFAnimator *trans) {
-    trans->makeDuplicate(mTranslation.data());
-}
-
-void DuplicatePathEffect::filterPath(const SkPath &src,
-                                     SkPath *dst) {
-    *dst = src;
-    dst->addPath(src,
-                 mTranslation->getEffectiveXValue(),
-                 mTranslation->getEffectiveYValue());
-}
 
 void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
                                                 const SkPath &src,
@@ -398,27 +342,6 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     mDisplacement->qra_setCurrentValue(10.);
 
     ca_addChildAnimator(mDisplacement.data());
-}
-
-Property *SolidifyPathEffect::makeDuplicate() {
-    SolidifyPathEffect *newEffect = new SolidifyPathEffect(mOutlineEffect);
-    makeDuplicate(newEffect);
-    return newEffect;
-}
-
-void SolidifyPathEffect::makeDuplicate(Property *target) {
-    SolidifyPathEffect *effectTarget = (SolidifyPathEffect*)target;
-
-    effectTarget->duplicateAnimatorsFrom(mDisplacement.data());
-}
-
-void SolidifyPathEffect::duplicateAnimatorsFrom(QrealAnimator *trans) {
-    trans->makeDuplicate(mDisplacement.data());
-}
-
-void SolidifyPathEffect::filterPath(const SkPath &src,
-                                     SkPath *dst) {
-
 }
 
 void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,

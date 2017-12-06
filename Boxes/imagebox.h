@@ -49,9 +49,6 @@ public:
 
     void setFilePath(const QString &path);
 
-    void makeDuplicate(Property *targetBox);
-    BoundingBox *createNewDuplicate();
-
     bool SWT_isImageBox() { return true; }
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);

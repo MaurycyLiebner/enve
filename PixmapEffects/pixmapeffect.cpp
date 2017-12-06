@@ -113,23 +113,6 @@ qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
     return mBlurRadius->qra_getEffectiveValueAtRelFrame(relFrame);
 }
 
-Property *BlurEffect::makeDuplicate() {
-    BlurEffect *newBlur = new BlurEffect();
-    makeDuplicate(newBlur);
-    return newBlur;
-}
-
-void BlurEffect::makeDuplicate(Property *target) {
-    BlurEffect *blurTarget = (BlurEffect*)target;
-
-    blurTarget->duplicateBlurRadiusAnimatorFrom(mBlurRadius.data());
-}
-
-void BlurEffect::duplicateBlurRadiusAnimatorFrom(
-        QrealAnimator *source) {
-    source->makeDuplicate(mBlurRadius.data());
-}
-
 PixmapEffectRenderData *BlurEffect::getPixmapEffectRenderDataForRelFrame(
                                     const int &relFrame) {
     BlurEffectRenderData *renderData = new BlurEffectRenderData();
@@ -252,38 +235,6 @@ qreal ShadowEffect::getMarginAtRelFrame(const int &relFrame) {
             pointToLen(mTranslation->getCurrentEffectivePointValueAtRelFrame(relFrame));
 }
 
-Property *ShadowEffect::makeDuplicate() {
-    ShadowEffect *newShadow = new ShadowEffect();
-    makeDuplicate(newShadow);
-    return newShadow;
-}
-
-void ShadowEffect::makeDuplicate(Property *target) {
-    ShadowEffect *shadowTarget = (ShadowEffect*)target;
-
-    shadowTarget->duplicateTranslationAnimatorFrom(mTranslation.data());
-    shadowTarget->duplicateBlurRadiusAnimatorFrom(mBlurRadius.data());
-    shadowTarget->duplicateColorAnimatorFrom(mColor.data());
-    shadowTarget->duplicateOpacityAnimatorFrom(mOpacity.data());
-}
-
-void ShadowEffect::duplicateTranslationAnimatorFrom(QPointFAnimator *source) {
-    source->makeDuplicate(mTranslation.data());
-}
-
-void ShadowEffect::duplicateBlurRadiusAnimatorFrom(
-        QrealAnimator *source) {
-    source->makeDuplicate(mBlurRadius.data());
-}
-
-void ShadowEffect::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->makeDuplicate(mColor.data());
-}
-
-void ShadowEffect::duplicateOpacityAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mOpacity.data());
-}
-
 LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
     PixmapEffect(EFFECT_LINES) {
     prp_setName("lines");
@@ -297,27 +248,6 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
     mLinesDistance->qra_setCurrentValue(linesDistance);
     mLinesDistance->prp_setName("distance");
     ca_addChildAnimator(mLinesDistance.data());
-}
-
-Property *LinesEffect::makeDuplicate() {
-    LinesEffect *linesTarget = new LinesEffect();
-    makeDuplicate(linesTarget);
-    return linesTarget;
-}
-
-void LinesEffect::makeDuplicate(Property *target) {
-    LinesEffect *linesTarget = (LinesEffect*)target;
-
-    linesTarget->duplicateDistanceAnimatorFrom(mLinesDistance.data());
-    linesTarget->duplicateWidthAnimatorFrom(mLinesWidth.data());
-}
-
-void LinesEffect::duplicateDistanceAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mLinesDistance.data());
-}
-
-void LinesEffect::duplicateWidthAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mLinesWidth.data());
 }
 
 void LinesEffect::apply(QImage *imgPtr,
@@ -381,27 +311,6 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
     ca_addChildAnimator(mCirclesDistance.data());
 }
 
-Property *CirclesEffect::makeDuplicate() {
-    CirclesEffect *linesTarget = new CirclesEffect();
-    makeDuplicate(linesTarget);
-    return linesTarget;
-}
-
-void CirclesEffect::makeDuplicate(Property *target) {
-    CirclesEffect *circlesTarget = (CirclesEffect*)target;
-
-    circlesTarget->duplicateDistanceAnimatorFrom(mCirclesDistance.data());
-    circlesTarget->duplicateRadiusAnimatorFrom(mCirclesRadius.data());
-}
-
-void CirclesEffect::duplicateDistanceAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mCirclesDistance.data());
-}
-
-void CirclesEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mCirclesRadius.data());
-}
-
 #include "Boxes/boundingbox.h"
 void CirclesEffect::apply(QImage *imgPtr,
                           const fmt_filters::image &img,
@@ -463,22 +372,6 @@ SwirlEffect::SwirlEffect(qreal degrees) :
     ca_addChildAnimator(mDegreesAnimator.data());
 }
 
-Property *SwirlEffect::makeDuplicate() {
-    SwirlEffect *linesTarget = new SwirlEffect();
-    makeDuplicate(linesTarget);
-    return linesTarget;
-}
-
-void SwirlEffect::makeDuplicate(Property *target) {
-    SwirlEffect *swirlTarget = (SwirlEffect*)target;
-
-    swirlTarget->duplicateDegreesAnimatorFrom(mDegreesAnimator.data());
-}
-
-void SwirlEffect::duplicateDegreesAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mDegreesAnimator.data());
-}
-
 void SwirlEffect::apply(QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
@@ -496,22 +389,6 @@ OilEffect::OilEffect(qreal radius) : PixmapEffect(EFFECT_OIL) {
     mRadiusAnimator->qra_setCurrentValue(radius);
     mRadiusAnimator->prp_setName("radius");
     ca_addChildAnimator(mRadiusAnimator.data());
-}
-
-Property *OilEffect::makeDuplicate() {
-    OilEffect *oilTarget = new OilEffect();
-    makeDuplicate(oilTarget);
-    return oilTarget;
-}
-
-void OilEffect::makeDuplicate(Property *target) {
-    OilEffect *oilTarget = (OilEffect*)target;
-
-    oilTarget->duplicateRadiusAnimatorFrom(mRadiusAnimator.data());
-}
-
-void OilEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mRadiusAnimator.data());
 }
 
 void OilEffect::apply(QImage *imgPtr,
@@ -533,22 +410,6 @@ ImplodeEffect::ImplodeEffect(qreal radius) :
     ca_addChildAnimator(mFactorAnimator.data());
 }
 
-Property *ImplodeEffect::makeDuplicate() {
-    ImplodeEffect *implodeTarget = new ImplodeEffect();
-    makeDuplicate(implodeTarget);
-    return implodeTarget;
-}
-
-void ImplodeEffect::makeDuplicate(Property *target) {
-    ImplodeEffect *implodeTarget = (ImplodeEffect*)target;
-
-    implodeTarget->duplicateFactorAnimatorFrom(mFactorAnimator.data());
-}
-
-void ImplodeEffect::duplicateFactorAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mFactorAnimator.data());
-}
-
 void ImplodeEffect::apply(QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
@@ -567,22 +428,6 @@ DesaturateEffect::DesaturateEffect(qreal radius) :
     mInfluenceAnimator->qra_setCurrentValue(radius);
     mInfluenceAnimator->prp_setName("factor");
     ca_addChildAnimator(mInfluenceAnimator.data());
-}
-
-Property *DesaturateEffect::makeDuplicate() {
-    DesaturateEffect *desaturateTarget = new DesaturateEffect();
-    makeDuplicate(desaturateTarget);
-    return desaturateTarget;
-}
-
-void DesaturateEffect::makeDuplicate(Property *target) {
-    DesaturateEffect *desaturateTarget = (DesaturateEffect*)target;
-
-    desaturateTarget->duplicateInfluenceAnimatorFrom(mInfluenceAnimator.data());
-}
-
-void DesaturateEffect::duplicateInfluenceAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mInfluenceAnimator.data());
 }
 
 PixmapEffectRenderData *DesaturateEffect::getPixmapEffectRenderDataForRelFrame(
@@ -639,31 +484,6 @@ ColorizeEffect::ColorizeEffect() :
     ca_addChildAnimator(mAlphaAnimator.data());
 }
 
-Property *ColorizeEffect::makeDuplicate() {
-    ColorizeEffect *colorizeTarget = new ColorizeEffect();
-    makeDuplicate(colorizeTarget);
-    return colorizeTarget;
-}
-
-void ColorizeEffect::makeDuplicate(Property *target) {
-    ColorizeEffect *colorizeTarget = (ColorizeEffect*)target;
-
-    colorizeTarget->duplicateAnimatorsFrom(mHueAnimator.data(),
-                                           mSaturationAnimator.data(),
-                                           mLightnessAnimator.data(),
-                                           mAlphaAnimator.data());
-}
-
-void ColorizeEffect::duplicateAnimatorsFrom(QrealAnimator *hue,
-                                            QrealAnimator *saturation,
-                                            QrealAnimator *lightness,
-                                            QrealAnimator *alpha) {
-    hue->makeDuplicate(mHueAnimator.data());
-    saturation->makeDuplicate(mSaturationAnimator.data());
-    lightness->makeDuplicate(mLightnessAnimator.data());
-    alpha->makeDuplicate(mAlphaAnimator.data());
-}
-
 PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame(
         const int &relFrame) {
     ReplaceColorEffectRenderData *renderData =
@@ -713,31 +533,6 @@ ReplaceColorEffect::ReplaceColorEffect() :
     ca_addChildAnimator(mToColor.data());
     ca_addChildAnimator(mToleranceAnimator.data());
     ca_addChildAnimator(mSmoothnessAnimator.data());
-}
-
-Property *ReplaceColorEffect::makeDuplicate() {
-    ReplaceColorEffect *colorizeTarget = new ReplaceColorEffect();
-    makeDuplicate(colorizeTarget);
-    return colorizeTarget;
-}
-
-void ReplaceColorEffect::makeDuplicate(Property *target) {
-    ReplaceColorEffect *colorizeTarget = (ReplaceColorEffect*)target;
-
-    colorizeTarget->duplicateAnimatorsFrom(mFromColor.data(),
-                                           mToColor.data(),
-                                           mToleranceAnimator.data(),
-                                           mSmoothnessAnimator.data());
-}
-
-void ReplaceColorEffect::duplicateAnimatorsFrom(ColorAnimator *fromColor,
-                                            ColorAnimator *toColor,
-                                            QrealAnimator *tolerance,
-                                            QrealAnimator *smoothness) {
-    fromColor->makeDuplicate(mFromColor.data());
-    toColor->makeDuplicate(mToColor.data());
-    tolerance->makeDuplicate(mToleranceAnimator.data());
-    smoothness->makeDuplicate(mSmoothnessAnimator.data());
 }
 
 void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,

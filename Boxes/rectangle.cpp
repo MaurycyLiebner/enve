@@ -32,20 +32,6 @@ Rectangle::~Rectangle() {
 
 }
 
-
-void Rectangle::duplicateRectanglePointsFrom(
-        RectangleTopLeftPoint *topLeftPoint,
-        RectangleBottomRightPoint *bottomRightPoint,
-        QPointFAnimator *radiusPoint) {
-    topLeftPoint->makeDuplicate(mTopLeftPoint);
-    bottomRightPoint->makeDuplicate(mBottomRightPoint);
-    radiusPoint->makeDuplicate(mRadiusPoint);
-}
-
-BoundingBox *Rectangle::createNewDuplicate() {
-    return new Rectangle();
-}
-
 void Rectangle::startAllPointsTransform() {
     mTopLeftPoint->startTransform();
     mBottomRightPoint->startTransform();

@@ -34,10 +34,7 @@ public:
 
     void loadPathFromSkPath(const SkPath &path);
 
-    void makeDuplicate(Property *targetBox);
-    BoundingBox *createNewDuplicate();
     PathAnimator *getPathAnimator();
-    void duplicatePathAnimatorFrom(PathAnimator *source);
 
     bool SWT_isVectorPath() { return true; }
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

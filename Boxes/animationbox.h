@@ -25,10 +25,6 @@ public:
     ~AnimationBox();
     void prp_setAbsFrame(const int &frame);
 
-    void makeDuplicate(Property *targetBox);
-
-//    BoundingBox *createNewDuplicate(BoxesGroup *parent);
-    void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
     void updateDurationRectangleAnimationRange();
     void reloadCacheHandler();
     virtual void reloadSound() {}

@@ -124,37 +124,6 @@ public:
     void generateParticlesIfNeeded();
     void generateParticles();
 
-    Property *makeDuplicate();
-
-    void duplicateAnimatorsFrom(
-            ColorAnimator *color,
-            QPointFAnimator *pos,
-            QrealAnimator *width,
-            QrealAnimator *srcVelInfl,
-
-            QrealAnimator *iniVelocity,
-            QrealAnimator *iniVelocityVar,
-            QrealAnimator *iniVelocityAngle,
-            QrealAnimator *iniVelocityAngleVar,
-            QPointFAnimator *acceleration,
-
-            QrealAnimator *particlesPerSecond,
-            QrealAnimator *particlesFrameLifetime,
-
-            QrealAnimator *velocityRandomVar,
-            QrealAnimator *velocityRandomVarPeriod,
-
-            QrealAnimator *particleSize,
-            QrealAnimator *particleSizeVar,
-
-            QrealAnimator *particleLength,
-
-            QrealAnimator *particlesDecayFrames,
-            QrealAnimator *particlesSizeDecay,
-            QrealAnimator *particlesOpacityDecay);
-
-    void makeDuplicate(Property *target);
-
     void setMinFrame(const int &minFrame);
 
     void setMaxFrame(const int &maxFrame);
@@ -252,11 +221,6 @@ public:
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
-
-    BoundingBox *createNewDuplicate();
-
-    void makeDuplicate(Property *targetBox);
-
     void startAllPointsTransform();
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

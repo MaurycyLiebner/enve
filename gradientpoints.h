@@ -33,12 +33,6 @@ public:
     void setPositions(const QPointF &startPos,
                       const QPointF &endPos);
 
-    Property *makeDuplicate() {
-        return NULL;
-    }
-    void makeDuplicate(Property *target);
-    void duplicatePointsFrom(GradientPoint *startPointT,
-                             GradientPoint *endPointT);
     QPointF getStartPointAtRelFrame(const int &relFrame);
     QPointF getEndPointAtRelFrame(const int &relFrame);
     void writeProperty(QIODevice *target);

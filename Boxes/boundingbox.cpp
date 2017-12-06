@@ -84,35 +84,18 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 #include "linkbox.h"
 BoundingBox *BoundingBox::createLink() {
     InternalLinkBox *linkBox = new InternalLinkBox(this);
-    BoundingBox::makeDuplicate(linkBox);
+    copyBoundingBoxDataTo(linkBox);
     return linkBox;
 }
 
-void BoundingBox::makeDuplicate(Property *property) {
-    BoundingBox *targetBox = (BoundingBox*)property;
-    targetBox->duplicateTransformAnimatorFrom(mTransformAnimator.data());
-    int effectsCount = mEffectsAnimators->ca_getNumberOfChildren();
-    for(int i = 0; i < effectsCount; i++) {
-        targetBox->addEffect(
-                    (PixmapEffect*)((PixmapEffect*)mEffectsAnimators->
-                           ca_getChildAt(i))->makeDuplicate() );
+void BoundingBox::copyBoundingBoxDataTo(BoundingBox *targetBox) {
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    BoundingBox::writeBoundingBox(&buffer);
+    if(buffer.seek(sizeof(BoundingBoxType)) ) {
+        targetBox->BoundingBox::readBoundingBox(&buffer);
     }
-}
-
-Property *BoundingBox::makeDuplicate() {
-    return createDuplicateWithSameParent();
-}
-
-BoundingBox *BoundingBox::createDuplicate() {
-    BoundingBox *target = createNewDuplicate();
-    makeDuplicate(target);
-    return target;
-}
-
-BoundingBox *BoundingBox::createDuplicateWithSameParent() {
-    BoundingBox *duplicate = createDuplicate();
-    mParentGroup->addContainedBox(duplicate);
-    return duplicate;
+    buffer.close();
 }
 
 void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
@@ -172,11 +155,6 @@ void BoundingBox::applyEffectsSk(const SkBitmap &im,
 Canvas *BoundingBox::getParentCanvas() {
     if(mParentGroup == NULL) return NULL;
     return mParentGroup->getParentCanvas();
-}
-
-void BoundingBox::duplicateTransformAnimatorFrom(
-        BoxTransformAnimator *source) {
-    source->makeDuplicate(mTransformAnimator.data());
 }
 
 void BoundingBox::updateAllBoxes() {

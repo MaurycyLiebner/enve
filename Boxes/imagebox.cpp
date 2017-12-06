@@ -19,16 +19,6 @@ ImageBox::~ImageBox() {
     }
 }
 
-void ImageBox::makeDuplicate(Property *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
-    ImageBox *imgTarget = (ImageBox*)targetBox;
-    imgTarget->setFilePath(mImageFilePath);
-}
-
-BoundingBox *ImageBox::createNewDuplicate() {
-    return new ImageBox();
-}
-
 void ImageBox::setFilePath(const QString &path) {
     mImageFilePath = path;
     if(mImgCacheHandler != NULL) {

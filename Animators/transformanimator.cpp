@@ -147,21 +147,6 @@ QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrame(
     return matrix;
 }
 
-void BasicTransformAnimator::duplicatePosAnimatorFrom(
-                        QPointFAnimator *source) {
-    source->makeDuplicate(mPosAnimator.data());
-}
-
-void BasicTransformAnimator::duplicateScaleAnimatorFrom(
-                        QPointFAnimator *source) {
-    source->makeDuplicate(mScaleAnimator.data());
-}
-
-void BasicTransformAnimator::duplicateRotAnimatorFrom(
-                        QrealAnimator *source) {
-    source->makeDuplicate(mRotAnimator.data());
-}
-
 void BasicTransformAnimator::moveByAbs(
                         const QPointF &absTrans) {
     moveToAbs(mParentTransformAnimator->mapRelPosToAbs(mPosAnimator->getSavedPointValue()) +
@@ -250,12 +235,6 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
 
     scale(sx, sy);
     mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()) );
-}
-
-void BasicTransformAnimator::makeDuplicate(BasicTransformAnimator *target) {
-    target->duplicatePosAnimatorFrom(mPosAnimator.data());
-    target->duplicateScaleAnimatorFrom(mScaleAnimator.data());
-    target->duplicateRotAnimatorFrom(mRotAnimator.data());
 }
 
 BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
@@ -465,21 +444,6 @@ QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrame(
     }
 }
 
-void BoxTransformAnimator::makeDuplicate(BoxTransformAnimator *target) {
-    BasicTransformAnimator::makeDuplicate(target);
-    target->duplicatePivotAnimatorFrom(mPivotAnimator.data());
-    target->duplicateOpacityAnimatorFrom(mOpacityAnimator.data());
-}
-
-void BoxTransformAnimator::duplicatePivotAnimatorFrom(
-        QPointFAnimator *source) {
-    source->makeDuplicate(mPivotAnimator.data());
-}
-
-void BoxTransformAnimator::duplicateOpacityAnimatorFrom(
-        QrealAnimator *source) {
-    source->makeDuplicate(mOpacityAnimator.data());
-}
 #include "Boxes/bone.h"
 QMatrix BoneTransformAnimator::BoneTransformAnimator::getCurrentTransformationMatrix() {
     QMatrix matrix;

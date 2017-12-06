@@ -61,18 +61,6 @@ bool PathEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }
 
-void PathEffectAnimators::filterPath(SkPath *srcDstPath) {
-    SkPath dstPath = *srcDstPath;
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        PathEffect *pathEffect = ((PathEffect*)effect.data());
-        if(pathEffect->isVisible()) {
-            SkPath srcPath = dstPath;
-            pathEffect->filterPath(srcPath, &dstPath);
-        }
-    }
-    *srcDstPath = dstPath;
-}
-
 void PathEffectAnimators::filterPathForRelFrameBeforeThickness(
                                                 const int &relFrame,
                                                 SkPath *srcDstPath) {

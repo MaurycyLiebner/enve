@@ -141,9 +141,6 @@ public:
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
-    void makeDuplicate(Property *targetBox);
-    BoundingBox *createNewDuplicate();
-
     void applyPaintSetting(
             const PaintSetting &setting) {
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {

@@ -334,12 +334,6 @@ void PathBox::startSelectedFillColorTransform() {
     mFillSettings->getColorAnimator()->prp_startTransform();
 }
 
-void PathBox::duplicateGradientPointsFrom(
-        GradientPoints *fillGradientPoints,
-        GradientPoints *strokeGradientPoints) {
-    duplicateFillGradientPointsFrom(fillGradientPoints);
-    duplicateStrokeGradientPointsFrom(strokeGradientPoints);
-}
 
 GradientPoints *PathBox::getStrokeGradientPoints() {
     return mStrokeGradientPoints.data();
@@ -347,20 +341,6 @@ GradientPoints *PathBox::getStrokeGradientPoints() {
 
 GradientPoints *PathBox::getFillGradientPoints() {
     return mFillGradientPoints.data();
-}
-
-void PathBox::duplicateStrokeGradientPointsFrom(
-        GradientPoints *strokeGradientPoints) {
-    if(strokeGradientPoints != NULL) {
-        strokeGradientPoints->makeDuplicate(mStrokeGradientPoints.data());
-    }
-}
-
-void PathBox::duplicateFillGradientPointsFrom(
-        GradientPoints *fillGradientPoints) {
-    if(fillGradientPoints != NULL) {
-        fillGradientPoints->makeDuplicate(mFillGradientPoints.data());
-    }
 }
 
 void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
@@ -373,7 +353,13 @@ void PathBox::duplicateFillSettingsFrom(PaintSettings *fillSettings) {
     if(fillSettings == NULL) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
-        fillSettings->makeDuplicate(mFillSettings.data());
+        QBuffer buffer;
+        buffer.open(QIODevice::ReadWrite);
+        fillSettings->writeProperty(&buffer);
+        if(buffer.reset()) {
+            mFillSettings->readProperty(&buffer);
+        }
+        buffer.close();
     }
 }
 
@@ -381,43 +367,14 @@ void PathBox::duplicateStrokeSettingsFrom(StrokeSettings *strokeSettings) {
     if(strokeSettings == NULL) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
-        strokeSettings->makeDuplicate(mStrokeSettings.data());
+        QBuffer buffer;
+        buffer.open(QIODevice::ReadWrite);
+        strokeSettings->writeProperty(&buffer);
+        if(buffer.reset()) {
+            mStrokeSettings->readProperty(&buffer);
+        }
+        buffer.close();
     }
-}
-
-void PathBox::makeDuplicate(Property *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
-
-    PathBox *pathBoxTarget = ((PathBox*)targetBox);
-
-    int effectsCount = mPathEffectsAnimators->ca_getNumberOfChildren();
-    for(int i = 0; i < effectsCount; i++) {
-        pathBoxTarget->addPathEffect(
-                (PathEffect*)((PathEffect*)mPathEffectsAnimators->
-                    ca_getChildAt(i))->makeDuplicate() );
-    }
-
-    int fillPathEffectsCount =
-            mFillPathEffectsAnimators->ca_getNumberOfChildren();
-    for(int i = 0; i < fillPathEffectsCount; i++) {
-        pathBoxTarget->addFillPathEffect(
-                (PathEffect*)((PathEffect*)mFillPathEffectsAnimators->
-                    ca_getChildAt(i))->makeDuplicate() );
-    }
-
-
-    int outlineEffectsCount =
-            mOutlinePathEffectsAnimators->ca_getNumberOfChildren();
-    for(int i = 0; i < outlineEffectsCount; i++) {
-        pathBoxTarget->addOutlinePathEffect(
-                (PathEffect*)((PathEffect*)mOutlinePathEffectsAnimators->
-                    ca_getChildAt(i))->makeDuplicate() );
-    }
-
-    pathBoxTarget->duplicatePaintSettingsFrom(mFillSettings.data(),
-                                              mStrokeSettings.data());
-    pathBoxTarget->duplicateGradientPointsFrom(mFillGradientPoints.data(),
-                                               mStrokeGradientPoints.data());
 }
 
 void PathBox::drawHoveredSk(SkCanvas *canvas,
@@ -438,6 +395,16 @@ void PathBox::setStrokeColorMode(const ColorMode &colorMode) {
     mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
 
+void PathBox::copyPathBoxDataTo(PathBox *targetBox) {
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    PathBox::writeBoundingBox(&buffer);
+    if(buffer.seek(sizeof(BoundingBoxType)) ) {
+        targetBox->PathBox::readBoundingBox(&buffer);
+    }
+    buffer.close();
+}
+
 #include "circle.h"
 VectorPath *PathBox::objectToVectorPathBox() {
     VectorPath *newPath = new VectorPath();
@@ -451,11 +418,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
     } else {
         newPath->loadPathFromSkPath(mPathSk);
     }
-    newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
-    newPath->duplicatePaintSettingsFrom(mFillSettings.data(),
-                                        mStrokeSettings.data());
-    newPath->duplicateGradientPointsFrom(mFillGradientPoints.data(),
-                                         mStrokeGradientPoints.data());
+    copyPathBoxDataTo(newPath);
     mParentGroup->addContainedBox(newPath);
     return newPath;
 }
@@ -463,12 +426,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
 VectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return NULL;
     VectorPath *newPath = new VectorPath();
-    newPath->loadPathFromSkPath(mOutlinePathSk);
-    newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
-    newPath->duplicatePaintSettingsFrom(mStrokeSettings.data(),
-                                        NULL);
-    newPath->duplicateGradientPointsFrom(mStrokeGradientPoints.data(),
-                                         NULL);
+    copyPathBoxDataTo(newPath);
     mParentGroup->addContainedBox(newPath);
     return newPath;
 }

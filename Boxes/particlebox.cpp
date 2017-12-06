@@ -88,19 +88,6 @@ void ParticleBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     }
 }
 
-BoundingBox *ParticleBox::createNewDuplicate() {
-    return new ParticleBox();
-}
-
-void ParticleBox::makeDuplicate(Property *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
-    ParticleBox *pbTarget = (ParticleBox*)targetBox;
-    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-        pbTarget->addEmitter((ParticleEmitter*)
-                             emitter->makeDuplicate());
-    }
-}
-
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     ParticleEmitter *emitter = new ParticleEmitter(this);
     emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos));
@@ -448,84 +435,6 @@ void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
     mParentBox->clearAllCache();
     mParentBox->scheduleUpdate();
-}
-
-Property *ParticleEmitter::makeDuplicate() {
-    ParticleEmitter *emitterDupli = new ParticleEmitter(mParentBox);
-    makeDuplicate(emitterDupli);
-    return emitterDupli;
-}
-
-void ParticleEmitter::duplicateAnimatorsFrom(ColorAnimator *color,
-                                             QPointFAnimator *pos,
-                                             QrealAnimator *width,
-                                             QrealAnimator *srcVelInfl,
-                                             QrealAnimator *iniVelocity,
-                                             QrealAnimator *iniVelocityVar,
-                                             QrealAnimator *iniVelocityAngle,
-                                             QrealAnimator *iniVelocityAngleVar,
-                                             QPointFAnimator *acceleration,
-                                             QrealAnimator *particlesPerSecond,
-                                             QrealAnimator *particlesFrameLifetime,
-                                             QrealAnimator *velocityRandomVar,
-                                             QrealAnimator *velocityRandomVarPeriod,
-                                             QrealAnimator *particleSize,
-                                             QrealAnimator *particleSizeVar,
-                                             QrealAnimator *particleLength,
-                                             QrealAnimator *particlesDecayFrames,
-                                             QrealAnimator *particlesSizeDecay,
-                                             QrealAnimator *particlesOpacityDecay) {
-    color->makeDuplicate(mColorAnimator.data());
-    pos->makeDuplicate(mPos.data());
-    width->makeDuplicate(mWidth.data());
-
-    srcVelInfl->makeDuplicate(mSrcVelInfl.data());
-
-    iniVelocity->makeDuplicate(mIniVelocity.data());
-    iniVelocityVar->makeDuplicate(mIniVelocityVar.data());
-    iniVelocityAngle->makeDuplicate(mIniVelocityAngle.data());
-    iniVelocityAngleVar->makeDuplicate(mIniVelocityAngleVar.data());
-    acceleration->makeDuplicate(mAcceleration.data());
-
-    particlesPerSecond->makeDuplicate(mParticlesPerSecond.data());
-    particlesFrameLifetime->makeDuplicate(mParticlesFrameLifetime.data());
-
-    velocityRandomVar->makeDuplicate(mVelocityRandomVar.data());
-    velocityRandomVarPeriod->makeDuplicate(mVelocityRandomVarPeriod.data());
-
-    particleSize->makeDuplicate(mParticleSize.data());
-    particleSizeVar->makeDuplicate(mParticleSizeVar.data());
-
-    particleLength->makeDuplicate(mParticleLength.data());
-
-    particlesDecayFrames->makeDuplicate(mParticlesDecayFrames.data());
-    particlesSizeDecay->makeDuplicate(mParticlesSizeDecay.data());
-    particlesOpacityDecay->makeDuplicate(mParticlesOpacityDecay.data());
-}
-
-void ParticleEmitter::makeDuplicate(Property *target) {
-    ParticleEmitter *peTarget = ((ParticleEmitter*)target);
-    peTarget->duplicateAnimatorsFrom(
-                mColorAnimator.data(),
-                mPos.data(),
-                mWidth.data(),
-                mSrcVelInfl.data(),
-                mIniVelocity.data(),
-                mIniVelocityVar.data(),
-                mIniVelocityAngle.data(),
-                mIniVelocityAngleVar.data(),
-                mAcceleration.data(),
-                mParticlesPerSecond.data(),
-                mParticlesFrameLifetime.data(),
-                mVelocityRandomVar.data(),
-                mVelocityRandomVarPeriod.data(),
-                mParticleSize.data(),
-                mParticleSizeVar.data(),
-                mParticleLength.data(),
-                mParticlesDecayFrames.data(),
-                mParticlesSizeDecay.data(),
-                mParticlesOpacityDecay.data());
-    peTarget->setFrameRange(mMinFrame, mMaxFrame);
 }
 
 void ParticleEmitter::setMinFrame(const int &minFrame) {

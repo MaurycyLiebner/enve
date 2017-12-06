@@ -176,19 +176,6 @@ Gradient::Gradient(const Color &color1, const Color &color2) :
     updateQGradientStops();
 }
 
-Property *Gradient::makeDuplicate() {
-    Gradient *newGradient = new Gradient();
-
-    Q_FOREACH(ColorAnimator *color, mColors) {
-        newGradient->addColorToList(
-                    (ColorAnimator*)color->makeDuplicate(), false);
-    }
-
-    newGradient->updateQGradientStops();
-
-    return newGradient;
-}
-
 bool Gradient::isEmpty() const {
     return mColors.isEmpty();
 }
@@ -380,17 +367,6 @@ void PaintSettings::setPaintPathTarget(PathBox *path) {
     mColor->prp_blockUpdater();
 }
 
-void PaintSettings::makeDuplicate(Property *target) {
-    PaintSettings *paintSettingsTarget = (PaintSettings*)target;
-    paintSettingsTarget->duplicateColorAnimatorFrom(mColor.data());
-    paintSettingsTarget->setGradient(mGradient.data());
-    paintSettingsTarget->setPaintType(mPaintType);
-}
-
-void PaintSettings::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->makeDuplicate(mColor.data());
-}
-
 void PaintSettings::setTargetPathBox(PathBox *target) {
     mTarget = target;
 }
@@ -564,18 +540,6 @@ bool StrokeSettings::nonZeroLineWidth() {
     return !isZero(mLineWidth->qra_getCurrentValue());
 }
 
-void StrokeSettings::makeDuplicate(Property *target) {
-    PaintSettings::makeDuplicate(target);
-    StrokeSettings *strokeSettingsTarget = (StrokeSettings*)target;
-    strokeSettingsTarget->duplicateLineWidthFrom(mLineWidth.data());
-    strokeSettingsTarget->setCapStyle(mCapStyle);
-    strokeSettingsTarget->setJoinStyle(mJoinStyle);
-    strokeSettingsTarget->setOutlineCompositionMode(mOutlineCompositionMode);
-}
-
-void StrokeSettings::duplicateLineWidthFrom(QrealAnimator *source) {
-    source->makeDuplicate(mLineWidth.data());
-}
 
 QrealAnimator *StrokeSettings::getLineWidthAnimator() {
     return mLineWidth.data();

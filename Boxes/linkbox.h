@@ -13,16 +13,6 @@ public:
     void changeSrc();
 
     void setSrc(const QString &src);
-
-    BoundingBox *createNewDuplicate() {
-        return new ExternalLinkBox();
-    }
-
-    void makeDuplicate(Property *targetBox) {
-        BoundingBox::makeDuplicate(targetBox);
-        ((ExternalLinkBox*)targetBox)->setSrc(mSrc);
-    }
-
 private:
     QString mSrc;
 };
@@ -76,10 +66,6 @@ public:
 
     BoundingBox *createLinkForLinkGroup() {
         return new InternalLinkBox(this);
-    }
-
-    BoundingBox *createNewDuplicate() {
-        return new InternalLinkBox(getLinkTarget());
     }
 
     BoundingBoxRenderData *createRenderData();

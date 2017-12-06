@@ -6,8 +6,6 @@ class ImageSequenceBox : public AnimationBox {
 public:
     ImageSequenceBox();
     void setListOfFrames(const QStringList &listOfFrames);
-    BoundingBox *createNewDuplicate();
-    void makeDuplicate(Property *targetBox);
 
     bool SWT_isImageSequenceBox() { return true; }
 
