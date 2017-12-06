@@ -246,7 +246,7 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 
 void CanvasWindow::qRender(QPainter *p) {
     if(mCurrentCanvas == NULL) return;
-    mCurrentCanvas->drawInputText(p);
+    //mCurrentCanvas->drawInputText(p);
 }
 
 void CanvasWindow::renderSk(SkCanvas *canvas) {

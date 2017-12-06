@@ -633,11 +633,11 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
 
 void PathEffect::writeProperty(QIODevice *target) {
     target->write((char*)&mPathEffectType, sizeof(PathEffectType));
-    target->write((char*)mVisible, sizeof(bool));
+    target->write((char*)&mVisible, sizeof(bool));
 }
 
 void PathEffect::readProperty(QIODevice *target) {
-    target->read((char*)mVisible, sizeof(bool));
+    target->read((char*)&mVisible, sizeof(bool));
 }
 
 void DisplacePathEffect::writeProperty(QIODevice *target) {

@@ -18,6 +18,7 @@ class MainWindow;
 class BoxScrollWidgetVisiblePart;
 class AnimationDockWidget;
 class DurationRectangleMovable;
+#include "valueinput.h"
 enum CtrlsMode : short;
 
 class KeysView : public QWidget, public KeyFocusTarget {
@@ -81,7 +82,11 @@ public:
     void updateAnimatorsColors();
     void clearHoveredMovable();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
+    void handleMouseMove(const QPoint &pos,
+                         const Qt::MouseButtons &buttons);
 protected:
+    ValueInput mValueInput;
+    QPoint mLastMovePos;
     void focusInEvent(QFocusEvent *);
 
     void resizeEvent(QResizeEvent *e);

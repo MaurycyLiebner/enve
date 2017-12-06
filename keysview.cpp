@@ -96,8 +96,7 @@ void KeysView::wheelEvent(QWheelEvent *e) {
 void KeysView::mousePressEvent(QMouseEvent *e) {
     QPoint posU = e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
     if(mGraphViewed) {
-        graphMousePressEvent(posU,
-                             e->button());
+        graphMousePressEvent(posU, e->button());
     } else {
         if(e->button() == Qt::MiddleButton) {
             middlePress(posU);
@@ -143,6 +142,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                     addKeyToSelection(mLastPressedKey);
 
                     mMovingKeys = true;
+                    mValueInput.setName("move");
                 }
             }
         } else {
@@ -172,15 +172,25 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         }
     }
 
+    mValueInput.clearAndDisableInput();
     mMainWindow->callUpdateSchedulers();
 }
 
+#include <QApplication>
 #include "clipboardcontainer.h"
 bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(mGraphViewed) {
         return graphProcessFilteredKeyEvent(event);
     } else {
-        if(event->modifiers() & Qt::ControlModifier &&
+        bool inputHandled = false;
+        if(mMovingKeys) {
+            if(mValueInput.handleKeyPressEventWhileMouseGrabbing(event)) {
+                inputHandled = true;
+            }
+        }
+        if(inputHandled) {
+            handleMouseMove(mLastMovePos, QApplication::mouseButtons());
+        } else if(event->modifiers() & Qt::ControlModifier &&
            event->key() == Qt::Key_V) {
             if(event->isAutoRepeat()) return false;
             KeysClipboardContainer *container =
@@ -203,19 +213,23 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mMainWindow->replaceClipboard(container);
             } else if(event->key() == Qt::Key_S) {
                 if(!mMovingKeys) {
+                    mValueInput.setName("scale");
                     mScalingKeys = true;
                     mMovingKeys = true;
                     mFirstMove = true;
-                    mLastPressPos = mapFromGlobal(QCursor::pos());
+                    mLastPressPos = mapFromGlobal(QCursor::pos()) +
+                            QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
                     mIsMouseGrabbing = true;
                     //setMouseTracking(true);
                     grabMouse();
                 }
             } else if(event->key() == Qt::Key_G) {
                 if(!mMovingKeys) {
+                    mValueInput.setName("move");
                     mMovingKeys = true;
                     mFirstMove = true;
-                    mLastPressPos = mapFromGlobal(QCursor::pos());
+                    mLastPressPos = mapFromGlobal(QCursor::pos()) +
+                            QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
                     mIsMouseGrabbing = true;
                     //setMouseTracking(true);
                     grabMouse();
@@ -241,9 +255,11 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                     addKeyToSelection(newKey);
                 }
 
+                mValueInput.setName("move");
                 mMovingKeys = true;
                 mFirstMove = true;
-                mLastPressPos = mapFromGlobal(QCursor::pos());
+                mLastPressPos = mapFromGlobal(QCursor::pos()) +
+                        QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
                 mIsMouseGrabbing = true;
                 //setMouseTracking(true);
                 grabMouse();
@@ -386,6 +402,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     }
 
     p.resetTransform();
+    mValueInput.draw(&p, height() - MIN_WIDGET_HEIGHT);
     if(hasFocus() ) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::red, 4.));
@@ -463,18 +480,18 @@ void KeysView::scrollLeft() {
     update();
 }
 
-void KeysView::mouseMoveEvent(QMouseEvent *event) {
-    QPoint posU = event->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
+void KeysView::handleMouseMove(const QPoint &pos,
+                               const Qt::MouseButtons &buttons) {
+    QPoint posU = pos + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
 
     if(mIsMouseGrabbing ||
-       (event->buttons() & Qt::LeftButton ||
-         event->buttons() & Qt::RightButton ||
-         event->buttons() & Qt::MiddleButton)) {
+       (buttons & Qt::LeftButton ||
+        buttons & Qt::RightButton ||
+        buttons & Qt::MiddleButton)) {
         if(mGraphViewed) {
-            graphMouseMoveEvent(posU,
-                                event->buttons());
+            graphMouseMoveEvent(posU, buttons);
         } else {
-            if(event->buttons() == Qt::MiddleButton) {
+            if(buttons & Qt::MiddleButton) {
                 middleMove(posU);
                 emit changedViewedFrames(mMinViewedFrame,
                                          mMaxViewedFrame);
@@ -502,17 +519,23 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                         }
                     }
                     if(mScalingKeys) {
-                        qreal keysScale = (event->x() - mLastPressPos.x())/
-                                           300.;
+                        qreal keysScale = (posU.x() - mLastPressPos.x())/150.;
+                        if(mValueInput.inputEnabled()) {
+                            keysScale = mValueInput.getValue() - 1.;
+                        }
                         Q_FOREACH(Key *key, mSelectedKeys) {
                             key->scaleFrameAndUpdateParentAnimator(
                                         mMainWindow->getCurrentFrame(),
                                         keysScale);
                         }
                     } else {
-                        int dFrame = qRound(
-                                    (posU.x() - mLastPressPos.x())/
-                                    mPixelsPerFrame );
+
+                        int dFrame =
+                                qRound((posU.x() - mLastPressPos.x())/
+                                       mPixelsPerFrame);
+                        if(mValueInput.inputEnabled()) {
+                            dFrame = mValueInput.getValue();
+                        }
                         int dDFrame = dFrame - mMoveDFrame;
 
                         if(dDFrame != 0) {
@@ -523,9 +546,12 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                         }
                     }
                 } else if(mMovingRect) {
-                    int dFrame = qRound(
-                                (posU.x() - mLastPressPos.x())/
-                                mPixelsPerFrame );
+                    int dFrame =
+                            qRound((posU.x() - mLastPressPos.x())/
+                                   mPixelsPerFrame);
+                    if(mValueInput.inputEnabled()) {
+                        dFrame = mValueInput.getValue();
+                    }
                     int dDFrame = dFrame - mMoveDFrame;
 
                     if(dDFrame != 0) {
@@ -546,6 +572,11 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
     }
 
     mMainWindow->callUpdateSchedulers();
+    mLastMovePos = pos;
+}
+
+void KeysView::mouseMoveEvent(QMouseEvent *event) {
+    handleMouseMove(event->pos(), event->buttons());
 }
 
 void KeysView::mouseReleaseEvent(QMouseEvent *e) {
@@ -615,6 +646,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
     updateHoveredPointFromPos(e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0));
     if(mouseGrabber() == this) releaseMouse();
 
+    mValueInput.clearAndDisableInput();
     mMainWindow->callUpdateSchedulers();
 }
 

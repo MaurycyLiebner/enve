@@ -108,7 +108,6 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_effects_blur");
     effectsMenu->addAction("Shadow")->setObjectName(
                 "canvas_effects_shadow");
-//            effectsMenu->addAction("Brush");
 //    effectsMenu->addAction("Lines");
 //    effectsMenu->addAction("Circles");
 //    effectsMenu->addAction("Swirl");
@@ -120,7 +119,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_effects_colorize");
     effectsMenu->addAction("Replace Color")->setObjectName(
                 "canvas_effects_replace_color");
-    effectsMenu->addAction("Painting")->setObjectName(
+    effectsMenu->addAction("Brush")->setObjectName(
                 "canvas_effects_brush");
 
     if(hasPathBox || hasGroups) {
@@ -279,7 +278,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
-        clearAndDisableInput();
+        mValueInput.clearAndDisableInput();
     } else {
         QPointF eventPos = mapCanvasAbsToRel(event->pos());
         BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(eventPos);
@@ -380,9 +379,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                 } else if(selectedAction->objectName() == "canvas_fill_effects_duplicate") {
                     addFillPathEffect(new DuplicatePathEffect(false));
                 } else if(selectedAction->objectName() == "canvas_outline_effects_discrete") {
-                    addOutlinePathEffect(new DisplacePathEffect(false));
+                    addOutlinePathEffect(new DisplacePathEffect(true));
                 } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
-                    addOutlinePathEffect(new DuplicatePathEffect(false));
+                    addOutlinePathEffect(new DuplicatePathEffect(true));
                 } else { // link canvas
                     const QList<QAction*> &canvasActions =
                             linkCanvasMenu->actions();
@@ -992,10 +991,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     setCurrentMouseEventPosAbs(event->pos());
     mXOnlyTransform = false;
     mYOnlyTransform = false;
-    if(mInputTransformationEnabled) {
+    if(mValueInput.inputEnabled()) {
         mFirstMouseMove = false;
     }
-    clearAndDisableInput();
+    mValueInput.clearAndDisableInput();
 
     if(mCurrentEdge != NULL) {
         if(!mFirstMouseMove) {
@@ -1021,9 +1020,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
 
 QPointF Canvas::getMoveByValueForEventPos(const QPointF &eventPos) {
     QPointF moveByPoint = eventPos - mLastPressPosRel;
-    if(mInputTransformationEnabled) {
-        moveByPoint = QPointF(mInputTransformationValue,
-                              mInputTransformationValue);
+    if(mValueInput.inputEnabled()) {
+        moveByPoint = QPointF(mValueInput.getValue(),
+                              mValueInput.getValue());
     }
     if(mYOnlyTransform) {
         moveByPoint.setX(0.);
@@ -1043,8 +1042,8 @@ void Canvas::handleMovePointMouseMove() {
            mRotPivot->handleMouseMove(mCurrentMouseEventPosRel,
                                       mLastPressPosRel,
                                       mXOnlyTransform, mYOnlyTransform,
-                                      mInputTransformationEnabled,
-                                      mInputTransformationValue,
+                                      mValueInput.inputEnabled(),
+                                      mValueInput.getValue(),
                                       mFirstMouseMove,
                                       mCurrentMode);
     } else if(mCurrentEdge != NULL) {
@@ -1085,8 +1084,8 @@ void Canvas::handleMovePathMouseMove() {
         mRotPivot->handleMouseMove(mCurrentMouseEventPosRel,
                                    mLastPressPosRel,
                                    mXOnlyTransform, mYOnlyTransform,
-                                   mInputTransformationEnabled,
-                                   mInputTransformationValue,
+                                   mValueInput.inputEnabled(),
+                                   mValueInput.getValue(),
                                    mFirstMouseMove,
                                    mCurrentMode);
     } else {

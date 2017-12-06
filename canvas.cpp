@@ -342,40 +342,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->drawRect(viewRect.makeInset(1, 1),
                              paint);
         }
-        if(mInputTransformationEnabled) {
-            SkRect inputRect = SkRect::MakeXYWH(
-                                    2*MIN_WIDGET_HEIGHT,
-                                    mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
-                                    5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
-            paint.setStyle(SkPaint::kFill_Style);
-            paint.setColor(SkColorSetARGBInline(255, 225, 225, 225));
-            canvas->drawRect(inputRect, paint);
-            QString transStr;
-            if(mRotPivot->isRotating()) {
-                transStr = "rot: " + mInputText + "|";
-            } else if(mXOnlyTransform) {
-                transStr = " x: " + mInputText + "|";
-            } else if(mYOnlyTransform) {
-                transStr = " y: " + mInputText + "|";
-            } else {
-                transStr = " x, y: " + mInputText + "|";
-            }
-            paint.setTextSize(FONT_HEIGHT);
-            SkRect bounds;
-            paint.measureText(transStr.toStdString().c_str(),
-                              transStr.size()*sizeof(char),
-                              &bounds);
-            paint.setColor(SK_ColorBLACK);
-            paint.setTypeface(SkTypeface::MakeDefault());
-            paint.setStyle(SkPaint::kFill_Style);
-
-            canvas->drawString(
-                   transStr.toStdString().c_str(),
-                   inputRect.x() + paint.getTextSize(),
-                   inputRect.y() + inputRect.height()*0.5 + bounds.height()*0.2f,
-                   paint);
-            //p->drawText(inputRect, Qt::AlignVCenter, transStr);
-        }
+        mValueInput.draw(canvas, mCanvasWidget->height() - MIN_WIDGET_HEIGHT);
     }    
 
     if(mCanvasWindow->hasFocus()) {
@@ -394,24 +361,6 @@ void Canvas::setMaxFrame(const int &frame) {
 
 Brush *Canvas::getCurrentBrush() {
     return mCurrentBrush;
-}
-
-void Canvas::drawInputText(QPainter *p) {
-    if(mInputTransformationEnabled) {
-        QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
-                                mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
-                                5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
-        p->fillRect(inputRect, QColor(225, 225, 225));
-        QString text;
-        if(mXOnlyTransform) {
-            text = " x: " + mInputText + "|";
-        } else if(mYOnlyTransform) {
-            text = " y: " + mInputText + "|";
-        } else {
-            text = " x, y: " + mInputText + "|";
-        }
-        p->drawText(inputRect, Qt::AlignVCenter, text);
-    }
 }
 
 bool Canvas::isMovingPath() {
@@ -537,6 +486,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     cont->replaceImageSk(renderData->renderedImage);
     if(mRendering || !mPreviewing) {
+        mCurrentPreviewContainerOutdated = false;
         setCurrentPreviewContainer(cont);
     } else if(mPreviewing) {
         cont->setBlocked(true);
@@ -545,6 +495,9 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                  const int &maxFrame) {
+    if(anim_mCurrentAbsFrame >= minFrame && anim_mCurrentAbsFrame <= maxFrame) {
+        mCurrentPreviewContainerOutdated = true;
+    }
     mCacheHandler.clearCacheForRelFrameRange(
                 prp_absFrameToRelFrame(minFrame),
                 prp_absFrameToRelFrame(maxFrame));
@@ -699,24 +652,6 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
         schedulePivotUpdate();
     }
 }
-
-void Canvas::clearAndDisableInput() {
-    mInputTransformationEnabled = false;
-    mInputText = "";
-}
-
-void Canvas::updateInputValue() {
-    if(mInputText.isEmpty()) {
-        mInputTransformationEnabled = false;
-    } else {
-        //mFirstMouseMove = false;
-        mInputTransformationEnabled = true;
-        mInputTransformationValue = mInputText.toDouble();
-    }
-
-    updateTransformation();
-}
-
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
     mCanvasWindow->grabMouse();
@@ -728,71 +663,42 @@ void Canvas::releaseMouseAndDontTrack() {
 }
 
 bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
+    if(mValueInput.handleKeyPressEventWhileMouseGrabbing(event)) {
+        if(mRotPivot->isRotating()) {
+            mValueInput.setName("rot");
+        } else if(mXOnlyTransform) {
+            mValueInput.setName("x");
+        } else if(mYOnlyTransform) {
+            mValueInput.setName("y");
+        } else {
+            mValueInput.setName("x, y");
+        }
+        updateTransformation();
+    } else if(event->key() == Qt::Key_Escape) {
         cancelCurrentTransform();
     } else if(event->key() == Qt::Key_Return ||
               event->key() == Qt::Key_Enter) {
         handleMouseRelease();
-        clearAndDisableInput();
-    } else if(event->key() == Qt::Key_Minus) {
-        if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
-            mInputText.remove("-");
-        } else {
-            mInputText.prepend("-");
-        }
-        updateInputValue();
-    } else if(event->key() == Qt::Key_0) {
-        mInputText += "0";
-        if(mInputText == "0" || mInputText == "-0") mInputText += ".";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_1) {
-        mInputText += "1";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_2) {
-        mInputText += "2";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_3) {
-        mInputText += "3";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_4) {
-        mInputText += "4";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_5) {
-        mInputText += "5";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_6) {
-        mInputText += "6";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_7) {
-        mInputText += "7";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_8) {
-        mInputText += "8";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_9) {
-        mInputText += "9";
-        updateInputValue();
-    } else if(event->key() == Qt::Key_Period ||
-              event->key() == Qt::Key_Comma) {
-        if(!mInputText.contains(".")) {
-            mInputText += ".";
-            updateInputValue();
-        }
-    } else if(event->key() == Qt::Key_Backspace) {
-        mInputText.chop(1);
-        if(mInputText == "0" ||
-           mInputText == "-" ||
-           mInputText == "-0") mInputText = "";
-        updateInputValue();
+        mValueInput.clearAndDisableInput();
     } else if(event->key() == Qt::Key_X) {
         mXOnlyTransform = !mXOnlyTransform;
         mYOnlyTransform = false;
 
+        if(mXOnlyTransform) {
+            mValueInput.setName("x");
+        } else {
+            mValueInput.setName("x, y");
+        }
         updateTransformation();
     } else if(event->key() == Qt::Key_Y) {
         mYOnlyTransform = !mYOnlyTransform;
         mXOnlyTransform = false;
 
+        if(mYOnlyTransform) {
+            mValueInput.setName("y");
+        } else {
+            mValueInput.setName("x, y");
+        }
         updateTransformation();
     } else if(event->key() == Qt::Key_N) {
         foreach(BoundingBox *box, mSelectedBoxes) {

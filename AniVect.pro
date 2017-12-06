@@ -200,7 +200,8 @@ SOURCES += main.cpp\
     Animators/qrealvalueeffect.cpp \
     Properties/intproperty.cpp \
     windowsinglewidgettarget.cpp \
-    Boxes/bone.cpp
+    Boxes/bone.cpp \
+    valueinput.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -360,7 +361,8 @@ HEADERS  += mainwindow.h \
     Animators/qrealvalueeffect.h \
     Properties/intproperty.h \
     windowsinglewidgettarget.h \
-    Boxes/bone.h
+    Boxes/bone.h \
+    valueinput.h
 
 RESOURCES += \
     resources.qrc

@@ -20,6 +20,7 @@ struct BrushEffectRenderData : public PixmapEffectRenderData {
     qreal strokeMaxDirectionAngle;
     qreal strokeCurvature;
     qreal numberStrokes;
+    bool randomize;
     bool smooth;
     int randStep;
     int relFrame;

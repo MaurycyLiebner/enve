@@ -258,7 +258,7 @@ void Canvas::applySumFillPathEffectToSelected() {
 void Canvas::applyDiscreteOutlinePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
-            box->addOutlinePathEffect(new DisplacePathEffect(false));
+            box->addOutlinePathEffect(new DisplacePathEffect(true));
         }
     }
 }
@@ -266,7 +266,7 @@ void Canvas::applyDiscreteOutlinePathEffectToSelected() {
 void Canvas::applyDuplicateOutlinePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
-            box->addOutlinePathEffect(new DuplicatePathEffect(false));
+            box->addOutlinePathEffect(new DuplicatePathEffect(true));
         }
     }
 }

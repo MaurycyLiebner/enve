@@ -98,6 +98,8 @@ PixmapEffectRenderData *BrushEffect::getPixmapEffectRenderDataForRelFrame(
             mStrokeMinDirectionAngle->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->smooth =
             mSmoothTransform->getValue();
+    renderData->randomize =
+            mRandomize->getValue();
     renderData->randStep =
             mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
     renderData->relFrame = relFrame;
@@ -201,11 +203,14 @@ void BrushStroke::prepareToDrawOnImage(const SkBitmap &img) {
     qreal currLen = 0.;
     qreal lastRadAngle = 0.;
     qreal maxLen = mStrokePath.length();
+    int width = img.width();
+    int height = img.height();
     while(currLen < maxLen) {
         qreal perc = mStrokePath.percentAtLength(currLen);
 
         QPointF colPos = mStrokePath.pointAtPercent(perc);
-        SkColor colSkAtPix = img.getColor(colPos.x(), colPos.y());
+        SkColor colSkAtPix = img.getColor(clampInt(colPos.x(), 0, width - 1),
+                                          clampInt(colPos.y(), 0, height - 1));
         QColor colAtPix = QColor(SkColorGetR(colSkAtPix),
                                  SkColorGetG(colSkAtPix),
                                  SkColorGetB(colSkAtPix),
@@ -257,7 +262,7 @@ void BrushEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
     QList<BrushStroke*> strokes;
     qsrand(seed);
     int seedAssist = qrand() % 999999;
-    if(smooth) {
+    if(randomize) {
         seedAssist += relFrame / randStep;
     }
     qsrand(seedAssist);

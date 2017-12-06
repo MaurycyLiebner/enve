@@ -6,6 +6,7 @@
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
 #include "skiaincludes.h"
+#include "valueinput.h"
 
 class TextBox;
 class Circle;
@@ -171,8 +172,6 @@ public:
     void setDisplayedFillStrokeSettingsFromLastSelected();
     void scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
                          QPointF absOrigin, bool startTrans);
-    void updateInputValue();
-    void clearAndDisableInput();
 
     void grabMouseAndTrack();
 
@@ -427,7 +426,6 @@ public:
     bool isPreviewingOrRendering() const {
         return mPreviewing || mRendering;
     }
-    void drawInputText(QPainter *p);
     QPointF mapCanvasAbsToRel(const QPointF &pos);
     void applyDiscretePathEffectToSelected();
     void applyDuplicatePathEffectToSelected();
@@ -452,8 +450,9 @@ public:
     void clearSelectionAction();
     void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
     bool shouldScheduleUpdate() {
-        return isVisibleAndInVisibleDurationRect() ||
-               isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame);
+        return (isVisibleAndInVisibleDurationRect() ||
+               isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame)) &&
+               mCurrentPreviewContainerOutdated;
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);
@@ -502,6 +501,37 @@ public:
     const bool &getPathEffectsVisible() const {
         return mPathEffectsVisible;
     }
+
+    void prp_setAbsFrame(const int &frame) {
+        int lastRelFrame = anim_mCurrentRelFrame;
+        ComplexAnimator::prp_setAbsFrame(frame);
+        CacheContainer *cont =
+                mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
+        if(cont == NULL) {
+            mCurrentPreviewContainerOutdated = true;
+            bool isInVisRange = isRelFrameInVisibleDurationRect(
+                        anim_mCurrentRelFrame);
+            if(mUpdateDrawOnParentBox != isInVisRange) {
+                if(mUpdateDrawOnParentBox) {
+                    mParentGroup->scheduleUpdate();
+                } else {
+                    scheduleUpdate();
+                }
+                mUpdateDrawOnParentBox = isInVisRange;
+            }
+            if(prp_differencesBetweenRelFrames(lastRelFrame,
+                                               anim_mCurrentRelFrame)) {
+                scheduleUpdate();
+            }
+        } else {
+            setCurrentPreviewContainer(cont);
+        }
+
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+            box->prp_setAbsFrame(frame);
+        }
+    }
+
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;
@@ -549,9 +579,8 @@ protected:
     ParticleBox *mCurrentParticleBox = NULL;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
-    QString mInputText;
-    qreal mInputTransformationValue = 0.;
-    bool mInputTransformationEnabled = false;
+
+    ValueInput mValueInput;
 
     bool mXOnlyTransform = false;
     bool mYOnlyTransform = false;
@@ -560,6 +589,8 @@ protected:
 
     bool mPreviewing = false;
     bool mRendering = false;
+
+    bool mCurrentPreviewContainerOutdated = false;
     std::shared_ptr<CacheContainer> mCurrentPreviewContainer;
     int mCurrentPreviewFrameId;
     int mMaxPreviewFrameId = 0;
