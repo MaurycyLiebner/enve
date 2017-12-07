@@ -15,8 +15,6 @@ public:
     void addEffect(PathEffect *effect);
     bool hasEffects();
 
-    //void makeDuplicate(Property *target);
-
     bool SWT_isPathEffectAnimators() {
         return true;
     }

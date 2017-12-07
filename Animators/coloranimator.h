@@ -42,8 +42,6 @@ public:
                               const bool &finish = false);
 
     void prp_openContextMenu(const QPoint &pos);
-    void makeDuplicate(Property *target);
-    Property *makeDuplicateT();
 
     void duplicateVal1AnimatorFrom(QrealAnimator *source);
     void duplicateVal2AnimatorFrom(QrealAnimator *source);

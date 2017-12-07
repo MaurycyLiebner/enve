@@ -5,20 +5,6 @@ QStringAnimator::QStringAnimator() : Animator() {
 
 }
 
-void QStringAnimator::makeDuplicate(QStringAnimator *anim) {
-    anim->prp_setName(prp_mName);
-    anim->prp_setRecording(false);
-    anim->setCurrentTextValue(mCurrentText, false);
-    if(anim_mIsRecording) {
-        anim->anim_setRecordingWithoutChangingKeys(anim_mIsRecording);
-    }
-    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
-        QStringKey *duplicate =
-                ((QStringKey*)key.get())->makeDuplicate(anim);
-        anim->anim_appendKey(duplicate);
-    }
-}
-
 void QStringAnimator::prp_setAbsFrame(const int &frame) {
     Animator::prp_setAbsFrame(frame);
     if(prp_hasKeys()) {
@@ -129,10 +115,6 @@ QStringKey::QStringKey(const QString &stringT,
     Key(parentAnimator) {
     mRelFrame = relFrame;
     mText = stringT;
-}
-
-QStringKey *QStringKey::makeDuplicate(QStringAnimator *anim) {
-    return new QStringKey(mText, mRelFrame, anim);
 }
 
 bool QStringKey::differsFromKey(Key *key) {

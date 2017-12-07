@@ -115,10 +115,6 @@ public:
 
     void setPaintPathTarget(PathBox *path);
 
-    void makeDuplicate(Property *target);
-    Property *makeDuplicateT() {
-        return NULL;
-    }
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
 

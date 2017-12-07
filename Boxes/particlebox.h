@@ -1,6 +1,7 @@
 #ifndef PARTICLEBOX_H
 #define PARTICLEBOX_H
 #include "boundingbox.h"
+#include "Properties/boxtargetproperty.h"
 class PointAnimator;
 
 class ParticleBox;
@@ -23,12 +24,18 @@ struct ParticleState {
     void drawSk(SkCanvas *canvas,
                 const SkPaint paint) const {
         if(size < 0.) return;
-        SkPaint paintT = paint;
-        paintT.setAlpha(opacity);
-        paintT.setStrokeWidth(size);
-        canvas->drawPath(linePath, paintT);
+        if(targetRenderData.get() == NULL) {
+            SkPaint paintT = paint;
+            paintT.setAlpha(opacity);
+            paintT.setStrokeWidth(size);
+            canvas->drawPath(linePath, paintT);
+        } else {
+            targetRenderData->renderToImage();
+            targetRenderData->drawRenderedImageForParent(canvas);
+        }
     }
 
+    std::shared_ptr<BoundingBoxRenderData> targetRenderData;
     SkPath linePath;
     SkPoint pos;
     SkScalar size;
@@ -134,14 +141,41 @@ public:
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint();
 
-    EmitterData getEmitterDataAtRelFrame(const int &relFrame) {
+    EmitterData getEmitterDataAtRelFrame(const int &relFrame,
+                                         ParticleBoxRenderData *particleData) {
         EmitterData data;
         data.color = mColorAnimator->getColorAtRelFrame(relFrame).getSkColor();
 
-        Q_FOREACH(Particle *particle, mParticles) {
-            if(particle->isVisibleAtFrame(relFrame)) {
-                data.particleStates <<
-                    particle->getParticleStateAtFrame(relFrame);
+        BoundingBox *targetT = mBoxTargetProperty->getTarget();
+        if(targetT == NULL) {
+            Q_FOREACH(Particle *particle, mParticles) {
+                if(particle->isVisibleAtFrame(relFrame)) {
+                    data.particleStates <<
+                        particle->getParticleStateAtFrame(relFrame);
+                }
+            }
+        } else {
+            int targetRelFrame = targetT->prp_absFrameToRelFrame(
+                        prp_relFrameToAbsFrame(relFrame));
+            Q_FOREACH(Particle *particle, mParticles) {
+                if(particle->isVisibleAtFrame(relFrame)) {
+                    ParticleState stateT = particle->getParticleStateAtFrame(relFrame);
+                    BoundingBoxRenderData *renderData = targetT->createRenderData();
+                    targetT->setupBoundingBoxRenderDataForRelFrame(
+                        targetRelFrame, renderData);
+                    QMatrix transformT = renderData->transform;
+                    transformT.setMatrix(transformT.m11()*stateT.size, transformT.m12(),
+                                         transformT.m21(), transformT.m22()*stateT.size,
+                                         stateT.pos.x(), stateT.pos.y());
+                    renderData->transform = transformT*particleData->transform;
+                    renderData->opacity = ((int)stateT.opacity)*
+                            renderData->opacity/255;
+
+                    stateT.targetRenderData =
+                            renderData->ref<BoundingBoxRenderData>();
+                    data.particleStates << stateT;
+                    renderData->dataSet();
+                }
             }
         }
 
@@ -205,6 +239,9 @@ private:
             (new QrealAnimator())->ref<QrealAnimator>();
     QSharedPointer<QrealAnimator> mParticlesOpacityDecay =
             (new QrealAnimator())->ref<QrealAnimator>();
+
+    QSharedPointer<BoxTargetProperty> mBoxTargetProperty =
+            (new BoxTargetProperty())->ref<BoxTargetProperty>();
 };
 
 class ParticleBox : public BoundingBox {
@@ -246,7 +283,7 @@ public:
         foreach(ParticleEmitter *emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();
             particleData->emittersData << emitter->getEmitterDataAtRelFrame(
-                                              relFrame);
+                                              relFrame, particleData);
         }
     }
 

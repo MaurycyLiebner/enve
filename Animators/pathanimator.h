@@ -27,17 +27,10 @@ public:
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
 
-    void makeDuplicate(Property *property);
-
-    Property *makeDuplicateT();
-
-
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
     void applyTransformToPoints(const QMatrix &transform);
-
-    void duplicatePathsTo(PathAnimator *target);
 
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,

@@ -92,11 +92,3 @@ void PathEffectAnimators::filterPathForRelFrame(const int &relFrame,
     }
     *srcDstPath = dstPath;
 }
-
-//void PathEffectAnimators::makeDuplicate(Property *target) {
-//    PathEffectAnimators *eaTarget = ((PathEffectAnimators*)target);
-//    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-//        eaTarget->addEffect((PathEffect*)
-//                    ((PathEffect*)effect.data())->makeDuplicate());
-//    }
-//}

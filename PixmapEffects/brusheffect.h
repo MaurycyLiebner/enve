@@ -80,9 +80,6 @@ public:
                const fmt_filters::image &img,
                qreal scale);
 
-    void makeDuplicate(Property *) {}
-    Property *makeDuplicateT() { return NULL; }
-
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(const int &relFrame);

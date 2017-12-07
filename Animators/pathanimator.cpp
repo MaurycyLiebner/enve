@@ -269,15 +269,6 @@ BoundingBox *PathAnimator::getParentBox() {
     return mParentBox;
 }
 
-
-void PathAnimator::duplicatePathsTo(PathAnimator *target) {
-    Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
-        VectorPathAnimator *duplicate = path->makeDuplicate();
-        duplicate->setParentPath(target);
-        target->addSinglePathAnimator(duplicate);
-    }
-}
-
 void PathAnimator::shiftAllPointsForAllKeys(const int &by) {
     Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
         path->shiftAllPointsForAllKeys(by);

@@ -144,12 +144,6 @@ public:
         mParentPathAnimator = parentPath;
     }
 
-    VectorPathAnimator *makeDuplicate() {
-        VectorPathAnimator *path =
-                new VectorPathAnimator(mParentPathAnimator);
-        return path;
-    }
-
     void finishAllPointsTransform();
     void startAllPointsTransform();
     void disconnectPoints(NodePoint *pt1,

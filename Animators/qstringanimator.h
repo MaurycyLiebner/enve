@@ -14,7 +14,6 @@ public:
 
     const QString &getText() { return mText; }
     void setText(const QString &text) { mText = text; }
-    QStringKey *makeDuplicate(QStringAnimator *anim);
     void writeQStringKey(QIODevice *target);
     void readQStringKey(QIODevice *target);
 private:
@@ -38,7 +37,6 @@ public:
                                                int *lastIdentical,
                                               const int &relFrame);
 
-    void makeDuplicate(QStringAnimator *anim);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:

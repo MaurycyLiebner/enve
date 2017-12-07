@@ -384,6 +384,8 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mParticlesOpacityDecay->qra_setValueRange(0., 1.);
     mParticlesOpacityDecay->qra_setCurrentValue(0.);
 
+    mBoxTargetProperty->prp_setName("box target");
+
     mPos->prp_setName("pos");
     ca_addChildAnimator(mPos.data());
     ca_addChildAnimator(mWidth.data());
@@ -412,6 +414,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     ca_addChildAnimator(mParticlesDecayFrames.data());
     ca_addChildAnimator(mParticlesSizeDecay.data());
     ca_addChildAnimator(mParticlesOpacityDecay.data());
+    ca_addChildAnimator(mBoxTargetProperty.data());
 
     prp_setUpdater(new ParticlesUpdater(this));
     prp_blockUpdater();
