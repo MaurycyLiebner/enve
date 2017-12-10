@@ -154,6 +154,12 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
         if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mBottomRightPoint;
         }
+        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+            MovablePoint *pt = emitter->getPosPoint();
+            if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+                return pt;
+            }
+        }
     } else if(currentCanvasMode == MOVE_PATH) {
         MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
         if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
@@ -161,12 +167,6 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
         }
     }
 
-    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-        MovablePoint *pt = emitter->getPosPoint();
-        if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return pt;
-        }
-    }
     return NULL;
 }
 

@@ -201,7 +201,8 @@ SOURCES += main.cpp\
     Properties/intproperty.cpp \
     windowsinglewidgettarget.cpp \
     Boxes/bone.cpp \
-    valueinput.cpp
+    valueinput.cpp \
+    drawpath.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -362,7 +363,8 @@ HEADERS  += mainwindow.h \
     Properties/intproperty.h \
     windowsinglewidgettarget.h \
     Boxes/bone.h \
-    valueinput.h
+    valueinput.h \
+    drawpath.h
 
 RESOURCES += \
     resources.qrc

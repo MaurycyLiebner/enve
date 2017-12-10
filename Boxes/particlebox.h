@@ -24,14 +24,18 @@ struct ParticleState {
     void drawSk(SkCanvas *canvas,
                 const SkPaint paint) const {
         if(size < 0.) return;
+        SkPaint paintT = paint;
         if(targetRenderData.get() == NULL) {
-            SkPaint paintT = paint;
             paintT.setAlpha(opacity);
             paintT.setStrokeWidth(size);
             canvas->drawPath(linePath, paintT);
         } else {
-            targetRenderData->renderToImage();
-            targetRenderData->drawRenderedImageForParent(canvas);
+            paintT.setAlpha(qRound(targetRenderData->opacity*2.55));
+            sk_sp<SkImage> imageT = targetRenderData->renderedImage;
+            if(imageT.get() == NULL) return;
+            canvas->drawImage(imageT,
+                              pos.x() - imageT->width()*0.5,
+                              pos.y() - imageT->height()*0.5, &paintT);
         }
     }
 
@@ -56,6 +60,7 @@ struct EmitterData {
         canvas->restore();
     }
 
+    bool boxDraw = false;
     SkColor color;
     QList<ParticleState> particleStates;
 };
@@ -78,7 +83,19 @@ private:
         canvas->save();
         canvas->clipRect(clipRect);
         Q_FOREACH(const EmitterData &emitterData, emittersData) {
-            emitterData.drawParticles(canvas);
+            if(emitterData.boxDraw) {
+                canvas->save();
+                canvas->resetMatrix();
+                canvas->translate(-globalBoundingRect.left(),
+                                  -globalBoundingRect.top());
+                QMatrix scale;
+                scale.scale(resolution, resolution);
+                canvas->concat(QMatrixToSkMatrix(scale));
+                emitterData.drawParticles(canvas);
+                canvas->restore();
+            } else {
+                emitterData.drawParticles(canvas);
+            }
         }
 
         canvas->restore();
@@ -148,6 +165,7 @@ public:
 
         BoundingBox *targetT = mBoxTargetProperty->getTarget();
         if(targetT == NULL) {
+            data.boxDraw = false;
             Q_FOREACH(Particle *particle, mParticles) {
                 if(particle->isVisibleAtFrame(relFrame)) {
                     data.particleStates <<
@@ -155,26 +173,28 @@ public:
                 }
             }
         } else {
-            int targetRelFrame = targetT->prp_absFrameToRelFrame(
-                        prp_relFrameToAbsFrame(relFrame));
+            data.boxDraw = true;
             Q_FOREACH(Particle *particle, mParticles) {
                 if(particle->isVisibleAtFrame(relFrame)) {
                     ParticleState stateT = particle->getParticleStateAtFrame(relFrame);
                     BoundingBoxRenderData *renderData = targetT->createRenderData();
-                    targetT->setupBoundingBoxRenderDataForRelFrame(
-                        targetRelFrame, renderData);
-                    QMatrix transformT = renderData->transform;
-                    transformT.setMatrix(transformT.m11()*stateT.size, transformT.m12(),
-                                         transformT.m21(), transformT.m22()*stateT.size,
-                                         stateT.pos.x(), stateT.pos.y());
-                    renderData->transform = transformT*particleData->transform;
-                    renderData->opacity = ((int)stateT.opacity)*
-                            renderData->opacity/255;
+                    QMatrix multMatr = QMatrix(stateT.size, 0.,
+                                               0., stateT.size,
+                                               0., 0.)*particleData->transform;
+                    renderData->appendRenderCustomizerFunctor(
+                            new MultiplyTransformCustomizer(multMatr,
+                                                            stateT.opacity/255.));
+                    renderData->appendRenderCustomizerFunctor(
+                            new ReplaceTransformDisplacementCustomizer(
+                                    stateT.pos.x(), stateT.pos.y()));
 
                     stateT.targetRenderData =
                             renderData->ref<BoundingBoxRenderData>();
+                    renderData->maxBoundsEnabled = false;
+                    renderData->parentIsTarget = false;
                     data.particleStates << stateT;
-                    renderData->dataSet();
+                    renderData->addDependent(particleData);
+                    renderData->addScheduler();
                 }
             }
         }

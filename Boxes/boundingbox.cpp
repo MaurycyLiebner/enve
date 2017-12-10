@@ -546,7 +546,9 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->relFrame = relFrame;
     data->renderedToImage = false;
     data->relTransform = getRelativeTransformAtRelFrame(relFrame);
-    data->transform = mTransformAnimator->getCombinedTransformMatrixAtRelFrame(relFrame);
+    data->parentTransform = mTransformAnimator->
+            getParentCombinedTransformMatrixAtRelFrame(relFrame);
+    data->transform = data->relTransform*data->parentTransform;
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
     bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
@@ -1131,7 +1133,12 @@ BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
     parentBox = parentBoxT->weakRef<BoundingBox>();
 }
 
-BoundingBoxRenderData::~BoundingBoxRenderData() {}
+BoundingBoxRenderData::~BoundingBoxRenderData() {
+    foreach(RenderDataCustomizerFunctor *functor,
+            mRenderDataCustomizerFunctors) {
+        delete functor;
+    }
+}
 
 void BoundingBoxRenderData::updateRelBoundingRect() {
     BoundingBox *parentBoxT = parentBox.data();
@@ -1174,17 +1181,18 @@ void BoundingBoxRenderData::renderToImage() {
     scale.scale(resolution, resolution);
     QMatrix transformRes = transform*scale;
     //transformRes.scale(resolution, resolution);
-    QRectF allUglyBoundingRect =
-            transformRes.mapRect(relBoundingRect).
+    globalBoundingRect = transformRes.mapRect(relBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,
                      effectsMargin, effectsMargin);
-    allUglyBoundingRect = allUglyBoundingRect.intersected(
-                          scale.mapRect(maxBoundsRect));
-    QSizeF sizeF = allUglyBoundingRect.size();
-    QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
-                    qRound(allUglyBoundingRect.top()/**resolution*/));
-    allUglyBoundingRect.translate(-transF);
+    if(maxBoundsEnabled) {
+        globalBoundingRect = globalBoundingRect.intersected(
+                              scale.mapRect(maxBoundsRect));
+    }
+    QSizeF sizeF = globalBoundingRect.size();
+    QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -
+            QPointF(qRound(globalBoundingRect.left()/**resolution*/),
+                    qRound(globalBoundingRect.top()/**resolution*/));
+    globalBoundingRect.translate(-transF);
     SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
                                          ceil(sizeF.height()),
                                          kBGRA_8888_SkColorType,
@@ -1197,16 +1205,16 @@ void BoundingBoxRenderData::renderToImage() {
     SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
     rasterCanvas->clear(SK_ColorTRANSPARENT);
 
-    rasterCanvas->translate(-allUglyBoundingRect.left(),
-                            -allUglyBoundingRect.top());
+    rasterCanvas->translate(-globalBoundingRect.left(),
+                            -globalBoundingRect.top());
     rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
 
     drawSk(rasterCanvas);
     rasterCanvas->flush();
     delete rasterCanvas;
 
-    drawPos = SkPoint::Make(qRound(allUglyBoundingRect.left()),
-                            qRound(allUglyBoundingRect.top()));
+    drawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
+                            qRound(globalBoundingRect.top()));
 
     if(!pixmapEffects.isEmpty()) {
         SkPixmap pixmap;
@@ -1238,13 +1246,13 @@ void BoundingBoxRenderData::beforeUpdate() {
 //    parentBox->updateCurrentPreviewDataFromRenderData(this);
 
     BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == NULL) return;
+    if(parentBoxT == NULL || !parentIsTarget) return;
     parentBoxT->nullifyCurrentRenderData();
 }
 
 void BoundingBoxRenderData::afterUpdate() {
     BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT != NULL) {
+    if(parentBoxT != NULL && parentIsTarget) {
         parentBoxT->renderDataFinished(this);
     }
     Updatable::afterUpdate();
@@ -1256,6 +1264,10 @@ void BoundingBoxRenderData::schedulerProccessed() {
         parentBoxT->setupBoundingBoxRenderDataForRelFrame(
                     parentBoxT->anim_getCurrentRelFrame(),
                     this);
+        foreach(RenderDataCustomizerFunctor *customizer,
+                mRenderDataCustomizerFunctors) {
+            (*customizer)(this);
+        }
     }
     mDataSet = false;
     if(!mDelayDataSet) {
@@ -1275,7 +1287,7 @@ void BoundingBoxRenderData::dataSet() {
         mDataSet = true;
         updateRelBoundingRect();
         BoundingBox *parentBoxT = parentBox.data();
-        if(parentBoxT == NULL) return;
+        if(parentBoxT == NULL || !parentIsTarget) return;
         parentBoxT->updateCurrentPreviewDataFromRenderData(this);
     }
 }

@@ -182,12 +182,12 @@ MovablePoint *NodePoint::getPointAtAbsPos(const QPointF &absPos,
             return mEndCtrlPt;
         }
     } else {
-        if(!isEndPoint()) {
+        if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
             return NULL;
         }
     }
-    if (isPointAtAbsPos(absPos,
-                        canvasScaleInv)) {
+    if(isPointAtAbsPos(absPos,
+                       canvasScaleInv)) {
         return this;
     }
     return NULL;

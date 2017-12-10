@@ -51,6 +51,15 @@ public:
 
     virtual void removeNodeAtAndApproximate(const int &nodeId) {
         int nodePtId = nodeIdToPointId(nodeId);
+        bool isLast = nodePtId == 1 ||
+                (nodePtId == mElementsPos.count() - 2 && !mPathClosed);
+        if(!isLast) {
+            int prevCtrlId = nodePtId - 2;
+            if(prevCtrlId < 0) prevCtrlId = mElementsPos.count() - 1;
+            int nextCtrlId = nodePtId + 2;
+            if(nextCtrlId >= mElementsPos.count()) nextCtrlId = 0;
+            // make approximate
+        }
         removeElementPosAt(nodePtId - 1);
         removeElementPosAt(nodePtId - 1);
         removeElementPosAt(nodePtId - 1);

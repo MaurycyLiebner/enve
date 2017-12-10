@@ -82,14 +82,17 @@ private:
     BoundingBox *mBoundingBox;
 };
 
+class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public Updatable {
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 
     virtual ~BoundingBoxRenderData();
     bool renderedToImage = false;
     QMatrix transform;
+    QMatrix parentTransform;
     QMatrix relTransform;
     QRectF relBoundingRect;
+    QRectF globalBoundingRect;
     qreal opacity;
     qreal resolution;
     qreal effectsMargin;
@@ -98,7 +101,9 @@ struct BoundingBoxRenderData : public Updatable {
     SkPoint drawPos = SkPoint::Make(0.f, 0.f);
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
     QRectF maxBoundsRect;
+    bool maxBoundsEnabled = true;
 
+    bool parentIsTarget = true;
     QWeakPointer<BoundingBox> parentBox;
 
     virtual void updateRelBoundingRect();
@@ -128,10 +133,103 @@ struct BoundingBoxRenderData : public Updatable {
     virtual QPointF getCenterPosition() {
         return relBoundingRect.center();
     }
+
+    void appendRenderCustomizerFunctor(RenderDataCustomizerFunctor *customizer) {
+        mRenderDataCustomizerFunctors.append(customizer);
+    }
+
+    void prependRenderCustomizerFunctor(RenderDataCustomizerFunctor *customizer) {
+        mRenderDataCustomizerFunctors.prepend(customizer);
+    }
 protected:
+    QList<RenderDataCustomizerFunctor*> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;
     virtual void drawSk(SkCanvas *canvas) = 0;
+};
+
+class RenderDataCustomizerFunctor {
+public:
+    RenderDataCustomizerFunctor() {}
+    virtual ~RenderDataCustomizerFunctor() {}
+    virtual void customize(BoundingBoxRenderData *data) = 0;
+    void operator()(BoundingBoxRenderData *data) {
+        customize(data);
+    }
+};
+
+class ReplaceTransformDisplacementCustomizer :
+        public RenderDataCustomizerFunctor {
+public:
+    ReplaceTransformDisplacementCustomizer(const qreal &dx,
+                                           const qreal &dy) {
+        mDx = dx;
+        mDy = dy;
+    }
+
+    void customize(BoundingBoxRenderData *data) {
+        QMatrix transformT = data->transform;
+        data->transform.setMatrix(transformT.m11(), transformT.m12(),
+                                  transformT.m21(), transformT.m22(),
+                                  mDx, mDy);
+    }
+protected:
+    qreal mDx, mDy;
+};
+
+class MultiplyTransformCustomizer :
+        public RenderDataCustomizerFunctor {
+public:
+    MultiplyTransformCustomizer(const QMatrix &transform,
+                                const qreal &opacity = 1.) {
+        mTransform = transform;
+        mOpacity = opacity;
+    }
+
+    void customize(BoundingBoxRenderData *data) {
+        data->transform = mTransform*data->transform;
+        data->opacity *= mOpacity;
+    }
+protected:
+    QMatrix mTransform;
+    qreal mOpacity = 1.;
+};
+
+struct BoundingBoxRenderDataContainer : public Updatable {
+    BoundingBoxRenderDataContainer(BoundingBoxRenderData *targetRenderDataT) {
+        targetRenderData = targetRenderDataT->ref<BoundingBoxRenderData>();
+    }
+
+    void processUpdate() {
+        targetRenderData->processUpdate();
+        Updatable::processUpdate();
+    }
+
+    void beforeUpdate() {
+        targetRenderData->beforeUpdate();
+        Updatable::beforeUpdate();
+    }
+
+    void afterUpdate() {
+        targetRenderData->afterUpdate();
+        Updatable::afterUpdate();
+    }
+
+    void schedulerProccessed() {
+        targetRenderData->schedulerProccessed();
+        Updatable::schedulerProccessed();
+    }
+
+    void addSchedulerNow() {
+        targetRenderData->addSchedulerNow();
+        Updatable::addSchedulerNow();
+    }
+
+    bool allDataReady() {
+        return targetRenderData->allDataReady();
+    }
+
+    std::shared_ptr<BoundingBoxRenderData> targetRenderData;
 };
 
 class BoundingBox :

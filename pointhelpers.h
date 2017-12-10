@@ -51,6 +51,13 @@ extern bool isZero2Dec(qreal val);
 
 extern bool isZero1Dec(qreal val);
 
+extern QPointF getClosestPointOnLineSegment(const QPointF &a,
+                                            const QPointF &b,
+                                            const QPointF &p);
+extern QPointF closestPointOnRect(const QRectF &rect,
+                                  const QPointF &point,
+                                  qreal *dist = NULL);
+
 extern qreal getTforBezierPoint(const qreal &x0,
                                 const qreal &x1,
                                 const qreal &x2,
@@ -61,7 +68,8 @@ extern qreal getTforBezierPoint(const qreal &x0,
                                 const qreal &y2,
                                 const qreal &y3,
                                 const qreal &y,
-                                qreal *error = NULL);
+                                qreal *error = NULL,
+                                const bool &fineTune = true);
 
 extern qreal getTforBezierPoint(const QPointF &p0,
                                 const QPointF &p1,

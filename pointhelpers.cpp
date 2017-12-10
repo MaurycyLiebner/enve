@@ -198,6 +198,77 @@ qreal get1DAccuracyValue(const qreal &x0,
     return qMax4(x0, x1, x2, x3) - qMin4(x0, x1, x2, x3);
 }
 
+QPointF getClosestPointOnLineSegment(const QPointF &a,
+                                     const QPointF &b,
+                                     const QPointF &p) {
+    QVector2D AP = QVector2D(p - a); //Vector from A to P
+    QVector2D AB = QVector2D(b - a); //Vector from A to B
+
+    qreal magnitudeAB = AB.lengthSquared(); //Magnitude of AB vector (it's length squared)
+    qreal ABAPproduct = QVector2D::dotProduct(AP, AB); //The DOT product of a_to_p and a_to_b
+    qreal distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point
+
+    if(distance < 0.) { //Check if P projection is over vectorAB
+        return a;
+    } else if (distance > 1.) {
+        return b;
+    } else {
+        return a + (AB * distance).toPointF();
+    }
+}
+
+QPointF closestPointOnRect(const QRectF &rect,
+                           const QPointF &point,
+                           qreal *dist) {
+    qreal minDist = DBL_MAX;
+    QPointF bestPos;
+    if(point.y() > rect.bottom()) {
+        // check bottom
+        QPointF pt = getClosestPointOnLineSegment(rect.bottomLeft(),
+                                                  rect.bottomRight(),
+                                                  point);
+        qreal dist = pointToLen(pt - point);
+        if(dist < minDist) {
+            minDist = dist;
+            bestPos = pt;
+        }
+    } else if(point.y() < rect.top()) {
+        // check top
+        QPointF pt = getClosestPointOnLineSegment(rect.topLeft(),
+                                                  rect.topRight(),
+                                                  point);
+        qreal dist = pointToLen(pt - point);
+        if(dist < minDist) {
+            minDist = dist;
+            bestPos = pt;
+        }
+    }
+
+    if(point.x() > rect.right()) {
+        // check right
+        QPointF pt = getClosestPointOnLineSegment(rect.topRight(),
+                                                  rect.bottomRight(),
+                                                  point);
+        qreal dist = pointToLen(pt - point);
+        if(dist < minDist) {
+            minDist = dist;
+            bestPos = pt;
+        }
+    } else if(point.y() < rect.left()) {
+        // check left
+        QPointF pt = getClosestPointOnLineSegment(rect.bottomLeft(),
+                                                  rect.topLeft(),
+                                                  point);
+        qreal dist = pointToLen(pt - point);
+        if(dist < minDist) {
+            minDist = dist;
+            bestPos = pt;
+        }
+    }
+    if(dist != NULL) *dist = minDist;
+    return bestPos;
+}
+
 qreal getTforBezierPoint(const qreal &x0,
                          const qreal &x1,
                          const qreal &x2,
@@ -208,7 +279,8 @@ qreal getTforBezierPoint(const qreal &x0,
                          const qreal &y2,
                          const qreal &y3,
                          const qreal &y,
-                         qreal *error) {
+                         qreal *error,
+                         const bool &fineTune) {
     QList<std::complex<double> > xValues;
     QList<std::complex<double> > yValues;
 
@@ -216,27 +288,66 @@ qreal getTforBezierPoint(const qreal &x0,
     getTValuesforBezier1D(x0, x1, x2, x3, x, &xValues);
     getTValuesforBezier1D(y0, y1, y2, y3, y, &yValues);
     qreal bestT = 0.;
+    QPointF bestPos;
     qreal minErrorT = 1000000.;
     Q_FOREACH(const std::complex<double> &yVal, yValues) {
-        qreal errorT = pointToLen(QPointF(calcCubicBezierVal(x0, x1, x2, x3,
-                                                             yVal.real()),
-                                          calcCubicBezierVal(y0, y1, y2, y3,
-                                                             yVal.real())) -
-                                 QPointF(x, y));
+        QPointF posT = QPointF(calcCubicBezierVal(x0, x1, x2, x3,
+                                                  yVal.real()),
+                               calcCubicBezierVal(y0, y1, y2, y3,
+                                                  yVal.real()));
+        qreal errorT = pointToLen(posT - QPointF(x, y));
         if(errorT < minErrorT) {
+            bestPos = posT;
             minErrorT = errorT;
             bestT = yVal.real();
         }
     }
     Q_FOREACH(const std::complex<double> &xVal, xValues) {
-        qreal errorT = pointToLen(QPointF(calcCubicBezierVal(x0, x1, x2, x3,
-                                                             xVal.real()),
-                                          calcCubicBezierVal(y0, y1, y2, y3,
-                                                             xVal.real())) -
-                                 QPointF(x, y));
+        QPointF posT = QPointF(calcCubicBezierVal(x0, x1, x2, x3,
+                                                  xVal.real()),
+                               calcCubicBezierVal(y0, y1, y2, y3,
+                                                  xVal.real()));
+        qreal errorT = pointToLen(posT - QPointF(x, y));
         if(errorT < minErrorT) {
+            bestPos = posT;
             minErrorT = errorT;
             bestT = xVal.real();
+        }
+    }
+
+    if(fineTune) {
+        if(minErrorT < 999999.) { // check if found
+            qreal incT = 0.1;
+            qreal lastDisplacement = 100000.;
+            while(lastDisplacement > 1.) {
+                bool foundBetter = false;
+                qreal nextT = clamp(bestT + incT, 0., 1.);
+                QPointF nextPosT = QPointF(calcCubicBezierVal(x0, x1, x2, x3, nextT),
+                                       calcCubicBezierVal(y0, y1, y2, y3, nextT));
+                lastDisplacement = pointToLen(nextPosT - bestPos);
+                qreal nextErrorT = pointToLen(nextPosT - QPointF(x, y));
+                if(nextErrorT < minErrorT) {
+                    bestPos = nextPosT;
+                    minErrorT = nextErrorT;
+                    bestT = nextT;
+                    foundBetter = true;
+                }
+
+                qreal prevT = clamp(bestT - incT, 0., 1.);
+                QPointF prevPosT = QPointF(calcCubicBezierVal(x0, x1, x2, x3, prevT),
+                                       calcCubicBezierVal(y0, y1, y2, y3, prevT));
+                lastDisplacement = qMax(lastDisplacement,
+                                        pointToLen(prevPosT - bestPos));
+                qreal prevErrorT = pointToLen(prevPosT - QPointF(x, y));
+                if(prevErrorT < minErrorT) {
+                    bestPos = prevPosT;
+                    minErrorT = prevErrorT;
+                    bestT = prevT;
+                    foundBetter = true;
+                }
+
+                if(!foundBetter) incT *= 0.5;
+            }
         }
     }
 

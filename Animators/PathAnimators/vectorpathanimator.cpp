@@ -396,8 +396,7 @@ void VectorPathAnimator::removeNodeAtAndApproximate(const int &nodeId) {
     setNodeCtrlsMode(nodeId - 1, CtrlsMode::CTRLS_CORNER);
     PathContainer::removeNodeAtAndApproximate(nodeId);
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((PathKey*)key.get())->
-                removeNodeAtAndApproximate(nodeId);
+        ((PathKey*)key.get())->removeNodeAtAndApproximate(nodeId);
     }
 }
 

@@ -233,16 +233,18 @@ void LinkCanvasRenderData::renderToImage() {
     scale.scale(resolution, resolution);
     QMatrix transformRes = transform*scale;
     //transformRes.scale(resolution, resolution);
-    QRectF allUglyBoundingRect =
+    QRectF globalBoundingRect =
             transformRes.mapRect(relBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,
                      effectsMargin, effectsMargin);
-    allUglyBoundingRect = allUglyBoundingRect.intersected(
-                          scale.mapRect(maxBoundsRect));
-    QSizeF sizeF = allUglyBoundingRect.size();
-    QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
-                    qRound(allUglyBoundingRect.top()/**resolution*/));
+    if(maxBoundsEnabled) {
+        globalBoundingRect = globalBoundingRect.intersected(
+                              scale.mapRect(maxBoundsRect));
+    }
+    QSizeF sizeF = globalBoundingRect.size();
+    QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -
+            QPointF(qRound(globalBoundingRect.left()/**resolution*/),
+                    qRound(globalBoundingRect.top()/**resolution*/));
 
     SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
                                          ceil(sizeF.height()),
@@ -256,10 +258,10 @@ void LinkCanvasRenderData::renderToImage() {
     SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
     rasterCanvas->clear(SK_ColorTRANSPARENT);
 
-    rasterCanvas->translate(-allUglyBoundingRect.left(),
-                            -allUglyBoundingRect.top());
+    rasterCanvas->translate(-globalBoundingRect.left(),
+                            -globalBoundingRect.top());
 
-    allUglyBoundingRect.translate(-transF);
+    globalBoundingRect.translate(-transF);
 
     rasterCanvas->translate(transF.x(), transF.y());
 
@@ -290,8 +292,8 @@ void LinkCanvasRenderData::renderToImage() {
     rasterCanvas->flush();
     delete rasterCanvas;
 
-    drawPos = SkPoint::Make(qRound(allUglyBoundingRect.left()),
-                            qRound(allUglyBoundingRect.top()));
+    drawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
+                            qRound(globalBoundingRect.top()));
 
     if(!pixmapEffects.isEmpty()) {
         SkPixmap pixmap;

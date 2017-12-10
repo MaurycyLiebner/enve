@@ -14,8 +14,7 @@
 
 VectorPath::VectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
-    mPathAnimator =
-            (new PathAnimator(this))->ref<PathAnimator>();
+    mPathAnimator = (new PathAnimator(this))->ref<PathAnimator>();
     setName("Path");
     mPathAnimator->prp_setUpdater(new NodePointUpdater(this));
     mPathAnimator->prp_blockUpdater();
