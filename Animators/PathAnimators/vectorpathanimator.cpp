@@ -103,7 +103,8 @@ void VectorPathAnimator::anim_saveCurrentValueAsKey() {
 }
 
 SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
-                                             const bool &considerCurrent) {
+                                             const bool &considerCurrent,
+                                             const bool &interpolate) {
     //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
     SkPath pathToRuturn;
     int prevId;
@@ -233,6 +234,7 @@ bool VectorPathAnimator::getTAndPointsForMouseEdgeInteraction(
 
     return true;
 }
+
 
 NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                                     const QPointF &absPos,

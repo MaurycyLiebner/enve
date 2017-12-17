@@ -12,6 +12,8 @@ class NodePoint;
 class VectorPathAnimator;
 class BoundingBox;
 class Canvas;
+class BoolAnimator;
+typedef QSharedPointer<BoolAnimator> BoolAnimatorQSPtr;
 
 class PathAnimator : public ComplexAnimator {
     Q_OBJECT
@@ -37,8 +39,8 @@ public:
                       const SkScalar &invScale,
                       const SkMatrix &combinedTransform);
 
-    void selectAndAddContainedPointsToList(
-            const QRectF &absRect, QList<MovablePoint *> *list);
+    void selectAndAddContainedPointsToList(const QRectF &absRect,
+                                           QList<MovablePoint *> *list);
 
     BoundingBox *getParentBox();
 
@@ -67,7 +69,13 @@ public:
     const QList<VectorPathAnimator*> &getSinglePathsList() {
         return mSinglePaths;
     }
+
+//    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+//                                         const int &relFrame2) {
+//        bool interpolate = mSmoothTransformation->g;
+//    }
 private:
+    BoolAnimatorQSPtr mSmoothTransformation;
     BoundingBox *mParentBox = NULL;
     QList<VectorPathAnimator*> mSinglePaths;
 signals:

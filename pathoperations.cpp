@@ -625,7 +625,7 @@ QPointF BezierCubic::getPointAtT(const qreal &t) {
 }
 
 qreal BezierCubic::getTForPoint(QPointF point) {
-    return getTforBezierPoint(mP1, mC1, mC2, mP2, point);
+    return getClosestTValueBezier2D(mP1, mC1, mC2, mP2, point);
 }
 
 

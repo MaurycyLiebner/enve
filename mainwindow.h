@@ -196,6 +196,9 @@ private:
     ActionButton *mMovePathMode;
     ActionButton *mMovePointMode;
     ActionButton *mAddPointMode;
+    ActionButton *mDrawPathMode;
+    ActionButton *mAddDrawPathNodeMode;
+
     ActionButton *mCircleMode;
 //
     ActionButton *mRectangleMode;

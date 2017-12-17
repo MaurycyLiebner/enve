@@ -332,7 +332,9 @@ void Canvas::renderSk(SkCanvas *canvas) {
                 mHoveredBox->drawHoveredSk(canvas, invScale);
             }
         }
-
+        if(mCurrentMode == DRAW_PATH) {
+            mDrawPath.drawPath(canvas);
+        }
         canvas->resetMatrix();
 
         if(!mClipToCanvasSize) {

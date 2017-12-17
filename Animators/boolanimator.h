@@ -10,6 +10,9 @@ public:
     bool getCurrentBoolValue();
     void setCurrentBoolValue(const bool &bT,
                              const bool &finish = false);
+    bool getCurrentBoolValueAtRelFrame(const int &relFrame) {
+        return getCurrentIntValueAtRelFrame(relFrame) == 1;
+    }
     bool SWT_isBoolAnimator() { return true; }
 };
 

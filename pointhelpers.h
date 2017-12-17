@@ -69,6 +69,7 @@ extern qreal getTforBezierPoint(const qreal &x0,
                                 const qreal &y3,
                                 const qreal &y,
                                 qreal *error = NULL,
+                                QPointF *bestPosPtr = NULL,
                                 const bool &fineTune = true);
 
 extern qreal getTforBezierPoint(const QPointF &p0,
@@ -76,7 +77,23 @@ extern qreal getTforBezierPoint(const QPointF &p0,
                                 const QPointF &p2,
                                 const QPointF &p3,
                                 const QPointF &p,
-                                qreal *error = NULL);
+                                qreal *error = NULL,
+                                QPointF *bestPosPtr = NULL);
+
+extern void getClosestTValuesBezier1D(const qreal &v0n,
+                                      const qreal &v1n,
+                                      const qreal &v2n,
+                                      const qreal &v3n,
+                                      const qreal &vn,
+                                      QList<qreal> *list);
+
+extern qreal getClosestTValueBezier2D(const QPointF &p0,
+                                      const QPointF &p1,
+                                      const QPointF &p2,
+                                      const QPointF &p3,
+                                      const QPointF &p,
+                                      QPointF *bestPosPtr = NULL,
+                                      qreal *errorPtr = NULL);
 
 extern qreal getBezierTValueForX(const qreal &x0,
                                  const qreal &x1,
@@ -84,7 +101,12 @@ extern qreal getBezierTValueForX(const qreal &x0,
                                  const qreal &x3,
                                  const qreal &x,
                                  qreal *error = NULL);
-
+extern void bezierLeastSquareV1V2(const QPointF &v0,
+                                  QPointF &v1, QPointF &v2,
+                                  const QPointF &v3,
+                                  const QList<QPointF> &vs,
+                                  const int &minVs,
+                                  const int &maxVs);
 
 extern qreal qMin4(qreal v1, qreal v2,
                    qreal v3, qreal v4);

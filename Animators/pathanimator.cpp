@@ -5,16 +5,19 @@
 #include "edge.h"
 #include "skqtconversions.h"
 #include "canvas.h"
+#include "boolanimator.h"
 
 PathAnimator::PathAnimator() :
     ComplexAnimator() {
     prp_setName("path");
+    mSmoothTransformation = (new BoolAnimator())->ref<BoolAnimator>();
+    mSmoothTransformation->prp_setName("interpolate");
+    ca_addChildAnimator(mSmoothTransformation.data());
 }
 
 PathAnimator::PathAnimator(BoundingBox *parentBox) :
     PathAnimator() {
     setParentBox(parentBox);
-    prp_setName("path");
 }
 
 PathAnimator::~PathAnimator() {
@@ -199,7 +202,8 @@ SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
     SkPath path = SkPath();
 
     Q_FOREACH(VectorPathAnimator *singlePath, mSinglePaths) {
-        path.addPath(singlePath->getPathAtRelFrame(relFrame));
+        bool interpolate = mSmoothTransformation->getCurrentBoolValueAtRelFrame(relFrame);
+        path.addPath(singlePath->getPathAtRelFrame(relFrame, true, interpolate));
     }
 
     return path;

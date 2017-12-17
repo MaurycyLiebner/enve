@@ -494,6 +494,10 @@ void Canvas::handleLeftButtonMousePress() {
         } // point adding mode
         else if (mCurrentMode == CanvasMode::MOVE_POINT) {
             handleMovePointMousePressEvent();
+        } else if (mCurrentMode == CanvasMode::DRAW_PATH) {
+            handleDrawPathMousePressEvent();
+        } else if (mCurrentMode == CanvasMode::ADD_DRAW_PATH_NODE) {
+            handleAddDrawPathNodeMousePressEvent();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
 
             QSharedPointer<Circle> newPath =
@@ -864,6 +868,28 @@ void Canvas::handleAddPointMousePress() {
     } // pats is not null
 }
 
+void Canvas::handleDrawPathMousePressEvent() {
+    if(isShiftPressed()) return;
+    mDrawPath.startDrawingPath(mLastPressPosRel, mLastPressPosRel);
+}
+
+void Canvas::handleDrawPathMouseMoveEvent() {
+    if(isShiftPressed()) return;
+    mDrawPath.drawPathMove(mLastMouseEventPosRel);
+}
+
+void Canvas::handleDrawPathMouseReleaseEvent() {
+    if(isShiftPressed()) {
+        mDrawPath.addNodeAt(mLastMouseEventPosRel);
+    } else {
+        mDrawPath.finishDrawingPath(false);
+    }
+}
+
+void Canvas::handleAddDrawPathNodeMousePressEvent() {
+
+}
+
 void Canvas::handleAddPointMouseRelease() {
     if(mCurrentEndPoint != NULL) {
         //mCurrentEndPoint->prp_updateInfluenceRangeAfterChanged();
@@ -897,6 +923,8 @@ void Canvas::handleMouseRelease() {
             }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseRelease();
+        } else if(mCurrentMode == CanvasMode::DRAW_PATH) {
+            handleDrawPathMouseReleaseEvent();
         } else if(mCurrentMode == PICK_PATH_SETTINGS) {
             if(mLastPressedBox != NULL) {
                 PathBox *srcPathBox = (PathBox*) mLastPressedBox;
@@ -1244,6 +1272,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
             }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseMove();
+        } else if(mCurrentMode == CanvasMode::DRAW_PATH) {
+            handleDrawPathMouseMoveEvent();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
             if(isShiftPressed() ) {
                 qreal lenR = pointToLen(mCurrentMouseEventPosRel -

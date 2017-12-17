@@ -160,6 +160,8 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-node.xpm"), 0, 0) );
     } else if(mode == PICK_PATH_SETTINGS) {
         setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
+    } else if(mode == DRAW_PATH) {
+        setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     } else if(mode == ADD_CIRCLE) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-ellipse.xpm"), 4, 4) );
     } else if(mode == ADD_RECTANGLE ||
@@ -192,6 +194,14 @@ void CanvasWindow::setMovePointMode() {
 
 void CanvasWindow::setAddPointMode() {
     setCanvasMode(ADD_POINT);
+}
+
+void CanvasWindow::setDrawPathMode() {
+    setCanvasMode(DRAW_PATH);
+}
+
+void CanvasWindow::setAddDrawPathNodeMode() {
+    setCanvasMode(ADD_DRAW_PATH_NODE);
 }
 
 void CanvasWindow::setRectangleMode() {
@@ -320,20 +330,24 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_F3) {
         setCanvasMode(CanvasMode::ADD_POINT);
     } else if(event->key() == Qt::Key_F4) {
-        setCanvasMode(CanvasMode::ADD_CIRCLE);
+        setCanvasMode(CanvasMode::DRAW_PATH);
     } else if(event->key() == Qt::Key_F5) {
-        setCanvasMode(CanvasMode::ADD_RECTANGLE);
+        setCanvasMode(CanvasMode::ADD_DRAW_PATH_NODE);
     } else if(event->key() == Qt::Key_F6) {
-        setCanvasMode(CanvasMode::ADD_TEXT);
+        setCanvasMode(CanvasMode::ADD_CIRCLE);
     } else if(event->key() == Qt::Key_F7) {
-        setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
+        setCanvasMode(CanvasMode::ADD_RECTANGLE);
     } else if(event->key() == Qt::Key_F8) {
-        setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+        setCanvasMode(CanvasMode::ADD_TEXT);
     } else if(event->key() == Qt::Key_F9) {
-        setCanvasMode(CanvasMode::ADD_PAINT_BOX);
+        setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
     } else if(event->key() == Qt::Key_F10) {
-        setCanvasMode(CanvasMode::PAINT_MODE);
+        setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
     } else if(event->key() == Qt::Key_F11) {
+        setCanvasMode(CanvasMode::ADD_PAINT_BOX);
+    } else if(event->key() == Qt::Key_F12) {
+        setCanvasMode(CanvasMode::PAINT_MODE);
+    } else if(event->key() == Qt::Key_F13) {
         //setCanvasMode(CanvasMode::ADD_BONE);
     } else if(mCurrentCanvas->keyPressEvent(event)) {
     } else {

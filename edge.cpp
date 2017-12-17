@@ -304,25 +304,25 @@ void VectorPathEdge::setPressedT(const qreal &t) {
 void VectorPathEdge::getNearestAbsPosAndT(const QPointF &absPos,
                                 QPointF *nearestPoint,
                                 qreal *t) {
-    *t = getTforBezierPoint(mPoint1->getAbsolutePos(),
-                            mPoint1->getEndCtrlPtAbsPos(),
-                            mPoint2->getStartCtrlPtAbsPos(),
-                            mPoint2->getAbsolutePos(),
-                            absPos);
-    *nearestPoint = getAbsPosAtT(*t);
+    *t = getClosestTValueBezier2D(mPoint1->getAbsolutePos(),
+                                  mPoint1->getEndCtrlPtAbsPos(),
+                                  mPoint2->getStartCtrlPtAbsPos(),
+                                  mPoint2->getAbsolutePos(),
+                                  absPos,
+                                  nearestPoint);
 }
 
 void VectorPathEdge::getNearestRelPosAndT(const QPointF &relPos,
                                 QPointF *nearestPoint,
                                 qreal *t,
                                 qreal *error) {
-    *t = getTforBezierPoint(mPoint1->getRelativePos(),
+    *t = getClosestTValueBezier2D(mPoint1->getRelativePos(),
                             mPoint1->getEndCtrlPtValue(),
                             mPoint2->getStartCtrlPtValue(),
                             mPoint2->getRelativePos(),
                             relPos,
+                            nearestPoint,
                             error);
-    *nearestPoint = getRelPosAtT(*t);
 }
 
 QPointF VectorPathEdge::getSlopeVector(const qreal &t) {

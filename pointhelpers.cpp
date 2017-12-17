@@ -141,12 +141,83 @@ qreal qclamp(qreal val, qreal min, qreal max) {
     return val;
 }
 
+void getClosestTValuesBezier1D(const qreal &v0n,
+                               const qreal &v1n,
+                               const qreal &v2n,
+                               const qreal &v3n,
+                               const qreal &vn,
+                               QList<qreal> *list) {
+    std::complex<double> v0 = std::complex<double>(v0n, 0.);
+    std::complex<double> v1 = std::complex<double>(v1n, 0.);
+    std::complex<double> v2 = std::complex<double>(v2n, 0.);
+    std::complex<double> v3 = std::complex<double>(v3n, 0.);
+    std::complex<double> v = std::complex<double>(vn, 0.);
+    std::complex<double> var1 = sqrt(pow(v1, 2.) + pow(v2, 2.) - v1*(v2 + v3) -
+                                 v0*(v3 - v2));
+    std::complex<double> var2 = v0 - 3.*v1 + 3.*v2 - v3;
+    std::complex<double> var3 = v0 - 2.*v1 + v2;
+    std::complex<double> sol1 = (var1 - var3)/-var2;
+    std::complex<double> sol2 = (var1 + var3)/var2;
+
+    std::complex<double> var4 =
+            pow(-2.*pow(v1,3.) + 3.*v0*v1*v2 + 3.*pow(v1,2.)*v2 -
+              6.*v0*pow(v2,2.) + 3.*v1*pow(v2,2.) - 2.*pow(v2,3.) +
+              v*pow(v0 - 3.*v1 + 3.*v2 - v3,2.) - pow(v0,2.)*v3 + 3.*v0*v1*v3 -
+              6.*pow(v1,2.)*v3 + 3.*v0*v2*v3 + 3.*v1*v2*v3 - v0*pow(v3,2.) +
+              sqrt(pow(v0 - 3.*v1 + 3.*v2 - v3,2.)*
+                (-3.*pow(v1,2.)*pow(v2,2.) + 4.*v0*pow(v2,3.) +
+                  pow(v,2.)*pow(v0 - 3.*v1 + 3.*v2 - v3,2.) + 4.*pow(v1,3.)*v3 -
+                  6.*v0*v1*v2*v3 + pow(v0,2.)*pow(v3,2.) -
+                  2.*v*(2.*pow(v1,3.) + 2.*pow(v2,3.) -
+                     3.*pow(v1,2.)*(v2 - 2.*v3) + pow(v0,2.)*v3 -
+                     3.*v1*(v0 + v2)*(v2 + v3) +
+                     v0*(6.*pow(v2,2.) - 3.*v2*v3 + pow(v3,2.))))),
+             1./3.);
+
+    std::complex<double> sol3 = (-2.*(v0 - 2.*v1 + v2) + (2.*v2to1div3*
+                    (pow(v1,2.) + pow(v2,2.) + v0*(-v2 + v3) - v1*(v2 + v3)))/
+                  var4 + v2to2div3*
+                  var4)/(2.*(-v0 + 3.*v1 - 3.*v2 + v3));
+    std::complex<double> sol4 =
+            (-36.*(v0 - 2.*v1 + v2) - (std::complex<double>(0.,18.)*v2to1div3*
+                     (std::complex<double>(0.,-1.) + sqrt(3.))*
+                     (pow(v1,2.) + pow(v2,2.) + v0*(-v2 + v3) - v1*(v2 + v3)))/
+                   var4 + std::complex<double>(0,9)*v2to2div3*
+                   (std::complex<double>(0.,1.) + sqrt(3.))*
+                   var4)/(36.*(-v0 + 3.*v1 - 3.*v2 + v3));
+
+    std::complex<double> sol5 =
+            (-36.*(v0 - 2.*v1 + v2) + (std::complex<double>(0.,18.)*v2to1div3*
+           (std::complex<double>(0.,1.) + sqrt(3.))*
+           (pow(v1,2.) + pow(v2,2.) + v0*(-v2 + v3) - v1*(v2 + v3)))/
+         var4 - 9.*v2to2div3*
+         (1. + std::complex<double>(0.,1.)*sqrt(3.))*var4)/
+            (36.*(-v0 + 3.*v1 - 3.*v2 + v3));
+    if(sol1.real() > 0. && sol1.real() < 1.) {
+        list->append(sol1.real());
+    }
+    if(sol2.real() > 0. && sol2.real() < 1.) {
+        list->append(sol2.real());
+    }
+    if(sol3.real() > 0. && sol3.real() < 1.) {
+        list->append(sol3.real());
+    }
+    if(sol4.real() > 0. && sol4.real() < 1.) {
+        list->append(sol4.real());
+    }
+    if(sol5.real() > 0. && sol5.real() < 1.) {
+        list->append(sol5.real());
+    }
+    list->append(0.);
+    list->append(1.);
+}
+
 void getTValuesforBezier1D(const qreal &x0n,
                           const qreal &x1n,
                           const qreal &x2n,
                           const qreal &x3n,
                           const qreal &xn,
-                          QList<std::complex<double> > *list) {
+                          QList<qreal> *list) {
     std::complex<double> i = std::complex<double>(0., 1.);
     std::complex<double> x0 = std::complex<double>(x0n, 0.);
     std::complex<double> x1 = std::complex<double>(x1n, 0.);
@@ -181,14 +252,146 @@ void getTValuesforBezier1D(const qreal &x0n,
     std::complex<double> t3 = (-4.*var6 + (2.*i*v2to1div3*(i + sqrt3)*var4)/var3 -
                  v2to2div3*(1. + i*sqrt3)*var3 ) / (4.*var5);
     if(t1.real() > 0. && t1.real() < 1.) {
-        list->append(t1);
+        list->append(t1.real());
     }
     if(t2.real() > 0. && t2.real() < 1.) {
-        list->append(t2);
+        list->append(t2.real());
     }
     if(t3.real() > 0. && t3.real() < 1.) {
-        list->append(t3);
+        list->append(t3.real());
     }
+    list->append(0.);
+    list->append(1.);
+}
+
+qreal getClosestTValueBezier2D(const QPointF &p0,
+                               const QPointF &p1,
+                               const QPointF &p2,
+                               const QPointF &p3,
+                               const QPointF &p,
+                               QPointF *bestPosPtr,
+                               qreal *errorPtr) {
+    QList<qreal> xValues;
+    QList<qreal> yValues;
+
+    //getClosestTValuesBezier1D(p0.x(), p1.x(), p2.x(), p3.x(), p.x(), &xValues);
+    getClosestTValuesBezier1D(p0.y(), p1.y(), p2.y(), p3.y(), p.y(), &yValues);
+    qreal bestT = 0.;
+    QPointF bestPos;
+    qreal minErrorT = 1000000.;
+    Q_FOREACH(const qreal &yVal, yValues) {
+        QPointF posT = QPointF(calcCubicBezierVal(p0.x(), p1.x(), p2.x(), p3.x(),
+                                                  yVal),
+                               calcCubicBezierVal(p0.y(), p1.y(), p2.y(), p3.y(),
+                                                  yVal));
+        qreal errorT = pointToLen(posT - QPointF(p.x(), p.y()));
+        if(errorT < minErrorT) {
+            bestPos = posT;
+            minErrorT = errorT;
+            bestT = yVal;
+        }
+    }
+//    Q_FOREACH(const qreal &xVal, xValues) {
+//        QPointF posT = QPointF(calcCubicBezierVal(x0, x1, x2, x3,
+//                                                  xVal),
+//                               calcCubicBezierVal(y0, y1, y2, y3,
+//                                                  xVal));
+//        qreal errorT = pointToLen(posT - QPointF(x, y));
+//        if(errorT < minErrorT) {
+//            bestPos = posT;
+//            minErrorT = errorT;
+//            bestT = xVal;
+//        }
+//    }
+    if(bestPosPtr != NULL) {
+        *bestPosPtr = bestPos;
+    }
+    if(errorPtr != NULL) {
+        *errorPtr = minErrorT;
+    }
+    return bestT;
+}
+
+//void VectorPathAnimator::bezierLeastSquareV1V2(const qreal &v0,
+//                                               qreal &v1, qreal &v2,
+//                                               const qreal &v3,
+//                                               const QList<qreal> &vs,
+//                                               const QList<qreal> &ts) {
+//    qreal v1Inc = 0.;
+//    qreal v1Dec = 0.;
+//    qreal v2Inc = 0.;
+//    qreal v2Dec = 0.;
+//    for(int i = 0; i < vs.count(); i++) {
+//        const qreal &val = vs.at(i);
+//        const qreal &t = ts.at(i);
+//        v1Inc += pow(1. - t, 2.)*t*(-v0*pow(1. - t, 3.) - 3.*v2*(1. - t)*pow(t, 2.) -
+//                 v3*pow(t, 3.) + val);
+//        v1Dec += (1. - t)*pow(t, 2.)*(3.*t*pow(1. - t, 2.));
+//        v2Inc += (1. - t)*pow(t, 2.)*(-v0*pow(1. - t, 3.) - 3.*v1*pow(1. - t, 2.)*t -
+//                 v3*pow(t, 3.) + val);
+//        v2Dec += (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
+//    }
+//    v1 = v1Inc/v1Dec;
+//    v2 = v2Inc/v2Dec;
+//}
+
+void bezierLeastSquareV1V2(const QPointF &v0,
+                           QPointF &v1, QPointF &v2,
+                           const QPointF &v3,
+                           const QList<QPointF> &vs,
+                           const QList<qreal> &ts) {
+    qreal v1XInc = 0.;
+    qreal v1Dec = 0.;
+    qreal v2XInc = 0.;
+    qreal v2Dec = 0.;
+    qreal v1YInc = 0.;
+    qreal v2YInc = 0.;
+    for(int i = 0; i < vs.count(); i++) {
+        const QPointF &val = vs.at(i);
+        const qreal &t = ts.at(i);
+        v1XInc += pow(1. - t, 2.)*t*(-v0.x()*pow(1. - t, 3.) - 3.*v2.x()*(1. - t)*pow(t, 2.) -
+                 v3.x()*pow(t, 3.) + val.x());
+        v2XInc += (1. - t)*pow(t, 2.)*(-v0.x()*pow(1. - t, 3.) - 3.*v1.x()*pow(1. - t, 2.)*t -
+                 v3.x()*pow(t, 3.) + val.x());
+        v1YInc += pow(1. - t, 2.)*t*(-v0.y()*pow(1. - t, 3.) - 3.*v2.y()*(1. - t)*pow(t, 2.) -
+                 v3.y()*pow(t, 3.) + val.y());
+        v2YInc += (1. - t)*pow(t, 2.)*(-v0.y()*pow(1. - t, 3.) - 3.*v1.y()*pow(1. - t, 2.)*t -
+                 v3.y()*pow(t, 3.) + val.y());
+        v1Dec = (1. - t)*pow(t, 2.)*(3.*t*pow(1. - t, 2.));
+        v2Dec = (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
+    }
+    v1 = QPointF(v1XInc/v1Dec, v1YInc/v1Dec);
+    v2 = QPointF(v2XInc/v2Dec, v2YInc/v2Dec);
+}
+
+void bezierLeastSquareV1V2(const QPointF &v0,
+                           QPointF &v1, QPointF &v2,
+                           const QPointF &v3,
+                           const QList<QPointF> &vs,
+                           const int &minVs,
+                           const int &maxVs) {
+    qreal v1XInc = 0.;
+    qreal v1Dec = 0.;
+    qreal v2XInc = 0.;
+    qreal v2Dec = 0.;
+    qreal v1YInc = 0.;
+    qreal v2YInc = 0.;
+    for(int i = minVs; i <= maxVs; i++) {
+        const QPointF &val = vs.at(i);
+        qreal t = ((qreal)i - minVs)/(maxVs - minVs);//getClosestTValueBezier2D(v0, v1, v2, v3, val);
+        v1XInc += pow(1. - t, 2.)*t*(-v0.x()*pow(1. - t, 3.) - 3.*v2.x()*(1. - t)*pow(t, 2.) -
+                 v3.x()*pow(t, 3.) + val.x());
+        v2XInc += (1. - t)*pow(t, 2.)*(-v0.x()*pow(1. - t, 3.) - 3.*v1.x()*pow(1. - t, 2.)*t -
+                 v3.x()*pow(t, 3.) + val.x());
+        v1YInc += pow(1. - t, 2.)*t*(-v0.y()*pow(1. - t, 3.) - 3.*v2.y()*(1. - t)*pow(t, 2.) -
+                 v3.y()*pow(t, 3.) + val.y());
+        v2YInc += (1. - t)*pow(t, 2.)*(-v0.y()*pow(1. - t, 3.) - 3.*v1.y()*pow(1. - t, 2.)*t -
+                 v3.y()*pow(t, 3.) + val.y());
+        v1Dec += (1. - t)*pow(t, 2.)*(3.*t*pow(1. - t, 2.));
+        v2Dec += (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
+    }
+    v1 = QPointF(v1XInc/v1Dec, v1YInc/v1Dec);
+    v2 = QPointF(v2XInc/v2Dec, v2YInc/v2Dec);
 }
 
 qreal get1DAccuracyValue(const qreal &x0,
@@ -280,9 +483,10 @@ qreal getTforBezierPoint(const qreal &x0,
                          const qreal &y3,
                          const qreal &y,
                          qreal *error,
+                         QPointF *bestPosPtr,
                          const bool &fineTune) {
-    QList<std::complex<double> > xValues;
-    QList<std::complex<double> > yValues;
+    QList<qreal> xValues;
+    QList<qreal> yValues;
 
 
     getTValuesforBezier1D(x0, x1, x2, x3, x, &xValues);
@@ -290,28 +494,28 @@ qreal getTforBezierPoint(const qreal &x0,
     qreal bestT = 0.;
     QPointF bestPos;
     qreal minErrorT = 1000000.;
-    Q_FOREACH(const std::complex<double> &yVal, yValues) {
+    Q_FOREACH(const qreal &yVal, yValues) {
         QPointF posT = QPointF(calcCubicBezierVal(x0, x1, x2, x3,
-                                                  yVal.real()),
+                                                  yVal),
                                calcCubicBezierVal(y0, y1, y2, y3,
-                                                  yVal.real()));
+                                                  yVal));
         qreal errorT = pointToLen(posT - QPointF(x, y));
         if(errorT < minErrorT) {
             bestPos = posT;
             minErrorT = errorT;
-            bestT = yVal.real();
+            bestT = yVal;
         }
     }
-    Q_FOREACH(const std::complex<double> &xVal, xValues) {
+    Q_FOREACH(const qreal &xVal, xValues) {
         QPointF posT = QPointF(calcCubicBezierVal(x0, x1, x2, x3,
-                                                  xVal.real()),
+                                                  xVal),
                                calcCubicBezierVal(y0, y1, y2, y3,
-                                                  xVal.real()));
+                                                  xVal));
         qreal errorT = pointToLen(posT - QPointF(x, y));
         if(errorT < minErrorT) {
             bestPos = posT;
             minErrorT = errorT;
-            bestT = xVal.real();
+            bestT = xVal;
         }
     }
 
@@ -352,7 +556,7 @@ qreal getTforBezierPoint(const qreal &x0,
     }
 
     if(error != NULL) *error = minErrorT;
-
+    if(bestPosPtr != NULL) *bestPosPtr = bestPos;
     return bestT;
 }
 
@@ -366,18 +570,18 @@ qreal getBezierTValueForX(const qreal &x0,
     if(qAbs(x0 - x) < 0.01) return x0;
     if(qAbs(x3 - x) < 0.01) return x3;
 
-    QList<std::complex<double> > xValues;
+    QList<qreal> xValues;
 
     getTValuesforBezier1D(x0, x1, x2, x3, x, &xValues);
     qreal bestT = 0.;
     qreal minErrorT = 1000000.;
 
-    Q_FOREACH(const std::complex<double> &xVal, xValues) {
+    Q_FOREACH(const qreal &xVal, xValues) {
         qreal errorT = qAbs(calcCubicBezierVal(x0, x1, x2, x3,
-                                          xVal.real()) - x);
+                                          xVal) - x);
         if(errorT < minErrorT) {
             minErrorT = errorT;
-            bestT = xVal.real();
+            bestT = xVal;
         }
     }
 
@@ -435,10 +639,11 @@ qreal getTforBezierPoint(const QPointF &p0,
                          const QPointF &p2,
                          const QPointF &p3,
                          const QPointF &p,
-                         qreal *error) {
+                         qreal *error,
+                         QPointF *bestPosPtr) {
     return getTforBezierPoint(p0.x(), p1.x(), p2.x(), p3.x(), p.x(),
                               p0.y(), p1.y(), p2.y(), p3.y(), p.y(),
-                              error);
+                              error, bestPosPtr);
 }
 
 qreal qMin4(qreal v1, qreal v2, qreal v3, qreal v4) {

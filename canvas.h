@@ -7,6 +7,7 @@
 #include "Boxes/rendercachehandler.h"
 #include "skiaincludes.h"
 #include "valueinput.h"
+#include "drawpath.h"
 
 class TextBox;
 class Circle;
@@ -25,6 +26,8 @@ enum CanvasMode : short {
     MOVE_PATH,
     MOVE_POINT,
     ADD_POINT,
+    DRAW_PATH,
+    ADD_DRAW_PATH_NODE,
     ADD_CIRCLE,
     ADD_RECTANGLE,
     ADD_TEXT,
@@ -646,6 +649,12 @@ protected:
     void handleMovePointMousePressEvent();
     void handleAddPointMouseRelease();
     void handleAddPointMousePress();
+
+    DrawPath mDrawPath;
+    void handleDrawPathMousePressEvent();
+    void handleAddDrawPathNodeMousePressEvent();
+    void handleDrawPathMouseMoveEvent();
+    void handleDrawPathMouseReleaseEvent();
 
     void updateTransformation();
     void handleMouseRelease();

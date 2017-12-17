@@ -19,7 +19,7 @@ public:
 
     void drawPath(SkCanvas *canvas);
 
-    void updateFittingPts();
+    void updateFittedPath();
 
     void addNodeAt(const QPointF &pos);
 
@@ -32,15 +32,25 @@ public:
     void sortNodes();
 
     void removePosForNode(const int &idT);
+
+    struct DrawPathNode {
+        DrawPathNode(const int &idT,
+                     const QPointF &posT) {
+            posId = idT;
+            pos = posT;
+        }
+        int posId;
+        QPointF pos;
+    };
 protected:
     QPointF mStartPos;
     QPointF mEndPos;
 
-    QList<int> mNodePosIds;
+    QList<DrawPathNode> mNodes;
     QList<QPointF> mOriginalPoses;
-    QList<QPointF> mFittingPts;
     SkPath mDrawPathOriginal;
     SkPath mDrawFitted;
+    //QList<QPointF> mFittedPts;
     bool mClosed = false;
 };
 

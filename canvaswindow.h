@@ -216,6 +216,8 @@ public slots:
     void setMovePathMode();
     void setMovePointMode();
     void setAddPointMode();
+    void setDrawPathMode();
+    void setAddDrawPathNodeMode();
     void setRectangleMode();
     void setCircleMode();
     void setTextMode();

@@ -516,55 +516,69 @@ void MainWindow::setupToolBar() {
     mAddPointMode->setCheckable(":/icons/draw_pen_checked.png");
     mToolBar->addWidget(mAddPointMode);
 
-    mCircleMode = new ActionButton(
-                ":/icons/draw_arc.png",
+    mDrawPathMode = new ActionButton(
+                ":/icons/draw_pen.png",
                 "F4", this);
-    mCircleMode->setCheckable(":/icons/draw_arc_checked.png");
-    mToolBar->addWidget(mCircleMode);
+    mDrawPathMode->setCheckable(":/icons/draw_pen_checked.png");
+    mToolBar->addWidget(mDrawPathMode);
 
     mToolBar->addSeparator();
 
+    mAddDrawPathNodeMode = new ActionButton(
+                ":/icons/draw_pen.png",
+                "F5", this);
+    mAddDrawPathNodeMode->setCheckable(":/icons/draw_pen_checked.png");
+    mToolBar->addWidget(mAddDrawPathNodeMode);
+
+    mCircleMode = new ActionButton(
+                ":/icons/draw_arc.png",
+                "F6", this);
+    mCircleMode->setCheckable(":/icons/draw_arc_checked.png");
+    mToolBar->addWidget(mCircleMode);
+
     mRectangleMode = new ActionButton(
                 ":/icons/draw_rect.png",
-                "F5", this);
+                "F7", this);
     mRectangleMode->setCheckable(":/icons/draw_rect_checked.png");
     mToolBar->addWidget(mRectangleMode);
 
     mTextMode = new ActionButton(
                 ":/icons/draw_text.png",
-                "F6", this);
+                "F8", this);
     mTextMode->setCheckable(":/icons/draw_text_checked.png");
     mToolBar->addWidget(mTextMode);
 
+    mToolBar->addSeparator();
+
     mParticleBoxMode = new ActionButton(
                 ":/icons/draw_particle_box.png",
-                "F7", this);
+                "F9", this);
     mParticleBoxMode->setCheckable(":/icons/draw_particle_box_checked.png");
     mToolBar->addWidget(mParticleBoxMode);
 
     mParticleEmitterMode = new ActionButton(
                 ":/icons/draw_particle_emitter.png",
-                "F8", this);
+                "F10", this);
     mParticleEmitterMode->setCheckable(
                 ":/icons/draw_particle_emitter_checked.png");
     mToolBar->addWidget(mParticleEmitterMode);
 
-    mToolBar->addSeparator();
-
     mPaintBoxMode = new ActionButton(
                 ":/icons/add_paint_box.png",
-                "F9", this);
+                "F11", this);
     mPaintBoxMode->setCheckable(
                 ":/icons/add_paint_box_checked.png");
     mToolBar->addWidget(mPaintBoxMode);
 
     mPaintMode = new ActionButton(
                 ":/icons/paint_mode.png",
-                "F10", this);
+                "F12", this);
     mPaintMode->setCheckable(
                 ":/icons/paint_mode_checked.png");
     mToolBar->addWidget(mPaintMode);
 
+    mToolBar->addSeparator();
+    mToolBar->addAction("     ");
     mToolBar->addSeparator();
 
     mActionConnectPoints = new ActionButton(
@@ -613,10 +627,14 @@ void MainWindow::setupToolBar() {
     mToolBar->addWidget(mActionCurve);
 
     mToolBar->addSeparator();
+    mToolBar->addAction("     ");
+    mToolBar->addSeparator();
 //
     mFontWidget = new FontsWidget(this);
     mToolBar->addWidget(mFontWidget);
 
+    mToolBar->addSeparator();
+    mToolBar->addAction("     ");
     mToolBar->addSeparator();
 
     QWidget *canvasComboWidget = new QWidget(this);
@@ -661,6 +679,10 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, SLOT(setMovePointMode()) );
     connect(mAddPointMode, SIGNAL(pressed()),
             mCanvasWindow, SLOT(setAddPointMode()) );
+    connect(mDrawPathMode, SIGNAL(pressed()),
+            mCanvasWindow, SLOT(setDrawPathMode()) );
+    connect(mAddDrawPathNodeMode, SIGNAL(pressed()),
+            mCanvasWindow, SLOT(setAddDrawPathNodeMode()) );
     connect(mCircleMode, SIGNAL(pressed()),
             mCanvasWindow, SLOT(setCircleMode()) );
     connect(mRectangleMode, SIGNAL(pressed()),
@@ -776,6 +798,8 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mMovePathMode->setChecked(currentMode == MOVE_PATH);
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
     mAddPointMode->setChecked(currentMode == ADD_POINT);
+    mDrawPathMode->setChecked(currentMode == DRAW_PATH);
+    mAddDrawPathNodeMode->setChecked(currentMode == ADD_DRAW_PATH_NODE);
     mCircleMode->setChecked(currentMode == ADD_CIRCLE);
     mRectangleMode->setChecked(currentMode == ADD_RECTANGLE);
     mTextMode->setChecked(currentMode == ADD_TEXT);

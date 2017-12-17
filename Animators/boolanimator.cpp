@@ -1,8 +1,7 @@
 #include "boolanimator.h"
 
-BoolAnimator::BoolAnimator() : IntAnimator()
-{
-
+BoolAnimator::BoolAnimator() : IntAnimator() {
+    setIntValueRange(0, 1);
 }
 
 bool BoolAnimator::getCurrentBoolValue() {
