@@ -233,6 +233,63 @@ void Tile::clearTileData() {
     mDrawer.reset();
 }
 
+void Tile::replaceData(const ushort &srcX, const ushort &srcY,
+                       const ushort &targetX, const ushort &targetY,
+                       const ushort &width, const ushort &height,
+                       Tile *srcTile) {
+    if(height == 0 || width == 0) return;
+    if(mPaintInOtherThread) {
+        if(!mDrawer->finished() ||
+                !srcTile->getTexTileDrawer()->finished()) {
+            return;
+        }
+    }
+    uchar *srcData = srcTile->getData();
+    int iFirst = 0;
+    int iLast = width - 1;
+    int iInc = 1;
+    int jFirst = 0;
+    int jLast = height - 1;
+    int jInc = 1;
+    if(srcData == mData) {
+        if(targetX > srcX) {
+            iInc = -1;
+            iFirst = width - 1;
+            iLast = 0;
+        }
+        if(targetY > srcY) {
+            jInc = -1;
+            jFirst = height - 1;
+            jLast = 0;
+        }
+    }
+    int i = iFirst;
+    while(true) {
+        int j = jFirst;
+        while(true) {
+            int idTarget = ((j + targetY)*TILE_DIM + targetX + i)*4;
+            int idSrc = ((j + srcY)*TILE_DIM + srcX + i)*4;
+
+            if(idSrc >= TILE_DIM*TILE_DIM*4) {
+                qDebug() << "error";
+            }
+            if(idTarget >= TILE_DIM*TILE_DIM*4) {
+                qDebug() << "error";
+            }
+            mData[idTarget] = srcData[idSrc];
+            mData[idTarget + 1] = srcData[idSrc + 1];
+            mData[idTarget + 2] = srcData[idSrc + 2];
+            mData[idTarget + 3] = srcData[idSrc + 3];
+            if(j == jLast) break;
+            j += jInc;
+        }
+        if(i == iLast) break;
+        i += iInc;
+    }
+
+    updateDrawerFromDataArray();
+}
+
 void Tile::initializeTileData() {
     SkImageInfo info = SkImageInfo::Make(TILE_DIM,
                                          TILE_DIM,

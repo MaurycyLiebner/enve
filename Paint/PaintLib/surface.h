@@ -89,7 +89,7 @@ public:
                     const ulong &timestamp,
                     const qreal &pressure,
                     Brush *brush);
-    void tabletEvent(const qreal &xT,
+    void tabletMoveEvent(const qreal &xT,
                      const qreal &yT,
                      const ulong &time_stamp,
                      const qreal &pressure,

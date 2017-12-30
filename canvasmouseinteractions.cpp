@@ -653,7 +653,7 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
             foreach(BoundingBox *box, mSelectedBoxes) {
                 if(box->SWT_isPaintBox()) {
                     PaintBox *paintBox = (PaintBox*)box;
-                    paintBox->paintPress(mLastMouseEventPosRel.x(),
+                    paintBox->mousePressEvent(mLastMouseEventPosRel.x(),
                                          mLastMouseEventPosRel.y(),
                                          event->timestamp(), 0.5,
                                          mCurrentBrush);
@@ -966,7 +966,7 @@ void Canvas::tabletEvent(QTabletEvent *e,
             foreach(BoundingBox *box, mSelectedBoxes) {
                 if(box->SWT_isPaintBox()) {
                     PaintBox *paintBox = (PaintBox*)box;
-                    paintBox->paintPress(mLastMouseEventPosRel.x(),
+                    paintBox->mousePressEvent(mLastMouseEventPosRel.x(),
                                          mLastMouseEventPosRel.y(),
                                          e->timestamp(),
                                          e->pressure(),
@@ -988,7 +988,7 @@ void Canvas::tabletEvent(QTabletEvent *e,
         foreach(BoundingBox *box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = (PaintBox*)box;
-                paintBox->tabletEvent(mLastMouseEventPosRel.x(),
+                paintBox->tabletMoveEvent(mLastMouseEventPosRel.x(),
                                       mLastMouseEventPosRel.y(),
                                       e->timestamp(),
                                       e->pressure(),

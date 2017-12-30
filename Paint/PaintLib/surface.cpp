@@ -472,7 +472,7 @@ void Surface::paintPress(const qreal &xT,
     mousePressEvent(xT, yT, timestamp, pressure, brush);
 }
 
-void Surface::tabletEvent(const qreal &xT,
+void Surface::tabletMoveEvent(const qreal &xT,
                                 const qreal &yT,
                                 const ulong &time_stamp,
                                 const qreal &pressure,
@@ -495,7 +495,7 @@ void Surface::tabletPressEvent(const qreal &xT,
                                const bool &erase,
                                Brush *brush) {
     startNewStroke(brush, xT, yT, pressure);
-    tabletEvent(xT, yT, time_stamp, pressure, erase, brush);
+    tabletMoveEvent(xT, yT, time_stamp, pressure, erase, brush);
 }
 
 void Surface::mouseReleaseEvent() {
@@ -517,7 +517,7 @@ void Surface::mouseMoveEvent(const qreal &xT,
                                    const ulong &time_stamp,
                                    const bool &erase,
                                    Brush *brush) {
-    tabletEvent(xT, yT,
+    tabletMoveEvent(xT, yT,
                 time_stamp, 1.0,
                 erase, brush);
 }

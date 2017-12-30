@@ -56,7 +56,7 @@ public:
 
     BoundingBoxRenderData *createRenderData();
 
-    void tabletEvent(const qreal &xT,
+    void tabletMoveEvent(const qreal &xT,
                      const qreal &yT,
                      const ulong &time_stamp,
                      const qreal &pressure,
@@ -79,11 +79,6 @@ public:
                         const ulong &time_stamp,
                         const bool &erase,
                         Brush *brush);
-    void paintPress(const qreal &xT,
-                    const qreal &yT,
-                    const ulong &timestamp,
-                    const qreal &pressure,
-                    Brush *brush);
     MovablePoint *getTopLeftPoint();
     MovablePoint *getBottomRightPoint();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

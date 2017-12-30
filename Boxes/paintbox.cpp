@@ -201,7 +201,7 @@ void PaintBox::finishSizeAndPosSetup() {
             mTopLeftPoint->getSavedPointValue();
     int dX = -qRound(trans.x());
     int dY = -qRound(trans.y());
-    if(dX <= 0 && dY <= 0) {
+    if(dX < 0 && dY < 0) {
         mMainHandler->move(dX, dY);
     } else if(dX < 0) {
         mMainHandler->move(dX, 0);
@@ -209,7 +209,7 @@ void PaintBox::finishSizeAndPosSetup() {
         mMainHandler->move(0, dY);
     }
     finishSizeSetup();
-    if(dX >= 0 && dY >= 0) {
+    if(dX > 0 && dY > 0) {
         mMainHandler->move(dX, dY);
     } else if(dX > 0) {
         mMainHandler->move(dX, 0);
@@ -313,7 +313,7 @@ bool PaintBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     return false;
 }
 
-void PaintBox::tabletEvent(const qreal &xT,
+void PaintBox::tabletMoveEvent(const qreal &xT,
                            const qreal &yT,
                            const ulong &time_stamp,
                            const qreal &pressure,
@@ -324,13 +324,23 @@ void PaintBox::tabletEvent(const qreal &xT,
                         anim_mCurrentRelFrame);
     int seedT = rand() % 1000;
     srand(seedT);
-    mMainHandler->tabletEvent(relPos.x(), relPos.y(),
+    mMainHandler->tabletMoveEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
                               erase, brush);
     srand(seedT);
-    mTemporaryHandler->tabletEvent(relPos.x(), relPos.y(),
+    mTemporaryHandler->tabletMoveEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
                               erase, brush);
+}
+
+void PaintBox::mouseMoveEvent(const qreal &xT,
+                              const qreal &yT,
+                              const ulong &time_stamp,
+                              const bool &erase,
+                              Brush *brush) {
+    tabletMoveEvent(xT, yT,
+                    time_stamp, 1.0,
+                    erase, brush);
 }
 
 void PaintBox::tabletReleaseEvent() {
@@ -356,61 +366,16 @@ void PaintBox::tabletPressEvent(const qreal &xT,
                                    erase, brush);
 }
 
-void PaintBox::mouseReleaseEvent() {
-    mMainHandler->mouseReleaseEvent();
-    mTemporaryHandler->mouseReleaseEvent();
-}
-
 void PaintBox::mousePressEvent(const qreal &xT,
                                const qreal &yT,
                                const ulong &timestamp,
                                const qreal &pressure,
                                Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
-            mTopLeftPoint->getRelativePosAtRelFrame(
-                        anim_mCurrentRelFrame);
-
-    mMainHandler->mousePressEvent(relPos.x(), relPos.y(),
-                                  timestamp, pressure,
-                                  brush);
-    mTemporaryHandler->mousePressEvent(relPos.x(), relPos.y(),
-                                  timestamp, pressure,
-                                  brush);
+    tabletPressEvent(xT, yT, timestamp, pressure, false, brush);
 }
 
-void PaintBox::mouseMoveEvent(const qreal &xT,
-                              const qreal &yT,
-                              const ulong &time_stamp,
-                              const bool &erase,
-                              Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
-            mTopLeftPoint->getRelativePosAtRelFrame(
-                        anim_mCurrentRelFrame);
-    int seedT = rand() % 1000;
-    srand(seedT);
-    mMainHandler->mouseMoveEvent(relPos.x(), relPos.y(),
-                                 time_stamp, erase, brush);
-    srand(seedT);
-    mTemporaryHandler->mouseMoveEvent(relPos.x(), relPos.y(),
-                                 time_stamp, erase, brush);
-    scheduleUpdate();
-}
-
-void PaintBox::paintPress(const qreal &xT,
-                          const qreal &yT,
-                          const ulong &timestamp,
-                          const qreal &pressure,
-                          Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
-            mTopLeftPoint->getRelativePosAtRelFrame(
-                        anim_mCurrentRelFrame);
-
-    mMainHandler->paintPress(relPos.x(), relPos.y(),
-                             timestamp, pressure,
-                             brush);
-    mTemporaryHandler->paintPress(relPos.x(), relPos.y(),
-                             timestamp, pressure,
-                                  brush);
+void PaintBox::mouseReleaseEvent() {
+    tabletReleaseEvent();
 }
 
 void PaintBoxRenderData::drawSk(SkCanvas *canvas) {

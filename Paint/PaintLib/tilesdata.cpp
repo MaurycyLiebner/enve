@@ -75,6 +75,24 @@ void TilesData::drawSk(SkCanvas *canvas, SkPaint *paint) {
     }
 }
 
+void TilesData::replaceData(const int &srcX, const int &srcY,
+                  const int &targetX, const int &targetY,
+                  const int &width, const int &height,
+                  const int &srcTileX, const int &srcTileY,
+                  Tile *targetTile) {
+    if(srcTileX >= mNTileCols ||
+       srcTileY >= mNTileRows ||
+       srcTileX < 0 || srcTileY < 0) {
+        targetTile->clearData(targetX, targetY, width, height);
+    } else {
+        Tile *srcTileT = mTiles[srcTileY][srcTileX];
+        targetTile->replaceData(srcX, srcY,
+                           targetX, targetY,
+                           width, height,
+                           srcTileT);
+    }
+}
+
 void TilesData::move(const int &xT, const int &yT) {
     if(mNoDataInMemory && !mDataStoredInTmpFile) return;
     // !!! handle differently when stored in tmp file
@@ -121,54 +139,108 @@ void TilesData::move(const int &xT, const int &yT) {
             int tileY0T = j + dTileY0T;
             int tileX1T = tileX0T + 1;
             int tileY1T = tileY0T + 1;
-            if(tileX0T >= mNTileCols ||
-               tileY0T >= mNTileRows ||
-               tileX0T < 0 || tileY0T < 0) {
-                tileT->clearData(0, 0,
-                                 width0T, height0T);
+            if(xT > 0 && yT > 0) {
+                replaceData(0, 0, width0T, height0T,
+                            width1T, height1T,
+                            tileX1T, tileY1T, tileT);
+                replaceData(x0T, 0, 0, height0T,
+                            width0T, height1T,
+                            tileX0T, tileY1T, tileT);
+                replaceData(0, y0T, width0T, 0,
+                            width1T, height0T,
+                            tileX1T, tileY0T, tileT);
+                replaceData(x0T, y0T, 0, 0,
+                            width0T, height0T,
+                            tileX0T, tileY0T, tileT);
+            } else if(xT > 0) {
+                replaceData(0, y0T, width0T, 0,
+                            width1T, height0T,
+                            tileX1T, tileY0T, tileT);
+                replaceData(x0T, y0T, 0, 0,
+                            width0T, height0T,
+                            tileX0T, tileY0T, tileT);
+                replaceData(0, 0, width0T, height0T,
+                            width1T, height1T,
+                            tileX1T, tileY1T, tileT);
+                replaceData(x0T, 0, 0, height0T,
+                            width0T, height1T,
+                            tileX0T, tileY1T, tileT);
+
+            } else if(yT > 0) {
+                replaceData(x0T, 0, 0, height0T,
+                            width0T, height1T,
+                            tileX0T, tileY1T, tileT);
+                replaceData(0, 0, width0T, height0T,
+                            width1T, height1T,
+                            tileX1T, tileY1T, tileT);
+                replaceData(x0T, y0T, 0, 0,
+                            width0T, height0T,
+                            tileX0T, tileY0T, tileT);
+                replaceData(0, y0T, width0T, 0,
+                            width1T, height0T,
+                            tileX1T, tileY0T, tileT);
             } else {
-                Tile *srcTileT = mTiles[tileY0T][tileX0T];
-                tileT->replaceData(x0T, y0T,
-                                   0, 0,
-                                   width0T, height0T,
-                                   srcTileT);
+                replaceData(x0T, y0T, 0, 0,
+                            width0T, height0T,
+                            tileX0T, tileY0T, tileT);
+                replaceData(0, y0T, width0T, 0,
+                            width1T, height0T,
+                            tileX1T, tileY0T, tileT);
+                replaceData(x0T, 0, 0, height0T,
+                            width0T, height1T,
+                            tileX0T, tileY1T, tileT);
+                replaceData(0, 0, width0T, height0T,
+                            width1T, height1T,
+                            tileX1T, tileY1T, tileT);
             }
-            if(tileX1T >= mNTileCols ||
-               tileY0T >= mNTileRows||
-               tileX1T < 0 || tileY0T < 0) {
-                tileT->clearData(width0T, 0,
-                                 width1T, height0T);
-            } else {
-                Tile *srcTileT = mTiles[tileY0T][tileX1T];
-                tileT->replaceData(0, y0T,
-                                   width0T, 0,
-                                   width1T, height0T,
-                                   srcTileT);
-            }
-            if(tileX0T >= mNTileCols ||
-               tileY1T >= mNTileRows ||
-               tileX0T < 0 || tileY1T < 0) {
-                tileT->clearData(0, height0T,
-                                 width0T, height1T);
-            } else {
-                Tile *srcTileT = mTiles[tileY1T][tileX0T];
-                tileT->replaceData(x0T, 0,
-                                   0, height0T,
-                                   width0T, height1T,
-                                   srcTileT);
-            }
-            if(tileX1T >= mNTileCols ||
-               tileY1T >= mNTileRows ||
-               tileX1T < 0 || tileY1T < 0) {
-                tileT->clearData(width0T, height0T,
-                                 width1T, height1T);
-            } else {
-                Tile *srcTileT = mTiles[tileY1T][tileX1T];
-                tileT->replaceData(0, 0,
-                                   width0T, height0T,
-                                   width1T, height1T,
-                                   srcTileT);
-            }
+//            if(tileX0T >= mNTileCols ||
+//               tileY0T >= mNTileRows ||
+//               tileX0T < 0 || tileY0T < 0) {
+//                tileT->clearData(0, 0,
+//                                 width0T, height0T);
+//            } else {
+//                Tile *srcTileT = mTiles[tileY0T][tileX0T];
+//                tileT->replaceData(x0T, y0T,
+//                                   0, 0,
+//                                   width0T, height0T,
+//                                   srcTileT);
+//            }
+//            if(tileX1T >= mNTileCols ||
+//               tileY0T >= mNTileRows ||
+//               tileX1T < 0 || tileY0T < 0) {
+//                tileT->clearData(width0T, 0,
+//                                 width1T, height0T);
+//            } else {
+//                Tile *srcTileT = mTiles[tileY0T][tileX1T];
+//                tileT->replaceData(0, y0T,
+//                                   width0T, 0,
+//                                   width1T, height0T,
+//                                   srcTileT);
+//            }
+//            if(tileX0T >= mNTileCols ||
+//               tileY1T >= mNTileRows ||
+//               tileX0T < 0 || tileY1T < 0) {
+//                tileT->clearData(0, height0T,
+//                                 width0T, height1T);
+//            } else {
+//                Tile *srcTileT = mTiles[tileY1T][tileX0T];
+//                tileT->replaceData(x0T, 0,
+//                                   0, height0T,
+//                                   width0T, height1T,
+//                                   srcTileT);
+//            }
+//            if(tileX1T >= mNTileCols ||
+//               tileY1T >= mNTileRows ||
+//               tileX1T < 0 || tileY1T < 0) {
+//                tileT->clearData(width0T, height0T,
+//                                 width1T, height1T);
+//            } else {
+//                Tile *srcTileT = mTiles[tileY1T][tileX1T];
+//                tileT->replaceData(0, 0,
+//                                   width0T, height0T,
+//                                   width1T, height1T,
+//                                   srcTileT);
+//            }
             if(j == jLast) break;
             j += jInc;
         }

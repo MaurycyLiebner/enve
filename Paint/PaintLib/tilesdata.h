@@ -55,7 +55,13 @@ public:
     void move(const int &xT, const int &yT);
 
     void setImage(const QImage &img);
+
 private:
+    void replaceData(const int &srcX, const int &srcY,
+                     const int &targetX, const int &targetY,
+                     const int &width, const int &height,
+                     const int &srcTileX, const int &srcTileY,
+                     Tile *targetTile);
     bool mNoDataInMemory = true;
     bool mDataStoredInTmpFile = false;
     QTemporaryFile *mTmpFile = NULL;

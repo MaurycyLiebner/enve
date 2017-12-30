@@ -83,8 +83,8 @@ void DrawPath::updateFittedPath() {
             mDrawFitted.moveTo(QPointFToSkPoint(p0));
         }
         p3 = nextNode.pos;
-        int minDataId = thisNode.posId + 1;
-        int maxDataId = nextNode.posId - 1;
+        int minDataId = thisNode.posId;
+        int maxDataId = nextNode.posId;
         QPointF p1 = p0;
         QPointF p2 = p3;
         bezierLeastSquareV1V2(p0, p1, p2, p3, mOriginalPoses,

@@ -274,7 +274,7 @@ qreal getClosestTValueBezier2D(const QPointF &p0,
     QList<qreal> xValues;
     QList<qreal> yValues;
 
-    //getClosestTValuesBezier1D(p0.x(), p1.x(), p2.x(), p3.x(), p.x(), &xValues);
+    getClosestTValuesBezier1D(p0.x(), p1.x(), p2.x(), p3.x(), p.x(), &xValues);
     getClosestTValuesBezier1D(p0.y(), p1.y(), p2.y(), p3.y(), p.y(), &yValues);
     qreal bestT = 0.;
     QPointF bestPos;
@@ -291,18 +291,18 @@ qreal getClosestTValueBezier2D(const QPointF &p0,
             bestT = yVal;
         }
     }
-//    Q_FOREACH(const qreal &xVal, xValues) {
-//        QPointF posT = QPointF(calcCubicBezierVal(x0, x1, x2, x3,
-//                                                  xVal),
-//                               calcCubicBezierVal(y0, y1, y2, y3,
-//                                                  xVal));
-//        qreal errorT = pointToLen(posT - QPointF(x, y));
-//        if(errorT < minErrorT) {
-//            bestPos = posT;
-//            minErrorT = errorT;
-//            bestT = xVal;
-//        }
-//    }
+    Q_FOREACH(const qreal &xVal, xValues) {
+        QPointF posT = QPointF(calcCubicBezierVal(p0.x(), p1.x(), p2.x(), p3.x(),
+                                                  xVal),
+                               calcCubicBezierVal(p0.y(), p1.y(), p2.y(), p3.y(),
+                                                  xVal));
+        qreal errorT = pointToLen(posT - QPointF(p.x(), p.y()));
+        if(errorT < minErrorT) {
+            bestPos = posT;
+            minErrorT = errorT;
+            bestT = xVal;
+        }
+    }
     if(bestPosPtr != NULL) {
         *bestPosPtr = bestPos;
     }
@@ -370,28 +370,31 @@ void bezierLeastSquareV1V2(const QPointF &v0,
                            const QList<QPointF> &vs,
                            const int &minVs,
                            const int &maxVs) {
-    qreal v1XInc = 0.;
-    qreal v1Dec = 0.;
-    qreal v2XInc = 0.;
-    qreal v2Dec = 0.;
-    qreal v1YInc = 0.;
-    qreal v2YInc = 0.;
-    for(int i = minVs; i <= maxVs; i++) {
-        const QPointF &val = vs.at(i);
-        qreal t = ((qreal)i - minVs)/(maxVs - minVs);//getClosestTValueBezier2D(v0, v1, v2, v3, val);
-        v1XInc += pow(1. - t, 2.)*t*(-v0.x()*pow(1. - t, 3.) - 3.*v2.x()*(1. - t)*pow(t, 2.) -
-                 v3.x()*pow(t, 3.) + val.x());
-        v2XInc += (1. - t)*pow(t, 2.)*(-v0.x()*pow(1. - t, 3.) - 3.*v1.x()*pow(1. - t, 2.)*t -
-                 v3.x()*pow(t, 3.) + val.x());
-        v1YInc += pow(1. - t, 2.)*t*(-v0.y()*pow(1. - t, 3.) - 3.*v2.y()*(1. - t)*pow(t, 2.) -
-                 v3.y()*pow(t, 3.) + val.y());
-        v2YInc += (1. - t)*pow(t, 2.)*(-v0.y()*pow(1. - t, 3.) - 3.*v1.y()*pow(1. - t, 2.)*t -
-                 v3.y()*pow(t, 3.) + val.y());
-        v1Dec += (1. - t)*pow(t, 2.)*(3.*t*pow(1. - t, 2.));
-        v2Dec += (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
+    for(int j = 0; j < 50; j++) {
+        qreal v1XInc = 0.;
+        qreal v1Dec = 0.;
+        qreal v2XInc = 0.;
+        qreal v2Dec = 0.;
+        qreal v1YInc = 0.;
+        qreal v2YInc = 0.;
+        for(int i = minVs; i <= maxVs; i++) {
+            const QPointF &val = vs.at(i);
+            qreal t = ((qreal)i - minVs)/(maxVs - minVs);
+            //qreal t = getClosestTValueBezier2D(v0, v1, v2, v3, val);
+            v1XInc += pow(1. - t, 2.)*t*(-v0.x()*pow(1. - t, 3.) - 3.*v2.x()*(1. - t)*pow(t, 2.) -
+                     v3.x()*pow(t, 3.) + val.x());
+            v2XInc += (1. - t)*pow(t, 2.)*(-v0.x()*pow(1. - t, 3.) - 3.*v1.x()*pow(1. - t, 2.)*t -
+                     v3.x()*pow(t, 3.) + val.x());
+            v1YInc += pow(1. - t, 2.)*t*(-v0.y()*pow(1. - t, 3.) - 3.*v2.y()*(1. - t)*pow(t, 2.) -
+                     v3.y()*pow(t, 3.) + val.y());
+            v2YInc += (1. - t)*pow(t, 2.)*(-v0.y()*pow(1. - t, 3.) - 3.*v1.y()*pow(1. - t, 2.)*t -
+                     v3.y()*pow(t, 3.) + val.y());
+            v1Dec += pow(1. - t, 2.)*t*(3.*t*pow(1. - t, 2.));
+            v2Dec += (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
+        }
+        v1 = QPointF(v1XInc/v1Dec, v1YInc/v1Dec);
+        v2 = QPointF(v2XInc/v2Dec, v2YInc/v2Dec);
     }
-    v1 = QPointF(v1XInc/v1Dec, v1YInc/v1Dec);
-    v2 = QPointF(v2XInc/v2Dec, v2YInc/v2Dec);
 }
 
 qreal get1DAccuracyValue(const qreal &x0,

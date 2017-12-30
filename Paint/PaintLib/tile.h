@@ -202,34 +202,7 @@ public:
     void replaceData(const ushort &srcX, const ushort &srcY,
                      const ushort &targetX, const ushort &targetY,
                      const ushort &width, const ushort &height,
-                     Tile *srcTile) {
-        if(mPaintInOtherThread) {
-            if(!mDrawer->finished() ||
-                !srcTile->getTexTileDrawer()->finished()) {
-                return;
-            }
-        }
-        uchar *srcData = srcTile->getData();
-        for(int i = 0; i < width; i++) {
-            for(int j = 0; j < height; j++) {
-                int idTarget = ((j + targetY)*TILE_DIM + targetX + i)*4;
-                int idSrc = ((j + srcY)*TILE_DIM + srcX + i)*4;
-
-                if(idSrc >= TILE_DIM*TILE_DIM*4) {
-                    qDebug() << "error";
-                }
-                if(idTarget >= TILE_DIM*TILE_DIM*4) {
-                    qDebug() << "error";
-                }
-                mData[idTarget] = srcData[idSrc];
-                mData[idTarget + 1] = srcData[idSrc + 1];
-                mData[idTarget + 2] = srcData[idSrc + 2];
-                mData[idTarget + 3] = srcData[idSrc + 3];
-            }
-        }
-
-        updateDrawerFromDataArray();
-    }
+                     Tile *srcTile);
 
     void clearData(const ushort &targetX, const ushort &targetY,
                    const ushort &width, const ushort &height) {
