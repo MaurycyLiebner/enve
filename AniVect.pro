@@ -48,7 +48,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     canvas.cpp \
     undoredo.cpp \
-    connectedtomainwindow.cpp \
     movablepoint.cpp \
     pathpivot.cpp \
     canvasmouseinteractions.cpp \
@@ -208,7 +207,6 @@ HEADERS  += mainwindow.h \
     canvas.h \
     undoredo.h \
     updatescheduler.h \
-    connectedtomainwindow.h \
     movablepoint.h \
     pathpivot.h \
     ctrlpoint.h \

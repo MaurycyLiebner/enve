@@ -14,7 +14,7 @@ public:
     VideoBox();
 
     void setParentGroup(BoxesGroup *parent);
-    void setFilePath(QString path);
+    void setFilePath(const QString &path);
     void reloadSound();
 
     bool SWT_isVideoBox() { return true; }

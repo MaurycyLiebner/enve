@@ -46,8 +46,7 @@ typedef QSharedPointer<QStringAnimator> QStringAnimatorQSPtr;
 enum CtrlsMode : short;
 enum PaintType : short;
 
-class UndoRedo
-{
+class UndoRedo {
 public:
     UndoRedo(QString name);
     virtual ~UndoRedo() {

@@ -20,6 +20,13 @@ class ImageSequenceBox;
 class Brush;
 class NodePoint;
 
+#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
+
+#define Q_FOREACHInverted(item, list) item = getAtIndexOrGiveNull((list).count() - 1, (list)); \
+    for(int i = (list).count() - 1; i >= 0; i--, item = getAtIndexOrGiveNull(i, (list)) )
+#define Q_FOREACHInverted2(item, list) for(int i = (list).count() - 1; i >= 0; i--) { \
+            item = getAtIndexOrGiveNull(i, (list));
+
 enum CtrlsMode : short;
 
 enum CanvasMode : short {
@@ -287,6 +294,7 @@ public:
     void renderSk(SkCanvas *canvas);
 
     void setCanvasSize(const int &width, const int &height) {
+        if(width == mWidth && height == mHeight) return;
         mWidth = width;
         mHeight = height;
         fitCanvasToSize();

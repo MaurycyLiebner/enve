@@ -2,7 +2,8 @@
 #define PROPERTY_H
 #include <QObject>
 #include <QColor>
-#include "connectedtomainwindow.h"
+class UndoRedo;
+class MainWindow;
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 
 class ComplexAnimator;

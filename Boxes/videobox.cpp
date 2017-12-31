@@ -59,7 +59,7 @@ void VideoBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     }
 }
 
-void VideoBox::setFilePath(QString path) {
+void VideoBox::setFilePath(const QString &path) {
     mSrcFilePath = path;
     if(mAnimationCacheHandler == NULL) {
         mAnimationCacheHandler = (AnimationCacheHandler*)

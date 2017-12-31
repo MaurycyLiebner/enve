@@ -868,7 +868,9 @@ void VideoBox::writeBoundingBox(QIODevice *target) {
 
 void VideoBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
-    readQString(target, &mSrcFilePath);
+    QString path;
+    readQString(target, &path);
+    setFilePath(path);
 }
 
 void Tile::writeTile(QIODevice *target) {
@@ -1189,8 +1191,8 @@ void CanvasWindow::readCanvases(QIODevice *target) {
         FillStrokeSettingsWidget *fillStrokeSettingsWidget =
                 MainWindow::getInstance()->getFillStrokeSettings();
         Canvas *canvas = new Canvas(fillStrokeSettingsWidget, this);
-        MainWindow::getInstance()->addCanvas(canvas);
         canvas->readBoundingBox(target);
+        MainWindow::getInstance()->addCanvas(canvas);
     }
     int currentCanvasId;
     target->read((char*)&currentCanvasId, sizeof(int));

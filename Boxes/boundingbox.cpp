@@ -808,6 +808,7 @@ void BoundingBox::prp_drawKeys(QPainter *p,
 }
 
 void BoundingBox::setName(const QString &name) {
+    if(name == prp_mName) return;
     prp_mName = name;
 
     emit nameChanged(name);
