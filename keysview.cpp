@@ -8,6 +8,7 @@
 #include "global.h"
 #include "pointhelpers.h"
 #include "Animators/qrealanimator.h"
+#include "canvaswindow.h"
 
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
@@ -556,6 +557,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
 
                     if(dDFrame != 0) {
                         mMoveDFrame = dFrame;
+                        mMainWindow->getCanvasWindow()->moveDurationRectForAllSelected(dDFrame);
                         mLastPressedDurationRectangleMovable->changeFramePosBy(
                                     dDFrame);
                     }

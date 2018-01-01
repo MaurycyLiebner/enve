@@ -9,13 +9,6 @@
 AnimationBox::AnimationBox() :
     BoundingBox(TYPE_IMAGE) {
     setName("Animation");
-    mTimeScaleAnimator->prp_setName("time scale");
-    mTimeScaleAnimator->qra_setValueRange(-100, 100);
-    mTimeScaleAnimator->qra_setCurrentValue(1.);
-    mTimeScaleAnimator->setPrefferedValueStep(0.05);
-    mTimeScaleAnimator->prp_setUpdater(new AnimationBoxFrameUpdater(this));
-    mTimeScaleAnimator->prp_blockUpdater();
-    ca_addChildAnimator(mTimeScaleAnimator.data());
 
     setDurationRectangle(new FixedLenAnimationRect(this));
 //    mFrameAnimator.blockPointer();
@@ -33,17 +26,17 @@ FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
-    qreal fpsRatio = getParentCanvas()->getFps()/mFps;
-    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
+    //qreal fpsRatio = getParentCanvas()->getFps()/mFps;
+    //qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
     getAnimationDurationRect()->setAnimationFrameDuration(
-            qCeil(qAbs(timeScale*mAnimationCacheHandler->getFramesCount())));
+            qCeil(qAbs(mAnimationCacheHandler->getFramesCount())));
 }
 
 void AnimationBox::reloadCacheHandler() {
-    if(mParentGroup != NULL) {
+    //if(mParentGroup != NULL) {
         updateDurationRectangleAnimationRange();
-    }
+    //}
     reloadSound();
     clearAllCache();
 
@@ -62,17 +55,14 @@ bool AnimationBox::shouldScheduleUpdate() {
 }
 
 int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
-    qreal fpsRatio = getParentCanvas()->getFps()/mFps;
-    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
-
     int pixId;
     const int &absMinAnimation =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
-    if(timeScale > 0.) {
-        pixId = (relFrame - absMinAnimation)/timeScale;
-    } else {
-        pixId = mAnimationCacheHandler->getFramesCount() - 1 +
-                (relFrame - absMinAnimation)/timeScale;
+    if(true) {
+        pixId = (relFrame - absMinAnimation);
+    } else { // reversed
+        pixId = mAnimationCacheHandler->getFramesCount() - 1 -
+                (relFrame - absMinAnimation);
     }
 
     if(pixId <= 0) {
@@ -145,5 +135,6 @@ BoundingBoxRenderData *AnimationBox::createRenderData() {
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameAtFrame(relFrame);
+    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameAtFrame(
+                animationFrame);
 }

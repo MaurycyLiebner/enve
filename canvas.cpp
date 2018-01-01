@@ -1172,6 +1172,12 @@ int Canvas::getMaxFrame() {
     return mMaxFrame;
 }
 
+void Canvas::moveDurationRectForAllSelected(const int &dFrame) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->moveDurationRect(dFrame);
+    }
+}
+
 SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition;
 }

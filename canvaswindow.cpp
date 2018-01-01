@@ -1233,3 +1233,8 @@ void CanvasWindow::importFile() {
         }
     }
 }
+
+void CanvasWindow::moveDurationRectForAllSelected(const int &dFrame) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->moveDurationRectForAllSelected(dFrame);
+}

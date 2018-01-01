@@ -51,8 +51,6 @@ protected:
     AnimationCacheHandler *mAnimationCacheHandler = NULL;
     qreal mFps = 24.;
 
-    QSharedPointer<QrealAnimator> mTimeScaleAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
     //IntAnimator mFrameAnimator;
 };
 

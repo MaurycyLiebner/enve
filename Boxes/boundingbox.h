@@ -682,6 +682,10 @@ public:
     }
 
     const BoundingBoxType &getBoxType() { return mType; }
+
+    void startDurationRectPosTransform();
+    void finishDurationRectPosTransform();
+    void moveDurationRect(const int &dFrame);
 protected:
     int mExpiredPixmap = 0;
     QPointF mSavedTransformPivot;

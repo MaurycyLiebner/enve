@@ -639,6 +639,23 @@ void BoundingBox::updateDrawRenderContainerTransform() {
 
 }
 
+void BoundingBox::startDurationRectPosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->startPosTransform();
+    }
+}
+
+void BoundingBox::finishDurationRectPosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->finishPosTransform();
+    }
+}
+
+void BoundingBox::moveDurationRect(const int &dFrame) {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->changeFramePosBy(dFrame);
+    }
+}
 
 BoxTransformAnimator *BoundingBox::getTransformAnimator() {
     return mTransformAnimator.data();

@@ -244,7 +244,7 @@ public:
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *e);
 
-    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent moveDurationRectForAllSelected*event);
 
     ImageSequenceBox *createAnimationBoxForPaths(const QStringList &paths);
     VideoBox *createVideoForPath(const QString &path);
