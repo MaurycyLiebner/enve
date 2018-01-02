@@ -686,6 +686,12 @@ public:
     void startDurationRectPosTransform();
     void finishDurationRectPosTransform();
     void moveDurationRect(const int &dFrame);
+    void startMinFramePosTransform();
+    void finishMinFramePosTransform();
+    void moveMinFrame(const int &dFrame);
+    void startMaxFramePosTransform();
+    void finishMaxFramePosTransform();
+    void moveMaxFrame(const int &dFrame);
 protected:
     int mExpiredPixmap = 0;
     QPointF mSavedTransformPivot;

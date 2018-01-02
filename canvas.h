@@ -244,7 +244,7 @@ public:
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *e);
 
-    bool keyPressEvent(QKeyEvent moveDurationRectForAllSelected*event);
+    bool keyPressEvent(QKeyEvent *event);
 
     ImageSequenceBox *createAnimationBoxForPaths(const QStringList &paths);
     VideoBox *createVideoForPath(const QString &path);
@@ -543,6 +543,15 @@ public:
         }
     }
 
+    void moveDurationRectForAllSelected(const int &dFrame);
+    void startDurationRectPosTransformForAllSelected();
+    void finishDurationRectPosTransformForAllSelected();
+    void startMinFramePosTransformForAllSelected();
+    void finishMinFramePosTransformForAllSelected();
+    void moveMinFrameForAllSelected(const int &dFrame);
+    void startMaxFramePosTransformForAllSelected();
+    void finishMaxFramePosTransformForAllSelected();
+    void moveMaxFrameForAllSelected(const int &dFrame);
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

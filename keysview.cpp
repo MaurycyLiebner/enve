@@ -547,6 +547,24 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         }
                     }
                 } else if(mMovingRect) {
+                    if(mFirstMove) {
+                        if(mLastPressedDurationRectangleMovable != NULL) {
+                            if(!mLastPressedDurationRectangleMovable->isSelected()) {
+                                mLastPressedDurationRectangleMovable->pressed(
+                                            mMainWindow->isShiftPressed());
+                            }
+                            if(mLastPressedDurationRectangleMovable->isDurationRect()) {
+                                mMainWindow->getCanvasWindow()->
+                                        startDurationRectPosTransformForAllSelected();
+                            } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
+                                mMainWindow->getCanvasWindow()->
+                                        startMaxFramePosTransformForAllSelected();
+                            } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
+                                mMainWindow->getCanvasWindow()->
+                                        startMinFramePosTransformForAllSelected();
+                            }
+                        }
+                    }
                     int dFrame =
                             qRound((posU.x() - mLastPressPos.x())/
                                    mPixelsPerFrame);
@@ -557,9 +575,15 @@ void KeysView::handleMouseMove(const QPoint &pos,
 
                     if(dDFrame != 0) {
                         mMoveDFrame = dFrame;
-                        mMainWindow->getCanvasWindow()->moveDurationRectForAllSelected(dDFrame);
-                        mLastPressedDurationRectangleMovable->changeFramePosBy(
-                                    dDFrame);
+                        if(mLastPressedDurationRectangleMovable->isDurationRect()) {
+                            mMainWindow->getCanvasWindow()->moveDurationRectForAllSelected(dDFrame);
+                        } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
+                            mMainWindow->getCanvasWindow()->moveMaxFrameForAllSelected(dDFrame);
+                        } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
+                            mMainWindow->getCanvasWindow()->moveMinFrameForAllSelected(dDFrame);
+                        }
+//                        mLastPressedDurationRectangleMovable->changeFramePosBy(
+//                                    dDFrame);
                     }
                 } else if(mSelecting) {
                     qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
@@ -639,9 +663,22 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 //setMouseTracking(false);
                 //releaseMouse();
             } else if(mMovingRect) {
-                mMoveDFrame = 0;
-                mMovingRect = false;
-                mLastPressedDurationRectangleMovable->finishedTransform();
+                if(mFirstMove) {
+                    if(mLastPressedDurationRectangleMovable != NULL) {
+                        mLastPressedDurationRectangleMovable->pressed(
+                                    mMainWindow->isShiftPressed());
+                    }
+                } else {
+                    mMoveDFrame = 0;
+                    mMovingRect = false;
+                    if(mLastPressedDurationRectangleMovable->isDurationRect()) {
+                        mMainWindow->getCanvasWindow()->finishDurationRectPosTransformForAllSelected();
+                    } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
+                        mMainWindow->getCanvasWindow()->finishMinFramePosTransformForAllSelected();
+                    } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
+                        mMainWindow->getCanvasWindow()->finishMaxFramePosTransformForAllSelected();
+                    }
+                }
             }
         }
     }

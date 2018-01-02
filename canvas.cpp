@@ -1172,9 +1172,57 @@ int Canvas::getMaxFrame() {
     return mMaxFrame;
 }
 
+void Canvas::startDurationRectPosTransformForAllSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->startDurationRectPosTransform();
+    }
+}
+
+void Canvas::finishDurationRectPosTransformForAllSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->finishDurationRectPosTransform();
+    }
+}
+
 void Canvas::moveDurationRectForAllSelected(const int &dFrame) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->moveDurationRect(dFrame);
+    }
+}
+
+void Canvas::startMinFramePosTransformForAllSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->startMinFramePosTransform();
+    }
+}
+
+void Canvas::finishMinFramePosTransformForAllSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->finishMinFramePosTransform();
+    }
+}
+
+void Canvas::moveMinFrameForAllSelected(const int &dFrame) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->moveMinFrame(dFrame);
+    }
+}
+
+void Canvas::startMaxFramePosTransformForAllSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->startMaxFramePosTransform();
+    }
+}
+
+void Canvas::finishMaxFramePosTransformForAllSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->finishMaxFramePosTransform();
+    }
+}
+
+void Canvas::moveMaxFrameForAllSelected(const int &dFrame) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->moveMaxFrame(dFrame);
     }
 }
 

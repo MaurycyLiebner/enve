@@ -3,11 +3,19 @@
 #include <QtCore>
 #include <QPainter>
 #include <QObject>
+class Property;
 
 class DurationRectangleMovable : public QObject {
     Q_OBJECT
 public:
-    DurationRectangleMovable();
+    enum Type {
+        MIN_FRAME,
+        MAX_FRAME,
+        DURATION_RECT,
+        NOT_SPECIFIED
+    };
+    DurationRectangleMovable(const Type &type);
+    DurationRectangleMovable() {}
 
     void setFramePos(const int &framePos);
 
@@ -28,6 +36,29 @@ public:
         return Qt::SplitHCursor;
     }
 
+    void pressed(const bool &shiftPressed);
+
+    void setChildProperty(Property *childProp) {
+        mChildProperty = childProp;
+    }
+
+    void startPosTransform() {}
+    void finishPosTransform() {}
+
+    bool isSelected();
+
+    bool isDurationRect() {
+        return mType == DURATION_RECT;
+    }
+    bool isMinFrame() {
+        return mType == MIN_FRAME;
+    }
+    bool isMaxFrame() {
+        return mType == MAX_FRAME;
+    }
+    void setType(const Type &type) {
+        mType = type;
+    }
 public slots:
     void setMaxPos(const int &maxPos);
 
@@ -37,13 +68,13 @@ signals:
     void posChanged(int);
     void finishedTransform();
 protected:
+    Property *mChildProperty = NULL;
+    Type mType = NOT_SPECIFIED;
     bool mHovered = false;
     int mMinPos = 0;
     int mMaxPos = 0;
     int mFramePos = 0;
 };
-
-class Property;
 
 class DurationRectangle : public DurationRectangleMovable {
     Q_OBJECT
@@ -90,14 +121,19 @@ public:
     virtual bool hasAnimationFrameRange() { return false; }
     void writeDurationRectangle(QIODevice *target);
     void readDurationRectangle(QIODevice *target);
+
+    void moveMinFrame(const int &change);
+    void finishMinFramePosTransform();
+    void startMinFramePosTransform();
+    void moveMaxFrame(const int &change);
+    void finishMaxFramePosTransform();
+    void startMaxFramePosTransform();
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);
     void rangeChanged();
     void finishedRangeChange();
 protected:
-    Property *mChildProperty;
-
     DurationRectangleMovable mMinFrame;
     DurationRectangleMovable mMaxFrame;
 };

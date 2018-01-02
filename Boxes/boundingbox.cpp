@@ -657,6 +657,42 @@ void BoundingBox::moveDurationRect(const int &dFrame) {
     }
 }
 
+void BoundingBox::startMinFramePosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->startMinFramePosTransform();
+    }
+}
+
+void BoundingBox::finishMinFramePosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->finishMinFramePosTransform();
+    }
+}
+
+void BoundingBox::moveMinFrame(const int &dFrame) {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->moveMinFrame(dFrame);
+    }
+}
+
+void BoundingBox::startMaxFramePosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->startMaxFramePosTransform();
+    }
+}
+
+void BoundingBox::finishMaxFramePosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->finishMaxFramePosTransform();
+    }
+}
+
+void BoundingBox::moveMaxFrame(const int &dFrame) {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->moveMaxFrame(dFrame);
+    }
+}
+
 BoxTransformAnimator *BoundingBox::getTransformAnimator() {
     return mTransformAnimator.data();
 }

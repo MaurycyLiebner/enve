@@ -2,9 +2,10 @@
 #include "Properties/property.h"
 #include "Boxes/rendercachehandler.h"
 #include "global.h"
+#include "Boxes/boundingbox.h"
 
-DurationRectangleMovable::DurationRectangleMovable() : QObject() {
-
+DurationRectangleMovable::DurationRectangleMovable(const Type &type) : QObject() {
+    mType = type;
 }
 
 void DurationRectangleMovable::setFramePos(const int &framePos) {
@@ -46,6 +47,22 @@ bool DurationRectangleMovable::isHovered() {
     return mHovered;
 }
 
+void DurationRectangleMovable::pressed(const bool &shiftPressed) {
+    if(mChildProperty == NULL) return;
+    if(mChildProperty->SWT_isBoundingBox()) {
+        ((BoundingBox*)mChildProperty)->selectionChangeTriggered(shiftPressed);
+    }
+}
+
+bool DurationRectangleMovable::isSelected() {
+    if(mChildProperty != NULL) {
+        if(mChildProperty->SWT_isBoundingBox()) {
+            return ((BoundingBox*)mChildProperty)->isSelected();
+        }
+    }
+    return false;
+}
+
 void DurationRectangleMovable::setMaxPos(const int &maxPos) {
     mMaxPos = maxPos - 1;
 }
@@ -55,11 +72,15 @@ void DurationRectangleMovable::setMinPos(const int &minPos) {
 }
 
 DurationRectangle::DurationRectangle(Property *childProp) :
-    DurationRectangleMovable() {
+    DurationRectangleMovable(DURATION_RECT) {
     mChildProperty = childProp;
 
+    mMinFrame.setChildProperty(childProp);
+    mMaxFrame.setChildProperty(childProp);
     setMinPos(-1000000);
     setMaxPos(1000000);
+    mMinFrame.setType(MIN_FRAME);
+    mMaxFrame.setType(MAX_FRAME);
     mMinFrame.setMaxPos(1000000);
     mMinFrame.setMinPos(-1000000);
     mMaxFrame.setMinPos(-1000000);
@@ -139,7 +160,9 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
     xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
     widthT = getFrameDuration()*pixelsPerFrame - pixelsPerFrame;
     QColor fillColor;
-    if(mHovered) {
+    bool selected = isSelected();
+
+    if(selected) {
         fillColor = QColor(50, 50, 255, 120);
     } else {
         fillColor = QColor(0, 0, 255, 120);
@@ -148,6 +171,9 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
                      widthT, MIN_WIDGET_HEIGHT);
 
     p->fillRect(drawRect.adjusted(0, 1, 0, -1), fillColor);
+    if(mHovered) {
+        p->drawRect(drawRect);
+    }
 
     if(mMinFrame.isHovered()) {
         p->setPen(QPen(Qt::white));
@@ -190,6 +216,30 @@ void DurationRectangle::changeFramePosBy(const int &change) {
     mMaxFrame.changeFramePosByWithoutSignal(change);
     mMinFrame.setMaxPos(getMaxFrame());
     DurationRectangleMovable::changeFramePosBy(change);
+}
+
+void DurationRectangle::startMinFramePosTransform() {
+    mMinFrame.startPosTransform();
+}
+
+void DurationRectangle::finishMinFramePosTransform() {
+    mMinFrame.finishPosTransform();
+}
+
+void DurationRectangle::moveMinFrame(const int &change) {
+    mMinFrame.changeFramePosBy(change);
+}
+
+void DurationRectangle::startMaxFramePosTransform() {
+    mMaxFrame.startPosTransform();
+}
+
+void DurationRectangle::finishMaxFramePosTransform() {
+    mMaxFrame.finishPosTransform();
+}
+
+void DurationRectangle::moveMaxFrame(const int &change) {
+    mMaxFrame.changeFramePosBy(change);
 }
 
 int AnimationRect::getMaxAnimationFrameAsRelFrame() const {

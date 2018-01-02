@@ -1234,7 +1234,47 @@ void CanvasWindow::importFile() {
     }
 }
 
+void CanvasWindow::startDurationRectPosTransformForAllSelected() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->startDurationRectPosTransformForAllSelected();
+}
+
+void CanvasWindow::finishDurationRectPosTransformForAllSelected() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->finishDurationRectPosTransformForAllSelected();
+}
+
 void CanvasWindow::moveDurationRectForAllSelected(const int &dFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->moveDurationRectForAllSelected(dFrame);
+}
+
+void CanvasWindow::startMinFramePosTransformForAllSelected() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->startMinFramePosTransformForAllSelected();
+}
+
+void CanvasWindow::finishMinFramePosTransformForAllSelected() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->finishMinFramePosTransformForAllSelected();
+}
+
+void CanvasWindow::moveMinFrameForAllSelected(const int &dFrame) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->moveMinFrameForAllSelected(dFrame);
+}
+
+void CanvasWindow::startMaxFramePosTransformForAllSelected() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->startMaxFramePosTransformForAllSelected();
+}
+
+void CanvasWindow::finishMaxFramePosTransformForAllSelected() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->finishMaxFramePosTransformForAllSelected();
+}
+
+void CanvasWindow::moveMaxFrameForAllSelected(const int &dFrame) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->moveMaxFrameForAllSelected(dFrame);
 }

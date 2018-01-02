@@ -145,6 +145,16 @@ public:
     WindowSingleWidgetTarget *getWindowSWT() {
         return mWindowSWTTarget;
     }
+
+    void startDurationRectPosTransformForAllSelected();
+    void finishDurationRectPosTransformForAllSelected();
+    void moveDurationRectForAllSelected(const int &dFrame);
+    void startMinFramePosTransformForAllSelected();
+    void finishMinFramePosTransformForAllSelected();
+    void moveMinFrameForAllSelected(const int &dFrame);
+    void startMaxFramePosTransformForAllSelected();
+    void finishMaxFramePosTransformForAllSelected();
+    void moveMaxFrameForAllSelected(const int &dFrame);
 protected:
     WindowSingleWidgetTarget *mWindowSWTTarget = NULL;
     PaintControler *mFileControler = NULL;
