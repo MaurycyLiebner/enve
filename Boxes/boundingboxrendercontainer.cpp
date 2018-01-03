@@ -140,6 +140,7 @@ void CacheContainer::setBlocked(const bool &bT) {
 void CacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
     mLoadingFromFile = false;
     mNoDataInMemory = false;
+    mLoadingUpdatable = NULL;
     mImageSk = img;
     if(!mBlocked) {
         MemoryHandler::getInstance()->addContainer(this);

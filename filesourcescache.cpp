@@ -166,7 +166,7 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
 
 void VideoCacheHandler::beforeUpdate() {
     FileCacheHandler::beforeUpdate();
-    qDebug() << "loading: " << mFramesLoadScheduled;
+    //qDebug() << "loading: " << mFramesLoadScheduled;
     mFramesBeingLoaded = mFramesLoadScheduled;
     mFramesBeingLoadedGUI = mFramesBeingLoaded;
     mFramesLoadScheduled.clear();
@@ -333,9 +333,9 @@ void VideoCacheHandler::processUpdate() {
         mLoadedFrames << SkImage::MakeFromBitmap(bitmap);
     // SKIA
     }
-    qDebug() << "elapsed loading " <<
-                mFramesBeingLoaded.count() <<
-                " frames: " << framesTimer.elapsed();
+//    qDebug() << "elapsed loading " <<
+//                mFramesBeingLoaded.count() <<
+//                " frames: " << framesTimer.elapsed();
 
     // clean up
     av_frame_free(&decodedFrame);
@@ -345,14 +345,14 @@ void VideoCacheHandler::processUpdate() {
 
     avformat_free_context(format);
 
-    qDebug() << "total elapsed: " << timer.elapsed();
+//    qDebug() << "total elapsed: " << timer.elapsed();
     // success
     return;// 0;
 }
 
 void VideoCacheHandler::afterUpdate() {
     FileCacheHandler::afterUpdate();
-    qDebug() << "loaded: " << mFramesBeingLoaded;
+//    qDebug() << "loaded: " << mFramesBeingLoaded;
     for(int i = 0; i < mFramesBeingLoaded.count(); i++) {
         CacheContainer *cont =
                 mFramesCache.createNewRenderContainerAtRelFrame(
@@ -374,7 +374,7 @@ const qreal &VideoCacheHandler::getFps() { return mFps; }
 Updatable *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
     if(mFramesLoadScheduled.contains(frame) ||
        mFramesBeingLoadedGUI.contains(frame)) return this;
-    qDebug() << "schedule frame load: " << frame;
+//    qDebug() << "schedule frame load: " << frame;
     CacheContainer *contAtFrame =
             mFramesCache.getRenderContainerAtRelFrame(frame);
     if(contAtFrame == NULL) {

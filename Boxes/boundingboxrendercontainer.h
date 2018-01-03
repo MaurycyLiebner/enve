@@ -4,6 +4,7 @@ class BoundingBox;
 #include "selfref.h"
 #include "skqtconversions.h"
 #include "skiaincludes.h"
+#include <QDebug>
 class QTemporaryFile;
 
 class CacheHandler;
@@ -93,16 +94,17 @@ public:
             mCancelAfterSaveDataClear = true;
             return mSavingUpdatable;
         }
-        if(!mNoDataInMemory || mLoadingFromFile) return NULL;
+        if(!mNoDataInMemory) return NULL;
+        if(mLoadingFromFile) return mLoadingUpdatable;
 
         mLoadingFromFile = true;
-        Updatable *updatable = new CacheContainerTmpFileDataLoader(mTmpFile,
-                                                                   this);
+        mLoadingUpdatable = new CacheContainerTmpFileDataLoader(mTmpFile,
+                                                                this);
         if(dependent != NULL) {
-            updatable->addDependent(dependent);
+            mLoadingUpdatable->addDependent(dependent);
         }
-        updatable->addScheduler();
-        return updatable;
+        mLoadingUpdatable->addScheduler();
+        return mLoadingUpdatable;
     }
 
     void setParentCacheHandler(CacheHandler *handler);
@@ -150,6 +152,7 @@ public:
     void setDataSavedToTmpFile(const QSharedPointer<QTemporaryFile> &tmpFile);
 protected:
     int mMemSizeAwaitingSave = 0;
+    Updatable *mLoadingUpdatable = NULL;
     Updatable *mSavingUpdatable = NULL;
     bool mCancelAfterSaveDataClear = false;
     bool mSavingToFile = false;

@@ -400,9 +400,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
             if(boxRenderData == NULL) {
                 continue;
             }
-            if(!boxRenderData->finished()) {
-                boxRenderData->addDependent(data);
-            }
+            boxRenderData->addDependent(data);
             groupData->childrenRenderData <<
                     boxRenderData->ref<BoundingBoxRenderData>();
             childrenEffectsMargin =

@@ -281,9 +281,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrame(
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
     foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
         foreach(TileSkDrawer *drawerT, drawer.drawers) {
-            if(!drawerT->finished()) {
-                drawerT->addDependent(paintData);
-            }
+            drawerT->addDependent(paintData);
         }
     }
     QPointF topLeft;

@@ -20,6 +20,9 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
             loadImageFromHandler();
         }
         BoundingBoxRenderData::beforeUpdate();
+        if(image.get() == NULL) {
+            qDebug() << "hell?";
+        }
     }
 
     bool allDataReady() {
@@ -37,6 +40,9 @@ private:
     void drawSk(SkCanvas *canvas) {
         SkPaint paint;
         //paint.setFilterQuality(kHigh_SkFilterQuality);
+        if(image == NULL) {
+            qDebug() << "no image to draw";
+        }
         canvas->drawImage(image, 0, 0, &paint);
     }
 };

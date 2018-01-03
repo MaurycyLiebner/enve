@@ -89,7 +89,6 @@ public:
     virtual Updatable *scheduleFrameLoad(const int &frame) = 0;
     const int &getFramesCount() { return mFramesCount; }
 protected:
-
     int mFramesCount = 0;
     virtual void updateFrameCount() = 0;
 };
