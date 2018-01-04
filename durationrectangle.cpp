@@ -172,6 +172,7 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
 
     p->fillRect(drawRect.adjusted(0, 1, 0, -1), fillColor);
     if(mHovered) {
+        p->setPen(QPen(Qt::white, .5));
         p->drawRect(drawRect);
     }
 

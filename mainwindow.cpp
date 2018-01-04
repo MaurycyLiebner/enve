@@ -761,6 +761,7 @@ void MainWindow::addCanvas(Canvas *newCanvas) {
 
     connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
             mCanvasWindow, SLOT(setCurrentCanvas(int)));
+    newCanvas->fitCanvasToSize();
 }
 
 void MainWindow::canvasNameChanged(Canvas *canvas,
