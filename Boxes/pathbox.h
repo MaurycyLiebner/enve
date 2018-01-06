@@ -97,8 +97,7 @@ public:
 
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 
-    void applyPaintSetting(
-            const PaintSetting &setting);
+    void applyPaintSetting(const PaintSetting &setting);
 
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
@@ -131,6 +130,7 @@ public:
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
+    SkPath getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     void drawSelectedSk(SkCanvas *canvas,

@@ -138,6 +138,10 @@ public:
         }
     }
 
+    void schedulePathUpdate() {
+        mPathUpdateNeeded = true;
+    }
+
     virtual void revertAllPoints() {
         revertElementPosSubset(0, -1);
         PathContainer::shiftAllPoints(1);

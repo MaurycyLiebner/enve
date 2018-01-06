@@ -1022,12 +1022,14 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         }
 
-        if(mTarget->contentVisible()) {
-            drawPixmapCentered(&p, mContentButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
-        } else {
-            drawPixmapCentered(&p, mContentButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
+        if(ca_target->hasChildAnimators()) {
+            if(mTarget->contentVisible()) {
+                drawPixmapCentered(&p, mContentButton->geometry(),
+                                   *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
+            } else {
+                drawPixmapCentered(&p, mContentButton->geometry(),
+                                   *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
+            }
         }
         p.setPen(Qt::white);
 

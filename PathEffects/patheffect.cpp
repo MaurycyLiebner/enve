@@ -35,6 +35,9 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mSeed->setIntValueRange(0, 9999);
     mSeed->setCurrentIntValue(qrand() % 9999, false);
 
+    mRepeat->prp_setName("repeat");
+    mRepeat->setValue(false);
+
     ca_addChildAnimator(mSegLength.data());
     ca_addChildAnimator(mMaxDev.data());
     ca_addChildAnimator(mSmoothness.data());
@@ -42,6 +45,7 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mRandomizeStep.data());
     ca_addChildAnimator(mSmoothTransform.data());
     ca_addChildAnimator(mSeed.data());
+    ca_addChildAnimator(mRepeat.data());
 }
 
 static void Perterb(SkPoint* p,
@@ -139,6 +143,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
     SkVector v;
     if(smoothness < 0.001f) {
         do {
+            SkPoint firstP;
             SkScalar length = meas.getLength();
 
             if(segLen * (2/* + doFill*/) > length) {
@@ -156,6 +161,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 if(meas.getPosTan(distance, &p, &v)) {
                     Perterb(&p, v, randFloat() /*rand.nextSScalar1()*/ * scale);
                     dst->moveTo(p);
+                    firstP = p;
                 }
                 while(--n >= 0) {
                     distance += delta;
@@ -165,6 +171,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                     }
                 }
                 if(meas.isClosed()) {
+                    //dst->lineTo(p);
                     dst->close();
                 }
             }
@@ -277,15 +284,23 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 
 void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
-                                               SkPath *dst) {
+                                               SkPath *dst, PathBox *) {
     qsrand(mSeed->getCurrentIntValue());
     mSeedAssist = qrand() % 999999;
     int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
-    if(mRandomize->getValue()) {
+    uint32_t nextSeed;
+    if(mRepeat->getValue()) {
+        if((relFrame / randStep) % 2 == 1) {
+            nextSeed = mSeedAssist;
+            mSeedAssist++;
+        } else {
+            nextSeed = mSeedAssist + 1;
+        }
+    } else if(mRandomize->getValue()) {
         mSeedAssist += relFrame / randStep;
+        nextSeed = mSeedAssist - 1;
     }
     if(mSmoothTransform->getValue()) {
-        uint32_t nextSeed = mSeedAssist - 1;
         SkPath path1;
         displaceFilterPath(&path1, src,
                            mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
@@ -324,7 +339,8 @@ DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
 
 void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
                                                 const SkPath &src,
-                                                SkPath *dst) {
+                                                SkPath *dst,
+                                                PathBox *) {
     *dst = src;
     dst->addPath(src,
                  mTranslation->getEffectiveXValueAtRelFrame(relFrame),
@@ -346,7 +362,7 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
 
 void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
-                                               SkPath *dst) {
+                                               SkPath *dst, PathBox *) {
     SkStroke strokerSk;
     qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame);
     if(widthT < 0.001) {
@@ -433,20 +449,18 @@ SumPathEffect::SumPathEffect(PathBox *parentPath,
     ca_addChildAnimator(mOperationType.data());
 }
 
-void SumPathEffect::filterPathForRelFrame(const int &relFrame,
-                                          const SkPath &src,
-                                          SkPath *dst) {
-    PathBox *pathBox = ((PathBox*)mBoxTarget->getTarget());
-    if(pathBox == NULL) {
+void sumPaths(const int &relFrame, const SkPath &src,
+              SkPath *dst, PathBox *srcBox,
+              PathBox *dstBox, const QString &operation) {
+    if(srcBox == NULL) {
         *dst = src;
         return;
     }
-    int absFrame = mParentPathBox->
+    int absFrame = dstBox->
             prp_relFrameToAbsFrame(relFrame);
-    int pathBoxRelFrame = pathBox->
+    int pathBoxRelFrame = srcBox->
             prp_absFrameToRelFrame(absFrame);
-    SkPath boxPath = pathBox->getPathAtRelFrame(
-                pathBoxRelFrame);
+    SkPath boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrame(pathBoxRelFrame);
     if(src.isEmpty()) {
         *dst = boxPath;
         return;
@@ -456,7 +470,6 @@ void SumPathEffect::filterPathForRelFrame(const int &relFrame,
         return;
     }
     bool unionInterThis, unionInterOther;
-    QString operation = mOperationType->getCurrentValueName();
     // "Union" << "Difference" << "Intersection" << "Exclusion"
     if(operation == "Union") {
         unionInterOther = true;
@@ -472,11 +485,11 @@ void SumPathEffect::filterPathForRelFrame(const int &relFrame,
         unionInterOther = false;
     }
     QMatrix pathBoxMatrix =
-            pathBox->getTransformAnimator()->
+            srcBox->getTransformAnimator()->
                 getCombinedTransformMatrixAtRelFrame(
                     pathBoxRelFrame);
     QMatrix parentBoxMatrix =
-            mParentPathBox->getTransformAnimator()->
+            dstBox->getTransformAnimator()->
                 getCombinedTransformMatrixAtRelFrame(
                     relFrame);
     boxPath.transform(
@@ -511,4 +524,67 @@ void SumPathEffect::filterPathForRelFrame(const int &relFrame,
         targetPath2.generateSinglePathPaths();
         dst->addPath(QPainterPathToSkPath(targetPath2.getPath()));
     }
+}
+
+
+void SumPathEffect::filterPathForRelFrame(const int &relFrame,
+                                          const SkPath &src,
+                                          SkPath *dst,
+                                          PathBox *) {
+    PathBox *pathBox = ((PathBox*)mBoxTarget->getTarget());
+    QString operation = mOperationType->getCurrentValueName();
+    sumPaths(relFrame, src, dst, pathBox,
+             mParentPathBox, operation);
+}
+
+GroupLastPathSumPathEffect::GroupLastPathSumPathEffect(
+        BoxesGroup *parentGroup,
+        const bool &outlinePathEffect) :
+    PathEffect(GROUP_SUM_PATH_EFFECT, outlinePathEffect) {
+    prp_setName("sum path effect");
+    mParentGroup = parentGroup;
+}
+
+void GroupLastPathSumPathEffect::filterPathForRelFrame(const int &relFrame,
+                                                       const SkPath &src,
+                                                       SkPath *dst,
+                                                       PathBox *box) {
+    QString operation = "Union";
+    const QList<QSharedPointer<BoundingBox> > &boxList =
+            mParentGroup->getContainedBoxesList();
+    QList<PathBox*> pathBoxes;
+    foreach(const QSharedPointer<BoundingBox> &pathBox, boxList) {
+        if(pathBox->SWT_isPathBox()) {
+            pathBoxes << (PathBox*)pathBox.data();
+        }
+    }
+    if(pathBoxes.count() < 2) {
+        *dst = src;
+        return;
+    }
+    PathBox *lastPath = pathBoxes.takeLast();
+    if(box != lastPath) {
+        *dst = src;
+        return;
+    }
+    SkPath srcT = src;
+    foreach(PathBox *pathBox, pathBoxes) {
+        sumPaths(relFrame, srcT, dst, pathBox,
+                 lastPath, operation);
+        srcT = *dst;
+    }
+}
+
+void GroupLastPathSumPathEffect::setParentGroup(BoxesGroup *parent) {
+    mParentGroup = parent;
+}
+
+bool GroupLastPathSumPathEffect::SWT_shouldBeVisible(
+                        const SWT_RulesCollection &rules,
+                        const bool &parentSatisfies,
+                        const bool &parentMainTarget) {
+    return Animator::SWT_shouldBeVisible(
+                rules,
+                parentSatisfies,
+                parentMainTarget);
 }

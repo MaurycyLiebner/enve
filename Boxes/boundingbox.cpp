@@ -1184,6 +1184,7 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
 }
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
+    if(parentBoxT == NULL) return;
     parentBox = parentBoxT->weakRef<BoundingBox>();
 }
 

@@ -135,7 +135,7 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup *linkTarget) :
     mType = TYPE_INTERNAL_LINK;
     setLinkTarget(linkTarget);
     const QList<QSharedPointer<BoundingBox> > &boxesList =
-            linkTarget->getChildBoxesList();
+            linkTarget->getContainedBoxesList();
     foreach(const QSharedPointer<BoundingBox> &child, boxesList) {
         QSharedPointer<BoundingBox> newLink =
                 child->createLinkForLinkGroup()->ref<BoundingBox>();

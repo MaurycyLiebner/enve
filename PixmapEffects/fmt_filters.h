@@ -246,7 +246,11 @@ namespace fmt_filters
 
         // radius = [0.01; 90.0], sigma = [0.01; 50.0]
         void anim_fast_blur(const image &im, const qreal &fRadius);
+        void anim_fast_blur(const image &im, const qreal &fRadius,
+                            const qreal &opacityT);
         void fast_blur(const image &im, int radius);
+        void fast_blur(const image &im, int radius,
+                       const qreal &opacityT);
 
         void anim_fast_shadow(const image &im,
                               const qreal &fRed,

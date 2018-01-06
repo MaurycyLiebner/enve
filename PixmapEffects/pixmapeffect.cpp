@@ -95,6 +95,31 @@ void applyBlur(const fmt_filters::image &img,
     }
 }
 
+void applyBlur(const fmt_filters::image &img,
+               const qreal &scale,
+               const qreal &blurRadius,
+               const bool &highQuality,
+               const bool &hasKeys,
+               const qreal &opacity) {
+    qreal radius = blurRadius*scale;
+
+    if(highQuality) {
+        if(hasKeys) {
+            fmt_filters::anim_fast_blur(img, radius*0.5, opacity);
+            fmt_filters::anim_fast_blur(img, radius*0.5, opacity);
+        } else {
+            fmt_filters::fast_blur(img, radius*0.5, opacity);
+            fmt_filters::fast_blur(img, radius*0.5, opacity);
+        }
+    } else {
+        if(hasKeys) {
+            fmt_filters::anim_fast_blur(img, radius*0.8, opacity);
+        } else {
+            fmt_filters::fast_blur(img, radius*0.8, opacity);
+        }
+    }
+}
+
 void BlurEffect::applySk(const SkBitmap &imgPtr,
                          const fmt_filters::image &img,
                          qreal scale) {
@@ -143,9 +168,9 @@ ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
     mColor->prp_setName("color");
     ca_addChildAnimator(mColor.data());
 
-    mOpacity->qra_setCurrentValue(100.);
     mOpacity->prp_setName("opacity");
-    mOpacity->qra_setValueRange(0., 100.);
+    mOpacity->qra_setValueRange(0., 1000.);
+    mOpacity->qra_setCurrentValue(100.);
     ca_addChildAnimator(mOpacity.data());
 //    mScale.setCurrentValue(1.);
 //    mScale.setName("scale");
@@ -163,6 +188,7 @@ PixmapEffectRenderData *ShadowEffect::getPixmapEffectRenderDataForRelFrame(
     renderData->color = mColor->getColorAtRelFrame(relFrame);
     renderData->translation = mTranslation->
             getCurrentEffectivePointValueAtRelFrame(relFrame);
+    renderData->opacity = mOpacity->getCurrentEffectiveValueAtRelFrame(relFrame)/100.;
     return renderData;
 }
 
@@ -172,7 +198,8 @@ void applyShadow(const SkBitmap &imgPtr,
                  const Color &currentColor,
                  const QPointF &trans,
                  const bool &hasKeys,
-                 const bool &highQuality) {
+                 const bool &highQuality,
+                 const qreal &opacity = 1.) {
     SkBitmap shadowBitmap;
     shadowBitmap.allocPixels(imgPtr.info());
 
@@ -189,9 +216,16 @@ void applyShadow(const SkBitmap &imgPtr,
     fmt_filters::image shadowImg((uint8_t*)shadowPixmap.writable_addr(),
                            shadowBitmap.width(), shadowBitmap.height());
 
-    applyBlur(shadowImg, scale,
-              blurRadius, highQuality,
-              hasKeys);
+    if(opacity > 1.) {
+        applyBlur(shadowImg, scale,
+                  blurRadius, highQuality,
+                  hasKeys, opacity);
+    } else {
+        applyBlur(shadowImg, scale,
+                  blurRadius, highQuality,
+                  hasKeys);
+        paint.setAlpha(qMin(255, qMax(0, (int)(opacity*255) )));
+    }
 
     SkCanvas *dstCanvas = new SkCanvas(imgPtr);
     paint.setBlendMode(SkBlendMode::kDstOver);
@@ -210,7 +244,8 @@ void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                 color,
                 translation,
                 hasKeys,
-                highQuality);
+                highQuality,
+                opacity);
 }
 
 void ShadowEffect::applySk(const SkBitmap &imgPtr,
@@ -218,11 +253,12 @@ void ShadowEffect::applySk(const SkBitmap &imgPtr,
                            qreal scale) {
     Q_UNUSED(img);
     applyShadow(imgPtr, scale,
-                mBlurRadius->qra_getCurrentValue(),
+                mBlurRadius->qra_getCurrentEffectiveValue(),
                 mColor->getCurrentColor(),
                 mTranslation->getCurrentEffectivePointValue(),
                 mBlurRadius->prp_hasKeys(),
-                mHighQuality->getValue());
+                mHighQuality->getValue(),
+                mOpacity->qra_getCurrentEffectiveValue());
 }
 
 qreal ShadowEffect::getMargin() {

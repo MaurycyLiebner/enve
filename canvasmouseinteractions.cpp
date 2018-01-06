@@ -132,6 +132,10 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                     "canvas_path_effects_solidify");
         pathEffectsMenu->addAction("Operation Effect")->setObjectName(
                     "canvas_path_effect_sum");
+        if(hasGroups) {
+            pathEffectsMenu->addAction("Group Sum Effect")->setObjectName(
+                        "canvas_path_effect_group_sum");
+        }
 
         QMenu *fillPathEffectsMenu = menu->addMenu("Fill Effects");
         fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
@@ -209,6 +213,8 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applySolidifyPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effect_sum") {
         applySumPathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_path_effect_group_sum") {
+        applyGroupSumPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_fill_effects_discrete") {
         applyDiscreteFillPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_fill_effects_duplicate") {

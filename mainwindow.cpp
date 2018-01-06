@@ -731,7 +731,7 @@ MainWindow *MainWindow::getInstance()
 }
 #include "newcanvasdialog.h"
 void MainWindow::createNewCanvas() {
-    QString defName = "Canvas " +
+    QString defName = "Scene " +
             QString::number(mCurrentCanvasComboBox->count());
     QSharedPointer<Canvas> newCanvas = (new Canvas(getFillStrokeSettings(),
                                    mCanvasWindow,
@@ -1097,6 +1097,7 @@ void MainWindow::setCurrentFrame(int frame) {
 void MainWindow::newFile() {
     if(askForSaving()) {
         closeProject();
+        createNewCanvas();
     }
 }
 

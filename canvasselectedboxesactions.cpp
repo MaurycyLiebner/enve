@@ -231,6 +231,13 @@ void Canvas::applySumPathEffectToSelected() {
     }
 }
 
+void Canvas::applyGroupSumPathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isBoxesGroup()) continue;
+        box->addPathEffect(new GroupLastPathSumPathEffect((BoxesGroup*)box, false));
+    }
+}
+
 void Canvas::applyDiscreteFillPathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {

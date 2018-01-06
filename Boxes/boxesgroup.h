@@ -19,7 +19,6 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
         mDelayDataSet = true;
     }
     QList<std::shared_ptr<BoundingBoxRenderData> > childrenRenderData;
-
     void updateRelBoundingRect() {
         SkPath boundingPaths = SkPath();
         Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &child,
@@ -36,6 +35,7 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
         relBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
     }
     void renderToImage();
+
 protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
@@ -182,8 +182,8 @@ public:
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                               int *lastIdentical,
-                                               const int &relFrame);
+                                              int *lastIdentical,
+                                              const int &relFrame);
     void processSchedulers();
     void addSchedulersToProcess();
 
@@ -209,7 +209,7 @@ public:
         }
     }
 
-    const QList<QSharedPointer<BoundingBox> > &getChildBoxesList() const {
+    const QList<QSharedPointer<BoundingBox> > &getContainedBoxesList() const {
         return mContainedBoxes;
     }
     BoundingBox *createLink();
@@ -234,18 +234,21 @@ public:
     }
 
     void filterPathForRelFrame(const int &relFrame,
-                               SkPath *srcDstPath);
-    void filterOutlinePathBeforeThicknessForRelFrame(
-            const int &relFrame, SkPath *srcDstPath);
+                               SkPath *srcDstPath,
+                               PathBox *box);
+    void filterOutlinePathBeforeThicknessForRelFrame(const int &relFrame,
+                                                     SkPath *srcDstPath);
     void filterOutlinePathForRelFrame(const int &relFrame,
-                               SkPath *srcDstPath);
+                                      SkPath *srcDstPath);
     void filterFillPathForRelFrame(const int &relFrame,
                                    SkPath *srcDstPath);
 //    bool prp_nextRelFrameWithKey(const int &relFrame,
 //                                 int &nextRelFrame);
 //    bool prp_prevRelFrameWithKey(const int &relFrame,
 //                                 int &prevRelFrame);
+    bool enabledGroupPathSumEffectPresent();
 protected:
+    QList<PathEffect*> mGroupPathSumEffects;
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
@@ -257,8 +260,9 @@ protected:
     QList<QSharedPointer<BoundingBox> > mContainedBoxes;
 
     //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
-    int getChildBoxIndex(BoundingBox *child);
+    int getContainedBoxIndex(BoundingBox *child);
     void iniPathEffects();
+    bool isLastPathBox(PathBox *pathBox);
 signals:
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);

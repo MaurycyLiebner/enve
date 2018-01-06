@@ -138,9 +138,9 @@ void FullVectorPath::generateFromPath(const SkPath &path) {
                 }
                 currentTarget = new MinimalVectorPath(this);
                 mSeparatePaths.append(currentTarget);
-                lastPoint = new MinimalNodePoint(QPointF(),
+                lastPoint = new MinimalNodePoint(QPointF(pt.x(), pt.y()),
                                                  QPointF(pt.x(), pt.y()),
-                                                 QPointF());
+                                                 QPointF(pt.x(), pt.y()));
                 currentTarget->addPoint(lastPoint);
                 firstPoint = lastPoint;
             }

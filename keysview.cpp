@@ -444,6 +444,11 @@ void KeysView::updateHoveredPointFromPos(const QPoint &posU) {
     }
 }
 
+void KeysView::clearHovered() {
+    clearHoveredMovable();
+    clearHoveredPoint();
+}
+
 void KeysView::clearHoveredPoint() {
     if(mHoveredKey == NULL) return;
     mHoveredKey->setHovered(false);

@@ -169,6 +169,7 @@ struct ShadowEffectRenderData : public PixmapEffectRenderData {
     qreal blurRadius;
     Color color;
     QPointF translation;
+    qreal opacity;
 };
 
 class ShadowEffect : public PixmapEffect {

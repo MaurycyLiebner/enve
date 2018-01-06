@@ -97,6 +97,11 @@ protected:
 
     void paintEvent(QPaintEvent *);
 
+    void leaveEvent(QEvent *) {
+        clearHovered();
+        update();
+    }
+
     void KFT_setFocusToWidget() {
         setFocus();
     }
@@ -126,6 +131,7 @@ public slots:
 
     void setViewedRange(const int &top,
                         const int &bottom);
+    void clearHovered();
 private slots:
     void scrollRight();
     void scrollLeft();

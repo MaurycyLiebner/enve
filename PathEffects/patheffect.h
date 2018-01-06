@@ -8,13 +8,16 @@
 #include "Properties/comboboxproperty.h"
 #include "Animators/intanimator.h"
 #include "skiaincludes.h"
+#include "Properties/boxtargetproperty.h"
+class PathBox;
 class PathEffectAnimators;
 enum PathEffectType : short {
     DISPLACE_PATH_EFFECT,
     DASH_PATH_EFFECT,
     DUPLICATE_PATH_EFFECT,
     SOLIDIFY_PATH_EFFECT,
-    SUM_PATH_EFFECT
+    SUM_PATH_EFFECT,
+    GROUP_SUM_PATH_EFFECT
 };
 class PathEffect;
 
@@ -44,9 +47,14 @@ public:
     PathEffect(const PathEffectType &type,
                const bool &outlinePathEffect);
 
+    const PathEffectType &getEffectType() {
+        return mPathEffectType;
+    }
+
     virtual void filterPathForRelFrame(const int &,
                                        const SkPath &,
-                                       SkPath *) = 0;
+                                       SkPath *,
+                                       PathBox *) = 0;
     virtual void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -110,7 +118,9 @@ public:
     DisplacePathEffect(const bool &outlinePathEffect);
 
     void filterPathForRelFrame(const int &relFrame,
-                               const SkPath &src, SkPath *dst);
+                               const SkPath &src,
+                               SkPath *dst,
+                               PathBox *);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -166,6 +176,8 @@ private:
             (new BoolProperty())->ref<BoolProperty>();
     QSharedPointer<IntAnimator> mSeed =
             (new IntAnimator())->ref<IntAnimator>();
+    QSharedPointer<BoolProperty> mRepeat =
+            (new BoolProperty())->ref<BoolProperty>();
     uint32_t mSeedAssist = 0;
 };
 
@@ -175,7 +187,9 @@ public:
     DuplicatePathEffect(const bool &outlinePathEffect);
 
     void filterPathForRelFrame(const int &relFrame,
-                               const SkPath &src, SkPath *dst);
+                               const SkPath &src,
+                               SkPath *dst,
+                               PathBox *);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -189,7 +203,9 @@ public:
     SolidifyPathEffect(const bool &outlinePathEffect);
 
     void filterPathForRelFrame(const int &relFrame,
-                               const SkPath &src, SkPath *dst);
+                               const SkPath &src,
+                               SkPath *dst,
+                               PathBox *);
     void writeProperty(QIODevice *target) {}
     void readProperty(QIODevice *target) {}
 private:
@@ -197,8 +213,6 @@ private:
             (new QrealAnimator())->ref<QrealAnimator>();
 };
 
-class PathBox;
-#include "Properties/boxtargetproperty.h"
 class SumPathEffect : public PathEffect {
     Q_OBJECT
 public:
@@ -207,7 +221,9 @@ public:
 
 
     void filterPathForRelFrame(const int &relFrame,
-                               const SkPath &src, SkPath *dst);
+                               const SkPath &src,
+                               SkPath *dst,
+                               PathBox *);
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
@@ -224,6 +240,33 @@ private:
                  "Exclusion"))->ref<ComboBoxProperty>();
     QSharedPointer<BoxTargetProperty> mBoxTarget =
             (new BoxTargetProperty())->ref<BoxTargetProperty>();
+};
+
+class GroupLastPathSumPathEffect : public PathEffect {
+    Q_OBJECT
+public:
+    GroupLastPathSumPathEffect(BoxesGroup *parentPath,
+                               const bool &outlinePathEffect);
+
+
+    void filterPathForRelFrame(const int &relFrame,
+                               const SkPath &src,
+                               SkPath *dst,
+                               PathBox *box);
+
+    void writeProperty(QIODevice *target) {}
+    void readProperty(QIODevice *target) {}
+
+//    bool hasReasonsNotToApplyUglyTransform() {
+//        return true;//mBoxTarget->getTarget() != NULL;
+//    }
+
+    void setParentGroup(BoxesGroup *parent);
+    bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                             const bool &parentSatisfies,
+                             const bool &parentMainTarget);
+private:
+    BoxesGroup *mParentGroup;
 };
 
 #endif // PATHEFFECT_H

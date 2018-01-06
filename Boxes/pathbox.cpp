@@ -119,10 +119,12 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     pathData->editPath = getPathAtRelFrame(relFrame);
     pathData->path = pathData->editPath;
     if(getParentCanvas()->getPathEffectsVisible()) {
-        mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+        mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path,
+                                                     this);
         int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                     prp_relFrameToAbsFrame(relFrame));
-        mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->path);
+        mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->path,
+                                            this);
     }
 
     SkPath outline;
@@ -139,13 +141,13 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     } else {
         outline = SkPath();
     }
-    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
+    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline, this);
     mParentGroup->filterOutlinePathForRelFrame(relFrame, &outline);
 
     pathData->outlinePath = outline;
     outline.addPath(pathData->path);
 
-    mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+    mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path, this);
     mParentGroup->filterFillPathForRelFrame(relFrame, &pathData->path);
 
     UpdatePaintSettings *fillSettings = &pathData->paintSettings;
@@ -339,6 +341,12 @@ GradientPoints *PathBox::getStrokeGradientPoints() {
     return mStrokeGradientPoints.data();
 }
 
+SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame) {
+    SkPath path = getPathAtRelFrame(relFrame);
+    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path, this);
+    return path;
+}
+
 GradientPoints *PathBox::getFillGradientPoints() {
     return mFillGradientPoints.data();
 }
@@ -478,7 +486,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     } else {
         outline = SkPath();
     }
-    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
+    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline, this);
     outline.addPath(path);
     return SkRectToQRectF(outline.computeTightBounds());
 }

@@ -12,7 +12,7 @@
 NodePoint::NodePoint(VectorPathAnimator *parentAnimator) :
     NonAnimatedMovablePoint(parentAnimator->getParentPathAnimator()->
                             getParentBox()->getTransformAnimator(),
-                 MovablePointType::TYPE_PATH_POINT, 9.5) {
+                 MovablePointType::TYPE_PATH_POINT, 6.5) {
     mParentPath = parentAnimator;
     mStartCtrlPt = new CtrlPoint(this, true);
     mEndCtrlPt = new CtrlPoint(this, false);
@@ -412,6 +412,8 @@ void NodePoint::setEndCtrlPtEnabled(const bool &enabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
     mCurrentNodeSettings->endEnabled = enabled;
+    mParentPath->schedulePathUpdate();
+    mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateEndCtrlPtVisibility();
 }
 
@@ -421,6 +423,8 @@ void NodePoint::setStartCtrlPtEnabled(const bool &enabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
     mCurrentNodeSettings->startEnabled = enabled;
+    mParentPath->schedulePathUpdate();
+    mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateStartCtrlPtVisibility();
 }
 
