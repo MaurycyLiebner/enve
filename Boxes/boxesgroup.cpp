@@ -507,6 +507,22 @@ void BoxesGroup::drawSelectedSk(SkCanvas *canvas,
 }
 
 void BoxesGroup::setIsCurrentGroup(const bool &bT) {
+    if(bT != mIsCurrentGroup) {
+        if(enabledGroupPathSumEffectPresent()) {
+            PathBox *lastPath = NULL;
+            for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+                BoundingBox *childAtI = mContainedBoxes.at(i).data();
+                if(childAtI->SWT_isPathBox()) {
+                    lastPath = (PathBox*)childAtI;
+                    break;
+                }
+            }
+            if(lastPath != NULL) {
+                lastPath->scheduleUpdate();
+                scheduleUpdate();
+            }
+        }
+    }
     mIsCurrentGroup = bT;
     if(!bT) {
         if(mContainedBoxes.isEmpty() && mParentGroup != NULL) {
