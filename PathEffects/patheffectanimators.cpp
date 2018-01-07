@@ -79,7 +79,7 @@ void PathEffectAnimators::filterPathForRelFrameBeforeThickness(
 
 void PathEffectAnimators::filterPathForRelFrame(const int &relFrame,
                                                 SkPath *srcDstPath,
-                                                PathBox *box) {
+                                                const bool &groupPathSum) {
     SkPath dstPath = *srcDstPath;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         PathEffect *effectT = (PathEffect*)effect.data();
@@ -90,7 +90,7 @@ void PathEffectAnimators::filterPathForRelFrame(const int &relFrame,
         effectT->filterPathForRelFrame(relFrame,
                                        srcPath,
                                        &dstPath,
-                                       box);
+                                       groupPathSum);
     }
     *srcDstPath = dstPath;
 }

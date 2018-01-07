@@ -54,7 +54,7 @@ public:
     virtual void filterPathForRelFrame(const int &,
                                        const SkPath &,
                                        SkPath *,
-                                       PathBox *) = 0;
+                                       const bool &) = 0;
     virtual void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -120,7 +120,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
-                               PathBox *);
+                               const bool &);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -189,7 +189,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
-                               PathBox *);
+                               const bool &);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -205,7 +205,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
-                               PathBox *);
+                               const bool &);
     void writeProperty(QIODevice *target) {}
     void readProperty(QIODevice *target) {}
 private:
@@ -223,7 +223,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
-                               PathBox *);
+                               const bool &);
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
@@ -252,7 +252,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
-                               PathBox *box);
+                               const bool &groupPathSum);
 
     void writeProperty(QIODevice *target) {}
     void readProperty(QIODevice *target) {}

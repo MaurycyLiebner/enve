@@ -284,7 +284,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 
 void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
-                                               SkPath *dst, PathBox *) {
+                                               SkPath *dst, const bool &) {
     qsrand(mSeed->getCurrentIntValue());
     mSeedAssist = qrand() % 999999;
     int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
@@ -340,7 +340,7 @@ DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
 void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
                                                 const SkPath &src,
                                                 SkPath *dst,
-                                                PathBox *) {
+                                                const bool &) {
     *dst = src;
     dst->addPath(src,
                  mTranslation->getEffectiveXValueAtRelFrame(relFrame),
@@ -362,7 +362,8 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
 
 void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
-                                               SkPath *dst, PathBox *) {
+                                               SkPath *dst,
+                                               const bool &) {
     SkStroke strokerSk;
     qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame);
     if(widthT < 0.001) {
@@ -530,7 +531,7 @@ void sumPaths(const int &relFrame, const SkPath &src,
 void SumPathEffect::filterPathForRelFrame(const int &relFrame,
                                           const SkPath &src,
                                           SkPath *dst,
-                                          PathBox *) {
+                                          const bool &) {
     PathBox *pathBox = ((PathBox*)mBoxTarget->getTarget());
     QString operation = mOperationType->getCurrentValueName();
     sumPaths(relFrame, src, dst, pathBox,
@@ -548,7 +549,11 @@ GroupLastPathSumPathEffect::GroupLastPathSumPathEffect(
 void GroupLastPathSumPathEffect::filterPathForRelFrame(const int &relFrame,
                                                        const SkPath &src,
                                                        SkPath *dst,
-                                                       PathBox *box) {
+                                                       const bool &groupPathSum) {
+    if(!groupPathSum) {
+        *dst = src;
+        return;
+    }
     QString operation = "Union";
     const QList<QSharedPointer<BoundingBox> > &boxList =
             mParentGroup->getContainedBoxesList();
@@ -563,10 +568,6 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(const int &relFrame,
         return;
     }
     PathBox *lastPath = pathBoxes.takeLast();
-    if(box != lastPath) {
-        *dst = src;
-        return;
-    }
     SkPath srcT = src;
     foreach(PathBox *pathBox, pathBoxes) {
         sumPaths(relFrame, srcT, dst, pathBox,

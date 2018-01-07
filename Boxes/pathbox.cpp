@@ -124,7 +124,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
         int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                     prp_relFrameToAbsFrame(relFrame));
         mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->path,
-                                            this);
+                                            data->parentBox.data());
     }
 
     SkPath outline;

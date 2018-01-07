@@ -192,12 +192,10 @@ void BoxesGroup::removeOutlinePathEffect(PathEffect *effect) {
 
 void BoxesGroup::filterPathForRelFrame(const int &relFrame,
                                        SkPath *srcDstPath,
-                                       PathBox *box) {
-    if(isCurrentGroup() ) {
-        mPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath, NULL);
-    } else {
-        mPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath, box);
-    }
+                                       BoundingBox *box) {
+    mPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath,
+                                                 box == this);
+
     if(mParentGroup == NULL) return;
     int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
@@ -445,14 +443,14 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
         }
         if(lastPathBox != NULL) {
             int boxRelFrame = lastPathBox->prp_absFrameToRelFrame(absFrame);
-            BoundingBoxRenderData *boxRenderData =
-                    lastPathBox->getCurrentRenderData();
+            BoundingBoxRenderData *boxRenderData = new PathBoxRenderData(this);
+            lastPathBox->setupBoundingBoxRenderDataForRelFrame(
+                boxRelFrame, boxRenderData);
+            boxRenderData->addScheduler();
             boxRenderData->addDependent(data);
             groupData->childrenRenderData.insert(idT,
                     boxRenderData->ref<BoundingBoxRenderData>());
-            childrenEffectsMargin =
-                    qMax(lastPathBox->getEffectsMarginAtRelFrame(boxRelFrame),
-                         childrenEffectsMargin);
+            boxRenderData->parentBox = NULL;
         }
     } else {
         foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
@@ -507,22 +505,6 @@ void BoxesGroup::drawSelectedSk(SkCanvas *canvas,
 }
 
 void BoxesGroup::setIsCurrentGroup(const bool &bT) {
-    if(bT != mIsCurrentGroup) {
-        if(enabledGroupPathSumEffectPresent()) {
-            PathBox *lastPath = NULL;
-            for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
-                BoundingBox *childAtI = mContainedBoxes.at(i).data();
-                if(childAtI->SWT_isPathBox()) {
-                    lastPath = (PathBox*)childAtI;
-                    break;
-                }
-            }
-            if(lastPath != NULL) {
-                lastPath->scheduleUpdate();
-                scheduleUpdate();
-            }
-        }
-    }
     mIsCurrentGroup = bT;
     if(!bT) {
         if(mContainedBoxes.isEmpty() && mParentGroup != NULL) {

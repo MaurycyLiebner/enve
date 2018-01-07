@@ -21,7 +21,7 @@ public:
 
     void filterPathForRelFrame(const int &relFrame,
                                SkPath *srcDstPath,
-                               PathBox *box);
+                               const bool &groupPathSum = false);
 
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
