@@ -85,6 +85,7 @@ public:
     virtual bool SWT_isPaintBox() { return false; }
     // Properties
     virtual bool SWT_isBoolProperty() { return false; }
+    virtual bool SWT_isBoolPropertyContainer() { return false; }
     virtual bool SWT_isComboBoxProperty() { return false; }
     virtual bool SWT_isBoxTargetProperty() { return false; }
     virtual bool SWT_isProperty() { return false; }
@@ -138,12 +139,19 @@ public:
     }
 
     void SWT_hide() {
-        SWT_mVisible = false;
+        SWT_setVisible(false);
     }
 
     void SWT_show() {
-        SWT_mVisible = true;
+        SWT_setVisible(true);
     }
+
+    void SWT_setVisible(const bool &bT) {
+        SWT_mVisible = bT;
+        SWT_afterContentVisibilityChanged();
+    }
+
+    void SWT_afterContentVisibilityChanged();
 protected:
     bool SWT_mVisible = true;
     QList<std::shared_ptr<SingleWidgetAbstraction> > mSWT_allAbstractions;

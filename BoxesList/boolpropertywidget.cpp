@@ -10,15 +10,26 @@ BoolPropertyWidget::BoolPropertyWidget(QWidget *parent) :
 
 void BoolPropertyWidget::setTarget(BoolProperty *property) {
     mTarget = property;
+    mTargetContainer = NULL;
+}
+
+void BoolPropertyWidget::setTarget(BoolPropertyContainer *property) {
+    mTargetContainer = property;
+    mTarget = NULL;
 }
 
 void BoolPropertyWidget::mousePressEvent(QMouseEvent *) {
-    mTarget->setValue(!mTarget->getValue());
+    if(mTargetContainer != NULL) {
+        mTargetContainer->setValue(!mTargetContainer->getValue());
+    }
+    if(mTarget != NULL) {
+        mTarget->setValue(!mTarget->getValue());
+    }
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void BoolPropertyWidget::paintEvent(QPaintEvent *) {
-    if(mTarget == NULL) return;
+    if(mTarget == NULL && mTargetContainer == NULL) return;
     QPainter p(this);
 
     p.setRenderHint(QPainter::Antialiasing);
@@ -31,7 +42,13 @@ void BoolPropertyWidget::paintEvent(QPaintEvent *) {
 
     p.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 5., 5.);
 
-    if(mTarget->getValue()) {
+    bool valueT;
+    if(mTarget == NULL) {
+        valueT = mTargetContainer->getValue();
+    } else {
+        valueT = mTarget->getValue();
+    }
+    if(valueT) {
         p.setPen(QPen(Qt::black, 2.));
         p.drawLine(QPoint(6, height()/2), QPoint(width()/2, height() - 6));
         p.drawLine(QPoint(width()/2, height() - 6), QPoint(width() - 6, 6));

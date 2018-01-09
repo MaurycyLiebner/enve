@@ -93,3 +93,10 @@ void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
 void SingleWidgetTarget::SWT_clearAll() {
     mSWT_allAbstractions.clear();
 }
+
+void SingleWidgetTarget::SWT_afterContentVisibilityChanged() {
+    foreach(const std::shared_ptr<SingleWidgetAbstraction> &swa,
+            mSWT_allAbstractions) {
+        swa->afterContentVisibilityChanged();
+    }
+}

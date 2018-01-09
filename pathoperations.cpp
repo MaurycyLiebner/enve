@@ -442,6 +442,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
             point = nextPoint;
             nextPoint = point->getNextPoint();
             lastCubic = newCubic;
+            if(nextPoint == NULL) break; // why is this possible?
         } while(point != firstPoint);
         firstThisCubic->setPrevCubic(lastCubic);
         lastCubic->setNextCubic(firstThisCubic);

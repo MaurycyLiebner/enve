@@ -168,12 +168,14 @@ private:
             (new QrealAnimator())->ref<QrealAnimator>();
     QSharedPointer<QrealAnimator> mSmoothness =
             (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<BoolProperty> mRandomize =
-            (new BoolProperty())->ref<BoolProperty>();
+    QSharedPointer<BoolPropertyContainer> mRandomize =
+            (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
     QSharedPointer<IntAnimator> mRandomizeStep =
             (new IntAnimator())->ref<IntAnimator>();
-    QSharedPointer<BoolProperty> mSmoothTransform =
-            (new BoolProperty())->ref<BoolProperty>();
+    QSharedPointer<BoolPropertyContainer> mSmoothTransform =
+            (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
+    QSharedPointer<QrealAnimator> mEasing =
+            (new QrealAnimator())->ref<QrealAnimator>();
     QSharedPointer<IntAnimator> mSeed =
             (new IntAnimator())->ref<IntAnimator>();
     QSharedPointer<BoolProperty> mRepeat =

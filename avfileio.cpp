@@ -100,6 +100,17 @@ void BoolProperty::readProperty(QIODevice *target) {
     target->read((char*)&mValue, sizeof(bool));
 }
 
+void BoolPropertyContainer::writeProperty(QIODevice *target) {
+    ComplexAnimator::writeProperty(target);
+    target->write((char*)&mValue, sizeof(bool));
+}
+
+void BoolPropertyContainer::readProperty(QIODevice *target) {
+    ComplexAnimator::readProperty(target);
+    target->read((char*)&mValue, sizeof(bool));
+}
+
+
 void ComboBoxProperty::writeProperty(QIODevice *target) {
     target->write((char*)&mCurrentValue, sizeof(int));
 }

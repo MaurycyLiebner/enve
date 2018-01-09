@@ -192,8 +192,12 @@ void SingleWidgetAbstraction::scheduleWidgetContentUpdateIfSearchNotEmpty() {
 void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
     //if(bT == mContentVisible) return;
     mContentVisible = bT;
-    mVisiblePartWidget->updateParentHeight();
-    mVisiblePartWidget->updateVisibleWidgetsContent();
+    afterContentVisibilityChanged();
+}
+
+void SingleWidgetAbstraction::afterContentVisibilityChanged() {
+    mVisiblePartWidget->scheduleUpdateParentHeight();
+    mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
 }
 
 void SingleWidgetAbstraction::addChildAbstractionForTarget(

@@ -202,6 +202,17 @@ void BoxesGroup::filterPathForRelFrame(const int &relFrame,
     mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
 }
 
+void BoxesGroup::filterPathForRelFrameUntilGroupSum(const int &relFrame,
+                                                    SkPath *srcDstPath) {
+    mPathEffectsAnimators->filterPathForRelFrameUntilGroupSum(relFrame,
+                                                              srcDstPath);
+
+    if(mParentGroup == NULL) return;
+    int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
+                prp_relFrameToAbsFrame(relFrame));
+    mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, srcDstPath);
+}
+
 void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
         const int &relFrame, SkPath *srcDstPath) {
     mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThickness(relFrame,
@@ -565,12 +576,12 @@ void BoxesGroup::ungroup() {
 
 PaintSettings *BoxesGroup::getFillSettings() {
     if(mContainedBoxes.isEmpty()) return NULL;
-    return mContainedBoxes.first()->getFillSettings();
+    return mContainedBoxes.last()->getFillSettings();
 }
 
 StrokeSettings *BoxesGroup::getStrokeSettings() {
     if(mContainedBoxes.isEmpty()) return NULL;
-    return mContainedBoxes.first()->getStrokeSettings();
+    return mContainedBoxes.last()->getStrokeSettings();
 }
 
 void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {

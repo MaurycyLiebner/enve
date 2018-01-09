@@ -323,6 +323,29 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCheckBox->setTarget((BoolProperty*)target);
 
         mValueSlider->hide();
+    } else if(target->SWT_isBoolPropertyContainer()) {
+
+        mRecordButton->show();
+
+        mContentButton->show();
+
+        mVisibleButton->hide();
+
+        mLockedButton->hide();
+
+        mColorButton->hide();
+
+        mPropertyComboBox->hide();
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
+
+        mCheckBox->show();
+        mCheckBox->setTarget((BoolPropertyContainer*)target);
+
+        mValueSlider->hide();
     } else if(target->SWT_isComboBoxProperty()) {
         mRecordButton->hide();
 

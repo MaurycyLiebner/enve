@@ -131,6 +131,8 @@ public:
     GradientPoints *getStrokeGradientPoints();
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
     SkPath getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame);
+    SkPath getPathWithEffectsUntilGroupSumAtRelFrame(const int &relFrame);
+
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     void drawSelectedSk(SkCanvas *canvas,

@@ -22,11 +22,13 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                SkPath *srcDstPath,
                                const bool &groupPathSum = false);
-
+    void filterPathForRelFrameUntilGroupSum(const int &relFrame,
+                                            SkPath *srcDstPath);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath);
+
     void removeEffect(PathEffect *effect);
     BoundingBox *getParentBox() {
         return mParentPath;

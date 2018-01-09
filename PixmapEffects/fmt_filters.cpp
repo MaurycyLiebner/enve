@@ -1913,11 +1913,19 @@ void fast_blur(const image &im, int radius,
             asum += pix[p+3];
         }
         for (x=0;x<w;x++){
-
-            r[yi]=dv[rsum];
-            g[yi]=dv[gsum];
-            b[yi]=dv[bsum];
-            a[yi]=dv[qMin(nDivMinus1, (int)(asum*opacityT))];
+            unsigned char aYiWithoutOp = dv[asum];
+            if(aYiWithoutOp == 0) {
+                r[yi]=dv[rsum];
+                g[yi]=dv[gsum];
+                b[yi]=dv[bsum];
+                a[yi]=dv[asum];
+            } else {
+                qreal multT = qMin((qreal)nDivMinus1, asum*opacityT)/asum;
+                r[yi]=dv[qMin(nDivMinus1, (int)(rsum*multT))];
+                g[yi]=dv[qMin(nDivMinus1, (int)(gsum*multT))];
+                b[yi]=dv[qMin(nDivMinus1, (int)(bsum*multT))];
+                a[yi]=dv[qMin(nDivMinus1, (int)(asum*opacityT))];
+            }
 
             if(y==0){
                 vMIN[x]=qMin(x+radius+1,wm);

@@ -84,6 +84,7 @@ public:
 
     void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
                                          const int &id);
+    void afterContentVisibilityChanged();
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;

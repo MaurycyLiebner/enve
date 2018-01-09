@@ -236,6 +236,8 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                SkPath *srcDstPath,
                                BoundingBox *box);
+    void filterPathForRelFrameUntilGroupSum(const int &relFrame,
+                                            SkPath *srcDstPath);
     void filterOutlinePathBeforeThicknessForRelFrame(const int &relFrame,
                                                      SkPath *srcDstPath);
     void filterOutlinePathForRelFrame(const int &relFrame,

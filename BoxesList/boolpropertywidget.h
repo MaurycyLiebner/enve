@@ -3,6 +3,7 @@
 
 #include <QCheckBox>
 class BoolProperty;
+class BoolPropertyContainer;
 
 class BoolPropertyWidget : public QWidget {
     Q_OBJECT
@@ -10,6 +11,7 @@ public:
     BoolPropertyWidget(QWidget *parent = 0);
 
     void setTarget(BoolProperty *property);
+    void setTarget(BoolPropertyContainer *property);
 protected:
     void mousePressEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
@@ -18,6 +20,7 @@ protected:
 private:
     bool mHovered = false;
     BoolProperty *mTarget = NULL;
+    BoolPropertyContainer *mTargetContainer = NULL;
 };
 
 #endif // BOOLPROPERTYWIDGET_H

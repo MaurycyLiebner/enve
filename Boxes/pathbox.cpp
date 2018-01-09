@@ -343,7 +343,17 @@ GradientPoints *PathBox::getStrokeGradientPoints() {
 
 SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame) {
     SkPath path = getPathAtRelFrame(relFrame);
-    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path, this);
+    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path);
+    return path;
+}
+
+SkPath PathBox::getPathWithEffectsUntilGroupSumAtRelFrame(const int &relFrame) {
+    SkPath path = getPathAtRelFrame(relFrame);
+    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path);
+    if(mParentGroup == NULL) return path;
+    int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
+                prp_relFrameToAbsFrame(relFrame));
+    mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, &path);
     return path;
 }
 

@@ -24,16 +24,19 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mSmoothness->prp_setName("smoothness");
     mSmoothness->qra_setValueRange(0., 1.);
 
+    mEasing->prp_setName("ease in/out");
+    mEasing->qra_setValueRange(0., 1.);
+
     mRandomize->prp_setName("randomize");
+
+    mSeed->prp_setName("seed");
+    mSeed->setIntValueRange(0, 9999);
+    mSeed->setCurrentIntValue(qrand() % 9999, false);
 
     mRandomizeStep->prp_setName("rand frame step");
     mRandomizeStep->setIntValueRange(1, 99);
 
     mSmoothTransform->prp_setName("smooth progression");
-
-    mSeed->prp_setName("seed");
-    mSeed->setIntValueRange(0, 9999);
-    mSeed->setCurrentIntValue(qrand() % 9999, false);
 
     mRepeat->prp_setName("repeat");
     mRepeat->setValue(false);
@@ -42,10 +45,13 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mMaxDev.data());
     ca_addChildAnimator(mSmoothness.data());
     ca_addChildAnimator(mRandomize.data());
-    ca_addChildAnimator(mRandomizeStep.data());
-    ca_addChildAnimator(mSmoothTransform.data());
-    ca_addChildAnimator(mSeed.data());
-    ca_addChildAnimator(mRepeat.data());
+    mRandomize->ca_addChildAnimator(mSeed.data());
+    mRandomize->ca_addChildAnimator(mRandomizeStep.data());
+    mRandomize->ca_addChildAnimator(mSmoothTransform.data());
+    mSmoothTransform->ca_addChildAnimator(mEasing.data());
+    mSmoothTransform->setValue(false);
+    mRandomize->ca_addChildAnimator(mRepeat.data());
+    mRandomize->setValue(false);
 }
 
 static void Perterb(SkPoint* p,
@@ -315,6 +321,11 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                            mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
                            nextSeed);
         qreal weight = qAbs(relFrame % randStep)*1./randStep;
+        qreal easing = mEasing->getCurrentEffectiveValueAtRelFrame(relFrame);
+        if(easing > 0.0001) {
+            qreal tT = getBezierTValueForX(0., easing, 1. - easing, 1., weight);
+            weight = calcCubicBezierVal(0., 0., 1., 1., tT);
+        }
         path1.interpolate(path2, weight, dst);
     } else {
         displaceFilterPath(dst, src,
@@ -452,7 +463,8 @@ SumPathEffect::SumPathEffect(PathBox *parentPath,
 
 void sumPaths(const int &relFrame, const SkPath &src,
               SkPath *dst, PathBox *srcBox,
-              PathBox *dstBox, const QString &operation) {
+              PathBox *dstBox, const QString &operation,
+              const bool &groupSum = false) {
     if(srcBox == NULL) {
         *dst = src;
         return;
@@ -461,7 +473,12 @@ void sumPaths(const int &relFrame, const SkPath &src,
             prp_relFrameToAbsFrame(relFrame);
     int pathBoxRelFrame = srcBox->
             prp_absFrameToRelFrame(absFrame);
-    SkPath boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrame(pathBoxRelFrame);
+    SkPath boxPath;
+    if(groupSum) {
+        boxPath = srcBox->getPathWithEffectsUntilGroupSumAtRelFrame(pathBoxRelFrame);
+    } else {
+        boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrame(pathBoxRelFrame);
+    }
     if(src.isEmpty()) {
         *dst = boxPath;
         return;
@@ -571,7 +588,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(const int &relFrame,
     SkPath srcT = src;
     foreach(PathBox *pathBox, pathBoxes) {
         sumPaths(relFrame, srcT, dst, pathBox,
-                 lastPath, operation);
+                 lastPath, operation, true);
         srcT = *dst;
     }
 }
