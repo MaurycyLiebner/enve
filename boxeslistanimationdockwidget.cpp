@@ -311,7 +311,8 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
     } else if(event->key() == Qt::Key_Left &&
               !(event->modifiers() & Qt::ControlModifier)) {
         setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
-    } else if(event->key() == Qt::Key_Down) {
+    } else if(event->key() == Qt::Key_Down &&
+              !(event->modifiers() & Qt::ControlModifier)) {
         Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(currCanvas == NULL) return false;
         int targetFrame;
@@ -320,7 +321,8 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
                 targetFrame)) {
             setCurrentFrame(targetFrame);
         }
-    } else if(event->key() == Qt::Key_Up) {
+    } else if(event->key() == Qt::Key_Up &&
+              !(event->modifiers() & Qt::ControlModifier)) {
         Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(currCanvas == NULL) return false;
         int targetFrame;

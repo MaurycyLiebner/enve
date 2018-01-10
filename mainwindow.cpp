@@ -1117,9 +1117,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             if(keyEvent->key() == Qt::Key_C ||
                 keyEvent->key() == Qt::Key_V ||
                 keyEvent->key() == Qt::Key_X ||
-                keyEvent->key() == Qt::Key_D ||
-                keyEvent->key() == Qt::Key_Up ||
-                keyEvent->key() == Qt::Key_Down) {
+                keyEvent->key() == Qt::Key_D //||
+/*                keyEvent->key() == Qt::Key_Up ||
+                keyEvent->key() == Qt::Key_Down*/) {
                 return processKeyEvent(keyEvent);
             }
         } else if(

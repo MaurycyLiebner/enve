@@ -224,8 +224,23 @@ public:
     Key *readKey(QIODevice *target);
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
+
+    void shiftAllNodeSettings(const int &by) {
+        if(by == 0) return;
+        if(mPathClosed) {
+            for(int i = 0; i < by*3; i++) {
+                mNodeSettings.prepend(mNodeSettings.takeLast());
+            }
+            for(int i = 0; i < -by*3; i++) {
+                mNodeSettings.append(mNodeSettings.takeFirst());
+            }
+            mPathUpdateNeeded = true;
+        }
+    }
+
     void shiftAllPoints(const int &by) {
         PathContainer::shiftAllPoints(by);
+        shiftAllNodeSettings(by);
         if(anim_mIsRecording) {
             anim_saveCurrentValueAsKey();
         } else {
@@ -233,8 +248,17 @@ public:
         }
     }
 
+    void revertAllNodeSettings() {
+        foreach(NodeSettings *settings, mNodeSettings) {
+            bool endT = settings->endEnabled;
+            settings->endEnabled = settings->startEnabled;
+            settings->startEnabled = endT;
+        }
+    }
+
     void revertAllPoints() {
         PathContainer::revertAllPoints();
+        revertAllNodeSettings();
         if(anim_mIsRecording) {
             anim_saveCurrentValueAsKey();
         } else {

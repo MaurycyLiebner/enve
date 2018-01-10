@@ -881,7 +881,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
               isAltPressed(event)) {
         resetSelectedScale();
     } else if(event->modifiers() & Qt::ControlModifier &&
-              event->key() == Qt::Key_R) {
+              (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down)) {
        if(event->modifiers() & Qt::ShiftModifier) {
            revertAllPointsForAllKeys();
        } else {
