@@ -119,7 +119,7 @@ void QDoubleSlider::paint(QPainter *p,
     if(!mTextEdit) {
         if(mShowValueSlider) {
             p->setPen(Qt::NoPen);
-            qreal valWidth = qclamp(mValue*width()/(mMaxValue - mMinValue),
+            qreal valWidth = qclamp((mValue - mMinValue)*width()/(mMaxValue - mMinValue),
                                     0., width() - 3.);
             p->setBrush(sliderFill);
             qreal heightRemoval = qMax(0., MIN_WIDGET_HEIGHT/2 - valWidth)*0.5;

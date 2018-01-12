@@ -305,10 +305,15 @@ void anim_brightness(const image &im, qreal bn) {
     // add to all color components 'bn' value, and check if the result is out of bounds.
     for(s32 y = 0; y < im.h; ++y) {
         bits = im.data + im.rw * y * sizeof(rgba);
-
         for(s32 x = 0; x < im.w; x++) {
+            u8 uAlpha = *(bits + 3);
+            qreal alpha = uAlpha/255.;
+            if(uAlpha == 0) {
+                bits += 4;
+                continue;
+            }
             for(s32 v = 0; v < 3; v++) {
-                val = bn + *bits;
+                val = bn*alpha + *bits;
                 *bits = val < 0 ? 0 : (val > 255 ? 255 : (u8)val);
 
                 bits++;
@@ -333,8 +338,14 @@ void brightness(const image &im, s32 bn) {
         bits = im.data + im.rw * y * sizeof(rgba);
 
         for(s32 x = 0; x < im.w; x++) {
+            u8 uAlpha = *(bits + 3);
+            qreal alpha = uAlpha/255.;
+            if(uAlpha == 0) {
+                bits += 4;
+                continue;
+            }
             for(s32 v = 0; v < 3; v++) {
-                val = bn + *bits;
+                val = bn*alpha + *bits;
                 *bits = val < 0 ? 0 : (val > 255 ? 255 : val);
 
                 bits++;

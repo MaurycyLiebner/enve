@@ -474,6 +474,14 @@ PixmapEffectRenderData *DesaturateEffect::getPixmapEffectRenderDataForRelFrame(
     return renderData;
 }
 
+void DesaturateEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
+                                                const fmt_filters::image &img,
+                                                const qreal &scale) {
+    Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
+    fmt_filters::desaturate(img,
+                            influence);
+}
 
 PixmapEffectRenderData *ColorizeEffect::getPixmapEffectRenderDataForRelFrame(
         const int &relFrame) {
@@ -520,28 +528,13 @@ ColorizeEffect::ColorizeEffect() :
     ca_addChildAnimator(mAlphaAnimator.data());
 }
 
-PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame(
-        const int &relFrame) {
-    ReplaceColorEffectRenderData *renderData =
-            new ReplaceColorEffectRenderData();
-    QColor fromColor = mFromColor->getColorAtRelFrame(relFrame).qcol;
-    QColor toColor = mToColor->getColorAtRelFrame(relFrame).qcol;
-
-    renderData->redR = qRound(fromColor.red()*fromColor.alphaF());
-    renderData->greenR = qRound(fromColor.green()*fromColor.alphaF());
-    renderData->blueR = qRound(fromColor.blue()*fromColor.alphaF());
-    renderData->alphaR = fromColor.alpha();
-
-    renderData->redT = qRound(toColor.red()*toColor.alphaF());
-    renderData->greenT = qRound(toColor.green()*toColor.alphaF());
-    renderData->blueT = qRound(toColor.blue()*toColor.alphaF());
-    renderData->alphaT = toColor.alpha();
-
-    renderData->tolerance = qRound(mToleranceAnimator->
-            getCurrentEffectiveValueAtRelFrame(relFrame)*255);
-    renderData->smoothness = mSmoothnessAnimator->
-            getCurrentEffectiveValueAtRelFrame(relFrame);
-    return renderData;
+void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
+                                              const fmt_filters::image &img,
+                                              const qreal &scale) {
+    Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
+    fmt_filters::colorizeHSV(img,
+                             hue, saturation, lightness, alpha);
 }
 
 ReplaceColorEffect::ReplaceColorEffect() :
@@ -571,6 +564,30 @@ ReplaceColorEffect::ReplaceColorEffect() :
     ca_addChildAnimator(mSmoothnessAnimator.data());
 }
 
+PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame(
+        const int &relFrame) {
+    ReplaceColorEffectRenderData *renderData =
+            new ReplaceColorEffectRenderData();
+    QColor fromColor = mFromColor->getColorAtRelFrame(relFrame).qcol;
+    QColor toColor = mToColor->getColorAtRelFrame(relFrame).qcol;
+
+    renderData->redR = qRound(fromColor.red()*fromColor.alphaF());
+    renderData->greenR = qRound(fromColor.green()*fromColor.alphaF());
+    renderData->blueR = qRound(fromColor.blue()*fromColor.alphaF());
+    renderData->alphaR = fromColor.alpha();
+
+    renderData->redT = qRound(toColor.red()*toColor.alphaF());
+    renderData->greenT = qRound(toColor.green()*toColor.alphaF());
+    renderData->blueT = qRound(toColor.blue()*toColor.alphaF());
+    renderData->alphaT = toColor.alpha();
+
+    renderData->tolerance = qRound(mToleranceAnimator->
+            getCurrentEffectiveValueAtRelFrame(relFrame)*255);
+    renderData->smoothness = mSmoothnessAnimator->
+            getCurrentEffectiveValueAtRelFrame(relFrame);
+    return renderData;
+}
+
 void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                                               const fmt_filters::image &img,
                                               const qreal &scale) {
@@ -580,20 +597,64 @@ void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                               tolerance, smoothness*scale);
 }
 
-void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                              const fmt_filters::image &img,
-                                              const qreal &scale) {
-    Q_UNUSED(imgPtr);
-    Q_UNUSED(scale);
-    fmt_filters::colorizeHSV(img,
-                             hue, saturation, lightness, alpha);
+ContrastEffect::ContrastEffect(qreal contrast) :
+    PixmapEffect(EFFECT_CONTRAST) {
+    prp_setName("contrast");
+
+    mContrastAnimator->qra_setValueRange(-255., 255.);
+    mContrastAnimator->qra_setCurrentValue(contrast);
+    mContrastAnimator->prp_setName("contrast");
+    ca_addChildAnimator(mContrastAnimator.data());
 }
 
-void DesaturateEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
+PixmapEffectRenderData *ContrastEffect::getPixmapEffectRenderDataForRelFrame(
+        const int &relFrame) {
+    ContrastEffectRenderData *renderData = new ContrastEffectRenderData();
+    renderData->contrast =
+            mContrastAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->hasKeys = mContrastAnimator->prp_hasKeys();
+    return renderData;
+}
+
+void ContrastEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                                                 const fmt_filters::image &img,
                                                 const qreal &scale) {
     Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
-    fmt_filters::desaturate(img,
-                            influence);
+    if(hasKeys) {
+        fmt_filters::anim_contrast(img, contrast);
+    } else {
+        fmt_filters::contrast(img, contrast);
+    }
+}
+
+BrightnessEffect::BrightnessEffect(qreal brightness) :
+    PixmapEffect(EFFECT_BRIGHTNESS) {
+    prp_setName("brightness");
+
+    mBrightnessAnimator->qra_setValueRange(-255., 255.);
+    mBrightnessAnimator->qra_setCurrentValue(brightness);
+    mBrightnessAnimator->prp_setName("brightness");
+    ca_addChildAnimator(mBrightnessAnimator.data());
+}
+
+PixmapEffectRenderData *BrightnessEffect::getPixmapEffectRenderDataForRelFrame(
+        const int &relFrame) {
+    BrightnessEffectRenderData *renderData = new BrightnessEffectRenderData();
+    renderData->brightness =
+            mBrightnessAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->hasKeys = mBrightnessAnimator->prp_hasKeys();
+    return renderData;
+}
+
+void BrightnessEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
+                                                const fmt_filters::image &img,
+                                                const qreal &scale) {
+    Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
+    if(hasKeys) {
+        fmt_filters::anim_brightness(img, brightness);
+    } else {
+        fmt_filters::brightness(img, brightness);
+    }
 }

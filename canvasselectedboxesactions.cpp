@@ -199,6 +199,18 @@ void Canvas::applyColorizeEffectToSelected() {
     }
 }
 
+void Canvas::applyContrastEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new ContrastEffect());
+    }
+}
+
+void Canvas::applyBrightnessEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new BrightnessEffect());
+    }
+}
+
 #include "PathEffects/patheffect.h"
 void Canvas::applyDiscretePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {

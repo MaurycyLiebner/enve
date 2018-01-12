@@ -5,6 +5,7 @@
 
 class ComplexKey;
 class KeysClipboardContainer;
+class QrealAnimator;
 
 class ComplexAnimator : public Animator {
     Q_OBJECT
@@ -71,6 +72,7 @@ public:
     void anim_saveCurrentValueAsKey();
     virtual void ca_removeAllChildAnimators();
     virtual Property *ca_getFirstDescendantWithName(const QString &name);
+    QrealAnimator *getQrealAnimatorIfIsTheOnlyOne();
 public slots:
     void ca_prependChildAnimator(Property *childAnimator,
                                  Property *prependWith);

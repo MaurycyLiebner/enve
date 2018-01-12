@@ -50,6 +50,8 @@ enum PixmapEffectType : short {
     EFFECT_IMPLODE,
     EFFECT_COLORIZE,
     EFFECT_REPLACE_COLOR,
+    EFFECT_CONTRAST,
+    EFFECT_BRIGHTNESS,
     EFFECT_BRUSH
 };
 
@@ -372,5 +374,53 @@ private:
 
     QrealAnimatorQSPtr mToleranceAnimator;
     QrealAnimatorQSPtr mSmoothnessAnimator;
+};
+
+struct ContrastEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal contrast;
+    bool hasKeys = false;
+};
+
+class ContrastEffect : public PixmapEffect {
+public:
+    ContrastEffect(qreal contrast = .0);
+
+    qreal getMargin() { return 0.; }
+
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+            const int &relFrame);
+    void writeProperty(QIODevice *target) {}
+    void readProperty(QIODevice *target) {}
+private:
+    QSharedPointer<QrealAnimator> mContrastAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
+};
+
+struct BrightnessEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal brightness;
+    bool hasKeys = false;
+};
+
+class BrightnessEffect : public PixmapEffect {
+public:
+    BrightnessEffect(qreal brightness = .0);
+
+    qreal getMargin() { return 0.; }
+
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+            const int &relFrame);
+    void writeProperty(QIODevice *target) {}
+    void readProperty(QIODevice *target) {}
+private:
+    QSharedPointer<QrealAnimator> mBrightnessAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 #endif // PIXMAPEFFECT_H

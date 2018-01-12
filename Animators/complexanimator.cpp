@@ -228,6 +228,16 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
     return NULL;
 }
 
+QrealAnimator *ComplexAnimator::getQrealAnimatorIfIsTheOnlyOne() {
+    if(ca_mChildAnimators.count() == 1) {
+        Property *prop = ca_mChildAnimators.first().data();
+        if(prop->SWT_isQrealAnimator()) {
+            return (QrealAnimator*)prop;
+        }
+    }
+    return NULL;
+}
+
 void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
                                             Property *animator2) {
     int id1 = getChildPropertyIndex(animator1);

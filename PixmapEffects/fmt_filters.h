@@ -169,7 +169,7 @@ namespace fmt_filters
 
     // change brightness of the image
     void brightness(const image &im, int bn);
-
+    void anim_brightness(const image &im, qreal bn) ;
     // change gamma
     // gamma should be  0.0 <= L <= 6.0
     //
@@ -192,7 +192,7 @@ namespace fmt_filters
     // change contrast with Photoshop-like method
     // contrast should be  -255 <= contrast <= 255
     void contrast(const image &im, int contrast);
-
+    void anim_contrast(const image &im, qreal contrast);
     enum swapRGBtype { GBR = 0, BRG = 1 };
 
     // negative

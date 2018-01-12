@@ -155,6 +155,8 @@ public:
     void applyDesaturateEffectToSelected();
     void applyColorizeEffectToSelected();
     void applyReplaceColorEffectToSelected();
+    void applyContrastEffectToSelected();
+    void applyBrightnessEffectToSelected();
 
     void rotateSelectedBy(const qreal &rotBy,
                           const QPointF &absOrigin,

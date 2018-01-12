@@ -119,6 +119,10 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_effects_colorize");
     effectsMenu->addAction("Replace Color")->setObjectName(
                 "canvas_effects_replace_color");
+    effectsMenu->addAction("Contrast")->setObjectName(
+                "canvas_effects_contrast");
+    effectsMenu->addAction("Brightness")->setObjectName(
+                "canvas_effects_brightness");
     effectsMenu->addAction("Brush")->setObjectName(
                 "canvas_effects_brush");
 
@@ -201,6 +205,10 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDesaturateEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_colorize") {
         applyColorizeEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_effects_contrast") {
+        applyContrastEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_effects_brightness") {
+        applyBrightnessEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_brush") {
         applyBrushEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_replace_color") {

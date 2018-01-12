@@ -423,8 +423,6 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     } else if(target->SWT_isComplexAnimator() ||
               target->SWT_isVectorPathAnimator() ||
               target->SWT_isAnimatedSurface()) {
-        //ComplexAnimator *ca_target = (ComplexAnimator*)target;
-
         mRecordButton->show();
 
         mContentButton->show();
@@ -451,8 +449,21 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->clearAnimator();
-        mValueSlider->hide();
+        if(target->SWT_isComplexAnimator() &&
+            !abs->contentVisible()) {
+            ComplexAnimator *ca_target = (ComplexAnimator*)target;
+            QrealAnimator *target = ca_target->getQrealAnimatorIfIsTheOnlyOne();
+            if(target == NULL) {
+                mValueSlider->clearAnimator();
+                mValueSlider->hide();
+            } else {
+                mValueSlider->setAnimator(target);
+                mValueSlider->show();
+            }
+        } else {
+            mValueSlider->clearAnimator();
+            mValueSlider->hide();
+        }
     } else if(target->SWT_isBoxTargetProperty()) {
         mRecordButton->hide();
 

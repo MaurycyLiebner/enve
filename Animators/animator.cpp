@@ -7,8 +7,7 @@
 #include "Animators/animatorupdater.h"
 #include "fakecomplexanimator.h"
 
-Animator::Animator() :
-    Property() {
+Animator::Animator() : Property() {
 }
 
 Animator::~Animator() {
