@@ -45,6 +45,16 @@ public:
     virtual void openContextMenu(const QPoint &globalPos) {
         Q_UNUSED(globalPos);
     }
+
+    void setNeighbouringSliderToTheLeft(const bool &bT) {
+        mLeftNeighbour = bT;
+        update();
+    }
+
+    void setNeighbouringSliderToTheRight(const bool &bT) {
+        mRightNeighbour = bT;
+        update();
+    }
 protected:
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -61,6 +71,8 @@ signals:
 public slots:
     void setDisplayedValue(qreal value);
 protected:
+    bool mLeftNeighbour = false;
+    bool mRightNeighbour = false;
     int mDecimals = 3;
 
     QString mName = "";

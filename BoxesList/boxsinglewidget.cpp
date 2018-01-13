@@ -41,6 +41,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mMainLayout = new QHBoxLayout(this);
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);
+    setContentsMargins(0, 0, 0, 0);
     mMainLayout->setContentsMargins(0, 0, 0, 0);
     mMainLayout->setMargin(0);
     mMainLayout->setAlignment(Qt::AlignLeft);
@@ -71,6 +72,9 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 
     mValueSlider = new QrealAnimatorValueSlider(NULL, this);
     mMainLayout->addWidget(mValueSlider, Qt::AlignRight);
+
+    mSecondValueSlider = new QrealAnimatorValueSlider(NULL, this);
+    mMainLayout->addWidget(mSecondValueSlider, Qt::AlignRight);
 
     mColorButton = new BoxesListActionButton(this);
     mMainLayout->addWidget(mColorButton, Qt::AlignRight);
@@ -242,6 +246,14 @@ void BoxSingleWidget::setBlendMode(const SkBlendMode &mode) {
     int id = blendModeToIntSk(mode);
     mCompositionModeCombo->setCurrentIndex(id);
 }
+
+void BoxSingleWidget::clearAndHideValueAnimators() {
+    mValueSlider->clearAnimator();
+    mValueSlider->hide();
+    mSecondValueSlider->clearAnimator();
+    mSecondValueSlider->hide();
+}
+
 #include "Animators/fakecomplexanimator.h"
 void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     SingleWidget::setTargetAbstraction(abs);
@@ -275,8 +287,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->clearAnimator();
-        mValueSlider->hide();
+        clearAndHideValueAnimators();
     } else if(target->SWT_isBoundingBox()) {
         //BoundingBox *bb_target = (BoundingBox*)target;
 
@@ -299,8 +310,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->clearAnimator();
-        mValueSlider->hide();
+        clearAndHideValueAnimators();
     } else if(target->SWT_isBoolProperty()) {
         mRecordButton->hide();
 
@@ -322,7 +332,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCheckBox->show();
         mCheckBox->setTarget((BoolProperty*)target);
 
-        mValueSlider->hide();
+        clearAndHideValueAnimators();
     } else if(target->SWT_isBoolPropertyContainer()) {
 
         mRecordButton->show();
@@ -345,7 +355,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCheckBox->show();
         mCheckBox->setTarget((BoolPropertyContainer*)target);
 
-        mValueSlider->hide();
+        clearAndHideValueAnimators();
     } else if(target->SWT_isComboBoxProperty()) {
         mRecordButton->hide();
 
@@ -379,7 +389,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                 mPropertyComboBox, SLOT(setCurrentIndex(int)));
         connect(mPropertyComboBox, SIGNAL(activated(int)),
                 MainWindow::getInstance(), SLOT(callUpdateSchedulers()));
-        mValueSlider->hide();
+        clearAndHideValueAnimators();
     } else if(target->SWT_isQrealAnimator()) {
         mRecordButton->show();
 
@@ -400,6 +410,9 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mValueSlider->setAnimator((QrealAnimator*)target);
         mValueSlider->show();
+        mValueSlider->setNeighbouringSliderToTheRight(false);
+        mSecondValueSlider->hide();
+        mSecondValueSlider->clearAnimator();
     } else if(target->SWT_isIntProperty()) {
         mRecordButton->hide();
 
@@ -451,18 +464,23 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         if(target->SWT_isComplexAnimator() &&
             !abs->contentVisible()) {
-            ComplexAnimator *ca_target = (ComplexAnimator*)target;
-            QrealAnimator *target = ca_target->getQrealAnimatorIfIsTheOnlyOne();
-            if(target == NULL) {
-                mValueSlider->clearAnimator();
-                mValueSlider->hide();
+            if(target->SWT_isQPointFAnimator()) {
+                updateValueSlidersForQPointFAnimator();
             } else {
-                mValueSlider->setAnimator(target);
-                mValueSlider->show();
+                ComplexAnimator *ca_target = (ComplexAnimator*)target;
+                QrealAnimator *qatarget = ca_target->getQrealAnimatorIfIsTheOnlyOne();
+                if(qatarget == NULL) {
+                    clearAndHideValueAnimators();
+                } else {
+                    mValueSlider->setAnimator(qatarget);
+                    mValueSlider->show();
+                    mValueSlider->setNeighbouringSliderToTheRight(false);
+                    mSecondValueSlider->hide();
+                    mSecondValueSlider->clearAnimator();
+                }
             }
         } else {
-            mValueSlider->clearAnimator();
-            mValueSlider->hide();
+            clearAndHideValueAnimators();
         }
     } else if(target->SWT_isBoxTargetProperty()) {
         mRecordButton->hide();
@@ -483,7 +501,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->setTargetProperty((BoxTargetProperty*)target);
         mCheckBox->hide();
 
-        mValueSlider->hide();
+        clearAndHideValueAnimators();
     } else if(target->SWT_isQStringAnimator()) {
         mRecordButton->show();
 
@@ -507,8 +525,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->clearAnimator();
-        mValueSlider->hide();
+        clearAndHideValueAnimators();
     }
 }
 
@@ -535,6 +552,7 @@ void BoxSingleWidget::loadStaticPixmaps() {
 #include "PathEffects/patheffectanimators.h"
 
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
+    if(isTargetDisabled()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isFakeComplexAnimator()) {
         target = ((FakeComplexAnimator*)target)->getTarget();
@@ -793,12 +811,20 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 
+bool BoxSingleWidget::isTargetDisabled() {
+    if(mTarget == NULL) {
+        return true;
+    }
+    return mTarget->getTarget()->SWT_isDisabled();
+}
+
 #include <QApplication>
 #include <QDrag>
 void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     if (!(event->buttons() & Qt::LeftButton)) {
         return;
     }
+    if(isTargetDisabled()) return;
     if ((event->pos() - mDragStartPos).manhattanLength()
          < QApplication::startDragDistance()) {
         return;
@@ -816,6 +842,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
+    if(isTargetDisabled()) return;
     setSelected(false);
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_HEIGHT/2) return;
     SingleWidgetTarget *target = mTarget->getTarget();
@@ -840,6 +867,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
+    if(isTargetDisabled()) return;
     if(e->modifiers() & Qt::ShiftModifier) {
         //mousePressEvent(e);
     } else {
@@ -932,11 +960,42 @@ void drawPixmapCentered(QPainter *p,
     p->drawPixmap(x, y, pixmap);
 }
 
+int BoxSingleWidget::getOptimalNameRightX() {
+    if(mTarget == NULL) return 0;
+    SingleWidgetTarget *target = mTarget->getTarget();
+    bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
+    if(fakeComplexAnimator) {
+        target = ((FakeComplexAnimator*)target)->getTarget();
+    }
+    QFontMetrics fm = QFontMetrics(QFont());
+    QString name;
+    if(target->SWT_isProperty()) {
+        name = ((Property*)target)->prp_getName();
+    }
+    int nameX = mFillWidget->x();
+    //return nameX;
+    if(target->SWT_isBoundingBox()) {
+        nameX += MIN_WIDGET_HEIGHT/4;
+    } else if(target->SWT_isQrealAnimator()) {
+        if(!fakeComplexAnimator) {
+            nameX += MIN_WIDGET_HEIGHT;
+        }
+    } else if(target->SWT_isBoxTargetProperty()) {
+        nameX += 2*MIN_WIDGET_HEIGHT;
+    } else {//if(target->SWT_isBoolProperty()) {
+        nameX += 2*MIN_WIDGET_HEIGHT;
+    }
+    return nameX + fm.width(name);
+}
+
 #include "keysview.h"
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(mTarget == NULL) return;
     QPainter p(this);
     SingleWidgetTarget *target = mTarget->getTarget();
+    if(target->SWT_isDisabled()) {
+        p.setOpacity(.5);
+    }
     bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
     if(fakeComplexAnimator) {
         target = ((FakeComplexAnimator*)target)->getTarget();
@@ -1087,12 +1146,13 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                                *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
         }
      } else if(target->SWT_isBoxTargetProperty()) {
-        nameX += 40;
+        nameX += 2*MIN_WIDGET_HEIGHT;
         name = ((BoxTargetProperty*)target)->prp_getName();
     } else {//if(target->SWT_isBoolProperty()) {
         nameX += 2*MIN_WIDGET_HEIGHT;
         name = ((Property*)target)->prp_getName();
     }
+
     p.drawText(QRect(nameX, 0,
                      width() - nameX -
                      MIN_WIDGET_HEIGHT,
@@ -1155,14 +1215,37 @@ void BoxSingleWidget::openColorSettingsDialog() {
     dialog->show();
 }
 
+void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
+    if(mTarget == NULL) return;
+    SingleWidgetTarget *target = mTarget->getTarget();
+    if(!target->SWT_isQPointFAnimator() ||
+        mTarget->contentVisible()) return;
+    int nameRightX = getOptimalNameRightX();
+    int slidersWidth = mValueSlider->minimumWidth() +
+            mSecondValueSlider->minimumWidth() + MIN_WIDGET_HEIGHT;
+    if(width() - nameRightX > slidersWidth) {
+        QPointFAnimator *pt_target = (QPointFAnimator*)target;
+        mValueSlider->setAnimator(pt_target->getXAnimator());
+        mValueSlider->show();
+        mValueSlider->setNeighbouringSliderToTheRight(true);
+        mSecondValueSlider->setAnimator(pt_target->getYAnimator());
+        mSecondValueSlider->show();
+        mSecondValueSlider->setNeighbouringSliderToTheLeft(true);
+    } else {
+        clearAndHideValueAnimators();
+    }
+}
+
 void BoxSingleWidget::updateCompositionBoxVisible() {
+    if(mTarget == NULL) return;
     if(mCompositionModeVisible) {
-        if(width() > 500) {
+        if(width() > 20*MIN_WIDGET_HEIGHT) {
             mCompositionModeCombo->show();
         } else {
             mCompositionModeCombo->hide();
         }
     }
+    updateValueSlidersForQPointFAnimator();
 }
 
 void BoxSingleWidget::resizeEvent(QResizeEvent *) {

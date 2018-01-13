@@ -30,6 +30,7 @@ QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
             this, SLOT(lineEditingFinished()));
 
     fitWidthToContent();
+    setContentsMargins(0, 0, 0, 0);
 }
 
 QDoubleSlider::QDoubleSlider(QString name,
@@ -115,7 +116,21 @@ void QDoubleSlider::paint(QPainter *p,
     QRectF boundingRect = rect().adjusted(1, 1, -1, -1);
     p->setPen(Qt::NoPen);
     p->setBrush(allFill);
+    if(mLeftNeighbour) {
+        p->setClipRect(width()/2, 0, width()/2, height());
+    } else if(mRightNeighbour) {
+        p->setClipRect(0, 0, width()/2, height());
+    }
     p->drawRoundedRect(boundingRect, 5., 5.);
+    if(mLeftNeighbour || mRightNeighbour) {
+        if(mLeftNeighbour) {
+            p->setClipRect(0, 0, width()/2, height());
+        } else if(mRightNeighbour) {
+            p->setClipRect(width()/2, 0, width()/2, height());
+        }
+        p->drawRect(boundingRect);
+        p->setClipping(false);
+    }
     if(!mTextEdit) {
         if(mShowValueSlider) {
             p->setPen(Qt::NoPen);
@@ -140,7 +155,23 @@ void QDoubleSlider::paint(QPainter *p,
     p->setPen(QPen(stroke, 1.));
     p->setBrush(Qt::NoBrush);
 
+    if(mLeftNeighbour) {
+        p->setClipRect(width()/2, 0, width()/2, height());
+    } else if(mRightNeighbour) {
+        p->setClipRect(0, 0, width()/2, height());
+    }
     p->drawRoundedRect(boundingRect, 5., 5.);
+    if(mLeftNeighbour || mRightNeighbour) {
+        if(mLeftNeighbour) {
+            boundingRect.adjust(-1, 0, 0, 0);
+            p->setClipRect(0, 0, width()/2, height());
+        } else if(mRightNeighbour) {
+            boundingRect.adjust(0, 0, 1, 0);
+            p->setClipRect(width()/2, 0, width()/2, height());
+        }
+        p->drawRect(boundingRect);
+        p->setClipping(false);
+    }
 
     p->restore();
 }
@@ -174,9 +205,13 @@ void QDoubleSlider::fitWidthToContent() {
         textMin = QString::number(mMinValue, 'f', mDecimals);
     }
     int textWidth = qMax(fm.width(textMax), fm.width(textMin));
-    int newWidth = qMin(60, textWidth + textWidth%2 + MIN_WIDGET_HEIGHT/2);
-    setFixedWidth(newWidth);
-    mLineEdit->setFixedWidth(newWidth);
+    int newWidth = qMin(3*MIN_WIDGET_HEIGHT,
+                        textWidth + textWidth%2 + MIN_WIDGET_HEIGHT/2);
+    int minWidth = qMax(0, newWidth - MIN_WIDGET_HEIGHT);
+    setMinimumWidth(minWidth);
+    mLineEdit->setMinimumWidth(minWidth);
+    setMaximumWidth(newWidth);
+    mLineEdit->setMaximumWidth(newWidth);
 }
 
 void QDoubleSlider::paintEvent(QPaintEvent *) {

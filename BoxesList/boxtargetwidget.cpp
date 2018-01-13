@@ -42,8 +42,9 @@ void BoxTargetWidget::dragLeaveEvent(
 }
 
 void BoxTargetWidget::paintEvent(QPaintEvent *) {
+    if(mProperty == NULL) return;
     QPainter p(this);
-
+    if(mProperty->SWT_isDisabled()) p.setOpacity(.5);
     p.setRenderHint(QPainter::Antialiasing);
     p.setBrush(Qt::white);
     if(mDragging) {

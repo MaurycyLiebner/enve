@@ -306,7 +306,7 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
         mSeedAssist += relFrame / randStep;
         nextSeed = mSeedAssist - 1;
     }
-    if(mSmoothTransform->getValue()) {
+    if(mSmoothTransform->getValue() && mRandomize->getValue()) {
         SkPath path1;
         displaceFilterPath(&path1, src,
                            mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),

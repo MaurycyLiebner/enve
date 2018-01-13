@@ -93,31 +93,6 @@ QMenuBar::item {
     border-radius: 4px;
 }
 
-QToolButton {
-    padding: 1px 4px;
-    background: transparent;
-    border-radius: 4px;
-    color: black;
-    margin-top: 10;
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
-    padding-bottom: 9;
-    margin-bottom: 1;
-}
-
-QToolButton:hover {
-    background-color: rgba(0, 0, 0, 30);
-}
-
-QToolButton:pressed {
-    background-color: rgba(0, 0, 0, 50);
-}
-
-QToolButton:checked {
-    background-color: rgb(60, 60, 60);
-    color: white;
-}
-
 QMenuBar::item:selected { /* when selected using mouse or keyboard */
     background: #a8a8a8;
 }
@@ -156,7 +131,10 @@ QComboBox QScrollBar::add-line {
     border-bottom: 0px solid black;
 }
 
-
+QLabel#blackTextLabel {
+    color: black;
+    background: transparent;
+}
 /*QMenuBar {
     color: white;
     background-color: rgb(50, 50, 50);
@@ -191,7 +169,7 @@ QTabBar::tab:hover:!selected {
     background-color: rgb(100, 100, 100);
 }
 
-QTabWidget{
+QTabWidget {
     border: 0px transparent black;
 }
 
@@ -396,3 +374,59 @@ QProgressBar::chunk {
     background-color: green;
     width: 5px;
 }
+
+
+QToolButton {
+    padding: 1px 4px;
+    background: transparent;
+    border-radius: 4px;
+    color: black;
+    margin-top: 10;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    padding-bottom: 9;
+    margin-bottom: 1;
+}
+
+QToolButton:hover {
+    background: rgba(0, 0, 0, 30);
+}
+
+QToolButton:pressed {
+    background: rgba(0, 0, 0, 50);
+}
+
+QToolButton:checked {
+    background: rgb(60, 60, 60);
+    color: white;
+}
+
+/*QToolButton#customToolButton {
+    padding: 1px 4px;
+    background: transparent;
+    border-radius: 4px;
+    color: black;
+    margin-top: 10;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    padding-bottom: 9;
+    margin-bottom: 1;
+}
+
+/*QToolButton#inactiveToolButton {
+    padding: 1px 4px;
+    background: transparent;
+    border-radius: 4px;
+    color: black;
+    margin-top: 10;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    padding-bottom: 9;
+    margin-bottom: 1;
+}*/
+
+QToolButton#inactiveToolButton:hover {background: transparent;}
+
+QToolButton#inactiveToolButton:pressed {background: transparent;}
+
+QToolButton#inactiveToolButton:checked {background: transparent;}

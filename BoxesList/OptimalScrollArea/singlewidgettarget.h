@@ -151,9 +151,26 @@ public:
         SWT_afterContentVisibilityChanged();
     }
 
+    void SWT_setDisabled(const bool &disable) {
+        SWT_mDisabled = disable;
+    }
+
+    void SWT_disable() {
+        SWT_setDisabled(true);
+    }
+
+    void SWT_enable() {
+        SWT_setDisabled(false);
+    }
+
+    bool SWT_isDisabled() {
+        return SWT_mDisabled;
+    }
+
     void SWT_afterContentVisibilityChanged();
 protected:
     bool SWT_mVisible = true;
+    bool SWT_mDisabled = false;
     QList<std::shared_ptr<SingleWidgetAbstraction> > mSWT_allAbstractions;
 };
 

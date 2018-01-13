@@ -58,6 +58,8 @@ public:
         mSelected = bT;
         update();
     }
+    bool isTargetDisabled();
+    int getOptimalNameRightX();
 protected:
     bool mSelected = false;
     void mousePressEvent(QMouseEvent *e);
@@ -70,6 +72,8 @@ protected:
 
     bool mCompositionModeVisible = false;
     void updateCompositionBoxVisible();
+    void clearAndHideValueAnimators();
+    void updateValueSlidersForQPointFAnimator();
 signals:
 
 private slots:
@@ -97,6 +101,8 @@ private:
     BoolPropertyWidget *mCheckBox;
     QHBoxLayout *mMainLayout;
     QrealAnimatorValueSlider *mValueSlider;
+    QrealAnimatorValueSlider *mSecondValueSlider;
+
     QComboBox *mPropertyComboBox;
     QComboBox *mCompositionModeCombo;
 };

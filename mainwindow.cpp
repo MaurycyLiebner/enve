@@ -577,9 +577,10 @@ void MainWindow::setupToolBar() {
                 ":/icons/paint_mode_checked.png");
     mToolBar->addWidget(mPaintMode);
 
-    mToolBar->addSeparator();
-    mToolBar->addAction("     ");
-    mToolBar->addSeparator();
+    //mToolBar->addSeparator();
+    mToolBar->widgetForAction(mToolBar->addAction("     "))->
+            setObjectName("inactiveToolButton");
+    //mToolBar->addSeparator();
 
     mActionConnectPoints = new ActionButton(
                 ":/icons/node_join_segment.png",
@@ -626,17 +627,18 @@ void MainWindow::setupToolBar() {
                 "MAKE SEGMENT CURVE", this);
     mToolBar->addWidget(mActionCurve);
 
-    mToolBar->addSeparator();
-    mToolBar->addAction("     ");
-    mToolBar->addSeparator();
+    //mToolBar->addSeparator();
+    mToolBar->widgetForAction(mToolBar->addAction("     "))->
+            setObjectName("inactiveToolButton");
+    //mToolBar->addSeparator();
 //
     mFontWidget = new FontsWidget(this);
     mToolBar->addWidget(mFontWidget);
 
-    mToolBar->addSeparator();
-    mToolBar->addAction("     ");
-    mToolBar->addSeparator();
-
+    //mToolBar->addSeparator();
+    mToolBar->widgetForAction(mToolBar->addAction("     "))->
+            setObjectName("inactiveToolButton");
+    //mToolBar->addSeparator();
     QWidget *canvasComboWidget = new QWidget(this);
     canvasComboWidget->setAttribute(Qt::WA_TranslucentBackground);
     QHBoxLayout *canvasComboLayout = new QHBoxLayout();
@@ -663,7 +665,6 @@ void MainWindow::setupToolBar() {
                 "border-bottom-left-radius: 0;");
     mNewCanvasButton->setFixedHeight(
                 mCurrentCanvasComboBox->sizeHint().height());
-
     canvasComboLayout->addWidget(mNewCanvasButton);
     canvasComboLayout->addWidget(mCurrentCanvasComboBox);
 
@@ -1105,6 +1106,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
     }
+    QWidget *focusWidget = QApplication::focusWidget();
+    if(focusWidget != NULL) {
+        if(focusWidget->property("forceHandleEvent").isValid()) return false;
+    }
     if(e->type() == QEvent::KeyPress) {
         QKeyEvent *key_event = (QKeyEvent*)e;
         return processKeyEvent(key_event);
@@ -1115,9 +1120,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         }
         if(isCtrlPressed()) {
             if(keyEvent->key() == Qt::Key_C ||
-                keyEvent->key() == Qt::Key_V ||
-                keyEvent->key() == Qt::Key_X ||
-                keyEvent->key() == Qt::Key_D //||
+               keyEvent->key() == Qt::Key_V ||
+               keyEvent->key() == Qt::Key_X ||
+               keyEvent->key() == Qt::Key_D //||
 /*                keyEvent->key() == Qt::Key_Up ||
                 keyEvent->key() == Qt::Key_Down*/) {
                 return processKeyEvent(keyEvent);

@@ -13,6 +13,7 @@
 #include "global.h"
 #include "canvas.h"
 #include "windowsinglewidgettarget.h"
+#include <QToolButton>
 
 BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                             QWidget *topWidget,
@@ -35,6 +36,29 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                                         "border-top: 0;"
                                         "border-bottom: 1px solid black;"
                                      "}");
+    ((QToolButton*)mBoxesListMenuBar->children()[0])->setStyleSheet(
+                "QToolButton {"
+                    "padding: 0px 0px;"
+                    "background: transparent;"
+                    "border-radius: 4px;"
+                    "margin-top: 0;"
+                    "border-bottom-right-radius: 0px;"
+                    "border-bottom-left-radius: 0px;"
+                    "padding-bottom: 0;"
+                    "margin-bottom: 0;"
+                "}"
+                "QToolButton:hover {"
+                    "background-color: rgba(0, 0, 0, 30);"
+                "}"
+
+                "QToolButton:pressed {"
+                    "background-color: rgba(0, 0, 0, 50);"
+                "}"
+
+                "QToolButton:checked {"
+                    "background-color: rgb(60, 60, 60);"
+                    "color: white;"
+                "}");
     mBoxesListMenuBar->addSeparator();
     QMenu *objectsMenu = mBoxesListMenuBar->addMenu("State");
     objectsMenu->addAction("All", this, SLOT(setRuleNone()));
@@ -79,7 +103,8 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mMenuWidgetsLayout->setMargin(0);
     mMenuWidgetsLayout->setSpacing(0);
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
-    mSearchLine->setFixedHeight(FONT_HEIGHT);
+    mSearchLine->setFixedHeight(MIN_WIDGET_HEIGHT/*FONT_HEIGHT*/);
+    mSearchLine->setProperty("forceHandleEvent", QVariant(true));
     mSearchLine->setStyleSheet("background-color: rgb(255, 255, 255);"
                                "border-bottom: 0;"
                                "border-radius: 4px;"
@@ -224,6 +249,16 @@ void BoxesListKeysViewWidget::connectToChangeWidthWidget(
 }
 
 void BoxesListKeysViewWidget::setBoxesListWidth(const int &width) {
+    int sizeHintWidth = mBoxesListMenuBar->sizeHint().width();
+    int cornerSizeHintWidth = mCornerMenuBar->sizeHint().width();
+    int widthT = width - mCornerMenuBar->sizeHint().width();
+    if(widthT > sizeHintWidth + cornerSizeHintWidth) {
+        mBoxesListMenuBar->setFixedWidth(sizeHintWidth);
+        mMenuWidgetsCont->setFixedWidth(widthT - sizeHintWidth);
+    } else {
+        mMenuWidgetsCont->setFixedWidth(cornerSizeHintWidth);
+        mBoxesListMenuBar->setFixedWidth(widthT - cornerSizeHintWidth);
+    }
     mBoxesListScrollArea->setFixedWidth(width);
 }
 

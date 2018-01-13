@@ -31,6 +31,11 @@ void BoolPropertyWidget::mousePressEvent(QMouseEvent *) {
 void BoolPropertyWidget::paintEvent(QPaintEvent *) {
     if(mTarget == NULL && mTargetContainer == NULL) return;
     QPainter p(this);
+    if(mTarget != NULL) {
+        if(mTarget->SWT_isDisabled()) p.setOpacity(.5);
+    } else if(mTargetContainer != NULL) {
+        if(mTargetContainer->SWT_isDisabled()) p.setOpacity(.5);
+    }
 
     p.setRenderHint(QPainter::Antialiasing);
     p.setBrush(Qt::white);

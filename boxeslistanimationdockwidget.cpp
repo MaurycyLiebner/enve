@@ -40,7 +40,7 @@ void ChangeWidthWidget::paintEvent(QPaintEvent *) {
 void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int newWidth = mCurrentWidth + event->x() - mPressX;
-    mCurrentWidth = qMax(200, newWidth);
+    mCurrentWidth = qMax(10*MIN_WIDGET_HEIGHT, newWidth);
     emit widthSet(mCurrentWidth);
     //mBoxesList->setFixedWidth(newWidth);
     updatePos();
@@ -173,7 +173,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 //    mGoToPreviousKeyButton->setFocusPolicy(Qt::NoFocus);
 //    mControlButtonsLayout->addWidget(mGoToNextKeyButton);
 //    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
-    mToolBar->addAction("Resolution:");
+    QAction *resA = mToolBar->addAction("Resolution:");
+    mToolBar->widgetForAction(resA)->setObjectName("inactiveToolButton");
+
     mToolBar->addWidget(mResolutionComboBox);
     mToolBar->addSeparator();
     //mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
@@ -200,10 +202,12 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     mTimelineAction = mToolBar->addAction("Timeline",
                                           this, SLOT(setTimelineMode()));
+    mTimelineAction->setObjectName("customToolButton");
     mTimelineAction->setCheckable(true);
     mTimelineAction->setChecked(true);
     mRenderAction = mToolBar->addAction("Render",
                                         this, SLOT(setRenderMode()));
+    mRenderAction->setObjectName("customToolButton");
     mRenderAction->setCheckable(true);
 
     mToolBar->addSeparator();

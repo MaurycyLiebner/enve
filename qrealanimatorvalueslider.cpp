@@ -20,8 +20,7 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(QrealAnimator *animator,
                                                    QWidget *parent) :
-    QDoubleSlider(parent)
-{
+    QDoubleSlider(parent) {
     setAnimator(animator);
 }
 
@@ -34,8 +33,7 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
                                                    qreal minVal, qreal maxVal,
                                                    qreal prefferedStep,
                                                    QWidget *parent) :
-    QDoubleSlider(name, minVal, maxVal, prefferedStep, parent)
-{
+    QDoubleSlider(name, minVal, maxVal, prefferedStep, parent) {
 
 }
 
@@ -98,6 +96,9 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
     if(mAnimator == NULL) {
         QDoubleSlider::paint(p);
     } else {
+        if(isTargetDisabled()) {
+            p->setOpacity(.5);
+        }
         QDoubleSlider::paint(p,
                        (mAnimator->prp_isRecording() ? QColor(255, 200, 200) :
                                                    QColor(255, 255, 255)),
@@ -106,6 +107,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
                        ((mAnimator->prp_isRecording() &&
                         mAnimator->prp_isKeyOnCurrentFrame()) ? Qt::red :
                                                             Qt::black));
+        p->setOpacity(1.);
     }
 }
 
@@ -152,6 +154,13 @@ void QrealAnimatorValueSlider::setIntAnimator(IntProperty *animator) {
         setDisplayedValue(animator->getValue());
         mAnimator = animator;
     }
+}
+
+bool QrealAnimatorValueSlider::isTargetDisabled() {
+    if(hasTargetAnimator()) {
+        return mAnimator->SWT_isDisabled();
+    }
+    return true;
 }
 
 void QrealAnimatorValueSlider::openContextMenu(

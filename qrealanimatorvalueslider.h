@@ -6,8 +6,7 @@ class IntProperty;
 class QrealAnimator;
 class Property;
 
-class QrealAnimatorValueSlider : public QDoubleSlider
-{
+class QrealAnimatorValueSlider : public QDoubleSlider {
     Q_OBJECT
 public:
     QrealAnimatorValueSlider(QString name, qreal minVal,
@@ -29,6 +28,9 @@ public:
     bool hasTargetAnimator() {
         return mAnimator != NULL;
     }
+
+    bool isTargetDisabled();
+
     void openContextMenu(const QPoint &globalPos);
     void clearAnimator();
 public slots:

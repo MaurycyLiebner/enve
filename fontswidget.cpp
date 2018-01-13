@@ -1,6 +1,7 @@
 #include "fontswidget.h"
 #include <QLineEdit>
 #include <QIntValidator>
+#include <QLabel>
 
 FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mFontStyleCombo = new QComboBox(this);
