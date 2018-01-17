@@ -109,6 +109,7 @@ ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
 void ComplexAnimator::ca_addChildAnimator(Property *childAnimator,
                                           const int &id) {
     ca_mChildAnimators.insert(id, childAnimator->ref<Property>());
+    childAnimator->setLastSetParent(this);
     childAnimator->prp_setUpdater(prp_mUpdater.get());
     childAnimator->prp_setParentFrameShift(prp_getFrameShift());
     connect(childAnimator, SIGNAL(prp_updateWholeInfluenceRange()),

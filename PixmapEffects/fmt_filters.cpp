@@ -396,43 +396,46 @@ void anim_contrast(const image &im, qreal contrast) {
     if(contrast < -255) contrast = -255;
     if(contrast >  255) contrast = 255;
 
-    rgba *bits;
     u8 Ravg, Gavg, Bavg;
     s32 Ra = 0, Ga = 0, Ba = 0, Rn, Gn, Bn;
+    unsigned char *pix = im.data;
 
     // calculate the average values for RED, GREEN and BLUE
     // color components
+    int p = 0;
     for(s32 y = 0; y < im.h; y++) {
-        bits = (rgba *)im.data + im.rw * y;
+        for(s32 x = 0; x < im.w; x++) {
+            u8 pA = pix[p + 3];
+            Ra += pix[p]*pA;
+            Ga += pix[p + 1]*pA;
+            Ba += pix[p + 2]*pA;
 
-        for(s32 x = 0;x < im.w;x++) {
-            Ra += bits->r;
-            Ga += bits->g;
-            Ba += bits->b;
-
-            bits++;
+            p += 4;
         }
     }
 
-    s32 S = im.w * im.h;
+    s32 S = im.w * im.h * 255;
 
     Ravg = Ra / S;
     Gavg = Ga / S;
     Bavg = Ba / S;
 
+    p = 0;
     for(s32 y = 0;y < im.h;y++) {
-        bits = (rgba *)im.data + im.rw * y;
-
         for(s32 x = 0; x < im.w; x++) {
-            Rn = (contrast > 0) ? ((bits->r - Ravg) * 256 / (256 - contrast) + Ravg) : ((bits->r - Ravg) * (256 + contrast) / 256 + Ravg);
-            Gn = (contrast > 0) ? ((bits->g - Gavg) * 256 / (256 - contrast) + Gavg) : ((bits->g - Gavg) * (256 + contrast) / 256 + Gavg);
-            Bn = (contrast > 0) ? ((bits->b - Bavg) * 256 / (256 - contrast) + Bavg) : ((bits->b - Bavg) * (256 + contrast) / 256 + Bavg);
+            u8 pR = pix[p];
+            u8 pG = pix[p + 1];
+            u8 pB = pix[p + 2];
 
-            bits->r = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
-            bits->g = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
-            bits->b = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
+            Rn = (contrast > 0) ? ((pR - Ravg) * 256 / (256 - contrast) + Ravg) : ((pR - Ravg) * (256 + contrast) / 256 + Ravg);
+            Gn = (contrast > 0) ? ((pG - Gavg) * 256 / (256 - contrast) + Gavg) : ((pG - Gavg) * (256 + contrast) / 256 + Gavg);
+            Bn = (contrast > 0) ? ((pB - Bavg) * 256 / (256 - contrast) + Bavg) : ((pB - Bavg) * (256 + contrast) / 256 + Bavg);
 
-            bits++;
+            pix[p] = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
+            pix[p + 1] = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
+            pix[p + 2] = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
+
+            p += 4;
         }
     }
 }
@@ -443,55 +446,23 @@ void contrast(const image &im, s32 contrast) {
 
     if(contrast < -255) contrast = -255;
     if(contrast >  255) contrast = 255;
+    unsigned char *pix = im.data;
 
-    rgba *bits;
-    u8 Ravg, Gavg, Bavg;
-    s32 Ra = 0, Ga = 0, Ba = 0, Rn, Gn, Bn;
+    qreal factor = (259. * (contrast + 255.)) / (255. * (259. - contrast));
 
-    // calculate the average values for RED, GREEN and BLUE
-    // color components
+    int p = 0;
     for(s32 y = 0; y < im.h; y++) {
-        bits = (rgba *)im.data + im.rw * y;
-
-        for(s32 x = 0;x < im.w;x++)
-        {
-        Ra += bits->r;
-        Ga += bits->g;
-        Ba += bits->b;
-
-        bits++;
-        }
-    }
-
-    s32 S = im.w * im.h;
-
-    Ravg = Ra / S;
-    Gavg = Ga / S;
-    Bavg = Ba / S;
-
-    // ok, now change contrast
-    // with the terms of alghoritm:
-    //
-    // if contrast > 0: I = (I - Avg) * 256 / (256 - contrast) + Avg
-    // if contrast < 0: I = (I - Avg) * (256 + contrast) / 256 + Avg
-    //
-    // where
-    //   I - current color component value
-    //   Avg - average value of this component (Ravg, Gavg or Bavg)
-    //
-    for(s32 y = 0;y < im.h;y++) {
-        bits = (rgba *)im.data + im.rw * y;
-
         for(s32 x = 0; x < im.w; x++) {
-            Rn = (contrast > 0) ? ((bits->r - Ravg) * 256 / (256 - contrast) + Ravg) : ((bits->r - Ravg) * (256 + contrast) / 256 + Ravg);
-            Gn = (contrast > 0) ? ((bits->g - Gavg) * 256 / (256 - contrast) + Gavg) : ((bits->g - Gavg) * (256 + contrast) / 256 + Gavg);
-            Bn = (contrast > 0) ? ((bits->b - Bavg) * 256 / (256 - contrast) + Bavg) : ((bits->b - Bavg) * (256 + contrast) / 256 + Bavg);
+            u8 pA = pix[p + 3];
+            if(pA == 0) {
+                p += 4;
+                continue;
+            }
+            pix[p] = truncateU8(factor * (pix[p]*255/pA  - 128) + 128)*pA/255;
+            pix[p + 2] = truncateU8(factor * (pix[p + 2]*255/pA - 128) + 128)*pA/255;
+            pix[p + 1] = truncateU8(factor * (pix[p + 1]*255/pA  - 128) + 128)*pA/255;
 
-            bits->r = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
-            bits->g = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
-            bits->b = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
-
-            bits++;
+            p += 4;
         }
     }
 }

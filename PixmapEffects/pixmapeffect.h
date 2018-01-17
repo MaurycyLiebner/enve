@@ -1,11 +1,22 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
-#include "Animators/coloranimator.h"
-#include "Animators/qpointfanimator.h"
-#include "Properties/boolproperty.h"
 #include <QObject>
-
+#include <QSharedPointer>
+#include "skiaincludes.h"
+#include "Colors/color.h"
+#include "Animators/complexanimator.h"
+#include <QMimeData>
+#include <QPointF>
+class EffectAnimators;
+class QIODevice;
+class QPointFAnimator;
+class QrealAnimator;
+class ColorAnimator;
+class BoolProperty;
+typedef QSharedPointer<QPointFAnimator> QPointFAnimatorQSPtr;
+typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
 typedef QSharedPointer<ColorAnimator> ColorAnimatorQSPtr;
+typedef QSharedPointer<BoolProperty> BoolPropertyQSPtr;
 
 namespace fmt_filters {
     struct image;
@@ -54,8 +65,6 @@ enum PixmapEffectType : short {
     EFFECT_BRIGHTNESS,
     EFFECT_BRUSH
 };
-
-class EffectAnimators;
 
 class PixmapEffect : public ComplexAnimator {
     Q_OBJECT
@@ -155,10 +164,8 @@ public:
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:
-    QSharedPointer<BoolProperty> mHighQuality =
-            (new BoolProperty())->ref<BoolProperty>();
-    QSharedPointer<QrealAnimator> mBlurRadius =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    BoolPropertyQSPtr mHighQuality;
+    QrealAnimatorQSPtr mBlurRadius;
 };
 
 struct ShadowEffectRenderData : public PixmapEffectRenderData {
@@ -191,20 +198,14 @@ public:
     void writeProperty(QIODevice *target);
 private:
 //    QrealAnimator mScale;
-    QSharedPointer<BoolProperty> mHighQuality =
-            (new BoolProperty())->ref<BoolProperty>();
-    QSharedPointer<QrealAnimator> mBlurRadius =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<QrealAnimator> mOpacity =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<ColorAnimator> mColor =
-            (new ColorAnimator())->ref<ColorAnimator>();
-    QSharedPointer<QPointFAnimator> mTranslation =
-            (new QPointFAnimator())->ref<QPointFAnimator>();
+    BoolPropertyQSPtr mHighQuality;
+    QrealAnimatorQSPtr mBlurRadius;
+    QrealAnimatorQSPtr mOpacity;
+    ColorAnimatorQSPtr mColor;
+    QPointFAnimatorQSPtr mTranslation;
 };
 
-class LinesEffect : public PixmapEffect
-{
+class LinesEffect : public PixmapEffect {
 public:
     LinesEffect(qreal linesWidth = 5.,
                 qreal linesDistance = 5.);
@@ -216,15 +217,12 @@ public:
     qreal getMargin() { return 0.; }
 
 private:
-    QSharedPointer<QrealAnimator> mLinesDistance =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<QrealAnimator> mLinesWidth =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mLinesDistance;
+    QrealAnimatorQSPtr mLinesWidth;
     bool mVertical = false;
 };
 
-class CirclesEffect : public PixmapEffect
-{
+class CirclesEffect : public PixmapEffect {
 public:
     CirclesEffect(qreal circlesRadius = 5.,
                   qreal circlesDistance = 5.);
@@ -236,10 +234,8 @@ public:
     qreal getMargin() { return 0.; }
 
 private:
-    QSharedPointer<QrealAnimator> mCirclesDistance =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<QrealAnimator> mCirclesRadius =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mCirclesDistance;
+    QrealAnimatorQSPtr mCirclesRadius;
 };
 
 class SwirlEffect : public PixmapEffect {
@@ -253,8 +249,7 @@ public:
     qreal getMargin() { return 0.; }
 
 private:
-    QSharedPointer<QrealAnimator> mDegreesAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mDegreesAnimator;
 };
 
 class OilEffect : public PixmapEffect {
@@ -269,8 +264,7 @@ public:
 
 
 private:
-    QSharedPointer<QrealAnimator> mRadiusAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mRadiusAnimator;
 };
 
 class ImplodeEffect : public PixmapEffect {
@@ -285,8 +279,7 @@ public:
 
 
 private:
-    QSharedPointer<QrealAnimator> mFactorAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mFactorAnimator;
 };
 
 struct DesaturateEffectRenderData : public PixmapEffectRenderData {
@@ -308,8 +301,7 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
-    QSharedPointer<QrealAnimator> mInfluenceAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mInfluenceAnimator;
 };
 
 struct ColorizeEffectRenderData : public PixmapEffectRenderData {
@@ -393,11 +385,10 @@ public:
 
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
-    void writeProperty(QIODevice *target) {}
-    void readProperty(QIODevice *target) {}
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
-    QSharedPointer<QrealAnimator> mContrastAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mContrastAnimator;
 };
 
 struct BrightnessEffectRenderData : public PixmapEffectRenderData {
@@ -417,10 +408,9 @@ public:
 
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
-    void writeProperty(QIODevice *target) {}
-    void readProperty(QIODevice *target) {}
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
-    QSharedPointer<QrealAnimator> mBrightnessAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mBrightnessAnimator;
 };
 #endif // PIXMAPEFFECT_H

@@ -31,7 +31,7 @@ public:
 
     void removeEffect(PathEffect *effect);
     BoundingBox *getParentBox() {
-        return mParentPath;
+        return mParentBox;
     }
     const bool &isOutline() const {
         return mIsOutline;
@@ -43,7 +43,7 @@ public:
 protected:
     bool mIsOutline;
     bool mIsFill;
-    BoundingBox *mParentPath = NULL;
+    BoundingBox *mParentBox = NULL;
 };
 
 

@@ -20,6 +20,8 @@ enum PathEffectType : short {
     GROUP_SUM_PATH_EFFECT
 };
 class PathEffect;
+typedef QSharedPointer<ComboBoxProperty> ComboBoxPropertyQSPtr;
+typedef QSharedPointer<BoxTargetProperty> BoxTargetPropertyQSPtr;
 
 class PathEffectMimeData : public QMimeData {
     Q_OBJECT
@@ -107,7 +109,7 @@ public:
 protected:
     bool mVisible = true;
     bool mOutlineEffect = false;
-    QSharedPointer<BoolProperty> mApplyBeforeThickness;
+    BoolPropertyQSPtr mApplyBeforeThickness;
     PathEffectType mPathEffectType;
     PathEffectAnimators *mParentEffectAnimators = NULL;
 };
@@ -195,8 +197,7 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
-    QSharedPointer<QPointFAnimator> mTranslation =
-            (new QPointFAnimator())->ref<QPointFAnimator>();
+    QPointFAnimatorQSPtr mTranslation;
 };
 
 class SolidifyPathEffect : public PathEffect {
@@ -208,11 +209,10 @@ public:
                                const SkPath &src,
                                SkPath *dst,
                                const bool &);
-    void writeProperty(QIODevice *target) {}
-    void readProperty(QIODevice *target) {}
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
-    QSharedPointer<QrealAnimator> mDisplacement =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mDisplacement;
 };
 
 class SumPathEffect : public PathEffect {
@@ -235,13 +235,8 @@ public:
     }
 private:
     PathBox *mParentPathBox;
-    QSharedPointer<ComboBoxProperty> mOperationType =
-            (new ComboBoxProperty(
-                 QStringList() << "Union" <<
-                 "Difference" << "Intersection" <<
-                 "Exclusion"))->ref<ComboBoxProperty>();
-    QSharedPointer<BoxTargetProperty> mBoxTarget =
-            (new BoxTargetProperty())->ref<BoxTargetProperty>();
+    ComboBoxPropertyQSPtr mOperationType;
+    BoxTargetPropertyQSPtr mBoxTarget;
 };
 
 class GroupLastPathSumPathEffect : public PathEffect {
@@ -256,8 +251,12 @@ public:
                                SkPath *dst,
                                const bool &groupPathSum);
 
-    void writeProperty(QIODevice *target) {}
-    void readProperty(QIODevice *target) {}
+    void writeProperty(QIODevice *target) {
+        Q_UNUSED(target);
+    }
+    void readProperty(QIODevice *target) {
+        Q_UNUSED(target);
+    }
 
 //    bool hasReasonsNotToApplyUglyTransform() {
 //        return true;//mBoxTarget->getTarget() != NULL;

@@ -18,8 +18,6 @@ public:
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~Key();
 
-    virtual KeyCloner *createNewKeyCloner() { return NULL; }
-
     virtual void startFrameTransform();
     virtual void finishFrameTransform();
 

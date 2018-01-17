@@ -10,12 +10,12 @@ PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
     ComplexAnimator() {
     mIsOutline = isOutline;
     mIsFill = isFill;
-    mParentPath = parentPath;
+    mParentBox = parentPath;
 }
 
 void PathEffectAnimators::addEffect(PathEffect *effect) {
-    if(mParentPath->SWT_isPathBox()) {
-        PathBox *pathBox = (PathBox*)mParentPath;
+    if(mParentBox->SWT_isPathBox()) {
+        PathBox *pathBox = (PathBox*)mParentBox;
         if(mIsOutline) {
             pathBox->addOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -23,8 +23,8 @@ void PathEffectAnimators::addEffect(PathEffect *effect) {
         } else {
             pathBox->addPathEffect(effect);
         }
-    } else if(mParentPath->SWT_isPathBox()) {
-        BoxesGroup *groupBox = (BoxesGroup*)mParentPath;
+    } else if(mParentBox->SWT_isPathBox()) {
+        BoxesGroup *groupBox = (BoxesGroup*)mParentBox;
         if(mIsOutline) {
             groupBox->addOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -36,8 +36,8 @@ void PathEffectAnimators::addEffect(PathEffect *effect) {
 }
 
 void PathEffectAnimators::removeEffect(PathEffect *effect) {
-    if(mParentPath->SWT_isPathBox()) {
-        PathBox *pathBox = (PathBox*)mParentPath;
+    if(mParentBox->SWT_isPathBox()) {
+        PathBox *pathBox = (PathBox*)mParentBox;
         if(mIsOutline) {
             pathBox->removeOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -45,8 +45,8 @@ void PathEffectAnimators::removeEffect(PathEffect *effect) {
         } else {
             pathBox->removePathEffect(effect);
         }
-    } else if(mParentPath->SWT_isPathBox()) {
-        BoxesGroup *groupBox = (BoxesGroup*)mParentPath;
+    } else if(mParentBox->SWT_isPathBox()) {
+        BoxesGroup *groupBox = (BoxesGroup*)mParentBox;
         if(mIsOutline) {
             groupBox->removeOutlinePathEffect(effect);
         } else if(mIsFill) {

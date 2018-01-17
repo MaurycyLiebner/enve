@@ -2,6 +2,7 @@
 #define LINKBOX_H
 #include "canvas.h"
 #include "Properties/boxtargetproperty.h"
+#include "Properties/boolproperty.h"
 
 class ExternalLinkBox : public BoxesGroup
 {
@@ -308,68 +309,25 @@ class InternalLinkCanvas : public InternalLinkGroupBox {
     Q_OBJECT
 public:
     InternalLinkCanvas(BoxesGroup *linkTarget);
-    void addSchedulersToProcess() {
-        getLinkTarget()->addSchedulersToProcess();
-        BoxesGroup::addSchedulersToProcess();
-    }
+    void addSchedulersToProcess();
 
-    void writeBoundingBox(QIODevice *target) {
-        InternalLinkGroupBox::writeBoundingBox(target);
-        mClipToCanvas->writeProperty(target);
-    }
+    void writeBoundingBox(QIODevice *target);
 
-    void readBoundingBox(QIODevice *target) {
-        InternalLinkGroupBox::readBoundingBox(target);
-        mClipToCanvas->readProperty(target);
-    }
+    void readBoundingBox(QIODevice *target);
 
-    void processSchedulers() {
-        getLinkTarget()->processSchedulers();
-        BoxesGroup::processSchedulers();
-    }
+    void processSchedulers();
 
     void setupBoundingBoxRenderDataForRelFrame(
                             const int &relFrame,
-                            BoundingBoxRenderData *data) {
-        InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
-                                                                    data);
+                            BoundingBoxRenderData *data);
 
-        BoxesGroup *finalTarget = getFinalTarget();
-        LinkCanvasRenderData *canvasData = (LinkCanvasRenderData*)data;
-        Canvas *canvasTarget = (Canvas*)finalTarget;
-        canvasData->bgColor = canvasTarget->getBgColorAnimator()->
-                                getColorAtRelFrame(relFrame).getSkColor();
-        qreal res = getParentCanvas()->getResolutionFraction();
-        canvasData->canvasHeight = canvasTarget->getCanvasHeight()*res;
-        canvasData->canvasWidth = canvasTarget->getCanvasWidth()*res;
-        if(mParentGroup->SWT_isLinkBox()) {
-            canvasData->clipToCanvas =
-                    ((InternalLinkCanvas*)getLinkTarget())->clipToCanvas();
-        } else {
-            canvasData->clipToCanvas = mClipToCanvas->getValue();
-        }
-    }
+    bool clipToCanvas();
 
-    bool clipToCanvas() {
-        return mClipToCanvas->getValue();
-    }
+    BoundingBox *createLinkForLinkGroup();
 
-    BoundingBox *createLinkForLinkGroup() {
-        if(mParentGroup->SWT_isLinkBox()) {
-            return getLinkTarget()->createLinkForLinkGroup();
-        } else {
-            return new InternalLinkCanvas(this);
-        }
-    }
+    BoundingBoxRenderData *createRenderData();
 
-    BoundingBoxRenderData *createRenderData() {
-        return new LinkCanvasRenderData(this);
-    }
-
-    bool relPointInsidePath(const QPointF &relPos) {
-        if(mClipToCanvas->getValue()) return mRelBoundingRect.contains(relPos);
-        return InternalLinkGroupBox::relPointInsidePath(relPos);
-    }
+    bool relPointInsidePath(const QPointF &relPos);
 protected:
     QSharedPointer<BoolProperty> mClipToCanvas =
                 (new BoolProperty())->ref<BoolProperty>();

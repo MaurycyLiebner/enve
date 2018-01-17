@@ -31,7 +31,7 @@ void BoolPropertyContainer::setValue(const bool &value) {
     prp_callFinishUpdater();
 
     Q_FOREACH(const QSharedPointer<Property> &prop, ca_mChildAnimators) {
-        //prop->SWT_setVisible(value != mReverseShow);
-        prop->SWT_setDisabled(value == mReverseShow);
+        //prop->SWT_setVisible(value);
+        prop->SWT_setDisabled(!value);
     }
 }

@@ -291,7 +291,9 @@ void QrealAnimator::readProperty(QIODevice *target) {
         anim_appendKey(readKey(target), false, false);
     }
 
-    target->read((char*)&mCurrentValue, sizeof(qreal));
+    qreal val;
+    target->read((char*)&val, sizeof(qreal));
+    qra_setCurrentValue(val);
     bool hasRandomGenerator;
     target->read((char*)&hasRandomGenerator, sizeof(bool));
     if(hasRandomGenerator) {
@@ -435,6 +437,26 @@ void ReplaceColorEffect::writeProperty(QIODevice *target) {
     mToColor->writeProperty(target);
     mToleranceAnimator->writeProperty(target);
     mSmoothnessAnimator->writeProperty(target);
+}
+
+void ContrastEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
+    mContrastAnimator->readProperty(target);
+}
+
+void ContrastEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mContrastAnimator->writeProperty(target);
+}
+
+void BrightnessEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
+    mBrightnessAnimator->readProperty(target);
+}
+
+void BrightnessEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mBrightnessAnimator->writeProperty(target);
 }
 
 void EffectAnimators::writeProperty(QIODevice *target) {
@@ -675,6 +697,16 @@ void DuplicatePathEffect::readProperty(QIODevice *target) {
     mTranslation->readProperty(target);
 }
 
+void SolidifyPathEffect::writeProperty(QIODevice *target) {
+    PathEffect::writeProperty(target);
+    mDisplacement->writeProperty(target);
+}
+
+void SolidifyPathEffect::readProperty(QIODevice *target) {
+    PathEffect::readProperty(target);
+    mDisplacement->readProperty(target);
+}
+
 void BoxTargetProperty::writeProperty(QIODevice *target) {
     BoundingBox *targetBox = mTarget.data();
     int targetId;
@@ -736,7 +768,13 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
         addEffect(duplicateEffect);
     } else if(typeT == SUM_PATH_EFFECT) {
         SumPathEffect *sumEffect =
-                new SumPathEffect(NULL, mIsOutline);
+                new SumPathEffect((PathBox*)mParentBox, mIsOutline);
+        sumEffect->readProperty(target);
+        addEffect(sumEffect);
+    } else if(typeT == GROUP_SUM_PATH_EFFECT) {
+        GroupLastPathSumPathEffect *sumEffect =
+                new GroupLastPathSumPathEffect((BoxesGroup*)mParentBox,
+                                               mIsOutline);
         sumEffect->readProperty(target);
         addEffect(sumEffect);
     }

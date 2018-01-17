@@ -73,6 +73,12 @@ public:
     virtual void ca_removeAllChildAnimators();
     virtual Property *ca_getFirstDescendantWithName(const QString &name);
     QrealAnimator *getQrealAnimatorIfIsTheOnlyOne();
+
+    void SWT_setChildrenAncestorDisabled(const bool &bT) {
+        Q_FOREACH(const QSharedPointer<Property> &prop, ca_mChildAnimators) {
+            prop->SWT_setAncestorDisabled(bT);
+        }
+    }
 public slots:
     void ca_prependChildAnimator(Property *childAnimator,
                                  Property *prependWith);

@@ -21,11 +21,11 @@ Circle::Circle() :
     mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.));
 
     QrealAnimator *hXAnimator = mHorizontalRadiusPoint->getXAnimator();
-    ca_addChildAnimator(hXAnimator);
+    ca_prependChildAnimator(hXAnimator, mEffectsAnimators.data());
     hXAnimator->prp_setName("horizontal radius");
 
     QrealAnimator *vYAnimator = mVerticalRadiusPoint->getYAnimator();
-    ca_addChildAnimator(vYAnimator);
+    ca_prependChildAnimator(vYAnimator, mEffectsAnimators.data());
     vYAnimator->prp_setName("vertical radius");
 
 
@@ -33,10 +33,8 @@ Circle::Circle() :
                                             mHorizontalRadiusPoint);
 
     mCenter->prp_setUpdater(new NodePointUpdater(this) );
-    mHorizontalRadiusPoint->prp_setUpdater(
-                new NodePointUpdater(this));
-    mVerticalRadiusPoint->prp_setUpdater(
-                new NodePointUpdater(this));
+    mHorizontalRadiusPoint->prp_setUpdater(new NodePointUpdater(this));
+    mVerticalRadiusPoint->prp_setUpdater(new NodePointUpdater(this));
 }
 
 void Circle::startAllPointsTransform() {
@@ -128,9 +126,12 @@ void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
 }
 
 SkPath Circle::getPathAtRelFrame(const int &relFrame) {
-    SkPath path;
     SkScalar xRadius = mHorizontalRadiusPoint->getEffectiveXValueAtRelFrame(relFrame);
     SkScalar yRadius = mVerticalRadiusPoint->getEffectiveYValueAtRelFrame(relFrame);
+    QPainterPath pathT;
+    pathT.addEllipse(QPointF(0., 0.), xRadius, yRadius);
+    return QPainterPathToSkPath(pathT);
+    SkPath path;
     path.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
                                   2*xRadius, 2*yRadius));
     return path;

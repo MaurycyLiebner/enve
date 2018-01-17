@@ -5,6 +5,9 @@
 #include "Boxes/boxesgroup.h"
 #include "fmt_filters.h"
 #include "pointhelpers.h"
+#include "Animators/coloranimator.h"
+#include "Animators/qpointfanimator.h"
+#include "Properties/boolproperty.h"
 
 QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr) {
     qulonglong ptrval(*reinterpret_cast<qulonglong *>(&ptr));
@@ -38,6 +41,8 @@ void PixmapEffect::prp_startDragging() {
 }
 
 BlurEffect::BlurEffect(qreal radius) : PixmapEffect(EFFECT_BLUR) {
+    mHighQuality = (new BoolProperty())->ref<BoolProperty>();
+    mBlurRadius = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("blur");
     mBlurRadius->qra_setCurrentValue(radius);
     mBlurRadius->prp_setName("radius");
@@ -148,6 +153,12 @@ PixmapEffectRenderData *BlurEffect::getPixmapEffectRenderDataForRelFrame(
 }
 
 ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
+    mHighQuality = (new BoolProperty())->ref<BoolProperty>();
+    mBlurRadius = (new QrealAnimator())->ref<QrealAnimator>();
+    mOpacity = (new QrealAnimator())->ref<QrealAnimator>();
+    mColor = (new ColorAnimator())->ref<ColorAnimator>();
+    mTranslation = (new QPointFAnimator())->ref<QPointFAnimator>();
+
     mBlurRadius->qra_setCurrentValue(radius);
     prp_setName("shadow");
 
@@ -273,6 +284,9 @@ qreal ShadowEffect::getMarginAtRelFrame(const int &relFrame) {
 
 LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
     PixmapEffect(EFFECT_LINES) {
+    mLinesDistance = (new QrealAnimator())->ref<QrealAnimator>();
+    mLinesWidth = (new QrealAnimator())->ref<QrealAnimator>();
+
     prp_setName("lines");
 
     mLinesWidth->qra_setValueRange(0., 100000.);
@@ -334,6 +348,9 @@ void LinesEffect::apply(QImage *imgPtr,
 CirclesEffect::CirclesEffect(qreal circlesRadius,
                              qreal circlesDistance) :
     PixmapEffect(EFFECT_CIRCLES) {
+    mCirclesDistance = (new QrealAnimator())->ref<QrealAnimator>();
+    mCirclesRadius = (new QrealAnimator())->ref<QrealAnimator>();
+
     prp_setName("circles");
 
     mCirclesRadius->qra_setValueRange(0., 1000.);
@@ -400,6 +417,7 @@ void CirclesEffect::apply(QImage *imgPtr,
 
 SwirlEffect::SwirlEffect(qreal degrees) :
     PixmapEffect(EFFECT_SWIRL) {
+    mDegreesAnimator = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("swirl");
 
     mDegreesAnimator->qra_setValueRange(-3600., 3600.);
@@ -419,6 +437,7 @@ void SwirlEffect::apply(QImage *imgPtr,
 }
 
 OilEffect::OilEffect(qreal radius) : PixmapEffect(EFFECT_OIL) {
+    mRadiusAnimator = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("oil");
 
     mRadiusAnimator->qra_setValueRange(1., 5.);
@@ -438,6 +457,7 @@ void OilEffect::apply(QImage *imgPtr,
 
 ImplodeEffect::ImplodeEffect(qreal radius) :
     PixmapEffect(EFFECT_IMPLODE) {
+    mFactorAnimator = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("implode");
 
     mFactorAnimator->qra_setValueRange(0., 100.);
@@ -458,6 +478,7 @@ void ImplodeEffect::apply(QImage *imgPtr,
 
 DesaturateEffect::DesaturateEffect(qreal radius) :
     PixmapEffect(EFFECT_DESATURATE) {
+    mInfluenceAnimator = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("desaturate");
 
     mInfluenceAnimator->qra_setValueRange(0., 1.);
@@ -599,6 +620,7 @@ void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
 
 ContrastEffect::ContrastEffect(qreal contrast) :
     PixmapEffect(EFFECT_CONTRAST) {
+    mContrastAnimator = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("contrast");
 
     mContrastAnimator->qra_setValueRange(-255., 255.);
@@ -630,6 +652,7 @@ void ContrastEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
 
 BrightnessEffect::BrightnessEffect(qreal brightness) :
     PixmapEffect(EFFECT_BRIGHTNESS) {
+    mBrightnessAnimator = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("brightness");
 
     mBrightnessAnimator->qra_setValueRange(-255., 255.);

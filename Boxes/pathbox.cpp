@@ -119,8 +119,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     pathData->editPath = getPathAtRelFrame(relFrame);
     pathData->path = pathData->editPath;
     if(getParentCanvas()->getPathEffectsVisible()) {
-        mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path,
-                                                     this);
+        mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
         int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                     prp_relFrameToAbsFrame(relFrame));
         mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->path,
@@ -141,13 +140,13 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     } else {
         outline = SkPath();
     }
-    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline, this);
+    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
     mParentGroup->filterOutlinePathForRelFrame(relFrame, &outline);
 
     pathData->outlinePath = outline;
     outline.addPath(pathData->path);
 
-    mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path, this);
+    mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
     mParentGroup->filterFillPathForRelFrame(relFrame, &pathData->path);
 
     UpdatePaintSettings *fillSettings = &pathData->paintSettings;
@@ -434,7 +433,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
                          circleT->getCurrentYRadius());
         newPath->loadPathFromSkPath(QPainterPathToSkPath(pathT));
     } else {
-        newPath->loadPathFromSkPath(mPathSk);
+        newPath->loadPathFromSkPath(mEditPathSk);
     }
     copyPathBoxDataTo(newPath);
     mParentGroup->addContainedBox(newPath);
@@ -496,7 +495,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     } else {
         outline = SkPath();
     }
-    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline, this);
+    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
     outline.addPath(path);
     return SkRectToQRectF(outline.computeTightBounds());
 }

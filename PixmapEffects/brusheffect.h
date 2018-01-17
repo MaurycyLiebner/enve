@@ -91,12 +91,7 @@ public:
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
 
-    void prp_setAbsFrame(const int &frame) {
-        ComplexAnimator::prp_setAbsFrame(frame);
-        if(mRandomize->getValue()) {
-            prp_callUpdater();
-        }
-    }
+    void prp_setAbsFrame(const int &frame);
 private:
     QrealAnimatorQSPtr mMinBrushRadius;
     QrealAnimatorQSPtr mMaxBrushRadius;

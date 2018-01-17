@@ -5,8 +5,7 @@
 class BoundingBox;
 class BoxTargetProperty;
 
-class BoxTargetWidget : public QWidget
-{
+class BoxTargetWidget : public QWidget {
     Q_OBJECT
 public:
     explicit BoxTargetWidget(QWidget *parent = 0);
@@ -23,6 +22,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void paintEvent(QPaintEvent *);
     void dragLeaveEvent(QDragLeaveEvent *);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // BOXTARGETWIDGET_H

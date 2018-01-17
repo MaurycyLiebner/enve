@@ -10,6 +10,7 @@ class ComplexAnimator;
 class Key;
 class QPainter;
 class AnimatorUpdater;
+class BoundingBox;
 typedef std::shared_ptr<AnimatorUpdater> AnimatorUpdaterStdSPtr;
 
 class Property :
@@ -174,8 +175,22 @@ public:
     bool isShiftPressed(QKeyEvent *event);
     bool isCtrlPressed(QKeyEvent *event);
     bool isAltPressed(QKeyEvent *event);
+    Property *getLastSetParent() {
+        return mLastSetParent;
+    }
+
+    void setLastSetParent(Property *parent) {
+        mLastSetParent = parent;
+    }
+
+    BoundingBox *getLastSetParentBoundingBoxAncestor() {
+        if(mLastSetParent == NULL) return NULL;
+        if(mLastSetParent->SWT_isBoundingBox()) return (BoundingBox*)mLastSetParent;
+        return mLastSetParent->getLastSetParentBoundingBoxAncestor();
+    }
 protected:
     MainWindow *mMainWindow;
+    Property *mLastSetParent = NULL;
 public slots:
     void prp_callUpdater();
 

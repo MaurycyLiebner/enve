@@ -14,6 +14,14 @@ void rotate(float rad_t, float *x_t, float *y_t)
     *y_t = y_rotated_t;
 }
 
+unsigned char truncateU8(const int &val) {
+    if(val > 255) {
+        return 255;
+    } else if(val < 0) {
+        return 0;
+    }
+    return val;
+}
 
 int clampInt(int val, int min, int max) {
     if(val > max) {

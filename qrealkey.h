@@ -82,8 +82,6 @@ public:
 
     bool differsFromKey(Key *key);
 
-    KeyCloner *createNewKeyCloner();
-
     void setEndFrame(const qreal &endFrame);
     void setStartFrame(const qreal &startFrame);
     void setStartValue(const qreal &value);
@@ -112,15 +110,6 @@ protected:
     qreal mEndFrame = 0.;
     bool mStartEnabled = false;
     bool mEndEnabled = false;
-};
-
-class QrealKeyCloner : public KeyCloner {
-public:
-    QrealKeyCloner(QrealKey *key);
-
-    Key *createKeyForAnimator(Animator *parentAnimator);
-private:
-    qreal mValue;
 };
 
 #endif // QREALKEY_H

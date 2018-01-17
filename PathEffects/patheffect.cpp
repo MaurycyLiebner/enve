@@ -338,7 +338,7 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
 
 DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
     PathEffect(DUPLICATE_PATH_EFFECT, outlinePathEffect) {
-
+    mTranslation = (new QPointFAnimator())->ref<QPointFAnimator>();
     prp_setName("duplicate effect");
 
     mTranslation->prp_setName("translation");
@@ -361,7 +361,7 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
 
 SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     PathEffect(SOLIDIFY_PATH_EFFECT, outlinePathEffect) {
-
+    mDisplacement = (new QrealAnimator())->ref<QrealAnimator>();
     prp_setName("solidify effect");
 
     mDisplacement->prp_setName("displacement");
@@ -454,6 +454,11 @@ DONE:
 SumPathEffect::SumPathEffect(PathBox *parentPath,
                              const bool &outlinePathEffect) :
     PathEffect(SUM_PATH_EFFECT, outlinePathEffect) {
+    mOperationType = (new ComboBoxProperty(
+                     QStringList() << "Union" <<
+                     "Difference" << "Intersection" <<
+                     "Exclusion"))->ref<ComboBoxProperty>();
+    mBoxTarget = (new BoxTargetProperty())->ref<BoxTargetProperty>();
     prp_setName("path operation effect");
     mParentPathBox = parentPath;
     ca_addChildAnimator(mBoxTarget.data());

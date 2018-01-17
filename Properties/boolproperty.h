@@ -32,7 +32,6 @@ public:
 public slots:
     void setValue(const bool &value);
 private:
-    bool mReverseShow = false;
     bool mValue = false;
 };
 

@@ -1,6 +1,7 @@
 #include "brusheffect.h"
 #include "Animators/intanimator.h"
 #include "Paint/PaintLib/surface.h"
+#include "Properties/boolproperty.h"
 
 BrushEffect::BrushEffect(qreal numberStrokes,
                          qreal brushMinRadius, qreal brushMaxRadius,
@@ -124,7 +125,8 @@ void BrushEffect::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical, int 
     }
 }
 
-bool BrushEffect::prp_differencesBetweenRelFrames(const int &relFrame1, const int &relFrame2) {
+bool BrushEffect::prp_differencesBetweenRelFrames(const int &relFrame1,
+                                                  const int &relFrame2) {
     if(mRandomize->getValue()) {
         int frameStep1 = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame1);
         int frameStep2 = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame2);
@@ -133,6 +135,13 @@ bool BrushEffect::prp_differencesBetweenRelFrames(const int &relFrame1, const in
     }
     return PixmapEffect::prp_differencesBetweenRelFrames(relFrame1,
                                                          relFrame2);
+}
+
+void BrushEffect::prp_setAbsFrame(const int &frame) {
+    ComplexAnimator::prp_setAbsFrame(frame);
+    if(mRandomize->getValue()) {
+        prp_callUpdater();
+    }
 }
 
 qreal BrushEffect::getMargin() {

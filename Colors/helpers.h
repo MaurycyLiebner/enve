@@ -16,7 +16,7 @@
 #define sqrt_2 1.41421356237
 #include <QtCore>
 
-
+extern unsigned char truncateU8(const int &val);
 extern int clampInt(int val, int min, int max);
 extern void glOrthoAndViewportSet(unsigned int w, unsigned int h);
 extern void normalize(qreal *x_t, qreal *y_t, qreal dest_len = 1.);

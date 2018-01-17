@@ -225,6 +225,67 @@ InternalLinkCanvas::InternalLinkCanvas(BoxesGroup *linkTarget) :
     ca_addChildAnimator(mClipToCanvas.data());
 }
 
+void InternalLinkCanvas::addSchedulersToProcess() {
+    getLinkTarget()->addSchedulersToProcess();
+    BoxesGroup::addSchedulersToProcess();
+}
+
+void InternalLinkCanvas::writeBoundingBox(QIODevice *target) {
+    InternalLinkGroupBox::writeBoundingBox(target);
+    mClipToCanvas->writeProperty(target);
+}
+
+void InternalLinkCanvas::readBoundingBox(QIODevice *target) {
+    InternalLinkGroupBox::readBoundingBox(target);
+    mClipToCanvas->readProperty(target);
+}
+
+void InternalLinkCanvas::processSchedulers() {
+    getLinkTarget()->processSchedulers();
+    BoxesGroup::processSchedulers();
+}
+
+void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrame(const int &relFrame, BoundingBoxRenderData *data) {
+    InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
+                                                                data);
+
+    BoxesGroup *finalTarget = getFinalTarget();
+    LinkCanvasRenderData *canvasData = (LinkCanvasRenderData*)data;
+    Canvas *canvasTarget = (Canvas*)finalTarget;
+    canvasData->bgColor = canvasTarget->getBgColorAnimator()->
+            getColorAtRelFrame(relFrame).getSkColor();
+    qreal res = getParentCanvas()->getResolutionFraction();
+    canvasData->canvasHeight = canvasTarget->getCanvasHeight()*res;
+    canvasData->canvasWidth = canvasTarget->getCanvasWidth()*res;
+    if(mParentGroup->SWT_isLinkBox()) {
+        canvasData->clipToCanvas =
+                ((InternalLinkCanvas*)getLinkTarget())->clipToCanvas();
+    } else {
+        canvasData->clipToCanvas = mClipToCanvas->getValue();
+    }
+}
+
+bool InternalLinkCanvas::clipToCanvas() {
+    return mClipToCanvas->getValue();
+}
+
+BoundingBox *InternalLinkCanvas::createLinkForLinkGroup() {
+    if(mParentGroup->SWT_isLinkBox()) {
+        return getLinkTarget()->createLinkForLinkGroup();
+    } else {
+        return new InternalLinkCanvas(this);
+    }
+}
+
+BoundingBoxRenderData *InternalLinkCanvas::createRenderData() {
+    return new LinkCanvasRenderData(this);
+}
+
+bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) {
+    if(mClipToCanvas->getValue()) return mRelBoundingRect.contains(relPos);
+    return InternalLinkGroupBox::relPointInsidePath(relPos);
+}
+
 #include "PixmapEffects/fmt_filters.h"
 void LinkCanvasRenderData::renderToImage() {
     if(renderedToImage) return;
@@ -239,7 +300,7 @@ void LinkCanvasRenderData::renderToImage() {
                      effectsMargin, effectsMargin);
     if(maxBoundsEnabled) {
         globalBoundingRect = globalBoundingRect.intersected(
-                              scale.mapRect(maxBoundsRect));
+                    scale.mapRect(maxBoundsRect));
     }
     QSizeF sizeF = globalBoundingRect.size();
     QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -

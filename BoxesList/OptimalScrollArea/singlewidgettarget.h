@@ -151,8 +151,13 @@ public:
         SWT_afterContentVisibilityChanged();
     }
 
+    virtual void SWT_setChildrenAncestorDisabled(const bool &bT) {
+        Q_UNUSED(bT);
+    }
+
     void SWT_setDisabled(const bool &disable) {
         SWT_mDisabled = disable;
+        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
     }
 
     void SWT_disable() {
@@ -164,11 +169,17 @@ public:
     }
 
     bool SWT_isDisabled() {
-        return SWT_mDisabled;
+        return SWT_mDisabled || SWT_mAncestorDisabled;
+    }
+
+    void SWT_setAncestorDisabled(const bool &bT) {
+        SWT_mAncestorDisabled = bT;
+        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
     }
 
     void SWT_afterContentVisibilityChanged();
 protected:
+    bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
     QList<std::shared_ptr<SingleWidgetAbstraction> > mSWT_allAbstractions;
