@@ -86,6 +86,11 @@ public:
 
     virtual void applyTransform(const QMatrix &transform) = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
+    void setRelativePosStartAndFinish(const QPointF &relPos) {
+        //startTransform();
+        setRelativePos(relPos);
+        //finishTransform();
+    }
     virtual QPointF getRelativePos() const = 0;
     virtual void moveByRel(const QPointF &relTranslation) = 0;
     const QPointF &getSavedRelPos() const;

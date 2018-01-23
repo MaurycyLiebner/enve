@@ -82,7 +82,7 @@ void UndoRedoStack::undo() {
     mRedoStack << toUndo;
 }
 
-UndoRedo::UndoRedo(QString name) {
+UndoRedo::UndoRedo(const QString &name) {
     mName = name;
     printName();
     mFrame = MainWindow::getInstance()->getCurrentFrame();
@@ -446,4 +446,38 @@ void ChangeTextUndoRedo::undo() {
 
 void ChangeTextUndoRedo::redo() {
     mTarget->setCurrentTextValue(mNewText, false);
+}
+
+AddPointToVectorPathAnimatorUndoRedo::AddPointToVectorPathAnimatorUndoRedo(
+        VectorPathAnimator *path,
+        const QPointF &startRelPos,
+        const QPointF &relPos,
+        const QPointF &endRelPos,
+        const int &targetNodeId,
+        const NodeSettings &nodeSettings,
+        const int &newNodeId) :
+    UndoRedo("AddPointToSeparatePathsUndoRedo") {
+    mPath = path;
+    mStartRelPos = startRelPos;
+    mRelPos = relPos;
+    mEndRelPos = endRelPos;
+    mTargetNodeId = targetNodeId;
+    mNodeSetting = nodeSettings;
+    mNewPointId = newNodeId;
+}
+
+AddPointToVectorPathAnimatorUndoRedo::~AddPointToVectorPathAnimatorUndoRedo() {
+}
+
+void AddPointToVectorPathAnimatorUndoRedo::redo() {
+    mPath->addNodeRelPos(mStartRelPos,
+                         mRelPos,
+                         mEndRelPos,
+                         mTargetNodeId,
+                         mNodeSetting,
+                         false);
+}
+
+void AddPointToVectorPathAnimatorUndoRedo::undo() {
+    mPath->removeNodeAt(mNewPointId, false);
 }

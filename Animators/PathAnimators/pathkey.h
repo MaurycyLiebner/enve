@@ -13,11 +13,13 @@ public:
     const SkPoint &getElementPos(const int &index) const;
     virtual void setElementPos(const int &index,
                                const SkPoint &pos);
-    void prependElementPos(const SkPoint &pos);
-    void appendElementPos(const SkPoint &pos);
-    void insertElementPos(const int &index,
-                          const SkPoint &pos);
-    void removeElementPosAt(const int &index);
+    void addNodeElements(const int &startPtIndex,
+                 const SkPoint &startPos,
+                 const SkPoint &pos,
+                 const SkPoint &endPos,
+                 const bool &saveUndoRedo = true);
+    void removeElementPosAt(const int &index,
+                            const bool &saveUndoRedo = true);
     const SkPath &getPath();
     void updatePath();
     virtual void setPathClosed(const bool &bT);
@@ -42,11 +44,10 @@ public:
         return nodeId*3 + 1;
     }
 
-    virtual void removeNodeAt(const int &nodeId) {
+    virtual void removeNodeAt(const int &nodeId,
+                              const bool &saveUndoRedo = true) {
         int nodePtId = nodeIdToPointId(nodeId);
-        removeElementPosAt(nodePtId - 1);
-        removeElementPosAt(nodePtId - 1);
-        removeElementPosAt(nodePtId - 1);
+        removeNodeElements(nodePtId, saveUndoRedo);
     }
 
     virtual void removeNodeAtAndApproximate(const int &nodeId) {
@@ -60,9 +61,7 @@ public:
             if(nextCtrlId >= mElementsPos.count()) nextCtrlId = 0;
             // make approximate
         }
-        removeElementPosAt(nodePtId - 1);
-        removeElementPosAt(nodePtId - 1);
-        removeElementPosAt(nodePtId - 1);
+        removeNodeElements(nodePtId - 1);
     }
 
     virtual void moveElementPosSubset(
@@ -146,11 +145,41 @@ public:
         revertElementPosSubset(0, -1);
         PathContainer::shiftAllPoints(1);
     }
+
+    virtual void startPathChange() {
+        if(mPathChanged) return;
+        mPathChanged = true;
+        mSavedElementsPos = mElementsPos;
+        return;
+    }
+
+    virtual void cancelPathChange() {
+        mPathChanged = false;
+    }
+
+    virtual void finishedPathChange();
+
+    void setElementsPos(const QList<SkPoint> &newElementsPos,
+                        const bool &saveUndoRedo) {
+        if(saveUndoRedo) {
+            startPathChange();
+        }
+        mElementsPos = newElementsPos;
+        if(saveUndoRedo) {
+            finishedPathChange();
+        }
+    }
+    void removeNodeElements(const int &startPtIndex,
+                            const bool &saveUndoRedo = true);
+
+    virtual void updateAfterChangedFromInside() = 0;
 protected:
+    bool mPathChanged = false;
     bool mPathClosed = false;
     bool mPathUpdateNeeded = false;
     SkPath mPath;
     QList<SkPoint> mElementsPos;
+    QList<SkPoint> mSavedElementsPos;
 };
 
 class PathKey : public Key,
@@ -178,6 +207,7 @@ public:
     PathKey *createNewKeyFromSubsetForPath(VectorPathAnimator *parentAnimator,
                                            const int &firstId,
                                            int count);
+    void updateAfterChangedFromInside();
 };
 
 #endif // PATHKEY_H

@@ -973,11 +973,17 @@ bool MainWindow::isAltPressed() {
     return QApplication::keyboardModifiers() & Qt::AltModifier;
 }
 
+void MainWindow::finishUndoRedoSet() {
+    mCurrentUndoRedoStack->finishSet();
+    mCurrentUndoRedoStack->startNewSet();
+
+}
+
 void MainWindow::callUpdateSchedulers() {
     if(!isEnabled()) {
         return;
     }
-    mCurrentUndoRedoStack->finishSet();
+//    mCurrentUndoRedoStack->finishSet();
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
@@ -1004,7 +1010,7 @@ void MainWindow::callUpdateSchedulers() {
     mFillStrokeSettings->update();
     emit updateAll();
 
-    mCurrentUndoRedoStack->startNewSet();
+//    mCurrentUndoRedoStack->startNewSet();
 }
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
@@ -1134,7 +1140,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
               return processKeyEvent(keyEvent);
         }
     } else if(e->type() == QEvent::KeyRelease) {
-
+        finishUndoRedoSet();
+    } else if(e->type() == QEvent::MouseButtonRelease) {
+        finishUndoRedoSet();
     } else if(obj == mCanvasWindow->getCanvasWidget()) {
         if(e->type() == QEvent::Drop) {
             mCanvasWindow->dropEvent((QDropEvent*)e);

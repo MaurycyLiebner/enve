@@ -408,10 +408,13 @@ void NodePoint::updateEndCtrlPtVisibility() {
 
 void NodePoint::setEndCtrlPtEnabled(const bool &enabled) {
     if(enabled == mCurrentNodeSettings->endEnabled) return;
-    if(mCurrentNodeSettings->endEnabled) {
+    NodeSettings newSettings = *mCurrentNodeSettings;
+    if(newSettings.endEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
-    mCurrentNodeSettings->endEnabled = enabled;
+    newSettings.endEnabled = enabled;
+    mParentPath->replaceNodeSettingsForPtId(getPtId(),
+                                            newSettings);
     mParentPath->schedulePathUpdate();
     mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateEndCtrlPtVisibility();
@@ -419,21 +422,24 @@ void NodePoint::setEndCtrlPtEnabled(const bool &enabled) {
 
 void NodePoint::setStartCtrlPtEnabled(const bool &enabled) {
     if(enabled == mCurrentNodeSettings->startEnabled) return;
-    if(mCurrentNodeSettings->startEnabled) {
+    NodeSettings newSettings = *mCurrentNodeSettings;
+    if(newSettings.startEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
-    mCurrentNodeSettings->startEnabled = enabled;
+    newSettings.startEnabled = enabled;
+    mParentPath->replaceNodeSettingsForPtId(getPtId(),
+                                            newSettings);
     mParentPath->schedulePathUpdate();
     mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateStartCtrlPtVisibility();
 }
 
 void NodePoint::resetEndCtrlPt() {
-    mEndCtrlPt->setRelativePos(getRelativePos());
+    mEndCtrlPt->setRelativePosStartAndFinish(getRelativePos());
 }
 
 void NodePoint::resetStartCtrlPt() {
-    mStartCtrlPt->setRelativePos(getRelativePos());
+    mStartCtrlPt->setRelativePosStartAndFinish(getRelativePos());
 }
 
 void NodePoint::setNodeId(const int &idT) {
@@ -498,7 +504,10 @@ bool NodePoint::isSeparateNodePoint() {
 }
 
 void NodePoint::setCtrlsMode(const CtrlsMode &mode) {
-    mCurrentNodeSettings->ctrlsMode = mode;
+    NodeSettings newSettings = *mCurrentNodeSettings;
+    newSettings.ctrlsMode = mode;
+    mParentPath->replaceNodeSettingsForPtId(getPtId(),
+                                            newSettings);
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
         QPointF newStartPos;
         QPointF newEndPos;
@@ -507,8 +516,8 @@ void NodePoint::setCtrlsMode(const CtrlsMode &mode) {
                              getRelativePos(),
                              &newEndPos,
                              &newStartPos);
-        mStartCtrlPt->setRelativePos(newStartPos);
-        mEndCtrlPt->setRelativePos(newEndPos);
+        mStartCtrlPt->setRelativePosStartAndFinish(newStartPos);
+        mEndCtrlPt->setRelativePosStartAndFinish(newEndPos);
     } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
         QPointF newStartPos;
         QPointF newEndPos;
@@ -517,7 +526,7 @@ void NodePoint::setCtrlsMode(const CtrlsMode &mode) {
                           getRelativePos(),
                           &newEndPos,
                           &newStartPos);
-        mStartCtrlPt->setRelativePos(newStartPos);
+        mStartCtrlPt->setRelativePosStartAndFinish(newStartPos);
     } else {
         return;
     }

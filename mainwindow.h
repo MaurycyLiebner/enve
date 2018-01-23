@@ -59,7 +59,9 @@ public:
 //    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
 
     static MainWindow *getInstance();
-
+    static void addUndoRedo(UndoRedo *uR) {
+        MainWindow::getInstance()->getUndoRedoStack()->addUndoRedo(uR);
+    }
     void createDetachedUndoRedoStack();
     void deleteDetachedUndoRedoStack();
 
@@ -138,6 +140,7 @@ public:
         return mFontWidget;
     }
     void addFileUpdateScheduler(Updatable *scheduler);
+    void finishUndoRedoSet();
 public slots:
     void setCurrentFrame(int frame);
     //void playPreview();

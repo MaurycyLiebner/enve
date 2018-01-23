@@ -11,10 +11,24 @@ PathEffect::PathEffect(const PathEffectType &type,
 
 DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     PathEffect(DISPLACE_PATH_EFFECT, outlinePathEffect) {
+    mSegLength = (new QrealAnimator())->ref<QrealAnimator>();
+    mMaxDev = (new QrealAnimator())->ref<QrealAnimator>();
+    mSmoothness = (new QrealAnimator())->ref<QrealAnimator>();
+    mRandomize = (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
+    mRandomizeStep = (new IntAnimator())->ref<IntAnimator>();
+    mSmoothTransform = (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
+    mEasing = (new QrealAnimator())->ref<QrealAnimator>();
+    mSeed = (new IntAnimator())->ref<IntAnimator>();
+    mRepeat = (new BoolProperty())->ref<BoolProperty>();
+
     prp_setName("discrete effect");
 
+    mSeed->prp_setName("seed");
+    mSeed->setIntValueRange(0, 9999);
+    mSeed->setCurrentIntValue(qrand() % 9999, false);
+
     mSegLength->prp_setName("segment length");
-    mSegLength->qra_setValueRange(0., 1000.);
+    mSegLength->qra_setValueRange(1., 1000.);
     mSegLength->qra_setCurrentValue(20.);
 
     mMaxDev->prp_setName("max deviation");
@@ -29,10 +43,6 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
 
     mRandomize->prp_setName("randomize");
 
-    mSeed->prp_setName("seed");
-    mSeed->setIntValueRange(0, 9999);
-    mSeed->setCurrentIntValue(qrand() % 9999, false);
-
     mRandomizeStep->prp_setName("rand frame step");
     mRandomizeStep->setIntValueRange(1, 99);
 
@@ -41,11 +51,12 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRepeat->prp_setName("repeat");
     mRepeat->setValue(false);
 
+    ca_addChildAnimator(mSeed.data());
     ca_addChildAnimator(mSegLength.data());
     ca_addChildAnimator(mMaxDev.data());
     ca_addChildAnimator(mSmoothness.data());
     ca_addChildAnimator(mRandomize.data());
-    mRandomize->ca_addChildAnimator(mSeed.data());
+
     mRandomize->ca_addChildAnimator(mRandomizeStep.data());
     mRandomize->ca_addChildAnimator(mSmoothTransform.data());
     mSmoothTransform->ca_addChildAnimator(mEasing.data());
@@ -140,46 +151,61 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
     SkPathMeasure meas(src, false);
     qsrand(seedAssist);
 
-    /* Caller may supply their own seed assist, which by default is 0 */
-    //uint32_t seed = seedAssist ^ SkScalarRoundToInt(meas.getLength());
-
-    //LCGRandom rand(seed ^ ((seed << 16) | (seed >> 16)));
     SkScalar scale = maxDev;
     SkPoint p;
     SkVector v;
+
     if(smoothness < 0.001f) {
         do {
-            SkPoint firstP;
             SkScalar length = meas.getLength();
-
-            if(segLen * (2/* + doFill*/) > length) {
+            if(segLen * 2 > length) {
                 meas.getSegment(0, length, dst, true);  // to short for us to mangle
-            } else {
-                int n = SkScalarRoundToInt(length / segLen);
-                SkScalar delta = length / n;
-                SkScalar distance = 0;
+                continue;
+            }
+            int nTot = SkScalarCeilToInt(length / segLen);
+            int n = nTot;
+            SkScalar distance = 0.f;
+            SkScalar remLen = segLen*nTot - length;
+            SkPoint firstP;
+            if(meas.isClosed()) {
+                n--;
+                distance += (length + segLen)*0.5f;
+            }
 
-                if(meas.isClosed()) {
-                    n--;
-                    distance += delta/2;
-                }
-
+            if(meas.getPosTan(distance, &p, &v)) {
+                //Perterb(&p, v, randFloat() * scale);
+                dst->moveTo(p);
+                firstP = p;
+            }
+            while(--n >= 0) {
+                distance += segLen;
                 if(meas.getPosTan(distance, &p, &v)) {
-                    Perterb(&p, v, randFloat() /*rand.nextSScalar1()*/ * scale);
-                    dst->moveTo(p);
-                    firstP = p;
+                    if(n == 0) {
+                        SkScalar scaleT = 1.f - remLen/segLen;
+                        Perterb(&p, v, randFloat() * scale * scaleT);
+
+                    } else {
+                        Perterb(&p, v, randFloat() * scale);
+                    }
+                    dst->lineTo(p);
                 }
+                if(distance + segLen > length) break;
+            }
+            if(meas.isClosed()) {
+                distance = distance + segLen - length;
                 while(--n >= 0) {
-                    distance += delta;
                     if(meas.getPosTan(distance, &p, &v)) {
-                        Perterb(&p, v, randFloat() /*rand.nextSScalar1()*/ * scale);
+                        if(n == 0) {
+                            SkScalar scaleT = 1.f - remLen/segLen;
+                            Perterb(&p, v, randFloat() * scale * scaleT);
+                        } else {
+                            Perterb(&p, v, randFloat() * scale);
+                        }
                         dst->lineTo(p);
                     }
+                    distance += segLen;
                 }
-                if(meas.isClosed()) {
-                    //dst->lineTo(p);
-                    dst->close();
-                }
+                dst->close();
             }
         } while (meas.nextContour());
     } else {
@@ -194,56 +220,90 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
         SkPoint c2;
 
         do {
-            SkScalar smoothLen = smoothness * segLen * 0.5f;
             SkScalar length = meas.getLength();
-
-            if(segLen * (2/* + doFill*/) > length) {
+            if(segLen * 2 > length) {
                 meas.getSegment(0, length, dst, true);  // to short for us to mangle
-            } else {
-                int n = SkScalarRoundToInt(length / segLen);
-                SkScalar delta = length / n;
-                SkScalar distance = 0;
+                continue;
+            }
+            int nTot = SkScalarCeilToInt(length / segLen);
+            int n = nTot;
+            SkScalar distance = 0.f;
+            SkScalar remLen = segLen*nTot - length;
+            SkScalar smoothLen = smoothness * segLen * 0.5f;
 
-                if(meas.isClosed()) {
+            if(meas.isClosed()) {
+                n--;
+                distance += (length + segLen)*0.5f;
+            }
+
+            if(meas.getPosTan(distance, &firstP, &v)) {
+                //Perterb(&firstP, v, randFloat() * scale);
+                lastP = firstP;
+            }
+
+            if(meas.isClosed()) {
+                distance += segLen;
+                if(meas.getPosTan(distance, &currP, &v)) {
+                    Perterb(&currP, v, randFloat() * scale);
                     n--;
-                    distance += delta/2;
+                    secondP = currP;
                 }
+                distance += segLen;
+                if(meas.getPosTan(distance, &nextP, &v)) {
+                    Perterb(&nextP, v, randFloat() * scale);
+                    n--;
+                    thirdP = nextP;
 
-                if(meas.getPosTan(distance, &firstP, &v)) {
-                    Perterb(&firstP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
-                    lastP = firstP;
+                    getC1AndC2(lastP, currP, nextP,
+                               &c1, &c2, smoothLen);
+
+                    lastC1 = c1;
+
+                    lastP = currP;
+                    currP = nextP;
                 }
+            } else {
+                currP = lastP;
+                lastC1 = currP;
+            }
+            dst->moveTo(lastP);
+            while(--n >= 0) {
+                distance += segLen;
+                if(meas.getPosTan(distance, &nextP, &v)) {
+                    if(n == 0) {
+                        SkScalar scaleT = 1.f - remLen/segLen;
+                        Perterb(&nextP, v, randFloat() * scale * scaleT);
 
-                if(meas.isClosed()) {
-                    distance += delta;
-                    if(meas.getPosTan(distance, &currP, &v)) {
-                        Perterb(&currP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
-                        n--;
-                        secondP = currP;
+                    } else {
+                        Perterb(&nextP, v, randFloat() * scale);
                     }
-                    distance += delta;
-                    if(meas.getPosTan(distance, &nextP, &v)) {
-                        Perterb(&nextP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
-                        n--;
-                        thirdP = nextP;
+                    getC1AndC2(lastP, currP, nextP,
+                               &c1, &c2, smoothLen);
 
-                        getC1AndC2(lastP, currP, nextP,
-                                   &c1, &c2, smoothLen);
 
-                        lastC1 = c1;
+                    dst->cubicTo(lastC1, c2, currP);
+                    lastC1 = c1;
 
-                        lastP = currP;
-                        currP = nextP;
-                    }
-                } else {
-                    currP = lastP;
-                    lastC1 = currP;
+                    lastP = currP;
+                    currP = nextP;
                 }
-                dst->moveTo(lastP);
+                if(distance + segLen > length) break;
+            }
+
+//            nextP = firstP;
+//            getC1AndC2(lastP, currP, nextP,
+//                       &c1, &c2, smoothLen);
+//            dst->cubicTo(lastC1, c2, currP);
+            if(meas.isClosed()) {
+                distance = distance + segLen - length;
                 while(--n >= 0) {
-                    distance += delta;
                     if(meas.getPosTan(distance, &nextP, &v)) {
-                        Perterb(&nextP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
+                        if(n == 0) {
+                            SkScalar scaleT = 1.f - remLen/segLen;
+                            Perterb(&nextP, v, randFloat() * scale * scaleT);
+                        } else {
+                            Perterb(&nextP, v, randFloat() * scale);
+                        }
                         getC1AndC2(lastP, currP, nextP,
                                    &c1, &c2, smoothLen);
 
@@ -254,34 +314,28 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                         lastP = currP;
                         currP = nextP;
                     }
+                    distance += segLen;
                 }
+                lastC1 = c1;
 
+//                lastP = currP;
+//                currP = nextP;
                 nextP = firstP;
+
+                getC1AndC2(lastP, currP, nextP,
+                           &c1, &c2, smoothLen);
+
+                dst->cubicTo(lastC1, c2, currP);
+                lastC1 = c1;
+
+                lastP = currP;
+                currP = nextP;
+                nextP = secondP;
                 getC1AndC2(lastP, currP, nextP,
                            &c1, &c2, smoothLen);
                 dst->cubicTo(lastC1, c2, currP);
-                if(meas.isClosed()) {
-                    lastC1 = c1;
 
-                    lastP = currP;
-                    currP = nextP;
-                    nextP = secondP;
-
-                    getC1AndC2(lastP, currP, nextP,
-                               &c1, &c2, smoothLen);
-
-                    dst->cubicTo(lastC1, c2, currP);
-                    lastC1 = c1;
-
-                    lastP = currP;
-                    currP = nextP;
-                    nextP = thirdP;
-                    getC1AndC2(lastP, currP, nextP,
-                               &c1, &c2, smoothLen);
-                    dst->cubicTo(lastC1, c2, currP);
-
-                    dst->close();
-                }
+                dst->close();
             }
         } while (meas.nextContour());
     }
@@ -291,6 +345,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
                                                SkPath *dst, const bool &) {
+    dst->reset();
     qsrand(mSeed->getCurrentIntValue());
     mSeedAssist = qrand() % 999999;
     int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);

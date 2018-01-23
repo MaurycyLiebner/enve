@@ -906,6 +906,9 @@ void Canvas::handleAddDrawPathNodeMousePressEvent() {
 
 void Canvas::handleAddPointMouseRelease() {
     if(mCurrentEndPoint != NULL) {
+        if(!mFirstMouseMove) {
+            mCurrentEndPoint->finishTransform();
+        }
         //mCurrentEndPoint->prp_updateInfluenceRangeAfterChanged();
         if(!mCurrentEndPoint->isEndPoint()) {
             setCurrentEndPoint(NULL);
@@ -1156,6 +1159,9 @@ void Canvas::handleMovePathMouseMove() {
 
 void Canvas::handleAddPointMouseMove() {
     if(mCurrentEndPoint == NULL) return;
+    if(mFirstMouseMove) {
+        mCurrentEndPoint->startTransform();
+    }
     if(mCurrentEndPoint->hasNextPoint() &&
        mCurrentEndPoint->hasPreviousPoint()) {
         if(mCurrentEndPoint->getCurrentCtrlsMode() !=

@@ -20,6 +20,8 @@ enum PathEffectType : short {
     GROUP_SUM_PATH_EFFECT
 };
 class PathEffect;
+typedef QSharedPointer<BoolPropertyContainer> BoolPropertyContainerQSPtr;
+typedef QSharedPointer<IntAnimator> IntAnimatorQSPtr;
 typedef QSharedPointer<ComboBoxProperty> ComboBoxPropertyQSPtr;
 typedef QSharedPointer<BoxTargetProperty> BoxTargetPropertyQSPtr;
 
@@ -164,24 +166,15 @@ public:
         }
     }
 private:
-    QSharedPointer<QrealAnimator> mSegLength =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<QrealAnimator> mMaxDev =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<QrealAnimator> mSmoothness =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<BoolPropertyContainer> mRandomize =
-            (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
-    QSharedPointer<IntAnimator> mRandomizeStep =
-            (new IntAnimator())->ref<IntAnimator>();
-    QSharedPointer<BoolPropertyContainer> mSmoothTransform =
-            (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
-    QSharedPointer<QrealAnimator> mEasing =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<IntAnimator> mSeed =
-            (new IntAnimator())->ref<IntAnimator>();
-    QSharedPointer<BoolProperty> mRepeat =
-            (new BoolProperty())->ref<BoolProperty>();
+    QrealAnimatorQSPtr mSegLength;
+    QrealAnimatorQSPtr mMaxDev;
+    QrealAnimatorQSPtr mSmoothness;
+    BoolPropertyContainerQSPtr mRandomize;
+    IntAnimatorQSPtr mRandomizeStep;
+    BoolPropertyContainerQSPtr mSmoothTransform;
+    QrealAnimatorQSPtr mEasing;
+    IntAnimatorQSPtr mSeed;
+    BoolPropertyQSPtr mRepeat;
     uint32_t mSeedAssist = 0;
 };
 

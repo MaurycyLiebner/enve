@@ -57,17 +57,15 @@ public:
     }
 
     void replaceNodeSettingsForNodeId(const int &nodeId,
-                                      const NodeSettings &settings) {
-        *mNodeSettings.at(nodeId) = settings;
-    }
+                                      const NodeSettings &settings,
+                                      const bool &saveUndoRedo = true);
 
     NodeSettings *insertNodeSettingsForNodeId(const int &nodeId,
-                                              const NodeSettings &settings) {
-        NodeSettings *newSettings = new NodeSettings;
-        *newSettings = settings;
-        mNodeSettings.insert(nodeId, newSettings);
-        return newSettings;
-    }
+                                              const NodeSettings &settings,
+                                              const bool &saveUndoRedo = true);
+
+    void removeNodeSettingsAt(const int &id,
+                              const bool &saveUndoRedo = true);
 
     void setNodeStartEnabled(const int &nodeId,
                              const bool &enabled) {
@@ -116,7 +114,8 @@ public:
     }
 
     void removeNodeAtAndApproximate(const int &nodeId);
-    void removeNodeAt(const int &nodeId);
+    void removeNodeAt(const int &nodeId,
+                      const bool &saveUndoRedo = true);
 
     NodePoint *addNodeAbsPos(const QPointF &absPos,
                               NodePoint *targetPt);
@@ -126,8 +125,14 @@ public:
                              const QPointF &relPos,
                              const QPointF &endRelPos,
                              NodePoint *targetPt,
-                             const NodeSettings &nodeSettings =
-            NodeSettings());
+                             const NodeSettings &nodeSettings = NodeSettings(),
+                             const bool &saveUndoRedo = true);
+    NodePoint *addNodeRelPos(const QPointF &startRelPos,
+                             const QPointF &relPos,
+                             const QPointF &endRelPos,
+                             const int &targetPtId,
+                             const NodeSettings &nodeSettings = NodeSettings(),
+                             const bool &saveUndoRedo = true);
     VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
     void selectAllPoints(Canvas *canvas);
@@ -265,6 +270,10 @@ public:
             updateNodePointsFromElements();
         }
     }
+
+    void updateAfterChangedFromInside() {
+        prp_updateInfluenceRangeAfterChanged();
+    }
 private:
     void setFirstPoint(NodePoint *firstPt);
 
@@ -284,7 +293,6 @@ private:
     PathAnimator *mParentPathAnimator;
     NodePoint *mFirstPoint = NULL;
     QList<NodePoint*> mPoints;
-    bool mPathChanged = false;
     bool mElementsUpdateNeeded = false;
 };
 

@@ -1,5 +1,6 @@
 #include "pathkey.h"
 #include "vectorpathanimator.h"
+#include "mainwindow.h"
 
 PathKey::PathKey(VectorPathAnimator *parentAnimator) :
     Key(parentAnimator) {
@@ -48,6 +49,10 @@ PathKey *PathKey::createNewKeyFromSubsetForPath(
     return newKey;
 }
 
+void PathKey::updateAfterChangedFromInside() {
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
 NodeSettings *PathKey::getNodeSettingsForPtId(const int &ptId) {
     return ((VectorPathAnimator*)mParentAnimator)->
             getNodeSettingsForPtId(ptId);
@@ -63,31 +68,41 @@ void PathContainer::setElementPos(const int &index,
     mPathUpdateNeeded = true;
 }
 
-void PathContainer::prependElementPos(const SkPoint &pos) {
-    mElementsPos.prepend(pos);
+void PathContainer::addNodeElements(const int &startPtIndex,
+                                    const SkPoint &startPos,
+                                    const SkPoint &pos,
+                                    const SkPoint &endPos,
+                                    const bool &saveUndoRedo) {
+    mElementsPos.insert(startPtIndex, endPos);
+    mElementsPos.insert(startPtIndex, pos);
+    mElementsPos.insert(startPtIndex, startPos);
     mPathUpdateNeeded = true;
-}
-
-void PathContainer::appendElementPos(const SkPoint &pos) {
-    mElementsPos.append(pos);
-    if(qIsNaN(pos.x()) || qIsNaN(pos.y())) {
-        mPathUpdateNeeded = false;
+    if(saveUndoRedo) {
+        MainWindow::addUndoRedo(
+            new PathContainerAddNodeElementsUR(this,
+                                               startPtIndex,
+                                               startPos,
+                                               pos,
+                                               endPos));
     }
-    mPathUpdateNeeded = true;
 }
 
-void PathContainer::insertElementPos(const int &index,
-                               const SkPoint &pos) {
-    mElementsPos.insert(index, pos);
-    if(qIsNaN(pos.x()) || qIsNaN(pos.y())) {
-        mPathUpdateNeeded = false;
+void PathContainer::removeNodeElements(const int &startPtIndex,
+                                       const bool &saveUndoRedo) {
+
+    mPathUpdateNeeded = true;
+    if(saveUndoRedo) {
+        MainWindow::addUndoRedo(
+            new PathContainerdRemoveNodeElementsUR(this,
+                                                   startPtIndex,
+                                                   mElementsPos.takeAt(startPtIndex),
+                                                   mElementsPos.takeAt(startPtIndex),
+                                                   mElementsPos.takeAt(startPtIndex)));
+    } else {
+        mElementsPos.removeAt(startPtIndex);
+        mElementsPos.removeAt(startPtIndex);
+        mElementsPos.removeAt(startPtIndex);
     }
-    mPathUpdateNeeded = true;
-}
-
-void PathContainer::removeElementPosAt(const int &index) {
-    mElementsPos.removeAt(index);
-    mPathUpdateNeeded = true;
 }
 
 const SkPath &PathContainer::getPath() {
@@ -236,6 +251,16 @@ DONE:
     return elements;
 }
 
+void PathContainer::finishedPathChange() {
+    if(mPathChanged) {
+        mPathChanged = false;
+        MainWindow::addUndoRedo(
+                    new PathContainerPathChangeUR(this,
+                                                        mSavedElementsPos,
+                                                        mElementsPos));
+    }
+}
+
 void PathContainer::setElementsFromSkPath(const SkPath &path) {
     clearElements();
     mElementsPos.reserve(path.countPoints() + 2);
@@ -361,14 +386,23 @@ void PathContainer::addNewPointAtTBetweenPts(const SkScalar &tVal,
                   &newPointEnd,
                   tVal);
 
-    insertElementPos(prevPtId + 2, SkPoint::Make(0., 0.));
-    insertElementPos(prevPtId + 3, newPointPos);
-    insertElementPos(prevPtId + 4, SkPoint::Make(0., 0.));
     if(newPtSmooth) {
-        setElementPos(prevPtId + 2, newPointStart - newPointPos);
-        setElementPos(prevPtId + 4, newPointEnd - newPointPos);
-        setElementPos(prevPtId + 1, prevPointEnd - prevPoint);
-        setElementPos(nextPtId - 1, nextPointStart - nextPoint);
+        addNodeElements(prevPtId + 2,
+                        newPointStart - newPointPos,
+                        newPointPos,
+                        newPointEnd - newPointPos);
+
+        startPathChange();
+        setElementPos(prevPtId + 1,
+                      prevPointEnd - prevPoint);
+        setElementPos(nextPtId - 1,
+                      nextPointStart - nextPoint);
+        finishedPathChange();
+    } else {
+        addNodeElements(prevPtId + 2,
+                        SkPoint::Make(0.f, 0.f),
+                        newPointPos,
+                        SkPoint::Make(0.f, 0.f));
     }
 }
 #include "skqtconversions.h"
@@ -376,20 +410,14 @@ void PathContainer::applyTransformToPoints(const QMatrix &transform) {
     for(int i = 1; i < mElementsPos.count(); i += 3) {
         QPointF nodePos = SkPointToQPointF(mElementsPos.at(i));
         QPointF newNodePos = transform.map(nodePos);
-        mElementsPos.replace(
-                    i,
-                    QPointFToSkPoint(
+        setElementPos(i, QPointFToSkPoint(
                         newNodePos) );
         QPointF startPos = nodePos + SkPointToQPointF(mElementsPos.at(i - 1));
-        mElementsPos.replace(
-                    i - 1,
-                    QPointFToSkPoint(
+        setElementPos(i - 1, QPointFToSkPoint(
                         transform.map(startPos) - newNodePos) );
         QPointF endPos = nodePos + SkPointToQPointF(mElementsPos.at(i + 1));
-        mElementsPos.replace(
-                    i + 1,
-                    QPointFToSkPoint(
-                        transform.map(endPos) - newNodePos) );
+        setElementPos(i + 1, QPointFToSkPoint(
+                        transform.map(endPos) - newNodePos));
     }
     mPathUpdateNeeded = true;
 }

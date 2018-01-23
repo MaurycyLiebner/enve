@@ -7,6 +7,7 @@
 #include <QFont>
 #include "skiaincludes.h"
 
+#include "Animators/PathAnimators/vectorpathanimator.h"
 class MainWindow;
 class MovablePoint;
 typedef QSharedPointer<MovablePoint> MovablePointQSPtr;
@@ -48,7 +49,7 @@ enum PaintType : short;
 
 class UndoRedo {
 public:
-    UndoRedo(QString name);
+    UndoRedo(const QString &name/* = ""*/);
     virtual ~UndoRedo() {
         qDebug() << "DELETE " << mName;
     }
@@ -192,31 +193,31 @@ private:
     QList<UndoRedo*> mRedoStack;
 };
 
-//class AddPointToSeparatePathsUndoRedo : public UndoRedo
-//{
-//public:
-//    AddPointToSeparatePathsUndoRedo(PathAnimator *path,
-//                                    NodePoint *point) :
-//        UndoRedo("AddPointToSeparatePathsUndoRedo") {
-//        mPath = path;
-//        mPoint = point;
-//    }
+class AddPointToVectorPathAnimatorUndoRedo : public UndoRedo {
+public:
+    AddPointToVectorPathAnimatorUndoRedo(VectorPathAnimator *path,
+                                         const QPointF &startRelPos,
+                                         const QPointF &relPos,
+                                         const QPointF &endRelPos,
+                                         const int &targetNodeId,
+                                         const NodeSettings &nodeSettings,
+                                         const int &newNodeId);
 
-//    ~AddPointToSeparatePathsUndoRedo() {
-//    }
+    ~AddPointToVectorPathAnimatorUndoRedo();
 
-//    void redo() {
-//        mPath->addPointToSeparatePaths(mPoint, false);
-//    }
+    void redo();
 
-//    void undo() {
-//        mPath->removePointFromSeparatePaths(mPoint, false);
-//    }
+    void undo();
 
-//private:
-//    PathAnimator *mPath;
-//    NodePoint *mPoint;
-//};
+private:
+    VectorPathAnimator *mPath;
+    QPointF mStartRelPos;
+    QPointF mRelPos;
+    QPointF mEndRelPos;
+    int mTargetNodeId;
+    int mNewPointId;
+    NodeSettings mNodeSetting;
+};
 
 //class RemovePointFromSeparatePathsUndoRedo :
 //        public AddPointToSeparatePathsUndoRedo
@@ -325,7 +326,7 @@ public:
 private:
 };
 
-class  SetBoxVisibleUndoRedo : public UndoRedo {
+class SetBoxVisibleUndoRedo : public UndoRedo {
 public:
      SetBoxVisibleUndoRedo(BoundingBox *target,
                            const bool &visibleBefore,
@@ -578,5 +579,183 @@ private:
     QStringAnimatorQSPtr mTarget;
     QString mOldText;
     QString mNewText;
+};
+
+class PathContainerAddNodeElementsUR : public UndoRedo {
+public:
+    PathContainerAddNodeElementsUR(PathContainer *target,
+                                   const int &startPtIndex,
+                                   const SkPoint &startPos,
+                                   const SkPoint &pos,
+                                   const SkPoint &endPos) :
+        UndoRedo("PathContainerAddNodeElementsUR") {
+        mTarget = target;
+        mStartPtIndex = startPtIndex;
+        mStartPos = startPos;
+        mPos = pos;
+        mEndPos = endPos;
+    }
+    ~PathContainerAddNodeElementsUR() {}
+
+    void undo() {
+        mTarget->removeNodeElements(mStartPtIndex, false);
+        mTarget->updateAfterChangedFromInside();
+    }
+
+    void redo() {
+        mTarget->addNodeElements(mStartPtIndex,
+                                 mStartPos,
+                                 mPos,
+                                 mEndPos, false);
+        mTarget->updateAfterChangedFromInside();
+    }
+private:
+    PathContainer *mTarget;
+    int mStartPtIndex;
+    SkPoint mStartPos;
+    SkPoint mPos;
+    SkPoint mEndPos;
+};
+
+class PathContainerdRemoveNodeElementsUR : public UndoRedo {
+public:
+    PathContainerdRemoveNodeElementsUR(PathContainer *target,
+                                       const int &startPtIndex,
+                                       const SkPoint &startPos,
+                                       const SkPoint &pos,
+                                       const SkPoint &endPos) :
+        UndoRedo("PathContainerdRemoveNodeElementsUR") {
+        mTarget = target;
+        mStartPtIndex = startPtIndex;
+        mStartPos = startPos;
+        mPos = pos;
+        mEndPos = endPos;
+    }
+    ~PathContainerdRemoveNodeElementsUR() {}
+
+    void undo() {
+        mTarget->addNodeElements(mStartPtIndex,
+                                 mStartPos,
+                                 mPos,
+                                 mEndPos, false);
+        mTarget->updateAfterChangedFromInside();
+    }
+
+    void redo() {
+        mTarget->removeNodeElements(mStartPtIndex, false);
+        mTarget->updateAfterChangedFromInside();
+    }
+private:
+    PathContainer *mTarget;
+    int mStartPtIndex;
+    SkPoint mStartPos;
+    SkPoint mPos;
+    SkPoint mEndPos;
+};
+
+class PathContainerPathChangeUR : public UndoRedo {
+public:
+    PathContainerPathChangeUR(PathContainer *target,
+                              const QList<SkPoint> oldPts,
+                              const QList<SkPoint> newPts) :
+    UndoRedo("PathContainerPathChangeUR") {
+        mTarget = target;
+        mOldPts = oldPts;
+        mNewPts = newPts;
+    }
+    ~PathContainerPathChangeUR() {}
+
+    void undo() {
+        mTarget->setElementsPos(mOldPts, false);
+        mTarget->updateAfterChangedFromInside();
+    }
+
+    void redo() {
+        mTarget->setElementsPos(mNewPts, false);
+        mTarget->updateAfterChangedFromInside();
+    }
+private:
+    PathContainer *mTarget;
+    QList<SkPoint> mOldPts;
+    QList<SkPoint> mNewPts;
+};
+
+class VectorPathAnimatorReplaceNodeSettingsUR : public UndoRedo {
+public:
+    VectorPathAnimatorReplaceNodeSettingsUR(
+             VectorPathAnimator *target,
+             const int &index,
+             const NodeSettings &oldSettings,
+             const NodeSettings &settings) :
+    UndoRedo("VectorPathAnimatorReplaceNodeSettingsUR") {
+        mTarget = target;
+        mId = index;
+        mOldSettings = oldSettings;
+        mSettings = settings;
+    }
+    ~VectorPathAnimatorReplaceNodeSettingsUR() {}
+
+    void undo() {
+        mTarget->replaceNodeSettingsForNodeId(mId, mOldSettings, false);
+    }
+
+    void redo() {
+        mTarget->replaceNodeSettingsForNodeId(mId, mSettings, false);
+    }
+private:
+    VectorPathAnimator *mTarget;
+    int mId;
+    NodeSettings mOldSettings;
+    NodeSettings mSettings;
+};
+
+class VectorPathAnimatorInsertNodeSettingsUR : public UndoRedo {
+public:
+    VectorPathAnimatorInsertNodeSettingsUR(VectorPathAnimator *target,
+                                 const int &index,
+                                 const NodeSettings &settings) :
+    UndoRedo("VectorPathAnimatorInsertNodeSettingsUR") {
+        mTarget = target;
+        mId = index;
+        mSettings = settings;
+    }
+    ~VectorPathAnimatorInsertNodeSettingsUR() {}
+
+    void undo() {
+        mTarget->removeNodeSettingsAt(mId, false);
+    }
+
+    void redo() {
+        mTarget->insertNodeSettingsForNodeId(mId, mSettings, false);
+    }
+private:
+    VectorPathAnimator *mTarget;
+    int mId;
+    NodeSettings mSettings;
+};
+
+class VectorPathAnimatorRemoveNodeSettingsUR : public UndoRedo {
+public:
+    VectorPathAnimatorRemoveNodeSettingsUR(VectorPathAnimator *target,
+                                 const int &index,
+                                 const NodeSettings &settings) :
+    UndoRedo("VectorPathAnimatorRemoveNodeSettingsUR") {
+        mTarget = target;
+        mId = index;
+        mSettings = settings;
+    }
+    ~VectorPathAnimatorRemoveNodeSettingsUR() {}
+
+    void undo() {
+        mTarget->insertNodeSettingsForNodeId(mId, mSettings, false);
+    }
+
+    void redo() {
+        mTarget->removeNodeSettingsAt(mId, false);
+    }
+private:
+    VectorPathAnimator *mTarget;
+    int mId;
+    NodeSettings mSettings;
 };
 #endif // UNDOREDO_H

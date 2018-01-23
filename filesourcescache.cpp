@@ -208,12 +208,12 @@ void VideoCacheHandler::processUpdate() {
     QByteArray pathByteArray = mUpdateFilePath.toLatin1();
     const char* path = pathByteArray.data();
     // get format from audio file
-    AVFormatContext* format = avformat_alloc_context();
-    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+    AVFormatContext *formatContext = avformat_alloc_context();
+    if(avformat_open_input(&formatContext, path, NULL, NULL) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return;// -1;
     }
-    if (avformat_find_stream_info(format, NULL) < 0) {
+    if(avformat_find_stream_info(formatContext, NULL) < 0) {
         fprintf(stderr,
                 "Could not retrieve stream info from file '%s'\n",
                 path);
@@ -222,9 +222,9 @@ void VideoCacheHandler::processUpdate() {
 
     // Find the index of the first audio stream
     int videoStreamIndex = -1;
-    for (uint i = 0; i < format->nb_streams; i++) {
+    for (uint i = 0; i < formatContext->nb_streams; i++) {
         const AVMediaType &mediaType =
-                format->streams[i]->codec->codec_type;
+                formatContext->streams[i]->codec->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
             videoStreamIndex = i;
             break;
@@ -239,7 +239,7 @@ void VideoCacheHandler::processUpdate() {
     AVCodecContext *videoCodec = NULL;
     struct SwsContext *sws = NULL;
 
-    AVStream *videoStream = format->streams[videoStreamIndex];
+    AVStream *videoStream = formatContext->streams[videoStreamIndex];
     videoCodec = videoStream->codec;
     if( avcodec_open2(videoCodec,
                       avcodec_find_decoder(videoCodec->codec_id),
@@ -277,7 +277,7 @@ void VideoCacheHandler::processUpdate() {
         frame /= 1000;
 
         if(frameId != 0) {
-            if(avformat_seek_file(format, videoStreamIndex, 0,
+            if(avformat_seek_file(formatContext, videoStreamIndex, 0,
                                    frame, frame,
                     AVSEEK_FLAG_FRAME) < 0) {
                 return;// 0;
@@ -289,7 +289,7 @@ void VideoCacheHandler::processUpdate() {
         int64_t pts = 0;
 
         do {
-            if(av_read_frame(format, &packet) >= 0) {
+            if(av_read_frame(formatContext, &packet) >= 0) {
                 int gotFrame;
                 if(packet.stream_index == videoStreamIndex) {
                     avcodec_decode_video2(videoCodec, decodedFrame, &gotFrame,
@@ -343,7 +343,7 @@ void VideoCacheHandler::processUpdate() {
     sws_freeContext(sws);
     avcodec_close(videoCodec);
 
-    avformat_free_context(format);
+    avformat_free_context(formatContext);
 
 //    qDebug() << "total elapsed: " << timer.elapsed();
     // success

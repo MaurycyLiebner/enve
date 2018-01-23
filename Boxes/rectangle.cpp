@@ -22,7 +22,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
 
     mRadiusPoint = new QPointFAnimator();
     mRadiusPoint->prp_setName("round radius");
-    ca_prependChildAnimator(mRadiusPoint, mEffectsAnimators.data()););
+    ca_prependChildAnimator(mRadiusPoint, mEffectsAnimators.data());
     mRadiusPoint->setValuesRange(0., 9999.);
 
     prp_setUpdater(new NodePointUpdater(this));
