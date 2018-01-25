@@ -68,8 +68,7 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
     update();
 }
 #include "memoryhandler.h"
-BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
-        MainWindow *parent) :
+BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     QWidget(parent) {
     setFocusPolicy(Qt::NoFocus);
 

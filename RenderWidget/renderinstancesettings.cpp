@@ -1,22 +1,24 @@
 #include "renderinstancesettings.h"
 #include "canvas.h"
 
-RenderInstanceSettings::RenderInstanceSettings()
-{
-
+RenderInstanceSettings::RenderInstanceSettings() {
 }
 
 qreal RenderInstanceSettings::getFps() const {
-    return 24.;
-    //return mTargetCanvas->getFps();
+    return mFps;
 }
 
 int RenderInstanceSettings::getVideoWidth() const {
-    return 1920;
-    //return mTargetCanvas->getCanvasWidth();
+    return mVideoWidth;
 }
 
 int RenderInstanceSettings::getVideoHeight() const {
-    return 1080;
-    //return mTargetCanvas->getCanvasHeight();
+    return mVideoHeight;
+}
+
+void RenderInstanceSettings::updateRenderVars() {
+    mFps = mTargetCanvas->getFps();
+    mTimeBase = { 1, qRound(mFps) };
+    mVideoWidth = mTargetCanvas->getCanvasHeight();
+    mVideoHeight = mTargetCanvas->getCanvasWidth();
 }

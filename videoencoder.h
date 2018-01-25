@@ -93,8 +93,8 @@ protected:
     QList<sk_sp<SkImage> > mImages;
     RenderInstanceSettings mRenderInstanceSettings;
     QByteArray mPathByteArray;
-    int mHaveVideo = 0;
-    int mHaveAudio = 0;
+    bool mHaveVideo = 0;
+    bool mHaveAudio = 0;
     int mEncodeVideo = 0;
     int mEncodeAudio = 0;
 

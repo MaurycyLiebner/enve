@@ -861,7 +861,7 @@ void CanvasWindow::outOfMemory() {
 
 void CanvasWindow::setRendering(const bool &bT) {
     mRendering = bT;
-    mCurrentCanvas->setRendering(bT);
+    mCurrentCanvas->setRenderingPreview(bT);
 }
 #include "memorychecker.h"
 void CanvasWindow::setPreviewing(const bool &bT) {

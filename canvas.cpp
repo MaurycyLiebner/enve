@@ -377,13 +377,12 @@ void Canvas::setPreviewing(const bool &bT) {
     mPreviewing = bT;
 }
 
-void Canvas::setRendering(const bool &bT) {
-    mRendering = bT;
+void Canvas::setRenderingPreview(const bool &bT) {
+    mRenderingPreview = bT;
 }
 
 void Canvas::setOutputRendering(const bool &bT) {
-    mRendering = bT;
-    setPreviewing(bT);
+    mRenderingOutput = bT;
 }
 
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
@@ -395,7 +394,7 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
 //        } else if(!mRendering) {
 //            mCurrentPreviewContainer->setBlocked(false);
 //        }
-        if(!mRendering) {
+        if(!mRenderingPreview || mRenderingOutput) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
@@ -487,7 +486,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame(fId);
     }
     cont->replaceImageSk(renderData->renderedImage);
-    if(mRendering || !mPreviewing) {
+    if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
         mCurrentPreviewContainerOutdated = false;
         setCurrentPreviewContainer(cont);
     } else if(mPreviewing) {

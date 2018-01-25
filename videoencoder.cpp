@@ -55,18 +55,6 @@ static void open_video(AVFormatContext *oc, OutputStream *ost) {
        exit(1);
     }
 
-    /* If the output format is not YUV420P, then a temporary YUV420P
-     * picture is needed too. It is then converted to the required
-     * output format. */
-    ost->tmp_frame = NULL;
-    if(c->pix_fmt != AV_PIX_FMT_BGRA) {
-       ost->tmp_frame = alloc_picture(AV_PIX_FMT_BGRA, c->width, c->height);
-       if(!ost->tmp_frame) {
-           fprintf(stderr, "Could not allocate temporary picture\n");
-           exit(1);
-       }
-    }
-
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0) {
@@ -77,17 +65,18 @@ static void open_video(AVFormatContext *oc, OutputStream *ost) {
 
 static void add_video_stream(OutputStream *ost,
                              AVFormatContext *oc,
-                             enum AVCodecID codec_id,
                              const RenderInstanceSettings &settings) {
     AVCodecContext *c;
-    AVCodec *codec;
+    AVCodec *codec = settings.getVideoCodec();
 
-    /* find the video encoder */
-    codec = avcodec_find_encoder(codec_id);
-    if(!codec) {
-        fprintf(stderr, "codec not found\n");
-        exit(1);
-    }
+//    if(codec == NULL) {
+//        /* find the video encoder */
+//        codec = avcodec_find_encoder(codec_id);
+//        if(!codec) {
+//            fprintf(stderr, "codec not found\n");
+//            exit(1);
+//        }
+//    }
 
     ost->st = avformat_new_stream(oc, NULL);
     if(!ost->st) {
@@ -103,24 +92,23 @@ static void add_video_stream(OutputStream *ost,
     ost->enc = c;
 
     /* Put sample parameters. */
-    c->bit_rate = 40000;//settings.getVideoBitrate();
+    c->bit_rate = settings.getVideoBitrate();//settings.getVideoBitrate();
     /* Resolution must be a multiple of two. */
-    c->width    = 1920;//settings.getVideoWidth();
-    c->height   = 1080;//settings.getVideoHeight();
+    c->width    = settings.getVideoWidth();
+    c->height   = settings.getVideoHeight();
     /* timebase: This is the fundamental unit of time (in seconds) in terms
      * of which frame timestamps are represented. For fixed-fps content,
      * timebase should be 1/framerate and timestamp increments should be
      * identical to 1. */
-    ost->st->time_base = (AVRational){ 1, 24/*qRound(settings.getFps())*/ };
+    ost->st->time_base = settings.getTimeBase();
     c->time_base       = ost->st->time_base;
 
     c->gop_size      = 12; /* emit one intra frame every twelve frames at most */
-    c->pix_fmt       = AV_PIX_FMT_YUV420P;//BGRA;
+    c->pix_fmt       = settings.getVideoPixelFormat();//BGRA;
     if(c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
         /* just for testing, we also add B-frames */
         c->max_b_frames = 2;
-    }
-    if(c->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
+    } else if(c->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
         /* Needed to avoid using macroblocks in which some coeffs overflow.
          * This does not happen with normal video, it just happens here as
          * the motion of the chroma plane does not match the luma plane. */
@@ -134,9 +122,8 @@ static void add_video_stream(OutputStream *ost,
 /* Prepare a dummy image. */
 static void copyImageToFrame(AVFrame *pict,
                            const sk_sp<SkImage> &skiaImg,
-                           int frame_index,
                            int width, int height) {
-    int i, ret;
+    int ret;
 
     /* when we pass a frame to the encoder, it may keep a reference to it
      * internally;
@@ -145,19 +132,18 @@ static void copyImageToFrame(AVFrame *pict,
     ret = av_frame_make_writable(pict);
     if(ret < 0) exit(1);
 
-    i = frame_index;
-
     SkPixmap pixmap;
     skiaImg->peekPixels(&pixmap);
 
     unsigned char *imgData = (unsigned char*)pixmap.writable_addr();
+    unsigned char *dstData = (unsigned char*)pict->data;
     int yi = 0;
     int xi = 0;
     for(int y = 0; y < height; y++) {
         for(int x = 0; x < width; x++) {
-            pict->data[0][y * pict->linesize[0] + x] = imgData[yi++];
-            //pict->data[xi++] = imgData[yi++];
-            //pict->data[xi++] = imgData[yi++];
+            dstData[xi++] = imgData[yi++];
+            dstData[xi++] = imgData[yi++];
+            dstData[xi++] = imgData[yi++];
             yi++;
             //pict->data[3][y * pict->linesize[3] + x] = imgData[yi++];
         }
@@ -196,13 +182,11 @@ static AVFrame *get_video_frame(OutputStream *ost,
         av_image_fill_linesizes(linesizesSk,
                                 AV_PIX_FMT_BGRA,
                                 image->width());
-
-        //copyImageToFrame(ost->tmp_frame, image, ost->next_pts, c->width, c->height);
         sws_scale(ost->sws_ctx, dstSk,
                   linesizesSk, 0, c->height, ost->frame->data,
                   ost->frame->linesize);
     } else {
-        copyImageToFrame(ost->frame, image, ost->next_pts, c->width, c->height);
+        copyImageToFrame(ost->frame, image, c->width, c->height);
     }
 
     ost->frame->pts = ost->next_pts++;
@@ -256,23 +240,23 @@ static int write_video_frame(AVFormatContext *oc,
 static void close_stream(AVFormatContext *oc, OutputStream *ost) {
     avcodec_free_context(&ost->enc);
     av_frame_free(&ost->frame);
-    av_frame_free(&ost->tmp_frame);
     sws_freeContext(ost->sws_ctx);
     avresample_free(&ost->avr);
 }
 
-static void add_audio_stream(OutputStream *ost, AVFormatContext *oc,
-                             enum AVCodecID codec_id) {
+static void add_audio_stream(OutputStream *ost,
+                             AVFormatContext *oc,
+                             const RenderInstanceSettings &settings) {
     AVCodecContext *c;
-    AVCodec *codec;
+    AVCodec *codec = settings.getAudioCodec();
     int ret;
 
-    /* find the audio encoder */
-    codec = avcodec_find_encoder(codec_id);
-    if (!codec) {
-        fprintf(stderr, "codec not found\n");
-        exit(1);
-    }
+//    /* find the audio encoder */
+//    codec = avcodec_find_encoder(codec_id);
+//    if (!codec) {
+//        fprintf(stderr, "codec not found\n");
+//        exit(1);
+//    }
 
     ost->st = avformat_new_stream(oc, NULL);
     if (!ost->st) {
@@ -288,11 +272,11 @@ static void add_audio_stream(OutputStream *ost, AVFormatContext *oc,
     ost->enc = c;
 
     /* put sample parameters */
-    c->sample_fmt     = codec->sample_fmts           ? codec->sample_fmts[0]           : AV_SAMPLE_FMT_S16;
-    c->sample_rate    = codec->supported_samplerates ? codec->supported_samplerates[0] : 44100;
-    c->channel_layout = codec->channel_layouts       ? codec->channel_layouts[0]       : AV_CH_LAYOUT_STEREO;
+    c->sample_fmt     = settings.getAudioSampleFormat();
+    c->sample_rate    = settings.getAudioSampleRate();
+    c->channel_layout = settings.getAudioChannelsLayout();
     c->channels       = av_get_channel_layout_nb_channels(c->channel_layout);
-    c->bit_rate       = 64000;
+    c->bit_rate       = settings.getAudioBitrate();
 
     ost->st->time_base = (AVRational){ 1, c->sample_rate };
 
@@ -311,7 +295,7 @@ static void add_audio_stream(OutputStream *ost, AVFormatContext *oc,
         exit(1);
     }
 
-    av_opt_set_int(ost->avr, "in_sample_fmt",      AV_SAMPLE_FMT_S16,   0);
+    av_opt_set_int(ost->avr, "in_sample_fmt",      AV_SAMPLE_FMT_S16,   0); // !!!
     av_opt_set_int(ost->avr, "in_sample_rate",     44100,               0);
     av_opt_set_int(ost->avr, "in_channel_layout",  AV_CH_LAYOUT_STEREO, 0);
     av_opt_set_int(ost->avr, "out_sample_fmt",     c->sample_fmt,       0);
@@ -379,7 +363,7 @@ static void open_audio(AVFormatContext *oc, OutputStream *ost) {
     ost->frame = alloc_audio_frame(c->sample_fmt, c->channel_layout,
                                    c->sample_rate, nb_samples);
     ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, AV_CH_LAYOUT_STEREO,
-                                       44100, nb_samples);
+                                       44100, nb_samples); // !!!
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
@@ -519,16 +503,21 @@ void VideoEncoder::startEncoding(const RenderInstanceSettings &settings) {
     mStartedEncoding = true;
     mEncodingInterrupted = false;
     mRenderInstanceSettings = settings;
+    mRenderInstanceSettings.updateRenderVars();
     mPathByteArray = mRenderInstanceSettings.getOutputDestination().toLatin1();
     // get format from audio file
-    mOutputFormat = av_guess_format(NULL, mPathByteArray.data(), NULL);
+
+    mOutputFormat = settings.getOutputFormat();
     if(mOutputFormat == NULL) {
-        fprintf(stderr, "Could not guess AVOutputFormat from file extension: using MPEG.\n");
-        mOutputFormat = av_guess_format("mpeg", NULL, NULL);
-    }
-    if(mOutputFormat == NULL) {
-        fprintf(stderr, "MPEG format not available.\n");
-        return;// -1;
+        mOutputFormat = av_guess_format(NULL, mPathByteArray.data(), NULL);
+        if(mOutputFormat == NULL) {
+            fprintf(stderr, "Could not guess AVOutputFormat from file extension: using MPEG.\n");
+            mOutputFormat = av_guess_format("mpeg", NULL, NULL);
+        }
+        if(mOutputFormat == NULL) {
+            fprintf(stderr, "MPEG format not available.\n");
+            return;// -1;
+        }
     }
     mFormatContext = avformat_alloc_context();
     if(!mFormatContext) {
@@ -544,16 +533,17 @@ void VideoEncoder::startEncoding(const RenderInstanceSettings &settings) {
     mEncodeAudio = 0;
     mVideoStream = { 0 };
     mAudioStream = { 0 };
-    if(mOutputFormat->video_codec != AV_CODEC_ID_NONE) {
+    if(settings.getVideoCodec() != NULL &&
+        settings.getVideoEnabled()) {
         add_video_stream(&mVideoStream, mFormatContext,
-                         mOutputFormat->video_codec,
                          mRenderInstanceSettings);
         mHaveVideo = 1;
         mEncodeVideo = 1;
     }
-    if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE && false) {
+    if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE  &&
+            settings.getAudioEnabled()) {
         add_audio_stream(&mAudioStream, mFormatContext,
-                         mOutputFormat->audio_codec);
+                         mRenderInstanceSettings);
         mHaveAudio = 1;
         mEncodeAudio = 1;
     }

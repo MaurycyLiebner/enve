@@ -1,6 +1,7 @@
 #include "renderinstancewidget.h"
 #include "global.h"
 #include <QFileDialog>
+#include "rendersettingsdialog.h"
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
@@ -66,12 +67,12 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     outputSettingsLayout->addWidget(outputSettingsLabel);
     outputSettingsLayout->addSpacing(MIN_WIDGET_HEIGHT);
 
-    QPushButton *outputSettingsButton = new QPushButton("Settings");
-    outputSettingsButton->setSizePolicy(QSizePolicy::Maximum,
+    mOutputSettingsButton = new QPushButton("Settings");
+    mOutputSettingsButton->setSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Minimum);
-    connect(outputSettingsButton, SIGNAL(pressed()),
+    connect(mOutputSettingsButton, SIGNAL(pressed()),
             this, SLOT(openOutputSettingsDialog()));
-    outputSettingsLayout->addWidget(outputSettingsButton);
+    outputSettingsLayout->addWidget(mOutputSettingsButton);
 
     outputSettingsLayout->addSpacing(6*MIN_WIDGET_HEIGHT);
 
@@ -120,13 +121,69 @@ RenderInstanceSettings *RenderInstanceWidget::getSettings() {
 }
 
 void RenderInstanceWidget::openOutputSettingsDialog() {
+    RenderSettingsDialog *dialog = new RenderSettingsDialog(*mSettings, this);
+    if(dialog->exec()) {
+        *mSettings = dialog->getSettings();
+        mOutputSettingsButton->setText(QString(mSettings->getVideoCodec()->name) +
+                                       " " + QString(av_get_pix_fmt_name(mSettings->getVideoPixelFormat())) +
+                                       " " + QString::number(mSettings->getVideoBitrate()/1000000.) + " Mbps");
+        updateOutputDestinationFromCurrentFormat();
+    }
+    delete dialog;
+}
 
+void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
+    QString outputDst = mSettings->getOutputDestination();
+    if(outputDst.isEmpty()) {
+        outputDst = QDir::homePath() + "/untitled";
+    }
+    AVOutputFormat *format = mSettings->getOutputFormat();
+    QString tmpStr = QString(format->extensions);
+    QStringList supportedExt = tmpStr.split(",");
+    QString fileName = outputDst.split("/").last();
+    QStringList dividedName = fileName.split(".");
+    QString currExt;
+    if(dividedName.count() > 1) {
+        QString namePart = dividedName.at(dividedName.count() - 2);
+        if(namePart.count() > 0) {
+            currExt = dividedName.last();
+        }
+    }
+    if(supportedExt.contains(currExt)) return;
+    if(!supportedExt.isEmpty()) {
+        QString firstSupported = supportedExt.first();
+        if(!firstSupported.isEmpty()) {
+            if(currExt.isEmpty()) {
+                if(outputDst.right(1) == ".") {
+                    outputDst = outputDst.left(outputDst.count() - 1);
+                }
+            } else {
+                int extId = outputDst.lastIndexOf("." + currExt);
+                outputDst.remove(extId, 1 + currExt.count());
+            }
+            outputDst += "." + firstSupported;
+            mSettings->setOutputDestination(outputDst);
+        }
+    }
+    mOutputDestinationButton->setText(outputDst);
 }
 
 void RenderInstanceWidget::openOutputDestinationDialog() {
+    QString supportedExts;
+    QString selectedExt;
+    AVOutputFormat *format = mSettings->getOutputFormat();
+    if(format != NULL) {
+        QString tmpStr = QString(format->extensions);
+        selectedExt = "." + tmpStr.split(",").first();
+        tmpStr.replace(",", " *.");
+        supportedExts = "Output File (*." + tmpStr + ")";
+    }
+    QString iniText = mSettings->getOutputDestination();
+    if(iniText.isEmpty()) iniText = QDir::homePath() + "/untitled" + selectedExt;
     QString saveAs = QFileDialog::getSaveFileName(this, "Output Destination",
-                               "untitled.png",
-                               "Output File (*.png)");
+                               iniText,
+                               supportedExts);
+    if(saveAs.isEmpty()) return;
     mSettings->setOutputDestination(saveAs);
     mOutputDestinationButton->setText(saveAs);
 }

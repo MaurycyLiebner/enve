@@ -18,11 +18,14 @@ public:
     RenderInstanceSettings *getSettings();
 private:
     QPushButton *mOutputDestinationButton;
+    QPushButton *mOutputSettingsButton;
     QLabel *mNameLabel;
     QVBoxLayout *mContentLayout = new QVBoxLayout();
     RenderInstanceSettings *mSettings;
 signals:
 
+protected:
+    void updateOutputDestinationFromCurrentFormat();
 private slots:
     void openOutputSettingsDialog();
     void openOutputDestinationDialog();

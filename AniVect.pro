@@ -202,7 +202,8 @@ SOURCES += main.cpp\
     Boxes/bone.cpp \
     valueinput.cpp \
     drawpath.cpp \
-    videoencoder.cpp
+    videoencoder.cpp \
+    RenderWidget/rendersettingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -364,7 +365,8 @@ HEADERS  += mainwindow.h \
     Boxes/bone.h \
     valueinput.h \
     drawpath.h \
-    videoencoder.h
+    videoencoder.h \
+    RenderWidget/rendersettingsdialog.h
 
 RESOURCES += \
     resources.qrc

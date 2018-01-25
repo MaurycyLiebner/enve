@@ -263,8 +263,6 @@ public:
         return this;
     }
 
-    bool isPreviewing() { return mPreviewing; }
-
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
                              const bool &);
@@ -434,10 +432,10 @@ public:
     }
 
     void setCurrentPreviewContainer(CacheContainer *cont);
-    void setRendering(const bool &bT);
+    void setRenderingPreview(const bool &bT);
 
     bool isPreviewingOrRendering() const {
-        return mPreviewing || mRendering;
+        return mPreviewing || mRenderingPreview || mRenderingOutput;
     }
     QPointF mapCanvasAbsToRel(const QPointF &pos);
     void applyDiscretePathEffectToSelected();
@@ -611,7 +609,8 @@ protected:
     VectorPathEdge *mCurrentEdge = NULL;
 
     bool mPreviewing = false;
-    bool mRendering = false;
+    bool mRenderingPreview = false;
+    bool mRenderingOutput = false;
 
     bool mCurrentPreviewContainerOutdated = false;
     std::shared_ptr<CacheContainer> mCurrentPreviewContainer;
