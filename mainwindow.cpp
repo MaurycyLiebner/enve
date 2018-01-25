@@ -24,6 +24,7 @@
 #include "global.h"
 #include "filesourcescache.h"
 #include "filesourcelist.h"
+#include "videoencoder.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -47,6 +48,7 @@ int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
+    mVideoEncoder = (new VideoEncoder())->ref<VideoEncoder>();
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_HEIGHT = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_HEIGHT*3/5;
@@ -1261,8 +1263,7 @@ void MainWindow::saveFileAs() {
     setFileChangedSinceSaving(false);
 }
 
-void MainWindow::saveBackup()
-{
+void MainWindow::saveBackup() {
     QString backupPath = "backup/backup_%1.av";
     int id = 1;
     QFile backupFile(backupPath.arg(id));

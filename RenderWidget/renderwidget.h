@@ -38,6 +38,7 @@ signals:
     void renderFromSettings(RenderInstanceSettings *);
 public slots:
     void render();
+    void stopRendering();
 };
 
 #endif // RENDERWIDGET_H

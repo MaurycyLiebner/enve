@@ -684,25 +684,14 @@ BoxesGroup *CanvasWindow::getCurrentGroup() {
     if(hasNoCanvas()) return NULL;
     return mCurrentCanvas->getCurrentBoxesGroup();
 }
-
-void CanvasWindow::renderOutput() {
-    QSize size = mCurrentCanvas->getCanvasSize();
-    RenderOutputWidget *dialog = new RenderOutputWidget(
-                                        size.width(),
-                                        size.height(),
-                                        MainWindow::getInstance());
-    connect(dialog, SIGNAL(renderOutput(QString, qreal)),
-            this, SLOT(saveOutput(QString, qreal)));
-    dialog->exec();
-}
-
+#include "videoencoder.h"
 void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
     mCurrentRenderSettings = settings;
+    VideoEncoder::startEncodingStatic(*settings);
     Canvas *canvas = settings->getTargetCanvas();
-    const QString &destination = settings->getOutputDestination();
     setCurrentCanvas(canvas);
     emit changeCurrentFrame(0);
-    saveOutput(destination, 1.);
+    saveOutput(1.);
 }
 
 void CanvasWindow::nextCurrentRenderFrame() {
@@ -952,21 +941,21 @@ void CanvasWindow::nextPreviewRenderFrame() {
 }
 
 void CanvasWindow::nextSaveOutputFrame() {
-    mCurrentCanvas->renderCurrentFrameToOutput(mOutputString);
-    if(mCurrentRenderFrame > mMaxRenderFrame) {
-        emit changeCurrentFrame(mSavedCurrentFrame);
+    mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
+    if(mCurrentRenderFrame >= mMaxRenderFrame) {
         mCurrentRenderSettings = NULL;
         mBoxesUpdateFinishedFunction = NULL;
         mFilesUpdateFinishedFunction = NULL;
         mCurrentCanvas->setOutputRendering(false);
         mCurrentCanvas->clearCurrentPreviewImage();
+        emit changeCurrentFrame(mSavedCurrentFrame);
         if(qAbs(mSavedResolutionFraction -
                 mCurrentCanvas->getResolutionFraction()) > 0.1) {
             mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
         }
+        VideoEncoder::finishEncodingStatic();
     } else {
-        mCurrentRenderSettings->setCurrentRenderFrame(
-                    mCurrentRenderFrame);
+        mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
         mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
         if(mNoBoxesAwaitUpdate) {
@@ -975,9 +964,7 @@ void CanvasWindow::nextSaveOutputFrame() {
     }
 }
 
-void CanvasWindow::saveOutput(const QString &renderDest,
-                              const qreal &resolutionFraction) {
-    mOutputString = renderDest;
+void CanvasWindow::saveOutput(const qreal &resolutionFraction) {
     mMaxRenderFrame = getMaxFrame();
     mBoxesUpdateFinishedFunction = &CanvasWindow::nextSaveOutputFrame;
     mSavedCurrentFrame = getCurrentFrame();

@@ -8,8 +8,7 @@
 #include <QComboBox>
 #include <QSpinBox>
 
-class RenderOutputWidget : public QDialog
-{
+class RenderOutputWidget : public QDialog {
     Q_OBJECT
 public:
     explicit RenderOutputWidget(const qreal &canvasWidth,

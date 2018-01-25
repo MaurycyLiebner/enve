@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT += multimedia core gui svg opengl sql xml concurrent #widgets-private # gui-private core-private
-LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -ltcmalloc
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc
 
 INCLUDEPATH += /home/ailuropoda/.skia/include/images/
 INCLUDEPATH += /home/ailuropoda/.skia/include/core/
@@ -201,7 +201,8 @@ SOURCES += main.cpp\
     windowsinglewidgettarget.cpp \
     Boxes/bone.cpp \
     valueinput.cpp \
-    drawpath.cpp
+    drawpath.cpp \
+    videoencoder.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -362,7 +363,8 @@ HEADERS  += mainwindow.h \
     windowsinglewidgettarget.h \
     Boxes/bone.h \
     valueinput.h \
-    drawpath.h
+    drawpath.h \
+    videoencoder.h
 
 RESOURCES += \
     resources.qrc

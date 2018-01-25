@@ -39,6 +39,8 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mStopRenderButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     mButtonsLayout->addWidget(mStopRenderButton, Qt::AlignRight);
     mButtonsLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
+    connect(mStopRenderButton, SIGNAL(pressed()),
+            this, SLOT(stopRendering()));
 
     mMainLayout->addLayout(mButtonsLayout);
 
@@ -89,4 +91,8 @@ void RenderWidget::render() {
         mCurrentRenderedSettings = settings;
         emit renderFromSettings(settings);
     }
+}
+#include "videoencoder.h"
+void RenderWidget::stopRendering() {
+    VideoEncoder::interruptEncodingStatic();
 }

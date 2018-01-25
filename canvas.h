@@ -194,7 +194,7 @@ public:
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal &percent);
 
-    void renderCurrentFrameToOutput(const QString &renderDest);
+    void renderCurrentFrameToOutput(const RenderInstanceSettings &renderDest);
 
     void applyCurrentTransformationToSelected();
     QPointF getSelectedPointsAbsPivotPos();

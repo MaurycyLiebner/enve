@@ -518,11 +518,16 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
 //}
 
 #include <QFile>
-void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
+#include "RenderWidget/renderinstancesettings.h"
+#include "videoencoder.h"
+void Canvas::renderCurrentFrameToOutput(const RenderInstanceSettings &renderDest) {
+    VideoEncoder::addImageToEncoderStatic(mCurrentPreviewContainer->getImageSk());
+//    m::addImageToEncoder();
+    return;
+    QString fileName = renderDest.getOutputDestination();
     SkData *data = mCurrentPreviewContainer->getImageSk()->
             encode(SkEncodedImageFormat::kPNG, 100);
     QFile file;
-    QString fileName = renderDest;
     fileName.remove(".png");
     fileName += QString::number(anim_mCurrentAbsFrame) + ".png";
     file.setFileName(fileName);

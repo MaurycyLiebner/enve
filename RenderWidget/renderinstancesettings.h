@@ -19,7 +19,7 @@ public:
         mOutputDestination = outputDestination;
     }
 
-    const QString &getOutputDestination() {
+    const QString &getOutputDestination() const {
         return mOutputDestination;
     }
 
@@ -55,7 +55,15 @@ public:
         return mCurrentRenderFrame;
     }
 
+    qreal getFps() const;
+
+    int getVideoWidth() const;
+    int getVideoHeight() const;
+    const int &getVideoBitrate() const {
+        return mBitrate;
+    }
 private:
+    int mBitrate = 400000;
     int mMinFrame = 0;
     int mMaxFrame = 0;
     int mCurrentRenderFrame = 0;

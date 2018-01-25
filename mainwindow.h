@@ -7,7 +7,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "undoredo.h"
-
+class VideoEncoder;
 enum ClipboardContainerType : short;
 
 class ClipboardContainer;
@@ -272,6 +272,8 @@ private:
     void setupMenuBar();
 
     QList<Gradient*> mLoadedGradientsList;
+
+    std::shared_ptr<VideoEncoder> mVideoEncoder;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *e);

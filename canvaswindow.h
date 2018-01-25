@@ -182,7 +182,6 @@ protected:
     QList<std::shared_ptr<Executable> > mUpdatablesAwaitingUpdate;
     QList<std::shared_ptr<Executable> > mFileUpdatablesAwaitingUpdate;
 
-    QString mOutputString;
     int mCurrentRenderFrame;
 
     bool mClearBeingUpdated = false;
@@ -282,7 +281,6 @@ public slots:
     void pausePreview();
     void resumePreview();
     void renderPreview();
-    void renderOutput();
     void renderFromSettings(RenderInstanceSettings *settings);
 
     void importFile();
@@ -312,8 +310,7 @@ private slots:
                                     Executable *lastUpdatable = NULL);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
-    void saveOutput(const QString &renderDest,
-                    const qreal &resolutionFraction);
+    void saveOutput(const qreal &resolutionFraction);
 
     void pushTimerExpired();
 };
