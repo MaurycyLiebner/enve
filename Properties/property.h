@@ -201,20 +201,23 @@ public slots:
 
     virtual void prp_updateAfterChangedRelFrameRange(const int &minFrame,
                                                      const int &maxFrame) {
-        int minFrameT;
-        if(minFrame == INT_MIN) {
-            minFrameT = minFrame;
-        } else {
-            minFrameT = prp_relFrameToAbsFrame(minFrame);
+        int minFrameT = minFrame;
+        int maxFrameT = maxFrame;
+
+        if(minFrameT != INT_MIN && minFrameT != INT_MAX) {
+            minFrameT = prp_relFrameToAbsFrame(minFrameT);
         }
-        int maxFrameT;
-        if(maxFrame == INT_MAX) {
-            maxFrameT = maxFrame;
-        } else {
-            maxFrameT = prp_relFrameToAbsFrame(maxFrame);
+        if(maxFrameT != INT_MAX && maxFrameT != INT_MIN) {
+            maxFrameT = prp_relFrameToAbsFrame(maxFrameT);
         }
-        prp_updateAfterChangedAbsFrameRange(minFrameT,
-                                            maxFrameT);
+
+        if(maxFrameT < minFrameT) {
+            prp_updateAfterChangedAbsFrameRange(maxFrameT,
+                                                minFrameT);
+        } else {
+            prp_updateAfterChangedAbsFrameRange(minFrameT,
+                                                maxFrameT);
+        }
     }
 
     virtual void prp_updateInfluenceRangeAfterChanged();

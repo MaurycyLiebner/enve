@@ -273,7 +273,7 @@ void RenderSettingsDialog::updateAvailableSampleRates() {
     if(currentCodec == NULL) return;
     const int *sampleRates = currentCodec->supported_samplerates;
     if(sampleRates == NULL) {
-        QList<int> ratesT = { 96000, 88200, 64000, 48000, 44000,
+        QList<int> ratesT = { 96000, 88200, 64000, 48000, 44100,
                               32000, 22050, 11025, 8000 };
         foreach(const int &rateT, ratesT) {
             mSampleRateComboBox->addItem(QString::number(rateT) + " Hz");
@@ -428,13 +428,14 @@ void RenderSettingsDialog::restoreInitialSettings() {
 
     int currentSampleRate = mInitialSettings.getAudioSampleRate();
     if(currentSampleRate <= 0) {
-        int i48000Id = mSampleFormatsComboBox->findText("48000 Hz");
+        int i48000Id = mSampleRateComboBox->findText("48000 Hz");
         if(i48000Id == -1) {
-            int i44000Id = mSampleFormatsComboBox->findText("44000 Hz");
-            if(i44000Id == -1) {
-                mSampleRateComboBox->setCurrentIndex(0);
+            int i44100Id = mSampleRateComboBox->findText("44100 Hz");
+            if(i44100Id == -1) {
+                int lastId = mSampleRateComboBox->count() - 1;
+                mSampleRateComboBox->setCurrentIndex(lastId);
             } else {
-                mSampleRateComboBox->setCurrentIndex(i44000Id);
+                mSampleRateComboBox->setCurrentIndex(i44100Id);
             }
         } else {
             mSampleRateComboBox->setCurrentIndex(i48000Id);
@@ -446,7 +447,13 @@ void RenderSettingsDialog::restoreInitialSettings() {
 
     int currentAudioBitrate = mInitialSettings.getAudioBitrate();
     if(currentAudioBitrate <= 0) {
-        mAudioBitrateComboBox->setCurrentIndex(0);
+        int i320Id = mAudioBitrateComboBox->findText("320 kbps");
+        if(i320Id == -1) {
+            int lastId = mAudioBitrateComboBox->count() - 1;
+            mAudioBitrateComboBox->setCurrentIndex(lastId);
+        } else {
+            mAudioBitrateComboBox->setCurrentIndex(i320Id);
+        }
     } else {
         QString currentAudioBitrateStr = QString::number(currentAudioBitrate/1000) + " kbps";
         mAudioBitrateComboBox->setCurrentText(currentAudioBitrateStr);
@@ -456,7 +463,8 @@ void RenderSettingsDialog::restoreInitialSettings() {
     if(currentChannelsLayout == 0) {
         mAudioChannelLayoutsComboBox->setCurrentIndex(0);
     } else {
-        QString currentChannelsLayoutStr = getChannelLayoutName(currentChannelsLayout);
+        QString currentChannelsLayoutStr =
+                getChannelLayoutName(currentChannelsLayout);
         if(currentChannelsLayoutStr == "Invalid") {
             mAudioChannelLayoutsComboBox->setCurrentIndex(0);
         } else {

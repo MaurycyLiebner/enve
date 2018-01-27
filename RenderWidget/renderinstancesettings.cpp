@@ -19,6 +19,6 @@ int RenderInstanceSettings::getVideoHeight() const {
 void RenderInstanceSettings::updateRenderVars() {
     mFps = mTargetCanvas->getFps();
     mTimeBase = { 1, qRound(mFps) };
-    mVideoWidth = mTargetCanvas->getCanvasHeight();
-    mVideoHeight = mTargetCanvas->getCanvasWidth();
+    mVideoWidth = mTargetCanvas->getCanvasWidth();
+    mVideoHeight = mTargetCanvas->getCanvasHeight();
 }

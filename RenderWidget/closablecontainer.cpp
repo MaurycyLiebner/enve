@@ -24,10 +24,10 @@ void ClosableContainer::setLabelWidget(QWidget *widget) {
     mContLayout->insertWidget(0, widget);
 }
 
-void ClosableContainer::setContentWidget(QWidget *widget) {
-    mContWidget = widget;
-    mContLayout->insertWidget(1, widget);
-    mContWidget->setVisible(mContentArrow->isChecked());
+void ClosableContainer::addContentWidget(QWidget *widget) {
+    mContWidgets << widget;
+    mContLayout->insertWidget(mContLayout->count(), widget);
+    widget->setVisible(mContentArrow->isChecked());
 }
 
 void ClosableContainer::setContentVisible(const bool &bT) {
@@ -36,7 +36,7 @@ void ClosableContainer::setContentVisible(const bool &bT) {
     } else {
         mContentArrow->setIcon(QIcon(":/icons/list_show_children.png"));
     }
-    if(mContWidget != NULL) {
-        mContWidget->setVisible(bT);
+    foreach(QWidget *widget, mContWidgets) {
+        widget->setVisible(bT);
     }
 }

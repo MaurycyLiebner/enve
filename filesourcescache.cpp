@@ -5,6 +5,7 @@
 #include "updatescheduler.h"
 #include "Boxes/boundingbox.h"
 #include "filesourcelist.h"
+#include "Boxes/videobox.h"
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
@@ -172,12 +173,15 @@ void VideoCacheHandler::beforeUpdate() {
     mFramesLoadScheduled.clear();
     mUpdateFilePath = mFilePath;
     qSort(mFramesBeingLoaded);
+    mUpdateFps = mFps;
+    mUpdateTimeBaseDen = mTimeBaseDen;
+    mUpdateTimeBaseNum = mTimeBaseNum;
 }
 
 void VideoCacheHandler::updateFrameCount() {
     QByteArray stringByteArray = mFilePath.toLatin1();
     const char *path = stringByteArray.constData();
-    AVFormatContext* format = avformat_alloc_context();
+    AVFormatContext *format = avformat_alloc_context();
     if (avformat_open_input(&format, path, NULL, NULL) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return;
@@ -193,9 +197,31 @@ void VideoCacheHandler::updateFrameCount() {
         const AVMediaType &mediaType = streamT->codecpar->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
             AVStream *vidStream = streamT;
-            mFps = (qreal)vidStream->avg_frame_rate.num/
-                        vidStream->avg_frame_rate.den;
-            mFramesCount = vidStream->nb_frames - 1;
+            mTimeBaseDen = vidStream->avg_frame_rate.den;
+            mTimeBaseNum = vidStream->avg_frame_rate.num;
+            if(mTimeBaseDen != 0) {
+                mFps = (qreal)mTimeBaseNum/mTimeBaseDen;
+            }
+            mFramesCount = vidStream->nb_frames;
+            // try something else if retrieving frame count failed
+            if(mFramesCount <= 0) {
+                if(vidStream->r_frame_rate.den &&
+                    vidStream->r_frame_rate.num) {
+                    mTimeBaseDen = vidStream->r_frame_rate.den;
+                    mTimeBaseNum = vidStream->r_frame_rate.num;
+                    if(mTimeBaseDen == 0) {
+                        mFramesCount = 0;
+                        break;
+                    } else {
+                        mFps = mTimeBaseNum/(qreal)mTimeBaseDen;
+                    }
+                    int64_t duration = format->duration + (format->duration <= INT64_MAX - 5000 ? 5000 : 0);
+                    mFramesCount = qFloor(duration*mFps/AV_TIME_BASE);
+                } else {
+                    mFramesCount = 0;
+                    break;
+                }
+            }
             break;
         }
     }
@@ -287,15 +313,16 @@ void VideoCacheHandler::processUpdate() {
 
     QElapsedTimer framesTimer;
     framesTimer.start();
+    int firstDts = 0;
+    if(videoStream->first_dts != AV_NOPTS_VALUE) {
+        firstDts = videoStream->first_dts;
+    }
+    bool frameReceived = false;
     foreach(const int &frameId, mFramesBeingLoaded) {
-        int tsms = qRound(frameId * 1000 /
-                          (double)videoStream->avg_frame_rate.num*
-                          videoStream->avg_frame_rate.den);
+        int tsms = qRound(frameId * 1000 / mUpdateFps);
 
         int64_t frame = av_rescale(tsms, videoStream->time_base.den,
-                                   videoStream->time_base.num);
-
-        frame /= 1000;
+                                   videoStream->time_base.num)/1000;
 
         if(frameId != 0) {
             if(avformat_seek_file(formatContext, videoStreamIndex, 0,
@@ -331,7 +358,7 @@ void VideoCacheHandler::processUpdate() {
                     av_packet_unref(packet);
                     continue;
                 }
-                if(frameId == 0) break;
+                //if(frameId == 0) break;
             } else {
                 break;
             }
@@ -340,6 +367,10 @@ void VideoCacheHandler::processUpdate() {
             pts = av_frame_get_best_effort_timestamp(decodedFrame);
             pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
             if(pts/1000 > tsms) {
+//                qDebug() << pts/1000 << tsms;
+//                qDebug() << "for" << frameId << "received" << pts*mUpdateFps/1000000;
+//                qDebug() << "seeked" << frame;
+                frameReceived = true;
                 break;
             }
             av_frame_unref(decodedFrame);
@@ -347,29 +378,33 @@ void VideoCacheHandler::processUpdate() {
 
     // SKIA
 
-        SkImageInfo info = SkImageInfo::Make(codecContext->width,
-                                             codecContext->height,
-                                             kBGRA_8888_SkColorType,
-                                             kPremul_SkAlphaType,
-                                             nullptr);
-        SkBitmap bitmap;
-        bitmap.allocPixels(info);
+        if(frameReceived) {
+            SkImageInfo info = SkImageInfo::Make(codecContext->width,
+                                                 codecContext->height,
+                                                 kBGRA_8888_SkColorType,
+                                                 kPremul_SkAlphaType,
+                                                 nullptr);
+            SkBitmap bitmap;
+            bitmap.allocPixels(info);
 
-        SkPixmap pixmap;
-        bitmap.peekPixels(&pixmap);
+            SkPixmap pixmap;
+            bitmap.peekPixels(&pixmap);
 
-        uint8_t *dstSk[] = {(unsigned char*)pixmap.writable_addr()};
-        int linesizesSk[4];
+            uint8_t *dstSk[] = {(unsigned char*)pixmap.writable_addr()};
+            int linesizesSk[4];
 
-        av_image_fill_linesizes(linesizesSk,
-                                AV_PIX_FMT_BGRA,
-                                decodedFrame->width);
+            av_image_fill_linesizes(linesizesSk,
+                                    AV_PIX_FMT_BGRA,
+                                    decodedFrame->width);
 
-        sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
-                  0, codecContext->height,
-                  dstSk, linesizesSk);
+            sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
+                      0, codecContext->height,
+                      dstSk, linesizesSk);
 
-        mLoadedFrames << SkImage::MakeFromBitmap(bitmap);
+            mLoadedFrames << SkImage::MakeFromBitmap(bitmap);
+        } else {
+            mLoadedFrames << sk_sp<SkImage>();
+        }
         av_frame_unref(decodedFrame);
         av_packet_unref(packet);
     // SKIA
@@ -396,10 +431,20 @@ void VideoCacheHandler::afterUpdate() {
     FileCacheHandler::afterUpdate();
 //    qDebug() << "loaded: " << mFramesBeingLoaded;
     for(int i = 0; i < mFramesBeingLoaded.count(); i++) {
-        CacheContainer *cont =
-                mFramesCache.createNewRenderContainerAtRelFrame(
-                    mFramesBeingLoaded.at(i));
-        cont->replaceImageSk(mLoadedFrames.at(i));
+        int frameId = mFramesBeingLoaded.at(i);
+        sk_sp<SkImage> imgT = mLoadedFrames.at(i);
+        if(imgT.get() == NULL) {
+            mFramesCount = frameId;
+            foreach(const BoundingBoxQWPtr &boxWPtr, mDependentBoxes) {
+                BoundingBox *box = boxWPtr.data();
+                if(box == NULL) continue;
+                ((VideoBox*)box)->updateDurationRectangleAnimationRange();
+            }
+        } else {
+            CacheContainer *cont =
+                    mFramesCache.createNewRenderContainerAtRelFrame(frameId);
+            cont->replaceImageSk(imgT);
+        }
     }
     mLoadedFrames.clear();
     mFramesBeingLoaded.clear();
@@ -414,6 +459,7 @@ void VideoCacheHandler::clearCache() {
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
 Updatable *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+    if(mFramesCount <= 0 || frame >= mFramesCount) return NULL;
     if(mFramesLoadScheduled.contains(frame) ||
        mFramesBeingLoadedGUI.contains(frame)) return this;
 //    qDebug() << "schedule frame load: " << frame;
@@ -469,7 +515,8 @@ Updatable *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
 bool isVideoExt(const QString &extension) {
     return extension == "avi" ||
            extension == "mp4" ||
-           extension == "mov";
+           extension == "mov"||
+           extension == "mkv";
 }
 
 bool isSoundExt(const QString &extension) {

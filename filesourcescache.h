@@ -134,7 +134,14 @@ protected:
     QList<int> mFramesBeingLoadedGUI;
     QList<int> mFramesBeingLoaded;
     QList<sk_sp<SkImage> > mLoadedFrames;
+
     qreal mFps = 24.;
+    int mTimeBaseDen = 1;
+    int mTimeBaseNum = 24;
+
+    qreal mUpdateFps = 24.;
+    int mUpdateTimeBaseDen = 1;
+    int mUpdateTimeBaseNum = 24;
 
     void updateFrameCount();
 

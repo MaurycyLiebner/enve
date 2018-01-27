@@ -30,40 +30,41 @@ static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt,
     ret = av_frame_get_buffer(picture, 32);
     if(ret < 0) {
         fprintf(stderr, "Could not allocate frame data.\n");
-        exit(1);
+        return NULL;
     }
 
     return picture;
 }
 
-static void open_video(AVFormatContext *oc, OutputStream *ost) {
+static bool open_video(AVCodec *codec, OutputStream *ost) {
     AVCodecContext *c;
     int ret;
 
     c = ost->enc;
 
     /* open the codec */
-    if(avcodec_open2(c, NULL, NULL) < 0) {
+    if(avcodec_open2(c, codec, NULL) < 0) {
        fprintf(stderr, "could not open codec\n");
-       exit(1);
+       return false;
     }
 
     /* Allocate the encoded raw picture. */
     ost->frame = alloc_picture(c->pix_fmt, c->width, c->height);
     if(!ost->frame) {
         fprintf(stderr, "Could not allocate picture\n");
-       exit(1);
+        return false;
     }
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0) {
         fprintf(stderr, "Could not copy the stream parameters\n");
-        exit(1);
+        return false;
     }
+    return true;
 }
 
-static void add_video_stream(OutputStream *ost,
+static bool add_video_stream(OutputStream *ost,
                              AVFormatContext *oc,
                              const RenderInstanceSettings &settings) {
     AVCodecContext *c;
@@ -74,20 +75,20 @@ static void add_video_stream(OutputStream *ost,
 //        codec = avcodec_find_encoder(codec_id);
 //        if(!codec) {
 //            fprintf(stderr, "codec not found\n");
-//            exit(1);
+//            return false;
 //        }
 //    }
 
     ost->st = avformat_new_stream(oc, NULL);
     if(!ost->st) {
         fprintf(stderr, "Could not alloc stream\n");
-        exit(1);
+        return false;
     }
 
     c = avcodec_alloc_context3(codec);
     if(!c) {
         fprintf(stderr, "Could not alloc an encoding context\n");
-        exit(1);
+        return false;
     }
     ost->enc = c;
 
@@ -117,12 +118,13 @@ static void add_video_stream(OutputStream *ost,
     /* Some formats want stream headers to be separate. */
     if(oc->oformat->flags & AVFMT_GLOBALHEADER)
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    return true;
 }
 
 /* Prepare a dummy image. */
-static void copyImageToFrame(AVFrame *pict,
-                           const sk_sp<SkImage> &skiaImg,
-                           int width, int height) {
+static bool copyImageToFrame(AVFrame *pict,
+                            const sk_sp<SkImage> &skiaImg,
+                            int width, int height) {
     int ret;
 
     /* when we pass a frame to the encoder, it may keep a reference to it
@@ -130,7 +132,7 @@ static void copyImageToFrame(AVFrame *pict,
      * make sure we do not overwrite it here
      */
     ret = av_frame_make_writable(pict);
-    if(ret < 0) exit(1);
+    if(ret < 0) return false;
 
     SkPixmap pixmap;
     skiaImg->peekPixels(&pixmap);
@@ -148,6 +150,7 @@ static void copyImageToFrame(AVFrame *pict,
             //pict->data[3][y * pict->linesize[3] + x] = imgData[yi++];
         }
     }
+    return true;
 }
 
 static AVFrame *get_video_frame(OutputStream *ost,
@@ -162,7 +165,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
     if(c->pix_fmt != AV_PIX_FMT_BGRA) {
         /* as we only generate a rgba picture, we must convert it
          * to the codec pixel format if needed */
-        if (!ost->sws_ctx) {
+        if(!ost->sws_ctx) {
             ost->sws_ctx = sws_getContext(c->width, c->height,
                                           AV_PIX_FMT_BGRA,
                                           c->width, c->height,
@@ -171,7 +174,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
             if (!ost->sws_ctx) {
                 fprintf(stderr,
                         "Cannot initialize the conversion context\n");
-                exit(1);
+                return NULL;
             }
         }
         SkPixmap pixmap;
@@ -182,11 +185,15 @@ static AVFrame *get_video_frame(OutputStream *ost,
         av_image_fill_linesizes(linesizesSk,
                                 AV_PIX_FMT_BGRA,
                                 image->width());
+        if(av_frame_make_writable(ost->frame) < 0) return NULL;
+
         sws_scale(ost->sws_ctx, dstSk,
                   linesizesSk, 0, c->height, ost->frame->data,
                   ost->frame->linesize);
     } else {
-        copyImageToFrame(ost->frame, image, c->width, c->height);
+        if(!copyImageToFrame(ost->frame, image, c->width, c->height)) {
+            return NULL;
+        }
     }
 
     ost->frame->pts = ost->next_pts++;
@@ -194,9 +201,10 @@ static AVFrame *get_video_frame(OutputStream *ost,
     return ost->frame;
 }
 
-static int write_video_frame(AVFormatContext *oc,
-                             OutputStream *ost,
-                             const sk_sp<SkImage> &image) {
+static bool write_video_frame(AVFormatContext *oc,
+                              OutputStream *ost,
+                              const sk_sp<SkImage> &image,
+                              int *encodeVideo) {
     int ret;
     AVCodecContext *c;
     AVFrame *frame;
@@ -207,12 +215,12 @@ static int write_video_frame(AVFormatContext *oc,
 
     /* encode the image */
     ret = avcodec_send_frame(c, frame);
-    if (ret < 0) {
+    if(ret < 0) {
         fprintf(stderr, "Error submitting a frame for encoding\n");
-        exit(1);
+        return false;
     }
 
-    while (ret >= 0) {
+    while(ret >= 0) {
         AVPacket pkt = { 0 };
 
         av_init_packet(&pkt);
@@ -220,7 +228,7 @@ static int write_video_frame(AVFormatContext *oc,
         ret = avcodec_receive_packet(c, &pkt);
         if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
             fprintf(stderr, "Error encoding a video frame\n");
-            exit(1);
+            return false;
         } else if (ret >= 0) {
             av_packet_rescale_ts(&pkt, c->time_base, ost->st->time_base);
             pkt.stream_index = ost->st->index;
@@ -229,22 +237,33 @@ static int write_video_frame(AVFormatContext *oc,
             ret = av_interleaved_write_frame(oc, &pkt);
             if (ret < 0) {
                 fprintf(stderr, "Error while writing video frame\n");
-                exit(1);
+                return false;
             }
         }
     }
 
-    return ret == AVERROR_EOF;
+    *encodeVideo = ret != AVERROR_EOF;
+    return true;
 }
 
 static void close_stream(AVFormatContext *oc, OutputStream *ost) {
-    avcodec_free_context(&ost->enc);
-    av_frame_free(&ost->frame);
-    sws_freeContext(ost->sws_ctx);
-    avresample_free(&ost->avr);
+    if(ost) {
+        if(ost->enc) {
+            avcodec_free_context(&ost->enc);
+        }
+        if(ost->frame) {
+            av_frame_free(&ost->frame);
+        }
+        if(ost->sws_ctx) {
+            sws_freeContext(ost->sws_ctx);
+        }
+        if(ost->avr) {
+            avresample_free(&ost->avr);
+        }
+    }
 }
 
-static void add_audio_stream(OutputStream *ost,
+static bool add_audio_stream(OutputStream *ost,
                              AVFormatContext *oc,
                              const RenderInstanceSettings &settings) {
     AVCodecContext *c;
@@ -255,19 +274,19 @@ static void add_audio_stream(OutputStream *ost,
 //    codec = avcodec_find_encoder(codec_id);
 //    if (!codec) {
 //        fprintf(stderr, "codec not found\n");
-//        exit(1);
+//        return false;
 //    }
 
     ost->st = avformat_new_stream(oc, NULL);
-    if (!ost->st) {
+    if(!ost->st) {
         fprintf(stderr, "Could not alloc stream\n");
-        exit(1);
+        return false;
     }
 
     c = avcodec_alloc_context3(codec);
     if (!c) {
         fprintf(stderr, "Could not alloc an encoding context\n");
-        exit(1);
+        return false;
     }
     ost->enc = c;
 
@@ -292,7 +311,7 @@ static void add_audio_stream(OutputStream *ost,
     ost->avr = avresample_alloc_context();
     if (!ost->avr) {
         fprintf(stderr, "Error allocating the resampling context\n");
-        exit(1);
+        return false;
     }
 
     av_opt_set_int(ost->avr, "in_sample_fmt",      AV_SAMPLE_FMT_S16,   0); // !!!
@@ -303,10 +322,11 @@ static void add_audio_stream(OutputStream *ost,
     av_opt_set_int(ost->avr, "out_channel_layout", c->channel_layout,   0);
 
     ret = avresample_open(ost->avr);
-    if (ret < 0) {
+    if(ret < 0) {
         fprintf(stderr, "Error opening the resampling context\n");
-        exit(1);
+        return false;
     }
+    return true;
 }
 
 static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
@@ -315,9 +335,9 @@ static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
     AVFrame *frame = av_frame_alloc();
     int ret;
 
-    if (!frame) {
+    if(!frame) {
         fprintf(stderr, "Error allocating an audio frame\n");
-        exit(1);
+        return NULL;
     }
 
     frame->format = sample_fmt;
@@ -329,23 +349,23 @@ static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
         ret = av_frame_get_buffer(frame, 0);
         if (ret < 0) {
             fprintf(stderr, "Error allocating an audio buffer\n");
-            exit(1);
+            return NULL;
         }
     }
 
     return frame;
 }
 
-static void open_audio(AVFormatContext *oc, OutputStream *ost) {
+static bool open_audio(AVCodec *codec, OutputStream *ost) {
     AVCodecContext *c;
     int nb_samples, ret;
 
     c = ost->enc;
 
     /* open it */
-    if(avcodec_open2(c, NULL, NULL) < 0) {
-        fprintf(stderr, "could not open codec\n");
-        exit(1);
+    if(avcodec_open2(c, codec, NULL) < 0) {
+        fprintf(stderr, "Ccould not open codec\n");
+        return false;
     }
 
     /* init signal generator */
@@ -362,15 +382,24 @@ static void open_audio(AVFormatContext *oc, OutputStream *ost) {
 
     ost->frame = alloc_audio_frame(c->sample_fmt, c->channel_layout,
                                    c->sample_rate, nb_samples);
+    if(ost->frame == NULL) {
+        fprintf(stderr, "Could not alloc audio frame\n");
+        return false;
+    }
     ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, AV_CH_LAYOUT_STEREO,
                                        44100, nb_samples); // !!!
+    if(ost->tmp_frame == NULL) {
+        fprintf(stderr, "Could not alloc temporary audio frame\n");
+        return false;
+    }
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if(ret < 0) {
         fprintf(stderr, "Could not copy the stream parameters\n");
-        exit(1);
+        return false;
     }
+    return true;
 }
 
 /* Prepare a 16 bit dummy audio frame of 'frame_size' samples and
@@ -401,15 +430,16 @@ static AVFrame *get_audio_frame(OutputStream *ost) {
 /* if a frame is provided, send it to the encoder, otherwise flush the encoder;
  * return 1 when encoding is finished, 0 otherwise
  */
-static int encode_audio_frame(AVFormatContext *oc,
-                              OutputStream *ost,
-                              AVFrame *frame) {
+static bool encode_audio_frame(AVFormatContext *oc,
+                               OutputStream *ost,
+                               AVFrame *frame,
+                               int *encodeAudio) {
     int ret;
 
     ret = avcodec_send_frame(ost->enc, frame);
     if(ret < 0) {
         fprintf(stderr, "Error submitting a frame for encoding\n");
-        exit(1);
+        return false;
     }
 
     while(ret >= 0) {
@@ -420,7 +450,7 @@ static int encode_audio_frame(AVFormatContext *oc,
         ret = avcodec_receive_packet(ost->enc, &pkt);
         if(ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
             fprintf(stderr, "Error encoding a video frame\n");
-            exit(1);
+            return false;
         } else if(ret >= 0) {
             av_packet_rescale_ts(&pkt, ost->enc->time_base, ost->st->time_base);
             pkt.stream_index = ost->st->index;
@@ -429,15 +459,18 @@ static int encode_audio_frame(AVFormatContext *oc,
             ret = av_interleaved_write_frame(oc, &pkt);
             if(ret < 0) {
                 fprintf(stderr, "Error while writing video frame\n");
-                exit(1);
+                return false;
             }
         }
     }
 
-    return ret == AVERROR_EOF;
+    *encodeAudio |= ret == AVERROR_EOF;
+    return true;
 }
 
-static int process_audio_stream(AVFormatContext *oc, OutputStream *ost) {
+static bool process_audio_stream(AVFormatContext *oc,
+                                 OutputStream *ost,
+                                 int *audioEnabled) {
     AVFrame *frame;
     int got_output = 0;
     int ret;
@@ -446,25 +479,24 @@ static int process_audio_stream(AVFormatContext *oc, OutputStream *ost) {
     got_output |= !!frame;
 
     /* feed the data to lavr */
-    if (frame) {
+    if(frame) {
         ret = avresample_convert(ost->avr, NULL, 0, 0,
                                  frame->extended_data, frame->linesize[0],
                                  frame->nb_samples);
         if (ret < 0) {
             fprintf(stderr, "Error feeding audio data to the resampler\n");
-            exit(1);
+            return false;
         }
     }
 
-    while ((frame && avresample_available(ost->avr) >= ost->frame->nb_samples) ||
-           (!frame && avresample_get_out_samples(ost->avr, 0))) {
+    while((frame && avresample_available(ost->avr) >= ost->frame->nb_samples) ||
+          (!frame && avresample_get_out_samples(ost->avr, 0))) {
         /* when we pass a frame to the encoder, it may keep a reference to it
          * internally;
          * make sure we do not overwrite it here
          */
         ret = av_frame_make_writable(ost->frame);
-        if (ret < 0)
-            exit(1);
+        if(ret < 0) return false;
 
         /* the difference between the two avresample calls here is that the
          * first one just reads the already converted data that is buffered in
@@ -481,10 +513,10 @@ static int process_audio_stream(AVFormatContext *oc, OutputStream *ost) {
 
         if (ret < 0) {
             fprintf(stderr, "Error while resampling\n");
-            exit(1);
+            return false;
         } else if (frame && ret != ost->frame->nb_samples) {
             fprintf(stderr, "Too few samples returned from lavr\n");
-            exit(1);
+            return false;
         }
 
         ost->frame->nb_samples = ret;
@@ -492,22 +524,16 @@ static int process_audio_stream(AVFormatContext *oc, OutputStream *ost) {
         ost->frame->pts        = ost->next_pts;
         ost->next_pts         += ost->frame->nb_samples;
 
-        got_output |= encode_audio_frame(oc, ost, ret ? ost->frame : NULL);
+        if(!encode_audio_frame(oc, ost, ret ? ost->frame : NULL, &got_output)) {
+            return false;
+        }
     }
 
-    return !got_output;
+    *audioEnabled = got_output;
+    return true;
 }
 
-void VideoEncoder::startEncoding(const RenderInstanceSettings &settings) {
-    if(mStartedEncoding) return;
-    mStartedEncoding = true;
-    mEncodingInterrupted = false;
-    mRenderInstanceSettings = settings;
-    mRenderInstanceSettings.updateRenderVars();
-    mPathByteArray = mRenderInstanceSettings.getOutputDestination().toLatin1();
-    // get format from audio file
-
-    mOutputFormat = settings.getOutputFormat();
+bool VideoEncoder::startEncodingNow() {
     if(mOutputFormat == NULL) {
         mOutputFormat = av_guess_format(NULL, mPathByteArray.data(), NULL);
         if(mOutputFormat == NULL) {
@@ -516,13 +542,13 @@ void VideoEncoder::startEncoding(const RenderInstanceSettings &settings) {
         }
         if(mOutputFormat == NULL) {
             fprintf(stderr, "MPEG format not available.\n");
-            return;// -1;
+            return false;
         }
     }
     mFormatContext = avformat_alloc_context();
     if(!mFormatContext) {
         fprintf(stderr, "Error allocating AVFormatContext\n");
-        return;// -1;
+        return false;
     }
     mFormatContext->oformat = mOutputFormat;
 
@@ -533,95 +559,179 @@ void VideoEncoder::startEncoding(const RenderInstanceSettings &settings) {
     mEncodeAudio = 0;
     mVideoStream = { 0 };
     mAudioStream = { 0 };
-    if(settings.getVideoCodec() != NULL &&
-        settings.getVideoEnabled()) {
-        add_video_stream(&mVideoStream, mFormatContext,
-                         mRenderInstanceSettings);
+    if(mRenderInstanceSettings.getVideoCodec() != NULL &&
+        mRenderInstanceSettings.getVideoEnabled()) {
+        if(!add_video_stream(&mVideoStream, mFormatContext,
+                             mRenderInstanceSettings)) {
+            return false;
+        }
         mHaveVideo = 1;
         mEncodeVideo = 1;
     }
     if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE  &&
-            settings.getAudioEnabled()) {
-        add_audio_stream(&mAudioStream, mFormatContext,
-                         mRenderInstanceSettings);
+            mRenderInstanceSettings.getAudioEnabled()) {
+        if(!add_audio_stream(&mAudioStream, mFormatContext,
+                             mRenderInstanceSettings)) {
+            return false;
+        }
         mHaveAudio = 1;
         mEncodeAudio = 1;
     }
     // open streams
-    if(mHaveVideo) open_video(mFormatContext, &mVideoStream);
-    if(mHaveAudio) open_video(mFormatContext, &mAudioStream);
+    if(mHaveVideo) {
+        if(!open_video(mRenderInstanceSettings.getVideoCodec(),
+                       &mVideoStream)) {
+            return false;
+        }
+    }
+    if(mHaveAudio) {
+        if(!open_audio(mRenderInstanceSettings.getAudioCodec(),
+                       &mAudioStream)) {
+            return false;
+        }
+    }
 
-    av_dump_format(mFormatContext, 0, mPathByteArray.data(), 1);
+    //av_dump_format(mFormatContext, 0, mPathByteArray.data(), 1);
     if(!(mOutputFormat->flags & AVFMT_NOFILE)) {
         if(avio_open(&mFormatContext->pb, mPathByteArray.data(), AVIO_FLAG_WRITE) < 0) {
             fprintf(stderr, "Could not open '%s'\n", mPathByteArray.data());
-            return; // -1;
+            return false;
         }
     }
 
     if(avformat_write_header(mFormatContext, NULL) < 0) {
         fprintf(stderr, "Could not open '%s'\n", mPathByteArray.data());
-        return; // -1;
+        return false;
+    }
+    return true;
+}
+
+void VideoEncoder::startEncoding(const RenderInstanceSettings &settings) {
+    if(mCurrentlyEncoding) return;
+    mRenderInstanceSettings = settings;
+    mRenderInstanceSettings.updateRenderVars();
+    mPathByteArray = mRenderInstanceSettings.getOutputDestination().toLatin1();
+    // get format from audio file
+
+    mOutputFormat = mRenderInstanceSettings.getOutputFormat();
+    if(startEncodingNow()) {
+        mCurrentlyEncoding = true;
+        mEmitter.encodingStarted();
+    } else {
+        mEmitter.encodingStartFailed();
     }
 }
 
+void VideoEncoder::interrupEncoding() {
+    finishEncodingNow();
+    mEmitter.encodingInterrupted();
+}
+
 void VideoEncoder::finishEncoding() {
-    if(!mStartedEncoding) return;
+    mEncodingSuccesfull = true;
+    finishEncodingNow();
+    mEmitter.encodingFinished();
+}
+
+void VideoEncoder::finishEncodingNow() {
+    if(!mCurrentlyEncoding) return;
 
     /* Write the trailer, if any. The trailer must be written before you
      * close the CodecContexts open when you wrote the header; otherwise
      * av_write_trailer() may try to use memory that was freed on
      * av_codec_close(). */
-    av_write_trailer(mFormatContext);
+    if(mEncodingSuccesfull) {
+        av_write_trailer(mFormatContext);
+    }
 
     /* Close each codec. */
     if(mHaveVideo) close_stream(mFormatContext, &mVideoStream);
     if(mHaveAudio) close_stream(mFormatContext, &mAudioStream);
 
-
-    if(!(mOutputFormat->flags & AVFMT_NOFILE)) avio_close(mFormatContext->pb);
-    avformat_free_context(mFormatContext);
+    if(mOutputFormat) {
+        if(!(mOutputFormat->flags & AVFMT_NOFILE)) {
+            avio_close(mFormatContext->pb);
+        }
+    } else if(mFormatContext) {
+        avio_close(mFormatContext->pb);
+    }
+    if(mFormatContext) {
+        avformat_free_context(mFormatContext);
+    }
 
     mEncodeAudio = false;
     mEncodeVideo = false;
-    mStartedEncoding = false;
+    mCurrentlyEncoding = false;
+    mEncodingSuccesfull = false;
     mImages.clear();
+    mUpdateImages.clear();
 }
 
 void VideoEncoder::processUpdate() {
-    bool encodeVideoT = true; // local encode
+    bool encodeVideoT = !mUpdateImages.isEmpty(); // local encode
     bool encodeAudioT = true; // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
-        if(mEncodeVideo && encodeVideoT &&
-           (!mEncodeAudio || av_compare_ts(mVideoStream.next_pts, mVideoStream.enc->time_base,
-                                           mAudioStream.next_pts, mAudioStream.enc->time_base) <= 0)) {
-            mEncodeVideo = !write_video_frame(mFormatContext, &mVideoStream,
-                                              mUpdateImages.takeFirst());
+        bool avAligned = true;
+        if(mEncodeAudio) {
+            avAligned = av_compare_ts(mVideoStream.next_pts,
+                                    mVideoStream.enc->time_base,
+                                    mAudioStream.next_pts,
+                                    mAudioStream.enc->time_base) <= 0;
+        }
+        if(mEncodeVideo && encodeVideoT && avAligned) {
+            if(!write_video_frame(mFormatContext, &mVideoStream,
+                                  mUpdateImages.takeFirst(),
+                                  &mEncodeVideo) ) {
+                mUpdateFailed = true;
+                return;
+            }
             encodeVideoT = !mUpdateImages.isEmpty();
-        } else {
-            mEncodeAudio = !process_audio_stream(mFormatContext, &mAudioStream);
+        } else if(mEncodeAudio) {
+            if(process_audio_stream(mFormatContext, &mAudioStream,
+                                    &mEncodeAudio)) {
+                mUpdateFailed = true;
+                return;
+            }
         }
     }
 }
 
 void VideoEncoder::beforeUpdate() {
     Updatable::beforeUpdate();
-    mUpdateImages = mImages;
+    if(mCurrentlyEncoding) {
+        mUpdateImages.append(mImages);
+    } else {
+        mUpdateImages.clear();
+    }
     mImages.clear();
 }
 
 void VideoEncoder::afterUpdate() {
-    if(mEncodingFinished || (!mEncodeAudio && !mEncodeVideo)) {
-        finishEncoding();
-    }
-    if(mEncodingInterrupted) {
-        finishEncoding();
+    if(mEncodingFinished ||
+       mEncodingInterrupted ||
+       mUpdateFailed ||
+       (!mEncodeAudio && !mEncodeVideo)) {
+        if(mEncodingInterrupted) {
+            interrupEncoding();
+            mEncodingInterrupted = false;
+        } else if(mUpdateFailed) {
+            finishEncodingNow();
+            mEmitter.encodingFailed();
+            mUpdateFailed = false;
+        } else {
+            finishEncoding();
+            mEncodingFinished = false;
+        }
         if(mNewEncodingPlanned) {
             mNewEncodingPlanned = false;
             startEncoding(mWaitingRenderInstanceSettings);
         }
     }
     Updatable::afterUpdate();
+}
+
+VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {
+    return mVideoEncoderInstance->getEmitter();
 }
 
 void VideoEncoder::finishEncodingStatic() {

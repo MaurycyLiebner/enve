@@ -10,12 +10,12 @@ public:
     explicit ClosableContainer(QWidget *parent = nullptr);
 
     void setLabelWidget(QWidget *widget);
-    void setContentWidget(QWidget *widget);
+    void addContentWidget(QWidget *widget);
 protected:
     QHBoxLayout *mMainLayout = new QHBoxLayout();
     QVBoxLayout *mContLayout = new QVBoxLayout();
     QWidget *mLabelWidget = NULL;
-    QWidget *mContWidget = NULL;
+    QList<QWidget*> mContWidgets;
     QPushButton *mContentArrow = new QPushButton();
 signals:
 

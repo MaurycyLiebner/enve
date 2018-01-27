@@ -23,7 +23,7 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     QWidget *contWid = new QWidget(this);
     contWid->setLayout(mContentLayout);
     contWid->setStyleSheet("QWidget { background: rgb(45, 45, 45); }");
-    setContentWidget(contWid);
+    addContentWidget(contWid);
 
     ClosableContainer *renderSettings = new ClosableContainer();
 
@@ -51,7 +51,25 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
 
     mContentLayout->addWidget(renderSettings);
 
-    ClosableContainer *outputSettings = new ClosableContainer();
+    mOutputSettings = new ClosableContainer();
+    mOutputFormatLabel = new QLabel("Format:", this);
+    mVideoCodecLabel = new QLabel("Video codec:", this);
+    mVideoPixelFormatLabel = new QLabel("Pixel format:", this);
+    mVideoBitrateLabel = new QLabel("Video bitrate:", this);
+    mAudioCodecLabel = new QLabel("Audio codec:", this);
+    mAudioSampleRateLabel = new QLabel("Audio sample rate:", this);
+    mAudioSampleFormatLabel = new QLabel("Audio sample format:", this);
+    mAudioBitrateLabel = new QLabel("Audio bitrate:", this);
+    mAudioChannelLayoutLabel = new QLabel("Audio channel layout:", this);
+    mOutputSettings->addContentWidget(mOutputFormatLabel);
+    mOutputSettings->addContentWidget(mVideoCodecLabel);
+    mOutputSettings->addContentWidget(mVideoPixelFormatLabel);
+    mOutputSettings->addContentWidget(mVideoBitrateLabel);
+    mOutputSettings->addContentWidget(mAudioCodecLabel);
+    mOutputSettings->addContentWidget(mAudioSampleRateLabel);
+    mOutputSettings->addContentWidget(mAudioSampleFormatLabel);
+    mOutputSettings->addContentWidget(mAudioBitrateLabel);
+    mOutputSettings->addContentWidget(mAudioChannelLayoutLabel);
 
     QWidget *outputSettingsLabelWidget = new QWidget();
     QHBoxLayout *outputSettingsLayout = new QHBoxLayout();
@@ -93,9 +111,9 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
 
     outputSettingsLabelWidget->setLayout(outputSettingsLayout);
 
-    outputSettings->setLabelWidget(outputSettingsLabelWidget);
+    mOutputSettings->setLabelWidget(outputSettingsLabelWidget);
 
-    mContentLayout->addWidget(outputSettings);
+    mContentLayout->addWidget(mOutputSettings);
 
     mContentLayout->setMargin(0);
     mContentLayout->setSpacing(0);
@@ -124,9 +142,7 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
     RenderSettingsDialog *dialog = new RenderSettingsDialog(*mSettings, this);
     if(dialog->exec()) {
         *mSettings = dialog->getSettings();
-        mOutputSettingsButton->setText(QString(mSettings->getVideoCodec()->name) +
-                                       " " + QString(av_get_pix_fmt_name(mSettings->getVideoPixelFormat())) +
-                                       " " + QString::number(mSettings->getVideoBitrate()/1000000.) + " Mbps");
+        mOutputSettingsButton->setText(QString(mSettings->getOutputFormat()->long_name));
         updateOutputDestinationFromCurrentFormat();
     }
     delete dialog;

@@ -17,6 +17,17 @@ public:
     void updateFromSettings();
     RenderInstanceSettings *getSettings();
 private:
+    ClosableContainer *mOutputSettings;
+    QLabel *mOutputFormatLabel;
+    QLabel *mVideoCodecLabel;
+    QLabel *mVideoPixelFormatLabel;
+    QLabel *mVideoBitrateLabel;
+    QLabel *mAudioCodecLabel;
+    QLabel *mAudioSampleRateLabel;
+    QLabel *mAudioSampleFormatLabel;
+    QLabel *mAudioBitrateLabel;
+    QLabel *mAudioChannelLayoutLabel;
+
     QPushButton *mOutputDestinationButton;
     QPushButton *mOutputSettingsButton;
     QLabel *mNameLabel;

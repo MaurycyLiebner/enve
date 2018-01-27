@@ -17,29 +17,42 @@ extern "C" {
 }
 
 typedef struct OutputStream {
-    AVStream *st;
-    AVCodecContext *enc;
+    AVStream *st = NULL;
+    AVCodecContext *enc = NULL;
 
     /* pts of the next frame that will be generated */
     int64_t next_pts;
 
-    AVFrame *frame;
-    AVFrame *tmp_frame;
+    AVFrame *frame = NULL;
+    AVFrame *tmp_frame = NULL;
 
     float t, tincr, tincr2;
 
-    struct SwsContext *sws_ctx;
-    AVAudioResampleContext *avr;
+    struct SwsContext *sws_ctx = NULL;
+    AVAudioResampleContext *avr = NULL;
 } OutputStream;
+
+class VideoEncoderEmitter : public QObject {
+    Q_OBJECT
+public:
+    VideoEncoderEmitter() {}
+signals:
+    void encodingStarted();
+    void encodingFinished();
+    void encodingInterrupted();
+
+    void encodingStartFailed();
+    void encodingFailed();
+};
 
 class VideoEncoder : public Updatable {
 public:
     VideoEncoder();
 
     void startNewEncoding(const RenderInstanceSettings &settings) {
-        if(mStartedEncoding) {
+        if(mCurrentlyEncoding) {
             interruptCurrentEncoding();
-            if(!mStartedEncoding) {
+            if(!mCurrentlyEncoding) {
                 startEncoding(settings);
                 return;
             }
@@ -52,7 +65,7 @@ public:
 
     void interruptCurrentEncoding() {
         if(!mBeingProcessed && !mSchedulerAdded && !mAwaitingUpdate) {
-            finishEncoding();
+            interrupEncoding();
         } else {
             mEncodingInterrupted = true;
         }
@@ -72,14 +85,27 @@ public:
     void afterUpdate();
 
     static VideoEncoder *mVideoEncoderInstance;
+    static VideoEncoderEmitter *getVideoEncoderEmitter();
+
     static void interruptEncodingStatic();
     static void startEncodingStatic(const RenderInstanceSettings &settings);
     static void addImageToEncoderStatic(const sk_sp<SkImage> &img);
     static void finishEncodingStatic();
-protected:
-    void finishEncoding();
-    void startEncoding(const RenderInstanceSettings &settings);
 
+    bool shouldUpdate() { return !mAwaitingUpdate && mCurrentlyEncoding; }
+
+    VideoEncoderEmitter *getEmitter() {
+        return &mEmitter;
+    }
+protected:
+    VideoEncoderEmitter mEmitter;
+    void interrupEncoding();
+    void finishEncoding();
+    void finishEncodingNow();
+    void startEncoding(const RenderInstanceSettings &settings);
+    bool startEncodingNow();
+
+    bool mEncodingSuccesfull = false;
     bool mEncodingFinished = false;
     bool mNewEncodingPlanned = false;
     RenderInstanceSettings mWaitingRenderInstanceSettings;
@@ -89,7 +115,7 @@ protected:
     OutputStream mAudioStream;
     AVFormatContext *mFormatContext = NULL;
     AVOutputFormat *mOutputFormat = NULL;
-    bool mStartedEncoding = false;
+    bool mCurrentlyEncoding = false;
     QList<sk_sp<SkImage> > mImages;
     RenderInstanceSettings mRenderInstanceSettings;
     QByteArray mPathByteArray;
@@ -98,6 +124,7 @@ protected:
     int mEncodeVideo = 0;
     int mEncodeAudio = 0;
 
+    bool mUpdateFailed = false;
     QList<sk_sp<SkImage> > mUpdateImages;
 };
 
