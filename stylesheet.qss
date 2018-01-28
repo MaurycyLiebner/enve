@@ -10,6 +10,14 @@ QMainWindow::separator {
     height: 8px;
 }
 
+QCheckBox {
+    color: black;
+}
+
+QCheckBox::indicator {
+    background: none;
+}
+
 QComboBox {
     background-color: rgb(200, 200, 200);
     border: 1px solid black;
@@ -221,6 +229,15 @@ QPushButton:checked {
     color: white;
 }
 
+QPushButton:disabled {
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(160, 160, 160),
+        stop:0.5 rgb(148, 148, 148));
+    color: rgb(65, 65, 65);
+}
+
+
 QPushButton#middleButton, QPushButton#rightButton, QPushButton#leftButton {
     color: white;
     background: qlineargradient(x1:0, y1:0,
@@ -253,6 +270,16 @@ QPushButton#leftButton:checked {
         stop:0 rgb(85, 175, 235),
         stop:0.5 rgb(60, 150, 200));
     color: black;
+}
+
+QPushButton#renderSettings {
+    color: lightblue;
+    background: transparent;
+    border: 0;
+}
+
+QPushButton#renderSettings:hover {
+    text-decoration: underline;
 }
 
 QToolBar {

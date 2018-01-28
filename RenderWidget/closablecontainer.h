@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QPushButton>
+class QCheckBox;
 
 class ClosableContainer : public QWidget {
     Q_OBJECT
@@ -11,7 +12,11 @@ public:
 
     void setLabelWidget(QWidget *widget);
     void addContentWidget(QWidget *widget);
+    void setCheckable(const bool &check);
+    void setChecked(const bool &check);
+    bool isChecked();
 protected:
+    QCheckBox *mCheckBox = NULL;
     QHBoxLayout *mMainLayout = new QHBoxLayout();
     QVBoxLayout *mContLayout = new QVBoxLayout();
     QWidget *mLabelWidget = NULL;

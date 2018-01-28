@@ -3,6 +3,7 @@
 #include "global.h"
 #include "renderinstancewidget.h"
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "videoencoder.h"
 
 RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mMainLayout = new QVBoxLayout(this);
@@ -58,6 +59,30 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     mMainLayout->addWidget(mScrollArea);
+
+    VideoEncoderEmitter *vidEmitter = VideoEncoder::getVideoEncoderEmitter();
+    connect(vidEmitter, &VideoEncoderEmitter::encodingStarted,
+            this, &RenderWidget::leaveOnlyInterruptionButtonsEnabled);
+
+    connect(vidEmitter, &VideoEncoderEmitter::encodingFinished,
+            this, &RenderWidget::leaveOnlyStartRenderButtonEnabled);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingFinished,
+            this, &RenderWidget::sendNextForRender);
+
+    connect(vidEmitter, &VideoEncoderEmitter::encodingInterrupted,
+            this, &RenderWidget::clearAwaitingRender);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingInterrupted,
+            this, &RenderWidget::leaveOnlyStartRenderButtonEnabled);
+
+    connect(vidEmitter, &VideoEncoderEmitter::encodingFailed,
+            this, &RenderWidget::leaveOnlyStartRenderButtonEnabled);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingFailed,
+            this, &RenderWidget::sendNextForRender);
+
+    connect(vidEmitter, &VideoEncoderEmitter::encodingStartFailed,
+            this, &RenderWidget::leaveOnlyStartRenderButtonEnabled);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingStartFailed,
+            this, &RenderWidget::sendNextForRender);
 }
 
 void RenderWidget::createNewRenderInstanceWidgetForCanvas(Canvas *canvas) {
@@ -81,18 +106,76 @@ void RenderWidget::setRenderedFrame(const int &frame) {
     mRenderProgressBar->setValue(frame);
 }
 
+void RenderWidget::render(RenderInstanceSettings *settings) {
+    mRenderProgressBar->setRange(settings->getMinFrame(),
+                                 settings->getMaxFrame());
+    mRenderProgressBar->setValue(settings->getMinFrame());
+    mCurrentRenderedSettings = settings;
+    emit renderFromSettings(settings);
+}
+
+void RenderWidget::leaveOnlyInterruptionButtonsEnabled() {
+    mStartRenderButton->setDisabled(true);
+    mPauseRenderButton->setEnabled(true);
+    mStopRenderButton->setEnabled(true);
+}
+
+void RenderWidget::leaveOnlyStartRenderButtonEnabled() {
+    mStartRenderButton->setEnabled(true);
+    mPauseRenderButton->setDisabled(true);
+    mStopRenderButton->setDisabled(true);
+}
+
+void RenderWidget::disableButtons() {
+    mStartRenderButton->setDisabled(true);
+    mPauseRenderButton->setDisabled(true);
+    mStopRenderButton->setDisabled(true);
+}
+
+void RenderWidget::enableButtons() {
+    mStartRenderButton->setEnabled(true);
+    mPauseRenderButton->setEnabled(true);
+    mStopRenderButton->setEnabled(true);
+}
+
 void RenderWidget::render() {
+    RenderInstanceWidget *firstWid = NULL;
     foreach(RenderInstanceWidget *wid, mRenderInstanceWidgets) {
-        //if
-        RenderInstanceSettings *settings = wid->getSettings();
-        mRenderProgressBar->setRange(settings->minFrame(),
-                                     settings->maxFrame());
-        mRenderProgressBar->setValue(settings->minFrame());
-        mCurrentRenderedSettings = settings;
-        emit renderFromSettings(settings);
+        if(!wid->isChecked()) continue;
+        if(firstWid == NULL) {
+            firstWid = wid;
+        } else {
+            mAwaitingSettings << wid;
+            wid->getSettings()->setCurrentState(RenderInstanceSettings::WAITING);
+        }
+    }
+    if(firstWid != NULL) {
+        disableButtons();
+        firstWid->setDisabled(true);
+        render(firstWid->getSettings());
     }
 }
 #include "videoencoder.h"
 void RenderWidget::stopRendering() {
+    disableButtons();
+    clearAwaitingRender();
     VideoEncoder::interruptEncodingStatic();
+}
+
+void RenderWidget::clearAwaitingRender() {
+    foreach(RenderInstanceWidget *wid, mAwaitingSettings) {
+        wid->getSettings()->setCurrentState(RenderInstanceSettings::NONE);
+    }
+    mAwaitingSettings.clear();
+}
+
+void RenderWidget::sendNextForRender() {
+    if(mAwaitingSettings.isEmpty()) return;
+    RenderInstanceWidget *wid = mAwaitingSettings.takeFirst();
+    if(wid->isChecked()) {
+        wid->setDisabled(true);
+        render(wid->getSettings());
+    } else {
+        sendNextForRender();
+    }
 }

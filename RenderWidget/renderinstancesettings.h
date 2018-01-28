@@ -12,10 +12,18 @@ extern "C" {
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
-
+class RenderInstanceWidget;
 
 class RenderInstanceSettings {
 public:
+    enum RenderState {
+        NONE,
+        ERROR,
+        FINISHED,
+        RENDERING,
+        PAUSED,
+        WAITING
+    };
     RenderInstanceSettings();
 
     const QString &getName() {
@@ -46,11 +54,11 @@ public:
         mCurrentRenderFrame = currentRenderFrame;
     }
 
-    const int &minFrame() const {
+    const int &getMinFrame() const {
         return mMinFrame;
     }
 
-    const int &maxFrame() const {
+    const int &getMaxFrame() const {
         return mMaxFrame;
     }
 
@@ -142,7 +150,7 @@ public:
         return mAudioEnabled;
     }
 
-    void updateRenderVars();
+    void renderingAboutToStart();
 
     AVRational getTimeBase() const {
         return mTimeBase;
@@ -163,7 +171,32 @@ public:
     void setAudioChannelsLayout(const uint64_t &layout) {
         mAudioChannelsLayout = layout;
     }
+
+    void setCurrentState(const RenderState &state,
+                         const QString &text = "");
+
+    const QString &getRenderError() const {
+        return mRenderError;
+    }
+
+    const RenderState &getCurrentState() const {
+        return mState;
+    }
+
+    void setParentWidget(RenderInstanceWidget *wid) {
+        mParentWidget = wid;
+    }
+
+    const qreal &getRenderResolution() const {
+        return mResolution;
+    }
 private:
+    void updateParentWidget();
+
+    RenderInstanceWidget *mParentWidget = NULL;
+
+    qreal mResolution = 1.;
+    RenderState mState = NONE;
     qreal mFps = 24.;
     AVRational mTimeBase = { 1, 24 }; // inverse of fps - 1/fps
     int mVideoWidth = 0;
@@ -191,6 +224,8 @@ private:
     uint64_t mAudioChannelsLayout = 0;
 
     QString mOutputDestination;
+
+    QString mRenderError;
 };
 
 #endif // RENDERINSTANCESETTINGS_H

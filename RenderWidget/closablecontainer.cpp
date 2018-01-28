@@ -1,5 +1,6 @@
 #include "closablecontainer.h"
 #include "global.h"
+#include <QCheckBox>
 
 ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {
     setLayout(mMainLayout);
@@ -28,6 +29,34 @@ void ClosableContainer::addContentWidget(QWidget *widget) {
     mContWidgets << widget;
     mContLayout->insertWidget(mContLayout->count(), widget);
     widget->setVisible(mContentArrow->isChecked());
+}
+
+void ClosableContainer::setCheckable(const bool &check) {
+    if(check == (mCheckBox != NULL)) return;
+    if(check) {
+        mCheckBox = new QCheckBox(this);
+        mCheckBox->setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+        mMainLayout->insertWidget(0, mCheckBox, Qt::AlignTop);
+        mMainLayout->setAlignment(mCheckBox, Qt::AlignTop);
+        mCheckBox->setStyleSheet("QWidget {"
+                                    "background-color: none;"
+                                 "}");
+        mCheckBox->setChecked(true);
+    } else {
+        delete mCheckBox;
+        mCheckBox = NULL;
+    }
+}
+
+void ClosableContainer::setChecked(const bool &check) {
+    if(mCheckBox == NULL) return;
+    if(mCheckBox->isChecked() == check) return;
+    mCheckBox->setChecked(true);
+}
+
+bool ClosableContainer::isChecked() {
+    if(mCheckBox == NULL) return true;
+    return mCheckBox->isChecked();
 }
 
 void ClosableContainer::setContentVisible(const bool &bT) {

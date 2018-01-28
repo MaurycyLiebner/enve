@@ -18,6 +18,7 @@
 #include "filesourcescache.h"
 #include <QFileDialog>
 #include "windowsinglewidgettarget.h"
+#include "videoencoder.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     mWindowSWTTarget = new WindowSingleWidgetTarget(this);
@@ -63,6 +64,19 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mCanvasWidget->setSizePolicy(QSizePolicy::Minimum,
                                  QSizePolicy::Minimum);
     mCanvasWidget->setMouseTracking(true);
+
+
+    VideoEncoderEmitter *vidEmitter = VideoEncoder::getVideoEncoderEmitter();
+//    connect(vidEmitter, &VideoEncoderEmitter::encodingStarted,
+//            this, &CanvasWindow::leaveOnlyInterruptionButtonsEnabled);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingFinished,
+            this, &CanvasWindow::interruptOutputRendering);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingInterrupted,
+            this, &CanvasWindow::interruptOutputRendering);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingFailed,
+            this, &CanvasWindow::interruptOutputRendering);
+    connect(vidEmitter, &VideoEncoderEmitter::encodingStartFailed,
+            this, &CanvasWindow::interruptOutputRendering);
 }
 
 CanvasWindow::~CanvasWindow() {
@@ -686,12 +700,32 @@ BoxesGroup *CanvasWindow::getCurrentGroup() {
 }
 #include "videoencoder.h"
 void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
-    mCurrentRenderSettings = settings;
-    VideoEncoder::startEncodingStatic(*settings);
-    Canvas *canvas = settings->getTargetCanvas();
-    setCurrentCanvas(canvas);
-    emit changeCurrentFrame(0);
-    saveOutput(1.);
+    VideoEncoder::startEncodingStatic(settings);
+    if(VideoEncoder::encodingSuccessfulyStartedStatic()) {
+        mSavedCurrentFrame = getCurrentFrame();
+        mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
+
+        mCurrentRenderSettings = settings;
+        Canvas *canvas = settings->getTargetCanvas();
+        setCurrentCanvas(canvas);
+        emit changeCurrentFrame(settings->getMinFrame());
+
+        qreal resolutionFraction = settings->getRenderResolution();
+        mMaxRenderFrame = settings->getMaxFrame();
+        mBoxesUpdateFinishedFunction = &CanvasWindow::nextSaveOutputFrame;
+        mCurrentCanvas->fitCanvasToSize();
+        if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.00001) {
+            mCurrentCanvas->setResolutionFraction(resolutionFraction);
+        }
+
+        mCurrentRenderFrame = settings->getMinFrame();
+        mCurrentCanvas->prp_setAbsFrame(mCurrentRenderFrame);
+        mCurrentCanvas->setOutputRendering(true);
+        mCurrentCanvas->updateAllBoxes();
+        if(mNoBoxesAwaitUpdate) {
+            nextSaveOutputFrame();
+        }
+    }
 }
 
 void CanvasWindow::nextCurrentRenderFrame() {
@@ -839,7 +873,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
 
 void CanvasWindow::interruptPreview() {
     if(mRendering) {
-        interruptRendering();
+        interruptPreviewRendering();
     } else if(mPreviewing) {
         stopPreview();
     }
@@ -869,7 +903,7 @@ void CanvasWindow::setPreviewing(const bool &bT) {
     mCurrentCanvas->setPreviewing(bT);
 }
 
-void CanvasWindow::interruptRendering() {
+void CanvasWindow::interruptPreviewRendering() {
     setRendering(false);
     mBoxesUpdateFinishedFunction = NULL;
     mFilesUpdateFinishedFunction = NULL;
@@ -880,6 +914,14 @@ void CanvasWindow::interruptRendering() {
                                          false);
     emit changeCurrentFrame(mSavedCurrentFrame);
     MainWindow::getInstance()->previewFinished();
+}
+
+void CanvasWindow::interruptOutputRendering() {
+    mCurrentCanvas->setOutputRendering(false);
+    mBoxesUpdateFinishedFunction = NULL;
+    mFilesUpdateFinishedFunction = NULL;
+    mCurrentCanvas->clearPreview();
+    emit changeCurrentFrame(mSavedCurrentFrame);
 }
 
 void CanvasWindow::stopPreview() {
@@ -961,25 +1003,6 @@ void CanvasWindow::nextSaveOutputFrame() {
         if(mNoBoxesAwaitUpdate) {
             nextSaveOutputFrame();
         }
-    }
-}
-
-void CanvasWindow::saveOutput(const qreal &resolutionFraction) {
-    mMaxRenderFrame = getMaxFrame();
-    mBoxesUpdateFinishedFunction = &CanvasWindow::nextSaveOutputFrame;
-    mSavedCurrentFrame = getCurrentFrame();
-    mCurrentCanvas->fitCanvasToSize();
-    mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
-    if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.001) {
-        mCurrentCanvas->setResolutionFraction(resolutionFraction);
-    }
-
-    mCurrentRenderFrame = mSavedCurrentFrame;
-    mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
-    mCurrentCanvas->setOutputRendering(true);
-    mCurrentCanvas->updateAllBoxes();
-    if(mNoBoxesAwaitUpdate) {
-        nextSaveOutputFrame();
     }
 }
 

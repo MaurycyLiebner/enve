@@ -160,6 +160,12 @@ protected:
     QPushButton *mOkButton = NULL;
     QPushButton *mCancelButton = NULL;
     QPushButton *mResetButton = NULL;
+    void addVideoCodec(const AVCodecID &codecId,
+                       AVOutputFormat *outputFormat,
+                       const QString &currentCodecName);
+    void addAudioCodec(const AVCodecID &codecId,
+                       AVOutputFormat *outputFormat,
+                       const QString &currentCodecName);
 };
 
 #endif // RENDERSETTINGSDIALOG_H

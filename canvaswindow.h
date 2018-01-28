@@ -274,7 +274,8 @@ public slots:
 
     void interruptPreview();
     void outOfMemory();
-    void interruptRendering();
+    void interruptPreviewRendering();
+    void interruptOutputRendering();
 
     void playPreview();
     void stopPreview();
@@ -310,7 +311,6 @@ private slots:
                                     Executable *lastUpdatable = NULL);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
-    void saveOutput(const qreal &resolutionFraction);
 
     void pushTimerExpired();
 };

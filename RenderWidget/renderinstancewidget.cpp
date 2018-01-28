@@ -5,17 +5,11 @@
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
-    setStyleSheet("QWidget { background: rgb(45, 45, 45); }"
-                  "QPushButton {"
-                      "color: lightblue;"
-                      "background: transparent;"
-                      "border: 0;"
-                  "}"
-                  "QPushButton:hover {"
-                      "text-decoration: underline;"
-                  "}");
+    setCheckable(true);
+    setStyleSheet("QWidget { background: rgb(45, 45, 45); }");
 
     mNameLabel = new QLabel(this);
+    mNameLabel->setTextFormat(Qt::RichText);
     mNameLabel->setFixedHeight(MIN_WIDGET_HEIGHT);
 
     setLabelWidget(mNameLabel);
@@ -40,6 +34,7 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     renderSettingsLayout->addSpacing(MIN_WIDGET_HEIGHT);
 
     QPushButton *renderSettingsButton = new QPushButton("Settings");
+    renderSettingsButton->setObjectName("renderSettings");
     renderSettingsButton->setSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Minimum);
     connect(renderSettingsButton, SIGNAL(pressed()),
@@ -86,6 +81,7 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     outputSettingsLayout->addSpacing(MIN_WIDGET_HEIGHT);
 
     mOutputSettingsButton = new QPushButton("Settings");
+    mOutputSettingsButton->setObjectName("renderSettings");
     mOutputSettingsButton->setSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Minimum);
     connect(mOutputSettingsButton, SIGNAL(pressed()),
@@ -102,8 +98,9 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     outputSettingsLayout->addSpacing(MIN_WIDGET_HEIGHT);
 
     mOutputDestinationButton = new QPushButton("Destination");
+    mOutputDestinationButton->setObjectName("renderSettings");
     mOutputDestinationButton->setSizePolicy(QSizePolicy::Maximum,
-                                        QSizePolicy::Minimum);
+                                            QSizePolicy::Minimum);
     connect(mOutputDestinationButton, SIGNAL(pressed()),
             this, SLOT(openOutputDestinationDialog()));
     outputSettingsLayout->addWidget(mOutputDestinationButton);
@@ -123,6 +120,7 @@ RenderInstanceWidget::RenderInstanceWidget(RenderInstanceSettings *settings,
                                            QWidget *parent) :
     RenderInstanceWidget(parent) {
     mSettings = settings;
+    mSettings->setParentWidget(this);
     updateFromSettings();
 }
 
@@ -131,7 +129,41 @@ RenderInstanceWidget::~RenderInstanceWidget() {
 }
 
 void RenderInstanceWidget::updateFromSettings() {
-    mNameLabel->setText("  " + mSettings->getName());
+    RenderInstanceSettings::RenderState renderState =
+            mSettings->getCurrentState();
+    bool enabled = renderState != RenderInstanceSettings::PAUSED &&
+       renderState != RenderInstanceSettings::RENDERING;
+    setEnabled(enabled);
+    QString nameLabelTxt = "&nbsp;&nbsp;" + mSettings->getName() +
+            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    if(renderState == RenderInstanceSettings::ERROR) {
+        nameLabelTxt += "<font color='red'>" +
+                        mSettings->getRenderError() +
+                        "</font>";
+    } else if(renderState == RenderInstanceSettings::FINISHED) {
+        nameLabelTxt += "<font color='green'>finished</font>";
+    } else if(renderState == RenderInstanceSettings::RENDERING) {
+        nameLabelTxt += "rendering...";
+    } else if(renderState == RenderInstanceSettings::WAITING) {
+        nameLabelTxt += "waiting";
+    } else if(renderState == RenderInstanceSettings::PAUSED) {
+        nameLabelTxt += "paused";
+    }
+    mNameLabel->setText(nameLabelTxt);
+
+    QString destinationTxt = mSettings->getOutputDestination();
+    if(destinationTxt.isEmpty()) {
+        destinationTxt = "Destination";
+    }
+    mOutputDestinationButton->setText(destinationTxt);
+    AVOutputFormat *formatT = mSettings->getOutputFormat();
+    QString outputTxt;
+    if(formatT != NULL) {
+        outputTxt = QString(formatT->long_name);
+    } else {
+        outputTxt = "Settings";
+    }
+    mOutputSettingsButton->setText(outputTxt);
 }
 
 RenderInstanceSettings *RenderInstanceWidget::getSettings() {
@@ -142,7 +174,8 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
     RenderSettingsDialog *dialog = new RenderSettingsDialog(*mSettings, this);
     if(dialog->exec()) {
         *mSettings = dialog->getSettings();
-        mOutputSettingsButton->setText(QString(mSettings->getOutputFormat()->long_name));
+        mOutputSettingsButton->setText(
+                    QString(mSettings->getOutputFormat()->long_name));
         updateOutputDestinationFromCurrentFormat();
     }
     delete dialog;
@@ -195,7 +228,9 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
         supportedExts = "Output File (*." + tmpStr + ")";
     }
     QString iniText = mSettings->getOutputDestination();
-    if(iniText.isEmpty()) iniText = QDir::homePath() + "/untitled" + selectedExt;
+    if(iniText.isEmpty()) {
+        iniText = QDir::homePath() + "/untitled" + selectedExt;
+    }
     QString saveAs = QFileDialog::getSaveFileName(this, "Output Destination",
                                iniText,
                                supportedExts);

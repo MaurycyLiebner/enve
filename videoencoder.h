@@ -49,16 +49,8 @@ class VideoEncoder : public Updatable {
 public:
     VideoEncoder();
 
-    void startNewEncoding(const RenderInstanceSettings &settings) {
-        if(mCurrentlyEncoding) {
-            interruptCurrentEncoding();
-            if(!mCurrentlyEncoding) {
-                startEncoding(settings);
-                return;
-            }
-            mNewEncodingPlanned = true;
-            mWaitingRenderInstanceSettings = settings;
-        } else {
+    void startNewEncoding(RenderInstanceSettings *settings) {
+        if(!mCurrentlyEncoding) {
             startEncoding(settings);
         }
     }
@@ -67,7 +59,7 @@ public:
         if(!mBeingProcessed && !mSchedulerAdded && !mAwaitingUpdate) {
             interrupEncoding();
         } else {
-            mEncodingInterrupted = true;
+            mInterruptEncoding = true;
         }
     }
 
@@ -88,28 +80,31 @@ public:
     static VideoEncoderEmitter *getVideoEncoderEmitter();
 
     static void interruptEncodingStatic();
-    static void startEncodingStatic(const RenderInstanceSettings &settings);
+    static void startEncodingStatic(RenderInstanceSettings *settings);
     static void addImageToEncoderStatic(const sk_sp<SkImage> &img);
     static void finishEncodingStatic();
+    static bool encodingSuccessfulyStartedStatic();
 
     bool shouldUpdate() { return !mAwaitingUpdate && mCurrentlyEncoding; }
 
     VideoEncoderEmitter *getEmitter() {
         return &mEmitter;
     }
+
+    bool getCurrentlyEncoding() {
+        return mCurrentlyEncoding;
+    }
 protected:
     VideoEncoderEmitter mEmitter;
     void interrupEncoding();
     void finishEncoding();
     void finishEncodingNow();
-    void startEncoding(const RenderInstanceSettings &settings);
-    bool startEncodingNow();
+    void startEncoding(RenderInstanceSettings *settings);
+    bool startEncodingNow(QString &error);
 
     bool mEncodingSuccesfull = false;
     bool mEncodingFinished = false;
-    bool mNewEncodingPlanned = false;
-    RenderInstanceSettings mWaitingRenderInstanceSettings;
-    bool mEncodingInterrupted = false;
+    bool mInterruptEncoding = false;
 
     OutputStream mVideoStream;
     OutputStream mAudioStream;
@@ -117,13 +112,14 @@ protected:
     AVOutputFormat *mOutputFormat = NULL;
     bool mCurrentlyEncoding = false;
     QList<sk_sp<SkImage> > mImages;
-    RenderInstanceSettings mRenderInstanceSettings;
+    RenderInstanceSettings *mRenderInstanceSettings = NULL;
     QByteArray mPathByteArray;
     bool mHaveVideo = 0;
     bool mHaveAudio = 0;
     int mEncodeVideo = 0;
     int mEncodeAudio = 0;
 
+    QString mUpdateError;
     bool mUpdateFailed = false;
     QList<sk_sp<SkImage> > mUpdateImages;
 };

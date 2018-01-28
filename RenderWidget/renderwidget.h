@@ -34,11 +34,21 @@ private:
     ScrollArea *mScrollArea;
     QList<RenderInstanceWidget*> mRenderInstanceWidgets;
     RenderInstanceSettings *mCurrentRenderedSettings = NULL;
+    QList<RenderInstanceWidget*> mAwaitingSettings;
+
+    void render(RenderInstanceSettings *settings);
 signals:
     void renderFromSettings(RenderInstanceSettings *);
 public slots:
+    void leaveOnlyInterruptionButtonsEnabled();
+    void leaveOnlyStartRenderButtonEnabled();
+    void disableButtons();
+    void enableButtons();
+
     void render();
     void stopRendering();
+    void clearAwaitingRender();
+    void sendNextForRender();
 };
 
 #endif // RENDERWIDGET_H
