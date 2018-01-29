@@ -112,6 +112,9 @@ protected:
     AVOutputFormat *mOutputFormat = NULL;
     bool mCurrentlyEncoding = false;
     QList<sk_sp<SkImage> > mImages;
+
+    RenderSettings mRenderSettings;
+    OutputSettings mOutputSettings;
     RenderInstanceSettings *mRenderInstanceSettings = NULL;
     QByteArray mPathByteArray;
     bool mHaveVideo = 0;

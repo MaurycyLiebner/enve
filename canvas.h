@@ -432,6 +432,8 @@ public:
     }
 
     void setCurrentPreviewContainer(CacheContainer *cont);
+    void setLoadingPreviewContainer(CacheContainer *cont);
+
     void setRenderingPreview(const bool &bT);
 
     bool isPreviewingOrRendering() const {
@@ -536,7 +538,11 @@ public:
                 scheduleUpdate();
             }
         } else {
-            setCurrentPreviewContainer(cont);
+            if(cont->storesDataInMemory()) { // !!!
+                setCurrentPreviewContainer(cont);
+            } else {// !!!
+                setLoadingPreviewContainer(cont);
+            }// !!!
         }
 
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
@@ -614,6 +620,8 @@ protected:
 
     bool mCurrentPreviewContainerOutdated = false;
     std::shared_ptr<CacheContainer> mCurrentPreviewContainer;
+    std::shared_ptr<CacheContainer> mLoadingPreviewContainer;
+
     int mCurrentPreviewFrameId;
     int mMaxPreviewFrameId = 0;
 

@@ -136,12 +136,16 @@ void CacheContainer::setBlocked(const bool &bT) {
         MemoryHandler::getInstance()->addContainer(this);
     }
 }
-
+#include "canvas.h"
 void CacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
     mLoadingFromFile = false;
     mNoDataInMemory = false;
     mLoadingUpdatable = NULL;
     mImageSk = img;
+    if(mTmpLoadTargetCanvas != NULL) {
+        mTmpLoadTargetCanvas->setCurrentPreviewContainer(this);
+        mTmpLoadTargetCanvas = NULL;
+    }
     if(!mBlocked) {
         MemoryHandler::getInstance()->addContainer(this);
     }

@@ -1,43 +1,43 @@
 #include "rendersettingsdialog.h"
 #include "mainwindow.h"
-#define COMPLIENCE FF_COMPLIANCE_NORMAL
+#include "global.h"
 
-static const QList<FormatCodecs> SUPPORTED_FORMATS = {
-    FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_PNG << AV_CODEC_ID_TIFF << AV_CODEC_ID_MJPEG,
-                 QList<AVCodecID>(),
-                 "*.jpg"),
-    FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_PNG << AV_CODEC_ID_QTRLE << AV_CODEC_ID_H264,
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-                 "*.mov"),
-    FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_H264 << AV_CODEC_ID_MPEG4 << AV_CODEC_ID_MPEG2VIDEO << AV_CODEC_ID_HEVC,
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-                 "*.mp4"),
-    FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_H264 << AV_CODEC_ID_MPEG4 << AV_CODEC_ID_MPEG2VIDEO << AV_CODEC_ID_HEVC,
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-    "*.mkv"),
-    FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_H264 << AV_CODEC_ID_MPEG4 << AV_CODEC_ID_MPEG2VIDEO << AV_CODEC_ID_HEVC << AV_CODEC_ID_RAWVIDEO << AV_CODEC_ID_MJPEG << AV_CODEC_ID_JPEG2000 << AV_CODEC_ID_JPEGLS,
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-    "*.avi"),
-    FormatCodecs(QList<AVCodecID>(),
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-    "*.mp3"),
-    FormatCodecs(QList<AVCodecID>(),
-                 QList<AVCodecID>() << AV_CODEC_ID_FLAC,
-    "*.flac"),
-    FormatCodecs(QList<AVCodecID>(),
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-    "*.wav"),
-    FormatCodecs(QList<AVCodecID>(),
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-    "*.ogg"),
-    FormatCodecs(QList<AVCodecID>(),
-                 QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
-    "*.aiff")
-};
-
-RenderSettingsDialog::RenderSettingsDialog(const RenderInstanceSettings &settings,
+RenderSettingsDialog::RenderSettingsDialog(const OutputSettings &settings,
                                            QWidget *parent) :
     QDialog(parent) {
+    mSupportedFormats = {
+        FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_PNG << AV_CODEC_ID_TIFF << AV_CODEC_ID_MJPEG << AV_CODEC_ID_LJPEG,
+                     QList<AVCodecID>(),
+                     "*.jpg"),
+        FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_PNG << AV_CODEC_ID_QTRLE << AV_CODEC_ID_H264,
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
+                     "*.mov"),
+        FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_H264 << AV_CODEC_ID_MPEG4 << AV_CODEC_ID_MPEG2VIDEO << AV_CODEC_ID_HEVC,
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
+                     "*.mp4"),
+        FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_H264 << AV_CODEC_ID_MPEG4 << AV_CODEC_ID_MPEG2VIDEO << AV_CODEC_ID_HEVC,
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
+        "*.mkv"),
+        FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_H264 << AV_CODEC_ID_MPEG4 << AV_CODEC_ID_MPEG2VIDEO << AV_CODEC_ID_HEVC << AV_CODEC_ID_RAWVIDEO << AV_CODEC_ID_LJPEG,
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
+        "*.avi"),
+        FormatCodecs(QList<AVCodecID>(),
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
+        "*.mp3"),
+        FormatCodecs(QList<AVCodecID>(),
+                     QList<AVCodecID>() << AV_CODEC_ID_FLAC,
+        "*.flac"),
+        FormatCodecs(QList<AVCodecID>(),
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK << AV_CODEC_ID_PCM_U8 << AV_CODEC_ID_PCM_S16LE << AV_CODEC_ID_PCM_S24LE << AV_CODEC_ID_PCM_S32LE << AV_CODEC_ID_PCM_S64LE << AV_CODEC_ID_PCM_F32LE << AV_CODEC_ID_PCM_F64LE,
+        "*.wav"),
+        FormatCodecs(QList<AVCodecID>(),
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
+        "*.ogg"),
+        FormatCodecs(QList<AVCodecID>(),
+                     QList<AVCodecID>() << AV_CODEC_ID_MP3 << AV_CODEC_ID_AAC << AV_CODEC_ID_AC3 << AV_CODEC_ID_FLAC << AV_CODEC_ID_VORBIS << AV_CODEC_ID_WAVPACK,
+        "*.aiff")
+    };
+
     setStyleSheet(MainWindow::getInstance()->styleSheet());
     mInitialSettings = settings;
 
@@ -97,6 +97,16 @@ RenderSettingsDialog::RenderSettingsDialog(const RenderInstanceSettings &setting
     mAudioSettingsLayout->addPair(mAudioChannelLayoutLabel,
                                   mAudioChannelLayoutsComboBox);
 
+    mShowLayout = new QHBoxLayout();
+    mShowLabel = new QLabel("Show all formats and codecs", this);
+    mShowAllFormatsAndCodecsCheckBox = new QCheckBox(this);
+    connect(mShowAllFormatsAndCodecsCheckBox, SIGNAL(toggled(bool)),
+            this, SLOT(setShowAllFormatsAndCodecs(bool)));
+    mShowLayout->addWidget(mShowAllFormatsAndCodecsCheckBox);
+    mShowLayout->addWidget(mShowLabel);
+
+    mShowLayout->setAlignment(Qt::AlignRight);
+
     mButtonsLayout = new QHBoxLayout();
     mOkButton = new QPushButton("Ok", this);
     mCancelButton = new QPushButton("Cancel", this);
@@ -112,19 +122,20 @@ RenderSettingsDialog::RenderSettingsDialog(const RenderInstanceSettings &setting
     mButtonsLayout->addWidget(mOkButton, Qt::AlignRight);
 
     mMainLayout->addLayout(mOutputFormatsLayout);
+    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT);
     mVideoGroupBox->setLayout(mVideoSettingsLayout);
     mMainLayout->addWidget(mVideoGroupBox);
     mAudioGroupBox->setLayout(mAudioSettingsLayout);
     mMainLayout->addWidget(mAudioGroupBox);
+    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT);
+    mMainLayout->addLayout(mShowLayout);
+    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT);
     mMainLayout->addLayout(mButtonsLayout);
 
-    connect(mOutputFormatsComboBox, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateAvailableVideoCodecs()));
     connect(mVideoCodecsComboBox, SIGNAL(currentTextChanged(QString)),
             this, SLOT(updateAvailablePixelFormats()));
 
-    connect(mOutputFormatsComboBox, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateAvailableAudioCodecs()));
+
     connect(mAudioCodecsComboBox, SIGNAL(currentTextChanged(QString)),
             this, SLOT(updateAvailableSampleFormats()));
     connect(mAudioCodecsComboBox, SIGNAL(currentTextChanged(QString)),
@@ -139,11 +150,11 @@ RenderSettingsDialog::RenderSettingsDialog(const RenderInstanceSettings &setting
 }
 
 void RenderSettingsDialog::updateAvailablePixelFormats() {
+    QString currentFormatName = mPixelFormatsComboBox->currentText();
     AVCodec *currentCodec = NULL;
     if(mVideoCodecsComboBox->count() > 0) {
         currentCodec = mVideoCodecsList.at(mVideoCodecsComboBox->currentIndex());
     }
-    QString currentFormatName = mPixelFormatsComboBox->currentText();
     mPixelFormatsComboBox->clear();
     mPixelFormatsList.clear();
     if(currentCodec != NULL) {
@@ -169,7 +180,7 @@ void RenderSettingsDialog::addVideoCodec(const AVCodecID &codecId,
     if(currentCodec->type != AVMEDIA_TYPE_VIDEO) return;
     if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) return;
     if(currentCodec->pix_fmts == NULL) return;
-    if(avformat_query_codec(outputFormat, codecId, COMPLIENCE) <= 0) return;
+    if(avformat_query_codec(outputFormat, codecId, COMPLIENCE) == 0) return;
     mVideoCodecsList << currentCodec;
     QString codecName = QString(currentCodec->long_name);
     mVideoCodecsComboBox->addItem(codecName);
@@ -186,7 +197,7 @@ void RenderSettingsDialog::addAudioCodec(const AVCodecID &codecId,
     if(currentCodec->type != AVMEDIA_TYPE_AUDIO) return;
     if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) return;
     if(currentCodec->sample_fmts == NULL) return;
-    if(avformat_query_codec(outputFormat, codecId, COMPLIENCE) <= 0) return;
+    if(avformat_query_codec(outputFormat, codecId, COMPLIENCE) == 0) return;
     mAudioCodecsList << currentCodec;
     QString codecName = QString(currentCodec->long_name);
     mAudioCodecsComboBox->addItem(codecName);
@@ -195,166 +206,161 @@ void RenderSettingsDialog::addAudioCodec(const AVCodecID &codecId,
     }
 }
 
-static const QList<AVCodecID> VIDEO_CODECS = { AV_CODEC_ID_H264,
-                                         AV_CODEC_ID_HEVC,
-                                         AV_CODEC_ID_MPEG4,
-                                         AV_CODEC_ID_MPEG2VIDEO,
-                                         AV_CODEC_ID_QTRLE,
-                                         AV_CODEC_ID_RAWVIDEO,
-                                         AV_CODEC_ID_MJPEG,
-                                         AV_CODEC_ID_PNG,
-                                         AV_CODEC_ID_TIFF,
-                                         AV_CODEC_ID_GIF };
-static const QList<AVCodecID> AUDIO_CODECS = { AV_CODEC_ID_MP2,
-                                         AV_CODEC_ID_MP3,
-                                         AV_CODEC_ID_AAC,
-                                         AV_CODEC_ID_AC3,
-                                         AV_CODEC_ID_FLAC,
-                                         AV_CODEC_ID_VORBIS,
-                                         AV_CODEC_ID_WAVPACK  };
-
 void RenderSettingsDialog::updateAvailableVideoCodecs() {
+    QString currentCodecName = mVideoCodecsComboBox->currentText();
     mVideoCodecsComboBox->clear();
     mVideoCodecsList.clear();
-    AVOutputFormat *outputFormat = NULL;
-    if(mOutputFormatsComboBox->count() > 0) {
-        int outputId = mOutputFormatsComboBox->currentIndex();
-        outputFormat = mOutputFormatsList.at(outputId);
-    }
+    if(mOutputFormatsComboBox->count() == 0) return;
+    int outputFormatId = mOutputFormatsComboBox->currentIndex();
+    AVOutputFormat *outputFormat = mOutputFormatsList.at(outputFormatId);
     if(outputFormat == NULL) return;
-    QString currentCodecName = mVideoCodecsComboBox->currentText();
-    foreach(const AVCodecID &codecId, VIDEO_CODECS) {
-        addVideoCodec(codecId,
-                      outputFormat,
-                      currentCodecName);
-    }
 
-//    AVCodec *currentCodec = NULL;
-//    do {
-//        currentCodec = av_codec_next(currentCodec);
-//        if(currentCodec == NULL) break;
-//        if(currentCodec->type != AVMEDIA_TYPE_VIDEO) continue;
-//        if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
-//            continue;
-//        }
-//        if(currentCodec->pix_fmts == NULL) continue;
-//        addVideoCodec(currentCodec);
-//    } while(currentCodec != NULL);
+    if(mShowAllFormatsAndCodecs) {
+        AVCodec *currentCodec = NULL;
+        do {
+            currentCodec = av_codec_next(currentCodec);
+            if(currentCodec == NULL) break;
+            if(currentCodec->type != AVMEDIA_TYPE_VIDEO) continue;
+            if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+                continue;
+            }
+            if(currentCodec->pix_fmts == NULL) continue;
+            addVideoCodec(currentCodec->id,
+                          outputFormat,
+                          currentCodecName);
+        } while(currentCodec != NULL);
+    } else {
+        FormatCodecs currFormatT = mSupportedFormats.at(outputFormatId);
+        foreach(const AVCodecID &codecId, currFormatT.mVidCodecs) {
+            AVCodec *currentCodec = avcodec_find_encoder(codecId);
+            if(currentCodec == NULL) break;
+            if(currentCodec->type != AVMEDIA_TYPE_VIDEO) continue;
+            if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+                continue;
+            }
+            if(currentCodec->pix_fmts == NULL) continue;
+            addVideoCodec(currentCodec->id,
+                          outputFormat,
+                          currentCodecName);
+        }
+    }
     bool noCodecs = mVideoCodecsComboBox->count() == 0;
     mVideoGroupBox->setChecked(!noCodecs);
     mVideoGroupBox->setDisabled(noCodecs);
 }
 
 void RenderSettingsDialog::updateAvailableAudioCodecs() {
+    QString currentCodecName = mAudioCodecsComboBox->currentText();
     mAudioCodecsComboBox->clear();
     mAudioCodecsList.clear();
-    AVOutputFormat *outputFormat = NULL;
-    if(mOutputFormatsComboBox->count() > 0) {
-        int outputId = mOutputFormatsComboBox->currentIndex();
-        outputFormat = mOutputFormatsList.at(outputId);
-    }
+    if(mOutputFormatsComboBox->count() == 0) return;
+    int outputFormatId = mOutputFormatsComboBox->currentIndex();
+    AVOutputFormat *outputFormat = mOutputFormatsList.at(outputFormatId);
     if(outputFormat == NULL) return;
-    QString currentCodecName = mAudioCodecsComboBox->currentText();
-    foreach(const AVCodecID &codecId, AUDIO_CODECS) {
-        addAudioCodec(codecId,
-                      outputFormat,
-                      currentCodecName);
+    if(mShowAllFormatsAndCodecs) {
+        AVCodec *currentCodec = NULL;
+        do {
+            currentCodec = av_codec_next(currentCodec);
+            if(currentCodec == NULL) break;
+            if(currentCodec->type != AVMEDIA_TYPE_AUDIO) continue;
+            if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+                continue;
+            }
+            if(currentCodec->sample_fmts == NULL) continue;
+            addAudioCodec(currentCodec->id,
+                          outputFormat,
+                          currentCodecName);
+        } while(currentCodec != NULL);
+    } else {
+        FormatCodecs currFormatT = mSupportedFormats.at(outputFormatId);
+        foreach(const AVCodecID &codecId, currFormatT.mAudioCodecs) {
+            AVCodec *currentCodec = avcodec_find_encoder(codecId);
+            if(currentCodec == NULL) break;
+            if(currentCodec->type != AVMEDIA_TYPE_AUDIO) continue;
+            if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+                continue;
+            }
+            if(currentCodec->sample_fmts == NULL) continue;
+            addAudioCodec(currentCodec->id,
+                          outputFormat,
+                          currentCodecName);
+        }
     }
-//    AVCodec *currentCodec = NULL;
-//    do {
-//        currentCodec = av_codec_next(currentCodec);
-//        if(currentCodec == NULL) break;
-//        if(currentCodec->type != AVMEDIA_TYPE_AUDIO) continue;
-//        if(currentCodec->sample_fmts == NULL) continue;
-//        if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) continue;
-//        AVCodecID codecId = currentCodec->id;
-//        if(avformat_query_codec(outputFormat, codecId, COMPLIENCE) == 0) continue;
-//        mAudioCodecsList << currentCodec;
-//        QString codecName = QString(currentCodec->long_name);
-//        mAudioCodecsComboBox->addItem(codecName);
-//        if(codecName == currentCodecName) {
-//            mAudioCodecsComboBox->setCurrentText(codecName);
-//        }
-//    } while(currentCodec != NULL);
     bool noCodecs = mAudioCodecsComboBox->count() == 0;
     mAudioGroupBox->setChecked(!noCodecs);
     mAudioGroupBox->setDisabled(noCodecs);
 }
 
-struct FormatCodecs {
-    FormatCodecs(const QList<AVCodecID> &vidCodecs,
-                 const QList<AVCodecID> &audioCodec,
-                 const char *name) {
-        mFormat = av_guess_format(NULL, name, NULL);
-        foreach(const AVCodecID &vidCodec, vidCodecs) {
-            if(avformat_query_codec(mFormat, vidCodec, COMPLIENCE) == 0) continue;
-            mVidCodecs << vidCodec;
-        }
-        foreach(const AVCodecID &audCodec, audioCodec) {
-            if(avformat_query_codec(mFormat, audCodec, COMPLIENCE) == 0) continue;
-            mAudioCodecs << audCodec;
-        }
-    }
-
-    AVOutputFormat *mFormat = NULL;
-    QList<AVCodecID> mVidCodecs;
-    QList<AVCodecID> mAudioCodecs;
-};
 
 void RenderSettingsDialog::updateAvailableOutputFormats() {
-    QString currentCodecName = mOutputFormatsComboBox->currentText();
-    mOutputFormatsComboBox->clear();
+    disconnect(mOutputFormatsComboBox, SIGNAL(currentTextChanged(QString)),
+               this, SLOT(updateAvailableVideoCodecs()));
+    disconnect(mOutputFormatsComboBox, SIGNAL(currentTextChanged(QString)),
+               this, SLOT(updateAvailableAudioCodecs()));
 
-    foreach(const char *chars, OUTPUT_FORMATS) {
-        AVOutputFormat *currentFormat = av_guess_format(NULL, chars, NULL);
-        if(currentFormat == NULL) break;
-        //if(!currentFormat->codec_tag || !currentFormat->codec_tag[0]) continue;
-        int supportedCodecs = 0;
-        foreach(const AVCodecID &codecId, VIDEO_CODECS) {
-            if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) <= 0) continue;
-            supportedCodecs++;
-            break;
-        }
-        foreach(const AVCodecID &codecId, AUDIO_CODECS) {
-            if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) <= 0) continue;
-            supportedCodecs++;
-            break;
-        }
-        if(supportedCodecs == 0) continue;
-        //if(currentFormat->query_codec == NULL) continue;
-        mOutputFormatsList << currentFormat;
-        QString formatName = QString(currentFormat->long_name);
-        mOutputFormatsComboBox->addItem(formatName);
-        if(formatName == currentCodecName) {
-            mOutputFormatsComboBox->setCurrentText(formatName);
+    QString currentFormatName = mOutputFormatsComboBox->currentText();
+
+    mOutputFormatsComboBox->clear();
+    mOutputFormatsList.clear();
+
+    if(mShowAllFormatsAndCodecs) {
+        AVOutputFormat *currentFormat = NULL;
+        do {
+            currentFormat = av_oformat_next(currentFormat);
+            if(currentFormat == NULL) break;
+            //if(!currentFormat->codec_tag || !currentFormat->codec_tag[0]) continue;
+//            int supportedCodecs = 0;
+//            foreach(const AVCodecID &codecId, VIDEO_CODECS) {
+//                if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) == 0) continue;
+//                supportedCodecs++;
+//                break;
+//            }
+//            foreach(const AVCodecID &codecId, AUDIO_CODECS) {
+//                if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) == 0) continue;
+//                supportedCodecs++;
+//                break;
+//            }
+//            if(supportedCodecs == 0) continue;
+            //if(currentFormat->query_codec == NULL) continue;
+            mOutputFormatsList << currentFormat;
+            QString formatName = QString(currentFormat->long_name);
+            mOutputFormatsComboBox->addItem(formatName);
+            if(formatName == currentFormatName) {
+                mOutputFormatsComboBox->setCurrentText(formatName);
+            }
+        } while(currentFormat != NULL);
+    } else {
+        foreach(const FormatCodecs &formatT, mSupportedFormats) {
+            AVOutputFormat *currentFormat = formatT.mFormat;
+            if(currentFormat == NULL) break;
+            //if(!currentFormat->codec_tag || !currentFormat->codec_tag[0]) continue;
+//            int supportedCodecs = 0;
+//            foreach(const AVCodecID &codecId, currentFormat->video_codec) {
+//                if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) == 0) continue;
+//                supportedCodecs++;
+//                break;
+//            }
+//            foreach(const AVCodecID &codecId, currentFormat->audio_codec) {
+//                if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) == 0) continue;
+//                supportedCodecs++;
+//                break;
+//            }
+//            if(supportedCodecs == 0) continue;
+            //if(currentFormat->query_codec == NULL) continue;
+            mOutputFormatsList << currentFormat;
+            QString formatName = QString(currentFormat->long_name);
+            mOutputFormatsComboBox->addItem(formatName);
+            if(formatName == currentFormatName) {
+                mOutputFormatsComboBox->setCurrentText(formatName);
+            }
         }
     }
-
-//    AVOutputFormat *currentFormat = NULL;
-//    do {
-//        currentFormat = av_oformat_next(currentFormat);
-//        if(currentFormat == NULL) break;
-//        if(!currentFormat->codec_tag || !currentFormat->codec_tag[0]) continue;
-//        int supportedCodecs = 0;
-//        foreach(const AVCodecID &codecId, VIDEO_CODECS) {
-//            if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) == 0) continue;
-//            supportedCodecs++;
-//            break;
-//        }
-//        foreach(const AVCodecID &codecId, AUDIO_CODECS) {
-//            if(avformat_query_codec(currentFormat, codecId, COMPLIENCE) == 0) continue;
-//            supportedCodecs++;
-//            break;
-//        }
-//        if(supportedCodecs == 0) continue;
-//        //if(currentFormat->query_codec == NULL) continue;
-//        mOutputFormatsList << currentFormat;
-//        QString formatName = QString(currentFormat->long_name);
-//        mOutputFormatsComboBox->addItem(formatName);
-//        if(formatName == currentCodecName) {
-//            mOutputFormatsComboBox->setCurrentText(formatName);
-//        }
-//    } while(currentFormat != NULL);
+    connect(mOutputFormatsComboBox, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(updateAvailableVideoCodecs()));
+    connect(mOutputFormatsComboBox, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(updateAvailableAudioCodecs()));
+    updateAvailableVideoCodecs();
+    updateAvailableAudioCodecs();
 }
 
 static const QStringList sampleFormatsNames = { "8 bits unsigned",
@@ -499,6 +505,48 @@ const static QString getChannelLayoutName(const uint64_t &layout) {
         return "Hexadecagonal";
     } else if(layout == AV_CH_LAYOUT_STEREO_DOWNMIX) {
         return "Downmix";
+    } else if(layout == AV_CH_FRONT_LEFT) {
+        return "Front left";
+    } else if(layout == AV_CH_FRONT_RIGHT) {
+        return "Front right";
+    } else if(layout == AV_CH_FRONT_CENTER) {
+        return "Front center";
+    } else if(layout == AV_CH_LOW_FREQUENCY) {
+        return "Low frequency";
+    } else if(layout == AV_CH_BACK_LEFT) {
+        return "Back left";
+    } else if(layout == AV_CH_BACK_RIGHT) {
+        return "Back right";
+    } else if(layout == AV_CH_TOP_CENTER) {
+        return "Top center";
+    } else if(layout == AV_CH_TOP_FRONT_LEFT) {
+        return "Top fron left";
+    } else if(layout == AV_CH_TOP_FRONT_CENTER) {
+        return "Top front center";
+    } else if(layout == AV_CH_TOP_FRONT_RIGHT) {
+        return "Top front right";
+    } else if(layout == AV_CH_TOP_BACK_LEFT) {
+        return "Top back left";
+    } else if(layout == AV_CH_TOP_BACK_CENTER) {
+        return "Top back center";
+    } else if(layout == AV_CH_TOP_BACK_RIGHT) {
+        return "Top back right";
+    } else if(layout == AV_CH_STEREO_LEFT) {
+        return "Stereo left";
+    } else if(layout == AV_CH_STEREO_RIGHT) {
+        return "Stereo right";
+    } else if(layout == AV_CH_WIDE_LEFT) {
+        return "Wide left";
+    } else if(layout == AV_CH_WIDE_RIGHT) {
+        return "Wide right";
+    } else if(layout == AV_CH_SURROUND_DIRECT_LEFT) {
+        return "Surround direct left";
+    } else if(layout == AV_CH_SURROUND_DIRECT_RIGHT) {
+        return "Surround direct right";
+    } else if(layout == AV_CH_LOW_FREQUENCY_2) {
+        return "Low frequency 2";
+    } else if(layout == AV_CH_LAYOUT_NATIVE) {
+        return "Native";
     }
     return "Invalid";
 }
@@ -531,38 +579,38 @@ void RenderSettingsDialog::updateAvailableAudioChannelLayouts() {
 }
 
 void RenderSettingsDialog::restoreInitialSettings() {
-    AVOutputFormat *currentOutputFormat = mInitialSettings.getOutputFormat();
+    AVOutputFormat *currentOutputFormat = mInitialSettings.outputFormat;
     if(currentOutputFormat == NULL) {
         mOutputFormatsComboBox->setCurrentIndex(0);
     } else {
         QString currentOutputFormatName = QString(currentOutputFormat->long_name);
         mOutputFormatsComboBox->setCurrentText(currentOutputFormatName);
     }
-    AVCodec *currentVideoCodec = mInitialSettings.getVideoCodec();
+    AVCodec *currentVideoCodec = mInitialSettings.videoCodec;
     if(currentVideoCodec == NULL) {
         mVideoCodecsComboBox->setCurrentIndex(0);
     } else {
         QString currentCodecName = QString(currentVideoCodec->long_name);
         mVideoCodecsComboBox->setCurrentText(currentCodecName);
     }
-    AVPixelFormat currentFormat = mInitialSettings.getVideoPixelFormat();
+    AVPixelFormat currentFormat = mInitialSettings.videoPixelFormat;
     if(currentFormat == AV_PIX_FMT_NONE) {
         mPixelFormatsComboBox->setCurrentIndex(0);
     } else {
         QString currentFormatName = QString(av_get_pix_fmt_name(currentFormat));
         mPixelFormatsComboBox->setCurrentText(currentFormatName);
     }
-    int currentBitrate = mInitialSettings.getVideoBitrate();
+    int currentBitrate = mInitialSettings.videoBitrate;
     if(currentBitrate <= 0) {
         mBitrateSpinBox->setValue(9.);
     } else {
         mBitrateSpinBox->setValue(currentBitrate/1000000.);
     }
     bool noVideoCodecs = mVideoCodecsComboBox->count() == 0;
-    mVideoGroupBox->setChecked(mInitialSettings.getVideoEnabled() &&
+    mVideoGroupBox->setChecked(mInitialSettings.videoEnabled &&
                                !noVideoCodecs);
 
-    AVCodec *currentAudioCodec = mInitialSettings.getAudioCodec();
+    AVCodec *currentAudioCodec = mInitialSettings.audioCodec;
     if(currentAudioCodec == NULL) {
         mAudioCodecsComboBox->setCurrentIndex(0);
     } else {
@@ -570,7 +618,7 @@ void RenderSettingsDialog::restoreInitialSettings() {
         mAudioCodecsComboBox->setCurrentText(currentCodecName);
     }
 
-    AVSampleFormat currentSampleFormat = mInitialSettings.getAudioSampleFormat();
+    AVSampleFormat currentSampleFormat = mInitialSettings.audioSampleFormat;
     if(currentSampleFormat == AV_SAMPLE_FMT_NONE) {
         mSampleFormatsComboBox->setCurrentIndex(0);
     } else {
@@ -578,7 +626,7 @@ void RenderSettingsDialog::restoreInitialSettings() {
         mSampleFormatsComboBox->setCurrentText(currentFormatName);
     }
 
-    int currentSampleRate = mInitialSettings.getAudioSampleRate();
+    int currentSampleRate = mInitialSettings.audioSampleRate;
     if(currentSampleRate <= 0) {
         int i48000Id = mSampleRateComboBox->findText("48000 Hz");
         if(i48000Id == -1) {
@@ -597,7 +645,7 @@ void RenderSettingsDialog::restoreInitialSettings() {
         mSampleRateComboBox->setCurrentText(currentSampleRateStr);
     }
 
-    int currentAudioBitrate = mInitialSettings.getAudioBitrate();
+    int currentAudioBitrate = mInitialSettings.audioBitrate;
     if(currentAudioBitrate <= 0) {
         int i320Id = mAudioBitrateComboBox->findText("320 kbps");
         if(i320Id == -1) {
@@ -611,7 +659,7 @@ void RenderSettingsDialog::restoreInitialSettings() {
         mAudioBitrateComboBox->setCurrentText(currentAudioBitrateStr);
     }
 
-    uint64_t currentChannelsLayout = mInitialSettings.getAudioChannelsLayout();
+    uint64_t currentChannelsLayout = mInitialSettings.audioChannelsLayout;
     if(currentChannelsLayout == 0) {
         mAudioChannelLayoutsComboBox->setCurrentIndex(0);
     } else {
@@ -625,6 +673,60 @@ void RenderSettingsDialog::restoreInitialSettings() {
     }
 
     bool noAudioCodecs = mAudioCodecsComboBox->count() == 0;
-    mAudioGroupBox->setChecked(mInitialSettings.getAudioEnabled() &&
+    mAudioGroupBox->setChecked(mInitialSettings.audioEnabled &&
                                !noAudioCodecs);
+}
+
+
+#ifndef AVFORMAT_INTERNAL_H
+#define AVFORMAT_INTERNAL_H
+typedef struct AVCodecTag {
+    enum AVCodecID id;
+    unsigned int tag;
+} AVCodecTag;
+#endif
+
+RenderSettingsDialog::FormatCodecs::FormatCodecs(const QList<AVCodecID> &vidCodecs, const QList<AVCodecID> &audioCodec, const char *name) {
+    mFormat = av_guess_format(NULL, name, NULL);
+    bool defVidAdded = false;
+    bool defAudAdded = false;
+    foreach(const AVCodecID &vidCodec, vidCodecs) {
+        if(avformat_query_codec(mFormat, vidCodec, COMPLIENCE) == 0) continue;
+        mVidCodecs << vidCodec;
+        if(vidCodec == mFormat->video_codec) defVidAdded = true;
+    }
+    foreach(const AVCodecID &audCodec, audioCodec) {
+        if(avformat_query_codec(mFormat, audCodec, COMPLIENCE) == 0) continue;
+        mAudioCodecs << audCodec;
+        if(audCodec == mFormat->audio_codec) defAudAdded = true;
+    }
+//    if(!defAudAdded) {
+//        if(mFormat->audio_codec != AV_CODEC_ID_NONE) {
+//            mAudioCodecs << mFormat->audio_codec;
+//        }
+//    }
+//    if(!defVidAdded) {
+//        if(mFormat->video_codec != AV_CODEC_ID_NONE) {
+//            mVidCodecs << mFormat->video_codec;
+//        }
+//    }
+
+//    for(int i = 0; mFormat->codec_tag && mFormat->codec_tag[i]; i++) {
+//        const AVCodecTag *tags2 = mFormat->codec_tag[i];
+//        for(int j = 0; tags2[j].id != AV_CODEC_ID_NONE; j++) {
+//            AVCodecID codecId = tags2[j].id;
+//            if(avformat_query_codec(mFormat, codecId, COMPLIENCE) == 0) continue;
+//            AVCodec *codecT = avcodec_find_encoder(codecId);
+//            if(codecT == NULL) continue;
+//            if(codecT->type == AVMEDIA_TYPE_VIDEO) {
+//                if(!mVidCodecs.contains(codecId)) {
+//                    mVidCodecs << codecId;
+//                }
+//            } else if(codecT->type == AVMEDIA_TYPE_AUDIO) {
+//                if(!mAudioCodecs.contains(codecId)) {
+//                    mAudioCodecs << codecId;
+//                }
+//            }
+//        }
+//    }
 }

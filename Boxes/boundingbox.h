@@ -344,7 +344,7 @@ public:
     virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     void setName(const QString &name);
-    QString getName();
+    const QString &getName();
 
     void hide();
     void show();

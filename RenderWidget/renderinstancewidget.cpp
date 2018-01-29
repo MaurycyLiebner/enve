@@ -1,27 +1,31 @@
 #include "renderinstancewidget.h"
 #include "global.h"
 #include <QFileDialog>
+#include <QMenu>
 #include "rendersettingsdialog.h"
+#include "outputsettingsprofilesdialog.h"
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
     setCheckable(true);
-    setStyleSheet("QWidget { background: rgb(45, 45, 45); }");
-
+    setObjectName("darkWidget");
     mNameLabel = new QLabel(this);
     mNameLabel->setTextFormat(Qt::RichText);
     mNameLabel->setFixedHeight(MIN_WIDGET_HEIGHT);
+    mNameLabel->setObjectName("darkWidget");
 
     setLabelWidget(mNameLabel);
 
     QWidget *contWid = new QWidget(this);
     contWid->setLayout(mContentLayout);
-    contWid->setStyleSheet("QWidget { background: rgb(45, 45, 45); }");
+    contWid->setObjectName("darkWidget");
+
     addContentWidget(contWid);
 
     ClosableContainer *renderSettings = new ClosableContainer();
 
     QWidget *renderSettingsLabelWidget = new QWidget();
+    renderSettingsLabelWidget->setObjectName("darkWidget");
     QHBoxLayout *renderSettingsLayout = new QHBoxLayout();
     renderSettingsLayout->setAlignment(Qt::AlignLeft);
     renderSettingsLayout->setSpacing(0);
@@ -29,6 +33,7 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
 
     renderSettingsLayout->addSpacing(MIN_WIDGET_HEIGHT);
     QLabel *renderSettingsLabel = new QLabel("Render Settings:", this);
+    //renderSettingsLabel->setObjectName("darkWidget");
     renderSettingsLabel->setFixedHeight(MIN_WIDGET_HEIGHT);
     renderSettingsLayout->addWidget(renderSettingsLabel);
     renderSettingsLayout->addSpacing(MIN_WIDGET_HEIGHT);
@@ -67,6 +72,7 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     mOutputSettings->addContentWidget(mAudioChannelLayoutLabel);
 
     QWidget *outputSettingsLabelWidget = new QWidget();
+    outputSettingsLabelWidget->setObjectName("darkWidget");
     QHBoxLayout *outputSettingsLayout = new QHBoxLayout();
     outputSettingsLayout->setAlignment(Qt::AlignLeft);
     outputSettingsLayout->setSpacing(0);
@@ -80,12 +86,21 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     outputSettingsLayout->addWidget(outputSettingsLabel);
     outputSettingsLayout->addSpacing(MIN_WIDGET_HEIGHT);
 
+    mOutputSettingsProfilesButton = new OutputProfilesListButton(this);
+    connect(mOutputSettingsProfilesButton,
+            SIGNAL(profileSelected(OutputSettingsProfile*)),
+            this,
+            SLOT(outputSettingsProfileSelected(OutputSettingsProfile*)) );
+    mOutputSettingsProfilesButton->setObjectName("renderSettings");
+    mOutputSettingsProfilesButton->setFixedWidth(MIN_WIDGET_HEIGHT);
+
     mOutputSettingsButton = new QPushButton("Settings");
     mOutputSettingsButton->setObjectName("renderSettings");
     mOutputSettingsButton->setSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Minimum);
     connect(mOutputSettingsButton, SIGNAL(pressed()),
             this, SLOT(openOutputSettingsDialog()));
+    outputSettingsLayout->addWidget(mOutputSettingsProfilesButton);
     outputSettingsLayout->addWidget(mOutputSettingsButton);
 
     outputSettingsLayout->addSpacing(6*MIN_WIDGET_HEIGHT);
@@ -156,12 +171,18 @@ void RenderInstanceWidget::updateFromSettings() {
         destinationTxt = "Destination";
     }
     mOutputDestinationButton->setText(destinationTxt);
-    AVOutputFormat *formatT = mSettings->getOutputFormat();
+    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
+    OutputSettingsProfile *outputProfile = mSettings->getOutputSettingsProfile();
     QString outputTxt;
-    if(formatT != NULL) {
-        outputTxt = QString(formatT->long_name);
+    if(outputProfile == NULL) {
+        AVOutputFormat *formatT = outputSettings.outputFormat;
+        if(formatT != NULL) {
+            outputTxt = "Custom " + QString(formatT->long_name);
+        } else {
+            outputTxt = "Settings";
+        }
     } else {
-        outputTxt = "Settings";
+        outputTxt = outputProfile->getName();
     }
     mOutputSettingsButton->setText(outputTxt);
 }
@@ -171,11 +192,21 @@ RenderInstanceSettings *RenderInstanceWidget::getSettings() {
 }
 
 void RenderInstanceWidget::openOutputSettingsDialog() {
-    RenderSettingsDialog *dialog = new RenderSettingsDialog(*mSettings, this);
+    mSettings->copySettingsFromOutputSettingsProfile();
+    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
+    RenderSettingsDialog *dialog = new RenderSettingsDialog(outputSettings,
+                                                            this);
     if(dialog->exec()) {
-        *mSettings = dialog->getSettings();
-        mOutputSettingsButton->setText(
-                    QString(mSettings->getOutputFormat()->long_name));
+        mSettings->setOutputSettingsProfile(NULL);
+        OutputSettings outputSettings = dialog->getSettings();
+        mSettings->setOutputRenderSettings(outputSettings);
+        AVOutputFormat *outputFormat = outputSettings.outputFormat;
+        if(outputFormat == NULL) {
+            mOutputSettingsButton->setText("Settings");
+        } else {
+            mOutputSettingsButton->setText("Custom " +
+                        QString(outputFormat->long_name));
+        }
         updateOutputDestinationFromCurrentFormat();
     }
     delete dialog;
@@ -186,7 +217,8 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     if(outputDst.isEmpty()) {
         outputDst = QDir::homePath() + "/untitled";
     }
-    AVOutputFormat *format = mSettings->getOutputFormat();
+    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
+    AVOutputFormat *format = outputSettings.outputFormat;
     QString tmpStr = QString(format->extensions);
     QStringList supportedExt = tmpStr.split(",");
     QString fileName = outputDst.split("/").last();
@@ -217,10 +249,17 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     mOutputDestinationButton->setText(outputDst);
 }
 
+void RenderInstanceWidget::outputSettingsProfileSelected(OutputSettingsProfile *profile) {
+    mSettings->setOutputSettingsProfile(profile);
+    updateOutputDestinationFromCurrentFormat();
+    updateFromSettings();
+}
+
 void RenderInstanceWidget::openOutputDestinationDialog() {
     QString supportedExts;
     QString selectedExt;
-    AVOutputFormat *format = mSettings->getOutputFormat();
+    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
+    AVOutputFormat *format = outputSettings.outputFormat;
     if(format != NULL) {
         QString tmpStr = QString(format->extensions);
         selectedExt = "." + tmpStr.split(",").first();
@@ -241,4 +280,49 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
 
 void RenderInstanceWidget::openRenderSettingsDialog() {
 
+}
+
+OutputProfilesListButton::OutputProfilesListButton(RenderInstanceWidget *parent) :
+    QPushButton(parent) {
+    mParentWidget = parent;
+    setIcon(QIcon(":/icons/down-arrow.png"));
+}
+
+void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
+    if(e->button() == Qt::LeftButton) {
+        QMenu menu;
+        int i = 0;
+        foreach(OutputSettingsProfile *profile,
+                OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES) {
+            QAction *actionT = new QAction(profile->getName());
+            actionT->setData(QVariant(i));
+            menu.addAction(actionT);
+            i++;
+        }
+        menu.addSeparator();
+        QAction *actionT = new QAction("Edit...");
+        actionT->setData(QVariant(-1));
+        menu.addAction(actionT);
+
+        QAction *selectedAction = menu.exec(mapToGlobal(QPoint(0, height())));
+        if(selectedAction != NULL) {
+            int profileId = selectedAction->data().toInt();
+            if(profileId == -1) {
+                const OutputSettings &outputSettings =
+                        mParentWidget->getSettings()->getOutputRenderSettings();
+                OutputSettingsProfilesDialog *profilesDialog =
+                        new OutputSettingsProfilesDialog(outputSettings, this);
+                if(profilesDialog->exec()) {
+                    OutputSettingsProfile *profileT =
+                            profilesDialog->getCurrentProfile();
+                    emit profileSelected(profileT);
+                }
+            } else {
+                OutputSettingsProfile *profileT =
+                        OutputSettingsProfilesDialog::
+                        OUTPUT_SETTINGS_PROFILES.at(profileId);
+                emit profileSelected(profileT);
+            }
+        }
+    }
 }

@@ -86,11 +86,7 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void RenderWidget::createNewRenderInstanceWidgetForCanvas(Canvas *canvas) {
-    RenderInstanceSettings *settings = new RenderInstanceSettings();
-    settings->setTargetCanvas(canvas);
-    settings->setName(canvas->getName());
-    settings->setMinFrame(0);
-    settings->setMaxFrame(canvas->getMaxFrame());
+    RenderInstanceSettings *settings = new RenderInstanceSettings(canvas);
     RenderInstanceWidget *wid = new RenderInstanceWidget(settings, this);
     mContLayout->addWidget(wid);
     mRenderInstanceWidgets << wid;
@@ -107,9 +103,10 @@ void RenderWidget::setRenderedFrame(const int &frame) {
 }
 
 void RenderWidget::render(RenderInstanceSettings *settings) {
-    mRenderProgressBar->setRange(settings->getMinFrame(),
-                                 settings->getMaxFrame());
-    mRenderProgressBar->setValue(settings->getMinFrame());
+    const RenderSettings &renderSettings = settings->getRenderSettings();
+    mRenderProgressBar->setRange(renderSettings.minFrame,
+                                 renderSettings.maxFrame);
+    mRenderProgressBar->setValue(renderSettings.minFrame);
     mCurrentRenderedSettings = settings;
     emit renderFromSettings(settings);
 }

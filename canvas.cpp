@@ -386,6 +386,7 @@ void Canvas::setOutputRendering(const bool &bT) {
 }
 
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
+    setLoadingPreviewContainer(NULL);
     if(cont == mCurrentPreviewContainer.get()) return;
     if(mCurrentPreviewContainer.get() != NULL) {
 //        if(mNoCache) {
@@ -404,6 +405,29 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
     }
     mCurrentPreviewContainer = cont->ref<CacheContainer>();
     mCurrentPreviewContainer->setBlocked(true);
+}
+
+void Canvas::setLoadingPreviewContainer(CacheContainer *cont) {
+    if(cont == mLoadingPreviewContainer.get()) return;
+    if(mLoadingPreviewContainer.get() != NULL) {
+        cont->setAsCurrentPreviewContainerAfterFinishedLoading(NULL);
+//        if(mNoCache) {
+//            mCurrentPreviewContainer->setBlocked(false);
+//            mCurrentPreviewContainer->freeThis();
+//        } else if(!mRendering) {
+//            mCurrentPreviewContainer->setBlocked(false);
+//        }
+        if(!mRenderingPreview || mRenderingOutput) {
+            mLoadingPreviewContainer->setBlocked(false);
+        }
+    }
+    if(cont == NULL) {
+        mLoadingPreviewContainer.reset();
+        return;
+    }
+    mLoadingPreviewContainer = cont->ref<CacheContainer>();
+    cont->setAsCurrentPreviewContainerAfterFinishedLoading(this);
+    mLoadingPreviewContainer->setBlocked(true);
 }
 
 void Canvas::playPreview(const int &minPreviewFrameId,

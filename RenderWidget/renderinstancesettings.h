@@ -1,6 +1,7 @@
 #ifndef RENDERINSTANCESETTINGS_H
 #define RENDERINSTANCESETTINGS_H
 #include <QString>
+#include "selfref.h"
 class Canvas;
 extern "C" {
     #include <libavcodec/avcodec.h>
@@ -14,6 +15,57 @@ extern "C" {
 }
 class RenderInstanceWidget;
 
+struct RenderSettings {
+    qreal resolution = 1.;
+    qreal fps = 24.;
+    AVRational timeBase = { 1, 24 }; // inverse of fps - 1/fps
+    int videoWidth = 0;
+    int videoHeight = 0;
+
+    int minFrame = 0;
+    int maxFrame = 0;
+};
+
+struct OutputSettings {
+    AVOutputFormat *outputFormat = NULL;
+
+    bool videoEnabled = true;
+    AVCodec *videoCodec = NULL;
+    AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
+    int videoBitrate = 0;
+
+    bool audioEnabled = false;
+    AVCodec *audioCodec = NULL;
+    int audioSampleRate = 0;
+    int audioBitrate = 0;
+    AVSampleFormat audioSampleFormat = AV_SAMPLE_FMT_NONE;
+    uint64_t audioChannelsLayout = 0;
+};
+
+class OutputSettingsProfile : public SelfRef {
+public:
+    OutputSettingsProfile() {}
+
+    const QString &getName() const {
+        return mName;
+    }
+
+    void setName(const QString &name) {
+        mName = name;
+    }
+
+    const OutputSettings &getSettings() const {
+        return mSettings;
+    }
+
+    void setSettings(const OutputSettings &settings) {
+        mSettings = settings;
+    }
+protected:
+    QString mName = "Untitled";
+    OutputSettings mSettings;
+};
+
 class RenderInstanceSettings {
 public:
     enum RenderState {
@@ -24,15 +76,9 @@ public:
         PAUSED,
         WAITING
     };
-    RenderInstanceSettings();
+    RenderInstanceSettings(Canvas *canvas);
 
-    const QString &getName() {
-        return mName;
-    }
-
-    void setName(const QString &name) {
-        mName = name;
-    }
+    const QString &getName();
 
     void setOutputDestination(const QString &outputDestination) {
         mOutputDestination = outputDestination;
@@ -54,123 +100,27 @@ public:
         mCurrentRenderFrame = currentRenderFrame;
     }
 
-    const int &getMinFrame() const {
-        return mMinFrame;
-    }
-
-    const int &getMaxFrame() const {
-        return mMaxFrame;
-    }
-
-    void setMaxFrame(const int &maxFrameT) {
-        mMaxFrame = maxFrameT;
-    }
-
-    void setMinFrame(const int &minFrameT) {
-        mMinFrame = minFrameT;
-    }
-
     const int &currentRenderFrame() {
         return mCurrentRenderFrame;
     }
 
-    qreal getFps() const;
-
-    int getVideoWidth() const;
-    int getVideoHeight() const;
-    const int &getVideoBitrate() const {
-        return mVideoBitrate;
+    const OutputSettings &getOutputRenderSettings() {
+        return mOutputSettings;
     }
 
-    void setVideoBitrate(const int &bitrate) {
-        mVideoBitrate = bitrate;
+    void setOutputRenderSettings(const OutputSettings &settings) {
+        mOutputSettings = settings;
     }
 
-    AVCodec *getVideoCodec() const {
-        return mVideoCodec;
+    const RenderSettings &getRenderSettings() {
+        return mRenderSettings;
     }
 
-    void setVideoCodec(AVCodec *codec) {
-        mVideoCodec = codec;
-    }
-
-    AVCodec *getAudioCodec() const {
-        return mAudioCodec;
-    }
-
-    void setAudioCodec(AVCodec *codec) {
-        mAudioCodec = codec;
-    }
-
-    void setVideoPixelFormat(const AVPixelFormat &format) {
-        mVideoPixelFormat = format;
-    }
-
-    const AVPixelFormat &getVideoPixelFormat() const {
-        return mVideoPixelFormat;
-    }
-
-    AVOutputFormat *getOutputFormat() const {
-        return mOutputFormat;
-    }
-
-    void setOutputFormat(AVOutputFormat *format) {
-        mOutputFormat = format;
-    }
-
-    int getAudioSampleRate() const {
-        return mAudioSampleRate;
-    }
-
-    void setAudioSampleRate(const int &sampleRate) {
-        mAudioSampleRate = sampleRate;
-    }
-
-    AVSampleFormat getAudioSampleFormat() const {
-        return mAudioSampleFormat;
-    }
-
-    void setAudioSampleFormat(const AVSampleFormat &format) {
-        mAudioSampleFormat = format;
-    }
-
-    void setVideoEnabled(const bool &enabled) {
-        mVideoEnabled = enabled;
-    }
-
-    bool getVideoEnabled() const {
-        return mVideoEnabled;
-    }
-
-    void setAudioEnabled(const bool &enabled) {
-        mAudioEnabled = enabled;
-    }
-
-    bool getAudioEnabled() const {
-        return mAudioEnabled;
+    void setRenderSettings(const RenderSettings &settings) {
+        mRenderSettings = settings;
     }
 
     void renderingAboutToStart();
-
-    AVRational getTimeBase() const {
-        return mTimeBase;
-    }
-
-    int getAudioBitrate() const {
-        return mAudioBitrate;
-    }
-
-    void setAudioBitrate(const int &bitrate) {
-        mAudioBitrate = bitrate;
-    }
-
-    uint64_t getAudioChannelsLayout() const {
-        return mAudioChannelsLayout;
-    }
-
-    void setAudioChannelsLayout(const uint64_t &layout) {
-        mAudioChannelsLayout = layout;
-    }
 
     void setCurrentState(const RenderState &state,
                          const QString &text = "");
@@ -187,41 +137,37 @@ public:
         mParentWidget = wid;
     }
 
-    const qreal &getRenderResolution() const {
-        return mResolution;
+    void copySettingsFromOutputSettingsProfile() {
+        OutputSettingsProfile *profileT = mOutputSettingsProfile.data();
+        if(profileT == NULL) return;
+        mOutputSettings = profileT->getSettings();
+    }
+
+    void setOutputSettingsProfile(OutputSettingsProfile *profile) {
+        if(profile == NULL) {
+            mOutputSettingsProfile.clear();
+        } else {
+            mOutputSettingsProfile =
+                    profile->weakRef<OutputSettingsProfile>();
+        }
+        copySettingsFromOutputSettingsProfile();
+    }
+
+    OutputSettingsProfile *getOutputSettingsProfile() {
+        return mOutputSettingsProfile.data();
     }
 private:
     void updateParentWidget();
-
-    RenderInstanceWidget *mParentWidget = NULL;
-
-    qreal mResolution = 1.;
     RenderState mState = NONE;
-    qreal mFps = 24.;
-    AVRational mTimeBase = { 1, 24 }; // inverse of fps - 1/fps
-    int mVideoWidth = 0;
-    int mVideoHeight = 0;
-
-    int mMinFrame = 0;
-    int mMaxFrame = 0;
     int mCurrentRenderFrame = 0;
 
+    QWeakPointer<OutputSettingsProfile> mOutputSettingsProfile;
+    RenderInstanceWidget *mParentWidget = NULL;
+
     Canvas *mTargetCanvas;
-    QString mName;
 
-    AVOutputFormat *mOutputFormat = NULL;
-
-    bool mVideoEnabled = true;
-    AVCodec *mVideoCodec = NULL;
-    AVPixelFormat mVideoPixelFormat = AV_PIX_FMT_NONE;
-    int mVideoBitrate = 0;
-
-    bool mAudioEnabled = false;
-    AVCodec *mAudioCodec = NULL;
-    int mAudioSampleRate = 0;
-    int mAudioBitrate = 0;
-    AVSampleFormat mAudioSampleFormat = AV_SAMPLE_FMT_NONE;
-    uint64_t mAudioChannelsLayout = 0;
+    RenderSettings mRenderSettings;
+    OutputSettings mOutputSettings;
 
     QString mOutputDestination;
 

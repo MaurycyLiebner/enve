@@ -68,10 +68,11 @@ static bool open_video(AVCodec *codec,
 
 static bool add_video_stream(OutputStream *ost,
                              AVFormatContext *oc,
-                             RenderInstanceSettings *settings,
+                             const OutputSettings &outSettings,
+                             const RenderSettings &renSettings,
                              QString &error) {
     AVCodecContext *c;
-    AVCodec *codec = settings->getVideoCodec();
+    AVCodec *codec = outSettings.videoCodec;
 
 //    if(codec == NULL) {
 //        /* find the video encoder */
@@ -96,19 +97,19 @@ static bool add_video_stream(OutputStream *ost,
     ost->enc = c;
 
     /* Put sample parameters. */
-    c->bit_rate = settings->getVideoBitrate();//settings->getVideoBitrate();
+    c->bit_rate = outSettings.videoBitrate;//settings->getVideoBitrate();
     /* Resolution must be a multiple of two. */
-    c->width    = settings->getVideoWidth();
-    c->height   = settings->getVideoHeight();
+    c->width    = renSettings.videoWidth;
+    c->height   = renSettings.videoHeight;
     /* timebase: This is the fundamental unit of time (in seconds) in terms
      * of which frame timestamps are represented. For fixed-fps content,
      * timebase should be 1/framerate and timestamp increments should be
      * identical to 1. */
-    ost->st->time_base = settings->getTimeBase();
+    ost->st->time_base = renSettings.timeBase;
     c->time_base       = ost->st->time_base;
 
     c->gop_size      = 12; /* emit one intra frame every twelve frames at most */
-    c->pix_fmt       = settings->getVideoPixelFormat();//BGRA;
+    c->pix_fmt       = outSettings.videoPixelFormat;//BGRA;
     if(c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
         /* just for testing, we also add B-frames */
         c->max_b_frames = 2;
@@ -277,10 +278,10 @@ static void close_stream(AVFormatContext *oc, OutputStream *ost) {
 
 static bool add_audio_stream(OutputStream *ost,
                              AVFormatContext *oc,
-                             RenderInstanceSettings *settings,
+                             const OutputSettings &settings,
                              QString &error) {
     AVCodecContext *c;
-    AVCodec *codec = settings->getAudioCodec();
+    AVCodec *codec = settings.audioCodec;
     int ret;
 
 //    /* find the audio encoder */
@@ -304,11 +305,11 @@ static bool add_audio_stream(OutputStream *ost,
     ost->enc = c;
 
     /* put sample parameters */
-    c->sample_fmt     = settings->getAudioSampleFormat();
-    c->sample_rate    = settings->getAudioSampleRate();
-    c->channel_layout = settings->getAudioChannelsLayout();
+    c->sample_fmt     = settings.audioSampleFormat;
+    c->sample_rate    = settings.audioSampleRate;
+    c->channel_layout = settings.audioChannelsLayout;
     c->channels       = av_get_channel_layout_nb_channels(c->channel_layout);
-    c->bit_rate       = settings->getAudioBitrate();
+    c->bit_rate       = settings.audioBitrate;
 
     ost->st->time_base = (AVRational){ 1, c->sample_rate };
 
@@ -582,19 +583,20 @@ bool VideoEncoder::startEncodingNow(QString &error) {
     mEncodeAudio = 0;
     mVideoStream = { 0 };
     mAudioStream = { 0 };
-    if(mRenderInstanceSettings->getVideoCodec() != NULL &&
-        mRenderInstanceSettings->getVideoEnabled()) {
+    if(mOutputSettings.videoCodec != NULL &&
+       mOutputSettings.videoEnabled) {
         if(!add_video_stream(&mVideoStream, mFormatContext,
-                             mRenderInstanceSettings, error)) {
+                             mOutputSettings, mRenderSettings,
+                             error)) {
             return false;
         }
         mHaveVideo = 1;
         mEncodeVideo = 1;
     }
     if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE  &&
-            mRenderInstanceSettings->getAudioEnabled()) {
+            mOutputSettings.audioEnabled) {
         if(!add_audio_stream(&mAudioStream, mFormatContext,
-                             mRenderInstanceSettings, error)) {
+                             mOutputSettings, error)) {
             return false;
         }
         mHaveAudio = 1;
@@ -602,13 +604,13 @@ bool VideoEncoder::startEncodingNow(QString &error) {
     }
     // open streams
     if(mHaveVideo) {
-        if(!open_video(mRenderInstanceSettings->getVideoCodec(),
+        if(!open_video(mOutputSettings.videoCodec,
                        &mVideoStream, error)) {
             return false;
         }
     }
     if(mHaveAudio) {
-        if(!open_audio(mRenderInstanceSettings->getAudioCodec(),
+        if(!open_audio(mOutputSettings.audioCodec,
                        &mAudioStream, error)) {
             return false;
         }
@@ -633,10 +635,12 @@ void VideoEncoder::startEncoding(RenderInstanceSettings *settings) {
     if(mCurrentlyEncoding) return;
     mRenderInstanceSettings = settings;
     mRenderInstanceSettings->renderingAboutToStart();
+    mOutputSettings = mRenderInstanceSettings->getOutputRenderSettings();
+    mRenderSettings = mRenderInstanceSettings->getRenderSettings();
     mPathByteArray = mRenderInstanceSettings->getOutputDestination().toLatin1();
     // get format from audio file
 
-    mOutputFormat = mRenderInstanceSettings->getOutputFormat();
+    mOutputFormat = mOutputSettings.outputFormat;
     QString error;
     if(startEncodingNow(error)) {
         mCurrentlyEncoding = true;

@@ -38,9 +38,6 @@ void ClosableContainer::setCheckable(const bool &check) {
         mCheckBox->setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
         mMainLayout->insertWidget(0, mCheckBox, Qt::AlignTop);
         mMainLayout->setAlignment(mCheckBox, Qt::AlignTop);
-        mCheckBox->setStyleSheet("QWidget {"
-                                    "background-color: none;"
-                                 "}");
         mCheckBox->setChecked(true);
     } else {
         delete mCheckBox;

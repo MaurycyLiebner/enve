@@ -2,27 +2,23 @@
 #include "canvas.h"
 #include "renderinstancewidget.h"
 
-RenderInstanceSettings::RenderInstanceSettings() {
+RenderInstanceSettings::RenderInstanceSettings(Canvas *canvas) {
+    setTargetCanvas(canvas);
+    mRenderSettings.minFrame = 0;
+    mRenderSettings.maxFrame = canvas->getMaxFrame();
 }
 
-qreal RenderInstanceSettings::getFps() const {
-    return mFps;
-}
-
-int RenderInstanceSettings::getVideoWidth() const {
-    return mVideoWidth;
-}
-
-int RenderInstanceSettings::getVideoHeight() const {
-    return mVideoHeight;
+const QString &RenderInstanceSettings::getName() {
+    return mTargetCanvas->getName();
 }
 
 void RenderInstanceSettings::renderingAboutToStart() {
+    copySettingsFromOutputSettingsProfile();
     mRenderError.clear();
-    mFps = mTargetCanvas->getFps();
-    mTimeBase = { 1, qRound(mFps) };
-    mVideoWidth = mTargetCanvas->getCanvasWidth();
-    mVideoHeight = mTargetCanvas->getCanvasHeight();
+    mRenderSettings.fps = mTargetCanvas->getFps();
+    mRenderSettings.timeBase = { 1, qRound(mRenderSettings.fps) };
+    mRenderSettings.videoWidth = mTargetCanvas->getCanvasWidth();
+    mRenderSettings.videoHeight = mTargetCanvas->getCanvasHeight();
 }
 
 void RenderInstanceSettings::setCurrentState(

@@ -7,7 +7,9 @@
 #include <QLabel>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
+#include <QCheckBox>
 #include "renderinstancesettings.h"
+#define COMPLIENCE FF_COMPLIANCE_NORMAL
 
 class TwoColumnLayout : public QHBoxLayout {
 public:
@@ -38,69 +40,78 @@ protected:
 class RenderSettingsDialog : public QDialog {
     Q_OBJECT
 public:
-    RenderSettingsDialog(const RenderInstanceSettings &settings,
+    struct FormatCodecs {
+        FormatCodecs(const QList<AVCodecID> &vidCodecs,
+                     const QList<AVCodecID> &audioCodec,
+                     const char *name);
+
+        AVOutputFormat *mFormat = NULL;
+        QList<AVCodecID> mVidCodecs;
+        QList<AVCodecID> mAudioCodecs;
+    };
+    RenderSettingsDialog(const OutputSettings &settings,
                          QWidget *parent = NULL);
-    RenderInstanceSettings getSettings() {
-        RenderInstanceSettings settings = mInitialSettings;
+    OutputSettings getSettings() {
+        OutputSettings settings = mInitialSettings;
 
         AVOutputFormat *currentOutputFormat = NULL;
         if(mVideoCodecsComboBox->count() > 0) {
             int formatId = mOutputFormatsComboBox->currentIndex();
             currentOutputFormat = mOutputFormatsList.at(formatId);
         }
-        settings.setOutputFormat(currentOutputFormat);
+        settings.outputFormat = currentOutputFormat;
 
-        settings.setVideoEnabled(mVideoGroupBox->isChecked());
+        settings.videoEnabled = mVideoGroupBox->isChecked();
         AVCodec *currentVideoCodec = NULL;
         if(mVideoCodecsComboBox->count() > 0) {
             int codecId = mVideoCodecsComboBox->currentIndex();
             currentVideoCodec = mVideoCodecsList.at(codecId);
         }
-        settings.setVideoCodec(currentVideoCodec);
+        settings.videoCodec = currentVideoCodec;
 
         AVPixelFormat currentPixelFormat = AV_PIX_FMT_NONE;
         if(mPixelFormatsList.count() > 0) {
             int formatId = mPixelFormatsComboBox->currentIndex();
             currentPixelFormat = mPixelFormatsList.at(formatId);
         }
-        settings.setVideoPixelFormat(currentPixelFormat);
-        settings.setVideoBitrate(mBitrateSpinBox->value()*1000000);
+        settings.videoPixelFormat = currentPixelFormat;
+        settings.videoBitrate = mBitrateSpinBox->value()*1000000;
 
-        settings.setAudioEnabled(mAudioGroupBox->isChecked());
+        settings.audioEnabled = mAudioGroupBox->isChecked();
         AVCodec *currentAudioCodec = NULL;
         if(mAudioCodecsComboBox->count() > 0) {
             int codecId = mAudioCodecsComboBox->currentIndex();
             currentAudioCodec = mAudioCodecsList.at(codecId);
         }
-        settings.setAudioCodec(currentAudioCodec);
+        settings.audioCodec = currentAudioCodec;
 
         AVSampleFormat currentSampleFormat = AV_SAMPLE_FMT_NONE;
         if(mSampleFormatsComboBox->count() > 0) {
             int formatId = mSampleFormatsComboBox->currentIndex();
             currentSampleFormat = mSampleFormatsList.at(formatId);
         }
-        settings.setAudioSampleFormat(currentSampleFormat);
+        settings.audioSampleFormat = currentSampleFormat;
 
         int currentSampleRate = 0;
         if(mSampleRateComboBox->count() > 0) {
             int sampleRateId = mSampleRateComboBox->currentIndex();
             currentSampleRate = mSampleRatesList.at(sampleRateId);
         }
-        settings.setAudioSampleRate(currentSampleRate);
+        settings.audioSampleRate = currentSampleRate;
 
         int currentAudioBitrate = 0;
         if(mAudioBitrateComboBox->count() > 0) {
             int bitrateId = mAudioBitrateComboBox->currentIndex();
             currentAudioBitrate = mAudioBitrateList.at(bitrateId);
         }
-        settings.setAudioBitrate(currentAudioBitrate);
+        settings.audioBitrate = currentAudioBitrate;
 
         uint64_t currentChannelsLayout = 0;
         if(mAudioChannelLayoutsComboBox->count() > 0) {
             int layoutId = mAudioChannelLayoutsComboBox->currentIndex();
             currentAudioBitrate = mAudioChannelLayoutsList.at(layoutId);
         }
-        settings.setAudioChannelsLayout(currentChannelsLayout);
+        settings.audioChannelsLayout = currentChannelsLayout;
 
         return settings;
     }
@@ -117,7 +128,15 @@ protected slots:
     void updateAvailableAudioChannelLayouts();
 
     void restoreInitialSettings();
+
+    void setShowAllFormatsAndCodecs(const bool &bT) {
+        if(mShowAllFormatsAndCodecs == bT) return;
+        mShowAllFormatsAndCodecs = bT;
+        updateAvailableOutputFormats();
+    }
 protected:
+    QList<FormatCodecs> mSupportedFormats;
+    bool mShowAllFormatsAndCodecs = false;
     QList<AVPixelFormat> mPixelFormatsList;
     QList<AVCodec*> mVideoCodecsList;
     QList<AVOutputFormat*> mOutputFormatsList;
@@ -127,7 +146,7 @@ protected:
     QList<int> mAudioBitrateList;
     QList<uint64_t> mAudioChannelLayoutsList;
 
-    RenderInstanceSettings mInitialSettings;
+    OutputSettings mInitialSettings;
     QVBoxLayout *mMainLayout = NULL;
 
     QHBoxLayout *mOutputFormatsLayout = NULL;
@@ -155,6 +174,10 @@ protected:
     QComboBox *mAudioBitrateComboBox = NULL;
     QLabel *mAudioChannelLayoutLabel = NULL;
     QComboBox *mAudioChannelLayoutsComboBox = NULL;
+
+    QHBoxLayout *mShowLayout = NULL;
+    QLabel *mShowLabel = NULL;
+    QCheckBox *mShowAllFormatsAndCodecsCheckBox = NULL;
 
     QHBoxLayout *mButtonsLayout = NULL;
     QPushButton *mOkButton = NULL;

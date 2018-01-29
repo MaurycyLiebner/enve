@@ -203,7 +203,8 @@ SOURCES += main.cpp\
     valueinput.cpp \
     drawpath.cpp \
     videoencoder.cpp \
-    RenderWidget/rendersettingsdialog.cpp
+    RenderWidget/rendersettingsdialog.cpp \
+    RenderWidget/outputsettingsprofilesdialog.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -366,7 +367,8 @@ HEADERS  += mainwindow.h \
     valueinput.h \
     drawpath.h \
     videoencoder.h \
-    RenderWidget/rendersettingsdialog.h
+    RenderWidget/rendersettingsdialog.h \
+    RenderWidget/outputsettingsprofilesdialog.h
 
 RESOURCES += \
     resources.qrc

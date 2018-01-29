@@ -10,12 +10,16 @@ QMainWindow::separator {
     height: 8px;
 }
 
-QCheckBox {
+/*QCheckBox {
     color: black;
 }
 
 QCheckBox::indicator {
     background: none;
+}*/
+
+QWidget#darkWidget {
+    background: rgb(45, 45, 45);
 }
 
 QComboBox {
@@ -137,6 +141,10 @@ QComboBox QScrollBar::sub-line {
 QComboBox QScrollBar::add-line {
     border-right: 0px solid black;
     border-bottom: 0px solid black;
+}
+
+QLabel {
+    background: none;
 }
 
 QLabel#blackTextLabel {

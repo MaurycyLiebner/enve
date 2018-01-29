@@ -867,7 +867,7 @@ void BoundingBox::setName(const QString &name) {
     emit nameChanged(name);
 }
 
-QString BoundingBox::getName() {
+const QString &BoundingBox::getName() {
     return prp_mName;
 }
 

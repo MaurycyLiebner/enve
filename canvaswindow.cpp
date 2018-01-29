@@ -706,19 +706,20 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
         mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
 
         mCurrentRenderSettings = settings;
+        const RenderSettings &renderSettings = settings->getRenderSettings();
         Canvas *canvas = settings->getTargetCanvas();
         setCurrentCanvas(canvas);
-        emit changeCurrentFrame(settings->getMinFrame());
+        emit changeCurrentFrame(renderSettings.minFrame);
 
-        qreal resolutionFraction = settings->getRenderResolution();
-        mMaxRenderFrame = settings->getMaxFrame();
+        qreal resolutionFraction = renderSettings.resolution;
+        mMaxRenderFrame = renderSettings.maxFrame;
         mBoxesUpdateFinishedFunction = &CanvasWindow::nextSaveOutputFrame;
         mCurrentCanvas->fitCanvasToSize();
         if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.00001) {
             mCurrentCanvas->setResolutionFraction(resolutionFraction);
         }
 
-        mCurrentRenderFrame = settings->getMinFrame();
+        mCurrentRenderFrame = renderSettings.minFrame;
         mCurrentCanvas->prp_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
         mCurrentCanvas->updateAllBoxes();

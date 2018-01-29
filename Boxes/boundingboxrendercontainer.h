@@ -6,6 +6,7 @@ class BoundingBox;
 #include "skiaincludes.h"
 #include <QDebug>
 class QTemporaryFile;
+class Canvas;
 
 class CacheHandler;
 struct BoundingBoxRenderData;
@@ -150,7 +151,11 @@ public:
         return !mNoDataInMemory;
     }
     void setDataSavedToTmpFile(const QSharedPointer<QTemporaryFile> &tmpFile);
+    void setAsCurrentPreviewContainerAfterFinishedLoading(Canvas *canvas) {
+        mTmpLoadTargetCanvas = canvas;
+    }
 protected:
+    Canvas *mTmpLoadTargetCanvas = NULL;
     int mMemSizeAwaitingSave = 0;
     Updatable *mLoadingUpdatable = NULL;
     Updatable *mSavingUpdatable = NULL;
