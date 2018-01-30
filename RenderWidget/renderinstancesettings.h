@@ -27,9 +27,12 @@ struct RenderSettings {
 };
 
 struct OutputSettings {
+    static const QStringList SAMPLE_FORMATS_NAMES;
+    static QString getChannelsLayoutNameStatic(const uint64_t &layout);
+
     AVOutputFormat *outputFormat = NULL;
 
-    bool videoEnabled = true;
+    bool videoEnabled = false;
     AVCodec *videoCodec = NULL;
     AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
     int videoBitrate = 0;

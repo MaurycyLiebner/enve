@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QAction>
 #include <QMenu>
+class OutputSettingsDisplayWidget;
 class RenderInstanceWidget;
 class OutputProfilesListButton : public QPushButton {
     Q_OBJECT
@@ -32,15 +33,7 @@ public:
     RenderInstanceSettings *getSettings();
 private:
     ClosableContainer *mOutputSettings;
-    QLabel *mOutputFormatLabel;
-    QLabel *mVideoCodecLabel;
-    QLabel *mVideoPixelFormatLabel;
-    QLabel *mVideoBitrateLabel;
-    QLabel *mAudioCodecLabel;
-    QLabel *mAudioSampleRateLabel;
-    QLabel *mAudioSampleFormatLabel;
-    QLabel *mAudioBitrateLabel;
-    QLabel *mAudioChannelLayoutLabel;
+    OutputSettingsDisplayWidget *mOutputSettingsDisplayWidget;
 
     QPushButton *mOutputDestinationButton;
 

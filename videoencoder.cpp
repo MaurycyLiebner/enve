@@ -602,6 +602,10 @@ bool VideoEncoder::startEncodingNow(QString &error) {
         mHaveAudio = 1;
         mEncodeAudio = 1;
     }
+    if(!mHaveAudio && !mHaveVideo) {
+        error = "No streams to render";
+        return false;
+    }
     // open streams
     if(mHaveVideo) {
         if(!open_video(mOutputSettings.videoCodec,

@@ -10,7 +10,6 @@
 #include <QCheckBox>
 #include "renderinstancesettings.h"
 #define COMPLIENCE FF_COMPLIANCE_NORMAL
-
 class TwoColumnLayout : public QHBoxLayout {
 public:
     TwoColumnLayout() {

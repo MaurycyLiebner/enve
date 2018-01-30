@@ -7,9 +7,8 @@ ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {
     mContentArrow = new QPushButton(QIcon(":/icons/list_show_children.png"),
                                     "",
                                     this);
+    mContentArrow->setObjectName("iconButton");
     mContentArrow->setCheckable(true);
-    mContentArrow->setStyleSheet("background: transparent;"
-                                 "border: 0;");
     mContentArrow->setIconSize(QSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT));
     mContentArrow->setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
     connect(mContentArrow, SIGNAL(toggled(bool)),

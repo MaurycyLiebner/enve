@@ -363,20 +363,6 @@ void RenderSettingsDialog::updateAvailableOutputFormats() {
     updateAvailableAudioCodecs();
 }
 
-static const QStringList sampleFormatsNames = { "8 bits unsigned",
-                                                "16 bits signed",
-                                                "32 bits signed",
-                                                "32 bits float",
-                                                "64 bits double",
-                                                "8 bits unsigned, planar",
-                                                "16 bits signed, planar",
-                                                "32 bits signed, planar",
-                                                "32 bits float, planar",
-                                                "64 bits double, planar",
-                                                "64 bits signed",
-                                                "64 bits signed, planar",
-                                                "" };
-
 void RenderSettingsDialog::updateAvailableSampleFormats() {
     QString currentFormatName = mSampleFormatsComboBox->currentText();
     mSampleFormatsComboBox->clear();
@@ -390,7 +376,7 @@ void RenderSettingsDialog::updateAvailableSampleFormats() {
     if(sampleFormats == NULL) return;
     while(*sampleFormats != -1) {
         mSampleFormatsList << *sampleFormats;
-        QString formatName = sampleFormatsNames.at(*sampleFormats);
+        QString formatName = OutputSettings::SAMPLE_FORMATS_NAMES.at(*sampleFormats);
         mSampleFormatsComboBox->addItem(formatName);
         if(formatName == currentFormatName) {
             mSampleFormatsComboBox->setCurrentText(formatName);
@@ -448,109 +434,6 @@ void RenderSettingsDialog::updateAvailableSampleRates() {
     }
 }
 
-const static QString getChannelLayoutName(const uint64_t &layout) {
-    if(layout == AV_CH_LAYOUT_MONO) {
-        return "Mono";
-    } else if(layout == AV_CH_LAYOUT_STEREO) {
-        return "Stereo";
-    } else if(layout == AV_CH_LAYOUT_2POINT1) {
-        return "2.1";
-    } else if(layout == AV_CH_LAYOUT_SURROUND) {
-        return "3.0";
-    } else if(layout == AV_CH_LAYOUT_2_1) {
-        return "3.0(back)";
-    } else if(layout == AV_CH_LAYOUT_4POINT0) {
-        return "4.0";
-    } else if(layout == AV_CH_LAYOUT_QUAD) {
-        return "Quad";
-    } else if(layout == AV_CH_LAYOUT_2_2) {
-        return "Quad(side)";
-    } else if(layout == AV_CH_LAYOUT_3POINT1) {
-        return "3.1";
-    } else if(layout == AV_CH_LAYOUT_5POINT0_BACK) {
-        return "5.0";
-    } else if(layout == AV_CH_LAYOUT_5POINT0) {
-        return "5.0(side)";
-    } else if(layout == AV_CH_LAYOUT_4POINT1) {
-        return "4.1";
-    } else if(layout == AV_CH_LAYOUT_5POINT1_BACK) {
-        return "5.1";
-    } else if(layout == AV_CH_LAYOUT_5POINT1) {
-        return "5.1(side)";
-    } else if(layout == AV_CH_LAYOUT_6POINT0) {
-        return "6.0";
-    } else if(layout == AV_CH_LAYOUT_6POINT0_FRONT) {
-        return "6.0(front)";
-    } else if(layout == AV_CH_LAYOUT_HEXAGONAL) {
-        return "Hexagonal";
-    } else if(layout == AV_CH_LAYOUT_6POINT1) {
-        return "6.1";
-    } else if(layout == AV_CH_LAYOUT_6POINT1_BACK) {
-        return "6.1(back)";
-    } else if(layout == AV_CH_LAYOUT_6POINT1_FRONT) {
-        return "6.1(front)";
-    } else if(layout == AV_CH_LAYOUT_7POINT0) {
-        return "7.0";
-    } else if(layout == AV_CH_LAYOUT_7POINT0_FRONT) {
-        return "7.0(front)";
-    } else if(layout == AV_CH_LAYOUT_7POINT1) {
-        return "7.1";
-    } else if(layout == AV_CH_LAYOUT_7POINT1_WIDE_BACK) {
-        return "7.1(wide)";
-    } else if(layout == AV_CH_LAYOUT_7POINT1_WIDE) {
-        return "7.1(wide-side)";
-    } else if(layout == AV_CH_LAYOUT_OCTAGONAL) {
-        return "Octagonal";
-    } else if(layout == AV_CH_LAYOUT_HEXADECAGONAL) {
-        return "Hexadecagonal";
-    } else if(layout == AV_CH_LAYOUT_STEREO_DOWNMIX) {
-        return "Downmix";
-    } else if(layout == AV_CH_FRONT_LEFT) {
-        return "Front left";
-    } else if(layout == AV_CH_FRONT_RIGHT) {
-        return "Front right";
-    } else if(layout == AV_CH_FRONT_CENTER) {
-        return "Front center";
-    } else if(layout == AV_CH_LOW_FREQUENCY) {
-        return "Low frequency";
-    } else if(layout == AV_CH_BACK_LEFT) {
-        return "Back left";
-    } else if(layout == AV_CH_BACK_RIGHT) {
-        return "Back right";
-    } else if(layout == AV_CH_TOP_CENTER) {
-        return "Top center";
-    } else if(layout == AV_CH_TOP_FRONT_LEFT) {
-        return "Top fron left";
-    } else if(layout == AV_CH_TOP_FRONT_CENTER) {
-        return "Top front center";
-    } else if(layout == AV_CH_TOP_FRONT_RIGHT) {
-        return "Top front right";
-    } else if(layout == AV_CH_TOP_BACK_LEFT) {
-        return "Top back left";
-    } else if(layout == AV_CH_TOP_BACK_CENTER) {
-        return "Top back center";
-    } else if(layout == AV_CH_TOP_BACK_RIGHT) {
-        return "Top back right";
-    } else if(layout == AV_CH_STEREO_LEFT) {
-        return "Stereo left";
-    } else if(layout == AV_CH_STEREO_RIGHT) {
-        return "Stereo right";
-    } else if(layout == AV_CH_WIDE_LEFT) {
-        return "Wide left";
-    } else if(layout == AV_CH_WIDE_RIGHT) {
-        return "Wide right";
-    } else if(layout == AV_CH_SURROUND_DIRECT_LEFT) {
-        return "Surround direct left";
-    } else if(layout == AV_CH_SURROUND_DIRECT_RIGHT) {
-        return "Surround direct right";
-    } else if(layout == AV_CH_LOW_FREQUENCY_2) {
-        return "Low frequency 2";
-    } else if(layout == AV_CH_LAYOUT_NATIVE) {
-        return "Native";
-    }
-    return "Invalid";
-}
-
 void RenderSettingsDialog::updateAvailableAudioChannelLayouts() {
     mAudioChannelLayoutsComboBox->clear();
     mAudioChannelLayoutsList.clear();
@@ -569,7 +452,7 @@ void RenderSettingsDialog::updateAvailableAudioChannelLayouts() {
     } else {
         uint64_t layout = *layouts;
         while(layout != 0) {
-            QString layoutName = getChannelLayoutName(layout);
+            QString layoutName = OutputSettings::getChannelsLayoutNameStatic(layout);
             mAudioChannelLayoutsList << layout;
             mAudioChannelLayoutsComboBox->addItem(layoutName);
             layouts++;
@@ -622,7 +505,7 @@ void RenderSettingsDialog::restoreInitialSettings() {
     if(currentSampleFormat == AV_SAMPLE_FMT_NONE) {
         mSampleFormatsComboBox->setCurrentIndex(0);
     } else {
-        QString currentFormatName = sampleFormatsNames.at(currentSampleFormat);
+        QString currentFormatName = OutputSettings::SAMPLE_FORMATS_NAMES.at(currentSampleFormat);
         mSampleFormatsComboBox->setCurrentText(currentFormatName);
     }
 
@@ -664,8 +547,8 @@ void RenderSettingsDialog::restoreInitialSettings() {
         mAudioChannelLayoutsComboBox->setCurrentIndex(0);
     } else {
         QString currentChannelsLayoutStr =
-                getChannelLayoutName(currentChannelsLayout);
-        if(currentChannelsLayoutStr == "Invalid") {
+                OutputSettings::getChannelsLayoutNameStatic(currentChannelsLayout);
+        if(currentChannelsLayoutStr == "-") {
             mAudioChannelLayoutsComboBox->setCurrentIndex(0);
         } else {
             mAudioBitrateComboBox->setCurrentText(currentChannelsLayoutStr);

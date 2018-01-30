@@ -208,6 +208,35 @@ QPushButton {
     padding: 2px 2px 2px 2px
 }
 
+QPushButton#dialogButton {
+    width: 4.5em;
+}
+
+QPushButton#iconButton {
+    background: transparent;
+    border: 0;
+    min-width: 0px;
+}
+
+QPushButton#addCanvasButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0px solid black;
+    background-color: rgb(51, 51, 51);
+    color: white;
+    font-weight: bold;
+    min-width: 0em;
+}
+
+QPushButton#addCanvasButton:hover {
+    background-color: rgb(70, 70, 70);
+}
+
+QComboBox#currentCanvasComboBox {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
 QPushButton:hover {
     background: qlineargradient(x1:0, y1:0,
                                 x2:0, y2:1,

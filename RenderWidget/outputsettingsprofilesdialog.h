@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "renderinstancesettings.h"
-
+class OutputSettingsDisplayWidget;
 class OutputSettingsProfilesDialog : public QDialog {
     Q_OBJECT
 public:
@@ -34,6 +34,8 @@ protected:
     QPushButton *mEditProfileButton;
     QPushButton *mDeleteProfileButton;
 
+    OutputSettingsDisplayWidget *mOutputSettingsDisplayWidget = NULL;
+
     QHBoxLayout *mButtonsLayout;
     QPushButton *mOkButton = NULL;
     QPushButton *mCancelButton = NULL;
@@ -42,6 +44,8 @@ protected:
 
     void updateButtonsEnabled();
 protected slots:
+    void currentProfileChanged();
+
     void setCurrentProfileName(const QString &name);
     void deleteCurrentProfile();
     void duplicateCurrentProfile();

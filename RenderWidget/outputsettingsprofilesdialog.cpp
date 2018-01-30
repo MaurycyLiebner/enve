@@ -1,6 +1,8 @@
 #include "outputsettingsprofilesdialog.h"
 #include "mainwindow.h"
 #include "rendersettingsdialog.h"
+#include "outputsettingsdisplaywidget.h"
+#include "global.h"
 QList<OutputSettingsProfile*> OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES;
 
 OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
@@ -17,40 +19,68 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mProfileLayout = new QHBoxLayout();
     mProfileLabel = new QLabel("Profile:", this);
     mProfilesComboBox = new QComboBox(this);
+    mProfilesComboBox->setMinimumContentsLength(20);
     mProfileLayout->addWidget(mProfileLabel);
     mProfileLayout->addWidget(mProfilesComboBox);
+    mProfileLayout->setAlignment(Qt::AlignHCenter);
 
     mProfileButtonsLayout = new QHBoxLayout();
     mNewProfileButton = new QPushButton("New...", this);
+    mNewProfileButton->setSizePolicy(QSizePolicy::Fixed,
+                                     QSizePolicy::Minimum);
     connect(mNewProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::createAndEditNewProfile);
     mDuplicateProfileButton = new QPushButton("Duplicate", this);
+    mDuplicateProfileButton->setSizePolicy(QSizePolicy::Fixed,
+                                           QSizePolicy::Minimum);
     connect(mDuplicateProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::duplicateCurrentProfile);
     mEditProfileButton = new QPushButton("Edit...", this);
+    mEditProfileButton->setSizePolicy(QSizePolicy::Fixed,
+                                      QSizePolicy::Minimum);
     connect(mEditProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::editCurrentProfile);
     mDeleteProfileButton = new QPushButton("Delete", this);
+    mDeleteProfileButton->setSizePolicy(QSizePolicy::Fixed,
+                                        QSizePolicy::Minimum);
     connect(mDeleteProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::deleteCurrentProfile);
     mProfileButtonsLayout->addWidget(mNewProfileButton);
     mProfileButtonsLayout->addWidget(mDuplicateProfileButton);
     mProfileButtonsLayout->addWidget(mEditProfileButton);
     mProfileButtonsLayout->addWidget(mDeleteProfileButton);
+    mNewProfileButton->setObjectName("dialogButton");
+    mDuplicateProfileButton->setObjectName("dialogButton");
+    mEditProfileButton->setObjectName("dialogButton");
+    mDeleteProfileButton->setObjectName("dialogButton");
+    mProfileButtonsLayout->setAlignment(Qt::AlignHCenter);
+
+    mOutputSettingsDisplayWidget = new OutputSettingsDisplayWidget(this);
+//    mOutputSettingsDisplayWidget->setMinimumSize(10*MIN_WIDGET_HEIGHT,
+//                                                 7*MIN_WIDGET_HEIGHT);
+    //mOutputSettingsDisplayWidget->setAlwaysShowAll(true);
 
     mButtonsLayout = new QHBoxLayout();
     mOkButton = new QPushButton("Ok", this);
     mCancelButton = new QPushButton("Cancel", this);
+    mOkButton->setObjectName("dialogButton");
+    mCancelButton->setObjectName("dialogButton");
+
+    mOkButton->setSizePolicy(QSizePolicy::Fixed,
+                             QSizePolicy::Minimum);
+    mCancelButton->setSizePolicy(QSizePolicy::Fixed,
+                                 QSizePolicy::Minimum);
     connect(mOkButton, &QPushButton::released,
             this, &QDialog::accept);
     connect(mCancelButton, &QPushButton::released,
             this, &QDialog::reject);
 
-    mButtonsLayout->addWidget(mCancelButton, Qt::AlignLeft);
+    mButtonsLayout->addWidget(mCancelButton, Qt::AlignRight);
     mButtonsLayout->addWidget(mOkButton, Qt::AlignRight);
 
     mMainLayout->addLayout(mProfileLayout);
     mMainLayout->addLayout(mProfileButtonsLayout);
+    mMainLayout->addWidget(mOutputSettingsDisplayWidget);
     mMainLayout->addLayout(mButtonsLayout);
 
     foreach(OutputSettingsProfile *profile, OUTPUT_SETTINGS_PROFILES) {
@@ -65,6 +95,10 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     }
     connect(mProfilesComboBox, SIGNAL(editTextChanged(QString)),
             this, SLOT(setCurrentProfileName(QString)));
+    connect(mProfilesComboBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(currentProfileChanged()));
+
+    currentProfileChanged();
 }
 
 void OutputSettingsProfilesDialog::updateButtonsEnabled() {
@@ -79,6 +113,16 @@ void OutputSettingsProfilesDialog::updateButtonsEnabled() {
         mDeleteProfileButton->setEnabled(true);
         mProfilesComboBox->setEnabled(true);
     }
+}
+
+void OutputSettingsProfilesDialog::currentProfileChanged() {
+    OutputSettingsProfile *currentProfile = getCurrentProfile();
+    if(currentProfile == NULL) {
+        mOutputSettingsDisplayWidget->hide();
+        return;
+    }
+    mOutputSettingsDisplayWidget->show();
+    mOutputSettingsDisplayWidget->setOutputSettings(currentProfile->getSettings());
 }
 
 void OutputSettingsProfilesDialog::setCurrentProfileName(const QString &name) {
@@ -96,6 +140,7 @@ void OutputSettingsProfilesDialog::deleteCurrentProfile() {
     mProfilesComboBox->removeItem(currentId);
     OUTPUT_SETTINGS_PROFILES.removeAt(currentId);
     updateButtonsEnabled();
+    currentProfileChanged();
 }
 
 void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
@@ -110,13 +155,19 @@ void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
 }
 
 void OutputSettingsProfilesDialog::createAndEditNewProfile() {
-    OutputSettingsProfile *newProfile = new OutputSettingsProfile();
-    OUTPUT_SETTINGS_PROFILES.append(newProfile);
-    mProfilesComboBox->addItem(newProfile->getName());
-    mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);
-    updateButtonsEnabled();
-
-    editCurrentProfile();
+    RenderSettingsDialog *dialog = new RenderSettingsDialog(OutputSettings(),
+                                                            this);
+    if(dialog->exec()) {
+        OutputSettingsProfile *newProfile = new OutputSettingsProfile();
+        OUTPUT_SETTINGS_PROFILES.append(newProfile);
+        mProfilesComboBox->addItem(newProfile->getName());
+        mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);
+        updateButtonsEnabled();
+        OutputSettings outputSettings = dialog->getSettings();
+        newProfile->setSettings(outputSettings);
+        currentProfileChanged();
+    }
+    delete dialog;
 }
 
 void OutputSettingsProfilesDialog::editCurrentProfile() {
@@ -128,6 +179,7 @@ void OutputSettingsProfilesDialog::editCurrentProfile() {
     if(dialog->exec()) {
         OutputSettings outputSettings = dialog->getSettings();
         currentProfile->setSettings(outputSettings);
+        currentProfileChanged();
     }
     delete dialog;
 }

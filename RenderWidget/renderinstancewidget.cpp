@@ -4,6 +4,7 @@
 #include <QMenu>
 #include "rendersettingsdialog.h"
 #include "outputsettingsprofilesdialog.h"
+#include "outputsettingsdisplaywidget.h"
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
@@ -52,24 +53,8 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     mContentLayout->addWidget(renderSettings);
 
     mOutputSettings = new ClosableContainer();
-    mOutputFormatLabel = new QLabel("Format:", this);
-    mVideoCodecLabel = new QLabel("Video codec:", this);
-    mVideoPixelFormatLabel = new QLabel("Pixel format:", this);
-    mVideoBitrateLabel = new QLabel("Video bitrate:", this);
-    mAudioCodecLabel = new QLabel("Audio codec:", this);
-    mAudioSampleRateLabel = new QLabel("Audio sample rate:", this);
-    mAudioSampleFormatLabel = new QLabel("Audio sample format:", this);
-    mAudioBitrateLabel = new QLabel("Audio bitrate:", this);
-    mAudioChannelLayoutLabel = new QLabel("Audio channel layout:", this);
-    mOutputSettings->addContentWidget(mOutputFormatLabel);
-    mOutputSettings->addContentWidget(mVideoCodecLabel);
-    mOutputSettings->addContentWidget(mVideoPixelFormatLabel);
-    mOutputSettings->addContentWidget(mVideoBitrateLabel);
-    mOutputSettings->addContentWidget(mAudioCodecLabel);
-    mOutputSettings->addContentWidget(mAudioSampleRateLabel);
-    mOutputSettings->addContentWidget(mAudioSampleFormatLabel);
-    mOutputSettings->addContentWidget(mAudioBitrateLabel);
-    mOutputSettings->addContentWidget(mAudioChannelLayoutLabel);
+    mOutputSettingsDisplayWidget = new OutputSettingsDisplayWidget(this);
+    mOutputSettings->addContentWidget(mOutputSettingsDisplayWidget);
 
     QWidget *outputSettingsLabelWidget = new QWidget();
     outputSettingsLabelWidget->setObjectName("darkWidget");
@@ -185,6 +170,7 @@ void RenderInstanceWidget::updateFromSettings() {
         outputTxt = outputProfile->getName();
     }
     mOutputSettingsButton->setText(outputTxt);
+    mOutputSettingsDisplayWidget->setOutputSettings(outputSettings);
 }
 
 RenderInstanceSettings *RenderInstanceWidget::getSettings() {
@@ -207,6 +193,7 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
             mOutputSettingsButton->setText("Custom " +
                         QString(outputFormat->long_name));
         }
+        mOutputSettingsDisplayWidget->setOutputSettings(outputSettings);
         updateOutputDestinationFromCurrentFormat();
     }
     delete dialog;
@@ -219,6 +206,7 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     }
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     AVOutputFormat *format = outputSettings.outputFormat;
+    if(format == NULL) return;
     QString tmpStr = QString(format->extensions);
     QStringList supportedExt = tmpStr.split(",");
     QString fileName = outputDst.split("/").last();
@@ -298,6 +286,9 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
             actionT->setData(QVariant(i));
             menu.addAction(actionT);
             i++;
+        }
+        if(OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES.isEmpty()) {
+            menu.addAction("No profiles")->setEnabled(false);
         }
         menu.addSeparator();
         QAction *actionT = new QAction("Edit...");
