@@ -65,8 +65,7 @@ private:
     QString mName;
 };
 
-class UndoRedoSet : public UndoRedo
-{
+class UndoRedoSet : public UndoRedo {
 public:
     UndoRedoSet() : UndoRedo("UndoRedoSet") {
     }
@@ -104,7 +103,8 @@ private:
 
 class UndoRedoStack {
 public:
-    UndoRedoStack() {
+    UndoRedoStack(MainWindow *mainWindow) {
+        mMainWindow = mainWindow;
         startNewSet();
     }
 
@@ -116,8 +116,6 @@ public:
         clearUndoStack();
         clearRedoStack();
     }
-
-    void setWindow(MainWindow *mainWindow);
 
     void finishSet() {
         mNumberOfSets--;
@@ -183,6 +181,153 @@ public:
         mUndoRedoBlocked = false;
     }
 
+    bool undoRedoBlocked() {
+        return mUndoRedoBlocked;
+    }
+
+    UndoRedo *addAddPointToVectorPathAnimatorUndoRedo(
+            VectorPathAnimator *path,
+            const QPointF &startRelPos,
+            const QPointF &relPos,
+            const QPointF &endRelPos,
+            const int &targetNodeId,
+            const NodeSettings &nodeSettings,
+            const int &newNodeId);
+
+    UndoRedo *addMoveChildInListUndoRedo(
+            BoundingBox *child,
+            const int &fromIndex,
+            const int &toIndex,
+            BoxesGroup *parentBox);
+
+    UndoRedo *addMoveChildAnimatorInListUndoRedo(
+            Property *child,
+            const int &fromIndex,
+            const int &toIndex,
+            ComplexAnimator *parentAnimator);
+
+    UndoRedo *addSetBoundingBoxZListIndexUnoRedo(
+            const int &indexBefore,
+            const int &indexAfter,
+            BoundingBox *box);
+
+    UndoRedo *addAddChildToListUndoRedo(
+            BoxesGroup *parent,
+            const int &index,
+            BoundingBox *child);
+
+    UndoRedo *addRemoveChildFromListUndoRedo(
+            BoxesGroup *parent,
+            const int &index,
+            BoundingBox *child);
+
+    UndoRedo *addSetBoxVisibleUndoRedo(
+            BoundingBox *target,
+            const bool &visibleBefore,
+            const bool &visibleAfter);
+
+    UndoRedo *addChangeQrealAnimatorValue(
+            const SkScalar &oldValue,
+            const SkScalar &newValue,
+            QrealAnimator *animator);
+
+    UndoRedo *addChangeQrealKeyValueUndoRedo(
+            const SkScalar &oldValue,
+            const SkScalar &newValue,
+            QrealKey *key);
+
+    UndoRedo *addChangeKeyFrameUndoRedo(
+            const int &oldFrame,
+            const int &newFrame,
+            Key *key);
+
+    UndoRedo *addAnimatorRecordingSetUndoRedo(
+            const bool &recordingOld,
+            const bool &recordingNew,
+            Animator *animator);
+
+    UndoRedo *addAddKeyToAnimatorUndoRedo(
+            Key *key,
+            Animator *animator);
+
+    UndoRedo *addRemoveKeyFromAnimatorUndoRedo(
+            Key *key,
+            Animator *animator);
+
+    UndoRedo *addPaintTypeChangeUndoRedo(
+            const PaintType &oldType,
+            const PaintType &newType,
+            PaintSettings *target);
+
+    UndoRedo *addGradientChangeUndoRedo(
+            Gradient *oldGradient,
+            Gradient *newGradient,
+            PaintSettings *target);
+
+    UndoRedo *addGradientColorAddedToListUndoRedo(
+            Gradient *target,
+            ColorAnimator *color);
+
+    UndoRedo *addGradientColorRemovedFromListUndoRedo(
+            Gradient *target,
+            ColorAnimator *color);
+
+    UndoRedo *addGradientSwapColorsUndoRedo(
+            Gradient *target,
+            const int &id1,
+            const int &id2);
+
+    UndoRedo *addAddSinglePathAnimatorUndoRedo(
+            PathAnimator *target,
+            VectorPathAnimator *path);
+
+    UndoRedo *addRemoveSinglePathAnimatorUndoRedo(
+            PathAnimator *target,
+            VectorPathAnimator *path);
+
+    UndoRedo *addChangeFontUndoRedo(
+            TextBox *target,
+            const QFont &fontBefore,
+            const QFont &fontAfter);
+
+    UndoRedo *addChangeTextUndoRedo(
+            QStringAnimator *target,
+            const QString &textBefore,
+            const QString &textAfter);
+
+    UndoRedo *addPathContainerAddNodeElementsUR(
+            PathContainer *target,
+            const int &startPtIndex,
+            const SkPoint &startPos,
+            const SkPoint &pos,
+            const SkPoint &endPos);
+
+    UndoRedo *addPathContainerdRemoveNodeElementsUR(
+            PathContainer *target,
+            const int &startPtIndex,
+            const SkPoint &startPos,
+            const SkPoint &pos,
+            const SkPoint &endPos);
+
+    UndoRedo *addPathContainerPathChangeUR(
+            PathContainer *target,
+            const QList<SkPoint> oldPts,
+            const QList<SkPoint> newPts);
+
+    UndoRedo *addVectorPathAnimatorReplaceNodeSettingsUR(
+            VectorPathAnimator *target,
+            const int &index,
+            const NodeSettings &oldSettings,
+            const NodeSettings &settings);
+
+    UndoRedo *addVectorPathAnimatorInsertNodeSettingsUR(
+            VectorPathAnimator *target,
+            const int &index,
+            const NodeSettings &settings);
+    UndoRedo *addVectorPathAnimatorRemoveNodeSettingsUR(
+            VectorPathAnimator *target,
+            const int &index,
+            const NodeSettings &settings);
 private:
     bool mUndoRedoBlocked = false;
     int mLastUndoRedoFrame = INT_MAX;

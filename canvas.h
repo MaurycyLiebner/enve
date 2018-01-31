@@ -19,6 +19,7 @@ class SkCanvas;
 class ImageSequenceBox;
 class Brush;
 class NodePoint;
+class UndoRedoStack;
 
 #define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
 
@@ -559,7 +560,16 @@ public:
     void startMaxFramePosTransformForAllSelected();
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int &dFrame);
+
+    UndoRedoStack *getUndoRedoStack() {
+        return mUndoRedoStack;
+    }
+
+    void blockUndoRedo();
+    void unblockUndoRedo();
 protected:
+    UndoRedoStack *mUndoRedoStack = NULL;
+
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;

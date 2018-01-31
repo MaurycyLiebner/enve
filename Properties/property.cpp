@@ -86,24 +86,10 @@ void Property::prp_callFinishUpdater() {
     prp_mUpdater->updateFinal();
 }
 
-void Property::startNewUndoRedoSet() {
-    mMainWindow->getUndoRedoStack()->startNewSet();
-}
-
-void Property::finishUndoRedoSet() {
-    mMainWindow->getUndoRedoStack()->finishSet();
-}
-
-void Property::createDetachedUndoRedoStack() {
-    mMainWindow->createDetachedUndoRedoStack();
-}
-
-void Property::deleteDetachedUndoRedoStack() {
-    mMainWindow->deleteDetachedUndoRedoStack();
-}
-
 void Property::addUndoRedo(UndoRedo *undoRedo) {
-    mMainWindow->getUndoRedoStack()->addUndoRedo(undoRedo);
+    UndoRedoStack *stack = mMainWindow->getUndoRedoStack();
+    if(stack == NULL) return;
+    stack->addUndoRedo(undoRedo);
 }
 
 void Property::callUpdateSchedulers() {

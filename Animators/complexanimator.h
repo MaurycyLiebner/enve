@@ -21,7 +21,8 @@ public:
                             const int &to,
                             const bool &saveUndoRedo = true);
     void ca_moveChildBelow(Property *move, Property *below);
-    void ca_moveChildAbove(Property *move, Property *above);
+    void ca_moveChildAbove(Property *move, Property *above,
+                           const bool &saveUndoRedo = true);
 
     void prp_startTransform();
     void prp_setUpdater(AnimatorUpdater *updater);

@@ -11,13 +11,263 @@
 #include "Animators/pathanimator.h"
 #include "Animators/qstringanimator.h"
 
-void UndoRedoStack::setWindow(MainWindow *mainWindow) {
-    mMainWindow = mainWindow;
+UndoRedo *UndoRedoStack::addMoveChildInListUndoRedo(
+        BoundingBox *child,
+        const int &fromIndex,
+        const int &toIndex,
+        BoxesGroup *parentBox) {
+    if(undoRedoBlocked()) return NULL;
+    return new MoveChildInListUndoRedo(child,
+                                       fromIndex,
+                                       toIndex,
+                                       parentBox);
+}
+
+UndoRedo *UndoRedoStack::addMoveChildAnimatorInListUndoRedo(
+        Property *child,
+        const int &fromIndex,
+        const int &toIndex,
+        ComplexAnimator *parentAnimator) {
+    if(undoRedoBlocked()) return NULL;
+    return new MoveChildAnimatorInListUndoRedo(child,
+                                               fromIndex,
+                                               toIndex,
+                                               parentAnimator);
+}
+
+UndoRedo *UndoRedoStack::addSetBoundingBoxZListIndexUnoRedo(
+        const int &indexBefore,
+        const int &indexAfter,
+        BoundingBox *box) {
+    if(undoRedoBlocked()) return NULL;
+    return new SetBoundingBoxZListIndexUnoRedo(indexBefore,
+                                               indexAfter,
+                                               box);
+}
+
+UndoRedo *UndoRedoStack::addAddChildToListUndoRedo(
+        BoxesGroup *parent,
+        const int &index,
+        BoundingBox *child) {
+    if(undoRedoBlocked()) return NULL;
+    return new AddChildToListUndoRedo(parent,
+                                      index,
+                                      child);
+}
+
+UndoRedo *UndoRedoStack::addRemoveChildFromListUndoRedo(
+        BoxesGroup *parent,
+        const int &index,
+        BoundingBox *child) {
+    if(undoRedoBlocked()) return NULL;
+    return new RemoveChildFromListUndoRedo(parent,
+                                           index,
+                                           child);
+}
+
+UndoRedo *UndoRedoStack::addSetBoxVisibleUndoRedo(
+        BoundingBox *target,
+        const bool &visibleBefore,
+        const bool &visibleAfter) {
+    if(undoRedoBlocked()) return NULL;
+    return new SetBoxVisibleUndoRedo(target,
+                                     visibleBefore,
+                                     visibleAfter);
+}
+
+UndoRedo *UndoRedoStack::addChangeQrealAnimatorValue(
+        const SkScalar &oldValue,
+        const SkScalar &newValue,
+        QrealAnimator *animator) {
+    if(undoRedoBlocked()) return NULL;
+    return new ChangeQrealAnimatorValue(oldValue,
+                                        newValue,
+                                        animator);
+}
+
+UndoRedo *UndoRedoStack::addChangeQrealKeyValueUndoRedo(
+        const SkScalar &oldValue,
+        const SkScalar &newValue,
+        QrealKey *key) {
+    if(undoRedoBlocked()) return NULL;
+    return new ChangeQrealKeyValueUndoRedo(oldValue,
+                                           newValue,
+                                           key);
+}
+
+UndoRedo *UndoRedoStack::addChangeKeyFrameUndoRedo(
+        const int &oldFrame,
+        const int &newFrame,
+        Key *key) {
+    if(undoRedoBlocked()) return NULL;
+    return new ChangeKeyFrameUndoRedo(oldFrame,
+                                      newFrame,
+                                      key);
+}
+
+UndoRedo *UndoRedoStack::addAnimatorRecordingSetUndoRedo(
+        const bool &recordingOld,
+        const bool &recordingNew,
+        Animator *animator) {
+    if(undoRedoBlocked()) return NULL;
+    return new AnimatorRecordingSetUndoRedo(recordingOld,
+                                            recordingNew,
+                                            animator);
+}
+
+UndoRedo *UndoRedoStack::addAddKeyToAnimatorUndoRedo(
+        Key *key, Animator *animator) {
+    if(undoRedoBlocked()) return NULL;
+    return new AddKeyToAnimatorUndoRedo(key, animator);
+}
+
+UndoRedo *UndoRedoStack::addRemoveKeyFromAnimatorUndoRedo(
+        Key *key, Animator *animator) {
+    if(undoRedoBlocked()) return NULL;
+    return new RemoveKeyFromAnimatorUndoRedo(key, animator);
+}
+
+UndoRedo *UndoRedoStack::addPaintTypeChangeUndoRedo(
+        const PaintType &oldType,
+        const PaintType &newType,
+        PaintSettings *target) {
+    if(undoRedoBlocked()) return NULL;
+    return new PaintTypeChangeUndoRedo(oldType, newType,
+                                       target);
+}
+
+UndoRedo *UndoRedoStack::addGradientChangeUndoRedo(
+        Gradient *oldGradient,
+        Gradient *newGradient,
+        PaintSettings *target) {
+    if(undoRedoBlocked()) return NULL;
+    return new GradientChangeUndoRedo(oldGradient,
+                                      newGradient,
+                                      target);
+}
+
+UndoRedo *UndoRedoStack::addGradientColorAddedToListUndoRedo(
+        Gradient *target,
+        ColorAnimator *color) {
+    if(undoRedoBlocked()) return NULL;
+    return new GradientColorAddedToListUndoRedo(target, color);
+}
+
+UndoRedo *UndoRedoStack::addGradientColorRemovedFromListUndoRedo(
+        Gradient *target,
+        ColorAnimator *color) {
+    if(undoRedoBlocked()) return NULL;
+    return new GradientColorRemovedFromListUndoRedo(target, color);
+}
+
+UndoRedo *UndoRedoStack::addGradientSwapColorsUndoRedo(
+        Gradient *target,
+        const int &id1,
+        const int &id2) {
+    if(undoRedoBlocked()) return NULL;
+    return new GradientSwapColorsUndoRedo(target, id1, id2);
+}
+
+UndoRedo *UndoRedoStack::addAddSinglePathAnimatorUndoRedo(
+        PathAnimator *target,
+        VectorPathAnimator *path) {
+    if(undoRedoBlocked()) return NULL;
+    return new AddSinglePathAnimatorUndoRedo(target, path);
+}
+
+UndoRedo *UndoRedoStack::addRemoveSinglePathAnimatorUndoRedo(
+        PathAnimator *target,
+        VectorPathAnimator *path) {
+    if(undoRedoBlocked()) return NULL;
+    return new RemoveSinglePathAnimatorUndoRedo(target, path);
+}
+
+UndoRedo *UndoRedoStack::addChangeFontUndoRedo(
+        TextBox *target,
+        const QFont &fontBefore,
+        const QFont &fontAfter) {
+    if(undoRedoBlocked()) return NULL;
+    return new ChangeFontUndoRedo(target, fontBefore, fontAfter);
+}
+
+UndoRedo *UndoRedoStack::addChangeTextUndoRedo(
+        QStringAnimator *target,
+        const QString &textBefore,
+        const QString &textAfter) {
+    if(undoRedoBlocked()) return NULL;
+    return new ChangeTextUndoRedo(target, textBefore, textAfter);
+}
+
+UndoRedo *UndoRedoStack::addPathContainerAddNodeElementsUR(
+        PathContainer *target,
+        const int &startPtIndex,
+        const SkPoint &startPos,
+        const SkPoint &pos,
+        const SkPoint &endPos) {
+    if(undoRedoBlocked()) return NULL;
+    return new PathContainerAddNodeElementsUR(target,
+                                              startPtIndex,
+                                              startPos,
+                                              pos,
+                                              endPos);
+}
+
+UndoRedo *UndoRedoStack::addPathContainerdRemoveNodeElementsUR(
+        PathContainer *target,
+        const int &startPtIndex,
+        const SkPoint &startPos,
+        const SkPoint &pos,
+        const SkPoint &endPos) {
+    if(undoRedoBlocked()) return NULL;
+    return new PathContainerdRemoveNodeElementsUR(target,
+                                                  startPtIndex,
+                                                  startPos,
+                                                  pos,
+                                                  endPos);
+}
+
+UndoRedo *UndoRedoStack::addPathContainerPathChangeUR(
+        PathContainer *target,
+        const QList<SkPoint> oldPts,
+        const QList<SkPoint> newPts) {
+    if(undoRedoBlocked()) return NULL;
+    return new PathContainerPathChangeUR(target, oldPts, newPts);
+}
+
+UndoRedo *UndoRedoStack::addVectorPathAnimatorReplaceNodeSettingsUR(
+        VectorPathAnimator *target,
+        const int &index,
+        const NodeSettings &oldSettings,
+        const NodeSettings &settings) {
+    if(undoRedoBlocked()) return NULL;
+    return new VectorPathAnimatorReplaceNodeSettingsUR(target,
+                                                       index,
+                                                       oldSettings,
+                                                       settings);
+}
+
+UndoRedo *UndoRedoStack::addVectorPathAnimatorInsertNodeSettingsUR(
+        VectorPathAnimator *target,
+        const int &index,
+        const NodeSettings &settings) {
+    if(undoRedoBlocked()) return NULL;
+    return new VectorPathAnimatorInsertNodeSettingsUR(target,
+                                                      index,
+                                                      settings);
+}
+
+UndoRedo *UndoRedoStack::addVectorPathAnimatorRemoveNodeSettingsUR(
+        VectorPathAnimator *target,
+        const int &index,
+        const NodeSettings &settings) {
+    if(undoRedoBlocked()) return NULL;
+    return new VectorPathAnimatorRemoveNodeSettingsUR(target,
+                                                      index,
+                                                      settings);
 }
 
 void UndoRedoStack::addUndoRedo(UndoRedo *undoRedo) {
-    if(mUndoRedoBlocked) {
-        delete undoRedo;
+    if(undoRedo == NULL) {
         return;
     }
     mMainWindow->setFileChangedSinceSaving(true);

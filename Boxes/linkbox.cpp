@@ -63,7 +63,8 @@ QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget) :
     BoundingBox(TYPE_INTERNAL_LINK) {
     setLinkTarget(linkTarget);
-    ca_addChildAnimator(mBoxTarget.data());
+    ca_prependChildAnimator(mTransformAnimator.data(),
+                            mBoxTarget.data());
     connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
             this, SLOT(setTargetSlot(BoundingBox*)));
 }
@@ -141,7 +142,8 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup *linkTarget) :
                 child->createLinkForLinkGroup()->ref<BoundingBox>();
         addContainedBox(newLink.data());
     }
-    ca_addChildAnimator(mBoxTarget.data());
+    ca_prependChildAnimator(mTransformAnimator.data(),
+                            mBoxTarget.data());
     connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
             this, SLOT(setTargetSlot(BoundingBox*)));
 }
@@ -222,7 +224,8 @@ QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 InternalLinkCanvas::InternalLinkCanvas(BoxesGroup *linkTarget) :
     InternalLinkGroupBox(linkTarget) {
     mClipToCanvas->prp_setName("clip to canvas");
-    ca_addChildAnimator(mClipToCanvas.data());
+    ca_prependChildAnimator(mTransformAnimator.data(),
+                            mClipToCanvas.data());
 }
 
 void InternalLinkCanvas::addSchedulersToProcess() {
@@ -254,9 +257,9 @@ void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrame(const int &relFra
     Canvas *canvasTarget = (Canvas*)finalTarget;
     canvasData->bgColor = canvasTarget->getBgColorAnimator()->
             getColorAtRelFrame(relFrame).getSkColor();
-    qreal res = getParentCanvas()->getResolutionFraction();
-    canvasData->canvasHeight = canvasTarget->getCanvasHeight()*res;
-    canvasData->canvasWidth = canvasTarget->getCanvasWidth()*res;
+    //qreal res = getParentCanvas()->getResolutionFraction();
+    canvasData->canvasHeight = canvasTarget->getCanvasHeight();//*res;
+    canvasData->canvasWidth = canvasTarget->getCanvasWidth();//*res;
     if(mParentGroup->SWT_isLinkBox()) {
         canvasData->clipToCanvas =
                 ((InternalLinkCanvas*)getLinkTarget())->clipToCanvas();

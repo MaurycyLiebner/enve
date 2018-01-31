@@ -69,14 +69,11 @@ MainWindow::MainWindow(QWidget *parent)
 //        mClipboardContainers << NULL;
 //    }
 
-    mCurrentUndoRedoStack = &mUndoRedoStack;
-
     mMemoryHandler = new MemoryHandler(this);
 
     mMainWindowInstance = this;
     //int nThreads = QThread::idealThreadCount();
 
-    mUndoRedoStack.setWindow(this);
     setCurrentPath("");
 
     mRightDock = new QDockWidget(this);
@@ -769,19 +766,6 @@ void MainWindow::canvasNameChanged(Canvas *canvas,
     mCurrentCanvasComboBox->setItemText(idT, name);
 }
 
-void MainWindow::createDetachedUndoRedoStack() {
-    mCurrentUndoRedoStack = new UndoRedoStack();
-    mCurrentUndoRedoStack->setWindow(this);
-    mDetachedUndoRedoStack = true;
-}
-
-void MainWindow::deleteDetachedUndoRedoStack()
-{
-    mDetachedUndoRedoStack = false;
-    delete mCurrentUndoRedoStack;
-    mCurrentUndoRedoStack = &mUndoRedoStack;
-}
-
 void MainWindow::updateCanvasModeButtonsChecked() {
     if(mCanvasWindow->hasNoCanvas()) return;
     const CanvasMode &currentMode =
@@ -963,9 +947,9 @@ bool MainWindow::isAltPressed() {
 }
 
 void MainWindow::finishUndoRedoSet() {
+    if(mCurrentUndoRedoStack == NULL) return;
     mCurrentUndoRedoStack->finishSet();
     mCurrentUndoRedoStack->startNewSet();
-
 }
 
 void MainWindow::callUpdateSchedulers() {
@@ -1187,7 +1171,6 @@ bool MainWindow::isEnabled() {
 void MainWindow::clearAll() {
     mUpdateSchedulers.clear();
     setFileChangedSinceSaving(false);
-    mUndoRedoStack.clearAll();
     mObjectSettingsWidget->setMainTarget(NULL);
     mBoxesListAnimationDockWidget->clearAll();
     mCurrentCanvasComboBox->clear();
@@ -1313,12 +1296,14 @@ void MainWindow::revert() {
 }
 
 void MainWindow::undo() {
+    if(mCurrentUndoRedoStack == NULL) return;
     getUndoRedoStack()->undo();
     mCanvasWindow->updateHoveredElements();
     callUpdateSchedulers();
 }
 
 void MainWindow::redo() {
+    if(mCurrentUndoRedoStack == NULL) return;
     getUndoRedoStack()->redo();
     mCanvasWindow->updateHoveredElements();
     callUpdateSchedulers();

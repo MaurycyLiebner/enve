@@ -28,6 +28,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                int canvasWidth, int canvasHeight,
                const int &frameCount, const qreal &fps) :
     BoxesGroup(fillStrokeSettings) {
+    mUndoRedoStack = new UndoRedoStack(mMainWindow);
     mFps = fps;
     connect(this, SIGNAL(nameChanged(QString)),
             this, SLOT(emitCanvasNameChanged()));
@@ -67,6 +68,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 }
 
 Canvas::~Canvas() {
+    delete mUndoRedoStack;
     delete mRotPivot;
     delete mCurrentBrush;
 }
@@ -1252,6 +1254,14 @@ void Canvas::moveMaxFrameForAllSelected(const int &dFrame) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->moveMaxFrame(dFrame);
     }
+}
+
+void Canvas::blockUndoRedo() {
+    mUndoRedoStack->blockUndoRedo();
+}
+
+void Canvas::unblockUndoRedo() {
+    mUndoRedoStack->unblockUndoRedo();
 }
 
 SoundComposition *Canvas::getSoundComposition() {

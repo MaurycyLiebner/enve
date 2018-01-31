@@ -161,7 +161,8 @@ void ComplexAnimator::ca_updateDescendatKeyFrame(Key *key) {
 }
 
 void ComplexAnimator::ca_moveChildAbove(Property *move,
-                                        Property *above) {
+                                        Property *above,
+                                        const bool &saveUndoRedo) {
     int indexFrom = getChildPropertyIndex(move);
     int indexTo = getChildPropertyIndex(above);
     if(indexFrom > indexTo) {
@@ -169,7 +170,8 @@ void ComplexAnimator::ca_moveChildAbove(Property *move,
     }
     ca_moveChildInList(move,
                        indexFrom,
-                       indexTo);
+                       indexTo,
+                       saveUndoRedo);
 }
 
 void ComplexAnimator::ca_moveChildBelow(Property *move,

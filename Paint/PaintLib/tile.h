@@ -227,7 +227,21 @@ public:
     void setPixel(const int &x, const int &y,
                   const uchar &r, const uchar &g,
                   const uchar &b, const uchar &a);
+
+    void startTransform() {
+        if(mTransformStarted) return;
+        mTransformStarted = true;
+        std::memcpy(mSavedData, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+    }
+    void finishTransform() {
+        if(!mTransformStarted) return;
+        mTransformStarted = false;
+    }
 private:
+    bool mTransformStarted = false;
+    uchar *mSavedData = NULL;
+    SkBitmap mSavedDataImage;
+
     bool mPaintInOtherThread;
 
     void updateDrawerFromDataArray();

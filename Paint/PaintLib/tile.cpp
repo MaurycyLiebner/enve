@@ -301,6 +301,11 @@ void Tile::initializeTileData() {
 
     mData = (uchar*)mDataTileImage.getPixels();
 
+    mSavedDataImage.allocPixels(info);
+    mSavedDataImage.setIsVolatile(true);
+
+    mSavedData = (uchar*)mSavedDataImage.getPixels();
+
     if(mPaintInOtherThread) {
         initializeDrawer();
     } else {

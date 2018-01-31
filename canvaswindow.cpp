@@ -137,6 +137,12 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
         emit changeFrameRange(0, getMaxFrame());
         emit changeCurrentFrame(getCurrentFrame());
     }
+    if(mCurrentCanvas == NULL) {
+        MainWindow::getInstance()->setCurrentUndoRedoStack(NULL);
+    } else {
+        MainWindow::getInstance()->setCurrentUndoRedoStack(
+                    mCurrentCanvas->getUndoRedoStack());
+    }
     mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
                 mCurrentCanvas.data(),
                 SWT_CurrentCanvas);
@@ -1167,7 +1173,7 @@ void CanvasWindow::importFile(const QString &path,
         createSoundForPath(path);
     } else {
         QSharedPointer<BoundingBox> importedBox;
-        MainWindow::getInstance()->blockUndoRedo();
+        mCurrentCanvas->blockUndoRedo();
         if(isVectorExt(extension)) {
             importedBox = loadSVGFile(path)->ref<BoundingBox>();
         } else if(isImageExt(extension)) {
@@ -1181,7 +1187,7 @@ void CanvasWindow::importFile(const QString &path,
         } else if(isAvExt(extension)) {
             MainWindow::getInstance()->loadAVFile(path);
         }
-        MainWindow::getInstance()->unblockUndoRedo();
+        mCurrentCanvas->unblockUndoRedo();
 
         if(importedBox != NULL) {
             mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(

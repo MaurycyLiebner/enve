@@ -27,22 +27,22 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mProfileButtonsLayout = new QHBoxLayout();
     mNewProfileButton = new QPushButton("New...", this);
     mNewProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                     QSizePolicy::Minimum);
+                                     QSizePolicy::Fixed);
     connect(mNewProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::createAndEditNewProfile);
     mDuplicateProfileButton = new QPushButton("Duplicate", this);
     mDuplicateProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                           QSizePolicy::Minimum);
+                                           QSizePolicy::Fixed);
     connect(mDuplicateProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::duplicateCurrentProfile);
     mEditProfileButton = new QPushButton("Edit...", this);
     mEditProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                      QSizePolicy::Minimum);
+                                      QSizePolicy::Fixed);
     connect(mEditProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::editCurrentProfile);
     mDeleteProfileButton = new QPushButton("Delete", this);
     mDeleteProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                        QSizePolicy::Minimum);
+                                        QSizePolicy::Fixed);
     connect(mDeleteProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::deleteCurrentProfile);
     mProfileButtonsLayout->addWidget(mNewProfileButton);
@@ -75,9 +75,9 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     connect(mCancelButton, &QPushButton::released,
             this, &QDialog::reject);
 
-    mButtonsLayout->addWidget(mCancelButton, Qt::AlignRight);
-    mButtonsLayout->addWidget(mOkButton, Qt::AlignRight);
-
+    mButtonsLayout->addWidget(mCancelButton);
+    mButtonsLayout->addWidget(mOkButton);
+    mButtonsLayout->setAlignment(Qt::AlignRight);
     mMainLayout->addLayout(mProfileLayout);
     mMainLayout->addLayout(mProfileButtonsLayout);
     mMainLayout->addWidget(mOutputSettingsDisplayWidget);

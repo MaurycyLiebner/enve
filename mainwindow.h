@@ -60,11 +60,14 @@ public:
 
     static MainWindow *getInstance();
     static void addUndoRedo(UndoRedo *uR) {
-        MainWindow::getInstance()->getUndoRedoStack()->addUndoRedo(uR);
+        UndoRedoStack *stack = MainWindow::getInstance()->getUndoRedoStack();
+        if(stack == NULL) return;
+        stack->addUndoRedo(uR);
     }
-    void createDetachedUndoRedoStack();
-    void deleteDetachedUndoRedoStack();
 
+    void setCurrentUndoRedoStack(UndoRedoStack *stack) {
+        mCurrentUndoRedoStack = stack;
+    }
     UndoRedoStack *getUndoRedoStack();
 
     void addUpdateScheduler(Updatable *scheduler);
@@ -124,14 +127,6 @@ public:
     void previewBeingPlayed();
     void previewBeingRendered();
     void previewPaused();
-
-    void blockUndoRedo() {
-        mUndoRedoStack.blockUndoRedo();
-    }
-
-    void unblockUndoRedo() {
-        mUndoRedoStack.unblockUndoRedo();
-    }
 
     void incBrushRadius();
     void decBrushRadius();
@@ -250,9 +245,7 @@ private:
     QMenu *mRenderMenu;
 
     CanvasWindow *mCanvasWindow;
-    UndoRedoStack mUndoRedoStack;
-    bool mDetachedUndoRedoStack = false;
-    UndoRedoStack *mCurrentUndoRedoStack;
+    UndoRedoStack *mCurrentUndoRedoStack = NULL;
 
     QList<std::shared_ptr<Updatable> > mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);

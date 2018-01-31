@@ -49,7 +49,9 @@ PathBox::PathBox(const BoundingBoxType &type) :
     mStrokeSettings->setTargetPathBox(this);
     ca_addChildAnimator(mFillSettings.data());
     ca_addChildAnimator(mStrokeSettings.data());
-    ca_moveChildAbove(mEffectsAnimators.data(), mStrokeSettings.data());
+    ca_moveChildAbove(mEffectsAnimators.data(),
+                      mStrokeSettings.data(),
+                      false);
     ca_addChildAnimator(mPathEffectsAnimators.data());
     ca_addChildAnimator(mFillPathEffectsAnimators.data());
     ca_addChildAnimator(mOutlinePathEffectsAnimators.data());

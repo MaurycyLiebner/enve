@@ -154,12 +154,6 @@ public:
 
     //
 
-    void startNewUndoRedoSet();
-    void finishUndoRedoSet();
-
-    void createDetachedUndoRedoStack();
-    void deleteDetachedUndoRedoStack();
-
     void addUndoRedo(UndoRedo *undoRedo);
     void callUpdateSchedulers();
     MainWindow *getMainWindow();

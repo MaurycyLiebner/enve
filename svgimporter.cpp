@@ -2073,7 +2073,7 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
         VectorPathAnimator *singlePath =
                 new VectorPathAnimator(pathAnimator);
         separatePath->apply(singlePath);
-        pathAnimator->addSinglePathAnimator(singlePath);
+        pathAnimator->addSinglePathAnimator(singlePath, false);
     }
 
     BoundingBoxSvgAttributes::apply((BoundingBox*)path);
@@ -2097,7 +2097,8 @@ void SvgSeparatePath::apply(VectorPathAnimator *path) {
                                         lastPoint,
                                         NodeSettings(point->getStartPointEnabled(),
                                                      point->getEndPointEnabled(),
-                                                     point->getCtrlsMode()));
+                                                     point->getCtrlsMode()),
+                                        false);
         if(firstPoint == NULL) firstPoint = lastPoint;
     }
     if(mClosedPath) {
