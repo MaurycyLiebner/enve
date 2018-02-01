@@ -43,6 +43,7 @@ class QrealKey;
 typedef std::shared_ptr<QrealKey> QrealKeyStdPtr;
 class QStringAnimator;
 typedef QSharedPointer<QStringAnimator> QStringAnimatorQSPtr;
+class Tile;
 
 enum CtrlsMode : short;
 enum PaintType : short;
@@ -902,5 +903,29 @@ private:
     VectorPathAnimator *mTarget;
     int mId;
     NodeSettings mSettings;
+};
+
+class TileChangedUndoRedo : public UndoRedo {
+public:
+    TileChangedUndoRedo(Tile *target) :
+        UndoRedo("TileChangedUndoRedo") {
+        mTarget = target;
+    }
+
+    void setOldBitmap(const SkBitmap &bitmap) {
+        SkPixmap pix;
+        bitmap.peekPixels(&pix);
+        mOldImage = SkImage::MakeRasterCopy(pix);
+    }
+
+    void setNewBitmap(const SkBitmap &bitmap) {
+        SkPixmap pix;
+        bitmap.peekPixels(&pix);
+        mNewImage = SkImage::MakeRasterCopy(pix);
+    }
+protected:
+    SkBitmap mOldImage;
+    SkBitmap mNewImage;
+    Tile *mTarget;
 };
 #endif // UNDOREDO_H

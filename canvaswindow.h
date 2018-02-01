@@ -19,8 +19,8 @@ class SoundComposition;
 class PaintSetting;
 class CanvasWidget;
 class RenderInstanceSettings;
-class Updatable;
-class Executable;
+class _ScheduledExecutor;
+class _Executor;
 class ImageBox;
 class SingleSound;
 class VideoBox;
@@ -87,7 +87,7 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void addUpdatableAwaitingUpdate(Executable *updatable);
+    void addUpdatableAwaitingUpdate(_Executor *updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             ScrollWidgetVisiblePart *visiblePartWidget);
@@ -141,7 +141,7 @@ public:
     bool noBoxesAwaitUpdate();
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
-    void addFileUpdatableAwaitingUpdate(Executable *updatable);
+    void addFileUpdatableAwaitingUpdate(_Executor *updatable);
     WindowSingleWidgetTarget *getWindowSWT() {
         return mWindowSWTTarget;
     }
@@ -179,8 +179,8 @@ protected:
     QList<QThread*> mControlerThreads;
     QThread *mFileControlerThread;
     QList<PaintControler*> mPaintControlers;
-    QList<std::shared_ptr<Executable> > mUpdatablesAwaitingUpdate;
-    QList<std::shared_ptr<Executable> > mFileUpdatablesAwaitingUpdate;
+    QList<std::shared_ptr<_Executor> > mUpdatablesAwaitingUpdate;
+    QList<std::shared_ptr<_Executor> > mFileUpdatablesAwaitingUpdate;
 
     int mCurrentRenderFrame;
 
@@ -216,8 +216,8 @@ protected:
     void renderSk(SkCanvas *canvas);
     void tabletEvent(QTabletEvent *e);
 signals:
-    void updateUpdatable(Executable*, int);
-    void updateFileUpdatable(Executable*, int);
+    void updateUpdatable(_Executor*, int);
+    void updateFileUpdatable(_Executor*, int);
 
     void changeCurrentFrame(int);
     void changeFrameRange(int, int);
@@ -306,9 +306,9 @@ public slots:
     void flipVerticalAction();
 private slots:
     void sendNextUpdatableForUpdate(const int &threadId,
-                                    Executable *lastUpdatable = NULL);
+                                    _Executor *lastUpdatable = NULL);
     void sendNextFileUpdatableForUpdate(const int &threadId,
-                                    Executable *lastUpdatable = NULL);
+                                    _Executor *lastUpdatable = NULL);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
 

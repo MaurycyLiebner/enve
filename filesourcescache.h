@@ -16,7 +16,7 @@ extern bool isVectorExt(const QString &extension);
 extern bool isImageExt(const QString &extension);
 extern bool isAvExt(const QString &extension);
 
-class FileCacheHandler : public Updatable {
+class FileCacheHandler : public _ScheduledExecutor {
 public:
     FileCacheHandler(const QString &filePath,
                      const bool &visibleInListWidgets = true);
@@ -66,7 +66,7 @@ public:
     ImageCacheHandler(const QString &filePath,
                       const bool &visibleSeparatly = true);
 
-    void processUpdate();
+    void _processUpdate();
     void afterUpdate();
     void clearCache() {
         mImage.reset();
@@ -86,7 +86,7 @@ public:
         FileCacheHandler("") {}
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
 
-    virtual Updatable *scheduleFrameLoad(const int &frame) = 0;
+    virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame) = 0;
     const int &getFramesCount() { return mFramesCount; }
 protected:
     int mFramesCount = 0;
@@ -101,11 +101,11 @@ public:
 
     void updateFrameCount();
 
-    void processUpdate() {}
+    void _processUpdate() {}
 
     void clearCache();
 
-    Updatable *scheduleFrameLoad(const int &frame);
+    _ScheduledExecutor *scheduleFrameLoad(const int &frame);
 protected:
     QStringList mFramePaths;
     QList<std::shared_ptr<ImageCacheHandler> > mFrameImageHandlers;
@@ -119,7 +119,7 @@ public:
 
     void beforeUpdate();
 
-    void processUpdate();
+    void _processUpdate();
 
     void afterUpdate();
 
@@ -127,7 +127,7 @@ public:
 
     const qreal &getFps();    
 
-    virtual Updatable *scheduleFrameLoad(const int &frame);
+    virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame);
 protected:
     QList<int> mFramesLoadScheduled;
 

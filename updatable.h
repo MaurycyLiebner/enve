@@ -5,79 +5,136 @@
 #include <QEventLoop>
 class PaintControler;
 
-class Executable : public StdSelfRef {
+class MinimalExecutor : public StdSelfRef {
 public:
-    Executable() {}
-    virtual ~Executable() {}
+    MinimalExecutor() {}
+    bool finished() { return mFinished; }
+
+    virtual void addDependent(MinimalExecutor *updatable) = 0;
+
+    virtual void clear() {
+        mFinished = false;
+        tellDependentThatFinished();
+    }
+
+    void decDependencies() {
+        nDependancies--;
+        if(mGUIThreadExecution) {
+            if(nDependancies == 0) {
+                GUI_process();
+                mFinished = true;
+                tellDependentThatFinished();
+            }
+        }
+    }
+    void incDependencies() { nDependancies++; }
+protected:
+    virtual void GUI_process() {}
+    bool mGUIThreadExecution = false;
+    void tellDependentThatFinished() {
+        foreach(MinimalExecutor *dependent, mCurrentExecutionDependent) {
+            dependent->decDependencies();
+        }
+        mCurrentExecutionDependent.clear();
+    }
+
+    bool mFinished = false;
+    QList<MinimalExecutor*> mCurrentExecutionDependent;
+    int nDependancies = 0;
+};
+
+class GUI_ThreadExecutor : public MinimalExecutor {
+    GUI_ThreadExecutor() {
+        mGUIThreadExecution = true;
+    }
+
+    void addDependent(MinimalExecutor *updatable) {
+        if(updatable == NULL) return;
+        if(!finished()) {
+            if(mCurrentExecutionDependent.contains(updatable)) return;
+            mCurrentExecutionDependent << updatable;
+            updatable->incDependencies();
+        }
+    }
+protected:
+    void GUI_process() = 0;
+};
+
+class _Executor : public MinimalExecutor {
+public:
+    _Executor() {}
+    virtual ~_Executor() {}
     void setCurrentPaintControler(PaintControler *paintControler) {
         mCurrentPaintControler = paintControler;
     }
 
     virtual void beforeUpdate() {
-        mSelfRef = ref<Executable>();
+        mSelfRef = ref<_Executor>();
         mBeingProcessed = true;
+        mCurrentExecutionDependent = mNextExecutionDependent;
+        mNextExecutionDependent.clear();
     }
 
-    virtual void processUpdate() = 0;
+    virtual void _processUpdate() = 0;
 
     void updateFinished() {
         mFinished = true;
         mBeingProcessed = false;
-        mCurrentPaintControler = NULL;
         afterUpdate();
         mSelfRef.reset();
     }
 
     virtual void afterUpdate() {
-
+        mCurrentPaintControler = NULL;
+        tellDependentThatFinished();
     }
 
     bool isBeingProcessed() { return mBeingProcessed; }
-    bool finished() { return mFinished; }
 
     void waitTillProcessed();
-
-    virtual bool readyToBeProcessed() {
-        return !mBeingProcessed;
-    }
-
-    virtual void clear() {
-        mFinished = false;
-        mBeingProcessed = false;
-        mSelfRef.reset();
-    }
-protected:
-    PaintControler *mCurrentPaintControler = NULL;
-    bool mFinished = false;
-    bool mBeingProcessed = false;
-    std::shared_ptr<Executable> mSelfRef;
-};
-
-class Updatable : public Executable {
-public:
-    Updatable() {
-        mFinished = true;
-    }
-    ~Updatable();
-
-    void beforeUpdate();
-
-    void afterUpdate();
-
-    virtual void schedulerProccessed();
-
-    void addDependent(Updatable *updatable);
-
-    void decDependencies() { nDependancies--; }
-    void incDependencies() { nDependancies++; }
-
 
     bool readyToBeProcessed() {
         return nDependancies == 0 && !mBeingProcessed;
     }
 
+    void clear() {
+        MinimalExecutor::clear();
+        mBeingProcessed = false;
+        mSelfRef.reset();
+        foreach(MinimalExecutor *dependent, mNextExecutionDependent) {
+            dependent->decDependencies();
+        }
+        mNextExecutionDependent.clear();
+    }
+
+    void addDependent(MinimalExecutor *updatable) {
+        if(updatable == NULL) return;
+        if(!finished()) {
+            if(mNextExecutionDependent.contains(updatable)) return;
+            mNextExecutionDependent << updatable;
+            updatable->incDependencies();
+        }
+    }
+protected:
+    PaintControler *mCurrentPaintControler = NULL;
+    bool mBeingProcessed = false;
+    std::shared_ptr<_Executor> mSelfRef;
+
+    QList<MinimalExecutor*> mNextExecutionDependent;
+};
+
+class _ScheduledExecutor : public _Executor {
+public:
+    _ScheduledExecutor() {
+        mFinished = true;
+    }
+    ~_ScheduledExecutor();
+
+    void beforeUpdate();
+
+    virtual void schedulerProccessed();
+
     void addScheduler();
-    virtual void addSchedulerNow();
 
     virtual bool shouldUpdate() {
         return true;
@@ -89,14 +146,9 @@ public:
     void clear();
     virtual bool isFileUpdatable() { return false; }
 protected:
+    virtual void addSchedulerNow();
     bool mSchedulerAdded = false;
     bool mAwaitingUpdate = false;
-
-    void tellDependentThatFinished();
-
-    QList<Updatable*> mDependent;
-    QList<Updatable*> mUpdateDependent;
-    int nDependancies = 0;
 };
 
 #endif // UPDATABLE_H

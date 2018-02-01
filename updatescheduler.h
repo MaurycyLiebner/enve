@@ -3,7 +3,7 @@
 
 class FileCacheHandler;
 class PathBox;
-class Updatable;
+class _ScheduledExecutor;
 class Gradient;
 
 class UpdateScheduler {

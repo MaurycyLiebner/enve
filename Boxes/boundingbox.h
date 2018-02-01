@@ -83,7 +83,7 @@ private:
 };
 
 class RenderDataCustomizerFunctor;
-struct BoundingBoxRenderData : public Updatable {
+struct BoundingBoxRenderData : public _ScheduledExecutor {
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 
     virtual ~BoundingBoxRenderData();
@@ -111,15 +111,13 @@ struct BoundingBoxRenderData : public Updatable {
     virtual void renderToImage();
     sk_sp<SkImage> renderedImage;
 
-    void processUpdate();
+    void _processUpdate();
 
     void beforeUpdate();
 
     void afterUpdate();
 
     void schedulerProccessed();
-
-    void addSchedulerNow();
 
     virtual bool allDataReady() { return true; }
 
@@ -142,6 +140,7 @@ struct BoundingBoxRenderData : public Updatable {
         mRenderDataCustomizerFunctors.prepend(customizer);
     }
 protected:
+    void addSchedulerNow();
     QList<RenderDataCustomizerFunctor*> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;
@@ -193,43 +192,6 @@ public:
 protected:
     QMatrix mTransform;
     qreal mOpacity = 1.;
-};
-
-struct BoundingBoxRenderDataContainer : public Updatable {
-    BoundingBoxRenderDataContainer(BoundingBoxRenderData *targetRenderDataT) {
-        targetRenderData = targetRenderDataT->ref<BoundingBoxRenderData>();
-    }
-
-    void processUpdate() {
-        targetRenderData->processUpdate();
-        Updatable::processUpdate();
-    }
-
-    void beforeUpdate() {
-        targetRenderData->beforeUpdate();
-        Updatable::beforeUpdate();
-    }
-
-    void afterUpdate() {
-        targetRenderData->afterUpdate();
-        Updatable::afterUpdate();
-    }
-
-    void schedulerProccessed() {
-        targetRenderData->schedulerProccessed();
-        Updatable::schedulerProccessed();
-    }
-
-    void addSchedulerNow() {
-        targetRenderData->addSchedulerNow();
-        Updatable::addSchedulerNow();
-    }
-
-    bool allDataReady() {
-        return targetRenderData->allDataReady();
-    }
-
-    std::shared_ptr<BoundingBoxRenderData> targetRenderData;
 };
 
 class BoundingBox :
@@ -576,7 +538,7 @@ public:
                                               int *lastIdentical,
                                               const int &relFrame);
     virtual void processSchedulers();
-    void addScheduler(Updatable *updatable);
+    void addScheduler(_ScheduledExecutor *updatable);
     virtual void addSchedulersToProcess();
 
     const int &getLoadId() {
@@ -699,7 +661,7 @@ protected:
     int mNReasonsNotToApplyUglyTransform = 0;
     QList<BoundingBox*> mChildBoxes;
     QList<BoundingBox*> mLinkingBoxes;
-    QList<std::shared_ptr<Updatable> > mSchedulers;
+    QList<std::shared_ptr<_ScheduledExecutor> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
 
     int mLoadId = -1;

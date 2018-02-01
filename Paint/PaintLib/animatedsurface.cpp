@@ -57,11 +57,11 @@ void AnimatedSurface::anim_saveCurrentValueAsKey() {
     newEmptyPaintFrame();
     SurfaceKey *key = (SurfaceKey*)anim_mKeyOnCurrentFrame;
     SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(key);
-    Tile ***tiles;
+    TilesData *tiles;
     if(prevKey == NULL) {
-        tiles = mCurrentTiles->getData();
+        tiles = mCurrentTiles.get();
     } else {
-        tiles = prevKey->getTilesData()->getData();
+        tiles = prevKey->getTilesData();
     }
     key->duplicateTilesContentFrom(tiles);
 }

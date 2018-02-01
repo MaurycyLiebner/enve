@@ -12,9 +12,9 @@ public:
                             QObject *parent = 0);
 
 signals:
-    void finishedUpdating(int, Executable*);
+    void finishedUpdating(int, _Executor*);
 public slots:
-    void updateUpdatable(Executable *updatable,
+    void updateUpdatable(_Executor *updatable,
                          const int &targetId);
 private:
     int mId;

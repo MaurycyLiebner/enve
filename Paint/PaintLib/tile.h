@@ -55,29 +55,36 @@ extern void processPaintDabs(const QList<Dab> &dabs,
                              uchar *data);
 
 class Tile;
-struct TileSkDrawer : public Updatable {
+struct TileSkDrawer : public _ScheduledExecutor {
     TileSkDrawer(Tile *parentTileT,
                  const ushort &xT, const ushort &yT);
     ~TileSkDrawer();
 
     void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) const;
 
-    void processUpdate();
+    void _processUpdate();
 
     void schedulerProccessed();
 
+    void beforeUpdate() {
+        _ScheduledExecutor::beforeUpdate();
+        _maxPaintX = maxPaintX;
+        _maxPaintY = maxPaintY;
+    }
     void afterUpdate();
 
     void clearImg();
 
     Tile *parentTile;
-    QList<Dab> dabsToPaint;
-    uchar *data;
+    QList<Dab> _dabsToPaint;
+    uchar *_data;
     sk_sp<SkImage> tileImg;
     ushort posX;
     ushort posY;
-    ushort maxPaintY = 0;
-    ushort maxPaintX = 0;
+    ushort maxPaintY = TILE_DIM;
+    ushort maxPaintX = TILE_DIM;
+    ushort _maxPaintY = 0;
+    ushort _maxPaintX = 0;
 };
 #include <SkColorMatrixFilter.h>
 #include "Colors/color.h"
@@ -141,9 +148,90 @@ struct TileSkDrawerCollection {
     uchar alpha = 255;
 };
 
+//class TileExecutor : public GUI_ThreadExecutor {
+//public:
+//    TileExecutor(Tile *tile) {
+//        mTarget = tile;
+//    }
+//protected:
+//    Tile *mTarget = NULL;
+//};
+
+//class TileClearExecutor : public TileExecutor {
+//public:
+//    TileClearExecutor(Tile *target) : TileExecutor(target) {
+//    }
+
+//protected:
+//    void GUI_process() {
+//        mTarget->clear();
+//    }
+//};
+
+//class TileDataGetterDependentExecutor : public TileExecutor {
+//public:
+//    TileDataGetterDependentExecutor(Tile *src, Tile *target) :
+//        TileExecutor(target) {
+//        mSrcGetter = (new TileDataGetter(src))->ref<TileDataGetter>();
+//    }
+
+//    void dataReady(uchar *data, const sk_sp<SkImage> &img) {
+//        mImgData = data;
+//        mDataImg = img;
+
+//        TileSkDrawer *drawer = mTarget->getTexTileDrawer();
+//        if(drawer->is)
+//    }
+//protected:
+//    sk_sp<SkImage> mDataImg;
+//    uchar *mImgData = NULL;
+//    std::shared_ptr<TileDataGetter> mSrcGetter;
+//};
+
+//class TileDataGetter : public GUI_ThreadExecutor {
+//public:
+//    TileDataGetter(Tile *src, TileDataGetterDependentExecutor *target) {
+//        mSrcTile = src;
+//    }
+
+//protected:
+//    TileDataGetterDependentExecutor *mTarget;
+//    Tile *mSrcTile = NULL;
+
+//    void GUI_process() {
+//        SkImageInfo info = SkImageInfo::Make(TILE_DIM,
+//                                             TILE_DIM,
+//                                             kBGRA_8888_SkColorType,
+//                                             kPremul_SkAlphaType,
+//                                             nullptr);
+//        SkBitmap bitmap;
+//        bitmap.allocPixels(info);
+//        sk_sp<SkImage> dataImg = SkImage::MakeFromBitmap(bitmap);
+
+//        SkPixmap pix;
+//        dataImg->peekPixels(&pix);
+//        data = (uchar*)pix.writable_addr();
+//        std::memcpy(data, mSrcTile->getData(),
+//                    TILE_DIM*TILE_DIM*4*sizeof(uchar));
+//        mTarget->dataReady(data, dataImg);
+//    }
+//};
+
+//class TileDuplicateExecutor : public GUI_ThreadExecutor {
+//public:
+//    TileDuplicateExecutor(Tile *target, Tile *src) {
+//        mSrcGetter = (new TileDataGetter(src))->ref<TileDataGetter>();
+//        mTarget = target;
+//    }
+
+//protected:
+//    Tile *mTarget;
+//};
+class TilesData;
 class Tile {
 public:
     Tile(const ushort &x_t, const ushort &y_t,
+         TilesData *parentTilesData,
          const bool &paintInOtherThread);
     ~Tile();
 
@@ -221,30 +309,25 @@ public:
             }
         }
 
-        updateDrawerFromDataArray();
+        copyDataToDrawer();
     }
-    void finishSettingPixels();
+    void copyDataToDrawer();
     void setPixel(const int &x, const int &y,
                   const uchar &r, const uchar &g,
                   const uchar &b, const uchar &a);
 
-    void startTransform() {
-        if(mTransformStarted) return;
-        mTransformStarted = true;
-        std::memcpy(mSavedData, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-    }
-    void finishTransform() {
-        if(!mTransformStarted) return;
-        mTransformStarted = false;
-    }
+    void startTransform();
+
+    void finishTransform();
 private:
+    bool mFinishTransformAfterUpdate = false;
+    TilesData *mParentTilesData = NULL;
     bool mTransformStarted = false;
     uchar *mSavedData = NULL;
     SkBitmap mSavedDataImage;
 
     bool mPaintInOtherThread;
 
-    void updateDrawerFromDataArray();
     std::shared_ptr<TileSkDrawer> mDrawer;
     SkBitmap mDataTileImage;
     SkBitmap mTmpDataTileImage;
@@ -258,7 +341,7 @@ private:
     ushort mPosX = 0;
     ushort mPosY = 0;
 
-    ushort mMaxPaintY = 0;
+    ushort mMaxPaintY = TILE_DIM;
     ushort mMaxPaintX = TILE_DIM;
 };
 

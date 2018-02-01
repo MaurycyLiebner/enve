@@ -24,7 +24,7 @@ public:
     bool differsFromKey(Key *key) { return key != this; }
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
-    void duplicateTilesContentFrom(Tile ***tilesSrc) {
+    void duplicateTilesContentFrom(TilesData *tilesSrc) {
         mTiles->duplicateTilesContentFrom(tilesSrc);
     }
 private:
@@ -40,12 +40,9 @@ public:
                     PaintBox *parentBox = NULL);
     ~AnimatedSurface();
     void setCurrentRelFrame(const int &relFrame);
-    Tile ***getTilesBeforeOrAtRelFrame(const int &relFrame,
-                                       int *foundAtRelFrame = NULL);
+
     bool getSurfaceFrameIdBeforeOrAtRelFrame(const int &relFrame,
                                              int *id);
-    Tile ***getTilesAfterRelFrame(const int &relFrame,
-                                  int *foundAtRelFrame = NULL);
     bool getSurfaceFrameIdAfterRelFrame(const int &relFrame, int *id);
     void getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers);
     void setSize(const ushort &width_t,

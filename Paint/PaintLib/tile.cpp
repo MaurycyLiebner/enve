@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 #include "Colors/helpers.h"
+#include "tilesdata.h"
+#include "mainwindow.h"
 
 void processPaintDabs(const QList<Dab> &dabs,
                       const ushort &maxPaintX,
@@ -94,11 +96,6 @@ void processPaintDabs(const QList<Dab> &dabs,
     }
 }
 
-void Tile::finishSettingPixels() {
-    uchar *drawerData = mDrawer->data;
-    std::memcpy(drawerData, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-}
-
 void Tile::setPixel(const int &x, const int &y,
                     const uchar &r, const uchar &g,
                     const uchar &b, const uchar &a) {
@@ -118,11 +115,33 @@ void Tile::setPixel(const int &x, const int &y,
     }
 }
 
+void Tile::startTransform() {
+    if(mTransformStarted) return;
+    mParentTilesData->addChangedTile(this);
+    mTransformStarted = true;
+    std::memcpy(mSavedData, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+}
+
+void Tile::finishTransform() {
+    if(!mTransformStarted) return;
+    if(mPaintInOtherThread) {
+        if(mDrawer->finished()) {
+            MainWindow::addUndoRedo(new TileChangedUndoRedo(mSavedDataImage,
+                                                            mDataTileImage,
+                                                            this));
+        } else {
+            mFinishTransformAfterUpdate = true;
+            return;
+        }
+    }
+    mTransformStarted = false;
+}
+
 void Tile::duplicateFrom(Tile *tile) {
     if(mPaintInOtherThread) {
         if(mDrawer->finished() && tile->getTexTileDrawer()->finished()) {
-            uchar *dataT = tile->getTexTileDrawer()->data;
-            uchar *drawerData = mDrawer->data;
+            uchar *dataT = tile->getTexTileDrawer()->_data;
+            uchar *drawerData = mDrawer->_data;
             std::memcpy(drawerData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
             std::memcpy(mData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
         }
@@ -145,24 +164,32 @@ void Tile::clear() {
         if(mDrawer->finished()) {
             mDrawer->clearImg();
             updateTexFromDataArray();
-        }
+        }/* else {
+            TileClearExecutor *executor = new TileClearExecutor(this);
+            mDrawer->addDependent(executor);
+            mDrawer
+        }*/
     } else {
         std::memset(mData, 0, TILE_DIM*TILE_DIM*4*sizeof(uchar));
     }
 }
 
 void Tile::setTileWidth(const ushort &width_t) {
+    if(width_t == mMaxPaintX) return;
     mMaxPaintX = width_t;
     if(mDrawer != NULL) {
         mDrawer->maxPaintX = mMaxPaintX;
     }
+    addScheduler();
 }
 
 void Tile::setTileHeight(const ushort &height_t) {
+    if(height_t == mMaxPaintY) return;
     mMaxPaintY = height_t;
     if(mDrawer != NULL) {
         mDrawer->maxPaintY = mMaxPaintY;
     }
+    addScheduler();
 }
 
 void Tile::resetTileSize() {
@@ -176,6 +203,8 @@ TileSkDrawer *Tile::getTexTileDrawer() {
 
 void Tile::addScheduler() {
     if(mPaintInOtherThread) {
+        startTransform();
+        mParentTilesData->incNumberTilesBeingProcessed();
         mDrawer->addScheduler();
     } else {
         processPaintDabs(mDabsToPaint,
@@ -186,7 +215,7 @@ void Tile::addScheduler() {
 }
 
 void Tile::setDabsForDrawer() {
-    mDrawer->dabsToPaint = mDabsToPaint;
+    mDrawer->_dabsToPaint = mDabsToPaint;
     mDabsToPaint.clear();
 }
 
@@ -207,7 +236,9 @@ void Tile::clearTmp() {
 }
 
 Tile::Tile(const ushort &x_t, const ushort &y_t,
+           TilesData *parentTilesData,
            const bool &paintInOtherThread) {
+    mParentTilesData = parentTilesData;
     mPaintInOtherThread = paintInOtherThread;
     setPosInSurface(x_t, y_t);
 
@@ -240,7 +271,7 @@ void Tile::replaceData(const ushort &srcX, const ushort &srcY,
     if(height == 0 || width == 0) return;
     if(mPaintInOtherThread) {
         if(!mDrawer->finished() ||
-                !srcTile->getTexTileDrawer()->finished()) {
+           !srcTile->getTexTileDrawer()->finished()) {
             return;
         }
     }
@@ -287,7 +318,7 @@ void Tile::replaceData(const ushort &srcX, const ushort &srcY,
         i += iInc;
     }
 
-    updateDrawerFromDataArray();
+    copyDataToDrawer();
 }
 
 void Tile::initializeTileData() {
@@ -427,12 +458,16 @@ void Tile::getColor(qreal cx,
 }
 
 void Tile::updateTexFromDataArray() {
-    uchar *dataT = mDrawer->data;
+    uchar *dataT = mDrawer->_data;
     std::memcpy(mData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+    mParentTilesData->decNumberTilesBeingProcessed();
+    if(mFinishTransformAfterUpdate) {
+        finishTransform();
+    }
 }
 
-void Tile::updateDrawerFromDataArray() {
-    uchar *dataT = mDrawer->data;
+void Tile::copyDataToDrawer() {
+    uchar *dataT = mDrawer->_data;
     std::memcpy(dataT, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
 }
 
@@ -454,7 +489,7 @@ TileSkDrawer::TileSkDrawer(Tile *parentTileT,
 
     SkPixmap pix;
     tileImg->peekPixels(&pix);
-    data = (uchar*)pix.writable_addr();
+    _data = (uchar*)pix.writable_addr();
 }
 
 TileSkDrawer::~TileSkDrawer() {
@@ -465,26 +500,26 @@ void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
 }
 
 void TileSkDrawer::schedulerProccessed() {
-    Updatable::schedulerProccessed();
+    _ScheduledExecutor::schedulerProccessed();
     if(parentTile != NULL) {
         parentTile->setDabsForDrawer();
     }
 }
 
-void TileSkDrawer::processUpdate() {
-    processPaintDabs(dabsToPaint,
-                     maxPaintX, maxPaintY, TILE_DIM,
-                     data);
-    dabsToPaint.clear();
+void TileSkDrawer::_processUpdate() {
+    processPaintDabs(_dabsToPaint,
+                     _maxPaintX, _maxPaintY, TILE_DIM,
+                     _data);
+    _dabsToPaint.clear();
 }
 
 void TileSkDrawer::afterUpdate() {
     if(parentTile != NULL) {
         parentTile->updateTexFromDataArray();
     }
-    Updatable::afterUpdate();
+    _ScheduledExecutor::afterUpdate();
 }
 
 void TileSkDrawer::clearImg() {
-    std::memset(data, 0, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+    std::memset(_data, 0, TILE_DIM*TILE_DIM*4*sizeof(uchar));
 }

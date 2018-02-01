@@ -113,20 +113,10 @@ public:
                         const ulong &time_stamp,
                         const bool &erase,
                         Brush *brush);
-    void setBackgroundMode(
-            const CanvasBackgroundMode &bg_mode_t);
-    void backgroundImgFromFile(const QString &file_name);
-    void setBackgroundColorRGB(const qreal &r_t,
-                               const qreal &g_t,
-                               const qreal &b_t);
-    void setBackgroundColorHSV(const qreal &h_t,
-                               const qreal &s_t,
-                               const qreal &v_t);
-    void clearTiles(Tile ***tiles);
     void writeSurface(QIODevice *target);
     void readSurface(QIODevice *target);
 
-    void duplicateTilesContentFrom(Tile ***tilesSrc);
+    void duplicateTilesContentFrom(TilesData *tilesSrc);
 
     TilesData *getTilesData() {
         return mCurrentTiles.get();

@@ -129,7 +129,7 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
     imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameAtFrame(animationFrame);
     if(imageData->image.get() == NULL) {
-        Updatable *upd = mAnimationCacheHandler->
+        _ScheduledExecutor *upd = mAnimationCacheHandler->
                 scheduleFrameLoad(animationFrame);
         if(upd != NULL) {
             upd->addDependent(imageData);

@@ -920,13 +920,13 @@ void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 
 void BoundingBox::processSchedulers() {
     mBlockedSchedule = true;
-    foreach(const std::shared_ptr<Updatable> &updatable, mSchedulers) {
+    foreach(const std::shared_ptr<_ScheduledExecutor> &updatable, mSchedulers) {
         updatable->schedulerProccessed();
     }
 }
 
 void BoundingBox::addSchedulersToProcess() {
-    foreach(const std::shared_ptr<Updatable> &updatable, mSchedulers) {
+    foreach(const std::shared_ptr<_ScheduledExecutor> &updatable, mSchedulers) {
         MainWindow::getInstance()->addUpdateScheduler(updatable.get());
     }
 
@@ -934,8 +934,8 @@ void BoundingBox::addSchedulersToProcess() {
     mBlockedSchedule = false;
 }
 
-void BoundingBox::addScheduler(Updatable *updatable) {
-    mSchedulers << updatable->ref<Updatable>();
+void BoundingBox::addScheduler(_ScheduledExecutor *updatable) {
+    mSchedulers << updatable->ref<_ScheduledExecutor>();
 }
 
 void BoundingBox::setVisibile(const bool &visible,
@@ -1286,7 +1286,7 @@ void BoundingBoxRenderData::renderToImage() {
     bitmap.reset();
 }
 
-void BoundingBoxRenderData::processUpdate() {
+void BoundingBoxRenderData::_processUpdate() {
     renderToImage();
 }
 
@@ -1294,7 +1294,7 @@ void BoundingBoxRenderData::beforeUpdate() {
     if(!mDataSet) {
         dataSet();
     }
-    Updatable::beforeUpdate();
+    _ScheduledExecutor::beforeUpdate();
     //parentBox->setUpdateVars();
 //    parentBox->setupBoundingBoxRenderDataForRelFrame(
 //                parentBox->anim_getCurrentRelFrame(), this);
@@ -1310,7 +1310,7 @@ void BoundingBoxRenderData::afterUpdate() {
     if(parentBoxT != NULL && parentIsTarget) {
         parentBoxT->renderDataFinished(this);
     }
-    Updatable::afterUpdate();
+    _ScheduledExecutor::afterUpdate();
 }
 
 void BoundingBoxRenderData::schedulerProccessed() {
@@ -1328,7 +1328,7 @@ void BoundingBoxRenderData::schedulerProccessed() {
     if(!mDelayDataSet) {
         dataSet();
     }
-    Updatable::schedulerProccessed();
+    _ScheduledExecutor::schedulerProccessed();
 }
 
 void BoundingBoxRenderData::addSchedulerNow() {

@@ -22,6 +22,9 @@
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
 #include "Paint/PaintLib/brush.h"
+#include <QFile>
+#include "RenderWidget/renderinstancesettings.h"
+#include "videoencoder.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWindow *canvasWidget,
@@ -387,16 +390,15 @@ void Canvas::setOutputRendering(const bool &bT) {
     mRenderingOutput = bT;
 }
 
-void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
+void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
+                                        const bool &frameEncoded) {
+    if(mRenderingOutput && !frameEncoded) {
+        VideoEncoder::addCacheContainerToEncoderStatic(cont);
+        return;
+    }
     setLoadingPreviewContainer(NULL);
     if(cont == mCurrentPreviewContainer.get()) return;
     if(mCurrentPreviewContainer.get() != NULL) {
-//        if(mNoCache) {
-//            mCurrentPreviewContainer->setBlocked(false);
-//            mCurrentPreviewContainer->freeThis();
-//        } else if(!mRendering) {
-//            mCurrentPreviewContainer->setBlocked(false);
-//        }
         if(!mRenderingPreview || mRenderingOutput) {
             mCurrentPreviewContainer->setBlocked(false);
         }
@@ -412,13 +414,7 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
 void Canvas::setLoadingPreviewContainer(CacheContainer *cont) {
     if(cont == mLoadingPreviewContainer.get()) return;
     if(mLoadingPreviewContainer.get() != NULL) {
-        cont->setAsCurrentPreviewContainerAfterFinishedLoading(NULL);
-//        if(mNoCache) {
-//            mCurrentPreviewContainer->setBlocked(false);
-//            mCurrentPreviewContainer->freeThis();
-//        } else if(!mRendering) {
-//            mCurrentPreviewContainer->setBlocked(false);
-//        }
+        mLoadingPreviewContainer->setAsCurrentPreviewContainerAfterFinishedLoading(NULL);
         if(!mRenderingPreview || mRenderingOutput) {
             mLoadingPreviewContainer->setBlocked(false);
         }
@@ -542,11 +538,9 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
 //    renderCurrentFrameToPreview();
 //}
 
-#include <QFile>
-#include "RenderWidget/renderinstancesettings.h"
-#include "videoencoder.h"
+
 void Canvas::renderCurrentFrameToOutput(const RenderInstanceSettings &renderDest) {
-    VideoEncoder::addImageToEncoderStatic(mCurrentPreviewContainer->getImageSk());
+//    VideoEncoder::addImageToEncoderStatic(mCurrentPreviewContainer->getImageSk());
 //    m::addImageToEncoder();
     return;
     QString fileName = renderDest.getOutputDestination();
@@ -565,10 +559,6 @@ void Canvas::renderCurrentFrameToOutput(const RenderInstanceSettings &renderDest
 
     //renderCurrentFrameToPreview();
     //clearCurrentPreviewImage();
-}
-
-void Canvas::clearCurrentPreviewImage() {
-
 }
 
 #include "Boxes/imagesequencebox.h"

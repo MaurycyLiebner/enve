@@ -225,7 +225,7 @@ CacheContainerTmpFileDataLoader::CacheContainerTmpFileDataLoader(
     mTmpFile = file;
 }
 
-void CacheContainerTmpFileDataLoader::processUpdate() {
+void CacheContainerTmpFileDataLoader::_processUpdate() {
     if(mTmpFile->open()) {
         int width, height;
         mTmpFile->read((char*)&width, sizeof(int));
@@ -247,7 +247,7 @@ void CacheContainerTmpFileDataLoader::processUpdate() {
 
 void CacheContainerTmpFileDataLoader::afterUpdate() {
     mTargetCont->setDataLoadedFromTmpFile(mImage);
-    Updatable::afterUpdate();
+    _ScheduledExecutor::afterUpdate();
 }
 
 void CacheContainerTmpFileDataLoader::addSchedulerNow() {
@@ -261,7 +261,7 @@ CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
     mImage = image;
 }
 
-void CacheContainerTmpFileDataSaver::processUpdate() {
+void CacheContainerTmpFileDataSaver::_processUpdate() {
     SkPixmap pix;
     mImage->peekPixels(&pix);
     mTmpFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile());
@@ -278,14 +278,14 @@ void CacheContainerTmpFileDataSaver::processUpdate() {
 
 void CacheContainerTmpFileDataSaver::afterUpdate() {
     mTargetCont->setDataSavedToTmpFile(mTmpFile);
-    Updatable::afterUpdate();
+    _ScheduledExecutor::afterUpdate();
 }
 
 void CacheContainerTmpFileDataSaver::addSchedulerNow() {
     MainWindow::getInstance()->addFileUpdateScheduler(this);
 }
 
-void CacheContainerTmpFileDataDeleter::processUpdate() {
+void CacheContainerTmpFileDataDeleter::_processUpdate() {
     mTmpFile.reset();
 }
 

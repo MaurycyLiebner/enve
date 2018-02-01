@@ -1,16 +1,17 @@
 #include "videoencoder.h"
 #include <QByteArray>
+#include "Boxes/boundingboxrendercontainer.h"
+#include "canvas.h"
 VideoEncoder *VideoEncoder::mVideoEncoderInstance = NULL;
 
 VideoEncoder::VideoEncoder() {
     mVideoEncoderInstance = this;
 }
 
-void VideoEncoder::addImage(const sk_sp<SkImage> &img) {
-    if(img.get() == NULL) return;
-    SkPixmap pix;
-    img->peekPixels(&pix);
-    mImages.append(SkImage::MakeRasterCopy(pix));
+void VideoEncoder::addContainer(CacheContainer *cont) {
+    if(cont == NULL) return;
+    cont->setBlocked(true);
+    mNextContainers.append(cont->ref<CacheContainer>());
     addScheduler();
 }
 
@@ -701,12 +702,20 @@ void VideoEncoder::finishEncodingNow() {
     mEncodeVideo = false;
     mCurrentlyEncoding = false;
     mEncodingSuccesfull = false;
-    mImages.clear();
-    mUpdateImages.clear();
+    mNextContainers.clear();
+    clearContainers();
 }
 
-void VideoEncoder::processUpdate() {
-    bool encodeVideoT = !mUpdateImages.isEmpty(); // local encode
+void VideoEncoder::clearContainers() {
+    foreach(const std::shared_ptr<CacheContainer> &cont,
+            _mContainers) {
+        cont->setBlocked(false);
+    }
+    _mContainers.clear();
+}
+
+void VideoEncoder::_processUpdate() {
+    bool encodeVideoT = !_mContainers.isEmpty(); // local encode
     bool encodeAudioT = true; // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
         bool avAligned = true;
@@ -718,12 +727,13 @@ void VideoEncoder::processUpdate() {
         }
         if(mEncodeVideo && encodeVideoT && avAligned) {
             if(!write_video_frame(mFormatContext, &mVideoStream,
-                                  mUpdateImages.takeFirst(),
+                                  _mContainers.at(_mCurrentContainerId)->getImageSk(),
                                   &mEncodeVideo, mUpdateError) ) {
                 mUpdateFailed = true;
                 return;
             }
-            encodeVideoT = !mUpdateImages.isEmpty();
+            _mCurrentContainerId++;
+            encodeVideoT = _mCurrentContainerId < _mContainers.count();
         } else if(mEncodeAudio) {
             if(process_audio_stream(mFormatContext, &mAudioStream,
                                     &mEncodeAudio, mUpdateError)) {
@@ -735,16 +745,30 @@ void VideoEncoder::processUpdate() {
 }
 
 void VideoEncoder::beforeUpdate() {
-    Updatable::beforeUpdate();
-    if(mCurrentlyEncoding) {
-        mUpdateImages.append(mImages);
-    } else {
-        mUpdateImages.clear();
+    _ScheduledExecutor::beforeUpdate();
+    _mCurrentContainerId = 0;
+    _mContainers.append(mNextContainers);
+    mNextContainers.clear();
+    if(!mCurrentlyEncoding) {
+        clearContainers();
     }
-    mImages.clear();
+
 }
 
 void VideoEncoder::afterUpdate() {
+    bool firstT = true;
+    for(int i = _mCurrentContainerId - 1; i >= 0; i--) {
+        const std::shared_ptr<CacheContainer> &cont =
+                _mContainers.at(i);
+        if(firstT) {
+            Canvas *currCanvas = mRenderInstanceSettings->getTargetCanvas();
+            currCanvas->setCurrentPreviewContainer(cont.get(), true);
+            firstT = false;
+        } else {
+            cont->setBlocked(false);
+        }
+        _mContainers.removeAt(i);
+    }
     if(mEncodingFinished ||
        mInterruptEncoding ||
        mUpdateFailed ||
@@ -767,7 +791,7 @@ void VideoEncoder::afterUpdate() {
             finishEncoding();
         }
     }
-    Updatable::afterUpdate();
+    _ScheduledExecutor::afterUpdate();
 }
 
 VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {
@@ -790,6 +814,6 @@ void VideoEncoder::startEncodingStatic(RenderInstanceSettings *settings) {
     mVideoEncoderInstance->startNewEncoding(settings);
 }
 
-void VideoEncoder::addImageToEncoderStatic(const sk_sp<SkImage> &img) {
-    mVideoEncoderInstance->addImage(img);
+void VideoEncoder::addCacheContainerToEncoderStatic(CacheContainer *cont) {
+    mVideoEncoderInstance->addContainer(cont);
 }

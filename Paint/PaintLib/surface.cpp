@@ -19,7 +19,7 @@ Surface::~Surface() {
 
 }
 
-void Surface::duplicateTilesContentFrom(Tile ***tilesSrc) {
+void Surface::duplicateTilesContentFrom(TilesData *tilesSrc) {
     mCurrentTiles->duplicateTilesContentFrom(tilesSrc);
 }
 
@@ -94,7 +94,7 @@ void Surface::getColor(const qreal &cx,
     short max_tile_y;
     getTileIdsOnRect(cx - r, cx + r, cy - r, cy + r,
                      &min_tile_x, &max_tile_x, &min_tile_y, &max_tile_y);
-    Tile ***tilesT = mCurrentTiles->getData();
+    Tile ***tilesT = mCurrentTiles->getTiles();
     for(short i = min_tile_x; i <= max_tile_x; i++) {
         for(short j = min_tile_y; j <= max_tile_y; j++) {
             Tile *tile_t = tilesT[j][i];
@@ -116,14 +116,6 @@ void Surface::getColor(const qreal &cx,
         *green = green_sum/weight_sum;
         *blue = blue_sum/weight_sum;
         *alpha = alpha_sum/weight_sum;
-    }
-}
-
-void Surface::clearTiles(Tile ***tiles) {
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            tiles[j][i]->clear();
-        }
     }
 }
 
@@ -297,7 +289,7 @@ void Surface::strokeTo(Brush *brush,
         stroke_v = stroke_blue;
         qrgb_to_hsv(&stroke_h, &stroke_s, &stroke_v);
     }
-    Tile ***tilesT = mCurrentTiles->getData();
+    Tile ***tilesT = mCurrentTiles->getTiles();
     mCurrentTiles->dataChanged();
     for(short i = 0; i < dabs_to_i; i++) {
         if(!fixed_color) {
@@ -442,28 +434,6 @@ void Surface::loadFromImage(const QImage &img) {
     mCurrentTiles->setImage(img);
 }
 
-void Surface::setBackgroundMode(
-        const CanvasBackgroundMode &bg_mode_t) {
-    mBackgroudMode = bg_mode_t;
-}
-
-void Surface::backgroundImgFromFile(
-        const QString &file_name) {
-
-}
-
-void Surface::setBackgroundColorRGB(const qreal &r_t,
-                                          const qreal &g_t,
-                                          const qreal &b_t) {
-    mBackgroundColor.setRGB(r_t, g_t, b_t);
-}
-
-void Surface::setBackgroundColorHSV(const qreal &h_t,
-                                          const qreal &s_t,
-                                          const qreal &v_t) {
-    mBackgroundColor.setHSV(h_t, s_t, v_t);
-}
-
 void Surface::paintPress(const qreal &xT,
                                const qreal &yT,
                                const ulong &timestamp,
@@ -486,6 +456,7 @@ void Surface::tabletMoveEvent(const qreal &xT,
 }
 
 void Surface::tabletReleaseEvent() {
+    mCurrentTiles->finishTransform();
 }
 
 void Surface::tabletPressEvent(const qreal &xT,

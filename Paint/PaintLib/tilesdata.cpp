@@ -27,10 +27,11 @@ TilesData::~TilesData() {
     }
 }
 
-void TilesData::duplicateTilesContentFrom(Tile ***src) {
+void TilesData::duplicateTilesContentFrom(TilesData *src) {
+    Tile ***srcTiles = src->getTiles();
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->duplicateFrom(src[j][i]);
+            mTiles[j][i]->duplicateFrom(srcTiles[j][i]);
         }
     }
 }
@@ -265,11 +266,18 @@ void TilesData::setImage(const QImage &img) {
                                     col.blue(), col.alpha());
                 }
             }
-            tileT->finishSettingPixels();
+            tileT->copyDataToDrawer();
             tileY += TILE_DIM;
         }
         tileX += TILE_DIM;
     }
+}
+
+void TilesData::finishTransform() {
+    foreach(Tile *tile, mTilesChanged) {
+        tile->finishTransform();
+    }
+    mTilesChanged.clear();
 }
 
 void TilesData::setSize(const ushort &width_t, const ushort &height_t) {
@@ -291,7 +299,7 @@ void TilesData::setSize(const ushort &width_t, const ushort &height_t) {
     mNTileCols = n_tile_cols_t;
 }
 
-Tile ***TilesData::getData() {
+Tile ***TilesData::getTiles() {
     return mTiles;
 }
 
@@ -423,7 +431,7 @@ void TilesData::resizeTiles(const ushort &nTileCols,
 
         for(ushort cl = first_new_col_in_row; cl < nTileCols; cl++) {
             Tile *newTile = new Tile(cl*TILE_DIM, rw*TILE_DIM,
-                                       mPaintInOtherThread);
+                                     this, mPaintInOtherThread);
             if(!mNoDataInMemory) {
                 newTile->initializeEmptyTileData();
             }

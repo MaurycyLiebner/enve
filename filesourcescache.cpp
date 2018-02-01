@@ -141,7 +141,7 @@ ImageCacheHandler::ImageCacheHandler(const QString &filePath,
     mVisibleInListWidgets = visibleSeparatly;
 }
 
-void ImageCacheHandler::processUpdate() {
+void ImageCacheHandler::_processUpdate() {
     sk_sp<SkData> data = SkData::MakeFromFileName(
                 mFilePath.toLocal8Bit().data());
     mUpdateImage = SkImage::MakeFromEncoded(data);
@@ -229,7 +229,7 @@ void VideoCacheHandler::updateFrameCount() {
     avformat_free_context(format);
 }
 #include <QElapsedTimer>
-void VideoCacheHandler::processUpdate() {
+void VideoCacheHandler::_processUpdate() {
     QElapsedTimer timer;
     timer.start();
     QByteArray pathByteArray = mUpdateFilePath.toLatin1();
@@ -458,7 +458,7 @@ void VideoCacheHandler::clearCache() {
 
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
-Updatable *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+_ScheduledExecutor *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
     if(mFramesCount <= 0 || frame >= mFramesCount) return NULL;
     if(mFramesLoadScheduled.contains(frame) ||
        mFramesBeingLoadedGUI.contains(frame)) return this;
@@ -506,7 +506,7 @@ void ImageSequenceCacheHandler::clearCache() {
     FileCacheHandler::clearCache();
 }
 
-Updatable *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
+_ScheduledExecutor *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
     ImageCacheHandler *imageHandler = mFrameImageHandlers.at(frame).get();
     imageHandler->addScheduler();
     return imageHandler;

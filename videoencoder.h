@@ -15,6 +15,7 @@ extern "C" {
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
+class CacheContainer;
 
 typedef struct OutputStream {
     AVStream *st = NULL;
@@ -45,7 +46,7 @@ signals:
     void encodingFailed();
 };
 
-class VideoEncoder : public Updatable {
+class VideoEncoder : public _ScheduledExecutor {
 public:
     VideoEncoder();
 
@@ -71,8 +72,8 @@ public:
         }
     }
 
-    void addImage(const sk_sp<SkImage> &img);
-    void processUpdate();
+    void addContainer(CacheContainer *cont);
+    void _processUpdate();
     void beforeUpdate();
     void afterUpdate();
 
@@ -81,7 +82,7 @@ public:
 
     static void interruptEncodingStatic();
     static void startEncodingStatic(RenderInstanceSettings *settings);
-    static void addImageToEncoderStatic(const sk_sp<SkImage> &img);
+    static void addCacheContainerToEncoderStatic(CacheContainer *cont);
     static void finishEncodingStatic();
     static bool encodingSuccessfulyStartedStatic();
 
@@ -95,6 +96,7 @@ public:
         return mCurrentlyEncoding;
     }
 protected:
+    void clearContainers();
     VideoEncoderEmitter mEmitter;
     void interrupEncoding();
     void finishEncoding();
@@ -111,7 +113,7 @@ protected:
     AVFormatContext *mFormatContext = NULL;
     AVOutputFormat *mOutputFormat = NULL;
     bool mCurrentlyEncoding = false;
-    QList<sk_sp<SkImage> > mImages;
+    QList<std::shared_ptr<CacheContainer> > mNextContainers;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;
@@ -124,7 +126,8 @@ protected:
 
     QString mUpdateError;
     bool mUpdateFailed = false;
-    QList<sk_sp<SkImage> > mUpdateImages;
+    int _mCurrentContainerId = 0;
+    QList<std::shared_ptr<CacheContainer> > _mContainers;
 };
 
 #endif // VIDEOENCODER_H

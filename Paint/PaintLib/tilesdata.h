@@ -4,6 +4,7 @@
 #include "Boxes/boundingboxrendercontainer.h"
 #include "updatable.h"
 #include <QTemporaryFile>
+#include <QAction>
 class Tile;
 struct TileSkDrawer;
 struct TileSkDrawerCollection;
@@ -16,7 +17,7 @@ public:
 
     ~TilesData();
 
-    void duplicateTilesContentFrom(Tile ***src);
+    void duplicateTilesContentFrom(TilesData *src);
 
     void clearTiles();
 
@@ -31,7 +32,7 @@ public:
     void setSize(const ushort &width_t,
                  const ushort &height_t);
 
-    Tile ***getData();
+    Tile ***getTiles();
     void writeTilesData(QIODevice *target);
     void readTilesData(QIODevice *target);
 
@@ -56,7 +57,32 @@ public:
 
     void setImage(const QImage &img);
 
+    void incNumberTilesBeingProcessed() {
+        mNTilesBeingProcessed++;
+    }
+
+    void decNumberTilesBeingProcessed() {
+        mNTilesBeingProcessed--;
+        if(mNTilesBeingProcessed == 0) {
+            processAwaitingOperations();
+        }
+    }
+
+    bool tilesBeingProcessed() {
+        return mNTilesBeingProcessed > 0;
+    }
+
+    void addChangedTile(Tile *tile) {
+        mTilesChanged << tile;
+    }
+
+    void finishTransform();
 private:
+    QList<Tile*> mTilesChanged;
+    void processAwaitingOperations() {
+
+    }
+    int mNTilesBeingProcessed = 0;
     void replaceData(const int &srcX, const int &srcY,
                      const int &targetX, const int &targetY,
                      const int &width, const int &height,
@@ -82,13 +108,13 @@ private:
     Tile ***mTiles = NULL;
 };
 
-class SaveTilesDataToTmpFileExec : public Executable {
+class SaveTilesDataToTmpFileExec : public _Executor {
 public:
     SaveTilesDataToTmpFileExec(TilesData *targetTilesDataT) {
         mTargetTilesData = targetTilesDataT;
     }
 
-    void processUpdate() {
+    void _processUpdate() {
         mTargetTilesData->_writeTilesDataToTmp();
     }
 
@@ -100,13 +126,13 @@ private:
     TilesData *mTargetTilesData;
 };
 
-class LoadTilesDataFromTmpFileExec : public Executable {
+class LoadTilesDataFromTmpFileExec : public _Executor {
 public:
     LoadTilesDataFromTmpFileExec(TilesData *targetTilesDataT) {
         mTargetTilesData = targetTilesDataT;
     }
 
-    void processUpdate() {
+    void _processUpdate() {
         mTargetTilesData->_readTilesDataFromTmp();
     }
 

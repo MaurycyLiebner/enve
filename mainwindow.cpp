@@ -926,11 +926,11 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
     updateTitle();
 }
 
-void MainWindow::addUpdateScheduler(Updatable *scheduler) {
-    mUpdateSchedulers.append(scheduler->ref<Updatable>());
+void MainWindow::addUpdateScheduler(_ScheduledExecutor *scheduler) {
+    mUpdateSchedulers.append(scheduler->ref<_ScheduledExecutor>());
 }
 
-void MainWindow::addFileUpdateScheduler(Updatable *scheduler) {
+void MainWindow::addFileUpdateScheduler(_ScheduledExecutor *scheduler) {
     mCanvasWindow->addFileUpdatableAwaitingUpdate(scheduler);
 }
 
@@ -962,7 +962,7 @@ void MainWindow::callUpdateSchedulers() {
 
     if(mCanvasWindow->noBoxesAwaitUpdate()) {
         mCanvasWindow->processSchedulers();
-        foreach(const std::shared_ptr<Updatable> &updatable,
+        foreach(const std::shared_ptr<_ScheduledExecutor> &updatable,
                 mUpdateSchedulers) {
             if(!updatable->isAwaitingUpdate()) {
                 updatable->schedulerProccessed();

@@ -6,8 +6,7 @@
 
 class SingleSound;
 
-class VideoBox : public AnimationBox
-{
+class VideoBox : public AnimationBox {
     Q_OBJECT
 public:
     VideoBox(const QString &filePath);

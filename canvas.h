@@ -422,7 +422,6 @@ public:
         return mLocalPivot;
     }
 
-    void clearCurrentPreviewImage();
     int getMaxFrame();
 
     void beforeCurrentFrameRender();
@@ -432,7 +431,8 @@ public:
         return &mCacheHandler;
     }
 
-    void setCurrentPreviewContainer(CacheContainer *cont);
+    void setCurrentPreviewContainer(CacheContainer *cont,
+                                    const bool &frameEncoded = false);
     void setLoadingPreviewContainer(CacheContainer *cont);
 
     void setRenderingPreview(const bool &bT);

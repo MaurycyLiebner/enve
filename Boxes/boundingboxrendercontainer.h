@@ -41,47 +41,47 @@ protected:
 };
 #include "updatable.h"
 class CacheContainer;
-class CacheContainerTmpFileDataLoader : public Updatable {
+class CacheContainerTmpFileDataLoader : public _ScheduledExecutor {
 public:
     CacheContainerTmpFileDataLoader(const QSharedPointer<QTemporaryFile> &file,
                                     CacheContainer *target);
-    void processUpdate();
+    void _processUpdate();
 
     void afterUpdate();
 
     bool isFileUpdatable() { return true; }
+protected:
     void addSchedulerNow();
-private:
     CacheContainer *mTargetCont = NULL;
     sk_sp<SkImage> mImage;
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
 
-class CacheContainerTmpFileDataSaver : public Updatable {
+class CacheContainerTmpFileDataSaver : public _ScheduledExecutor {
 public:
     CacheContainerTmpFileDataSaver(const sk_sp<SkImage> &image,
                                    CacheContainer *target);
-    void processUpdate();
+    void _processUpdate();
 
     void afterUpdate();
     bool isFileUpdatable() { return true; }
+protected:
     void addSchedulerNow();
-private:
     CacheContainer *mTargetCont = NULL;
     sk_sp<SkImage> mImage;
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
 
-class CacheContainerTmpFileDataDeleter : public Updatable {
+class CacheContainerTmpFileDataDeleter : public _ScheduledExecutor {
 public:
     CacheContainerTmpFileDataDeleter(const QSharedPointer<QTemporaryFile> &file) {
         mTmpFile = file;
     }
-    void processUpdate();
+    void _processUpdate();
 
     bool isFileUpdatable() { return true; }
+protected:
     void addSchedulerNow();
-private:
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
 
@@ -90,7 +90,7 @@ public:
     CacheContainer() {}
     ~CacheContainer();
 
-    Updatable *scheduleLoadFromTmpFile(Updatable *dependent = NULL) {
+    _ScheduledExecutor *scheduleLoadFromTmpFile(_ScheduledExecutor *dependent = NULL) {
         if(mSavingToFile) {
             mCancelAfterSaveDataClear = true;
             return mSavingUpdatable;
@@ -129,7 +129,7 @@ public:
 
     void scheduleDeleteTmpFile() {
         if(mTmpFile == NULL) return;
-        Updatable *updatable = new CacheContainerTmpFileDataDeleter(mTmpFile);
+        _ScheduledExecutor *updatable = new CacheContainerTmpFileDataDeleter(mTmpFile);
         mTmpFile.reset();
         updatable->addScheduler();
     }
@@ -157,8 +157,8 @@ public:
 protected:
     Canvas *mTmpLoadTargetCanvas = NULL;
     int mMemSizeAwaitingSave = 0;
-    Updatable *mLoadingUpdatable = NULL;
-    Updatable *mSavingUpdatable = NULL;
+    _ScheduledExecutor *mLoadingUpdatable = NULL;
+    _ScheduledExecutor *mSavingUpdatable = NULL;
     bool mCancelAfterSaveDataClear = false;
     bool mSavingToFile = false;
     bool mLoadingFromFile = false;

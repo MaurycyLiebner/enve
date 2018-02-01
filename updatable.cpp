@@ -3,43 +3,22 @@
 #include "updatescheduler.h"
 #include "paintcontroler.h"
 
-Updatable::~Updatable() {
+_ScheduledExecutor::~_ScheduledExecutor() {
     clear();
 }
 
-void Updatable::beforeUpdate() {
-    Executable::beforeUpdate();
+void _ScheduledExecutor::beforeUpdate() {
+    _Executor::beforeUpdate();
     mAwaitingUpdate = false;
-    mUpdateDependent = mDependent;
-    mDependent.clear();
+
 }
 
-void Updatable::afterUpdate() {
-    tellDependentThatFinished();
-}
-
-void Updatable::schedulerProccessed() {
+void _ScheduledExecutor::schedulerProccessed() {
     mAwaitingUpdate = true;
     mSchedulerAdded = false;
 }
 
-void Updatable::tellDependentThatFinished() {
-    foreach(Updatable *dependent, mUpdateDependent) {
-        dependent->decDependencies();
-    }
-    mUpdateDependent.clear();
-}
-
-void Updatable::addDependent(Updatable *updatable) {
-    if(updatable == NULL) return;
-    if(!finished()) {
-        if(mDependent.contains(updatable)) return;
-        mDependent << updatable;
-        updatable->incDependencies();
-    }
-}
-
-void Updatable::addScheduler() {
+void _ScheduledExecutor::addScheduler() {
     if(!shouldUpdate() || mSchedulerAdded) return;
 
     mFinished = false;
@@ -47,29 +26,24 @@ void Updatable::addScheduler() {
     addSchedulerNow();
 }
 
-void Updatable::addSchedulerNow() {
+void _ScheduledExecutor::addSchedulerNow() {
     MainWindow::getInstance()->addUpdateScheduler(this);
 }
 
-void Updatable::clear() {
-    foreach(Updatable *dependent, mDependent) {
-        dependent->decDependencies();
-    }
-    mDependent.clear();
-    tellDependentThatFinished();
+void _ScheduledExecutor::clear() {
     mSchedulerAdded = false;
     mAwaitingUpdate = false;
-    Executable::clear();
+    _Executor::clear();
 }
 
-void Executable::waitTillProcessed() {
+void _Executor::waitTillProcessed() {
     if(mCurrentPaintControler == NULL) {
         return;
     }
     {
         QEventLoop loop;
         loop.connect(mCurrentPaintControler,
-                     SIGNAL(finishedUpdating(int,Executable*)),
+                     SIGNAL(finishedUpdating(int,_Executor*)),
                      SLOT(quit()));
         loop.exec();
     }

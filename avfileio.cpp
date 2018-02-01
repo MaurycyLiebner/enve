@@ -928,7 +928,7 @@ void Tile::writeTile(QIODevice *target) {
 
 void Tile::readTile(QIODevice *target) {
     target->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-    updateDrawerFromDataArray();
+    copyDataToDrawer();
 }
 
 void TilesData::writeTilesData(QIODevice *target) {

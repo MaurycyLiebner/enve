@@ -28,10 +28,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
         QThread *paintControlerThread = new QThread(this);
         PaintControler *paintControler = new PaintControler(i);
         paintControler->moveToThread(paintControlerThread);
-        connect(paintControler, SIGNAL(finishedUpdating(int, Executable*)),
-                this, SLOT(sendNextUpdatableForUpdate(int, Executable*)) );
-        connect(this, SIGNAL(updateUpdatable(Executable*, int)),
-                paintControler, SLOT(updateUpdatable(Executable*, int)) );
+        connect(paintControler, SIGNAL(finishedUpdating(int, _Executor*)),
+                this, SLOT(sendNextUpdatableForUpdate(int, _Executor*)) );
+        connect(this, SIGNAL(updateUpdatable(_Executor*, int)),
+                paintControler, SLOT(updateUpdatable(_Executor*, int)) );
 
         paintControlerThread->start();
 
@@ -44,10 +44,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mFileControlerThread = new QThread(this);
     mFileControler = new PaintControler(numberThreads);
     mFileControler->moveToThread(mFileControlerThread);
-    connect(mFileControler, SIGNAL(finishedUpdating(int, Executable*)),
-            this, SLOT(sendNextFileUpdatableForUpdate(int, Executable*)) );
-    connect(this, SIGNAL(updateFileUpdatable(Executable*, int)),
-            mFileControler, SLOT(updateUpdatable(Executable*, int)) );
+    connect(mFileControler, SIGNAL(finishedUpdating(int, _Executor*)),
+            this, SLOT(sendNextFileUpdatableForUpdate(int, _Executor*)) );
+    connect(this, SIGNAL(updateFileUpdatable(_Executor*, int)),
+            mFileControler, SLOT(updateUpdatable(_Executor*, int)) );
 
     mFileControlerThread->start();
     mControlerThreads << mFileControlerThread;
@@ -790,19 +790,19 @@ bool CanvasWindow::noBoxesAwaitUpdate() {
     return mNoBoxesAwaitUpdate;
 }
 
-void CanvasWindow::addUpdatableAwaitingUpdate(Executable *updatable) {
+void CanvasWindow::addUpdatableAwaitingUpdate(_Executor *updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
 
-    mUpdatablesAwaitingUpdate << updatable->ref<Executable>();
+    mUpdatablesAwaitingUpdate << updatable->ref<_Executor>();
     if(!mFreeThreads.isEmpty()) {
         sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
     }
 }
 
-void CanvasWindow::addFileUpdatableAwaitingUpdate(Executable *updatable) {
-    mFileUpdatablesAwaitingUpdate << updatable->ref<Executable>();
+void CanvasWindow::addFileUpdatableAwaitingUpdate(_Executor *updatable) {
+    mFileUpdatablesAwaitingUpdate << updatable->ref<_Executor>();
 
     if(mNoFileAwaitUpdate) {
         mNoFileAwaitUpdate = false;
@@ -811,7 +811,7 @@ void CanvasWindow::addFileUpdatableAwaitingUpdate(Executable *updatable) {
 }
 
 void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
-                                              Executable *lastUpdatable) {
+                                              _Executor *lastUpdatable) {
     Q_UNUSED(threadId);
     if(lastUpdatable != NULL) {
         lastUpdatable->updateFinished();
@@ -829,7 +829,7 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
         }
     } else {
         for(int i = 0; i < mFileUpdatablesAwaitingUpdate.count(); i++) {
-            Executable *updatablaT = mFileUpdatablesAwaitingUpdate.at(i).get();
+            _Executor *updatablaT = mFileUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
                 updatablaT->setCurrentPaintControler(mFileControler);
                 updatablaT->beforeUpdate();
@@ -843,7 +843,7 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
 }
 
 void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
-                                              Executable *lastUpdatable) {
+                                              _Executor *lastUpdatable) {
     if(lastUpdatable != NULL) {
         if(mClearBeingUpdated) {
             lastUpdatable->clear();
@@ -863,7 +863,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
         }
     } else {
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
-            Executable *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
+            _Executor *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
                 updatablaT->setCurrentPaintControler(
                             mPaintControlers.at(threadId));
@@ -996,7 +996,6 @@ void CanvasWindow::nextSaveOutputFrame() {
         mBoxesUpdateFinishedFunction = NULL;
         mFilesUpdateFinishedFunction = NULL;
         mCurrentCanvas->setOutputRendering(false);
-        mCurrentCanvas->clearCurrentPreviewImage();
         emit changeCurrentFrame(mSavedCurrentFrame);
         if(qAbs(mSavedResolutionFraction -
                 mCurrentCanvas->getResolutionFraction()) > 0.1) {
