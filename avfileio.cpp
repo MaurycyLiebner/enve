@@ -1157,6 +1157,11 @@ void PathAnimator::readVectorPathAnimator(QIODevice *target) {
     addSinglePathAnimator(pathAnimator, false);
 }
 
+QMatrix PathAnimator::getCombinedTransform() {
+    if(mParentBox == NULL) return QMatrix();
+    return mParentBox->getCombinedTransform();
+}
+
 void PathAnimator::readProperty(QIODevice *target) {
     int nPaths;
     target->read((char*)&nPaths, sizeof(int));

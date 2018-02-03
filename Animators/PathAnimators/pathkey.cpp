@@ -68,22 +68,25 @@ void PathContainer::setElementPos(const int &index,
     mPathUpdateNeeded = true;
 }
 
-void PathContainer::addNodeElements(const int &startPtIndex,
+void PathContainer::addNodeElements(int startPtIndex,
                                     const SkPoint &startPos,
                                     const SkPoint &pos,
                                     const SkPoint &endPos,
                                     const bool &saveUndoRedo) {
+    if(startPtIndex == -1 || startPtIndex > mElementsPos.count()) {
+        startPtIndex = mElementsPos.count();
+    }
     mElementsPos.insert(startPtIndex, endPos);
     mElementsPos.insert(startPtIndex, pos);
     mElementsPos.insert(startPtIndex, startPos);
     mPathUpdateNeeded = true;
     if(saveUndoRedo) {
-        MainWindow::addUndoRedo(
-            new PathContainerAddNodeElementsUR(this,
-                                               startPtIndex,
-                                               startPos,
-                                               pos,
-                                               endPos));
+//        MainWindow::addUndoRedo(
+//            new PathContainerAddNodeElementsUR(this,
+//                                               startPtIndex,
+//                                               startPos,
+//                                               pos,
+//                                               endPos));
     }
 }
 
@@ -91,18 +94,18 @@ void PathContainer::removeNodeElements(const int &startPtIndex,
                                        const bool &saveUndoRedo) {
 
     mPathUpdateNeeded = true;
-    if(saveUndoRedo) {
-        MainWindow::addUndoRedo(
-            new PathContainerdRemoveNodeElementsUR(this,
-                                                   startPtIndex,
-                                                   mElementsPos.takeAt(startPtIndex),
-                                                   mElementsPos.takeAt(startPtIndex),
-                                                   mElementsPos.takeAt(startPtIndex)));
-    } else {
+//    if(saveUndoRedo) {
+//        MainWindow::addUndoRedo(
+//            new PathContainerdRemoveNodeElementsUR(this,
+//                                                   startPtIndex,
+//                                                   mElementsPos.takeAt(startPtIndex),
+//                                                   mElementsPos.takeAt(startPtIndex),
+//                                                   mElementsPos.takeAt(startPtIndex)));
+//    } else {
         mElementsPos.removeAt(startPtIndex);
         mElementsPos.removeAt(startPtIndex);
         mElementsPos.removeAt(startPtIndex);
-    }
+//    }
 }
 
 const SkPath &PathContainer::getPath() {
@@ -254,10 +257,10 @@ DONE:
 void PathContainer::finishedPathChange() {
     if(mPathChanged) {
         mPathChanged = false;
-        MainWindow::addUndoRedo(
-                    new PathContainerPathChangeUR(this,
-                                                        mSavedElementsPos,
-                                                        mElementsPos));
+//        MainWindow::addUndoRedo(
+//                    new PathContainerPathChangeUR(this,
+//                                                        mSavedElementsPos,
+//                                                        mElementsPos));
     }
 }
 

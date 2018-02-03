@@ -13,6 +13,11 @@ class MovablePoint;
 enum CanvasMode : short;
 struct NodeSettings {
     NodeSettings() {}
+    NodeSettings(const NodeSettings &settings) {
+        startEnabled = settings.startEnabled;
+        endEnabled = settings.endEnabled;
+        ctrlsMode = settings.ctrlsMode;
+    }
     NodeSettings(const bool &startEnabledT,
                  const bool &endEnabledT,
                  const CtrlsMode &ctrlsModeT) {
@@ -31,9 +36,9 @@ class VectorPathAnimator : public Animator,
     Q_OBJECT
 public:
     VectorPathAnimator(PathAnimator *pathAnimator);
-    VectorPathAnimator(const QList<NodeSettings *> &settingsList,
+    VectorPathAnimator(const QList<NodeSettings> &settingsList,
                        PathAnimator *pathAnimator);
-    VectorPathAnimator(const QList<NodeSettings *> &settingsList,
+    VectorPathAnimator(const QList<NodeSettings> &settingsList,
                        const QList<SkPoint> &posList,
                        PathAnimator *pathAnimator);
     ~VectorPathAnimator();
@@ -183,6 +188,10 @@ public:
         *nodeSettingsList = mNodeSettings;
     }
 
+    const QList<NodeSettings*> &getNodeSettingsList() {
+        return mNodeSettings;
+    }
+
     void getElementPosList(QList<SkPoint> *elementPosList) {
         *elementPosList = mElementsPos;
     }
@@ -253,14 +262,6 @@ public:
         }
     }
 
-    void revertAllNodeSettings() {
-        foreach(NodeSettings *settings, mNodeSettings) {
-            bool endT = settings->endEnabled;
-            settings->endEnabled = settings->startEnabled;
-            settings->startEnabled = endT;
-        }
-    }
-
     void revertAllPoints() {
         PathContainer::revertAllPoints();
         revertAllNodeSettings();
@@ -274,7 +275,16 @@ public:
     void updateAfterChangedFromInside() {
         prp_updateInfluenceRangeAfterChanged();
     }
+
+    void removeFromParent();
 private:
+    void revertAllNodeSettings() {
+        foreach(NodeSettings *settings, mNodeSettings) {
+            bool endT = settings->endEnabled;
+            settings->endEnabled = settings->startEnabled;
+            settings->startEnabled = endT;
+        }
+    }
     void setFirstPoint(NodePoint *firstPt);
 
     NodePoint *createNewNode(const int &targetNodeId,

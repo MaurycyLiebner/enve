@@ -307,7 +307,7 @@ void Animator::anim_appendKey(Key *newKey,
                               const bool &saveUndoRedo,
                               const bool &update) {
     if(saveUndoRedo && !anim_isComplexAnimator()) {
-        addUndoRedo(new AddKeyToAnimatorUndoRedo(newKey, this));
+//        addUndoRedo(new AddKeyToAnimatorUndoRedo(newKey, this));
     }
     if(!anim_mIsRecording) {
         anim_mIsRecording = true;
@@ -335,8 +335,8 @@ void Animator::anim_removeKey(Key *keyToRemove,
     anim_updateAfterChangedKey(keyToRemove);
 
     if(saveUndoRedo && !anim_isComplexAnimator()) {
-        addUndoRedo(new RemoveKeyFromAnimatorUndoRedo(
-                                keyToRemove, this));
+//        addUndoRedo(new RemoveKeyFromAnimatorUndoRedo(
+//                                keyToRemove, this));
     }
     anim_mKeys.removeAt(anim_getKeyIndex(keyToRemove));
 
@@ -421,9 +421,9 @@ bool Animator::prp_hasKeys() {
 void Animator::anim_setRecordingWithoutChangingKeys(const bool &rec,
                                                     const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new AnimatorRecordingSetUndoRedo(anim_mIsRecording,
-                                                     rec,
-                                                     this));
+//        addUndoRedo(new AnimatorRecordingSetUndoRedo(anim_mIsRecording,
+//                                                     rec,
+//                                                     this));
     }
 
     anim_setRecordingValue(rec);

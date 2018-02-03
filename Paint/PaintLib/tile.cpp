@@ -117,18 +117,18 @@ void Tile::setPixel(const int &x, const int &y,
 
 void Tile::startTransform() {
     if(mTransformStarted) return;
-    mParentTilesData->addChangedTile(this);
+//    mParentTilesData->addChangedTile(this);
     mTransformStarted = true;
-    std::memcpy(mSavedData, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+//    std::memcpy(mSavedData, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
 }
 
 void Tile::finishTransform() {
     if(!mTransformStarted) return;
     if(mPaintInOtherThread) {
         if(mDrawer->finished()) {
-            MainWindow::addUndoRedo(new TileChangedUndoRedo(mSavedDataImage,
-                                                            mDataTileImage,
-                                                            this));
+//            MainWindow::addUndoRedo(new TileChangedUndoRedo(mSavedDataImage,
+//                                                            mDataTileImage,
+//                                                            this));
         } else {
             mFinishTransformAfterUpdate = true;
             return;
@@ -179,8 +179,8 @@ void Tile::setTileWidth(const ushort &width_t) {
     mMaxPaintX = width_t;
     if(mDrawer != NULL) {
         mDrawer->maxPaintX = mMaxPaintX;
+        addScheduler();
     }
-    addScheduler();
 }
 
 void Tile::setTileHeight(const ushort &height_t) {
@@ -188,8 +188,8 @@ void Tile::setTileHeight(const ushort &height_t) {
     mMaxPaintY = height_t;
     if(mDrawer != NULL) {
         mDrawer->maxPaintY = mMaxPaintY;
+        addScheduler();
     }
-    addScheduler();
 }
 
 void Tile::resetTileSize() {
@@ -332,10 +332,10 @@ void Tile::initializeTileData() {
 
     mData = (uchar*)mDataTileImage.getPixels();
 
-    mSavedDataImage.allocPixels(info);
-    mSavedDataImage.setIsVolatile(true);
+//    mSavedDataImage.allocPixels(info);
+//    mSavedDataImage.setIsVolatile(true);
 
-    mSavedData = (uchar*)mSavedDataImage.getPixels();
+//    mSavedData = (uchar*)mSavedDataImage.getPixels();
 
     if(mPaintInOtherThread) {
         initializeDrawer();

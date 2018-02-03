@@ -95,9 +95,9 @@ void Key::setSelected(const bool &bT) {
 #include "undoredo.h"
 void Key::finishFrameTransform() {
     if(mParentAnimator == NULL) return;
-    mParentAnimator->addUndoRedo(
-                new ChangeKeyFrameUndoRedo(mSavedRelFrame,
-                                           mRelFrame, this));
+//    mParentAnimator->addUndoRedo(
+//                new ChangeKeyFrameUndoRedo(mSavedRelFrame,
+//                                           mRelFrame, this));
 }
 
 int Key::getAbsFrame() {

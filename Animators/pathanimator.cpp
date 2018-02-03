@@ -43,7 +43,7 @@ void PathAnimator::addSinglePathAnimator(VectorPathAnimator *path,
     mSinglePaths << path;
     ca_addChildAnimator(path);
     if(saveUndoRedo) {
-        addUndoRedo(new AddSinglePathAnimatorUndoRedo(this, path));
+//        addUndoRedo(new AddSinglePathAnimatorUndoRedo(this, path));
     }
 }
 
@@ -51,9 +51,12 @@ void PathAnimator::removeSinglePathAnimator(VectorPathAnimator *path,
                                             const bool &saveUndoRedo) {
     if(mSinglePaths.removeOne(path) ) {
         if(saveUndoRedo) {
-            addUndoRedo(new RemoveSinglePathAnimatorUndoRedo(this, path));
+//            addUndoRedo(new RemoveSinglePathAnimatorUndoRedo(this, path));
         }
         ca_removeChildAnimator(path);
+        if(mSinglePaths.isEmpty()) {
+            mParentBox->removeFromParent();
+        }
     }
 }
 

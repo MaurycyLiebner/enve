@@ -1,6 +1,7 @@
 #include "canvas.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "nodepoint.h"
+#include "Animators/pathanimator.h"
 
 void Canvas::connectPoints() {
     QList<NodePoint*> selectedNodePoints;
@@ -11,29 +12,46 @@ void Canvas::connectPoints() {
             }
         }
     }
+    clearPointsSelection();
+
     if(selectedNodePoints.count() == 2) {
         NodePoint *firstPoint = selectedNodePoints.first();
         NodePoint *secondPoint = selectedNodePoints.last();
-        VectorPathAnimator *firstParentPath = firstPoint->getParentPath();
-        VectorPathAnimator *secondParentPath = secondPoint->getParentPath();
-        if(firstParentPath->getParentPathAnimator() ==
-           secondParentPath->getParentPathAnimator()) {
-            if(firstParentPath == secondParentPath) {
-                firstPoint->getParentPath()->
-                        connectPoints(firstPoint, secondPoint);
+        VectorPathAnimator *firstSinglePath = firstPoint->getParentPath();
+        VectorPathAnimator *secondSinglePath = secondPoint->getParentPath();
+        PathAnimator *firstParentPath = firstSinglePath->getParentPathAnimator();
+        PathAnimator *secondParentPath = secondSinglePath->getParentPathAnimator();
+        if(firstParentPath == secondParentPath) {
+            if(firstSinglePath == secondSinglePath) {
+                firstSinglePath->connectPoints(firstPoint, secondPoint);
             } else {
                 if(firstPoint->isSeparateNodePoint()) {
-                    firstParentPath->revertElementPosSubset(0, -1);
-                    firstParentPath->revertNodeSettingsSubset(0, -1);
+                    firstSinglePath->revertAllPointsForAllKeys();
                 }
                 if(!secondPoint->isSeparateNodePoint()) {
-                    secondParentPath->revertElementPosSubset(0, -1);
-                    firstParentPath->revertNodeSettingsSubset(0, -1);
+                    secondSinglePath->revertAllPointsForAllKeys();
                 }
-                firstParentPath->connectWith(secondParentPath);
+                firstSinglePath->connectWith(secondSinglePath);
             }
         } else {
+            if(firstPoint->isSeparateNodePoint()) {
+                firstSinglePath->revertAllPointsForAllKeys();
+            }
+            if(!secondPoint->isSeparateNodePoint()) {
+                secondSinglePath->revertAllPointsForAllKeys();
+            }
+            QMatrix firstMatrix =
+                    firstParentPath->getCombinedTransform();
+            QMatrix secondMatrix =
+                    secondParentPath->getCombinedTransform();
+            QMatrix effectiveMatrix =
+                    secondMatrix*firstMatrix.inverted();
+            secondSinglePath->applyTransformToPoints(effectiveMatrix);
+            firstParentPath->addSinglePathAnimator(secondSinglePath);
+            secondSinglePath->removeFromParent();
+            secondSinglePath->setParentPath(firstParentPath);
 
+            firstSinglePath->connectWith(secondSinglePath);
         }
     }
 }
@@ -76,9 +94,58 @@ void Canvas::mergePoints() {
         NodePoint *secondPoint = selectedNodePoints.last();
         if(firstPoint->isEndPoint() &&
            secondPoint->isEndPoint()) {
+            VectorPathAnimator *firstParentPath = firstPoint->getParentPath();
+            VectorPathAnimator *secondParentPath = secondPoint->getParentPath();
+            if(firstParentPath == secondParentPath) {
+                secondParentPath->connectPoints(firstPoint, secondPoint);
+            } else {
+                if(firstPoint->isSeparateNodePoint()) {
+                    firstParentPath->revertAllPointsForAllKeys();
+                }
+                if(!secondPoint->isSeparateNodePoint()) {
+                    secondParentPath->revertAllPointsForAllKeys();
+                }
+                PathAnimator *firstPathAnimator =
+                        firstParentPath->getParentPathAnimator();
+                PathAnimator *secondPathAnimator =
+                        secondParentPath->getParentPathAnimator();
+                const QList<SkPoint> &listT =
+                        secondParentPath->getElementsPosList();
+                const QList<NodeSettings*> &nodeStts =
+                        secondParentPath->getNodeSettingsList();
+                if(firstPathAnimator == secondPathAnimator) {
+                    for(int i = 0; i < listT.count() - 2; i += 3) {
+                        QPointF pos = SkPointToQPointF(listT.at(i + 1));
+                        firstParentPath->addNodeRelPos(
+                                    SkPointToQPointF(listT.at(i)) + pos,
+                                    pos,
+                                    SkPointToQPointF(listT.at(i + 2)) + pos,
+                                    -1, *nodeStts.at(i/3));
+                    }
+                } else {
+                    QMatrix firstMatrix =
+                            firstPathAnimator->getCombinedTransform();
+                    QMatrix secondMatrix =
+                            secondPathAnimator->getCombinedTransform();
+                    QMatrix effectiveMatrix =
+                            secondMatrix*firstMatrix.inverted();
 
-            secondPoint->getParentPath()->connectPoints(firstPoint,
-                                                        secondPoint);
+                    for(int i = 0; i < listT.count() - 2; i += 3) {
+                        QPointF pos = SkPointToQPointF(listT.at(i + 1));
+                        pos = effectiveMatrix.map(pos);
+
+                        QPointF startPos = SkPointToQPointF(listT.at(i)) + pos;
+                        startPos = effectiveMatrix.map(startPos);
+
+                        QPointF endPos = SkPointToQPointF(listT.at(i + 2)) + pos;
+                        endPos = effectiveMatrix.map(endPos);
+                        firstParentPath->addNodeRelPos(startPos, pos, endPos,
+                                                       -1, *nodeStts.at(i/3));
+                    }
+                }
+                secondParentPath->removeFromParent();
+                return;
+            }
         } else if(firstPoint->getNextPoint() != secondPoint &&
                   firstPoint->getPreviousPoint() != secondPoint) {
             return;

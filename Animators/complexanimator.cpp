@@ -192,8 +192,8 @@ void ComplexAnimator::ca_moveChildInList(
     SWT_moveChildAbstractionForTargetToInAll(child,
                                              to);
     if(saveUndoRedo) {
-        addUndoRedo(new MoveChildAnimatorInListUndoRedo(
-                        child, from, to, this) );
+//        addUndoRedo(new MoveChildAnimatorInListUndoRedo(
+//                        child, from, to, this) );
     }
 
     prp_callUpdater();

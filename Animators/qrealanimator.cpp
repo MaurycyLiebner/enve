@@ -594,12 +594,9 @@ void QrealAnimator::prp_startTransform() {
 
 void QrealAnimator::prp_finishTransform() {
     if(mTransformed) {
-//        if(mSavedCurrentValue == mCurrentValue) {
-//            mTransformed = false;
-//        } else {
-        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
-                                                 mCurrentValue,
-                                                 this) );
+//        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
+//                                                 mCurrentValue,
+//                                                 this) );
         if(anim_mIsRecording) {
             anim_saveCurrentValueAsKey();
         } else {
@@ -610,7 +607,6 @@ void QrealAnimator::prp_finishTransform() {
         if(anim_mIsCurrentAnimator) {
             graphScheduleUpdateAfterKeysChanged();
         }
-//        }
         prp_callFinishUpdater();
     }
 }

@@ -28,9 +28,9 @@ void QStringAnimator::anim_saveCurrentValueAsKey() {
 void QStringAnimator::setCurrentTextValue(const QString &text,
                                           const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new ChangeTextUndoRedo(this,
-                                           mCurrentText,
-                                           text));
+//        addUndoRedo(new ChangeTextUndoRedo(this,
+//                                           mCurrentText,
+//                                           text));
     }
     mCurrentText = text;
     if(prp_isRecording() && saveUndoRedo) {

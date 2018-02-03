@@ -198,8 +198,8 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator,
     ca_addChildAnimator(newColorAnimator);
 
     if(saveUndoRedo) {
-        addUndoRedo(new GradientColorAddedToListUndoRedo(this,
-                                                         newColorAnimator));
+//        addUndoRedo(new GradientColorAddedToListUndoRedo(this,
+//                                                         newColorAnimator));
     }
 }
 
@@ -230,7 +230,7 @@ QGradientStops Gradient::getQGradientStops() {
 void Gradient::swapColors(const int &id1, const int &id2,
                           const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new GradientSwapColorsUndoRedo(this, id1, id2));
+//        addUndoRedo(new GradientSwapColorsUndoRedo(this, id1, id2));
     }
     ca_swapChildAnimators(mColors.at(id1), mColors.at(id2));
     mColors.swap(id1, id2);
@@ -244,8 +244,8 @@ void Gradient::removeColor(const int &id) {
 void Gradient::removeColor(ColorAnimator *color,
                            const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new GradientColorRemovedFromListUndoRedo(
-                        this, color));
+//        addUndoRedo(new GradientColorRemovedFromListUndoRedo(
+//                        this, color));
     }
     ca_removeChildAnimator(color);
     emit resetGradientWidgetColorIdIfEquals(this, mColors.indexOf(color));
@@ -410,7 +410,7 @@ void PaintSettings::setGradient(Gradient *gradient,
     if(gradient == mGradient.data()) return;
 
     if(saveUndoRedo) {
-        addUndoRedo(new GradientChangeUndoRedo(mGradient.data(), gradient, this));
+//        addUndoRedo(new GradientChangeUndoRedo(mGradient.data(), gradient, this));
     }
     setGradientVar(gradient);
 
@@ -433,8 +433,8 @@ void PaintSettings::setPaintType(const PaintType &paintType,
         ca_addChildAnimator(mColor.data());
     }
     if(saveUndoRedo) {
-        addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
-                                                this));
+//        addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
+//                                                this));
         if(mPaintType == GRADIENTPAINT) {
             setGradient(NULL);
         }

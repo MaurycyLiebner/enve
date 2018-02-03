@@ -668,7 +668,7 @@ void BoxesGroup::addContainedBoxToListAt(const int &index,
     mContainedBoxes.insert(index, child->ref<BoundingBox>());
     child->setParentGroup(this);
     if(saveUndoRedo) {
-        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
+//        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
     connect(child, SIGNAL(prp_absFrameRangeChanged(int,int)),
             this, SLOT(prp_updateAfterChangedAbsFrameRange(int,int)));
@@ -712,20 +712,20 @@ void BoxesGroup::prp_setAbsFrame(const int &frame) {
 
 void BoxesGroup::removeContainedBoxFromList(const int &id,
                                      const bool &saveUndoRedo) {
-    BoundingBox *box = mContainedBoxes.at(id).data();
+    QSharedPointer<BoundingBox> box = mContainedBoxes.at(id);
     box->clearAllCache();
     if(box->isSelected()) {
         box->removeFromSelection();
     }
-    disconnect(box, 0, this, 0);
+    disconnect(box.data(), 0, this, 0);
     if(saveUndoRedo) {
-        addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
-                                                   box) );
+//        addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
+//                                                   box) );
     }
     mContainedBoxes.removeAt(id);
 
     if(box->SWT_isBoxesGroup()) {
-        BoxesGroup *group = (BoxesGroup*) box;
+        BoxesGroup *group = (BoxesGroup*)box.data();
         if(group->isCurrentGroup()) {
             mMainWindow->getCanvasWindow()->getCurrentCanvas()->
                     setCurrentBoxesGroup(group->getParentGroup());
@@ -733,7 +733,7 @@ void BoxesGroup::removeContainedBoxFromList(const int &id,
     }
     updateContainedBoxIds(id, saveUndoRedo);
 
-    SWT_removeChildAbstractionForTargetFromAll(box);
+    SWT_removeChildAbstractionForTargetFromAll(box.data());
 
     foreach(BoundingBox *box, mLinkingBoxes) {
         ((InternalLinkGroupBox*)box)->removeContainedBoxFromList(id, false);
@@ -755,6 +755,7 @@ void BoxesGroup::removeContainedBox(BoundingBox *child) {
     if(index < 0) {
         return;
     }
+    child->removeFromSelection();
     removeContainedBoxFromList(index);
     if(mContainedBoxes.isEmpty() &&
        mParentGroup != NULL) {
@@ -804,7 +805,7 @@ void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
     SWT_moveChildAbstractionForTargetToInAll(child, mContainedBoxes.count() - to - 1
                                                     + ca_mChildAnimators.count());
     if(saveUndoRedo) {
-        addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
+//        addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }
 
     scheduleUpdate();

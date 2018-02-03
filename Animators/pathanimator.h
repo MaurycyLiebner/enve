@@ -74,6 +74,7 @@ public:
 //                                         const int &relFrame2) {
 //        bool interpolate = mSmoothTransformation->g;
 //    }
+    QMatrix getCombinedTransform();
 private:
     BoolAnimatorQSPtr mSmoothTransformation;
     BoundingBox *mParentBox = NULL;

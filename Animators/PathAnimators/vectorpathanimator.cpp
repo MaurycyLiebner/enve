@@ -12,17 +12,18 @@ VectorPathAnimator::VectorPathAnimator(PathAnimator *pathAnimator) :
     mParentPathAnimator = pathAnimator;
 }
 
-VectorPathAnimator::VectorPathAnimator(const QList<NodeSettings*> &settingsList,
+VectorPathAnimator::VectorPathAnimator(const QList<NodeSettings> &settingsList,
                                        PathAnimator *pathAnimator) :
     VectorPathAnimator(pathAnimator) {
-    mNodeSettings = settingsList;
+    foreach(const NodeSettings &nodeSetting, settingsList) {
+        mNodeSettings << new NodeSettings(nodeSetting);
+    }
 }
 
-VectorPathAnimator::VectorPathAnimator(const QList<NodeSettings*> &settingsList,
+VectorPathAnimator::VectorPathAnimator(const QList<NodeSettings> &settingsList,
                                        const QList<SkPoint> &posList,
                                        PathAnimator *pathAnimator) :
-    VectorPathAnimator(settingsList,
-                       pathAnimator) {
+    VectorPathAnimator(settingsList, pathAnimator) {
     mElementsPos = posList;
     updatePath();
     updateNodePointsFromElements();
@@ -162,10 +163,10 @@ void VectorPathAnimator::replaceNodeSettingsForNodeId(const int &nodeId,
                                                       const NodeSettings &settings,
                                                       const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new VectorPathAnimatorReplaceNodeSettingsUR(
-                        this, nodeId,
-                        *mNodeSettings.at(nodeId),
-                        settings));
+//        addUndoRedo(new VectorPathAnimatorReplaceNodeSettingsUR(
+//                        this, nodeId,
+//                        *mNodeSettings.at(nodeId),
+//                        settings));
     }
     *mNodeSettings.at(nodeId) = settings;
 }
@@ -178,9 +179,9 @@ NodeSettings *VectorPathAnimator::insertNodeSettingsForNodeId(
     *newSettings = settings;
     mNodeSettings.insert(nodeId, newSettings);
     if(saveUndoRedo) {
-        addUndoRedo(new VectorPathAnimatorInsertNodeSettingsUR(this,
-                                                               nodeId,
-                                                               settings));
+//        addUndoRedo(new VectorPathAnimatorInsertNodeSettingsUR(this,
+//                                                               nodeId,
+//                                                               settings));
     }
     return newSettings;
 }
@@ -457,9 +458,9 @@ void VectorPathAnimator::removeNodeSettingsAt(const int &id,
                                               const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         NodeSettings nodeSettings = *mNodeSettings.takeAt(id);
-        addUndoRedo(new VectorPathAnimatorRemoveNodeSettingsUR(this,
-                                                               id,
-                                                               nodeSettings));
+//        addUndoRedo(new VectorPathAnimatorRemoveNodeSettingsUR(this,
+//                                                               id,
+//                                                               nodeSettings));
     } else {
         mNodeSettings.removeAt(id);
     }
@@ -606,14 +607,14 @@ void VectorPathAnimator::revertNodeSettingsSubset(
 void VectorPathAnimator::connectWith(VectorPathAnimator *srcPath) {
     QList<int> keyFrames;
     QList<QList<SkPoint> > newKeysData;
-    QList<NodeSettings*> newNodeSettings;
+    QList<NodeSettings> newNodeSettings;
     foreach(NodeSettings *setting, mNodeSettings) {
-        newNodeSettings << setting;
+        newNodeSettings << *setting;
     }
     QList<NodeSettings*> srcNodeSettings;
     srcPath->getNodeSettingsList(&srcNodeSettings);
     foreach(NodeSettings *setting, srcNodeSettings) {
-        newNodeSettings << setting;
+        newNodeSettings << *setting;
     }
 
     getKeysDataForConnection(this, srcPath, &keyFrames, &newKeysData, false);
@@ -638,9 +639,8 @@ void VectorPathAnimator::connectWith(VectorPathAnimator *srcPath) {
 
     mParentPathAnimator->addSinglePathAnimator(newAnimator);
 
-
-    mParentPathAnimator->removeSinglePathAnimator(this);
-    mParentPathAnimator->removeSinglePathAnimator(srcPath);
+    srcPath->removeFromParent();
+    removeFromParent();
 }
 
 void VectorPathAnimator::revertElementPosSubset(
@@ -671,13 +671,13 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
         updateNodePointsFromElements();
     } else {
         VectorPathAnimator *newSinglePath;
-        QList<NodeSettings*> nodeSettings;
+        QList<NodeSettings> nodeSettings;
         {
             int firstNodeForNew = nextPt->getNodeId();
             int countNds = mNodeSettings.count() - firstNodeForNew;
 
             for(int i = 0; i < countNds; i++) {
-                nodeSettings.append(mNodeSettings.at(firstNodeForNew));
+                nodeSettings.append(*mNodeSettings.at(firstNodeForNew));
                 removeNodeSettingsAt(firstNodeForNew, true);
             }
         }
@@ -795,7 +795,13 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         const NodeSettings &nodeSettings,
         const bool &saveUndoRedo) {
     NodePoint *ptT = NULL;
-    if(targetPtId > -1) ptT = mPoints.at(targetPtId);
+    if(!mPoints.isEmpty()) {
+        if(targetPtId == -1) {
+            ptT = mPoints.last();
+        } else {
+            ptT = mPoints.at(targetPtId);
+        }
+    }
     return addNodeRelPos(startRelPos, relPos,
                   endRelPos, ptT,
                   nodeSettings, saveUndoRedo);
@@ -823,8 +829,16 @@ void VectorPathAnimator::shiftAllPointsForAllKeys(const int &by) {
 
 void VectorPathAnimator::revertAllPointsForAllKeys() {
     PathContainer::revertAllPoints();
+    revertAllNodeSettings();
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
         ((PathKey*)key.get())->revertAllPoints();
     }
     setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
+}
+
+void VectorPathAnimator::removeFromParent() {
+    if(mParentPathAnimator == NULL) return;
+    PathAnimator *parentT = mParentPathAnimator; // in case this gets deleted
+    mParentPathAnimator = NULL;
+    parentT->removeSinglePathAnimator(this);
 }

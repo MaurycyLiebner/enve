@@ -323,8 +323,8 @@ private:
     bool mFinishTransformAfterUpdate = false;
     TilesData *mParentTilesData = NULL;
     bool mTransformStarted = false;
-    uchar *mSavedData = NULL;
-    SkBitmap mSavedDataImage;
+//    uchar *mSavedData = NULL;
+//    SkBitmap mSavedDataImage;
 
     bool mPaintInOtherThread;
 

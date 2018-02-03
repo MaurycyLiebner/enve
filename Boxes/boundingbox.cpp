@@ -617,7 +617,7 @@ void BoundingBox::bringToEnd() {
 void BoundingBox::setZListIndex(const int &z,
                                 const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new SetBoundingBoxZListIndexUnoRedo(mZListIndex, z, this));
+//        addUndoRedo(new SetBoundingBoxZListIndexUnoRedo(mZListIndex, z, this));
     }
     mZListIndex = z;
 }
@@ -945,7 +945,7 @@ void BoundingBox::setVisibile(const bool &visible,
         removeFromSelection();
     }
     if(saveUndoRedo) {
-        addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
+//        addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
     }
     mVisible = visible;
 
@@ -1106,7 +1106,8 @@ void BoundingBox::removeFromParent() {
 
 void BoundingBox::removeFromSelection() {
     if(mSelected) {
-        getParentCanvas()->removeBoxFromSelection(this);
+        Canvas *parentCanvas = getParentCanvas();
+        parentCanvas->removeBoxFromSelection(this);
     }
 }
 

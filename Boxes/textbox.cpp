@@ -36,7 +36,7 @@ void TextBox::openTextEditor(const bool &saveUndoRedo) {
 
 void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new ChangeFontUndoRedo(this, mFont, font));
+//        addUndoRedo(new ChangeFontUndoRedo(this, mFont, font));
     }
     clearAllCache();
     mFont = font;

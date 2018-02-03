@@ -13,7 +13,7 @@ public:
     const SkPoint &getElementPos(const int &index) const;
     virtual void setElementPos(const int &index,
                                const SkPoint &pos);
-    void addNodeElements(const int &startPtIndex,
+    void addNodeElements(int startPtIndex,
                  const SkPoint &startPos,
                  const SkPoint &pos,
                  const SkPoint &endPos,
@@ -144,6 +144,7 @@ public:
     virtual void revertAllPoints() {
         revertElementPosSubset(0, -1);
         PathContainer::shiftAllPoints(1);
+        mPathUpdateNeeded = true;
     }
 
     virtual void startPathChange() {
