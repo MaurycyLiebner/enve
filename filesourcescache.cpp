@@ -93,6 +93,8 @@ FileCacheHandler::FileCacheHandler(const QString &filePath,
                                    const bool &visibleInListWidgets) {
     mVisibleInListWidgets = visibleInListWidgets;
     mFilePath = filePath;
+    QFile file(mFilePath);
+    mFileMissing = !file.exists();
     FileSourcesCache::addHandlerToHandlersList(this);
     if(visibleInListWidgets) {
         FileSourcesCache::addHandlerToListWidgets(this);
@@ -114,6 +116,8 @@ FileCacheHandler::~FileCacheHandler() {
 }
 
 void FileCacheHandler::clearCache() {
+    QFile file(mFilePath);
+    mFileMissing = !file.exists();
     foreach(const BoundingBoxQWPtr &boxPtr, mDependentBoxes) {
         BoundingBox *box = boxPtr.data();
         if(box == NULL) continue;
@@ -430,7 +434,8 @@ void VideoCacheHandler::_processUpdate() {
 void VideoCacheHandler::afterUpdate() {
     FileCacheHandler::afterUpdate();
 //    qDebug() << "loaded: " << mFramesBeingLoaded;
-    for(int i = 0; i < mFramesBeingLoaded.count(); i++) {
+    for(int i = 0; i < mFramesBeingLoaded.count() &&
+        i < mLoadedFrames.count(); i++) {
         int frameId = mFramesBeingLoaded.at(i);
         sk_sp<SkImage> imgT = mLoadedFrames.at(i);
         if(imgT.get() == NULL) {
@@ -515,8 +520,9 @@ _ScheduledExecutor *ImageSequenceCacheHandler::scheduleFrameLoad(const int &fram
 bool isVideoExt(const QString &extension) {
     return extension == "avi" ||
            extension == "mp4" ||
-           extension == "mov"||
-           extension == "mkv";
+           extension == "mov" ||
+           extension == "mkv" ||
+           extension == "m4v";
 }
 
 bool isSoundExt(const QString &extension) {

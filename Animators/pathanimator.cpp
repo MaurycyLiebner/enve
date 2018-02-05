@@ -288,6 +288,15 @@ void PathAnimator::revertAllPointsForAllKeys() {
     }
 }
 
+void PathAnimator::addAllSinglePathsToAnimator(PathAnimator *target) {
+    while(!mSinglePaths.isEmpty()) {
+        VectorPathAnimator *path = mSinglePaths.at(0);
+        target->addSinglePathAnimator(path);
+        removeSinglePathAnimator(path);
+        path->setParentPath(target);
+    }
+}
+
 void PathAnimator::shiftAllPoints(const int &by) {
     Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
         path->shiftAllPoints(by);

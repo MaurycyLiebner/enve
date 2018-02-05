@@ -205,7 +205,9 @@ SOURCES += main.cpp\
     videoencoder.cpp \
     RenderWidget/rendersettingsdialog.cpp \
     RenderWidget/outputsettingsprofilesdialog.cpp \
-    RenderWidget/outputsettingsdisplaywidget.cpp
+    RenderWidget/outputsettingsdisplaywidget.cpp \
+    durationrectsettingsdialog.cpp \
+    twocolumnlayout.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -370,7 +372,9 @@ HEADERS  += mainwindow.h \
     videoencoder.h \
     RenderWidget/rendersettingsdialog.h \
     RenderWidget/outputsettingsprofilesdialog.h \
-    RenderWidget/outputsettingsdisplaywidget.h
+    RenderWidget/outputsettingsdisplaywidget.h \
+    durationrectsettingsdialog.h \
+    twocolumnlayout.h
 
 RESOURCES += \
     resources.qrc

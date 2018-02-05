@@ -9,32 +9,8 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include "renderinstancesettings.h"
+#include "twocolumnlayout.h"
 #define COMPLIENCE FF_COMPLIANCE_NORMAL
-class TwoColumnLayout : public QHBoxLayout {
-public:
-    TwoColumnLayout() {
-        mLayout1 = new QVBoxLayout();
-        mLayout2 = new QVBoxLayout();
-        addLayout(mLayout1);
-        addLayout(mLayout2);
-    }
-
-    void addWidgetToFirstColumn(QWidget *wid) {
-        mLayout1->addWidget(wid);
-    }
-
-    void addWidgetToSecondColumn(QWidget *wid) {
-        mLayout2->addWidget(wid);
-    }
-
-    void addPair(QWidget *column1, QWidget *column2) {
-        addWidgetToFirstColumn(column1);
-        addWidgetToSecondColumn(column2);
-    }
-protected:
-    QVBoxLayout *mLayout1 = NULL;
-    QVBoxLayout *mLayout2 = NULL;
-};
 
 class RenderSettingsDialog : public QDialog {
     Q_OBJECT

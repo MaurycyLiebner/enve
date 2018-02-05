@@ -1238,7 +1238,7 @@ void CanvasWindow::importFile() {
                                             MainWindow::getInstance(),
                                             "Import File", "",
                                             "Files (*.av *.svg "
-                                                   "*.mp4 *.mov *.avi *.mkv "
+                                                   "*.mp4 *.mov *.avi *.mkv *.m4v "
                                                    "*.png *.jpg "
                                                    "*.wav *.mp3)");
     MainWindow::getInstance()->enableEventFilter();

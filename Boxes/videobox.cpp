@@ -39,7 +39,7 @@ void VideoBox::changeSourceFile() {
     QString importPath = QFileDialog::getOpenFileName(
                                             MainWindow::getInstance(),
                                             "Change Source", "",
-                                            "Video Files (*.mp4 *.mov *.avi *.mkv)");
+                                            "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     MainWindow::getInstance()->enableEventFilter();
     if(!importPath.isEmpty()) {
         setFilePath(importPath);

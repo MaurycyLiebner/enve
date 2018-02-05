@@ -565,11 +565,16 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             BoundingBox *boxTarget = ((BoundingBox*)target);
             menu.addAction("Rename")->setObjectName("swt_rename");
             if(!target->SWT_isParticleBox() &&
-                !target->SWT_isAnimationBox()) {
+               !target->SWT_isAnimationBox()) {
                 QAction *durRectAct = menu.addAction("Visibility Range");
                 durRectAct->setObjectName("swt_visibility_range");
                 durRectAct->setCheckable(true);
                 durRectAct->setChecked(boxTarget->hasDurationRectangle());
+            }
+            DurationRectangle *durRect = boxTarget->getDurationRectangle();
+            if(durRect != NULL) {
+                menu.addAction("Visibility Range Settings...")->
+                        setObjectName("swt_visibility_range_settings");
             }
             menu.addSeparator();
         }
@@ -669,6 +674,12 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     boxTarget->setDurationRectangle(NULL);
                 } else {
                     boxTarget->createDurationRectangle();
+                }
+            } else if(selectedAction->objectName() == "swt_visibility_range_settings") {
+                BoundingBox *boxTarget = (BoundingBox*)target;
+                DurationRectangle *durRect = boxTarget->getDurationRectangle();
+                if(durRect != NULL) {
+                    durRect->openDurationSettingsDialog(this);
                 }
             } else if(selectedAction->objectName() == "swt_copy") {
                 if(target->SWT_isBoundingBox()) {

@@ -61,11 +61,7 @@ public:
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
     void readVectorPathAnimator(QIODevice *target);
-    void addAllSinglePathsToAnimator(PathAnimator *target) {
-        foreach(VectorPathAnimator *path, mSinglePaths) {
-            target->addSinglePathAnimator(path);
-        }
-    }
+    void addAllSinglePathsToAnimator(PathAnimator *target);
     const QList<VectorPathAnimator*> &getSinglePathsList() {
         return mSinglePaths;
     }

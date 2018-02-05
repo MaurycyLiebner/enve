@@ -654,6 +654,10 @@ public:
     void startMaxFramePosTransform();
     void finishMaxFramePosTransform();
     void moveMaxFrame(const int &dFrame);
+
+    DurationRectangle *getDurationRectangle() {
+        return mDurationRectangle;
+    }
 protected:
     int mExpiredPixmap = 0;
     QPointF mSavedTransformPivot;

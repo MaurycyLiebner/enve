@@ -33,7 +33,12 @@ public:
     void removeDependentBox(BoundingBox *dependent);
     virtual void replace() {}
     void setVisibleInListWidgets(const bool &bT);
+
+    bool isFileMissing() {
+        return mFileMissing;
+    }
 protected:
+    bool mFileMissing = false;
     bool mVisibleInListWidgets;
     QList<BoundingBoxQWPtr> mDependentBoxes;
     QString mFilePath;

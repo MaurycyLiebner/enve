@@ -12,6 +12,8 @@ public:
         MIN_FRAME,
         MAX_FRAME,
         DURATION_RECT,
+        VARYING_LEN_ANIMATION_RECT,
+        FIXED_LEN_ANIMATION_LEN,
         NOT_SPECIFIED
     };
     DurationRectangleMovable(const Type &type);
@@ -48,7 +50,9 @@ public:
     bool isSelected();
 
     bool isDurationRect() {
-        return mType == DURATION_RECT;
+        return mType == DURATION_RECT ||
+               mType == VARYING_LEN_ANIMATION_RECT ||
+               mType == FIXED_LEN_ANIMATION_LEN;
     }
     bool isMinFrame() {
         return mType == MIN_FRAME;
@@ -58,6 +62,10 @@ public:
     }
     void setType(const Type &type) {
         mType = type;
+    }
+
+    const Type &getType() {
+        return mType;
     }
 public slots:
     void setMaxPos(const int &maxPos);
@@ -119,8 +127,8 @@ public:
     }
 
     virtual bool hasAnimationFrameRange() { return false; }
-    void writeDurationRectangle(QIODevice *target);
-    void readDurationRectangle(QIODevice *target);
+    virtual void writeDurationRectangle(QIODevice *target);
+    virtual void readDurationRectangle(QIODevice *target);
 
     void moveMinFrame(const int &change);
     void finishMinFramePosTransform();
@@ -128,6 +136,8 @@ public:
     void moveMaxFrame(const int &change);
     void finishMaxFramePosTransform();
     void startMaxFramePosTransform();
+
+    virtual void openDurationSettingsDialog(QWidget *parent = NULL);
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);
@@ -172,7 +182,7 @@ class VaryingLenAnimationRect : public AnimationRect {
     Q_OBJECT
 public:
     VaryingLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
-
+        mType = VARYING_LEN_ANIMATION_RECT;
     }
 
     int getMinAnimationFrame() const {
@@ -196,7 +206,7 @@ class FixedLenAnimationRect : public AnimationRect {
     Q_OBJECT
 public:
     FixedLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
-
+        mType = FIXED_LEN_ANIMATION_LEN;
     }
 
     int getMinAnimationFrame() const;
@@ -205,6 +215,15 @@ public:
     void bindToAnimationFrameRange();
     void setBindToAnimationFrameRange();
     void changeFramePosBy(const int &change);
+    void writeDurationRectangle(QIODevice *target);
+    void readDurationRectangle(QIODevice *target);
+
+    void setFirstAnimationFrame(const int &minAnimationFrame) {
+        int animDur = mMaxAnimationFrame - mMinAnimationFrame;
+        setMinAnimationFrame(minAnimationFrame);
+        setMaxAnimationFrame(minAnimationFrame + animDur);
+    }
+    void openDurationSettingsDialog(QWidget *parent = NULL);
 protected:
     void setMinAnimationFrame(const int &minAnimationFrame);
     void setMaxAnimationFrame(const int &maxAnimationFrame);

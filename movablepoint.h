@@ -94,6 +94,10 @@ public:
     virtual QPointF getRelativePos() const = 0;
     virtual void moveByRel(const QPointF &relTranslation) = 0;
     const QPointF &getSavedRelPos() const;
+
+    void setParentTransformAnimator(BasicTransformAnimator *parent) {
+        mParent = parent;
+    }
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

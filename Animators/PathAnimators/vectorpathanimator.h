@@ -151,9 +151,7 @@ public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
-    void setParentPath(PathAnimator *parentPath) {
-        mParentPathAnimator = parentPath;
-    }
+    void setParentPath(PathAnimator *parentPath);
 
     void finishAllPointsTransform();
     void startAllPointsTransform();
@@ -234,7 +232,7 @@ public:
         }
     }
 
-    void connectWith(VectorPathAnimator *srcPath);
+    VectorPathAnimator *connectWith(VectorPathAnimator *srcPath);
     Key *readKey(QIODevice *target);
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
@@ -277,6 +275,22 @@ public:
     }
 
     void removeFromParent();
+
+    NodePoint *getNodePtWithNodeId(const int &id) {
+        if(id < 0 || id >= mPoints.count()) return NULL;
+        return mPoints.at(id);
+    }
+
+    int getNodeCount() {
+        return mNodeSettings.count();
+    }
+
+    void mergeNodes(const int &nodeId1,
+                    const int &nodeId2);
+
+    const bool &isClosed() const {
+        return mPathClosed;
+    }
 private:
     void revertAllNodeSettings() {
         foreach(NodeSettings *settings, mNodeSettings) {

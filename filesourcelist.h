@@ -27,6 +27,10 @@ struct FileCacheHandlerAbstraction {
         return target->getFilePath();
     }
 
+    bool isFileMissing() {
+        return target->isFileMissing();
+    }
+
     FileSourceListVisibleWidget *parentVisibleWidget;
 };
 

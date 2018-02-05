@@ -931,8 +931,8 @@ void Canvas::selectedPathsCombine() {
                 boxPath->getPathAnimator()->applyTransformToPoints(relTransf);
                 boxPath->getPathAnimator()->addAllSinglePathsToAnimator(
                             firstVectorPath->getPathAnimator());
-                boxPath->removeFromParent();
             }
+            box->removeFromParent();
         }
     }
 }

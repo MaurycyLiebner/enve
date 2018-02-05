@@ -9,6 +9,7 @@
 #include "pointhelpers.h"
 #include "Animators/qrealanimator.h"
 #include "canvaswindow.h"
+#include "durationrectsettingsdialog.h"
 
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
@@ -169,6 +170,22 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 //setMouseTracking(false);
                 mIsMouseGrabbing = false;
                 releaseMouse();
+            } else {
+                DurationRectangleMovable *durRect =
+                        mBoxesListVisible->getRectangleMovableAtPos(
+                                            posU.x(), posU.y(),
+                                            mPixelsPerFrame,
+                                            mMinViewedFrame);
+                if(durRect == NULL) {
+
+                } else if(durRect->isDurationRect()) {
+                    QMenu menu;
+                    menu.addAction("Settings...");
+                    QAction *selectedAction = menu.exec(e->globalPos());
+                    if(selectedAction != NULL) {
+                        ((DurationRectangle*)durRect)->openDurationSettingsDialog(this);
+                    }
+                }
             }
         }
     }

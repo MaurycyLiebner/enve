@@ -12,30 +12,39 @@ void Canvas::connectPoints() {
             }
         }
     }
-    clearPointsSelection();
 
     if(selectedNodePoints.count() == 2) {
         NodePoint *firstPoint = selectedNodePoints.first();
         NodePoint *secondPoint = selectedNodePoints.last();
+        if(!firstPoint->isEndPoint() || !secondPoint->isEndPoint()) return;
+        clearPointsSelection();
+
         VectorPathAnimator *firstSinglePath = firstPoint->getParentPath();
         VectorPathAnimator *secondSinglePath = secondPoint->getParentPath();
         PathAnimator *firstParentPath = firstSinglePath->getParentPathAnimator();
         PathAnimator *secondParentPath = secondSinglePath->getParentPathAnimator();
+
+        int nodeToSelectId = firstPoint->getNodeId();
+        VectorPathAnimator *newSinglePath = NULL;
         if(firstParentPath == secondParentPath) {
             if(firstSinglePath == secondSinglePath) {
                 firstSinglePath->connectPoints(firstPoint, secondPoint);
             } else {
                 if(firstPoint->isSeparateNodePoint()) {
                     firstSinglePath->revertAllPointsForAllKeys();
+                    nodeToSelectId = firstSinglePath->getNodeCount() - 1 -
+                            nodeToSelectId;
                 }
                 if(!secondPoint->isSeparateNodePoint()) {
                     secondSinglePath->revertAllPointsForAllKeys();
                 }
-                firstSinglePath->connectWith(secondSinglePath);
+                newSinglePath = firstSinglePath->connectWith(secondSinglePath);
             }
         } else {
             if(firstPoint->isSeparateNodePoint()) {
                 firstSinglePath->revertAllPointsForAllKeys();
+                nodeToSelectId = firstSinglePath->getNodeCount() - 1 -
+                        nodeToSelectId;
             }
             if(!secondPoint->isSeparateNodePoint()) {
                 secondSinglePath->revertAllPointsForAllKeys();
@@ -51,33 +60,121 @@ void Canvas::connectPoints() {
             secondSinglePath->removeFromParent();
             secondSinglePath->setParentPath(firstParentPath);
 
-            firstSinglePath->connectWith(secondSinglePath);
+            newSinglePath = firstSinglePath->connectWith(secondSinglePath);
+        }
+        if(newSinglePath != NULL) {
+            NodePoint *nodePt1 = newSinglePath->getNodePtWithNodeId(nodeToSelectId);
+            NodePoint *nodePt2 = newSinglePath->getNodePtWithNodeId(nodeToSelectId + 1);
+            addPointToSelection(nodePt1);
+            addPointToSelection(nodePt2);
         }
     }
 }
 
 void Canvas::disconnectPoints() {
     QList<NodePoint*> selectedNodePoints;
-        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-            if(point->isNodePoint()) {
-                NodePoint *nextPoint = ((NodePoint*)point)->getNextPoint();
-                if(nextPoint == NULL) continue;
-                if(nextPoint->isSelected()) {
-                    selectedNodePoints.append( (NodePoint*) point);
-                }
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
+        if(point->isNodePoint()) {
+            NodePoint *nextPoint = ((NodePoint*)point)->getNextPoint();
+            if(nextPoint == NULL) continue;
+            if(nextPoint->isSelected()) {
+                selectedNodePoints.append((NodePoint*)point);
             }
         }
-        clearPointsSelection();
-        Q_FOREACH(NodePoint *point, selectedNodePoints) {
-            NodePoint *secondPoint = point->getNextPoint();
-            if(secondPoint == NULL) secondPoint = point->getPreviousPoint();
-            if(point->getParentPath() ==
-                    secondPoint->getParentPath()) {
-                point->getParentPath()->
-                        disconnectPoints(point, secondPoint);
-            }
+    }
+    if(selectedNodePoints.count() != 1) return;
+    clearPointsSelection();
+    Q_FOREACH(NodePoint *point, selectedNodePoints) {
+        NodePoint *secondPoint = point->getNextPoint();
+        VectorPathAnimator *parentPath = point->getParentPath();
+        bool wasClosed = parentPath->isClosed();
+        parentPath->disconnectPoints(point, secondPoint);
+        if(wasClosed) {
+            addPointToSelection(parentPath->getNodePtWithNodeId(0));
+            addPointToSelection(parentPath->getNodePtWithNodeId(
+                                    parentPath->getNodeCount() - 1));
         }
+    }
 }
+
+//void Canvas::mergePoints() {
+//    QList<NodePoint*> selectedNodePoints;
+//    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
+//        if(point->isNodePoint()) {
+//            if(((NodePoint*)point)->isEndPoint()) {
+//                selectedNodePoints.append( (NodePoint*) point);
+//            }
+//        }
+//    }
+//    clearPointsSelection();
+
+//    if(selectedNodePoints.count() == 2) {
+//        bool vailable = false;
+//        vailable = vailable || (firstPoint->isEndPoint() &&
+//                                secondPoint->isEndPoint());
+//        vailable = vailable || (firstPoint->getPreviousPoint() == secondPoint);
+//        vailable = vailable || (firstPoint->getNextPoint() == secondPoint);
+//        if(!vailable) return;
+//        NodePoint *firstPoint = selectedNodePoints.first();
+//        NodePoint *secondPoint = selectedNodePoints.last();
+
+//        QPointF sumPos = firstPoint->getAbsolutePos() +
+//                secondPoint->getAbsolutePos();
+//        bool firstWasPrevious = firstPoint ==
+//                secondPoint->getPreviousPoint();
+
+//        secondPoint->startTransform();
+//        secondPoint->moveToAbs(sumPos/2);
+//        if(firstWasPrevious) {
+//            secondPoint->moveStartCtrlPtToAbsPos(
+//                        firstPoint->getStartCtrlPtAbsPos());
+//        } else {
+//            secondPoint->moveEndCtrlPtToAbsPos(
+//                        firstPoint->getEndCtrlPtAbsPos());
+//        }
+//        secondPoint->finishTransform();
+
+//        NodePoint *firstPointT;
+//        firstPointT->removeFromVectorPath();
+
+//        VectorPathAnimator *firstSinglePath = firstPoint->getParentPath();
+//        VectorPathAnimator *secondSinglePath = secondPoint->getParentPath();
+//        PathAnimator *firstParentPath = firstSinglePath->getParentPathAnimator();
+//        PathAnimator *secondParentPath = secondSinglePath->getParentPathAnimator();
+//        if(firstParentPath == secondParentPath) {
+//            if(firstSinglePath == secondSinglePath) {
+//                firstSinglePath->connectPoints(firstPoint, secondPoint);
+//            } else {
+//                if(firstPoint->isSeparateNodePoint()) {
+//                    firstSinglePath->revertAllPointsForAllKeys();
+//                }
+//                if(!secondPoint->isSeparateNodePoint()) {
+//                    secondSinglePath->revertAllPointsForAllKeys();
+//                }
+//                firstSinglePath->connectWith(secondSinglePath);
+//            }
+//        } else {
+//            if(firstPoint->isSeparateNodePoint()) {
+//                firstSinglePath->revertAllPointsForAllKeys();
+//            }
+//            if(!secondPoint->isSeparateNodePoint()) {
+//                secondSinglePath->revertAllPointsForAllKeys();
+//            }
+//            QMatrix firstMatrix =
+//                    firstParentPath->getCombinedTransform();
+//            QMatrix secondMatrix =
+//                    secondParentPath->getCombinedTransform();
+//            QMatrix effectiveMatrix =
+//                    secondMatrix*firstMatrix.inverted();
+//            secondSinglePath->applyTransformToPoints(effectiveMatrix);
+//            firstParentPath->addSinglePathAnimator(secondSinglePath);
+//            secondSinglePath->removeFromParent();
+//            secondSinglePath->setParentPath(firstParentPath);
+
+//            firstSinglePath->connectWith(secondSinglePath);
+//        }
+//    }
+//}
 
 void Canvas::mergePoints() {
     QList<NodePoint*> selectedNodePoints;
@@ -88,85 +185,31 @@ void Canvas::mergePoints() {
             //}
         }
     }
-    clearPointsSelection();
     if(selectedNodePoints.count() == 2) {
         NodePoint *firstPoint = selectedNodePoints.first();
         NodePoint *secondPoint = selectedNodePoints.last();
-        if(firstPoint->isEndPoint() &&
-           secondPoint->isEndPoint()) {
-            VectorPathAnimator *firstParentPath = firstPoint->getParentPath();
-            VectorPathAnimator *secondParentPath = secondPoint->getParentPath();
-            if(firstParentPath == secondParentPath) {
-                secondParentPath->connectPoints(firstPoint, secondPoint);
-            } else {
-                if(firstPoint->isSeparateNodePoint()) {
-                    firstParentPath->revertAllPointsForAllKeys();
-                }
-                if(!secondPoint->isSeparateNodePoint()) {
-                    secondParentPath->revertAllPointsForAllKeys();
-                }
-                PathAnimator *firstPathAnimator =
-                        firstParentPath->getParentPathAnimator();
-                PathAnimator *secondPathAnimator =
-                        secondParentPath->getParentPathAnimator();
-                const QList<SkPoint> &listT =
-                        secondParentPath->getElementsPosList();
-                const QList<NodeSettings*> &nodeStts =
-                        secondParentPath->getNodeSettingsList();
-                if(firstPathAnimator == secondPathAnimator) {
-                    for(int i = 0; i < listT.count() - 2; i += 3) {
-                        QPointF pos = SkPointToQPointF(listT.at(i + 1));
-                        firstParentPath->addNodeRelPos(
-                                    SkPointToQPointF(listT.at(i)) + pos,
-                                    pos,
-                                    SkPointToQPointF(listT.at(i + 2)) + pos,
-                                    -1, *nodeStts.at(i/3));
-                    }
-                } else {
-                    QMatrix firstMatrix =
-                            firstPathAnimator->getCombinedTransform();
-                    QMatrix secondMatrix =
-                            secondPathAnimator->getCombinedTransform();
-                    QMatrix effectiveMatrix =
-                            secondMatrix*firstMatrix.inverted();
+        bool vailable = false;
+        vailable = vailable || (firstPoint->isEndPoint() &&
+                                secondPoint->isEndPoint());
+        vailable = vailable || (firstPoint->getPreviousPoint() == secondPoint);
+        vailable = vailable || (firstPoint->getNextPoint() == secondPoint);
+        if(!vailable) return;
+        clearPointsSelection();
 
-                    for(int i = 0; i < listT.count() - 2; i += 3) {
-                        QPointF pos = SkPointToQPointF(listT.at(i + 1));
-                        pos = effectiveMatrix.map(pos);
-
-                        QPointF startPos = SkPointToQPointF(listT.at(i)) + pos;
-                        startPos = effectiveMatrix.map(startPos);
-
-                        QPointF endPos = SkPointToQPointF(listT.at(i + 2)) + pos;
-                        endPos = effectiveMatrix.map(endPos);
-                        firstParentPath->addNodeRelPos(startPos, pos, endPos,
-                                                       -1, *nodeStts.at(i/3));
-                    }
-                }
-                secondParentPath->removeFromParent();
-                return;
-            }
-        } else if(firstPoint->getNextPoint() != secondPoint &&
-                  firstPoint->getPreviousPoint() != secondPoint) {
+        if(firstPoint->getPreviousPoint() != secondPoint &&
+           firstPoint->getNextPoint() != secondPoint) {
+            addPointToSelection(firstPoint);
+            addPointToSelection(secondPoint);
+            connectPoints();
+            mergePoints();
             return;
         }
-        QPointF sumPos = firstPoint->getAbsolutePos() +
-                secondPoint->getAbsolutePos();
-        bool firstWasPrevious = firstPoint ==
-                secondPoint->getPreviousPoint();
-
-        secondPoint->startTransform();
-        secondPoint->moveToAbs(sumPos/2);
-        if(firstWasPrevious) {
-            secondPoint->moveStartCtrlPtToAbsPos(
-                        firstPoint->getStartCtrlPtAbsPos());
-        } else {
-            secondPoint->moveEndCtrlPtToAbsPos(
-                        firstPoint->getEndCtrlPtAbsPos());
-        }
-        secondPoint->finishTransform();
-
-        firstPoint->removeFromVectorPath();
+        int selectNodeId = qMin(firstPoint->getNodeId(),
+                                secondPoint->getNodeId());
+        VectorPathAnimator *parentPath = firstPoint->getParentPath();
+        parentPath->mergeNodes(firstPoint->getNodeId(),
+                               secondPoint->getNodeId());
+        addPointToSelection(parentPath->getNodePtWithNodeId(selectNodeId));
     }
 }
 
@@ -315,8 +358,7 @@ DONE:
     mSelectedPoints.clear(); schedulePivotUpdate();
 }
 
-void Canvas::clearPointsSelection()
-{
+void Canvas::clearPointsSelection() {
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         point->deselect();
     }

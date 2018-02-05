@@ -174,6 +174,9 @@ public:
                             const bool &saveUndoRedo = true);
 
     virtual void updateAfterChangedFromInside() = 0;
+
+    virtual void mergeNodes(const int &nodeId1,
+                            const int &nodeId2);
 protected:
     bool mPathChanged = false;
     bool mPathClosed = false;

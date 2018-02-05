@@ -3,6 +3,7 @@
 #include "Boxes/rendercachehandler.h"
 #include "global.h"
 #include "Boxes/boundingbox.h"
+#include "durationrectsettingsdialog.h"
 
 DurationRectangleMovable::DurationRectangleMovable(const Type &type) : QObject() {
     mType = type;
@@ -235,6 +236,38 @@ void DurationRectangle::startMaxFramePosTransform() {
     mMaxFrame.startPosTransform();
 }
 
+void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
+    int oldMinFrame = getMinFrame();
+    int oldMaxFrame = getMaxFrame();
+
+    DurationRectSettingsDialog *dialog = NULL;
+    dialog = new DurationRectSettingsDialog(mType,
+                                            getMinFrame(),
+                                            getMaxFrame(),
+                                            parent);
+    if(dialog->exec()) {
+        setMinFrame(dialog->getMinFrame());
+        setMaxFrame(dialog->getMaxFrame());
+    }
+
+    if(dialog != NULL) {
+        if(dialog->result() == QDialog::Accepted) {
+            int newMinFrame = getMinFrame();
+            int newMaxFrame = getMaxFrame();
+
+            int minMinFrame = qMin(oldMinFrame, newMinFrame);
+            int maxMinFrame = qMax(oldMinFrame, newMinFrame);
+            int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
+            int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
+            mChildProperty->prp_updateAfterChangedRelFrameRange(
+                        minMinFrame, maxMinFrame);
+            mChildProperty->prp_updateAfterChangedRelFrameRange(
+                        minMaxFrame, maxMaxFrame);
+        }
+        delete dialog;
+    }
+}
+
 void DurationRectangle::finishMaxFramePosTransform() {
     mMaxFrame.finishPosTransform();
 }
@@ -262,7 +295,38 @@ int AnimationRect::getMinAnimationFrameAsAbsFrame() const {
 }
 
 void AnimationRect::setAnimationFrameDuration(const int &frameDuration) {
+    int oldMinFrame = getMinFrame();
+    int oldMaxFrame = getMaxFrame();
+    int oldMinAnimationFrame = getMinAnimationFrame();
+    int oldMaxAnimationFrame = getMaxAnimationFrame();
+
     setMaxAnimationFrame(getMinAnimationFrame() + frameDuration - 1);
+
+    int newMinFrame = getMinFrame();
+    int newMaxFrame = getMaxFrame();
+    int newMinAnimationFrame = getMinAnimationFrame();
+    int newMaxAnimationFrame = getMaxAnimationFrame();
+    int minMinFrame = qMin(oldMinFrame, newMinFrame);
+    int maxMinFrame = qMax(oldMinFrame, newMinFrame);
+    int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
+    int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
+    mChildProperty->prp_updateAfterChangedRelFrameRange(
+                minMinFrame, maxMinFrame);
+    mChildProperty->prp_updateAfterChangedRelFrameRange(
+                minMaxFrame, maxMaxFrame);
+
+    int minMinAnimationFrame = qMin(oldMinAnimationFrame,
+                                    newMinAnimationFrame);
+    int maxMinAnimationFrame = qMax(oldMinAnimationFrame,
+                                    newMinAnimationFrame);
+    int minMaxAnimationFrame = qMin(oldMaxAnimationFrame,
+                                    newMaxAnimationFrame);
+    int maxMaxAnimationFrame = qMax(oldMaxAnimationFrame,
+                                    newMaxAnimationFrame);
+    mChildProperty->prp_updateAfterChangedRelFrameRange(
+                minMinAnimationFrame, maxMinAnimationFrame);
+    mChildProperty->prp_updateAfterChangedRelFrameRange(
+                minMaxAnimationFrame, maxMaxAnimationFrame);
 }
 
 int AnimationRect::getAnimationFrameDuration() {
@@ -293,6 +357,54 @@ int FixedLenAnimationRect::getMinAnimationFrame() const {
 
 int FixedLenAnimationRect::getMaxAnimationFrame() const {
     return mMaxAnimationFrame;
+}
+
+void FixedLenAnimationRect::openDurationSettingsDialog(QWidget *parent) {
+    int oldMinFrame = getMinFrame();
+    int oldMaxFrame = getMaxFrame();
+    int oldMinAnimationFrame = getMinAnimationFrame();
+    int oldMaxAnimationFrame = getMaxAnimationFrame();
+    DurationRectSettingsDialog *dialog = NULL;
+    dialog = new DurationRectSettingsDialog(mType,
+                                            getMinFrame(),
+                                            getMaxFrame(),
+                                            getMinAnimationFrame(),
+                                            parent);
+    if(dialog->exec()) {
+        setMinFrame(dialog->getMinFrame());
+        setMaxFrame(dialog->getMaxFrame());
+        setFirstAnimationFrame(dialog->getFirstAnimationFrame());
+    }
+
+    if(dialog != NULL) {
+        if(dialog->result() == QDialog::Accepted) {
+            int newMinFrame = getMinFrame();
+            int newMaxFrame = getMaxFrame();
+            int newMinAnimationFrame = getMinAnimationFrame();
+            int newMaxAnimationFrame = getMaxAnimationFrame();
+            int minMinFrame = qMin(oldMinFrame, newMinFrame);
+            int maxMinFrame = qMax(oldMinFrame, newMinFrame);
+            int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
+            int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
+            mChildProperty->prp_updateAfterChangedRelFrameRange(
+                        minMinFrame, maxMinFrame);
+            mChildProperty->prp_updateAfterChangedRelFrameRange(
+                        minMaxFrame, maxMaxFrame);
+
+            int minMinAnimationFrame = qMin(oldMinAnimationFrame,
+                                            newMinAnimationFrame);
+            int maxMinAnimationFrame = qMax(oldMinAnimationFrame,
+                                            newMinAnimationFrame);
+            int minMaxAnimationFrame = qMin(oldMaxAnimationFrame,
+                                            newMaxAnimationFrame);
+            int maxMaxAnimationFrame = qMax(oldMaxAnimationFrame,
+                                            newMaxAnimationFrame);
+            mChildProperty->prp_updateAfterChangedRelFrameRange(
+                        qMin(minMinAnimationFrame, minMaxAnimationFrame),
+                        qMax(maxMinAnimationFrame, maxMaxAnimationFrame));
+        }
+        delete dialog;
+    }
 }
 
 void FixedLenAnimationRect::bindToAnimationFrameRange() {

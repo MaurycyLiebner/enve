@@ -264,6 +264,33 @@ void PathContainer::finishedPathChange() {
     }
 }
 
+void PathContainer::mergeNodes(const int &nodeId1, const int &nodeId2) {
+    if(nodeId1 == nodeId2) return;
+    int minNodeId = qMin(nodeId1, nodeId2);
+    int minPtId = nodeIdToPointId(minNodeId);
+    int maxNodeId = qMax(nodeId1, nodeId2);
+    int maxPtId = nodeIdToPointId(maxNodeId);
+    int node1PtId = nodeIdToPointId(nodeId1);
+    int node2PtId = nodeIdToPointId(nodeId2);
+    const SkPoint &pos1 = mElementsPos.at(node1PtId);
+    const SkPoint &pos2 = mElementsPos.at(node2PtId);
+    mElementsPos.replace(minPtId, (pos1 + pos2)*0.5f);
+
+    if(qAbs(nodeId1 - nodeId2) > 1) {
+        mElementsPos.replace(minPtId - 1,
+                             mElementsPos.at(maxPtId - 1) +
+                             mElementsPos.at(maxPtId) -
+                             mElementsPos.at(minPtId));
+    } else {
+        mElementsPos.replace(minPtId + 1,
+                             mElementsPos.at(maxPtId + 1) +
+                             mElementsPos.at(maxPtId) -
+                             mElementsPos.at(minPtId));
+    }
+
+    PathContainer::removeNodeAt(maxNodeId);
+}
+
 void PathContainer::setElementsFromSkPath(const SkPath &path) {
     clearElements();
     mElementsPos.reserve(path.countPoints() + 2);

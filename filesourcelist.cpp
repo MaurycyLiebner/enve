@@ -72,6 +72,9 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
                    QColor(180, 180, 180));
         p.setPen(Qt::black);
     }
+    if(mTargetCache->isFileMissing()) {
+        p.setPen(Qt::red);
+    }
 
     p.drawText(rect().adjusted(MIN_WIDGET_HEIGHT, 0,
                                -0.5*MIN_WIDGET_HEIGHT, 0),

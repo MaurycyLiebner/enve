@@ -219,6 +219,7 @@ void VectorPathAnimator::readProperty(QIODevice *target) {
     }
 
     readPathContainer(target);
+    updateNodePointsFromElements();
 }
 
 void QrealKey::writeKey(QIODevice *target) {
@@ -623,6 +624,26 @@ void DurationRectangle::readDurationRectangle(QIODevice *target) {
     setMinFrame(minFrame);
     setMaxFrame(maxFrame);
     setFramePos(framePos);
+}
+
+void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
+    DurationRectangle::writeDurationRectangle(target);
+    target->read((char*)&mBoundToAnimation, sizeof(bool));
+    target->read((char*)&mSetMaxFrameAtLeastOnce, sizeof(bool));
+    target->read((char*)&mMinAnimationFrame, sizeof(int));
+    target->read((char*)&mMaxAnimationFrame, sizeof(int));
+}
+
+void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
+    DurationRectangle::readDurationRectangle(target);
+    int minFrame;
+    int maxFrame;
+    target->read((char*)&mBoundToAnimation, sizeof(bool));
+    target->read((char*)&mSetMaxFrameAtLeastOnce, sizeof(bool));
+    target->read((char*)&minFrame, sizeof(int));
+    target->read((char*)&maxFrame, sizeof(int));
+    setMinAnimationFrame(minFrame);
+    setMaxAnimationFrame(maxFrame);
 }
 
 void BoundingBox::writeBoundingBox(QIODevice *target) {
