@@ -4,6 +4,9 @@
 #include "skiaincludes.h"
 struct NodeSettings;
 class VectorPathAnimator;
+
+enum CtrlsMode : short;
+
 class PathContainer {
 public:
     PathContainer() {}
@@ -63,6 +66,8 @@ public:
         }
         removeNodeElements(nodePtId - 1);
     }
+
+    virtual void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
 
     virtual void moveElementPosSubset(
             int firstId,

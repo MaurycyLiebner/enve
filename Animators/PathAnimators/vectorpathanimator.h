@@ -291,6 +291,7 @@ public:
     const bool &isClosed() const {
         return mPathClosed;
     }
+    void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
 private:
     void revertAllNodeSettings() {
         foreach(NodeSettings *settings, mNodeSettings) {

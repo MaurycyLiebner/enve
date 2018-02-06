@@ -57,6 +57,39 @@ void VectorPathAnimator::anim_saveCurrentValueToKey(PathKey *key) {
     key->setElementsFromSkPath(getPath());
 }
 
+void VectorPathAnimator::setCtrlsModeForNode(const int &nodeId,
+                                             const CtrlsMode &mode) {
+    NodeSettings newSettings = *mNodeSettings.at(nodeId);
+    newSettings.ctrlsMode = mode;
+    newSettings.endEnabled = true;
+    newSettings.startEnabled = true;
+    replaceNodeSettingsForNodeId(nodeId, newSettings);
+    int nodePtId = nodeIdToPointId(nodeId);
+    QPointF pos = SkPointToQPointF(mElementsPos.at(nodePtId));
+    QPointF startPos = SkPointToQPointF(mElementsPos.at(nodePtId - 1)) + pos;
+    QPointF endPos = SkPointToQPointF(mElementsPos.at(nodePtId + 1)) + pos;
+    QPointF newStartPos;
+    QPointF newEndPos;
+    if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
+        getCtrlsSymmetricPos(endPos,
+                             startPos,
+                             pos,
+                             &newEndPos,
+                             &newStartPos);
+        mElementsPos.replace(nodePtId - 1, QPointFToSkPoint(newStartPos - pos));
+        mElementsPos.replace(nodePtId + 1, QPointFToSkPoint(newEndPos));
+    } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
+        getCtrlsSmoothPos(endPos,
+                          startPos,
+                          pos,
+                          &newEndPos,
+                          &newStartPos);
+        mElementsPos.replace(nodePtId - 1, QPointFToSkPoint(newStartPos - pos));
+    }
+
+    //mParentPath->schedulePathUpdate();
+}
+
 void VectorPathAnimator::startPathChange() {
     if(mPathChanged) return;
     if(prp_isRecording()) {
@@ -875,7 +908,11 @@ void VectorPathAnimator::removeFromParent() {
 
 void VectorPathAnimator::mergeNodes(const int &nodeId1,
                                     const int &nodeId2) {
+    int minNodeId = qMin(nodeId1, nodeId2);
+    NodeSettings *settings = mNodeSettings.at(minNodeId);
+    settings->endEnabled = mNodeSettings.at(qMax(nodeId1, nodeId2))->endEnabled;
     PathContainer::mergeNodes(nodeId1, nodeId2);
+    setCtrlsModeForNode(minNodeId, getNodeCtrlsMode(minNodeId));
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
         ((PathKey*)key.get())->mergeNodes(nodeId1, nodeId2);
     }
