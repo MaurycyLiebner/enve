@@ -144,7 +144,7 @@ qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
 }
 
 PixmapEffectRenderData *BlurEffect::getPixmapEffectRenderDataForRelFrame(
-                                    const int &relFrame) {
+        const int &relFrame, BoundingBoxRenderData *data) {
     BlurEffectRenderData *renderData = new BlurEffectRenderData();
     renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mBlurRadius->prp_hasKeys();
@@ -191,7 +191,7 @@ ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
 }
 
 PixmapEffectRenderData *ShadowEffect::getPixmapEffectRenderDataForRelFrame(
-                                    const int &relFrame) {
+        const int &relFrame, BoundingBoxRenderData *data) {
     ShadowEffectRenderData *renderData = new ShadowEffectRenderData();
     renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mBlurRadius->prp_hasKeys();
@@ -488,7 +488,7 @@ DesaturateEffect::DesaturateEffect(qreal radius) :
 }
 
 PixmapEffectRenderData *DesaturateEffect::getPixmapEffectRenderDataForRelFrame(
-        const int &relFrame) {
+        const int &relFrame, BoundingBoxRenderData *data) {
     DesaturateEffectRenderData *renderData = new DesaturateEffectRenderData();
     renderData->influence =
             mInfluenceAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
@@ -505,7 +505,7 @@ void DesaturateEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
 }
 
 PixmapEffectRenderData *ColorizeEffect::getPixmapEffectRenderDataForRelFrame(
-        const int &relFrame) {
+        const int &relFrame, BoundingBoxRenderData *data) {
     ColorizeEffectRenderData *renderData = new ColorizeEffectRenderData();
     renderData->hue =
             mHueAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
@@ -586,7 +586,7 @@ ReplaceColorEffect::ReplaceColorEffect() :
 }
 
 PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame(
-        const int &relFrame) {
+        const int &relFrame, BoundingBoxRenderData *data) {
     ReplaceColorEffectRenderData *renderData =
             new ReplaceColorEffectRenderData();
     QColor fromColor = mFromColor->getColorAtRelFrame(relFrame).qcol;
@@ -630,7 +630,7 @@ ContrastEffect::ContrastEffect(qreal contrast) :
 }
 
 PixmapEffectRenderData *ContrastEffect::getPixmapEffectRenderDataForRelFrame(
-        const int &relFrame) {
+        const int &relFrame, BoundingBoxRenderData *data) {
     ContrastEffectRenderData *renderData = new ContrastEffectRenderData();
     renderData->contrast =
             mContrastAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
@@ -662,7 +662,7 @@ BrightnessEffect::BrightnessEffect(qreal brightness) :
 }
 
 PixmapEffectRenderData *BrightnessEffect::getPixmapEffectRenderDataForRelFrame(
-        const int &relFrame) {
+        const int &relFrame, BoundingBoxRenderData *data) {
     BrightnessEffectRenderData *renderData = new BrightnessEffectRenderData();
     renderData->brightness =
             mBrightnessAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
@@ -680,4 +680,79 @@ void BrightnessEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
     } else {
         fmt_filters::brightness(img, brightness);
     }
+}
+
+SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
+    PixmapEffect(EFFECT_MOTION_BLUR) {
+    mParentBox = box;
+    mOpacity = (new QrealAnimator())->ref<QrealAnimator>();
+    mNumberFrames = (new QrealAnimator())->ref<QrealAnimator>();
+    mFrameStep = (new QrealAnimator())->ref<QrealAnimator>();
+    mBlur = (new QrealAnimator())->ref<QrealAnimator>();
+    prp_setName("motion blur");
+
+    mOpacity->qra_setValueRange(0., 100.);
+    mOpacity->qra_setCurrentValue(100.);
+    mOpacity->prp_setName("opacity");
+    ca_addChildAnimator(mOpacity.data());
+    mNumberFrames->qra_setValueRange(-255., 255.);
+    mNumberFrames->qra_setCurrentValue(1.);
+    mNumberFrames->prp_setName("number of frames");
+    ca_addChildAnimator(mNumberFrames.data());
+    mFrameStep->qra_setValueRange(.1, 9.9);
+    mFrameStep->qra_setCurrentValue(1.);
+    mFrameStep->prp_setName("frame step");
+    ca_addChildAnimator(mFrameStep.data());
+    mBlur->qra_setValueRange(0., 999.);
+    mBlur->qra_setCurrentValue(0.);
+    mBlur->prp_setName("blur");
+    ca_addChildAnimator(mBlur.data());
+}
+
+PixmapEffectRenderData *SampledMotionBlurEffect::
+getPixmapEffectRenderDataForRelFrame(const int &relFrame,
+                                     BoundingBoxRenderData *data) {
+    if(!data->parentIsTarget) return NULL;
+    SampledMotionBlurEffectRenderData *renderData =
+            new SampledMotionBlurEffectRenderData();
+    renderData->opacity =
+            mOpacity->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->blur =
+            mBlur->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->hasKeys = mBlur->prp_hasKeys();
+
+    qreal numberFrames =
+            mNumberFrames->getCurrentEffectiveValueAtRelFrame(relFrame);
+    qreal minFrame = relFrame - numberFrames;
+    qreal frameStep = mFrameStep->getCurrentEffectiveValueAtRelFrame(relFrame);
+    for(qreal i = minFrame; i < relFrame; i += frameStep) {
+        BoundingBoxRenderData *sampleRenderData = mParentBox->createRenderData();
+        //mParentBox->setupBoundingBoxRenderDataForRelFrameF(i, sampleRenderData);
+        sampleRenderData->parentIsTarget = false;
+        sampleRenderData->useCustomRelFrame = true;
+        sampleRenderData->customRelFrame = i;
+        renderData->samples << sampleRenderData->ref<BoundingBoxRenderData>();
+        sampleRenderData->addScheduler();
+        sampleRenderData->addDependent(data);
+    }
+    return renderData;
+}
+
+void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
+                                                       const fmt_filters::image &img,
+                                                       const qreal &scale) {
+    SkBitmap motionBlur;
+    motionBlur.allocPixels(imgPtr.info());
+    motionBlur.eraseColor(SK_ColorTRANSPARENT);
+    SkCanvas canvasSk(motionBlur);
+    qreal opacityStepT = 1./samples.count();
+    qreal opacityT = opacityStepT;
+    SkPaint paint;
+    foreach(const BoundingBoxRenderDataSPtr &sample, samples) {
+        paint.setAlpha(qRound(opacityT * 255));
+        canvasSk.drawImage(sample->renderedImage, 0.f, 0.f, &paint);
+        opacityT += opacityStepT;
+    }
+    SkCanvas canvasSk2(imgPtr);
+    canvasSk2.drawBitmap(motionBlur, 0.f, 0.f);
 }

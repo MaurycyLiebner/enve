@@ -40,9 +40,21 @@ int Property::prp_absFrameToRelFrame(const int &absFrame) const {
     return absFrame - prp_getFrameShift();
 }
 
+qreal Property::prp_absFrameToRelFrameF(const qreal &absFrame) const {
+    if(qRound(absFrame) == INT_MIN) return INT_MIN;
+    if(qRound(absFrame) == INT_MAX) return INT_MAX;
+    return absFrame - prp_getFrameShift();
+}
+
 int Property::prp_relFrameToAbsFrame(const int &relFrame) const {
     if(relFrame == INT_MIN) return INT_MIN;
     if(relFrame == INT_MAX) return INT_MAX;
+    return relFrame + prp_getFrameShift();
+}
+
+qreal Property::prp_relFrameToAbsFrameF(const qreal &relFrame) const {
+    if(qRound(relFrame) == INT_MIN) return INT_MIN;
+    if(qRound(relFrame) == INT_MAX) return INT_MAX;
     return relFrame + prp_getFrameShift();
 }
 

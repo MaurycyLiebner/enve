@@ -32,6 +32,8 @@ public:
 
     int prp_absFrameToRelFrame(const int &absFrame) const;
     int prp_relFrameToAbsFrame(const int &relFrame) const;
+    qreal prp_absFrameToRelFrameF(const qreal &absFrame) const;
+    qreal prp_relFrameToAbsFrameF(const qreal &relFrame) const;
 
     virtual void prp_drawKeys(QPainter *p,
                               const qreal &pixelsPerFrame,

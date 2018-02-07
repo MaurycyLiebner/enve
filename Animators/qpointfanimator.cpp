@@ -38,6 +38,24 @@ QPointF QPointFAnimator::getCurrentEffectivePointValueAtRelFrame(const int &fram
                    mYAnimator->getCurrentEffectiveValueAtRelFrame(frame));
 }
 
+QPointF QPointFAnimator::getCurrentPointValueAtAbsFrameF(const qreal &frame) const {
+    return getCurrentPointValueAtRelFrameF(prp_absFrameToRelFrameF(frame));
+}
+
+QPointF QPointFAnimator::getCurrentPointValueAtRelFrameF(const qreal &frame) const {
+    return QPointF(mXAnimator->getCurrentValueAtRelFrameF(frame),
+                   mYAnimator->getCurrentValueAtRelFrameF(frame));
+}
+
+QPointF QPointFAnimator::getCurrentEffectivePointValueAtAbsFrameF(const qreal &frame) const {
+    return getCurrentEffectivePointValueAtRelFrameF(prp_absFrameToRelFrameF(frame));
+}
+
+QPointF QPointFAnimator::getCurrentEffectivePointValueAtRelFrameF(const qreal &frame) const {
+    return QPointF(mXAnimator->getCurrentEffectiveValueAtRelFrameF(frame),
+                   mYAnimator->getCurrentEffectiveValueAtRelFrameF(frame));
+}
+
 void QPointFAnimator::setPrefferedValueStep(const qreal &valueStep) {
     mXAnimator->setPrefferedValueStep(valueStep);
     mYAnimator->setPrefferedValueStep(valueStep);
@@ -78,6 +96,22 @@ qreal QPointFAnimator::getEffectiveXValueAtRelFrame(const int &relFrame) {
 
 qreal QPointFAnimator::getEffectiveYValueAtRelFrame(const int &relFrame) {
     return mYAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
+}
+
+qreal QPointFAnimator::getXValueAtRelFrameF(const qreal &relFrame) {
+    return mXAnimator->qra_getValueAtRelFrameF(relFrame);
+}
+
+qreal QPointFAnimator::getYValueAtRelFrameF(const qreal &relFrame) {
+    return mYAnimator->qra_getValueAtRelFrameF(relFrame);
+}
+
+qreal QPointFAnimator::getEffectiveXValueAtRelFrameF(const qreal &relFrame) {
+    return mXAnimator->qra_getEffectiveValueAtRelFrameF(relFrame);
+}
+
+qreal QPointFAnimator::getEffectiveYValueAtRelFrameF(const qreal &relFrame) {
+    return mYAnimator->qra_getEffectiveValueAtRelFrameF(relFrame);
 }
 
 void QPointFAnimator::setCurrentPointValue(const QPointF &val,

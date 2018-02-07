@@ -343,6 +343,10 @@ qreal BoxTransformAnimator::getOpacityAtRelFrame(const int &relFrame) {
     return mOpacityAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
 }
 
+qreal BoxTransformAnimator::getOpacityAtRelFrameF(const qreal &relFrame) {
+    return mOpacityAnimator->qra_getEffectiveValueAtRelFrameF(relFrame);
+}
+
 bool BoxTransformAnimator::rotOrScaleOrPivotRecording() {
     return mRotAnimator->prp_isDescendantRecording() ||
            mScaleAnimator->prp_isDescendantRecording() ||
@@ -398,8 +402,24 @@ QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrame(
     matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
                  mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame) );
 
-    matrix.translate(-pivotX,
-                     -pivotY);
+    matrix.translate(-pivotX, -pivotY);
+    return matrix;
+}
+
+QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrameF(
+                                    const qreal &relFrame) {
+    QMatrix matrix;
+    qreal pivotX = mPivotAnimator->getEffectiveXValueAtRelFrameF(relFrame);
+    qreal pivotY = mPivotAnimator->getEffectiveYValueAtRelFrameF(relFrame);
+
+    matrix.translate(pivotX + mPosAnimator->getEffectiveXValueAtRelFrameF(relFrame),
+                     pivotY + mPosAnimator->getEffectiveYValueAtRelFrameF(relFrame));
+
+    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+    matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrameF(relFrame),
+                 mScaleAnimator->getEffectiveYValueAtRelFrameF(relFrame) );
+
+    matrix.translate(-pivotX, -pivotY);
     return matrix;
 }
 
@@ -441,6 +461,33 @@ QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrame(
         return getRelativeTransformAtRelFrame(relFrame)*
                 mParentTransformAnimator->
                     getCombinedTransformMatrixAtRelFrame(parentRelFrame);
+    }
+}
+
+QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrameF(
+        const qreal &relFrame) {
+    if(mParentTransformAnimator.data() == NULL) {
+        return QMatrix();
+    } else {
+        qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        qreal parentRelFrame =
+                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
+        return mParentTransformAnimator->
+                getCombinedTransformMatrixAtRelFrameF(parentRelFrame);
+    }
+}
+
+QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrameF(
+        const qreal &relFrame) {
+    if(mParentTransformAnimator.data() == NULL) {
+        return getRelativeTransformAtRelFrame(relFrame);
+    } else {
+        qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        qreal parentRelFrame =
+                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
+        return getRelativeTransformAtRelFrame(relFrame)*
+                mParentTransformAnimator->
+                    getCombinedTransformMatrixAtRelFrameF(parentRelFrame);
     }
 }
 

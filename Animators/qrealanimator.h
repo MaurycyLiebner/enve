@@ -178,7 +178,16 @@ public:
     qreal qra_getEffectiveValueAtAbsFrame(const int &frame);
     qreal getCurrentEffectiveValueAtRelFrame(const int &frame) const;
     qreal getCurrentEffectiveValueAtAbsFrame(const int &frame);
-protected:
+    qreal qra_getValueAtRelFrameF(const qreal &frame) const;
+    qreal qra_getEffectiveValueAtRelFrameF(const qreal &frame) const;
+    qreal getCurrentEffectiveValueAtRelFrameF(const qreal &frame) const;
+    qreal getCurrentEffectiveValueAtAbsFrameF(const qreal &frame);
+    qreal qra_getValueAtRelFrameF(const qreal &frame,
+                                  QrealKey *prevKey,
+                                  QrealKey *nextKey) const;
+    qreal getCurrentValueAtRelFrameF(const qreal &frame) const;
+    qreal getCurrentValueAtAbsFrameF(const qreal &frame);
+ protected:
     RandomQrealGeneratorQSPtr mRandomGenerator;
     std::map<void*, QColor> mAnimatorColors;
 

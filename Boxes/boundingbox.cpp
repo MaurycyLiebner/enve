@@ -540,6 +540,10 @@ qreal BoundingBox::getEffectsMarginAtRelFrame(const int &relFrame) {
     return mEffectsAnimators->getEffectsMarginAtRelFrame(relFrame);
 }
 
+qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
+    return mEffectsAnimators->getEffectsMarginAtRelFrameF(relFrame);
+}
+
 void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
@@ -567,10 +571,41 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     }
 }
 
+void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
+                        const qreal &relFrame,
+                        BoundingBoxRenderData *data) {
+    data->relFrame = relFrame;
+    data->renderedToImage = false;
+    data->relTransform = getRelativeTransformAtRelFrameF(relFrame);
+    data->parentTransform = mTransformAnimator->
+            getParentCombinedTransformMatrixAtRelFrameF(relFrame);
+    data->transform = data->relTransform*data->parentTransform;
+    data->opacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
+    data->resolution = getParentCanvas()->getResolutionFraction();
+    bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
+    if(effectsVisible) {
+        data->effectsMargin = getEffectsMarginAtRelFrameF(relFrame)*
+                data->resolution + 2.;
+    } else {
+        data->effectsMargin = 2.;
+    }
+    data->blendMode = getBlendMode();
+
+    Canvas *parentCanvas = getParentCanvas();
+    data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
+    if(data->opacity > 0.001 && effectsVisible) {
+        setupEffectsF(relFrame, data);
+    }
+}
+
 void BoundingBox::setupEffects(const int &relFrame,
                                BoundingBoxRenderData *data) {
-    mEffectsAnimators->addEffectRenderDataToList(relFrame,
-                                                 &data->pixmapEffects);
+    mEffectsAnimators->addEffectRenderDataToList(relFrame, data);
+}
+
+void BoundingBox::setupEffectsF(const qreal &relFrame,
+                               BoundingBoxRenderData *data) {
+    mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
 
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
@@ -1317,9 +1352,15 @@ void BoundingBoxRenderData::afterUpdate() {
 void BoundingBoxRenderData::schedulerProccessed() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != NULL) {
-        parentBoxT->setupBoundingBoxRenderDataForRelFrame(
-                    parentBoxT->anim_getCurrentRelFrame(),
-                    this);
+        if(useCustomRelFrame) {
+            parentBoxT->setupBoundingBoxRenderDataForRelFrame(
+                        customRelFrame,
+                        this);
+        } else {
+            parentBoxT->setupBoundingBoxRenderDataForRelFrame(
+                        parentBoxT->anim_getCurrentRelFrame(),
+                        this);
+        }
         foreach(RenderDataCustomizerFunctor *customizer,
                 mRenderDataCustomizerFunctors) {
             (*customizer)(this);

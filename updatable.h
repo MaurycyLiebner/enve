@@ -27,7 +27,9 @@ public:
             }
         }
     }
-    void incDependencies() { nDependancies++; }
+    void incDependencies() {
+        nDependancies++;
+    }
 protected:
     virtual void GUI_process() {}
     bool mGUIThreadExecution = false;

@@ -21,6 +21,7 @@ class RandomQrealGenerator : public QrealValueEffect {
 public:
     RandomQrealGenerator(const int &firstFrame, const int &lastFrame);
     qreal getDevAtRelFrame(const int &relFrame);
+    qreal getDevAtRelFrameF(const qreal &relFrame);
     void generateData();
     void prp_setAbsFrame(const int &frame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,

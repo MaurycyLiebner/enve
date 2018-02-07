@@ -77,9 +77,12 @@ public:
     bool SWT_isBasicTransformAnimator() { return true; }
 
     virtual QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
+    QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
+    virtual QMatrix getCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
+    QMatrix getParentCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
+
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
-    QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
 
     QPointFAnimator *getPosAnimator() {
         return mPosAnimator.data();
@@ -135,6 +138,7 @@ public:
     void reset(const bool &finish = false);
     QMatrix getCurrentTransformationMatrix();
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
+    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
     QMatrix getCombinedTransformMatrixAtRelFrame(
                                         const int &relFrame);
 
@@ -158,6 +162,7 @@ public:
     bool SWT_isBoxTransformAnimator() { return true; }
 
     qreal getOpacityAtRelFrame(const int &relFrame);
+    qreal getOpacityAtRelFrameF(const qreal &relFrame);
 
     bool rotOrScaleOrPivotRecording();
     void writeProperty(QIODevice *target);

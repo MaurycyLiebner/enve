@@ -106,6 +106,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
     QMenu *effectsMenu = menu->addMenu("Effects");
     effectsMenu->addAction("Blur")->setObjectName(
                 "canvas_effects_blur");
+    effectsMenu->addAction("Motion Blur")->setObjectName(
+                "canvas_effects_motion_blur");
     effectsMenu->addAction("Shadow")->setObjectName(
                 "canvas_effects_shadow");
 //    effectsMenu->addAction("Lines");
@@ -199,6 +201,8 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         centerPivotForSelected();
     } else if(selectedAction->objectName() == "canvas_effects_blur") {
         applyBlurToSelected();
+    } else if(selectedAction->objectName() == "canvas_effects_motion_blur") {
+        applySampledMotionBlurToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_shadow") {
         applyShadowToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_desaturate") {

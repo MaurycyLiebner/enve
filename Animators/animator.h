@@ -137,6 +137,9 @@ public:
     void disableFakeComplexAnimatrIfNotNeeded();
     int anim_getPrevKeyRelFrame(const int &relFrame);
     int anim_getNextKeyRelFrame(const int &relFrame);
+    bool anim_getNextAndPreviousKeyIdForRelFrameF(int *prevIdP,
+                                                  int *nextIdP,
+                                                  const qreal &frame) const;
 protected:
     int anim_getKeyIndex(Key *key);
 

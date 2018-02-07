@@ -49,14 +49,43 @@ qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
     return newMargin;
 }
 
-void EffectAnimators::addEffectRenderDataToList(
-        const int &relFrame,
-        QList<PixmapEffectRenderData *> *pixmapEffects) {
+qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const {
+    qreal newMargin = 0.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
         if(pixmapEffect->isVisible()) {
-            pixmapEffects->append(pixmapEffect->
-                         getPixmapEffectRenderDataForRelFrame(relFrame) );
+            newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
+        }
+    }
+    return newMargin;
+}
+
+void EffectAnimators::addEffectRenderDataToList(
+        const int &relFrame,
+        BoundingBoxRenderData *data) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        if(pixmapEffect->isVisible()) {
+            PixmapEffectRenderData *effectRenderData =
+                    pixmapEffect->getPixmapEffectRenderDataForRelFrame(relFrame,
+                                                                       data);
+            if(effectRenderData == NULL) continue;
+            data->pixmapEffects.append(effectRenderData);
+        }
+    }
+}
+
+void EffectAnimators::addEffectRenderDataToListF(
+        const qreal &relFrame,
+        BoundingBoxRenderData *data) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        if(pixmapEffect->isVisible()) {
+            PixmapEffectRenderData *effectRenderData =
+                    pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame,
+                                                                        data);
+            if(effectRenderData == NULL) continue;
+            data->pixmapEffects.append(effectRenderData);
         }
     }
 }

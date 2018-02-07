@@ -14,13 +14,14 @@ public:
 
     qreal getXValueAtRelFrame(const int &relFrame);
     qreal getYValueAtRelFrame(const int &relFrame);
+    qreal getXValueAtRelFrameF(const qreal &relFrame);
+    qreal getYValueAtRelFrameF(const qreal &relFrame);
 
     void setCurrentPointValue(const QPointF &val,
                               const bool &saveUndoRedo = false,
                               const bool &finish = false,
                               const bool &callUpdater = true);
-    void incCurrentValues(const qreal &x,
-                          const qreal &y);
+    void incCurrentValues(const qreal &x, const qreal &y);
     void multCurrentValues(qreal sx, qreal sy);
 
     QPointF getSavedPointValue();
@@ -46,6 +47,8 @@ public:
     QPointF getCurrentPointValue() const;
     QPointF getCurrentPointValueAtAbsFrame(const int &frame) const;
     QPointF getCurrentPointValueAtRelFrame(const int &frame) const;
+    QPointF getCurrentPointValueAtAbsFrameF(const qreal &frame) const;
+    QPointF getCurrentPointValueAtRelFrameF(const qreal &frame) const;
 
     void setPrefferedValueStep(const qreal &valueStep);
 
@@ -56,9 +59,13 @@ public:
     bool getBeingTransformed();
     QPointF getCurrentEffectivePointValueAtAbsFrame(const int &frame) const;
     QPointF getCurrentEffectivePointValueAtRelFrame(const int &frame) const;
+    QPointF getCurrentEffectivePointValueAtAbsFrameF(const qreal &frame) const;
+    QPointF getCurrentEffectivePointValueAtRelFrameF(const qreal &frame) const;
     QPointF getCurrentEffectivePointValue() const;
     qreal getEffectiveXValueAtRelFrame(const int &relFrame);
     qreal getEffectiveYValueAtRelFrame(const int &relFrame);
+    qreal getEffectiveXValueAtRelFrameF(const qreal &relFrame);
+    qreal getEffectiveYValueAtRelFrameF(const qreal &relFrame);
     qreal getEffectiveXValue();
     qreal getEffectiveYValue();
 protected:

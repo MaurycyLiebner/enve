@@ -146,6 +146,7 @@ public:
     void convertSelectedBoxesToPath();
     void convertSelectedPathStrokesToPath();
 
+    void applySampledMotionBlurToSelected();
     void applyBlurToSelected();
     void applyBrushEffectToSelected();
     void applyLinesEffectToSelected();

@@ -520,6 +520,53 @@ bool Animator::anim_getNextAndPreviousKeyIdForRelFrame(
     return true;
 }
 
+bool Animator::anim_getNextAndPreviousKeyIdForRelFrameF(
+                        int *prevIdP, int *nextIdP,
+                        const qreal &frame) const {
+    if(anim_mKeys.isEmpty()) return false;
+    int minId = 0;
+    int maxId = anim_mKeys.count() - 1;
+    if(frame + 0.0001 >= anim_mKeys.last()->getRelFrame()) {
+        *prevIdP = maxId;
+        *nextIdP = maxId;
+        return true;
+    }
+    if(frame + 0.0001 <= anim_mKeys.first()->getRelFrame()) {
+        *prevIdP = minId;
+        *nextIdP = minId;
+        return true;
+    }
+    while(maxId - minId > 1) {
+        int guess = (maxId + minId)/2;
+        int keyFrame = anim_mKeys.at(guess)->getRelFrame();
+        if(keyFrame > frame) {
+            maxId = guess;
+        } else if(keyFrame < frame) {
+            minId = guess;
+        } else {
+            *nextIdP = guess;
+            *prevIdP = guess;
+            return true;
+        }
+    }
+
+    if(minId == maxId) {
+        Key *key = anim_mKeys.at(minId).get();
+        if(key->getRelFrame() > frame) {
+            if(minId != 0) {
+                minId = minId - 1;
+            }
+        } else if(key->getRelFrame() < frame) {
+            if(minId < anim_mKeys.count() - 1) {
+                maxId = minId + 1;
+            }
+        }
+    }
+    *prevIdP = minId;
+    *nextIdP = maxId;
+    return true;
+}
+
 bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                const int &relFrame2) {
     if(relFrame1 == relFrame2) return false;

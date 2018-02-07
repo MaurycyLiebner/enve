@@ -139,6 +139,13 @@ void Canvas::applyBlurToSelected() {
     }
 }
 
+void Canvas::applySampledMotionBlurToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new SampledMotionBlurEffect(box));
+    }
+}
+
+
 void Canvas::applyShadowToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->addEffect(new ShadowEffect());

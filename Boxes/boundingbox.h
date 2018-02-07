@@ -97,6 +97,9 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     qreal resolution;
     qreal effectsMargin;
     int relFrame;
+    bool useCustomRelFrame = false;
+    qreal customRelFrame;
+
     QList<PixmapEffectRenderData*> pixmapEffects;
     SkPoint drawPos = SkPoint::Make(0.f, 0.f);
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
@@ -509,10 +512,14 @@ public:
     virtual void setupBoundingBoxRenderDataForRelFrame(
             const int &relFrame, BoundingBoxRenderData *data);
 
+    virtual void setupBoundingBoxRenderDataForRelFrameF(
+            const qreal &relFrame, BoundingBoxRenderData *data);
+
     virtual BoundingBoxRenderData *createRenderData() { return NULL; }
 
     BoundingBoxRenderData *getCurrentRenderData();
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
+    virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
@@ -607,9 +614,16 @@ public:
     virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
     }
+
+    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {
+        return mTransformAnimator->getRelativeTransformAtRelFrameF(relFrame);
+    }
+
     int prp_getRelFrameShift() const;
     virtual void setupEffects(const int &relFrame,
                               BoundingBoxRenderData *data);
+    virtual void setupEffectsF(const qreal &relFrame,
+                               BoundingBoxRenderData *data);
 
     void addLinkingBox(BoundingBox *box) {
         mLinkingBoxes << box;
