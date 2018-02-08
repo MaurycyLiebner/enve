@@ -720,6 +720,7 @@ getPixmapEffectRenderDataForRelFrame(const int &relFrame,
     renderData->blur =
             mBlur->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mBlur->prp_hasKeys();
+    renderData->boxData = data;
 
     qreal numberFrames =
             mNumberFrames->getCurrentEffectiveValueAtRelFrame(relFrame);
@@ -731,6 +732,7 @@ getPixmapEffectRenderDataForRelFrame(const int &relFrame,
         sampleRenderData->parentIsTarget = false;
         sampleRenderData->useCustomRelFrame = true;
         sampleRenderData->customRelFrame = i;
+        sampleRenderData->motionBlurTarget = data;
         renderData->samples << sampleRenderData->ref<BoundingBoxRenderData>();
         sampleRenderData->addScheduler();
         sampleRenderData->addDependent(data);
@@ -745,14 +747,22 @@ void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
     motionBlur.allocPixels(imgPtr.info());
     motionBlur.eraseColor(SK_ColorTRANSPARENT);
     SkCanvas canvasSk(motionBlur);
-    qreal opacityStepT = 1./samples.count();
+    qreal opacityStepT = 1./(samples.count() + 1);
     qreal opacityT = opacityStepT;
     SkPaint paint;
     foreach(const BoundingBoxRenderDataSPtr &sample, samples) {
         paint.setAlpha(qRound(opacityT * 255));
-        canvasSk.drawImage(sample->renderedImage, 0.f, 0.f, &paint);
+        QPointF drawPos = sample->globalBoundingRect.topLeft() -
+                boxData->globalBoundingRect.topLeft();//QPointF(0., 0.);
+//        drawPos = boxData->transform.inverted().map(
+//                    sample->transform.map(drawPos));
+        canvasSk.drawImage(sample->renderedImage,
+                           drawPos.x(), drawPos.y(),
+                           &paint);
         opacityT += opacityStepT;
     }
     SkCanvas canvasSk2(imgPtr);
-    canvasSk2.drawBitmap(motionBlur, 0.f, 0.f);
+    SkPaint paintT;
+    paintT.setBlendMode(SkBlendMode::kDstOver);
+    canvasSk2.drawBitmap(motionBlur, 0.f, 0.f, &paintT);
 }

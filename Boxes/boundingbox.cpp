@@ -1229,6 +1229,9 @@ BoundingBoxRenderData::~BoundingBoxRenderData() {
             mRenderDataCustomizerFunctors) {
         delete functor;
     }
+    foreach(PixmapEffectRenderData *effectT, pixmapEffects) {
+        delete effectT;
+    }
 }
 
 void BoundingBoxRenderData::updateRelBoundingRect() {
@@ -1272,7 +1275,11 @@ void BoundingBoxRenderData::renderToImage() {
     scale.scale(resolution, resolution);
     QMatrix transformRes = transform*scale;
     //transformRes.scale(resolution, resolution);
-    globalBoundingRect = transformRes.mapRect(relBoundingRect).
+    globalBoundingRect = transformRes.mapRect(relBoundingRect);
+    foreach(const QRectF &rectT, otherGlobalRects) {
+        globalBoundingRect = globalBoundingRect.united(rectT);
+    }
+    globalBoundingRect = globalBoundingRect.
             adjusted(-effectsMargin, -effectsMargin,
                      effectsMargin, effectsMargin);
     if(maxBoundsEnabled) {
@@ -1342,6 +1349,9 @@ void BoundingBoxRenderData::beforeUpdate() {
 }
 
 void BoundingBoxRenderData::afterUpdate() {
+    if(motionBlurTarget != NULL) {
+        motionBlurTarget->otherGlobalRects << globalBoundingRect;
+    }
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != NULL && parentIsTarget) {
         parentBoxT->renderDataFinished(this);

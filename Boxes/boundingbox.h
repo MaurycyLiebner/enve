@@ -97,8 +97,13 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     qreal resolution;
     qreal effectsMargin;
     int relFrame;
+
+    // for motion blur
     bool useCustomRelFrame = false;
     qreal customRelFrame;
+    QList<QRectF> otherGlobalRects;
+    BoundingBoxRenderData *motionBlurTarget = NULL;
+    // for motion blur
 
     QList<PixmapEffectRenderData*> pixmapEffects;
     SkPoint drawPos = SkPoint::Make(0.f, 0.f);

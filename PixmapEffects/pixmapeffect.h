@@ -28,6 +28,7 @@ struct PixmapEffectRenderData {
     virtual void applyEffectsSk(const SkBitmap &imgPtr,
                                 const fmt_filters::image &img,
                                 const qreal &scale) = 0;
+    virtual ~PixmapEffectRenderData() {}
 };
 
 class PixmapEffect;
@@ -437,6 +438,7 @@ struct SampledMotionBlurEffectRenderData : public PixmapEffectRenderData {
 
     qreal opacity;
     qreal blur;
+    BoundingBoxRenderData *boxData;
     QList<BoundingBoxRenderDataSPtr> samples;
     bool hasKeys = false;
 };
