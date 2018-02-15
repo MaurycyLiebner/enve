@@ -311,6 +311,18 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const int &absFrame) {
     return stops;
 }
 
+QGradientStops Gradient::getQGradientStopsAtAbsFrameF(const qreal &absFrame) {
+    QGradientStops stops;
+    qreal inc = 1./(mColors.length() - 1.);
+    qreal cPos = 0.;
+    for(int i = 0; i < mColors.length(); i++) {
+        stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
+                     mColors.at(i)->getColorAtRelFrameF(absFrame).qcol) );
+        cPos += inc;
+    }
+    return stops;
+}
+
 void Gradient::updateQGradientStops() {
     mQGradientStops.clear();
     qreal inc = 1./(mColors.length() - 1.);
@@ -395,6 +407,10 @@ Color PaintSettings::getCurrentColor() const {
 
 Color PaintSettings::getColorAtRelFrame(const int &relFrame) const {
     return mColor->getColorAtRelFrame(relFrame);
+}
+
+Color PaintSettings::getColorAtRelFrameF(const qreal &relFrame) const {
+    return mColor->getColorAtRelFrameF(relFrame);
 }
 
 PaintType PaintSettings::getPaintType() const {
@@ -507,6 +523,13 @@ void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
 void StrokeSettings::setStrokerSettingsForRelFrameSk(const int &relFrame,
                                                      SkStroke *stroker) {
     stroker->setWidth(mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame));
+    stroker->setCap(QCapToSkCap(mCapStyle));
+    stroker->setJoin(QJoinToSkJoin(mJoinStyle));
+}
+
+void StrokeSettings::setStrokerSettingsForRelFrameSkF(const qreal &relFrame,
+                                                     SkStroke *stroker) {
+    stroker->setWidth(mLineWidth->qra_getEffectiveValueAtRelFrameF(relFrame));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }

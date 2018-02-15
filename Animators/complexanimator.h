@@ -68,7 +68,7 @@ public:
 
     void ca_updateDescendatKeyFrame(Key *key);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                               int *lastIdentical,
+                                              int *lastIdentical,
                                               const int &relFrame);
     void anim_saveCurrentValueAsKey();
     virtual void ca_removeAllChildAnimators();

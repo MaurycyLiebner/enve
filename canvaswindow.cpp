@@ -88,9 +88,10 @@ CanvasWindow::~CanvasWindow() {
     foreach(PaintControler *paintControler, mPaintControlers) {
         delete paintControler;
     }
-    mFileControlerThread->quit();
-    mFileControlerThread->wait();
+//    mFileControlerThread->quit();
+//    mFileControlerThread->wait();
     delete mFileControler;
+    delete mWindowSWTTarget;
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
@@ -323,12 +324,15 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     if(hasNoCanvas()) return;
-    CanvasSettingsDialog dialog(mCurrentCanvas.data(), mCanvasWidget);
+    CanvasSettingsDialog *dialog =
+            new CanvasSettingsDialog(mCurrentCanvas.data(),
+                                     MainWindow::getInstance());
 
-    if(dialog.exec() == QDialog::Accepted) {
-        dialog.applySettingsToCanvas(mCurrentCanvas.data());
+    if(dialog->exec() == QDialog::Accepted) {
+        dialog->applySettingsToCanvas(mCurrentCanvas.data());
         setCurrentCanvas(mCurrentCanvas.data());
     }
+    delete dialog;
 }
 
 void CanvasWindow::rotate90CCW() {
@@ -786,8 +790,8 @@ void CanvasWindow::processSchedulers() {
     mCurrentCanvas->addSchedulersToProcess();
 }
 
-bool CanvasWindow::noBoxesAwaitUpdate() {
-    return mNoBoxesAwaitUpdate;
+bool CanvasWindow::shouldProcessAwaitingSchedulers() {
+    return mNoBoxesAwaitUpdate;// || !mFreeThreads.isEmpty();
 }
 
 void CanvasWindow::addUpdatableAwaitingUpdate(_Executor *updatable) {

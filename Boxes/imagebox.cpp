@@ -64,7 +64,19 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrame(
                                     BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
-    imgData->image = mImgCacheHandler->getImage();
+    imgData->image = mImgCacheHandler->getImageCopy();
+    if(imgData->image == NULL) {
+        mImgCacheHandler->addScheduler();
+        mImgCacheHandler->addDependent(imgData);
+    }
+}
+
+void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
+                                    const qreal &relFrame,
+                                    BoundingBoxRenderData *data) {
+    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
+    imgData->image = mImgCacheHandler->getImageCopy();
     if(imgData->image == NULL) {
         mImgCacheHandler->addScheduler();
         mImgCacheHandler->addDependent(imgData);
@@ -89,5 +101,5 @@ bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
 }
 #include "filesourcescache.h"
 void ImageBoxRenderData::loadImageFromHandler() {
-    image = ((ImageCacheHandler*)srcCacheHandler)->getImage();
+    image = ((ImageCacheHandler*)srcCacheHandler)->getImageCopy();
 }

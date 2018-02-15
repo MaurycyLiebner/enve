@@ -21,9 +21,9 @@ DurationRectSettingsDialog::DurationRectSettingsDialog(
     mMaxFrameSpinBox = new QSpinBox(this);
     mMaxFrameSpinBox->setRange(minFrame, 99999);
     mMaxFrameSpinBox->setValue(maxFrame);
-    connect(mMinFrameSpinBox, SIGNAL(valueChanged(int)),
-            this, SLOT(setMinFrameSpinBoxMaxFrame(int)));
     connect(mMaxFrameSpinBox, SIGNAL(valueChanged(int)),
+            this, SLOT(setMinFrameSpinBoxMaxFrame(int)));
+    connect(mMinFrameSpinBox, SIGNAL(valueChanged(int)),
             this, SLOT(setMaxFrameSpinBoxMinFrame(int)));
     mTwoColumnLayout->addPair(mMinFrameLabel,
                               mMinFrameSpinBox);

@@ -43,6 +43,7 @@ private:
 
 class StdSelfRef {
 public:
+    virtual ~StdSelfRef() {}
     template<class T>
     std::shared_ptr<T> ref() {
         if(mThisWeak.expired()) {

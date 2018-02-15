@@ -19,14 +19,15 @@ ParticleBox::ParticleBox() :
     mBottomRightPoint = new PointAnimator(mTransformAnimator.data(),
                                           TYPE_PATH_POINT);
 
-    ca_addChildAnimator(mTopLeftPoint);
-    ca_addChildAnimator(mBottomRightPoint);
     mTopLeftPoint->prp_setUpdater(
                 new DisplayedFillStrokeSettingsUpdater(this));
     mTopLeftPoint->prp_setName("top left");
     mBottomRightPoint->prp_setUpdater(
                 new DisplayedFillStrokeSettingsUpdater(this));
     mBottomRightPoint->prp_setName("bottom right");
+
+    ca_prependChildAnimator(mTopLeftPoint, mEffectsAnimators.data());
+    ca_prependChildAnimator(mBottomRightPoint, mEffectsAnimators.data());
 
     VaryingLenAnimationRect *durRect = new VaryingLenAnimationRect(this);
     setDurationRectangle(durRect);
@@ -299,6 +300,20 @@ bool Particle::isVisibleAtFrame(const int &frame) {
 ParticleState Particle::getParticleStateAtFrame(const int &frame) {
     int arrayId = frame - mFirstFrame;
     return mParticleStates[arrayId];
+}
+
+bool Particle::getParticleStateAtFrameF(const qreal &frame,
+                                        ParticleState &state) {
+    int arrayId = qFloor(frame) - mFirstFrame;
+    int arrayId2 = qFloor(frame) + 1 - mFirstFrame;
+    if(arrayId < 0) return false;
+    if(arrayId2 < 0) return false;
+    if(arrayId >= mNumberFrames) return false;
+    if(arrayId2 >= mNumberFrames) return false;
+    state = ParticleState::interpolate(mParticleStates[arrayId],
+                                      mParticleStates[arrayId2],
+                                      frame - qFloor(frame));
+    return true;
 }
 
 ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :

@@ -24,11 +24,19 @@ public:
                                const bool &groupPathSum = false);
     void filterPathForRelFrameUntilGroupSum(const int &relFrame,
                                             SkPath *srcDstPath);
-    void readProperty(QIODevice *target);
-    void writeProperty(QIODevice *target);
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath);
+    void filterPathForRelFrameF(const qreal &relFrame,
+                               SkPath *srcDstPath,
+                               const bool &groupPathSum = false);
+    void filterPathForRelFrameUntilGroupSumF(const qreal &relFrame,
+                                            SkPath *srcDstPath);
+    void filterPathForRelFrameBeforeThicknessF(const qreal &relFrame,
+                                              SkPath *srcDstPath);
 
+
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice *target);
     void removeEffect(PathEffect *effect);
     BoundingBox *getParentBox() {
         return mParentBox;

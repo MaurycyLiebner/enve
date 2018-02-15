@@ -62,7 +62,8 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
-
+    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+                                                BoundingBoxRenderData *data);
     BoundingBoxRenderData *createRenderData();
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);

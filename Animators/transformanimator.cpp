@@ -147,6 +147,19 @@ QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrame(
     return matrix;
 }
 
+QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrameF(
+                                    const qreal &relFrame) {
+    QMatrix matrix;
+
+    matrix.translate(mPosAnimator->getEffectiveXValueAtRelFrameF(relFrame),
+                     mPosAnimator->getEffectiveYValueAtRelFrameF(relFrame));
+
+    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+    matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrameF(relFrame),
+                 mScaleAnimator->getEffectiveYValueAtRelFrameF(relFrame) );
+    return matrix;
+}
+
 void BasicTransformAnimator::moveByAbs(
                         const QPointF &absTrans) {
     moveToAbs(mParentTransformAnimator->mapRelPosToAbs(mPosAnimator->getSavedPointValue()) +
@@ -480,12 +493,12 @@ QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrameF(
 QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrameF(
         const qreal &relFrame) {
     if(mParentTransformAnimator.data() == NULL) {
-        return getRelativeTransformAtRelFrame(relFrame);
+        return getRelativeTransformAtRelFrameF(relFrame);
     } else {
         qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         qreal parentRelFrame =
                 mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
-        return getRelativeTransformAtRelFrame(relFrame)*
+        return getRelativeTransformAtRelFrameF(relFrame)*
                 mParentTransformAnimator->
                     getCombinedTransformMatrixAtRelFrameF(parentRelFrame);
     }
@@ -516,6 +529,21 @@ QMatrix BoneTransformAnimator::getRelativeTransformAtRelFrame(
     matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
     matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
                  mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame) );
+    matrix.translate(-rootRelPos.x(), -rootRelPos.y());
+
+    return matrix;
+}
+
+QMatrix BoneTransformAnimator::getRelativeTransformAtRelFrameF(
+                                    const qreal &relFrame) {
+    QMatrix matrix;
+    QPointF rootRelPos = mParentBone->getRootRelPos();
+    matrix.translate(rootRelPos.x() + mPosAnimator->getEffectiveXValueAtRelFrameF(relFrame),
+                     rootRelPos.y() + mPosAnimator->getEffectiveYValueAtRelFrameF(relFrame));
+
+    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+    matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrameF(relFrame),
+                 mScaleAnimator->getEffectiveYValueAtRelFrameF(relFrame) );
     matrix.translate(-rootRelPos.x(), -rootRelPos.y());
 
     return matrix;

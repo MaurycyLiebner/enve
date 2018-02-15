@@ -78,6 +78,12 @@ public:
         FileCacheHandler::clearCache();
     }
     sk_sp<SkImage> getImage() { return mImage; }
+    sk_sp<SkImage> getImageCopy() {
+        if(mImage.get() == NULL) return sk_sp<SkImage>();
+        SkPixmap pix;
+        mImage->peekPixels(&pix);
+        return SkImage::MakeRasterCopy(pix);
+    }
 private:
     sk_sp<SkImage> mUpdateImage;
     sk_sp<SkImage> mImage;
@@ -90,6 +96,13 @@ public:
     AnimationCacheHandler() :
         FileCacheHandler("") {}
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
+    sk_sp<SkImage> getFrameCopyAtFrame(const int &relFrame) {
+        sk_sp<SkImage> imageToCopy = getFrameAtFrame(relFrame);
+        if(imageToCopy.get() == NULL) return sk_sp<SkImage>();
+        SkPixmap pix;
+        imageToCopy->peekPixels(&pix);
+        return SkImage::MakeRasterCopy(pix);
+    }
 
     virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame) = 0;
     const int &getFramesCount() { return mFramesCount; }

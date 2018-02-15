@@ -14,7 +14,7 @@ struct PixmapEffectRenderData;
 
 class EffectAnimators : public ComplexAnimator {
 public:
-    EffectAnimators();
+    EffectAnimators(BoundingBox *parentBox);
 
     void addEffect(PixmapEffect *effect);
 
@@ -46,7 +46,7 @@ public:
     void readProperty(QIODevice *target);
     void readPixmapEffect(QIODevice *target);
 private:
-    BoundingBox *mParentBox;
+    BoundingBox *mParentBox = NULL;
 };
 
 #endif // EFFECTANIMATORS_H

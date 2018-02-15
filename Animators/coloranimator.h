@@ -25,6 +25,7 @@ public:
 
     Color getCurrentColor() const;
     Color getColorAtRelFrame(const int &relFrame);
+    Color getColorAtRelFrameF(const qreal &relFrame);
     void setColorMode(const ColorMode &colorMode);
 
     void startVal1Transform();

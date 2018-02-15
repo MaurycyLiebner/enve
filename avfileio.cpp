@@ -460,6 +460,20 @@ void BrightnessEffect::writeProperty(QIODevice *target) {
     mBrightnessAnimator->writeProperty(target);
 }
 
+void SampledMotionBlurEffect::readProperty(QIODevice *target) {
+    PixmapEffect::readProperty(target);
+    mOpacity->readProperty(target);
+    mNumberSamples->readProperty(target);
+    mFrameStep->readProperty(target);
+}
+
+void SampledMotionBlurEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mOpacity->writeProperty(target);
+    mNumberSamples->writeProperty(target);
+    mFrameStep->writeProperty(target);
+}
+
 void EffectAnimators::writeProperty(QIODevice *target) {
     int nEffects = ca_mChildAnimators.count();
     target->write((char*)&nEffects, sizeof(int));
@@ -471,27 +485,28 @@ void EffectAnimators::writeProperty(QIODevice *target) {
 void EffectAnimators::readPixmapEffect(QIODevice *target) {
     PixmapEffectType typeT;
     target->read((char*)&typeT, sizeof(PixmapEffectType));
+    PixmapEffect *effect = NULL;
     if(typeT == EFFECT_BLUR) {
-        BlurEffect *effect = new BlurEffect();
-        effect->readProperty(target);
-        addEffect(effect);
+        effect = new BlurEffect();
     } else if(typeT == EFFECT_SHADOW) {
-        ShadowEffect *effect = new ShadowEffect();
-        effect->readProperty(target);
-        addEffect(effect);
+        effect = new ShadowEffect();
     } else if(typeT == EFFECT_DESATURATE) {
-        DesaturateEffect *effect = new DesaturateEffect();
-        effect->readProperty(target);
-        addEffect(effect);
+        effect = new DesaturateEffect();
     } else if(typeT == EFFECT_COLORIZE) {
-        ColorizeEffect *effect = new ColorizeEffect();
-        effect->readProperty(target);
-        addEffect(effect);
+        effect = new ColorizeEffect();
     } else if(typeT == EFFECT_REPLACE_COLOR) {
-        ReplaceColorEffect *effect = new ReplaceColorEffect();
-        effect->readProperty(target);
-        addEffect(effect);
+        effect = new ReplaceColorEffect();
+    } else if(typeT == EFFECT_BRIGHTNESS) {
+        effect = new BrightnessEffect();
+    } else if(typeT == EFFECT_CONTRAST) {
+        effect = new ContrastEffect();
+    } else if(typeT == EFFECT_MOTION_BLUR) {
+        effect = new SampledMotionBlurEffect(mParentBox);
+    } else {
+        return;
     }
+    effect->readProperty(target);
+    addEffect(effect);
 }
 
 void EffectAnimators::readProperty(QIODevice *target) {
@@ -628,10 +643,10 @@ void DurationRectangle::readDurationRectangle(QIODevice *target) {
 
 void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
     DurationRectangle::writeDurationRectangle(target);
-    target->read((char*)&mBoundToAnimation, sizeof(bool));
-    target->read((char*)&mSetMaxFrameAtLeastOnce, sizeof(bool));
-    target->read((char*)&mMinAnimationFrame, sizeof(int));
-    target->read((char*)&mMaxAnimationFrame, sizeof(int));
+    target->write((char*)&mBoundToAnimation, sizeof(bool));
+    target->write((char*)&mSetMaxFrameAtLeastOnce, sizeof(bool));
+    target->write((char*)&mMinAnimationFrame, sizeof(int));
+    target->write((char*)&mMaxAnimationFrame, sizeof(int));
 }
 
 void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
@@ -679,6 +694,45 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
         if(mDurationRectangle == NULL) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(target);
     }
+
+    mTransformAnimator->readProperty(target);
+    mEffectsAnimators->readProperty(target);
+    BoundingBox::addLoadedBox(this);
+}
+
+void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) {
+    target->write((char*)&mType, sizeof(BoundingBoxType));
+    writeQString(target, prp_mName);
+    target->write((char*)&mLoadId, sizeof(int));
+    target->write((char*)&mPivotAutoAdjust, sizeof(bool));
+    target->write((char*)&mVisible, sizeof(bool));
+    target->write((char*)&mLocked, sizeof(bool));
+    target->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
+//    bool hasDurRect = mDurationRectangle != NULL;
+//    target->write((char*)&hasDurRect, sizeof(bool));
+
+//    if(hasDurRect) {
+//        mDurationRectangle->writeDurationRectangle(target);
+//    }
+
+    mTransformAnimator->writeProperty(target);
+    mEffectsAnimators->writeProperty(target);
+}
+
+void BoundingBox::readBoundingBoxDataForLink(QIODevice *target) {
+    readQString(target, &prp_mName);
+    target->read((char*)&mLoadId, sizeof(int));
+    target->read((char*)&mPivotAutoAdjust, sizeof(bool));
+    target->read((char*)&mVisible, sizeof(bool));
+    target->read((char*)&mLocked, sizeof(bool));
+    target->read((char*)&mBlendModeSk, sizeof(SkBlendMode));
+//    bool hasDurRect;
+//    target->read((char*)&hasDurRect, sizeof(bool));
+
+//    if(hasDurRect) {
+//        if(mDurationRectangle == NULL) createDurationRectangle();
+//        mDurationRectangle->readDurationRectangle(target);
+//    }
 
     mTransformAnimator->readProperty(target);
     mEffectsAnimators->readProperty(target);

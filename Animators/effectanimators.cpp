@@ -3,9 +3,9 @@
 #include "Boxes/boundingbox.h"
 #include <QDebug>
 
-EffectAnimators::EffectAnimators() :
+EffectAnimators::EffectAnimators(BoundingBox *parentBox) :
     ComplexAnimator() {
-
+    setParentBox(parentBox);
 }
 
 void EffectAnimators::addEffect(PixmapEffect *effect) {

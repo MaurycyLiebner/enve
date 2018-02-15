@@ -127,7 +127,25 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
     AnimationBoxRenderData *imageData = (AnimationBoxRenderData*)data;
     int animationFrame = getAnimationFrameForRelFrame(relFrame);
     imageData->animationFrame = animationFrame;
-    imageData->image = mAnimationCacheHandler->getFrameAtFrame(animationFrame);
+    imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
+    if(imageData->image.get() == NULL) {
+        _ScheduledExecutor *upd = mAnimationCacheHandler->
+                scheduleFrameLoad(animationFrame);
+        if(upd != NULL) {
+            upd->addDependent(imageData);
+        }
+    }
+}
+
+void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
+                                const qreal &relFrame,
+                                BoundingBoxRenderData *data) {
+    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
+                                                       data);
+    AnimationBoxRenderData *imageData = (AnimationBoxRenderData*)data;
+    int animationFrame = getAnimationFrameForRelFrame(qCeil(relFrame));
+    imageData->animationFrame = animationFrame;
+    imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
     if(imageData->image.get() == NULL) {
         _ScheduledExecutor *upd = mAnimationCacheHandler->
                 scheduleFrameLoad(animationFrame);
@@ -142,6 +160,6 @@ BoundingBoxRenderData *AnimationBox::createRenderData() {
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameAtFrame(
+    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameCopyAtFrame(
                 animationFrame);
 }

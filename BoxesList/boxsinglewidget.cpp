@@ -1213,7 +1213,7 @@ void BoxSingleWidget::switchBoxLockedAction() {
 }
 
 void BoxSingleWidget::openColorSettingsDialog() {
-    QDialog *dialog = new QDialog(this);
+    QDialog *dialog = new QDialog(MainWindow::getInstance());
     dialog->setLayout(new QVBoxLayout(dialog));
     ColorSettingsWidget *colorSettingsWidget =
             new ColorSettingsWidget(dialog);

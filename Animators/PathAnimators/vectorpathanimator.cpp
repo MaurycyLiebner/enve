@@ -192,6 +192,40 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
     return pathToRuturn;
 }
 
+SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame,
+                                              const bool &considerCurrent,
+                                              const bool &interpolate) {
+    //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
+    SkPath pathToRuturn;
+    int prevId;
+    int nextId;
+    if(anim_getNextAndPreviousKeyIdForRelFrameF(&prevId, &nextId, relFrame) ) {
+        if(prevId == nextId) {
+            pathToRuturn = ((PathKey*)anim_mKeys.at(prevId).get())->getPath();
+        } else {
+            PathKey *prevKey = ((PathKey*)anim_mKeys.at(prevId).get());
+            PathKey *nextKey = ((PathKey*)anim_mKeys.at(nextId).get());
+            int prevRelFrame = prevKey->getRelFrame();
+            int nextRelFrame = nextKey->getRelFrame();
+            SkScalar weight = ((SkScalar)relFrame - prevRelFrame)/
+                    (nextRelFrame - prevRelFrame);
+            nextKey->getPath().interpolate(prevKey->getPath(),
+                                           weight, &pathToRuturn);
+        }
+    } else {
+        pathToRuturn = getPath();
+    }
+
+    if(mElementsUpdateNeeded) {
+        if(relFrame == anim_mCurrentRelFrame) {
+            mElementsUpdateNeeded = false;
+            setElementsFromSkPath(pathToRuturn);
+        }
+    }
+
+    return pathToRuturn;
+}
+
 void VectorPathAnimator::replaceNodeSettingsForNodeId(const int &nodeId,
                                                       const NodeSettings &settings,
                                                       const bool &saveUndoRedo) {

@@ -40,6 +40,7 @@ public:
                                   const qreal &dY);
     virtual QMatrix getCurrentTransformationMatrix();
     virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
+    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 
     qreal dx();
     qreal dy();
@@ -126,6 +127,7 @@ public:
 
     QMatrix getCurrentTransformationMatrix();
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
+    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 protected:
     Bone *mParentBone = NULL;
 };

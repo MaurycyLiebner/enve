@@ -56,6 +56,12 @@ void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
 }
 
+void InternalLinkBox::setupBoundingBoxRenderDataForRelFrameF(
+        const qreal &relFrame, BoundingBoxRenderData *data) {
+    getLinkTarget()->setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+}
+
 QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }
@@ -77,6 +83,12 @@ bool InternalLinkBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
     if(getLinkTarget() == NULL) return false;
     return BoundingBox::isRelFrameInVisibleDurationRect(relFrame) &&
             getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
+}
+
+bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
+    if(getLinkTarget() == NULL) return false;
+    return BoundingBox::isRelFrameFInVisibleDurationRect(relFrame) &&
+            getLinkTarget()->isRelFrameFInVisibleDurationRect(relFrame);
 }
 
 void InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
@@ -257,6 +269,26 @@ void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrame(const int &relFra
     Canvas *canvasTarget = (Canvas*)finalTarget;
     canvasData->bgColor = canvasTarget->getBgColorAnimator()->
             getColorAtRelFrame(relFrame).getSkColor();
+    //qreal res = getParentCanvas()->getResolutionFraction();
+    canvasData->canvasHeight = canvasTarget->getCanvasHeight();//*res;
+    canvasData->canvasWidth = canvasTarget->getCanvasWidth();//*res;
+    if(mParentGroup->SWT_isLinkBox()) {
+        canvasData->clipToCanvas =
+                ((InternalLinkCanvas*)getLinkTarget())->clipToCanvas();
+    } else {
+        canvasData->clipToCanvas = mClipToCanvas->getValue();
+    }
+}
+
+void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
+        const qreal &relFrame, BoundingBoxRenderData *data) {
+    InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+
+    BoxesGroup *finalTarget = getFinalTarget();
+    LinkCanvasRenderData *canvasData = (LinkCanvasRenderData*)data;
+    Canvas *canvasTarget = (Canvas*)finalTarget;
+    canvasData->bgColor = canvasTarget->getBgColorAnimator()->
+            getColorAtRelFrameF(relFrame).getSkColor();
     //qreal res = getParentCanvas()->getResolutionFraction();
     canvasData->canvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->canvasWidth = canvasTarget->getCanvasWidth();//*res;

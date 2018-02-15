@@ -124,6 +124,7 @@ public:
 
     bool SWT_isPaintSettings() { return true; }
     Color getColorAtRelFrame(const int &relFrame) const;
+    Color getColorAtRelFrameF(const qreal &relFrame) const;
     const bool &getGradientLinear() { return mGradientLinear; }
     void setGradientLinear(const bool &linear) {
         mGradientLinear = linear;
@@ -219,6 +220,7 @@ public:
         return 0;
     }
     QGradientStops getQGradientStopsAtAbsFrame(const int &absFrame);
+    QGradientStops getQGradientStopsAtAbsFrameF(const qreal &absFrame);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -304,6 +306,8 @@ public:
     bool SWT_isStrokeSettings() { return true; }
     void setStrokerSettingsForRelFrameSk(const int &relFrame,
                                          SkStroke *stroker);
+    void setStrokerSettingsForRelFrameSkF(const qreal &relFrame,
+                                          SkStroke *stroker);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:

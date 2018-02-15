@@ -35,6 +35,7 @@ public:
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);
     SkPath getPathAtRelFrame(const int &relFrame);
+    SkPath getPathAtRelFrameF(const qreal &relFrame);
     void setCurrentTextValue(const QString &text,
                              const bool &saveUndoRedo = true);
 

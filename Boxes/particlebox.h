@@ -21,6 +21,26 @@ struct ParticleState {
         linePath = path;
     }
 
+    static ParticleState interpolate(const ParticleState &state1,
+                              const ParticleState &state2,
+                              const qreal &weight2) {
+        qreal weight1 = 1. - weight2;
+        SkPath pathT;
+        if(state2.linePath.isEmpty()) {
+            pathT = state1.linePath;
+        } else if(state1.linePath.isEmpty()) {
+            pathT = state2.linePath;
+        } else {
+            state1.linePath.interpolate(state2.linePath, 1. - weight2, &pathT);
+        }
+        uchar opacity1 = state1.opacity;
+        uchar opacity2 = state2.opacity;
+        uchar opacityT = qMax(0, qMin(255, qRound(opacity1*weight1 + opacity2*weight2)));
+        return ParticleState(state1.pos*weight1 + state2.pos*weight2, 1.,
+                             state1.size*weight1 + state2.size*weight2, opacityT,
+                             pathT);
+    }
+
     void drawSk(SkCanvas *canvas,
                 const SkPaint paint) const {
         if(size < 0.) return;
@@ -121,6 +141,7 @@ public:
 
     bool isVisibleAtFrame(const int &frame);
     ParticleState getParticleStateAtFrame(const int &frame);
+    bool getParticleStateAtFrameF(const qreal &frame, ParticleState &state);
 private:
     SkScalar mSize;
     SkPoint mPrevVelocityVar;
@@ -177,6 +198,53 @@ public:
             Q_FOREACH(Particle *particle, mParticles) {
                 if(particle->isVisibleAtFrame(relFrame)) {
                     ParticleState stateT = particle->getParticleStateAtFrame(relFrame);
+                    BoundingBoxRenderData *renderData = targetT->createRenderData();
+                    QMatrix multMatr = QMatrix(stateT.size, 0.,
+                                               0., stateT.size,
+                                               0., 0.)*particleData->transform;
+                    renderData->appendRenderCustomizerFunctor(
+                            new MultiplyTransformCustomizer(multMatr,
+                                                            stateT.opacity/255.));
+                    renderData->appendRenderCustomizerFunctor(
+                            new ReplaceTransformDisplacementCustomizer(
+                                    stateT.pos.x(), stateT.pos.y()));
+
+                    stateT.targetRenderData =
+                            renderData->ref<BoundingBoxRenderData>();
+                    renderData->maxBoundsEnabled = false;
+                    renderData->parentIsTarget = false;
+                    data.particleStates << stateT;
+                    renderData->addDependent(particleData);
+                    renderData->addScheduler();
+                }
+            }
+        }
+
+        return data;
+    }
+
+    EmitterData getEmitterDataAtRelFrameF(const qreal &relFrame,
+                                          ParticleBoxRenderData *particleData) {
+        EmitterData data;
+        data.color = mColorAnimator->getColorAtRelFrameF(relFrame).getSkColor();
+
+        BoundingBox *targetT = mBoxTargetProperty->getTarget();
+        if(targetT == NULL) {
+            data.boxDraw = false;
+            Q_FOREACH(Particle *particle, mParticles) {
+                if(particle->isVisibleAtFrame(relFrame)) {
+                    ParticleState stateT;
+                    if(particle->getParticleStateAtFrameF(relFrame, stateT)) {
+                        data.particleStates << stateT;
+                    }
+                }
+            }
+        } else {
+            data.boxDraw = true;
+            Q_FOREACH(Particle *particle, mParticles) {
+                if(particle->isVisibleAtFrame(relFrame)) {
+                    ParticleState stateT;
+                    if(!particle->getParticleStateAtFrameF(relFrame, stateT)) continue;
                     BoundingBoxRenderData *renderData = targetT->createRenderData();
                     QMatrix multMatr = QMatrix(stateT.size, 0.,
                                                0., stateT.size,
@@ -303,6 +371,18 @@ public:
         foreach(ParticleEmitter *emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();
             particleData->emittersData << emitter->getEmitterDataAtRelFrame(
+                                              relFrame, particleData);
+        }
+    }
+
+    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+                                               BoundingBoxRenderData *data) {
+        BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+        ParticleBoxRenderData *particleData = (ParticleBoxRenderData*)data;
+        particleData->emittersData.clear();
+        foreach(ParticleEmitter *emitter, mEmitters) {
+            emitter->generateParticlesIfNeeded();
+            particleData->emittersData << emitter->getEmitterDataAtRelFrameF(
                                               relFrame, particleData);
         }
     }

@@ -59,6 +59,11 @@ public:
                                        const SkPath &,
                                        SkPath *,
                                        const bool &) = 0;
+
+    virtual void filterPathForRelFrameF(const qreal &,
+                                       const SkPath &,
+                                       SkPath *,
+                                       const bool &) = 0;
     virtual void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -125,6 +130,10 @@ public:
                                const SkPath &src,
                                SkPath *dst,
                                const bool &);
+    void filterPathForRelFrameF(const qreal &relFrame,
+                                const SkPath &src,
+                                SkPath *dst,
+                                const bool &);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -187,6 +196,10 @@ public:
                                const SkPath &src,
                                SkPath *dst,
                                const bool &);
+    void filterPathForRelFrameF(const qreal &relFrame,
+                                const SkPath &src,
+                                SkPath *dst,
+                                const bool &);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -202,6 +215,13 @@ public:
                                const SkPath &src,
                                SkPath *dst,
                                const bool &);
+    void filterPathForRelFrameF(const qreal &relFrame,
+                                const SkPath &src,
+                                SkPath *dst,
+                                const bool &);
+    void solidify(const qreal &widthT,
+                  const SkPath &src,
+                  SkPath *dst);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -219,6 +239,10 @@ public:
                                const SkPath &src,
                                SkPath *dst,
                                const bool &);
+    void filterPathForRelFrameF(const qreal &relFrame,
+                                const SkPath &src,
+                                SkPath *dst,
+                                const bool &);
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
@@ -243,7 +267,10 @@ public:
                                const SkPath &src,
                                SkPath *dst,
                                const bool &groupPathSum);
-
+    void filterPathForRelFrameF(const qreal &relFrame,
+                                const SkPath &src,
+                                SkPath *dst,
+                                const bool &groupPathSum);
     void writeProperty(QIODevice *target) {
         Q_UNUSED(target);
     }

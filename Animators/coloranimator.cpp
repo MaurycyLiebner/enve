@@ -112,6 +112,27 @@ Color ColorAnimator::getColorAtRelFrame(const int &relFrame) {
     return color;
 }
 
+Color ColorAnimator::getColorAtRelFrameF(const qreal &relFrame) {
+    Color color;
+    if(mColorMode == RGBMODE) {
+        color.setRGB(mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+    } else if(mColorMode == HSVMODE) {
+        color.setHSV(mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+    } else { // HSLMODE
+        color.setHSL(mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
+                     mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+    }
+    return color;
+}
+
 void ColorAnimator::setColorMode(const ColorMode &colorMode) {
     if(colorMode == RGBMODE) {
         mVal1Animator->prp_setName("red");

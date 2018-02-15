@@ -60,6 +60,22 @@ SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
     return path;
 }
 
+SkPath Rectangle::getPathAtRelFrameF(const qreal &relFrame) {
+    SkPath path;
+    SkPoint topLeft =
+            QPointFToSkPoint(mTopLeftPoint->
+                                getCurrentEffectivePointValueAtRelFrameF(relFrame));
+    SkPoint bottomRight =
+            QPointFToSkPoint(mBottomRightPoint->
+                                getCurrentEffectivePointValueAtRelFrameF(relFrame));
+    QPointF radiusAtFrame =
+            mRadiusPoint->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+    path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
+                                       bottomRight.x(), bottomRight.y()),
+                      radiusAtFrame.x(), radiusAtFrame.y());
+    return path;
+}
+
 void Rectangle::setTopLeftPos(const QPointF &pos) {
     mTopLeftPoint->setRelativePos(pos);
 }
@@ -136,6 +152,13 @@ void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
             list->append(mBottomRightPoint);
         }
     }
+}
+
+void Rectangle::getMotionBlurProperties(QList<Property*> *list) {
+    PathBox::getMotionBlurProperties(list);
+    list->append(mTopLeftPoint);
+    list->append(mBottomRightPoint);
+    list->append(mRadiusPoint);
 }
 
 RectangleTopLeftPoint::RectangleTopLeftPoint(BasicTransformAnimator *parent) :

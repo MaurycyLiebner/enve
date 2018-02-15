@@ -293,6 +293,33 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrame(
     paintData->trans = QPointFToSkPoint(topLeft);
 }
 
+void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
+        const qreal &relFrame, BoundingBoxRenderData *data) {
+    if(mFinishSizeAndPosSetupScheduled) {
+        mFinishSizeAndPosSetupScheduled = false;
+        finishSizeAndPosSetup();
+    } else if(mFinishSizeSetupScheduled) {
+        mFinishSizeSetupScheduled = false;
+        finishSizeSetup();
+    }
+    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
+    if(mMainHandler == NULL) return;
+    mMainHandler->getTileDrawers(&paintData->tileDrawers);
+    foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
+        foreach(TileSkDrawer *drawerT, drawer.drawers) {
+            drawerT->addDependent(paintData);
+        }
+    }
+    QPointF topLeft;
+    if(mTopLeftPoint->getBeingTransformed()) {
+        topLeft = mTopLeftPoint->getSavedPointValue();
+    } else {
+        topLeft = mTopLeftPoint->getRelativePosAtRelFrame(relFrame);
+    }
+    paintData->trans = QPointFToSkPoint(topLeft);
+}
+
 BoundingBoxRenderData *PaintBox::createRenderData() {
     return new PaintBoxRenderData(this);
 }

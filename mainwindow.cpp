@@ -726,13 +726,15 @@ void MainWindow::createNewCanvas() {
                                    1080,
                                    200))->ref<Canvas>();
     newCanvas->setName(defName);
-    CanvasSettingsDialog dialog(newCanvas.data(), this);
+    CanvasSettingsDialog *dialog = new CanvasSettingsDialog(newCanvas.data(),
+                                                            this);
 
-    if(dialog.exec() == QDialog::Accepted) {
-        dialog.applySettingsToCanvas(newCanvas.data());
+    if(dialog->exec() == QDialog::Accepted) {
+        dialog->applySettingsToCanvas(newCanvas.data());
 
         addCanvas(newCanvas.data());
     }
+    delete dialog;
 }
 
 void MainWindow::addCanvas(Canvas *newCanvas) {
@@ -960,7 +962,7 @@ void MainWindow::callUpdateSchedulers() {
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
-    if(mCanvasWindow->noBoxesAwaitUpdate()) {
+    if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
         mCanvasWindow->processSchedulers();
         foreach(const std::shared_ptr<_ScheduledExecutor> &updatable,
                 mUpdateSchedulers) {

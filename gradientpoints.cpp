@@ -80,6 +80,14 @@ QPointF GradientPoints::getEndPointAtRelFrame(const int &relFrame) {
     return endPoint->getCurrentEffectivePointValueAtRelFrame(relFrame);
 }
 
+QPointF GradientPoints::getStartPointAtRelFrameF(const qreal &relFrame) {
+    return startPoint->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+}
+
+QPointF GradientPoints::getEndPointAtRelFrameF(const qreal &relFrame) {
+    return endPoint->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+}
+
 void GradientPoints::setColors(QColor startColor, QColor endColor) {
     startPoint->setColor(startColor);
     endPoint->setColor(endColor);

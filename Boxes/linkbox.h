@@ -72,7 +72,8 @@ public:
     BoundingBoxRenderData *createRenderData();
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
-
+    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+                                               BoundingBoxRenderData *data);
     const SkBlendMode &getBlendMode() {
         if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getBlendMode();
@@ -103,6 +104,7 @@ public:
         }
     }
     bool isRelFrameInVisibleDurationRect(const int &relFrame);
+    bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);
 public slots:
     void setTargetSlot(BoundingBox *target) {
         setLinkTarget(target);
@@ -251,6 +253,33 @@ public:
         data->effectsMargin += childrenEffectsMargin;
     }
 
+    void setupBoundingBoxRenderDataForRelFrameF(
+                            const qreal &relFrame,
+                            BoundingBoxRenderData *data) {
+        BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+        BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
+        groupData->childrenRenderData.clear();
+        qreal childrenEffectsMargin = 0.;
+        qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+            qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
+            if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
+                BoundingBoxRenderData *boxRenderData =
+                        box->getCurrentRenderData();
+                if(boxRenderData == NULL) {
+                    continue;
+                }
+                boxRenderData->addDependent(data);
+                groupData->childrenRenderData <<
+                        boxRenderData->ref<BoundingBoxRenderData>();
+                childrenEffectsMargin =
+                        qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
+                             childrenEffectsMargin);
+            }
+        }
+        data->effectsMargin += childrenEffectsMargin;
+    }
+
     BoxesGroup *getFinalTarget() {
         if(getLinkTarget()->SWT_isLinkBox()) {
             return ((InternalLinkGroupBox*)getLinkTarget())->getFinalTarget();
@@ -320,7 +349,9 @@ public:
     void setupBoundingBoxRenderDataForRelFrame(
                             const int &relFrame,
                             BoundingBoxRenderData *data);
-
+    void setupBoundingBoxRenderDataForRelFrameF(
+                            const qreal &relFrame,
+                            BoundingBoxRenderData *data);
     bool clipToCanvas();
 
     BoundingBox *createLinkForLinkGroup();

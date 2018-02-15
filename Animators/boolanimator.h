@@ -13,6 +13,10 @@ public:
     bool getCurrentBoolValueAtRelFrame(const int &relFrame) {
         return getCurrentIntValueAtRelFrame(relFrame) == 1;
     }
+    bool getCurrentBoolValueAtRelFrameF(const qreal &relFrame) {
+        return getCurrentIntValueAtRelFrameF(relFrame) == 1;
+    }
+
     bool SWT_isBoolAnimator() { return true; }
 };
 

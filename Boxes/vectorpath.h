@@ -43,6 +43,8 @@ public:
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
     SkPath getPathAtRelFrame(const int &relFrame);
+    SkPath getPathAtRelFrameF(const qreal &relFrame);
+
 
     void selectAllPoints(Canvas *canvas);
     void writeBoundingBox(QIODevice *target);
@@ -53,6 +55,7 @@ public:
     void revertAllPoints();
     void breakPathsApart();
 protected:
+    void getMotionBlurProperties(QList<Property*> *list);
     PathAnimatorQSPtr mPathAnimator;
 };
 

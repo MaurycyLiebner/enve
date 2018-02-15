@@ -93,7 +93,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     QMatrix relTransform;
     QRectF relBoundingRect;
     QRectF globalBoundingRect;
-    qreal opacity;
+    qreal opacity = 1.;
     qreal resolution;
     qreal effectsMargin;
     int relFrame;
@@ -132,6 +132,9 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     void dataSet();
 
     void clearPixmapEffects() {
+        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+            delete effect;
+        }
         pixmapEffects.clear();
         effectsMargin = 0.;
     }
@@ -200,6 +203,20 @@ public:
 protected:
     QMatrix mTransform;
     qreal mOpacity = 1.;
+};
+
+class MultiplyOpacityCustomizer :
+        public RenderDataCustomizerFunctor {
+public:
+    MultiplyOpacityCustomizer(const qreal &opacity) {
+        mOpacity = opacity;
+    }
+
+    void customize(BoundingBoxRenderData *data) {
+        data->opacity *= mOpacity;
+    }
+protected:
+    qreal mOpacity;
 };
 
 class BoundingBox :
@@ -545,10 +562,16 @@ public:
     void updateCurrentRenderData();
     void nullifyCurrentRenderData();
     virtual bool isRelFrameInVisibleDurationRect(const int &relFrame);
+    virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
+    bool isRelFrameFVisibleAndInVisibleDurationRect(const qreal &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
                                               const int &relFrame);
+    virtual void getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame,
+                                               const bool &takeAncestorsIntoAccount = true);
     virtual void processSchedulers();
     void addScheduler(_ScheduledExecutor *updatable);
     virtual void addSchedulersToProcess();
@@ -615,6 +638,10 @@ public:
     }
     virtual void writeBoundingBox(QIODevice *target);
     virtual void readBoundingBox(QIODevice *target);
+
+    void writeBoundingBoxDataForLink(QIODevice *target);
+    void readBoundingBoxDataForLink(QIODevice *target);
+
     virtual void shiftAll(const int &shift);
     virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
@@ -677,7 +704,14 @@ public:
     DurationRectangle *getDurationRectangle() {
         return mDurationRectangle;
     }
+
 protected:
+    virtual void getMotionBlurProperties(QList<Property*> *list) {
+        list->append(mTransformAnimator->getScaleAnimator());
+        list->append(mTransformAnimator->getPosAnimator());
+        list->append(mTransformAnimator->getPivotAnimator());
+        list->append(mTransformAnimator->getRotAnimator());
+    }
     int mExpiredPixmap = 0;
     QPointF mSavedTransformPivot;
     bool mSelected = false;

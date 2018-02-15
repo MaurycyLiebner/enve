@@ -10,6 +10,7 @@ class QVBoxLayout;
 class TwoColumnLayout;
 
 class DurationRectSettingsDialog : public QDialog {
+    Q_OBJECT
 public:
     DurationRectSettingsDialog(const DurationRectangle::Type &type,
                                const int &minFrame,

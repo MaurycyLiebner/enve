@@ -50,6 +50,8 @@ public:
     void renderDataFinished(BoundingBoxRenderData *renderData);
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
+    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+                                                BoundingBoxRenderData *data);
     BoundingBox *createNewDuplicate() {
         return new PaintBox(100, 100);
     }

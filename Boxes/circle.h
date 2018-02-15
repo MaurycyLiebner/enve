@@ -69,6 +69,7 @@ public:
 
     void startAllPointsTransform();
     SkPath getPathAtRelFrame(const int &relFrame);
+    SkPath getPathAtRelFrameF(const qreal &relFrame);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 
@@ -91,6 +92,7 @@ protected:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;
     CircleRadiusPoint *mVerticalRadiusPoint;
+    void getMotionBlurProperties(QList<Property *> *list);
 };
 
 #endif // CIRCLE_H

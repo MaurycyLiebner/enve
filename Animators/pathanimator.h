@@ -54,6 +54,7 @@ public:
     void selectAllPoints(Canvas *canvas);
     bool SWT_isPathAnimator();
     SkPath getPathAtRelFrame(const int &relFrame);
+    SkPath getPathAtRelFrameF(const qreal &relFrame);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
     void shiftAllPoints(const int &by);

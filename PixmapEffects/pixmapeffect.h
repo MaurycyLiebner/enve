@@ -436,11 +436,10 @@ struct SampledMotionBlurEffectRenderData : public PixmapEffectRenderData {
                         const fmt_filters::image &img,
                         const qreal &scale);
 
+    qreal numberSamples;
     qreal opacity;
-    qreal blur;
     BoundingBoxRenderData *boxData;
     QList<BoundingBoxRenderDataSPtr> samples;
-    bool hasKeys = false;
 };
 
 class SampledMotionBlurEffect : public PixmapEffect {
@@ -452,17 +451,27 @@ public:
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame,
             BoundingBoxRenderData *data);
-    void writeProperty(QIODevice *target) {}
-    void readProperty(QIODevice *target) {}
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 
     void setParentBox(BoundingBox *box) {
         mParentBox = box;
     }
+
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                              int *lastIdentical,
+                                              const int &relFrame);
+
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+                                        const qreal &relFrame,
+            BoundingBoxRenderData *data);
+    void prp_setAbsFrame(const int &frame);
 private:
+    void getParentBoxFirstLastMarginAjusted(int *firstT, int *lastT,
+                                            const int &relFrame);
     BoundingBox *mParentBox = NULL;
     QrealAnimatorQSPtr mOpacity;
-    QrealAnimatorQSPtr mNumberFrames;
+    QrealAnimatorQSPtr mNumberSamples;
     QrealAnimatorQSPtr mFrameStep;
-    QrealAnimatorQSPtr mBlur;
 };
 #endif // PIXMAPEFFECT_H

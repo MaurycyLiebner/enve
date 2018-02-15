@@ -137,6 +137,24 @@ SkPath Circle::getPathAtRelFrame(const int &relFrame) {
     return path;
 }
 
+SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
+    SkScalar xRadius = mHorizontalRadiusPoint->getEffectiveXValueAtRelFrameF(relFrame);
+    SkScalar yRadius = mVerticalRadiusPoint->getEffectiveYValueAtRelFrameF(relFrame);
+    QPainterPath pathT;
+    pathT.addEllipse(QPointF(0., 0.), xRadius, yRadius);
+    return QPainterPathToSkPath(pathT);
+    SkPath path;
+    path.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
+                                  2*xRadius, 2*yRadius));
+    return path;
+}
+
+void Circle::getMotionBlurProperties(QList<Property*> *list) {
+    PathBox::getMotionBlurProperties(list);
+    list->append(mHorizontalRadiusPoint);
+    list->append(mVerticalRadiusPoint);
+}
+
 CircleCenterPoint::CircleCenterPoint(BasicTransformAnimator *parent,
                                      MovablePointType type) :
     PointAnimator(parent, type) {

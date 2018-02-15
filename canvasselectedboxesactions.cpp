@@ -821,6 +821,7 @@ void Canvas::groupSelectedBoxes() {
     mCurrentBoxesGroup->addContainedBox(newGroup);
     BoundingBox *box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
+        QSharedPointer<BoundingBox> boxSP = box->ref<BoundingBox>();
         box->removeFromParent();
         newGroup->addContainedBox(box);
     }

@@ -138,7 +138,7 @@ public:
     void rotate90CCW();
     void rotate90CW();
     void processSchedulers();
-    bool noBoxesAwaitUpdate();
+    bool shouldProcessAwaitingSchedulers();
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
     void addFileUpdatableAwaitingUpdate(_Executor *updatable);

@@ -158,3 +158,12 @@ void VectorPath::selectAndAddContainedPointsToList(const QRectF &absRect,
 SkPath VectorPath::getPathAtRelFrame(const int &relFrame) {
      return mPathAnimator->getPathAtRelFrame(relFrame);
 }
+
+SkPath VectorPath::getPathAtRelFrameF(const qreal &relFrame) {
+     return mPathAnimator->getPathAtRelFrameF(relFrame);
+}
+
+void VectorPath::getMotionBlurProperties(QList<Property*> *list) {
+    PathBox::getMotionBlurProperties(list);
+    list->append(mPathAnimator.data());
+}

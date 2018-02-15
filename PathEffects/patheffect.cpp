@@ -391,6 +391,55 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
     }
 }
 
+void DisplacePathEffect::filterPathForRelFrameF(const qreal &relFrame,
+                                                const SkPath &src,
+                                                SkPath *dst, const bool &) {
+    dst->reset();
+    qsrand(mSeed->getCurrentIntValue());
+    mSeedAssist = qrand() % 999999;
+    int randStep = mRandomizeStep->getCurrentIntValueAtRelFrameF(relFrame);
+    uint32_t nextSeed;
+    if(mRepeat->getValue()) {
+        if((qFloor(relFrame / randStep)) % 2 == 1) {
+            nextSeed = mSeedAssist;
+            mSeedAssist++;
+        } else {
+            nextSeed = mSeedAssist + 1;
+        }
+    } else if(mRandomize->getValue()) {
+        mSeedAssist += qFloor(relFrame / randStep);
+        nextSeed = mSeedAssist - 1;
+    }
+    if(mSmoothTransform->getValue() && mRandomize->getValue()) {
+        SkPath path1;
+        displaceFilterPath(&path1, src,
+                           mMaxDev->qra_getEffectiveValueAtRelFrameF(relFrame),
+                           mSegLength->qra_getEffectiveValueAtRelFrameF(relFrame),
+                           mSmoothness->qra_getEffectiveValueAtRelFrameF(relFrame),
+                           mSeedAssist);
+        SkPath path2;
+        qsrand(mSeed->getCurrentIntValue());
+        displaceFilterPath(&path2, src,
+                           mMaxDev->qra_getEffectiveValueAtRelFrameF(relFrame + randStep),
+                           mSegLength->qra_getEffectiveValueAtRelFrameF(relFrame + randStep),
+                           mSmoothness->qra_getEffectiveValueAtRelFrameF(relFrame + randStep),
+                           nextSeed);
+        qreal weight = qAbs(qFloor(relFrame) % randStep)*1./randStep;
+        qreal easing = mEasing->getCurrentEffectiveValueAtRelFrameF(relFrame);
+        if(easing > 0.0001) {
+            qreal tT = getBezierTValueForX(0., easing, 1. - easing, 1., weight);
+            weight = calcCubicBezierVal(0., 0., 1., 1., tT);
+        }
+        path1.interpolate(path2, weight, dst);
+    } else {
+        displaceFilterPath(dst, src,
+                           mMaxDev->qra_getEffectiveValueAtRelFrameF(relFrame),
+                           mSegLength->qra_getEffectiveValueAtRelFrameF(relFrame),
+                           mSmoothness->qra_getEffectiveValueAtRelFrameF(relFrame),
+                           mSeedAssist);
+    }
+}
+
 DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
     PathEffect(DUPLICATE_PATH_EFFECT, outlinePathEffect) {
     mTranslation = (new QPointFAnimator())->ref<QPointFAnimator>();
@@ -413,6 +462,15 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
                  mTranslation->getEffectiveYValueAtRelFrame(relFrame));
 }
 
+void DuplicatePathEffect::filterPathForRelFrameF(const qreal &relFrame,
+                                                 const SkPath &src,
+                                                 SkPath *dst,
+                                                 const bool &) {
+    *dst = src;
+    dst->addPath(src,
+                 mTranslation->getEffectiveXValueAtRelFrameF(relFrame),
+                 mTranslation->getEffectiveYValueAtRelFrameF(relFrame));
+}
 
 SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     PathEffect(SOLIDIFY_PATH_EFFECT, outlinePathEffect) {
@@ -430,12 +488,26 @@ void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
                                                SkPath *dst,
                                                const bool &) {
-    SkStroke strokerSk;
     qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame);
+    solidify(widthT, src, dst);
+}
+
+void SolidifyPathEffect::filterPathForRelFrameF(const qreal &relFrame,
+                                                const SkPath &src,
+                                                SkPath *dst,
+                                                const bool &) {
+    qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrameF(relFrame);
+    solidify(widthT, src, dst);
+}
+
+void SolidifyPathEffect::solidify(const qreal &widthT,
+                                  const SkPath &src,
+                                  SkPath *dst) {
     if(widthT < 0.001) {
         *dst = src;
         return;
     }
+    SkStroke strokerSk;
     strokerSk.setWidth(widthT);
     SkPath outline;
     strokerSk.strokePath(src, &outline);
@@ -615,6 +687,100 @@ void SumPathEffect::filterPathForRelFrame(const int &relFrame,
              mParentPathBox, operation);
 }
 
+void sumPathsF(const qreal &relFrame, const SkPath &src,
+               SkPath *dst, PathBox *srcBox,
+               PathBox *dstBox, const QString &operation,
+               const bool &groupSum = false) {
+    if(srcBox == NULL) {
+        *dst = src;
+        return;
+    }
+    qreal absFrame = dstBox->
+            prp_relFrameToAbsFrameF(relFrame);
+    qreal pathBoxRelFrame = srcBox->
+            prp_absFrameToRelFrameF(absFrame);
+    SkPath boxPath;
+    if(groupSum) {
+        boxPath = srcBox->getPathWithEffectsUntilGroupSumAtRelFrameF(pathBoxRelFrame);
+    } else {
+        boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrameF(pathBoxRelFrame);
+    }
+    if(src.isEmpty()) {
+        *dst = boxPath;
+        return;
+    }
+    if(boxPath.isEmpty()) {
+        *dst = src;
+        return;
+    }
+    bool unionInterThis, unionInterOther;
+    // "Union" << "Difference" << "Intersection" << "Exclusion"
+    if(operation == "Union") {
+        unionInterOther = true;
+        unionInterThis = true;
+    } else if(operation == "Difference") {
+        unionInterThis = false;
+        unionInterOther = true;
+    } else if(operation == "Intersection") {
+        unionInterThis = false;
+        unionInterOther = false;
+    } else {
+        unionInterThis = true;
+        unionInterOther = false;
+    }
+    QMatrix pathBoxMatrix =
+            srcBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrameF(
+                    pathBoxRelFrame);
+    QMatrix parentBoxMatrix =
+            dstBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrameF(
+                    relFrame);
+    boxPath.transform(
+                QMatrixToSkMatrix(
+                    pathBoxMatrix*parentBoxMatrix.inverted()));
+    FullVectorPath addToPath;
+    addToPath.generateFromPath(boxPath);
+    FullVectorPath addedPath;
+    addedPath.generateFromPath(src);
+
+    addToPath.intersectWith(&addedPath,
+                            unionInterThis,
+                            unionInterOther);
+    FullVectorPath targetPath;
+    targetPath.getSeparatePathsFromOther(&addToPath);
+    targetPath.getSeparatePathsFromOther(&addedPath);
+    targetPath.generateSinglePathPaths();
+
+    *dst = QPainterPathToSkPath(targetPath.getPath());
+    if(unionInterThis && !unionInterOther) {
+        FullVectorPath addToPath2;
+        addToPath2.generateFromPath(src);
+        FullVectorPath addedPath2;
+        addedPath2.generateFromPath(boxPath);
+
+        addToPath2.intersectWith(&addedPath2,
+                                 unionInterThis,
+                                 unionInterOther);
+        FullVectorPath targetPath2;
+        targetPath2.getSeparatePathsFromOther(&addToPath2);
+        targetPath2.getSeparatePathsFromOther(&addedPath2);
+        targetPath2.generateSinglePathPaths();
+        dst->addPath(QPainterPathToSkPath(targetPath2.getPath()));
+    }
+}
+
+
+void SumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
+                                           const SkPath &src,
+                                           SkPath *dst,
+                                           const bool &) {
+    PathBox *pathBox = ((PathBox*)mBoxTarget->getTarget());
+    QString operation = mOperationType->getCurrentValueName();
+    sumPathsF(relFrame, src, dst, pathBox,
+              mParentPathBox, operation);
+}
+
 GroupLastPathSumPathEffect::GroupLastPathSumPathEffect(
         BoxesGroup *parentGroup,
         const bool &outlinePathEffect) :
@@ -652,6 +818,37 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(const int &relFrame,
         srcT = *dst;
     }
 }
+
+void GroupLastPathSumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
+                                                       const SkPath &src,
+                                                       SkPath *dst,
+                                                       const bool &groupPathSum) {
+    if(!groupPathSum) {
+        *dst = src;
+        return;
+    }
+    QString operation = "Union";
+    const QList<QSharedPointer<BoundingBox> > &boxList =
+            mParentGroup->getContainedBoxesList();
+    QList<PathBox*> pathBoxes;
+    foreach(const QSharedPointer<BoundingBox> &pathBox, boxList) {
+        if(pathBox->SWT_isPathBox()) {
+            pathBoxes << (PathBox*)pathBox.data();
+        }
+    }
+    if(pathBoxes.count() < 2) {
+        *dst = src;
+        return;
+    }
+    PathBox *lastPath = pathBoxes.takeLast();
+    SkPath srcT = src;
+    foreach(PathBox *pathBox, pathBoxes) {
+        sumPathsF(relFrame, srcT, dst, pathBox,
+                  lastPath, operation, true);
+        srcT = *dst;
+    }
+}
+
 
 void GroupLastPathSumPathEffect::setParentGroup(BoxesGroup *parent) {
     mParentGroup = parent;

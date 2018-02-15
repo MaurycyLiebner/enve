@@ -70,10 +70,10 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
     if(*currY > minY && satisfiesRule && !mIsMainTarget) {
         if(*currentWidgetId < widgets->count()) {
             SingleWidget *currWidget = (SingleWidget*)widgets->at(*currentWidgetId);
+            currWidget->setTargetAbstraction(this);
             int currWx = currWidget->x();
             currWidget->move(currX, currWidget->y());
             currWidget->setFixedWidth(currWx - currX + currWidget->width());
-            currWidget->setTargetAbstraction(this);
             *currentWidgetId = *currentWidgetId + 1;
         }
     }

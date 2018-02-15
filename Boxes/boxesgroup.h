@@ -178,12 +178,18 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
+    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+                                                BoundingBoxRenderData *data);
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
                                               const int &relFrame);
+    void getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame,
+                                               const bool &takeAncestorsIntoAccount = true);
     void processSchedulers();
     void addSchedulersToProcess();
 
@@ -243,6 +249,18 @@ public:
     void filterOutlinePathForRelFrame(const int &relFrame,
                                       SkPath *srcDstPath);
     void filterFillPathForRelFrame(const int &relFrame,
+                                   SkPath *srcDstPath);
+
+    void filterPathForRelFrameF(const qreal &relFrame,
+                               SkPath *srcDstPath,
+                               BoundingBox *box);
+    void filterPathForRelFrameUntilGroupSumF(const qreal &relFrame,
+                                            SkPath *srcDstPath);
+    void filterOutlinePathBeforeThicknessForRelFrameF(const qreal &relFrame,
+                                                     SkPath *srcDstPath);
+    void filterOutlinePathForRelFrameF(const qreal &relFrame,
+                                      SkPath *srcDstPath);
+    void filterFillPathForRelFrameF(const qreal &relFrame,
                                    SkPath *srcDstPath);
 //    bool prp_nextRelFrameWithKey(const int &relFrame,
 //                                 int &nextRelFrame);

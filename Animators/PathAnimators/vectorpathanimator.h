@@ -47,6 +47,9 @@ public:
     SkPath getPathAtRelFrame(const int &relFrame,
                              const bool &considerCurrent = true,
                              const bool &interpolate = true);
+    SkPath getPathAtRelFrameF(const qreal &relFrame,
+                              const bool &considerCurrent = true,
+                              const bool &interpolate = true);
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId) {
         return mNodeSettings.at(pointIdToNodeId(ptId));

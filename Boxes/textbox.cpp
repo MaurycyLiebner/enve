@@ -15,7 +15,7 @@ TextBox::TextBox() :
 
     mText = (new QStringAnimator())->ref<QStringAnimator>();
     mText->prp_setName("text");
-    ca_addChildAnimator(mText.data());
+    ca_prependChildAnimator(mText.data(), mEffectsAnimators.data());
     mText->prp_setUpdater(new NodePointUpdater(this));
 }
 
@@ -103,6 +103,31 @@ bool TextBox::handleSelectedCanvasAction(QAction *selectedAction) {
 }
 
 SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
+    QPainterPath qPath = QPainterPath();
+
+    QString textAtFrame = mText->getTextValueAtRelFrame(relFrame);
+    QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
+    QFontMetricsF fm(mFont);
+    qreal yT = 0.;
+    qreal maxWidth = 0.;
+    Q_FOREACH(QString line, lines) {
+        qreal lineWidth = fm.width(line);
+        if(lineWidth > maxWidth) maxWidth = lineWidth;
+    }
+    Q_FOREACH(QString line, lines) {
+        qreal lineWidth = fm.width(line);
+        qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
+                      yT, mFont, line);
+        yT += fm.height();
+    }
+
+    QRectF boundingRect = qPath.boundingRect();
+    qPath.translate(-boundingRect.center());
+
+    return QPainterPathToSkPath(qPath);
+}
+
+SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     QPainterPath qPath = QPainterPath();
 
     QString textAtFrame = mText->getTextValueAtRelFrame(relFrame);

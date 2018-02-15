@@ -34,7 +34,9 @@ QrealKey::QrealKey(const int &frame,
 }
 
 QrealKey::~QrealKey() {
-
+    delete mEndPoint;
+    delete mStartPoint;
+    delete mGraphPoint;
 }
 
 QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {

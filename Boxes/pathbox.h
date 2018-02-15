@@ -116,7 +116,9 @@ public:
     void setupBoundingBoxRenderDataForRelFrame(
                                 const int &relFrame,
                                 BoundingBoxRenderData *data);
-
+    void setupBoundingBoxRenderDataForRelFrameF(
+                                const qreal &relFrame,
+                                BoundingBoxRenderData *data);
     BoundingBoxRenderData *createRenderData() {
         return new PathBoxRenderData(this);
     }
@@ -130,8 +132,11 @@ public:
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
+    virtual SkPath getPathAtRelFrameF(const qreal &relFrame) = 0;
     SkPath getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame);
     SkPath getPathWithEffectsUntilGroupSumAtRelFrame(const int &relFrame);
+    SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame);
+    SkPath getPathWithEffectsUntilGroupSumAtRelFrameF(const qreal &relFrame);
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
@@ -174,6 +179,7 @@ protected:
     void updateWholePathSk();
 
     bool mOutlineAffectedByScale = true;
+    void getMotionBlurProperties(QList<Property*> *list);
 };
 
 #endif // PATHBOX_H

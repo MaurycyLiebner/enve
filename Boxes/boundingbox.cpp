@@ -24,9 +24,8 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
             (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
     ca_addChildAnimator(mTransformAnimator.data());
 
-    mEffectsAnimators = (new EffectAnimators())->ref<EffectAnimators>();
+    mEffectsAnimators = (new EffectAnimators(this))->ref<EffectAnimators>();
     mEffectsAnimators->prp_setName("effects");
-    mEffectsAnimators->setParentBox(this);
     mEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
     mEffectsAnimators->prp_blockUpdater();
     ca_addChildAnimator(mEffectsAnimators.data());
@@ -91,9 +90,9 @@ BoundingBox *BoundingBox::createLink() {
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox *targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    BoundingBox::writeBoundingBox(&buffer);
+    BoundingBox::writeBoundingBoxDataForLink(&buffer);
     if(buffer.seek(sizeof(BoundingBoxType)) ) {
-        targetBox->BoundingBox::readBoundingBox(&buffer);
+        targetBox->BoundingBox::readBoundingBoxDataForLink(&buffer);
     }
     buffer.close();
 }
@@ -916,14 +915,25 @@ bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
+bool BoundingBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
+    if(mDurationRectangle == NULL) return true;
+    return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
+           relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
+}
+
 bool BoundingBox::isRelFrameVisibleAndInVisibleDurationRect(
         const int &relFrame) {
     return isRelFrameInVisibleDurationRect(relFrame) && mVisible;
 }
 
+bool BoundingBox::isRelFrameFVisibleAndInVisibleDurationRect(
+        const qreal &relFrame) {
+    return isRelFrameFInVisibleDurationRect(relFrame) && mVisible;
+}
+
 void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                        int *lastIdentical,
-                                                        const int &relFrame) {
+                                                       int *lastIdentical,
+                                                       const int &relFrame) {
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
@@ -950,6 +960,87 @@ void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     } else {
         *firstIdentical = INT_MIN;
         *lastIdentical = INT_MAX;
+    }
+}
+
+
+void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
+                                                        int *lastIdentical,
+                                                        const int &relFrame,
+                                                        const bool &takeAncestorsIntoAccount) {
+    if(mVisible) {
+        if(isRelFrameInVisibleDurationRect(relFrame)) {
+            int fId = INT_MIN;
+            int lId = INT_MAX;
+            {
+                int fId_ = INT_MIN;
+                int lId_ = INT_MAX;
+
+                QList<Property*> propertiesT;
+                getMotionBlurProperties(&propertiesT);
+                Q_FOREACH(Property *child, propertiesT) {
+                    if(fId_ > lId_) {
+                        break;
+                    }
+                    int fIdT_;
+                    int lIdT_;
+                    child->prp_getFirstAndLastIdenticalRelFrame(
+                                &fIdT_, &lIdT_,
+                                relFrame);
+                    if(fIdT_ > fId_) {
+                        fId_ = fIdT_;
+                    }
+                    if(lIdT_ < lId_) {
+                        lId_ = lIdT_;
+                    }
+                }
+
+                if(lId_ > fId_) {
+                    fId = fId_;
+                    lId = lId_;
+                } else {
+                    fId = relFrame;
+                    lId = relFrame;
+                }
+            }
+            *firstIdentical = fId;
+            *lastIdentical = lId;
+            if(mDurationRectangle != NULL) {
+                if(fId < mDurationRectangle->getMinFrameAsRelFrame()) {
+                    *firstIdentical = relFrame;
+                }
+                if(lId > mDurationRectangle->getMaxFrameAsRelFrame()) {
+                    *lastIdentical = relFrame;
+                }
+            }
+        } else {
+            if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+                *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame() + 1;
+                *lastIdentical = INT_MAX;
+            } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
+                *firstIdentical = INT_MIN;
+                *lastIdentical = mDurationRectangle->getMinFrameAsRelFrame() - 1;
+            }
+        }
+    } else {
+        *firstIdentical = INT_MIN;
+        *lastIdentical = INT_MAX;
+    }
+    if(mParentGroup == NULL || takeAncestorsIntoAccount) return;
+    if(*firstIdentical == relFrame && *lastIdentical == relFrame) return;
+    int parentFirst;
+    int parentLast;
+    int parentRel = mParentGroup->prp_absFrameToRelFrame(
+                prp_relFrameToAbsFrame(relFrame));
+    mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(
+                  &parentFirst,
+                  &parentLast,
+                  parentRel);
+    if(parentFirst > *firstIdentical) {
+        *firstIdentical = parentFirst;
+    }
+    if(parentLast < *lastIdentical) {
+        *lastIdentical = parentLast;
     }
 }
 
@@ -1363,7 +1454,7 @@ void BoundingBoxRenderData::schedulerProccessed() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != NULL) {
         if(useCustomRelFrame) {
-            parentBoxT->setupBoundingBoxRenderDataForRelFrame(
+            parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
                         customRelFrame,
                         this);
         } else {

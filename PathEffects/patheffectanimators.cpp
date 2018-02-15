@@ -115,3 +115,59 @@ void PathEffectAnimators::filterPathForRelFrameUntilGroupSum(
     }
     *srcDstPath = dstPath;
 }
+
+
+void PathEffectAnimators::filterPathForRelFrameBeforeThicknessF(
+                                                const qreal &relFrame,
+                                                SkPath *srcDstPath) {
+    SkPath dstPath = *srcDstPath;
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        PathEffect *effectT = (PathEffect*)effect.data();
+        if(effectT->applyBeforeThickness() && effectT->isVisible()) {
+            SkPath srcPath = dstPath;
+            effectT->filterPathForRelFrameF(relFrame,
+                                           srcPath,
+                                           &dstPath, NULL);
+        }
+    }
+    *srcDstPath = dstPath;
+}
+
+void PathEffectAnimators::filterPathForRelFrameF(const qreal &relFrame,
+                                                SkPath *srcDstPath,
+                                                const bool &groupPathSum) {
+    SkPath dstPath = *srcDstPath;
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        PathEffect *effectT = (PathEffect*)effect.data();
+        if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
+            continue;
+        }
+        SkPath srcPath = dstPath;
+        effectT->filterPathForRelFrameF(relFrame,
+                                       srcPath,
+                                       &dstPath,
+                                       groupPathSum);
+    }
+    *srcDstPath = dstPath;
+}
+
+void PathEffectAnimators::filterPathForRelFrameUntilGroupSumF(
+                        const qreal &relFrame,
+                        SkPath *srcDstPath) {
+    SkPath dstPath = *srcDstPath;
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        PathEffect *effectT = (PathEffect*)effect.data();
+        if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
+            continue;
+        }
+        if(effectT->getEffectType() == GROUP_SUM_PATH_EFFECT) {
+            break;
+        }
+        SkPath srcPath = dstPath;
+        effectT->filterPathForRelFrameF(relFrame,
+                                       srcPath,
+                                       &dstPath,
+                                       false);
+    }
+    *srcDstPath = dstPath;
+}

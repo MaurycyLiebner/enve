@@ -35,6 +35,7 @@ public:
 
     bool SWT_isRectangle() { return true; }
     SkPath getPathAtRelFrame(const int &relFrame);
+    SkPath getPathAtRelFrameF(const qreal &relFrame);
 
     void setTopLeftPos(const QPointF &pos);
     void setBottomRightPos(const QPointF &pos);
@@ -47,6 +48,7 @@ protected:
     RectangleBottomRightPoint *mBottomRightPoint;
 
     QPointFAnimator *mRadiusPoint;
+    void getMotionBlurProperties(QList<Property *> *list);
 };
 
 #endif // RECTANGLE_H

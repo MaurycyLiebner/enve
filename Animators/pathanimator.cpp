@@ -212,6 +212,17 @@ SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
     return path;
 }
 
+SkPath PathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
+    SkPath path = SkPath();
+
+    Q_FOREACH(VectorPathAnimator *singlePath, mSinglePaths) {
+        bool interpolate = mSmoothTransformation->getCurrentBoolValueAtRelFrameF(relFrame);
+        path.addPath(singlePath->getPathAtRelFrameF(relFrame, true, interpolate));
+    }
+
+    return path;
+}
+
 void PathAnimator::selectAllPoints(Canvas *canvas) {
     Q_FOREACH(VectorPathAnimator *singlePath, mSinglePaths) {
         singlePath->selectAllPoints(canvas);
