@@ -504,8 +504,6 @@ void Canvas::handleLeftButtonMousePress() {
         } else {
             handleMovePointMousePressEvent();
         }
-    } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        mLastPressedBox = getPathAtFromAllAncestors(mLastPressPosRel);
     } else {
         if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMousePress();
@@ -514,8 +512,8 @@ void Canvas::handleLeftButtonMousePress() {
             handleMovePointMousePressEvent();
         } else if (mCurrentMode == CanvasMode::DRAW_PATH) {
             handleDrawPathMousePressEvent();
-        } else if (mCurrentMode == CanvasMode::ADD_DRAW_PATH_NODE) {
-            handleAddDrawPathNodeMousePressEvent();
+        } else if (mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
+            mLastPressedBox = getPathAtFromAllAncestors(mLastPressPosRel);
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
 
             QSharedPointer<Circle> newPath =
@@ -714,8 +712,8 @@ void Canvas::cancelCurrentTransform() {
         }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
 
-    } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        mCanvasWindow->setCanvasMode(MOVE_PATH);
+    } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
+        //mCanvasWindow->setCanvasMode(MOVE_PATH);
     }
 
     if(mIsMouseGrabbing) {
@@ -946,26 +944,37 @@ void Canvas::handleMouseRelease() {
             handleAddPointMouseRelease();
         } else if(mCurrentMode == CanvasMode::DRAW_PATH) {
             handleDrawPathMouseReleaseEvent();
-        } else if(mCurrentMode == PICK_PATH_SETTINGS) {
+        } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
             if(mLastPressedBox != NULL) {
                 PathBox *srcPathBox = (PathBox*) mLastPressedBox;
                 foreach(BoundingBox *box, mSelectedBoxes) {
                     if(box->SWT_isPathBox()) {
                         PathBox *pathBox = (PathBox*)box;
-                        if(mPickStrokeFromPath) {
-                            pathBox->duplicateStrokeSettingsFrom(
-                                        srcPathBox->getStrokeSettings());
-                            pathBox->resetStrokeGradientPointsPos();
-                        }
-                        if(mPickFillFromPath) {
-                            pathBox->duplicateFillSettingsFrom(
-                                        srcPathBox->getFillSettings());
-                            pathBox->resetFillGradientPointsPos();
+                        if(isCtrlPressed()) {
+                            if(isShiftPressed()) {
+                                pathBox->duplicateStrokeSettingsFrom(
+                                            srcPathBox->getStrokeSettings());
+                                pathBox->resetStrokeGradientPointsPos();
+                            } else {
+                                pathBox->duplicateFillSettingsFrom(
+                                            srcPathBox->getFillSettings());
+                                pathBox->resetFillGradientPointsPos();
+                            }
+                        } else {
+                            if(isShiftPressed()) {
+                                pathBox->duplicateStrokeSettingsNotAnimatedFrom(
+                                            srcPathBox->getStrokeSettings());
+                                pathBox->resetStrokeGradientPointsPos();
+                            } else {
+                                pathBox->duplicateFillSettingsNotAnimatedFrom(
+                                            srcPathBox->getFillSettings());
+                                pathBox->resetFillGradientPointsPos();
+                            }
                         }
                     }
                 }
             }
-            mCanvasWindow->setCanvasMode(MOVE_PATH);
+            //mCanvasWindow->setCanvasMode(MOVE_PATH);
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             if(mCurrentTextBox != NULL) {
                 mCurrentTextBox->openTextEditor();

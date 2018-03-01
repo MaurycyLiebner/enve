@@ -5,6 +5,7 @@
 #include "glwindow.h"
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 #include "keyfocustarget.h"
+class Brush;
 class WindowSingleWidgetTarget;
 class Canvas;
 typedef QSharedPointer<Canvas> CanvasQSPtr;
@@ -66,9 +67,6 @@ public:
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
     void strokeWidthChanged(const qreal &strokeWidth,
                             const bool &finish);
-
-    void pickPathForSettings(const bool &pickFill,
-                             const bool &pickStroke);
     void updateDisplayedFillStrokeSettings();
 
     void setResolutionFraction(const qreal &percent);
@@ -222,11 +220,15 @@ signals:
     void changeCurrentFrame(int);
     void changeFrameRange(int, int);
 public slots:
+    void setCurrentBrush(const Brush *brush);
+    void replaceBrush(const Brush *oldBrush,
+                      const Brush *newBrush);
+
     void setMovePathMode();
     void setMovePointMode();
     void setAddPointMode();
     void setDrawPathMode();
-    void setAddDrawPathNodeMode();
+    void setPickPaintSettingsMode();
     void setRectangleMode();
     void setCircleMode();
     void setTextMode();

@@ -28,6 +28,8 @@ void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
             canvas->drawPath(path, paintT);
         }
     }
+    //paint->setAntiAlias(true);
+    //paint->setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
     canvas->restore();
 }
@@ -183,7 +185,10 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
 }
 
 void CacheContainer::drawSk(SkCanvas *canvas) {
-    canvas->drawImage(mImageSk, 0, 0);
+    //SkPaint paint;
+    //paint.setAntiAlias(true);
+    //paint.setFilterQuality(kHigh_SkFilterQuality);
+    canvas->drawImage(mImageSk, 0, 0/*, &paint*/);
 }
 
 void CacheContainer::setDataSavedToTmpFile(

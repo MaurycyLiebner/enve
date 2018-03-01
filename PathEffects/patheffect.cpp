@@ -149,14 +149,16 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
     if(segLen < 0.01) return false;
     dst->reset();
     SkPathMeasure meas(src, false);
-    qsrand(seedAssist);
 
     SkScalar scale = maxDev;
     SkPoint p;
     SkVector v;
 
+    uint32_t seedContourInc = 0;;
     if(smoothness < 0.001f) {
         do {
+            qsrand(seedAssist + seedContourInc);
+            seedContourInc += 100;
             SkScalar length = meas.getLength();
             if(segLen * 2 > length) {
                 meas.getSegment(0, length, dst, true);  // to short for us to mangle
@@ -207,7 +209,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 }
                 dst->close();
             }
-        } while (meas.nextContour());
+        } while(meas.nextContour());
     } else {
         SkPoint firstP;
         SkPoint secondP;
@@ -220,6 +222,8 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
         SkPoint c2;
 
         do {
+            qsrand(seedAssist + seedContourInc);
+            seedContourInc += 100;
             SkScalar length = meas.getLength();
             if(segLen * 2 > length) {
                 meas.getSegment(0, length, dst, true);  // to short for us to mangle
@@ -337,7 +341,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 
                 dst->close();
             }
-        } while (meas.nextContour());
+        } while(meas.nextContour());
     }
     return true;
 }
@@ -351,14 +355,14 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
     int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
     uint32_t nextSeed;
     if(mRepeat->getValue()) {
-        if((relFrame / randStep) % 2 == 1) {
+        if(qAbs(relFrame / randStep) % 2 == 1) {
             nextSeed = mSeedAssist;
             mSeedAssist++;
         } else {
             nextSeed = mSeedAssist + 1;
         }
     } else if(mRandomize->getValue()) {
-        mSeedAssist += relFrame / randStep;
+        mSeedAssist += qAbs(relFrame / randStep);
         nextSeed = mSeedAssist - 1;
     }
     if(mSmoothTransform->getValue() && mRandomize->getValue()) {

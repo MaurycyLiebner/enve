@@ -84,7 +84,7 @@ public:
                           const ulong &time_stamp,
                           const qreal &pressure,
                           const bool &erase,
-                          Brush *brush);
+                          const Brush *brush);
 protected:
     PaintBox *mParentBox = NULL;
 

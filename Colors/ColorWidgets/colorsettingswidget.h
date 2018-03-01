@@ -22,8 +22,9 @@ class ColorSettingsWidget : public QWidget
 public:
     explicit ColorSettingsWidget(QWidget *parent = 0);
 
-
+    QColor getCurrentQColor();
     void setCurrentColor(const Color &color);
+    void setCurrentColor(const QColor &color);
     void hideAlphaControlers();
 signals:
     void colorSettingSignal(const ColorSetting&);

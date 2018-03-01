@@ -490,6 +490,44 @@ void PathBox::duplicateStrokeSettingsFrom(StrokeSettings *strokeSettings) {
     }
 }
 
+void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) {
+    if(fillSettings == NULL) {
+        mFillSettings->setPaintType(NOPAINT);
+    } else {
+        PaintType paintType = fillSettings->getPaintType();
+        mFillSettings->setPaintType(paintType);
+        if(paintType == FLATPAINT) {
+            mFillSettings->setCurrentColor(
+                        fillSettings->getCurrentColor());
+        } else if(paintType == GRADIENTPAINT) {
+            mFillSettings->setGradient(
+                        fillSettings->getGradient());
+            mFillSettings->setGradientLinear(
+                        fillSettings->getGradientLinear());
+        }
+    }
+}
+
+void PathBox::duplicateStrokeSettingsNotAnimatedFrom(StrokeSettings *strokeSettings) {
+    if(strokeSettings == NULL) {
+        mStrokeSettings->setPaintType(NOPAINT);
+    } else {
+        PaintType paintType = strokeSettings->getPaintType();
+        mStrokeSettings->setPaintType(paintType);
+        if(paintType == FLATPAINT) {
+            mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
+                        strokeSettings->getCurrentColor(), true, true);
+        } else if(paintType == GRADIENTPAINT) {
+            mStrokeSettings->setGradient(
+                        strokeSettings->getGradient());
+            mStrokeSettings->setGradientLinear(
+                        strokeSettings->getGradientLinear());
+        }
+        mStrokeSettings->getStrokeWidthAnimator()->qra_setCurrentValue(
+                    strokeSettings->getCurrentStrokeWidth(), true, true);
+    }
+}
+
 void PathBox::drawHoveredSk(SkCanvas *canvas,
                             const SkScalar &invScale) {
     drawHoveredPathSk(canvas, mPathSk, invScale);

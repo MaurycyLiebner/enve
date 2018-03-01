@@ -343,7 +343,7 @@ void PaintBox::tabletMoveEvent(const qreal &xT,
                            const ulong &time_stamp,
                            const qreal &pressure,
                            const bool &erase,
-                           Brush *brush) {
+                           const Brush *brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
                         anim_mCurrentRelFrame);
@@ -352,6 +352,11 @@ void PaintBox::tabletMoveEvent(const qreal &xT,
     mMainHandler->tabletMoveEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
                               erase, brush);
+    qreal pRed, pGreen, pBlue, pAlpha;
+    mMainHandler->getPickedUpRGBA(&pRed, &pGreen,
+                                  &pBlue, &pAlpha);
+    mTemporaryHandler->setPickedUpRGBA(pRed, pGreen,
+                                       pBlue, pAlpha);
     srand(seedT);
     mTemporaryHandler->tabletMoveEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
@@ -362,7 +367,7 @@ void PaintBox::mouseMoveEvent(const qreal &xT,
                               const qreal &yT,
                               const ulong &time_stamp,
                               const bool &erase,
-                              Brush *brush) {
+                              const Brush *brush) {
     tabletMoveEvent(xT, yT,
                     time_stamp, 1.0,
                     erase, brush);
@@ -378,7 +383,7 @@ void PaintBox::tabletPressEvent(const qreal &xT,
                                 const ulong &time_stamp,
                                 const qreal &pressure,
                                 const bool &erase,
-                                Brush *brush) {
+                                const Brush *brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
                         anim_mCurrentRelFrame);
@@ -395,7 +400,7 @@ void PaintBox::mousePressEvent(const qreal &xT,
                                const qreal &yT,
                                const ulong &timestamp,
                                const qreal &pressure,
-                               Brush *brush) {
+                               const Brush *brush) {
     tabletPressEvent(xT, yT, timestamp, pressure, false, brush);
 }
 
@@ -404,7 +409,7 @@ void PaintBox::mouseReleaseEvent() {
 }
 
 void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
-    SkPaint paint;
+    //SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->translate(trans.x(), trans.y());
     foreach(const TileSkDrawerCollection &tile, tileDrawers) {

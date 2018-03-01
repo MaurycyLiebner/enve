@@ -26,23 +26,21 @@ void ColorSettingsWidget::setCurrentColor(const GLfloat &h_t,
                                           const GLfloat &a_t) {
 
     //wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
-//    r_rect->setColorHSV_f(h_t, s_t, v_t);
-//    g_rect->setColorHSV_f(h_t, s_t, v_t);
-//    b_rect->setColorHSV_f(h_t, s_t, v_t);
+    r_rect->setColorHSV_f(h_t, s_t, v_t);
+    g_rect->setColorHSV_f(h_t, s_t, v_t);
+    b_rect->setColorHSV_f(h_t, s_t, v_t);
 
-//    h_rect->setColorHSV_f(h_t, s_t, v_t);
-//    hsv_s_rect->setColorHSV_f(h_t, s_t, v_t);
-//    v_rect->setColorHSV_f(h_t, s_t, v_t);
+    h_rect->setColorHSV_f(h_t, s_t, v_t);
+    h_rect->setDisplayedValue(h_t);
+    hsv_s_rect->setColorHSV_f(h_t, s_t, v_t);
+    h_rect->setDisplayedValue(s_t);
+    v_rect->setColorHSV_f(h_t, s_t, v_t);
+    h_rect->setDisplayedValue(v_t);
 
-//    hsl_h_rect->setColorHSV_f(h_t, s_t, v_t);
-//    hsl_s_rect->setColorHSV_f(h_t, s_t, v_t);
-//    l_rect->setColorHSV_f(h_t, s_t, v_t);
+    hsl_s_rect->setColorHSV_f(h_t, s_t, v_t);
+    l_rect->setColorHSV_f(h_t, s_t, v_t);
 
-//    color_label->setColorHSV_f(h_t, s_t, v_t);
-//    color_label->setAlpha(a_t);
-
-//    a_rect->setColorHSV_f(h_t, s_t, v_t);
-//    a_rect->setDisplayedValue(a_t);
+    color_label->setColorHSV_f(h_t, s_t, v_t);
 
     qreal hue = h_t;
     qreal hsvSat = s_t;
@@ -52,6 +50,10 @@ void ColorSettingsWidget::setCurrentColor(const GLfloat &h_t,
     qreal green = hsvSat;
     qreal blue = val;
     qhsv_to_rgb(&red, &green, &blue);
+
+    r_rect->setDisplayedValue(red);
+    g_rect->setDisplayedValue(green);
+    b_rect->setDisplayedValue(blue);
 
     rSpin->setValueExternal(red);
     gSpin->setValueExternal(green);
@@ -65,15 +67,28 @@ void ColorSettingsWidget::setCurrentColor(const GLfloat &h_t,
     qreal lig = val;
     qhsv_to_hsl(&hue, &hslSat, &lig);
 
+    hsl_s_rect->setDisplayedValue(hslSat);
+    l_rect->setDisplayedValue(lig);
+
     hslSSpin->setValueExternal(hslSat);
     lSpin->setValueExternal(lig);
 
     if(mAlphaHidden) return;
+    color_label->setAlpha(a_t);
+    aRect->setColorHSV_f(h_t, s_t, v_t);
+    aRect->setDisplayedValue(a_t);
     aSpin->setValueExternal(a_t);
 }
 
 void ColorSettingsWidget::setCurrentColor(const Color &color) {
     setCurrentColor(color.gl_h, color.gl_s, color.gl_v, color.gl_a);
+}
+
+void ColorSettingsWidget::setCurrentColor(const QColor &color) {
+    setCurrentColor(Color(color.red(),
+                          color.green(),
+                          color.blue(),
+                          color.alpha()));
 }
 
 void ColorSettingsWidget::hideAlphaControlers() {
@@ -621,6 +636,14 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     setCurrentColor(0.f, 0.f, 0.f);
 
     moveAlphaWidgetToTab(0);
+}
+
+QColor ColorSettingsWidget::getCurrentQColor() {
+    qreal red = rSpin->value();
+    qreal green = gSpin->value();
+    qreal blue = bSpin->value();
+    qreal alpha = aSpin->value();
+    return QColor(red*255, green*255, blue*255, alpha*255);
 }
 
 void addColorWidgetActionToMenu(QMenu *menu_t,

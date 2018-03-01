@@ -93,6 +93,27 @@ struct TileSkDrawerCollection {
 //    ~TileSkDrawerCollection();
 
     void drawSk(SkCanvas *canvas) const {
+        QRectF rect;
+        foreach(TileSkDrawer *drawer, drawers) {
+            if(rect.isNull()) {
+                rect = QRectF(drawer->posX,
+                              drawer->posY,
+                              TILE_DIM, TILE_DIM);
+                continue;
+            }
+            rect = rect.united(QRectF(drawer->posX,
+                               drawer->posY,
+                               TILE_DIM, TILE_DIM));
+        }
+        SkBitmap bitmap;
+        SkImageInfo info = SkImageInfo::Make(ceil(rect.width()),
+                                             ceil(rect.height()),
+                                             kBGRA_8888_SkColorType,
+                                             kPremul_SkAlphaType,
+                                             nullptr);
+        bitmap.allocPixels(info);
+        SkCanvas *bitmapCanvas = new SkCanvas(bitmap);
+        bitmapCanvas->clear(SK_ColorTRANSPARENT);
         if(hueChange) {
             SkPaint paint;
             paint.setAlpha(alpha);
@@ -109,16 +130,22 @@ struct TileSkDrawerCollection {
 //            canvas->saveLayer(NULL, NULL);
 //            canvas->clear(hueCol);
             foreach(TileSkDrawer *drawer, drawers) {
-                drawer->drawSk(canvas, &paint);
+                drawer->drawSk(bitmapCanvas, &paint);
             }
             //canvas->restore();
         } else {
             SkPaint paint;
             paint.setAlpha(alpha);
             foreach(TileSkDrawer *drawer, drawers) {
-                drawer->drawSk(canvas, &paint);
+                drawer->drawSk(bitmapCanvas, &paint);
             }
         }
+        bitmapCanvas->flush();
+        delete bitmapCanvas;
+        SkPaint paint;
+        paint.setFilterQuality(kHigh_SkFilterQuality);
+        paint.setAntiAlias(true);
+        canvas->drawBitmap(bitmap, 0.f, 0.f, &paint);
     }
 
     void addTileSkDrawer(TileSkDrawer *drawer) {

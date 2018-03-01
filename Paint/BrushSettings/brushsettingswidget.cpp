@@ -3,20 +3,31 @@
 #include <QPushButton>
 #include "Colors/ColorWidgets/colorsettingswidget.h"
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "brushselectionscrollarea.h"
 #include "global.h"
 
 BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     : QWidget(parent) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-    main_layout = new QVBoxLayout(this);
+    mMainLayout = new QVBoxLayout(this);
 
     mColorSettingsWidget = new ColorSettingsWidget(this);
     mColorSettingsWidget->hideAlphaControlers();
     connect(mColorSettingsWidget, SIGNAL(colorSettingSignal(ColorSetting)),
             this, SLOT(setColorSetting(ColorSetting)));
-    main_layout->addWidget(mColorSettingsWidget);
+    mMainLayout->addWidget(mColorSettingsWidget);
+
+    mBrushSelection = new BrushSelectionScrollArea(this);
+    connect(mBrushSelection, SIGNAL(brushSelected(const Brush*)),
+            this, SIGNAL(brushSelected(const Brush*)));
+    connect(mBrushSelection, SIGNAL(brushReplaced(const Brush*, const Brush*)),
+            this, SIGNAL(brushReplaced(const Brush*, const Brush*)));
+    mMainLayout->addWidget(mBrushSelection);
+    connect(mBrushSelection, SIGNAL(brushSelected(const Brush*)),
+            this, SLOT(setCurrentBrush(const Brush*)));
+
     h_layout = new QHBoxLayout();
-    main_layout->addLayout(h_layout);
+    mMainLayout->addLayout(h_layout);
     labels_layout = new QVBoxLayout();
     rest_layout = new QVBoxLayout();
 
@@ -32,11 +43,11 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     mAdvancedLayout->addLayout(mAdvancedLabelsLayout);
     mAdvancedLayout->addLayout(mAdvancedRestLayout);
     mAdvancedWidget->setLayout(mAdvancedLayout);
-    main_layout->addWidget(mAdvancedArea);
+    mMainLayout->addWidget(mAdvancedArea);
 
     h_layout->addLayout(labels_layout);
     h_layout->addLayout(rest_layout);
-    for(int i = 0; i < BRUSH_SETTING_ALPHA; i++) {
+    for(int i = 0; i < BRUSH_SETTING_ASPECT_RATIO; i++) {
         BrushSettingWidget *setting_widget_t =
                 new BrushSettingWidget(labels_layout,
                                        rest_layout,
@@ -46,7 +57,7 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
         connect(setting_widget_t, SIGNAL(setBrushSetting(BrushSetting,qreal)),
                 this, SLOT(setBrushSetting(BrushSetting,qreal)));
     }
-    for(int i = BRUSH_SETTING_ALPHA; i < BRUSH_SETTINGS_COUNT; i++) {
+    for(int i = BRUSH_SETTING_ASPECT_RATIO; i < BRUSH_SETTINGS_COUNT; i++) {
         BrushSettingWidget *setting_widget_t =
                 new BrushSettingWidget(mAdvancedLabelsLayout,
                                        mAdvancedRestLayout,
@@ -60,24 +71,19 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     //setting_widgets.at(BRUSH_SETTING_SLOW_TRACKING)->show();
 
     buttons_layout = new QHBoxLayout();
-    save_brush_button = new QPushButton("Save Brush...", this);
+    save_brush_button = new QPushButton("Save Brush", this);
     connect(save_brush_button, SIGNAL(released()),
-            this, SLOT(openBrushSaveDialog()) );
+            this, SLOT(saveBrush()) );
     buttons_layout->addWidget(save_brush_button);
-
-    overwrite_brush_settings = new QPushButton("Overwrite Brush Settings");
-    connect(overwrite_brush_settings, SIGNAL(released()),
-            this, SLOT(overwriteBrushSettings()) );
-    buttons_layout->addWidget(overwrite_brush_settings);
 
     advanced_button = new QPushButton("Advanced Settings", this);
     connect(advanced_button, SIGNAL(released()),
             this, SLOT(showHideAdvancedSettings()) );
     buttons_layout->addWidget(advanced_button);
-    main_layout->addLayout(buttons_layout);
+    mMainLayout->addLayout(buttons_layout);
 
-
-    setLayout(main_layout);
+    setLayout(mMainLayout);
+    setCurrentBrush(mBrushSelection->getCurrentBrush());
 }
 
 void BrushSettingsWidget::setBrushWidgetSetting(const BrushSetting &setting_id,
@@ -86,8 +92,8 @@ void BrushSettingsWidget::setBrushWidgetSetting(const BrushSetting &setting_id,
     setting_widgets.at(setting_id)->setVal(val_t, edited_t);
 }
 
-void BrushSettingsWidget::setCurrentBrush(Brush *brushT) {
-    mCurrentBrush = brushT;
+void BrushSettingsWidget::setCurrentBrush(const Brush *brushT) {
+    mCurrentBrush = const_cast<Brush*>(brushT);
     if(mCurrentBrush == NULL) return;
     for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
         BrushSetting id_t = static_cast<BrushSetting>(i);
@@ -95,6 +101,7 @@ void BrushSettingsWidget::setCurrentBrush(Brush *brushT) {
                         brushT->getSettingVal(id_t),
                         false);
     }
+    mBrushSelection->setCurrentBrush(mCurrentBrush);
 }
 
 void BrushSettingsWidget::setBrushSetting(
@@ -119,50 +126,70 @@ Brush *BrushSettingsWidget::getCurrentBrush() {
     return mCurrentBrush;
 }
 
+void BrushSettingsWidget::saveBrushesForProject(QIODevice *target) {
+    mBrushSelection->saveBrushesForProject(target);
+}
+
+void BrushSettingsWidget::readBrushesForProject(QIODevice *target) {
+    mBrushSelection->readBrushesForProject(target);
+}
+
+void BrushSettingsWidget::setCurrentQColor(const QColor &color) {
+    mColorSettingsWidget->setCurrentColor(color);
+}
+
+QColor BrushSettingsWidget::getCurrentQColor() {
+    return mColorSettingsWidget->getCurrentQColor();
+}
+
 void BrushSettingsWidget::showHideAdvancedSettings() {
     advanced_settings_visible = !advanced_settings_visible;
     mAdvancedArea->setVisible(advanced_settings_visible);
 }
-
-void BrushSettingsWidget::openBrushSaveDialog() {
+#include <QFileDialog>
+void BrushSettingsWidget::saveBrush() {
     //new BrushSaveDialog(window_vars);
-}
-
-void BrushSettingsWidget::overwriteBrushSettings() {
-    //mCurrentBrush->setDefaultSettingsFromCurrent();
-    saveBrushDataAsFile(mCurrentBrush,
-                        mCurrentBrush->getCollectionName(),
-                        mCurrentBrush->getBrushName());
-    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
-        BrushSetting id_t = static_cast<BrushSetting>(i);
-        setting_widgets.at(i)->setDefaultButtonEnabled(false);
+    mCurrentBrush->setProjectOnly(false);
+    QString collectionT = mCurrentBrush->getCollectionName();
+    if(!collectionT.isEmpty()) collectionT += "/";
+    QString dir = QDir::homePath() + "/.AniVect/";
+    QString saveAs = dir +
+            collectionT +
+            mCurrentBrush->getBrushName() + ".avb";
+    if(QDir::home().mkpath(dir)) {
+        QFile file(saveAs);
+        file.open(QFile::WriteOnly);
+        file.resize(0);
+        mCurrentBrush->writeBrush(&file);
+        file.close();
+        mBrushSelection->update();
     }
 }
 
 void BrushSettingsWidget::setColorSetting(const ColorSetting &colorSetting) {
     ColorMode colorMode = colorSetting.getSettingMode();
     if(colorMode == ColorMode::HSVMODE) {
-        mCurrentBrush->setHSV(colorSetting.getVal1(),
-                              colorSetting.getVal2(),
-                              colorSetting.getVal3());
+        Brush::setHSV(colorSetting.getVal1(),
+                      colorSetting.getVal2(),
+                      colorSetting.getVal3());
     } else if(colorMode == ColorMode::HSLMODE) {
         Color color;
         color.setHSL(colorSetting.getVal1(),
                      colorSetting.getVal2(),
                      colorSetting.getVal3(),
                      colorSetting.getAlpa());
-        mCurrentBrush->setHSV(color.gl_h,
-                              color.gl_s,
-                              color.gl_v);
+        Brush::setHSV(color.gl_h,
+                      color.gl_s,
+                      color.gl_v);
     } else if(colorMode == ColorMode::RGBMODE) {
         Color color;
         color.setRGB(colorSetting.getVal1(),
                      colorSetting.getVal2(),
                      colorSetting.getVal3(),
                      colorSetting.getAlpa());
-        mCurrentBrush->setHSV(color.gl_h,
-                              color.gl_s,
-                              color.gl_v);
+        Brush::setHSV(color.gl_h,
+                      color.gl_s,
+                      color.gl_v);
     }
 }
 

@@ -8,6 +8,7 @@ Surface::Surface(const ushort &widthT,
                  const ushort &heightT,
                  const qreal &scale,
                  const bool &paintInOtherThread) {
+    mIsTemporary = !paintInOtherThread;
     mScale = scale;
     mCurrentTiles = (new TilesData(widthT, heightT,
                                    paintInOtherThread))->ref<TilesData>();
@@ -137,7 +138,61 @@ void Surface::saveToTmp() {
     mCurrentTiles->saveToTmp();
 }
 
-void Surface::strokeTo(Brush *brush,
+void Surface::getPickedUpRGBA(qreal *red_t,
+                            qreal *green_t,
+                            qreal *blue_t,
+                            qreal *alpha_t) const {
+    *red_t = picked_up_red;
+    *green_t = picked_up_green;
+    *blue_t = picked_up_blue;
+    *alpha_t = picked_up_alpha;
+}
+
+void Surface::setPickedUpRGBA(qreal red_t,
+                              qreal green_t,
+                              qreal blue_t,
+                              qreal alpha_t) {
+    picked_up_red = red_t;
+    picked_up_green = green_t;
+    picked_up_blue = blue_t;
+    picked_up_alpha = alpha_t;
+}
+
+void Surface::addPickedUpRGBAFromNewStroke(qreal red_t,
+                                           qreal green_t,
+                                           qreal blue_t,
+                                           qreal alpha_t,
+                                           const Brush *brush) {
+    alpha_t *= brush->getColorPickUp();
+    picked_up_alpha = picked_up_alpha*(1.f - brush->getColorPickUpDecay());
+    qreal alpha_sum = alpha_t + picked_up_alpha;
+    if(alpha_sum < 0.0001f) {
+        picked_up_red = 0.f;
+        picked_up_green = 0.f;
+        picked_up_blue = 0.f;
+        picked_up_alpha = 0.f;
+    } else {
+        picked_up_red = (red_t*alpha_t + picked_up_red*picked_up_alpha)/alpha_sum;
+        picked_up_green = (green_t*alpha_t + picked_up_green*picked_up_alpha)/alpha_sum;
+        picked_up_blue = (blue_t*alpha_t + picked_up_blue*picked_up_alpha)/alpha_sum;
+        if(picked_up_alpha > 1.f) {
+
+        } else if(alpha_sum > 1.f) {
+            picked_up_alpha = 1.f;
+        } else {
+            picked_up_alpha = alpha_sum;
+        }
+    }
+}
+
+void Surface::resetPickedUpRGBA(const Brush *brush) {
+    picked_up_red = brush->getRed();
+    picked_up_green = brush->getGreen();
+    picked_up_blue = brush->getBlue();
+    picked_up_alpha = brush->getInitialAlpha();
+}
+
+void Surface::strokeTo(const Brush *brush,
                        qreal x, qreal y,
                        const qreal &pressure,
                        const ushort &dt,
@@ -232,24 +287,22 @@ void Surface::strokeTo(Brush *brush,
     qreal dab_aspect_ratio = brush->getAspectRatio() +
             brush->getPressureAspectRatioGain()*pressure;
 
-    qreal smudge_red;
-    qreal smudge_green;
-    qreal smudge_blue;
-    qreal smudge_alpha;
-    getColor(mLastPaintedStrokeX, mLastPaintedStrokeY,
-             dab_hardness, dab_opa,
-             dab_aspect_ratio, dab_r, dest_angle,
-             &smudge_red, &smudge_green,
-             &smudge_blue, &smudge_alpha);
-    brush->addPickedUpRGBAFromNewStroke(smudge_red,
-                                        smudge_green,
-                                        smudge_blue,
-                                        smudge_alpha);
-    brush->getPickedUpRGBA(&smudge_red,
-                           &smudge_green,
-                           &smudge_blue,
-                           &smudge_alpha);
-
+    if(!mIsTemporary) {
+        qreal smudge_red;
+        qreal smudge_green;
+        qreal smudge_blue;
+        qreal smudge_alpha;
+        getColor(mLastPaintedStrokeX, mLastPaintedStrokeY,
+                 dab_hardness, dab_opa,
+                 dab_aspect_ratio, dab_r, dest_angle,
+                 &smudge_red, &smudge_green,
+                 &smudge_blue, &smudge_alpha);
+        addPickedUpRGBAFromNewStroke(smudge_red,
+                                     smudge_green,
+                                     smudge_blue,
+                                     smudge_alpha,
+                                     brush);
+    }
 
     qreal stroke_red;
     qreal stroke_green;
@@ -265,13 +318,13 @@ void Surface::strokeTo(Brush *brush,
                    &dab_alpha);
     dab_alpha += brush->getPressureAlphaGain()*pressure;
 
-    qreal alpha_sum_t = dab_alpha + smudge_alpha;
+    qreal alpha_sum_t = dab_alpha + picked_up_alpha;
     stroke_red = (stroke_red*dab_alpha +
-                  smudge_alpha*smudge_red)/alpha_sum_t;
+                  picked_up_alpha*picked_up_red)/alpha_sum_t;
     stroke_green = (stroke_green*dab_alpha +
-                    smudge_alpha*smudge_green)/alpha_sum_t;
+                    picked_up_alpha*picked_up_green)/alpha_sum_t;
     stroke_blue = (stroke_blue*dab_alpha +
-                   smudge_alpha*smudge_blue)/alpha_sum_t;
+                   picked_up_alpha*picked_up_blue)/alpha_sum_t;
     if(alpha_sum_t > 1.) {
         alpha_sum_t = 1.;
     }
@@ -369,7 +422,7 @@ void Surface::strokeTo(Brush *brush,
     currentDataModified();
 }
 
-void Surface::startNewStroke(Brush *brush,
+void Surface::startNewStroke(const Brush *brush,
                              qreal x, qreal y,
                              const qreal &pressure) {
     x *= mScale;
@@ -403,7 +456,7 @@ void Surface::startNewStroke(Brush *brush,
     mLastXSpeedOffset = 0.;
     mLastYSpeedOffset = 0.;
     mLastStrokePress = pressure;
-    brush->resetPickedUpRGBA();
+    resetPickedUpRGBA(brush);
 
     mNextSecondColorAlpha = 0.;
     mPreviousSecondColorAlpha = 0.;
@@ -438,7 +491,7 @@ void Surface::paintPress(const qreal &xT,
                                const qreal &yT,
                                const ulong &timestamp,
                                const qreal &pressure,
-                               Brush *brush) {
+                               const Brush *brush) {
     mousePressEvent(xT, yT, timestamp, pressure, brush);
 }
 
@@ -447,7 +500,7 @@ void Surface::tabletMoveEvent(const qreal &xT,
                                 const ulong &time_stamp,
                                 const qreal &pressure,
                                 const bool &erase,
-                                Brush *brush) {
+                                const Brush *brush) {
     Q_UNUSED(time_stamp);
     strokeTo(brush,
              xT, yT,
@@ -464,7 +517,7 @@ void Surface::tabletPressEvent(const qreal &xT,
                                const ulong &time_stamp,
                                const qreal &pressure,
                                const bool &erase,
-                               Brush *brush) {
+                               const Brush *brush) {
     startNewStroke(brush, xT, yT, pressure);
     tabletMoveEvent(xT, yT, time_stamp, pressure, erase, brush);
 }
@@ -474,20 +527,20 @@ void Surface::mouseReleaseEvent() {
 }
 
 void Surface::mousePressEvent(const qreal &xT,
-                                    const qreal &yT,
-                                    const ulong &timestamp,
-                                    const qreal &pressure,
-                                    Brush *brush) {
+                              const qreal &yT,
+                              const ulong &timestamp,
+                              const qreal &pressure,
+                              const Brush *brush) {
     tabletPressEvent(xT, yT,
                      timestamp, pressure,
                      false, brush);
 }
 
 void Surface::mouseMoveEvent(const qreal &xT,
-                                   const qreal &yT,
-                                   const ulong &time_stamp,
-                                   const bool &erase,
-                                   Brush *brush) {
+                             const qreal &yT,
+                             const ulong &time_stamp,
+                             const bool &erase,
+                             const Brush *brush) {
     tabletMoveEvent(xT, yT,
                 time_stamp, 1.0,
                 erase, brush);

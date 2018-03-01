@@ -62,25 +62,26 @@ public:
                      const qreal &yT,
                      const ulong &time_stamp,
                      const qreal &pressure,
-                     const bool &erase, Brush *brush);
+                     const bool &erase,
+                         const Brush *brush);
     void tabletReleaseEvent();
     void tabletPressEvent(const qreal &xT,
                           const qreal &yT,
                           const ulong &time_stamp,
                           const qreal &pressure,
                           const bool &erase,
-                          Brush *brush);
+                          const Brush *brush);
     void mouseReleaseEvent();
     void mousePressEvent(const qreal &xT,
                          const qreal &yT,
                          const ulong &timestamp,
                          const qreal &pressure,
-                         Brush *brush);
+                         const Brush *brush);
     void mouseMoveEvent(const qreal &xT,
                         const qreal &yT,
                         const ulong &time_stamp,
                         const bool &erase,
-                        Brush *brush);
+                        const Brush *brush);
     MovablePoint *getTopLeftPoint();
     MovablePoint *getBottomRightPoint();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

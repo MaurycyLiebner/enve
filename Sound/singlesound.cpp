@@ -85,10 +85,10 @@ int decode_audio_file(const char* path,
         if(packet.stream_index == audioStreamIndex) {
             // decode one frame
             int gotFrame;
-            if (avcodec_decode_audio4(audioCodec, frame, &gotFrame, &packet) < 0) {
+            if(avcodec_decode_audio4(audioCodec, frame, &gotFrame, &packet) < 0) {
                 break;
             }
-            if (!gotFrame) {
+            if(!gotFrame) {
                 continue;
             }
             // resample frames
@@ -226,13 +226,13 @@ void SingleSound::reloadDataFromFile() {
     }
     if(!mPath.isEmpty()) {
         if(QFile(mPath).exists()) {
-            decode_audio_file(mPath.toLatin1().data(), SAMPLERATE,
+            decode_audio_file(mPath.toLatin1().data(), SOUND_SAMPLERATE,
                               &mSrcData, &mSrcSampleCount);
         }
     }
     if(mOwnDurationRectangle) {
         mDurationRectangle->setAnimationFrameDuration(
-                    qCeil(mSrcSampleCount*24./SAMPLERATE));
+                    qCeil(mSrcSampleCount*24./SOUND_SAMPLERATE));
     }
 
     scheduleFinalDataUpdate();
@@ -269,9 +269,9 @@ void SingleSound::prepareFinalData(const qreal &fps,
         int finalMaxRelFrame = prp_absFrameToRelFrame(finalMaxAbsFrame);
         qDebug() << "sound rel frame range:" << finalMinRelFrame << finalMaxRelFrame;
 
-        int minSampleFromSrc = finalMinRelFrame*SAMPLERATE/fps;
+        int minSampleFromSrc = finalMinRelFrame*SOUND_SAMPLERATE/fps;
         int maxSampleFromSrc = qMin(mSrcSampleCount,
-                                    qCeil(finalMaxRelFrame*SAMPLERATE/fps));
+                                    qCeil(finalMaxRelFrame*SOUND_SAMPLERATE/fps));
 
 
         mFinalSampleCount = maxSampleFromSrc - minSampleFromSrc;
@@ -282,7 +282,7 @@ void SingleSound::prepareFinalData(const qreal &fps,
             int frame = 0;
             qreal lastFrameVol =
                     mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame)/100.;
-            qreal volStep = fps/SAMPLERATE;
+            qreal volStep = fps/SOUND_SAMPLERATE;
             while(j < mFinalSampleCount) {
                 frame++;
                 qreal nextFrameVol =
@@ -290,7 +290,7 @@ void SingleSound::prepareFinalData(const qreal &fps,
                 qreal volDiff = (nextFrameVol - lastFrameVol);
                 qreal currVolFrac = lastFrameVol;
                 for(int i = 0;
-                    i < SAMPLERATE/fps && j < mFinalSampleCount;
+                    i < SOUND_SAMPLERATE/fps && j < mFinalSampleCount;
                     i++, j++) {
                     currVolFrac += volStep*volDiff;
                     mFinalData[j] = (float)(mSrcData[j + minSampleFromSrc]*

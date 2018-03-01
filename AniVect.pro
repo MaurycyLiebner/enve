@@ -207,7 +207,9 @@ SOURCES += main.cpp\
     RenderWidget/outputsettingsprofilesdialog.cpp \
     RenderWidget/outputsettingsdisplaywidget.cpp \
     durationrectsettingsdialog.cpp \
-    twocolumnlayout.cpp
+    twocolumnlayout.cpp \
+    Paint/BrushSettings/brushselectionwidget.cpp \
+    Paint/BrushSettings/brushselectionscrollarea.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -374,7 +376,9 @@ HEADERS  += mainwindow.h \
     RenderWidget/outputsettingsprofilesdialog.h \
     RenderWidget/outputsettingsdisplaywidget.h \
     durationrectsettingsdialog.h \
-    twocolumnlayout.h
+    twocolumnlayout.h \
+    Paint/BrushSettings/brushselectionwidget.h \
+    Paint/BrushSettings/brushselectionscrollarea.h
 
 RESOURCES += \
     resources.qrc

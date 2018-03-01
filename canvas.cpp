@@ -31,6 +31,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                int canvasWidth, int canvasHeight,
                const int &frameCount, const qreal &fps) :
     BoxesGroup(fillStrokeSettings) {
+    setCurrentBrush(mMainWindow->getCurrentBrush());
     mUndoRedoStack = new UndoRedoStack(mMainWindow);
     mFps = fps;
     connect(this, SIGNAL(nameChanged(QString)),
@@ -65,7 +66,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
     prp_setAbsFrame(0);
 
-    mCurrentBrush = new Brush();
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
 }
@@ -73,7 +73,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 Canvas::~Canvas() {
     delete mUndoRedoStack;
     delete mRotPivot;
-    delete mCurrentBrush;
 }
 
 QRectF Canvas::getRelBoundingRectAtRelFrame(const int &) {
@@ -366,7 +365,7 @@ void Canvas::setMaxFrame(const int &frame) {
     mMaxFrame = frame;
 }
 
-Brush *Canvas::getCurrentBrush() {
+const Brush *Canvas::getCurrentBrush() const {
     return mCurrentBrush;
 }
 

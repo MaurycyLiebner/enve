@@ -11,6 +11,7 @@ class VideoBox : public AnimationBox {
 public:
     VideoBox(const QString &filePath);
     VideoBox();
+    ~VideoBox();
 
     void setParentGroup(BoxesGroup *parent);
     void setFilePath(const QString &path);

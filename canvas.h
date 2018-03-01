@@ -35,13 +35,12 @@ enum CanvasMode : short {
     MOVE_POINT,
     ADD_POINT,
     DRAW_PATH,
-    ADD_DRAW_PATH_NODE,
+    PICK_PAINT_SETTINGS,
     ADD_CIRCLE,
     ADD_RECTANGLE,
     ADD_TEXT,
     ADD_PARTICLE_BOX,
     ADD_PARTICLE_EMITTER,
-    PICK_PATH_SETTINGS,
     ADD_PAINT_BOX,
     PAINT_MODE,
     ADD_BONE
@@ -64,8 +63,7 @@ protected:
 };
 
 extern bool boxesZSort(BoundingBox *box1, BoundingBox *box2);
-class Canvas : public BoxesGroup
-{
+class Canvas : public BoxesGroup {
     Q_OBJECT
 public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
@@ -350,7 +348,10 @@ public:
 
     bool clipToCanvas() { return mClipToCanvasSize; }
 
-    Brush *getCurrentBrush();
+    const Brush *getCurrentBrush() const;
+    void setCurrentBrush(const Brush *brush) {
+        mCurrentBrush = brush;
+    }
 protected:
 //    void updateAfterCombinedTransformationChanged() {
 ////        Q_FOREACH(BoundingBox *child, mChildBoxes) {
@@ -579,7 +580,7 @@ public:
 protected:
     UndoRedoStack *mUndoRedoStack = NULL;
 
-    Brush *mCurrentBrush;
+    const Brush *mCurrentBrush = NULL;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;

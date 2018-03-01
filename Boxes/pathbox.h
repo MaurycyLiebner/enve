@@ -128,6 +128,10 @@ public:
             StrokeSettings *strokeSettings);
     void duplicateFillSettingsFrom(
             PaintSettings *fillSettings);
+    void duplicateStrokeSettingsNotAnimatedFrom(
+            StrokeSettings *strokeSettings);
+    void duplicateFillSettingsNotAnimatedFrom(
+            PaintSettings *fillSettings);
 
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();

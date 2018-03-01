@@ -7,6 +7,7 @@
 class ColorSettingsWidget;
 class ColorSetting;
 class ScrollArea;
+class BrushSelectionScrollArea;
 
 class BrushSettingsWidget : public QWidget {
     Q_OBJECT
@@ -18,20 +19,30 @@ public:
     float getBrushSetting(const BrushSetting &settind_id);
     void incBrushRadius();
     void decBrushRadius();
-    void setCurrentBrush(Brush *brushT);
     void revertSettingToDefault(const BrushSetting &setting_t);
     bool hasSettingDefaultVal(const BrushSetting &setting_t);
     Brush *getCurrentBrush();
-signals:
+    void createNewBrush();
 
+    void saveBrushesForProject(QIODevice *target);
+    void readBrushesForProject(QIODevice *target);
+
+    void setCurrentQColor(const QColor &color);
+    QColor getCurrentQColor();
+signals:
+    void brushSelected(const Brush*);
+    void brushReplaced(const Brush*, const Brush*); // second one is new
 public slots:
+    void setCurrentBrush(const Brush *brush);
+
     void setBrushSetting(const BrushSetting &setting_id,
                          const qreal &val_t);
     void showHideAdvancedSettings();
-    void openBrushSaveDialog();
-    void overwriteBrushSettings();
+    void saveBrush();
     void setColorSetting(const ColorSetting &colorSetting);
+
 private:
+    BrushSelectionScrollArea *mBrushSelection = NULL;
     ScrollArea *mAdvancedArea;
     QWidget *mAdvancedWidget;
     ColorSettingsWidget *mColorSettingsWidget;
@@ -43,7 +54,7 @@ private:
     bool advanced_settings_visible = false;
     Brush *mCurrentBrush = NULL;
     QList<BrushSettingWidget*> setting_widgets;
-    QVBoxLayout *main_layout = NULL;
+    QVBoxLayout *mMainLayout = NULL;
     QHBoxLayout *h_layout = NULL;
     QVBoxLayout *labels_layout = NULL;
     QVBoxLayout *rest_layout = NULL;

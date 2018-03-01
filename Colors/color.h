@@ -2,13 +2,15 @@
 #define COLOR_H
 #include <QColor>
 #include "skiaincludes.h"
-
-class Color
-{
+class QIODevice;
+class Color {
 public:
     Color();
     Color(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a_t = 1.0f);
     Color(int r_t, int g_t, int b_t, int a_t = 255);
+
+    void readColor(QIODevice *read);
+    void writeColor(QIODevice *write);
 
     GLfloat gl_r = 1.0f;
     GLfloat gl_g = 1.0f;

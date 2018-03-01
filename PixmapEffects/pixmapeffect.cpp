@@ -816,7 +816,7 @@ void SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(int *firstT,
     }
     if(boxLast == INT_MAX) {
         if(boxFirst != INT_MIN) {
-            if(boxFirst + margin > relFrame) {
+            if(boxFirst > relFrame) {
                 boxLast = relFrame;
             }
         }

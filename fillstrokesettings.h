@@ -71,9 +71,6 @@ private slots:
     void finishTransform();
     void startTransform(const char *slot);
 
-    void startLoadingFillFromPath();
-    void startLoadingStrokeFromPath();
-    void startLoadingSettingsFromPath();
     void setGradientFill();
     void setFlatFill();
     void setNoneFill();
@@ -182,10 +179,6 @@ private:
     QPushButton *mRadialGradientButton;
     QWidget *mGradientTypeWidget;
 
-    QHBoxLayout *mPickersLayout = new QHBoxLayout();
-    ActionButton *mFillPickerButton;
-    ActionButton *mStrokePickerButton;
-    ActionButton *mFillStrokePickerButton;
     void setTransformFinishEmitter(const char *slot);
 };
 

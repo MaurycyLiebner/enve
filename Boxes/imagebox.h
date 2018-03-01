@@ -39,7 +39,8 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
 private:
     void drawSk(SkCanvas *canvas) {
         SkPaint paint;
-        //paint.setFilterQuality(kHigh_SkFilterQuality);
+        paint.setFilterQuality(kHigh_SkFilterQuality);
+        paint.setAntiAlias(true);
         if(image == NULL) {
             qDebug() << "no image to draw";
         }

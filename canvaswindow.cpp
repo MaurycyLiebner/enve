@@ -179,7 +179,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
         setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mode == MOVE_POINT) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-node.xpm"), 0, 0) );
-    } else if(mode == PICK_PATH_SETTINGS) {
+    } else if(mode == PICK_PAINT_SETTINGS) {
         setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
     } else if(mode == DRAW_PATH) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
@@ -221,12 +221,12 @@ void CanvasWindow::setDrawPathMode() {
     setCanvasMode(DRAW_PATH);
 }
 
-void CanvasWindow::setAddDrawPathNodeMode() {
-    setCanvasMode(ADD_DRAW_PATH_NODE);
-}
-
 void CanvasWindow::setRectangleMode() {
     setCanvasMode(ADD_RECTANGLE);
+}
+
+void CanvasWindow::setPickPaintSettingsMode() {
+    setCanvasMode(PICK_PAINT_SETTINGS);
 }
 
 void CanvasWindow::setCircleMode() {
@@ -356,7 +356,7 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_F4) {
         setCanvasMode(CanvasMode::DRAW_PATH);
     } else if(event->key() == Qt::Key_F5) {
-        setCanvasMode(CanvasMode::ADD_DRAW_PATH_NODE);
+        setCanvasMode(CanvasMode::PICK_PAINT_SETTINGS);
     } else if(event->key() == Qt::Key_F6) {
         setCanvasMode(CanvasMode::ADD_CIRCLE);
     } else if(event->key() == Qt::Key_F7) {
@@ -439,6 +439,20 @@ void CanvasWindow::flipVerticalAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->flipSelectedBoxesVertically();
     callUpdateSchedulers();
+}
+
+void CanvasWindow::setCurrentBrush(const Brush *brush) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setCurrentBrush(brush);
+}
+
+void CanvasWindow::replaceBrush(const Brush *oldBrush,
+                                const Brush *newBrush) {
+    foreach(const CanvasQSPtr &canvas, mCanvasList) {
+        if(canvas->getCurrentBrush() == oldBrush) {
+            canvas->setCurrentBrush(newBrush);
+        }
+    }
 }
 
 void CanvasWindow::pathsUnionAction() {
@@ -651,13 +665,6 @@ void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
 void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->prp_setAbsFrame(currentFrame);
-}
-
-void CanvasWindow::pickPathForSettings(const bool &pickFill,
-                                       const bool &pickStroke) {
-    if(hasNoCanvas()) return;
-    setCanvasMode(PICK_PATH_SETTINGS);
-    mCurrentCanvas->setPickingFromPath(pickFill, pickStroke);
 }
 
 void CanvasWindow::updateDisplayedFillStrokeSettings() {
@@ -1088,7 +1095,7 @@ void CanvasWindow::initializeAudio() {
             this, SLOT(pushTimerExpired()));
 
     mAudioDevice = QAudioDeviceInfo::defaultOutputDevice();
-    mAudioFormat.setSampleRate(SAMPLERATE);
+    mAudioFormat.setSampleRate(SOUND_SAMPLERATE);
     mAudioFormat.setChannelCount(1);
     mAudioFormat.setSampleSize(32);
     mAudioFormat.setCodec("audio/pcm");

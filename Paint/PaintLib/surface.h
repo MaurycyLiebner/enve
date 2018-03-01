@@ -53,12 +53,12 @@ public:
             const qreal &scale,
             const bool &paintInOtherThread);
     ~Surface();
-    void strokeTo(Brush *brush,
+    void strokeTo(const Brush *brush,
                   qreal x, qreal y,
                   const qreal &pressure,
                   const ushort &dt,
                   const bool &erase);
-    void startNewStroke(Brush *brush,
+    void startNewStroke(const Brush *brush,
                         qreal x, qreal y,
                         const qreal &pressure);
     void getColor(const qreal &cx,
@@ -88,31 +88,31 @@ public:
                     const qreal &yT,
                     const ulong &timestamp,
                     const qreal &pressure,
-                    Brush *brush);
+                    const Brush *brush);
     void tabletMoveEvent(const qreal &xT,
                      const qreal &yT,
                      const ulong &time_stamp,
                      const qreal &pressure,
                      const bool &erase,
-                     Brush *brush);
+                     const Brush *brush);
     void tabletReleaseEvent();
     virtual void tabletPressEvent(const qreal &xT,
                           const qreal &yT,
                           const ulong &time_stamp,
                           const qreal &pressure,
                           const bool &erase,
-                          Brush *brush);
+                          const Brush *brush);
     void mouseReleaseEvent();
     void mousePressEvent(const qreal &xT,
                          const qreal &yT,
                          const ulong &timestamp,
                          const qreal &pressure,
-                         Brush *brush);
+                         const Brush *brush);
     void mouseMoveEvent(const qreal &xT,
                         const qreal &yT,
                         const ulong &time_stamp,
                         const bool &erase,
-                        Brush *brush);
+                        const Brush *brush);
     void writeSurface(QIODevice *target);
     void readSurface(QIODevice *target);
 
@@ -124,7 +124,22 @@ public:
     virtual void move(const int &xT, const int &yT);
 
     virtual void loadFromImage(const QImage &img);
+    void setPickedUpRGBA(qreal red_t,
+                         qreal green_t,
+                         qreal blue_t,
+                         qreal alpha_t);
+    void getPickedUpRGBA(qreal *red_t,
+                         qreal *green_t,
+                         qreal *blue_t,
+                         qreal *alpha_t) const;
 protected:
+    bool mIsTemporary = false;
+    void addPickedUpRGBAFromNewStroke(qreal red_t,
+                                      qreal green_t,
+                                      qreal blue_t,
+                                      qreal alpha_t, const Brush *brush);
+    void resetPickedUpRGBA(const Brush *brush);
+
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;
     Color mBackgroundColor = Color(1.f, 1.f, 1.f);
@@ -177,6 +192,12 @@ protected:
     ushort mHeight = 0;
     ushort mNTileCols = 0;
     ushort mNTileRows = 0;
+
+    qreal picked_up_red = 0.;
+    qreal picked_up_green = 0.;
+    qreal picked_up_blue = 0.;
+    qreal picked_up_alpha = 0.;
+
     std::shared_ptr<TilesData> mCurrentTiles;
     void getTileIdsOnRect(const qreal &x_min,
                           const qreal &x_max,

@@ -196,7 +196,7 @@ void VideoCacheHandler::updateFrameCount() {
     }
 
     // Find the index of the first audio stream
-    for (uint i = 0; i < format->nb_streams; i++) {
+    for(uint i = 0; i < format->nb_streams; i++) {
         AVStream *streamT = format->streams[i];
         const AVMediaType &mediaType = streamT->codecpar->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
@@ -541,4 +541,166 @@ bool isImageExt(const QString &extension) {
 
 bool isAvExt(const QString &extension) {
     return extension == "av";
+}
+extern "C" {
+    #include <libavutil/opt.h>
+    #include <libavcodec/avcodec.h>
+    #include <libavformat/avformat.h>
+    #include <libswresample/swresample.h>
+    #include <libswscale/swscale.h>
+}
+#include "Sound/soundcomposition.h"
+int SoundCacheHandler::decodeSoundDataRange(SoundDataRange &range) {
+    float **audioData = &range.data;
+    QByteArray pathBytes = mUpdateFilePath.toLatin1();
+    const char* path = pathBytes.data();
+    // get format from audio file
+    AVFormatContext* format = avformat_alloc_context();
+    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+        fprintf(stderr, "Could not open file '%s'\n", path);
+        return -1;
+    }
+    if (avformat_find_stream_info(format, NULL) < 0) {
+        fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
+        return -1;
+    }
+
+    // Find the index of the first audio stream
+    int audioStreamIndex = -1;
+    for (uint i = 0; i< format->nb_streams; i++) {
+        AVStream *streamT = format->streams[i];
+        const AVMediaType &mediaType = streamT->codecpar->codec_type;
+        if(mediaType == AVMEDIA_TYPE_AUDIO) {
+            audioStreamIndex = i;
+            break;
+        }
+    }
+    if (audioStreamIndex == -1) {
+        fprintf(stderr,
+                "Could not retrieve audio stream from file '%s'\n", path);
+        return -1;
+    }
+    AVCodecContext *audioCodec = NULL;
+    struct SwrContext *swr = NULL;
+
+    AVStream* audioStream = format->streams[audioStreamIndex];
+    // find & open codec
+    audioCodec = audioStream->codec;
+    if (avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), NULL) < 0) {
+        fprintf(stderr, "Failed to open decoder for stream #%u in file '%s'\n",
+                audioStreamIndex, path);
+        return -1;
+    }
+
+    // prepare resampler
+    swr = swr_alloc();
+    av_opt_set_int(swr, "in_channel_count",  audioCodec->channels, 0);
+    av_opt_set_int(swr, "out_channel_count", 1, 0);
+    av_opt_set_int(swr, "in_channel_layout",  audioCodec->channel_layout, 0);
+    av_opt_set_int(swr, "out_channel_layout", AV_CH_LAYOUT_MONO, 0);
+    av_opt_set_int(swr, "in_sample_rate", audioCodec->sample_rate, 0);
+    av_opt_set_int(swr, "out_sample_rate", SOUND_SAMPLERATE, 0);
+    av_opt_set_sample_fmt(swr, "in_sample_fmt",  audioCodec->sample_fmt, 0);
+    av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLT,  0);
+    swr_init(swr);
+    if (!swr_is_initialized(swr)) {
+        fprintf(stderr, "Resampler has not been properly initialized\n");
+        return -1;
+    }
+
+    // prepare to read data
+    AVPacket packet;
+    av_init_packet(&packet);
+    AVFrame* audioFrame = av_frame_alloc();
+    if (!audioFrame) {
+        fprintf(stderr, "Error allocating the frame\n");
+        return -1;
+    }
+
+    // iterate through frames
+    *audioData = NULL;
+    int nSamples = 0;
+    int maxFrameTsms = qRound(range.maxRelFrame * 1000 / mUpdateFps);
+    int minFrameTsms = qRound(range.minRelFrame * 1000 / mUpdateFps);
+
+    int64_t seekFrame = av_rescale(minFrameTsms,
+                                   audioStream->time_base.den,
+                                   audioStream->time_base.num)/1000;
+
+    if(range.minRelFrame != 0) {
+        if(avformat_seek_file(format, audioStreamIndex, 0,
+                              seekFrame, seekFrame,
+                AVSEEK_FLAG_FRAME) < 0) {
+            fprintf(stderr, "Error seeking the audio frame\n");
+            return -1;// 0;
+        }
+    }
+    bool firstFrame = true;
+    while(av_read_frame(format, &packet) >= 0) {
+        if(packet.stream_index == audioStreamIndex) {
+            // decode one frame
+            int gotFrame;
+            if(avcodec_decode_audio4(audioCodec, audioFrame, &gotFrame, &packet) < 0) {
+                break;
+            }
+            if(!gotFrame) {
+                continue;
+            }
+            // resample frames
+            float *buffer;
+            av_samples_alloc((uint8_t**) &buffer, NULL, 1,
+                             audioFrame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
+            int nSamplesT = swr_convert(swr,
+                                          (uint8_t**) &buffer,
+                                          audioFrame->nb_samples,
+                                          (const uint8_t**) audioFrame->data,
+                                          audioFrame->nb_samples);
+            // append resampled frames to data
+            *audioData = (float*) realloc(*audioData,
+                                     (nSamples + audioFrame->nb_samples) * sizeof(float));
+            memcpy(*audioData + nSamples, buffer, nSamplesT * sizeof(float));
+
+            av_freep(&((uint8_t**) &buffer)[0]);
+            nSamples += nSamplesT;
+
+            if(firstFrame) {
+                firstFrame = false;
+                int64_t pts = av_frame_get_best_effort_timestamp(audioFrame);
+                pts = av_rescale_q(pts, audioStream->time_base, AV_TIME_BASE_Q);
+                range.minSample = pts*SOUND_SAMPLERATE/1000000;
+            }
+            int64_t pts = av_frame_get_best_effort_timestamp(audioFrame);
+            pts = av_rescale_q(pts, audioStream->time_base, AV_TIME_BASE_Q);
+            if(pts/1000 > maxFrameTsms) {
+                range.maxSample = range.minSample + nSamples;
+                range.updateSampleCount();
+                break;
+            }
+        }
+
+        av_free_packet(&packet);
+    }
+
+    // clean up
+    av_frame_free(&audioFrame);
+    if(swr != NULL) {
+        swr_free(&swr);
+    }
+    if(audioCodec != NULL) {
+        avcodec_close(audioCodec);
+    }
+    avformat_free_context(format);
+
+    // success
+    return 0;
+}
+
+void SoundCacheHandler::_processUpdate() {
+    for(int i = 0; i < mSoundBeingLoaded.count(); i++) {
+        SoundDataRange range = mSoundBeingLoaded.at(i);
+
+        decodeSoundDataRange(range);
+
+        mSoundBeingLoaded.replace(i, range);
+    }
 }

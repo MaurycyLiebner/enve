@@ -496,6 +496,8 @@ TileSkDrawer::~TileSkDrawer() {
 }
 
 void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
+    //paint->setAntiAlias(true);
+    //paint->setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(tileImg, posX, posY, paint);
 }
 

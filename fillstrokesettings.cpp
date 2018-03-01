@@ -151,26 +151,6 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
             SIGNAL(colorSettingSignal(ColorSetting)),
             this, SLOT(colorSettingReceived(ColorSetting)));
 
-    mFillPickerButton = new ActionButton(
-                ":/icons/fill_dropper.png", "", this);
-    mStrokePickerButton = new ActionButton(
-                ":/icons/stroke_dropper.png", "", this);
-    mFillStrokePickerButton = new ActionButton(
-                ":/icons/fill_stroke_dropper.png", "", this);
-
-    mPickersLayout->addWidget(mFillPickerButton);
-
-    connect(mFillPickerButton, SIGNAL(pressed()),
-            this, SLOT(startLoadingFillFromPath()) );
-
-    mPickersLayout->setAlignment(Qt::AlignLeft);
-    mPickersLayout->addWidget(mStrokePickerButton);
-    connect(mStrokePickerButton, SIGNAL(pressed()),
-            this, SLOT(startLoadingStrokeFromPath()) );
-    mPickersLayout->addWidget(mFillStrokePickerButton);
-    connect(mFillStrokePickerButton, SIGNAL(pressed()),
-            this, SLOT(startLoadingSettingsFromPath()) );
-
     connect(mColorsSettingsWidget, SIGNAL(colorModeChanged(ColorMode)),
             this, SLOT(setCurrentColorMode(ColorMode)));
 
@@ -204,7 +184,6 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mMainLayout->addWidget(mStrokeSettingsWidget);
     mMainLayout->addWidget(mGradientWidget);
     mMainLayout->addWidget(mColorsSettingsWidget);
-    mMainLayout->addLayout(mPickersLayout);
     mMainLayout->addStretch(1);
 
     mGradientTypeWidget->hide();
@@ -574,18 +553,6 @@ void FillStrokeSettingsWidget::emitCapStyleChanged() {
 
 void FillStrokeSettingsWidget::emitJoinStyleChanged() {
     mCanvasWindow->strokeJoinStyleChanged(mCurrentJoinStyle);
-}
-
-void FillStrokeSettingsWidget::startLoadingFillFromPath() {
-    mCanvasWindow->pickPathForSettings(true, false);
-}
-
-void FillStrokeSettingsWidget::startLoadingStrokeFromPath() {
-    mCanvasWindow->pickPathForSettings(false, true);
-}
-
-void FillStrokeSettingsWidget::startLoadingSettingsFromPath() {
-    mCanvasWindow->pickPathForSettings(true, true);
 }
 
 void FillStrokeSettingsWidget::finishTransform()

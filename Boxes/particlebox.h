@@ -53,6 +53,8 @@ struct ParticleState {
             paintT.setAlpha(qRound(targetRenderData->opacity*2.55));
             sk_sp<SkImage> imageT = targetRenderData->renderedImage;
             if(imageT.get() == NULL) return;
+            //paintT.setAntiAlias(true);
+            //paintT.setFilterQuality(kHigh_SkFilterQuality);
             canvas->drawImage(imageT,
                               pos.x() - imageT->width()*0.5,
                               pos.y() - imageT->height()*0.5, &paintT);

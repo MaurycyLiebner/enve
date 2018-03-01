@@ -29,6 +29,7 @@ class ObjectSettingsWidget;
 class BoxScrollWidget;
 class ScrollWidget;
 class ScrollArea;
+class Brush;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -49,8 +50,7 @@ const QString MENU_STYLESHEET =
             color: black;\
         };";
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     MainWindow(QWidget *parent = 0);
@@ -136,6 +136,7 @@ public:
     }
     void addFileUpdateScheduler(_ScheduledExecutor *scheduler);
     void finishUndoRedoSet();
+    Brush *getCurrentBrush();
 public slots:
     void setCurrentFrame(int frame);
     //void playPreview();
@@ -195,7 +196,7 @@ private:
     ActionButton *mMovePointMode;
     ActionButton *mAddPointMode;
     ActionButton *mDrawPathMode;
-    ActionButton *mAddDrawPathNodeMode;
+    ActionButton *mPickPaintSettingsMode;
 
     ActionButton *mCircleMode;
 //

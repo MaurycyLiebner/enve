@@ -4,12 +4,11 @@
 #include <QString>
 #include <QList>
 
-enum BrushSetting
-{
+enum BrushSetting {
     BRUSH_SETTING_RADIUS,
     BRUSH_SETTING_OPACITY,
     BRUSH_SETTING_HARDNESS,
-    BRUSH_SETTING_ALPHA,
+
     BRUSH_SETTING_ASPECT_RATIO,
     BRUSH_SETTING_DISTANCE_BETWEEN_DABS,
     BRUSH_SETTING_INITIAL_ROTATION,
@@ -56,8 +55,9 @@ struct BrushSettingInfo
     qreal def;
     QString name;
 
-    BrushSettingInfo(BrushSetting setting_t, qreal min_t, qreal max_t, qreal def_t, QString name_t)
-    {
+    BrushSettingInfo(BrushSetting setting_t,
+                     qreal min_t, qreal max_t,
+                     qreal def_t, QString name_t) {
         setting = setting_t;
         min = min_t;
         max = max_t;
@@ -66,78 +66,114 @@ struct BrushSettingInfo
     }
 };
 
-class Brush
-{
+class Brush {
 public:
     Brush();
-    qreal *getSettingValuePointer(BrushSetting setting_t);
-    qreal getDistBetweenDabsPx();
-    void setHSV(qreal h_t, qreal s_t, qreal v_t);
-    void setSecondHSV(qreal h_t, qreal s_t, qreal v_t);
+
+    static qreal getRed() {
+        return red;
+    }
+
+    static qreal getGreen() {
+        return green;
+    }
+
+    static qreal getBlue() {
+        return blue;
+    }
+
+    static qreal getAlpha() {
+        return alpha;
+    }
+
+    static void setHSV(qreal h_t, qreal s_t, qreal v_t);
+    static void getRGBA(qreal *red_t,
+                 qreal *green_t,
+                 qreal *blue_t,
+                 qreal *alpha_t);
+    static void getHSV(qreal *h_t,
+                qreal *s_t,
+                qreal *v_t);
+
+    qreal *getSettingValuePointer(const BrushSetting &setting_t);
+    const qreal *getSettingValuePointerConst(const BrushSetting &setting_t) const;
+    qreal getDistBetweenDabsPx() const;
+
     void setSetting(BrushSetting setting_t, qreal val_t);
     void loadDefaultSettings();
-    qreal getSettingVal(BrushSetting setting_t);
+    void writeBrush(QIODevice *write);
+    void readBrush(QIODevice *read);
+    qreal getSettingVal(BrushSetting setting_t) const;
     static const BrushSettingInfo *getBrushSettingInfo(BrushSetting setting_t);
-    void getRGBA(qreal *red_t, qreal *green_t, qreal *blue_t, qreal *alpha_t);
-    void getHSV(qreal *h_t, qreal *s_t, qreal *v_t);
-    qreal getHardness();
-    qreal getOpacity();
-    qreal getRadius();
-    qreal getAspectRatio();
-    qreal getColorPickUp();
-    qreal getColorPickUpDecay();
-    qreal getInitialRotation();
-    qreal getRotationInfluence();
-    qreal getRotationDelay();
-    qreal getDabPositionNoisePx();
-    qreal getStrokePositionNoisePx();
-    qreal getStrokePositionNoiseFrequency();
 
-    qreal getRotationNoise();
-    qreal getRotationNoiseFrequency();
+    qreal getHardness() const;
+    qreal getOpacity() const;
+    qreal getRadius() const;
+    qreal getAspectRatio() const;
+    qreal getColorPickUp() const;
+    qreal getColorPickUpDecay() const;
+    qreal getInitialRotation() const;
+    qreal getRotationInfluence() const;
+    qreal getRotationDelay() const;
+    qreal getDabPositionNoisePx() const;
+    qreal getStrokePositionNoisePx() const;
+    qreal getStrokePositionNoiseFrequency() const;
 
-    qreal getHueNoise();
-    qreal getHueNoiseFrequency();
-    qreal getSaturationNoise();
-    qreal getSaturationNoiseFrequency();
-    qreal getValueNoise();
-    qreal getValueNoiseFrequency();
+    qreal getRotationNoise() const;
+    qreal getRotationNoiseFrequency() const;
 
-    qreal getRotationBetweenDabs();
+    qreal getHueNoise() const;
+    qreal getHueNoiseFrequency() const;
+    qreal getSaturationNoise() const;
+    qreal getSaturationNoiseFrequency() const;
+    qreal getValueNoise() const;
+    qreal getValueNoiseFrequency() const;
 
-    qreal getPressureRadiusGainPx();
-    qreal getPressureOpacityGain();
-    qreal getPressureHardnessGain();
-    qreal getPressureAlphaGain();
-    qreal getPressureAspectRatioGain();
+    qreal getRotationBetweenDabs() const;
 
-    qreal getSpeedRadiusGain();
-    qreal getSpeedOpacityGain();
-    qreal getSpeedHardnessGain();
+    qreal getPressureRadiusGainPx() const;
+    qreal getPressureOpacityGain() const;
+    qreal getPressureHardnessGain() const;
+    qreal getPressureAlphaGain() const;
+    qreal getPressureAspectRatioGain() const;
 
-    void getPickedUpRGBA(qreal *red_t, qreal *green_t, qreal *blue_t, qreal *alpha_t);
-    void resetPickedUpRGBA();
-    void addPickedUpRGBAFromNewStroke(qreal red_t, qreal green_t, qreal blue_t, qreal alpha_t);
+    qreal getSpeedRadiusGain() const;
+    qreal getSpeedOpacityGain() const;
+    qreal getSpeedHardnessGain() const;
+
     void setSettingFromString(QString setting_line_t);
     static BrushSettingInfo brush_settings_info[];
-    QString getSettingAsFileLine(BrushSetting setting_t);
+    QString getSettingAsFileLine(BrushSetting setting_t) const;
 
     void setBrushName(QString brush_name_t);
     void setCollectionName(QString collection_name_t);
     void setBrushFilePath(QString path_t);
 
-    QString getBrushName();
-    QString getCollectionName();
-    QString getBrushFilePath();
+    QString getBrushName() const;
+    QString getCollectionName() const;
+    QString getBrushFilePath() const;
 
-    qreal getDistBetweenDabs();
-    qreal getPressureRadiusGain();
+    qreal getDistBetweenDabs() const;
+    qreal getPressureRadiusGain() const;
 
     void setStrokeBrushFilePath(QString path_t);
-    QString getStrokeBrushFilePath();
+    QString getStrokeBrushFilePath() const;
     void setChangedSinceLastStroke(bool b_t);
-    bool wasChangedSinceLastStroke();
+    bool wasChangedSinceLastStroke() const;
+
+    qreal getInitialAlpha() const {
+        return initial_alpha;
+    }
+
+    void setProjectOnly(const bool &bT) {
+        mIsProjectOnly = bT;
+    }
+
+    const bool &isProjectOnly() const {
+        return mIsProjectOnly;
+    }
 private:
+    bool mIsProjectOnly = true;
     bool changed_since_last_stroke = true;
 
     QString stroke_brush_file_path;
@@ -147,16 +183,15 @@ private:
     QString brush_name;
     QString collection_name;
 
-    qreal h;
-    qreal s;
-    qreal v;
+    static qreal h;
+    static qreal s;
+    static qreal v;
 
-    qreal red;
-    qreal green;
-    qreal blue;
-
+    static qreal red;
+    static qreal green;
+    static qreal blue;
+    static qreal alpha;
     // alpha (weight) of brush color throughout painting
-    qreal alpha;
     qreal initial_alpha;
     qreal hardness;
     qreal opacity;
@@ -171,10 +206,6 @@ private:
     qreal color_pick_up;
     // how much smudge(picked up) color decays with every stroke
     qreal color_decay;
-    qreal picked_up_red;
-    qreal picked_up_green;
-    qreal picked_up_blue;
-    qreal picked_up_alpha;
 
     qreal dab_position_noise;
     qreal stroke_position_noise;

@@ -202,6 +202,7 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
 
 void BoundingBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
     if(mTransformAnimator->getOpacity() < 0.001) { return; }
+    //paint->setFilterQuality(kHigh_SkFilterQuality);
     mDrawRenderContainer.drawSk(canvas, paint);
 }
 
@@ -1339,6 +1340,8 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     SkPaint paint;
     paint.setAlpha(qRound(opacity*2.55));
     paint.setBlendMode(blendMode);
+    //paint.setAntiAlias(true);
+    //paint.setFilterQuality(kHigh_SkFilterQuality);
     if(blendMode == SkBlendMode::kDstIn ||
        blendMode == SkBlendMode::kSrcIn ||
        blendMode == SkBlendMode::kDstATop) {

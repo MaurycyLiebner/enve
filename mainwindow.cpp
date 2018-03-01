@@ -120,6 +120,13 @@ MainWindow::MainWindow(QWidget *parent)
     mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
 
     mBrushSettingsWidget = new BrushSettingsWidget(this);
+    connect(mBrushSettingsWidget, SIGNAL(brushSelected(const Brush*)),
+            mCanvasWindow, SLOT(setCurrentBrush(const Brush*)));
+    connect(mBrushSettingsWidget,
+            SIGNAL(brushReplaced(const Brush*,const Brush*)),
+            mCanvasWindow,
+            SLOT(replaceBrush(const Brush*,const Brush*)));
+
     mBrushSettingsDock->setWidget(mBrushSettingsWidget);
 
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
@@ -457,7 +464,7 @@ void MainWindow::addCanvasToRenderQue() {
 void MainWindow::updateSettingsForCurrentCanvas() {
     if(mCanvasWindow->hasNoCanvas()) {
         mObjectSettingsWidget->setMainTarget(NULL);
-        mBrushSettingsWidget->setCurrentBrush(NULL);
+        //mBrushSettingsWidget->setCurrentBrush(NULL);
         mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(NULL);
         return;
     }
@@ -523,11 +530,11 @@ void MainWindow::setupToolBar() {
 
     mToolBar->addSeparator();
 
-    mAddDrawPathNodeMode = new ActionButton(
-                ":/icons/draw_pen.png",
+    mPickPaintSettingsMode = new ActionButton(
+                ":/icons/draw_dropper.png",
                 "F5", this);
-    mAddDrawPathNodeMode->setCheckable(":/icons/draw_pen_checked.png");
-    mToolBar->addWidget(mAddDrawPathNodeMode);
+    mPickPaintSettingsMode->setCheckable(":/icons/draw_dropper_checked.png");
+    mToolBar->addWidget(mPickPaintSettingsMode);
 
     mCircleMode = new ActionButton(
                 ":/icons/draw_arc.png",
@@ -668,8 +675,8 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, SLOT(setAddPointMode()) );
     connect(mDrawPathMode, SIGNAL(pressed()),
             mCanvasWindow, SLOT(setDrawPathMode()) );
-    connect(mAddDrawPathNodeMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setAddDrawPathNodeMode()) );
+    connect(mPickPaintSettingsMode, SIGNAL(pressed()),
+            mCanvasWindow, SLOT(setPickPaintSettingsMode()) );
     connect(mCircleMode, SIGNAL(pressed()),
             mCanvasWindow, SLOT(setCircleMode()) );
     connect(mRectangleMode, SIGNAL(pressed()),
@@ -729,7 +736,8 @@ void MainWindow::createNewCanvas() {
     CanvasSettingsDialog *dialog = new CanvasSettingsDialog(newCanvas.data(),
                                                             this);
 
-    if(dialog->exec() == QDialog::Accepted) {
+    int dialogRet = dialog->exec();
+    if(dialogRet == QDialog::Accepted) {
         dialog->applySettingsToCanvas(newCanvas.data());
 
         addCanvas(newCanvas.data());
@@ -776,7 +784,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
     mAddPointMode->setChecked(currentMode == ADD_POINT);
     mDrawPathMode->setChecked(currentMode == DRAW_PATH);
-    mAddDrawPathNodeMode->setChecked(currentMode == ADD_DRAW_PATH_NODE);
+    mPickPaintSettingsMode->setChecked(currentMode == PICK_PAINT_SETTINGS);
     mCircleMode->setChecked(currentMode == ADD_CIRCLE);
     mRectangleMode->setChecked(currentMode == ADD_RECTANGLE);
     mTextMode->setChecked(currentMode == ADD_TEXT);
@@ -952,6 +960,10 @@ void MainWindow::finishUndoRedoSet() {
     if(mCurrentUndoRedoStack == NULL) return;
     mCurrentUndoRedoStack->finishSet();
     mCurrentUndoRedoStack->startNewSet();
+}
+
+Brush *MainWindow::getCurrentBrush() {
+    return mBrushSettingsWidget->getCurrentBrush();
 }
 
 void MainWindow::callUpdateSchedulers() {

@@ -24,7 +24,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
                                     const qreal &fps) {
     if(mSounds.isEmpty()) return;
 
-    int nSamples = (endAbsFrame - startAbsFrame)*SAMPLERATE/fps;
+    int nSamples = (endAbsFrame - startAbsFrame)*SOUND_SAMPLERATE/fps;
     //float *data1 = NULL;
     float *data = new float[nSamples];
     for(int i = 0; i < nSamples; i++) {
@@ -49,18 +49,18 @@ void SoundComposition::generateData(const int &startAbsFrame,
         int sampleCountNeeded;
         int firstTargetSample;
         int samplesInSoundFrameRange =
-                        (endAbsFrame - soundStartFrame)*SAMPLERATE/fps;
+                        (endAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps;
 
         if(soundStartFrame >= startAbsFrame) {
             firstTargetSample =
-                        (soundStartFrame - startAbsFrame)*SAMPLERATE/fps;
+                        (soundStartFrame - startAbsFrame)*SOUND_SAMPLERATE/fps;
             firstSampleFromSound = 0;
             sampleCountNeeded = qMin(soundSampleCount,
                                      samplesInSoundFrameRange);
         } else {
             firstTargetSample = 0;
             firstSampleFromSound =
-                        (startAbsFrame - soundStartFrame)*SAMPLERATE/fps;
+                        (startAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps;
             sampleCountNeeded = qMin(soundSampleCount - firstSampleFromSound,
                                      samplesInSoundFrameRange);
         }

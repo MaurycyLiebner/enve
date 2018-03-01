@@ -285,11 +285,13 @@ void AnimatedSurface::move(const int &xT, const int &yT) {
 void AnimatedSurface::tabletPressEvent(const qreal &xT, const qreal &yT,
                                        const ulong &time_stamp,
                                        const qreal &pressure,
-                                       const bool &erase, Brush *brush) {
+                                       const bool &erase,
+                                       const Brush *brush) {
     if(prp_isRecording() && !prp_isKeyOnCurrentFrame()) {
         newEmptyPaintFrame();
     }
-    Surface::tabletPressEvent(xT, yT, time_stamp, pressure, erase, brush);
+    Surface::tabletPressEvent(xT, yT, time_stamp,
+                              pressure, erase, brush);
 }
 
 bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,

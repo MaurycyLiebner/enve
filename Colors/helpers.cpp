@@ -138,8 +138,7 @@ void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/)
 }
 
 // (from gimp_hsv_to_rgb)
-void hsv_to_rgb_float (float *h_, float *s_, float *v_)
-{
+void hsv_to_rgb_float (float *h_, float *s_, float *v_) {
   int    i;
   double f, w, q, t;
   float h, s, v;
@@ -218,8 +217,7 @@ void hsv_to_rgb_float (float *h_, float *s_, float *v_)
 }
 
 // (from gimp_rgb_to_hsl)
-void rgb_to_hsl_float (float *r_, float *g_, float *b_)
-{
+void rgb_to_hsl_float (float *r_, float *g_, float *b_) {
   double max, min, delta;
 
   float h, s, l;
@@ -790,38 +788,26 @@ void applyUNoise(qreal noise_t,
 #include <QFile>
 #include <QTextStream>
 #include "Paint/PaintLib/brush.h"
-void saveBrushDataAsFile(Brush *brush_t, QString file_path_t)
-{
+void saveBrushDataAsFile(Brush *brush_t, QString file_path_t) {
     QFile file(file_path_t);
-    file.open(QFile::WriteOnly | QFile::Text);
+    file.open(QFile::WriteOnly);
     file.resize(0);
-    QTextStream in(&file);
-    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++)
-    {
-        in << brush_t->getSettingAsFileLine(Brush::brush_settings_info[i].setting ) << endl;
-    }
-    in.flush();
+    brush_t->writeBrush(&file);
     file.close();
 }
 
-void saveBrushDataAsFile(Brush *brush_t, QString collection_name, QString brush_name)
-{
+void saveBrushDataAsFile(Brush *brush_t,
+                         QString collection_name,
+                         QString brush_name) {
     brush_name = brush_name.replace(" ", "_").toLower();
-    QFile file("brushes/" + collection_name + "/" + brush_name + ".plb");
-    file.open(QFile::WriteOnly | QFile::Text);
+    QFile file("brushes/" + collection_name + "/" + brush_name + ".avb");
+    file.open(QFile::WriteOnly);
     file.resize(0);
-    QTextStream in(&file);
-    in << "name:" + brush_name << endl;
-    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++)
-    {
-        in << brush_t->getSettingAsFileLine(Brush::brush_settings_info[i].setting ) << endl;
-    }
-    in.flush();
+    brush_t->writeBrush(&file);
     file.close();
 }
 
-ushort getFreeRamMB()
-{
+ushort getFreeRamMB() {
     struct sysinfo info_t;
     sysinfo(&info_t);
     return info_t.freeram*0.000001;

@@ -16,7 +16,7 @@
 #include <QSlider>
 #include <QTimer>
 class SingleSound;
-const int SAMPLERATE = 44100;
+const int SOUND_SAMPLERATE = 44100;
 
 class SoundComposition : public QIODevice
 {

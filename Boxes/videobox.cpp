@@ -18,6 +18,13 @@ VideoBox::VideoBox() :
     setName("Video");
 }
 
+VideoBox::~VideoBox() {
+    Canvas *parentCanvas = getParentCanvas();
+    if(parentCanvas != NULL && mSound != NULL) {
+        parentCanvas->getSoundComposition()->removeSound(mSound);
+    }
+}
+
 VideoBox::VideoBox(const QString &filePath) :
     VideoBox() {
     setFilePath(filePath);
