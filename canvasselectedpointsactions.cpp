@@ -342,19 +342,17 @@ void Canvas::removeSelectedPointsAndClearList() {
                     mLastPressedPoint->deselect();
                     mLastPressedPoint->removeFromVectorPath();
                     mSelectedPoints.removeOne(mLastPressedPoint);
-                    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-                        point->deselect();
-                    }
-                    goto DONE;
+                    schedulePivotUpdate();
+                    return;
                 }
             }
         }
     }
+
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         point->deselect();
         point->removeFromVectorPath();
     }
-DONE:
     mSelectedPoints.clear(); schedulePivotUpdate();
 }
 

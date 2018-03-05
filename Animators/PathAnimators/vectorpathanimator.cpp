@@ -550,8 +550,8 @@ void VectorPathAnimator::removeNodeSettingsAt(const int &id,
 
 void VectorPathAnimator::removeNodeAt(const int &nodeId,
                                       const bool &saveUndoRedo) {
-    if(nodeId <= 0 || nodeId >= mElementsPos.count()/3) return;
-
+    if(nodeId < 0 || nodeId >= mElementsPos.count()/3) return;
+    mNodesToRemove.append(nodeId);
     removeNodeSettingsAt(nodeId, saveUndoRedo);
     PathContainer::removeNodeAt(nodeId, saveUndoRedo);
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {

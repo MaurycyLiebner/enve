@@ -74,6 +74,18 @@ bool PaintBox::prp_prevRelFrameWithKey(const int &relFrame,
     return bbHasPrev;
 }
 
+const bool &PaintBox::isDraft() const {
+    return mMainHandler->isDraft();
+}
+
+void PaintBox::setIsDraft(const bool &bT) {
+    mMainHandler->setIsDraft(bT);
+}
+
+bool PaintBox::isSurfaceAnimated() {
+    return mMainHandler->prp_hasKeys();
+}
+
 void PaintBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
 

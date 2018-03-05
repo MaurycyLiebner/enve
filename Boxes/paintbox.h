@@ -125,6 +125,12 @@ public:
                                  int &nextRelFrame);
     bool prp_prevRelFrameWithKey(const int &relFrame,
                                  int &prevRelFrame);
+
+    const bool &isDraft() const;
+
+    void setIsDraft(const bool &bT);
+
+    bool isSurfaceAnimated();
 private:
     bool mFinishSizeAndPosSetupScheduled = false;
     bool mFinishSizeSetupScheduled = false;

@@ -1065,6 +1065,7 @@ void SurfaceKey::readKey(QIODevice *target) {
 }
 
 void AnimatedSurface::writeProperty(QIODevice *target) {
+    target->write((char*)&mIsDraft, sizeof(bool));
     target->write((char*)&mWidth, sizeof(ushort));
     target->write((char*)&mHeight, sizeof(ushort));
     int nKeys = anim_mKeys.count();
@@ -1087,6 +1088,7 @@ Key *AnimatedSurface::readKey(QIODevice *target) {
 }
 
 void AnimatedSurface::readProperty(QIODevice *target) {
+    target->read((char*)&mIsDraft, sizeof(bool));
     target->read((char*)&mWidth, sizeof(ushort));
     target->read((char*)&mHeight, sizeof(ushort));
     int nKeys;

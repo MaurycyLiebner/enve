@@ -15,6 +15,7 @@ enum BrushSetting {
     BRUSH_SETTING_ROTATION_INFLUENCE,
     BRUSH_SETTING_ROTATION_DELAY,
     BRUSH_SETTING_ROTATION_BETWEEN_DABS,
+    BRUSH_SETTING_CONTINUES_ALPHA,
     BRUSH_SETTING_INITIAL_ALPHA,
     BRUSH_SETTING_COLOR_PICK_UP,
     BRUSH_SETTING_COLOR_DECAY,
@@ -82,15 +83,14 @@ public:
         return blue;
     }
 
-    static qreal getAlpha() {
-        return alpha;
+    const qreal &getContinuesAlpha() const {
+        return continuesAlpha;
     }
 
     static void setHSV(qreal h_t, qreal s_t, qreal v_t);
-    static void getRGBA(qreal *red_t,
+    static void getRGB(qreal *red_t,
                  qreal *green_t,
-                 qreal *blue_t,
-                 qreal *alpha_t);
+                 qreal *blue_t);
     static void getHSV(qreal *h_t,
                 qreal *s_t,
                 qreal *v_t);
@@ -190,7 +190,7 @@ private:
     static qreal red;
     static qreal green;
     static qreal blue;
-    static qreal alpha;
+    qreal continuesAlpha;
     // alpha (weight) of brush color throughout painting
     qreal initial_alpha;
     qreal hardness;

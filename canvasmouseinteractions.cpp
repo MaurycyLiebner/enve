@@ -162,6 +162,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
 
     foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isPaintBox()) {
+            PaintBox *paintBox = (PaintBox*)box;
             menu->addSeparator();
             menu->addAction("New Paint Frame")->setObjectName(
                         "canvas_new_paint_frame");
@@ -169,6 +170,13 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                         "canvas_new_empty_paint_frame");
             menu->addAction("Setup Animation Frames")->setObjectName(
                         "canvas_setup_animation_frames");
+            menu->addSeparator();
+            if(paintBox->isAnimated()) {
+                QAction *draftAction = menu->addAction("Draft");
+                draftAction->setObjectName("canvas_draft");
+                draftAction->setCheckable(true);
+                draftAction->setChecked(paintBox->isDraft());
+            }
             menu->addSeparator();
             menu->addAction("Load From Image")->setObjectName(
                         "canvas_load_from_img");
@@ -267,6 +275,13 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
                 PaintBox *paintBox = (PaintBox*)box;
                 paintBox->setOverlapFrames(overlapFrames);
                 paintBox->setFrameStep(frameStep);
+            }
+        }
+    } else if(selectedAction->objectName() == "canvas_draft") {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->setIsDraft(selectedAction->isChecked());
             }
         }
     } else if(selectedAction->objectName() == "canvas_load_from_img") {
@@ -985,7 +1000,8 @@ void Canvas::handleMouseRelease() {
 
 void Canvas::tabletEvent(QTabletEvent *e,
                          const QPointF &absPos) {
-    if(mCurrentMode != PAINT_MODE) return;
+    if(mCurrentMode != PAINT_MODE ||
+            e->buttons() & Qt::MiddleButton) return;
     setLastMouseEventPosAbs(absPos);
     if(e->type() == QEvent::TabletPress) {
         if(e->button() == Qt::RightButton) {
@@ -1226,8 +1242,12 @@ void Canvas::updateTransformation() {
 void Canvas::mouseMoveEvent(QMouseEvent *event) {
     if(isPreviewingOrRendering()) return;
     setCurrentMouseEventPosAbs(event->pos());
+    if(event->buttons() & Qt::MiddleButton) {
+        moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
+        return;
+    }
     if(mCurrentMode == PAINT_MODE &&
-       event->buttons() & Qt::LeftButton)  {
+        event->buttons() & Qt::LeftButton)  {
         foreach(BoundingBox *box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = (PaintBox*)box;
@@ -1277,9 +1297,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
-    if(event->buttons() & Qt::MiddleButton) {
-        moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
-    } else if(event->buttons() & Qt::LeftButton ||
+    if(event->buttons() & Qt::LeftButton ||
                mIsMouseGrabbing) {
         if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
             if((mCurrentMode == CanvasMode::MOVE_POINT &&

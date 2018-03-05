@@ -995,6 +995,22 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         } else {
             shiftAllPoints(-1);
         }
+    } else if(event->key() == Qt::Key_Minus ||
+              event->key() == Qt::Key_Plus) {
+        if(isPreviewingOrRendering()) return false;
+        if(event->key() == Qt::Key_Plus) {
+            zoomCanvas(1.2, mCanvasWindow->mapFromGlobal(
+                           QCursor::pos()));
+        } else {
+            zoomCanvas(0.8, mCanvasWindow->mapFromGlobal(
+                           QCursor::pos()));
+        }
+        mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
+        mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
+
+        if(mHoveredEdge != NULL) {
+            mHoveredEdge->generatePainterPath();
+        }
     } else {
         return false;
     }

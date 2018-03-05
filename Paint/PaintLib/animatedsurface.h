@@ -85,13 +85,23 @@ public:
                           const qreal &pressure,
                           const bool &erase,
                           const Brush *brush);
+
+    const bool &isDraft() const {
+        return mIsDraft;
+    }
+
+    void setIsDraft(const bool &bT) {
+        mIsDraft = bT;
+        updateTargetTiles();
+        prp_updateInfluenceRangeAfterChanged();
+    }
 protected:
     PaintBox *mParentBox = NULL;
 
     QList<std::shared_ptr<TilesData>> mDrawTilesData;
     QList<int> mDrawTilesFrames;
     int mOverlapFrames = 2;
-    bool mIsDraft = true;
+    bool mIsDraft = false;
 };
 
 #endif // ANIMATEDSURFACE_H

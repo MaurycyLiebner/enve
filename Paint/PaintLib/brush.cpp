@@ -7,7 +7,6 @@ qreal Brush::v = 0.;
 qreal Brush::red = 0.;
 qreal Brush::green = 0.;
 qreal Brush::blue = 0.;
-qreal Brush::alpha = .5;
 
 BrushSettingInfo Brush::brush_settings_info[BRUSH_SETTINGS_COUNT] = {
         BrushSettingInfo(BRUSH_SETTING_RADIUS, 1.f, 100.f, 5.f, "radius"),
@@ -19,6 +18,7 @@ BrushSettingInfo Brush::brush_settings_info[BRUSH_SETTINGS_COUNT] = {
         BrushSettingInfo(BRUSH_SETTING_ROTATION_INFLUENCE, 0.f, 1.f, 0.f, "rotation influence"),
         BrushSettingInfo(BRUSH_SETTING_ROTATION_DELAY, 0.f, 1.f, 0.f, "rotation delay"),
         BrushSettingInfo(BRUSH_SETTING_ROTATION_BETWEEN_DABS, 0.f, 90.f, 0.f, "rotation between dabs"),
+        BrushSettingInfo(BRUSH_SETTING_CONTINUES_ALPHA, 0.f, 1.f, 0.5f, "continues alpha"),
         BrushSettingInfo(BRUSH_SETTING_INITIAL_ALPHA, 0.f, 10.f, 0.5f, "initial alpha"),
         BrushSettingInfo(BRUSH_SETTING_COLOR_PICK_UP, 0.f, 1.f, 0.5f, "color pick up"),
         BrushSettingInfo(BRUSH_SETTING_COLOR_DECAY, 0.f, 1.f, 0.5f, "color decay"),
@@ -76,6 +76,8 @@ const qreal *Brush::getSettingValuePointerConst(const BrushSetting &setting_t) c
         return &rotation_delay;
     } else if(setting_t == BRUSH_SETTING_ROTATION_BETWEEN_DABS) {
         return &rotation_between_dabs;
+    } else if(setting_t == BRUSH_SETTING_CONTINUES_ALPHA) {
+        return &continuesAlpha;
     } else if(setting_t == BRUSH_SETTING_INITIAL_ALPHA) {
         return &initial_alpha;
     } else if(setting_t == BRUSH_SETTING_COLOR_PICK_UP) {
@@ -190,14 +192,12 @@ const BrushSettingInfo *Brush::getBrushSettingInfo(BrushSetting setting_t) {
     return &brush_settings_info[setting_t];
 }
 
-void Brush::getRGBA(qreal *red_t,
-                    qreal *green_t,
-                    qreal *blue_t,
-                    qreal *alpha_t) {
+void Brush::getRGB(qreal *red_t,
+                   qreal *green_t,
+                   qreal *blue_t) {
     *red_t = red;
     *green_t = green;
     *blue_t = blue;
-    *alpha_t = alpha;
 }
 
 void Brush::getHSV(qreal *h_t,

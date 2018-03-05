@@ -296,6 +296,8 @@ public:
     }
     void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
 private:
+    QList<int> mNodesToRemove;
+
     void revertAllNodeSettings() {
         foreach(NodeSettings *settings, mNodeSettings) {
             bool endT = settings->endEnabled;

@@ -312,10 +312,10 @@ void Surface::strokeTo(const Brush *brush,
             isZero(brush->getSaturationNoise()) &&
             isZero(brush->getValueNoise());
 
-    brush->getRGBA(&stroke_red,
-                   &stroke_green,
-                   &stroke_blue,
-                   &dab_alpha);
+    Brush::getRGB(&stroke_red,
+                  &stroke_green,
+                  &stroke_blue);
+    dab_alpha = brush->getContinuesAlpha();
     dab_alpha += brush->getPressureAlphaGain()*pressure;
 
     qreal alpha_sum_t = dab_alpha + picked_up_alpha;
