@@ -33,7 +33,7 @@ public:
                  const ushort &height_t);
 
     Tile ***getTiles();
-    void writeTilesData(QIODevice *target);
+    bool writeTilesData(QIODevice *target);
     void readTilesData(QIODevice *target);
 
     void setCurrentlyUsed(const bool &used);
@@ -49,7 +49,7 @@ public:
     void afterLoadedFromTmpFile();
 
     void afterSavedToTmpFile();
-    void _writeTilesDataToTmp();
+    bool _writeTilesDataToTmp();
     void _readTilesDataFromTmp();
     void initializeEmptyTilesData();
     void writeTilesDataFromMemoryOrTmp(QIODevice *target);

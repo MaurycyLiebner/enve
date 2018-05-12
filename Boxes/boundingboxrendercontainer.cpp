@@ -282,7 +282,13 @@ void CacheContainerTmpFileDataSaver::_processUpdate() {
 }
 
 void CacheContainerTmpFileDataSaver::afterUpdate() {
-    mTargetCont->setDataSavedToTmpFile(mTmpFile);
+    if(mSavingFailed) {
+        if(!mTargetCont->freeAndRemove()) {
+
+        }
+    } else {
+        mTargetCont->setDataSavedToTmpFile(mTmpFile);
+    }
     _ScheduledExecutor::afterUpdate();
 }
 

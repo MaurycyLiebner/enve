@@ -543,8 +543,8 @@ void Canvas::renderCurrentFrameToOutput(const RenderInstanceSettings &renderDest
 //    m::addImageToEncoder();
     return;
     QString fileName = renderDest.getOutputDestination();
-    SkData *data = mCurrentPreviewContainer->getImageSk()->
-            encode(SkEncodedImageFormat::kPNG, 100);
+    sk_sp<SkData> data = mCurrentPreviewContainer->getImageSk()->
+            encodeToData(SkEncodedImageFormat::kPNG, 100);
     QFile file;
     fileName.remove(".png");
     fileName += QString::number(anim_mCurrentAbsFrame) + ".png";

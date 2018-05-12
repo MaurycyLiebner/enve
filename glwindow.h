@@ -29,12 +29,12 @@ protected:
     void bindSkia();
     void resizeEvent(QResizeEvent *);
 
-    const GrGLInterface *mInterface;
-    GrContext *mGrContext;
+    sk_sp<const GrGLInterface> mInterface;
+    sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
     SkCanvas *mCanvas;
 
-    GrGLFramebufferInfo m_fbInfo;
+    GrGLFramebufferInfo mFbInfo;
     QOpenGLContext *m_context = nullptr;
     //QOpenGLPaintDevice *m_device = nullptr;
 

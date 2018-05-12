@@ -8,7 +8,6 @@
 #ifndef SkStroke_DEFINED
 #define SkStroke_DEFINED
 
-#include "skiadefines.h"
 #include "SkPath.h"
 #include "SkPoint.h"
 #include "SkPaint.h"

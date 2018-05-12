@@ -378,7 +378,8 @@ HEADERS  += mainwindow.h \
     durationrectsettingsdialog.h \
     twocolumnlayout.h \
     Paint/BrushSettings/brushselectionwidget.h \
-    Paint/BrushSettings/brushselectionscrollarea.h
+    Paint/BrushSettings/brushselectionscrollarea.h \
+    AddInclude/SkPointPriv.h
 
 RESOURCES += \
     resources.qrc

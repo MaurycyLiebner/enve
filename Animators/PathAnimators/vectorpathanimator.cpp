@@ -161,6 +161,9 @@ void VectorPathAnimator::anim_saveCurrentValueAsKey() {
 SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
                                              const bool &considerCurrent,
                                              const bool &interpolate) {
+    if(mElementsUpdateNeeded) {
+        finalizeNodesRemove();
+    }
     //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
     SkPath pathToRuturn;
     int prevId;
@@ -185,6 +188,7 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
     if(mElementsUpdateNeeded) {
         if(relFrame == anim_mCurrentRelFrame) {
             mElementsUpdateNeeded = false;
+            finalizeNodesRemove();
             setElementsFromSkPath(pathToRuturn);
         }
     }
@@ -195,6 +199,9 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
 SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame,
                                               const bool &considerCurrent,
                                               const bool &interpolate) {
+    if(mElementsUpdateNeeded) {
+        finalizeNodesRemove();
+    }
     //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
     SkPath pathToRuturn;
     int prevId;
@@ -219,6 +226,7 @@ SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame,
     if(mElementsUpdateNeeded) {
         if(relFrame == anim_mCurrentRelFrame) {
             mElementsUpdateNeeded = false;
+            finalizeNodesRemove();
             setElementsFromSkPath(pathToRuturn);
         }
     }
@@ -464,6 +472,7 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
 void VectorPathAnimator::updateNodePointsFromElements() {
     if(mElementsUpdateNeeded) {
         mElementsUpdateNeeded = false;
+        finalizeNodesRemove();
         setElementsFromSkPath(getPath());
     }
     if(mFirstPoint != NULL) {
@@ -523,6 +532,19 @@ void VectorPathAnimator::updateNodePointsFromElements() {
     setFirstPoint(newFirstPt);
 }
 
+void VectorPathAnimator::finalizeNodesRemove() {
+    qSort(mNodesToRemove.begin(), mNodesToRemove.end());
+    for(int i = mNodesToRemove.count() - 1; i >= 0; i--) {
+        const int &nodeId = mNodesToRemove.at(i);
+        removeNodeSettingsAt(nodeId);
+        PathContainer::removeNodeAt(nodeId);
+        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+            ((PathKey*)key.get())->removeNodeAt(nodeId);
+        }
+    }
+    mNodesToRemove.clear();
+}
+
 void VectorPathAnimator::removeNodeAtAndApproximate(const int &nodeId) {
     if(nodeId <= 0 || nodeId >= mElementsPos.count()/3) return;
     removeNodeSettingsAt(nodeId, true);
@@ -548,15 +570,9 @@ void VectorPathAnimator::removeNodeSettingsAt(const int &id,
     }
 }
 
-void VectorPathAnimator::removeNodeAt(const int &nodeId,
-                                      const bool &saveUndoRedo) {
+void VectorPathAnimator::removeNodeAt(const int &nodeId) {
     if(nodeId < 0 || nodeId >= mElementsPos.count()/3) return;
     mNodesToRemove.append(nodeId);
-    removeNodeSettingsAt(nodeId, saveUndoRedo);
-    PathContainer::removeNodeAt(nodeId, saveUndoRedo);
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((PathKey*)key.get())->removeNodeAt(nodeId, saveUndoRedo);
-    }
     mElementsUpdateNeeded = true;
     prp_updateInfluenceRangeAfterChanged();
 }

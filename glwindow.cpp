@@ -28,8 +28,9 @@ void GLWindow::bindSkia() {
     GrBackendRenderTarget backendRT = GrBackendRenderTarget(
                                         width(), height(),
                                         kMsaaSampleCount, kStencilBits,
-                                        kRGBA_half_GrPixelConfig
-                                        /*kSkia8888_GrPixelConfig*/, m_fbInfo);
+                                        mFbInfo
+                                        /*kRGBA_half_GrPixelConfig*/
+                                        /*kSkia8888_GrPixelConfig*/);
 
     // setup SkSurface
     // To use distance field text, use commented out SkSurfaceProps instead
@@ -37,14 +38,14 @@ void GLWindow::bindSkia() {
     //                      SkSurfaceProps::kLegacyFontHost_InitType);
     SkSurfaceProps props(SkSurfaceProps::kLegacyFontHost_InitType);
 
-    //sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGBLinear();
+    sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGB();
     mSurface = SkSurface::MakeFromBackendRenderTarget(
-                                    mGrContext,
+                                    mGrContext.get(),
                                     backendRT,
                                     kBottomLeft_GrSurfaceOrigin,
-                                    nullptr,
-                                    //colorSpace,
-                                    &props);
+                                    SkColorType::kRGBA_8888_SkColorType,
+                                    nullptr/*colorSpace*/,
+                                    nullptr/*&props*/);
     mCanvas = mSurface->getCanvas();
 }
 
@@ -62,18 +63,20 @@ void GLWindow::initialize() {
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
     // setup GrContext
-    mInterface = GrGLCreateNativeInterface();
+    mInterface = GrGLMakeNativeInterface();
 
+    GrContextOptions options;
     // setup contexts
-    mGrContext = GrContext::Create(kOpenGL_GrBackend,
-                                   (GrBackendContext)mInterface);
+    mGrContext = GrContext::MakeGL(mInterface, options);
     SkASSERT(mGrContext);
 
     // Wrap the frame buffer object attached to the screen in
     // a Skia render target so Skia can render to it
     //GrGLint buffer;
     //GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
-    m_fbInfo.fFBOID = m_context->defaultFramebufferObject();//buffer;
+    mFbInfo.fFBOID = m_context->defaultFramebufferObject();//buffer;
+    mFbInfo.fFormat = GR_GL_RGBA8;//buffer;
+
     bindSkia();
 
 //    qDebug() << "OpenGL Info";

@@ -66,6 +66,7 @@ public:
     void afterUpdate();
     bool isFileUpdatable() { return true; }
 protected:
+    bool mSavingFailed = false;
     void addSchedulerNow();
     CacheContainer *mTargetCont = NULL;
     sk_sp<SkImage> mImage;

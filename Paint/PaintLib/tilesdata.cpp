@@ -349,10 +349,13 @@ void TilesData::afterSavedToTmpFile() {
 
 bool TilesData::cacheAndFree() {
     if(mNoDataInMemory) return false;
-    mNoDataInMemory = true;
     if(!mDataStoredInTmpFile) {
-        _writeTilesDataToTmp();
-        afterSavedToTmpFile();
+        if(_writeTilesDataToTmp()) {
+            mNoDataInMemory = true;
+            afterSavedToTmpFile();
+        } else {
+            return false;
+        }
 //        MainWindow::getInstance()->getCanvasWindow()->
 //                addUpdatableAwaitingUpdate(
 //                    new SaveTilesDataToTmpFileExec(this));
@@ -364,14 +367,17 @@ bool TilesData::freeAndRemove() {
     return false;
 }
 
-void TilesData::_writeTilesDataToTmp() {
+bool TilesData::_writeTilesDataToTmp() {
     if(mTmpFile != NULL) {
         delete mTmpFile;
     }
     mTmpFile = new QTemporaryFile();
     if(mTmpFile->open()) {
-        writeTilesData(mTmpFile);
+        bool writeSuccess = writeTilesData(mTmpFile);
         mTmpFile->close();
+        if(!writeSuccess) return false;
+    } else {
+        return false;
     }
 
     for(int i = 0; i < mNTileCols; i++) {
@@ -379,6 +385,7 @@ void TilesData::_writeTilesDataToTmp() {
             mTiles[j][i]->clearTileData();
         }
     }
+    return true;
 }
 
 void TilesData::_readTilesDataFromTmp() {

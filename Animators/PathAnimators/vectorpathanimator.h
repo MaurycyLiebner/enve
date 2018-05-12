@@ -121,9 +121,10 @@ public:
         return mParentPathAnimator;
     }
 
+    void finalizeNodesRemove();
+
     void removeNodeAtAndApproximate(const int &nodeId);
-    void removeNodeAt(const int &nodeId,
-                      const bool &saveUndoRedo = true);
+    void removeNodeAt(const int &nodeId);
 
     NodePoint *addNodeAbsPos(const QPointF &absPos,
                               NodePoint *targetPt);

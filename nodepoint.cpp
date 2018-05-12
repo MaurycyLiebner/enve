@@ -348,7 +348,11 @@ void NodePoint::drawSk(SkCanvas *canvas,
                           QString::number(mNodeId).size()*sizeof(char),
                           &bounds);
         paint.setColor(SK_ColorBLACK);
-        paint.setTypeface(SkTypeface::MakeDefault(SkTypeface::kBold));
+        SkFontStyle fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
+                                            SkFontStyle::kNormal_Width,
+                                            SkFontStyle::kUpright_Slant);
+        sk_sp<SkTypeface> typeFace = SkTypeface::MakeFromName(nullptr, fontStyle);
+        paint.setTypeface(typeFace);
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawString(QString::number(mNodeId).toStdString().c_str(),
                            absPos.x(),

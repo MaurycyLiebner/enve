@@ -12,7 +12,7 @@ KeyFocusTarget::~KeyFocusTarget() {
         KFT_mCurrentTarget = NULL;
     }
 }
-
+#include <QDebug>
 bool KeyFocusTarget::KFT_handleKeyEvent(QKeyEvent *e) {
     if(KFT_mCurrentTarget != NULL) {
         if(KFT_mCurrentTarget->KFT_handleKeyEventForTarget(e)) {

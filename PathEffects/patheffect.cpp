@@ -64,12 +64,12 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRandomize->ca_addChildAnimator(mRepeat.data());
     mRandomize->setValue(false);
 }
-
+#include "AddInclude/SkPointPriv.h"
 static void Perterb(SkPoint* p,
                     const SkVector& tangent,
                     SkScalar scale) {
     SkVector normal = tangent;
-    normal.rotateCCW();
+    SkPointPriv::RotateCCW(&normal);
     normal.setLength(scale);
     *p += normal;
 }

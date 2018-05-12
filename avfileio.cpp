@@ -996,8 +996,8 @@ void VideoBox::readBoundingBox(QIODevice *target) {
     setFilePath(path);
 }
 
-void Tile::writeTile(QIODevice *target) {
-    target->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+bool Tile::writeTile(QIODevice *target) {
+    return target->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar)) > 0;
 }
 
 void Tile::readTile(QIODevice *target) {
@@ -1005,12 +1005,14 @@ void Tile::readTile(QIODevice *target) {
     copyDataToDrawer();
 }
 
-void TilesData::writeTilesData(QIODevice *target) {
+bool TilesData::writeTilesData(QIODevice *target) {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->writeTile(target);
+            bool writeSuccess = mTiles[j][i]->writeTile(target);
+            if(!writeSuccess) return false;
         }
     }
+    return true;
 }
 
 void TilesData::writeTilesDataFromMemoryOrTmp(QIODevice *target) {
@@ -1167,6 +1169,9 @@ void TextBox::readBoundingBox(QIODevice *target) {
 
 void BoxesGroup::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
+    mPathEffectsAnimators->writeProperty(target);
+    mFillPathEffectsAnimators->writeProperty(target);
+    mOutlinePathEffectsAnimators->writeProperty(target);
     int nChildBoxes = mContainedBoxes.count();
     target->write((char*)&nChildBoxes, sizeof(int));
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
@@ -1216,6 +1221,9 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
 
 void BoxesGroup::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
+    mPathEffectsAnimators->readProperty(target);
+    mFillPathEffectsAnimators->readProperty(target);
+    mOutlinePathEffectsAnimators->readProperty(target);
     readChildBoxes(target);
 }
 

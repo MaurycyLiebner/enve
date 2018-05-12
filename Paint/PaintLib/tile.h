@@ -301,7 +301,7 @@ public:
 
     void saveToTmp();
     void clearTmp();
-    void writeTile(QIODevice *target);
+    bool writeTile(QIODevice *target);
     void readTile(QIODevice *target);
 
     void duplicateFrom(Tile *tile);
