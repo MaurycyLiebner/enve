@@ -7,7 +7,6 @@
 #include "Boxes/rendercachehandler.h"
 #include "skiaincludes.h"
 #include "valueinput.h"
-#include "drawpath.h"
 
 class TextBox;
 class Circle;
@@ -21,7 +20,7 @@ class Brush;
 class NodePoint;
 class UndoRedoStack;
 
-#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
+#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? nullptr : (list).at( (index) ))
 
 #define Q_FOREACHInverted(item, list) item = getAtIndexOrGiveNull((list).count() - 1, (list)); \
     for(int i = (list).count() - 1; i >= 0; i--, item = getAtIndexOrGiveNull(i, (list)) )
@@ -34,7 +33,6 @@ enum CanvasMode : short {
     MOVE_PATH,
     MOVE_POINT,
     ADD_POINT,
-    DRAW_PATH,
     PICK_PAINT_SETTINGS,
     ADD_CIRCLE,
     ADD_RECTANGLE,
@@ -532,21 +530,14 @@ public:
         ComplexAnimator::prp_setAbsFrame(frame);
         CacheContainer *cont =
                 mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
-        if(cont == NULL) {
-            mCurrentPreviewContainerOutdated = true;
-            bool isInVisRange = isRelFrameInVisibleDurationRect(
-                        anim_mCurrentRelFrame);
-            if(mUpdateDrawOnParentBox != isInVisRange) {
-                if(mUpdateDrawOnParentBox) {
-                    mParentGroup->scheduleUpdate();
-                } else {
-                    scheduleUpdate();
-                }
-                mUpdateDrawOnParentBox = isInVisRange;
-            }
-            if(prp_differencesBetweenRelFrames(lastRelFrame,
-                                               anim_mCurrentRelFrame)) {
+        if(cont == nullptr) {
+            bool difference = prp_differencesBetweenRelFrames(lastRelFrame,
+                                                              anim_mCurrentRelFrame);
+            mCurrentPreviewContainerOutdated = difference;
+            if(difference) {
                 scheduleUpdate();
+            } else {
+                setCurrentPreviewContainer(mCurrentPreviewContainer);
             }
         } else {
             if(cont->storesDataInMemory()) { // !!!
@@ -578,9 +569,9 @@ public:
     void blockUndoRedo();
     void unblockUndoRedo();
 protected:
-    UndoRedoStack *mUndoRedoStack = NULL;
+    UndoRedoStack *mUndoRedoStack = nullptr;
 
-    const Brush *mCurrentBrush = NULL;
+    const Brush *mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;
@@ -599,12 +590,12 @@ protected:
     void sortSelectedBoxesByZAscending();
 
     QMatrix mCanvasTransformMatrix;
-    SoundComposition *mSoundComposition = NULL;
+    SoundComposition *mSoundComposition = nullptr;
 
-    MovablePoint *mHoveredPoint = NULL;
-    BoundingBox *mHoveredBox = NULL;
-    VectorPathEdge *mHoveredEdge = NULL;
-    Bone *mHoveredBone = NULL;
+    MovablePoint *mHoveredPoint = nullptr;
+    BoundingBox *mHoveredBox = nullptr;
+    VectorPathEdge *mHoveredEdge = nullptr;
+    Bone *mHoveredBone = nullptr;
 
     QList<Bone*> mSelectedBones;
     QList<MovablePoint*> mSelectedPoints;
@@ -620,10 +611,10 @@ protected:
     CanvasWindow *mCanvasWindow;
     QWidget *mCanvasWidget;
 
-    Circle *mCurrentCircle = NULL;
-    Rectangle *mCurrentRectangle = NULL;
-    TextBox *mCurrentTextBox = NULL;
-    ParticleBox *mCurrentParticleBox = NULL;
+    Circle *mCurrentCircle = nullptr;
+    Rectangle *mCurrentRectangle = nullptr;
+    TextBox *mCurrentTextBox = nullptr;
+    ParticleBox *mCurrentParticleBox = nullptr;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
 
@@ -632,7 +623,7 @@ protected:
     bool mXOnlyTransform = false;
     bool mYOnlyTransform = false;
 
-    VectorPathEdge *mCurrentEdge = NULL;
+    VectorPathEdge *mCurrentEdge = nullptr;
 
     bool mPreviewing = false;
     bool mRenderingPreview = false;
@@ -683,10 +674,10 @@ protected:
 
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
-    MovablePoint *mLastPressedPoint = NULL;
-    NodePoint *mCurrentEndPoint = NULL;
-    BoundingBox *mLastPressedBox = NULL;
-    Bone *mLastPressedBone = NULL;
+    MovablePoint *mLastPressedPoint = nullptr;
+    NodePoint *mCurrentEndPoint = nullptr;
+    BoundingBox *mLastPressedBox = nullptr;
+    Bone *mLastPressedBone = nullptr;
     void setCtrlPointsEnabled(bool enabled);
     PathPivot *mRotPivot;
     void handleMovePointMouseMove();
@@ -696,12 +687,6 @@ protected:
     void handleMovePointMousePressEvent();
     void handleAddPointMouseRelease();
     void handleAddPointMousePress();
-
-    DrawPath mDrawPath;
-    void handleDrawPathMousePressEvent();
-    void handleAddDrawPathNodeMousePressEvent();
-    void handleDrawPathMouseMoveEvent();
-    void handleDrawPathMouseReleaseEvent();
 
     void updateTransformation();
     void handleMouseRelease();

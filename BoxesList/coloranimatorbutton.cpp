@@ -9,7 +9,7 @@ ColorAnimatorButton::ColorAnimatorButton(ColorAnimator *colorTarget,
                                          QWidget *parent) :
     BoxesListActionButton(parent) {
     mColorTarget = colorTarget;
-    if(colorTarget != NULL) {
+    if(colorTarget != nullptr) {
         connect(colorTarget->getVal1Animator(),
                 SIGNAL(valueChangedSignal(qreal)),
                 this, SLOT(update()));
@@ -23,7 +23,7 @@ ColorAnimatorButton::ColorAnimatorButton(ColorAnimator *colorTarget,
 }
 
 void ColorAnimatorButton::paintEvent(QPaintEvent *) {
-    if(mColorTarget == NULL) return;
+    if(mColorTarget == nullptr) return;
     QPainter p(this);
     if(mHover) {
         p.setPen(Qt::red);

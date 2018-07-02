@@ -70,10 +70,10 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mMainLayout->addWidget(mFillWidget);
     mFillWidget->setStyleSheet("background-color: rgba(0, 0, 0, 0)");
 
-    mValueSlider = new QrealAnimatorValueSlider(NULL, this);
+    mValueSlider = new QrealAnimatorValueSlider(nullptr, this);
     mMainLayout->addWidget(mValueSlider, Qt::AlignRight);
 
-    mSecondValueSlider = new QrealAnimatorValueSlider(NULL, this);
+    mSecondValueSlider = new QrealAnimatorValueSlider(nullptr, this);
     mMainLayout->addWidget(mSecondValueSlider, Qt::AlignRight);
 
     mColorButton = new BoxesListActionButton(this);
@@ -373,7 +373,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
 
         disconnect(mPropertyComboBox, 0, 0, 0);
-        if(mLastComboBoxProperty.data() != NULL) {
+        if(mLastComboBoxProperty.data() != nullptr) {
             disconnect(mLastComboBoxProperty.data(), 0, mPropertyComboBox, 0);
         }
         ComboBoxProperty *comboBoxProperty = (ComboBoxProperty*)target;
@@ -469,7 +469,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
             } else {
                 ComplexAnimator *ca_target = (ComplexAnimator*)target;
                 QrealAnimator *qatarget = ca_target->getQrealAnimatorIfIsTheOnlyOne();
-                if(qatarget == NULL) {
+                if(qatarget == nullptr) {
                     clearAndHideValueAnimators();
                 } else {
                     mValueSlider->setAnimator(qatarget);
@@ -572,7 +572,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 durRectAct->setChecked(boxTarget->hasDurationRectangle());
             }
             DurationRectangle *durRect = boxTarget->getDurationRectangle();
-            if(durRect != NULL) {
+            if(durRect != nullptr) {
                 menu.addAction("Visibility Range Settings...")->
                         setObjectName("swt_visibility_range_settings");
             }
@@ -584,7 +584,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     MainWindow::getInstance()->getClipboardContainer(
                                                 CCT_PROPERTY);
             menu.addAction("Copy")->setObjectName("swt_copy");
-            if(clipboard != NULL) {
+            if(clipboard != nullptr) {
                 if(target->SWT_isBoundingBox()) {
                     if(target->SWT_isBoxesGroup() &&
                         !target->SWT_isLinkBox()) {
@@ -592,7 +592,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                                 (BoxesClipboardContainer*)
                                 MainWindow::getInstance()->getClipboardContainer(
                                                             CCT_BOXES);
-                        if(clipboard != NULL) {
+                        if(clipboard != nullptr) {
                             menu.addAction("Paste Boxes")->
                                     setObjectName("swt_paste_boxes");
                         }
@@ -665,20 +665,20 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             }
         }
         QAction *selectedAction = menu.exec(event->globalPos());
-        if(selectedAction != NULL) {
+        if(selectedAction != nullptr) {
             if(selectedAction->objectName() == "swt_rename") {
                 rename();
             } else if(selectedAction->objectName() == "swt_visibility_range") {
                 BoundingBox *boxTarget = (BoundingBox*)target;
                 if(boxTarget->hasDurationRectangle()) {
-                    boxTarget->setDurationRectangle(NULL);
+                    boxTarget->setDurationRectangle(nullptr);
                 } else {
                     boxTarget->createDurationRectangle();
                 }
             } else if(selectedAction->objectName() == "swt_visibility_range_settings") {
                 BoundingBox *boxTarget = (BoundingBox*)target;
                 DurationRectangle *durRect = boxTarget->getDurationRectangle();
-                if(durRect != NULL) {
+                if(durRect != nullptr) {
                     durRect->openDurationSettingsDialog(this);
                 }
             } else if(selectedAction->objectName() == "swt_copy") {
@@ -792,7 +792,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 qrealTarget->setGenerator(randGen);
             } else if(selectedAction->objectName() == "swt_remove_random_generator") {
                 QrealAnimator *qrealTarget = (QrealAnimator*)target;
-                qrealTarget->setGenerator(NULL);
+                qrealTarget->setGenerator(nullptr);
             } else if(selectedAction->objectName() == "swt_delete_key") {
                 Animator *animTarget = (Animator*)target;
                 animTarget->anim_deleteCurrentKey();
@@ -823,7 +823,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 bool BoxSingleWidget::isTargetDisabled() {
-    if(mTarget == NULL) {
+    if(mTarget == nullptr) {
         return true;
     }
     return mTarget->getTarget()->SWT_isDisabled();
@@ -844,7 +844,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     connect(drag, SIGNAL(destroyed(QObject*)), this, SLOT(clearSelected()));
 
     QMimeData *mimeData = mTarget->getTarget()->SWT_createMimeData();
-    if(mimeData == NULL) return;
+    if(mimeData == nullptr) return;
     setSelected(true);
     drag->setMimeData(mimeData);
 
@@ -866,7 +866,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         KeysView *keysView =
                 ((BoxScrollWidgetVisiblePart*)mParent)->getKeysView();
-        if(keysView != NULL) {
+        if(keysView != nullptr) {
             if(qa_target->isCurrentAnimator(mParent)) {
                 keysView->graphRemoveViewedAnimator(qa_target);
             } else {
@@ -920,7 +920,7 @@ void BoxSingleWidget::drawKeys(QPainter *p, const qreal &pixelsPerFrame,
 Key *BoxSingleWidget::getKeyAtPos(const int &pressX,
                                   const qreal &pixelsPerFrame,
                                   const int &minViewedFrame) {
-    if(isHidden()) return NULL;
+    if(isHidden()) return nullptr;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         Animator *anim_target = (Animator*)target;
@@ -928,14 +928,14 @@ Key *BoxSingleWidget::getKeyAtPos(const int &pressX,
                                minViewedFrame,
                                pixelsPerFrame);
     }
-    return NULL;
+    return nullptr;
 }
 
 DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
                             const int &pressX,
                             const qreal &pixelsPerFrame,
                             const int &minViewedFrame) {
-    if(isHidden()) return NULL;
+    if(isHidden()) return nullptr;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         Animator *anim_target = (Animator*)target;
@@ -944,7 +944,7 @@ DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
                                     minViewedFrame,
                                     pixelsPerFrame);
     }
-    return NULL;
+    return nullptr;
 }
 
 void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
@@ -972,7 +972,7 @@ void drawPixmapCentered(QPainter *p,
 }
 
 int BoxSingleWidget::getOptimalNameRightX() {
-    if(mTarget == NULL) return 0;
+    if(mTarget == nullptr) return 0;
     SingleWidgetTarget *target = mTarget->getTarget();
     bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
     if(fakeComplexAnimator) {
@@ -1001,7 +1001,7 @@ int BoxSingleWidget::getOptimalNameRightX() {
 
 #include "keysview.h"
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
-    if(mTarget == NULL) return;
+    if(mTarget == nullptr) return;
     QPainter p(this);
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isDisabled()) {
@@ -1227,7 +1227,7 @@ void BoxSingleWidget::openColorSettingsDialog() {
 }
 
 void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
-    if(mTarget == NULL) return;
+    if(mTarget == nullptr) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(!target->SWT_isQPointFAnimator() ||
         mTarget->contentVisible()) return;
@@ -1248,7 +1248,7 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
 }
 
 void BoxSingleWidget::updateCompositionBoxVisible() {
-    if(mTarget == NULL) return;
+    if(mTarget == nullptr) return;
     if(mCompositionModeVisible) {
         if(width() > 20*MIN_WIDGET_HEIGHT) {
             mCompositionModeCombo->show();

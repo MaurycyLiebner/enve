@@ -248,8 +248,7 @@ void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
     mMainWindow->setResolutionFractionValue(text.toDouble()/100.);
 }
 
-void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
-                                        int id) {
+void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {
     if(mBoxesListKeysViewStack->isHidden()) {
         mBoxesListKeysViewStack->show();
         setMinimumHeight(10*MIN_WIDGET_HEIGHT);
@@ -263,7 +262,7 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
                                                 this,
                                                 mBoxesListKeysViewStack);
     } else {
-        newWidget = new BoxesListKeysViewWidget(NULL,
+        newWidget = new BoxesListKeysViewWidget(nullptr,
                                                 this,
                                                 mBoxesListKeysViewStack);
     }
@@ -317,7 +316,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
     } else if(event->key() == Qt::Key_Down &&
               !(event->modifiers() & Qt::ControlModifier)) {
         Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
-        if(currCanvas == NULL) return false;
+        if(currCanvas == nullptr) return false;
         int targetFrame;
         if(currCanvas->prp_prevRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
@@ -327,7 +326,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
     } else if(event->key() == Qt::Key_Up &&
               !(event->modifiers() & Qt::ControlModifier)) {
         Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
-        if(currCanvas == NULL) return false;
+        if(currCanvas == nullptr) return false;
         int targetFrame;
         if(currCanvas->prp_nextRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
@@ -442,8 +441,8 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                                         Canvas *canvas) {
-    if(canvas == NULL) {
-        mAnimationWidgetScrollbar->setCacheHandler(NULL);
+    if(canvas == nullptr) {
+        mAnimationWidgetScrollbar->setCacheHandler(nullptr);
     } else {
         disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
                    this, SLOT(setResolutionFractionText(QString)));

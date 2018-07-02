@@ -26,7 +26,7 @@ DurationRectangleMovable *DurationRectangleMovable::getMovableAt(
     if(thisDFrame == pressedDFrame) {
         return this;
     }
-    return NULL;
+    return nullptr;
 }
 
 void DurationRectangleMovable::changeFramePosBy(const int &change) {
@@ -49,14 +49,14 @@ bool DurationRectangleMovable::isHovered() {
 }
 
 void DurationRectangleMovable::pressed(const bool &shiftPressed) {
-    if(mChildProperty == NULL) return;
+    if(mChildProperty == nullptr) return;
     if(mChildProperty->SWT_isBoundingBox()) {
         ((BoundingBox*)mChildProperty)->selectionChangeTriggered(shiftPressed);
     }
 }
 
 bool DurationRectangleMovable::isSelected() {
-    if(mChildProperty != NULL) {
+    if(mChildProperty != nullptr) {
         if(mChildProperty->SWT_isBoundingBox()) {
             return ((BoundingBox*)mChildProperty)->isSelected();
         }
@@ -209,7 +209,7 @@ DurationRectangleMovable *DurationRectangle::getMovableAt(
     } else if(pressX > startX && pressX < endX) {
         return this;
     }
-    return NULL;
+    return nullptr;
 }
 
 void DurationRectangle::changeFramePosBy(const int &change) {
@@ -240,7 +240,7 @@ void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
     int oldMinFrame = getMinFrame();
     int oldMaxFrame = getMaxFrame();
 
-    DurationRectSettingsDialog *dialog = NULL;
+    DurationRectSettingsDialog *dialog = nullptr;
     dialog = new DurationRectSettingsDialog(mType,
                                             getMinFrame(),
                                             getMaxFrame(),
@@ -250,7 +250,7 @@ void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
         setMaxFrame(dialog->getMaxFrame());
     }
 
-    if(dialog != NULL) {
+    if(dialog != nullptr) {
         if(dialog->result() == QDialog::Accepted) {
             int newMinFrame = getMinFrame();
             int newMaxFrame = getMaxFrame();
@@ -364,7 +364,7 @@ void FixedLenAnimationRect::openDurationSettingsDialog(QWidget *parent) {
     int oldMaxFrame = getMaxFrame();
     int oldMinAnimationFrame = getMinAnimationFrame();
     int oldMaxAnimationFrame = getMaxAnimationFrame();
-    DurationRectSettingsDialog *dialog = NULL;
+    DurationRectSettingsDialog *dialog = nullptr;
     dialog = new DurationRectSettingsDialog(mType,
                                             getMinFrame(),
                                             getMaxFrame(),
@@ -376,7 +376,7 @@ void FixedLenAnimationRect::openDurationSettingsDialog(QWidget *parent) {
         setFirstAnimationFrame(dialog->getFirstAnimationFrame());
     }
 
-    if(dialog != NULL) {
+    if(dialog != nullptr) {
         if(dialog->result() == QDialog::Accepted) {
             int newMinFrame = getMinFrame();
             int newMaxFrame = getMaxFrame();

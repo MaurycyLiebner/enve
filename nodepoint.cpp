@@ -115,7 +115,7 @@ void NodePoint::setRelativePos(const QPointF &relPos) {
 }
 
 void NodePoint::connectToPoint(NodePoint *point) {
-    if(point == NULL) {
+    if(point == nullptr) {
         return;
     }
     if(!hasNextPoint()) {
@@ -128,13 +128,13 @@ void NodePoint::connectToPoint(NodePoint *point) {
 }
 
 void NodePoint::disconnectFromPoint(NodePoint *point) {
-    if(point == NULL) {
+    if(point == nullptr) {
         return;
     }
     if(point == mNextPoint) {
-        setPointAsNext(NULL);
+        setPointAsNext(nullptr);
     } else if(point == mPreviousPoint) {
-        setPointAsPrevious(NULL);
+        setPointAsPrevious(nullptr);
     } else {
         return;
     }
@@ -183,14 +183,14 @@ MovablePoint *NodePoint::getPointAtAbsPos(const QPointF &absPos,
         }
     } else {
         if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
-            return NULL;
+            return nullptr;
         }
     }
     if(isPointAtAbsPos(absPos,
                        canvasScaleInv)) {
         return this;
     }
-    return NULL;
+    return nullptr;
 }
 
 QPointF NodePoint::symmetricToAbsPos(const QPointF &absPosToMirror) {
@@ -372,18 +372,18 @@ NodePoint *NodePoint::getPreviousPoint() {
 
 NodePoint *NodePoint::getConnectedSeparateNodePoint() {
     if(isSeparateNodePoint() ||
-       mPreviousPoint == NULL) return this;
+       mPreviousPoint == nullptr) return this;
     return mPreviousPoint->getConnectedSeparateNodePoint();
 }
 
 void NodePoint::setNextPoint(NodePoint *nextPoint) {
     mNextPoint = nextPoint;
-    if(mNextPoint == NULL) {
-        if(mNextEdge.get() != NULL) {
+    if(mNextPoint == nullptr) {
+        if(mNextEdge.get() != nullptr) {
             mNextEdge.reset();
         }
     } else {
-        if(mNextEdge.get() == NULL) {
+        if(mNextEdge.get() == nullptr) {
             mNextEdge = (new VectorPathEdge(this, mNextPoint))->
                                 ref<VectorPathEdge>();
         } else {
@@ -395,7 +395,7 @@ void NodePoint::setNextPoint(NodePoint *nextPoint) {
 }
 
 void NodePoint::updateStartCtrlPtVisibility() {
-    if(mPreviousPoint == NULL) {
+    if(mPreviousPoint == nullptr) {
         mStartCtrlPt->hide();
     } else {
         mStartCtrlPt->setVisible(mCurrentNodeSettings->startEnabled);
@@ -403,7 +403,7 @@ void NodePoint::updateStartCtrlPtVisibility() {
 }
 
 void NodePoint::updateEndCtrlPtVisibility() {
-    if(mNextPoint == NULL) {
+    if(mNextPoint == nullptr) {
         mEndCtrlPt->hide();
     } else {
         mEndCtrlPt->setVisible(mCurrentNodeSettings->endEnabled);
@@ -488,9 +488,9 @@ void NodePoint::setCtrlPtEnabled(const bool &enabled,
 }
 
 bool NodePoint::isNeighbourSelected() {
-    bool nextSelected = (mNextPoint == NULL) ?
+    bool nextSelected = (mNextPoint == nullptr) ?
                 false : mNextPoint->isSelected();
-    bool prevSelected = (mPreviousPoint == NULL) ?
+    bool prevSelected = (mPreviousPoint == nullptr) ?
                 false : mPreviousPoint->isSelected();
     return isSelected() || nextSelected || prevSelected;
 }
@@ -547,29 +547,29 @@ void NodePoint::setPreviousPoint(NodePoint *previousPoint) {
 }
 
 bool NodePoint::hasNextPoint() {
-    return mNextPoint != NULL;
+    return mNextPoint != nullptr;
 }
 
 bool NodePoint::hasPreviousPoint() {
-    return mPreviousPoint != NULL;
+    return mPreviousPoint != nullptr;
 }
 
 void NodePoint::setPointAsNext(NodePoint *pointToSet) {
     if(hasNextPoint()) {
-        mNextPoint->setPreviousPoint(NULL);
+        mNextPoint->setPreviousPoint(nullptr);
     }
     setNextPoint(pointToSet);
-    if(pointToSet != NULL) {
+    if(pointToSet != nullptr) {
         pointToSet->setPreviousPoint(this);
     }
 }
 
 void NodePoint::setPointAsPrevious(NodePoint *pointToSet) {
     if(hasPreviousPoint()) {
-        mPreviousPoint->setNextPoint(NULL);
+        mPreviousPoint->setNextPoint(nullptr);
     }
     setPreviousPoint(pointToSet);
-    if(pointToSet != NULL) {
+    if(pointToSet != nullptr) {
         pointToSet->setNextPoint(this);
     }
 }
@@ -602,7 +602,7 @@ void NodePoint::setElementsPos(const QPointF &startPos,
 }
 
 bool NodePoint::isEndPoint() {
-    return mNextPoint == NULL || mPreviousPoint == NULL;
+    return mNextPoint == nullptr || mPreviousPoint == nullptr;
 }
 
 NodePointValues operator-(const NodePointValues &ppv1,

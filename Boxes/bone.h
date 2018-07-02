@@ -102,7 +102,7 @@ public:
                                    const qreal &scaleYBy);
 
     BonesBox *getParentBox() {
-        if(mParentBonesBox == NULL) {
+        if(mParentBonesBox == nullptr) {
             return mParentBone->getParentBox();
         }
         return mParentBonesBox;
@@ -110,16 +110,16 @@ public:
 protected:
     QPointF mSavedTransformPivot;
     bool mSelected = false;
-    BonePt *mTipPt = NULL;
-    BonePt *mRootPt = NULL;
+    BonePt *mTipPt = nullptr;
+    BonePt *mRootPt = nullptr;
 
     bool mConnectedToParent = true;
     QPointF mRelRootPos;
     QPointF mRelTipPos;
     QSharedPointer<BoneTransformAnimator> mTransformAnimator;
     QList<Bone*> mChildBones;
-    Bone *mParentBone = NULL;
-    BonesBox *mParentBonesBox = NULL;
+    Bone *mParentBone = nullptr;
+    BonesBox *mParentBonesBox = nullptr;
 };
 
 class BonePt : public NonAnimatedMovablePoint {
@@ -132,7 +132,7 @@ public:
 
     void setRelativePos(const QPointF &relPos) {
         NonAnimatedMovablePoint::setRelativePos(relPos);
-        if(mTipBone != NULL) {
+        if(mTipBone != nullptr) {
             if(mParentBone == mTipBone) {
                 mTipBone->setRelTipPos(relPos);
             } else {
@@ -154,14 +154,14 @@ public:
 
     void setTipBone(Bone *bone) {
         mTipBone = bone;
-        if(bone != NULL) {
+        if(bone != nullptr) {
             setParentBone(bone);
         }
     }
 
     void addRootBone(Bone *bone) {
         mRootBones << bone;
-        if(mTipBone == NULL) {
+        if(mTipBone == nullptr) {
             setParentBone(bone);
         }
     }
@@ -172,7 +172,7 @@ public:
 
     void setParentBone(Bone *bone) {
         mParentBone = bone;
-        if(bone != NULL) {
+        if(bone != nullptr) {
             mParent = mParentBone->getTransformAnimator();
         }
     }
@@ -185,8 +185,8 @@ public:
         return mParentBone;
     }
 protected:
-    Bone *mParentBone = NULL;
-    Bone *mTipBone = NULL;
+    Bone *mParentBone = nullptr;
+    Bone *mTipBone = nullptr;
     QList<Bone*> mRootBones;
     QPointF mCurrentPos;
 };

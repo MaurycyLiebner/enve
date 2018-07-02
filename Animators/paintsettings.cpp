@@ -360,7 +360,7 @@ void Gradient::setLoadId(const int &id) {
 
 PaintSettings::PaintSettings() : PaintSettings(Color(255, 255, 255),
                                                PaintType::FLATPAINT,
-                                               NULL) {
+                                               nullptr) {
 }
 
 PaintSettings::PaintSettings(const Color &colorT,
@@ -389,7 +389,7 @@ void PaintSettings::setGradientVar(Gradient *grad) {
         ca_removeChildAnimator((QrealAnimator*) mGradientPoints);
         mGradient->removePath(mTarget);
     }
-    if(grad == NULL) {
+    if(grad == nullptr) {
         mGradient.reset();
     } else {
         mGradient = grad->ref<Gradient>();
@@ -452,7 +452,7 @@ void PaintSettings::setPaintType(const PaintType &paintType,
 //        addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
 //                                                this));
         if(mPaintType == GRADIENTPAINT) {
-            setGradient(NULL);
+            setGradient(nullptr);
         }
     }
 
@@ -473,7 +473,7 @@ void PaintSettings::setGradientPoints(GradientPoints *gradientPoints) {
 
 StrokeSettings::StrokeSettings() : StrokeSettings(Color(0, 0, 0),
                                                   PaintType::FLATPAINT,
-                                                  NULL) {
+                                                  nullptr) {
 }
 
 StrokeSettings::StrokeSettings(const Color &colorT,

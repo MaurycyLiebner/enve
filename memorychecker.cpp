@@ -10,7 +10,7 @@ MemoryChecker *MemoryChecker::mInstance;
 
 unsigned long long getTotalRam() {
     FILE *meminfo = fopen("/proc/meminfo", "r");
-    if(meminfo == NULL) return 0;
+    if(meminfo == nullptr) return 0;
 
     char line[256];
 
@@ -87,7 +87,7 @@ unsigned long long getFreeRam() {
     }
 
     FILE *meminfo = fopen("/proc/meminfo", "r");
-    if(meminfo == NULL) return 0;
+    if(meminfo == nullptr) return 0;
 
     char line[256];
     unsigned long long ramULL = 0;
@@ -133,7 +133,7 @@ void MemoryChecker::checkMemory() {
 
 unsigned long long getMajorPageFaults() {
     FILE *meminfo = fopen("/proc/vmstat", "r");
-    if(meminfo == NULL) return 0;
+    if(meminfo == nullptr) return 0;
 
     char line[256];
     while(fgets(line, sizeof(line), meminfo)) {

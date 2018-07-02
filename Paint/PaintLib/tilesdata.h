@@ -90,7 +90,7 @@ private:
                      Tile *targetTile);
     bool mNoDataInMemory = true;
     bool mDataStoredInTmpFile = false;
-    QTemporaryFile *mTmpFile = NULL;
+    QTemporaryFile *mTmpFile = nullptr;
 
     bool mCurrentlyUsed = false;
     void resizeTiles(const ushort &nTileCols,
@@ -105,7 +105,7 @@ private:
     ushort mNTileRows = 0;
     ushort mLastRowHeight = 0;
     ushort mLastColumnWidth = 0;
-    Tile ***mTiles = NULL;
+    Tile ***mTiles = nullptr;
 };
 
 class SaveTilesDataToTmpFileExec : public _Executor {

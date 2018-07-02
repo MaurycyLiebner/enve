@@ -83,7 +83,7 @@ private:
 
     MainWindow *mMainWindow;
     QList<QSharedPointer<Gradient> > mGradients;
-    Gradient *mCurrentGradient = NULL;
+    Gradient *mCurrentGradient = nullptr;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
     void setCurrentGradient(const int &listId);

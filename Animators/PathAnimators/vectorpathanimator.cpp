@@ -144,7 +144,7 @@ void VectorPathAnimator::setElementPos(const int &index,
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) prp_setRecording(true);
 
-    if(anim_mKeyOnCurrentFrame == NULL) {
+    if(anim_mKeyOnCurrentFrame == nullptr) {
         anim_mKeyOnCurrentFrame = new PathKey(anim_mCurrentRelFrame,
                                               getPath(),
                                               mElementsPos,
@@ -289,8 +289,8 @@ void VectorPathAnimator::anim_appendKey(Key *newKey,
 VectorPathEdge *VectorPathAnimator::getEdge(const QPointF &absPos,
                                             const qreal &canvasScaleInv) {
     qreal pressedT;
-    NodePoint *prevPoint = NULL;
-    NodePoint *nextPoint = NULL;
+    NodePoint *prevPoint = nullptr;
+    NodePoint *nextPoint = nullptr;
     if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
                                             &prevPoint, &nextPoint,
                                             canvasScaleInv)) {
@@ -299,10 +299,10 @@ VectorPathEdge *VectorPathAnimator::getEdge(const QPointF &absPos,
             edge->setPressedT(pressedT);
             return edge;
         } else {
-            return NULL;
+            return nullptr;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool VectorPathAnimator::getTAndPointsForMouseEdgeInteraction(
@@ -332,7 +332,7 @@ bool VectorPathAnimator::getTAndPointsForMouseEdgeInteraction(
 
     foreach(NodePoint *nodePoint, mPoints) {
         VectorPathEdge *edgeT = nodePoint->getNextEdge();
-        if(edgeT == NULL) continue;
+        if(edgeT == nullptr) continue;
         QPointF posT;
         qreal tT;
         qreal errorT;
@@ -352,10 +352,10 @@ bool VectorPathAnimator::getTAndPointsForMouseEdgeInteraction(
        qAbs(distT.y()) > maxDistY) return false;
 
     *pressedT = nearestT;
-    if(*prevPoint == NULL) return false;
+    if(*prevPoint == nullptr) return false;
 
     *nextPoint = (*prevPoint)->getNextPoint();
-    if(*nextPoint == NULL) return false;
+    if(*nextPoint == nullptr) return false;
 
     return true;
 }
@@ -366,8 +366,8 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                                     const bool &adjust,
                                     const qreal &canvasScaleInv) {
     qreal pressedT;
-    NodePoint *prevPoint = NULL;
-    NodePoint *nextPoint = NULL;
+    NodePoint *prevPoint = nullptr;
+    NodePoint *nextPoint = nullptr;
     if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
                                             &prevPoint, &nextPoint,
                                             canvasScaleInv)) {
@@ -466,7 +466,7 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
             return newPoint;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void VectorPathAnimator::updateNodePointsFromElements() {
@@ -475,19 +475,19 @@ void VectorPathAnimator::updateNodePointsFromElements() {
         finalizeNodesRemove();
         setElementsFromSkPath(getPath());
     }
-    if(mFirstPoint != NULL) {
-        mFirstPoint->setPointAsPrevious(NULL); // make sure path not closed
+    if(mFirstPoint != nullptr) {
+        mFirstPoint->setPointAsPrevious(nullptr); // make sure path not closed
     }
     NodePoint *currOldNode = mFirstPoint;
-    NodePoint *newFirstPt = NULL;
+    NodePoint *newFirstPt = nullptr;
     int elementsCount = mElementsPos.count();
     int nodesCount = elementsCount/3;
     if(nodesCount == 0) return;
-    NodePoint *lastP = NULL;
+    NodePoint *lastP = nullptr;
     for(int i = 0; i < nodesCount; i++) {
         int nodePtId = nodeIdToPointId(i);
         NodePoint *newP;
-        if(currOldNode == NULL) {
+        if(currOldNode == nullptr) {
             newP = new NodePoint(this);
         } else {
             newP = currOldNode;
@@ -507,16 +507,16 @@ void VectorPathAnimator::updateNodePointsFromElements() {
         lastP = newP;
     }
 
-    while(currOldNode != NULL) {
+    while(currOldNode != nullptr) {
         NodePoint *oldOldNode = currOldNode;
         currOldNode = currOldNode->getNextPoint();
         mPoints.removeOne(oldOldNode);
         if(oldOldNode->isSelected()) {
-            if(mParentPathAnimator != NULL) {
+            if(mParentPathAnimator != nullptr) {
                 BoundingBox *parentBox = mParentPathAnimator->getParentBox();
-                if(parentBox != NULL) {
+                if(parentBox != nullptr) {
                     Canvas *parentCanvas = parentBox->getParentCanvas();
-                    if(parentCanvas != NULL) {
+                    if(parentCanvas != nullptr) {
                         parentCanvas->removePointFromSelection(oldOldNode);
                     }
                 }
@@ -527,7 +527,7 @@ void VectorPathAnimator::updateNodePointsFromElements() {
     if(mPathClosed) {
         newFirstPt->setPointAsPrevious(lastP);
     } else {
-        lastP->setPointAsNext(NULL);
+        lastP->setPointAsNext(nullptr);
     }
     setFirstPoint(newFirstPt);
 }
@@ -614,14 +614,14 @@ MovablePoint *VectorPathAnimator::getPointAtAbsPos(
                 point->getPointAtAbsPos(absPtPos,
                                         currentCanvasMode,
                                         canvasScaleInv);
-        if(pointToReturn == NULL) continue;
+        if(pointToReturn == nullptr) continue;
         return pointToReturn;
     }
-    return NULL;
+    return nullptr;
 }
 
 void VectorPathAnimator::setParentPath(PathAnimator *parentPath) {
-    if(mParentPathAnimator != NULL && parentPath != NULL) {
+    if(mParentPathAnimator != nullptr && parentPath != nullptr) {
         if(mParentPathAnimator->getParentBox() != parentPath->getParentBox()) {
             Q_FOREACH(NodePoint *point, mPoints) {
                 point->setParentTransformAnimator(
@@ -686,11 +686,11 @@ void VectorPathAnimator::appendToPointsList(NodePoint *pt) {
 }
 
 void VectorPathAnimator::setFirstPoint(NodePoint *firstPt) {
-    if(mFirstPoint != NULL) {
+    if(mFirstPoint != nullptr) {
         mFirstPoint->setSeparateNodePoint(false);
     }
     mFirstPoint = firstPt;
-    if(mFirstPoint != NULL) {
+    if(mFirstPoint != nullptr) {
         mFirstPoint->setSeparateNodePoint(true);
     }
 }
@@ -859,7 +859,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         const bool &saveUndoRedo) {
     int targetNodeId;
     bool changeFirstPt = false;
-    if(targetPt == NULL) {
+    if(targetPt == nullptr) {
         targetNodeId = 0;
         changeFirstPt = true;
     } else {
@@ -879,7 +879,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
     if(changeFirstPt) {
         setFirstPoint(newP);
     }
-    if(targetPt != NULL) {
+    if(targetPt != nullptr) {
         targetPt->connectToPoint(newP);
     }
     updateNodePointIds();
@@ -887,7 +887,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
 
 //    if(saveUndoRedo) {
 //        int targetPtId = -1;
-//        if(targetPt != NULL) targetPtId = targetPt->getPtId();
+//        if(targetPt != nullptr) targetPtId = targetPt->getPtId();
 //        addUndoRedo(new AddPointToVectorPathAnimatorUndoRedo(this,
 //                                                             startRelPos,
 //                                                             relPos,
@@ -907,7 +907,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         const int &targetPtId,
         const NodeSettings &nodeSettings,
         const bool &saveUndoRedo) {
-    NodePoint *ptT = NULL;
+    NodePoint *ptT = nullptr;
     if(!mPoints.isEmpty()) {
         if(targetPtId == -1) {
             ptT = mPoints.last();
@@ -921,14 +921,14 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
 }
 
 void VectorPathAnimator::updateNodePointIds() {
-    if(mFirstPoint == NULL) return;
+    if(mFirstPoint == nullptr) return;
     int pointId = 0;
     NodePoint *nextPoint = mFirstPoint;
     while(true) {
         nextPoint->setNodeId(pointId);
         pointId++;
         nextPoint = nextPoint->getNextPoint();
-        if(nextPoint == NULL || nextPoint == mFirstPoint) break;
+        if(nextPoint == nullptr || nextPoint == mFirstPoint) break;
     }
 }
 
@@ -950,9 +950,9 @@ void VectorPathAnimator::revertAllPointsForAllKeys() {
 }
 
 void VectorPathAnimator::removeFromParent() {
-    if(mParentPathAnimator == NULL) return;
+    if(mParentPathAnimator == nullptr) return;
     PathAnimator *parentT = mParentPathAnimator; // in case this gets deleted
-    mParentPathAnimator = NULL;
+    mParentPathAnimator = nullptr;
     parentT->removeSinglePathAnimator(this);
 }
 

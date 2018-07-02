@@ -76,7 +76,7 @@ private:
 
     CVR_TYPE mLastTriggeredCVR;
 
-    ColorAnimator *mTargetAnimator = NULL;
+    ColorAnimator *mTargetAnimator = nullptr;
 
     QHBoxLayout *mColorModeLayout = new QHBoxLayout();
     QLabel *mColorModeLabel = new QLabel("Color model:", this);
@@ -87,23 +87,23 @@ private:
 
 //    QWidget *mWheelWidget = new QWidget();
 //    QVBoxLayout *mWheelLayout = new QVBoxLayout();
-//    H_Wheel_SV_Triangle *wheel_triangle_widget = NULL;
+//    H_Wheel_SV_Triangle *wheel_triangle_widget = nullptr;
 
     QWidget *mRGBWidget = new QWidget();
     QVBoxLayout *mRGBLayout = new QVBoxLayout();
     QHBoxLayout *rLayout = new QHBoxLayout();
     QLabel *rLabel = new QLabel("R:");
-    ColorValueRect *r_rect = NULL;
+    ColorValueRect *r_rect = nullptr;
     QrealAnimatorValueSlider *rSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *gLayout = new QHBoxLayout();
     QLabel *gLabel = new QLabel("G:");
-    ColorValueRect *g_rect = NULL;
+    ColorValueRect *g_rect = nullptr;
     QrealAnimatorValueSlider *gSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *bLayout = new QHBoxLayout();
     QLabel *bLabel = new QLabel("B:");
-    ColorValueRect *b_rect = NULL;
+    ColorValueRect *b_rect = nullptr;
     QrealAnimatorValueSlider *bSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
@@ -111,17 +111,17 @@ private:
     QVBoxLayout *mHSVLayout = new QVBoxLayout();
     QHBoxLayout *hLayout = new QHBoxLayout();
     QLabel *hLabel = new QLabel("H:");
-    ColorValueRect *h_rect = NULL;
+    ColorValueRect *h_rect = nullptr;
     QrealAnimatorValueSlider *hSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *hsvSLayout = new QHBoxLayout();
     QLabel *hsvSLabel = new QLabel("S:");
-    ColorValueRect *hsv_s_rect = NULL;
+    ColorValueRect *hsv_s_rect = nullptr;
     QrealAnimatorValueSlider *hsvSSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *vLayout = new QHBoxLayout();
     QLabel *vLabel = new QLabel("V:");
-    ColorValueRect *v_rect = NULL;
+    ColorValueRect *v_rect = nullptr;
     QrealAnimatorValueSlider *vSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
@@ -130,26 +130,26 @@ private:
 
     QHBoxLayout *hslSLayout = new QHBoxLayout();
     QLabel *hslSLabel = new QLabel("S:");
-    ColorValueRect *hsl_s_rect = NULL;
+    ColorValueRect *hsl_s_rect = nullptr;
     QrealAnimatorValueSlider *hslSSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *lLayout = new QHBoxLayout();
     QLabel *lLabel = new QLabel("L:");
-    ColorValueRect *l_rect = NULL;
+    ColorValueRect *l_rect = nullptr;
     QrealAnimatorValueSlider *lSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
     bool mAlphaHidden = false;
     QHBoxLayout *aLayout = new QHBoxLayout();
     QLabel *aLabel = new QLabel("A:");
-    ColorValueRect *aRect = NULL;
+    ColorValueRect *aRect = nullptr;
     QrealAnimatorValueSlider *aSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
     QHBoxLayout *mColorLabelLayout = new QHBoxLayout();
     ActionButton *mPickingButton;
 
-    ColorLabel *color_label = NULL;
+    ColorLabel *color_label = nullptr;
     void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,
                                         const char *slot,
                                         ColorWidget *signal_src,

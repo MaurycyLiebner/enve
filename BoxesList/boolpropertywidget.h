@@ -19,8 +19,8 @@ protected:
     void leaveEvent(QEvent *);
 private:
     bool mHovered = false;
-    BoolProperty *mTarget = NULL;
-    BoolPropertyContainer *mTargetContainer = NULL;
+    BoolProperty *mTarget = nullptr;
+    BoolPropertyContainer *mTargetContainer = nullptr;
 };
 
 #endif // BOOLPROPERTYWIDGET_H

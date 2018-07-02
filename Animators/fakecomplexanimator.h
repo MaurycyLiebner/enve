@@ -23,7 +23,7 @@ public:
 
     bool SWT_isFakeComplexAnimator();
 private:
-    Property *mTarget = NULL;
+    Property *mTarget = nullptr;
 };
 
 #endif // FAKECOMPLEXANIMATOR_H

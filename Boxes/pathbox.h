@@ -44,7 +44,7 @@ private:
             canvas->drawPath(path, paint);
         }
         if(!outlinePath.isEmpty()) {
-            paint.setShader(NULL);
+            paint.setShader(nullptr);
             strokeSettings.applyPainterSettingsSk(&paint);
 
             canvas->drawPath(outlinePath, paint);

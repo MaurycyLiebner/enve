@@ -109,21 +109,21 @@ void CanvasWindow::SWT_addChildrenAbstractions(
 
 void CanvasWindow::setCurrentCanvas(const int &id) {
     if(id < 0 || id >= mCanvasList.count()) {
-        setCurrentCanvas((Canvas*)NULL);
+        setCurrentCanvas((Canvas*)nullptr);
     } else {
         setCurrentCanvas(mCanvasList.at(id).data());
     }
 }
 
 void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
-    if(mCurrentCanvas != NULL) {
+    if(mCurrentCanvas != nullptr) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mPreviewFPSTimer, SIGNAL(timeout()),
                    mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
     }
 
-    if(canvas == NULL) {
-        mCurrentSoundComposition = NULL;
+    if(canvas == nullptr) {
+        mCurrentSoundComposition = nullptr;
         mCurrentCanvas.reset();
     } else {
         mCurrentCanvas = canvas->ref<Canvas>();
@@ -138,12 +138,18 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
         emit changeFrameRange(0, getMaxFrame());
         emit changeCurrentFrame(getCurrentFrame());
     }
-    if(mCurrentCanvas == NULL) {
-        MainWindow::getInstance()->setCurrentUndoRedoStack(NULL);
+    BoxesGroup *currentGroup;
+    if(mCurrentCanvas == nullptr) {
+        MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
+        currentGroup = nullptr;
     } else {
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
+        currentGroup = mCurrentCanvas->getCurrentBoxesGroup();
     }
+    mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
+                currentGroup,
+                SWT_CurrentGroup);
     mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
                 mCurrentCanvas.data(),
                 SWT_CurrentCanvas);
@@ -161,7 +167,7 @@ void CanvasWindow::removeCanvas(const int &id) {
     CanvasQSPtr canvas = mCanvasList.takeAt(id);
     mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     if(mCanvasList.isEmpty()) {
-        setCurrentCanvas((Canvas*)NULL);
+        setCurrentCanvas((Canvas*)nullptr);
     } else if(id < mCanvasList.count()) {
         setCurrentCanvas(id);
     } else {
@@ -181,8 +187,6 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-node.xpm"), 0, 0) );
     } else if(mode == PICK_PAINT_SETTINGS) {
         setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
-    } else if(mode == DRAW_PATH) {
-        setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     } else if(mode == ADD_CIRCLE) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-ellipse.xpm"), 4, 4) );
     } else if(mode == ADD_RECTANGLE ||
@@ -215,10 +219,6 @@ void CanvasWindow::setMovePointMode() {
 
 void CanvasWindow::setAddPointMode() {
     setCanvasMode(ADD_POINT);
-}
-
-void CanvasWindow::setDrawPathMode() {
-    setCanvasMode(DRAW_PATH);
 }
 
 void CanvasWindow::setRectangleMode() {
@@ -267,21 +267,21 @@ void CanvasWindow::renameCanvas(const int &id, const QString &newName) {
 }
 
 bool CanvasWindow::hasNoCanvas() {
-    return mCurrentCanvas == NULL;
+    return mCurrentCanvas == nullptr;
 }
 
 void CanvasWindow::renameCurrentCanvas(const QString &newName) {
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == nullptr) return;
     renameCanvas(mCurrentCanvas.data(), newName);
 }
 
 void CanvasWindow::qRender(QPainter *p) {
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == nullptr) return;
     //mCurrentCanvas->drawInputText(p);
 }
 
 void CanvasWindow::renderSk(SkCanvas *canvas) {
-    if(mCurrentCanvas == NULL) {
+    if(mCurrentCanvas == nullptr) {
         canvas->clear(SK_ColorBLACK);
         return;
     }
@@ -298,27 +298,27 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     KFT_setFocus();
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == nullptr) return;
     mCurrentCanvas->mousePressEvent(event);
 }
 
 void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == nullptr) return;
     mCurrentCanvas->mouseReleaseEvent(event);
 }
 
 void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == nullptr) return;
     mCurrentCanvas->mouseMoveEvent(event);
 }
 
 void CanvasWindow::wheelEvent(QWheelEvent *event) {
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == nullptr) return;
     mCurrentCanvas->wheelEvent(event);
 }
 
 void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == nullptr) return;
     mCurrentCanvas->mouseDoubleClickEvent(event);
 }
 
@@ -327,12 +327,16 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     CanvasSettingsDialog *dialog =
             new CanvasSettingsDialog(mCurrentCanvas.data(),
                                      MainWindow::getInstance());
-
-    if(dialog->exec() == QDialog::Accepted) {
+    connect(dialog, &QDialog::accepted, this, [dialog, this]() {
         dialog->applySettingsToCanvas(mCurrentCanvas.data());
-        setCurrentCanvas(mCurrentCanvas.data());
-    }
-    delete dialog;
+        this->setCurrentCanvas(mCurrentCanvas.data());
+    });
+    dialog->show();
+
+//    if(dialog->exec() == QDialog::Accepted) {
+//        dialog->applySettingsToCanvas(mCurrentCanvas.data());
+//        setCurrentCanvas(mCurrentCanvas.data());
+//    }
 }
 
 void CanvasWindow::rotate90CCW() {
@@ -354,8 +358,6 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_F3) {
         setCanvasMode(CanvasMode::ADD_POINT);
     } else if(event->key() == Qt::Key_F4) {
-        setCanvasMode(CanvasMode::DRAW_PATH);
-    } else if(event->key() == Qt::Key_F5) {
         setCanvasMode(CanvasMode::PICK_PAINT_SETTINGS);
     } else if(event->key() == Qt::Key_F6) {
         setCanvasMode(CanvasMode::ADD_CIRCLE);
@@ -712,7 +714,7 @@ void CanvasWindow::schedulePivotUpdate() {
 }
 
 BoxesGroup *CanvasWindow::getCurrentGroup() {
-    if(hasNoCanvas()) return NULL;
+    if(hasNoCanvas()) return nullptr;
     return mCurrentCanvas->getCurrentBoxesGroup();
 }
 #include "videoencoder.h"
@@ -808,7 +810,7 @@ void CanvasWindow::addUpdatableAwaitingUpdate(_Executor *updatable) {
 
     mUpdatablesAwaitingUpdate << updatable->ref<_Executor>();
     if(!mFreeThreads.isEmpty()) {
-        sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
+        sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), nullptr);
     }
 }
 
@@ -817,26 +819,26 @@ void CanvasWindow::addFileUpdatableAwaitingUpdate(_Executor *updatable) {
 
     if(mNoFileAwaitUpdate) {
         mNoFileAwaitUpdate = false;
-        sendNextFileUpdatableForUpdate(mPaintControlers.count(), NULL);
+        sendNextFileUpdatableForUpdate(mPaintControlers.count(), nullptr);
     }
 }
 
 void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
                                               _Executor *lastUpdatable) {
     Q_UNUSED(threadId);
-    if(lastUpdatable != NULL) {
+    if(lastUpdatable != nullptr) {
         lastUpdatable->updateFinished();
     }
     if(mFileUpdatablesAwaitingUpdate.isEmpty()) {
         mNoFileAwaitUpdate = true;
-        if(mFilesUpdateFinishedFunction != NULL) {
+        if(mFilesUpdateFinishedFunction != nullptr) {
             (*this.*mFilesUpdateFinishedFunction)();
         }
         if(!mRendering) {
             callUpdateSchedulers();
         }
         if(!mFreeThreads.isEmpty() && !mUpdatablesAwaitingUpdate.isEmpty()) {
-            sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
+            sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), nullptr);
         }
     } else {
         for(int i = 0; i < mFileUpdatablesAwaitingUpdate.count(); i++) {
@@ -855,7 +857,7 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
 
 void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
                                               _Executor *lastUpdatable) {
-    if(lastUpdatable != NULL) {
+    if(lastUpdatable != nullptr) {
         if(mClearBeingUpdated) {
             lastUpdatable->clear();
         } else {
@@ -866,7 +868,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
         mClearBeingUpdated = false;
         mNoBoxesAwaitUpdate = true;
         mFreeThreads << threadId;
-        if(mBoxesUpdateFinishedFunction != NULL) {
+        if(mBoxesUpdateFinishedFunction != nullptr) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
         if(!mRendering) {
@@ -902,10 +904,10 @@ void CanvasWindow::outOfMemory() {
         if(mNoBoxesAwaitUpdate && mNoFileAwaitUpdate) {
             playPreview();
         } else if(mNoBoxesAwaitUpdate) {
-            mBoxesUpdateFinishedFunction = NULL;
+            mBoxesUpdateFinishedFunction = nullptr;
             mFilesUpdateFinishedFunction = &CanvasWindow::playPreview;
         } else if(mNoFileAwaitUpdate) {
-            mFilesUpdateFinishedFunction = NULL;
+            mFilesUpdateFinishedFunction = nullptr;
             mBoxesUpdateFinishedFunction = &CanvasWindow::playPreview;
         }
     }
@@ -923,8 +925,8 @@ void CanvasWindow::setPreviewing(const bool &bT) {
 
 void CanvasWindow::interruptPreviewRendering() {
     setRendering(false);
-    mBoxesUpdateFinishedFunction = NULL;
-    mFilesUpdateFinishedFunction = NULL;
+    mBoxesUpdateFinishedFunction = nullptr;
+    mFilesUpdateFinishedFunction = nullptr;
     mCurrentCanvas->clearPreview();
     mCurrentCanvas->getCacheHandler()->
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
@@ -936,8 +938,8 @@ void CanvasWindow::interruptPreviewRendering() {
 
 void CanvasWindow::interruptOutputRendering() {
     mCurrentCanvas->setOutputRendering(false);
-    mBoxesUpdateFinishedFunction = NULL;
-    mFilesUpdateFinishedFunction = NULL;
+    mBoxesUpdateFinishedFunction = nullptr;
+    mFilesUpdateFinishedFunction = nullptr;
     mCurrentCanvas->clearPreview();
     emit changeCurrentFrame(mSavedCurrentFrame);
 }
@@ -971,8 +973,8 @@ void CanvasWindow::resumePreview() {
 
 void CanvasWindow::playPreview() {
     //emit changeCurrentFrame(mSavedCurrentFrame);
-    mBoxesUpdateFinishedFunction = NULL;
-    mFilesUpdateFinishedFunction = NULL;
+    mBoxesUpdateFinishedFunction = nullptr;
+    mFilesUpdateFinishedFunction = nullptr;
     mCurrentCanvas->playPreview(mSavedCurrentFrame,
                                 mCurrentRenderFrame);
     setRendering(false);
@@ -1003,9 +1005,9 @@ void CanvasWindow::nextPreviewRenderFrame() {
 void CanvasWindow::nextSaveOutputFrame() {
     mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        mCurrentRenderSettings = NULL;
-        mBoxesUpdateFinishedFunction = NULL;
-        mFilesUpdateFinishedFunction = NULL;
+        mCurrentRenderSettings = nullptr;
+        mBoxesUpdateFinishedFunction = nullptr;
+        mFilesUpdateFinishedFunction = nullptr;
         mCurrentCanvas->setOutputRendering(false);
         emit changeCurrentFrame(mSavedCurrentFrame);
         if(qAbs(mSavedResolutionFraction -
@@ -1018,6 +1020,7 @@ void CanvasWindow::nextSaveOutputFrame() {
         mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
         if(mNoBoxesAwaitUpdate) {
+            // mCurrentCanvas->setCurrentPreviewContainer(); !!!
             nextSaveOutputFrame();
         }
     }
@@ -1033,7 +1036,7 @@ void CanvasWindow::clearAll() {
     }
 
     mCanvasList.clear();
-    setCurrentCanvas((Canvas*)NULL);
+    setCurrentCanvas((Canvas*)nullptr);
 }
 
 void CanvasWindow::createLinkToFileWithPath(const QString &path) {
@@ -1048,17 +1051,17 @@ void CanvasWindow::createAnimationBoxForPaths(
 }
 
 VideoBox *CanvasWindow::createVideoForPath(const QString &path) {
-    if(hasNoCanvas()) return NULL;
+    if(hasNoCanvas()) return nullptr;
     return mCurrentCanvas->createVideoForPath(path);
 }
 
 ImageBox *CanvasWindow::createImageForPath(const QString &path) {
-    if(hasNoCanvas()) return NULL;
+    if(hasNoCanvas()) return nullptr;
     return mCurrentCanvas->createImageBox(path);
 }
 
 SingleSound *CanvasWindow::createSoundForPath(const QString &path) {
-    if(hasNoCanvas()) return NULL;
+    if(hasNoCanvas()) return nullptr;
     return mCurrentCanvas->createSoundForPath(path);
 }
 
@@ -1119,7 +1122,7 @@ void CanvasWindow::startAudio() {
 void CanvasWindow::stopAudio() {
     //mAudioOutput->suspend();
     //mCurrentSoundComposition->stop();
-    mAudioIOOutput = NULL;
+    mAudioIOOutput = nullptr;
     mAudioOutput->stop();
     mAudioOutput->reset();
     mCurrentSoundComposition->stop();
@@ -1199,7 +1202,7 @@ void CanvasWindow::importFile(const QString &path,
         }
         mCurrentCanvas->unblockUndoRedo();
 
-        if(importedBox != NULL) {
+        if(importedBox != nullptr) {
             mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(
                         importedBox.data());
             QPointF trans = relDropPos;

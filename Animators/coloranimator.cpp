@@ -262,7 +262,7 @@ void ColorAnimator::prp_openContextMenu(const QPoint &pos) {
     colorModeMenu.addAction(hslAction);
     menu.addMenu(&colorModeMenu);
     QAction *selected_action = menu.exec(pos);
-    if(selected_action != NULL)
+    if(selected_action != nullptr)
     {
         if(selected_action->text() == "Add Key")
         {

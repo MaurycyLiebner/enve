@@ -20,13 +20,13 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
             loadImageFromHandler();
         }
         BoundingBoxRenderData::beforeUpdate();
-        if(image.get() == NULL) {
+        if(image.get() == nullptr) {
             qDebug() << "hell?";
         }
     }
 
     bool allDataReady() {
-        return image.get() != NULL;
+        return image.get() != nullptr;
     }
 
     void updateRelBoundingRect() {
@@ -41,7 +41,7 @@ private:
         SkPaint paint;
         paint.setFilterQuality(kHigh_SkFilterQuality);
         paint.setAntiAlias(true);
-        if(image == NULL) {
+        if(image == nullptr) {
             qDebug() << "no image to draw";
         }
         canvas->drawImage(image, 0, 0, &paint);
@@ -69,7 +69,7 @@ public:
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 private:
-    ImageCacheHandler *mImgCacheHandler = NULL;
+    ImageCacheHandler *mImgCacheHandler = nullptr;
     QString mImageFilePath;
 };
 

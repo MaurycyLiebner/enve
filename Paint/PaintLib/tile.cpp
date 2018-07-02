@@ -177,7 +177,7 @@ void Tile::clear() {
 void Tile::setTileWidth(const ushort &width_t) {
     if(width_t == mMaxPaintX) return;
     mMaxPaintX = width_t;
-    if(mDrawer != NULL) {
+    if(mDrawer != nullptr) {
         mDrawer->maxPaintX = mMaxPaintX;
         addScheduler();
     }
@@ -186,7 +186,7 @@ void Tile::setTileWidth(const ushort &width_t) {
 void Tile::setTileHeight(const ushort &height_t) {
     if(height_t == mMaxPaintY) return;
     mMaxPaintY = height_t;
-    if(mDrawer != NULL) {
+    if(mDrawer != nullptr) {
         mDrawer->maxPaintY = mMaxPaintY;
         addScheduler();
     }
@@ -246,8 +246,8 @@ Tile::Tile(const ushort &x_t, const ushort &y_t,
 }
 
 Tile::~Tile() {
-    if(mDrawer == NULL) return;
-    mDrawer->parentTile = NULL;
+    if(mDrawer == nullptr) return;
+    mDrawer->parentTile = nullptr;
 }
 
 void Tile::initializeDrawer() {
@@ -259,7 +259,7 @@ void Tile::initializeDrawer() {
 }
 
 void Tile::clearTileData() {
-    mData = NULL;
+    mData = nullptr;
     mDataTileImage.reset();
     mDrawer.reset();
 }
@@ -503,7 +503,7 @@ void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
 
 void TileSkDrawer::schedulerProccessed() {
     _ScheduledExecutor::schedulerProccessed();
-    if(parentTile != NULL) {
+    if(parentTile != nullptr) {
         parentTile->setDabsForDrawer();
     }
 }
@@ -516,7 +516,7 @@ void TileSkDrawer::_processUpdate() {
 }
 
 void TileSkDrawer::afterUpdate() {
-    if(parentTile != NULL) {
+    if(parentTile != nullptr) {
         parentTile->updateTexFromDataArray();
     }
     _ScheduledExecutor::afterUpdate();

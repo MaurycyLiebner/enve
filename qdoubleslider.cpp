@@ -51,9 +51,9 @@ QDoubleSlider::~QDoubleSlider() {
     removeEventFilter(this);
     mLineEdit->removeEventFilter(this);
 //    delete mLineEdit;
-//    mLineEdit = NULL;
+//    mLineEdit = nullptr;
 //    delete mValidator;
-//    mValidator = NULL;
+//    mValidator = nullptr;
 }
 
 void QDoubleSlider::setValueSliderVisibile(bool valueSliderVisible) {

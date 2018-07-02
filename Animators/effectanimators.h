@@ -46,7 +46,7 @@ public:
     void readProperty(QIODevice *target);
     void readPixmapEffect(QIODevice *target);
 private:
-    BoundingBox *mParentBox = NULL;
+    BoundingBox *mParentBox = nullptr;
 };
 
 #endif // EFFECTANIMATORS_H

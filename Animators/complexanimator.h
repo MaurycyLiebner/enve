@@ -63,7 +63,7 @@ public:
 
 
     void prp_setParentFrameShift(const int &shift,
-                                 ComplexAnimator *parentAnimator = NULL);
+                                 ComplexAnimator *parentAnimator = nullptr);
     int getChildPropertyIndex(Property *child);
 
     void ca_updateDescendatKeyFrame(Key *key);

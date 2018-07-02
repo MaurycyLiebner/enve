@@ -46,7 +46,7 @@ public slots:
     void setMinMaxFrames(const int &minFrame,
                          const int &maxFrame);
 private:
-    CacheHandler *mCacheHandler = NULL;
+    CacheHandler *mCacheHandler = nullptr;
     bool mTopBorderVisible = true;
     bool mClamp;
 

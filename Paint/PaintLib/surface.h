@@ -43,7 +43,7 @@ public:
 private:
     ushort mWidth = 0;
     ushort mHeight = 0;
-    char *mData = NULL;
+    char *mData = nullptr;
 };
 
 class Surface {

@@ -25,7 +25,7 @@ Key *FakeComplexAnimator::prp_getKeyAtPos(const qreal &relX,
                                           const qreal &pixelsPerFrame) {
     Key *key = ComplexAnimator::prp_getKeyAtPos(relX, minViewedFrame,
                                                 pixelsPerFrame);
-    if(key != NULL) return key;
+    if(key != nullptr) return key;
     return mTarget->prp_getKeyAtPos(relX, minViewedFrame,
                                     pixelsPerFrame);
 }

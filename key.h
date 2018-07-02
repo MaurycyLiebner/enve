@@ -83,7 +83,7 @@ public:
     virtual void readKey(QIODevice *target);
 protected:
     bool mIsSelected = false;
-    Animator *mParentAnimator = NULL;
+    Animator *mParentAnimator = nullptr;
 
     int mRelFrame;
     int mSavedRelFrame;

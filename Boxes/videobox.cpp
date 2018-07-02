@@ -20,7 +20,7 @@ VideoBox::VideoBox() :
 
 VideoBox::~VideoBox() {
     Canvas *parentCanvas = getParentCanvas();
-    if(parentCanvas != NULL && mSound != NULL) {
+    if(parentCanvas != nullptr && mSound != nullptr) {
         parentCanvas->getSoundComposition()->removeSound(mSound);
     }
 }
@@ -31,11 +31,11 @@ VideoBox::VideoBox(const QString &filePath) :
 }
 
 void VideoBox::setParentGroup(BoxesGroup *parent) {
-    if(mParentGroup != NULL && mSound != NULL) {
+    if(mParentGroup != nullptr && mSound != nullptr) {
         getParentCanvas()->getSoundComposition()->removeSound(mSound);
     }
     AnimationBox::setParentGroup(parent);
-    if(mParentGroup != NULL && mSound != NULL) {
+    if(mParentGroup != nullptr && mSound != nullptr) {
         getParentCanvas()->getSoundComposition()->addSound(mSound);
     }
 }
@@ -68,11 +68,11 @@ void VideoBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 
 void VideoBox::setFilePath(const QString &path) {
     mSrcFilePath = path;
-    if(mAnimationCacheHandler == NULL) {
+    if(mAnimationCacheHandler == nullptr) {
         mAnimationCacheHandler = (AnimationCacheHandler*)
                                     FileSourcesCache::getHandlerForFilePath(
                                                             mSrcFilePath);
-        if(mAnimationCacheHandler == NULL) {
+        if(mAnimationCacheHandler == nullptr) {
             mAnimationCacheHandler = new VideoCacheHandler(mSrcFilePath);
         }
         mAnimationCacheHandler->addDependentBox(this);
@@ -83,11 +83,11 @@ void VideoBox::setFilePath(const QString &path) {
 bool hasSound(const char* path) {
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
-    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+    if (avformat_open_input(&format, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return false;
     }
-    if(avformat_find_stream_info(format, NULL) < 0) {
+    if(avformat_find_stream_info(format, nullptr) < 0) {
         fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
         return false;
     }
@@ -109,11 +109,11 @@ bool hasSound(const char* path) {
 
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
-        if(mSound == NULL) {
+        if(mSound == nullptr) {
             mSound = new SingleSound(mSrcFilePath,
                                      (FixedLenAnimationRect*)mDurationRectangle);
             ca_addChildAnimator(mSound);
-            if(mParentGroup != NULL) {
+            if(mParentGroup != nullptr) {
                 getParentCanvas()->getSoundComposition()->addSound(mSound);
             }
         } else {

@@ -42,7 +42,7 @@ void AnimatedSurface::currentDataModified() {
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
         } else {
             Key *key = anim_getPrevKey(anim_mCurrentRelFrame);
-            if(key == NULL) {
+            if(key == nullptr) {
                 key = anim_getNextKey(anim_mCurrentRelFrame);
             }
             anim_updateAfterChangedKey(key);
@@ -58,7 +58,7 @@ void AnimatedSurface::anim_saveCurrentValueAsKey() {
     SurfaceKey *key = (SurfaceKey*)anim_mKeyOnCurrentFrame;
     SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(key);
     TilesData *tiles;
-    if(prevKey == NULL) {
+    if(prevKey == nullptr) {
         tiles = mCurrentTiles.get();
     } else {
         tiles = prevKey->getTilesData();
@@ -71,13 +71,13 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
         anim_setRecordingValue(true);
     }
     Key *keyAtFrame = anim_getKeyAtRelFrame(relFrame);
-    if(keyAtFrame != NULL) {
+    if(keyAtFrame != nullptr) {
         ((SurfaceKey*)keyAtFrame)->getTilesData()->clearTiles();
         return;
     }
 
     SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(relFrame);
-    if(prevKey != NULL) {
+    if(prevKey != nullptr) {
         if(prevKey->getRelFrame() == relFrame) {
             prevKey->getTilesData()->clearTiles();
             return;
@@ -313,7 +313,7 @@ bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,
 
 void AnimatedSurface::anim_updateAfterChangedKey(Key *key) {
     if(anim_mIsComplexAnimator) return;
-    if(key == NULL) {
+    if(key == nullptr) {
         prp_updateInfluenceRangeAfterChanged();
         return;
     }

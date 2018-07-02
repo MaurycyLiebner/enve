@@ -41,7 +41,7 @@ BoundingBox::~BoundingBox() {
 
 Property *BoundingBox::ca_getFirstDescendantWithName(const QString &name) {
     Property *propT = ComplexAnimator::ca_getFirstDescendantWithName(name);
-    if(propT != NULL) return propT;
+    if(propT != nullptr) return propT;
     if(name == mEffectsAnimators->prp_getName()) {
         return mEffectsAnimators.data();
     }
@@ -119,7 +119,7 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
 
 bool BoundingBox::isAncestor(BoxesGroup *box) const {
     if(mParentGroup == box) return true;
-    if(mParentGroup == NULL) return false;
+    if(mParentGroup == nullptr) return false;
     return mParentGroup->isAncestor(box);
 }
 
@@ -152,7 +152,7 @@ void BoundingBox::applyEffectsSk(const SkBitmap &im,
 }
 
 Canvas *BoundingBox::getParentCanvas() {
-    if(mParentGroup == NULL) return NULL;
+    if(mParentGroup == nullptr) return nullptr;
     return mParentGroup->getParentCanvas();
 }
 
@@ -251,7 +251,7 @@ bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     bool differences =
             ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
                                                              relFrame2);
-    if(differences || mDurationRectangle == NULL) return differences;
+    if(differences || mDurationRectangle == nullptr) return differences;
     return mDurationRectangle->hasAnimationFrameRange();
 }
 
@@ -336,9 +336,9 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 void BoundingBox::scheduleUpdate() {
     Q_ASSERT(!mBlockedSchedule);
     if(!shouldScheduleUpdate()) return;
-    if(mCurrentRenderData == NULL) {
+    if(mCurrentRenderData == nullptr) {
         updateCurrentRenderData();
-        if(mCurrentRenderData == NULL) return;
+        if(mCurrentRenderData == nullptr) return;
     } else {
         if(!mRedoUpdate) {
             mRedoUpdate = mCurrentRenderData->isAwaitingUpdate();
@@ -350,7 +350,7 @@ void BoundingBox::scheduleUpdate() {
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
-    if(mParentGroup != NULL) {
+    if(mParentGroup != nullptr) {
         mParentGroup->scheduleUpdate();
     }
 
@@ -377,7 +377,7 @@ BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
     if(absPointInsidePath(absPos)) {
         return this;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -386,11 +386,11 @@ QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
 }
 
 PaintSettings *BoundingBox::getFillSettings() {
-    return NULL;
+    return nullptr;
 }
 
 StrokeSettings *BoundingBox::getStrokeSettings() {
-    return NULL;
+    return nullptr;
 }
 
 void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
@@ -451,6 +451,10 @@ QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() {
 }
 
 void BoundingBox::applyTransformation(BoxTransformAnimator *transAnimator) {
+    Q_UNUSED(transAnimator);
+}
+
+void BoundingBox::applyTransformationInverted(BoxTransformAnimator *transAnimator) {
     Q_UNUSED(transAnimator);
 }
 
@@ -625,7 +629,7 @@ MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPtPos,
             return pivotMovable;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void BoundingBox::cancelTransform() {
@@ -768,7 +772,7 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
 }
 
 int BoundingBox::prp_getParentFrameShift() const {
-    if(mParentGroup == NULL) {
+    if(mParentGroup == nullptr) {
         return 0;
     } else {
         return mParentGroup->prp_getFrameShift();
@@ -776,14 +780,14 @@ int BoundingBox::prp_getParentFrameShift() const {
 }
 
 bool BoundingBox::hasDurationRectangle() {
-    return mDurationRectangle != NULL;
+    return mDurationRectangle != nullptr;
 }
 
 void BoundingBox::createDurationRectangle() {
     DurationRectangle *durRect = new DurationRectangle(this);
     durRect->setMinFrame(0);
     Canvas *parentCanvas = getParentCanvas();
-    if(parentCanvas != NULL) {
+    if(parentCanvas != nullptr) {
         durRect->setFramesDuration(getParentCanvas()->getFrameCount());
     }
     setDurationRectangle(durRect);
@@ -798,23 +802,23 @@ void BoundingBox::shiftAll(const int &shift) {
 }
 
 int BoundingBox::prp_getRelFrameShift() const {
-    if(mDurationRectangle == NULL) return 0;
+    if(mDurationRectangle == nullptr) return 0;
     return mDurationRectangle->getFrameShift();
 }
 
 void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     if(durationRect == mDurationRectangle) return;
-    if(mDurationRectangle != NULL) {
+    if(mDurationRectangle != nullptr) {
         disconnect(mDurationRectangle, 0, this, 0);
     }
     DurationRectangle *oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted();
-    if(durationRect == NULL) {
+    if(durationRect == nullptr) {
         shiftAll(oldDurRect->getFrameShift());
     }
 
-    if(mDurationRectangle == NULL) return;
+    if(mDurationRectangle == nullptr) return;
     connect(mDurationRectangle, SIGNAL(posChangedBy(int)),
             this, SLOT(updateAfterDurationRectangleShifted(int)));
     connect(mDurationRectangle, SIGNAL(rangeChanged()),
@@ -871,7 +875,7 @@ DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
                             const qreal &relX,
                             const int &minViewedFrame,
                             const qreal &pixelsPerFrame) {
-    if(mDurationRectangle == NULL) return NULL;
+    if(mDurationRectangle == nullptr) return nullptr;
     return mDurationRectangle->getMovableAt(relX,
                                            pixelsPerFrame,
                                            minViewedFrame);
@@ -882,7 +886,7 @@ void BoundingBox::prp_drawKeys(QPainter *p,
                                const qreal &drawY,
                                const int &startFrame,
                                const int &endFrame) {
-    if(mDurationRectangle != NULL) {
+    if(mDurationRectangle != nullptr) {
         p->save();
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
         mDurationRectangle->draw(p, pixelsPerFrame,
@@ -911,13 +915,13 @@ bool BoundingBox::isVisibleAndInVisibleDurationRect() {
 }
 
 bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
-    if(mDurationRectangle == NULL) return true;
+    if(mDurationRectangle == nullptr) return true;
     return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
 bool BoundingBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
-    if(mDurationRectangle == NULL) return true;
+    if(mDurationRectangle == nullptr) return true;
     return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
@@ -941,7 +945,7 @@ void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                         firstIdentical,
                                         lastIdentical,
                                         relFrame);
-            if(mDurationRectangle != NULL) {
+            if(mDurationRectangle != nullptr) {
                 if(relFrame == mDurationRectangle->getMinFrameAsRelFrame()) {
                     *firstIdentical = relFrame;
                 }
@@ -1006,7 +1010,7 @@ void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
             }
             *firstIdentical = fId;
             *lastIdentical = lId;
-            if(mDurationRectangle != NULL) {
+            if(mDurationRectangle != nullptr) {
                 if(fId < mDurationRectangle->getMinFrameAsRelFrame()) {
                     *firstIdentical = relFrame;
                 }
@@ -1027,7 +1031,7 @@ void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
         *firstIdentical = INT_MIN;
         *lastIdentical = INT_MAX;
     }
-    if(mParentGroup == NULL || takeAncestorsIntoAccount) return;
+    if(mParentGroup == nullptr || takeAncestorsIntoAccount) return;
     if(*firstIdentical == relFrame && *lastIdentical == relFrame) return;
     int parentFirst;
     int parentLast;
@@ -1145,7 +1149,7 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool &parentSatisfies,
                                       const bool &parentMainTarget) {
     const SWT_Rule &rule = rules.rule;
-    bool satisfies;
+    bool satisfies = false;
     bool alwaysShowChildren = rules.alwaysShowChildren;
     if(rules.type == &SingleWidgetTarget::SWT_isSingleSound) return false;
     if(alwaysShowChildren) {
@@ -1240,7 +1244,7 @@ void BoundingBox::removeFromSelection() {
 
 bool BoundingBox::SWT_handleContextMenuActionSelected(
         QAction *selectedAction) {
-    if(selectedAction != NULL) {
+    if(selectedAction != nullptr) {
         if(selectedAction->text() == "Delete") {
             mParentGroup->removeContainedBox(this);
         } else if(selectedAction->text() == "Apply Transformation") {
@@ -1290,19 +1294,19 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 
 void BoundingBox::updateCurrentRenderData() {
     BoundingBoxRenderData *renderData = createRenderData();
-    if(renderData == NULL) return;
+    if(renderData == nullptr) return;
     mCurrentRenderData = renderData->ref<BoundingBoxRenderData>();
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
-    if(mCurrentRenderData == NULL) {
+    if(mCurrentRenderData == nullptr) {
         return mDrawRenderContainer.getSrcRenderData();
     }
     return mCurrentRenderData.get();
 }
 
 void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
-    if(mDurationRectangle == NULL) {
+    if(mDurationRectangle == nullptr) {
         *minFrame = INT_MIN;
         *maxFrame = INT_MAX;
     } else {
@@ -1312,7 +1316,7 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
 }
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
-    if(parentBoxT == NULL) return;
+    if(parentBoxT == nullptr) return;
     parentBox = parentBoxT->weakRef<BoundingBox>();
 }
 
@@ -1328,7 +1332,7 @@ BoundingBoxRenderData::~BoundingBoxRenderData() {
 
 void BoundingBoxRenderData::updateRelBoundingRect() {
     BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == NULL) return;
+    if(parentBoxT == nullptr) return;
     relBoundingRect = parentBoxT->getRelBoundingRectAtRelFrame(relFrame);
 }
 
@@ -1438,16 +1442,16 @@ void BoundingBoxRenderData::beforeUpdate() {
 //    parentBox->updateCurrentPreviewDataFromRenderData(this);
 
     BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == NULL || !parentIsTarget) return;
+    if(parentBoxT == nullptr || !parentIsTarget) return;
     parentBoxT->nullifyCurrentRenderData();
 }
 
 void BoundingBoxRenderData::afterUpdate() {
-    if(motionBlurTarget != NULL) {
+    if(motionBlurTarget != nullptr) {
         motionBlurTarget->otherGlobalRects << globalBoundingRect;
     }
     BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT != NULL && parentIsTarget) {
+    if(parentBoxT != nullptr && parentIsTarget) {
         parentBoxT->renderDataFinished(this);
     }
     _ScheduledExecutor::afterUpdate();
@@ -1455,7 +1459,7 @@ void BoundingBoxRenderData::afterUpdate() {
 
 void BoundingBoxRenderData::schedulerProccessed() {
     BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT != NULL) {
+    if(parentBoxT != nullptr) {
         if(useCustomRelFrame) {
             parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
                         customRelFrame,
@@ -1479,7 +1483,7 @@ void BoundingBoxRenderData::schedulerProccessed() {
 
 void BoundingBoxRenderData::addSchedulerNow() {
     BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == NULL) return;
+    if(parentBoxT == nullptr) return;
     parentBoxT->addScheduler(this);
 }
 
@@ -1488,7 +1492,7 @@ void BoundingBoxRenderData::dataSet() {
         mDataSet = true;
         updateRelBoundingRect();
         BoundingBox *parentBoxT = parentBox.data();
-        if(parentBoxT == NULL || !parentIsTarget) return;
+        if(parentBoxT == nullptr || !parentIsTarget) return;
         parentBoxT->updateCurrentPreviewDataFromRenderData(this);
     }
 }

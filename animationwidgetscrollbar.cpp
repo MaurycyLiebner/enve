@@ -65,7 +65,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
                2*MIN_WIDGET_HEIGHT - MIN_WIDGET_HEIGHT/2, height(),
                QColor(30, 30, 30));
 
-    if(mCacheHandler != NULL) {
+    if(mCacheHandler != nullptr) {
         mCacheHandler->drawCacheOnTimeline(&p, pixPerFrame, 0.,
                                            mMinFrame, mMaxFrame);
     }

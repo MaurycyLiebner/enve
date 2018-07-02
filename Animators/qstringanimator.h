@@ -8,7 +8,7 @@ class QStringKey : public Key {
 public:
     QStringKey(const QString &stringT,
                const int &relFrame,
-               QStringAnimator *parentAnimator = NULL);
+               QStringAnimator *parentAnimator = nullptr);
 
     bool differsFromKey(Key *key);
 

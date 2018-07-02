@@ -102,7 +102,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     bool useCustomRelFrame = false;
     qreal customRelFrame;
     QList<QRectF> otherGlobalRects;
-    BoundingBoxRenderData *motionBlurTarget = NULL;
+    BoundingBoxRenderData *motionBlurTarget = nullptr;
     // for motion blur
 
     QList<PixmapEffectRenderData*> pixmapEffects;
@@ -266,6 +266,7 @@ public:
 
 
     void applyTransformation(BoxTransformAnimator *transAnimator);
+    void applyTransformationInverted(BoxTransformAnimator *transAnimator);
 
     QPointF getAbsolutePos();
 
@@ -326,7 +327,7 @@ public:
         Q_UNUSED(absPos);
         Q_UNUSED(adjust);
         Q_UNUSED(canvasScaleInv);
-        return NULL;
+        return nullptr;
     }
     virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
@@ -375,7 +376,7 @@ public:
                                     const qreal &canvasScaleInv) {
         Q_UNUSED(absPos);
         Q_UNUSED(canvasScaleInv);
-        return NULL;
+        return nullptr;
     }
     void setAbsolutePos(const QPointF &pos,
                         const bool &saveUndoRedo = false);
@@ -389,8 +390,8 @@ public:
     void resetTranslation();
     void resetRotation();
     BoxTransformAnimator *getTransformAnimator();
-    virtual VectorPath *objectToVectorPathBox() { return NULL; }
-    virtual VectorPath *strokeToVectorPathBox() { return NULL; }
+    virtual VectorPath *objectToVectorPathBox() { return nullptr; }
+    virtual VectorPath *strokeToVectorPathBox() { return nullptr; }
 
     void updatePrettyPixmap();
 
@@ -537,7 +538,7 @@ public:
     virtual void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData *data);
 
-    virtual BoundingBoxRenderData *createRenderData() { return NULL; }
+    virtual BoundingBoxRenderData *createRenderData() { return nullptr; }
 
     BoundingBoxRenderData *getCurrentRenderData();
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
@@ -551,7 +552,7 @@ public:
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData *renderData);
     virtual bool shouldScheduleUpdate() {
-        if(mParentGroup == NULL) return false;
+        if(mParentGroup == nullptr) return false;
         if((isVisibleAndInVisibleDurationRect()) ||
            (isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame))) {
             return true;
@@ -595,7 +596,7 @@ public:
                 return box;
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     static void addFunctionWaitingForBoxLoad(FunctionWaitingForBoxLoad *func) {
@@ -704,7 +705,6 @@ public:
     DurationRectangle *getDurationRectangle() {
         return mDurationRectangle;
     }
-
 protected:
     virtual void getMotionBlurProperties(QList<Property*> *list) {
         list->append(mTransformAnimator->getScaleAnimator());
@@ -725,9 +725,9 @@ protected:
 
     bool mBlockedSchedule = false;
 
-    DurationRectangle *mDurationRectangle = NULL;
-    SingleWidgetAbstraction *mSelectedAbstraction = NULL;
-    SingleWidgetAbstraction *mTimelineAbstraction = NULL;
+    DurationRectangle *mDurationRectangle = nullptr;
+    SingleWidgetAbstraction *mSelectedAbstraction = nullptr;
+    SingleWidgetAbstraction *mTimelineAbstraction = nullptr;
 
     QPointF mPreviewDrawPos;
     QRectF mRelBoundingRect;
@@ -743,8 +743,8 @@ protected:
 
     void setType(const BoundingBoxType &type) { mType = type; }
     BoundingBoxType mType;
-    BoxesGroup *mParentGroup = NULL;
-    BasicTransformAnimator *mParentTransform = NULL;
+    BoxesGroup *mParentGroup = nullptr;
+    BasicTransformAnimator *mParentTransform = nullptr;
 
     QSharedPointer<EffectAnimators> mEffectsAnimators;
 

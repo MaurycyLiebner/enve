@@ -14,7 +14,7 @@ class SingleSound : public ComplexAnimator
     Q_OBJECT
 public:
     SingleSound(const QString &path,
-                FixedLenAnimationRect *durRect = NULL);
+                FixedLenAnimationRect *durRect = nullptr);
 
     void setDurationRect(FixedLenAnimationRect *durRect);
 
@@ -52,9 +52,9 @@ private slots:
 private:
     bool mFinalDataUpdateNeeded = false;
     bool mOwnDurationRectangle;
-    FixedLenAnimationRect *mDurationRectangle = NULL;
-    float *mSrcData = NULL;
-    float *mFinalData = NULL;
+    FixedLenAnimationRect *mDurationRectangle = nullptr;
+    float *mSrcData = nullptr;
+    float *mFinalData = nullptr;
     int mFinalSampleCount = 0;
     int mFinalAbsStartFrame = 0;
     int mSrcSampleCount = 0;

@@ -38,7 +38,7 @@ public:
     void setContentVisible(const bool &bT);
 
     void clearTarget() {
-        mTarget = NULL;
+        mTarget = nullptr;
     }
     SingleWidgetTarget *getTarget() {
         return mTarget;
@@ -89,7 +89,7 @@ private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;
     bool mContentVisible = false;
-    SingleWidgetTarget *mTarget = NULL;
+    SingleWidgetTarget *mTarget = nullptr;
 
     QList<std::shared_ptr<SingleWidgetAbstraction> > mChildren;
 };

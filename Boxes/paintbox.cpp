@@ -35,7 +35,7 @@ bool PaintBox::prp_nextRelFrameWithKey(const int &relFrame,
     int bbNext;
     bool bbHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
                                                           bbNext);
-    if(mMainHandler != NULL) {
+    if(mMainHandler != nullptr) {
         if(mMainHandler->prp_hasKeys()) {
             int clostestFrame;
             mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
@@ -57,7 +57,7 @@ bool PaintBox::prp_prevRelFrameWithKey(const int &relFrame,
     int bbPrev;
     bool bbHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
                                                           bbPrev);
-    if(mMainHandler != NULL) {
+    if(mMainHandler != nullptr) {
         if(mMainHandler->prp_hasKeys()) {
             int clostestFrame;
             mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
@@ -89,7 +89,7 @@ bool PaintBox::isSurfaceAnimated() {
 void PaintBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
 
-    if(mMainHandler == NULL) return;
+    if(mMainHandler == nullptr) return;
     mMainHandler->setCurrentRelFrame(frame);
 }
 
@@ -109,7 +109,7 @@ MovablePoint *PaintBox::getPointAtAbsPos(const QPointF &absPtPos,
             return pivotMovable;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void PaintBox::selectAndAddContainedPointsToList(const QRectF &absRect,
@@ -194,14 +194,14 @@ void PaintBox::finishSizeSetup() {
     if(widthT == mWidth && heightT == mHeight) return;
     mWidth = widthT;
     mHeight = heightT;
-    if(mMainHandler == NULL) {
+    if(mMainHandler == nullptr) {
         mMainHandler = new AnimatedSurface(mWidth, mHeight, 1., this);
         mMainHandler->setCurrentRelFrame(anim_mCurrentRelFrame);
         ca_addChildAnimator(mMainHandler);
     } else {
         mMainHandler->setSize(mWidth, mHeight);
     }
-    if(mTemporaryHandler == NULL) {
+    if(mTemporaryHandler == nullptr) {
         mTemporaryHandler = new Surface(mWidth/4, mHeight/4, 0.25, false);
     } else {
         mTemporaryHandler->setSize(mWidth/4, mHeight/4);
@@ -249,9 +249,9 @@ void PaintBox::scheduleFinishSizeSetup() {
 }
 
 void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
-    canvas->saveLayer(NULL, paint);
-    BoundingBox::drawPixmapSk(canvas, NULL);
-    if(mTemporaryHandler != NULL) {
+    canvas->saveLayer(nullptr, paint);
+    BoundingBox::drawPixmapSk(canvas, nullptr);
+    if(mTemporaryHandler != nullptr) {
         canvas->concat(
                 QMatrixToSkMatrix(
                     mTransformAnimator->getCombinedTransform()) );
@@ -265,7 +265,7 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
 }
 
 void PaintBox::processSchedulers() {
-    if(mTemporaryHandler != NULL) {
+    if(mTemporaryHandler != nullptr) {
         mTemporaryHandler->saveToTmp();
     }
     BoundingBox::processSchedulers();
@@ -273,7 +273,7 @@ void PaintBox::processSchedulers() {
 
 void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     BoundingBox::renderDataFinished(renderData);
-    if(mTemporaryHandler != NULL) {
+    if(mTemporaryHandler != nullptr) {
         mTemporaryHandler->clearTmp();
     }
 }
@@ -289,7 +289,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrame(
     }
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
-    if(mMainHandler == NULL) return;
+    if(mMainHandler == nullptr) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
     foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
         foreach(TileSkDrawer *drawerT, drawer.drawers) {
@@ -316,7 +316,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
     }
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
-    if(mMainHandler == NULL) return;
+    if(mMainHandler == nullptr) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
     foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
         foreach(TileSkDrawer *drawerT, drawer.drawers) {
@@ -341,7 +341,7 @@ bool PaintBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     if(ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1, relFrame2)) {
         return true;
     }
-    if(mMainHandler != NULL) {
+    if(mMainHandler != nullptr) {
         if(mMainHandler->prp_differencesBetweenRelFrames(relFrame1,
                                                          relFrame2)) {
             return true;

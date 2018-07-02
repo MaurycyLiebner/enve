@@ -27,7 +27,7 @@ void SavedColorsWidget::mousePressEvent(QMouseEvent *e)
         menu.addAction("Add Color");
         menu.addAction("Delete Collection");
         QAction *selected_action = menu.exec(e->globalPos());
-        if(selected_action != NULL)
+        if(selected_action != nullptr)
         {
             if(selected_action->text() == "Add Color")
             {

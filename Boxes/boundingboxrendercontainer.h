@@ -52,7 +52,7 @@ public:
     bool isFileUpdatable() { return true; }
 protected:
     void addSchedulerNow();
-    CacheContainer *mTargetCont = NULL;
+    CacheContainer *mTargetCont = nullptr;
     sk_sp<SkImage> mImage;
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
@@ -68,7 +68,7 @@ public:
 protected:
     bool mSavingFailed = false;
     void addSchedulerNow();
-    CacheContainer *mTargetCont = NULL;
+    CacheContainer *mTargetCont = nullptr;
     sk_sp<SkImage> mImage;
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
@@ -91,18 +91,18 @@ public:
     CacheContainer() {}
     ~CacheContainer();
 
-    _ScheduledExecutor *scheduleLoadFromTmpFile(_ScheduledExecutor *dependent = NULL) {
+    _ScheduledExecutor *scheduleLoadFromTmpFile(_ScheduledExecutor *dependent = nullptr) {
         if(mSavingToFile) {
             mCancelAfterSaveDataClear = true;
             return mSavingUpdatable;
         }
-        if(!mNoDataInMemory) return NULL;
+        if(!mNoDataInMemory) return nullptr;
         if(mLoadingFromFile) return mLoadingUpdatable;
 
         mLoadingFromFile = true;
         mLoadingUpdatable = new CacheContainerTmpFileDataLoader(mTmpFile,
                                                                 this);
-        if(dependent != NULL) {
+        if(dependent != nullptr) {
             mLoadingUpdatable->addDependent(dependent);
         }
         mLoadingUpdatable->addScheduler();
@@ -115,7 +115,7 @@ public:
     void setBlocked(const bool &bT);
 
     int getByteCount() {
-        if(mImageSk.get() == NULL) return 0;
+        if(mImageSk.get() == nullptr) return 0;
         SkPixmap pixmap;
         if(mImageSk->peekPixels(&pixmap)) {
             return pixmap.width()*pixmap.height()*
@@ -129,7 +129,7 @@ public:
     }
 
     void scheduleDeleteTmpFile() {
-        if(mTmpFile == NULL) return;
+        if(mTmpFile == nullptr) return;
         _ScheduledExecutor *updatable = new CacheContainerTmpFileDataDeleter(mTmpFile);
         mTmpFile.reset();
         updatable->addScheduler();
@@ -156,10 +156,10 @@ public:
         mTmpLoadTargetCanvas = canvas;
     }
 protected:
-    Canvas *mTmpLoadTargetCanvas = NULL;
+    Canvas *mTmpLoadTargetCanvas = nullptr;
     int mMemSizeAwaitingSave = 0;
-    _ScheduledExecutor *mLoadingUpdatable = NULL;
-    _ScheduledExecutor *mSavingUpdatable = NULL;
+    _ScheduledExecutor *mLoadingUpdatable = nullptr;
+    _ScheduledExecutor *mSavingUpdatable = nullptr;
     bool mCancelAfterSaveDataClear = false;
     bool mSavingToFile = false;
     bool mLoadingFromFile = false;
@@ -168,7 +168,7 @@ protected:
     QSharedPointer<QTemporaryFile> mTmpFile;
 
     sk_sp<SkImage> mImageSk;
-    CacheHandler *mParentCacheHandler = NULL;
+    CacheHandler *mParentCacheHandler = nullptr;
     int mMinRelFrame = 0;
     int mMaxRelFrame = 0;
 };

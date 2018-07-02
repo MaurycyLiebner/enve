@@ -56,7 +56,7 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
     } else if(isImageExt(ext)) {
         return new ImageCacheHandler(filePath);
     }
-    return NULL;
+    return nullptr;
 }
 
 void FileSourcesCache::removeHandler(FileCacheHandler *handler) {
@@ -120,7 +120,7 @@ void FileCacheHandler::clearCache() {
     mFileMissing = !file.exists();
     foreach(const BoundingBoxQWPtr &boxPtr, mDependentBoxes) {
         BoundingBox *box = boxPtr.data();
-        if(box == NULL) continue;
+        if(box == nullptr) continue;
         box->reloadCacheHandler();
     }
 }
@@ -164,7 +164,7 @@ VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
 
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     CacheContainer *cont = mFramesCache.getRenderContainerAtRelFrame(relFrame);
-    if(cont == NULL) return sk_sp<SkImage>();
+    if(cont == nullptr) return sk_sp<SkImage>();
     //cont->neededInMemory();
     return cont->getImageSk();
 }
@@ -186,11 +186,11 @@ void VideoCacheHandler::updateFrameCount() {
     QByteArray stringByteArray = mFilePath.toLatin1();
     const char *path = stringByteArray.constData();
     AVFormatContext *format = avformat_alloc_context();
-    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+    if (avformat_open_input(&format, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return;
     }
-    if (avformat_find_stream_info(format, NULL) < 0) {
+    if (avformat_find_stream_info(format, nullptr) < 0) {
         fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
         return;
     }
@@ -244,11 +244,11 @@ void VideoCacheHandler::_processUpdate() {
         fprintf(stderr, "Error allocating AVFormatContext\n");
         return;// -1;
     }
-    if(avformat_open_input(&formatContext, path, NULL, NULL) != 0) {
+    if(avformat_open_input(&formatContext, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return;// -1;
     }
-    if(avformat_find_stream_info(formatContext, NULL) < 0) {
+    if(avformat_find_stream_info(formatContext, nullptr) < 0) {
         fprintf(stderr,
                 "Could not retrieve stream info from file '%s'\n",
                 path);
@@ -257,9 +257,9 @@ void VideoCacheHandler::_processUpdate() {
 
     // Find the index of the first audio stream
     int videoStreamIndex = -1;
-    AVCodecParameters *codecPars = NULL;
-    AVCodec *codec = NULL;
-    AVStream *videoStream = NULL;
+    AVCodecParameters *codecPars = nullptr;
+    AVCodec *codec = nullptr;
+    AVStream *videoStream = nullptr;
     for(uint i = 0; i < formatContext->nb_streams; i++) {
         AVStream *streamT = formatContext->streams[i];
         AVCodecParameters *codecParsT = streamT->codecpar;
@@ -279,7 +279,7 @@ void VideoCacheHandler::_processUpdate() {
         return;// -1;
     }
 
-    if(codec == NULL) {
+    if(codec == nullptr) {
         fprintf(stderr, "Unsuported codec\n");
         return;
     }
@@ -293,15 +293,15 @@ void VideoCacheHandler::_processUpdate() {
         return;// -1;
     }
 
-    if(avcodec_open2(codecContext, codec, NULL) < 0 ) {
+    if(avcodec_open2(codecContext, codec, nullptr) < 0 ) {
         fprintf(stderr, "Failed to open codec\n");
         return;// -1;
     }
-    struct SwsContext *sws = NULL;
+    struct SwsContext *sws = nullptr;
     sws = sws_getContext(codecContext->width, codecContext->height,
                          codecContext->pix_fmt,
                          codecContext->width, codecContext->height,
-                         AV_PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
+                         AV_PIX_FMT_BGRA, SWS_BICUBIC, nullptr, nullptr, nullptr);
 
     // prepare to read data
     AVPacket *packet = av_packet_alloc();
@@ -438,11 +438,11 @@ void VideoCacheHandler::afterUpdate() {
         i < mLoadedFrames.count(); i++) {
         int frameId = mFramesBeingLoaded.at(i);
         sk_sp<SkImage> imgT = mLoadedFrames.at(i);
-        if(imgT.get() == NULL) {
+        if(imgT.get() == nullptr) {
             mFramesCount = frameId;
             foreach(const BoundingBoxQWPtr &boxWPtr, mDependentBoxes) {
                 BoundingBox *box = boxWPtr.data();
-                if(box == NULL) continue;
+                if(box == nullptr) continue;
                 ((VideoBox*)box)->updateDurationRectangleAnimationRange();
             }
         } else {
@@ -464,13 +464,13 @@ void VideoCacheHandler::clearCache() {
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
 _ScheduledExecutor *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
-    if(mFramesCount <= 0 || frame >= mFramesCount) return NULL;
+    if(mFramesCount <= 0 || frame >= mFramesCount) return nullptr;
     if(mFramesLoadScheduled.contains(frame) ||
        mFramesBeingLoadedGUI.contains(frame)) return this;
 //    qDebug() << "schedule frame load: " << frame;
     CacheContainer *contAtFrame =
             mFramesCache.getRenderContainerAtRelFrame(frame);
-    if(contAtFrame == NULL) {
+    if(contAtFrame == nullptr) {
         mFramesLoadScheduled << frame;
     } else {
         return contAtFrame->scheduleLoadFromTmpFile();
@@ -485,7 +485,7 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
     foreach(const QString &path, framePaths) {
         ImageCacheHandler *imgCacheHandler = (ImageCacheHandler*)
                 FileSourcesCache::getHandlerForFilePath(path);
-        if(imgCacheHandler == NULL) {
+        if(imgCacheHandler == nullptr) {
             mFrameImageHandlers << (new ImageCacheHandler(path, false))->ref<ImageCacheHandler>();
         } else {
             mFrameImageHandlers << imgCacheHandler->ref<ImageCacheHandler>();
@@ -496,7 +496,7 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
 
 sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int &relFrame) {
     ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame).get();
-    if(cacheHandler == NULL) return sk_sp<SkImage>();
+    if(cacheHandler == nullptr) return sk_sp<SkImage>();
     return cacheHandler->getImage();
 }
 
@@ -556,11 +556,11 @@ int SoundCacheHandler::decodeSoundDataRange(SoundDataRange &range) {
     const char* path = pathBytes.data();
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
-    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+    if (avformat_open_input(&format, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return -1;
     }
-    if (avformat_find_stream_info(format, NULL) < 0) {
+    if (avformat_find_stream_info(format, nullptr) < 0) {
         fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
         return -1;
     }
@@ -580,13 +580,13 @@ int SoundCacheHandler::decodeSoundDataRange(SoundDataRange &range) {
                 "Could not retrieve audio stream from file '%s'\n", path);
         return -1;
     }
-    AVCodecContext *audioCodec = NULL;
-    struct SwrContext *swr = NULL;
+    AVCodecContext *audioCodec = nullptr;
+    struct SwrContext *swr = nullptr;
 
     AVStream* audioStream = format->streams[audioStreamIndex];
     // find & open codec
     audioCodec = audioStream->codec;
-    if (avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), NULL) < 0) {
+    if (avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), nullptr) < 0) {
         fprintf(stderr, "Failed to open decoder for stream #%u in file '%s'\n",
                 audioStreamIndex, path);
         return -1;
@@ -618,7 +618,7 @@ int SoundCacheHandler::decodeSoundDataRange(SoundDataRange &range) {
     }
 
     // iterate through frames
-    *audioData = NULL;
+    *audioData = nullptr;
     int nSamples = 0;
     int maxFrameTsms = qRound(range.maxRelFrame * 1000 / mUpdateFps);
     int minFrameTsms = qRound(range.minRelFrame * 1000 / mUpdateFps);
@@ -648,7 +648,7 @@ int SoundCacheHandler::decodeSoundDataRange(SoundDataRange &range) {
             }
             // resample frames
             float *buffer;
-            av_samples_alloc((uint8_t**) &buffer, NULL, 1,
+            av_samples_alloc((uint8_t**) &buffer, nullptr, 1,
                              audioFrame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
             int nSamplesT = swr_convert(swr,
                                           (uint8_t**) &buffer,
@@ -683,10 +683,10 @@ int SoundCacheHandler::decodeSoundDataRange(SoundDataRange &range) {
 
     // clean up
     av_frame_free(&audioFrame);
-    if(swr != NULL) {
+    if(swr != nullptr) {
         swr_free(&swr);
     }
-    if(audioCodec != NULL) {
+    if(audioCodec != nullptr) {
         avcodec_close(audioCodec);
     }
     avformat_free_context(format);

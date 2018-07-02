@@ -10,30 +10,30 @@ BoolPropertyWidget::BoolPropertyWidget(QWidget *parent) :
 
 void BoolPropertyWidget::setTarget(BoolProperty *property) {
     mTarget = property;
-    mTargetContainer = NULL;
+    mTargetContainer = nullptr;
 }
 
 void BoolPropertyWidget::setTarget(BoolPropertyContainer *property) {
     mTargetContainer = property;
-    mTarget = NULL;
+    mTarget = nullptr;
 }
 
 void BoolPropertyWidget::mousePressEvent(QMouseEvent *) {
-    if(mTargetContainer != NULL) {
+    if(mTargetContainer != nullptr) {
         mTargetContainer->setValue(!mTargetContainer->getValue());
     }
-    if(mTarget != NULL) {
+    if(mTarget != nullptr) {
         mTarget->setValue(!mTarget->getValue());
     }
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void BoolPropertyWidget::paintEvent(QPaintEvent *) {
-    if(mTarget == NULL && mTargetContainer == NULL) return;
+    if(mTarget == nullptr && mTargetContainer == nullptr) return;
     QPainter p(this);
-    if(mTarget != NULL) {
+    if(mTarget != nullptr) {
         if(mTarget->SWT_isDisabled()) p.setOpacity(.5);
-    } else if(mTargetContainer != NULL) {
+    } else if(mTargetContainer != nullptr) {
         if(mTargetContainer->SWT_isDisabled()) p.setOpacity(.5);
     }
 
@@ -48,7 +48,7 @@ void BoolPropertyWidget::paintEvent(QPaintEvent *) {
     p.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 5., 5.);
 
     bool valueT;
-    if(mTarget == NULL) {
+    if(mTarget == nullptr) {
         valueT = mTargetContainer->getValue();
     } else {
         valueT = mTarget->getValue();

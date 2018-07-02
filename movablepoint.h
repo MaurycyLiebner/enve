@@ -104,7 +104,7 @@ protected:
     bool mHidden = false;
     qreal mRadius;
     QPointF mSavedRelPos;
-    BasicTransformAnimator *mParent = NULL;
+    BasicTransformAnimator *mParent = nullptr;
 
     virtual void drawOnAbsPosSk(SkCanvas *canvas,
                 const SkPoint &absPos,

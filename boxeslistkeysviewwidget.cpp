@@ -186,12 +186,13 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 
     setLayout(mMainLayout);
 
-    mMainWindow->getCanvasWindow()->getWindowSWT()->SWT_getAbstractionForWidget(
+    WindowSingleWidgetTarget *window = mMainWindow->getCanvasWindow()->getWindowSWT();
+    window->SWT_getAbstractionForWidget(
                 mBoxesListWidget->getVisiblePartWidget());
     mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(SWT_NoRule);
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                NULL,
+                window->getCanvasWindow()->getCurrentCanvas(),
                 SWT_CurrentCanvas);
 
     setTopWidget(topWidget);
@@ -207,10 +208,10 @@ void BoxesListKeysViewWidget::setGraphEnabled(const bool &bT) {
 }
 
 void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
-    if(mTopWidget != NULL) {
+    if(mTopWidget != nullptr) {
         delete mTopWidget;
     }
-    if(topWidget == NULL) {
+    if(topWidget == nullptr) {
         mTopWidget = new QWidget(this);
         mTopWidget->setFixedHeight(MIN_WIDGET_HEIGHT);
         mTopWidget->setStyleSheet("background-color: rgb(50, 50, 50)");
@@ -350,7 +351,7 @@ void BoxesListKeysViewWidget::setTypeSound() {
 
 void BoxesListKeysViewWidget::setTypeAll() {
     mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentType(NULL);
+            setCurrentType(nullptr);
     mMainWindow->callUpdateSchedulers();
 }
 

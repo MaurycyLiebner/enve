@@ -159,9 +159,9 @@ void RenderInstanceWidget::updateFromSettings() {
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     OutputSettingsProfile *outputProfile = mSettings->getOutputSettingsProfile();
     QString outputTxt;
-    if(outputProfile == NULL) {
+    if(outputProfile == nullptr) {
         AVOutputFormat *formatT = outputSettings.outputFormat;
-        if(formatT != NULL) {
+        if(formatT != nullptr) {
             outputTxt = "Custom " + QString(formatT->long_name);
         } else {
             outputTxt = "Settings";
@@ -183,11 +183,11 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
     RenderSettingsDialog *dialog = new RenderSettingsDialog(outputSettings,
                                                             this);
     if(dialog->exec()) {
-        mSettings->setOutputSettingsProfile(NULL);
+        mSettings->setOutputSettingsProfile(nullptr);
         OutputSettings outputSettings = dialog->getSettings();
         mSettings->setOutputRenderSettings(outputSettings);
         AVOutputFormat *outputFormat = outputSettings.outputFormat;
-        if(outputFormat == NULL) {
+        if(outputFormat == nullptr) {
             mOutputSettingsButton->setText("Settings");
         } else {
             mOutputSettingsButton->setText("Custom " +
@@ -206,7 +206,7 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     }
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     AVOutputFormat *format = outputSettings.outputFormat;
-    if(format == NULL) return;
+    if(format == nullptr) return;
     QString tmpStr = QString(format->extensions);
     QStringList supportedExt = tmpStr.split(",");
     QString fileName = outputDst.split("/").last();
@@ -248,7 +248,7 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString selectedExt;
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     AVOutputFormat *format = outputSettings.outputFormat;
-    if(format != NULL) {
+    if(format != nullptr) {
         QString tmpStr = QString(format->extensions);
         selectedExt = "." + tmpStr.split(",").first();
         tmpStr.replace(",", " *.");
@@ -296,7 +296,7 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
         menu.addAction(actionT);
 
         QAction *selectedAction = menu.exec(mapToGlobal(QPoint(0, height())));
-        if(selectedAction != NULL) {
+        if(selectedAction != nullptr) {
             int profileId = selectedAction->data().toInt();
             if(profileId == -1) {
                 const OutputSettings &outputSettings =

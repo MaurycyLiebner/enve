@@ -31,10 +31,15 @@ void ScrollArea::resizeEvent(QResizeEvent *e) {
     }
     QScrollArea::resizeEvent(e);
 }
-
+#include "global.h"
 void ScrollArea::callWheelEvent(QWheelEvent *event) {
-    verticalScrollBar()->triggerAction(
-                (event->delta() > 0) ?
-                    QAbstractSlider::SliderSingleStepSub :
-                    QAbstractSlider::SliderSingleStepAdd);
+    if(event->delta() > 0) {
+        scrollBy(0, -MIN_WIDGET_HEIGHT);
+    } else {
+        scrollBy(0, MIN_WIDGET_HEIGHT);
+    }
+//    verticalScrollBar()->triggerAction(
+//                (event->delta() > 0) ?
+//                    QAbstractSlider::SliderSingleStepSub :
+//                    QAbstractSlider::SliderSingleStepAdd);
 }

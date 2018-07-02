@@ -117,9 +117,9 @@ void FullVectorPath::generateSinglePathPaths() {
 }
 
 void FullVectorPath::generateFromPath(const SkPath &path) {
-    MinimalNodePoint *firstPoint = NULL;
-    MinimalNodePoint *lastPoint = NULL;
-    MinimalVectorPath *currentTarget = NULL;
+    MinimalNodePoint *firstPoint = nullptr;
+    MinimalNodePoint *lastPoint = nullptr;
+    MinimalVectorPath *currentTarget = nullptr;
 
     SkPath::RawIter iter = SkPath::RawIter(path);;
 
@@ -233,11 +233,11 @@ DONE:
 }
 
 //void FullVectorPath::generateFromPath(const QPainterPath &path) {
-//    MinimalNodePoint *firstPoint = NULL;
-//    MinimalNodePoint *lastPoint = NULL;
+//    MinimalNodePoint *firstPoint = nullptr;
+//    MinimalNodePoint *lastPoint = nullptr;
 //    bool firstOther = true;
 //    QPointF startCtrlPoint;
-//    MinimalVectorPath *currentTarget = NULL;
+//    MinimalVectorPath *currentTarget = nullptr;
 
 //    for(int i = 0; i < path.elementCount(); i++) {
 //        const QPainterPath::Element &elem = path.elementAt(i);
@@ -342,8 +342,8 @@ void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
     Q_FOREACH(MinimalVectorPath *separatePath, mSeparatePaths) {
         MinimalNodePoint *firstPoint = separatePath->getFirstPoint();
         MinimalNodePoint *point = firstPoint;
-        NodePoint *firstNodePoint = NULL;
-        NodePoint *lastNodePoint = NULL;
+        NodePoint *firstNodePoint = nullptr;
+        NodePoint *lastNodePoint = nullptr;
         VectorPathAnimator *singlePath =
                 new VectorPathAnimator(path);
         do {
@@ -351,7 +351,7 @@ void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
                                                  point->getStartPos(),
                                                  point->getEndPos(),
                                                  lastNodePoint);
-            if(firstNodePoint == NULL) {
+            if(firstNodePoint == nullptr) {
                 firstNodePoint = lastNodePoint;
             }
             point = point->getNextPoint();
@@ -378,7 +378,7 @@ void MinimalVectorPath::setLastPointPos(QPointF pos) {
 }
 
 void MinimalVectorPath::addPoint(MinimalNodePoint *point) {
-    if(mLastPoint == NULL) {
+    if(mLastPoint == nullptr) {
         mFirstPoint = point;
     } else {
         mLastPoint->setNextPoint(point);
@@ -397,17 +397,17 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
     if(mPath.intersects(otherPath->getPath())) {
         MinimalNodePoint *firstPoint = otherPath->getFirstPoint();
         MinimalNodePoint *point = firstPoint;
-        if(point == NULL) return;
+        if(point == nullptr) return;
         MinimalNodePoint *nextPoint = point->getNextPoint();
-        if(nextPoint == NULL) return;
+        if(nextPoint == nullptr) return;
 
-        PointsBezierCubic *lastCubic = NULL;
-        PointsBezierCubic *firstOtherCubic = NULL;
+        PointsBezierCubic *lastCubic = nullptr;
+        PointsBezierCubic *firstOtherCubic = nullptr;
         do {
             PointsBezierCubic *newCubic = new PointsBezierCubic(point,
                                                                 nextPoint,
                                                                 otherPath);
-            if(firstOtherCubic == NULL) {
+            if(firstOtherCubic == nullptr) {
                 firstOtherCubic = newCubic;
             } else {
                 lastCubic->setNextCubic(newCubic);
@@ -423,16 +423,16 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
 
         firstPoint = getFirstPoint();
         point = firstPoint;
-        if(point == NULL) return;
+        if(point == nullptr) return;
         nextPoint = point->getNextPoint();
-        if(nextPoint == NULL) return;
-        lastCubic = NULL;
-        PointsBezierCubic *firstThisCubic = NULL;
+        if(nextPoint == nullptr) return;
+        lastCubic = nullptr;
+        PointsBezierCubic *firstThisCubic = nullptr;
         do {
             PointsBezierCubic *newCubic = new PointsBezierCubic(point,
                                                                 nextPoint,
                                                                 this);
-            if(firstThisCubic == NULL) {
+            if(firstThisCubic == nullptr) {
                 firstThisCubic = newCubic;
             } else {
                 lastCubic->setNextCubic(newCubic);
@@ -442,7 +442,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
             point = nextPoint;
             nextPoint = point->getNextPoint();
             lastCubic = newCubic;
-            if(nextPoint == NULL) break; // why is this possible?
+            if(nextPoint == nullptr) break; // why is this possible?
         } while(point != firstPoint);
         firstThisCubic->setPrevCubic(lastCubic);
         lastCubic->setNextCubic(firstThisCubic);
@@ -531,7 +531,7 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList,
                 }
 
                 mIntersectionPoints.removeOne((IntersectionNodePoint*)point);
-                MinimalNodePoint *newPoint = NULL;
+                MinimalNodePoint *newPoint = nullptr;
                 if(reversed) {
                     newPoint = new MinimalNodePoint(point->getEndPos(),
                                                     point->getPos(),
@@ -555,7 +555,7 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList,
                     point = point->getNextPoint();
                 }
             } else {
-                MinimalNodePoint *newPoint = NULL;
+                MinimalNodePoint *newPoint = nullptr;
                 if(reversed) {
                     newPoint = new MinimalNodePoint(point->getEndPos(),
                                                     point->getPos(),
@@ -570,7 +570,7 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList,
 
                 point = nextPoint;
             }
-            if(point == NULL) {
+            if(point == nullptr) {
                 break;
             }
             if(reversed) {
@@ -590,7 +590,7 @@ void MinimalVectorPath::generateQPainterPath() {
     mPath.moveTo(point->getPos());
     while(true) {
         point = point->getNextPoint();
-        if(point == NULL) break;
+        if(point == nullptr) break;
 
         mPath.cubicTo(lastPointEnd,
                       point->getStartPos(),
@@ -903,7 +903,7 @@ divideCubicAtPointAndReturnIntersection(const QPointF &pos) {
     setPoints(mMPP1, interPt);
 
     newCubic->setNextCubic(mNextCubic);
-    if(mNextCubic != NULL) {
+    if(mNextCubic != nullptr) {
         mNextCubic->setPrevCubic(newCubic);
     }
 
@@ -915,7 +915,7 @@ divideCubicAtPointAndReturnIntersection(const QPointF &pos) {
 
 void PointsBezierCubic::disconnect() {
     mMPP1->setReversed(true);
-    mMPP1->setNextPoint(NULL);
+    mMPP1->setNextPoint(nullptr);
     mMPP2->setReversed(false);
-    mMPP2->setPrevPoint(NULL);
+    mMPP2->setPrevPoint(nullptr);
 }

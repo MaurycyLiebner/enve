@@ -23,7 +23,7 @@ class InternalLinkBox : public BoundingBox {
 public:
     InternalLinkBox(BoundingBox *linkTarget);
     ~InternalLinkBox() {
-        setLinkTarget(NULL);
+        setLinkTarget(nullptr);
     }
 
     void writeBoundingBox(QIODevice *target) {
@@ -38,14 +38,14 @@ public:
 
     void setLinkTarget(BoundingBox *linkTarget) {
         disconnect(mBoxTarget.data(), 0, this, 0);
-        if(getLinkTarget() != NULL) {
+        if(getLinkTarget() != nullptr) {
             disconnect(getLinkTarget(), 0, this, 0);
             getLinkTarget()->removeLinkingBox(this);
         }
-        if(linkTarget == NULL) {
+        if(linkTarget == nullptr) {
             setName("empty link");
 
-            mBoxTarget->setTarget(NULL);
+            mBoxTarget->setTarget(nullptr);
         } else {
             setName(linkTarget->getName() + " link");
             mBoxTarget->setTarget(linkTarget);
@@ -97,7 +97,7 @@ public:
     bool SWT_isLinkBox() { return true; }
 
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
-        if(mParentGroup == NULL ? false : mParentGroup->SWT_isLinkBox()) {
+        if(mParentGroup == nullptr ? false : mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getRelativeTransformAtRelFrame(relFrame);
         } else {
             return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
@@ -119,7 +119,7 @@ class InternalLinkGroupBox : public BoxesGroup {
 public:
     InternalLinkGroupBox(BoxesGroup *linkTarget);
     ~InternalLinkGroupBox() {
-        setLinkTarget(NULL);
+        setLinkTarget(nullptr);
     }
 
     void writeBoundingBox(QIODevice *target) {
@@ -134,14 +134,14 @@ public:
 
     void setLinkTarget(BoxesGroup *linkTarget) {
         disconnect(mBoxTarget.data(), 0, this, 0);
-        if(getLinkTarget() != NULL) {
+        if(getLinkTarget() != nullptr) {
             disconnect(getLinkTarget(), 0, this, 0);
             getLinkTarget()->removeLinkingBox(this);
         }
-        if(linkTarget == NULL) {
+        if(linkTarget == nullptr) {
             setName("empty link");
 
-            mBoxTarget->setTarget(NULL);
+            mBoxTarget->setTarget(nullptr);
         } else {
             setName(linkTarget->getName() + " link");
             mBoxTarget->setTarget(linkTarget);
@@ -178,7 +178,7 @@ public:
     }
 
     bool isRelFrameInVisibleDurationRect(const int &relFrame) {
-        if(getLinkTarget() == NULL) return false;
+        if(getLinkTarget() == nullptr) return false;
         return BoxesGroup::isRelFrameInVisibleDurationRect(relFrame) &&
                 getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
     }
@@ -239,7 +239,7 @@ public:
             if(box->isRelFrameVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 BoundingBoxRenderData *boxRenderData =
                         box->getCurrentRenderData();
-                if(boxRenderData == NULL) {
+                if(boxRenderData == nullptr) {
                     continue;
                 }
                 boxRenderData->addDependent(data);
@@ -266,7 +266,7 @@ public:
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 BoundingBoxRenderData *boxRenderData =
                         box->getCurrentRenderData();
-                if(boxRenderData == NULL) {
+                if(boxRenderData == nullptr) {
                     continue;
                 }
                 boxRenderData->addDependent(data);
@@ -289,7 +289,7 @@ public:
 
     int prp_getRelFrameShift() const {
         if(getLinkTarget()->SWT_isLinkBox() ||
-           (mParentGroup == NULL ? false : mParentGroup->SWT_isLinkBox())) {
+           (mParentGroup == nullptr ? false : mParentGroup->SWT_isLinkBox())) {
             return BoxesGroup::prp_getRelFrameShift() +
                     getLinkTarget()->prp_getRelFrameShift();
         }

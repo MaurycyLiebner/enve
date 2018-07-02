@@ -14,7 +14,7 @@ ComplexAnimator::~ComplexAnimator() {
 
 void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
                                               Property *prependWith) {
-    if(prependWith == NULL) return;
+    if(prependWith == nullptr) return;
     int id = getChildPropertyIndex(childAnimator);
     if(id == -1) return;
     ca_addChildAnimator(prependWith, id);
@@ -26,7 +26,7 @@ void ComplexAnimator::ca_replaceChildAnimator(Property *childAnimator,
     int id = getChildPropertyIndex(childAnimator);
     if(id == -1) return;
     ca_removeChildAnimator(childAnimator);
-    if(replaceWith == NULL) return;
+    if(replaceWith == nullptr) return;
     ca_addChildAnimator(replaceWith, id);
 }
 
@@ -200,7 +200,7 @@ void ComplexAnimator::ca_moveChildInList(
 }
 
 void ComplexAnimator::ca_removeChildAnimator(Property *removeAnimator) {
-    removeAnimator->prp_setUpdater(NULL);
+    removeAnimator->prp_setUpdater(nullptr);
     removeAnimator->prp_removeAllKeysFromComplexAnimator(this);
     disconnect(removeAnimator, 0, this, 0);
 
@@ -225,10 +225,10 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
         } else if(property->SWT_isComplexAnimator()) {
             Property *propT = ((ComplexAnimator*)property.data())->
                     ca_getFirstDescendantWithName(name);
-            if(propT != NULL) return propT;
+            if(propT != nullptr) return propT;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 QrealAnimator *ComplexAnimator::getQrealAnimatorIfIsTheOnlyOne() {
@@ -238,7 +238,7 @@ QrealAnimator *ComplexAnimator::getQrealAnimatorIfIsTheOnlyOne() {
             return (QrealAnimator*)prop;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
@@ -404,7 +404,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
 
 void ComplexAnimator::ca_addDescendantsKey(Key *key) {
     ComplexKey *collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame() );
-    if(collection == NULL) {
+    if(collection == nullptr) {
         collection = new ComplexKey(this);
         collection->setAbsFrame(key->getAbsFrame());
         anim_appendKey(collection, true, false);
@@ -414,7 +414,7 @@ void ComplexAnimator::ca_addDescendantsKey(Key *key) {
 
 void ComplexAnimator::ca_removeDescendantsKey(Key *key) {
     ComplexKey *collection = ca_getKeyCollectionAtRelFrame(key->getRelFrame());//key->getParentKey();//getKeyCollectionAtAbsFrame(key->getAbsFrame() );
-    if(collection == NULL) return;
+    if(collection == nullptr) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
         anim_removeKey(collection);

@@ -64,7 +64,7 @@ void Property::prp_setName(const QString &newName) {
 
 void Property::prp_setUpdater(AnimatorUpdater *updater) {
     if(prp_mUpdaterBlocked) return;
-    if(updater == NULL) {
+    if(updater == nullptr) {
         prp_mUpdater.reset();
     } else {
         prp_mUpdater = updater->ref<AnimatorUpdater>();
@@ -86,7 +86,7 @@ void Property::prp_blockUpdater() {
 }
 
 void Property::prp_callUpdater() {
-    if(prp_mUpdater.get() == NULL) {
+    if(prp_mUpdater.get() == nullptr) {
         return;
     } else {
         prp_mUpdater->update();
@@ -94,13 +94,13 @@ void Property::prp_callUpdater() {
 }
 
 void Property::prp_callFinishUpdater() {
-    if(prp_mUpdater.get() == NULL) return;
+    if(prp_mUpdater.get() == nullptr) return;
     prp_mUpdater->updateFinal();
 }
 
 void Property::addUndoRedo(UndoRedo *undoRedo) {
     UndoRedoStack *stack = mMainWindow->getUndoRedoStack();
-    if(stack == NULL) return;
+    if(stack == nullptr) return;
     stack->addUndoRedo(undoRedo);
 }
 

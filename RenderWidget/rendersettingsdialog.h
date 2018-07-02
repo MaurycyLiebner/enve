@@ -20,16 +20,16 @@ public:
                      const QList<AVCodecID> &audioCodec,
                      const char *name);
 
-        AVOutputFormat *mFormat = NULL;
+        AVOutputFormat *mFormat = nullptr;
         QList<AVCodecID> mVidCodecs;
         QList<AVCodecID> mAudioCodecs;
     };
     RenderSettingsDialog(const OutputSettings &settings,
-                         QWidget *parent = NULL);
+                         QWidget *parent = nullptr);
     OutputSettings getSettings() {
         OutputSettings settings = mInitialSettings;
 
-        AVOutputFormat *currentOutputFormat = NULL;
+        AVOutputFormat *currentOutputFormat = nullptr;
         if(mVideoCodecsComboBox->count() > 0) {
             int formatId = mOutputFormatsComboBox->currentIndex();
             currentOutputFormat = mOutputFormatsList.at(formatId);
@@ -37,7 +37,7 @@ public:
         settings.outputFormat = currentOutputFormat;
 
         settings.videoEnabled = mVideoGroupBox->isChecked();
-        AVCodec *currentVideoCodec = NULL;
+        AVCodec *currentVideoCodec = nullptr;
         if(mVideoCodecsComboBox->count() > 0) {
             int codecId = mVideoCodecsComboBox->currentIndex();
             currentVideoCodec = mVideoCodecsList.at(codecId);
@@ -53,7 +53,7 @@ public:
         settings.videoBitrate = mBitrateSpinBox->value()*1000000;
 
         settings.audioEnabled = mAudioGroupBox->isChecked();
-        AVCodec *currentAudioCodec = NULL;
+        AVCodec *currentAudioCodec = nullptr;
         if(mAudioCodecsComboBox->count() > 0) {
             int codecId = mAudioCodecsComboBox->currentIndex();
             currentAudioCodec = mAudioCodecsList.at(codecId);
@@ -122,42 +122,42 @@ protected:
     QList<uint64_t> mAudioChannelLayoutsList;
 
     OutputSettings mInitialSettings;
-    QVBoxLayout *mMainLayout = NULL;
+    QVBoxLayout *mMainLayout = nullptr;
 
-    QHBoxLayout *mOutputFormatsLayout = NULL;
-    QLabel *mOutputFormatsLabel = NULL;
-    QComboBox *mOutputFormatsComboBox = NULL;
+    QHBoxLayout *mOutputFormatsLayout = nullptr;
+    QLabel *mOutputFormatsLabel = nullptr;
+    QComboBox *mOutputFormatsComboBox = nullptr;
 
-    QGroupBox *mVideoGroupBox = NULL;
-    TwoColumnLayout *mVideoSettingsLayout = NULL;
-    QLabel *mVideoCodecsLabel = NULL;
-    QComboBox *mVideoCodecsComboBox = NULL;
-    QLabel *mPixelFormatsLabel = NULL;
-    QComboBox *mPixelFormatsComboBox = NULL;
-    QLabel *mBitrateLabel = NULL;
-    QDoubleSpinBox *mBitrateSpinBox = NULL;
+    QGroupBox *mVideoGroupBox = nullptr;
+    TwoColumnLayout *mVideoSettingsLayout = nullptr;
+    QLabel *mVideoCodecsLabel = nullptr;
+    QComboBox *mVideoCodecsComboBox = nullptr;
+    QLabel *mPixelFormatsLabel = nullptr;
+    QComboBox *mPixelFormatsComboBox = nullptr;
+    QLabel *mBitrateLabel = nullptr;
+    QDoubleSpinBox *mBitrateSpinBox = nullptr;
 
-    QGroupBox *mAudioGroupBox = NULL;
-    TwoColumnLayout *mAudioSettingsLayout = NULL;
-    QLabel *mAudioCodecsLabel = NULL;
-    QComboBox *mAudioCodecsComboBox = NULL;
-    QLabel *mSampleFormatsLabel = NULL;
-    QComboBox *mSampleFormatsComboBox = NULL;
-    QLabel *mSampleRateLabel = NULL;
-    QComboBox *mSampleRateComboBox = NULL;
-    QLabel *mAudioBitrateLabel = NULL;
-    QComboBox *mAudioBitrateComboBox = NULL;
-    QLabel *mAudioChannelLayoutLabel = NULL;
-    QComboBox *mAudioChannelLayoutsComboBox = NULL;
+    QGroupBox *mAudioGroupBox = nullptr;
+    TwoColumnLayout *mAudioSettingsLayout = nullptr;
+    QLabel *mAudioCodecsLabel = nullptr;
+    QComboBox *mAudioCodecsComboBox = nullptr;
+    QLabel *mSampleFormatsLabel = nullptr;
+    QComboBox *mSampleFormatsComboBox = nullptr;
+    QLabel *mSampleRateLabel = nullptr;
+    QComboBox *mSampleRateComboBox = nullptr;
+    QLabel *mAudioBitrateLabel = nullptr;
+    QComboBox *mAudioBitrateComboBox = nullptr;
+    QLabel *mAudioChannelLayoutLabel = nullptr;
+    QComboBox *mAudioChannelLayoutsComboBox = nullptr;
 
-    QHBoxLayout *mShowLayout = NULL;
-    QLabel *mShowLabel = NULL;
-    QCheckBox *mShowAllFormatsAndCodecsCheckBox = NULL;
+    QHBoxLayout *mShowLayout = nullptr;
+    QLabel *mShowLabel = nullptr;
+    QCheckBox *mShowAllFormatsAndCodecsCheckBox = nullptr;
 
-    QHBoxLayout *mButtonsLayout = NULL;
-    QPushButton *mOkButton = NULL;
-    QPushButton *mCancelButton = NULL;
-    QPushButton *mResetButton = NULL;
+    QHBoxLayout *mButtonsLayout = nullptr;
+    QPushButton *mOkButton = nullptr;
+    QPushButton *mCancelButton = nullptr;
+    QPushButton *mResetButton = nullptr;
     void addVideoCodec(const AVCodecID &codecId,
                        AVOutputFormat *outputFormat,
                        const QString &currentCodecName);

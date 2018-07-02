@@ -185,16 +185,16 @@ public:
 private:
     std::shared_ptr<VectorPathEdge> mNextEdge;
 
-    NodeSettings *mCurrentNodeSettings = NULL;
+    NodeSettings *mCurrentNodeSettings = nullptr;
     int mNodeId;
 
     VectorPathAnimator *mParentPath;
 
     bool mSeparateNodePoint = false;
-    NodePoint *mNextPoint = NULL;
-    NodePoint *mPreviousPoint = NULL;
-    CtrlPoint *mStartCtrlPt = NULL;
-    CtrlPoint *mEndCtrlPt = NULL;
+    NodePoint *mNextPoint = nullptr;
+    NodePoint *mPreviousPoint = nullptr;
+    CtrlPoint *mStartCtrlPt = nullptr;
+    CtrlPoint *mEndCtrlPt = nullptr;
     void ctrlPointPosChanged(CtrlPoint *pointChanged,
                              CtrlPoint *pointToUpdate);
 };

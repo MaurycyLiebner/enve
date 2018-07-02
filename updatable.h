@@ -51,7 +51,7 @@ class GUI_ThreadExecutor : public MinimalExecutor {
     }
 
     void addDependent(MinimalExecutor *updatable) {
-        if(updatable == NULL) return;
+        if(updatable == nullptr) return;
         if(!finished()) {
             if(mCurrentExecutionDependent.contains(updatable)) return;
             mCurrentExecutionDependent << updatable;
@@ -87,7 +87,7 @@ public:
     }
 
     virtual void afterUpdate() {
-        mCurrentPaintControler = NULL;
+        mCurrentPaintControler = nullptr;
         tellDependentThatFinished();
     }
 
@@ -110,7 +110,7 @@ public:
     }
 
     void addDependent(MinimalExecutor *updatable) {
-        if(updatable == NULL) return;
+        if(updatable == nullptr) return;
         if(!finished()) {
             if(mNextExecutionDependent.contains(updatable)) return;
             mNextExecutionDependent << updatable;
@@ -118,7 +118,7 @@ public:
         }
     }
 protected:
-    PaintControler *mCurrentPaintControler = NULL;
+    PaintControler *mCurrentPaintControler = nullptr;
     bool mBeingProcessed = false;
     std::shared_ptr<_Executor> mSelfRef;
 

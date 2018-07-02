@@ -56,12 +56,12 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-//    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
+//    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
 
     static MainWindow *getInstance();
     static void addUndoRedo(UndoRedo *uR) {
         UndoRedoStack *stack = MainWindow::getInstance()->getUndoRedoStack();
-        if(stack == NULL) return;
+        if(stack == nullptr) return;
         stack->addUndoRedo(uR);
     }
 
@@ -173,12 +173,12 @@ private:
     static MainWindow *mMainWindowInstance;
     MemoryHandler *mMemoryHandler;
 
-    ClipboardContainer *mClipboardContainer = NULL;
+    ClipboardContainer *mClipboardContainer = nullptr;
 //    bool mRendering = false;
 
     QComboBox *mCurrentCanvasComboBox;
 //    bool mCancelLastBoxUpdate = false;
-//    BoundingBox *mLastUpdatedBox = NULL;
+//    BoundingBox *mLastUpdatedBox = nullptr;
 //    QList<BoundingBox*> mBoxesAwaitingUpdate;
 //    bool mNoBoxesAwaitUpdate = true;
 
@@ -187,15 +187,14 @@ private:
     QDockWidget *mLeftDock;
     QDockWidget *mLeftDock2;
     QDockWidget *mBrushSettingsDock;
-    BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget = NULL;
-    BrushSettingsWidget *mBrushSettingsWidget = NULL;
+    BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget = nullptr;
+    BrushSettingsWidget *mBrushSettingsWidget = nullptr;
 
     QToolBar *mToolBar;
 
     ActionButton *mMovePathMode;
     ActionButton *mMovePointMode;
     ActionButton *mAddPointMode;
-    ActionButton *mDrawPathMode;
     ActionButton *mPickPaintSettingsMode;
 
     ActionButton *mCircleMode;
@@ -230,7 +229,7 @@ private:
 
     QPushButton *mNewCanvasButton;
 
-    FontsWidget *mFontWidget = NULL;
+    FontsWidget *mFontWidget = nullptr;
 
     QString mCurrentFilePath = "";
 
@@ -246,7 +245,7 @@ private:
     QMenu *mRenderMenu;
 
     CanvasWindow *mCanvasWindow;
-    UndoRedoStack *mCurrentUndoRedoStack = NULL;
+    UndoRedoStack *mCurrentUndoRedoStack = nullptr;
 
     QList<std::shared_ptr<_ScheduledExecutor> > mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
@@ -255,10 +254,10 @@ private:
     bool mChangedSinceSaving = false;
     bool mEventFilterDisabled = true;
     bool isEnabled();
-    QWidget *mGrayOutWidget = NULL;
+    QWidget *mGrayOutWidget = nullptr;
     bool mDisplayedFillStrokeSettingsUpdateNeeded = false;
 
-    BoxScrollWidget *mObjectSettingsWidget = NULL;
+    BoxScrollWidget *mObjectSettingsWidget = nullptr;
     ScrollArea *mObjectSettingsScrollArea;
 
     void setupToolBar();

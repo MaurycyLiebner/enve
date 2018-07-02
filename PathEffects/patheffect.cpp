@@ -348,7 +348,9 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 
 void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
-                                               SkPath *dst, const bool &) {
+                                               SkPath *dst,
+                                               const qreal &scale,
+                                               const bool &) {
     dst->reset();
     qsrand(mSeed->getCurrentIntValue());
     mSeedAssist = qrand() % 999999;
@@ -368,15 +370,15 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
     if(mSmoothTransform->getValue() && mRandomize->getValue()) {
         SkPath path1;
         displaceFilterPath(&path1, src,
-                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame)/scale,
+                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame)/scale,
                            mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
                            mSeedAssist);
         SkPath path2;
         qsrand(mSeed->getCurrentIntValue());
         displaceFilterPath(&path2, src,
-                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
-                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
+                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame + randStep)/scale,
+                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame + randStep)/scale,
                            mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
                            nextSeed);
         qreal weight = qAbs(relFrame % randStep)*1./randStep;
@@ -388,8 +390,8 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
         path1.interpolate(path2, weight, dst);
     } else {
         displaceFilterPath(dst, src,
-                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame)/scale,
+                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame)/scale,
                            mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
                            mSeedAssist);
     }
@@ -459,6 +461,7 @@ DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
 void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
                                                 const SkPath &src,
                                                 SkPath *dst,
+                                                const qreal &,
                                                 const bool &) {
     *dst = src;
     dst->addPath(src,
@@ -491,8 +494,9 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
 void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
                                                SkPath *dst,
+                                               const qreal &scale,
                                                const bool &) {
-    qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame);
+    qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame)/scale;
     solidify(widthT, src, dst);
 }
 
@@ -601,7 +605,7 @@ void sumPaths(const int &relFrame, const SkPath &src,
               SkPath *dst, PathBox *srcBox,
               PathBox *dstBox, const QString &operation,
               const bool &groupSum = false) {
-    if(srcBox == NULL) {
+    if(srcBox == nullptr) {
         *dst = src;
         return;
     }
@@ -684,6 +688,7 @@ void sumPaths(const int &relFrame, const SkPath &src,
 void SumPathEffect::filterPathForRelFrame(const int &relFrame,
                                           const SkPath &src,
                                           SkPath *dst,
+                                          const qreal &,
                                           const bool &) {
     PathBox *pathBox = ((PathBox*)mBoxTarget->getTarget());
     QString operation = mOperationType->getCurrentValueName();
@@ -695,7 +700,7 @@ void sumPathsF(const qreal &relFrame, const SkPath &src,
                SkPath *dst, PathBox *srcBox,
                PathBox *dstBox, const QString &operation,
                const bool &groupSum = false) {
-    if(srcBox == NULL) {
+    if(srcBox == nullptr) {
         *dst = src;
         return;
     }
@@ -796,6 +801,7 @@ GroupLastPathSumPathEffect::GroupLastPathSumPathEffect(
 void GroupLastPathSumPathEffect::filterPathForRelFrame(const int &relFrame,
                                                        const SkPath &src,
                                                        SkPath *dst,
+                                                       const qreal &,
                                                        const bool &groupPathSum) {
     if(!groupPathSum) {
         *dst = src;

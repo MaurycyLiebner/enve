@@ -150,8 +150,8 @@ void Canvas::drawSelectedSk(SkCanvas *canvas,
 #include "Boxes/bone.h"
 void Canvas::updateHoveredBox() {
     mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
-    mHoveredBone = NULL;
-    if(mHoveredBox != NULL && mBonesSelectionEnabled) {
+    mHoveredBone = nullptr;
+    if(mHoveredBox != nullptr && mBonesSelectionEnabled) {
         if(mHoveredBox->SWT_isBonesBox()) {
             mHoveredBone = ((BonesBox*)mHoveredBox)->getBoneAtAbsPos(
                         mCurrentMouseEventPosRel);
@@ -167,7 +167,7 @@ void Canvas::updateHoveredPoint() {
 
 void Canvas::updateHoveredEdge() {
     mHoveredEdge = getEdgeAt(mCurrentMouseEventPosRel);
-    if(mHoveredEdge != NULL) {
+    if(mHoveredEdge != nullptr) {
         mHoveredEdge->generatePainterPath();
     }
 }
@@ -228,7 +228,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
 
     if(isPreviewingOrRendering()) {
         drawTransparencyMesh(canvas, viewRect);
-        if(mCurrentPreviewContainer != NULL) {
+        if(mCurrentPreviewContainer != nullptr) {
             canvas->save();
 
             canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
@@ -244,7 +244,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         drawTransparencyMesh(canvas, viewRect);
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
 
-        if(mCurrentPreviewContainer != NULL) {
+        if(mCurrentPreviewContainer != nullptr) {
             canvas->save();
             SkScalar reversedRes = 1./mResolutionFraction;
             canvas->scale(reversedRes, reversedRes);
@@ -260,7 +260,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         }
         bool drawCanvas =
                 mEffectsAnimators->hasEffects() &&
-                mCurrentPreviewContainer != NULL &&
+                mCurrentPreviewContainer != nullptr &&
                 mExpiredPixmap == 0;
         drawTransparencyMesh(canvas, viewRect);
         if(!drawCanvas) {
@@ -269,7 +269,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         }
 
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
-        canvas->saveLayer(NULL, NULL);
+        canvas->saveLayer(nullptr, nullptr);
         if(!mClipToCanvasSize || !drawCanvas) {
             Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes){
                 box->drawPixmapSk(canvas);
@@ -303,7 +303,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
                 canvas->drawLine(QPointFToSkPoint(mRotPivot->getAbsolutePos()),
                                  QPointFToSkPoint(mLastMouseEventPosRel),
                                  paint);
-                paint.setPathEffect(NULL);
+                paint.setPathEffect(nullptr);
             } else if(!mIsMouseGrabbing || mRotPivot->isSelected()) {
                 mRotPivot->drawSk(canvas, invScale);
             }
@@ -319,25 +319,22 @@ void Canvas::renderSk(SkCanvas *canvas) {
                                      MIN_WIDGET_HEIGHT*0.25f*invScale};
             paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
             canvas->drawRect(QRectFToSkRect(mSelectionRect), paint);
-            paint.setPathEffect(NULL);
+            paint.setPathEffect(nullptr);
             //SkPath selectionPath;
             //selectionPath.addRect(QRectFToSkRect(mSelectionRect));
             //canvas->drawPath(selectionPath, paint);
         }
 
-        if(mHoveredPoint != NULL) {
+        if(mHoveredPoint != nullptr) {
             mHoveredPoint->drawHovered(canvas, invScale);
-        } else if(mHoveredEdge != NULL) {
+        } else if(mHoveredEdge != nullptr) {
             mHoveredEdge->drawHoveredSk(canvas, invScale);
-        } else if(mHoveredBone != NULL) {
+        } else if(mHoveredBone != nullptr) {
             mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invScale);
-        } else if(mHoveredBox != NULL) {
-            if(mCurrentEdge == NULL) {
+        } else if(mHoveredBox != nullptr) {
+            if(mCurrentEdge == nullptr) {
                 mHoveredBox->drawHoveredSk(canvas, invScale);
             }
-        }
-        if(mCurrentMode == DRAW_PATH) {
-            mDrawPath.drawPath(canvas);
         }
         canvas->resetMatrix();
 
@@ -395,14 +392,14 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
         VideoEncoder::addCacheContainerToEncoderStatic(cont);
         return;
     }
-    setLoadingPreviewContainer(NULL);
+    setLoadingPreviewContainer(nullptr);
     if(cont == mCurrentPreviewContainer.get()) return;
-    if(mCurrentPreviewContainer.get() != NULL) {
+    if(mCurrentPreviewContainer.get() != nullptr) {
         if(!mRenderingPreview || mRenderingOutput) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
-    if(cont == NULL) {
+    if(cont == nullptr) {
         mCurrentPreviewContainer.reset();
         return;
     }
@@ -412,13 +409,13 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
 
 void Canvas::setLoadingPreviewContainer(CacheContainer *cont) {
     if(cont == mLoadingPreviewContainer.get()) return;
-    if(mLoadingPreviewContainer.get() != NULL) {
-        mLoadingPreviewContainer->setAsCurrentPreviewContainerAfterFinishedLoading(NULL);
+    if(mLoadingPreviewContainer.get() != nullptr) {
+        mLoadingPreviewContainer->setAsCurrentPreviewContainerAfterFinishedLoading(nullptr);
         if(!mRenderingPreview || mRenderingOutput) {
             mLoadingPreviewContainer->setBlocked(false);
         }
     }
-    if(cont == NULL) {
+    if(cont == nullptr) {
         mLoadingPreviewContainer.reset();
         return;
     }
@@ -454,7 +451,7 @@ int Canvas::getMaxPreviewFrame(const int &minFrame,
 //            mCacheHandler.cacheDataBeforeRelFrame(firstF);
 //        }
         CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(firstF);
-        if(cont != NULL) {
+        if(cont != nullptr) {
             if(cont->storesDataInMemory()) {
                 maxFrameT++;
             }
@@ -503,7 +500,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);
     CacheContainer *cont =
           mCacheHandler.getRenderContainerAtRelFrame(fId);
-    if(cont == NULL) {
+    if(cont == nullptr) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame(fId);
     }
     cont->replaceImageSk(renderData->renderedImage);
@@ -586,7 +583,7 @@ void Canvas::schedulePivotUpdate() {
     if(mRotPivot->isRotating() ||
         mRotPivot->isScaling() ||
         mRotPivot->isSelected()) return;
-    if(mLastPressedPoint != NULL) {
+    if(mLastPressedPoint != nullptr) {
         if(mLastPressedPoint->isCtrlPoint()) {
             return;
         }
@@ -664,7 +661,7 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
 
     mCurrentMode = mode;
     mSelecting = false;
-    mHoveredPoint = NULL;
+    mHoveredPoint = nullptr;
     clearHoveredEdge();
     clearPointsSelection();
     clearCurrentEndPoint();
@@ -772,7 +769,7 @@ void Canvas::pasteAction() {
     BoxesClipboardContainer *container =
             (BoxesClipboardContainer*)
             mMainWindow->getClipboardContainer(CCT_BOXES);
-    if(container == NULL) return;
+    if(container == nullptr) return;
     clearBoxesSelection();
     container->pasteTo(mCurrentBoxesGroup);
 }
@@ -1008,7 +1005,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
         mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
 
-        if(mHoveredEdge != NULL) {
+        if(mHoveredEdge != nullptr) {
             mHoveredEdge->generatePainterPath();
         }
     } else {
@@ -1020,10 +1017,10 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
 }
 
 void Canvas::setCurrentEndPoint(NodePoint *point) {
-    if(mCurrentEndPoint != NULL) {
+    if(mCurrentEndPoint != nullptr) {
         mCurrentEndPoint->deselect();
     }
-    if(point != NULL) {
+    if(point != nullptr) {
         point->select();
     }
     mCurrentEndPoint = point;
@@ -1031,7 +1028,7 @@ void Canvas::setCurrentEndPoint(NodePoint *point) {
 
 void Canvas::selectOnlyLastPressedBone() {
     clearBonesSelection();
-    if(mLastPressedBone == NULL) {
+    if(mLastPressedBone == nullptr) {
         return;
     }
     addBoneToSelection(mLastPressedBone);
@@ -1039,7 +1036,7 @@ void Canvas::selectOnlyLastPressedBone() {
 
 void Canvas::selectOnlyLastPressedBox() {
     clearBoxesSelection();
-    if(mLastPressedBox == NULL) {
+    if(mLastPressedBox == nullptr) {
         return;
     }
     addBoxToSelection(mLastPressedBox);
@@ -1047,7 +1044,7 @@ void Canvas::selectOnlyLastPressedBox() {
 
 void Canvas::selectOnlyLastPressedPoint() {
     clearPointsSelection();
-    if(mLastPressedPoint == NULL) {
+    if(mLastPressedPoint == nullptr) {
         return;
     }
     addPointToSelection(mLastPressedPoint);
@@ -1123,7 +1120,7 @@ void Canvas::connectPointsFromDifferentPaths(NodePoint *pointSrc,
 //    if(pointSrc->hasNextPoint()) {
 //        NodePoint *point = pointSrc;
 //        bool mirror = pointDest->hasNextPoint();
-//        while(point != NULL) {
+//        while(point != nullptr) {
 //            QPointF startCtrlPpclab.pltPos;
 //            QPointF endCtrlPtPos;
 //            getMirroredCtrlPtAbsPos(mirror, point,
@@ -1139,7 +1136,7 @@ void Canvas::connectPointsFromDifferentPaths(NodePoint *pointSrc,
 //    } else {
 //        NodePoint *point = pointSrc;
 //        bool mirror = pointDest->hasPreviousPoint();
-//        while(point != NULL) {
+//        while(point != nullptr) {
 //            QPointF startCtrlPtPos;
 //            QPointF endCtrlPtPos;
 //            getMirroredCtrlPtAbsPos(mirror, point,
@@ -1166,7 +1163,7 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     if(alwaysShowChildren) {
         return false;
     } else {
-        if(rules.type == NULL) {
+        if(rules.type == nullptr) {
         } else if(rules.type == &SingleWidgetTarget::SWT_isSingleSound) {
             return false;
         }

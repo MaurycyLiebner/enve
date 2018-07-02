@@ -21,7 +21,7 @@ void SavedColorButton::mousePressEvent(QMouseEvent *e)
         QMenu menu(this);
         menu.addAction("Delete Color");
         QAction *selected_action = menu.exec(e->globalPos());
-        if(selected_action != NULL)
+        if(selected_action != nullptr)
         {
             if(selected_action->text() == "Delete Color")
             {

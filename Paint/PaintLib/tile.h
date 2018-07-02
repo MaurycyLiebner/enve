@@ -60,7 +60,7 @@ struct TileSkDrawer : public _ScheduledExecutor {
                  const ushort &xT, const ushort &yT);
     ~TileSkDrawer();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) const;
+    void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr) const;
 
     void _processUpdate();
 
@@ -127,7 +127,7 @@ struct TileSkDrawerCollection {
                                                           SkColorGetG(hueCol)*0.3,
                                                           SkColorGetB(hueCol)*0.3)));
 //            paint.setBlendMode(SkBlendMode::kDstIn);
-//            canvas->saveLayer(NULL, NULL);
+//            canvas->saveLayer(nullptr, nullptr);
 //            canvas->clear(hueCol);
             foreach(TileSkDrawer *drawer, drawers) {
                 drawer->drawSk(bitmapCanvas, &paint);
@@ -181,7 +181,7 @@ struct TileSkDrawerCollection {
 //        mTarget = tile;
 //    }
 //protected:
-//    Tile *mTarget = NULL;
+//    Tile *mTarget = nullptr;
 //};
 
 //class TileClearExecutor : public TileExecutor {
@@ -211,7 +211,7 @@ struct TileSkDrawerCollection {
 //    }
 //protected:
 //    sk_sp<SkImage> mDataImg;
-//    uchar *mImgData = NULL;
+//    uchar *mImgData = nullptr;
 //    std::shared_ptr<TileDataGetter> mSrcGetter;
 //};
 
@@ -223,7 +223,7 @@ struct TileSkDrawerCollection {
 
 //protected:
 //    TileDataGetterDependentExecutor *mTarget;
-//    Tile *mSrcTile = NULL;
+//    Tile *mSrcTile = nullptr;
 
 //    void GUI_process() {
 //        SkImageInfo info = SkImageInfo::Make(TILE_DIM,
@@ -297,7 +297,7 @@ public:
 
     void setDabsForDrawer();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint = NULL);
+    void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
 
     void saveToTmp();
     void clearTmp();
@@ -348,9 +348,9 @@ public:
     void finishTransform();
 private:
     bool mFinishTransformAfterUpdate = false;
-    TilesData *mParentTilesData = NULL;
+    TilesData *mParentTilesData = nullptr;
     bool mTransformStarted = false;
-//    uchar *mSavedData = NULL;
+//    uchar *mSavedData = nullptr;
 //    SkBitmap mSavedDataImage;
 
     bool mPaintInOtherThread;
@@ -358,8 +358,8 @@ private:
     std::shared_ptr<TileSkDrawer> mDrawer;
     SkBitmap mDataTileImage;
     SkBitmap mTmpDataTileImage;
-    uchar *mDataTmp = NULL;
-    uchar *mData = NULL;
+    uchar *mDataTmp = nullptr;
+    uchar *mData = nullptr;
 
     QList<Dab> mDabsToPaint;
 

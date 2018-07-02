@@ -42,26 +42,26 @@ public slots:
     void setColorSetting(const ColorSetting &colorSetting);
 
 private:
-    BrushSelectionScrollArea *mBrushSelection = NULL;
+    BrushSelectionScrollArea *mBrushSelection = nullptr;
     ScrollArea *mAdvancedArea;
     QWidget *mAdvancedWidget;
     ColorSettingsWidget *mColorSettingsWidget;
-    QHBoxLayout *buttons_layout = NULL;
-    QPushButton *save_brush_button = NULL;
-    QPushButton *overwrite_brush_settings = NULL;
-    QPushButton *advanced_button = NULL;
+    QHBoxLayout *buttons_layout = nullptr;
+    QPushButton *save_brush_button = nullptr;
+    QPushButton *overwrite_brush_settings = nullptr;
+    QPushButton *advanced_button = nullptr;
 
     bool advanced_settings_visible = false;
-    Brush *mCurrentBrush = NULL;
+    Brush *mCurrentBrush = nullptr;
     QList<BrushSettingWidget*> setting_widgets;
-    QVBoxLayout *mMainLayout = NULL;
-    QHBoxLayout *h_layout = NULL;
-    QVBoxLayout *labels_layout = NULL;
-    QVBoxLayout *rest_layout = NULL;
+    QVBoxLayout *mMainLayout = nullptr;
+    QHBoxLayout *h_layout = nullptr;
+    QVBoxLayout *labels_layout = nullptr;
+    QVBoxLayout *rest_layout = nullptr;
 
     QHBoxLayout *mAdvancedLayout;
-    QVBoxLayout *mAdvancedLabelsLayout = NULL;
-    QVBoxLayout *mAdvancedRestLayout = NULL;
+    QVBoxLayout *mAdvancedLabelsLayout = nullptr;
+    QVBoxLayout *mAdvancedRestLayout = nullptr;
 };
 
 

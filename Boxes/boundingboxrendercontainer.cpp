@@ -10,10 +10,10 @@ RenderContainer::~RenderContainer() {
 }
 
 void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
-    if(mSrcRenderData == NULL) return;
+    if(mSrcRenderData == nullptr) return;
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
-    if(paint != NULL) {
+    if(paint != nullptr) {
         if(paint->getBlendMode() == SkBlendMode::kDstIn ||
            paint->getBlendMode() == SkBlendMode::kSrcIn ||
            paint->getBlendMode() == SkBlendMode::kDstATop) {
@@ -85,7 +85,7 @@ MinimalCacheContainer::MinimalCacheContainer(const bool &addToMemoryHandler) {
 
 MinimalCacheContainer::~MinimalCacheContainer() {
     //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
-    if(MemoryHandler::getInstance() == NULL) return;
+    if(MemoryHandler::getInstance() == nullptr) return;
     MemoryHandler::getInstance()->removeContainer(this);
 }
 
@@ -116,14 +116,14 @@ void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
 bool CacheContainer::cacheAndFree() {
     if(mBlocked || mNoDataInMemory ||
         mSavingToFile || mLoadingFromFile) return false;
-    if(mParentCacheHandler == NULL) return false;
+    if(mParentCacheHandler == nullptr) return false;
     saveToTmpFile();
     return true;
 }
 
 bool CacheContainer::freeAndRemove() {
     if(mBlocked || mNoDataInMemory) return false;
-    if(mParentCacheHandler == NULL) return false;
+    if(mParentCacheHandler == nullptr) return false;
     mParentCacheHandler->removeRenderContainer(this);
     return true;
 }
@@ -142,11 +142,11 @@ void CacheContainer::setBlocked(const bool &bT) {
 void CacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
     mLoadingFromFile = false;
     mNoDataInMemory = false;
-    mLoadingUpdatable = NULL;
+    mLoadingUpdatable = nullptr;
     mImageSk = img;
-    if(mTmpLoadTargetCanvas != NULL) {
+    if(mTmpLoadTargetCanvas != nullptr) {
         mTmpLoadTargetCanvas->setCurrentPreviewContainer(this);
-        mTmpLoadTargetCanvas = NULL;
+        mTmpLoadTargetCanvas = nullptr;
     }
     if(!mBlocked) {
         MemoryHandler::getInstance()->addContainer(this);
@@ -193,7 +193,7 @@ void CacheContainer::drawSk(SkCanvas *canvas) {
 
 void CacheContainer::setDataSavedToTmpFile(
         const QSharedPointer<QTemporaryFile> &tmpFile) {
-    mSavingUpdatable = NULL;
+    mSavingUpdatable = nullptr;
     mTmpFile = tmpFile;
     mSavingToFile = false;
     if(mCancelAfterSaveDataClear) {

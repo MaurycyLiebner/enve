@@ -38,12 +38,12 @@ public slots:
     void incVal(const qreal &inc_t);
     void revertToDefaultVal();
 private:
-    QHBoxLayout *mMainLayout = NULL;
-    QPushButton *mDefaultButton = NULL;
-    const BrushSettingInfo *mSettingInfo = NULL;
-    QLabel *mNameLabel = NULL;
-    QDoubleSpinBox *mValSpinBox = NULL;
-    QSlider *mValSlider = NULL;
+    QHBoxLayout *mMainLayout = nullptr;
+    QPushButton *mDefaultButton = nullptr;
+    const BrushSettingInfo *mSettingInfo = nullptr;
+    QLabel *mNameLabel = nullptr;
+    QDoubleSpinBox *mValSpinBox = nullptr;
+    QSlider *mValSlider = nullptr;
     BrushSetting mTargetSetting;
 };
 

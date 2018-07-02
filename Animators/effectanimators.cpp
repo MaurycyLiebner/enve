@@ -69,7 +69,7 @@ void EffectAnimators::addEffectRenderDataToList(
             PixmapEffectRenderData *effectRenderData =
                     pixmapEffect->getPixmapEffectRenderDataForRelFrame(relFrame,
                                                                        data);
-            if(effectRenderData == NULL) continue;
+            if(effectRenderData == nullptr) continue;
             data->pixmapEffects.append(effectRenderData);
         }
     }
@@ -84,7 +84,7 @@ void EffectAnimators::addEffectRenderDataToListF(
             PixmapEffectRenderData *effectRenderData =
                     pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame,
                                                                         data);
-            if(effectRenderData == NULL) continue;
+            if(effectRenderData == nullptr) continue;
             data->pixmapEffects.append(effectRenderData);
         }
     }

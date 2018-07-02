@@ -12,7 +12,7 @@ public:
 
     void setSize(const ushort &width,
                  const ushort &height) {
-        if(mTiles == NULL) {
+        if(mTiles == nullptr) {
             mTiles = (new TilesData(width, height, true))->ref<TilesData>();
         } else {
             mTiles->setSize(width, height);
@@ -37,7 +37,7 @@ public:
     AnimatedSurface(const ushort &widthT,
                     const ushort &heightT,
                     const qreal &scale,
-                    PaintBox *parentBox = NULL);
+                    PaintBox *parentBox = nullptr);
     ~AnimatedSurface();
     void setCurrentRelFrame(const int &relFrame);
 
@@ -96,7 +96,7 @@ public:
         prp_updateInfluenceRangeAfterChanged();
     }
 protected:
-    PaintBox *mParentBox = NULL;
+    PaintBox *mParentBox = nullptr;
 
     QList<std::shared_ptr<TilesData>> mDrawTilesData;
     QList<int> mDrawTilesFrames;

@@ -168,7 +168,7 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
@@ -217,7 +217,7 @@ void Particle::initializeParticle(const int &firstFrame,
     mFirstFrame = firstFrame;
     mLastPos = iniPos;
     mLastVel = iniVel;
-    if(mParticleStates != NULL) {
+    if(mParticleStates != nullptr) {
         if(nFrames == mNumberFrames) return;
         delete[] mParticleStates;
     }
@@ -441,8 +441,8 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
     mParentBox = parentBox;
 
     scheduleGenerateParticles();
-    if(parentBox == NULL) {
-        mColorAnimator->prp_setUpdater(NULL);
+    if(parentBox == nullptr) {
+        mColorAnimator->prp_setUpdater(nullptr);
     } else {
         mColorAnimator->prp_setUpdater(
                     new DisplayedFillStrokeSettingsUpdater(parentBox));

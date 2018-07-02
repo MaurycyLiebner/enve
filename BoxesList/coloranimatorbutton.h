@@ -7,14 +7,14 @@ class ColorAnimatorButton : public BoxesListActionButton {
     Q_OBJECT
 public:
     ColorAnimatorButton(ColorAnimator *colorTarget,
-                        QWidget *parent = NULL);
+                        QWidget *parent = nullptr);
 
 
     void openColorSettingsDialog();
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *);
-    ColorAnimator *mColorTarget = NULL;
+    ColorAnimator *mColorTarget = nullptr;
 };
 
 #endif // COLORANIMATORBUTTON_H

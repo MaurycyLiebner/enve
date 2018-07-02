@@ -98,12 +98,12 @@ QrealAnimator *QrealKey::getParentQrealAnimator() {
 }
 
 qreal QrealKey::getPrevKeyValue() {
-    if(mParentAnimator == NULL) return mValue;
+    if(mParentAnimator == nullptr) return mValue;
     return getParentQrealAnimator()->qra_getPrevKeyValue(this);
 }
 
 qreal QrealKey::getNextKeyValue() {
-    if(mParentAnimator == NULL) return mValue;
+    if(mParentAnimator == nullptr) return mValue;
     return getParentQrealAnimator()->qra_getNextKeyValue(this);
 }
 
@@ -142,7 +142,7 @@ QrealPoint *QrealKey::mousePress(const qreal &frameT,
     if(mGraphPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue)) {
         return mGraphPoint;
     }
-    return NULL;
+    return nullptr;
 }
 
 void QrealKey::setCtrlsMode(const CtrlsMode &mode) {
@@ -216,7 +216,7 @@ void QrealKey::setValue(qreal value,
                         const bool &saveUndoRedo,
                         const bool &finish,
                         const bool &callUpdater) {
-    if(mParentAnimator != NULL) {
+    if(mParentAnimator != nullptr) {
         value = clamp(value,
                       getParentQrealAnimator()->getMinPossibleValue(),
                       getParentQrealAnimator()->getMaxPossibleValue());
@@ -225,7 +225,7 @@ void QrealKey::setValue(qreal value,
     setEndValueVar(mEndValue + dVal);
     setStartValueVar(mStartValue + dVal);
     if(saveUndoRedo) {
-        if(mParentAnimator != NULL) {
+        if(mParentAnimator != nullptr) {
 //            mParentAnimator->addUndoRedo(
 //                    new ChangeQrealKeyValueUndoRedo(mValue, value, this) );
         }
@@ -237,7 +237,7 @@ void QrealKey::setValue(qreal value,
 }
 
 void QrealKey::finishValueTransform() {
-    if(mParentAnimator != NULL) {
+    if(mParentAnimator != nullptr) {
 //        mParentAnimator->addUndoRedo(
 //                    new ChangeQrealKeyValueUndoRedo(mSavedValue,
 //                                                    mValue, this) );
@@ -370,7 +370,7 @@ void QrealKey::setRelFrame(const int &frame) {
     setEndFrameVar(mEndFrame + dFrame);
     setStartFrameVar(mStartFrame + dFrame);
     mRelFrame = frame;
-    if(mParentAnimator == NULL) return;
+    if(mParentAnimator == nullptr) return;
     mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }
 
@@ -393,7 +393,7 @@ bool QrealKey::differsFromKey(Key *key) {
 void QrealKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
     setValue(frameValueChange.y() + mSavedValue);
     int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
-    if(mParentAnimator != NULL) {
+    if(mParentAnimator != nullptr) {
         mParentAnimator->anim_moveKeyToRelFrame(this, newFrame, false);
     } else {
         setRelFrame(newFrame);

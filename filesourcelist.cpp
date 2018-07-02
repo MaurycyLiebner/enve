@@ -15,7 +15,7 @@ FileSourceWidget::FileSourceWidget(FileSourceListVisibleWidget *parent) :
 
 void FileSourceWidget::setTargetCache(FileCacheHandlerAbstraction *target) {
     mTargetCache = target;
-    if(mTargetCache == NULL) {
+    if(mTargetCache == nullptr) {
         setToolTip("");
     } else {
         setToolTip(mTargetCache->getFilePath());
@@ -43,7 +43,7 @@ void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
 
 
 void FileSourceWidget::paintEvent(QPaintEvent *) {
-    if(mTargetCache == NULL || width() <= 2*MIN_WIDGET_HEIGHT) return;
+    if(mTargetCache == nullptr || width() <= 2*MIN_WIDGET_HEIGHT) return;
     QPainter p(this);
 
     QString wholeString = mTargetCache->getFilePath();
@@ -93,7 +93,7 @@ void FileSourceWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void FileSourceWidget::mouseReleaseEvent(QMouseEvent *event) {
-    if(mTargetCache == NULL) return;
+    if(mTargetCache == nullptr) return;
     if(event->button() == Qt::LeftButton) {
         if(event->modifiers() & Qt::ShiftModifier) {
             mTargetCache->switchSelected();
@@ -207,7 +207,7 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
         menu.addAction("replace...");
     }
     QAction *selected_action = menu.exec(globalPos);
-    if(selected_action != NULL) {
+    if(selected_action != nullptr) {
         if(selected_action->text() == "reload") {
             foreach(FileCacheHandlerAbstraction *abs, mSelectedList) {
                 abs->target->clearCache();

@@ -16,10 +16,10 @@ public:
     void setChecked(const bool &check);
     bool isChecked();
 protected:
-    QCheckBox *mCheckBox = NULL;
+    QCheckBox *mCheckBox = nullptr;
     QHBoxLayout *mMainLayout = new QHBoxLayout();
     QVBoxLayout *mContLayout = new QVBoxLayout();
-    QWidget *mLabelWidget = NULL;
+    QWidget *mLabelWidget = nullptr;
     QList<QWidget*> mContWidgets;
     QPushButton *mContentArrow = new QPushButton();
 signals:

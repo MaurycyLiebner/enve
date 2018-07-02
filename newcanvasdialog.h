@@ -14,16 +14,16 @@ class CanvasSettingsDialog : public QDialog
 {
 public:
     CanvasSettingsDialog(Canvas *canvas,
-                         QWidget *parent = NULL);
+                         QWidget *parent = nullptr);
     CanvasSettingsDialog(const QString &defName,
-                         QWidget *parent = NULL);
+                         QWidget *parent = nullptr);
     CanvasSettingsDialog(const QString &currName,
                          const int &currWidth,
                          const int &currHeight,
                          const int &currFrameCount,
                          const qreal &currFps,
                          ColorAnimator *bgColorAnimator,
-                         QWidget *parent = NULL);
+                         QWidget *parent = nullptr);
 
     int getCanvasWidth();
     int getCanvasHeight();

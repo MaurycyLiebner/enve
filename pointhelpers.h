@@ -56,7 +56,7 @@ extern QPointF getClosestPointOnLineSegment(const QPointF &a,
                                             const QPointF &p);
 extern QPointF closestPointOnRect(const QRectF &rect,
                                   const QPointF &point,
-                                  qreal *dist = NULL);
+                                  qreal *dist = nullptr);
 
 extern qreal getTforBezierPoint(const qreal &x0,
                                 const qreal &x1,
@@ -68,8 +68,8 @@ extern qreal getTforBezierPoint(const qreal &x0,
                                 const qreal &y2,
                                 const qreal &y3,
                                 const qreal &y,
-                                qreal *error = NULL,
-                                QPointF *bestPosPtr = NULL,
+                                qreal *error = nullptr,
+                                QPointF *bestPosPtr = nullptr,
                                 const bool &fineTune = true);
 
 extern qreal getTforBezierPoint(const QPointF &p0,
@@ -77,8 +77,8 @@ extern qreal getTforBezierPoint(const QPointF &p0,
                                 const QPointF &p2,
                                 const QPointF &p3,
                                 const QPointF &p,
-                                qreal *error = NULL,
-                                QPointF *bestPosPtr = NULL);
+                                qreal *error = nullptr,
+                                QPointF *bestPosPtr = nullptr);
 
 extern void getClosestTValuesBezier1D(const qreal &v0n,
                                       const qreal &v1n,
@@ -92,15 +92,15 @@ extern qreal getClosestTValueBezier2D(const QPointF &p0,
                                       const QPointF &p2,
                                       const QPointF &p3,
                                       const QPointF &p,
-                                      QPointF *bestPosPtr = NULL,
-                                      qreal *errorPtr = NULL);
+                                      QPointF *bestPosPtr = nullptr,
+                                      qreal *errorPtr = nullptr);
 
 extern qreal getBezierTValueForX(const qreal &x0,
                                  const qreal &x1,
                                  const qreal &x2,
                                  const qreal &x3,
                                  const qreal &x,
-                                 qreal *error = NULL);
+                                 qreal *error = nullptr);
 extern void bezierLeastSquareV1V2(const QPointF &v0,
                                   QPointF &v1, QPointF &v2,
                                   const QPointF &v3,
@@ -157,6 +157,6 @@ extern qreal getBezierTValueForXAssumeNoOverlapGrowingOnly(const qreal &x0,
                                                            const qreal &x3,
                                                            const qreal &x,
                                                            const qreal &maxError,
-                                                           qreal *error = NULL);
+                                                           qreal *error = nullptr);
 
 #endif // POINTHELPERS_H

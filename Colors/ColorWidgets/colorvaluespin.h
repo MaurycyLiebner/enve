@@ -25,7 +25,7 @@ private slots:
     void spinBoxValSet(double spin_box_val_t);
 private:
     bool mBlockValue = false;
-    QrealAnimatorValueSlider *mSpinBox = NULL;
+    QrealAnimatorValueSlider *mSpinBox = nullptr;
 };
 
 #endif // COLORVALUESPIN_H

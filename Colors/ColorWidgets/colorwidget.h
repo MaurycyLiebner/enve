@@ -11,7 +11,7 @@ class ColorWidget : public GLWidget
 {
     Q_OBJECT
 public:
-    ColorWidget(QWidget *parent = NULL);
+    ColorWidget(QWidget *parent = nullptr);
 protected:
     bool mValueBlocked = false;
 

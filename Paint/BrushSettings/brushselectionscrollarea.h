@@ -7,7 +7,7 @@ class BrushSelectionWidget;
 class BrushSelectionScrollArea : public ScrollArea {
     Q_OBJECT
 public:
-    BrushSelectionScrollArea(QWidget *parent = NULL);
+    BrushSelectionScrollArea(QWidget *parent = nullptr);
     const Brush *getCurrentBrush();
     void saveBrushesForProject(QIODevice *target);
     void readBrushesForProject(QIODevice *target);
@@ -17,7 +17,7 @@ signals:
 public slots:
     void setCurrentBrush(const Brush *brush);
 private:
-    BrushSelectionWidget *mBrushesWidget = NULL;
+    BrushSelectionWidget *mBrushesWidget = nullptr;
 };
 
 #endif // BRUSHSELECTIONSCROLLAREA_H

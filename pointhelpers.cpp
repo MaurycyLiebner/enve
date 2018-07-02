@@ -303,10 +303,10 @@ qreal getClosestTValueBezier2D(const QPointF &p0,
             bestT = xVal;
         }
     }
-    if(bestPosPtr != NULL) {
+    if(bestPosPtr != nullptr) {
         *bestPosPtr = bestPos;
     }
-    if(errorPtr != NULL) {
+    if(errorPtr != nullptr) {
         *errorPtr = minErrorT;
     }
     return bestT;
@@ -471,7 +471,7 @@ QPointF closestPointOnRect(const QRectF &rect,
             bestPos = pt;
         }
     }
-    if(dist != NULL) *dist = minDist;
+    if(dist != nullptr) *dist = minDist;
     return bestPos;
 }
 
@@ -558,8 +558,8 @@ qreal getTforBezierPoint(const qreal &x0,
         }
     }
 
-    if(error != NULL) *error = minErrorT;
-    if(bestPosPtr != NULL) *bestPosPtr = bestPos;
+    if(error != nullptr) *error = minErrorT;
+    if(bestPosPtr != nullptr) *bestPosPtr = bestPos;
     return bestT;
 }
 
@@ -588,7 +588,7 @@ qreal getBezierTValueForX(const qreal &x0,
         }
     }
 
-    if(error != NULL) *error = minErrorT;
+    if(error != nullptr) *error = minErrorT;
 
     return bestT;
 }
@@ -606,7 +606,7 @@ qreal getBezierTValueForXAssumeNoOverlapGrowingOnly(const qreal &x0,
     qreal guessVal = calcCubicBezierVal(x0, x1, x2, x3, tGuess);
     qreal errorT = qAbs(guessVal - x);
     if(errorT < maxError) {
-        if(error != NULL) {
+        if(error != nullptr) {
             *error = errorT;
         }
         return tGuess;

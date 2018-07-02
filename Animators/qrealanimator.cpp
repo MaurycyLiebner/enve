@@ -46,7 +46,7 @@ void QrealAnimator::prp_openContextMenu(const QPoint &pos) {
     QMenu menu;
     menu.addAction("Add Key");
     QAction *selected_action = menu.exec(pos);
-    if(selected_action != NULL)
+    if(selected_action != nullptr)
     {
         if(selected_action->text() == "Add Key")
         {
@@ -158,7 +158,7 @@ QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
 #include "fakecomplexanimator.h"
 void QrealAnimator::setGenerator(RandomQrealGenerator *generator) {
     if(generator == mRandomGenerator.data()) return;
-    if(generator == NULL) {
+    if(generator == nullptr) {
         mFakeComplexAnimator->ca_removeChildAnimator(mRandomGenerator.data());
         disableFakeComplexAnimatrIfNotNeeded();
     } else {
@@ -170,7 +170,7 @@ void QrealAnimator::setGenerator(RandomQrealGenerator *generator) {
 
         mFakeComplexAnimator->ca_addChildAnimator(generator);
     }
-    if(generator == NULL) {
+    if(generator == nullptr) {
         mRandomGenerator.reset();
     } else {
         mRandomGenerator = generator->ref<RandomQrealGenerator>();
@@ -319,7 +319,7 @@ void QrealAnimator::qra_saveCurrentValueToKey(QrealKey *key,
 void QrealAnimator::qra_saveValueToKey(const int &frame,
                                        const qreal &value) {
     QrealKey *keyAtFrame = (QrealKey*)anim_getKeyAtAbsFrame(frame);
-    if(keyAtFrame == NULL) {
+    if(keyAtFrame == nullptr) {
         keyAtFrame = new QrealKey(this);
         keyAtFrame->setRelFrame(frame);
         keyAtFrame->setValue(value);
@@ -355,7 +355,7 @@ void QrealAnimator::prp_setAbsFrame(const int &frame) {
 
 void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
     QrealKey *keyAtFrame = (QrealKey*)anim_getKeyAtAbsFrame(frame);
-    if(keyAtFrame == NULL) {
+    if(keyAtFrame == nullptr) {
         qreal value = qra_getValueAtAbsFrame(frame);
         keyAtFrame = new QrealKey(this);
         keyAtFrame->setRelFrame(frame);
@@ -373,7 +373,7 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
         return;
     }
 
-    if(anim_mKeyOnCurrentFrame == NULL) {
+    if(anim_mKeyOnCurrentFrame == nullptr) {
         anim_mKeyOnCurrentFrame = new QrealKey(anim_mCurrentRelFrame,
                                                mCurrentValue, this);
         anim_appendKey(anim_mKeyOnCurrentFrame,
@@ -394,7 +394,7 @@ void QrealAnimator::anim_removeAllKeys() {
         anim_removeKey(key.get());
     }
     qra_setCurrentValue(currentValue);
-    anim_mKeyOnCurrentFrame = NULL;
+    anim_mKeyOnCurrentFrame = nullptr;
 }
 
 void QrealAnimator::anim_mergeKeysIfNeeded() {
@@ -430,7 +430,7 @@ void QrealAnimator::anim_moveKeyToRelFrame(Key *key,
 
 void QrealAnimator::qra_updateKeysPath() {
     mKeysPath = QPainterPath();
-    QrealKey *lastKey = NULL;
+    QrealKey *lastKey = nullptr;
     Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         QrealKey *qaKey = ((QrealKey*)key.get());
         int keyFrame = key->getAbsFrame();
@@ -440,7 +440,7 @@ void QrealAnimator::qra_updateKeysPath() {
         } else {
             keyValue = qaKey->getValue();
         }
-        if(lastKey == NULL) {
+        if(lastKey == nullptr) {
             mKeysPath.moveTo(-5000, keyValue);
             mKeysPath.lineTo(keyFrame, keyValue);
         } else {
@@ -453,7 +453,7 @@ void QrealAnimator::qra_updateKeysPath() {
         }
         lastKey = qaKey;
     }
-    if(lastKey == NULL) {
+    if(lastKey == nullptr) {
         mKeysPath.moveTo(-5000, mCurrentValue);
         mKeysPath.lineTo(5000, mCurrentValue);
     } else {
@@ -594,10 +594,10 @@ void QrealAnimator::getMinAndMaxMoveFrame(
 }
 
 void QrealAnimator::qra_constrainCtrlsFrameValues() {
-    QrealKey *lastKey = NULL;
+    QrealKey *lastKey = nullptr;
     Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         QrealKey *qaKey = ((QrealKey*)key.get());
-        if(lastKey != NULL) {
+        if(lastKey != nullptr) {
             lastKey->constrainEndCtrlMaxFrame(qaKey->getAbsFrame());
             qaKey->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
         }
@@ -693,11 +693,11 @@ QrealPoint *QrealAnimator::qra_getPointAt(const qreal &value,
                                           const qreal &frame,
                                           const qreal &pixelsPerFrame,
                                           const qreal &pixelsPerValUnit) {
-    QrealPoint *point = NULL;
+    QrealPoint *point = nullptr;
     Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         point = ((QrealKey*)key.get())->mousePress(frame, value,
                                 pixelsPerFrame, pixelsPerValUnit);
-        if(point != NULL) {
+        if(point != nullptr) {
             break;
         }
     }

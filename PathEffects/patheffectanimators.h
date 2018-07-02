@@ -21,11 +21,14 @@ public:
 
     void filterPathForRelFrame(const int &relFrame,
                                SkPath *srcDstPath,
+                               const qreal &scale = 1.,
                                const bool &groupPathSum = false);
     void filterPathForRelFrameUntilGroupSum(const int &relFrame,
-                                            SkPath *srcDstPath);
+                                            SkPath *srcDstPath,
+                                            const qreal &scale = 1.);
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
-                                              SkPath *srcDstPath);
+                                              SkPath *srcDstPath,
+                                              const qreal &scale = 1.);
     void filterPathForRelFrameF(const qreal &relFrame,
                                SkPath *srcDstPath,
                                const bool &groupPathSum = false);
@@ -51,7 +54,7 @@ public:
 protected:
     bool mIsOutline;
     bool mIsFill;
-    BoundingBox *mParentBox = NULL;
+    BoundingBox *mParentBox = nullptr;
 };
 
 

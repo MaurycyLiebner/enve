@@ -126,16 +126,16 @@ public:
     }
 
     void addSet() {
-        if((mCurrentSet == NULL) ? true : mCurrentSet->isEmpty()) {
-            mCurrentSet = NULL;
+        if((mCurrentSet == nullptr) ? true : mCurrentSet->isEmpty()) {
+            mCurrentSet = nullptr;
             return;
         }
         addUndoRedo(mCurrentSet);
-        mCurrentSet = NULL;
+        mCurrentSet = nullptr;
     }
 
     void addToSet(UndoRedo *undoRedo) {
-        if(mCurrentSet == NULL) {
+        if(mCurrentSet == nullptr) {
             mCurrentSet = new UndoRedoSet();
         }
         mCurrentSet->addUndoRedo(undoRedo);
@@ -190,7 +190,7 @@ private:
     int mLastUndoRedoFrame = INT_MAX;
     MainWindow *mMainWindow;
     int mNumberOfSets = 0;
-    UndoRedoSet *mCurrentSet = NULL;
+    UndoRedoSet *mCurrentSet = nullptr;
     QList<UndoRedo*> mUndoStack;
     QList<UndoRedo*> mRedoStack;
 };

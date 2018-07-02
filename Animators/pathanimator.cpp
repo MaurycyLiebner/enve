@@ -32,10 +32,10 @@ VectorPathEdge *PathAnimator::getEdge(const QPointF &absPos,
                                       const qreal &canvasScaleInv) {
     Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
         VectorPathEdge *edge = path->getEdge(absPos, canvasScaleInv);
-        if(edge == NULL) continue;
+        if(edge == nullptr) continue;
         return edge;
     }
-    return NULL;
+    return nullptr;
 }
 
 void PathAnimator::addSinglePathAnimator(VectorPathAnimator *path,
@@ -63,10 +63,10 @@ void PathAnimator::removeSinglePathAnimator(VectorPathAnimator *path,
 bool PathAnimator::SWT_isPathAnimator() { return true; }
 #include "AddInclude/SkGeometry.h"
 void PathAnimator::loadPathFromSkPath(const SkPath &path) {
-    NodePoint *firstPoint = NULL;
-    NodePoint *lastPoint = NULL;
+    NodePoint *firstPoint = nullptr;
+    NodePoint *lastPoint = nullptr;
 
-    VectorPathAnimator *singlePathAnimator = NULL;
+    VectorPathAnimator *singlePathAnimator = nullptr;
 
     SkPath::RawIter iter = SkPath::RawIter(path);
 
@@ -77,20 +77,20 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
     SkAutoConicToQuads conicToQuads;
     int quadsCount = 0;
     int quadId = 0;
-    SkPoint *ptsT = NULL;
+    SkPoint *ptsT = nullptr;
 
     SkPath::Verb verbT = iter.next(pts);
     for(;;) {
         switch(verbT) {
             case SkPath::kMove_Verb: {
                 SkPoint pt = pts[0];
-                if(singlePathAnimator != NULL) {
+                if(singlePathAnimator != nullptr) {
                     addSinglePathAnimator(singlePathAnimator);
                 }
                 singlePathAnimator = new VectorPathAnimator(this);
                 lastPoint = singlePathAnimator->addNodeRelPos(
                                         SkPointToQPointF(pt),
-                            NULL);
+                            nullptr);
                 firstPoint = lastPoint;
             }
                 break;
@@ -196,7 +196,7 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
         }
     }
 DONE:
-    if(singlePathAnimator != NULL) {
+    if(singlePathAnimator != nullptr) {
         addSinglePathAnimator(singlePathAnimator);
     }
 }
@@ -236,10 +236,10 @@ NodePoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
         NodePoint *pt = singlePath->createNewPointOnLineNear(absPos,
                                                              adjust,
                                                              canvasScaleInv);
-        if(pt == NULL) continue;
+        if(pt == nullptr) continue;
         return pt;
     }
-    return NULL;
+    return nullptr;
 }
 
 void PathAnimator::applyTransformToPoints(const QMatrix &transform) {
@@ -256,11 +256,11 @@ MovablePoint *PathAnimator::getPointAtAbsPos(
         MovablePoint *pt = sepAnim->getPointAtAbsPos(absPtPos,
                                                      currentCanvasMode,
                                                      canvasScaleInv);
-        if(pt == NULL) continue;
+        if(pt == nullptr) continue;
         return pt;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void PathAnimator::drawSelected(SkCanvas *canvas,

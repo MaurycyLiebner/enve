@@ -1,5 +1,5 @@
 #include "keyfocustarget.h"
-KeyFocusTarget *KeyFocusTarget::KFT_mCurrentTarget = NULL;
+KeyFocusTarget *KeyFocusTarget::KFT_mCurrentTarget = nullptr;
 QList<KeyFocusTarget*> KeyFocusTarget::KFT_mAllTargets;
 
 KeyFocusTarget::KeyFocusTarget() {
@@ -9,12 +9,12 @@ KeyFocusTarget::KeyFocusTarget() {
 KeyFocusTarget::~KeyFocusTarget() {
     KFT_mAllTargets.removeOne(this);
     if(KFT_mCurrentTarget == this) {
-        KFT_mCurrentTarget = NULL;
+        KFT_mCurrentTarget = nullptr;
     }
 }
 #include <QDebug>
 bool KeyFocusTarget::KFT_handleKeyEvent(QKeyEvent *e) {
-    if(KFT_mCurrentTarget != NULL) {
+    if(KFT_mCurrentTarget != nullptr) {
         if(KFT_mCurrentTarget->KFT_handleKeyEventForTarget(e)) {
             return true;
         }
@@ -32,7 +32,7 @@ bool KeyFocusTarget::KFT_handleKeyEvent(QKeyEvent *e) {
 
 void KeyFocusTarget::KFT_setCurrentTarget(KeyFocusTarget *target) {
     if(target == KFT_mCurrentTarget) return;
-    if(KFT_mCurrentTarget != NULL) {
+    if(KFT_mCurrentTarget != nullptr) {
         KFT_mCurrentTarget->KFT_clearFocus();
     }
     KFT_mCurrentTarget = target;

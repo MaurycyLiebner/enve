@@ -15,7 +15,7 @@ class H_Wheel_SV_Triangle : public ColorWidget
 {
     Q_OBJECT
 public:
-    H_Wheel_SV_Triangle(QWidget *parent_t = NULL);
+    H_Wheel_SV_Triangle(QWidget *parent_t = nullptr);
 private:
     void paintGL();
     void resizeGL(int w, int h);

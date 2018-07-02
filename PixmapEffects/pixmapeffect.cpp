@@ -707,7 +707,7 @@ SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
 PixmapEffectRenderData *SampledMotionBlurEffect::
 getPixmapEffectRenderDataForRelFrame(const int &relFrame,
                                      BoundingBoxRenderData *data) {
-    if(!data->parentIsTarget) return NULL;
+    if(!data->parentIsTarget) return nullptr;
     SampledMotionBlurEffectRenderData *renderData =
             new SampledMotionBlurEffectRenderData();
     renderData->opacity =
@@ -747,7 +747,7 @@ getPixmapEffectRenderDataForRelFrame(const int &relFrame,
 PixmapEffectRenderData *SampledMotionBlurEffect::
 getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
                                      BoundingBoxRenderData *data) {
-    if(!data->parentIsTarget) return NULL;
+    if(!data->parentIsTarget) return nullptr;
     SampledMotionBlurEffectRenderData *renderData =
             new SampledMotionBlurEffectRenderData();
     renderData->opacity =

@@ -10,7 +10,7 @@ class FontsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    FontsWidget(QWidget *parent = NULL);
+    FontsWidget(QWidget *parent = nullptr);
 
     qreal getCurrentFontSize();
     QString getCurrentFontStyle();

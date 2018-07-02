@@ -120,8 +120,8 @@ private:
     void setCurrentGradientVal(Gradient *gradient);
     void setCurrentGradientLinearVal(const bool &linear);
 
-    ColorAnimator *mCurrentFillColorAnimator = NULL;
-    ColorAnimator *mCurrentStrokeColorAnimator = NULL;
+    ColorAnimator *mCurrentFillColorAnimator = nullptr;
+    ColorAnimator *mCurrentStrokeColorAnimator = nullptr;
     PaintType mCurrentFillPaintType = NOPAINT;
     PaintType mCurrentStrokePaintType = NOPAINT;
     Color mCurrentFillColor;
@@ -130,8 +130,8 @@ private:
     bool mCurrentStrokeGradientLinear = true;
     bool mCurrentFillGradientLinear = true;
 
-    Gradient *mCurrentStrokeGradient = NULL;
-    Gradient *mCurrentFillGradient = NULL;
+    Gradient *mCurrentStrokeGradient = nullptr;
+    Gradient *mCurrentFillGradient = nullptr;
     Qt::PenCapStyle mCurrentCapStyle;
     Qt::PenJoinStyle mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;
@@ -149,9 +149,9 @@ private:
     QPushButton *mStrokeTargetButton;
 
     QHBoxLayout *mColorTypeLayout;
-    QPushButton *mFillNoneButton = NULL;
-    QPushButton *mFillFlatButton = NULL;
-    QPushButton *mFillGradientButton = NULL;
+    QPushButton *mFillNoneButton = nullptr;
+    QPushButton *mFillFlatButton = nullptr;
+    QPushButton *mFillGradientButton = nullptr;
 
     QWidget *mStrokeSettingsWidget;
     QVBoxLayout *mStrokeSettingsLayout = new QVBoxLayout();

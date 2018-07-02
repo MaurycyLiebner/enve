@@ -27,9 +27,9 @@ private slots:
 protected:
     int mContentHeight = 0;
     virtual void createVisiblePartWidget();
-    SingleWidgetTarget *mMainTarget = NULL;
-    SingleWidgetAbstraction *mMainAbstraction = NULL;
-    ScrollWidgetVisiblePart *mVisiblePartWidget = NULL;
+    SingleWidgetTarget *mMainTarget = nullptr;
+    SingleWidgetAbstraction *mMainAbstraction = nullptr;
+    ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;
 };
 
 #endif // SCROLLWIDGET_H

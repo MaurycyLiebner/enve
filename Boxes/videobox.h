@@ -28,7 +28,7 @@ public:
 protected:
     void updateFrameCount(const char *path);
 private:
-    SingleSound *mSound = NULL;
+    SingleSound *mSound = nullptr;
     QString mSrcFilePath;
 };
 

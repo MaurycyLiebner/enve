@@ -14,7 +14,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(Canvas *canvas,
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &defName,
                                            QWidget *parent) :
-    CanvasSettingsDialog(defName, 1920, 1080, 200, 24., NULL, parent) {}
+    CanvasSettingsDialog(defName, 1920, 1080, 200, 24., nullptr, parent) {}
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
                                            const int &currWidth,

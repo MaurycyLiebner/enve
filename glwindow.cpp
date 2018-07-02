@@ -45,7 +45,7 @@ void GLWindow::bindSkia() {
                                     kBottomLeft_GrSurfaceOrigin,
                                     SkColorType::kRGBA_8888_SkColorType,
                                     nullptr/*colorSpace*/,
-                                    nullptr/*&props*/);
+                                    &props);
     mCanvas = mSurface->getCanvas();
 }
 
@@ -65,9 +65,9 @@ void GLWindow::initialize() {
     // setup GrContext
     mInterface = GrGLMakeNativeInterface();
 
-    GrContextOptions options;
+//    GrContextOptions options;
     // setup contexts
-    mGrContext = GrContext::MakeGL(mInterface, options);
+    mGrContext = GrContext::MakeGL(mInterface/*, options*/);
     SkASSERT(mGrContext);
 
     // Wrap the frame buffer object attached to the screen in

@@ -27,7 +27,7 @@ void BrushSelectionWidget::duplicateCurrentBrush() {
 Brush *BrushSelectionWidget::getBrushAt(const QPoint &pos) {
     int brushId = pos.x()/(mDimension + mMargin) +
             (pos.y()/(mDimension + mMargin))*mNumberColumns;
-    if(brushId < 0 || brushId >= mAllBrushes.count()) return NULL;
+    if(brushId < 0 || brushId >= mAllBrushes.count()) return nullptr;
     return mAllBrushes.at(brushId);
 }
 
@@ -85,7 +85,7 @@ void BrushSelectionWidget::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton ||
         event->button() == Qt::RightButton) {
         Brush *pressedBrush = getBrushAt(event->pos());
-        if(pressedBrush != NULL) {
+        if(pressedBrush != nullptr) {
             mCurrentBrush = pressedBrush;
             emit brushSelected(pressedBrush);
             update();
@@ -95,7 +95,7 @@ void BrushSelectionWidget::mousePressEvent(QMouseEvent *event) {
         QMenu menu;
         menu.addAction("New Brush...");
         QAction *action = menu.exec(event->globalPos());
-        if(action != NULL) {
+        if(action != nullptr) {
             bool ok;
             QString text = QInputDialog::getText(this, "Brush Name",
                                                  "Brush name:", QLineEdit::Normal,
@@ -139,7 +139,7 @@ void BrushSelectionWidget::setCurrentBrush(const Brush *brush) {
 }
 
 void BrushSelectionWidget::removeBrush(Brush *brush) {
-    if(brush == NULL) return;
+    if(brush == nullptr) return;
     mAllBrushes.removeOne(brush);
     if(mCurrentBrush == brush) {
         if(mAllBrushes.isEmpty()) {

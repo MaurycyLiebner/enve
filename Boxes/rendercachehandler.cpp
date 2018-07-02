@@ -6,7 +6,7 @@
 #include "global.h"
 
 void CacheHandler::removeRenderContainer(CacheContainer *cont) {
-    cont->setParentCacheHandler(NULL);
+    cont->setParentCacheHandler(nullptr);
     for(int i = 0; i < mRenderContainers.count(); i++) {
         if(mRenderContainers.at(i).get() == cont) {
             mRenderContainers.removeAt(i);
@@ -86,17 +86,17 @@ CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(
 int CacheHandler::getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
                                                        CacheContainer **contP) {
     int currFrame = frame + 1;
-    CacheContainer *cont = NULL;
+    CacheContainer *cont = nullptr;
     while(true) {
         cont = getRenderContainerAtRelFrame(currFrame);
-        if(cont == NULL) {
+        if(cont == nullptr) {
             break;
         } else if(!cont->storesDataInMemory()) {
             break;
         }
         currFrame = cont->getMaxRelFrame();
     }
-    if(contP != NULL) {
+    if(contP != nullptr) {
         *contP = cont;
     }
     return currFrame;
@@ -104,10 +104,10 @@ int CacheHandler::getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
 
 int CacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) {
     int currFrame = frame + 1;
-    CacheContainer *cont = NULL;
+    CacheContainer *cont = nullptr;
     while(true) {
         cont = getRenderContainerAtRelFrame(currFrame);
-        if(cont == NULL) {
+        if(cont == nullptr) {
             return currFrame;
         }
         currFrame = cont->getMaxRelFrame();
@@ -117,10 +117,10 @@ int CacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) {
 
 int CacheHandler::getFirstEmptyFrameAtOrAfterFrame(const int &frame) {
     int currFrame = frame;
-    CacheContainer *cont = NULL;
+    CacheContainer *cont = nullptr;
     while(true) {
         cont = getRenderContainerAtRelFrame(currFrame);
-        if(cont == NULL) {
+        if(cont == nullptr) {
             return currFrame;
         }
         currFrame = cont->getMaxRelFrame();
@@ -146,7 +146,7 @@ void CacheHandler::setContainersInFrameRangeBlocked(const int &minFrame,
 
 void CacheHandler::clearCache() {
     Q_FOREACH(const std::shared_ptr<CacheContainer> &cont, mRenderContainers) {
-        cont->setParentCacheHandler(NULL);
+        cont->setParentCacheHandler(nullptr);
     }
 
     mRenderContainers.clear();
@@ -207,7 +207,7 @@ CacheContainer *CacheHandler::getRenderContainerAtRelFrame(const int &frame) {
     if(getRenderContainterIdAtRelFrame(frame, &id)) {
         return mRenderContainers.at(id).get();
     }
-    return NULL;
+    return nullptr;
 }
 
 int CacheHandler::getRenderContainerIdAtOrBeforeRelFrame(const int &frame) {
@@ -221,7 +221,7 @@ int CacheHandler::getRenderContainerIdAtOrBeforeRelFrame(const int &frame) {
 CacheContainer *CacheHandler::getRenderContainerAtOrBeforeRelFrame(
                                                 const int &frame) {
     CacheContainer *cont = getRenderContainerAtRelFrame(frame);
-    if(cont == NULL) {
+    if(cont == nullptr) {
         int id = getRenderContainterInsertIdAtRelFrame(frame) - 1;
         if(id >= 0 && id < mRenderContainers.length()) {
             cont = mRenderContainers.at(id).get();
@@ -242,7 +242,7 @@ int CacheHandler::getRenderContainerIdAtOrAfterRelFrame(const int &frame) {
 CacheContainer *CacheHandler::getRenderContainerAtOrAfterRelFrame(
                                                 const int &frame) {
     CacheContainer *cont = getRenderContainerAtRelFrame(frame);
-    if(cont == NULL) {
+    if(cont == nullptr) {
         int id = getRenderContainterInsertIdAtRelFrame(frame);
         if(id >= 0 && id < mRenderContainers.length()) {
             cont = mRenderContainers.at(id).get();
@@ -305,6 +305,6 @@ void CacheHandler::clearCacheForRelFrameRange(const int &minFrame,
         maxId = getRenderContainterInsertIdAtRelFrame(maxFrame) - 1;
     }
     for(int i = minId; i <= maxId; i++) {
-        mRenderContainers.takeAt(minId)->setParentCacheHandler(NULL);
+        mRenderContainers.takeAt(minId)->setParentCacheHandler(nullptr);
     }
 }

@@ -58,6 +58,7 @@ public:
     virtual void filterPathForRelFrame(const int &,
                                        const SkPath &,
                                        SkPath *,
+                                       const qreal &,
                                        const bool &) = 0;
 
     virtual void filterPathForRelFrameF(const qreal &,
@@ -68,7 +69,7 @@ public:
     void readProperty(QIODevice *target);
 
     bool applyBeforeThickness() {
-        if(mApplyBeforeThickness == NULL) return false;
+        if(mApplyBeforeThickness == nullptr) return false;
         return mApplyBeforeThickness->getValue();
     }
     void setParentEffectAnimators(PathEffectAnimators *parent) {
@@ -92,7 +93,7 @@ public:
             mApplyBeforeThickness = (new BoolProperty())->ref<BoolProperty>();
             mApplyBeforeThickness->prp_setName("pre-thickness");
             ca_addChildAnimator(mApplyBeforeThickness.data());
-        } else if(mApplyBeforeThickness != NULL) {
+        } else if(mApplyBeforeThickness != nullptr) {
             ca_removeChildAnimator(mApplyBeforeThickness.data());
             mApplyBeforeThickness.reset();
         }
@@ -118,7 +119,7 @@ protected:
     bool mOutlineEffect = false;
     BoolPropertyQSPtr mApplyBeforeThickness;
     PathEffectType mPathEffectType;
-    PathEffectAnimators *mParentEffectAnimators = NULL;
+    PathEffectAnimators *mParentEffectAnimators = nullptr;
 };
 
 class DisplacePathEffect : public PathEffect {
@@ -129,7 +130,8 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
-                               const bool &);
+                               const qreal &scale = 1.,
+                               const bool & = false);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath *dst,
@@ -195,6 +197,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
+                               const qreal &,
                                const bool &);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
@@ -214,7 +217,8 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
-                               const bool &);
+                               const qreal &scale = 1.,
+                               const bool & = false);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath *dst,
@@ -238,6 +242,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
+                               const qreal &,
                                const bool &);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
@@ -248,7 +253,7 @@ public:
     void readProperty(QIODevice *target);
 
     bool hasReasonsNotToApplyUglyTransform() {
-        return true;//mBoxTarget->getTarget() != NULL;
+        return true;//mBoxTarget->getTarget() != nullptr;
     }
 private:
     PathBox *mParentPathBox;
@@ -266,6 +271,7 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src,
                                SkPath *dst,
+                               const qreal &,
                                const bool &groupPathSum);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
@@ -279,7 +285,7 @@ public:
     }
 
 //    bool hasReasonsNotToApplyUglyTransform() {
-//        return true;//mBoxTarget->getTarget() != NULL;
+//        return true;//mBoxTarget->getTarget() != nullptr;
 //    }
 
     void setParentGroup(BoxesGroup *parent);

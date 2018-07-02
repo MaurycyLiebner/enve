@@ -146,8 +146,8 @@ QPointF VectorPathEdge::getPosBetweenPointsAtT(const qreal &t,
 QPointF VectorPathEdge::getRelPosBetweenPointsAtT(const qreal &t,
                                         NodePoint *point1,
                                         NodePoint *point2) {
-    if(point1 == NULL) return point2->getRelativePos();
-    if(point2 == NULL) return point1->getRelativePos();
+    if(point1 == nullptr) return point2->getRelativePos();
+    if(point2 == nullptr) return point1->getRelativePos();
 
     CtrlPoint *point1EndPt = point1->getEndCtrlPt();
     CtrlPoint *point2StartPt = point2->getStartCtrlPt();
@@ -162,8 +162,8 @@ QPointF VectorPathEdge::getRelPosBetweenPointsAtT(const qreal &t,
 QPointF VectorPathEdge::getAbsPosBetweenPointsAtT(const qreal &t,
                                         NodePoint *point1,
                                         NodePoint *point2) {
-    if(point1 == NULL) return point2->getAbsolutePos();
-    if(point2 == NULL) return point1->getAbsolutePos();
+    if(point1 == nullptr) return point2->getAbsolutePos();
+    if(point2 == nullptr) return point1->getAbsolutePos();
 
     CtrlPoint *point1EndPt = point1->getEndCtrlPt();
     CtrlPoint *point2StartPt = point2->getStartCtrlPt();

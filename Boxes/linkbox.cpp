@@ -80,13 +80,13 @@ bool InternalLinkBox::relPointInsidePath(const QPointF &point) {
 }
 
 bool InternalLinkBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
-    if(getLinkTarget() == NULL) return false;
+    if(getLinkTarget() == nullptr) return false;
     return BoundingBox::isRelFrameInVisibleDurationRect(relFrame) &&
             getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
 }
 
 bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
-    if(getLinkTarget() == NULL) return false;
+    if(getLinkTarget() == nullptr) return false;
     return BoundingBox::isRelFrameFInVisibleDurationRect(relFrame) &&
             getLinkTarget()->isRelFrameFInVisibleDurationRect(relFrame);
 }
@@ -138,7 +138,7 @@ bool InternalLinkBox::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                              relFrame2) ||
             getLinkTarget()->prp_differencesBetweenRelFrames(relFrame1,
                                                          relFrame2);
-    if(differences || mDurationRectangle == NULL) return differences;
+    if(differences || mDurationRectangle == nullptr) return differences;
     return mDurationRectangle->hasAnimationFrameRange();
 }
 
@@ -210,7 +210,7 @@ bool InternalLinkGroupBox::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                              relFrame2) ||
             getLinkTarget()->prp_differencesBetweenRelFrames(relFrame1,
                                                          relFrame2);
-    if(differences || mDurationRectangle == NULL) return differences;
+    if(differences || mDurationRectangle == nullptr) return differences;
     return mDurationRectangle->hasAnimationFrameRange();
 }
 

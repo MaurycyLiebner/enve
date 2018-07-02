@@ -37,7 +37,7 @@ struct FileCacheHandlerAbstraction {
 class FileSourceWidget : public QWidget {
     Q_OBJECT
 public:
-    FileSourceWidget(FileSourceListVisibleWidget *parent = NULL);
+    FileSourceWidget(FileSourceListVisibleWidget *parent = nullptr);
 
     void setTargetCache(FileCacheHandlerAbstraction *target);
 
@@ -47,8 +47,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *);
     bool mFileNameOnly = true;
-    FileCacheHandlerAbstraction *mTargetCache = NULL;
-    FileSourceListVisibleWidget *mParentVisibleWidget = NULL;
+    FileCacheHandlerAbstraction *mTargetCache = nullptr;
+    FileSourceListVisibleWidget *mParentVisibleWidget = nullptr;
     void mouseMoveEvent(QMouseEvent *event);
     QPoint mDragStartPos;
 };
@@ -110,7 +110,7 @@ protected:
 class FileSourceList : public ScrollArea {
     Q_OBJECT
 public:
-    FileSourceList(QWidget *parent = NULL);
+    FileSourceList(QWidget *parent = nullptr);
 
 protected:
     void dropEvent(QDropEvent *event);

@@ -25,7 +25,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
     if(mSounds.isEmpty()) return;
 
     int nSamples = (endAbsFrame - startAbsFrame)*SOUND_SAMPLERATE/fps;
-    //float *data1 = NULL;
+    //float *data1 = nullptr;
     float *data = new float[nSamples];
     for(int i = 0; i < nSamples; i++) {
         data[i] = 0.f;

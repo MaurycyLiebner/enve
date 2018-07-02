@@ -14,21 +14,21 @@ ImageBox::ImageBox(const QString &filePath) :
 }
 
 ImageBox::~ImageBox() {
-    if(mImgCacheHandler != NULL) {
+    if(mImgCacheHandler != nullptr) {
         mImgCacheHandler->removeDependentBox(this);
     }
 }
 
 void ImageBox::setFilePath(const QString &path) {
     mImageFilePath = path;
-    if(mImgCacheHandler != NULL) {
+    if(mImgCacheHandler != nullptr) {
         mImgCacheHandler->removeDependentBox(this);
     }
     mImgCacheHandler = (ImageCacheHandler*)
                                 FileSourcesCache::getHandlerForFilePath(
                                                         path);
 
-    if(mImgCacheHandler == NULL) {
+    if(mImgCacheHandler == nullptr) {
         QFile file(path);
         if(file.exists()) {
             mImgCacheHandler = new ImageCacheHandler(path);
@@ -65,7 +65,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrame(
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
     imgData->image = mImgCacheHandler->getImageCopy();
-    if(imgData->image == NULL) {
+    if(imgData->image == nullptr) {
         mImgCacheHandler->addScheduler();
         mImgCacheHandler->addDependent(imgData);
     }
@@ -77,7 +77,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
     imgData->image = mImgCacheHandler->getImageCopy();
-    if(imgData->image == NULL) {
+    if(imgData->image == nullptr) {
         mImgCacheHandler->addScheduler();
         mImgCacheHandler->addDependent(imgData);
     }
@@ -91,7 +91,7 @@ bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "ib_set_src_file") {
         changeSourceFile();
     } else if(selectedAction->objectName() == "ib_reload") {
-        if(mImgCacheHandler != NULL) {
+        if(mImgCacheHandler != nullptr) {
             mImgCacheHandler->clearCache();
         }
     } else {

@@ -25,7 +25,7 @@ void Canvas::connectPoints() {
         PathAnimator *secondParentPath = secondSinglePath->getParentPathAnimator();
 
         int nodeToSelectId = firstPoint->getNodeId();
-        VectorPathAnimator *newSinglePath = NULL;
+        VectorPathAnimator *newSinglePath = nullptr;
         if(firstParentPath == secondParentPath) {
             if(firstSinglePath == secondSinglePath) {
                 firstSinglePath->connectPoints(firstPoint, secondPoint);
@@ -62,7 +62,7 @@ void Canvas::connectPoints() {
 
             newSinglePath = firstSinglePath->connectWith(secondSinglePath);
         }
-        if(newSinglePath != NULL) {
+        if(newSinglePath != nullptr) {
             NodePoint *nodePt1 = newSinglePath->getNodePtWithNodeId(nodeToSelectId);
             NodePoint *nodePt2 = newSinglePath->getNodePtWithNodeId(nodeToSelectId + 1);
             addPointToSelection(nodePt1);
@@ -76,7 +76,7 @@ void Canvas::disconnectPoints() {
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         if(point->isNodePoint()) {
             NodePoint *nextPoint = ((NodePoint*)point)->getNextPoint();
-            if(nextPoint == NULL) continue;
+            if(nextPoint == nullptr) continue;
             if(nextPoint->isSelected()) {
                 selectedNodePoints.append((NodePoint*)point);
             }
@@ -336,7 +336,7 @@ void Canvas::removeSelectedPointsAndClearList() {
     if(mIsMouseGrabbing) {
         if(!BoxesGroup::mCtrlsAlwaysVisible ||
             mSelectedPoints.count() == 1) {
-            if(mLastPressedPoint != NULL) {
+            if(mLastPressedPoint != nullptr) {
                 if(mLastPressedPoint->isCtrlPoint()) {
                     mLastPressedPoint->cancelTransform();
                     mLastPressedPoint->deselect();
@@ -364,22 +364,22 @@ void Canvas::clearPointsSelection() {
     if(mCurrentMode == MOVE_POINT) {
         schedulePivotUpdate();
     }
-//    if(mLastPressedPoint != NULL) {
+//    if(mLastPressedPoint != nullptr) {
 //        mLastPressedPoint->deselect();
-//        mLastPressedPoint = NULL;
+//        mLastPressedPoint = nullptr;
 //    }
-//    setCurrentEndPoint(NULL);
+//    setCurrentEndPoint(nullptr);
 }
 
 void Canvas::clearLastPressedPoint() {
-    if(mLastPressedPoint != NULL) {
+    if(mLastPressedPoint != nullptr) {
         mLastPressedPoint->deselect();
-        mLastPressedPoint = NULL;
+        mLastPressedPoint = nullptr;
     }
 }
 
 void Canvas::clearCurrentEndPoint() {
-    setCurrentEndPoint(NULL);
+    setCurrentEndPoint(nullptr);
 }
 
 QPointF Canvas::getSelectedPointsAbsPivotPos() {

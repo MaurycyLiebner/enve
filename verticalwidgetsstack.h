@@ -28,8 +28,8 @@ public:
 signals:
     void finishedChanging();
 private:
-    BoxesListKeysViewWidgetResizer *mAboveResizer = NULL;
-    BoxesListKeysViewWidgetResizer *mBelowResizer = NULL;
+    BoxesListKeysViewWidgetResizer *mAboveResizer = nullptr;
+    BoxesListKeysViewWidgetResizer *mBelowResizer = nullptr;
 
     QWidget *mAboveWidget;
     QWidget *mBelowWidget;

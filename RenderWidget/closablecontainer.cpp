@@ -31,7 +31,7 @@ void ClosableContainer::addContentWidget(QWidget *widget) {
 }
 
 void ClosableContainer::setCheckable(const bool &check) {
-    if(check == (mCheckBox != NULL)) return;
+    if(check == (mCheckBox != nullptr)) return;
     if(check) {
         mCheckBox = new QCheckBox(this);
         mCheckBox->setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
@@ -40,18 +40,18 @@ void ClosableContainer::setCheckable(const bool &check) {
         mCheckBox->setChecked(true);
     } else {
         delete mCheckBox;
-        mCheckBox = NULL;
+        mCheckBox = nullptr;
     }
 }
 
 void ClosableContainer::setChecked(const bool &check) {
-    if(mCheckBox == NULL) return;
+    if(mCheckBox == nullptr) return;
     if(mCheckBox->isChecked() == check) return;
     mCheckBox->setChecked(true);
 }
 
 bool ClosableContainer::isChecked() {
-    if(mCheckBox == NULL) return true;
+    if(mCheckBox == nullptr) return true;
     return mCheckBox->isChecked();
 }
 

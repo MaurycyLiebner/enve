@@ -91,7 +91,7 @@ bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
 }
 
 void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
-    if(mMainAbstraction == NULL) return;
+    if(mMainAbstraction == nullptr) return;
     //updateParentHeight();
     int idP = 0;
     int currX;
@@ -120,13 +120,13 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 
 void ScrollWidgetVisiblePart::setMainAbstraction(
         SingleWidgetAbstraction *abs) {
-    if(abs == NULL) {
+    if(abs == nullptr) {
         mMainAbstraction.reset();
     } else {
         mMainAbstraction = abs->ref<SingleWidgetAbstraction>();
     }
     scheduledUpdateVisibleWidgetsContent();
-//    if(abs == NULL) return;
+//    if(abs == nullptr) return;
 //    abs->setContentVisible(true);
 //    updateVisibleWidgetsContent();
 //    updateParentHeight();
@@ -137,7 +137,7 @@ QWidget *ScrollWidgetVisiblePart::createNewSingleWidget() {
 }
 
 SWT_RulesCollection::SWT_RulesCollection() {
-    type = NULL;
+    type = nullptr;
     rule = SWT_NoRule;
     alwaysShowChildren = false;
     target = SWT_CurrentCanvas;

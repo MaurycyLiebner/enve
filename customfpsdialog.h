@@ -26,18 +26,18 @@ public:
         return mCheckBox->isChecked();
     }
 protected:
-    QVBoxLayout *mMainLayout = NULL;
+    QVBoxLayout *mMainLayout = nullptr;
 
-    QHBoxLayout *mFpsLayout = NULL;
+    QHBoxLayout *mFpsLayout = nullptr;
 
-    QLabel *mFpsLabel = NULL;
+    QLabel *mFpsLabel = nullptr;
 
-    QCheckBox *mCheckBox = NULL;
-    QDoubleSpinBox *mSpinBox = NULL;
+    QCheckBox *mCheckBox = nullptr;
+    QDoubleSpinBox *mSpinBox = nullptr;
 
-    QHBoxLayout *mButtonsLayout = NULL;
-    QPushButton *mAcceptButton = NULL;
-    QPushButton *mCancelButton = NULL;
+    QHBoxLayout *mButtonsLayout = nullptr;
+    QPushButton *mAcceptButton = nullptr;
+    QPushButton *mCancelButton = nullptr;
 };
 
 #endif // CUSTOMFPSDIALOG_H

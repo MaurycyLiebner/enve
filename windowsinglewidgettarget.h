@@ -7,13 +7,16 @@ class WindowSingleWidgetTarget : public SingleWidgetTarget {
 public:
     WindowSingleWidgetTarget(CanvasWindow *window);
 
+    CanvasWindow* getCanvasWindow() const {
+        return mWindow;
+    }
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             ScrollWidgetVisiblePart *visiblePartWidget);
 protected:
-    CanvasWindow *mWindow = NULL;
+    CanvasWindow *mWindow = nullptr;
 };
 
 #endif // WINDOWSINGLEWIDGETTARGET_H

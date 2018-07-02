@@ -21,7 +21,7 @@ class ColorValueRect : public ColorWidget
 {
     Q_OBJECT
 public:
-    ColorValueRect(CVR_TYPE type_t, QWidget *parent = NULL);
+    ColorValueRect(CVR_TYPE type_t, QWidget *parent = nullptr);
     void updateVal();
     GLfloat getVal();
     void setDisplayedValue(const GLfloat &val_t);

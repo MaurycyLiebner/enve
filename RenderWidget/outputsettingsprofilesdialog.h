@@ -10,13 +10,13 @@ class OutputSettingsProfilesDialog : public QDialog {
     Q_OBJECT
 public:
     OutputSettingsProfilesDialog(const OutputSettings &currentSettings,
-                                 QWidget *parent = NULL);
+                                 QWidget *parent = nullptr);
 
     OutputSettingsProfile *getCurrentProfile() {
-        if(OUTPUT_SETTINGS_PROFILES.isEmpty()) return NULL;
+        if(OUTPUT_SETTINGS_PROFILES.isEmpty()) return nullptr;
         int indexT = mProfilesComboBox->currentIndex();
-        if(indexT < 0) return NULL;
-        if(indexT >= OUTPUT_SETTINGS_PROFILES.count()) return NULL;
+        if(indexT < 0) return nullptr;
+        if(indexT >= OUTPUT_SETTINGS_PROFILES.count()) return nullptr;
         return OUTPUT_SETTINGS_PROFILES.at(indexT);
     }
 
@@ -34,11 +34,11 @@ protected:
     QPushButton *mEditProfileButton;
     QPushButton *mDeleteProfileButton;
 
-    OutputSettingsDisplayWidget *mOutputSettingsDisplayWidget = NULL;
+    OutputSettingsDisplayWidget *mOutputSettingsDisplayWidget = nullptr;
 
     QHBoxLayout *mButtonsLayout;
-    QPushButton *mOkButton = NULL;
-    QPushButton *mCancelButton = NULL;
+    QPushButton *mOkButton = nullptr;
+    QPushButton *mCancelButton = nullptr;
 
     OutputSettings mCurrentSettings;
 

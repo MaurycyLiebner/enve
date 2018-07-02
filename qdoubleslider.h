@@ -78,7 +78,7 @@ protected:
     QString mName = "";
     bool mShowName = false;
 
-    QLineEdit *mLineEdit = NULL;
+    QLineEdit *mLineEdit = nullptr;
     qreal mValue = 0.;
     bool mTextEdit = false;
     int mMovesCount = 0;

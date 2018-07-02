@@ -137,12 +137,12 @@ private:
 
     int mOverlapFrames = 1;
     int mFrameStep = 1;
-    PointAnimator *mTopLeftPoint = NULL;
-    PointAnimator *mBottomRightPoint = NULL;
+    PointAnimator *mTopLeftPoint = nullptr;
+    PointAnimator *mBottomRightPoint = nullptr;
     ushort mWidth = 0;
     ushort mHeight = 0;
-    AnimatedSurface *mMainHandler = NULL;
-    Surface *mTemporaryHandler = NULL;
+    AnimatedSurface *mMainHandler = nullptr;
+    Surface *mTemporaryHandler = nullptr;
 };
 
 #endif // PAINTBOX_H

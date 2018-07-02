@@ -23,8 +23,7 @@ SingleWidgetAbstraction *SingleWidgetTarget::SWT_createAbstraction(
     SingleWidgetAbstraction *SWT_Abstraction =
             new SingleWidgetAbstraction(this,
                                         visiblePartWidget);
-    SWT_addChildrenAbstractions(SWT_Abstraction,
-                                visiblePartWidget);
+    SWT_addChildrenAbstractions(SWT_Abstraction, visiblePartWidget);
     mSWT_allAbstractions << SWT_Abstraction->ref<SingleWidgetAbstraction>();
     return SWT_Abstraction;
 }

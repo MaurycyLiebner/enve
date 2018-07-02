@@ -146,7 +146,7 @@ void RenderInstanceSettings::setCurrentState(
 }
 
 void RenderInstanceSettings::updateParentWidget() {
-    if(mParentWidget != NULL) {
+    if(mParentWidget != nullptr) {
         mParentWidget->updateFromSettings();
     }
 }

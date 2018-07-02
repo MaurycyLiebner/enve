@@ -45,14 +45,14 @@ struct ParticleState {
                 const SkPaint paint) const {
         if(size < 0.) return;
         SkPaint paintT = paint;
-        if(targetRenderData.get() == NULL) {
+        if(targetRenderData.get() == nullptr) {
             paintT.setAlpha(opacity);
             paintT.setStrokeWidth(size);
             canvas->drawPath(linePath, paintT);
         } else {
             paintT.setAlpha(qRound(targetRenderData->opacity*2.55));
             sk_sp<SkImage> imageT = targetRenderData->renderedImage;
-            if(imageT.get() == NULL) return;
+            if(imageT.get() == nullptr) return;
             //paintT.setAntiAlias(true);
             //paintT.setFilterQuality(kHigh_SkFilterQuality);
             canvas->drawImage(imageT,
@@ -153,7 +153,7 @@ private:
     ParticleBox *mParentBox;
     int mFirstFrame;
     int mNumberFrames;
-    ParticleState *mParticleStates = NULL;
+    ParticleState *mParticleStates = nullptr;
 
     SkScalar mLastScale;
     SkScalar mLastOpacity;
@@ -187,7 +187,7 @@ public:
         data.color = mColorAnimator->getColorAtRelFrame(relFrame).getSkColor();
 
         BoundingBox *targetT = mBoxTargetProperty->getTarget();
-        if(targetT == NULL) {
+        if(targetT == nullptr) {
             data.boxDraw = false;
             Q_FOREACH(Particle *particle, mParticles) {
                 if(particle->isVisibleAtFrame(relFrame)) {
@@ -231,7 +231,7 @@ public:
         data.color = mColorAnimator->getColorAtRelFrameF(relFrame).getSkColor();
 
         BoundingBox *targetT = mBoxTargetProperty->getTarget();
-        if(targetT == NULL) {
+        if(targetT == nullptr) {
             data.boxDraw = false;
             Q_FOREACH(Particle *particle, mParticles) {
                 if(particle->isVisibleAtFrame(relFrame)) {
@@ -282,7 +282,7 @@ private:
 
     QList<Particle*> mParticles;
     QList<Particle*> mNotFinishedParticles;
-    ParticleBox *mParentBox = NULL;
+    ParticleBox *mParentBox = nullptr;
 
     QSharedPointer<ColorAnimator> mColorAnimator =
             (new ColorAnimator())->ref<ColorAnimator>();

@@ -2,14 +2,14 @@
 #include <QByteArray>
 #include "Boxes/boundingboxrendercontainer.h"
 #include "canvas.h"
-VideoEncoder *VideoEncoder::mVideoEncoderInstance = NULL;
+VideoEncoder *VideoEncoder::mVideoEncoderInstance = nullptr;
 
 VideoEncoder::VideoEncoder() {
     mVideoEncoderInstance = this;
 }
 
 void VideoEncoder::addContainer(CacheContainer *cont) {
-    if(cont == NULL) return;
+    if(cont == nullptr) return;
     cont->setBlocked(true);
     mNextContainers.append(cont->ref<CacheContainer>());
     addScheduler();
@@ -21,7 +21,7 @@ static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt,
     int ret;
 
     picture = av_frame_alloc();
-    if(!picture) return NULL;
+    if(!picture) return nullptr;
 
     picture->format = pix_fmt;
     picture->width  = width;
@@ -31,7 +31,7 @@ static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt,
     ret = av_frame_get_buffer(picture, 32);
     if(ret < 0) {
         fprintf(stderr, "Could not allocate frame data.\n");
-        return NULL;
+        return nullptr;
     }
 
     return picture;
@@ -46,7 +46,7 @@ static bool open_video(AVCodec *codec,
     c = ost->enc;
 
     /* open the codec */
-    if(avcodec_open2(c, codec, NULL) < 0) {
+    if(avcodec_open2(c, codec, nullptr) < 0) {
        error = "Could not open codec";
        return false;
     }
@@ -75,7 +75,7 @@ static bool add_video_stream(OutputStream *ost,
     AVCodecContext *c;
     AVCodec *codec = outSettings.videoCodec;
 
-//    if(codec == NULL) {
+//    if(codec == nullptr) {
 //        /* find the video encoder */
 //        codec = avcodec_find_encoder(codec_id);
 //        if(!codec) {
@@ -84,7 +84,7 @@ static bool add_video_stream(OutputStream *ost,
 //        }
 //    }
 
-    ost->st = avformat_new_stream(oc, NULL);
+    ost->st = avformat_new_stream(oc, nullptr);
     if(!ost->st) {
         error = "Could not alloc stream";
         return false;
@@ -171,7 +171,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
     /* check if we want to generate more frames */
 //    if (av_compare_ts(ost->next_pts, c->time_base,
 //                      STREAM_DURATION, (AVRational){ 1, 1 }) >= 0)
-//        return NULL;
+//        return nullptr;
 
     if(c->pix_fmt != AV_PIX_FMT_BGRA) {
         /* as we only generate a rgba picture, we must convert it
@@ -181,10 +181,10 @@ static AVFrame *get_video_frame(OutputStream *ost,
                                           AV_PIX_FMT_BGRA,
                                           c->width, c->height,
                                           c->pix_fmt,
-                                          SWS_BICUBIC, NULL, NULL, NULL);
+                                          SWS_BICUBIC, nullptr, nullptr, nullptr);
             if (!ost->sws_ctx) {
                 error = "Cannot initialize the conversion context";
-                return NULL;
+                return nullptr;
             }
         }
         SkPixmap pixmap;
@@ -197,7 +197,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
                                 image->width());
         if(av_frame_make_writable(ost->frame) < 0) {
             error = "Could not make AVFrame writable";
-            return NULL;
+            return nullptr;
         }
 
         sws_scale(ost->sws_ctx, dstSk,
@@ -205,7 +205,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
                   ost->frame->linesize);
     } else {
         if(!copyImageToFrame(ost->frame, image, c->width, c->height, error)) {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -225,7 +225,7 @@ static bool write_video_frame(AVFormatContext *oc,
     c = ost->enc;
 
     AVFrame *frame = get_video_frame(ost, image, error);
-    if(frame == NULL) return false;
+    if(frame == nullptr) return false;
 
     /* encode the image */
     ret = avcodec_send_frame(c, frame);
@@ -292,7 +292,7 @@ static bool add_audio_stream(OutputStream *ost,
 //        return false;
 //    }
 
-    ost->st = avformat_new_stream(oc, NULL);
+    ost->st = avformat_new_stream(oc, nullptr);
     if(!ost->st) {
         error = "Could not alloc stream";
         return false;
@@ -353,7 +353,7 @@ static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
 
     if(!frame) {
         error = "Error allocating an audio frame";
-        return NULL;
+        return nullptr;
     }
 
     frame->format = sample_fmt;
@@ -365,7 +365,7 @@ static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
         ret = av_frame_get_buffer(frame, 0);
         if(ret < 0) {
             error = "Error allocating an audio buffer";
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -380,7 +380,7 @@ static bool open_audio(AVCodec *codec, OutputStream *ost,
     c = ost->enc;
 
     /* open it */
-    if(avcodec_open2(c, codec, NULL) < 0) {
+    if(avcodec_open2(c, codec, nullptr) < 0) {
         error = "Could not open codec";
         return false;
     }
@@ -400,13 +400,13 @@ static bool open_audio(AVCodec *codec, OutputStream *ost,
     ost->frame = alloc_audio_frame(c->sample_fmt, c->channel_layout,
                                    c->sample_rate, nb_samples,
                                    error);
-    if(ost->frame == NULL) {
+    if(ost->frame == nullptr) {
         error = "Could not alloc audio frame";
         return false;
     }
     ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, AV_CH_LAYOUT_STEREO,
                                        44100, nb_samples, error); // !!!
-    if(ost->tmp_frame == NULL) {
+    if(ost->tmp_frame == nullptr) {
         error = "Could not alloc temporary audio frame";
         return false;
     }
@@ -430,7 +430,7 @@ static AVFrame *get_audio_frame(OutputStream *ost) {
     /* check if we want to generate more frames */
 //    if(av_compare_ts(ost->next_pts, ost->enc->time_base,
 //                     STREAM_DURATION, (AVRational){ 1, 1 }) >= 0)
-//        return NULL;
+//        return nullptr;
 
 
     for(j = 0; j < frame->nb_samples; j++) {
@@ -501,7 +501,7 @@ static bool process_audio_stream(AVFormatContext *oc,
 
     /* feed the data to lavr */
     if(frame) {
-        ret = avresample_convert(ost->avr, NULL, 0, 0,
+        ret = avresample_convert(ost->avr, nullptr, 0, 0,
                                  frame->extended_data, frame->linesize[0],
                                  frame->nb_samples);
         if (ret < 0) {
@@ -531,7 +531,7 @@ static bool process_audio_stream(AVFormatContext *oc,
         } else {
             ret = avresample_convert(ost->avr, ost->frame->extended_data,
                                      ost->frame->linesize[0], ost->frame->nb_samples,
-                                     NULL, 0, 0);
+                                     nullptr, 0, 0);
         }
 
         if(ret < 0) {
@@ -557,15 +557,15 @@ static bool process_audio_stream(AVFormatContext *oc,
 }
 
 bool VideoEncoder::startEncodingNow(QString &error) {
-    if(mOutputFormat == NULL) {
-        mOutputFormat = av_guess_format(NULL, mPathByteArray.data(), NULL);
-        if(mOutputFormat == NULL) {
+    if(mOutputFormat == nullptr) {
+        mOutputFormat = av_guess_format(nullptr, mPathByteArray.data(), nullptr);
+        if(mOutputFormat == nullptr) {
             error = "No AVOutputFormat provided. "
                     "Could not guess AVOutputFormat from file extension";
             return false;
-//            mOutputFormat = av_guess_format("mpeg", NULL, NULL);
+//            mOutputFormat = av_guess_format("mpeg", nullptr, nullptr);
         }
-//        if(mOutputFormat == NULL) {
+//        if(mOutputFormat == nullptr) {
 //            fprintf(stderr, "MPEG format not available.\n");
 //            return false;
 //        }
@@ -584,7 +584,7 @@ bool VideoEncoder::startEncodingNow(QString &error) {
     mEncodeAudio = 0;
     mVideoStream = { 0 };
     mAudioStream = { 0 };
-    if(mOutputSettings.videoCodec != NULL &&
+    if(mOutputSettings.videoCodec != nullptr &&
        mOutputSettings.videoEnabled) {
         if(!add_video_stream(&mVideoStream, mFormatContext,
                              mOutputSettings, mRenderSettings,
@@ -629,7 +629,7 @@ bool VideoEncoder::startEncodingNow(QString &error) {
         }
     }
 
-    if(avformat_write_header(mFormatContext, NULL) < 0) {
+    if(avformat_write_header(mFormatContext, nullptr) < 0) {
         error = "Could not write header to " + QString(mPathByteArray.data());
         return false;
     }

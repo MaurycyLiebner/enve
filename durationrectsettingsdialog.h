@@ -16,11 +16,11 @@ public:
                                const int &minFrame,
                                const int &maxFrame,
                                const int &firstAnimationFrame,
-                               QWidget *parent = NULL);
+                               QWidget *parent = nullptr);
     DurationRectSettingsDialog(const DurationRectangle::Type &type,
                                const int &minFrame,
                                const int &maxFrame,
-                               QWidget *parent = NULL);
+                               QWidget *parent = nullptr);
 
     int getMinFrame() {
         return mMinFrameSpinBox->value();
@@ -31,7 +31,7 @@ public:
     }
 
     int getFirstAnimationFrame() {
-        if(mFirstAnimationFrameSpinBox == NULL) return 0;
+        if(mFirstAnimationFrameSpinBox == nullptr) return 0;
         return mFirstAnimationFrameSpinBox->value();
     }
 protected:
@@ -43,7 +43,7 @@ protected:
     QLabel *mMaxFrameLabel;
     QSpinBox *mMaxFrameSpinBox;
     QLabel *mFirstAnimationFrameLabel;
-    QSpinBox *mFirstAnimationFrameSpinBox = NULL;
+    QSpinBox *mFirstAnimationFrameSpinBox = nullptr;
 
     QHBoxLayout *mButtonsLayout;
     QPushButton *mOkButton;

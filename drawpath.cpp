@@ -50,7 +50,7 @@ qreal minSquareDistance(const QPointF &p0,
                         const QPointF &p3,
                         const QPointF &p) {
     qreal error;
-    getClosestTValueBezier2D(p0, p1, p2, p3, p, NULL, &error);
+    getClosestTValueBezier2D(p0, p1, p2, p3, p, nullptr, &error);
     return error*error;
 }
 
@@ -64,7 +64,7 @@ qreal minSquareDistanceSum(const QPointF &p0,
     qreal errorSquaredSum = 0.;
     for(int i = minPtId; i <= maxPtId; i++) {
         qreal error;
-        getClosestTValueBezier2D(p0, p1, p2, p3, pts.at(i), NULL, &error);
+        getClosestTValueBezier2D(p0, p1, p2, p3, pts.at(i), nullptr, &error);
         errorSquaredSum += error*error;
     }
     return errorSquaredSum;

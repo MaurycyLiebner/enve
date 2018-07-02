@@ -46,7 +46,7 @@ QList<Key*> KeysClipboardContainer::paste(const int &pasteFrame,
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
         Animator *animator = animatorT.data();
         Key *keyT = animator->readKey(&target);
-        if(animator == NULL) {
+        if(animator == nullptr) {
             keyT->ref<Key>();
             continue;
         }
@@ -63,7 +63,7 @@ QList<Key*> KeysClipboardContainer::paste(const int &pasteFrame,
 
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
         Animator *animator = animatorT.data();
-        if(animator == NULL) {
+        if(animator == nullptr) {
             keys.removeAt(keyId);
             continue;
         }
@@ -91,7 +91,7 @@ QList<Key*> KeysClipboardContainer::pasteWithoutMerging(const int &pasteFrame,
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
         Animator *animator = animatorT.data();
         Key *keyT = animator->readKey(&target);
-        if(animator == NULL) {
+        if(animator == nullptr) {
             keyT->ref<Key>();
             continue;
         }
@@ -108,7 +108,7 @@ QList<Key*> KeysClipboardContainer::pasteWithoutMerging(const int &pasteFrame,
 
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
         Animator *animator = animatorT.data();
-        if(animator == NULL) {
+        if(animator == nullptr) {
             keys.removeAt(keyId);
             continue;
         }
@@ -250,7 +250,7 @@ void PropertyClipboardContainer::setProperty(Property *property) {
     mBoxTargetProperty = property->SWT_isBoxTargetProperty();
     if(mBoxTargetProperty) {
         BoundingBox *targetBox = ((BoxTargetProperty*)property)->getTarget();
-        if(targetBox == NULL) {
+        if(targetBox == nullptr) {
             mTargetBox.clear();
         } else {
             mTargetBox = targetBox->weakRef<BoundingBox>();

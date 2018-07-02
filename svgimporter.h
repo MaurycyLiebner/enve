@@ -32,6 +32,32 @@ private:
     Qt::Alignment mAlignment = Qt::AlignLeft;
 };
 
+class GradientsSvgCollection {
+public:
+    GradientsSvgCollection() {}
+
+    void addGradient(Gradient* gradient,
+                     const QString& name) {
+        mGradientNames << name;
+        mGradients << gradient;
+    }
+
+    Gradient* getGradientWithId(QString id) {
+        if(id.isEmpty()) return nullptr;
+        if(id.at(0) == '#') id.remove(0, 1);
+
+        for(int i = 0; i < mGradientNames.count(); i++) {
+            if(mGradientNames.at(i) == id) {
+                return mGradients.at(i);
+            }
+        }
+        return nullptr;
+    }
+private:
+    QList<QString> mGradientNames;
+    QList<Gradient*> mGradients;
+};
+
 class FillSvgAttributes {
 public:
     FillSvgAttributes();
@@ -54,14 +80,12 @@ public:
 protected:
     Color mColor = Color(0, 0, 0);
     PaintType mPaintType = FLATPAINT;//NOPAINT;
-    Gradient *mGradient = NULL;
+    Gradient *mGradient = nullptr;
 };
 
 class StrokeSvgAttributes : public FillSvgAttributes {
 public:
     StrokeSvgAttributes();
-
-
 
     StrokeSvgAttributes &operator*=(const StrokeSvgAttributes &overwritter);
     const qreal &getLineWidth() const;
@@ -194,8 +218,8 @@ private:
                         qreal rx, qreal ry, qreal xAxisRotation);
 
     void addPoint(SvgNodePoint *point);
-    SvgNodePoint *mFirstPoint = NULL;
-    SvgNodePoint *mLastPoint = NULL;
+    SvgNodePoint *mFirstPoint = nullptr;
+    SvgNodePoint *mLastPoint = nullptr;
     QList<SvgNodePoint*> mPoints;
     bool mClosedPath = false;
 };
@@ -221,23 +245,9 @@ protected:
 };
 
 
-extern BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
-                                  BoxesGroup *parentGroup,
-                                  BoundingBoxSvgAttributes *attributes);
-extern bool parsePathDataFast(const QString &dataStr,
-                              VectorPathSvgAttributes *attributes);
-extern void loadVectorPath(const QDomElement &pathElement,
-                           BoxesGroup *parentGroup,
-                           VectorPathSvgAttributes *attributes);
-extern void loadElement(const QDomElement &element,
-                        BoxesGroup *parentGroup,
+extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
                         BoundingBoxSvgAttributes *parentGroupAttributes);
 extern BoxesGroup *loadSVGFile(const QString &filename);
-
-extern QMatrix getMatrixFromString(const QString &matrixStr);
-extern bool getColorFromString(const QString &colorStr,
-                               Color *color);
-
 /*
 #include <QStringRef>
 #include <QPainterPath>

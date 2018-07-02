@@ -8,7 +8,7 @@
 class PaintBoxSettingsDialog : public QDialog
 {
 public:
-    PaintBoxSettingsDialog(QWidget *parent = NULL);
+    PaintBoxSettingsDialog(QWidget *parent = nullptr);
     ~PaintBoxSettingsDialog();
 
     int getFirstFrame();
@@ -24,20 +24,20 @@ public:
         mFrameStepSpin->setValue(frameStep);
     }
 private:
-    QVBoxLayout *mMainLayout = NULL;
+    QVBoxLayout *mMainLayout = nullptr;
 
-    QHBoxLayout *mFrameStepLayout = NULL;
-    QHBoxLayout *mOverlapFramesLayout = NULL;
+    QHBoxLayout *mFrameStepLayout = nullptr;
+    QHBoxLayout *mOverlapFramesLayout = nullptr;
 
-    QLabel *mFrameStepLabel = NULL;
-    QLabel *mOverlapFramesLabel = NULL;
+    QLabel *mFrameStepLabel = nullptr;
+    QLabel *mOverlapFramesLabel = nullptr;
 
-    QSpinBox *mFrameStepSpin = NULL;
-    QSpinBox *mOverlapFramesSpin = NULL;
+    QSpinBox *mFrameStepSpin = nullptr;
+    QSpinBox *mOverlapFramesSpin = nullptr;
 
-    QHBoxLayout *mButtonsLayout = NULL;
-    QPushButton *mAcceptButton = NULL;
-    QPushButton *mCancelButton = NULL;
+    QHBoxLayout *mButtonsLayout = nullptr;
+    QPushButton *mAcceptButton = nullptr;
+    QPushButton *mCancelButton = nullptr;
 };
 
 #endif // PAINTBOXSETTINGSDIALOG_H

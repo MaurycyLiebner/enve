@@ -76,7 +76,7 @@ signals:
     void posChanged(int);
     void finishedTransform();
 protected:
-    Property *mChildProperty = NULL;
+    Property *mChildProperty = nullptr;
     Type mType = NOT_SPECIFIED;
     bool mHovered = false;
     int mMinPos = 0;
@@ -137,7 +137,7 @@ public:
     void finishMaxFramePosTransform();
     void startMaxFramePosTransform();
 
-    virtual void openDurationSettingsDialog(QWidget *parent = NULL);
+    virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);
@@ -223,7 +223,7 @@ public:
         setMinAnimationFrame(minAnimationFrame);
         setMaxAnimationFrame(minAnimationFrame + animDur);
     }
-    void openDurationSettingsDialog(QWidget *parent = NULL);
+    void openDurationSettingsDialog(QWidget *parent = nullptr);
 protected:
     void setMinAnimationFrame(const int &minAnimationFrame);
     void setMaxAnimationFrame(const int &maxAnimationFrame);

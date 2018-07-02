@@ -26,7 +26,7 @@ public:
     void setIntAnimator(IntProperty *animator);
 
     bool hasTargetAnimator() {
-        return mAnimator != NULL;
+        return mAnimator != nullptr;
     }
 
     bool isTargetDisabled();
@@ -45,7 +45,7 @@ public slots:
 protected:
     void emitValueChanged(qreal value);
 private:
-    Property *mAnimator = NULL;
+    Property *mAnimator = nullptr;
     bool mBlockAnimatorSignals = false;
 signals:
     void displayedValueChanged(qreal);

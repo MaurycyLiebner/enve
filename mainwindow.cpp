@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupToolBar();
 
 //    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
-//        mClipboardContainers << NULL;
+//        mClipboardContainers << nullptr;
 //    }
 
     mMemoryHandler = new MemoryHandler(this);
@@ -161,7 +161,7 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectSettingsWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Selected);
     mObjectSettingsWidget->getVisiblePartWidget()->
-            setCurrentTarget(NULL, SWT_CurrentGroup);
+            setCurrentTarget(nullptr, SWT_CurrentGroup);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),
@@ -225,7 +225,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
 //    mPaintControlerThread->terminate();
 //    mPaintControlerThread->quit();
-    replaceClipboard(NULL);
+    replaceClipboard(nullptr);
 }
 
 #include "noshortcutaction.h"
@@ -463,9 +463,9 @@ void MainWindow::addCanvasToRenderQue() {
 
 void MainWindow::updateSettingsForCurrentCanvas() {
     if(mCanvasWindow->hasNoCanvas()) {
-        mObjectSettingsWidget->setMainTarget(NULL);
-        //mBrushSettingsWidget->setCurrentBrush(NULL);
-        mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(NULL);
+        mObjectSettingsWidget->setMainTarget(nullptr);
+        //mBrushSettingsWidget->setCurrentBrush(nullptr);
+        mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(nullptr);
         return;
     }
     Canvas *canvas = mCanvasWindow->getCurrentCanvas();
@@ -478,7 +478,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
 }
 
 void MainWindow::replaceClipboard(ClipboardContainer *container) {
-    if(mClipboardContainer != NULL) {
+    if(mClipboardContainer != nullptr) {
         delete mClipboardContainer;
         BoundingBox::clearLoadedBoxes();
     }
@@ -487,11 +487,11 @@ void MainWindow::replaceClipboard(ClipboardContainer *container) {
 
 ClipboardContainer *MainWindow::getClipboardContainer(
         const ClipboardContainerType &type) {
-    if(mClipboardContainer == NULL) return NULL;
+    if(mClipboardContainer == nullptr) return nullptr;
     if(type == mClipboardContainer->getType()) {
         return mClipboardContainer;
     }
-    return NULL;
+    return nullptr;
 }
 
 void MainWindow::setupToolBar() {
@@ -522,19 +522,13 @@ void MainWindow::setupToolBar() {
     mAddPointMode->setCheckable(":/icons/draw_pen_checked.png");
     mToolBar->addWidget(mAddPointMode);
 
-    mDrawPathMode = new ActionButton(
-                ":/icons/draw_pen.png",
-                "F4", this);
-    mDrawPathMode->setCheckable(":/icons/draw_pen_checked.png");
-    mToolBar->addWidget(mDrawPathMode);
-
-    mToolBar->addSeparator();
-
     mPickPaintSettingsMode = new ActionButton(
                 ":/icons/draw_dropper.png",
                 "F5", this);
     mPickPaintSettingsMode->setCheckable(":/icons/draw_dropper_checked.png");
     mToolBar->addWidget(mPickPaintSettingsMode);
+
+    mToolBar->addSeparator();
 
     mCircleMode = new ActionButton(
                 ":/icons/draw_arc.png",
@@ -673,8 +667,6 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, SLOT(setMovePointMode()) );
     connect(mAddPointMode, SIGNAL(pressed()),
             mCanvasWindow, SLOT(setAddPointMode()) );
-    connect(mDrawPathMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setDrawPathMode()) );
     connect(mPickPaintSettingsMode, SIGNAL(pressed()),
             mCanvasWindow, SLOT(setPickPaintSettingsMode()) );
     connect(mCircleMode, SIGNAL(pressed()),
@@ -783,7 +775,6 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mMovePathMode->setChecked(currentMode == MOVE_PATH);
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
     mAddPointMode->setChecked(currentMode == ADD_POINT);
-    mDrawPathMode->setChecked(currentMode == DRAW_PATH);
     mPickPaintSettingsMode->setChecked(currentMode == PICK_PAINT_SETTINGS);
     mCircleMode->setChecked(currentMode == ADD_CIRCLE);
     mRectangleMode->setChecked(currentMode == ADD_RECTANGLE);
@@ -807,7 +798,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 
 //void MainWindow::sendNextBoxForUpdate()
 //{
-//    if(mLastUpdatedBox != NULL) {
+//    if(mLastUpdatedBox != nullptr) {
 //        mLastUpdatedBox->setAwaitingUpdate(false);
 //        if(mLastUpdatedBox->shouldRedoUpdate()) {
 //            mLastUpdatedBox->setRedoUpdateToFalse();
@@ -816,9 +807,9 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 //    }
 //    if(mBoxesAwaitingUpdate.isEmpty()) {
 //        mNoBoxesAwaitUpdate = true;
-//        mLastUpdatedBox = NULL;
+//        mLastUpdatedBox = nullptr;
 //        callUpdateSchedulers();
-//        if(mBoxesUpdateFinishedFunction != NULL) {
+//        if(mBoxesUpdateFinishedFunction != nullptr) {
 //            (*this.*mBoxesUpdateFinishedFunction)();
 //        }
 //        //callUpdateSchedulers();
@@ -851,7 +842,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 //    if(mCurrentRenderFrame >= mMaxFrame || mPreviewInterrupted) {
 //        mRendering = false;
 //        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
-//        mBoxesUpdateFinishedFunction = NULL;
+//        mBoxesUpdateFinishedFunction = nullptr;
 //            mCanvas->playPreview();
 //    } else {
 //        mCurrentRenderFrame++;
@@ -866,7 +857,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 //    mCanvas->renderCurrentFrameToOutput(mOutputString);
 //    if(mCurrentRenderFrame >= mMaxFrame) {
 //        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
-//        mBoxesUpdateFinishedFunction = NULL;
+//        mBoxesUpdateFinishedFunction = nullptr;
 //    } else {
 //        mCurrentRenderFrame++;
 //        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
@@ -957,7 +948,7 @@ bool MainWindow::isAltPressed() {
 }
 
 void MainWindow::finishUndoRedoSet() {
-    if(mCurrentUndoRedoStack == NULL) return;
+    if(mCurrentUndoRedoStack == nullptr) return;
     mCurrentUndoRedoStack->finishSet();
     mCurrentUndoRedoStack->startNewSet();
 }
@@ -1001,9 +992,9 @@ void MainWindow::callUpdateSchedulers() {
 }
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
-    if(box == NULL) {
-        mFillStrokeSettings->setCurrentSettings(NULL,
-                                                NULL);
+    if(box == nullptr) {
+        mFillStrokeSettings->setCurrentSettings(nullptr,
+                                                nullptr);
     } else {
         mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
                                                 box->getStrokeSettings());
@@ -1066,10 +1057,10 @@ void MainWindow::disable() {
 }
 
 void MainWindow::enable() {
-    if(mGrayOutWidget == NULL) return;
+    if(mGrayOutWidget == nullptr) return;
     enableEventFilter();
     delete mGrayOutWidget;
-    mGrayOutWidget = NULL;
+    mGrayOutWidget = nullptr;
     callUpdateSchedulers();
 }
 
@@ -1100,7 +1091,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         return QMainWindow::eventFilter(obj, e);
     }
     QWidget *focusWidget = QApplication::focusWidget();
-    if(focusWidget != NULL) {
+    if(focusWidget != nullptr) {
         if(focusWidget->property("forceHandleEvent").isValid()) return false;
     }
     if(e->type() == QEvent::KeyPress) {
@@ -1179,13 +1170,14 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
 }
 
 bool MainWindow::isEnabled() {
-    return mGrayOutWidget == NULL;
+    return mGrayOutWidget == nullptr;
 }
 
 void MainWindow::clearAll() {
     mUpdateSchedulers.clear();
     setFileChangedSinceSaving(false);
-    mObjectSettingsWidget->setMainTarget(NULL);
+    mObjectSettingsWidget->setMainTarget(nullptr);
+
     mBoxesListAnimationDockWidget->clearAll();
     mCurrentCanvasComboBox->clear();
     mCanvasWindow->clearAll();
@@ -1194,7 +1186,7 @@ void MainWindow::clearAll() {
 //        delete cont;
 //    }
 //    mClipboardContainers.clear();
-    replaceClipboard(NULL);
+    replaceClipboard(nullptr);
     FileSourcesCache::clearAll();
     //mBoxListWidget->clearAll();
 }
@@ -1310,14 +1302,14 @@ void MainWindow::revert() {
 }
 
 void MainWindow::undo() {
-    if(mCurrentUndoRedoStack == NULL) return;
+    if(mCurrentUndoRedoStack == nullptr) return;
     getUndoRedoStack()->undo();
     mCanvasWindow->updateHoveredElements();
     callUpdateSchedulers();
 }
 
 void MainWindow::redo() {
-    if(mCurrentUndoRedoStack == NULL) return;
+    if(mCurrentUndoRedoStack == nullptr) return;
     getUndoRedoStack()->redo();
     mCanvasWindow->updateHoveredElements();
     callUpdateSchedulers();
@@ -1333,7 +1325,7 @@ Gradient *MainWindow::getLoadedGradientById(const int &id) {
             return gradient;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void MainWindow::clearLoadedGradientsList() {

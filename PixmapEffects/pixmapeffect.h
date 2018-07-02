@@ -113,10 +113,10 @@ public:
 
     virtual PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
                                         const int &,
-                                        BoundingBoxRenderData *) { return NULL; }
+                                        BoundingBoxRenderData *) { return nullptr; }
     virtual PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
                                         const qreal &relFrame,
-                                        BoundingBoxRenderData *data) { /*return NULL; }*/
+                                        BoundingBoxRenderData *data) { /*return nullptr; }*/
         return getPixmapEffectRenderDataForRelFrame(relFrame, data);
     }
 
@@ -143,7 +143,7 @@ public slots:
     }
 protected:
     bool mVisible = true;
-    EffectAnimators *mParentEffects = NULL;
+    EffectAnimators *mParentEffects = nullptr;
     PixmapEffectType mType;
     bool mInterrupted = false;
 };
@@ -444,7 +444,7 @@ struct SampledMotionBlurEffectRenderData : public PixmapEffectRenderData {
 
 class SampledMotionBlurEffect : public PixmapEffect {
 public:
-    SampledMotionBlurEffect(BoundingBox *box = NULL);
+    SampledMotionBlurEffect(BoundingBox *box = nullptr);
 
     qreal getMargin() { return 0.; }
 
@@ -469,7 +469,7 @@ public:
 private:
     void getParentBoxFirstLastMarginAjusted(int *firstT, int *lastT,
                                             const int &relFrame);
-    BoundingBox *mParentBox = NULL;
+    BoundingBox *mParentBox = nullptr;
     QrealAnimatorQSPtr mOpacity;
     QrealAnimatorQSPtr mNumberSamples;
     QrealAnimatorQSPtr mFrameStep;

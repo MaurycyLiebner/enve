@@ -18,19 +18,19 @@ extern "C" {
 class CacheContainer;
 
 typedef struct OutputStream {
-    AVStream *st = NULL;
-    AVCodecContext *enc = NULL;
+    AVStream *st = nullptr;
+    AVCodecContext *enc = nullptr;
 
     /* pts of the next frame that will be generated */
     int64_t next_pts;
 
-    AVFrame *frame = NULL;
-    AVFrame *tmp_frame = NULL;
+    AVFrame *frame = nullptr;
+    AVFrame *tmp_frame = nullptr;
 
     float t, tincr, tincr2;
 
-    struct SwsContext *sws_ctx = NULL;
-    AVAudioResampleContext *avr = NULL;
+    struct SwsContext *sws_ctx = nullptr;
+    AVAudioResampleContext *avr = nullptr;
 } OutputStream;
 
 class VideoEncoderEmitter : public QObject {
@@ -110,14 +110,14 @@ protected:
 
     OutputStream mVideoStream;
     OutputStream mAudioStream;
-    AVFormatContext *mFormatContext = NULL;
-    AVOutputFormat *mOutputFormat = NULL;
+    AVFormatContext *mFormatContext = nullptr;
+    AVOutputFormat *mOutputFormat = nullptr;
     bool mCurrentlyEncoding = false;
     QList<std::shared_ptr<CacheContainer> > mNextContainers;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;
-    RenderInstanceSettings *mRenderInstanceSettings = NULL;
+    RenderInstanceSettings *mRenderInstanceSettings = nullptr;
     QByteArray mPathByteArray;
     bool mHaveVideo = 0;
     bool mHaveAudio = 0;

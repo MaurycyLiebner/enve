@@ -74,7 +74,7 @@ public:
     QMatrix getCombinedTransform();
 private:
     BoolAnimatorQSPtr mSmoothTransformation;
-    BoundingBox *mParentBox = NULL;
+    BoundingBox *mParentBox = nullptr;
     QList<VectorPathAnimator*> mSinglePaths;
 signals:
     void lastSinglePathRemoved();

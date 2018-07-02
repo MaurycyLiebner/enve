@@ -18,7 +18,7 @@ AnimationBox::AnimationBox() :
 
 AnimationBox::~AnimationBox() {
     mAnimationCacheHandler->removeDependentBox(this);
-    mAnimationCacheHandler = NULL;
+    mAnimationCacheHandler = nullptr;
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
@@ -41,7 +41,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 }
 
 void AnimationBox::reloadCacheHandler() {
-    //if(mParentGroup != NULL) {
+    //if(mParentGroup != nullptr) {
         updateDurationRectangleAnimationRange();
     //}
     reloadSound();
@@ -57,7 +57,7 @@ void AnimationBox::setParentGroup(BoxesGroup *parent) {
 }
 
 bool AnimationBox::shouldScheduleUpdate() {
-    if(mAnimationCacheHandler == NULL || mParentGroup == NULL) return false;
+    if(mAnimationCacheHandler == nullptr || mParentGroup == nullptr) return false;
     return BoundingBox::shouldScheduleUpdate();
 }
 
@@ -83,7 +83,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
 
 void AnimationBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
-    if(mAnimationCacheHandler == NULL) return;
+    if(mAnimationCacheHandler == nullptr) return;
 
     mNewCurrentFrameUpdateNeeded = true;
 
@@ -110,7 +110,7 @@ bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "ab_set_src_file") {
         changeSourceFile();
     } else if(selectedAction->objectName() == "ab_reload") {
-        if(mAnimationCacheHandler != NULL) {
+        if(mAnimationCacheHandler != nullptr) {
             mAnimationCacheHandler->clearCache();
         }
     } else {
@@ -128,10 +128,10 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
     int animationFrame = getAnimationFrameForRelFrame(relFrame);
     imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
-    if(imageData->image.get() == NULL) {
+    if(imageData->image.get() == nullptr) {
         _ScheduledExecutor *upd = mAnimationCacheHandler->
                 scheduleFrameLoad(animationFrame);
-        if(upd != NULL) {
+        if(upd != nullptr) {
             upd->addDependent(imageData);
         }
     }
@@ -146,10 +146,10 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
     int animationFrame = getAnimationFrameForRelFrame(qCeil(relFrame));
     imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
-    if(imageData->image.get() == NULL) {
+    if(imageData->image.get() == nullptr) {
         _ScheduledExecutor *upd = mAnimationCacheHandler->
                 scheduleFrameLoad(animationFrame);
-        if(upd != NULL) {
+        if(upd != nullptr) {
             upd->addDependent(imageData);
         }
     }

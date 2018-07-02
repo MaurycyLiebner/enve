@@ -154,16 +154,16 @@ public:
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int &dFrame);
 protected:
-    WindowSingleWidgetTarget *mWindowSWTTarget = NULL;
-    PaintControler *mFileControler = NULL;
-    RenderInstanceSettings *mCurrentRenderSettings = NULL;
+    WindowSingleWidgetTarget *mWindowSWTTarget = nullptr;
+    PaintControler *mFileControler = nullptr;
+    RenderInstanceSettings *mCurrentRenderSettings = nullptr;
     bool mMouseGrabber = false;
     bool mHasFocus = false;
     QWidget *mCanvasWidget;
     void setRendering(const bool &bT);
     void setPreviewing(const bool &bT);
 
-    QTimer *mPreviewFPSTimer = NULL;
+    QTimer *mPreviewFPSTimer = nullptr;
 
     qreal mSavedResolutionFraction = 100.;
     int mSavedCurrentFrame = 0;
@@ -184,8 +184,8 @@ protected:
 
     bool mClearBeingUpdated = false;
 
-    void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
-    void (CanvasWindow::*mFilesUpdateFinishedFunction)(void) = NULL;
+    void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
+    void (CanvasWindow::*mFilesUpdateFinishedFunction)(void) = nullptr;
 
     CanvasQSPtr mCurrentCanvas;
     QList<CanvasQSPtr> mCanvasList;
@@ -227,7 +227,6 @@ public slots:
     void setMovePathMode();
     void setMovePointMode();
     void setAddPointMode();
-    void setDrawPathMode();
     void setPickPaintSettingsMode();
     void setRectangleMode();
     void setCircleMode();
@@ -308,9 +307,9 @@ public slots:
     void flipVerticalAction();
 private slots:
     void sendNextUpdatableForUpdate(const int &threadId,
-                                    _Executor *lastUpdatable = NULL);
+                                    _Executor *lastUpdatable = nullptr);
     void sendNextFileUpdatableForUpdate(const int &threadId,
-                                    _Executor *lastUpdatable = NULL);
+                                    _Executor *lastUpdatable = nullptr);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
 

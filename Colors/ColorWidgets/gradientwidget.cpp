@@ -84,7 +84,7 @@ void GradientWidget::newGradient(const int &fromGradientId) {
 void GradientWidget::clearAll() {
     mGradients.clear();
 
-    mCurrentGradient = NULL;
+    mCurrentGradient = nullptr;
     mCenterGradientId = 1;
     mCurrentColorId = 0;
     updateAll();
@@ -103,8 +103,8 @@ int GradientWidget::getGradientIndex(Gradient *child) {
 void GradientWidget::removeGradientFromList(Gradient *toRemove) {
     mGradients.removeAt(getGradientIndex(toRemove));
     if(mCurrentGradient == toRemove) {
-        mCurrentGradient = NULL;
-        setCurrentGradient((Gradient*) NULL);
+        mCurrentGradient = nullptr;
+        setCurrentGradient((Gradient*) nullptr);
     }
     updateNumberOfGradients();
 }
@@ -134,13 +134,13 @@ void GradientWidget::setCurrentColor(GLfloat h,
 
 void GradientWidget::setCurrentGradient(Gradient *gradient,
                                         const bool &emitChange) {
-    if(mCurrentGradient != NULL) {
+    if(mCurrentGradient != nullptr) {
         disconnect(mCurrentGradient,
                    SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
                    this,
                    SLOT(resetColorIdIfEquals(Gradient*,int)));
     }
-    if(gradient == NULL) {
+    if(gradient == nullptr) {
         if(mGradients.isEmpty()) newGradient();
         setCurrentGradient(0);
         return;
@@ -148,7 +148,7 @@ void GradientWidget::setCurrentGradient(Gradient *gradient,
         return;
     }
     mCurrentGradient = gradient;
-    if(mCurrentGradient != NULL) {
+    if(mCurrentGradient != nullptr) {
         connect(mCurrentGradient,
                 SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
                 this,
@@ -166,12 +166,12 @@ Gradient *GradientWidget::getCurrentGradient() {
 }
 
 Color GradientWidget::getCurrentColor() {
-    if(mCurrentGradient == NULL) return Color();
+    if(mCurrentGradient == nullptr) return Color();
     return mCurrentGradient->getCurrentColorAt(mCurrentColorId);
 }
 
 ColorAnimator *GradientWidget::getCurrentColorAnimator() {
-    if(mCurrentGradient == NULL) return NULL;
+    if(mCurrentGradient == nullptr) return nullptr;
     return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
 }
 
@@ -191,12 +191,12 @@ void GradientWidget::setCurrentGradient(const int &listId) {
 void GradientWidget::colorRightPress(const int &x,
                                      const QPoint &point) {
     colorLeftPress(x);
-    if(mCurrentGradient != NULL) {
+    if(mCurrentGradient != nullptr) {
         QMenu menu(this);
         menu.addAction("Delete Color");
         menu.addAction("Add Color");
         QAction *selected_action = menu.exec(point);
-        if(selected_action != NULL) {
+        if(selected_action != nullptr) {
             if(selected_action->text() == "Delete Color") {
 
                 if(mCurrentGradient->getColorCount() < 2) {
@@ -230,14 +230,14 @@ int GradientWidget::getColorIdAtX(const int &x) {
 }
 
 void GradientWidget::colorLeftPress(const int &x) {
-    if(mCurrentGradient != NULL) {
+    if(mCurrentGradient != nullptr) {
         setCurrentColorId(getColorIdAtX(x));
     }
     updateAll();
 }
 
 void GradientWidget::moveColor(const int &x) {
-    if(mCurrentGradient != NULL) {
+    if(mCurrentGradient != nullptr) {
         int nCols = mCurrentGradient->getColorCount();
             int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
             if(colorId != mCurrentColorId) {
@@ -255,7 +255,7 @@ void GradientWidget::drawCurrentGradientColors(const int &x,
                                                const int &y,
                                                const int &width,
                                                const int &height) {
-    if(mCurrentGradient == NULL) return;
+    if(mCurrentGradient == nullptr) return;
 
     int len = mCurrentGradient->getColorCount();
     Color nextColor = mCurrentGradient->getCurrentColorAt(0);
@@ -282,7 +282,7 @@ void GradientWidget::drawCurrentGradient(const int &x,
                                          const int &y,
                                          const int &width,
                                          const int &height) {
-    if(mCurrentGradient == NULL) return;
+    if(mCurrentGradient == nullptr) return;
     GLWidget::drawGradient(mCurrentGradient,
                  x, y, width, height);
 }
@@ -322,7 +322,7 @@ void GradientWidget::drawHoveredGradientBorder(const int &displayedTop,
 
 void GradientWidget::drawHoveredColorBorder(const int &hoveredX,
                                             const int &colHeight) {
-    if(hoveredX < 0 || hoveredX > width() || mCurrentGradient == NULL) return;
+    if(hoveredX < 0 || hoveredX > width() || mCurrentGradient == nullptr) return;
     int colId = getColorIdAtX(hoveredX);
     int len = mCurrentGradient->getColorCount();
     int colWidth = width()/len;
@@ -366,7 +366,7 @@ void GradientWidget::gradientContextMenuReq(const int &gradId,
         menu.addAction("Delete Gradient");
     }
     QAction *selected_action = menu.exec(globalPos);
-    if(selected_action != NULL) {
+    if(selected_action != nullptr) {
         if(selected_action->text() == "Delete Gradient") {
             removeGradient(gradId);
         } else if(selected_action->text() == "Duplicate Gradient") {
@@ -380,18 +380,18 @@ void GradientWidget::gradientContextMenuReq(const int &gradId,
 }
 
 void GradientWidget::startSelectedColorTransform() {
-    if(mCurrentGradient == NULL) return;
+    if(mCurrentGradient == nullptr) return;
     mCurrentGradient->startColorIdTransform(mCurrentColorId);
 }
 
 void GradientWidget::finishGradientTransform()
 {
-    if(mCurrentGradient == NULL) return;
+    if(mCurrentGradient == nullptr) return;
     mCurrentGradient->prp_finishTransform();
 }
 
 void GradientWidget::startGradientTransform()
 {
-    if(mCurrentGradient == NULL) return;
+    if(mCurrentGradient == nullptr) return;
     mCurrentGradient->prp_startTransform();
 }

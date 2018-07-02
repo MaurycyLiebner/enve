@@ -16,7 +16,7 @@ Key::~Key() {
 bool Key::isSelected() { return mIsSelected; }
 
 void Key::removeFromAnimator() {
-    if(mParentAnimator == NULL) return;
+    if(mParentAnimator == nullptr) return;
     mParentAnimator->anim_removeKey(this);
 }
 
@@ -29,12 +29,12 @@ Key *Key::getPrevKey() {
 }
 
 bool Key::hasPrevKey() {
-    if(mParentAnimator == NULL) return false;
+    if(mParentAnimator == nullptr) return false;
     return mParentAnimator->anim_hasPrevKey(this);
 }
 
 bool Key::hasNextKey() {
-    if(mParentAnimator == NULL) return false;
+    if(mParentAnimator == nullptr) return false;
     return mParentAnimator->anim_hasNextKey(this);
 }
 
@@ -45,7 +45,7 @@ void Key::incFrameAndUpdateParentAnimator(const int &inc,
 
 void Key::setRelFrameAndUpdateParentAnimator(const int &relFrame,
                                           const bool &finish) {
-    if(mParentAnimator == NULL) return;
+    if(mParentAnimator == nullptr) return;
     mParentAnimator->anim_moveKeyToRelFrame(this, relFrame, finish);
 }
 
@@ -94,7 +94,7 @@ void Key::setSelected(const bool &bT) {
 }
 #include "undoredo.h"
 void Key::finishFrameTransform() {
-    if(mParentAnimator == NULL) return;
+    if(mParentAnimator == nullptr) return;
 //    mParentAnimator->addUndoRedo(
 //                new ChangeKeyFrameUndoRedo(mSavedRelFrame,
 //                                           mRelFrame, this));
@@ -111,7 +111,7 @@ int Key::getRelFrame() {
 void Key::setRelFrame(const int &frame) {
     if(frame == mRelFrame) return;
     mRelFrame = frame;
-    if(mParentAnimator == NULL) return;
+    if(mParentAnimator == nullptr) return;
     mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }
 

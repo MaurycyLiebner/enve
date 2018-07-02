@@ -36,7 +36,7 @@ public:
             const qreal &val3T,
             const qreal &alphaT,
             const ColorSettingType &typeT,
-            ColorAnimator *excludeT = NULL);
+            ColorAnimator *excludeT = nullptr);
     void apply(ColorAnimator *target) const;
 
     const ColorSettingType &getType() const;
@@ -59,7 +59,7 @@ private:
     qreal mVal2 = 1.;
     qreal mVal3 = 1.;
     qreal mAlpha = 1.;
-    ColorAnimator *mExclude = NULL;
+    ColorAnimator *mExclude = nullptr;
 };
 
 class Gradient;
@@ -93,7 +93,7 @@ public:
 
     PaintSettings(const Color &colorT,
                   const PaintType &paintTypeT,
-                  Gradient *gradientT = NULL);
+                  Gradient *gradientT = nullptr);
 
     Color getCurrentColor() const;
 
@@ -135,7 +135,7 @@ public:
 private:
     bool mGradientLinear = true;
     PathBox *mTarget;
-    GradientPoints *mGradientPoints = NULL;
+    GradientPoints *mGradientPoints = nullptr;
     QSharedPointer<ColorAnimator> mColor =
             (new ColorAnimator())->ref<ColorAnimator>();
     PaintType mPaintType = FLATPAINT;
@@ -204,9 +204,9 @@ public:
     bool SWT_isGradient() { return true; }
 
     void prp_setParentFrameShift(const int &shift,
-                                 ComplexAnimator *parentAnimator = NULL) {
+                                 ComplexAnimator *parentAnimator = nullptr) {
         Q_UNUSED(shift);
-        if(parentAnimator == NULL) return;
+        if(parentAnimator == nullptr) return;
         Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
             parentAnimator->ca_updateDescendatKeyFrame(key.get());
         }
@@ -231,7 +231,7 @@ private:
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
     QList<PathBox*> mAffectedPaths;
-    ColorAnimator *mCurrentColor = NULL;
+    ColorAnimator *mCurrentColor = nullptr;
 };
 
 struct UpdatePaintSettings {
@@ -274,7 +274,7 @@ public:
 
     StrokeSettings(const Color &colorT,
                    const PaintType &paintTypeT,
-                   Gradient *gradientT = NULL);
+                   Gradient *gradientT = nullptr);
 
     void setCurrentStrokeWidth(const qreal &newWidth);
 

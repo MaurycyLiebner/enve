@@ -484,7 +484,7 @@ void EffectAnimators::writeProperty(QIODevice *target) {
 void EffectAnimators::readPixmapEffect(QIODevice *target) {
     PixmapEffectType typeT;
     target->read((char*)&typeT, sizeof(PixmapEffectType));
-    PixmapEffect *effect = NULL;
+    PixmapEffect *effect = nullptr;
     if(typeT == EFFECT_BLUR) {
         effect = new BlurEffect();
     } else if(typeT == EFFECT_SHADOW) {
@@ -597,7 +597,7 @@ void PaintSettings::writeProperty(QIODevice *target) {
     mColor->writeProperty(target);
     target->write((char*)&mPaintType, sizeof(PaintType));
     int gradId;
-    if(mGradient == NULL) {
+    if(mGradient == nullptr) {
         gradId = -1;
     } else {
         gradId = mGradient->getLoadId();
@@ -668,7 +668,7 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
     target->write((char*)&mVisible, sizeof(bool));
     target->write((char*)&mLocked, sizeof(bool));
     target->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
-    bool hasDurRect = mDurationRectangle != NULL;
+    bool hasDurRect = mDurationRectangle != nullptr;
     target->write((char*)&hasDurRect, sizeof(bool));
 
     if(hasDurRect) {
@@ -690,7 +690,7 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     target->read((char*)&hasDurRect, sizeof(bool));
 
     if(hasDurRect) {
-        if(mDurationRectangle == NULL) createDurationRectangle();
+        if(mDurationRectangle == nullptr) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(target);
     }
 
@@ -707,7 +707,7 @@ void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) {
     target->write((char*)&mVisible, sizeof(bool));
     target->write((char*)&mLocked, sizeof(bool));
     target->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
-//    bool hasDurRect = mDurationRectangle != NULL;
+//    bool hasDurRect = mDurationRectangle != nullptr;
 //    target->write((char*)&hasDurRect, sizeof(bool));
 
 //    if(hasDurRect) {
@@ -729,7 +729,7 @@ void BoundingBox::readBoundingBoxDataForLink(QIODevice *target) {
 //    target->read((char*)&hasDurRect, sizeof(bool));
 
 //    if(hasDurRect) {
-//        if(mDurationRectangle == NULL) createDurationRectangle();
+//        if(mDurationRectangle == nullptr) createDurationRectangle();
 //        mDurationRectangle->readDurationRectangle(target);
 //    }
 
@@ -784,7 +784,7 @@ void SolidifyPathEffect::readProperty(QIODevice *target) {
 void BoxTargetProperty::writeProperty(QIODevice *target) {
     BoundingBox *targetBox = mTarget.data();
     int targetId;
-    if(targetBox == NULL) {
+    if(targetBox == nullptr) {
         targetId = -1;
     } else {
         targetId = targetBox->getLoadId();
@@ -801,7 +801,7 @@ void BoxTargetProperty::readProperty(QIODevice *target) {
     int targetId;
     target->read((char*)&targetId, sizeof(int));
     BoundingBox *targetBox = BoundingBox::getLoadedBoxById(targetId);
-    if(targetBox == NULL && targetId >= 0) {
+    if(targetBox == nullptr && targetId >= 0) {
         BoundingBox::addFunctionWaitingForBoxLoad(
                     new BoxTargetPropertyWaitingForBoxLoad(targetId, this) );
     } else {
@@ -1207,11 +1207,11 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
         } else if(boxType == TYPE_IMAGESQUENCE) {
             box = new ImageSequenceBox();
         } else if(boxType == TYPE_INTERNAL_LINK) {
-            box = new InternalLinkBox(NULL);
+            box = new InternalLinkBox(nullptr);
         } else if(boxType == TYPE_EXTERNAL_LINK) {
             box = new ExternalLinkBox();
         } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
-            box = new InternalLinkCanvas(NULL);
+            box = new InternalLinkCanvas(nullptr);
         }
 
         box->readBoundingBox(target);
@@ -1242,7 +1242,7 @@ void PathAnimator::readVectorPathAnimator(QIODevice *target) {
 }
 
 QMatrix PathAnimator::getCombinedTransform() {
-    if(mParentBox == NULL) return QMatrix();
+    if(mParentBox == nullptr) return QMatrix();
     return mParentBox->getCombinedTransform();
 }
 
@@ -1269,6 +1269,7 @@ void Canvas::writeBoundingBox(QIODevice *target) {
     target->write((char*)&mWidth, sizeof(int));
     target->write((char*)&mHeight, sizeof(int));
     target->write((char*)&mFps, sizeof(qreal));
+    mBackgroundColor->writeProperty(target);
     target->write((char*)&mMaxFrame, sizeof(int));
     target->write((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
 }
@@ -1279,6 +1280,7 @@ void Canvas::readBoundingBox(QIODevice *target) {
     target->read((char*)&mWidth, sizeof(int));
     target->read((char*)&mHeight, sizeof(int));
     target->read((char*)&mFps, sizeof(qreal));
+    mBackgroundColor->readProperty(target);
     target->read((char*)&mMaxFrame, sizeof(int));
     target->read((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;

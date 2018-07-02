@@ -14,7 +14,7 @@ public:
     void addColorButton(Color color_t);
     void mousePressEvent(QMouseEvent *e);
 private:
-    QHBoxLayout *main_layout = NULL;
+    QHBoxLayout *main_layout = nullptr;
 signals:
 
 public slots:

@@ -12,7 +12,7 @@ public:
 
     void setTargetProperty(BoxTargetProperty *property);
 private:
-    BoxTargetProperty *mProperty = NULL;
+    BoxTargetProperty *mProperty = nullptr;
     bool mDragging = false;
 signals:
 

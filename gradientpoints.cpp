@@ -69,7 +69,7 @@ MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos,
             return endPoint;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 QPointF GradientPoints::getStartPointAtRelFrame(const int &relFrame) {

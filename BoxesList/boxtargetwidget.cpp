@@ -48,12 +48,12 @@ void BoxTargetWidget::dragLeaveEvent(
 }
 
 void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
-    if(mProperty == NULL) return;
+    if(mProperty == nullptr) return;
     if(event->button() == Qt::LeftButton) {
         BoundingBox *parentBox = mProperty->getLastSetParentBoundingBoxAncestor();
-        if(parentBox == NULL) return;
+        if(parentBox == nullptr) return;
         BoxesGroup *srcGroup = parentBox->getParentGroup();
-        if(srcGroup == NULL) return;
+        if(srcGroup == nullptr) return;
         QList<QSharedPointer<BoundingBox> > boxesT =
                 srcGroup->getContainedBoxesList();
         QMenu menu(this);
@@ -62,7 +62,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         BoundingBox *currentTarget = mProperty->getTarget();
         int i = -1;
         QAction *act = menu.addAction("-none-");
-        if(currentTarget == NULL) {
+        if(currentTarget == nullptr) {
             act->setCheckable(true);
             act->setChecked(true);
             act->setDisabled(true);
@@ -79,12 +79,12 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
             }
         }
         QAction *selected_action = menu.exec(mapToGlobal(QPoint(0, height())));
-        if(selected_action != NULL) {
+        if(selected_action != nullptr) {
             QVariant varT = selected_action->property("targetBoxPtr");
             if(varT.isValid()) {
                 mProperty->setTarget(boxesT.at(varT.toInt()).data());
             } else {
-                mProperty->setTarget(NULL);
+                mProperty->setTarget(nullptr);
             }
             MainWindow::getInstance()->callUpdateSchedulers();
         } else {
@@ -96,7 +96,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void BoxTargetWidget::paintEvent(QPaintEvent *) {
-    if(mProperty == NULL) return;
+    if(mProperty == nullptr) return;
     QPainter p(this);
     if(mProperty->SWT_isDisabled()) p.setOpacity(.5);
     p.setRenderHint(QPainter::Antialiasing);
@@ -111,7 +111,7 @@ void BoxTargetWidget::paintEvent(QPaintEvent *) {
     p.setPen(Qt::black);
     if(mProperty) {
         BoundingBox *target = mProperty->getTarget();
-        if(target == NULL) {
+        if(target == nullptr) {
             p.drawText(rect(), Qt::AlignCenter, "-none-");
         } else {
             p.drawText(rect(), Qt::AlignCenter, target->getName());

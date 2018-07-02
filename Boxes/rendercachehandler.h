@@ -42,7 +42,7 @@ public:
     int getNumberNotCachedBeforeRelFrame(const int &relFrame);
     void updateAllAfterFrameInMemoryHandler(const int &relFrame);
     int getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
-                                             CacheContainer **contP = NULL);
+                                             CacheContainer **contP = nullptr);
     void clearCacheForRelFrameRange(const int &minFrame,
                                     const int &maxFrame);
 protected:

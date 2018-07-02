@@ -106,11 +106,11 @@ void ColorSettingsWidget::refreshColorAnimatorTarget() {
 }
 
 void ColorSettingsWidget::nullifyAnimator() {
-    setColorAnimatorTarget(NULL);
+    setColorAnimatorTarget(nullptr);
 }
 
 void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
-    if(mTargetAnimator != NULL) {
+    if(mTargetAnimator != nullptr) {
         disconnect(mTargetAnimator, 0, this, 0);
     }
     mTargetAnimator = target;
@@ -125,7 +125,7 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
     if(!mAlphaHidden) {
         aSpin->clearAnimator();
     }
-    if(target != NULL) {
+    if(target != nullptr) {
         disconnect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(setColorMode(int)));
         mColorModeCombo->setCurrentIndex(target->getColorMode());
@@ -200,7 +200,7 @@ void ColorSettingsWidget::emitColorChangedSignal() {
 
 void ColorSettingsWidget::emitEditingFinishedSignal() {
     int tabId = mTabWidget->currentIndex();
-    if(mTargetAnimator != NULL) {
+    if(mTargetAnimator != nullptr) {
         if(mTargetAnimator->getColorMode() != tabId) {
             mTargetAnimator->prp_finishTransform();
         }
@@ -237,7 +237,7 @@ void ColorSettingsWidget::emitEditingFinishedSignal() {
 
 void ColorSettingsWidget::emitEditingStartedSignal() {
     int tabId = mTabWidget->currentIndex();
-    if(mTargetAnimator != NULL) {
+    if(mTargetAnimator != nullptr) {
         if(mTargetAnimator->getColorMode() != tabId) {
             mTargetAnimator->startVal1Transform();
             mTargetAnimator->startVal2Transform();
@@ -321,12 +321,12 @@ void ColorSettingsWidget::emitEditingStartedAlpha() {
 
 void ColorSettingsWidget::emitFullColorChangedSignal() {
     mLastTriggeredCVR = CVR_ALL;
-    if(mTargetAnimator != NULL) {
+    if(mTargetAnimator != nullptr) {
         mTargetAnimator->prp_startTransform();
     }
     updateValuesFromHSV();
     updateAlphaFromSpin();
-    if(mTargetAnimator != NULL) {
+    if(mTargetAnimator != nullptr) {
         mTargetAnimator->prp_finishTransform();
     }
     emitEditingStartedSignal();
@@ -794,7 +794,7 @@ void ColorSettingsWidget::updateAlphaFromSpin() {
 }
 
 void ColorSettingsWidget::setColorMode(const int &colorMode) {
-    if(mTargetAnimator != NULL) {
+    if(mTargetAnimator != nullptr) {
         mTargetAnimator->setColorMode(static_cast<ColorMode>(colorMode));
     }
     emit colorModeChanged(static_cast<ColorMode>(colorMode));

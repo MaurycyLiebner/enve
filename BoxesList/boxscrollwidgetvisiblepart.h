@@ -54,12 +54,12 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *);
     void dragMoveEvent(QDragMoveEvent *event);
 
-    QTimer *mScrollTimer = NULL;
+    QTimer *mScrollTimer = nullptr;
 
     int mLastDragMoveY;
     SWT_TargetTypes mLastDragMoveTargetTypes;
 
-    KeysView *mKeysView = NULL;
+    KeysView *mKeysView = nullptr;
 
     bool mDragging = false;
     int mCurrentDragPosId = 0;

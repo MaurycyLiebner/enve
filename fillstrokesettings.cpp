@@ -226,7 +226,7 @@ void FillStrokeSettingsWidget::setNoneFill() {
 
 void FillStrokeSettingsWidget::updateColorAnimator() {
     if(getCurrentPaintTypeVal() == 0) {
-        setColorAnimatorTarget(NULL);
+        setColorAnimatorTarget(nullptr);
     } else if(getCurrentPaintTypeVal() == 1) {
         if(mTargetId == 0) {
             setColorAnimatorTarget(mCurrentFillColorAnimator);
@@ -332,9 +332,9 @@ void FillStrokeSettingsWidget::colorTypeSet(const int &id) {
     } else if(id == 1) {
         setFlatPaintType();
     } else {
-        if((mTargetId == 0) ? (mCurrentFillGradient == NULL) :
-                (mCurrentStrokeGradient == NULL) ) {
-            mGradientWidget->setCurrentGradient((Gradient*)NULL);
+        if((mTargetId == 0) ? (mCurrentFillGradient == nullptr) :
+                (mCurrentStrokeGradient == nullptr) ) {
+            mGradientWidget->setCurrentGradient((Gradient*)nullptr);
         }
         setGradientPaintType();
     }
@@ -504,8 +504,8 @@ void FillStrokeSettingsWidget::setCurrentGradientLinearVal(
 
 void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
         PaintSettings *settings) {
-    if(settings == NULL) {
-        mCurrentFillColorAnimator = NULL;
+    if(settings == nullptr) {
+        mCurrentFillColorAnimator = nullptr;
     } else {
         mCurrentFillGradientLinear = settings->getGradientLinear();
         mCurrentFillColor = settings->getCurrentColor();
@@ -517,8 +517,8 @@ void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
 
 void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         StrokeSettings *settings) {
-    if(settings == NULL) {
-        mCurrentStrokeColorAnimator = NULL;
+    if(settings == nullptr) {
+        mCurrentStrokeColorAnimator = nullptr;
         mLineWidthSpin->clearAnimator();
     } else {
         mCurrentStrokeGradientLinear = settings->getGradientLinear();
@@ -697,13 +697,13 @@ void FillStrokeSettingsWidget::setGradientPaintType() {
     connectGradient();
     if(mTargetId == 0) {
         mCurrentFillPaintType = GRADIENTPAINT;
-        if(mCurrentFillGradient == NULL) {
+        if(mCurrentFillGradient == nullptr) {
             mCurrentFillGradient =
                     mGradientWidget->getCurrentGradient();
         }
     } else {
         mCurrentStrokePaintType = GRADIENTPAINT;
-        if(mCurrentStrokeGradient == NULL) {
+        if(mCurrentStrokeGradient == nullptr) {
             mCurrentStrokeGradient =
                     mGradientWidget->getCurrentGradient();
         }

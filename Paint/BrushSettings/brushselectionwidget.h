@@ -34,8 +34,8 @@ private:
     int mDimension = 48;
     int mMargin = 4;
     QList<Brush*> mAllBrushes;
-    Brush *mDefaultBrush = NULL;
-    Brush *mCurrentBrush = NULL;
+    Brush *mDefaultBrush = nullptr;
+    Brush *mCurrentBrush = nullptr;
 };
 
 #endif // BRUSHSELECTIONWIDGET_H

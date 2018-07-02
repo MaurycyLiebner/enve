@@ -61,7 +61,7 @@ public:
         Q_UNUSED(relX);
         Q_UNUSED(minViewedFrame);
         Q_UNUSED(pixelsPerFrame);
-        return NULL;
+        return nullptr;
     }
 
     Key *prp_getKeyAtPos(const qreal &relX,
@@ -120,7 +120,7 @@ public:
                                  int &prevRelFrame);
     virtual Key *readKey(QIODevice *target) {
         Q_UNUSED(target);
-        return NULL;
+        return nullptr;
     }
 
     bool hasFakeComplexAnimator() {
@@ -154,7 +154,7 @@ protected:
     bool anim_mIsComplexAnimator = false;
     bool anim_mIsCurrentAnimator = false;
     bool anim_mIsRecording = false;
-    Key *anim_mKeyOnCurrentFrame = NULL;
+    Key *anim_mKeyOnCurrentFrame = nullptr;
     QColor anim_mAnimatorColor;
     FakeComplexAnimatorQSPtr mFakeComplexAnimator;
 public slots:

@@ -19,8 +19,8 @@ public:
     void finishTransform();
     void moveByAbs(const QPointF &absTranslatione);
 private:
-    MovablePoint *mVerticalPoint = NULL;
-    MovablePoint *mHorizontalPoint = NULL;
+    MovablePoint *mVerticalPoint = nullptr;
+    MovablePoint *mHorizontalPoint = nullptr;
 };
 
 class CircleRadiusPoint : public PointAnimator
@@ -40,7 +40,7 @@ public:
     void finishTransform();
     void setRelativePos(const QPointF &relPos);
 private:
-    MovablePoint *mCenterPoint = NULL;
+    MovablePoint *mCenterPoint = nullptr;
     bool mXBlocked = false;
 };
 

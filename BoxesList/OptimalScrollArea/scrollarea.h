@@ -6,7 +6,7 @@ class ScrollArea : public QScrollArea
 {
     Q_OBJECT
 public:
-    ScrollArea(QWidget *parent = NULL);
+    ScrollArea(QWidget *parent = nullptr);
 
     void scrollBy(const int &x,
                   const int &y);

@@ -102,7 +102,7 @@ void VectorPath::loadPathFromSkPath(const SkPath &path) {
 
 //    menu.addAction("Delete");
 //    QAction *selected_action = menu.exec(globalPos);
-//    if(selected_action != NULL)
+//    if(selected_action != nullptr)
 //    {
 //        if(selected_action->text() == "Delete")
 //        {
@@ -142,7 +142,7 @@ MovablePoint *VectorPath::getPointAtAbsPos(const QPointF &absPtPos,
     MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
-    if(pointToReturn == NULL) {
+    if(pointToReturn == nullptr) {
         pointToReturn = mPathAnimator->getPointAtAbsPos(absPtPos,
                                                       currentCanvasMode,
                                                       canvasScaleInv);

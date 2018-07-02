@@ -13,7 +13,7 @@ TilesData::TilesData(const ushort &width,
 }
 
 TilesData::~TilesData() {
-    if(mTiles != NULL) {
+    if(mTiles != nullptr) {
         for(int i = 0; i < mNTileRows; i++) {
             for(int j = 0; j < mNTileCols; j++) {
                 delete mTiles[i][j];
@@ -22,7 +22,7 @@ TilesData::~TilesData() {
         }
         delete[] mTiles;
     }
-    if(mTmpFile != NULL) {
+    if(mTmpFile != nullptr) {
         delete mTmpFile;
     }
 }
@@ -331,9 +331,9 @@ void TilesData::initializeEmptyTilesData() {
 
 void TilesData::dataChanged() {
     if(mDataStoredInTmpFile) {
-        if(mTmpFile != NULL) {
+        if(mTmpFile != nullptr) {
             delete mTmpFile;
-            mTmpFile = NULL;
+            mTmpFile = nullptr;
         }
         mDataStoredInTmpFile = false;
     }
@@ -368,7 +368,7 @@ bool TilesData::freeAndRemove() {
 }
 
 bool TilesData::_writeTilesDataToTmp() {
-    if(mTmpFile != NULL) {
+    if(mTmpFile != nullptr) {
         delete mTmpFile;
     }
     mTmpFile = new QTemporaryFile();
@@ -454,7 +454,7 @@ void TilesData::resizeTiles(const ushort &nTileCols,
         delete[] mTiles[rw];
     }
 
-    if(mTiles != NULL) {
+    if(mTiles != nullptr) {
         delete[] mTiles;
     }
     if(lastRowHeight != 0) {

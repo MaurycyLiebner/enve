@@ -12,7 +12,7 @@ SingleWidgetAbstraction::SingleWidgetAbstraction(
 }
 
 SingleWidgetAbstraction::~SingleWidgetAbstraction() {
-//    if(mTarget != NULL) {
+//    if(mTarget != nullptr) {
 //        mTarget->SWT_removeAbstractionFromList(this);
 //    }
 //    Q_FOREACH(SingleWidgetAbstraction *abs, mChildren) {
@@ -143,7 +143,7 @@ SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
             return abs.get();
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void SingleWidgetAbstraction::removeChildAbstractionForTarget(

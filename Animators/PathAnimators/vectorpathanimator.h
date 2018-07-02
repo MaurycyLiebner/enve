@@ -218,7 +218,7 @@ public:
                     (PathKey*)targetPath->anim_getKeyAtRelFrame(relFrame);
             const QList<SkPoint> &srcKeyElements = srcKey->getElementsPosList();
             QList<SkPoint> targetKeyElements;
-            if(keyAtRelFrame == NULL) {
+            if(keyAtRelFrame == nullptr) {
                 targetKeyElements =
                         extractElementsFromSkPath(targetPath->getPathAtRelFrame(relFrame));
             } else {
@@ -281,7 +281,7 @@ public:
     void removeFromParent();
 
     NodePoint *getNodePtWithNodeId(const int &id) {
-        if(id < 0 || id >= mPoints.count()) return NULL;
+        if(id < 0 || id >= mPoints.count()) return nullptr;
         return mPoints.at(id);
     }
 
@@ -322,7 +322,7 @@ private:
                                               const qreal &canvasScaleInv);
     QList<NodeSettings*> mNodeSettings;
     PathAnimator *mParentPathAnimator;
-    NodePoint *mFirstPoint = NULL;
+    NodePoint *mFirstPoint = nullptr;
     QList<NodePoint*> mPoints;
     bool mElementsUpdateNeeded = false;
 };

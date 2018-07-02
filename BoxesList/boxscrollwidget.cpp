@@ -11,8 +11,8 @@ BoxScrollWidget::BoxScrollWidget(ScrollArea *parent) :
 }
 
 //void BoxScrollWidget::updateAbstraction() {
-//    if(mMainTarget == NULL) {
-//        mMainAbstraction = NULL;
+//    if(mMainTarget == nullptr) {
+//        mMainAbstraction = nullptr;
 //    } else {
 //        mMainAbstraction = mMainTarget->
 //                SWT_getAbstractionForWidget(mVisiblePartWidget);

@@ -322,17 +322,17 @@ NodePoint *Canvas::createNewPointOnLineNearSelected(
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         NodePoint *point = box->createNewPointOnLineNear(absPos, adjust,
                                                          canvasScaleInv);
-        if(point != NULL) {
+        if(point != nullptr) {
             return point;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void Canvas::setDisplayedFillStrokeSettingsFromLastSelected() {
     if(mSelectedBoxes.isEmpty()) {
-        mFillStrokeSettingsWidget->setCurrentSettings(NULL,
-                                                      NULL);
+        mFillStrokeSettingsWidget->setCurrentSettings(nullptr,
+                                                      nullptr);
     } else {
         setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
     }
@@ -399,11 +399,11 @@ VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
         if(box->isSelected() ) {
             VectorPathEdge *pathEdge = box->getEdge(absPos,
                                                     1./mCanvasTransformMatrix.m11());
-            if(pathEdge == NULL) continue;
+            if(pathEdge == nullptr) continue;
             return pathEdge;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {
@@ -602,7 +602,7 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
     box->deselect();
     mSelectedBoxes.removeOne(box); schedulePivotUpdate();
     if(mSelectedBoxes.isEmpty()) {
-        mMainWindow->setCurrentBox(NULL);
+        mMainWindow->setCurrentBox(nullptr);
     } else {
         mMainWindow->setCurrentBox(mSelectedBoxes.last());
     }
@@ -634,10 +634,10 @@ void Canvas::clearBoxesSelection() {
         box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
-    mMainWindow->setCurrentBox(NULL);
-//    if(mLastPressedBox != NULL) {
+    mMainWindow->setCurrentBox(nullptr);
+//    if(mLastPressedBox != nullptr) {
 //        mLastPressedBox->deselect();
-//        mLastPressedBox = NULL;
+//        mLastPressedBox = nullptr;
 //    }
 }
 
@@ -712,18 +712,18 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
         if(mRotPivot->isPointAtAbsPos(absPos, canvasScaleInv)) {
             return mRotPivot;
         }
-        MovablePoint *pointAtPos = NULL;
+        MovablePoint *pointAtPos = nullptr;
         Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
             pointAtPos = box->getPointAtAbsPos(absPos,
                                                currentMode,
                                                canvasScaleInv);
-            if(pointAtPos != NULL) {
+            if(pointAtPos != nullptr) {
                 break;
             }
         }
         return pointAtPos;
     }
-    return NULL;
+    return nullptr;
 }
 
 void Canvas::finishSelectedBoxesTransform() {
@@ -837,8 +837,8 @@ VectorPath *Canvas::getPathResultingFromOperation(
     QList<FullVectorPath*> pathsT;
     FullVectorPath *targetPath = new FullVectorPath();
     pathsT << targetPath;
-    FullVectorPath *addToPath = NULL;
-    FullVectorPath *addedPath = NULL;
+    FullVectorPath *addToPath = nullptr;
+    FullVectorPath *addedPath = nullptr;
 
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isPathBox()) {
@@ -909,14 +909,14 @@ void Canvas::selectedPathsExclusion() {
 #include "Animators/pathanimator.h"
 void Canvas::selectedPathsCombine() {
     if(mSelectedBoxes.isEmpty()) return;
-    VectorPath *firstVectorPath = NULL;
+    VectorPath *firstVectorPath = nullptr;
     foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
             firstVectorPath = (VectorPath*)box;
             break;
         }
     }
-    if(firstVectorPath == NULL) {
+    if(firstVectorPath == nullptr) {
         firstVectorPath = new VectorPath();
         addContainedBox(firstVectorPath);
     }

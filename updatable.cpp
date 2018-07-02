@@ -37,7 +37,7 @@ void _ScheduledExecutor::clear() {
 }
 
 void _Executor::waitTillProcessed() {
-    if(mCurrentPaintControler == NULL) {
+    if(mCurrentPaintControler == nullptr) {
         return;
     }
     {

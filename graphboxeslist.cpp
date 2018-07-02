@@ -210,12 +210,12 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         mCurrentPoint = animator->qra_getPointAt(value, frame,
                                                  mPixelsPerFrame,
                                                  mPixelsPerValUnit);
-        if(mCurrentPoint != NULL) break;
+        if(mCurrentPoint != nullptr) break;
     }
-    QrealKey *parentKey = (mCurrentPoint == NULL) ?
-                NULL :
+    QrealKey *parentKey = (mCurrentPoint == nullptr) ?
+                nullptr :
                 mCurrentPoint->getParentKey();
-    if(mCurrentPoint == NULL) {
+    if(mCurrentPoint == nullptr) {
         if(mMainWindow->isCtrlPressed() ) {
 //            graphClearKeysSelection();
 //            QrealKey *newKey = new QrealKey(qRound(frame), mAnimator, value);
@@ -272,7 +272,7 @@ void KeysView::graphMouseRelease()
         }
 
         mSelecting = false;
-    } else if(mCurrentPoint != NULL) {
+    } else if(mCurrentPoint != nullptr) {
         if(mCurrentPoint->isKeyPoint()) {
             if(mFirstMove) {
                 if(!mMainWindow->isShiftPressed()) {
@@ -289,7 +289,7 @@ void KeysView::graphMouseRelease()
         } else {
                mCurrentPoint->setSelected(false);
         }
-        mCurrentPoint = NULL;
+        mCurrentPoint = nullptr;
 
         Q_FOREACH(QrealAnimator *animator, mAnimators) {
             animator->qra_constrainCtrlsFrameValues();
@@ -386,7 +386,7 @@ void KeysView::graphClearAnimatorSelection() {
 }
 
 void KeysView::graphDeletePressed() {
-    if(mCurrentPoint != NULL) {
+    if(mCurrentPoint != nullptr) {
             QrealKey *key = mCurrentPoint->getParentKey();
             if(mCurrentPoint->isEndPoint()) {
                 key->setEndEnabled(false);
@@ -436,7 +436,7 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
         qreal frame;
         graphGetValueAndFrameFromPos(mousePos, &value, &frame);
         mSelectionRect.setBottomRight(QPointF(frame, value));
-    } else if(mCurrentPoint != NULL) {
+    } else if(mCurrentPoint != nullptr) {
         if(!mCurrentPoint->isEnabled()) {
             QrealKey *parentKey = mCurrentPoint->getParentKey();
             parentKey->setEndEnabled(true);
@@ -484,13 +484,13 @@ void KeysView::graphMousePressEvent(const QPoint &eventPos,
         qreal value;
         qreal frame;
         graphGetValueAndFrameFromPos(eventPos, &value, &frame);
-        QrealPoint *point = NULL;
+        QrealPoint *point = nullptr;
         Q_FOREACH(QrealAnimator *animator, mAnimators) {
             point = animator->qra_getPointAt(value, frame,
                                          mPixelsPerFrame, mPixelsPerValUnit);
-            if(point != NULL) break;
+            if(point != nullptr) break;
         }
-        if(point == NULL) return;
+        if(point == nullptr) return;
         QrealPointValueDialog *dialog = new QrealPointValueDialog(point, this);
         dialog->show();
         connect(dialog, SIGNAL(repaintSignal()),

@@ -5,7 +5,7 @@
 class BoxScrollArea : public ScrollArea
 {
 public:
-    BoxScrollArea(QWidget *parent = NULL);
+    BoxScrollArea(QWidget *parent = nullptr);
 protected:
     void focusInEvent(QFocusEvent *);
 };

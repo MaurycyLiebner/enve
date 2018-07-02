@@ -29,8 +29,8 @@ public:
     bool wasAdded() { return mAdded; }
     void setAdded() { mAdded = true; }
 private:
-    MinimalNodePoint *mNextPoint = NULL;
-    MinimalNodePoint *mPrevPoint = NULL;
+    MinimalNodePoint *mNextPoint = nullptr;
+    MinimalNodePoint *mPrevPoint = nullptr;
     QPointF mStartCtrlPos;
     QPointF mPos;
     QPointF mEndCtrlPos;
@@ -121,9 +121,9 @@ public:
     }
 
 private:
-    FullVectorPath *mParentFullPath = NULL;
-    MinimalNodePoint *mFirstPoint = NULL;
-    MinimalNodePoint *mLastPoint = NULL;
+    FullVectorPath *mParentFullPath = nullptr;
+    MinimalNodePoint *mFirstPoint = nullptr;
+    MinimalNodePoint *mLastPoint = nullptr;
     QList<IntersectionNodePoint*> mIntersectionPoints;
     QPainterPath mPath;
 };
@@ -185,11 +185,11 @@ public:
     MinimalNodePoint *getMPP1() { return mMPP1; }
     MinimalNodePoint *getMPP2() { return mMPP2; }
 private:
-    PointsBezierCubic *mNextCubic = NULL;
-    PointsBezierCubic *mPrevCubic = NULL;
+    PointsBezierCubic *mNextCubic = nullptr;
+    PointsBezierCubic *mPrevCubic = nullptr;
     MinimalNodePoint *mMPP1;
     MinimalNodePoint *mMPP2;
-    MinimalVectorPath *mParentPath = NULL;
+    MinimalVectorPath *mParentPath = nullptr;
 };
 
 #endif // PATHOPERATIONS_H

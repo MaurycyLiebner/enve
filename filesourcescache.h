@@ -79,7 +79,7 @@ public:
     }
     sk_sp<SkImage> getImage() { return mImage; }
     sk_sp<SkImage> getImageCopy() {
-        if(mImage.get() == NULL) return sk_sp<SkImage>();
+        if(mImage.get() == nullptr) return sk_sp<SkImage>();
         SkPixmap pix;
         mImage->peekPixels(&pix);
         return SkImage::MakeRasterCopy(pix);
@@ -98,7 +98,7 @@ public:
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
     sk_sp<SkImage> getFrameCopyAtFrame(const int &relFrame) {
         sk_sp<SkImage> imageToCopy = getFrameAtFrame(relFrame);
-        if(imageToCopy.get() == NULL) return sk_sp<SkImage>();
+        if(imageToCopy.get() == nullptr) return sk_sp<SkImage>();
         SkPixmap pix;
         imageToCopy->peekPixels(&pix);
         return SkImage::MakeRasterCopy(pix);
@@ -216,7 +216,7 @@ public:
         int minRelFrame = 0;
         int maxRelFrame = 0;
         qreal fps;
-        float *data = NULL;
+        float *data = nullptr;
 
         bool canBeMergedWith(const SoundDataRange &range) {
             return range.minRelFrame == maxRelFrame ||
@@ -250,7 +250,7 @@ public:
         bool mergeWithRange(const SoundDataRange &range) {
             if(!canBeMergedWith(range)) return false;
             removeOverlapWith(range);
-            float *newData = NULL;
+            float *newData = nullptr;
             newData = new float[range.sampleCount + sampleCount];
             if(range.minSample > minSample) {
                 int j = 0;
@@ -336,7 +336,7 @@ public:
             if(i >= mSoundData.count()) break;
             const SoundDataRange &range = mSoundData.at(i);
             if(range.clipOverlapFrames(&minRelFrame, &maxRelFrame)) {
-                if(minRelFrame >= maxRelFrame) return NULL;
+                if(minRelFrame >= maxRelFrame) return nullptr;
             }
         }
 
@@ -349,7 +349,7 @@ public:
             if(i >= mSoundBeingLoadedGUI.count()) break;
             const SoundDataRange &range = mSoundBeingLoadedGUI.at(i);
             if(range.clipOverlapFrames(&minRelFrame, &maxRelFrame)) {
-                if(minRelFrame >= maxRelFrame) return NULL;
+                if(minRelFrame >= maxRelFrame) return nullptr;
             }
         }
 
@@ -362,7 +362,7 @@ public:
             if(i >= mScheduledSoundLoad.count()) break;
             const SoundDataRange &range = mScheduledSoundLoad.at(i);
             if(range.clipOverlapFrames(&minRelFrame, &maxRelFrame)) {
-                if(minRelFrame >= maxRelFrame) return NULL;
+                if(minRelFrame >= maxRelFrame) return nullptr;
                 newDataRangeToLoad.minRelFrame = qMin(minRelFrame,
                                                       range.minRelFrame);
                 newDataRangeToLoad.maxRelFrame = qMax(maxRelFrame,

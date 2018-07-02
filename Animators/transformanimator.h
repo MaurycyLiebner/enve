@@ -129,7 +129,7 @@ public:
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 protected:
-    Bone *mParentBone = NULL;
+    Bone *mParentBone = nullptr;
 };
 
 class BoxTransformAnimator : public BasicTransformAnimator {
@@ -185,7 +185,7 @@ public:
     }
 private:
     bool mPivotAutoAdjust = true;
-    BoundingBox *mParentBox = NULL;
+    BoundingBox *mParentBox = nullptr;
     QSharedPointer<PointAnimator> mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;
 };

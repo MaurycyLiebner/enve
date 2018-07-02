@@ -50,7 +50,7 @@ public:
     void drawOnImage(unsigned char *data,
                      const int &width, const int &height);
 private:
-    Brush *mBrush = NULL;
+    Brush *mBrush = nullptr;
     QList<Dab> mDabs;
 
     QPainterPath mStrokePath;

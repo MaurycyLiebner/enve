@@ -64,7 +64,7 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
         const int &minViewedFrame) {
     int remaining = pressY % MIN_WIDGET_HEIGHT;
     if(remaining < (MIN_WIDGET_HEIGHT - KEY_RECT_SIZE)/2 ||
-       remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return NULL;
+       remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return nullptr;
     Q_FOREACH(QWidget *container, mSingleWidgets) {
         int containerTop = container->y();
         int containerBottom = containerTop + container->height();
@@ -73,7 +73,7 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
                 getKeyAtPos(pressX, pixelsPerFrame,
                             minViewedFrame);
     }
-    return NULL;
+    return nullptr;
 }
 
 DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
@@ -89,7 +89,7 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
                 getRectangleMovableAtPos(pressX, pixelsPerFrame,
                                          minViewedFrame);
     }
-    return NULL;
+    return nullptr;
 }
 
 void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
@@ -144,7 +144,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                     idAtYPos);
         while(singleWidgetUnderMouse->isHidden()) {
             idAtYPos++;
-            if(idAtYPos >= mSingleWidgets.count()) return NULL;
+            if(idAtYPos >= mSingleWidgets.count()) return nullptr;
             singleWidgetUnderMouse = (BoxSingleWidget*)
                     mSingleWidgets.at(
                         idAtYPos);
@@ -153,7 +153,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                 singleWidgetUnderMouse->getTargetAbstraction();
         while(!type.isTargeted(targetAbs->getTarget()) ) {
             idAtYPos++;
-            if(idAtYPos >= mSingleWidgets.count()) return NULL;
+            if(idAtYPos >= mSingleWidgets.count()) return nullptr;
             singleWidgetUnderMouse = (BoxSingleWidget*)
                     mSingleWidgets.at(
                         idAtYPos);
@@ -162,7 +162,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
         *isBelow = targetId > idAtYPos;
         return singleWidgetUnderMouse;
     }
-    return NULL;
+    return nullptr;
 }
 
 BoxSingleWidget *BoxScrollWidgetVisiblePart::
@@ -202,7 +202,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
         *isBelow = targetId > idAtYPos;
         return singleWidgetUnderMouse;
     }
-    return NULL;
+    return nullptr;
 }
 
 void BoxScrollWidgetVisiblePart::stopScrolling() {
@@ -229,28 +229,29 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                     type,
                     yPos,
                     &below);
-        if(singleWidgetUnderMouse == NULL) return;
+        if(singleWidgetUnderMouse == nullptr) return;
 
-        BoundingBox *box = ((BoundingBoxMimeData*)event->mimeData())->
-                getBoundingBox();
+        QSharedPointer<BoundingBox> box = ((BoundingBoxMimeData*)event->mimeData())->
+                getBoundingBox()->ref<BoundingBox>();
         BoundingBox *boxUnderMouse =
                 ((BoundingBox*)singleWidgetUnderMouse->
                  getTargetAbstraction()->getTarget());
 
         BoxesGroup *parentGroup = boxUnderMouse->getParentGroup();
-        if(parentGroup == NULL ||
-           boxUnderMouse->isAncestor(box)) return;
+        if(parentGroup == nullptr ||
+           boxUnderMouse->isAncestor(box.data())) return;
         if(parentGroup != box->getParentGroup()) {
-            box->getParentGroup()->removeContainedBox(box);
-            parentGroup->addContainedBox(box);
+            box->getParentGroup()->removeContainedBox(box.data());
+            parentGroup->addContainedBox(box.data());
+            box->applyTransformationInverted(box->getTransformAnimator());
         }
         if(below) { // add box below
             parentGroup->moveContainedBoxAbove( // boxesgroup list is reversed
-                        box,
+                        box.data(),
                        boxUnderMouse);
         } else { // add box above
             parentGroup->moveContainedBoxBelow(
-                        box,
+                        box.data(),
                         boxUnderMouse);
         }
     } else if(event->mimeData()->hasFormat("pixmapeffect")) {
@@ -265,7 +266,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                     type,
                     yPos,
                     &below);
-        if(singleWidgetUnderMouse == NULL) return;
+        if(singleWidgetUnderMouse == nullptr) return;
 
         PixmapEffect *effect = ((PixmapEffectMimeData*)event->mimeData())->
                 getPixmapEffect();
@@ -305,7 +306,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                     type,
                     yPos,
                     &below);
-        if(singleWidgetUnderMouse == NULL) return;
+        if(singleWidgetUnderMouse == nullptr) return;
 
         PathEffect *effect = ((PathEffectMimeData*)event->mimeData())->
                 getPathEffect();
@@ -428,7 +429,7 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
             getClosestsSingleWidgetWithTargetType(mLastDragMoveTargetTypes,
                                                   mLastDragMoveY,
                                                   &below);
-    if(singleWidgetUnderMouse != NULL) {
+    if(singleWidgetUnderMouse != nullptr) {
         int currentDragPosId = singleWidgetUnderMouse->y()/MIN_WIDGET_HEIGHT;
         if(below) {
             //currentDragPosId++;

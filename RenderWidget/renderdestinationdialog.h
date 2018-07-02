@@ -4,7 +4,7 @@
 
 class RenderDestinationDialog : public QDialog {
 public:
-    RenderDestinationDialog(QWidget *parent = NULL);
+    RenderDestinationDialog(QWidget *parent = nullptr);
 };
 
 #endif // RENDERDESTINATIONDIALOG_H

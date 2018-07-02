@@ -15,7 +15,7 @@ void BonesBox::drawHoveredSk(SkCanvas *canvas,
 
 bool BonesBox::relPointInsidePath(const QPointF &relPos) {
     foreach(Bone *bone, mBones) {
-        if(bone->getBoneAtRelPos(relPos) != NULL) { return true; }
+        if(bone->getBoneAtRelPos(relPos) != nullptr) { return true; }
     }
     return false;
 }
@@ -70,18 +70,18 @@ MovablePoint *BonesBox::getPointAtAbsPos(
     MovablePoint *pointToReturn = BoundingBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
-    if(pointToReturn == NULL) {
+    if(pointToReturn == nullptr) {
         foreach(Bone *bone, mBones) {
             pointToReturn = bone->getPointAtAbsPos(absPtPos,
                                                    canvasScaleInv);
-            if(pointToReturn == NULL) continue;
+            if(pointToReturn == nullptr) continue;
             return pointToReturn;
         }
     }
     return pointToReturn;
 }
 
-BoundingBox *BonesBox::createNewDuplicate() { return NULL; }
+BoundingBox *BonesBox::createNewDuplicate() { return nullptr; }
 
 Bone *BonesBox::getBoneAtAbsPos(const QPointF &absPos) {
     return getBoneAtRelPos(mapAbsPosToRel(absPos));
@@ -90,9 +90,9 @@ Bone *BonesBox::getBoneAtAbsPos(const QPointF &absPos) {
 Bone *BonesBox::getBoneAtRelPos(const QPointF &relPos) {
     foreach(Bone *bone, mBones) {
         Bone *boneT = bone->getBoneAtRelPos(relPos);
-        if(boneT != NULL) { return boneT; }
+        if(boneT != nullptr) { return boneT; }
     }
-    return NULL;
+    return nullptr;
 }
 
 Bone::Bone(BonesBox *boneBox) {
@@ -174,7 +174,7 @@ void Bone::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo) {
 }
 
 void Bone::saveTransformPivotAbsPos(const QPointF &absPivot) {
-    if(mParentBone == NULL) {
+    if(mParentBone == nullptr) {
         mSavedTransformPivot =
                 mParentBonesBox->mapAbsPosToRel(absPivot);
     } else {
@@ -217,14 +217,14 @@ Bone *Bone::getBoneAtRelPos(const QPointF &relPos) {
     QPointF realRelPos = mTransformAnimator->mapFromParent(relPos);
     foreach(Bone *boneT, mChildBones) {
         Bone *boneTT = boneT->getBoneAtRelPos(realRelPos);
-        if(boneTT != NULL) return boneTT;
+        if(boneTT != nullptr) return boneTT;
     }
     //if(QRectF(mRelRootPos, mRelTipPos).contains(realRelPos)) {
     if(getCurrentRelPath().contains(realRelPos.x(), realRelPos.y())) {
             return this;
         }
     //}
-    return NULL;
+    return nullptr;
 }
 
 SkPath Bone::getCurrentRelPath() {
@@ -309,13 +309,13 @@ BasicTransformAnimator *Bone::getTransformAnimator() {
 }
 
 const bool &Bone::isConnectedToParent() {
-    return mConnectedToParent && mParentBone != NULL;
+    return mConnectedToParent && mParentBone != nullptr;
 }
 
 void Bone::setConnectedToParent(const bool &bT) {
     if(bT == mConnectedToParent) return;
     mConnectedToParent = bT;
-    if(mParentBone == NULL) return;
+    if(mParentBone == nullptr) return;
     if(bT) {
         delete mRootPt;
         mRootPt = mParentBone->getTipPt();
@@ -339,13 +339,13 @@ BonePt *Bone::getRootPt() {
 
 MovablePoint *Bone::getPointAtAbsPos(const QPointF &absPtPos,
                                      const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = NULL;
+    MovablePoint *pointToReturn = nullptr;
     foreach(Bone *boneT, mChildBones) {
         pointToReturn = boneT->getPointAtAbsPos(absPtPos, canvasScaleInv);
-        if(pointToReturn == NULL) continue;
+        if(pointToReturn == nullptr) continue;
         return pointToReturn;
     }
-    if(pointToReturn == NULL) {
+    if(pointToReturn == nullptr) {
         if(mTipPt->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mTipPt;
         }
@@ -412,12 +412,12 @@ void Bone::selectAndAddContainedPointsToList(const QRectF &absRect,
 
 void Bone::setParentBone(Bone *parentBone) {
     if(parentBone == mParentBone) return;
-    if(mParentBone != NULL) {
+    if(mParentBone != nullptr) {
         mParentBone->removeChildBone(this);
     }
-    if(mParentBonesBox != NULL) {
+    if(mParentBonesBox != nullptr) {
         mParentBonesBox->removeBone(this);
-        mParentBonesBox = NULL;
+        mParentBonesBox = nullptr;
     }
 
     mTransformAnimator->setParentTransformAnimator(
@@ -430,18 +430,18 @@ void Bone::setParentBone(Bone *parentBone) {
 }
 
 void Bone::setParentBonesBox(BonesBox *bonesBox) {
-    if(mParentBone != NULL) {
+    if(mParentBone != nullptr) {
         mParentBone->removeChildBone(this);
-        mParentBone = NULL;
+        mParentBone = nullptr;
         mRootPt->removeRootBone(this);
-        mRootPt = NULL;
+        mRootPt = nullptr;
     }
-    if(mParentBonesBox != NULL) {
+    if(mParentBonesBox != nullptr) {
         mParentBonesBox->removeBone(this);
     }
     mTransformAnimator->setParentTransformAnimator(
                 bonesBox->getTransformAnimator());
-    if(mRootPt == NULL) {
+    if(mRootPt == nullptr) {
         mRootPt = new BonePt(mTransformAnimator.data(), TYPE_BONE_POINT);
         mRootPt->addRootBone(this);
     }

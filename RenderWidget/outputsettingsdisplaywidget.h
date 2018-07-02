@@ -13,7 +13,7 @@ class OutputSettingsDisplayWidget : public QWidget
 public:
     explicit OutputSettingsDisplayWidget(QWidget *parent = nullptr);
     void setOutputSettings(const OutputSettings &settings) {
-        if(settings.outputFormat  == NULL) {
+        if(settings.outputFormat  == nullptr) {
             setOutputFormatText("-");
         } else {
             setOutputFormatText(QString(settings.outputFormat->long_name));
@@ -21,13 +21,13 @@ public:
         if(!mAlwaysShowAll) {
             setVideoLabelsVisible(settings.videoEnabled);
         }
-        if(settings.videoCodec  == NULL) {
+        if(settings.videoCodec  == nullptr) {
             setVideoCodecText("-");
         } else {
             setVideoCodecText(QString(settings.videoCodec->long_name));
         }
         const char *pixelFormat = av_get_pix_fmt_name(settings.videoPixelFormat);
-        if(pixelFormat == NULL) {
+        if(pixelFormat == nullptr) {
             setPixelFormatText("-");
         } else {
             setPixelFormatText(QString(pixelFormat));
@@ -36,7 +36,7 @@ public:
         if(!mAlwaysShowAll) {
             setAudioLabelsVisible(settings.audioEnabled);
         }
-        if(settings.audioCodec  == NULL) {
+        if(settings.audioCodec  == nullptr) {
             setAudioCodecText("-");
         } else {
             setAudioCodecText(QString(settings.audioCodec->long_name));

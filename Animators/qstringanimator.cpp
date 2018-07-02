@@ -15,7 +15,7 @@ void QStringAnimator::prp_setAbsFrame(const int &frame) {
 void QStringAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) prp_setRecording(true);
 
-    if(anim_mKeyOnCurrentFrame == NULL) {
+    if(anim_mKeyOnCurrentFrame == nullptr) {
         anim_mKeyOnCurrentFrame = new QStringKey(mCurrentText,
                                                  anim_mCurrentRelFrame,
                                                  this);
@@ -56,7 +56,7 @@ QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
     } else {
         key = (QStringKey*)anim_getPrevKey(relFrame);
     }
-    if(key == NULL) {
+    if(key == nullptr) {
         key = (QStringKey*)anim_getNextKey(relFrame);
     }
     return key->getText();
@@ -87,7 +87,7 @@ void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
             fId = prevKey->getRelFrame();
             prevPrevKey = prevKey;
             prevKey = prevKey->getPrevKey();
-            if(prevKey == NULL) {
+            if(prevKey == nullptr) {
                 fId = INT_MIN;
                 break;
             }
@@ -99,7 +99,7 @@ void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
             if(nextKey->differsFromKey(prevNextKey)) break;
             prevNextKey = nextKey;
             nextKey = nextKey->getNextKey();
-            if(nextKey == NULL) {
+            if(nextKey == nullptr) {
                 lId = INT_MAX;
                 break;
             }

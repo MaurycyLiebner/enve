@@ -15,10 +15,10 @@ public:
 
 
 private:
-    QPushButton *add_collection_button = NULL;
-    QVBoxLayout *main_layout = NULL;
-    QVBoxLayout *widgets_layout = NULL;
-    WindowVariables *window_vars = NULL;
+    QPushButton *add_collection_button = nullptr;
+    QVBoxLayout *main_layout = nullptr;
+    QVBoxLayout *widgets_layout = nullptr;
+    WindowVariables *window_vars = nullptr;
 signals:
 
 public slots:

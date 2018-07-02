@@ -141,7 +141,7 @@ private:
     void updateHoveredPointFromPos(const QPoint &posU);
 
     QPointer<DurationRectangleMovable> mHoveredMovable;
-    Key *mHoveredKey = NULL;
+    Key *mHoveredKey = nullptr;
 
     bool mIsMouseGrabbing = false;
     int mViewedTop = 0;
@@ -158,7 +158,7 @@ private:
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
     QPointer<DurationRectangleMovable> mLastPressedDurationRectangleMovable;
-    Key *mLastPressedKey = NULL;
+    Key *mLastPressedKey = nullptr;
     bool mFirstMove = false;
     int mMoveDFrame = 0;
     QPointF mLastPressPos;
@@ -177,7 +177,7 @@ private:
 
     qreal mPixelsPerValUnit = 0.;
     qreal mMinShownVal = 0.;
-    QrealPoint *mCurrentPoint = NULL;
+    QrealPoint *mCurrentPoint = nullptr;
     qreal mMinVal = 0.;
     qreal mMaxVal = 0.;
     qreal mMinMoveFrame = 0.;

@@ -33,7 +33,7 @@ private:
     QVBoxLayout *mContLayout;
     ScrollArea *mScrollArea;
     QList<RenderInstanceWidget*> mRenderInstanceWidgets;
-    RenderInstanceSettings *mCurrentRenderedSettings = NULL;
+    RenderInstanceSettings *mCurrentRenderedSettings = nullptr;
     QList<RenderInstanceWidget*> mAwaitingSettings;
 
     void render(RenderInstanceSettings *settings);

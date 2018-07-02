@@ -17,11 +17,11 @@ int decode_audio_file(const char* path,
                       int* size) {
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
-    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+    if (avformat_open_input(&format, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return -1;
     }
-    if (avformat_find_stream_info(format, NULL) < 0) {
+    if (avformat_find_stream_info(format, nullptr) < 0) {
         fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
         return -1;
     }
@@ -41,13 +41,13 @@ int decode_audio_file(const char* path,
                 "Could not retrieve audio stream from file '%s'\n", path);
         return -1;
     }
-    AVCodecContext *audioCodec = NULL;
-    struct SwrContext *swr = NULL;
+    AVCodecContext *audioCodec = nullptr;
+    struct SwrContext *swr = nullptr;
 
     AVStream* audioStream = format->streams[audioStreamIndex];
     // find & open codec
     audioCodec = audioStream->codec;
-    if (avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), NULL) < 0) {
+    if (avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), nullptr) < 0) {
         fprintf(stderr, "Failed to open decoder for stream #%u in file '%s'\n",
                 audioStreamIndex, path);
         return -1;
@@ -79,7 +79,7 @@ int decode_audio_file(const char* path,
     }
 
     // iterate through frames
-    *audioData = NULL;
+    *audioData = nullptr;
     *size = 0;
     while(av_read_frame(format, &packet) >= 0) {
         if(packet.stream_index == audioStreamIndex) {
@@ -93,7 +93,7 @@ int decode_audio_file(const char* path,
             }
             // resample frames
             float *buffer;
-            av_samples_alloc((uint8_t**) &buffer, NULL, 1,
+            av_samples_alloc((uint8_t**) &buffer, nullptr, 1,
                              frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
             int frame_count = swr_convert(swr,
                                           (uint8_t**) &buffer,
@@ -113,10 +113,10 @@ int decode_audio_file(const char* path,
 
     // clean up
     av_frame_free(&frame);
-    if(swr != NULL) {
+    if(swr != nullptr) {
         swr_free(&swr);
     }
-    if(audioCodec != NULL) {
+    if(audioCodec != nullptr) {
         avcodec_close(audioCodec);
     }
     avformat_free_context(format);
@@ -165,10 +165,10 @@ FixedLenAnimationRect *SingleSound::getDurationRect() {
 }
 
 void SingleSound::setDurationRect(FixedLenAnimationRect *durRect) {
-    if(mDurationRectangle != NULL) {
+    if(mDurationRectangle != nullptr) {
         delete mDurationRectangle;
     }
-    if(durRect == NULL) {
+    if(durRect == nullptr) {
         mOwnDurationRectangle = true;
         mDurationRectangle = new FixedLenAnimationRect(this);
         mDurationRectangle->setBindToAnimationFrameRange();
@@ -219,9 +219,9 @@ void SingleSound::setFilePath(const QString &path) {
 }
 
 void SingleSound::reloadDataFromFile() {
-    if(mSrcData != NULL) {
+    if(mSrcData != nullptr) {
         free(mSrcData);
-        mSrcData = NULL;
+        mSrcData = nullptr;
         mSrcSampleCount = 0;
     }
     if(!mPath.isEmpty()) {
@@ -249,11 +249,11 @@ int SingleSound::getSampleCount() const {
 void SingleSound::prepareFinalData(const qreal &fps,
                                    const int &minAbsFrame,
                                    const int &maxAbsFrame) {
-    if(mFinalData != NULL) {
+    if(mFinalData != nullptr) {
         free(mFinalData);
     }
-    if(mSrcData == NULL) {
-        mFinalData = NULL;
+    if(mSrcData == nullptr) {
+        mFinalData = nullptr;
         mFinalSampleCount = 0;
     } else {
         mFinalAbsStartFrame =

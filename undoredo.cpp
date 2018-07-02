@@ -12,7 +12,7 @@
 #include "Animators/qstringanimator.h"
 
 void UndoRedoStack::addUndoRedo(UndoRedo *undoRedo) {
-    if(undoRedo == NULL) {
+    if(undoRedo == nullptr) {
         return;
     }
     mMainWindow->setFileChangedSinceSaving(true);
@@ -28,7 +28,7 @@ void UndoRedoStack::addUndoRedo(UndoRedo *undoRedo) {
 //            addUndoRedo(frameChangeUndoRedo);
 //        }
 //        if(currentFrame != mLastUndoRedoFrame) {
-//            bool noSet = mCurrentSet == NULL;
+//            bool noSet = mCurrentSet == nullptr;
 
 //            if(noSet) {
 //                addToSet(undoRedo);

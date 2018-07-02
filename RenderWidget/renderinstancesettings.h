@@ -30,15 +30,15 @@ struct OutputSettings {
     static const QStringList SAMPLE_FORMATS_NAMES;
     static QString getChannelsLayoutNameStatic(const uint64_t &layout);
 
-    AVOutputFormat *outputFormat = NULL;
+    AVOutputFormat *outputFormat = nullptr;
 
     bool videoEnabled = false;
-    AVCodec *videoCodec = NULL;
+    AVCodec *videoCodec = nullptr;
     AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
     int videoBitrate = 0;
 
     bool audioEnabled = false;
-    AVCodec *audioCodec = NULL;
+    AVCodec *audioCodec = nullptr;
     int audioSampleRate = 0;
     int audioBitrate = 0;
     AVSampleFormat audioSampleFormat = AV_SAMPLE_FMT_NONE;
@@ -142,12 +142,12 @@ public:
 
     void copySettingsFromOutputSettingsProfile() {
         OutputSettingsProfile *profileT = mOutputSettingsProfile.data();
-        if(profileT == NULL) return;
+        if(profileT == nullptr) return;
         mOutputSettings = profileT->getSettings();
     }
 
     void setOutputSettingsProfile(OutputSettingsProfile *profile) {
-        if(profile == NULL) {
+        if(profile == nullptr) {
             mOutputSettingsProfile.clear();
         } else {
             mOutputSettingsProfile =
@@ -165,7 +165,7 @@ private:
     int mCurrentRenderFrame = 0;
 
     QWeakPointer<OutputSettingsProfile> mOutputSettingsProfile;
-    RenderInstanceWidget *mParentWidget = NULL;
+    RenderInstanceWidget *mParentWidget = nullptr;
 
     Canvas *mTargetCanvas;
 

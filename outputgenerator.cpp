@@ -8,7 +8,7 @@ OutputGenerator::OutputGenerator()
 static void video_encode_example(const char *filename,
                                  const int &codec_id) {
     AVCodec *codec;
-    AVCodecContext *c= NULL;
+    AVCodecContext *c= nullptr;
     int i, ret, x, y, got_output;
     FILE *f;
     AVFrame *frame;
@@ -45,7 +45,7 @@ static void video_encode_example(const char *filename,
     if (codec_id == AV_CODEC_ID_H264)
         av_opt_set(c->priv_data, "preset", "slow", 0);
     /* open it */
-    if (avcodec_open2(c, codec, NULL) < 0) {
+    if (avcodec_open2(c, codec, nullptr) < 0) {
         fprintf(stderr, "Could not open codec\n");
         exit(1);
     }
@@ -73,7 +73,7 @@ static void video_encode_example(const char *filename,
     /* encode 1 second of video */
     for (i = 0; i < 25; i++) {
         av_init_packet(&pkt);
-        pkt.data = NULL;    // packet data will be allocated by the encoder
+        pkt.data = nullptr;    // packet data will be allocated by the encoder
         pkt.size = 0;
         fflush(stdout);
         /* prepare a dummy image */
@@ -106,7 +106,7 @@ static void video_encode_example(const char *filename,
     /* get the delayed frames */
     for (got_output = 1; got_output; i++) {
         fflush(stdout);
-        ret = avcodec_encode_video2(c, &pkt, NULL, &got_output);
+        ret = avcodec_encode_video2(c, &pkt, nullptr, &got_output);
         if (ret < 0) {
             fprintf(stderr, "Error encoding frame\n");
             exit(1);
@@ -175,7 +175,7 @@ static int select_channel_layout(AVCodec *codec)
 
 static void audio_encode_example(const char *filename) {
     AVCodec *codec;
-    AVCodecContext *c= NULL;
+    AVCodecContext *c= nullptr;
     AVFrame *frame;
     AVPacket pkt;
     int i, j, k, ret, got_output;
@@ -209,7 +209,7 @@ static void audio_encode_example(const char *filename) {
     c->channel_layout = select_channel_layout(codec);
     c->channels       = av_get_channel_layout_nb_channels(c->channel_layout);
     /* open it */
-    if (avcodec_open2(c, codec, NULL) < 0) {
+    if (avcodec_open2(c, codec, nullptr) < 0) {
         fprintf(stderr, "Could not open codec\n");
         exit(1);
     }
@@ -229,7 +229,7 @@ static void audio_encode_example(const char *filename) {
     frame->channel_layout = c->channel_layout;
     /* the codec gives us the frame size, in samples,
      * we calculate the size of the samples buffer in bytes */
-    buffer_size = av_samples_get_buffer_size(NULL, c->channels, c->frame_size,
+    buffer_size = av_samples_get_buffer_size(nullptr, c->channels, c->frame_size,
                                              c->sample_fmt, 0);
     if (buffer_size < 0) {
         fprintf(stderr, "Could not get sample buffer size\n");
@@ -253,7 +253,7 @@ static void audio_encode_example(const char *filename) {
     tincr = 2 * M_PI * 440.0 / c->sample_rate;
     for (i = 0; i < 200; i++) {
         av_init_packet(&pkt);
-        pkt.data = NULL; // packet data will be allocated by the encoder
+        pkt.data = nullptr; // packet data will be allocated by the encoder
         pkt.size = 0;
         for (j = 0; j < c->frame_size; j++) {
             samples[2*j] = (int)(sin(t) * 10000);
@@ -274,7 +274,7 @@ static void audio_encode_example(const char *filename) {
     }
     /* get the delayed frames */
     for (got_output = 1; got_output; i++) {
-        ret = avcodec_encode_audio2(c, &pkt, NULL, &got_output);
+        ret = avcodec_encode_audio2(c, &pkt, nullptr, &got_output);
         if (ret < 0) {
             fprintf(stderr, "Error encoding frame\n");
             exit(1);

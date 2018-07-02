@@ -130,7 +130,7 @@ public:
     }
 
     virtual QMimeData *SWT_createMimeData() {
-        return NULL;
+        return nullptr;
     }
 
     virtual void SWT_clearAll();

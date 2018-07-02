@@ -60,7 +60,7 @@ public:
         Q_UNUSED(relX);
         Q_UNUSED(minViewedFrame);
         Q_UNUSED(pixelsPerFrame);
-        return NULL;
+        return nullptr;
     }
 
     virtual void prp_cancelTransform() {}
@@ -109,7 +109,7 @@ public:
     void prp_callFinishUpdater();
 
     virtual void prp_setParentFrameShift(const int &shift,
-                                         ComplexAnimator *parentAnimator = NULL);
+                                         ComplexAnimator *parentAnimator = nullptr);
     void prp_setBlockedUpdater(AnimatorUpdater *updater);
 
     bool SWT_isProperty() { return true; }
@@ -180,13 +180,13 @@ public:
     }
 
     BoundingBox *getLastSetParentBoundingBoxAncestor() {
-        if(mLastSetParent == NULL) return NULL;
+        if(mLastSetParent == nullptr) return nullptr;
         if(mLastSetParent->SWT_isBoundingBox()) return (BoundingBox*)mLastSetParent;
         return mLastSetParent->getLastSetParentBoundingBoxAncestor();
     }
 protected:
     MainWindow *mMainWindow;
-    Property *mLastSetParent = NULL;
+    Property *mLastSetParent = nullptr;
 public slots:
     void prp_callUpdater();
 
