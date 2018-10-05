@@ -23,7 +23,7 @@ void PathEffectAnimators::addEffect(PathEffect *effect) {
         } else {
             pathBox->addPathEffect(effect);
         }
-    } else if(mParentBox->SWT_isPathBox()) {
+    } else if(mParentBox->SWT_isBoxesGroup()) {
         BoxesGroup *groupBox = (BoxesGroup*)mParentBox;
         if(mIsOutline) {
             groupBox->addOutlinePathEffect(effect);
@@ -45,7 +45,7 @@ void PathEffectAnimators::removeEffect(PathEffect *effect) {
         } else {
             pathBox->removePathEffect(effect);
         }
-    } else if(mParentBox->SWT_isPathBox()) {
+    } else if(mParentBox->SWT_isBoxesGroup()) {
         BoxesGroup *groupBox = (BoxesGroup*)mParentBox;
         if(mIsOutline) {
             groupBox->removeOutlinePathEffect(effect);

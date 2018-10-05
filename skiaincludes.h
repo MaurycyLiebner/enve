@@ -31,4 +31,6 @@
 
 #define foreach Q_FOREACH
 
+extern sk_sp<SkImage> makeSkImageCopy(const sk_sp<SkImage>& img);
+
 #endif // SKIAINCLUDES_H

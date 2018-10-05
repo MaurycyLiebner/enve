@@ -17,7 +17,8 @@ enum PathEffectType : short {
     DUPLICATE_PATH_EFFECT,
     SOLIDIFY_PATH_EFFECT,
     SUM_PATH_EFFECT,
-    GROUP_SUM_PATH_EFFECT
+    GROUP_SUM_PATH_EFFECT,
+    LENGTH_PATH_EFFECT
 };
 class PathEffect;
 typedef QSharedPointer<BoolPropertyContainer> BoolPropertyContainerQSPtr;
@@ -187,6 +188,27 @@ private:
     IntAnimatorQSPtr mSeed;
     BoolPropertyQSPtr mRepeat;
     uint32_t mSeedAssist = 0;
+};
+
+class LengthPathEffect : public PathEffect {
+    Q_OBJECT
+public:
+    LengthPathEffect(const bool &outlinePathEffect);
+
+    void filterPathForRelFrame(const int &relFrame,
+                               const SkPath &src,
+                               SkPath *dst,
+                               const qreal &scale = 1.,
+                               const bool & = false);
+    void filterPathForRelFrameF(const qreal &relFrame,
+                                const SkPath &src,
+                                SkPath *dst,
+                                const bool &);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
+private:
+    QrealAnimatorQSPtr mLength;
+    BoolPropertyQSPtr mReverse;
 };
 
 class DuplicatePathEffect : public PathEffect {

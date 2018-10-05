@@ -58,6 +58,7 @@ int CacheHandler::getRenderContainterInsertIdAtRelFrame(
         int guess = (minId + maxId)/2;
         CacheContainer *cont = mRenderContainers.at(guess).get();
         int contFrame = cont->getMinRelFrame();
+        Q_ASSERT(contFrame != relFrame);
         if(contFrame > relFrame) {
             if(guess == maxId) {
                 return minId;
@@ -94,7 +95,7 @@ int CacheHandler::getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
         } else if(!cont->storesDataInMemory()) {
             break;
         }
-        currFrame = cont->getMaxRelFrame();
+        currFrame = cont->getMaxRelFrame() + 1;
     }
     if(contP != nullptr) {
         *contP = cont;
@@ -110,7 +111,7 @@ int CacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) {
         if(cont == nullptr) {
             return currFrame;
         }
-        currFrame = cont->getMaxRelFrame();
+        currFrame = cont->getMaxRelFrame() + 1;
     }
     return currFrame;
 }
@@ -123,7 +124,7 @@ int CacheHandler::getFirstEmptyFrameAtOrAfterFrame(const int &frame) {
         if(cont == nullptr) {
             return currFrame;
         }
-        currFrame = cont->getMaxRelFrame();
+        currFrame = cont->getMaxRelFrame() + 1;
     }
     return currFrame;
 }
@@ -262,18 +263,18 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     int lastDrawX = 0;
     bool lastStoresInMemory = true;
     Q_FOREACH(const std::shared_ptr<CacheContainer> &cont, mRenderContainers) {
-        int maxFrame = cont->getMaxRelFrame();
-        if(maxFrame < startFrame) continue;
+        int afterMaxFrame = cont->getMaxRelFrame() + 1;
+        if(afterMaxFrame < startFrame) continue;
         int minFrame = cont->getMinRelFrame();
         if(minFrame > endFrame + 1) return;
 
-        if(maxFrame > endFrame) maxFrame = endFrame + 1;
+        if(afterMaxFrame > endFrame) afterMaxFrame = endFrame + 1;
         if(minFrame < startFrame) minFrame = startFrame;
 
         int dFrame = minFrame - startFrame;
         int xT = dFrame*pixelsPerFrame;
 
-        int widthT = pixelsPerFrame*(maxFrame - minFrame);
+        int widthT = pixelsPerFrame*(afterMaxFrame - minFrame);
         if(lastDrawnFrame == minFrame) {
             widthT += xT - lastDrawX;
             xT = lastDrawX;
@@ -289,7 +290,7 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
         }
 
         p->drawRect(xT, drawY, widthT, MIN_WIDGET_HEIGHT);
-        lastDrawnFrame = maxFrame;
+        lastDrawnFrame = afterMaxFrame;
         lastDrawX = xT + widthT;
     }
 }

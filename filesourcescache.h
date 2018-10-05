@@ -79,10 +79,7 @@ public:
     }
     sk_sp<SkImage> getImage() { return mImage; }
     sk_sp<SkImage> getImageCopy() {
-        if(mImage.get() == nullptr) return sk_sp<SkImage>();
-        SkPixmap pix;
-        mImage->peekPixels(&pix);
-        return SkImage::MakeRasterCopy(pix);
+        return makeSkImageCopy(mImage);
     }
 private:
     sk_sp<SkImage> mUpdateImage;
@@ -96,12 +93,15 @@ public:
     AnimationCacheHandler() :
         FileCacheHandler("") {}
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
+    virtual sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame) = 0;
     sk_sp<SkImage> getFrameCopyAtFrame(const int &relFrame) {
         sk_sp<SkImage> imageToCopy = getFrameAtFrame(relFrame);
-        if(imageToCopy.get() == nullptr) return sk_sp<SkImage>();
-        SkPixmap pix;
-        imageToCopy->peekPixels(&pix);
-        return SkImage::MakeRasterCopy(pix);
+        return makeSkImageCopy(imageToCopy);
+    }
+
+    sk_sp<SkImage> getFrameCopyAtOrBeforeFrame(const int &relFrame) {
+        sk_sp<SkImage> imageToCopy = getFrameAtOrBeforeFrame(relFrame);
+        return makeSkImageCopy(imageToCopy);
     }
 
     virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame) = 0;
@@ -116,6 +116,7 @@ public:
     ImageSequenceCacheHandler(const QStringList &framePaths);
 
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
+    sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
 
     void updateFrameCount();
 
@@ -134,6 +135,7 @@ public:
     VideoCacheHandler(const QString &filePath);
 
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
+    sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
 
     void beforeUpdate();
 

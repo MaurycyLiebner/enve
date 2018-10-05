@@ -72,6 +72,7 @@ ImageMagick Studio.
 
 #include "fmt_filters.h"
 #include "Colors/helpers.h"
+#include <QColor>
 
 #include <cmath>
 #include "cstring"
@@ -197,6 +198,7 @@ void replaceColor(const image &im,
     int dataH = im.h;
     qreal *imMap = new qreal[dataW * dataH];
 
+    QColor colT(redR, greenR, blueR, alphaR);
     for(s32 y = 0; y < im.h; ++y) {
         bits = im.data + im.rw * y * sizeof(rgba);
 
@@ -205,10 +207,15 @@ void replaceColor(const image &im,
             int u8bT = (u8)*(bits);
             int u8gT = (u8)*(bits + 1);
             int u8rT = (u8)*(bits + 2);
+//            int avgDT = (qAbs(u8aT - alphaR) +
+//                         qAbs(u8bT - blueR) +
+//                         qAbs(u8gT - greenR) +
+//                         qAbs(u8rT - redR))/4;
+            QColor col(u8rT, u8gT, u8bT, u8aT);
             int avgDT = (qAbs(u8aT - alphaR) +
-                         qAbs(u8bT - blueR) +
-                         qAbs(u8gT - greenR) +
-                         qAbs(u8rT - redR))/4;
+                         qAbs(col.valueF() - colT.valueF())*255 +
+                         qAbs(col.hueF() - colT.hueF())*255 +
+                         qAbs(col.saturationF() - colT.saturationF())*2*255)/5;
             if(avgDT < tolerance) {
                 imMap[y * dataW + x] = 1.;
             } else {
@@ -218,6 +225,27 @@ void replaceColor(const image &im,
             bits += 4;
         }
     }
+//    for(s32 y = 0; y < im.h; ++y) {
+//        bits = im.data + im.rw * y * sizeof(rgba);
+
+//        for(s32 x = 0; x < im.w; x++) {
+//            int u8aT = (u8)*(bits + 3);
+//            int u8bT = (u8)*(bits);
+//            int u8gT = (u8)*(bits + 1);
+//            int u8rT = (u8)*(bits + 2);
+//            int avgDT = (qAbs(u8aT - alphaR) +
+//                         qAbs(u8bT - blueR) +
+//                         qAbs(u8gT - greenR) +
+//                         qAbs(u8rT - redR))/4;
+//            if(avgDT < tolerance) {
+//                imMap[y * dataW + x] = 1.;
+//            } else {
+//                imMap[y * dataW + x] = 0.;
+//            }
+
+//            bits += 4;
+//        }
+//    }
 
     qspredMono(imMap, dataW, dataH, smooth*10.);
     for(s32 y = 0; y < im.h; ++y) {
@@ -2409,7 +2437,7 @@ void edge(image &im, qreal radius)
 
     qreal *kernel;
     int width;
-    register long i;
+    long i;
     rgba *dest = 0;
 
     width = getOptimalKernelWidth(radius, 0.5);
@@ -2453,7 +2481,7 @@ void emboss(image &im, qreal radius, qreal sigma)
 
     qreal alpha, *kernel;
     int j, width;
-    register long i, u, v;
+    long i, u, v;
     rgba *dest = 0;
 
     if(sigma == 0.0)
@@ -2515,7 +2543,7 @@ void sharpen(image &im, qreal radius, qreal sigma)
 
     qreal alpha, normalize, *kernel;
     int width;
-    register long i, u, v;
+    long i, u, v;
     rgba *dest = 0;
 
     if(sigma == 0.0)
@@ -2694,8 +2722,8 @@ static bool convolveImage(image *image, rgba **dest, const unsigned int order,
     qreal red, green, blue;
     u8 alpha;
     qreal normalize, *normal_kernel;
-    register const qreal *k;
-    register rgba *q;
+    const qreal *k;
+    rgba *q;
     int x, y, mx, my, sx, sy;
     long i;
     int mcx, mcy;
@@ -3040,7 +3068,7 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
         }
     case PoissonNoise:
         {
-            register s32
+            s32
                 i;
 
             for (i=0; alpha > exp(-SigmaPoisson*pixel); i++)
@@ -3082,10 +3110,10 @@ static inline void scaleDown(T &val, T min, T max)
 
 static void blurScanLine(qreal *kernel, s32 width,
                          rgba *src, rgba *dest, s32 columns) {
-    register qreal *p;
+    qreal *p;
     rgba *q;
-    register s32 x;
-    register long i;
+    s32 x;
+    long i;
     qreal red, green, blue, alpha;
     qreal scale = 0.0;
 
@@ -3246,7 +3274,7 @@ static s32 getBlurKernel(s32 width, qreal sigma, qreal **kernel)
 #define KernelRankQ 18.0
 
     qreal alpha, normalize;
-    register long i;
+    long i;
     s32 bias;
 
     if(sigma == 0.0)
@@ -3634,7 +3662,7 @@ static int getOptimalKernelWidth(qreal radius, qreal sigma)
 {
     qreal normalize, value;
     long width;
-    register long u;
+    long u;
 
     if(sigma == 0.0)
         sigma = 0.01;

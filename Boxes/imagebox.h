@@ -21,7 +21,7 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
         }
         BoundingBoxRenderData::beforeUpdate();
         if(image.get() == nullptr) {
-            qDebug() << "hell?";
+            qDebug() << "ImageBoxRenderData::beforeUpdate() - no image to render";
         }
     }
 
@@ -42,7 +42,7 @@ private:
         paint.setFilterQuality(kHigh_SkFilterQuality);
         paint.setAntiAlias(true);
         if(image == nullptr) {
-            qDebug() << "no image to draw";
+            qDebug() << "ImageBoxRenderData::drawSk() - no image to draw";
         }
         canvas->drawImage(image, 0, 0, &paint);
     }

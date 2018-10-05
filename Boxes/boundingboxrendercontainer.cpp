@@ -162,12 +162,12 @@ const int &CacheContainer::getMaxRelFrame() const {
 }
 
 bool CacheContainer::relFrameInRange(const int &relFrame) {
-    return relFrame >= mMinRelFrame && relFrame < mMaxRelFrame;
+    return relFrame >= mMinRelFrame && relFrame <= mMaxRelFrame; // !!! max inclusive?
 }
 
 void CacheContainer::setRelFrame(const int &frame) {
     mMinRelFrame = frame;
-    mMaxRelFrame = frame + 1;
+    mMaxRelFrame = frame;
 }
 
 void CacheContainer::setMaxRelFrame(const int &maxFrame) {
@@ -267,6 +267,7 @@ CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
 }
 
 void CacheContainerTmpFileDataSaver::_processUpdate() {
+    mSavingFailed = true; return; // NO TMP FILES !!!
     SkPixmap pix;
     mImage->peekPixels(&pix);
     mTmpFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile());
@@ -278,6 +279,8 @@ void CacheContainerTmpFileDataSaver::_processUpdate() {
         mTmpFile->write((char*)pix.writable_addr(),
                         width*height*4*sizeof(uchar));
         mTmpFile->close();
+    } else {
+        mSavingFailed = true;
     }
 }
 

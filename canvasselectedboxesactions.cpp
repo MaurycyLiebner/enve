@@ -235,6 +235,14 @@ void Canvas::applyDuplicatePathEffectToSelected() {
     }
 }
 
+void Canvas::applyLengthPathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
+            box->addPathEffect(new LengthPathEffect(false));
+        }
+    }
+}
+
 void Canvas::applySolidifyPathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {

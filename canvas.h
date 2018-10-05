@@ -451,6 +451,7 @@ public:
     QPointF mapCanvasAbsToRel(const QPointF &pos);
     void applyDiscretePathEffectToSelected();
     void applyDuplicatePathEffectToSelected();
+    void applyLengthPathEffectToSelected();
     void applySolidifyPathEffectToSelected();
     void applyDiscreteOutlinePathEffectToSelected();
     void applyDuplicateOutlinePathEffectToSelected();
@@ -525,32 +526,7 @@ public:
         return mPathEffectsVisible;
     }
 
-    void prp_setAbsFrame(const int &frame) {
-        int lastRelFrame = anim_mCurrentRelFrame;
-        ComplexAnimator::prp_setAbsFrame(frame);
-        CacheContainer *cont =
-                mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
-        if(cont == nullptr) {
-            bool difference = prp_differencesBetweenRelFrames(lastRelFrame,
-                                                              anim_mCurrentRelFrame);
-            mCurrentPreviewContainerOutdated = difference;
-            if(difference) {
-                scheduleUpdate();
-            } else {
-                setCurrentPreviewContainer(mCurrentPreviewContainer);
-            }
-        } else {
-            if(cont->storesDataInMemory()) { // !!!
-                setCurrentPreviewContainer(cont);
-            } else {// !!!
-                setLoadingPreviewContainer(cont);
-            }// !!!
-        }
-
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
-            box->prp_setAbsFrame(frame);
-        }
-    }
+    void prp_setAbsFrame(const int &frame);
 
     void moveDurationRectForAllSelected(const int &dFrame);
     void startDurationRectPosTransformForAllSelected();

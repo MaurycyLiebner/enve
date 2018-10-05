@@ -160,6 +160,6 @@ BoundingBoxRenderData *AnimationBox::createRenderData() {
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameCopyAtFrame(
+    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameCopyAtOrBeforeFrame(
                 animationFrame);
 }

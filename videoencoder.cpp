@@ -666,7 +666,9 @@ void VideoEncoder::interrupEncoding() {
     mEmitter.encodingInterrupted();
 }
 
-void VideoEncoder::finishEncoding() {
+void VideoEncoder::finishEncodingSuccess() {
+    mRenderInstanceSettings->setCurrentState(
+                RenderInstanceSettings::FINISHED);
     mEncodingSuccesfull = true;
     finishEncodingNow();
     mEmitter.encodingFinished();
@@ -726,14 +728,21 @@ void VideoEncoder::_processUpdate() {
                                     mAudioStream.enc->time_base) <= 0;
         }
         if(mEncodeVideo && encodeVideoT && avAligned) {
+            std::shared_ptr<CacheContainer> cacheCont =
+                    _mContainers.at(_mCurrentContainerId);
+            int nFrames = cacheCont->getMaxRelFrame() - cacheCont->getMinRelFrame() + 1;
             if(!write_video_frame(mFormatContext, &mVideoStream,
-                                  _mContainers.at(_mCurrentContainerId)->getImageSk(),
+                                  cacheCont->getImageSk(),
                                   &mEncodeVideo, mUpdateError) ) {
                 mUpdateFailed = true;
                 return;
             }
-            _mCurrentContainerId++;
-            encodeVideoT = _mCurrentContainerId < _mContainers.count();
+            _mCurrentContainerFrame++;
+            if(_mCurrentContainerFrame >= nFrames) {
+                _mCurrentContainerId++;
+                _mCurrentContainerFrame = 0;
+                encodeVideoT = _mCurrentContainerId < _mContainers.count();
+            }
         } else if(mEncodeAudio) {
             if(process_audio_stream(mFormatContext, &mAudioStream,
                                     &mEncodeAudio, mUpdateError)) {
@@ -747,6 +756,7 @@ void VideoEncoder::_processUpdate() {
 void VideoEncoder::beforeUpdate() {
     _ScheduledExecutor::beforeUpdate();
     _mCurrentContainerId = 0;
+    _mCurrentContainerFrame = 0;
     _mContainers.append(mNextContainers);
     mNextContainers.clear();
     if(!mCurrentlyEncoding) {
@@ -786,9 +796,7 @@ void VideoEncoder::afterUpdate() {
             mUpdateFailed = false;
             mEmitter.encodingFailed();
         } else {
-            mRenderInstanceSettings->setCurrentState(
-                        RenderInstanceSettings::FINISHED);
-            finishEncoding();
+            finishEncodingSuccess();
         }
     }
     _ScheduledExecutor::afterUpdate();

@@ -90,6 +90,46 @@ SkPath QPainterPathToSkPath(const QPainterPath &qPath) {
     return path;
 }
 
+QPainterPath SkPathToQPainterPath(const SkPath& path) {
+    QPainterPath qPath;
+    SkPath::RawIter iter = SkPath::RawIter(path);
+
+    SkPoint pts[4];
+    for(;;) {
+        switch(iter.next(pts)) {
+            case SkPath::kMove_Verb: {
+                SkPoint pt = pts[0];
+                qPath.moveTo(SkPointToQPointF(pt));
+            }
+                break;
+            case SkPath::kLine_Verb: {
+                SkPoint pt = pts[1];
+
+                qPath.lineTo(SkPointToQPointF(pt));
+            }
+                break;
+            case SkPath::kCubic_Verb: {
+                SkPoint endPt = pts[1];
+                SkPoint startPt = pts[2];
+                SkPoint targetPt = pts[3];
+                qPath.cubicTo(SkPointToQPointF(endPt),
+                              SkPointToQPointF(startPt),
+                              SkPointToQPointF(targetPt));
+            }
+                break;
+            case SkPath::kClose_Verb:
+                qPath.closeSubpath();
+                break;
+            case SkPath::kQuad_Verb:
+            case SkPath::kConic_Verb:
+            case SkPath::kDone_Verb:
+                return qPath;
+                break;
+        }
+    }
+    return qPath;
+}
+
 //SkScalar SkLine::angleTo(const SkLine &l) const {
 //    if(isNull() || l.isNull()) return 0.f;
 //    const SkScalar a1 = angle();

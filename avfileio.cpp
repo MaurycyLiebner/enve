@@ -106,7 +106,9 @@ void BoolPropertyContainer::writeProperty(QIODevice *target) {
 
 void BoolPropertyContainer::readProperty(QIODevice *target) {
     ComplexAnimator::readProperty(target);
-    target->read((char*)&mValue, sizeof(bool));
+    bool value;
+    target->read((char*)&value, sizeof(bool));
+    setValue(value);
 }
 
 
@@ -752,6 +754,12 @@ void DisplacePathEffect::writeProperty(QIODevice *target) {
     mSegLength->writeProperty(target);
     mMaxDev->writeProperty(target);
     mSmoothness->writeProperty(target);
+    mRandomize->writeProperty(target);
+    mRandomizeStep->writeProperty(target);
+    mSmoothTransform->writeProperty(target);
+    mEasing->writeProperty(target);
+    mSeed->writeProperty(target);
+    mRepeat->writeProperty(target);
 }
 
 void DisplacePathEffect::readProperty(QIODevice *target) {
@@ -759,6 +767,12 @@ void DisplacePathEffect::readProperty(QIODevice *target) {
     mSegLength->readProperty(target);
     mMaxDev->readProperty(target);
     mSmoothness->readProperty(target);
+    mRandomize->readProperty(target);
+    mRandomizeStep->readProperty(target);
+    mSmoothTransform->readProperty(target);
+    mEasing->readProperty(target);
+    mSeed->readProperty(target);
+    mRepeat->readProperty(target);
 }
 
 void DuplicatePathEffect::writeProperty(QIODevice *target) {
@@ -769,6 +783,18 @@ void DuplicatePathEffect::writeProperty(QIODevice *target) {
 void DuplicatePathEffect::readProperty(QIODevice *target) {
     PathEffect::readProperty(target);
     mTranslation->readProperty(target);
+}
+
+void LengthPathEffect::writeProperty(QIODevice *target) {
+    PathEffect::writeProperty(target);
+    mLength->writeProperty(target);
+    mReverse->writeProperty(target);
+}
+
+void LengthPathEffect::readProperty(QIODevice *target) {
+    PathEffect::readProperty(target);
+    mLength->readProperty(target);
+    mReverse->readProperty(target);
 }
 
 void SolidifyPathEffect::writeProperty(QIODevice *target) {
@@ -851,6 +877,11 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
                                                mIsOutline);
         sumEffect->readProperty(target);
         addEffect(sumEffect);
+    } else if(typeT == LENGTH_PATH_EFFECT) {
+        LengthPathEffect *lenEffect =
+                new LengthPathEffect(mIsOutline);
+        lenEffect->readProperty(target);
+        addEffect(lenEffect);
     }
 }
 

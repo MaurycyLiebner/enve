@@ -169,6 +169,15 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     return cont->getImageSk();
 }
 
+sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int& relFrame) {
+    CacheContainer *cont =
+            mFramesCache.getRenderContainerAtOrBeforeRelFrame(
+                relFrame);
+    if(cont == nullptr) return sk_sp<SkImage>();
+    //cont->neededInMemory();
+    return cont->getImageSk();
+}
+
 void VideoCacheHandler::beforeUpdate() {
     FileCacheHandler::beforeUpdate();
     //qDebug() << "loading: " << mFramesLoadScheduled;
@@ -497,6 +506,16 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
 sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int &relFrame) {
     ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame).get();
     if(cacheHandler == nullptr) return sk_sp<SkImage>();
+    return cacheHandler->getImage();
+}
+
+sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtOrBeforeFrame(
+        const int &relFrame) {
+    if(mFrameImageHandlers.isEmpty()) return sk_sp<SkImage>();
+    if(relFrame >= mFrameImageHandlers.count()) {
+        return mFrameImageHandlers.last()->getImage();
+    }
+    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame).get();
     return cacheHandler->getImage();
 }
 

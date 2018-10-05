@@ -1016,8 +1016,14 @@ void CanvasWindow::nextSaveOutputFrame() {
         }
         VideoEncoder::finishEncodingStatic();
     } else {
+        int lastIdentical;
+        int firstIdentical;
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
-        mCurrentRenderFrame++;
+        mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(&firstIdentical, &lastIdentical,
+                                                             mCurrentRenderFrame);
+        if(lastIdentical > mMaxRenderFrame) lastIdentical = mMaxRenderFrame;
+        mCurrentRenderFrame = lastIdentical + 1;
+        //mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
         if(mNoBoxesAwaitUpdate) {
             // mCurrentCanvas->setCurrentPreviewContainer(); !!!

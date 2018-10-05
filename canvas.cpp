@@ -389,6 +389,12 @@ void Canvas::setOutputRendering(const bool &bT) {
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
                                         const bool &frameEncoded) {
     if(mRenderingOutput && !frameEncoded) {
+        int firstIdentical;
+        int lastIdentical;
+        prp_getFirstAndLastIdenticalRelFrame(&firstIdentical, &lastIdentical,
+                                             cont->getMinRelFrame());
+        if(lastIdentical > mMaxFrame) lastIdentical = mMaxFrame;
+        cont->setMaxRelFrame(lastIdentical);
         VideoEncoder::addCacheContainerToEncoderStatic(cont);
         return;
     }
@@ -812,9 +818,34 @@ void Canvas::invertSelectionAction() {
     }
 }
 
+void Canvas::prp_setAbsFrame(const int &frame) {
+    int lastRelFrame = anim_mCurrentRelFrame;
+    ComplexAnimator::prp_setAbsFrame(frame);
+    CacheContainer *cont =
+            mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
+    if(cont == nullptr) {
+        bool difference = prp_differencesBetweenRelFrames(lastRelFrame,
+                                                          anim_mCurrentRelFrame);
+        mCurrentPreviewContainerOutdated = difference;
+        if(difference) {
+            scheduleUpdate();
+        }
+    } else {
+        if(cont->storesDataInMemory()) { // !!!
+            setCurrentPreviewContainer(cont);
+        } else {// !!!
+            setLoadingPreviewContainer(cont);
+        }// !!!
+    }
+
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+        box->prp_setAbsFrame(frame);
+    }
+}
+
 void Canvas::clearSelectionAction() {
     if(mCurrentMode == MOVE_POINT) {
-        clearPointsSelection(); 
+        clearPointsSelection();
     } else {//if(mCurrentMode == MOVE_PATH) {
         clearBonesSelection();
         clearPointsSelection();
@@ -830,7 +861,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         if(handleKeyPressEventWhileMouseGrabbing(event)) return true;
     }
     if(event->modifiers() & Qt::ControlModifier &&
-       event->key() == Qt::Key_V) {
+            event->key() == Qt::Key_V) {
         if(event->isAutoRepeat()) return false;
         pasteAction();
     } else if(event->modifiers() & Qt::ControlModifier &&

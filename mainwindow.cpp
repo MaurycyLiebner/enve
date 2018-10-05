@@ -1206,7 +1206,7 @@ void MainWindow::openFile() {
     if(askForSaving()) {
         disable();
         QString openPath = QFileDialog::getOpenFileName(this,
-            "Open File", "", "AniVect Files (*.av)");
+            "Open File", mCurrentFilePath, "AniVect Files (*.av)");
         if(!openPath.isEmpty()) {
             clearAll();
             setCurrentPath(openPath);
@@ -1229,7 +1229,7 @@ void MainWindow::saveFile() {
 void MainWindow::saveFileAs() {
     disableEventFilter();
     QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
-                               "untitled.av",
+                               mCurrentFilePath,
                                "AniVect Files (*.av)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {

@@ -1,4 +1,4 @@
-#include "canvas.h"
+﻿#include "canvas.h"
 #include <QMouseEvent>
 #include <QMenu>
 #include "pathpivot.h"
@@ -134,6 +134,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                     "canvas_path_effects_discrete");
         pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                     "canvas_path_effects_duplicate");
+        pathEffectsMenu->addAction("Length Effect")->setObjectName(
+                    "canvas_path_effects_length");
         pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
                     "canvas_path_effects_solidify");
         pathEffectsMenu->addAction("Operation Effect")->setObjectName(
@@ -229,6 +231,8 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDiscretePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
         applyDuplicatePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_path_effects_length") {
+        applyLengthPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_solidify") {
         applySolidifyPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effect_sum") {
@@ -359,6 +363,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                         "canvas_path_effects_duplicate");
             pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
                         "canvas_path_effects_solidify");
+            pathEffectsMenu->addAction("Length Effect")->setObjectName(
+                        "canvas_path_effects_length");
 
             QMenu *fillPathEffectsMenu = menu.addMenu("Fill Effects");
             fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
@@ -405,6 +411,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     addPathEffect(new DisplacePathEffect(false));
                 } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
                     addPathEffect(new DuplicatePathEffect(false));
+                } else if(selectedAction->objectName() == "canvas_path_effects_length") {
+                    addPathEffect(new LengthPathEffect(false));
                 } else if(selectedAction->objectName() == "canvas_path_effects_solidify") {
                     addPathEffect(new SolidifyPathEffect(false));
                 } else if(selectedAction->objectName() == "canvas_fill_effects_discrete") {

@@ -193,14 +193,19 @@ void BoxesGroup::removeOutlinePathEffect(PathEffect *effect) {
 void BoxesGroup::filterPathForRelFrame(const int &relFrame,
                                        SkPath *srcDstPath,
                                        BoundingBox *box) {
+    if(mParentGroup != nullptr) {
+        int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
+                    prp_relFrameToAbsFrame(relFrame));
+        mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
+    }
     mPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath,
                                                  qAbs(box->getCombinedTransform().m11()),
                                                  box == this);
 
-    if(mParentGroup == nullptr) return;
-    int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
-                prp_relFrameToAbsFrame(relFrame));
-    mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
+//    if(mParentGroup == nullptr) return;
+//    int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
+//                prp_relFrameToAbsFrame(relFrame));
+//    mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
 }
 
 void BoxesGroup::filterPathForRelFrameUntilGroupSum(const int &relFrame,
@@ -232,13 +237,18 @@ void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
 void BoxesGroup::filterPathForRelFrameF(const qreal &relFrame,
                                        SkPath *srcDstPath,
                                        BoundingBox *box) {
+    if(mParentGroup != nullptr) {
+        qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
+                    prp_relFrameToAbsFrameF(relFrame));
+        mParentGroup->filterPathForRelFrameF(parentRelFrame, srcDstPath, box);
+    }
     mPathEffectsAnimators->filterPathForRelFrameF(relFrame, srcDstPath,
                                                  box == this);
 
-    if(mParentGroup == nullptr) return;
-    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-                prp_relFrameToAbsFrameF(relFrame));
-    mParentGroup->filterPathForRelFrameF(parentRelFrame, srcDstPath, box);
+//    if(mParentGroup == nullptr) return;
+//    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
+//                prp_relFrameToAbsFrameF(relFrame));
+//    mParentGroup->filterPathForRelFrameF(parentRelFrame, srcDstPath, box);
 }
 
 void BoxesGroup::filterPathForRelFrameUntilGroupSumF(const qreal &relFrame,

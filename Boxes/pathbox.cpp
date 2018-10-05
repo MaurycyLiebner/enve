@@ -121,11 +121,14 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     pathData->editPath = getPathAtRelFrame(relFrame);
     pathData->path = pathData->editPath;
     if(getParentCanvas()->getPathEffectsVisible()) {
-        mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+        // !!! reversed
+        //mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
         int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                     prp_relFrameToAbsFrame(relFrame));
         mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->path,
                                             data->parentBox.data());
+        // !!! reversed
+        mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
     }
 
     SkPath outline;
@@ -190,11 +193,14 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     pathData->editPath = getPathAtRelFrameF(relFrame);
     pathData->path = pathData->editPath;
     if(getParentCanvas()->getPathEffectsVisible()) {
-        mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
+        // !!! reversed
+        //mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
         qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                     prp_relFrameToAbsFrameF(relFrame));
         mParentGroup->filterPathForRelFrameF(parentRelFrame, &pathData->path,
                                             data->parentBox.data());
+        // !!! reversed
+        mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
     }
 
     SkPath outline;

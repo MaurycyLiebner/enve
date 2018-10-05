@@ -66,7 +66,7 @@ public:
 
     void finishCurrentEncoding() {
         if(!mBeingProcessed && !mSchedulerAdded && !mAwaitingUpdate) {
-            finishEncoding();
+            finishEncodingSuccess();
         } else {
             mEncodingFinished = true;
         }
@@ -99,7 +99,7 @@ protected:
     void clearContainers();
     VideoEncoderEmitter mEmitter;
     void interrupEncoding();
-    void finishEncoding();
+    void finishEncodingSuccess();
     void finishEncodingNow();
     void startEncoding(RenderInstanceSettings *settings);
     bool startEncodingNow(QString &error);
@@ -127,6 +127,8 @@ protected:
     QString mUpdateError;
     bool mUpdateFailed = false;
     int _mCurrentContainerId = 0;
+    int _mCurrentContainerFrame = 0; // some containers will add multiple frames
+
     QList<std::shared_ptr<CacheContainer> > _mContainers;
 };
 

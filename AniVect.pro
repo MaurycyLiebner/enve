@@ -209,7 +209,8 @@ SOURCES += main.cpp\
     durationrectsettingsdialog.cpp \
     twocolumnlayout.cpp \
     Paint/BrushSettings/brushselectionwidget.cpp \
-    Paint/BrushSettings/brushselectionscrollarea.cpp
+    Paint/BrushSettings/brushselectionscrollarea.cpp \
+    skiaincludes.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
