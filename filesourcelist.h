@@ -1,7 +1,7 @@
 #ifndef FILESOURCELIST_H
 #define FILESOURCELIST_H
-#include <QWidget>
 #include "filesourcescache.h"
+#include <QWidget>
 #include "BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h"
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "BoxesList/OptimalScrollArea/minimalscrollwidget.h"

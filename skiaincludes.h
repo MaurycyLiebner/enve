@@ -1,9 +1,9 @@
 #ifndef SKIAINCLUDES_H
 #define SKIAINCLUDES_H
 
-#undef foreach
-
 #include "skiadefines.h"
+
+#undef foreach
 
 #include "GrBackendSurface.h"
 #include "GrContext.h"
@@ -30,7 +30,5 @@
 #include "AddInclude/SkStroke.h"
 
 #define foreach Q_FOREACH
-
-extern sk_sp<SkImage> makeSkImageCopy(const sk_sp<SkImage>& img);
 
 #endif // SKIAINCLUDES_H

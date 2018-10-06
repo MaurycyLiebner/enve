@@ -17,11 +17,15 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     mTopLeftPoint->prp_setName("top left");
     mBottomRightPoint->prp_setName("bottom right");
 
+    ca_addChildAnimator(mTopLeftPoint);
+    ca_addChildAnimator(mBottomRightPoint);
+
     ca_prependChildAnimator(mTopLeftPoint, mEffectsAnimators.data());
     ca_prependChildAnimator(mBottomRightPoint, mEffectsAnimators.data());
 
     mRadiusPoint = new QPointFAnimator();
     mRadiusPoint->prp_setName("round radius");
+    ca_addChildAnimator(mRadiusPoint);
     ca_prependChildAnimator(mRadiusPoint, mEffectsAnimators.data());
     mRadiusPoint->setValuesRange(0., 9999.);
 

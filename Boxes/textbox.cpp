@@ -6,8 +6,8 @@
 #include "Animators/qstringanimator.h"
 #include "Animators/animatorupdater.h"
 
-TextBox::TextBox() :
-    PathBox(TYPE_TEXT) {
+TextBox::TextBox() : PathBox(TYPE_TEXT) {
+    mPivotAutoAdjust = false;
     setName("text");
 
     mFillSettings->setCurrentColor(Color(0, 0, 0));
@@ -15,6 +15,7 @@ TextBox::TextBox() :
 
     mText = (new QStringAnimator())->ref<QStringAnimator>();
     mText->prp_setName("text");
+    ca_addChildAnimator(mText.data());
     ca_prependChildAnimator(mText.data(), mEffectsAnimators.data());
     mText->prp_setUpdater(new NodePointUpdater(this));
 }
@@ -121,8 +122,8 @@ SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
         yT += fm.height();
     }
 
-    QRectF boundingRect = qPath.boundingRect();
-    qPath.translate(-boundingRect.center());
+    //QRectF boundingRect = qPath.boundingRect();
+    //qPath.translate(-boundingRect.center());
 
     return QPainterPathToSkPath(qPath);
 }

@@ -267,7 +267,7 @@ CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
 }
 
 void CacheContainerTmpFileDataSaver::_processUpdate() {
-    mSavingFailed = true; return; // NO TMP FILES !!!
+    // mSavingFailed = true; return; // NO TMP FILES !!!
     SkPixmap pix;
     mImage->peekPixels(&pix);
     mTmpFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile());

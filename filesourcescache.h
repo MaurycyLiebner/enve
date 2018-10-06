@@ -1,9 +1,9 @@
 #ifndef FILESOURCESCACHE_H
 #define FILESOURCESCACHE_H
+#include "skimagecopy.h"
 #include <unordered_map>
 #include <QString>
 #include <QList>
-#include "skiaincludes.h"
 #include "Boxes/rendercachehandler.h"
 #include "updatable.h"
 class BoundingBox;

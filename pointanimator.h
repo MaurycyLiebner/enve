@@ -20,7 +20,7 @@ class PointAnimator :
 public:
     PointAnimator(BasicTransformAnimator *parent,
                  const MovablePointType &type,
-                 const qreal &radius = 7.5);
+                 const qreal &radius = 5.);
 
     ~PointAnimator() {}
 

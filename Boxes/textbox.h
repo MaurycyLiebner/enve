@@ -5,8 +5,7 @@
 class QStringAnimator;
 typedef QSharedPointer<QStringAnimator> QStringAnimatorQSPtr;
 
-class TextBox : public PathBox
-{
+class TextBox : public PathBox {
 public:
     TextBox();
 

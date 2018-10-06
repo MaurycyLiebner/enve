@@ -210,7 +210,7 @@ SOURCES += main.cpp\
     twocolumnlayout.cpp \
     Paint/BrushSettings/brushselectionwidget.cpp \
     Paint/BrushSettings/brushselectionscrollarea.cpp \
-    skiaincludes.cpp
+    skimagecopy.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -380,7 +380,8 @@ HEADERS  += mainwindow.h \
     twocolumnlayout.h \
     Paint/BrushSettings/brushselectionwidget.h \
     Paint/BrushSettings/brushselectionscrollarea.h \
-    AddInclude/SkPointPriv.h
+    AddInclude/SkPointPriv.h \
+    skimagecopy.h
 
 RESOURCES += \
     resources.qrc

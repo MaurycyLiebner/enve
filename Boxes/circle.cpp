@@ -21,10 +21,12 @@ Circle::Circle() :
     mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.));
 
     QrealAnimator *hXAnimator = mHorizontalRadiusPoint->getXAnimator();
+    ca_addChildAnimator(hXAnimator);
     ca_prependChildAnimator(hXAnimator, mEffectsAnimators.data());
     hXAnimator->prp_setName("horizontal radius");
 
     QrealAnimator *vYAnimator = mVerticalRadiusPoint->getYAnimator();
+    ca_addChildAnimator(vYAnimator);
     ca_prependChildAnimator(vYAnimator, mEffectsAnimators.data());
     vYAnimator->prp_setName("vertical radius");
 
@@ -32,9 +34,8 @@ Circle::Circle() :
     mCenter->setVerticalAndHorizontalPoints(mVerticalRadiusPoint,
                                             mHorizontalRadiusPoint);
 
-    mCenter->prp_setUpdater(new NodePointUpdater(this) );
-    mHorizontalRadiusPoint->prp_setUpdater(new NodePointUpdater(this));
-    mVerticalRadiusPoint->prp_setUpdater(new NodePointUpdater(this));
+    prp_setUpdater(new NodePointUpdater(this));
+    mCenter->prp_setUpdater(new NodePointUpdater(this));
 }
 
 void Circle::startAllPointsTransform() {
@@ -243,10 +244,10 @@ void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {
 
 void CircleRadiusPoint::startTransform() {
     if(mCenterPoint->isSelected() ) return;
-    MovablePoint::startTransform();
+    PointAnimator::startTransform();
 }
 
 void CircleRadiusPoint::finishTransform() {
     if(mCenterPoint->isSelected() ) return;
-    MovablePoint::finishTransform();
+    PointAnimator::finishTransform();
 }
