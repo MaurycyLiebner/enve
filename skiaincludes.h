@@ -28,6 +28,8 @@
 #include <GL/gl.h>
 
 #include "AddInclude/SkStroke.h"
+#include "AddInclude/SkGeometry.h"
+#include "AddInclude/SkPointPriv.h"
 
 #define foreach Q_FOREACH
 

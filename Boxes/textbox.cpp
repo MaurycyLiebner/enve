@@ -18,6 +18,12 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     ca_addChildAnimator(mText.data());
     ca_prependChildAnimator(mText.data(), mEffectsAnimators.data());
     mText->prp_setUpdater(new NodePointUpdater(this));
+
+    mLinesDist = (new QrealAnimator())->ref<QrealAnimator>();
+    mLinesDist->prp_setName("line dist");
+    mLinesDist->qra_setValueRange(0., 100.);
+    mLinesDist->qra_setCurrentValue(100.);
+    mLinesDist->prp_setUpdater(new NodePointUpdater(this));
 }
 
 #include <QApplication>
@@ -106,6 +112,7 @@ bool TextBox::handleSelectedCanvasAction(QAction *selectedAction) {
 SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
     QPainterPath qPath = QPainterPath();
 
+    qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
     QString textAtFrame = mText->getTextValueAtRelFrame(relFrame);
     QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
@@ -119,11 +126,13 @@ SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
         qreal lineWidth = fm.width(line);
         qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
                       yT, mFont, line);
-        yT += fm.height();
+        yT += fm.height()*linesDistAtFrame;
     }
 
-    //QRectF boundingRect = qPath.boundingRect();
-    //qPath.translate(-boundingRect.center());
+    // !!! remove so that text stays at the same position after changing string
+    // QRectF boundingRect = qPath.boundingRect();
+    // qPath.translate(-boundingRect.center());
+    //
 
     return QPainterPathToSkPath(qPath);
 }
@@ -131,6 +140,7 @@ SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     QPainterPath qPath = QPainterPath();
 
+    qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrameF(relFrame)*0.01;
     QString textAtFrame = mText->getTextValueAtRelFrame(relFrame);
     QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
@@ -144,11 +154,11 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
         qreal lineWidth = fm.width(line);
         qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
                       yT, mFont, line);
-        yT += fm.height();
+        yT += fm.height()*linesDistAtFrame; // changed distance between lines
     }
 
-    QRectF boundingRect = qPath.boundingRect();
-    qPath.translate(-boundingRect.center());
+    // QRectF boundingRect = qPath.boundingRect();
+    // qPath.translate(-boundingRect.center());
 
     return QPainterPathToSkPath(qPath);
 }

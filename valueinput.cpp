@@ -14,7 +14,7 @@ void ValueInput::draw(SkCanvas *canvas, const int &y) {
                                 y,
                                 5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
         paint.setStyle(SkPaint::kFill_Style);
-        paint.setColor(SkColorSetARGBInline(255, 225, 225, 225));
+        paint.setColor(SkColorSetARGB(255, 225, 225, 225));
         canvas->drawRect(inputRect, paint);
         QString transStr;
         transStr = mName + ": " + mInputText + "|";

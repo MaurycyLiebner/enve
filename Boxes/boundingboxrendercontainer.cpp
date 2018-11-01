@@ -269,7 +269,12 @@ CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
 void CacheContainerTmpFileDataSaver::_processUpdate() {
     // mSavingFailed = true; return; // NO TMP FILES !!!
     SkPixmap pix;
-    mImage->peekPixels(&pix);
+    if(!mImage->peekPixels(&pix)) {
+        if(!mImage->makeRasterImage()->peekPixels(&pix)) {
+            mSavingFailed = true;
+            return;
+        }
+    }
     mTmpFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile());
     if(mTmpFile->open()) {
         int width = pix.width();

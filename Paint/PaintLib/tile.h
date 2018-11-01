@@ -118,11 +118,11 @@ struct TileSkDrawerCollection {
             SkPaint paint;
             paint.setAlpha(alpha);
             paint.setColorFilter(SkColorMatrixFilter::MakeLightingFilter(
-                                     SkColorSetARGBInline(255,
+                                     SkColorSetARGB(255,
                                                           SkColorGetR(hueCol)*0.7,
                                                           SkColorGetG(hueCol)*0.7,
                                                           SkColorGetB(hueCol)*0.7),
-                                     SkColorSetARGBInline(255,
+                                     SkColorSetARGB(255,
                                                           SkColorGetR(hueCol)*0.3,
                                                           SkColorGetG(hueCol)*0.3,
                                                           SkColorGetB(hueCol)*0.3)));

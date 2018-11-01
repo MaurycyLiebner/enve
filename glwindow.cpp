@@ -206,8 +206,8 @@ void GLWindow::renderNow() {
 //    gradPoints[0] = SkPoint::Make(0.f, 0.f);
 //    gradPoints[1] = SkPoint::Make(width(), 0.f);
 //    SkColor gradColors[2];
-//    gradColors[0] = SkColorSetARGBInline(255, 0, 0, 0);
-//    gradColors[1] = SkColorSetARGBInline(0, 125, 125, 125);
+//    gradColors[0] = SkColorSetARGB(255, 0, 0, 0);
+//    gradColors[1] = SkColorSetARGB(0, 125, 125, 125);
 //    SkScalar gradPos[2];
 //    gradPos[0] = 0.f;
 //    gradPos[1] = 1.f;

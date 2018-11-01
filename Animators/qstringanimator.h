@@ -14,8 +14,8 @@ public:
 
     const QString &getText() { return mText; }
     void setText(const QString &text) { mText = text; }
-    void writeQStringKey(QIODevice *target);
-    void readQStringKey(QIODevice *target);
+    void writeKey(QIODevice *target);
+    void readKey(QIODevice *target);
 private:
     QString mText;
 };

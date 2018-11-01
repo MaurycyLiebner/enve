@@ -143,7 +143,7 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
                                                        data);
     AnimationBoxRenderData *imageData = (AnimationBoxRenderData*)data;
-    int animationFrame = getAnimationFrameForRelFrame(qCeil(relFrame));
+    int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
     imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
     if(imageData->image.get() == nullptr) {

@@ -35,7 +35,7 @@ void GradientPoint::drawSk(SkCanvas *canvas,
 
     SkPaint paint;
     paint.setAntiAlias(true);
-    paint.setColor(SkColorSetARGBInline(mFillColor.alpha(),
+    paint.setColor(SkColorSetARGB(mFillColor.alpha(),
                                         mFillColor.red(),
                                         mFillColor.green(),
                                         mFillColor.blue()));

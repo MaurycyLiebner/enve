@@ -42,6 +42,7 @@ public:
     void readBoundingBox(QIODevice *target);
 private:
     QStringAnimatorQSPtr mText;
+    QrealAnimatorQSPtr mLinesDist;
     QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;
 };

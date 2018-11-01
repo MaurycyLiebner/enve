@@ -48,7 +48,7 @@ public:
     }*/
 
     SkColor getSkColor() const {
-        return SkColorSetARGBInline(qcol.alpha(),
+        return SkColorSetARGB(qcol.alpha(),
                                     qcol.red(),
                                     qcol.green(),
                                     qcol.blue());

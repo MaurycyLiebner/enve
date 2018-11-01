@@ -32,8 +32,8 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mInstance = this;
 
     //unsigned long long totRam = getTotalRam();
-    mLowFreeRam = 1200000000;
-    mVeryLowFreeRam = 800000000;
+    mLowFreeRam = 1800000000; // 1200000000;
+    mVeryLowFreeRam = 1400000000; // 800000000;
 
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()),

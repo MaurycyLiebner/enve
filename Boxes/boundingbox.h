@@ -99,7 +99,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     int relFrame;
 
     // for motion blur
-    bool useCustomRelFrame = false;
+    bool useCustomRelFrame = true; // true; // false;
     qreal customRelFrame;
     QList<QRectF> otherGlobalRects;
     BoundingBoxRenderData *motionBlurTarget = nullptr;
@@ -493,7 +493,6 @@ public:
 
     virtual QMatrix getCombinedTransform() const;
 
-    QPainter::CompositionMode getCompositionMode();
     bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                     const qreal &relX,
@@ -751,10 +750,8 @@ protected:
     QSharedPointer<BoxTransformAnimator> mTransformAnimator;
 
     int mZListIndex = 0;
-    bool mPivotAutoAdjust = true;
+    bool mPivotAutoAdjust = true; // !!! pivot autoadjust disabled
 
-    QPainter::CompositionMode mCompositionMode =
-            QPainter::CompositionMode_SourceOver;
     SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;
 
     void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);

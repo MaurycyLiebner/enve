@@ -60,6 +60,7 @@ void readQString(QIODevice *target,
 
     target->read((char*)chars, nChars*sizeof(ushort));
     *targetStr = QString::fromUtf16(chars, nChars);
+
     delete[] chars;
 }
 
@@ -332,11 +333,13 @@ void ColorAnimator::readProperty(QIODevice *target) {
     mAlphaAnimator->readProperty(target);
 }
 
-void QStringKey::writeQStringKey(QIODevice *target) {
+void QStringKey::writeKey(QIODevice *target) {
+    Key::writeKey(target);
     writeQString(target, mText);
 }
 
-void QStringKey::readQStringKey(QIODevice *target) {
+void QStringKey::readKey(QIODevice *target) {
+    Key::readKey(target);
     readQString(target, &mText);
 }
 
@@ -344,7 +347,7 @@ void QStringAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
     target->write((char*)&nKeys, sizeof(int));
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QStringKey*)key.get())->writeQStringKey(target);
+        ((QStringKey*)key.get())->writeKey(target);
     }
     writeQString(target, mCurrentText);
 }
@@ -354,7 +357,7 @@ void QStringAnimator::readProperty(QIODevice *target) {
     target->read((char*)&nKeys, sizeof(int));
     for(int i = 0; i < nKeys; i++) {
         QStringKey *newKey = new QStringKey("", 0, this);
-        newKey->readQStringKey(target);
+        newKey->readKey(target);
         anim_appendKey(newKey, false, false);
     }
     readQString(target, &mCurrentText);
@@ -682,9 +685,11 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
 }
 
 void BoundingBox::readBoundingBox(QIODevice *target) {
+    mPivotAutoAdjust = false; // pivot will be read anyway, so temporarly disable adjusting
     readQString(target, &prp_mName);
     target->read((char*)&mLoadId, sizeof(int));
-    target->read((char*)&mPivotAutoAdjust, sizeof(bool));
+    bool pivotAutoAdjust;
+    target->read((char*)&pivotAutoAdjust, sizeof(bool));
     target->read((char*)&mVisible, sizeof(bool));
     target->read((char*)&mLocked, sizeof(bool));
     target->read((char*)&mBlendModeSk, sizeof(SkBlendMode));
@@ -694,11 +699,17 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     if(hasDurRect) {
         if(mDurationRectangle == nullptr) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(target);
+        updateAfterDurationRectangleShifted();
     }
 
     mTransformAnimator->readProperty(target);
     mEffectsAnimators->readProperty(target);
+
+    if(hasDurRect) {
+        anim_shiftAllKeys(prp_getFrameShift());
+    }
     BoundingBox::addLoadedBox(this);
+    mPivotAutoAdjust = pivotAutoAdjust;
 }
 
 void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) {
@@ -960,6 +971,9 @@ void ParticleEmitter::readProperty(QIODevice *target) {
 }
 
 void ParticleBox::writeBoundingBox(QIODevice *target) {
+    BoundingBox::writeBoundingBox(target);
+    mTopLeftPoint->writeProperty(target);
+    mBottomRightPoint->writeProperty(target);
     int nEmitters = mEmitters.count();
     target->write((char*)&nEmitters, sizeof(int));
     foreach(ParticleEmitter *emitter, mEmitters) {
@@ -968,6 +982,9 @@ void ParticleBox::writeBoundingBox(QIODevice *target) {
 }
 
 void ParticleBox::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
+    mTopLeftPoint->readProperty(target);
+    mBottomRightPoint->readProperty(target);
     int nEmitters;
     target->read((char*)&nEmitters, sizeof(int));
     for(int i = 0; i < nEmitters; i++) {
@@ -1243,6 +1260,8 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
             box = new ExternalLinkBox();
         } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
             box = new InternalLinkCanvas(nullptr);
+        } else {
+            qDebug() << "Corrupted file - invalid box type";
         }
 
         box->readBoundingBox(target);

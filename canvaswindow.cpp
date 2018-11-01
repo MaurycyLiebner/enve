@@ -854,20 +854,24 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
         }
     }
 }
-
-void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
+#include <chrono>
+void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
                                               _Executor *lastUpdatable) {
+    //auto start = std::chrono::steady_clock::now();
+    //qDebug() << "sendNextUpdatableForUpdate::begin" << mFreeThreads.count();
     if(lastUpdatable != nullptr) {
         if(mClearBeingUpdated) {
             lastUpdatable->clear();
         } else {
             lastUpdatable->updateFinished();
         }
+        //qDebug() << "finished processing using: " << finishedThreadId;
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
         mClearBeingUpdated = false;
         mNoBoxesAwaitUpdate = true;
-        mFreeThreads << threadId;
+        mFreeThreads << finishedThreadId;
+        //qDebug() << "thread free: " << finishedThreadId;
         if(mBoxesUpdateFinishedFunction != nullptr) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
@@ -875,20 +879,31 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
             callUpdateSchedulers();
         }
     } else {
+        int threadId = finishedThreadId;
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
             _Executor *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
+                //qDebug() << "started processing using: " << threadId;
                 updatablaT->setCurrentPaintControler(
                             mPaintControlers.at(threadId));
                 updatablaT->beforeUpdate();
                 emit updateUpdatable(updatablaT, threadId);
                 mUpdatablesAwaitingUpdate.removeAt(i);
                 i--;
-                return;
+                //return;
+                if(mFreeThreads.isEmpty() || mUpdatablesAwaitingUpdate.isEmpty()) {
+                    //auto end = std::chrono::steady_clock::now();
+                    //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
+                    return;
+                }
+                threadId = mFreeThreads.takeFirst();
             }
         }
+        //qDebug() << "thread free, not ready: " << threadId;
         mFreeThreads << threadId;
     }
+    //auto end = std::chrono::steady_clock::now();
+    //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
 }
 
 void CanvasWindow::interruptPreview() {

@@ -1095,8 +1095,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         if(focusWidget->property("forceHandleEvent").isValid()) return false;
     }
     if(e->type() == QEvent::KeyPress) {
-        QKeyEvent *key_event = (QKeyEvent*)e;
-        return processKeyEvent(key_event);
+        QKeyEvent *keyEvent = (QKeyEvent*)e;
+        if(keyEvent->key() == Qt::Key_Delete && focusWidget != nullptr) {
+            mEventFilterDisabled = true;
+            bool widHandled = QCoreApplication::sendEvent(focusWidget, keyEvent);
+            mEventFilterDisabled = false;
+            if(widHandled) return false;
+        }
+        return processKeyEvent(keyEvent);
     } else if(e->type() == QEvent::ShortcutOverride) {
         QKeyEvent *keyEvent = (QKeyEvent*)e;
         if(isShiftPressed() && keyEvent->key() == Qt::Key_D) {
@@ -1113,9 +1119,17 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             }
         } else if(
              keyEvent->key() == Qt::Key_A ||
-             keyEvent->key() == Qt::Key_I ||
-             keyEvent->key() == Qt::Key_Delete) {
+             keyEvent->key() == Qt::Key_I/* ||
+             keyEvent->key() == Qt::Key_Delete*/) {
               return processKeyEvent(keyEvent);
+        } else if(keyEvent->key() == Qt::Key_Delete) {
+            if(focusWidget != nullptr) {
+                mEventFilterDisabled = true;
+                bool widHandled = QCoreApplication::sendEvent(focusWidget, keyEvent);
+                mEventFilterDisabled = false;
+                if(widHandled) return QMainWindow::eventFilter(obj, e);
+            }
+            return processKeyEvent(keyEvent);
         }
     } else if(e->type() == QEvent::KeyRelease) {
         finishUndoRedoSet();

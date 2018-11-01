@@ -306,7 +306,7 @@ public slots:
     void flipHorizontalAction();
     void flipVerticalAction();
 private slots:
-    void sendNextUpdatableForUpdate(const int &threadId,
+    void sendNextUpdatableForUpdate(const int &finishedThreadId,
                                     _Executor *lastUpdatable = nullptr);
     void sendNextFileUpdatableForUpdate(const int &threadId,
                                     _Executor *lastUpdatable = nullptr);

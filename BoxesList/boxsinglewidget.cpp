@@ -280,7 +280,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mCompositionModeVisible = true;
         mCompositionModeCombo->setCurrentIndex(
-                    ((BoundingBox*)target)->getCompositionMode());
+                    blendModeToIntSk(((BoundingBox*)target)->getBlendMode()));
         updateCompositionBoxVisible();
         mPropertyComboBox->hide();
 

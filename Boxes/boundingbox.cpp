@@ -211,10 +211,6 @@ void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
-QPainter::CompositionMode BoundingBox::getCompositionMode() {
-    return mCompositionMode;
-}
-
 void BoundingBox::resetScale() {
     mTransformAnimator->resetScale(true);
 }
@@ -234,7 +230,7 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
                 anim_mCurrentRelFrame);
     if(mUpdateDrawOnParentBox != isInVisRange) {
         if(mUpdateDrawOnParentBox) {
-            mParentGroup->scheduleUpdate();
+            if(mParentGroup != nullptr) mParentGroup->scheduleUpdate();
         } else {
             scheduleUpdate();
         }
@@ -420,7 +416,7 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
 //    SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
 //                             MIN_WIDGET_HEIGHT*0.25f*invScale};
 //    paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-//    paint.setColor(SkColorSetARGBInline(125, 0, 0, 0));
+//    paint.setColor(SkColorSetARGB(125, 0, 0, 0));
 //    paint.setStyle(SkPaint::kStroke_Style);
 //    paint.setStrokeWidth(invScale);
 //    SkPath mappedPath = path;
@@ -1453,6 +1449,7 @@ void BoundingBoxRenderData::afterUpdate() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != nullptr && parentIsTarget) {
         parentBoxT->renderDataFinished(this);
+        //qDebug() << "box render finished:" << parentBoxT->prp_getName();
     }
     _ScheduledExecutor::afterUpdate();
 }

@@ -23,7 +23,7 @@ public:
     void setName(QString name);
     void setNumberDecimals(int decimals);
 
-    void setValueNoUpdate(qreal value);
+    void setValueNoUpdate(const qreal &value);
     void updateLineEditFromValue();
     void fitWidthToContent();
     QString getValueString();
@@ -34,7 +34,7 @@ public:
                const QColor &allFill,
                const QColor &sliderFill,
                const QColor &stroke);
-    void setPrefferedValueStep(qreal step);
+    void setPrefferedValueStep(const qreal &step);
 
     qreal maximum();
     qreal minimum();

@@ -340,7 +340,6 @@ void NodePoint::drawSk(SkCanvas *canvas,
     }
     if(MainWindow::isCtrlPressed()) {
         SkPaint paint;
-        paint.setTextAlign(SkPaint::kCenter_Align);
         paint.setAntiAlias(true);
         paint.setTextSize(FONT_HEIGHT*invScale);
         SkRect bounds;
@@ -355,7 +354,7 @@ void NodePoint::drawSk(SkCanvas *canvas,
         paint.setTypeface(typeFace);
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawString(QString::number(mNodeId).toStdString().c_str(),
-                           absPos.x(),
+                           absPos.x() + bounds.width()*0.5f,
                            absPos.y() + bounds.height()*0.5f,
                            paint);
     }

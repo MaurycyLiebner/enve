@@ -61,7 +61,7 @@ void PathAnimator::removeSinglePathAnimator(VectorPathAnimator *path,
 }
 
 bool PathAnimator::SWT_isPathAnimator() { return true; }
-#include "AddInclude/SkGeometry.h"
+
 void PathAnimator::loadPathFromSkPath(const SkPath &path) {
     NodePoint *firstPoint = nullptr;
     NodePoint *lastPoint = nullptr;

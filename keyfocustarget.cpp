@@ -12,6 +12,11 @@ KeyFocusTarget::~KeyFocusTarget() {
         KFT_mCurrentTarget = nullptr;
     }
 }
+
+KeyFocusTarget * KeyFocusTarget::KFT_getCurrentTarget() {
+    return KeyFocusTarget::KFT_mCurrentTarget;
+}
+
 #include <QDebug>
 bool KeyFocusTarget::KFT_handleKeyEvent(QKeyEvent *e) {
     if(KFT_mCurrentTarget != nullptr) {

@@ -188,7 +188,7 @@ void Canvas::drawTransparencyMesh(SkCanvas *canvas,
         SkPaint paint;
         paint.setAntiAlias(true);
         paint.setStyle(SkPaint::kFill_Style);
-        paint.setColor(SkColorSetARGBInline(125, 255, 255, 255));
+        paint.setColor(SkColorSetARGB(125, 255, 255, 255));
         SkScalar currX = viewRect.left();
         SkScalar currY = viewRect.top();
         SkScalar widthT = MIN_WIDGET_HEIGHT*0.5f*mCanvasTransformMatrix.m11();
@@ -253,7 +253,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         }
 #else
         if(!mClipToCanvasSize) {
-            paint.setColor(SkColorSetARGBInline(255, 75, 75, 75));
+            paint.setColor(SkColorSetARGB(255, 75, 75, 75));
             canvas->drawRect(QRectFToSkRect(mCanvasTransformMatrix.mapRect(
                                                 getMaxBoundsRect())),
                              paint);
@@ -313,7 +313,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
 //        p->setPen(pen);
         if(mSelecting) {
             paint.setStyle(SkPaint::kStroke_Style);
-            paint.setColor(SkColorSetARGBInline(255, 0, 0, 255));
+            paint.setColor(SkColorSetARGB(255, 0, 0, 255));
             paint.setStrokeWidth(2.*invScale);
             SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
                                      MIN_WIDGET_HEIGHT*0.25f*invScale};
@@ -403,6 +403,9 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
     if(mCurrentPreviewContainer.get() != nullptr) {
         if(!mRenderingPreview || mRenderingOutput) {
             mCurrentPreviewContainer->setBlocked(false);
+//            if(mRenderingOutput) { // !!! dont keep frames in memory when rendering output
+//                mCurrentPreviewContainer->freeAndRemove();
+//            }
         }
     }
     if(cont == nullptr) {

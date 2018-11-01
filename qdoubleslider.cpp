@@ -13,7 +13,7 @@ QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
     mMaxValue = maxVal;
     mPrefferedValueStep = prefferedStep;
     setFixedHeight(MIN_WIDGET_HEIGHT);
-    mLineEdit = new QLineEdit(QString::number(mValue, 'f', mDecimals), this);
+    mLineEdit = new QLineEdit(QLocale().toString(mValue, 'f', mDecimals), this);
     mLineEdit->setAttribute(Qt::WA_TranslucentBackground);
     mLineEdit->setStyleSheet("background-color: rgba(0, 0, 0, 0);"
                              "color: black;");
@@ -78,16 +78,16 @@ void QDoubleSlider::setNumberDecimals(int decimals) {
     fitWidthToContent();
 }
 
-void QDoubleSlider::setValueNoUpdate(qreal value) {
+void QDoubleSlider::setValueNoUpdate(const qreal& value) {
     mValue = qclamp(value, mMinValue, mMaxValue);
 }
 
 void QDoubleSlider::updateLineEditFromValue() {
-    mLineEdit->setText(QString::number(mValue, 'f', mDecimals));
+    mLineEdit->setText(QLocale().toString(mValue, 'f', mDecimals));
 }
 
 QString QDoubleSlider::getValueString() {
-    return QString::number(mValue, 'f', mDecimals);
+    return QLocale().toString(mValue, 'f', mDecimals);
 }
 
 void QDoubleSlider::setValueRange(qreal min, qreal max) {
@@ -237,7 +237,7 @@ void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     }
 }
 
-void QDoubleSlider::setPrefferedValueStep(qreal step) {
+void QDoubleSlider::setPrefferedValueStep(const qreal& step) {
     mPrefferedValueStep = step;
 }
 
@@ -271,6 +271,22 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
            keyEvent->key() == Qt::Key_Enter) {
             finishTextEditing();
             MainWindow::getInstance()->callUpdateSchedulers();
+        } else if((keyEvent->key() == Qt::Key_Period ||
+                  keyEvent->key() == Qt::Key_Comma) && mTextEdit) {
+            QString currentText = mLineEdit->text();
+            int int2;
+            QString currentTextPeriod = currentText + ".";
+            if(mValidator->validate(currentTextPeriod, int2) !=
+                    QValidator::Invalid) {
+                mLineEdit->setText(currentTextPeriod);
+                return true;
+            }
+            QString currentTextComa = currentText + ",";
+            if(mValidator->validate(currentTextComa, int2) !=
+                    QValidator::Invalid) {
+                mLineEdit->setText(currentTextComa);
+                return true;
+            }
         }
         return !mTextEdit;
     } else if(event->type() == QEvent::KeyRelease) {
@@ -360,7 +376,7 @@ void QDoubleSlider::lineEditingFinished() {
     mLineEdit->setCursor(Qt::ArrowCursor);
     setCursor(Qt::ArrowCursor);
     QString text = mLineEdit->text();
-    setValueNoUpdate(text.toDouble());
+    setValueNoUpdate(QLocale().toDouble(text));
     mLineEdit->releaseMouse();
 
     emitEditingStarted(mValue);

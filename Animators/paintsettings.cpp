@@ -654,12 +654,12 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
         paint->setShader(gradientSk);
         paint->setAlpha(255);
     } else if(paintType == FLATPAINT) {
-        paint->setColor(SkColorSetARGBInline(paintColor.alpha(),
+        paint->setColor(SkColorSetARGB(paintColor.alpha(),
                                              paintColor.red(),
                                              paintColor.green(),
                                              paintColor.blue()));
     } else {
-        paint->setColor(SkColorSetARGBInline(0, 0, 0, 0));
+        paint->setColor(SkColorSetARGB(0, 0, 0, 0));
     }
 }
 
@@ -682,7 +682,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         const QGradientStop &stopT = stops.at(i);
         QColor col = stopT.second;
         gradPoints[i] = SkPoint::Make(currX, currY);
-        gradColors[i] = SkColorSetARGBInline(col.alpha(),
+        gradColors[i] = SkColorSetARGB(col.alpha(),
                                              col.red(),
                                              col.green(),
                                              col.blue());

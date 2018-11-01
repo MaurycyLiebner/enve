@@ -74,7 +74,7 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
 
     SkPaint paint;
     paint.setAntiAlias(true);
-    paint.setColor(SkColorSetARGBInline(255, r, g, b));
+    paint.setColor(SkColorSetARGB(255, r, g, b));
 
     paint.setStyle(SkPaint::kFill_Style);
     canvas->drawCircle(absPos,
