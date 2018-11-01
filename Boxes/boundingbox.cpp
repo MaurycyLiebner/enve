@@ -1423,6 +1423,12 @@ void BoundingBoxRenderData::afterUpdate() {
     _ScheduledExecutor::afterUpdate();
 }
 
+void BoundingBoxRenderData::parentBeingProcessed() {
+    mFinished = false;
+    mSchedulerAdded = true;
+    schedulerProccessed();
+}
+
 void BoundingBoxRenderData::schedulerProccessed() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != nullptr) {

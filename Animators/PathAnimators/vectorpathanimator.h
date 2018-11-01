@@ -112,6 +112,8 @@ public:
     void finishedPathChange();
 
     void anim_saveCurrentValueAsKey();
+    void anim_addKeyAtRelFrame(const int &relFrame);
+
     void anim_removeKey(Key *keyToRemove, const bool &saveUndoRedo);
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,

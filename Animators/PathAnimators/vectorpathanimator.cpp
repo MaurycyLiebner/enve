@@ -141,6 +141,22 @@ void VectorPathAnimator::setElementPos(const int &index,
     }
 }
 
+void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
+    if(!anim_mIsRecording) prp_setRecording(true);
+
+    PathKey *newKey = (PathKey*)anim_getKeyAtRelFrame(relFrame);
+
+    if(newKey == nullptr) {
+        newKey = new PathKey(relFrame,
+                             getPathAtRelFrame(relFrame),
+                             this,
+                             mPathClosed);
+        anim_appendKey(newKey, true, false);
+    } else {
+        newKey->setElementsFromSkPath(getPathAtRelFrame(relFrame));
+    }
+}
+
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) prp_setRecording(true);
 

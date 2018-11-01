@@ -883,6 +883,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
             _Executor *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
+                qDebug() << i;
                 //qDebug() << "started processing using: " << threadId;
                 updatablaT->setCurrentPaintControler(
                             mPaintControlers.at(threadId));

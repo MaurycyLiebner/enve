@@ -46,12 +46,10 @@ enum BoundingBoxType {
 };
 
 class BoxesGroup;
-
 class VectorPathEdge;
-
 class VectorPath;
-
 class DurationRectangle;
+class BoxesGroupRenderData;
 
 struct FunctionWaitingForBoxLoad {
     FunctionWaitingForBoxLoad(const int &boxIdT) {
@@ -150,6 +148,8 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     void prependRenderCustomizerFunctor(RenderDataCustomizerFunctor *customizer) {
         mRenderDataCustomizerFunctors.prepend(customizer);
     }
+
+    void parentBeingProcessed();
 protected:
     void addSchedulerNow();
     QList<RenderDataCustomizerFunctor*> mRenderDataCustomizerFunctors;

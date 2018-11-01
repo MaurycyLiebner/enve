@@ -1148,14 +1148,14 @@ void Canvas::connectPointsFromDifferentPaths(NodePoint *pointSrc,
 //    if(pointSrc->getParentPath() == pointDest->getParentPath()) {
 //        return;
 //    }
-//    PathAnimator *pathSrc = pointSrc->getParentPath();
-//    PathAnimator *pathDest = pointDest->getParentPath();
+//    VectorPathAnimator *pathSrc = pointSrc->getParentPath();
+//    VectorPathAnimator *pathDest = pointDest->getParentPath();
 //    setCurrentEndPoint(pointDest);
 //    if(pointSrc->hasNextPoint()) {
 //        NodePoint *point = pointSrc;
 //        bool mirror = pointDest->hasNextPoint();
 //        while(point != nullptr) {
-//            QPointF startCtrlPpclab.pltPos;
+//            QPointF startCtrlPtPos;
 //            QPointF endCtrlPtPos;
 //            getMirroredCtrlPtAbsPos(mirror, point,
 //                                    &startCtrlPtPos, &endCtrlPtPos);
@@ -1185,7 +1185,7 @@ void Canvas::connectPointsFromDifferentPaths(NodePoint *pointSrc,
 //            point = point->getPreviousPoint();
 //        }
 //    }
-//    mCurrentBoxesGroup->removeChild(pathSrc->getParentBox());
+    //mCurrentBoxesGroup->removeChild(pathSrc->getParentBox());
 }
 
 bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,

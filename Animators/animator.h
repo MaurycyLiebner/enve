@@ -91,6 +91,7 @@ public:
     Key *anim_getKeyAtAbsFrame(const int &frame);
 
     virtual void anim_saveCurrentValueAsKey() {}
+    virtual void anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
 
     Key *anim_getNextKey(Key *key);
     Key *anim_getPrevKey(Key *key);

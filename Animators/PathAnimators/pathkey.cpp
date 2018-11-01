@@ -10,10 +10,12 @@ PathKey::PathKey(VectorPathAnimator *parentAnimator) :
 
 PathKey::PathKey(const int &relFrame,
                  const SkPath &path,
-                 VectorPathAnimator *parentAnimator) :
+                 VectorPathAnimator *parentAnimator,
+                 const bool& closed) :
     PathKey(parentAnimator) {
     mRelFrame = relFrame;
     setElementsFromSkPath(path);
+    mPathClosed = closed;
 }
 
 PathKey::PathKey(const int &relFrame,

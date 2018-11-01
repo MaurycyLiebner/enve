@@ -197,7 +197,8 @@ public:
     PathKey(VectorPathAnimator *parentAnimator);
     PathKey(const int &relFrame,
             const SkPath &path,
-            VectorPathAnimator *parentAnimator);
+            VectorPathAnimator *parentAnimator,
+            const bool &closed = false);
     PathKey(const int &relFrame,
             const SkPath &path,
             const QList<SkPoint> &elementsPos,
