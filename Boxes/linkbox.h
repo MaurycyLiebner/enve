@@ -70,8 +70,6 @@ public:
     }
 
     BoundingBoxRenderData *createRenderData();
-    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
-                                               BoundingBoxRenderData *data);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                BoundingBoxRenderData *data);
     const SkBlendMode &getBlendMode() {
@@ -225,34 +223,6 @@ public:
         return BoundingBox::getBlendMode();
     }
 
-    void setupBoundingBoxRenderDataForRelFrame(
-                            const int &relFrame,
-                            BoundingBoxRenderData *data) {
-        BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
-                                                           data);
-        BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
-        groupData->childrenRenderData.clear();
-        qreal childrenEffectsMargin = 0.;
-        int absFrame = prp_relFrameToAbsFrame(relFrame);
-        foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
-            int boxRelFrame = box->prp_absFrameToRelFrame(absFrame);
-            if(box->isRelFrameVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                BoundingBoxRenderData *boxRenderData =
-                        box->getCurrentRenderData();
-                if(boxRenderData == nullptr) {
-                    continue;
-                }
-                boxRenderData->addDependent(data);
-                groupData->childrenRenderData <<
-                        boxRenderData->ref<BoundingBoxRenderData>();
-                childrenEffectsMargin =
-                        qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
-                             childrenEffectsMargin);
-            }
-        }
-        data->effectsMargin += childrenEffectsMargin;
-    }
-
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
                             BoundingBoxRenderData *data) {
@@ -346,9 +316,6 @@ public:
 
     void processSchedulers();
 
-    void setupBoundingBoxRenderDataForRelFrame(
-                            const int &relFrame,
-                            BoundingBoxRenderData *data);
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
                             BoundingBoxRenderData *data);

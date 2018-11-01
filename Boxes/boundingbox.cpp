@@ -544,37 +544,10 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
     return mEffectsAnimators->getEffectsMarginAtRelFrameF(relFrame);
 }
 
-void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
-                        const int &relFrame,
-                        BoundingBoxRenderData *data) {
-    data->relFrame = relFrame;
-    data->renderedToImage = false;
-    data->relTransform = getRelativeTransformAtRelFrame(relFrame);
-    data->parentTransform = mTransformAnimator->
-            getParentCombinedTransformMatrixAtRelFrame(relFrame);
-    data->transform = data->relTransform*data->parentTransform;
-    data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
-    data->resolution = getParentCanvas()->getResolutionFraction();
-    bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
-    if(effectsVisible) {
-        data->effectsMargin = getEffectsMarginAtRelFrame(relFrame)*
-                data->resolution + 2.;
-    } else {
-        data->effectsMargin = 2.;
-    }
-    data->blendMode = getBlendMode();
-
-    Canvas *parentCanvas = getParentCanvas();
-    data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
-    if(data->opacity > 0.001 && effectsVisible) {
-        setupEffects(relFrame, data);
-    }
-}
-
 void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
                         BoundingBoxRenderData *data) {
-    data->relFrame = relFrame;
+    data->relFrame = qRound(relFrame);
     data->renderedToImage = false;
     data->relTransform = getRelativeTransformAtRelFrameF(relFrame);
     data->parentTransform = mTransformAnimator->
@@ -1432,10 +1405,6 @@ void BoundingBoxRenderData::beforeUpdate() {
         dataSet();
     }
     _ScheduledExecutor::beforeUpdate();
-    //parentBox->setUpdateVars();
-//    parentBox->setupBoundingBoxRenderDataForRelFrame(
-//                parentBox->anim_getCurrentRelFrame(), this);
-//    parentBox->updateCurrentPreviewDataFromRenderData(this);
 
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr || !parentIsTarget) return;
@@ -1462,7 +1431,7 @@ void BoundingBoxRenderData::schedulerProccessed() {
                         customRelFrame,
                         this);
         } else {
-            parentBoxT->setupBoundingBoxRenderDataForRelFrame(
+            parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
                         parentBoxT->anim_getCurrentRelFrame(),
                         this);
         }

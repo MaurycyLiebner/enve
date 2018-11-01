@@ -113,9 +113,6 @@ public:
 
     bool SWT_isPathBox() { return true; }
 
-    void setupBoundingBoxRenderDataForRelFrame(
-                                const int &relFrame,
-                                BoundingBoxRenderData *data);
     void setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,
                                 BoundingBoxRenderData *data);

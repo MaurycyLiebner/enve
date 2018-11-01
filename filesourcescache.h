@@ -10,6 +10,12 @@ class BoundingBox;
 typedef QWeakPointer<BoundingBox> BoundingBoxQWPtr;
 class FileSourceListVisibleWidget;
 
+extern bool hasVideoExt(const QString &filename);
+extern bool hasSoundExt(const QString &filename);
+extern bool hasVectorExt(const QString &filename);
+extern bool hasImageExt(const QString &filename);
+extern bool hasAvExt(const QString &filename);
+
 extern bool isVideoExt(const QString &extension);
 extern bool isSoundExt(const QString &extension);
 extern bool isVectorExt(const QString &extension);
@@ -145,7 +151,9 @@ public:
 
     void clearCache();
 
-    const qreal &getFps();    
+    void replace();
+
+    const qreal &getFps();
 
     virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame);
 protected:

@@ -176,8 +176,6 @@ public:
         return new BoxesGroupRenderData(this);
     }
 
-    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
-                                               BoundingBoxRenderData *data);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData *data);
 

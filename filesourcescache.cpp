@@ -12,6 +12,7 @@ extern "C" {
     #include <libswscale/swscale.h>
     #include <libavutil/imgutils.h>
 }
+#include <QFileDialog>
 
 QList<std::shared_ptr<FileCacheHandler> >
 FileSourcesCache::mFileCacheHandlers;
@@ -470,13 +471,30 @@ void VideoCacheHandler::clearCache() {
     AnimationCacheHandler::clearCache();
 }
 
+void VideoCacheHandler::replace() {
+    QString importPath = QFileDialog::getOpenFileName(
+                MainWindow::getInstance(),
+                "Replace Video Source " + mFilePath, "",
+                "Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
+    MainWindow::getInstance()->enableEventFilter();
+    if(!importPath.isEmpty()) {
+        QFile file(importPath);
+        if(!file.exists()) return;
+        if(hasVideoExt(importPath)) {
+            mFilePath = importPath;
+            updateFrameCount();
+            clearCache();
+        }
+    }
+}
+
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
 _ScheduledExecutor *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
     if(mFramesCount <= 0 || frame >= mFramesCount) return nullptr;
     if(mFramesLoadScheduled.contains(frame) ||
-       mFramesBeingLoadedGUI.contains(frame)) return this;
-//    qDebug() << "schedule frame load: " << frame;
+            mFramesBeingLoadedGUI.contains(frame)) return this;
+    //    qDebug() << "schedule frame load: " << frame;
     CacheContainer *contAtFrame =
             mFramesCache.getRenderContainerAtRelFrame(frame);
     if(contAtFrame == nullptr) {
@@ -722,4 +740,29 @@ void SoundCacheHandler::_processUpdate() {
 
         mSoundBeingLoaded.replace(i, range);
     }
+}
+
+bool hasVideoExt(const QString &filename) {
+    QString extension = filename.split(".").last();
+    return isVideoExt(extension);
+}
+
+bool hasSoundExt(const QString &filename) {
+    QString extension = filename.split(".").last();
+    return isSoundExt(extension);
+}
+
+bool hasVectorExt(const QString &filename) {
+    QString extension = filename.split(".").last();
+    return isVectorExt(extension);
+}
+
+bool hasImageExt(const QString &filename) {
+    QString extension = filename.split(".").last();
+    return isImageExt(extension);
+}
+
+bool hasAvExt(const QString &filename) {
+    QString extension = filename.split(".").last();
+    return isAvExt(extension);
 }

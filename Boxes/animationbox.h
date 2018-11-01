@@ -34,9 +34,6 @@ public:
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);
     virtual void changeSourceFile() = 0;
-    void setupBoundingBoxRenderDataForRelFrame(
-                                const int &relFrame,
-                                BoundingBoxRenderData *data);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData *data);
     BoundingBoxRenderData *createRenderData();

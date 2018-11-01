@@ -50,12 +50,6 @@ BoundingBoxRenderData *InternalLinkBox::createRenderData() {
     return renderData;
 }
 
-void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
-        const int &relFrame, BoundingBoxRenderData *data) {
-    getLinkTarget()->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-}
-
 void InternalLinkBox::setupBoundingBoxRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData *data) {
     getLinkTarget()->setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
@@ -258,26 +252,6 @@ void InternalLinkCanvas::readBoundingBox(QIODevice *target) {
 void InternalLinkCanvas::processSchedulers() {
     getLinkTarget()->processSchedulers();
     BoxesGroup::processSchedulers();
-}
-
-void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrame(const int &relFrame, BoundingBoxRenderData *data) {
-    InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
-                                                                data);
-
-    BoxesGroup *finalTarget = getFinalTarget();
-    LinkCanvasRenderData *canvasData = (LinkCanvasRenderData*)data;
-    Canvas *canvasTarget = (Canvas*)finalTarget;
-    canvasData->bgColor = canvasTarget->getBgColorAnimator()->
-            getColorAtRelFrame(relFrame).getSkColor();
-    //qreal res = getParentCanvas()->getResolutionFraction();
-    canvasData->canvasHeight = canvasTarget->getCanvasHeight();//*res;
-    canvasData->canvasWidth = canvasTarget->getCanvasWidth();//*res;
-    if(mParentGroup->SWT_isLinkBox()) {
-        canvasData->clipToCanvas =
-                ((InternalLinkCanvas*)getLinkTarget())->clipToCanvas();
-    } else {
-        canvasData->clipToCanvas = mClipToCanvas->getValue();
-    }
 }
 
 void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(

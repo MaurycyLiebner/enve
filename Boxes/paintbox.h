@@ -48,8 +48,6 @@ public:
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
     void processSchedulers();
     void renderDataFinished(BoundingBoxRenderData *renderData);
-    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
-                                               BoundingBoxRenderData *data);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData *data);
     BoundingBox *createNewDuplicate() {

@@ -99,7 +99,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     int relFrame;
 
     // for motion blur
-    bool useCustomRelFrame = true; // true; // false;
+    bool useCustomRelFrame = false;
     qreal customRelFrame;
     QList<QRectF> otherGlobalRects;
     BoundingBoxRenderData *motionBlurTarget = nullptr;
@@ -530,9 +530,6 @@ public:
     virtual bool handleSelectedCanvasAction(QAction *) {
         return false;
     }
-
-    virtual void setupBoundingBoxRenderDataForRelFrame(
-            const int &relFrame, BoundingBoxRenderData *data);
 
     virtual void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData *data);

@@ -61,8 +61,6 @@ public:
     bool handleSelectedCanvasAction(QAction *selectedAction);
     void changeSourceFile();
 
-    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
-                                               BoundingBoxRenderData *data);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData *data);
     BoundingBoxRenderData *createRenderData();

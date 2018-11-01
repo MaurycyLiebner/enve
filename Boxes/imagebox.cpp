@@ -59,18 +59,6 @@ void ImageBox::changeSourceFile() {
     }
 }
 
-void ImageBox::setupBoundingBoxRenderDataForRelFrame(
-                                    const int &relFrame,
-                                    BoundingBoxRenderData *data) {
-    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-    ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
-    imgData->image = mImgCacheHandler->getImageCopy();
-    if(imgData->image == nullptr) {
-        mImgCacheHandler->addScheduler();
-        mImgCacheHandler->addDependent(imgData);
-    }
-}
-
 void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
                                     const qreal &relFrame,
                                     BoundingBoxRenderData *data) {

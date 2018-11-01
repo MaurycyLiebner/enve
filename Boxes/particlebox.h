@@ -365,18 +365,6 @@ public:
         return new ParticleBoxRenderData(this);
     }
 
-    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
-                                               BoundingBoxRenderData *data) {
-        BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-        ParticleBoxRenderData *particleData = (ParticleBoxRenderData*)data;
-        particleData->emittersData.clear();
-        foreach(ParticleEmitter *emitter, mEmitters) {
-            emitter->generateParticlesIfNeeded();
-            particleData->emittersData << emitter->getEmitterDataAtRelFrame(
-                                              relFrame, particleData);
-        }
-    }
-
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                BoundingBoxRenderData *data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
