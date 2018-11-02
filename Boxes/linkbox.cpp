@@ -323,10 +323,10 @@ void LinkCanvasRenderData::renderToImage() {
                                          nullptr);
     SkBitmap bitmap;
     bitmap.allocPixels(info);
-
+    bitmap.eraseColor(SK_ColorTRANSPARENT);
     //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
     SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
-    rasterCanvas->clear(SK_ColorTRANSPARENT);
+    //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
     rasterCanvas->translate(-globalBoundingRect.left(),
                             -globalBoundingRect.top());
@@ -376,6 +376,7 @@ void LinkCanvasRenderData::renderToImage() {
         clearPixmapEffects();
     }
 
+    bitmap.setImmutable();
     renderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
 }

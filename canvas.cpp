@@ -1320,8 +1320,9 @@ void CanvasRenderData::renderToImage() {
                                          nullptr);
     SkBitmap bitmap;
     bitmap.allocPixels(info);
+    bitmap.eraseColor(bgColor);
     SkCanvas *rasterCanvas = new SkCanvas(bitmap);
-    rasterCanvas->clear(bgColor);
+    //rasterCanvas->clear(bgColor);
 
     drawSk(rasterCanvas);
     rasterCanvas->flush();
@@ -1337,6 +1338,7 @@ void CanvasRenderData::renderToImage() {
         clearPixmapEffects();
     }
 
+    bitmap.setImmutable();
     renderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
     delete rasterCanvas;

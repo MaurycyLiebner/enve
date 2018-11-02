@@ -243,7 +243,15 @@ bool GLWindow::event(QEvent *event) {
         //QWindow::event(event);
         return true;
     default:
-        if(isExposed()) requestUpdate();
+//        qDebug() << event->type();
+//        if(isExposed()) {
+//            QEvent::Type type = event->type();
+//            if(type == QEvent::MouseMove ||
+//                type == QEvent::MouseButtonPress ||
+//                type == QEvent::) {
+//                requestUpdate();
+//            }
+//        }
         return QWindow::event(event);
     }
 }
