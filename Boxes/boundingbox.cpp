@@ -130,27 +130,6 @@ bool BoundingBox::isAncestor(BoundingBox *box) const {
     return false;
 }
 
-//#include <CImg.h>
-//using namespace cimg_library;
-void BoundingBox::applyEffectsSk(const SkBitmap &im,
-                                 const qreal &scale) {
-//    SkPixmap pixmap1;
-//    im.peekPixels(&pixmap1);
-//    CImg<unsigned char> cimg =
-//           CImg<unsigned char>(
-//                (unsigned char*)pixmap1.writable_addr(),
-//                pixmap1.width(), pixmap1.height(),
-//                1, 4, true);
-//    cimg.blur(10.);
-    if(mEffectsAnimators->hasChildAnimators()) {
-        SkPixmap pixmap;
-        im.peekPixels(&pixmap);
-        fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
-                               im.width(), im.height());
-        mEffectsAnimators->applyEffectsSk(im, img, scale);
-    }
-}
-
 Canvas *BoundingBox::getParentCanvas() {
     if(mParentGroup == nullptr) return nullptr;
     return mParentGroup->getParentCanvas();
@@ -312,7 +291,7 @@ void BoundingBox::select() {
 }
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
-        BoundingBoxRenderData *renderData) {
+        const std::shared_ptr<BoundingBoxRenderData>& renderData) {
     mRelBoundingRect = renderData->relBoundingRect;
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath = SkPath();
@@ -325,7 +304,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
 }
 
 void BoundingBox::updateCurrentPreviewDataFromRenderData(
-        BoundingBoxRenderData *renderData) {
+        const std::shared_ptr<BoundingBoxRenderData>& renderData) {
     updateRelBoundingRectFromRenderData(renderData);
 }
 
@@ -546,7 +525,7 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
 
 void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
-                        BoundingBoxRenderData *data) {
+                        const std::shared_ptr<BoundingBoxRenderData>& data) {
     data->relFrame = qRound(relFrame);
     data->renderedToImage = false;
     data->relTransform = getRelativeTransformAtRelFrameF(relFrame);
@@ -571,13 +550,8 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 }
 
-void BoundingBox::setupEffects(const int &relFrame,
-                               BoundingBoxRenderData *data) {
-    mEffectsAnimators->addEffectRenderDataToList(relFrame, data);
-}
-
 void BoundingBox::setupEffectsF(const qreal &relFrame,
-                               BoundingBoxRenderData *data) {
+                               const std::shared_ptr<BoundingBoxRenderData>& data) {
     mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
 
@@ -1027,7 +1001,7 @@ void BoundingBox::processSchedulers() {
 
 void BoundingBox::addSchedulersToProcess() {
     foreach(const std::shared_ptr<_ScheduledExecutor> &updatable, mSchedulers) {
-        MainWindow::getInstance()->addUpdateScheduler(updatable.get());
+        MainWindow::getInstance()->addUpdateScheduler(updatable);
     }
 
     mSchedulers.clear();
@@ -1252,7 +1226,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
     return false;
 }
 
-void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
+void BoundingBox::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
     mExpiredPixmap--;
     if(mRedoUpdate) {
         scheduleUpdate();
@@ -1262,9 +1236,9 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void BoundingBox::updateCurrentRenderData() {
-    BoundingBoxRenderData *renderData = createRenderData();
+    auto renderData = createRenderData();
     if(renderData == nullptr) return;
-    mCurrentRenderData = renderData->ref<BoundingBoxRenderData>();
+    mCurrentRenderData = renderData;
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
@@ -1417,7 +1391,7 @@ void BoundingBoxRenderData::afterUpdate() {
     }
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != nullptr && parentIsTarget) {
-        parentBoxT->renderDataFinished(this);
+        parentBoxT->renderDataFinished(ref<BoundingBoxRenderData>());
         //qDebug() << "box render finished:" << parentBoxT->prp_getName();
     }
     _ScheduledExecutor::afterUpdate();
@@ -1435,15 +1409,15 @@ void BoundingBoxRenderData::schedulerProccessed() {
         if(useCustomRelFrame) {
             parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
                         customRelFrame,
-                        this);
+                        ref<BoundingBoxRenderData>());
         } else {
             parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
                         parentBoxT->anim_getCurrentRelFrame(),
-                        this);
+                        ref<BoundingBoxRenderData>());
         }
         foreach(RenderDataCustomizerFunctor *customizer,
                 mRenderDataCustomizerFunctors) {
-            (*customizer)(this);
+            (*customizer)(ref<BoundingBoxRenderData>());
         }
     }
     mDataSet = false;
@@ -1465,6 +1439,6 @@ void BoundingBoxRenderData::dataSet() {
         updateRelBoundingRect();
         BoundingBox *parentBoxT = parentBox.data();
         if(parentBoxT == nullptr || !parentIsTarget) return;
-        parentBoxT->updateCurrentPreviewDataFromRenderData(this);
+        parentBoxT->updateCurrentPreviewDataFromRenderData(ref<BoundingBoxRenderData>());
     }
 }

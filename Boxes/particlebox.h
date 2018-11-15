@@ -181,52 +181,8 @@ public:
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint();
 
-    EmitterData getEmitterDataAtRelFrame(const int &relFrame,
-                                         ParticleBoxRenderData *particleData) {
-        EmitterData data;
-        data.color = mColorAnimator->getColorAtRelFrame(relFrame).getSkColor();
-
-        BoundingBox *targetT = mBoxTargetProperty->getTarget();
-        if(targetT == nullptr) {
-            data.boxDraw = false;
-            Q_FOREACH(Particle *particle, mParticles) {
-                if(particle->isVisibleAtFrame(relFrame)) {
-                    data.particleStates <<
-                        particle->getParticleStateAtFrame(relFrame);
-                }
-            }
-        } else {
-            data.boxDraw = true;
-            Q_FOREACH(Particle *particle, mParticles) {
-                if(particle->isVisibleAtFrame(relFrame)) {
-                    ParticleState stateT = particle->getParticleStateAtFrame(relFrame);
-                    BoundingBoxRenderData *renderData = targetT->createRenderData();
-                    QMatrix multMatr = QMatrix(stateT.size, 0.,
-                                               0., stateT.size,
-                                               0., 0.)*particleData->transform;
-                    renderData->appendRenderCustomizerFunctor(
-                            new MultiplyTransformCustomizer(multMatr,
-                                                            stateT.opacity/255.));
-                    renderData->appendRenderCustomizerFunctor(
-                            new ReplaceTransformDisplacementCustomizer(
-                                    stateT.pos.x(), stateT.pos.y()));
-
-                    stateT.targetRenderData =
-                            renderData->ref<BoundingBoxRenderData>();
-                    renderData->maxBoundsEnabled = false;
-                    renderData->parentIsTarget = false;
-                    data.particleStates << stateT;
-                    renderData->addDependent(particleData);
-                    renderData->addScheduler();
-                }
-            }
-        }
-
-        return data;
-    }
-
     EmitterData getEmitterDataAtRelFrameF(const qreal &relFrame,
-                                          ParticleBoxRenderData *particleData) {
+                                          const std::shared_ptr<ParticleBoxRenderData>& particleData) {
         EmitterData data;
         data.color = mColorAnimator->getColorAtRelFrameF(relFrame).getSkColor();
 
@@ -247,7 +203,7 @@ public:
                 if(particle->isVisibleAtFrame(relFrame)) {
                     ParticleState stateT;
                     if(!particle->getParticleStateAtFrameF(relFrame, stateT)) continue;
-                    BoundingBoxRenderData *renderData = targetT->createRenderData();
+                    std::shared_ptr<BoundingBoxRenderData> renderData = targetT->createRenderData();
                     QMatrix multMatr = QMatrix(stateT.size, 0.,
                                                0., stateT.size,
                                                0., 0.)*particleData->transform;
@@ -361,14 +317,14 @@ public:
 
     bool SWT_isParticleBox();
 
-    BoundingBoxRenderData *createRenderData() {
-        return new ParticleBoxRenderData(this);
+    std::shared_ptr<BoundingBoxRenderData> createRenderData() {
+        return (new ParticleBoxRenderData(this))->ref<BoundingBoxRenderData>();
     }
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                               BoundingBoxRenderData *data) {
+                                               const std::shared_ptr<BoundingBoxRenderData>& data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        ParticleBoxRenderData *particleData = (ParticleBoxRenderData*)data;
+        auto particleData = data->ref<ParticleBoxRenderData>();
         particleData->emittersData.clear();
         foreach(ParticleEmitter *emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();

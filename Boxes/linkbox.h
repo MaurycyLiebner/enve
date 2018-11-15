@@ -69,9 +69,9 @@ public:
         return new InternalLinkBox(this);
     }
 
-    BoundingBoxRenderData *createRenderData();
+    std::shared_ptr<BoundingBoxRenderData> createRenderData();
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                               BoundingBoxRenderData *data);
+                                               const std::shared_ptr<BoundingBoxRenderData>& data);
     const SkBlendMode &getBlendMode() {
         if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getBlendMode();
@@ -181,7 +181,7 @@ public:
                 getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
     }
 
-    BoundingBoxRenderData *createRenderData();
+    std::shared_ptr<BoundingBoxRenderData> createRenderData();
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
@@ -200,12 +200,13 @@ public:
         }
     }
 
-    void setupEffects(const int &relFrame,
-                      BoundingBoxRenderData *data) {
+
+    void setupEffectsF(const qreal &relFrame,
+                      const std::shared_ptr<BoundingBoxRenderData>& data) {
         if(mParentGroup->SWT_isLinkBox()) {
-            getLinkTarget()->setupEffects(relFrame, data);
+            getLinkTarget()->setupEffectsF(relFrame, data);
         } else {
-            BoundingBox::setupEffects(relFrame, data);
+            BoundingBox::setupEffectsF(relFrame, data);
         }
     }
 
@@ -225,9 +226,9 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            BoundingBoxRenderData *data) {
+                            const std::shared_ptr<BoundingBoxRenderData>& data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
+        auto groupData = data->ref<BoxesGroupRenderData>();
         groupData->childrenRenderData.clear();
         qreal childrenEffectsMargin = 0.;
         qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -318,12 +319,12 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            BoundingBoxRenderData *data);
+                            const std::shared_ptr<BoundingBoxRenderData>& data);
     bool clipToCanvas();
 
     BoundingBox *createLinkForLinkGroup();
 
-    BoundingBoxRenderData *createRenderData();
+    std::shared_ptr<BoundingBoxRenderData> createRenderData();
 
     bool relPointInsidePath(const QPointF &relPos);
 protected:

@@ -74,12 +74,6 @@ class PixmapEffect : public ComplexAnimator {
     Q_OBJECT
 public:
     PixmapEffect(const PixmapEffectType &type);
-    virtual void apply(QImage *,
-                       const fmt_filters::image &,
-                       qreal) {}
-    virtual void applySk(const SkBitmap &,
-                         const fmt_filters::image &,
-                         qreal) {}
 
     virtual qreal getMargin() { return 0.; }
     virtual qreal getMarginAtRelFrame(const int &) { return 0.; }
@@ -111,14 +105,8 @@ public:
         mParentEffects = parentEffects;
     }
 
-    virtual PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-                                        const int &,
-                                        BoundingBoxRenderData *) { return nullptr; }
     virtual PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
-                                        const qreal &relFrame,
-                                        BoundingBoxRenderData *data) { /*return nullptr; }*/
-        return getPixmapEffectRenderDataForRelFrame(relFrame, data);
-    }
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data) = 0;
 
     bool SWT_isPixmapEffect() { return true; }
 
@@ -162,16 +150,12 @@ class BlurEffect : public PixmapEffect {
 public:
     BlurEffect(qreal radius = 10.);
 
-    void applySk(const SkBitmap &imgPtr,
-                 const fmt_filters::image &img,
-                 qreal scale);
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:
@@ -196,16 +180,11 @@ class ShadowEffect : public PixmapEffect {
 public:
     ShadowEffect(qreal radius = 10.);
 
-    void applySk(const SkBitmap &imgPtr,
-                 const fmt_filters::image &img,
-                 qreal scale);
-
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:
@@ -217,21 +196,37 @@ private:
     QPointFAnimatorQSPtr mTranslation;
 };
 
+struct LinesEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal linesDistance;
+    qreal linesWidth;
+    bool vertical = false;
+};
+
 class LinesEffect : public PixmapEffect {
 public:
     LinesEffect(qreal linesWidth = 5.,
                 qreal linesDistance = 5.);
-
-    void apply(QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
-
     qreal getMargin() { return 0.; }
 
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
 private:
     QrealAnimatorQSPtr mLinesDistance;
     QrealAnimatorQSPtr mLinesWidth;
     bool mVertical = false;
+};
+
+struct CirclesEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal circlesDistance;
+    qreal circlesRadius;
 };
 
 class CirclesEffect : public PixmapEffect {
@@ -239,57 +234,70 @@ public:
     CirclesEffect(qreal circlesRadius = 5.,
                   qreal circlesDistance = 5.);
 
-    void apply(QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
-
     qreal getMargin() { return 0.; }
-
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
 private:
     QrealAnimatorQSPtr mCirclesDistance;
     QrealAnimatorQSPtr mCirclesRadius;
+};
+
+struct SwirlEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal degrees;
 };
 
 class SwirlEffect : public PixmapEffect {
 public:
     SwirlEffect(qreal degrees = 45.);
 
-    void apply(QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
-
     qreal getMargin() { return 0.; }
 
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
 private:
     QrealAnimatorQSPtr mDegreesAnimator;
+};
+
+struct OilEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal radius;
 };
 
 class OilEffect : public PixmapEffect {
 public:
     OilEffect(qreal radius = 2.);
 
-    void apply(QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
-
     qreal getMargin() { return 0.; }
 
-
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
 private:
     QrealAnimatorQSPtr mRadiusAnimator;
+};
+
+struct ImplodeEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal factor;
 };
 
 class ImplodeEffect : public PixmapEffect {
 public:
     ImplodeEffect(qreal radius = 10.);
 
-    void apply(QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
-
     qreal getMargin() { return 0.; }
 
-
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
 private:
     QrealAnimatorQSPtr mFactorAnimator;
 };
@@ -308,9 +316,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -335,9 +342,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -370,9 +376,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:
@@ -398,9 +403,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -422,9 +426,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& );
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -438,7 +441,7 @@ struct SampledMotionBlurEffectRenderData : public PixmapEffectRenderData {
 
     qreal numberSamples;
     qreal opacity;
-    BoundingBoxRenderData *boxData;
+    std::shared_ptr<BoundingBoxRenderData> boxData;
     QList<BoundingBoxRenderDataSPtr> samples;
 };
 
@@ -448,9 +451,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-            const int &relFrame,
-            BoundingBoxRenderData *data);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
@@ -463,8 +463,7 @@ public:
                                               const int &relFrame);
 
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
-                                        const qreal &relFrame,
-            BoundingBoxRenderData *data);
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data);
     void prp_setAbsFrame(const int &frame);
 private:
     void getParentBoxFirstLastMarginAjusted(int *firstT, int *lastT,

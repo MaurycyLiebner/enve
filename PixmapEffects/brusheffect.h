@@ -82,7 +82,8 @@ public:
 
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(const int &relFrame);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData> &);
 
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,

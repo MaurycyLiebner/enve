@@ -499,7 +499,7 @@ void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     *lastIdentical = qMin(lId, getMaxFrame());
 }
 
-void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
+void Canvas::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
     mExpiredPixmap--;
     if(mRedoUpdate) {
         scheduleUpdate();

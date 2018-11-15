@@ -114,10 +114,10 @@ void PathBox::drawSelectedSk(SkCanvas *canvas,
 
 void PathBox::setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            BoundingBoxRenderData *data) {
+                            const std::shared_ptr<BoundingBoxRenderData>& data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
                                                         data);
-    PathBoxRenderData *pathData = (PathBoxRenderData*)data;
+    auto pathData = data->ref<PathBoxRenderData>();
     pathData->editPath = getPathAtRelFrameF(relFrame);
     pathData->path = pathData->editPath;
     if(getParentCanvas()->getPathEffectsVisible()) {
@@ -569,9 +569,8 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 }
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
-        BoundingBoxRenderData *renderData) {
-    PathBoxRenderData *pathRenderData =
-            ((PathBoxRenderData*)renderData);
+        const std::shared_ptr<BoundingBoxRenderData>& renderData) {
+    auto pathRenderData = renderData->ref<PathBoxRenderData>();
     mEditPathSk = pathRenderData->editPath;
     mPathSk = pathRenderData->path;
     mOutlinePathSk = pathRenderData->outlinePath;

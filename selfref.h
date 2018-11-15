@@ -3,6 +3,14 @@
 #include <QSharedPointer>
 #include <QObject>
 
+template <typename Ptr, typename List>
+extern bool listContainsSharedPtr(Ptr ptr, List list) {
+    foreach(Ptr ptrT, list) {
+        if(ptrT == ptr) return true;
+    }
+    return false;
+}
+
 class SelfRef : public QObject {
     Q_OBJECT
 public:

@@ -18,10 +18,6 @@ public:
 
     void addEffect(PixmapEffect *effect);
 
-    void applyEffectsSk(const SkBitmap &imgPtr,
-                        const fmt_filters::image &img,
-                        const qreal &scale);
-
     qreal getEffectsMargin() const;
 
     void setParentBox(BoundingBox *box);
@@ -35,10 +31,8 @@ public:
     qreal getEffectsMarginAtRelFrame(const int &relFrame) const;
     qreal getEffectsMarginAtRelFrameF(const qreal &relFrame) const;
 
-    void addEffectRenderDataToList(const int &relFrame,
-                                   BoundingBoxRenderData *data);
     void addEffectRenderDataToListF(const qreal &relFrame,
-                                    BoundingBoxRenderData *data);
+                                    const std::shared_ptr<BoundingBoxRenderData>& data);
 
     void ca_removeAllChildAnimators();
 

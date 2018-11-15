@@ -121,10 +121,10 @@ bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
 
 void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,
-                                BoundingBoxRenderData *data) {
+                                const std::shared_ptr<BoundingBoxRenderData>& data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
                                                        data);
-    AnimationBoxRenderData *imageData = (AnimationBoxRenderData*)data;
+    auto imageData = data->ref<AnimationBoxRenderData>();
     int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
     imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
@@ -137,8 +137,8 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 }
 
-BoundingBoxRenderData *AnimationBox::createRenderData() {
-    return new AnimationBoxRenderData(mAnimationCacheHandler, this);
+std::shared_ptr<BoundingBoxRenderData> AnimationBox::createRenderData() {
+    return (new AnimationBoxRenderData(mAnimationCacheHandler, this))->ref<BoundingBoxRenderData>();
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {

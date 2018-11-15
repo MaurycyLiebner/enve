@@ -803,19 +803,19 @@ bool CanvasWindow::shouldProcessAwaitingSchedulers() {
     return mNoBoxesAwaitUpdate;// || !mFreeThreads.isEmpty();
 }
 
-void CanvasWindow::addUpdatableAwaitingUpdate(_Executor *updatable) {
+void CanvasWindow::addUpdatableAwaitingUpdate(const std::shared_ptr<_Executor>& updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
 
-    mUpdatablesAwaitingUpdate << updatable->ref<_Executor>();
+    mUpdatablesAwaitingUpdate << updatable;
     if(!mFreeThreads.isEmpty()) {
         sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), nullptr);
     }
 }
 
-void CanvasWindow::addFileUpdatableAwaitingUpdate(_Executor *updatable) {
-    mFileUpdatablesAwaitingUpdate << updatable->ref<_Executor>();
+void CanvasWindow::addFileUpdatableAwaitingUpdate(const std::shared_ptr<_Executor>& updatable) {
+    mFileUpdatablesAwaitingUpdate << updatable;
 
     if(mNoFileAwaitUpdate) {
         mNoFileAwaitUpdate = false;

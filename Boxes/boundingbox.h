@@ -100,7 +100,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     bool useCustomRelFrame = false;
     qreal customRelFrame;
     QList<QRectF> otherGlobalRects;
-    BoundingBoxRenderData *motionBlurTarget = nullptr;
+    std::shared_ptr<BoundingBoxRenderData> motionBlurTarget;
     // for motion blur
 
     QList<PixmapEffectRenderData*> pixmapEffects;
@@ -162,8 +162,8 @@ class RenderDataCustomizerFunctor {
 public:
     RenderDataCustomizerFunctor() {}
     virtual ~RenderDataCustomizerFunctor() {}
-    virtual void customize(BoundingBoxRenderData *data) = 0;
-    void operator()(BoundingBoxRenderData *data) {
+    virtual void customize(const std::shared_ptr<BoundingBoxRenderData>& data) = 0;
+    void operator()(const std::shared_ptr<BoundingBoxRenderData>& data) {
         customize(data);
     }
 };
@@ -177,7 +177,7 @@ public:
         mDy = dy;
     }
 
-    void customize(BoundingBoxRenderData *data) {
+    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
         QMatrix transformT = data->transform;
         data->transform.setMatrix(transformT.m11(), transformT.m12(),
                                   transformT.m21(), transformT.m22(),
@@ -196,7 +196,7 @@ public:
         mOpacity = opacity;
     }
 
-    void customize(BoundingBoxRenderData *data) {
+    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
         data->transform = mTransform*data->transform;
         data->opacity *= mOpacity;
     }
@@ -212,7 +212,7 @@ public:
         mOpacity = opacity;
     }
 
-    void customize(BoundingBoxRenderData *data) {
+    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
         data->opacity *= mOpacity;
     }
 protected:
@@ -489,8 +489,6 @@ public:
     }
     void switchLocked();
 
-    void applyEffectsSk(const SkBitmap &im, const qreal &scale = 1.);
-
     virtual QMatrix getCombinedTransform() const;
 
     bool isParticleBox();
@@ -532,9 +530,9 @@ public:
     }
 
     virtual void setupBoundingBoxRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData *data);
+            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data);
 
-    virtual BoundingBoxRenderData *createRenderData() { return nullptr; }
+    virtual std::shared_ptr<BoundingBoxRenderData> createRenderData() { return nullptr; }
 
     BoundingBoxRenderData *getCurrentRenderData();
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
@@ -542,11 +540,11 @@ public:
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
-    virtual void renderDataFinished(BoundingBoxRenderData *renderData);
-    void updateRelBoundingRectFromRenderData(BoundingBoxRenderData *renderData);
+    virtual void renderDataFinished(const std::shared_ptr<BoundingBoxRenderData> &renderData);
+    void updateRelBoundingRectFromRenderData(const std::shared_ptr<BoundingBoxRenderData>& renderData);
 
     virtual void updateCurrentPreviewDataFromRenderData(
-            BoundingBoxRenderData *renderData);
+            const std::shared_ptr<BoundingBoxRenderData>& renderData);
     virtual bool shouldScheduleUpdate() {
         if(mParentGroup == nullptr) return false;
         if((isVisibleAndInVisibleDurationRect()) ||
@@ -649,10 +647,8 @@ public:
     }
 
     int prp_getRelFrameShift() const;
-    virtual void setupEffects(const int &relFrame,
-                              BoundingBoxRenderData *data);
     virtual void setupEffectsF(const qreal &relFrame,
-                               BoundingBoxRenderData *data);
+                               const std::shared_ptr<BoundingBoxRenderData>& data);
 
     void addLinkingBox(BoundingBox *box) {
         mLinkingBoxes << box;

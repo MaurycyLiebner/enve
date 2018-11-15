@@ -91,7 +91,9 @@ public:
     CacheContainer() {}
     ~CacheContainer();
 
-    _ScheduledExecutor *scheduleLoadFromTmpFile(_ScheduledExecutor *dependent = nullptr) {
+    _ScheduledExecutor *scheduleLoadFromTmpFile(
+            const std::shared_ptr<_ScheduledExecutor>& dependent =
+                std::shared_ptr<_ScheduledExecutor>()) {
         if(mSavingToFile) {
             mCancelAfterSaveDataClear = true;
             return mSavingUpdatable;
@@ -193,7 +195,7 @@ public:
 
     const qreal &getResolutionFraction() const;
 
-    void setVariablesFromRenderData(BoundingBoxRenderData *data);
+    void setVariablesFromRenderData(const std::shared_ptr<BoundingBoxRenderData>& data);
     int getRelFrame() {
         return mRelFrame;
     }

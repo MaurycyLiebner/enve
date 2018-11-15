@@ -586,9 +586,9 @@ BoundingBox *BoxesGroup::createLink() {
 
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
-                        BoundingBoxRenderData *data) {
+                        const std::shared_ptr<BoundingBoxRenderData>& data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
+    auto groupData = data->ref<BoxesGroupRenderData>();
     groupData->childrenRenderData.clear();
     qreal childrenEffectsMargin = 0.;
     qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -598,7 +598,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                BoundingBoxRenderData *boxRenderData = box->createRenderData();
+                auto boxRenderData = box->createRenderData();
                 if(box->SWT_isPathBox()) {
                     idT = groupData->childrenRenderData.count();
                     lastPathBox = (PathBox*)box.data();
@@ -620,7 +620,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         }
         if(lastPathBox != nullptr) {
             qreal boxRelFrame = lastPathBox->prp_absFrameToRelFrameF(absFrame);
-            BoundingBoxRenderData *boxRenderData = new PathBoxRenderData(this);
+            auto boxRenderData = (new PathBoxRenderData(this))->ref<PathBoxRenderData>();
             lastPathBox->setupBoundingBoxRenderDataForRelFrameF(
                 boxRelFrame, boxRenderData);
             boxRenderData->addScheduler();
@@ -634,7 +634,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                BoundingBoxRenderData *boxRenderData = box->createRenderData();
+                auto boxRenderData = box->createRenderData();
                 boxRenderData->parentIsTarget = false;
                 boxRenderData->useCustomRelFrame = true;
                 boxRenderData->customRelFrame = boxRelFrame;

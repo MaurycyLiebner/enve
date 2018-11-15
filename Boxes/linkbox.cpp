@@ -44,14 +44,14 @@ BoundingBox *InternalLinkBox::createLink() {
     return getLinkTarget()->createLink();
 }
 
-BoundingBoxRenderData *InternalLinkBox::createRenderData() {
-    BoundingBoxRenderData *renderData = getLinkTarget()->createRenderData();
+std::shared_ptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
+    std::shared_ptr<BoundingBoxRenderData> renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = weakRef<BoundingBox>();
     return renderData;
 }
 
 void InternalLinkBox::setupBoundingBoxRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData *data) {
+        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data) {
     getLinkTarget()->setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
 }
@@ -217,8 +217,8 @@ BoxesGroup *InternalLinkGroupBox::getLinkTarget() const {
     return (BoxesGroup*)mBoxTarget->getTarget();
 }
 
-BoundingBoxRenderData *InternalLinkGroupBox::createRenderData() {
-    BoundingBoxRenderData *renderData = getLinkTarget()->createRenderData();
+std::shared_ptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
+    auto renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = weakRef<BoundingBox>();
     return renderData;
 }
@@ -255,11 +255,11 @@ void InternalLinkCanvas::processSchedulers() {
 }
 
 void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData *data) {
+        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data) {
     InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
 
     BoxesGroup *finalTarget = getFinalTarget();
-    LinkCanvasRenderData *canvasData = (LinkCanvasRenderData*)data;
+    auto canvasData = data->ref<LinkCanvasRenderData>();
     Canvas *canvasTarget = (Canvas*)finalTarget;
     canvasData->bgColor = canvasTarget->getBgColorAnimator()->
             getColorAtRelFrameF(relFrame).getSkColor();
@@ -286,8 +286,8 @@ BoundingBox *InternalLinkCanvas::createLinkForLinkGroup() {
     }
 }
 
-BoundingBoxRenderData *InternalLinkCanvas::createRenderData() {
-    return new LinkCanvasRenderData(this);
+std::shared_ptr<BoundingBoxRenderData> InternalLinkCanvas::createRenderData() {
+    return (new LinkCanvasRenderData(this))->ref<BoundingBoxRenderData>();
 }
 
 bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) {

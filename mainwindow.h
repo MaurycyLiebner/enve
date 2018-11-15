@@ -70,7 +70,7 @@ public:
     }
     UndoRedoStack *getUndoRedoStack();
 
-    void addUpdateScheduler(_ScheduledExecutor *scheduler);
+    void addUpdateScheduler(const std::shared_ptr<_ScheduledExecutor> &scheduler);
 
     static bool isShiftPressed();
     static bool isCtrlPressed();
@@ -134,7 +134,7 @@ public:
     FontsWidget *getFontsWidget() {
         return mFontWidget;
     }
-    void addFileUpdateScheduler(_ScheduledExecutor *scheduler);
+    void addFileUpdateScheduler(const std::shared_ptr<_ScheduledExecutor>& scheduler);
     void finishUndoRedoSet();
     Brush *getCurrentBrush();
 public slots:

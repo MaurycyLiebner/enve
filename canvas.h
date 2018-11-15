@@ -322,14 +322,14 @@ public:
         return mBackgroundColor.data();
     }
 
-    BoundingBoxRenderData *createRenderData() {
-        return new CanvasRenderData(this);
+    std::shared_ptr<BoundingBoxRenderData> createRenderData() {
+        return (new CanvasRenderData(this))->ref<BoundingBoxRenderData>();
     }
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                BoundingBoxRenderData *data) {
+                                                const std::shared_ptr<BoundingBoxRenderData>& data) {
         BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        CanvasRenderData *canvasData = (CanvasRenderData*)data;
+        auto canvasData = data->ref<CanvasRenderData>();
         canvasData->bgColor = mBackgroundColor->getCurrentColor().getSkColor();
         canvasData->canvasHeight = mHeight*mResolutionFraction;
         canvasData->canvasWidth = mWidth*mResolutionFraction;
@@ -470,7 +470,7 @@ public:
                mCurrentPreviewContainerOutdated;
     }
 
-    void renderDataFinished(BoundingBoxRenderData *renderData);
+    void renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);

@@ -62,8 +62,8 @@ public:
     void changeSourceFile();
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                BoundingBoxRenderData *data);
-    BoundingBoxRenderData *createRenderData();
+                                                const std::shared_ptr<BoundingBoxRenderData>& data);
+    std::shared_ptr<BoundingBoxRenderData> createRenderData();
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 private:

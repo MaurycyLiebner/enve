@@ -61,7 +61,7 @@ const qreal &RenderContainer::getResolutionFraction() const {
     return mResolutionFraction;
 }
 
-void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
+void RenderContainer::setVariablesFromRenderData(const std::shared_ptr<BoundingBoxRenderData>& data) {
     mNoDataInMemory = false;
     scheduleDeleteTmpFile();
 
@@ -256,7 +256,7 @@ void CacheContainerTmpFileDataLoader::afterUpdate() {
 }
 
 void CacheContainerTmpFileDataLoader::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(this);
+    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledExecutor>());
 }
 
 CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
@@ -301,7 +301,7 @@ void CacheContainerTmpFileDataSaver::afterUpdate() {
 }
 
 void CacheContainerTmpFileDataSaver::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(this);
+    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledExecutor>());
 }
 
 void CacheContainerTmpFileDataDeleter::_processUpdate() {
@@ -309,5 +309,5 @@ void CacheContainerTmpFileDataDeleter::_processUpdate() {
 }
 
 void CacheContainerTmpFileDataDeleter::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(this);
+    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledExecutor>());
 }

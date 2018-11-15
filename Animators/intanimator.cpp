@@ -16,6 +16,10 @@ int IntAnimator::getCurrentIntValueAtRelFrameF(const qreal &relFrame) const {
     return qRound(getCurrentValueAtRelFrameF(relFrame));
 }
 
+int IntAnimator::getCurrentIntEffectiveValueAtRelFrameF(const qreal &relFrame) const {
+    return qRound(getCurrentEffectiveValueAtRelFrameF(relFrame));
+}
+
 void IntAnimator::setCurrentIntValue(const int &value,
                                      const bool &saveUndoRedo,
                                      const bool &finish) {

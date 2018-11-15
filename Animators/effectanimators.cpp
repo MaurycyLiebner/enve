@@ -16,17 +16,6 @@ void EffectAnimators::setParentBox(BoundingBox *box) {
     mParentBox = box;
 }
 
-void EffectAnimators::applyEffectsSk(const SkBitmap &imgPtr,
-                                     const fmt_filters::image &img,
-                                     const qreal &scale) {
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
-        if(pixmapEffect->isVisible()) {
-            pixmapEffect->applySk(imgPtr, img, scale);
-        }
-    }
-}
-
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
@@ -60,24 +49,9 @@ qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const 
     return newMargin;
 }
 
-void EffectAnimators::addEffectRenderDataToList(
-        const int &relFrame,
-        BoundingBoxRenderData *data) {
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
-        if(pixmapEffect->isVisible()) {
-            PixmapEffectRenderData *effectRenderData =
-                    pixmapEffect->getPixmapEffectRenderDataForRelFrame(relFrame,
-                                                                       data);
-            if(effectRenderData == nullptr) continue;
-            data->pixmapEffects.append(effectRenderData);
-        }
-    }
-}
-
 void EffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
-        BoundingBoxRenderData *data) {
+        const std::shared_ptr<BoundingBoxRenderData>& data) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
         if(pixmapEffect->isVisible()) {

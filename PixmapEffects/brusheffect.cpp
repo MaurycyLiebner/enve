@@ -80,31 +80,31 @@ BrushEffect::BrushEffect(qreal numberStrokes,
     ca_addChildAnimator(mSeed.data());
 }
 
-PixmapEffectRenderData *BrushEffect::getPixmapEffectRenderDataForRelFrame(
-                                    const int &relFrame) {
+PixmapEffectRenderData *BrushEffect::getPixmapEffectRenderDataForRelFrameF(
+        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& ) {
     BrushEffectRenderData *renderData = new BrushEffectRenderData();
     renderData->maxBrushRadius =
-            mMaxBrushRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mMaxBrushRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->minBrushRadius =
-            mMinBrushRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mMinBrushRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->numberStrokes =
-            mNumberStrokes->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mNumberStrokes->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->strokeCurvature =
-            mStrokeCurvature->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mStrokeCurvature->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->strokeMaxDirectionAngle =
-            mStrokeMaxDirectionAngle->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mStrokeMaxDirectionAngle->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->strokeMaxLength =
-            mStrokeMaxLength->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mStrokeMaxLength->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->strokeMinDirectionAngle =
-            mStrokeMinDirectionAngle->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mStrokeMinDirectionAngle->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->smooth =
             mSmoothTransform->getValue();
     renderData->randomize =
             mRandomize->getValue();
     renderData->randStep =
-            mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+            mRandomizeStep->getCurrentIntValueAtRelFrameF(relFrame);
     renderData->relFrame = relFrame;
-    renderData->seed = mSeed->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->seed = mSeed->getCurrentIntEffectiveValueAtRelFrameF(relFrame);
     return renderData;
 }
 

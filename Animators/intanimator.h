@@ -15,6 +15,7 @@ public:
     bool SWT_isIntAnimator() { return true; }
     int getCurrentIntValueAtRelFrame(const int &relFrame) const;
     int getCurrentIntValueAtRelFrameF(const qreal &relFrame) const;
+    int getCurrentIntEffectiveValueAtRelFrameF(const qreal &relFrame) const;
 };
 
 #endif // INTANIMATOR_H

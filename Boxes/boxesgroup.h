@@ -172,12 +172,12 @@ public:
     void prp_setAbsFrame(const int &frame);
     void schedulerProccessed();
 
-    BoundingBoxRenderData *createRenderData() {
-        return new BoxesGroupRenderData(this);
+    std::shared_ptr<BoundingBoxRenderData> createRenderData() {
+        return (new BoxesGroupRenderData(this))->ref<BoundingBoxRenderData>();;
     }
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                BoundingBoxRenderData *data);
+                                                const std::shared_ptr<BoundingBoxRenderData>& data);
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);

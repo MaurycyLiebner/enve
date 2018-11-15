@@ -10,7 +10,7 @@ public:
     MinimalExecutor() {}
     bool finished() { return mFinished; }
 
-    virtual void addDependent(MinimalExecutor *updatable) = 0;
+    virtual void addDependent(const std::shared_ptr<MinimalExecutor>& updatable) = 0;
 
     virtual void clear() {
         mFinished = false;
@@ -34,14 +34,14 @@ protected:
     virtual void GUI_process() {}
     bool mGUIThreadExecution = false;
     void tellDependentThatFinished() {
-        foreach(MinimalExecutor *dependent, mCurrentExecutionDependent) {
+        foreach(const std::shared_ptr<MinimalExecutor>& dependent, mCurrentExecutionDependent) {
             dependent->decDependencies();
         }
         mCurrentExecutionDependent.clear();
     }
 
     bool mFinished = false;
-    QList<MinimalExecutor*> mCurrentExecutionDependent;
+    QList<std::shared_ptr<MinimalExecutor> > mCurrentExecutionDependent;
     int nDependancies = 0;
 };
 
@@ -50,10 +50,10 @@ class GUI_ThreadExecutor : public MinimalExecutor {
         mGUIThreadExecution = true;
     }
 
-    void addDependent(MinimalExecutor *updatable) {
+    void addDependent(const std::shared_ptr<MinimalExecutor>& updatable) {
         if(updatable == nullptr) return;
         if(!finished()) {
-            if(mCurrentExecutionDependent.contains(updatable)) return;
+            if(listContainsSharedPtr(updatable, mCurrentExecutionDependent)) return;
             mCurrentExecutionDependent << updatable;
             updatable->incDependencies();
         }
@@ -103,16 +103,16 @@ public:
         MinimalExecutor::clear();
         mBeingProcessed = false;
         mSelfRef.reset();
-        foreach(MinimalExecutor *dependent, mNextExecutionDependent) {
+        foreach(const std::shared_ptr<MinimalExecutor>& dependent, mNextExecutionDependent) {
             dependent->decDependencies();
         }
         mNextExecutionDependent.clear();
     }
 
-    void addDependent(MinimalExecutor *updatable) {
+    void addDependent(const std::shared_ptr<MinimalExecutor>& updatable) {
         if(updatable == nullptr) return;
         if(!finished()) {
-            if(mNextExecutionDependent.contains(updatable)) return;
+            if(listContainsSharedPtr(updatable, mNextExecutionDependent)) return;
             mNextExecutionDependent << updatable;
             updatable->incDependencies();
         }
@@ -122,7 +122,7 @@ protected:
     bool mBeingProcessed = false;
     std::shared_ptr<_Executor> mSelfRef;
 
-    QList<MinimalExecutor*> mNextExecutionDependent;
+    QList<std::shared_ptr<MinimalExecutor> > mNextExecutionDependent;
 };
 
 class _ScheduledExecutor : public _Executor {

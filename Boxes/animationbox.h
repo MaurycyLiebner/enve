@@ -35,8 +35,8 @@ public:
     bool handleSelectedCanvasAction(QAction *selectedAction);
     virtual void changeSourceFile() = 0;
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                BoundingBoxRenderData *data);
-    BoundingBoxRenderData *createRenderData();
+                                                const std::shared_ptr<BoundingBoxRenderData>& data);
+    std::shared_ptr<BoundingBoxRenderData> createRenderData();
 
     void afterUpdate();
     void setParentGroup(BoxesGroup *parent);

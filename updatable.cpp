@@ -27,7 +27,7 @@ void _ScheduledExecutor::addScheduler() {
 }
 
 void _ScheduledExecutor::addSchedulerNow() {
-    MainWindow::getInstance()->addUpdateScheduler(this);
+    MainWindow::getInstance()->addUpdateScheduler(ref<_ScheduledExecutor>());
 }
 
 void _ScheduledExecutor::clear() {

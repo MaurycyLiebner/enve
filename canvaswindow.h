@@ -85,7 +85,7 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void addUpdatableAwaitingUpdate(_Executor *updatable);
+    void addUpdatableAwaitingUpdate(const std::shared_ptr<_Executor> &updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             ScrollWidgetVisiblePart *visiblePartWidget);
@@ -139,7 +139,7 @@ public:
     bool shouldProcessAwaitingSchedulers();
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
-    void addFileUpdatableAwaitingUpdate(_Executor *updatable);
+    void addFileUpdatableAwaitingUpdate(const std::shared_ptr<_Executor> &updatable);
     WindowSingleWidgetTarget *getWindowSWT() {
         return mWindowSWTTarget;
     }

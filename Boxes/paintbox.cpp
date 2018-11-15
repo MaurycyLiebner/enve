@@ -271,7 +271,7 @@ void PaintBox::processSchedulers() {
     BoundingBox::processSchedulers();
 }
 
-void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
+void PaintBox::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
     BoundingBox::renderDataFinished(renderData);
     if(mTemporaryHandler != nullptr) {
         mTemporaryHandler->clearTmp();
@@ -279,7 +279,7 @@ void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData *data) {
+        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data) {
     if(mFinishSizeAndPosSetupScheduled) {
         mFinishSizeAndPosSetupScheduled = false;
         finishSizeAndPosSetup();
@@ -288,7 +288,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
         finishSizeSetup();
     }
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
+    auto paintData = data->ref<PaintBoxRenderData>();
     if(mMainHandler == nullptr) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
     foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
@@ -305,8 +305,8 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
     paintData->trans = QPointFToSkPoint(topLeft);
 }
 
-BoundingBoxRenderData *PaintBox::createRenderData() {
-    return new PaintBoxRenderData(this);
+std::shared_ptr<BoundingBoxRenderData> PaintBox::createRenderData() {
+    return (new PaintBoxRenderData(this))->ref<BoundingBoxRenderData>();
 }
 
 bool PaintBox::prp_differencesBetweenRelFrames(const int &relFrame1,

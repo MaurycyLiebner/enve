@@ -242,6 +242,10 @@ bool GLWindow::event(QEvent *event) {
         renderNow();
         //QWindow::event(event);
         return true;
+    case QEvent::WindowStateChange:
+    case QEvent::Resize:
+        requestUpdate();
+        return true;
     default:
 //        qDebug() << event->type();
 //        if(isExposed()) {
