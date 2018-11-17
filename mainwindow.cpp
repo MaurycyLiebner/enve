@@ -3,6 +3,8 @@
 #include <QKeyEvent>
 #include <QApplication>
 #include <QDebug>
+#include <QStatusBar>
+#include "usagewidget.h"
 #include <QToolBar>
 #include "updatescheduler.h"
 #include "Colors/ColorWidgets/colorsettingswidget.h"
@@ -64,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
 //                new SingleSound("/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/lektor.wav"));
     BoxSingleWidget::loadStaticPixmaps();
     setupToolBar();
+    setupStatusBar();
 
 //    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
 //        mClipboardContainers << nullptr;
@@ -492,6 +495,14 @@ ClipboardContainer *MainWindow::getClipboardContainer(
         return mClipboardContainer;
     }
     return nullptr;
+}
+
+#include <QSpacerItem>
+void MainWindow::setupStatusBar() {
+    mStatusBar = new QStatusBar(this);
+    setStatusBar(mStatusBar);
+    mUsageWidget = new UsageWidget(mStatusBar);
+    mStatusBar->addWidget(mUsageWidget);
 }
 
 void MainWindow::setupToolBar() {
@@ -965,7 +976,7 @@ void MainWindow::callUpdateSchedulers() {
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
-    if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
+    //if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
         mCanvasWindow->processSchedulers();
         foreach(const std::shared_ptr<_ScheduledExecutor> &updatable,
                 mUpdateSchedulers) {
@@ -975,7 +986,7 @@ void MainWindow::callUpdateSchedulers() {
             mCanvasWindow->addUpdatableAwaitingUpdate(updatable);
         }
         mUpdateSchedulers.clear();
-    }
+    //}
 
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mCanvasWindow->updateHoveredElements();

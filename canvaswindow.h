@@ -172,6 +172,7 @@ protected:
     int mMaxRenderFrame = 0;
 
     QList<int> mFreeThreads;
+    int mThreadsUsed = 0;
     bool mNoBoxesAwaitUpdate = true;
     bool mNoFileAwaitUpdate = true;
     QList<QThread*> mControlerThreads;

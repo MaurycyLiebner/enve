@@ -500,12 +500,13 @@ void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 void Canvas::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
-    mExpiredPixmap--;
-    if(mRedoUpdate) {
-        scheduleUpdate();
+    mExpiredPixmap = 0;
+    if(renderData->redo) {
+        scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
     }
     int fId;
     int lId;
+    //qDebug() << renderData->relFrame;
     prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);
     CacheContainer *cont =
           mCacheHandler.getRenderContainerAtRelFrame(fId);
@@ -534,9 +535,8 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
     int lId;
     prp_getFirstAndLastIdenticalRelFrame(&fId, &lId,
                                           anim_mCurrentRelFrame);
-    if(fId < minFrame &&
-       fId > maxFrame) return;
-    scheduleUpdate();
+    if(fId < minFrame && fId > maxFrame) return;
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 //void Canvas::updatePixmaps() {
@@ -831,7 +831,7 @@ void Canvas::prp_setAbsFrame(const int &frame) {
                                                           anim_mCurrentRelFrame);
         mCurrentPreviewContainerOutdated = difference;
         if(difference) {
-            scheduleUpdate();
+            scheduleUpdate(Animator::FRAME_CHANGE);
         }
     } else {
         if(cont->storesDataInMemory()) { // !!!

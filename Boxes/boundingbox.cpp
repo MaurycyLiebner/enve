@@ -9,7 +9,6 @@
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 #include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
-#include "PixmapEffects/fmt_filters.h"
 #include "Animators/animatorupdater.h"
 #include "pointhelpers.h"
 #include "skqtconversions.h"
@@ -54,7 +53,7 @@ void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                   maxFrame);
     if(anim_mCurrentAbsFrame >= minFrame) {
         if(anim_mCurrentAbsFrame <= maxFrame) {
-            scheduleUpdate();
+            scheduleUpdate(Animator::USER_CHANGE);
         }
     }
 }
@@ -135,8 +134,8 @@ Canvas *BoundingBox::getParentCanvas() {
     return mParentGroup->getParentCanvas();
 }
 
-void BoundingBox::updateAllBoxes() {
-    scheduleUpdate();
+void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
+    scheduleUpdate(reason);
 }
 
 void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
@@ -209,15 +208,15 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
                 anim_mCurrentRelFrame);
     if(mUpdateDrawOnParentBox != isInVisRange) {
         if(mUpdateDrawOnParentBox) {
-            if(mParentGroup != nullptr) mParentGroup->scheduleUpdate();
+            if(mParentGroup != nullptr) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
         } else {
-            scheduleUpdate();
+            scheduleUpdate(Animator::FRAME_CHANGE);
         }
         mUpdateDrawOnParentBox = isInVisRange;
     }
     if(prp_differencesBetweenRelFrames(lastRelFrame,
                                        anim_mCurrentRelFrame)) {
-        scheduleUpdate();
+        scheduleUpdate(Animator::FRAME_CHANGE);
     }
 }
 
@@ -237,7 +236,7 @@ void BoundingBox::setParentGroup(BoxesGroup *parent) {
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
     prp_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
-    mTransformAnimator->updateCombinedTransform();
+    mTransformAnimator->updateCombinedTransform(Animator::USER_CHANGE);
 }
 
 void BoundingBox::setParent(BasicTransformAnimator *parent) {
@@ -245,7 +244,7 @@ void BoundingBox::setParent(BasicTransformAnimator *parent) {
     mParentTransform = parent;
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
-    mTransformAnimator->updateCombinedTransform();
+    mTransformAnimator->updateCombinedTransform(Animator::USER_CHANGE);
 }
 
 void BoundingBox::clearParent() {
@@ -308,34 +307,61 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
     updateRelBoundingRectFromRenderData(renderData);
 }
 
-void BoundingBox::scheduleUpdate() {
+void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
+    scheduleUpdate(anim_mCurrentRelFrame, reason);
+}
+
+void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason) {
     Q_ASSERT(!mBlockedSchedule);
     if(!shouldScheduleUpdate()) return;
-    if(mCurrentRenderData == nullptr) {
-        updateCurrentRenderData();
-        if(mCurrentRenderData == nullptr) return;
+    mExpiredPixmap = 1;
+    auto currentRenderData = getCurrentRenderData(relFrame);
+    if(currentRenderData == nullptr) {
+        currentRenderData = updateCurrentRenderData(relFrame);
+        if(currentRenderData == nullptr) return;
     } else {
-        if(!mRedoUpdate) {
-            mRedoUpdate = mCurrentRenderData->isAwaitingUpdate();
+        if(!currentRenderData->redo && reason != UpdateReason::FRAME_CHANGE) {
+            currentRenderData->redo = currentRenderData->isAwaitingUpdate();
         }
         return;
     }
-    mRedoUpdate = false;
-    mExpiredPixmap++;
+    currentRenderData->redo = false;
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
     if(mParentGroup != nullptr) {
-        mParentGroup->scheduleUpdate();
+        mParentGroup->scheduleUpdate(reason);
     }
 
-    mCurrentRenderData->addScheduler();
+    currentRenderData->addScheduler();
 
     emit scheduledUpdate();
 }
 
-void BoundingBox::nullifyCurrentRenderData() {
-    mCurrentRenderData.reset();
+BoundingBoxRenderDataSPtr BoundingBox::updateCurrentRenderData(const int& relFrame) {
+    auto renderData = createRenderData();
+    if(renderData == nullptr) return BoundingBoxRenderDataSPtr();
+    renderData->relFrame = relFrame;
+    mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
+    return renderData;
+}
+
+BoundingBoxRenderDataSPtr BoundingBox::getCurrentRenderData(const int& relFrame) {
+    BoundingBoxRenderDataSPtr currentRenderData = mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
+    if(currentRenderData == nullptr && mExpiredPixmap == 0) {
+        currentRenderData = mDrawRenderContainer.getSrcRenderData();
+        if(currentRenderData == nullptr) return BoundingBoxRenderDataSPtr();
+        if(currentRenderData->relFrame == relFrame) {
+            return currentRenderData->makeCopy();
+        }
+        return BoundingBoxRenderDataSPtr();
+    }
+    return currentRenderData;
+}
+
+
+void BoundingBox::nullifyCurrentRenderData(const int& relFrame) {
+    mCurrentRenderDataHandler.removeItemAtRelFrame(relFrame);
 }
 
 void BoundingBox::deselect() {
@@ -1025,7 +1051,7 @@ void BoundingBox::setVisibile(const bool &visible,
 
     clearAllCache();
 
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
@@ -1227,25 +1253,12 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
-    mExpiredPixmap--;
-    if(mRedoUpdate) {
-        scheduleUpdate();
+    mExpiredPixmap = 0;
+    if(renderData->redo) {
+        scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
     }
     mDrawRenderContainer.setVariablesFromRenderData(renderData);
     updateDrawRenderContainerTransform();
-}
-
-void BoundingBox::updateCurrentRenderData() {
-    auto renderData = createRenderData();
-    if(renderData == nullptr) return;
-    mCurrentRenderData = renderData;
-}
-
-BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
-    if(mCurrentRenderData == nullptr) {
-        return mDrawRenderContainer.getSrcRenderData();
-    }
-    return mCurrentRenderData.get();
 }
 
 void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
@@ -1255,190 +1268,5 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
     } else {
         *minFrame = mDurationRectangle->getMinFrameAsAbsFrame();
         *maxFrame = mDurationRectangle->getMaxFrameAsAbsFrame();
-    }
-}
-
-BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
-    if(parentBoxT == nullptr) return;
-    parentBox = parentBoxT->weakRef<BoundingBox>();
-}
-
-BoundingBoxRenderData::~BoundingBoxRenderData() {
-    foreach(RenderDataCustomizerFunctor *functor,
-            mRenderDataCustomizerFunctors) {
-        delete functor;
-    }
-    foreach(PixmapEffectRenderData *effectT, pixmapEffects) {
-        delete effectT;
-    }
-}
-
-void BoundingBoxRenderData::updateRelBoundingRect() {
-    BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == nullptr) return;
-    relBoundingRect = parentBoxT->getRelBoundingRectAtRelFrame(relFrame);
-}
-
-void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
-    if(opacity < 0.001) return;
-    canvas->save();
-    canvas->scale(1.f/resolution, 1.f/resolution);
-    renderToImage();
-    SkPaint paint;
-    paint.setAlpha(qRound(opacity*2.55));
-    paint.setBlendMode(blendMode);
-    //paint.setAntiAlias(true);
-    //paint.setFilterQuality(kHigh_SkFilterQuality);
-    if(blendMode == SkBlendMode::kDstIn ||
-       blendMode == SkBlendMode::kSrcIn ||
-       blendMode == SkBlendMode::kDstATop) {
-        SkPaint paintT;
-        paintT.setBlendMode(blendMode);
-        paintT.setColor(SK_ColorTRANSPARENT);
-        SkPath path;
-        path.addRect(SkRect::MakeXYWH(drawPos.x(), drawPos.y(),
-                                      renderedImage->width(),
-                                      renderedImage->height()));
-        path.toggleInverseFillType();
-        canvas->drawPath(path, paintT);
-    }
-    canvas->drawImage(renderedImage,
-                      drawPos.x(), drawPos.y(),
-                      &paint);
-    canvas->restore();
-}
-
-void BoundingBoxRenderData::renderToImage() {
-    if(renderedToImage) return;
-    renderedToImage = true;
-    if(opacity < 0.001) return;
-    QMatrix scale;
-    scale.scale(resolution, resolution);
-    QMatrix transformRes = transform*scale;
-    //transformRes.scale(resolution, resolution);
-    globalBoundingRect = transformRes.mapRect(relBoundingRect);
-    foreach(const QRectF &rectT, otherGlobalRects) {
-        globalBoundingRect = globalBoundingRect.united(rectT);
-    }
-    globalBoundingRect = globalBoundingRect.
-            adjusted(-effectsMargin, -effectsMargin,
-                     effectsMargin, effectsMargin);
-    if(maxBoundsEnabled) {
-        globalBoundingRect = globalBoundingRect.intersected(
-                              scale.mapRect(maxBoundsRect));
-    }
-    QSizeF sizeF = globalBoundingRect.size();
-    QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(globalBoundingRect.left()/**resolution*/),
-                    qRound(globalBoundingRect.top()/**resolution*/));
-    globalBoundingRect.translate(-transF);
-    SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
-                                         ceil(sizeF.height()),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    bitmap.eraseColor(SK_ColorTRANSPARENT);
-    //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
-    //rasterCanvas->clear(SK_ColorTRANSPARENT);
-
-    rasterCanvas->translate(-globalBoundingRect.left(),
-                            -globalBoundingRect.top());
-    rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
-
-    drawSk(rasterCanvas);
-    rasterCanvas->flush();
-    delete rasterCanvas;
-
-    drawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
-                            qRound(globalBoundingRect.top()));
-
-    if(!pixmapEffects.isEmpty()) {
-        SkPixmap pixmap;
-        bitmap.peekPixels(&pixmap);
-        fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
-                               pixmap.width(), pixmap.height());
-        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, img, resolution);
-        }
-        clearPixmapEffects();
-    }
-    bitmap.setImmutable();
-    renderedImage = SkImage::MakeFromBitmap(bitmap);
-    bitmap.reset();
-}
-
-void BoundingBoxRenderData::_processUpdate() {
-    renderToImage();
-}
-
-void BoundingBoxRenderData::beforeUpdate() {
-    if(!mDataSet) {
-        dataSet();
-    }
-    _ScheduledExecutor::beforeUpdate();
-
-    BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == nullptr || !parentIsTarget) return;
-    parentBoxT->nullifyCurrentRenderData();
-}
-
-void BoundingBoxRenderData::afterUpdate() {
-    if(motionBlurTarget != nullptr) {
-        motionBlurTarget->otherGlobalRects << globalBoundingRect;
-    }
-    BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT != nullptr && parentIsTarget) {
-        parentBoxT->renderDataFinished(ref<BoundingBoxRenderData>());
-        //qDebug() << "box render finished:" << parentBoxT->prp_getName();
-    }
-    _ScheduledExecutor::afterUpdate();
-}
-
-void BoundingBoxRenderData::parentBeingProcessed() {
-    mFinished = false;
-    mSchedulerAdded = true;
-    schedulerProccessed();
-}
-
-void BoundingBoxRenderData::schedulerProccessed() {
-    BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT != nullptr) {
-        if(useCustomRelFrame) {
-            parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
-                        customRelFrame,
-                        ref<BoundingBoxRenderData>());
-        } else {
-            parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
-                        parentBoxT->anim_getCurrentRelFrame(),
-                        ref<BoundingBoxRenderData>());
-        }
-        foreach(RenderDataCustomizerFunctor *customizer,
-                mRenderDataCustomizerFunctors) {
-            (*customizer)(ref<BoundingBoxRenderData>());
-        }
-    }
-    mDataSet = false;
-    if(!mDelayDataSet) {
-        dataSet();
-    }
-    _ScheduledExecutor::schedulerProccessed();
-}
-
-void BoundingBoxRenderData::addSchedulerNow() {
-    BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == nullptr) return;
-    parentBoxT->addScheduler(this);
-}
-
-void BoundingBoxRenderData::dataSet() {
-    if(allDataReady()) {
-        mDataSet = true;
-        updateRelBoundingRect();
-        BoundingBox *parentBoxT = parentBox.data();
-        if(parentBoxT == nullptr || !parentIsTarget) return;
-        parentBoxT->updateCurrentPreviewDataFromRenderData(ref<BoundingBoxRenderData>());
     }
 }

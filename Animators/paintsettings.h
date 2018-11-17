@@ -172,11 +172,11 @@ public:
 
     bool affectsPaths();
 
-    void updatePaths();
+    void updatePaths(const UpdateReason &reason);
 
     //void finishTransform();
 
-    void updateQGradientStops();
+    void updateQGradientStops(const UpdateReason &reason);
 
     int getLoadId();
     void setLoadId(const int &id);
@@ -198,7 +198,7 @@ public:
     ColorAnimator *getColorAnimatorAt(const int &id);
     void removeColor(const int &id);
 
-    void updateQGradientStopsFinal();
+    void updateQGradientStopsFinal(const UpdateReason &reason);
     bool isEmpty() const;
 
     bool SWT_isGradient() { return true; }

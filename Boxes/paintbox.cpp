@@ -158,17 +158,17 @@ void PaintBox::startAllPointsTransform() {
 
 void PaintBox::newPaintFrameOnCurrentFrame() {
     mMainHandler->anim_saveCurrentValueAsKey();
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PaintBox::newEmptyPaintFrameOnCurrentFrame() {
     mMainHandler->newEmptyPaintFrame();
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PaintBox::newEmptyPaintFrameAtFrame(const int &relFrame) {
     mMainHandler->newEmptyPaintFrame(relFrame);
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PaintBox::setOverlapFrames(const int &overlapFrames) {
@@ -241,7 +241,7 @@ void PaintBox::loadFromImage(const QImage &img) {
         finishSizeSetup();
     }
     mMainHandler->loadFromImage(img);
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PaintBox::scheduleFinishSizeSetup() {

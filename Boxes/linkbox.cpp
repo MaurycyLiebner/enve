@@ -13,7 +13,7 @@ ExternalLinkBox::ExternalLinkBox() :
 void ExternalLinkBox::reload() {
 
 
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void ExternalLinkBox::changeSrc() {

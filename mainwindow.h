@@ -30,6 +30,7 @@ class BoxScrollWidget;
 class ScrollWidget;
 class ScrollArea;
 class Brush;
+class UsageWidget;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -137,6 +138,10 @@ public:
     void addFileUpdateScheduler(const std::shared_ptr<_ScheduledExecutor>& scheduler);
     void finishUndoRedoSet();
     Brush *getCurrentBrush();
+
+    UsageWidget* getUsageWidget() {
+        return mUsageWidget;
+    }
 public slots:
     void setCurrentFrame(int frame);
     //void playPreview();
@@ -190,6 +195,8 @@ private:
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget = nullptr;
     BrushSettingsWidget *mBrushSettingsWidget = nullptr;
 
+    QStatusBar* mStatusBar;
+    UsageWidget* mUsageWidget;
     QToolBar *mToolBar;
 
     ActionButton *mMovePathMode;
@@ -260,6 +267,7 @@ private:
     BoxScrollWidget *mObjectSettingsWidget = nullptr;
     ScrollArea *mObjectSettingsScrollArea;
 
+    void setupStatusBar();
     void setupToolBar();
     void connectToolBarActions();
     void setupMenuBar();

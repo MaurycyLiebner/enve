@@ -27,7 +27,7 @@ public:
 
     void setTextAlignment(const Qt::Alignment &alignment) {
         mAlignment = alignment;
-        scheduleUpdate();
+        scheduleUpdate(Animator::USER_CHANGE);
     }
 
     bool SWT_isTextBox() { return true; }

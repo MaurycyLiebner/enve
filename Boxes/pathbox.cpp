@@ -304,13 +304,13 @@ void PathBox::resetFillGradientPointsPos() {
 void PathBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
     clearAllCache();
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
     clearAllCache();
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PathBox::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
@@ -325,7 +325,7 @@ void PathBox::setOutlineCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
     clearAllCache();
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PathBox::startSelectedStrokeWidthTransform() {
@@ -469,7 +469,7 @@ void PathBox::drawHoveredSk(SkCanvas *canvas,
 
 void PathBox::applyPaintSetting(const PaintSetting &setting) {
     setting.apply(this);
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PathBox::setFillColorMode(const ColorMode &colorMode) {
@@ -590,7 +590,7 @@ bool PathBox::relPointInsidePath(const QPointF &relPos) {
 
 void PathBox::setOutlineAffectedByScale(const bool &bT) {
     mOutlineAffectedByScale = bT;
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 PaintSettings *PathBox::getFillSettings() {

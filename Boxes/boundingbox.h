@@ -1,5 +1,6 @@
-#ifndef CHILDPARENT_H
-#define CHILDPARENT_H
+#ifndef BOUNDINGBOX_H
+#define BOUNDINGBOX_H
+
 #include <QMatrix>
 #include "transformable.h"
 #include "fillstrokesettings.h"
@@ -15,6 +16,10 @@
 #include "boundingboxrendercontainer.h"
 #include "skiaincludes.h"
 #include "updatable.h"
+
+#include "boundingboxrenderdata.h"
+
+#include "renderdatahandler.h"
 
 class Canvas;
 
@@ -80,149 +85,10 @@ private:
     BoundingBox *mBoundingBox;
 };
 
-class RenderDataCustomizerFunctor;
-struct BoundingBoxRenderData : public _ScheduledExecutor {
-    BoundingBoxRenderData(BoundingBox *parentBoxT);
-
-    virtual ~BoundingBoxRenderData();
-    bool renderedToImage = false;
-    QMatrix transform;
-    QMatrix parentTransform;
-    QMatrix relTransform;
-    QRectF relBoundingRect;
-    QRectF globalBoundingRect;
-    qreal opacity = 1.;
-    qreal resolution;
-    qreal effectsMargin;
-    int relFrame;
-
-    // for motion blur
-    bool useCustomRelFrame = false;
-    qreal customRelFrame;
-    QList<QRectF> otherGlobalRects;
-    std::shared_ptr<BoundingBoxRenderData> motionBlurTarget;
-    // for motion blur
-
-    QList<PixmapEffectRenderData*> pixmapEffects;
-    SkPoint drawPos = SkPoint::Make(0.f, 0.f);
-    SkBlendMode blendMode = SkBlendMode::kSrcOver;
-    QRectF maxBoundsRect;
-    bool maxBoundsEnabled = true;
-
-    bool parentIsTarget = true;
-    QWeakPointer<BoundingBox> parentBox;
-
-    virtual void updateRelBoundingRect();
-    void drawRenderedImageForParent(SkCanvas *canvas);
-    virtual void renderToImage();
-    sk_sp<SkImage> renderedImage;
-
-    void _processUpdate();
-
-    void beforeUpdate();
-
-    void afterUpdate();
-
-    void schedulerProccessed();
-
-    virtual bool allDataReady() { return true; }
-
-    void dataSet();
-
-    void clearPixmapEffects() {
-        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
-            delete effect;
-        }
-        pixmapEffects.clear();
-        effectsMargin = 0.;
-    }
-
-    virtual QPointF getCenterPosition() {
-        return relBoundingRect.center();
-    }
-
-    void appendRenderCustomizerFunctor(RenderDataCustomizerFunctor *customizer) {
-        mRenderDataCustomizerFunctors.append(customizer);
-    }
-
-    void prependRenderCustomizerFunctor(RenderDataCustomizerFunctor *customizer) {
-        mRenderDataCustomizerFunctors.prepend(customizer);
-    }
-
-    void parentBeingProcessed();
-protected:
-    void addSchedulerNow();
-    QList<RenderDataCustomizerFunctor*> mRenderDataCustomizerFunctors;
-    bool mDelayDataSet = false;
-    bool mDataSet = false;
-    virtual void drawSk(SkCanvas *canvas) = 0;
-};
-
-class RenderDataCustomizerFunctor {
-public:
-    RenderDataCustomizerFunctor() {}
-    virtual ~RenderDataCustomizerFunctor() {}
-    virtual void customize(const std::shared_ptr<BoundingBoxRenderData>& data) = 0;
-    void operator()(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        customize(data);
-    }
-};
-
-class ReplaceTransformDisplacementCustomizer :
-        public RenderDataCustomizerFunctor {
-public:
-    ReplaceTransformDisplacementCustomizer(const qreal &dx,
-                                           const qreal &dy) {
-        mDx = dx;
-        mDy = dy;
-    }
-
-    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        QMatrix transformT = data->transform;
-        data->transform.setMatrix(transformT.m11(), transformT.m12(),
-                                  transformT.m21(), transformT.m22(),
-                                  mDx, mDy);
-    }
-protected:
-    qreal mDx, mDy;
-};
-
-class MultiplyTransformCustomizer :
-        public RenderDataCustomizerFunctor {
-public:
-    MultiplyTransformCustomizer(const QMatrix &transform,
-                                const qreal &opacity = 1.) {
-        mTransform = transform;
-        mOpacity = opacity;
-    }
-
-    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        data->transform = mTransform*data->transform;
-        data->opacity *= mOpacity;
-    }
-protected:
-    QMatrix mTransform;
-    qreal mOpacity = 1.;
-};
-
-class MultiplyOpacityCustomizer :
-        public RenderDataCustomizerFunctor {
-public:
-    MultiplyOpacityCustomizer(const qreal &opacity) {
-        mOpacity = opacity;
-    }
-
-    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        data->opacity *= mOpacity;
-    }
-protected:
-    qreal mOpacity;
-};
-
-class BoundingBox :
-        public ComplexAnimator {
+class BoundingBox : public ComplexAnimator {
     Q_OBJECT
 public:
+
     BoundingBox(const BoundingBoxType &type);
     virtual ~BoundingBox();
 
@@ -417,7 +283,7 @@ public:
         return mBlendModeSk;
     }
 
-    virtual void updateAllBoxes();
+    virtual void updateAllBoxes(const UpdateReason &reason);
     void selectionChangeTriggered(const bool &shiftPressed);
 
     bool isAnimated() { return prp_isDescendantRecording(); }
@@ -534,7 +400,6 @@ public:
 
     virtual std::shared_ptr<BoundingBoxRenderData> createRenderData() { return nullptr; }
 
-    BoundingBoxRenderData *getCurrentRenderData();
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
     virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
 
@@ -554,8 +419,15 @@ public:
         return false;
     }
 
-    void updateCurrentRenderData();
-    void nullifyCurrentRenderData();
+//    BoundingBoxRenderDataSPtr getCurrentRenderData() {
+//        return getCurrentRenderData(anim_mCurrentRelFrame);
+//    }
+    BoundingBoxRenderDataSPtr getCurrentRenderData(const int &relFrame);
+//    BoundingBoxRenderDataSPtr updateCurrentRenderData() {
+//        return updateCurrentRenderData(anim_mCurrentRelFrame);
+//    }
+    BoundingBoxRenderDataSPtr updateCurrentRenderData(const int& relFrame);
+    void nullifyCurrentRenderData(const int& relFrame);
     virtual bool isRelFrameInVisibleDurationRect(const int &relFrame);
     virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
@@ -711,7 +583,8 @@ protected:
     QList<BoundingBox*> mChildBoxes;
     QList<BoundingBox*> mLinkingBoxes;
     QList<std::shared_ptr<_ScheduledExecutor> > mSchedulers;
-    std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
+    RenderDataHandler mCurrentRenderDataHandler;
+
 
     int mLoadId = -1;
 
@@ -728,8 +601,6 @@ protected:
     RenderContainer mDrawRenderContainer;
 
     bool mUpdateDrawOnParentBox = true;
-
-    bool mRedoUpdate = false;
 
     SkPath mSkRelBoundingRectPath;
 
@@ -759,7 +630,8 @@ signals:
     void nameChanged(QString);
     void scheduledUpdate();
 public slots:
-    void scheduleUpdate();
+    void scheduleUpdate(const UpdateReason &reason);
+    void scheduleUpdate(const int& relFrame, const UpdateReason &reason);
 
     void updateAfterDurationRectangleShifted(const int &dFrame = 0);
     void updateAfterDurationMinFrameChangedBy(const int &by);
@@ -772,4 +644,4 @@ public slots:
 };
 
 
-#endif // CHILDPARENT_H
+#endif // BOUNDINGBOX_H

@@ -194,19 +194,19 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
     mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
-void BasicTransformAnimator::updateRelativeTransform() {
+void BasicTransformAnimator::updateRelativeTransform(const UpdateReason &reason) {
     mRelTransform = getCurrentTransformationMatrix();
-    updateCombinedTransform();
+    updateCombinedTransform(reason);
 }
 
-void BasicTransformAnimator::updateCombinedTransform() {
+void BasicTransformAnimator::updateCombinedTransform(const UpdateReason &reason) {
     if(mParentTransformAnimator.isNull()) {
         mCombinedTransform = mRelTransform;
     } else {
         mCombinedTransform = mRelTransform *
                              mParentTransformAnimator->getCombinedTransform();
     }
-    emit combinedTransformChanged();
+    emit combinedTransformChanged(reason);
     schedulePivotUpdate();
 }
 
@@ -221,17 +221,18 @@ const QMatrix &BasicTransformAnimator::getRelativeTransform() const {
 void BasicTransformAnimator::setParentTransformAnimator(
                                 BasicTransformAnimator *parent) {
     if(!mParentTransformAnimator.isNull()) {
-        disconnect(mParentTransformAnimator.data(), SIGNAL(combinedTransformChanged()),
-                   this, SLOT(updateCombinedTransform()));
+        disconnect(mParentTransformAnimator.data(),
+                   SIGNAL(combinedTransformChanged(const UpdateReason&)),
+                   this, SLOT(updateCombinedTransform(const UpdateReason&)));
     }
     if(parent == nullptr) {
         mParentTransformAnimator.reset();
     } else {
         mParentTransformAnimator = parent->ref<BasicTransformAnimator>();
-        connect(parent, SIGNAL(combinedTransformChanged()),
-                this, SLOT(updateCombinedTransform()));
+        connect(parent, SIGNAL(combinedTransformChanged(const UpdateReason&)),
+                this, SLOT(updateCombinedTransform(const UpdateReason&)));
     }
-    updateCombinedTransform();
+    updateCombinedTransform(Animator::USER_CHANGE);
 }
 
 void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
@@ -366,11 +367,11 @@ bool BoxTransformAnimator::rotOrScaleOrPivotRecording() {
            mPivotAnimator->prp_isDescendantRecording();
 }
 
-void BoxTransformAnimator::updateCombinedTransform() {
-    BasicTransformAnimator::updateCombinedTransform();
+void BoxTransformAnimator::updateCombinedTransform(const UpdateReason &reason) {
+    BasicTransformAnimator::updateCombinedTransform(reason);
 
     mParentBox->updateDrawRenderContainerTransform();
-    mParentBox->scheduleUpdate();
+    mParentBox->scheduleUpdate(reason);
 }
 
 qreal BoxTransformAnimator::getPivotX() {

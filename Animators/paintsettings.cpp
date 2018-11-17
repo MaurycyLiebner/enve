@@ -9,7 +9,6 @@
 #include "skqtconversions.h"
 #include "skiaincludes.h"
 #include "Boxes/pathbox.h"
-QList<Gradient*> mLoadedGradients;
 
 ColorSetting::ColorSetting() {
     mChangedValue = CVR_ALL;
@@ -159,7 +158,7 @@ Gradient::Gradient() : ComplexAnimator() {
     prp_setUpdater(new GradientUpdater(this));
     prp_blockUpdater();
     prp_setName("gradient");
-    updateQGradientStops();
+    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 Gradient::~Gradient() {
@@ -173,7 +172,7 @@ Gradient::Gradient(const Color &color1, const Color &color2) :
     prp_setName("gradient");
     addColorToList(color1, false);
     addColorToList(color2, false);
-    updateQGradientStops();
+    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 bool Gradient::isEmpty() const {
@@ -234,7 +233,7 @@ void Gradient::swapColors(const int &id1, const int &id2,
     }
     ca_swapChildAnimators(mColors.at(id1), mColors.at(id2));
     mColors.swap(id1, id2);
-    updateQGradientStops();
+    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 void Gradient::removeColor(const int &id) {
@@ -250,17 +249,17 @@ void Gradient::removeColor(ColorAnimator *color,
     ca_removeChildAnimator(color);
     emit resetGradientWidgetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
-    updateQGradientStops();
+    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 void Gradient::addColor(const Color &color) {
     addColorToList(color);
-    updateQGradientStops();
+    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 void Gradient::replaceColor(const int &id, const Color &color) {
     mColors.at(id)->qra_setCurrentValue(color);
-    updateQGradientStops();
+    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 bool Gradient::isInPaths(PathBox *path) {
@@ -279,11 +278,11 @@ bool Gradient::affectsPaths() {
     return !mAffectedPaths.isEmpty();
 }
 
-void Gradient::updatePaths() {
+void Gradient::updatePaths(const UpdateReason &reason) {
     Q_FOREACH (PathBox *path, mAffectedPaths) {
         //path->replaceCurrentFrameCache();
         path->updateDrawGradients();
-        path->scheduleUpdate();
+        path->scheduleUpdate(reason);
     }
 }
 
@@ -323,7 +322,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrameF(const qreal &absFrame) {
     return stops;
 }
 
-void Gradient::updateQGradientStops() {
+void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
     mQGradientStops.clear();
     qreal inc = 1./(mColors.length() - 1.);
     qreal cPos = 0.;
@@ -332,10 +331,10 @@ void Gradient::updateQGradientStops() {
                                     mColors.at(i)->getCurrentColor().qcol) );
         cPos += inc;
     }
-    updatePaths();
+    updatePaths(reason);
 }
 
-void Gradient::updateQGradientStopsFinal() {
+void Gradient::updateQGradientStopsFinal(const Animator::UpdateReason& reason) {
     mQGradientStops.clear();
     qreal inc = 1./(mColors.length() - 1.);
     qreal cPos = 0.;
@@ -346,7 +345,7 @@ void Gradient::updateQGradientStopsFinal() {
     }
     Q_FOREACH(PathBox *path, mAffectedPaths) {
         path->updateDrawGradients();
-        path->scheduleUpdate();
+        path->scheduleUpdate(reason);
     }
 }
 

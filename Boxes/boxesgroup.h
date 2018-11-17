@@ -104,7 +104,7 @@ public:
 
     PaintSettings *getFillSettings();
     StrokeSettings *getStrokeSettings();
-    void updateAllBoxes();
+    void updateAllBoxes(const UpdateReason &reason);
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
         SkPath boundingPaths = SkPath();
@@ -226,13 +226,13 @@ public:
     void removeFillPathEffect(PathEffect *effect);
     void removeOutlinePathEffect(PathEffect *effect);
 
-    void updateAllChildPathBoxes() {
+    void updateAllChildPathBoxes(const UpdateReason &reason) {
         foreach(const QSharedPointer<BoundingBox> &box,
                 mContainedBoxes) {
             if(box->SWT_isPathBox()) {
-                box->scheduleUpdate();
+                box->scheduleUpdate(reason);
             } else if(box->SWT_isBoxesGroup()) {
-                ((BoxesGroup*)box.data())->updateAllChildPathBoxes();
+                ((BoxesGroup*)box.data())->updateAllChildPathBoxes(reason);
             }
         }
     }

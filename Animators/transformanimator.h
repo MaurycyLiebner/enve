@@ -69,7 +69,7 @@ public:
     void rotateRelativeToSavedValue(const qreal &rotRel,
                                     const QPointF &pivot);
 
-    void updateRelativeTransform();
+    void updateRelativeTransform(const UpdateReason &reason);
     const QMatrix &getCombinedTransform() const;
     const QMatrix &getRelativeTransform() const;
 
@@ -113,9 +113,9 @@ protected:
 
     AnimatorUpdaterStdSPtr mTransformUpdater;
 public slots:
-    virtual void updateCombinedTransform();
+    virtual void updateCombinedTransform(const UpdateReason &reason);
 signals:
-    void combinedTransformChanged();
+    void combinedTransformChanged(const UpdateReason &);
 };
 
 class Bone;
@@ -178,7 +178,7 @@ public:
         return mOpacityAnimator.data();
     }
 
-    void updateCombinedTransform();
+    void updateCombinedTransform(const UpdateReason &reason);
 
     BoundingBox *getParentBox() {
         return mParentBox;

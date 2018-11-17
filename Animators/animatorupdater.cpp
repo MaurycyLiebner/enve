@@ -9,15 +9,15 @@ TransformUpdater::TransformUpdater(BasicTransformAnimator *transformAnimator) {
 }
 
 void TransformUpdater::update() {
-    mTarget->updateRelativeTransform();
+    mTarget->updateRelativeTransform(Animator::USER_CHANGE);
 }
 
 void TransformUpdater::updateFinal() {
-    mTarget->updateRelativeTransform();
+    mTarget->updateRelativeTransform(Animator::USER_CHANGE);
 }
 
 void TransformUpdater::frameChangeUpdate() {
-    mTarget->updateRelativeTransform();
+    mTarget->updateRelativeTransform(Animator::FRAME_CHANGE);
 }
 
 NodePointUpdater::NodePointUpdater(PathBox *vectorPath) {
@@ -25,11 +25,11 @@ NodePointUpdater::NodePointUpdater(PathBox *vectorPath) {
 }
 
 void NodePointUpdater::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void NodePointUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
 GradientUpdater::GradientUpdater(Gradient *gradient) {
@@ -37,15 +37,15 @@ GradientUpdater::GradientUpdater(Gradient *gradient) {
 }
 
 void GradientUpdater::update() {
-    mTarget->updateQGradientStopsFinal();
+    mTarget->updateQGradientStopsFinal(Animator::USER_CHANGE);
 }
 
 void GradientUpdater::updateFinal() {
-    mTarget->updateQGradientStopsFinal();
+    mTarget->updateQGradientStopsFinal(Animator::USER_CHANGE);
 }
 
 void GradientUpdater::frameChangeUpdate() {
-    mTarget->updateQGradientStops();
+    mTarget->updateQGradientStops(Animator::FRAME_CHANGE);
 }
 
 StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path) {
@@ -53,11 +53,11 @@ StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path) {
 }
 
 void StrokeWidthUpdater::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void StrokeWidthUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
 DisplayedFillStrokeSettingsUpdater::
@@ -66,11 +66,11 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 }
 
 void DisplayedFillStrokeSettingsUpdater::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
 void DisplayedFillStrokeSettingsUpdater::updateFinal() {
@@ -82,11 +82,11 @@ PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
 }
 
 void PixmapEffectUpdater::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PixmapEffectUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
 void PixmapEffectUpdater::updateFinal() {
@@ -99,7 +99,7 @@ AnimationBoxFrameUpdater::AnimationBoxFrameUpdater(AnimationBox *target) {
 }
 
 void AnimationBoxFrameUpdater::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
     mTarget->updateDurationRectangleAnimationRange();
 }
 
@@ -113,13 +113,13 @@ void ParticlesUpdater::update() {
 }
 
 void GradientPointsUpdater::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
     if(mIsFill) {
         mTarget->updateFillDrawGradient();
     } else {
         mTarget->updateStrokeDrawGradient();
     }
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void GradientPointsUpdater::frameChangeUpdate() {
@@ -128,7 +128,7 @@ void GradientPointsUpdater::frameChangeUpdate() {
     } else {
         mTarget->updateStrokeDrawGradient();
     }
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
 #include "Sound/singlesound.h"
@@ -151,7 +151,7 @@ PaintBoxSizeUpdaterBR::~PaintBoxSizeUpdaterBR() {
 }
 
 void PaintBoxSizeUpdaterBR::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PaintBoxSizeUpdaterBR::frameChangeUpdate() {
@@ -160,7 +160,7 @@ void PaintBoxSizeUpdaterBR::frameChangeUpdate() {
 
 void PaintBoxSizeUpdaterBR::updateFinal() {
     mTarget->scheduleFinishSizeSetup();
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 PaintBoxSizeUpdaterTL::PaintBoxSizeUpdaterTL(PaintBox *paintBox) {
@@ -171,7 +171,7 @@ PaintBoxSizeUpdaterTL::~PaintBoxSizeUpdaterTL() {
 }
 
 void PaintBoxSizeUpdaterTL::update() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PaintBoxSizeUpdaterTL::frameChangeUpdate() {
@@ -180,7 +180,7 @@ void PaintBoxSizeUpdaterTL::frameChangeUpdate() {
 
 void PaintBoxSizeUpdaterTL::updateFinal() {
     mTarget->scheduleFinishSizeAndPosSetup();
-    mTarget->scheduleUpdate();
+    mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 RandomQrealGeneratorUpdater::RandomQrealGeneratorUpdater(
@@ -197,9 +197,9 @@ GroupAllPathsUpdater::GroupAllPathsUpdater(BoxesGroup *boxesGroup) {
 }
 
 void GroupAllPathsUpdater::update() {
-    mTarget->updateAllChildPathBoxes();
+    mTarget->updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void GroupAllPathsUpdater::frameChangeUpdate() {
-    mTarget->updateAllChildPathBoxes();
+    mTarget->updateAllChildPathBoxes(Animator::FRAME_CHANGE);
 }

@@ -21,6 +21,10 @@ MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
             this,
             SLOT(freeMemory(const MemoryState &,
                             const unsigned long long &)) );
+    connect(mMemoryChecker,
+            SIGNAL(memoryChecked(const int &, const int &)),
+            this,
+            SLOT(memoryChecked(const int &, const int &)) );
 
     mMemoryChekerThread->start();
 }
@@ -86,4 +90,9 @@ void MemoryHandler::freeMemory(const MemoryState &state,
     //MainWindow::getInstance()->callUpdateSchedulers();
     //MallocExtension::instance()->ReleaseToSystem(bytes - memToFree);
     //MallocExtension::instance()->ReleaseFreeMemory();
+}
+#include "usagewidget.h"
+void MemoryHandler::memoryChecked(const int &memKb, const int& totMemKb) {
+    MainWindow::getInstance()->getUsageWidget()->setTotalRam(totMemKb/1000000.);
+    MainWindow::getInstance()->getUsageWidget()->setRamUsage(-memKb/1000000.);
 }

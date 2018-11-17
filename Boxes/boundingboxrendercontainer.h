@@ -200,8 +200,8 @@ public:
         return mRelFrame;
     }
 
-    BoundingBoxRenderData *getSrcRenderData() {
-        return mSrcRenderData.get();
+    std::shared_ptr<BoundingBoxRenderData> getSrcRenderData() {
+        return mSrcRenderData;
     }
 
 protected:

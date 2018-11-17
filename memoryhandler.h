@@ -24,6 +24,7 @@ signals:
 public slots:
     void freeMemory(const MemoryState &state,
                     const unsigned long long &minFreeBytes);
+    void memoryChecked(const int& memKb, const int &totMemKb);
 private:
     long long mMemoryScheduledToRemove = 0;
     static MemoryHandler *mInstance;

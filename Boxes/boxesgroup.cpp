@@ -115,7 +115,7 @@ void BoxesGroup::addPathEffect(PathEffect *effect) {
     effect->setParentEffectAnimators(mPathEffectsAnimators.data());
 
     clearAllCache();
-    updateAllChildPathBoxes();
+    updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void BoxesGroup::addFillPathEffect(PathEffect *effect) {
@@ -130,7 +130,7 @@ void BoxesGroup::addFillPathEffect(PathEffect *effect) {
     effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
 
     clearAllCache();
-    updateAllChildPathBoxes();
+    updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void BoxesGroup::addOutlinePathEffect(PathEffect *effect) {
@@ -145,7 +145,7 @@ void BoxesGroup::addOutlinePathEffect(PathEffect *effect) {
     effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
 
     clearAllCache();
-    updateAllChildPathBoxes();
+    updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void BoxesGroup::removePathEffect(PathEffect *effect) {
@@ -161,7 +161,7 @@ void BoxesGroup::removePathEffect(PathEffect *effect) {
     }
 
     clearAllCache();
-    updateAllChildPathBoxes();
+    updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void BoxesGroup::removeFillPathEffect(PathEffect *effect) {
@@ -174,7 +174,7 @@ void BoxesGroup::removeFillPathEffect(PathEffect *effect) {
     }
 
     clearAllCache();
-    updateAllChildPathBoxes();
+    updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void BoxesGroup::removeOutlinePathEffect(PathEffect *effect) {
@@ -187,7 +187,7 @@ void BoxesGroup::removeOutlinePathEffect(PathEffect *effect) {
     }
 
     clearAllCache();
-    updateAllChildPathBoxes();
+    updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void BoxesGroup::filterPathForRelFrame(const int &relFrame,
@@ -348,11 +348,11 @@ void BoxesGroup::addSchedulersToProcess() {
     BoundingBox::addSchedulersToProcess();
 }
 
-void BoxesGroup::updateAllBoxes() {
+void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
-        child->updateAllBoxes();
+        child->updateAllBoxes(reason);
     }
-    scheduleUpdate();
+    scheduleUpdate(reason);
 }
 
 void BoxesGroup::clearAllCache() {
@@ -634,18 +634,23 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                auto boxRenderData = box->createRenderData();
-                boxRenderData->parentIsTarget = false;
-                boxRenderData->useCustomRelFrame = true;
-                boxRenderData->customRelFrame = boxRelFrame;
-                groupData->childrenRenderData << boxRenderData->ref<BoundingBoxRenderData>();
+                auto boxRenderData = box->getCurrentRenderData(qRound(boxRelFrame));
+                if(boxRenderData == nullptr) {
+                    boxRenderData = box->createRenderData();
+                    //boxRenderData->parentIsTarget = false;
+                    boxRenderData->useCustomRelFrame = true;
+                    boxRenderData->customRelFrame = boxRelFrame;
+                    boxRenderData->addScheduler();
+                    boxRenderData->addDependent(data);
+                    boxRenderData->schedulerProccessed();
+                    mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
+                } else {
+                    boxRenderData->addDependent(data);
+                }
+                groupData->childrenRenderData << boxRenderData;
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
                              childrenEffectsMargin);
-                boxRenderData->addScheduler();
-                boxRenderData->addDependent(data);
-                boxRenderData->schedulerProccessed();
-                mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
             }
         }
     }
@@ -711,7 +716,7 @@ bool BoxesGroup::shouldPaintOnImage() {
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
     if(!bT) {
-        scheduleUpdate();
+        scheduleUpdate(Animator::USER_CHANGE);
     }
     if(mParentGroup == nullptr) return;
     mParentGroup->setDescendantCurrentGroup(bT);
@@ -977,7 +982,7 @@ void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
 //        addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }
 
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 
     clearAllCache();
 }

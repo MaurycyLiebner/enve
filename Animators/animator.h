@@ -14,6 +14,11 @@ class Animator :
     public Property {
     Q_OBJECT
 public:
+    enum UpdateReason {
+        FRAME_CHANGE,
+        USER_CHANGE
+    };
+
     Animator();
     ~Animator();
 

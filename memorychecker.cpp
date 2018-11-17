@@ -31,7 +31,7 @@ unsigned long long getTotalRam() {
 MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mInstance = this;
 
-    //unsigned long long totRam = getTotalRam();
+    mTotalRam = getTotalRam();
     mLowFreeRam = 1800000000; // 1200000000;
     mVeryLowFreeRam = 1400000000; // 800000000;
 
@@ -129,6 +129,8 @@ void MemoryChecker::checkMemory() {
         }
         //setCurrentMemoryState(LOW_MEMORY_STATE);
     }
+
+    emit memoryChecked((int)(freeMem/1000ULL), (int)(mTotalRam/1000ULL));
 }
 
 unsigned long long getMajorPageFaults() {

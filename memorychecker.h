@@ -33,6 +33,7 @@ private:
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     QTimer *mTimer;
 
+    unsigned long long mTotalRam = 0ULL;
     unsigned long long mLowFreeRam = 0ULL;
     unsigned long long mVeryLowFreeRam = 0ULL;
 
@@ -49,6 +50,7 @@ private slots:
     void checkMemory();
     void checkMajorMemoryPageFault();
 signals:
+    void memoryChecked(const int&, const int&);
     void handleMemoryState(const MemoryState &,
                            const unsigned long long &);
 };

@@ -525,28 +525,26 @@ void BasicTransformAnimator::writeProperty(QIODevice *target) {
     mPosAnimator->writeProperty(target);
     mScaleAnimator->writeProperty(target);
     mRotAnimator->writeProperty(target);
-    updateRelativeTransform();
 }
 
 void BasicTransformAnimator::readProperty(QIODevice *target) {
     mPosAnimator->readProperty(target);
     mScaleAnimator->readProperty(target);
     mRotAnimator->readProperty(target);
-    updateRelativeTransform();
+    updateRelativeTransform(Animator::USER_CHANGE);
 }
 
 void BoxTransformAnimator::writeProperty(QIODevice *target) {
     BasicTransformAnimator::writeProperty(target);
     mOpacityAnimator->writeProperty(target);
     mPivotAnimator->writeProperty(target);
-    updateRelativeTransform();
 }
 
 void BoxTransformAnimator::readProperty(QIODevice *target) {
     BasicTransformAnimator::readProperty(target);
     mOpacityAnimator->readProperty(target);
     mPivotAnimator->readProperty(target);
-    updateRelativeTransform();
+    updateRelativeTransform(Animator::USER_CHANGE);
 }
 
 void GradientPoints::writeProperty(QIODevice *target) {

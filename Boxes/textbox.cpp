@@ -47,7 +47,7 @@ void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
     }
     clearAllCache();
     mFont = font;
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void TextBox::setSelectedFontSize(const qreal &size) {

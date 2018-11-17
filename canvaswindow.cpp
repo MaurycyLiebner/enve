@@ -19,6 +19,7 @@
 #include <QFileDialog>
 #include "windowsinglewidgettarget.h"
 #include "videoencoder.h"
+#include "usagewidget.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     mWindowSWTTarget = new WindowSingleWidgetTarget(this);
@@ -677,21 +678,21 @@ void CanvasWindow::updateDisplayedFillStrokeSettings() {
 void CanvasWindow::setClipToCanvas(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setClipToCanvas(bT);
-    mCurrentCanvas->updateAllBoxes();
+    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     callUpdateSchedulers();
 }
 
 void CanvasWindow::setRasterEffectsVisible(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setRasterEffectsVisible(bT);
-    mCurrentCanvas->updateAllBoxes();
+    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     callUpdateSchedulers();
 }
 
 void CanvasWindow::setPathEffectsVisible(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setPathEffectsVisible(bT);
-    mCurrentCanvas->updateAllBoxes();
+    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     callUpdateSchedulers();
 }
 
@@ -699,7 +700,7 @@ void CanvasWindow::setResolutionFraction(const qreal &percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->clearAllCache();
-    mCurrentCanvas->updateAllBoxes();
+    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     callUpdateSchedulers();
 }
 
@@ -741,7 +742,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
         mCurrentRenderFrame = renderSettings.minFrame;
         mCurrentCanvas->prp_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
-        mCurrentCanvas->updateAllBoxes();
+        mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
         if(mNoBoxesAwaitUpdate) {
             nextSaveOutputFrame();
         }
@@ -854,12 +855,14 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
         }
     }
 }
+
 #include <chrono>
 void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
                                               _Executor *lastUpdatable) {
     //auto start = std::chrono::steady_clock::now();
     //qDebug() << "sendNextUpdatableForUpdate::begin" << mFreeThreads.count();
     if(lastUpdatable != nullptr) {
+        mThreadsUsed--;
         if(mClearBeingUpdated) {
             lastUpdatable->clear();
         } else {
@@ -883,6 +886,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
             _Executor *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
+                mThreadsUsed++;
                 //qDebug() << "started processing using: " << threadId;
                 updatablaT->setCurrentPaintControler(
                             mPaintControlers.at(threadId));
@@ -892,6 +896,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
                 i--;
                 //return;
                 if(mFreeThreads.isEmpty() || mUpdatablesAwaitingUpdate.isEmpty()) {
+                    MainWindow::getInstance()->getUsageWidget()->setThreadsUsage(mThreadsUsed);
                     //auto end = std::chrono::steady_clock::now();
                     //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
                     return;
@@ -901,7 +906,14 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
         }
         //qDebug() << "thread free, not ready: " << threadId;
         mFreeThreads << threadId;
+        // !!! parallel
+        if(mBoxesUpdateFinishedFunction != nullptr) {
+            (*this.*mBoxesUpdateFinishedFunction)();
+        }
+        //qDebug() << "free";
+        // !!! parallel
     }
+    MainWindow::getInstance()->getUsageWidget()->setThreadsUsage(mThreadsUsed);
     //auto end = std::chrono::steady_clock::now();
     //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
 }
@@ -998,7 +1010,8 @@ void CanvasWindow::playPreview() {
                                            mCurrentRenderFrame,
                                            mCurrentCanvas->getFps());
     startAudio();
-    mPreviewFPSTimer->setInterval(1000/mCurrentCanvas->getFps());
+    int mSecInterval = qRound(1000/mCurrentCanvas->getFps());
+    mPreviewFPSTimer->setInterval(mSecInterval);
     mPreviewFPSTimer->start();
     MainWindow::getInstance()->previewBeingPlayed();
     requestUpdate();
@@ -1018,7 +1031,7 @@ void CanvasWindow::nextPreviewRenderFrame() {
 }
 
 void CanvasWindow::nextSaveOutputFrame() {
-    mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
+    //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         mCurrentRenderSettings = nullptr;
         mBoxesUpdateFinishedFunction = nullptr;

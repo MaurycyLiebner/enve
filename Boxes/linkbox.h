@@ -53,7 +53,7 @@ public:
             connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
-        scheduleUpdate();
+        scheduleUpdate(Animator::USER_CHANGE);
         connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
                 this, SLOT(setTargetSlot(BoundingBox*)));
     }
@@ -147,7 +147,7 @@ public:
             connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
-        scheduleUpdate();
+        scheduleUpdate(Animator::USER_CHANGE);
         connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
                 this, SLOT(setTargetSlot(BoundingBox*)));
     }
@@ -235,8 +235,8 @@ public:
         foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                BoundingBoxRenderData *boxRenderData =
-                        box->getCurrentRenderData();
+                BoundingBoxRenderDataSPtr boxRenderData =
+                        box->getCurrentRenderData(boxRelFrame);
                 if(boxRenderData == nullptr) {
                     continue;
                 }

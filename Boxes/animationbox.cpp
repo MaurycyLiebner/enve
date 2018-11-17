@@ -48,7 +48,7 @@ void AnimationBox::reloadCacheHandler() {
     clearAllCache();
 
     //mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
-    scheduleUpdate();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void AnimationBox::setParentGroup(BoxesGroup *parent) {
@@ -90,7 +90,7 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
     //if(!mWaitingForSchedulerToBeProcessed) {
         //scheduleUpdate();
     //} else {
-        scheduleUpdate();
+        scheduleUpdate(Animator::FRAME_CHANGE);
     //}
 }
 

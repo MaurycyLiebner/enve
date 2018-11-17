@@ -9,9 +9,9 @@ class RenderContainer;
 class CacheContainer;
 class RenderCacheHandler;
 
-class CacheHandler : public QObject {
-    Q_OBJECT
+class CacheHandler {
 public:
+    virtual ~CacheHandler() {}
     void removeRenderContainer(CacheContainer *cont);
     CacheContainer *getRenderContainerAtRelFrame(const int &frame);
     virtual CacheContainer *createNewRenderContainerAtRelFrame(const int &frame);

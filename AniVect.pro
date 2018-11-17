@@ -210,7 +210,10 @@ SOURCES += main.cpp\
     twocolumnlayout.cpp \
     Paint/BrushSettings/brushselectionwidget.cpp \
     Paint/BrushSettings/brushselectionscrollarea.cpp \
-    skimagecopy.cpp
+    skimagecopy.cpp \
+    Boxes/renderdatahandler.cpp \
+    Boxes/boundingboxrenderdata.cpp \
+    usagewidget.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -381,7 +384,10 @@ HEADERS  += mainwindow.h \
     Paint/BrushSettings/brushselectionwidget.h \
     Paint/BrushSettings/brushselectionscrollarea.h \
     AddInclude/SkPointPriv.h \
-    skimagecopy.h
+    skimagecopy.h \
+    Boxes/renderdatahandler.h \
+    Boxes/boundingboxrenderdata.h \
+    usagewidget.h
 
 RESOURCES += \
     resources.qrc
