@@ -607,15 +607,16 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                 boxRenderData->parentIsTarget = false;
                 boxRenderData->useCustomRelFrame = true;
                 boxRenderData->customRelFrame = boxRelFrame;
+                boxRenderData->addScheduler();
+                boxRenderData->addDependent(data);
+                boxRenderData->schedulerProccessed();
+                mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
+
                 groupData->childrenRenderData <<
                         boxRenderData->ref<BoundingBoxRenderData>();
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
                              childrenEffectsMargin);
-                boxRenderData->addScheduler();
-                boxRenderData->addDependent(data);
-                boxRenderData->schedulerProccessed();
-                mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
             }
         }
         if(lastPathBox != nullptr) {
@@ -630,7 +631,6 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
             boxRenderData->parentBox = nullptr;
         }
     } else {
-
         foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {

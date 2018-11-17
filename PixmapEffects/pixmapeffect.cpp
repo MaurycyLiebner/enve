@@ -622,15 +622,17 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
             relFrameT += frameStep;
             continue;
         }
-        std::shared_ptr<BoundingBoxRenderData> sampleRenderData = mParentBox->createRenderData();
+        std::shared_ptr<BoundingBoxRenderData> sampleRenderData =
+                mParentBox->createRenderData();
         //mParentBox->setupBoundingBoxRenderDataForRelFrameF(i, sampleRenderData);
         sampleRenderData->parentIsTarget = false;
         sampleRenderData->useCustomRelFrame = true;
         sampleRenderData->customRelFrame = relFrameT;
         sampleRenderData->motionBlurTarget = data;
-        renderData->samples << sampleRenderData;
         sampleRenderData->addScheduler();
         sampleRenderData->addDependent(data);
+        renderData->samples << sampleRenderData;
+
         relFrameT += frameStep;
     }
     return renderData;
