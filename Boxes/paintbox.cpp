@@ -271,7 +271,7 @@ void PaintBox::processSchedulers() {
     BoundingBox::processSchedulers();
 }
 
-void PaintBox::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
+void PaintBox::renderDataFinished(const BoundingBoxRenderDataSPtr& renderData) {
     BoundingBox::renderDataFinished(renderData);
     if(mTemporaryHandler != nullptr) {
         mTemporaryHandler->clearTmp();
@@ -279,7 +279,7 @@ void PaintBox::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& 
 }
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
-        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data) {
+        const qreal &relFrame, const BoundingBoxRenderDataSPtr& data) {
     if(mFinishSizeAndPosSetupScheduled) {
         mFinishSizeAndPosSetupScheduled = false;
         finishSizeAndPosSetup();
@@ -305,7 +305,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
     paintData->trans = QPointFToSkPoint(topLeft);
 }
 
-std::shared_ptr<BoundingBoxRenderData> PaintBox::createRenderData() {
+BoundingBoxRenderDataSPtr PaintBox::createRenderData() {
     return (new PaintBoxRenderData(this))->ref<BoundingBoxRenderData>();
 }
 

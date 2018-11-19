@@ -12,6 +12,8 @@ class SkBitmap;
 class BoundingBoxRenderData;
 struct PixmapEffectRenderData;
 
+#include "sharedpointerdefs.h"
+
 class EffectAnimators : public ComplexAnimator {
 public:
     EffectAnimators(BoundingBox *parentBox);
@@ -32,7 +34,7 @@ public:
     qreal getEffectsMarginAtRelFrameF(const qreal &relFrame) const;
 
     void addEffectRenderDataToListF(const qreal &relFrame,
-                                    const std::shared_ptr<BoundingBoxRenderData>& data);
+                                    const BoundingBoxRenderDataSPtr& data);
 
     void ca_removeAllChildAnimators();
 

@@ -586,7 +586,7 @@ BoundingBox *BoxesGroup::createLink() {
 
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
-                        const std::shared_ptr<BoundingBoxRenderData>& data) {
+                        const BoundingBoxRenderDataSPtr& data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     auto groupData = data->ref<BoxesGroupRenderData>();
     groupData->childrenRenderData.clear();
@@ -1092,7 +1092,7 @@ void BoxesGroupRenderData::renderToImage() {
         bitmap.peekPixels(&pixmap);
         fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
                                pixmap.width(), pixmap.height());
-        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+        foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
         clearPixmapEffects();

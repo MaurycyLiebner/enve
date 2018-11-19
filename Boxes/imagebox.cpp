@@ -61,7 +61,7 @@ void ImageBox::changeSourceFile() {
 
 void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
                                     const qreal &relFrame,
-                                    const std::shared_ptr<BoundingBoxRenderData>& data) {
+                                    const BoundingBoxRenderDataSPtr& data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     auto imgData = data->ref<ImageBoxRenderData>();
     imgData->image = mImgCacheHandler->getImageCopy();
@@ -71,7 +71,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 }
 
-std::shared_ptr<BoundingBoxRenderData> ImageBox::createRenderData() {
+BoundingBoxRenderDataSPtr ImageBox::createRenderData() {
     return (new ImageBoxRenderData(mImgCacheHandler, this))->ref<BoundingBoxRenderData>();
 }
 

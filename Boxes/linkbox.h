@@ -69,9 +69,9 @@ public:
         return new InternalLinkBox(this);
     }
 
-    std::shared_ptr<BoundingBoxRenderData> createRenderData();
+    BoundingBoxRenderDataSPtr createRenderData();
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                               const std::shared_ptr<BoundingBoxRenderData>& data);
+                                               const BoundingBoxRenderDataSPtr& data);
     const SkBlendMode &getBlendMode() {
         if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getBlendMode();
@@ -181,7 +181,7 @@ public:
                 getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
     }
 
-    std::shared_ptr<BoundingBoxRenderData> createRenderData();
+    BoundingBoxRenderDataSPtr createRenderData();
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
@@ -202,7 +202,7 @@ public:
 
 
     void setupEffectsF(const qreal &relFrame,
-                      const std::shared_ptr<BoundingBoxRenderData>& data) {
+                      const BoundingBoxRenderDataSPtr& data) {
         if(mParentGroup->SWT_isLinkBox()) {
             getLinkTarget()->setupEffectsF(relFrame, data);
         } else {
@@ -226,7 +226,7 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            const std::shared_ptr<BoundingBoxRenderData>& data) {
+                            const BoundingBoxRenderDataSPtr& data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto groupData = data->ref<BoxesGroupRenderData>();
         groupData->childrenRenderData.clear();
@@ -319,12 +319,12 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            const std::shared_ptr<BoundingBoxRenderData>& data);
+                            const BoundingBoxRenderDataSPtr& data);
     bool clipToCanvas();
 
     BoundingBox *createLinkForLinkGroup();
 
-    std::shared_ptr<BoundingBoxRenderData> createRenderData();
+    BoundingBoxRenderDataSPtr createRenderData();
 
     bool relPointInsidePath(const QPointF &relPos);
 protected:

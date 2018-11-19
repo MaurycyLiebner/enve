@@ -80,9 +80,9 @@ BrushEffect::BrushEffect(qreal numberStrokes,
     ca_addChildAnimator(mSeed.data());
 }
 
-PixmapEffectRenderData *BrushEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& ) {
-    BrushEffectRenderData *renderData = new BrushEffectRenderData();
+PixmapEffectRenderDataSPtr BrushEffect::getPixmapEffectRenderDataForRelFrameF(
+        const qreal &relFrame, const BoundingBoxRenderDataSPtr& ) {
+    auto renderData = BrushEffectRenderData::createBrushEffectRenderData();
     renderData->maxBrushRadius =
             mMaxBrushRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->minBrushRadius =
@@ -184,10 +184,10 @@ QColor colorMix(QColor col1, QColor col2) {
     qreal a2 = col2.alphaF();
     qreal aSum = a1 + a2;
     if(aSum < 0.001) return QColor(Qt::transparent);
-    return QColor((col1.red()*a1 + col2.red()*a2)/aSum,
-                  (col1.green()*a1 + col2.green()*a2)/aSum,
-                  (col1.blue()*a1 + col2.blue()*a2)/aSum,
-                  qMin(a1, a2)*255);
+    return QColor(qRound((col1.red()*a1 + col2.red()*a2)/aSum),
+                  qRound((col1.green()*a1 + col2.green()*a2)/aSum),
+                  qRound((col1.blue()*a1 + col2.blue()*a2)/aSum),
+                  qRound(qMin(a1, a2)*255));
 }
 
 bool isTooDifferent(const QColor &col1, const QColor &col2) {

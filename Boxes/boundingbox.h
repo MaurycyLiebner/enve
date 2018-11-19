@@ -396,20 +396,22 @@ public:
     }
 
     virtual void setupBoundingBoxRenderDataForRelFrameF(
-            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data);
+            const qreal &relFrame, const BoundingBoxRenderDataSPtr& data);
 
-    virtual std::shared_ptr<BoundingBoxRenderData> createRenderData() { return nullptr; }
+    virtual BoundingBoxRenderDataSPtr createRenderData() { return nullptr; }
 
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
     virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
 
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2);
-    virtual void renderDataFinished(const std::shared_ptr<BoundingBoxRenderData> &renderData);
-    void updateRelBoundingRectFromRenderData(const std::shared_ptr<BoundingBoxRenderData>& renderData);
+    bool prp_differencesBetweenRelFrames(const int &relFrame1, const int &relFrame2);
+
+    bool prp_differencesBetweenRelFramesIncludingInherited(
+            const int &relFrame1, const int &relFrame2);
+    virtual void renderDataFinished(const BoundingBoxRenderDataSPtr &renderData);
+    void updateRelBoundingRectFromRenderData(const BoundingBoxRenderDataSPtr& renderData);
 
     virtual void updateCurrentPreviewDataFromRenderData(
-            const std::shared_ptr<BoundingBoxRenderData>& renderData);
+            const BoundingBoxRenderDataSPtr& renderData);
     virtual bool shouldScheduleUpdate() {
         if(mParentGroup == nullptr) return false;
         if((isVisibleAndInVisibleDurationRect()) ||
@@ -520,7 +522,7 @@ public:
 
     int prp_getRelFrameShift() const;
     virtual void setupEffectsF(const qreal &relFrame,
-                               const std::shared_ptr<BoundingBoxRenderData>& data);
+                               const BoundingBoxRenderDataSPtr& data);
 
     void addLinkingBox(BoundingBox *box) {
         mLinkingBoxes << box;

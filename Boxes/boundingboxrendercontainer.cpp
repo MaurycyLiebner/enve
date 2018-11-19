@@ -61,7 +61,7 @@ const qreal &RenderContainer::getResolutionFraction() const {
     return mResolutionFraction;
 }
 
-void RenderContainer::setVariablesFromRenderData(const std::shared_ptr<BoundingBoxRenderData>& data) {
+void RenderContainer::setVariablesFromRenderData(const BoundingBoxRenderDataSPtr& data) {
     mNoDataInMemory = false;
     scheduleDeleteTmpFile();
 
@@ -184,7 +184,7 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
     mMaxRelFrame = maxFrame;
 }
 
-void CacheContainer::drawSk(SkCanvas *canvas) {
+void CacheContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
     //SkPaint paint;
     //paint.setAntiAlias(true);
     //paint.setFilterQuality(kHigh_SkFilterQuality);

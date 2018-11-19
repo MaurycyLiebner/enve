@@ -61,7 +61,7 @@ struct ParticleState {
         }
     }
 
-    std::shared_ptr<BoundingBoxRenderData> targetRenderData;
+    BoundingBoxRenderDataSPtr targetRenderData;
     SkPath linePath;
     SkPoint pos;
     SkScalar size;
@@ -182,51 +182,7 @@ public:
     MovablePoint *getPosPoint();
 
     EmitterData getEmitterDataAtRelFrameF(const qreal &relFrame,
-                                          const std::shared_ptr<ParticleBoxRenderData>& particleData) {
-        EmitterData data;
-        data.color = mColorAnimator->getColorAtRelFrameF(relFrame).getSkColor();
-
-        BoundingBox *targetT = mBoxTargetProperty->getTarget();
-        if(targetT == nullptr) {
-            data.boxDraw = false;
-            Q_FOREACH(Particle *particle, mParticles) {
-                if(particle->isVisibleAtFrame(relFrame)) {
-                    ParticleState stateT;
-                    if(particle->getParticleStateAtFrameF(relFrame, stateT)) {
-                        data.particleStates << stateT;
-                    }
-                }
-            }
-        } else {
-            data.boxDraw = true;
-            Q_FOREACH(Particle *particle, mParticles) {
-                if(particle->isVisibleAtFrame(relFrame)) {
-                    ParticleState stateT;
-                    if(!particle->getParticleStateAtFrameF(relFrame, stateT)) continue;
-                    std::shared_ptr<BoundingBoxRenderData> renderData = targetT->createRenderData();
-                    QMatrix multMatr = QMatrix(stateT.size, 0.,
-                                               0., stateT.size,
-                                               0., 0.)*particleData->transform;
-                    renderData->appendRenderCustomizerFunctor(
-                            new MultiplyTransformCustomizer(multMatr,
-                                                            stateT.opacity/255.));
-                    renderData->appendRenderCustomizerFunctor(
-                            new ReplaceTransformDisplacementCustomizer(
-                                    stateT.pos.x(), stateT.pos.y()));
-
-                    stateT.targetRenderData =
-                            renderData->ref<BoundingBoxRenderData>();
-                    renderData->maxBoundsEnabled = false;
-                    renderData->parentIsTarget = false;
-                    data.particleStates << stateT;
-                    renderData->addDependent(particleData);
-                    renderData->addScheduler();
-                }
-            }
-        }
-
-        return data;
-    }
+                                          const std::shared_ptr<ParticleBoxRenderData>& particleData);
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
@@ -317,12 +273,12 @@ public:
 
     bool SWT_isParticleBox();
 
-    std::shared_ptr<BoundingBoxRenderData> createRenderData() {
+    BoundingBoxRenderDataSPtr createRenderData() {
         return (new ParticleBoxRenderData(this))->ref<BoundingBoxRenderData>();
     }
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                               const std::shared_ptr<BoundingBoxRenderData>& data) {
+                                               const BoundingBoxRenderDataSPtr& data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto particleData = data->ref<ParticleBoxRenderData>();
         particleData->emittersData.clear();

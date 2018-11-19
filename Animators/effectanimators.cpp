@@ -51,11 +51,11 @@ qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const 
 
 void EffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
-        const std::shared_ptr<BoundingBoxRenderData>& data) {
+        const BoundingBoxRenderDataSPtr& data) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
         if(pixmapEffect->isVisible()) {
-            PixmapEffectRenderData *effectRenderData =
+            PixmapEffectRenderDataSPtr effectRenderData =
                     pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame,
                                                                         data);
             if(effectRenderData == nullptr) continue;

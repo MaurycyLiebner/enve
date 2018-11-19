@@ -499,7 +499,7 @@ void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     *lastIdentical = qMin(lId, getMaxFrame());
 }
 
-void Canvas::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
+void Canvas::renderDataFinished(const BoundingBoxRenderDataSPtr& renderData) {
     mExpiredPixmap = 0;
     if(renderData->redo) {
         scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
@@ -1332,7 +1332,7 @@ void CanvasRenderData::renderToImage() {
         bitmap.peekPixels(&pixmap);
         fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
                                pixmap.width(), pixmap.height());
-        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+        foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
         clearPixmapEffects();
@@ -1348,7 +1348,7 @@ void CanvasRenderData::drawSk(SkCanvas *canvas) {
     canvas->save();
 
     canvas->scale(resolution, resolution);
-    Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &renderData,
+    Q_FOREACH(const BoundingBoxRenderDataSPtr &renderData,
               childrenRenderData) {
         //box->draw(p);
         renderData->drawRenderedImageForParent(canvas);

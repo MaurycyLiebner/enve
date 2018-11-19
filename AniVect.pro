@@ -387,7 +387,8 @@ HEADERS  += mainwindow.h \
     skimagecopy.h \
     Boxes/renderdatahandler.h \
     Boxes/boundingboxrenderdata.h \
-    usagewidget.h
+    usagewidget.h \
+    sharedpointerdefs.h
 
 RESOURCES += \
     resources.qrc

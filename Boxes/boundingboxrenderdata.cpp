@@ -12,12 +12,13 @@ BoundingBoxRenderData::~BoundingBoxRenderData() {
             mRenderDataCustomizerFunctors) {
         delete functor;
     }
-    foreach(PixmapEffectRenderData *effectT, pixmapEffects) {
-        delete effectT;
-    }
 }
+
 #include "skimagecopy.h"
-void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
+void BoundingBoxRenderData::copyFrom(const BoundingBoxRenderDataSPtr& src) {
+    globalBoundingRect = src->globalBoundingRect;
+    transform = src->transform;
+    parentTransform = src->parentTransform;
     customRelFrame = src->customRelFrame;
     useCustomRelFrame = src->useCustomRelFrame;
     relFrame = src->relFrame;
@@ -32,11 +33,11 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     copied = true;
 }
 
-std::shared_ptr<BoundingBoxRenderData> BoundingBoxRenderData::makeCopy() {
+BoundingBoxRenderDataSPtr BoundingBoxRenderData::makeCopy() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return nullptr;
-    std::shared_ptr<BoundingBoxRenderData> copy = parentBoxT->createRenderData();
-    copy->copyFrom(this);
+    BoundingBoxRenderDataSPtr copy = parentBoxT->createRenderData();
+    copy->copyFrom(ref<BoundingBoxRenderData>());
     return copy;
 }
 
@@ -49,7 +50,7 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     if(opacity < 0.001) return;
     canvas->save();
-    canvas->scale(1.f/resolution, 1.f/resolution);
+    canvas->scale(1.f/(SkScalar)resolution, 1.f/(SkScalar)resolution);
     renderToImage();
     SkPaint paint;
     paint.setAlpha(qRound(opacity*2.55));
@@ -127,7 +128,7 @@ void BoundingBoxRenderData::renderToImage() {
         bitmap.peekPixels(&pixmap);
         fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
                                pixmap.width(), pixmap.height());
-        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+        foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
         clearPixmapEffects();
@@ -209,4 +210,45 @@ void BoundingBoxRenderData::dataSet() {
         if(parentBoxT == nullptr || !parentIsTarget) return;
         parentBoxT->updateCurrentPreviewDataFromRenderData(ref<BoundingBoxRenderData>());
     }
+}
+
+RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
+
+RenderDataCustomizerFunctor::~RenderDataCustomizerFunctor() {}
+
+void RenderDataCustomizerFunctor::operator()(const BoundingBoxRenderDataSPtr &data) {
+    customize(data);
+}
+
+ReplaceTransformDisplacementCustomizer::ReplaceTransformDisplacementCustomizer(
+        const qreal &dx, const qreal &dy) {
+    mDx = dx;
+    mDy = dy;
+}
+
+void ReplaceTransformDisplacementCustomizer::customize(
+        const BoundingBoxRenderDataSPtr &data) {
+    QMatrix transformT = data->transform;
+    data->transform.setMatrix(transformT.m11(), transformT.m12(),
+                              transformT.m21(), transformT.m22(),
+                              mDx, mDy);
+}
+
+MultiplyTransformCustomizer::MultiplyTransformCustomizer(
+        const QMatrix &transform, const qreal &opacity) {
+    mTransform = transform;
+    mOpacity = opacity;
+}
+
+void MultiplyTransformCustomizer::customize(const BoundingBoxRenderDataSPtr &data) {
+    data->transform = mTransform*data->transform;
+    data->opacity *= mOpacity;
+}
+
+MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal &opacity) {
+    mOpacity = opacity;
+}
+
+void MultiplyOpacityCustomizer::customize(const BoundingBoxRenderDataSPtr &data) {
+    data->opacity *= mOpacity;
 }

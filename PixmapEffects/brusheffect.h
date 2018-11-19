@@ -25,7 +25,14 @@ struct BrushEffectRenderData : public PixmapEffectRenderData {
     int randStep;
     int relFrame;
     int seed;
+
+    static BrushEffectRenderDataSPtr createBrushEffectRenderData() {
+        return (new BrushEffectRenderData)->ref<BrushEffectRenderData>();
+    }
+private:
+    BrushEffectRenderData() {}
 };
+
 class Dab;
 class Brush;
 class BrushStroke {
@@ -82,8 +89,8 @@ public:
 
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
-    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData> &);
+    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, const BoundingBoxRenderDataSPtr &);
 
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,

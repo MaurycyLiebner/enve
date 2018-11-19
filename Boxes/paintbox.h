@@ -47,14 +47,14 @@ public:
     bool SWT_isPaintBox() { return true; }
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
     void processSchedulers();
-    void renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData);
+    void renderDataFinished(const BoundingBoxRenderDataSPtr& renderData);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                const std::shared_ptr<BoundingBoxRenderData>& data);
+                                                const BoundingBoxRenderDataSPtr& data);
     BoundingBox *createNewDuplicate() {
         return new PaintBox(100, 100);
     }
 
-    std::shared_ptr<BoundingBoxRenderData> createRenderData();
+    BoundingBoxRenderDataSPtr createRenderData();
 
     void tabletMoveEvent(const qreal &xT,
                      const qreal &yT,

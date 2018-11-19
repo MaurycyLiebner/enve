@@ -18,10 +18,10 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
         BoundingBoxRenderData(parentBoxT) {
         mDelayDataSet = true;
     }
-    QList<std::shared_ptr<BoundingBoxRenderData> > childrenRenderData;
+    QList<BoundingBoxRenderDataSPtr > childrenRenderData;
     void updateRelBoundingRect() {
         SkPath boundingPaths = SkPath();
-        Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &child,
+        Q_FOREACH(const BoundingBoxRenderDataSPtr &child,
                   childrenRenderData) {
             SkPath childPath;
             childPath.addRect(
@@ -40,7 +40,7 @@ protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
-        Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &child,
+        Q_FOREACH(const BoundingBoxRenderDataSPtr &child,
                   childrenRenderData) {
             child->drawRenderedImageForParent(canvas);
         }
@@ -172,12 +172,12 @@ public:
     void prp_setAbsFrame(const int &frame);
     void schedulerProccessed();
 
-    std::shared_ptr<BoundingBoxRenderData> createRenderData() {
+    BoundingBoxRenderDataSPtr createRenderData() {
         return (new BoxesGroupRenderData(this))->ref<BoundingBoxRenderData>();;
     }
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                const std::shared_ptr<BoundingBoxRenderData>& data);
+                                                const BoundingBoxRenderDataSPtr& data);
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);

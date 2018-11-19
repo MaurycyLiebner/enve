@@ -44,14 +44,14 @@ BoundingBox *InternalLinkBox::createLink() {
     return getLinkTarget()->createLink();
 }
 
-std::shared_ptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
-    std::shared_ptr<BoundingBoxRenderData> renderData = getLinkTarget()->createRenderData();
+BoundingBoxRenderDataSPtr InternalLinkBox::createRenderData() {
+    BoundingBoxRenderDataSPtr renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = weakRef<BoundingBox>();
     return renderData;
 }
 
 void InternalLinkBox::setupBoundingBoxRenderDataForRelFrameF(
-        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data) {
+        const qreal &relFrame, const BoundingBoxRenderDataSPtr& data) {
     getLinkTarget()->setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
 }
@@ -217,7 +217,7 @@ BoxesGroup *InternalLinkGroupBox::getLinkTarget() const {
     return (BoxesGroup*)mBoxTarget->getTarget();
 }
 
-std::shared_ptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
+BoundingBoxRenderDataSPtr InternalLinkGroupBox::createRenderData() {
     auto renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = weakRef<BoundingBox>();
     return renderData;
@@ -255,7 +255,7 @@ void InternalLinkCanvas::processSchedulers() {
 }
 
 void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
-        const qreal &relFrame, const std::shared_ptr<BoundingBoxRenderData>& data) {
+        const qreal &relFrame, const BoundingBoxRenderDataSPtr& data) {
     InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
 
     BoxesGroup *finalTarget = getFinalTarget();
@@ -286,7 +286,7 @@ BoundingBox *InternalLinkCanvas::createLinkForLinkGroup() {
     }
 }
 
-std::shared_ptr<BoundingBoxRenderData> InternalLinkCanvas::createRenderData() {
+BoundingBoxRenderDataSPtr InternalLinkCanvas::createRenderData() {
     return (new LinkCanvasRenderData(this))->ref<BoundingBoxRenderData>();
 }
 
@@ -370,7 +370,7 @@ void LinkCanvasRenderData::renderToImage() {
         bitmap.peekPixels(&pixmap);
         fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
                                pixmap.width(), pixmap.height());
-        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+        foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
         clearPixmapEffects();

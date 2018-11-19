@@ -5,6 +5,7 @@ class BoundingBox;
 #include "skqtconversions.h"
 #include "skiaincludes.h"
 #include <QDebug>
+#include "sharedpointerdefs.h"
 class QTemporaryFile;
 class Canvas;
 
@@ -149,7 +150,7 @@ public:
     void setMinRelFrame(const int &minFrame);
     void setRelFrameRange(const int &minFrame, const int &maxFrame);
     bool relFrameInRange(const int &relFrame);
-    virtual void drawSk(SkCanvas *canvas);
+    virtual void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
     bool storesDataInMemory() {
         return !mNoDataInMemory;
     }
@@ -180,7 +181,7 @@ public:
     RenderContainer() {}
     virtual ~RenderContainer();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint);
+    void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
 
     void updatePaintTransformGivenNewCombinedTransform(
             const QMatrix &combinedTransform);
@@ -195,17 +196,17 @@ public:
 
     const qreal &getResolutionFraction() const;
 
-    void setVariablesFromRenderData(const std::shared_ptr<BoundingBoxRenderData>& data);
+    void setVariablesFromRenderData(const BoundingBoxRenderDataSPtr& data);
     int getRelFrame() {
         return mRelFrame;
     }
 
-    std::shared_ptr<BoundingBoxRenderData> getSrcRenderData() {
+    BoundingBoxRenderDataSPtr getSrcRenderData() {
         return mSrcRenderData;
     }
 
 protected:
-    std::shared_ptr<BoundingBoxRenderData> mSrcRenderData;
+    BoundingBoxRenderDataSPtr mSrcRenderData;
     int mRelFrame = 0;
     qreal mResolutionFraction;
     QMatrix mTransform;

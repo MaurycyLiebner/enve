@@ -4,9 +4,11 @@
 
 #include <QWeakPointer>
 #include "updatable.h"
+#include "Animators/animator.h"
 #include <QMatrix>
 class PixmapEffectRenderData;
 class BoundingBox;
+#include "sharedpointerdefs.h"
 
 class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public _ScheduledExecutor {
@@ -14,11 +16,12 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
 
     virtual ~BoundingBoxRenderData();
 
-    virtual void copyFrom(BoundingBoxRenderData* src);
+    virtual void copyFrom(const BoundingBoxRenderDataSPtr &src);
     bool copied = false;
 
+    Animator::UpdateReason reason;
 
-    std::shared_ptr<BoundingBoxRenderData> makeCopy();
+    BoundingBoxRenderDataSPtr makeCopy();
 
     bool redo = false;
 
@@ -32,15 +35,16 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     qreal resolution;
     qreal effectsMargin;
     int relFrame;
+    int kbSize = 0;
 
     // for motion blur
     bool useCustomRelFrame = false;
     qreal customRelFrame;
     QList<QRectF> otherGlobalRects;
-    std::shared_ptr<BoundingBoxRenderData> motionBlurTarget;
+    BoundingBoxRenderDataSPtr motionBlurTarget;
     // for motion blur
 
-    QList<PixmapEffectRenderData*> pixmapEffects;
+    QList<PixmapEffectRenderDataSPtr> pixmapEffects;
     SkPoint drawPos = SkPoint::Make(0.f, 0.f);
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
     QRectF maxBoundsRect;
@@ -67,9 +71,6 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     void dataSet();
 
     void clearPixmapEffects() {
-        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
-            delete effect;
-        }
         pixmapEffects.clear();
         effectsMargin = 0.;
     }
@@ -95,65 +96,40 @@ protected:
     virtual void drawSk(SkCanvas *canvas) = 0;
 };
 
-typedef std::shared_ptr<BoundingBoxRenderData> BoundingBoxRenderDataSPtr;
-
 class RenderDataCustomizerFunctor {
 public:
-    RenderDataCustomizerFunctor() {}
-    virtual ~RenderDataCustomizerFunctor() {}
-    virtual void customize(const std::shared_ptr<BoundingBoxRenderData>& data) = 0;
-    void operator()(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        customize(data);
-    }
+    RenderDataCustomizerFunctor();
+    virtual ~RenderDataCustomizerFunctor();
+    virtual void customize(const BoundingBoxRenderDataSPtr& data) = 0;
+    void operator()(const BoundingBoxRenderDataSPtr& data);
 };
 
-class ReplaceTransformDisplacementCustomizer :
-        public RenderDataCustomizerFunctor {
+class ReplaceTransformDisplacementCustomizer : public RenderDataCustomizerFunctor {
 public:
     ReplaceTransformDisplacementCustomizer(const qreal &dx,
-                                           const qreal &dy) {
-        mDx = dx;
-        mDy = dy;
-    }
+                                           const qreal &dy);
 
-    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        QMatrix transformT = data->transform;
-        data->transform.setMatrix(transformT.m11(), transformT.m12(),
-                                  transformT.m21(), transformT.m22(),
-                                  mDx, mDy);
-    }
+    void customize(const BoundingBoxRenderDataSPtr& data);
 protected:
     qreal mDx, mDy;
 };
 
-class MultiplyTransformCustomizer :
-        public RenderDataCustomizerFunctor {
+class MultiplyTransformCustomizer : public RenderDataCustomizerFunctor {
 public:
     MultiplyTransformCustomizer(const QMatrix &transform,
-                                const qreal &opacity = 1.) {
-        mTransform = transform;
-        mOpacity = opacity;
-    }
+                                const qreal &opacity = 1.);
 
-    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        data->transform = mTransform*data->transform;
-        data->opacity *= mOpacity;
-    }
+    void customize(const BoundingBoxRenderDataSPtr& data);
 protected:
     QMatrix mTransform;
     qreal mOpacity = 1.;
 };
 
-class MultiplyOpacityCustomizer :
-        public RenderDataCustomizerFunctor {
+class MultiplyOpacityCustomizer : public RenderDataCustomizerFunctor {
 public:
-    MultiplyOpacityCustomizer(const qreal &opacity) {
-        mOpacity = opacity;
-    }
+    MultiplyOpacityCustomizer(const qreal &opacity);
 
-    void customize(const std::shared_ptr<BoundingBoxRenderData>& data) {
-        data->opacity *= mOpacity;
-    }
+    void customize(const BoundingBoxRenderDataSPtr& data);
 protected:
     qreal mOpacity;
 };

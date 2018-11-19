@@ -115,12 +115,12 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,
-                                const std::shared_ptr<BoundingBoxRenderData>& data);
-    std::shared_ptr<BoundingBoxRenderData> createRenderData() {
+                                const BoundingBoxRenderDataSPtr& data);
+    BoundingBoxRenderDataSPtr createRenderData() {
         return (new PathBoxRenderData(this))->ref<BoundingBoxRenderData>();
     }
     void updateCurrentPreviewDataFromRenderData(
-            const std::shared_ptr<BoundingBoxRenderData>& renderData);
+            const BoundingBoxRenderDataSPtr& renderData);
     void duplicateStrokeSettingsFrom(
             StrokeSettings *strokeSettings);
     void duplicateFillSettingsFrom(

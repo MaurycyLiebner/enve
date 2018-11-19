@@ -35,8 +35,7 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     mTransformAnimator->reset();
 }
 
-BoundingBox::~BoundingBox() {
-}
+BoundingBox::~BoundingBox() {-}
 
 Property *BoundingBox::ca_getFirstDescendantWithName(const QString &name) {
     Property *propT = ComplexAnimator::ca_getFirstDescendantWithName(name);
@@ -229,6 +228,21 @@ bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     return mDurationRectangle->hasAnimationFrameRange();
 }
 
+bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
+        const int &relFrame1, const int &relFrame2) {
+    bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
+    if(mParentGroup == nullptr || diffThis) return diffThis;
+    int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
+    int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
+    int parentRelFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
+    int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+
+    bool diffInherited =
+            mParentGroup->prp_differencesBetweenRelFramesIncludingInherited(
+                parentRelFrame1, parentRelFrame2);
+    return diffThis || diffInherited;
+}
+
 void BoundingBox::setParentGroup(BoxesGroup *parent) {
     mParentGroup = parent;
 
@@ -290,7 +304,7 @@ void BoundingBox::select() {
 }
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
-        const std::shared_ptr<BoundingBoxRenderData>& renderData) {
+        const BoundingBoxRenderDataSPtr& renderData) {
     mRelBoundingRect = renderData->relBoundingRect;
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath = SkPath();
@@ -303,7 +317,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
 }
 
 void BoundingBox::updateCurrentPreviewDataFromRenderData(
-        const std::shared_ptr<BoundingBoxRenderData>& renderData) {
+        const BoundingBoxRenderDataSPtr& renderData) {
     updateRelBoundingRectFromRenderData(renderData);
 }
 
@@ -325,12 +339,21 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
         }
         return;
     }
+    auto currentReason = currentRenderData->reason;
+    if(reason == USER_CHANGE &&
+            (currentReason == CHILD_USER_CHANGE ||
+             currentReason == FRAME_CHANGE)) {
+        currentRenderData->reason = reason;
+    } else if(reason == CHILD_USER_CHANGE &&
+              currentReason == FRAME_CHANGE) {
+        currentRenderData->reason = reason;
+    }
     currentRenderData->redo = false;
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
     if(mParentGroup != nullptr) {
-        mParentGroup->scheduleUpdate(reason);
+        mParentGroup->scheduleUpdate(reason == USER_CHANGE ? CHILD_USER_CHANGE : reason);
     }
 
     currentRenderData->addScheduler();
@@ -351,7 +374,9 @@ BoundingBoxRenderDataSPtr BoundingBox::getCurrentRenderData(const int& relFrame)
     if(currentRenderData == nullptr && mExpiredPixmap == 0) {
         currentRenderData = mDrawRenderContainer.getSrcRenderData();
         if(currentRenderData == nullptr) return BoundingBoxRenderDataSPtr();
-        if(currentRenderData->relFrame == relFrame) {
+//        if(currentRenderData->relFrame == relFrame) {
+        if(!prp_differencesBetweenRelFramesIncludingInherited(
+                    currentRenderData->relFrame, relFrame)) {
             return currentRenderData->makeCopy();
         }
         return BoundingBoxRenderDataSPtr();
@@ -433,10 +458,8 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
 
 void BoundingBox::drawBoundingRectSk(SkCanvas *canvas,
                                      const qreal &invScale) {
-    drawAsBoundingRectSk(canvas,
-                         mSkRelBoundingRectPath,
-                         invScale,
-                         true);
+    drawAsBoundingRectSk(canvas, mSkRelBoundingRectPath,
+                         invScale, true);
 }
 
 const SkPath &BoundingBox::getRelBoundingRectPath() {
@@ -551,7 +574,7 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
 
 void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
-                        const std::shared_ptr<BoundingBoxRenderData>& data) {
+                        const BoundingBoxRenderDataSPtr& data) {
     data->relFrame = qRound(relFrame);
     data->renderedToImage = false;
     data->relTransform = getRelativeTransformAtRelFrameF(relFrame);
@@ -577,7 +600,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 void BoundingBox::setupEffectsF(const qreal &relFrame,
-                               const std::shared_ptr<BoundingBoxRenderData>& data) {
+                               const BoundingBoxRenderDataSPtr& data) {
     mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
 
@@ -778,7 +801,7 @@ int BoundingBox::prp_getRelFrameShift() const {
 void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     if(durationRect == mDurationRectangle) return;
     if(mDurationRectangle != nullptr) {
-        disconnect(mDurationRectangle, 0, this, 0);
+        disconnect(mDurationRectangle, nullptr, this, nullptr);
     }
     DurationRectangle *oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
@@ -845,9 +868,8 @@ DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
                             const int &minViewedFrame,
                             const qreal &pixelsPerFrame) {
     if(mDurationRectangle == nullptr) return nullptr;
-    return mDurationRectangle->getMovableAt(relX,
-                                           pixelsPerFrame,
-                                           minViewedFrame);
+    return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
+                                            minViewedFrame);
 }
 
 void BoundingBox::prp_drawKeys(QPainter *p,
@@ -1252,7 +1274,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
     return false;
 }
 
-void BoundingBox::renderDataFinished(const std::shared_ptr<BoundingBoxRenderData>& renderData) {
+void BoundingBox::renderDataFinished(const BoundingBoxRenderDataSPtr& renderData) {
     mExpiredPixmap = 0;
     if(renderData->redo) {
         scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
