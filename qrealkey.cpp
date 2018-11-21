@@ -285,6 +285,27 @@ void QrealKey::setEndValue(const qreal &value) {
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
+void QrealKey::scaleFrameAndUpdateParentAnimator(
+        const int &relativeToFrame, const qreal &scaleFactor,
+        const bool& useSavedFrame) {
+    int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
+
+    setStartFrameVar(thisRelFrame + (mStartFrame - thisRelFrame)*scaleFactor);
+    setEndFrameVar(thisRelFrame + (mEndFrame - thisRelFrame)*scaleFactor);
+
+    int newFrame =
+            qRound(thisRelFrame +
+                   (thisRelFrame -
+                    mParentAnimator->
+                    prp_absFrameToRelFrame(relativeToFrame))*
+                   scaleFactor);
+    if(newFrame != mRelFrame) {
+        incFrameAndUpdateParentAnimator(newFrame - mRelFrame);
+    } else {
+        mParentAnimator->anim_updateAfterChangedKey(this);
+    }
+}
+
 qreal QrealKey::getStartValue() {
     if(mStartEnabled) return mStartValue;
     return mValue;

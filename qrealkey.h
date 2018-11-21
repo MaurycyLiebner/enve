@@ -87,6 +87,11 @@ public:
     void setStartValue(const qreal &value);
     void setEndValue(const qreal &value);
 
+    void scaleFrameAndUpdateParentAnimator(
+            const int &relativeToFrame,
+            const qreal &scaleFactor,
+            const bool &useSavedFrame = true);
+
     void startValueTransform();
     void finishValueTransform();
     void writeKey(QIODevice *target);

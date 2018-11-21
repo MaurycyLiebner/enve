@@ -95,13 +95,12 @@ void BoundingBoxRenderData::renderToImage() {
         globalBoundingRect = globalBoundingRect.intersected(
                               scale.mapRect(maxBoundsRect));
     }
-    QSizeF sizeF = globalBoundingRect.size();
     QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -
             QPointF(qRound(globalBoundingRect.left()/**resolution*/),
                     qRound(globalBoundingRect.top()/**resolution*/));
     globalBoundingRect.translate(-transF);
-    SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
-                                         ceil(sizeF.height()),
+    SkImageInfo info = SkImageInfo::Make(qCeil(globalBoundingRect.width()),
+                                         qCeil(globalBoundingRect.height()),
                                          kBGRA_8888_SkColorType,
                                          kPremul_SkAlphaType,
                                          nullptr);
@@ -150,7 +149,9 @@ void BoundingBoxRenderData::beforeUpdate() {
 
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr || !parentIsTarget) return;
-    parentBoxT->nullifyCurrentRenderData(relFrame);
+    if(reason != BoundingBox::USER_CHANGE &&
+            reason != BoundingBox::CHILD_USER_CHANGE)
+        parentBoxT->nullifyCurrentRenderData(relFrame);
     // qDebug() << "box render started:" << relFrame << parentBoxT->prp_getName();
 }
 

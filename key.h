@@ -44,8 +44,10 @@ public:
     }
 
     virtual void cancelFrameTransform();
-    virtual void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
-                                                   const qreal &scaleFactor);
+    virtual void scaleFrameAndUpdateParentAnimator(
+            const int &relativeToFrame,
+            const qreal &scaleFactor,
+            const bool &useSavedFrame = true);
     void setSelected(const bool &bT);
     bool isSelected();
 

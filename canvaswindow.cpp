@@ -896,7 +896,9 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
                 i--;
                 //return;
                 if(mFreeThreads.isEmpty() || mUpdatablesAwaitingUpdate.isEmpty()) {
-                    MainWindow::getInstance()->getUsageWidget()->setThreadsUsage(mThreadsUsed);
+                    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
+                    if(usageWidget != nullptr)
+                        usageWidget->setThreadsUsage(mThreadsUsed);
                     //auto end = std::chrono::steady_clock::now();
                     //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
                     return;
@@ -913,7 +915,9 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
         //qDebug() << "free";
         // !!! parallel
     }
-    MainWindow::getInstance()->getUsageWidget()->setThreadsUsage(mThreadsUsed);
+    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
+    if(usageWidget == nullptr) return;
+    usageWidget->setThreadsUsage(mThreadsUsed);
     //auto end = std::chrono::steady_clock::now();
     //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
 }

@@ -451,6 +451,25 @@ public:
 
     const qreal &getFps() const { return mFps; }
     void setFps(const qreal &fps) { mFps = fps; }
+
+    BoundingBox *getBoxAt(const QPointF &absPos) {
+        if(mClipToCanvasSize) {
+            if(!getMaxBoundsRect().contains(absPos)) return nullptr;
+        }
+        return BoxesGroup::getBoxAt(absPos);
+    }
+
+    void scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+        BoxesGroup::scaleTime(pivotAbsFrame, scale);
+//        int newAbsPos = qRound(scale*pivotAbsFrame);
+//        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
+        setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
+    }
+
+    void changeFpsTo(const qreal& fps) {
+        scaleTime(0, fps/mFps);
+        setFps(fps);
+    }
     void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
 
     bool SWT_isCanvas() { return true; }

@@ -24,6 +24,8 @@ public:
     Animator();
     ~Animator();
 
+    virtual void scaleTime(const int &pivotAbsFrame, const qreal &scale);
+
     virtual void anim_updateAfterChangedKey(Key *key);
 
     virtual void prp_setAbsFrame(const int &frame);

@@ -35,7 +35,7 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     mTransformAnimator->reset();
 }
 
-BoundingBox::~BoundingBox() {-}
+BoundingBox::~BoundingBox() {}
 
 Property *BoundingBox::ca_getFirstDescendantWithName(const QString &name) {
     Property *propT = ComplexAnimator::ca_getFirstDescendantWithName(name);
@@ -596,6 +596,10 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
     if(data->opacity > 0.001 && effectsVisible) {
         setupEffectsF(relFrame, data);
+    }
+    if(data->parentIsTarget && (data->reason == USER_CHANGE ||
+            data->reason != BoundingBox::CHILD_USER_CHANGE)) {
+        nullifyCurrentRenderData(data->relFrame);
     }
 }
 

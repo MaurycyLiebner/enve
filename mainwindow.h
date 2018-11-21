@@ -196,7 +196,7 @@ private:
     BrushSettingsWidget *mBrushSettingsWidget = nullptr;
 
     QStatusBar* mStatusBar;
-    UsageWidget* mUsageWidget;
+    UsageWidget* mUsageWidget = nullptr;
     QToolBar *mToolBar;
 
     ActionButton *mMovePathMode;

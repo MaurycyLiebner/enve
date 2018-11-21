@@ -76,12 +76,12 @@ void Key::cancelFrameTransform() {
                                             false);
 }
 
-void Key::scaleFrameAndUpdateParentAnimator(
-        const int &relativeToFrame,
-        const qreal &scaleFactor) {
+void Key::scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
+        const qreal &scaleFactor, const bool &useSavedFrame) {
+    int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
     int newFrame =
-            qRound(mSavedRelFrame +
-                  (mSavedRelFrame -
+            qRound(thisRelFrame +
+                  (thisRelFrame -
                    mParentAnimator->
                    prp_absFrameToRelFrame(relativeToFrame))*
                    scaleFactor);

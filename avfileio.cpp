@@ -1314,6 +1314,7 @@ void VectorPath::readBoundingBox(QIODevice *target) {
 
 void Canvas::writeBoundingBox(QIODevice *target) {
     BoxesGroup::writeBoundingBox(target);
+    target->write((char*)&mClipToCanvasSize, sizeof(bool));
     target->write((char*)&mWidth, sizeof(int));
     target->write((char*)&mHeight, sizeof(int));
     target->write((char*)&mFps, sizeof(qreal));
@@ -1325,6 +1326,7 @@ void Canvas::writeBoundingBox(QIODevice *target) {
 void Canvas::readBoundingBox(QIODevice *target) {
     target->read((char*)&mType, sizeof(BoundingBoxType));
     BoxesGroup::readBoundingBox(target);
+    target->read((char*)&mClipToCanvasSize, sizeof(bool));
     target->read((char*)&mWidth, sizeof(int));
     target->read((char*)&mHeight, sizeof(int));
     target->read((char*)&mFps, sizeof(qreal));

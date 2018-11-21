@@ -311,6 +311,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     }
     return true;
 }
+#include <QInputDialog>
 #include "PathEffects/patheffect.h"
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
@@ -383,12 +384,21 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                         "canvas_outline_effect_sum");
 
 
+            menu.addAction("Map to Different Fps...")->setObjectName(
+                        "map_to_different_fps");
+
             menu.addAction("Settings...");
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != nullptr) {
                 if(selectedAction->text() == "Paste") {
                     pasteAction();
+                } else if(selectedAction->objectName() == "map_to_different_fps") {
+                    bool ok;
+                    qreal newFps = QInputDialog::getDouble(mMainWindow, "Map to Different Fps",
+                                                           "New Fps:", mFps, 1., 999.,
+                                                           2, &ok);
+                    if(ok) changeFpsTo(newFps);
                 } else if(selectedAction->text()== "Settings...") {
                     mCanvasWindow->openSettingsWindowForCurrentCanvas();
                 } else if(selectedAction->text() == "Blur") {

@@ -499,10 +499,12 @@ ClipboardContainer *MainWindow::getClipboardContainer(
 
 #include <QSpacerItem>
 void MainWindow::setupStatusBar() {
+#ifdef QT_DEBUG
     mStatusBar = new QStatusBar(this);
     setStatusBar(mStatusBar);
     mUsageWidget = new UsageWidget(mStatusBar);
     mStatusBar->addWidget(mUsageWidget);
+#endif
 }
 
 void MainWindow::setupToolBar() {

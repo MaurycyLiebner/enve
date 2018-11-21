@@ -14,6 +14,12 @@ Animator::~Animator() {
 
 }
 
+void Animator::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
+        key->scaleFrameAndUpdateParentAnimator(pivotAbsFrame, scale, false);
+    }
+}
+
 void Animator::anim_shiftAllKeys(const int &shift) {
     Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         anim_moveKeyToRelFrame(key.get(),

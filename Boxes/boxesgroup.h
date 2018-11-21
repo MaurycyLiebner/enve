@@ -56,10 +56,12 @@ public:
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
     ~BoxesGroup();
 
+    void scaleTime(const int& pivotAbsFrame, const qreal& scale);
+
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
 
-    BoundingBox *getBoxAt(const QPointF &absPos);
+    virtual BoundingBox *getBoxAt(const QPointF &absPos);
     //MovablePoint *getPointAt(const QPointF &absPos, const CanvasMode &currentMode);
 
     void addContainedBoxesToSelection(const QRectF &rect);

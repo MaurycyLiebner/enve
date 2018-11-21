@@ -35,7 +35,6 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     qreal resolution;
     qreal effectsMargin;
     int relFrame;
-    int kbSize = 0;
 
     // for motion blur
     bool useCustomRelFrame = false;

@@ -519,6 +519,14 @@ void BoxesGroup::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
 BoxesGroup::~BoxesGroup() {
 }
 
+void BoxesGroup::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+    BoundingBox::scaleTime(pivotAbsFrame, scale);
+
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+        box->scaleTime(pivotAbsFrame, scale);
+    }
+}
+
 bool BoxesGroup::relPointInsidePath(const QPointF &relPos) {
     if(mRelBoundingRect.contains(relPos)) {
         QPointF absPos = mapRelPosToAbs(relPos);
