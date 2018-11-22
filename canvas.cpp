@@ -520,6 +520,7 @@ void Canvas::renderDataFinished(const BoundingBoxRenderDataSPtr& renderData) {
     } else if(mPreviewing) {
         cont->setBlocked(true);
     }
+    callUpdateSchedulers();
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,

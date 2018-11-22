@@ -213,7 +213,8 @@ SOURCES += main.cpp\
     skimagecopy.cpp \
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
-    usagewidget.cpp
+    usagewidget.cpp \
+    application.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -388,7 +389,8 @@ HEADERS  += mainwindow.h \
     Boxes/renderdatahandler.h \
     Boxes/boundingboxrenderdata.h \
     usagewidget.h \
-    sharedpointerdefs.h
+    sharedpointerdefs.h \
+    application.h
 
 RESOURCES += \
     resources.qrc

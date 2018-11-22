@@ -76,17 +76,17 @@ void Key::cancelFrameTransform() {
                                             false);
 }
 
-void Key::scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
-        const qreal &scaleFactor, const bool &useSavedFrame) {
+void Key::scaleFrameAndUpdateParentAnimator(
+        const int &relativeToFrame,
+        const qreal &scaleFactor,
+        const bool &useSavedFrame) {
     int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
-    int newFrame =
-            qRound(thisRelFrame +
-                  (thisRelFrame -
-                   mParentAnimator->
-                   prp_absFrameToRelFrame(relativeToFrame))*
-                   scaleFactor);
+    int relativeToRelFrame =
+            mParentAnimator->prp_absFrameToRelFrame(relativeToFrame);
+    int newFrame = qRound(relativeToRelFrame +
+                          (thisRelFrame - relativeToRelFrame)*scaleFactor);
     if(newFrame == mRelFrame) return;
-    incFrameAndUpdateParentAnimator(newFrame - mRelFrame);
+    setRelFrameAndUpdateParentAnimator(newFrame);
 }
 
 void Key::setSelected(const bool &bT) {

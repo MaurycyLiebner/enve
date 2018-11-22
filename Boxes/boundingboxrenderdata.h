@@ -19,6 +19,8 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     virtual void copyFrom(const BoundingBoxRenderDataSPtr &src);
     bool copied = false;
 
+    bool relBoundingRectSet = false;
+
     Animator::UpdateReason reason;
 
     BoundingBoxRenderDataSPtr makeCopy();

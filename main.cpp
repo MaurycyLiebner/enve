@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include <QApplication>
+#include "application.h"
 #include <QSurfaceFormat>
 #include <QProcess>
 
@@ -23,7 +23,7 @@ void setDefaultFormat()
 }
 
 int main(int argc, char *argv[]) {
-    QApplication a(argc, argv);
+    Application a(argc, argv);
     setDefaultFormat();
 //    QSurfaceFormat  format;
 

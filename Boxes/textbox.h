@@ -40,6 +40,9 @@ public:
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
+
+    bool differenceInEditPathBetweenFrames(
+                const int& frame1, const int& frame2) const;
 private:
     QStringAnimatorQSPtr mText;
     QrealAnimatorQSPtr mLinesDist;

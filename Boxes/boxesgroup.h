@@ -183,6 +183,8 @@ public:
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
+    bool prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
+            const int &relFrame1, const int &relFrame2);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
                                               const int &relFrame);

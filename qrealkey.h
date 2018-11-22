@@ -96,6 +96,11 @@ public:
     void finishValueTransform();
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
+    void startFrameTransform() {
+        Key::startFrameTransform();
+        mSavedStartFrame = mStartFrame;
+        mSavedEndFrame = mEndFrame;
+    }
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 
@@ -106,8 +111,8 @@ protected:
     qreal mValue;
     qreal mSavedValue;
 
-    qreal mSavedMaxStartFrameDist;
-    qreal mSavedMaxEndFrameDist;
+    qreal mSavedStartFrame;
+    qreal mSavedEndFrame;
 
     qreal mStartValue = 0.;
     qreal mEndValue = 0.;

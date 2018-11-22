@@ -60,10 +60,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mCanvasWidget = QWidget::createWindowContainer(this, parent);
     //mCanvasWidget = new CanvasWidget(this, parent);
     mCanvasWidget->setAcceptDrops(true);
-    mCanvasWidget->setMinimumSize(MIN_WIDGET_HEIGHT*10,
-                                  MIN_WIDGET_HEIGHT*10);
-    mCanvasWidget->setSizePolicy(QSizePolicy::Minimum,
-                                 QSizePolicy::Minimum);
+//    mCanvasWidget->setMinimumSize(MIN_WIDGET_HEIGHT*10,
+//                                  MIN_WIDGET_HEIGHT*10);
+//    mCanvasWidget->setSizePolicy(QSizePolicy::Minimum,
+//                                 QSizePolicy::Minimum);
     mCanvasWidget->setMouseTracking(true);
 
 
@@ -878,9 +878,9 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
         if(mBoxesUpdateFinishedFunction != nullptr) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
-        if(!mRendering) {
-            callUpdateSchedulers();
-        }
+//        if(!mRendering) {
+//            callUpdateSchedulers();
+//        }
     } else {
         int threadId = finishedThreadId;
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
@@ -984,7 +984,7 @@ void CanvasWindow::stopPreview() {
     emit changeCurrentFrame(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
     stopAudio();
-    repaint();
+    requestUpdate();
     MainWindow::getInstance()->previewFinished();
 }
 
@@ -1273,11 +1273,6 @@ void CanvasWindow::releaseMouse() {
 
 bool CanvasWindow::isMouseGrabber() {
     return mMouseGrabber;
-}
-
-void CanvasWindow::repaint() {
-    //mCanvasWidget->update();
-    requestUpdate();
 }
 
 QRect CanvasWindow::rect() {

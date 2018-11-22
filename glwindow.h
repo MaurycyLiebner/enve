@@ -13,7 +13,7 @@ class GLWindow : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
-    GLWindow(QScreen *screen = 0);
+    GLWindow(QScreen *screen = nullptr);
     ~GLWindow();
 protected:
     void initialize();

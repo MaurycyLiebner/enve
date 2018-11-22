@@ -165,6 +165,13 @@ void Rectangle::getMotionBlurProperties(QList<Property*> *list) {
     list->append(mRadiusPoint);
 }
 
+bool Rectangle::differenceInEditPathBetweenFrames(
+        const int& frame1, const int& frame2) const {
+    if(mTopLeftPoint->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    if(mBottomRightPoint->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    return mRadiusPoint->prp_differencesBetweenRelFrames(frame1, frame2);
+}
+
 RectangleTopLeftPoint::RectangleTopLeftPoint(BasicTransformAnimator *parent) :
     PointAnimator(parent, TYPE_PATH_POINT) {
 

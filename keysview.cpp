@@ -542,9 +542,9 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         }
                     }
                     if(mScalingKeys) {
-                        qreal keysScale = (posU.x() - mLastPressPos.x())/150.;
+                        qreal keysScale = 1. + (posU.x() - mLastPressPos.x())/150.;
                         if(mValueInput.inputEnabled()) {
-                            keysScale = mValueInput.getValue() - 1.;
+                            keysScale = mValueInput.getValue();
                         }
                         Q_FOREACH(Key *key, mSelectedKeys) {
                             key->scaleFrameAndUpdateParentAnimator(

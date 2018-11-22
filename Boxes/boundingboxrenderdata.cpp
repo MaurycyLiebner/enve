@@ -30,6 +30,8 @@ void BoundingBoxRenderData::copyFrom(const BoundingBoxRenderDataSPtr& src) {
     opacity = src->opacity;
     resolution = src->resolution;
     renderedImage = makeSkImageCopy(src->renderedImage);
+    mFinished = true;
+    relBoundingRectSet = true;
     copied = true;
 }
 
@@ -206,7 +208,7 @@ void BoundingBoxRenderData::addSchedulerNow() {
 void BoundingBoxRenderData::dataSet() {
     if(allDataReady()) {
         mDataSet = true;
-        updateRelBoundingRect();
+        if(!relBoundingRectSet) updateRelBoundingRect();
         BoundingBox *parentBoxT = parentBox.data();
         if(parentBoxT == nullptr || !parentIsTarget) return;
         parentBoxT->updateCurrentPreviewDataFromRenderData(ref<BoundingBoxRenderData>());

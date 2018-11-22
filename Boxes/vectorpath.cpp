@@ -52,6 +52,11 @@ void VectorPath::breakPathsApart() {
     removeFromParent();
 }
 
+bool VectorPath::differenceInEditPathBetweenFrames(
+        const int &frame1, const int &frame2) const {
+    return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
+}
+
 void VectorPath::selectAllPoints(Canvas *canvas) {
     mPathAnimator->selectAllPoints(canvas);
 }

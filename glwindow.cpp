@@ -243,9 +243,12 @@ bool GLWindow::event(QEvent *event) {
         //QWindow::event(event);
         return true;
     case QEvent::WindowStateChange:
+    case QEvent::WindowActivate:
+    case QEvent::Expose:
     case QEvent::Resize:
         requestUpdate();
-        return true;
+        [[fallthrough]];
+       // return true;
     default:
 //        qDebug() << event->type();
 //        if(isExposed()) {

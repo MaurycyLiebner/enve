@@ -115,8 +115,6 @@ public:
         mHasFocus = false;
     }
 
-    void repaint();
-
     QRect rect();
 
     void releaseMouse();

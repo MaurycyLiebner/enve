@@ -464,6 +464,7 @@ public:
 //        int newAbsPos = qRound(scale*pivotAbsFrame);
 //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
         setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
+        mCanvasWindow->setCurrentCanvas(this);
     }
 
     void changeFpsTo(const qreal& fps) {

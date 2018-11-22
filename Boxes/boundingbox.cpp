@@ -238,7 +238,7 @@ bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
     int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
 
     bool diffInherited =
-            mParentGroup->prp_differencesBetweenRelFramesIncludingInherited(
+            mParentGroup->prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
                 parentRelFrame1, parentRelFrame2);
     return diffThis || diffInherited;
 }
@@ -329,26 +329,30 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
     Q_ASSERT(!mBlockedSchedule);
     if(!shouldScheduleUpdate()) return;
     mExpiredPixmap = 1;
-    auto currentRenderData = getCurrentRenderData(relFrame);
-    if(currentRenderData == nullptr) {
-        currentRenderData = updateCurrentRenderData(relFrame);
-        if(currentRenderData == nullptr) return;
-    } else {
-        if(!currentRenderData->redo && reason != UpdateReason::FRAME_CHANGE) {
-            currentRenderData->redo = currentRenderData->isAwaitingUpdate();
+//    if(SWT_isCanvas()) {
+        auto currentRenderData = getCurrentRenderData(relFrame);
+        if(currentRenderData == nullptr) {
+            currentRenderData = updateCurrentRenderData(relFrame, reason);
+            if(currentRenderData == nullptr) return;
+        } else {
+            if(!currentRenderData->redo && !currentRenderData->copied &&
+                    reason != UpdateReason::FRAME_CHANGE) {
+                currentRenderData->redo = currentRenderData->isAwaitingUpdate();
+            }
+            return;
         }
-        return;
-    }
-    auto currentReason = currentRenderData->reason;
-    if(reason == USER_CHANGE &&
-            (currentReason == CHILD_USER_CHANGE ||
-             currentReason == FRAME_CHANGE)) {
-        currentRenderData->reason = reason;
-    } else if(reason == CHILD_USER_CHANGE &&
-              currentReason == FRAME_CHANGE) {
-        currentRenderData->reason = reason;
-    }
-    currentRenderData->redo = false;
+        auto currentReason = currentRenderData->reason;
+        if(reason == USER_CHANGE &&
+                (currentReason == CHILD_USER_CHANGE ||
+                 currentReason == FRAME_CHANGE)) {
+            currentRenderData->reason = reason;
+        } else if(reason == CHILD_USER_CHANGE &&
+                  currentReason == FRAME_CHANGE) {
+            currentRenderData->reason = reason;
+        }
+        currentRenderData->redo = false;
+        currentRenderData->addScheduler();
+//    }
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
@@ -356,15 +360,15 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
         mParentGroup->scheduleUpdate(reason == USER_CHANGE ? CHILD_USER_CHANGE : reason);
     }
 
-    currentRenderData->addScheduler();
-
     emit scheduledUpdate();
 }
 
-BoundingBoxRenderDataSPtr BoundingBox::updateCurrentRenderData(const int& relFrame) {
+BoundingBoxRenderDataSPtr BoundingBox::updateCurrentRenderData(const int& relFrame,
+                                                               const UpdateReason& reason) {
     auto renderData = createRenderData();
     if(renderData == nullptr) return BoundingBoxRenderDataSPtr();
     renderData->relFrame = relFrame;
+    renderData->reason = reason;
     mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
     return renderData;
 }
@@ -373,13 +377,16 @@ BoundingBoxRenderDataSPtr BoundingBox::getCurrentRenderData(const int& relFrame)
     BoundingBoxRenderDataSPtr currentRenderData = mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData == nullptr && mExpiredPixmap == 0) {
         currentRenderData = mDrawRenderContainer.getSrcRenderData();
-        if(currentRenderData == nullptr) return BoundingBoxRenderDataSPtr();
+        if(currentRenderData == nullptr) return nullptr;
 //        if(currentRenderData->relFrame == relFrame) {
         if(!prp_differencesBetweenRelFramesIncludingInherited(
                     currentRenderData->relFrame, relFrame)) {
-            return currentRenderData->makeCopy();
+            auto copy = currentRenderData->makeCopy();
+            copy->relFrame = relFrame;
+            mCurrentRenderDataHandler.addItemAtRelFrame(copy);
+            return copy;
         }
-        return BoundingBoxRenderDataSPtr();
+        return nullptr;
     }
     return currentRenderData;
 }
@@ -767,15 +774,15 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
     clearAllCache();
 }
 
-int BoundingBox::prp_getParentFrameShift() const {
-    if(mParentGroup == nullptr) {
-        return 0;
-    } else {
-        return mParentGroup->prp_getFrameShift();
-    }
-}
+//int BoundingBox::prp_getParentFrameShift() const {
+//    if(mParentGroup == nullptr) {
+//        return 0;
+//    } else {
+//        return mParentGroup->prp_getFrameShift();
+//    }
+//}
 
-bool BoundingBox::hasDurationRectangle() {
+bool BoundingBox::hasDurationRectangle() const {
     return mDurationRectangle != nullptr;
 }
 

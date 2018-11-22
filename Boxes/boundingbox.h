@@ -363,7 +363,7 @@ public:
                                     const int &minViewedFrame,
                                     const qreal &pixelsPerFrame);
 
-    int prp_getParentFrameShift() const;
+//    int prp_getParentFrameShift() const;
 
     void setDurationRectangle(DurationRectangle *durationRect);
 
@@ -376,7 +376,7 @@ public:
 
     void startPivotTransform();
     void finishPivotTransform();
-    bool hasDurationRectangle();
+    bool hasDurationRectangle() const;
     void createDurationRectangle();
     void prp_drawKeys(QPainter *p,
                       const qreal &pixelsPerFrame,
@@ -428,7 +428,8 @@ public:
 //    BoundingBoxRenderDataSPtr updateCurrentRenderData() {
 //        return updateCurrentRenderData(anim_mCurrentRelFrame);
 //    }
-    BoundingBoxRenderDataSPtr updateCurrentRenderData(const int& relFrame);
+    BoundingBoxRenderDataSPtr updateCurrentRenderData(const int& relFrame,
+                                                      const UpdateReason &reason);
     void nullifyCurrentRenderData(const int& relFrame);
     virtual bool isRelFrameInVisibleDurationRect(const int &relFrame);
     virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);

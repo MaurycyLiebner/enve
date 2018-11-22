@@ -43,6 +43,8 @@ public:
     void setXRadius(const qreal &radiusX);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
+    bool differenceInEditPathBetweenFrames(
+                const int& frame1, const int& frame2) const;
 protected:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;

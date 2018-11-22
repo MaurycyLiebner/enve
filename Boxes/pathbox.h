@@ -17,13 +17,14 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
 
     SkPath editPath;
     SkPath path;
+    SkPath fillPath;
     SkPath outlinePath;
     UpdatePaintSettings paintSettings;
     UpdateStrokeSettings strokeSettings;
 
     void updateRelBoundingRect() {
         SkPath totalPath;
-        totalPath.addPath(path);
+        totalPath.addPath(fillPath);
         totalPath.addPath(outlinePath);
         relBoundingRect = SkRectToQRectF(totalPath.computeTightBounds());
     }
@@ -38,10 +39,10 @@ private:
         paint.setAntiAlias(true);
         paint.setStyle(SkPaint::kFill_Style);
 
-        if(!path.isEmpty()) {
+        if(!fillPath.isEmpty()) {
             paintSettings.applyPainterSettingsSk(&paint);
 
-            canvas->drawPath(path, paint);
+            canvas->drawPath(fillPath, paint);
         }
         if(!outlinePath.isEmpty()) {
             paint.setShader(nullptr);
@@ -161,8 +162,16 @@ public:
         return mOutlinePathEffectsAnimators.data();
     }
     void copyPathBoxDataTo(PathBox *targetBox);
-protected:
 
+    virtual bool differenceInEditPathBetweenFrames(
+            const int& frame1, const int& frame2) const = 0;
+    bool differenceInPathBetweenFrames(
+            const int& frame1, const int& frame2) const;
+    bool differenceInOutlinePathBetweenFrames(
+            const int& frame1, const int& frame2) const;
+    bool differenceInFillPathBetweenFrames(
+            const int& frame1, const int& frame2) const;
+protected:
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
@@ -174,10 +183,11 @@ protected:
     QSharedPointer<StrokeSettings> mStrokeSettings =
             (new StrokeSettings)->ref<StrokeSettings>();
 
+    int mCurrentPathsFrame = INT_MIN;
     SkPath mEditPathSk;
     SkPath mPathSk;
+    SkPath mFillPathSk;
     SkPath mOutlinePathSk;
-    void updateWholePathSk();
 
     bool mOutlineAffectedByScale = true;
     void getMotionBlurProperties(QList<Property*> *list);

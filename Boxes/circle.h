@@ -88,6 +88,9 @@ public:
     qreal getCurrentYRadius() {
         return mVerticalRadiusPoint->getEffectiveYValue();
     }
+
+    bool differenceInEditPathBetweenFrames(
+                const int& frame1, const int& frame2) const;
 protected:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;

@@ -380,6 +380,21 @@ bool BoxesGroup::prp_differencesBetweenRelFrames(const int &relFrame1,
     return false;
 }
 
+bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
+        const int &relFrame1, const int &relFrame2) {
+    bool diffThis = BoundingBox::prp_differencesBetweenRelFrames(relFrame1, relFrame2);
+    if(mParentGroup == nullptr || diffThis) return diffThis;
+    int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
+    int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
+    int parentRelFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
+    int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+
+    bool diffInherited =
+            mParentGroup->prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
+                parentRelFrame1, parentRelFrame2);
+    return diffThis || diffInherited;
+}
+
 void BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                        int *lastIdentical,
                                                        const int &relFrame) {
@@ -645,6 +660,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                 auto boxRenderData = box->getCurrentRenderData(qRound(boxRelFrame));
                 if(boxRenderData == nullptr) {
                     boxRenderData = box->createRenderData();
+                    boxRenderData->reason = data->reason;
                     //boxRenderData->parentIsTarget = false;
                     boxRenderData->useCustomRelFrame = true;
                     boxRenderData->customRelFrame = boxRelFrame;
@@ -654,6 +670,9 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                     mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
                 } else {
                     boxRenderData->addDependent(data);
+                    if(boxRenderData->copied) {
+                        box->nullifyCurrentRenderData(boxRenderData->relFrame);
+                    }
                 }
                 groupData->childrenRenderData << boxRenderData;
                 childrenEffectsMargin =

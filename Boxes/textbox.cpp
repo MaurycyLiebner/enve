@@ -167,3 +167,9 @@ void TextBox::setCurrentTextValue(const QString &text,
                                   const bool &saveUndoRedo) {
     mText->setCurrentTextValue(text, saveUndoRedo);
 }
+
+bool TextBox::differenceInEditPathBetweenFrames(
+        const int& frame1, const int& frame2) const {
+    if(mText->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    return mLinesDist->prp_differencesBetweenRelFrames(frame1, frame2);
+}

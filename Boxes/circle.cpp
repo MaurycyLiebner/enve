@@ -156,6 +156,13 @@ void Circle::getMotionBlurProperties(QList<Property*> *list) {
     list->append(mVerticalRadiusPoint);
 }
 
+bool Circle::differenceInEditPathBetweenFrames(
+        const int& frame1, const int& frame2) const {
+    if(mCenter->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    if(mHorizontalRadiusPoint->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    return mVerticalRadiusPoint->prp_differencesBetweenRelFrames(frame1, frame2);
+}
+
 CircleCenterPoint::CircleCenterPoint(BasicTransformAnimator *parent,
                                      MovablePointType type) :
     PointAnimator(parent, type) {

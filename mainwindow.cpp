@@ -137,10 +137,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     mFillStrokeSettings->setCanvasWindowPtr(mCanvasWindow);
 
-    setCentralWidget(mCanvasWindow->getCanvasWidget());
-
-    showMaximized();
-
     mLeftDock = new QDockWidget(this);
     mLeftDock->setFeatures(mLeftDock->features().setFlag(
                                QDockWidget::DockWidgetClosable, false));
@@ -214,6 +210,10 @@ MainWindow::MainWindow(QWidget *parent)
     setupMenuBar();
 
     connectToolBarActions();
+
+    setCentralWidget(mCanvasWindow->getCanvasWidget());
+
+    showMaximized();
 
     this->setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
@@ -990,10 +990,10 @@ void MainWindow::callUpdateSchedulers() {
         mUpdateSchedulers.clear();
     //}
 
-    ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mCanvasWindow->updateHoveredElements();
     mCanvasWindow->updatePivotIfNeeded();
-    mCanvasWindow->repaint();
+    mCanvasWindow->requestUpdate();
+    ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mObjectSettingsWidget->update();
     //mKeysView->repaint();
     mBoxesListAnimationDockWidget->update();
@@ -1097,6 +1097,21 @@ void MainWindow::newFile() {
         closeProject();
         createNewCanvas();
     }
+}
+
+/// Gives human-readable event type information.
+QDebug operator<<(QDebug str, const QEvent * ev) {
+   static int eventEnumIndex = QEvent::staticMetaObject
+         .indexOfEnumerator("Type");
+   str << "QEvent";
+   if (ev) {
+      QString name = QEvent::staticMetaObject
+            .enumerator(eventEnumIndex).valueToKey(ev->type());
+      if (!name.isEmpty()) str << name; else str << ev->type();
+   } else {
+      str << (void*)ev;
+   }
+   return str.maybeSpace();
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *e) {

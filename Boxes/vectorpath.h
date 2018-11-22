@@ -54,6 +54,9 @@ public:
     void shiftAllPoints(const int &by);
     void revertAllPoints();
     void breakPathsApart();
+
+    bool differenceInEditPathBetweenFrames(
+                const int& frame1, const int& frame2) const;
 protected:
     void getMotionBlurProperties(QList<Property*> *list);
     PathAnimatorQSPtr mPathAnimator;

@@ -289,16 +289,16 @@ void QrealKey::scaleFrameAndUpdateParentAnimator(
         const int &relativeToFrame, const qreal &scaleFactor,
         const bool& useSavedFrame) {
     int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
+    qreal startRelFrame = useSavedFrame ? mSavedStartFrame : mStartFrame;
+    qreal endRelFrame = useSavedFrame ? mSavedEndFrame : mEndFrame;
 
-    setStartFrameVar(thisRelFrame + (mStartFrame - thisRelFrame)*scaleFactor);
-    setEndFrameVar(thisRelFrame + (mEndFrame - thisRelFrame)*scaleFactor);
+    setStartFrameVar(thisRelFrame + (startRelFrame - thisRelFrame)*scaleFactor);
+    setEndFrameVar(thisRelFrame + (endRelFrame - thisRelFrame)*scaleFactor);
 
-    int newFrame =
-            qRound(thisRelFrame +
-                   (thisRelFrame -
-                    mParentAnimator->
-                    prp_absFrameToRelFrame(relativeToFrame))*
-                   scaleFactor);
+    int relativeToRelFrame =
+            mParentAnimator->prp_absFrameToRelFrame(relativeToFrame);
+    int newFrame = qRound(relativeToRelFrame +
+                          (thisRelFrame - relativeToRelFrame)*scaleFactor);
     if(newFrame != mRelFrame) {
         incFrameAndUpdateParentAnimator(newFrame - mRelFrame);
     } else {
