@@ -20,10 +20,10 @@ void moveAndResizeValueRect(const int &rect_x_t,
     rect_t->resize(rect_width, rect_height);
 }
 
-void ColorSettingsWidget::setCurrentColor(const GLfloat &h_t,
-                                          const GLfloat &s_t,
-                                          const GLfloat &v_t,
-                                          const GLfloat &a_t) {
+void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
+                                          const qreal &s_t,
+                                          const qreal &v_t,
+                                          const qreal &a_t) {
 
     //wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
     r_rect->setColorHSV_f(h_t, s_t, v_t);
@@ -80,15 +80,9 @@ void ColorSettingsWidget::setCurrentColor(const GLfloat &h_t,
     aSpin->setValueExternal(a_t);
 }
 
-void ColorSettingsWidget::setCurrentColor(const Color &color) {
-    setCurrentColor(color.gl_h, color.gl_s, color.gl_v, color.gl_a);
-}
-
 void ColorSettingsWidget::setCurrentColor(const QColor &color) {
-    setCurrentColor(Color(color.red(),
-                          color.green(),
-                          color.blue(),
-                          color.alpha()));
+    setCurrentColor(color.redF(), color.greenF(), color.blueF(),
+                    color.alphaF());
 }
 
 void ColorSettingsWidget::hideAlphaControlers() {

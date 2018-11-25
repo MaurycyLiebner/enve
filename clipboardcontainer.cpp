@@ -6,19 +6,20 @@ ClipboardContainer::ClipboardContainer(const ClipboardContainerType &type) {
     mType = type;
 }
 
+ClipboardContainer::~ClipboardContainer() {}
+
 ClipboardContainerType ClipboardContainer::getType() {
     return mType;
 }
 
+QByteArray *ClipboardContainer::getBytesArray() {
+    return &mData;
+}
+
 BoxesClipboardContainer::BoxesClipboardContainer() :
-    ClipboardContainer(CCT_BOXES) {
+    ClipboardContainer(CCT_BOXES) {}
 
-}
-
-BoxesClipboardContainer::~BoxesClipboardContainer() {
-}
-
-void BoxesClipboardContainer::pasteTo(BoxesGroup *parent) {
+void BoxesClipboardContainer::pasteTo(BoxesGroup* parent) {
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
     parent->readChildBoxes(&target);
@@ -35,17 +36,17 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 }
 
 #include "keysview.h"
-QList<Key*> KeysClipboardContainer::paste(const int &pasteFrame,
+QList<KeySPtr> KeysClipboardContainer::paste(const int &pasteFrame,
                                           KeysView *keysView) {
     keysView->clearKeySelection();
 
     int firstKeyFrame = 1000000;
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
-    QList<Key*> keys;
+    QList<KeySPtr> keys;
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
         Animator *animator = animatorT.data();
-        Key *keyT = animator->readKey(&target);
+        KeySPtr keyT = animator->readKey(&target);
         if(animator == nullptr) {
             keyT->ref<Key>();
             continue;
@@ -59,42 +60,42 @@ QList<Key*> KeysClipboardContainer::paste(const int &pasteFrame,
     int dFrame = pasteFrame - firstKeyFrame;
 
     int keyId = 0;
-    QList<Animator*> animators;
+    QList<AnimatorQSPtr> animators;
 
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
-        Animator *animator = animatorT.data();
-        if(animator == nullptr) {
+        if(animatorT.isNull()) {
             keys.removeAt(keyId);
             continue;
         }
-        Key *keyT = keys.at(keyId);
+        AnimatorQSPtr animator = animatorT;
+        KeySPtr keyT = keys.at(keyId);
         keyT->setRelFrame(keyT->getRelFrame() + dFrame);
         animator->anim_appendKey(keyT);
         keyId++;
         if(animators.contains(animator)) continue;
         animators << animator;
     }
-    Q_FOREACH(Animator *animator, animators) {
+    Q_FOREACH(const AnimatorQSPtr& animator, animators) {
         animator->anim_mergeKeysIfNeeded();
     }
     return keys;
 }
 
-QList<Key*> KeysClipboardContainer::pasteWithoutMerging(const int &pasteFrame,
-                                                        KeysView *keysView) {
+QList<KeySPtr> KeysClipboardContainer::pasteWithoutMerging(
+            const int &pasteFrame, KeysView *keysView) {
     keysView->clearKeySelection();
 
     int firstKeyFrame = 1000000;
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
-    QList<Key*> keys;
+    QList<KeySPtr> keys;
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
-        Animator *animator = animatorT.data();
-        Key *keyT = animator->readKey(&target);
-        if(animator == nullptr) {
-            keyT->ref<Key>();
+        if(animatorT.isNull()) {
             continue;
         }
+        AnimatorQSPtr animator = animatorT;
+        KeySPtr keyT = animator->readKey(&target);
+
         if(keyT->getAbsFrame() < firstKeyFrame) {
             firstKeyFrame = keyT->getAbsFrame();
         }
@@ -104,15 +105,15 @@ QList<Key*> KeysClipboardContainer::pasteWithoutMerging(const int &pasteFrame,
     int dFrame = pasteFrame - firstKeyFrame;
 
     int keyId = 0;
-    QList<Animator*> animators;
+    QList<AnimatorQSPtr> animators;
 
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
-        Animator *animator = animatorT.data();
-        if(animator == nullptr) {
+        if(animatorT.isNull()) {
             keys.removeAt(keyId);
             continue;
         }
-        Key *keyT = keys.at(keyId);
+        AnimatorQSPtr animator = animatorT;
+        KeySPtr keyT = keys.at(keyId);
         keyT->setRelFrame(keyT->getRelFrame() + dFrame);
         animator->anim_appendKey(keyT);
         keyId++;

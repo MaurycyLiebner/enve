@@ -5,19 +5,19 @@
 #include <QMouseEvent>
 #include "color.h"
 
-class SavedColorButton : public QWidget
-{
+class SavedColorButton : public QWidget {
     Q_OBJECT
 public:
-    explicit SavedColorButton(Color color_t, QWidget *parent = 0);
+    explicit SavedColorButton(const QColor& colorT,
+                              QWidget *parent = nullptr);
 
     void mousePressEvent(QMouseEvent *e);
     void paintEvent(QPaintEvent *);
 private:
-    Color color;
+    QColor mColor;
 
 signals:
-    void colorButtonPressed(Color);
+    void colorButtonPressed(QColor);
 public slots:
 };
 

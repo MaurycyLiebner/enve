@@ -5,10 +5,9 @@
 #include "glwindow.h"
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 #include "keyfocustarget.h"
+#include "sharedpointerdefs.h"
 class Brush;
 class WindowSingleWidgetTarget;
-class Canvas;
-typedef QSharedPointer<Canvas> CanvasQSPtr;
 enum ColorMode : short;
 enum CanvasMode : short;
 class Color;
@@ -41,9 +40,9 @@ public:
     }
 
     void setCurrentCanvas(Canvas *canvas);
-    void addCanvasToList(Canvas *canvas);
+    void addCanvasToList(const CanvasQSPtr &canvas);
     void removeCanvas(const int &id);
-    void addCanvasToListAndSetAsCurrent(Canvas *canvas);
+    void addCanvasToListAndSetAsCurrent(const CanvasQSPtr &canvas);
     void renameCanvas(Canvas *canvas, const QString &newName);
     void renameCanvas(const int &id, const QString &newName);
     bool hasNoCanvas();
@@ -152,41 +151,44 @@ public:
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int &dFrame);
 protected:
+    bool mPreviewing = false;
+    bool mRendering = false;
+    bool mMouseGrabber = false;
+    bool mHasFocus = false;
+    bool mNoBoxesAwaitUpdate = true;
+    bool mNoFileAwaitUpdate = true;
+    bool mClearBeingUpdated = false;
+
+    int mCurrentRenderFrame;
+    int mMaxRenderFrame = 0;
+    int mSavedCurrentFrame = 0;
+    int mThreadsUsed = 0;
+    QList<int> mFreeThreads;
+
+    qreal mSavedResolutionFraction = 100.;
+
     WindowSingleWidgetTarget *mWindowSWTTarget = nullptr;
     PaintControler *mFileControler = nullptr;
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
-    bool mMouseGrabber = false;
-    bool mHasFocus = false;
+
     QWidget *mCanvasWidget;
     void setRendering(const bool &bT);
     void setPreviewing(const bool &bT);
 
     QTimer *mPreviewFPSTimer = nullptr;
 
-    qreal mSavedResolutionFraction = 100.;
-    int mSavedCurrentFrame = 0;
-    bool mPreviewing = false;
-    bool mRendering = false;
-    int mMaxRenderFrame = 0;
-
-    QList<int> mFreeThreads;
-    int mThreadsUsed = 0;
-    bool mNoBoxesAwaitUpdate = true;
-    bool mNoFileAwaitUpdate = true;
     QList<QThread*> mControlerThreads;
     QThread *mFileControlerThread;
     QList<PaintControler*> mPaintControlers;
     QList<std::shared_ptr<_Executor> > mUpdatablesAwaitingUpdate;
     QList<std::shared_ptr<_Executor> > mFileUpdatablesAwaitingUpdate;
 
-    int mCurrentRenderFrame;
 
-    bool mClearBeingUpdated = false;
 
     void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
     void (CanvasWindow::*mFilesUpdateFinishedFunction)(void) = nullptr;
 
-    CanvasQSPtr mCurrentCanvas;
+    CanvasQPtr mCurrentCanvas;
     QList<CanvasQSPtr> mCanvasList;
 
     //void paintEvent(QPaintEvent *);
@@ -201,7 +203,7 @@ protected:
     void volumeChanged(int value);
 
     QAudioDeviceInfo mAudioDevice;
-    SoundComposition *mCurrentSoundComposition;
+    SoundCompositionQPtr mCurrentSoundComposition;
     QAudioOutput *mAudioOutput;
     QIODevice *mAudioIOOutput; // not owned
     QAudioFormat mAudioFormat;
@@ -243,8 +245,9 @@ public slots:
     void objectsToPathAction();
     void strokeToPathAction();
 
-    void setFontFamilyAndStyle(QString family, QString style);
-    void setFontSize(qreal size);
+    void setFontFamilyAndStyle(const QString& family,
+                               const QString& style);
+    void setFontSize(const qreal &size);
 
     void connectPointsSlot();
     void disconnectPointsSlot();

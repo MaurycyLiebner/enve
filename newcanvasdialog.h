@@ -6,14 +6,14 @@
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QLabel>
+#include "sharedpointerdefs.h"
 class Canvas;
 class ColorAnimator;
 class ColorAnimatorButton;
 
-class CanvasSettingsDialog : public QDialog
-{
+class CanvasSettingsDialog : public QDialog {
 public:
-    CanvasSettingsDialog(Canvas *canvas,
+    CanvasSettingsDialog(Canvas* canvas,
                          QWidget *parent = nullptr);
     CanvasSettingsDialog(const QString &defName,
                          QWidget *parent = nullptr);
@@ -22,7 +22,7 @@ public:
                          const int &currHeight,
                          const int &currFrameCount,
                          const qreal &currFps,
-                         ColorAnimator *bgColorAnimator,
+                         ColorAnimator* bgColorAnimator,
                          QWidget *parent = nullptr);
 
     int getCanvasWidth();

@@ -14,22 +14,27 @@ double fRand(double fMin, double fMax) {
 ParticleBox::ParticleBox() :
     BoundingBox(TYPE_PARTICLES) {
     setName("Particle Box");
-    mTopLeftPoint = new PointAnimator(mTransformAnimator.data(),
-                                      TYPE_PATH_POINT);
-    mBottomRightPoint = new PointAnimator(mTransformAnimator.data(),
-                                          TYPE_PATH_POINT);
+    mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
+    mTopLeftPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mTopLeftAnimator.data(),
+                mTransformAnimator.data(),
+                TYPE_PATH_POINT);
+    mTopLeftAnimator->prp_setUpdater(
+                SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
 
-    mTopLeftPoint->prp_setUpdater(
-                new DisplayedFillStrokeSettingsUpdater(this));
-    mTopLeftPoint->prp_setName("top left");
-    mBottomRightPoint->prp_setUpdater(
-                new DisplayedFillStrokeSettingsUpdater(this));
-    mBottomRightPoint->prp_setName("bottom right");
+    mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom right");
+    mBottomRightPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mBottomRightAnimator.data(),
+                mTransformAnimator.data(),
+                TYPE_PATH_POINT);
+    mBottomRightAnimator->prp_setUpdater(
+                SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
 
-    ca_prependChildAnimator(mTopLeftPoint, mEffectsAnimators.data());
-    ca_prependChildAnimator(mBottomRightPoint, mEffectsAnimators.data());
+    ca_prependChildAnimator(mTopLeftAnimator.data(), mEffectsAnimators);
+    ca_prependChildAnimator(mBottomRightAnimator.data(), mEffectsAnimators);
 
-    VaryingLenAnimationRect *durRect = new VaryingLenAnimationRect(this);
+    VaryingLenAnimationRectQSPtr durRect =
+            SPtrCreate(VaryingLenAnimationRect)(this);
     setDurationRectangle(durRect);
     durRect->setMaxFrame(200);
     durRect->setMinFrame(-10);
@@ -53,7 +58,7 @@ void ParticleBox::prp_setAbsFrame(const int &frame) {
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
     if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
         /*if(mEmitters.isEmpty()) */return true;
-//        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+//        Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
 //            if(emitter->relPointInsidePath(relPos)) {
 //                return true;
 //            }
@@ -64,13 +69,13 @@ bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
     }
 }
 
-void ParticleBox::addEmitter(ParticleEmitter *emitter) {
+void ParticleBox::addEmitter(const ParticleEmitterQSPtr& emitter) {
     mEmitters << emitter;
     ca_addChildAnimator(emitter);
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-void ParticleBox::removeEmitter(ParticleEmitter *emitter) {
+void ParticleBox::removeEmitter(const ParticleEmitterQSPtr& emitter) {
     mEmitters.removeOne(emitter);
     ca_removeChildAnimator(emitter);
     scheduleUpdate(Animator::USER_CHANGE);
@@ -90,7 +95,7 @@ void ParticleBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
-    ParticleEmitter *emitter = new ParticleEmitter(this);
+    ParticleEmitterQSPtr emitter = SPtrCreate(ParticleEmitter)(this);
     emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos));
     addEmitter(emitter);
 }
@@ -105,14 +110,14 @@ QRectF ParticleBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
     int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
-    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+    Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
         emitter->setFrameRange(minFrame, maxFrame);
     }
 }
 
 void ParticleBox::applyPaintSetting(const PaintSetting &setting) {
     if(setting.targetsFill()) {
-        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+        Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
             setting.applyColorSetting(emitter->getColorAnimator());
         }
     }
@@ -133,7 +138,7 @@ void ParticleBox::drawSelectedSk(SkCanvas *canvas,
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             mTopLeftPoint->drawSk(canvas, invScale);
             mBottomRightPoint->drawSk(canvas, invScale);
-            Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+            Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
                 MovablePoint *pt = emitter->getPosPoint();
                 pt->drawSk(canvas, invScale);
             }
@@ -150,12 +155,12 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
                                       const qreal &canvasScaleInv) {
     if(currentCanvasMode == MOVE_POINT) {
         if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mTopLeftPoint;
+            return mTopLeftPoint.get();
         }
         if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-            return mBottomRightPoint;
+            return mBottomRightPoint.get();
         }
-        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+        Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
             MovablePoint *pt = emitter->getPosPoint();
             if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
                 return pt;
@@ -172,30 +177,30 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                  QList<MovablePoint *> *list) {
+                                                    QList<MovablePoint *> &list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
-            list->append(mTopLeftPoint);
+            list.append(mTopLeftPoint.get());
         }
     }
     if(!mBottomRightPoint->isSelected()) {
         if(mBottomRightPoint->isContainedInRect(absRect)) {
             mBottomRightPoint->select();
-            list->append(mBottomRightPoint);
+            list.append(mBottomRightPoint.get());
         }
     }
-    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+    Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
         if(pt->isContainedInRect(absRect)) {
             pt->select();
-            list->append(pt);
+            list.append(pt);
         }
     }
 }
 
 MovablePoint *ParticleBox::getBottomRightPoint() {
-    return mBottomRightPoint;
+    return mBottomRightPoint.get();
 }
 
 Particle::Particle(ParticleBox *parentBox) {
@@ -311,148 +316,127 @@ bool Particle::getParticleStateAtFrameF(const qreal &frame,
     if(arrayId >= mNumberFrames) return false;
     if(arrayId2 >= mNumberFrames) return false;
     state = ParticleState::interpolate(mParticleStates[arrayId],
-                                      mParticleStates[arrayId2],
-                                      frame - qFloor(frame));
+                                       mParticleStates[arrayId2],
+                                       frame - qFloor(frame));
     return true;
 }
 
 ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
-    ComplexAnimator() {
+    ComplexAnimator("particle emitter") {
     setParentBox(parentBox);
 
-    prp_setName("particle emitter");
-
-    mPos = (new PointAnimator(mParentBox->getTransformAnimator(),
-                              TYPE_PATH_POINT))->ref<PointAnimator>();
+    mPosPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mPos.get(),
+                mParentBox_k->getTransformAnimator(),
+                TYPE_PATH_POINT);
     //mPos->setName("pos");
     //mPos.setCurrentValue(QPointF(0., 0.));
 
-    mColorAnimator->prp_setName("color");
-    mColorAnimator->qra_setCurrentValue(Color(0, 0, 0));
-    ca_addChildAnimator(mColorAnimator.data());
+    mColorAnimator->qra_setCurrentValue(QColor(0, 0, 0));
+    ca_addChildAnimator(mColorAnimator);
 
-    mWidth->prp_setName("width");
     mWidth->qra_setValueRange(0., 6000.);
     mWidth->qra_setCurrentValue(0.);
 
-    mSrcVelInfl->prp_setName("src vel infl");
     mSrcVelInfl->qra_setValueRange(-1., 1.);
     mSrcVelInfl->qra_setCurrentValue(0.);
 
-    mIniVelocity->prp_setName("ini vel");
     mIniVelocity->qra_setValueRange(-1000., 1000.);
     mIniVelocity->qra_setCurrentValue(10.);
 
-    mIniVelocityVar->prp_setName("ini vel var");
     mIniVelocityVar->qra_setValueRange(0., 1000.);
     mIniVelocityVar->qra_setCurrentValue(5.);
 
-    mIniVelocityAngle->prp_setName("ini vel angle");
     mIniVelocityAngle->qra_setValueRange(-3600., 3600.);
     mIniVelocityAngle->qra_setCurrentValue(-90.);
 
-    mIniVelocityAngleVar->prp_setName("ini vel angle var");
     mIniVelocityAngleVar->qra_setValueRange(0., 3600.);
     mIniVelocityAngleVar->qra_setCurrentValue(15.);
 
-    mAcceleration->prp_setName("acceleration");
     mAcceleration->setValuesRange(-100., 100.);
     mAcceleration->setCurrentPointValue(QPointF(0., 9.8));
 
-    mParticlesPerSecond->prp_setName("particles per second");
     mParticlesPerSecond->qra_setValueRange(0., 10000.);
     mParticlesPerSecond->qra_setCurrentValue(120);
 
-    mParticlesFrameLifetime->prp_setName("particles lifetime");
     mParticlesFrameLifetime->qra_setValueRange(1., 1000.);
     mParticlesFrameLifetime->qra_setCurrentValue(50.);
 
-    mVelocityRandomVar->prp_setName("velocity random var");
     mVelocityRandomVar->qra_setValueRange(0., 1000.);
     mVelocityRandomVar->qra_setCurrentValue(5.);
 
-    mVelocityRandomVarPeriod->prp_setName("velocity random var period");
     mVelocityRandomVarPeriod->qra_setValueRange(1., 100.);
     mVelocityRandomVarPeriod->qra_setCurrentValue(10.);
 
-    mParticleSize->prp_setName("particle size");
     mParticleSize->qra_setValueRange(0., 100.);
     mParticleSize->qra_setCurrentValue(5.);
 
-    mParticleSizeVar->prp_setName("particle size var");
     mParticleSizeVar->qra_setValueRange(0., 100.);
     mParticleSizeVar->qra_setCurrentValue(1.);
 
-    mParticleLength->prp_setName("length");
     mParticleLength->qra_setValueRange(0., 2000.);
     mParticleLength->qra_setCurrentValue(0.);
 
-    mParticlesDecayFrames->prp_setName("decay frames");
     mParticlesDecayFrames->qra_setValueRange(0., 1000.);
     mParticlesDecayFrames->qra_setCurrentValue(10.);
 
-    mParticlesSizeDecay->prp_setName("final scale");
     mParticlesSizeDecay->qra_setValueRange(0., 10.);
     mParticlesSizeDecay->qra_setCurrentValue(0.);
 
-    mParticlesOpacityDecay->prp_setName("final opacity");
     mParticlesOpacityDecay->qra_setValueRange(0., 1.);
     mParticlesOpacityDecay->qra_setCurrentValue(0.);
 
-    mBoxTargetProperty->prp_setName("box target");
+    ca_addChildAnimator(mPos);
+    ca_addChildAnimator(mWidth);
 
-    mPos->prp_setName("pos");
-    ca_addChildAnimator(mPos.data());
-    ca_addChildAnimator(mWidth.data());
+    ca_addChildAnimator(mSrcVelInfl);
 
-    ca_addChildAnimator(mSrcVelInfl.data());
+    ca_addChildAnimator(mIniVelocity);
+    ca_addChildAnimator(mIniVelocityVar);
 
-    ca_addChildAnimator(mIniVelocity.data());
-    ca_addChildAnimator(mIniVelocityVar.data());
+    ca_addChildAnimator(mIniVelocityAngle);
+    ca_addChildAnimator(mIniVelocityAngleVar);
 
-    ca_addChildAnimator(mIniVelocityAngle.data());
-    ca_addChildAnimator(mIniVelocityAngleVar.data());
+    ca_addChildAnimator(mAcceleration);
 
-    ca_addChildAnimator(mAcceleration.data());
+    ca_addChildAnimator(mParticlesPerSecond);
+    ca_addChildAnimator(mParticlesFrameLifetime);
 
-    ca_addChildAnimator(mParticlesPerSecond.data());
-    ca_addChildAnimator(mParticlesFrameLifetime.data());
+    ca_addChildAnimator(mVelocityRandomVar);
+    ca_addChildAnimator(mVelocityRandomVarPeriod);
 
-    ca_addChildAnimator(mVelocityRandomVar.data());
-    ca_addChildAnimator(mVelocityRandomVarPeriod.data());
+    ca_addChildAnimator(mParticleSize);
+    ca_addChildAnimator(mParticleSizeVar);
 
-    ca_addChildAnimator(mParticleSize.data());
-    ca_addChildAnimator(mParticleSizeVar.data());
+    ca_addChildAnimator(mParticleLength);
 
-    ca_addChildAnimator(mParticleLength.data());
+    ca_addChildAnimator(mParticlesDecayFrames);
+    ca_addChildAnimator(mParticlesSizeDecay);
+    ca_addChildAnimator(mParticlesOpacityDecay);
+    ca_addChildAnimator(mBoxTargetProperty);
 
-    ca_addChildAnimator(mParticlesDecayFrames.data());
-    ca_addChildAnimator(mParticlesSizeDecay.data());
-    ca_addChildAnimator(mParticlesOpacityDecay.data());
-    ca_addChildAnimator(mBoxTargetProperty.data());
-
-    prp_setUpdater(new ParticlesUpdater(this));
+    prp_setUpdater(SPtrCreate(ParticlesUpdater)(this));
     prp_blockUpdater();
 
     scheduleGenerateParticles();
 }
 
 void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
-    mParentBox = parentBox;
+    mParentBox_k = parentBox;
 
     scheduleGenerateParticles();
     if(parentBox == nullptr) {
         mColorAnimator->prp_setUpdater(nullptr);
     } else {
         mColorAnimator->prp_setUpdater(
-                    new DisplayedFillStrokeSettingsUpdater(parentBox));
+                    SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parentBox));
     }
 }
 
 void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
-    mParentBox->clearAllCache();
-    mParentBox->scheduleUpdate(Animator::USER_CHANGE);
+    mParentBox_k->clearAllCache();
+    mParentBox_k->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void ParticleEmitter::setMinFrame(const int &minFrame) {
@@ -489,14 +473,15 @@ ColorAnimator *ParticleEmitter::getColorAnimator() {
 }
 
 MovablePoint *ParticleEmitter::getPosPoint() {
-    return mPos.data();
+    return mPosPoint.get();
 }
 
 EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
         const qreal &relFrame,
         const std::shared_ptr<ParticleBoxRenderData> &particleData) {
     EmitterData data;
-    data.color = mColorAnimator->getColorAtRelFrameF(relFrame).getSkColor();
+    auto qcol = mColorAnimator->getColorAtRelFrameF(relFrame);
+    data.color = QColorToSkColor(qcol);
 
     BoundingBox *targetT = mBoxTargetProperty->getTarget();
     if(targetT == nullptr) {
@@ -531,7 +516,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
                 renderData->maxBoundsEnabled = false;
                 renderData->parentIsTarget = false;
                 data.particleStates << stateT;
-                renderData->addDependent(particleData);
+                renderData->addDependent(particleData.get());
                 renderData->addScheduler();
             }
         }
@@ -607,7 +592,7 @@ void ParticleEmitter::generateParticles() {
                 currentReuseParticle++;
                 reuseParticle = currentReuseParticle < nReuseParticles;
             } else {
-                newParticle = new Particle(mParentBox);
+                newParticle = new Particle(mParentBox_k);
                 mParticles << newParticle;
             }
             qreal partVelAmp = fRand(iniVelocity - iniVelocityVar,

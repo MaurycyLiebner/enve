@@ -111,7 +111,6 @@ SOURCES += main.cpp\
     actionbutton.cpp \
     Boxes/boxpainthandler.cpp \
     newcanvasdialog.cpp \
-    PixmapEffects/brusheffect.cpp \
     PixmapEffects/fmt_filters.cpp \
     PixmapEffects/pixmapeffect.cpp \
     Boxes/particlebox.cpp \
@@ -214,7 +213,9 @@ SOURCES += main.cpp\
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
     usagewidget.cpp \
-    application.cpp
+    application.cpp \
+    selfref.cpp \
+    stdpointer.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -281,7 +282,6 @@ HEADERS  += mainwindow.h \
     actionbutton.h \
     Boxes/boxpainthandler.h \
     newcanvasdialog.h \
-    PixmapEffects/brusheffect.h \
     PixmapEffects/pixmapeffect.h \
     PixmapEffects/fmt_filters.h \
     Boxes/particlebox.h \
@@ -390,7 +390,8 @@ HEADERS  += mainwindow.h \
     Boxes/boundingboxrenderdata.h \
     usagewidget.h \
     sharedpointerdefs.h \
-    application.h
+    application.h \
+    stdpointer.h
 
 RESOURCES += \
     resources.qrc

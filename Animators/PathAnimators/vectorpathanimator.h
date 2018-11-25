@@ -11,7 +11,7 @@ class VectorPathEdge;
 class Canvas;
 class MovablePoint;
 enum CanvasMode : short;
-struct NodeSettings {
+struct NodeSettings : public StdSelfRef {
     NodeSettings() {}
     NodeSettings(const NodeSettings &settings) {
         startEnabled = settings.startEnabled;
@@ -41,7 +41,6 @@ public:
     VectorPathAnimator(const QList<NodeSettings> &settingsList,
                        const QList<SkPoint> &posList,
                        PathAnimator *pathAnimator);
-    ~VectorPathAnimator();
 
     void prp_setAbsFrame(const int &frame);
     SkPath getPathAtRelFrame(const int &relFrame,
@@ -52,11 +51,11 @@ public:
                               const bool &interpolate = true);
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId) {
-        return mNodeSettings.at(pointIdToNodeId(ptId));
+        return mNodeSettings.at(pointIdToNodeId(ptId)).get();
     }
 
     NodeSettings *getNodeSettingsForNodeId(const int &nodeId) {
-        return mNodeSettings.at(nodeId);
+        return mNodeSettings.at(nodeId).get();
     }
 
     void replaceNodeSettingsForPtId(const int &ptId,
@@ -95,8 +94,8 @@ public:
 
     void setPathClosed(const bool &bT) {
         PathContainer::setPathClosed(bT);
-        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-            ((PathKey*)key.get())->setPathClosed(bT);
+        foreach(const KeySPtr &key, anim_mKeys) {
+            SPtrGetAs(key, PathKey)->setPathClosed(bT);
         }
         if(prp_hasKeys()) {
             setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
@@ -114,19 +113,19 @@ public:
     void anim_saveCurrentValueAsKey();
     void anim_addKeyAtRelFrame(const int &relFrame);
 
-    void anim_removeKey(Key *keyToRemove, const bool &saveUndoRedo);
+    void anim_removeKey(const KeySPtr &keyToRemove,
+                        const bool &saveUndoRedo);
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
     void updateNodePointsFromElements();
-    PathAnimator *getParentPathAnimator() {
-        return mParentPathAnimator;
-    }
+    PathAnimator *getParentPathAnimator();
 
     void finalizeNodesRemove();
 
     void removeNodeAtAndApproximate(const int &nodeId);
-    void removeNodeAt(const int &nodeId);
+    void removeNodeAt(const int &nodeId,
+                      const bool &saveUndoRedo = true);
 
     NodePoint *addNodeAbsPos(const QPointF &absPos,
                               NodePoint *targetPt);
@@ -135,7 +134,7 @@ public:
     NodePoint *addNodeRelPos(const QPointF &startRelPos,
                              const QPointF &relPos,
                              const QPointF &endRelPos,
-                             NodePoint *targetPt,
+                             NodePoint* targetPt,
                              const NodeSettings &nodeSettings = NodeSettings(),
                              const bool &saveUndoRedo = true);
     NodePoint *addNodeRelPos(const QPointF &startRelPos,
@@ -150,7 +149,7 @@ public:
     void applyTransformToPoints(const QMatrix &transform);
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
-                      const qreal &invScale,
+                      const SkScalar &invScale,
                       const SkMatrix &combinedTransform);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
@@ -165,7 +164,7 @@ public:
                           NodePoint *pt2);
     void connectPoints(NodePoint *pt1,
                        NodePoint *pt2);
-    void appendToPointsList(NodePoint *pt);
+    void appendToPointsList(const NodePointSPtr &pt);
 
     void setElementPos(const int &index,
                        const SkPoint &pos);
@@ -180,7 +179,7 @@ public:
                                 const int &newFrame,
                                 const bool &saveUndoRedo = true,
                                 const bool &finish = true);
-    void anim_appendKey(Key *newKey,
+    void anim_appendKey(const KeySPtr &newKey,
                         const bool &saveUndoRedo = true,
                         const bool &update = true);
 
@@ -188,11 +187,11 @@ public:
     void revertElementPosSubset(const int &firstId, int count);
     void revertNodeSettingsSubset(const int &firstId, int count);
 
-    void getNodeSettingsList(QList<NodeSettings*> *nodeSettingsList) {
-        *nodeSettingsList = mNodeSettings;
+    void getNodeSettingsList(QList<NodeSettingsSPtr>& nodeSettingsList) {
+        nodeSettingsList = mNodeSettings;
     }
 
-    const QList<NodeSettings*> &getNodeSettingsList() {
+    const QList<NodeSettingsSPtr> &getNodeSettingsList() {
         return mNodeSettings;
     }
 
@@ -200,31 +199,30 @@ public:
         *elementPosList = mElementsPos;
     }
 
-    void getKeysList(QList<PathKey*> *pathKeyList) {
-        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-            pathKeyList->append((PathKey*)key.get());
+    void getKeysList(QList<PathKeySPtr>& pathKeyList) {
+        foreach(const KeySPtr &key, anim_mKeys) {
+            pathKeyList.append(key->ref<PathKey>());
         }
     }
 
     static void getKeysDataForConnection(VectorPathAnimator *targetPath,
-                                  VectorPathAnimator *srcPath,
+                                  VectorPathAnimator* srcPath,
                                   QList<int> *keyFrames,
                                   QList<QList<SkPoint> > *newKeysData,
                                   const bool &addSrcFirst) {
-        QList<PathKey*> keys;
-        srcPath->getKeysList(&keys);
-        foreach(PathKey *srcKey, keys) {
+        QList<PathKeySPtr> keys;
+        srcPath->getKeysList(keys);
+        foreach(const PathKeySPtr& srcKey, keys) {
             QList<SkPoint> combinedKeyData;
             int relFrame = srcKey->getRelFrame();
-            PathKey *keyAtRelFrame =
-                    (PathKey*)targetPath->anim_getKeyAtRelFrame(relFrame);
+            Key* keyAtRelFrame = targetPath->anim_getKeyAtRelFrame(relFrame);
             const QList<SkPoint> &srcKeyElements = srcKey->getElementsPosList();
             QList<SkPoint> targetKeyElements;
             if(keyAtRelFrame == nullptr) {
                 targetKeyElements =
                         extractElementsFromSkPath(targetPath->getPathAtRelFrame(relFrame));
             } else {
-                targetKeyElements = keyAtRelFrame->getElementsPosList();
+                targetKeyElements = SPtrGetAs(keyAtRelFrame, PathKey)->getElementsPosList();
             }
             if(addSrcFirst) {
                 combinedKeyData.append(targetKeyElements);
@@ -284,7 +282,7 @@ public:
 
     NodePoint *getNodePtWithNodeId(const int &id) {
         if(id < 0 || id >= mPoints.count()) return nullptr;
-        return mPoints.at(id);
+        return mPoints.at(id).get();
     }
 
     int getNodeCount() {
@@ -299,16 +297,14 @@ public:
     }
     void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
 private:
-    QList<int> mNodesToRemove;
-
     void revertAllNodeSettings() {
-        foreach(NodeSettings *settings, mNodeSettings) {
+        foreach(const NodeSettingsSPtr& settings, mNodeSettings) {
             bool endT = settings->endEnabled;
             settings->endEnabled = settings->startEnabled;
             settings->startEnabled = endT;
         }
     }
-    void setFirstPoint(NodePoint *firstPt);
+    void setFirstPoint(NodePoint *pt);
 
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,
@@ -318,15 +314,21 @@ private:
     void updateNodePointIds();
 
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
-                                              qreal *pressedT,
+                                              qreal &pressedT,
                                               NodePoint **prevPoint,
                                               NodePoint **nextPoint,
                                               const qreal &canvasScaleInv);
-    QList<NodeSettings*> mNodeSettings;
-    PathAnimator *mParentPathAnimator;
-    NodePoint *mFirstPoint = nullptr;
-    QList<NodePoint*> mPoints;
+private:
+    NodePoint *createNodePointAndAppendToList();
+
     bool mElementsUpdateNeeded = false;
+
+    PathAnimatorQPtr mParentPathAnimator;
+    NodePointPtr mFirstPoint;
+
+    QList<int> mNodesToRemove;
+    QList<NodeSettingsSPtr> mNodeSettings;
+    QList<NodePointSPtr> mPoints;
 };
 
 #endif // VECTORPATHANIMATOR_H

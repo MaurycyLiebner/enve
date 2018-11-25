@@ -9,17 +9,14 @@ class PathBox;
 class BasicTransformAnimator;
 class BoxesGroup;
 
-class AnimatorUpdater : public StdSelfRef
-{
+class AnimatorUpdater : public StdSelfRef {
 public:
-    AnimatorUpdater() {}
-    virtual ~AnimatorUpdater() {}
+    AnimatorUpdater();
+    virtual ~AnimatorUpdater();
 
-    virtual void update() {}
-    virtual void frameChangeUpdate() {
-        update();
-    }
-    virtual void updateFinal() {}
+    virtual void update();
+    virtual void frameChangeUpdate();
+    virtual void updateFinal();
 };
 
 class TransformUpdater : public AnimatorUpdater {
@@ -69,8 +66,7 @@ private:
     Gradient *mTarget;
 };
 
-class StrokeWidthUpdater : public AnimatorUpdater
-{
+class StrokeWidthUpdater : public AnimatorUpdater {
 public:
     StrokeWidthUpdater(PathBox *path);
 
@@ -81,8 +77,7 @@ private:
     PathBox *mTarget;
 };
 
-class DisplayedFillStrokeSettingsUpdater : public AnimatorUpdater
-{
+class DisplayedFillStrokeSettingsUpdater : public AnimatorUpdater {
 public:
     DisplayedFillStrokeSettingsUpdater(BoundingBox *path);
 
@@ -93,8 +88,7 @@ private:
     BoundingBox *mTarget;
 };
 
-class PixmapEffectUpdater : public AnimatorUpdater
-{
+class PixmapEffectUpdater : public AnimatorUpdater {
 public:
     PixmapEffectUpdater(BoundingBox *target);
 
@@ -106,8 +100,7 @@ private:
 };
 
 class AnimationBox;
-class AnimationBoxFrameUpdater : public AnimatorUpdater
-{
+class AnimationBoxFrameUpdater : public AnimatorUpdater {
 public:
     AnimationBoxFrameUpdater(AnimationBox *target);
 

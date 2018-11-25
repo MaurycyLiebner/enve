@@ -50,7 +50,7 @@ int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
-    mVideoEncoder = (new VideoEncoder())->ref<VideoEncoder>();
+    mVideoEncoder = SPtrCreate(VideoEncoder)();
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_HEIGHT = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_HEIGHT*3/5;
@@ -471,7 +471,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
         mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(nullptr);
         return;
     }
-    Canvas *canvas = mCanvasWindow->getCurrentCanvas();
+    Canvas* canvas = mCanvasWindow->getCurrentCanvas();
     mClipViewToCanvas->setChecked(canvas->clipToCanvas());
     mRasterEffectsVisible->setChecked(canvas->getRasterEffectsVisible());
     mPathEffectsVisible->setChecked(canvas->getPathEffectsVisible());
@@ -724,33 +724,31 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, SLOT(setFontFamilyAndStyle(QString, QString)) );
 }
 
-MainWindow *MainWindow::getInstance()
-{
+MainWindow *MainWindow::getInstance() {
     return mMainWindowInstance;
 }
+
 #include "newcanvasdialog.h"
 void MainWindow::createNewCanvas() {
     QString defName = "Scene " +
             QString::number(mCurrentCanvasComboBox->count());
-    QSharedPointer<Canvas> newCanvas = (new Canvas(getFillStrokeSettings(),
-                                   mCanvasWindow,
-                                   1920,
-                                   1080,
-                                   200))->ref<Canvas>();
+    CanvasQSPtr newCanvas =
+            SPtrCreate(Canvas)(getFillStrokeSettings(), mCanvasWindow,
+                               1920, 1080, 200);
     newCanvas->setName(defName);
-    CanvasSettingsDialog *dialog = new CanvasSettingsDialog(newCanvas.data(),
-                                                            this);
+    CanvasSettingsDialog *dialog =
+            new CanvasSettingsDialog(newCanvas.get(), this);
 
     int dialogRet = dialog->exec();
     if(dialogRet == QDialog::Accepted) {
-        dialog->applySettingsToCanvas(newCanvas.data());
+        dialog->applySettingsToCanvas(newCanvas.get());
 
-        addCanvas(newCanvas.data());
+        addCanvas(newCanvas);
     }
     delete dialog;
 }
 
-void MainWindow::addCanvas(Canvas *newCanvas) {
+void MainWindow::addCanvas(const CanvasQSPtr& newCanvas) {
     mCanvasWindow->addCanvasToListAndSetAsCurrent(newCanvas);
 
     disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
@@ -758,8 +756,8 @@ void MainWindow::addCanvas(Canvas *newCanvas) {
     mCurrentCanvasComboBox->addItem(newCanvas->getName());
     mCurrentCanvasComboBox->setCurrentIndex(
                 mCurrentCanvasComboBox->count() - 1);
-    connect(newCanvas, SIGNAL(canvasNameChanged(Canvas*, QString)),
-            this, SLOT(canvasNameChanged(Canvas*,QString)));
+    connect(newCanvas.get(), &Canvas::canvasNameChanged,
+            this, &MainWindow::canvasNameChanged);
 
     connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
             mCanvasWindow, SLOT(setCurrentCanvas(int)));

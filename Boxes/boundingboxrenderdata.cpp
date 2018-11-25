@@ -15,7 +15,7 @@ BoundingBoxRenderData::~BoundingBoxRenderData() {
 }
 
 #include "skimagecopy.h"
-void BoundingBoxRenderData::copyFrom(const BoundingBoxRenderDataSPtr& src) {
+void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     globalBoundingRect = src->globalBoundingRect;
     transform = src->transform;
     parentTransform = src->parentTransform;
@@ -35,7 +35,7 @@ void BoundingBoxRenderData::copyFrom(const BoundingBoxRenderDataSPtr& src) {
     copied = true;
 }
 
-BoundingBoxRenderDataSPtr BoundingBoxRenderData::makeCopy() {
+BoundingBoxRenderData *BoundingBoxRenderData::makeCopy() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return nullptr;
     BoundingBoxRenderDataSPtr copy = parentBoxT->createRenderData();
@@ -243,7 +243,7 @@ MultiplyTransformCustomizer::MultiplyTransformCustomizer(
     mOpacity = opacity;
 }
 
-void MultiplyTransformCustomizer::customize(const BoundingBoxRenderDataSPtr &data) {
+void MultiplyTransformCustomizer::customize(BoundingBoxRenderData *data) {
     data->transform = mTransform*data->transform;
     data->opacity *= mOpacity;
 }
@@ -252,6 +252,6 @@ MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal &opacity) {
     mOpacity = opacity;
 }
 
-void MultiplyOpacityCustomizer::customize(const BoundingBoxRenderDataSPtr &data) {
+void MultiplyOpacityCustomizer::customize(BoundingBoxRenderData *data) {
     data->opacity *= mOpacity;
 }

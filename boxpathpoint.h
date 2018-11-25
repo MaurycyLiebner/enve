@@ -3,10 +3,11 @@
 #include "pointanimator.h"
 class BoundingBox;
 class BoxTransformAnimator;
-class BoxPathPoint : public PointAnimator
-{
+class BoxPathPoint : public PointAnimatorMovablePoint {
+    friend class StdSelfRef;
 public:
-    BoxPathPoint(BoxTransformAnimator *box);
+    BoxPathPoint(QPointFAnimator *associatedAnimator,
+                 BoxTransformAnimator *box);
 
     void startTransform();
     void finishTransform();

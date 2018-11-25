@@ -18,12 +18,10 @@
 class SingleSound;
 const int SOUND_SAMPLERATE = 44100;
 
-class SoundComposition : public QIODevice
-{
+class SoundComposition : public QIODevice {
     Q_OBJECT
 public:
     SoundComposition(QObject *parent);
-    ~SoundComposition();
 
     void start();
     void stop();
@@ -36,18 +34,18 @@ public:
                       const int &endAbsFrame,
                       const qreal &fps);
 
-    void addSound(SingleSound *sound);
-    void removeSound(SingleSound *sound);
+    void addSound(const SingleSoundQSPtr &sound);
+    void removeSound(const SingleSoundQSPtr &sound);
 
     ComplexAnimator *getSoundsAnimatorContainer();
-    void addSoundAnimator(SingleSound *sound);
-    void removeSoundAnimator(SingleSound *sound);
+    void addSoundAnimator(const SingleSoundQSPtr &sound);
+    void removeSoundAnimator(const SingleSoundQSPtr &sound);
 private:
-    QSharedPointer<ComplexAnimator> mSoundsAnimatorContainer =
-            (new ComplexAnimator())->ref<ComplexAnimator>();
-    QList<SingleSound*> mSounds;
-    qint64 mPos;
     QByteArray mBuffer;
+    qint64 mPos;
+    QSharedPointer<ComplexAnimator> mSoundsAnimatorContainer =
+            SPtrCreate(ComplexAnimator)("sounds");
+    QList<SingleSoundQSPtr> mSounds;
 };
 
 #endif // SOUNDCOMPOSITION_H

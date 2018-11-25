@@ -6,6 +6,7 @@
 #include <QFlags>
 #include <memory>
 #include "selfref.h"
+#include "sharedpointerdefs.h"
 
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
@@ -35,12 +36,13 @@ public:
     void SWT_removeChildAbstractionForTargetFromAll(
             SingleWidgetTarget *target);
 
-    SingleWidgetAbstraction *SWT_createAbstraction(
+    SingleWidgetAbstractionSPtr SWT_createAbstraction(
             ScrollWidgetVisiblePart *visiblePartWidget);
-    void SWT_removeAbstractionFromList(SingleWidgetAbstraction *abs);
+    SingleWidgetAbstractionSPtr SWT_removeAbstractionFromList(
+            SingleWidgetAbstraction * abs);
 
     virtual void SWT_addChildrenAbstractions(
-            SingleWidgetAbstraction *,
+            const SingleWidgetAbstractionSPtr&  ,
             ScrollWidgetVisiblePart *) {}
 
     // Animators
@@ -93,12 +95,12 @@ public:
     // Sound
     virtual bool SWT_isSingleSound() { return false; }
 
-    virtual SingleWidgetAbstraction* SWT_getAbstractionForWidget(
+    virtual SingleWidgetAbstractionSPtr SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
         return SWT_createAbstraction(visiblePartWidget);
     }
     void SWT_addChildAbstractionForTargetToAllAt(
-            SingleWidgetTarget *target, const int &id);
+            const SingleWidgetTargetQSPtr& target, const int &id);
 
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool &parentSatisfies,
@@ -182,7 +184,7 @@ protected:
     bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
-    QList<std::shared_ptr<SingleWidgetAbstraction> > mSWT_allAbstractions;
+    QList<SingleWidgetAbstractionSPtr> mSWT_allAbstractions;
 };
 
 typedef bool (SingleWidgetTarget::*SWT_Checker)();

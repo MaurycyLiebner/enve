@@ -688,7 +688,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     QBuffer targetT(container->getBytesArray());
                     targetT.open(QIODevice::WriteOnly);
                     int nBoxes = 1;
-                    targetT.write((char*)&nBoxes, sizeof(int));
+                    targetT.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
                     ((BoundingBox*)target)->writeBoundingBox(&targetT);
                     targetT.close();
 
@@ -908,9 +908,10 @@ void BoxSingleWidget::drawKeys(QPainter *p, const qreal &pixelsPerFrame,
                                const int &minViewedFrame,
                                const int &maxViewedFrame) {
     if(isHidden()) return;
-    SingleWidgetTarget *target = mTarget->getTarget();
+    auto target = mTarget->getTarget();
+    Q_ASSERT(target);
     if(target->SWT_isAnimator()) {
-        Animator *anim_target = (Animator*)target;
+        Animator *anim_target = static_cast<Animator*>(target);
         anim_target->prp_drawKeys(p, pixelsPerFrame,
                             containerTop,
                             minViewedFrame, maxViewedFrame);
@@ -921,9 +922,10 @@ Key *BoxSingleWidget::getKeyAtPos(const int &pressX,
                                   const qreal &pixelsPerFrame,
                                   const int &minViewedFrame) {
     if(isHidden()) return nullptr;
-    SingleWidgetTarget *target = mTarget->getTarget();
+    auto target = mTarget->getTarget();
+    Q_ASSERT(target);
     if(target->SWT_isAnimator()) {
-        Animator *anim_target = (Animator*)target;
+        auto anim_target = static_cast<Animator*>(target);
         return anim_target->prp_getKeyAtPos(pressX,
                                minViewedFrame,
                                pixelsPerFrame);
@@ -936,9 +938,10 @@ DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
                             const qreal &pixelsPerFrame,
                             const int &minViewedFrame) {
     if(isHidden()) return nullptr;
-    SingleWidgetTarget *target = mTarget->getTarget();
+    auto target = mTarget->getTarget();
+    Q_ASSERT(target);
     if(target->SWT_isAnimator()) {
-        Animator *anim_target = (Animator*)target;
+        auto anim_target = static_cast<Animator*>(target);
         return anim_target->anim_getRectangleMovableAtPos(
                                     pressX,
                                     minViewedFrame,
@@ -949,11 +952,12 @@ DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
 
 void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
                                     const qreal &pixelsPerFrame,
-                                    QList<Key *> *listKeys) {
+                                    QList<Key*>& listKeys) {
     if(isHidden()) return;
-    SingleWidgetTarget *target = mTarget->getTarget();
+    auto target = mTarget->getTarget();
+    Q_ASSERT(target);
     if(target->SWT_isAnimator()) {
-        Animator *anim_target = (Animator*)target;
+        auto anim_target = static_cast<Animator*>(target);
 
         anim_target->prp_getKeysInRect(selectionRect,
                                  pixelsPerFrame,
@@ -972,16 +976,16 @@ void drawPixmapCentered(QPainter *p,
 }
 
 int BoxSingleWidget::getOptimalNameRightX() {
-    if(mTarget == nullptr) return 0;
-    SingleWidgetTarget *target = mTarget->getTarget();
+    if(!mTarget) return 0;
+    auto target = mTarget->getTarget();
     bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
     if(fakeComplexAnimator) {
-        target = ((FakeComplexAnimator*)target)->getTarget();
+        target = static_cast<FakeComplexAnimator*>(target)->getTarget();
     }
     QFontMetrics fm = QFontMetrics(QFont());
     QString name;
     if(target->SWT_isProperty()) {
-        name = ((Property*)target)->prp_getName();
+        name = SPtrGetAs(target, Property)->prp_getName();
     }
     int nameX = mFillWidget->x();
     //return nameX;
@@ -1003,19 +1007,20 @@ int BoxSingleWidget::getOptimalNameRightX() {
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(mTarget == nullptr) return;
     QPainter p(this);
-    SingleWidgetTarget *target = mTarget->getTarget();
+    auto target = mTarget->getTarget();
+    Q_ASSERT(target);
     if(target->SWT_isDisabled()) {
         p.setOpacity(.5);
     }
     bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
     if(fakeComplexAnimator) {
-        target = ((FakeComplexAnimator*)target)->getTarget();
+        target = SPtrGetAs(target, FakeComplexAnimator)->getTarget();
     }
 
     int nameX = mFillWidget->x();
     QString name;
     if(target->SWT_isBoundingBox()) {
-        BoundingBox *bb_target = (BoundingBox*)target;
+        BoundingBox *bb_target = static_cast<BoundingBox*>(target);
 
         nameX += MIN_WIDGET_HEIGHT/4;
         name = bb_target->getName();
@@ -1058,7 +1063,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 //        p.setFont(font);
     } /*else if(type == SWT_BoxesGroup) {
     } */else if(target->SWT_isQrealAnimator()) {
-        QrealAnimator *qa_target = (QrealAnimator*)target;
+        QrealAnimator *qa_target = static_cast<QrealAnimator*>(target);
         if(qa_target->isCurrentAnimator(mParent)) {
             p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
                        MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,

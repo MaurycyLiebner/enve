@@ -2,12 +2,12 @@
 #define CLIPBOARDCONTAINER_H
 #include <QList>
 #include <QWeakPointer>
+#include "sharedpointerdefs.h"
 class QrealAnimator;
 class BoundingBox;
 class BoxesGroup;
 class KeysView;
 class Key;
-class KeyCloner;
 class Animator;
 class Property;
 
@@ -21,12 +21,10 @@ enum  ClipboardContainerType : short {
 class ClipboardContainer {
 public:
     ClipboardContainer(const ClipboardContainerType &type);
-    virtual ~ClipboardContainer() {}
+    virtual ~ClipboardContainer();
 
     ClipboardContainerType getType();
-    QByteArray *getBytesArray() {
-        return &mData;
-    }
+    QByteArray *getBytesArray();
 private:
     QByteArray mData;
     ClipboardContainerType mType;
@@ -35,11 +33,10 @@ private:
 class BoxesClipboardContainer : public ClipboardContainer {
 public:
     BoxesClipboardContainer();
-    ~BoxesClipboardContainer();
 
     void pasteTo(BoxesGroup *parent);
 private:
-    QList<BoundingBox*> mBoxesList;
+    QList<BoundingBoxQSPtr> mBoxesList;
 };
 
 class KeysClipboardContainer : public ClipboardContainer {
@@ -47,10 +44,10 @@ public:
     KeysClipboardContainer();
     ~KeysClipboardContainer();
 
-    QList<Key *> paste(const int &pasteFrame,
-                       KeysView *keysView);
-    QList<Key *> pasteWithoutMerging(const int &pasteFrame,
-                                     KeysView *keysView);
+    QList<KeySPtr> paste(const int &pasteFrame,
+                         KeysView *keysView);
+    QList<KeySPtr> pasteWithoutMerging(const int &pasteFrame,
+                                       KeysView *keysView);
 
     void addTargetAnimator(Animator *anim);
 private:
@@ -97,7 +94,7 @@ private:
     bool mVectorPathAnimator = false;
     bool mBoxTargetProperty = false;
     QString mPropertyName;
-    QWeakPointer<BoundingBox> mTargetBox;
+    QPointer<BoundingBox> mTargetBox;
 };
 
 #endif // CLIPBOARDCONTAINER_H

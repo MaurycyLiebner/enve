@@ -41,7 +41,7 @@ public:
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> *list);
+                                           QList<MovablePointSPtr> &list);
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
@@ -58,7 +58,7 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;
 protected:
-    void getMotionBlurProperties(QList<Property*> *list);
+    void getMotionBlurProperties(QList<PropertyQSPtr>& list);
     PathAnimatorQSPtr mPathAnimator;
 };
 

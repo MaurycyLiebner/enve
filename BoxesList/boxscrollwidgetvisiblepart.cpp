@@ -242,7 +242,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
            boxUnderMouse->isAncestor(box.data())) return;
         if(parentGroup != box->getParentGroup()) {
             box->getParentGroup()->removeContainedBox(box.data());
-            parentGroup->addContainedBox(box.data());
+            parentGroup->addContainedBox(box);
             box->applyTransformationInverted(box->getTransformAnimator());
         }
         if(below) { // add box below
@@ -268,11 +268,10 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                     &below);
         if(singleWidgetUnderMouse == nullptr) return;
 
-        PixmapEffect *effect = ((PixmapEffectMimeData*)event->mimeData())->
-                getPixmapEffect();
-        PixmapEffect *effectUnderMouse =
-                ((PixmapEffect*)singleWidgetUnderMouse->
-                 getTargetAbstraction()->getTarget());
+        auto peMimeData = static_cast<const PixmapEffectMimeData*>(event->mimeData());
+        PixmapEffectQSPtr effect = (peMimeData)->getPixmapEffect();
+        auto targetUnderMouse = singleWidgetUnderMouse->getTargetAbstraction()->getTarget();
+        auto effectUnderMouse = targetUnderMouse->ref<PixmapEffect>();
 
         if(effect != effectUnderMouse) {
             EffectAnimators *underMouseAnimator =

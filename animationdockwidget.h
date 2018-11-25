@@ -6,8 +6,7 @@
 class ActionButton;
 class KeysView;
 
-class AnimationDockWidget : public QToolBar
-{
+class AnimationDockWidget : public QToolBar {
     Q_OBJECT
 public:
     explicit AnimationDockWidget(QWidget *parent, KeysView *keysView);

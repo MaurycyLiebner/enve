@@ -2,15 +2,13 @@
 #include "Colors/helpers.h"
 #include <QDebug>
 
-ColorAnimator::ColorAnimator() : ComplexAnimator() {
-    prp_setName("color");
-    mAlphaAnimator->prp_setName("alpha");
+ColorAnimator::ColorAnimator(const QString &name) : ComplexAnimator(name) {
     setColorMode(RGBMODE);
 
-    ca_addChildAnimator(mVal1Animator.data());
-    ca_addChildAnimator(mVal2Animator.data());
-    ca_addChildAnimator(mVal3Animator.data());
-    ca_addChildAnimator(mAlphaAnimator.data());
+    ca_addChildAnimator(mVal1Animator);
+    ca_addChildAnimator(mVal2Animator);
+    ca_addChildAnimator(mVal3Animator);
+    ca_addChildAnimator(mAlphaAnimator);
 
     mVal1Animator->qra_setValueRange(0., 1.);
     mVal1Animator->setPrefferedValueStep(0.05);
@@ -26,109 +24,78 @@ ColorAnimator::ColorAnimator() : ComplexAnimator() {
     mAlphaAnimator->freezeMinMaxValues();
 }
 
-void ColorAnimator::qra_setCurrentValue(const Color &colorValue,
+void ColorAnimator::qra_setCurrentValue(const QColor &colorValue,
                                         const bool &saveUndoRedo,
                                         const bool &finish) {
+    qreal val1, val2, val3;
     if(mColorMode == RGBMODE) {
-        mVal1Animator->qra_setCurrentValue(colorValue.gl_r,
-                                           saveUndoRedo,
-                                           finish);
-        mVal2Animator->qra_setCurrentValue(colorValue.gl_g,
-                                           saveUndoRedo,
-                                           finish);
-        mVal3Animator->qra_setCurrentValue(colorValue.gl_b,
-                                           saveUndoRedo,
-                                           finish);
+        val1 = colorValue.redF();
+        val2 = colorValue.greenF();
+        val3 = colorValue.blueF();
     } else if(mColorMode == HSVMODE) {
-        mVal1Animator->qra_setCurrentValue(colorValue.gl_h,
-                                           saveUndoRedo,
-                                           finish);
-        mVal2Animator->qra_setCurrentValue(colorValue.gl_s,
-                                           saveUndoRedo,
-                                           finish);
-        mVal3Animator->qra_setCurrentValue(colorValue.gl_v,
-                                           saveUndoRedo,
-                                           finish);
+        val1 = colorValue.hsvHueF();
+        val2 = colorValue.hsvSaturationF();
+        val3 = colorValue.valueF();
     } else { // HSLMODE
-        float h = colorValue.gl_h;
-        float s = colorValue.gl_s;
-        float l = colorValue.gl_v;
-        hsv_to_hsl(&h, &s, &l);
-
-        mVal1Animator->qra_setCurrentValue(h, saveUndoRedo, finish);
-        mVal2Animator->qra_setCurrentValue(s, saveUndoRedo, finish);
-        mVal3Animator->qra_setCurrentValue(l, saveUndoRedo, finish);
+        val1 = colorValue.hslHueF();
+        val2 = colorValue.hslSaturationF();
+        val3 = colorValue.lightnessF();
     }
-    mAlphaAnimator->qra_setCurrentValue(colorValue.gl_a, saveUndoRedo, finish);
+    qreal alpha = colorValue.alphaF();
+
+    mVal1Animator->qra_setCurrentValue(val1, saveUndoRedo, finish);
+    mVal2Animator->qra_setCurrentValue(val2, saveUndoRedo, finish);
+    mVal3Animator->qra_setCurrentValue(val3, saveUndoRedo, finish);
+    mAlphaAnimator->qra_setCurrentValue(alpha, saveUndoRedo, finish);
 }
 
-void ColorAnimator::qra_setCurrentValue(const QColor &qcolorValue,
-                                        const bool &saveUndoRedo,
-                                        const bool &finish) {
-    Color color;
-    color.setQColor(qcolorValue);
-    qra_setCurrentValue(color, saveUndoRedo, finish);
-}
+QColor ColorAnimator::getCurrentColor() const {
+    qreal val1 = mVal1Animator->qra_getCurrentEffectiveValue();
+    qreal val2 = mVal2Animator->qra_getCurrentEffectiveValue();
+    qreal val3 = mVal3Animator->qra_getCurrentEffectiveValue();
+    qreal alpha = mAlphaAnimator->qra_getCurrentEffectiveValue();
 
-Color ColorAnimator::getCurrentColor() const {
-    Color color;
+    QColor color;
     if(mColorMode == RGBMODE) {
-        color.setRGB(mVal1Animator->qra_getCurrentEffectiveValue(),
-                     mVal2Animator->qra_getCurrentEffectiveValue(),
-                     mVal3Animator->qra_getCurrentEffectiveValue(),
-                     mAlphaAnimator->qra_getCurrentEffectiveValue() );
+        color.setRgbF(val1, val2, val3, alpha);
     } else if(mColorMode == HSVMODE) {
-        color.setHSV(mVal1Animator->qra_getCurrentEffectiveValue(),
-                     mVal2Animator->qra_getCurrentEffectiveValue(),
-                     mVal3Animator->qra_getCurrentEffectiveValue(),
-                     mAlphaAnimator->qra_getCurrentEffectiveValue() );
+        color.setHsvF(val1, val2, val3, alpha);
     } else { // HSLMODE
-        color.setHSL(mVal1Animator->qra_getCurrentEffectiveValue(),
-                     mVal2Animator->qra_getCurrentEffectiveValue(),
-                     mVal3Animator->qra_getCurrentEffectiveValue(),
-                     mAlphaAnimator->qra_getCurrentEffectiveValue() );
+        color.setHslF(val1, val2, val3, alpha);
     }
     return color;
 }
 
-Color ColorAnimator::getColorAtRelFrame(const int &relFrame) {
-    Color color;
+QColor ColorAnimator::getColorAtRelFrame(const int &relFrame) {
+    qreal val1 = mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame);
+    qreal val2 = mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame);
+    qreal val3 = mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame);
+    qreal alpha = mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
+
+    QColor color;
     if(mColorMode == RGBMODE) {
-        color.setRGB(mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
+        color.setRgbF(val1, val2, val3, alpha);
     } else if(mColorMode == HSVMODE) {
-        color.setHSV(mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
+        color.setHsvF(val1, val2, val3, alpha);
     } else { // HSLMODE
-        color.setHSL(mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame),
-                     mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
+        color.setHslF(val1, val2, val3, alpha);
     }
     return color;
 }
 
-Color ColorAnimator::getColorAtRelFrameF(const qreal &relFrame) {
-    Color color;
+QColor ColorAnimator::getColorAtRelFrameF(const qreal &relFrame) {
+    qreal val1 = mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame);
+    qreal val2 = mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame);
+    qreal val3 = mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame);
+    qreal alpha = mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame);
+
+    QColor color;
     if(mColorMode == RGBMODE) {
-        color.setRGB(mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+        color.setRgbF(val1, val2, val3, alpha);
     } else if(mColorMode == HSVMODE) {
-        color.setHSV(mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+        color.setHsvF(val1, val2, val3, alpha);
     } else { // HSLMODE
-        color.setHSL(mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame),
-                     mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame) );
+        color.setHslF(val1, val2, val3, alpha);
     }
     return color;
 }
@@ -166,7 +133,7 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
         return;
     }
 
-    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const KeySPtr &key, anim_mKeys) {
         int frame = key->getAbsFrame();
 
         qreal rF = mVal1Animator->getCurrentValueAtAbsFrame(frame);
@@ -262,10 +229,8 @@ void ColorAnimator::prp_openContextMenu(const QPoint &pos) {
     colorModeMenu.addAction(hslAction);
     menu.addMenu(&colorModeMenu);
     QAction *selected_action = menu.exec(pos);
-    if(selected_action != nullptr)
-    {
-        if(selected_action->text() == "Add Key")
-        {
+    if(selected_action != nullptr) {
+        if(selected_action->text() == "Add Key") {
             anim_saveCurrentValueAsKey();
         } else if(selected_action == rgbAction) {
             setColorMode(RGBMODE);

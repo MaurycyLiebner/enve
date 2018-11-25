@@ -2,6 +2,7 @@
 #define SINGLEWIDGETABSTRACTION_H
 
 #include "selfref.h"
+#include "sharedpointerdefs.h"
 #include <QWidget>
 class SingleWidgetTarget;
 class SingleWidget;
@@ -13,13 +14,13 @@ struct SWT_RulesCollection;
 
 class SingleWidgetAbstraction : public StdSelfRef {
 public:
-    SingleWidgetAbstraction(SingleWidgetTarget *target,
+    SingleWidgetAbstraction(const SingleWidgetTargetQSPtr& target,
                             ScrollWidgetVisiblePart *visiblePart);
     virtual ~SingleWidgetAbstraction();
 
     bool getAbstractions(const int &minY, const int &maxY,
-                         int *currY, int currX,
-                         QList<SingleWidgetAbstraction *> *abstractions,
+                         int& currY, int currX,
+                         QList<SingleWidgetAbstractionSPtr>& abstractions,
                          const SWT_RulesCollection &rules,
                          const bool &parentSatisfiesRule,
                          const bool &parentMainTarget);
@@ -37,23 +38,18 @@ public:
 
     void setContentVisible(const bool &bT);
 
-    void clearTarget() {
-        mTarget = nullptr;
-    }
-    SingleWidgetTarget *getTarget() {
-        return mTarget;
-    }
+    SingleWidgetTarget *getTarget();
 
     void addChildAbstractionForTarget(SingleWidgetTarget *target);
     void addChildAbstractionForTargetAt(
             SingleWidgetTarget *target,
             const int &id);
-    void addChildAbstraction(SingleWidgetAbstraction *abs);
-    void addChildAbstractionAt(SingleWidgetAbstraction *abs,
-                             const int &id);
+    void addChildAbstraction(const SingleWidgetAbstractionSPtr& abs);
+    void addChildAbstractionAt(const SingleWidgetAbstractionSPtr& abs,
+                               const int &id);
 
     void removeChildAbstractionForTarget(SingleWidgetTarget *target);
-    void removeChildAbstraction(SingleWidgetAbstraction *abs);
+    void removeChildAbstraction(const SingleWidgetAbstractionSPtr& abs);
 
     void switchContentVisible();
 
@@ -89,9 +85,9 @@ private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;
     bool mContentVisible = false;
-    SingleWidgetTarget *mTarget = nullptr;
+    SingleWidgetTarget* mTarget = nullptr;
 
-    QList<std::shared_ptr<SingleWidgetAbstraction> > mChildren;
+    QList<SingleWidgetAbstractionSPtr> mChildren;
 };
 
 #endif // SINGLEWIDGETABSTRACTION_H

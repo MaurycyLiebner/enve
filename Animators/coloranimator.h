@@ -13,19 +13,15 @@ enum ColorMode : short {
 
 class ColorAnimator : public ComplexAnimator {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    ColorAnimator();
-
-    void qra_setCurrentValue(const Color &colorValue,
-                             const bool &saveUndoRedo = false,
-                             const bool &finish = false);
     void qra_setCurrentValue(const QColor &qcolorValue,
                              const bool &saveUndoRedo = false,
                              const bool &finish = false);
 
-    Color getCurrentColor() const;
-    Color getColorAtRelFrame(const int &relFrame);
-    Color getColorAtRelFrameF(const qreal &relFrame);
+    QColor getCurrentColor() const;
+    QColor getColorAtRelFrame(const int &relFrame);
+    QColor getColorAtRelFrameF(const qreal &relFrame);
     void setColorMode(const ColorMode &colorMode);
 
     void startVal1Transform();
@@ -54,35 +50,38 @@ public:
     }
 
     QrealAnimator *getVal1Animator() {
-        return mVal1Animator.data();
+        return mVal1Animator.get();
     }
 
     QrealAnimator *getVal2Animator() {
-        return mVal2Animator.data();
+        return mVal2Animator.get();
     }
 
     QrealAnimator *getVal3Animator() {
-        return mVal3Animator.data();
+        return mVal3Animator.get();
     }
 
     QrealAnimator *getAlphaAnimator() {
-        return mAlphaAnimator.data();
+        return mAlphaAnimator.get();
     }
 
     bool SWT_isColorAnimator() { return true; }
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+protected:
+    ColorAnimator(const QString& name = "color");
 private:
     ColorMode mColorMode = RGBMODE;
+
     QSharedPointer<QrealAnimator> mVal1Animator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+            SPtrCreate(QrealAnimator)("");
     QSharedPointer<QrealAnimator> mVal2Animator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+            SPtrCreate(QrealAnimator)("");
     QSharedPointer<QrealAnimator> mVal3Animator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+            SPtrCreate(QrealAnimator)("");
     QSharedPointer<QrealAnimator> mAlphaAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+            SPtrCreate(QrealAnimator)("alpha");
 signals:
     void colorModeChanged(ColorMode);
 };

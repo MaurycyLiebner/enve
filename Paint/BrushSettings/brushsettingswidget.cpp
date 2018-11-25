@@ -173,7 +173,7 @@ void BrushSettingsWidget::setColorSetting(const ColorSetting &colorSetting) {
                       colorSetting.getVal2(),
                       colorSetting.getVal3());
     } else if(colorMode == ColorMode::HSLMODE) {
-        Color color;
+        QColor color;
         color.setHSL(colorSetting.getVal1(),
                      colorSetting.getVal2(),
                      colorSetting.getVal3(),
@@ -182,7 +182,7 @@ void BrushSettingsWidget::setColorSetting(const ColorSetting &colorSetting) {
                       color.gl_s,
                       color.gl_v);
     } else if(colorMode == ColorMode::RGBMODE) {
-        Color color;
+        QColor color;
         color.setRGB(colorSetting.getVal1(),
                      colorSetting.getVal2(),
                      colorSetting.getVal3(),

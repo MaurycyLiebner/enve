@@ -4,22 +4,9 @@
 #include "clipboardcontainer.h"
 #include "qrealpoint.h"
 
-QrealKey::QrealKey(QrealAnimator *parentAnimator) :
-    Key(parentAnimator) {
-    mEndFrame = mRelFrame + 5;
-    mStartFrame = mRelFrame - 5;
-    mValue = 0.;
-    mStartValue = mValue;
-    mEndValue = mValue;
-
-    mGraphPoint = new QrealPoint(KEY_POINT, this, 6.);
-    mStartPoint = new QrealPoint(START_POINT, this, 4.);
-    mEndPoint = new QrealPoint(END_POINT, this, 4.);
-}
-
 QrealKey::QrealKey(const int &frame,
                    const qreal &val,
-                   QrealAnimator *parentAnimator) :
+                   QrealAnimator* parentAnimator) :
     Key(parentAnimator) {
     mValue = val;
     mRelFrame = frame;
@@ -28,19 +15,17 @@ QrealKey::QrealKey(const int &frame,
     mStartValue = mValue;
     mEndValue = mValue;
 
-    mGraphPoint = new QrealPoint(KEY_POINT, this, 6.);
-    mStartPoint = new QrealPoint(START_POINT, this, 4.);
-    mEndPoint = new QrealPoint(END_POINT, this, 4.);
+    mGraphPoint = SPtrCreate(QrealPoint)(KEY_POINT, this, 6.);
+    mStartPoint = SPtrCreate(QrealPoint)(START_POINT, this, 4.);
+    mEndPoint = SPtrCreate(QrealPoint)(END_POINT, this, 4.);
 }
 
-QrealKey::~QrealKey() {
-    delete mEndPoint;
-    delete mStartPoint;
-    delete mGraphPoint;
-}
+QrealKey::QrealKey(QrealAnimator *parentAnimator) :
+    QrealKey(0, 0., parentAnimator) { }
 
-QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
-    QrealKey *target = new QrealKey(targetParent);
+QrealKeySPtr QrealKey::makeQrealKeyDuplicate(
+        QrealAnimator* targetParent) {
+    QrealKeySPtr target = SPtrCreate(QrealKey)(targetParent);
     target->setValue(mValue);
     target->setRelFrame(mRelFrame);
     target->setCtrlsMode(mCtrlsMode);
@@ -74,15 +59,15 @@ CtrlsMode QrealKey::getCtrlsMode() {
 }
 
 QrealPoint *QrealKey::getStartPoint() {
-    return mStartPoint;
+    return mStartPoint.get();
 }
 
 QrealPoint *QrealKey::getEndPoint() {
-    return mEndPoint;
+    return mEndPoint.get();
 }
 
 QrealPoint *QrealKey::getGraphPoint() {
-    return mGraphPoint;
+    return mGraphPoint.get();
 }
 
 bool QrealKey::isEndPointEnabled() {
@@ -94,7 +79,7 @@ bool QrealKey::isStartPointEnabled() {
 }
 
 QrealAnimator *QrealKey::getParentQrealAnimator() {
-    return ((QrealAnimator*)mParentAnimator);
+    return static_cast<QrealAnimator*>(mParentAnimator.data());
 }
 
 qreal QrealKey::getPrevKeyValue() {
@@ -131,16 +116,16 @@ QrealPoint *QrealKey::mousePress(const qreal &frameT,
         if( (mStartEnabled && hasPrevKey()) ?
             mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
             false ) {
-            return mStartPoint;
+            return mStartPoint.get();
         }
         if((mEndEnabled && hasNextKey()) ?
             mEndPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
             false ) {
-            return mEndPoint;
+            return mEndPoint.get();
         }
     }
     if(mGraphPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue)) {
-        return mGraphPoint;
+        return mGraphPoint.get();
     }
     return nullptr;
 }
@@ -183,11 +168,11 @@ void QrealKey::updateCtrlFromCtrl(const QrealPointType &type) {
     if(type == END_POINT) {
         fromPt = QPointF(mEndFrame, mEndValue);
         toPt = QPointF(mStartFrame, mStartValue);
-        targetPt = mStartPoint;
+        targetPt = mStartPoint.get();
     } else {
         toPt = QPointF(mEndFrame, mEndValue);
         fromPt = QPointF(mStartFrame, mStartValue);
-        targetPt = mEndPoint;
+        targetPt = mEndPoint.get();
     }
     QPointF newFrameValue;
     if(mCtrlsMode == CTRLS_SMOOTH) {
@@ -397,8 +382,8 @@ void QrealKey::setRelFrame(const int &frame) {
 
 bool QrealKey::differsFromKey(Key *key) {
     if(key == this) return false;
-    QrealKey *qa_key = (QrealKey*)key;
-    if(qa_key->getValue() == mValue) {
+    QrealKeySPtr qa_key = key->ref<QrealKey>();
+    if(isZero(qa_key->getValue() - mValue)) {
         if(key->getRelFrame() > mRelFrame) {
             if(qa_key->isStartPointEnabled() ||
                isEndPointEnabled()) return true;

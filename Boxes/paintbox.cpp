@@ -8,9 +8,9 @@
 PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {
     setName("Paint Box");
-    mTopLeftPoint = new PointAnimator(mTransformAnimator.data(),
+    mTopLeftPoint = new QPointFAnimator(mTransformAnimator.data(),
                                       TYPE_PATH_POINT);
-    mBottomRightPoint = new PointAnimator(mTransformAnimator.data(),
+    mBottomRightPoint = new QPointFAnimator(mTransformAnimator.data(),
                                           TYPE_PATH_POINT);
 
     mTopLeftPoint->prp_setUpdater(
@@ -271,7 +271,7 @@ void PaintBox::processSchedulers() {
     BoundingBox::processSchedulers();
 }
 
-void PaintBox::renderDataFinished(const BoundingBoxRenderDataSPtr& renderData) {
+void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     BoundingBox::renderDataFinished(renderData);
     if(mTemporaryHandler != nullptr) {
         mTemporaryHandler->clearTmp();
@@ -279,7 +279,7 @@ void PaintBox::renderDataFinished(const BoundingBoxRenderDataSPtr& renderData) {
 }
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
-        const qreal &relFrame, const BoundingBoxRenderDataSPtr& data) {
+        const qreal &relFrame, BoundingBoxRenderData* data) {
     if(mFinishSizeAndPosSetupScheduled) {
         mFinishSizeAndPosSetupScheduled = false;
         finishSizeAndPosSetup();
@@ -306,7 +306,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 BoundingBoxRenderDataSPtr PaintBox::createRenderData() {
-    return (new PaintBoxRenderData(this))->ref<BoundingBoxRenderData>();
+    return SPtrCreate(PaintBoxRenderData)(this);
 }
 
 bool PaintBox::prp_differencesBetweenRelFrames(const int &relFrame1,

@@ -34,7 +34,7 @@ public:
     qreal getEffectsMarginAtRelFrameF(const qreal &relFrame) const;
 
     void addEffectRenderDataToListF(const qreal &relFrame,
-                                    const BoundingBoxRenderDataSPtr& data);
+                                    BoundingBoxRenderData *data);
 
     void ca_removeAllChildAnimators();
 

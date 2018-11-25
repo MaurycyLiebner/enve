@@ -5,10 +5,9 @@
 class QrealAnimator;
 typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
 
-class QPointFAnimator : public ComplexAnimator
-{
+class QPointFAnimator : public ComplexAnimator {
+    friend class SelfRef;
 public:
-    QPointFAnimator();
     qreal getXValue();
     qreal getYValue();
 
@@ -69,6 +68,8 @@ public:
     qreal getEffectiveXValue();
     qreal getEffectiveYValue();
 protected:
+    QPointFAnimator(const QString& name);
+
     QrealAnimatorQSPtr mXAnimator;
     QrealAnimatorQSPtr mYAnimator;
 };

@@ -24,9 +24,9 @@ private:
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *e);
-    bool isInTriangle(QPoint pos_t);
-    bool isInWheel(QPoint pos_t);
-    void wheelInteraction(int x_t, int y_t);
+    bool isInTriangle(const QPoint &pos_t);
+    bool isInWheel(const QPoint &pos_t);
+    void wheelInteraction(const int& x_t, const int& y_t);
     void triangleInteraction(int x_t, int y_t);
 
     void wheelEvent(QWheelEvent *e);

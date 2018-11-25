@@ -3,8 +3,9 @@
 #include "Animators/animatorupdater.h"
 #include "mainwindow.h"
 
-Property::Property() {
+Property::Property(const QString& name) {
     mMainWindow = MainWindow::getInstance();
+    prp_setName(name);
 }
 
 void Property::prp_valueChanged() {
@@ -62,16 +63,16 @@ void Property::prp_setName(const QString &newName) {
     prp_mName = newName;
 }
 
-void Property::prp_setUpdater(AnimatorUpdater *updater) {
+void Property::prp_setUpdater(const AnimatorUpdaterSPtr& updater) {
     if(prp_mUpdaterBlocked) return;
     if(updater == nullptr) {
         prp_mUpdater.reset();
     } else {
-        prp_mUpdater = updater->ref<AnimatorUpdater>();
+        prp_mUpdater = updater;
     }
 }
 
-void Property::prp_setBlockedUpdater(AnimatorUpdater *updater) {
+void Property::prp_setBlockedUpdater(const AnimatorUpdaterSPtr& updater) {
     prp_mUpdaterBlocked = false;
     prp_setUpdater(updater);
     prp_blockUpdater();
@@ -134,6 +135,12 @@ bool Property::isAltPressed() {
 
 bool Property::isAltPressed(QKeyEvent *event) {
     return event->modifiers() & Qt::AltModifier;
+}
+
+BoundingBox *Property::getLastSetParentBoundingBoxAncestor() {
+    if(mLastSetParent == nullptr) return nullptr;
+    if(mLastSetParent->SWT_isBoundingBox()) return SPtrGetAs(mLastSetParent, BoundingBox);
+    return mLastSetParent->getLastSetParentBoundingBoxAncestor();
 }
 
 int Property::getCurrentFrameFromMainWindow() {

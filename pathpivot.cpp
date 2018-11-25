@@ -31,27 +31,24 @@ void PathPivot::drawSk(SkCanvas *canvas,
     SkPaint paint;
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    qreal scaledHalfRadius = mRadius*invScale*0.5;
-    canvas->drawLine(-scaledHalfRadius, 0., scaledHalfRadius, 0., paint);
-    canvas->drawLine(0, -scaledHalfRadius, 0., scaledHalfRadius, paint);
+    SkScalar scaledHalfRadius = static_cast<SkScalar>(mRadius)*invScale*0.5f;
+    canvas->drawLine(-scaledHalfRadius, 0.f, scaledHalfRadius, 0.f, paint);
+    canvas->drawLine(0.f, -scaledHalfRadius, 0.f, scaledHalfRadius, paint);
     canvas->restore();
 }
 
-void PathPivot::finishTransform()
-{
+void PathPivot::finishTransform() {
     if(!mTransformStarted) {
         return;
     }
     mTransformStarted = false;
 }
 
-bool PathPivot::isRotating()
-{
+bool PathPivot::isRotating() {
     return mRotating;
 }
 
-bool PathPivot::isScaling()
-{
+bool PathPivot::isScaling() {
     return mScaling;
 }
 
@@ -61,14 +58,12 @@ void PathPivot::startRotating() {
     mRotHalfCycles = 0;
 }
 
-void PathPivot::startScaling()
-{
+void PathPivot::startScaling() {
     mScaling = true;
 }
 
 bool PathPivot::handleMousePress(const QPointF &absPressPos,
-                                 const qreal &canvasInvScale)
-{
+                                 const qreal &canvasInvScale) {
     if(mHidden) return false;
     if(isPointAtAbsPos(absPressPos, canvasInvScale)) {
         select();
@@ -82,8 +77,7 @@ bool PathPivot::handleMousePress(const QPointF &absPressPos,
     return false;
 }
 
-bool PathPivot::handleMouseRelease()
-{
+bool PathPivot::handleMouseRelease() {
     if(mRotating) {
         mRotating = false;
         return true;
@@ -170,18 +164,8 @@ bool PathPivot::handleMouseMove(const QPointF &moveDestAbs,
             scaleX = 1.;
             scaleY = scaleBy;
         } else {
-            if(MainWindow::getInstance()->isShiftPressed() ||
-               inputTransformationEnabled || true) { // always
-                scaleX = scaleBy;
-                scaleY = scaleBy;
-            } else {
-                scaleX = 1. +
-                        distSign(distMoved -
-                                 QPointF(0., distMoved.y()) )*0.003;
-                scaleY = 1. +
-                        distSign(distMoved -
-                                 QPointF(distMoved.x(), 0.) )*0.003;
-            }
+            scaleX = scaleBy;
+            scaleY = scaleBy;
         }
 
         if(mode == CanvasMode::MOVE_PATH) {
@@ -194,7 +178,6 @@ bool PathPivot::handleMouseMove(const QPointF &moveDestAbs,
     return false;
 }
 
-//bool PathPivot::isRotationPathAt(QPointF absPos)
-//{
+//bool PathPivot::isRotationPathAt(QPointF absPos) {
 //    return mMappedRotationPath.contains(absPos);
 //}

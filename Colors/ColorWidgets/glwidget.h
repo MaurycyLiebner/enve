@@ -7,8 +7,7 @@ extern GLfloat AA_VECT_LEN;
 extern GLfloat AA_SHARP_VECT_LEN;
 class Gradient;
 
-class GLWidget : public QOpenGLWidget
-{
+class GLWidget : public QOpenGLWidget {
     Q_OBJECT
 public:
     GLWidget(QWidget *parent);
@@ -200,7 +199,7 @@ public:
                                 GLfloat wt,
                                 GLfloat ht);
 protected:
-    Color bgColor;
+    SkColor4f mBgColor;
 
     void resizeGL(int w, int h);
 private:

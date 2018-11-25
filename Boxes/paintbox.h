@@ -6,7 +6,7 @@ struct TileSkDrawer;
 class Surface;
 class Brush;
 class AnimatedSurface;
-class PointAnimator;
+class QPointFAnimator;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
     PaintBoxRenderData(BoundingBox *parentBoxT) :
@@ -47,9 +47,9 @@ public:
     bool SWT_isPaintBox() { return true; }
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
     void processSchedulers();
-    void renderDataFinished(const BoundingBoxRenderDataSPtr& renderData);
+    void renderDataFinished(BoundingBoxRenderData *renderData);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                const BoundingBoxRenderDataSPtr& data);
+                                                BoundingBoxRenderData* data);
     BoundingBox *createNewDuplicate() {
         return new PaintBox(100, 100);
     }
@@ -135,8 +135,8 @@ private:
 
     int mOverlapFrames = 1;
     int mFrameStep = 1;
-    PointAnimator *mTopLeftPoint = nullptr;
-    PointAnimator *mBottomRightPoint = nullptr;
+    QPointFAnimator *mTopLeftPoint = nullptr;
+    QPointFAnimator *mBottomRightPoint = nullptr;
     ushort mWidth = 0;
     ushort mHeight = 0;
     AnimatedSurface *mMainHandler = nullptr;

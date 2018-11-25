@@ -9,7 +9,7 @@ SavedColorWidgets::SavedColorWidgets(QWidget *parent) : QWidget(parent)
     widgets_layout = new QVBoxLayout();
     main_layout->addLayout(widgets_layout);
 
-    add_collection_button = new QPushButton("New Color Collection", this);
+    add_collection_button = new QPushButton("New QColor Collection", this);
     connect(add_collection_button, SIGNAL(pressed()), this, SLOT(addCollection()) );
     main_layout->addWidget(add_collection_button);
 }

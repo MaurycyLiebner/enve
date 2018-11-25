@@ -9,16 +9,16 @@ class SavedColorsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SavedColorsWidget(QWidget *parent = 0);
+    explicit SavedColorsWidget(QWidget *parent = nullptr);
 
-    void addColorButton(Color color_t);
+    void addColorButton(const QColor& colorT);
     void mousePressEvent(QMouseEvent *e);
 private:
-    QHBoxLayout *main_layout = nullptr;
+    QHBoxLayout *mMainLayout = nullptr;
 signals:
 
 public slots:
-    void setColorFromButton(const Color &color_t);
+    void setColorFromButton(const QColor &colorT);
 };
 
 #endif // SAVEDCOLORSWIDGET_H

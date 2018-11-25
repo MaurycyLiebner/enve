@@ -61,7 +61,7 @@ void ImageBox::changeSourceFile() {
 
 void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
                                     const qreal &relFrame,
-                                    const BoundingBoxRenderDataSPtr& data) {
+                                    BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     auto imgData = data->ref<ImageBoxRenderData>();
     imgData->image = mImgCacheHandler->getImageCopy();
@@ -72,7 +72,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 BoundingBoxRenderDataSPtr ImageBox::createRenderData() {
-    return (new ImageBoxRenderData(mImgCacheHandler, this))->ref<BoundingBoxRenderData>();
+    return SPtrCreate(ImageBoxRenderData)(mImgCacheHandler, this);
 }
 
 bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {

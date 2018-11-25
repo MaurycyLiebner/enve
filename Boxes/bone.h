@@ -5,8 +5,8 @@ class BonePt;
 class BonesBox;
 class Bone : public ComplexAnimator {
 public:
-    Bone(BonesBox *boneBox);
-    Bone(Bone *parentBone);
+    static Bone* createBone(BonesBox *boneBox);
+    static Bone* createBone(Bone*  parentBone);
 
     Bone *getBoneAtRelPos(const QPointF &relPos);
 
@@ -27,7 +27,7 @@ public:
 
     BasicTransformAnimator *getTransformAnimator();
 
-    const bool &isConnectedToParent();
+    bool isConnectedToParent();
 
     void setConnectedToParent(const bool &bT);
 
@@ -44,19 +44,19 @@ public:
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 
-    void addChildBone(Bone *child);
+    void addChildBone(const BoneQSPtr &child);
 
-    void removeChildBone(Bone *child);
+    void removeChildBone(const BoneQSPtr &child);
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> *list);
+                                           QList<MovablePoint *> &list);
     void setParentBone(Bone *parentBone);
     void setParentBonesBox(BonesBox *bonesBox);
 
     void drawHoveredPathSk(SkCanvas *canvas,
-                           const qreal &invScale);
+                           const SkScalar &invScale);
     void drawHoveredOnlyThisPathSk(SkCanvas *canvas,
-                                   const qreal &invScale);
+                                   const SkScalar &invScale);
     void deselect();
     void select();
     const bool &isSelected();
@@ -70,9 +70,7 @@ public:
     void startTransform();
 
     void finishTransform();
-    void cancelTransform() {
-        mTransformAnimator->prp_cancelTransform();
-    }
+    void cancelTransform();
 
     void moveByAbs(const QPointF &trans);
 
@@ -101,94 +99,56 @@ public:
     void scaleRelativeToSavedPivot(const qreal &scaleXBy,
                                    const qreal &scaleYBy);
 
-    BonesBox *getParentBox() {
-        if(mParentBonesBox == nullptr) {
-            return mParentBone->getParentBox();
-        }
-        return mParentBonesBox;
+    BonesBox *getParentBox();
+
+    void clearCurrentParent() {
+        clearParentBone();
+        clearParentBonesBox();
     }
 protected:
-    QPointF mSavedTransformPivot;
-    bool mSelected = false;
-    BonePt *mTipPt = nullptr;
-    BonePt *mRootPt = nullptr;
+    Bone();
+
+    void clearParentBonesBox();
+    void clearParentBone();
 
     bool mConnectedToParent = true;
+    bool mSelected = false;
+
     QPointF mRelRootPos;
     QPointF mRelTipPos;
-    QSharedPointer<BoneTransformAnimator> mTransformAnimator;
-    QList<Bone*> mChildBones;
-    Bone *mParentBone = nullptr;
-    BonesBox *mParentBonesBox = nullptr;
+    QPointF mSavedTransformPivot;
+
+    BonePtSPtr mTipPt;
+    BonePtSPtr mRootPt;
+
+    BoneTransformAnimatorQSPtr mTransformAnimator;
+    QList<BoneQSPtr> mChildBones;
+    BoneQPtr mParentBone;
+    BonesBoxQPtr mParentBonesBox;
 };
 
 class BonePt : public NonAnimatedMovablePoint {
 public:
+    void setRelativePos(const QPointF &relPos);
+
+    void setTipBone(Bone *bone);
+
+    void addRootBone(Bone *bone);
+
+    void removeRootBone(Bone *bone);
+
+    void setParentBone(Bone *bone);
+
+    Bone *getTipBone();
+
+    Bone *getParentBone();
+protected:
     BonePt(BasicTransformAnimator *parent,
            const MovablePointType &type,
-           const qreal &radius = 7.5) :
-        NonAnimatedMovablePoint(parent, type, radius) {
-    }
-
-    void setRelativePos(const QPointF &relPos) {
-        NonAnimatedMovablePoint::setRelativePos(relPos);
-        if(mTipBone != nullptr) {
-            if(mParentBone == mTipBone) {
-                mTipBone->setRelTipPos(relPos);
-            } else {
-                mTipBone->setAbsTipPos(
-                            mParentBone->getTransformAnimator()->
-                                mapRelPosToAbs(relPos));
-            }
-        }
-        foreach(Bone *rootBone, mRootBones) {
-            if(mParentBone == rootBone) {
-                rootBone->setRelRootPos(relPos);
-            } else {
-                rootBone->setAbsRootPos(
-                            mParentBone->getTransformAnimator()->
-                                mapRelPosToAbs(relPos));
-            }
-        }
-    }
-
-    void setTipBone(Bone *bone) {
-        mTipBone = bone;
-        if(bone != nullptr) {
-            setParentBone(bone);
-        }
-    }
-
-    void addRootBone(Bone *bone) {
-        mRootBones << bone;
-        if(mTipBone == nullptr) {
-            setParentBone(bone);
-        }
-    }
-
-    void removeRootBone(Bone *bone) {
-        mRootBones.removeOne(bone);
-    }
-
-    void setParentBone(Bone *bone) {
-        mParentBone = bone;
-        if(bone != nullptr) {
-            mParent = mParentBone->getTransformAnimator();
-        }
-    }
-
-    Bone *getTipBone() {
-        return mTipBone;
-    }
-
-    Bone *getParentBone() {
-        return mParentBone;
-    }
-protected:
-    Bone *mParentBone = nullptr;
-    Bone *mTipBone = nullptr;
-    QList<Bone*> mRootBones;
-    QPointF mCurrentPos;
+           const qreal &radius = 7.5);
+    BoneQPtr mParentBone;
+    BoneQPtr mTipBone;
+    QList<BoneQPtr> mRootBones;
 };
 
 class BonesBox : public BoundingBox {
@@ -215,14 +175,13 @@ public:
     bool SWT_isBonesBox();
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> *list);
+                                           QList<MovablePoint*>& list);
 
-    void addBone(Bone *bone);
-
-    void removeBone(Bone *bone);
+    void addBone(const BoneQSPtr &bone);
+    void removeBone(const BoneQSPtr &bone);
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
-    QList<Bone*> mBones;
+    QList<BoneQSPtr> mBones;
 };
 
 #endif // BONE_H

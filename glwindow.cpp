@@ -17,10 +17,10 @@ GLWindow::~GLWindow() {
 //    mGrContext->abandonContext();
 //    delete mGrContext;
 //    delete mInterface;
-//    m_context->makeCurrent(this);
+//    mContext->makeCurrent(this);
 //    mSurface.reset();
 //    delete mGrContext;
-//    m_context->doneCurrent();
+//    mContext->doneCurrent();
 }
 
 #include <QDebug>
@@ -50,7 +50,7 @@ void GLWindow::bindSkia() {
 }
 
 void GLWindow::resizeEvent(QResizeEvent *) {
-    if(!m_context) return;
+    if(!mContext) return;
     bindSkia();
 }
 
@@ -74,7 +74,7 @@ void GLWindow::initialize() {
     // a Skia render target so Skia can render to it
     //GrGLint buffer;
     //GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
-    mFbInfo.fFBOID = m_context->defaultFramebufferObject();//buffer;
+    mFbInfo.fFBOID = mContext->defaultFramebufferObject();//buffer;
     mFbInfo.fFormat = GR_GL_RGBA8;//buffer;
 
     bindSkia();
@@ -85,7 +85,7 @@ void GLWindow::initialize() {
 //    qDebug() << "  Version: " << reinterpret_cast<const char *>(glGetString(GL_VERSION));
 //    qDebug() << "  Shading language: " << reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 //    qDebug() << "  Requested format: " << QSurfaceFormat::defaultFormat();
-//    qDebug() << "  Current format:   " << m_context->format();
+//    qDebug() << "  Current format:   " << mContext->format();
 }
 
 //void glOrthoAndViewportSet(GLuint w, GLuint h) {
@@ -180,15 +180,15 @@ void GLWindow::renderNow() {
     if(!isExposed()) return;
 
     bool needsInitialize = false;
-    if (!m_context) {
-        m_context = new QOpenGLContext(this);
-        m_context->setFormat(QSurfaceFormat::defaultFormat());
-        m_context->create();
+    if (!mContext) {
+        mContext = new QOpenGLContext(this);
+        mContext->setFormat(QSurfaceFormat::defaultFormat());
+        mContext->create();
 
         needsInitialize = true;
     }
 
-    m_context->makeCurrent(this);
+    mContext->makeCurrent(this);
 
     if(needsInitialize) {
         initializeOpenGLFunctions();
@@ -224,16 +224,16 @@ void GLWindow::renderNow() {
     mCanvas->flush();
 
 
-//    if(!m_device) m_device = new QOpenGLPaintDevice;
+//    if(!mDevice) mDevice = new QOpenGLPaintDevice;
 
-//    m_device->setSize(size());
+//    mDevice->setSize(size());
 
-//    QPainter painter(m_device);
+//    QPainter painter(mDevice);
 //    qRender(&painter);
 
-    m_context->swapBuffers(this);
+    mContext->swapBuffers(this);
 
-    m_context->doneCurrent();
+    mContext->doneCurrent();
 }
 
 bool GLWindow::event(QEvent *event) {

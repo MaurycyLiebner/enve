@@ -2,12 +2,12 @@
 #define RECTANGLE_H
 #include "Boxes/pathbox.h"
 
-class RectangleTopLeftPoint : public PointAnimator {
+class RectangleTopLeftPoint : public QPointFAnimator {
 public:
     RectangleTopLeftPoint(BasicTransformAnimator *parent);
 };
 
-class RectangleBottomRightPoint : public PointAnimator {
+class RectangleBottomRightPoint : public QPointFAnimator {
 public:
     RectangleBottomRightPoint(BasicTransformAnimator *parent);
 };
@@ -28,7 +28,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> *list);
+                                           QList<MovablePointSPtr>& list);
 
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
@@ -50,7 +50,7 @@ protected:
     RectangleBottomRightPoint *mBottomRightPoint;
 
     QPointFAnimator *mRadiusPoint;
-    void getMotionBlurProperties(QList<Property *> *list);
+    void getMotionBlurProperties(QList<PropertyQSPtr> &list);
 };
 
 #endif // RECTANGLE_H

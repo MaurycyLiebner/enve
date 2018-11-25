@@ -96,7 +96,7 @@ CanvasWindow::~CanvasWindow() {
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
-    return mCurrentCanvas.data();
+    return mCurrentCanvas;
 }
 
 void CanvasWindow::SWT_addChildrenAbstractions(
@@ -110,9 +110,9 @@ void CanvasWindow::SWT_addChildrenAbstractions(
 
 void CanvasWindow::setCurrentCanvas(const int &id) {
     if(id < 0 || id >= mCanvasList.count()) {
-        setCurrentCanvas((Canvas*)nullptr);
+        setCurrentCanvas(nullptr);
     } else {
-        setCurrentCanvas(mCanvasList.at(id).data());
+        setCurrentCanvas(mCanvasList.at(id).get());
     }
 }
 
@@ -125,9 +125,9 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
 
     if(canvas == nullptr) {
         mCurrentSoundComposition = nullptr;
-        mCurrentCanvas.reset();
+        mCurrentCanvas.clear();
     } else {
-        mCurrentCanvas = canvas->ref<Canvas>();
+        mCurrentCanvas = canvas;
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         connect(mPreviewFPSTimer, SIGNAL(timeout()),
                 mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
@@ -159,16 +159,16 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
     callUpdateSchedulers();
 }
 
-void CanvasWindow::addCanvasToList(Canvas *canvas) {
-    mCanvasList << canvas->ref<Canvas>();
-    mWindowSWTTarget->SWT_addChildAbstractionForTargetToAll(canvas);
+void CanvasWindow::addCanvasToList(const CanvasQSPtr& canvas) {
+    mCanvasList << canvas;
+    mWindowSWTTarget->SWT_addChildAbstractionForTargetToAll(canvas.get());
 }
 
 void CanvasWindow::removeCanvas(const int &id) {
     CanvasQSPtr canvas = mCanvasList.takeAt(id);
     mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     if(mCanvasList.isEmpty()) {
-        setCurrentCanvas((Canvas*)nullptr);
+        setCurrentCanvas(nullptr);
     } else if(id < mCanvasList.count()) {
         setCurrentCanvas(id);
     } else {
@@ -254,16 +254,19 @@ void CanvasWindow::setPaintMode() {
     setCanvasMode(PAINT_MODE);
 }
 
-void CanvasWindow::addCanvasToListAndSetAsCurrent(Canvas *canvas) {
+void CanvasWindow::addCanvasToListAndSetAsCurrent(
+        const CanvasQSPtr& canvas) {
     addCanvasToList(canvas);
-    setCurrentCanvas(canvas);
+    setCurrentCanvas(canvas.get());
 }
 
-void CanvasWindow::renameCanvas(Canvas *canvas, const QString &newName) {
+void CanvasWindow::renameCanvas(Canvas *canvas,
+                                const QString &newName) {
     canvas->setName(newName);
 }
 
-void CanvasWindow::renameCanvas(const int &id, const QString &newName) {
+void CanvasWindow::renameCanvas(const int &id,
+                                const QString &newName) {
     renameCanvas(mCanvasList.at(id).data(), newName);
 }
 
@@ -500,13 +503,14 @@ void CanvasWindow::pathsBreakApartAction() {
     callUpdateSchedulers();
 }
 
-void CanvasWindow::setFontFamilyAndStyle(QString family, QString style) {
+void CanvasWindow::setFontFamilyAndStyle(const QString& family,
+                                         const QString& style) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontFamilyAndStyle(family, style);
     callUpdateSchedulers();
 }
 
-void CanvasWindow::setFontSize(qreal size) {
+void CanvasWindow::setFontSize(const qreal& size) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontSize(size);
     callUpdateSchedulers();
@@ -750,7 +754,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 }
 
 void CanvasWindow::nextCurrentRenderFrame() {
-    int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler()->
+    int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler().
             getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
     int firstIdT;
     int lastIdT;
@@ -763,7 +767,7 @@ void CanvasWindow::nextCurrentRenderFrame() {
         newCurrentRenderFrame = firstIdT;
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
-        mCurrentCanvas->getCacheHandler()->
+        mCurrentCanvas->getCacheHandler().
             setContainersInFrameRangeBlocked(mCurrentRenderFrame + 1,
                                              newCurrentRenderFrame - 1,
                                              true);
@@ -959,7 +963,7 @@ void CanvasWindow::interruptPreviewRendering() {
     mBoxesUpdateFinishedFunction = nullptr;
     mFilesUpdateFinishedFunction = nullptr;
     mCurrentCanvas->clearPreview();
-    mCurrentCanvas->getCacheHandler()->
+    mCurrentCanvas->getCacheHandler().
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
                                          mMaxRenderFrame,
                                          false);
@@ -977,7 +981,7 @@ void CanvasWindow::interruptOutputRendering() {
 
 void CanvasWindow::stopPreview() {
     setPreviewing(false);
-    mCurrentCanvas->getCacheHandler()->
+    mCurrentCanvas->getCacheHandler().
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
                                          mMaxRenderFrame,
                                          false);
@@ -1242,7 +1246,7 @@ void CanvasWindow::importFile(const QString &path,
 
         if(importedBox != nullptr) {
             mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(
-                        importedBox.data());
+                        importedBox);
             QPointF trans = relDropPos;
             trans -= importedBox->mapRelPosToAbs(
                         importedBox->getRelCenterPosition());

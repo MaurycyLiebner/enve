@@ -6,13 +6,12 @@
 #include "skqtconversions.h"
 #include "pointhelpers.h"
 
-MovablePoint::MovablePoint(BasicTransformAnimator *parent,
+MovablePoint::MovablePoint(BasicTransformAnimator* parentTransform,
                            const MovablePointType &type,
-                           const qreal &radius) :
-    Transformable() {
+                           const qreal &radius) {
     mType = type;
     mRadius = radius;
-    mParent = parent;
+    setParentTransformAnimator(parentTransform);
 }
 
 void MovablePoint::startTransform() {
@@ -25,14 +24,14 @@ const QPointF &MovablePoint::getSavedRelPos() const {
 }
 
 void MovablePoint::drawHovered(SkCanvas *canvas,
-                               const qreal &invScale) {
+                               const SkScalar &invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kStroke_Style);
-    paint.setStrokeWidth(2.*invScale);
+    paint.setStrokeWidth(2.f*invScale);
     paint.setColor(SK_ColorRED);
     canvas->drawCircle(QPointFToSkPoint(getAbsolutePos()),
-                       mRadius*invScale, paint);
+                       static_cast<SkScalar>(mRadius)*invScale, paint);
     //pen.setCosmetic(true);
     //p->setPen(pen);
 //    drawCosmeticEllipse(p, getAbsolutePos(),
@@ -46,15 +45,15 @@ void MovablePoint::finishTransform() {
 }
 
 void MovablePoint::setAbsolutePos(const QPointF &pos) {
-    setRelativePos(mParent->mapAbsPosToRel(pos));
+    setRelativePos(mParentTransform_cv->mapAbsPosToRel(pos));
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(const QPointF &relPos) const {
-    return mParent->mapRelPosToAbs(relPos);
+    return mParentTransform_cv->mapRelPosToAbs(relPos);
 }
 
 QPointF MovablePoint::mapAbsoluteToRelative(const QPointF &absPos) const {
-    return mParent->mapAbsPosToRel(absPos);
+    return mParentTransform_cv->mapAbsPosToRel(absPos);
 }
 
 QPointF MovablePoint::getAbsolutePos() const {
@@ -70,7 +69,7 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
                 const bool &keyOnCurrent) {
     canvas->save();
 
-    SkScalar scaledRadius = mRadius*invScale;
+    SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;
 
     SkPaint paint;
     paint.setAntiAlias(true);
@@ -90,13 +89,13 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
         paint.setColor(SK_ColorRED);
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawCircle(absPos,
-                           scaledRadius*0.5, paint);
+                           scaledRadius*0.5f, paint);
 
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setStrokeWidth(0.5);
         paint.setColor(SK_ColorBLACK);
         canvas->drawCircle(absPos,
-                           scaledRadius*0.5, paint);
+                           scaledRadius*0.5f, paint);
     }
     canvas->restore();
 }
@@ -119,8 +118,8 @@ void MovablePoint::drawSk(SkCanvas *canvas,
     }
 }
 
-BasicTransformAnimator *MovablePoint::getParent() {
-    return mParent;
+BasicTransformAnimator *MovablePoint::getParentTransform() {
+    return mParentTransform_cv;
 }
 
 bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
@@ -163,7 +162,7 @@ void MovablePoint::scaleRelativeToSavedPivot(const qreal &sx,
 }
 
 void MovablePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
-    mSavedTransformPivot = mParent->mapAbsPosToRel(absPivot);
+    mSavedTransformPivot = mParentTransform_cv->mapAbsPosToRel(absPivot);
 }
 
 void MovablePoint::rotateBy(const qreal &rot) {
@@ -204,7 +203,7 @@ void MovablePoint::scale(const qreal &scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
-void MovablePoint::setRadius(qreal radius) {
+void MovablePoint::setRadius(const qreal& radius) {
     mRadius = radius;
 }
 

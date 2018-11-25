@@ -64,7 +64,7 @@ public:
 
     FillSvgAttributes &operator*=(const FillSvgAttributes &overwritter);
 
-    void setColor(const Color &val);
+    void setColor(const QColor &val);
 
     void setColorOpacity(const qreal &opacity);
 
@@ -72,13 +72,13 @@ public:
 
     void setGradient(Gradient *gradient);
 
-    const Color &getColor() const;
+    const QColor &getColor() const;
     const PaintType &getPaintType() const;
     Gradient *getGradient() const;
 
     void apply(BoundingBox *box);
 protected:
-    Color mColor = Color(0, 0, 0);
+    QColor mColor = QColor(0, 0, 0);
     PaintType mPaintType = FLATPAINT;//NOPAINT;
     Gradient *mGradient = nullptr;
 };
@@ -103,11 +103,11 @@ public:
 
     void apply(BoundingBox *box, const qreal &scale);
 protected:
-    qreal mLineWidth = 0.;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
+    qreal mLineWidth = 0.;
 };
 
 class BoundingBoxSvgAttributes {
@@ -134,6 +134,8 @@ public:
     void setFillAttribute(const QString &value);
     void setStrokeAttribute(const QString &value);
 protected:
+    Qt::FillRule mFillRule = Qt::OddEvenFill;
+
     qreal mDx = 0.;
     qreal mDy = 0.;
     qreal mScaleX = 1.;
@@ -142,13 +144,15 @@ protected:
     qreal mShearY = 0.;
     qreal mRot = 0.;
 
-    QString mId;
+    qreal mOpacity = 100.;
+
     QMatrix mRelTransform;
+
+    QString mId;
+
     FillSvgAttributes mFillAttributes;
     StrokeSvgAttributes mStrokeAttributes;
     TextSvgAttributes mTextAttributes;
-    qreal mOpacity = 100.;
-    Qt::FillRule mFillRule = Qt::OddEvenFill;
 };
 
 class SvgNodePoint {
@@ -176,11 +180,11 @@ public:
     void applyTransfromation(const QMatrix &transformation);
 private:
     bool mStartPointSet = false;
-    QPointF mStartPoint;
     bool mEndPointSet = false;
+    CtrlsMode mCtrlsMode;
+    QPointF mStartPoint;
     QPointF mEndPoint;
     QPointF mPoint;
-    CtrlsMode mCtrlsMode;
 };
 
 class PathAnimator;
@@ -218,10 +222,11 @@ private:
                         qreal rx, qreal ry, qreal xAxisRotation);
 
     void addPoint(SvgNodePoint *point);
+
+    bool mClosedPath = false;
     SvgNodePoint *mFirstPoint = nullptr;
     SvgNodePoint *mLastPoint = nullptr;
     QList<SvgNodePoint*> mPoints;
-    bool mClosedPath = false;
 };
 
 

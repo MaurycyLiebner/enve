@@ -4,8 +4,7 @@
 #include "colorwidget.h"
 
 
-class ColorLabel : public ColorWidget
-{
+class ColorLabel : public ColorWidget {
     Q_OBJECT
 public:
     explicit ColorLabel(QWidget *parent = 0);

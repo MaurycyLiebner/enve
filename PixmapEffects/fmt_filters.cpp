@@ -720,11 +720,11 @@ void gray(const image &im)
     }
 }
 
-void desaturate(const image &im, float desat) {
+void desaturate(const image &im, qreal desat) {
     if(!checkImage(im))
       return;
 
-    scaleDown(desat, 0.0f, 1.0f);
+    desat = clamp();qMax(0., qMin(1., desat));
 
     rgba *bits;
     s32 h = 0, s = 0, v = 0;

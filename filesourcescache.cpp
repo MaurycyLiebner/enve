@@ -513,7 +513,7 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
         ImageCacheHandler *imgCacheHandler = (ImageCacheHandler*)
                 FileSourcesCache::getHandlerForFilePath(path);
         if(imgCacheHandler == nullptr) {
-            mFrameImageHandlers << (new ImageCacheHandler(path, false))->ref<ImageCacheHandler>();
+            mFrameImageHandlers << SPtrCreate(ImageCacheHandler)(path, false);
         } else {
             mFrameImageHandlers << imgCacheHandler->ref<ImageCacheHandler>();
         }

@@ -13,17 +13,17 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mFillSettings->setCurrentColor(Color(0, 0, 0));
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
 
-    mText = (new QStringAnimator())->ref<QStringAnimator>();
+    mText = SPtrCreate(QStringAnimator)();
     mText->prp_setName("text");
-    ca_addChildAnimator(mText.data());
+    ca_addChildAnimator(mText);
     ca_prependChildAnimator(mText.data(), mEffectsAnimators.data());
-    mText->prp_setUpdater(new NodePointUpdater(this));
+    mText->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
 
-    mLinesDist = (new QrealAnimator())->ref<QrealAnimator>();
+    mLinesDist = SPtrCreate(QrealAnimator)();
     mLinesDist->prp_setName("line dist");
     mLinesDist->qra_setValueRange(0., 100.);
     mLinesDist->qra_setCurrentValue(100.);
-    mLinesDist->prp_setUpdater(new NodePointUpdater(this));
+    mLinesDist->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 
 #include <QApplication>
@@ -41,10 +41,7 @@ void TextBox::openTextEditor(const bool &saveUndoRedo) {
     }
 }
 
-void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-//        addUndoRedo(new ChangeFontUndoRedo(this, mFont, font));
-    }
+void TextBox::setFont(const QFont &font) {
     clearAllCache();
     mFont = font;
     scheduleUpdate(Animator::USER_CHANGE);
@@ -52,7 +49,7 @@ void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
 
 void TextBox::setSelectedFontSize(const qreal &size) {
     QFont newFont = mFont;
-    newFont.setPointSize(size);
+    newFont.setPointSizeF(size);
     setFont(newFont);
 }
 

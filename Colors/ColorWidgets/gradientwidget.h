@@ -15,21 +15,21 @@ public:
     void setCurrentGradient(Gradient *gradient,
                             const bool &emitChange = true);
     Gradient *getCurrentGradient();
-    Color getCurrentColor();
+    QColor getCurrentColor();
     ColorAnimator *getCurrentColorAnimator();
 
     void moveColor(const int &x);
 
-    void newGradient(const Color &color1 = Color(0.f, 0.f, 0.f, 1.f),
-                     const Color &color2 = Color(0.f, 0.f, 0.f, 0.f));
+    void newGradient(const QColor &color1 = QColor(0, 0, 0),
+                     const QColor &color2 = QColor(0, 0, 0));
     void newGradient(const int &fromGradientId);
-    void removeGradient(int gradientId);
+    void removeGradient(const int &gradientId);
 
     void finishGradientTransform();
     void startGradientTransform();
     void clearAll();
-    void addGradientToList(Gradient *gradient);
-    void removeGradientFromList(Gradient *toRemove);
+    void addGradientToList(const GradientQSPtr &gradient);
+    void removeGradientFromList(const GradientQSPtr& toRemove);
     void startSelectedColorTransform();
     int getGradientIndex(Gradient *child);
     void updateNumberOfGradients();
@@ -68,7 +68,7 @@ signals:
     void gradientSettingsChanged();
 public slots:
     void resetColorIdIfEquals(Gradient *gradient, const int &id);
-    void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
+    void setCurrentColor(const QColor &col);
 private slots:
     void updateAll();
 private:

@@ -11,13 +11,10 @@ class Key;
 class QPainter;
 class AnimatorUpdater;
 class BoundingBox;
-typedef std::shared_ptr<AnimatorUpdater> AnimatorUpdaterStdSPtr;
 
-class Property :
-    public SingleWidgetTarget {
+class Property : public SingleWidgetTarget {
     Q_OBJECT
 public:
-    Property();
     virtual ~Property() {
         emit beingDeleted();
     }
@@ -48,7 +45,7 @@ public:
     }
     virtual void prp_getKeysInRect(const QRectF &selectionRect,
                                    const qreal &pixelsPerFrame,
-                                   QList<Key *> *keysList) {
+                                   QList<Key*>& keysList) {
         Q_UNUSED(selectionRect);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(keysList);
@@ -93,24 +90,26 @@ public:
     virtual void prp_startDragging() {}
 
     virtual bool prp_isRecording() { return false; }
-    virtual void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
+    virtual void prp_removeAllKeysFromComplexAnimator(
+            ComplexAnimator* target) {
         Q_UNUSED(target);
     }
     virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
-    virtual void prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
+    virtual void prp_addAllKeysToComplexAnimator(
+            ComplexAnimator* target) {
         Q_UNUSED(target);
     }
 
     const QString &prp_getName();
     void prp_setName(const QString &newName);
 
-    virtual void prp_setUpdater(AnimatorUpdater *updater);
+    virtual void prp_setUpdater(const AnimatorUpdaterSPtr &updater);
     void prp_blockUpdater();
     void prp_callFinishUpdater();
 
     virtual void prp_setParentFrameShift(const int &shift,
-                                         ComplexAnimator *parentAnimator = nullptr);
-    void prp_setBlockedUpdater(AnimatorUpdater *updater);
+                                         ComplexAnimator* parentAnimator = nullptr);
+    void prp_setBlockedUpdater(const AnimatorUpdaterSPtr &updater);
 
     bool SWT_isProperty() { return true; }
 
@@ -172,6 +171,7 @@ public:
     bool isCtrlPressed(QKeyEvent *event);
     bool isAltPressed(QKeyEvent *event);
     Property *getLastSetParent() {
+        if(mLastSetParent == nullptr) return nullptr;
         return mLastSetParent;
     }
 
@@ -179,14 +179,12 @@ public:
         mLastSetParent = parent;
     }
 
-    BoundingBox *getLastSetParentBoundingBoxAncestor() {
-        if(mLastSetParent == nullptr) return nullptr;
-        if(mLastSetParent->SWT_isBoundingBox()) return (BoundingBox*)mLastSetParent;
-        return mLastSetParent->getLastSetParentBoundingBoxAncestor();
-    }
+    BoundingBox *getLastSetParentBoundingBoxAncestor();
 protected:
+    Property(const QString &name);
+
     MainWindow *mMainWindow;
-    Property *mLastSetParent = nullptr;
+    QPointer<Property> mLastSetParent;
 public slots:
     void prp_callUpdater();
 
@@ -222,16 +220,15 @@ signals:
     void prp_isRecordingChanged();
     void prp_absFrameRangeChanged(const int &minFrame,
                                   const int &maxFrame);
-    void prp_removingKey(Key *);
-    void prp_addingKey(Key *);
-    void prp_replaceWith(Property *, Property *);
-    void prp_prependWith(Property *, Property *);
+    void prp_removingKey(Key*);
+    void prp_addingKey(Key*);
+    void prp_replaceWith(const PropertyQSPtr&, const PropertyQSPtr&);
+    void prp_prependWith(Property*, const PropertyQSPtr&);
     void beingDeleted();
 protected:
-    int prp_mParentFrameShift = 0;
-    AnimatorUpdaterStdSPtr prp_mUpdater;
     bool prp_mUpdaterBlocked = false;
-
+    int prp_mParentFrameShift = 0;
+    AnimatorUpdaterSPtr prp_mUpdater;
     QString prp_mName = "";
 };
 

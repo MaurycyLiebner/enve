@@ -66,7 +66,7 @@ public:
     void generatePainterPath();
 
     void drawHoveredSk(SkCanvas *canvas,
-                                 const qreal &invScale);
+                       const SkScalar &invScale);
 
     NodePoint *getPoint1() const;
 

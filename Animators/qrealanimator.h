@@ -18,9 +18,8 @@ typedef QSharedPointer<RandomQrealGenerator> RandomQrealGeneratorQSPtr;
 
 class QrealAnimator :  public Animator {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    QrealAnimator();
-
     virtual ~QrealAnimator();
 
     void qra_setValueRange(const qreal &minVal,
@@ -101,10 +100,10 @@ public:
     qreal getMaxPossibleValue();
 
     void anim_mergeKeysIfNeeded();
-    void anim_appendKey(Key *newKey,
+    void anim_appendKey(const KeySPtr &newKey,
                         const bool &saveUndoRedo = true,
                         const bool &update = true);
-    void anim_removeKey(Key *keyToRemove,
+    void anim_removeKey(const KeySPtr &keyToRemove,
                         const bool &saveUndoRedo = true);
     void anim_moveKeyToRelFrame(Key *key,
                                 const int &newFrame,
@@ -188,28 +187,29 @@ public:
     qreal getCurrentValueAtRelFrameF(const qreal &frame) const;
     qreal getCurrentValueAtAbsFrameF(const qreal &frame);
  protected:
-    RandomQrealGeneratorQSPtr mRandomGenerator;
-    std::map<void*, QColor> mAnimatorColors;
+    QrealAnimator(const QString& name);
 
     bool mMinMaxValuesFrozen = false;
+    bool mTransformed = false;
+
+    int mDecimals = 3;
 
     qreal mMaxPossibleVal = DBL_MAX;
     qreal mMinPossibleVal = -DBL_MAX;
-    bool mTransformed = false;
 
     qreal mCurrentValue = 0.;
     qreal mSavedCurrentValue = 0.;
+
+    RandomQrealGeneratorQSPtr mRandomGenerator;
+    std::map<void*, QColor> mAnimatorColors;
+
     QPainterPath mKeysPath;
 
     qreal mPrefferedValueStep = 1.;
-
-    QColor anim_mAnimatorColor;
-
-    int mDecimals = 3;
 signals:
     void valueChangedSignal(qreal);
 public slots:
-    void prp_setRecording(bool rec);
+    void prp_setRecording(const bool& rec);
 
     void anim_saveCurrentValueAsKey();
 };

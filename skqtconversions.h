@@ -2,7 +2,20 @@
 #define SKQTCONVERSIONS_H
 #include <QRectF>
 #include <QMatrix>
+#include <QColor>
+
 #include "skiaincludes.h"
+
+extern inline qreal SkScalarToQreal(const SkScalar &ss) {
+    return static_cast<qreal>(ss);
+}
+
+extern inline SkScalar qrealToSkScalar(const qreal &qr) {
+    return static_cast<SkScalar>(qr);
+}
+
+
+extern SkColor QColorToSkColor(const QColor& qcol);
 
 extern QRectF SkRectToQRectF(const SkRect &rect);
 extern SkRect QRectFToSkRect(const QRectF &rect);
@@ -28,6 +41,8 @@ extern bool skRectContainesSkPoint(const SkRect &absRect,
                                    const SkPoint &pos);
 extern SkPath QPainterPathToSkPath(const QPainterPath &qPath);
 extern QPainterPath SkPathToQPainterPath(const SkPath &path);
+
+
 
 //struct SkLine {
 //    SkLine(const SkPoint &p1T,

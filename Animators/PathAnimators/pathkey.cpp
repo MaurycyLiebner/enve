@@ -3,14 +3,14 @@
 #include "mainwindow.h"
 #include "skqtconversions.h"
 
-PathKey::PathKey(VectorPathAnimator *parentAnimator) :
+PathKey::PathKey(const VectorPathAnimatorQSPtr& parentAnimator) :
     Key(parentAnimator) {
 
 }
 
 PathKey::PathKey(const int &relFrame,
                  const SkPath &path,
-                 VectorPathAnimator *parentAnimator,
+                 const VectorPathAnimatorQSPtr &parentAnimator,
                  const bool& closed) :
     PathKey(parentAnimator) {
     mRelFrame = relFrame;
@@ -21,7 +21,7 @@ PathKey::PathKey(const int &relFrame,
 PathKey::PathKey(const int &relFrame,
                  const SkPath &path,
                  const QList<SkPoint> &elementsPos,
-                 VectorPathAnimator *parentAnimator,
+                 const VectorPathAnimatorQSPtr &parentAnimator,
                  const bool &closed) :
     PathKey(parentAnimator) {
     mRelFrame = relFrame;
@@ -32,7 +32,7 @@ PathKey::PathKey(const int &relFrame,
 
 PathKey::PathKey(const int &relFrame,
                  const QList<SkPoint> &elementsPos,
-                 VectorPathAnimator *parentAnimator,
+                 const VectorPathAnimatorQSPtr &parentAnimator,
                  const bool &closed) :
     PathKey(parentAnimator) {
     mRelFrame = relFrame;
@@ -41,14 +41,15 @@ PathKey::PathKey(const int &relFrame,
     updatePath();
 }
 
-PathKey *PathKey::createNewKeyFromSubsetForPath(
-        VectorPathAnimator *parentAnimator,
+PathKeySPtr PathKey::createNewKeyFromSubsetForPath(
+        const VectorPathAnimatorQSPtr &parentAnimator,
         const int &firstId, int count) {
     QList<SkPoint> elementsPos =
             takeElementsPosSubset(firstId, count);
-    PathKey *newKey = new PathKey(mRelFrame, elementsPos,
-                                  parentAnimator, false);
-    parentAnimator->anim_appendKey(newKey);
+    PathKeySPtr newKey =
+            SPtrCreate(PathKey)(mRelFrame, elementsPos,
+                                parentAnimator, false);
+    parentAnimator->anim_appendKey(newKey.get());
     return newKey;
 }
 
@@ -57,7 +58,7 @@ void PathKey::updateAfterChangedFromInside() {
 }
 
 NodeSettings *PathKey::getNodeSettingsForPtId(const int &ptId) {
-    return ((VectorPathAnimator*)mParentAnimator)->
+    return SPtrGetAs(mParentAnimator, VectorPathAnimator)->
             getNodeSettingsForPtId(ptId);
 }
 
@@ -95,6 +96,7 @@ void PathContainer::addNodeElements(int startPtIndex,
 
 void PathContainer::removeNodeElements(const int &startPtIndex,
                                        const bool &saveUndoRedo) {
+    Q_UNUSED(saveUndoRedo);
 
     mPathUpdateNeeded = true;
 //    if(saveUndoRedo) {
@@ -135,7 +137,7 @@ void PathContainer::updatePath() {
     int currId = 4;
     while(currId < elementsCount) {
         const SkPoint &targetPos = mElementsPos.at(currId);
-        NodeSettings *nodeSettings = getNodeSettingsForPtId(currId);
+        NodeSettingsSPtr nodeSettings = getNodeSettingsForPtId(currId);
 
         SkPoint startPos;
         if(nodeSettings->startEnabled) {

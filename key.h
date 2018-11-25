@@ -1,6 +1,7 @@
 #ifndef KEY_H
 #define KEY_H
 #include "selfref.h"
+#include "sharedpointerdefs.h"
 #include <QtCore>
 
 class ComplexAnimator;
@@ -31,9 +32,9 @@ public:
     void setRelFrameAndUpdateParentAnimator(const int &relFrame,
                                          const bool &finish = true);
 
-    Animator *getParentAnimator();
+    Animator* getParentAnimator();
 
-    virtual void mergeWith(Key *key) { key->removeFromAnimator(); }
+    virtual void mergeWith(const KeySPtr& key) { key->removeFromAnimator(); }
 
     virtual bool isDescendantSelected() { return isSelected(); }
 
@@ -55,8 +56,8 @@ public:
         return false;
     }
 
-    virtual void addToSelection(QList<Key *> *selectedKeys);
-    virtual void removeFromSelection(QList<Key *> *selectedKeys);
+    virtual void addToSelection(QList<Key *> &selectedKeys);
+    virtual void removeFromSelection(QList<Key*> &selectedKeys);
 
     bool isHovered() {
         return mHovered;
@@ -69,7 +70,7 @@ public:
     int getRelFrame();
     void setAbsFrame(const int &frame);
 
-    Key *getNextKey();
+    Key* getNextKey();
     Key *getPrevKey();
 
     bool differesFromNextKey() {
@@ -80,48 +81,31 @@ public:
         return differsFromKey(getPrevKey());
     }
 
-    virtual bool differsFromKey(Key *key) = 0;
+    virtual bool differsFromKey(Key* key) = 0;
     virtual void writeKey(QIODevice *target);
     virtual void readKey(QIODevice *target);
 protected:
     bool mIsSelected = false;
-    Animator *mParentAnimator = nullptr;
+    bool mHovered = false;
 
     int mRelFrame;
     int mSavedRelFrame;
 
-    bool mHovered = false;
+    QPointer<Animator> mParentAnimator;
 };
 
 struct KeyPair {
-    KeyPair(Key *key1T, Key *key2T) {
+    KeyPair(Key* key1T, Key* key2T) {
         key1 = key1T;
         key2 = key2T;
     }
 
-    void merge() {
-        key1->mergeWith(key2);
+    void merge() const {
+        key1->mergeWith(key2->ref<Key>());
     }
 
-    Key *key1;
-    Key *key2;
-};
-
-class KeyCloner {
-public:
-    KeyCloner(Key *key);
-    virtual ~KeyCloner() {}
-
-    int getRelFrame() { return mRelFrame; }
-
-    int getAbsFrame() { return mAbsFrame; }
-
-    void shiftKeyFrame(const int &frameShift);
-
-    virtual Key *createKeyForAnimator(Animator *parentAnimator) = 0;
-protected:
-    int mAbsFrame;
-    int mRelFrame;
+    Key* key1;
+    Key* key2;
 };
 
 #endif // KEY_H

@@ -24,7 +24,7 @@ public:
     int getStartAbsFrame() const;
     int getSampleCount() const;
     const float *getFinalData() const;
-    void prepareFinalData(const qreal &fps,
+    void prepareFinalData(const float &fps,
                           const int &minAbsFrame,
                           const int &maxAbsFrame);
     void prp_drawKeys(QPainter *p,
@@ -33,9 +33,8 @@ public:
                       const int &startFrame,
                       const int &endFrame);
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
-                                            const qreal &relX,
-                                            const int &minViewedFrame,
-                                            const qreal &pixelsPerFrame);
+            const int &relX, const int &minViewedFrame,
+            const qreal &pixelsPerFrame);
     void updateFinalDataIfNeeded(const qreal &fps,
                                  const int &minAbsFrame,
                                  const int &maxAbsFrame);
@@ -52,15 +51,20 @@ private slots:
 private:
     bool mFinalDataUpdateNeeded = false;
     bool mOwnDurationRectangle;
-    FixedLenAnimationRect *mDurationRectangle = nullptr;
-    float *mSrcData = nullptr;
-    float *mFinalData = nullptr;
-    int mFinalSampleCount = 0;
+
     int mFinalAbsStartFrame = 0;
     int mSrcSampleCount = 0;
-    QSharedPointer<QrealAnimator> mVolumeAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    int mFinalSampleCount = 0;
+
     QString mPath;
+
+    float *mSrcData = nullptr;
+    float *mFinalData = nullptr;
+
+    FixedLenAnimationRect *mDurationRectangle = nullptr;
+
+    QSharedPointer<QrealAnimator> mVolumeAnimator =
+            SPtrCreate(QrealAnimator)("volume");
 };
 
 #endif // SINGLESOUND_H

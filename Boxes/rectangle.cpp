@@ -29,7 +29,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_prependChildAnimator(mRadiusPoint, mEffectsAnimators.data());
     mRadiusPoint->setValuesRange(0., 9999.);
 
-    prp_setUpdater(new NodePointUpdater(this));
+    prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 
 Rectangle::~Rectangle() {
@@ -143,26 +143,26 @@ MovablePoint *Rectangle::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                  QList<MovablePoint *> *list) {
+                                                  QList<MovablePointSPtr>& list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
-            list->append(mTopLeftPoint);
+            list.append(mTopLeftPoint);
         }
     }
     if(!mBottomRightPoint->isSelected()) {
         if(mBottomRightPoint->isContainedInRect(absRect)) {
             mBottomRightPoint->select();
-            list->append(mBottomRightPoint);
+            list.append(mBottomRightPoint);
         }
     }
 }
 
-void Rectangle::getMotionBlurProperties(QList<Property*> *list) {
+void Rectangle::getMotionBlurProperties(QList<PropertyQSPtr>& list) {
     PathBox::getMotionBlurProperties(list);
-    list->append(mTopLeftPoint);
-    list->append(mBottomRightPoint);
-    list->append(mRadiusPoint);
+    list.append(mTopLeftPoint);
+    list.append(mBottomRightPoint);
+    list.append(mRadiusPoint);
 }
 
 bool Rectangle::differenceInEditPathBetweenFrames(
@@ -173,11 +173,11 @@ bool Rectangle::differenceInEditPathBetweenFrames(
 }
 
 RectangleTopLeftPoint::RectangleTopLeftPoint(BasicTransformAnimator *parent) :
-    PointAnimator(parent, TYPE_PATH_POINT) {
+    QPointFAnimator(parent, TYPE_PATH_POINT) {
 
 }
 
 RectangleBottomRightPoint::RectangleBottomRightPoint(BasicTransformAnimator *parent) :
-    PointAnimator(parent, TYPE_PATH_POINT) {
+    QPointFAnimator(parent, TYPE_PATH_POINT) {
 
 }

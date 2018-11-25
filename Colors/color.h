@@ -1,7 +1,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 #include <QColor>
-#include "skiaincludes.h"
+#include "skqtconversions.h"
 class QIODevice;
 class Color {
 public:
@@ -48,10 +48,7 @@ public:
     }*/
 
     SkColor getSkColor() const {
-        return SkColorSetARGB(qcol.alpha(),
-                                    qcol.red(),
-                                    qcol.green(),
-                                    qcol.blue());
+        return QColorToSkColor(qcol);
     }
     void updateHSVFromRGB();
     void updateQColFromHSV();
@@ -65,6 +62,18 @@ public:
     void setGLColorB(GLfloat b_t);
     void setQColor(QColor col_t);
     void setGLColorA(GLfloat a_t);
+
+    qreal redF() const {
+        return qcol.redF();
+    }
+
+    qreal greenF() const {
+        return qcol.greenF();
+    }
+
+    qreal blueF() const {
+        return qcol.blueF();
+    }
 
     void setHSL(GLfloat h, GLfloat s, GLfloat l, GLfloat a);
 };

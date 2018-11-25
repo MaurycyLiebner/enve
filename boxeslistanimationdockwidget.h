@@ -15,6 +15,7 @@
 #include <QLineEdit>
 #include <QWidgetAction>
 #include <QToolBar>
+#include "sharedpointerdefs.h"
 class AnimationWidgetScrollBar;
 class BoxesListKeysViewWidget;
 class VerticalWidgetsStack;
@@ -25,11 +26,10 @@ class RenderWidget;
 class ActionButton;
 class Canvas;
 
-class ChangeWidthWidget : public QWidget
-{
+class ChangeWidthWidget : public QWidget {
     Q_OBJECT
 public:
-    ChangeWidthWidget(QWidget *parent = 0);
+    ChangeWidthWidget(QWidget *parent = nullptr);
 
     void updatePos();
 
@@ -49,9 +49,9 @@ public:
 signals:
     void widthSet(int);
 private:
-    int mCurrentWidth = 400;
     bool mHover = false;
     bool mPressed = false;
+    int mCurrentWidth = 400;
     int mPressX;
 };
 
@@ -67,7 +67,8 @@ public:
     void previewPaused();
 
     void updateSettingsForCurrentCanvas(Canvas *canvas);
-    void addNewBoxesListKeysViewWidgetBelow(BoxesListKeysViewWidget *widget);
+    void addNewBoxesListKeysViewWidgetBelow(
+            BoxesListKeysViewWidget *widget);
     void clearAll();
 
     RenderWidget *getRenderWidget();
@@ -95,35 +96,32 @@ private slots:
     void pausePreview();
     void resumePreview();
 private:
-    QAction *mTimelineAction;
-    QAction *mRenderAction;
-
     QToolBar *mToolBar;
-    QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
 
-    VerticalWidgetsStack *mBoxesListKeysViewStack;
-    ChangeWidthWidget *mChww;
-    MainWindow *mMainWindow;
-
-    RenderWidget *mRenderWidget;
     QWidget *mTimelineWidget;
     QVBoxLayout *mTimelineLayout;
-
     QVBoxLayout *mMainLayout;
 
     QLabel *mControlButtonsWidget;
 
     QComboBox *mResolutionComboBox;
-//    QPushButton *mGoToPreviousKeyButton;
-//    QPushButton *mGoToNextKeyButton;
 
     ActionButton *mPlayButton;
     ActionButton *mStopButton;
-
     ActionButton *mLocalPivot;
 //    ActionButton *mBonesSelection;
 
+    QAction *mTimelineAction;
+    QAction *mRenderAction;
+
+    VerticalWidgetsStack *mBoxesListKeysViewStack;
+    QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
+    RenderWidget *mRenderWidget;
     AnimationDockWidget *mAnimationDockWidget;
+
+    ChangeWidthWidget *mChww;
+
+    MainWindow *mMainWindow;
 
     AnimationWidgetScrollBar *mFrameRangeScrollbar;
     AnimationWidgetScrollBar *mAnimationWidgetScrollbar;

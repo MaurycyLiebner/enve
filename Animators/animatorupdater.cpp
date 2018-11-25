@@ -203,3 +203,15 @@ void GroupAllPathsUpdater::update() {
 void GroupAllPathsUpdater::frameChangeUpdate() {
     mTarget->updateAllChildPathBoxes(Animator::FRAME_CHANGE);
 }
+
+AnimatorUpdater::AnimatorUpdater() {}
+
+AnimatorUpdater::~AnimatorUpdater() {}
+
+void AnimatorUpdater::update() {}
+
+void AnimatorUpdater::frameChangeUpdate() {
+    update();
+}
+
+void AnimatorUpdater::updateFinal() {}

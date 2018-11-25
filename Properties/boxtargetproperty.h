@@ -9,18 +9,18 @@ class BoxTargetProperty;
 
 #include "Boxes/boundingbox.h"
 struct BoxTargetPropertyWaitingForBoxLoad : public FunctionWaitingForBoxLoad {
-    BoxTargetPropertyWaitingForBoxLoad(const int &boxIdT,
-                            BoxTargetProperty *targetPropertyT);
+    BoxTargetPropertyWaitingForBoxLoad(
+            const int &boxIdT, BoxTargetProperty* targetPropertyT);
 
     void boxLoaded(BoundingBox *box);
 
-    BoxTargetProperty *targetProperty;
+    BoxTargetPropertyQPtr targetProperty;
 };
 
 class BoxTargetProperty : public Property {
     Q_OBJECT
 public:
-    BoxTargetProperty();
+    BoxTargetProperty(const QString& name);
 
     BoundingBox *getTarget() const;
     void setTarget(BoundingBox *box);
@@ -29,9 +29,9 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 signals:
-    void targetSet(BoundingBox *);
+    void targetSet(BoundingBox*);
 private:
-    QWeakPointer<BoundingBox> mTarget;
+    BoundingBoxQPtr mTarget_d;
 };
 
 #endif // BOXTARGETPROPERTY_H

@@ -49,7 +49,8 @@ private:
 class PathEffect : public ComplexAnimator {
     Q_OBJECT
 public:
-    PathEffect(const PathEffectType &type,
+    PathEffect(const QString& name,
+               const PathEffectType &type,
                const bool &outlinePathEffect);
 
     const PathEffectType &getEffectType() {
@@ -91,11 +92,11 @@ public:
         if(bT == mOutlineEffect) return;
         mOutlineEffect = bT;
         if(mOutlineEffect) {
-            mApplyBeforeThickness = (new BoolProperty())->ref<BoolProperty>();
+            mApplyBeforeThickness = SPtrCreate(BoolProperty)();
             mApplyBeforeThickness->prp_setName("pre-thickness");
-            ca_addChildAnimator(mApplyBeforeThickness.data());
+            ca_addChildAnimator(mApplyBeforeThickness);
         } else if(mApplyBeforeThickness != nullptr) {
-            ca_removeChildAnimator(mApplyBeforeThickness.data());
+            ca_removeChildAnimator(mApplyBeforeThickness);
             mApplyBeforeThickness.reset();
         }
     }

@@ -13,6 +13,7 @@ extern "C" {
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
+#include "sharedpointerdefs.h"
 class RenderInstanceWidget;
 
 struct RenderSettings {
@@ -33,16 +34,19 @@ struct OutputSettings {
     AVOutputFormat *outputFormat = nullptr;
 
     bool videoEnabled = false;
-    AVCodec *videoCodec = nullptr;
-    AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
-    int videoBitrate = 0;
-
     bool audioEnabled = false;
-    AVCodec *audioCodec = nullptr;
+
+    AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
+    AVSampleFormat audioSampleFormat = AV_SAMPLE_FMT_NONE;
+
+    int videoBitrate = 0;
     int audioSampleRate = 0;
     int audioBitrate = 0;
-    AVSampleFormat audioSampleFormat = AV_SAMPLE_FMT_NONE;
+
     uint64_t audioChannelsLayout = 0;
+
+    AVCodec *videoCodec = nullptr;
+    AVCodec *audioCodec = nullptr;
 };
 
 class OutputSettingsProfile : public SelfRef {
@@ -79,7 +83,7 @@ public:
         PAUSED,
         WAITING
     };
-    RenderInstanceSettings(Canvas *canvas);
+    RenderInstanceSettings(const CanvasQSPtr& canvas);
 
     const QString &getName();
 
@@ -150,21 +154,20 @@ public:
         if(profile == nullptr) {
             mOutputSettingsProfile.clear();
         } else {
-            mOutputSettingsProfile =
-                    profile->weakRef<OutputSettingsProfile>();
+            mOutputSettingsProfile = profile;
         }
         copySettingsFromOutputSettingsProfile();
     }
 
     OutputSettingsProfile *getOutputSettingsProfile() {
-        return mOutputSettingsProfile.data();
+        return mOutputSettingsProfile;
     }
 private:
     void updateParentWidget();
     RenderState mState = NONE;
     int mCurrentRenderFrame = 0;
 
-    QWeakPointer<OutputSettingsProfile> mOutputSettingsProfile;
+    OutputSettingsProfileQPtr mOutputSettingsProfile;
     RenderInstanceWidget *mParentWidget = nullptr;
 
     Canvas *mTargetCanvas;

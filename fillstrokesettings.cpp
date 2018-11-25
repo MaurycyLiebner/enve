@@ -453,7 +453,7 @@ PaintType FillStrokeSettingsWidget::getCurrentPaintTypeVal() {
     }
 }
 
-void FillStrokeSettingsWidget::setCurrentPaintTypeVal(PaintType paintType) {
+void FillStrokeSettingsWidget::setCurrentPaintTypeVal(const PaintType& paintType) {
     if(mTargetId == 0) {
         mCurrentFillPaintType = paintType;
     } else {
@@ -461,7 +461,7 @@ void FillStrokeSettingsWidget::setCurrentPaintTypeVal(PaintType paintType) {
     }
 }
 
-Color FillStrokeSettingsWidget::getCurrentColorVal() {
+QColor FillStrokeSettingsWidget::getCurrentColorVal() {
     if(mTargetId == 0) {
         return mCurrentFillColor;
     } else {
@@ -469,7 +469,7 @@ Color FillStrokeSettingsWidget::getCurrentColorVal() {
     }
 }
 
-void FillStrokeSettingsWidget::setCurrentColorVal(Color color) {
+void FillStrokeSettingsWidget::setCurrentColorVal(const QColor& color) {
     if(mTargetId == 0) {
         mCurrentFillColor = color;
     } else {

@@ -1,6 +1,7 @@
 #ifndef QREALANIMATORVALUESLIDER_H
 #define QREALANIMATORVALUESLIDER_H
 #include "qdoubleslider.h"
+#include "sharedpointerdefs.h"
 
 class IntProperty;
 class QrealAnimator;
@@ -15,9 +16,9 @@ public:
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
                              QWidget *parent);
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
-                             QrealAnimator *animator, QWidget *parent = 0);
-    QrealAnimatorValueSlider(QrealAnimator *animator, QWidget *parent = 0);
-    QrealAnimatorValueSlider(QWidget *parent = 0);
+                             const QrealAnimatorQSPtr& animator, QWidget *parent = nullptr);
+    QrealAnimatorValueSlider(const QrealAnimatorQSPtr& animator, QWidget *parent = nullptr);
+    QrealAnimatorValueSlider(QWidget *parent = nullptr);
     ~QrealAnimatorValueSlider() {}
 
     void paint(QPainter *p);
@@ -45,8 +46,8 @@ public slots:
 protected:
     void emitValueChanged(qreal value);
 private:
-    Property *mAnimator = nullptr;
     bool mBlockAnimatorSignals = false;
+    PropertyQSPtr mAnimator;
 signals:
     void displayedValueChanged(qreal);
 };

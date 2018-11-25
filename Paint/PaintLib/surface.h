@@ -142,7 +142,7 @@ protected:
 
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;
-    Color mBackgroundColor = Color(1.f, 1.f, 1.f);
+    QColor mBackgroundColor = Color(1.f, 1.f, 1.f);
 
     qreal mScale = 1.;
     qreal countDabsTo(const qreal &dist_between_dabs,

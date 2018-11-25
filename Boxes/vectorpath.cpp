@@ -14,11 +14,11 @@
 
 VectorPath::VectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
-    mPathAnimator = (new PathAnimator(this))->ref<PathAnimator>();
+    mPathAnimator = SPtrCreate(PathAnimator)(this);
     setName("Path");
-    mPathAnimator->prp_setUpdater(new NodePointUpdater(this));
+    mPathAnimator->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
     mPathAnimator->prp_blockUpdater();
-    ca_addChildAnimator(mPathAnimator.data());
+    ca_addChildAnimator(mPathAnimator);
     ca_moveChildBelow(mPathAnimator.data(), mEffectsAnimators.data());
 }
 
@@ -39,10 +39,10 @@ void VectorPath::revertAllPoints() {
 }
 
 void VectorPath::breakPathsApart() {
-    QList<VectorPathAnimator*> pathsList = mPathAnimator->getSinglePathsList();
-    foreach(VectorPathAnimator *path, pathsList) {
-        VectorPath *newPath = new VectorPath();
-        copyPathBoxDataTo(newPath);
+    QList<VectorPathAnimatorQSPtr> pathsList = mPathAnimator->getSinglePathsList();
+    foreach(const VectorPathAnimatorQSPtr& path, pathsList) {
+        VectorPathQSPtr newPath = SPtrCreate(VectorPath)();
+        copyPathBoxDataTo(newPath.get());
         mParentGroup->addContainedBox(newPath);
         PathAnimator *pathAnimator = newPath->getPathAnimator();
         pathAnimator->addSinglePathAnimator(path, false);
@@ -144,7 +144,7 @@ void VectorPath::drawSelectedSk(SkCanvas *canvas,
 MovablePoint *VectorPath::getPointAtAbsPos(const QPointF &absPtPos,
                                      const CanvasMode &currentCanvasMode,
                                      const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
+    MovablePointSPtr pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
     if(pointToReturn == nullptr) {
@@ -156,7 +156,7 @@ MovablePoint *VectorPath::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void VectorPath::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                   QList<MovablePoint *> *list) {
+                                                   QList<MovablePointSPtr>& list) {
     mPathAnimator->selectAndAddContainedPointsToList(absRect, list);
 }
 
@@ -168,7 +168,7 @@ SkPath VectorPath::getPathAtRelFrameF(const qreal &relFrame) {
      return mPathAnimator->getPathAtRelFrameF(relFrame);
 }
 
-void VectorPath::getMotionBlurProperties(QList<Property*> *list) {
+void VectorPath::getMotionBlurProperties(QList<PropertyQSPtr> &list) {
     PathBox::getMotionBlurProperties(list);
-    list->append(mPathAnimator.data());
+    list.append(mPathAnimator);
 }

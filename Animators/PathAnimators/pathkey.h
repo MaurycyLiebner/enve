@@ -191,33 +191,32 @@ protected:
     QList<SkPoint> mSavedElementsPos;
 };
 
-class PathKey : public Key,
-                public PathContainer {
+class PathKey : public Key, public PathContainer {
 public:
-    PathKey(VectorPathAnimator *parentAnimator);
-    PathKey(const int &relFrame,
-            const SkPath &path,
-            VectorPathAnimator *parentAnimator,
-            const bool &closed = false);
-    PathKey(const int &relFrame,
-            const SkPath &path,
-            const QList<SkPoint> &elementsPos,
-            VectorPathAnimator *parentAnimator,
-            const bool &closed);
-    PathKey(const int &relFrame,
-            const QList<SkPoint> &elementsPos,
-            VectorPathAnimator *parentAnimator,
-            const bool &closed);
-
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
     bool differsFromKey(Key *key) { return key != this; }
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
 
-    PathKey *createNewKeyFromSubsetForPath(VectorPathAnimator *parentAnimator,
-                                           const int &firstId,
-                                           int count);
+    PathKeySPtr createNewKeyFromSubsetForPath(
+            const VectorPathAnimatorQSPtr& parentAnimator,
+            const int &firstId, int count);
     void updateAfterChangedFromInside();
+protected:
+    PathKey(const VectorPathAnimatorQSPtr &parentAnimator);
+    PathKey(const int &relFrame,
+            const SkPath &path,
+            const VectorPathAnimatorQSPtr &parentAnimator,
+            const bool &closed = false);
+    PathKey(const int &relFrame,
+            const SkPath &path,
+            const QList<SkPoint> &elementsPos,
+            const VectorPathAnimatorQSPtr &parentAnimator,
+            const bool &closed);
+    PathKey(const int &relFrame,
+            const QList<SkPoint> &elementsPos,
+            const VectorPathAnimatorQSPtr &parentAnimator,
+            const bool &closed);
 };
 
 #endif // PATHKEY_H

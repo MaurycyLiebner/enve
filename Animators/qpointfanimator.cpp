@@ -1,13 +1,15 @@
 #include "Animators/qpointfanimator.h"
 #include "Animators/qrealanimator.h"
 
-QPointFAnimator::QPointFAnimator() : ComplexAnimator() {
-    mXAnimator = (new QrealAnimator())->ref<QrealAnimator>();
-    mYAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+QPointFAnimator::QPointFAnimator(const QString &name) :
+    ComplexAnimator(name) {
+    mXAnimator = SPtrCreate(QrealAnimator)();
+    mYAnimator = SPtrCreate(QrealAnimator)();
     mXAnimator->prp_setName("x");
     mYAnimator->prp_setName("y");
-    ca_addChildAnimator(mXAnimator.data());
-    ca_addChildAnimator(mYAnimator.data());
+    ca_addChildAnimator(mXAnimator);
+    ca_addChildAnimator(mYAnimator);
+    prp_setName(name);
 }
 
 QPointF QPointFAnimator::getCurrentPointValue() const {

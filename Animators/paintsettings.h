@@ -5,6 +5,7 @@
 #include "coloranimator.h"
 #include "Colors/color.h"
 #include "skiaincludes.h"
+#include "sharedpointerdefs.h"
 
 enum PaintType : short {
     NOPAINT,
@@ -72,7 +73,7 @@ public:
 
     PaintSetting(const bool &targetFillSettings,
                  const bool &linearGradient,
-                 Gradient *gradient);
+                 Gradient* gradient);
 
     void apply(PathBox *box) const;
 
@@ -80,22 +81,18 @@ public:
 
     bool targetsFill() const { return mTargetFillSettings; }
 private:
+    static void *operator new (size_t);
+
     bool mTargetFillSettings;
     bool mLinearGradient = true;
-    Gradient *mGradient;
+    GradientQPtr mGradient;
     PaintType mPaintType;
     ColorSetting mColorSetting;
 };
 
 class PaintSettings : public ComplexAnimator {
 public:
-    PaintSettings();
-
-    PaintSettings(const Color &colorT,
-                  const PaintType &paintTypeT,
-                  Gradient *gradientT = nullptr);
-
-    Color getCurrentColor() const;
+    QColor getCurrentColor() const;
 
     PaintType getPaintType() const;
 
@@ -104,27 +101,25 @@ public:
     void setGradient(Gradient *gradient,
                      const bool &saveUndoRedo = true);
 
-    void setCurrentColor(const Color &color);
+    void setCurrentColor(const QColor &color);
 
     void setPaintType(const PaintType &paintType,
                       const bool &saveUndoRedo = true);
 
     ColorAnimator *getColorAnimator();
 
-    void setGradientPoints(GradientPoints *gradientPoints);
+    void setGradientPoints(const GradientPointsQSPtr &gradientPoints);
 
     void setPaintPathTarget(PathBox *path);
 
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
 
-    void setTargetPathBox(PathBox *target);
-
     void setGradientVar(Gradient *grad);
 
     bool SWT_isPaintSettings() { return true; }
-    Color getColorAtRelFrame(const int &relFrame) const;
-    Color getColorAtRelFrameF(const qreal &relFrame) const;
+    QColor getColorAtRelFrame(const int &relFrame) const;
+    QColor getColorAtRelFrameF(const qreal &relFrame) const;
     const bool &getGradientLinear() { return mGradientLinear; }
     void setGradientLinear(const bool &linear) {
         mGradientLinear = linear;
@@ -132,35 +127,38 @@ public:
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+protected:
+    PaintSettings(PathBox *parent);
+
+    PaintSettings(PathBox *parent,
+                  const QColor &colorT,
+                  const PaintType &paintTypeT,
+                  Gradient *gradientT = nullptr);
 private:
     bool mGradientLinear = true;
-    PathBox *mTarget;
-    GradientPoints *mGradientPoints = nullptr;
-    QSharedPointer<ColorAnimator> mColor =
-            (new ColorAnimator())->ref<ColorAnimator>();
     PaintType mPaintType = FLATPAINT;
-    QSharedPointer<Gradient> mGradient;
+
+    PathBox * const mTarget_k;
+    GradientPointsQSPtr mGradientPoints;
+    QSharedPointer<ColorAnimator> mColor =
+            SPtrCreate(ColorAnimator)();
+    GradientQPtr mGradient;
 };
 
 class Gradient : public ComplexAnimator {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    Gradient();
-    ~Gradient();
-
-    Gradient(const Color &color1,
-             const Color &color2);
-
     void swapColors(const int &id1, const int &id2,
                     const bool &saveUndoRedo = true);
 
-    void removeColor(ColorAnimator *color,
+    void removeColor(const ColorAnimatorQSPtr &color,
                      const bool &saveUndoRedo = true);
 
-    void addColor(const Color &color);
+    void addColor(const QColor &color);
 
     void replaceColor(const int &id,
-                      const Color &color);
+                      const QColor &color);
 
     void prp_startTransform();
 
@@ -181,10 +179,10 @@ public:
     int getLoadId();
     void setLoadId(const int &id);
 
-    void addColorToList(const Color &color,
+    void addColorToList(const QColor &color,
                         const bool &saveUndoRedo = true);
 
-    Color getCurrentColorAt(const int &id);
+    QColor getCurrentColorAt(const int &id);
 
     int getColorCount();
 
@@ -193,7 +191,7 @@ public:
 
     QGradientStops getQGradientStops();
     void startColorIdTransform(int id);
-    void addColorToList(ColorAnimator *newColorAnimator,
+    void addColorToList(const ColorAnimatorQSPtr &newColorAnimator,
                         const bool &saveUndoRedo = true);
     ColorAnimator *getColorAnimatorAt(const int &id);
     void removeColor(const int &id);
@@ -204,11 +202,11 @@ public:
     bool SWT_isGradient() { return true; }
 
     void prp_setParentFrameShift(const int &shift,
-                                 ComplexAnimator *parentAnimator = nullptr) {
+                                 ComplexAnimator* parentAnimator = nullptr) {
         Q_UNUSED(shift);
         if(parentAnimator == nullptr) return;
-        Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
-            parentAnimator->ca_updateDescendatKeyFrame(key.get());
+        Q_FOREACH(const KeySPtr &key, anim_mKeys) {
+            parentAnimator->ca_updateDescendatKeyFrame(key);
         }
     }
 
@@ -226,12 +224,16 @@ public:
 
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
+protected:
+    Gradient();
+    Gradient(const QColor &color1,
+             const QColor &color2);
 private:
     int mLoadId = -1;
     QGradientStops mQGradientStops;
-    QList<ColorAnimator*> mColors;
-    QList<PathBox*> mAffectedPaths;
-    ColorAnimator *mCurrentColor = nullptr;
+    QList<ColorAnimatorQSPtr> mColors;
+    QList<PathBoxQPtr> mAffectedPaths;
+    ColorAnimatorQPtr mCurrentColor;
 };
 
 struct UpdatePaintSettings {
@@ -248,14 +250,14 @@ struct UpdatePaintSettings {
                         const QPointF &start,
                         const QPointF &finalStop,
                         const bool &linearGradient = true);
-
-    QColor paintColor;
     PaintType paintType;
+    QColor paintColor;
     sk_sp<SkShader> gradientSk;
 };
 
 struct UpdateStrokeSettings : UpdatePaintSettings {
-    UpdateStrokeSettings(const QColor &paintColorT,
+    UpdateStrokeSettings(
+            const QColor &paintColorT,
             const PaintType &paintTypeT,
             const QPainter::CompositionMode &outlineCompositionModeT);
 
@@ -267,15 +269,8 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
             QPainter::CompositionMode_Source;
 };
 
-class StrokeSettings : public PaintSettings
-{
+class StrokeSettings : public PaintSettings {
 public:
-    StrokeSettings();
-
-    StrokeSettings(const Color &colorT,
-                   const PaintType &paintTypeT,
-                   Gradient *gradientT = nullptr);
-
     void setCurrentStrokeWidth(const qreal &newWidth);
 
     void setCapStyle(const Qt::PenCapStyle &capStyle);
@@ -310,12 +305,19 @@ public:
                                           SkStroke *stroker);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+protected:
+    StrokeSettings();
+
+    StrokeSettings(const QColor &colorT,
+                   const PaintType &paintTypeT,
+                   Gradient* gradientT = nullptr);
 private:
-    QSharedPointer<QrealAnimator> mLineWidth =
-            (new QrealAnimator())->ref<QrealAnimator>();
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
+
+    QrealAnimatorQSPtr mLineWidth =
+            SPtrCreate(QrealAnimator)("thickness");
 };
 #endif // PAINTSETTINGS_H

@@ -164,8 +164,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
-    mToolBar->setIconSize(QSize(1.25*MIN_WIDGET_HEIGHT,
-                                1.25*MIN_WIDGET_HEIGHT));
+    mToolBar->setIconSize(QSize(5*MIN_WIDGET_HEIGHT/4,
+                                5*MIN_WIDGET_HEIGHT/4));
     mToolBar->addSeparator();
 
 //    mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
@@ -352,7 +352,7 @@ void BoxesListAnimationDockWidget::previewFinished() {
     mStopButton->setDisabled(true);
     mPlayButton->setIcon(":/icons/renderPreviewButton.png");
     mPlayButton->setToolTip("render preview");
-    disconnect(mPlayButton, 0, this, 0);
+    disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, SIGNAL(pressed()),
             this, SLOT(renderPreview()));
 }
@@ -361,7 +361,7 @@ void BoxesListAnimationDockWidget::previewBeingPlayed() {
     mStopButton->setDisabled(false);
     mPlayButton->setIcon(":/icons/pausePreviewButton.png");
     mPlayButton->setToolTip("pause preview");
-    disconnect(mPlayButton, 0, this, 0);
+    disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, SIGNAL(pressed()),
             this, SLOT(pausePreview()));
 }
@@ -370,7 +370,7 @@ void BoxesListAnimationDockWidget::previewBeingRendered() {
     mStopButton->setDisabled(false);
     mPlayButton->setIcon(":/icons/playPreviewButton.png");
     mPlayButton->setToolTip("play preview");
-    disconnect(mPlayButton, 0, this, 0);
+    disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, SIGNAL(pressed()),
             this, SLOT(playPreview()));
 }
@@ -379,7 +379,7 @@ void BoxesListAnimationDockWidget::previewPaused() {
     mStopButton->setDisabled(false);
     mPlayButton->setIcon(":/icons/playPreviewButton.png");
     mPlayButton->setToolTip("resume preview");
-    disconnect(mPlayButton, 0, this, 0);
+    disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, SIGNAL(pressed()),
             this, SLOT(resumePreview()));
 }
@@ -440,7 +440,7 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
-                                        Canvas *canvas) {
+        Canvas* canvas) {
     if(canvas == nullptr) {
         mAnimationWidgetScrollbar->setCacheHandler(nullptr);
     } else {
@@ -450,7 +450,7 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                     QString::number(canvas->getResolutionFraction()*100.) + " %");
         connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
                 this, SLOT(setResolutionFractionText(QString)));
-        mAnimationWidgetScrollbar->setCacheHandler(canvas->getCacheHandler());
+        mAnimationWidgetScrollbar->setCacheHandler(&canvas->getCacheHandler());
     }
 }
 

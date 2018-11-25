@@ -4,8 +4,7 @@
 #include <QTimer>
 #include "Boxes/boundingbox.h"
 
-class PaintControler : public QObject
-{
+class PaintControler : public QObject {
     Q_OBJECT
 public:
     explicit PaintControler(const int &id,

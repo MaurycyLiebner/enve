@@ -116,7 +116,7 @@ QString OutputSettings::getChannelsLayoutNameStatic(const uint64_t &layout) {
     }
     return "-";
 }
-RenderInstanceSettings::RenderInstanceSettings(Canvas *canvas) {
+RenderInstanceSettings::RenderInstanceSettings(const CanvasQSPtr &canvas) {
     setTargetCanvas(canvas);
     mRenderSettings.minFrame = -50; // !!!
     mRenderSettings.maxFrame = canvas->getMaxFrame();

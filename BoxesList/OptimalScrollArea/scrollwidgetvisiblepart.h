@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QtMath>
 #include <memory>
+#include "sharedpointerdefs.h"
 class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidget;
@@ -46,7 +47,7 @@ class ScrollWidgetVisiblePart :
         public MinimalScrollWidgetVisiblePart {
     Q_OBJECT
 public:
-    ScrollWidgetVisiblePart(ScrollWidget *parent = 0);
+    ScrollWidgetVisiblePart(ScrollWidget *parent = nullptr);
     ~ScrollWidgetVisiblePart();
 
     void updateVisibleWidgetsContent();
@@ -80,11 +81,9 @@ public:
     void setCurrentType(SWT_Checker type);
 
 protected:
-    SWT_RulesCollection mCurrentRulesCollection;
-
     bool mAlwaysShowChildren = false;
-
-    std::shared_ptr<SingleWidgetAbstraction> mMainAbstraction;
+    SWT_RulesCollection mCurrentRulesCollection;
+    SingleWidgetAbstractionSPtr mMainAbstraction;
 };
 
 

@@ -20,20 +20,19 @@ class ColorSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ColorSettingsWidget(QWidget *parent = 0);
+    explicit ColorSettingsWidget(QWidget *parent = nullptr);
 
     QColor getCurrentQColor();
-    void setCurrentColor(const Color &color);
     void setCurrentColor(const QColor &color);
     void hideAlphaControlers();
 signals:
     void colorSettingSignal(const ColorSetting&);
     void colorModeChanged(const ColorMode&);
 public slots:
-    void setCurrentColor(const GLfloat &h_t,
-                         const GLfloat &s_t,
-                         const GLfloat &v_t,
-                         const GLfloat &a_t = 1.f);
+    void setCurrentColor(const qreal &h_t,
+                         const qreal &s_t,
+                         const qreal &v_t,
+                         const qreal &a_t = 1.);
     void setColorAnimatorTarget(ColorAnimator *target);
     void emitColorChangedSignal();
     void emitEditingFinishedSignal();

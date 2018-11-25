@@ -5,7 +5,7 @@
 #include "Boxes/boundingbox.h"
 #include "durationrectsettingsdialog.h"
 
-DurationRectangleMovable::DurationRectangleMovable(const Type &type) : QObject() {
+DurationRectangleMovable::DurationRectangleMovable(const Type &type) {
     mType = type;
 }
 

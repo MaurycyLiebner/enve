@@ -4,10 +4,10 @@
 
 class RenderDataHandler {
 public:
-    bool removeItem(const BoundingBoxRenderDataSPtr& item);
+    bool removeItem(BoundingBoxRenderData *item);
     bool removeItemAtRelFrame(const int& frame);
-    BoundingBoxRenderDataSPtr getItemAtRelFrame(const int &frame);
-    void addItemAtRelFrame(const BoundingBoxRenderDataSPtr& item);
+    BoundingBoxRenderData *getItemAtRelFrame(const int &frame);
+    void addItemAtRelFrame(BoundingBoxRenderData *item);
 protected:
     int getItemInsertIdAtRelFrame(const int &relFrame);
     bool getItemIdAtRelFrame(const int &relFrame, int *id);

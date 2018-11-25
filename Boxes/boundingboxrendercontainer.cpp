@@ -61,7 +61,7 @@ const qreal &RenderContainer::getResolutionFraction() const {
     return mResolutionFraction;
 }
 
-void RenderContainer::setVariablesFromRenderData(const BoundingBoxRenderDataSPtr& data) {
+void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
     mNoDataInMemory = false;
     scheduleDeleteTmpFile();
 
@@ -97,12 +97,32 @@ bool MinimalCacheContainer::cacheFreeAndRemoveFromMemoryHandler() {
     return false;
 }
 
+CacheContainer::CacheContainer(CacheHandler *parent) :
+    mParentCacheHandler_k(parent) {
+
+}
+
 CacheContainer::~CacheContainer() {
     scheduleDeleteTmpFile();
 }
 
-void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
-    mParentCacheHandler = handler;
+_ScheduledExecutorSPtr CacheContainer::scheduleLoadFromTmpFile(_ScheduledExecutor *dependent) {
+    if(mSavingToFile) {
+        mCancelAfterSaveDataClear = true;
+        return mSavingUpdatable;
+    }
+    if(!mNoDataInMemory) return nullptr;
+    if(mLoadingFromFile) return mLoadingUpdatable;
+
+    mLoadingFromFile = true;
+    mLoadingUpdatable =
+            SPtrCreate(CacheContainerTmpFileDataLoader)(
+                mTmpFile, this);
+    if(dependent != nullptr) {
+        mLoadingUpdatable->addDependent(dependent);
+    }
+    mLoadingUpdatable->addScheduler();
+    return mLoadingUpdatable;
 }
 
 void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
@@ -115,16 +135,16 @@ void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
 
 bool CacheContainer::cacheAndFree() {
     if(mBlocked || mNoDataInMemory ||
-        mSavingToFile || mLoadingFromFile) return false;
-    if(mParentCacheHandler == nullptr) return false;
+            mSavingToFile || mLoadingFromFile) return false;
+    if(mParentCacheHandler_k == nullptr) return false;
     saveToTmpFile();
     return true;
 }
 
 bool CacheContainer::freeAndRemove() {
     if(mBlocked || mNoDataInMemory) return false;
-    if(mParentCacheHandler == nullptr) return false;
-    mParentCacheHandler->removeRenderContainer(this);
+    if(mParentCacheHandler_k == nullptr) return false;
+    mParentCacheHandler_k->removeRenderContainer(ref<CacheContainer>());
     return true;
 }
 
@@ -137,6 +157,28 @@ void CacheContainer::setBlocked(const bool &bT) {
     } else {
         MemoryHandler::getInstance()->addContainer(this);
     }
+}
+
+int CacheContainer::getByteCount() {
+    if(mImageSk.get() == nullptr) return 0;
+    SkPixmap pixmap;
+    if(mImageSk->peekPixels(&pixmap)) {
+        return pixmap.width()*pixmap.height()*
+                pixmap.info().bytesPerPixel();
+    }
+    return 0;
+}
+
+sk_sp<SkImage> CacheContainer::getImageSk() {
+    return mImageSk;
+}
+
+void CacheContainer::scheduleDeleteTmpFile() {
+    if(mTmpFile == nullptr) return;
+    _ScheduledExecutorSPtr updatable =
+            SPtrCreate(CacheContainerTmpFileDataDeleter)(mTmpFile);
+    mTmpFile.reset();
+    updatable->addScheduler();
 }
 #include "canvas.h"
 void CacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
@@ -185,10 +227,15 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
 }
 
 void CacheContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
+    Q_UNUSED(paint);
     //SkPaint paint;
     //paint.setAntiAlias(true);
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(mImageSk, 0, 0/*, &paint*/);
+}
+
+bool CacheContainer::storesDataInMemory() {
+    return !mNoDataInMemory;
 }
 
 void CacheContainer::setDataSavedToTmpFile(
@@ -210,6 +257,10 @@ void CacheContainer::setDataSavedToTmpFile(
     MemoryHandler::getInstance()->incMemoryScheduledToRemove(-mMemSizeAwaitingSave);
 }
 
+void CacheContainer::setAsCurrentPreviewContainerAfterFinishedLoading(Canvas *canvas) {
+    mTmpLoadTargetCanvas = canvas;
+}
+
 void CacheContainer::saveToTmpFile() {
     if(mSavingToFile || mLoadingFromFile) return;
     mMemSizeAwaitingSave = getByteCount();
@@ -218,23 +269,21 @@ void CacheContainer::saveToTmpFile() {
     mSavingToFile = true;
     mNoDataInMemory = true;
     mCancelAfterSaveDataClear = false;
-    mSavingUpdatable = new CacheContainerTmpFileDataSaver(mImageSk,
-                                                          this);
+    mSavingUpdatable = SPtrCreate(CacheContainerTmpFileDataSaver)(mImageSk, this);
     mSavingUpdatable->addScheduler();
 }
 
 CacheContainerTmpFileDataLoader::CacheContainerTmpFileDataLoader(
         const QSharedPointer<QTemporaryFile> &file,
-        CacheContainer *target) {
-    mTargetCont = target;
+        CacheContainer *target) : mTargetCont(target) {
     mTmpFile = file;
 }
 
 void CacheContainerTmpFileDataLoader::_processUpdate() {
     if(mTmpFile->open()) {
         int width, height;
-        mTmpFile->read((char*)&width, sizeof(int));
-        mTmpFile->read((char*)&height, sizeof(int));
+        mTmpFile->read(reinterpret_cast<char*>(&width), sizeof(int));
+        mTmpFile->read(reinterpret_cast<char*>(&height), sizeof(int));
         SkBitmap btmp;
         SkImageInfo info = SkImageInfo::Make(width,
                                              height,
@@ -242,8 +291,8 @@ void CacheContainerTmpFileDataLoader::_processUpdate() {
                                              kPremul_SkAlphaType,
                                              nullptr);
         btmp.allocPixels(info);
-        mTmpFile->read((char*)btmp.getPixels(),
-                       width*height*4*sizeof(uchar));
+        mTmpFile->read(static_cast<char*>(btmp.getPixels()),
+                       width*height*4*static_cast<qint64>(sizeof(uchar)));
         mImage = SkImage::MakeFromBitmap(btmp);
 
         mTmpFile->close();
@@ -261,8 +310,7 @@ void CacheContainerTmpFileDataLoader::addSchedulerNow() {
 
 CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
         const sk_sp<SkImage> &image,
-        CacheContainer *target) {
-    mTargetCont = target;
+        CacheContainer *target) : mTargetCont(target) {
     mImage = image;
 }
 
@@ -279,10 +327,10 @@ void CacheContainerTmpFileDataSaver::_processUpdate() {
     if(mTmpFile->open()) {
         int width = pix.width();
         int height = pix.height();
-        mTmpFile->write((char*)&width, sizeof(int));
-        mTmpFile->write((char*)&height, sizeof(int));
-        mTmpFile->write((char*)pix.writable_addr(),
-                        width*height*4*sizeof(uchar));
+        mTmpFile->write(reinterpret_cast<char*>(&width), sizeof(int));
+        mTmpFile->write(reinterpret_cast<char*>(&height), sizeof(int));
+        mTmpFile->write(static_cast<char*>(pix.writable_addr()),
+                        width*height*4*static_cast<qint64>(sizeof(uchar)));
         mTmpFile->close();
     } else {
         mSavingFailed = true;

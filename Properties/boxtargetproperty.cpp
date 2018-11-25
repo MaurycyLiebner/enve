@@ -2,26 +2,24 @@
 #include "Animators/complexanimator.h"
 #include "Boxes/boundingbox.h"
 
-BoxTargetProperty::BoxTargetProperty() :
-    Property() {
-    prp_setName("target");
+BoxTargetProperty::BoxTargetProperty(const QString &name) :
+    Property(name) {}
+
+BoundingBox* BoxTargetProperty::getTarget() const {
+    return mTarget_d;
 }
 
-BoundingBox *BoxTargetProperty::getTarget() const {
-    return mTarget.data();
-}
-
-void BoxTargetProperty::setTarget(BoundingBox *box) {
-    if(mTarget.data() != nullptr) {
-        QObject::disconnect(mTarget.data(), 0, this, 0);
+void BoxTargetProperty::setTarget(BoundingBox* box) {
+    if(mTarget_d != nullptr) {
+        QObject::disconnect(mTarget_d, nullptr, this, nullptr);
     }
     if(box == nullptr) {
-        mTarget.clear();
+        mTarget_d.clear();
     } else {
-        mTarget = box->weakRef<BoundingBox>();
+        mTarget_d = box;
     }
-    if(mTarget.data() != nullptr) {
-        QObject::connect(mTarget.data(), SIGNAL(scheduledUpdate()),
+    if(mTarget_d != nullptr) {
+        QObject::connect(mTarget_d, SIGNAL(scheduledUpdate()),
                          this, SLOT(prp_callUpdater()));
     }
     prp_updateInfluenceRangeAfterChanged();
@@ -30,12 +28,13 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
     emit targetSet(box);
 }
 
-BoxTargetPropertyWaitingForBoxLoad::BoxTargetPropertyWaitingForBoxLoad(const int &boxIdT,
-                                                 BoxTargetProperty *targetPropertyT) :
+BoxTargetPropertyWaitingForBoxLoad::BoxTargetPropertyWaitingForBoxLoad(
+        const int &boxIdT, BoxTargetProperty* targetPropertyT) :
     FunctionWaitingForBoxLoad(boxIdT) {
     targetProperty = targetPropertyT;
 }
 
 void BoxTargetPropertyWaitingForBoxLoad::boxLoaded(BoundingBox *box) {
+    if(targetProperty == nullptr) return;
     targetProperty->setTarget(box);
 }

@@ -155,19 +155,15 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
 }
 
 Gradient::Gradient() : ComplexAnimator() {
-    prp_setUpdater(new GradientUpdater(this));
+    prp_setUpdater(SPtrCreate(GradientUpdater)(this));
     prp_blockUpdater();
     prp_setName("gradient");
     updateQGradientStops(Animator::USER_CHANGE);
 }
 
-Gradient::~Gradient() {
-}
-
-Gradient::Gradient(const Color &color1, const Color &color2) :
-    ComplexAnimator()
-{
-    prp_setUpdater(new GradientUpdater(this));
+Gradient::Gradient(const QColor &color1, const QColor &color2) :
+    ComplexAnimator() {
+    prp_setUpdater(SPtrCreate(GradientUpdater)(this));
     prp_blockUpdater();
     prp_setName("gradient");
     addColorToList(color1, false);
@@ -183,14 +179,14 @@ void Gradient::prp_startTransform() {
     //savedColors = colors;
 }
 
-void Gradient::addColorToList(const Color &color,
+void Gradient::addColorToList(const QColor &color,
                               const bool &saveUndoRedo) {
-    ColorAnimator *newColorAnimator = new ColorAnimator();
+    ColorAnimatorQSPtr newColorAnimator = SPtrCreate(ColorAnimator)();
     newColorAnimator->qra_setCurrentValue(color);
     addColorToList(newColorAnimator, saveUndoRedo);
 }
 
-void Gradient::addColorToList(ColorAnimator *newColorAnimator,
+void Gradient::addColorToList(const ColorAnimatorQSPtr& newColorAnimator,
                               const bool &saveUndoRedo) {
     mColors << newColorAnimator;
 
@@ -202,12 +198,12 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator,
     }
 }
 
-Color Gradient::getCurrentColorAt(const int &id) {
+QColor Gradient::getCurrentColorAt(const int &id) {
     return mColors.at(id)->getCurrentColor();
 }
 
 ColorAnimator *Gradient::getColorAnimatorAt(const int &id) {
-    return mColors.at(id);
+    return mColors.at(id).get();
 }
 
 int Gradient::getColorCount() {
@@ -231,7 +227,8 @@ void Gradient::swapColors(const int &id1, const int &id2,
     if(saveUndoRedo) {
 //        addUndoRedo(new GradientSwapColorsUndoRedo(this, id1, id2));
     }
-    ca_swapChildAnimators(mColors.at(id1), mColors.at(id2));
+    ca_swapChildAnimators(mColors.at(id1).get(),
+                          mColors.at(id2).get());
     mColors.swap(id1, id2);
     updateQGradientStops(Animator::USER_CHANGE);
 }
@@ -240,7 +237,7 @@ void Gradient::removeColor(const int &id) {
     removeColor(mColors.at(id));
 }
 
-void Gradient::removeColor(ColorAnimator *color,
+void Gradient::removeColor(const ColorAnimatorQSPtr& color,
                            const bool &saveUndoRedo) {
     if(saveUndoRedo) {
 //        addUndoRedo(new GradientColorRemovedFromListUndoRedo(
@@ -252,12 +249,12 @@ void Gradient::removeColor(ColorAnimator *color,
     updateQGradientStops(Animator::USER_CHANGE);
 }
 
-void Gradient::addColor(const Color &color) {
+void Gradient::addColor(const QColor &color) {
     addColorToList(color);
     updateQGradientStops(Animator::USER_CHANGE);
 }
 
-void Gradient::replaceColor(const int &id, const Color &color) {
+void Gradient::replaceColor(const int &id, const QColor &color) {
     mColors.at(id)->qra_setCurrentValue(color);
     updateQGradientStops(Animator::USER_CHANGE);
 }
@@ -304,7 +301,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const int &absFrame) {
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                     mColors.at(i)->getColorAtRelFrame(absFrame).qcol) );
+                     mColors.at(i)->getColorAtRelFrame(absFrame)) );
         cPos += inc;
     }
     return stops;
@@ -316,7 +313,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrameF(const qreal &absFrame) {
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                     mColors.at(i)->getColorAtRelFrameF(absFrame).qcol) );
+                     mColors.at(i)->getColorAtRelFrameF(absFrame)) );
         cPos += inc;
     }
     return stops;
@@ -328,7 +325,7 @@ void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                                    mColors.at(i)->getCurrentColor().qcol) );
+                                    mColors.at(i)->getCurrentColor()) );
         cPos += inc;
     }
     updatePaths(reason);
@@ -340,7 +337,7 @@ void Gradient::updateQGradientStopsFinal(const Animator::UpdateReason& reason) {
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                               mColors.at(i)->getCurrentColor().qcol) );
+                               mColors.at(i)->getCurrentColor()) );
         cPos += inc;
     }
     Q_FOREACH(PathBox *path, mAffectedPaths) {
@@ -357,58 +354,53 @@ void Gradient::setLoadId(const int &id) {
     mLoadId = id;
 }
 
-PaintSettings::PaintSettings() : PaintSettings(Color(255, 255, 255),
-                                               PaintType::FLATPAINT,
-                                               nullptr) {
+PaintSettings::PaintSettings(PathBox *parent) :
+    PaintSettings(parent, QColor(255, 255, 255),
+                  PaintType::FLATPAINT,  nullptr) {
 }
 
-PaintSettings::PaintSettings(const Color &colorT,
+PaintSettings::PaintSettings(PathBox *parent,
+                             const QColor &colorT,
                              const PaintType &paintTypeT,
-                             Gradient *gradientT) : ComplexAnimator() {
-    prp_setName("fill");
+                             Gradient* gradientT) :
+    ComplexAnimator("fill"), mTarget_k(parent) {
     mColor->qra_setCurrentValue(colorT);
     mPaintType = paintTypeT;
     setGradientVar(gradientT);
 
-    ca_addChildAnimator(mColor.data());
+    ca_addChildAnimator(mColor);
 }
 
 void PaintSettings::setPaintPathTarget(PathBox *path) {
-    mColor->prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(path));
+    mColor->prp_setUpdater(SPtrCreate(DisplayedFillStrokeSettingsUpdater)(path));
     mColor->prp_blockUpdater();
 }
 
-void PaintSettings::setTargetPathBox(PathBox *target) {
-    mTarget = target;
-}
-
-void PaintSettings::setGradientVar(Gradient *grad) {
+void PaintSettings::setGradientVar(Gradient* grad) {
     if(!mGradient.isNull()) {
-        ca_removeChildAnimator(mGradient.data());
-        ca_removeChildAnimator((QrealAnimator*) mGradientPoints);
-        mGradient->removePath(mTarget);
+        ca_removeChildAnimator(mGradient->ref<Gradient>());
+        ca_removeChildAnimator(mGradientPoints);
+        mGradient->removePath(mTarget_k);
     }
     if(grad == nullptr) {
-        mGradient.reset();
+        mGradient.clear();
     } else {
-        mGradient = grad->ref<Gradient>();
-    }
-    if(!mGradient.isNull()) {
-        ca_addChildAnimator(mGradient.data());
-        ca_addChildAnimator((QrealAnimator*) mGradientPoints);
-        mGradient->addPath(mTarget);
+        ca_addChildAnimator(grad->ref<Gradient>());
+        ca_addChildAnimator(mGradientPoints);
+        mGradient = grad;
+        mGradient->addPath(mTarget_k);
     }
 }
 
-Color PaintSettings::getCurrentColor() const {
+QColor PaintSettings::getCurrentColor() const {
     return mColor->getCurrentColor();
 }
 
-Color PaintSettings::getColorAtRelFrame(const int &relFrame) const {
+QColor PaintSettings::getColorAtRelFrame(const int &relFrame) const {
     return mColor->getColorAtRelFrame(relFrame);
 }
 
-Color PaintSettings::getColorAtRelFrameF(const qreal &relFrame) const {
+QColor PaintSettings::getColorAtRelFrameF(const qreal &relFrame) const {
     return mColor->getColorAtRelFrameF(relFrame);
 }
 
@@ -420,21 +412,21 @@ Gradient *PaintSettings::getGradient() const {
     return mGradient.data();
 }
 
-void PaintSettings::setGradient(Gradient *gradient,
+void PaintSettings::setGradient(Gradient* gradient,
                                 const bool &saveUndoRedo) {
-    if(gradient == mGradient.data()) return;
+    if(gradient == mGradient) return;
 
     if(saveUndoRedo) {
 //        addUndoRedo(new GradientChangeUndoRedo(mGradient.data(), gradient, this));
     }
     setGradientVar(gradient);
 
-    if(mTarget->isSelected()) {
+    if(mTarget_k->isSelected()) {
         mMainWindow->scheduleDisplayedFillStrokeSettingsUpdate();
     }
 }
 
-void PaintSettings::setCurrentColor(const Color &color) {
+void PaintSettings::setCurrentColor(const QColor &color) {
     mColor->qra_setCurrentValue(color);
 }
 
@@ -443,9 +435,9 @@ void PaintSettings::setPaintType(const PaintType &paintType,
     if(paintType == mPaintType) return;
 
     if(mPaintType == FLATPAINT) {
-        ca_removeChildAnimator(mColor.data());
+        ca_removeChildAnimator(mColor);
     } else if(paintType == FLATPAINT) {
-        ca_addChildAnimator(mColor.data());
+        ca_addChildAnimator(mColor);
     }
     if(saveUndoRedo) {
 //        addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
@@ -456,8 +448,8 @@ void PaintSettings::setPaintType(const PaintType &paintType,
     }
 
     mPaintType = paintType;
-    mTarget->updateDrawGradients();
-    if(mTarget->isSelected()) {
+    mTarget_k->updateDrawGradients();
+    if(mTarget_k->isSelected()) {
         mMainWindow->scheduleDisplayedFillStrokeSettingsUpdate();
     }
 }
@@ -466,32 +458,31 @@ ColorAnimator *PaintSettings::getColorAnimator() {
     return mColor.data();
 }
 
-void PaintSettings::setGradientPoints(GradientPoints *gradientPoints) {
+void PaintSettings::setGradientPoints(const GradientPointsQSPtr& gradientPoints) {
     mGradientPoints = gradientPoints;
 }
 
-StrokeSettings::StrokeSettings() : StrokeSettings(Color(0, 0, 0),
+StrokeSettings::StrokeSettings() : StrokeSettings(QColor(0, 0, 0),
                                                   PaintType::FLATPAINT,
                                                   nullptr) {
 }
 
-StrokeSettings::StrokeSettings(const Color &colorT,
+StrokeSettings::StrokeSettings(const QColor &colorT,
                                const PaintType &paintTypeT,
-                               Gradient *gradientT) :
+                               Gradient* gradientT) :
     PaintSettings(colorT,
                   paintTypeT,
                   gradientT) {
     prp_setName("stroke");
     mLineWidth->qra_setCurrentValue(1.);
-    mLineWidth->prp_setName("thickness");
 
-    ca_addChildAnimator(mLineWidth.data());
+    ca_addChildAnimator(mLineWidth);
 
     mLineWidth->qra_setValueRange(0., mLineWidth->getMaxPossibleValue());
 }
 
 void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
-    mLineWidth->prp_setUpdater(new StrokeWidthUpdater(path));
+    mLineWidth->prp_setUpdater(SPtrCreate(StrokeWidthUpdater)(path));
     setPaintPathTarget(path);
 }
 
@@ -514,21 +505,21 @@ void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
 }
 
 void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
-    stroker->setWidth(mLineWidth->qra_getCurrentValue());
+    stroker->setWidth(qrealToSkScalar(mLineWidth->qra_getCurrentValue()));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
 void StrokeSettings::setStrokerSettingsForRelFrameSk(const int &relFrame,
                                                      SkStroke *stroker) {
-    stroker->setWidth(mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame));
+    stroker->setWidth(qrealToSkScalar(mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame)));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
 void StrokeSettings::setStrokerSettingsForRelFrameSkF(const qreal &relFrame,
                                                      SkStroke *stroker) {
-    stroker->setWidth(mLineWidth->qra_getEffectiveValueAtRelFrameF(relFrame));
+    stroker->setWidth(qrealToSkScalar(mLineWidth->qra_getEffectiveValueAtRelFrameF(relFrame)));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
@@ -581,7 +572,7 @@ PaintSetting::PaintSetting(const bool &targetFillSettings) {
 
 PaintSetting::PaintSetting(const bool &targetFillSettings,
                            const bool &linearGradient,
-                           Gradient *gradient) {
+                           const GradientQSPtr &gradient) {
     mLinearGradient = linearGradient;
     mTargetFillSettings = targetFillSettings;
     mPaintType = GRADIENTPAINT;
@@ -589,7 +580,7 @@ PaintSetting::PaintSetting(const bool &targetFillSettings,
 }
 
 void PaintSetting::apply(PathBox *box) const {
-    PaintSettings *paintSettings;
+    PaintSettings* paintSettings = nullptr;
     if(mTargetFillSettings) {
         paintSettings = box->getFillSettings();
     } else {
@@ -653,10 +644,7 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
         paint->setShader(gradientSk);
         paint->setAlpha(255);
     } else if(paintType == FLATPAINT) {
-        paint->setColor(SkColorSetARGB(paintColor.alpha(),
-                                             paintColor.red(),
-                                             paintColor.green(),
-                                             paintColor.blue()));
+        paint->setColor(QColorToSkColor(paintColor));
     } else {
         paint->setColor(SkColorSetARGB(0, 0, 0, 0));
     }
@@ -670,10 +658,10 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
     SkPoint gradPoints[nStops];
     SkColor gradColors[nStops];
     SkScalar gradPos[nStops];
-    SkScalar xInc = finalStop.x() - start.x();
-    SkScalar yInc = finalStop.y() - start.y();
-    SkScalar currX = start.x();
-    SkScalar currY = start.y();
+    SkScalar xInc = static_cast<SkScalar>(finalStop.x() - start.x());
+    SkScalar yInc = static_cast<SkScalar>(finalStop.y() - start.y());
+    SkScalar currX = static_cast<SkScalar>(start.x());
+    SkScalar currY = static_cast<SkScalar>(start.y());
     SkScalar currT = 0.f;
     SkScalar tInc = 1.f/(nStops - 1);
 
@@ -681,10 +669,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         const QGradientStop &stopT = stops.at(i);
         QColor col = stopT.second;
         gradPoints[i] = SkPoint::Make(currX, currY);
-        gradColors[i] = SkColorSetARGB(col.alpha(),
-                                             col.red(),
-                                             col.green(),
-                                             col.blue());
+        gradColors[i] = QColorToSkColor(col);
         gradPos[i] = currT;
 
         currX += xInc;
@@ -699,8 +684,8 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                                   SkShader::kClamp_TileMode);
     } else {
         QPointF distPt = finalStop - start;
-        SkScalar radius = qSqrt(distPt.x()*distPt.x() +
-                                distPt.y()*distPt.y());
+        SkScalar radius = static_cast<SkScalar>(
+                    qSqrt(distPt.x()*distPt.x() + distPt.y()*distPt.y()));
         gradientSk = SkGradientShader::MakeRadial(
                         QPointFToSkPoint(start),
                         radius,

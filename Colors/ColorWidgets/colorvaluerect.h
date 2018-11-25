@@ -17,15 +17,15 @@ enum CVR_TYPE : short {
     CVR_ALL
 };
 
-class ColorValueRect : public ColorWidget
-{
+class ColorValueRect : public ColorWidget {
     Q_OBJECT
 public:
-    ColorValueRect(CVR_TYPE type_t, QWidget *parent = nullptr);
+    ColorValueRect(const CVR_TYPE &type_t, QWidget *parent = nullptr);
     void updateVal();
-    GLfloat getVal();
-    void setDisplayedValue(const GLfloat &val_t);
-
+    void setDisplayedValue(const qreal &val_t);
+    qreal qVal() const {
+        return static_cast<qreal>(mVal);
+    }
 private:
     void paintGL();
     void mouseMoveEvent(QMouseEvent *e);
@@ -33,17 +33,17 @@ private:
     void mouseReleaseEvent(QMouseEvent *);
     //void wheelEvent(QWheelEvent *e);
 
-    void mouseInteraction(int x_t);
+    void mouseInteraction(const int &x_t);
     void setColorParameterFromVal();
-    void setValueAndEmitValueChanged(GLfloat val_t);
+    void setValueAndEmitValueChanged(const qreal &valT);
 signals:
-    void valChanged(qreal);
-    void editingFinished(qreal);
-    void editingStarted(qreal);
+    void valChanged(const qreal&);
+    void editingFinished(const qreal&);
+    void editingStarted(const qreal&);
 private:
-    CVR_TYPE type;
-    GLfloat val = 0.f;
-    GLushort number_segments = 5;
+    GLushort mNumberSegments = 5;
+    CVR_TYPE mType;
+    GLfloat mVal = 0.f;
 };
 
 #endif // COLORVALUERECT_H

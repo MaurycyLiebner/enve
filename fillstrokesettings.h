@@ -85,7 +85,7 @@ private:
     MainWindow *mMainWindow;
     bool mTransormStarted = false;
 
-    QTimer *mUndoRedoSaveTimer;
+    QTimer *mUndoRedoSaveTimer = nullptr;
 
     void connectGradient();
     void disconnectGradient();
@@ -101,11 +101,11 @@ private:
 
     PaintType getCurrentPaintTypeVal();
 
-    void setCurrentPaintTypeVal(PaintType paintType);
+    void setCurrentPaintTypeVal(const PaintType& paintType);
 
-    Color getCurrentColorVal();
+    QColor getCurrentColorVal();
 
-    void setCurrentColorVal(Color color);
+    void setCurrentColorVal(const QColor& color);
 
     Gradient *getCurrentGradientVal();
 
@@ -120,18 +120,18 @@ private:
     void setCurrentGradientVal(Gradient *gradient);
     void setCurrentGradientLinearVal(const bool &linear);
 
-    ColorAnimator *mCurrentFillColorAnimator = nullptr;
-    ColorAnimator *mCurrentStrokeColorAnimator = nullptr;
+    ColorAnimatorQPtr mCurrentFillColorAnimator;
+    ColorAnimatorQPtr mCurrentStrokeColorAnimator;
     PaintType mCurrentFillPaintType = NOPAINT;
     PaintType mCurrentStrokePaintType = NOPAINT;
-    Color mCurrentFillColor;
-    Color mCurrentStrokeColor;
+    QColor mCurrentFillColor;
+    QColor mCurrentStrokeColor;
 
     bool mCurrentStrokeGradientLinear = true;
     bool mCurrentFillGradientLinear = true;
 
-    Gradient *mCurrentStrokeGradient = nullptr;
-    Gradient *mCurrentFillGradient = nullptr;
+    GradientQPtr mCurrentStrokeGradient;
+    GradientQPtr mCurrentFillGradient;
     Qt::PenCapStyle mCurrentCapStyle;
     Qt::PenJoinStyle mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;

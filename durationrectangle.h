@@ -3,9 +3,10 @@
 #include <QtCore>
 #include <QPainter>
 #include <QObject>
+#include "selfref.h"
 class Property;
 
-class DurationRectangleMovable : public QObject {
+class DurationRectangleMovable : public SelfRef {
     Q_OBJECT
 public:
     enum Type {
@@ -76,12 +77,12 @@ signals:
     void posChanged(int);
     void finishedTransform();
 protected:
-    Property *mChildProperty = nullptr;
-    Type mType = NOT_SPECIFIED;
     bool mHovered = false;
+    Type mType = NOT_SPECIFIED;
     int mMinPos = 0;
     int mMaxPos = 0;
     int mFramePos = 0;
+    Property *mChildProperty = nullptr;
 };
 
 class DurationRectangle : public DurationRectangleMovable {

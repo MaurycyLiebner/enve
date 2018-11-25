@@ -2,93 +2,88 @@
 #include "gradientpoint.h"
 #include "skqtconversions.h"
 
-GradientPoints::GradientPoints() : ComplexAnimator()
-{
-    prp_setName("gradient points");
-}
+GradientPoints::GradientPoints(PathBox *parentT) :
+    ComplexAnimator("gradient points") {
+    mParent_k = parentT;
 
-GradientPoints::~GradientPoints() {
-}
+    mStartAnimator = SPtrCreate(QPointFAnimator)("point1");
+    ca_addChildAnimator(mStartAnimator);
+    mStartPoint = SPtrCreate(GradientPoint)(mParent_k);
 
-void GradientPoints::initialize(PathBox *parentT)
-{
-    parent = parentT;
-    startPoint = new GradientPoint(parent);
-    ca_addChildAnimator(startPoint );
-    startPoint->prp_setName("point1");
-    endPoint = new GradientPoint(parent);
-    endPoint->prp_setName("point2");
-    ca_addChildAnimator(endPoint);
-    enabled = false;
+    mEndAnimator = SPtrCreate(QPointFAnimator)("point2");
+    ca_addChildAnimator(mEndAnimator);
+    mEndPoint = SPtrCreate(GradientPoint)(mParent_k);
+
+    mEnabled = false;
 }
 
 void GradientPoints::enable() {
-    if(enabled) {
+    if(mEnabled) {
         return;
     }
-    enabled = true;
+    mEnabled = true;
 }
 
 void GradientPoints::setPositions(const QPointF &startPos,
                                   const QPointF &endPos) {
-    startPoint->setRelativePos(startPos);
-    endPoint->setRelativePos(endPos);
+    mStartPoint->setRelativePos(startPos);
+    mEndPoint->setRelativePos(endPos);
 }
 
-void GradientPoints::disable()
-{
-    enabled = false;
+void GradientPoints::disable() {
+    mEnabled = false;
 }
 
 void GradientPoints::drawGradientPointsSk(SkCanvas *canvas,
                                           const SkScalar &invScale) {
-    if(enabled) {
-        SkPoint startPos = QPointFToSkPoint(startPoint->getAbsolutePos());
-        SkPoint endPos = QPointFToSkPoint(endPoint->getAbsolutePos());
+    if(mEnabled) {
+        SkPoint startPos = QPointFToSkPoint(mStartPoint->getAbsolutePos());
+        SkPoint endPos = QPointFToSkPoint(mEndPoint->getAbsolutePos());
         SkPaint paint;
         paint.setAntiAlias(true);
         paint.setColor(SK_ColorBLACK);
-        paint.setStrokeWidth(1.5*invScale);
+        paint.setStrokeWidth(1.5f*invScale);
         paint.setStyle(SkPaint::kStroke_Style);
 
         canvas->drawLine(startPos, endPos, paint);
         paint.setColor(SK_ColorWHITE);
-        paint.setStrokeWidth(0.75*invScale);
+        paint.setStrokeWidth(0.75f*invScale);
         canvas->drawLine(startPos, endPos, paint);
-        startPoint->drawSk(canvas, invScale);
-        endPoint->drawSk(canvas, invScale);
+        mStartPoint->drawSk(canvas, invScale);
+        mEndPoint->drawSk(canvas, invScale);
     }
 }
 
 MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos,
                                              const qreal &canvasScaleInv) {
-    if(enabled) {
-        if(startPoint->isPointAtAbsPos(absPos, canvasScaleInv) ) {
-            return startPoint;
-        } else if (endPoint->isPointAtAbsPos(absPos, canvasScaleInv) ){
-            return endPoint;
+    if(mEnabled) {
+        if(mStartPoint->isPointAtAbsPos(absPos, canvasScaleInv) ) {
+            return mStartPoint.get();
+        } else if (mEndPoint->isPointAtAbsPos(absPos, canvasScaleInv) ){
+            return mEndPoint.get();
         }
     }
     return nullptr;
 }
 
 QPointF GradientPoints::getStartPointAtRelFrame(const int &relFrame) {
-    return startPoint->getCurrentEffectivePointValueAtRelFrame(relFrame);
+    return mStartAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrame(const int &relFrame) {
-    return endPoint->getCurrentEffectivePointValueAtRelFrame(relFrame);
+    return mEndAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
 }
 
 QPointF GradientPoints::getStartPointAtRelFrameF(const qreal &relFrame) {
-    return startPoint->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+    return mStartAnimator->getCurrentEffectivePointValueAtRelFrameF(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrameF(const qreal &relFrame) {
-    return endPoint->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+    return mEndAnimator->getCurrentEffectivePointValueAtRelFrameF(relFrame);
 }
 
-void GradientPoints::setColors(QColor startColor, QColor endColor) {
-    startPoint->setColor(startColor);
-    endPoint->setColor(endColor);
+void GradientPoints::setColors(const QColor& startColor,
+                               const QColor& endColor) {
+    mStartPoint->setColor(startColor);
+    mEndPoint->setColor(endColor);
 }

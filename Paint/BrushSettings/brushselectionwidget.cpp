@@ -171,7 +171,7 @@ void BrushSelectionWidget::saveBrushesForProject(QIODevice *target) {
 
 void BrushSelectionWidget::readBrushesForProject(QIODevice *target) {
     int nBrushes;
-    target->read((char*)&nBrushes, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nBrushes), sizeof(int));
     for(int i = 0; i < nBrushes; i++) {
         Brush *newBrush = new Brush();
         newBrush->readBrush(target);

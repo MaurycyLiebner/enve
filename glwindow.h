@@ -35,8 +35,8 @@ protected:
     SkCanvas *mCanvas;
 
     GrGLFramebufferInfo mFbInfo;
-    QOpenGLContext *m_context = nullptr;
-    //QOpenGLPaintDevice *m_device = nullptr;
+    QOpenGLContext *mContext = nullptr;
+    //QOpenGLPaintDevice *mDevice = nullptr;
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);

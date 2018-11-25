@@ -11,11 +11,10 @@ ColorLabel::ColorLabel(QWidget *parent) : ColorWidget(parent)
 }
 
 void ColorLabel::mousePressEvent(QMouseEvent *e) {
-
+    Q_UNUSED(e);
 }
 
-void ColorLabel::setAlpha(GLfloat alpha_t)
-{
+void ColorLabel::setAlpha(GLfloat alpha_t) {
     alpha = alpha_t;
     update();
 }

@@ -2,48 +2,121 @@
 #define SHAREDPOINTERDEFS_H
 
 #include <QSharedPointer>
+#include <QPointer>
 #include <memory>
+#include "stdpointer.h"
 
-class QPointFAnimator;
-class QrealAnimator;
-class ColorAnimator;
-class BoolProperty;
-typedef QSharedPointer<QPointFAnimator> QPointFAnimatorQSPtr;
-typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
-typedef QSharedPointer<ColorAnimator> ColorAnimatorQSPtr;
-typedef QSharedPointer<BoolProperty> BoolPropertyQSPtr;
+#define SPtrGetAs(baseObjT, derivedClassT) derivedClassT::getAs<derivedClassT>(baseObjT)
+#define SPtrCreate(classT) classT::create<classT>
+#define classQPtrs(classT) class classT; \
+    typedef QSharedPointer<classT> classT##QSPtr; \
+    typedef QWeakPointer<classT> classT##QWPtr; \
+    typedef QPointer<classT> classT##QPtr;
+#define classPtrs(classT) class classT; \
+    typedef std::shared_ptr<classT> classT##SPtr; \
+    typedef std::weak_ptr<classT> classT##WPtr; \
+    typedef StdPointer<classT> classT##Ptr;
+#define structPtrs(structT) struct structT; \
+    typedef std::shared_ptr<structT> structT##SPtr; \
+    typedef std::weak_ptr<structT> structT##WPtr; \
+    typedef StdPointer<structT> structT##Ptr;
 
-struct BoundingBoxRenderData;
-typedef std::shared_ptr<BoundingBoxRenderData> BoundingBoxRenderDataSPtr;
+classQPtrs(BoundingBox)
+classQPtrs(BoxesGroup)
+classQPtrs(Canvas)
+classQPtrs(PathBox)
+classQPtrs(VectorPath)
+classQPtrs(Circle)
+classQPtrs(Rectangle)
+classQPtrs(TextBox)
+classQPtrs(ParticleBox)
+classQPtrs(ImageBox)
+classQPtrs(ImageSequenceBox)
+classQPtrs(VideoBox)
+classQPtrs(PaintBox)
+classQPtrs(BonesBox)
+classQPtrs(ExternalLinkBox)
 
-struct PixmapEffectRenderData;
-typedef std::shared_ptr<PixmapEffectRenderData> PixmapEffectRenderDataSPtr;
-struct BlurEffectRenderData;
-typedef std::shared_ptr<BlurEffectRenderData> BlurEffectRenderDataSPtr;
-struct ShadowEffectRenderData;
-typedef std::shared_ptr<ShadowEffectRenderData> ShadowEffectRenderDataSPtr;
-struct LinesEffectRenderData;
-typedef std::shared_ptr<LinesEffectRenderData> LinesEffectRenderDataSPtr;
-struct CirclesEffectRenderData;
-typedef std::shared_ptr<CirclesEffectRenderData> CirclesEffectRenderDataSPtr;
-struct SwirlEffectRenderData;
-typedef std::shared_ptr<SwirlEffectRenderData> SwirlEffectRenderDataSPtr;
-struct OilEffectRenderData;
-typedef std::shared_ptr<OilEffectRenderData> OilEffectRenderDataSPtr;
-struct ImplodeEffectRenderData;
-typedef std::shared_ptr<ImplodeEffectRenderData> ImplodeEffectRenderDataSPtr;
-struct DesaturateEffectRenderData;
-typedef std::shared_ptr<DesaturateEffectRenderData> DesaturateEffectRenderDataSPtr;
-struct ColorizeEffectRenderData;
-typedef std::shared_ptr<ColorizeEffectRenderData> ColorizeEffectRenderDataSPtr;
-struct ReplaceColorEffectRenderData;
-typedef std::shared_ptr<ReplaceColorEffectRenderData> ReplaceColorEffectRenderDataSPtr;
-struct ContrastEffectRenderData;
-typedef std::shared_ptr<ContrastEffectRenderData> ContrastEffectRenderDataSPtr;
-struct BrightnessEffectRenderData;
-typedef std::shared_ptr<BrightnessEffectRenderData> BrightnessEffectRenderDataSPtr;
-struct SampledMotionBlurEffectRenderData;
-typedef std::shared_ptr<SampledMotionBlurEffectRenderData> SampledMotionBlurEffectRenderDataSPtr;
-struct BrushEffectRenderData;
-typedef std::shared_ptr<BrushEffectRenderData> BrushEffectRenderDataSPtr;
+classQPtrs(QPointFAnimator)
+classQPtrs(QrealAnimator)
+classQPtrs(IntPropertyQSPtr)
+classQPtrs(ColorAnimator)
+classQPtrs(BoolProperty)
+classQPtrs(SingleWidgetTarget)
+classQPtrs(VectorPathAnimator)
+classQPtrs(PathAnimator)
+classQPtrs(Gradient)
+classQPtrs(ColorAnimator)
+classQPtrs(PaintSettings)
+classQPtrs(StrokeSettings)
+classQPtrs(Bone)
+classQPtrs(AnimationBox)
+classQPtrs(ParticleEmitter)
+classQPtrs(InternalLinkBox)
+classQPtrs(ComplexAnimator)
+classQPtrs(PixmapEffect)
+classQPtrs(PathEffect)
+classQPtrs(Property)
+classQPtrs(BoxTargetProperty)
+classQPtrs(QrealAnimator)
+classQPtrs(Animator)
+classQPtrs(QStringAnimator)
+classQPtrs(InternalLinkGroupBox)
+classQPtrs(SingleSound)
+classQPtrs(SoundComposition)
+classQPtrs(GradientPoints)
+
+classQPtrs(DurationRectangle)
+classQPtrs(VaryingLenAnimationRect)
+
+classQPtrs(BasicTransformAnimator)
+classQPtrs(BoxTransformAnimator)
+classQPtrs(BoneTransformAnimator)
+
+classQPtrs(OutputSettingsProfile)
+
+classPtrs(VectorPathEdge)
+classPtrs(MinimalExecutor)
+classPtrs(_ScheduledExecutor)
+classPtrs(CacheContainer)
+classPtrs(FunctionWaitingForBoxLoad)
+classPtrs(Key)
+classPtrs(PathKey)
+classPtrs(QrealKey)
+classPtrs(ComplexKey)
+classPtrs(AnimatorUpdater)
+classPtrs(SingleWidgetAbstraction)
+
+classPtrs(MovablePoint)
+classPtrs(PointAnimatorMovablePoint)
+classPtrs(CircleCenterPoint)
+classPtrs(CircleRadiusPoint)
+classPtrs(PathPivot)
+classPtrs(QrealPoint)
+classPtrs(GradientPoint)
+classPtrs(NodePoint)
+classPtrs(BonePt)
+classPtrs(CtrlPoint)
+classPtrs(BoxPathPoint)
+
+structPtrs(NodeSettings)
+
+structPtrs(BoundingBoxRenderData)
+structPtrs(ParticleBoxRenderData)
+structPtrs(PixmapEffectRenderData)
+structPtrs(BlurEffectRenderData)
+structPtrs(ShadowEffectRenderData)
+structPtrs(LinesEffectRenderData)
+structPtrs(CirclesEffectRenderData)
+structPtrs(SwirlEffectRenderData)
+structPtrs(OilEffectRenderData)
+structPtrs(ImplodeEffectRenderData)
+structPtrs(DesaturateEffectRenderData)
+structPtrs(ColorizeEffectRenderData)
+structPtrs(ReplaceColorEffectRenderData)
+structPtrs(ContrastEffectRenderData)
+structPtrs(BrightnessEffectRenderData)
+structPtrs(SampledMotionBlurEffectRenderData)
+structPtrs(BrushEffectRenderData)
+
 #endif // SHAREDPOINTERDEFS_H

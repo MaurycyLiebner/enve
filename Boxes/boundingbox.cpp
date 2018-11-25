@@ -14,20 +14,18 @@
 #include "skqtconversions.h"
 #include "global.h"
 
-QList<BoundingBox*> BoundingBox::mLoadedBoxes;
-QList<FunctionWaitingForBoxLoad*> BoundingBox::mFunctionsWaitingForBoxLoad;
+QList<BoundingBoxQSPtr> BoundingBox::mLoadedBoxes;
+QList<FunctionWaitingForBoxLoadSPtr> BoundingBox::mFunctionsWaitingForBoxLoad;
 
-BoundingBox::BoundingBox(const BoundingBoxType &type) :
-    ComplexAnimator() {
-    mTransformAnimator =
-            (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
-    ca_addChildAnimator(mTransformAnimator.data());
+BoundingBox::BoundingBox(const BoundingBoxType &type) : ComplexAnimator() {
+    mTransformAnimator = SPtrCreate(BoxTransformAnimator)(this);
+    ca_addChildAnimator(mTransformAnimator);
 
-    mEffectsAnimators = (new EffectAnimators(this))->ref<EffectAnimators>();
+    mEffectsAnimators = SPtrCreate(EffectAnimators)(this);
     mEffectsAnimators->prp_setName("effects");
-    mEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
+    mEffectsAnimators->prp_setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     mEffectsAnimators->prp_blockUpdater();
-    ca_addChildAnimator(mEffectsAnimators.data());
+    ca_addChildAnimator(mEffectsAnimators);
     mEffectsAnimators->SWT_hide();
 
     mType = type;
@@ -36,15 +34,6 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
 }
 
 BoundingBox::~BoundingBox() {}
-
-Property *BoundingBox::ca_getFirstDescendantWithName(const QString &name) {
-    Property *propT = ComplexAnimator::ca_getFirstDescendantWithName(name);
-    if(propT != nullptr) return propT;
-    if(name == mEffectsAnimators->prp_getName()) {
-        return mEffectsAnimators.data();
-    }
-    return propT;
-}
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                       const int &maxFrame) {
@@ -63,15 +52,15 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }
 
-SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
+SingleWidgetAbstractionSPtr BoundingBox::SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs,
+    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs,
               mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
-            return abs.get();
+            return abs;
         }
     }
-    SingleWidgetAbstraction *abs = SWT_createAbstraction(visiblePartWidget);
+    SingleWidgetAbstractionSPtr abs = SWT_createAbstraction(visiblePartWidget);
     if(visiblePartWidget->getCurrentRulesCollection().rule == SWT_Selected) {
         abs->setContentVisible(true);
     }
@@ -79,9 +68,9 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 }
 
 #include "linkbox.h"
-BoundingBox *BoundingBox::createLink() {
-    InternalLinkBox *linkBox = new InternalLinkBox(this);
-    copyBoundingBoxDataTo(linkBox);
+BoundingBoxQSPtr BoundingBox::createLink() {
+    BoundingBoxQSPtr linkBox = SPtrCreate(InternalLinkBox)(this);
+    copyBoundingBoxDataTo(linkBox.get());
     return linkBox;
 }
 
@@ -97,7 +86,7 @@ void BoundingBox::copyBoundingBoxDataTo(BoundingBox *targetBox) {
 
 void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
                                     const SkPath &path,
-                                    const qreal &invScale) {
+                                    const SkScalar &invScale) {
     canvas->save();
     SkPath mappedPath = path;
     mappedPath.transform(QMatrixToSkMatrix(
@@ -105,7 +94,7 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setColor(SK_ColorBLACK);
-    paint.setStrokeWidth(2.*invScale);
+    paint.setStrokeWidth(2*invScale);
     paint.setStyle(SkPaint::kStroke_Style);
     canvas->drawPath(mappedPath, paint);
 
@@ -123,7 +112,7 @@ bool BoundingBox::isAncestor(BoxesGroup *box) const {
 
 bool BoundingBox::isAncestor(BoundingBox *box) const {
     if(box->SWT_isBoxesGroup()) {
-        return isAncestor((BoxesGroup*)box);
+        return isAncestor(box);
     }
     return false;
 }
@@ -169,7 +158,8 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
         canvas->save();
 
         SkPaint paint;
-        paint.setAlpha(qRound(mTransformAnimator->getOpacity()*2.55));
+        int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
+        paint.setAlpha(static_cast<U8CPU>(intAlpha));
         paint.setBlendMode(mBlendModeSk);
         //paint.setFilterQuality(kHigh_SkFilterQuality);
         drawPixmapSk(canvas, &paint);
@@ -304,7 +294,7 @@ void BoundingBox::select() {
 }
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
-        const BoundingBoxRenderDataSPtr& renderData) {
+        BoundingBoxRenderData* renderData) {
     mRelBoundingRect = renderData->relBoundingRect;
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath = SkPath();
@@ -317,7 +307,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
 }
 
 void BoundingBox::updateCurrentPreviewDataFromRenderData(
-        const BoundingBoxRenderDataSPtr& renderData) {
+        BoundingBoxRenderData* renderData) {
     updateRelBoundingRectFromRenderData(renderData);
 }
 
@@ -363,7 +353,7 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
     emit scheduledUpdate();
 }
 
-BoundingBoxRenderDataSPtr BoundingBox::updateCurrentRenderData(const int& relFrame,
+BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(const int& relFrame,
                                                                const UpdateReason& reason) {
     auto renderData = createRenderData();
     if(renderData == nullptr) return BoundingBoxRenderDataSPtr();
@@ -373,7 +363,7 @@ BoundingBoxRenderDataSPtr BoundingBox::updateCurrentRenderData(const int& relFra
     return renderData;
 }
 
-BoundingBoxRenderDataSPtr BoundingBox::getCurrentRenderData(const int& relFrame) {
+BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
     BoundingBoxRenderDataSPtr currentRenderData = mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData == nullptr && mExpiredPixmap == 0) {
         currentRenderData = mDrawRenderContainer.getSrcRenderData();
@@ -408,7 +398,7 @@ bool BoundingBox::isContainedIn(const QRectF &absRect) {
 
 BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
     if(absPointInsidePath(absPos)) {
-        return this;
+        return ref<BoundingBox>();
     } else {
         return nullptr;
     }
@@ -439,13 +429,13 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
         paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
     }
     paint.setAntiAlias(true);
-    paint.setStrokeWidth(1.5*invScale);
+    paint.setStrokeWidth(1.5f*invScale);
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
     SkPath mappedPath = path;
     mappedPath.transform(QMatrixToSkMatrix(getCombinedTransform()));
     canvas->drawPath(mappedPath, paint);
-    paint.setStrokeWidth(0.75*invScale);
+    paint.setStrokeWidth(0.75f*invScale);
     paint.setColor(SK_ColorWHITE);
     canvas->drawPath(mappedPath, paint);
 
@@ -464,7 +454,7 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
 }
 
 void BoundingBox::drawBoundingRectSk(SkCanvas *canvas,
-                                     const qreal &invScale) {
+                                     const SkScalar &invScale) {
     drawAsBoundingRectSk(canvas, mSkRelBoundingRectPath,
                          invScale, true);
 }
@@ -581,7 +571,7 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
 
 void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
-                        const BoundingBoxRenderDataSPtr& data) {
+                        BoundingBoxRenderData* data) {
     data->relFrame = qRound(relFrame);
     data->renderedToImage = false;
     data->relTransform = getRelativeTransformAtRelFrameF(relFrame);
@@ -599,7 +589,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     }
     data->blendMode = getBlendMode();
 
-    Canvas *parentCanvas = getParentCanvas();
+    Canvas* parentCanvas = getParentCanvas();
     data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
     if(data->opacity > 0.001 && effectsVisible) {
         setupEffectsF(relFrame, data);
@@ -611,7 +601,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 void BoundingBox::setupEffectsF(const qreal &relFrame,
-                               const BoundingBoxRenderDataSPtr& data) {
+                               BoundingBoxRenderData *data) {
     mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
 
@@ -627,7 +617,7 @@ MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPtPos,
                                             const CanvasMode &currentCanvasMode,
                                             const qreal &canvasScaleInv) {
     if(currentCanvasMode == MOVE_PATH) {
-        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
+        MovablePoint* pivotMovable = mTransformAnimator->getPivotMovablePoint();
         if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return pivotMovable;
         }
@@ -736,11 +726,11 @@ void BoundingBox::moveMaxFrame(const int &dFrame) {
 }
 
 BoxTransformAnimator *BoundingBox::getTransformAnimator() {
-    return mTransformAnimator.data();
+    return mTransformAnimator.get();
 }
 
 void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
-    Canvas *parentCanvas = getParentCanvas();
+    Canvas* parentCanvas = getParentCanvas();
     if(shiftPressed) {
         if(mSelected) {
             parentCanvas->removeBoxFromSelection(this);
@@ -753,8 +743,8 @@ void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
     }
 }
 
-void BoundingBox::addEffect(PixmapEffect *effect) {
-    //effect->setUpdater(new PixmapEffectUpdater(this));
+void BoundingBox::addEffect(const PixmapEffectQSPtr& effect) {
+    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
 
     if(!mEffectsAnimators->hasChildAnimators()) {
         mEffectsAnimators->SWT_show();
@@ -765,7 +755,7 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     clearAllCache();
 }
 
-void BoundingBox::removeEffect(PixmapEffect *effect) {
+void BoundingBox::removeEffect(const PixmapEffectQSPtr& effect) {
     mEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mEffectsAnimators->hasChildAnimators()) {
         mEffectsAnimators->SWT_hide();
@@ -787,9 +777,10 @@ bool BoundingBox::hasDurationRectangle() const {
 }
 
 void BoundingBox::createDurationRectangle() {
-    DurationRectangle *durRect = new DurationRectangle(this);
+    DurationRectangleQSPtr durRect =
+            SPtrCreate(DurationRectangle)(this);
     durRect->setMinFrame(0);
-    Canvas *parentCanvas = getParentCanvas();
+    Canvas* parentCanvas = getParentCanvas();
     if(parentCanvas != nullptr) {
         durRect->setFramesDuration(getParentCanvas()->getFrameCount());
     }
@@ -809,12 +800,12 @@ int BoundingBox::prp_getRelFrameShift() const {
     return mDurationRectangle->getFrameShift();
 }
 
-void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
+void BoundingBox::setDurationRectangle(const DurationRectangleQSPtr& durationRect) {
     if(durationRect == mDurationRectangle) return;
     if(mDurationRectangle != nullptr) {
-        disconnect(mDurationRectangle, nullptr, this, nullptr);
+        disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
     }
-    DurationRectangle *oldDurRect = mDurationRectangle;
+    DurationRectangleQSPtr oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted();
     if(durationRect == nullptr) {
@@ -822,14 +813,14 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     }
 
     if(mDurationRectangle == nullptr) return;
-    connect(mDurationRectangle, SIGNAL(posChangedBy(int)),
+    connect(mDurationRectangle.data(), SIGNAL(posChangedBy(int)),
             this, SLOT(updateAfterDurationRectangleShifted(int)));
-    connect(mDurationRectangle, SIGNAL(rangeChanged()),
+    connect(mDurationRectangle.data(), SIGNAL(rangeChanged()),
             this, SLOT(updateAfterDurationRectangleRangeChanged()));
 
-    connect(mDurationRectangle, SIGNAL(minFrameChangedBy(int)),
+    connect(mDurationRectangle.data(), SIGNAL(minFrameChangedBy(int)),
             this, SLOT(updateAfterDurationMinFrameChangedBy(int)));
-    connect(mDurationRectangle, SIGNAL(maxFrameChangedBy(int)),
+    connect(mDurationRectangle.data(), SIGNAL(maxFrameChangedBy(int)),
             this, SLOT(updateAfterDurationMaxFrameChangedBy(int)));
 }
 
@@ -875,9 +866,8 @@ void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
 }
 
 DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
-                            const qreal &relX,
-                            const int &minViewedFrame,
-                            const qreal &pixelsPerFrame) {
+        const int &relX, const int &minViewedFrame,
+        const qreal &pixelsPerFrame) {
     if(mDurationRectangle == nullptr) return nullptr;
     return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
                                             minViewedFrame);
@@ -984,8 +974,8 @@ void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
                 int lId_ = INT_MAX;
 
                 QList<Property*> propertiesT;
-                getMotionBlurProperties(&propertiesT);
-                Q_FOREACH(Property *child, propertiesT) {
+                getMotionBlurProperties(propertiesT);
+                Q_FOREACH(Property* child, propertiesT) {
                     if(fId_ > lId_) {
                         break;
                     }
@@ -1088,7 +1078,7 @@ void BoundingBox::setVisibile(const bool &visible,
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
-    foreach(BoundingBox *box, mLinkingBoxes) {
+    foreach(const BoundingBoxQSPtr& box, mLinkingBoxes) {
         if(box->isParentLinkBox()) {
             box->setVisibile(visible, false);
         }
@@ -1239,7 +1229,7 @@ void BoundingBox::removeFromParent() {
 
 void BoundingBox::removeFromSelection() {
     if(mSelected) {
-        Canvas *parentCanvas = getParentCanvas();
+        CanvasQSPtr parentCanvas = getParentCanvas();
         parentCanvas->removeBoxFromSelection(this);
     }
 }
@@ -1285,12 +1275,12 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
     return false;
 }
 
-void BoundingBox::renderDataFinished(const BoundingBoxRenderDataSPtr& renderData) {
+void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     mExpiredPixmap = 0;
     if(renderData->redo) {
         scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
     }
-    mDrawRenderContainer.setVariablesFromRenderData(renderData);
+    mDrawRenderContainer.setSrcRenderData(renderData);
     updateDrawRenderContainerTransform();
 }
 
@@ -1302,4 +1292,8 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
         *minFrame = mDurationRectangle->getMinFrameAsAbsFrame();
         *maxFrame = mDurationRectangle->getMaxFrameAsAbsFrame();
     }
+}
+
+FunctionWaitingForBoxLoad::FunctionWaitingForBoxLoad(const int &boxIdT) {
+    loadBoxId = boxIdT;
 }

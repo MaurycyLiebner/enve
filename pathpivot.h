@@ -1,6 +1,7 @@
 #ifndef PATHPIVOT_H
 #define PATHPIVOT_H
 #include "movablepoint.h"
+#include "sharedpointerdefs.h"
 
 class Canvas;
 
@@ -8,7 +9,7 @@ enum CanvasMode : short;
 
 class PathPivot : public NonAnimatedMovablePoint {
 public:
-    PathPivot(Canvas *parent);
+    PathPivot(Canvas* parent);
 
     //void setRelativePos(const QPointF &relPos);
 
@@ -30,11 +31,11 @@ public:
     void startScaling();
     void drawSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
-    qreal mLastDRot = 0.;
-    int mRotHalfCycles = 0;
-    Canvas *mCanvas;
     bool mRotating = false;
     bool mScaling = false;
+    int mRotHalfCycles = 0;
+    qreal mLastDRot = 0.;
+    Canvas* mCanvas = nullptr;
 };
 
 #endif // PATHPIVOT_H

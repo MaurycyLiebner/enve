@@ -3,19 +3,27 @@
 #include "Animators/animatorupdater.h"
 #include "pointhelpers.h"
 
-GradientPoint::GradientPoint(PathBox *parent) :
-    PointAnimator(parent->getTransformAnimator(), TYPE_GRADIENT_POINT) {
-    prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
+GradientPoint::GradientPoint(QPointFAnimator* associatedAnimator,
+                             PathBox* parent) :
+    PointAnimatorMovablePoint(associatedAnimator,
+                              parent->getTransformAnimator(),
+                              TYPE_GRADIENT_POINT) {
+    mAssociatedAnimator_k->prp_setUpdater(
+                SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parent));
 }
 
 void GradientPoint::setRelativePos(const QPointF &relPos) {
-    PointAnimator::setRelativePos(relPos);
-    ((VectorPath*)(((BoxTransformAnimator*)mParent)->getParentBox()))->updateDrawGradients();
+    PointAnimatorMovablePoint::setRelativePos(relPos);
+    BoxTransformAnimator* boxParent =
+            SPtrGetAs(mParentTransform_cv, BoxTransformAnimator);
+    SPtrGetAs(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
 }
 
 void GradientPoint::moveByRel(const QPointF &relTranslatione) {
-    PointAnimator::moveByRel(relTranslatione);
-    ((VectorPath*)(((BoxTransformAnimator*)mParent)->getParentBox()))->updateDrawGradients();
+    PointAnimatorMovablePoint::moveByRel(relTranslatione);
+    BoxTransformAnimator* boxParent =
+            SPtrGetAs(mParentTransform_cv, BoxTransformAnimator);
+    SPtrGetAs(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
 }
 
 void GradientPoint::setColor(const QColor &fillColor) {
@@ -31,14 +39,12 @@ void GradientPoint::drawSk(SkCanvas *canvas,
     SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
     canvas->save();
 
-    SkScalar scaledRadius = mRadius*invScale;
+    SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;
 
     SkPaint paint;
     paint.setAntiAlias(true);
-    paint.setColor(SkColorSetARGB(mFillColor.alpha(),
-                                        mFillColor.red(),
-                                        mFillColor.green(),
-                                        mFillColor.blue()));
+    SkColor paintColor = QColorToSkColor(mFillColor);
+    paint.setColor(paintColor);
 
     paint.setStyle(SkPaint::kFill_Style);
     canvas->drawCircle(absPos,
@@ -46,24 +52,24 @@ void GradientPoint::drawSk(SkCanvas *canvas,
 
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    paint.setStrokeWidth(1.5*invScale);
+    paint.setStrokeWidth(1.5f*invScale);
     canvas->drawCircle(absPos,
                        scaledRadius, paint);
     paint.setColor(SK_ColorWHITE);
-    paint.setStrokeWidth(0.75*invScale);
+    paint.setStrokeWidth(0.75f*invScale);
     canvas->drawCircle(absPos,
                        scaledRadius, paint);
 
-    if(prp_isKeyOnCurrentFrame()) {
+    if(mAssociatedAnimator_k->prp_isKeyOnCurrentFrame()) {
         paint.setColor(SK_ColorRED);
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawCircle(absPos,
-                           scaledRadius*0.5, paint);
+                           scaledRadius*0.5f, paint);
 
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setColor(SK_ColorBLACK);
         canvas->drawCircle(absPos,
-                           scaledRadius*0.5, paint);
+                           scaledRadius*0.5f, paint);
     }
     canvas->restore();
 }

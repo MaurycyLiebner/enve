@@ -8,9 +8,6 @@ class PathBox;
 
 class GradientPoints : public ComplexAnimator {
 public:
-    GradientPoints();
-    ~GradientPoints();
-
     void initialize(PathBox *parentT);
 
     void enable();
@@ -23,12 +20,7 @@ public:
     MovablePoint *qra_getPointAt(const QPointF &absPos,
                                  const qreal &canvasScaleInv);
 
-    void setColors(QColor startColor, QColor endColor);
-
-    bool enabled;
-    GradientPoint *startPoint;
-    GradientPoint *endPoint;
-    PathBox *parent;
+    void setColors(const QColor &startColor, const QColor &endColor);
 
     void setPositions(const QPointF &startPos,
                       const QPointF &endPos);
@@ -39,6 +31,22 @@ public:
     QPointF getEndPointAtRelFrameF(const qreal &relFrame);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+
+    bool enabled() const {
+        return mEnabled;
+    }
+protected:
+    GradientPoints(PathBox *parentT);
+
+    bool mEnabled;
+
+    QPointFAnimatorQSPtr mStartAnimator;
+    QPointFAnimatorQSPtr mEndAnimator;
+
+    GradientPointSPtr mStartPoint;
+    GradientPointSPtr mEndPoint;
+
+    PathBoxQPtr mParent_k;
 };
 
 #endif // GRADIENTPOINTS_H

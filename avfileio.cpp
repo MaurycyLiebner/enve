@@ -47,19 +47,20 @@
 
 void writeQString(QIODevice *target,
                  const QString &strToWrite) {
-    int nChars = strToWrite.length();
-    target->write((char*)&nChars, sizeof(int));
-    target->write((char*)strToWrite.utf16(), nChars*sizeof(ushort));
+    uint nChars = static_cast<uint>(strToWrite.length());
+    target->write(reinterpret_cast<const char*>(&nChars), sizeof(uint));
+    target->write(reinterpret_cast<const char*>(strToWrite.utf16()),
+                  nChars*sizeof(ushort));
 }
 
 void readQString(QIODevice *target,
-                QString *targetStr) {
-    int nChars;
-    target->read((char*)&nChars, sizeof(int));
+                 QString& targetStr) {
+    uint nChars;
+    target->read(reinterpret_cast<char*>(&nChars), sizeof(uint));
     ushort *chars = new ushort[nChars];
 
-    target->read((char*)chars, nChars*sizeof(ushort));
-    *targetStr = QString::fromUtf16(chars, nChars);
+    target->read(reinterpret_cast<char*>(chars), nChars*sizeof(ushort));
+    targetStr = QString::fromUtf16(chars, static_cast<int>(nChars));
 
     delete[] chars;
 }
@@ -82,87 +83,87 @@ struct FileFooter {
     }
 
     void write(QIODevice *target) {
-        target->write((char*)this, sizeof(FileFooter));
+        target->write(reinterpret_cast<char*>(this), sizeof(FileFooter));
     }
 
     void read(QIODevice *target) {
         target->seek(target->size() - sizeof(FileFooter));
-        target->read((char*)this, sizeof(FileFooter));
+        target->read(reinterpret_cast<char*>(this), sizeof(FileFooter));
         target->seek(0);
     }
 };
 
 void BoolProperty::writeProperty(QIODevice *target) {
-    target->write((char*)&mValue, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mValue), sizeof(bool));
 }
 
 void BoolProperty::readProperty(QIODevice *target) {
-    target->read((char*)&mValue, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mValue), sizeof(bool));
 }
 
 void BoolPropertyContainer::writeProperty(QIODevice *target) {
     ComplexAnimator::writeProperty(target);
-    target->write((char*)&mValue, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mValue), sizeof(bool));
 }
 
 void BoolPropertyContainer::readProperty(QIODevice *target) {
     ComplexAnimator::readProperty(target);
     bool value;
-    target->read((char*)&value, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&value), sizeof(bool));
     setValue(value);
 }
 
 
 void ComboBoxProperty::writeProperty(QIODevice *target) {
-    target->write((char*)&mCurrentValue, sizeof(int));
+    target->write(reinterpret_cast<char*>(&mCurrentValue), sizeof(int));
 }
 
 void ComboBoxProperty::readProperty(QIODevice *target) {
-    target->read((char*)&mCurrentValue, sizeof(int));
+    target->read(reinterpret_cast<char*>(&mCurrentValue), sizeof(int));
 }
 
 void IntProperty::writeProperty(QIODevice *target) {
-    target->write((char*)&mMinValue, sizeof(int));
-    target->write((char*)&mMaxValue, sizeof(int));
-    target->write((char*)&mValue, sizeof(int));
+    target->write(reinterpret_cast<char*>(&mMinValue), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mMaxValue), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mValue), sizeof(int));
 }
 
 void IntProperty::readProperty(QIODevice *target) {
-    target->read((char*)&mMinValue, sizeof(int));
-    target->read((char*)&mMaxValue, sizeof(int));
-    target->read((char*)&mValue, sizeof(int));
+    target->read(reinterpret_cast<char*>(&mMinValue), sizeof(int));
+    target->read(reinterpret_cast<char*>(&mMaxValue), sizeof(int));
+    target->read(reinterpret_cast<char*>(&mValue), sizeof(int));
 }
 
 void Key::writeKey(QIODevice *target) {
-    target->write((char*)&mRelFrame, sizeof(int));
+    target->write(reinterpret_cast<char*>(&mRelFrame), sizeof(int));
 }
 
 void Key::readKey(QIODevice *target) {
-    target->read((char*)&mRelFrame, sizeof(int));
+    target->read(reinterpret_cast<char*>(&mRelFrame), sizeof(int));
 }
 
 void PathContainer::writePathContainer(QIODevice *target) {
     int nPts = mElementsPos.count();
-    target->write((char*)&nPts, sizeof(int)); // number pts
+    target->write(reinterpret_cast<char*>(&nPts), sizeof(int)); // number pts
     foreach(const SkPoint &pos, mElementsPos) {
         SkScalar xT, yT;
         xT = pos.x(); yT = pos.y();
-        target->write((char*)&xT, sizeof(SkScalar));
-        target->write((char*)&yT, sizeof(SkScalar));
+        target->write(reinterpret_cast<char*>(&xT), sizeof(SkScalar));
+        target->write(reinterpret_cast<char*>(&yT), sizeof(SkScalar));
     }
-    target->write((char*)&mPathClosed, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mPathClosed), sizeof(bool));
 }
 
 void PathContainer::readPathContainer(QIODevice *target) {
     int nPts;
-    target->read((char*)&nPts, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nPts), sizeof(int));
     for(int i = 0; i < nPts; i++) {
         SkScalar xT, yT;
-        target->read((char*)&xT, sizeof(SkScalar));
-        target->read((char*)&yT, sizeof(SkScalar));
+        target->read(reinterpret_cast<char*>(&xT), sizeof(SkScalar));
+        target->read(reinterpret_cast<char*>(&yT), sizeof(SkScalar));
         mElementsPos.append(SkPoint::Make(xT, yT));
     }
-    target->read((char*)&mPathClosed, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mPathClosed), sizeof(bool));
     mPathUpdateNeeded = true;
 }
 
@@ -178,24 +179,24 @@ void PathKey::readKey(QIODevice *target) {
 
 void VectorPathAnimator::writeProperty(QIODevice *target) {
     int nNodes = mNodeSettings.count();
-    target->write((char*)&nNodes, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nNodes), sizeof(int));
     foreach(NodeSettings *nodeSettings, mNodeSettings) {
-        target->write((char*)&nodeSettings->ctrlsMode, sizeof(CtrlsMode));
-        target->write((char*)&nodeSettings->startEnabled, sizeof(bool));
-        target->write((char*)&nodeSettings->endEnabled, sizeof(bool));
+        target->write(reinterpret_cast<char*>(&nodeSettings->ctrlsMode), sizeof(CtrlsMode));
+        target->write(reinterpret_cast<char*>(&nodeSettings->startEnabled), sizeof(bool));
+        target->write(reinterpret_cast<char*>(&nodeSettings->endEnabled), sizeof(bool));
     }
 
     int nKeys = anim_mKeys.count();
-    target->write((char*)&nKeys, sizeof(int));
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((PathKey*)key.get())->writeKey(target);
+    target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
+    foreach(const KeySPtr &key, anim_mKeys) {
+        key->writeKey(target);
     }
 
     writePathContainer(target);
 }
 
 Key *VectorPathAnimator::readKey(QIODevice *target) {
-    PathKey *newKey = new PathKey(this);
+    PathKeySPtr newKey = SPtrCreate(PathKey)(this);
 
     newKey->readKey(target);
     return newKey;
@@ -203,17 +204,17 @@ Key *VectorPathAnimator::readKey(QIODevice *target) {
 
 void VectorPathAnimator::readProperty(QIODevice *target) {
     int nNodes;
-    target->read((char*)&nNodes, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nNodes), sizeof(int));
     for(int i = 0; i < nNodes; i++) {
         NodeSettings nodeSettings;
-        target->read((char*)&nodeSettings.ctrlsMode, sizeof(CtrlsMode));
-        target->read((char*)&nodeSettings.startEnabled, sizeof(bool));
-        target->read((char*)&nodeSettings.endEnabled, sizeof(bool));
+        target->read(reinterpret_cast<char*>(&nodeSettings.ctrlsMode), sizeof(CtrlsMode));
+        target->read(reinterpret_cast<char*>(&nodeSettings.startEnabled), sizeof(bool));
+        target->read(reinterpret_cast<char*>(&nodeSettings.endEnabled), sizeof(bool));
         insertNodeSettingsForNodeId(i, nodeSettings);
     }
 
     int nKeys;
-    target->read((char*)&nKeys, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nKeys), sizeof(int));
     for(int i = 0; i < nKeys; i++) {
         anim_appendKey(readKey(target),
                        false,
@@ -226,48 +227,48 @@ void VectorPathAnimator::readProperty(QIODevice *target) {
 
 void QrealKey::writeKey(QIODevice *target) {
     Key::writeKey(target);
-    target->write((char*)&mValue, sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&mValue), sizeof(qreal));
 
-    target->write((char*)&mStartEnabled, sizeof(bool));
-    target->write((char*)&mStartFrame, sizeof(qreal));
-    target->write((char*)&mStartValue, sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&mStartEnabled), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mStartFrame), sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&mStartValue), sizeof(qreal));
 
-    target->write((char*)&mEndEnabled, sizeof(bool));
-    target->write((char*)&mEndFrame, sizeof(qreal));
-    target->write((char*)&mEndValue, sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&mEndEnabled), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mEndFrame), sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&mEndValue), sizeof(qreal));
 }
 
 void QrealKey::readKey(QIODevice *target) {
     Key::readKey(target);
-    target->read((char*)&mValue, sizeof(qreal));
+    target->read(reinterpret_cast<char*>(&mValue), sizeof(qreal));
 
-    target->read((char*)&mStartEnabled, sizeof(bool));
-    target->read((char*)&mStartFrame, sizeof(qreal));
-    target->read((char*)&mStartValue, sizeof(qreal));
+    target->read(reinterpret_cast<char*>(&mStartEnabled), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mStartFrame), sizeof(qreal));
+    target->read(reinterpret_cast<char*>(&mStartValue), sizeof(qreal));
 
-    target->read((char*)&mEndEnabled, sizeof(bool));
-    target->read((char*)&mEndFrame, sizeof(qreal));
-    target->read((char*)&mEndValue, sizeof(qreal));
+    target->read(reinterpret_cast<char*>(&mEndEnabled), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mEndFrame), sizeof(qreal));
+    target->read(reinterpret_cast<char*>(&mEndValue), sizeof(qreal));
 }
 
 void QrealAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
-    target->write((char*)&nKeys, sizeof(int));
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QrealKey*)key.get())->writeKey(target);
+    target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
+    foreach(const KeySPtr &key, anim_mKeys) {
+        key->writeKey(target);
     }
 
-    target->write((char*)&mCurrentValue, sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&mCurrentValue), sizeof(qreal));
 
     bool hasRandomGenerator = !mRandomGenerator.isNull();
-    target->write((char*)&hasRandomGenerator, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&hasRandomGenerator), sizeof(bool));
     if(hasRandomGenerator) {
         mRandomGenerator->writeProperty(target);
     }
 }
 
 Key *QrealAnimator::readKey(QIODevice *target) {
-    QrealKey *newKey = new QrealKey(this);
+    QrealKeySPtr newKey = SPtrCreate(QrealKey)(this);
     newKey->readKey(target);
     return newKey;
 }
@@ -289,16 +290,16 @@ void RandomQrealGenerator::readProperty(QIODevice *target) {
 
 void QrealAnimator::readProperty(QIODevice *target) {
     int nKeys;
-    target->read((char*)&nKeys, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nKeys), sizeof(int));
     for(int i = 0; i < nKeys; i++) {
         anim_appendKey(readKey(target), false, false);
     }
 
     qreal val;
-    target->read((char*)&val, sizeof(qreal));
+    target->read(reinterpret_cast<char*>(&val), sizeof(qreal));
     qra_setCurrentValue(val);
     bool hasRandomGenerator;
-    target->read((char*)&hasRandomGenerator, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&hasRandomGenerator), sizeof(bool));
     if(hasRandomGenerator) {
         RandomQrealGenerator *generator = new RandomQrealGenerator(0, 9999);
         generator->readProperty(target);
@@ -317,7 +318,7 @@ void QPointFAnimator::readProperty(QIODevice *target) {
 }
 
 void ColorAnimator::writeProperty(QIODevice *target) {
-    target->write((char*)&mColorMode, sizeof(ColorMode));
+    target->write(reinterpret_cast<char*>(&mColorMode), sizeof(ColorMode));
     mVal1Animator->writeProperty(target);
     mVal2Animator->writeProperty(target);
     mVal3Animator->writeProperty(target);
@@ -325,7 +326,7 @@ void ColorAnimator::writeProperty(QIODevice *target) {
 }
 
 void ColorAnimator::readProperty(QIODevice *target) {
-    target->read((char*)&mColorMode, sizeof(ColorMode));
+    target->read(reinterpret_cast<char*>(&mColorMode), sizeof(ColorMode));
     setColorMode(mColorMode);
     mVal1Animator->readProperty(target);
     mVal2Animator->readProperty(target);
@@ -340,36 +341,36 @@ void QStringKey::writeKey(QIODevice *target) {
 
 void QStringKey::readKey(QIODevice *target) {
     Key::readKey(target);
-    readQString(target, &mText);
+    readQString(target, mText);
 }
 
 void QStringAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
-    target->write((char*)&nKeys, sizeof(int));
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QStringKey*)key.get())->writeKey(target);
+    target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
+    foreach(const KeySPtr &key, anim_mKeys) {
+        key->writeKey(target);
     }
     writeQString(target, mCurrentText);
 }
 
 void QStringAnimator::readProperty(QIODevice *target) {
     int nKeys;
-    target->read((char*)&nKeys, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nKeys), sizeof(int));
     for(int i = 0; i < nKeys; i++) {
         QStringKey *newKey = new QStringKey("", 0, this);
         newKey->readKey(target);
         anim_appendKey(newKey, false, false);
     }
-    readQString(target, &mCurrentText);
+    readQString(target, mCurrentText);
 }
 
 void PixmapEffect::writeProperty(QIODevice *target) {
-    target->write((char*)&mType, sizeof(PixmapEffectType));
-    target->write((char*)&mVisible, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mType), sizeof(PixmapEffectType));
+    target->write(reinterpret_cast<char*>(&mVisible), sizeof(bool));
 }
 
 void PixmapEffect::readProperty(QIODevice *target) {
-    target->read((char*)&mVisible, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mVisible), sizeof(bool));
 }
 
 void BlurEffect::readProperty(QIODevice *target) {
@@ -480,15 +481,15 @@ void SampledMotionBlurEffect::writeProperty(QIODevice *target) {
 
 void EffectAnimators::writeProperty(QIODevice *target) {
     int nEffects = ca_mChildAnimators.count();
-    target->write((char*)&nEffects, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nEffects), sizeof(int));
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PixmapEffect*)effect.data())->writeProperty(target);
+        effect->writeProperty(target);
     }
 }
 
 void EffectAnimators::readPixmapEffect(QIODevice *target) {
     PixmapEffectType typeT;
-    target->read((char*)&typeT, sizeof(PixmapEffectType));
+    target->read(reinterpret_cast<char*>(&typeT), sizeof(PixmapEffectType));
     PixmapEffect *effect = nullptr;
     if(typeT == EFFECT_BLUR) {
         effect = new BlurEffect();
@@ -515,7 +516,7 @@ void EffectAnimators::readPixmapEffect(QIODevice *target) {
 
 void EffectAnimators::readProperty(QIODevice *target) {
     int nEffects;
-    target->read((char*)&nEffects, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nEffects), sizeof(int));
     for(int i = 0; i < nEffects; i++) {
         readPixmapEffect(target);
     }
@@ -548,28 +549,28 @@ void BoxTransformAnimator::readProperty(QIODevice *target) {
 }
 
 void GradientPoints::writeProperty(QIODevice *target) {
-    startPoint->writeProperty(target);
-    endPoint->writeProperty(target);
+    mStartPoint->writeProperty(target);
+    mEndPoint->writeProperty(target);
 }
 
 void GradientPoints::readProperty(QIODevice *target) {
-    startPoint->readProperty(target);
-    endPoint->readProperty(target);
+    mStartPoint->readProperty(target);
+    mEndPoint->readProperty(target);
 }
 
 void Gradient::writeProperty(QIODevice *target) {
-    target->write((char*)&mLoadId, sizeof(int));
+    target->write(reinterpret_cast<char*>(&mLoadId), sizeof(int));
     int nColors = mColors.count();
-    target->write((char*)&nColors, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nColors), sizeof(int));
     foreach(ColorAnimator *color, mColors) {
         color->writeProperty(target);
     }
 }
 
 void Gradient::readProperty(QIODevice *target) {
-    target->read((char*)&mLoadId, sizeof(int));
+    target->read(reinterpret_cast<char*>(&mLoadId), sizeof(int));
     int nColors;
-    target->read((char*)&nColors, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nColors), sizeof(int));
     for(int i = 0; i < nColors; i++) {
         ColorAnimator *colorAnim = new ColorAnimator();
         colorAnim->readProperty(target);
@@ -580,42 +581,42 @@ void Gradient::readProperty(QIODevice *target) {
 void StrokeSettings::writeProperty(QIODevice *target) {
     PaintSettings::writeProperty(target);
     mLineWidth->writeProperty(target);
-    target->write((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
-    target->write((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
-    target->write((char*)&mOutlineCompositionMode,
+    target->write(reinterpret_cast<char*>(&mCapStyle), sizeof(Qt::PenCapStyle));
+    target->write(reinterpret_cast<char*>(&mJoinStyle), sizeof(Qt::PenJoinStyle));
+    target->write(reinterpret_cast<char*>(&mOutlineCompositionMode),
                sizeof(QPainter::CompositionMode));
 }
 
 void StrokeSettings::readProperty(QIODevice *target) {
     PaintSettings::readProperty(target);
     mLineWidth->readProperty(target);
-    target->read((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
-    target->read((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
-    target->read((char*)&mOutlineCompositionMode,
+    target->read(reinterpret_cast<char*>(&mCapStyle), sizeof(Qt::PenCapStyle));
+    target->read(reinterpret_cast<char*>(&mJoinStyle), sizeof(Qt::PenJoinStyle));
+    target->read(reinterpret_cast<char*>(&mOutlineCompositionMode),
                 sizeof(QPainter::CompositionMode));
 }
 
 void PaintSettings::writeProperty(QIODevice *target) {
     mGradientPoints->writeProperty(target);
     mColor->writeProperty(target);
-    target->write((char*)&mPaintType, sizeof(PaintType));
+    target->write(reinterpret_cast<char*>(&mPaintType), sizeof(PaintType));
     int gradId;
     if(mGradient == nullptr) {
         gradId = -1;
     } else {
         gradId = mGradient->getLoadId();
     }
-    target->write((char*)&mGradientLinear, sizeof(bool));
-    target->write((char*)&gradId, sizeof(int));
+    target->write(reinterpret_cast<char*>(&mGradientLinear), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&gradId), sizeof(int));
 }
 
 void PaintSettings::readProperty(QIODevice *target) {
     mGradientPoints->readProperty(target);
     mColor->readProperty(target);
-    target->read((char*)&mPaintType, sizeof(PaintType));
+    target->read(reinterpret_cast<char*>(&mPaintType), sizeof(PaintType));
     int gradId;
-    target->read((char*)&mGradientLinear, sizeof(bool));
-    target->read((char*)&gradId, sizeof(int));
+    target->read(reinterpret_cast<char*>(&mGradientLinear), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&gradId), sizeof(int));
     if(gradId != -1) {
         mGradient = MainWindow::getInstance()->
                 getLoadedGradientById(gradId)->ref<Gradient>();
@@ -626,18 +627,18 @@ void DurationRectangle::writeDurationRectangle(QIODevice *target) {
     int minFrame = getMinFrame();
     int maxFrame = getMaxFrame();
     int framePos = getFramePos();
-    target->write((char*)&minFrame, sizeof(int));
-    target->write((char*)&maxFrame, sizeof(int));
-    target->write((char*)&framePos, sizeof(int));
+    target->write(reinterpret_cast<char*>(&minFrame), sizeof(int));
+    target->write(reinterpret_cast<char*>(&maxFrame), sizeof(int));
+    target->write(reinterpret_cast<char*>(&framePos), sizeof(int));
 }
 
 void DurationRectangle::readDurationRectangle(QIODevice *target) {
     int minFrame;
     int maxFrame;
     int framePos;
-    target->read((char*)&minFrame, sizeof(int));
-    target->read((char*)&maxFrame, sizeof(int));
-    target->read((char*)&framePos, sizeof(int));
+    target->read(reinterpret_cast<char*>(&minFrame), sizeof(int));
+    target->read(reinterpret_cast<char*>(&maxFrame), sizeof(int));
+    target->read(reinterpret_cast<char*>(&framePos), sizeof(int));
     setMinFrame(minFrame);
     setMaxFrame(maxFrame);
     setFramePos(framePos);
@@ -645,34 +646,34 @@ void DurationRectangle::readDurationRectangle(QIODevice *target) {
 
 void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
     DurationRectangle::writeDurationRectangle(target);
-    target->write((char*)&mBoundToAnimation, sizeof(bool));
-    target->write((char*)&mSetMaxFrameAtLeastOnce, sizeof(bool));
-    target->write((char*)&mMinAnimationFrame, sizeof(int));
-    target->write((char*)&mMaxAnimationFrame, sizeof(int));
+    target->write(reinterpret_cast<char*>(&mBoundToAnimation), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mSetMaxFrameAtLeastOnce), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mMinAnimationFrame), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mMaxAnimationFrame), sizeof(int));
 }
 
 void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
     DurationRectangle::readDurationRectangle(target);
     int minFrame;
     int maxFrame;
-    target->read((char*)&mBoundToAnimation, sizeof(bool));
-    target->read((char*)&mSetMaxFrameAtLeastOnce, sizeof(bool));
-    target->read((char*)&minFrame, sizeof(int));
-    target->read((char*)&maxFrame, sizeof(int));
+    target->read(reinterpret_cast<char*>(&mBoundToAnimation), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mSetMaxFrameAtLeastOnce), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&minFrame), sizeof(int));
+    target->read(reinterpret_cast<char*>(&maxFrame), sizeof(int));
     setMinAnimationFrame(minFrame);
     setMaxAnimationFrame(maxFrame);
 }
 
 void BoundingBox::writeBoundingBox(QIODevice *target) {
-    target->write((char*)&mType, sizeof(BoundingBoxType));
+    target->write(reinterpret_cast<char*>(&mType), sizeof(BoundingBoxType));
     writeQString(target, prp_mName);
-    target->write((char*)&mLoadId, sizeof(int));
-    target->write((char*)&mPivotAutoAdjust, sizeof(bool));
-    target->write((char*)&mVisible, sizeof(bool));
-    target->write((char*)&mLocked, sizeof(bool));
-    target->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
+    target->write(reinterpret_cast<char*>(&mLoadId), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mPivotAutoAdjust), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mVisible), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mLocked), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mBlendModeSk), sizeof(SkBlendMode));
     bool hasDurRect = mDurationRectangle != nullptr;
-    target->write((char*)&hasDurRect, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&hasDurRect), sizeof(bool));
 
     if(hasDurRect) {
         mDurationRectangle->writeDurationRectangle(target);
@@ -684,15 +685,15 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
 
 void BoundingBox::readBoundingBox(QIODevice *target) {
     mPivotAutoAdjust = false; // pivot will be read anyway, so temporarly disable adjusting
-    readQString(target, &prp_mName);
-    target->read((char*)&mLoadId, sizeof(int));
+    readQString(target, prp_mName);
+    target->read(reinterpret_cast<char*>(&mLoadId), sizeof(int));
     bool pivotAutoAdjust;
-    target->read((char*)&pivotAutoAdjust, sizeof(bool));
-    target->read((char*)&mVisible, sizeof(bool));
-    target->read((char*)&mLocked, sizeof(bool));
-    target->read((char*)&mBlendModeSk, sizeof(SkBlendMode));
+    target->read(reinterpret_cast<char*>(&pivotAutoAdjust), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mVisible), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mLocked), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mBlendModeSk), sizeof(SkBlendMode));
     bool hasDurRect;
-    target->read((char*)&hasDurRect, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&hasDurRect), sizeof(bool));
 
     if(hasDurRect) {
         if(mDurationRectangle == nullptr) createDurationRectangle();
@@ -711,15 +712,15 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
 }
 
 void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) {
-    target->write((char*)&mType, sizeof(BoundingBoxType));
+    target->write(reinterpret_cast<char*>(&mType), sizeof(BoundingBoxType));
     writeQString(target, prp_mName);
-    target->write((char*)&mLoadId, sizeof(int));
-    target->write((char*)&mPivotAutoAdjust, sizeof(bool));
-    target->write((char*)&mVisible, sizeof(bool));
-    target->write((char*)&mLocked, sizeof(bool));
-    target->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
+    target->write(reinterpret_cast<char*>(&mLoadId), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mPivotAutoAdjust), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mVisible), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mLocked), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mBlendModeSk), sizeof(SkBlendMode));
 //    bool hasDurRect = mDurationRectangle != nullptr;
-//    target->write((char*)&hasDurRect, sizeof(bool));
+//    target->write(reinterpret_cast<char*>(&hasDurRect), sizeof(bool));
 
 //    if(hasDurRect) {
 //        mDurationRectangle->writeDurationRectangle(target);
@@ -730,14 +731,14 @@ void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) {
 }
 
 void BoundingBox::readBoundingBoxDataForLink(QIODevice *target) {
-    readQString(target, &prp_mName);
-    target->read((char*)&mLoadId, sizeof(int));
-    target->read((char*)&mPivotAutoAdjust, sizeof(bool));
-    target->read((char*)&mVisible, sizeof(bool));
-    target->read((char*)&mLocked, sizeof(bool));
-    target->read((char*)&mBlendModeSk, sizeof(SkBlendMode));
+    readQString(target, prp_mName);
+    target->read(reinterpret_cast<char*>(&mLoadId), sizeof(int));
+    target->read(reinterpret_cast<char*>(&mPivotAutoAdjust), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mVisible), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mLocked), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mBlendModeSk), sizeof(SkBlendMode));
 //    bool hasDurRect;
-//    target->read((char*)&hasDurRect, sizeof(bool));
+//    target->read(reinterpret_cast<char*>(&hasDurRect), sizeof(bool));
 
 //    if(hasDurRect) {
 //        if(mDurationRectangle == nullptr) createDurationRectangle();
@@ -750,12 +751,12 @@ void BoundingBox::readBoundingBoxDataForLink(QIODevice *target) {
 }
 
 void PathEffect::writeProperty(QIODevice *target) {
-    target->write((char*)&mPathEffectType, sizeof(PathEffectType));
-    target->write((char*)&mVisible, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mPathEffectType), sizeof(PathEffectType));
+    target->write(reinterpret_cast<char*>(&mVisible), sizeof(bool));
 }
 
 void PathEffect::readProperty(QIODevice *target) {
-    target->read((char*)&mVisible, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mVisible), sizeof(bool));
 }
 
 void DisplacePathEffect::writeProperty(QIODevice *target) {
@@ -817,7 +818,7 @@ void SolidifyPathEffect::readProperty(QIODevice *target) {
 }
 
 void BoxTargetProperty::writeProperty(QIODevice *target) {
-    BoundingBox *targetBox = mTarget.data();
+    BoundingBox *targetBox = mTarget_d.data();
     int targetId;
     if(targetBox == nullptr) {
         targetId = -1;
@@ -829,13 +830,13 @@ void BoxTargetProperty::writeProperty(QIODevice *target) {
             BoundingBox::addLoadedBox(targetBox);
         }
     }
-    target->write((char*)&targetId, sizeof(int));
+    target->write(reinterpret_cast<char*>(&targetId), sizeof(int));
 }
 
 void BoxTargetProperty::readProperty(QIODevice *target) {
     int targetId;
-    target->read((char*)&targetId, sizeof(int));
-    BoundingBox *targetBox = BoundingBox::getLoadedBoxById(targetId);
+    target->read(reinterpret_cast<char*>(&targetId), sizeof(int));
+    BoundingBoxQSPtr targetBox = BoundingBox::getLoadedBoxById(targetId);
     if(targetBox == nullptr && targetId >= 0) {
         BoundingBox::addFunctionWaitingForBoxLoad(
                     new BoxTargetPropertyWaitingForBoxLoad(targetId, this) );
@@ -856,15 +857,15 @@ void SumPathEffect::readProperty(QIODevice *target) {
 
 void PathEffectAnimators::writeProperty(QIODevice *target) {   
     int nEffects = ca_mChildAnimators.count();
-    target->write((char*)&nEffects, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nEffects), sizeof(int));
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PathEffect*)effect.data())->writeProperty(target);
+        effect->writeProperty(target);
     }
 }
 
 void PathEffectAnimators::readPathEffect(QIODevice *target) {
     PathEffectType typeT;
-    target->read((char*)&typeT, sizeof(PathEffectType));
+    target->read(reinterpret_cast<char*>(&typeT), sizeof(PathEffectType));
     if(typeT == DISPLACE_PATH_EFFECT) {
         DisplacePathEffect *displaceEffect =
                 new DisplacePathEffect(mIsOutline);
@@ -896,7 +897,7 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
 
 void PathEffectAnimators::readProperty(QIODevice *target) {
     int nEffects;
-    target->read((char*)&nEffects, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nEffects), sizeof(int));
     for(int i = 0; i < nEffects; i++) {
         readPathEffect(target);
     }
@@ -973,7 +974,7 @@ void ParticleBox::writeBoundingBox(QIODevice *target) {
     mTopLeftPoint->writeProperty(target);
     mBottomRightPoint->writeProperty(target);
     int nEmitters = mEmitters.count();
-    target->write((char*)&nEmitters, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nEmitters), sizeof(int));
     foreach(ParticleEmitter *emitter, mEmitters) {
         emitter->writeProperty(target);
     }
@@ -984,7 +985,7 @@ void ParticleBox::readBoundingBox(QIODevice *target) {
     mTopLeftPoint->readProperty(target);
     mBottomRightPoint->readProperty(target);
     int nEmitters;
-    target->read((char*)&nEmitters, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nEmitters), sizeof(int));
     for(int i = 0; i < nEmitters; i++) {
         ParticleEmitter *emitter = new ParticleEmitter(this);
         emitter->readProperty(target);
@@ -1000,20 +1001,20 @@ void ImageBox::writeBoundingBox(QIODevice *target) {
 void ImageBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
     QString path;
-    readQString(target, &path);
+    readQString(target, path);
     setFilePath(path);
 }
 
 void Circle::writeBoundingBox(QIODevice *target) {
     PathBox::writeBoundingBox(target);
-    mHorizontalRadiusPoint->writeProperty(target);
-    mVerticalRadiusPoint->writeProperty(target);
+    mHorizontalRadiusAnimator->writeProperty(target);
+    mVerticalRadiusAnimator->writeProperty(target);
 }
 
 void Circle::readBoundingBox(QIODevice *target) {
     PathBox::readBoundingBox(target);
-    mHorizontalRadiusPoint->readProperty(target);
-    mVerticalRadiusPoint->readProperty(target);
+    mHorizontalRadiusAnimator->readProperty(target);
+    mVerticalRadiusAnimator->readProperty(target);
 }
 
 void Rectangle::writeBoundingBox(QIODevice *target) {
@@ -1038,16 +1039,16 @@ void VideoBox::writeBoundingBox(QIODevice *target) {
 void VideoBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
     QString path;
-    readQString(target, &path);
+    readQString(target, path);
     setFilePath(path);
 }
 
 bool Tile::writeTile(QIODevice *target) {
-    return target->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar)) > 0;
+    return target->write(reinterpret_cast<char*>(mData), TILE_DIM*TILE_DIM*4*sizeof(uchar)) > 0;
 }
 
 void Tile::readTile(QIODevice *target) {
-    target->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+    target->read(reinterpret_cast<char*>(mData), TILE_DIM*TILE_DIM*4*sizeof(uchar));
     copyDataToDrawer();
 }
 
@@ -1062,10 +1063,10 @@ bool TilesData::writeTilesData(QIODevice *target) {
 }
 
 void TilesData::writeTilesDataFromMemoryOrTmp(QIODevice *target) {
-    target->write((char*)&mWidth, sizeof(ushort));
-    target->write((char*)&mHeight, sizeof(ushort));
+    target->write(reinterpret_cast<char*>(&mWidth), sizeof(ushort));
+    target->write(reinterpret_cast<char*>(&mHeight), sizeof(ushort));
     bool noDataInMemory = !mDataStoredInTmpFile && mNoDataInMemory;
-    target->write((char*)&noDataInMemory, sizeof(bool));
+    target->write(reinterpret_cast<char*>(&noDataInMemory), sizeof(bool));
     if(mNoDataInMemory) {
         if(mDataStoredInTmpFile) {
             target->write(mTmpFile->readAll());
@@ -1078,9 +1079,9 @@ void TilesData::writeTilesDataFromMemoryOrTmp(QIODevice *target) {
 void TilesData::readTilesData(QIODevice *target) {
     ushort width;
     ushort height;
-    target->read((char*)&width, sizeof(ushort));
-    target->read((char*)&height, sizeof(ushort));
-    target->read((char*)&mNoDataInMemory, sizeof(bool));
+    target->read(reinterpret_cast<char*>(&width), sizeof(ushort));
+    target->read(reinterpret_cast<char*>(&height), sizeof(ushort));
+    target->read(reinterpret_cast<char*>(&mNoDataInMemory), sizeof(bool));
     setSize(width, height);
     if(mNoDataInMemory) return;
     for(int i = 0; i < mNTileCols; i++) {
@@ -1091,14 +1092,14 @@ void TilesData::readTilesData(QIODevice *target) {
 }
 
 void Surface::writeSurface(QIODevice *target) {
-    target->write((char*)&mWidth, sizeof(ushort));
-    target->write((char*)&mHeight, sizeof(ushort));
+    target->write(reinterpret_cast<char*>(&mWidth), sizeof(ushort));
+    target->write(reinterpret_cast<char*>(&mHeight), sizeof(ushort));
     mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
 }
 
 void Surface::readSurface(QIODevice *target) {
-    target->read((char*)&mWidth, sizeof(ushort));
-    target->read((char*)&mHeight, sizeof(ushort));
+    target->read(reinterpret_cast<char*>(&mWidth), sizeof(ushort));
+    target->read(reinterpret_cast<char*>(&mHeight), sizeof(ushort));
     mCurrentTiles->readTilesData(target);
 }
 
@@ -1113,34 +1114,33 @@ void SurfaceKey::readKey(QIODevice *target) {
 }
 
 void AnimatedSurface::writeProperty(QIODevice *target) {
-    target->write((char*)&mIsDraft, sizeof(bool));
-    target->write((char*)&mWidth, sizeof(ushort));
-    target->write((char*)&mHeight, sizeof(ushort));
+    target->write(reinterpret_cast<char*>(&mIsDraft), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mWidth), sizeof(ushort));
+    target->write(reinterpret_cast<char*>(&mHeight), sizeof(ushort));
     int nKeys = anim_mKeys.count();
-    target->write((char*)&nKeys, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
     if(nKeys == 0) {
         mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
     } else {
-        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-            ((SurfaceKey*)key.get())->writeKey(target);
+        foreach(const KeySPtr &key, anim_mKeys) {
+            key->writeKey(target);
         }
     }
 }
 
 Key *AnimatedSurface::readKey(QIODevice *target) {
     SurfaceKey *newKey = new SurfaceKey(this);
-    newKey->setTiles(new TilesData(0,
-                                   0, true));
+    newKey->setTiles(new TilesData(0, 0, true));
     newKey->readKey(target);
     return newKey;
 }
 
 void AnimatedSurface::readProperty(QIODevice *target) {
-    target->read((char*)&mIsDraft, sizeof(bool));
-    target->read((char*)&mWidth, sizeof(ushort));
-    target->read((char*)&mHeight, sizeof(ushort));
+    target->read(reinterpret_cast<char*>(&mIsDraft), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mWidth), sizeof(ushort));
+    target->read(reinterpret_cast<char*>(&mHeight), sizeof(ushort));
     int nKeys;
-    target->read((char*)&nKeys, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nKeys), sizeof(int));
     if(nKeys == 0) {
         mCurrentTiles->readTilesData(target);
     } else {
@@ -1169,7 +1169,7 @@ void PaintBox::readBoundingBox(QIODevice *target) {
 void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
     int nFrames = mListOfFrames.count();
-    target->write((char*)&nFrames, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nFrames), sizeof(int));
     foreach(const QString &frame, mListOfFrames) {
         writeQString(target, frame);
     }
@@ -1178,10 +1178,10 @@ void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
 void ImageSequenceBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
     int nFrames;
-    target->read((char*)&nFrames, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nFrames), sizeof(int));
     for(int i = 0; i < nFrames; i++) {
         QString frame;
-        readQString(target, &frame);
+        readQString(target, frame);
         mListOfFrames << frame;
     }
 }
@@ -1189,11 +1189,11 @@ void ImageSequenceBox::readBoundingBox(QIODevice *target) {
 void TextBox::writeBoundingBox(QIODevice *target) {
     PathBox::writeBoundingBox(target);
     mText->writeProperty(target);
-    target->write((char*)&mAlignment, sizeof(Qt::Alignment));
+    target->write(reinterpret_cast<char*>(&mAlignment), sizeof(Qt::Alignment));
     qreal fontSize = mFont.pointSizeF();
     QString fontFamily = mFont.family();
     QString fontStyle = mFont.styleName();
-    target->write((char*)&fontSize, sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&fontSize), sizeof(qreal));
     writeQString(target, fontFamily);
     writeQString(target, fontStyle);
 }
@@ -1201,13 +1201,13 @@ void TextBox::writeBoundingBox(QIODevice *target) {
 void TextBox::readBoundingBox(QIODevice *target) {
     PathBox::readBoundingBox(target);
     mText->readProperty(target);
-    target->read((char*)&mAlignment, sizeof(Qt::Alignment));
+    target->read(reinterpret_cast<char*>(&mAlignment), sizeof(Qt::Alignment));
     qreal fontSize;
     QString fontFamily;
     QString fontStyle;
-    target->read((char*)&fontSize, sizeof(qreal));
-    readQString(target, &fontFamily);
-    readQString(target, &fontStyle);
+    target->read(reinterpret_cast<char*>(&fontSize), sizeof(qreal));
+    readQString(target, fontFamily);
+    readQString(target, fontStyle);
     mFont.setPointSizeF(fontSize);
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);
@@ -1219,7 +1219,7 @@ void BoxesGroup::writeBoundingBox(QIODevice *target) {
     mFillPathEffectsAnimators->writeProperty(target);
     mOutlinePathEffectsAnimators->writeProperty(target);
     int nChildBoxes = mContainedBoxes.count();
-    target->write((char*)&nChildBoxes, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nChildBoxes), sizeof(int));
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
         child->writeBoundingBox(target);
     }
@@ -1227,11 +1227,11 @@ void BoxesGroup::writeBoundingBox(QIODevice *target) {
 
 void BoxesGroup::readChildBoxes(QIODevice *target) {
     int nChildBoxes;
-    target->read((char*)&nChildBoxes, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nChildBoxes), sizeof(int));
     for(int i = 0; i < nChildBoxes; i++) {
-        BoundingBox *box;
+        BoundingBoxQSPtr box;
         BoundingBoxType boxType;
-        target->read((char*)&boxType, sizeof(BoundingBoxType));
+        target->read(reinterpret_cast<char*>(&boxType), sizeof(BoundingBoxType));
         if(boxType == TYPE_VECTOR_PATH) {
             box = new VectorPath();
         } else if(boxType == TYPE_IMAGE) {
@@ -1260,6 +1260,7 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
             box = new InternalLinkCanvas(nullptr);
         } else {
             qDebug() << "Corrupted file - invalid box type";
+            break;
         }
 
         box->readBoundingBox(target);
@@ -1277,7 +1278,7 @@ void BoxesGroup::readBoundingBox(QIODevice *target) {
 
 void PathAnimator::writeProperty(QIODevice *target) {
     int nPaths = mSinglePaths.count();
-    target->write((char*)&nPaths, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nPaths), sizeof(int));
     foreach(VectorPathAnimator *pathAnimator, mSinglePaths) {
         pathAnimator->writeProperty(target);
     }
@@ -1296,7 +1297,7 @@ QMatrix PathAnimator::getCombinedTransform() {
 
 void PathAnimator::readProperty(QIODevice *target) {
     int nPaths;
-    target->read((char*)&nPaths, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nPaths), sizeof(int));
     for(int i = 0; i < nPaths; i++) {
         readVectorPathAnimator(target);
     }
@@ -1314,32 +1315,32 @@ void VectorPath::readBoundingBox(QIODevice *target) {
 
 void Canvas::writeBoundingBox(QIODevice *target) {
     BoxesGroup::writeBoundingBox(target);
-    target->write((char*)&mClipToCanvasSize, sizeof(bool));
-    target->write((char*)&mWidth, sizeof(int));
-    target->write((char*)&mHeight, sizeof(int));
-    target->write((char*)&mFps, sizeof(qreal));
+    target->write(reinterpret_cast<char*>(&mClipToCanvasSize), sizeof(bool));
+    target->write(reinterpret_cast<char*>(&mWidth), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mHeight), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mFps), sizeof(qreal));
     mBackgroundColor->writeProperty(target);
-    target->write((char*)&mMaxFrame, sizeof(int));
-    target->write((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
+    target->write(reinterpret_cast<char*>(&mMaxFrame), sizeof(int));
+    target->write(reinterpret_cast<char*>(&mCanvasTransformMatrix), sizeof(QMatrix));
 }
 
 void Canvas::readBoundingBox(QIODevice *target) {
-    target->read((char*)&mType, sizeof(BoundingBoxType));
+    target->read(reinterpret_cast<char*>(&mType), sizeof(BoundingBoxType));
     BoxesGroup::readBoundingBox(target);
-    target->read((char*)&mClipToCanvasSize, sizeof(bool));
-    target->read((char*)&mWidth, sizeof(int));
-    target->read((char*)&mHeight, sizeof(int));
-    target->read((char*)&mFps, sizeof(qreal));
+    target->read(reinterpret_cast<char*>(&mClipToCanvasSize), sizeof(bool));
+    target->read(reinterpret_cast<char*>(&mWidth), sizeof(int));
+    target->read(reinterpret_cast<char*>(&mHeight), sizeof(int));
+    target->read(reinterpret_cast<char*>(&mFps), sizeof(qreal));
     mBackgroundColor->readProperty(target);
-    target->read((char*)&mMaxFrame, sizeof(int));
-    target->read((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
+    target->read(reinterpret_cast<char*>(&mMaxFrame), sizeof(int));
+    target->read(reinterpret_cast<char*>(&mCanvasTransformMatrix), sizeof(QMatrix));
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
 }
 
 void GradientWidget::writeGradients(QIODevice *target) {
     int nGradients = mGradients.count();
-    target->write((char*)&nGradients, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nGradients), sizeof(int));
     foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
         gradient->writeProperty(target);
     }
@@ -1347,7 +1348,7 @@ void GradientWidget::writeGradients(QIODevice *target) {
 
 void GradientWidget::readGradients(QIODevice *target) {
     int nGradients;
-    target->read((char*)&nGradients, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nGradients), sizeof(int));
     for(int i = 0; i < nGradients; i++) {
         Gradient *gradient = new Gradient();
         gradient->readProperty(target);
@@ -1363,7 +1364,7 @@ void Brush::writeBrush(QIODevice *write) {
     for(uchar i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
         BrushSettingInfo setting_info = brush_settings_info[i];
         qreal value = getSettingVal(setting_info.setting);
-        write->write((const char *)&value, sizeof(qreal));
+        write->write(reinterpret_cast<const char*>(&value), sizeof(qreal));
     }
 }
 
@@ -1381,17 +1382,28 @@ void Brush::readBrush(QIODevice *read) {
 
 void Color::readColor(QIODevice *read) {
     QColor qcolT;
-    read->read((char*)&qcolT, sizeof(QColor));
+    read->read(reinterpret_cast<char*>(&qcolT), sizeof(QColor));
     setQColor(qcolT);
 }
 
 void Color::writeColor(QIODevice *write) {
-    write->write((const char*)&qcol, sizeof(QColor));
+    write->write(reinterpret_cast<const char*>(&qcol), sizeof(QColor));
+}
+
+
+QColor readQColor(QIODevice *read) {
+    QColor qcolT;
+    read->read(reinterpret_cast<char*>(&qcolT), sizeof(QColor));
+    return qcolT;
+}
+
+void writeQColor(const QColor& qcol, QIODevice *write) {
+    write->write(reinterpret_cast<const char*>(&qcol), sizeof(QColor));
 }
 
 void CanvasWindow::writeCanvases(QIODevice *target) {
     int nCanvases = mCanvasList.count();
-    target->write((char*)&nCanvases, sizeof(int));
+    target->write(reinterpret_cast<char*>(&nCanvases), sizeof(int));
     int currentCanvasId = -1;
     int boxLoadId = 0;
     foreach(const CanvasQSPtr &canvas, mCanvasList) {
@@ -1401,7 +1413,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
             currentCanvasId = mCurrentCanvas->getLoadId();
         }
     }
-    target->write((char*)&currentCanvasId, sizeof(int));
+    target->write(reinterpret_cast<char*>(&currentCanvasId), sizeof(int));
     foreach(const CanvasQSPtr &canvas, mCanvasList) {
         canvas->clearBoxLoadId();
     }
@@ -1409,7 +1421,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
 
 void CanvasWindow::readCanvases(QIODevice *target) {
     int nCanvases;
-    target->read((char*)&nCanvases, sizeof(int));
+    target->read(reinterpret_cast<char*>(&nCanvases), sizeof(int));
     for(int i = 0; i < nCanvases; i++) {
         FillStrokeSettingsWidget *fillStrokeSettingsWidget =
                 MainWindow::getInstance()->getFillStrokeSettings();
@@ -1418,8 +1430,8 @@ void CanvasWindow::readCanvases(QIODevice *target) {
         MainWindow::getInstance()->addCanvas(canvas);
     }
     int currentCanvasId;
-    target->read((char*)&currentCanvasId, sizeof(int));
-    setCurrentCanvas((Canvas*)BoundingBox::getLoadedBoxById(currentCanvasId));
+    target->read(reinterpret_cast<char*>(&currentCanvasId), sizeof(int));
+    setCurrentCanvas(BoundingBox::getLoadedBoxById(currentCanvasId)->ref<Canvas>());
 }
 
 void MainWindow::loadAVFile(const QString &path) {
@@ -1430,7 +1442,7 @@ void MainWindow::loadAVFile(const QString &path) {
         if(footer.combatybilityMode() ==
                 FileFooter::CompatybilityMode::Compatible) {
             QColor qcolT;
-            target.read((char*)&qcolT, sizeof(QColor));
+            target.read(reinterpret_cast<char*>(&qcolT), sizeof(QColor));
             mBrushSettingsWidget->setCurrentQColor(qcolT);
             Brush::setHSV(qcolT.hueF(),
                           qcolT.saturationF(),
@@ -1465,7 +1477,7 @@ void MainWindow::saveToFile(const QString &path) {
 
     if(target.open(QIODevice::WriteOnly) ) {
         QColor color = mBrushSettingsWidget->getCurrentQColor();
-        target.write((char*)&color, sizeof(QColor));
+        target.write(reinterpret_cast<char*>(&color), sizeof(QColor));
 
         mBrushSettingsWidget->saveBrushesForProject(&target);
         GradientWidget *gradientWidget =

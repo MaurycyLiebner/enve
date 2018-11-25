@@ -7,15 +7,13 @@ extern bool shouldValPointerBeLightHSV(GLfloat hue, GLfloat saturation, GLfloat 
 extern bool shouldValPointerBeLightHSL(GLfloat hue, GLfloat saturation, GLfloat lightness);
 extern bool shouldValPointerBeLightRGB(GLfloat r, GLfloat g, GLfloat b);
 
-class ColorWidget : public GLWidget
-{
+class ColorWidget : public GLWidget {
     Q_OBJECT
 public:
     ColorWidget(QWidget *parent = nullptr);
 protected:
     bool mValueBlocked = false;
 
-    Color bgColor;
     GLfloat hsl_saturaton_tmp = -1.f; // HSL saturation saved when changing lightness
 
     GLfloat hue = 0.f;

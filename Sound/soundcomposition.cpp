@@ -2,12 +2,7 @@
 #include "singlesound.h"
 
 SoundComposition::SoundComposition(QObject *parent)
-    :   QIODevice(parent) {
-    mSoundsAnimatorContainer->prp_setName("sounds");
-}
-
-SoundComposition::~SoundComposition() {
-}
+    :   QIODevice(parent) {}
 
 void SoundComposition::start() {
     open(QIODevice::ReadOnly);
@@ -24,10 +19,11 @@ void SoundComposition::generateData(const int &startAbsFrame,
                                     const qreal &fps) {
     if(mSounds.isEmpty()) return;
 
-    int nSamples = (endAbsFrame - startAbsFrame)*SOUND_SAMPLERATE/fps;
+    uint nSamples =
+            static_cast<uint>(qCeil((endAbsFrame - startAbsFrame)*SOUND_SAMPLERATE/fps));
     //float *data1 = nullptr;
     float *data = new float[nSamples];
-    for(int i = 0; i < nSamples; i++) {
+    for(uint i = 0; i < nSamples; i++) {
         data[i] = 0.f;
     }
 //    int size;
@@ -41,7 +37,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
 //    }
 //    free(data1);
 
-    Q_FOREACH(SingleSound *sound, mSounds) {
+    Q_FOREACH(const SingleSoundQSPtr &sound, mSounds) {
         sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);
         const int &soundStartFrame = sound->getStartAbsFrame();
         const int &soundSampleCount = sound->getSampleCount();
@@ -49,18 +45,18 @@ void SoundComposition::generateData(const int &startAbsFrame,
         int sampleCountNeeded;
         int firstTargetSample;
         int samplesInSoundFrameRange =
-                        (endAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps;
+                        qCeil((endAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps);
 
         if(soundStartFrame >= startAbsFrame) {
             firstTargetSample =
-                        (soundStartFrame - startAbsFrame)*SOUND_SAMPLERATE/fps;
+                        qRound((soundStartFrame - startAbsFrame)*SOUND_SAMPLERATE/fps);
             firstSampleFromSound = 0;
             sampleCountNeeded = qMin(soundSampleCount,
                                      samplesInSoundFrameRange);
         } else {
             firstTargetSample = 0;
             firstSampleFromSound =
-                        (startAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps;
+                        qRound((startAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps);
             sampleCountNeeded = qMin(soundSampleCount - firstSampleFromSound,
                                      samplesInSoundFrameRange);
         }
@@ -74,31 +70,31 @@ void SoundComposition::generateData(const int &startAbsFrame,
         }
     }
 
-    mBuffer.setRawData((char*)data, nSamples*sizeof(float));
+    mBuffer.setRawData(reinterpret_cast<char*>(data), nSamples*sizeof(float));
     mPos = 0;
 }
 
-void SoundComposition::addSound(SingleSound *sound) {
+void SoundComposition::addSound(const SingleSoundQSPtr& sound) {
     mSounds.append(sound);
 }
 
-void SoundComposition::removeSound(SingleSound *sound) {
+void SoundComposition::removeSound(const SingleSoundQSPtr& sound) {
     mSounds.removeOne(sound);
 }
 
-void SoundComposition::addSoundAnimator(SingleSound *sound) {
+void SoundComposition::addSoundAnimator(const SingleSoundQSPtr& sound) {
     addSound(sound);
     mSoundsAnimatorContainer->ca_addChildAnimator(sound);
 }
 
-void SoundComposition::removeSoundAnimator(SingleSound *sound) {
+void SoundComposition::removeSoundAnimator(const SingleSoundQSPtr& sound) {
     if(mSounds.removeOne(sound)) {
         mSoundsAnimatorContainer->ca_removeChildAnimator(sound);
     }
 }
 
 ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {
-    return mSoundsAnimatorContainer.data();
+    return mSoundsAnimatorContainer.get();
 }
 
 qint64 SoundComposition::readData(char *data, qint64 len) {
@@ -106,7 +102,8 @@ qint64 SoundComposition::readData(char *data, qint64 len) {
     if(!mBuffer.isEmpty()) {
         while(len - total > 0) {
             const qint64 chunk = qMin((mBuffer.size() - mPos), len - total);
-            memcpy(data + total, mBuffer.constData() + mPos, chunk);
+            memcpy(data + total, mBuffer.constData() + mPos,
+                   static_cast<size_t>(chunk));
             mPos = (mPos + chunk) % mBuffer.size();
             total += chunk;
         }

@@ -9,7 +9,7 @@ class TextBox : public PathBox {
 public:
     TextBox();
 
-    void setFont(const QFont &font, const bool &saveUndoRedo = true);
+    void setFont(const QFont &font);
     void setSelectedFontSize(const qreal &size);
     void setSelectedFontFamilyAndStyle(const QString &fontFamily,
                                        const QString &fontStyle);
@@ -44,10 +44,11 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;
 private:
-    QStringAnimatorQSPtr mText;
-    QrealAnimatorQSPtr mLinesDist;
-    QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;
+    QFont mFont;
+
+    QrealAnimatorQSPtr mLinesDist;
+    QStringAnimatorQSPtr mText;
 };
 
 #endif // TEXTBOX_H

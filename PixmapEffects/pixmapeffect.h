@@ -28,11 +28,11 @@ class PixmapEffect;
 class PixmapEffectMimeData : public QMimeData {
     Q_OBJECT
 public:
-    PixmapEffectMimeData(PixmapEffect *target) : QMimeData() {
+    PixmapEffectMimeData(const PixmapEffectQSPtr& target) : QMimeData() {
         mPixmapEffect = target;
     }
 
-    PixmapEffect *getPixmapEffect() {
+    PixmapEffectQSPtr getPixmapEffect() const {
         return mPixmapEffect;
     }
 
@@ -42,7 +42,7 @@ public:
     }
 
 private:
-    PixmapEffect *mPixmapEffect;
+    PixmapEffectQSPtr mPixmapEffect;
 };
 
 enum PixmapEffectType : short {
@@ -64,8 +64,9 @@ enum PixmapEffectType : short {
 
 class PixmapEffect : public ComplexAnimator {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    PixmapEffect(const PixmapEffectType &type);
+    PixmapEffect(const QString& name, const PixmapEffectType &type);
 
     bool interrupted() {
         if(mInterrupted) {
@@ -87,7 +88,7 @@ public:
                                       PixmapEffect *& ptr);
 
     QMimeData *SWT_createMimeData() {
-        return new PixmapEffectMimeData(this);
+        return new PixmapEffectMimeData(ref<PixmapEffect>());
     }
 
     EffectAnimators *getParentEffectAnimators() {
@@ -99,7 +100,7 @@ public:
     }
 
     virtual PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& data) = 0;
+            const qreal &relFrame, BoundingBoxRenderData* data) = 0;
 
     bool SWT_isPixmapEffect() { return true; }
 
@@ -125,8 +126,8 @@ public slots:
 protected:
     bool mInterrupted = false;
     bool mVisible = true;
+    PixmapEffectType mType;
     EffectAnimators *mParentEffects = nullptr;
-    PixmapEffectType mType; 
 };
 
 struct BlurEffectRenderData : public PixmapEffectRenderData {
@@ -154,7 +155,7 @@ public:
 
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData* );
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:
@@ -170,7 +171,7 @@ struct ShadowEffectRenderData : public PixmapEffectRenderData {
     bool hasKeys;
     bool highQuality;
     qreal blurRadius;
-    Color color;
+    QColor color;
     QPointF translation;
     qreal opacity;
 
@@ -189,7 +190,7 @@ public:
     qreal getMarginAtRelFrame(const int &relFrame);
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:
@@ -225,7 +226,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
 private:
     bool mVertical = false;
     QrealAnimatorQSPtr mLinesDistance;
@@ -255,7 +256,7 @@ public:
 
     qreal getMargin() { return 0.; }
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
 private:
     QrealAnimatorQSPtr mCirclesDistance;
     QrealAnimatorQSPtr mCirclesRadius;
@@ -283,7 +284,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
 private:
     QrealAnimatorQSPtr mDegreesAnimator;
 };
@@ -310,7 +311,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
 private:
     QrealAnimatorQSPtr mRadiusAnimator;
 };
@@ -337,7 +338,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
 private:
     QrealAnimatorQSPtr mFactorAnimator;
 };
@@ -364,7 +365,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -396,7 +397,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -436,7 +437,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 private:
@@ -469,7 +470,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -498,7 +499,7 @@ public:
     qreal getMargin() { return 0.; }
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& );
+            const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
@@ -541,7 +542,7 @@ public:
                                               const int &relFrame);
 
     PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& data);
+            const qreal &relFrame, BoundingBoxRenderData* data);
     void prp_setAbsFrame(const int &frame);
 private:
     void getParentBoxFirstLastMarginAjusted(int *firstT, int *lastT,

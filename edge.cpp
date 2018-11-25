@@ -198,7 +198,7 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
     QPointF p3Pos = mPoint2->getAbsolutePos();
 
     if(!mEditPath) {
-        BoundingBox *parentBox = ((BoxTransformAnimator*)mPoint1->getParent())->
+        BoundingBoxQSPtr parentBox = ((BoxTransformAnimator*)mPoint1->getParentTransform())->
                                         getParentBox();
         NodePointValues p1Values = mPoint1->getPointValues();
         p0Pos = parentBox->getCombinedTransform().map(
@@ -266,16 +266,16 @@ void VectorPathEdge::generatePainterPath() {
 }
 
 void VectorPathEdge::drawHoveredSk(SkCanvas *canvas,
-                                   const qreal &invScale) {
+                                   const SkScalar &invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setColor(SK_ColorBLACK);
-    paint.setStrokeWidth(2.5*invScale);
+    paint.setStrokeWidth(2.5f*invScale);
     paint.setStyle(SkPaint::kStroke_Style);
     canvas->drawPath(mSkPath, paint);
 
     paint.setColor(SK_ColorRED);
-    paint.setStrokeWidth(1.25*invScale);
+    paint.setStrokeWidth(1.25f*invScale);
     canvas->drawPath(mSkPath, paint);
 }
 

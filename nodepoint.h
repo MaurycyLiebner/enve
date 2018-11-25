@@ -67,7 +67,6 @@ NodePointValues operator*(const qreal &val, const NodePointValues &ppv);
 
 class NodePoint : public NonAnimatedMovablePoint {
 public:
-    NodePoint(VectorPathAnimator *parentAnimator);
     ~NodePoint();
 
     void applyTransform(const QMatrix &transform);
@@ -88,9 +87,9 @@ public:
     CtrlPoint *getEndCtrlPt();
 
     void drawSk(SkCanvas *canvas,
-              const CanvasMode &mode,
-              const SkScalar &invScale,
-              const bool &keyOnCurrent);
+                const CanvasMode &mode,
+                const SkScalar &invScale,
+                const bool &keyOnCurrent);
 
     NodePoint *getNextPoint();
     NodePoint *getPreviousPoint();
@@ -163,8 +162,6 @@ public:
 
     NodePoint *getConnectedSeparateNodePoint();
 
-    void setParentPath(VectorPathAnimator *path);
-
     void saveTransformPivotAbsPos(const QPointF &absPivot);
     void rotateRelativeToSavedPivot(const qreal &rot);
     void scaleRelativeToSavedPivot(const qreal &sx,
@@ -182,19 +179,21 @@ public:
     void setElementsPos(const QPointF &startPos,
                         const QPointF &targetPos,
                         const QPointF &endPos);
+protected:
+    NodePoint(VectorPathAnimator *parentAnimator);
 private:
-    std::shared_ptr<VectorPathEdge> mNextEdge;
-
-    NodeSettings *mCurrentNodeSettings = nullptr;
+    bool mSeparateNodePoint = false;
     int mNodeId;
 
-    VectorPathAnimator *mParentPath;
+    VectorPathEdgeSPtr mNextEdge;
+    NodeSettings *mCurrentNodeSettings = nullptr;
+    const VectorPathAnimatorQPtr mParentPath;
 
-    bool mSeparateNodePoint = false;
     NodePoint *mNextPoint = nullptr;
     NodePoint *mPreviousPoint = nullptr;
-    CtrlPoint *mStartCtrlPt = nullptr;
-    CtrlPoint *mEndCtrlPt = nullptr;
+    CtrlPointSPtr mStartCtrlPt;
+    CtrlPointSPtr mEndCtrlPt;
+
     void ctrlPointPosChanged(CtrlPoint *pointChanged,
                              CtrlPoint *pointToUpdate);
 };

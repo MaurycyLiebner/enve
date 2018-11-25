@@ -221,7 +221,7 @@ namespace fmt_filters
         void gray(const image &im);
 
         // desat = [0.0; 1.0]
-        void desaturate(const image &im, float desat);
+        void desaturate(const image &im, qreal desat);
 
         // threshold = [0; 255]
         void threshold(const image &im, unsigned int threshold);

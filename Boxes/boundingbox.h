@@ -20,6 +20,7 @@
 #include "boundingboxrenderdata.h"
 
 #include "renderdatahandler.h"
+#include "sharedpointerdefs.h"
 
 class Canvas;
 
@@ -56,14 +57,12 @@ class VectorPath;
 class DurationRectangle;
 class BoxesGroupRenderData;
 
-struct FunctionWaitingForBoxLoad {
-    FunctionWaitingForBoxLoad(const int &boxIdT) {
-        loadBoxId = boxIdT;
-    }
-    virtual ~FunctionWaitingForBoxLoad() {}
-
+struct FunctionWaitingForBoxLoad : public StdSelfRef {
     virtual void boxLoaded(BoundingBox *box) = 0;
     int loadBoxId;
+
+protected:
+    FunctionWaitingForBoxLoad(const int &boxIdT);
 };
 
 class BoundingBoxMimeData : public QMimeData {
@@ -87,14 +86,15 @@ private:
 
 class BoundingBox : public ComplexAnimator {
     Q_OBJECT
+    friend class SelfRef;
 public:
 
     BoundingBox(const BoundingBoxType &type);
     virtual ~BoundingBox();
 
-    virtual BoundingBox *createLink();
-    virtual BoundingBox *createLinkForLinkGroup() {
-        BoundingBox *box = createLink();
+    virtual BoundingBoxQSPtr createLink();
+    virtual BoundingBoxQSPtr createLinkForLinkGroup() {
+        BoundingBoxQSPtr box = createLink();
         box->clearEffects();
         return box;
     }
@@ -155,15 +155,15 @@ public:
     void setZListIndex(const int &z,
                        const bool &saveUndoRedo = true);
 
-    virtual void selectAndAddContainedPointsToList(const QRectF &,
-                                                   QList<MovablePoint*> *) {}
+    virtual void selectAndAddContainedPointsToList(
+            const QRectF &, QList<MovablePoint*>&) {}
 
     QPointF getPivotAbsPos();
     virtual void select();
     void deselect();
     int getZIndex();
     virtual void drawBoundingRectSk(SkCanvas *canvas,
-                                    const qreal &invScale);
+                                    const SkScalar &invScale);
 
     virtual void setParentGroup(BoxesGroup *parent);
     virtual void setParent(BasicTransformAnimator *parent);
@@ -275,8 +275,8 @@ public:
 
 
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
-    void addEffect(PixmapEffect *effect);
-    void removeEffect(PixmapEffect *effect);
+    void addEffect(const PixmapEffectQSPtr &effect);
+    void removeEffect(const PixmapEffectQSPtr &effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
     virtual const SkBlendMode &getBlendMode() {
@@ -308,7 +308,7 @@ public:
 
     bool SWT_isBoundingBox() { return true; }
 
-    SingleWidgetAbstraction *SWT_getAbstractionForWidget(
+    SingleWidgetAbstractionSPtr SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
@@ -340,7 +340,7 @@ public:
 
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
-                           const qreal &invScale);
+                           const SkScalar &invScale);
 
     virtual void applyPaintSetting(
             const PaintSetting &setting) {
@@ -359,13 +359,12 @@ public:
 
     bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
-                                    const qreal &relX,
-                                    const int &minViewedFrame,
-                                    const qreal &pixelsPerFrame);
+            const int &relX, const int &minViewedFrame,
+            const qreal &pixelsPerFrame);
 
 //    int prp_getParentFrameShift() const;
 
-    void setDurationRectangle(DurationRectangle *durationRect);
+    void setDurationRectangle(const DurationRectangleQSPtr &durationRect);
 
     bool isVisibleAndInVisibleDurationRect();
     void incUsedAsTarget();
@@ -383,12 +382,12 @@ public:
                       const qreal &drawY,
                       const int &startFrame,
                       const int &endFrame);
-    virtual void addPathEffect(PathEffect *) {}
-    virtual void addFillPathEffect(PathEffect *) {}
-    virtual void addOutlinePathEffect(PathEffect *) {}
-    virtual void removePathEffect(PathEffect *) {}
-    virtual void removeFillPathEffect(PathEffect *) {}
-    virtual void removeOutlinePathEffect(PathEffect *) {}
+    virtual void addPathEffect(const PathEffectQSPtr&) {}
+    virtual void addFillPathEffect(const PathEffectQSPtr&) {}
+    virtual void addOutlinePathEffect(const PathEffectQSPtr&) {}
+    virtual void removePathEffect(const PathEffectQSPtr&) {}
+    virtual void removeFillPathEffect(const PathEffectQSPtr&) {}
+    virtual void removeOutlinePathEffect(const PathEffectQSPtr&) {}
 
     virtual void addActionsToMenu(QMenu *) {}
     virtual bool handleSelectedCanvasAction(QAction *) {
@@ -396,7 +395,7 @@ public:
     }
 
     virtual void setupBoundingBoxRenderDataForRelFrameF(
-            const qreal &relFrame, const BoundingBoxRenderDataSPtr& data);
+            const qreal &relFrame, BoundingBoxRenderData *data);
 
     virtual BoundingBoxRenderDataSPtr createRenderData() { return nullptr; }
 
@@ -407,11 +406,11 @@ public:
 
     bool prp_differencesBetweenRelFramesIncludingInherited(
             const int &relFrame1, const int &relFrame2);
-    virtual void renderDataFinished(const BoundingBoxRenderDataSPtr &renderData);
-    void updateRelBoundingRectFromRenderData(const BoundingBoxRenderDataSPtr& renderData);
+    virtual void renderDataFinished(BoundingBoxRenderData *renderData);
+    void updateRelBoundingRectFromRenderData(BoundingBoxRenderData *renderData);
 
     virtual void updateCurrentPreviewDataFromRenderData(
-            const BoundingBoxRenderDataSPtr& renderData);
+            BoundingBoxRenderData* renderData);
     virtual bool shouldScheduleUpdate() {
         if(mParentGroup == nullptr) return false;
         if((isVisibleAndInVisibleDurationRect()) ||
@@ -421,14 +420,14 @@ public:
         return false;
     }
 
-//    BoundingBoxRenderDataSPtr getCurrentRenderData() {
+//    BoundingBoxRenderData *getCurrentRenderData() {
 //        return getCurrentRenderData(anim_mCurrentRelFrame);
 //    }
-    BoundingBoxRenderDataSPtr getCurrentRenderData(const int &relFrame);
-//    BoundingBoxRenderDataSPtr updateCurrentRenderData() {
+    BoundingBoxRenderData *getCurrentRenderData(const int &relFrame);
+//    BoundingBoxRenderData *updateCurrentRenderData() {
 //        return updateCurrentRenderData(anim_mCurrentRelFrame);
 //    }
-    BoundingBoxRenderDataSPtr updateCurrentRenderData(const int& relFrame,
+    BoundingBoxRenderData *updateCurrentRenderData(const int& relFrame,
                                                       const UpdateReason &reason);
     void nullifyCurrentRenderData(const int& relFrame);
     virtual bool isRelFrameInVisibleDurationRect(const int &relFrame);
@@ -460,26 +459,25 @@ public:
     }
 
     static BoundingBox *getLoadedBoxById(const int &loadId) {
-        foreach(BoundingBox *box, mLoadedBoxes) {
+        foreach(const BoundingBoxQSPtr& box, mLoadedBoxes) {
             if(box->getLoadId() == loadId) {
-                return box;
+                return box.get();
             }
         }
         return nullptr;
     }
 
     static void addFunctionWaitingForBoxLoad(FunctionWaitingForBoxLoad *func) {
-        mFunctionsWaitingForBoxLoad << func;
+        mFunctionsWaitingForBoxLoad << func->ref<FunctionWaitingForBoxLoad>();
     }
 
     static void addLoadedBox(BoundingBox *box) {
-        mLoadedBoxes << box;
+        mLoadedBoxes << box->ref<BoundingBox>();
         for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
-            FunctionWaitingForBoxLoad *funcT =
+            FunctionWaitingForBoxLoadSPtr funcT =
                     mFunctionsWaitingForBoxLoad.at(i);
             if(funcT->loadBoxId == box->getLoadId()) {
                 funcT->boxLoaded(box);
-                delete funcT;
                 mFunctionsWaitingForBoxLoad.removeAt(i);
                 i--;
             }
@@ -491,15 +489,10 @@ public:
     }
 
     static void clearLoadedBoxes() {
-        foreach(BoundingBox *box, mLoadedBoxes) {
+        foreach(const BoundingBoxQSPtr& box, mLoadedBoxes) {
             box->clearBoxLoadId();
         }
         mLoadedBoxes.clear();
-        foreach(FunctionWaitingForBoxLoad *funcT,
-                mFunctionsWaitingForBoxLoad) {
-            delete funcT;
-        }
-
         mFunctionsWaitingForBoxLoad.clear();
     }
 
@@ -523,7 +516,7 @@ public:
 
     int prp_getRelFrameShift() const;
     virtual void setupEffectsF(const qreal &relFrame,
-                               const BoundingBoxRenderDataSPtr& data);
+                               BoundingBoxRenderData* data);
 
     void addLinkingBox(BoundingBox *box) {
         mLinkingBoxes << box;
@@ -533,11 +526,10 @@ public:
         mLinkingBoxes.removeOne(box);
     }
 
-    const QList<BoundingBox*> &getLinkingBoxes() const {
+    const QList<BoundingBoxQPtr> &getLinkingBoxes() const {
         return mLinkingBoxes;
     }
 
-    Property *ca_getFirstDescendantWithName(const QString &name);
     EffectAnimators *getEffectsAnimators() {
         return mEffectsAnimators.data();
     }
@@ -570,65 +562,58 @@ public:
     void moveMaxFrame(const int &dFrame);
 
     DurationRectangle *getDurationRectangle() {
-        return mDurationRectangle;
+        return mDurationRectangle.get();
     }
 protected:
-    virtual void getMotionBlurProperties(QList<Property*> *list) {
-        list->append(mTransformAnimator->getScaleAnimator());
-        list->append(mTransformAnimator->getPosAnimator());
-        list->append(mTransformAnimator->getPivotAnimator());
-        list->append(mTransformAnimator->getRotAnimator());
+    virtual void getMotionBlurProperties(QList<Property*>& list) {
+        list.append(mTransformAnimator->getScaleAnimator());
+        list.append(mTransformAnimator->getPosAnimator());
+        list.append(mTransformAnimator->getPivotAnimator());
+        list.append(mTransformAnimator->getRotAnimator());
     }
-    int mExpiredPixmap = 0;
-    QPointF mSavedTransformPivot;
+
     bool mSelected = false;
-    int mNReasonsNotToApplyUglyTransform = 0;
-    QList<BoundingBox*> mChildBoxes;
-    QList<BoundingBox*> mLinkingBoxes;
-    QList<std::shared_ptr<_ScheduledExecutor> > mSchedulers;
-    RenderDataHandler mCurrentRenderDataHandler;
-
-
-    int mLoadId = -1;
-
     bool mBlockedSchedule = false;
-
-    DurationRectangle *mDurationRectangle = nullptr;
-    SingleWidgetAbstraction *mSelectedAbstraction = nullptr;
-    SingleWidgetAbstraction *mTimelineAbstraction = nullptr;
-
-    QPointF mPreviewDrawPos;
-    QRectF mRelBoundingRect;
-    SkRect mRelBoundingRectSk;
-
-    RenderContainer mDrawRenderContainer;
-
     bool mUpdateDrawOnParentBox = true;
-
-    SkPath mSkRelBoundingRectPath;
-
-    void setType(const BoundingBoxType &type) { mType = type; }
-    BoundingBoxType mType;
-    BoxesGroup *mParentGroup = nullptr;
-    BasicTransformAnimator *mParentTransform = nullptr;
-
-    QSharedPointer<EffectAnimators> mEffectsAnimators;
-
-    QSharedPointer<BoxTransformAnimator> mTransformAnimator;
-
-    int mZListIndex = 0;
-    bool mPivotAutoAdjust = true; // !!! pivot autoadjust disabled
-
-    SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;
-
-    void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);
-
+    bool mPivotAutoAdjust = true;
     bool mVisible = true;
     bool mLocked = false;
 
-    static QList<BoundingBox*> mLoadedBoxes;
-    static QList<FunctionWaitingForBoxLoad*> mFunctionsWaitingForBoxLoad;
+    int mZListIndex = 0;
+    int mNReasonsNotToApplyUglyTransform = 0;
+    int mExpiredPixmap = 0;
+    int mLoadId = -1;
 
+    BoundingBoxType mType;
+    SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;
+
+    QPointF mSavedTransformPivot;
+    QPointF mPreviewDrawPos;
+
+    QRectF mRelBoundingRect;
+    SkRect mRelBoundingRectSk;
+    SkPath mSkRelBoundingRectPath;
+
+    BoxesGroupQPtr mParentGroup;
+    BasicTransformAnimatorQPtr mParentTransform;
+
+    QList<BoundingBoxQPtr> mChildBoxes;
+    QList<BoundingBoxQPtr> mLinkingBoxes;
+
+    RenderDataHandler mCurrentRenderDataHandler;
+    RenderContainer mDrawRenderContainer;
+
+    DurationRectangleQSPtr mDurationRectangle;
+
+    QSharedPointer<EffectAnimators> mEffectsAnimators;
+    BoxTransformAnimatorQSPtr mTransformAnimator;
+
+    QList<_ScheduledExecutorSPtr> mSchedulers;
+
+    static QList<BoundingBoxQSPtr> mLoadedBoxes;
+    static QList<FunctionWaitingForBoxLoadSPtr> mFunctionsWaitingForBoxLoad;
+private:
+    void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);
 signals:
     void nameChanged(QString);
     void scheduledUpdate();

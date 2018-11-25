@@ -121,7 +121,7 @@ public:
     void replaceClipboard(ClipboardContainer *container);
     ClipboardContainer *getClipboardContainer(
             const ClipboardContainerType &type);
-    void addCanvas(Canvas *newCanvas);
+    void addCanvas(const CanvasQSPtr &newCanvas);
 
     Gradient *getLoadedGradientById(const int &id);
     void clearLoadedGradientsList();

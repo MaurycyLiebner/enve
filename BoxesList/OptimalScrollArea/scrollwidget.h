@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "minimalscrollwidget.h"
+#include "sharedpointerdefs.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
 class SingleWidgetAbstraction;
@@ -14,7 +15,7 @@ class ScrollArea;
 class ScrollWidget : public MinimalScrollWidget {
     Q_OBJECT
 public:
-    explicit ScrollWidget(ScrollArea *parent = 0);
+    explicit ScrollWidget(ScrollArea *parent = nullptr);
 
     void updateHeight();
     void setMainTarget(SingleWidgetTarget *target);
@@ -27,8 +28,8 @@ private slots:
 protected:
     int mContentHeight = 0;
     virtual void createVisiblePartWidget();
-    SingleWidgetTarget *mMainTarget = nullptr;
-    SingleWidgetAbstraction *mMainAbstraction = nullptr;
+    SingleWidgetTargetQSPtr mMainTarget;
+    SingleWidgetAbstractionSPtr mMainAbstraction;
     ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;
 };
 

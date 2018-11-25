@@ -14,19 +14,15 @@ class NodePoint;
 
 class AnimatorUpdater;
 
-class PointAnimator :
-    public QPointFAnimator,
-    public MovablePoint {
-public:
-    PointAnimator(BasicTransformAnimator *parent,
-                 const MovablePointType &type,
-                 const qreal &radius = 5.);
+class QPointFAnimator;
 
-    ~PointAnimator() {}
+class PointAnimatorMovablePoint : public MovablePoint {
+    friend class StdSelfRef;
+public:
+    ~PointAnimatorMovablePoint() {}
 
     void startTransform();
     void finishTransform();
-
 
     QPointF getRelativePos() const;
 
@@ -44,10 +40,15 @@ public:
 
     virtual void applyTransform(const QMatrix &transform);
 
-    void removeAnimations();
-
     virtual QPointF getRelativePosAtRelFrame(const int &frame) const;
 protected:
+    PointAnimatorMovablePoint(
+            QPointFAnimator* associatedAnimator,
+            BasicTransformAnimator *parentTransform,
+            const MovablePointType &type,
+            const qreal &radius = 5.);
+
+    const QPointFAnimatorQSPtr mAssociatedAnimator_k;
 };
 
 #endif // POINTANIMATOR_H

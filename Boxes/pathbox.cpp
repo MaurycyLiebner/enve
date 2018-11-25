@@ -17,52 +17,47 @@ PathBox::PathBox(const BoundingBoxType &type) :
             ref<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setBlockedUpdater(
-                new NodePointUpdater(this));
+                SPtrCreate(NodePointUpdater)(this));
 
     mFillPathEffectsAnimators =
             (new PathEffectAnimators(false, true, this))->
             ref<PathEffectAnimators>();
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setBlockedUpdater(
-                new NodePointUpdater(this));
+                SPtrCreate(NodePointUpdater)(this));
 
     mOutlinePathEffectsAnimators =
             (new PathEffectAnimators(true, false, this))->
             ref<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
-                new NodePointUpdater(this));
+                SPtrCreate(NodePointUpdater)(this));
 
 //    mPathEffectsAnimators->prp_setName("path effects");
 //    mPathEffectsAnimators->prp_setBlockedUpdater(
-//                new PixmapEffectUpdater(this));
+//                SPtrCreate(PixmapEffectUpdater)(this));
 
 //    mOutlinePathEffectsAnimators->prp_setName("outline path effects");
 //    mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
-//                new PixmapEffectUpdater(this));
+//                SPtrCreate(PixmapEffectUpdater)(this));
 
-    mStrokeGradientPoints =
-            (new GradientPoints)->ref<GradientPoints>();
-    mFillGradientPoints =
-            (new GradientPoints)->ref<GradientPoints>();
-    mFillSettings->setTargetPathBox(this);
-    mStrokeSettings->setTargetPathBox(this);
-    ca_addChildAnimator(mFillSettings.data());
-    ca_addChildAnimator(mStrokeSettings.data());
+    mStrokeGradientPoints = SPtrCreate(GradientPoints)(this);
+    mFillGradientPoints = SPtrCreate(GradientPoints)(this);
+    mFillSettings = SPtrCreate(PaintSettings)(this);
+    mStrokeSettings = SPtrCreate(StrokeSettings)(this);
+    ca_addChildAnimator(mFillSettings);
+    ca_addChildAnimator(mStrokeSettings);
     ca_moveChildAbove(mEffectsAnimators.data(),
                       mStrokeSettings.data(),
                       false);
-    ca_addChildAnimator(mPathEffectsAnimators.data());
-    ca_addChildAnimator(mFillPathEffectsAnimators.data());
-    ca_addChildAnimator(mOutlinePathEffectsAnimators.data());
-
-    mFillGradientPoints->initialize(this);
-    mStrokeGradientPoints->initialize(this);
+    ca_addChildAnimator(mPathEffectsAnimators);
+    ca_addChildAnimator(mFillPathEffectsAnimators);
+    ca_addChildAnimator(mOutlinePathEffectsAnimators);
 
     mFillGradientPoints->prp_setBlockedUpdater(
-                new GradientPointsUpdater(true, this));
+                SPtrCreate(GradientPointsUpdater)(true, this));
     mStrokeGradientPoints->prp_setBlockedUpdater(
-                new GradientPointsUpdater(false, this));
+                SPtrCreate(GradientPointsUpdater)(false, this));
 
     mFillSettings->setGradientPoints(mFillGradientPoints.data());
     mStrokeSettings->setGradientPoints(mStrokeGradientPoints.data());
@@ -78,21 +73,6 @@ PathBox::~PathBox() {
     if(mStrokeSettings->getGradient() != nullptr) {
         mStrokeSettings->getGradient()->removePath(this);
     }
-}
-
-Property *PathBox::ca_getFirstDescendantWithName(const QString &name) {
-    Property *propT = BoundingBox::ca_getFirstDescendantWithName(name);
-    if(propT != nullptr) return propT;
-    if(name == mOutlinePathEffectsAnimators->prp_getName()) {
-        return mOutlinePathEffectsAnimators.data();
-    }
-    if(name == mFillPathEffectsAnimators->prp_getName()) {
-        return mFillPathEffectsAnimators.data();
-    }
-    if(name == mPathEffectsAnimators->prp_getName()) {
-        return mPathEffectsAnimators.data();
-    }
-    return nullptr;
 }
 
 void PathBox::drawSelectedSk(SkCanvas *canvas,
@@ -114,7 +94,7 @@ void PathBox::drawSelectedSk(SkCanvas *canvas,
 
 void PathBox::setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            const BoundingBoxRenderDataSPtr& data) {
+                            BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
                                                         data);
 
@@ -201,7 +181,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     UpdatePaintSettings *fillSettings = &pathData->paintSettings;
 
     fillSettings->paintColor = mFillSettings->
-            getColorAtRelFrameF(relFrame).qcol;
+            getColorAtRelFrameF(relFrame);
     fillSettings->paintType = mFillSettings->getPaintType();
     Gradient *grad = mFillSettings->getGradient();
     if(grad != nullptr) {
@@ -215,7 +195,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
 
     UpdateStrokeSettings *strokeSettings = &pathData->strokeSettings;
     strokeSettings->paintColor = mStrokeSettings->
-            getColorAtRelFrameF(relFrame).qcol;
+            getColorAtRelFrameF(relFrame);
     strokeSettings->paintType = mStrokeSettings->getPaintType();
     grad = mStrokeSettings->getGradient();
     if(grad != nullptr) {
@@ -229,9 +209,9 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
-                                     const CanvasMode &currentCanvasMode,
-                                     const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = nullptr;
+                                        const CanvasMode &currentCanvasMode,
+                                        const qreal &canvasScaleInv) {
+    MovablePoint* pointToReturn = nullptr;
     if(currentCanvasMode == MOVE_POINT) {
         pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
                                                               canvasScaleInv);
@@ -240,7 +220,8 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
                                                                 canvasScaleInv);
         }
     } else if(currentCanvasMode == MOVE_PATH) {
-        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
+        MovablePoint* pivotMovable =
+                mTransformAnimator->getPivotMovablePoint();
         if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return pivotMovable;
         }
@@ -249,13 +230,13 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void PathBox::drawBoundingRectSk(SkCanvas *canvas,
-                                 const qreal &invScale) {
+                                 const SkScalar &invScale) {
     BoundingBox::drawBoundingRectSk(canvas, invScale);
     drawAsBoundingRectSk(canvas, mEditPathSk, invScale, false);
 }
 
-void PathBox::addPathEffect(PathEffect *effect) {
-    //effect->setUpdater(new PixmapEffectUpdater(this));
+void PathBox::addPathEffect(const PathEffectQSPtr& effect) {
+    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
 
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         incReasonsNotToApplyUglyTransform();
@@ -269,8 +250,8 @@ void PathBox::addPathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
-void PathBox::addFillPathEffect(PathEffect *effect) {
-    //effect->setUpdater(new PixmapEffectUpdater(this));
+void PathBox::addFillPathEffect(const PathEffectQSPtr& effect) {
+    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         incReasonsNotToApplyUglyTransform();
     }
@@ -283,8 +264,8 @@ void PathBox::addFillPathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
-void PathBox::addOutlinePathEffect(PathEffect *effect) {
-    //effect->setUpdater(new PixmapEffectUpdater(this));
+void PathBox::addOutlinePathEffect(const PathEffectQSPtr& effect) {
+    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         incReasonsNotToApplyUglyTransform();
     }
@@ -297,7 +278,7 @@ void PathBox::addOutlinePathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
-void PathBox::removePathEffect(PathEffect *effect) {
+void PathBox::removePathEffect(const PathEffectQSPtr& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -309,7 +290,7 @@ void PathBox::removePathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
-void PathBox::removeFillPathEffect(PathEffect *effect) {
+void PathBox::removeFillPathEffect(const PathEffectQSPtr& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -321,7 +302,7 @@ void PathBox::removeFillPathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
-void PathBox::removeOutlinePathEffect(PathEffect *effect) {
+void PathBox::removeOutlinePathEffect(const PathEffectQSPtr& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -412,11 +393,11 @@ SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame) {
 }
 
 
-void PathBox::getMotionBlurProperties(QList<Property*> *list) {
+void PathBox::getMotionBlurProperties(QList<Property *> &list) {
     BoundingBox::getMotionBlurProperties(list);
-    list->append(mPathEffectsAnimators.data());
-    list->append(mFillPathEffectsAnimators.data());
-    list->append(mOutlinePathEffectsAnimators.data());
+    list.append(mPathEffectsAnimators.get());
+    list.append(mFillPathEffectsAnimators.get());
+    list.append(mOutlinePathEffectsAnimators.get());
 }
 
 SkPath PathBox::getPathWithEffectsUntilGroupSumAtRelFrameF(const qreal &relFrame) {
@@ -582,10 +563,10 @@ void PathBox::updateFillDrawGradient() {
 
         mFillGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                        gradient->getLastQGradientStopQColor());
-        if(!mFillGradientPoints->enabled) {
+        if(!mFillGradientPoints->enabled()) {
             mFillGradientPoints->enable();
         }
-    } else if(mFillGradientPoints->enabled) {
+    } else if(mFillGradientPoints->enabled()) {
         mFillGradientPoints->disable();
     }
 }
@@ -597,10 +578,10 @@ void PathBox::updateStrokeDrawGradient() {
         mStrokeGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                          gradient->getLastQGradientStopQColor() );
 
-        if(!mStrokeGradientPoints->enabled) {
+        if(!mStrokeGradientPoints->enabled()) {
             mStrokeGradientPoints->enable();
         }
-    } else if(mStrokeGradientPoints->enabled) {
+    } else if(mStrokeGradientPoints->enabled()) {
         mStrokeGradientPoints->disable();
     }
 }

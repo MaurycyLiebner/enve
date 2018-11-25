@@ -13,7 +13,7 @@ public:
     void setSize(const ushort &width,
                  const ushort &height) {
         if(mTiles == nullptr) {
-            mTiles = (new TilesData(width, height, true))->ref<TilesData>();
+            mTiles = SPtrCreate(TilesData)(width, height, true);
         } else {
             mTiles->setSize(width, height);
         }

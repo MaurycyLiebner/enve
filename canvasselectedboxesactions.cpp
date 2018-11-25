@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "pathpivot.h"
 #include "Boxes/bone.h"
+#include "PixmapEffects/brusheffect.h"
 
 bool Canvas::prp_nextRelFrameWithKey(const int &relFrame,
                                      int &nextRelFrame) {
@@ -9,7 +10,7 @@ bool Canvas::prp_nextRelFrameWithKey(const int &relFrame,
     bool thisHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
                                                             thisNext);
     int minNextFrame = INT_MAX;
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxNext;
         if(box->prp_nextRelFrameWithKey(boxRelFrame, boxNext)) {
@@ -39,7 +40,7 @@ bool Canvas::prp_prevRelFrameWithKey(const int &relFrame,
     bool thisHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
                                                             thisPrev);
     int minPrevFrame = INT_MIN;
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxPrev;
         if(box->prp_prevRelFrameWithKey(boxRelFrame, boxPrev)) {
@@ -64,37 +65,37 @@ bool Canvas::prp_prevRelFrameWithKey(const int &relFrame,
 }
 
 void Canvas::shiftAllPointsForAllKeys(const int &by) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
-            ((VectorPath*)box)->shiftAllPointsForAllKeys(by);
+            SPtrGetAs(box, VectorPath)->shiftAllPointsForAllKeys(by);
         }
     }}
 
 void Canvas::revertAllPointsForAllKeys() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
-            ((VectorPath*)box)->revertAllPointsForAllKeys();
+            SPtrGetAs(box, VectorPath)->revertAllPointsForAllKeys();
         }
     }}
 
 void Canvas::shiftAllPoints(const int &by) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
-            ((VectorPath*)box)->shiftAllPoints(by);
+            SPtrGetAs(box, VectorPath)->shiftAllPoints(by);
         }
     }
 }
 
 void Canvas::revertAllPoints() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
-            ((VectorPath*)box)->revertAllPoints();
+            SPtrGetAs(box, VectorPath)->revertAllPoints();
         }
     }
 }
 
 void Canvas::flipSelectedBoxesHorizontally() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->startScaleTransform();
         box->scale(-1., 1.);
         box->finishTransform();
@@ -102,7 +103,7 @@ void Canvas::flipSelectedBoxesHorizontally() {
 }
 
 void Canvas::flipSelectedBoxesVertically() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->startScaleTransform();
         box->scale(1., -1.);
         box->finishTransform();
@@ -110,117 +111,118 @@ void Canvas::flipSelectedBoxesVertically() {
 }
 
 void Canvas::convertSelectedBoxesToPath() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->objectToVectorPathBox();
     }
 }
 
 void Canvas::convertSelectedPathStrokesToPath() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->strokeToVectorPathBox();
     }
 }
 
-void Canvas::setSelectedFontFamilyAndStyle(QString family, QString style) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+void Canvas::setSelectedFontFamilyAndStyle(
+        const QString& family, const QString& style) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->setSelectedFontFamilyAndStyle(family, style);
     }
 }
 
-void Canvas::setSelectedFontSize(qreal size) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+void Canvas::setSelectedFontSize(const qreal &size) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->setSelectedFontSize(size);
     }
 }
 
 void Canvas::applyBlurToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new BlurEffect());
     }
 }
 
 void Canvas::applySampledMotionBlurToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new SampledMotionBlurEffect(box));
     }
 }
 
 
 void Canvas::applyShadowToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new ShadowEffect());
     }
 }
-#include "PixmapEffects/brusheffect.h"
+
 void Canvas::applyBrushEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new BrushEffect());
     }
 }
 
 void Canvas::applyLinesEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new LinesEffect());
     }
 }
 
 void Canvas::applyCirclesEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new CirclesEffect());
     }
 }
 
 void Canvas::applySwirlEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new SwirlEffect());
     }
 }
 
 void Canvas::applyOilEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new OilEffect());
     }
 }
 
 void Canvas::applyImplodeEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new ImplodeEffect());
     }
 }
 
 void Canvas::applyDesaturateEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new DesaturateEffect());
     }
 }
 
 void Canvas::applyReplaceColorEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new ReplaceColorEffect());
     }
 }
 
 void Canvas::applyColorizeEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new ColorizeEffect());
     }
 }
 
 void Canvas::applyContrastEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new ContrastEffect());
     }
 }
 
 void Canvas::applyBrightnessEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->addEffect(new BrightnessEffect());
     }
 }
 
 #include "PathEffects/patheffect.h"
 void Canvas::applyDiscretePathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addPathEffect(new DisplacePathEffect(false));
         }
@@ -228,7 +230,7 @@ void Canvas::applyDiscretePathEffectToSelected() {
 }
 
 void Canvas::applyDuplicatePathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addPathEffect(new DuplicatePathEffect(false));
         }
@@ -236,7 +238,7 @@ void Canvas::applyDuplicatePathEffectToSelected() {
 }
 
 void Canvas::applyLengthPathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addPathEffect(new LengthPathEffect(false));
         }
@@ -244,7 +246,7 @@ void Canvas::applyLengthPathEffectToSelected() {
 }
 
 void Canvas::applySolidifyPathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addPathEffect(new SolidifyPathEffect(false));
         }
@@ -252,21 +254,21 @@ void Canvas::applySolidifyPathEffectToSelected() {
 }
 
 void Canvas::applySumPathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
         box->addPathEffect(new SumPathEffect((PathBox*)box, false));
     }
 }
 
 void Canvas::applyGroupSumPathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(!box->SWT_isBoxesGroup()) continue;
         box->addPathEffect(new GroupLastPathSumPathEffect((BoxesGroup*)box, false));
     }
 }
 
 void Canvas::applyDiscreteFillPathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addFillPathEffect(new DisplacePathEffect(false));
         }
@@ -274,7 +276,7 @@ void Canvas::applyDiscreteFillPathEffectToSelected() {
 }
 
 void Canvas::applyDuplicateFillPathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addFillPathEffect(new DuplicatePathEffect(false));
         }
@@ -282,7 +284,7 @@ void Canvas::applyDuplicateFillPathEffectToSelected() {
 }
 
 void Canvas::applySumFillPathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
         box->addFillPathEffect(new SumPathEffect((PathBox*)box, false));
     }
@@ -290,7 +292,7 @@ void Canvas::applySumFillPathEffectToSelected() {
 
 
 void Canvas::applyDiscreteOutlinePathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addOutlinePathEffect(new DisplacePathEffect(true));
         }
@@ -298,7 +300,7 @@ void Canvas::applyDiscreteOutlinePathEffectToSelected() {
 }
 
 void Canvas::applyDuplicateOutlinePathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {
             box->addOutlinePathEffect(new DuplicatePathEffect(true));
         }
@@ -306,28 +308,28 @@ void Canvas::applyDuplicateOutlinePathEffectToSelected() {
 }
 
 void Canvas::resetSelectedTranslation() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->resetTranslation();
     }
 }
 
 void Canvas::resetSelectedScale() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->resetScale();
     }
 }
 
 void Canvas::resetSelectedRotation() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->resetRotation();
     }
 }
 
-NodePoint *Canvas::createNewPointOnLineNearSelected(
+NodePoint* Canvas::createNewPointOnLineNearSelected(
                         const QPointF &absPos,
                         const bool &adjust,
                         const qreal &canvasScaleInv) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         NodePoint *point = box->createNewPointOnLineNear(absPos, adjust,
                                                          canvasScaleInv);
         if(point != nullptr) {
@@ -349,61 +351,61 @@ void Canvas::setDisplayedFillStrokeSettingsFromLastSelected() {
 
 void Canvas::applyPaintSettingToSelected(
         const PaintSetting &setting) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->applyPaintSetting(setting);
     }
 }
 
 void Canvas::setSelectedFillColorMode(const ColorMode &mode) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->setFillColorMode(mode);
     }
 }
 
 void Canvas::setSelectedStrokeColorMode(const ColorMode &mode) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->setStrokeColorMode(mode);
     }
 }
 
-void Canvas::setSelectedCapStyle(Qt::PenCapStyle capStyle) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+void Canvas::setSelectedCapStyle(const Qt::PenCapStyle &capStyle) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
-void Canvas::setSelectedJoinStyle(Qt::PenJoinStyle joinStyle) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+void Canvas::setSelectedJoinStyle(const Qt::PenJoinStyle joinStyle) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
 }
 
-void Canvas::setSelectedStrokeWidth(qreal strokeWidth, const bool &finish) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+void Canvas::setSelectedStrokeWidth(const qreal &strokeWidth, const bool &finish) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->setStrokeWidth(strokeWidth, finish);
     }
 }
 
 void Canvas::startSelectedStrokeWidthTransform() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->startSelectedStrokeWidthTransform();
     }
 }
 
 void Canvas::startSelectedStrokeColorTransform() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->startSelectedStrokeColorTransform();
     }
 }
 
 void Canvas::startSelectedFillColorTransform() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->startSelectedFillColorTransform();
     }
 }
 
 VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->isSelected() ) {
             VectorPathEdge *pathEdge = box->getEdge(absPos,
                                                     1./mCanvasTransformMatrix.m11());
@@ -416,13 +418,13 @@ VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
 
 void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {
     if(mLocalPivot) {
-        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             box->startRotTransform();
             box->rotateBy(rotBy);
             box->finishTransform();
         }
     } else {
-        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             box->startRotTransform();
             box->startPosTransform();
             box->saveTransformPivotAbsPos(mRotPivot->getAbsolutePos());
@@ -438,25 +440,25 @@ void Canvas::rotateSelectedBy(const qreal &rotBy,
     if(mSelectedBones.isEmpty()) {
         if(mLocalPivot) {
             if(startTrans) {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->startRotTransform();
                     box->rotateBy(rotBy);
                 }
             } else {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->rotateBy(rotBy);
                 }
             }
         } else {
             if(startTrans) {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->startRotTransform();
                     box->startPosTransform();
                     box->saveTransformPivotAbsPos(absOrigin);
                     box->rotateRelativeToSavedPivot(rotBy);
                 }
             } else {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->rotateRelativeToSavedPivot(rotBy);
                 }
             }
@@ -490,31 +492,32 @@ void Canvas::rotateSelectedBy(const qreal &rotBy,
     }
 }
 
-void Canvas::scaleSelectedBy(qreal scaleBy,
-                             QPointF absOrigin,
-                             bool startTrans) {
+void Canvas::scaleSelectedBy(const qreal &scaleBy,
+                             const QPointF &absOrigin,
+                             const bool &startTrans) {
     scaleSelectedBy(scaleBy, scaleBy,
                     absOrigin, startTrans);
 }
 
-void Canvas::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
-                                 QPointF absOrigin,
-                                 bool startTrans) {
+void Canvas::scaleSelectedBy(const qreal& scaleXBy,
+                             const qreal& scaleYBy,
+                             const QPointF& absOrigin,
+                             const bool& startTrans) {
     if(mSelectedBones.isEmpty()) {
         if(mLocalPivot) {
             if(startTrans) {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->startScaleTransform();
                     box->scale(scaleXBy, scaleYBy);
                 }
             } else {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->scale(scaleXBy, scaleYBy);
                 }
             }
         } else {
             if(startTrans) {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->startScaleTransform();
                     box->startPosTransform();
                     box->saveTransformPivotAbsPos(absOrigin);
@@ -522,7 +525,7 @@ void Canvas::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
                                                    scaleYBy);
                 }
             } else {
-                Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+                Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     box->scaleRelativeToSavedPivot(scaleXBy,
                                                    scaleYBy);
                 }
@@ -563,7 +566,7 @@ QPointF Canvas::getSelectedBoxesAbsPivotPos() {
     if(mSelectedBoxes.isEmpty()) return QPointF(0., 0.);
     QPointF posSum = QPointF(0., 0.);
     int count = mSelectedBoxes.length();
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         posSum += box->getPivotAbsPos();
     }
     return posSum/count;
@@ -574,7 +577,7 @@ bool Canvas::isSelectionEmpty() {
 }
 
 void Canvas::ungroupSelectedBoxes() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isBoxesGroup()) {
             ((BoxesGroup*) box)->ungroup();
         }
@@ -582,13 +585,13 @@ void Canvas::ungroupSelectedBoxes() {
 }
 
 void Canvas::centerPivotForSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->centerPivotPosition(true);
     }
 }
 
 void Canvas::removeSelectedBoxesAndClearList() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         //box->deselect();
         box->removeFromParent();
     }
@@ -638,7 +641,7 @@ void Canvas::clearBonesSelection() {
 }
 
 void Canvas::clearBoxesSelection() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
@@ -651,12 +654,12 @@ void Canvas::clearBoxesSelection() {
 
 
 void Canvas::applyCurrentTransformationToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->applyCurrentTransformation();
     }
 }
 
-bool zLessThan(BoundingBox *box1, BoundingBox *box2) {
+bool zLessThan(BoundingBox *box1, const BoundingBoxQSPtr& box2) {
     return box1->getZIndex() > box2->getZIndex();
 }
 
@@ -665,20 +668,20 @@ void Canvas::sortSelectedBoxesByZAscending() {
 }
 
 void Canvas::raiseSelectedBoxesToTop() {
-    BoundingBox *box;
+    const BoundingBoxQSPtr& box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
         box->bringToFront();
     }
 }
 
 void Canvas::lowerSelectedBoxesToBottom() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->bringToEnd();
     }
 }
 
 void Canvas::lowerSelectedBoxes() {
-    BoundingBox *box;
+    const BoundingBoxQSPtr& box;
     int lastZ = -10000;
     bool lastBoxChanged = true;
     Q_FOREACHInverted(box, mSelectedBoxes) {
@@ -694,7 +697,7 @@ void Canvas::lowerSelectedBoxes() {
 void Canvas::raiseSelectedBoxes() {
     int lastZ = -10000;
     bool lastBoxChanged = true;
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         int boxZ = box->getZIndex();
         if(boxZ + 1 != lastZ || lastBoxChanged) {
             box->moveUp();
@@ -705,7 +708,7 @@ void Canvas::raiseSelectedBoxes() {
 }
 
 void Canvas::deselectAllBoxes() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         removeBoxFromSelection(box);
     }
 }
@@ -721,7 +724,7 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
             return mRotPivot;
         }
         MovablePoint *pointAtPos = nullptr;
-        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             pointAtPos = box->getPointAtAbsPos(absPos,
                                                currentMode,
                                                canvasScaleInv);
@@ -736,7 +739,7 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
 
 void Canvas::finishSelectedBoxesTransform() {
     if(mSelectedBones.isEmpty()) {
-        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             box->finishTransform();
         }
     } else {
@@ -748,7 +751,7 @@ void Canvas::finishSelectedBoxesTransform() {
 
 void Canvas::cancelSelectedBoxesTransform() {
     if(mSelectedBones.isEmpty()) {
-        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             box->cancelTransform();
         }
     } else {
@@ -761,12 +764,12 @@ void Canvas::cancelSelectedBoxesTransform() {
 void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
                                     const bool &startTransform) {
     if(startTransform) {
-        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             box->startPosTransform();
             box->moveByAbs(by);
         }
     } else {
-        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             box->moveByAbs(by);
         }
     }
@@ -791,7 +794,7 @@ void Canvas::moveSelectedBonesByAbs(const QPointF &by,
 //    QPointF posSum = QPointF(0., 0.);
 //    if(mChildren.isEmpty()) return posSum;
 //    int count = mChildren.length();
-//    Q_FOREACH(BoundingBox *box, mChildren) {
+//    Q_FOREACH(const BoundingBoxQSPtr& box, mChildren) {
 //        posSum += box->getPivotAbsPos();
 //    }
 //    return mapAbsPosToRel(posSum/count);
@@ -799,7 +802,7 @@ void Canvas::moveSelectedBonesByAbs(const QPointF &by,
 
 #include "Boxes/linkbox.h"
 void Canvas::createLinkBoxForSelected() {
-    Q_FOREACH(BoundingBox *selectedBox, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQSPtr& selectedBox, mSelectedBoxes) {
         mCurrentBoxesGroup->addContainedBox(selectedBox->createLink());
     }
 }
@@ -811,10 +814,10 @@ void Canvas::duplicateSelectedBoxes() {
     QBuffer target(container->getBytesArray());
     target.open(QIODevice::WriteOnly);
     int nBoxes = mSelectedBoxes.count();
-    target.write((char*)&nBoxes, sizeof(int));
+    target.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
 
     qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }
     target.close();
@@ -827,7 +830,7 @@ void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) return;
     BoxesGroup *newGroup = new BoxesGroup();
     mCurrentBoxesGroup->addContainedBox(newGroup);
-    BoundingBox *box;
+    const BoundingBoxQSPtr& box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
         QSharedPointer<BoundingBox> boxSP = box->ref<BoundingBox>();
         box->removeFromParent();
@@ -848,7 +851,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
     FullVectorPath *addToPath = nullptr;
     FullVectorPath *addedPath = nullptr;
 
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox()) {
             SkPath boxPath = ((PathBox*)box)->getRelativePath();
             boxPath.transform(QMatrixToSkMatrix(box->getRelativeTransformAtCurrentFrame()));
@@ -918,7 +921,7 @@ void Canvas::selectedPathsExclusion() {
 void Canvas::selectedPathsCombine() {
     if(mSelectedBoxes.isEmpty()) return;
     VectorPath *firstVectorPath = nullptr;
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
             firstVectorPath = (VectorPath*)box;
             break;
@@ -929,7 +932,7 @@ void Canvas::selectedPathsCombine() {
         addContainedBox(firstVectorPath);
     }
     QMatrix firstTranf = firstVectorPath->getCombinedTransform();
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPathBox()) {
             if(box->SWT_isVectorPath()) {
                 if(box == firstVectorPath) continue;
@@ -955,7 +958,7 @@ void Canvas::selectedPathsCombine() {
 
 void Canvas::selectedPathsBreakApart() {
     if(mSelectedBoxes.isEmpty()) return;
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
             ((VectorPath*)box)->breakPathsApart();
         }

@@ -10,32 +10,32 @@
 RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
                                            const int &lastFrame) {
     prp_setName("noise");
-    mPeriod = (new QrealAnimator())->ref<QrealAnimator>();
+    mPeriod = SPtrCreate(QrealAnimator)();
     mPeriod->prp_setName("period");
     mPeriod->qra_setValueRange(1., 999.);
     mPeriod->qra_setCurrentValue(10.);
-    mPeriod->prp_setBlockedUpdater(new RandomQrealGeneratorUpdater(this));
-    ca_addChildAnimator(mPeriod.data());
-    mSmoothness = (new QrealAnimator())->ref<QrealAnimator>();
+    mPeriod->prp_setBlockedUpdater(SPtrCreate(RandomQrealGeneratorUpdater)(this));
+    ca_addChildAnimator(mPeriod);
+    mSmoothness = SPtrCreate(QrealAnimator)();
     mSmoothness->prp_setName("smoothness");
     mSmoothness->qra_setValueRange(0., 1.);
-    ca_addChildAnimator(mSmoothness.data());
-    mMaxDev = (new QrealAnimator())->ref<QrealAnimator>();
+    ca_addChildAnimator(mSmoothness);
+    mMaxDev = SPtrCreate(QrealAnimator)();
     mMaxDev->prp_setName("amplitude");
     mMaxDev->qra_setValueRange(0., 999.);
-    ca_addChildAnimator(mMaxDev.data());
+    ca_addChildAnimator(mMaxDev);
     mType = (new ComboBoxProperty(QStringList() <<
                                   "add" << "subtract" << "overlay"))
             ->ref<ComboBoxProperty>();
     mType->prp_setName("type");
-    ca_addChildAnimator(mType.data());
+    ca_addChildAnimator(mType);
 
-    mSeedAssist = (new IntProperty())->ref<IntProperty>();
+    mSeedAssist = SPtrCreate(IntProperty)();
     mSeedAssist->prp_setName("seed");
     mSeedAssist->setValueRange(0, 9999);
     mSeedAssist->setCurrentValue(0);
-    ca_addChildAnimator(mSeedAssist.data());
-    mSeedAssist->prp_setBlockedUpdater(new RandomQrealGeneratorUpdater(this));
+    ca_addChildAnimator(mSeedAssist);
+    mSeedAssist->prp_setBlockedUpdater(SPtrCreate(RandomQrealGeneratorUpdater)(this));
 
     mFirstFrame = firstFrame;
     mLastFrame = lastFrame;

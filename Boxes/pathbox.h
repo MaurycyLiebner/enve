@@ -12,7 +12,6 @@ typedef QSharedPointer<GradientPoints> GradientPointsQSPtr;
 struct PathBoxRenderData : public BoundingBoxRenderData {
     PathBoxRenderData(BoundingBox *parentBoxT) :
         BoundingBoxRenderData(parentBoxT) {
-
     }
 
     SkPath editPath;
@@ -56,8 +55,8 @@ private:
 };
 
 class PathBox : public BoundingBox {
+    friend class SelfRef;
 public:
-    PathBox(const BoundingBoxType &type);
     ~PathBox();
 
     void resetStrokeGradientPointsPos();
@@ -110,15 +109,15 @@ public:
                                    const qreal &canvasScaleInv);
 
     void drawBoundingRectSk(SkCanvas *canvas,
-                            const qreal &invScale);
+                            const SkScalar &invScale);
 
     bool SWT_isPathBox() { return true; }
 
     void setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,
-                                const BoundingBoxRenderDataSPtr& data);
+                                BoundingBoxRenderData* data);
     BoundingBoxRenderDataSPtr createRenderData() {
-        return (new PathBoxRenderData(this))->ref<BoundingBoxRenderData>();
+        return SPtrCreate(PathBoxRenderData)(this);
     }
     void updateCurrentPreviewDataFromRenderData(
             const BoundingBoxRenderDataSPtr& renderData);
@@ -145,13 +144,12 @@ public:
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
-    void addPathEffect(PathEffect *effect);
-    void addFillPathEffect(PathEffect *effect);
-    void addOutlinePathEffect(PathEffect *effect);
-    void removePathEffect(PathEffect *effect);
-    void removeFillPathEffect(PathEffect *effect);
-    void removeOutlinePathEffect(PathEffect *effect);
-    Property *ca_getFirstDescendantWithName(const QString &name);
+    void addPathEffect(const PathEffectQSPtr &effect);
+    void addFillPathEffect(const PathEffectQSPtr &effect);
+    void addOutlinePathEffect(const PathEffectQSPtr &effect);
+    void removePathEffect(const PathEffectQSPtr &effect);
+    void removeFillPathEffect(const PathEffectQSPtr &effect);
+    void removeOutlinePathEffect(const PathEffectQSPtr &effect);
     PathEffectAnimators *getPathEffectsAnimators() {
         return mPathEffectsAnimators.data();
     }
@@ -172,25 +170,26 @@ public:
     bool differenceInFillPathBetweenFrames(
             const int& frame1, const int& frame2) const;
 protected:
+    PathBox(const BoundingBoxType &type);
+    void getMotionBlurProperties(QList<Property*>& list);
+
+    bool mOutlineAffectedByScale = true;
+
+    int mCurrentPathsFrame = INT_MIN;
+
+    SkPath mEditPathSk;
+    SkPath mPathSk;
+    SkPath mFillPathSk;
+    SkPath mOutlinePathSk;
+
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
     GradientPointsQSPtr mFillGradientPoints;
     GradientPointsQSPtr mStrokeGradientPoints;
 
-    QSharedPointer<PaintSettings> mFillSettings =
-            (new PaintSettings)->ref<PaintSettings>();
-    QSharedPointer<StrokeSettings> mStrokeSettings =
-            (new StrokeSettings)->ref<StrokeSettings>();
-
-    int mCurrentPathsFrame = INT_MIN;
-    SkPath mEditPathSk;
-    SkPath mPathSk;
-    SkPath mFillPathSk;
-    SkPath mOutlinePathSk;
-
-    bool mOutlineAffectedByScale = true;
-    void getMotionBlurProperties(QList<Property*> *list);
+    PaintSettingsQSPtr mFillSettings;
+    StrokeSettingsQSPtr mStrokeSettings;
 };
 
 #endif // PATHBOX_H

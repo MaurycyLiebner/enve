@@ -127,18 +127,15 @@ int decode_audio_file(const char* path,
 
 SingleSound::SingleSound(const QString &path,
                          FixedLenAnimationRect *durRect) :
-    ComplexAnimator() {
+    ComplexAnimator("sound") {
     setDurationRect(durRect);
 
-    prp_setUpdater(new SingleSoundUpdater(this));
+    prp_setUpdater(SPtrCreate(SingleSoundUpdater)(this));
     prp_blockUpdater();
 
-    prp_setName("sound");
-
-    ca_addChildAnimator(mVolumeAnimator.data());
+    ca_addChildAnimator(mVolumeAnimator);
     mVolumeAnimator->qra_setValueRange(0, 200);
     mVolumeAnimator->qra_setCurrentValue(100);
-    mVolumeAnimator->prp_setName("volume");
 
     setFilePath(path);
 }
@@ -191,11 +188,10 @@ void SingleSound::updateAfterDurationRectangleShifted() {
 }
 
 DurationRectangleMovable *SingleSound::anim_getRectangleMovableAtPos(
-                            const qreal &relX,
+                            const int &relX,
                             const int &minViewedFrame,
                             const qreal &pixelsPerFrame) {
-    return mDurationRectangle->getMovableAt(relX,
-                                           pixelsPerFrame,
+    return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
                                             minViewedFrame);
 }
 
@@ -203,7 +199,7 @@ void SingleSound::updateFinalDataIfNeeded(const qreal &fps,
                                           const int &minAbsFrame,
                                           const int &maxAbsFrame) {
     if(mFinalDataUpdateNeeded) {
-        prepareFinalData(fps, minAbsFrame, maxAbsFrame);
+        prepareFinalData(static_cast<float>(fps), minAbsFrame, maxAbsFrame);
         mFinalDataUpdateNeeded = false;
     }
 }
@@ -246,7 +242,7 @@ int SingleSound::getSampleCount() const {
     return mFinalSampleCount;
 }
 
-void SingleSound::prepareFinalData(const qreal &fps,
+void SingleSound::prepareFinalData(const float &fps,
                                    const int &minAbsFrame,
                                    const int &maxAbsFrame) {
     if(mFinalData != nullptr) {
@@ -269,37 +265,42 @@ void SingleSound::prepareFinalData(const qreal &fps,
         int finalMaxRelFrame = prp_absFrameToRelFrame(finalMaxAbsFrame);
         qDebug() << "sound rel frame range:" << finalMinRelFrame << finalMaxRelFrame;
 
-        int minSampleFromSrc = finalMinRelFrame*SOUND_SAMPLERATE/fps;
-        int maxSampleFromSrc = qMin(mSrcSampleCount,
-                                    qCeil(finalMaxRelFrame*SOUND_SAMPLERATE/fps));
+        int minSampleFromSrc = static_cast<int>(
+                    floor(finalMinRelFrame*SOUND_SAMPLERATE/fps));
+        int maxSamplePlayed = static_cast<int>(
+                    ceil(finalMaxRelFrame*SOUND_SAMPLERATE/fps));
+        int maxSampleFromSrc = std::min(mSrcSampleCount, maxSamplePlayed);
 
 
-        mFinalSampleCount = maxSampleFromSrc - minSampleFromSrc;
+        mFinalSampleCount = static_cast<int>(maxSampleFromSrc - minSampleFromSrc);
         qDebug() << minSampleFromSrc << maxSampleFromSrc << mFinalSampleCount;
-        mFinalData = (float*)malloc(mFinalSampleCount*sizeof(float));
+        ulong dataSize = static_cast<ulong>(mFinalSampleCount)*sizeof(float);
+        void* data = malloc(dataSize);
+        mFinalData = static_cast<float*>(data);
         if(mVolumeAnimator->prp_hasKeys()) {
             int j = 0;
             int frame = 0;
-            qreal lastFrameVol =
-                    mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame)/100.;
-            qreal volStep = fps/SOUND_SAMPLERATE;
+            qreal volVal = mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame);
+            float lastFrameVol = static_cast<float>(volVal*0.01);
+            float volStep = fps/SOUND_SAMPLERATE;
             while(j < mFinalSampleCount) {
                 frame++;
-                qreal nextFrameVol =
-                        mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame)/100.;
-                qreal volDiff = (nextFrameVol - lastFrameVol);
-                qreal currVolFrac = lastFrameVol;
+                float nextFrameVol = static_cast<float>(
+                        mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame)/100.);
+                float volDiff = (nextFrameVol - lastFrameVol);
+                float currVolFrac = lastFrameVol;
                 for(int i = 0;
                     i < SOUND_SAMPLERATE/fps && j < mFinalSampleCount;
                     i++, j++) {
                     currVolFrac += volStep*volDiff;
-                    mFinalData[j] = (float)(mSrcData[j + minSampleFromSrc]*
+                    mFinalData[j] = static_cast<float>(mSrcData[j + minSampleFromSrc]*
                                             currVolFrac);
                 }
                 lastFrameVol = nextFrameVol;
             }
         } else {
-            qreal volFrac = mVolumeAnimator->qra_getCurrentValue()/100.;
+            float volFrac =
+                    static_cast<float>(mVolumeAnimator->qra_getCurrentValue()/100.);
             for(int i = 0; i < mFinalSampleCount; i++) {
                 mFinalData[i] = mSrcData[i + minSampleFromSrc]*volFrac;
             }

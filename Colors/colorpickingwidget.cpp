@@ -13,10 +13,9 @@
 ColorPickingWidget::ColorPickingWidget(ColorSettingsWidget *parent)
     : QWidget() {
     QScreen *screen = QGuiApplication::primaryScreen();
-    if (const QWindow *window = windowHandle())
+    if(const QWindow *window = windowHandle())
         screen = window->screen();
-    if (!screen)
-        return;
+    if(!screen) return;
 
     QApplication::beep();
 
@@ -38,9 +37,7 @@ void ColorPickingWidget::mouseReleaseEvent(QMouseEvent *e) {
     if(e->button() == Qt::RightButton) endThis();
     QPoint pos_t = mapToGlobal(e->pos());
     QColor pickedColor = colorFromPoint(pos_t.x(), pos_t.y());
-    Color color;
-    color.setQColor(pickedColor);
-    mColorSettingsWidget->setCurrentColor(color);
+    mColorSettingsWidget->setCurrentColor(pickedColor);
     mColorSettingsWidget->emitFullColorChangedSignal();
     MainWindow::getInstance()->callUpdateSchedulers();
     endThis();
@@ -58,22 +55,18 @@ void ColorPickingWidget::paintEvent(QPaintEvent *) {
     p.end();
 }
 
-void ColorPickingWidget::keyPressEvent(QKeyEvent *e)
-{
-    if(e->isAutoRepeat() )
-    {
+void ColorPickingWidget::keyPressEvent(QKeyEvent *e) {
+    if(e->isAutoRepeat()) {
         return;
     }
     endThis();
 }
 
-void ColorPickingWidget::mouseMoveEvent(QMouseEvent *e)
-{
+void ColorPickingWidget::mouseMoveEvent(QMouseEvent *e) {
     updateBox(e->pos());
 }
 
-QColor ColorPickingWidget::colorFromPoint(int x_t, int y_t)
-{
+QColor ColorPickingWidget::colorFromPoint(int x_t, int y_t) {
     QPixmap *pix = new QPixmap;
     *pix = QGuiApplication::primaryScreen()->grabWindow(
                 QApplication::desktop()->winId(), x_t, y_t, 1, 1);
@@ -87,16 +80,14 @@ QColor ColorPickingWidget::colorFromPoint(int x_t, int y_t)
     return c;
 }
 
-void ColorPickingWidget::endThis()
-{
+void ColorPickingWidget::endThis() {
     QApplication::restoreOverrideCursor();
     releaseMouse();
     releaseKeyboard();
     deleteLater();
 }
 
-void ColorPickingWidget::updateBox(QPoint pos_t)
-{
+void ColorPickingWidget::updateBox(QPoint pos_t) {
     cursor_x = pos_t.x();
     cursor_y = pos_t.y();
     QPointF globalPos = mapToGlobal(pos_t);

@@ -2,6 +2,7 @@
 #define QREALKEY_H
 #include "key.h"
 #include "pointhelpers.h"
+#include "sharedpointerdefs.h"
 
 class QPainter;
 class ComplexAnimator;
@@ -15,18 +16,16 @@ enum QrealPointType : short;
 
 class QrealKey : public Key {
 public:
-    QrealKey(QrealAnimator *parentAnimator);
+    QrealKey(QrealAnimator* parentAnimator);
     QrealKey(const int &frame,
              const qreal &val,
-             QrealAnimator *parentAnimator);
+             QrealAnimator* parentAnimator);
     QrealPoint *mousePress(const qreal &frameT,
                            const qreal &valueT,
                            const qreal &pixelsPerFrame,
                            const qreal &pixelsPerValue);
-    virtual ~QrealKey();
 
-
-    QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
+    QrealKeySPtr makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     void updateCtrlFromCtrl(const QrealPointType &type);
 
@@ -102,11 +101,10 @@ public:
         mSavedEndFrame = mEndFrame;
     }
 protected:
-    CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
+    bool mStartEnabled = false;
+    bool mEndEnabled = false;
 
-    QrealPoint *mGraphPoint;
-    QrealPoint *mStartPoint;
-    QrealPoint *mEndPoint;
+    CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 
     qreal mValue;
     qreal mSavedValue;
@@ -118,8 +116,10 @@ protected:
     qreal mEndValue = 0.;
     qreal mStartFrame = 0.;
     qreal mEndFrame = 0.;
-    bool mStartEnabled = false;
-    bool mEndEnabled = false;
+
+    QrealPointSPtr mGraphPoint;
+    QrealPointSPtr mStartPoint;
+    QrealPointSPtr mEndPoint;
 };
 
 #endif // QREALKEY_H

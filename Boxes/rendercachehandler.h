@@ -2,17 +2,15 @@
 #define RENDERCACHEHANDLER_H
 #include <QtCore>
 #include <memory>
-
+#include "sharedpointerdefs.h"
 class QPainter;
-class RenderContainer;
-class RenderContainer;
 class CacheContainer;
 class RenderCacheHandler;
 
 class CacheHandler {
 public:
     virtual ~CacheHandler() {}
-    void removeRenderContainer(CacheContainer *cont);
+    void removeRenderContainer(const CacheContainerSPtr &cont);
     CacheContainer *getRenderContainerAtRelFrame(const int &frame);
     virtual CacheContainer *createNewRenderContainerAtRelFrame(const int &frame);
     int getFirstEmptyFrameAtOrAfterFrame(const int &frame);
@@ -48,7 +46,7 @@ public:
 protected:
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
     bool getRenderContainterIdAtRelFrame(const int &relFrame, int *id);
-    QList<std::shared_ptr<CacheContainer> > mRenderContainers;
+    QList<CacheContainerSPtr> mRenderContainers;
 };
 
 #endif // RENDERCACHEHANDLER_H

@@ -3,65 +3,54 @@
 #include "pathoperations.h"
 #include "skqtconversions.h"
 
-PathEffect::PathEffect(const PathEffectType &type,
-                       const bool &outlinePathEffect) {
+PathEffect::PathEffect(const QString &name,
+                       const PathEffectType &type,
+                       const bool &outlinePathEffect) :
+    ComplexAnimator(name) {
     mPathEffectType = type;
     setIsOutlineEffect(outlinePathEffect);
 }
 
 DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
-    PathEffect(DISPLACE_PATH_EFFECT, outlinePathEffect) {
-    mSegLength = (new QrealAnimator())->ref<QrealAnimator>();
-    mMaxDev = (new QrealAnimator())->ref<QrealAnimator>();
-    mSmoothness = (new QrealAnimator())->ref<QrealAnimator>();
-    mRandomize = (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
-    mRandomizeStep = (new IntAnimator())->ref<IntAnimator>();
-    mSmoothTransform = (new BoolPropertyContainer())->ref<BoolPropertyContainer>();
-    mEasing = (new QrealAnimator())->ref<QrealAnimator>();
-    mSeed = (new IntAnimator())->ref<IntAnimator>();
-    mRepeat = (new BoolProperty())->ref<BoolProperty>();
+    PathEffect("displace effect", DISPLACE_PATH_EFFECT, outlinePathEffect) {
+    mSegLength = SPtrCreate(QrealAnimator)("segment length");
+    mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
+    mSmoothness = SPtrCreate(QrealAnimator)("smoothness");
+    mRandomize = SPtrCreate(BoolPropertyContainer)("randomize");
+    mRandomizeStep = SPtrCreate(IntAnimator)("randomize step");
+    mSmoothTransform = SPtrCreate(BoolPropertyContainer)("smooth progression");
+    mEasing = SPtrCreate(QrealAnimator)("ease in/out");
+    mSeed = SPtrCreate(IntAnimator)("seed");
+    mRepeat = SPtrCreate(BoolProperty)("repeat");
 
-    prp_setName("discrete effect");
-
-    mSeed->prp_setName("seed");
     mSeed->setIntValueRange(0, 9999);
     mSeed->setCurrentIntValue(qrand() % 9999, false);
 
-    mSegLength->prp_setName("segment length");
     mSegLength->qra_setValueRange(1., 1000.);
     mSegLength->qra_setCurrentValue(20.);
 
-    mMaxDev->prp_setName("max deviation");
     mMaxDev->qra_setValueRange(0., 1000.);
     mMaxDev->qra_setCurrentValue(20.);
 
-    mSmoothness->prp_setName("smoothness");
     mSmoothness->qra_setValueRange(0., 1.);
 
-    mEasing->prp_setName("ease in/out");
     mEasing->qra_setValueRange(0., 1.);
 
-    mRandomize->prp_setName("randomize");
-
-    mRandomizeStep->prp_setName("rand frame step");
     mRandomizeStep->setIntValueRange(1, 99);
 
-    mSmoothTransform->prp_setName("smooth progression");
-
-    mRepeat->prp_setName("repeat");
     mRepeat->setValue(false);
 
-    ca_addChildAnimator(mSeed.data());
-    ca_addChildAnimator(mSegLength.data());
-    ca_addChildAnimator(mMaxDev.data());
-    ca_addChildAnimator(mSmoothness.data());
-    ca_addChildAnimator(mRandomize.data());
+    ca_addChildAnimator(mSeed);
+    ca_addChildAnimator(mSegLength);
+    ca_addChildAnimator(mMaxDev);
+    ca_addChildAnimator(mSmoothness);
+    ca_addChildAnimator(mRandomize);
 
-    mRandomize->ca_addChildAnimator(mRandomizeStep.data());
-    mRandomize->ca_addChildAnimator(mSmoothTransform.data());
-    mSmoothTransform->ca_addChildAnimator(mEasing.data());
+    mRandomize->ca_addChildAnimator(mRandomizeStep);
+    mRandomize->ca_addChildAnimator(mSmoothTransform);
+    mSmoothTransform->ca_addChildAnimator(mEasing);
     mSmoothTransform->setValue(false);
-    mRandomize->ca_addChildAnimator(mRepeat.data());
+    mRandomize->ca_addChildAnimator(mRepeat);
     mRandomize->setValue(false);
 }
 
@@ -138,7 +127,7 @@ void getC1AndC2(const SkPoint &lastP,
 }
 
 float randFloat() {
-    return (float)qRandF(-1., 1.);
+    return static_cast<float>(qRandF(-1., 1.));
 }
 
 bool displaceFilterPath(SkPath* dst, const SkPath& src,
@@ -146,7 +135,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                         const SkScalar &segLen,
                         const SkScalar &smoothness,
                         const uint32_t &seedAssist) {
-    if(segLen < 0.01) return false;
+    if(segLen < 0.01f) return false;
     dst->reset();
     SkPathMeasure meas(src, false);
 
@@ -352,7 +341,7 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const qreal &scale,
                                                const bool &) {
     dst->reset();
-    qsrand(mSeed->getCurrentIntValue());
+    qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
     mSeedAssist = qrand() % 999999;
     int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
     uint32_t nextSeed;
@@ -448,8 +437,8 @@ void DisplacePathEffect::filterPathForRelFrameF(const qreal &relFrame,
 
 LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
     PathEffect(LENGTH_PATH_EFFECT, outlinePathEffect) {
-    mLength = (new QrealAnimator())->ref<QrealAnimator>();
-    mReverse = (new BoolProperty())->ref<BoolProperty>();
+    mLength = SPtrCreate(QrealAnimator)();
+    mReverse = SPtrCreate(BoolProperty)();
     prp_setName("length effect");
 
     mLength->prp_setName("segment length");
@@ -459,8 +448,8 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
     mReverse->prp_setName("reverse");
     mReverse->setValue(false);
 
-    ca_addChildAnimator(mLength.data());
-    ca_addChildAnimator(mReverse.data());
+    ca_addChildAnimator(mLength);
+    ca_addChildAnimator(mReverse);
 }
 
 void LengthPathEffect::filterPathForRelFrame(const int &relFrame,
@@ -590,13 +579,13 @@ void LengthPathEffect::filterPathForRelFrameF(const qreal &relFrame,
 
 DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
     PathEffect(DUPLICATE_PATH_EFFECT, outlinePathEffect) {
-    mTranslation = (new QPointFAnimator())->ref<QPointFAnimator>();
+    mTranslation = SPtrCreate(QPointFAnimator)();
     prp_setName("duplicate effect");
 
     mTranslation->prp_setName("translation");
     mTranslation->setCurrentPointValue(QPointF(10., 10.));
 
-    ca_addChildAnimator(mTranslation.data());
+    ca_addChildAnimator(mTranslation);
 }
 
 void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
@@ -622,14 +611,14 @@ void DuplicatePathEffect::filterPathForRelFrameF(const qreal &relFrame,
 
 SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     PathEffect(SOLIDIFY_PATH_EFFECT, outlinePathEffect) {
-    mDisplacement = (new QrealAnimator())->ref<QrealAnimator>();
+    mDisplacement = SPtrCreate(QrealAnimator)();
     prp_setName("solidify effect");
 
     mDisplacement->prp_setName("displacement");
     mDisplacement->qra_setValueRange(0., 999.999);
     mDisplacement->qra_setCurrentValue(10.);
 
-    ca_addChildAnimator(mDisplacement.data());
+    ca_addChildAnimator(mDisplacement);
 }
 
 void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
@@ -734,12 +723,12 @@ SumPathEffect::SumPathEffect(PathBox *parentPath,
                      QStringList() << "Union" <<
                      "Difference" << "Intersection" <<
                      "Exclusion"))->ref<ComboBoxProperty>();
-    mBoxTarget = (new BoxTargetProperty())->ref<BoxTargetProperty>();
+    mBoxTarget = SPtrCreate(BoxTargetProperty)("sum with");
     prp_setName("path operation effect");
     mParentPathBox = parentPath;
-    ca_addChildAnimator(mBoxTarget.data());
+    ca_addChildAnimator(mBoxTarget);
     mOperationType->prp_setName("operation type");
-    ca_addChildAnimator(mOperationType.data());
+    ca_addChildAnimator(mOperationType);
 }
 
 void sumPaths(const int &relFrame, const SkPath &src,

@@ -4,8 +4,7 @@
 #include <QString>
 #include <sys/sysinfo.h>
 
-void rotate(float rad_t, float *x_t, float *y_t)
-{
+void rotate(float rad_t, float *x_t, float *y_t) {
     float cos_hue = cos(rad_t);
     float sin_hue = sin(rad_t);
     float x_rotated_t = *x_t*cos_hue - *y_t*sin_hue;
@@ -20,7 +19,7 @@ unsigned char truncateU8(const int &val) {
     } else if(val < 0) {
         return 0;
     }
-    return val;
+    return static_cast<unsigned char>(val);
 }
 
 int clampInt(int val, int min, int max) {
@@ -41,15 +40,14 @@ int clampInt(int val, int min, int max) {
 //}
 
 void glOrthoAndViewportSet(unsigned int w, unsigned int h) {
-    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+    glViewport(0, 0, static_cast<GLsizei>(w), static_cast<GLsizei>(h));
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0f, w, h, 0.0f, 0.0f, 1.0f);
+    glOrtho(0., w, h, 0., 0., 1.);
     glMatrixMode(GL_MODELVIEW);
 }
 
-float clamp(float val_t, float min_t, float max_t)
-{
+float clamp(float val_t, float min_t, float max_t) {
     if(val_t > max_t)
     {
         return max_t;
@@ -61,14 +59,13 @@ float clamp(float val_t, float min_t, float max_t)
     return val_t;
 }
 
-float getAngleF(double x1, double y1, double x2, double y2)
-{
+double getAngleF(double x1, double y1, double x2, double y2) {
     double dot = x1*x2 + y1*y2;
     double det = x1*y2 - y1*x2;
     return atan2(det, dot)*RadToF + 0.5;
 }
 
-float getAngleDeg(double x1, double y1, double x2, double y2)
+double getAngleDeg(double x1, double y1, double x2, double y2)
 {
     double dot = x1*x2 + y1*y2;
     double det = x1*y2 - y1*x2;
@@ -76,28 +73,27 @@ float getAngleDeg(double x1, double y1, double x2, double y2)
 }
 
 void normalize(qreal *x_t, qreal *y_t, qreal dest_len) {
-    float x_val_t = *x_t;
-    float y_val_t = *y_t;
-    float curr_len = sqrt(x_val_t*x_val_t + y_val_t*y_val_t);
+    qreal x_val_t = *x_t;
+    qreal y_val_t = *y_t;
+    qreal curr_len = sqrt(x_val_t*x_val_t + y_val_t*y_val_t);
     *x_t = x_val_t*dest_len/curr_len;
     *y_t = y_val_t*dest_len/curr_len;
 }
 
-void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/)
-{
+void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/) {
   float max, min, delta;
   float h, s, v;
   float r, g, b;
 
-  h = 0.0; // silence gcc warning
+  h = 0.f; // silence gcc warning
 
   r = *r_;
   g = *g_;
   b = *b_;
 
-  r = CLAMP(r, 0.0, 1.0);
-  g = CLAMP(g, 0.0, 1.0);
-  b = CLAMP(b, 0.0, 1.0);
+  r = CLAMP(r, 0.f, 1.f);
+  g = CLAMP(g, 0.f, 1.f);
+  b = CLAMP(b, 0.f, 1.f);
 
   max = MAX3(r, g, b);
   min = MIN3(r, g, b);
@@ -105,31 +101,30 @@ void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/)
   v = max;
   delta = max - min;
 
-  if (delta > 0.0001)
-    {
+  if(delta > 0.0001f) {
       s = delta / max;
 
       if (r == max)
         {
           h = (g - b) / delta;
-          if (h < 0.0)
-            h += 6.0;
+          if (h < 0.f)
+            h += 6.f;
         }
       else if (g == max)
         {
-          h = 2.0 + (b - r) / delta;
+          h = 2.f + (b - r) / delta;
         }
       else if (b == max)
         {
-          h = 4.0 + (r - g) / delta;
+          h = 4.f + (r - g) / delta;
         }
 
-      h /= 6.0;
+      h /= 6.f;
     }
   else
     {
-      s = 0.0;
-      h = 0.0;
+      s = 0.f;
+      h = 0.f;
     }
 
   *r_ = h;
@@ -140,7 +135,7 @@ void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/)
 // (from gimp_hsv_to_rgb)
 void hsv_to_rgb_float (float *h_, float *s_, float *v_) {
   int    i;
-  double f, w, q, t;
+  float f, w, q, t;
   float h, s, v;
   float r, g, b;
   r = g = b = 0.0; // silence gcc warning
@@ -150,12 +145,12 @@ void hsv_to_rgb_float (float *h_, float *s_, float *v_) {
   v = *v_;
 
   h = h - floor(h);
-  s = CLAMP(s, 0.0, 1.0);
-  v = CLAMP(v, 0.0, 1.0);
+  s = CLAMP(s, 0.f, 1.f);
+  v = CLAMP(v, 0.f, 1.f);
 
-  double hue;
+  float hue;
 
-  if (s == 0.0)
+  if (s == 0.f)
     {
       r = v;
       g = v;
@@ -165,16 +160,16 @@ void hsv_to_rgb_float (float *h_, float *s_, float *v_) {
     {
       hue = h;
 
-      if (hue == 1.0)
-        hue = 0.0;
+      if (hue == 1.f)
+        hue = 0.f;
 
-      hue *= 6.0;
+      hue *= 6.f;
 
-      i = (int) hue;
+      i = static_cast<int>(floor(hue));
       f = hue - i;
-      w = v * (1.0 - s);
-      q = v * (1.0 - (s * f));
-      t = v * (1.0 - (s * (1.0 - f)));
+      w = v * (1.f - s);
+      q = v * (1.f - (s * f));
+      t = v * (1.f - (s * (1.f - f)));
 
       switch (i)
         {
@@ -218,43 +213,43 @@ void hsv_to_rgb_float (float *h_, float *s_, float *v_) {
 
 // (from gimp_rgb_to_hsl)
 void rgb_to_hsl_float (float *r_, float *g_, float *b_) {
-  double max, min, delta;
+  float max, min, delta;
 
   float h, s, l;
   float r, g, b;
 
   // silence gcc warnings
-  h=0;
+  h=0.f;
 
   r = *r_;
   g = *g_;
   b = *b_;
 
-  r = CLAMP(r, 0.0, 1.0);
-  g = CLAMP(g, 0.0, 1.0);
-  b = CLAMP(b, 0.0, 1.0);
+  r = CLAMP(r, 0.f, 1.f);
+  g = CLAMP(g, 0.f, 1.f);
+  b = CLAMP(b, 0.f, 1.f);
 
   max = MAX3(r, g, b);
   min = MIN3(r, g, b);
 
-  l = (max + min) / 2.0;
+  l = (max + min) / 2.f;
 
   if (max == min)
     {
-      s = 0.0;
-      h = 0.0; //GIMP_HSL_UNDEFINED;
+      s = 0.f;
+      h = 0.f; //GIMP_HSL_UNDEFINED;
     }
   else
     {
-      if (l <= 0.5)
+      if (l <= 0.5f)
         s = (max - min) / (max + min);
       else
-        s = (max - min) / (2.0 - max - min);
+        s = (max - min) / (2.f - max - min);
 
       delta = max - min;
 
-      if (delta == 0.0)
-        delta = 1.0;
+      if (delta == 0.f)
+        delta = 1.f;
 
       if (r == max)
         {
@@ -262,17 +257,17 @@ void rgb_to_hsl_float (float *r_, float *g_, float *b_) {
         }
       else if (g == max)
         {
-          h = 2.0 + (b - r) / delta;
+          h = 2.f + (b - r) / delta;
         }
       else if (b == max)
         {
-          h = 4.0 + (r - g) / delta;
+          h = 4.f + (r - g) / delta;
         }
 
-      h /= 6.0;
+      h /= 6.f;
 
-      if (h < 0.0)
-        h += 1.0;
+      if (h < 0.f)
+        h += 1.f;
     }
 
   *r_ = h;
@@ -304,6 +299,28 @@ static double hsl_value (double n1,
 }
 
 
+static float hsl_value (float n1,
+           float n2,
+           float hue) {
+  float val;
+
+  if (hue > 6.f)
+    hue -= 6.f;
+  else if (hue < 0.f)
+    hue += 6.f;
+
+  if (hue < 1.f)
+    val = n1 + (n2 - n1) * hue;
+  else if (hue < 3.f)
+    val = n2;
+  else if (hue < 4.f)
+    val = n1 + (n2 - n1) * (4.f - hue);
+  else
+    val = n1;
+
+  return val;
+}
+
 /**
  * gimp_hsl_to_rgb:
  * @hsl: A color value in the HSL colorspace
@@ -311,8 +328,7 @@ static double hsl_value (double n1,
  *
  * Convert a HSL color value to an RGB color value.
  **/
-void hsl_to_rgb_float (float *h_, float *s_, float *l_)
-{
+void hsl_to_rgb_float (float *h_, float *s_, float *l_) {
   float h, s, l;
   float r, g, b;
 
@@ -321,10 +337,10 @@ void hsl_to_rgb_float (float *h_, float *s_, float *l_)
   l = *l_;
 
   h = h - floor(h);
-  s = CLAMP(s, 0.0, 1.0);
-  l = CLAMP(l, 0.0, 1.0);
+  s = CLAMP(s, 0.f, 1.f);
+  l = CLAMP(l, 0.f, 1.f);
 
-  if (s == 0)
+  if (s == 0.f)
     {
       /*  achromatic case  */
       r = l;
@@ -333,18 +349,18 @@ void hsl_to_rgb_float (float *h_, float *s_, float *l_)
     }
   else
     {
-      double m1, m2;
+      float m1, m2;
 
-      if (l <= 0.5)
-        m2 = l * (1.0 + s);
+      if (l <= 0.5f)
+        m2 = l * (1.f + s);
       else
         m2 = l + s - l * s;
 
-      m1 = 2.0 * l - m2;
+      m1 = 2.f * l - m2;
 
-      r = hsl_value (m1, m2, h * 6.0 + 2.0);
-      g = hsl_value (m1, m2, h * 6.0);
-      b = hsl_value (m1, m2, h * 6.0 - 2.0);
+      r = hsl_value (m1, m2, h * 6.f + 2.f);
+      g = hsl_value (m1, m2, h * 6.f);
+      b = hsl_value (m1, m2, h * 6.f - 2.f);
     }
 
   *h_ = r;
@@ -358,9 +374,9 @@ void hsv_to_hsl(float* h, float* s, float *v)
     float ss = *s;
     float vv = *v;
     *h = hh;
-    *v = (2 - ss) * vv;
+    *v = (2.f - ss) * vv;
     *s = ss * vv;
-    *s /= (*v <= 1) ? (*v) : 2 - (*v);
+    *s /= (*v <= 1.f) ? (*v) : 2.f - (*v);
     *v *= 0.5f;
     if(isnan(*s) )
     {
@@ -374,10 +390,10 @@ void hsl_to_hsv(float* h, float *s, float *l)
     float ss = *s;
     float ll = *l;
     *h = hh;
-    ll *= 2;
-    ss *= (ll <= 1) ? ll : 2 - ll;
-    *l = (ll + ss) *0.5;
-    *s = (2 * ss) / (ll + ss);
+    ll *= 2.f;
+    ss *= (ll <= 1.f) ? ll : 2.f - ll;
+    *l = (ll + ss) *0.5f;
+    *s = (2.f * ss) / (ll + ss);
     if(isnan(*s) )
     {
         *s = 0.f;
@@ -402,9 +418,9 @@ void qhsv_to_hsl(qreal* h, qreal* s, qreal *v)
 
 void qhsl_to_hsv(qreal* h, qreal *s, qreal *l)
 {
-    float hh = *h;
-    float ss = *s;
-    float ll = *l;
+    qreal hh = *h;
+    qreal ss = *s;
+    qreal ll = *l;
     *h = hh;
     ll *= 2;
     ss *= (ll <= 1) ? ll : 2 - ll;
@@ -429,7 +445,7 @@ void qhsl_to_rgb(qreal *h_, qreal *s_, qreal *l_)
   s = CLAMP(s, 0.0, 1.0);
   l = CLAMP(l, 0.0, 1.0);
 
-  if (s == 0)
+  if (s == 0.)
     {
       /*  achromatic case  */
       r = l;
@@ -545,7 +561,7 @@ void qhsv_to_rgb(qreal *h_, qreal *s_, qreal *v_)
 
       hue *= 6.0;
 
-      i = (int) hue;
+      i = static_cast<int>(floor(hue));
       f = hue - i;
       w = v * (1.0 - s);
       q = v * (1.0 - (s * f));
@@ -615,13 +631,10 @@ void qrgb_to_hsl(qreal *r_, qreal *g_, qreal *b_)
 
   l = (max + min) / 2.0;
 
-  if (max == min)
-    {
+  if(max == min) {
       s = 0.0;
       h = 0.0; //GIMP_HSL_UNDEFINED;
-    }
-  else
-    {
+    } else {
       if (l <= 0.5)
         s = (max - min) / (max + min);
       else
@@ -664,28 +677,28 @@ bool isZero(const float val_t) {
     return val_t < 0.0001f && val_t > - 0.0001f;
 }
 
+bool isNonZero(const double &val_t) {
+    return val_t > 0.0001 || val_t < - 0.0001;
+}
 
-qreal getUNoise(qreal noise_scale)
-{
-    if( isNonZero(noise_scale) )
-    {
+bool isZero(const double val_t) {
+    return val_t < 0.0001 && val_t > - 0.0001;
+}
+
+
+qreal getUNoise(qreal noise_scale) {
+    if(isNonZero(noise_scale)) {
         return ( rand() % 101 )*0.01 * noise_scale;
-    }
-    else
-    {
-        return 0.f;
+    } else {
+        return 0.;
     }
 }
 
-qreal getNoise(qreal noise_scale)
-{
-    if( isNonZero(noise_scale) )
-    {
+qreal getNoise(qreal noise_scale) {
+    if(isNonZero(noise_scale)) {
         return ( rand() % 201 - 100)*0.01 * noise_scale;
-    }
-    else
-    {
-        return 0.f;
+    } else {
+        return 0.;
     }
 }
 
@@ -697,21 +710,16 @@ void applyXYNoise(qreal noise_t,
                   qreal noise_frequency,
                   uchar *noise_count,
                   qreal *value_x,
-                  qreal *value_y)
-{
-    if(isNonZero(noise_t) )
-    {
-        uchar max_stroke_noise_count = (uchar)(100 - noise_frequency*100);
-        if(*noise_count >= max_stroke_noise_count )
-        {
+                  qreal *value_y) {
+    if(isNonZero(noise_t)) {
+        uchar max_stroke_noise_count = static_cast<uchar>(100 - noise_frequency*100);
+        if(*noise_count >= max_stroke_noise_count) {
             *noise_count = 0;
             *previous_noise_x = *next_noise_x;
             *previous_noise_y = *next_noise_y;
             *next_noise_x = getNoise(noise_t );
             *next_noise_y = getNoise(noise_t );
-        }
-        else
-        {
+        } else {
             *noise_count = *noise_count + 1;
         }
         qreal current_noise_x = ( (*next_noise_x)*(*noise_count) +
@@ -732,19 +740,14 @@ void applyNoise(qreal noise_t,
                 qreal *next_noise,
                 qreal noise_frequency,
                 uchar *noise_count,
-                qreal *value)
-{
-    if(isNonZero(noise_t) )
-    {
-        uchar max_stroke_noise_count = (uchar)(100 - noise_frequency*100);
-        if(*noise_count >= max_stroke_noise_count )
-        {
+                qreal *value) {
+    if(isNonZero(noise_t) ) {
+        uchar max_stroke_noise_count = static_cast<uchar>(100 - noise_frequency*100);
+        if(*noise_count >= max_stroke_noise_count) {
             *noise_count = 0;
             *previous_noise = *next_noise;
             *next_noise = getNoise(noise_t );
-        }
-        else
-        {
+        } else {
             *noise_count = *noise_count + 1;
         }
         qreal current_noise = ( (*next_noise)*(*noise_count) +
@@ -760,19 +763,14 @@ void applyUNoise(qreal noise_t,
                  qreal *next_noise,
                  qreal noise_frequency,
                  uchar *noise_count,
-                 qreal *value)
-{
-    if(isNonZero(noise_t) )
-    {
-        uchar max_stroke_noise_count = (uchar)(10000 - noise_frequency*10000);
-        if(*noise_count >= max_stroke_noise_count )
-        {
+                 qreal *value) {
+    if(isNonZero(noise_t)) {
+        uchar max_stroke_noise_count = static_cast<uchar>(10000 - noise_frequency*10000);
+        if(*noise_count >= max_stroke_noise_count) {
             *noise_count = 0;
             *previous_noise = *next_noise;
             *next_noise = getUNoise(noise_t );
-        }
-        else
-        {
+        } else {
             *noise_count = *noise_count + 1;
         }
         qreal current_noise = ( (*next_noise)*(*noise_count) +
@@ -810,5 +808,5 @@ void saveBrushDataAsFile(Brush *brush_t,
 ushort getFreeRamMB() {
     struct sysinfo info_t;
     sysinfo(&info_t);
-    return info_t.freeram*0.000001;
+    return static_cast<ushort>(info_t.freeram/1000000);
 }

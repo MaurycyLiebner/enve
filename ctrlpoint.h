@@ -31,8 +31,8 @@ public:
     void setRelativePosVal(const QPointF &relPos);
 private:
     bool mIsStartCtrlPt;
-    NodePoint *mParentPoint;
-    CtrlPoint *mOtherCtrlPt;
+    NodePointPtr mParentPoint_k;
+    CtrlPointPtr mOtherCtrlPt_cv;
 };
 
 #endif // CTRLPOINT_H

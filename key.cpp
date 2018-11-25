@@ -4,27 +4,25 @@
 #include "Animators/complexanimator.h"
 #include "clipboardcontainer.h"
 
-Key::Key(Animator *parentAnimator) {
+Key::Key(Animator* parentAnimator) {
     mParentAnimator = parentAnimator;
     mRelFrame = 0;
 }
 
-Key::~Key() {
-
-}
+Key::~Key() {}
 
 bool Key::isSelected() { return mIsSelected; }
 
 void Key::removeFromAnimator() {
     if(mParentAnimator == nullptr) return;
-    mParentAnimator->anim_removeKey(this);
+    mParentAnimator->anim_removeKey(ref<Key>());
 }
 
-Key *Key::getNextKey() {
+Key* Key::getNextKey() {
     return mParentAnimator->anim_getNextKey(this);
 }
 
-Key *Key::getPrevKey() {
+Key* Key::getPrevKey() {
     return mParentAnimator->anim_getPrevKey(this);
 }
 
@@ -49,20 +47,20 @@ void Key::setRelFrameAndUpdateParentAnimator(const int &relFrame,
     mParentAnimator->anim_moveKeyToRelFrame(this, relFrame, finish);
 }
 
-void Key::addToSelection(QList<Key *> *selectedKeys) {
+void Key::addToSelection(QList<Key*> &selectedKeys) {
     if(isSelected()) return;
     setSelected(true);
-    selectedKeys->append(this);
+    selectedKeys.append(this);
 }
 
-void Key::removeFromSelection(QList<Key *> *selectedKeys) {
+void Key::removeFromSelection(QList<Key*> &selectedKeys) {
     if(isSelected()) {
         setSelected(false);
-        selectedKeys->removeOne(this);
+        selectedKeys.removeOne(this);
     }
 }
 
-Animator *Key::getParentAnimator() {
+Animator* Key::getParentAnimator() {
     return mParentAnimator;
 }
 
@@ -117,14 +115,4 @@ void Key::setRelFrame(const int &frame) {
 
 void Key::setAbsFrame(const int &frame) {
     setRelFrame(mParentAnimator->prp_absFrameToRelFrame(frame));
-}
-
-KeyCloner::KeyCloner(Key *key) {
-    mRelFrame = key->getRelFrame();
-    mAbsFrame = key->getAbsFrame();
-}
-
-void KeyCloner::shiftKeyFrame(const int &frameShift) {
-    mRelFrame += frameShift;
-    mAbsFrame += frameShift;
 }

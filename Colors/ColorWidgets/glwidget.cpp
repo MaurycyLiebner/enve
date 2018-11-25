@@ -6,73 +6,66 @@
 GLfloat AA_VECT_LEN = 1.5f;
 GLfloat AA_SHARP_VECT_LEN = AA_VECT_LEN*2.f;
 
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
-{
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     setMinimumSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
-    bgColor = Color(60, 60, 60);
+    SkColor bgColor = SkColorSetARGB(255, 60, 60, 60);
+    mBgColor = SkColor4f::FromColor(bgColor);
 }
 
-bool GLWidget::isVisible()
-{
+bool GLWidget::isVisible() {
     return visible;
 }
 
-bool GLWidget::isHidden()
-{
+bool GLWidget::isHidden() {
     return !visible;
 }
 
-void GLWidget::setVisible(bool b_t)
-{
+void GLWidget::setVisible(bool b_t) {
     visible = b_t;
     QWidget::setVisible(b_t);
 }
 
-void GLWidget::show()
-{
+void GLWidget::show() {
     visible = true;
     QWidget::show();
 }
 
-void GLWidget::hide()
-{
+void GLWidget::hide() {
     visible = false;
     QWidget::hide();
 }
 
-
 void GLWidget::drawSubTris(GLfloat x1, GLfloat y1,
-                              GLfloat h1, GLfloat s1, GLfloat v1,
-                              GLfloat x2, GLfloat y2,
-                              GLfloat h2, GLfloat s2, GLfloat v2,
-                              GLfloat x3, GLfloat y3,
-                              GLfloat h3, GLfloat s3, GLfloat v3,
-                              int n_next, GLboolean e12_aa, GLboolean e13_aa, GLboolean e23_aa)
-{
+                           GLfloat h1, GLfloat s1, GLfloat v1,
+                           GLfloat x2, GLfloat y2,
+                           GLfloat h2, GLfloat s2, GLfloat v2,
+                           GLfloat x3, GLfloat y3,
+                           GLfloat h3, GLfloat s3, GLfloat v3,
+                           int n_next, GLboolean e12_aa,
+                           GLboolean e13_aa, GLboolean e23_aa) {
     n_next--;
-    if(n_next > 0)
-    {
-        GLfloat x12 = (x1 + x2)*0.5;
-        GLfloat y12 = (y1 + y2)*0.5;
+    if(n_next > 0) {
+        GLfloat x12 = (x1 + x2)*0.5f;
+        GLfloat y12 = (y1 + y2)*0.5f;
 
-        GLfloat h12 = (h1 + h2)*0.5;
-        GLfloat s12 = (s1 + s2)*0.5;
-        GLfloat v12 = (v1 + v2)*0.5;
+        GLfloat h12 = (h1 + h2)*0.5f;
+        GLfloat s12 = (s1 + s2)*0.5f;
+        GLfloat v12 = (v1 + v2)*0.5f;
 
-        GLfloat x13 = (x1 + x3)*0.5;
-        GLfloat y13 = (y1 + y3)*0.5;
+        GLfloat x13 = (x1 + x3)*0.5f;
+        GLfloat y13 = (y1 + y3)*0.5f;
 
-        GLfloat h13 = (h1 + h3)*0.5;
-        GLfloat s13 = (s1 + s3)*0.5;
-        GLfloat v13 = (v1 + v3)*0.5;
+        GLfloat h13 = (h1 + h3)*0.5f;
+        GLfloat s13 = (s1 + s3)*0.5f;
+        GLfloat v13 = (v1 + v3)*0.5f;
 
-        GLfloat x23 = (x2 + x3)*0.5;
-        GLfloat y23 = (y2 + y3)*0.5;
+        GLfloat x23 = (x2 + x3)*0.5f;
+        GLfloat y23 = (y2 + y3)*0.5f;
 
-        GLfloat h23 = (h2 + h3)*0.5;
-        GLfloat s23 = (s2 + s3)*0.5;
-        GLfloat v23 = (v2 + v3)*0.5;
+        GLfloat h23 = (h2 + h3)*0.5f;
+        GLfloat s23 = (s2 + s3)*0.5f;
+        GLfloat v23 = (v2 + v3)*0.5f;
         drawSubTris(x1, y1,
                     h1, s1, v1,
                     x12, y12,
@@ -101,9 +94,7 @@ void GLWidget::drawSubTris(GLfloat x1, GLfloat y1,
                     x23, y23,
                     h23, s23, v23,
                     n_next, false, false, false);
-    }
-    else
-    {
+    } else {
         hsv_to_rgb_float(&h1, &s1, &v1);
         hsv_to_rgb_float(&h2, &s2, &v2);
         hsv_to_rgb_float(&h3, &s3, &v3);
@@ -117,8 +108,7 @@ void GLWidget::drawSubTris(GLfloat x1, GLfloat y1,
     }
 }
 
-void GLWidget::normalize(GLfloat *x_t, GLfloat *y_t, GLfloat dest_len)
-{
+void GLWidget::normalize(GLfloat *x_t, GLfloat *y_t, GLfloat dest_len) {
     GLfloat x_val_t = *x_t;
     GLfloat y_val_t = *y_t;
     GLfloat curr_len = sqrt(x_val_t*x_val_t + y_val_t*y_val_t);
@@ -127,10 +117,9 @@ void GLWidget::normalize(GLfloat *x_t, GLfloat *y_t, GLfloat dest_len)
 }
 
 void GLWidget::getAAVect(GLfloat center_x, GLfloat center_y,
-                                    GLfloat x_t, GLfloat y_t,
-                                    GLfloat *result_x, GLfloat *result_y,
-                                    GLfloat blurrines)
-{
+                         GLfloat x_t, GLfloat y_t,
+                         GLfloat *result_x, GLfloat *result_y,
+                         GLfloat blurrines) {
     GLfloat dx = x_t - center_x;
     GLfloat dy = y_t - center_y;
     normalize(&dx, &dy, blurrines);
@@ -139,10 +128,9 @@ void GLWidget::getAAVect(GLfloat center_x, GLfloat center_y,
 }
 
 void GLWidget::getAATrisVert(GLfloat center_x, GLfloat center_y,
-                                        GLfloat x_t, GLfloat y_t,
-                                        GLfloat *result_x, GLfloat *result_y,
-                                        GLfloat blurriness)
-{
+                             GLfloat x_t, GLfloat y_t,
+                             GLfloat *result_x, GLfloat *result_y,
+                             GLfloat blurriness) {
      GLfloat dx;
      GLfloat dy;
      getAAVect(center_x, center_y, x_t, y_t, &dx, &dy, blurriness);
@@ -151,17 +139,13 @@ void GLWidget::getAATrisVert(GLfloat center_x, GLfloat center_y,
 }
 
 void GLWidget::drawSolidAATris(GLfloat x1, GLfloat y1,
-                                  GLfloat x2, GLfloat y2,
-                                  GLfloat x3, GLfloat y3,
-                                  GLfloat r, GLfloat g, GLfloat b,
-                                  GLboolean e12_aa, GLboolean e13_aa, GLboolean e23_aa)
-{
-    drawAATris(x1, y1,
-               r, g, b,
-               x2, y2,
-               r, g, b,
-               x3, y3,
-               r, g, b,
+                               GLfloat x2, GLfloat y2,
+                               GLfloat x3, GLfloat y3,
+                               GLfloat r, GLfloat g, GLfloat b,
+                               GLboolean e12_aa, GLboolean e13_aa, GLboolean e23_aa) {
+    drawAATris(x1, y1, r, g, b,
+               x2, y2, r, g, b,
+               x3, y3, r, g, b,
                e12_aa, e13_aa, e23_aa);
 }
 
@@ -196,12 +180,12 @@ void GLWidget::drawAATris(const GLfloat &x1,
     GLfloat y33_sharp;
 
 
-    GLfloat x11;
-    GLfloat y11;
-    GLfloat x22;
-    GLfloat y22;
-    GLfloat x33;
-    GLfloat y33;
+    GLfloat x11 = 0.f;
+    GLfloat y11 = 0.f;
+    GLfloat x22 = 0.f;
+    GLfloat y22 = 0.f;
+    GLfloat x33 = 0.f;
+    GLfloat y33 = 0.f;
     GLboolean sharp_1 = e12_aa && e13_aa;
     GLboolean sharp_2 = e12_aa && e23_aa;
     GLboolean sharp_3 = e13_aa && e23_aa;
@@ -238,11 +222,11 @@ void GLWidget::drawAATris(const GLfloat &x1,
         glVertex2f(x3, y3);
 
         if(e12_aa) {
-            GLfloat dx12;
-            GLfloat dy12;
+            GLfloat dx12 = 0.f;
+            GLfloat dy12 = 0.f;
             if(!sharp_1 || !sharp_2) {
                 getAAVect(center_x, center_y,
-                          (x1 + x2)*0.5, (y1 + y2)*0.5,
+                          (x1 + x2)*0.5f, (y1 + y2)*0.5f,
                           &dx12, &dy12,
                           AA_VECT_LEN);
             }
@@ -270,11 +254,11 @@ void GLWidget::drawAATris(const GLfloat &x1,
         }
 
         if(e13_aa) {
-            GLfloat dx13;
-            GLfloat dy13;
+            GLfloat dx13 = 0.f;
+            GLfloat dy13 = 0.f;
             if(!sharp_1 || !sharp_3) {
                 getAAVect(center_x, center_y,
-                          (x1 + x3)*0.5, (y1 + y3)*0.5,
+                          (x1 + x3)*0.5f, (y1 + y3)*0.5f,
                           &dx13, &dy13,
                           AA_VECT_LEN);
             }
@@ -302,12 +286,12 @@ void GLWidget::drawAATris(const GLfloat &x1,
         }
 
         if(e23_aa) {
-            GLfloat dx23;
-            GLfloat dy23;
+            GLfloat dx23 = 0.f;
+            GLfloat dy23 = 0.f;
             if(!sharp_2 || !sharp_3) {
                 getAAVect(center_x, center_y,
-                          (x2 + x3)*0.5,
-                          (y2 + y3)*0.5,
+                          (x2 + x3)*0.5f,
+                          (y2 + y3)*0.5f,
                           &dx23, &dy23,
                           AA_VECT_LEN);
             }
@@ -337,10 +321,11 @@ void GLWidget::drawAATris(const GLfloat &x1,
     glEnd();
 }
 
-void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
-                                GLfloat r, GLfloat g, GLfloat b,
-                                GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
-{
+void GLWidget::drawSolidRect(GLfloat x, GLfloat y,
+                             GLfloat width, GLfloat height,
+                             GLfloat r, GLfloat g, GLfloat b,
+                             GLboolean top_aa, GLboolean bottom_aa,
+                             GLboolean left_aa, GLboolean right_aa) {
     drawRect(x, y, width, height,
              r, g, b,
              r, g, b,
@@ -349,10 +334,11 @@ void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height
              top_aa, bottom_aa, left_aa, right_aa);
 }
 
-void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
-                                GLfloat r, GLfloat g, GLfloat b, GLfloat a,
-                                GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
-{
+void GLWidget::drawSolidRect(GLfloat x, GLfloat y,
+                             GLfloat width, GLfloat height,
+                             GLfloat r, GLfloat g, GLfloat b, GLfloat a,
+                             GLboolean top_aa, GLboolean bottom_aa,
+                             GLboolean left_aa, GLboolean right_aa) {
     drawRect(x, y, width, height,
              r, g, b, a,
              r, g, b, a,
@@ -361,42 +347,35 @@ void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height
              top_aa, bottom_aa, left_aa, right_aa);
 }
 
-void GLWidget::drawSolidRectCenter(GLfloat cx,
-                                   GLfloat cy,
-                                   GLfloat width,
-                                   GLfloat height,
-                                   GLfloat r,
-                                   GLfloat g,
-                                   GLfloat b,
-                                   GLboolean top_aa,
-                                   GLboolean bottom_aa,
-                                   GLboolean left_aa,
-                                   GLboolean right_aa) {
+void GLWidget::drawSolidRectCenter(GLfloat cx, GLfloat cy,
+                                   GLfloat width, GLfloat height,
+                                   GLfloat r, GLfloat g, GLfloat b,
+                                   GLboolean top_aa, GLboolean bottom_aa,
+                                   GLboolean left_aa, GLboolean right_aa) {
     drawSolidRect(cx - width*0.5f, cy - height*0.5f, width, height, r, g, b,
                   top_aa, bottom_aa, left_aa, right_aa);
 }
 
 void GLWidget::drawGradient(Gradient *gradient,
-                            const int &x,
-                            const int &y,
-                            const int &width,
-                            const int &height) {
+                            const int &x, const int &y,
+                            const int &width, const int &height) {
     //drawMeshBg(x, y, width, height);
     if(!gradient->isEmpty()) {
         int len = gradient->getColorCount();
-        Color nextColor = gradient->getCurrentColorAt(0);
+        SkColor4f nextColor = SkColor4f::FromColor(
+                    QColorToSkColor(
+                        gradient->getCurrentColorAt(0)));
         GLfloat cX = x;
-        GLfloat segWidth = width/(GLfloat)(len - 1);
+        GLfloat segWidth = width/(len - 1.f);
 
         for(int i = 0; i < len - 1; i++) {
-            Color color = nextColor;
-            nextColor = gradient->getCurrentColorAt(i + 1);
+            SkColor4f color = nextColor;
 
             drawRect(cX, y, segWidth, height,
-                     color.gl_r, color.gl_g, color.gl_b, color.gl_a,
-                     nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
-                     nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
-                     color.gl_r, color.gl_g, color.gl_b, color.gl_a,
+                     color.fR, color.fG, color.fB, color.fA,
+                     nextColor.fR, nextColor.fG, nextColor.fB, nextColor.fA,
+                     nextColor.fR, nextColor.fG, nextColor.fB, nextColor.fA,
+                     color.fR, color.fG, color.fB, color.fA,
                      false, false, false, false);
             cX += segWidth;
         }
@@ -444,11 +423,12 @@ void GLWidget::drawMeshBg() {
 }
 
 void GLWidget::resizeGL(int w, int h) {
-    glOrthoAndViewportSet(w, h);
+    glOrthoAndViewportSet(static_cast<uint>(w),
+                          static_cast<uint>(h));
 }
 
 void GLWidget::initializeGL() {
-    bgColor.setGLClearColor();
+    glClearColor(mBgColor.fR, mBgColor.fG, mBgColor.fB, mBgColor.fA);
 
     //Set blending
     glEnable( GL_BLEND );
@@ -458,20 +438,19 @@ void GLWidget::initializeGL() {
 
 
 void GLWidget::drawAACircTris(GLfloat x1, GLfloat y1,
-                                 GLfloat x2, GLfloat y2,
-                                 GLfloat cx, GLfloat cy,
-                                 GLfloat r1, GLfloat g1, GLfloat b1,
-                                 GLfloat r2, GLfloat g2, GLfloat b2)
-{
+                              GLfloat x2, GLfloat y2,
+                              GLfloat cx, GLfloat cy,
+                              GLfloat r1, GLfloat g1, GLfloat b1,
+                              GLfloat r2, GLfloat g2, GLfloat b2) {
     GLfloat x11;
     GLfloat y11;
     getAATrisVert(cx, cy, x1, y1, &x11, &y11, AA_VECT_LEN);
     GLfloat x22;
     GLfloat y22;
     getAATrisVert(cx, cy, x2, y2, &x22, &y22, AA_VECT_LEN);
-    GLfloat rc = (r1 + r2)*0.5;
-    GLfloat gc = (g1 + g2)*0.5;
-    GLfloat bc = (b1 + b2)*0.5;
+    GLfloat rc = (r1 + r2)*0.5f;
+    GLfloat gc = (g1 + g2)*0.5f;
+    GLfloat bc = (b1 + b2)*0.5f;
 
     glBegin(GL_TRIANGLES);
         glColor3f(r1, g1, b1);
@@ -500,7 +479,7 @@ void GLWidget::drawAACircTris(GLfloat x1, GLfloat y1,
 void GLWidget::drawSolidCircle(GLfloat r, GLfloat cx,
                                GLfloat cy, GLuint num_seg,
                                GLfloat red, GLfloat green, GLfloat blue) {
-    float theta = 2 * PI / float(num_seg);
+    float theta = 2.f * PIf / float(num_seg);
     float c = cosf(theta);//precalculate the sine and cosine
     float s = sinf(theta);
     float inner_x = r;
@@ -525,13 +504,14 @@ void GLWidget::drawSolidCircle(GLfloat r, GLfloat cx,
     }
 }
 
-void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
-                           GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
-                           GLfloat r2, GLfloat g2, GLfloat b2, GLfloat a2,
-                           GLfloat r3, GLfloat g3, GLfloat b3, GLfloat a3,
-                           GLfloat r4, GLfloat g4, GLfloat b4, GLfloat a4,
-                           GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
-{
+void GLWidget::drawRect(GLfloat x, GLfloat y,
+                        GLfloat width, GLfloat height,
+                        GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
+                        GLfloat r2, GLfloat g2, GLfloat b2, GLfloat a2,
+                        GLfloat r3, GLfloat g3, GLfloat b3, GLfloat a3,
+                        GLfloat r4, GLfloat g4, GLfloat b4, GLfloat a4,
+                        GLboolean top_aa, GLboolean bottom_aa,
+                        GLboolean left_aa, GLboolean right_aa) {
     GLfloat x1 = x;
     GLfloat y1 = y;
     GLfloat x11 = x1 - AA_VECT_LEN;
@@ -562,8 +542,7 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
         glColor4f(r4, g4, b4, a4);
         glVertex2f(x4, y4);
 
-        if(top_aa)
-        {
+        if(top_aa) {
             glColor4f(r1, g1, b1, 0.f);
             glVertex2f(x11, y11);
             glColor4f(r2, g2, b2, 0.f);
@@ -573,8 +552,7 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
             glColor3f(r1, g1, b1);
             glVertex2f(x1, y1);
         }
-        if(left_aa)
-        {
+        if(left_aa) {
             glColor4f(r1, g1, b1, 0.f);
             glVertex2f(x11, y11);
             glColor3f(r1, g1, b1);
@@ -584,8 +562,7 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
             glColor4f(r4, g4, b4, 0.f);
             glVertex2f(x44, y44);
         }
-        if(right_aa)
-        {
+        if(right_aa) {
             glColor3f(r2, g2, b2);
             glVertex2f(x2, y2);
             glColor4f(r2, g2, b2, 0.f);
@@ -595,8 +572,7 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
             glColor3f(r3, g3, b3);
             glVertex2f(x3, y3);
         }
-        if(bottom_aa)
-        {
+        if(bottom_aa) {
             glColor3f(r4, g4, b4);
             glVertex2f(x4, y4);
             glColor3f(r3, g3, b3);
@@ -658,7 +634,8 @@ void GLWidget::drawHoverBorder(GLfloat xt, GLfloat yt,
              false, false, false, false);
 }
 
-void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
+void GLWidget::drawRect(GLfloat x, GLfloat y,
+                        GLfloat width, GLfloat height,
                         GLfloat r1, GLfloat g1, GLfloat b1,
                         GLfloat r2, GLfloat g2, GLfloat b2,
                         GLfloat r3, GLfloat g3, GLfloat b3,

@@ -34,10 +34,10 @@ void ScrollWidgetVisiblePart::setCurrentRule(
 }
 
 void ScrollWidgetVisiblePart::setCurrentTarget(
-        SingleWidgetTarget *targetP,
+        const SingleWidgetTargetQSPtr& targetP,
         const SWT_Target &target) {
     mCurrentRulesCollection.target = target;
-    ((ScrollWidget*)mParentWidget)->setMainTarget(targetP);
+    static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
@@ -71,10 +71,10 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
-        SingleWidgetTarget *targetP,
+        const SingleWidgetTargetQSPtr& targetP,
         const SWT_Target &target) {
     if(mCurrentRulesCollection.target == target) {
-        ((ScrollWidget*)mParentWidget)->setMainTarget(targetP);
+        static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
         scheduleUpdateParentHeight();
         scheduledUpdateVisibleWidgetsContent();
     }
@@ -119,7 +119,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 }
 
 void ScrollWidgetVisiblePart::setMainAbstraction(
-        SingleWidgetAbstraction *abs) {
+        const SingleWidgetAbstractionSPtr& abs) {
     if(abs == nullptr) {
         mMainAbstraction.reset();
     } else {

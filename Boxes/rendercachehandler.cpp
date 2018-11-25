@@ -5,10 +5,9 @@
 #include "durationrectangle.h"
 #include "global.h"
 
-void CacheHandler::removeRenderContainer(CacheContainer *cont) {
-    cont->setParentCacheHandler(nullptr);
+void CacheHandler::removeRenderContainer(const CacheContainerSPtr& cont) {
     for(int i = 0; i < mRenderContainers.count(); i++) {
-        if(mRenderContainers.at(i).get() == cont) {
+        if(mRenderContainers.at(i) == cont) {
             mRenderContainers.removeAt(i);
         }
     }
@@ -74,14 +73,12 @@ int CacheHandler::getRenderContainterInsertIdAtRelFrame(
     return 0;
 }
 
-CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(
-                                const int &frame) {
-    CacheContainer *cont = new CacheContainer();
-    cont->setParentCacheHandler(this);
+CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(const int &frame) {
+    CacheContainerSPtr cont = SPtrCreate(CacheContainer)(this);
     cont->setRelFrame(frame);
     int contId = getRenderContainterInsertIdAtRelFrame(frame);
     mRenderContainers.insert(contId, cont->ref<CacheContainer>());
-    return cont;
+    return cont.get();
 }
 
 int CacheHandler::getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
@@ -113,7 +110,6 @@ int CacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) {
         }
         currFrame = cont->getMaxRelFrame() + 1;
     }
-    return currFrame;
 }
 
 int CacheHandler::getFirstEmptyFrameAtOrAfterFrame(const int &frame) {
@@ -126,7 +122,6 @@ int CacheHandler::getFirstEmptyFrameAtOrAfterFrame(const int &frame) {
         }
         currFrame = cont->getMaxRelFrame() + 1;
     }
-    return currFrame;
 }
 
 void CacheHandler::setContainersInFrameRangeBlocked(const int &minFrame,
@@ -146,10 +141,6 @@ void CacheHandler::setContainersInFrameRangeBlocked(const int &minFrame,
 }
 
 void CacheHandler::clearCache() {
-    Q_FOREACH(const std::shared_ptr<CacheContainer> &cont, mRenderContainers) {
-        cont->setParentCacheHandler(nullptr);
-    }
-
     mRenderContainers.clear();
 }
 
@@ -262,7 +253,7 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     int lastDrawnFrame = startFrame;
     int lastDrawX = 0;
     bool lastStoresInMemory = true;
-    Q_FOREACH(const std::shared_ptr<CacheContainer> &cont, mRenderContainers) {
+    Q_FOREACH(const CacheContainerSPtr &cont, mRenderContainers) {
         int afterMaxFrame = cont->getMaxRelFrame() + 1;
         if(afterMaxFrame < startFrame) continue;
         int minFrame = cont->getMinRelFrame();
@@ -272,9 +263,9 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
         if(minFrame < startFrame) minFrame = startFrame;
 
         int dFrame = minFrame - startFrame;
-        int xT = dFrame*pixelsPerFrame;
+        int xT = qRound(dFrame*pixelsPerFrame);
 
-        int widthT = pixelsPerFrame*(afterMaxFrame - minFrame);
+        int widthT = qRound(pixelsPerFrame*(afterMaxFrame - minFrame));
         if(lastDrawnFrame == minFrame) {
             widthT += xT - lastDrawX;
             xT = lastDrawX;
@@ -289,7 +280,7 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
             lastStoresInMemory = storesInMemory;
         }
 
-        p->drawRect(xT, drawY, widthT, MIN_WIDGET_HEIGHT);
+        p->drawRect(xT, qRound(drawY), widthT, MIN_WIDGET_HEIGHT);
         lastDrawnFrame = afterMaxFrame;
         lastDrawX = xT + widthT;
     }
@@ -306,6 +297,6 @@ void CacheHandler::clearCacheForRelFrameRange(const int &minFrame,
         maxId = getRenderContainterInsertIdAtRelFrame(maxFrame) - 1;
     }
     for(int i = minId; i <= maxId; i++) {
-        mRenderContainers.takeAt(minId)->setParentCacheHandler(nullptr);
+        mRenderContainers.removeAt(minId);
     }
 }

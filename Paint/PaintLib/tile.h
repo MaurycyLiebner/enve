@@ -156,11 +156,7 @@ struct TileSkDrawerCollection {
         hueChange = bT;
     }
 
-    void setHue(const qreal &hueT) {
-        Color col;
-        col.setHSV(hueT, 1., 1.);
-        hueCol = col.getSkColor();
-    }
+    void setHue(const qreal &hueT);
 //    void processUpdate();
 
 //    void schedulerProccessed();
@@ -199,7 +195,7 @@ struct TileSkDrawerCollection {
 //public:
 //    TileDataGetterDependentExecutor(Tile *src, Tile *target) :
 //        TileExecutor(target) {
-//        mSrcGetter = (new TileDataGetter(src))->ref<TileDataGetter>();
+//        mSrcGetter = SPtrCreate(TileDataGetter)(src);
 //    }
 
 //    void dataReady(uchar *data, const sk_sp<SkImage> &img) {
@@ -247,7 +243,7 @@ struct TileSkDrawerCollection {
 //class TileDuplicateExecutor : public GUI_ThreadExecutor {
 //public:
 //    TileDuplicateExecutor(Tile *target, Tile *src) {
-//        mSrcGetter = (new TileDataGetter(src))->ref<TileDataGetter>();
+//        mSrcGetter = SPtrCreate(TileDataGetter)(src);
 //        mTarget = target;
 //    }
 

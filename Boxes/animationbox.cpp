@@ -121,7 +121,7 @@ bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
 
 void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,
-                                const BoundingBoxRenderDataSPtr& data) {
+                                BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
                                                        data);
     auto imageData = data->ref<AnimationBoxRenderData>();
@@ -138,7 +138,7 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 BoundingBoxRenderDataSPtr AnimationBox::createRenderData() {
-    return (new AnimationBoxRenderData(mAnimationCacheHandler, this))->ref<BoundingBoxRenderData>();
+    return SPtrCreate(AnimationBoxRenderData)(mAnimationCacheHandler, this);
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {

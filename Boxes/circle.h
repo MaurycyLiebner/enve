@@ -3,14 +3,18 @@
 #include "Boxes/pathbox.h"
 #include "movablepoint.h"
 
-class CircleCenterPoint : public PointAnimator
-{
+class CircleCenterPoint : public PointAnimatorMovablePoint {
+    friend class StdSelfRef;
 public:
-    CircleCenterPoint(BasicTransformAnimator *parent, MovablePointType type);
-    ~CircleCenterPoint();
+    static CircleCenterPointSPtr createCircleCenterPoint(
+            QPointFAnimator *associatedAnimator,
+            BasicTransformAnimator* parent,
+            const MovablePointType &type) {
+        return SPtrCreate(CircleCenterPoint)(associatedAnimator, parent, type);
+    }
 
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
-                                        MovablePoint *horizontalPoint);
+                                        MovablePoint* horizontalPoint);
 
     void moveByRel(const QPointF &relTranslatione);
 
@@ -18,19 +22,22 @@ public:
 
     void finishTransform();
     void moveByAbs(const QPointF &absTranslatione);
+protected:
+    CircleCenterPoint(QPointFAnimator *associatedAnimator,
+                      BasicTransformAnimator *parent,
+                      const MovablePointType &type);
 private:
-    MovablePoint *mVerticalPoint = nullptr;
-    MovablePoint *mHorizontalPoint = nullptr;
+    MovablePointPtr mVerticalPoint_cv;
+    MovablePointPtr mHorizontalPoint_cv;
 };
 
-class CircleRadiusPoint : public PointAnimator
-{
+class CircleRadiusPoint : public PointAnimatorMovablePoint {
 public:
-    CircleRadiusPoint(BasicTransformAnimator *parent,
-                      const MovablePointType &type,
-                      const bool &blockX,
-                      MovablePoint *centerPoint);
-    ~CircleRadiusPoint();
+    static CircleRadiusPointSPtr createCircleRadiusPoint(
+            const BasicTransformAnimatorQSPtr &parent,
+            const MovablePointType &type,
+            const bool &blockX,
+            const MovablePointSPtr& centerPoint);
 
     void moveByRel(const QPointF &relTranslation);
 //    void setAbsPosRadius(QPointF pos);
@@ -39,16 +46,19 @@ public:
     void startTransform();
     void finishTransform();
     void setRelativePos(const QPointF &relPos);
+protected:
+    CircleRadiusPoint(const BasicTransformAnimatorQSPtr &parent,
+                      const MovablePointType &type,
+                      const bool &blockX,
+                      MovablePoint *centerPoint);
 private:
-    MovablePoint *mCenterPoint = nullptr;
     bool mXBlocked = false;
+    MovablePointPtr mCenterPoint_cv;
 };
 
-class Circle : public PathBox
-{
+class Circle : public PathBox {
+    friend class SelfRef;
 public:
-    Circle();
-
     void setVerticalRadius(const qreal &verticalRadius);
     void setHorizontalRadius(const qreal &horizontalRadius);
     void setRadius(const qreal &radius);
@@ -58,7 +68,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> *list);
+                                           QList<MovablePoint*>& list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
     void drawSelectedSk(SkCanvas *canvas,
@@ -74,28 +84,35 @@ public:
     void readBoundingBox(QIODevice *target);
 
     qreal getXRadiusAtRelFrame(const int &relFrame) {
-        return mHorizontalRadiusPoint->getEffectiveXValueAtRelFrame(relFrame);
+        return mHorizontalRadiusAnimator->getEffectiveXValueAtRelFrame(relFrame);
     }
 
     qreal getYRadiusAtRelFrame(const int &relFrame) {
-        return mVerticalRadiusPoint->getEffectiveYValueAtRelFrame(relFrame);
+        return mVerticalRadiusAnimator->getEffectiveYValueAtRelFrame(relFrame);
     }
 
     qreal getCurrentXRadius() {
-        return mHorizontalRadiusPoint->getEffectiveXValue();
+        return mHorizontalRadiusAnimator->getEffectiveXValue();
     }
 
     qreal getCurrentYRadius() {
-        return mVerticalRadiusPoint->getEffectiveYValue();
+        return mVerticalRadiusAnimator->getEffectiveYValue();
     }
 
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;
 protected:
-    CircleCenterPoint *mCenter;
-    CircleRadiusPoint *mHorizontalRadiusPoint;
-    CircleRadiusPoint *mVerticalRadiusPoint;
-    void getMotionBlurProperties(QList<Property *> *list);
+    Circle();
+
+    void getMotionBlurProperties(QList<Property*>& list);
+
+    CircleCenterPointSPtr mCenterPoint;
+    CircleRadiusPointSPtr mHorizontalRadiusPoint;
+    CircleRadiusPointSPtr mVerticalRadiusPoint;
+
+    QPointFAnimatorQSPtr mCenterAnimator;
+    QPointFAnimatorQSPtr mHorizontalRadiusAnimator;
+    QPointFAnimatorQSPtr mVerticalRadiusAnimator;
 };
 
 #endif // CIRCLE_H

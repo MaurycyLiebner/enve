@@ -16,14 +16,14 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
 
     virtual ~BoundingBoxRenderData();
 
-    virtual void copyFrom(const BoundingBoxRenderDataSPtr &src);
+    virtual void copyFrom(BoundingBoxRenderData *src);
     bool copied = false;
 
     bool relBoundingRectSet = false;
 
     Animator::UpdateReason reason;
 
-    BoundingBoxRenderDataSPtr makeCopy();
+    BoundingBoxRenderData *makeCopy();
 
     bool redo = false;
 
@@ -101,8 +101,8 @@ class RenderDataCustomizerFunctor {
 public:
     RenderDataCustomizerFunctor();
     virtual ~RenderDataCustomizerFunctor();
-    virtual void customize(const BoundingBoxRenderDataSPtr& data) = 0;
-    void operator()(const BoundingBoxRenderDataSPtr& data);
+    virtual void customize(BoundingBoxRenderData *data) = 0;
+    void operator()(BoundingBoxRenderData* data);
 };
 
 class ReplaceTransformDisplacementCustomizer : public RenderDataCustomizerFunctor {
@@ -110,7 +110,7 @@ public:
     ReplaceTransformDisplacementCustomizer(const qreal &dx,
                                            const qreal &dy);
 
-    void customize(const BoundingBoxRenderDataSPtr& data);
+    void customize(BoundingBoxRenderData *data);
 protected:
     qreal mDx, mDy;
 };
@@ -120,7 +120,7 @@ public:
     MultiplyTransformCustomizer(const QMatrix &transform,
                                 const qreal &opacity = 1.);
 
-    void customize(const BoundingBoxRenderDataSPtr& data);
+    void customize(BoundingBoxRenderData *data);
 protected:
     QMatrix mTransform;
     qreal mOpacity = 1.;
@@ -130,7 +130,7 @@ class MultiplyOpacityCustomizer : public RenderDataCustomizerFunctor {
 public:
     MultiplyOpacityCustomizer(const qreal &opacity);
 
-    void customize(const BoundingBoxRenderDataSPtr& data);
+    void customize(BoundingBoxRenderData *data);
 protected:
     qreal mOpacity;
 };

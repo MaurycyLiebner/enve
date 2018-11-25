@@ -7,6 +7,7 @@
 #include <QProgressBar>
 #include <QLabel>
 #include <QPushButton>
+#include "sharedpointerdefs.h"
 class ScrollArea;
 class Canvas;
 class RenderInstanceWidget;
@@ -16,7 +17,7 @@ class RenderWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit RenderWidget(QWidget *parent = 0);
+    explicit RenderWidget(QWidget *parent = nullptr);
 
     void createNewRenderInstanceWidgetForCanvas(Canvas *canvas);
     void removeRenderInstanceWidget(RenderInstanceWidget *wid);

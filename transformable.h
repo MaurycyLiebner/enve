@@ -8,8 +8,6 @@ public:
     Transformable();
     virtual ~Transformable() {}
 
-    virtual void startTransform() {}
-    virtual void finishTransform() {}
 
     virtual void moveByRel(const QPointF &relTranslatione) {
         Q_UNUSED(relTranslatione);
@@ -22,24 +20,16 @@ public:
                        const qreal &scaleYBy) {
         Q_UNUSED(scaleXBy); Q_UNUSED(scaleYBy);
     }
-    virtual void scale(const qreal &scaleBy) {
-        scale(scaleBy, scaleBy);
-    }
 
-    virtual void rotateBy(const qreal &rot) {
-        Q_UNUSED(rot);
-    }
 
-    bool isSelected() { return mSelected; }
 
-    virtual void saveTransformPivotAbsPos(QPointF absPivot) {
+    virtual void saveTransformPivotAbsPos(const QPointF& absPivot) {
         Q_UNUSED(absPivot);
     }
 
     virtual void cancelTransform() {}
 protected:
-    QPointF mSavedTransformPivot;
-    bool mSelected = false;
+
 };
 
 #endif // TRANSFORMABLE_H

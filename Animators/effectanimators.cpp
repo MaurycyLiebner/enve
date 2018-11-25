@@ -19,7 +19,7 @@ void EffectAnimators::setParentBox(BoundingBox *box) {
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        PixmapEffect *pixmapEffect = SPtrGetAs(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMargin();
         }
@@ -30,7 +30,7 @@ qreal EffectAnimators::getEffectsMargin() const {
 qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
     qreal newMargin = 0.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        PixmapEffect *pixmapEffect = SPtrGetAs(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
         }
@@ -41,9 +41,9 @@ qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
 qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const {
     qreal newMargin = 0.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        PixmapEffect *pixmapEffect = SPtrGetAs(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {
-            newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
+            newMargin += pixmapEffect->getMarginAtRelFrame(qRound(relFrame));
         }
     }
     return newMargin;
@@ -51,13 +51,12 @@ qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const 
 
 void EffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
-        const BoundingBoxRenderDataSPtr& data) {
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        PixmapEffect *pixmapEffect = ((PixmapEffect*)effect.data());
+        BoundingBoxRenderData* data) {
+    Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
+        PixmapEffect *pixmapEffect = SPtrGetAs(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {
             PixmapEffectRenderDataSPtr effectRenderData =
-                    pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame,
-                                                                        data);
+                    pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame, data);
             if(effectRenderData == nullptr) continue;
             data->pixmapEffects.append(effectRenderData);
         }
@@ -66,7 +65,7 @@ void EffectAnimators::addEffectRenderDataToListF(
 
 void EffectAnimators::ca_removeAllChildAnimators() {
     ComplexAnimator::ca_removeAllChildAnimators();
-    mParentBox->ca_removeChildAnimator(this);
+    mParentBox->ca_removeChildAnimator(ref<BoundingBox>());
 }
 
 bool EffectAnimators::hasEffects() {

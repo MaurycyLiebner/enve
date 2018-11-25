@@ -46,13 +46,13 @@ enum CanvasMode : short {
 
 #include "canvaswindow.h"
 
-extern bool zLessThan(BoundingBox *box1, BoundingBox *box2);
+extern bool zLessThan(BoundingBox *box1, const BoundingBoxQSPtr& box2);
 
 struct CanvasRenderData : public BoxesGroupRenderData {
     CanvasRenderData(BoundingBox *parentBoxT);
     void renderToImage();
-    SkScalar canvasWidth;
-    SkScalar canvasHeight;
+    qreal canvasWidth;
+    qreal canvasHeight;
     SkColor bgColor;
 protected:
     void drawSk(SkCanvas *canvas);
@@ -60,7 +60,9 @@ protected:
     void updateRelBoundingRect();
 };
 
-extern bool boxesZSort(BoundingBox *box1, BoundingBox *box2);
+extern bool boxesZSort(const BoundingBoxQPtr &box1,
+                       const BoundingBoxQPtr &box2);
+
 class Canvas : public BoxesGroup {
     Q_OBJECT
 public:
@@ -83,7 +85,7 @@ public:
     void setCanvasMode(const CanvasMode &mode);
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
-    void setPointCtrlsMode(CtrlsMode mode);
+    void setPointCtrlsMode(const CtrlsMode& mode);
     void setCurrentBoxesGroup(BoxesGroup *group);
 
     void updatePivot();
@@ -164,24 +166,26 @@ public:
     bool isSelectionEmpty();
 
     void ungroupSelectedBoxes();
-    void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
+    void scaleSelectedBy(const qreal& scaleBy,
+                         const QPointF &absOrigin,
+                         const bool& startTrans);
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
-    NodePoint *createNewPointOnLineNearSelected(const QPointF &absPos,
-                                                const bool &adjust,
-                                                const qreal &canvasScaleInv);
+    NodePoint *createNewPointOnLineNearSelected(
+            const QPointF &absPos, const bool &adjust,
+            const qreal &canvasScaleInv);
 
 
-    void setSelectedCapStyle(Qt::PenCapStyle capStyle);
-    void setSelectedJoinStyle(Qt::PenJoinStyle joinStyle);
-    void setSelectedStrokeWidth(qreal strokeWidth, const bool &finish);
+    void setSelectedCapStyle(const Qt::PenCapStyle& capStyle);
+    void setSelectedJoinStyle(const Qt::PenJoinStyle &joinStyle);
+    void setSelectedStrokeWidth(const qreal &strokeWidth, const bool &finish);
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
     void setDisplayedFillStrokeSettingsFromLastSelected();
-    void scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
-                         QPointF absOrigin, bool startTrans);
+    void scaleSelectedBy(const qreal &scaleXBy, const qreal &scaleYBy,
+                         const QPointF &absOrigin, const bool &startTrans);
 
     void grabMouseAndTrack();
 
@@ -217,8 +221,9 @@ public:
     void disconnectPoints();
     void connectPoints();
 
-    void setSelectedFontFamilyAndStyle(QString family, QString style);
-    void setSelectedFontSize(qreal size);
+    void setSelectedFontFamilyAndStyle(
+            const QString& family, const QString& style);
+    void setSelectedFontSize(const qreal& size);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
     void clearBoxesSelection();
@@ -236,7 +241,7 @@ public:
     void raiseSelectedBoxes();
     void lowerSelectedBoxes();
 
-    void selectAndAddContainedPointsToSelection(QRectF absRect);
+    void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -246,12 +251,15 @@ public:
 
     bool keyPressEvent(QKeyEvent *event);
 
-    ImageSequenceBox *createAnimationBoxForPaths(const QStringList &paths);
-    VideoBox *createVideoForPath(const QString &path);
+    BoundingBoxQSPtr createLink();
+    ImageBox* createImageBox(const QString &path);
+    ImageSequenceBox* createAnimationBoxForPaths(const QStringList &paths);
+    VideoBox* createVideoForPath(const QString &path);
+    ExternalLinkBox *createLinkToFileWithPath(const QString &path);
+    SingleSound* createSoundForPath(const QString &path);
 
     void setPreviewing(const bool &bT);
     void setOutputRendering(const bool &bT);
-    void createLinkToFileWithPath(const QString &path);
 
     const CanvasMode &getCurrentCanvasMode() const {
         return mCurrentMode;
@@ -319,18 +327,16 @@ public:
     void setMaxFrame(const int &frame);
 
     ColorAnimator *getBgColorAnimator() {
-        return mBackgroundColor.data();
+        return mBackgroundColor.get();
     }
 
-    BoundingBoxRenderDataSPtr createRenderData() {
-        return (new CanvasRenderData(this))->ref<BoundingBoxRenderData>();
-    }
+    BoundingBoxRenderDataSPtr createRenderData();
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                const BoundingBoxRenderDataSPtr& data) {
+                                                BoundingBoxRenderData* data) {
         BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        auto canvasData = data->ref<CanvasRenderData>();
-        canvasData->bgColor = mBackgroundColor->getCurrentColor().getSkColor();
+        auto canvasData = SPtrGetAs(data, CanvasRenderData);
+        canvasData->bgColor = QColorToSkColor(mBackgroundColor->getCurrentColor());
         canvasData->canvasHeight = mHeight*mResolutionFraction;
         canvasData->canvasWidth = mWidth*mResolutionFraction;
     }
@@ -343,7 +349,7 @@ public:
     }
 protected:
 //    void updateAfterCombinedTransformationChanged() {
-////        Q_FOREACH(BoundingBox *child, mChildBoxes) {
+////        Q_FOREACH(const BoundingBoxQSPtr& child, mChildBoxes) {
 ////            child->updateCombinedTransformTmp();
 ////            child->scheduleSoftUpdate();
 ////        }
@@ -379,8 +385,6 @@ public:
     void makeSegmentLine();
     void makeSegmentCurve();
 
-    BoundingBox *createLink();
-    ImageBox *createImageBox(const QString &path);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
@@ -398,8 +402,6 @@ public:
     int getFrameCount();
 
     SoundComposition *getSoundComposition();
-
-    SingleSound *createSoundForPath(const QString &path);
 
     void updateHoveredBox();
     void updateHoveredPoint();
@@ -426,8 +428,8 @@ public:
     void beforeCurrentFrameRender();
     void afterCurrentFrameRender();
     //void updatePixmaps();
-    CacheHandler *getCacheHandler() {
-        return &mCacheHandler;
+    CacheHandler& getCacheHandler() {
+        return mCacheHandler;
     }
 
     void setCurrentPreviewContainer(CacheContainer *cont,
@@ -490,7 +492,7 @@ public:
                mCurrentPreviewContainerOutdated;
     }
 
-    void renderDataFinished(const BoundingBoxRenderDataSPtr& renderData);
+    void renderDataFinished(BoundingBoxRenderData *renderData);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
@@ -522,7 +524,7 @@ public:
     int getByteCountPerFrame() {
         return qCeil(mWidth*mResolutionFraction)*
                 qCeil(mHeight*mResolutionFraction)*4;
-        return mCurrentPreviewContainer->getByteCount();
+        //return mCurrentPreviewContainer->getByteCount();
     }
     int getMaxPreviewFrame(const int &minFrame, const int &maxFrame);
     void selectedPathsCombine();
@@ -569,7 +571,7 @@ protected:
     sk_sp<SkImage> mRenderImageSk;
 
     QSharedPointer<ColorAnimator> mBackgroundColor =
-            (new ColorAnimator())->ref<ColorAnimator>();
+            SPtrCreate(ColorAnimator)();
 
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
@@ -577,16 +579,16 @@ protected:
     void sortSelectedBoxesByZAscending();
 
     QMatrix mCanvasTransformMatrix;
-    SoundComposition *mSoundComposition = nullptr;
+    SoundCompositionQSPtr mSoundComposition;
 
-    MovablePoint *mHoveredPoint = nullptr;
-    BoundingBox *mHoveredBox = nullptr;
-    VectorPathEdge *mHoveredEdge = nullptr;
-    Bone *mHoveredBone = nullptr;
+    MovablePoint* mHoveredPoint_d = nullptr;
+    BoundingBoxQPtr mHoveredBox;
+    VectorPathEdge *mHoveredEdge_d = nullptr;
+    BoneQPtr mHoveredBone;
 
-    QList<Bone*> mSelectedBones;
-    QList<MovablePoint*> mSelectedPoints;
-    QList<BoundingBox*> mSelectedBoxes;
+    QList<BoneQPtr> mSelectedBones;
+    QList<MovablePointPtr> mSelectedPoints_d;
+    QList<BoundingBoxQPtr> mSelectedBoxes;
 
     bool mLocalPivot = false;
     bool mBonesSelectionEnabled = false;
@@ -598,10 +600,10 @@ protected:
     CanvasWindow *mCanvasWindow;
     QWidget *mCanvasWidget;
 
-    Circle *mCurrentCircle = nullptr;
-    Rectangle *mCurrentRectangle = nullptr;
-    TextBox *mCurrentTextBox = nullptr;
-    ParticleBox *mCurrentParticleBox = nullptr;
+    CircleQSPtr mCurrentCircle;
+    RectangleQSPtr mCurrentRectangle;
+    TextBoxQSPtr mCurrentTextBox;
+    ParticleBoxQSPtr mCurrentParticleBox;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
 
@@ -632,10 +634,10 @@ protected:
     bool mDoubleClick = false;
     int mMovesToSkip = 0;
 
-    Color mFillColor;
-    Color mOutlineColor;
+    QColor mFillColor;
+    QColor mOutlineColor;
 
-    BoxesGroup *mCurrentBoxesGroup;
+    BoxesGroupQPtr mCurrentBoxesGroup;
 
     int mWidth;
     int mHeight;
@@ -661,12 +663,14 @@ protected:
 
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
-    MovablePoint *mLastPressedPoint = nullptr;
-    NodePoint *mCurrentEndPoint = nullptr;
-    BoundingBox *mLastPressedBox = nullptr;
-    Bone *mLastPressedBone = nullptr;
+
+    MovablePointPtr mLastPressedPoint;
+    NodePointPtr mCurrentEndPoint;
+    BoundingBoxQPtr mLastPressedBox;
+    BoneQPtr mLastPressedBone;
+
     void setCtrlPointsEnabled(bool enabled);
-    PathPivot *mRotPivot;
+    PathPivotSPtr mRotPivot;
     void handleMovePointMouseMove();
     void handleMovePathMouseMove();
     void handleAddPointMouseMove();

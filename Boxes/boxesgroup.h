@@ -18,7 +18,7 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
         BoundingBoxRenderData(parentBoxT) {
         mDelayDataSet = true;
     }
-    QList<BoundingBoxRenderDataSPtr > childrenRenderData;
+
     void updateRelBoundingRect() {
         SkPath boundingPaths = SkPath();
         Q_FOREACH(const BoundingBoxRenderDataSPtr &child,
@@ -36,6 +36,7 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
     }
     void renderToImage();
 
+    QList<BoundingBoxRenderDataSPtr> childrenRenderData;
 protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
@@ -75,9 +76,10 @@ public:
     void ungroup();
 
     bool isCurrentGroup();
-    void addContainedBox(BoundingBox *child);
-    void addContainedBoxToListAt(const int &index, BoundingBox *child,
-                          const bool &saveUndoRedo = true);
+    void addContainedBox(const BoundingBoxQSPtr &child);
+    void addContainedBoxToListAt(const int &index,
+                                 const BoundingBoxQSPtr &child,
+                                 const bool &saveUndoRedo = true);
     void updateContainedBoxIds(const int &firstId,
                           const bool &saveUndoRedo = true);
     void updateContainedBoxIds(const int &firstId,
@@ -93,9 +95,9 @@ public:
                          const int &to,
                          const bool &saveUndoRedo = true);
     void moveContainedBoxBelow(BoundingBox *boxToMove,
-                        BoundingBox *below);
+                        const BoundingBoxQSPtr &below);
     void moveContainedBoxAbove(BoundingBox *boxToMove,
-                        BoundingBox *above);
+                        const BoundingBoxQSPtr &above);
 
     void removeContainedBoxFromList(const int &id,
                              const bool &saveUndoRedo = true);
@@ -175,11 +177,11 @@ public:
     void schedulerProccessed();
 
     BoundingBoxRenderDataSPtr createRenderData() {
-        return (new BoxesGroupRenderData(this))->ref<BoundingBoxRenderData>();;
+        return SPtrCreate(BoxesGroupRenderData)(this);
     }
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                const BoundingBoxRenderDataSPtr& data);
+                                                BoundingBoxRenderData* data);
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
@@ -220,15 +222,15 @@ public:
     const QList<QSharedPointer<BoundingBox> > &getContainedBoxesList() const {
         return mContainedBoxes;
     }
-    BoundingBox *createLink();
+    BoundingBoxQSPtr createLink();
     void readChildBoxes(QIODevice *target);
 
-    void addPathEffect(PathEffect *effect);
-    void addFillPathEffect(PathEffect *effect);
-    void addOutlinePathEffect(PathEffect *effect);
-    void removePathEffect(PathEffect *effect);
-    void removeFillPathEffect(PathEffect *effect);
-    void removeOutlinePathEffect(PathEffect *effect);
+    void addPathEffect(const PathEffectQSPtr& effect);
+    void addFillPathEffect(const PathEffectQSPtr& effect);
+    void addOutlinePathEffect(const PathEffectQSPtr& effect);
+    void removePathEffect(const PathEffectQSPtr& effect);
+    void removeFillPathEffect(const PathEffectQSPtr& effect);
+    void removeOutlinePathEffect(const PathEffectQSPtr& effect);
 
     void updateAllChildPathBoxes(const UpdateReason &reason) {
         foreach(const QSharedPointer<BoundingBox> &box,
@@ -236,7 +238,7 @@ public:
             if(box->SWT_isPathBox()) {
                 box->scheduleUpdate(reason);
             } else if(box->SWT_isBoxesGroup()) {
-                ((BoxesGroup*)box.data())->updateAllChildPathBoxes(reason);
+                static_cast<BoxesGroup*>(box.data())->updateAllChildPathBoxes(reason);
             }
         }
     }

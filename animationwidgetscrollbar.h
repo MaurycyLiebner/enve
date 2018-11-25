@@ -2,10 +2,10 @@
 #define ANIMATiONWIDGETSCROLLBAR_H
 
 #include <QWidget>
+#include "sharedpointerdefs.h"
 class CacheHandler;
 
-class AnimationWidgetScrollBar : public QWidget
-{
+class AnimationWidgetScrollBar : public QWidget {
     Q_OBJECT
 public:
     explicit AnimationWidgetScrollBar(const int &minSpan,
@@ -14,7 +14,8 @@ public:
                                       const int &height,
                                       const bool &range,
                                       const bool &clamp,
-                                      QWidget *parent = 0);
+                                      QWidget *parent = nullptr);
+    virtual ~AnimationWidgetScrollBar() {}
     void emitChange();
     bool setFirstViewedFrame(const int &firstFrame);
     void setFramesSpan(int newSpan);
@@ -46,7 +47,7 @@ public slots:
     void setMinMaxFrames(const int &minFrame,
                          const int &maxFrame);
 private:
-    CacheHandler *mCacheHandler = nullptr;
+    CacheHandler* mCacheHandler_d = nullptr;
     bool mTopBorderVisible = true;
     bool mClamp;
 

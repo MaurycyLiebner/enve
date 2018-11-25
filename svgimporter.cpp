@@ -535,10 +535,11 @@ BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
     bool hasTransform = attributes->hasTransform();
     if(allRootChildNodes.count() > 1 ||
        hasTransform || parentGroup == nullptr) {
-        boxesGroup = new BoxesGroup();
+        auto newBoxesGroup = SPtrCreate(BoxesGroup)();
+        boxesGroup = newBoxesGroup.data();
         attributes->apply(boxesGroup);
         if(parentGroup != nullptr) {
-            parentGroup->addContainedBox(boxesGroup);
+            parentGroup->addContainedBox(newBoxesGroup);
         }
     } else {
         boxesGroup = parentGroup;
@@ -556,21 +557,21 @@ BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
 void loadVectorPath(const QDomElement &pathElement,
                     BoxesGroup *parentGroup,
                     VectorPathSvgAttributes *attributes) {
-    VectorPath *vectorPath = new VectorPath();
+    VectorPathQSPtr vectorPath = SPtrCreate(VectorPath)();
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
-    attributes->apply(vectorPath);
+    attributes->apply(vectorPath.get());
     parentGroup->addContainedBox(vectorPath);
 }
 
 void loadPolyline(const QDomElement &pathElement,
                   BoxesGroup *parentGroup,
                   VectorPathSvgAttributes *attributes) {
-    VectorPath *vectorPath = new VectorPath();
+    VectorPathQSPtr vectorPath = SPtrCreate(VectorPath)();
 
     QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
-    attributes->apply(vectorPath);
+    attributes->apply(vectorPath.get());
     parentGroup->addContainedBox(vectorPath);
 }
 
@@ -584,12 +585,12 @@ void loadCircle(const QDomElement &pathElement,
     QString rXstr = pathElement.attribute("rx");
     QString rYstr = pathElement.attribute("ry");
 
-    Circle *circle;
+    CircleQSPtr circle;
     if(!rStr.isEmpty()) {
-        circle = new Circle();
+        circle = SPtrCreate(Circle)();
         circle->setRadius(rStr.toDouble());
     } else if(!rXstr.isEmpty() && !rYstr.isEmpty()){
-        circle = new Circle();
+        circle = SPtrCreate(Circle)();
         circle->setHorizontalRadius(rXstr.toDouble());
         circle->setVerticalRadius(rYstr.toDouble());
     } else {
@@ -598,7 +599,7 @@ void loadCircle(const QDomElement &pathElement,
 
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
 
-    attributes->apply(circle);
+    attributes->apply(circle.data());
     parentGroup->addContainedBox(circle);
 }
 
@@ -619,7 +620,7 @@ void loadRect(const QDomElement &pathElement,
         rXstr = rYstr;
     }
 
-    Rectangle *rect = new Rectangle();
+    RectangleQSPtr rect = SPtrCreate(Rectangle)();
 
     rect->moveByRel(QPointF(xStr.toDouble(),
                             yStr.toDouble()));
@@ -629,7 +630,7 @@ void loadRect(const QDomElement &pathElement,
     rect->setYRadius(rYstr.toDouble());
     rect->setXRadius(rXstr.toDouble());
 
-    attributes->apply(rect);
+    attributes->apply(rect.data());
     parentGroup->addContainedBox(rect);
 }
 
@@ -641,13 +642,13 @@ void loadText(const QDomElement &pathElement,
     QString xStr = pathElement.attribute("x");
     QString yStr = pathElement.attribute("y");
 
-    TextBox *textBox = new TextBox();
+    TextBoxQSPtr textBox = SPtrCreate(TextBox)();
 
     textBox->moveByRel(QPointF(xStr.toDouble(),
                                yStr.toDouble()));
     textBox->setCurrentTextValue(pathElement.text(), false);
 
-    attributes->apply(textBox);
+    attributes->apply(textBox.data());
     parentGroup->addContainedBox(textBox);
 }
 
@@ -723,7 +724,7 @@ bool getGradientFromString(const QString &colorStr, FillSvgAttributes *target,
 
 bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) {
     target->setPaintType(FLATPAINT);
-    Color color;
+    QColor color;
 
     QRegExp rx = QRegExp("rgb\\(.*\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(colorStr)) {
@@ -731,22 +732,22 @@ bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) 
         if(rx.exactMatch(colorStr)) {
             rx.indexIn(colorStr);
             QStringList intRGB = rx.capturedTexts();
-            color.setRGB(((const QString &)intRGB.at(1)).toInt()/255.,
-                         ((const QString &)intRGB.at(2)).toInt()/255.,
-                         ((const QString &)intRGB.at(3)).toInt()/255. );
+            color.setRgb(intRGB.at(1).toInt(),
+                         intRGB.at(2).toInt(),
+                         intRGB.at(3).toInt());
         } else {
             rx = QRegExp("rgb\\(\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*\\)", Qt::CaseInsensitive);
             rx.indexIn(colorStr);
             QStringList intRGB = rx.capturedTexts();
-            color.setRGB(((const QString &)intRGB.at(1)).toInt()/100.,
-                         ((const QString &)intRGB.at(2)).toInt()/100.,
-                         ((const QString &)intRGB.at(3)).toInt()/100. );
+            color.setRgbF(intRGB.at(1).toInt()/100.,
+                          intRGB.at(2).toInt()/100.,
+                          intRGB.at(3).toInt()/100.);
 
         }
     } else {
         rx = QRegExp("#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})", Qt::CaseInsensitive);
         if(rx.exactMatch(colorStr)) {
-            color.setQColor(QColor(colorStr));
+            color = QColor(colorStr);
         } else {
             return false;
         }
@@ -771,12 +772,12 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
     if(rx.exactMatch(matrixStr)) {
         rx.indexIn(matrixStr);
         QStringList capturedTxt = rx.capturedTexts();
-        matrix.setMatrix( ( (const QString&)capturedTxt.at(1)).toDouble(),
-                          ( (const QString&)capturedTxt.at(3)).toDouble(),
-                          ( (const QString&)capturedTxt.at(5)).toDouble(),
-                          ( (const QString&)capturedTxt.at(7)).toDouble(),
-                          ( (const QString&)capturedTxt.at(9)).toDouble(),
-                          ( (const QString&)capturedTxt.at(11)).toDouble());
+        matrix.setMatrix(capturedTxt.at(1).toDouble(),
+                         capturedTxt.at(3).toDouble(),
+                         capturedTxt.at(5).toDouble(),
+                         capturedTxt.at(7).toDouble(),
+                         capturedTxt.at(9).toDouble(),
+                         capturedTxt.at(11).toDouble());
     } else {
         QRegExp rx2 = QRegExp("translate\\("
                              "\\s*(-?\\d+(\\.\\d*)?),"
@@ -785,8 +786,8 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
         if(rx2.exactMatch(matrixStr)) {
             rx2.indexIn(matrixStr);
             QStringList capturedTxt = rx2.capturedTexts();
-            matrix.translate(((const QString&)capturedTxt.at(1)).toDouble(),
-                             ((const QString&)capturedTxt.at(3)).toDouble());
+            matrix.translate(capturedTxt.at(1).toDouble(),
+                             capturedTxt.at(3).toDouble());
         } else {
             QRegExp rx3 = QRegExp("scale\\("
                                  "\\s*(-?\\d+(\\.\\d*)?),"
@@ -795,8 +796,8 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
             if(rx3.exactMatch(matrixStr)) {
                 rx3.indexIn(matrixStr);
                 QStringList capturedTxt = rx3.capturedTexts();
-                matrix.scale(((const QString&)capturedTxt.at(1)).toDouble(),
-                             ((const QString&)capturedTxt.at(3)).toDouble());
+                matrix.scale(capturedTxt.at(1).toDouble(),
+                             capturedTxt.at(3).toDouble());
             } else {
                 QRegExp rx4 = QRegExp("rotate\\("
                                      "\\s*(-?\\d+(\\.\\d*)?)"
@@ -804,7 +805,7 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
                 if(rx4.exactMatch(matrixStr)) {
                     rx4.indexIn(matrixStr);
                     QStringList capturedTxt = rx4.capturedTexts();
-                    matrix.rotate(((const QString&)capturedTxt.at(1)).toDouble());
+                    matrix.rotate(capturedTxt.at(1).toDouble());
                 } else {
                     qDebug() << "getMatrixFromString - could not extract values from string: "
                              << endl << matrixStr;
@@ -1009,12 +1010,12 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
         case 'c':
             if (name == "color") {
                 mFillAttributes.setPaintType(FLATPAINT);
-                Color color = mFillAttributes.getColor();
-                color.setGLColorA(toDouble(value));
+                QColor color = mFillAttributes.getColor();
+                color.setAlphaF(toDouble(value));
                 mFillAttributes.setColor(color);
             } else if (name == "color-opacity") {
-                Color color = mFillAttributes.getColor();
-                color.setGLColorA(toDouble(value));
+                QColor color = mFillAttributes.getColor();
+                color.setAlphaF(toDouble(value));
                 mFillAttributes.setColor(color);
             } else if (name == "comp-op") {
                 //compOp = value;
@@ -1956,15 +1957,13 @@ FillSvgAttributes &FillSvgAttributes::operator*=(
     return *this;
 }
 
-void FillSvgAttributes::setColor(const Color &val) {
-    qreal opacity = val.gl_a;
+void FillSvgAttributes::setColor(const QColor &val) {
     mColor = val;
-    mColor.setGLColorA(opacity);
     setPaintType(FLATPAINT);
 }
 
 void FillSvgAttributes::setColorOpacity(const qreal &opacity) {
-    mColor.setGLColorA(opacity);
+    mColor.setAlphaF(opacity);
 }
 
 void FillSvgAttributes::setPaintType(const PaintType &type) {
@@ -1977,7 +1976,7 @@ void FillSvgAttributes::setGradient(Gradient *gradient) {
     setPaintType(GRADIENTPAINT);
 }
 
-const Color &FillSvgAttributes::getColor() const { return mColor; }
+const QColor &FillSvgAttributes::getColor() const { return mColor; }
 
 const PaintType &FillSvgAttributes::getPaintType() const { return mPaintType; }
 
@@ -1988,10 +1987,10 @@ void FillSvgAttributes::apply(BoundingBox *box) {
     if(mPaintType == FLATPAINT) {
         setting = new PaintSetting(true, ColorSetting(RGBMODE,
                                                       CVR_ALL,
-                                                      mColor.gl_r,
-                                                      mColor.gl_g,
-                                                      mColor.gl_b,
-                                                      mColor.gl_a,
+                                                      mColor.redF(),
+                                                      mColor.greenF(),
+                                                      mColor.blueF(),
+                                                      mColor.alphaF(),
                                                       CST_CHANGE));
     } else if(mPaintType == GRADIENTPAINT) {
         setting = new PaintSetting(true, true, mGradient);
@@ -1999,7 +1998,7 @@ void FillSvgAttributes::apply(BoundingBox *box) {
         setting = new PaintSetting(true);
     }
     if(box->SWT_isPathBox()) {
-        setting->apply((PathBox*)box);
+        setting->apply(box->ref<PathBox>());
     }
     delete setting;
 }
@@ -2053,26 +2052,25 @@ void StrokeSvgAttributes::setOutlineCompositionMode(
     mOutlineCompositionMode = compMode;
 }
 
-void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale)
-{
+void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
     box->setStrokeWidth(mLineWidth*scale, false);
 
     PaintSetting *setting;
     if(mPaintType == FLATPAINT) {
         setting = new PaintSetting(false, ColorSetting(RGBMODE,
                                                        CVR_ALL,
-                                                       mColor.gl_r,
-                                                       mColor.gl_g,
-                                                       mColor.gl_b,
-                                                      mColor.gl_a,
-                                                      CST_CHANGE));
+                                                       mColor.redF(),
+                                                       mColor.greenF(),
+                                                       mColor.blueF(),
+                                                       mColor.alphaF(),
+                                                       CST_CHANGE));
     } else if(mPaintType == GRADIENTPAINT) {
         setting = new PaintSetting(false, true, mGradient);
     } else {
         setting = new PaintSetting(false);
     }
     if(box->SWT_isPathBox()) {
-        setting->apply((PathBox*)box);
+        setting->apply(box->ref<PathBox>());
     }
     delete setting;
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
@@ -2081,7 +2079,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale)
 void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
     box->getTransformAnimator()->setOpacity(mOpacity);
     if(box->SWT_isPathBox()) {
-        PathBox *path = (PathBox*)box;
+        PathBoxQSPtr path = box->ref<PathBox>();
         qreal m11 = mRelTransform.m11();
         qreal m12 = mRelTransform.m12();
         qreal m21 = mRelTransform.m21();
@@ -2093,14 +2091,14 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
                                 (sxAbs + syAbs)*0.5);
         mFillAttributes.apply(path);
         if(box->SWT_isTextBox()) {
-            TextBox *text = (TextBox*)path;
+            TextBoxQSPtr text = path->ref<TextBox>();
             text->setFont(mTextAttributes.getFont());
         }
     }
 }
 
 void VectorPathSvgAttributes::apply(VectorPath *path) {
-    PathAnimator *pathAnimator = path->getPathAnimator();
+    PathAnimatorQSPtr pathAnimator = path->getPathAnimator();
     Q_FOREACH(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
         VectorPathAnimator *singlePath =
@@ -2109,7 +2107,7 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
         pathAnimator->addSinglePathAnimator(singlePath, false);
     }
 
-    BoundingBoxSvgAttributes::apply((BoundingBox*)path);
+    BoundingBoxSvgAttributes::apply(path);
 }
 
 SvgSeparatePath::SvgSeparatePath() {}
@@ -2184,7 +2182,9 @@ void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
     }
 }
 
-void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation, int large_arc_flag, int sweep_flag, qreal x, qreal y, qreal curx, qreal cury) {
+void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
+                              int large_arc_flag, int sweep_flag,
+                              qreal x, qreal y, qreal curx, qreal cury) {
     qreal sin_th, cos_th;
     qreal a00, a01, a10, a11;
     qreal x0, y0, x1, y1, xc, yc;
@@ -2255,7 +2255,9 @@ void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation, int lar
     }
 }
 
-void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc, qreal th0, qreal th1, qreal rx, qreal ry, qreal xAxisRotation)
+void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc,
+                                     qreal th0, qreal th1,
+                                     qreal rx, qreal ry, qreal xAxisRotation)
 {
     qreal sinTh, cosTh;
     qreal a00, a01, a10, a11;

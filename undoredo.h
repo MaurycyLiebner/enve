@@ -8,41 +8,8 @@
 #include "skiaincludes.h"
 
 #include "Animators/PathAnimators/vectorpathanimator.h"
+#include "sharedpointerdefs.h"
 class MainWindow;
-class MovablePoint;
-typedef QSharedPointer<MovablePoint> MovablePointQSPtr;
-class NodePoint;
-typedef QSharedPointer<NodePoint> NodePointQSPtr;
-class VectorPathAnimator;
-typedef QSharedPointer<VectorPathAnimator> VectorPathAnimatorQSPtr;
-class PathAnimator;
-typedef QSharedPointer<PathAnimator> PathAnimatorQSPtr;
-class Gradient;
-typedef QSharedPointer<Gradient> GradientQSPtr;
-class ColorAnimator;
-typedef QSharedPointer<ColorAnimator> ColorAnimatorQSPtr;
-class PaintSettings;
-typedef QSharedPointer<PaintSettings> PaintSettingsQSPtr;
-class BoxesGroup;
-typedef QSharedPointer<BoxesGroup> BoxesGroupQSPtr;
-class BoundingBox;
-typedef QSharedPointer<BoundingBox> BoundingBoxQSPtr;
-class TextBox;
-typedef QSharedPointer<TextBox> TextBoxQSPtr;
-class ComplexAnimator;
-typedef QSharedPointer<ComplexAnimator> ComplexAnimatorQSPtr;
-class Property;
-typedef QSharedPointer<Property> PropertyQSPtr;
-class QrealAnimator;
-typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
-class Animator;
-typedef QSharedPointer<Animator> AnimatorQSPtr;
-class Key;
-typedef std::shared_ptr<Key> KeyStdPtr;
-class QrealKey;
-typedef std::shared_ptr<QrealKey> QrealKeyStdPtr;
-class QStringAnimator;
-typedef QSharedPointer<QStringAnimator> QStringAnimatorQSPtr;
 class Tile;
 
 enum CtrlsMode : short;

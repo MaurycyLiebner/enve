@@ -6,6 +6,7 @@ class BoundingBox;
 #include "skiaincludes.h"
 #include <QDebug>
 #include "sharedpointerdefs.h"
+#include "updatable.h"
 class QTemporaryFile;
 class Canvas;
 
@@ -14,8 +15,6 @@ struct BoundingBoxRenderData;
 
 class MinimalCacheContainer : public StdSelfRef {
 public:
-    MinimalCacheContainer(const bool &addToMemoryHandler = true);
-
     virtual ~MinimalCacheContainer();
 
     bool cacheFreeAndRemoveFromMemoryHandler();
@@ -37,6 +36,8 @@ public:
         return mHandledByMemoryHandler;
     }
 protected:
+    MinimalCacheContainer(const bool &addToMemoryHandler = true);
+
     bool mHandledByMemoryHandler = false;
     bool mBlocked = false;
 };
@@ -44,99 +45,67 @@ protected:
 class CacheContainer;
 class CacheContainerTmpFileDataLoader : public _ScheduledExecutor {
 public:
-    CacheContainerTmpFileDataLoader(const QSharedPointer<QTemporaryFile> &file,
-                                    CacheContainer *target);
     void _processUpdate();
 
     void afterUpdate();
 
     bool isFileUpdatable() { return true; }
 protected:
+    CacheContainerTmpFileDataLoader(const QSharedPointer<QTemporaryFile> &file,
+                                    CacheContainer *target);
     void addSchedulerNow();
-    CacheContainer *mTargetCont = nullptr;
-    sk_sp<SkImage> mImage;
+
+    const QPointer<CacheContainer> mTargetCont;
     QSharedPointer<QTemporaryFile> mTmpFile;
+    sk_sp<SkImage> mImage;
 };
 
 class CacheContainerTmpFileDataSaver : public _ScheduledExecutor {
 public:
-    CacheContainerTmpFileDataSaver(const sk_sp<SkImage> &image,
-                                   CacheContainer *target);
     void _processUpdate();
 
     void afterUpdate();
     bool isFileUpdatable() { return true; }
 protected:
-    bool mSavingFailed = false;
+    CacheContainerTmpFileDataSaver(const sk_sp<SkImage> &image,
+                                   CacheContainer *target);
     void addSchedulerNow();
-    CacheContainer *mTargetCont = nullptr;
+
+    bool mSavingFailed = false;
+    const QPointer<CacheContainer> mTargetCont;
     sk_sp<SkImage> mImage;
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
 
 class CacheContainerTmpFileDataDeleter : public _ScheduledExecutor {
 public:
-    CacheContainerTmpFileDataDeleter(const QSharedPointer<QTemporaryFile> &file) {
-        mTmpFile = file;
-    }
     void _processUpdate();
 
     bool isFileUpdatable() { return true; }
 protected:
+    CacheContainerTmpFileDataDeleter(const QSharedPointer<QTemporaryFile> &file) {
+        mTmpFile = file;
+    }
     void addSchedulerNow();
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
 
 class CacheContainer : public MinimalCacheContainer {
 public:
-    CacheContainer() {}
     ~CacheContainer();
 
-    _ScheduledExecutor *scheduleLoadFromTmpFile(
-            const std::shared_ptr<_ScheduledExecutor>& dependent =
-                std::shared_ptr<_ScheduledExecutor>()) {
-        if(mSavingToFile) {
-            mCancelAfterSaveDataClear = true;
-            return mSavingUpdatable;
-        }
-        if(!mNoDataInMemory) return nullptr;
-        if(mLoadingFromFile) return mLoadingUpdatable;
+    _ScheduledExecutorSPtr scheduleLoadFromTmpFile(
+            _ScheduledExecutor* dependent = nullptr);
 
-        mLoadingFromFile = true;
-        mLoadingUpdatable = new CacheContainerTmpFileDataLoader(mTmpFile,
-                                                                this);
-        if(dependent != nullptr) {
-            mLoadingUpdatable->addDependent(dependent);
-        }
-        mLoadingUpdatable->addScheduler();
-        return mLoadingUpdatable;
-    }
-
-    void setParentCacheHandler(CacheHandler *handler);
     bool cacheAndFree();
     bool freeAndRemove();
     void setBlocked(const bool &bT);
 
-    int getByteCount() {
-        if(mImageSk.get() == nullptr) return 0;
-        SkPixmap pixmap;
-        if(mImageSk->peekPixels(&pixmap)) {
-            return pixmap.width()*pixmap.height()*
-                    pixmap.info().bytesPerPixel();
-        }
-        return 0;
-    }
+    int getByteCount();
 
-    sk_sp<SkImage> getImageSk() {
-        return mImageSk;
-    }
+    sk_sp<SkImage> getImageSk();
 
-    void scheduleDeleteTmpFile() {
-        if(mTmpFile == nullptr) return;
-        _ScheduledExecutor *updatable = new CacheContainerTmpFileDataDeleter(mTmpFile);
-        mTmpFile.reset();
-        updatable->addScheduler();
-    }
+    void scheduleDeleteTmpFile();
 
     void setDataLoadedFromTmpFile(const sk_sp<SkImage> &img);
     void replaceImageSk(const sk_sp<SkImage> &img);
@@ -151,34 +120,37 @@ public:
     void setRelFrameRange(const int &minFrame, const int &maxFrame);
     bool relFrameInRange(const int &relFrame);
     virtual void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
-    bool storesDataInMemory() {
-        return !mNoDataInMemory;
-    }
+    bool storesDataInMemory();
     void setDataSavedToTmpFile(const QSharedPointer<QTemporaryFile> &tmpFile);
-    void setAsCurrentPreviewContainerAfterFinishedLoading(Canvas *canvas) {
-        mTmpLoadTargetCanvas = canvas;
-    }
+    void setAsCurrentPreviewContainerAfterFinishedLoading(Canvas *canvas);
 protected:
-    Canvas *mTmpLoadTargetCanvas = nullptr;
-    int mMemSizeAwaitingSave = 0;
-    _ScheduledExecutor *mLoadingUpdatable = nullptr;
-    _ScheduledExecutor *mSavingUpdatable = nullptr;
+    CacheContainer(CacheHandler* parent);
+
+protected:
+    void saveToTmpFile();
+
     bool mCancelAfterSaveDataClear = false;
     bool mSavingToFile = false;
     bool mLoadingFromFile = false;
-    void saveToTmpFile();
     bool mNoDataInMemory = false;
+
+    int mMemSizeAwaitingSave = 0;
+    int mMinRelFrame = 0;
+    int mMaxRelFrame = 0;
+
+    CanvasQPtr mTmpLoadTargetCanvas;
+    _ScheduledExecutorSPtr mLoadingUpdatable;
+    _ScheduledExecutorSPtr mSavingUpdatable;
+
     QSharedPointer<QTemporaryFile> mTmpFile;
 
     sk_sp<SkImage> mImageSk;
-    CacheHandler *mParentCacheHandler = nullptr;
-    int mMinRelFrame = 0;
-    int mMaxRelFrame = 0;
+    CacheHandler * const mParentCacheHandler_k;
 };
 
 class RenderContainer : public CacheContainer {
 public:
-    RenderContainer() {}
+    RenderContainer() : CacheContainer(nullptr) {}
     virtual ~RenderContainer();
 
     void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
@@ -196,22 +168,22 @@ public:
 
     const qreal &getResolutionFraction() const;
 
-    void setVariablesFromRenderData(const BoundingBoxRenderDataSPtr& data);
+    void setSrcRenderData(BoundingBoxRenderData *data);
     int getRelFrame() {
         return mRelFrame;
     }
 
-    BoundingBoxRenderDataSPtr getSrcRenderData() {
-        return mSrcRenderData;
+    BoundingBoxRenderData *getSrcRenderData() {
+        return mSrcRenderData.get();
     }
 
 protected:
-    BoundingBoxRenderDataSPtr mSrcRenderData;
     int mRelFrame = 0;
     qreal mResolutionFraction;
+    SkPoint mDrawPos;
     QMatrix mTransform;
     QMatrix mPaintTransform;
-    SkPoint mDrawPos;
+    BoundingBoxRenderDataSPtr mSrcRenderData;
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H

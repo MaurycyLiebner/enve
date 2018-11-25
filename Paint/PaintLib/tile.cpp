@@ -252,7 +252,7 @@ Tile::~Tile() {
 
 void Tile::initializeDrawer() {
     if(mPaintInOtherThread) {
-        mDrawer = (new TileSkDrawer(this, mPosX, mPosY))->ref<TileSkDrawer>();
+        mDrawer = SPtrCreate(TileSkDrawer)(this, mPosX, mPosY);
         mDrawer->maxPaintX = mMaxPaintX;
         mDrawer->maxPaintY = mMaxPaintY;
     }
@@ -524,4 +524,10 @@ void TileSkDrawer::afterUpdate() {
 
 void TileSkDrawer::clearImg() {
     std::memset(_data, 0, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+}
+
+void TileSkDrawerCollection::setHue(const qreal &hueT) {
+    QColor qcol;
+    qcol.setHsvF(hueT, 1., 1.);
+    hueCol = QColorToSkColor(qcol);
 }

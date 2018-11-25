@@ -3,6 +3,7 @@
 #include "Animators/complexanimator.h"
 #include "Animators/qpointfanimator.h"
 #include "pointanimator.h"
+#include "sharedpointerdefs.h"
 class TransformUpdater;
 
 class BasicTransformAnimator : public ComplexAnimator {
@@ -86,32 +87,29 @@ public:
     void readProperty(QIODevice *target);
 
     QPointFAnimator *getPosAnimator() {
-        return mPosAnimator.data();
+        return mPosAnimator.get();
     }
 
     QPointFAnimator *getScaleAnimator() {
-        return mScaleAnimator.data();
+        return mScaleAnimator.get();
     }
 
     QrealAnimator *getRotAnimator() {
-        return mRotAnimator.data();
+        return mRotAnimator.get();
     }
-
 protected:
-    QList<BasicTransformAnimator*> mChildBoxes;
+    QList<BasicTransformAnimatorQSPtr> mChildBoxes;
 
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;
 
-    QSharedPointer<BasicTransformAnimator> mParentTransformAnimator;
+    BasicTransformAnimatorQPtr mParentTransformAnimator;
 
-    QSharedPointer<QPointFAnimator> mPosAnimator =
-            (new QPointFAnimator)->ref<QPointFAnimator>();
-    QSharedPointer<QPointFAnimator> mScaleAnimator =
-            (new QPointFAnimator)->ref<QPointFAnimator>();
+    QPointFAnimatorQSPtr mPosAnimator;
+    QPointFAnimatorQSPtr mScaleAnimator;
     QrealAnimatorQSPtr mRotAnimator;
 
-    AnimatorUpdaterStdSPtr mTransformUpdater;
+    AnimatorUpdaterSPtr mTransformUpdater;
 public slots:
     virtual void updateCombinedTransform(const UpdateReason &reason);
 signals:
@@ -170,23 +168,24 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
-    PointAnimator *getPivotAnimator() {
-        return mPivotAnimator.data();
+    QPointFAnimator *getPivotAnimator() {
+        return mPivotAnimator.get();
     }
 
     QrealAnimator *getOpacityAnimator() {
-        return mOpacityAnimator.data();
+        return mOpacityAnimator.get();
     }
 
     void updateCombinedTransform(const UpdateReason &reason);
 
     BoundingBox *getParentBox() {
-        return mParentBox;
+        return mParentBox_k;
     }
 private:
     bool mPivotAutoAdjust = true;
-    BoundingBox *mParentBox = nullptr;
-    QSharedPointer<PointAnimator> mPivotAnimator;
+    BoundingBox * const mParentBox_k;
+    BoxPathPointSPtr mPivotPoint;
+    QPointFAnimatorQSPtr mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;
 };
 

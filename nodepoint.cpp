@@ -12,29 +12,18 @@
 NodePoint::NodePoint(VectorPathAnimator *parentAnimator) :
     NonAnimatedMovablePoint(parentAnimator->getParentPathAnimator()->
                             getParentBox()->getTransformAnimator(),
-                 MovablePointType::TYPE_PATH_POINT, 6.5) {
-    mParentPath = parentAnimator;
-    mStartCtrlPt = new CtrlPoint(this, true);
-    mEndCtrlPt = new CtrlPoint(this, false);
+                 MovablePointType::TYPE_PATH_POINT, 6.5), mParentPath(parentAnimator) {
+    mStartCtrlPt = SPtrCreate(CtrlPoint)(this, true);
+    mEndCtrlPt = SPtrCreate(CtrlPoint)(this, false);
 
-    mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
-    mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
+    mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt.get());
+    mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt.get());
 
     mStartCtrlPt->hide();
     mEndCtrlPt->hide();
 
-    parentAnimator->appendToPointsList(this);
-    //NodePointUpdater *updater = new NodePointUpdater(vectorPath);
+    //NodePointUpdater *updater = SPtrCreate(NodePointUpdater)(vectorPath);
     //prp_setUpdater(updater);
-}
-
-NodePoint::~NodePoint() {
-    delete mStartCtrlPt;
-    delete mEndCtrlPt;
-}
-
-void NodePoint::setParentPath(VectorPathAnimator *path) {
-    mParentPath = path;
 }
 
 void NodePoint::applyTransform(const QMatrix &transform) {
@@ -159,13 +148,13 @@ void NodePoint::rectPointsSelection(const QRectF &absRect,
     if(!mEndCtrlPt->isSelected()) {
         if(mEndCtrlPt->isContainedInRect(absRect)) {
             mEndCtrlPt->select();
-            list->append(mEndCtrlPt);
+            list->append(mEndCtrlPt.get());
         }
     }
     if(!mStartCtrlPt->isSelected()) {
         if(mStartCtrlPt->isContainedInRect(absRect)) {
             mStartCtrlPt->select();
-            list->append(mStartCtrlPt);
+            list->append(mStartCtrlPt.get());
         }
     }
 }
@@ -176,10 +165,10 @@ MovablePoint *NodePoint::getPointAtAbsPos(const QPointF &absPos,
     if(canvasMode == CanvasMode::MOVE_POINT) {
         if(mStartCtrlPt->isPointAtAbsPos(absPos,
                                          canvasScaleInv)) {
-            return mStartCtrlPt;
+            return mStartCtrlPt->get();
         } else if (mEndCtrlPt->isPointAtAbsPos(absPos,
                                                canvasScaleInv)) {
-            return mEndCtrlPt;
+            return mEndCtrlPt->get();
         }
     } else {
         if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
@@ -216,7 +205,7 @@ void NodePoint::moveEndCtrlPtToRelPos(const QPointF &endCtrlPt) {
     }
     mParentPath->setElementPos(getPtId() + 1, QPointFToSkPoint(endCtrlPt));
     mEndCtrlPt->setRelativePos(endCtrlPt);
-    ctrlPointPosChanged(mEndCtrlPt, mStartCtrlPt);
+    ctrlPointPosChanged(mEndCtrlPt.get(), mStartCtrlPt.get());
 }
 
 void NodePoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
@@ -225,7 +214,7 @@ void NodePoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
     }
     mParentPath->setElementPos(getPtId() - 1, QPointFToSkPoint(startCtrlPt));
     mStartCtrlPt->setRelativePos(startCtrlPt);
-    ctrlPointPosChanged(mStartCtrlPt, mEndCtrlPt);
+    ctrlPointPosChanged(mStartCtrlPt.get(), mEndCtrlPt.get());
 }
 
 QPointF NodePoint::getStartCtrlPtAbsPos() const {
@@ -240,14 +229,13 @@ QPointF NodePoint::getStartCtrlPtValue() const {
     }
 }
 
-CtrlPoint *NodePoint::getStartCtrlPt()
-{
-    return mStartCtrlPt;
+CtrlPoint *NodePoint::getStartCtrlPt() {
+    return mStartCtrlPt.get();
 }
 
 void NodePoint::ctrlPointPosChanged(const bool &startPtChanged) {
-    ctrlPointPosChanged((startPtChanged) ? mStartCtrlPt : mEndCtrlPt,
-                        (startPtChanged) ? mEndCtrlPt : mStartCtrlPt);
+    ctrlPointPosChanged((startPtChanged) ? mStartCtrlPt.get() : mEndCtrlPt.get(),
+                        (startPtChanged) ? mEndCtrlPt.get() : mStartCtrlPt.get());
 }
 
 void NodePoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
@@ -282,8 +270,9 @@ QPointF NodePoint::getEndCtrlPtValue() const {
 }
 
 CtrlPoint *NodePoint::getEndCtrlPt() {
-    return mEndCtrlPt;
+    return mEndCtrlPt.get();
 }
+
 #include "mainwindow.h"
 #include "global.h"
 void NodePoint::drawSk(SkCanvas *canvas,
@@ -315,24 +304,24 @@ void NodePoint::drawSk(SkCanvas *canvas,
             SkPoint endAbsPos = QPointFToSkPoint(
                         mEndCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
-            paint.setStrokeWidth(1.5*invScale);
+            paint.setStrokeWidth(1.5f*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
 
             canvas->drawLine(absPos, endAbsPos, paint);
             paint.setColor(SK_ColorWHITE);
-            paint.setStrokeWidth(0.75*invScale);
+            paint.setStrokeWidth(0.75f*invScale);
             canvas->drawLine(absPos, endAbsPos, paint);
         }
         if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
             SkPoint startAbsPos = QPointFToSkPoint(
                         mStartCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
-            paint.setStrokeWidth(1.5*invScale);
+            paint.setStrokeWidth(1.5f*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
             canvas->drawLine(absPos, startAbsPos, paint);
 
             paint.setColor(SK_ColorWHITE);
-            paint.setStrokeWidth(0.75*invScale);
+            paint.setStrokeWidth(0.75f*invScale);
             canvas->drawLine(absPos, startAbsPos, paint);
         }
         mEndCtrlPt->drawSk(canvas, invScale);

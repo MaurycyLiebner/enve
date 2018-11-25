@@ -21,7 +21,6 @@ private:
 class InternalLinkBox : public BoundingBox {
     Q_OBJECT
 public:
-    InternalLinkBox(BoundingBox *linkTarget);
     ~InternalLinkBox() {
         setLinkTarget(nullptr);
     }
@@ -37,9 +36,9 @@ public:
     }
 
     void setLinkTarget(BoundingBox *linkTarget) {
-        disconnect(mBoxTarget.data(), 0, this, 0);
+        disconnect(mBoxTarget.data(), nullptr, this, nullptr);
         if(getLinkTarget() != nullptr) {
-            disconnect(getLinkTarget(), 0, this, 0);
+            disconnect(getLinkTarget(), nullptr, this, nullptr);
             getLinkTarget()->removeLinkingBox(this);
         }
         if(linkTarget == nullptr) {
@@ -54,8 +53,8 @@ public:
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
-                this, SLOT(setTargetSlot(BoundingBox*)));
+        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBoxQSPtr)),
+                this, SLOT(setTargetSlot(BoundingBoxQSPtr)));
     }
 
     bool relPointInsidePath(const QPointF &point);
@@ -63,15 +62,13 @@ public:
 
     BoundingBox *getLinkTarget() const;
 
-    BoundingBox *createLink();
+    BoundingBoxQSPtr createLink();
 
-    BoundingBox *createLinkForLinkGroup() {
-        return new InternalLinkBox(this);
-    }
+    BoundingBoxQSPtr createLinkForLinkGroup();
 
     BoundingBoxRenderDataSPtr createRenderData();
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                               const BoundingBoxRenderDataSPtr& data);
+                                                BoundingBoxRenderData* data);
     const SkBlendMode &getBlendMode() {
         if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getBlendMode();
@@ -108,8 +105,9 @@ public slots:
         setLinkTarget(target);
     }
 protected:
-    QSharedPointer<BoxTargetProperty> mBoxTarget =
-            (new BoxTargetProperty())->ref<BoxTargetProperty>();
+    InternalLinkBox(BoundingBox *linkTarget);
+    BoxTargetPropertyQSPtr mBoxTarget =
+            SPtrCreate(BoxTargetProperty)("link target");
 };
 
 class InternalLinkGroupBox : public BoxesGroup {
@@ -131,9 +129,9 @@ public:
     }
 
     void setLinkTarget(BoxesGroup *linkTarget) {
-        disconnect(mBoxTarget.data(), 0, this, 0);
+        disconnect(mBoxTarget.data(), nullptr, this, nullptr);
         if(getLinkTarget() != nullptr) {
-            disconnect(getLinkTarget(), 0, this, 0);
+            disconnect(getLinkTarget(), nullptr, this, nullptr);
             getLinkTarget()->removeLinkingBox(this);
         }
         if(linkTarget == nullptr) {
@@ -148,8 +146,8 @@ public:
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
-                this, SLOT(setTargetSlot(BoundingBox*)));
+        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBoxQSPtr)),
+                this, SLOT(setTargetSlot(BoundingBoxQSPtr)));
     }
 
     //bool relPointInsidePath(const QPointF &point);
@@ -157,22 +155,16 @@ public:
 
     BoxesGroup *getLinkTarget() const;
 
-    BoundingBox *createLink() {
+    BoundingBoxQSPtr createLink() {
         return getLinkTarget()->createLink();
     }
 
-    BoundingBox *createLinkForLinkGroup() {
-        if(mParentGroup->SWT_isLinkBox()) {
-            return getLinkTarget()->createLinkForLinkGroup();
-        } else {
-            return new InternalLinkGroupBox(this);
-        }
-    }
+    BoundingBoxQSPtr createLinkForLinkGroup();
 
     bool SWT_isLinkBox() { return true; }
 
-    BoundingBox *createNewDuplicate() {
-        return new InternalLinkGroupBox(getLinkTarget());
+    BoundingBoxQSPtr createNewDuplicate() {
+        return SPtrCreate(InternalLinkGroupBox)(getLinkTarget());
     }
 
     bool isRelFrameInVisibleDurationRect(const int &relFrame) {
@@ -202,7 +194,7 @@ public:
 
 
     void setupEffectsF(const qreal &relFrame,
-                      const BoundingBoxRenderDataSPtr& data) {
+                       BoundingBoxRenderData* data) {
         if(mParentGroup->SWT_isLinkBox()) {
             getLinkTarget()->setupEffectsF(relFrame, data);
         } else {
@@ -226,17 +218,17 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            const BoundingBoxRenderDataSPtr& data) {
+                            BoundingBoxRenderData* data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        auto groupData = data->ref<BoxesGroupRenderData>();
+        auto groupData = SPtrGetAs(data, BoxesGroupRenderData);
         groupData->childrenRenderData.clear();
         qreal childrenEffectsMargin = 0.;
         qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                BoundingBoxRenderDataSPtr boxRenderData =
-                        box->getCurrentRenderData(boxRelFrame);
+                BoundingBoxRenderData* boxRenderData =
+                        box->getCurrentRenderData(qRound(boxRelFrame));
                 if(boxRenderData == nullptr) {
                     continue;
                 }
@@ -253,7 +245,7 @@ public:
 
     BoxesGroup *getFinalTarget() {
         if(getLinkTarget()->SWT_isLinkBox()) {
-            return ((InternalLinkGroupBox*)getLinkTarget())->getFinalTarget();
+            return SPtrGetAs(getLinkTarget(), InternalLinkGroupBox)->getFinalTarget();
         }
         return getLinkTarget();
     }
@@ -278,19 +270,17 @@ public:
 public slots:
     void setTargetSlot(BoundingBox *target) {
         if(target->SWT_isBoxesGroup()) {
-            setLinkTarget((BoxesGroup*)target);
+            setLinkTarget(SPtrGetAs(target, BoxesGroup));
         }
     }
 protected:
     QSharedPointer<BoxTargetProperty> mBoxTarget =
-            (new BoxTargetProperty())->ref<BoxTargetProperty>();
+            SPtrCreate(BoxTargetProperty)("link target");
 };
 
 struct LinkCanvasRenderData : public CanvasRenderData {
-    LinkCanvasRenderData(BoundingBox *parentBoxT) :
-        CanvasRenderData(parentBoxT) {
-
-    }
+    LinkCanvasRenderData(BoundingBox* parentBoxT) :
+        CanvasRenderData(parentBoxT) {}
 
     void updateRelBoundingRect() {
         if(clipToCanvas) {
@@ -308,7 +298,7 @@ protected:
 class InternalLinkCanvas : public InternalLinkGroupBox {
     Q_OBJECT
 public:
-    InternalLinkCanvas(BoxesGroup *linkTarget);
+    InternalLinkCanvas(BoxesGroup* linkTarget);
     void addSchedulersToProcess();
 
     void writeBoundingBox(QIODevice *target);
@@ -319,17 +309,17 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
-                            const BoundingBoxRenderDataSPtr& data);
+                            BoundingBoxRenderData* data);
     bool clipToCanvas();
 
-    BoundingBox *createLinkForLinkGroup();
+    BoundingBoxQSPtr createLinkForLinkGroup();
 
     BoundingBoxRenderDataSPtr createRenderData();
 
     bool relPointInsidePath(const QPointF &relPos);
 protected:
     QSharedPointer<BoolProperty> mClipToCanvas =
-                (new BoolProperty())->ref<BoolProperty>();
+                SPtrCreate(BoolProperty)();
 };
 
 #endif // LINKBOX_H

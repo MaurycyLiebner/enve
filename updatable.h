@@ -3,126 +3,67 @@
 #include <QList>
 #include "selfref.h"
 #include <QEventLoop>
+#include "sharedpointerdefs.h"
 class PaintControler;
 
 class MinimalExecutor : public StdSelfRef {
 public:
-    MinimalExecutor() {}
-    bool finished() { return mFinished; }
+    MinimalExecutor();
+    bool finished();
 
-    virtual void addDependent(const std::shared_ptr<MinimalExecutor>& updatable) = 0;
+    virtual void addDependent(MinimalExecutor* updatable) = 0;
 
-    virtual void clear() {
-        mFinished = false;
-        tellDependentThatFinished();
-    }
+    virtual void clear();
 
-    void decDependencies() {
-        nDependancies--;
-        if(mGUIThreadExecution) {
-            if(nDependancies == 0) {
-                GUI_process();
-                mFinished = true;
-                tellDependentThatFinished();
-            }
-        }
-    }
-    void incDependencies() {
-        nDependancies++;
-    }
+    void decDependencies();
+    void incDependencies();
 protected:
-    virtual void GUI_process() {}
+    virtual void GUI_process();
     bool mGUIThreadExecution = false;
-    void tellDependentThatFinished() {
-        foreach(const std::shared_ptr<MinimalExecutor>& dependent, mCurrentExecutionDependent) {
-            dependent->decDependencies();
-        }
-        mCurrentExecutionDependent.clear();
-    }
+    void tellDependentThatFinished();
 
     bool mFinished = false;
-    QList<std::shared_ptr<MinimalExecutor> > mCurrentExecutionDependent;
     int nDependancies = 0;
+    QList<MinimalExecutorWPtr> mCurrentExecutionDependent;
 };
 
 class GUI_ThreadExecutor : public MinimalExecutor {
-    GUI_ThreadExecutor() {
-        mGUIThreadExecution = true;
-    }
+    GUI_ThreadExecutor();
 
-    void addDependent(const std::shared_ptr<MinimalExecutor>& updatable) {
-        if(updatable == nullptr) return;
-        if(!finished()) {
-            if(listContainsSharedPtr(updatable, mCurrentExecutionDependent)) return;
-            mCurrentExecutionDependent << updatable;
-            updatable->incDependencies();
-        }
-    }
+    void addDependent(MinimalExecutor* updatable);
 protected:
     void GUI_process() = 0;
 };
 
 class _Executor : public MinimalExecutor {
 public:
-    _Executor() {}
-    virtual ~_Executor() {}
-    void setCurrentPaintControler(PaintControler *paintControler) {
-        mCurrentPaintControler = paintControler;
-    }
+    _Executor();
 
-    virtual void beforeUpdate() {
-        mSelfRef = ref<_Executor>();
-        mBeingProcessed = true;
-        mCurrentExecutionDependent = mNextExecutionDependent;
-        mNextExecutionDependent.clear();
-    }
+    void setCurrentPaintControler(PaintControler *paintControler);
+
+    virtual void beforeUpdate();
 
     virtual void _processUpdate() = 0;
 
-    void updateFinished() {
-        mFinished = true;
-        mBeingProcessed = false;
-        afterUpdate();
-        mSelfRef.reset();
-    }
+    void updateFinished();
 
-    virtual void afterUpdate() {
-        mCurrentPaintControler = nullptr;
-        tellDependentThatFinished();
-    }
+    virtual void afterUpdate();
 
-    bool isBeingProcessed() { return mBeingProcessed; }
+    bool isBeingProcessed();
 
     void waitTillProcessed();
 
-    bool readyToBeProcessed() {
-        return nDependancies == 0 && !mBeingProcessed;
-    }
+    bool readyToBeProcessed();
 
-    void clear() {
-        MinimalExecutor::clear();
-        mBeingProcessed = false;
-        mSelfRef.reset();
-        foreach(const std::shared_ptr<MinimalExecutor>& dependent, mNextExecutionDependent) {
-            dependent->decDependencies();
-        }
-        mNextExecutionDependent.clear();
-    }
+    void clear();
 
-    void addDependent(const std::shared_ptr<MinimalExecutor>& updatable) {
-        if(updatable == nullptr) return;
-        if(!finished()) {
-            if(listContainsSharedPtr(updatable, mNextExecutionDependent)) return;
-            mNextExecutionDependent << updatable;
-            updatable->incDependencies();
-        }
-    }
+    void addDependent(MinimalExecutor* updatable);
 protected:
-    PaintControler *mCurrentPaintControler = nullptr;
     bool mBeingProcessed = false;
+    QPointer<PaintControler> mCurrentPaintControler;
     std::shared_ptr<_Executor> mSelfRef;
 
-    QList<std::shared_ptr<MinimalExecutor> > mNextExecutionDependent;
+    QList<MinimalExecutorWPtr> mNextExecutionDependent;
 };
 
 class _ScheduledExecutor : public _Executor {
