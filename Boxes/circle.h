@@ -6,13 +6,6 @@
 class CircleCenterPoint : public PointAnimatorMovablePoint {
     friend class StdSelfRef;
 public:
-    static CircleCenterPointSPtr createCircleCenterPoint(
-            QPointFAnimator *associatedAnimator,
-            BasicTransformAnimator* parent,
-            const MovablePointType &type) {
-        return SPtrCreate(CircleCenterPoint)(associatedAnimator, parent, type);
-    }
-
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
                                         MovablePoint* horizontalPoint);
 
@@ -32,13 +25,8 @@ private:
 };
 
 class CircleRadiusPoint : public PointAnimatorMovablePoint {
+    friend class StdSelfRef;
 public:
-    static CircleRadiusPointSPtr createCircleRadiusPoint(
-            const BasicTransformAnimatorQSPtr &parent,
-            const MovablePointType &type,
-            const bool &blockX,
-            const MovablePointSPtr& centerPoint);
-
     void moveByRel(const QPointF &relTranslation);
 //    void setAbsPosRadius(QPointF pos);
     void moveByAbs(const QPointF &absTranslatione);
@@ -47,7 +35,8 @@ public:
     void finishTransform();
     void setRelativePos(const QPointF &relPos);
 protected:
-    CircleRadiusPoint(const BasicTransformAnimatorQSPtr &parent,
+    CircleRadiusPoint(QPointFAnimator *associatedAnimator,
+                      BasicTransformAnimator *parent,
                       const MovablePointType &type,
                       const bool &blockX,
                       MovablePoint *centerPoint);
@@ -68,7 +57,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint*>& list);
+                                           QList<MovablePointPtr> &list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
     void drawSelectedSk(SkCanvas *canvas,

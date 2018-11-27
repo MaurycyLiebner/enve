@@ -7,11 +7,8 @@
 #include "canvas.h"
 #include "boolanimator.h"
 
-PathAnimator::PathAnimator() :
-    ComplexAnimator() {
-    prp_setName("path");
-    mSmoothTransformation = SPtrCreate(BoolAnimator)();
-    mSmoothTransformation->prp_setName("interpolate");
+PathAnimator::PathAnimator() : ComplexAnimator("path") {
+    mSmoothTransformation = SPtrCreate(BoolAnimator)("interpolate");
     ca_addChildAnimator(mSmoothTransformation);
 }
 
@@ -274,7 +271,7 @@ void PathAnimator::drawSelected(SkCanvas *canvas,
 }
 
 void PathAnimator::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<MovablePoint*>& list) {
+        const QRectF &absRect, QList<MovablePointPtr> &list) {
     Q_FOREACH(const VectorPathAnimatorQSPtr& singlePath, mSinglePaths) {
         singlePath->selectAndAddContainedPointsToList(absRect, list);
     }

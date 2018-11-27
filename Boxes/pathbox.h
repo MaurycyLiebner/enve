@@ -119,8 +119,7 @@ public:
     BoundingBoxRenderDataSPtr createRenderData() {
         return SPtrCreate(PathBoxRenderData)(this);
     }
-    void updateCurrentPreviewDataFromRenderData(
-            const BoundingBoxRenderDataSPtr& renderData);
+    void updateCurrentPreviewDataFromRenderData(BoundingBoxRenderData *renderData);
     void duplicateStrokeSettingsFrom(
             StrokeSettings *strokeSettings);
     void duplicateFillSettingsFrom(
@@ -169,13 +168,17 @@ public:
             const int& frame1, const int& frame2) const;
     bool differenceInFillPathBetweenFrames(
             const int& frame1, const int& frame2) const;
+    void setPathsOutdated(const bool &bT) {
+        mCurrentPathsOutdated = bT;
+    }
 protected:
     PathBox(const BoundingBoxType &type);
     void getMotionBlurProperties(QList<Property*>& list);
 
     bool mOutlineAffectedByScale = true;
+    bool mCurrentPathsOutdated = true;
 
-    int mCurrentPathsFrame = INT_MIN;
+    int mCurrentPathsFrame = 0;
 
     SkPath mEditPathSk;
     SkPath mPathSk;

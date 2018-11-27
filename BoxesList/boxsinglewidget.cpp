@@ -15,6 +15,9 @@
 #include "Properties/comboboxproperty.h"
 #include "Animators/qstringanimator.h"
 #include "Animators/randomqrealgenerator.h"
+#include "Animators/animatorupdater.h"
+#include "Properties/boolproperty.h"
+#include "Properties/intproperty.h"
 
 QPixmap *BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap *BoxSingleWidget::INVISIBLE_PIXMAP;
@@ -196,7 +199,6 @@ SkBlendMode idToBlendModeSk(const int &id) {
         case 25: return SkBlendMode::kLuminosity;
         default: return SkBlendMode::kSrcOver;
     }
-    return SkBlendMode::kSrcOver;
 }
 
 int blendModeToIntSk(const SkBlendMode &mode) {
@@ -229,15 +231,14 @@ int blendModeToIntSk(const SkBlendMode &mode) {
         case SkBlendMode::kLuminosity: return 25;
         default: return 0;
     }
-    return 0;
 }
 
 void BoxSingleWidget::setCompositionMode(const int &id) {
     SingleWidgetTarget *target = mTarget->getTarget();
 
     if(target->SWT_isBoundingBox()) {
-        ((BoundingBox*)target)->setBlendModeSk(
-                    idToBlendModeSk(id));
+        auto boxTarget = getAsPtr(target, BoundingBox);
+        boxTarget->setBlendModeSk(idToBlendModeSk(id));
     }
     MainWindow::getInstance()->callUpdateSchedulers();
 }
@@ -261,7 +262,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
     bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
     if(fakeComplexAnimator) {
-        target = ((FakeComplexAnimator*)target)->getTarget();
+        target = getAsPtr(target, FakeComplexAnimator)->getTarget();
     }
     if(target->SWT_isBoxesGroup()) {
         //BoxesGroup *bg_target = (BoxesGroup*)target;
@@ -279,8 +280,9 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mColorButton->hide();
 
         mCompositionModeVisible = true;
+        auto boxTarget = getAsPtr(target, BoundingBox);
         mCompositionModeCombo->setCurrentIndex(
-                    blendModeToIntSk(((BoundingBox*)target)->getBlendMode()));
+                    blendModeToIntSk(boxTarget->getBlendMode()));
         updateCompositionBoxVisible();
         mPropertyComboBox->hide();
 
@@ -304,7 +306,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mCompositionModeVisible = true;
         mCompositionModeCombo->setCurrentIndex(
-            blendModeToIntSk(((BoundingBox*)target)->getBlendMode()) );
+            blendModeToIntSk(getAsPtr(target, BoundingBox)->getBlendMode()) );
         updateCompositionBoxVisible();
 
         mBoxTargetWidget->hide();
@@ -330,7 +332,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
 
         mCheckBox->show();
-        mCheckBox->setTarget((BoolProperty*)target);
+        mCheckBox->setTarget(getAsPtr(target, BoolProperty));
 
         clearAndHideValueAnimators();
     } else if(target->SWT_isBoolPropertyContainer()) {
@@ -353,7 +355,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
 
         mCheckBox->show();
-        mCheckBox->setTarget((BoolPropertyContainer*)target);
+        mCheckBox->setTarget(getAsPtr(target, BoolPropertyContainer));
 
         clearAndHideValueAnimators();
     } else if(target->SWT_isComboBoxProperty()) {
@@ -372,12 +374,14 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mBoxTargetWidget->hide();
 
-        disconnect(mPropertyComboBox, 0, 0, 0);
+        disconnect(mPropertyComboBox, nullptr, nullptr, nullptr);
         if(mLastComboBoxProperty.data() != nullptr) {
-            disconnect(mLastComboBoxProperty.data(), 0, mPropertyComboBox, 0);
+            disconnect(mLastComboBoxProperty.data(), nullptr,
+                       mPropertyComboBox, nullptr);
         }
-        ComboBoxProperty *comboBoxProperty = (ComboBoxProperty*)target;
-        mLastComboBoxProperty = comboBoxProperty->weakRef<ComboBoxProperty>();
+        ComboBoxProperty *comboBoxProperty =
+                getAsPtr(target, ComboBoxProperty);
+        mLastComboBoxProperty = comboBoxProperty;
         mPropertyComboBox->clear();
         mPropertyComboBox->addItems(comboBoxProperty->getValueNames());
         mPropertyComboBox->setCurrentIndex(
@@ -408,7 +412,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->setAnimator((QrealAnimator*)target);
+        mValueSlider->setAnimator(getAsPtr(target, QrealAnimator));
         mValueSlider->show();
         mValueSlider->setNeighbouringSliderToTheRight(false);
         mSecondValueSlider->hide();
@@ -431,7 +435,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->setIntAnimator((IntProperty*)target);
+        mValueSlider->setIntAnimator(getAsPtr(target, IntProperty));
         mValueSlider->show();
     } else if(target->SWT_isComplexAnimator() ||
               target->SWT_isVectorPathAnimator() ||
@@ -467,8 +471,10 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
             if(target->SWT_isQPointFAnimator()) {
                 updateValueSlidersForQPointFAnimator();
             } else {
-                ComplexAnimator *ca_target = (ComplexAnimator*)target;
-                QrealAnimator *qatarget = ca_target->getQrealAnimatorIfIsTheOnlyOne();
+                ComplexAnimator *ca_target =
+                        getAsPtr(target, ComplexAnimator);
+                QrealAnimator *qatarget =
+                        ca_target->getQrealAnimatorIfIsTheOnlyOne();
                 if(qatarget == nullptr) {
                     clearAndHideValueAnimators();
                 } else {
@@ -498,7 +504,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeVisible = false;
 
         mBoxTargetWidget->show();
-        mBoxTargetWidget->setTargetProperty((BoxTargetProperty*)target);
+        mBoxTargetWidget->setTargetProperty(
+                    getAsPtr(target, BoxTargetProperty));
         mCheckBox->hide();
 
         clearAndHideValueAnimators();
@@ -555,14 +562,14 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     if(isTargetDisabled()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isFakeComplexAnimator()) {
-        target = ((FakeComplexAnimator*)target)->getTarget();
+        target = getAsPtr(target, FakeComplexAnimator)->getTarget();
     }
     if(event->button() == Qt::RightButton) {
         setSelected(true);
         QMenu menu(this);
 
         if(target->SWT_isBoundingBox()) {
-            BoundingBox *boxTarget = ((BoundingBox*)target);
+            BoundingBox *boxTarget = getAsPtr(target, BoundingBox);
             menu.addAction("Rename")->setObjectName("swt_rename");
             if(!target->SWT_isParticleBox() &&
                !target->SWT_isAnimationBox()) {
@@ -579,20 +586,14 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             menu.addSeparator();
         }
         if(target->SWT_isProperty()) {
-            PropertyClipboardContainer *clipboard =
-                    (PropertyClipboardContainer*)
-                    MainWindow::getInstance()->getClipboardContainer(
-                                                CCT_PROPERTY);
+            auto clipboard = MainWindow::getPropertyClipboardContainer();
             menu.addAction("Copy")->setObjectName("swt_copy");
             if(clipboard != nullptr) {
                 if(target->SWT_isBoundingBox()) {
                     if(target->SWT_isBoxesGroup() &&
                         !target->SWT_isLinkBox()) {
-                        BoxesClipboardContainer *clipboard =
-                                (BoxesClipboardContainer*)
-                                MainWindow::getInstance()->getClipboardContainer(
-                                                            CCT_BOXES);
-                        if(clipboard != nullptr) {
+                        auto boxClip = MainWindow::getBoxesClipboardContainer();
+                        if(boxClip != nullptr) {
                             menu.addAction("Paste Boxes")->
                                     setObjectName("swt_paste_boxes");
                         }
@@ -636,13 +637,13 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             }
             if(target->SWT_isBoundingBox()) {
                 menu.addSeparator();
-                BoundingBox *boxTarget = (BoundingBox*)target;
+                BoundingBox *boxTarget = getAsPtr(target, BoundingBox);
                 QMenu *canvasMenu = menu.addMenu("Canvas");
                 boxTarget->addActionsToMenu(canvasMenu);
                 boxTarget->getParentCanvas()->addCanvasActionToMenu(canvasMenu);
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();
-                Animator *animTarget = (Animator*)target;
+                Animator *animTarget = getAsPtr(target, Animator);
                 if(animTarget->prp_isKeyOnCurrentFrame()) {
                     menu.addAction("Add Key")->setDisabled(true);
                     menu.addAction("Delete Key")->setObjectName("swt_delete_key");
@@ -654,7 +655,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     menu.addSeparator();
                     menu.addAction("Delete Effect")->setObjectName("swt_delete_effect");
                 } else if(target->SWT_isQrealAnimator()) {
-                    if(((QrealAnimator*)target)->qra_hasNoise() ) {
+                    if(getAsPtr(target, QrealAnimator)->qra_hasNoise()) {
                         menu.addSeparator();
                         menu.addAction("Remove Noise")->setObjectName("swt_remove_random_generator");
                     } else {
@@ -669,110 +670,87 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             if(selectedAction->objectName() == "swt_rename") {
                 rename();
             } else if(selectedAction->objectName() == "swt_visibility_range") {
-                BoundingBox *boxTarget = (BoundingBox*)target;
+                auto boxTarget = getAsPtr(target, BoundingBox);
                 if(boxTarget->hasDurationRectangle()) {
                     boxTarget->setDurationRectangle(nullptr);
                 } else {
                     boxTarget->createDurationRectangle();
                 }
             } else if(selectedAction->objectName() == "swt_visibility_range_settings") {
-                BoundingBox *boxTarget = (BoundingBox*)target;
-                DurationRectangle *durRect = boxTarget->getDurationRectangle();
+                auto boxTarget = getAsPtr(target, BoundingBox);
+                DurationRectangle *durRect =
+                        boxTarget->getDurationRectangle();
                 if(durRect != nullptr) {
                     durRect->openDurationSettingsDialog(this);
                 }
             } else if(selectedAction->objectName() == "swt_copy") {
                 if(target->SWT_isBoundingBox()) {
-                    BoxesClipboardContainer *container =
-                            new BoxesClipboardContainer();
+                    auto container = SPtrCreate(BoxesClipboardContainer)();
                     QBuffer targetT(container->getBytesArray());
                     targetT.open(QIODevice::WriteOnly);
                     int nBoxes = 1;
                     targetT.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
-                    ((BoundingBox*)target)->writeBoundingBox(&targetT);
+                    auto boxTarget = getAsPtr(target, BoundingBox);
+                    boxTarget->writeBoundingBox(&targetT);
                     targetT.close();
 
                     MainWindow::getInstance()->replaceClipboard(container);
                 } else {
-                    PropertyClipboardContainer *container =
-                            new PropertyClipboardContainer();
-                    container->setProperty((Property*)target);
+                    auto container = SPtrCreate(PropertyClipboardContainer)();
+                    container->setProperty(getAsPtr(target, Property));
                     MainWindow::getInstance()->replaceClipboard(container);
                 }
             } else if(selectedAction->objectName() == "swt_paste") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->paste((Property*)target);
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                clipboard->paste(getAsPtr(target, Property));
             } else if(selectedAction->objectName() == "swt_paste_pixmap_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->paste(((BoundingBox*)target)->getEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto boxTarget = getAsPtr(target, BoundingBox);
+                clipboard->paste(boxTarget->getEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_paste_outline_path_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->paste(((PathBox*)target)->getOutlinePathEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto targetPathBox = getAsPtr(target, PathBox);
+                clipboard->paste(targetPathBox->getOutlinePathEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_paste_fill_path_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->paste(((PathBox*)target)->getFillPathEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto targetPathBox = getAsPtr(target, PathBox);
+                clipboard->paste(targetPathBox->getFillPathEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_paste_path_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->paste(((PathBox*)target)->getPathEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto targetPathBox = getAsPtr(target, PathBox);
+                clipboard->paste(targetPathBox->getPathEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_clear_and_paste_pixmap_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->clearAndPaste(((BoundingBox*)target)->getEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto boxTarget = getAsPtr(target, BoundingBox);
+                clipboard->clearAndPaste(boxTarget->getEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_clear_and_paste_outline_path_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->clearAndPaste(((PathBox*)target)->getOutlinePathEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto targetPathBox = getAsPtr(target, PathBox);
+                clipboard->clearAndPaste(targetPathBox->getOutlinePathEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_clear_and_paste_fill_path_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->clearAndPaste(((PathBox*)target)->getFillPathEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto targetPathBox = getAsPtr(target, PathBox);
+                clipboard->clearAndPaste(targetPathBox->getFillPathEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_clear_and_paste_path_effect") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->clearAndPaste(((PathBox*)target)->getPathEffectsAnimators());
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto targetPathBox = getAsPtr(target, PathBox);
+                clipboard->clearAndPaste(targetPathBox->getPathEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_clear_and_paste") {
-                PropertyClipboardContainer *clipboard =
-                        (PropertyClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_PROPERTY);
-                clipboard->clearAndPaste((Property*)target);
+                auto clipboard = MainWindow::getPropertyClipboardContainer();
+                auto targetProperty = getAsPtr(target, Property);
+                clipboard->clearAndPaste(targetProperty);
             } else if(selectedAction->objectName() == "swt_paste_boxes") {
-                BoxesClipboardContainer *clipboard =
-                        (BoxesClipboardContainer*)
-                        MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_BOXES);
-                clipboard->pasteTo(((BoxesGroup*)target));
+                auto clipboard = MainWindow::getBoxesClipboardContainer();
+                clipboard->pasteTo(getAsPtr(target, BoxesGroup));
             } else if(selectedAction->objectName() == "swt_delete_effect") {
                 if(target->SWT_isPixmapEffect()) {
-                    PixmapEffect *effectTarget = (PixmapEffect*)target;
+                    auto effectTarget = getAsSPtr(target, PixmapEffect);
                     effectTarget->getParentEffectAnimators()->
                             getParentBox()->removeEffect(effectTarget);
                 } else {
-                    PathEffect *effectTarget = (PathEffect*)target;
-                    PathEffectAnimators *parentAnimators = effectTarget->getParentEffectAnimators();
+                    auto effectTarget = getAsSPtr(target, PathEffect);
+                    PathEffectAnimators *parentAnimators =
+                            effectTarget->getParentEffectAnimators();
                     if(parentAnimators->isOutline()) {
                         parentAnimators->getParentBox()->
                                 removeOutlinePathEffect(effectTarget);
@@ -786,21 +764,23 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
 
                 }
             } else if(selectedAction->objectName() == "swt_add_random_generator") {
-                QrealAnimator *qrealTarget = (QrealAnimator*)target;
-                RandomQrealGenerator *randGen = new RandomQrealGenerator(0, 9999);
-                randGen->prp_setBlockedUpdater(qrealTarget->prp_getUpdater());
+                auto qrealTarget = getAsPtr(target, QrealAnimator);
+                auto randGen = SPtrCreate(RandomQrealGenerator)(0, 9999);
+                auto updater = getAsSPtr(qrealTarget->prp_getUpdater(),
+                                         AnimatorUpdater);
+                randGen->prp_setBlockedUpdater(updater);
                 qrealTarget->setGenerator(randGen);
             } else if(selectedAction->objectName() == "swt_remove_random_generator") {
-                QrealAnimator *qrealTarget = (QrealAnimator*)target;
+                QrealAnimator *qrealTarget = getAsPtr(target, QrealAnimator);
                 qrealTarget->setGenerator(nullptr);
             } else if(selectedAction->objectName() == "swt_delete_key") {
-                Animator *animTarget = (Animator*)target;
+                auto animTarget = getAsPtr(target, Animator);
                 animTarget->anim_deleteCurrentKey();
             } else if(selectedAction->objectName() == "swt_add_key") {
-                Animator *animTarget = (Animator*)target;
+                auto animTarget = getAsPtr(target, Animator);
                 animTarget->anim_saveCurrentValueAsKey();
             } else if(target->SWT_isBoundingBox()) {
-                BoundingBox *boxTarget = ((BoundingBox*)target);
+                auto boxTarget = getAsPtr(target, BoundingBox);
                 if(!boxTarget->getParentCanvas()->
                         handleSelectedCanvasAction(selectedAction) ) {
                     boxTarget->handleSelectedCanvasAction(selectedAction);
@@ -858,19 +838,19 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_HEIGHT/2) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isBoundingBox() && !target->SWT_isCanvas()) {
-        BoundingBox *bb_target = (BoundingBox*)target;
-        bb_target->selectionChangeTriggered(event->modifiers() &
+        auto boxTarget = getAsPtr(target, BoundingBox);
+        boxTarget->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);
         MainWindow::getInstance()->callUpdateSchedulers();
     } else if(target->SWT_isQrealAnimator()) {
-        QrealAnimator *qa_target = (QrealAnimator*)target;
-        KeysView *keysView =
-                ((BoxScrollWidgetVisiblePart*)mParent)->getKeysView();
+        auto qrealTarget = getAsPtr(target, QrealAnimator);
+        auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
+        KeysView *keysView = bsvt->getKeysView();
         if(keysView != nullptr) {
-            if(qa_target->isCurrentAnimator(mParent)) {
-                keysView->graphRemoveViewedAnimator(qa_target);
+            if(qrealTarget->isCurrentAnimator(mParent)) {
+                keysView->graphRemoveViewedAnimator(qrealTarget);
             } else {
-                keysView->graphAddViewedAnimator(qa_target);
+                keysView->graphAddViewedAnimator(qrealTarget);
             }
             MainWindow::getInstance()->callUpdateSchedulers();
         }
@@ -890,15 +870,14 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
 void BoxSingleWidget::rename() {
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isBoundingBox()) {
-        BoundingBox *bb_target = (BoundingBox*)target;
+        auto boxTarget = getAsPtr(target, BoundingBox);
         bool ok;
         QString text = QInputDialog::getText(this, tr("New name dialog"),
                                              tr("Name:"), QLineEdit::Normal,
-                                             bb_target->getName(), &ok);
+                                             boxTarget->getName(), &ok);
         if(ok) {
-            bb_target->setName(text);
-
-            bb_target->SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
+            boxTarget->setName(text);
+            boxTarget->SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
         }
     }
 }
@@ -985,7 +964,7 @@ int BoxSingleWidget::getOptimalNameRightX() {
     QFontMetrics fm = QFontMetrics(QFont());
     QString name;
     if(target->SWT_isProperty()) {
-        name = SPtrGetAs(target, Property)->prp_getName();
+        name = getAsPtr(target, Property)->prp_getName();
     }
     int nameX = mFillWidget->x();
     //return nameX;
@@ -1014,7 +993,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     }
     bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
     if(fakeComplexAnimator) {
-        target = SPtrGetAs(target, FakeComplexAnimator)->getTarget();
+        target = getAsPtr(target, FakeComplexAnimator)->getTarget();
     }
 
     int nameX = mFillWidget->x();
@@ -1091,16 +1070,16 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 
         p.setPen(Qt::white);
     } else if(target->SWT_isComplexAnimator()) {
-        ComplexAnimator *ca_target = (ComplexAnimator*)target;
-        name = ca_target->prp_getName();
+        ComplexAnimator *caTarget = getAsPtr(target, ComplexAnimator);
+        name = caTarget->prp_getName();
 
-        if(ca_target->prp_isRecording()) {
+        if(caTarget->prp_isRecording()) {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
-            if(ca_target->prp_isDescendantRecording()) {
+            if(caTarget->prp_isDescendantRecording()) {
                 p.save();
                 p.setRenderHint(QPainter::Antialiasing);
                 p.setBrush(Qt::red);
@@ -1114,7 +1093,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
 
         if(target->SWT_isPixmapEffect()) {
-            if(((PixmapEffect*)target)->isVisible()) {
+            if(getAsPtr(target, PixmapEffect)->isVisible()) {
                 drawPixmapCentered(&p, mVisibleButton->geometry(),
                                    *BoxSingleWidget::VISIBLE_PIXMAP);
             } else {
@@ -1122,7 +1101,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                                    *BoxSingleWidget::INVISIBLE_PIXMAP);
             }
         } else if(target->SWT_isPathEffect()) {
-            if(((PathEffect*)target)->isVisible()) {
+            if(getAsPtr(target, PathEffect)->isVisible()) {
                 drawPixmapCentered(&p, mVisibleButton->geometry(),
                                    *BoxSingleWidget::VISIBLE_PIXMAP);
             } else {
@@ -1131,7 +1110,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         }
 
-        if(ca_target->hasChildAnimators()) {
+        if(caTarget->hasChildAnimators()) {
             if(mTarget->contentVisible()) {
                 drawPixmapCentered(&p, mContentButton->geometry(),
                                    *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
@@ -1143,18 +1122,18 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         p.setPen(Qt::white);
 
         if(target->SWT_isColorAnimator()) {
-            ColorAnimator *col_target = (ColorAnimator*)ca_target;
-            p.setBrush(col_target->getCurrentColor().qcol);
+            ColorAnimator *colTarget = getAsPtr(caTarget, ColorAnimator);
+            p.setBrush(colTarget->getCurrentColor());
             p.drawRect(mColorButton->x(), 3,
                        MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT - 6);
         }
     } else if(target->SWT_isQStringAnimator() ||
               target->SWT_isVectorPathAnimator() ||
               target->SWT_isAnimatedSurface()) {
-        Animator *ca_target = (Animator*)target;
-        name = ca_target->prp_getName();
+        Animator *aTarget = getAsPtr(target, Animator);
+        name = aTarget->prp_getName();
 
-        if(ca_target->prp_isRecording()) {
+        if(aTarget->prp_isRecording()) {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {
@@ -1163,10 +1142,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
      } else if(target->SWT_isBoxTargetProperty()) {
         nameX += 2*MIN_WIDGET_HEIGHT;
-        name = ((BoxTargetProperty*)target)->prp_getName();
+        name = getAsPtr(target, BoxTargetProperty)->prp_getName();
     } else {//if(target->SWT_isBoolProperty()) {
         nameX += 2*MIN_WIDGET_HEIGHT;
-        name = ((Property*)target)->prp_getName();
+        name = getAsPtr(target, Property)->prp_getName();
     }
 
     p.drawText(QRect(nameX, 0,
@@ -1189,9 +1168,10 @@ void BoxSingleWidget::switchContentVisibleAction() {
 }
 
 void BoxSingleWidget::switchRecordingAction() {
-    Animator *target = (Animator*)mTarget->getTarget();
+    Animator *target = getAsPtr(mTarget->getTarget(), Animator);
     if(target->SWT_isFakeComplexAnimator()) {
-        target = (Animator*)((FakeComplexAnimator*)target)->getTarget();
+        auto fcaTarget = getAsPtr(target, FakeComplexAnimator);
+        target = getAsPtr(fcaTarget->getTarget(), Animator);
     }
     target->prp_switchRecording();
     MainWindow::getInstance()->callUpdateSchedulers();
@@ -1201,18 +1181,18 @@ void BoxSingleWidget::switchRecordingAction() {
 void BoxSingleWidget::switchBoxVisibleAction() {
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isBoundingBox()) {
-        ((BoundingBox*)target)->switchVisible();
+        getAsPtr(target, BoundingBox)->switchVisible();
     } else if(target->SWT_isPixmapEffect()) {
-        ((PixmapEffect*)target)->switchVisible();
+        getAsPtr(target, PixmapEffect)->switchVisible();
     } else if(target->SWT_isPathEffect()) {
-        ((PathEffect*)target)->switchVisible();
+        getAsPtr(target, PathEffect)->switchVisible();
     }
     MainWindow::getInstance()->callUpdateSchedulers();
     update();
 }
 
 void BoxSingleWidget::switchBoxLockedAction() {
-    ((BoundingBox*)mTarget->getTarget())->switchLocked();
+    getAsPtr(mTarget->getTarget(), BoundingBox)->switchLocked();
     MainWindow::getInstance()->callUpdateSchedulers();
     update();
 }
@@ -1223,7 +1203,7 @@ void BoxSingleWidget::openColorSettingsDialog() {
     ColorSettingsWidget *colorSettingsWidget =
             new ColorSettingsWidget(dialog);
     colorSettingsWidget->setColorAnimatorTarget(
-                (ColorAnimator*)mTarget->getTarget());
+                getAsPtr(mTarget->getTarget(), ColorAnimator));
     dialog->layout()->addWidget(colorSettingsWidget);
     connect(MainWindow::getInstance(), SIGNAL(updateAll()),
             dialog, SLOT(update()));
@@ -1240,7 +1220,8 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     int slidersWidth = mValueSlider->minimumWidth() +
             mSecondValueSlider->minimumWidth() + MIN_WIDGET_HEIGHT;
     if(width() - nameRightX > slidersWidth) {
-        QPointFAnimator *pt_target = (QPointFAnimator*)target;
+        QPointFAnimator *pt_target =
+                getAsPtr(target, QPointFAnimator);
         mValueSlider->setAnimator(pt_target->getXAnimator());
         mValueSlider->show();
         mValueSlider->setNeighbouringSliderToTheRight(true);

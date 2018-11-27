@@ -5,8 +5,7 @@
 #include <QLineEdit>
 #include <QDoubleValidator>
 
-class QDoubleSlider : public QWidget
-{
+class QDoubleSlider : public QWidget {
     Q_OBJECT
 public:
     QDoubleSlider(qreal minVal, qreal maxVal, qreal prefferedStep,

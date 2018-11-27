@@ -14,46 +14,44 @@
 
 
 // '0' is 0x30 and '9' is 0x39
-static bool isDigit(ushort ch)
-{
+static bool isDigit(ushort ch) {
     static quint16 magic = 0x3ff;
     return ((ch >> 4) == 3) && (magic >> (ch & 15));
 }
 
-static qreal toDouble(const QChar *&str)
-{
+static qreal toDouble(const QChar *&str) {
     const int maxLen = 255;//technically doubles can go til 308+ but whatever
     char temp[maxLen+1];
     int pos = 0;
 
-    if (*str == QLatin1Char('-')) {
+    if(*str == QLatin1Char('-')) {
         temp[pos++] = '-';
         ++str;
-    } else if (*str == QLatin1Char('+')) {
+    } else if(*str == QLatin1Char('+')) {
         ++str;
     }
-    while (isDigit(str->unicode()) && pos < maxLen) {
+    while(isDigit(str->unicode()) && pos < maxLen) {
         temp[pos++] = str->toLatin1();
         ++str;
     }
-    if (*str == QLatin1Char('.') && pos < maxLen) {
+    if(*str == QLatin1Char('.') && pos < maxLen) {
         temp[pos++] = '.';
         ++str;
     }
-    while (isDigit(str->unicode()) && pos < maxLen) {
+    while(isDigit(str->unicode()) && pos < maxLen) {
         temp[pos++] = str->toLatin1();
         ++str;
     }
     bool exponent = false;
-    if ((*str == QLatin1Char('e') || *str == QLatin1Char('E')) && pos < maxLen) {
+    if((*str == QLatin1Char('e') || *str == QLatin1Char('E')) && pos < maxLen) {
         exponent = true;
         temp[pos++] = 'e';
         ++str;
-        if ((*str == QLatin1Char('-') || *str == QLatin1Char('+')) && pos < maxLen) {
+        if((*str == QLatin1Char('-') || *str == QLatin1Char('+')) && pos < maxLen) {
             temp[pos++] = str->toLatin1();
             ++str;
         }
-        while (isDigit(str->unicode()) && pos < maxLen) {
+        while(isDigit(str->unicode()) && pos < maxLen) {
             temp[pos++] = str->toLatin1();
             ++str;
         }
@@ -62,7 +60,7 @@ static qreal toDouble(const QChar *&str)
     temp[pos] = '\0';
 
     qreal val;
-    if (!exponent && pos < 10) {
+    if(!exponent && pos < 10) {
         int ival = 0;
         const char *t = temp;
         bool neg = false;
@@ -84,12 +82,11 @@ static qreal toDouble(const QChar *&str)
                 div *= 10;
                 ++t;
             }
-            val = ((qreal)ival)/((qreal)div);
+            val = static_cast<qreal>(ival)/div;
         } else {
             val = ival;
         }
-        if (neg)
-            val = -val;
+        if(neg) val = -val;
     } else {
         val = QByteArray::fromRawData(temp, pos).toDouble();
     }
@@ -115,8 +112,7 @@ static qreal toDouble(const QString &str, bool *ok = nullptr) {
 //}
 
 static void parseNumbersArray(const QChar *&str,
-                              QVarLengthArray<qreal, 8> &points)
-{
+                              QVarLengthArray<qreal, 8> &points) {
     while (str->isSpace())
         ++str;
     while (isDigit(str->unicode()) ||
@@ -527,28 +523,27 @@ bool parsePolylineDataFast(const QString &dataStr,
     return true;
 }
 
-BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
+BoxesGroupQSPtr loadBoxesGroup(const QDomElement &groupElement,
                            BoxesGroup *parentGroup,
                            BoundingBoxSvgAttributes *attributes) {
     QDomNodeList allRootChildNodes = groupElement.childNodes();
-    BoxesGroup *boxesGroup;
+    BoxesGroupQSPtr boxesGroup;
     bool hasTransform = attributes->hasTransform();
     if(allRootChildNodes.count() > 1 ||
        hasTransform || parentGroup == nullptr) {
-        auto newBoxesGroup = SPtrCreate(BoxesGroup)();
-        boxesGroup = newBoxesGroup.data();
-        attributes->apply(boxesGroup);
+        boxesGroup = SPtrCreate(BoxesGroup)();
+        attributes->apply(boxesGroup.get());
         if(parentGroup != nullptr) {
-            parentGroup->addContainedBox(newBoxesGroup);
+            parentGroup->addContainedBox(boxesGroup);
         }
     } else {
-        boxesGroup = parentGroup;
+        boxesGroup = getAsSPtr(parentGroup, BoxesGroup);
     }
 
     for(int i = 0; i < allRootChildNodes.count(); i++) {
         QDomNode iNode = allRootChildNodes.at(i);
         if(iNode.isElement()) {
-            loadElement(iNode.toElement(), boxesGroup, attributes);
+            loadElement(iNode.toElement(), boxesGroup.get(), attributes);
         }
     }
     return boxesGroup;
@@ -819,7 +814,7 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
 
 
 #include "mainwindow.h"
-BoxesGroup *loadSVGFile(const QString &filename) {
+BoxesGroupQSPtr loadSVGFile(const QString &filename) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
@@ -1211,12 +1206,12 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
 }
 
 bool BoundingBoxSvgAttributes::hasTransform() const {
-    return !(isZero(mRelTransform.dx()) &&
-             isZero(mRelTransform.dy()) &&
-             isZero(mRelTransform.m11() - 1.) &&
-             isZero(mRelTransform.m22() - 1) &&
-             isZero(mRelTransform.m12()) &&
-             isZero(mRelTransform.m21())); /*&&
+    return !(isZero4Dec(mRelTransform.dx()) &&
+             isZero4Dec(mRelTransform.dy()) &&
+             isZero4Dec(mRelTransform.m11() - 1.) &&
+             isZero4Dec(mRelTransform.m22() - 1) &&
+             isZero4Dec(mRelTransform.m12()) &&
+             isZero4Dec(mRelTransform.m21())); /*&&
                  isZero(mDx) && isZero(mDy) &&
                  isZero(mScaleX - 1.) && isZero(mScaleY - 1.) &&
                  isZero(mShearX) && isZero(mShearY) &&
@@ -1983,24 +1978,26 @@ const PaintType &FillSvgAttributes::getPaintType() const { return mPaintType; }
 Gradient *FillSvgAttributes::getGradient() const { return mGradient; }
 
 void FillSvgAttributes::apply(BoundingBox *box) {
-    PaintSetting *setting;
+    apply(box, true);
+}
+
+void FillSvgAttributes::apply(BoundingBox *box, const bool& isFill) {
+    PaintSettingSPtr setting;
     if(mPaintType == FLATPAINT) {
-        setting = new PaintSetting(true, ColorSetting(RGBMODE,
-                                                      CVR_ALL,
-                                                      mColor.redF(),
-                                                      mColor.greenF(),
-                                                      mColor.blueF(),
-                                                      mColor.alphaF(),
-                                                      CST_CHANGE));
+        ColorSetting colorSetting =
+                ColorSetting(RGBMODE, CVR_ALL,
+                             mColor.redF(), mColor.greenF(),
+                             mColor.blueF(), mColor.alphaF(),
+                             CST_CHANGE);
+        setting = SPtrCreate(PaintSetting)(isFill, colorSetting);
     } else if(mPaintType == GRADIENTPAINT) {
-        setting = new PaintSetting(true, true, mGradient);
+        setting = SPtrCreate(PaintSetting)(isFill, true, mGradient);
     } else {
-        setting = new PaintSetting(true);
+        setting = SPtrCreate(PaintSetting)(isFill);
     }
     if(box->SWT_isPathBox()) {
-        setting->apply(box->ref<PathBox>());
+        setting->apply(getAsPtr(box, PathBox));
     }
-    delete setting;
 }
 
 StrokeSvgAttributes::StrokeSvgAttributes() {}
@@ -2054,32 +2051,14 @@ void StrokeSvgAttributes::setOutlineCompositionMode(
 
 void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
     box->setStrokeWidth(mLineWidth*scale, false);
-
-    PaintSetting *setting;
-    if(mPaintType == FLATPAINT) {
-        setting = new PaintSetting(false, ColorSetting(RGBMODE,
-                                                       CVR_ALL,
-                                                       mColor.redF(),
-                                                       mColor.greenF(),
-                                                       mColor.blueF(),
-                                                       mColor.alphaF(),
-                                                       CST_CHANGE));
-    } else if(mPaintType == GRADIENTPAINT) {
-        setting = new PaintSetting(false, true, mGradient);
-    } else {
-        setting = new PaintSetting(false);
-    }
-    if(box->SWT_isPathBox()) {
-        setting->apply(box->ref<PathBox>());
-    }
-    delete setting;
+    FillSvgAttributes::apply(box, false);
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
 }
 
 void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
     box->getTransformAnimator()->setOpacity(mOpacity);
     if(box->SWT_isPathBox()) {
-        PathBoxQSPtr path = box->ref<PathBox>();
+        PathBox* path = getAsPtr(box, PathBox);
         qreal m11 = mRelTransform.m11();
         qreal m12 = mRelTransform.m12();
         qreal m21 = mRelTransform.m21();
@@ -2091,45 +2070,30 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
                                 (sxAbs + syAbs)*0.5);
         mFillAttributes.apply(path);
         if(box->SWT_isTextBox()) {
-            TextBoxQSPtr text = path->ref<TextBox>();
+            TextBox* text = getAsPtr(box, TextBox);
             text->setFont(mTextAttributes.getFont());
         }
     }
 }
 
 void VectorPathSvgAttributes::apply(VectorPath *path) {
-    PathAnimatorQSPtr pathAnimator = path->getPathAnimator();
-    Q_FOREACH(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
+    PathAnimator* pathAnimator = path->getPathAnimator();
+    Q_FOREACH(const SvgSeparatePathSPtr& separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
-        VectorPathAnimator *singlePath =
-                new VectorPathAnimator(pathAnimator);
-        separatePath->apply(singlePath);
+        VectorPathAnimatorQSPtr singlePath =
+                SPtrCreate(VectorPathAnimator)(pathAnimator);
+        separatePath->apply(singlePath.get());
         pathAnimator->addSinglePathAnimator(singlePath, false);
     }
 
     BoundingBoxSvgAttributes::apply(path);
 }
 
-SvgSeparatePath::SvgSeparatePath() {}
-
-SvgSeparatePath::~SvgSeparatePath() {
-    Q_FOREACH(SvgNodePoint *point, mPoints) {
-        delete point;
-    }
-}
-
 void SvgSeparatePath::apply(VectorPathAnimator *path) {
     NodePoint *lastPoint = nullptr;
     NodePoint *firstPoint = nullptr;
-    Q_FOREACH(SvgNodePoint *point, mPoints) {
-        lastPoint = path->addNodeRelPos(point->getStartPoint(),
-                                        point->getPoint(),
-                                        point->getEndPoint(),
-                                        lastPoint,
-                                        NodeSettings(point->getStartPointEnabled(),
-                                                     point->getEndPointEnabled(),
-                                                     point->getCtrlsMode()),
-                                        false);
+    Q_FOREACH(const SvgNodePointSPtr& point, mPoints) {
+        lastPoint = path->addNodeRelPos(point.get(), lastPoint);
         if(firstPoint == nullptr) firstPoint = lastPoint;
     }
     if(mClosedPath) {
@@ -2139,34 +2103,38 @@ void SvgSeparatePath::apply(VectorPathAnimator *path) {
 }
 
 void SvgSeparatePath::closePath() {
-    if(mLastPoint->getStartPointEnabled() &&
-            pointToLen(mLastPoint->getPoint() - mFirstPoint->getPoint()) < 0.1) {
+    qreal distBetweenEndPts = pointToLen(mLastPoint->getPoint() -
+                                         mFirstPoint->getPoint());
+    if(mLastPoint->getStartPointEnabled() && distBetweenEndPts < 0.1) {
         mFirstPoint->setStartPoint(mLastPoint->getStartPoint());
-        delete mPoints.takeLast();
-        mLastPoint = mPoints.last();
+        mPoints.removeLast();
+        mLastPoint = mPoints.last().get();
     }
 
     mClosedPath = true;
 }
 
 void SvgSeparatePath::moveTo(const QPointF &e) {
-    mFirstPoint = new SvgNodePoint(e);
+    auto newPt = SPtrCreate(SvgNodePoint)(e);
+    mFirstPoint = newPt.get();
     mLastPoint = mFirstPoint;
-    addPoint(mFirstPoint);
+    addPoint(newPt);
 }
 
 void SvgSeparatePath::cubicTo(const QPointF &c1,
                               const QPointF &c2,
                               const QPointF &e) {
     mLastPoint->setEndPoint(c1);
-    mLastPoint = new SvgNodePoint(e);
+    auto newPt = SPtrCreate(SvgNodePoint)(e);
+    mLastPoint = newPt.get();
     mLastPoint->setStartPoint(c2);
-    addPoint(mLastPoint);
+    addPoint(newPt);
 }
 
 void SvgSeparatePath::lineTo(const QPointF &e) {
-    mLastPoint = new SvgNodePoint(e);
-    addPoint(mLastPoint);
+    auto newPt = SPtrCreate(SvgNodePoint)(e);
+    mLastPoint = newPt.get();
+    addPoint(newPt);
 }
 
 void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
@@ -2177,7 +2145,7 @@ void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
 }
 
 void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
-    Q_FOREACH(SvgNodePoint *point, mPoints) {
+    Q_FOREACH(const SvgNodePointSPtr& point, mPoints) {
         point->applyTransfromation(transformation);
     }
 }
@@ -2287,7 +2255,7 @@ void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc,
             QPointF(a00 * x3 + a01 * y3, a10 * x3 + a11 * y3));
 }
 
-void SvgSeparatePath::addPoint(SvgNodePoint *point) {
+void SvgSeparatePath::addPoint(const SvgNodePointSPtr &point) {
     mPoints << point;
 }
 
@@ -2369,11 +2337,11 @@ QPointF SvgNodePoint::getEndPoint() const {
     return mEndPoint;
 }
 
-bool SvgNodePoint::getStartPointEnabled() {
+bool SvgNodePoint::getStartPointEnabled() const {
     return mStartPointSet;
 }
 
-bool SvgNodePoint::getEndPointEnabled() {
+bool SvgNodePoint::getEndPointEnabled() const {
     return mEndPointSet;
 }
 

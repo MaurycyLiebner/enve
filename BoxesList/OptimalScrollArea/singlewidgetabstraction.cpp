@@ -23,7 +23,7 @@ SingleWidgetAbstraction::~SingleWidgetAbstraction() {
 bool SingleWidgetAbstraction::getAbstractions(
         const int &minY, const int &maxY,
         int& currY, int currX,
-        QList<SingleWidgetAbstractionSPtr>& abstractions,
+        QList<SingleWidgetAbstraction *> &abstractions,
         const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule,
         const bool &parentMainTarget) { // returns whether should abort
@@ -32,13 +32,13 @@ bool SingleWidgetAbstraction::getAbstractions(
                                                       parentSatisfiesRule,
                                                       parentMainTarget);
     if(currY > minY && satisfiesRule && !mIsMainTarget) {
-        abstractions.append(ref<SingleWidgetAbstraction>());
+        abstractions.append(this);
     }
     if(satisfiesRule && !mIsMainTarget) {
         currX += MIN_WIDGET_HEIGHT;
         currY += MIN_WIDGET_HEIGHT;
     }
-    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mChildren) {
+    Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
         if(abs->getAbstractions(
                     minY, maxY,
                     currY, currX,
@@ -82,7 +82,7 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         currX += MIN_WIDGET_HEIGHT;
         *currY += MIN_WIDGET_HEIGHT;
     }
-    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mChildren) {
+    Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
         if(abs->setSingleWidgetAbstractions(
                     minY, maxY,
                     currY, currX,
@@ -110,7 +110,7 @@ int SingleWidgetAbstraction::getHeight(
         if(satisfiesRule && !mIsMainTarget) {
             height += MIN_WIDGET_HEIGHT;
         }
-        Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mChildren) {
+        Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
             height += abs->getHeight(
                         rules,
                         (satisfiesRule && mContentVisible) || mIsMainTarget,
@@ -122,16 +122,16 @@ int SingleWidgetAbstraction::getHeight(
 }
 
 void SingleWidgetAbstraction::addChildAbstraction(
-        const SingleWidgetAbstractionSPtr& abs) {
-    mChildren.append(abs->ref<SingleWidgetAbstraction>());
+        SingleWidgetAbstraction* abs) {
+    mChildren.append(abs);
 
     mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
     mVisiblePartWidget->scheduleUpdateParentHeight();
 }
 
 void SingleWidgetAbstraction::addChildAbstractionAt(
-        const SingleWidgetAbstractionSPtr& abs, const int &id) {
-    mChildren.insert(id, abs->ref<SingleWidgetAbstraction>());
+        SingleWidgetAbstraction* abs, const int &id) {
+    mChildren.insert(id, abs);
 
     mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
     mVisiblePartWidget->scheduleUpdateParentHeight();
@@ -139,9 +139,9 @@ void SingleWidgetAbstraction::addChildAbstractionAt(
 
 SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
         SingleWidgetTarget* target) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mChildren) {
+    Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
         if(abs->getTarget() == target) {
-            return abs.get();
+            return abs;
         }
     }
     return nullptr;
@@ -149,19 +149,13 @@ SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
 
 void SingleWidgetAbstraction::removeChildAbstractionForTarget(
         SingleWidgetTarget* target) {
-    auto chidAbs = getChildAbstractionForTarget(target);
-    removeChildAbstraction(chidAbs->ref<SingleWidgetAbstraction>());
+    auto childAbs = getChildAbstractionForTarget(target);
+    removeChildAbstraction(childAbs);
 }
 
 void SingleWidgetAbstraction::removeChildAbstraction(
-        const SingleWidgetAbstractionSPtr& abs) {
-    for(int i = 0; i < mChildren.count(); i++) {
-        const std::shared_ptr<SingleWidgetAbstraction> &absT = mChildren.at(i);
-        if(abs == absT) {
-            mChildren.removeAt(i);
-            break;
-        }
-    }
+        SingleWidgetAbstraction* abs) {
+    mChildren.removeOne(abs);
 
     mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
     mVisiblePartWidget->scheduleUpdateParentHeight();
@@ -233,8 +227,8 @@ void SingleWidgetAbstraction::moveChildAbstractionForTargetTo(
 //    }
     int currId = -1;
     for(int i = 0; i < mChildren.count(); i++) {
-        const SingleWidgetAbstractionSPtr& absT = mChildren.at(i);
-        if(abs == absT.get()) {
+        const SingleWidgetAbstractionPtr& absT = mChildren.at(i);
+        if(abs == absT) {
             currId = i;
             break;
         }

@@ -12,15 +12,33 @@ class Canvas;
 class MovablePoint;
 enum CanvasMode : short;
 struct NodeSettings : public StdSelfRef {
+    friend class StdSelfRef;
     NodeSettings() {}
-    NodeSettings(const NodeSettings &settings) {
-        startEnabled = settings.startEnabled;
-        endEnabled = settings.endEnabled;
-        ctrlsMode = settings.ctrlsMode;
+    NodeSettings(const NodeSettings *settings) {
+        if(settings == nullptr) return;
+        copyFrom(settings);
     }
     NodeSettings(const bool &startEnabledT,
                  const bool &endEnabledT,
                  const CtrlsMode &ctrlsModeT) {
+        set(startEnabledT, endEnabledT, ctrlsModeT);
+    }
+
+    void copyFrom(const NodeSettings *settings) {
+        if(settings == nullptr) {
+            startEnabled = false;
+            endEnabled = false;
+            ctrlsMode = CtrlsMode::CTRLS_CORNER;
+        } else {
+            startEnabled = settings->startEnabled;
+            endEnabled = settings->endEnabled;
+            ctrlsMode = settings->ctrlsMode;
+        }
+    }
+
+    void set(const bool &startEnabledT,
+             const bool &endEnabledT,
+             const CtrlsMode &ctrlsModeT) {
         startEnabled = startEnabledT;
         endEnabled = endEnabledT;
         ctrlsMode = ctrlsModeT;
@@ -29,19 +47,16 @@ struct NodeSettings : public StdSelfRef {
     bool startEnabled = false;
     bool endEnabled = false;
     CtrlsMode ctrlsMode = CtrlsMode::CTRLS_CORNER;
+
+    void write(QIODevice *target);
+    void read(QIODevice *target);
 };
 
 class VectorPathAnimator : public Animator,
                            public PathContainer {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    VectorPathAnimator(PathAnimator *pathAnimator);
-    VectorPathAnimator(const QList<NodeSettings> &settingsList,
-                       PathAnimator *pathAnimator);
-    VectorPathAnimator(const QList<NodeSettings> &settingsList,
-                       const QList<SkPoint> &posList,
-                       PathAnimator *pathAnimator);
-
     void prp_setAbsFrame(const int &frame);
     SkPath getPathAtRelFrame(const int &relFrame,
                              const bool &considerCurrent = true,
@@ -50,62 +65,39 @@ public:
                               const bool &considerCurrent = true,
                               const bool &interpolate = true);
 
-    NodeSettings *getNodeSettingsForPtId(const int &ptId) {
-        return mNodeSettings.at(pointIdToNodeId(ptId)).get();
-    }
+    NodeSettings *getNodeSettingsForPtId(const int &ptId);
 
-    NodeSettings *getNodeSettingsForNodeId(const int &nodeId) {
-        return mNodeSettings.at(nodeId).get();
-    }
+    NodeSettings *getNodeSettingsForNodeId(const int &nodeId);
 
     void replaceNodeSettingsForPtId(const int &ptId,
-                                    const NodeSettings &settings) {
-        replaceNodeSettingsForNodeId(pointIdToNodeId(ptId), settings);
-    }
+                                    const NodeSettings *settings);
 
     void replaceNodeSettingsForNodeId(const int &nodeId,
-                                      const NodeSettings &settings,
+                                      const NodeSettings *settings,
                                       const bool &saveUndoRedo = true);
 
-    NodeSettings *insertNodeSettingsForNodeId(const int &nodeId,
-                                              const NodeSettings &settings,
-                                              const bool &saveUndoRedo = true);
+    NodeSettings* insertNodeSettingsForNodeId(const int &nodeId,
+                                     const NodeSettings *settings,
+                                     const bool &saveUndoRedo = true);
+    void insertNodeSettingsForNodeId(const int &nodeId,
+                                     const NodeSettingsSPtr &newSettings,
+                                     const bool &saveUndoRedo = true);
 
     void removeNodeSettingsAt(const int &id,
                               const bool &saveUndoRedo = true);
 
     void setNodeStartEnabled(const int &nodeId,
-                             const bool &enabled) {
-        NodeSettings *settings = getNodeSettingsForNodeId(nodeId);
-        settings->startEnabled = enabled;
-    }
+                             const bool &enabled);
 
     void setNodeEndEnabled(const int &nodeId,
-                           const bool &enabled) {
-        NodeSettings *settings = getNodeSettingsForNodeId(nodeId);
-        settings->endEnabled = enabled;
-    }
+                           const bool &enabled);
 
     void setNodeCtrlsMode(const int &nodeId,
-                          const CtrlsMode &ctrlsMode) {
-        NodeSettings *settings = getNodeSettingsForNodeId(nodeId);
-        settings->ctrlsMode = ctrlsMode;
-    }
+                          const CtrlsMode &ctrlsMode);
 
-    void setPathClosed(const bool &bT) {
-        PathContainer::setPathClosed(bT);
-        foreach(const KeySPtr &key, anim_mKeys) {
-            SPtrGetAs(key, PathKey)->setPathClosed(bT);
-        }
-        if(prp_hasKeys()) {
-            setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
-        }
-        prp_updateInfluenceRangeAfterChanged();
-    }
+    void setPathClosed(const bool &bT);
 
-    const CtrlsMode &getNodeCtrlsMode(const int &nodeId) {
-        return getNodeSettingsForNodeId(nodeId)->ctrlsMode;
-    }
+    const CtrlsMode &getNodeCtrlsMode(const int &nodeId);
     void anim_saveCurrentValueToKey(PathKey *key);
 
     void finishedPathChange();
@@ -127,21 +119,32 @@ public:
     void removeNodeAt(const int &nodeId,
                       const bool &saveUndoRedo = true);
 
+    NodePoint *addNodeRelPos(const SvgNodePoint *svgPoint,
+                             NodePoint *targetPt);
     NodePoint *addNodeAbsPos(const QPointF &absPos,
-                              NodePoint *targetPt);
+                             NodePoint *targetPt);
     NodePoint *addNodeRelPos(const QPointF &relPos,
                              NodePoint *targetPt);
     NodePoint *addNodeRelPos(const QPointF &startRelPos,
                              const QPointF &relPos,
                              const QPointF &endRelPos,
+                             NodePoint *targetPt);
+
+    NodePoint *addNodeRelPos(const QPointF &startRelPos,
+                             const QPointF &relPos,
+                             const QPointF &endRelPos,
+                             const bool &startEnabled,
+                             const bool &endEnabled,
+                             const CtrlsMode &ctrlsMode,
                              NodePoint* targetPt,
-                             const NodeSettings &nodeSettings = NodeSettings(),
                              const bool &saveUndoRedo = true);
     NodePoint *addNodeRelPos(const QPointF &startRelPos,
                              const QPointF &relPos,
                              const QPointF &endRelPos,
+                             const bool& startEnabled,
+                             const bool& endEnabled,
+                             const CtrlsMode& ctrlsMode,
                              const int &targetPtId,
-                             const NodeSettings &nodeSettings = NodeSettings(),
                              const bool &saveUndoRedo = true);
     VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
@@ -152,7 +155,7 @@ public:
                       const SkScalar &invScale,
                       const SkMatrix &combinedTransform);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> *list);
+                                           QList<MovablePointPtr> &list);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
@@ -174,7 +177,7 @@ public:
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 
-    bool SWT_isVectorPathAnimator() { return true; }
+    bool SWT_isVectorPathAnimator();
     void anim_moveKeyToRelFrame(Key *key,
                                 const int &newFrame,
                                 const bool &saveUndoRedo = true,
@@ -187,130 +190,63 @@ public:
     void revertElementPosSubset(const int &firstId, int count);
     void revertNodeSettingsSubset(const int &firstId, int count);
 
-    void getNodeSettingsList(QList<NodeSettingsSPtr>& nodeSettingsList) {
-        nodeSettingsList = mNodeSettings;
-    }
+    void getNodeSettingsList(QList<NodeSettingsSPtr>& nodeSettingsList);
 
-    const QList<NodeSettingsSPtr> &getNodeSettingsList() {
-        return mNodeSettings;
-    }
+    const QList<NodeSettingsSPtr> &getNodeSettingsList();
 
-    void getElementPosList(QList<SkPoint> *elementPosList) {
-        *elementPosList = mElementsPos;
-    }
+    void getElementPosList(QList<SkPoint> *elementPosList);
 
-    void getKeysList(QList<PathKeySPtr>& pathKeyList) {
-        foreach(const KeySPtr &key, anim_mKeys) {
-            pathKeyList.append(key->ref<PathKey>());
-        }
-    }
+    void getKeysList(QList<PathKeySPtr>& pathKeyList);
 
     static void getKeysDataForConnection(VectorPathAnimator *targetPath,
                                   VectorPathAnimator* srcPath,
-                                  QList<int> *keyFrames,
-                                  QList<QList<SkPoint> > *newKeysData,
-                                  const bool &addSrcFirst) {
-        QList<PathKeySPtr> keys;
-        srcPath->getKeysList(keys);
-        foreach(const PathKeySPtr& srcKey, keys) {
-            QList<SkPoint> combinedKeyData;
-            int relFrame = srcKey->getRelFrame();
-            Key* keyAtRelFrame = targetPath->anim_getKeyAtRelFrame(relFrame);
-            const QList<SkPoint> &srcKeyElements = srcKey->getElementsPosList();
-            QList<SkPoint> targetKeyElements;
-            if(keyAtRelFrame == nullptr) {
-                targetKeyElements =
-                        extractElementsFromSkPath(targetPath->getPathAtRelFrame(relFrame));
-            } else {
-                targetKeyElements = SPtrGetAs(keyAtRelFrame, PathKey)->getElementsPosList();
-            }
-            if(addSrcFirst) {
-                combinedKeyData.append(targetKeyElements);
-                combinedKeyData.append(srcKeyElements);
-            } else {
-                combinedKeyData.append(targetKeyElements);
-                combinedKeyData.append(srcKeyElements);
-            }
-            newKeysData->append(combinedKeyData);
-            keyFrames->append(srcKey->getRelFrame());
-        }
-    }
+                                  QList<int> &keyFrames,
+                                  QList<QList<SkPoint> > &newKeysData,
+                                  const bool &addSrcFirst);
 
     VectorPathAnimator *connectWith(VectorPathAnimator *srcPath);
-    Key *readKey(QIODevice *target);
+    KeySPtr readKey(QIODevice *target);
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
 
-    void shiftAllNodeSettings(const int &by) {
-        if(by == 0) return;
-        if(mPathClosed) {
-            for(int i = 0; i < by*3; i++) {
-                mNodeSettings.prepend(mNodeSettings.takeLast());
-            }
-            for(int i = 0; i < -by*3; i++) {
-                mNodeSettings.append(mNodeSettings.takeFirst());
-            }
-            mPathUpdateNeeded = true;
-        }
-    }
+    void shiftAllNodeSettings(const int &by);
 
-    void shiftAllPoints(const int &by) {
-        PathContainer::shiftAllPoints(by);
-        shiftAllNodeSettings(by);
-        if(anim_mIsRecording) {
-            anim_saveCurrentValueAsKey();
-        } else {
-            updateNodePointsFromElements();
-        }
-    }
+    void shiftAllPoints(const int &by);
 
-    void revertAllPoints() {
-        PathContainer::revertAllPoints();
-        revertAllNodeSettings();
-        if(anim_mIsRecording) {
-            anim_saveCurrentValueAsKey();
-        } else {
-            updateNodePointsFromElements();
-        }
-    }
+    void revertAllPoints();
 
-    void updateAfterChangedFromInside() {
-        prp_updateInfluenceRangeAfterChanged();
-    }
+    void updateAfterChangedFromInside();
 
     void removeFromParent();
 
-    NodePoint *getNodePtWithNodeId(const int &id) {
-        if(id < 0 || id >= mPoints.count()) return nullptr;
-        return mPoints.at(id).get();
-    }
+    NodePoint *getNodePtWithNodeId(const int &id);
 
-    int getNodeCount() {
-        return mNodeSettings.count();
-    }
+    int getNodeCount();
 
     void mergeNodes(const int &nodeId1,
                     const int &nodeId2);
 
-    const bool &isClosed() const {
-        return mPathClosed;
-    }
+    const bool &isClosed() const;
     void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
+protected:
+    VectorPathAnimator(PathAnimator *pathAnimator);
+    VectorPathAnimator(const QList<const NodeSettings*> &settingsList,
+                       PathAnimator *pathAnimator);
+    VectorPathAnimator(const QList<const NodeSettings *> &settingsList,
+                       const QList<SkPoint> &posList,
+                       PathAnimator *pathAnimator);
 private:
-    void revertAllNodeSettings() {
-        foreach(const NodeSettingsSPtr& settings, mNodeSettings) {
-            bool endT = settings->endEnabled;
-            settings->endEnabled = settings->startEnabled;
-            settings->startEnabled = endT;
-        }
-    }
+    void revertAllNodeSettings();
     void setFirstPoint(NodePoint *pt);
 
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,
                              const QPointF &relPos,
                              const QPointF &endRelPos,
-                             const NodeSettings &nodeSettings);
+                             const bool &startEnabled,
+                             const bool &endEnabled,
+                             const CtrlsMode &ctrlsMode);
+
     void updateNodePointIds();
 
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
@@ -318,11 +254,11 @@ private:
                                               NodePoint **prevPoint,
                                               NodePoint **nextPoint,
                                               const qreal &canvasScaleInv);
-private:
     NodePoint *createNodePointAndAppendToList();
 
     bool mElementsUpdateNeeded = false;
 
+    BasicTransformAnimatorQPtr mParentTransform;
     PathAnimatorQPtr mParentPathAnimator;
     NodePointPtr mFirstPoint;
 

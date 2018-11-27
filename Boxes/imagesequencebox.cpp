@@ -11,7 +11,8 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     if(mAnimationCacheHandler != nullptr) {
         mAnimationCacheHandler->removeDependentBox(this);
     }
-    mAnimationCacheHandler = new ImageSequenceCacheHandler(mListOfFrames);
+    mAnimationCacheHandler =
+            ImageSequenceCacheHandler::createNewHandler(mListOfFrames);
     mAnimationCacheHandler->addDependentBox(this);
 
     reloadCacheHandler();

@@ -6,18 +6,13 @@ class BoundingBox;
 #include "skiaincludes.h"
 class PathBox;
 
-class PathEffectAnimators : public ComplexAnimator
-{
+class PathEffectAnimators : public ComplexAnimator {
+    friend class SelfRef;
 public:
-    PathEffectAnimators(const bool &isOutline,
-                        const bool &isFill,
-                        BoundingBox *parentPath);
-    void addEffect(PathEffect *effect);
+    void addEffect(const PathEffectQSPtr &effect);
     bool hasEffects();
 
-    bool SWT_isPathEffectAnimators() {
-        return true;
-    }
+    bool SWT_isPathEffectAnimators();
 
     void filterPathForRelFrame(const int &relFrame,
                                SkPath *srcDstPath,
@@ -40,21 +35,19 @@ public:
 
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
-    void removeEffect(PathEffect *effect);
-    BoundingBox *getParentBox() {
-        return mParentBox;
-    }
-    const bool &isOutline() const {
-        return mIsOutline;
-    }
-    const bool &isFill() const {
-        return mIsFill;
-    }
+    void removeEffect(const PathEffectQSPtr& effect);
+    BoundingBox *getParentBox();
+    const bool &isOutline() const;
+    const bool &isFill() const;
     void readPathEffect(QIODevice *target);
 protected:
+    PathEffectAnimators(const bool &isOutline,
+                        const bool &isFill,
+                        BoundingBox *parentPath);
+
     bool mIsOutline;
     bool mIsFill;
-    BoundingBox *mParentBox = nullptr;
+    BoundingBoxQPtr mParentBox;
 };
 
 

@@ -10,6 +10,8 @@ enum CtrlsMode : short;
 class PathContainer {
 public:
     PathContainer() {}
+    virtual ~PathContainer() {}
+
     const QList<SkPoint> &getElementsPosList() const {
         return mElementsPos;
     }
@@ -192,6 +194,7 @@ protected:
 };
 
 class PathKey : public Key, public PathContainer {
+    friend class StdSelfRef;
 public:
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
     bool differsFromKey(Key *key) { return key != this; }
@@ -199,23 +202,23 @@ public:
     void readKey(QIODevice *target);
 
     PathKeySPtr createNewKeyFromSubsetForPath(
-            const VectorPathAnimatorQSPtr& parentAnimator,
+            VectorPathAnimator *parentAnimator,
             const int &firstId, int count);
     void updateAfterChangedFromInside();
 protected:
-    PathKey(const VectorPathAnimatorQSPtr &parentAnimator);
+    PathKey(VectorPathAnimator *parentAnimator);
     PathKey(const int &relFrame,
             const SkPath &path,
-            const VectorPathAnimatorQSPtr &parentAnimator,
+            VectorPathAnimator *parentAnimator,
             const bool &closed = false);
     PathKey(const int &relFrame,
             const SkPath &path,
             const QList<SkPoint> &elementsPos,
-            const VectorPathAnimatorQSPtr &parentAnimator,
+            VectorPathAnimator *parentAnimator,
             const bool &closed);
     PathKey(const int &relFrame,
             const QList<SkPoint> &elementsPos,
-            const VectorPathAnimatorQSPtr &parentAnimator,
+            VectorPathAnimator *parentAnimator,
             const bool &closed);
 };
 

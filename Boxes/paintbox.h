@@ -9,6 +9,7 @@ class AnimatedSurface;
 class QPointFAnimator;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
+    friend class StdSelfRef;
     PaintBoxRenderData(BoundingBox *parentBoxT) :
         BoundingBoxRenderData(parentBoxT) {
 
@@ -22,6 +23,7 @@ struct PaintBoxRenderData : public BoundingBoxRenderData {
 };
 
 class PaintBox : public BoundingBox {
+    friend class SelfRef;
 public:
     PaintBox();
     PaintBox(const ushort &canvasWidthT,
@@ -86,7 +88,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> *list);
+                                           QList<MovablePoint *> &list);
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
     void drawSelectedSk(SkCanvas *canvas,
@@ -133,13 +135,18 @@ private:
     bool mFinishSizeAndPosSetupScheduled = false;
     bool mFinishSizeSetupScheduled = false;
 
-    int mOverlapFrames = 1;
-    int mFrameStep = 1;
-    QPointFAnimator *mTopLeftPoint = nullptr;
-    QPointFAnimator *mBottomRightPoint = nullptr;
     ushort mWidth = 0;
     ushort mHeight = 0;
-    AnimatedSurface *mMainHandler = nullptr;
+
+    int mOverlapFrames = 1;
+    int mFrameStep = 1;
+    QPointFAnimatorQSPtr mTopLeftAnimator;
+    QPointFAnimatorQSPtr mBottomRightAnimator;
+
+    PointAnimatorMovablePointSPtr mTopLeftPoint;
+    PointAnimatorMovablePointSPtr mBottomRightPoint;
+
+    AnimatedSurfaceQSPtr mMainHandler;
     Surface *mTemporaryHandler = nullptr;
 };
 

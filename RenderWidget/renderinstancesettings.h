@@ -49,10 +49,9 @@ struct OutputSettings {
     AVCodec *audioCodec = nullptr;
 };
 
-class OutputSettingsProfile : public SelfRef {
+class OutputSettingsProfile : public StdSelfRef {
+    friend class StdSelfRef;
 public:
-    OutputSettingsProfile() {}
-
     const QString &getName() const {
         return mName;
     }
@@ -69,6 +68,8 @@ public:
         mSettings = settings;
     }
 protected:
+    OutputSettingsProfile() {}
+
     QString mName = "Untitled";
     OutputSettings mSettings;
 };
@@ -83,101 +84,44 @@ public:
         PAUSED,
         WAITING
     };
-    RenderInstanceSettings(const CanvasQSPtr& canvas);
+    RenderInstanceSettings(Canvas* canvas);
 
     const QString &getName();
-
-    void setOutputDestination(const QString &outputDestination) {
-        mOutputDestination = outputDestination;
-    }
-
-    const QString &getOutputDestination() const {
-        return mOutputDestination;
-    }
-
-    void setTargetCanvas(Canvas *canvas) {
-        mTargetCanvas = canvas;
-    }
-
-    Canvas *getTargetCanvas() {
-        return mTargetCanvas;
-    }
-
-    void setCurrentRenderFrame(const int &currentRenderFrame) {
-        mCurrentRenderFrame = currentRenderFrame;
-    }
-
-    const int &currentRenderFrame() {
-        return mCurrentRenderFrame;
-    }
-
-    const OutputSettings &getOutputRenderSettings() {
-        return mOutputSettings;
-    }
-
-    void setOutputRenderSettings(const OutputSettings &settings) {
-        mOutputSettings = settings;
-    }
-
-    const RenderSettings &getRenderSettings() {
-        return mRenderSettings;
-    }
-
-    void setRenderSettings(const RenderSettings &settings) {
-        mRenderSettings = settings;
-    }
-
+    void setOutputDestination(const QString &outputDestination);
+    const QString &getOutputDestination() const;
+    void setTargetCanvas(Canvas *canvas);
+    Canvas *getTargetCanvas();
+    void setCurrentRenderFrame(const int &currentRenderFrame);
+    const int &currentRenderFrame();
+    const OutputSettings &getOutputRenderSettings();
+    void setOutputRenderSettings(const OutputSettings &settings);
+    const RenderSettings &getRenderSettings();
+    void setRenderSettings(const RenderSettings &settings);
     void renderingAboutToStart();
-
     void setCurrentState(const RenderState &state,
                          const QString &text = "");
-
-    const QString &getRenderError() const {
-        return mRenderError;
-    }
-
-    const RenderState &getCurrentState() const {
-        return mState;
-    }
-
-    void setParentWidget(RenderInstanceWidget *wid) {
-        mParentWidget = wid;
-    }
-
-    void copySettingsFromOutputSettingsProfile() {
-        OutputSettingsProfile *profileT = mOutputSettingsProfile.data();
-        if(profileT == nullptr) return;
-        mOutputSettings = profileT->getSettings();
-    }
-
-    void setOutputSettingsProfile(OutputSettingsProfile *profile) {
-        if(profile == nullptr) {
-            mOutputSettingsProfile.clear();
-        } else {
-            mOutputSettingsProfile = profile;
-        }
-        copySettingsFromOutputSettingsProfile();
-    }
-
-    OutputSettingsProfile *getOutputSettingsProfile() {
-        return mOutputSettingsProfile;
-    }
+    const QString &getRenderError() const;
+    const RenderState &getCurrentState() const;
+    void setParentWidget(RenderInstanceWidget *wid);
+    void copySettingsFromOutputSettingsProfile();
+    void setOutputSettingsProfile(OutputSettingsProfile *profile);
+    OutputSettingsProfile *getOutputSettingsProfile();
 private:
     void updateParentWidget();
+
     RenderState mState = NONE;
     int mCurrentRenderFrame = 0;
 
-    OutputSettingsProfileQPtr mOutputSettingsProfile;
+    QString mOutputDestination;
+    QString mRenderError;
+
+    OutputSettingsProfilePtr mOutputSettingsProfile;
     RenderInstanceWidget *mParentWidget = nullptr;
 
-    Canvas *mTargetCanvas;
+    CanvasQPtr mTargetCanvas;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;
-
-    QString mOutputDestination;
-
-    QString mRenderError;
 };
 
 #endif // RENDERINSTANCESETTINGS_H

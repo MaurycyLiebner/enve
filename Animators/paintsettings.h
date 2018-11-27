@@ -64,8 +64,15 @@ private:
 };
 
 class Gradient;
-class PaintSetting {
+class PaintSetting : public StdSelfRef {
+    friend class StdSelfRef;
 public:
+    void apply(PathBox *box) const;
+
+    void applyColorSetting(ColorAnimator *animator) const;
+
+    bool targetsFill() const { return mTargetFillSettings; }
+protected:
     PaintSetting(const bool &targetFillSettings,
                  const ColorSetting &colorSetting);
 
@@ -74,16 +81,8 @@ public:
     PaintSetting(const bool &targetFillSettings,
                  const bool &linearGradient,
                  Gradient* gradient);
-
-    void apply(PathBox *box) const;
-
-    void applyColorSetting(ColorAnimator *animator) const;
-
-    bool targetsFill() const { return mTargetFillSettings; }
 private:
-    static void *operator new (size_t);
-
-    bool mTargetFillSettings;
+    const bool mTargetFillSettings;
     bool mLinearGradient = true;
     GradientQPtr mGradient;
     PaintType mPaintType;
@@ -91,6 +90,7 @@ private:
 };
 
 class PaintSettings : public ComplexAnimator {
+    friend class SelfRef;
 public:
     QColor getCurrentColor() const;
 
@@ -108,7 +108,7 @@ public:
 
     ColorAnimator *getColorAnimator();
 
-    void setGradientPoints(const GradientPointsQSPtr &gradientPoints);
+    void setGradientPoints(GradientPoints *gradientPoints);
 
     void setPaintPathTarget(PathBox *path);
 
@@ -128,9 +128,10 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 protected:
-    PaintSettings(PathBox *parent);
+    PaintSettings(GradientPoints* grdPts, PathBox *parent);
 
-    PaintSettings(PathBox *parent,
+    PaintSettings(GradientPoints *grdPts,
+                  PathBox *parent,
                   const QColor &colorT,
                   const PaintType &paintTypeT,
                   Gradient *gradientT = nullptr);
@@ -139,9 +140,8 @@ private:
     PaintType mPaintType = FLATPAINT;
 
     PathBox * const mTarget_k;
-    GradientPointsQSPtr mGradientPoints;
-    QSharedPointer<ColorAnimator> mColor =
-            SPtrCreate(ColorAnimator)();
+    GradientPointsQPtr mGradientPoints;
+    QSharedPointer<ColorAnimator> mColor = SPtrCreate(ColorAnimator)();
     GradientQPtr mGradient;
 };
 
@@ -206,7 +206,7 @@ public:
         Q_UNUSED(shift);
         if(parentAnimator == nullptr) return;
         Q_FOREACH(const KeySPtr &key, anim_mKeys) {
-            parentAnimator->ca_updateDescendatKeyFrame(key);
+            parentAnimator->ca_updateDescendatKeyFrame(key.get());
         }
     }
 
@@ -270,6 +270,7 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
 };
 
 class StrokeSettings : public PaintSettings {
+    friend class SelfRef;
 public:
     void setCurrentStrokeWidth(const qreal &newWidth);
 
@@ -306,9 +307,11 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 protected:
-    StrokeSettings();
+    StrokeSettings(GradientPoints* grdPts, PathBox *parent);
 
-    StrokeSettings(const QColor &colorT,
+    StrokeSettings(GradientPoints* grdPts,
+                   PathBox *parent,
+                   const QColor &colorT,
                    const PaintType &paintTypeT,
                    Gradient* gradientT = nullptr);
 private:

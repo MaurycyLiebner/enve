@@ -223,7 +223,8 @@ void ColorValueRect::mouseReleaseEvent(QMouseEvent *) {
 //}
 
 void ColorValueRect::mouseInteraction(const int& x_t) {
-    setValueAndEmitValueChanged(clamp((x_t)/width(), 0., 1.));
+    setValueAndEmitValueChanged(
+                clamp(static_cast<qreal>(x_t)/width(), 0., 1.));
 }
 
 

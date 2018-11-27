@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "BoxesList/boxsinglewidget.h"
 #include "global.h"
+#include "qrealanimator.h"
 
 ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {
     anim_mIsComplexAnimator = true;
@@ -39,7 +40,7 @@ Property *ComplexAnimator::ca_getChildAt(const int &i) {
 #include <QDebug>
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 void ComplexAnimator::SWT_addChildrenAbstractions(
-        const SingleWidgetAbstractionSPtr &abstraction,
+        SingleWidgetAbstraction* abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
     Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         abstraction->addChildAbstraction(
@@ -98,11 +99,11 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 bool ComplexAnimator::SWT_isComplexAnimator() { return true; }
 
 ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(const int &frame) {
-    return SPtrGetAs(anim_getKeyAtAbsFrame(frame), ComplexKey);
+    return getAsPtr(anim_getKeyAtAbsFrame(frame), ComplexKey);
 }
 
 ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
-    return SPtrGetAs(anim_getKeyAtRelFrame(frame), ComplexKey);
+    return getAsPtr(anim_getKeyAtRelFrame(frame), ComplexKey);
 }
 
 void ComplexAnimator::ca_addChildAnimator(const PropertyQSPtr& childAnimator,
@@ -111,27 +112,27 @@ void ComplexAnimator::ca_addChildAnimator(const PropertyQSPtr& childAnimator,
     childAnimator->setLastSetParent(this);
     childAnimator->prp_setUpdater(prp_mUpdater);
     childAnimator->prp_setParentFrameShift(prp_getFrameShift());
-    connect(childAnimator.data(), SIGNAL(prp_updateWholeInfluenceRange()),
-            this, SLOT(prp_updateInfluenceRangeAfterChanged()));
-    connect(childAnimator.data(), SIGNAL(prp_isRecordingChanged()),
-            this, SLOT(ca_childAnimatorIsRecordingChanged()));
-    connect(childAnimator.data(), SIGNAL(prp_absFrameRangeChanged(int, int)),
-            this, SLOT(prp_updateAfterChangedAbsFrameRange(int, int)));
-    connect(childAnimator.data(), SIGNAL(prp_addingKey(Key*)),
-            this, SLOT(ca_addDescendantsKey(Key*)));
-    connect(childAnimator.data(), SIGNAL(prp_removingKey(Key*)),
-            this, SLOT(ca_removeDescendantsKey(Key*)));
-    connect(childAnimator.data(), SIGNAL(prp_replaceWith(const PropertyQSPtr&,const PropertyQSPtr&)),
-            this, SLOT(ca_replaceChildAnimator(const PropertyQSPtr&,const PropertyQSPtr&)));
-    connect(childAnimator.data(), SIGNAL(prp_prependWith(Property*,const PropertyQSPtr&)),
-            this, SLOT(ca_prependChildAnimator(Property*,const PropertyQSPtr&)));
+    connect(childAnimator.data(), &Property::prp_updateWholeInfluenceRange,
+            this, &Property::prp_updateInfluenceRangeAfterChanged);
+    connect(childAnimator.data(), &Property::prp_isRecordingChanged,
+            this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
+    connect(childAnimator.data(), &Property::prp_absFrameRangeChanged,
+            this, &Property::prp_updateAfterChangedAbsFrameRange);
+    connect(childAnimator.data(), &Property::prp_addingKey,
+            this, &ComplexAnimator::ca_addDescendantsKey);
+    connect(childAnimator.data(), &Property::prp_removingKey,
+            this, &ComplexAnimator::ca_removeDescendantsKey);
+    connect(childAnimator.data(), &Property::prp_replaceWith,
+            this, &ComplexAnimator::ca_replaceChildAnimator);
+    connect(childAnimator.data(), &Property::prp_prependWith,
+            this, &ComplexAnimator::ca_prependChildAnimator);
 
-    childAnimator->prp_addAllKeysToComplexAnimator(ref<ComplexAnimator>());
+    childAnimator->prp_addAllKeysToComplexAnimator(this);
     ca_childAnimatorIsRecordingChanged();
     childAnimator->prp_setAbsFrame(anim_mCurrentAbsFrame);
     //updateKeysPath();
 
-    SWT_addChildAbstractionForTargetToAllAt(childAnimator, id);
+    SWT_addChildAbstractionForTargetToAllAt(childAnimator.get(), id);
 
     prp_callUpdater();
 }
@@ -145,10 +146,10 @@ int ComplexAnimator::getChildPropertyIndex(Property *child) {
     return -1;
 }
 
-void ComplexAnimator::ca_updateDescendatKeyFrame(const KeySPtr& key) {
+void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
     Q_FOREACH(const KeySPtr &ckey, anim_mKeys) {
-        ComplexKeySPtr complexKey = ckey->ref<ComplexKey>();
-        if(complexKey->hasKey(key.get())) {
+        ComplexKeySPtr complexKey = getAsSPtr(ckey, ComplexKey);
+        if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
             if(complexKey->isEmpty() ) {
                 anim_removeKey(complexKey);
@@ -197,10 +198,10 @@ void ComplexAnimator::ca_moveChildInList(
     prp_callUpdater();
 }
 
-PropertyQSPtr ComplexAnimator::ca_removeChildAnimator(
+void ComplexAnimator::ca_removeChildAnimator(
         const PropertyQSPtr& removeAnimator) {
     removeAnimator->prp_setUpdater(nullptr);
-    removeAnimator->prp_removeAllKeysFromComplexAnimator(ref<ComplexAnimator>());
+    removeAnimator->prp_removeAllKeysFromComplexAnimator(this);
     disconnect(removeAnimator.get(), nullptr, this, nullptr);
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator.get());
@@ -222,7 +223,7 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
         if(property->prp_getName() == name) {
             return property.get();
         } else if(property->SWT_isComplexAnimator()) {
-            Property* propT = SPtrGetAs(property, ComplexAnimator)->
+            Property* propT = getAsPtr(property, ComplexAnimator)->
                     ca_getFirstDescendantWithName(name);
             if(propT != nullptr) return propT;
         }
@@ -232,9 +233,9 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
 
 QrealAnimator *ComplexAnimator::getQrealAnimatorIfIsTheOnlyOne() {
     if(ca_mChildAnimators.count() == 1) {
-        PropertyQSPtr prop = ca_mChildAnimators.first();
+        Property* prop = ca_mChildAnimators.first().get();
         if(prop->SWT_isQrealAnimator()) {
-            return SPtrGetAs(prop, QrealAnimator);
+            return getAsPtr(prop, QrealAnimator);
         }
     }
     return nullptr;
@@ -316,7 +317,7 @@ void ComplexAnimator::prp_setUpdater(const AnimatorUpdaterSPtr& updater) {
     if(prp_mUpdaterBlocked) return;
     Animator::prp_setUpdater(updater);
 
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const PropertyQSPtr &property, ca_mChildAnimators) {
         property->prp_setUpdater(updater);
     }
 }
@@ -362,7 +363,7 @@ void ComplexAnimator::anim_saveCurrentValueAsKey() {
     } else {
         Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
             if(property->SWT_isAnimator()) {
-                SPtrGetAs(property, Animator)->anim_saveCurrentValueAsKey();
+                getAsPtr(property, Animator)->anim_saveCurrentValueAsKey();
             }
         }
     }
@@ -400,7 +401,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     }
 }
 
-void ComplexAnimator::ca_addDescendantsKey(const KeySPtr& key) {
+void ComplexAnimator::ca_addDescendantsKey(Key* key) {
     ComplexKey* collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());
     if(collection == nullptr) {
         auto newCollection = SPtrCreate(ComplexKey)(this);
@@ -411,42 +412,42 @@ void ComplexAnimator::ca_addDescendantsKey(const KeySPtr& key) {
     collection->addAnimatorKey(key);
 }
 
-void ComplexAnimator::ca_removeDescendantsKey(const KeySPtr& key) {
+void ComplexAnimator::ca_removeDescendantsKey(Key* key) {
     ComplexKey* collection =
             ca_getKeyCollectionAtRelFrame(key->getRelFrame());//key->getParentKey();//getKeyCollectionAtAbsFrame(key->getAbsFrame() );
     if(collection == nullptr) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
-        anim_removeKey(collection->ref<ComplexKey>());
+        anim_removeKey(getAsSPtr(collection, ComplexKey));
     }
 }
 
-ComplexKey::ComplexKey(const ComplexAnimatorQSPtr& parentAnimator) :
+ComplexKey::ComplexKey(ComplexAnimator* parentAnimator) :
     Key(parentAnimator) {
 }
 
-void ComplexKey::addAnimatorKey(const KeySPtr& key) {
+void ComplexKey::addAnimatorKey(Key* key) {
     mKeys << key;
 }
 
 void ComplexKey::addOrMergeKey(const KeySPtr& keyAdd) {
-    Q_FOREACH(const KeySPtr& key, mKeys) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
         if(key->getParentAnimator() == keyAdd->getParentAnimator() ) {
             key->mergeWith(keyAdd);
             return;
         }
     }
-    addAnimatorKey(keyAdd);
+    addAnimatorKey(keyAdd.get());
 }
 
 void ComplexKey::deleteKey() {
-    QList<KeySPtr> keys = mKeys;
-    Q_FOREACH(const KeySPtr& key, keys) {
+    QList<KeyPtr> keys = mKeys;
+    Q_FOREACH(const KeyPtr& key, keys) {
         key->deleteKey();
     }
 }
 
-void ComplexKey::removeAnimatorKey(const KeySPtr& key) {
+void ComplexKey::removeAnimatorKey(Key* key) {
     mKeys.removeOne(key);
 }
 
@@ -481,27 +482,27 @@ void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);
 
     int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
-    Q_FOREACH(const KeySPtr& key, mKeys) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
         key->setAbsFrame(absFrame);
     }
 }
 
 void ComplexKey::mergeWith(const KeySPtr& key) {
-    SPtrGetAs(key, ComplexKey)->margeAllKeysToKey(this);
+    getAsPtr(key, ComplexKey)->margeAllKeysToKey(this);
     key->removeFromAnimator();
 }
 
 void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
-    QList<KeySPtr> keys = mKeys;
-    Q_FOREACH(const KeySPtr& key, keys) {
+    QList<KeyPtr> keys = mKeys;
+    Q_FOREACH(const KeyPtr& key, keys) {
         removeAnimatorKey(key);
-        target->addOrMergeKey(key);
+        target->addOrMergeKey(getAsSPtr(key, Key));
     }
 }
 
 bool ComplexKey::isDescendantSelected() {
     if(isSelected()) return true;
-    Q_FOREACH(const KeySPtr& key, mKeys) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
         if(key->isDescendantSelected()) return true;
     }
     return false;
@@ -525,7 +526,7 @@ void ComplexKey::cancelFrameTransform() {
 }
 
 bool ComplexKey::areAllChildrenSelected() {
-    Q_FOREACH(const KeySPtr& key, mKeys) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
         if(key->isSelected() ||
                 key->areAllChildrenSelected()) continue;
         return false;
@@ -534,15 +535,16 @@ bool ComplexKey::areAllChildrenSelected() {
     return true;
 }
 
-void ComplexKey::addToSelection(QList<Key*> &selectedKeys) {
-    Q_FOREACH(const KeySPtr& key, mKeys) {
-        key->addToSelection(selectedKeys);
+void ComplexKey::addToSelection(QList<KeyPtr> &selectedKeys,
+                                QList<AnimatorQPtr> &selectedAnimators) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
+        key->addToSelection(selectedKeys, selectedAnimators);
     }
 }
 
 bool ComplexKey::hasKey(Key *key) {
-    Q_FOREACH(const KeySPtr& keyT, mKeys) {
-        if(key == keyT.get()) {
+    Q_FOREACH(const KeyPtr& keyT, mKeys) {
+        if(key == keyT) {
             return true;
         }
     }
@@ -550,10 +552,10 @@ bool ComplexKey::hasKey(Key *key) {
 }
 
 bool ComplexKey::differsFromKey(Key *otherKey) {
-    ComplexKey* otherComplexKey = SPtrGetAs(otherKey, ComplexKey);
+    ComplexKey* otherComplexKey = getAsPtr(otherKey, ComplexKey);
     if(getChildKeysCount() == otherComplexKey->getChildKeysCount()) {
-        Q_FOREACH(const KeySPtr& key, mKeys) {
-            if(otherComplexKey->hasSameKey(key.get())) continue;
+        Q_FOREACH(const KeyPtr& key, mKeys) {
+            if(otherComplexKey->hasSameKey(key)) continue;
             return true;
         }
         return false;
@@ -566,7 +568,7 @@ int ComplexKey::getChildKeysCount() {
 }
 
 bool ComplexKey::hasSameKey(Key *otherKey) {
-    Q_FOREACH(const KeySPtr& key, mKeys) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
         if(key->getParentAnimator() == otherKey->getParentAnimator()) {
             if(key->differsFromKey(otherKey)) return false;
             return true;
@@ -575,22 +577,23 @@ bool ComplexKey::hasSameKey(Key *otherKey) {
     return false;
 }
 
-void ComplexKey::removeFromSelection(QList<Key*> &selectedKeys) {
-    Q_FOREACH(const KeySPtr& key, mKeys) {
-        key->removeFromSelection(selectedKeys);
+void ComplexKey::removeFromSelection(QList<KeyPtr> &selectedKeys,
+                                     QList<AnimatorQPtr> &selectedAnimators) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
+        key->removeFromSelection(selectedKeys, selectedAnimators);
     }
 }
 
 void ComplexKey::startFrameTransform() {
     Key::startFrameTransform();
-    Q_FOREACH(const KeySPtr& key, mKeys) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
         if(key->isSelected()) continue;
         key->startFrameTransform();
     }
 }
 
 void ComplexKey::finishFrameTransform() {
-    Q_FOREACH(const KeySPtr& key, mKeys) {
+    Q_FOREACH(const KeyPtr& key, mKeys) {
         if(key->isSelected()) continue;
         key->finishFrameTransform();
     }

@@ -10,7 +10,7 @@ AnimationBox::AnimationBox() :
     BoundingBox(TYPE_IMAGE) {
     setName("Animation");
 
-    setDurationRectangle(new FixedLenAnimationRect(this));
+    setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
     //    mFrameAnimator.setCurrentIntValue(0);
@@ -18,11 +18,10 @@ AnimationBox::AnimationBox() :
 
 AnimationBox::~AnimationBox() {
     mAnimationCacheHandler->removeDependentBox(this);
-    mAnimationCacheHandler = nullptr;
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
-    return ((FixedLenAnimationRect*)mDurationRectangle);
+    return getAsPtr(mDurationRectangle, FixedLenAnimationRect);
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
@@ -65,12 +64,12 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
     int pixId;
     const int &absMinAnimation =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
-    if(true) {
+//    if(true) {
         pixId = (relFrame - absMinAnimation);
-    } else { // reversed
-        pixId = mAnimationCacheHandler->getFramesCount() - 1 -
-                (relFrame - absMinAnimation);
-    }
+//    } else { // reversed
+//        pixId = mAnimationCacheHandler->getFramesCount() - 1 -
+//                (relFrame - absMinAnimation);
+//    }
 
     if(pixId <= 0) {
         pixId = 0;
@@ -124,12 +123,12 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
                                 BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
                                                        data);
-    auto imageData = data->ref<AnimationBoxRenderData>();
+    auto imageData = getAsPtr(data, AnimationBoxRenderData);
     int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
     imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
     if(imageData->image.get() == nullptr) {
-        _ScheduledExecutor *upd = mAnimationCacheHandler->
+        _ScheduledExecutor* upd = mAnimationCacheHandler->
                 scheduleFrameLoad(animationFrame);
         if(upd != nullptr) {
             upd->addDependent(imageData);
@@ -142,6 +141,6 @@ BoundingBoxRenderDataSPtr AnimationBox::createRenderData() {
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameCopyAtOrBeforeFrame(
-                animationFrame);
+    image = getAsPtr(srcCacheHandler, AnimationCacheHandler)->
+            getFrameCopyAtOrBeforeFrame(animationFrame);
 }

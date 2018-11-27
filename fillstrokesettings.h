@@ -79,6 +79,8 @@ private slots:
     void colorSettingReceived(const ColorSetting &colorSetting);
     void setCurrentColorMode(const ColorMode &mode);
 private:
+    void setTransformFinishEmitter(const char *slot);
+    void applyGradient();
 
     CanvasWindow *mCanvasWindow;
 
@@ -178,8 +180,6 @@ private:
     QPushButton *mLinearGradientButton;
     QPushButton *mRadialGradientButton;
     QWidget *mGradientTypeWidget;
-
-    void setTransformFinishEmitter(const char *slot);
 };
 
 #endif // FILLSTROKESETTINGS_H

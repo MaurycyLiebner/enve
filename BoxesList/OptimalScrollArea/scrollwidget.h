@@ -28,8 +28,8 @@ private slots:
 protected:
     int mContentHeight = 0;
     virtual void createVisiblePartWidget();
-    SingleWidgetTargetQSPtr mMainTarget;
-    SingleWidgetAbstractionSPtr mMainAbstraction;
+    SingleWidgetTargetQPtr mMainTarget;
+    SingleWidgetAbstractionPtr mMainAbstraction;
     ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;
 };
 

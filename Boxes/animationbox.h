@@ -46,7 +46,7 @@ public:
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
-    AnimationCacheHandler *mAnimationCacheHandler = nullptr;
+    AnimationCacheHandlerPtr mAnimationCacheHandler;
     qreal mFps = 24.;
 
     //IntAnimator mFrameAnimator;

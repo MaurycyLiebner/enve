@@ -2,21 +2,9 @@
 #define RECTANGLE_H
 #include "Boxes/pathbox.h"
 
-class RectangleTopLeftPoint : public QPointFAnimator {
-public:
-    RectangleTopLeftPoint(BasicTransformAnimator *parent);
-};
-
-class RectangleBottomRightPoint : public QPointFAnimator {
-public:
-    RectangleBottomRightPoint(BasicTransformAnimator *parent);
-};
-
 class Rectangle : public PathBox {
+    friend class SelfRef;
 public:
-    Rectangle();
-    ~Rectangle();
-
     void moveSizePointByAbs(const QPointF &absTrans);
     void startAllPointsTransform();
 
@@ -28,7 +16,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointSPtr>& list);
+                                           QList<MovablePointPtr> &list);
 
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
@@ -46,11 +34,17 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;
 protected:
-    RectangleTopLeftPoint *mTopLeftPoint;
-    RectangleBottomRightPoint *mBottomRightPoint;
+    Rectangle();
 
-    QPointFAnimator *mRadiusPoint;
-    void getMotionBlurProperties(QList<PropertyQSPtr> &list);
+    QPointFAnimatorQSPtr mTopLeftAnimator;
+    QPointFAnimatorQSPtr mBottomRightAnimator;
+    QPointFAnimatorQSPtr mRadiusAnimator;
+
+    PointAnimatorMovablePointSPtr mTopLeftPoint;
+    PointAnimatorMovablePointSPtr mBottomRightPoint;
+    PointAnimatorMovablePointSPtr mRadiusPoint;
+
+    void getMotionBlurProperties(QList<Property*> &list);
 };
 
 #endif // RECTANGLE_H

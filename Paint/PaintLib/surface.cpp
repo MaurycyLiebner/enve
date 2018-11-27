@@ -10,15 +10,13 @@ Surface::Surface(const ushort &widthT,
                  const bool &paintInOtherThread) {
     mIsTemporary = !paintInOtherThread;
     mScale = scale;
-    mCurrentTiles = (new TilesData(widthT, heightT,
-                                   paintInOtherThread))->ref<TilesData>();
+    mCurrentTiles = SPtrCreate(TilesData)(widthT, heightT,
+                                          paintInOtherThread);
     mCurrentTiles->setCurrentlyUsed(true);
     setSize(widthT, heightT);
 }
 
-Surface::~Surface() {
-
-}
+Surface::~Surface() {}
 
 void Surface::duplicateTilesContentFrom(TilesData *tilesSrc) {
     mCurrentTiles->duplicateTilesContentFrom(tilesSrc);
@@ -32,15 +30,15 @@ qreal Surface::countDabsTo(const qreal &dist_between_dabs,
     return sqrt(dx*dx + dy*dy)/dist_between_dabs;
 }
 
-void replaceIfSmaller(const short &potentially_smaller,
-                      short *to_be_replaced) {
+void replaceIfSmaller(const int &potentially_smaller,
+                      int *to_be_replaced) {
     if(potentially_smaller < *to_be_replaced) {
         *to_be_replaced = potentially_smaller;
     }
 }
 
-void replaceIfBigger(const short &potentially_bigger,
-                     short *to_be_replaced) {
+void replaceIfBigger(const int &potentially_bigger,
+                     int *to_be_replaced) {
     if(potentially_bigger > *to_be_replaced) {
         *to_be_replaced = potentially_bigger;
     }
@@ -50,23 +48,23 @@ void Surface::getTileIdsOnRect(const qreal &x_min,
                                const qreal &x_max,
                                const qreal &y_min,
                                const qreal &y_max,
-                               short *tile_x_min,
-                               short *tile_x_max,
-                               short *tile_y_min,
-                               short *tile_y_max) {
-    *tile_x_min = floor(x_min/TILE_DIM);
+                               int *tile_x_min,
+                               int *tile_x_max,
+                               int *tile_y_min,
+                               int *tile_y_max) {
+    *tile_x_min = qFloor(x_min/TILE_DIM);
     if(*tile_x_min < 0) {
         *tile_x_min = 0;
     }
-    *tile_x_max = ceil(x_max/TILE_DIM);
+    *tile_x_max = qCeil(x_max/TILE_DIM);
     if(*tile_x_max >= mNTileCols) {
         *tile_x_max = mNTileCols - 1;
     }
-    *tile_y_min = floor(y_min/TILE_DIM);
+    *tile_y_min = qFloor(y_min/TILE_DIM);
     if(*tile_y_min < 0) {
         *tile_y_min = 0;
     }
-    *tile_y_max = ceil(y_max/TILE_DIM);
+    *tile_y_max = qCeil(y_max/TILE_DIM);
     if(*tile_y_max >= mNTileRows) {
         *tile_y_max = mNTileRows - 1;
     }
@@ -89,15 +87,15 @@ void Surface::getColor(const qreal &cx,
     qreal blue_sum = 0.;
     qreal alpha_sum = 0.;
     qreal weight_sum = 0.;
-    short min_tile_x;
-    short max_tile_x;
-    short min_tile_y;
-    short max_tile_y;
+    int min_tile_x;
+    int max_tile_x;
+    int min_tile_y;
+    int max_tile_y;
     getTileIdsOnRect(cx - r, cx + r, cy - r, cy + r,
                      &min_tile_x, &max_tile_x, &min_tile_y, &max_tile_y);
     Tile ***tilesT = mCurrentTiles->getTiles();
-    for(short i = min_tile_x; i <= max_tile_x; i++) {
-        for(short j = min_tile_y; j <= max_tile_y; j++) {
+    for(int i = min_tile_x; i <= max_tile_x; i++) {
+        for(int j = min_tile_y; j <= max_tile_y; j++) {
             Tile *tile_t = tilesT[j][i];
             tile_t->getColor(cx, cy,
                              r, aspect_ratio, cs, sn,
@@ -164,21 +162,21 @@ void Surface::addPickedUpRGBAFromNewStroke(qreal red_t,
                                            qreal alpha_t,
                                            const Brush *brush) {
     alpha_t *= brush->getColorPickUp();
-    picked_up_alpha = picked_up_alpha*(1.f - brush->getColorPickUpDecay());
+    picked_up_alpha = picked_up_alpha*(1. - brush->getColorPickUpDecay());
     qreal alpha_sum = alpha_t + picked_up_alpha;
-    if(alpha_sum < 0.0001f) {
-        picked_up_red = 0.f;
-        picked_up_green = 0.f;
-        picked_up_blue = 0.f;
-        picked_up_alpha = 0.f;
+    if(alpha_sum < 0.0001) {
+        picked_up_red = 0.;
+        picked_up_green = 0.;
+        picked_up_blue = 0.;
+        picked_up_alpha = 0.;
     } else {
         picked_up_red = (red_t*alpha_t + picked_up_red*picked_up_alpha)/alpha_sum;
         picked_up_green = (green_t*alpha_t + picked_up_green*picked_up_alpha)/alpha_sum;
         picked_up_blue = (blue_t*alpha_t + picked_up_blue*picked_up_alpha)/alpha_sum;
-        if(picked_up_alpha > 1.f) {
+        if(picked_up_alpha > 1.) {
 
-        } else if(alpha_sum > 1.f) {
-            picked_up_alpha = 1.f;
+        } else if(alpha_sum > 1.) {
+            picked_up_alpha = 1.;
         } else {
             picked_up_alpha = alpha_sum;
         }
@@ -227,7 +225,7 @@ void Surface::strokeTo(const Brush *brush,
     qreal dabs_dx = first_dab_dx;
     qreal dabs_dy = first_dab_dy;
 
-    if(isZero(first_dab_dx) && isZero(first_dab_dy)) {
+    if(isZero4Dec(first_dab_dx) && isZero4Dec(first_dab_dy)) {
         first_dab_dx = 0.;
         first_dab_dy = 0.;
         dabs_dx = 0.;
@@ -241,12 +239,12 @@ void Surface::strokeTo(const Brush *brush,
     qreal first_dab_x = mLastPaintedStrokeX + first_dab_dx;
     qreal first_dab_y = mLastPaintedStrokeY + first_dab_dy;
 
-    short min_affected_tile_x = 10000;
-    short max_affected_tile_x = 0;
-    short min_affected_tile_y = 10000;
-    short max_affected_tile_y = 0;
+    int min_affected_tile_x = 10000;
+    int max_affected_tile_x = 0;
+    int min_affected_tile_y = 10000;
+    int max_affected_tile_y = 0;
 
-    short dabs_to_i = floor(dabs_to);
+    int dabs_to_i = qFloor(dabs_to);
     if(dabs_to_i <= 0) return;
     qreal rotation_delay = brush->getRotationDelay();
     qreal angle_t =
@@ -308,9 +306,9 @@ void Surface::strokeTo(const Brush *brush,
     qreal stroke_green;
     qreal stroke_blue;
     qreal dab_alpha;
-    bool fixed_color = isZero(brush->getHueNoise()) &&
-            isZero(brush->getSaturationNoise()) &&
-            isZero(brush->getValueNoise());
+    bool fixed_color = isZero4Dec(brush->getHueNoise()) &&
+            isZero4Dec(brush->getSaturationNoise()) &&
+            isZero4Dec(brush->getValueNoise());
 
     Brush::getRGB(&stroke_red,
                   &stroke_green,
@@ -333,9 +331,9 @@ void Surface::strokeTo(const Brush *brush,
     qreal dab_green = stroke_green;
     qreal dab_blue = stroke_blue;
 
-    qreal stroke_h;
-    qreal stroke_s;
-    qreal stroke_v;
+    qreal stroke_h = 0.;
+    qreal stroke_s = 0.;
+    qreal stroke_v = 0.;
     if(!fixed_color) {
         stroke_h = stroke_red;
         stroke_s = stroke_green;
@@ -344,7 +342,7 @@ void Surface::strokeTo(const Brush *brush,
     }
     Tile ***tilesT = mCurrentTiles->getTiles();
     mCurrentTiles->dataChanged();
-    for(short i = 0; i < dabs_to_i; i++) {
+    for(int i = 0; i < dabs_to_i; i++) {
         if(!fixed_color) {
             dab_red = stroke_h;
             applyNoise(brush->getHueNoise(),
@@ -373,8 +371,8 @@ void Surface::strokeTo(const Brush *brush,
         mLastPaintedStrokeX = dab_x;
         mLastPaintedStrokeY = dab_y;
         mLastDabRotationInc += brush->getRotationBetweenDabs();
-        if(mLastDabRotationInc > 180.f) {
-            mLastDabRotationInc -= 180.f;
+        if(mLastDabRotationInc > 180.) {
+            mLastDabRotationInc -= 180.;
         }
 
         qreal dab_x_min = dab_x - dab_r;
@@ -382,10 +380,10 @@ void Surface::strokeTo(const Brush *brush,
         qreal dab_y_min = dab_y - dab_r;
         qreal dab_y_max = dab_y + dab_r;
 
-        short dab_min_tile_x;
-        short dab_max_tile_x;
-        short dab_min_tile_y;
-        short dab_max_tile_y;
+        int dab_min_tile_x;
+        int dab_max_tile_x;
+        int dab_min_tile_y;
+        int dab_max_tile_y;
         getTileIdsOnRect(dab_x_min, dab_x_max,
                          dab_y_min, dab_y_max,
                          &dab_min_tile_x, &dab_max_tile_x,
@@ -399,8 +397,8 @@ void Surface::strokeTo(const Brush *brush,
                 mLastDabRotationInc +
                 getNoise(brush->getRotationNoise() );
         //#pragma omp parallel for
-        for(short tx = dab_min_tile_x; tx <= dab_max_tile_x; tx++) {
-            for(short ty = dab_min_tile_y; ty <= dab_max_tile_y; ty++) {
+        for(int tx = dab_min_tile_x; tx <= dab_max_tile_x; tx++) {
+            for(int ty = dab_min_tile_y; ty <= dab_max_tile_y; ty++) {
                 tilesT[ty][tx]->addDabToDraw(dab_x, dab_y,
                                             dab_hardness,
                                             dab_opa*alpha_sum_t,
@@ -412,8 +410,8 @@ void Surface::strokeTo(const Brush *brush,
         }
     }
 
-    for(short tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++) {
-        for(short ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++) {
+    for(int tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++) {
+        for(int ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++) {
             tilesT[ty][tx]->addScheduler();
         }
     }
@@ -468,39 +466,40 @@ void Surface::setSize(const ushort &width_t,
     if(width_t == mWidth && height_t == mHeight) return;
 
     // initialize tiles
-    ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
-    ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
+    int nTileCols = qCeil(width_t/static_cast<qreal>(TILE_DIM));
+    int nTileRows = qCeil(height_t/static_cast<qreal>(TILE_DIM));
 
     mCurrentTiles->setSize(width_t, height_t);
 
     mWidth = width_t;
     mHeight = height_t;
-    mNTileRows = n_tile_rows_t;
-    mNTileCols = n_tile_cols_t;
+    mNTileRows = nTileRows;
+    mNTileCols = nTileCols;
 }
 
 void Surface::move(const int &xT, const int &yT) {
     mCurrentTiles->move(xT, yT);
 }
+
 #include <QImage>
 void Surface::loadFromImage(const QImage &img) {
     mCurrentTiles->setImage(img);
 }
 
 void Surface::paintPress(const qreal &xT,
-                               const qreal &yT,
-                               const ulong &timestamp,
-                               const qreal &pressure,
-                               const Brush *brush) {
+                         const qreal &yT,
+                         const ulong &timestamp,
+                         const qreal &pressure,
+                         const Brush *brush) {
     mousePressEvent(xT, yT, timestamp, pressure, brush);
 }
 
 void Surface::tabletMoveEvent(const qreal &xT,
-                                const qreal &yT,
-                                const ulong &time_stamp,
-                                const qreal &pressure,
-                                const bool &erase,
-                                const Brush *brush) {
+                              const qreal &yT,
+                              const ulong &time_stamp,
+                              const qreal &pressure,
+                              const bool &erase,
+                              const Brush *brush) {
     Q_UNUSED(time_stamp);
     strokeTo(brush,
              xT, yT,

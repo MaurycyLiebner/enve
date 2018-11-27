@@ -4,6 +4,7 @@
 #include "Animators/qpointfanimator.h"
 #include "pointanimator.h"
 #include "sharedpointerdefs.h"
+#include "skqtconversions.h"
 class TransformUpdater;
 
 class BasicTransformAnimator : public ComplexAnimator {
@@ -62,6 +63,18 @@ public:
     QPointF mapFromParent(const QPointF &parentRelPos) const {
         return mapAbsPosToRel(
                     mParentTransformAnimator->mapRelPosToAbs(parentRelPos));
+    }
+
+    SkPoint mapAbsPosToRel(const SkPoint &absPos) const {
+        return QPointFToSkPoint(mapAbsPosToRel(SkPointToQPointF(absPos)));
+    }
+
+    SkPoint mapRelPosToAbs(const SkPoint &relPos) const {
+        return QPointFToSkPoint(mapRelPosToAbs(SkPointToQPointF(relPos)));
+    }
+
+    SkPoint mapFromParent(const SkPoint &parentRelPos) const {
+        return QPointFToSkPoint(mapFromParent(SkPointToQPointF(parentRelPos)));
     }
 
     void scaleRelativeToSavedValue(const qreal &sx,

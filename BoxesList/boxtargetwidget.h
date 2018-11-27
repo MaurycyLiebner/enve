@@ -4,16 +4,17 @@
 #include <QWidget>
 class BoundingBox;
 class BoxTargetProperty;
+#include "sharedpointerdefs.h"
 
 class BoxTargetWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit BoxTargetWidget(QWidget *parent = 0);
+    explicit BoxTargetWidget(QWidget *parent = nullptr);
 
     void setTargetProperty(BoxTargetProperty *property);
 private:
-    BoxTargetProperty *mProperty = nullptr;
     bool mDragging = false;
+    BoxTargetPropertyQPtr mProperty;
 signals:
 
 public slots:

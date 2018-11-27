@@ -8,9 +8,9 @@
 
 CtrlPoint::CtrlPoint(NodePoint *parentPoint, bool isStartCtrlPt) :
     NonAnimatedMovablePoint(parentPoint->getParentTransform(),
-                 MovablePointType::TYPE_CTRL_POINT, 5.) {
+                 MovablePointType::TYPE_CTRL_POINT, 5.),
+    mParentPoint_k(parentPoint) {
     mIsStartCtrlPt = isStartCtrlPt;
-    mParentPoint_k = parentPoint;
     mParentTransform_cv = mParentPoint_k->getParentTransform();
 }
 

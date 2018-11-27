@@ -18,27 +18,19 @@ SingleWidgetTarget::~SingleWidgetTarget() {
 //    }
 //}
 
-SingleWidgetAbstractionSPtr SingleWidgetTarget::SWT_createAbstraction(
+SingleWidgetAbstraction* SingleWidgetTarget::SWT_createAbstraction(
         ScrollWidgetVisiblePart *visiblePartWidget) {
     SingleWidgetAbstractionSPtr SWT_Abstraction =
             SPtrCreate(SingleWidgetAbstraction)(
                 ref<SingleWidgetTarget>(), visiblePartWidget);
-    SWT_addChildrenAbstractions(SWT_Abstraction, visiblePartWidget);
+    SWT_addChildrenAbstractions(SWT_Abstraction.get(), visiblePartWidget);
     mSWT_allAbstractions << SWT_Abstraction;
-    return SWT_Abstraction;
+    return SWT_Abstraction.get();
 }
 
-SingleWidgetAbstractionSPtr SingleWidgetTarget::SWT_removeAbstractionFromList(
-        SingleWidgetAbstraction* abs) {
-    for(int i = 0; i < mSWT_allAbstractions.count(); i++) {
-        const SingleWidgetAbstractionSPtr &absT = mSWT_allAbstractions.at(i);
-        if(abs == absT.get()) {
-            SingleWidgetAbstractionSPtr lastSPtr = absT;
-            mSWT_allAbstractions.removeAt(i);
-            return lastSPtr;
-        }
-    }
-    return nullptr;
+void SingleWidgetTarget::SWT_removeAbstractionFromList(
+        const SingleWidgetAbstractionSPtr &abs) {
+    mSWT_allAbstractions.removeOne(abs);
 }
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
@@ -49,7 +41,7 @@ void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
 }
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
-        const SingleWidgetTargetQSPtr& target, const int &id) {
+        SingleWidgetTarget* target, const int &id) {
     Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
         abs->addChildAbstractionForTargetAt(target, id);
     }

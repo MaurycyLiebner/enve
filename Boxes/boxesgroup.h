@@ -14,6 +14,7 @@ class MainWindow;
 class VectorPathEdge;
 
 struct BoxesGroupRenderData : public BoundingBoxRenderData {
+    friend class StdSelfRef;
     BoxesGroupRenderData(BoundingBox *parentBoxT) :
         BoundingBoxRenderData(parentBoxT) {
         mDelayDataSet = true;
@@ -52,6 +53,7 @@ protected:
 
 class BoxesGroup : public BoundingBox {
     Q_OBJECT
+    friend class SelfRef;
 public:
     BoxesGroup();
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
@@ -85,7 +87,7 @@ public:
     void updateContainedBoxIds(const int &firstId,
                           const int &lastId,
                           const bool &saveUndoRedo = true);
-    void removeContainedBox(BoundingBox *child);
+    void removeContainedBox(const BoundingBoxQSPtr &child);
     void increaseContainedBoxZInList(BoundingBox *child);
     void decreaseContainedBoxZInList(BoundingBox *child);
     void bringContainedBoxToEndList(BoundingBox *child);
@@ -95,9 +97,9 @@ public:
                          const int &to,
                          const bool &saveUndoRedo = true);
     void moveContainedBoxBelow(BoundingBox *boxToMove,
-                        const BoundingBoxQSPtr &below);
+                               BoundingBox *below);
     void moveContainedBoxAbove(BoundingBox *boxToMove,
-                        const BoundingBoxQSPtr &above);
+                        BoundingBox *above);
 
     void removeContainedBoxFromList(const int &id,
                              const bool &saveUndoRedo = true);
@@ -274,7 +276,7 @@ public:
 //                                 int &prevRelFrame);
     bool enabledGroupPathSumEffectPresent();
 protected:
-    QList<PathEffect*> mGroupPathSumEffects;
+    QList<PathEffectQSPtr> mGroupPathSumEffects;
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;

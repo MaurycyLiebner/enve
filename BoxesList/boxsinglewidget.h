@@ -8,6 +8,7 @@
 #include <QMimeData>
 #include <QComboBox>
 #include "skiaincludes.h"
+#include "sharedpointerdefs.h"
 class QrealAnimatorValueSlider;
 class DurationRectangleMovable;
 class Key;
@@ -16,11 +17,10 @@ class BoxesListActionButton;
 class BoolPropertyWidget;
 class ComboBoxProperty;
 
-class BoxSingleWidget : public SingleWidget
-{
+class BoxSingleWidget : public SingleWidget {
     Q_OBJECT
 public:
-    explicit BoxSingleWidget(ScrollWidgetVisiblePart *parent = 0);
+    explicit BoxSingleWidget(ScrollWidgetVisiblePart *parent = nullptr);
 
     void setTargetAbstraction(SingleWidgetAbstraction *abs);
 
@@ -88,6 +88,8 @@ private slots:
     void openColorSettingsDialog();
     void setCompositionMode(const int &id);
 private:
+    QPoint mDragStartPos;
+
     BoxesListActionButton *mRecordButton;
     BoxesListActionButton *mContentButton;
     BoxesListActionButton *mVisibleButton;
@@ -95,8 +97,7 @@ private:
     BoxesListActionButton *mColorButton;
     BoxTargetWidget *mBoxTargetWidget;
 
-    QWeakPointer<ComboBoxProperty> mLastComboBoxProperty;
-    QPoint mDragStartPos;
+    ComboBoxPropertyQPtr mLastComboBoxProperty;
     QWidget *mFillWidget;
     BoolPropertyWidget *mCheckBox;
     QHBoxLayout *mMainLayout;

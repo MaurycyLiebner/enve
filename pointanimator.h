@@ -48,7 +48,7 @@ protected:
             const MovablePointType &type,
             const qreal &radius = 5.);
 
-    const QPointFAnimatorQSPtr mAssociatedAnimator_k;
+    QPointFAnimator* const mAssociatedAnimator_k;
 };
 
 #endif // POINTANIMATOR_H

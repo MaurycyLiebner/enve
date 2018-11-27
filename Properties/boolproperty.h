@@ -4,9 +4,8 @@
 
 class BoolProperty : public Property {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    BoolProperty();
-
     bool getValue();
 
     bool SWT_isBoolProperty() { return true; }
@@ -14,6 +13,8 @@ public:
     void readProperty(QIODevice *target);
 public slots:
     void setValue(const bool &value);
+protected:
+    BoolProperty(const QString& name);
 private:
     bool mValue = false;
 };
@@ -21,9 +22,8 @@ private:
 #include "Animators/complexanimator.h"
 class BoolPropertyContainer : public ComplexAnimator {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    BoolPropertyContainer();
-
     bool getValue();
 
     bool SWT_isBoolPropertyContainer() { return true; }
@@ -31,6 +31,8 @@ public:
     void readProperty(QIODevice *target);
 public slots:
     void setValue(const bool &value);
+protected:
+    BoolPropertyContainer(const QString& name);
 private:
     bool mValue = false;
 };

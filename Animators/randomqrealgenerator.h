@@ -1,12 +1,6 @@
 #ifndef RANDOMQREALGENERATOR_H
 #define RANDOMQREALGENERATOR_H
 #include "qrealvalueeffect.h"
-class QrealAnimator;
-typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
-class ComboBoxProperty;
-typedef QSharedPointer<ComboBoxProperty> ComboBoxPropertyQSPtr;
-class IntProperty;
-typedef QSharedPointer<IntProperty> IntPropertyQSPtr;
 
 struct FrameValue {
     FrameValue(const qreal &frameT, const qreal &valueT) {
@@ -18,8 +12,8 @@ struct FrameValue {
 };
 
 class RandomQrealGenerator : public QrealValueEffect {
+    friend class SelfRef;
 public:
-    RandomQrealGenerator(const int &firstFrame, const int &lastFrame);
     qreal getDevAtRelFrame(const int &relFrame);
     qreal getDevAtRelFrameF(const qreal &relFrame);
     void generateData();
@@ -31,6 +25,8 @@ public:
     void writeProperty(QIODevice *device);
     void readProperty(QIODevice *device);
 protected:
+    RandomQrealGenerator(const int &firstFrame, const int &lastFrame);
+
     int getClosestLowerFrameId(const int &minId,
                                const int &maxId,
                                const int &targetFrame);

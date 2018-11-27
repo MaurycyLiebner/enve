@@ -2,6 +2,7 @@
 #include "Animators/complexanimator.h"
 #include "Animators/animatorupdater.h"
 #include "mainwindow.h"
+#include "Boxes/boundingbox.h"
 
 Property::Property(const QString& name) {
     mMainWindow = MainWindow::getInstance();
@@ -139,7 +140,7 @@ bool Property::isAltPressed(QKeyEvent *event) {
 
 BoundingBox *Property::getLastSetParentBoundingBoxAncestor() {
     if(mLastSetParent == nullptr) return nullptr;
-    if(mLastSetParent->SWT_isBoundingBox()) return SPtrGetAs(mLastSetParent, BoundingBox);
+    if(mLastSetParent->SWT_isBoundingBox()) return getAsPtr(mLastSetParent, BoundingBox);
     return mLastSetParent->getLastSetParentBoundingBoxAncestor();
 }
 

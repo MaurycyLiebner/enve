@@ -1,6 +1,10 @@
 #include "clipboardcontainer.h"
 #include "Boxes/boundingbox.h"
 #include "Boxes/boxesgroup.h"
+#include "Properties/boxtargetproperty.h"
+#include "PathEffects/patheffectanimators.h"
+#include "Animators/pathanimator.h"
+#include "Properties/boxtargetproperty.h"
 
 ClipboardContainer::ClipboardContainer(const ClipboardContainerType &type) {
     mType = type;
@@ -36,96 +40,62 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 }
 
 #include "keysview.h"
-QList<KeySPtr> KeysClipboardContainer::paste(const int &pasteFrame,
-                                          KeysView *keysView) {
+void KeysClipboardContainer::paste(const int &pasteFrame,
+                                   KeysView *keysView,
+                                   const bool& merge,
+                                   const bool& selectPasted) {
     keysView->clearKeySelection();
 
-    int firstKeyFrame = 1000000;
-    QBuffer target(getBytesArray());
-    target.open(QIODevice::ReadOnly);
-    QList<KeySPtr> keys;
-    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
-        Animator *animator = animatorT.data();
-        KeySPtr keyT = animator->readKey(&target);
-        if(animator == nullptr) {
-            keyT->ref<Key>();
-            continue;
+    QList<Key*> rKeys;
+    int firstKeyFrame = INT_MAX;
+
+    QList<QList<KeySPtr>> animatorKeys;
+    Q_FOREACH(const auto &animData, mAnimatorData) {
+        Animator *animator = animData.first;
+        if(animator == nullptr) continue;
+        QList<KeySPtr> keys;
+        int nKeys;
+        QBuffer target(const_cast<QByteArray*>(&animData.second));
+        target.open(QIODevice::ReadOnly);
+        target.read(reinterpret_cast<char*>(&nKeys), sizeof(int));
+        for(int i = 0; i < nKeys; i++) {
+            KeySPtr keyT = animator->readKey(&target);
+            if(keyT->getAbsFrame() < firstKeyFrame) {
+                firstKeyFrame = keyT->getAbsFrame();
+            }
+            keys << keyT;
         }
-        if(keyT->getAbsFrame() < firstKeyFrame) {
-            firstKeyFrame = keyT->getAbsFrame();
-        }
-        keys << keyT;
+        target.close();
+
+        animatorKeys << keys;
     }
-    target.close();
+    if(firstKeyFrame == INT_MAX) return;
     int dFrame = pasteFrame - firstKeyFrame;
 
-    int keyId = 0;
-    QList<AnimatorQSPtr> animators;
-
-    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
-        if(animatorT.isNull()) {
-            keys.removeAt(keyId);
-            continue;
+    int keysId = 0;
+    Q_FOREACH(const auto &animData, mAnimatorData) {
+        Animator *animator = animData.first;
+        const QList<KeySPtr>& keys = animatorKeys.at(keysId);
+        Q_FOREACH(const auto& key, keys) {
+            key->setRelFrame(key->getRelFrame() + dFrame);
+            animator->anim_appendKey(key);
+            rKeys.append(key.get());
+            if(selectPasted) keysView->addKeyToSelection(key.get());
         }
-        AnimatorQSPtr animator = animatorT;
-        KeySPtr keyT = keys.at(keyId);
-        keyT->setRelFrame(keyT->getRelFrame() + dFrame);
-        animator->anim_appendKey(keyT);
-        keyId++;
-        if(animators.contains(animator)) continue;
-        animators << animator;
+        keysId++;
     }
-    Q_FOREACH(const AnimatorQSPtr& animator, animators) {
-        animator->anim_mergeKeysIfNeeded();
+    if(merge) {
+        Q_FOREACH(const auto &animData, mAnimatorData) {
+            Animator *animator = animData.first;
+            if(animator == nullptr) continue;
+            animator->anim_mergeKeysIfNeeded();
+        }
     }
-    return keys;
 }
 
-QList<KeySPtr> KeysClipboardContainer::pasteWithoutMerging(
-            const int &pasteFrame, KeysView *keysView) {
-    keysView->clearKeySelection();
-
-    int firstKeyFrame = 1000000;
-    QBuffer target(getBytesArray());
-    target.open(QIODevice::ReadOnly);
-    QList<KeySPtr> keys;
-    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
-        if(animatorT.isNull()) {
-            continue;
-        }
-        AnimatorQSPtr animator = animatorT;
-        KeySPtr keyT = animator->readKey(&target);
-
-        if(keyT->getAbsFrame() < firstKeyFrame) {
-            firstKeyFrame = keyT->getAbsFrame();
-        }
-        keys << keyT;
-    }
-    target.close();
-    int dFrame = pasteFrame - firstKeyFrame;
-
-    int keyId = 0;
-    QList<AnimatorQSPtr> animators;
-
-    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
-        if(animatorT.isNull()) {
-            keys.removeAt(keyId);
-            continue;
-        }
-        AnimatorQSPtr animator = animatorT;
-        KeySPtr keyT = keys.at(keyId);
-        keyT->setRelFrame(keyT->getRelFrame() + dFrame);
-        animator->anim_appendKey(keyT);
-        keyId++;
-        if(animators.contains(animator)) continue;
-        animators << animator;
-    }
-
-    return keys;
-}
-
-void KeysClipboardContainer::addTargetAnimator(Animator *anim) {
-    mTargetAnimators << anim->weakRef<Animator>();
+void KeysClipboardContainer::addTargetAnimator(
+        Animator *anim, const QByteArray &keyData) {
+    mAnimatorData << AnimatorKeyDataPair(QPointer<Animator>(anim), keyData);
 }
 
 PropertyClipboardContainer::PropertyClipboardContainer() :
@@ -142,43 +112,41 @@ void PropertyClipboardContainer::clearAndPaste(Property *targetProperty) {
             if(targetProperty->SWT_isComplexAnimator()) {
                 if(targetProperty->SWT_isPixmapEffectAnimators() ||
                    targetProperty->SWT_isPathEffectAnimators()) {
-                    ((ComplexAnimator*)targetProperty)->
+                    getAsPtr(targetProperty, ComplexAnimator)->
                             ca_removeAllChildAnimators();
                 }
             } else {
-                ((Animator*)targetProperty)->anim_removeAllKeys();
+                getAsPtr(targetProperty, Animator)->anim_removeAllKeys();
             }
         }
     }
     paste(targetProperty);
 }
-#include "PathEffects/patheffectanimators.h"
-#include "Animators/pathanimator.h"
-#include "Properties/boxtargetproperty.h"
+
 void PropertyClipboardContainer::paste(Property *targetProperty) {
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
     if(propertyCompatible(targetProperty)) {
         if(mBoxTargetProperty) {
             if(targetProperty->SWT_isBoxTargetProperty()) {
-                ((BoxTargetProperty*)targetProperty)->setTarget(
+                getAsPtr(targetProperty, BoxTargetProperty)->setTarget(
                             mTargetBox.data());
             }
         } else if(mPathEffect &&
            targetProperty->SWT_isPathEffectAnimators()) {
-            ((PathEffectAnimators*)targetProperty)->readPathEffect(&target);
+            getAsPtr(targetProperty, PathEffectAnimators)->readPathEffect(&target);
         } else if(mPixmapEffect &&
             targetProperty->SWT_isPixmapEffectAnimators()) {
-            ((EffectAnimators*)targetProperty)->readPixmapEffect(&target);
+            getAsPtr(targetProperty, EffectAnimators)->readPixmapEffect(&target);
         } else if(mPathEffectAnimators &&
             targetProperty->SWT_isPathEffectAnimators()) {
-            ((PathEffectAnimators*)targetProperty)->readProperty(&target);
+            getAsPtr(targetProperty, PathEffectAnimators)->readProperty(&target);
         } else if(mPixmapEffectAnimators &&
             targetProperty->SWT_isPixmapEffectAnimators()) {
-            ((EffectAnimators*)targetProperty)->readProperty(&target);
+            getAsPtr(targetProperty, EffectAnimators)->readProperty(&target);
         } else if(mVectorPathAnimator &&
             targetProperty->SWT_isPathAnimator()) {
-            ((PathAnimator*)targetProperty)->readVectorPathAnimator(&target);
+            getAsPtr(targetProperty, PathAnimator)->readVectorPathAnimator(&target);
         } else {
             targetProperty->readProperty(&target);
         }
@@ -230,7 +198,7 @@ bool PropertyClipboardContainer::propertyCompatible(Property *target) {
     }
     return false;
 }
-#include "Properties/boxtargetproperty.h"
+
 void PropertyClipboardContainer::setProperty(Property *property) {
     QBuffer targetBuff(getBytesArray());
     targetBuff.open(QIODevice::WriteOnly);
@@ -250,11 +218,6 @@ void PropertyClipboardContainer::setProperty(Property *property) {
     mPixmapEffect = property->SWT_isPixmapEffect();
     mBoxTargetProperty = property->SWT_isBoxTargetProperty();
     if(mBoxTargetProperty) {
-        BoundingBox *targetBox = ((BoxTargetProperty*)property)->getTarget();
-        if(targetBox == nullptr) {
-            mTargetBox.clear();
-        } else {
-            mTargetBox = targetBox->weakRef<BoundingBox>();
-        }
+        mTargetBox = getAsPtr(property, BoxTargetProperty)->getTarget();
     }
 }

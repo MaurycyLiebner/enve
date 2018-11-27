@@ -7,9 +7,8 @@ class PathBox;
 #include "skiaincludes.h"
 
 class GradientPoints : public ComplexAnimator {
+    friend class SelfRef;
 public:
-    void initialize(PathBox *parentT);
-
     void enable();
 
     void disable();
@@ -46,7 +45,7 @@ protected:
     GradientPointSPtr mStartPoint;
     GradientPointSPtr mEndPoint;
 
-    PathBoxQPtr mParent_k;
+    PathBox* const mParent_k;
 };
 
 #endif // GRADIENTPOINTS_H

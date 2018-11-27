@@ -344,13 +344,11 @@ void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
         MinimalNodePoint *point = firstPoint;
         NodePoint *firstNodePoint = nullptr;
         NodePoint *lastNodePoint = nullptr;
-        VectorPathAnimator *singlePath =
-                new VectorPathAnimator(path);
+        VectorPathAnimatorQSPtr singlePath = SPtrCreate(VectorPathAnimator)(path);
         do {
-            lastNodePoint = singlePath->addNodeRelPos(point->getPos(),
-                                                 point->getStartPos(),
-                                                 point->getEndPos(),
-                                                 lastNodePoint);
+            lastNodePoint = singlePath->addNodeRelPos(
+                        point->getStartPos(), point->getPos(),
+                        point->getEndPos(), lastNodePoint);
             if(firstNodePoint == nullptr) {
                 firstNodePoint = lastNodePoint;
             }
@@ -918,4 +916,170 @@ void PointsBezierCubic::disconnect() {
     mMPP1->setNextPoint(nullptr);
     mMPP2->setReversed(false);
     mMPP2->setPrevPoint(nullptr);
+}
+
+void applyOperation(const int &relFrame, const SkPath &src,
+              SkPath *dst, PathBox *srcBox,
+              PathBox *dstBox, const QString &operation,
+              const bool &groupSum) {
+    if(srcBox == nullptr) {
+        *dst = src;
+        return;
+    }
+    int absFrame = dstBox->
+            prp_relFrameToAbsFrame(relFrame);
+    int pathBoxRelFrame = srcBox->
+            prp_absFrameToRelFrame(absFrame);
+    SkPath boxPath;
+    if(groupSum) {
+        boxPath = srcBox->getPathWithEffectsUntilGroupSumAtRelFrame(pathBoxRelFrame);
+    } else {
+        boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrame(pathBoxRelFrame);
+    }
+    if(src.isEmpty()) {
+        *dst = boxPath;
+        return;
+    }
+    if(boxPath.isEmpty()) {
+        *dst = src;
+        return;
+    }
+    bool unionInterThis, unionInterOther;
+    // "Union" << "Difference" << "Intersection" << "Exclusion"
+    if(operation == "Union") {
+        unionInterOther = true;
+        unionInterThis = true;
+    } else if(operation == "Difference") {
+        unionInterThis = false;
+        unionInterOther = true;
+    } else if(operation == "Intersection") {
+        unionInterThis = false;
+        unionInterOther = false;
+    } else {
+        unionInterThis = true;
+        unionInterOther = false;
+    }
+    QMatrix pathBoxMatrix =
+            srcBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrame(
+                    pathBoxRelFrame);
+    QMatrix parentBoxMatrix =
+            dstBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrame(
+                    relFrame);
+    boxPath.transform(
+                QMatrixToSkMatrix(
+                    pathBoxMatrix*parentBoxMatrix.inverted()));
+    FullVectorPath addToPath;
+    addToPath.generateFromPath(boxPath);
+    FullVectorPath addedPath;
+    addedPath.generateFromPath(src);
+
+    addToPath.intersectWith(&addedPath,
+                            unionInterThis,
+                            unionInterOther);
+    FullVectorPath targetPath;
+    targetPath.getSeparatePathsFromOther(&addToPath);
+    targetPath.getSeparatePathsFromOther(&addedPath);
+    targetPath.generateSinglePathPaths();
+
+    *dst = QPainterPathToSkPath(targetPath.getPath());
+    if(unionInterThis && !unionInterOther) {
+        FullVectorPath addToPath2;
+        addToPath2.generateFromPath(src);
+        FullVectorPath addedPath2;
+        addedPath2.generateFromPath(boxPath);
+
+        addToPath2.intersectWith(&addedPath2,
+                                 unionInterThis,
+                                 unionInterOther);
+        FullVectorPath targetPath2;
+        targetPath2.getSeparatePathsFromOther(&addToPath2);
+        targetPath2.getSeparatePathsFromOther(&addedPath2);
+        targetPath2.generateSinglePathPaths();
+        dst->addPath(QPainterPathToSkPath(targetPath2.getPath()));
+    }
+}
+
+void applyOperationF(const qreal &relFrame, const SkPath &src,
+               SkPath *dst, PathBox *srcBox,
+               PathBox *dstBox, const QString &operation,
+               const bool &groupSum) {
+    if(srcBox == nullptr) {
+        *dst = src;
+        return;
+    }
+    qreal absFrame = dstBox->
+            prp_relFrameToAbsFrameF(relFrame);
+    qreal pathBoxRelFrame = srcBox->
+            prp_absFrameToRelFrameF(absFrame);
+    SkPath boxPath;
+    if(groupSum) {
+        boxPath = srcBox->getPathWithEffectsUntilGroupSumAtRelFrameF(pathBoxRelFrame);
+    } else {
+        boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrameF(pathBoxRelFrame);
+    }
+    if(src.isEmpty()) {
+        *dst = boxPath;
+        return;
+    }
+    if(boxPath.isEmpty()) {
+        *dst = src;
+        return;
+    }
+    bool unionInterThis, unionInterOther;
+    // "Union" << "Difference" << "Intersection" << "Exclusion"
+    if(operation == "Union") {
+        unionInterOther = true;
+        unionInterThis = true;
+    } else if(operation == "Difference") {
+        unionInterThis = false;
+        unionInterOther = true;
+    } else if(operation == "Intersection") {
+        unionInterThis = false;
+        unionInterOther = false;
+    } else {
+        unionInterThis = true;
+        unionInterOther = false;
+    }
+    QMatrix pathBoxMatrix =
+            srcBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrameF(
+                    pathBoxRelFrame);
+    QMatrix parentBoxMatrix =
+            dstBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrameF(
+                    relFrame);
+    boxPath.transform(
+                QMatrixToSkMatrix(
+                    pathBoxMatrix*parentBoxMatrix.inverted()));
+    FullVectorPath addToPath;
+    addToPath.generateFromPath(boxPath);
+    FullVectorPath addedPath;
+    addedPath.generateFromPath(src);
+
+    addToPath.intersectWith(&addedPath,
+                            unionInterThis,
+                            unionInterOther);
+    FullVectorPath targetPath;
+    targetPath.getSeparatePathsFromOther(&addToPath);
+    targetPath.getSeparatePathsFromOther(&addedPath);
+    targetPath.generateSinglePathPaths();
+
+    *dst = QPainterPathToSkPath(targetPath.getPath());
+    if(unionInterThis && !unionInterOther) {
+        FullVectorPath addToPath2;
+        addToPath2.generateFromPath(src);
+        FullVectorPath addedPath2;
+        addedPath2.generateFromPath(boxPath);
+
+        addToPath2.intersectWith(&addedPath2,
+                                 unionInterThis,
+                                 unionInterOther);
+        FullVectorPath targetPath2;
+        targetPath2.getSeparatePathsFromOther(&addToPath2);
+        targetPath2.getSeparatePathsFromOther(&addedPath2);
+        targetPath2.generateSinglePathPaths();
+        dst->addPath(QPainterPathToSkPath(targetPath2.getPath()));
+    }
 }

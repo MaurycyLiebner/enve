@@ -1,7 +1,8 @@
 #include "fakecomplexanimator.h"
 #include <QPainter>
 
-FakeComplexAnimator::FakeComplexAnimator(Property *target) {
+FakeComplexAnimator::FakeComplexAnimator(const QString &name, Property *target) :
+    ComplexAnimator(name) {
     mTarget = target;
 }
 
@@ -30,7 +31,9 @@ Key *FakeComplexAnimator::prp_getKeyAtPos(const qreal &relX,
                                     pixelsPerFrame);
 }
 
-void FakeComplexAnimator::prp_getKeysInRect(const QRectF &selectionRect, const qreal &pixelsPerFrame, QList<Key *> *keysList) {
+void FakeComplexAnimator::prp_getKeysInRect(const QRectF &selectionRect,
+                                            const qreal &pixelsPerFrame,
+                                            QList<Key *> &keysList) {
     mTarget->prp_getKeysInRect(selectionRect, pixelsPerFrame, keysList);
     ComplexAnimator::prp_getKeysInRect(selectionRect, pixelsPerFrame, keysList);
 }

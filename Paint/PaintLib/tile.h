@@ -106,8 +106,8 @@ struct TileSkDrawerCollection {
                                TILE_DIM, TILE_DIM));
         }
         SkBitmap bitmap;
-        SkImageInfo info = SkImageInfo::Make(ceil(rect.width()),
-                                             ceil(rect.height()),
+        SkImageInfo info = SkImageInfo::Make(qCeil(rect.width()),
+                                             qCeil(rect.height()),
                                              kBGRA_8888_SkColorType,
                                              kPremul_SkAlphaType,
                                              nullptr);
@@ -119,13 +119,13 @@ struct TileSkDrawerCollection {
             paint.setAlpha(alpha);
             paint.setColorFilter(SkColorMatrixFilter::MakeLightingFilter(
                                      SkColorSetARGB(255,
-                                                          SkColorGetR(hueCol)*0.7,
-                                                          SkColorGetG(hueCol)*0.7,
-                                                          SkColorGetB(hueCol)*0.7),
+                                                  SkColorGetR(hueCol)*0.7,
+                                                  SkColorGetG(hueCol)*0.7,
+                                                  SkColorGetB(hueCol)*0.7),
                                      SkColorSetARGB(255,
-                                                          SkColorGetR(hueCol)*0.3,
-                                                          SkColorGetG(hueCol)*0.3,
-                                                          SkColorGetB(hueCol)*0.3)));
+                                                  SkColorGetR(hueCol)*0.3,
+                                                  SkColorGetG(hueCol)*0.3,
+                                                  SkColorGetB(hueCol)*0.3)));
 //            paint.setBlendMode(SkBlendMode::kDstIn);
 //            canvas->saveLayer(nullptr, nullptr);
 //            canvas->clear(hueCol);

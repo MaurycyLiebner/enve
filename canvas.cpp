@@ -42,7 +42,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
     mSoundComposition = QSharedPointer<SoundComposition>::create(this);
     auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();
-    ca_addChildAnimator(soundsAnimatorContainer->ref<Property>());
+    ca_addChildAnimator(getAsSPtr(soundsAnimatorContainer, Property));
 
     mMaxFrame = frameCount;
 
@@ -137,7 +137,7 @@ void Canvas::updateHoveredBox() {
     mHoveredBone = nullptr;
     if(mHoveredBox != nullptr && mBonesSelectionEnabled) {
         if(mHoveredBox->SWT_isBonesBox()) {
-            mHoveredBone = SPtrGetAs(mHoveredBox, BonesBox)->getBoneAtAbsPos(
+            mHoveredBone = getAsPtr(mHoveredBox, BonesBox)->getBoneAtAbsPos(
                         mCurrentMouseEventPosRel);
         }
     }
@@ -400,7 +400,7 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
         mCurrentPreviewContainer.reset();
         return;
     }
-    mCurrentPreviewContainer = cont->ref<CacheContainer>();
+    mCurrentPreviewContainer = getAsSPtr(cont, CacheContainer);
     mCurrentPreviewContainer->setBlocked(true);
 }
 
@@ -416,7 +416,7 @@ void Canvas::setLoadingPreviewContainer(CacheContainer *cont) {
         mLoadingPreviewContainer.reset();
         return;
     }
-    mLoadingPreviewContainer = cont->ref<CacheContainer>();
+    mLoadingPreviewContainer = getAsSPtr(cont, CacheContainer);
     cont->setAsCurrentPreviewContainerAfterFinishedLoading(this);
     mLoadingPreviewContainer->setBlocked(true);
 }
@@ -435,7 +435,8 @@ void Canvas::playPreview(const int &minPreviewFrameId,
 #include "memorychecker.h"
 int Canvas::getMaxPreviewFrame(const int &minFrame,
                                const int &maxFrame) {
-    unsigned long long frameSize = getByteCountPerFrame();
+    unsigned long long frameSize =
+            static_cast<unsigned long long>(getByteCountPerFrame());
     unsigned long long freeRam = getFreeRam() -
             MemoryChecker::getInstance()->getLowFreeRam();
     int maxNewFrames = static_cast<int>(freeRam/frameSize);
@@ -733,7 +734,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_N) {
         foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox *paintBox = SPtrGetAs(box, PaintBox);
+                PaintBox *paintBox = getAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
             }
         }
@@ -762,8 +763,8 @@ bool boxesZSort(const BoundingBoxQPtr& box1,
 }
 
 void Canvas::copyAction() {
-    BoxesClipboardContainer *container =
-            new BoxesClipboardContainer();
+    BoxesClipboardContainerSPtr container =
+            SPtrCreate(BoxesClipboardContainer)();
     mMainWindow->replaceClipboard(container);
     QBuffer target(container->getBytesArray());
     target.open(QIODevice::WriteOnly);

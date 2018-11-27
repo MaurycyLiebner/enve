@@ -77,7 +77,7 @@ CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(const int &fram
     CacheContainerSPtr cont = SPtrCreate(CacheContainer)(this);
     cont->setRelFrame(frame);
     int contId = getRenderContainterInsertIdAtRelFrame(frame);
-    mRenderContainers.insert(contId, cont->ref<CacheContainer>());
+    mRenderContainers.insert(contId, getAsSPtr(cont, CacheContainer));
     return cont.get();
 }
 

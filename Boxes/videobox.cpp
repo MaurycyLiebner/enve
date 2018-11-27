@@ -69,11 +69,14 @@ void VideoBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 void VideoBox::setFilePath(const QString &path) {
     mSrcFilePath = path;
     if(mAnimationCacheHandler == nullptr) {
-        mAnimationCacheHandler = (AnimationCacheHandler*)
-                                    FileSourcesCache::getHandlerForFilePath(
-                                                            mSrcFilePath);
+        auto currentHandler =
+                FileSourcesCache::getHandlerForFilePath(mSrcFilePath);
+        mAnimationCacheHandler =
+                getAsPtr(currentHandler, AnimationCacheHandler);
         if(mAnimationCacheHandler == nullptr) {
-            mAnimationCacheHandler = new VideoCacheHandler(mSrcFilePath);
+            VideoCacheHandler* newHandler =
+                    VideoCacheHandler::createNewHandler(mSrcFilePath);
+            mAnimationCacheHandler = newHandler;
         }
         mAnimationCacheHandler->addDependentBox(this);
     }
@@ -110,8 +113,8 @@ bool hasSound(const char* path) {
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
         if(mSound == nullptr) {
-            mSound = new SingleSound(mSrcFilePath,
-                                     (FixedLenAnimationRect*)mDurationRectangle);
+            auto flar = getAsPtr(mDurationRectangle, FixedLenAnimationRect);
+            mSound = SPtrCreate(SingleSound)(mSrcFilePath, flar);
             ca_addChildAnimator(mSound);
             if(mParentGroup != nullptr) {
                 getParentCanvas()->getSoundComposition()->addSound(mSound);

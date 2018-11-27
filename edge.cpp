@@ -111,7 +111,7 @@ qreal VectorPathEdge::getLength(const QPointF &p0Pos,
 
     QPointF lastPoint = p0Pos;
     for(int i = 1; i < divisions; i++) {
-        qreal t = i/(qreal)divisions;
+        qreal t = i/static_cast<qreal>(divisions);
         QPointF currentPoint = getPosBetweenPointsAtT(t,
                                                       p0Pos,
                                                       p1EndPos,
@@ -198,8 +198,10 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
     QPointF p3Pos = mPoint2->getAbsolutePos();
 
     if(!mEditPath) {
-        BoundingBoxQSPtr parentBox = ((BoxTransformAnimator*)mPoint1->getParentTransform())->
-                                        getParentBox();
+        auto parentTransform =
+                getAsPtr(mPoint1->getParentTransform(),
+                         BoxTransformAnimator);
+        BoundingBox* parentBox = parentTransform->getParentBox();
         NodePointValues p1Values = mPoint1->getPointValues();
         p0Pos = parentBox->getCombinedTransform().map(
                     p1Values.pointRelPos);

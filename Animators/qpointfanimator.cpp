@@ -3,13 +3,10 @@
 
 QPointFAnimator::QPointFAnimator(const QString &name) :
     ComplexAnimator(name) {
-    mXAnimator = SPtrCreate(QrealAnimator)();
-    mYAnimator = SPtrCreate(QrealAnimator)();
-    mXAnimator->prp_setName("x");
-    mYAnimator->prp_setName("y");
+    mXAnimator = SPtrCreate(QrealAnimator)("x");
+    mYAnimator = SPtrCreate(QrealAnimator)("y");
     ca_addChildAnimator(mXAnimator);
     ca_addChildAnimator(mYAnimator);
-    prp_setName(name);
 }
 
 QPointF QPointFAnimator::getCurrentPointValue() const {

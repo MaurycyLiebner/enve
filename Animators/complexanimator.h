@@ -16,7 +16,7 @@ public:
 
     void ca_addChildAnimator(const PropertyQSPtr &childAnimator,
                              const int &id = INT_MAX);
-    PropertyQSPtr ca_removeChildAnimator(const PropertyQSPtr &removeAnimator);
+    void ca_removeChildAnimator(const PropertyQSPtr &removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
     void ca_moveChildInList(Property *child,
                             const int &from,
@@ -49,9 +49,8 @@ public:
     int ca_getNumberOfChildren();
     Property *ca_getChildAt(const int &i);
 
-    void SWT_addChildrenAbstractions(
-            const SingleWidgetAbstractionSPtr& abstraction,
-            ScrollWidgetVisiblePart *visiblePartWidget);
+    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
+                                     ScrollWidgetVisiblePart *visiblePartWidget);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
@@ -70,7 +69,7 @@ public:
                                  ComplexAnimator *parentAnimator = nullptr);
     int getChildPropertyIndex(Property *child);
 
-    void ca_updateDescendatKeyFrame(const KeySPtr &key);
+    void ca_updateDescendatKeyFrame(Key* key);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
                                               const int &relFrame);
@@ -91,8 +90,8 @@ public slots:
                                  const PropertyQSPtr& replaceWith);
     void prp_setRecording(const bool &rec);
 
-    virtual void ca_addDescendantsKey(const KeySPtr &key);
-    virtual void ca_removeDescendantsKey(const KeySPtr &key);
+    void ca_addDescendantsKey(Key* key);
+    void ca_removeDescendantsKey(Key *key);
     virtual void ca_childAnimatorIsRecordingChanged();
 protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
@@ -102,16 +101,15 @@ protected:
 };
 
 class ComplexKey : public Key {
+    friend class StdSelfRef;
 public:
-    ComplexKey(const ComplexAnimatorQSPtr &parentAnimator);
-
-    void addAnimatorKey(const KeySPtr &key);
+    void addAnimatorKey(Key *key);
 
     void addOrMergeKey(const KeySPtr &keyAdd);
 
     void deleteKey();
 
-    void removeAnimatorKey(const KeySPtr &key);
+    void removeAnimatorKey(Key *key);
 
     bool isEmpty();
 
@@ -130,8 +128,10 @@ public:
     //QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     bool areAllChildrenSelected();
-    void removeFromSelection(QList<Key *> &selectedKeys);
-    void addToSelection(QList<Key *> &selectedKeys);
+    void addToSelection(QList<KeyPtr> &selectedKeys,
+                        QList<AnimatorQPtr> &selectedAnimators);
+    void removeFromSelection(QList<KeyPtr> &selectedKeys,
+                             QList<AnimatorQPtr> &selectedAnimators);
 
     bool hasKey(Key *key);
 
@@ -140,8 +140,10 @@ public:
     int getChildKeysCount();
 
     bool hasSameKey(Key *otherKey);
+protected:
+    ComplexKey(ComplexAnimator* parentAnimator);
 private:
-    QList<KeySPtr> mKeys;
+    QList<KeyPtr> mKeys;
 };
 
 #endif // COMPLEXANIMATOR_H

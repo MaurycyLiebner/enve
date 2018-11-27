@@ -10,6 +10,8 @@
 #include "Animators/qrealanimator.h"
 #include "canvaswindow.h"
 #include "durationrectsettingsdialog.h"
+#include <QApplication>
+#include "clipboardcontainer.h"
 
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
@@ -67,7 +69,7 @@ void KeysView::selectKeysInSelectionRect() {
     QList<Key*> listKeys;
     mBoxesListVisible->getKeysInRect(mSelectionRect,
                                      mPixelsPerFrame,
-                                     &listKeys);
+                                     listKeys);
     Q_FOREACH(Key *key, listKeys) {
         addKeyToSelection(key);
     }
@@ -171,19 +173,19 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 mIsMouseGrabbing = false;
                 releaseMouse();
             } else {
-                DurationRectangleMovable *durRect =
+                auto movable =
                         mBoxesListVisible->getRectangleMovableAtPos(
                                             posU.x(), posU.y(),
                                             mPixelsPerFrame,
                                             mMinViewedFrame);
-                if(durRect == nullptr) {
-
-                } else if(durRect->isDurationRect()) {
+                if(movable == nullptr) {
+                } else if(movable->isDurationRect()) {
                     QMenu menu;
                     menu.addAction("Settings...");
                     QAction *selectedAction = menu.exec(e->globalPos());
                     if(selectedAction != nullptr) {
-                        ((DurationRectangle*)durRect)->openDurationSettingsDialog(this);
+                        auto durRect = getAsPtr(movable, DurationRectangle);
+                        durRect->openDurationSettingsDialog(this);
                     }
                 }
             }
@@ -194,8 +196,20 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     mMainWindow->callUpdateSchedulers();
 }
 
-#include <QApplication>
-#include "clipboardcontainer.h"
+KeysClipboardContainerSPtr KeysView::getSelectedKeysClipboardContainer() {
+    KeysClipboardContainerSPtr container =
+            SPtrCreate(KeysClipboardContainer)();
+    Q_FOREACH(const AnimatorQPtr& anim, mSelectedAnimators) {
+        QByteArray keyData;
+        QBuffer target(&keyData);
+        target.open(QIODevice::WriteOnly);
+        anim->writeSelectedKeys(&target);
+        target.close();
+        container->addTargetAnimator(anim, keyData);
+    }
+    return container;
+}
+
 bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(mGraphViewed) {
         return graphProcessFilteredKeyEvent(event);
@@ -211,23 +225,16 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         } else if(event->modifiers() & Qt::ControlModifier &&
            event->key() == Qt::Key_V) {
             if(event->isAutoRepeat()) return false;
-            KeysClipboardContainer *container =
-                    (KeysClipboardContainer*)
-                    mMainWindow->getClipboardContainer(CCT_KEYS);
+            auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
+            KeysClipboardContainer* container =
+                    getAsPtr(cont, KeysClipboardContainer);
             if(container == nullptr) return false;
-            container->paste(mMainWindow->getCurrentFrame(), this);
+            container->paste(mMainWindow->getCurrentFrame(), this, true, true);
         } else if(!mSelectedKeys.isEmpty()) {
             if(event->modifiers() & Qt::ControlModifier &&
                       event->key() == Qt::Key_C) {
                 if(event->isAutoRepeat()) return false;
-                KeysClipboardContainer *container = new KeysClipboardContainer();
-                QBuffer target(container->getBytesArray());
-                target.open(QIODevice::WriteOnly);
-                Q_FOREACH(Key *key, mSelectedKeys) {
-                    key->writeKey(&target);
-                    container->addTargetAnimator(key->getParentAnimator());
-                }
-                target.close();
+                auto container = getSelectedKeysClipboardContainer();
                 mMainWindow->replaceClipboard(container);
             } else if(event->key() == Qt::Key_S) {
                 if(!mMovingKeys) {
@@ -254,24 +261,15 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 }
             } else if(mMainWindow->isShiftPressed() &&
                      event->key() == Qt::Key_D) {
-                KeysClipboardContainer container;
-                QBuffer target(container.getBytesArray());
-                target.open(QIODevice::WriteOnly);
+                auto container = getSelectedKeysClipboardContainer();
                 int lowestKey = INT_MAX;
                 Q_FOREACH(Key *key, mSelectedKeys) {
                     int keyAbsFrame = key->getAbsFrame();
                     if(keyAbsFrame < lowestKey) {
                         lowestKey = keyAbsFrame;
                     }
-                    key->writeKey(&target);
-                    container.addTargetAnimator(key->getParentAnimator());
                 }
-                target.close();
-                QList<Key*> newKeys =
-                        container.pasteWithoutMerging(lowestKey, this);
-                foreach(Key *newKey, newKeys) {
-                    addKeyToSelection(newKey);
-                }
+                container->paste(lowestKey, this, false, true);
 
                 mValueInput.setName("move");
                 mMovingKeys = true;
@@ -283,15 +281,8 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 grabMouse();
             } else if(mMainWindow->isCtrlPressed() &&
                       event->key() == Qt::Key_D) {
-                KeysClipboardContainer container;
-                QBuffer target(container.getBytesArray());
-                target.open(QIODevice::WriteOnly);
-                Q_FOREACH(Key *key, mSelectedKeys) {
-                    key->writeKey(&target);
-                    container.addTargetAnimator(key->getParentAnimator());
-                }
-                target.close();
-                container.paste(mMainWindow->getCurrentFrame(), this);
+                auto container = getSelectedKeysClipboardContainer();
+                container->paste(mMainWindow->getCurrentFrame(), this, true, true);
              } else if(event->key() == Qt::Key_Delete) {
                 deleteSelectedKeys();
                 update();
@@ -741,16 +732,17 @@ void KeysView::updatePixelsPerFrame() {
 }
 
 void KeysView::addKeyToSelection(Key *key) {
-    key->addToSelection(&mSelectedKeys);
+    key->addToSelection(mSelectedKeys, mSelectedAnimators);
 }
 
 void KeysView::removeKeyFromSelection(Key *key) {
-    key->removeFromSelection(&mSelectedKeys);
+    key->removeFromSelection(mSelectedKeys, mSelectedAnimators);
 }
 
 void KeysView::clearKeySelection() {
     Q_FOREACH(Key *key, mSelectedKeys) {
         key->setSelected(false);
     }
+    mSelectedAnimators.clear();
     mSelectedKeys.clear();
 }

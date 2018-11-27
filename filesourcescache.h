@@ -7,7 +7,6 @@
 #include "Boxes/rendercachehandler.h"
 #include "updatable.h"
 class BoundingBox;
-typedef QWeakPointer<BoundingBox> BoundingBoxQWPtr;
 class FileSourceListVisibleWidget;
 
 extern bool hasVideoExt(const QString &filename);
@@ -26,7 +25,6 @@ class FileCacheHandler : public _ScheduledExecutor {
 public:
     FileCacheHandler(const QString &filePath,
                      const bool &visibleInListWidgets = true);
-    ~FileCacheHandler();
 
     const QString &getFilePath() {
         return mFilePath;
@@ -46,36 +44,46 @@ public:
 protected:
     bool mFileMissing = false;
     bool mVisibleInListWidgets;
-    QList<BoundingBoxQWPtr> mDependentBoxes;
+    QList<BoundingBoxQPtr> mDependentBoxes;
     QString mFilePath;
     QString mUpdateFilePath;
 };
 
-class FileSourcesCache {
-public:
-    FileSourcesCache();
-
-    static void addFileSourceListVisibleWidget(
+namespace FileSourcesCache {
+    void addFileSourceListVisibleWidget(
             FileSourceListVisibleWidget *wid);
-    static void removeFileSourceListVisibleWidget(
+    void removeFileSourceListVisibleWidget(
             FileSourceListVisibleWidget *wid);
-    static FileCacheHandler *getHandlerForFilePath(const QString &filePath);
-    static void removeHandler(FileCacheHandler *handler);
-    static void clearAll();
-    static int getFileCacheListCount();
+    FileCacheHandler *getHandlerForFilePath(
+            const QString &filePath);
+    void clearAll();
+    int getFileCacheListCount();
 
-    static void addHandlerToHandlersList(FileCacheHandler *handlerPtr);
-    static void addHandlerToListWidgets(FileCacheHandler *handlerPtr);
-    static void removeHandlerFromListWidgets(FileCacheHandler *handlerPtr);
-private:
-    static QList<FileSourceListVisibleWidget*> mFileSourceListVisibleWidgets;
-    static QList<std::shared_ptr<FileCacheHandler> > mFileCacheHandlers;
+    void removeHandler(const FileCacheHandlerSPtr &handler);
+    void addHandlerToHandlersList(
+            const FileCacheHandlerSPtr& handlerPtr);
+    void addHandlerToListWidgets(
+            FileCacheHandler *handlerPtr);
+    void removeHandlerFromListWidgets(
+            FileCacheHandler *handlerPtr);
+    namespace {
+        QList<FileSourceListVisibleWidget*> mFileSourceListVisibleWidgets;
+        QList<FileCacheHandlerSPtr> mFileCacheHandlers;
+    }
 };
+
+#define CacheHandlerCreatorDef(T) \
+    template<typename... Args> \
+    static T* createNewHandler(Args && ...arguments) { \
+        auto newHandler = (new T(arguments...))->template iniRef<T>(); \
+        FileSourcesCache::addHandlerToHandlersList(newHandler); \
+        FileSourcesCache::addHandlerToListWidgets(newHandler.get()); \
+        return newHandler.get(); \
+    }
 
 class ImageCacheHandler : public FileCacheHandler {
 public:
-    ImageCacheHandler(const QString &filePath,
-                      const bool &visibleSeparatly = true);
+    CacheHandlerCreatorDef(ImageCacheHandler)
 
     void _processUpdate();
     void afterUpdate();
@@ -87,6 +95,9 @@ public:
     sk_sp<SkImage> getImageCopy() {
         return makeSkImageCopy(mImage);
     }
+protected:
+    ImageCacheHandler(const QString &filePath,
+                      const bool &visibleSeparatly = true);
 private:
     sk_sp<SkImage> mUpdateImage;
     sk_sp<SkImage> mImage;
@@ -94,10 +105,6 @@ private:
 
 class AnimationCacheHandler : public FileCacheHandler {
 public:
-    AnimationCacheHandler(const QString &filePath) :
-        FileCacheHandler(filePath) {}
-    AnimationCacheHandler() :
-        FileCacheHandler("") {}
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
     virtual sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame) = 0;
     sk_sp<SkImage> getFrameCopyAtFrame(const int &relFrame) {
@@ -110,16 +117,21 @@ public:
         return makeSkImageCopy(imageToCopy);
     }
 
-    virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame) = 0;
+    virtual _ScheduledExecutor* scheduleFrameLoad(const int &frame) = 0;
     const int &getFramesCount() { return mFramesCount; }
 protected:
+    AnimationCacheHandler(const QString &filePath) :
+        FileCacheHandler(filePath) {}
+    AnimationCacheHandler() :
+        FileCacheHandler("") {}
+
     int mFramesCount = 0;
     virtual void updateFrameCount() = 0;
 };
 
 class ImageSequenceCacheHandler : public AnimationCacheHandler {
 public:
-    ImageSequenceCacheHandler(const QStringList &framePaths);
+    CacheHandlerCreatorDef(ImageSequenceCacheHandler)
 
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
@@ -130,15 +142,17 @@ public:
 
     void clearCache();
 
-    _ScheduledExecutor *scheduleFrameLoad(const int &frame);
+    _ScheduledExecutor* scheduleFrameLoad(const int &frame);
 protected:
+    ImageSequenceCacheHandler(const QStringList &framePaths);
+
     QStringList mFramePaths;
-    QList<std::shared_ptr<ImageCacheHandler> > mFrameImageHandlers;
+    QList<ImageCacheHandlerPtr> mFrameImageHandlers;
 };
 
 class VideoCacheHandler : public AnimationCacheHandler {
 public:
-    VideoCacheHandler(const QString &filePath);
+    CacheHandlerCreatorDef(VideoCacheHandler)
 
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
@@ -157,19 +171,21 @@ public:
 
     virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame);
 protected:
+    VideoCacheHandler(const QString &filePath);
+
+    int mTimeBaseDen = 1;
+    int mTimeBaseNum = 24;
+    int mUpdateTimeBaseDen = 1;
+    int mUpdateTimeBaseNum = 24;
+
+    qreal mFps = 24.;
+    qreal mUpdateFps = 24.;
+
     QList<int> mFramesLoadScheduled;
 
     QList<int> mFramesBeingLoadedGUI;
     QList<int> mFramesBeingLoaded;
     QList<sk_sp<SkImage> > mLoadedFrames;
-
-    qreal mFps = 24.;
-    int mTimeBaseDen = 1;
-    int mTimeBaseNum = 24;
-
-    qreal mUpdateFps = 24.;
-    int mUpdateTimeBaseDen = 1;
-    int mUpdateTimeBaseNum = 24;
 
     void updateFrameCount();
 
@@ -179,6 +195,8 @@ protected:
 
 class SoundCacheHandler : public FileCacheHandler {
 public:
+    CacheHandlerCreatorDef(SoundCacheHandler)
+
     struct SoundDataRange {
         SoundDataRange(const int &minRelFrameT,
                        const int &maxRelFrameT) {
@@ -261,7 +279,8 @@ public:
             if(!canBeMergedWith(range)) return false;
             removeOverlapWith(range);
             float *newData = nullptr;
-            newData = new float[range.sampleCount + sampleCount];
+            ulong sizeT = static_cast<ulong>(range.sampleCount + sampleCount);
+            newData = new float[sizeT];
             if(range.minSample > minSample) {
                 int j = 0;
                 for(int i = 0; i < sampleCount; i++, j++) {

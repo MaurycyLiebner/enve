@@ -4,26 +4,12 @@
 #include <QString>
 #include <QRectF>
 #include <QPainter>
-#include "skiaincludes.h"
-
+#include "simplemath.h"
 enum CtrlsMode : short {
     CTRLS_SMOOTH,
     CTRLS_SYMMETRIC,
     CTRLS_CORNER
 };
-
-extern qreal qRandF(const qreal &fMin = 0., const qreal &fMax = 1.);
-
-extern QPointF symmetricToPos(QPointF toMirror,
-                              QPointF mirrorCenter);
-extern QPointF symmetricToPosNewLen(QPointF toMirror,
-                                    QPointF mirrorCenter,
-                                    qreal newLen);
-extern qreal pointToLen(QPointF point);
-extern SkScalar pointToLen(SkPoint point);
-
-extern bool isPointZero(QPointF pos);
-extern QPointF scalePointToNewLen(QPointF point, qreal newLen);
 
 extern void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
                                  QPointF centerPos, QPointF *newEndPos,
@@ -31,10 +17,6 @@ extern void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
 extern void getCtrlsSmoothPos(QPointF endPos, QPointF startPos,
                               QPointF centerPos, QPointF *newEndPos,
                               QPointF *newStartPos);
-
-extern qreal clamp(qreal val, qreal min, qreal max);
-
-extern qreal qclamp(qreal val, qreal min, qreal max);
 
 extern qreal calcCubicBezierVal(qreal p0, qreal p1,
                                 qreal p2, qreal p3, qreal t);
@@ -45,11 +27,6 @@ extern qreal tFromX(qreal p0x, qreal p1x,
                        qreal p2x, qreal p3x,
                        qreal x);
 
-extern bool isZero(qreal val);
-
-extern bool isZero2Dec(qreal val);
-
-extern bool isZero1Dec(qreal val);
 
 extern QPointF getClosestPointOnLineSegment(const QPointF &a,
                                             const QPointF &b,
@@ -108,21 +85,7 @@ extern void bezierLeastSquareV1V2(const QPointF &v0,
                                   const int &minVs,
                                   const int &maxVs);
 
-extern qreal qMin4(qreal v1, qreal v2,
-                   qreal v3, qreal v4);
-extern qreal qMax4(qreal v1, qreal v2,
-                   qreal v3, qreal v4);
 
-extern QRectF qRectF4Points(QPointF p1, QPointF c1,
-                            QPointF c2, QPointF p2);
-
-extern QPointF rotateVector90Degrees(const QPointF &pt);
-
-extern qreal degreesBetweenVectors(const QPointF &pt1,
-                                   const QPointF &pt2);
-
-extern qreal radiansBetweenVectors(const QPointF &pt1,
-                                   const QPointF &pt2);
 extern void drawCosmeticEllipse(QPainter *p,
                                 const QPointF &absPos,
                                 qreal rX, qreal rY);

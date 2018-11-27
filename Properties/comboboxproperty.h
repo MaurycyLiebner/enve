@@ -4,7 +4,8 @@
 class ComboBoxProperty : public Property {
     Q_OBJECT
 public:
-    ComboBoxProperty(const QStringList &list);
+    ComboBoxProperty(const QString& name,
+                     const QStringList &list);
     const int &getCurrentValue() {
         return mCurrentValue;
     }
@@ -32,8 +33,8 @@ public slots:
         prp_callFinishUpdater();
     }
 private:
-    QStringList mValueNames;
     int mCurrentValue = 0;
+    QStringList mValueNames;
 };
 
 #endif // COMBOBOXPROPERTY_H

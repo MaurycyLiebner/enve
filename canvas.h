@@ -46,7 +46,8 @@ enum CanvasMode : short {
 
 #include "canvaswindow.h"
 
-extern bool zLessThan(BoundingBox *box1, const BoundingBoxQSPtr& box2);
+extern bool zLessThan(const BoundingBoxQPtr &box1,
+                      const BoundingBoxQPtr &box2);
 
 struct CanvasRenderData : public BoxesGroupRenderData {
     CanvasRenderData(BoundingBox *parentBoxT);
@@ -65,6 +66,7 @@ extern bool boxesZSort(const BoundingBoxQPtr &box1,
 
 class Canvas : public BoxesGroup {
     Q_OBJECT
+    friend class SelfRef;
 public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                     CanvasWindow *canvasWidget,
@@ -145,8 +147,6 @@ public:
     void convertSelectedPathStrokesToPath();
 
     void applySampledMotionBlurToSelected();
-    void applyBlurToSelected();
-    void applyBrushEffectToSelected();
     void applyLinesEffectToSelected();
     void applyCirclesEffectToSelected();
     void applySwirlEffectToSelected();
@@ -335,7 +335,7 @@ public:
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data) {
         BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        auto canvasData = SPtrGetAs(data, CanvasRenderData);
+        auto canvasData = getAsPtr(data, CanvasRenderData);
         canvasData->bgColor = QColorToSkColor(mBackgroundColor->getCurrentColor());
         canvasData->canvasHeight = mHeight*mResolutionFraction;
         canvasData->canvasWidth = mWidth*mResolutionFraction;
@@ -557,6 +557,13 @@ public:
 
     void blockUndoRedo();
     void unblockUndoRedo();
+
+    template <class T>
+    void applyEffectToSelected() {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
+            box->addEffect<T>();
+        }
+    }
 protected:
     UndoRedoStack *mUndoRedoStack = nullptr;
 

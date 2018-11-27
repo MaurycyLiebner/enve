@@ -4,6 +4,16 @@
 #include "Boxes/vectorpath.h"
 #include "nodepoint.h"
 
+extern void applyOperationF(const qreal &relFrame, const SkPath &src,
+                            SkPath *dst, PathBox *srcBox,
+                            PathBox *dstBox, const QString &operation,
+                            const bool &groupSum = false);
+
+extern void applyOperation(const int &relFrame, const SkPath &src,
+                           SkPath *dst, PathBox *srcBox,
+                           PathBox *dstBox, const QString &operation,
+                           const bool &groupSum = false);
+
 class MinimalNodePoint {
 public:
     MinimalNodePoint();
@@ -51,7 +61,7 @@ public:
     void fixSiblingSideCtrlPoint();
 
 private:
-    IntersectionNodePoint *mSiblingIntPoint;
+    IntersectionNodePoint *mSiblingIntPoint = nullptr;
 };
 
 class MinimalVectorPath;

@@ -244,6 +244,19 @@ namespace fmt_filters
 
         void equalize(const image &im);
 
+        void applyBlur(const fmt_filters::image &img,
+                       const qreal &scale,
+                       const qreal &blurRadius,
+                       const bool &highQuality,
+                       const bool &hasKeys);
+
+        void applyBlur(const fmt_filters::image &img,
+                       const qreal &scale,
+                       const qreal &blurRadius,
+                       const bool &highQuality,
+                       const bool &hasKeys,
+                       const qreal &opacity);
+
         // radius = [0.01; 90.0], sigma = [0.01; 50.0]
         void anim_fast_blur(const image &im, const qreal &fRadius);
         void anim_fast_blur(const image &im, const qreal &fRadius,

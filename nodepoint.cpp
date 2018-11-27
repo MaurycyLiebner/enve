@@ -9,10 +9,10 @@
 #include "pointhelpers.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 
-NodePoint::NodePoint(VectorPathAnimator *parentAnimator) :
-    NonAnimatedMovablePoint(parentAnimator->getParentPathAnimator()->
-                            getParentBox()->getTransformAnimator(),
-                 MovablePointType::TYPE_PATH_POINT, 6.5), mParentPath(parentAnimator) {
+NodePoint::NodePoint(VectorPathAnimator *parentAnimator,
+                     BasicTransformAnimator *parentTransform) :
+    NonAnimatedMovablePoint(parentTransform, TYPE_PATH_POINT, 6.5),
+    mParentPath(parentAnimator) {
     mStartCtrlPt = SPtrCreate(CtrlPoint)(this, true);
     mEndCtrlPt = SPtrCreate(CtrlPoint)(this, false);
 
@@ -93,14 +93,13 @@ void NodePoint::finishTransform() {
     if(!mEndCtrlPt->isSelected()) {
         mEndCtrlPt->NonAnimatedMovablePoint::finishTransform();
     }
-    getParentPath()->finishedPathChange();
-    getParentPath()->setElementPos(getPtId(),
-                                   QPointFToSkPoint(getRelativePos()));
+    mParentPath->finishedPathChange();
+    mParentPath->setElementPos(getPtId(),  QPointFToSkPoint(getRelativePos()));
 }
 
 void NodePoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
-    getParentPath()->setElementPos(getPtId(), QPointFToSkPoint(relPos));
+    mParentPath->setElementPos(getPtId(), QPointFToSkPoint(relPos));
 }
 
 void NodePoint::connectToPoint(NodePoint *point) {
@@ -138,23 +137,23 @@ void NodePoint::removeApproximate() {
 }
 
 void NodePoint::rectPointsSelection(const QRectF &absRect,
-                                    QList<MovablePoint*> *list) {
+                                    QList<MovablePointPtr> &list) {
     if(!isSelected()) {
         if(isContainedInRect(absRect)) {
             select();
-            list->append(this);
+            list.append(this);
         }
     }
     if(!mEndCtrlPt->isSelected()) {
         if(mEndCtrlPt->isContainedInRect(absRect)) {
             mEndCtrlPt->select();
-            list->append(mEndCtrlPt.get());
+            list.append(mEndCtrlPt.get());
         }
     }
     if(!mStartCtrlPt->isSelected()) {
         if(mStartCtrlPt->isContainedInRect(absRect)) {
             mStartCtrlPt->select();
-            list->append(mStartCtrlPt.get());
+            list.append(mStartCtrlPt.get());
         }
     }
 }
@@ -165,10 +164,10 @@ MovablePoint *NodePoint::getPointAtAbsPos(const QPointF &absPos,
     if(canvasMode == CanvasMode::MOVE_POINT) {
         if(mStartCtrlPt->isPointAtAbsPos(absPos,
                                          canvasScaleInv)) {
-            return mStartCtrlPt->get();
+            return mStartCtrlPt.get();
         } else if (mEndCtrlPt->isPointAtAbsPos(absPos,
                                                canvasScaleInv)) {
-            return mEndCtrlPt->get();
+            return mEndCtrlPt.get();
         }
     } else {
         if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
@@ -234,8 +233,11 @@ CtrlPoint *NodePoint::getStartCtrlPt() {
 }
 
 void NodePoint::ctrlPointPosChanged(const bool &startPtChanged) {
-    ctrlPointPosChanged((startPtChanged) ? mStartCtrlPt.get() : mEndCtrlPt.get(),
-                        (startPtChanged) ? mEndCtrlPt.get() : mStartCtrlPt.get());
+    if(startPtChanged) {
+        ctrlPointPosChanged(mStartCtrlPt.get(), mEndCtrlPt.get());
+    } else {
+        ctrlPointPosChanged(mEndCtrlPt.get(), mStartCtrlPt.get());
+    }
 }
 
 void NodePoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
@@ -332,8 +334,9 @@ void NodePoint::drawSk(SkCanvas *canvas,
         paint.setAntiAlias(true);
         paint.setTextSize(FONT_HEIGHT*invScale);
         SkRect bounds;
+        ulong sizeT = static_cast<ulong>(QString::number(mNodeId).size());
         paint.measureText(QString::number(mNodeId).toStdString().c_str(),
-                          QString::number(mNodeId).size()*sizeof(char),
+                          sizeT*sizeof(char),
                           &bounds);
         paint.setColor(SK_ColorBLACK);
         SkFontStyle fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
@@ -372,8 +375,7 @@ void NodePoint::setNextPoint(NodePoint *nextPoint) {
         }
     } else {
         if(mNextEdge.get() == nullptr) {
-            mNextEdge = (new VectorPathEdge(this, mNextPoint))->
-                                ref<VectorPathEdge>();
+            mNextEdge = SPtrCreate(VectorPathEdge)(this, mNextPoint);
         } else {
             mNextEdge->setPoint2(mNextPoint);
         }
@@ -400,13 +402,10 @@ void NodePoint::updateEndCtrlPtVisibility() {
 
 void NodePoint::setEndCtrlPtEnabled(const bool &enabled) {
     if(enabled == mCurrentNodeSettings->endEnabled) return;
-    NodeSettings newSettings = *mCurrentNodeSettings;
-    if(newSettings.endEnabled) {
+    if(mCurrentNodeSettings->endEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
-    newSettings.endEnabled = enabled;
-    mParentPath->replaceNodeSettingsForPtId(getPtId(),
-                                            newSettings);
+    mCurrentNodeSettings->endEnabled = enabled;
     mParentPath->schedulePathUpdate();
     mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateEndCtrlPtVisibility();
@@ -414,13 +413,10 @@ void NodePoint::setEndCtrlPtEnabled(const bool &enabled) {
 
 void NodePoint::setStartCtrlPtEnabled(const bool &enabled) {
     if(enabled == mCurrentNodeSettings->startEnabled) return;
-    NodeSettings newSettings = *mCurrentNodeSettings;
-    if(newSettings.startEnabled) {
+    if(mCurrentNodeSettings->startEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
-    newSettings.startEnabled = enabled;
-    mParentPath->replaceNodeSettingsForPtId(getPtId(),
-                                            newSettings);
+    mCurrentNodeSettings->startEnabled = enabled;
     mParentPath->schedulePathUpdate();
     mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateStartCtrlPtVisibility();
@@ -497,9 +493,7 @@ bool NodePoint::isSeparateNodePoint() {
 
 void NodePoint::setCtrlsMode(const CtrlsMode &mode) {
     NodeSettings newSettings = *mCurrentNodeSettings;
-    newSettings.ctrlsMode = mode;
-    mParentPath->replaceNodeSettingsForPtId(getPtId(),
-                                            newSettings);
+    mCurrentNodeSettings->ctrlsMode = mode;
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
         QPointF newStartPos;
         QPointF newEndPos;
@@ -609,7 +603,7 @@ NodePointValues operator+(const NodePointValues &ppv1,
 
 NodePointValues operator/(const NodePointValues &ppv,
                           const qreal &val) {
-    qreal invVal = 1.f/val;
+    qreal invVal = 1./val;
     return NodePointValues(ppv.startRelPos * invVal,
                            ppv.pointRelPos * invVal,
                            ppv.endRelPos * invVal);

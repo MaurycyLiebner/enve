@@ -6,19 +6,18 @@
 #include <memory>
 #include "stdpointer.h"
 
-#define SPtrGetAs(baseObjT, derivedClassT) derivedClassT::getAs<derivedClassT>(baseObjT)
+#define getAsPtr(baseObjT, derivedClassT) derivedClassT::getAsPtr<derivedClassT>(baseObjT)
+#define getAsSPtr(baseObjT, derivedClassT) derivedClassT::getAsSPtr<derivedClassT>(baseObjT)
+
 #define SPtrCreate(classT) classT::create<classT>
 #define classQPtrs(classT) class classT; \
     typedef QSharedPointer<classT> classT##QSPtr; \
-    typedef QWeakPointer<classT> classT##QWPtr; \
     typedef QPointer<classT> classT##QPtr;
 #define classPtrs(classT) class classT; \
     typedef std::shared_ptr<classT> classT##SPtr; \
-    typedef std::weak_ptr<classT> classT##WPtr; \
     typedef StdPointer<classT> classT##Ptr;
 #define structPtrs(structT) struct structT; \
     typedef std::shared_ptr<structT> structT##SPtr; \
-    typedef std::weak_ptr<structT> structT##WPtr; \
     typedef StdPointer<structT> structT##Ptr;
 
 classQPtrs(BoundingBox)
@@ -36,13 +35,26 @@ classQPtrs(VideoBox)
 classQPtrs(PaintBox)
 classQPtrs(BonesBox)
 classQPtrs(ExternalLinkBox)
+classQPtrs(InternalLinkCanvas)
 
+classQPtrs(SingleWidgetTarget)
+classQPtrs(WindowSingleWidgetTarget)
+
+classQPtrs(Property)
+classQPtrs(IntProperty)
+classQPtrs(BoolProperty)
+classQPtrs(ComboBoxProperty)
+
+classQPtrs(Animator)
+classQPtrs(QStringAnimator)
 classQPtrs(QPointFAnimator)
 classQPtrs(QrealAnimator)
-classQPtrs(IntPropertyQSPtr)
+classQPtrs(RandomQrealGenerator)
+classQPtrs(IntAnimator)
 classQPtrs(ColorAnimator)
-classQPtrs(BoolProperty)
-classQPtrs(SingleWidgetTarget)
+classQPtrs(ComplexAnimator)
+classQPtrs(BoolPropertyContainer)
+
 classQPtrs(VectorPathAnimator)
 classQPtrs(PathAnimator)
 classQPtrs(Gradient)
@@ -53,14 +65,18 @@ classQPtrs(Bone)
 classQPtrs(AnimationBox)
 classQPtrs(ParticleEmitter)
 classQPtrs(InternalLinkBox)
-classQPtrs(ComplexAnimator)
-classQPtrs(PixmapEffect)
-classQPtrs(PathEffect)
-classQPtrs(Property)
 classQPtrs(BoxTargetProperty)
-classQPtrs(QrealAnimator)
-classQPtrs(Animator)
-classQPtrs(QStringAnimator)
+
+classQPtrs(EffectAnimators)
+classQPtrs(PixmapEffect)
+
+classQPtrs(PathEffectAnimators)
+classQPtrs(PathEffect)
+classQPtrs(DisplacePathEffect)
+classQPtrs(DuplicatePathEffect)
+classQPtrs(LengthPathEffect)
+classQPtrs(SolidifyPathEffect)
+
 classQPtrs(InternalLinkGroupBox)
 classQPtrs(SingleSound)
 classQPtrs(SoundComposition)
@@ -73,19 +89,42 @@ classQPtrs(BasicTransformAnimator)
 classQPtrs(BoxTransformAnimator)
 classQPtrs(BoneTransformAnimator)
 
-classQPtrs(OutputSettingsProfile)
+classPtrs(OutputSettingsProfile)
+
+classPtrs(PaintSetting)
+classPtrs(SvgNodePoint)
+classPtrs(SvgSeparatePath)
 
 classPtrs(VectorPathEdge)
+
 classPtrs(MinimalExecutor)
 classPtrs(_ScheduledExecutor)
+classPtrs(FileCacheHandler)
+classPtrs(ImageCacheHandler)
+classPtrs(AnimationCacheHandler)
+classPtrs(ImageSequenceCacheHandler)
+classPtrs(VideoCacheHandler)
+classPtrs(SoundCacheHandler)
+
 classPtrs(CacheContainer)
-classPtrs(FunctionWaitingForBoxLoad)
+structPtrs(FunctionWaitingForBoxLoad)
+classPtrs(AnimatorUpdater)
+classPtrs(SingleWidgetAbstraction)
+
+classPtrs(TilesData)
+classPtrs(SurfaceKey)
+classQPtrs(AnimatedSurface)
+
 classPtrs(Key)
 classPtrs(PathKey)
 classPtrs(QrealKey)
 classPtrs(ComplexKey)
-classPtrs(AnimatorUpdater)
-classPtrs(SingleWidgetAbstraction)
+classPtrs(QStringKey)
+
+classPtrs(ClipboardContainer)
+classPtrs(KeysClipboardContainer)
+classPtrs(BoxesClipboardContainer)
+classPtrs(PropertyClipboardContainer)
 
 classPtrs(MovablePoint)
 classPtrs(PointAnimatorMovablePoint)
@@ -118,5 +157,11 @@ structPtrs(ContrastEffectRenderData)
 structPtrs(BrightnessEffectRenderData)
 structPtrs(SampledMotionBlurEffectRenderData)
 structPtrs(BrushEffectRenderData)
+
+classPtrs(RenderContainer)
+
+classPtrs(MultiplyTransformCustomizer)
+classPtrs(ReplaceTransformDisplacementCustomizer)
+classPtrs(RenderDataCustomizerFunctor)
 
 #endif // SHAREDPOINTERDEFS_H

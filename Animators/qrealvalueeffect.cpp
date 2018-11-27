@@ -1,6 +1,7 @@
 #include "qrealvalueeffect.h"
 
-QrealValueEffect::QrealValueEffect()  {
+QrealValueEffect::QrealValueEffect(const QString &name) :
+    ComplexAnimator(name) {
 
 }
 

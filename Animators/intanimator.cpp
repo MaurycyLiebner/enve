@@ -1,6 +1,6 @@
 #include "intanimator.h"
 
-IntAnimator::IntAnimator() : QrealAnimator() {
+IntAnimator::IntAnimator(const QString& name) : QrealAnimator(name) {
     setNumberDecimals(0);
 }
 

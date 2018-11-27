@@ -1,6 +1,6 @@
 #include "boolanimator.h"
 
-BoolAnimator::BoolAnimator() : IntAnimator() {
+BoolAnimator::BoolAnimator(const QString &name) : IntAnimator(name) {
     setIntValueRange(0, 1);
 }
 

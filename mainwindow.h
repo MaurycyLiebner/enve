@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "undoredo.h"
+#include "clipboardcontainer.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
 
@@ -54,10 +55,20 @@ const QString MENU_STYLESHEET =
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 //    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
+
+    static PropertyClipboardContainer* getPropertyClipboardContainer() {
+        auto contT = getInstance()->getClipboardContainer(CCT_PROPERTY);
+        return static_cast<PropertyClipboardContainer*>(contT);
+    }
+
+    static BoxesClipboardContainer* getBoxesClipboardContainer() {
+        auto contT = getInstance()->getClipboardContainer(CCT_BOXES);
+        return static_cast<BoxesClipboardContainer*>(contT);
+    }
 
     static MainWindow *getInstance();
     static void addUndoRedo(UndoRedo *uR) {
@@ -71,7 +82,7 @@ public:
     }
     UndoRedoStack *getUndoRedoStack();
 
-    void addUpdateScheduler(const std::shared_ptr<_ScheduledExecutor> &scheduler);
+    void addUpdateScheduler(const _ScheduledExecutorSPtr &scheduler);
 
     static bool isShiftPressed();
     static bool isCtrlPressed();
@@ -118,7 +129,7 @@ public:
     void setCurrentFrameForAllWidgets(const int &frame);
     void updateSettingsForCurrentCanvas();
 
-    void replaceClipboard(ClipboardContainer *container);
+    void replaceClipboard(const ClipboardContainerSPtr &container);
     ClipboardContainer *getClipboardContainer(
             const ClipboardContainerType &type);
     void addCanvas(const CanvasQSPtr &newCanvas);
@@ -135,7 +146,7 @@ public:
     FontsWidget *getFontsWidget() {
         return mFontWidget;
     }
-    void addFileUpdateScheduler(const std::shared_ptr<_ScheduledExecutor>& scheduler);
+    void addFileUpdateScheduler(const _ScheduledExecutorSPtr& scheduler);
     void finishUndoRedoSet();
     Brush *getCurrentBrush();
 
@@ -178,7 +189,7 @@ private:
     static MainWindow *mMainWindowInstance;
     MemoryHandler *mMemoryHandler;
 
-    ClipboardContainer *mClipboardContainer = nullptr;
+    ClipboardContainerSPtr mClipboardContainer;
 //    bool mRendering = false;
 
     QComboBox *mCurrentCanvasComboBox;

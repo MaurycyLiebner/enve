@@ -168,33 +168,26 @@ void BrushSettingsWidget::saveBrush() {
 
 void BrushSettingsWidget::setColorSetting(const ColorSetting &colorSetting) {
     ColorMode colorMode = colorSetting.getSettingMode();
+    QColor color;
     if(colorMode == ColorMode::HSVMODE) {
-        Brush::setHSV(colorSetting.getVal1(),
+        color.setHsvF(colorSetting.getVal1(),
                       colorSetting.getVal2(),
-                      colorSetting.getVal3());
+                      colorSetting.getVal3(),
+                      colorSetting.getAlpa());
     } else if(colorMode == ColorMode::HSLMODE) {
-        QColor color;
-        color.setHSL(colorSetting.getVal1(),
-                     colorSetting.getVal2(),
-                     colorSetting.getVal3(),
-                     colorSetting.getAlpa());
-        Brush::setHSV(color.gl_h,
-                      color.gl_s,
-                      color.gl_v);
+        color.setHslF(colorSetting.getVal1(),
+                      colorSetting.getVal2(),
+                      colorSetting.getVal3(),
+                      colorSetting.getAlpa());
     } else if(colorMode == ColorMode::RGBMODE) {
-        QColor color;
-        color.setRGB(colorSetting.getVal1(),
-                     colorSetting.getVal2(),
-                     colorSetting.getVal3(),
-                     colorSetting.getAlpa());
-        Brush::setHSV(color.gl_h,
-                      color.gl_s,
-                      color.gl_v);
+        color.setRgbF(colorSetting.getVal1(),
+                      colorSetting.getVal2(),
+                      colorSetting.getVal3(),
+                      colorSetting.getAlpa());
     }
-}
-
-float BrushSettingsWidget::getBrushSetting(const BrushSetting &settind_id) {
-    return setting_widgets.at(settind_id)->getVal();
+    Brush::setHSV(color.hsvHueF(),
+                  color.hsvSaturationF(),
+                  color.valueF());
 }
 
 void BrushSettingsWidget::incBrushRadius() {

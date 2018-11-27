@@ -9,33 +9,44 @@ Circle::Circle() :
     PathBox(TYPE_CIRCLE) {
     setName("Circle");
 
-    mCenterPoint = CircleCenterPoint::createCircleCenterPoint(mTransformAnimator,
-                                                              TYPE_PATH_POINT);
+    mCenterAnimator = SPtrCreate(QPointFAnimator)("center");
+    mCenterPoint = SPtrCreate(CircleCenterPoint)(mCenterAnimator.get(),
+                                                 mTransformAnimator.get(),
+                                                 TYPE_PATH_POINT);
     mCenterPoint->setRelativePos(QPointF(0., 0.));
+
+    mHorizontalRadiusAnimator =
+            SPtrCreate(QPointFAnimator)("horizontal radius");
     mHorizontalRadiusPoint =
-            CircleRadiusPoint::createCircleRadiusPoint(mTransformAnimator,
-                                                   TYPE_PATH_POINT,
-                                                   false, mCenterPoint);
+            SPtrCreate(CircleRadiusPoint)(mHorizontalRadiusAnimator.get(),
+                                          mTransformAnimator.get(),
+                                          TYPE_PATH_POINT,
+                                          false, mCenterPoint.get());
     mHorizontalRadiusPoint->setRelativePos(QPointF(10., 0.));
+
+    mVerticalRadiusAnimator =
+            SPtrCreate(QPointFAnimator)("vertical radius");
     mVerticalRadiusPoint =
-            CircleRadiusPoint::createCircleRadiusPoint(mTransformAnimator,
-                                                 TYPE_PATH_POINT,
-                                                 true, mCenterPoint);
+            SPtrCreate(CircleRadiusPoint)(mVerticalRadiusAnimator.get(),
+                                          mTransformAnimator.get(),
+                                          TYPE_PATH_POINT,
+                                          true, mCenterPoint.get());
     mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.));
 
     QrealAnimator *hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
-    ca_addChildAnimator(hXAnimator);
-    ca_prependChildAnimator(hXAnimator, mEffectsAnimators.data());
+    ca_addChildAnimator(getAsSPtr(hXAnimator, QrealAnimator));
+    ca_prependChildAnimator(hXAnimator, mEffectsAnimators);
     hXAnimator->prp_setName("horizontal radius");
 
     QrealAnimator *vYAnimator = mVerticalRadiusAnimator->getYAnimator();
-    ca_addChildAnimator(vYAnimator);
-    ca_prependChildAnimator(vYAnimator, mEffectsAnimators.data());
+    ca_addChildAnimator(getAsSPtr(vYAnimator, QrealAnimator));
+    ca_prependChildAnimator(vYAnimator, mEffectsAnimators);
     vYAnimator->prp_setName("vertical radius");
 
 
-    mCenterPoint->setVerticalAndHorizontalPoints(mVerticalRadiusPoint,
-                                            mHorizontalRadiusPoint);
+    mCenterPoint->setVerticalAndHorizontalPoints(
+                mVerticalRadiusPoint.get(),
+                mHorizontalRadiusPoint.get());
 
     prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
     mCenterAnimator->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
@@ -90,41 +101,41 @@ MovablePoint *Circle::getPointAtAbsPos(
                                 const QPointF &absPtPos,
                                 const CanvasMode &currentCanvasMode,
                                 const qreal &canvasScaleInv) {
-    MovablePointSPtr pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
+    MovablePoint* pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
     if(pointToReturn == nullptr) {
         if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-            return mHorizontalRadiusPoint;
+            return mHorizontalRadiusPoint.get();
         }
         if(mVerticalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-            return mVerticalRadiusPoint;
+            return mVerticalRadiusPoint.get();
         }
         if(mCenterPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mCenterPoint;
+            return mCenterPoint.get();
         }
     }
     return pointToReturn;
 }
 
 void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                               QList<MovablePoint *> &list) {
+                                               QList<MovablePointPtr> &list) {
     if(!mCenterPoint->isSelected()) {
         if(mCenterPoint->isContainedInRect(absRect)) {
             mCenterPoint->select();
-            list.append(mCenterPoint);
+            list.append(mCenterPoint.get());
         }
     }
     if(!mHorizontalRadiusPoint->isSelected()) {
         if(mHorizontalRadiusPoint->isContainedInRect(absRect)) {
             mHorizontalRadiusPoint->select();
-            list->append(mHorizontalRadiusPoint);
+            list.append(mHorizontalRadiusPoint.get());
         }
     }
     if(!mVerticalRadiusPoint->isSelected()) {
         if(mVerticalRadiusPoint->isContainedInRect(absRect)) {
             mVerticalRadiusPoint->select();
-            list->append(mVerticalRadiusPoint);
+            list.append(mVerticalRadiusPoint.get());
         }
     }
 }
@@ -199,18 +210,14 @@ void CircleCenterPoint::finishTransform() {
     mParentTransform_cv->prp_finishTransform();
 }
 
-CircleRadiusPoint::CircleRadiusPoint(const BasicTransformAnimatorQSPtr& parent,
+CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator *associatedAnimator,
+                                     BasicTransformAnimator* parent,
                                      const MovablePointType &type,
                                      const bool &blockX,
                                      MovablePoint *centerPoint) :
-    PointAnimatorMovablePoint(parent, type) {
+    PointAnimatorMovablePoint(associatedAnimator, parent, type) {
     mCenterPoint_cv = centerPoint;
     mXBlocked = blockX;
-}
-
-CircleRadiusPointSPtr CircleRadiusPoint::createCircleRadiusPoint(const BasicTransformAnimatorQSPtr &parent, const MovablePointType &type, const bool &blockX, const MovablePointSPtr &centerPoint) {
-    return SPtrCreate(CircleRadiusPoint)(
-                parent, type, blockX, centerPoint.get());
 }
 
 void CircleRadiusPoint::moveByRel(const QPointF &relTranslation) {

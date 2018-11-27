@@ -9,22 +9,21 @@ class BoundingBox;
 class SkImage;
 class SkCanvas;
 class SkBitmap;
-class BoundingBoxRenderData;
+struct BoundingBoxRenderData;
 struct PixmapEffectRenderData;
 
 #include "sharedpointerdefs.h"
 
 class EffectAnimators : public ComplexAnimator {
+    friend class SelfRef;
 public:
-    EffectAnimators(BoundingBox *parentBox);
-
-    void addEffect(PixmapEffect *effect);
+    void addEffect(const PixmapEffectQSPtr &effect);
 
     qreal getEffectsMargin() const;
 
     void setParentBox(BoundingBox *box);
     BoundingBox *getParentBox() {
-        return mParentBox;
+        return mParentBox_k;
     }
 
     bool hasEffects();
@@ -41,8 +40,10 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
     void readPixmapEffect(QIODevice *target);
+protected:
+    EffectAnimators(BoundingBox *parentBox);
 private:
-    BoundingBox *mParentBox = nullptr;
+    BoundingBox * const mParentBox_k;
 };
 
 #endif // EFFECTANIMATORS_H

@@ -65,24 +65,8 @@ protected:
     FunctionWaitingForBoxLoad(const int &boxIdT);
 };
 
-class BoundingBoxMimeData : public QMimeData {
-    Q_OBJECT
-public:
-    BoundingBoxMimeData(BoundingBox *target) : QMimeData() {
-        mBoundingBox = target;
-    }
-
-    BoundingBox *getBoundingBox() {
-        return mBoundingBox;
-    }
-
-    bool hasFormat(const QString &mimetype) const {
-        if(mimetype == "boundingbox") return true;
-        return false;
-    }
-private:
-    BoundingBox *mBoundingBox;
-};
+typedef PropertyMimeData<BoundingBox,
+    InternalMimeData::BOUNDING_BOX> BoundingBoxMimeData;
 
 class BoundingBox : public ComplexAnimator {
     Q_OBJECT
@@ -156,7 +140,7 @@ public:
                        const bool &saveUndoRedo = true);
 
     virtual void selectAndAddContainedPointsToList(
-            const QRectF &, QList<MovablePoint*>&) {}
+            const QRectF &, QList<MovablePointPtr>&) {}
 
     QPointF getPivotAbsPos();
     virtual void select();
@@ -275,6 +259,11 @@ public:
 
 
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
+    template <class T>
+    void addEffect() {
+        addEffect(T::template create<T>());
+    }
+
     void addEffect(const PixmapEffectQSPtr &effect);
     void removeEffect(const PixmapEffectQSPtr &effect);
 
@@ -308,7 +297,7 @@ public:
 
     bool SWT_isBoundingBox() { return true; }
 
-    SingleWidgetAbstractionSPtr SWT_getAbstractionForWidget(
+    SingleWidgetAbstraction* SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
@@ -411,14 +400,7 @@ public:
 
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData* renderData);
-    virtual bool shouldScheduleUpdate() {
-        if(mParentGroup == nullptr) return false;
-        if((isVisibleAndInVisibleDurationRect()) ||
-           (isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame))) {
-            return true;
-        }
-        return false;
-    }
+    virtual bool shouldScheduleUpdate();
 
 //    BoundingBoxRenderData *getCurrentRenderData() {
 //        return getCurrentRenderData(anim_mCurrentRelFrame);
@@ -442,7 +424,7 @@ public:
                                                const int &relFrame,
                                                const bool &takeAncestorsIntoAccount = true);
     virtual void processSchedulers();
-    void addScheduler(_ScheduledExecutor *updatable);
+    void addScheduler(const _ScheduledExecutorSPtr &updatable);
     virtual void addSchedulersToProcess();
 
     const int &getLoadId() {
@@ -459,20 +441,22 @@ public:
     }
 
     static BoundingBox *getLoadedBoxById(const int &loadId) {
-        foreach(const BoundingBoxQSPtr& box, mLoadedBoxes) {
+        foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
+            if(box == nullptr) return nullptr;
             if(box->getLoadId() == loadId) {
-                return box.get();
+                return box;
             }
         }
         return nullptr;
     }
 
-    static void addFunctionWaitingForBoxLoad(FunctionWaitingForBoxLoad *func) {
-        mFunctionsWaitingForBoxLoad << func->ref<FunctionWaitingForBoxLoad>();
+    static void addFunctionWaitingForBoxLoad(
+            const FunctionWaitingForBoxLoadSPtr& func) {
+        mFunctionsWaitingForBoxLoad << func;
     }
 
     static void addLoadedBox(BoundingBox *box) {
-        mLoadedBoxes << box->ref<BoundingBox>();
+        mLoadedBoxes << box;
         for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
             FunctionWaitingForBoxLoadSPtr funcT =
                     mFunctionsWaitingForBoxLoad.at(i);
@@ -489,7 +473,7 @@ public:
     }
 
     static void clearLoadedBoxes() {
-        foreach(const BoundingBoxQSPtr& box, mLoadedBoxes) {
+        foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
             box->clearBoxLoadId();
         }
         mLoadedBoxes.clear();
@@ -601,7 +585,8 @@ protected:
     QList<BoundingBoxQPtr> mLinkingBoxes;
 
     RenderDataHandler mCurrentRenderDataHandler;
-    RenderContainer mDrawRenderContainer;
+    RenderContainerSPtr mDrawRenderContainer =
+            SPtrCreate(RenderContainer)();
 
     DurationRectangleQSPtr mDurationRectangle;
 
@@ -610,7 +595,7 @@ protected:
 
     QList<_ScheduledExecutorSPtr> mSchedulers;
 
-    static QList<BoundingBoxQSPtr> mLoadedBoxes;
+    static QList<BoundingBoxQPtr> mLoadedBoxes;
     static QList<FunctionWaitingForBoxLoadSPtr> mFunctionsWaitingForBoxLoad;
 private:
     void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);

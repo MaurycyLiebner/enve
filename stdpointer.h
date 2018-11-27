@@ -5,8 +5,6 @@
 
 template <class T>
 class StdPointer {
-    Q_STATIC_ASSERT_X(!std::is_pointer<T>::value, "StdPointer's template type must not be a pointer type");
-
     std::weak_ptr<StdSelfRef> wp;
     StdSelfRef* rp = nullptr;
 
@@ -19,8 +17,14 @@ class StdPointer {
         }
     }
 public:
-    inline StdPointer() { }
-    inline StdPointer(T *p) : wp(p, true), rp(p) { }
+    inline StdPointer() {
+        static_assert(std::is_base_of<StdSelfRef, T>::value,
+                      "StdPointer can be used only for StdSelfRef derived classes");
+    }
+    inline StdPointer(T *p) : wp(p->template weakRef<T>()), rp(p) {
+        static_assert(std::is_base_of<StdSelfRef, T>::value,
+                      "StdPointer can be used only for StdSelfRef derived classes");
+    }
     // compiler-generated copy/move ctor/assignment operators are fine!
     // compiler-generated dtor is fine!
 

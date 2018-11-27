@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     mRightDock = new QDockWidget(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
     mRightDock->setWidget(mFillStrokeSettings);
-    mRightDock->setFeatures(0);
+    mRightDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     mRightDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
     mRightDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mBottomDock = new QDockWidget(this);
 
-    mBottomDock->setFeatures(0);
+    mBottomDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
@@ -222,7 +222,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mEventFilterDisabled = false;
 
-    QApplication::instance()->installEventFilter((QObject*)this);
+    QApplication::instance()->installEventFilter(this);
 }
 
 MainWindow::~MainWindow() {
@@ -480,9 +480,8 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
 }
 
-void MainWindow::replaceClipboard(ClipboardContainer *container) {
+void MainWindow::replaceClipboard(const ClipboardContainerSPtr& container) {
     if(mClipboardContainer != nullptr) {
-        delete mClipboardContainer;
         BoundingBox::clearLoadedBoxes();
     }
     mClipboardContainer = container;
@@ -492,7 +491,7 @@ ClipboardContainer *MainWindow::getClipboardContainer(
         const ClipboardContainerType &type) {
     if(mClipboardContainer == nullptr) return nullptr;
     if(type == mClipboardContainer->getType()) {
-        return mClipboardContainer;
+        return mClipboardContainer.get();
     }
     return nullptr;
 }
@@ -938,11 +937,11 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
     updateTitle();
 }
 
-void MainWindow::addUpdateScheduler(const std::shared_ptr<_ScheduledExecutor>& scheduler) {
-    mUpdateSchedulers.append(scheduler->ref<_ScheduledExecutor>());
+void MainWindow::addUpdateScheduler(const _ScheduledExecutorSPtr& scheduler) {
+    mUpdateSchedulers.append(scheduler);
 }
 
-void MainWindow::addFileUpdateScheduler(const std::shared_ptr<_ScheduledExecutor>& scheduler) {
+void MainWindow::addFileUpdateScheduler(const _ScheduledExecutorSPtr& scheduler) {
     mCanvasWindow->addFileUpdatableAwaitingUpdate(scheduler);
 }
 
@@ -1010,7 +1009,7 @@ void MainWindow::setCurrentBox(BoundingBox *box) {
         mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
                                                 box->getStrokeSettings());
         if(box->SWT_isTextBox()) {
-            TextBox *txtBox = (TextBox*)box;
+            TextBox *txtBox = getAsPtr(box, TextBox);
             mFontWidget->setCurrentSettings(txtBox->getFontSize(),
                                             txtBox->getFontFamily(),
                                             txtBox->getFontStyle());
@@ -1097,21 +1096,6 @@ void MainWindow::newFile() {
     }
 }
 
-/// Gives human-readable event type information.
-QDebug operator<<(QDebug str, const QEvent * ev) {
-   static int eventEnumIndex = QEvent::staticMetaObject
-         .indexOfEnumerator("Type");
-   str << "QEvent";
-   if (ev) {
-      QString name = QEvent::staticMetaObject
-            .enumerator(eventEnumIndex).valueToKey(ev->type());
-      if (!name.isEmpty()) str << name; else str << ev->type();
-   } else {
-      str << (void*)ev;
-   }
-   return str.maybeSpace();
-}
-
 bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
@@ -1121,7 +1105,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         if(focusWidget->property("forceHandleEvent").isValid()) return false;
     }
     if(e->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = (QKeyEvent*)e;
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
         if(keyEvent->key() == Qt::Key_Delete && focusWidget != nullptr) {
             mEventFilterDisabled = true;
             bool widHandled = QCoreApplication::sendEvent(focusWidget, keyEvent);
@@ -1130,7 +1114,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         }
         return processKeyEvent(keyEvent);
     } else if(e->type() == QEvent::ShortcutOverride) {
-        QKeyEvent *keyEvent = (QKeyEvent*)e;
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
         if(isShiftPressed() && keyEvent->key() == Qt::Key_D) {
             return processKeyEvent(keyEvent);
         }
@@ -1163,9 +1147,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         finishUndoRedoSet();
     } else if(obj == mCanvasWindow->getCanvasWidget()) {
         if(e->type() == QEvent::Drop) {
-            mCanvasWindow->dropEvent((QDropEvent*)e);
+            mCanvasWindow->dropEvent(static_cast<QDropEvent*>(e));
         } else if(e->type() == QEvent::DragEnter) {
-            mCanvasWindow->dragEnterEvent((QDragEnterEvent*)e);
+            mCanvasWindow->dragEnterEvent(static_cast<QDragEnterEvent*>(e));
         } else if(e->type() == QEvent::FocusIn) {
             mCanvasWindow->getCanvasWidget();
         }

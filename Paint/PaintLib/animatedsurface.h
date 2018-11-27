@@ -6,8 +6,8 @@
 class PaintBox;
 
 class SurfaceKey : public Key {
+    friend class StdSelfRef;
 public:
-    SurfaceKey(Animator *parentAnimator);
     ~SurfaceKey();
 
     void setSize(const ushort &width,
@@ -20,19 +20,24 @@ public:
     }
 
     TilesData *getTilesData() { return mTiles.get(); }
-    void setTiles(TilesData *tiles) { mTiles = tiles->ref<TilesData>(); }
+    void setTiles(const TilesDataSPtr& tiles) {
+        mTiles = tiles;
+    }
     bool differsFromKey(Key *key) { return key != this; }
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
     void duplicateTilesContentFrom(TilesData *tilesSrc) {
         mTiles->duplicateTilesContentFrom(tilesSrc);
     }
+protected:
+    SurfaceKey(Animator *parentAnimator);
 private:
-    std::shared_ptr<TilesData> mTiles;
+    TilesDataSPtr mTiles;
 };
 
 class AnimatedSurface : public Surface,
                         public Animator {
+    friend class SelfRef;
 public:
     AnimatedSurface(const ushort &widthT,
                     const ushort &heightT,
@@ -50,9 +55,9 @@ public:
 
     void updateTargetTiles();
 
-    void anim_removeKey(Key *keyToRemove,
+    void anim_removeKey(const KeySPtr &keyToRemove,
                         const bool &saveUndoRedo = true);
-    void anim_appendKey(Key *newKey,
+    void anim_appendKey(const KeySPtr &newKey,
                         const bool &saveUndoRedo = true,
                         const bool &update = true);
     void anim_moveKeyToRelFrame(Key *key,
@@ -76,7 +81,7 @@ public:
     void setOverlapFrames(const int &overlapFrames) {
         mOverlapFrames = overlapFrames;
     }
-    Key *readKey(QIODevice *target);
+    KeySPtr readKey(QIODevice *target);
     void move(const int &xT, const int &yT);
 
     void tabletPressEvent(const qreal &xT,
@@ -98,7 +103,7 @@ public:
 protected:
     PaintBox *mParentBox = nullptr;
 
-    QList<std::shared_ptr<TilesData>> mDrawTilesData;
+    QList<TilesDataSPtr> mDrawTilesData;
     QList<int> mDrawTilesFrames;
     int mOverlapFrames = 2;
     bool mIsDraft = false;

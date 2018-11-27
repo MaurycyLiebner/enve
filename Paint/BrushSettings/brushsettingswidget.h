@@ -12,11 +12,10 @@ class BrushSelectionScrollArea;
 class BrushSettingsWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit BrushSettingsWidget(QWidget *parent = 0);
+    explicit BrushSettingsWidget(QWidget *parent = nullptr);
     void setBrushWidgetSetting(const BrushSetting &setting_id,
                                const qreal &val_t,
                                const bool &edited_t);
-    float getBrushSetting(const BrushSetting &settind_id);
     void incBrushRadius();
     void decBrushRadius();
     void revertSettingToDefault(const BrushSetting &setting_t);

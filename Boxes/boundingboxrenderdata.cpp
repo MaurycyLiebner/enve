@@ -4,15 +4,10 @@
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
     if(parentBoxT == nullptr) return;
-    parentBox = parentBoxT->weakRef<BoundingBox>();
+    parentBox = parentBoxT;
 }
 
-BoundingBoxRenderData::~BoundingBoxRenderData() {
-    foreach(RenderDataCustomizerFunctor *functor,
-            mRenderDataCustomizerFunctors) {
-        delete functor;
-    }
-}
+BoundingBoxRenderData::~BoundingBoxRenderData() {}
 
 #include "skimagecopy.h"
 void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
@@ -35,11 +30,11 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     copied = true;
 }
 
-BoundingBoxRenderData *BoundingBoxRenderData::makeCopy() {
+BoundingBoxRenderDataSPtr BoundingBoxRenderData::makeCopy() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return nullptr;
     BoundingBoxRenderDataSPtr copy = parentBoxT->createRenderData();
-    copy->copyFrom(ref<BoundingBoxRenderData>());
+    copy->copyFrom(this);
     return copy;
 }
 
@@ -52,10 +47,11 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     if(opacity < 0.001) return;
     canvas->save();
-    canvas->scale(1.f/(SkScalar)resolution, 1.f/(SkScalar)resolution);
+    SkScalar invScale = 1.f/qrealToSkScalar(resolution);
+    canvas->scale(invScale, invScale);
     renderToImage();
     SkPaint paint;
-    paint.setAlpha(qRound(opacity*2.55));
+    paint.setAlpha(static_cast<U8CPU>(qRound(opacity*2.55)));
     paint.setBlendMode(blendMode);
     //paint.setAntiAlias(true);
     //paint.setFilterQuality(kHigh_SkFilterQuality);
@@ -113,8 +109,8 @@ void BoundingBoxRenderData::renderToImage() {
     SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
     //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
-    rasterCanvas->translate(-globalBoundingRect.left(),
-                            -globalBoundingRect.top());
+    rasterCanvas->translate(qrealToSkScalar(-globalBoundingRect.left()),
+                            qrealToSkScalar(-globalBoundingRect.top()));
     rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
 
     drawSk(rasterCanvas);
@@ -127,7 +123,7 @@ void BoundingBoxRenderData::renderToImage() {
     if(!pixmapEffects.isEmpty()) {
         SkPixmap pixmap;
         bitmap.peekPixels(&pixmap);
-        fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
+        fmt_filters::image img(static_cast<uint8_t*>(pixmap.writable_addr()),
                                pixmap.width(), pixmap.height());
         foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
@@ -163,7 +159,7 @@ void BoundingBoxRenderData::afterUpdate() {
     }
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != nullptr && parentIsTarget) {
-        parentBoxT->renderDataFinished(ref<BoundingBoxRenderData>());
+        parentBoxT->renderDataFinished(this);
         // qDebug() << "box render finished:" << relFrame << parentBoxT->prp_getName();
     }
     _ScheduledExecutor::afterUpdate();
@@ -180,16 +176,13 @@ void BoundingBoxRenderData::schedulerProccessed() {
     if(parentBoxT != nullptr) {
         if(useCustomRelFrame) {
             parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
-                        customRelFrame,
-                        ref<BoundingBoxRenderData>());
+                        customRelFrame, this);
         } else {
             parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
-                        relFrame,
-                        ref<BoundingBoxRenderData>());
+                        relFrame, this);
         }
-        foreach(RenderDataCustomizerFunctor *customizer,
-                mRenderDataCustomizerFunctors) {
-            (*customizer)(ref<BoundingBoxRenderData>());
+        foreach(const auto& customizer, mRenderDataCustomizerFunctors) {
+            (*customizer)(this);
         }
     }
     mDataSet = false;
@@ -202,16 +195,19 @@ void BoundingBoxRenderData::schedulerProccessed() {
 void BoundingBoxRenderData::addSchedulerNow() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return;
-    parentBoxT->addScheduler(this);
+    parentBoxT->addScheduler(getAsSPtr(this, _ScheduledExecutor));
 }
 
 void BoundingBoxRenderData::dataSet() {
     if(allDataReady()) {
         mDataSet = true;
-        if(!relBoundingRectSet) updateRelBoundingRect();
+        if(!relBoundingRectSet) {
+            relBoundingRectSet = true;
+            updateRelBoundingRect();
+        }
         BoundingBox *parentBoxT = parentBox.data();
         if(parentBoxT == nullptr || !parentIsTarget) return;
-        parentBoxT->updateCurrentPreviewDataFromRenderData(ref<BoundingBoxRenderData>());
+        parentBoxT->updateCurrentPreviewDataFromRenderData(this);
     }
 }
 
@@ -219,7 +215,7 @@ RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
 
 RenderDataCustomizerFunctor::~RenderDataCustomizerFunctor() {}
 
-void RenderDataCustomizerFunctor::operator()(const BoundingBoxRenderDataSPtr &data) {
+void RenderDataCustomizerFunctor::operator()(BoundingBoxRenderData* data) {
     customize(data);
 }
 
@@ -230,7 +226,7 @@ ReplaceTransformDisplacementCustomizer::ReplaceTransformDisplacementCustomizer(
 }
 
 void ReplaceTransformDisplacementCustomizer::customize(
-        const BoundingBoxRenderDataSPtr &data) {
+        BoundingBoxRenderData* data) {
     QMatrix transformT = data->transform;
     data->transform.setMatrix(transformT.m11(), transformT.m12(),
                               transformT.m21(), transformT.m22(),

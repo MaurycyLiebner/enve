@@ -28,8 +28,8 @@ public:
 
     const QFont &getFont() const { return mFont; }
 private:
-    QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;
+    QFont mFont;
 };
 
 class GradientsSvgCollection {
@@ -77,6 +77,7 @@ public:
     Gradient *getGradient() const;
 
     void apply(BoundingBox *box);
+    void apply(BoundingBox *box, const bool &isFill);
 protected:
     QColor mColor = QColor(0, 0, 0);
     PaintType mPaintType = FLATPAINT;//NOPAINT;
@@ -155,7 +156,7 @@ protected:
     TextSvgAttributes mTextAttributes;
 };
 
-class SvgNodePoint {
+class SvgNodePoint : public StdSelfRef {
 public:
     SvgNodePoint(QPointF point);
 
@@ -173,9 +174,9 @@ public:
 
     QPointF getEndPoint() const;
 
-    bool getStartPointEnabled();
+    bool getStartPointEnabled() const;
 
-    bool getEndPointEnabled();
+    bool getEndPointEnabled() const;
 
     void applyTransfromation(const QMatrix &transformation);
 private:
@@ -189,11 +190,9 @@ private:
 
 class PathAnimator;
 class VectorPathAnimator;
-class SvgSeparatePath {
+class SvgSeparatePath : public StdSelfRef {
+    friend class StdSelfRef;
 public:
-    SvgSeparatePath();
-    virtual ~SvgSeparatePath();
-
     void apply(VectorPathAnimator *path);
 
     void closePath();
@@ -216,43 +215,40 @@ public:
                  qreal x,
                  qreal y,
                  qreal curx, qreal cury);
+protected:
+    SvgSeparatePath() {}
 private:
     void pathArcSegment(qreal xc, qreal yc,
                         qreal th0, qreal th1,
                         qreal rx, qreal ry, qreal xAxisRotation);
 
-    void addPoint(SvgNodePoint *point);
+    void addPoint(const SvgNodePointSPtr& point);
 
     bool mClosedPath = false;
-    SvgNodePoint *mFirstPoint = nullptr;
-    SvgNodePoint *mLastPoint = nullptr;
-    QList<SvgNodePoint*> mPoints;
+    SvgNodePointPtr mFirstPoint;
+    SvgNodePointPtr mLastPoint;
+    QList<SvgNodePointSPtr> mPoints;
 };
 
 
 class VectorPathSvgAttributes : public BoundingBoxSvgAttributes {
 public:
     VectorPathSvgAttributes() {}
-    ~VectorPathSvgAttributes() {
-        Q_FOREACH(SvgSeparatePath *path, mSvgSeparatePaths) {
-            delete path;
-        }
-    }
 
     SvgSeparatePath *newSeparatePath() {
-        SvgSeparatePath *lastPath = new SvgSeparatePath();
+        SvgSeparatePathSPtr lastPath = SPtrCreate(SvgSeparatePath)();
         mSvgSeparatePaths << lastPath;
-        return lastPath;
+        return lastPath.get();
     }
     void apply(VectorPath *path);
 protected:
-    QList<SvgSeparatePath*> mSvgSeparatePaths;
+    QList<SvgSeparatePathSPtr> mSvgSeparatePaths;
 };
 
 
 extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
                         BoundingBoxSvgAttributes *parentGroupAttributes);
-extern BoxesGroup *loadSVGFile(const QString &filename);
+extern BoxesGroupQSPtr loadSVGFile(const QString &filename);
 /*
 #include <QStringRef>
 #include <QPainterPath>

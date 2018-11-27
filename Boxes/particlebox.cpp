@@ -56,7 +56,7 @@ void ParticleBox::prp_setAbsFrame(const int &frame) {
 }
 
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
-    if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
+    if(mRelBoundingRect.contains(relPos.x(), relPos.y())) {
         /*if(mEmitters.isEmpty()) */return true;
 //        Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
 //            if(emitter->relPointInsidePath(relPos)) {
@@ -177,7 +177,7 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                    QList<MovablePoint *> &list) {
+                                                    QList<MovablePointPtr> &list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
@@ -505,14 +505,14 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
                                            0., stateT.size,
                                            0., 0.)*particleData->transform;
                 renderData->appendRenderCustomizerFunctor(
-                            new MultiplyTransformCustomizer(multMatr,
-                                                            stateT.opacity/255.));
+                            SPtrCreate(MultiplyTransformCustomizer)(
+                                multMatr, stateT.opacity/255.));
                 renderData->appendRenderCustomizerFunctor(
-                            new ReplaceTransformDisplacementCustomizer(
+                            SPtrCreate(ReplaceTransformDisplacementCustomizer)(
                                 stateT.pos.x(), stateT.pos.y()));
 
                 stateT.targetRenderData =
-                        renderData->ref<BoundingBoxRenderData>();
+                        getAsSPtr(renderData, BoundingBoxRenderData);
                 renderData->maxBoundsEnabled = false;
                 renderData->parentIsTarget = false;
                 data.particleStates << stateT;

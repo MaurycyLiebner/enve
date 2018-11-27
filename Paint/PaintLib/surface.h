@@ -52,7 +52,7 @@ public:
             const ushort &heightT,
             const qreal &scale,
             const bool &paintInOtherThread);
-    ~Surface();
+    virtual ~Surface();
     void strokeTo(const Brush *brush,
                   qreal x, qreal y,
                   const qreal &pressure,
@@ -76,7 +76,8 @@ public:
     virtual void getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers);
 
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
-        canvas->scale(1./mScale, 1./mScale);
+        canvas->scale(qrealToSkScalar(1./mScale),
+                      qrealToSkScalar(1./mScale));
         mCurrentTiles->drawSk(canvas, paint);
     }
 
@@ -133,16 +134,27 @@ public:
                          qreal *blue_t,
                          qreal *alpha_t) const;
 protected:
-    bool mIsTemporary = false;
     void addPickedUpRGBAFromNewStroke(qreal red_t,
                                       qreal green_t,
                                       qreal blue_t,
                                       qreal alpha_t, const Brush *brush);
     void resetPickedUpRGBA(const Brush *brush);
 
+    void getTileIdsOnRect(const qreal &x_min,
+                          const qreal &x_max,
+                          const qreal &y_min,
+                          const qreal &y_max,
+                          int *tile_x_min,
+                          int *tile_x_max,
+                          int *tile_y_min,
+                          int *tile_y_max);
+    virtual void currentDataModified() {}
+
+    bool mIsTemporary = false;
+
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;
-    QColor mBackgroundColor = Color(1.f, 1.f, 1.f);
+    QColor mBackgroundColor = QColor(255, 255, 255);
 
     qreal mScale = 1.;
     qreal countDabsTo(const qreal &dist_between_dabs,
@@ -188,26 +200,17 @@ protected:
     qreal mLastPaintedStrokeY = 0.;
     qreal mLastStrokePress = 0.;
 
-    ushort mWidth = 0;
-    ushort mHeight = 0;
-    ushort mNTileCols = 0;
-    ushort mNTileRows = 0;
+    int mWidth = 0;
+    int mHeight = 0;
+    int mNTileCols = 0;
+    int mNTileRows = 0;
 
     qreal picked_up_red = 0.;
     qreal picked_up_green = 0.;
     qreal picked_up_blue = 0.;
     qreal picked_up_alpha = 0.;
 
-    std::shared_ptr<TilesData> mCurrentTiles;
-    void getTileIdsOnRect(const qreal &x_min,
-                          const qreal &x_max,
-                          const qreal &y_min,
-                          const qreal &y_max,
-                          short *tile_x_min,
-                          short *tile_x_max,
-                          short *tile_y_min,
-                          short *tile_y_max);
-    virtual void currentDataModified() {}
+    TilesDataSPtr mCurrentTiles;
 };
 
 #endif // SURFACE_H

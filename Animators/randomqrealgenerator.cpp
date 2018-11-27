@@ -8,34 +8,30 @@
 #include "Properties/intproperty.h"
 
 RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
-                                           const int &lastFrame) {
-    prp_setName("noise");
-    mPeriod = SPtrCreate(QrealAnimator)();
-    mPeriod->prp_setName("period");
+                                           const int &lastFrame) :
+    QrealValueEffect("noise") {
+    mPeriod = SPtrCreate(QrealAnimator)("period");
     mPeriod->qra_setValueRange(1., 999.);
     mPeriod->qra_setCurrentValue(10.);
-    mPeriod->prp_setBlockedUpdater(SPtrCreate(RandomQrealGeneratorUpdater)(this));
+    mPeriod->prp_setBlockedUpdater(
+                SPtrCreate(RandomQrealGeneratorUpdater)(this));
     ca_addChildAnimator(mPeriod);
-    mSmoothness = SPtrCreate(QrealAnimator)();
-    mSmoothness->prp_setName("smoothness");
+    mSmoothness = SPtrCreate(QrealAnimator)("smoothness");
     mSmoothness->qra_setValueRange(0., 1.);
     ca_addChildAnimator(mSmoothness);
-    mMaxDev = SPtrCreate(QrealAnimator)();
-    mMaxDev->prp_setName("amplitude");
+    mMaxDev = SPtrCreate(QrealAnimator)("amplitude");
     mMaxDev->qra_setValueRange(0., 999.);
     ca_addChildAnimator(mMaxDev);
-    mType = (new ComboBoxProperty(QStringList() <<
-                                  "add" << "subtract" << "overlay"))
-            ->ref<ComboBoxProperty>();
-    mType->prp_setName("type");
+    mType = SPtrCreate(ComboBoxProperty)("type",
+                QStringList() << "add" << "subtract" << "overlay");
     ca_addChildAnimator(mType);
 
-    mSeedAssist = SPtrCreate(IntProperty)();
-    mSeedAssist->prp_setName("seed");
+    mSeedAssist = SPtrCreate(IntProperty)("seed");
     mSeedAssist->setValueRange(0, 9999);
     mSeedAssist->setCurrentValue(0);
     ca_addChildAnimator(mSeedAssist);
-    mSeedAssist->prp_setBlockedUpdater(SPtrCreate(RandomQrealGeneratorUpdater)(this));
+    mSeedAssist->prp_setBlockedUpdater(
+                SPtrCreate(RandomQrealGeneratorUpdater)(this));
 
     mFirstFrame = firstFrame;
     mLastFrame = lastFrame;
@@ -204,7 +200,8 @@ qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
     int nextFrame = relFrame;
     qreal nextPeriod = prevPeriod;
     while(true) {
-        QrealKey *nextKey = (QrealKey*)mPeriod->anim_getNextKey(nextFrame);
+        QrealKey *nextKey =
+                getAsPtr(mPeriod->anim_getNextKey(nextFrame), QrealKey);
         if(nextKey == nullptr) {
             totDeltaX += qMax(0., prevPeriod - A/prevPeriod);
             break;
@@ -221,8 +218,10 @@ qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
             if(qAbs(y1 - y2) < 0.01) {
                 deltaX = prevPeriod - A/prevPeriod;
             } else {
-                qreal c1 = x1*x1*y1 - 2*x1*x2*y1 - 2*x1*y1*y1 + 2*x1*y1*y2 + x2*x2*y1 + 2*x2*y1*y1 - 2*x2*y1*y2;
-                qreal c2 = qSqrt(-(x1 - x2)*(x1 - x2)*(x2 - x1 + 2*(y1 - y2))*(2*A*y2 -2*A*y1 + x1*y1*y1 - x2*y1*y1));
+                qreal c1 = x1*x1*y1 - 2*x1*x2*y1 - 2*x1*y1*y1 + 2*x1*y1*y2 +
+                        x2*x2*y1 + 2*x2*y1*y1 - 2*x2*y1*y2;
+                qreal c2 = qSqrt(-(x1 - x2)*(x1 - x2)*(x2 - x1 + 2*(y1 - y2))*
+                                 (2*A*y2 -2*A*y1 + x1*y1*y1 - x2*y1*y1));
                 qreal c3 = (y1 - y2)*(x2 - x1 + 2*(y1 - y2));
                 qreal deltaX1 = (c1 - c2)/c3;
                 qreal deltaX2 = (c1 + c2)/c3;

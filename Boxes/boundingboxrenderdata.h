@@ -6,12 +6,13 @@
 #include "updatable.h"
 #include "Animators/animator.h"
 #include <QMatrix>
-class PixmapEffectRenderData;
+struct PixmapEffectRenderData;
 class BoundingBox;
 #include "sharedpointerdefs.h"
 
 class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public _ScheduledExecutor {
+    friend class StdSelfRef;
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 
     virtual ~BoundingBoxRenderData();
@@ -23,7 +24,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
 
     Animator::UpdateReason reason;
 
-    BoundingBoxRenderData *makeCopy();
+    BoundingBoxRenderDataSPtr makeCopy();
 
     bool redo = false;
 
@@ -42,7 +43,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     bool useCustomRelFrame = false;
     qreal customRelFrame;
     QList<QRectF> otherGlobalRects;
-    BoundingBoxRenderDataSPtr motionBlurTarget;
+    BoundingBoxRenderDataPtr motionBlurTarget;
     // for motion blur
 
     QList<PixmapEffectRenderDataSPtr> pixmapEffects;
@@ -52,7 +53,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     bool maxBoundsEnabled = true;
 
     bool parentIsTarget = true;
-    QWeakPointer<BoundingBox> parentBox;
+    BoundingBoxQPtr parentBox;
 
     virtual void updateRelBoundingRect();
     void drawRenderedImageForParent(SkCanvas *canvas);
@@ -80,24 +81,26 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
         return relBoundingRect.center();
     }
 
-    void appendRenderCustomizerFunctor(RenderDataCustomizerFunctor *customizer) {
+    void appendRenderCustomizerFunctor(
+            const RenderDataCustomizerFunctorSPtr& customizer) {
         mRenderDataCustomizerFunctors.append(customizer);
     }
 
-    void prependRenderCustomizerFunctor(RenderDataCustomizerFunctor *customizer) {
+    void prependRenderCustomizerFunctor(
+            const RenderDataCustomizerFunctorSPtr& customizer) {
         mRenderDataCustomizerFunctors.prepend(customizer);
     }
 
     void parentBeingProcessed();
 protected:
     void addSchedulerNow();
-    QList<RenderDataCustomizerFunctor*> mRenderDataCustomizerFunctors;
+    QList<RenderDataCustomizerFunctorSPtr> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;
     virtual void drawSk(SkCanvas *canvas) = 0;
 };
 
-class RenderDataCustomizerFunctor {
+class RenderDataCustomizerFunctor : public StdSelfRef {
 public:
     RenderDataCustomizerFunctor();
     virtual ~RenderDataCustomizerFunctor();

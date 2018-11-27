@@ -16,8 +16,8 @@ public:
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
                              QWidget *parent);
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
-                             const QrealAnimatorQSPtr& animator, QWidget *parent = nullptr);
-    QrealAnimatorValueSlider(const QrealAnimatorQSPtr& animator, QWidget *parent = nullptr);
+                             QrealAnimator* animator, QWidget *parent = nullptr);
+    QrealAnimatorValueSlider(QrealAnimator* animator, QWidget *parent = nullptr);
     QrealAnimatorValueSlider(QWidget *parent = nullptr);
     ~QrealAnimatorValueSlider() {}
 
@@ -26,9 +26,7 @@ public:
     void setAnimator(QrealAnimator *animator);
     void setIntAnimator(IntProperty *animator);
 
-    bool hasTargetAnimator() {
-        return mAnimator != nullptr;
-    }
+    bool hasTargetAnimator();
 
     bool isTargetDisabled();
 
@@ -47,7 +45,7 @@ protected:
     void emitValueChanged(qreal value);
 private:
     bool mBlockAnimatorSignals = false;
-    PropertyQSPtr mAnimator;
+    PropertyQPtr mAnimator;
 signals:
     void displayedValueChanged(qreal);
 };

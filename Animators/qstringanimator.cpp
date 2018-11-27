@@ -1,9 +1,8 @@
 #include "qstringanimator.h"
 #include "undoredo.h"
 
-QStringAnimator::QStringAnimator() : Animator() {
-
-}
+QStringAnimator::QStringAnimator(const QString &name) :
+    Animator(name) {}
 
 void QStringAnimator::prp_setAbsFrame(const int &frame) {
     Animator::prp_setAbsFrame(frame);
@@ -16,12 +15,13 @@ void QStringAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) prp_setRecording(true);
 
     if(anim_mKeyOnCurrentFrame == nullptr) {
-        anim_mKeyOnCurrentFrame = new QStringKey(mCurrentText,
-                                                 anim_mCurrentRelFrame,
-                                                 this);
-        anim_appendKey(anim_mKeyOnCurrentFrame);
+        auto newKey = SPtrCreate(QStringKey)(mCurrentText,
+                                             anim_mCurrentRelFrame,
+                                             this);
+        anim_appendKey(newKey);
+        anim_mKeyOnCurrentFrame = newKey.get();
     } else {
-        ((QStringKey*)anim_mKeyOnCurrentFrame)->setText(mCurrentText);
+        getAsPtr(anim_mKeyOnCurrentFrame, QStringKey)->setText(mCurrentText);
     }
 }
 
@@ -50,16 +50,16 @@ QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
     if(anim_mKeys.isEmpty()) {
         return mCurrentText;
     }
-    QStringKey *key;
+    Key *key;
     if(prp_isKeyOnCurrentFrame()) {
-        key = (QStringKey*)anim_mKeyOnCurrentFrame;
+        key = anim_mKeyOnCurrentFrame;
     } else {
-        key = (QStringKey*)anim_getPrevKey(relFrame);
+        key = anim_getPrevKey(relFrame);
     }
     if(key == nullptr) {
-        key = (QStringKey*)anim_getNextKey(relFrame);
+        key = anim_getNextKey(relFrame);
     }
-    return key->getText();
+    return getAsPtr(key, QStringKey)->getText();
 }
 
 void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
@@ -118,5 +118,5 @@ QStringKey::QStringKey(const QString &stringT,
 }
 
 bool QStringKey::differsFromKey(Key *key) {
-    return ((QStringKey*)key)->getText() != mText;
+    return getAsPtr(key, QStringKey)->getText() != mText;
 }

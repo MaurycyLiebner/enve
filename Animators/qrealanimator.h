@@ -10,9 +10,7 @@
 class QrealKey;
 class QrealPoint;
 class QrealAnimatorValueSlider;
-class RandomQrealGenerator;
-typedef QSharedPointer<RandomQrealGenerator> RandomQrealGeneratorQSPtr;
-#define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = (QrealKey*)keyK;
+#define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = getAsPtr(keyK, QrealKey);
 
 #include <QDoubleSpinBox>
 
@@ -165,12 +163,12 @@ public:
         Property::prp_updateAfterChangedRelFrameRange(minFrame, maxFrame);
     }
 
-    void setGenerator(RandomQrealGenerator *generator);
+    void setGenerator(const RandomQrealGeneratorQSPtr &generator);
 
     bool SWT_isQrealAnimator() { return true; }
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
-    Key *readKey(QIODevice *target);
+    KeySPtr readKey(QIODevice *target);
     bool qra_hasNoise();
 
     qreal qra_getEffectiveValueAtRelFrame(const int &frame) const;

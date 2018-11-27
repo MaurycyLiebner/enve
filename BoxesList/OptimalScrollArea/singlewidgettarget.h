@@ -36,13 +36,13 @@ public:
     void SWT_removeChildAbstractionForTargetFromAll(
             SingleWidgetTarget *target);
 
-    SingleWidgetAbstractionSPtr SWT_createAbstraction(
+    SingleWidgetAbstraction *SWT_createAbstraction(
             ScrollWidgetVisiblePart *visiblePartWidget);
-    SingleWidgetAbstractionSPtr SWT_removeAbstractionFromList(
-            SingleWidgetAbstraction * abs);
+    void SWT_removeAbstractionFromList(
+            const SingleWidgetAbstractionSPtr& abs);
 
     virtual void SWT_addChildrenAbstractions(
-            const SingleWidgetAbstractionSPtr&  ,
+            SingleWidgetAbstraction*,
             ScrollWidgetVisiblePart *) {}
 
     // Animators
@@ -95,12 +95,12 @@ public:
     // Sound
     virtual bool SWT_isSingleSound() { return false; }
 
-    virtual SingleWidgetAbstractionSPtr SWT_getAbstractionForWidget(
+    virtual SingleWidgetAbstraction* SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
         return SWT_createAbstraction(visiblePartWidget);
     }
     void SWT_addChildAbstractionForTargetToAllAt(
-            const SingleWidgetTargetQSPtr& target, const int &id);
+            SingleWidgetTarget *target, const int &id);
 
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool &parentSatisfies,

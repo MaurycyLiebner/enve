@@ -4,9 +4,8 @@ class CanvasWindow;
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 
 class WindowSingleWidgetTarget : public SingleWidgetTarget {
+    friend class SelfRef;
 public:
-    WindowSingleWidgetTarget(CanvasWindow *window);
-
     CanvasWindow* getCanvasWindow() const {
         return mWindow;
     }
@@ -16,6 +15,8 @@ public:
             SingleWidgetAbstraction *abstraction,
             ScrollWidgetVisiblePart *visiblePartWidget);
 protected:
+    WindowSingleWidgetTarget(CanvasWindow *window);
+
     CanvasWindow *mWindow = nullptr;
 };
 

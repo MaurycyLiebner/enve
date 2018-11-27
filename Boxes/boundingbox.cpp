@@ -14,15 +14,15 @@
 #include "skqtconversions.h"
 #include "global.h"
 
-QList<BoundingBoxQSPtr> BoundingBox::mLoadedBoxes;
+QList<BoundingBoxQPtr> BoundingBox::mLoadedBoxes;
 QList<FunctionWaitingForBoxLoadSPtr> BoundingBox::mFunctionsWaitingForBoxLoad;
 
-BoundingBox::BoundingBox(const BoundingBoxType &type) : ComplexAnimator() {
+BoundingBox::BoundingBox(const BoundingBoxType &type) :
+    ComplexAnimator("box") {
     mTransformAnimator = SPtrCreate(BoxTransformAnimator)(this);
     ca_addChildAnimator(mTransformAnimator);
 
     mEffectsAnimators = SPtrCreate(EffectAnimators)(this);
-    mEffectsAnimators->prp_setName("effects");
     mEffectsAnimators->prp_setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     mEffectsAnimators->prp_blockUpdater();
     ca_addChildAnimator(mEffectsAnimators);
@@ -52,15 +52,15 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }
 
-SingleWidgetAbstractionSPtr BoundingBox::SWT_getAbstractionForWidget(
+SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
     Q_FOREACH(const SingleWidgetAbstractionSPtr &abs,
               mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
-            return abs;
+            return abs.get();
         }
     }
-    SingleWidgetAbstractionSPtr abs = SWT_createAbstraction(visiblePartWidget);
+    SingleWidgetAbstraction* abs = SWT_createAbstraction(visiblePartWidget);
     if(visiblePartWidget->getCurrentRulesCollection().rule == SWT_Selected) {
         abs->setContentVisible(true);
     }
@@ -170,7 +170,7 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
 void BoundingBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
     if(mTransformAnimator->getOpacity() < 0.001) { return; }
     //paint->setFilterQuality(kHigh_SkFilterQuality);
-    mDrawRenderContainer.drawSk(canvas, paint);
+    mDrawRenderContainer->drawSk(canvas, paint);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
@@ -311,6 +311,15 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
     updateRelBoundingRectFromRenderData(renderData);
 }
 
+bool BoundingBox::shouldScheduleUpdate() {
+    if(mParentGroup == nullptr) return false;
+    if((isVisibleAndInVisibleDurationRect()) ||
+            (isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame))) {
+        return true;
+    }
+    return false;
+}
+
 void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
     scheduleUpdate(anim_mCurrentRelFrame, reason);
 }
@@ -354,19 +363,20 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
 }
 
 BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(const int& relFrame,
-                                                               const UpdateReason& reason) {
+                                                            const UpdateReason& reason) {
     auto renderData = createRenderData();
-    if(renderData == nullptr) return BoundingBoxRenderDataSPtr();
+    if(renderData == nullptr) return nullptr;
     renderData->relFrame = relFrame;
     renderData->reason = reason;
     mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
-    return renderData;
+    return renderData.get();
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
-    BoundingBoxRenderDataSPtr currentRenderData = mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
+    BoundingBoxRenderData* currentRenderData =
+            mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData == nullptr && mExpiredPixmap == 0) {
-        currentRenderData = mDrawRenderContainer.getSrcRenderData();
+        currentRenderData = mDrawRenderContainer->getSrcRenderData();
         if(currentRenderData == nullptr) return nullptr;
 //        if(currentRenderData->relFrame == relFrame) {
         if(!prp_differencesBetweenRelFramesIncludingInherited(
@@ -374,7 +384,7 @@ BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
             auto copy = currentRenderData->makeCopy();
             copy->relFrame = relFrame;
             mCurrentRenderDataHandler.addItemAtRelFrame(copy);
-            return copy;
+            return copy.get();
         }
         return nullptr;
     }
@@ -398,7 +408,7 @@ bool BoundingBox::isContainedIn(const QRectF &absRect) {
 
 BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
     if(absPointInsidePath(absPos)) {
-        return ref<BoundingBox>();
+        return this;
     } else {
         return nullptr;
     }
@@ -665,7 +675,7 @@ QPointF BoundingBox::getAbsolutePos() {
 
 void BoundingBox::updateDrawRenderContainerTransform() {
     if(mNReasonsNotToApplyUglyTransform == 0) {
-        mDrawRenderContainer.updatePaintTransformGivenNewCombinedTransform(
+        mDrawRenderContainer->updatePaintTransformGivenNewCombinedTransform(
                     mTransformAnimator->getCombinedTransform());
     }
 
@@ -1049,7 +1059,7 @@ void BoundingBox::processSchedulers() {
 }
 
 void BoundingBox::addSchedulersToProcess() {
-    foreach(const std::shared_ptr<_ScheduledExecutor> &updatable, mSchedulers) {
+    foreach(const _ScheduledExecutorSPtr &updatable, mSchedulers) {
         MainWindow::getInstance()->addUpdateScheduler(updatable);
     }
 
@@ -1057,8 +1067,8 @@ void BoundingBox::addSchedulersToProcess() {
     mBlockedSchedule = false;
 }
 
-void BoundingBox::addScheduler(_ScheduledExecutor *updatable) {
-    mSchedulers << updatable->ref<_ScheduledExecutor>();
+void BoundingBox::addScheduler(const _ScheduledExecutorSPtr& updatable) {
+    mSchedulers << updatable;
 }
 
 void BoundingBox::setVisibile(const bool &visible,
@@ -1078,7 +1088,7 @@ void BoundingBox::setVisibile(const bool &visible,
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
-    foreach(const BoundingBoxQSPtr& box, mLinkingBoxes) {
+    Q_FOREACH(BoundingBox* box, mLinkingBoxes) {
         if(box->isParentLinkBox()) {
             box->setVisibile(visible, false);
         }
@@ -1224,12 +1234,12 @@ void BoundingBox::SWT_addToContextMenu(
 }
 
 void BoundingBox::removeFromParent() {
-    mParentGroup->removeContainedBox(this);
+    mParentGroup->removeContainedBox(getAsSPtr(this, BoundingBox));
 }
 
 void BoundingBox::removeFromSelection() {
     if(mSelected) {
-        CanvasQSPtr parentCanvas = getParentCanvas();
+        Canvas* parentCanvas = getParentCanvas();
         parentCanvas->removeBoxFromSelection(this);
     }
 }
@@ -1238,7 +1248,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
         QAction *selectedAction) {
     if(selectedAction != nullptr) {
         if(selectedAction->text() == "Delete") {
-            mParentGroup->removeContainedBox(this);
+            mParentGroup->removeContainedBox(getAsSPtr(this, BoundingBox));
         } else if(selectedAction->text() == "Apply Transformation") {
             applyCurrentTransformation();
         } else if(selectedAction->text() == "Create Link") {
@@ -1280,7 +1290,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(renderData->redo) {
         scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
     }
-    mDrawRenderContainer.setSrcRenderData(renderData);
+    mDrawRenderContainer->setSrcRenderData(renderData);
     updateDrawRenderContainerTransform();
 }
 

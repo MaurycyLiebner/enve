@@ -10,12 +10,10 @@ class DurationRectangleMovable;
 class Key;
 class KeysView;
 
-class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart
-{
+class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart {
     Q_OBJECT
 public:
-    explicit BoxScrollWidgetVisiblePart(ScrollWidget *parent = 0);
-
+    explicit BoxScrollWidgetVisiblePart(ScrollWidget *parent = nullptr);
 
     QWidget *createNewSingleWidget();
     void paintEvent(QPaintEvent *);
@@ -29,7 +27,7 @@ public:
                           const int &minViewedFrame);
     void getKeysInRect(QRectF selectionRect,
                        qreal pixelsPerFrame,
-                       QList<Key *> *listKeys);
+                       QList<Key *> &listKeys);
 
     BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
             const SWT_TargetTypes &type, const int &yPos, bool *isBelow);
@@ -54,15 +52,14 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *);
     void dragMoveEvent(QDragMoveEvent *event);
 
-    QTimer *mScrollTimer = nullptr;
-
-    int mLastDragMoveY;
-    SWT_TargetTypes mLastDragMoveTargetTypes;
-
-    KeysView *mKeysView = nullptr;
-
     bool mDragging = false;
+
     int mCurrentDragPosId = 0;
+    int mLastDragMoveY;
+
+    SWT_TargetTypes mLastDragMoveTargetTypes;
+    QTimer *mScrollTimer = nullptr;
+    KeysView *mKeysView = nullptr;
 
     void dragEnterEvent(QDragEnterEvent *event);
 signals:

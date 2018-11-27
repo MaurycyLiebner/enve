@@ -215,7 +215,27 @@ SOURCES += main.cpp\
     usagewidget.cpp \
     application.cpp \
     selfref.cpp \
-    stdpointer.cpp
+    stdpointer.cpp \
+    PathEffects/displacepatheffect.cpp \
+    PathEffects/lengthpatheffect.cpp \
+    PathEffects/duplicatepatheffect.cpp \
+    PathEffects/solidifypatheffect.cpp \
+    PathEffects/operationpatheffect.cpp \
+    PathEffects/grouplastpathsumpatheffect.cpp \
+    PixmapEffects/blureffect.cpp \
+    PixmapEffects/shadoweffect.cpp \
+    PixmapEffects/lineseffect.cpp \
+    PixmapEffects/circleseffect.cpp \
+    PixmapEffects/swirleffect.cpp \
+    PixmapEffects/oileffect.cpp \
+    PixmapEffects/implodeeffect.cpp \
+    PixmapEffects/desaturateeffect.cpp \
+    PixmapEffects/colorizeeffect.cpp \
+    PixmapEffects/replacecoloreffect.cpp \
+    PixmapEffects/contrasteffect.cpp \
+    PixmapEffects/brightnesseffect.cpp \
+    PixmapEffects/sampledmotionblureffect.cpp \
+    simplemath.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -391,7 +411,29 @@ HEADERS  += mainwindow.h \
     usagewidget.h \
     sharedpointerdefs.h \
     application.h \
-    stdpointer.h
+    stdpointer.h \
+    PathEffects/displacepatheffect.h \
+    PathEffects/lengthpatheffect.h \
+    PathEffects/duplicatepatheffect.h \
+    PathEffects/solidifypatheffect.h \
+    PathEffects/operationpatheffect.h \
+    PathEffects/grouplastpathsumpatheffect.h \
+    PixmapEffects/blureffect.h \
+    PixmapEffects/shadoweffect.h \
+    PixmapEffects/lineseffect.h \
+    PixmapEffects/circleseffect.h \
+    PixmapEffects/swirleffect.h \
+    PixmapEffects/oileffect.h \
+    PixmapEffects/implodeeffect.h \
+    PixmapEffects/desaturateeffect.h \
+    PixmapEffects/colorizeeffect.h \
+    PixmapEffects/replacecoloreffect.h \
+    PixmapEffects/contrasteffect.h \
+    PixmapEffects/brightnesseffect.h \
+    PixmapEffects/sampledmotionblureffect.h \
+    PathEffects/patheffectsinclude.h \
+    PixmapEffects/pixmapeffectsinclude.h \
+    simplemath.h
 
 RESOURCES += \
     resources.qrc

@@ -30,9 +30,8 @@ void ColorAnimatorButton::paintEvent(QPaintEvent *) {
     } else {
         p.setPen(Qt::white);
     }
-    p.setBrush(mColorTarget->getCurrentColor().qcol);
-    p.drawRect(0, 0,
-               width() - 1, height() - 1);
+    p.setBrush(mColorTarget->getCurrentColor());
+    p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
 void ColorAnimatorButton::mousePressEvent(QMouseEvent *) {

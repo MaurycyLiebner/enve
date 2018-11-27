@@ -10,17 +10,15 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mPivotAutoAdjust = false;
     setName("text");
 
-    mFillSettings->setCurrentColor(Color(0, 0, 0));
+    mFillSettings->setCurrentColor(QColor(0, 0, 0));
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
 
-    mText = SPtrCreate(QStringAnimator)();
-    mText->prp_setName("text");
+    mText = SPtrCreate(QStringAnimator)("text");
     ca_addChildAnimator(mText);
-    ca_prependChildAnimator(mText.data(), mEffectsAnimators.data());
+    ca_prependChildAnimator(mText.data(), mEffectsAnimators);
     mText->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
 
-    mLinesDist = SPtrCreate(QrealAnimator)();
-    mLinesDist->prp_setName("line dist");
+    mLinesDist = SPtrCreate(QrealAnimator)("line dist");
     mLinesDist->qra_setValueRange(0., 100.);
     mLinesDist->qra_setCurrentValue(100.);
     mLinesDist->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));

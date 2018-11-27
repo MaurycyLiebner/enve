@@ -28,12 +28,12 @@ public:
 
     virtual void prp_switchRecording();
 
-    virtual bool prp_isDescendantRecording() { return anim_mIsRecording; }
+    virtual bool prp_isDescendantRecording();
 
-    bool anim_isComplexAnimator() { return anim_mIsComplexAnimator; }
+    bool anim_isComplexAnimator();
 
-    virtual bool prp_isAnimator() { return true; }
-    virtual void prp_startDragging() {}
+    virtual bool prp_isAnimator();
+    virtual void prp_startDragging();
 
     void anim_updateRelFrame();
     virtual void anim_mergeKeysIfNeeded();
@@ -62,12 +62,7 @@ public:
     virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                            const int &relX,
                                            const int &minViewedFrame,
-                                           const qreal &pixelsPerFrame) {
-        Q_UNUSED(relX);
-        Q_UNUSED(minViewedFrame);
-        Q_UNUSED(pixelsPerFrame);
-        return nullptr;
-    }
+                                           const qreal &pixelsPerFrame);
 
     Key *prp_getKeyAtPos(const qreal &relX,
                          const int &minViewedFrame,
@@ -95,8 +90,8 @@ public:
                               const int &endFrame);
     Key *anim_getKeyAtAbsFrame(const int &frame);
 
-    virtual void anim_saveCurrentValueAsKey() {}
-    virtual void anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
+    virtual void anim_saveCurrentValueAsKey();
+    virtual void anim_addKeyAtRelFrame(const int &relFrame);
 
     Key *anim_getNextKey(Key* key);
     Key* anim_getPrevKey(Key* key);
@@ -104,15 +99,11 @@ public:
     int anim_getPrevKeyRelFrame(Key* key);
     void anim_setRecordingValue(const bool &rec);
 
-    bool SWT_isAnimator() { return true; }
+    bool SWT_isAnimator();
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
-    int anim_getCurrentAbsFrame() {
-        return anim_mCurrentAbsFrame;
-    }
-    int anim_getCurrentRelFrame() {
-        return anim_mCurrentRelFrame;
-    }
+    int anim_getCurrentAbsFrame();
+    int anim_getCurrentRelFrame();
     virtual void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                       int *lastIdentical,
                                                       const int &relFrame);
@@ -124,18 +115,11 @@ public:
                                  int &nextRelFrame);
     bool prp_prevRelFrameWithKey(const int &relFrame,
                                  int &prevRelFrame);
-    virtual Key* readKey(QIODevice *target) {
-        Q_UNUSED(target);
-        return nullptr;
-    }
+    virtual KeySPtr readKey(QIODevice *target);
 
-    bool hasFakeComplexAnimator() {
-        return !mFakeComplexAnimator.isNull();
-    }
+    bool hasFakeComplexAnimator();
 
-    FakeComplexAnimator *getFakeComplexAnimator() {
-        return mFakeComplexAnimator.data();
-    }
+    FakeComplexAnimator *getFakeComplexAnimator();
 
     void enableFakeComplexAnimator();
 
@@ -146,6 +130,13 @@ public:
     bool anim_getNextAndPreviousKeyIdForRelFrameF(int *prevIdP,
                                                   int *nextIdP,
                                                   const qreal &frame) const;
+    bool hasSelectedKeys() const;
+
+    void addSelectedKey(Key* key);
+
+    void removeSelectedKey(Key* key);
+
+    void writeSelectedKeys(QIODevice* target);
 protected:
     Animator(const QString &name);
 
@@ -157,6 +148,7 @@ protected:
                          const qreal &drawY,
                          const int &startFrame);
     QList<KeySPtr> anim_mKeys;
+    QList<KeyPtr> anim_mSelectedKeys;
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
     bool anim_mIsComplexAnimator = false;

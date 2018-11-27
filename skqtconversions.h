@@ -27,11 +27,19 @@ extern QMatrix SkMatrixToQMatrix(const SkMatrix &matrix);
 
 extern SkMatrix QMatrixToSkMatrix(const QMatrix &matrix);
 
-extern QPointF SkPointToQPointF(const SkPoint &point);
+extern inline QPointF SkPointToQPointF(const SkPoint &point) {
+    return QPointF(SkScalarToQreal(point.x()),
+                   SkScalarToQreal(point.y()));
+}
 
-extern SkPoint QPointFToSkPoint(const QPointF &point);
+extern inline SkPoint QPointFToSkPoint(const QPointF &point) {
+    return SkPoint::Make(qrealToSkScalar(point.x()),
+                         qrealToSkScalar(point.y()));
+}
 
-extern SkPoint QPointToSkPoint(const QPoint &point);
+extern inline SkPoint QPointToSkPoint(const QPoint &point) {
+    return SkPoint::Make(point.x(), point.y());
+}
 
 extern SkPaint::Cap QCapToSkCap(const Qt::PenCapStyle &cap);
 

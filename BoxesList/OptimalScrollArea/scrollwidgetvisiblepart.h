@@ -83,7 +83,7 @@ public:
 protected:
     bool mAlwaysShowChildren = false;
     SWT_RulesCollection mCurrentRulesCollection;
-    SingleWidgetAbstractionSPtr mMainAbstraction;
+    SingleWidgetAbstractionPtr mMainAbstraction;
 };
 
 

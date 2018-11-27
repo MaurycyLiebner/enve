@@ -3,7 +3,7 @@
 #include "rendersettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "global.h"
-QList<OutputSettingsProfile*> OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES;
+QList<OutputSettingsProfileSPtr> OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES;
 
 OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
         const OutputSettings &currentSettings,
@@ -83,7 +83,7 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mMainLayout->addWidget(mOutputSettingsDisplayWidget);
     mMainLayout->addLayout(mButtonsLayout);
 
-    foreach(OutputSettingsProfile *profile, OUTPUT_SETTINGS_PROFILES) {
+    foreach(const auto& profile, OUTPUT_SETTINGS_PROFILES) {
         mProfilesComboBox->addItem(profile->getName());
     }
 
@@ -146,7 +146,7 @@ void OutputSettingsProfilesDialog::deleteCurrentProfile() {
 void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(currentProfile == nullptr) return;
-    OutputSettingsProfile *newProfile = new OutputSettingsProfile();
+    auto newProfile = SPtrCreate(OutputSettingsProfile)();
     newProfile->setSettings(currentProfile->getSettings());
     newProfile->setName(currentProfile->getName() + "1");
     OUTPUT_SETTINGS_PROFILES.append(newProfile);
@@ -158,7 +158,7 @@ void OutputSettingsProfilesDialog::createAndEditNewProfile() {
     RenderSettingsDialog *dialog = new RenderSettingsDialog(OutputSettings(),
                                                             this);
     if(dialog->exec()) {
-        OutputSettingsProfile *newProfile = new OutputSettingsProfile();
+        auto newProfile = SPtrCreate(OutputSettingsProfile)();
         OUTPUT_SETTINGS_PROFILES.append(newProfile);
         mProfilesComboBox->addItem(newProfile->getName());
         mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);

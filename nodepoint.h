@@ -32,7 +32,7 @@ struct NodePointValues {
     QPointF endRelPos;
 
     NodePointValues &operator/=(const qreal &val) {
-        qreal inv = 1.f/val;
+        qreal inv = 1./val;
         startRelPos *= inv;
         pointRelPos *= inv;
         endRelPos *= inv;
@@ -66,9 +66,8 @@ NodePointValues operator*(const NodePointValues &ppv, const qreal &val);
 NodePointValues operator*(const qreal &val, const NodePointValues &ppv);
 
 class NodePoint : public NonAnimatedMovablePoint {
+    friend class StdSelfRef;
 public:
-    ~NodePoint();
-
     void applyTransform(const QMatrix &transform);
 
     void startTransform();
@@ -116,7 +115,7 @@ public:
                                    const CanvasMode &canvasMode,
                                    const qreal &canvasScaleInv);
     void rectPointsSelection(const QRectF &absRect,
-                             QList<MovablePoint *> *list);
+                             QList<MovablePointPtr> &list);
     void updateStartCtrlPtVisibility();
     void updateEndCtrlPtVisibility();
 
@@ -180,7 +179,8 @@ public:
                         const QPointF &targetPos,
                         const QPointF &endPos);
 protected:
-    NodePoint(VectorPathAnimator *parentAnimator);
+    NodePoint(VectorPathAnimator *parentAnimator,
+              BasicTransformAnimator* parentTransform);
 private:
     bool mSeparateNodePoint = false;
     int mNodeId;

@@ -1,6 +1,6 @@
 #include "renderdatahandler.h"
 
-bool RenderDataHandler::removeItem(BoundingBoxRenderData *item) {
+bool RenderDataHandler::removeItem(const BoundingBoxRenderDataSPtr& item) {
     return removeItemAtRelFrame(item->relFrame);
 }
 
@@ -16,12 +16,12 @@ bool RenderDataHandler::removeItemAtRelFrame(const int &frame) {
 BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int &frame) {
     int id;
     if(getItemIdAtRelFrame(frame, &id)) {
-        return mItems.at(id);
+        return mItems.at(id).get();
     }
-    return BoundingBoxRenderDataSPtr();
+    return nullptr;
 }
 
-void RenderDataHandler::addItemAtRelFrame(BoundingBoxRenderData *item) {
+void RenderDataHandler::addItemAtRelFrame(const BoundingBoxRenderDataSPtr& item) {
     int itemId = getItemInsertIdAtRelFrame(item->relFrame);
     mItems.insert(itemId, item);
 }

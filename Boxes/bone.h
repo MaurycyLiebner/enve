@@ -4,6 +4,7 @@
 class BonePt;
 class BonesBox;
 class Bone : public ComplexAnimator {
+    friend class SelfRef;
 public:
     static Bone* createBone(BonesBox *boneBox);
     static Bone* createBone(Bone*  parentBone);
@@ -49,7 +50,7 @@ public:
     void removeChildBone(const BoneQSPtr &child);
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> &list);
+                                           QList<MovablePointPtr> &list);
     void setParentBone(Bone *parentBone);
     void setParentBonesBox(BonesBox *bonesBox);
 
@@ -128,6 +129,7 @@ protected:
 };
 
 class BonePt : public NonAnimatedMovablePoint {
+    friend class StdSelfRef;
 public:
     void setRelativePos(const QPointF &relPos);
 
@@ -143,17 +145,15 @@ public:
 
     Bone *getParentBone();
 protected:
-    BonePt(BasicTransformAnimator *parent,
-           const MovablePointType &type,
-           const qreal &radius = 7.5);
+    BonePt(BasicTransformAnimator *parent);
     BoneQPtr mParentBone;
     BoneQPtr mTipBone;
     QList<BoneQPtr> mRootBones;
 };
 
 class BonesBox : public BoundingBox {
+    friend class SelfRef;
 public:
-    BonesBox();
     void drawPixmapSk(SkCanvas *canvas);
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
     void drawSelectedSk(SkCanvas *canvas,
@@ -175,12 +175,14 @@ public:
     bool SWT_isBonesBox();
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint*>& list);
+                                           QList<MovablePointPtr>& list);
 
     void addBone(const BoneQSPtr &bone);
     void removeBone(const BoneQSPtr &bone);
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
+    BonesBox();
+
     QList<BoneQSPtr> mBones;
 };
 

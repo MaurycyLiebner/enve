@@ -18,7 +18,7 @@ void getTileDrawers(const std::shared_ptr<TilesData> &drawTilesData,
         alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
     }
     TileSkDrawerCollection coll;
-    coll.alpha = alpha;
+    coll.alpha = static_cast<uchar>(alpha);
     drawTilesData->getTileDrawers(&coll.drawers);
     tileDrawers->append(coll);
 }
@@ -28,13 +28,11 @@ AnimatedSurface::AnimatedSurface(const ushort &widthT,
                                  const qreal &scale,
                                  PaintBox *parentBox) :
     Surface(widthT, heightT, scale, true),
-    Animator() {
-    prp_setName("canvas");
+    Animator("canvas") {
     mParentBox = parentBox;
 }
 
-AnimatedSurface::~AnimatedSurface() {
-}
+AnimatedSurface::~AnimatedSurface() {}
 
 void AnimatedSurface::currentDataModified() {
     if(prp_hasKeys()) {
@@ -55,8 +53,8 @@ void AnimatedSurface::currentDataModified() {
 void AnimatedSurface::anim_saveCurrentValueAsKey() {
     if(prp_isKeyOnCurrentFrame()) return;
     newEmptyPaintFrame();
-    SurfaceKey *key = (SurfaceKey*)anim_mKeyOnCurrentFrame;
-    SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(key);
+    SurfaceKey *key = getAsPtr(anim_mKeyOnCurrentFrame, SurfaceKey);
+    SurfaceKey *prevKey = getAsPtr(anim_getPrevKey(key), SurfaceKey);
     TilesData *tiles;
     if(prevKey == nullptr) {
         tiles = mCurrentTiles.get();
@@ -72,11 +70,11 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
     }
     Key *keyAtFrame = anim_getKeyAtRelFrame(relFrame);
     if(keyAtFrame != nullptr) {
-        ((SurfaceKey*)keyAtFrame)->getTilesData()->clearTiles();
+        getAsPtr(keyAtFrame, SurfaceKey)->getTilesData()->clearTiles();
         return;
     }
 
-    SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(relFrame);
+    SurfaceKey *prevKey = getAsPtr(anim_getPrevKey(relFrame), SurfaceKey);
     if(prevKey != nullptr) {
         if(prevKey->getRelFrame() == relFrame) {
             prevKey->getTilesData()->clearTiles();
@@ -84,12 +82,13 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
         }
     }
 
-    SurfaceKey *frameT = new SurfaceKey(this);
+    SurfaceKeySPtr frameT = SPtrCreate(SurfaceKey)(this);
     frameT->setRelFrame(relFrame);
     if(prp_hasKeys()) {
-        frameT->setSize(mWidth, mHeight);
+        frameT->setSize(static_cast<ushort>(mWidth),
+                        static_cast<ushort>(mHeight));
     } else {
-        frameT->setTiles(mCurrentTiles.get());
+        frameT->setTiles(mCurrentTiles);
     }
 
     anim_appendKey(frameT);
@@ -112,20 +111,20 @@ void AnimatedSurface::updateTargetTiles() {
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
                                                anim_mCurrentRelFrame)) {
-        SurfaceKey *prevKey = (SurfaceKey*)anim_mKeys.at(prevId).get();
-        SurfaceKey *nextKey = (SurfaceKey*)anim_mKeys.at(nextId).get();
+        SurfaceKey *prevKey = getAsPtr(anim_mKeys.at(prevId), SurfaceKey);
+        SurfaceKey *nextKey = getAsPtr(anim_mKeys.at(nextId), SurfaceKey);
 
         TilesData *prevKeyTilesData = prevKey->getTilesData();
         prevKeyTilesData->setCurrentlyUsed(true);
-        mDrawTilesData.append(prevKeyTilesData->ref<TilesData>());
+        mDrawTilesData.append(getAsSPtr(prevKeyTilesData, TilesData));
         mDrawTilesFrames.append(prevKey->getRelFrame());
         if(mIsDraft) {
             int idT = prevId - 1;
             while(idT >= 0) {
-                SurfaceKey *keyT = (SurfaceKey*)anim_mKeys.at(idT).get();
+                SurfaceKey *keyT = getAsPtr(anim_mKeys.at(idT), SurfaceKey);
                 TilesData *keyTTilesData = keyT->getTilesData();
                 keyTTilesData->setCurrentlyUsed(true);
-                mDrawTilesData.prepend(keyTTilesData->ref<TilesData>());
+                mDrawTilesData.prepend(getAsSPtr(keyTTilesData, TilesData));
                 mDrawTilesFrames.prepend(keyT->getRelFrame());
                 idT--;
                 if(anim_mCurrentRelFrame - keyT->getRelFrame() >=
@@ -134,15 +133,15 @@ void AnimatedSurface::updateTargetTiles() {
             if(nextKey != prevKey) {
                 TilesData *nextKeyTilesData = nextKey->getTilesData();
                 nextKeyTilesData->setCurrentlyUsed(true);
-                mDrawTilesData.append(nextKeyTilesData->ref<TilesData>());
+                mDrawTilesData.append(getAsSPtr(nextKeyTilesData, TilesData));
                 mDrawTilesFrames.append(nextKey->getRelFrame());
             }
             idT = nextId + 1;
             while(idT < anim_mKeys.count()) {
-                SurfaceKey *keyT = (SurfaceKey*)anim_mKeys.at(idT).get();
+                SurfaceKey *keyT = getAsPtr(anim_mKeys.at(idT), SurfaceKey);
                 TilesData *keyTTilesData = keyT->getTilesData();
                 keyTTilesData->setCurrentlyUsed(true);
-                mDrawTilesData.append(keyTTilesData->ref<TilesData>());
+                mDrawTilesData.append(getAsSPtr(keyTTilesData, TilesData));
                 mDrawTilesFrames.append(keyT->getRelFrame());
                 idT++;
                 if(keyT->getRelFrame() - anim_mCurrentRelFrame >=
@@ -154,9 +153,9 @@ void AnimatedSurface::updateTargetTiles() {
         int prevDFrame = qAbs(prevKey->getRelFrame() - anim_mCurrentRelFrame);
 
         if(nextDFrame > prevDFrame) {
-            mCurrentTiles = prevKey->getTilesData()->ref<TilesData>();
+            mCurrentTiles = getAsSPtr(prevKey->getTilesData(), TilesData);
         } else {
-            mCurrentTiles = nextKey->getTilesData()->ref<TilesData>();
+            mCurrentTiles = getAsSPtr(nextKey->getTilesData(), TilesData);
         }
     }
     mCurrentTiles->setCurrentlyUsed(true);
@@ -215,7 +214,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
                     }
                     alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
                 }
-                coll.alpha = alpha;
+                coll.alpha = static_cast<uchar>(alpha);
                 bool hueChange = relFrame != anim_mCurrentRelFrame;
                 coll.setHueChangeEnabled(hueChange);
 
@@ -231,13 +230,14 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
     }
 }
 
-void AnimatedSurface::anim_removeKey(Key *keyToRemove,
+void AnimatedSurface::anim_removeKey(const KeySPtr& keyToRemove,
                                      const bool &saveUndoRedo) {
     Animator::anim_removeKey(keyToRemove, saveUndoRedo);
     updateTargetTiles();
 }
 
-void AnimatedSurface::anim_appendKey(Key *newKey,
+void AnimatedSurface::anim_appendKey(
+                    const KeySPtr& newKey,
                     const bool &saveUndoRedo,
                     const bool &update) {
     Animator::anim_appendKey(newKey, saveUndoRedo, update);
@@ -258,10 +258,10 @@ void AnimatedSurface::setSize(const ushort &width_t,
     // initialize tiles
     if(width_t == mWidth && height_t == mHeight) return;
     if(prp_hasKeys()) {
-        ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
-        ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
+        int n_tile_cols_t = qCeil(width_t/static_cast<qreal>(TILE_DIM));
+        int n_tile_rows_t = qCeil(height_t/static_cast<qreal>(TILE_DIM));
         Q_FOREACH(const KeySPtr &key, anim_mKeys) {
-            SurfaceKey *frameT = (SurfaceKey*)key.get();
+            SurfaceKey *frameT = getAsPtr(key, SurfaceKey);
             frameT->setSize(width_t,
                             height_t);
         }
@@ -277,7 +277,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
 void AnimatedSurface::move(const int &xT, const int &yT) {
     if(prp_hasKeys()) {
         Q_FOREACH(const KeySPtr &key, anim_mKeys) {
-            SurfaceKey *frameT = (SurfaceKey*)key.get();
+            SurfaceKey *frameT = getAsPtr(key, SurfaceKey);
             frameT->getTilesData()->move(xT, yT);
         }
     } else {

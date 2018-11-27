@@ -56,8 +56,10 @@ public:
         return false;
     }
 
-    virtual void addToSelection(QList<Key *> &selectedKeys);
-    virtual void removeFromSelection(QList<Key*> &selectedKeys);
+    virtual void addToSelection(QList<KeyPtr> &selectedKeys,
+                                QList<AnimatorQPtr> &selectedAnimators);
+    virtual void removeFromSelection(QList<KeyPtr> &selectedKeys,
+                                     QList<AnimatorQPtr> &selectedAnimators);
 
     bool isHovered() {
         return mHovered;
@@ -101,7 +103,7 @@ struct KeyPair {
     }
 
     void merge() const {
-        key1->mergeWith(key2->ref<Key>());
+        key1->mergeWith(getAsSPtr(key2, Key));
     }
 
     Key* key1;

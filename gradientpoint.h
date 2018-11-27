@@ -4,6 +4,7 @@
 class PathBox;
 
 class GradientPoint : public PointAnimatorMovablePoint {
+    friend class StdSelfRef;
 public:
     void setRelativePos(const QPointF &relPos);
     void moveByRel(const QPointF &relTranslatione);

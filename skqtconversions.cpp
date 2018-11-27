@@ -38,20 +38,6 @@ SkMatrix QMatrixToSkMatrix(const QMatrix &matrix) {
     return skMatrix;
 }
 
-QPointF SkPointToQPointF(const SkPoint &point) {
-    return QPointF(SkScalarToQreal(point.x()),
-                   SkScalarToQreal(point.y()));
-}
-
-SkPoint QPointFToSkPoint(const QPointF &point) {
-    return SkPoint::Make(qrealToSkScalar(point.x()),
-                         qrealToSkScalar(point.y()));
-}
-
-SkPoint QPointToSkPoint(const QPoint &point) {
-    return SkPoint::Make(point.x(), point.y());
-}
-
 SkPaint::Cap QCapToSkCap(const Qt::PenCapStyle &cap) {
     if(cap == Qt::RoundCap) {
         return SkPaint::kRound_Cap;

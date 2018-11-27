@@ -4,34 +4,6 @@
 #include <QString>
 #include <sys/sysinfo.h>
 
-void rotate(float rad_t, float *x_t, float *y_t) {
-    float cos_hue = cos(rad_t);
-    float sin_hue = sin(rad_t);
-    float x_rotated_t = *x_t*cos_hue - *y_t*sin_hue;
-    float y_rotated_t = *x_t*sin_hue + *y_t*cos_hue;
-    *x_t = x_rotated_t;
-    *y_t = y_rotated_t;
-}
-
-unsigned char truncateU8(const int &val) {
-    if(val > 255) {
-        return 255;
-    } else if(val < 0) {
-        return 0;
-    }
-    return static_cast<unsigned char>(val);
-}
-
-int clampInt(int val, int min, int max) {
-    if(val > max) {
-        return max;
-    } else if(val < min) {
-        return min;
-    } else {
-        return val;
-    }
-}
-
 
 //bool isnan(float var)
 //{
@@ -45,39 +17,6 @@ void glOrthoAndViewportSet(unsigned int w, unsigned int h) {
     glLoadIdentity();
     glOrtho(0., w, h, 0., 0., 1.);
     glMatrixMode(GL_MODELVIEW);
-}
-
-float clamp(float val_t, float min_t, float max_t) {
-    if(val_t > max_t)
-    {
-        return max_t;
-    }
-    if(val_t < min_t)
-    {
-        return min_t;
-    }
-    return val_t;
-}
-
-double getAngleF(double x1, double y1, double x2, double y2) {
-    double dot = x1*x2 + y1*y2;
-    double det = x1*y2 - y1*x2;
-    return atan2(det, dot)*RadToF + 0.5;
-}
-
-double getAngleDeg(double x1, double y1, double x2, double y2)
-{
-    double dot = x1*x2 + y1*y2;
-    double det = x1*y2 - y1*x2;
-    return atan2(det, dot)*RadToDeg + 180;
-}
-
-void normalize(qreal *x_t, qreal *y_t, qreal dest_len) {
-    qreal x_val_t = *x_t;
-    qreal y_val_t = *y_t;
-    qreal curr_len = sqrt(x_val_t*x_val_t + y_val_t*y_val_t);
-    *x_t = x_val_t*dest_len/curr_len;
-    *y_t = y_val_t*dest_len/curr_len;
 }
 
 void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/) {
@@ -667,22 +606,6 @@ void qrgb_to_hsl(qreal *r_, qreal *g_, qreal *b_)
   *r_ = h;
   *g_ = s;
   *b_ = l;
-}
-
-bool isNonZero(const float &val_t) {
-    return val_t > 0.0001f || val_t < - 0.0001f;
-}
-
-bool isZero(const float val_t) {
-    return val_t < 0.0001f && val_t > - 0.0001f;
-}
-
-bool isNonZero(const double &val_t) {
-    return val_t > 0.0001 || val_t < - 0.0001;
-}
-
-bool isZero(const double val_t) {
-    return val_t < 0.0001 && val_t > - 0.0001;
 }
 
 

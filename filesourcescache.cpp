@@ -14,15 +14,6 @@ extern "C" {
 }
 #include <QFileDialog>
 
-QList<std::shared_ptr<FileCacheHandler> >
-FileSourcesCache::mFileCacheHandlers;
-QList<FileSourceListVisibleWidget*>
-FileSourcesCache::mFileSourceListVisibleWidgets;
-
-FileSourcesCache::FileSourcesCache() {
-
-}
-
 void FileSourcesCache::addFileSourceListVisibleWidget(
         FileSourceListVisibleWidget *wid) {
     mFileSourceListVisibleWidgets << wid;
@@ -33,8 +24,9 @@ void FileSourcesCache::removeFileSourceListVisibleWidget(
     mFileSourceListVisibleWidgets.removeOne(wid);
 }
 
-void FileSourcesCache::addHandlerToHandlersList(FileCacheHandler *handlerPtr) {
-    mFileCacheHandlers.append(handlerPtr->ref<FileCacheHandler>());
+void FileSourcesCache::addHandlerToHandlersList(
+        const FileCacheHandlerSPtr &handlerPtr) {
+    mFileCacheHandlers.append(handlerPtr);
 }
 
 void FileSourcesCache::addHandlerToListWidgets(FileCacheHandler *handlerPtr) {
@@ -45,7 +37,7 @@ void FileSourcesCache::addHandlerToListWidgets(FileCacheHandler *handlerPtr) {
 
 FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
         const QString &filePath) {
-    Q_FOREACH(const std::shared_ptr<FileCacheHandler> &handler,
+    Q_FOREACH(const FileCacheHandlerSPtr &handler,
               mFileCacheHandlers) {
         if(handler->getFilePath() == filePath) {
             return handler.get();
@@ -53,22 +45,17 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
     }
     QString ext = filePath.split(".").last();
     if(isVideoExt(ext)) {
-        return new VideoCacheHandler(filePath);
+        return VideoCacheHandler::createNewHandler(filePath);
     } else if(isImageExt(ext)) {
-        return new ImageCacheHandler(filePath);
+        return ImageCacheHandler::createNewHandler(filePath);
     }
     return nullptr;
 }
 
-void FileSourcesCache::removeHandler(FileCacheHandler *handler) {
-    for(int i = 0 ; i < mFileCacheHandlers.count(); i++) {
-        if(mFileCacheHandlers.at(i).get() == handler) {
-            mFileCacheHandlers.removeAt(i);
-            break;
-        }
-    }
+void FileSourcesCache::removeHandler(const FileCacheHandlerSPtr& handler) {
+    mFileCacheHandlers.removeOne(handler);
     foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
-        wid->removeCacheHandlerFromList(handler);
+        wid->removeCacheHandlerFromList(handler.get());
     }
 }
 
@@ -96,10 +83,6 @@ FileCacheHandler::FileCacheHandler(const QString &filePath,
     mFilePath = filePath;
     QFile file(mFilePath);
     mFileMissing = !file.exists();
-    FileSourcesCache::addHandlerToHandlersList(this);
-    if(visibleInListWidgets) {
-        FileSourcesCache::addHandlerToListWidgets(this);
-    }
 }
 
 void FileCacheHandler::setVisibleInListWidgets(const bool &bT) {
@@ -112,14 +95,10 @@ void FileCacheHandler::setVisibleInListWidgets(const bool &bT) {
     }
 }
 
-FileCacheHandler::~FileCacheHandler() {
-    FileSourcesCache::removeHandler(this);
-}
-
 void FileCacheHandler::clearCache() {
     QFile file(mFilePath);
     mFileMissing = !file.exists();
-    foreach(const BoundingBoxQWPtr &boxPtr, mDependentBoxes) {
+    foreach(const BoundingBoxQPtr &boxPtr, mDependentBoxes) {
         BoundingBox *box = boxPtr.data();
         if(box == nullptr) continue;
         box->reloadCacheHandler();
@@ -127,12 +106,12 @@ void FileCacheHandler::clearCache() {
 }
 
 void FileCacheHandler::addDependentBox(BoundingBox *dependent) {
-    mDependentBoxes << dependent->weakRef<BoundingBox>();
+    mDependentBoxes << dependent;
 }
 
 void FileCacheHandler::removeDependentBox(BoundingBox *dependent) {
     for(int i = 0; i < mDependentBoxes.count(); i++) {
-        const BoundingBoxQWPtr &boxPtr = mDependentBoxes.at(i);
+        const BoundingBoxQPtr &boxPtr = mDependentBoxes.at(i);
         if(boxPtr.data() == dependent) {
             mDependentBoxes.removeAt(i);
             return;
@@ -214,7 +193,7 @@ void VideoCacheHandler::updateFrameCount() {
             mTimeBaseDen = vidStream->avg_frame_rate.den;
             mTimeBaseNum = vidStream->avg_frame_rate.num;
             if(mTimeBaseDen != 0) {
-                mFps = (qreal)mTimeBaseNum/mTimeBaseDen;
+                mFps = static_cast<qreal>(mTimeBaseNum/mTimeBaseDen);
             }
             mFramesCount = vidStream->nb_frames;
             // try something else if retrieving frame count failed
@@ -227,7 +206,7 @@ void VideoCacheHandler::updateFrameCount() {
                         mFramesCount = 0;
                         break;
                     } else {
-                        mFps = mTimeBaseNum/(qreal)mTimeBaseDen;
+                        mFps = mTimeBaseNum/static_cast<qreal>(mTimeBaseDen);
                     }
                     int64_t duration = format->duration + (format->duration <= INT64_MAX - 5000 ? 5000 : 0);
                     mFramesCount = qFloor(duration*mFps/AV_TIME_BASE);
@@ -275,7 +254,7 @@ void VideoCacheHandler::_processUpdate() {
         AVCodecParameters *codecParsT = streamT->codecpar;
         const AVMediaType &mediaType = codecParsT->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
-            videoStreamIndex = i;
+            videoStreamIndex = static_cast<int>(i);
             codecPars = codecParsT;
             codec = avcodec_find_decoder(codecPars->codec_id);
             videoStream = formatContext->streams[videoStreamIndex];
@@ -325,12 +304,6 @@ void VideoCacheHandler::_processUpdate() {
         return;// -1;
     }
 
-    QElapsedTimer framesTimer;
-    framesTimer.start();
-    int firstDts = 0;
-    if(videoStream->first_dts != AV_NOPTS_VALUE) {
-        firstDts = videoStream->first_dts;
-    }
     bool frameReceived = false;
     foreach(const int &frameId, mFramesBeingLoaded) {
         int tsms = qRound(frameId * 1000 / mUpdateFps);
@@ -450,10 +423,9 @@ void VideoCacheHandler::afterUpdate() {
         sk_sp<SkImage> imgT = mLoadedFrames.at(i);
         if(imgT.get() == nullptr) {
             mFramesCount = frameId;
-            foreach(const BoundingBoxQWPtr &boxWPtr, mDependentBoxes) {
-                BoundingBox *box = boxWPtr.data();
+            foreach(const BoundingBoxQPtr &box, mDependentBoxes) {
                 if(box == nullptr) continue;
-                ((VideoBox*)box)->updateDurationRectangleAnimationRange();
+                getAsPtr(box, VideoBox)->updateDurationRectangleAnimationRange();
             }
         } else {
             CacheContainer *cont =
@@ -490,7 +462,8 @@ void VideoCacheHandler::replace() {
 
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
-_ScheduledExecutor *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+_ScheduledExecutor* VideoCacheHandler::scheduleFrameLoad(
+        const int &frame) {
     if(mFramesCount <= 0 || frame >= mFramesCount) return nullptr;
     if(mFramesLoadScheduled.contains(frame) ||
             mFramesBeingLoadedGUI.contains(frame)) return this;
@@ -510,19 +483,21 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
         const QStringList &framePaths) {
     mFramePaths = framePaths;
     foreach(const QString &path, framePaths) {
-        ImageCacheHandler *imgCacheHandler = (ImageCacheHandler*)
-                FileSourcesCache::getHandlerForFilePath(path);
+        auto imgCacheHandler = getAsPtr(
+                FileSourcesCache::getHandlerForFilePath(path),
+                    ImageCacheHandler);
         if(imgCacheHandler == nullptr) {
-            mFrameImageHandlers << SPtrCreate(ImageCacheHandler)(path, false);
+            auto newHandler = ImageCacheHandler::createNewHandler(path, false);
+            mFrameImageHandlers << newHandler;
         } else {
-            mFrameImageHandlers << imgCacheHandler->ref<ImageCacheHandler>();
+            mFrameImageHandlers << getAsPtr(imgCacheHandler, ImageCacheHandler);
         }
     }
     updateFrameCount();
 }
 
 sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int &relFrame) {
-    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame).get();
+    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
     if(cacheHandler == nullptr) return sk_sp<SkImage>();
     return cacheHandler->getImage();
 }
@@ -533,7 +508,7 @@ sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtOrBeforeFrame(
     if(relFrame >= mFrameImageHandlers.count()) {
         return mFrameImageHandlers.last()->getImage();
     }
-    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame).get();
+    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
     return cacheHandler->getImage();
 }
 
@@ -542,15 +517,15 @@ void ImageSequenceCacheHandler::updateFrameCount() {
 }
 
 void ImageSequenceCacheHandler::clearCache() {
-    foreach(const std::shared_ptr<ImageCacheHandler> &cacheHandler, mFrameImageHandlers) {
+    foreach(const ImageCacheHandlerPtr &cacheHandler, mFrameImageHandlers) {
         cacheHandler->clearCache();
     }
     FileCacheHandler::clearCache();
 }
 
-_ScheduledExecutor *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
-    ImageCacheHandler *imageHandler = mFrameImageHandlers.at(frame).get();
-    imageHandler->addScheduler();
+_ScheduledExecutor *ImageSequenceCacheHandler::scheduleFrameLoad(
+        const int &frame) {
+    ImageCacheHandler* imageHandler = mFrameImageHandlers.at(frame);
     return imageHandler;
 }
 

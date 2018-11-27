@@ -19,6 +19,8 @@
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "fontswidget.h"
 #include "Boxes/bone.h"
+#include "PathEffects/patheffectsinclude.h"
+#include "PixmapEffects/pixmapeffectsinclude.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -30,7 +32,7 @@ void Canvas::handleMovePathMousePressEvent() {
     } else {
         if(mLastPressedBox->SWT_isBonesBox()) {
             if(mBonesSelectionEnabled) {
-                mLastPressedBone = SPtrGetAs(mLastPressedBox, BonesBox)->
+                mLastPressedBone = getAsPtr(mLastPressedBox, BonesBox)->
                         getBoneAtAbsPos(mLastMouseEventPosRel);
                 if(!isShiftPressed()) {
                     clearBonesSelection();
@@ -148,6 +150,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                     "canvas_fill_effects_discrete");
         fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                     "canvas_fill_effects_duplicate");
+        pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+                    "canvas_fill_effects_solidify");
         fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
                     "canvas_fill_effect_sum");
 
@@ -156,13 +160,17 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                     "canvas_outline_effects_discrete");
         outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                     "canvas_outline_effects_duplicate");
+        pathEffectsMenu->addAction("Length Effect")->setObjectName(
+                    "canvas_path_effects_length");
         outlinePathEffectsMenu->addAction("Operation Effect")->setObjectName(
                     "canvas_outline_effect_sum");
+        pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+                    "canvas_outline_effects_solidify");
     }
 
     foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPaintBox()) {
-            PaintBox *paintBox = SPtrGetAs(box, PaintBox);
+            PaintBox *paintBox = getAsPtr(box, PaintBox);
             menu->addSeparator();
             menu->addAction("New Paint Frame")->setObjectName(
                         "canvas_new_paint_frame");
@@ -207,21 +215,21 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     } else if(selectedAction->objectName() == "canvas_center_pivot") {
         centerPivotForSelected();
     } else if(selectedAction->objectName() == "canvas_effects_blur") {
-        applyBlurToSelected();
-    } else if(selectedAction->objectName() == "canvas_effects_motion_blur") {
+        applyEffectToSelected<BlurEffect>();
+    } else if(selectedAction->data() == "canvas_effects_motion_blur") {
         applySampledMotionBlurToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_shadow") {
-        applyShadowToSelected();
+        applyEffectToSelected<ShadowEffect>();
     } else if(selectedAction->objectName() == "canvas_effects_desaturate") {
-        applyDesaturateEffectToSelected();
+        applyEffectToSelected<DesaturateEffect>();
     } else if(selectedAction->objectName() == "canvas_effects_colorize") {
-        applyColorizeEffectToSelected();
+        applyEffectToSelected<ColorizeEffect>();
     } else if(selectedAction->objectName() == "canvas_effects_contrast") {
-        applyContrastEffectToSelected();
+        applyEffectToSelected<ContrastEffect>();
     } else if(selectedAction->objectName() == "canvas_effects_brightness") {
-        applyBrightnessEffectToSelected();
+        applyEffectToSelected<BrightnessEffect>();
     } else if(selectedAction->objectName() == "canvas_effects_replace_color") {
-        applyReplaceColorEffectToSelected();
+        applyEffectToSelected<ReplaceColorEffect>();
     } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
         applyDiscretePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
@@ -247,20 +255,20 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     } else if(selectedAction->objectName() == "canvas_new_paint_frame") {
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = SPtrGetAs(box, PaintBox);
+                PaintBox* paintBox = getAsPtr(box, PaintBox);
                 paintBox->newPaintFrameOnCurrentFrame();
             }
         }
     } else if(selectedAction->objectName() == "canvas_new_empty_paint_frame") {
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = SPtrGetAs(box, PaintBox);
+                PaintBox* paintBox = getAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
             }
         }
     } else if(selectedAction->objectName() == "canvas_setup_animation_frames") {
         PaintBoxSettingsDialog dialog;
-        PaintBox* firstPaintBox = SPtrGetAs(mSelectedBoxes.first(), PaintBox);
+        PaintBox* firstPaintBox = getAsPtr(mSelectedBoxes.first(), PaintBox);
         int frameStep = firstPaintBox->getFrameStep();
         int overlapFrames = firstPaintBox->getOverlapFrames();
         dialog.setOverlapFrames(overlapFrames);
@@ -271,7 +279,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         overlapFrames = dialog.getOverlapFrames();
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = SPtrGetAs(box, PaintBox);
+                PaintBox* paintBox = getAsPtr(box, PaintBox);
                 paintBox->setOverlapFrames(overlapFrames);
                 paintBox->setFrameStep(frameStep);
             }
@@ -279,7 +287,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     } else if(selectedAction->objectName() == "canvas_draft") {
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = SPtrGetAs(box, PaintBox);
+                PaintBox* paintBox = getAsPtr(box, PaintBox);
                 paintBox->setIsDraft(selectedAction->isChecked());
             }
         }
@@ -295,7 +303,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
             if(img.load(importPath)) {
                 foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     if(box->SWT_isPaintBox()) {
-                        PaintBoxQSPtr paintBox = box->ref<PaintBox>();
+                        PaintBoxQSPtr paintBox = getAsSPtr(box, PaintBox);
                         paintBox->loadFromImage(img);
                     }
                 }
@@ -321,8 +329,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             QMenu menu(mCanvasWindow->getCanvasWidget());
 
             BoxesClipboardContainer *clipboard =
-                    static_cast<BoxesClipboardContainer*>(
-                        MainWindow::getInstance()->getClipboardContainer(CCT_BOXES));
+                    MainWindow::getBoxesClipboardContainer();
             if(clipboard != nullptr) {
                 menu.addAction("Paste")->setShortcut(Qt::CTRL + Qt::Key_V);
             }
@@ -343,29 +350,49 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             }
 
             QMenu *effectsMenu = menu.addMenu("Effects");
-            effectsMenu->addAction("Blur");
-            effectsMenu->addAction("Brush");
-            effectsMenu->addAction("Lines");
-            effectsMenu->addAction("Circles");
-            effectsMenu->addAction("Swirl");
-            effectsMenu->addAction("Oil");
-            effectsMenu->addAction("Implode");
-            effectsMenu->addAction("Desaturate");
+            effectsMenu->addAction("Blur")->setObjectName(
+                        "canvas_effects_blur");
+            effectsMenu->addAction("Motion Blur")->setObjectName(
+                        "canvas_effects_motion_blur");
+            effectsMenu->addAction("Shadow")->setObjectName(
+                        "canvas_effects_shadow");
+        //    effectsMenu->addAction("Lines");
+        //    effectsMenu->addAction("Circles");
+        //    effectsMenu->addAction("Swirl");
+        //    effectsMenu->addAction("Oil");
+        //    effectsMenu->addAction("Implode");
+            effectsMenu->addAction("Desaturate")->setObjectName(
+                        "canvas_effects_desaturate");
+            effectsMenu->addAction("Colorize")->setObjectName(
+                        "canvas_effects_colorize");
+            effectsMenu->addAction("Replace Color")->setObjectName(
+                        "canvas_effects_replace_color");
+            effectsMenu->addAction("Contrast")->setObjectName(
+                        "canvas_effects_contrast");
+            effectsMenu->addAction("Brightness")->setObjectName(
+                        "canvas_effects_brightness");
+
             QMenu *pathEffectsMenu = menu.addMenu("Path Effects");
             pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
                         "canvas_path_effects_discrete");
             pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                         "canvas_path_effects_duplicate");
-            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
-                        "canvas_path_effects_solidify");
             pathEffectsMenu->addAction("Length Effect")->setObjectName(
                         "canvas_path_effects_length");
+            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+                        "canvas_path_effects_solidify");
+            pathEffectsMenu->addAction("Operation Effect")->setObjectName(
+                        "canvas_path_effect_sum");
+            pathEffectsMenu->addAction("Group Sum Effect")->setObjectName(
+                        "canvas_path_effect_group_sum");
 
             QMenu *fillPathEffectsMenu = menu.addMenu("Fill Effects");
             fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
                         "canvas_fill_effects_discrete");
             fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                         "canvas_fill_effects_duplicate");
+            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+                        "canvas_fill_effects_solidify");
             fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
                         "canvas_fill_effect_sum");
 
@@ -374,14 +401,17 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                         "canvas_outline_effects_discrete");
             outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                         "canvas_outline_effects_duplicate");
+            pathEffectsMenu->addAction("Length Effect")->setObjectName(
+                        "canvas_path_effects_length");
             outlinePathEffectsMenu->addAction("Operation Effect")->setObjectName(
                         "canvas_outline_effect_sum");
-
+            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+                        "canvas_outline_effects_solidify");
 
             menu.addAction("Map to Different Fps...")->setObjectName(
                         "map_to_different_fps");
 
-            menu.addAction("Settings...");
+            menu.addAction("Settings...")->setObjectName("canvas_settings");
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != nullptr) {
@@ -389,26 +419,28 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     pasteAction();
                 } else if(selectedAction->objectName() == "map_to_different_fps") {
                     bool ok;
-                    qreal newFps = QInputDialog::getDouble(mMainWindow, "Map to Different Fps",
-                                                           "New Fps:", mFps, 1., 999.,
-                                                           2, &ok);
+                    qreal newFps = QInputDialog::getDouble(
+                                mMainWindow, "Map to Different Fps",
+                                "New Fps:", mFps, 1., 999., 2, &ok);
                     if(ok) changeFpsTo(newFps);
-                } else if(selectedAction->text()== "Settings...") {
+                } else if(selectedAction->objectName()== "canvas_settings") {
                     mCanvasWindow->openSettingsWindowForCurrentCanvas();
-                } else if(selectedAction->text() == "Blur") {
-                    addEffect(SPtrCreate(BlurEffect)());
-                } else if(selectedAction->text() == "Lines") {
-                    addEffect(SPtrCreate(LinesEffect)());
-                } else if(selectedAction->text() == "Circles") {
-                    addEffect(SPtrCreate(CirclesEffect)());
-                } else if(selectedAction->text() == "Swirl") {
-                    addEffect(SPtrCreate(SwirlEffect)());
-                } else if(selectedAction->text() == "Oil") {
-                    addEffect(SPtrCreate(OilEffect)());
-                } else if(selectedAction->text() == "Implode") {
-                    addEffect(SPtrCreate(ImplodeEffect)());
-                } else if(selectedAction->text() == "Desaturate") {
-                    addEffect(SPtrCreate(DesaturateEffect)());
+                } else if(selectedAction->objectName() == "canvas_effects_blur") {
+                    addEffect<BlurEffect>();
+                } else if(selectedAction->objectName() == "canvas_effects_motion_blur") {
+                    addEffect<SampledMotionBlurEffect>();
+                } else if(selectedAction->objectName() == "canvas_effects_shadow") {
+                    addEffect<ShadowEffect>();
+                } else if(selectedAction->objectName() == "canvas_effects_desaturate") {
+                    addEffect<DesaturateEffect>();
+                } else if(selectedAction->objectName() == "canvas_effects_colorize") {
+                    addEffect<ColorizeEffect>();
+                } else if(selectedAction->objectName() == "canvas_effects_contrast") {
+                    addEffect<ContrastEffect>();
+                } else if(selectedAction->objectName() == "canvas_effects_brightness") {
+                    addEffect<BrightnessEffect>();
+                } else if(selectedAction->objectName() == "canvas_effects_replace_color") {
+                    addEffect<ReplaceColorEffect>();
                 } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
                     addPathEffect(SPtrCreate(DisplacePathEffect)(false));
                 } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
@@ -430,11 +462,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                             linkCanvasMenu->actions();
                     int id = canvasActions.indexOf(selectedAction);
                     if(id >= 0) {
-                        QSharedPointer<InternalLinkCanvas> canvasLink =
-                                listOfCanvas.at(id)->
-                                createLink()->ref<InternalLinkCanvas>();
-                        mCurrentBoxesGroup->addContainedBox(canvasLink);
-                        canvasLink->centerPivotPosition();
+                        auto newLink = listOfCanvas.at(id)->createLink();
+                        mCurrentBoxesGroup->addContainedBox(newLink);
+                        getAsPtr(newLink, InternalLinkCanvas)->centerPivotPosition();
                     }
                 }
             } else {
@@ -583,9 +613,8 @@ void Canvas::handleLeftButtonMousePress() {
         } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
             Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                 if(box->SWT_isParticleBox()) {
-                    QPointF relPos = box->mapAbsPosToRel(mLastMouseEventPosRel);
-                    if(box->getRelBoundingRectPath().contains(relPos.x(), relPos.y())) {
-                        SPtrGetAs(box, ParticleBox)->addEmitterAtAbsPos(
+                    if(box->absPointInsidePath(mLastMouseEventPosRel)) {
+                        getAsPtr(box, ParticleBox)->addEmitterAtAbsPos(
                                     mLastMouseEventPosRel);
                         break;
                     }
@@ -609,7 +638,7 @@ void Canvas::handleLeftButtonMousePress() {
 
             if(mLastPressedPoint != nullptr) {
                 if(mLastPressedPoint->isBonePoint()) {
-                    bonePt = SPtrGetAs(mLastPressedPoint, BonePt);
+                    bonePt = getAsPtr(mLastPressedPoint, BonePt);
                     if(bonePt->getTipBone() == nullptr) {
                         mLastMouseEventPosRel = bonePt->getAbsolutePos();
                         bonePt = nullptr;
@@ -622,7 +651,7 @@ void Canvas::handleLeftButtonMousePress() {
                 if(mSelectedBoxes.count() > 0) {
                     BoundingBox *lastSelected = mSelectedBoxes.last();
                     if(lastSelected->SWT_isBonesBox()) {
-                        boneBox = lastSelected->ref<BonesBox>();
+                        boneBox = getAsSPtr(lastSelected, BonesBox);
 
                         newBone = Bone::createBone(boneBox.data());
 
@@ -687,7 +716,7 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
         if(event->button() == Qt::LeftButton) {
             foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
                 if(box->SWT_isPaintBox()) {
-                    PaintBox *paintBox = SPtrGetAs(box, PaintBox);
+                    PaintBox *paintBox = getAsPtr(box, PaintBox);
                     paintBox->mousePressEvent(mLastMouseEventPosRel.x(),
                                          mLastMouseEventPosRel.y(),
                                          event->timestamp(), 0.5,
@@ -1373,7 +1402,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
                        mCurrentMode == MOVE_POINT) &&
                       boxAt->SWT_isTextBox()) {
                 releaseMouseAndDontTrack();
-                SPtrGetAs(boxAt, TextBox)->openTextEditor();
+                getAsPtr(boxAt, TextBox)->openTextEditor();
             } else if(mCurrentMode == MOVE_PATH &&
                       boxAt->SWT_isVectorPath()) {
                 mCanvasWindow->setCanvasMode(MOVE_POINT);

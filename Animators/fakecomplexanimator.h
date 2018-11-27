@@ -3,8 +3,8 @@
 #include "complexanimator.h"
 
 class FakeComplexAnimator : public ComplexAnimator {
+    friend class SelfRef;
 public:
-    FakeComplexAnimator(Property *target);
     Property *getTarget();
 
     void prp_drawKeys(QPainter *p,
@@ -19,9 +19,11 @@ public:
 
     void prp_getKeysInRect(const QRectF &selectionRect,
                            const qreal &pixelsPerFrame,
-                           QList<Key *> *keysList);
+                           QList<Key *>& keysList);
 
     bool SWT_isFakeComplexAnimator();
+protected:
+    FakeComplexAnimator(const QString& name, Property *target);
 private:
     Property *mTarget = nullptr;
 };

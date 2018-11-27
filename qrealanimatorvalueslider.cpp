@@ -53,9 +53,9 @@ void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mAnimator != nullptr) {
         if(mAnimator->SWT_isQrealAnimator()) {
-            SPtrGetAs(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
+            getAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
         } else if(mAnimator->SWT_isIntProperty()) {
-            SPtrGetAs(mAnimator, IntProperty)->setCurrentValue(qRound(value));
+            getAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
         }
     }
     QDoubleSlider::emitValueChanged(value);
@@ -65,9 +65,9 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     if(mAnimator != nullptr) {
         mBlockAnimatorSignals = true;
         if(mAnimator->SWT_isQrealAnimator()) {
-            SPtrGetAs(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
+            getAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
         } else if(mAnimator->SWT_isIntProperty()) {
-            SPtrGetAs(mAnimator, IntProperty)->setCurrentValue(qRound(value));
+            getAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
         }
         mBlockAnimatorSignals = false;
     }
@@ -113,7 +113,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
 
 void QrealAnimatorValueSlider::clearAnimator() {
     if(mAnimator != nullptr) {
-        disconnect(mAnimator.get(), nullptr, this, nullptr);
+        disconnect(mAnimator, nullptr, this, nullptr);
     }
     mAnimator = nullptr;
 }
@@ -124,9 +124,9 @@ void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
     mAnimator = animator;
     if(mAnimator != nullptr) {
         setNumberDecimals(animator->getNumberDecimals());
-        connect(animator.get(), SIGNAL(valueChangedSignal(qreal)),
+        connect(animator, SIGNAL(valueChangedSignal(qreal)),
                 this, SLOT(setValueFromAnimator(qreal)));
-        connect(animator.get(), SIGNAL(beingDeleted()),
+        connect(animator, SIGNAL(beingDeleted()),
                 this, SLOT(nullifyAnimator()));
 
         setValueRange(animator->getMinPossibleValue(),
@@ -156,6 +156,10 @@ void QrealAnimatorValueSlider::setIntAnimator(IntProperty *animator) {
     }
 }
 
+bool QrealAnimatorValueSlider::hasTargetAnimator() {
+    return mAnimator != nullptr;
+}
+
 bool QrealAnimatorValueSlider::isTargetDisabled() {
     if(hasTargetAnimator()) {
         return mAnimator->SWT_isDisabled();
@@ -170,11 +174,11 @@ void QrealAnimatorValueSlider::openContextMenu(
 
     if(mAnimator->prp_isKeyOnCurrentFrame()) {
         menu.addAction("Delete Keyframe",
-                       mAnimator.get(),
+                       mAnimator,
                        SLOT(anim_deleteCurrentKey()));
     } else {
         menu.addAction("Add Keyframe",
-                       mAnimator.get(),
+                       mAnimator,
                        SLOT(anim_saveCurrentValueAsKey()));
     }
 
@@ -184,7 +188,7 @@ void QrealAnimatorValueSlider::openContextMenu(
     recAct->setCheckable(true);
     recAct->setChecked(mAnimator->prp_isRecording());
     connect(recAct, SIGNAL(toggled(bool)),
-            mAnimator.get(), SLOT(prp_setRecording(bool)));
+            mAnimator, SLOT(prp_setRecording(bool)));
 
     QAction *selectedAction = menu.exec(globalPos);
     if(selectedAction == nullptr) {

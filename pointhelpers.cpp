@@ -3,16 +3,7 @@
 #include <complex>
 #include <QDebug>
 #include <QMatrix>
-
-#define v2to1div3 1.25992104989
-#define sqrt3     1.73205080757
-#define v2to2div3 1.58740105197
 #include <QList>
-
-qreal qRandF(const qreal &fMin, const qreal &fMax) {
-    qreal f = (qreal)qrand() / RAND_MAX;
-    return fMin + f * (fMax - fMin);
-}
 
 QPointF symmetricToPos(QPointF toMirror,
                        QPointF mirrorCenter) {
@@ -64,37 +55,6 @@ qreal tFromX(qreal p0x, qreal p1x,
     return guessT;
 }
 
-qreal pointToLen(QPointF point) {
-    return qSqrt(point.x()*point.x() + point.y()*point.y());
-}
-
-SkScalar pointToLen(SkPoint point) {
-    return SkScalarSqrt(point.x()*point.x() + point.y()*point.y());
-}
-
-bool isZero(qreal val) {
-    return qAbs(val) < 0.0001;
-}
-
-bool isZero2Dec(qreal val) {
-    return qAbs(val) < 0.01;
-}
-
-bool isZero1Dec(qreal val) {
-    return qAbs(val) < 0.1;
-}
-
-bool isPointZero(QPointF pos) {
-    return pointToLen(pos) < 0.0001;
-}
-
-QPointF scalePointToNewLen(QPointF point, qreal newLen) {
-    if(isPointZero(point)) {
-        return point;
-    }
-    return point * newLen / pointToLen(point);
-}
-
 void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
                           QPointF centerPos,
                           QPointF *newEndPos, QPointF *newStartPos) {
@@ -127,18 +87,6 @@ void getCtrlsSmoothPos(QPointF endPos, QPointF startPos,
             qAbs(QPointF::dotProduct(point1Rel, newStartDirection));
     *newEndPos = -newStartDirection*endCtrlPtLen +
             centerPos;
-}
-
-qreal clamp(qreal val, qreal min, qreal max) {
-    if(val > max) return max;
-    if(val < min) return min;
-    return val;
-}
-
-qreal qclamp(qreal val, qreal min, qreal max) {
-    if(val > max) return max;
-    if(val < min) return min;
-    return val;
 }
 
 void getClosestTValuesBezier1D(const qreal &v0n,
@@ -647,39 +595,6 @@ qreal getTforBezierPoint(const QPointF &p0,
     return getTforBezierPoint(p0.x(), p1.x(), p2.x(), p3.x(), p.x(),
                               p0.y(), p1.y(), p2.y(), p3.y(), p.y(),
                               error, bestPosPtr);
-}
-
-qreal qMin4(qreal v1, qreal v2, qreal v3, qreal v4) {
-    return qMin(v1, qMin(v2, qMin(v3, v4) ) );
-}
-
-qreal qMax4(qreal v1, qreal v2, qreal v3, qreal v4) {
-    return qMax(v1, qMax(v2, qMax(v3, v4) ) );
-}
-
-QRectF qRectF4Points(QPointF p1, QPointF c1,
-                     QPointF c2, QPointF p2) {
-    return QRectF(QPointF(qMin4(p1.x(), c1.x(), c2.x(), p2.x()),
-                          qMin4(p1.y(), c1.y(), c2.y(), p2.y())),
-
-                  QPointF(qMax4(p1.x(), c1.x(), c2.x(), p2.x()),
-                          qMax4(p1.y(), c1.y(), c2.y(), p2.y())));
-}
-
-QPointF rotateVector90Degrees(const QPointF &pt) {
-    return QPointF(-pt.y(), pt.x()); // y is downwards
-}
-
-qreal degreesBetweenVectors(const QPointF &pt1,
-                            const QPointF &pt2) {
-    return radiansBetweenVectors(pt1, pt2)*180./M_PI;
-}
-
-qreal radiansBetweenVectors(const QPointF &pt1,
-                            const QPointF &pt2) {
-    qreal dot = pt1.x()*pt2.x() + pt1.y()*pt2.y();
-    qreal det = pt1.x()*pt2.y() - pt1.y()*pt2.x();
-    return atan2(det, dot);
 }
 
 void drawCosmeticEllipse(QPainter *p,

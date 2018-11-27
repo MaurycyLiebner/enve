@@ -334,74 +334,65 @@ void FillStrokeSettingsWidget::colorTypeSet(const int &id) {
     } else {
         if((mTargetId == 0) ? (mCurrentFillGradient == nullptr) :
                 (mCurrentStrokeGradient == nullptr) ) {
-            mGradientWidget->setCurrentGradient((Gradient*)nullptr);
+            mGradientWidget->setCurrentGradient(nullptr);
         }
         setGradientPaintType();
     }
+
+    bool isFill;
+    PaintType currentPaintType;
+    Gradient *currentGradient;
+    bool currentGradientLinear;
     if(mTargetId == 0) {
-        if(mCurrentFillPaintType == FLATPAINT) {
-            PaintSetting paintSetting =
-                    PaintSetting(true, ColorSetting());
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        } else if(mCurrentFillPaintType == GRADIENTPAINT) {
-            PaintSetting paintSetting =
-                    PaintSetting(true,
-                                 mCurrentFillGradientLinear,
-                                 mCurrentFillGradient);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        } else{
-            PaintSetting paintSetting =
-                    PaintSetting(true);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        }
+        isFill = true;
+        currentPaintType = mCurrentFillPaintType;
+        currentGradient = mCurrentFillGradient;
+        currentGradientLinear = mCurrentFillGradientLinear;
     } else {
-        if(mCurrentStrokePaintType == FLATPAINT) {
-            PaintSetting paintSetting =
-                    PaintSetting(false, ColorSetting());
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        } else if(mCurrentStrokePaintType == GRADIENTPAINT) {
-            PaintSetting paintSetting =
-                    PaintSetting(false,
-                                 mCurrentStrokeGradientLinear,
-                                 mCurrentStrokeGradient);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        } else{
-            PaintSetting paintSetting =
-                    PaintSetting(false);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        }
+        isFill = false;
+        currentPaintType = mCurrentStrokePaintType;
+        currentGradient = mCurrentStrokeGradient;
+        currentGradientLinear = mCurrentStrokeGradientLinear;
     }
+    PaintSettingSPtr paintSetting;
+    if(currentPaintType == FLATPAINT) {
+        paintSetting = SPtrCreate(PaintSetting)(isFill, ColorSetting());
+    } else if(currentPaintType == GRADIENTPAINT) {
+        paintSetting = SPtrCreate(PaintSetting)(
+                    isFill, currentGradientLinear, currentGradient);
+    } else{
+        paintSetting = SPtrCreate(PaintSetting)(isFill);
+    }
+    mCanvasWindow->applyPaintSettingToSelected(*paintSetting);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(
         const ColorSetting &colorSetting) {
+    bool isFill;
+    PaintType currentPaintType;
+    Gradient *currentGradient;
+    bool currentGradientLinear;
     if(mTargetId == 0) {
-        if(mCurrentFillPaintType == FLATPAINT) {
-            PaintSetting paintSetting =
-                    PaintSetting(true, colorSetting);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        } else {
-            PaintSetting paintSetting =
-                    PaintSetting(true,
-                                 mCurrentFillGradientLinear,
-                                 mCurrentFillGradient);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        }
+        isFill = true;
+        currentPaintType = mCurrentFillPaintType;
+        currentGradient = mCurrentFillGradient;
+        currentGradientLinear = mCurrentFillGradientLinear;
     } else {
-        if(mCurrentStrokePaintType == FLATPAINT) {
-            PaintSetting paintSetting =
-                    PaintSetting(false, colorSetting);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        } else {
-            PaintSetting paintSetting =
-                    PaintSetting(false,
-                                 mCurrentStrokeGradientLinear,
-                                 mCurrentStrokeGradient);
-            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-        }
+        isFill = false;
+        currentPaintType = mCurrentStrokePaintType;
+        currentGradient = mCurrentStrokeGradient;
+        currentGradientLinear = mCurrentStrokeGradientLinear;
     }
+    PaintSettingSPtr paintSetting;
+    if(currentPaintType == FLATPAINT) {
+        paintSetting = SPtrCreate(PaintSetting)(isFill, colorSetting);
+    } else { // GRADIENTPAINT
+        paintSetting = SPtrCreate(PaintSetting)(
+                    isFill, currentGradientLinear, currentGradient);
+    }
+    mCanvasWindow->applyPaintSettingToSelected(*paintSetting);
 }
 
 void FillStrokeSettingsWidget::connectGradient() {
@@ -580,40 +571,34 @@ void FillStrokeSettingsWidget::startTransform(const char *slot)
     }*/
 }
 
+void FillStrokeSettingsWidget::applyGradient() {
+    bool isFill;
+    Gradient *currentGradient;
+    bool currentGradientLinear;
+    if(mTargetId == 0) {
+        isFill = true;
+        currentGradient = mCurrentFillGradient;
+        currentGradientLinear = mCurrentFillGradientLinear;
+    } else {
+        isFill = false;
+        currentGradient = mCurrentStrokeGradient;
+        currentGradientLinear = mCurrentStrokeGradientLinear;
+    }
+    PaintSettingSPtr paintSetting = SPtrCreate(PaintSetting)(
+                isFill, currentGradientLinear, currentGradient);
+    mCanvasWindow->applyPaintSettingToSelected(*paintSetting);
+}
+
 void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {
     setCurrentGradientVal(gradient);
-    if(mTargetId == 0) {
-        PaintSetting paintSetting =
-                PaintSetting(true,
-                             mCurrentFillGradientLinear,
-                             mCurrentFillGradient);
-        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-    } else {
-        PaintSetting paintSetting =
-                PaintSetting(false,
-                             mCurrentStrokeGradientLinear,
-                             mCurrentStrokeGradient);
-        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-    }
+    applyGradient();
 }
 
 void FillStrokeSettingsWidget::setGradientLinear(const bool &linear) {
     setCurrentGradientLinearVal(linear);
     mLinearGradientButton->setChecked(linear);
     mRadialGradientButton->setChecked(!linear);
-    if(mTargetId == 0) {
-        PaintSetting paintSetting =
-                PaintSetting(true,
-                             mCurrentFillGradientLinear,
-                             mCurrentFillGradient);
-        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-    } else {
-        PaintSetting paintSetting =
-                PaintSetting(false,
-                             mCurrentStrokeGradientLinear,
-                             mCurrentStrokeGradient);
-        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-    }
+    applyGradient();
 }
 
 void FillStrokeSettingsWidget::setBevelJoinStyle() {
@@ -646,8 +631,7 @@ void FillStrokeSettingsWidget::setRoundCapStyle() {
     emitCapStyleChanged();
 }
 
-void FillStrokeSettingsWidget::waitToSaveChanges()
-{
+void FillStrokeSettingsWidget::waitToSaveChanges() {
     if(mUndoRedoSaveTimer->isActive()) {
         mUndoRedoSaveTimer->setInterval(50);
         return;

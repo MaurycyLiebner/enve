@@ -1,18 +1,18 @@
 #include "gradientpoints.h"
 #include "gradientpoint.h"
 #include "skqtconversions.h"
+#include "Boxes/pathbox.h"
 
 GradientPoints::GradientPoints(PathBox *parentT) :
-    ComplexAnimator("gradient points") {
-    mParent_k = parentT;
+    ComplexAnimator("gradient points"), mParent_k(parentT) {
 
     mStartAnimator = SPtrCreate(QPointFAnimator)("point1");
     ca_addChildAnimator(mStartAnimator);
-    mStartPoint = SPtrCreate(GradientPoint)(mParent_k);
+    mStartPoint = SPtrCreate(GradientPoint)(mStartAnimator.get(), mParent_k);
 
     mEndAnimator = SPtrCreate(QPointFAnimator)("point2");
     ca_addChildAnimator(mEndAnimator);
-    mEndPoint = SPtrCreate(GradientPoint)(mParent_k);
+    mEndPoint = SPtrCreate(GradientPoint)(mEndAnimator.get(), mParent_k);
 
     mEnabled = false;
 }

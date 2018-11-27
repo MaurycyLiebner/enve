@@ -2,8 +2,6 @@
 #define QPOINTFANIMATOR_H
 #include "Animators/complexanimator.h"
 #include "skiaincludes.h"
-class QrealAnimator;
-typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
 
 class QPointFAnimator : public ComplexAnimator {
     friend class SelfRef;

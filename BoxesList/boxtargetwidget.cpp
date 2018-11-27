@@ -18,8 +18,8 @@ void BoxTargetWidget::setTargetProperty(BoxTargetProperty *property) {
 void BoxTargetWidget::dropEvent(
         QDropEvent *event) {
     if(event->mimeData()->hasFormat("boundingbox")) {
-        BoundingBox *targetT = ((BoundingBoxMimeData*)event->mimeData())->
-                getBoundingBox();
+        auto boxMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
+        BoundingBox *targetT = boxMimeData->getTarget();
         mProperty->setTarget(targetT);
         mDragging = false;
         update();
@@ -30,8 +30,8 @@ void BoxTargetWidget::dropEvent(
 void BoxTargetWidget::dragEnterEvent(
         QDragEnterEvent *event) {
     if(event->mimeData()->hasFormat("boundingbox")) {
-        BoundingBox *targetT = ((BoundingBoxMimeData*)event->mimeData())->
-                getBoundingBox();
+        auto boxMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
+        BoundingBox *targetT = boxMimeData->getTarget();
         BoundingBox *parentBox =
                 mProperty->getLastSetParentBoundingBoxAncestor();
         if(parentBox == targetT) return;

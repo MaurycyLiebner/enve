@@ -92,7 +92,7 @@ void MinimalScrollWidgetVisiblePart::updateParentHeightIfNeeded() {
 
 void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
     int neededWidgets = qCeil(mVisibleHeight/
-                              (qreal)MIN_WIDGET_HEIGHT);
+                              static_cast<qreal>(MIN_WIDGET_HEIGHT));
     int currentNWidgets = mSingleWidgets.count();
 
     if(neededWidgets == currentNWidgets) return;
@@ -118,10 +118,10 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
 
 void MinimalScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     int idP = 0;
-    int currX;
-    int currY;
-    currX = 0;
-    currY = MIN_WIDGET_HEIGHT/2;
+//    int currX;
+//    int currY;
+//    currX = 0;
+//    currY = MIN_WIDGET_HEIGHT/2;
 //    mMainAbstraction->setSingleWidgetAbstractions(
 //                mVisibleTop,
 //                mVisibleTop + mVisibleHeight + currY,

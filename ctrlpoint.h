@@ -3,9 +3,8 @@
 #include "movablepoint.h"
 
 class CtrlPoint : public NonAnimatedMovablePoint {
+    friend class StdSelfRef;
 public:
-    CtrlPoint(NodePoint *parentPoint, bool isStartCtrlPt);
-
     QPointF getRelativePos() const;
 
     void moveByAbs(const QPointF &absTranslatione);
@@ -29,9 +28,11 @@ public:
     int getPtId();
 
     void setRelativePosVal(const QPointF &relPos);
+protected:
+    CtrlPoint(NodePoint *parentPoint, bool isStartCtrlPt);
 private:
     bool mIsStartCtrlPt;
-    NodePointPtr mParentPoint_k;
+    NodePoint* const mParentPoint_k;
     CtrlPointPtr mOtherCtrlPt_cv;
 };
 

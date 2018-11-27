@@ -73,7 +73,7 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.reset();
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);
-    mSrcRenderData = data->ref<BoundingBoxRenderData>();
+    mSrcRenderData = getAsSPtr(data, BoundingBoxRenderData);
     MemoryHandler::getInstance()->containerUpdated(this);
 }
 
@@ -106,23 +106,23 @@ CacheContainer::~CacheContainer() {
     scheduleDeleteTmpFile();
 }
 
-_ScheduledExecutorSPtr CacheContainer::scheduleLoadFromTmpFile(_ScheduledExecutor *dependent) {
+_ScheduledExecutor* CacheContainer::scheduleLoadFromTmpFile(
+        _ScheduledExecutor *dependent) {
     if(mSavingToFile) {
         mCancelAfterSaveDataClear = true;
-        return mSavingUpdatable;
+        return mSavingUpdatable.get();
     }
     if(!mNoDataInMemory) return nullptr;
-    if(mLoadingFromFile) return mLoadingUpdatable;
+    if(mLoadingFromFile) return mLoadingUpdatable.get();
 
     mLoadingFromFile = true;
     mLoadingUpdatable =
-            SPtrCreate(CacheContainerTmpFileDataLoader)(
-                mTmpFile, this);
+            SPtrCreate(CacheContainerTmpFileDataLoader)(mTmpFile, this);
     if(dependent != nullptr) {
         mLoadingUpdatable->addDependent(dependent);
     }
     mLoadingUpdatable->addScheduler();
-    return mLoadingUpdatable;
+    return mLoadingUpdatable.get();
 }
 
 void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {

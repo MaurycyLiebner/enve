@@ -198,7 +198,7 @@ private:
 
     QList<Particle*> mParticles;
     QList<Particle*> mNotFinishedParticles;
-    ParticleBoxQPtr mParentBox_k;
+    ParticleBox* mParentBox_k = nullptr;
 
     ColorAnimatorQSPtr mColorAnimator =
             SPtrCreate(ColorAnimator)();
@@ -274,7 +274,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint*>& list);
+                                           QList<MovablePointPtr> &list);
     void applyPaintSetting(const PaintSetting &setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
@@ -288,7 +288,7 @@ public:
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                BoundingBoxRenderData* data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        auto particleData = data->ref<ParticleBoxRenderData>();
+        auto particleData = getAsSPtr(data, ParticleBoxRenderData);
         particleData->emittersData.clear();
         foreach(const ParticleEmitterQSPtr& emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();

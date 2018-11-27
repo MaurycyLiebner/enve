@@ -6,34 +6,38 @@
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     setName("Rectangle");
 
-    mTopLeftPoint = new RectangleTopLeftPoint(mTransformAnimator.data());
+    mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
+    mTopLeftPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mTopLeftAnimator.get(), mTransformAnimator.data(),
+                TYPE_PATH_POINT);
     mTopLeftPoint->setRelativePos(QPointF(0., 0.));
-    mBottomRightPoint = new RectangleBottomRightPoint(mTransformAnimator.data());
+
+    mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom left");
+    mBottomRightPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mTopLeftAnimator.get(), mTransformAnimator.data(),
+                TYPE_PATH_POINT);
     mBottomRightPoint->setRelativePos(QPointF(0., 0.));
 
     //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
     //mBottomRightPoint->setRadiusPoint(mRadiusPoint);
 
-    mTopLeftPoint->prp_setName("top left");
-    mBottomRightPoint->prp_setName("bottom right");
+    ca_addChildAnimator(mTopLeftAnimator);
+    ca_addChildAnimator(mBottomRightAnimator);
 
-    ca_addChildAnimator(mTopLeftPoint);
-    ca_addChildAnimator(mBottomRightPoint);
+    ca_prependChildAnimator(mTopLeftAnimator.get(), mEffectsAnimators);
+    ca_prependChildAnimator(mBottomRightAnimator.get(), mEffectsAnimators);
 
-    ca_prependChildAnimator(mTopLeftPoint, mEffectsAnimators.data());
-    ca_prependChildAnimator(mBottomRightPoint, mEffectsAnimators.data());
+    mRadiusAnimator = SPtrCreate(QPointFAnimator)("round radius");
+    mRadiusAnimator->setValuesRange(0., 9999.);
 
-    mRadiusPoint = new QPointFAnimator();
-    mRadiusPoint->prp_setName("round radius");
-    ca_addChildAnimator(mRadiusPoint);
-    ca_prependChildAnimator(mRadiusPoint, mEffectsAnimators.data());
-    mRadiusPoint->setValuesRange(0., 9999.);
+    mRadiusPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mRadiusAnimator.get(), mTransformAnimator.data(),
+                TYPE_PATH_POINT);
+
+    ca_addChildAnimator(mRadiusAnimator);
+    ca_prependChildAnimator(mRadiusAnimator.get(), mEffectsAnimators);
 
     prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
-}
-
-Rectangle::~Rectangle() {
-
 }
 
 void Rectangle::startAllPointsTransform() {
@@ -51,13 +55,13 @@ void Rectangle::finishAllPointsTransform() {
 SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
     SkPath path;
     SkPoint topLeft =
-            QPointFToSkPoint(mTopLeftPoint->
+            QPointFToSkPoint(mTopLeftAnimator->
                                 getCurrentEffectivePointValueAtRelFrame(relFrame));
     SkPoint bottomRight =
-            QPointFToSkPoint(mBottomRightPoint->
+            QPointFToSkPoint(mBottomRightAnimator->
                                 getCurrentEffectivePointValueAtRelFrame(relFrame));
     QPointF radiusAtFrame =
-            mRadiusPoint->getCurrentEffectivePointValueAtRelFrame(relFrame);
+            mRadiusAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
     path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
                                        bottomRight.x(), bottomRight.y()),
                       radiusAtFrame.x(), radiusAtFrame.y());
@@ -67,13 +71,13 @@ SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
 SkPath Rectangle::getPathAtRelFrameF(const qreal &relFrame) {
     SkPath path;
     SkPoint topLeft =
-            QPointFToSkPoint(mTopLeftPoint->
+            QPointFToSkPoint(mTopLeftAnimator->
                                 getCurrentEffectivePointValueAtRelFrameF(relFrame));
     SkPoint bottomRight =
-            QPointFToSkPoint(mBottomRightPoint->
+            QPointFToSkPoint(mBottomRightAnimator->
                                 getCurrentEffectivePointValueAtRelFrameF(relFrame));
     QPointF radiusAtFrame =
-            mRadiusPoint->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+            mRadiusAnimator->getCurrentEffectivePointValueAtRelFrameF(relFrame);
     path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
                                        bottomRight.x(), bottomRight.y()),
                       radiusAtFrame.x(), radiusAtFrame.y());
@@ -89,11 +93,11 @@ void Rectangle::setBottomRightPos(const QPointF &pos) {
 }
 
 void Rectangle::setYRadius(const qreal &radiusY) {
-    mRadiusPoint->getYAnimator()->qra_setCurrentValue(radiusY);
+    mRadiusAnimator->getYAnimator()->qra_setCurrentValue(radiusY);
 }
 
 void Rectangle::setXRadius(const qreal &radiusX) {
-    mRadiusPoint->getXAnimator()->qra_setCurrentValue(radiusX);
+    mRadiusAnimator->getXAnimator()->qra_setCurrentValue(radiusX);
 }
 
 void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {
@@ -101,7 +105,7 @@ void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {
 }
 
 MovablePoint *Rectangle::getBottomRightPoint() {
-    return mBottomRightPoint;
+    return mBottomRightPoint.get();
 }
 
 void Rectangle::drawSelectedSk(SkCanvas *canvas,
@@ -133,51 +137,41 @@ MovablePoint *Rectangle::getPointAtAbsPos(const QPointF &absPtPos,
                                                             canvasScaleInv);
     if(pointToReturn == nullptr) {
         if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mTopLeftPoint;
+            return mTopLeftPoint.get();
         }
         if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-            return mBottomRightPoint;
+            return mBottomRightPoint.get();
         }
     }
     return pointToReturn;
 }
 
 void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                  QList<MovablePointSPtr>& list) {
+                                                  QList<MovablePointPtr>& list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
-            list.append(mTopLeftPoint);
+            list.append(mTopLeftPoint.get());
         }
     }
     if(!mBottomRightPoint->isSelected()) {
         if(mBottomRightPoint->isContainedInRect(absRect)) {
             mBottomRightPoint->select();
-            list.append(mBottomRightPoint);
+            list.append(mBottomRightPoint.get());
         }
     }
 }
 
-void Rectangle::getMotionBlurProperties(QList<PropertyQSPtr>& list) {
+void Rectangle::getMotionBlurProperties(QList<Property *> &list) {
     PathBox::getMotionBlurProperties(list);
-    list.append(mTopLeftPoint);
-    list.append(mBottomRightPoint);
-    list.append(mRadiusPoint);
+    list.append(mTopLeftAnimator.get());
+    list.append(mBottomRightAnimator.get());
+    list.append(mRadiusAnimator.get());
 }
 
 bool Rectangle::differenceInEditPathBetweenFrames(
         const int& frame1, const int& frame2) const {
-    if(mTopLeftPoint->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
-    if(mBottomRightPoint->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
-    return mRadiusPoint->prp_differencesBetweenRelFrames(frame1, frame2);
-}
-
-RectangleTopLeftPoint::RectangleTopLeftPoint(BasicTransformAnimator *parent) :
-    QPointFAnimator(parent, TYPE_PATH_POINT) {
-
-}
-
-RectangleBottomRightPoint::RectangleBottomRightPoint(BasicTransformAnimator *parent) :
-    QPointFAnimator(parent, TYPE_PATH_POINT) {
-
+    if(mTopLeftAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    if(mBottomRightAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    return mRadiusAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }

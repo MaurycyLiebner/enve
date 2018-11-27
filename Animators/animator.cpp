@@ -38,11 +38,23 @@ bool Animator::prp_prevRelFrameWithKey(const int &relFrame,
     return true;
 }
 
+KeySPtr Animator::readKey(QIODevice *target) {
+    Q_UNUSED(target);
+    return nullptr;
+}
+
+bool Animator::hasFakeComplexAnimator() {
+    return !mFakeComplexAnimator.isNull();
+}
+
+FakeComplexAnimator *Animator::getFakeComplexAnimator() {
+    return mFakeComplexAnimator.data();
+}
+
 void Animator::enableFakeComplexAnimator() {
     if(!mFakeComplexAnimator.isNull()) return;
     SWT_hide();
-    mFakeComplexAnimator = SPtrCreate(FakeComplexAnimator)(this);
-    mFakeComplexAnimator->prp_setName(prp_mName);
+    mFakeComplexAnimator = SPtrCreate(FakeComplexAnimator)(prp_mName, this);
     emit prp_prependWith(this, mFakeComplexAnimator);
 }
 
@@ -140,6 +152,14 @@ void Animator::prp_switchRecording() {
     prp_setRecording(!anim_mIsRecording);
 }
 
+bool Animator::prp_isDescendantRecording() { return anim_mIsRecording; }
+
+bool Animator::anim_isComplexAnimator() { return anim_mIsComplexAnimator; }
+
+bool Animator::prp_isAnimator() { return true; }
+
+void Animator::prp_startDragging() {}
+
 void Animator::anim_mergeKeysIfNeeded() {
     Key* lastKey = nullptr;
     QList<KeyPair> keyPairsToMerge;
@@ -187,6 +207,10 @@ bool Animator::anim_getClosestsKeyOccupiedRelFrame(const int &frame,
 Key *Animator::anim_getKeyAtAbsFrame(const int &frame) {
     return anim_getKeyAtRelFrame(prp_absFrameToRelFrame(frame));
 }
+
+void Animator::anim_saveCurrentValueAsKey() {}
+
+void Animator::anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
 
 int Animator::anim_getKeyIndex(Key* key) {
     int index = -1;
@@ -295,7 +319,7 @@ void Animator::anim_updateAfterShifted() {
     }
 }
 
-bool keysFrameSort(Key *key1,
+bool keysFrameSort(const KeySPtr &key1,
                    const KeySPtr &key2) {
     return key1->getAbsFrame() < key2->getAbsFrame();
 }
@@ -376,6 +400,14 @@ void Animator::anim_updateKeyOnCurrrentFrame() {
     anim_mKeyOnCurrentFrame = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
 }
 
+DurationRectangleMovable *Animator::anim_getRectangleMovableAtPos(
+        const int &relX, const int &minViewedFrame, const qreal &pixelsPerFrame) {
+    Q_UNUSED(relX);
+    Q_UNUSED(minViewedFrame);
+    Q_UNUSED(pixelsPerFrame);
+    return nullptr;
+}
+
 Key *Animator::prp_getKeyAtPos(const qreal &relX,
                                const int &minViewedFrame,
                                const qreal &pixelsPerFrame) {
@@ -408,13 +440,13 @@ Key *Animator::prp_getKeyAtPos(const qreal &relX,
 
 void Animator::prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
     Q_FOREACH(const KeySPtr &key, anim_mKeys) {
-        target->ca_addDescendantsKey(key);
+        target->ca_addDescendantsKey(key.get());
     }
 }
 
 void Animator::prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
     Q_FOREACH(const KeySPtr &key, anim_mKeys) {
-        target->ca_removeDescendantsKey(key);
+        target->ca_removeDescendantsKey(key.get());
     }
 }
 
@@ -438,6 +470,8 @@ void Animator::anim_setRecordingValue(const bool &rec) {
     anim_mIsRecording = rec;
     emit prp_isRecordingChanged();
 }
+
+bool Animator::SWT_isAnimator() { return true; }
 
 bool Animator::prp_isRecording() {
     return anim_mIsRecording;
@@ -472,7 +506,7 @@ void Animator::prp_getKeysInRect(const QRectF &selectionRect,
     for(int i = selRightFrame; i >= selLeftFrame; i--) {
         Key* keyAtPos = anim_getKeyAtAbsFrame(i);
         if(keyAtPos != nullptr) {
-            keysList.append(QPointer<Key>(keyAtPos));
+            keysList.append(keyAtPos);
         }
     }
 }
@@ -571,6 +605,18 @@ bool Animator::anim_getNextAndPreviousKeyIdForRelFrameF(
     return true;
 }
 
+bool Animator::hasSelectedKeys() const {
+    return !anim_mSelectedKeys.isEmpty();
+}
+
+void Animator::addSelectedKey(Key *key) {
+    anim_mSelectedKeys << key;
+}
+
+void Animator::removeSelectedKey(Key *key) {
+    anim_mSelectedKeys.removeOne(key);
+}
+
 bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                const int &relFrame2) {
     if(relFrame1 == relFrame2) return false;
@@ -588,6 +634,14 @@ bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
     if(prevId1 == nextId2) return false;
     return anim_mKeys.at(prevId1)->differsFromKey(
                 anim_mKeys.at(nextId2).get());
+}
+
+int Animator::anim_getCurrentAbsFrame() {
+    return anim_mCurrentAbsFrame;
+}
+
+int Animator::anim_getCurrentRelFrame() {
+    return anim_mCurrentRelFrame;
 }
 
 void Animator::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,

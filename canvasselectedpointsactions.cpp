@@ -7,8 +7,9 @@ void Canvas::connectPoints() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            if(((NodePoint*)point)->isEndPoint()) {
-                selectedNodePoints.append( (NodePoint*) point);
+            auto asNodePt = getAsPtr(point, NodePoint);
+            if(asNodePt->isEndPoint()) {
+                selectedNodePoints.append(asNodePt);
             }
         }
     }
@@ -56,7 +57,8 @@ void Canvas::connectPoints() {
             QMatrix effectiveMatrix =
                     secondMatrix*firstMatrix.inverted();
             secondSinglePath->applyTransformToPoints(effectiveMatrix);
-            firstParentPath->addSinglePathAnimator(secondSinglePath);
+            auto secondSinglePathSPtr = getAsSPtr(secondSinglePath, VectorPathAnimator);
+            firstParentPath->addSinglePathAnimator(secondSinglePathSPtr);
             secondSinglePath->removeFromParent();
             secondSinglePath->setParentPath(firstParentPath);
 
@@ -75,10 +77,11 @@ void Canvas::disconnectPoints() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            NodePoint *nextPoint = ((NodePoint*)point)->getNextPoint();
+            auto asNodePt = getAsPtr(point, NodePoint);
+            NodePoint *nextPoint = asNodePt->getNextPoint();
             if(nextPoint == nullptr) continue;
             if(nextPoint->isSelected()) {
-                selectedNodePoints.append((NodePoint*)point);
+                selectedNodePoints.append(asNodePt);
             }
         }
     }
@@ -180,8 +183,9 @@ void Canvas::mergePoints() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
+            auto asNodePt = getAsPtr(point, NodePoint);
             //if(((NodePoint*)point)->isEndPoint()) {
-                selectedNodePoints.append( (NodePoint*) point);
+                selectedNodePoints.append(asNodePt);
             //}
         }
     }
@@ -216,7 +220,8 @@ void Canvas::mergePoints() {
 void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            ((NodePoint*)point)->setCtrlsMode(mode);
+            auto asNodePt = getAsPtr(point, NodePoint);
+            asNodePt->setCtrlsMode(mode);
         }
     }
 }
@@ -225,7 +230,8 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            selectedNodePoints.append((NodePoint*)point);
+            auto asNodePt = getAsPtr(point, NodePoint);
+            selectedNodePoints.append(asNodePt);
         }
     }
     Q_FOREACH(NodePoint *selectedPoint,
@@ -245,7 +251,8 @@ void Canvas::makeSelectedPointsSegmentsLines() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            selectedNodePoints.append( (NodePoint*) point);
+            auto asNodePt = getAsPtr(point, NodePoint);
+            selectedNodePoints.append(asNodePt);
         }
     }
     Q_FOREACH(NodePoint *selectedPoint,
@@ -295,11 +302,11 @@ void Canvas::moveSelectedPointsByAbs(const QPointF &by,
 
 void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->selectAndAddContainedPointsToList(absRect, &mSelectedPoints_d);
+        box->selectAndAddContainedPointsToList(absRect, mSelectedPoints_d);
     }
 }
 
-void Canvas::addPointToSelection(const MovablePoint& point) {
+void Canvas::addPointToSelection(MovablePoint* point) {
     if(point->isSelected()) {
         return;
     }
@@ -314,18 +321,18 @@ void Canvas::removePointFromSelection(MovablePoint *point) {
 
 void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
     if(!BoxesGroup::mCtrlsAlwaysVisible) {
-        QList<MovablePointSPtr> pointsToDeselect;
-        Q_FOREACH(const MovablePointSPtr& point, mSelectedPoints_d) {
+        QList<MovablePoint*> pointsToDeselect;
+        Q_FOREACH(MovablePoint* point, mSelectedPoints_d) {
             pointsToDeselect << point;
         }
-        Q_FOREACH(const MovablePointSPtr& point, pointsToDeselect) {
+        Q_FOREACH(MovablePoint* point, pointsToDeselect) {
             removePointFromSelection(point);
         }
     }
 }
 
 void Canvas::removeSelectedPointsApproximateAndClearList() {
-    Q_FOREACH(const MovablePointSPtr& point, mSelectedPoints_d) {
+    Q_FOREACH(MovablePoint* point, mSelectedPoints_d) {
         point->deselect();
         point->removeApproximate();
     }

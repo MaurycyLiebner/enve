@@ -22,7 +22,7 @@
 #include "usagewidget.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
-    mWindowSWTTarget = new WindowSingleWidgetTarget(this);
+    mWindowSWTTarget = SPtrCreate(WindowSingleWidgetTarget)(this);
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
@@ -92,7 +92,6 @@ CanvasWindow::~CanvasWindow() {
 //    mFileControlerThread->quit();
 //    mFileControlerThread->wait();
     delete mFileControler;
-    delete mWindowSWTTarget;
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
@@ -280,6 +279,7 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 }
 
 void CanvasWindow::qRender(QPainter *p) {
+    Q_UNUSED(p);
     if(mCurrentCanvas == nullptr) return;
     //mCurrentCanvas->drawInputText(p);
 }
@@ -1078,7 +1078,7 @@ void CanvasWindow::clearAll() {
     }
 
     mCanvasList.clear();
-    setCurrentCanvas((Canvas*)nullptr);
+    setCurrentCanvas(nullptr);
 }
 
 void CanvasWindow::createLinkToFileWithPath(const QString &path) {
@@ -1227,17 +1227,17 @@ void CanvasWindow::importFile(const QString &path,
     if(isSoundExt(extension)) {
         createSoundForPath(path);
     } else {
-        QSharedPointer<BoundingBox> importedBox;
+        BoundingBoxQSPtr importedBox;
         mCurrentCanvas->blockUndoRedo();
         if(isVectorExt(extension)) {
-            importedBox = loadSVGFile(path)->ref<BoundingBox>();
+            importedBox = loadSVGFile(path);
         } else if(isImageExt(extension)) {
-            ImageBox *imgBox = new ImageBox();
-            importedBox = imgBox->ref<BoundingBox>();
+            ImageBoxQSPtr imgBox = SPtrCreate(ImageBox)();
+            importedBox = getAsSPtr(imgBox, BoundingBox);
             imgBox->setFilePath(path);
         } else if(isVideoExt(extension)) {
-            VideoBox *vidBox = new VideoBox();
-            importedBox = vidBox->ref<BoundingBox>();
+            VideoBoxQSPtr vidBox = SPtrCreate(VideoBox)();
+            importedBox = getAsSPtr(vidBox, BoundingBox);
             vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {
             MainWindow::getInstance()->loadAVFile(path);

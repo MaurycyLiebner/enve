@@ -17,10 +17,10 @@ public:
         int indexT = mProfilesComboBox->currentIndex();
         if(indexT < 0) return nullptr;
         if(indexT >= OUTPUT_SETTINGS_PROFILES.count()) return nullptr;
-        return OUTPUT_SETTINGS_PROFILES.at(indexT);
+        return OUTPUT_SETTINGS_PROFILES.at(indexT).get();
     }
 
-    static QList<OutputSettingsProfile*> OUTPUT_SETTINGS_PROFILES;
+    static QList<OutputSettingsProfileSPtr> OUTPUT_SETTINGS_PROFILES;
 protected:
     QVBoxLayout *mMainLayout;
 

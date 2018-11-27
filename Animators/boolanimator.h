@@ -2,11 +2,9 @@
 #define BOOLANIMATOR_H
 #include "intanimator.h"
 
-class BoolAnimator : public IntAnimator
-{
+class BoolAnimator : public IntAnimator {
+    friend class SelfRef;
 public:
-    BoolAnimator();
-
     bool getCurrentBoolValue();
     void setCurrentBoolValue(const bool &bT,
                              const bool &finish = false);
@@ -18,6 +16,8 @@ public:
     }
 
     bool SWT_isBoolAnimator() { return true; }
+protected:
+    BoolAnimator(const QString& name);
 };
 
 #endif // BOOLANIMATOR_H

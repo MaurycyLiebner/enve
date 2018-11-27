@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QPointer>
 #include "keyfocustarget.h"
+#include "sharedpointerdefs.h"
 
 const QList<QColor> ANIMATORCOLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),
@@ -136,6 +137,8 @@ private slots:
     void scrollRight();
     void scrollLeft();
 private:
+    KeysClipboardContainerSPtr getSelectedKeysClipboardContainer();
+
     QTimer *mScrollTimer;
 
     void updateHoveredPointFromPos(const QPoint &posU);
@@ -167,7 +170,8 @@ private:
     bool mMovingRect = false;
 
     MainWindow *mMainWindow;
-    QList<Key*> mSelectedKeys;
+    QList<KeyPtr> mSelectedKeys;
+    QList<AnimatorQPtr> mSelectedAnimators;
 
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;

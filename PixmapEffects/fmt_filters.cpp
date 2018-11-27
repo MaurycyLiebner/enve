@@ -724,7 +724,7 @@ void desaturate(const image &im, qreal desat) {
     if(!checkImage(im))
       return;
 
-    desat = clamp();qMax(0., qMin(1., desat));
+    desat = qMax(0., qMin(1., desat));
 
     rgba *bits;
     s32 h = 0, s = 0, v = 0;
@@ -3689,6 +3689,50 @@ static int getOptimalKernelWidth(qreal radius, qreal sigma)
     }
 
     return ((int)width-2);
+}
+
+void applyBlur(const image &img, const qreal &scale,
+               const qreal &blurRadius, const bool &highQuality,
+               const bool &hasKeys) {
+    qreal radius = blurRadius*scale;
+
+    if(highQuality) {
+        if(hasKeys) {
+            fmt_filters::anim_fast_blur(img, radius*0.5);
+            fmt_filters::anim_fast_blur(img, radius*0.5);
+        } else {
+            fmt_filters::fast_blur(img, qRound(radius*0.5));
+            fmt_filters::fast_blur(img, qRound(radius*0.5));
+        }
+    } else {
+        if(hasKeys) {
+            fmt_filters::anim_fast_blur(img, radius*0.8);
+        } else {
+            fmt_filters::fast_blur(img, qRound(radius*0.8));
+        }
+    }
+}
+
+void applyBlur(const image &img, const qreal &scale,
+               const qreal &blurRadius, const bool &highQuality,
+               const bool &hasKeys, const qreal &opacity) {
+    qreal radius = blurRadius*scale;
+
+    if(highQuality) {
+        if(hasKeys) {
+            fmt_filters::anim_fast_blur(img, radius*0.5, opacity);
+            fmt_filters::anim_fast_blur(img, radius*0.5, opacity);
+        } else {
+            fmt_filters::fast_blur(img, qRound(radius*0.5), opacity);
+            fmt_filters::fast_blur(img, qRound(radius*0.5), opacity);
+        }
+    } else {
+        if(hasKeys) {
+            fmt_filters::anim_fast_blur(img, radius*0.8, opacity);
+        } else {
+            fmt_filters::fast_blur(img, qRound(radius*0.8), opacity);
+        }
+    }
 }
 
 } // namespace

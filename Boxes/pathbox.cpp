@@ -13,22 +13,19 @@
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
-            (new PathEffectAnimators(false, false, this))->
-            ref<PathEffectAnimators>();
+            SPtrCreate(PathEffectAnimators)(false, false, this);
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setBlockedUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mFillPathEffectsAnimators =
-            (new PathEffectAnimators(false, true, this))->
-            ref<PathEffectAnimators>();
+            SPtrCreate(PathEffectAnimators)(false, true, this);
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setBlockedUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mOutlinePathEffectsAnimators =
-            (new PathEffectAnimators(true, false, this))->
-            ref<PathEffectAnimators>();
+            SPtrCreate(PathEffectAnimators)(true, false, this);
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
                 SPtrCreate(NodePointUpdater)(this));
@@ -42,9 +39,17 @@ PathBox::PathBox(const BoundingBoxType &type) :
 //                SPtrCreate(PixmapEffectUpdater)(this));
 
     mStrokeGradientPoints = SPtrCreate(GradientPoints)(this);
+    mStrokeGradientPoints->prp_setBlockedUpdater(
+                SPtrCreate(GradientPointsUpdater)(false, this));
+
     mFillGradientPoints = SPtrCreate(GradientPoints)(this);
-    mFillSettings = SPtrCreate(PaintSettings)(this);
-    mStrokeSettings = SPtrCreate(StrokeSettings)(this);
+    mFillGradientPoints->prp_setBlockedUpdater(
+                SPtrCreate(GradientPointsUpdater)(true, this));
+
+    mFillSettings = SPtrCreate(PaintSettings)(
+                mFillGradientPoints.data(), this);
+    mStrokeSettings = SPtrCreate(StrokeSettings)(
+                mStrokeGradientPoints.data(), this);
     ca_addChildAnimator(mFillSettings);
     ca_addChildAnimator(mStrokeSettings);
     ca_moveChildAbove(mEffectsAnimators.data(),
@@ -53,14 +58,6 @@ PathBox::PathBox(const BoundingBoxType &type) :
     ca_addChildAnimator(mPathEffectsAnimators);
     ca_addChildAnimator(mFillPathEffectsAnimators);
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
-
-    mFillGradientPoints->prp_setBlockedUpdater(
-                SPtrCreate(GradientPointsUpdater)(true, this));
-    mStrokeGradientPoints->prp_setBlockedUpdater(
-                SPtrCreate(GradientPointsUpdater)(false, this));
-
-    mFillSettings->setGradientPoints(mFillGradientPoints.data());
-    mStrokeSettings->setGradientPoints(mStrokeGradientPoints.data());
 
     mStrokeSettings->setLineWidthUpdaterTarget(this);
     mFillSettings->setPaintPathTarget(this);
@@ -103,22 +100,26 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     bool currentOutlinePathCompatible = false;
     bool currentFillPathCompatible = false;
 
-    if(mCurrentPathsFrame != INT_MIN) {
+    if(!mCurrentPathsOutdated) {
         currentEditPathCompatible =
-                !differenceInEditPathBetweenFrames(data->relFrame, mCurrentPathsFrame);
+                !differenceInEditPathBetweenFrames(
+                    data->relFrame, mCurrentPathsFrame);
         if(currentEditPathCompatible) {
             currentPathCompatible =
-                    !differenceInPathBetweenFrames(data->relFrame, mCurrentPathsFrame);
+                    !differenceInPathBetweenFrames(
+                        data->relFrame, mCurrentPathsFrame);
             if(currentPathCompatible) {
                 currentOutlinePathCompatible =
-                        !differenceInOutlinePathBetweenFrames(data->relFrame, mCurrentPathsFrame);
+                        !differenceInOutlinePathBetweenFrames(
+                            data->relFrame, mCurrentPathsFrame);
                 currentFillPathCompatible =
-                        !differenceInFillPathBetweenFrames(data->relFrame, mCurrentPathsFrame);
+                        !differenceInFillPathBetweenFrames(
+                            data->relFrame, mCurrentPathsFrame);
             }
         }
     }
 
-    auto pathData = data->ref<PathBoxRenderData>();
+    auto pathData = getAsSPtr(data, PathBoxRenderData);
     if(currentEditPathCompatible) {
         pathData->editPath = mEditPathSk;
     } else {
@@ -531,10 +532,10 @@ bool PathBox::differenceInFillPathBetweenFrames(const int &frame1, const int &fr
 
 #include "circle.h"
 VectorPath *PathBox::objectToVectorPathBox() {
-    VectorPath *newPath = new VectorPath();
+    VectorPathQSPtr newPath = SPtrCreate(VectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
-        Circle *circleT = (Circle*)this;
+        Circle* circleT = getAsPtr(this, Circle);
         pathT.addEllipse(QPointF(0., 0.),
                          circleT->getCurrentXRadius(),
                          circleT->getCurrentYRadius());
@@ -542,17 +543,17 @@ VectorPath *PathBox::objectToVectorPathBox() {
     } else {
         newPath->loadPathFromSkPath(mEditPathSk);
     }
-    copyPathBoxDataTo(newPath);
+    copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
-    return newPath;
+    return newPath.get();
 }
 
 VectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return nullptr;
-    VectorPath *newPath = new VectorPath();
-    copyPathBoxDataTo(newPath);
+    VectorPathQSPtr newPath = SPtrCreate(VectorPath)();
+    copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
-    return newPath;
+    return newPath.get();
 }
 
 const SkPath &PathBox::getRelativePath() const { return mPathSk; }
@@ -608,22 +609,24 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 }
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
-        const BoundingBoxRenderDataSPtr& renderData) {
-    auto pathRenderData = renderData->ref<PathBoxRenderData>();
+        BoundingBoxRenderData* renderData) {
+    auto pathRenderData = getAsSPtr(renderData, PathBoxRenderData);
     mCurrentPathsFrame = renderData->relFrame;
     mEditPathSk = pathRenderData->editPath;
     mPathSk = pathRenderData->path;
     mOutlinePathSk = pathRenderData->outlinePath;
     mFillPathSk = pathRenderData->fillPath;
+    mCurrentPathsOutdated = false;
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) {
-    if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
-        if(mFillPathSk.contains(relPos.x(), relPos.y())) {
+    SkPoint relPosSk = QPointFToSkPoint(relPos);
+    if(mSkRelBoundingRectPath.contains(relPosSk.x(), relPosSk.y()) ) {
+        if(mFillPathSk.contains(relPosSk.x(), relPosSk.y())) {
             return true;
         }
-        return mOutlinePathSk.contains(relPos.x(), relPos.y());
+        return mOutlinePathSk.contains(relPosSk.x(), relPosSk.y());
     } else {
         return false;
     }

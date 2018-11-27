@@ -18,16 +18,17 @@ void _ScheduledExecutor::schedulerProccessed() {
     mSchedulerAdded = false;
 }
 
-void _ScheduledExecutor::addScheduler() {
-    if(!shouldUpdate() || mSchedulerAdded) return;
+bool _ScheduledExecutor::addScheduler() {
+    if(!shouldUpdate() || mSchedulerAdded) return false;
 
     mFinished = false;
     mSchedulerAdded = true;
     addSchedulerNow();
+    return true;
 }
 
 void _ScheduledExecutor::addSchedulerNow() {
-    MainWindow::getInstance()->addUpdateScheduler(ref<_ScheduledExecutor>());
+    MainWindow::getInstance()->addUpdateScheduler(getAsSPtr(this, _ScheduledExecutor));
 }
 
 void _ScheduledExecutor::clear() {
@@ -43,7 +44,7 @@ void _Executor::setCurrentPaintControler(PaintControler *paintControler) {
 }
 
 void _Executor::beforeUpdate() {
-    mSelfRef = ref<_Executor>();
+    mSelfRef = getAsSPtr(this, _Executor);
     mBeingProcessed = true;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
@@ -70,7 +71,7 @@ void _Executor::waitTillProcessed() {
     {
         QEventLoop loop;
         loop.connect(mCurrentPaintControler,
-                     SIGNAL(finishedUpdating(int,_Executor*)),
+                     SIGNAL(finishedUpdating(int, _Executor*)),
                      SLOT(quit()));
         loop.exec();
     }
@@ -84,9 +85,9 @@ void _Executor::clear() {
     MinimalExecutor::clear();
     mBeingProcessed = false;
     mSelfRef.reset();
-    foreach(const MinimalExecutorWPtr& dependent, mNextExecutionDependent) {
-        if(dependent.expired()) continue;
-        dependent.lock()->decDependencies();
+    foreach(const MinimalExecutorPtr& dependent, mNextExecutionDependent) {
+        if(dependent == nullptr) continue;
+        dependent->decDependencies();
     }
     mNextExecutionDependent.clear();
 }
@@ -95,7 +96,7 @@ void _Executor::addDependent(MinimalExecutor *updatable) {
     if(updatable == nullptr) return;
     if(!finished()) {
         if(listContainsSharedPtr(updatable, mNextExecutionDependent)) return;
-        mNextExecutionDependent << updatable->weakRef<MinimalExecutor>();
+        mNextExecutionDependent << updatable;
         updatable->incDependencies();
     }
 }
@@ -107,7 +108,7 @@ GUI_ThreadExecutor::GUI_ThreadExecutor() {
 void GUI_ThreadExecutor::addDependent(MinimalExecutor *updatable) {
     if(!finished()) {
         if(listContainsSharedPtr(updatable, mCurrentExecutionDependent)) return;
-        mCurrentExecutionDependent << updatable->weakRef<MinimalExecutor>();
+        mCurrentExecutionDependent << updatable;
         updatable->incDependencies();
     }
 }
@@ -139,9 +140,9 @@ void MinimalExecutor::incDependencies() {
 void MinimalExecutor::GUI_process() {}
 
 void MinimalExecutor::tellDependentThatFinished() {
-    foreach(const MinimalExecutorWPtr& dependent, mCurrentExecutionDependent) {
-        if(dependent.expired()) continue;
-        dependent.lock()->decDependencies();
+    foreach(const MinimalExecutorPtr& dependent, mCurrentExecutionDependent) {
+        if(dependent == nullptr) continue;
+        dependent->decDependencies();
     }
     mCurrentExecutionDependent.clear();
 }

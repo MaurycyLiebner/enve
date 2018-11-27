@@ -40,7 +40,7 @@ public:
                       const SkMatrix &combinedTransform);
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint*> &list);
+                                           QList<MovablePointPtr> &list);
 
     BoundingBox *getParentBox();
 

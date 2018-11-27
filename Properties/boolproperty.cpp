@@ -1,8 +1,7 @@
 #include "boolproperty.h"
 
-BoolProperty::BoolProperty() : Property() {
-
-}
+BoolProperty::BoolProperty(const QString &name) :
+    Property(name) {}
 
 bool BoolProperty::getValue() {
     return mValue;
@@ -16,9 +15,8 @@ void BoolProperty::setValue(const bool &value) {
 }
 
 
-BoolPropertyContainer::BoolPropertyContainer() : ComplexAnimator() {
-
-}
+BoolPropertyContainer::BoolPropertyContainer(const QString &name) :
+    ComplexAnimator(name) {}
 
 bool BoolPropertyContainer::getValue() {
     return mValue;

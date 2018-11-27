@@ -20,7 +20,7 @@ public:
 
     bool getAbstractions(const int &minY, const int &maxY,
                          int& currY, int currX,
-                         QList<SingleWidgetAbstractionSPtr>& abstractions,
+                         QList<SingleWidgetAbstraction*>& abstractions,
                          const SWT_RulesCollection &rules,
                          const bool &parentSatisfiesRule,
                          const bool &parentMainTarget);
@@ -44,12 +44,12 @@ public:
     void addChildAbstractionForTargetAt(
             SingleWidgetTarget *target,
             const int &id);
-    void addChildAbstraction(const SingleWidgetAbstractionSPtr& abs);
-    void addChildAbstractionAt(const SingleWidgetAbstractionSPtr& abs,
+    void addChildAbstraction(SingleWidgetAbstraction *abs);
+    void addChildAbstractionAt(SingleWidgetAbstraction *abs,
                                const int &id);
 
     void removeChildAbstractionForTarget(SingleWidgetTarget *target);
-    void removeChildAbstraction(const SingleWidgetAbstractionSPtr& abs);
+    void removeChildAbstraction(SingleWidgetAbstraction* abs);
 
     void switchContentVisible();
 
@@ -85,9 +85,9 @@ private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;
     bool mContentVisible = false;
-    SingleWidgetTarget* mTarget = nullptr;
+    SingleWidgetTargetQPtr mTarget;
 
-    QList<SingleWidgetAbstractionSPtr> mChildren;
+    QList<SingleWidgetAbstractionPtr> mChildren;
 };
 
 #endif // SINGLEWIDGETABSTRACTION_H

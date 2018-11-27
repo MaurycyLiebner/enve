@@ -138,7 +138,7 @@ public:
     void readCanvases(QIODevice *target);
     void addFileUpdatableAwaitingUpdate(const std::shared_ptr<_Executor> &updatable);
     WindowSingleWidgetTarget *getWindowSWT() {
-        return mWindowSWTTarget;
+        return mWindowSWTTarget.get();
     }
 
     void startDurationRectPosTransformForAllSelected();
@@ -167,7 +167,7 @@ protected:
 
     qreal mSavedResolutionFraction = 100.;
 
-    WindowSingleWidgetTarget *mWindowSWTTarget = nullptr;
+    WindowSingleWidgetTargetQSPtr mWindowSWTTarget;
     PaintControler *mFileControler = nullptr;
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
 

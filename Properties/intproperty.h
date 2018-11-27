@@ -4,9 +4,8 @@
 
 class IntProperty : public Property {
     Q_OBJECT
+    friend class SelfRef;
 public:
-    IntProperty();
-
     void setValueRange(const int &minValue,
                        const int &maxValue);
 
@@ -26,10 +25,12 @@ public:
     void prp_startTransform();
     void prp_finishTransform();
 protected:
+    IntProperty(const QString& name);
+
     bool mTransformed = false;
+    int mValue = 0;
     int mMinValue = 0;
     int mMaxValue = 9999;
-    int mValue = 0;
 signals:
     void valueChangedSignal(qreal);
 };

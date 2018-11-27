@@ -5,10 +5,8 @@
 class QStringAnimator;
 
 class QStringKey : public Key {
+    friend class StdSelfRef;
 public:
-    QStringKey(const QString &stringT,
-               const int &relFrame,
-               QStringAnimator *parentAnimator = nullptr);
 
     bool differsFromKey(Key *key);
 
@@ -16,15 +14,17 @@ public:
     void setText(const QString &text) { mText = text; }
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
+protected:
+    QStringKey(const QString &stringT,
+               const int &relFrame,
+               QStringAnimator *parentAnimator = nullptr);
 private:
     QString mText;
 };
 
-class QStringAnimator : public Animator
-{
+class QStringAnimator : public Animator {
+    friend class SelfRef;
 public:
-    QStringAnimator();
-
     void prp_setAbsFrame(const int &frame);
     void setCurrentTextValue(const QString &text,
                              const bool &saveUndoRedo = true);
@@ -39,10 +39,10 @@ public:
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+protected:
+    QStringAnimator(const QString& name);
 private:
-
     QString mCurrentText;
-    QList<QStringKey*> mTextValues;
 };
 
 #endif // QSTRINGANIMATOR_H

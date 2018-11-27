@@ -280,7 +280,7 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
         QMenu menu;
         int i = 0;
-        foreach(OutputSettingsProfile *profile,
+        foreach(const auto& profile,
                 OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES) {
             QAction *actionT = new QAction(profile->getName());
             actionT->setData(QVariant(i));
@@ -311,7 +311,7 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
             } else {
                 OutputSettingsProfile *profileT =
                         OutputSettingsProfilesDialog::
-                        OUTPUT_SETTINGS_PROFILES.at(profileId);
+                        OUTPUT_SETTINGS_PROFILES.at(profileId).get();
                 emit profileSelected(profileT);
             }
         }

@@ -11,6 +11,8 @@ class Key;
 class Animator;
 class Property;
 
+typedef QPair<AnimatorQPtr, QByteArray> AnimatorKeyDataPair;
+
 enum  ClipboardContainerType : short {
     CCT_BOXES,
     CCT_KEYS,
@@ -18,7 +20,7 @@ enum  ClipboardContainerType : short {
     CCT_COUNT
 };
 
-class ClipboardContainer {
+class ClipboardContainer : public StdSelfRef {
 public:
     ClipboardContainer(const ClipboardContainerType &type);
     virtual ~ClipboardContainer();
@@ -31,32 +33,35 @@ private:
 };
 
 class BoxesClipboardContainer : public ClipboardContainer {
+    friend class StdSelfRef;
 public:
-    BoxesClipboardContainer();
-
     void pasteTo(BoxesGroup *parent);
+protected:
+    BoxesClipboardContainer();
 private:
-    QList<BoundingBoxQSPtr> mBoxesList;
+    QList<BoundingBoxQPtr> mBoxesList;
 };
 
 class KeysClipboardContainer : public ClipboardContainer {
+    friend class StdSelfRef;
 public:
-    KeysClipboardContainer();
     ~KeysClipboardContainer();
 
-    QList<KeySPtr> paste(const int &pasteFrame,
-                         KeysView *keysView);
-    QList<KeySPtr> pasteWithoutMerging(const int &pasteFrame,
-                                       KeysView *keysView);
+    void paste(const int &pasteFrame,
+               KeysView *keysView,
+               const bool &merge,
+               const bool &selectPasted);
 
-    void addTargetAnimator(Animator *anim);
+    void addTargetAnimator(Animator *anim, const QByteArray& keyData);
+protected:
+    KeysClipboardContainer();
 private:
-    QList<QWeakPointer<Animator> > mTargetAnimators;
+    QList<AnimatorKeyDataPair> mAnimatorData;
 };
 
 class PropertyClipboardContainer : public ClipboardContainer {
+    friend class StdSelfRef;
 public:
-    PropertyClipboardContainer();
     ~PropertyClipboardContainer();
 
     void paste(Property *targetProperty);
@@ -80,6 +85,8 @@ public:
     bool isPixmapEffectAnimators() {
         return mPixmapEffectAnimators;
     }
+protected:
+    PropertyClipboardContainer();
 private:
     bool mQrealAnimator = false;
     bool mQPointFAnimator = false;

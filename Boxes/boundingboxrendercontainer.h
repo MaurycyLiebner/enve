@@ -44,6 +44,7 @@ protected:
 #include "updatable.h"
 class CacheContainer;
 class CacheContainerTmpFileDataLoader : public _ScheduledExecutor {
+    friend class StdSelfRef;
 public:
     void _processUpdate();
 
@@ -55,12 +56,13 @@ protected:
                                     CacheContainer *target);
     void addSchedulerNow();
 
-    const QPointer<CacheContainer> mTargetCont;
+    const CacheContainerPtr mTargetCont;
     QSharedPointer<QTemporaryFile> mTmpFile;
     sk_sp<SkImage> mImage;
 };
 
 class CacheContainerTmpFileDataSaver : public _ScheduledExecutor {
+    friend class StdSelfRef;
 public:
     void _processUpdate();
 
@@ -72,12 +74,13 @@ protected:
     void addSchedulerNow();
 
     bool mSavingFailed = false;
-    const QPointer<CacheContainer> mTargetCont;
+    const CacheContainerPtr mTargetCont;
     sk_sp<SkImage> mImage;
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
 
 class CacheContainerTmpFileDataDeleter : public _ScheduledExecutor {
+    friend class StdSelfRef;
 public:
     void _processUpdate();
 
@@ -91,10 +94,11 @@ protected:
 };
 
 class CacheContainer : public MinimalCacheContainer {
+    friend class StdSelfRef;
 public:
     ~CacheContainer();
 
-    _ScheduledExecutorSPtr scheduleLoadFromTmpFile(
+    _ScheduledExecutor *scheduleLoadFromTmpFile(
             _ScheduledExecutor* dependent = nullptr);
 
     bool cacheAndFree();
@@ -149,8 +153,8 @@ protected:
 };
 
 class RenderContainer : public CacheContainer {
+    friend class StdSelfRef;
 public:
-    RenderContainer() : CacheContainer(nullptr) {}
     virtual ~RenderContainer();
 
     void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
@@ -178,6 +182,7 @@ public:
     }
 
 protected:
+    RenderContainer() : CacheContainer(nullptr) {}
     int mRelFrame = 0;
     qreal mResolutionFraction;
     SkPoint mDrawPos;

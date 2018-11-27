@@ -8,25 +8,26 @@
 PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {
     setName("Paint Box");
-    mTopLeftPoint = new QPointFAnimator(mTransformAnimator.data(),
-                                      TYPE_PATH_POINT);
-    mBottomRightPoint = new QPointFAnimator(mTransformAnimator.data(),
-                                          TYPE_PATH_POINT);
+    mTopLeftAnimator = SPtrCreate(QPointFAnimator)("bottom right");
+    mTopLeftAnimator->prp_setUpdater(
+                SPtrCreate(PaintBoxSizeUpdaterTL)(this));
 
-    mTopLeftPoint->prp_setUpdater(
-                new PaintBoxSizeUpdaterTL(this));
-    mTopLeftPoint->prp_setName("top left");
-    mBottomRightPoint->prp_setUpdater(
-                new PaintBoxSizeUpdaterBR(this));
-    mBottomRightPoint->prp_setName("bottom right");
+    mBottomRightAnimator = SPtrCreate(QPointFAnimator)("top left");
+    mBottomRightAnimator->prp_setUpdater(
+                SPtrCreate(PaintBoxSizeUpdaterBR)(this));
+
+    mTopLeftPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mTopLeftAnimator.get(), mTransformAnimator.data(),
+                TYPE_PATH_POINT);
+    mBottomRightPoint = SPtrCreate(PointAnimatorMovablePoint)(
+                mBottomRightAnimator.get(), mTransformAnimator.data(),
+                TYPE_PATH_POINT);
 }
 
 PaintBox::PaintBox(const ushort &canvasWidthT,
-                   const ushort &canvasHeightT) :
-    PaintBox() {
-    mBottomRightPoint->setCurrentPointValue(QPointF(canvasWidthT,
-                                                    canvasHeightT),
-                                            false, true);
+                   const ushort &canvasHeightT) : PaintBox() {
+    mBottomRightAnimator->setCurrentPointValue(
+                QPointF(canvasWidthT, canvasHeightT), false, true);
     finishSizeSetup();
 }
 
@@ -98,10 +99,10 @@ MovablePoint *PaintBox::getPointAtAbsPos(const QPointF &absPtPos,
                                          const qreal &canvasScaleInv) {
     if(currentCanvasMode == MOVE_POINT) {
         if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mTopLeftPoint;
+            return mTopLeftPoint.get();
         }
         if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-            return mBottomRightPoint;
+            return mBottomRightPoint.get();
         }
     } else if(currentCanvasMode == MOVE_PATH) {
         MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
@@ -113,17 +114,17 @@ MovablePoint *PaintBox::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void PaintBox::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                  QList<MovablePoint *> *list) {
+                                                 QList<MovablePoint*> &list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
-            list->append(mTopLeftPoint);
+            list.append(mTopLeftPoint.get());
         }
     }
     if(!mBottomRightPoint->isSelected()) {
         if(mBottomRightPoint->isContainedInRect(absRect)) {
             mBottomRightPoint->select();
-            list->append(mBottomRightPoint);
+            list.append(mBottomRightPoint.get());
         }
     }
 }
@@ -177,25 +178,25 @@ void PaintBox::setOverlapFrames(const int &overlapFrames) {
 }
 
 MovablePoint *PaintBox::getTopLeftPoint() {
-    return mTopLeftPoint;
+    return mTopLeftPoint.get();
 }
 
 MovablePoint *PaintBox::getBottomRightPoint() {
-    return mBottomRightPoint;
+    return mBottomRightPoint.get();
 }
 
 void PaintBox::finishSizeSetup() {
-    QPointF tL = mTopLeftPoint->getCurrentPointValue();
-    QPointF bR = mBottomRightPoint->getCurrentPointValue();
+    QPointF tL = mTopLeftAnimator->getCurrentPointValue();
+    QPointF bR = mBottomRightAnimator->getCurrentPointValue();
     QPointF sizeT = bR - tL;
     if(sizeT.x() < 1. || sizeT.y() < 1.) return;
-    ushort widthT = sizeT.x();
-    ushort heightT = sizeT.y();
+    ushort widthT = qRound(sizeT.x());
+    ushort heightT = qRound(sizeT.y());
     if(widthT == mWidth && heightT == mHeight) return;
     mWidth = widthT;
     mHeight = heightT;
     if(mMainHandler == nullptr) {
-        mMainHandler = new AnimatedSurface(mWidth, mHeight, 1., this);
+        mMainHandler = SPtrCreate(AnimatedSurface)(mWidth, mHeight, 1., this);
         mMainHandler->setCurrentRelFrame(anim_mCurrentRelFrame);
         ca_addChildAnimator(mMainHandler);
     } else {
@@ -209,8 +210,8 @@ void PaintBox::finishSizeSetup() {
 }
 
 void PaintBox::finishSizeAndPosSetup() {
-    QPointF trans = mTopLeftPoint->getCurrentPointValue() -
-            mTopLeftPoint->getSavedPointValue();
+    QPointF trans = mTopLeftAnimator->getCurrentPointValue() -
+            mTopLeftAnimator->getSavedPointValue();
     int dX = -qRound(trans.x());
     int dY = -qRound(trans.y());
     if(dX < 0 && dY < 0) {
@@ -257,7 +258,8 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
                     mTransformAnimator->getCombinedTransform()) );
         QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
                     anim_mCurrentRelFrame);
-        canvas->translate(trans.x(), trans.y());
+        SkPoint transkSk = QPointFToSkPoint(trans);
+        canvas->translate(transkSk.x(), transkSk.y());
         mTemporaryHandler->drawSk(canvas, paint);
     }
 
@@ -288,17 +290,17 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
         finishSizeSetup();
     }
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    auto paintData = data->ref<PaintBoxRenderData>();
+    auto paintData = getAsSPtr(data, PaintBoxRenderData);
     if(mMainHandler == nullptr) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
     foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
         foreach(TileSkDrawer *drawerT, drawer.drawers) {
-            drawerT->addDependent(paintData);
+            drawerT->addDependent(paintData.get());
         }
     }
     QPointF topLeft;
-    if(mTopLeftPoint->getBeingTransformed()) {
-        topLeft = mTopLeftPoint->getSavedPointValue();
+    if(mTopLeftAnimator->getBeingTransformed()) {
+        topLeft = mTopLeftAnimator->getSavedPointValue();
     } else {
         topLeft = mTopLeftPoint->getRelativePosAtRelFrame(relFrame);
     }

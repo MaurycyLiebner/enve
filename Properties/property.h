@@ -12,6 +12,41 @@ class QPainter;
 class AnimatorUpdater;
 class BoundingBox;
 
+class InternalMimeData : public QMimeData {
+public:
+    enum Type : short {
+        PIXMAP_EFFECT,
+        PATH_EFFECT,
+        BOUNDING_BOX
+    };
+
+    InternalMimeData(const Type& type) : mType(type) {}
+
+    bool hasFormat(const QString &mimetype) const {
+        if(mimetype == "av_internal_format") return true;
+        return false;
+    }
+
+    bool hasType(const Type& type) const {
+        return type == mType;
+    }
+private:
+    const Type mType;
+};
+
+template <class T, InternalMimeData::Type type>
+class PropertyMimeData : public InternalMimeData {
+public:
+    PropertyMimeData(T *target) :
+        InternalMimeData(type), mTarget(target) {}
+
+    T *getTarget() const {
+        return mTarget;
+    }
+private:
+    const QPointer<T> mTarget;
+};
+
 class Property : public SingleWidgetTarget {
     Q_OBJECT
 public:

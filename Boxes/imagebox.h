@@ -67,7 +67,7 @@ public:
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 private:
-    ImageCacheHandler *mImgCacheHandler = nullptr;
+    ImageCacheHandlerPtr mImgCacheHandler;
     QString mImageFilePath;
 };
 

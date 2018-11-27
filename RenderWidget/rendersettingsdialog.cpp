@@ -569,7 +569,9 @@ typedef struct AVCodecTag {
 } AVCodecTag;
 #endif
 
-RenderSettingsDialog::FormatCodecs::FormatCodecs(const QList<AVCodecID> &vidCodecs, const QList<AVCodecID> &audioCodec, const char *name) {
+RenderSettingsDialog::FormatCodecs::FormatCodecs(
+        const QList<AVCodecID> &vidCodecs,
+        const QList<AVCodecID> &audioCodec, const char *name) {
     mFormat = av_guess_format(nullptr, name, nullptr);
     bool defVidAdded = false;
     bool defAudAdded = false;

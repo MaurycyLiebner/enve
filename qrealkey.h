@@ -15,6 +15,7 @@ class QrealPoint;
 enum QrealPointType : short;
 
 class QrealKey : public Key {
+    friend class StdSelfRef;
 public:
     QrealKey(QrealAnimator* parentAnimator);
     QrealKey(const int &frame,

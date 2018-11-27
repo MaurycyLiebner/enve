@@ -69,15 +69,16 @@ void KeysView::graphPaint(QPainter *p) {
     qreal incY = mValueInc*mPixelsPerValUnit;
     qreal yL = height() + fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit + incY;
     qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
-    int nLines = qCeil(yL / incY);
-    QLine *lines = new QLine[nLines];
+    int nLines = qCeil(yL/incY);
+    QLine *lines = new QLine[static_cast<uint>(nLines)];
     int currLine = 0;
     while(yL > 0) {
         p->drawText(QRectF(-MIN_WIDGET_HEIGHT/4, yL - incY,
                            2*MIN_WIDGET_HEIGHT, 2*incY),
                     Qt::AlignCenter,
                     QString::number(currValue, 'f', mValuePrec));
-        lines[currLine] = QLine(2*MIN_WIDGET_HEIGHT, yL, width(), yL);
+        int yLi = qRound(yL);
+        lines[currLine] = QLine(2*MIN_WIDGET_HEIGHT, yLi, width(), yLi);
         currLine++;
         yL -= incY;
         currValue += mValueInc;
@@ -248,7 +249,9 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
             }
         }
     } else {
-        ((QrealAnimator*)mCurrentPoint->getParentKey()->getParentAnimator())->
+        auto parentAnimator =
+                mCurrentPoint->getParentKey()->getParentAnimator();
+        getAsPtr(parentAnimator, QrealAnimator)->
                 getMinAndMaxMoveFrame(
                     mCurrentPoint->getParentKey(), mCurrentPoint,
                     &mMinMoveFrame, &mMaxMoveFrame);
@@ -415,15 +418,13 @@ void KeysView::graphClearKeysSelection() {
     mSelectedKeys.clear();
 }
 
-void KeysView::graphAddKeyToSelection(QrealKey *key)
-{
+void KeysView::graphAddKeyToSelection(QrealKey *key) {
     if(key->isSelected()) return;
     key->setSelected(true);
-    mSelectedKeys << key;
+    mSelectedKeys << getAsPtr(key, Key);
 }
 
-void KeysView::graphRemoveKeyFromSelection(QrealKey *key)
-{
+void KeysView::graphRemoveKeyFromSelection(QrealKey *key) {
     if(key->isSelected()) {
         key->setSelected(false);
         mSelectedKeys.removeOne(key);

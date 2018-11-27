@@ -1,20 +1,24 @@
 #include "renderinstancesettings.h"
 #include "canvas.h"
 #include "renderinstancewidget.h"
-const QStringList OutputSettings::SAMPLE_FORMATS_NAMES = { "8 bits unsigned",
-                                         "16 bits signed",
-                                         "32 bits signed",
-                                         "32 bits float",
-                                         "64 bits double",
-                                         "8 bits unsigned, planar",
-                                         "16 bits signed, planar",
-                                         "32 bits signed, planar",
-                                         "32 bits float, planar",
-                                         "64 bits double, planar",
-                                         "64 bits signed",
-                                         "64 bits signed, planar",
-                                         "" };
-QString OutputSettings::getChannelsLayoutNameStatic(const uint64_t &layout) {
+const QStringList OutputSettings::SAMPLE_FORMATS_NAMES = {
+    "8 bits unsigned",
+    "16 bits signed",
+    "32 bits signed",
+    "32 bits float",
+    "64 bits double",
+    "8 bits unsigned, planar",
+    "16 bits signed, planar",
+    "32 bits signed, planar",
+    "32 bits float, planar",
+    "64 bits double, planar",
+    "64 bits signed",
+    "64 bits signed, planar",
+    ""
+};
+
+QString OutputSettings::getChannelsLayoutNameStatic(
+        const uint64_t &layout) {
     if(layout == AV_CH_LAYOUT_MONO) {
         return "Mono";
     } else if(layout == AV_CH_LAYOUT_STEREO) {
@@ -116,14 +120,59 @@ QString OutputSettings::getChannelsLayoutNameStatic(const uint64_t &layout) {
     }
     return "-";
 }
-RenderInstanceSettings::RenderInstanceSettings(const CanvasQSPtr &canvas) {
+
+RenderInstanceSettings::RenderInstanceSettings(Canvas* canvas) {
     setTargetCanvas(canvas);
-    mRenderSettings.minFrame = -50; // !!!
+    mRenderSettings.minFrame = 0; // !!!
     mRenderSettings.maxFrame = canvas->getMaxFrame();
 }
 
 const QString &RenderInstanceSettings::getName() {
     return mTargetCanvas->getName();
+}
+
+void RenderInstanceSettings::setOutputDestination(
+        const QString &outputDestination) {
+    mOutputDestination = outputDestination;
+}
+
+const QString &RenderInstanceSettings::getOutputDestination() const {
+    return mOutputDestination;
+}
+
+void RenderInstanceSettings::setTargetCanvas(Canvas *canvas) {
+    mTargetCanvas = canvas;
+}
+
+Canvas *RenderInstanceSettings::getTargetCanvas() {
+    return mTargetCanvas;
+}
+
+void RenderInstanceSettings::setCurrentRenderFrame(
+        const int &currentRenderFrame) {
+    mCurrentRenderFrame = currentRenderFrame;
+}
+
+const int &RenderInstanceSettings::currentRenderFrame() {
+    return mCurrentRenderFrame;
+}
+
+const OutputSettings &RenderInstanceSettings::getOutputRenderSettings() {
+    return mOutputSettings;
+}
+
+void RenderInstanceSettings::setOutputRenderSettings(
+        const OutputSettings &settings) {
+    mOutputSettings = settings;
+}
+
+const RenderSettings &RenderInstanceSettings::getRenderSettings() {
+    return mRenderSettings;
+}
+
+void RenderInstanceSettings::setRenderSettings(
+        const RenderSettings &settings) {
+    mRenderSettings = settings;
 }
 
 void RenderInstanceSettings::renderingAboutToStart() {
@@ -143,6 +192,38 @@ void RenderInstanceSettings::setCurrentState(
         mRenderError = text;
     }
     updateParentWidget();
+}
+
+const QString &RenderInstanceSettings::getRenderError() const {
+    return mRenderError;
+}
+
+const RenderInstanceSettings::RenderState &RenderInstanceSettings::getCurrentState() const {
+    return mState;
+}
+
+void RenderInstanceSettings::setParentWidget(RenderInstanceWidget *wid) {
+    mParentWidget = wid;
+}
+
+void RenderInstanceSettings::copySettingsFromOutputSettingsProfile() {
+    OutputSettingsProfile *profileT = mOutputSettingsProfile;
+    if(profileT == nullptr) return;
+    mOutputSettings = profileT->getSettings();
+}
+
+void RenderInstanceSettings::setOutputSettingsProfile(
+        OutputSettingsProfile *profile) {
+    if(profile == nullptr) {
+        mOutputSettingsProfile.clear();
+    } else {
+        mOutputSettingsProfile = profile;
+    }
+    copySettingsFromOutputSettingsProfile();
+}
+
+OutputSettingsProfile *RenderInstanceSettings::getOutputSettingsProfile() {
+    return mOutputSettingsProfile;
 }
 
 void RenderInstanceSettings::updateParentWidget() {
