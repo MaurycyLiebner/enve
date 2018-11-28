@@ -1255,6 +1255,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
     setCurrentMouseEventPosAbs(event->pos());
     if(event->buttons() & Qt::MiddleButton) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
+        callUpdateSchedulers();
         return;
     }
     if(mCurrentMode == PAINT_MODE &&

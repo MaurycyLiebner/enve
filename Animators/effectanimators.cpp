@@ -47,7 +47,7 @@ void EffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
         BoundingBoxRenderData* data) {
     Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
-        auto pixmapEffect = getAsPtr(effect.get(), PixmapEffect);
+        auto pixmapEffect = getAsPtr(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {
             PixmapEffectRenderDataSPtr effectRenderData =
                     pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame, data);

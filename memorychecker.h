@@ -15,7 +15,7 @@ extern unsigned long long getFreeRam();
 class MemoryChecker : public QObject {
     Q_OBJECT
 public:
-    explicit MemoryChecker(QObject *parent = 0);
+    explicit MemoryChecker(QObject *parent = nullptr);
     static MemoryChecker *getInstance() { return mInstance; }
 //    void decUsedMemory(const unsigned long long &used) {
 //        mUsedRam -= used;

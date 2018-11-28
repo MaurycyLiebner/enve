@@ -773,7 +773,8 @@ void BoxesGroup::ungroup() {
         removeContainedBox(box);
         mParentGroup->addContainedBox(box);
     }
-    mParentGroup->removeContainedBox(ref<BoundingBox>());
+// will be removed automatically when has no boxes
+//    mParentGroup->removeContainedBox(ref<BoundingBox>());
 }
 
 PaintSettings *BoxesGroup::getFillSettings() {

@@ -24,18 +24,19 @@ public:
 
     void setTargetAbstraction(SingleWidgetAbstraction *abs);
 
-    static QPixmap *VISIBLE_PIXMAP;
-    static QPixmap *INVISIBLE_PIXMAP;
-    static QPixmap *HIDE_CHILDREN;
-    static QPixmap *SHOW_CHILDREN;
-    static QPixmap *LOCKED_PIXMAP;
-    static QPixmap *UNLOCKED_PIXMAP;
-    static QPixmap *ANIMATOR_CHILDREN_VISIBLE;
-    static QPixmap *ANIMATOR_CHILDREN_HIDDEN;
-    static QPixmap *ANIMATOR_RECORDING;
-    static QPixmap *ANIMATOR_NOT_RECORDING;
+    static QPixmap* VISIBLE_PIXMAP;
+    static QPixmap* INVISIBLE_PIXMAP;
+    static QPixmap* HIDE_CHILDREN;
+    static QPixmap* SHOW_CHILDREN;
+    static QPixmap* LOCKED_PIXMAP;
+    static QPixmap* UNLOCKED_PIXMAP;
+    static QPixmap* ANIMATOR_CHILDREN_VISIBLE;
+    static QPixmap* ANIMATOR_CHILDREN_HIDDEN;
+    static QPixmap* ANIMATOR_RECORDING;
+    static QPixmap* ANIMATOR_NOT_RECORDING;
     static bool mStaticPixmapsLoaded;
     static void loadStaticPixmaps();
+    static void clearStaticPixmaps();
 
     void rename();
     void drawKeys(QPainter *p,

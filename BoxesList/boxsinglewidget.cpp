@@ -19,16 +19,16 @@
 #include "Properties/boolproperty.h"
 #include "Properties/intproperty.h"
 
-QPixmap *BoxSingleWidget::VISIBLE_PIXMAP;
-QPixmap *BoxSingleWidget::INVISIBLE_PIXMAP;
-QPixmap *BoxSingleWidget::HIDE_CHILDREN;
-QPixmap *BoxSingleWidget::SHOW_CHILDREN;
-QPixmap *BoxSingleWidget::LOCKED_PIXMAP;
-QPixmap *BoxSingleWidget::UNLOCKED_PIXMAP;
-QPixmap *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE;
-QPixmap *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
-QPixmap *BoxSingleWidget::ANIMATOR_RECORDING;
-QPixmap *BoxSingleWidget::ANIMATOR_NOT_RECORDING;
+QPixmap* BoxSingleWidget::VISIBLE_PIXMAP;
+QPixmap* BoxSingleWidget::INVISIBLE_PIXMAP;
+QPixmap* BoxSingleWidget::HIDE_CHILDREN;
+QPixmap* BoxSingleWidget::SHOW_CHILDREN;
+QPixmap* BoxSingleWidget::LOCKED_PIXMAP;
+QPixmap* BoxSingleWidget::UNLOCKED_PIXMAP;
+QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE;
+QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
+QPixmap* BoxSingleWidget::ANIMATOR_RECORDING;
+QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 bool BoxSingleWidget::mStaticPixmapsLoaded = false;
 
 #include "global.h"
@@ -554,6 +554,20 @@ void BoxSingleWidget::loadStaticPixmaps() {
                 ":/icons/not_recording.png");
     mStaticPixmapsLoaded = true;
 }
+
+void BoxSingleWidget::clearStaticPixmaps() {
+    if(!mStaticPixmapsLoaded) return;
+    delete VISIBLE_PIXMAP;
+    delete INVISIBLE_PIXMAP;
+    delete HIDE_CHILDREN;
+    delete SHOW_CHILDREN;
+    delete LOCKED_PIXMAP;
+    delete UNLOCKED_PIXMAP;
+    delete ANIMATOR_CHILDREN_VISIBLE;
+    delete ANIMATOR_CHILDREN_HIDDEN;
+    delete ANIMATOR_RECORDING;
+    delete ANIMATOR_NOT_RECORDING;
+}
 #include "canvas.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
@@ -622,7 +636,8 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                                 setObjectName("swt_clear_and_paste_pixmap_effect");
                     }
                 } else {
-                    if(clipboard->propertyCompatible((Property*)target)) {
+                    if(clipboard->propertyCompatible(
+                                getAsPtr(target, Property))) {
                         menu.addAction("Paste")->setObjectName("swt_paste");
                         if(target->SWT_isAnimator()) {
                             menu.addAction("Clear and Paste")->setObjectName("swt_clear_and_paste");
@@ -897,7 +912,7 @@ void BoxSingleWidget::drawKeys(QPainter *p, const qreal &pixelsPerFrame,
     }
 }
 
-Key *BoxSingleWidget::getKeyAtPos(const int &pressX,
+Key* BoxSingleWidget::getKeyAtPos(const int &pressX,
                                   const qreal &pixelsPerFrame,
                                   const int &minViewedFrame) {
     if(isHidden()) return nullptr;
@@ -912,7 +927,7 @@ Key *BoxSingleWidget::getKeyAtPos(const int &pressX,
     return nullptr;
 }
 
-DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
+DurationRectangleMovable* BoxSingleWidget::getRectangleMovableAtPos(
                             const int &pressX,
                             const qreal &pixelsPerFrame,
                             const int &minViewedFrame) {

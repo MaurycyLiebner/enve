@@ -229,6 +229,7 @@ MainWindow::~MainWindow() {
 //    mPaintControlerThread->terminate();
 //    mPaintControlerThread->quit();
     replaceClipboard(nullptr);
+    BoxSingleWidget::clearStaticPixmaps();
 }
 
 #include "noshortcutaction.h"

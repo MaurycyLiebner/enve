@@ -12,7 +12,7 @@ MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
     mInstance = this;
 
     mMemoryChekerThread = new QThread(this);
-    mMemoryChecker = new MemoryChecker();
+    mMemoryChecker = new MemoryChecker(this);
     mMemoryChecker->moveToThread(mMemoryChekerThread);
     qRegisterMetaType<MemoryState>();
     connect(mMemoryChecker,
