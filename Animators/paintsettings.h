@@ -3,7 +3,7 @@
 
 #include "qrealanimator.h"
 #include "coloranimator.h"
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include "skiaincludes.h"
 #include "sharedpointerdefs.h"
 

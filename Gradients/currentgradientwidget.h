@@ -1,7 +1,7 @@
 #ifndef CURRENTGRADIENTWIDGET_H
 #define CURRENTGRADIENTWIDGET_H
 
-#include "Colors/ColorWidgets/glwidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/glwidget.h"
 class GradientWidget;
 
 class CurrentGradientWidget : public GLWidget

@@ -1,7 +1,7 @@
 #ifndef DISPLACYEDGRADIENTSWIDGET_H
 #define DISPLACYEDGRADIENTSWIDGET_H
 
-#include "Colors/ColorWidgets/glwidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/glwidget.h"
 #include "global.h"
 class Gradient;
 class GradientWidget;

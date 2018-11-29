@@ -1,5 +1,5 @@
 #include "colorvaluerect.h"
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include <QMouseEvent>
 #include <QDebug>
 #include <QPainter>

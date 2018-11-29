@@ -38,7 +38,7 @@
 #include "gradientpoint.h"
 #include "qrealkey.h"
 #include "GUI/mainwindow.h"
-#include "Colors/ColorWidgets/gradientwidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/gradientwidget.h"
 #include <QMessageBox>
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"

@@ -2,7 +2,7 @@
 #define CANVAS_H
 
 #include "Boxes/boxesgroup.h"
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
 #include "skiaincludes.h"

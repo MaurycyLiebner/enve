@@ -1,10 +1,10 @@
 #include "fillstrokesettings.h"
-#include "Colors/ColorWidgets/gradientwidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/gradientwidget.h"
 #include "mainwindow.h"
 #include "undoredo.h"
 #include "canvas.h"
 #include "qrealanimatorvalueslider.h"
-#include "Colors/ColorWidgets/colorsettingswidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/colorsettingswidget.h"
 #include "actionbutton.h"
 #include "qdoubleslider.h"
 

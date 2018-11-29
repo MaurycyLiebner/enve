@@ -2,8 +2,8 @@
 #include "GUI/mainwindow.h"
 #include <QResizeEvent>
 #include <QMenu>
-#include "Colors/colorpickingwidget.h"
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/colorpickingwidget.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include "colorlabel.h"
 #include "global.h"
 #include "GUI/actionbutton.h"

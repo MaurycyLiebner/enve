@@ -2,7 +2,7 @@
 #include <QMouseEvent>
 #include <QMenu>
 #include <QAction>
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include "GUI/mainwindow.h"
 #include "Gradients/displayedgradientswidget.h"
 

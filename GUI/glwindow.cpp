@@ -1,5 +1,5 @@
 #include "glwindow.h"
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include <QPainter>
 
 static const int kStencilBits = 8;  // Skia needs 8 stencil bits
@@ -175,7 +175,7 @@ void draw(SkCanvas* canvas) {
 }
 
 
-#include "Colors/ColorWidgets/colorwidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/colorwidget.h"
 void GLWindow::renderNow() {
     if(!isExposed()) return;
 

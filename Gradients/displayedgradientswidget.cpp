@@ -1,6 +1,6 @@
 #include "displayedgradientswidget.h"
 #include <QPainter>
-#include "Colors/ColorWidgets/gradientwidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/gradientwidget.h"
 
 DisplayedGradientsWidget::DisplayedGradientsWidget(
                                 GradientWidget *gradientWidget,

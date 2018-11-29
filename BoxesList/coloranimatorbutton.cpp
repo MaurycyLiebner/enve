@@ -1,6 +1,6 @@
 #include "coloranimatorbutton.h"
 #include "Animators/coloranimator.h"
-#include "Colors/ColorWidgets/colorsettingswidget.h"
+#include "GUI/ColorWidgets/ColorWidgets/colorsettingswidget.h"
 #include <QVBoxLayout>
 #include <QDialog>
 #include "GUI/mainwindow.h"

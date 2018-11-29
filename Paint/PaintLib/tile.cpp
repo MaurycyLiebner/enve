@@ -2,7 +2,7 @@
 #include <GLES3/gl3.h>
 #include <math.h>
 #include <stdio.h>
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include "tilesdata.h"
 #include "GUI/mainwindow.h"
 

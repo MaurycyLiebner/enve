@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include "skiaincludes.h"
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include "Animators/complexanimator.h"
 #include <QMimeData>
 #include <QPointF>

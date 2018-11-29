@@ -71,7 +71,7 @@ ImageMagick Studio.
 */
 
 #include "fmt_filters.h"
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include <QColor>
 
 #include <cmath>
@@ -133,7 +133,7 @@ u8 qrealToU8(const qreal &val) {
     return (u8)qMin(255, qMax(0, qRound(val)));
 }
 
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 // colorize tool
 void colorizeHSV(const image &im,
               const qreal &hue,

@@ -1,7 +1,7 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 #include <QOpenGLWidget>
-#include "Colors/helpers.h"
+#include "GUI/ColorWidgets/helpers.h"
 #include "skiaincludes.h"
 
 extern GLfloat AA_VECT_LEN;
