@@ -31,7 +31,7 @@
 #include "Boxes/paintbox.h"
 #include "Paint/PaintLib/surface.h"
 #include "Paint/PaintLib/animatedsurface.h"
-#include "Paint/BrushSettings/brushsettingswidget.h"
+#include "GUI/BrushWidgets/brushsettingswidget.h"
 #include "canvas.h"
 #include "durationrectangle.h"
 #include "gradientpoints.h"

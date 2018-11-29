@@ -147,8 +147,8 @@ SOURCES += main.cpp\
     Properties/boxtargetproperty.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
-    Paint/BrushSettings/brushsettingswidget.cpp \
-    Paint/BrushSettings/brushsettingwidget.cpp \
+    GUI/BrushWidgets/brushsettingswidget.cpp \
+    GUI/BrushWidgets/brushsettingwidget.cpp \
     Paint/PaintLib/brush.cpp \
     Paint/PaintLib/surface.cpp \
     Paint/PaintLib/tile.cpp \
@@ -175,8 +175,8 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
-    Paint/BrushSettings/brushselectionwidget.cpp \
-    Paint/BrushSettings/brushselectionscrollarea.cpp \
+    GUI/BrushWidgets/brushselectionwidget.cpp \
+    GUI/BrushWidgets/brushselectionscrollarea.cpp \
     skimagecopy.cpp \
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
@@ -341,8 +341,8 @@ HEADERS  += \
     Properties/boxtargetproperty.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
-    Paint/BrushSettings/brushsettingswidget.h \
-    Paint/BrushSettings/brushsettingwidget.h \
+    GUI/BrushWidgets/brushsettingswidget.h \
+    GUI/BrushWidgets/brushsettingwidget.h \
     Paint/PaintLib/brush.h \
     Paint/PaintLib/surface.h \
     Paint/PaintLib/tile.h \
@@ -369,8 +369,8 @@ HEADERS  += \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/outputsettingsprofilesdialog.h \
     GUI/RenderWidgets/outputsettingsdisplaywidget.h \
-    Paint/BrushSettings/brushselectionwidget.h \
-    Paint/BrushSettings/brushselectionscrollarea.h \
+    GUI/BrushWidgets/brushselectionwidget.h \
+    GUI/BrushWidgets/brushselectionscrollarea.h \
     AddInclude/SkPointPriv.h \
     skimagecopy.h \
     Boxes/renderdatahandler.h \

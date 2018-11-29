@@ -33,7 +33,7 @@
 #include "Sound/singlesound.h"
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "memoryhandler.h"
-#include "Paint/BrushSettings/brushsettingswidget.h"
+#include "GUI/BrushWidgets/brushsettingswidget.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
