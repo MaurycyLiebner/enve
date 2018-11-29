@@ -74,7 +74,8 @@ protected:
     OutputSettings mSettings;
 };
 
-class RenderInstanceSettings {
+class RenderInstanceSettings : public QObject {
+    Q_OBJECT
 public:
     enum RenderState {
         NONE,
@@ -102,13 +103,12 @@ public:
                          const QString &text = "");
     const QString &getRenderError() const;
     const RenderState &getCurrentState() const;
-    void setParentWidget(RenderInstanceWidget *wid);
     void copySettingsFromOutputSettingsProfile();
     void setOutputSettingsProfile(OutputSettingsProfile *profile);
     OutputSettingsProfile *getOutputSettingsProfile();
+signals:
+    void stateChanged();
 private:
-    void updateParentWidget();
-
     RenderState mState = NONE;
     int mCurrentRenderFrame = 0;
 

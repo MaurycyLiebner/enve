@@ -29,7 +29,6 @@ public:
                          QWidget *parent = nullptr);
     ~RenderInstanceWidget();
 
-    void updateFromSettings();
     RenderInstanceSettings *getSettings();
 private:
     ClosableContainer *mOutputSettings;
@@ -47,6 +46,8 @@ signals:
 protected:
     void updateOutputDestinationFromCurrentFormat();
 private slots:
+    void updateFromSettings();
+
     void outputSettingsProfileSelected(OutputSettingsProfile *profile);
 
     void openOutputSettingsDialog();

@@ -191,7 +191,7 @@ void RenderInstanceSettings::setCurrentState(
     if(mState == ERROR) {
         mRenderError = text;
     }
-    updateParentWidget();
+    emit stateChanged();
 }
 
 const QString &RenderInstanceSettings::getRenderError() const {
@@ -200,10 +200,6 @@ const QString &RenderInstanceSettings::getRenderError() const {
 
 const RenderInstanceSettings::RenderState &RenderInstanceSettings::getCurrentState() const {
     return mState;
-}
-
-void RenderInstanceSettings::setParentWidget(RenderInstanceWidget *wid) {
-    mParentWidget = wid;
 }
 
 void RenderInstanceSettings::copySettingsFromOutputSettingsProfile() {
@@ -224,10 +220,4 @@ void RenderInstanceSettings::setOutputSettingsProfile(
 
 OutputSettingsProfile *RenderInstanceSettings::getOutputSettingsProfile() {
     return mOutputSettingsProfile;
-}
-
-void RenderInstanceSettings::updateParentWidget() {
-    if(mParentWidget != nullptr) {
-        mParentWidget->updateFromSettings();
-    }
 }

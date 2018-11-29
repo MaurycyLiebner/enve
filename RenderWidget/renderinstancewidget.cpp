@@ -120,7 +120,8 @@ RenderInstanceWidget::RenderInstanceWidget(RenderInstanceSettings *settings,
                                            QWidget *parent) :
     RenderInstanceWidget(parent) {
     mSettings = settings;
-    mSettings->setParentWidget(this);
+    connect(mSettings, &RenderInstanceSettings::stateChanged,
+            this, &RenderInstanceWidget::updateFromSettings);
     updateFromSettings();
 }
 
