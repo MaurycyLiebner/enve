@@ -185,8 +185,8 @@ void BrushSettingsWidget::setColorSetting(const ColorSetting &colorSetting) {
                       colorSetting.getVal3(),
                       colorSetting.getAlpa());
     }
-    Brush::setHSV(helpers.hsvHueF(),
-                  helpers.hsvSaturationF(),
+    Brush::setHSV(color.hsvHueF(),
+                  color.hsvSaturationF(),
                   color.valueF());
 }
 
