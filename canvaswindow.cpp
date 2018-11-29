@@ -895,8 +895,8 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
                 updatablaT->setCurrentPaintControler(
                             mPaintControlers.at(threadId));
                 updatablaT->beforeUpdate();
-                emit updateUpdatable(updatablaT, threadId);
                 mUpdatablesAwaitingUpdate.removeAt(i);
+                emit updateUpdatable(updatablaT, threadId);
                 i--;
                 //return;
                 if(mFreeThreads.isEmpty() || mUpdatablesAwaitingUpdate.isEmpty()) {

@@ -15,6 +15,7 @@ ScrollArea::ScrollArea(QWidget *parent) : QScrollArea(parent) {
 }
 
 void ScrollArea::scrollBy(const int &x, const int &y) {
+    Q_UNUSED(x);
     verticalScrollBar()->setValue(verticalScrollBar()->value() + y);
 }
 

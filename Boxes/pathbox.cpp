@@ -119,7 +119,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         }
     }
 
-    auto pathData = getAsSPtr(data, PathBoxRenderData);
+    auto pathData = getAsPtr(data, PathBoxRenderData);
     if(currentEditPathCompatible) {
         pathData->editPath = mEditPathSk;
     } else {
@@ -610,7 +610,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
         BoundingBoxRenderData* renderData) {
-    auto pathRenderData = getAsSPtr(renderData, PathBoxRenderData);
+    auto pathRenderData = getAsPtr(renderData, PathBoxRenderData);
     mCurrentPathsFrame = renderData->relFrame;
     mEditPathSk = pathRenderData->editPath;
     mPathSk = pathRenderData->path;

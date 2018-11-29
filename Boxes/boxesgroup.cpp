@@ -664,15 +664,12 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                     boxRenderData->useCustomRelFrame = true;
                     boxRenderData->customRelFrame = boxRelFrame;
                     boxRenderData->addScheduler();
-                    boxRenderData->addDependent(data);
-                    boxRenderData->schedulerProccessed();
-                    mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
                 } else {
-                    boxRenderData->addDependent(data);
                     if(boxRenderData->copied) {
                         box->nullifyCurrentRenderData(boxRenderData->relFrame);
                     }
                 }
+                boxRenderData->addDependent(data);
                 groupData->childrenRenderData << boxRenderData;
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
