@@ -14,7 +14,6 @@ extern "C" {
     #include <libavutil/opt.h>
 }
 #include "sharedpointerdefs.h"
-class RenderInstanceWidget;
 
 struct RenderSettings {
     qreal resolution = 1.;
@@ -86,6 +85,7 @@ public:
         WAITING
     };
     RenderInstanceSettings(Canvas* canvas);
+    virtual ~RenderInstanceSettings() {}
 
     const QString &getName();
     void setOutputDestination(const QString &outputDestination);
@@ -116,7 +116,6 @@ private:
     QString mRenderError;
 
     OutputSettingsProfilePtr mOutputSettingsProfile;
-    RenderInstanceWidget *mParentWidget = nullptr;
 
     CanvasQPtr mTargetCanvas;
 

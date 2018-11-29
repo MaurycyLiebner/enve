@@ -1,6 +1,5 @@
 #include "renderinstancesettings.h"
 #include "canvas.h"
-#include "renderinstancewidget.h"
 const QStringList OutputSettings::SAMPLE_FORMATS_NAMES = {
     "8 bits unsigned",
     "16 bits signed",
