@@ -51,19 +51,19 @@ SOURCES += main.cpp\
     pathpivot.cpp \
     canvasmouseinteractions.cpp \
     ctrlpoint.cpp \
-    Colors/ColorWidgets/colorlabel.cpp \
-    Colors/ColorWidgets/colorsettingswidget.cpp \
-    Colors/ColorWidgets/colorvaluerect.cpp \
-    Colors/ColorWidgets/colorvaluespin.cpp \
-    Colors/ColorWidgets/colorwidget.cpp \
-    Colors/ColorWidgets/h_wheel_sv_triangle.cpp \
-    Colors/colorpickingwidget.cpp \
-    Colors/savedcolorbutton.cpp \
-    Colors/savedcolorswidget.cpp \
-    Colors/savedcolorwidgets.cpp \
-    Colors/helpers.cpp \
-    Colors/ColorWidgets/gradientwidget.cpp \
-    Colors/ColorWidgets/glwidget.cpp \
+    GUI/ColorWidgets/colorlabel.cpp \
+    GUI/ColorWidgets/colorsettingswidget.cpp \
+    GUI/ColorWidgets/colorvaluerect.cpp \
+    GUI/ColorWidgets/colorvaluespin.cpp \
+    GUI/ColorWidgets/colorwidget.cpp \
+    GUI/ColorWidgets/h_wheel_sv_triangle.cpp \
+    GUI/ColorWidgets/colorpickingwidget.cpp \
+    GUI/ColorWidgets/savedcolorbutton.cpp \
+    GUI/ColorWidgets/savedcolorswidget.cpp \
+    GUI/ColorWidgets/savedcolorwidgets.cpp \
+    GUI/ColorWidgets/helpers.cpp \
+    GUI/ColorWidgets/gradientwidget.cpp \
+    GUI/ColorWidgets/glwidget.cpp \
     gradientpoint.cpp \
     svgimporter.cpp \
     qrealkey.cpp \
@@ -239,19 +239,19 @@ HEADERS  += \
     movablepoint.h \
     pathpivot.h \
     ctrlpoint.h \
-    Colors/ColorWidgets/colorlabel.h \
-    Colors/ColorWidgets/colorsettingswidget.h \
-    Colors/ColorWidgets/colorvaluerect.h \
-    Colors/ColorWidgets/colorvaluespin.h \
-    Colors/ColorWidgets/colorwidget.h \
-    Colors/ColorWidgets/h_wheel_sv_triangle.h \
-    Colors/colorpickingwidget.h \
-    Colors/savedcolorbutton.h \
-    Colors/savedcolorswidget.h \
-    Colors/savedcolorwidgets.h \
-    Colors/helpers.h \
-    Colors/ColorWidgets/gradientwidget.h \
-    Colors/ColorWidgets/glwidget.h \
+    GUI/ColorWidgets/colorlabel.h \
+    GUI/ColorWidgets/colorsettingswidget.h \
+    GUI/ColorWidgets/colorvaluerect.h \
+    GUI/ColorWidgets/colorvaluespin.h \
+    GUI/ColorWidgets/colorwidget.h \
+    GUI/ColorWidgets/h_wheel_sv_triangle.h \
+    GUI/ColorWidgets/colorpickingwidget.h \
+    GUI/ColorWidgets/savedcolorbutton.h \
+    GUI/ColorWidgets/savedcolorswidget.h \
+    GUI/ColorWidgets/savedcolorwidgets.h \
+    GUI/ColorWidgets/helpers.h \
+    GUI/ColorWidgets/gradientwidget.h \
+    GUI/ColorWidgets/glwidget.h \
     gradientpoint.h \
     svgimporter.h \
     qrealkey.h \
