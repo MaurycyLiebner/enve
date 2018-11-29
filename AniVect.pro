@@ -62,7 +62,7 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/savedcolorswidget.cpp \
     GUI/ColorWidgets/savedcolorwidgets.cpp \
     GUI/ColorWidgets/helpers.cpp \
-    GUI/ColorWidgets/gradientwidget.cpp \
+    GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     gradientpoint.cpp \
     svgimporter.cpp \
