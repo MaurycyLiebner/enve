@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QMouseEvent>
-#include "color.h"
+#include "helpers.h"
 
 class SavedColorButton : public QWidget {
     Q_OBJECT

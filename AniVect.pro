@@ -57,7 +57,6 @@ SOURCES += main.cpp\
     Colors/ColorWidgets/colorvaluespin.cpp \
     Colors/ColorWidgets/colorwidget.cpp \
     Colors/ColorWidgets/h_wheel_sv_triangle.cpp \
-    Colors/color.cpp \
     Colors/colorpickingwidget.cpp \
     Colors/savedcolorbutton.cpp \
     Colors/savedcolorswidget.cpp \
@@ -246,7 +245,6 @@ HEADERS  += \
     Colors/ColorWidgets/colorvaluespin.h \
     Colors/ColorWidgets/colorwidget.h \
     Colors/ColorWidgets/h_wheel_sv_triangle.h \
-    Colors/color.h \
     Colors/colorpickingwidget.h \
     Colors/savedcolorbutton.h \
     Colors/savedcolorswidget.h \

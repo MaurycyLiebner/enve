@@ -2,6 +2,12 @@
 #define HELPERS_H
 #include "simplemath.h"
 
+enum ColorMode : short {
+    RGBMODE,
+    HSVMODE,
+    HSLMODE
+};
+
 extern void glOrthoAndViewportSet(unsigned int w, unsigned int h);
 
 extern void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/);

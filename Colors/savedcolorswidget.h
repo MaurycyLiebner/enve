@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
-#include "color.h"
+#include "helpers.h"
 
 class SavedColorsWidget : public QWidget
 {

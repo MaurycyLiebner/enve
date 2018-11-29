@@ -1,7 +1,7 @@
 #ifndef COLORWIDGET_H
 #define COLORWIDGET_H
 #include "glwidget.h"
-#include "Colors/color.h"
+#include "Colors/helpers.h"
 
 extern bool shouldValPointerBeLightHSV(GLfloat hue, GLfloat saturation, GLfloat value);
 extern bool shouldValPointerBeLightHSL(GLfloat hue, GLfloat saturation, GLfloat lightness);

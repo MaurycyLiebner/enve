@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "tile.h"
 #include "brush.h"
-#include "Colors/color.h"
+#include "Colors/helpers.h"
 #include <png++/png.hpp>
 #include "tilesdata.h"
 

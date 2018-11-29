@@ -2,7 +2,7 @@
 #include "savedcolorbutton.h"
 #include <QAction>
 #include <QMenu>
-#include "color.h"
+#include "helpers.h"
 
 SavedColorsWidget::SavedColorsWidget(QWidget *parent)
     : QWidget(parent) {
