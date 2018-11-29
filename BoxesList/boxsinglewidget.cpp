@@ -9,7 +9,7 @@
 #include "boxscrollwidgetvisiblepart.h"
 #include "GUI/keysview.h"
 #include "pointhelpers.h"
-#include "BoxesList/boolpropertywidget.h"
+#include "GUI/BoxesList/boolpropertywidget.h"
 #include "boxtargetwidget.h"
 #include "Properties/boxtargetproperty.h"
 #include "Properties/comboboxproperty.h"

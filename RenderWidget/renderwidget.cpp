@@ -2,7 +2,7 @@
 #include "canvas.h"
 #include "global.h"
 #include "renderinstancewidget.h"
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "videoencoder.h"
 
 RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {

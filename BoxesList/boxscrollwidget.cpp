@@ -1,5 +1,5 @@
 #include "boxscrollwidget.h"
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "Boxes/boundingbox.h"
 #include "boxscrollwidgetvisiblepart.h"
 #include "GUI/canvaswindow.h"

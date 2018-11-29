@@ -3,7 +3,7 @@
 #include "clipboardcontainer.h"
 #include <QPainter>
 #include "mainwindow.h"
-#include "BoxesList/boxscrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
 #include "global.h"
 #include "pointhelpers.h"
@@ -310,7 +310,7 @@ void KeysView::focusInEvent(QFocusEvent *) {
     KeyFocusTarget::KFT_setCurrentTarget(this);
 }
 
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 
 void KeysView::paintEvent(QPaintEvent *) {
     QPainter p(this);

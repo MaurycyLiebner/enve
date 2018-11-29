@@ -10,7 +10,7 @@
 #include "edge.h"
 #include "Sound/soundcomposition.h"
 #include "Boxes/textbox.h"
-#include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "Sound/singlesound.h"
 #include "global.h"
 #include "pointhelpers.h"
@@ -105,7 +105,7 @@ void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
     mLastPressPosAbs = mCanvasTransformMatrix.map(mLastPressPosRel);
 }
 
-#include "BoxesList/boxscrollwidget.h"
+#include "GUI/BoxesList/boxscrollwidget.h"
 void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     mCurrentBoxesGroup->setIsCurrentGroup(false);
     clearBoxesSelection();

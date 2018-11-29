@@ -1,6 +1,6 @@
 #ifndef BRUSHSELECTIONSCROLLAREA_H
 #define BRUSHSELECTIONSCROLLAREA_H
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 class Brush;
 class BrushSelectionWidget;
 

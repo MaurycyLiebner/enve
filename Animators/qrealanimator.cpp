@@ -7,7 +7,7 @@
 #include <QMenu>
 #include "GUI/qrealanimatorvalueslider.h"
 #include <QWidgetAction>
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include "qrealpoint.h"
 #include "qrealkey.h"
 #include "randomqrealgenerator.h"

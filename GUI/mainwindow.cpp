@@ -15,10 +15,10 @@
 #include "qdoubleslider.h"
 #include "svgimporter.h"
 #include "canvaswindow.h"
-#include "BoxesList/boxscrollwidget.h"
+#include "GUI/BoxesList/boxscrollwidget.h"
 #include "clipboardcontainer.h"
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
-#include "BoxesList/boxscrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
+#include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 #include "RenderWidget/renderwidget.h"
 #include "actionbutton.h"
 #include "fontswidget.h"
@@ -31,7 +31,7 @@
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
 #include "Sound/singlesound.h"
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include "memoryhandler.h"
 #include "Paint/BrushSettings/brushsettingswidget.h"
 extern "C" {

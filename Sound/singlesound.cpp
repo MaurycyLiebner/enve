@@ -316,7 +316,7 @@ int SingleSound::prp_getFrameShift() const {
     return Animator::prp_getFrameShift();
 }
 
-#include "BoxesList/boxscrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool &parentSatisfies,
                                       const bool &parentMainTarget) {

@@ -5,8 +5,8 @@
 #include "canvas.h"
 #include "animationdockwidget.h"
 #include <QScrollBar>
-#include "BoxesList/boxscrollwidget.h"
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxscrollwidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include "verticalwidgetsstack.h"
 #include "actionbutton.h"
 #include "RenderWidget/renderwidget.h"

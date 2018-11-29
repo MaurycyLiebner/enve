@@ -1,6 +1,6 @@
 #include "Animators/complexanimator.h"
 #include "GUI/mainwindow.h"
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include "global.h"
 #include "qrealanimator.h"
 

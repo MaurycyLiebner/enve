@@ -1,7 +1,7 @@
 #ifndef GRADIENTSLISTWIDGET_H
 #define GRADIENTSLISTWIDGET_H
 
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 class GradientWidget;
 class DisplayedGradientsWidget;
 

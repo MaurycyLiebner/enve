@@ -2,7 +2,7 @@
 #include "Animators/complexanimator.h"
 #include "GUI/mainwindow.h"
 #include "key.h"
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include "global.h"
 #include "Animators/animatorupdater.h"
 #include "fakecomplexanimator.h"

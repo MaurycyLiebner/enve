@@ -98,14 +98,14 @@ SOURCES += main.cpp\
     PixmapEffects/fmt_filters.cpp \
     PixmapEffects/pixmapeffect.cpp \
     Boxes/particlebox.cpp \
-    BoxesList/OptimalScrollArea/scrollarea.cpp \
-    BoxesList/OptimalScrollArea/scrollwidget.cpp \
-    BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.cpp \
-    BoxesList/OptimalScrollArea/singlewidget.cpp \
-    BoxesList/boxsinglewidget.cpp \
-    BoxesList/boxscrollwidgetvisiblepart.cpp \
-    BoxesList/boxscrollwidget.cpp \
-    BoxesList/boxeslistactionbutton.cpp \
+    GUI/BoxesList/OptimalScrollArea/scrollarea.cpp \
+    GUI/BoxesList/OptimalScrollArea/scrollwidget.cpp \
+    GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.cpp \
+    GUI/BoxesList/OptimalScrollArea/singlewidget.cpp \
+    GUI/BoxesList/boxsinglewidget.cpp \
+    GUI/BoxesList/boxscrollwidgetvisiblepart.cpp \
+    GUI/BoxesList/boxscrollwidget.cpp \
+    GUI/BoxesList/boxeslistactionbutton.cpp \
     canvasselectedpointsactions.cpp \
     canvasselectedboxesactions.cpp \
     clipboardcontainer.cpp \
@@ -118,7 +118,7 @@ SOURCES += main.cpp\
     Properties/property.cpp \
     durationrectangle.cpp \
     Properties/boolproperty.cpp \
-    BoxesList/boolpropertywidget.cpp \
+    GUI/BoxesList/boolpropertywidget.cpp \
     Boxes/imagesequencebox.cpp \
     key.cpp \
     Boxes/rendercachehandler.cpp \
@@ -141,12 +141,12 @@ SOURCES += main.cpp\
     RenderWidget/renderdestinationdialog.cpp \
     PathEffects/patheffect.cpp \
     PathEffects/patheffectanimators.cpp \
-    BoxesList/coloranimatorbutton.cpp \
+    GUI/BoxesList/coloranimatorbutton.cpp \
     updatable.cpp \
-    BoxesList/boxtargetwidget.cpp \
+    GUI/BoxesList/boxtargetwidget.cpp \
     Properties/boxtargetproperty.cpp \
-    BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
-    BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
+    GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
+    GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
     Paint/BrushSettings/brushsettingswidget.cpp \
     Paint/BrushSettings/brushsettingwidget.cpp \
     Paint/PaintLib/brush.cpp \
@@ -162,7 +162,7 @@ SOURCES += main.cpp\
     Paint/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     Paint/PaintLib/tilesdata.cpp \
-    BoxesList/boxscrollarea.cpp \
+    GUI/BoxesList/boxscrollarea.cpp \
     Properties/comboboxproperty.cpp \
     Animators/randomqrealgenerator.cpp \
     Animators/fakecomplexanimator.cpp \
@@ -287,14 +287,14 @@ HEADERS  += \
     PixmapEffects/pixmapeffect.h \
     PixmapEffects/fmt_filters.h \
     Boxes/particlebox.h \
-    BoxesList/OptimalScrollArea/scrollarea.h \
-    BoxesList/OptimalScrollArea/scrollwidget.h \
-    BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h \
-    BoxesList/OptimalScrollArea/singlewidget.h \
-    BoxesList/boxsinglewidget.h \
-    BoxesList/boxscrollwidgetvisiblepart.h \
-    BoxesList/boxscrollwidget.h \
-    BoxesList/boxeslistactionbutton.h \
+    GUI/BoxesList/OptimalScrollArea/scrollarea.h \
+    GUI/BoxesList/OptimalScrollArea/scrollwidget.h \
+    GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h \
+    GUI/BoxesList/OptimalScrollArea/singlewidget.h \
+    GUI/BoxesList/boxsinglewidget.h \
+    GUI/BoxesList/boxscrollwidgetvisiblepart.h \
+    GUI/BoxesList/boxscrollwidget.h \
+    GUI/BoxesList/boxeslistactionbutton.h \
     clipboardcontainer.h \
     Animators/paintsettings.h \
     edge.h \
@@ -305,7 +305,7 @@ HEADERS  += \
     Properties/property.h \
     durationrectangle.h \
     Properties/boolproperty.h \
-    BoxesList/boolpropertywidget.h \
+    GUI/BoxesList/boolpropertywidget.h \
     Boxes/imagesequencebox.h \
     key.h \
     Boxes/rendercachehandler.h \
@@ -335,12 +335,12 @@ HEADERS  += \
     RenderWidget/renderdestinationdialog.h \
     PathEffects/patheffect.h \
     PathEffects/patheffectanimators.h \
-    BoxesList/coloranimatorbutton.h \
+    GUI/BoxesList/coloranimatorbutton.h \
     updatable.h \
-    BoxesList/boxtargetwidget.h \
+    GUI/BoxesList/boxtargetwidget.h \
     Properties/boxtargetproperty.h \
-    BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
-    BoxesList/OptimalScrollArea/minimalscrollwidget.h \
+    GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
+    GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
     Paint/BrushSettings/brushsettingswidget.h \
     Paint/BrushSettings/brushsettingwidget.h \
     Paint/PaintLib/brush.h \
@@ -356,7 +356,7 @@ HEADERS  += \
     Paint/paintboxsettingsdialog.h \
     execdelegator.h \
     Paint/PaintLib/tilesdata.h \
-    BoxesList/boxscrollarea.h \
+    GUI/BoxesList/boxscrollarea.h \
     Properties/comboboxproperty.h \
     Animators/randomqrealgenerator.h \
     Animators/fakecomplexanimator.h \

@@ -1,5 +1,5 @@
 #include "animationbox.h"
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include "Animators/animatorupdater.h"
 #include "canvas.h"
 #include "filesourcescache.h"

@@ -1,6 +1,6 @@
 #include "newcanvasdialog.h"
 #include "canvas.h"
-#include "BoxesList/coloranimatorbutton.h"
+#include "GUI/BoxesList/coloranimatorbutton.h"
 
 CanvasSettingsDialog::CanvasSettingsDialog(Canvas *canvas,
                                            QWidget *parent) :

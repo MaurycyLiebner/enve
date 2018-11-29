@@ -3,7 +3,7 @@
 
 #include "closablecontainer.h"
 #include "renderinstancesettings.h"
-#include "BoxesList/boxsinglewidget.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include <QPushButton>
 #include <QMouseEvent>
 #include <QAction>

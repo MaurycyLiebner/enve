@@ -2,9 +2,9 @@
 #define FILESOURCELIST_H
 #include "filesourcescache.h"
 #include <QWidget>
-#include "BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h"
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
-#include "BoxesList/OptimalScrollArea/minimalscrollwidget.h"
+#include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
+#include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h"
 
 struct FileCacheHandlerAbstraction {
     FileCacheHandlerAbstraction(

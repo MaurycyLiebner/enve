@@ -5,9 +5,9 @@
 #include <QDebug>
 #include "GUI/mainwindow.h"
 #include "GUI/keysview.h"
-#include "BoxesList/boxscrollwidget.h"
+#include "GUI/BoxesList/boxscrollwidget.h"
 #include "singlewidgetabstraction.h"
-#include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
 #include "Animators/animatorupdater.h"
 #include "pointhelpers.h"
