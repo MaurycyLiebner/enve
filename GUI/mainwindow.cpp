@@ -19,7 +19,7 @@
 #include "clipboardcontainer.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
-#include "RenderWidget/renderwidget.h"
+#include "GUI/RenderWidgets/renderwidget.h"
 #include "actionbutton.h"
 #include "fontswidget.h"
 #include "global.h"

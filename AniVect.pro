@@ -126,8 +126,8 @@ SOURCES += main.cpp\
     memoryhandler.cpp \
     boxpathpoint.cpp \
     outputgenerator.cpp \
-    RenderWidget/renderwidget.cpp \
-    RenderWidget/renderinstancewidget.cpp \
+    GUI/RenderWidgets/renderwidget.cpp \
+    GUI/RenderWidgets/renderinstancewidget.cpp \
     renderinstancesettings.cpp \
     GUI/GradientWidgets/gradientslistwidget.cpp \
     GUI/GradientWidgets/displayedgradientswidget.cpp \
@@ -137,8 +137,8 @@ SOURCES += main.cpp\
     AddInclude/SkStroke.cpp \
     AddInclude/SkGeometry.cpp \
     AddInclude/SkStrokerPriv.cpp \
-    RenderWidget/closablecontainer.cpp \
-    RenderWidget/renderdestinationdialog.cpp \
+    GUI/RenderWidgets/closablecontainer.cpp \
+    GUI/RenderWidgets/renderdestinationdialog.cpp \
     PathEffects/patheffect.cpp \
     PathEffects/patheffectanimators.cpp \
     GUI/BoxesList/coloranimatorbutton.cpp \
@@ -172,9 +172,9 @@ SOURCES += main.cpp\
     Boxes/bone.cpp \
     drawpath.cpp \
     videoencoder.cpp \
-    RenderWidget/rendersettingsdialog.cpp \
-    RenderWidget/outputsettingsprofilesdialog.cpp \
-    RenderWidget/outputsettingsdisplaywidget.cpp \
+    GUI/RenderWidgets/rendersettingsdialog.cpp \
+    GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
+    GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
     Paint/BrushSettings/brushselectionwidget.cpp \
     Paint/BrushSettings/brushselectionscrollarea.cpp \
     skimagecopy.cpp \
@@ -314,8 +314,8 @@ HEADERS  += \
     selfref.h \
     boxpathpoint.h \
     outputgenerator.h \
-    RenderWidget/renderwidget.h \
-    RenderWidget/renderinstancewidget.h \
+    GUI/RenderWidgets/renderwidget.h \
+    GUI/RenderWidgets/renderinstancewidget.h \
     renderinstancesettings.h \
     GUI/GradientWidgets/gradientslistwidget.h \
     GUI/GradientWidgets/displayedgradientswidget.h \
@@ -331,8 +331,8 @@ HEADERS  += \
     skiaincludes.h \
     AddInclude/SkPathPriv.h \
     skiadefines.h \
-    RenderWidget/closablecontainer.h \
-    RenderWidget/renderdestinationdialog.h \
+    GUI/RenderWidgets/closablecontainer.h \
+    GUI/RenderWidgets/renderdestinationdialog.h \
     PathEffects/patheffect.h \
     PathEffects/patheffectanimators.h \
     GUI/BoxesList/coloranimatorbutton.h \
@@ -366,9 +366,9 @@ HEADERS  += \
     Boxes/bone.h \
     drawpath.h \
     videoencoder.h \
-    RenderWidget/rendersettingsdialog.h \
-    RenderWidget/outputsettingsprofilesdialog.h \
-    RenderWidget/outputsettingsdisplaywidget.h \
+    GUI/RenderWidgets/rendersettingsdialog.h \
+    GUI/RenderWidgets/outputsettingsprofilesdialog.h \
+    GUI/RenderWidgets/outputsettingsdisplaywidget.h \
     Paint/BrushSettings/brushselectionwidget.h \
     Paint/BrushSettings/brushselectionscrollarea.h \
     AddInclude/SkPointPriv.h \

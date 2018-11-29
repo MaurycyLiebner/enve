@@ -9,7 +9,7 @@
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "verticalwidgetsstack.h"
 #include "actionbutton.h"
-#include "RenderWidget/renderwidget.h"
+#include "GUI/RenderWidgets/renderwidget.h"
 #include "boxeslistkeysviewwidget.h"
 #include "animationwidgetscrollbar.h"
 #include "global.h"
