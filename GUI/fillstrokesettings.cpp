@@ -1,5 +1,5 @@
 #include "fillstrokesettings.h"
-#include "GUI/ColorWidgets/ColorWidgets/gradientwidget.h"
+#include "GUI/ColorWidgets/GradientWidgets/gradientwidget.h"
 #include "mainwindow.h"
 #include "undoredo.h"
 #include "canvas.h"

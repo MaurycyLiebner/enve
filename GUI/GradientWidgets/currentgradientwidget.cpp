@@ -1,5 +1,5 @@
 #include "currentgradientwidget.h"
-#include "GUI/ColorWidgets/ColorWidgets/gradientwidget.h"
+#include "GUI/ColorWidgets/GradientWidgets/gradientwidget.h"
 
 CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
                                              QWidget *parent) :

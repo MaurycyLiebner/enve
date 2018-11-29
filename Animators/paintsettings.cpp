@@ -1,7 +1,7 @@
 #include "paintsettings.h"
 #include "undoredo.h"
 #include "GUI/ColorWidgets/helpers.h"
-#include "GUI/ColorWidgets/ColorWidgets/gradientwidget.h"
+#include "GUI/ColorWidgets/GradientWidgets/gradientwidget.h"
 #include "GUI/mainwindow.h"
 #include "GUI/ColorWidgets/ColorWidgets/colorvaluerect.h"
 #include "Animators/animatorupdater.h"

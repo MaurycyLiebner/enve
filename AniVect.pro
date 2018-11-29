@@ -250,7 +250,7 @@ HEADERS  += \
     GUI/ColorWidgets/savedcolorswidget.h \
     GUI/ColorWidgets/savedcolorwidgets.h \
     GUI/ColorWidgets/helpers.h \
-    GUI/ColorWidgets/gradientwidget.h \
+    GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     gradientpoint.h \
     svgimporter.h \

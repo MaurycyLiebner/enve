@@ -1082,7 +1082,7 @@ int MainWindow::getCurrentFrame() {
 int MainWindow::getFrameCount() {
     return mCanvasWindow->getMaxFrame();
 }
-#include "GUI/ColorWidgets/ColorWidgets/gradientwidget.h"
+#include "GUI/ColorWidgets/GradientWidgets/gradientwidget.h"
 void MainWindow::setCurrentFrame(int frame) {
     mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
     mCanvasWindow->updateAfterFrameChanged(frame);
