@@ -10,7 +10,7 @@ class GradientsListWidget : public ScrollArea
     Q_OBJECT
 public:
     explicit GradientsListWidget(GradientWidget *gradientWidget,
-                                 QWidget *parent = 0);
+                                 QWidget *parent = nullptr);
 
     void setNumberGradients(const int &n);
 

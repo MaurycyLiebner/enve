@@ -175,7 +175,7 @@ void draw(SkCanvas* canvas) {
 }
 
 
-#include "GUI/ColorWidgets/ColorWidgets/colorwidget.h"
+#include "GUI/ColorWidgets/colorwidget.h"
 void GLWindow::renderNow() {
     if(!isExposed()) return;
 

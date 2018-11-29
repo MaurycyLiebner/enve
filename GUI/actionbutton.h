@@ -9,7 +9,7 @@ class ActionButton : public QWidget
 public:
     explicit ActionButton(const QString &notCheckedPix,
                           const QString &toolTip,
-                          QWidget *parent = 0);
+                          QWidget *parent = nullptr);
     void setIcon(const QString &notCheckedPix);
     void setCheckable(const QString &checkedPix);
     void setChecked(bool checked);

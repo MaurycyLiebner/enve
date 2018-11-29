@@ -2,7 +2,7 @@
 #include "Boxes/vectorpath.h"
 #include "Boxes/boxesgroup.h"
 #include "canvas.h"
-#include "GUI/ColorWidgets/ColorWidgets/colorvaluerect.h"
+#include "GUI/ColorWidgets/colorvaluerect.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include "Animators/pathanimator.h"
 #include "nodepoint.h"

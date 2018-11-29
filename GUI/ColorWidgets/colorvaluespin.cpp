@@ -1,5 +1,5 @@
 #include "colorvaluespin.h"
-#include "qrealanimatorvalueslider.h"
+#include "GUI/qrealanimatorvalueslider.h"
 
 ColorValueSpin::ColorValueSpin(QWidget *parent)
     : QObject(parent)

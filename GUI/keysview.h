@@ -26,7 +26,7 @@ class KeysView : public QWidget, public KeyFocusTarget {
     Q_OBJECT
 public:
     explicit KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
-                      QWidget *parent = 0);
+                      QWidget *parent = nullptr);
 
     void setGraphViewed(bool bT);
 

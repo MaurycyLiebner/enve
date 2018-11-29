@@ -6,7 +6,7 @@
 #include <QStatusBar>
 #include "usagewidget.h"
 #include <QToolBar>
-#include "GUI/ColorWidgets/ColorWidgets/colorsettingswidget.h"
+#include "GUI/ColorWidgets/colorsettingswidget.h"
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -1082,7 +1082,7 @@ int MainWindow::getCurrentFrame() {
 int MainWindow::getFrameCount() {
     return mCanvasWindow->getMaxFrame();
 }
-#include "GUI/ColorWidgets/GradientWidgets/gradientwidget.h"
+#include "GUI/GradientWidgets/gradientwidget.h"
 void MainWindow::setCurrentFrame(int frame) {
     mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
     mCanvasWindow->updateAfterFrameChanged(frame);

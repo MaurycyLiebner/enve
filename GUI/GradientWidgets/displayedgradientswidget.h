@@ -1,7 +1,7 @@
 #ifndef DISPLACYEDGRADIENTSWIDGET_H
 #define DISPLACYEDGRADIENTSWIDGET_H
 
-#include "GUI/ColorWidgets/ColorWidgets/glwidget.h"
+#include "GUI/ColorWidgets/glwidget.h"
 #include "global.h"
 class Gradient;
 class GradientWidget;
@@ -10,7 +10,7 @@ class DisplayedGradientsWidget : public GLWidget {
     Q_OBJECT
 public:
     explicit DisplayedGradientsWidget(GradientWidget *gradientWidget,
-                                      QWidget *parent = 0);
+                                      QWidget *parent = nullptr);
 
     void incTop(const int &inc);
     void setTop(const int &top);

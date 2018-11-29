@@ -1,7 +1,7 @@
 #include "brushsettingswidget.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include <QPushButton>
-#include "GUI/ColorWidgets/ColorWidgets/colorsettingswidget.h"
+#include "GUI/ColorWidgets/colorsettingswidget.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "brushselectionscrollarea.h"
 #include "global.h"

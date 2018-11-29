@@ -13,7 +13,7 @@ class RenderOutputWidget : public QDialog {
 public:
     explicit RenderOutputWidget(const qreal &canvasWidth,
                                 const qreal &canvasHeight,
-                                QWidget *parent = 0);
+                                QWidget *parent = nullptr);
 
 private:
     qreal mCurrentResolutionFrac = 1.;

@@ -1,7 +1,7 @@
 #ifndef CURRENTGRADIENTWIDGET_H
 #define CURRENTGRADIENTWIDGET_H
 
-#include "GUI/ColorWidgets/ColorWidgets/glwidget.h"
+#include "GUI/ColorWidgets/glwidget.h"
 class GradientWidget;
 
 class CurrentGradientWidget : public GLWidget
@@ -9,16 +9,16 @@ class CurrentGradientWidget : public GLWidget
     Q_OBJECT
 public:
     explicit CurrentGradientWidget(GradientWidget *gradientWidget,
-                                   QWidget *parent = 0);
+                                   QWidget *parent = nullptr);
 
     void paintGL();
 
 protected:
-    GradientWidget *mGradientWidget;
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void leaveEvent(QEvent *);
     int mHoveredX = 0;
+    GradientWidget *mGradientWidget;
 signals:
 
 public slots:

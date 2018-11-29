@@ -26,7 +26,7 @@ class RenderInstanceWidget : public ClosableContainer {
 public:
     RenderInstanceWidget(QWidget *parent = nullptr);
     RenderInstanceWidget(RenderInstanceSettings *settings,
-                         QWidget *parent = 0);
+                         QWidget *parent = nullptr);
     ~RenderInstanceWidget();
 
     void updateFromSettings();

@@ -18,7 +18,7 @@ public:
     explicit BrushSettingWidget(QVBoxLayout *label_layout_t,
                                 QVBoxLayout *rest_layout_t,
                                 BrushSetting setting_id_t,
-                                QWidget *parent = 0);
+                                QWidget *parent = nullptr);
     qreal getVal();
     void setVal(const qreal &val_t,
                 const bool &edited_t);

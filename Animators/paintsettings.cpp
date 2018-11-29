@@ -1,9 +1,9 @@
 #include "paintsettings.h"
 #include "undoredo.h"
 #include "GUI/ColorWidgets/helpers.h"
-#include "GUI/ColorWidgets/GradientWidgets/gradientwidget.h"
+#include "GUI/GradientWidgets/gradientwidget.h"
 #include "GUI/mainwindow.h"
-#include "GUI/ColorWidgets/ColorWidgets/colorvaluerect.h"
+#include "GUI/ColorWidgets/colorvaluerect.h"
 #include "Animators/animatorupdater.h"
 #include "skqtconversions.h"
 #include "skiaincludes.h"
@@ -514,14 +514,16 @@ void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
 
 void StrokeSettings::setStrokerSettingsForRelFrameSk(const int &relFrame,
                                                      SkStroke *stroker) {
-    stroker->setWidth(qrealToSkScalar(mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame)));
+    qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame);
+    stroker->setWidth(qrealToSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
 void StrokeSettings::setStrokerSettingsForRelFrameSkF(const qreal &relFrame,
                                                      SkStroke *stroker) {
-    stroker->setWidth(qrealToSkScalar(mLineWidth->qra_getEffectiveValueAtRelFrameF(relFrame)));
+    qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrameF(relFrame);
+    stroker->setWidth(qrealToSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }

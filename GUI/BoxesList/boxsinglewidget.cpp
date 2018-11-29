@@ -2,7 +2,7 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
-#include "GUI/ColorWidgets/ColorWidgets/colorsettingswidget.h"
+#include "GUI/ColorWidgets/colorsettingswidget.h"
 
 #include "Boxes/boxesgroup.h"
 #include "GUI/qrealanimatorvalueslider.h"
