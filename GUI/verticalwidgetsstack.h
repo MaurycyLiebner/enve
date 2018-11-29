@@ -42,7 +42,7 @@ class VerticalWidgetsStack :
         public QWidget {
     Q_OBJECT
 public:
-    VerticalWidgetsStack(QWidget *parent = 0);
+    VerticalWidgetsStack(QWidget *parent = nullptr);
 
     void updateSizesAndPositions();
     void updateResizers();

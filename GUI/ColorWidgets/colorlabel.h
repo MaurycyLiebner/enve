@@ -7,7 +7,7 @@
 class ColorLabel : public ColorWidget {
     Q_OBJECT
 public:
-    explicit ColorLabel(QWidget *parent = 0);
+    explicit ColorLabel(QWidget *parent = nullptr);
     void saveCurrentColorAsLast();
     void setLastColorHSV(GLfloat h, GLfloat s, GLfloat v);
     void mousePressEvent(QMouseEvent *e);

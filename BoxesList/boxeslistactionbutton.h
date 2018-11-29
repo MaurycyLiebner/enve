@@ -7,7 +7,7 @@ class BoxesListActionButton : public QWidget
 {
     Q_OBJECT
 public:
-    BoxesListActionButton(QWidget *parent = 0);
+    BoxesListActionButton(QWidget *parent = nullptr);
 protected:
     void mousePressEvent(QMouseEvent *);
     void enterEvent(QEvent *);

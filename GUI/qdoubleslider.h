@@ -12,7 +12,7 @@ public:
                   QWidget *parent = 0);
     QDoubleSlider(QString name, qreal minVal, qreal maxVal, qreal prefferedStep,
                   QWidget *parent = 0);
-    QDoubleSlider(QWidget *parent = 0);
+    QDoubleSlider(QWidget *parent = nullptr);
     virtual ~QDoubleSlider();
 
     bool eventFilter(QObject *, QEvent *event);

@@ -11,7 +11,7 @@ class SavedColorWidgets : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SavedColorWidgets(QWidget *parent = 0);
+    explicit SavedColorWidgets(QWidget *parent = nullptr);
 
 
 private:

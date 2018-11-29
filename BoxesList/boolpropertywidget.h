@@ -8,7 +8,7 @@ class BoolPropertyContainer;
 class BoolPropertyWidget : public QWidget {
     Q_OBJECT
 public:
-    BoolPropertyWidget(QWidget *parent = 0);
+    BoolPropertyWidget(QWidget *parent = nullptr);
 
     void setTarget(BoolProperty *property);
     void setTarget(BoolPropertyContainer *property);

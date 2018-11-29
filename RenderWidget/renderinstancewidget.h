@@ -24,7 +24,7 @@ protected:
 class RenderInstanceWidget : public ClosableContainer {
     Q_OBJECT
 public:
-    RenderInstanceWidget(QWidget *parent = 0);
+    RenderInstanceWidget(QWidget *parent = nullptr);
     RenderInstanceWidget(RenderInstanceSettings *settings,
                          QWidget *parent = 0);
     ~RenderInstanceWidget();
