@@ -3,8 +3,8 @@
 #include "GUI/fillstrokesettings.h"
 #include <QComboBox>
 #include <QScrollArea>
-#include "Gradients/gradientslistwidget.h"
-#include "Gradients/currentgradientwidget.h"
+#include "GUI/GradientWidgets/gradientslistwidget.h"
+#include "GUI/GradientWidgets/currentgradientwidget.h"
 
 class GradientWidget : public QWidget {
     Q_OBJECT

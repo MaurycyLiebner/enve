@@ -129,9 +129,9 @@ SOURCES += main.cpp\
     RenderWidget/renderwidget.cpp \
     RenderWidget/renderinstancewidget.cpp \
     RenderWidget/renderinstancesettings.cpp \
-    Gradients/gradientslistwidget.cpp \
-    Gradients/displayedgradientswidget.cpp \
-    Gradients/currentgradientwidget.cpp \
+    GUI/GradientWidgets/gradientslistwidget.cpp \
+    GUI/GradientWidgets/displayedgradientswidget.cpp \
+    GUI/GradientWidgets/currentgradientwidget.cpp \
     filesourcescache.cpp \
     skqtconversions.cpp \
     AddInclude/SkStroke.cpp \
@@ -317,9 +317,9 @@ HEADERS  += \
     RenderWidget/renderwidget.h \
     RenderWidget/renderinstancewidget.h \
     RenderWidget/renderinstancesettings.h \
-    Gradients/gradientslistwidget.h \
-    Gradients/displayedgradientswidget.h \
-    Gradients/currentgradientwidget.h \
+    GUI/GradientWidgets/gradientslistwidget.h \
+    GUI/GradientWidgets/displayedgradientswidget.h \
+    GUI/GradientWidgets/currentgradientwidget.h \
     filesourcescache.h \
     global.h \
     skqtconversions.h \
