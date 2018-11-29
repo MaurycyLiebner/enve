@@ -26,10 +26,10 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     connect(mBrushSelection, SIGNAL(brushSelected(const Brush*)),
             this, SLOT(setCurrentBrush(const Brush*)));
 
-    h_layout = new QHBoxLayout();
-    mMainLayout->addLayout(h_layout);
-    labels_layout = new QVBoxLayout();
-    rest_layout = new QVBoxLayout();
+    mHLayout = new QHBoxLayout();
+    mMainLayout->addLayout(mHLayout);
+    mLabelsLayout = new QVBoxLayout();
+    mRestLayout = new QVBoxLayout();
 
     mAdvancedArea = new ScrollArea(this);
     mAdvancedArea->setMinimumHeight(10*MIN_WIDGET_HEIGHT);
@@ -45,15 +45,15 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     mAdvancedWidget->setLayout(mAdvancedLayout);
     mMainLayout->addWidget(mAdvancedArea);
 
-    h_layout->addLayout(labels_layout);
-    h_layout->addLayout(rest_layout);
+    mHLayout->addLayout(mLabelsLayout);
+    mHLayout->addLayout(mRestLayout);
     for(int i = 0; i < BRUSH_SETTING_ASPECT_RATIO; i++) {
         BrushSettingWidget *setting_widget_t =
-                new BrushSettingWidget(labels_layout,
-                                       rest_layout,
+                new BrushSettingWidget(mLabelsLayout,
+                                       mRestLayout,
                                        static_cast<BrushSetting>(i),
                                        this);
-        setting_widgets.append(setting_widget_t);
+        mSettingWidgets.append(setting_widget_t);
         connect(setting_widget_t, SIGNAL(setBrushSetting(BrushSetting,qreal)),
                 this, SLOT(setBrushSetting(BrushSetting,qreal)));
     }
@@ -63,24 +63,24 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
                                        mAdvancedRestLayout,
                                        static_cast<BrushSetting>(i),
                                        this);
-        setting_widgets.append(setting_widget_t);
+        mSettingWidgets.append(setting_widget_t);
         connect(setting_widget_t, SIGNAL(setBrushSetting(BrushSetting,qreal)),
                 this, SLOT(setBrushSetting(BrushSetting,qreal)));
     }
     mAdvancedArea->hide();
     //setting_widgets.at(BRUSH_SETTING_SLOW_TRACKING)->show();
 
-    buttons_layout = new QHBoxLayout();
+    mButtonsLayout = new QHBoxLayout();
     save_brush_button = new QPushButton("Save Brush", this);
     connect(save_brush_button, SIGNAL(released()),
             this, SLOT(saveBrush()) );
-    buttons_layout->addWidget(save_brush_button);
+    mButtonsLayout->addWidget(save_brush_button);
 
-    advanced_button = new QPushButton("Advanced Settings", this);
-    connect(advanced_button, SIGNAL(released()),
+    mAdvancedButton = new QPushButton("Advanced Settings", this);
+    connect(mAdvancedButton, SIGNAL(released()),
             this, SLOT(showHideAdvancedSettings()) );
-    buttons_layout->addWidget(advanced_button);
-    mMainLayout->addLayout(buttons_layout);
+    mButtonsLayout->addWidget(mAdvancedButton);
+    mMainLayout->addLayout(mButtonsLayout);
 
     setLayout(mMainLayout);
     setCurrentBrush(mBrushSelection->getCurrentBrush());
@@ -89,7 +89,7 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
 void BrushSettingsWidget::setBrushWidgetSetting(const BrushSetting &setting_id,
                                                 const qreal &val_t,
                                                 const bool &edited_t) {
-    setting_widgets.at(setting_id)->setVal(val_t, edited_t);
+    mSettingWidgets.at(setting_id)->setVal(val_t, edited_t);
 }
 
 void BrushSettingsWidget::setCurrentBrush(const Brush *brushT) {
@@ -143,8 +143,8 @@ QColor BrushSettingsWidget::getCurrentQColor() {
 }
 
 void BrushSettingsWidget::showHideAdvancedSettings() {
-    advanced_settings_visible = !advanced_settings_visible;
-    mAdvancedArea->setVisible(advanced_settings_visible);
+    mAdvancedSettingsVisible = !mAdvancedSettingsVisible;
+    mAdvancedArea->setVisible(mAdvancedSettingsVisible);
 }
 #include <QFileDialog>
 void BrushSettingsWidget::saveBrush() {
@@ -192,12 +192,12 @@ void BrushSettingsWidget::setColorSetting(const ColorSetting &colorSetting) {
 
 void BrushSettingsWidget::incBrushRadius() {
     BrushSettingWidget *setting_widget_t =
-            setting_widgets.at(BRUSH_SETTING_RADIUS);
+            mSettingWidgets.at(BRUSH_SETTING_RADIUS);
     setting_widget_t->incVal(mCurrentBrush->getRadius()*0.2 + 0.3);
 }
 
 void BrushSettingsWidget::decBrushRadius() {
     BrushSettingWidget *setting_widget_t =
-            setting_widgets.at(BRUSH_SETTING_RADIUS);
+            mSettingWidgets.at(BRUSH_SETTING_RADIUS);
     setting_widget_t->incVal(-(mCurrentBrush->getRadius()*0.2 + 0.3) );
 }

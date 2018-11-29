@@ -1,8 +1,8 @@
-#ifndef BRUSHSETTINGSWIDGET_H
+﻿#ifndef BRUSHSETTINGSWIDGET_H
 #define BRUSHSETTINGSWIDGET_H
 
 #include <QWidget>
-#include "../PaintLib/brush.h"
+#include "Paint/brush.h"
 #include "brushsettingwidget.h"
 class ColorSettingsWidget;
 class ColorSetting;
@@ -41,22 +41,22 @@ public slots:
     void setColorSetting(const ColorSetting &colorSetting);
 
 private:
+    bool mAdvancedSettingsVisible = false;
     BrushSelectionScrollArea *mBrushSelection = nullptr;
     ScrollArea *mAdvancedArea;
     QWidget *mAdvancedWidget;
     ColorSettingsWidget *mColorSettingsWidget;
-    QHBoxLayout *buttons_layout = nullptr;
+    QHBoxLayout *mButtonsLayout = nullptr;
     QPushButton *save_brush_button = nullptr;
-    QPushButton *overwrite_brush_settings = nullptr;
-    QPushButton *advanced_button = nullptr;
+    QPushButton *mOverwriteBrushSettings = nullptr;
+    QPushButton *mAdvancedButton = nullptr;
 
-    bool advanced_settings_visible = false;
     Brush *mCurrentBrush = nullptr;
-    QList<BrushSettingWidget*> setting_widgets;
+    QList<BrushSettingWidget*> mSettingWidgets;
     QVBoxLayout *mMainLayout = nullptr;
-    QHBoxLayout *h_layout = nullptr;
-    QVBoxLayout *labels_layout = nullptr;
-    QVBoxLayout *rest_layout = nullptr;
+    QHBoxLayout *mHLayout = nullptr;
+    QVBoxLayout *mLabelsLayout = nullptr;
+    QVBoxLayout *mRestLayout = nullptr;
 
     QHBoxLayout *mAdvancedLayout;
     QVBoxLayout *mAdvancedLabelsLayout = nullptr;

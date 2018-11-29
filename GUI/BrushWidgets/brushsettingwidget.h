@@ -6,13 +6,12 @@
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QLabel>
-#include "../PaintLib/brush.h"
+#include "Paint/brush.h"
 #include <QPushButton>
 
 struct WindowVariables;
 
-class BrushSettingWidget : public QObject
-{
+class BrushSettingWidget : public QObject {
     Q_OBJECT
 public:
     explicit BrushSettingWidget(QVBoxLayout *label_layout_t,
