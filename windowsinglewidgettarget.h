@@ -1,7 +1,7 @@
 #ifndef WINDOWSINGLEWIDGETTARGET_H
 #define WINDOWSINGLEWIDGETTARGET_H
 class CanvasWindow;
-#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include "singlewidgettarget.h"
 
 class WindowSingleWidgetTarget : public SingleWidgetTarget {
     friend class SelfRef;

@@ -2,8 +2,9 @@
 #include "Boxes/boundingboxrendercontainer.h"
 #include <gperftools/malloc_extension.h>
 #include <malloc.h>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include <QMetaType>
+#include "GUI/usagewidget.h"
 
 MemoryHandler *MemoryHandler::mInstance;
 Q_DECLARE_METATYPE(MemoryState)
@@ -92,7 +93,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
     //MallocExtension::instance()->ReleaseToSystem(bytes - memToFree);
     //MallocExtension::instance()->ReleaseFreeMemory();
 }
-#include "usagewidget.h"
+
 void MemoryHandler::memoryChecked(const int &memKb, const int& totMemKb) {
     UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
     if(usageWidget == nullptr) return;

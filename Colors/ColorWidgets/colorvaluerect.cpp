@@ -3,7 +3,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QPainter>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 
 ColorValueRect::ColorValueRect(const CVR_TYPE& type_t, QWidget *parent) :
     ColorWidget(parent) {

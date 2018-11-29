@@ -4,7 +4,7 @@
 #include "singlewidget.h"
 #include "scrollwidget.h"
 #include "singlewidgettarget.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "global.h"
 
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(

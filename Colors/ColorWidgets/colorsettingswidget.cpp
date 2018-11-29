@@ -1,11 +1,12 @@
 #include "colorsettingswidget.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include <QResizeEvent>
 #include <QMenu>
 #include "Colors/colorpickingwidget.h"
 #include "Colors/helpers.h"
 #include "colorlabel.h"
 #include "global.h"
+#include "GUI/actionbutton.h"
 
 void moveAndResizeValueRect(const int &rect_x_t,
                             int *rect_y_t,
@@ -24,23 +25,26 @@ void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
                                           const qreal &s_t,
                                           const qreal &v_t,
                                           const qreal &a_t) {
-
+    GLfloat hueGl = static_cast<GLfloat>(h_t);
+    GLfloat satGl = static_cast<GLfloat>(s_t);
+    GLfloat valGl = static_cast<GLfloat>(v_t);
+    GLfloat alphaGl = static_cast<GLfloat>(a_t);
     //wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
-    r_rect->setColorHSV_f(h_t, s_t, v_t);
-    g_rect->setColorHSV_f(h_t, s_t, v_t);
-    b_rect->setColorHSV_f(h_t, s_t, v_t);
+    r_rect->setColorHSV_f(hueGl, satGl, valGl);
+    g_rect->setColorHSV_f(hueGl, satGl, valGl);
+    b_rect->setColorHSV_f(hueGl, satGl, valGl);
 
-    h_rect->setColorHSV_f(h_t, s_t, v_t);
+    h_rect->setColorHSV_f(hueGl, satGl, valGl);
     h_rect->setDisplayedValue(h_t);
-    hsv_s_rect->setColorHSV_f(h_t, s_t, v_t);
+    hsv_s_rect->setColorHSV_f(hueGl, satGl, valGl);
     h_rect->setDisplayedValue(s_t);
-    v_rect->setColorHSV_f(h_t, s_t, v_t);
+    v_rect->setColorHSV_f(hueGl, satGl, valGl);
     h_rect->setDisplayedValue(v_t);
 
-    hsl_s_rect->setColorHSV_f(h_t, s_t, v_t);
-    l_rect->setColorHSV_f(h_t, s_t, v_t);
+    hsl_s_rect->setColorHSV_f(hueGl, satGl, valGl);
+    l_rect->setColorHSV_f(hueGl, satGl, valGl);
 
-    color_label->setColorHSV_f(h_t, s_t, v_t);
+    color_label->setColorHSV_f(hueGl, satGl, valGl);
 
     qreal hue = h_t;
     qreal hsvSat = s_t;
@@ -74,8 +78,8 @@ void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
     lSpin->setValueExternal(lig);
 
     if(mAlphaHidden) return;
-    color_label->setAlpha(a_t);
-    aRect->setColorHSV_f(h_t, s_t, v_t);
+    color_label->setAlpha(alphaGl);
+    aRect->setColorHSV_f(hueGl, satGl, valGl);
     aRect->setDisplayedValue(a_t);
     aSpin->setValueExternal(a_t);
 }
@@ -381,7 +385,6 @@ void ColorSettingsWidget::startColorPicking()
 {
     new ColorPickingWidget(this);
 }
-#include "actionbutton.h"
 
 ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mColorModeCombo = new QComboBox(this);
@@ -652,17 +655,17 @@ void ColorSettingsWidget::setRectValuesAndColor(
         const qreal &red, const qreal &green, const qreal &blue,
         const qreal &hue, const qreal &hsvSaturation, const qreal &value,
         const qreal &hslSaturation, const qreal &lightness) {
-    GLfloat hueGl = hue;
-    GLfloat satGl = hsvSaturation;
-    GLfloat valGl = value;
+    GLfloat hueGl = static_cast<GLfloat>(hue);
+    GLfloat satGl = static_cast<GLfloat>(hsvSaturation);
+    GLfloat valGl = static_cast<GLfloat>(value);
 
     r_rect->setDisplayedValue(red);
     g_rect->setDisplayedValue(green);
     b_rect->setDisplayedValue(blue);
 
-    h_rect->setDisplayedValue(hueGl);
-    hsv_s_rect->setDisplayedValue(satGl);
-    v_rect->setDisplayedValue(valGl);
+    h_rect->setDisplayedValue(hue);
+    hsv_s_rect->setDisplayedValue(hsvSaturation);
+    v_rect->setDisplayedValue(value);
 
     hsl_s_rect->setDisplayedValue(hslSaturation);
     l_rect->setDisplayedValue(lightness);

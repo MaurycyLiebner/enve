@@ -3,7 +3,7 @@
 #include <QComboBox>
 #include "mainwindow.h"
 #include "BoxesList/boxscrollwidgetvisiblepart.h"
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "singlewidgetabstraction.h"
 #include "paintcontroler.h"
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
@@ -153,7 +153,6 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
     mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
                 mCurrentCanvas.data(),
                 SWT_CurrentCanvas);
-    updateDisplayedFillStrokeSettings();
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
     callUpdateSchedulers();
 }
@@ -674,9 +673,11 @@ void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
     mCurrentCanvas->prp_setAbsFrame(currentFrame);
 }
 
-void CanvasWindow::updateDisplayedFillStrokeSettings() {
+void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
+        PaintSettings*& fillSetings, StrokeSettings*& strokeSettings) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->setDisplayedFillStrokeSettingsFromLastSelected();
+    mCurrentCanvas->getDisplayedFillStrokeSettingsFromLastSelected(
+                fillSetings, strokeSettings);
 }
 
 void CanvasWindow::setClipToCanvas(const bool &bT) {

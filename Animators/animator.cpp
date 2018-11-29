@@ -1,6 +1,6 @@
 #include "animator.h"
 #include "Animators/complexanimator.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "key.h"
 #include "BoxesList/boxsinglewidget.h"
 #include "global.h"

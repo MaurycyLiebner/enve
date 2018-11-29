@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
-#include "qrealanimatorvalueslider.h"
+#include "GUI/qrealanimatorvalueslider.h"
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettings.h"
 

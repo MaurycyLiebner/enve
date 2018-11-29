@@ -1,7 +1,6 @@
 #include "Boxes/circle.h"
 #include "canvas.h"
 #include "movablepoint.h"
-#include "updatescheduler.h"
 #include "Animators/animatorupdater.h"
 #include "gradientpoints.h"
 

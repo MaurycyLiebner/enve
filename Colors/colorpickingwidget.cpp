@@ -1,7 +1,7 @@
 #include "colorpickingwidget.h"
 #include <QMouseEvent>
 #include <QPainter>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include <QApplication>
 #include <QScreen>
 #include <QDesktopWidget>

@@ -1,7 +1,7 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
 #include "Animators/animatorupdater.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "Boxes/boundingbox.h"
 
 Property::Property(const QString& name) {

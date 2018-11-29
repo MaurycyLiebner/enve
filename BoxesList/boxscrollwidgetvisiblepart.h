@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
-#include "OptimalScrollArea/singlewidgettarget.h"
+#include "singlewidgettarget.h"
 
 class BoxSingleWidget;
 class DurationRectangleMovable;

@@ -2,7 +2,7 @@
 #define SVGIMPORTER_H
 #include <QDebug>
 #include <QtXml/QDomDocument>
-#include "fillstrokesettings.h"
+#include "GUI/fillstrokesettings.h"
 #include <QtMath>
 class VectorPath;
 class Canvas;

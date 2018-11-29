@@ -70,7 +70,6 @@ SOURCES += main.cpp\
     qrealkey.cpp \
     qrealpoint.cpp \
     pointhelpers.cpp \
-    updatescheduler.cpp \
     gradientpoints.cpp \
     paintcontroler.cpp \
     Animators/transformanimator.cpp \
@@ -102,8 +101,6 @@ SOURCES += main.cpp\
     Boxes/particlebox.cpp \
     BoxesList/OptimalScrollArea/scrollarea.cpp \
     BoxesList/OptimalScrollArea/scrollwidget.cpp \
-    BoxesList/OptimalScrollArea/singlewidgettarget.cpp \
-    BoxesList/OptimalScrollArea/singlewidgetabstraction.cpp \
     BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.cpp \
     BoxesList/OptimalScrollArea/singlewidget.cpp \
     BoxesList/boxsinglewidget.cpp \
@@ -233,12 +230,13 @@ SOURCES += main.cpp\
     GUI/filesourcelist.cpp \
     GUI/customfpsdialog.cpp \
     GUI/durationrectsettingsdialog.cpp \
-    GUI/fillstrokesettings.cpp
+    GUI/fillstrokesettings.cpp \
+    singlewidgettarget.cpp \
+    singlewidgetabstraction.cpp
 
 HEADERS  += \
     canvas.h \
     undoredo.h \
-    updatescheduler.h \
     movablepoint.h \
     pathpivot.h \
     ctrlpoint.h \
@@ -293,8 +291,6 @@ HEADERS  += \
     Boxes/particlebox.h \
     BoxesList/OptimalScrollArea/scrollarea.h \
     BoxesList/OptimalScrollArea/scrollwidget.h \
-    BoxesList/OptimalScrollArea/singlewidgettarget.h \
-    BoxesList/OptimalScrollArea/singlewidgetabstraction.h \
     BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h \
     BoxesList/OptimalScrollArea/singlewidget.h \
     BoxesList/boxsinglewidget.h \
@@ -431,7 +427,9 @@ HEADERS  += \
     GUI/glwindow.h \
     GUI/noshortcutaction.h \
     GUI/qrealpointvaluedialog.h \
-    GUI/renderoutputwidget.h
+    GUI/renderoutputwidget.h \
+    singlewidgettarget.h \
+    singlewidgetabstraction.h
 
 RESOURCES += \
     resources.qrc

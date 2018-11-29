@@ -1,5 +1,5 @@
 #include "canvas.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "pathpivot.h"
 #include "Boxes/bone.h"
 
@@ -265,12 +265,15 @@ NodePoint* Canvas::createNewPointOnLineNearSelected(
     return nullptr;
 }
 
-void Canvas::setDisplayedFillStrokeSettingsFromLastSelected() {
+void Canvas::getDisplayedFillStrokeSettingsFromLastSelected(
+        PaintSettings*& fillSetings, StrokeSettings*& strokeSettings) {
     if(mSelectedBoxes.isEmpty()) {
-        mFillStrokeSettingsWidget->setCurrentSettings(nullptr,
-                                                      nullptr);
+        fillSetings = nullptr;
+        strokeSettings = nullptr;
     } else {
-        setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
+        auto box = mSelectedBoxes.last();
+        fillSetings = box->getFillSettings();
+        strokeSettings = box->getStrokeSettings();
     }
 }
 

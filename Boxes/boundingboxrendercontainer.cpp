@@ -3,7 +3,7 @@
 #include <QElapsedTimer>
 #include "memoryhandler.h"
 #include "rendercachehandler.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 
 RenderContainer::~RenderContainer() {
 

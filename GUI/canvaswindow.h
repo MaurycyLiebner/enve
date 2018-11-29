@@ -3,14 +3,13 @@
 
 #include <QWidget>
 #include "glwindow.h"
-#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include "singlewidgettarget.h"
 #include "keyfocustarget.h"
 #include "sharedpointerdefs.h"
 class Brush;
 class WindowSingleWidgetTarget;
 enum ColorMode : short;
 enum CanvasMode : short;
-class Color;
 class Gradient;
 class BoundingBox;
 class BoxesGroup;
@@ -66,7 +65,6 @@ public:
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
     void strokeWidthChanged(const qreal &strokeWidth,
                             const bool &finish);
-    void updateDisplayedFillStrokeSettings();
 
     void setResolutionFraction(const qreal &percent);
     void updatePivotIfNeeded();
@@ -150,6 +148,8 @@ public:
     void startMaxFramePosTransformForAllSelected();
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int &dFrame);
+    void getDisplayedFillStrokeSettingsFromLastSelected(
+            PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
 protected:
     bool mPreviewing = false;
     bool mRendering = false;

@@ -2,15 +2,13 @@
 #define BOUNDINGBOX_H
 
 #include <QMatrix>
-#include "transformable.h"
-#include "fillstrokesettings.h"
 #include "Animators/transformanimator.h"
 
 #include "PixmapEffects/pixmapeffect.h"
 
 #include "Animators/effectanimators.h"
 
-#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include "singlewidgettarget.h"
 #include <unordered_map>
 
 #include "boundingboxrendercontainer.h"
@@ -77,35 +75,21 @@ public:
     virtual ~BoundingBox();
 
     virtual BoundingBoxQSPtr createLink();
-    virtual BoundingBoxQSPtr createLinkForLinkGroup() {
-        BoundingBoxQSPtr box = createLink();
-        box->clearEffects();
-        return box;
-    }
+    virtual BoundingBoxQSPtr createLinkForLinkGroup();
 
-    void clearEffects() {
-        mEffectsAnimators->ca_removeAllChildAnimators();
-    }
+    void clearEffects();
 
-    virtual void setFont(const QFont &) {}
-    virtual void setSelectedFontSize(const qreal &) {}
+    virtual void setFont(const QFont &);
+    virtual void setSelectedFontSize(const qreal &);
     virtual void setSelectedFontFamilyAndStyle(const QString &,
-                                               const QString &) {}
+                                               const QString &);
 
-    virtual QPointF getRelCenterPosition() {
-        return mRelBoundingRect.center();
-    }
+    virtual QPointF getRelCenterPosition();
 
-    virtual void centerPivotPosition(const bool &saveUndoRedo = false) {
-        mTransformAnimator->setPivotWithoutChangingTransformation(
-                    getRelCenterPosition(), saveUndoRedo);
-    }
+    virtual void centerPivotPosition(const bool &saveUndoRedo = false);
     virtual void setPivotPosition(
             const QPointF &pos,
-            const bool &saveUndoRedo = false) {
-        mTransformAnimator->setPivotWithoutChangingTransformation(
-                    pos, saveUndoRedo);
-    }
+            const bool &saveUndoRedo = false);
     virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmapSk(SkCanvas *canvas);
@@ -140,7 +124,7 @@ public:
                        const bool &saveUndoRedo = true);
 
     virtual void selectAndAddContainedPointsToList(
-            const QRectF &, QList<MovablePointPtr>&) {}
+            const QRectF &, QList<MovablePointPtr>&);
 
     QPointF getPivotAbsPos();
     virtual void select();
@@ -173,12 +157,7 @@ public:
 
     virtual NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
-                                                const qreal &canvasScaleInv) {
-        Q_UNUSED(absPos);
-        Q_UNUSED(adjust);
-        Q_UNUSED(canvasScaleInv);
-        return nullptr;
-    }
+                                                const qreal &canvasScaleInv);
     virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     void setName(const QString &name);
@@ -207,27 +186,20 @@ public:
     virtual void startScaleTransform();
     virtual void prp_setAbsFrame(const int &frame);
 
-    virtual void startAllPointsTransform() {}
-    virtual void finishAllPointsTransform() {}
+    virtual void startAllPointsTransform();
+    virtual void finishAllPointsTransform();
 
-    virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
-        Q_UNUSED(capStyle); }
-    virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
-        Q_UNUSED(joinStyle); }
+    virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
+    virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     virtual void setStrokeWidth(const qreal &strokeWidth,
-                                const bool &finish) {
-        Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
+                                const bool &finish);
 
-    virtual void startSelectedStrokeWidthTransform() {}
-    virtual void startSelectedStrokeColorTransform() {}
-    virtual void startSelectedFillColorTransform() {}
+    virtual void startSelectedStrokeWidthTransform();
+    virtual void startSelectedStrokeColorTransform();
+    virtual void startSelectedFillColorTransform();
 
     virtual VectorPathEdge *getEdge(const QPointF &absPos,
-                                    const qreal &canvasScaleInv) {
-        Q_UNUSED(absPos);
-        Q_UNUSED(canvasScaleInv);
-        return nullptr;
-    }
+                                    const qreal &canvasScaleInv);
     void setAbsolutePos(const QPointF &pos,
                         const bool &saveUndoRedo = false);
     void setRelativePos(const QPointF &relPos,
@@ -240,8 +212,8 @@ public:
     void resetTranslation();
     void resetRotation();
     BoxTransformAnimator *getTransformAnimator();
-    virtual VectorPath *objectToVectorPathBox() { return nullptr; }
-    virtual VectorPath *strokeToVectorPathBox() { return nullptr; }
+    virtual VectorPath *objectToVectorPathBox();
+    virtual VectorPath *strokeToVectorPathBox();
 
     void updatePrettyPixmap();
 
@@ -268,34 +240,27 @@ public:
     void removeEffect(const PixmapEffectQSPtr &effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
-    virtual const SkBlendMode &getBlendMode() {
-        return mBlendModeSk;
-    }
+    virtual const SkBlendMode &getBlendMode();
 
     virtual void updateAllBoxes(const UpdateReason &reason);
     void selectionChangeTriggered(const bool &shiftPressed);
 
-    bool isAnimated() { return prp_isDescendantRecording(); }
+    bool isAnimated();
 
     virtual const SkPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransformAtCurrentFrame();
     QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
-    QRectF getRelBoundingRect() const {
-        return mRelBoundingRect;
-    }
+    QRectF getRelBoundingRect() const;
 
-    virtual QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
-        Q_UNUSED(relFrame);
-        return getRelBoundingRect();
-    }
+    virtual QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
-    virtual void applyCurrentTransformation() {}
+    virtual void applyCurrentTransformation();
 
     virtual Canvas *getParentCanvas();
-    virtual void reloadCacheHandler() { clearAllCache(); }
+    virtual void reloadCacheHandler();
 
-    bool SWT_isBoundingBox() { return true; }
+    bool SWT_isBoundingBox();
 
     SingleWidgetAbstraction* SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
@@ -304,16 +269,12 @@ public:
                              const bool &parentSatisfies,
                              const bool &parentMainTarget);
 
-    bool SWT_visibleOnlyIfParentDescendant() {
-        return false;
-    }
+    bool SWT_visibleOnlyIfParentDescendant();
 
     void SWT_addToContextMenu(QMenu *menu);
     bool SWT_handleContextMenuActionSelected(QAction *selectedAction);
 
-    QMimeData *SWT_createMimeData() {
-        return new BoundingBoxMimeData(this);
-    }
+    QMimeData *SWT_createMimeData();
 
     bool isAncestor(BoxesGroup *box) const;
     bool isAncestor(BoundingBox *box) const;
@@ -323,25 +284,17 @@ public:
     void copyBoundingBoxDataTo(BoundingBox *targetBox);
 
     virtual void drawHoveredSk(SkCanvas *canvas,
-                               const SkScalar &invScale) {
-        drawHoveredPathSk(canvas, mSkRelBoundingRectPath, invScale);
-    }
+                               const SkScalar &invScale);
 
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
                            const SkScalar &invScale);
 
     virtual void applyPaintSetting(
-            const PaintSetting &setting) {
-        Q_UNUSED(setting);
-    }
+            const PaintSetting &setting);
 
-    virtual void setFillColorMode(const ColorMode &colorMode) {
-        Q_UNUSED(colorMode);
-    }
-    virtual void setStrokeColorMode(const ColorMode &colorMode) {
-        Q_UNUSED(colorMode);
-    }
+    virtual void setFillColorMode(const ColorMode &colorMode);
+    virtual void setStrokeColorMode(const ColorMode &colorMode);
     void switchLocked();
 
     virtual QMatrix getCombinedTransform() const;
@@ -371,22 +324,20 @@ public:
                       const qreal &drawY,
                       const int &startFrame,
                       const int &endFrame);
-    virtual void addPathEffect(const PathEffectQSPtr&) {}
-    virtual void addFillPathEffect(const PathEffectQSPtr&) {}
-    virtual void addOutlinePathEffect(const PathEffectQSPtr&) {}
-    virtual void removePathEffect(const PathEffectQSPtr&) {}
-    virtual void removeFillPathEffect(const PathEffectQSPtr&) {}
-    virtual void removeOutlinePathEffect(const PathEffectQSPtr&) {}
+    virtual void addPathEffect(const PathEffectQSPtr&);
+    virtual void addFillPathEffect(const PathEffectQSPtr&);
+    virtual void addOutlinePathEffect(const PathEffectQSPtr&);
+    virtual void removePathEffect(const PathEffectQSPtr&);
+    virtual void removeFillPathEffect(const PathEffectQSPtr&);
+    virtual void removeOutlinePathEffect(const PathEffectQSPtr&);
 
-    virtual void addActionsToMenu(QMenu *) {}
-    virtual bool handleSelectedCanvasAction(QAction *) {
-        return false;
-    }
+    virtual void addActionsToMenu(QMenu *);
+    virtual bool handleSelectedCanvasAction(QAction *);
 
     virtual void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData *data);
 
-    virtual BoundingBoxRenderDataSPtr createRenderData() { return nullptr; }
+    virtual BoundingBoxRenderDataSPtr createRenderData();
 
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
     virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
@@ -427,62 +378,24 @@ public:
     void addScheduler(const _ScheduledExecutorSPtr &updatable);
     virtual void addSchedulersToProcess();
 
-    const int &getLoadId() {
-        return mLoadId;
-    }
+    const int &getLoadId();
 
-    virtual int setBoxLoadId(const int &loadId) {
-        mLoadId = loadId;
-        return loadId + 1;
-    }
+    virtual int setBoxLoadId(const int &loadId);
 
-    virtual void clearBoxLoadId() {
-        mLoadId = -1;
-    }
+    virtual void clearBoxLoadId();
 
-    static BoundingBox *getLoadedBoxById(const int &loadId) {
-        foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
-            if(box == nullptr) return nullptr;
-            if(box->getLoadId() == loadId) {
-                return box;
-            }
-        }
-        return nullptr;
-    }
+    static BoundingBox *getLoadedBoxById(const int &loadId);
 
     static void addFunctionWaitingForBoxLoad(
-            const FunctionWaitingForBoxLoadSPtr& func) {
-        mFunctionsWaitingForBoxLoad << func;
-    }
+            const FunctionWaitingForBoxLoadSPtr& func);
 
-    static void addLoadedBox(BoundingBox *box) {
-        mLoadedBoxes << box;
-        for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
-            FunctionWaitingForBoxLoadSPtr funcT =
-                    mFunctionsWaitingForBoxLoad.at(i);
-            if(funcT->loadBoxId == box->getLoadId()) {
-                funcT->boxLoaded(box);
-                mFunctionsWaitingForBoxLoad.removeAt(i);
-                i--;
-            }
-        }
-    }
+    static void addLoadedBox(BoundingBox *box);
 
-    static int getLoadedBoxesCount() {
-        return mLoadedBoxes.count();
-    }
+    static int getLoadedBoxesCount();
 
-    static void clearLoadedBoxes() {
-        foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
-            box->clearBoxLoadId();
-        }
-        mLoadedBoxes.clear();
-        mFunctionsWaitingForBoxLoad.clear();
-    }
+    static void clearLoadedBoxes();
 
-    virtual void selectAllPoints(Canvas *canvas) {
-        Q_UNUSED(canvas);
-    }
+    virtual void selectAllPoints(Canvas *canvas);
     virtual void writeBoundingBox(QIODevice *target);
     virtual void readBoundingBox(QIODevice *target);
 
@@ -490,50 +403,32 @@ public:
     void readBoundingBoxDataForLink(QIODevice *target);
 
     virtual void shiftAll(const int &shift);
-    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
-        return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
-    }
+    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
 
-    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {
-        return mTransformAnimator->getRelativeTransformAtRelFrameF(relFrame);
-    }
+    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 
     int prp_getRelFrameShift() const;
     virtual void setupEffectsF(const qreal &relFrame,
                                BoundingBoxRenderData* data);
 
-    void addLinkingBox(BoundingBox *box) {
-        mLinkingBoxes << box;
-    }
+    void addLinkingBox(BoundingBox *box);
 
-    void removeLinkingBox(BoundingBox *box) {
-        mLinkingBoxes.removeOne(box);
-    }
+    void removeLinkingBox(BoundingBox *box);
 
-    const QList<BoundingBoxQPtr> &getLinkingBoxes() const {
-        return mLinkingBoxes;
-    }
+    const QList<BoundingBoxQPtr> &getLinkingBoxes() const;
 
-    EffectAnimators *getEffectsAnimators() {
-        return mEffectsAnimators.data();
-    }
+    EffectAnimators *getEffectsAnimators();
 
-    void incReasonsNotToApplyUglyTransform() {
-        mNReasonsNotToApplyUglyTransform++;
-    }
+    void incReasonsNotToApplyUglyTransform();
 
-    void decReasonsNotToApplyUglyTransform() {
-        mNReasonsNotToApplyUglyTransform--;
-    }
+    void decReasonsNotToApplyUglyTransform();
 
-    bool isSelected() { return mSelected; }
+    bool isSelected();
 
     void updateDrawRenderContainerTransform();
-    void setPivotAutoAdjust(const bool &bT) {
-        mPivotAutoAdjust = bT;
-    }
+    void setPivotAutoAdjust(const bool &bT);
 
-    const BoundingBoxType &getBoxType() { return mType; }
+    const BoundingBoxType &getBoxType();
 
     void startDurationRectPosTransform();
     void finishDurationRectPosTransform();
@@ -545,16 +440,9 @@ public:
     void finishMaxFramePosTransform();
     void moveMaxFrame(const int &dFrame);
 
-    DurationRectangle *getDurationRectangle() {
-        return mDurationRectangle.get();
-    }
+    DurationRectangle *getDurationRectangle();
 protected:
-    virtual void getMotionBlurProperties(QList<Property*>& list) {
-        list.append(mTransformAnimator->getScaleAnimator());
-        list.append(mTransformAnimator->getPosAnimator());
-        list.append(mTransformAnimator->getPivotAnimator());
-        list.append(mTransformAnimator->getRotAnimator());
-    }
+    virtual void getMotionBlurProperties(QList<Property*>& list);
 
     bool mSelected = false;
     bool mBlockedSchedule = false;
@@ -609,7 +497,7 @@ public slots:
     void updateAfterDurationRectangleShifted(const int &dFrame = 0);
     void updateAfterDurationMinFrameChangedBy(const int &by);
     void updateAfterDurationMaxFrameChangedBy(const int &by);
-    virtual void updateAfterDurationRectangleRangeChanged() {}
+    virtual void updateAfterDurationRectangleRangeChanged();
 
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);

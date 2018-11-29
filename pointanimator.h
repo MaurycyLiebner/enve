@@ -6,7 +6,6 @@
 #include <QRectF>
 #include <QPainter>
 #include "Animators/qpointfanimator.h"
-#include "transformable.h"
 #include "skiaincludes.h"
 
 class BoundingBox;

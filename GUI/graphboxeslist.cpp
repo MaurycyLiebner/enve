@@ -3,7 +3,6 @@
 #include "mainwindow.h"
 #include "qrealpointvaluedialog.h"
 #include "keysview.h"
-#include "updatescheduler.h"
 #include "qrealpoint.h"
 #include "global.h"
 #include "qrealkey.h"
@@ -580,7 +579,7 @@ void KeysView::graphResetValueScaleAndMinShown() {
     graphUpdateDimensions();
 }
 
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "singlewidgetabstraction.h"
 void KeysView::updateAnimatorsColors() {
     int i = 0;
     Q_FOREACH(QrealAnimator *animator, mAnimators) {

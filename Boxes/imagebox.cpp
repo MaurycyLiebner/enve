@@ -1,6 +1,6 @@
 #include "Boxes/imagebox.h"
 #include <QFileDialog>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "filesourcescache.h"
 
 ImageBox::ImageBox() :

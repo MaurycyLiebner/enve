@@ -1,5 +1,5 @@
 #include "outputsettingsprofilesdialog.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "rendersettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "global.h"

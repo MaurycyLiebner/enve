@@ -2,8 +2,8 @@
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "Boxes/boundingbox.h"
 #include "boxscrollwidgetvisiblepart.h"
-#include "canvaswindow.h"
-#include "mainwindow.h"
+#include "GUI/canvaswindow.h"
+#include "GUI/mainwindow.h"
 
 BoxScrollWidget::BoxScrollWidget(ScrollArea *parent) :
     ScrollWidget(parent) {

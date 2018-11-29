@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "Colors/helpers.h"
 #include "tilesdata.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 
 void processPaintDabs(const QList<Dab> &dabs,
                       const ushort &maxPaintX,

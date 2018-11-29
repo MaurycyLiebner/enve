@@ -1,6 +1,6 @@
 #include "linkbox.h"
 #include <QFileDialog>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "canvas.h"
 #include "durationrectangle.h"
 #include "PixmapEffects/fmt_filters.h"

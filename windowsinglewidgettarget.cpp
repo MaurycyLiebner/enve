@@ -1,6 +1,6 @@
 #include "windowsinglewidgettarget.h"
-#include "canvaswindow.h"
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "GUI/canvaswindow.h"
+#include "singlewidgetabstraction.h"
 
 WindowSingleWidgetTarget::WindowSingleWidgetTarget(CanvasWindow *window) {
     mWindow = window;

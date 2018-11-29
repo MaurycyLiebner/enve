@@ -1,6 +1,5 @@
 #include "updatable.h"
-#include "mainwindow.h"
-#include "updatescheduler.h"
+#include "GUI/mainwindow.h"
 #include "paintcontroler.h"
 
 _ScheduledExecutor::~_ScheduledExecutor() {

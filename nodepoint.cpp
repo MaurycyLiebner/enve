@@ -8,6 +8,8 @@
 #include "canvas.h"
 #include "pointhelpers.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
+#include "GUI/mainwindow.h"
+#include "global.h"
 
 NodePoint::NodePoint(VectorPathAnimator *parentAnimator,
                      BasicTransformAnimator *parentTransform) :
@@ -275,8 +277,6 @@ CtrlPoint *NodePoint::getEndCtrlPt() {
     return mEndCtrlPt.get();
 }
 
-#include "mainwindow.h"
-#include "global.h"
 void NodePoint::drawSk(SkCanvas *canvas,
                      const CanvasMode &mode,
                      const SkScalar &invScale,

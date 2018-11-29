@@ -3,8 +3,7 @@
 #include "canvas.h"
 #include <QDebug>
 #include "undoredo.h"
-#include "mainwindow.h"
-#include "updatescheduler.h"
+#include "GUI/mainwindow.h"
 #include "pathpivot.h"
 #include "pointhelpers.h"
 #include "Animators/animatorupdater.h"

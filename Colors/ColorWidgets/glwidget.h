@@ -2,6 +2,7 @@
 #define GLWIDGET_H
 #include <QOpenGLWidget>
 #include "Colors/color.h"
+#include "skiaincludes.h"
 
 extern GLfloat AA_VECT_LEN;
 extern GLfloat AA_SHARP_VECT_LEN;
@@ -11,6 +12,8 @@ class GLWidget : public QOpenGLWidget {
     Q_OBJECT
 public:
     GLWidget(QWidget *parent);
+    ~GLWidget() {}
+
     bool isVisible();
     bool isHidden();
     void setVisible(bool b_t);
@@ -198,13 +201,12 @@ public:
                                 GLfloat yt,
                                 GLfloat wt,
                                 GLfloat ht);
-protected:
-    SkColor4f mBgColor;
-
-    void resizeGL(int w, int h);
 private:
-    bool visible = true;
     void initializeGL();
+    bool mVisible = true;
+protected:
+    void resizeGL(int w, int h);
+    SkColor4f mBgColor;
 };
 
 #endif // GLWIDGET_H

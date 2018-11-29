@@ -1,6 +1,6 @@
 #include "boolpropertywidget.h"
 #include "Properties/boolproperty.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "global.h"
 
 BoolPropertyWidget::BoolPropertyWidget(QWidget *parent) :

@@ -4,7 +4,7 @@
 #include <QColor>
 class UndoRedo;
 class MainWindow;
-#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include "singlewidgettarget.h"
 
 class ComplexAnimator;
 class Key;

@@ -5,7 +5,7 @@ extern "C" {
     #include <libswscale/swscale.h>
     #include <libavutil/imgutils.h>
 }
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include <QDebug>
 #include "Sound/singlesound.h"
 #include "canvas.h"

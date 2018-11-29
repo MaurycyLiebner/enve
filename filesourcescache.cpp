@@ -1,10 +1,9 @@
 #include "filesourcescache.h"
 #include "Boxes/rendercachehandler.h"
 #include "Boxes/boundingboxrendercontainer.h"
-#include "mainwindow.h"
-#include "updatescheduler.h"
+#include "GUI/mainwindow.h"
 #include "Boxes/boundingbox.h"
-#include "filesourcelist.h"
+#include "GUI/filesourcelist.h"
 #include "Boxes/videobox.h"
 extern "C" {
     #include <libavcodec/avcodec.h>

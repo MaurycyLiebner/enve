@@ -1,7 +1,7 @@
 #include "Animators/animatorupdater.h"
 #include <QDebug>
 #include "Boxes/pathbox.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "Boxes/boxesgroup.h"
 
 TransformUpdater::TransformUpdater(BasicTransformAnimator *transformAnimator) {

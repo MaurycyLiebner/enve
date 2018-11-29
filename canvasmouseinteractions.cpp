@@ -13,14 +13,17 @@
 #include "pointhelpers.h"
 #include "Boxes/particlebox.h"
 #include "clipboardcontainer.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "Boxes/paintbox.h"
 #include "Paint/PaintLib/brush.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
-#include "fontswidget.h"
+#include "GUI/fontswidget.h"
 #include "Boxes/bone.h"
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
+#include <QFileDialog>
+#include "Paint/paintboxsettingsdialog.h"
+#include "GUI/customfpsdialog.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -192,9 +195,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
         }
     }
 }
-#include <QFileDialog>
-#include "Paint/paintboxsettingsdialog.h"
-#include "customfpsdialog.h"
+
 bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "canvas_copy") {
         copyAction();

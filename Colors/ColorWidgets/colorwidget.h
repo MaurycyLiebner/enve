@@ -11,6 +11,15 @@ class ColorWidget : public GLWidget {
     Q_OBJECT
 public:
     ColorWidget(QWidget *parent = nullptr);
+
+    void setColorHSV(const qreal& h,
+                     const qreal& s,
+                     const qreal& v) {
+        setColorHSV_f(static_cast<GLfloat>(h),
+                      static_cast<GLfloat>(s),
+                      static_cast<GLfloat>(v));
+    }
+    void setColorHSV_f(GLfloat h, GLfloat s, GLfloat v);
 protected:
     bool mValueBlocked = false;
 
@@ -20,7 +29,6 @@ protected:
     GLfloat saturation = 0.f;
     GLfloat value = 0.f;
 public slots:
-    void setColorHSV_f(GLfloat h, GLfloat s, GLfloat v);
     void setHue_f(GLfloat h);
     void setHSVSaturation_f(GLfloat s);
     void setValue_f(GLfloat v);

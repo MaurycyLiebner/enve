@@ -1,14 +1,14 @@
 #include "Boxes/boxesgroup.h"
 #include "undoredo.h"
 #include <QApplication>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "ctrlpoint.h"
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
 #include "BoxesList/boxscrollwidget.h"
 #include "textbox.h"
 #include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
-#include "canvaswindow.h"
+#include "GUI/canvaswindow.h"
 #include "canvas.h"
 #include "Boxes/particlebox.h"
 #include "durationrectangle.h"
@@ -24,16 +24,9 @@ bool BoxesGroup::mCtrlsAlwaysVisible = false;
 //    return box1->getZIndex() < box2->getZIndex();
 //}
 
-BoxesGroup::BoxesGroup() :
-    BoundingBox(BoundingBoxType::TYPE_GROUP) {
+BoxesGroup::BoxesGroup(const BoundingBoxType &type) :
+    BoundingBox(type) {
     setName("Group");
-    mFillStrokeSettingsWidget = getMainWindow()->getFillStrokeSettings();
-    iniPathEffects();
-}
-
-BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
-    BoundingBox(BoundingBoxType::TYPE_CANVAS) {
-    mFillStrokeSettingsWidget = fillStrokeSetting;
     iniPathEffects();
 }
 
@@ -783,12 +776,6 @@ StrokeSettings *BoxesGroup::getStrokeSettings() {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getStrokeSettings();
 }
-
-void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {
-    mFillStrokeSettingsWidget->setCurrentSettings(box->getFillSettings(),
-                                                  box->getStrokeSettings());
-}
-
 void BoxesGroup::applyCurrentTransformation() {
     mNReasonsNotToApplyUglyTransform++;
     QPointF absPivot = getPivotAbsPos();
@@ -1037,7 +1024,7 @@ void BoxesGroup::moveContainedBoxAbove(BoundingBox *boxToMove,
     moveContainedBoxInList(boxToMove, indexFrom, indexTo);
 }
 
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "singlewidgetabstraction.h"
 void BoxesGroup::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction* abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {

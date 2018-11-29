@@ -1,5 +1,5 @@
 #include "particlebox.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "durationrectangle.h"
 #include "Animators/animatorupdater.h"
 #include "canvas.h"

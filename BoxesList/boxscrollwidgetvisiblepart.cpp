@@ -7,10 +7,10 @@
 #include <QMimeData>
 #include "Boxes/boundingbox.h"
 #include "Boxes/boxesgroup.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "global.h"
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
-#include "keysview.h"
+#include "singlewidgetabstraction.h"
+#include "GUI/keysview.h"
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
         ScrollWidget *parent) :

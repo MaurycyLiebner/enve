@@ -3,10 +3,10 @@
 #include "undoredo.h"
 #include "Boxes/boxesgroup.h"
 #include <QDebug>
-#include "mainwindow.h"
-#include "keysview.h"
+#include "GUI/mainwindow.h"
+#include "GUI/keysview.h"
 #include "BoxesList/boxscrollwidget.h"
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "singlewidgetabstraction.h"
 #include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
 #include "Animators/animatorupdater.h"
@@ -74,6 +74,36 @@ BoundingBoxQSPtr BoundingBox::createLink() {
     return linkBox;
 }
 
+BoundingBoxQSPtr BoundingBox::createLinkForLinkGroup() {
+    BoundingBoxQSPtr box = createLink();
+    box->clearEffects();
+    return box;
+}
+
+void BoundingBox::clearEffects() {
+    mEffectsAnimators->ca_removeAllChildAnimators();
+}
+
+void BoundingBox::setFont(const QFont &) {}
+
+void BoundingBox::setSelectedFontSize(const qreal &) {}
+
+void BoundingBox::setSelectedFontFamilyAndStyle(const QString &, const QString &) {}
+
+QPointF BoundingBox::getRelCenterPosition() {
+    return mRelBoundingRect.center();
+}
+
+void BoundingBox::centerPivotPosition(const bool &saveUndoRedo) {
+    mTransformAnimator->setPivotWithoutChangingTransformation(
+                getRelCenterPosition(), saveUndoRedo);
+}
+
+void BoundingBox::setPivotPosition(const QPointF &pos, const bool &saveUndoRedo) {
+    mTransformAnimator->setPivotWithoutChangingTransformation(
+                pos, saveUndoRedo);
+}
+
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox *targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
@@ -82,6 +112,10 @@ void BoundingBox::copyBoundingBoxDataTo(BoundingBox *targetBox) {
         targetBox->BoundingBox::readBoundingBoxDataForLink(&buffer);
     }
     buffer.close();
+}
+
+void BoundingBox::drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale) {
+    drawHoveredPathSk(canvas, mSkRelBoundingRectPath, invScale);
 }
 
 void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
@@ -104,6 +138,18 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     canvas->restore();
 }
 
+void BoundingBox::applyPaintSetting(const PaintSetting &setting) {
+    Q_UNUSED(setting);
+}
+
+void BoundingBox::setFillColorMode(const ColorMode &colorMode) {
+    Q_UNUSED(colorMode);
+}
+
+void BoundingBox::setStrokeColorMode(const ColorMode &colorMode) {
+    Q_UNUSED(colorMode);
+}
+
 bool BoundingBox::isAncestor(BoxesGroup *box) const {
     if(mParentGroup == box) return true;
     if(mParentGroup == nullptr) return false;
@@ -121,6 +167,10 @@ Canvas *BoundingBox::getParentCanvas() {
     if(mParentGroup == nullptr) return nullptr;
     return mParentGroup->getParentCanvas();
 }
+
+void BoundingBox::reloadCacheHandler() { clearAllCache(); }
+
+bool BoundingBox::SWT_isBoundingBox() { return true; }
 
 void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
     scheduleUpdate(reason);
@@ -178,6 +228,10 @@ void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
+const SkBlendMode &BoundingBox::getBlendMode() {
+    return mBlendModeSk;
+}
+
 void BoundingBox::resetScale() {
     mTransformAnimator->resetScale(true);
 }
@@ -207,6 +261,31 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
                                        anim_mCurrentRelFrame)) {
         scheduleUpdate(Animator::FRAME_CHANGE);
     }
+}
+
+void BoundingBox::startAllPointsTransform() {}
+
+void BoundingBox::finishAllPointsTransform() {}
+
+void BoundingBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
+    Q_UNUSED(capStyle); }
+
+void BoundingBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+    Q_UNUSED(joinStyle); }
+
+void BoundingBox::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
+    Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
+
+void BoundingBox::startSelectedStrokeWidthTransform() {}
+
+void BoundingBox::startSelectedStrokeColorTransform() {}
+
+void BoundingBox::startSelectedFillColorTransform() {}
+
+VectorPathEdge *BoundingBox::getEdge(const QPointF &absPos, const qreal &canvasScaleInv) {
+    Q_UNUSED(absPos);
+    Q_UNUSED(canvasScaleInv);
+    return nullptr;
 }
 
 bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
@@ -497,13 +576,20 @@ void BoundingBox::scale(const qreal &scaleXBy, const qreal &scaleYBy) {
     mTransformAnimator->scale(scaleXBy, scaleYBy);
 }
 
+NodePoint *BoundingBox::createNewPointOnLineNear(const QPointF &absPos, const bool &adjust, const qreal &canvasScaleInv) {
+    Q_UNUSED(absPos);
+    Q_UNUSED(adjust);
+    Q_UNUSED(canvasScaleInv);
+    return nullptr;
+}
+
 void BoundingBox::rotateBy(const qreal &rot) {
     mTransformAnimator->rotateRelativeToSavedValue(rot);
 }
 
 void BoundingBox::rotateRelativeToSavedPivot(const qreal &rot) {
     mTransformAnimator->rotateRelativeToSavedValue(rot,
-                                                  mSavedTransformPivot);
+                                                   mSavedTransformPivot);
 }
 
 void BoundingBox::scaleRelativeToSavedPivot(const qreal &scaleXBy,
@@ -520,9 +606,20 @@ QPointF BoundingBox::mapRelPosToAbs(const QPointF &relPos) const {
     return mTransformAnimator->mapRelPosToAbs(relPos);
 }
 
+QRectF BoundingBox::getRelBoundingRect() const {
+    return mRelBoundingRect;
+}
+
+QRectF BoundingBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+    Q_UNUSED(relFrame);
+    return getRelBoundingRect();
+}
+
+void BoundingBox::applyCurrentTransformation() {}
+
 void BoundingBox::moveByAbs(const QPointF &trans) {
     mTransformAnimator->moveByAbs(trans);
-//    QPointF by = mParent->mapAbsPosToRel(trans) -
+    //    QPointF by = mParent->mapAbsPosToRel(trans) -
 //                 mParent->mapAbsPosToRel(QPointF(0., 0.));
 // //    QPointF by = mapAbsPosToRel(
 // //                trans - mapRelativeToAbsolute(QPointF(0., 0.)));
@@ -610,10 +707,38 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 }
 
+BoundingBoxRenderDataSPtr BoundingBox::createRenderData() { return nullptr; }
+
 void BoundingBox::setupEffectsF(const qreal &relFrame,
-                               BoundingBoxRenderData *data) {
+                                BoundingBoxRenderData *data) {
     mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
+
+void BoundingBox::addLinkingBox(BoundingBox *box) {
+    mLinkingBoxes << box;
+}
+
+void BoundingBox::removeLinkingBox(BoundingBox *box) {
+    mLinkingBoxes.removeOne(box);
+}
+
+const QList<BoundingBoxQPtr> &BoundingBox::getLinkingBoxes() const {
+    return mLinkingBoxes;
+}
+
+EffectAnimators *BoundingBox::getEffectsAnimators() {
+    return mEffectsAnimators.data();
+}
+
+void BoundingBox::incReasonsNotToApplyUglyTransform() {
+    mNReasonsNotToApplyUglyTransform++;
+}
+
+void BoundingBox::decReasonsNotToApplyUglyTransform() {
+    mNReasonsNotToApplyUglyTransform--;
+}
+
+bool BoundingBox::isSelected() { return mSelected; }
 
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
     return mRelBoundingRect.contains(point.toPoint());
@@ -664,6 +789,8 @@ void BoundingBox::setZListIndex(const int &z,
     mZListIndex = z;
 }
 
+void BoundingBox::selectAndAddContainedPointsToList(const QRectF &, QList<MovablePointPtr> &) {}
+
 int BoundingBox::getZIndex() {
     return mZListIndex;
 }
@@ -680,6 +807,12 @@ void BoundingBox::updateDrawRenderContainerTransform() {
     }
 
 }
+
+void BoundingBox::setPivotAutoAdjust(const bool &bT) {
+    mPivotAutoAdjust = bT;
+}
+
+const BoundingBoxType &BoundingBox::getBoxType() { return mType; }
 
 void BoundingBox::startDurationRectPosTransform() {
     if(hasDurationRectangle()) {
@@ -735,9 +868,24 @@ void BoundingBox::moveMaxFrame(const int &dFrame) {
     }
 }
 
+DurationRectangle *BoundingBox::getDurationRectangle() {
+    return mDurationRectangle.get();
+}
+
+void BoundingBox::getMotionBlurProperties(QList<Property *> &list) {
+    list.append(mTransformAnimator->getScaleAnimator());
+    list.append(mTransformAnimator->getPosAnimator());
+    list.append(mTransformAnimator->getPivotAnimator());
+    list.append(mTransformAnimator->getRotAnimator());
+}
+
 BoxTransformAnimator *BoundingBox::getTransformAnimator() {
     return mTransformAnimator.get();
 }
+
+VectorPath *BoundingBox::objectToVectorPathBox() { return nullptr; }
+
+VectorPath *BoundingBox::strokeToVectorPathBox() { return nullptr; }
 
 void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
     Canvas* parentCanvas = getParentCanvas();
@@ -752,6 +900,8 @@ void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
         parentCanvas->addBoxToSelection(this);
     }
 }
+
+bool BoundingBox::isAnimated() { return prp_isDescendantRecording(); }
 
 void BoundingBox::addEffect(const PixmapEffectQSPtr& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
@@ -803,6 +953,14 @@ void BoundingBox::shiftAll(const int &shift) {
     } else {
         anim_shiftAllKeys(shift);
     }
+}
+
+QMatrix BoundingBox::getRelativeTransformAtRelFrame(const int &relFrame) {
+    return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
+}
+
+QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {
+    return mTransformAnimator->getRelativeTransformAtRelFrameF(relFrame);
 }
 
 int BoundingBox::prp_getRelFrameShift() const {
@@ -875,6 +1033,8 @@ void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
     }
 }
 
+void BoundingBox::updateAfterDurationRectangleRangeChanged() {}
+
 DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
         const int &relX, const int &minViewedFrame,
         const qreal &pixelsPerFrame) {
@@ -899,6 +1059,24 @@ void BoundingBox::prp_drawKeys(QPainter *p,
     Animator::prp_drawKeys(p,
                            pixelsPerFrame, drawY,
                            startFrame, endFrame);
+}
+
+void BoundingBox::addPathEffect(const PathEffectQSPtr &) {}
+
+void BoundingBox::addFillPathEffect(const PathEffectQSPtr &) {}
+
+void BoundingBox::addOutlinePathEffect(const PathEffectQSPtr &) {}
+
+void BoundingBox::removePathEffect(const PathEffectQSPtr &) {}
+
+void BoundingBox::removeFillPathEffect(const PathEffectQSPtr &) {}
+
+void BoundingBox::removeOutlinePathEffect(const PathEffectQSPtr &) {}
+
+void BoundingBox::addActionsToMenu(QMenu *) {}
+
+bool BoundingBox::handleSelectedCanvasAction(QAction *) {
+    return false;
 }
 
 void BoundingBox::setName(const QString &name) {
@@ -1067,6 +1245,62 @@ void BoundingBox::addSchedulersToProcess() {
     mBlockedSchedule = false;
 }
 
+const int &BoundingBox::getLoadId() {
+    return mLoadId;
+}
+
+int BoundingBox::setBoxLoadId(const int &loadId) {
+    mLoadId = loadId;
+    return loadId + 1;
+}
+
+void BoundingBox::clearBoxLoadId() {
+    mLoadId = -1;
+}
+
+BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
+    foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
+        if(box == nullptr) return nullptr;
+        if(box->getLoadId() == loadId) {
+            return box;
+        }
+    }
+    return nullptr;
+}
+
+void BoundingBox::addFunctionWaitingForBoxLoad(const FunctionWaitingForBoxLoadSPtr &func) {
+    mFunctionsWaitingForBoxLoad << func;
+}
+
+void BoundingBox::addLoadedBox(BoundingBox *box) {
+    mLoadedBoxes << box;
+    for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
+        FunctionWaitingForBoxLoadSPtr funcT =
+                mFunctionsWaitingForBoxLoad.at(i);
+        if(funcT->loadBoxId == box->getLoadId()) {
+            funcT->boxLoaded(box);
+            mFunctionsWaitingForBoxLoad.removeAt(i);
+            i--;
+        }
+    }
+}
+
+int BoundingBox::getLoadedBoxesCount() {
+    return mLoadedBoxes.count();
+}
+
+void BoundingBox::clearLoadedBoxes() {
+    foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
+        box->clearBoxLoadId();
+    }
+    mLoadedBoxes.clear();
+    mFunctionsWaitingForBoxLoad.clear();
+}
+
+void BoundingBox::selectAllPoints(Canvas *canvas) {
+    Q_UNUSED(canvas);
+}
+
 void BoundingBox::addScheduler(const _ScheduledExecutorSPtr& updatable) {
     mSchedulers << updatable;
 }
@@ -1078,7 +1312,7 @@ void BoundingBox::setVisibile(const bool &visible,
         removeFromSelection();
     }
     if(saveUndoRedo) {
-//        addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
+        //        addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
     }
     mVisible = visible;
 
@@ -1209,6 +1443,10 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return satisfies;
 }
 
+bool BoundingBox::SWT_visibleOnlyIfParentDescendant() {
+    return false;
+}
+
 void BoundingBox::SWT_addToContextMenu(
         QMenu *menu) {
     menu->addAction("Apply Transformation");
@@ -1283,6 +1521,10 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 
     }
     return false;
+}
+
+QMimeData *BoundingBox::SWT_createMimeData() {
+    return new BoundingBoxMimeData(this);
 }
 
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {

@@ -1,5 +1,7 @@
 #include "imagesequencebox.h"
 #include "filesourcescache.h"
+#include "GUI/mainwindow.h"
+#include <QFileDialog>
 
 ImageSequenceBox::ImageSequenceBox() :
     AnimationBox() {
@@ -18,8 +20,6 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     reloadCacheHandler();
 }
 
-#include "mainwindow.h"
-#include <QFileDialog>
 void ImageSequenceBox::changeSourceFile() {
     MainWindow::getInstance()->disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(

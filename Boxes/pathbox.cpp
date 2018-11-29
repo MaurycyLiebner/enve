@@ -1,6 +1,5 @@
 #include "Boxes/pathbox.h"
-#include "updatescheduler.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "gradientpoint.h"
 #include "Animators/animatorupdater.h"
 #include "gradientpoints.h"

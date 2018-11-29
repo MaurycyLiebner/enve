@@ -1,5 +1,5 @@
 #include "rendersettingsdialog.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "global.h"
 
 RenderSettingsDialog::RenderSettingsDialog(const OutputSettings &settings,

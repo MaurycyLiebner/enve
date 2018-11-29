@@ -2,10 +2,10 @@
 #include <QPainter>
 #include <QDebug>
 #include <QApplication>
-#include "mainwindow.h"
-#include "animationdockwidget.h"
+#include "GUI/mainwindow.h"
+#include "GUI/animationdockwidget.h"
 #include <QMenu>
-#include "qrealanimatorvalueslider.h"
+#include "GUI/qrealanimatorvalueslider.h"
 #include <QWidgetAction>
 #include "BoxesList/boxsinglewidget.h"
 #include "qrealpoint.h"

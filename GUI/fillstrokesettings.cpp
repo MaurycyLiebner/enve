@@ -3,7 +3,6 @@
 #include "mainwindow.h"
 #include "undoredo.h"
 #include "canvas.h"
-#include "updatescheduler.h"
 #include "qrealanimatorvalueslider.h"
 #include "Colors/ColorWidgets/colorsettingswidget.h"
 #include "actionbutton.h"

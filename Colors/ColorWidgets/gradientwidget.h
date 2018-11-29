@@ -1,6 +1,6 @@
 #ifndef GRADIENTWIDGET_H
 #define GRADIENTWIDGET_H
-#include "fillstrokesettings.h"
+#include "GUI/fillstrokesettings.h"
 #include <QComboBox>
 #include <QScrollArea>
 #include "Gradients/gradientslistwidget.h"

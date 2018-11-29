@@ -11,7 +11,7 @@
 #include "Boxes/rectangle.h"
 #include "Boxes/textbox.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
-
+#include "GUI/mainwindow.h"
 
 // '0' is 0x30 and '9' is 0x39
 static bool isDigit(ushort ch) {
@@ -813,7 +813,6 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
 }
 
 
-#include "mainwindow.h"
 BoxesGroupQSPtr loadSVGFile(const QString &filename) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {

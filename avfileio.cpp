@@ -37,7 +37,7 @@
 #include "gradientpoints.h"
 #include "gradientpoint.h"
 #include "qrealkey.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "Colors/ColorWidgets/gradientwidget.h"
 #include <QMessageBox>
 #include "PathEffects/patheffectsinclude.h"
@@ -1401,17 +1401,6 @@ void Brush::readBrush(QIODevice *read) {
     }
 }
 
-void Color::readColor(QIODevice *read) {
-    QColor qcolT;
-    read->read(reinterpret_cast<char*>(&qcolT), sizeof(QColor));
-    setQColor(qcolT);
-}
-
-void Color::writeColor(QIODevice *write) {
-    write->write(reinterpret_cast<const char*>(&qcol), sizeof(QColor));
-}
-
-
 QColor readQColor(QIODevice *read) {
     QColor qcolT;
     read->read(reinterpret_cast<char*>(&qcolT), sizeof(QColor));
@@ -1444,10 +1433,8 @@ void CanvasWindow::readCanvases(QIODevice *target) {
     int nCanvases;
     target->read(reinterpret_cast<char*>(&nCanvases), sizeof(int));
     for(int i = 0; i < nCanvases; i++) {
-        FillStrokeSettingsWidget *fillStrokeSettingsWidget =
-                MainWindow::getInstance()->getFillStrokeSettings();
         CanvasQSPtr canvas =
-                SPtrCreate(Canvas)(fillStrokeSettingsWidget, this);
+                SPtrCreate(Canvas)(this);
         canvas->readBoundingBox(target);
         MainWindow::getInstance()->addCanvas(canvas);
     }

@@ -3,7 +3,7 @@
 #include "Colors/ColorWidgets/colorsettingswidget.h"
 #include <QVBoxLayout>
 #include <QDialog>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 
 ColorAnimatorButton::ColorAnimatorButton(ColorAnimator *colorTarget,
                                          QWidget *parent) :

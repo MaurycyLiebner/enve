@@ -2,7 +2,6 @@
 #define BOXESGROUP_H
 #include "Boxes/boundingbox.h"
 #include "Boxes/vectorpath.h"
-#include "fillstrokesettings.h"
 
 #define Q_FOREACHBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
     for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
@@ -55,8 +54,7 @@ class BoxesGroup : public BoundingBox {
     Q_OBJECT
     friend class SelfRef;
 public:
-    BoxesGroup();
-    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
+    BoxesGroup(const BoundingBoxType& type = TYPE_GROUP);
     ~BoxesGroup();
 
     void scaleTime(const int& pivotAbsFrame, const qreal& scale);
@@ -72,8 +70,6 @@ public:
     void setIsCurrentGroup(const bool &bT);
 
     BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
-
-    void setCurrentFillStrokeSettingsFromBox(BoundingBox *box);
 
     void ungroup();
 
@@ -282,7 +278,6 @@ protected:
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
 
     static bool mCtrlsAlwaysVisible;
-    FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
     QList<QSharedPointer<BoundingBox> > mContainedBoxes;

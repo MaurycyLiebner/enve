@@ -3,7 +3,7 @@
 #include "Boxes/rendercachehandler.h"
 #include "global.h"
 #include "Boxes/boundingbox.h"
-#include "durationrectsettingsdialog.h"
+#include "GUI/durationrectsettingsdialog.h"
 
 DurationRectangleMovable::DurationRectangleMovable(const Type &type) {
     mType = type;

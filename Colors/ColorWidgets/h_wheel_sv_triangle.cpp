@@ -1,5 +1,5 @@
 #include "h_wheel_sv_triangle.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "Colors/helpers.h"
 #include <QDebug>
 #include <QMouseEvent>

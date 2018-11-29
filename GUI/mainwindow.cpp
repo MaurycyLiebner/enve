@@ -6,7 +6,6 @@
 #include <QStatusBar>
 #include "usagewidget.h"
 #include <QToolBar>
-#include "updatescheduler.h"
 #include "Colors/ColorWidgets/colorsettingswidget.h"
 #include <QMenuBar>
 #include <QFileDialog>
@@ -27,6 +26,7 @@
 #include "filesourcescache.h"
 #include "filesourcelist.h"
 #include "videoencoder.h"
+#include "fillstrokesettings.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
     MIN_WIDGET_HEIGHT = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_HEIGHT*3/5;
     av_register_all();
-    QFile file("/home/ailuropoda/Dev/AniVect/stylesheet.qss");
+    QFile file(":/styles/stylesheet.qss");
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setStyleSheet(file.readAll());
         file.close();
@@ -479,6 +479,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(canvas->getCurrentBoxesGroup());
     mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
+    updateDisplayedFillStrokeSettings();
 }
 
 void MainWindow::replaceClipboard(const ClipboardContainerSPtr& container) {
@@ -733,8 +734,7 @@ void MainWindow::createNewCanvas() {
     QString defName = "Scene " +
             QString::number(mCurrentCanvasComboBox->count());
     CanvasQSPtr newCanvas =
-            SPtrCreate(Canvas)(getFillStrokeSettings(), mCanvasWindow,
-                               1920, 1080, 200);
+            SPtrCreate(Canvas)(mCanvasWindow, 1920, 1080, 200);
     newCanvas->setName(defName);
     CanvasSettingsDialog *dialog =
             new CanvasSettingsDialog(newCanvas.get(), this);
@@ -1165,7 +1165,12 @@ void MainWindow::closeEvent(QCloseEvent *e) {
 }
 
 void MainWindow::updateDisplayedFillStrokeSettings() {
-    mCanvasWindow->updateDisplayedFillStrokeSettings();
+    PaintSettings* fillSettings;
+    StrokeSettings* strokeSettings;
+    mCanvasWindow->getDisplayedFillStrokeSettingsFromLastSelected(
+                fillSettings, strokeSettings);
+    mFillStrokeSettings->setCurrentSettings(
+                fillSettings, strokeSettings);
 }
 
 void MainWindow::updateDisplayedFillStrokeSettingsIfNeeded() {

@@ -6,7 +6,8 @@
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
 #include "skiaincludes.h"
-#include "valueinput.h"
+#include "GUI/valueinput.h"
+#include "GUI/canvaswindow.h"
 
 class TextBox;
 class Circle;
@@ -44,7 +45,6 @@ enum CanvasMode : short {
     ADD_BONE
 };
 
-#include "canvaswindow.h"
 
 extern bool zLessThan(const BoundingBoxQPtr &box1,
                       const BoundingBoxQPtr &box2);
@@ -68,8 +68,7 @@ class Canvas : public BoxesGroup {
     Q_OBJECT
     friend class SelfRef;
 public:
-    explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-                    CanvasWindow *canvasWidget,
+    explicit Canvas(CanvasWindow *canvasWidget,
                     int canvasWidth = 1920,
                     int canvasHeight = 1080,
                     const int &frameCount = 200,
@@ -183,7 +182,7 @@ public:
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
-    void setDisplayedFillStrokeSettingsFromLastSelected();
+    void getDisplayedFillStrokeSettingsFromLastSelected(PaintSettings*& fillSetings, StrokeSettings*& strokeSettings);
     void scaleSelectedBy(const qreal &scaleXBy, const qreal &scaleYBy,
                          const QPointF &absOrigin, const bool &startTrans);
 

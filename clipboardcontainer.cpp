@@ -5,6 +5,7 @@
 #include "PathEffects/patheffectanimators.h"
 #include "Animators/pathanimator.h"
 #include "Properties/boxtargetproperty.h"
+#include "GUI/keysview.h"
 
 ClipboardContainer::ClipboardContainer(const ClipboardContainerType &type) {
     mType = type;
@@ -39,7 +40,6 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 
 }
 
-#include "keysview.h"
 void KeysClipboardContainer::paste(const int &pasteFrame,
                                    KeysView *keysView,
                                    const bool& merge,

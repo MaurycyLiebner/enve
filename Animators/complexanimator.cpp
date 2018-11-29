@@ -1,5 +1,5 @@
 #include "Animators/complexanimator.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "BoxesList/boxsinglewidget.h"
 #include "global.h"
 #include "qrealanimator.h"
@@ -38,7 +38,7 @@ Property *ComplexAnimator::ca_getChildAt(const int &i) {
     return ca_mChildAnimators.at(i).data();
 }
 #include <QDebug>
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "singlewidgetabstraction.h"
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction* abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {

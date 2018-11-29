@@ -1,6 +1,6 @@
 #include "tilesdata.h"
-#include "mainwindow.h"
-#include "canvaswindow.h"
+#include "GUI/mainwindow.h"
+#include "GUI/canvaswindow.h"
 #include "tile.h"
 #include "memoryhandler.h"
 

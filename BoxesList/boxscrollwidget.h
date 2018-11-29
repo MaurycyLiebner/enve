@@ -2,14 +2,14 @@
 #define BOXSCROLLWIDGET_H
 
 #include "OptimalScrollArea/scrollwidget.h"
-#include "keyfocustarget.h"
+#include "GUI/keyfocustarget.h"
 class BoxScrollWidgetVisiblePart;
 class ScrollArea;
 
 class BoxScrollWidget : public ScrollWidget {
     Q_OBJECT
 public:
-    explicit BoxScrollWidget(ScrollArea *parent = 0);
+    explicit BoxScrollWidget(ScrollArea *parent = nullptr);
     BoxScrollWidgetVisiblePart *getVisiblePartWidget();
     //    void updateAbstraction();
 protected:

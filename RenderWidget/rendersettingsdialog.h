@@ -9,7 +9,7 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include "renderinstancesettings.h"
-#include "twocolumnlayout.h"
+#include "GUI/twocolumnlayout.h"
 #define COMPLIENCE FF_COMPLIANCE_NORMAL
 
 class RenderSettingsDialog : public QDialog {

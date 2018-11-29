@@ -5,7 +5,7 @@
 #include "global.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "pointhelpers.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 
 VectorPathEdge::VectorPathEdge(NodePoint *pt1, NodePoint *pt2) {
     setPoint1(pt1);

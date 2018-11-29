@@ -4,14 +4,12 @@
 #include <QDebug>
 #include <QApplication>
 #include "undoredo.h"
-#include "mainwindow.h"
-#include "updatescheduler.h"
+#include "GUI/mainwindow.h"
 #include "pathpivot.h"
 #include "Boxes/imagebox.h"
 #include "edge.h"
 #include "Sound/soundcomposition.h"
 #include "Boxes/textbox.h"
-#include "fillstrokesettings.h"
 #include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "Sound/singlesound.h"
 #include "global.h"
@@ -26,11 +24,10 @@
 #include "RenderWidget/renderinstancesettings.h"
 #include "videoencoder.h"
 
-Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-               CanvasWindow *canvasWidget,
+Canvas::Canvas(CanvasWindow *canvasWidget,
                int canvasWidth, int canvasHeight,
                const int &frameCount, const qreal &fps) :
-    BoxesGroup(fillStrokeSettings) {
+    BoxesGroup(TYPE_CANVAS) {
     setCurrentBrush(mMainWindow->getCurrentBrush());
     mUndoRedoStack = new UndoRedoStack(mMainWindow);
     mFps = fps;
@@ -732,7 +729,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
         }
         updateTransformation();
     } else if(event->key() == Qt::Key_N) {
-        foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = getAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();

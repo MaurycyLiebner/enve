@@ -2,6 +2,7 @@
 #define PARTICLEBOX_H
 #include "boundingbox.h"
 #include "Properties/boxtargetproperty.h"
+#include "Animators/coloranimator.h"
 class QPointFAnimator;
 
 class ParticleBox;

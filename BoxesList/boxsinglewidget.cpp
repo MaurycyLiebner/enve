@@ -1,13 +1,13 @@
 #include "boxsinglewidget.h"
-#include "OptimalScrollArea/singlewidgetabstraction.h"
-#include "OptimalScrollArea/singlewidgettarget.h"
+#include "singlewidgetabstraction.h"
+#include "singlewidgettarget.h"
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "Colors/ColorWidgets/colorsettingswidget.h"
 
 #include "Boxes/boxesgroup.h"
-#include "qrealanimatorvalueslider.h"
+#include "GUI/qrealanimatorvalueslider.h"
 #include "boxscrollwidgetvisiblepart.h"
-#include "keysview.h"
+#include "GUI/keysview.h"
 #include "pointhelpers.h"
 #include "BoxesList/boolpropertywidget.h"
 #include "boxtargetwidget.h"
@@ -32,7 +32,7 @@ QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 bool BoxSingleWidget::mStaticPixmapsLoaded = false;
 
 #include "global.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include <QInputDialog>
 #include <QMenu>
 #include "clipboardcontainer.h"
@@ -997,7 +997,6 @@ int BoxSingleWidget::getOptimalNameRightX() {
     return nameX + fm.width(name);
 }
 
-#include "keysview.h"
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(mTarget == nullptr) return;
     QPainter p(this);

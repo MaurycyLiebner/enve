@@ -3,7 +3,7 @@
 #include <QPainter>
 #include "Boxes/boxesgroup.h"
 #include "Properties/boxtargetproperty.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 
 BoxTargetWidget::BoxTargetWidget(QWidget *parent) : QWidget(parent) {
     setAcceptDrops(true);

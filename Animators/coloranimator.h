@@ -5,12 +5,6 @@
 #include "Colors/color.h"
 #include "qrealanimator.h"
 
-enum ColorMode : short {
-    RGBMODE,
-    HSVMODE,
-    HSLMODE
-};
-
 class ColorAnimator : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;

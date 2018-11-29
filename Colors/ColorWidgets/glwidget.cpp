@@ -1,7 +1,7 @@
 #include "glwidget.h"
 #include "Colors/helpers.h"
-#include "fillstrokesettings.h"
 #include "global.h"
+#include "Animators/paintsettings.h"
 
 GLfloat AA_VECT_LEN = 1.5f;
 GLfloat AA_SHARP_VECT_LEN = AA_VECT_LEN*2.f;
@@ -14,25 +14,25 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
 }
 
 bool GLWidget::isVisible() {
-    return visible;
+    return mVisible;
 }
 
 bool GLWidget::isHidden() {
-    return !visible;
+    return !mVisible;
 }
 
 void GLWidget::setVisible(bool b_t) {
-    visible = b_t;
+    mVisible = b_t;
     QWidget::setVisible(b_t);
 }
 
 void GLWidget::show() {
-    visible = true;
+    mVisible = true;
     QWidget::show();
 }
 
 void GLWidget::hide() {
-    visible = false;
+    mVisible = false;
     QWidget::hide();
 }
 

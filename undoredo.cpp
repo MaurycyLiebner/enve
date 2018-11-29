@@ -1,5 +1,5 @@
 #include "undoredo.h"
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include "qrealkey.h"
 #include "canvas.h"
 #include "Boxes/vectorpath.h"
