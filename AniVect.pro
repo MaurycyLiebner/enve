@@ -45,7 +45,6 @@ TARGET = AniVect
 TEMPLATE = app
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     canvas.cpp \
     undoredo.cpp \
     movablepoint.cpp \
@@ -64,27 +63,16 @@ SOURCES += main.cpp\
     Colors/savedcolorswidget.cpp \
     Colors/savedcolorwidgets.cpp \
     Colors/helpers.cpp \
-    fillstrokesettings.cpp \
     Colors/ColorWidgets/gradientwidget.cpp \
     Colors/ColorWidgets/glwidget.cpp \
     gradientpoint.cpp \
     svgimporter.cpp \
-    transformable.cpp \
-    animationdockwidget.cpp \
-    qrealpointvaluedialog.cpp \
-    boxeslistanimationdockwidget.cpp \
     qrealkey.cpp \
     qrealpoint.cpp \
     pointhelpers.cpp \
     updatescheduler.cpp \
-    graphboxeslist.cpp \
-    keysview.cpp \
     gradientpoints.cpp \
-    fontswidget.cpp \
     paintcontroler.cpp \
-    qdoubleslider.cpp \
-    qrealanimatorvalueslider.cpp \
-    renderoutputwidget.cpp \
     Animators/transformanimator.cpp \
     Animators/animator.cpp \
     Animators/boolanimator.cpp \
@@ -108,9 +96,7 @@ SOURCES += main.cpp\
     Boxes/animationbox.cpp \
     pathoperations.cpp \
     Boxes/linkbox.cpp \
-    actionbutton.cpp \
     Boxes/boxpainthandler.cpp \
-    newcanvasdialog.cpp \
     PixmapEffects/fmt_filters.cpp \
     PixmapEffects/pixmapeffect.cpp \
     Boxes/particlebox.cpp \
@@ -134,9 +120,6 @@ SOURCES += main.cpp\
     Sound/soundcomposition.cpp \
     Boxes/boundingboxrendercontainer.cpp \
     Properties/property.cpp \
-    boxeslistkeysviewwidget.cpp \
-    animationwidgetscrollbar.cpp \
-    verticalwidgetsstack.cpp \
     durationrectangle.cpp \
     Properties/boolproperty.cpp \
     BoxesList/boolpropertywidget.cpp \
@@ -154,27 +137,20 @@ SOURCES += main.cpp\
     Gradients/displayedgradientswidget.cpp \
     Gradients/currentgradientwidget.cpp \
     filesourcescache.cpp \
-    glwindow.cpp \
-    canvaswindow.cpp \
     skqtconversions.cpp \
     AddInclude/SkStroke.cpp \
     AddInclude/SkGeometry.cpp \
     AddInclude/SkStrokerPriv.cpp \
-    canvaswidget.cpp \
     RenderWidget/closablecontainer.cpp \
     RenderWidget/renderdestinationdialog.cpp \
-    sqltablecreation.cpp \
     PathEffects/patheffect.cpp \
     PathEffects/patheffectanimators.cpp \
     BoxesList/coloranimatorbutton.cpp \
-    keyfocustarget.cpp \
-    noshortcutaction.cpp \
     updatable.cpp \
     BoxesList/boxtargetwidget.cpp \
     Properties/boxtargetproperty.cpp \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
-    filesourcelist.cpp \
     Paint/BrushSettings/brushsettingswidget.cpp \
     Paint/BrushSettings/brushsettingwidget.cpp \
     Paint/PaintLib/brush.cpp \
@@ -190,7 +166,6 @@ SOURCES += main.cpp\
     Paint/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     Paint/PaintLib/tilesdata.cpp \
-    customfpsdialog.cpp \
     BoxesList/boxscrollarea.cpp \
     Properties/comboboxproperty.cpp \
     Animators/randomqrealgenerator.cpp \
@@ -199,20 +174,16 @@ SOURCES += main.cpp\
     Properties/intproperty.cpp \
     windowsinglewidgettarget.cpp \
     Boxes/bone.cpp \
-    valueinput.cpp \
     drawpath.cpp \
     videoencoder.cpp \
     RenderWidget/rendersettingsdialog.cpp \
     RenderWidget/outputsettingsprofilesdialog.cpp \
     RenderWidget/outputsettingsdisplaywidget.cpp \
-    durationrectsettingsdialog.cpp \
-    twocolumnlayout.cpp \
     Paint/BrushSettings/brushselectionwidget.cpp \
     Paint/BrushSettings/brushselectionscrollarea.cpp \
     skimagecopy.cpp \
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
-    usagewidget.cpp \
     application.cpp \
     selfref.cpp \
     stdpointer.cpp \
@@ -235,9 +206,36 @@ SOURCES += main.cpp\
     PixmapEffects/contrasteffect.cpp \
     PixmapEffects/brightnesseffect.cpp \
     PixmapEffects/sampledmotionblureffect.cpp \
-    simplemath.cpp
+    simplemath.cpp \
+    GUI/boxeslistkeysviewwidget.cpp \
+    GUI/boxeslistanimationdockwidget.cpp \
+    GUI/actionbutton.cpp \
+    GUI/animationdockwidget.cpp \
+    GUI/animationwidgetscrollbar.cpp \
+    GUI/canvaswindow.cpp \
+    GUI/canvaswidget.cpp \
+    GUI/graphboxeslist.cpp \
+    GUI/keysview.cpp \
+    GUI/mainwindow.cpp \
+    GUI/newcanvasdialog.cpp \
+    GUI/noshortcutaction.cpp \
+    GUI/keyfocustarget.cpp \
+    GUI/usagewidget.cpp \
+    GUI/verticalwidgetsstack.cpp \
+    GUI/valueinput.cpp \
+    GUI/twocolumnlayout.cpp \
+    GUI/qrealpointvaluedialog.cpp \
+    GUI/renderoutputwidget.cpp \
+    GUI/qdoubleslider.cpp \
+    GUI/qrealanimatorvalueslider.cpp \
+    GUI/glwindow.cpp \
+    GUI/fontswidget.cpp \
+    GUI/filesourcelist.cpp \
+    GUI/customfpsdialog.cpp \
+    GUI/durationrectsettingsdialog.cpp \
+    GUI/fillstrokesettings.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     canvas.h \
     undoredo.h \
     updatescheduler.h \
@@ -256,25 +254,15 @@ HEADERS  += mainwindow.h \
     Colors/savedcolorswidget.h \
     Colors/savedcolorwidgets.h \
     Colors/helpers.h \
-    fillstrokesettings.h \
     Colors/ColorWidgets/gradientwidget.h \
     Colors/ColorWidgets/glwidget.h \
     gradientpoint.h \
     svgimporter.h \
-    transformable.h \
-    animationdockwidget.h \
-    qrealpointvaluedialog.h \
-    boxeslistanimationdockwidget.h \
     qrealkey.h \
     qrealpoint.h \
     pointhelpers.h \
-    keysview.h \
     gradientpoints.h \
-    fontswidget.h \
     paintcontroler.h \
-    qdoubleslider.h \
-    qrealanimatorvalueslider.h \
-    renderoutputwidget.h \
     keypoint.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
@@ -299,9 +287,7 @@ HEADERS  += mainwindow.h \
     Boxes/animationbox.h \
     pathoperations.h \
     Boxes/linkbox.h \
-    actionbutton.h \
     Boxes/boxpainthandler.h \
-    newcanvasdialog.h \
     PixmapEffects/pixmapeffect.h \
     PixmapEffects/fmt_filters.h \
     Boxes/particlebox.h \
@@ -323,9 +309,6 @@ HEADERS  += mainwindow.h \
     Sound/soundcomposition.h \
     Boxes/boundingboxrendercontainer.h \
     Properties/property.h \
-    boxeslistkeysviewwidget.h \
-    animationwidgetscrollbar.h \
-    verticalwidgetsstack.h \
     durationrectangle.h \
     Properties/boolproperty.h \
     BoxesList/boolpropertywidget.h \
@@ -345,15 +328,12 @@ HEADERS  += mainwindow.h \
     Gradients/currentgradientwidget.h \
     filesourcescache.h \
     global.h \
-    glwindow.h \
-    canvaswindow.h \
     skqtconversions.h \
     AddInclude/SkStroke.h \
     AddInclude/SkPaintDefaults.h \
     AddInclude/SkGeometry.h \
     AddInclude/SkStrokerPriv.h \
     AddInclude/SkNx.h \
-    canvaswidget.h \
     skiaincludes.h \
     AddInclude/SkPathPriv.h \
     skiadefines.h \
@@ -362,14 +342,11 @@ HEADERS  += mainwindow.h \
     PathEffects/patheffect.h \
     PathEffects/patheffectanimators.h \
     BoxesList/coloranimatorbutton.h \
-    keyfocustarget.h \
-    noshortcutaction.h \
     updatable.h \
     BoxesList/boxtargetwidget.h \
     Properties/boxtargetproperty.h \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     BoxesList/OptimalScrollArea/minimalscrollwidget.h \
-    filesourcelist.h \
     Paint/BrushSettings/brushsettingswidget.h \
     Paint/BrushSettings/brushsettingwidget.h \
     Paint/PaintLib/brush.h \
@@ -385,7 +362,6 @@ HEADERS  += mainwindow.h \
     Paint/paintboxsettingsdialog.h \
     execdelegator.h \
     Paint/PaintLib/tilesdata.h \
-    customfpsdialog.h \
     BoxesList/boxscrollarea.h \
     Properties/comboboxproperty.h \
     Animators/randomqrealgenerator.h \
@@ -394,21 +370,17 @@ HEADERS  += mainwindow.h \
     Properties/intproperty.h \
     windowsinglewidgettarget.h \
     Boxes/bone.h \
-    valueinput.h \
     drawpath.h \
     videoencoder.h \
     RenderWidget/rendersettingsdialog.h \
     RenderWidget/outputsettingsprofilesdialog.h \
     RenderWidget/outputsettingsdisplaywidget.h \
-    durationrectsettingsdialog.h \
-    twocolumnlayout.h \
     Paint/BrushSettings/brushselectionwidget.h \
     Paint/BrushSettings/brushselectionscrollarea.h \
     AddInclude/SkPointPriv.h \
     skimagecopy.h \
     Boxes/renderdatahandler.h \
     Boxes/boundingboxrenderdata.h \
-    usagewidget.h \
     sharedpointerdefs.h \
     application.h \
     stdpointer.h \
@@ -433,7 +405,33 @@ HEADERS  += mainwindow.h \
     PixmapEffects/sampledmotionblureffect.h \
     PathEffects/patheffectsinclude.h \
     PixmapEffects/pixmapeffectsinclude.h \
-    simplemath.h
+    simplemath.h \
+    GUI/actionbutton.h \
+    GUI/animationdockwidget.h \
+    GUI/animationwidgetscrollbar.h \
+    GUI/boxeslistanimationdockwidget.h \
+    GUI/boxeslistkeysviewwidget.h \
+    GUI/canvaswidget.h \
+    GUI/canvaswindow.h \
+    GUI/customfpsdialog.h \
+    GUI/durationrectsettingsdialog.h \
+    GUI/filesourcelist.h \
+    GUI/fillstrokesettings.h \
+    GUI/fontswidget.h \
+    GUI/keyfocustarget.h \
+    GUI/keysview.h \
+    GUI/mainwindow.h \
+    GUI/newcanvasdialog.h \
+    GUI/qdoubleslider.h \
+    GUI/qrealanimatorvalueslider.h \
+    GUI/twocolumnlayout.h \
+    GUI/usagewidget.h \
+    GUI/valueinput.h \
+    GUI/verticalwidgetsstack.h \
+    GUI/glwindow.h \
+    GUI/noshortcutaction.h \
+    GUI/qrealpointvaluedialog.h \
+    GUI/renderoutputwidget.h
 
 RESOURCES += \
     resources.qrc
