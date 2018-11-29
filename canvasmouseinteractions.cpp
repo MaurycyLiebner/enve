@@ -15,7 +15,7 @@
 #include "clipboardcontainer.h"
 #include "GUI/mainwindow.h"
 #include "Boxes/paintbox.h"
-#include "Paint/PaintLib/brush.h"
+#include "Paint//brush.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "GUI/fontswidget.h"
 #include "Boxes/bone.h"

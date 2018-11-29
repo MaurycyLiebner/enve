@@ -2,7 +2,7 @@
 #include <QPainter>
 #include <QResizeEvent>
 
-#include "Paint/PaintLib/brush.h"
+#include "Paint//brush.h"
 
 BrushSelectionWidget::BrushSelectionWidget(QWidget *parent) :
     QWidget(parent) {

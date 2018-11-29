@@ -149,11 +149,11 @@ SOURCES += main.cpp\
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
     GUI/BrushWidgets/brushsettingswidget.cpp \
     GUI/BrushWidgets/brushsettingwidget.cpp \
-    Paint/PaintLib/brush.cpp \
-    Paint/PaintLib/surface.cpp \
-    Paint/PaintLib/tile.cpp \
+    Paint//brush.cpp \
+    Paint//surface.cpp \
+    Paint//tile.cpp \
     Boxes/paintbox.cpp \
-    Paint/PaintLib/animatedsurface.cpp \
+    Paint//animatedsurface.cpp \
     Animators/PathAnimators/pathkey.cpp \
     Animators/PathAnimators/vectorpathanimator.cpp \
     pointanimator.cpp \
@@ -161,7 +161,7 @@ SOURCES += main.cpp\
     avfileio.cpp \
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
-    Paint/PaintLib/tilesdata.cpp \
+    Paint//tilesdata.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
     Properties/comboboxproperty.cpp \
     Animators/randomqrealgenerator.cpp \
@@ -343,11 +343,11 @@ HEADERS  += \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
     GUI/BrushWidgets/brushsettingswidget.h \
     GUI/BrushWidgets/brushsettingwidget.h \
-    Paint/PaintLib/brush.h \
-    Paint/PaintLib/surface.h \
-    Paint/PaintLib/tile.h \
+    Paint//brush.h \
+    Paint//surface.h \
+    Paint//tile.h \
     Boxes/paintbox.h \
-    Paint/PaintLib/animatedsurface.h \
+    Paint//animatedsurface.h \
     Animators/PathAnimators/pathkey.h \
     Animators/PathAnimators/vectorpathanimator.h \
     pointanimator.h \
@@ -355,7 +355,7 @@ HEADERS  += \
     avfileio.h \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
-    Paint/PaintLib/tilesdata.h \
+    Paint//tilesdata.h \
     GUI/BoxesList/boxscrollarea.h \
     Properties/comboboxproperty.h \
     Animators/randomqrealgenerator.h \

@@ -1,6 +1,6 @@
 #include "paintbox.h"
-#include "Paint/PaintLib/surface.h"
-#include "Paint/PaintLib/animatedsurface.h"
+#include "Paint//surface.h"
+#include "Paint//animatedsurface.h"
 #include "canvas.h"
 #include "Animators/animatorupdater.h"
 #include "pointanimator.h"

@@ -1,7 +1,7 @@
 #ifndef PAINTBOX_H
 #define PAINTBOX_H
 #include "boundingbox.h"
-#include "Paint/PaintLib/tile.h"
+#include "Paint//tile.h"
 struct TileSkDrawer;
 class Surface;
 class Brush;

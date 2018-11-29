@@ -19,7 +19,7 @@
 #include "Animators/animatorupdater.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
-#include "Paint/PaintLib/brush.h"
+#include "Paint//brush.h"
 #include <QFile>
 #include "renderinstancesettings.h"
 #include "videoencoder.h"
