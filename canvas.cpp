@@ -21,7 +21,7 @@
 #include "Boxes/paintbox.h"
 #include "Paint/PaintLib/brush.h"
 #include <QFile>
-#include "RenderWidget/renderinstancesettings.h"
+#include "renderinstancesettings.h"
 #include "videoencoder.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,

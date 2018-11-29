@@ -128,7 +128,7 @@ SOURCES += main.cpp\
     outputgenerator.cpp \
     RenderWidget/renderwidget.cpp \
     RenderWidget/renderinstancewidget.cpp \
-    RenderWidget/renderinstancesettings.cpp \
+    renderinstancesettings.cpp \
     GUI/GradientWidgets/gradientslistwidget.cpp \
     GUI/GradientWidgets/displayedgradientswidget.cpp \
     GUI/GradientWidgets/currentgradientwidget.cpp \
@@ -316,7 +316,7 @@ HEADERS  += \
     outputgenerator.h \
     RenderWidget/renderwidget.h \
     RenderWidget/renderinstancewidget.h \
-    RenderWidget/renderinstancesettings.h \
+    renderinstancesettings.h \
     GUI/GradientWidgets/gradientslistwidget.h \
     GUI/GradientWidgets/displayedgradientswidget.h \
     GUI/GradientWidgets/currentgradientwidget.h \

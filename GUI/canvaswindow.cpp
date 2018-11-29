@@ -9,7 +9,7 @@
 #include "Sound/soundcomposition.h"
 #include "global.h"
 #include "canvaswidget.h"
-#include "RenderWidget/renderinstancesettings.h"
+#include "renderinstancesettings.h"
 #include "newcanvasdialog.h"
 #include "Boxes/videobox.h"
 #include "Boxes/imagebox.h"

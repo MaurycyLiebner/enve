@@ -4,7 +4,7 @@
 #include <QList>
 #include "skiaincludes.h"
 #include "updatable.h"
-#include "RenderWidget/renderinstancesettings.h"
+#include "renderinstancesettings.h"
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
