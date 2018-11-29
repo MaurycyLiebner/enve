@@ -159,7 +159,7 @@ SOURCES += main.cpp\
     pointanimator.cpp \
     nodepoint.cpp \
     avfileio.cpp \
-    Paint/paintboxsettingsdialog.cpp \
+    GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     Paint/PaintLib/tilesdata.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
@@ -353,7 +353,7 @@ HEADERS  += \
     pointanimator.h \
     nodepoint.h \
     avfileio.h \
-    Paint/paintboxsettingsdialog.h \
+    GUI/paintboxsettingsdialog.h \
     execdelegator.h \
     Paint/PaintLib/tilesdata.h \
     GUI/BoxesList/boxscrollarea.h \

@@ -22,7 +22,7 @@
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 #include <QFileDialog>
-#include "Paint/paintboxsettingsdialog.h"
+#include "GUI/paintboxsettingsdialog.h"
 #include "GUI/customfpsdialog.h"
 
 void Canvas::handleMovePathMousePressEvent() {
