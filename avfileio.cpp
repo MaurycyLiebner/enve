@@ -31,7 +31,7 @@
 #include "Boxes/paintbox.h"
 #include "Paint//surface.h"
 #include "Paint//animatedsurface.h"
-#include "GUI/BrushWidgets/brushsettingswidget.h"
+//#include "GUI/BrushWidgets/brushsettingswidget.h"
 #include "canvas.h"
 #include "durationrectangle.h"
 #include "gradientpoints.h"
@@ -1433,11 +1433,11 @@ void MainWindow::loadAVFile(const QString &path) {
                 FileFooter::CompatybilityMode::Compatible) {
             QColor qcolT;
             target.read(reinterpret_cast<char*>(&qcolT), sizeof(QColor));
-            mBrushSettingsWidget->setCurrentQColor(qcolT);
+//            mBrushSettingsWidget->setCurrentQColor(qcolT);
             Brush::setHSV(qcolT.hueF(),
                           qcolT.saturationF(),
                           qcolT.valueF());
-            mBrushSettingsWidget->readBrushesForProject(&target);
+//            mBrushSettingsWidget->readBrushesForProject(&target);
             GradientWidget *gradientWidget =
                     mFillStrokeSettings->getGradientWidget();
             gradientWidget->readGradients(&target);
@@ -1466,10 +1466,10 @@ void MainWindow::saveToFile(const QString &path) {
     }
 
     if(target.open(QIODevice::WriteOnly) ) {
-        QColor color = mBrushSettingsWidget->getCurrentQColor();
-        target.write(reinterpret_cast<char*>(&color), sizeof(QColor));
+//        QColor color = mBrushSettingsWidget->getCurrentQColor();
+//        target.write(reinterpret_cast<char*>(&color), sizeof(QColor));
 
-        mBrushSettingsWidget->saveBrushesForProject(&target);
+//        mBrushSettingsWidget->saveBrushesForProject(&target);
         GradientWidget *gradientWidget =
                 mFillStrokeSettings->getGradientWidget();
         gradientWidget->setGradientLoadIds();

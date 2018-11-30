@@ -236,8 +236,9 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/brushwidget.cpp \
     GUI/BrushWidgets/itemselectionwidget.cpp \
     GUI/BrushWidgets/itemwrapper.cpp \
-    qstringio.cpp
-
+    qstringio.cpp \
+    GUI/BrushWidgets/flowlayout.cpp \
+    GUI/BrushWidgets/itemwidget.cpp
 HEADERS  += \
     canvas.h \
     undoredo.h \
@@ -437,7 +438,9 @@ HEADERS  += \
     GUI/BrushWidgets/collectionarea.h \
     GUI/BrushWidgets/itemselectionwidget.h \
     GUI/BrushWidgets/itemwrapper.h \
-    qstringio.h
+    qstringio.h \
+    GUI/BrushWidgets/flowlayout.h \
+    GUI/BrushWidgets/itemwidget.h
 
 RESOURCES += \
     resources.qrc

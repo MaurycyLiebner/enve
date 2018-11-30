@@ -33,7 +33,7 @@
 #include "Sound/singlesound.h"
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "memoryhandler.h"
-#include "GUI/BrushWidgets/brushsettingswidget.h"
+ #include "GUI/BrushWidgets/brushselectionwidget.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -122,15 +122,15 @@ MainWindow::MainWindow(QWidget *parent)
     brushDockLabel->setAlignment(Qt::AlignCenter);
     mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
 
-    mBrushSettingsWidget = new BrushSettingsWidget(this);
-    connect(mBrushSettingsWidget, SIGNAL(brushSelected(const Brush*)),
-            mCanvasWindow, SLOT(setCurrentBrush(const Brush*)));
-    connect(mBrushSettingsWidget,
-            SIGNAL(brushReplaced(const Brush*,const Brush*)),
-            mCanvasWindow,
-            SLOT(replaceBrush(const Brush*,const Brush*)));
+    mBrushSelectionWidget = new BrushSelectionWidget(this);
+//    connect(mBrushSettingsWidget, SIGNAL(brushSelected(const Brush*)),
+//            mCanvasWindow, SLOT(setCurrentBrush(const Brush*)));
+//    connect(mBrushSettingsWidget,
+//            SIGNAL(brushReplaced(const Brush*,const Brush*)),
+//            mCanvasWindow,
+//            SLOT(replaceBrush(const Brush*,const Brush*)));
 
-    mBrushSettingsDock->setWidget(mBrushSettingsWidget);
+    mBrushSettingsDock->setWidget(mBrushSelectionWidget);
 
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
     mBrushSettingsDock->hide();
@@ -478,7 +478,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     mPathEffectsVisible->setChecked(canvas->getPathEffectsVisible());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(canvas->getCurrentBoxesGroup());
-    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
+//    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
     updateDisplayedFillStrokeSettings();
 }
 
@@ -907,11 +907,11 @@ void MainWindow::previewPaused() {
 }
 
 void MainWindow::incBrushRadius() {
-    mBrushSettingsWidget->incBrushRadius();
+//    mBrushSettingsWidget->incBrushRadius();
 }
 
 void MainWindow::decBrushRadius() {
-    mBrushSettingsWidget->decBrushRadius();
+//    mBrushSettingsWidget->decBrushRadius();
 }
 
 //void MainWindow::stopPreview() {
@@ -965,7 +965,8 @@ void MainWindow::finishUndoRedoSet() {
 }
 
 Brush *MainWindow::getCurrentBrush() {
-    return mBrushSettingsWidget->getCurrentBrush();
+//    return mBrushSettingsWidget->getCurrentBrush();
+    return nullptr;
 }
 
 void MainWindow::callUpdateSchedulers() {

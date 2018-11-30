@@ -20,7 +20,7 @@ class AnimationDockWidget;
 class ColorSettingsWidget;
 class FillStrokeSettingsWidget;
 class BoxesListAnimationDockWidget;
-class BrushSettingsWidget;
+class BrushSelectionWidget;
 class Canvas;
 class CanvasWindow;
 class MemoryHandler;
@@ -204,7 +204,7 @@ private:
     QDockWidget *mLeftDock2;
     QDockWidget *mBrushSettingsDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget = nullptr;
-    BrushSettingsWidget *mBrushSettingsWidget = nullptr;
+    BrushSelectionWidget *mBrushSelectionWidget = nullptr;
 
     QStatusBar* mStatusBar;
     UsageWidget* mUsageWidget = nullptr;
