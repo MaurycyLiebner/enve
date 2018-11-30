@@ -6,8 +6,8 @@
 #include <memory>
 #include "stdpointer.h"
 
-#define getAsPtr(baseObjT, derivedClassT) derivedClassT::getAsPtr<derivedClassT>(baseObjT)
-#define getAsSPtr(baseObjT, derivedClassT) derivedClassT::getAsSPtr<derivedClassT>(baseObjT)
+#define GetAsPtr(baseObjT, derivedClassT) derivedClassT::getAsPtr<derivedClassT>(baseObjT)
+#define GetAsSPtr(baseObjT, derivedClassT) derivedClassT::getAsSPtr<derivedClassT>(baseObjT)
 
 #define SPtrCreate(classT) classT::create<classT>
 #define classQPtrs(classT) class classT; \

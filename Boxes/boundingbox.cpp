@@ -1472,7 +1472,7 @@ void BoundingBox::SWT_addToContextMenu(
 }
 
 void BoundingBox::removeFromParent() {
-    mParentGroup->removeContainedBox(getAsSPtr(this, BoundingBox));
+    mParentGroup->removeContainedBox(GetAsSPtr(this, BoundingBox));
 }
 
 void BoundingBox::removeFromSelection() {
@@ -1486,7 +1486,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
         QAction *selectedAction) {
     if(selectedAction != nullptr) {
         if(selectedAction->text() == "Delete") {
-            mParentGroup->removeContainedBox(getAsSPtr(this, BoundingBox));
+            mParentGroup->removeContainedBox(GetAsSPtr(this, BoundingBox));
         } else if(selectedAction->text() == "Apply Transformation") {
             applyCurrentTransformation();
         } else if(selectedAction->text() == "Create Link") {

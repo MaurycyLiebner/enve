@@ -378,16 +378,16 @@ void PaintSettings::setPaintPathTarget(PathBox *path) {
 
 void PaintSettings::setGradientVar(Gradient* grad) {
     if(!mGradient.isNull()) {
-        ca_removeChildAnimator(getAsSPtr(mGradient, Gradient));
+        ca_removeChildAnimator(GetAsSPtr(mGradient, Gradient));
         ca_removeChildAnimator(
-                    getAsSPtr(mGradientPoints, GradientPoints));
+                    GetAsSPtr(mGradientPoints, GradientPoints));
         mGradient->removePath(mTarget_k);
     }
     if(grad == nullptr) {
         mGradient.clear();
     } else {
-        ca_addChildAnimator(getAsSPtr(grad, Gradient));
-        ca_addChildAnimator(getAsSPtr(mGradientPoints, GradientPoints));
+        ca_addChildAnimator(GetAsSPtr(grad, Gradient));
+        ca_addChildAnimator(GetAsSPtr(mGradientPoints, GradientPoints));
         mGradient = grad;
         mGradient->addPath(mTarget_k);
     }

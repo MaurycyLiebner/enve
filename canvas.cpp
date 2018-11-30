@@ -39,7 +39,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
     mSoundComposition = QSharedPointer<SoundComposition>::create(this);
     auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();
-    ca_addChildAnimator(getAsSPtr(soundsAnimatorContainer, Property));
+    ca_addChildAnimator(GetAsSPtr(soundsAnimatorContainer, Property));
 
     mMaxFrame = frameCount;
 
@@ -134,7 +134,7 @@ void Canvas::updateHoveredBox() {
     mHoveredBone = nullptr;
     if(mHoveredBox != nullptr && mBonesSelectionEnabled) {
         if(mHoveredBox->SWT_isBonesBox()) {
-            mHoveredBone = getAsPtr(mHoveredBox, BonesBox)->getBoneAtAbsPos(
+            mHoveredBone = GetAsPtr(mHoveredBox, BonesBox)->getBoneAtAbsPos(
                         mCurrentMouseEventPosRel);
         }
     }
@@ -397,7 +397,7 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
         mCurrentPreviewContainer.reset();
         return;
     }
-    mCurrentPreviewContainer = getAsSPtr(cont, CacheContainer);
+    mCurrentPreviewContainer = GetAsSPtr(cont, CacheContainer);
     mCurrentPreviewContainer->setBlocked(true);
 }
 
@@ -413,7 +413,7 @@ void Canvas::setLoadingPreviewContainer(CacheContainer *cont) {
         mLoadingPreviewContainer.reset();
         return;
     }
-    mLoadingPreviewContainer = getAsSPtr(cont, CacheContainer);
+    mLoadingPreviewContainer = GetAsSPtr(cont, CacheContainer);
     cont->setAsCurrentPreviewContainerAfterFinishedLoading(this);
     mLoadingPreviewContainer->setBlocked(true);
 }
@@ -731,7 +731,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_N) {
         Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox *paintBox = getAsPtr(box, PaintBox);
+                PaintBox *paintBox = GetAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
             }
         }

@@ -27,7 +27,7 @@ bool _ScheduledExecutor::addScheduler() {
 }
 
 void _ScheduledExecutor::addSchedulerNow() {
-    MainWindow::getInstance()->addUpdateScheduler(getAsSPtr(this, _ScheduledExecutor));
+    MainWindow::getInstance()->addUpdateScheduler(GetAsSPtr(this, _ScheduledExecutor));
 }
 
 void _ScheduledExecutor::clear() {
@@ -43,7 +43,7 @@ void _Executor::setCurrentPaintControler(PaintControler *paintControler) {
 }
 
 void _Executor::beforeUpdate() {
-    mSelfRef = getAsSPtr(this, _Executor);
+    mSelfRef = GetAsSPtr(this, _Executor);
     mBeingProcessed = true;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();

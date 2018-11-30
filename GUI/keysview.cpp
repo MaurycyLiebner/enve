@@ -184,7 +184,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                     menu.addAction("Settings...");
                     QAction *selectedAction = menu.exec(e->globalPos());
                     if(selectedAction != nullptr) {
-                        auto durRect = getAsPtr(movable, DurationRectangle);
+                        auto durRect = GetAsPtr(movable, DurationRectangle);
                         durRect->openDurationSettingsDialog(this);
                     }
                 }
@@ -227,7 +227,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
             if(event->isAutoRepeat()) return false;
             auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
             KeysClipboardContainer* container =
-                    getAsPtr(cont, KeysClipboardContainer);
+                    GetAsPtr(cont, KeysClipboardContainer);
             if(container == nullptr) return false;
             container->paste(mMainWindow->getCurrentFrame(), this, true, true);
         } else if(!mSelectedKeys.isEmpty()) {

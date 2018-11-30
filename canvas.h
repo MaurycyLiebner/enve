@@ -334,7 +334,7 @@ public:
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data) {
         BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        auto canvasData = getAsPtr(data, CanvasRenderData);
+        auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->bgColor = QColorToSkColor(mBackgroundColor->getCurrentColor());
         canvasData->canvasHeight = mHeight*mResolutionFraction;
         canvasData->canvasWidth = mWidth*mResolutionFraction;

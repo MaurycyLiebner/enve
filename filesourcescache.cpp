@@ -424,7 +424,7 @@ void VideoCacheHandler::afterUpdate() {
             mFramesCount = frameId;
             foreach(const BoundingBoxQPtr &box, mDependentBoxes) {
                 if(box == nullptr) continue;
-                getAsPtr(box, VideoBox)->updateDurationRectangleAnimationRange();
+                GetAsPtr(box, VideoBox)->updateDurationRectangleAnimationRange();
             }
         } else {
             CacheContainer *cont =
@@ -482,14 +482,14 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
         const QStringList &framePaths) {
     mFramePaths = framePaths;
     foreach(const QString &path, framePaths) {
-        auto imgCacheHandler = getAsPtr(
+        auto imgCacheHandler = GetAsPtr(
                 FileSourcesCache::getHandlerForFilePath(path),
                     ImageCacheHandler);
         if(imgCacheHandler == nullptr) {
             auto newHandler = ImageCacheHandler::createNewHandler(path, false);
             mFrameImageHandlers << newHandler;
         } else {
-            mFrameImageHandlers << getAsPtr(imgCacheHandler, ImageCacheHandler);
+            mFrameImageHandlers << GetAsPtr(imgCacheHandler, ImageCacheHandler);
         }
     }
     updateFrameCount();

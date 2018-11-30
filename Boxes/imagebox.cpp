@@ -25,7 +25,7 @@ void ImageBox::setFilePath(const QString &path) {
         mImgCacheHandler->removeDependentBox(this);
     }
     auto handlerT = FileSourcesCache::getHandlerForFilePath(path);
-    mImgCacheHandler = getAsPtr(handlerT, ImageCacheHandler);
+    mImgCacheHandler = GetAsPtr(handlerT, ImageCacheHandler);
 
     if(mImgCacheHandler == nullptr) {
         QFile file(path);
@@ -62,7 +62,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
                                     const qreal &relFrame,
                                     BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    auto imgData = getAsPtr(data, ImageBoxRenderData);
+    auto imgData = GetAsPtr(data, ImageBoxRenderData);
     imgData->image = mImgCacheHandler->getImageCopy();
     if(imgData->image == nullptr) {
         mImgCacheHandler->addScheduler();
@@ -88,5 +88,5 @@ bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
 }
 #include "filesourcescache.h"
 void ImageBoxRenderData::loadImageFromHandler() {
-    image = getAsPtr(srcCacheHandler, ImageCacheHandler)->getImageCopy();
+    image = GetAsPtr(srcCacheHandler, ImageCacheHandler)->getImageCopy();
 }

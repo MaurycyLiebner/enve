@@ -53,9 +53,9 @@ void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mAnimator != nullptr) {
         if(mAnimator->SWT_isQrealAnimator()) {
-            getAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
+            GetAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
         } else if(mAnimator->SWT_isIntProperty()) {
-            getAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
+            GetAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
         }
     }
     QDoubleSlider::emitValueChanged(value);
@@ -65,9 +65,9 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     if(mAnimator != nullptr) {
         mBlockAnimatorSignals = true;
         if(mAnimator->SWT_isQrealAnimator()) {
-            getAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
+            GetAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
         } else if(mAnimator->SWT_isIntProperty()) {
-            getAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
+            GetAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
         }
         mBlockAnimatorSignals = false;
     }

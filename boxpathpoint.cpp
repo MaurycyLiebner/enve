@@ -11,21 +11,21 @@ void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();
     mSavedAbsPos = getAbsolutePos();
     BoxTransformAnimator *boxTrans =
-            getAsPtr(mParentTransform_cv, BoxTransformAnimator);
+            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     boxTrans->startPivotTransform();
 }
 
 void BoxPathPoint::finishTransform() {
     MovablePoint::finishTransform();
     BoxTransformAnimator *boxTrans =
-            getAsPtr(mParentTransform_cv, BoxTransformAnimator);
+            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     boxTrans->finishPivotTransform();
 }
 
 void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
     QPointF absPos = mSavedAbsPos + absTranslatione;
     BoxTransformAnimator *boxTrans =
-            getAsPtr(mParentTransform_cv, BoxTransformAnimator);
+            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     boxTrans->getParentBox()->setPivotAbsPos(absPos, false, false);
 }
 

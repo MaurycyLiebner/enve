@@ -15,15 +15,15 @@ GradientPoint::GradientPoint(QPointFAnimator* associatedAnimator,
 void GradientPoint::setRelativePos(const QPointF &relPos) {
     PointAnimatorMovablePoint::setRelativePos(relPos);
     BoxTransformAnimator* boxParent =
-            getAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    getAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
+            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
+    GetAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
 }
 
 void GradientPoint::moveByRel(const QPointF &relTranslatione) {
     PointAnimatorMovablePoint::moveByRel(relTranslatione);
     BoxTransformAnimator* boxParent =
-            getAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    getAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
+            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
+    GetAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
 }
 
 void GradientPoint::setColor(const QColor &fillColor) {

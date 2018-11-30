@@ -42,30 +42,10 @@
 #include <QMessageBox>
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
-
+#include "qstringio.h"
 #define FORMAT_STR "AniVect av"
 #define CREATOR_VERSION "0.1a"
 #define CREATOR_APPLICATION "AniVect"
-
-void writeQString(QIODevice *target,
-                 const QString &strToWrite) {
-    uint nChars = static_cast<uint>(strToWrite.length());
-    target->write(reinterpret_cast<const char*>(&nChars), sizeof(uint));
-    target->write(reinterpret_cast<const char*>(strToWrite.utf16()),
-                  nChars*sizeof(ushort));
-}
-
-void readQString(QIODevice *target,
-                 QString& targetStr) {
-    uint nChars;
-    target->read(reinterpret_cast<char*>(&nChars), sizeof(uint));
-    ushort *chars = new ushort[nChars];
-
-    target->read(reinterpret_cast<char*>(chars), nChars*sizeof(ushort));
-    targetStr = QString::fromUtf16(chars, static_cast<int>(nChars));
-
-    delete[] chars;
-}
 
 struct FileFooter {
     enum CompatybilityMode {
@@ -900,11 +880,11 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
                 SPtrCreate(DuplicatePathEffect)(mIsOutline);
     } else if(typeT == SUM_PATH_EFFECT) {
         pathEffect =
-                SPtrCreate(OperationPathEffect)(getAsPtr(mParentBox, PathBox), mIsOutline);
+                SPtrCreate(OperationPathEffect)(GetAsPtr(mParentBox, PathBox), mIsOutline);
     } else if(typeT == GROUP_SUM_PATH_EFFECT) {
         pathEffect =
                 SPtrCreate(GroupLastPathSumPathEffect)(
-                    getAsPtr(mParentBox, BoxesGroup),
+                    GetAsPtr(mParentBox, BoxesGroup),
                     mIsOutline);
     } else if(typeT == LENGTH_PATH_EFFECT) {
         pathEffect = SPtrCreate(LengthPathEffect)(mIsOutline);
@@ -1441,7 +1421,7 @@ void CanvasWindow::readCanvases(QIODevice *target) {
     int currentCanvasId;
     target->read(reinterpret_cast<char*>(&currentCanvasId), sizeof(int));
     setCurrentCanvas(
-                getAsPtr(BoundingBox::getLoadedBoxById(currentCanvasId), Canvas));
+                GetAsPtr(BoundingBox::getLoadedBoxById(currentCanvasId), Canvas));
 }
 
 void MainWindow::loadAVFile(const QString &path) {

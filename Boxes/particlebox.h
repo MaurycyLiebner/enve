@@ -289,7 +289,7 @@ public:
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                BoundingBoxRenderData* data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        auto particleData = getAsSPtr(data, ParticleBoxRenderData);
+        auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
         particleData->emittersData.clear();
         foreach(const ParticleEmitterQSPtr& emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();

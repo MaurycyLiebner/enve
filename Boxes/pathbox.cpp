@@ -118,7 +118,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         }
     }
 
-    auto pathData = getAsPtr(data, PathBoxRenderData);
+    auto pathData = GetAsPtr(data, PathBoxRenderData);
     if(currentEditPathCompatible) {
         pathData->editPath = mEditPathSk;
     } else {
@@ -534,7 +534,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
     VectorPathQSPtr newPath = SPtrCreate(VectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
-        Circle* circleT = getAsPtr(this, Circle);
+        Circle* circleT = GetAsPtr(this, Circle);
         pathT.addEllipse(QPointF(0., 0.),
                          circleT->getCurrentXRadius(),
                          circleT->getCurrentYRadius());
@@ -609,7 +609,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
         BoundingBoxRenderData* renderData) {
-    auto pathRenderData = getAsPtr(renderData, PathBoxRenderData);
+    auto pathRenderData = GetAsPtr(renderData, PathBoxRenderData);
     mCurrentPathsFrame = renderData->relFrame;
     mEditPathSk = pathRenderData->editPath;
     mPathSk = pathRenderData->path;

@@ -290,7 +290,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
         finishSizeSetup();
     }
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    auto paintData = getAsSPtr(data, PaintBoxRenderData);
+    auto paintData = GetAsSPtr(data, PaintBoxRenderData);
     if(mMainHandler == nullptr) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
     foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {

@@ -58,7 +58,7 @@ void PathKey::updateAfterChangedFromInside() {
 }
 
 NodeSettings *PathKey::getNodeSettingsForPtId(const int &ptId) {
-    return getAsPtr(mParentAnimator, VectorPathAnimator)->
+    return GetAsPtr(mParentAnimator, VectorPathAnimator)->
             getNodeSettingsForPtId(ptId);
 }
 

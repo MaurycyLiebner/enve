@@ -199,7 +199,7 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
 
     if(!mEditPath) {
         auto parentTransform =
-                getAsPtr(mPoint1->getParentTransform(),
+                GetAsPtr(mPoint1->getParentTransform(),
                          BoxTransformAnimator);
         BoundingBox* parentBox = parentTransform->getParentBox();
         NodePointValues p1Values = mPoint1->getPointValues();

@@ -110,7 +110,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
     Q_FOREACH(SingleWidgetAbstraction *abs, abstractions) {
         SingleWidgetTarget *target = abs->getTarget();
         if(target->SWT_isAnimator()) {
-            Animator *anim_target = getAsPtr(target, Animator);
+            Animator *anim_target = GetAsPtr(target, Animator);
             anim_target->prp_getKeysInRect(
                         selectionRect, pixelsPerFrame, listKeys);
         }
@@ -227,14 +227,14 @@ void BoxScrollWidgetVisiblePart::dropEvent(
 
         auto bbMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
         BoundingBox* box = bbMimeData->getTarget();
-        BoundingBox *boxUnderMouse = getAsPtr(singleWidgetUnderMouse->
+        BoundingBox *boxUnderMouse = GetAsPtr(singleWidgetUnderMouse->
                  getTargetAbstraction()->getTarget(), BoundingBox);
 
         BoxesGroup *parentGroup = boxUnderMouse->getParentGroup();
         if(parentGroup == nullptr ||
            boxUnderMouse->isAncestor(box)) return;
         if(parentGroup != box->getParentGroup()) {
-            auto boxSPtr = getAsSPtr(box, BoundingBox);
+            auto boxSPtr = GetAsSPtr(box, BoundingBox);
             box->getParentGroup()->removeContainedBox(boxSPtr);
             parentGroup->addContainedBox(boxSPtr);
             box->applyTransformationInverted(box->getTransformAnimator());
@@ -265,7 +265,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
         auto peMimeData = static_cast<const PixmapEffectMimeData*>(event->mimeData());
         PixmapEffect* effect = peMimeData->getTarget();
         auto targetUnderMouse = singleWidgetUnderMouse->getTargetAbstraction()->getTarget();
-        auto effectUnderMouse = getAsSPtr(targetUnderMouse, PixmapEffect);
+        auto effectUnderMouse = GetAsSPtr(targetUnderMouse, PixmapEffect);
 
         if(effect != effectUnderMouse) {
             EffectAnimators *underMouseAnimator =
@@ -273,7 +273,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
             EffectAnimators *draggedAnimator =
                                      effect->getParentEffectAnimators();
             if(draggedAnimator != underMouseAnimator) {
-                PixmapEffectQSPtr effectSPtr = getAsSPtr(effect, PixmapEffect);
+                PixmapEffectQSPtr effectSPtr = GetAsSPtr(effect, PixmapEffect);
                 underMouseAnimator->getParentBox()->addEffect(effectSPtr);
                 draggedAnimator->getParentBox()->removeEffect(effectSPtr);
             }
@@ -306,7 +306,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                 static_cast<const PathEffectMimeData*>(
                     event->mimeData());
         PathEffectQSPtr effect =
-                getAsSPtr(pathEffectMimeData->getTarget(), PathEffect);
+                GetAsSPtr(pathEffectMimeData->getTarget(), PathEffect);
         auto targetUnderMouse = singleWidgetUnderMouse->
                 getTargetAbstraction()->getTarget();
         PathEffect *effectUnderMouse =

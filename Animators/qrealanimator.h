@@ -10,7 +10,7 @@
 class QrealKey;
 class QrealPoint;
 class QrealAnimatorValueSlider;
-#define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = getAsPtr(keyK, QrealKey);
+#define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = GetAsPtr(keyK, QrealKey);
 
 #include <QDoubleSpinBox>
 

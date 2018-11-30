@@ -73,7 +73,7 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.reset();
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);
-    mSrcRenderData = getAsSPtr(data, BoundingBoxRenderData);
+    mSrcRenderData = GetAsSPtr(data, BoundingBoxRenderData);
     MemoryHandler::getInstance()->containerUpdated(this);
 }
 

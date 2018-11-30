@@ -21,7 +21,7 @@ AnimationBox::~AnimationBox() {
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
-    return getAsPtr(mDurationRectangle, FixedLenAnimationRect);
+    return GetAsPtr(mDurationRectangle, FixedLenAnimationRect);
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
@@ -123,7 +123,7 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
                                 BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
                                                        data);
-    auto imageData = getAsPtr(data, AnimationBoxRenderData);
+    auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
     imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
@@ -141,6 +141,6 @@ BoundingBoxRenderDataSPtr AnimationBox::createRenderData() {
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    image = getAsPtr(srcCacheHandler, AnimationCacheHandler)->
+    image = GetAsPtr(srcCacheHandler, AnimationCacheHandler)->
             getFrameCopyAtOrBeforeFrame(animationFrame);
 }

@@ -1,6 +1,6 @@
 #include "singlewidgettarget.h"
 #include "singlewidgetabstraction.h"
-#include "scrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 
 SingleWidgetTarget::SingleWidgetTarget() {
 }

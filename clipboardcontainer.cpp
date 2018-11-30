@@ -112,11 +112,11 @@ void PropertyClipboardContainer::clearAndPaste(Property *targetProperty) {
             if(targetProperty->SWT_isComplexAnimator()) {
                 if(targetProperty->SWT_isPixmapEffectAnimators() ||
                    targetProperty->SWT_isPathEffectAnimators()) {
-                    getAsPtr(targetProperty, ComplexAnimator)->
+                    GetAsPtr(targetProperty, ComplexAnimator)->
                             ca_removeAllChildAnimators();
                 }
             } else {
-                getAsPtr(targetProperty, Animator)->anim_removeAllKeys();
+                GetAsPtr(targetProperty, Animator)->anim_removeAllKeys();
             }
         }
     }
@@ -129,24 +129,24 @@ void PropertyClipboardContainer::paste(Property *targetProperty) {
     if(propertyCompatible(targetProperty)) {
         if(mBoxTargetProperty) {
             if(targetProperty->SWT_isBoxTargetProperty()) {
-                getAsPtr(targetProperty, BoxTargetProperty)->setTarget(
+                GetAsPtr(targetProperty, BoxTargetProperty)->setTarget(
                             mTargetBox.data());
             }
         } else if(mPathEffect &&
            targetProperty->SWT_isPathEffectAnimators()) {
-            getAsPtr(targetProperty, PathEffectAnimators)->readPathEffect(&target);
+            GetAsPtr(targetProperty, PathEffectAnimators)->readPathEffect(&target);
         } else if(mPixmapEffect &&
             targetProperty->SWT_isPixmapEffectAnimators()) {
-            getAsPtr(targetProperty, EffectAnimators)->readPixmapEffect(&target);
+            GetAsPtr(targetProperty, EffectAnimators)->readPixmapEffect(&target);
         } else if(mPathEffectAnimators &&
             targetProperty->SWT_isPathEffectAnimators()) {
-            getAsPtr(targetProperty, PathEffectAnimators)->readProperty(&target);
+            GetAsPtr(targetProperty, PathEffectAnimators)->readProperty(&target);
         } else if(mPixmapEffectAnimators &&
             targetProperty->SWT_isPixmapEffectAnimators()) {
-            getAsPtr(targetProperty, EffectAnimators)->readProperty(&target);
+            GetAsPtr(targetProperty, EffectAnimators)->readProperty(&target);
         } else if(mVectorPathAnimator &&
             targetProperty->SWT_isPathAnimator()) {
-            getAsPtr(targetProperty, PathAnimator)->readVectorPathAnimator(&target);
+            GetAsPtr(targetProperty, PathAnimator)->readVectorPathAnimator(&target);
         } else {
             targetProperty->readProperty(&target);
         }
@@ -218,6 +218,6 @@ void PropertyClipboardContainer::setProperty(Property *property) {
     mPixmapEffect = property->SWT_isPixmapEffect();
     mBoxTargetProperty = property->SWT_isBoxTargetProperty();
     if(mBoxTargetProperty) {
-        mTargetBox = getAsPtr(property, BoxTargetProperty)->getTarget();
+        mTargetBox = GetAsPtr(property, BoxTargetProperty)->getTarget();
     }
 }

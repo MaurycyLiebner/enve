@@ -5,7 +5,8 @@
 #-------------------------------------------------
 
 QT += multimedia core gui svg opengl sql xml concurrent #widgets-private # gui-private core-private
-LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -lmypaint-2.0
+INCLUDEPATH += /usr/local/include/libmypaint-2.0/
 
 INCLUDEPATH += /home/ailuropoda/.skia/include/images/
 INCLUDEPATH += /home/ailuropoda/.skia/include/core/
@@ -147,8 +148,6 @@ SOURCES += main.cpp\
     Properties/boxtargetproperty.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
-    GUI/BrushWidgets/brushsettingswidget.cpp \
-    GUI/BrushWidgets/brushsettingwidget.cpp \
     Paint//brush.cpp \
     Paint//surface.cpp \
     Paint//tile.cpp \
@@ -175,8 +174,6 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
-    GUI/BrushWidgets/brushselectionwidget.cpp \
-    GUI/BrushWidgets/brushselectionscrollarea.cpp \
     skimagecopy.cpp \
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
@@ -231,7 +228,15 @@ SOURCES += main.cpp\
     GUI/durationrectsettingsdialog.cpp \
     GUI/fillstrokesettings.cpp \
     singlewidgettarget.cpp \
-    singlewidgetabstraction.cpp
+    singlewidgetabstraction.cpp \
+    GUI/BrushWidgets/arraywidget.cpp \
+    GUI/BrushWidgets/brusharraywidget.cpp \
+    GUI/BrushWidgets/brushcollection.cpp \
+    GUI/BrushWidgets/brushselectionwidget.cpp \
+    GUI/BrushWidgets/brushwidget.cpp \
+    GUI/BrushWidgets/itemselectionwidget.cpp \
+    GUI/BrushWidgets/itemwrapper.cpp \
+    qstringio.cpp
 
 HEADERS  += \
     canvas.h \
@@ -341,8 +346,6 @@ HEADERS  += \
     Properties/boxtargetproperty.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
-    GUI/BrushWidgets/brushsettingswidget.h \
-    GUI/BrushWidgets/brushsettingwidget.h \
     Paint//brush.h \
     Paint//surface.h \
     Paint//tile.h \
@@ -369,8 +372,6 @@ HEADERS  += \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/outputsettingsprofilesdialog.h \
     GUI/RenderWidgets/outputsettingsdisplaywidget.h \
-    GUI/BrushWidgets/brushselectionwidget.h \
-    GUI/BrushWidgets/brushselectionscrollarea.h \
     AddInclude/SkPointPriv.h \
     skimagecopy.h \
     Boxes/renderdatahandler.h \
@@ -427,7 +428,16 @@ HEADERS  += \
     GUI/qrealpointvaluedialog.h \
     GUI/renderoutputwidget.h \
     singlewidgettarget.h \
-    singlewidgetabstraction.h
+    singlewidgetabstraction.h \
+    GUI/BrushWidgets/arraywidget.h \
+    GUI/BrushWidgets/brusharraywidget.h \
+    GUI/BrushWidgets/brushcollection.h \
+    GUI/BrushWidgets/brushselectionwidget.h \
+    GUI/BrushWidgets/brushwidget.h \
+    GUI/BrushWidgets/collectionarea.h \
+    GUI/BrushWidgets/itemselectionwidget.h \
+    GUI/BrushWidgets/itemwrapper.h \
+    qstringio.h
 
 RESOURCES += \
     resources.qrc

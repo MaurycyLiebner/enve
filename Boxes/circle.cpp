@@ -33,12 +33,12 @@ Circle::Circle() :
     mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.));
 
     QrealAnimator *hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
-    ca_addChildAnimator(getAsSPtr(hXAnimator, QrealAnimator));
+    ca_addChildAnimator(GetAsSPtr(hXAnimator, QrealAnimator));
     ca_prependChildAnimator(hXAnimator, mEffectsAnimators);
     hXAnimator->prp_setName("horizontal radius");
 
     QrealAnimator *vYAnimator = mVerticalRadiusAnimator->getYAnimator();
-    ca_addChildAnimator(getAsSPtr(vYAnimator, QrealAnimator));
+    ca_addChildAnimator(GetAsSPtr(vYAnimator, QrealAnimator));
     ca_prependChildAnimator(vYAnimator, mEffectsAnimators);
     vYAnimator->prp_setName("vertical radius");
 

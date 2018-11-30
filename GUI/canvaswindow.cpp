@@ -1234,11 +1234,11 @@ void CanvasWindow::importFile(const QString &path,
             importedBox = loadSVGFile(path);
         } else if(isImageExt(extension)) {
             ImageBoxQSPtr imgBox = SPtrCreate(ImageBox)();
-            importedBox = getAsSPtr(imgBox, BoundingBox);
+            importedBox = GetAsSPtr(imgBox, BoundingBox);
             imgBox->setFilePath(path);
         } else if(isVideoExt(extension)) {
             VideoBoxQSPtr vidBox = SPtrCreate(VideoBox)();
-            importedBox = getAsSPtr(vidBox, BoundingBox);
+            importedBox = GetAsSPtr(vidBox, BoundingBox);
             vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {
             MainWindow::getInstance()->loadAVFile(path);

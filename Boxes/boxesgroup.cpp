@@ -601,7 +601,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    auto groupData = getAsSPtr(data, BoxesGroupRenderData);
+    auto groupData = GetAsSPtr(data, BoxesGroupRenderData);
     groupData->childrenRenderData.clear();
     qreal childrenEffectsMargin = 0.;
     qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -614,7 +614,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                 auto boxRenderData = box->createRenderData();
                 if(box->SWT_isPathBox()) {
                     idT = groupData->childrenRenderData.count();
-                    lastPathBox = getAsSPtr(box, PathBox);
+                    lastPathBox = GetAsSPtr(box, PathBox);
                     continue;
                 }
                 boxRenderData->parentIsTarget = false;
@@ -626,7 +626,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                 mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
 
                 groupData->childrenRenderData <<
-                        getAsSPtr(boxRenderData, BoundingBoxRenderData);
+                        GetAsSPtr(boxRenderData, BoundingBoxRenderData);
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
                              childrenEffectsMargin);
@@ -640,7 +640,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
             boxRenderData->addScheduler();
             boxRenderData->addDependent(data);
             groupData->childrenRenderData.insert(idT,
-                    getAsSPtr(boxRenderData, BoundingBoxRenderData));
+                    GetAsSPtr(boxRenderData, BoundingBoxRenderData));
             boxRenderData->parentBox = nullptr;
         }
     } else {
@@ -648,7 +648,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 auto boxRenderData =
-                        getAsSPtr(box->getCurrentRenderData(qRound(boxRelFrame)),
+                        GetAsSPtr(box->getCurrentRenderData(qRound(boxRelFrame)),
                                   BoundingBoxRenderData);
                 if(boxRenderData == nullptr) {
                     boxRenderData = box->createRenderData();
@@ -853,7 +853,7 @@ void BoxesGroup::addContainedBoxToListAt(
         const int &index,
         const BoundingBoxQSPtr& child,
         const bool &saveUndoRedo) {
-    mContainedBoxes.insert(index, getAsSPtr(child, BoundingBox));
+    mContainedBoxes.insert(index, GetAsSPtr(child, BoundingBox));
     child->setParentGroup(this);
     if(saveUndoRedo) {
 //        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
@@ -871,7 +871,7 @@ void BoxesGroup::addContainedBoxToListAt(
 
     foreach(const BoundingBoxQPtr& box, mLinkingBoxes) {
         InternalLinkGroupBoxQSPtr internalLinkGroup =
-                getAsSPtr(box, InternalLinkGroupBox);
+                GetAsSPtr(box, InternalLinkGroupBox);
         internalLinkGroup->addContainedBoxToListAt(
                     index, child->createLinkForLinkGroup(), false);
     }
@@ -914,7 +914,7 @@ void BoxesGroup::removeContainedBoxFromList(const int &id,
     mContainedBoxes.removeAt(id);
 
     if(box->SWT_isBoxesGroup()) {
-        BoxesGroupQSPtr group = getAsSPtr(box, BoxesGroup);
+        BoxesGroupQSPtr group = GetAsSPtr(box, BoxesGroup);
         if(group->isCurrentGroup()) {
             mMainWindow->getCanvasWindow()->getCurrentCanvas()->
                     setCurrentBoxesGroup(group->getParentGroup());
@@ -926,7 +926,7 @@ void BoxesGroup::removeContainedBoxFromList(const int &id,
 
     foreach(const BoundingBoxQPtr& box, mLinkingBoxes) {
         InternalLinkGroupBoxQSPtr internalLinkGroup =
-                getAsSPtr(box, InternalLinkGroupBox);
+                GetAsSPtr(box, InternalLinkGroupBox);
         internalLinkGroup->removeContainedBoxFromList(id, false);
     }
 }

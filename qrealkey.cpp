@@ -382,7 +382,7 @@ void QrealKey::setRelFrame(const int &frame) {
 
 bool QrealKey::differsFromKey(Key *key) {
     if(key == this) return false;
-    QrealKeySPtr qa_key = getAsSPtr(key, QrealKey);
+    QrealKeySPtr qa_key = GetAsSPtr(key, QrealKey);
     if(isZero4Dec(qa_key->getValue() - mValue)) {
         if(key->getRelFrame() > mRelFrame) {
             if(qa_key->isStartPointEnabled() ||

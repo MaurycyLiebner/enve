@@ -1,7 +1,7 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
-#include "singlewidget.h"
-#include "scrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/OptimalScrollArea/singlewidget.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "global.h"
 
 SingleWidgetAbstraction::SingleWidgetAbstraction(

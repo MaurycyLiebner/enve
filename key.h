@@ -103,7 +103,7 @@ struct KeyPair {
     }
 
     void merge() const {
-        key1->mergeWith(getAsSPtr(key2, Key));
+        key1->mergeWith(GetAsSPtr(key2, Key));
     }
 
     Key* key1;

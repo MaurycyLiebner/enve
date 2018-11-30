@@ -7,7 +7,7 @@ void Canvas::connectPoints() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            auto asNodePt = getAsPtr(point, NodePoint);
+            auto asNodePt = GetAsPtr(point, NodePoint);
             if(asNodePt->isEndPoint()) {
                 selectedNodePoints.append(asNodePt);
             }
@@ -57,7 +57,7 @@ void Canvas::connectPoints() {
             QMatrix effectiveMatrix =
                     secondMatrix*firstMatrix.inverted();
             secondSinglePath->applyTransformToPoints(effectiveMatrix);
-            auto secondSinglePathSPtr = getAsSPtr(secondSinglePath, VectorPathAnimator);
+            auto secondSinglePathSPtr = GetAsSPtr(secondSinglePath, VectorPathAnimator);
             firstParentPath->addSinglePathAnimator(secondSinglePathSPtr);
             secondSinglePath->removeFromParent();
             secondSinglePath->setParentPath(firstParentPath);
@@ -77,7 +77,7 @@ void Canvas::disconnectPoints() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            auto asNodePt = getAsPtr(point, NodePoint);
+            auto asNodePt = GetAsPtr(point, NodePoint);
             NodePoint *nextPoint = asNodePt->getNextPoint();
             if(nextPoint == nullptr) continue;
             if(nextPoint->isSelected()) {
@@ -183,7 +183,7 @@ void Canvas::mergePoints() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            auto asNodePt = getAsPtr(point, NodePoint);
+            auto asNodePt = GetAsPtr(point, NodePoint);
             //if(((NodePoint*)point)->isEndPoint()) {
                 selectedNodePoints.append(asNodePt);
             //}
@@ -220,7 +220,7 @@ void Canvas::mergePoints() {
 void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            auto asNodePt = getAsPtr(point, NodePoint);
+            auto asNodePt = GetAsPtr(point, NodePoint);
             asNodePt->setCtrlsMode(mode);
         }
     }
@@ -230,7 +230,7 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            auto asNodePt = getAsPtr(point, NodePoint);
+            auto asNodePt = GetAsPtr(point, NodePoint);
             selectedNodePoints.append(asNodePt);
         }
     }
@@ -251,7 +251,7 @@ void Canvas::makeSelectedPointsSegmentsLines() {
     QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
         if(point->isNodePoint()) {
-            auto asNodePt = getAsPtr(point, NodePoint);
+            auto asNodePt = GetAsPtr(point, NodePoint);
             selectedNodePoints.append(asNodePt);
         }
     }

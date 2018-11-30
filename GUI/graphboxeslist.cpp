@@ -250,7 +250,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
     } else {
         auto parentAnimator =
                 mCurrentPoint->getParentKey()->getParentAnimator();
-        getAsPtr(parentAnimator, QrealAnimator)->
+        GetAsPtr(parentAnimator, QrealAnimator)->
                 getMinAndMaxMoveFrame(
                     mCurrentPoint->getParentKey(), mCurrentPoint,
                     &mMinMoveFrame, &mMaxMoveFrame);
@@ -420,7 +420,7 @@ void KeysView::graphClearKeysSelection() {
 void KeysView::graphAddKeyToSelection(QrealKey *key) {
     if(key->isSelected()) return;
     key->setSelected(true);
-    mSelectedKeys << getAsPtr(key, Key);
+    mSelectedKeys << GetAsPtr(key, Key);
 }
 
 void KeysView::graphRemoveKeyFromSelection(QrealKey *key) {

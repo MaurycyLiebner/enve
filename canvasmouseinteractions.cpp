@@ -35,7 +35,7 @@ void Canvas::handleMovePathMousePressEvent() {
     } else {
         if(mLastPressedBox->SWT_isBonesBox()) {
             if(mBonesSelectionEnabled) {
-                mLastPressedBone = getAsPtr(mLastPressedBox, BonesBox)->
+                mLastPressedBone = GetAsPtr(mLastPressedBox, BonesBox)->
                         getBoneAtAbsPos(mLastMouseEventPosRel);
                 if(!isShiftPressed()) {
                     clearBonesSelection();
@@ -173,7 +173,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
 
     foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
         if(box->SWT_isPaintBox()) {
-            PaintBox *paintBox = getAsPtr(box, PaintBox);
+            PaintBox *paintBox = GetAsPtr(box, PaintBox);
             menu->addSeparator();
             menu->addAction("New Paint Frame")->setObjectName(
                         "canvas_new_paint_frame");
@@ -256,20 +256,20 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     } else if(selectedAction->objectName() == "canvas_new_paint_frame") {
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = getAsPtr(box, PaintBox);
+                PaintBox* paintBox = GetAsPtr(box, PaintBox);
                 paintBox->newPaintFrameOnCurrentFrame();
             }
         }
     } else if(selectedAction->objectName() == "canvas_new_empty_paint_frame") {
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = getAsPtr(box, PaintBox);
+                PaintBox* paintBox = GetAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
             }
         }
     } else if(selectedAction->objectName() == "canvas_setup_animation_frames") {
         PaintBoxSettingsDialog dialog;
-        PaintBox* firstPaintBox = getAsPtr(mSelectedBoxes.first(), PaintBox);
+        PaintBox* firstPaintBox = GetAsPtr(mSelectedBoxes.first(), PaintBox);
         int frameStep = firstPaintBox->getFrameStep();
         int overlapFrames = firstPaintBox->getOverlapFrames();
         dialog.setOverlapFrames(overlapFrames);
@@ -280,7 +280,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         overlapFrames = dialog.getOverlapFrames();
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = getAsPtr(box, PaintBox);
+                PaintBox* paintBox = GetAsPtr(box, PaintBox);
                 paintBox->setOverlapFrames(overlapFrames);
                 paintBox->setFrameStep(frameStep);
             }
@@ -288,7 +288,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     } else if(selectedAction->objectName() == "canvas_draft") {
         foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = getAsPtr(box, PaintBox);
+                PaintBox* paintBox = GetAsPtr(box, PaintBox);
                 paintBox->setIsDraft(selectedAction->isChecked());
             }
         }
@@ -304,7 +304,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
             if(img.load(importPath)) {
                 foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
                     if(box->SWT_isPaintBox()) {
-                        PaintBoxQSPtr paintBox = getAsSPtr(box, PaintBox);
+                        PaintBoxQSPtr paintBox = GetAsSPtr(box, PaintBox);
                         paintBox->loadFromImage(img);
                     }
                 }
@@ -465,7 +465,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     if(id >= 0) {
                         auto newLink = listOfCanvas.at(id)->createLink();
                         mCurrentBoxesGroup->addContainedBox(newLink);
-                        getAsPtr(newLink, InternalLinkCanvas)->centerPivotPosition();
+                        GetAsPtr(newLink, InternalLinkCanvas)->centerPivotPosition();
                     }
                 }
             } else {
@@ -615,7 +615,7 @@ void Canvas::handleLeftButtonMousePress() {
             Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
                 if(box->SWT_isParticleBox()) {
                     if(box->absPointInsidePath(mLastMouseEventPosRel)) {
-                        getAsPtr(box, ParticleBox)->addEmitterAtAbsPos(
+                        GetAsPtr(box, ParticleBox)->addEmitterAtAbsPos(
                                     mLastMouseEventPosRel);
                         break;
                     }
@@ -639,7 +639,7 @@ void Canvas::handleLeftButtonMousePress() {
 
             if(mLastPressedPoint != nullptr) {
                 if(mLastPressedPoint->isBonePoint()) {
-                    bonePt = getAsPtr(mLastPressedPoint, BonePt);
+                    bonePt = GetAsPtr(mLastPressedPoint, BonePt);
                     if(bonePt->getTipBone() == nullptr) {
                         mLastMouseEventPosRel = bonePt->getAbsolutePos();
                         bonePt = nullptr;
@@ -652,7 +652,7 @@ void Canvas::handleLeftButtonMousePress() {
                 if(mSelectedBoxes.count() > 0) {
                     BoundingBox *lastSelected = mSelectedBoxes.last();
                     if(lastSelected->SWT_isBonesBox()) {
-                        boneBox = getAsSPtr(lastSelected, BonesBox);
+                        boneBox = GetAsSPtr(lastSelected, BonesBox);
 
                         newBone = Bone::createBone(boneBox.data());
 
@@ -717,7 +717,7 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
         if(event->button() == Qt::LeftButton) {
             foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
                 if(box->SWT_isPaintBox()) {
-                    PaintBox *paintBox = getAsPtr(box, PaintBox);
+                    PaintBox *paintBox = GetAsPtr(box, PaintBox);
                     paintBox->mousePressEvent(mLastMouseEventPosRel.x(),
                                          mLastMouseEventPosRel.y(),
                                          event->timestamp(), 0.5,
@@ -1404,7 +1404,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
                        mCurrentMode == MOVE_POINT) &&
                       boxAt->SWT_isTextBox()) {
                 releaseMouseAndDontTrack();
-                getAsPtr(boxAt, TextBox)->openTextEditor();
+                GetAsPtr(boxAt, TextBox)->openTextEditor();
             } else if(mCurrentMode == MOVE_PATH &&
                       boxAt->SWT_isVectorPath()) {
                 mCanvasWindow->setCanvasMode(MOVE_POINT);

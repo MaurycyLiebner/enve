@@ -1,41 +1,30 @@
 #ifndef BRUSHSELECTIONWIDGET_H
 #define BRUSHSELECTIONWIDGET_H
 
-#include <QWidget>
-#include <QGridLayout>
+class BrushCollection;
+#include <QTabWidget>
+#include <mypaint-brush.h>
+#include "brushwidget.h"
+class FlowLayout;
+#include "itemselectionwidget.h"
 
-class Brush;
-
-class BrushSelectionWidget : public QWidget {
+class BrushSelectionWidget : public ItemSelectionWidget<BrushWrapper> {
     Q_OBJECT
 public:
-    explicit BrushSelectionWidget(QWidget *parent = nullptr);
-    const Brush *getCurrentBrush() const;
-    void duplicateCurrentBrush();
-    void saveBrushesForProject(QIODevice *target);
-    void readBrushesForProject(QIODevice *target);
-protected:
-    Brush *getBrushAt(const QPoint &pos);
-    int maxNumberColumns() const;
-    int maxNumberRows() const;
-    void paintEvent(QPaintEvent *);
-    void mousePressEvent(QMouseEvent *event);
-    void resizeEvent(QResizeEvent *);
-    void addBrush(Brush *brush);
-    void removeCurrentBrush();
+    BrushSelectionWidget(QWidget* parent = nullptr);
+    ~BrushSelectionWidget() {}
+
 signals:
-    void brushSelected(const Brush*);
-    void brushReplaced(const Brush*, const Brush*); // second one is new
+    void currentBrushChanged(BrushWrapper*);
+    void brushBookmarked(BrushWrapper*);
 public slots:
-    void setCurrentBrush(const Brush *brush);
+    void brushSelected(BrushWrapper *wrapper);
+protected:
+    void emitCurrentItemChanged(BrushWrapper* brushWrapper) {
+        emit currentBrushChanged(brushWrapper);
+    }
 private:
-    void removeBrush(Brush *brush);
-    int mNumberColumns = 0;
-    int mDimension = 48;
-    int mMargin = 4;
-    QList<Brush*> mAllBrushes;
-    Brush *mDefaultBrush = nullptr;
-    Brush *mCurrentBrush = nullptr;
+    void loadCollectionFromDir(const QString& mainDirPath);
 };
 
 #endif // BRUSHSELECTIONWIDGET_H

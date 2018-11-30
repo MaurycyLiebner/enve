@@ -195,7 +195,7 @@ void BoundingBoxRenderData::schedulerProccessed() {
 void BoundingBoxRenderData::addSchedulerNow() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return;
-    parentBoxT->addScheduler(getAsSPtr(this, _ScheduledExecutor));
+    parentBoxT->addScheduler(GetAsSPtr(this, _ScheduledExecutor));
 }
 
 void BoundingBoxRenderData::dataSet() {

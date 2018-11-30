@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <QScreen>
 #include <QDesktopWidget>
-#include "ColorWidgets/colorsettingswidget.h"
+#include "colorsettingswidget.h"
 #include <QDebug>
 #include "global.h"
 #include <QWindow>

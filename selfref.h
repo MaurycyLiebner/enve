@@ -89,7 +89,7 @@ private:
 #include <memory>
 template <class T>
 class StdPointer;
-
+template <class T> using sptr = std::shared_ptr<T>;
 class StdSelfRef {
     template <class T> friend class StdPointer;
 public:

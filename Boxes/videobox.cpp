@@ -72,7 +72,7 @@ void VideoBox::setFilePath(const QString &path) {
         auto currentHandler =
                 FileSourcesCache::getHandlerForFilePath(mSrcFilePath);
         mAnimationCacheHandler =
-                getAsPtr(currentHandler, AnimationCacheHandler);
+                GetAsPtr(currentHandler, AnimationCacheHandler);
         if(mAnimationCacheHandler == nullptr) {
             VideoCacheHandler* newHandler =
                     VideoCacheHandler::createNewHandler(mSrcFilePath);
@@ -113,7 +113,7 @@ bool hasSound(const char* path) {
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
         if(mSound == nullptr) {
-            auto flar = getAsPtr(mDurationRectangle, FixedLenAnimationRect);
+            auto flar = GetAsPtr(mDurationRectangle, FixedLenAnimationRect);
             mSound = SPtrCreate(SingleSound)(mSrcFilePath, flar);
             ca_addChildAnimator(mSound);
             if(mParentGroup != nullptr) {

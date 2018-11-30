@@ -99,11 +99,11 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 bool ComplexAnimator::SWT_isComplexAnimator() { return true; }
 
 ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(const int &frame) {
-    return getAsPtr(anim_getKeyAtAbsFrame(frame), ComplexKey);
+    return GetAsPtr(anim_getKeyAtAbsFrame(frame), ComplexKey);
 }
 
 ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
-    return getAsPtr(anim_getKeyAtRelFrame(frame), ComplexKey);
+    return GetAsPtr(anim_getKeyAtRelFrame(frame), ComplexKey);
 }
 
 void ComplexAnimator::ca_addChildAnimator(const PropertyQSPtr& childAnimator,
@@ -148,7 +148,7 @@ int ComplexAnimator::getChildPropertyIndex(Property *child) {
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
     Q_FOREACH(const KeySPtr &ckey, anim_mKeys) {
-        ComplexKeySPtr complexKey = getAsSPtr(ckey, ComplexKey);
+        ComplexKeySPtr complexKey = GetAsSPtr(ckey, ComplexKey);
         if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
             if(complexKey->isEmpty() ) {
@@ -223,7 +223,7 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
         if(property->prp_getName() == name) {
             return property.get();
         } else if(property->SWT_isComplexAnimator()) {
-            Property* propT = getAsPtr(property, ComplexAnimator)->
+            Property* propT = GetAsPtr(property, ComplexAnimator)->
                     ca_getFirstDescendantWithName(name);
             if(propT != nullptr) return propT;
         }
@@ -235,7 +235,7 @@ QrealAnimator *ComplexAnimator::getQrealAnimatorIfIsTheOnlyOne() {
     if(ca_mChildAnimators.count() == 1) {
         Property* prop = ca_mChildAnimators.first().get();
         if(prop->SWT_isQrealAnimator()) {
-            return getAsPtr(prop, QrealAnimator);
+            return GetAsPtr(prop, QrealAnimator);
         }
     }
     return nullptr;
@@ -363,7 +363,7 @@ void ComplexAnimator::anim_saveCurrentValueAsKey() {
     } else {
         Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
             if(property->SWT_isAnimator()) {
-                getAsPtr(property, Animator)->anim_saveCurrentValueAsKey();
+                GetAsPtr(property, Animator)->anim_saveCurrentValueAsKey();
             }
         }
     }
@@ -418,7 +418,7 @@ void ComplexAnimator::ca_removeDescendantsKey(Key* key) {
     if(collection == nullptr) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
-        anim_removeKey(getAsSPtr(collection, ComplexKey));
+        anim_removeKey(GetAsSPtr(collection, ComplexKey));
     }
 }
 
@@ -488,7 +488,7 @@ void ComplexKey::setRelFrame(const int &frame) {
 }
 
 void ComplexKey::mergeWith(const KeySPtr& key) {
-    getAsPtr(key, ComplexKey)->margeAllKeysToKey(this);
+    GetAsPtr(key, ComplexKey)->margeAllKeysToKey(this);
     key->removeFromAnimator();
 }
 
@@ -496,7 +496,7 @@ void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
     QList<KeyPtr> keys = mKeys;
     Q_FOREACH(const KeyPtr& key, keys) {
         removeAnimatorKey(key);
-        target->addOrMergeKey(getAsSPtr(key, Key));
+        target->addOrMergeKey(GetAsSPtr(key, Key));
     }
 }
 
@@ -552,7 +552,7 @@ bool ComplexKey::hasKey(Key *key) {
 }
 
 bool ComplexKey::differsFromKey(Key *otherKey) {
-    ComplexKey* otherComplexKey = getAsPtr(otherKey, ComplexKey);
+    ComplexKey* otherComplexKey = GetAsPtr(otherKey, ComplexKey);
     if(getChildKeysCount() == otherComplexKey->getChildKeysCount()) {
         Q_FOREACH(const KeyPtr& key, mKeys) {
             if(otherComplexKey->hasSameKey(key)) continue;

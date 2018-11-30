@@ -216,7 +216,7 @@ QPointF InternalLinkGroupBox::getRelCenterPosition() {
 }
 
 BoxesGroup *InternalLinkGroupBox::getLinkTarget() const {
-    return getAsPtr(mBoxTarget->getTarget(), BoxesGroup);
+    return GetAsPtr(mBoxTarget->getTarget(), BoxesGroup);
 }
 
 BoundingBoxQSPtr InternalLinkGroupBox::createLinkForLinkGroup() {
@@ -268,8 +268,8 @@ void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
     InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
 
     BoxesGroup* finalTarget = getFinalTarget();
-    auto canvasData = getAsSPtr(data, LinkCanvasRenderData);
-    CanvasQSPtr canvasTarget = getAsSPtr(finalTarget, Canvas);
+    auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
+    CanvasQSPtr canvasTarget = GetAsSPtr(finalTarget, Canvas);
     canvasData->bgColor = QColorToSkColor(canvasTarget->getBgColorAnimator()->
             getColorAtRelFrameF(relFrame));
     //qreal res = getParentCanvas()->getResolutionFraction();
@@ -277,7 +277,7 @@ void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
     canvasData->canvasWidth = canvasTarget->getCanvasWidth();//*res;
     if(mParentGroup->SWT_isLinkBox()) {
         canvasData->clipToCanvas =
-                getAsPtr(getLinkTarget(), InternalLinkCanvas)->clipToCanvas();
+                GetAsPtr(getLinkTarget(), InternalLinkCanvas)->clipToCanvas();
     } else {
         canvasData->clipToCanvas = mClipToCanvas->getValue();
     }

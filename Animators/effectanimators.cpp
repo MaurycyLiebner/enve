@@ -13,7 +13,7 @@ void EffectAnimators::addEffect(const PixmapEffectQSPtr& effect) {
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
     Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
-        auto pixmapEffect = getAsPtr(effect.get(), PixmapEffect);
+        auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMargin();
         }
@@ -24,7 +24,7 @@ qreal EffectAnimators::getEffectsMargin() const {
 qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
     qreal newMargin = 0.;
     Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
-        auto pixmapEffect = getAsPtr(effect.get(), PixmapEffect);
+        auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
         }
@@ -35,7 +35,7 @@ qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
 qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const {
     qreal newMargin = 0.;
     Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
-        auto pixmapEffect = getAsPtr(effect.get(), PixmapEffect);
+        auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(qRound(relFrame));
         }
@@ -47,7 +47,7 @@ void EffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
         BoundingBoxRenderData* data) {
     Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
-        auto pixmapEffect = getAsPtr(effect, PixmapEffect);
+        auto pixmapEffect = GetAsPtr(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {
             PixmapEffectRenderDataSPtr effectRenderData =
                     pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame, data);

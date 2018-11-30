@@ -21,7 +21,7 @@ void QStringAnimator::anim_saveCurrentValueAsKey() {
         anim_appendKey(newKey);
         anim_mKeyOnCurrentFrame = newKey.get();
     } else {
-        getAsPtr(anim_mKeyOnCurrentFrame, QStringKey)->setText(mCurrentText);
+        GetAsPtr(anim_mKeyOnCurrentFrame, QStringKey)->setText(mCurrentText);
     }
 }
 
@@ -59,7 +59,7 @@ QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
     if(key == nullptr) {
         key = anim_getNextKey(relFrame);
     }
-    return getAsPtr(key, QStringKey)->getText();
+    return GetAsPtr(key, QStringKey)->getText();
 }
 
 void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
@@ -118,5 +118,5 @@ QStringKey::QStringKey(const QString &stringT,
 }
 
 bool QStringKey::differsFromKey(Key *key) {
-    return getAsPtr(key, QStringKey)->getText() != mText;
+    return GetAsPtr(key, QStringKey)->getText() != mText;
 }

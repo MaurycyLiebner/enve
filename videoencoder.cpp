@@ -11,7 +11,7 @@ VideoEncoder::VideoEncoder() {
 void VideoEncoder::addContainer(CacheContainer *cont) {
     if(cont == nullptr) return;
     cont->setBlocked(true);
-    mNextContainers.append(getAsSPtr(cont, CacheContainer));
+    mNextContainers.append(GetAsSPtr(cont, CacheContainer));
     addScheduler();
 }
 

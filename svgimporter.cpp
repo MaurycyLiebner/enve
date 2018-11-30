@@ -537,7 +537,7 @@ BoxesGroupQSPtr loadBoxesGroup(const QDomElement &groupElement,
             parentGroup->addContainedBox(boxesGroup);
         }
     } else {
-        boxesGroup = getAsSPtr(parentGroup, BoxesGroup);
+        boxesGroup = GetAsSPtr(parentGroup, BoxesGroup);
     }
 
     for(int i = 0; i < allRootChildNodes.count(); i++) {
@@ -1995,7 +1995,7 @@ void FillSvgAttributes::apply(BoundingBox *box, const bool& isFill) {
         setting = SPtrCreate(PaintSetting)(isFill);
     }
     if(box->SWT_isPathBox()) {
-        setting->apply(getAsPtr(box, PathBox));
+        setting->apply(GetAsPtr(box, PathBox));
     }
 }
 
@@ -2057,7 +2057,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
 void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
     box->getTransformAnimator()->setOpacity(mOpacity);
     if(box->SWT_isPathBox()) {
-        PathBox* path = getAsPtr(box, PathBox);
+        PathBox* path = GetAsPtr(box, PathBox);
         qreal m11 = mRelTransform.m11();
         qreal m12 = mRelTransform.m12();
         qreal m21 = mRelTransform.m21();
@@ -2069,7 +2069,7 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
                                 (sxAbs + syAbs)*0.5);
         mFillAttributes.apply(path);
         if(box->SWT_isTextBox()) {
-            TextBox* text = getAsPtr(box, TextBox);
+            TextBox* text = GetAsPtr(box, TextBox);
             text->setFont(mTextAttributes.getFont());
         }
     }

@@ -222,7 +222,7 @@ public:
                             const qreal &relFrame,
                             BoundingBoxRenderData* data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-        auto groupData = getAsPtr(data, BoxesGroupRenderData);
+        auto groupData = GetAsPtr(data, BoxesGroupRenderData);
         groupData->childrenRenderData.clear();
         qreal childrenEffectsMargin = 0.;
         qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -236,7 +236,7 @@ public:
                 }
                 boxRenderData->addDependent(data);
                 groupData->childrenRenderData <<
-                        getAsSPtr(boxRenderData, BoundingBoxRenderData);
+                        GetAsSPtr(boxRenderData, BoundingBoxRenderData);
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
                              childrenEffectsMargin);
@@ -247,7 +247,7 @@ public:
 
     BoxesGroup *getFinalTarget() {
         if(getLinkTarget()->SWT_isLinkBox()) {
-            return getAsPtr(getLinkTarget(), InternalLinkGroupBox)->getFinalTarget();
+            return GetAsPtr(getLinkTarget(), InternalLinkGroupBox)->getFinalTarget();
         }
         return getLinkTarget();
     }
@@ -272,7 +272,7 @@ public:
 public slots:
     void setTargetSlot(BoundingBox *target) {
         if(target->SWT_isBoxesGroup()) {
-            setLinkTarget(getAsPtr(target, BoxesGroup));
+            setLinkTarget(GetAsPtr(target, BoxesGroup));
         }
     }
 protected:

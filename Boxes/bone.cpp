@@ -221,7 +221,7 @@ BonesBox *Bone::getParentBox() {
     if(mParentBonesBox == nullptr) {
         return mParentBone->getParentBox();
     }
-    return getAsPtr(mParentBonesBox, BonesBox);
+    return GetAsPtr(mParentBonesBox, BonesBox);
 }
 
 Bone *Bone::getBoneAtRelPos(const QPointF &relPos) {
@@ -331,7 +331,7 @@ void Bone::setConnectedToParent(const bool &bT) {
     mConnectedToParent = bT;
     if(mParentBone == nullptr) return;
     if(bT) {
-        mRootPt = getAsSPtr(mParentBone->getTipPt(), BonePt);
+        mRootPt = GetAsSPtr(mParentBone->getTipPt(), BonePt);
     } else {
         mRootPt = SPtrCreate(BonePt)(mTransformAnimator.get());
     }
@@ -447,7 +447,7 @@ void Bone::setParentBone(Bone *parentBone) {
 
     mTransformAnimator->setParentTransformAnimator(
                 parentBone->getTransformAnimator());
-    mRootPt = getAsSPtr(parentBone->getTipPt(), BonePt);
+    mRootPt = GetAsSPtr(parentBone->getTipPt(), BonePt);
     setAbsRootPos(mRootPt->getAbsolutePos());
     mRootPt->addRootBone(this);
     mParentBone = parentBone;

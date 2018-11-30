@@ -23,7 +23,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(
     QList<PathBox*> pathBoxes;
     foreach(const QSharedPointer<BoundingBox> &pathBox, boxList) {
         if(pathBox->SWT_isPathBox()) {
-            pathBoxes << getAsPtr(pathBox.data(), PathBox);
+            pathBoxes << GetAsPtr(pathBox.data(), PathBox);
         }
     }
     if(pathBoxes.count() < 2) {
@@ -53,7 +53,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
     QList<PathBox*> pathBoxes;
     foreach(const QSharedPointer<BoundingBox> &pathBox, boxList) {
         if(pathBox->SWT_isPathBox()) {
-            pathBoxes << getAsPtr(pathBox, PathBox);
+            pathBoxes << GetAsPtr(pathBox, PathBox);
         }
     }
     if(pathBoxes.count() < 2) {

@@ -94,7 +94,7 @@ void VectorPathAnimator::startPathChange() {
         anim_saveCurrentValueAsKey();
     }
     if(prp_isKeyOnCurrentFrame()) {
-        getAsPtr(anim_mKeyOnCurrentFrame, PathKey)->startPathChange();
+        GetAsPtr(anim_mKeyOnCurrentFrame, PathKey)->startPathChange();
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
         PathContainer::startPathChange();
@@ -106,7 +106,7 @@ void VectorPathAnimator::startPathChange() {
 void VectorPathAnimator::cancelPathChange() {
     if(!mPathChanged) return;
     if(prp_isKeyOnCurrentFrame()) {
-        getAsPtr(anim_mKeyOnCurrentFrame, PathKey)->cancelPathChange();
+        GetAsPtr(anim_mKeyOnCurrentFrame, PathKey)->cancelPathChange();
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
         PathContainer::cancelPathChange();
@@ -120,7 +120,7 @@ bool VectorPathAnimator::SWT_isVectorPathAnimator() { return true; }
 void VectorPathAnimator::finishedPathChange() {
     if(!mPathChanged) return;
     if(prp_isKeyOnCurrentFrame()) {
-        getAsPtr(anim_mKeyOnCurrentFrame, PathKey)->finishedPathChange();
+        GetAsPtr(anim_mKeyOnCurrentFrame, PathKey)->finishedPathChange();
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
         PathContainer::finishedPathChange();
@@ -133,7 +133,7 @@ void VectorPathAnimator::finishedPathChange() {
 void VectorPathAnimator::setElementPos(const int &index,
                                        const SkPoint &pos) {
     if(prp_isKeyOnCurrentFrame()) {
-        getAsPtr(anim_mKeyOnCurrentFrame, PathKey)->setElementPos(index, pos);
+        GetAsPtr(anim_mKeyOnCurrentFrame, PathKey)->setElementPos(index, pos);
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
         PathContainer::setElementPos(index, pos);
@@ -145,7 +145,7 @@ void VectorPathAnimator::setElementPos(const int &index,
 void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
     if(!anim_mIsRecording) prp_setRecording(true);
 
-    PathKeySPtr newKey = getAsSPtr(anim_getKeyAtRelFrame(relFrame), PathKey);
+    PathKeySPtr newKey = GetAsSPtr(anim_getKeyAtRelFrame(relFrame), PathKey);
 
     if(newKey == nullptr) {
         newKey = SPtrCreate(PathKey)(relFrame, getPathAtRelFrame(relFrame),
@@ -168,7 +168,7 @@ void VectorPathAnimator::anim_saveCurrentValueAsKey() {
         anim_appendKey(newKey, true, false);
         anim_mKeyOnCurrentFrame = newKey.get();
     } else {
-        anim_saveCurrentValueToKey(getAsPtr(anim_mKeyOnCurrentFrame, PathKey));
+        anim_saveCurrentValueToKey(GetAsPtr(anim_mKeyOnCurrentFrame, PathKey));
     }
 }
 
@@ -186,10 +186,10 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, relFrame) ) {
         if(prevId == nextId) {
-            pathToRuturn = getAsPtr(anim_mKeys.at(prevId), PathKey)->getPath();
+            pathToRuturn = GetAsPtr(anim_mKeys.at(prevId), PathKey)->getPath();
         } else {
-            PathKey* prevKey = getAsPtr(anim_mKeys.at(prevId), PathKey);
-            PathKey* nextKey = getAsPtr(anim_mKeys.at(nextId), PathKey);
+            PathKey* prevKey = GetAsPtr(anim_mKeys.at(prevId), PathKey);
+            PathKey* nextKey = GetAsPtr(anim_mKeys.at(nextId), PathKey);
             int prevRelFrame = prevKey->getRelFrame();
             int nextRelFrame = nextKey->getRelFrame();
             SkScalar weight = (static_cast<SkScalar>(relFrame) - prevRelFrame)/
@@ -226,10 +226,10 @@ SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame,
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrameF(&prevId, &nextId, relFrame) ) {
         if(prevId == nextId) {
-            pathToRuturn = getAsPtr(anim_mKeys.at(prevId), PathKey)->getPath();
+            pathToRuturn = GetAsPtr(anim_mKeys.at(prevId), PathKey)->getPath();
         } else {
-            PathKey* prevKey = getAsPtr(anim_mKeys.at(prevId), PathKey);
-            PathKey* nextKey = getAsPtr(anim_mKeys.at(nextId), PathKey);
+            PathKey* prevKey = GetAsPtr(anim_mKeys.at(prevId), PathKey);
+            PathKey* nextKey = GetAsPtr(anim_mKeys.at(nextId), PathKey);
             int prevRelFrame = prevKey->getRelFrame();
             int nextRelFrame = nextKey->getRelFrame();
             SkScalar weight = (static_cast<SkScalar>(relFrame) - prevRelFrame)/
@@ -489,7 +489,7 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                                          SkPointToQPointF(mElementsPos.at(nextPtId + 1)));
             } else {
                 foreach(const KeySPtr &key, anim_mKeys) {
-                    getAsPtr(key, PathKey)->
+                    GetAsPtr(key, PathKey)->
                             addNewPointAtTBetweenPts(static_cast<SkScalar>(pressedT),
                                                      prevPtId,
                                                      nextPtId,
@@ -556,7 +556,7 @@ void VectorPathAnimator::updateNodePointsFromElements() {
                 parentCanvas->removePointFromSelection(oldOldNode);
             }
         }
-        mPoints.removeOne(getAsSPtr(oldOldNode, NodePoint));
+        mPoints.removeOne(GetAsSPtr(oldOldNode, NodePoint));
     }
     if(mPathClosed) {
         newFirstPt->setPointAsPrevious(lastP);
@@ -577,7 +577,7 @@ void VectorPathAnimator::finalizeNodesRemove() {
         removeNodeSettingsAt(nodeId);
         PathContainer::removeNodeAt(nodeId);
         foreach(const KeySPtr &key, anim_mKeys) {
-            getAsPtr(key, PathKey)->removeNodeAt(nodeId);
+            GetAsPtr(key, PathKey)->removeNodeAt(nodeId);
         }
     }
     mNodesToRemove.clear();
@@ -591,7 +591,7 @@ void VectorPathAnimator::removeNodeAtAndApproximate(const int &nodeId) {
     setNodeCtrlsMode(nodeId - 1, CtrlsMode::CTRLS_CORNER);
     PathContainer::removeNodeAtAndApproximate(nodeId);
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->removeNodeAtAndApproximate(nodeId);
+        GetAsPtr(key, PathKey)->removeNodeAtAndApproximate(nodeId);
     }
     mElementsUpdateNeeded = true;
 }
@@ -629,7 +629,7 @@ void VectorPathAnimator::setNodeCtrlsMode(const int &nodeId,
 void VectorPathAnimator::setPathClosed(const bool &bT) {
     PathContainer::setPathClosed(bT);
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->setPathClosed(bT);
+        GetAsPtr(key, PathKey)->setPathClosed(bT);
     }
     if(prp_hasKeys()) {
         setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
@@ -659,7 +659,7 @@ void VectorPathAnimator::selectAllPoints(Canvas *canvas) {
 void VectorPathAnimator::applyTransformToPoints(const QMatrix &transform) {
     PathContainer::applyTransformToPoints(transform);
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->applyTransformToPoints(transform);
+        GetAsPtr(key, PathKey)->applyTransformToPoints(transform);
     }
     updateNodePointsFromElements();
 }
@@ -761,7 +761,7 @@ void VectorPathAnimator::moveElementPosSubset(int firstId,
                                               int targetId) {
     PathContainer::moveElementPosSubset(firstId, count, targetId);
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->moveElementPosSubset(firstId, count, targetId);
+        GetAsPtr(key, PathKey)->moveElementPosSubset(firstId, count, targetId);
     }
 }
 
@@ -792,7 +792,7 @@ void VectorPathAnimator::getElementPosList(QList<SkPoint> *elementPosList) {
 
 void VectorPathAnimator::getKeysList(QList<PathKeySPtr> &pathKeyList) {
     foreach(const KeySPtr &key, anim_mKeys) {
-        pathKeyList.append(getAsSPtr(key, PathKey));
+        pathKeyList.append(GetAsSPtr(key, PathKey));
     }
 }
 
@@ -813,7 +813,7 @@ void VectorPathAnimator::getKeysDataForConnection(
                         targetPath->getPathAtRelFrame(relFrame));
         } else {
             targetKeyElements =
-                    getAsPtr(keyAtRelFrame, PathKey)->getElementsPosList();
+                    GetAsPtr(keyAtRelFrame, PathKey)->getElementsPosList();
         }
         if(addSrcFirst) {
             combinedKeyData.append(targetKeyElements);
@@ -873,7 +873,7 @@ void VectorPathAnimator::revertElementPosSubset(
         int count) {
     PathContainer::revertElementPosSubset(firstId, count);
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key.get(), PathKey)->revertElementPosSubset(firstId, count);
+        GetAsPtr(key.get(), PathKey)->revertElementPosSubset(firstId, count);
     }
 }
 
@@ -910,7 +910,7 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
             newSinglePath = SPtrCreate(VectorPathAnimator)(
                         nodeSettings, mParentPathAnimator);
             foreach(const KeySPtr &key, anim_mKeys) {
-                getAsPtr(key, PathKey)->createNewKeyFromSubsetForPath(
+                GetAsPtr(key, PathKey)->createNewKeyFromSubsetForPath(
                                              newSinglePath.get(),
                                              nextPt->getPtId() - 1,
                                              -1);
@@ -951,7 +951,7 @@ NodePoint* VectorPathAnimator::createNewNode(const int &targetNodeId,
                     QPointFToSkPoint(relPos),
                     QPointFToSkPoint(endRelPos - relPos));
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->addNodeElements(nodePtId,
+        GetAsPtr(key, PathKey)->addNodeElements(nodePtId,
                         QPointFToSkPoint(startRelPos - relPos),
                         QPointFToSkPoint(relPos),
                         QPointFToSkPoint(endRelPos - relPos));
@@ -1087,7 +1087,7 @@ void VectorPathAnimator::updateNodePointIds() {
 void VectorPathAnimator::shiftAllPointsForAllKeys(const int &by) {
     PathContainer::shiftAllPoints(by);
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->shiftAllPoints(by);
+        GetAsPtr(key, PathKey)->shiftAllPoints(by);
     }
     setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
 }
@@ -1096,7 +1096,7 @@ void VectorPathAnimator::revertAllPointsForAllKeys() {
     PathContainer::revertAllPoints();
     revertAllNodeSettings();
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->revertAllPoints();
+        GetAsPtr(key, PathKey)->revertAllPoints();
     }
     setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
 }
@@ -1160,7 +1160,7 @@ void VectorPathAnimator::mergeNodes(const int &nodeId1,
     PathContainer::mergeNodes(nodeId1, nodeId2);
     setCtrlsModeForNode(minNodeId, getNodeCtrlsMode(minNodeId));
     foreach(const KeySPtr &key, anim_mKeys) {
-        getAsPtr(key, PathKey)->mergeNodes(nodeId1, nodeId2);
+        GetAsPtr(key, PathKey)->mergeNodes(nodeId1, nodeId2);
     }
 
     setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));

@@ -1010,7 +1010,7 @@ void MainWindow::setCurrentBox(BoundingBox *box) {
         mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
                                                 box->getStrokeSettings());
         if(box->SWT_isTextBox()) {
-            TextBox *txtBox = getAsPtr(box, TextBox);
+            TextBox *txtBox = GetAsPtr(box, TextBox);
             mFontWidget->setCurrentSettings(txtBox->getFontSize(),
                                             txtBox->getFontFamily(),
                                             txtBox->getFontStyle());

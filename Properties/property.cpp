@@ -140,7 +140,7 @@ bool Property::isAltPressed(QKeyEvent *event) {
 
 BoundingBox *Property::getLastSetParentBoundingBoxAncestor() {
     if(mLastSetParent == nullptr) return nullptr;
-    if(mLastSetParent->SWT_isBoundingBox()) return getAsPtr(mLastSetParent, BoundingBox);
+    if(mLastSetParent->SWT_isBoundingBox()) return GetAsPtr(mLastSetParent, BoundingBox);
     return mLastSetParent->getLastSetParentBoundingBoxAncestor();
 }
 

@@ -23,7 +23,7 @@ void OperationPathEffect::filterPathForRelFrame(const int &relFrame,
                                           SkPath *dst,
                                           const qreal &,
                                           const bool &) {
-    PathBox *pathBox = getAsPtr(mBoxTarget->getTarget(), PathBox);
+    PathBox *pathBox = GetAsPtr(mBoxTarget->getTarget(), PathBox);
     QString operation = mOperationType->getCurrentValueName();
     applyOperation(relFrame, src, dst, pathBox,
              mParentPathBox, operation);
@@ -33,7 +33,7 @@ void OperationPathEffect::filterPathForRelFrameF(const qreal &relFrame,
                                            const SkPath &src,
                                            SkPath *dst,
                                            const bool &) {
-    PathBox *pathBox = getAsPtr(mBoxTarget->getTarget(), PathBox);
+    PathBox *pathBox = GetAsPtr(mBoxTarget->getTarget(), PathBox);
     QString operation = mOperationType->getCurrentValueName();
     applyOperationF(relFrame, src, dst, pathBox,
               mParentPathBox, operation);
