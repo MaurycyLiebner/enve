@@ -2,7 +2,6 @@
 #define ITEMWIDGET_H
 #include <QWidget>
 #include "selfref.h"
-#include "tablethoverfix.h"
 
 class ItemWidgetQObject : public QWidget {
     Q_OBJECT
@@ -50,9 +49,7 @@ protected:
     void enterEvent(QEvent*);
     void leaveEvent(QEvent*);
     void mousePressEvent(QMouseEvent *event);
-#if TABLET_MOUSE_SYNTH == TABLET_DEFAULT_MOUSE_SYNTHESIZE
-    void tabletEvent(QTabletEvent* event);
-#endif
+//    void tabletEvent(QTabletEvent* event);
 private:
     bool mDrawName = false;
     sptr<Item> mItem;

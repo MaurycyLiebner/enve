@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <mypaint-brush.h>
 #include "selfref.h"
-#include "tablethoverfix.h"
 #include "itemwidget.h"
 #include "itemwrapper.h"
 

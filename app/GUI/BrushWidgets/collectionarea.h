@@ -3,7 +3,6 @@
 
 #include <QMouseEvent>
 #include <QScrollArea>
-#include "tablethoverfix.h"
 #include "selfref.h"
 #include "itemwidget.h"
 class QVBoxLayout;

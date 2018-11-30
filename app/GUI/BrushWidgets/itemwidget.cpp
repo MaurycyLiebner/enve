@@ -82,18 +82,16 @@ void ItemWidget<Item>::mousePressEvent(QMouseEvent *event) {
     }
 }
 
-#if TABLET_MOUSE_SYNTH == TABLET_DEFAULT_MOUSE_SYNTHESIZE
-template <class Item>
-void CollectionWidget::tabletEvent(QTabletEvent *event) {
-    if(mItem == nullptr) return;
-    if(event->type() == QTabletEvent::TabletPress) {
-        if(event->button() == Qt::LeftButton) {
-            if(mSelected) return;
-            emit selected(mItem);
-        }
-    }
-}
-#endif
+//template <class Item>
+//void CollectionWidget::tabletEvent(QTabletEvent *event) {
+//    if(mItem == nullptr) return;
+//    if(event->type() == QTabletEvent::TabletPress) {
+//        if(event->button() == Qt::LeftButton) {
+//            if(mSelected) return;
+//            emit selected(mItem);
+//        }
+//    }
+//}
 
 template <class Item>
 ItemWidget<Item> *ItemWidget<Item>::createWidget(const sptr<Item>& itemSptr,
