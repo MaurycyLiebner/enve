@@ -25,7 +25,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     stdpointer.cpp \
     selfref.cpp \
-    stdselfref.cpp
+    stdselfref.cpp \
+    sharedpointerdefs.h
 
 HEADERS += \
         core_global.h \ 

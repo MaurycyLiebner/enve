@@ -380,7 +380,6 @@ HEADERS  += \
     skimagecopy.h \
     Boxes/renderdatahandler.h \
     Boxes/boundingboxrenderdata.h \
-    sharedpointerdefs.h \
     application.h \
     PathEffects/displacepatheffect.h \
     PathEffects/lengthpatheffect.h \
