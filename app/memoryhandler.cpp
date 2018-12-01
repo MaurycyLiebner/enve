@@ -27,6 +27,10 @@ MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
             this,
             SLOT(memoryChecked(const int &, const int &)) );
 
+    mTimer = new QTimer(this);
+    connect(mTimer, SIGNAL(timeout()),
+            mMemoryChecker, SLOT(checkMemory()) );
+    mTimer->start(500);
     mMemoryChekerThread->start();
 }
 
@@ -57,6 +61,23 @@ void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
 
 void MemoryHandler::freeMemory(const MemoryState &state,
                                const unsigned long long &minFreeBytes) {
+    if(state != mCurrentMemoryState) {
+//        qDebug() << "set state: " << state;
+        //bool worsend = state > mCurrentMemoryState;
+        if(state == NORMAL_MEMORY_STATE) {
+            disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
+            connect(mTimer, SIGNAL(timeout()),
+                    mMemoryChecker, SLOT(checkMemory()) );
+            mTimer->setInterval(1000);
+        } else if(mCurrentMemoryState == NORMAL_MEMORY_STATE) {
+            disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
+            connect(mTimer, SIGNAL(timeout()),
+                    mMemoryChecker, SLOT(checkMajorMemoryPageFault()) );
+            mTimer->setInterval(500);
+        }
+        mCurrentMemoryState = state;
+    }
+
     long long memToFree = (long long)minFreeBytes;
     if(state == LOW_MEMORY_STATE) {
         memToFree -= mMemoryScheduledToRemove;

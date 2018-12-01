@@ -31,11 +31,12 @@ public:
     void setCurrentMemoryState(const MemoryState &state);
 private:
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
-    QTimer *mTimer;
+    int mLastPgFlts = -1;
 
     unsigned long long mTotalRam = 0ULL;
     unsigned long long mLowFreeRam = 0ULL;
     unsigned long long mVeryLowFreeRam = 0ULL;
+    QTimer *mTimer;
 
 //    unsigned long long mUsedRam = 0ULL;
 //    unsigned long long mLeaveUnused = 1500000000ULL;
@@ -45,7 +46,6 @@ private:
 //    unsigned long long mMemUnit;
     static MemoryChecker *mInstance;
     QList<int> mPgFltSamples;
-    int mLastPgFlts = -1;
 private slots:
     void checkMemory();
     void checkMajorMemoryPageFault();

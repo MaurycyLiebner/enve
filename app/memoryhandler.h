@@ -7,7 +7,7 @@ class MinimalCacheContainer;
 class MemoryHandler : public QObject {
     Q_OBJECT
 public:
-    explicit MemoryHandler(QObject *parent = 0);
+    explicit MemoryHandler(QObject *parent = nullptr);
     ~MemoryHandler();
 
     void addContainer(MinimalCacheContainer *cont);
@@ -26,8 +26,10 @@ public slots:
                     const unsigned long long &minFreeBytes);
     void memoryChecked(const int& memKb, const int &totMemKb);
 private:
+    MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     long long mMemoryScheduledToRemove = 0;
     static MemoryHandler *mInstance;
+    QTimer *mTimer;
     QThread *mMemoryChekerThread;
     MemoryChecker *mMemoryChecker;
     QList<MinimalCacheContainer*> mContainers;

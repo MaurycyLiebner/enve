@@ -34,29 +34,15 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mTotalRam = getTotalRam();
     mLowFreeRam = 1800000000; // 1200000000;
     mVeryLowFreeRam = 1400000000; // 800000000;
-
-    mTimer = new QTimer(this);
-    connect(mTimer, SIGNAL(timeout()),
-            this, SLOT(checkMemory()) );
-    mTimer->start(500);
 }
 
 void MemoryChecker::setCurrentMemoryState(const MemoryState &state) {
     if(state == mCurrentMemoryState) return;
-    qDebug() << "set state: " << state;
+//    qDebug() << "set state: " << state;
     //bool worsend = state > mCurrentMemoryState;
     if(state == NORMAL_MEMORY_STATE) {
-        disconnect(mTimer, 0, this, 0);
-        connect(mTimer, SIGNAL(timeout()),
-                this, SLOT(checkMemory()) );
-        mTimer->setInterval(1000);
         mPgFltSamples.clear();
         mLastPgFlts = -1;
-    } else if(mCurrentMemoryState == NORMAL_MEMORY_STATE) {
-        disconnect(mTimer, 0, this, 0);
-        connect(mTimer, SIGNAL(timeout()),
-                this, SLOT(checkMajorMemoryPageFault()) );
-        mTimer->setInterval(500);
     }
     mCurrentMemoryState = state;
 }
