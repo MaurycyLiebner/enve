@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <mypaint-brush.h>
-#include "../core/selfref.h"
+#include "sharedpointerdefs.h"
 #include "itemwidget.h"
 #include "itemwrapper.h"
 

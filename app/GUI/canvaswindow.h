@@ -23,7 +23,9 @@ class _Executor;
 class ImageBox;
 class SingleSound;
 class VideoBox;
-
+class Canvas;
+class PaintSettings;
+class StrokeSettings;
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow,

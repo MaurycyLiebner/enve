@@ -1,6 +1,7 @@
 #ifndef BLUREFFECT_H
 #define BLUREFFECT_H
 #include "pixmapeffect.h"
+class BoolProperty;
 
 struct BlurEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;

@@ -234,9 +234,9 @@ void BoxScrollWidgetVisiblePart::dropEvent(
         if(parentGroup == nullptr ||
            boxUnderMouse->isAncestor(box)) return;
         if(parentGroup != box->getParentGroup()) {
-            auto stdsptr<box> = GetAsSPtr(box, BoundingBox);
-            box->getParentGroup()->removeContainedBox(stdsptr<box>);
-            parentGroup->addContainedBox(stdsptr<box>);
+            auto boxSPtr = GetAsSPtr(box, BoundingBox);
+            box->getParentGroup()->removeContainedBox(boxSPtr);
+            parentGroup->addContainedBox(boxSPtr);
             box->applyTransformationInverted(box->getTransformAnimator());
         }
         if(below) { // add box below
@@ -273,9 +273,9 @@ void BoxScrollWidgetVisiblePart::dropEvent(
             EffectAnimators *draggedAnimator =
                                      effect->getParentEffectAnimators();
             if(draggedAnimator != underMouseAnimator) {
-                qsptr<PixmapEffect> stdsptr<effect> = GetAsSPtr(effect, PixmapEffect);
-                underMouseAnimator->getParentBox()->addEffect(stdsptr<effect>);
-                draggedAnimator->getParentBox()->removeEffect(stdsptr<effect>);
+                qsptr<PixmapEffect> effectPtr = GetAsSPtr(effect, PixmapEffect);
+                underMouseAnimator->getParentBox()->addEffect(effectPtr);
+                draggedAnimator->getParentBox()->removeEffect(effectPtr);
             }
             if(below) { // add box below
                 underMouseAnimator->ca_moveChildAbove( // boxesgroup list is reversed

@@ -6,7 +6,6 @@
 #include <QLabel>
 #include "minimalscrollwidget.h"
 #include "sharedpointerdefs.h"
-#include "selfref.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
 class SingleWidgetAbstraction;

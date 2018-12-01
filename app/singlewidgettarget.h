@@ -5,9 +5,7 @@
 #include <QMimeData>
 #include <QFlags>
 #include <memory>
-#include "../core/stdselfref.h"
-#include "../core/selfref.h"
-#include "stdpointer.h"
+#include "sharedpointerdefs.h"
 
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;

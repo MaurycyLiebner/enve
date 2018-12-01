@@ -1,6 +1,7 @@
 #ifndef REPLACECOLOREFFECT_H
 #define REPLACECOLOREFFECT_H
 #include "pixmapeffect.h"
+#include "Animators/coloranimator.h"
 
 struct ReplaceColorEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;

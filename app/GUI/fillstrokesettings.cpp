@@ -362,7 +362,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const int &id) {
     } else{
         paintSetting = SPtrCreate(PaintSetting)(isFill);
     }
-    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
 
     mMainWindow->callUpdateSchedulers();
 }
@@ -391,7 +391,7 @@ void FillStrokeSettingsWidget::colorSettingReceived(
         paintSetting = SPtrCreate(PaintSetting)(
                     isFill, currentGradientLinear, currentGradient);
     }
-    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
 }
 
 void FillStrokeSettingsWidget::connectGradient() {
@@ -585,7 +585,7 @@ void FillStrokeSettingsWidget::applyGradient() {
     }
     stdsptr<PaintSetting> paintSetting = SPtrCreate(PaintSetting)(
                 isFill, currentGradientLinear, currentGradient);
-    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
 }
 
 void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {

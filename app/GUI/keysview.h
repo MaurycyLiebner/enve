@@ -19,6 +19,8 @@ class MainWindow;
 class BoxScrollWidgetVisiblePart;
 class AnimationDockWidget;
 class DurationRectangleMovable;
+class KeysClipboardContainer;
+class Animator;
 #include "valueinput.h"
 enum CtrlsMode : short;
 

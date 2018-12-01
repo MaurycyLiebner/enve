@@ -1,7 +1,7 @@
 #ifndef QREALPOINT_H
 #define QREALPOINT_H
 #include <QPainter>
-#include "../core/stdselfref.h"
+#include "sharedpointerdefs.h"
 
 class QrealKey;
 

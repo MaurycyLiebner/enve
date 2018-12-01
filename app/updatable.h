@@ -1,7 +1,6 @@
 #ifndef UPDATABLE_H
 #define UPDATABLE_H
 #include <QList>
-#include "../core/selfref.h"
 #include <QEventLoop>
 #include "sharedpointerdefs.h"
 class PaintControler;

@@ -1,6 +1,9 @@
 #ifndef SHADOWEFFECT_H
 #define SHADOWEFFECT_H
 #include "pixmapeffect.h"
+#include "Animators/qpointfanimator.h"
+#include "Animators/coloranimator.h"
+#include "Properties/boolproperty.h"
 
 struct ShadowEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
