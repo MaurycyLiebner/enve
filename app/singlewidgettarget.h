@@ -5,8 +5,8 @@
 #include <QMimeData>
 #include <QFlags>
 #include <memory>
+#include "../core/stdselfref.h"
 #include "../core/selfref.h"
-#include "sharedpointerdefs.h"
 
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
@@ -39,7 +39,7 @@ public:
     SingleWidgetAbstraction *SWT_createAbstraction(
             ScrollWidgetVisiblePart *visiblePartWidget);
     void SWT_removeAbstractionFromList(
-            const SingleWidgetAbstractionSPtr& abs);
+            const stdsptr<SingleWidgetAbstraction>& abs);
 
     virtual void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction*,
@@ -135,7 +135,6 @@ public:
         return nullptr;
     }
 
-    virtual void SWT_clearAll();
     bool SWT_isVisible() {
         return SWT_mVisible;
     }
@@ -184,7 +183,7 @@ protected:
     bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
-    QList<SingleWidgetAbstractionSPtr> mSWT_allAbstractions;
+    QList<stdsptr<SingleWidgetAbstraction>> mSWT_allAbstractions;
 };
 
 typedef bool (SingleWidgetTarget::*SWT_Checker)();

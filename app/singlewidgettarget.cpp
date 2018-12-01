@@ -6,13 +6,12 @@ SingleWidgetTarget::SingleWidgetTarget() {
 }
 
 SingleWidgetTarget::~SingleWidgetTarget() {
-    SWT_clearAll();
 }
 
 //void SingleWidgetTarget::SWT_addChildrenAbstractions(
-//        const SingleWidgetAbstractionSPtr&  SWT_Abstraction,
+//        const stdsptr<SingleWidgetAbstraction>&  SWT_Abstraction,
 //        ScrollWidgetVisiblePart *visiblePartWidget) {
-//    Q_FOREACH(const SingleWidgetTargetQSPtr& child, mChildren) {
+//    Q_FOREACH(const qsptr<SingleWidgetTarget>& child, mChildren) {
 //        SWT_Abstraction->addChildAbstraction(
 //                    child->createAbstraction(visiblePartWidget));
 //    }
@@ -20,7 +19,7 @@ SingleWidgetTarget::~SingleWidgetTarget() {
 
 SingleWidgetAbstraction* SingleWidgetTarget::SWT_createAbstraction(
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    SingleWidgetAbstractionSPtr SWT_Abstraction =
+    stdsptr<SingleWidgetAbstraction> SWT_Abstraction =
             SPtrCreate(SingleWidgetAbstraction)(
                 ref<SingleWidgetTarget>(), visiblePartWidget);
     SWT_addChildrenAbstractions(SWT_Abstraction.get(), visiblePartWidget);
@@ -29,27 +28,27 @@ SingleWidgetAbstraction* SingleWidgetTarget::SWT_createAbstraction(
 }
 
 void SingleWidgetTarget::SWT_removeAbstractionFromList(
-        const SingleWidgetAbstractionSPtr &abs) {
+        const stdsptr<SingleWidgetAbstraction> &abs) {
     mSWT_allAbstractions.removeOne(abs);
 }
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
         SingleWidgetTarget *target) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->addChildAbstractionForTarget(target);
     }
 }
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
         SingleWidgetTarget* target, const int &id) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->addChildAbstractionForTargetAt(target, id);
     }
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
         const SWT_Rule &rule) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfIsCurrentRule(rule);
     }
 }
@@ -57,33 +56,29 @@ void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithTarget(
         SingleWidgetTarget *targetP,
         const SWT_Target &target) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfIsCurrentTarget(targetP, target);
     }
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty() {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfSearchNotEmpty();
     }
 }
 
 void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
         SingleWidgetTarget* target) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->removeChildAbstractionForTarget(target);
     }
 }
 
 void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
         SingleWidgetTarget *target, const int &id) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs, mSWT_allAbstractions) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->moveChildAbstractionForTargetTo(target, id);
     }
-}
-
-void SingleWidgetTarget::SWT_clearAll() {
-    mSWT_allAbstractions.clear();
 }
 
 void SingleWidgetTarget::SWT_afterContentVisibilityChanged() {

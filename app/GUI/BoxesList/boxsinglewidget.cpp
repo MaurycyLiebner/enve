@@ -827,7 +827,7 @@ bool BoxSingleWidget::isTargetDisabled() {
 #include <QApplication>
 #include <QDrag>
 void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
-    if (!(event->buttons() & Qt::LeftButton)) {
+    if(!(event->buttons() & Qt::LeftButton)) {
         return;
     }
     if(isTargetDisabled()) return;

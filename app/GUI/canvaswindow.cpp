@@ -1070,7 +1070,6 @@ void CanvasWindow::nextSaveOutputFrame() {
 }
 
 void CanvasWindow::clearAll() {
-    //SWT_clearAll();
 
     mClearBeingUpdated = !mNoBoxesAwaitUpdate;
     mUpdatablesAwaitingUpdate.clear();
