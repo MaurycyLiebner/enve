@@ -9,7 +9,7 @@ public:
                      const QObject *receiver,
                      const char *member,
                      const QKeySequence &shortcut = 0,
-                     QObject *parent = 0);
+                     QObject *parent = nullptr);
 
 protected:
     bool event(QEvent *e);

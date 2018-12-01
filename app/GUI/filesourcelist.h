@@ -66,7 +66,7 @@ public:
 class FileSourceListVisibleWidget : public MinimalScrollWidgetVisiblePart {
     Q_OBJECT
 public:
-    FileSourceListVisibleWidget(MinimalScrollWidget *parent = 0);
+    FileSourceListVisibleWidget(MinimalScrollWidget *parent = nullptr);
     ~FileSourceListVisibleWidget();
 
     void updateVisibleWidgetsContent();

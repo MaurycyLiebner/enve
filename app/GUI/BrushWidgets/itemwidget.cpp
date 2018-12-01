@@ -18,7 +18,7 @@ bool ItemWidget<Item>::event(QEvent *event) {
 }
 
 template <class Item>
-ItemWidget<Item>::ItemWidget(const sptr<Item>& itemSptr,
+ItemWidget<Item>::ItemWidget(const stdsptr<Item>& itemSptr,
                              QWidget *parent) : ItemWidgetQObject(parent) {
     setFocusPolicy(Qt::NoFocus);
     mItem = itemSptr;
@@ -94,7 +94,7 @@ void ItemWidget<Item>::mousePressEvent(QMouseEvent *event) {
 //}
 
 template <class Item>
-ItemWidget<Item> *ItemWidget<Item>::createWidget(const sptr<Item>& itemSptr,
+ItemWidget<Item> *ItemWidget<Item>::createWidget(const stdsptr<Item>& itemSptr,
                                                  QWidget *parent) {
     if(itemSptr == nullptr) return nullptr;
     ItemWidget* newWidget = new ItemWidget(itemSptr, parent);

@@ -25,7 +25,7 @@ class ActionButton;
 class FillStrokeSettingsWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit FillStrokeSettingsWidget(MainWindow *parent = 0);
+    explicit FillStrokeSettingsWidget(MainWindow *parent = nullptr);
 
     void setCurrentSettings(PaintSettings *fillPaintSettings,
                             StrokeSettings *strokePaintSettings);

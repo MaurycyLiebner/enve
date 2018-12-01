@@ -13,7 +13,7 @@ class ScrollArea;
 class MinimalScrollWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit MinimalScrollWidget(ScrollArea *parent = 0);
+    explicit MinimalScrollWidget(ScrollArea *parent = nullptr);
 
     virtual void updateHeight() = 0;
 

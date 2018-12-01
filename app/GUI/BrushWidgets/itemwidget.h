@@ -31,7 +31,7 @@ signals:
 template <class Item>
 class ItemWidget : public ItemWidgetQObject {
 public:
-    static ItemWidget *createWidget(const sptr<Item>& itemSptr,
+    static ItemWidget *createWidget(const stdsptr<Item>& itemSptr,
                                     QWidget *parent);
     ~ItemWidget() {
         if(mSelected) emit selected(nullptr);
@@ -43,7 +43,7 @@ public:
         return mItem.get();
     }
 protected:
-    ItemWidget(const sptr<Item>& item, QWidget *parent = nullptr);
+    ItemWidget(const stdsptr<Item>& item, QWidget *parent = nullptr);
     bool event(QEvent *event);
     void paintEvent(QPaintEvent*);
     void enterEvent(QEvent*);
@@ -52,7 +52,7 @@ protected:
 //    void tabletEvent(QTabletEvent* event);
 private:
     bool mDrawName = false;
-    sptr<Item> mItem;
+    stdsptr<Item> mItem;
 };
 #include "itemwidget.cpp"
 

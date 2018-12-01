@@ -14,7 +14,7 @@ public:
     BrushArrayWidget(const Qt::Orientation& orientation,
                      QWidget *parent = nullptr);
 
-    void insertBrush(const int& i, const sptr<BrushWrapper>& brush) {
+    void insertBrush(const int& i, const stdsptr<BrushWrapper>& brush) {
         BrushWidget* newWidget = BrushWidget::createWidget(brush, this);
         if(mNoDuplicated) removeBrush(brush);
         insertWidget(i, newWidget);
@@ -27,7 +27,7 @@ public:
         return hasWidget(tester);
     }
 
-    bool removeBrush(const sptr<BrushWrapper>& brush) {
+    bool removeBrush(const stdsptr<BrushWrapper>& brush) {
         auto tester = [&brush](QWidget* widget) {
             return static_cast<BrushWidget*>(widget)->getItem() == brush.get();
         };
@@ -38,13 +38,13 @@ public:
                     BrushSelectionWidget* brushes);
     bool writeBinary(QIODevice *dst);
 public slots:
-    void appendBrush(const sptr<BrushWrapper>& brush) {
+    void appendBrush(const stdsptr<BrushWrapper>& brush) {
         BrushWidget* newWidget = BrushWidget::createWidget(brush, this);
         if(mNoDuplicated) removeBrush(brush);
         appendWidget(newWidget);
     }
 
-    void prependBrush(const sptr<BrushWrapper>& brush) {
+    void prependBrush(const stdsptr<BrushWrapper>& brush) {
         BrushWidget* newWidget = BrushWidget::createWidget(brush, this);
         if(mNoDuplicated) removeBrush(brush);
         if(newWidget == nullptr) return;

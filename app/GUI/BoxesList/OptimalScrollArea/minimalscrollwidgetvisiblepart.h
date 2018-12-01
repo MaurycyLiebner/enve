@@ -8,7 +8,7 @@ class MinimalScrollWidgetVisiblePart :
         public QWidget {
     Q_OBJECT
 public:
-    MinimalScrollWidgetVisiblePart(MinimalScrollWidget *parent = 0);
+    MinimalScrollWidgetVisiblePart(MinimalScrollWidget *parent = nullptr);
     virtual ~MinimalScrollWidgetVisiblePart();
 
     void setVisibleTop(const int &top);

@@ -9,7 +9,7 @@ class ColorPickingWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ColorPickingWidget(ColorSettingsWidget *parent = 0);
+    explicit ColorPickingWidget(ColorSettingsWidget *parent = nullptr);
     void mouseReleaseEvent(QMouseEvent *e);
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);

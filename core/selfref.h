@@ -11,6 +11,8 @@ extern inline bool listContainsSharedPtr(Ptr ptr, List list) {
     }
     return false;
 }
+template <class T> using qsptr = QSharedPointer<T>;
+template <class T> using qptr = QPointer<T>;
 
 class SelfRef : public QObject {
     Q_OBJECT
@@ -89,7 +91,9 @@ private:
 #include <memory>
 template <class T>
 class StdPointer;
-template <class T> using sptr = std::shared_ptr<T>;
+template <class T> using stdsptr = std::shared_ptr<T>;
+template <class T> using stdptr = StdPointer<T>;
+
 class StdSelfRef {
     template <class T> friend class StdPointer;
 public:

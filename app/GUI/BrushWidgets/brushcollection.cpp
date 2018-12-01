@@ -25,7 +25,7 @@ void BrushCollection::loadCollectionFromDir(const QString &mainDirPath) {
 }
 
 bool BrushCollection::loadBrushFromFile(const QString &path) {
-    sptr<BrushWrapper> itemSptr = BrushWrapper::createBrushWrapper(path, getName());
+    stdsptr<BrushWrapper> itemSptr = BrushWrapper::createBrushWrapper(path, getName());
     if(itemSptr == nullptr) return false;
     BrushWidget* brushWidget = BrushWidget::createWidget(itemSptr, this);
     if(brushWidget == nullptr) return false;

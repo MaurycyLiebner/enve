@@ -11,7 +11,7 @@
 //    Q_OBJECT
 //public:
 //    explicit CanvasWidget(CanvasWindow *window,
-//                          QWidget *parent = 0,
+//                          QWidget *parent = nullptr,
 //                          const Qt::WindowFlags &flags = 0);
 
 //    void KFT_setFocusToWidget();

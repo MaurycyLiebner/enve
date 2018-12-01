@@ -8,7 +8,7 @@ class ScrollWidgetVisiblePart;
 class SingleWidget : public QWidget {
     Q_OBJECT
 public:
-    SingleWidget(ScrollWidgetVisiblePart *parent = 0);
+    SingleWidget(ScrollWidgetVisiblePart *parent = nullptr);
     virtual void setTargetAbstraction(SingleWidgetAbstraction *abs);
     SingleWidgetAbstraction *getTargetAbstraction() {
         return mTarget;

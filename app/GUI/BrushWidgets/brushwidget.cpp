@@ -5,7 +5,7 @@
 #include <QFileInfo>
 #include "sharedpointerdefs.h"
 
-sptr<BrushWrapper> BrushWrapper::createBrushWrapper(const QString &fileName,
+stdsptr<BrushWrapper> BrushWrapper::createBrushWrapper(const QString &fileName,
                                                     const QString& collectionName) {
     QFile dataFile(fileName);
     if(!dataFile.exists()) return nullptr;

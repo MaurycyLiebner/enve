@@ -8,7 +8,7 @@ class PaintControler : public QObject {
     Q_OBJECT
 public:
     explicit PaintControler(const int &id,
-                            QObject *parent = 0);
+                            QObject *parent = nullptr);
 
 signals:
     void finishedUpdating(int, _Executor*);

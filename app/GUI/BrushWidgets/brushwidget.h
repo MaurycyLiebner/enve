@@ -22,7 +22,7 @@ public:
         mypaint_brush_unref(getItem());
     }
 
-    static sptr<BrushWrapper> createBrushWrapper(const QString& fileName,
+    static stdsptr<BrushWrapper> createBrushWrapper(const QString& fileName,
                                                  const QString &collectionName);
 };
 

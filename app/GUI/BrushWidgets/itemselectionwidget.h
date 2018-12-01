@@ -79,7 +79,7 @@ public:
     Item* getItem(const QString &collectionName,
                   const QString &itemName) const;
 
-    void setDefaultItem(sptr<Item> item) {
+    void setDefaultItem(stdsptr<Item> item) {
         if(mCurrentItem == mDefaultItem) mCurrentItem = nullptr;
         mDefaultItem = item;
         if(mCurrentItem == nullptr) mCurrentItem = mDefaultItem;
@@ -118,7 +118,7 @@ private:
     }
 
     StdPointer<Item> mCurrentItem;
-    sptr<Item> mDefaultItem;
+    stdsptr<Item> mDefaultItem;
 };
 
 #include <QDir>
