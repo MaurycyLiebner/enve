@@ -24,7 +24,7 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
 
     Animator::UpdateReason reason;
 
-    BoundingBoxRenderDataSPtr makeCopy();
+    stdsptr<BoundingBoxRenderData> makeCopy();
 
     bool redo = false;
 
@@ -43,17 +43,17 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     bool useCustomRelFrame = false;
     qreal customRelFrame;
     QList<QRectF> otherGlobalRects;
-    BoundingBoxRenderDataPtr motionBlurTarget;
+    stdptr<BoundingBoxRenderData>motionBlurTarget;
     // for motion blur
 
-    QList<PixmapEffectRenderDataSPtr> pixmapEffects;
+    QList<stdsptr<PixmapEffectRenderData>> pixmapEffects;
     SkPoint drawPos = SkPoint::Make(0.f, 0.f);
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
     QRectF maxBoundsRect;
     bool maxBoundsEnabled = true;
 
     bool parentIsTarget = true;
-    BoundingBoxQPtr parentBox;
+    qptr<BoundingBox> parentBox;
 
     virtual void updateRelBoundingRect();
     void drawRenderedImageForParent(SkCanvas *canvas);
@@ -82,19 +82,19 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     }
 
     void appendRenderCustomizerFunctor(
-            const RenderDataCustomizerFunctorSPtr& customizer) {
+            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
         mRenderDataCustomizerFunctors.append(customizer);
     }
 
     void prependRenderCustomizerFunctor(
-            const RenderDataCustomizerFunctorSPtr& customizer) {
+            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
         mRenderDataCustomizerFunctors.prepend(customizer);
     }
 
     void parentBeingProcessed();
 protected:
     void addSchedulerNow();
-    QList<RenderDataCustomizerFunctorSPtr> mRenderDataCustomizerFunctors;
+    QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;
     virtual void drawSk(SkCanvas *canvas) = 0;

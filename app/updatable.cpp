@@ -84,7 +84,7 @@ void _Executor::clear() {
     MinimalExecutor::clear();
     mBeingProcessed = false;
     mSelfRef.reset();
-    foreach(const MinimalExecutorPtr& dependent, mNextExecutionDependent) {
+    foreach(const stdptr<MinimalExecutor>& dependent, mNextExecutionDependent) {
         if(dependent == nullptr) continue;
         dependent->decDependencies();
     }
@@ -139,7 +139,7 @@ void MinimalExecutor::incDependencies() {
 void MinimalExecutor::GUI_process() {}
 
 void MinimalExecutor::tellDependentThatFinished() {
-    foreach(const MinimalExecutorPtr& dependent, mCurrentExecutionDependent) {
+    foreach(const stdptr<MinimalExecutor>& dependent, mCurrentExecutionDependent) {
         if(dependent == nullptr) continue;
         dependent->decDependencies();
     }

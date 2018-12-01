@@ -137,7 +137,7 @@ private slots:
     void scrollRight();
     void scrollLeft();
 private:
-    KeysClipboardContainerSPtr getSelectedKeysClipboardContainer();
+    stdsptr<KeysClipboardContainer> getSelectedKeysClipboardContainer();
 
     QTimer *mScrollTimer;
 
@@ -170,8 +170,8 @@ private:
     bool mMovingRect = false;
 
     MainWindow *mMainWindow;
-    QList<KeyPtr> mSelectedKeys;
-    QList<AnimatorQPtr> mSelectedAnimators;
+    QList<stdptr<Key>> mSelectedKeys;
+    QList<qptr<Animator>> mSelectedAnimators;
 
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;

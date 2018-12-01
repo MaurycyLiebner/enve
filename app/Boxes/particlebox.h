@@ -65,7 +65,7 @@ struct ParticleState {
         }
     }
 
-    BoundingBoxRenderDataSPtr targetRenderData;
+    stdsptr<BoundingBoxRenderData> targetRenderData;
     SkPath linePath;
     SkPoint pos;
     SkScalar size;
@@ -187,7 +187,7 @@ public:
 
     EmitterData getEmitterDataAtRelFrameF(
             const qreal &relFrame,
-            const ParticleBoxRenderDataSPtr& particleData);
+            const stdsptr<ParticleBoxRenderData>& particleData);
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
@@ -201,57 +201,57 @@ private:
     QList<Particle*> mNotFinishedParticles;
     ParticleBox* mParentBox_k = nullptr;
 
-    ColorAnimatorQSPtr mColorAnimator =
+    qsptr<ColorAnimator> mColorAnimator =
             SPtrCreate(ColorAnimator)();
 
-    QPointFAnimatorQSPtr mPos =
+    qsptr<QPointFAnimator> mPos =
             SPtrCreate(QPointFAnimator)("position");
 
-    PointAnimatorMovablePointSPtr mPosPoint;
+    stdsptr<PointAnimatorMovablePoint> mPosPoint;
 
-    QrealAnimatorQSPtr mWidth =
+    qsptr<QrealAnimator> mWidth =
             SPtrCreate(QrealAnimator)("width");
 
-    QrealAnimatorQSPtr mSrcVelInfl =
+    qsptr<QrealAnimator> mSrcVelInfl =
             SPtrCreate(QrealAnimator)("source velocity influence");
 
-    QrealAnimatorQSPtr mIniVelocity =
+    qsptr<QrealAnimator> mIniVelocity =
             SPtrCreate(QrealAnimator)("initial velocity");
-    QrealAnimatorQSPtr mIniVelocityVar =
+    qsptr<QrealAnimator> mIniVelocityVar =
             SPtrCreate(QrealAnimator)("initial velocity variation");
-    QrealAnimatorQSPtr mIniVelocityAngle =
+    qsptr<QrealAnimator> mIniVelocityAngle =
             SPtrCreate(QrealAnimator)("initial velocity angle");
-    QrealAnimatorQSPtr mIniVelocityAngleVar =
+    qsptr<QrealAnimator> mIniVelocityAngleVar =
             SPtrCreate(QrealAnimator)("initial velocity angle variation");
-    QSharedPointer<QPointFAnimator> mAcceleration =
+    qsptr<QPointFAnimator> mAcceleration =
             SPtrCreate(QPointFAnimator)("acceleration");
 
-    QrealAnimatorQSPtr mParticlesPerSecond =
+    qsptr<QrealAnimator> mParticlesPerSecond =
             SPtrCreate(QrealAnimator)("particles per second");
-    QrealAnimatorQSPtr mParticlesFrameLifetime =
+    qsptr<QrealAnimator> mParticlesFrameLifetime =
             SPtrCreate(QrealAnimator)("particle lifetime");
 
-    QrealAnimatorQSPtr mVelocityRandomVar =
+    qsptr<QrealAnimator> mVelocityRandomVar =
             SPtrCreate(QrealAnimator)("velocity random variation");
-    QrealAnimatorQSPtr mVelocityRandomVarPeriod =
+    qsptr<QrealAnimator> mVelocityRandomVarPeriod =
             SPtrCreate(QrealAnimator)("velocity variation period");
 
-    QrealAnimatorQSPtr mParticleSize =
+    qsptr<QrealAnimator> mParticleSize =
             SPtrCreate(QrealAnimator)("particle size");
-    QrealAnimatorQSPtr mParticleSizeVar =
+    qsptr<QrealAnimator> mParticleSizeVar =
             SPtrCreate(QrealAnimator)("particle size variation");
 
-    QrealAnimatorQSPtr mParticleLength =
+    qsptr<QrealAnimator> mParticleLength =
             SPtrCreate(QrealAnimator)("particle length");
 
-    QrealAnimatorQSPtr mParticlesDecayFrames =
+    qsptr<QrealAnimator> mParticlesDecayFrames =
             SPtrCreate(QrealAnimator)("decay frames");
-    QrealAnimatorQSPtr mParticlesSizeDecay =
+    qsptr<QrealAnimator> mParticlesSizeDecay =
             SPtrCreate(QrealAnimator)("final scale");
-    QrealAnimatorQSPtr mParticlesOpacityDecay =
+    qsptr<QrealAnimator> mParticlesOpacityDecay =
             SPtrCreate(QrealAnimator)("final opacity");
 
-    BoxTargetPropertyQSPtr mBoxTargetProperty =
+    qsptr<BoxTargetProperty> mBoxTargetProperty =
             SPtrCreate(BoxTargetProperty)("source");
 };
 
@@ -265,7 +265,7 @@ public:
     void prp_setAbsFrame(const int &frame);
     bool relPointInsidePath(const QPointF &relPos);
 
-    void addEmitter(const ParticleEmitterQSPtr &emitter);
+    void addEmitter(const qsptr<ParticleEmitter> &emitter);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
@@ -275,14 +275,14 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr> &list);
-    void applyPaintSetting(const PaintSetting &setting);
+                                           QList<stdptr<MovablePoint>> &list);
+    void applyPaintSetting( PaintSetting *setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
 
     bool SWT_isParticleBox();
 
-    BoundingBoxRenderDataSPtr createRenderData() {
+    stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(ParticleBoxRenderData)(this);
     }
 
@@ -291,7 +291,7 @@ public:
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
         particleData->emittersData.clear();
-        foreach(const ParticleEmitterQSPtr& emitter, mEmitters) {
+        foreach(const qsptr<ParticleEmitter>& emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();
             particleData->emittersData << emitter->getEmitterDataAtRelFrameF(
                                               relFrame, particleData);
@@ -300,7 +300,7 @@ public:
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
-    void removeEmitter(const ParticleEmitterQSPtr &emitter);
+    void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
@@ -310,12 +310,12 @@ public:
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:
-    QPointFAnimatorQSPtr mTopLeftAnimator;
-    QPointFAnimatorQSPtr mBottomRightAnimator;
+    qsptr<QPointFAnimator> mTopLeftAnimator;
+    qsptr<QPointFAnimator> mBottomRightAnimator;
 
-    PointAnimatorMovablePointSPtr mTopLeftPoint;
-    PointAnimatorMovablePointSPtr mBottomRightPoint;
-    QList<ParticleEmitterQSPtr> mEmitters;
+    stdsptr<PointAnimatorMovablePoint> mTopLeftPoint;
+    stdsptr<PointAnimatorMovablePoint> mBottomRightPoint;
+    QList<qsptr<ParticleEmitter>> mEmitters;
 };
 
 #endif // PARTICLEBOX_H

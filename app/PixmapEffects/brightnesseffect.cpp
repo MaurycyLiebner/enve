@@ -11,7 +11,7 @@ BrightnessEffect::BrightnessEffect(qreal brightness) :
     ca_addChildAnimator(mBrightnessAnimator);
 }
 
-PixmapEffectRenderDataSPtr BrightnessEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData =
             SPtrCreate(BrightnessEffectRenderData)();

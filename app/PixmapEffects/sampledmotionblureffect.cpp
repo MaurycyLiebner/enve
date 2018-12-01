@@ -22,7 +22,7 @@ SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
     ca_addChildAnimator(mFrameStep);
 }
 
-PixmapEffectRenderDataSPtr SampledMotionBlurEffect::
+stdsptr<PixmapEffectRenderData> SampledMotionBlurEffect::
 getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
                                      BoundingBoxRenderData* data) {
     if(!data->parentIsTarget) return nullptr;
@@ -46,7 +46,7 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
             relFrameT += frameStep;
             continue;
         }
-        BoundingBoxRenderDataSPtr sampleRenderData =
+        stdsptr<BoundingBoxRenderData> sampleRenderData =
                 mParentBox->createRenderData();
         //mParentBox->setupBoundingBoxRenderDataForRelFrameF(i, sampleRenderData);
         sampleRenderData->parentIsTarget = false;
@@ -193,7 +193,7 @@ void SampledMotionBlurEffectRenderData::applyEffectsSk(
     //SkCanvas canvasSk(motionBlur);
     qreal opacityStepT = 1./(numberSamples + 1);
     qreal opacityT = opacityStepT*(1. - qCeil(numberSamples) + numberSamples);
-    foreach(const BoundingBoxRenderDataSPtr &sample, samples) {
+    foreach(const stdsptr<BoundingBoxRenderData> &sample, samples) {
         qreal sampleAlpha = opacityT*opacityT*opacity;
         QPointF drawPosF = sample->globalBoundingRect.topLeft() -
                 boxData->globalBoundingRect.topLeft();//QPointF(0., 0.);

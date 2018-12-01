@@ -38,7 +38,7 @@ ShadowEffect::ShadowEffect(qreal radius) :
 //    addChildAnimator(&mScale);
 }
 
-PixmapEffectRenderDataSPtr ShadowEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ShadowEffectRenderData)();
     renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);

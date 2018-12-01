@@ -28,7 +28,7 @@ void BoolPropertyContainer::setValue(const bool &value) {
     prp_callUpdater();
     prp_callFinishUpdater();
 
-    Q_FOREACH(const QSharedPointer<Property> &prop, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &prop, ca_mChildAnimators) {
         //prop->SWT_setVisible(value);
         prop->SWT_setDisabled(!value);
     }

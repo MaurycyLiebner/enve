@@ -4,14 +4,14 @@
 
 class RenderDataHandler {
 public:
-    bool removeItem(const BoundingBoxRenderDataSPtr &item);
+    bool removeItem(const stdsptr<BoundingBoxRenderData> &item);
     bool removeItemAtRelFrame(const int& frame);
     BoundingBoxRenderData *getItemAtRelFrame(const int &frame);
-    void addItemAtRelFrame(const BoundingBoxRenderDataSPtr &item);
+    void addItemAtRelFrame(const stdsptr<BoundingBoxRenderData> &item);
 protected:
     int getItemInsertIdAtRelFrame(const int &relFrame);
     bool getItemIdAtRelFrame(const int &relFrame, int *id);
-    QList<BoundingBoxRenderDataSPtr > mItems;
+    QList<stdsptr<BoundingBoxRenderData> > mItems;
 };
 
 #endif // RENDERDATAHANDLER_H

@@ -5,7 +5,7 @@
 #include "durationrectangle.h"
 #include "global.h"
 
-void CacheHandler::removeRenderContainer(const CacheContainerSPtr& cont) {
+void CacheHandler::removeRenderContainer(const stdsptr<CacheContainer>& cont) {
     for(int i = 0; i < mRenderContainers.count(); i++) {
         if(mRenderContainers.at(i) == cont) {
             mRenderContainers.removeAt(i);
@@ -74,7 +74,7 @@ int CacheHandler::getRenderContainterInsertIdAtRelFrame(
 }
 
 CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(const int &frame) {
-    CacheContainerSPtr cont = SPtrCreate(CacheContainer)(this);
+    stdsptr<CacheContainer> cont = SPtrCreate(CacheContainer)(this);
     cont->setRelFrame(frame);
     int contId = getRenderContainterInsertIdAtRelFrame(frame);
     mRenderContainers.insert(contId, GetAsSPtr(cont, CacheContainer));
@@ -253,7 +253,7 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     int lastDrawnFrame = startFrame;
     int lastDrawX = 0;
     bool lastStoresInMemory = true;
-    Q_FOREACH(const CacheContainerSPtr &cont, mRenderContainers) {
+    Q_FOREACH(const stdsptr<CacheContainer> &cont, mRenderContainers) {
         int afterMaxFrame = cont->getMaxRelFrame() + 1;
         if(afterMaxFrame < startFrame) continue;
         int minFrame = cont->getMinRelFrame();

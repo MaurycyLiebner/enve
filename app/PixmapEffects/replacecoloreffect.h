@@ -28,18 +28,18 @@ class ReplaceColorEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 protected:
     ReplaceColorEffect();
 private:
-    ColorAnimatorQSPtr mFromColor;
-    ColorAnimatorQSPtr mToColor;
+    qsptr<ColorAnimator> mFromColor;
+    qsptr<ColorAnimator> mToColor;
 
-    QrealAnimatorQSPtr mToleranceAnimator;
-    QrealAnimatorQSPtr mSmoothnessAnimator;
+    qsptr<QrealAnimator> mToleranceAnimator;
+    qsptr<QrealAnimator> mSmoothnessAnimator;
 };
 
 #endif // REPLACECOLOREFFECT_H

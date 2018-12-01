@@ -63,11 +63,11 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);
-    BoundingBoxRenderDataSPtr createRenderData();
+    stdsptr<BoundingBoxRenderData> createRenderData();
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 private:
-    ImageCacheHandlerPtr mImgCacheHandler;
+    stdptr<ImageCacheHandler>mImgCacheHandler;
     QString mImageFilePath;
 };
 

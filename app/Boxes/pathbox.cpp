@@ -235,7 +235,7 @@ void PathBox::drawBoundingRectSk(SkCanvas *canvas,
     drawAsBoundingRectSk(canvas, mEditPathSk, invScale, false);
 }
 
-void PathBox::addPathEffect(const PathEffectQSPtr& effect) {
+void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
 
     if(effect->hasReasonsNotToApplyUglyTransform()) {
@@ -250,7 +250,7 @@ void PathBox::addPathEffect(const PathEffectQSPtr& effect) {
     clearAllCache();
 }
 
-void PathBox::addFillPathEffect(const PathEffectQSPtr& effect) {
+void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         incReasonsNotToApplyUglyTransform();
@@ -264,7 +264,7 @@ void PathBox::addFillPathEffect(const PathEffectQSPtr& effect) {
     clearAllCache();
 }
 
-void PathBox::addOutlinePathEffect(const PathEffectQSPtr& effect) {
+void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         incReasonsNotToApplyUglyTransform();
@@ -278,7 +278,7 @@ void PathBox::addOutlinePathEffect(const PathEffectQSPtr& effect) {
     clearAllCache();
 }
 
-void PathBox::removePathEffect(const PathEffectQSPtr& effect) {
+void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -290,7 +290,7 @@ void PathBox::removePathEffect(const PathEffectQSPtr& effect) {
     clearAllCache();
 }
 
-void PathBox::removeFillPathEffect(const PathEffectQSPtr& effect) {
+void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -302,7 +302,7 @@ void PathBox::removeFillPathEffect(const PathEffectQSPtr& effect) {
     clearAllCache();
 }
 
-void PathBox::removeOutlinePathEffect(const PathEffectQSPtr& effect) {
+void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -492,8 +492,8 @@ void PathBox::drawHoveredSk(SkCanvas *canvas,
     drawHoveredPathSk(canvas, mPathSk, invScale);
 }
 
-void PathBox::applyPaintSetting(const PaintSetting &setting) {
-    setting.apply(this);
+void PathBox::applyPaintSetting( PaintSetting *setting) {
+    setting->apply(this);
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
@@ -531,7 +531,7 @@ bool PathBox::differenceInFillPathBetweenFrames(const int &frame1, const int &fr
 
 #include "circle.h"
 VectorPath *PathBox::objectToVectorPathBox() {
-    VectorPathQSPtr newPath = SPtrCreate(VectorPath)();
+    qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
         Circle* circleT = GetAsPtr(this, Circle);
@@ -549,7 +549,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
 
 VectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return nullptr;
-    VectorPathQSPtr newPath = SPtrCreate(VectorPath)();
+    qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
     return newPath.get();

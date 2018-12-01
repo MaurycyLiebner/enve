@@ -36,7 +36,7 @@ public:
     virtual void changeSourceFile() = 0;
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);
-    BoundingBoxRenderDataSPtr createRenderData();
+    stdsptr<BoundingBoxRenderData> createRenderData();
 
     void afterUpdate();
     void setParentGroup(BoxesGroup *parent);
@@ -46,7 +46,7 @@ public:
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
-    AnimationCacheHandlerPtr mAnimationCacheHandler;
+    stdptr<AnimationCacheHandler>mAnimationCacheHandler;
     qreal mFps = 24.;
 
     //IntAnimator mFrameAnimator;

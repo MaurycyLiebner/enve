@@ -19,13 +19,13 @@ class CirclesEffect : public PixmapEffect {
     friend class SelfRef;
 public:
     qreal getMargin() { return 0.; }
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
 protected:
     CirclesEffect(qreal circlesRadius = 5.,
                   qreal circlesDistance = 5.);
 private:
-    QrealAnimatorQSPtr mCirclesDistance;
-    QrealAnimatorQSPtr mCirclesRadius;
+    qsptr<QrealAnimator> mCirclesDistance;
+    qsptr<QrealAnimator> mCirclesRadius;
 };
 #endif // CIRCLESEFFECT_H

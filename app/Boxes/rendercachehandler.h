@@ -10,7 +10,7 @@ class RenderCacheHandler;
 class CacheHandler {
 public:
     virtual ~CacheHandler() {}
-    void removeRenderContainer(const CacheContainerSPtr &cont);
+    void removeRenderContainer(const stdsptr<CacheContainer> &cont);
     CacheContainer *getRenderContainerAtRelFrame(const int &frame);
     virtual CacheContainer *createNewRenderContainerAtRelFrame(const int &frame);
     int getFirstEmptyFrameAtOrAfterFrame(const int &frame);
@@ -46,7 +46,7 @@ public:
 protected:
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
     bool getRenderContainterIdAtRelFrame(const int &relFrame, int *id);
-    QList<CacheContainerSPtr> mRenderContainers;
+    QList<stdsptr<CacheContainer>> mRenderContainers;
 };
 
 #endif // RENDERCACHEHANDLER_H

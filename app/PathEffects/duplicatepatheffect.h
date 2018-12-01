@@ -20,7 +20,7 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
-    QPointFAnimatorQSPtr mTranslation;
+    qsptr<QPointFAnimator> mTranslation;
 };
 
 #endif // DUPLICATEPATHEFFECT_H

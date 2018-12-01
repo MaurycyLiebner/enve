@@ -13,7 +13,7 @@ ComplexAnimator::~ComplexAnimator() {
 }
 
 void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
-                                              const PropertyQSPtr &prependWith) {
+                                              const qsptr<Property> &prependWith) {
     if(prependWith == nullptr) return;
     int id = getChildPropertyIndex(childAnimator);
     if(id == -1) return;
@@ -21,8 +21,8 @@ void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
 }
 
 
-void ComplexAnimator::ca_replaceChildAnimator(const PropertyQSPtr& childAnimator,
-                                              const PropertyQSPtr &replaceWith) {
+void ComplexAnimator::ca_replaceChildAnimator(const qsptr<Property>& childAnimator,
+                                              const qsptr<Property> &replaceWith) {
     int id = getChildPropertyIndex(childAnimator.get());
     if(id == -1) return;
     ca_removeChildAnimator(childAnimator);
@@ -42,7 +42,7 @@ Property *ComplexAnimator::ca_getChildAt(const int &i) {
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction* abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         abstraction->addChildAbstraction(
                     property->SWT_createAbstraction(visiblePartWidget));
     }
@@ -56,7 +56,7 @@ void ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
     int fId = INT_MIN;
     int lId = INT_MAX;
 
-    Q_FOREACH(const QSharedPointer<Property> &child, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &child, ca_mChildAnimators) {
         if(fId > lId) {
             break;
         }
@@ -106,7 +106,7 @@ ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
     return GetAsPtr(anim_getKeyAtRelFrame(frame), ComplexKey);
 }
 
-void ComplexAnimator::ca_addChildAnimator(const PropertyQSPtr& childAnimator,
+void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childAnimator,
                                           const int &id) {
     ca_mChildAnimators.insert(id, childAnimator);
     childAnimator->setLastSetParent(this);
@@ -147,8 +147,8 @@ int ComplexAnimator::getChildPropertyIndex(Property *child) {
 }
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
-    Q_FOREACH(const KeySPtr &ckey, anim_mKeys) {
-        ComplexKeySPtr complexKey = GetAsSPtr(ckey, ComplexKey);
+    Q_FOREACH(const stdsptr<Key> &ckey, anim_mKeys) {
+        stdsptr<ComplexKey> complexKey = GetAsSPtr(ckey, ComplexKey);
         if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
             if(complexKey->isEmpty() ) {
@@ -199,7 +199,7 @@ void ComplexAnimator::ca_moveChildInList(
 }
 
 void ComplexAnimator::ca_removeChildAnimator(
-        const PropertyQSPtr& removeAnimator) {
+        const qsptr<Property>& removeAnimator) {
     removeAnimator->prp_setUpdater(nullptr);
     removeAnimator->prp_removeAllKeysFromComplexAnimator(this);
     disconnect(removeAnimator.get(), nullptr, this, nullptr);
@@ -219,7 +219,7 @@ void ComplexAnimator::ca_removeAllChildAnimators() {
 }
 
 Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         if(property->prp_getName() == name) {
             return property.get();
         } else if(property->SWT_isComplexAnimator()) {
@@ -251,7 +251,7 @@ void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
 }
 
 void ComplexAnimator::prp_clearFromGraphView() {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_clearFromGraphView();
     }
 }
@@ -261,13 +261,13 @@ bool ComplexAnimator::hasChildAnimators() {
 }
 
 void ComplexAnimator::prp_startTransform() {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_startTransform();
     }
 }
 
 void ComplexAnimator::prp_setTransformed(const bool &bT) {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_setTransformed(bT);
     }
 }
@@ -301,7 +301,7 @@ void ComplexAnimator::prp_setParentFrameShift(const int &shift,
                                               ComplexAnimator* parentAnimator) {
     Property::prp_setParentFrameShift(shift, parentAnimator);
     int thisShift = prp_getFrameShift();
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_setParentFrameShift(thisShift, this);
     }
 }
@@ -313,11 +313,11 @@ void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
     prp_callUpdater();
 }
 
-void ComplexAnimator::prp_setUpdater(const AnimatorUpdaterSPtr& updater) {
+void ComplexAnimator::prp_setUpdater(const stdsptr<AnimatorUpdater>& updater) {
     if(prp_mUpdaterBlocked) return;
     Animator::prp_setUpdater(updater);
 
-    Q_FOREACH(const PropertyQSPtr &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_setUpdater(updater);
     }
 }
@@ -326,25 +326,25 @@ void ComplexAnimator::prp_setAbsFrame(const int &frame) {
     //if(!prp_isDescendantRecording()) return;
     Animator::prp_setAbsFrame(frame);
 
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_setAbsFrame(frame);
     }
 }
 
 void ComplexAnimator::prp_retrieveSavedValue() {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_retrieveSavedValue();
     }
 }
 
 void ComplexAnimator::prp_finishTransform() {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_finishTransform();
     }
 }
 
 void ComplexAnimator::prp_cancelTransform() {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_cancelTransform();
     }
 }
@@ -361,7 +361,7 @@ void ComplexAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) {
         prp_setRecording(true);
     } else {
-        Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+        Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
             if(property->SWT_isAnimator()) {
                 GetAsPtr(property, Animator)->anim_saveCurrentValueAsKey();
             }
@@ -370,7 +370,7 @@ void ComplexAnimator::anim_saveCurrentValueAsKey() {
 }
 
 void ComplexAnimator::prp_setRecording(const bool &rec) {
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         property->prp_setRecording(rec);
     }
     anim_setRecordingValue(rec);
@@ -379,7 +379,7 @@ void ComplexAnimator::prp_setRecording(const bool &rec) {
 void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     bool rec = true;
     bool childRecordingT = false;
-    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
         bool isChildRec = property->prp_isRecording();
         bool isChildDescRec = property->prp_isDescendantRecording();
         if(isChildDescRec) {
@@ -430,8 +430,8 @@ void ComplexKey::addAnimatorKey(Key* key) {
     mKeys << key;
 }
 
-void ComplexKey::addOrMergeKey(const KeySPtr& keyAdd) {
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+void ComplexKey::addOrMergeKey(const stdsptr<Key>& keyAdd) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->getParentAnimator() == keyAdd->getParentAnimator() ) {
             key->mergeWith(keyAdd);
             return;
@@ -441,8 +441,8 @@ void ComplexKey::addOrMergeKey(const KeySPtr& keyAdd) {
 }
 
 void ComplexKey::deleteKey() {
-    QList<KeyPtr> keys = mKeys;
-    Q_FOREACH(const KeyPtr& key, keys) {
+    QList<stdptr<Key>> keys = mKeys;
+    Q_FOREACH(const stdptr<Key>& key, keys) {
         key->deleteKey();
     }
 }
@@ -482,19 +482,19 @@ void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);
 
     int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         key->setAbsFrame(absFrame);
     }
 }
 
-void ComplexKey::mergeWith(const KeySPtr& key) {
+void ComplexKey::mergeWith(const stdsptr<Key>& key) {
     GetAsPtr(key, ComplexKey)->margeAllKeysToKey(this);
     key->removeFromAnimator();
 }
 
 void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
-    QList<KeyPtr> keys = mKeys;
-    Q_FOREACH(const KeyPtr& key, keys) {
+    QList<stdptr<Key>> keys = mKeys;
+    Q_FOREACH(const stdptr<Key>& key, keys) {
         removeAnimatorKey(key);
         target->addOrMergeKey(GetAsSPtr(key, Key));
     }
@@ -502,7 +502,7 @@ void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
 
 bool ComplexKey::isDescendantSelected() {
     if(isSelected()) return true;
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->isDescendantSelected()) return true;
     }
     return false;
@@ -526,7 +526,7 @@ void ComplexKey::cancelFrameTransform() {
 }
 
 bool ComplexKey::areAllChildrenSelected() {
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->isSelected() ||
                 key->areAllChildrenSelected()) continue;
         return false;
@@ -535,15 +535,15 @@ bool ComplexKey::areAllChildrenSelected() {
     return true;
 }
 
-void ComplexKey::addToSelection(QList<KeyPtr> &selectedKeys,
-                                QList<AnimatorQPtr> &selectedAnimators) {
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+void ComplexKey::addToSelection(QList<stdptr<Key>> &selectedKeys,
+                                QList<qptr<Animator>> &selectedAnimators) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         key->addToSelection(selectedKeys, selectedAnimators);
     }
 }
 
 bool ComplexKey::hasKey(Key *key) {
-    Q_FOREACH(const KeyPtr& keyT, mKeys) {
+    Q_FOREACH(const stdptr<Key>& keyT, mKeys) {
         if(key == keyT) {
             return true;
         }
@@ -554,7 +554,7 @@ bool ComplexKey::hasKey(Key *key) {
 bool ComplexKey::differsFromKey(Key *otherKey) {
     ComplexKey* otherComplexKey = GetAsPtr(otherKey, ComplexKey);
     if(getChildKeysCount() == otherComplexKey->getChildKeysCount()) {
-        Q_FOREACH(const KeyPtr& key, mKeys) {
+        Q_FOREACH(const stdptr<Key>& key, mKeys) {
             if(otherComplexKey->hasSameKey(key)) continue;
             return true;
         }
@@ -568,7 +568,7 @@ int ComplexKey::getChildKeysCount() {
 }
 
 bool ComplexKey::hasSameKey(Key *otherKey) {
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->getParentAnimator() == otherKey->getParentAnimator()) {
             if(key->differsFromKey(otherKey)) return false;
             return true;
@@ -577,23 +577,23 @@ bool ComplexKey::hasSameKey(Key *otherKey) {
     return false;
 }
 
-void ComplexKey::removeFromSelection(QList<KeyPtr> &selectedKeys,
-                                     QList<AnimatorQPtr> &selectedAnimators) {
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+void ComplexKey::removeFromSelection(QList<stdptr<Key>> &selectedKeys,
+                                     QList<qptr<Animator>> &selectedAnimators) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         key->removeFromSelection(selectedKeys, selectedAnimators);
     }
 }
 
 void ComplexKey::startFrameTransform() {
     Key::startFrameTransform();
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->isSelected()) continue;
         key->startFrameTransform();
     }
 }
 
 void ComplexKey::finishFrameTransform() {
-    Q_FOREACH(const KeyPtr& key, mKeys) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->isSelected()) continue;
         key->finishFrameTransform();
     }

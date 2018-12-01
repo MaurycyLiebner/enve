@@ -20,6 +20,7 @@ class ImageSequenceBox;
 class Brush;
 class NodePoint;
 class UndoRedoStack;
+class ExternalLinkBox;
 
 #define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? nullptr : (list).at( (index) ))
 
@@ -46,8 +47,8 @@ enum CanvasMode : short {
 };
 
 
-extern bool zLessThan(const BoundingBoxQPtr &box1,
-                      const BoundingBoxQPtr &box2);
+extern bool zLessThan(const qptr<BoundingBox> &box1,
+                      const qptr<BoundingBox> &box2);
 
 struct CanvasRenderData : public BoxesGroupRenderData {
     CanvasRenderData(BoundingBox *parentBoxT);
@@ -61,8 +62,8 @@ protected:
     void updateRelBoundingRect();
 };
 
-extern bool boxesZSort(const BoundingBoxQPtr &box1,
-                       const BoundingBoxQPtr &box2);
+extern bool boxesZSort(const qptr<BoundingBox> &box1,
+                       const qptr<BoundingBox> &box2);
 
 class Canvas : public BoxesGroup {
     Q_OBJECT
@@ -250,7 +251,7 @@ public:
 
     bool keyPressEvent(QKeyEvent *event);
 
-    BoundingBoxQSPtr createLink();
+    qsptr<BoundingBox> createLink();
     ImageBox* createImageBox(const QString &path);
     ImageSequenceBox* createAnimationBoxForPaths(const QStringList &paths);
     VideoBox* createVideoForPath(const QString &path);
@@ -329,7 +330,7 @@ public:
         return mBackgroundColor.get();
     }
 
-    BoundingBoxRenderDataSPtr createRenderData();
+    stdsptr<BoundingBoxRenderData> createRenderData();
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data) {
@@ -348,7 +349,7 @@ public:
     }
 protected:
 //    void updateAfterCombinedTransformationChanged() {
-////        Q_FOREACH(const BoundingBoxQSPtr& child, mChildBoxes) {
+////        Q_FOREACH(const qsptr<BoundingBox>& child, mChildBoxes) {
 ////            child->updateCombinedTransformTmp();
 ////            child->scheduleSoftUpdate();
 ////        }
@@ -394,7 +395,7 @@ public:
     void clearLastPressedPoint();
     void clearCurrentEndPoint();
     void clearHoveredEdge();
-    void applyPaintSettingToSelected(const PaintSetting &setting);
+    void applyPaintSettingToSelected(PaintSetting *setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
     int getCurrentFrame();
@@ -559,7 +560,7 @@ public:
 
     template <class T>
     void applyEffectToSelected() {
-        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
+        Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
             box->addEffect<T>();
         }
     }
@@ -576,7 +577,7 @@ protected:
 
     sk_sp<SkImage> mRenderImageSk;
 
-    QSharedPointer<ColorAnimator> mBackgroundColor =
+    qsptr<ColorAnimator> mBackgroundColor =
             SPtrCreate(ColorAnimator)();
 
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
@@ -585,16 +586,16 @@ protected:
     void sortSelectedBoxesByZAscending();
 
     QMatrix mCanvasTransformMatrix;
-    SoundCompositionQSPtr mSoundComposition;
+    qsptr<SoundComposition> mSoundComposition;
 
     MovablePoint* mHoveredPoint_d = nullptr;
-    BoundingBoxQPtr mHoveredBox;
+    qptr<BoundingBox> mHoveredBox;
     VectorPathEdge *mHoveredEdge_d = nullptr;
-    BoneQPtr mHoveredBone;
+    qptr<Bone> mHoveredBone;
 
-    QList<BoneQPtr> mSelectedBones;
-    QList<MovablePointPtr> mSelectedPoints_d;
-    QList<BoundingBoxQPtr> mSelectedBoxes;
+    QList<qptr<Bone>> mSelectedBones;
+    QList<stdptr<MovablePoint>> mSelectedPoints_d;
+    QList<qptr<BoundingBox>> mSelectedBoxes;
 
     bool mLocalPivot = false;
     bool mBonesSelectionEnabled = false;
@@ -606,10 +607,10 @@ protected:
     CanvasWindow *mCanvasWindow;
     QWidget *mCanvasWidget;
 
-    CircleQSPtr mCurrentCircle;
-    RectangleQSPtr mCurrentRectangle;
-    TextBoxQSPtr mCurrentTextBox;
-    ParticleBoxQSPtr mCurrentParticleBox;
+    qsptr<Circle> mCurrentCircle;
+    qsptr<Rectangle> mCurrentRectangle;
+    qsptr<TextBox> mCurrentTextBox;
+    qsptr<ParticleBox> mCurrentParticleBox;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
 
@@ -643,7 +644,7 @@ protected:
     QColor mFillColor;
     QColor mOutlineColor;
 
-    BoxesGroupQPtr mCurrentBoxesGroup;
+    qptr<BoxesGroup> mCurrentBoxesGroup;
 
     int mWidth;
     int mHeight;
@@ -670,13 +671,13 @@ protected:
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
 
-    MovablePointPtr mLastPressedPoint;
-    NodePointPtr mCurrentEndPoint;
-    BoundingBoxQPtr mLastPressedBox;
-    BoneQPtr mLastPressedBone;
+    stdptr<MovablePoint>mLastPressedPoint;
+    stdptr<NodePoint>mCurrentEndPoint;
+    qptr<BoundingBox> mLastPressedBox;
+    qptr<Bone> mLastPressedBone;
 
     void setCtrlPointsEnabled(bool enabled);
-    PathPivotSPtr mRotPivot;
+    stdsptr<PathPivot> mRotPivot;
     void handleMovePointMouseMove();
     void handleMovePathMouseMove();
     void handleAddPointMouseMove();

@@ -136,7 +136,7 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 }
 
-BoundingBoxRenderDataSPtr AnimationBox::createRenderData() {
+stdsptr<BoundingBoxRenderData> AnimationBox::createRenderData() {
     return SPtrCreate(AnimationBoxRenderData)(mAnimationCacheHandler, this);
 }
 

@@ -10,6 +10,8 @@ class NodePoint;
 class VectorPathEdge;
 class Canvas;
 class MovablePoint;
+class SvgNodePoint;
+class BasicTransformAnimator;
 enum CanvasMode : short;
 struct NodeSettings : public StdSelfRef {
     friend class StdSelfRef;
@@ -80,7 +82,7 @@ public:
                                      const NodeSettings *settings,
                                      const bool &saveUndoRedo = true);
     void insertNodeSettingsForNodeId(const int &nodeId,
-                                     const NodeSettingsSPtr &newSettings,
+                                     const stdsptr<NodeSettings> &newSettings,
                                      const bool &saveUndoRedo = true);
 
     void removeNodeSettingsAt(const int &id,
@@ -105,7 +107,7 @@ public:
     void anim_saveCurrentValueAsKey();
     void anim_addKeyAtRelFrame(const int &relFrame);
 
-    void anim_removeKey(const KeySPtr &keyToRemove,
+    void anim_removeKey(const stdsptr<Key> &keyToRemove,
                         const bool &saveUndoRedo);
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
@@ -155,7 +157,7 @@ public:
                       const SkScalar &invScale,
                       const SkMatrix &combinedTransform);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr> &list);
+                                           QList<stdptr<MovablePoint>> &list);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
@@ -167,7 +169,7 @@ public:
                           NodePoint *pt2);
     void connectPoints(NodePoint *pt1,
                        NodePoint *pt2);
-    void appendToPointsList(const NodePointSPtr &pt);
+    void appendToPointsList(const stdsptr<NodePoint> &pt);
 
     void setElementPos(const int &index,
                        const SkPoint &pos);
@@ -182,7 +184,7 @@ public:
                                 const int &newFrame,
                                 const bool &saveUndoRedo = true,
                                 const bool &finish = true);
-    void anim_appendKey(const KeySPtr &newKey,
+    void anim_appendKey(const stdsptr<Key> &newKey,
                         const bool &saveUndoRedo = true,
                         const bool &update = true);
 
@@ -190,13 +192,13 @@ public:
     void revertElementPosSubset(const int &firstId, int count);
     void revertNodeSettingsSubset(const int &firstId, int count);
 
-    void getNodeSettingsList(QList<NodeSettingsSPtr>& nodeSettingsList);
+    void getNodeSettingsList(QList<stdsptr<NodeSettings>>& nodeSettingsList);
 
-    const QList<NodeSettingsSPtr> &getNodeSettingsList();
+    const QList<stdsptr<NodeSettings>> &getNodeSettingsList();
 
     void getElementPosList(QList<SkPoint> *elementPosList);
 
-    void getKeysList(QList<PathKeySPtr>& pathKeyList);
+    void getKeysList(QList<stdsptr<PathKey>>& pathKeyList);
 
     static void getKeysDataForConnection(VectorPathAnimator *targetPath,
                                   VectorPathAnimator* srcPath,
@@ -205,7 +207,7 @@ public:
                                   const bool &addSrcFirst);
 
     VectorPathAnimator *connectWith(VectorPathAnimator *srcPath);
-    KeySPtr readKey(QIODevice *target);
+    stdsptr<Key> readKey(QIODevice *target);
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
 
@@ -258,13 +260,13 @@ private:
 
     bool mElementsUpdateNeeded = false;
 
-    BasicTransformAnimatorQPtr mParentTransform;
-    PathAnimatorQPtr mParentPathAnimator;
-    NodePointPtr mFirstPoint;
+    qptr<BasicTransformAnimator> mParentTransform;
+    qptr<PathAnimator> mParentPathAnimator;
+    stdptr<NodePoint>mFirstPoint;
 
     QList<int> mNodesToRemove;
-    QList<NodeSettingsSPtr> mNodeSettings;
-    QList<NodePointSPtr> mPoints;
+    QList<stdsptr<NodeSettings>> mNodeSettings;
+    QList<stdsptr<NodePoint>> mPoints;
 };
 
 #endif // VECTORPATHANIMATOR_H

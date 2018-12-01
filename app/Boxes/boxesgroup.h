@@ -21,7 +21,7 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
 
     void updateRelBoundingRect() {
         SkPath boundingPaths = SkPath();
-        Q_FOREACH(const BoundingBoxRenderDataSPtr &child,
+        Q_FOREACH(const stdsptr<BoundingBoxRenderData> &child,
                   childrenRenderData) {
             SkPath childPath;
             childPath.addRect(
@@ -36,12 +36,12 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
     }
     void renderToImage();
 
-    QList<BoundingBoxRenderDataSPtr> childrenRenderData;
+    QList<stdsptr<BoundingBoxRenderData>> childrenRenderData;
 protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
-        Q_FOREACH(const BoundingBoxRenderDataSPtr &child,
+        Q_FOREACH(const stdsptr<BoundingBoxRenderData> &child,
                   childrenRenderData) {
             child->drawRenderedImageForParent(canvas);
         }
@@ -74,16 +74,16 @@ public:
     void ungroup();
 
     bool isCurrentGroup();
-    void addContainedBox(const BoundingBoxQSPtr &child);
+    void addContainedBox(const qsptr<BoundingBox> &child);
     void addContainedBoxToListAt(const int &index,
-                                 const BoundingBoxQSPtr &child,
+                                 const qsptr<BoundingBox> &child,
                                  const bool &saveUndoRedo = true);
     void updateContainedBoxIds(const int &firstId,
                           const bool &saveUndoRedo = true);
     void updateContainedBoxIds(const int &firstId,
                           const int &lastId,
                           const bool &saveUndoRedo = true);
-    void removeContainedBox(const BoundingBoxQSPtr &child);
+    void removeContainedBox(const qsptr<BoundingBox> &child);
     void increaseContainedBoxZInList(BoundingBox *child);
     void decreaseContainedBoxZInList(BoundingBox *child);
     void bringContainedBoxToEndList(BoundingBox *child);
@@ -111,7 +111,7 @@ public:
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
         SkPath boundingPaths = SkPath();
         int absFrame = prp_relFrameToAbsFrame(relFrame);
-        Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
+        Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
             int childRelFrame = child->prp_absFrameToRelFrame(absFrame);
             if(child->isRelFrameVisibleAndInVisibleDurationRect(childRelFrame)) {
                 SkPath childPath;
@@ -143,20 +143,19 @@ public:
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
-    void applyPaintSetting(
-            const PaintSetting &setting) {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+    void applyPaintSetting(PaintSetting *setting) {
+        Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
             box->applyPaintSetting(setting);
         }
     }
 
     void setFillColorMode(const ColorMode &colorMode) {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box,  mContainedBoxes) {
+        Q_FOREACH(const qsptr<BoundingBox> &box,  mContainedBoxes) {
             box->setFillColorMode(colorMode);
         }
     }
     void setStrokeColorMode(const ColorMode &colorMode) {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+        Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
             box->setStrokeColorMode(colorMode);
         }
     }
@@ -174,7 +173,7 @@ public:
     void prp_setAbsFrame(const int &frame);
     void schedulerProccessed();
 
-    BoundingBoxRenderDataSPtr createRenderData() {
+    stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(BoxesGroupRenderData)(this);
     }
 
@@ -203,7 +202,7 @@ public:
 
     int setBoxLoadId(const int &loadId) {
         int loadIdT = BoundingBox::setBoxLoadId(loadId);
-        foreach(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
+        foreach(const qsptr<BoundingBox> &child, mContainedBoxes) {
             loadIdT = child->setBoxLoadId(loadIdT);
         }
 
@@ -212,26 +211,26 @@ public:
 
     virtual void clearBoxLoadId() {
         BoundingBox::clearBoxLoadId();
-        foreach(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
+        foreach(const qsptr<BoundingBox> &child, mContainedBoxes) {
             child->clearBoxLoadId();
         }
     }
 
-    const QList<QSharedPointer<BoundingBox> > &getContainedBoxesList() const {
+    const QList<qsptr<BoundingBox> > &getContainedBoxesList() const {
         return mContainedBoxes;
     }
-    BoundingBoxQSPtr createLink();
+    qsptr<BoundingBox> createLink();
     void readChildBoxes(QIODevice *target);
 
-    void addPathEffect(const PathEffectQSPtr& effect);
-    void addFillPathEffect(const PathEffectQSPtr& effect);
-    void addOutlinePathEffect(const PathEffectQSPtr& effect);
-    void removePathEffect(const PathEffectQSPtr& effect);
-    void removeFillPathEffect(const PathEffectQSPtr& effect);
-    void removeOutlinePathEffect(const PathEffectQSPtr& effect);
+    void addPathEffect(const qsptr<PathEffect>& effect);
+    void addFillPathEffect(const qsptr<PathEffect>& effect);
+    void addOutlinePathEffect(const qsptr<PathEffect>& effect);
+    void removePathEffect(const qsptr<PathEffect>& effect);
+    void removeFillPathEffect(const qsptr<PathEffect>& effect);
+    void removeOutlinePathEffect(const qsptr<PathEffect>& effect);
 
     void updateAllChildPathBoxes(const UpdateReason &reason) {
-        foreach(const QSharedPointer<BoundingBox> &box,
+        foreach(const qsptr<BoundingBox> &box,
                 mContainedBoxes) {
             if(box->SWT_isPathBox()) {
                 box->scheduleUpdate(reason);
@@ -272,17 +271,17 @@ public:
 //                                 int &prevRelFrame);
     bool enabledGroupPathSumEffectPresent();
 protected:
-    QList<PathEffectQSPtr> mGroupPathSumEffects;
-    PathEffectAnimatorsQSPtr mPathEffectsAnimators;
-    PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
-    PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
+    QList<qsptr<PathEffect>> mGroupPathSumEffects;
+    qsptr<PathEffectAnimators> mPathEffectsAnimators;
+    qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
+    qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
 
     static bool mCtrlsAlwaysVisible;
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
-    QList<QSharedPointer<BoundingBox> > mContainedBoxes;
+    QList<qsptr<BoundingBox> > mContainedBoxes;
 
-    //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
+    //QList<qsptr<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getContainedBoxIndex(BoundingBox *child);
     void iniPathEffects();
     bool isLastPathBox(PathBox *pathBox);

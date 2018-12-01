@@ -115,9 +115,9 @@ private:
     QString mOutputDestination;
     QString mRenderError;
 
-    OutputSettingsProfilePtr mOutputSettingsProfile;
+    stdptr<OutputSettingsProfile>mOutputSettingsProfile;
 
-    CanvasQPtr mTargetCanvas;
+    qptr<Canvas> mTargetCanvas;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;

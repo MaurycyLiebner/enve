@@ -179,12 +179,12 @@ void Gradient::prp_startTransform() {
 
 void Gradient::addColorToList(const QColor &color,
                               const bool &saveUndoRedo) {
-    ColorAnimatorQSPtr newColorAnimator = SPtrCreate(ColorAnimator)();
+    qsptr<ColorAnimator> newColorAnimator = SPtrCreate(ColorAnimator)();
     newColorAnimator->qra_setCurrentValue(color);
     addColorToList(newColorAnimator, saveUndoRedo);
 }
 
-void Gradient::addColorToList(const ColorAnimatorQSPtr& newColorAnimator,
+void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator,
                               const bool &saveUndoRedo) {
     mColors << newColorAnimator;
 
@@ -235,7 +235,7 @@ void Gradient::removeColor(const int &id) {
     removeColor(mColors.at(id));
 }
 
-void Gradient::removeColor(const ColorAnimatorQSPtr& color,
+void Gradient::removeColor(const qsptr<ColorAnimator>& color,
                            const bool &saveUndoRedo) {
     if(saveUndoRedo) {
 //        addUndoRedo(new GradientColorRemovedFromListUndoRedo(

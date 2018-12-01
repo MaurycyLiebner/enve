@@ -41,16 +41,16 @@ BoundingBox *InternalLinkBox::getLinkTarget() const {
     return mBoxTarget->getTarget();
 }
 
-BoundingBoxQSPtr InternalLinkBox::createLink() {
+qsptr<BoundingBox> InternalLinkBox::createLink() {
     return getLinkTarget()->createLink();
 }
 
-BoundingBoxQSPtr InternalLinkBox::createLinkForLinkGroup() {
+qsptr<BoundingBox> InternalLinkBox::createLinkForLinkGroup() {
     return SPtrCreate(InternalLinkBox)(this);
 }
 
-BoundingBoxRenderDataSPtr InternalLinkBox::createRenderData() {
-    BoundingBoxRenderDataSPtr renderData = getLinkTarget()->createRenderData();
+stdsptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
+    stdsptr<BoundingBoxRenderData> renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = this;
     return renderData;
 }
@@ -145,10 +145,10 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
     BoxesGroup() {
     mType = TYPE_INTERNAL_LINK;
     setLinkTarget(linkTarget);
-    const QList<BoundingBoxQSPtr> &boxesList =
+    const QList<qsptr<BoundingBox>> &boxesList =
             linkTarget->getContainedBoxesList();
-    foreach(const BoundingBoxQSPtr &child, boxesList) {
-        BoundingBoxQSPtr newLink = child->createLinkForLinkGroup();
+    foreach(const qsptr<BoundingBox> &child, boxesList) {
+        qsptr<BoundingBox> newLink = child->createLinkForLinkGroup();
         addContainedBox(newLink);
     }
     ca_prependChildAnimator(mTransformAnimator.data(), mBoxTarget);
@@ -219,7 +219,7 @@ BoxesGroup *InternalLinkGroupBox::getLinkTarget() const {
     return GetAsPtr(mBoxTarget->getTarget(), BoxesGroup);
 }
 
-BoundingBoxQSPtr InternalLinkGroupBox::createLinkForLinkGroup() {
+qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
     if(mParentGroup->SWT_isLinkBox()) {
         return getLinkTarget()->createLinkForLinkGroup();
     } else {
@@ -227,7 +227,7 @@ BoundingBoxQSPtr InternalLinkGroupBox::createLinkForLinkGroup() {
     }
 }
 
-BoundingBoxRenderDataSPtr InternalLinkGroupBox::createRenderData() {
+stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
     auto renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = this;
     return renderData;
@@ -269,7 +269,7 @@ void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
 
     BoxesGroup* finalTarget = getFinalTarget();
     auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
-    CanvasQSPtr canvasTarget = GetAsSPtr(finalTarget, Canvas);
+    qsptr<Canvas> canvasTarget = GetAsSPtr(finalTarget, Canvas);
     canvasData->bgColor = QColorToSkColor(canvasTarget->getBgColorAnimator()->
             getColorAtRelFrameF(relFrame));
     //qreal res = getParentCanvas()->getResolutionFraction();
@@ -287,7 +287,7 @@ bool InternalLinkCanvas::clipToCanvas() {
     return mClipToCanvas->getValue();
 }
 
-BoundingBoxQSPtr InternalLinkCanvas::createLinkForLinkGroup() {
+qsptr<BoundingBox> InternalLinkCanvas::createLinkForLinkGroup() {
     if(mParentGroup->SWT_isLinkBox()) {
         return getLinkTarget()->createLinkForLinkGroup();
     } else {
@@ -295,7 +295,7 @@ BoundingBoxQSPtr InternalLinkCanvas::createLinkForLinkGroup() {
     }
 }
 
-BoundingBoxRenderDataSPtr InternalLinkCanvas::createRenderData() {
+stdsptr<BoundingBoxRenderData> InternalLinkCanvas::createRenderData() {
     return SPtrCreate(LinkCanvasRenderData)(this);
 }
 
@@ -379,7 +379,7 @@ void LinkCanvasRenderData::renderToImage() {
         bitmap.peekPixels(&pixmap);
         fmt_filters::image img(static_cast<uint8_t*>(pixmap.writable_addr()),
                                pixmap.width(), pixmap.height());
-        foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
+        foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
         clearPixmapEffects();

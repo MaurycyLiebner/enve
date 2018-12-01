@@ -41,12 +41,12 @@ PathKey::PathKey(const int &relFrame,
     updatePath();
 }
 
-PathKeySPtr PathKey::createNewKeyFromSubsetForPath(
+stdsptr<PathKey> PathKey::createNewKeyFromSubsetForPath(
         VectorPathAnimator* parentAnimator,
         const int &firstId, int count) {
     QList<SkPoint> elementsPos =
             takeElementsPosSubset(firstId, count);
-    PathKeySPtr newKey =
+    stdsptr<PathKey> newKey =
             SPtrCreate(PathKey)(mRelFrame, elementsPos,
                                 parentAnimator, false);
     parentAnimator->anim_appendKey(newKey);

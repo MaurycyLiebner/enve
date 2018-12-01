@@ -14,8 +14,8 @@
 #include "skqtconversions.h"
 #include "global.h"
 
-QList<BoundingBoxQPtr> BoundingBox::mLoadedBoxes;
-QList<FunctionWaitingForBoxLoadSPtr> BoundingBox::mFunctionsWaitingForBoxLoad;
+QList<qptr<BoundingBox>> BoundingBox::mLoadedBoxes;
+QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::mFunctionsWaitingForBoxLoad;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator("box") {
@@ -54,7 +54,7 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(const SingleWidgetAbstractionSPtr &abs,
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs,
               mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
             return abs.get();
@@ -68,14 +68,14 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 }
 
 #include "linkbox.h"
-BoundingBoxQSPtr BoundingBox::createLink() {
-    BoundingBoxQSPtr linkBox = SPtrCreate(InternalLinkBox)(this);
+qsptr<BoundingBox> BoundingBox::createLink() {
+    qsptr<BoundingBox> linkBox = SPtrCreate(InternalLinkBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
     return linkBox;
 }
 
-BoundingBoxQSPtr BoundingBox::createLinkForLinkGroup() {
-    BoundingBoxQSPtr box = createLink();
+qsptr<BoundingBox> BoundingBox::createLinkForLinkGroup() {
+    qsptr<BoundingBox> box = createLink();
     box->clearEffects();
     return box;
 }
@@ -138,7 +138,7 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     canvas->restore();
 }
 
-void BoundingBox::applyPaintSetting(const PaintSetting &setting) {
+void BoundingBox::applyPaintSetting( PaintSetting *setting) {
     Q_UNUSED(setting);
 }
 
@@ -707,7 +707,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 }
 
-BoundingBoxRenderDataSPtr BoundingBox::createRenderData() { return nullptr; }
+stdsptr<BoundingBoxRenderData> BoundingBox::createRenderData() { return nullptr; }
 
 void BoundingBox::setupEffectsF(const qreal &relFrame,
                                 BoundingBoxRenderData *data) {
@@ -722,7 +722,7 @@ void BoundingBox::removeLinkingBox(BoundingBox *box) {
     mLinkingBoxes.removeOne(box);
 }
 
-const QList<BoundingBoxQPtr> &BoundingBox::getLinkingBoxes() const {
+const QList<qptr<BoundingBox>> &BoundingBox::getLinkingBoxes() const {
     return mLinkingBoxes;
 }
 
@@ -789,7 +789,7 @@ void BoundingBox::setZListIndex(const int &z,
     mZListIndex = z;
 }
 
-void BoundingBox::selectAndAddContainedPointsToList(const QRectF &, QList<MovablePointPtr> &) {}
+void BoundingBox::selectAndAddContainedPointsToList(const QRectF &, QList<stdptr<MovablePoint>> &) {}
 
 int BoundingBox::getZIndex() {
     return mZListIndex;
@@ -903,7 +903,7 @@ void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
 
 bool BoundingBox::isAnimated() { return prp_isDescendantRecording(); }
 
-void BoundingBox::addEffect(const PixmapEffectQSPtr& effect) {
+void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
 
     if(!mEffectsAnimators->hasChildAnimators()) {
@@ -915,7 +915,7 @@ void BoundingBox::addEffect(const PixmapEffectQSPtr& effect) {
     clearAllCache();
 }
 
-void BoundingBox::removeEffect(const PixmapEffectQSPtr& effect) {
+void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
     mEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mEffectsAnimators->hasChildAnimators()) {
         mEffectsAnimators->SWT_hide();
@@ -937,7 +937,7 @@ bool BoundingBox::hasDurationRectangle() const {
 }
 
 void BoundingBox::createDurationRectangle() {
-    DurationRectangleQSPtr durRect =
+    qsptr<DurationRectangle> durRect =
             SPtrCreate(DurationRectangle)(this);
     durRect->setMinFrame(0);
     Canvas* parentCanvas = getParentCanvas();
@@ -968,12 +968,12 @@ int BoundingBox::prp_getRelFrameShift() const {
     return mDurationRectangle->getFrameShift();
 }
 
-void BoundingBox::setDurationRectangle(const DurationRectangleQSPtr& durationRect) {
+void BoundingBox::setDurationRectangle(const qsptr<DurationRectangle>& durationRect) {
     if(durationRect == mDurationRectangle) return;
     if(mDurationRectangle != nullptr) {
         disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
     }
-    DurationRectangleQSPtr oldDurRect = mDurationRectangle;
+    qsptr<DurationRectangle> oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted();
     if(durationRect == nullptr) {
@@ -1061,17 +1061,17 @@ void BoundingBox::prp_drawKeys(QPainter *p,
                            startFrame, endFrame);
 }
 
-void BoundingBox::addPathEffect(const PathEffectQSPtr &) {}
+void BoundingBox::addPathEffect(const qsptr<PathEffect> &) {}
 
-void BoundingBox::addFillPathEffect(const PathEffectQSPtr &) {}
+void BoundingBox::addFillPathEffect(const qsptr<PathEffect> &) {}
 
-void BoundingBox::addOutlinePathEffect(const PathEffectQSPtr &) {}
+void BoundingBox::addOutlinePathEffect(const qsptr<PathEffect> &) {}
 
-void BoundingBox::removePathEffect(const PathEffectQSPtr &) {}
+void BoundingBox::removePathEffect(const qsptr<PathEffect> &) {}
 
-void BoundingBox::removeFillPathEffect(const PathEffectQSPtr &) {}
+void BoundingBox::removeFillPathEffect(const qsptr<PathEffect> &) {}
 
-void BoundingBox::removeOutlinePathEffect(const PathEffectQSPtr &) {}
+void BoundingBox::removeOutlinePathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::addActionsToMenu(QMenu *) {}
 
@@ -1237,7 +1237,7 @@ void BoundingBox::processSchedulers() {
 }
 
 void BoundingBox::addSchedulersToProcess() {
-    foreach(const _ScheduledExecutorSPtr &updatable, mSchedulers) {
+    foreach(const stdsptr<_ScheduledExecutor> &updatable, mSchedulers) {
         MainWindow::getInstance()->addUpdateScheduler(updatable);
     }
 
@@ -1259,7 +1259,7 @@ void BoundingBox::clearBoxLoadId() {
 }
 
 BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
-    foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
+    foreach(const qptr<BoundingBox>& box, mLoadedBoxes) {
         if(box == nullptr) return nullptr;
         if(box->getLoadId() == loadId) {
             return box;
@@ -1268,14 +1268,14 @@ BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
     return nullptr;
 }
 
-void BoundingBox::addFunctionWaitingForBoxLoad(const FunctionWaitingForBoxLoadSPtr &func) {
+void BoundingBox::addFunctionWaitingForBoxLoad(const stdsptr<FunctionWaitingForBoxLoad> &func) {
     mFunctionsWaitingForBoxLoad << func;
 }
 
 void BoundingBox::addLoadedBox(BoundingBox *box) {
     mLoadedBoxes << box;
     for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
-        FunctionWaitingForBoxLoadSPtr funcT =
+        stdsptr<FunctionWaitingForBoxLoad> funcT =
                 mFunctionsWaitingForBoxLoad.at(i);
         if(funcT->loadBoxId == box->getLoadId()) {
             funcT->boxLoaded(box);
@@ -1290,7 +1290,7 @@ int BoundingBox::getLoadedBoxesCount() {
 }
 
 void BoundingBox::clearLoadedBoxes() {
-    foreach(const BoundingBoxQPtr& box, mLoadedBoxes) {
+    foreach(const qptr<BoundingBox>& box, mLoadedBoxes) {
         box->clearBoxLoadId();
     }
     mLoadedBoxes.clear();
@@ -1301,7 +1301,7 @@ void BoundingBox::selectAllPoints(Canvas *canvas) {
     Q_UNUSED(canvas);
 }
 
-void BoundingBox::addScheduler(const _ScheduledExecutorSPtr& updatable) {
+void BoundingBox::addScheduler(const stdsptr<_ScheduledExecutor>& updatable) {
     mSchedulers << updatable;
 }
 

@@ -49,17 +49,17 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     QList<Key*> rKeys;
     int firstKeyFrame = INT_MAX;
 
-    QList<QList<KeySPtr>> animatorKeys;
+    QList<QList<stdsptr<Key>>> animatorKeys;
     Q_FOREACH(const auto &animData, mAnimatorData) {
         Animator *animator = animData.first;
         if(animator == nullptr) continue;
-        QList<KeySPtr> keys;
+        QList<stdsptr<Key>> keys;
         int nKeys;
         QBuffer target(const_cast<QByteArray*>(&animData.second));
         target.open(QIODevice::ReadOnly);
         target.read(reinterpret_cast<char*>(&nKeys), sizeof(int));
         for(int i = 0; i < nKeys; i++) {
-            KeySPtr keyT = animator->readKey(&target);
+            stdsptr<Key> keyT = animator->readKey(&target);
             if(keyT->getAbsFrame() < firstKeyFrame) {
                 firstKeyFrame = keyT->getAbsFrame();
             }
@@ -75,7 +75,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     int keysId = 0;
     Q_FOREACH(const auto &animData, mAnimatorData) {
         Animator *animator = animData.first;
-        const QList<KeySPtr>& keys = animatorKeys.at(keysId);
+        const QList<stdsptr<Key>>& keys = animatorKeys.at(keysId);
         Q_FOREACH(const auto& key, keys) {
             key->setRelFrame(key->getRelFrame() + dFrame);
             animator->anim_appendKey(key);

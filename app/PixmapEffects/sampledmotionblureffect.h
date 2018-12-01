@@ -10,8 +10,8 @@ struct SampledMotionBlurEffectRenderData : public PixmapEffectRenderData {
 
     qreal numberSamples;
     qreal opacity;
-    BoundingBoxRenderDataPtr boxData;
-    QList<BoundingBoxRenderDataSPtr> samples;
+    stdptr<BoundingBoxRenderData>boxData;
+    QList<stdsptr<BoundingBoxRenderData>> samples;
 private:
     SampledMotionBlurEffectRenderData() {}
 };
@@ -32,7 +32,7 @@ public:
                                               int *lastIdentical,
                                               const int &relFrame);
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data);
     void prp_setAbsFrame(const int &frame);
 protected:
@@ -40,9 +40,9 @@ protected:
 private:
     void getParentBoxFirstLastMarginAjusted(int *firstT, int *lastT,
                                             const int &relFrame);
-    BoundingBoxQPtr mParentBox;
-    QrealAnimatorQSPtr mOpacity;
-    QrealAnimatorQSPtr mNumberSamples;
-    QrealAnimatorQSPtr mFrameStep;
+    qptr<BoundingBox> mParentBox;
+    qsptr<QrealAnimator> mOpacity;
+    qsptr<QrealAnimator> mNumberSamples;
+    qsptr<QrealAnimator> mFrameStep;
 };
 #endif // SAMPLEDMOTIONBLUREFFECT_H

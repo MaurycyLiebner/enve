@@ -82,7 +82,7 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
         }
     }
 
-    SurfaceKeySPtr frameT = SPtrCreate(SurfaceKey)(this);
+    stdsptr<SurfaceKey> frameT = SPtrCreate(SurfaceKey)(this);
     frameT->setRelFrame(relFrame);
     if(prp_hasKeys()) {
         frameT->setSize(static_cast<ushort>(mWidth),
@@ -230,14 +230,14 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
     }
 }
 
-void AnimatedSurface::anim_removeKey(const KeySPtr& keyToRemove,
+void AnimatedSurface::anim_removeKey(const stdsptr<Key>& keyToRemove,
                                      const bool &saveUndoRedo) {
     Animator::anim_removeKey(keyToRemove, saveUndoRedo);
     updateTargetTiles();
 }
 
 void AnimatedSurface::anim_appendKey(
-                    const KeySPtr& newKey,
+                    const stdsptr<Key>& newKey,
                     const bool &saveUndoRedo,
                     const bool &update) {
     Animator::anim_appendKey(newKey, saveUndoRedo, update);
@@ -260,7 +260,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
     if(prp_hasKeys()) {
         int n_tile_cols_t = qCeil(width_t/static_cast<qreal>(TILE_DIM));
         int n_tile_rows_t = qCeil(height_t/static_cast<qreal>(TILE_DIM));
-        Q_FOREACH(const KeySPtr &key, anim_mKeys) {
+        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
             SurfaceKey *frameT = GetAsPtr(key, SurfaceKey);
             frameT->setSize(width_t,
                             height_t);
@@ -276,7 +276,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
 
 void AnimatedSurface::move(const int &xT, const int &yT) {
     if(prp_hasKeys()) {
-        Q_FOREACH(const KeySPtr &key, anim_mKeys) {
+        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
             SurfaceKey *frameT = GetAsPtr(key, SurfaceKey);
             frameT->getTilesData()->move(xT, yT);
         }

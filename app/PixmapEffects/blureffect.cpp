@@ -30,7 +30,7 @@ qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
     return mBlurRadius->qra_getEffectiveValueAtRelFrame(relFrame);
 }
 
-PixmapEffectRenderDataSPtr BlurEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> BlurEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(BlurEffectRenderData)();
     renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);

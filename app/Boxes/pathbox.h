@@ -5,9 +5,7 @@
 class GradientPoints;
 class SkStroke;
 class PathEffectAnimators;
-typedef QSharedPointer<PathEffectAnimators> PathEffectAnimatorsQSPtr;
 class PathEffect;
-typedef QSharedPointer<GradientPoints> GradientPointsQSPtr;
 
 struct PathBoxRenderData : public BoundingBoxRenderData {
     PathBoxRenderData(BoundingBox *parentBoxT) :
@@ -97,7 +95,7 @@ public:
 
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 
-    void applyPaintSetting(const PaintSetting &setting);
+    void applyPaintSetting( PaintSetting *setting);
 
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
@@ -116,7 +114,7 @@ public:
     void setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,
                                 BoundingBoxRenderData* data);
-    BoundingBoxRenderDataSPtr createRenderData() {
+    stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(PathBoxRenderData)(this);
     }
     void updateCurrentPreviewDataFromRenderData(BoundingBoxRenderData *renderData);
@@ -143,12 +141,12 @@ public:
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
-    void addPathEffect(const PathEffectQSPtr &effect);
-    void addFillPathEffect(const PathEffectQSPtr &effect);
-    void addOutlinePathEffect(const PathEffectQSPtr &effect);
-    void removePathEffect(const PathEffectQSPtr &effect);
-    void removeFillPathEffect(const PathEffectQSPtr &effect);
-    void removeOutlinePathEffect(const PathEffectQSPtr &effect);
+    void addPathEffect(const qsptr<PathEffect> &effect);
+    void addFillPathEffect(const qsptr<PathEffect> &effect);
+    void addOutlinePathEffect(const qsptr<PathEffect> &effect);
+    void removePathEffect(const qsptr<PathEffect> &effect);
+    void removeFillPathEffect(const qsptr<PathEffect> &effect);
+    void removeOutlinePathEffect(const qsptr<PathEffect> &effect);
     PathEffectAnimators *getPathEffectsAnimators() {
         return mPathEffectsAnimators.data();
     }
@@ -185,14 +183,14 @@ protected:
     SkPath mFillPathSk;
     SkPath mOutlinePathSk;
 
-    PathEffectAnimatorsQSPtr mPathEffectsAnimators;
-    PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
-    PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
-    GradientPointsQSPtr mFillGradientPoints;
-    GradientPointsQSPtr mStrokeGradientPoints;
+    qsptr<PathEffectAnimators> mPathEffectsAnimators;
+    qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
+    qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
+    qsptr<GradientPoints> mFillGradientPoints;
+    qsptr<GradientPoints> mStrokeGradientPoints;
 
-    PaintSettingsQSPtr mFillSettings;
-    StrokeSettingsQSPtr mStrokeSettings;
+    qsptr<PaintSettings> mFillSettings;
+    qsptr<StrokeSettings> mStrokeSettings;
 };
 
 #endif // PATHBOX_H

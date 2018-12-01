@@ -22,17 +22,17 @@ class ColorizeEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 protected:
     ColorizeEffect();
 private:
-    QrealAnimatorQSPtr mHueAnimator;
-    QrealAnimatorQSPtr mSaturationAnimator;
-    QrealAnimatorQSPtr mLightnessAnimator;
-    QrealAnimatorQSPtr mAlphaAnimator;
+    qsptr<QrealAnimator> mHueAnimator;
+    qsptr<QrealAnimator> mSaturationAnimator;
+    qsptr<QrealAnimator> mLightnessAnimator;
+    qsptr<QrealAnimator> mAlphaAnimator;
 };
 
 #endif // COLORIZEEFFECT_H

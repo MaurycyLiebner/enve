@@ -3,7 +3,6 @@
 #include "Boxes/pathbox.h"
 #include "skiaincludes.h"
 class QStringAnimator;
-typedef QSharedPointer<QStringAnimator> QStringAnimatorQSPtr;
 
 class TextBox : public PathBox {
 public:
@@ -47,8 +46,8 @@ private:
     Qt::Alignment mAlignment = Qt::AlignLeft;
     QFont mFont;
 
-    QrealAnimatorQSPtr mLinesDist;
-    QStringAnimatorQSPtr mText;
+    qsptr<QrealAnimator> mLinesDist;
+    qsptr<QStringAnimator> mText;
 };
 
 #endif // TEXTBOX_H

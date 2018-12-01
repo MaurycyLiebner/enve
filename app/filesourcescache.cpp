@@ -24,7 +24,7 @@ void FileSourcesCache::removeFileSourceListVisibleWidget(
 }
 
 void FileSourcesCache::addHandlerToHandlersList(
-        const FileCacheHandlerSPtr &handlerPtr) {
+        const stdsptr<FileCacheHandler> &handlerPtr) {
     mFileCacheHandlers.append(handlerPtr);
 }
 
@@ -36,7 +36,7 @@ void FileSourcesCache::addHandlerToListWidgets(FileCacheHandler *handlerPtr) {
 
 FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
         const QString &filePath) {
-    Q_FOREACH(const FileCacheHandlerSPtr &handler,
+    Q_FOREACH(const stdsptr<FileCacheHandler> &handler,
               mFileCacheHandlers) {
         if(handler->getFilePath() == filePath) {
             return handler.get();
@@ -51,7 +51,7 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
     return nullptr;
 }
 
-void FileSourcesCache::removeHandler(const FileCacheHandlerSPtr& handler) {
+void FileSourcesCache::removeHandler(const stdsptr<FileCacheHandler>& handler) {
     mFileCacheHandlers.removeOne(handler);
     foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handler.get());
@@ -97,7 +97,7 @@ void FileCacheHandler::setVisibleInListWidgets(const bool &bT) {
 void FileCacheHandler::clearCache() {
     QFile file(mFilePath);
     mFileMissing = !file.exists();
-    foreach(const BoundingBoxQPtr &boxPtr, mDependentBoxes) {
+    foreach(const qptr<BoundingBox> &boxPtr, mDependentBoxes) {
         BoundingBox *box = boxPtr.data();
         if(box == nullptr) continue;
         box->reloadCacheHandler();
@@ -110,7 +110,7 @@ void FileCacheHandler::addDependentBox(BoundingBox *dependent) {
 
 void FileCacheHandler::removeDependentBox(BoundingBox *dependent) {
     for(int i = 0; i < mDependentBoxes.count(); i++) {
-        const BoundingBoxQPtr &boxPtr = mDependentBoxes.at(i);
+        const qptr<BoundingBox> &boxPtr = mDependentBoxes.at(i);
         if(boxPtr.data() == dependent) {
             mDependentBoxes.removeAt(i);
             return;
@@ -422,7 +422,7 @@ void VideoCacheHandler::afterUpdate() {
         sk_sp<SkImage> imgT = mLoadedFrames.at(i);
         if(imgT.get() == nullptr) {
             mFramesCount = frameId;
-            foreach(const BoundingBoxQPtr &box, mDependentBoxes) {
+            foreach(const qptr<BoundingBox> &box, mDependentBoxes) {
                 if(box == nullptr) continue;
                 GetAsPtr(box, VideoBox)->updateDurationRectangleAnimationRange();
             }
@@ -516,7 +516,7 @@ void ImageSequenceCacheHandler::updateFrameCount() {
 }
 
 void ImageSequenceCacheHandler::clearCache() {
-    foreach(const ImageCacheHandlerPtr &cacheHandler, mFrameImageHandlers) {
+    foreach(const stdptr<ImageCacheHandler> &cacheHandler, mFrameImageHandlers) {
         cacheHandler->clearCache();
     }
     FileCacheHandler::clearCache();

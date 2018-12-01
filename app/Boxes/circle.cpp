@@ -118,7 +118,7 @@ MovablePoint *Circle::getPointAtAbsPos(
 }
 
 void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                               QList<MovablePointPtr> &list) {
+                                               QList<stdptr<MovablePoint>> &list) {
     if(!mCenterPoint->isSelected()) {
         if(mCenterPoint->isContainedInRect(absRect)) {
             mCenterPoint->select();

@@ -11,7 +11,7 @@ DesaturateEffect::DesaturateEffect(qreal radius) :
     ca_addChildAnimator(mInfluenceAnimator);
 }
 
-PixmapEffectRenderDataSPtr DesaturateEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> DesaturateEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(DesaturateEffectRenderData)();
     renderData->influence =

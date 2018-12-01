@@ -2,7 +2,7 @@
 #include "Animators/qrealanimator.h"
 #include "fmt_filters.h"
 
-PixmapEffectRenderDataSPtr ColorizeEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> ColorizeEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ColorizeEffectRenderData)();
     renderData->hue =

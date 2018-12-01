@@ -11,7 +11,7 @@ ImplodeEffect::ImplodeEffect(qreal radius) :
     ca_addChildAnimator(mFactorAnimator);
 }
 
-PixmapEffectRenderDataSPtr ImplodeEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> ImplodeEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ImplodeEffectRenderData)();
     renderData->factor = mFactorAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);

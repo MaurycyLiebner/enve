@@ -122,8 +122,8 @@ private:
     void setCurrentGradientVal(Gradient *gradient);
     void setCurrentGradientLinearVal(const bool &linear);
 
-    ColorAnimatorQPtr mCurrentFillColorAnimator;
-    ColorAnimatorQPtr mCurrentStrokeColorAnimator;
+    qptr<ColorAnimator> mCurrentFillColorAnimator;
+    qptr<ColorAnimator> mCurrentStrokeColorAnimator;
     PaintType mCurrentFillPaintType = NOPAINT;
     PaintType mCurrentStrokePaintType = NOPAINT;
     QColor mCurrentFillColor;
@@ -132,8 +132,8 @@ private:
     bool mCurrentStrokeGradientLinear = true;
     bool mCurrentFillGradientLinear = true;
 
-    GradientQPtr mCurrentStrokeGradient;
-    GradientQPtr mCurrentFillGradient;
+    qptr<Gradient> mCurrentStrokeGradient;
+    qptr<Gradient> mCurrentFillGradient;
     Qt::PenCapStyle mCurrentCapStyle;
     Qt::PenJoinStyle mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;

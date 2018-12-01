@@ -19,13 +19,13 @@ class DesaturateEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 protected:
     DesaturateEffect(qreal influence = .5);
 private:
-    QrealAnimatorQSPtr mInfluenceAnimator;
+    qsptr<QrealAnimator> mInfluenceAnimator;
 };
 #endif // DESATURATEEFFECT_H

@@ -307,7 +307,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
     paintData->trans = QPointFToSkPoint(topLeft);
 }
 
-BoundingBoxRenderDataSPtr PaintBox::createRenderData() {
+stdsptr<BoundingBoxRenderData> PaintBox::createRenderData() {
     return SPtrCreate(PaintBoxRenderData)(this);
 }
 

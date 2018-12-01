@@ -64,7 +64,7 @@ void Property::prp_setName(const QString &newName) {
     prp_mName = newName;
 }
 
-void Property::prp_setUpdater(const AnimatorUpdaterSPtr& updater) {
+void Property::prp_setUpdater(const stdsptr<AnimatorUpdater>& updater) {
     if(prp_mUpdaterBlocked) return;
     if(updater == nullptr) {
         prp_mUpdater.reset();
@@ -73,7 +73,7 @@ void Property::prp_setUpdater(const AnimatorUpdaterSPtr& updater) {
     }
 }
 
-void Property::prp_setBlockedUpdater(const AnimatorUpdaterSPtr& updater) {
+void Property::prp_setBlockedUpdater(const stdsptr<AnimatorUpdater>& updater) {
     prp_mUpdaterBlocked = false;
     prp_setUpdater(updater);
     prp_blockUpdater();

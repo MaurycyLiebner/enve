@@ -162,21 +162,21 @@ void PathKey::readKey(QIODevice *target) {
 void VectorPathAnimator::writeProperty(QIODevice *target) {
     int nNodes = mNodeSettings.count();
     target->write(reinterpret_cast<char*>(&nNodes), sizeof(int));
-    foreach(const NodeSettingsSPtr &nodeSettings, mNodeSettings) {
+    foreach(const stdsptr<NodeSettings> &nodeSettings, mNodeSettings) {
         nodeSettings->write(target);
     }
 
     int nKeys = anim_mKeys.count();
     target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
-    foreach(const KeySPtr &key, anim_mKeys) {
+    foreach(const stdsptr<Key> &key, anim_mKeys) {
         key->writeKey(target);
     }
 
     writePathContainer(target);
 }
 
-KeySPtr VectorPathAnimator::readKey(QIODevice *target) {
-    PathKeySPtr newKey = SPtrCreate(PathKey)(this);
+stdsptr<Key> VectorPathAnimator::readKey(QIODevice *target) {
+    stdsptr<PathKey> newKey = SPtrCreate(PathKey)(this);
 
     newKey->readKey(target);
     return newKey;
@@ -204,7 +204,7 @@ void VectorPathAnimator::readProperty(QIODevice *target) {
     int nNodes;
     target->read(reinterpret_cast<char*>(&nNodes), sizeof(int));
     for(int i = 0; i < nNodes; i++) {
-        NodeSettingsSPtr nodeSettings =
+        stdsptr<NodeSettings> nodeSettings =
                 SPtrCreate(NodeSettings)();
         nodeSettings->read(target);
         insertNodeSettingsForNodeId(i, nodeSettings);
@@ -259,7 +259,7 @@ void QrealKey::readKey(QIODevice *target) {
 void QrealAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
     target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
-    foreach(const KeySPtr &key, anim_mKeys) {
+    foreach(const stdsptr<Key> &key, anim_mKeys) {
         key->writeKey(target);
     }
 
@@ -272,8 +272,8 @@ void QrealAnimator::writeProperty(QIODevice *target) {
     }
 }
 
-KeySPtr QrealAnimator::readKey(QIODevice *target) {
-    QrealKeySPtr newKey = SPtrCreate(QrealKey)(this);
+stdsptr<Key> QrealAnimator::readKey(QIODevice *target) {
+    stdsptr<QrealKey> newKey = SPtrCreate(QrealKey)(this);
     newKey->readKey(target);
     return newKey;
 }
@@ -306,7 +306,7 @@ void QrealAnimator::readProperty(QIODevice *target) {
     bool hasRandomGenerator;
     target->read(reinterpret_cast<char*>(&hasRandomGenerator), sizeof(bool));
     if(hasRandomGenerator) {
-        RandomQrealGeneratorQSPtr generator =
+        qsptr<RandomQrealGenerator> generator =
                 SPtrCreate(RandomQrealGenerator)(0, 9999);
         generator->readProperty(target);
         setGenerator(generator);
@@ -353,7 +353,7 @@ void QStringKey::readKey(QIODevice *target) {
 void QStringAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
     target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
-    foreach(const KeySPtr &key, anim_mKeys) {
+    foreach(const stdsptr<Key> &key, anim_mKeys) {
         key->writeKey(target);
     }
     writeQString(target, mCurrentText);
@@ -363,7 +363,7 @@ void QStringAnimator::readProperty(QIODevice *target) {
     int nKeys;
     target->read(reinterpret_cast<char*>(&nKeys), sizeof(int));
     for(int i = 0; i < nKeys; i++) {
-        QStringKeySPtr newKey = SPtrCreate(QStringKey)("", 0, this);
+        stdsptr<QStringKey> newKey = SPtrCreate(QStringKey)("", 0, this);
         newKey->readKey(target);
         anim_appendKey(newKey, false, false);
     }
@@ -488,7 +488,7 @@ void SampledMotionBlurEffect::writeProperty(QIODevice *target) {
 void EffectAnimators::writeProperty(QIODevice *target) {
     int nEffects = ca_mChildAnimators.count();
     target->write(reinterpret_cast<char*>(&nEffects), sizeof(int));
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         effect->writeProperty(target);
     }
 }
@@ -496,7 +496,7 @@ void EffectAnimators::writeProperty(QIODevice *target) {
 void EffectAnimators::readPixmapEffect(QIODevice *target) {
     PixmapEffectType typeT;
     target->read(reinterpret_cast<char*>(&typeT), sizeof(PixmapEffectType));
-    PixmapEffectQSPtr effect;
+    qsptr<PixmapEffect> effect;
     if(typeT == EFFECT_BLUR) {
         effect = SPtrCreate(BlurEffect)();
     } else if(typeT == EFFECT_SHADOW) {
@@ -568,7 +568,7 @@ void Gradient::writeProperty(QIODevice *target) {
     target->write(reinterpret_cast<char*>(&mLoadId), sizeof(int));
     int nColors = mColors.count();
     target->write(reinterpret_cast<char*>(&nColors), sizeof(int));
-    foreach(const ColorAnimatorQSPtr& color, mColors) {
+    foreach(const qsptr<ColorAnimator>& color, mColors) {
         color->writeProperty(target);
     }
 }
@@ -578,7 +578,7 @@ void Gradient::readProperty(QIODevice *target) {
     int nColors;
     target->read(reinterpret_cast<char*>(&nColors), sizeof(int));
     for(int i = 0; i < nColors; i++) {
-        ColorAnimatorQSPtr colorAnim = SPtrCreate(ColorAnimator)();
+        qsptr<ColorAnimator> colorAnim = SPtrCreate(ColorAnimator)();
         colorAnim->readProperty(target);
         addColorToList(colorAnim, false);
     }
@@ -863,7 +863,7 @@ void OperationPathEffect::readProperty(QIODevice *target) {
 void PathEffectAnimators::writeProperty(QIODevice *target) {   
     int nEffects = ca_mChildAnimators.count();
     target->write(reinterpret_cast<char*>(&nEffects), sizeof(int));
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         effect->writeProperty(target);
     }
 }
@@ -871,7 +871,7 @@ void PathEffectAnimators::writeProperty(QIODevice *target) {
 void PathEffectAnimators::readPathEffect(QIODevice *target) {
     PathEffectType typeT;
     target->read(reinterpret_cast<char*>(&typeT), sizeof(PathEffectType));
-    PathEffectQSPtr pathEffect;
+    qsptr<PathEffect> pathEffect;
     if(typeT == DISPLACE_PATH_EFFECT) {
         pathEffect =
                 SPtrCreate(DisplacePathEffect)(mIsOutline);
@@ -975,7 +975,7 @@ void ParticleBox::writeBoundingBox(QIODevice *target) {
     mBottomRightAnimator->writeProperty(target);
     int nEmitters = mEmitters.count();
     target->write(reinterpret_cast<char*>(&nEmitters), sizeof(int));
-    foreach(const ParticleEmitterQSPtr& emitter, mEmitters) {
+    foreach(const qsptr<ParticleEmitter>& emitter, mEmitters) {
         emitter->writeProperty(target);
     }
 }
@@ -987,7 +987,7 @@ void ParticleBox::readBoundingBox(QIODevice *target) {
     int nEmitters;
     target->read(reinterpret_cast<char*>(&nEmitters), sizeof(int));
     for(int i = 0; i < nEmitters; i++) {
-        ParticleEmitterQSPtr emitter = SPtrCreate(ParticleEmitter)(this);
+        qsptr<ParticleEmitter> emitter = SPtrCreate(ParticleEmitter)(this);
         emitter->readProperty(target);
         addEmitter(emitter);
     }
@@ -1122,14 +1122,14 @@ void AnimatedSurface::writeProperty(QIODevice *target) {
     if(nKeys == 0) {
         mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
     } else {
-        foreach(const KeySPtr &key, anim_mKeys) {
+        foreach(const stdsptr<Key> &key, anim_mKeys) {
             key->writeKey(target);
         }
     }
 }
 
-KeySPtr AnimatedSurface::readKey(QIODevice *target) {
-    SurfaceKeySPtr newKey = SPtrCreate(SurfaceKey)(this);
+stdsptr<Key> AnimatedSurface::readKey(QIODevice *target) {
+    stdsptr<SurfaceKey> newKey = SPtrCreate(SurfaceKey)(this);
     newKey->setTiles(SPtrCreate(TilesData)(0, 0, true));
     newKey->readKey(target);
     return newKey;
@@ -1220,7 +1220,7 @@ void BoxesGroup::writeBoundingBox(QIODevice *target) {
     mOutlinePathEffectsAnimators->writeProperty(target);
     int nChildBoxes = mContainedBoxes.count();
     target->write(reinterpret_cast<char*>(&nChildBoxes), sizeof(int));
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
+    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
         child->writeBoundingBox(target);
     }
 }
@@ -1229,7 +1229,7 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
     int nChildBoxes;
     target->read(reinterpret_cast<char*>(&nChildBoxes), sizeof(int));
     for(int i = 0; i < nChildBoxes; i++) {
-        BoundingBoxQSPtr box;
+        qsptr<BoundingBox> box;
         BoundingBoxType boxType;
         target->read(reinterpret_cast<char*>(&boxType), sizeof(BoundingBoxType));
         if(boxType == TYPE_VECTOR_PATH) {
@@ -1279,13 +1279,13 @@ void BoxesGroup::readBoundingBox(QIODevice *target) {
 void PathAnimator::writeProperty(QIODevice *target) {
     int nPaths = mSinglePaths.count();
     target->write(reinterpret_cast<char*>(&nPaths), sizeof(int));
-    foreach(const VectorPathAnimatorQSPtr& pathAnimator, mSinglePaths) {
+    foreach(const qsptr<VectorPathAnimator>& pathAnimator, mSinglePaths) {
         pathAnimator->writeProperty(target);
     }
 }
 
 void PathAnimator::readVectorPathAnimator(QIODevice *target) {
-    VectorPathAnimatorQSPtr pathAnimator =
+    qsptr<VectorPathAnimator> pathAnimator =
             SPtrCreate(VectorPathAnimator)(this);
     pathAnimator->readProperty(target);
     addSinglePathAnimator(pathAnimator, false);
@@ -1342,7 +1342,7 @@ void Canvas::readBoundingBox(QIODevice *target) {
 void GradientWidget::writeGradients(QIODevice *target) {
     int nGradients = mGradients.count();
     target->write(reinterpret_cast<char*>(&nGradients), sizeof(int));
-    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
+    foreach(const qsptr<Gradient> &gradient, mGradients) {
         gradient->writeProperty(target);
     }
 }
@@ -1351,7 +1351,7 @@ void GradientWidget::readGradients(QIODevice *target) {
     int nGradients;
     target->read(reinterpret_cast<char*>(&nGradients), sizeof(int));
     for(int i = 0; i < nGradients; i++) {
-        GradientQSPtr gradient = SPtrCreate(Gradient)();
+        qsptr<Gradient> gradient = SPtrCreate(Gradient)();
         gradient->readProperty(target);
         addGradientToList(gradient);
         MainWindow::getInstance()->addLoadedGradient(gradient.get());
@@ -1396,7 +1396,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
     target->write(reinterpret_cast<char*>(&nCanvases), sizeof(int));
     int currentCanvasId = -1;
     int boxLoadId = 0;
-    foreach(const CanvasQSPtr &canvas, mCanvasList) {
+    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
         boxLoadId = canvas->setBoxLoadId(boxLoadId);
         canvas->writeBoundingBox(target);
         if(canvas.get() == mCurrentCanvas) {
@@ -1404,7 +1404,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
         }
     }
     target->write(reinterpret_cast<char*>(&currentCanvasId), sizeof(int));
-    foreach(const CanvasQSPtr &canvas, mCanvasList) {
+    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
         canvas->clearBoxLoadId();
     }
 }
@@ -1413,7 +1413,7 @@ void CanvasWindow::readCanvases(QIODevice *target) {
     int nCanvases;
     target->read(reinterpret_cast<char*>(&nCanvases), sizeof(int));
     for(int i = 0; i < nCanvases; i++) {
-        CanvasQSPtr canvas =
+        qsptr<Canvas> canvas =
                 SPtrCreate(Canvas)(this);
         canvas->readBoundingBox(target);
         MainWindow::getInstance()->addCanvas(canvas);

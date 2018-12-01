@@ -63,7 +63,7 @@ private:
 
     FixedLenAnimationRect *mDurationRectangle = nullptr;
 
-    QSharedPointer<QrealAnimator> mVolumeAnimator =
+    qsptr<QrealAnimator> mVolumeAnimator =
             SPtrCreate(QrealAnimator)("volume");
 };
 

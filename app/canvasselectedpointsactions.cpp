@@ -57,8 +57,8 @@ void Canvas::connectPoints() {
             QMatrix effectiveMatrix =
                     secondMatrix*firstMatrix.inverted();
             secondSinglePath->applyTransformToPoints(effectiveMatrix);
-            auto secondSinglePathSPtr = GetAsSPtr(secondSinglePath, VectorPathAnimator);
-            firstParentPath->addSinglePathAnimator(secondSinglePathSPtr);
+            auto stdsptr<secondSinglePath> = GetAsSPtr(secondSinglePath, VectorPathAnimator);
+            firstParentPath->addSinglePathAnimator(stdsptr<secondSinglePath>);
             secondSinglePath->removeFromParent();
             secondSinglePath->setParentPath(firstParentPath);
 

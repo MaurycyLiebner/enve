@@ -20,7 +20,7 @@ public:
     }
 
     TilesData *getTilesData() { return mTiles.get(); }
-    void setTiles(const TilesDataSPtr& tiles) {
+    void setTiles(const stdsptr<TilesData>& tiles) {
         mTiles = tiles;
     }
     bool differsFromKey(Key *key) { return key != this; }
@@ -32,7 +32,7 @@ public:
 protected:
     SurfaceKey(Animator *parentAnimator);
 private:
-    TilesDataSPtr mTiles;
+    stdsptr<TilesData> mTiles;
 };
 
 class AnimatedSurface : public Surface,
@@ -55,9 +55,9 @@ public:
 
     void updateTargetTiles();
 
-    void anim_removeKey(const KeySPtr &keyToRemove,
+    void anim_removeKey(const stdsptr<Key> &keyToRemove,
                         const bool &saveUndoRedo = true);
-    void anim_appendKey(const KeySPtr &newKey,
+    void anim_appendKey(const stdsptr<Key> &newKey,
                         const bool &saveUndoRedo = true,
                         const bool &update = true);
     void anim_moveKeyToRelFrame(Key *key,
@@ -81,7 +81,7 @@ public:
     void setOverlapFrames(const int &overlapFrames) {
         mOverlapFrames = overlapFrames;
     }
-    KeySPtr readKey(QIODevice *target);
+    stdsptr<Key> readKey(QIODevice *target);
     void move(const int &xT, const int &yT);
 
     void tabletPressEvent(const qreal &xT,
@@ -103,7 +103,7 @@ public:
 protected:
     PaintBox *mParentBox = nullptr;
 
-    QList<TilesDataSPtr> mDrawTilesData;
+    QList<stdsptr<TilesData>> mDrawTilesData;
     QList<int> mDrawTilesFrames;
     int mOverlapFrames = 2;
     bool mIsDraft = false;

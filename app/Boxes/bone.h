@@ -45,12 +45,12 @@ public:
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 
-    void addChildBone(const BoneQSPtr &child);
+    void addChildBone(const qsptr<Bone> &child);
 
-    void removeChildBone(const BoneQSPtr &child);
+    void removeChildBone(const qsptr<Bone> &child);
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr> &list);
+                                           QList<stdptr<MovablePoint>> &list);
     void setParentBone(Bone *parentBone);
     void setParentBonesBox(BonesBox *bonesBox);
 
@@ -119,13 +119,13 @@ protected:
     QPointF mRelTipPos;
     QPointF mSavedTransformPivot;
 
-    BonePtSPtr mTipPt;
-    BonePtSPtr mRootPt;
+    stdsptr<BonePt> mTipPt;
+    stdsptr<BonePt> mRootPt;
 
-    BoneTransformAnimatorQSPtr mTransformAnimator;
-    QList<BoneQSPtr> mChildBones;
-    BoneQPtr mParentBone;
-    BonesBoxQPtr mParentBonesBox;
+    qsptr<BoneTransformAnimator> mTransformAnimator;
+    QList<qsptr<Bone>> mChildBones;
+    qptr<Bone> mParentBone;
+    qptr<BonesBox> mParentBonesBox;
 };
 
 class BonePt : public NonAnimatedMovablePoint {
@@ -146,9 +146,9 @@ public:
     Bone *getParentBone();
 protected:
     BonePt(BasicTransformAnimator *parent);
-    BoneQPtr mParentBone;
-    BoneQPtr mTipBone;
-    QList<BoneQPtr> mRootBones;
+    qptr<Bone> mParentBone;
+    qptr<Bone> mTipBone;
+    QList<qptr<Bone>> mRootBones;
 };
 
 class BonesBox : public BoundingBox {
@@ -175,15 +175,15 @@ public:
     bool SWT_isBonesBox();
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr>& list);
+                                           QList<stdptr<MovablePoint>>& list);
 
-    void addBone(const BoneQSPtr &bone);
-    void removeBone(const BoneQSPtr &bone);
+    void addBone(const qsptr<Bone> &bone);
+    void removeBone(const qsptr<Bone> &bone);
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
     BonesBox();
 
-    QList<BoneQSPtr> mBones;
+    QList<qsptr<Bone>> mBones;
 };
 
 #endif // BONE_H

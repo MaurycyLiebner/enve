@@ -18,10 +18,10 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(
         return;
     }
     QString operation = "Union";
-    const QList<BoundingBoxQSPtr> &boxList =
+    const QList<qsptr<BoundingBox>> &boxList =
             mParentGroup->getContainedBoxesList();
     QList<PathBox*> pathBoxes;
-    foreach(const QSharedPointer<BoundingBox> &pathBox, boxList) {
+    foreach(const qsptr<BoundingBox> &pathBox, boxList) {
         if(pathBox->SWT_isPathBox()) {
             pathBoxes << GetAsPtr(pathBox.data(), PathBox);
         }
@@ -48,10 +48,10 @@ void GroupLastPathSumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
         return;
     }
     QString operation = "Union";
-    const QList<QSharedPointer<BoundingBox> > &boxList =
+    const QList<qsptr<BoundingBox> > &boxList =
             mParentGroup->getContainedBoxesList();
     QList<PathBox*> pathBoxes;
-    foreach(const QSharedPointer<BoundingBox> &pathBox, boxList) {
+    foreach(const qsptr<BoundingBox> &pathBox, boxList) {
         if(pathBox->SWT_isPathBox()) {
             pathBoxes << GetAsPtr(pathBox, PathBox);
         }

@@ -54,7 +54,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         if(parentBox == nullptr) return;
         BoxesGroup *srcGroup = parentBox->getParentGroup();
         if(srcGroup == nullptr) return;
-        QList<QSharedPointer<BoundingBox> > boxesT =
+        QList<qsptr<BoundingBox> > boxesT =
                 srcGroup->getContainedBoxesList();
         QMenu menu(this);
 
@@ -67,7 +67,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
             act->setChecked(true);
             act->setDisabled(true);
         }
-        foreach(const QSharedPointer<BoundingBox> &boxT, boxesT) {
+        foreach(const qsptr<BoundingBox> &boxT, boxesT) {
             i++;
             if(boxT.data() == parentBox) continue;
             QAction *act2 = menu.addAction(boxT->prp_getName());

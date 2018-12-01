@@ -37,7 +37,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     ca_addChildAnimator(mBackgroundColor);
     mBackgroundColor->prp_setUpdater(
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
-    mSoundComposition = QSharedPointer<SoundComposition>::create(this);
+    mSoundComposition = qsptr<SoundComposition>::create(this);
     auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();
     ca_addChildAnimator(GetAsSPtr(soundsAnimatorContainer, Property));
 
@@ -252,7 +252,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         canvas->saveLayer(nullptr, nullptr);
         if(!mClipToCanvasSize || !drawCanvas) {
-            Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes){
+            Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes){
                 box->drawPixmapSk(canvas);
             }
         }
@@ -343,7 +343,7 @@ void Canvas::setMaxFrame(const int &frame) {
     mMaxFrame = frame;
 }
 
-BoundingBoxRenderDataSPtr Canvas::createRenderData() {
+stdsptr<BoundingBoxRenderData> Canvas::createRenderData() {
     return SPtrCreate(CanvasRenderData)(this);
 }
 
@@ -550,19 +550,19 @@ void Canvas::renderCurrentFrameToOutput(const RenderInstanceSettings &renderDest
 //    data->unref();
 }
 
-BoundingBoxQSPtr Canvas::createLink() {
+qsptr<BoundingBox> Canvas::createLink() {
     return SPtrCreate(InternalLinkCanvas)(this);
 }
 
 ImageBox *Canvas::createImageBox(const QString &path) {
-    ImageBoxQSPtr img = SPtrCreate(ImageBox)(path);
+    qsptr<ImageBox> img = SPtrCreate(ImageBox)(path);
     mCurrentBoxesGroup->addContainedBox(img);
     return img.get();
 }
 
 #include "Boxes/imagesequencebox.h"
 ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
-    ImageSequenceBoxQSPtr aniBox = SPtrCreate(ImageSequenceBox)();
+    qsptr<ImageSequenceBox> aniBox = SPtrCreate(ImageSequenceBox)();
     aniBox->setListOfFrames(paths);
     mCurrentBoxesGroup->addContainedBox(aniBox);
     return aniBox.get();
@@ -570,21 +570,21 @@ ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 
 #include "Boxes/videobox.h"
 VideoBox* Canvas::createVideoForPath(const QString &path) {
-    VideoBoxQSPtr vidBox = SPtrCreate(VideoBox)(path);
+    qsptr<VideoBox> vidBox = SPtrCreate(VideoBox)(path);
     mCurrentBoxesGroup->addContainedBox(vidBox);
     return vidBox.get();
 }
 
 #include "Boxes/linkbox.h"
 ExternalLinkBox* Canvas::createLinkToFileWithPath(const QString &path) {
-    ExternalLinkBoxQSPtr extLinkBox = SPtrCreate(ExternalLinkBox)();
+    qsptr<ExternalLinkBox> extLinkBox = SPtrCreate(ExternalLinkBox)();
     extLinkBox->setSrc(path);
     mCurrentBoxesGroup->addContainedBox(extLinkBox);
     return extLinkBox.get();
 }
 
 SingleSound* Canvas::createSoundForPath(const QString &path) {
-    SingleSoundQSPtr singleSound = SPtrCreate(SingleSound)(path);
+    qsptr<SingleSound> singleSound = SPtrCreate(SingleSound)(path);
     getSoundComposition()->addSoundAnimator(singleSound);
     return singleSound.get();
 }
@@ -729,7 +729,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
         }
         updateTransformation();
     } else if(event->key() == Qt::Key_N) {
-        Q_FOREACH(const BoundingBoxQPtr& box, mSelectedBoxes) {
+        Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = GetAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
@@ -754,13 +754,13 @@ void Canvas::deleteAction() {
     }
 }
 
-bool boxesZSort(const BoundingBoxQPtr& box1,
-                const BoundingBoxQPtr& box2) {
+bool boxesZSort(const qptr<BoundingBox>& box1,
+                const qptr<BoundingBox>& box2) {
     return box1->getZIndex() < box2->getZIndex();
 }
 
 void Canvas::copyAction() {
-    BoxesClipboardContainerSPtr container =
+    stdsptr<BoxesClipboardContainer> container =
             SPtrCreate(BoxesClipboardContainer)();
     mMainWindow->replaceClipboard(container);
     QBuffer target(container->getBytesArray());
@@ -806,17 +806,17 @@ void Canvas::selectAllAction() {
 
 void Canvas::invertSelectionAction() {
     if(mCurrentMode == MOVE_POINT) {
-        QList<MovablePointPtr> selectedPts = mSelectedPoints_d;
-        foreach(const BoundingBoxQPtr& box, mSelectedBoxes) {
+        QList<stdptr<MovablePoint>> selectedPts = mSelectedPoints_d;
+        foreach(const qptr<BoundingBox>& box, mSelectedBoxes) {
             box->selectAllPoints(this);
         }
-        foreach(const MovablePointPtr& pt, selectedPts) {
+        foreach(const stdptr<MovablePoint>& pt, selectedPts) {
             removePointFromSelection(pt);
         }
     } else {//if(mCurrentMode == MOVE_PATH) {
-        QList<BoundingBoxQPtr> boxes = mSelectedBoxes;
+        QList<qptr<BoundingBox>> boxes = mSelectedBoxes;
         selectAllBoxesFromBoxesGroup();
-        foreach(const BoundingBoxQPtr& box, boxes) {
+        foreach(const qptr<BoundingBox>& box, boxes) {
             box->removeFromSelection();
         }
     }
@@ -842,7 +842,7 @@ void Canvas::prp_setAbsFrame(const int &frame) {
         }// !!!
     }
 
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+    Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
         box->prp_setAbsFrame(frame);
     }
 }
@@ -894,7 +894,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
             Bone *bone = mSelectedBones.last();
             BasicTransformAnimator *trans = bone->getTransformAnimator();
             BoundingBox* box = bone->getParentBox();
-            foreach(const BoundingBoxQPtr& boxT, mSelectedBoxes) {
+            foreach(const qptr<BoundingBox>& boxT, mSelectedBoxes) {
                 if(boxT == box) continue;
                 boxT->setParent(trans);
             }
@@ -1123,7 +1123,7 @@ void Canvas::moveByRel(const QPointF &trans) {
 //void Canvas::updateAfterFrameChanged(const int &currentFrame) {
 //    anim_mCurrentAbsFrame = currentFrame;
 
-//    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+//    Q_FOREACH(const qsptr<BoundingBox> &box, mChildBoxes) {
 //        box->prp_setAbsFrame(currentFrame);
 //    }
 
@@ -1334,7 +1334,7 @@ void CanvasRenderData::renderToImage() {
         bitmap.peekPixels(&pixmap);
         fmt_filters::image img(static_cast<uint8_t*>(pixmap.writable_addr()),
                                pixmap.width(), pixmap.height());
-        foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
+        foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
         clearPixmapEffects();
@@ -1351,7 +1351,7 @@ void CanvasRenderData::drawSk(SkCanvas *canvas) {
 
     canvas->scale(qrealToSkScalar(resolution),
                   qrealToSkScalar(resolution));
-    Q_FOREACH(const BoundingBoxRenderDataSPtr &renderData,
+    Q_FOREACH(const stdsptr<BoundingBoxRenderData> &renderData,
               childrenRenderData) {
         //box->draw(p);
         renderData->drawRenderedImageForParent(canvas);

@@ -6,6 +6,7 @@
 #include "sharedpointerdefs.h"
 #include "skqtconversions.h"
 class TransformUpdater;
+class BoxPathPoint;
 
 class BasicTransformAnimator : public ComplexAnimator {
     Q_OBJECT
@@ -111,18 +112,18 @@ public:
         return mRotAnimator.get();
     }
 protected:
-    QList<BasicTransformAnimatorQSPtr> mChildBoxes;
+    QList<qsptr<BasicTransformAnimator>> mChildBoxes;
 
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;
 
-    BasicTransformAnimatorQPtr mParentTransformAnimator;
+    qptr<BasicTransformAnimator> mParentTransformAnimator;
 
-    QPointFAnimatorQSPtr mPosAnimator;
-    QPointFAnimatorQSPtr mScaleAnimator;
-    QrealAnimatorQSPtr mRotAnimator;
+    qsptr<QPointFAnimator> mPosAnimator;
+    qsptr<QPointFAnimator> mScaleAnimator;
+    qsptr<QrealAnimator> mRotAnimator;
 
-    AnimatorUpdaterSPtr mTransformUpdater;
+    stdsptr<AnimatorUpdater> mTransformUpdater;
 public slots:
     virtual void updateCombinedTransform(const UpdateReason &reason);
 signals:
@@ -197,9 +198,9 @@ public:
 private:
     bool mPivotAutoAdjust = true;
     BoundingBox * const mParentBox_k;
-    BoxPathPointSPtr mPivotPoint;
-    QPointFAnimatorQSPtr mPivotAnimator;
-    QrealAnimatorQSPtr mOpacityAnimator;
+    stdsptr<BoxPathPoint> mPivotPoint;
+    qsptr<QPointFAnimator> mPivotAnimator;
+    qsptr<QrealAnimator> mOpacityAnimator;
 };
 
 #endif // TRANSFORMANIMATOR_H

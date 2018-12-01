@@ -8,13 +8,13 @@ BonesBox::BonesBox() : BoundingBox(TYPE_BONES_BOX) {
 
 void BonesBox::drawHoveredSk(SkCanvas *canvas,
                             const SkScalar &invScale) {
-    foreach(const BoneQSPtr& bone, mBones) {
+    foreach(const qsptr<Bone>& bone, mBones) {
         bone->drawHoveredPathSk(canvas, invScale);
     }
 }
 
 bool BonesBox::relPointInsidePath(const QPointF &relPos) {
-    foreach(const BoneQSPtr& bone, mBones) {
+    foreach(const qsptr<Bone>& bone, mBones) {
         if(bone->getBoneAtRelPos(relPos) != nullptr) { return true; }
     }
     return false;
@@ -23,25 +23,25 @@ bool BonesBox::relPointInsidePath(const QPointF &relPos) {
 bool BonesBox::SWT_isBonesBox() { return true; }
 
 void BonesBox::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<MovablePointPtr> &list) {
-    foreach(const BoneQSPtr& bone, mBones) {
+        const QRectF &absRect, QList<stdptr<MovablePoint>> &list) {
+    foreach(const qsptr<Bone>& bone, mBones) {
         bone->selectAndAddContainedPointsToList(absRect, list);
     }
 }
 
-void BonesBox::addBone(const BoneQSPtr& bone) {
+void BonesBox::addBone(const qsptr<Bone>& bone) {
     mBones << bone;
     ca_addChildAnimator(bone);
     bone->setParentBonesBox(this);
 }
 
-void BonesBox::removeBone(const BoneQSPtr& bone) {
+void BonesBox::removeBone(const qsptr<Bone>& bone) {
     mBones.removeOne(bone);
     ca_removeChildAnimator(bone);
 }
 
 void BonesBox::drawPixmapSk(SkCanvas *canvas) {
-    foreach(const BoneQSPtr& bone, mBones) {
+    foreach(const qsptr<Bone>& bone, mBones) {
         bone->drawOnCanvas(canvas);
     }
 }
@@ -57,7 +57,7 @@ void BonesBox::drawSelectedSk(SkCanvas *canvas,
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
         BoundingBox::drawSelectedSk(canvas, currentCanvasMode, invScale);
-        foreach(const BoneQSPtr& bone, mBones) {
+        foreach(const qsptr<Bone>& bone, mBones) {
             bone->drawSelectedSk(canvas, currentCanvasMode, invScale);
         }
         canvas->restore();
@@ -73,7 +73,7 @@ MovablePoint *BonesBox::getPointAtAbsPos(
                                           currentCanvasMode,
                                           canvasScaleInv);
     if(pointToReturn == nullptr) {
-        foreach(const BoneQSPtr& bone, mBones) {
+        foreach(const qsptr<Bone>& bone, mBones) {
             pointToReturn = bone->getPointAtAbsPos(absPtPos,
                                                    canvasScaleInv);
             if(pointToReturn == nullptr) continue;
@@ -90,7 +90,7 @@ Bone *BonesBox::getBoneAtAbsPos(const QPointF &absPos) {
 }
 
 Bone *BonesBox::getBoneAtRelPos(const QPointF &relPos) {
-    foreach(const BoneQSPtr& bone, mBones) {
+    foreach(const qsptr<Bone>& bone, mBones) {
         Bone* boneT = bone->getBoneAtRelPos(relPos);
         if(boneT != nullptr) { return boneT; }
     }
@@ -106,13 +106,13 @@ Bone::Bone() : ComplexAnimator("bone") {
 }
 
 Bone *Bone::createBone(BonesBox *boneBox) {
-    BoneQSPtr newBone = SPtrCreate(Bone)();
+    qsptr<Bone> newBone = SPtrCreate(Bone)();
     boneBox->addBone(newBone);
     return newBone.get();
 }
 
 Bone *Bone::createBone(Bone *parentBone) {
-    BoneQSPtr newBone = SPtrCreate(Bone)();
+    qsptr<Bone> newBone = SPtrCreate(Bone)();
     parentBone->addChildBone(newBone);
     return newBone.get();
 }
@@ -226,7 +226,7 @@ BonesBox *Bone::getParentBox() {
 
 Bone *Bone::getBoneAtRelPos(const QPointF &relPos) {
     QPointF realRelPos = mTransformAnimator->mapFromParent(relPos);
-    foreach(const BoneQSPtr& boneT, mChildBones) {
+    foreach(const qsptr<Bone>& boneT, mChildBones) {
         Bone* boneTT = boneT->getBoneAtRelPos(realRelPos);
         if(boneTT != nullptr) return boneTT;
     }
@@ -292,7 +292,7 @@ void Bone::drawOnCanvas(SkCanvas *canvas) {
     paintT.setStyle(SkPaint::kStroke_Style);
     paintT.setAntiAlias(true);
     canvas->drawPath(path, paintT);
-    foreach(const BoneQSPtr& boneT, mChildBones) {
+    foreach(const qsptr<Bone>& boneT, mChildBones) {
         boneT->drawOnCanvas(canvas);
     }
 }
@@ -353,7 +353,7 @@ BonePt *Bone::getRootPt() {
 MovablePoint *Bone::getPointAtAbsPos(const QPointF &absPtPos,
                                        const qreal &canvasScaleInv) {
     MovablePoint* pointToReturn = nullptr;
-    foreach(const BoneQSPtr& boneT, mChildBones) {
+    foreach(const qsptr<Bone>& boneT, mChildBones) {
         pointToReturn = boneT->getPointAtAbsPos(absPtPos, canvasScaleInv);
         if(pointToReturn == nullptr) continue;
         return pointToReturn;
@@ -390,27 +390,27 @@ void Bone::drawSelectedSk(SkCanvas *canvas,
         mRootPt->drawSk(canvas, invScale);
         mTipPt->drawSk(canvas, invScale);
     }
-    foreach(const BoneQSPtr& boneT, mChildBones) {
+    foreach(const qsptr<Bone>& boneT, mChildBones) {
         boneT->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }
     canvas->restore();
 }
 
-void Bone::addChildBone(const BoneQSPtr& child) {
+void Bone::addChildBone(const qsptr<Bone>& child) {
     mChildBones << child;
     ca_addChildAnimator(child);
     child->setParentBone(this);
 }
 
-void Bone::removeChildBone(const BoneQSPtr& child) {
+void Bone::removeChildBone(const qsptr<Bone>& child) {
     if(mChildBones.removeOne(child)) {
         ca_removeChildAnimator(child);
     }
 }
 
 void Bone::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<MovablePointPtr> &list) {
-    foreach(const BoneQSPtr& boneT, mChildBones) {
+        const QRectF &absRect, QList<stdptr<MovablePoint>> &list) {
+    foreach(const qsptr<Bone>& boneT, mChildBones) {
         boneT->selectAndAddContainedPointsToList(absRect, list);
     }
     if(mTipPt->isContainedInRect(absRect)) {
@@ -487,7 +487,7 @@ void Bone::drawHoveredOnlyThisPathSk(SkCanvas *canvas,
 
 void Bone::drawHoveredPathSk(SkCanvas *canvas, const SkScalar &invScale) {
     drawHoveredOnlyThisPathSk(canvas, invScale);
-    foreach(const BoneQSPtr& bone, mChildBones) {
+    foreach(const qsptr<Bone>& bone, mChildBones) {
         bone->drawHoveredPathSk(canvas, invScale);
     }
 }

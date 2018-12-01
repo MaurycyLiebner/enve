@@ -34,18 +34,18 @@ public:
                       const int &endAbsFrame,
                       const qreal &fps);
 
-    void addSound(const SingleSoundQSPtr &sound);
-    void removeSound(const SingleSoundQSPtr &sound);
+    void addSound(const qsptr<SingleSound> &sound);
+    void removeSound(const qsptr<SingleSound> &sound);
 
     ComplexAnimator *getSoundsAnimatorContainer();
-    void addSoundAnimator(const SingleSoundQSPtr &sound);
-    void removeSoundAnimator(const SingleSoundQSPtr &sound);
+    void addSoundAnimator(const qsptr<SingleSound> &sound);
+    void removeSoundAnimator(const qsptr<SingleSound> &sound);
 private:
     QByteArray mBuffer;
     qint64 mPos;
-    QSharedPointer<ComplexAnimator> mSoundsAnimatorContainer =
+    qsptr<ComplexAnimator> mSoundsAnimatorContainer =
             SPtrCreate(ComplexAnimator)("sounds");
-    QList<SingleSoundQSPtr> mSounds;
+    QList<qsptr<SingleSound>> mSounds;
 };
 
 #endif // SOUNDCOMPOSITION_H

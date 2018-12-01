@@ -482,7 +482,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     updateDisplayedFillStrokeSettings();
 }
 
-void MainWindow::replaceClipboard(const ClipboardContainerSPtr& container) {
+void MainWindow::replaceClipboard(const stdsptr<ClipboardContainer>& container) {
     if(mClipboardContainer != nullptr) {
         BoundingBox::clearLoadedBoxes();
     }
@@ -733,7 +733,7 @@ MainWindow *MainWindow::getInstance() {
 void MainWindow::createNewCanvas() {
     QString defName = "Scene " +
             QString::number(mCurrentCanvasComboBox->count());
-    CanvasQSPtr newCanvas =
+    qsptr<Canvas> newCanvas =
             SPtrCreate(Canvas)(mCanvasWindow, 1920, 1080, 200);
     newCanvas->setName(defName);
     CanvasSettingsDialog *dialog =
@@ -748,7 +748,7 @@ void MainWindow::createNewCanvas() {
     delete dialog;
 }
 
-void MainWindow::addCanvas(const CanvasQSPtr& newCanvas) {
+void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
     mCanvasWindow->addCanvasToListAndSetAsCurrent(newCanvas);
 
     disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
@@ -766,9 +766,9 @@ void MainWindow::addCanvas(const CanvasQSPtr& newCanvas) {
 
 void MainWindow::canvasNameChanged(Canvas *canvas,
                                    const QString &name) {
-    const QList<CanvasQSPtr> &canvasList = mCanvasWindow->getCanvasList();
+    const QList<qsptr<Canvas>> &canvasList = mCanvasWindow->getCanvasList();
     int idT = 0;
-    foreach(const CanvasQSPtr &canvasPtr, canvasList) {
+    foreach(const qsptr<Canvas> &canvasPtr, canvasList) {
         if(canvasPtr == canvas) {
             break;
         }
@@ -938,11 +938,11 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
     updateTitle();
 }
 
-void MainWindow::addUpdateScheduler(const _ScheduledExecutorSPtr& scheduler) {
+void MainWindow::addUpdateScheduler(const stdsptr<_ScheduledExecutor>& scheduler) {
     mUpdateSchedulers.append(scheduler);
 }
 
-void MainWindow::addFileUpdateScheduler(const _ScheduledExecutorSPtr& scheduler) {
+void MainWindow::addFileUpdateScheduler(const stdsptr<_ScheduledExecutor>& scheduler) {
     mCanvasWindow->addFileUpdatableAwaitingUpdate(scheduler);
 }
 

@@ -34,6 +34,6 @@ public:
                              const bool &parentSatisfies,
                              const bool &parentMainTarget);
 private:
-    BoxesGroupQPtr mParentGroup;
+    qptr<BoxesGroup> mParentGroup;
 };
 #endif // GROUPLASTPATHSUMPATHEFFECT_H

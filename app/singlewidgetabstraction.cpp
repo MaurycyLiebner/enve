@@ -5,7 +5,7 @@
 #include "global.h"
 
 SingleWidgetAbstraction::SingleWidgetAbstraction(
-        const SingleWidgetTargetQSPtr& target,
+        const qsptr<SingleWidgetTarget>& target,
         ScrollWidgetVisiblePart *visiblePart) {
     mTarget = target.data();
     mVisiblePartWidget = visiblePart;
@@ -15,7 +15,7 @@ SingleWidgetAbstraction::~SingleWidgetAbstraction() {
 //    if(mTarget != nullptr) {
 //        mTarget->SWT_removeAbstractionFromList(this);
 //    }
-//    Q_FOREACH(const SingleWidgetAbstractionSPtr& abs, mChildren) {
+//    Q_FOREACH(const stdsptr<SingleWidgetAbstraction>& abs, mChildren) {
 //        delete abs;
 //    }
 }
@@ -38,7 +38,7 @@ bool SingleWidgetAbstraction::getAbstractions(
         currX += MIN_WIDGET_HEIGHT;
         currY += MIN_WIDGET_HEIGHT;
     }
-    Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
+    Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
         if(abs->getAbstractions(
                     minY, maxY,
                     currY, currX,
@@ -82,7 +82,7 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         currX += MIN_WIDGET_HEIGHT;
         *currY += MIN_WIDGET_HEIGHT;
     }
-    Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
+    Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
         if(abs->setSingleWidgetAbstractions(
                     minY, maxY,
                     currY, currX,
@@ -110,7 +110,7 @@ int SingleWidgetAbstraction::getHeight(
         if(satisfiesRule && !mIsMainTarget) {
             height += MIN_WIDGET_HEIGHT;
         }
-        Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
+        Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
             height += abs->getHeight(
                         rules,
                         (satisfiesRule && mContentVisible) || mIsMainTarget,
@@ -139,7 +139,7 @@ void SingleWidgetAbstraction::addChildAbstractionAt(
 
 SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
         SingleWidgetTarget* target) {
-    Q_FOREACH(const SingleWidgetAbstractionPtr &abs, mChildren) {
+    Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
         if(abs->getTarget() == target) {
             return abs;
         }
@@ -217,7 +217,7 @@ void SingleWidgetAbstraction::moveChildAbstractionForTargetTo(
     int targetId = id;
 //    if(!abs->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
 //        for(int i = 0; i < mChildren.count(); i++) {
-//            const SingleWidgetAbstractionSPtr& abs1 = mChildren.at(i);
+//            const stdsptr<SingleWidgetAbstraction>& abs1 = mChildren.at(i);
 //            if(abs1->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
 //                targetId++;
 //            } else {
@@ -227,7 +227,7 @@ void SingleWidgetAbstraction::moveChildAbstractionForTargetTo(
 //    }
     int currId = -1;
     for(int i = 0; i < mChildren.count(); i++) {
-        const SingleWidgetAbstractionPtr& absT = mChildren.at(i);
+        const stdptr<SingleWidgetAbstraction>& absT = mChildren.at(i);
         if(abs == absT) {
             currId = i;
             break;

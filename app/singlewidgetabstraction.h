@@ -14,7 +14,7 @@ struct SWT_RulesCollection;
 
 class SingleWidgetAbstraction : public StdSelfRef {
 public:
-    SingleWidgetAbstraction(const SingleWidgetTargetQSPtr& target,
+    SingleWidgetAbstraction(const qsptr<SingleWidgetTarget>& target,
                             ScrollWidgetVisiblePart *visiblePart);
     virtual ~SingleWidgetAbstraction();
 
@@ -85,9 +85,9 @@ private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;
     bool mContentVisible = false;
-    SingleWidgetTargetQPtr mTarget;
+    qptr<SingleWidgetTarget> mTarget;
 
-    QList<SingleWidgetAbstractionPtr> mChildren;
+    QList<stdptr<SingleWidgetAbstraction>> mChildren;
 };
 
 #endif // SINGLEWIDGETABSTRACTION_H

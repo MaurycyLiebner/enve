@@ -60,15 +60,15 @@ public:
 private:
     uint32_t mSeedAssist = 0;
 
-    QrealAnimatorQSPtr mSegLength;
-    QrealAnimatorQSPtr mMaxDev;
-    QrealAnimatorQSPtr mSmoothness;
-    BoolPropertyContainerQSPtr mRandomize;
-    IntAnimatorQSPtr mRandomizeStep;
-    BoolPropertyContainerQSPtr mSmoothTransform;
-    QrealAnimatorQSPtr mEasing;
-    IntAnimatorQSPtr mSeed;
-    BoolPropertyQSPtr mRepeat;
+    qsptr<QrealAnimator> mSegLength;
+    qsptr<QrealAnimator> mMaxDev;
+    qsptr<QrealAnimator> mSmoothness;
+    qsptr<BoolPropertyContainer> mRandomize;
+    qsptr<IntAnimator> mRandomizeStep;
+    qsptr<BoolPropertyContainer> mSmoothTransform;
+    qsptr<QrealAnimator> mEasing;
+    qsptr<IntAnimator> mSeed;
+    qsptr<BoolProperty> mRepeat;
 };
 
 #endif // DISPLACEPATHEFFECT_H

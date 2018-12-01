@@ -196,10 +196,10 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     mMainWindow->callUpdateSchedulers();
 }
 
-KeysClipboardContainerSPtr KeysView::getSelectedKeysClipboardContainer() {
-    KeysClipboardContainerSPtr container =
+stdsptr<KeysClipboardContainer> KeysView::getSelectedKeysClipboardContainer() {
+    stdsptr<KeysClipboardContainer> container =
             SPtrCreate(KeysClipboardContainer)();
-    Q_FOREACH(const AnimatorQPtr& anim, mSelectedAnimators) {
+    Q_FOREACH(const qptr<Animator>& anim, mSelectedAnimators) {
         QByteArray keyData;
         QBuffer target(&keyData);
         target.open(QIODevice::WriteOnly);

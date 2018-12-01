@@ -201,7 +201,7 @@ public:
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
 
-    PathKeySPtr createNewKeyFromSubsetForPath(
+    stdsptr<PathKey> createNewKeyFromSubsetForPath(
             VectorPathAnimator *parentAnimator,
             const int &firstId, int count);
     void updateAfterChangedFromInside();

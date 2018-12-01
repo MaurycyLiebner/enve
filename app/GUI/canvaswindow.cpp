@@ -101,7 +101,7 @@ Canvas *CanvasWindow::getCurrentCanvas() {
 void CanvasWindow::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(const CanvasQSPtr &child, mCanvasList) {
+    Q_FOREACH(const qsptr<Canvas> &child, mCanvasList) {
         abstraction->addChildAbstraction(
                     child->SWT_getAbstractionForWidget(visiblePartWidget));
     }
@@ -157,13 +157,13 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
     callUpdateSchedulers();
 }
 
-void CanvasWindow::addCanvasToList(const CanvasQSPtr& canvas) {
+void CanvasWindow::addCanvasToList(const qsptr<Canvas>& canvas) {
     mCanvasList << canvas;
     mWindowSWTTarget->SWT_addChildAbstractionForTargetToAll(canvas.get());
 }
 
 void CanvasWindow::removeCanvas(const int &id) {
-    CanvasQSPtr canvas = mCanvasList.takeAt(id);
+    qsptr<Canvas> canvas = mCanvasList.takeAt(id);
     mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     if(mCanvasList.isEmpty()) {
         setCurrentCanvas(nullptr);
@@ -253,7 +253,7 @@ void CanvasWindow::setPaintMode() {
 }
 
 void CanvasWindow::addCanvasToListAndSetAsCurrent(
-        const CanvasQSPtr& canvas) {
+        const qsptr<Canvas>& canvas) {
     addCanvasToList(canvas);
     setCurrentCanvas(canvas.get());
 }
@@ -453,7 +453,7 @@ void CanvasWindow::setCurrentBrush(const Brush *brush) {
 
 void CanvasWindow::replaceBrush(const Brush *oldBrush,
                                 const Brush *newBrush) {
-    foreach(const CanvasQSPtr &canvas, mCanvasList) {
+    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
         if(canvas->getCurrentBrush() == oldBrush) {
             canvas->setCurrentBrush(newBrush);
         }
@@ -652,8 +652,7 @@ void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth,
     callUpdateSchedulers();
 }
 
-void CanvasWindow::applyPaintSettingToSelected(
-        const PaintSetting &setting) {
+void CanvasWindow::applyPaintSettingToSelected(PaintSetting *setting) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->applyPaintSettingToSelected(setting);
 }
@@ -1073,7 +1072,7 @@ void CanvasWindow::clearAll() {
 
     mClearBeingUpdated = !mNoBoxesAwaitUpdate;
     mUpdatablesAwaitingUpdate.clear();
-    foreach(const CanvasQSPtr &canvas, mCanvasList) {
+    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
         mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     }
 
@@ -1227,16 +1226,16 @@ void CanvasWindow::importFile(const QString &path,
     if(isSoundExt(extension)) {
         createSoundForPath(path);
     } else {
-        BoundingBoxQSPtr importedBox;
+        qsptr<BoundingBox> importedBox;
         mCurrentCanvas->blockUndoRedo();
         if(isVectorExt(extension)) {
             importedBox = loadSVGFile(path);
         } else if(isImageExt(extension)) {
-            ImageBoxQSPtr imgBox = SPtrCreate(ImageBox)();
+            qsptr<ImageBox> imgBox = SPtrCreate(ImageBox)();
             importedBox = GetAsSPtr(imgBox, BoundingBox);
             imgBox->setFilePath(path);
         } else if(isVideoExt(extension)) {
-            VideoBoxQSPtr vidBox = SPtrCreate(VideoBox)();
+            qsptr<VideoBox> vidBox = SPtrCreate(VideoBox)();
             importedBox = GetAsSPtr(vidBox, BoundingBox);
             vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {

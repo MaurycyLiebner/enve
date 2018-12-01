@@ -32,6 +32,7 @@ class ScrollWidget;
 class ScrollArea;
 class Brush;
 class UsageWidget;
+class Gradient;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -82,7 +83,7 @@ public:
     }
     UndoRedoStack *getUndoRedoStack();
 
-    void addUpdateScheduler(const _ScheduledExecutorSPtr &scheduler);
+    void addUpdateScheduler(const stdsptr<_ScheduledExecutor> &scheduler);
 
     static bool isShiftPressed();
     static bool isCtrlPressed();
@@ -129,10 +130,10 @@ public:
     void setCurrentFrameForAllWidgets(const int &frame);
     void updateSettingsForCurrentCanvas();
 
-    void replaceClipboard(const ClipboardContainerSPtr &container);
+    void replaceClipboard(const stdsptr<ClipboardContainer> &container);
     ClipboardContainer *getClipboardContainer(
             const ClipboardContainerType &type);
-    void addCanvas(const CanvasQSPtr &newCanvas);
+    void addCanvas(const qsptr<Canvas> &newCanvas);
 
     Gradient *getLoadedGradientById(const int &id);
     void clearLoadedGradientsList();
@@ -146,7 +147,7 @@ public:
     FontsWidget *getFontsWidget() {
         return mFontWidget;
     }
-    void addFileUpdateScheduler(const _ScheduledExecutorSPtr& scheduler);
+    void addFileUpdateScheduler(const stdsptr<_ScheduledExecutor>& scheduler);
     void finishUndoRedoSet();
     Brush *getCurrentBrush();
 
@@ -189,7 +190,7 @@ private:
     static MainWindow *mMainWindowInstance;
     MemoryHandler *mMemoryHandler;
 
-    ClipboardContainerSPtr mClipboardContainer;
+    stdsptr<ClipboardContainer> mClipboardContainer;
 //    bool mRendering = false;
 
     QComboBox *mCurrentCanvasComboBox;

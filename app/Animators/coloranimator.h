@@ -68,13 +68,13 @@ protected:
 private:
     ColorMode mColorMode = RGBMODE;
 
-    QSharedPointer<QrealAnimator> mVal1Animator =
+    qsptr<QrealAnimator> mVal1Animator =
             SPtrCreate(QrealAnimator)("");
-    QSharedPointer<QrealAnimator> mVal2Animator =
+    qsptr<QrealAnimator> mVal2Animator =
             SPtrCreate(QrealAnimator)("");
-    QSharedPointer<QrealAnimator> mVal3Animator =
+    qsptr<QrealAnimator> mVal3Animator =
             SPtrCreate(QrealAnimator)("");
-    QSharedPointer<QrealAnimator> mAlphaAnimator =
+    qsptr<QrealAnimator> mAlphaAnimator =
             SPtrCreate(QrealAnimator)("alpha");
 signals:
     void colorModeChanged(ColorMode);

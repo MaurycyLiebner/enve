@@ -1,7 +1,5 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
-#include <QObject>
-#include <QSharedPointer>
 #include "skiaincludes.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include "Animators/complexanimator.h"
@@ -9,7 +7,7 @@
 #include <QPointF>
 class EffectAnimators;
 class QIODevice;
-
+class BoundingBoxRenderData;
 #include "sharedpointerdefs.h"
 
 namespace fmt_filters {
@@ -70,7 +68,7 @@ public:
 
     void setParentEffectAnimators(EffectAnimators *parentEffects);
 
-    virtual PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data) = 0;
 
     bool SWT_isPixmapEffect();
@@ -88,6 +86,6 @@ protected:
     bool mInterrupted = false;
     bool mVisible = true;
     PixmapEffectType mType;
-    EffectAnimatorsQPtr mParentEffects;
+    qptr<EffectAnimators> mParentEffects;
 };
 #endif // PIXMAPEFFECT_H

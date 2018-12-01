@@ -7,6 +7,7 @@
 #include <memory>
 #include "../core/stdselfref.h"
 #include "../core/selfref.h"
+#include "stdpointer.h"
 
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;

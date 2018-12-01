@@ -9,7 +9,7 @@ class PathBox;
 class PathEffectAnimators : public ComplexAnimator {
     friend class SelfRef;
 public:
-    void addEffect(const PathEffectQSPtr &effect);
+    void addEffect(const qsptr<PathEffect> &effect);
     bool hasEffects();
 
     bool SWT_isPathEffectAnimators();
@@ -35,7 +35,7 @@ public:
 
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
-    void removeEffect(const PathEffectQSPtr& effect);
+    void removeEffect(const qsptr<PathEffect>& effect);
     BoundingBox *getParentBox();
     const bool &isOutline() const;
     const bool &isFill() const;
@@ -47,7 +47,7 @@ protected:
 
     bool mIsOutline;
     bool mIsFill;
-    BoundingBoxQPtr mParentBox;
+    qptr<BoundingBox> mParentBox;
 };
 
 

@@ -26,7 +26,7 @@ public:
                            const qreal &pixelsPerFrame,
                            const qreal &pixelsPerValue);
 
-    QrealKeySPtr makeQrealKeyDuplicate(QrealAnimator *targetParent);
+    stdsptr<QrealKey> makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     void updateCtrlFromCtrl(const QrealPointType &type);
 
@@ -118,9 +118,9 @@ protected:
     qreal mStartFrame = 0.;
     qreal mEndFrame = 0.;
 
-    QrealPointSPtr mGraphPoint;
-    QrealPointSPtr mStartPoint;
-    QrealPointSPtr mEndPoint;
+    stdsptr<QrealPoint> mGraphPoint;
+    stdsptr<QrealPoint> mStartPoint;
+    stdsptr<QrealPoint> mEndPoint;
 };
 
 #endif // QREALKEY_H

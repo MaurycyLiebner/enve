@@ -210,7 +210,7 @@ protected:
     qreal picked_up_blue = 0.;
     qreal picked_up_alpha = 0.;
 
-    TilesDataSPtr mCurrentTiles;
+    stdsptr<TilesData> mCurrentTiles;
 };
 
 #endif // SURFACE_H

@@ -25,7 +25,7 @@ public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
@@ -33,11 +33,11 @@ protected:
     ShadowEffect(qreal radius = 10.);
 private:
 //    QrealAnimator mScale;
-    BoolPropertyQSPtr mHighQuality;
-    QrealAnimatorQSPtr mBlurRadius;
-    QrealAnimatorQSPtr mOpacity;
-    ColorAnimatorQSPtr mColor;
-    QPointFAnimatorQSPtr mTranslation;
+    qsptr<BoolProperty> mHighQuality;
+    qsptr<QrealAnimator> mBlurRadius;
+    qsptr<QrealAnimator> mOpacity;
+    qsptr<ColorAnimator> mColor;
+    qsptr<QPointFAnimator> mTranslation;
 };
 
 #endif // SHADOWEFFECT_H

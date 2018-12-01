@@ -13,7 +13,7 @@ PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
     mParentBox = parentPath;
 }
 
-void PathEffectAnimators::addEffect(const PathEffectQSPtr& effect) {
+void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
     if(mParentBox->SWT_isPathBox()) {
         PathBox *pathBox = GetAsPtr(mParentBox, PathBox);
         if(mIsOutline) {
@@ -35,7 +35,7 @@ void PathEffectAnimators::addEffect(const PathEffectQSPtr& effect) {
     }
 }
 
-void PathEffectAnimators::removeEffect(const PathEffectQSPtr& effect) {
+void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
     if(mParentBox->SWT_isPathBox()) {
         PathBox *pathBox = GetAsPtr(mParentBox, PathBox);
         if(mIsOutline) {
@@ -82,7 +82,7 @@ void PathEffectAnimators::filterPathForRelFrameBeforeThickness(
                                                 SkPath *srcDstPath,
                                                 const qreal &scale) {
     SkPath dstPath = *srcDstPath;
-    Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         PathEffect *effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() && effectT->isVisible()) {
             SkPath srcPath = dstPath;
@@ -101,7 +101,7 @@ void PathEffectAnimators::filterPathForRelFrame(const int &relFrame,
                                                 const qreal &scale,
                                                 const bool &groupPathSum) {
     SkPath dstPath = *srcDstPath;
-    Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         PathEffect *effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
             continue;
@@ -121,7 +121,7 @@ void PathEffectAnimators::filterPathForRelFrameUntilGroupSum(
                         SkPath *srcDstPath,
                         const qreal &scale) {
     SkPath dstPath = *srcDstPath;
-    Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         PathEffect *effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
             continue;
@@ -144,7 +144,7 @@ void PathEffectAnimators::filterPathForRelFrameBeforeThicknessF(
                                                 const qreal &relFrame,
                                                 SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
-    Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         PathEffect *effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() && effectT->isVisible()) {
             SkPath srcPath = dstPath;
@@ -160,7 +160,7 @@ void PathEffectAnimators::filterPathForRelFrameF(const qreal &relFrame,
                                                 SkPath *srcDstPath,
                                                 const bool &groupPathSum) {
     SkPath dstPath = *srcDstPath;
-    Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         PathEffect *effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
             continue;
@@ -178,7 +178,7 @@ void PathEffectAnimators::filterPathForRelFrameUntilGroupSumF(
                         const qreal &relFrame,
                         SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
-    Q_FOREACH(const PropertyQSPtr &effect, ca_mChildAnimators) {
+    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
         PathEffect *effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
             continue;

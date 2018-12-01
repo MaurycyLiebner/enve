@@ -44,7 +44,7 @@ public:
 protected:
     bool mFileMissing = false;
     bool mVisibleInListWidgets;
-    QList<BoundingBoxQPtr> mDependentBoxes;
+    QList<qptr<BoundingBox>> mDependentBoxes;
     QString mFilePath;
     QString mUpdateFilePath;
 };
@@ -59,16 +59,16 @@ namespace FileSourcesCache {
     void clearAll();
     int getFileCacheListCount();
 
-    void removeHandler(const FileCacheHandlerSPtr &handler);
+    void removeHandler(const stdsptr<FileCacheHandler> &handler);
     void addHandlerToHandlersList(
-            const FileCacheHandlerSPtr& handlerPtr);
+            const stdsptr<FileCacheHandler>& handlerPtr);
     void addHandlerToListWidgets(
             FileCacheHandler *handlerPtr);
     void removeHandlerFromListWidgets(
             FileCacheHandler *handlerPtr);
     namespace {
         QList<FileSourceListVisibleWidget*> mFileSourceListVisibleWidgets;
-        QList<FileCacheHandlerSPtr> mFileCacheHandlers;
+        QList<stdsptr<FileCacheHandler>> mFileCacheHandlers;
     }
 };
 
@@ -147,7 +147,7 @@ protected:
     ImageSequenceCacheHandler(const QStringList &framePaths);
 
     QStringList mFramePaths;
-    QList<ImageCacheHandlerPtr> mFrameImageHandlers;
+    QList<stdptr<ImageCacheHandler>> mFrameImageHandlers;
 };
 
 class VideoCacheHandler : public AnimationCacheHandler {

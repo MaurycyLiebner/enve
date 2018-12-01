@@ -34,14 +34,14 @@ public:
     ~CanvasWindow();
 
     Canvas *getCurrentCanvas();
-    const QList<CanvasQSPtr> &getCanvasList() {
+    const QList<qsptr<Canvas>> &getCanvasList() {
         return mCanvasList;
     }
 
     void setCurrentCanvas(Canvas *canvas);
-    void addCanvasToList(const CanvasQSPtr &canvas);
+    void addCanvasToList(const qsptr<Canvas> &canvas);
     void removeCanvas(const int &id);
-    void addCanvasToListAndSetAsCurrent(const CanvasQSPtr &canvas);
+    void addCanvasToListAndSetAsCurrent(const qsptr<Canvas> &canvas);
     void renameCanvas(Canvas *canvas, const QString &newName);
     void renameCanvas(const int &id, const QString &newName);
     bool hasNoCanvas();
@@ -71,7 +71,7 @@ public:
     void schedulePivotUpdate();
 
     BoxesGroup *getCurrentGroup();
-    void applyPaintSettingToSelected(const PaintSetting &setting);
+    void applyPaintSettingToSelected(PaintSetting* setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
 
@@ -167,7 +167,7 @@ protected:
 
     qreal mSavedResolutionFraction = 100.;
 
-    WindowSingleWidgetTargetQSPtr mWindowSWTTarget;
+    qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
     PaintControler *mFileControler = nullptr;
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
 
@@ -188,8 +188,8 @@ protected:
     void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
     void (CanvasWindow::*mFilesUpdateFinishedFunction)(void) = nullptr;
 
-    CanvasQPtr mCurrentCanvas;
-    QList<CanvasQSPtr> mCanvasList;
+    qptr<Canvas> mCurrentCanvas;
+    QList<qsptr<Canvas>> mCanvasList;
 
     //void paintEvent(QPaintEvent *);
 
@@ -203,7 +203,7 @@ protected:
     void volumeChanged(int value);
 
     QAudioDeviceInfo mAudioDevice;
-    SoundCompositionQPtr mCurrentSoundComposition;
+    qptr<SoundComposition> mCurrentSoundComposition;
     QAudioOutput *mAudioOutput;
     QIODevice *mAudioIOOutput; // not owned
     QAudioFormat mAudioFormat;

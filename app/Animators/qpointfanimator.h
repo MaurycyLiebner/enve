@@ -68,8 +68,8 @@ public:
 protected:
     QPointFAnimator(const QString& name);
 
-    QrealAnimatorQSPtr mXAnimator;
-    QrealAnimatorQSPtr mYAnimator;
+    qsptr<QrealAnimator> mXAnimator;
+    qsptr<QrealAnimator> mYAnimator;
 };
 
 #endif // QPOINTFANIMATOR_H

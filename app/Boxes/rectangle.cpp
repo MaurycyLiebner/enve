@@ -147,7 +147,7 @@ MovablePoint *Rectangle::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                  QList<MovablePointPtr>& list) {
+                                                  QList<stdptr<MovablePoint>>& list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();

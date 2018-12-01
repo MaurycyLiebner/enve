@@ -17,7 +17,7 @@ struct PixmapEffectRenderData;
 class EffectAnimators : public ComplexAnimator {
     friend class SelfRef;
 public:
-    void addEffect(const PixmapEffectQSPtr &effect);
+    void addEffect(const qsptr<PixmapEffect> &effect);
 
     qreal getEffectsMargin() const;
 

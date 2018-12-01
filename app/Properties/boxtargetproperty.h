@@ -14,7 +14,7 @@ struct BoxTargetPropertyWaitingForBoxLoad : public FunctionWaitingForBoxLoad {
 
     void boxLoaded(BoundingBox *box);
 
-    BoxTargetPropertyQPtr targetProperty;
+    qptr<BoxTargetProperty> targetProperty;
 };
 
 class BoxTargetProperty : public Property {
@@ -31,7 +31,7 @@ public:
 signals:
     void targetSet(BoundingBox*);
 private:
-    BoundingBoxQPtr mTarget_d;
+    qptr<BoundingBox> mTarget_d;
 };
 
 #endif // BOXTARGETPROPERTY_H

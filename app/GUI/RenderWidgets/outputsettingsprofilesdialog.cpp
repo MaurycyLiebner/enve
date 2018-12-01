@@ -3,7 +3,7 @@
 #include "rendersettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "global.h"
-QList<OutputSettingsProfileSPtr> OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES;
+QList<stdsptr<OutputSettingsProfile>> OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES;
 
 OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
         const OutputSettings &currentSettings,

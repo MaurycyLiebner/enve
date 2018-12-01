@@ -138,13 +138,13 @@ public:
     const QString &prp_getName();
     void prp_setName(const QString &newName);
 
-    virtual void prp_setUpdater(const AnimatorUpdaterSPtr &updater);
+    virtual void prp_setUpdater(const stdsptr<AnimatorUpdater> &updater);
     void prp_blockUpdater();
     void prp_callFinishUpdater();
 
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
-    void prp_setBlockedUpdater(const AnimatorUpdaterSPtr &updater);
+    void prp_setBlockedUpdater(const stdsptr<AnimatorUpdater> &updater);
 
     bool SWT_isProperty() { return true; }
 
@@ -257,13 +257,13 @@ signals:
                                   const int &maxFrame);
     void prp_removingKey(Key*);
     void prp_addingKey(Key*);
-    void prp_replaceWith(const PropertyQSPtr&, const PropertyQSPtr&);
-    void prp_prependWith(Property*, const PropertyQSPtr&);
+    void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);
+    void prp_prependWith(Property*, const qsptr<Property>&);
     void beingDeleted();
 protected:
     bool prp_mUpdaterBlocked = false;
     int prp_mParentFrameShift = 0;
-    AnimatorUpdaterSPtr prp_mUpdater;
+    stdsptr<AnimatorUpdater> prp_mUpdater;
     QString prp_mName = "";
 };
 

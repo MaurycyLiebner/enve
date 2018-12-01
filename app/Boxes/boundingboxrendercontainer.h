@@ -52,12 +52,12 @@ public:
 
     bool isFileUpdatable() { return true; }
 protected:
-    CacheContainerTmpFileDataLoader(const QSharedPointer<QTemporaryFile> &file,
+    CacheContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
                                     CacheContainer *target);
     void addSchedulerNow();
 
-    const CacheContainerPtr mTargetCont;
-    QSharedPointer<QTemporaryFile> mTmpFile;
+    const stdptr<CacheContainer> mTargetCont;
+    qsptr<QTemporaryFile> mTmpFile;
     sk_sp<SkImage> mImage;
 };
 
@@ -74,9 +74,9 @@ protected:
     void addSchedulerNow();
 
     bool mSavingFailed = false;
-    const CacheContainerPtr mTargetCont;
+    const stdptr<CacheContainer> mTargetCont;
     sk_sp<SkImage> mImage;
-    QSharedPointer<QTemporaryFile> mTmpFile;
+    qsptr<QTemporaryFile> mTmpFile;
 };
 
 class CacheContainerTmpFileDataDeleter : public _ScheduledExecutor {
@@ -86,11 +86,11 @@ public:
 
     bool isFileUpdatable() { return true; }
 protected:
-    CacheContainerTmpFileDataDeleter(const QSharedPointer<QTemporaryFile> &file) {
+    CacheContainerTmpFileDataDeleter(const qsptr<QTemporaryFile> &file) {
         mTmpFile = file;
     }
     void addSchedulerNow();
-    QSharedPointer<QTemporaryFile> mTmpFile;
+    qsptr<QTemporaryFile> mTmpFile;
 };
 
 class CacheContainer : public MinimalCacheContainer {
@@ -125,7 +125,7 @@ public:
     bool relFrameInRange(const int &relFrame);
     virtual void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
     bool storesDataInMemory();
-    void setDataSavedToTmpFile(const QSharedPointer<QTemporaryFile> &tmpFile);
+    void setDataSavedToTmpFile(const qsptr<QTemporaryFile> &tmpFile);
     void setAsCurrentPreviewContainerAfterFinishedLoading(Canvas *canvas);
 protected:
     CacheContainer(CacheHandler* parent);
@@ -142,11 +142,11 @@ protected:
     int mMinRelFrame = 0;
     int mMaxRelFrame = 0;
 
-    CanvasQPtr mTmpLoadTargetCanvas;
-    _ScheduledExecutorSPtr mLoadingUpdatable;
-    _ScheduledExecutorSPtr mSavingUpdatable;
+    qptr<Canvas> mTmpLoadTargetCanvas;
+    stdsptr<_ScheduledExecutor> mLoadingUpdatable;
+    stdsptr<_ScheduledExecutor> mSavingUpdatable;
 
-    QSharedPointer<QTemporaryFile> mTmpFile;
+    qsptr<QTemporaryFile> mTmpFile;
 
     sk_sp<SkImage> mImageSk;
     CacheHandler * const mParentCacheHandler_k;
@@ -188,7 +188,7 @@ protected:
     SkPoint mDrawPos;
     QMatrix mTransform;
     QMatrix mPaintTransform;
-    BoundingBoxRenderDataSPtr mSrcRenderData;
+    stdsptr<BoundingBoxRenderData> mSrcRenderData;
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H

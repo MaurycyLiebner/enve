@@ -53,14 +53,14 @@ void GradientWidget::updateNumberOfGradients() {
     mGradientsListWidget->setNumberGradients(mGradients.count());
 }
 
-void GradientWidget::addGradientToList(const GradientQSPtr& gradient) {
+void GradientWidget::addGradientToList(const qsptr<Gradient>& gradient) {
     mGradients << gradient;
     updateNumberOfGradients();
 }
 
 void GradientWidget::newGradient(const QColor &color1,
                                  const QColor &color2) {
-    GradientQSPtr newGradient = SPtrCreate(Gradient)(color1, color2);
+    qsptr<Gradient> newGradient = SPtrCreate(Gradient)(color1, color2);
     addGradientToList(newGradient);
     setCurrentGradient(newGradient.get());
     updateAll();
@@ -68,7 +68,7 @@ void GradientWidget::newGradient(const QColor &color1,
 
 void GradientWidget::newGradient(const int &fromGradientId) {
     Gradient *fromGradient = mGradients.at(fromGradientId).data();
-    GradientQSPtr newGradient = SPtrCreate(Gradient)();
+    qsptr<Gradient> newGradient = SPtrCreate(Gradient)();
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     fromGradient->writeProperty(&buffer);
@@ -100,7 +100,7 @@ int GradientWidget::getGradientIndex(Gradient *child) {
     return index;
 }
 
-void GradientWidget::removeGradientFromList(const GradientQSPtr &toRemove) {
+void GradientWidget::removeGradientFromList(const qsptr<Gradient> &toRemove) {
     mGradients.removeAt(getGradientIndex(toRemove.get()));
     if(mCurrentGradient == toRemove) {
         mCurrentGradient = nullptr;
@@ -110,7 +110,7 @@ void GradientWidget::removeGradientFromList(const GradientQSPtr &toRemove) {
 }
 
 void GradientWidget::removeGradient(const int& gradientId) {
-    GradientQSPtr toRemove = mGradients.at(gradientId);
+    qsptr<Gradient> toRemove = mGradients.at(gradientId);
     if(toRemove->affectsPaths()) {
         return;
     }
@@ -327,20 +327,20 @@ void GradientWidget::drawHoveredColorBorder(const int &hoveredX,
 }
 
 void GradientWidget::updateAfterFrameChanged(const int &absFrame) {
-    Q_FOREACH(const GradientQSPtr &gradient, mGradients) {
+    Q_FOREACH(const qsptr<Gradient> &gradient, mGradients) {
         gradient->prp_setAbsFrame(absFrame);
     }
 }
 
 void GradientWidget::clearGradientsLoadIds() {
-    foreach(const GradientQSPtr &gradient, mGradients) {
+    foreach(const qsptr<Gradient> &gradient, mGradients) {
         gradient->setLoadId(-1);
     }
 }
 
 void GradientWidget::setGradientLoadIds() {
     int id = 0;
-    foreach(const GradientQSPtr &gradient, mGradients) {
+    foreach(const qsptr<Gradient> &gradient, mGradients) {
         gradient->setLoadId(id);
         id++;
     }

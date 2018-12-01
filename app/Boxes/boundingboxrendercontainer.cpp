@@ -175,7 +175,7 @@ sk_sp<SkImage> CacheContainer::getImageSk() {
 
 void CacheContainer::scheduleDeleteTmpFile() {
     if(mTmpFile == nullptr) return;
-    _ScheduledExecutorSPtr updatable =
+    stdsptr<_ScheduledExecutor> updatable =
             SPtrCreate(CacheContainerTmpFileDataDeleter)(mTmpFile);
     mTmpFile.reset();
     updatable->addScheduler();
@@ -239,7 +239,7 @@ bool CacheContainer::storesDataInMemory() {
 }
 
 void CacheContainer::setDataSavedToTmpFile(
-        const QSharedPointer<QTemporaryFile> &tmpFile) {
+        const qsptr<QTemporaryFile> &tmpFile) {
     mSavingUpdatable = nullptr;
     mTmpFile = tmpFile;
     mSavingToFile = false;
@@ -274,7 +274,7 @@ void CacheContainer::saveToTmpFile() {
 }
 
 CacheContainerTmpFileDataLoader::CacheContainerTmpFileDataLoader(
-        const QSharedPointer<QTemporaryFile> &file,
+        const qsptr<QTemporaryFile> &file,
         CacheContainer *target) : mTargetCont(target) {
     mTmpFile = file;
 }
@@ -323,7 +323,7 @@ void CacheContainerTmpFileDataSaver::_processUpdate() {
             return;
         }
     }
-    mTmpFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile());
+    mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
     if(mTmpFile->open()) {
         int width = pix.width();
         int height = pix.height();

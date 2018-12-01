@@ -55,8 +55,8 @@ public:
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBoxQSPtr)),
-                this, SLOT(setTargetSlot(BoundingBoxQSPtr)));
+        connect(mBoxTarget.data(), SIGNAL(targetSet(qsptr<BoundingBox>)),
+                this, SLOT(setTargetSlot(qsptr<BoundingBox>)));
     }
 
     bool relPointInsidePath(const QPointF &point);
@@ -64,11 +64,11 @@ public:
 
     BoundingBox *getLinkTarget() const;
 
-    BoundingBoxQSPtr createLink();
+    qsptr<BoundingBox> createLink();
 
-    BoundingBoxQSPtr createLinkForLinkGroup();
+    qsptr<BoundingBox> createLinkForLinkGroup();
 
-    BoundingBoxRenderDataSPtr createRenderData();
+    stdsptr<BoundingBoxRenderData> createRenderData();
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);
     const SkBlendMode &getBlendMode() {
@@ -108,7 +108,7 @@ public slots:
     }
 protected:
     InternalLinkBox(BoundingBox *linkTarget);
-    BoxTargetPropertyQSPtr mBoxTarget =
+    qsptr<BoxTargetProperty> mBoxTarget =
             SPtrCreate(BoxTargetProperty)("link target");
 };
 
@@ -148,8 +148,8 @@ public:
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBoxQSPtr)),
-                this, SLOT(setTargetSlot(BoundingBoxQSPtr)));
+        connect(mBoxTarget.data(), SIGNAL(targetSet(qsptr<BoundingBox>)),
+                this, SLOT(setTargetSlot(qsptr<BoundingBox>)));
     }
 
     //bool relPointInsidePath(const QPointF &point);
@@ -157,15 +157,15 @@ public:
 
     BoxesGroup *getLinkTarget() const;
 
-    BoundingBoxQSPtr createLink() {
+    qsptr<BoundingBox> createLink() {
         return getLinkTarget()->createLink();
     }
 
-    BoundingBoxQSPtr createLinkForLinkGroup();
+    qsptr<BoundingBox> createLinkForLinkGroup();
 
     bool SWT_isLinkBox() { return true; }
 
-    BoundingBoxQSPtr createNewDuplicate() {
+    qsptr<BoundingBox> createNewDuplicate() {
         return SPtrCreate(InternalLinkGroupBox)(getLinkTarget());
     }
 
@@ -175,7 +175,7 @@ public:
                 getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
     }
 
-    BoundingBoxRenderDataSPtr createRenderData();
+    stdsptr<BoundingBoxRenderData> createRenderData();
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
@@ -226,7 +226,7 @@ public:
         groupData->childrenRenderData.clear();
         qreal childrenEffectsMargin = 0.;
         qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
+        foreach(const qsptr<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 BoundingBoxRenderData* boxRenderData =
@@ -278,7 +278,7 @@ public slots:
 protected:
     InternalLinkGroupBox(BoxesGroup *linkTarget);
 
-    QSharedPointer<BoxTargetProperty> mBoxTarget =
+    qsptr<BoxTargetProperty> mBoxTarget =
             SPtrCreate(BoxTargetProperty)("link target");
 };
 
@@ -318,14 +318,14 @@ public:
                             BoundingBoxRenderData* data);
     bool clipToCanvas();
 
-    BoundingBoxQSPtr createLinkForLinkGroup();
+    qsptr<BoundingBox> createLinkForLinkGroup();
 
-    BoundingBoxRenderDataSPtr createRenderData();
+    stdsptr<BoundingBoxRenderData> createRenderData();
 
     bool relPointInsidePath(const QPointF &relPos);
 protected:
     InternalLinkCanvas(BoxesGroup* linkTarget);
-    BoolPropertyQSPtr mClipToCanvas =
+    qsptr<BoolProperty> mClipToCanvas =
             SPtrCreate(BoolProperty)("clip");
 };
 

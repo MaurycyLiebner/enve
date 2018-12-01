@@ -33,7 +33,7 @@ ParticleBox::ParticleBox() :
     ca_prependChildAnimator(mTopLeftAnimator.data(), mEffectsAnimators);
     ca_prependChildAnimator(mBottomRightAnimator.data(), mEffectsAnimators);
 
-    VaryingLenAnimationRectQSPtr durRect =
+    qsptr<VaryingLenAnimationRect> durRect =
             SPtrCreate(VaryingLenAnimationRect)(this);
     setDurationRectangle(durRect);
     durRect->setMaxFrame(200);
@@ -58,7 +58,7 @@ void ParticleBox::prp_setAbsFrame(const int &frame) {
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
     if(mRelBoundingRect.contains(relPos.x(), relPos.y())) {
         /*if(mEmitters.isEmpty()) */return true;
-//        Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
+//        Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
 //            if(emitter->relPointInsidePath(relPos)) {
 //                return true;
 //            }
@@ -69,13 +69,13 @@ bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
     }
 }
 
-void ParticleBox::addEmitter(const ParticleEmitterQSPtr& emitter) {
+void ParticleBox::addEmitter(const qsptr<ParticleEmitter>& emitter) {
     mEmitters << emitter;
     ca_addChildAnimator(emitter);
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-void ParticleBox::removeEmitter(const ParticleEmitterQSPtr& emitter) {
+void ParticleBox::removeEmitter(const qsptr<ParticleEmitter>& emitter) {
     mEmitters.removeOne(emitter);
     ca_removeChildAnimator(emitter);
     scheduleUpdate(Animator::USER_CHANGE);
@@ -95,7 +95,7 @@ void ParticleBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
-    ParticleEmitterQSPtr emitter = SPtrCreate(ParticleEmitter)(this);
+    qsptr<ParticleEmitter> emitter = SPtrCreate(ParticleEmitter)(this);
     emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos));
     addEmitter(emitter);
 }
@@ -110,15 +110,15 @@ QRectF ParticleBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
     int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
-    Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
+    Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
         emitter->setFrameRange(minFrame, maxFrame);
     }
 }
 
-void ParticleBox::applyPaintSetting(const PaintSetting &setting) {
-    if(setting.targetsFill()) {
-        Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
-            setting.applyColorSetting(emitter->getColorAnimator());
+void ParticleBox::applyPaintSetting(PaintSetting *setting) {
+    if(setting->targetsFill()) {
+        Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+            setting->applyColorSetting(emitter->getColorAnimator());
         }
     }
 }
@@ -138,7 +138,7 @@ void ParticleBox::drawSelectedSk(SkCanvas *canvas,
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             mTopLeftPoint->drawSk(canvas, invScale);
             mBottomRightPoint->drawSk(canvas, invScale);
-            Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
+            Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
                 MovablePoint *pt = emitter->getPosPoint();
                 pt->drawSk(canvas, invScale);
             }
@@ -160,7 +160,7 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
         if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mBottomRightPoint.get();
         }
-        Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
+        Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
             MovablePoint *pt = emitter->getPosPoint();
             if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
                 return pt;
@@ -177,7 +177,7 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                    QList<MovablePointPtr> &list) {
+                                                    QList<stdptr<MovablePoint>> &list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
@@ -190,7 +190,7 @@ void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
             list.append(mBottomRightPoint.get());
         }
     }
-    Q_FOREACH(const ParticleEmitterQSPtr& emitter, mEmitters) {
+    Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
         if(pt->isContainedInRect(absRect)) {
             pt->select();
@@ -500,7 +500,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
             if(particle->isVisibleAtFrame(relFrame)) {
                 ParticleState stateT;
                 if(!particle->getParticleStateAtFrameF(relFrame, stateT)) continue;
-                BoundingBoxRenderDataSPtr renderData = targetT->createRenderData();
+                stdsptr<BoundingBoxRenderData> renderData = targetT->createRenderData();
                 QMatrix multMatr = QMatrix(stateT.size, 0.,
                                            0., stateT.size,
                                            0., 0.)*particleData->transform;

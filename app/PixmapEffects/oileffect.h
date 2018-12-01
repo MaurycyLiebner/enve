@@ -19,12 +19,12 @@ class OilEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
 protected:
     OilEffect(qreal radius = 2.);
 private:
-    QrealAnimatorQSPtr mRadiusAnimator;
+    qsptr<QrealAnimator> mRadiusAnimator;
 };
 
 #endif // OILEFFECT_H

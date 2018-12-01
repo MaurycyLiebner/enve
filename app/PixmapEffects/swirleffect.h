@@ -19,12 +19,12 @@ class SwirlEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
 protected:
     SwirlEffect(qreal degrees = 45.);
 private:
-    QrealAnimatorQSPtr mDegreesAnimator;
+    qsptr<QrealAnimator> mDegreesAnimator;
 };
 
 #endif // SWIRLEFFECT_H

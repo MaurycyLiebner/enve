@@ -13,7 +13,6 @@ class VectorPathAnimator;
 class BoundingBox;
 class Canvas;
 class BoolAnimator;
-typedef QSharedPointer<BoolAnimator> BoolAnimatorQSPtr;
 
 class PathAnimator : public ComplexAnimator {
     Q_OBJECT
@@ -40,16 +39,16 @@ public:
                       const SkMatrix &combinedTransform);
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr> &list);
+                                           QList<stdptr<MovablePoint>> &list);
 
     BoundingBox *getParentBox();
 
     void loadPathFromSkPath(const SkPath &path);
 
     void setParentBox(BoundingBox *parent);
-    void addSinglePathAnimator(const VectorPathAnimatorQSPtr &path,
+    void addSinglePathAnimator(const qsptr<VectorPathAnimator> &path,
                                const bool &saveUndoRedo = true);
-    void removeSinglePathAnimator(const VectorPathAnimatorQSPtr &path,
+    void removeSinglePathAnimator(const qsptr<VectorPathAnimator> &path,
                                   const bool &saveUndoRedo = true);
     void selectAllPoints(Canvas *canvas);
     bool SWT_isPathAnimator();
@@ -63,7 +62,7 @@ public:
     void revertAllPointsForAllKeys();
     void readVectorPathAnimator(QIODevice *target);
     void addAllSinglePathsToAnimator(PathAnimator *target);
-    const QList<VectorPathAnimatorQSPtr> &getSinglePathsList() {
+    const QList<qsptr<VectorPathAnimator>> &getSinglePathsList() {
         return mSinglePaths;
     }
 
@@ -73,9 +72,9 @@ public:
 //    }
     QMatrix getCombinedTransform();
 private:
-    BoolAnimatorQSPtr mSmoothTransformation;
+    qsptr<BoolAnimator> mSmoothTransformation;
     BoundingBox *mParentBox = nullptr;
-    QList<VectorPathAnimatorQSPtr> mSinglePaths;
+    QList<qsptr<VectorPathAnimator>> mSinglePaths;
 signals:
     void lastSinglePathRemoved();
 };

@@ -5,6 +5,7 @@
 template <class T>
 class StdPointer;
 template <class T> using stdsptr = std::shared_ptr<T>;
+
 class StdSelfRef {
     template <class T> friend class StdPointer;
 public:

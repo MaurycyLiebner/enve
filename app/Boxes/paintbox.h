@@ -56,7 +56,7 @@ public:
         return new PaintBox(100, 100);
     }
 
-    BoundingBoxRenderDataSPtr createRenderData();
+    stdsptr<BoundingBoxRenderData> createRenderData();
 
     void tabletMoveEvent(const qreal &xT,
                      const qreal &yT,
@@ -140,13 +140,13 @@ private:
 
     int mOverlapFrames = 1;
     int mFrameStep = 1;
-    QPointFAnimatorQSPtr mTopLeftAnimator;
-    QPointFAnimatorQSPtr mBottomRightAnimator;
+    qsptr<QPointFAnimator> mTopLeftAnimator;
+    qsptr<QPointFAnimator> mBottomRightAnimator;
 
-    PointAnimatorMovablePointSPtr mTopLeftPoint;
-    PointAnimatorMovablePointSPtr mBottomRightPoint;
+    stdsptr<PointAnimatorMovablePoint> mTopLeftPoint;
+    stdsptr<PointAnimatorMovablePoint> mBottomRightPoint;
 
-    AnimatedSurfaceQSPtr mMainHandler;
+    qsptr<AnimatedSurface> mMainHandler;
     Surface *mTemporaryHandler = nullptr;
 };
 

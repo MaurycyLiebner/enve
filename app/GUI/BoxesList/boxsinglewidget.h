@@ -98,7 +98,7 @@ private:
     BoxesListActionButton *mColorButton;
     BoxTargetWidget *mBoxTargetWidget;
 
-    ComboBoxPropertyQPtr mLastComboBoxProperty;
+    qptr<ComboBoxProperty> mLastComboBoxProperty;
     QWidget *mFillWidget;
     BoolPropertyWidget *mCheckBox;
     QHBoxLayout *mMainLayout;

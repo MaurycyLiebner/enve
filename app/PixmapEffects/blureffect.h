@@ -23,15 +23,15 @@ public:
     qreal getMarginAtRelFrame(const int &relFrame);
 
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* );
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 protected:
     BlurEffect();
 private:
-    BoolPropertyQSPtr mHighQuality;
-    QrealAnimatorQSPtr mBlurRadius;
+    qsptr<BoolProperty> mHighQuality;
+    qsptr<QrealAnimator> mBlurRadius;
 };
 
 #endif // BLUREFFECT_H

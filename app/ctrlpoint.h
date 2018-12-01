@@ -33,7 +33,7 @@ protected:
 private:
     bool mIsStartCtrlPt;
     NodePoint* const mParentPoint_k;
-    CtrlPointPtr mOtherCtrlPt_cv;
+    stdptr<CtrlPoint>mOtherCtrlPt_cv;
 };
 
 #endif // CTRLPOINT_H

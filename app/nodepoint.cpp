@@ -139,7 +139,7 @@ void NodePoint::removeApproximate() {
 }
 
 void NodePoint::rectPointsSelection(const QRectF &absRect,
-                                    QList<MovablePointPtr> &list) {
+                                    QList<stdptr<MovablePoint>> &list) {
     if(!isSelected()) {
         if(isContainedInRect(absRect)) {
             select();

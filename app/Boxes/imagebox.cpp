@@ -70,7 +70,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 }
 
-BoundingBoxRenderDataSPtr ImageBox::createRenderData() {
+stdsptr<BoundingBoxRenderData> ImageBox::createRenderData() {
     return SPtrCreate(ImageBoxRenderData)(mImgCacheHandler, this);
 }
 

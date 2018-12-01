@@ -353,7 +353,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const int &id) {
         currentGradient = mCurrentStrokeGradient;
         currentGradientLinear = mCurrentStrokeGradientLinear;
     }
-    PaintSettingSPtr paintSetting;
+    stdsptr<PaintSetting> paintSetting;
     if(currentPaintType == FLATPAINT) {
         paintSetting = SPtrCreate(PaintSetting)(isFill, ColorSetting());
     } else if(currentPaintType == GRADIENTPAINT) {
@@ -362,7 +362,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const int &id) {
     } else{
         paintSetting = SPtrCreate(PaintSetting)(isFill);
     }
-    mCanvasWindow->applyPaintSettingToSelected(*paintSetting);
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
 
     mMainWindow->callUpdateSchedulers();
 }
@@ -384,14 +384,14 @@ void FillStrokeSettingsWidget::colorSettingReceived(
         currentGradient = mCurrentStrokeGradient;
         currentGradientLinear = mCurrentStrokeGradientLinear;
     }
-    PaintSettingSPtr paintSetting;
+    stdsptr<PaintSetting> paintSetting;
     if(currentPaintType == FLATPAINT) {
         paintSetting = SPtrCreate(PaintSetting)(isFill, colorSetting);
     } else { // GRADIENTPAINT
         paintSetting = SPtrCreate(PaintSetting)(
                     isFill, currentGradientLinear, currentGradient);
     }
-    mCanvasWindow->applyPaintSettingToSelected(*paintSetting);
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
 }
 
 void FillStrokeSettingsWidget::connectGradient() {
@@ -583,9 +583,9 @@ void FillStrokeSettingsWidget::applyGradient() {
         currentGradient = mCurrentStrokeGradient;
         currentGradientLinear = mCurrentStrokeGradientLinear;
     }
-    PaintSettingSPtr paintSetting = SPtrCreate(PaintSetting)(
+    stdsptr<PaintSetting> paintSetting = SPtrCreate(PaintSetting)(
                 isFill, currentGradientLinear, currentGradient);
-    mCanvasWindow->applyPaintSettingToSelected(*paintSetting);
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
 }
 
 void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {

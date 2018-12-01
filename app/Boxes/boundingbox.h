@@ -28,6 +28,15 @@ class NodePoint;
 class PathEffect;
 class PathAnimator;
 class DurationRectangleMovable;
+class PaintSettings;
+class StrokeSettings;
+class PaintSetting;
+
+class BoxesGroup;
+class VectorPathEdge;
+class VectorPath;
+class DurationRectangle;
+class BoxesGroupRenderData;
 
 enum CanvasMode : short;
 
@@ -49,12 +58,6 @@ enum BoundingBoxType {
     TYPE_BONES_BOX
 };
 
-class BoxesGroup;
-class VectorPathEdge;
-class VectorPath;
-class DurationRectangle;
-class BoxesGroupRenderData;
-
 struct FunctionWaitingForBoxLoad : public StdSelfRef {
     virtual void boxLoaded(BoundingBox *box) = 0;
     int loadBoxId;
@@ -74,8 +77,8 @@ public:
     BoundingBox(const BoundingBoxType &type);
     virtual ~BoundingBox();
 
-    virtual BoundingBoxQSPtr createLink();
-    virtual BoundingBoxQSPtr createLinkForLinkGroup();
+    virtual qsptr<BoundingBox> createLink();
+    virtual qsptr<BoundingBox> createLinkForLinkGroup();
 
     void clearEffects();
 
@@ -124,7 +127,7 @@ public:
                        const bool &saveUndoRedo = true);
 
     virtual void selectAndAddContainedPointsToList(
-            const QRectF &, QList<MovablePointPtr>&);
+            const QRectF &, QList<stdptr<MovablePoint>>&);
 
     QPointF getPivotAbsPos();
     virtual void select();
@@ -236,8 +239,8 @@ public:
         addEffect(T::template create<T>());
     }
 
-    void addEffect(const PixmapEffectQSPtr &effect);
-    void removeEffect(const PixmapEffectQSPtr &effect);
+    void addEffect(const qsptr<PixmapEffect> &effect);
+    void removeEffect(const qsptr<PixmapEffect> &effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
     virtual const SkBlendMode &getBlendMode();
@@ -290,8 +293,7 @@ public:
                            const SkPath &path,
                            const SkScalar &invScale);
 
-    virtual void applyPaintSetting(
-            const PaintSetting &setting);
+    virtual void applyPaintSetting(PaintSetting *setting);
 
     virtual void setFillColorMode(const ColorMode &colorMode);
     virtual void setStrokeColorMode(const ColorMode &colorMode);
@@ -306,7 +308,7 @@ public:
 
 //    int prp_getParentFrameShift() const;
 
-    void setDurationRectangle(const DurationRectangleQSPtr &durationRect);
+    void setDurationRectangle(const qsptr<DurationRectangle> &durationRect);
 
     bool isVisibleAndInVisibleDurationRect();
     void incUsedAsTarget();
@@ -324,12 +326,12 @@ public:
                       const qreal &drawY,
                       const int &startFrame,
                       const int &endFrame);
-    virtual void addPathEffect(const PathEffectQSPtr&);
-    virtual void addFillPathEffect(const PathEffectQSPtr&);
-    virtual void addOutlinePathEffect(const PathEffectQSPtr&);
-    virtual void removePathEffect(const PathEffectQSPtr&);
-    virtual void removeFillPathEffect(const PathEffectQSPtr&);
-    virtual void removeOutlinePathEffect(const PathEffectQSPtr&);
+    virtual void addPathEffect(const qsptr<PathEffect>&);
+    virtual void addFillPathEffect(const qsptr<PathEffect>&);
+    virtual void addOutlinePathEffect(const qsptr<PathEffect>&);
+    virtual void removePathEffect(const qsptr<PathEffect>&);
+    virtual void removeFillPathEffect(const qsptr<PathEffect>&);
+    virtual void removeOutlinePathEffect(const qsptr<PathEffect>&);
 
     virtual void addActionsToMenu(QMenu *);
     virtual bool handleSelectedCanvasAction(QAction *);
@@ -337,7 +339,7 @@ public:
     virtual void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData *data);
 
-    virtual BoundingBoxRenderDataSPtr createRenderData();
+    virtual stdsptr<BoundingBoxRenderData> createRenderData();
 
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
     virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
@@ -375,7 +377,7 @@ public:
                                                const int &relFrame,
                                                const bool &takeAncestorsIntoAccount = true);
     virtual void processSchedulers();
-    void addScheduler(const _ScheduledExecutorSPtr &updatable);
+    void addScheduler(const stdsptr<_ScheduledExecutor> &updatable);
     virtual void addSchedulersToProcess();
 
     const int &getLoadId();
@@ -387,7 +389,7 @@ public:
     static BoundingBox *getLoadedBoxById(const int &loadId);
 
     static void addFunctionWaitingForBoxLoad(
-            const FunctionWaitingForBoxLoadSPtr& func);
+            const stdsptr<FunctionWaitingForBoxLoad>& func);
 
     static void addLoadedBox(BoundingBox *box);
 
@@ -415,7 +417,7 @@ public:
 
     void removeLinkingBox(BoundingBox *box);
 
-    const QList<BoundingBoxQPtr> &getLinkingBoxes() const;
+    const QList<qptr<BoundingBox>> &getLinkingBoxes() const;
 
     EffectAnimators *getEffectsAnimators();
 
@@ -466,25 +468,25 @@ protected:
     SkRect mRelBoundingRectSk;
     SkPath mSkRelBoundingRectPath;
 
-    BoxesGroupQPtr mParentGroup;
-    BasicTransformAnimatorQPtr mParentTransform;
+    qptr<BoxesGroup> mParentGroup;
+    qptr<BasicTransformAnimator> mParentTransform;
 
-    QList<BoundingBoxQPtr> mChildBoxes;
-    QList<BoundingBoxQPtr> mLinkingBoxes;
+    QList<qptr<BoundingBox>> mChildBoxes;
+    QList<qptr<BoundingBox>> mLinkingBoxes;
 
     RenderDataHandler mCurrentRenderDataHandler;
-    RenderContainerSPtr mDrawRenderContainer =
+    stdsptr<RenderContainer> mDrawRenderContainer =
             SPtrCreate(RenderContainer)();
 
-    DurationRectangleQSPtr mDurationRectangle;
+    qsptr<DurationRectangle> mDurationRectangle;
 
-    QSharedPointer<EffectAnimators> mEffectsAnimators;
-    BoxTransformAnimatorQSPtr mTransformAnimator;
+    qsptr<EffectAnimators> mEffectsAnimators;
+    qsptr<BoxTransformAnimator> mTransformAnimator;
 
-    QList<_ScheduledExecutorSPtr> mSchedulers;
+    QList<stdsptr<_ScheduledExecutor>> mSchedulers;
 
-    static QList<BoundingBoxQPtr> mLoadedBoxes;
-    static QList<FunctionWaitingForBoxLoadSPtr> mFunctionsWaitingForBoxLoad;
+    static QList<qptr<BoundingBox>> mLoadedBoxes;
+    static QList<stdsptr<FunctionWaitingForBoxLoad>> mFunctionsWaitingForBoxLoad;
 private:
     void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);
 signals:

@@ -19,8 +19,8 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
-    QrealAnimatorQSPtr mLength;
-    BoolPropertyQSPtr mReverse;
+    qsptr<QrealAnimator> mLength;
+    qsptr<BoolProperty> mReverse;
 };
 
 #endif // LENGTHPATHEFFECT_H

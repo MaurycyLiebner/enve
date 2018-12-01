@@ -37,7 +37,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
 //    }
 //    free(data1);
 
-    Q_FOREACH(const SingleSoundQSPtr &sound, mSounds) {
+    Q_FOREACH(const qsptr<SingleSound> &sound, mSounds) {
         sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);
         const int &soundStartFrame = sound->getStartAbsFrame();
         const int &soundSampleCount = sound->getSampleCount();
@@ -74,20 +74,20 @@ void SoundComposition::generateData(const int &startAbsFrame,
     mPos = 0;
 }
 
-void SoundComposition::addSound(const SingleSoundQSPtr& sound) {
+void SoundComposition::addSound(const qsptr<SingleSound>& sound) {
     mSounds.append(sound);
 }
 
-void SoundComposition::removeSound(const SingleSoundQSPtr& sound) {
+void SoundComposition::removeSound(const qsptr<SingleSound>& sound) {
     mSounds.removeOne(sound);
 }
 
-void SoundComposition::addSoundAnimator(const SingleSoundQSPtr& sound) {
+void SoundComposition::addSoundAnimator(const qsptr<SingleSound>& sound) {
     addSound(sound);
     mSoundsAnimatorContainer->ca_addChildAnimator(sound);
 }
 
-void SoundComposition::removeSoundAnimator(const SingleSoundQSPtr& sound) {
+void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
     if(mSounds.removeOne(sound)) {
         mSoundsAnimatorContainer->ca_removeChildAnimator(sound);
     }

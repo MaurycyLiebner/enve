@@ -20,14 +20,14 @@ class ContrastEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 protected:
     ContrastEffect(qreal contrast = .0);
 private:
-    QrealAnimatorQSPtr mContrastAnimator;
+    qsptr<QrealAnimator> mContrastAnimator;
 };
 
 #endif // CONTRASTEFFECT_H

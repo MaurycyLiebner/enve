@@ -24,7 +24,7 @@ protected:
     bool mGUIThreadExecution = false;
     bool mFinished = false;
     int nDependancies = 0;
-    QList<MinimalExecutorPtr> mCurrentExecutionDependent;
+    QList<stdptr<MinimalExecutor>> mCurrentExecutionDependent;
 };
 
 class GUI_ThreadExecutor : public MinimalExecutor {
@@ -63,7 +63,7 @@ protected:
     QPointer<PaintControler> mCurrentPaintControler;
     std::shared_ptr<_Executor> mSelfRef;
 
-    QList<MinimalExecutorPtr> mNextExecutionDependent;
+    QList<stdptr<MinimalExecutor>> mNextExecutionDependent;
 };
 
 class _ScheduledExecutor : public _Executor {

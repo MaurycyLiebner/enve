@@ -19,12 +19,12 @@ class ImplodeEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
 protected:
     ImplodeEffect(qreal radius = 10.);
 private:
-    QrealAnimatorQSPtr mFactorAnimator;
+    qsptr<QrealAnimator> mFactorAnimator;
 };
 
 #endif // IMPLODEEFFECT_H

@@ -115,7 +115,7 @@ public:
                                    const CanvasMode &canvasMode,
                                    const qreal &canvasScaleInv);
     void rectPointsSelection(const QRectF &absRect,
-                             QList<MovablePointPtr> &list);
+                             QList<stdptr<MovablePoint>> &list);
     void updateStartCtrlPtVisibility();
     void updateEndCtrlPtVisibility();
 
@@ -185,14 +185,14 @@ private:
     bool mSeparateNodePoint = false;
     int mNodeId;
 
-    VectorPathEdgeSPtr mNextEdge;
+    stdsptr<VectorPathEdge> mNextEdge;
     NodeSettings *mCurrentNodeSettings = nullptr;
-    const VectorPathAnimatorQPtr mParentPath;
+    const qptr<VectorPathAnimator> mParentPath;
 
     NodePoint *mNextPoint = nullptr;
     NodePoint *mPreviousPoint = nullptr;
-    CtrlPointSPtr mStartCtrlPt;
-    CtrlPointSPtr mEndCtrlPt;
+    stdsptr<CtrlPoint> mStartCtrlPt;
+    stdsptr<CtrlPoint> mEndCtrlPt;
 
     void ctrlPointPosChanged(CtrlPoint *pointChanged,
                              CtrlPoint *pointToUpdate);

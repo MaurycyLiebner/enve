@@ -30,10 +30,10 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     copied = true;
 }
 
-BoundingBoxRenderDataSPtr BoundingBoxRenderData::makeCopy() {
+stdsptr<BoundingBoxRenderData> BoundingBoxRenderData::makeCopy() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return nullptr;
-    BoundingBoxRenderDataSPtr copy = parentBoxT->createRenderData();
+    stdsptr<BoundingBoxRenderData> copy = parentBoxT->createRenderData();
     copy->copyFrom(this);
     return copy;
 }
@@ -125,7 +125,7 @@ void BoundingBoxRenderData::renderToImage() {
         bitmap.peekPixels(&pixmap);
         fmt_filters::image img(static_cast<uint8_t*>(pixmap.writable_addr()),
                                pixmap.width(), pixmap.height());
-        foreach(const PixmapEffectRenderDataSPtr& effect, pixmapEffects) {
+        foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
         clearPixmapEffects();

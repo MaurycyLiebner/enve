@@ -4,6 +4,7 @@
 class GradientPoint;
 class MovablePoint;
 class PathBox;
+class QPointFAnimator;
 #include "skiaincludes.h"
 
 class GradientPoints : public ComplexAnimator {
@@ -39,11 +40,11 @@ protected:
 
     bool mEnabled;
 
-    QPointFAnimatorQSPtr mStartAnimator;
-    QPointFAnimatorQSPtr mEndAnimator;
+    qsptr<QPointFAnimator> mStartAnimator;
+    qsptr<QPointFAnimator> mEndAnimator;
 
-    GradientPointSPtr mStartPoint;
-    GradientPointSPtr mEndPoint;
+    stdsptr<GradientPoint> mStartPoint;
+    stdsptr<GradientPoint> mEndPoint;
 
     PathBox* const mParent_k;
 };

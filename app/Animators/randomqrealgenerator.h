@@ -1,6 +1,8 @@
 #ifndef RANDOMQREALGENERATOR_H
 #define RANDOMQREALGENERATOR_H
 #include "qrealvalueeffect.h"
+class IntProperty;
+class ComboBoxProperty;
 
 struct FrameValue {
     FrameValue(const qreal &frameT, const qreal &valueT) {
@@ -35,11 +37,11 @@ private:
     int mFirstFrame;
     int mLastFrame;
     QList<FrameValue> mFrameValues;
-    QrealAnimatorQSPtr mPeriod;
-    QrealAnimatorQSPtr mSmoothness;
-    QrealAnimatorQSPtr mMaxDev;
-    IntPropertyQSPtr mSeedAssist;
-    ComboBoxPropertyQSPtr mType;
+    qsptr<QrealAnimator> mPeriod;
+    qsptr<QrealAnimator> mSmoothness;
+    qsptr<QrealAnimator> mMaxDev;
+    qsptr<IntProperty> mSeedAssist;
+    qsptr<ComboBoxProperty> mType;
 };
 
 #endif // RANDOMQREALGENERATOR_H

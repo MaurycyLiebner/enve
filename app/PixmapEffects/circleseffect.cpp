@@ -17,7 +17,7 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
     ca_addChildAnimator(mCirclesDistance);
 }
 
-PixmapEffectRenderDataSPtr CirclesEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> CirclesEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(CirclesEffectRenderData)();
     renderData->circlesDistance =

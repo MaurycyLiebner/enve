@@ -34,7 +34,7 @@ public:
 
     Animator* getParentAnimator();
 
-    virtual void mergeWith(const KeySPtr& key) { key->removeFromAnimator(); }
+    virtual void mergeWith(const stdsptr<Key>& key) { key->removeFromAnimator(); }
 
     virtual bool isDescendantSelected() { return isSelected(); }
 
@@ -56,10 +56,10 @@ public:
         return false;
     }
 
-    virtual void addToSelection(QList<KeyPtr> &selectedKeys,
-                                QList<AnimatorQPtr> &selectedAnimators);
-    virtual void removeFromSelection(QList<KeyPtr> &selectedKeys,
-                                     QList<AnimatorQPtr> &selectedAnimators);
+    virtual void addToSelection(QList<stdptr<Key>> &selectedKeys,
+                                QList<qptr<Animator>> &selectedAnimators);
+    virtual void removeFromSelection(QList<stdptr<Key>> &selectedKeys,
+                                     QList<qptr<Animator>> &selectedAnimators);
 
     bool isHovered() {
         return mHovered;

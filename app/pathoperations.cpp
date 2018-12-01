@@ -344,7 +344,7 @@ void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
         MinimalNodePoint *point = firstPoint;
         NodePoint *firstNodePoint = nullptr;
         NodePoint *lastNodePoint = nullptr;
-        VectorPathAnimatorQSPtr singlePath = SPtrCreate(VectorPathAnimator)(path);
+        qsptr<VectorPathAnimator> singlePath = SPtrCreate(VectorPathAnimator)(path);
         do {
             lastNodePoint = singlePath->addNodeRelPos(
                         point->getStartPos(), point->getPos(),

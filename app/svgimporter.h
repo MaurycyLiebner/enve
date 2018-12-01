@@ -222,12 +222,12 @@ private:
                         qreal th0, qreal th1,
                         qreal rx, qreal ry, qreal xAxisRotation);
 
-    void addPoint(const SvgNodePointSPtr& point);
+    void addPoint(const stdsptr<SvgNodePoint>& point);
 
     bool mClosedPath = false;
-    SvgNodePointPtr mFirstPoint;
-    SvgNodePointPtr mLastPoint;
-    QList<SvgNodePointSPtr> mPoints;
+    stdptr<SvgNodePoint>mFirstPoint;
+    stdptr<SvgNodePoint>mLastPoint;
+    QList<stdsptr<SvgNodePoint>> mPoints;
 };
 
 
@@ -236,19 +236,19 @@ public:
     VectorPathSvgAttributes() {}
 
     SvgSeparatePath *newSeparatePath() {
-        SvgSeparatePathSPtr lastPath = SPtrCreate(SvgSeparatePath)();
+        stdsptr<SvgSeparatePath> lastPath = SPtrCreate(SvgSeparatePath)();
         mSvgSeparatePaths << lastPath;
         return lastPath.get();
     }
     void apply(VectorPath *path);
 protected:
-    QList<SvgSeparatePathSPtr> mSvgSeparatePaths;
+    QList<stdsptr<SvgSeparatePath>> mSvgSeparatePaths;
 };
 
 
 extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
                         BoundingBoxSvgAttributes *parentGroupAttributes);
-extern BoxesGroupQSPtr loadSVGFile(const QString &filename);
+extern qsptr<BoxesGroup> loadSVGFile(const QString &filename);
 /*
 #include <QStringRef>
 #include <QPainterPath>

@@ -21,14 +21,14 @@ class LinesEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
 protected:
     LinesEffect(qreal linesWidth = 5.,
                 qreal linesDistance = 5.);
 private:
     bool mVertical = false;
-    QrealAnimatorQSPtr mLinesDistance;
-    QrealAnimatorQSPtr mLinesWidth;
+    qsptr<QrealAnimator> mLinesDistance;
+    qsptr<QrealAnimator> mLinesWidth;
 };
 #endif // LINESEFFECT_H

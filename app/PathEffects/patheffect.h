@@ -71,8 +71,8 @@ protected:
     bool mVisible = true;
     bool mOutlineEffect = false;
     PathEffectType mPathEffectType;
-    BoolPropertyQSPtr mApplyBeforeThickness;
-    PathEffectAnimatorsQPtr mParentEffectAnimators;
+    qsptr<BoolProperty> mApplyBeforeThickness;
+    qptr<PathEffectAnimators> mParentEffectAnimators;
 };
 
 #endif // PATHEFFECT_H

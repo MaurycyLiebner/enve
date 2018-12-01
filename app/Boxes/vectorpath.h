@@ -7,7 +7,6 @@
 class NodePoint;
 class BoxesGroup;
 class PathAnimator;
-typedef QSharedPointer<PathAnimator> PathAnimatorQSPtr;
 
 enum CanvasMode : short;
 
@@ -41,7 +40,7 @@ public:
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr> &list);
+                                           QList<stdptr<MovablePoint>> &list);
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
@@ -59,7 +58,7 @@ public:
                 const int& frame1, const int& frame2) const;
 protected:
     void getMotionBlurProperties(QList<Property *> &list);
-    PathAnimatorQSPtr mPathAnimator;
+    qsptr<PathAnimator> mPathAnimator;
 };
 
 #endif // VECTORPATH_H

@@ -27,9 +27,9 @@ public:
         return true;//mBoxTarget->getTarget() != nullptr;
     }
 private:
-    PathBoxQPtr mParentPathBox;
-    ComboBoxPropertyQSPtr mOperationType;
-    BoxTargetPropertyQSPtr mBoxTarget;
+    qptr<PathBox> mParentPathBox;
+    qsptr<ComboBoxProperty> mOperationType;
+    qsptr<BoxTargetProperty> mBoxTarget;
 };
 
 #endif // OPERATIONPATHEFFECT_H

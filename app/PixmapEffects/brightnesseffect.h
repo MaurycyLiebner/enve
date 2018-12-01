@@ -19,13 +19,13 @@ class BrightnessEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    PixmapEffectRenderDataSPtr getPixmapEffectRenderDataForRelFrameF(
+    stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 protected:
     BrightnessEffect(qreal brightness = .0);
 private:
-    QrealAnimatorQSPtr mBrightnessAnimator;
+    qsptr<QrealAnimator> mBrightnessAnimator;
 };
 #endif // BRIGHTNESSEFFECT_H

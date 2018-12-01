@@ -22,7 +22,7 @@ ReplaceColorEffect::ReplaceColorEffect() :
     ca_addChildAnimator(mSmoothnessAnimator);
 }
 
-PixmapEffectRenderDataSPtr ReplaceColorEffect::getPixmapEffectRenderDataForRelFrameF(
+stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ReplaceColorEffectRenderData)();
     QColor fromColor = mFromColor->getColorAtRelFrameF(relFrame);

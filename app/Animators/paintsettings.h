@@ -84,9 +84,9 @@ protected:
 private:
     const bool mTargetFillSettings;
     bool mLinearGradient = true;
-    GradientQPtr mGradient;
     PaintType mPaintType;
     ColorSetting mColorSetting;
+    qptr<Gradient> mGradient;
 };
 
 class PaintSettings : public ComplexAnimator {
@@ -140,9 +140,9 @@ private:
     PaintType mPaintType = FLATPAINT;
 
     PathBox * const mTarget_k;
-    GradientPointsQPtr mGradientPoints;
-    QSharedPointer<ColorAnimator> mColor = SPtrCreate(ColorAnimator)();
-    GradientQPtr mGradient;
+    qptr<GradientPoints> mGradientPoints;
+    qsptr<ColorAnimator> mColor = SPtrCreate(ColorAnimator)();
+    qptr<Gradient> mGradient;
 };
 
 class Gradient : public ComplexAnimator {
@@ -152,7 +152,7 @@ public:
     void swapColors(const int &id1, const int &id2,
                     const bool &saveUndoRedo = true);
 
-    void removeColor(const ColorAnimatorQSPtr &color,
+    void removeColor(const qsptr<ColorAnimator> &color,
                      const bool &saveUndoRedo = true);
 
     void addColor(const QColor &color);
@@ -191,7 +191,7 @@ public:
 
     QGradientStops getQGradientStops();
     void startColorIdTransform(int id);
-    void addColorToList(const ColorAnimatorQSPtr &newColorAnimator,
+    void addColorToList(const qsptr<ColorAnimator> &newColorAnimator,
                         const bool &saveUndoRedo = true);
     ColorAnimator *getColorAnimatorAt(const int &id);
     void removeColor(const int &id);
@@ -205,7 +205,7 @@ public:
                                  ComplexAnimator* parentAnimator = nullptr) {
         Q_UNUSED(shift);
         if(parentAnimator == nullptr) return;
-        Q_FOREACH(const KeySPtr &key, anim_mKeys) {
+        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
             parentAnimator->ca_updateDescendatKeyFrame(key.get());
         }
     }
@@ -231,9 +231,9 @@ protected:
 private:
     int mLoadId = -1;
     QGradientStops mQGradientStops;
-    QList<ColorAnimatorQSPtr> mColors;
-    QList<PathBoxQPtr> mAffectedPaths;
-    ColorAnimatorQPtr mCurrentColor;
+    QList<qsptr<ColorAnimator>> mColors;
+    QList<qptr<PathBox>> mAffectedPaths;
+    qptr<ColorAnimator> mCurrentColor;
 };
 
 struct UpdatePaintSettings {
@@ -320,7 +320,7 @@ private:
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
 
-    QrealAnimatorQSPtr mLineWidth =
+    qsptr<QrealAnimator> mLineWidth =
             SPtrCreate(QrealAnimator)("thickness");
 };
 #endif // PAINTSETTINGS_H

@@ -8,7 +8,6 @@ class Key;
 class QPainter;
 class DurationRectangleMovable;
 class FakeComplexAnimator;
-typedef QSharedPointer<FakeComplexAnimator> FakeComplexAnimatorQSPtr;
 
 class Animator : public Property {
     Q_OBJECT
@@ -45,10 +44,10 @@ public:
     virtual void anim_callFrameChangeUpdater();
     virtual void anim_sortKeys();
 
-    virtual void anim_appendKey(const KeySPtr &newKey,
+    virtual void anim_appendKey(const stdsptr<Key> &newKey,
                                 const bool &saveUndoRedo = true,
                                 const bool &update = true);
-    virtual void anim_removeKey(const KeySPtr& keyToRemove,
+    virtual void anim_removeKey(const stdsptr<Key>& keyToRemove,
                                 const bool &saveUndoRedo = true);
     virtual void anim_moveKeyToRelFrame(Key *key,
                                         const int &newFrame,
@@ -115,7 +114,7 @@ public:
                                  int &nextRelFrame);
     bool prp_prevRelFrameWithKey(const int &relFrame,
                                  int &prevRelFrame);
-    virtual KeySPtr readKey(QIODevice *target);
+    virtual stdsptr<Key> readKey(QIODevice *target);
 
     bool hasFakeComplexAnimator();
 
@@ -147,16 +146,19 @@ protected:
                          const qreal &pixelsPerFrame,
                          const qreal &drawY,
                          const int &startFrame);
-    QList<KeySPtr> anim_mKeys;
-    QList<KeyPtr> anim_mSelectedKeys;
-    int anim_mCurrentAbsFrame = 0;
-    int anim_mCurrentRelFrame = 0;
     bool anim_mIsComplexAnimator = false;
     bool anim_mIsCurrentAnimator = false;
     bool anim_mIsRecording = false;
-    KeyPtr anim_mKeyOnCurrentFrame;
+
+    int anim_mCurrentAbsFrame = 0;
+    int anim_mCurrentRelFrame = 0;
+
     QColor anim_mAnimatorColor;
-    FakeComplexAnimatorQSPtr mFakeComplexAnimator;
+
+    QList<stdsptr<Key>> anim_mKeys;
+    QList<stdptr<Key>> anim_mSelectedKeys;
+    stdptr<Key> anim_mKeyOnCurrentFrame;
+    qsptr<FakeComplexAnimator> mFakeComplexAnimator;
 public slots:
     void anim_deleteCurrentKey();
     virtual void anim_updateAfterShifted();

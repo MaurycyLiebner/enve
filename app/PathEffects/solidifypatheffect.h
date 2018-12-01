@@ -23,7 +23,7 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:
-    QrealAnimatorQSPtr mDisplacement;
+    qsptr<QrealAnimator> mDisplacement;
 };
 
 #endif // SOLIDIFYPATHEFFECT_H

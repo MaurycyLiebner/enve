@@ -6,6 +6,7 @@
 #include <QLabel>
 #include "minimalscrollwidget.h"
 #include "sharedpointerdefs.h"
+#include "selfref.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
 class SingleWidgetAbstraction;
@@ -28,8 +29,8 @@ private slots:
 protected:
     int mContentHeight = 0;
     virtual void createVisiblePartWidget();
-    SingleWidgetTargetQPtr mMainTarget;
-    SingleWidgetAbstractionPtr mMainAbstraction;
+    qptr<SingleWidgetTarget> mMainTarget;
+    stdptr<SingleWidgetAbstraction>mMainAbstraction;
     ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;
 };
 

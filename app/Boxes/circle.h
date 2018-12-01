@@ -20,8 +20,8 @@ protected:
                       BasicTransformAnimator *parent,
                       const MovablePointType &type);
 private:
-    MovablePointPtr mVerticalPoint_cv;
-    MovablePointPtr mHorizontalPoint_cv;
+    stdptr<MovablePoint>mVerticalPoint_cv;
+    stdptr<MovablePoint>mHorizontalPoint_cv;
 };
 
 class CircleRadiusPoint : public PointAnimatorMovablePoint {
@@ -42,7 +42,7 @@ protected:
                       MovablePoint *centerPoint);
 private:
     bool mXBlocked = false;
-    MovablePointPtr mCenterPoint_cv;
+    stdptr<MovablePoint>mCenterPoint_cv;
 };
 
 class Circle : public PathBox {
@@ -57,7 +57,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr> &list);
+                                           QList<stdptr<MovablePoint>> &list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
     void drawSelectedSk(SkCanvas *canvas,
@@ -95,13 +95,13 @@ protected:
 
     void getMotionBlurProperties(QList<Property*>& list);
 
-    CircleCenterPointSPtr mCenterPoint;
-    CircleRadiusPointSPtr mHorizontalRadiusPoint;
-    CircleRadiusPointSPtr mVerticalRadiusPoint;
+    stdsptr<CircleCenterPoint> mCenterPoint;
+    stdsptr<CircleRadiusPoint> mHorizontalRadiusPoint;
+    stdsptr<CircleRadiusPoint> mVerticalRadiusPoint;
 
-    QPointFAnimatorQSPtr mCenterAnimator;
-    QPointFAnimatorQSPtr mHorizontalRadiusAnimator;
-    QPointFAnimatorQSPtr mVerticalRadiusAnimator;
+    qsptr<QPointFAnimator> mCenterAnimator;
+    qsptr<QPointFAnimator> mHorizontalRadiusAnimator;
+    qsptr<QPointFAnimator> mVerticalRadiusAnimator;
 };
 
 #endif // CIRCLE_H

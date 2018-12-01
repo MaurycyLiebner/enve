@@ -16,7 +16,7 @@ public:
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePointPtr> &list);
+                                           QList<stdptr<MovablePoint>> &list);
 
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
@@ -36,13 +36,13 @@ public:
 protected:
     Rectangle();
 
-    QPointFAnimatorQSPtr mTopLeftAnimator;
-    QPointFAnimatorQSPtr mBottomRightAnimator;
-    QPointFAnimatorQSPtr mRadiusAnimator;
+    qsptr<QPointFAnimator> mTopLeftAnimator;
+    qsptr<QPointFAnimator> mBottomRightAnimator;
+    qsptr<QPointFAnimator> mRadiusAnimator;
 
-    PointAnimatorMovablePointSPtr mTopLeftPoint;
-    PointAnimatorMovablePointSPtr mBottomRightPoint;
-    PointAnimatorMovablePointSPtr mRadiusPoint;
+    stdsptr<PointAnimatorMovablePoint> mTopLeftPoint;
+    stdsptr<PointAnimatorMovablePoint> mBottomRightPoint;
+    stdsptr<PointAnimatorMovablePoint> mRadiusPoint;
 
     void getMotionBlurProperties(QList<Property*> &list);
 };

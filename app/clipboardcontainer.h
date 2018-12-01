@@ -11,7 +11,7 @@ class Key;
 class Animator;
 class Property;
 
-typedef QPair<AnimatorQPtr, QByteArray> AnimatorKeyDataPair;
+typedef QPair<qptr<Animator>, QByteArray> AnimatorKeyDataPair;
 
 enum  ClipboardContainerType : short {
     CCT_BOXES,
@@ -39,7 +39,7 @@ public:
 protected:
     BoxesClipboardContainer();
 private:
-    QList<BoundingBoxQPtr> mBoxesList;
+    QList<qptr<BoundingBox>> mBoxesList;
 };
 
 class KeysClipboardContainer : public ClipboardContainer {

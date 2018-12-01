@@ -14,9 +14,9 @@ public:
     ComplexAnimator(const QString& name);
     ~ComplexAnimator();
 
-    void ca_addChildAnimator(const PropertyQSPtr &childAnimator,
+    void ca_addChildAnimator(const qsptr<Property> &childAnimator,
                              const int &id = INT_MAX);
-    void ca_removeChildAnimator(const PropertyQSPtr &removeAnimator);
+    void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
     void ca_moveChildInList(Property *child,
                             const int &from,
@@ -29,7 +29,7 @@ public:
                            const bool &saveUndoRedo = true);
 
     void prp_startTransform();
-    void prp_setUpdater(const AnimatorUpdaterSPtr& updater);
+    void prp_setUpdater(const stdsptr<AnimatorUpdater>& updater);
     void prp_setAbsFrame(const int &frame);
 
     void prp_retrieveSavedValue();
@@ -79,15 +79,15 @@ public:
     QrealAnimator *getQrealAnimatorIfIsTheOnlyOne();
 
     void SWT_setChildrenAncestorDisabled(const bool &bT) {
-        Q_FOREACH(const QSharedPointer<Property> &prop, ca_mChildAnimators) {
+        Q_FOREACH(const qsptr<Property> &prop, ca_mChildAnimators) {
             prop->SWT_setAncestorDisabled(bT);
         }
     }
 public slots:
     void ca_prependChildAnimator(Property *childAnimator,
-                                 const PropertyQSPtr& prependWith);
-    void ca_replaceChildAnimator(const PropertyQSPtr &childAnimator,
-                                 const PropertyQSPtr& replaceWith);
+                                 const qsptr<Property>& prependWith);
+    void ca_replaceChildAnimator(const qsptr<Property> &childAnimator,
+                                 const qsptr<Property>& replaceWith);
     void prp_setRecording(const bool &rec);
 
     void ca_addDescendantsKey(Key* key);
@@ -97,7 +97,7 @@ protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(const int &frame);
     bool ca_mChildAnimatorRecording = false;
-    QList<PropertyQSPtr> ca_mChildAnimators;
+    QList<qsptr<Property>> ca_mChildAnimators;
 };
 
 class ComplexKey : public Key {
@@ -105,7 +105,7 @@ class ComplexKey : public Key {
 public:
     void addAnimatorKey(Key *key);
 
-    void addOrMergeKey(const KeySPtr &keyAdd);
+    void addOrMergeKey(const stdsptr<Key> &keyAdd);
 
     void deleteKey();
 
@@ -115,7 +115,7 @@ public:
 
     void setRelFrame(const int &frame);
 
-    void mergeWith(const KeySPtr &key);
+    void mergeWith(const stdsptr<Key> &key);
 
     void margeAllKeysToKey(ComplexKey *target);
 
@@ -128,10 +128,10 @@ public:
     //QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     bool areAllChildrenSelected();
-    void addToSelection(QList<KeyPtr> &selectedKeys,
-                        QList<AnimatorQPtr> &selectedAnimators);
-    void removeFromSelection(QList<KeyPtr> &selectedKeys,
-                             QList<AnimatorQPtr> &selectedAnimators);
+    void addToSelection(QList<stdptr<Key>> &selectedKeys,
+                        QList<qptr<Animator>> &selectedAnimators);
+    void removeFromSelection(QList<stdptr<Key>> &selectedKeys,
+                             QList<qptr<Animator>> &selectedAnimators);
 
     bool hasKey(Key *key);
 
@@ -143,7 +143,7 @@ public:
 protected:
     ComplexKey(ComplexAnimator* parentAnimator);
 private:
-    QList<KeyPtr> mKeys;
+    QList<stdptr<Key>> mKeys;
 };
 
 #endif // COMPLEXANIMATOR_H

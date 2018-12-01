@@ -20,7 +20,7 @@ public:
         return OUTPUT_SETTINGS_PROFILES.at(indexT).get();
     }
 
-    static QList<OutputSettingsProfileSPtr> OUTPUT_SETTINGS_PROFILES;
+    static QList<stdsptr<OutputSettingsProfile>> OUTPUT_SETTINGS_PROFILES;
 protected:
     QVBoxLayout *mMainLayout;
 

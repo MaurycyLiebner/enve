@@ -14,7 +14,7 @@ public:
     void setTargetProperty(BoxTargetProperty *property);
 private:
     bool mDragging = false;
-    BoxTargetPropertyQPtr mProperty;
+    qptr<BoxTargetProperty> mProperty;
 signals:
 
 public slots:

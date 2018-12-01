@@ -2,7 +2,7 @@
 #define QREALANIMATORVALUESLIDER_H
 #include "qdoubleslider.h"
 #include "sharedpointerdefs.h"
-
+#include "selfref.h"
 class IntProperty;
 class QrealAnimator;
 class Property;
@@ -45,7 +45,7 @@ protected:
     void emitValueChanged(qreal value);
 private:
     bool mBlockAnimatorSignals = false;
-    PropertyQPtr mAnimator;
+    qptr<Property> mAnimator;
 signals:
     void displayedValueChanged(qreal);
 };

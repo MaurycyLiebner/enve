@@ -23,9 +23,9 @@ QrealKey::QrealKey(const int &frame,
 QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     QrealKey(0, 0., parentAnimator) { }
 
-QrealKeySPtr QrealKey::makeQrealKeyDuplicate(
+stdsptr<QrealKey> QrealKey::makeQrealKeyDuplicate(
         QrealAnimator* targetParent) {
-    QrealKeySPtr target = SPtrCreate(QrealKey)(targetParent);
+    stdsptr<QrealKey> target = SPtrCreate(QrealKey)(targetParent);
     target->setValue(mValue);
     target->setRelFrame(mRelFrame);
     target->setCtrlsMode(mCtrlsMode);
@@ -382,7 +382,7 @@ void QrealKey::setRelFrame(const int &frame) {
 
 bool QrealKey::differsFromKey(Key *key) {
     if(key == this) return false;
-    QrealKeySPtr qa_key = GetAsSPtr(key, QrealKey);
+    stdsptr<QrealKey> qa_key = GetAsSPtr(key, QrealKey);
     if(isZero4Dec(qa_key->getValue() - mValue)) {
         if(key->getRelFrame() > mRelFrame) {
             if(qa_key->isStartPointEnabled() ||

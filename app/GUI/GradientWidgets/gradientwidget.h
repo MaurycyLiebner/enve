@@ -28,8 +28,8 @@ public:
     void finishGradientTransform();
     void startGradientTransform();
     void clearAll();
-    void addGradientToList(const GradientQSPtr &gradient);
-    void removeGradientFromList(const GradientQSPtr& toRemove);
+    void addGradientToList(const qsptr<Gradient> &gradient);
+    void removeGradientFromList(const qsptr<Gradient>& toRemove);
     void startSelectedColorTransform();
     int getGradientIndex(Gradient *child);
     void updateNumberOfGradients();
@@ -82,7 +82,7 @@ private:
     int mScrollItemHeight;
 
     MainWindow *mMainWindow;
-    QList<QSharedPointer<Gradient> > mGradients;
+    QList<qsptr<Gradient> > mGradients;
     Gradient *mCurrentGradient = nullptr;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;

@@ -1,6 +1,6 @@
 #include "renderdatahandler.h"
 
-bool RenderDataHandler::removeItem(const BoundingBoxRenderDataSPtr& item) {
+bool RenderDataHandler::removeItem(const stdsptr<BoundingBoxRenderData>& item) {
     return removeItemAtRelFrame(item->relFrame);
 }
 
@@ -21,7 +21,7 @@ BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int &frame) {
     return nullptr;
 }
 
-void RenderDataHandler::addItemAtRelFrame(const BoundingBoxRenderDataSPtr& item) {
+void RenderDataHandler::addItemAtRelFrame(const stdsptr<BoundingBoxRenderData>& item) {
     int itemId = getItemInsertIdAtRelFrame(item->relFrame);
     mItems.insert(itemId, item);
 }
@@ -32,7 +32,7 @@ int RenderDataHandler::getItemInsertIdAtRelFrame(const int &relFrame) {
 
     while(minId < maxId) {
         int guess = (minId + maxId)/2;
-        BoundingBoxRenderDataSPtr item = mItems.at(guess);
+        stdsptr<BoundingBoxRenderData> item = mItems.at(guess);
         int contFrame = item->relFrame;
         Q_ASSERT(contFrame != relFrame);
         if(contFrame > relFrame) {
@@ -56,7 +56,7 @@ bool RenderDataHandler::getItemIdAtRelFrame(const int &relFrame, int *id) {
 
     while(minId <= maxId) {
         int guess = (minId + maxId)/2;
-        BoundingBoxRenderDataSPtr item = mItems.at(guess);
+        stdsptr<BoundingBoxRenderData> item = mItems.at(guess);
         if(item->relFrame == relFrame) {
             *id = guess;
             return true;
