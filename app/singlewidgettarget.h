@@ -5,7 +5,7 @@
 #include <QMimeData>
 #include <QFlags>
 #include <memory>
-#include "selfref.h"
+#include "../core/selfref.h"
 #include "sharedpointerdefs.h"
 
 class SingleWidgetAbstraction;

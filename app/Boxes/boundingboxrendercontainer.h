@@ -1,7 +1,7 @@
 #ifndef BOUNDINGBOXRENDERCONTAINER_H
 #define BOUNDINGBOXRENDERCONTAINER_H
 class BoundingBox;
-#include "selfref.h"
+#include "../core/selfref.h"
 #include "skqtconversions.h"
 #include "skiaincludes.h"
 #include <QDebug>

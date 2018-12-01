@@ -3,7 +3,7 @@
 
 #include <QMouseEvent>
 #include <QScrollArea>
-#include "selfref.h"
+#include "../core/selfref.h"
 #include "itemwidget.h"
 class QVBoxLayout;
 class FlowLayout;

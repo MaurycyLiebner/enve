@@ -6,6 +6,12 @@
 
 QT += multimedia core gui svg opengl sql xml concurrent #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -lmypaint-2.0
+
+QMAKE_RPATHDIR += ../core/
+LIBS += -L$$OUT_PWD/../core/ -lcore
+INCLUDEPATH += $$PWD/../core
+DEPENDPATH += $$PWD/../core
+
 INCLUDEPATH += /usr/local/include/libmypaint-2.0/
 
 INCLUDEPATH += /home/ailuropoda/.skia/include/images/
@@ -178,8 +184,6 @@ SOURCES += main.cpp\
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
     application.cpp \
-    selfref.cpp \
-    stdpointer.cpp \
     PathEffects/displacepatheffect.cpp \
     PathEffects/lengthpatheffect.cpp \
     PathEffects/duplicatepatheffect.cpp \
@@ -317,7 +321,6 @@ HEADERS  += \
     Boxes/rendercachehandler.h \
     memorychecker.h \
     memoryhandler.h \
-    selfref.h \
     boxpathpoint.h \
     outputgenerator.h \
     GUI/RenderWidgets/renderwidget.h \
@@ -379,7 +382,6 @@ HEADERS  += \
     Boxes/boundingboxrenderdata.h \
     sharedpointerdefs.h \
     application.h \
-    stdpointer.h \
     PathEffects/displacepatheffect.h \
     PathEffects/lengthpatheffect.h \
     PathEffects/duplicatepatheffect.h \

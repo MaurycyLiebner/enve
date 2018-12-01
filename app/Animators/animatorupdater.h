@@ -1,6 +1,6 @@
 #ifndef ANIMATORUPDATER_H
 #define ANIMATORUPDATER_H
-#include "selfref.h"
+#include "../core/selfref.h"
 
 class BoundingBox;
 

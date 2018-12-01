@@ -1,7 +1,7 @@
 #ifndef RENDERINSTANCESETTINGS_H
 #define RENDERINSTANCESETTINGS_H
 #include <QString>
-#include "selfref.h"
+#include "../core/selfref.h"
 class Canvas;
 extern "C" {
     #include <libavcodec/avcodec.h>

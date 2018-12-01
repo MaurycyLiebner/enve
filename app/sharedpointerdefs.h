@@ -4,7 +4,7 @@
 #include <QSharedPointer>
 #include <QPointer>
 #include <memory>
-#include "stdpointer.h"
+#include "../core/stdpointer.h"
 
 #define GetAsPtr(baseObjT, derivedClassT) derivedClassT::getAsPtr<derivedClassT>(baseObjT)
 #define GetAsSPtr(baseObjT, derivedClassT) derivedClassT::getAsSPtr<derivedClassT>(baseObjT)

@@ -1,7 +1,7 @@
 #ifndef QREALPOINT_H
 #define QREALPOINT_H
 #include <QPainter>
-#include "selfref.h"
+#include "../core/selfref.h"
 
 class QrealKey;
 

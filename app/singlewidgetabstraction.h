@@ -1,7 +1,7 @@
 ﻿#ifndef SINGLEWIDGETABSTRACTION_H
 #define SINGLEWIDGETABSTRACTION_H
 
-#include "selfref.h"
+#include "../core/selfref.h"
 #include "sharedpointerdefs.h"
 #include <QWidget>
 class SingleWidgetTarget;

@@ -3,7 +3,7 @@
 #include <QtCore>
 #include <QPainter>
 #include <QObject>
-#include "selfref.h"
+#include "../core/selfref.h"
 class Property;
 
 class DurationRectangleMovable : public SelfRef {

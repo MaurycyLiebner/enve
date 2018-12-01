@@ -1,6 +1,6 @@
 #ifndef ITEMWRAPPER_H
 #define ITEMWRAPPER_H
-#include "selfref.h"
+#include "../core/selfref.h"
 #include "itemwidget.h"
 
 class ItemTarget : public StdSelfRef {

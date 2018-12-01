@@ -1,6 +1,6 @@
 #ifndef KEY_H
 #define KEY_H
-#include "selfref.h"
+#include "../core/selfref.h"
 #include "sharedpointerdefs.h"
 #include <QtCore>
 
