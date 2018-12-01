@@ -1,9 +1,9 @@
 #ifndef SHAREDPOINTERDEFS_H
 #define SHAREDPOINTERDEFS_H
 
-#include "../core/stdpointer.h"
-#include "../core/stdselfref.h"
-#include "../core/selfref.h"
+#include "stdpointer.h"
+#include "stdselfref.h"
+#include "selfref.h"
 
 template <typename Ptr, typename List>
 extern inline bool listContainsSharedPtr(Ptr ptr, List list) {

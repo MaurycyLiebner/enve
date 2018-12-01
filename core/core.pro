@@ -25,14 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     stdpointer.cpp \
     selfref.cpp \
-    stdselfref.cpp \
-    sharedpointerdefs.h
+    stdselfref.cpp
 
 HEADERS += \
         core_global.h \ 
     stdpointer.h \
     selfref.h \
-    stdselfref.h
+    stdselfref.h \
+    sharedpointerdefs.h
 
 unix {
     target.path = /usr/lib
