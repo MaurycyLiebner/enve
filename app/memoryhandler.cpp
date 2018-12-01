@@ -78,7 +78,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
         mCurrentMemoryState = state;
     }
 
-    long long memToFree = (long long)minFreeBytes;
+    long long memToFree = static_cast<long long>(minFreeBytes);
     if(state == LOW_MEMORY_STATE) {
         memToFree -= mMemoryScheduledToRemove;
     }
