@@ -1,7 +1,7 @@
 #ifndef ITEMWIDGET_H
 #define ITEMWIDGET_H
 #include <QWidget>
-#include "../core/selfref.h"
+#include "../core/stdselfref.h"
 
 class ItemWidgetQObject : public QWidget {
     Q_OBJECT

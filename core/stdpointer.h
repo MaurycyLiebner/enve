@@ -1,7 +1,7 @@
 #ifndef STDPOINTER_H
 #define STDPOINTER_H
 #include <QtCore/QtCore>
-#include "selfref.h"
+#include "stdselfref.h"
 
 template <class T>
 class StdPointer {
@@ -63,6 +63,8 @@ public:
         rp = nullptr;
     }
 };
+template <class T> using stdptr = StdPointer<T>;
+
 template <class T> Q_DECLARE_TYPEINFO_BODY(StdPointer<T>, Q_MOVABLE_TYPE);
 
 template <class T>

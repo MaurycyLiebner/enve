@@ -1,6 +1,6 @@
 #ifndef ANIMATORUPDATER_H
 #define ANIMATORUPDATER_H
-#include "../core/selfref.h"
+#include "../core/stdselfref.h"
 
 class BoundingBox;
 
@@ -132,8 +132,8 @@ public:
 
     void frameChangeUpdate();
 private:
-    PathBox *mTarget;
     bool mIsFill;
+    PathBox *mTarget;
 };
 
 class SingleSound;

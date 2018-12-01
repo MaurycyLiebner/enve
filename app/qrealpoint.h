@@ -1,7 +1,7 @@
 #ifndef QREALPOINT_H
 #define QREALPOINT_H
 #include <QPainter>
-#include "../core/selfref.h"
+#include "../core/stdselfref.h"
 
 class QrealKey;
 
@@ -11,8 +11,7 @@ enum QrealPointType : short {
     KEY_POINT
 };
 
-class QrealPoint : public StdSelfRef
-{
+class QrealPoint : public StdSelfRef {
 public:
     QrealPoint(QrealPointType type,
                QrealKey *parentKey,

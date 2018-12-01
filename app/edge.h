@@ -1,7 +1,7 @@
 #ifndef EDGE_H
 #define EDGE_H
 #include <QPainter>
-#include "../core/selfref.h"
+#include "../core/stdselfref.h"
 class NodePoint;
 class CtrlPoint;
 #include "skiaincludes.h"
