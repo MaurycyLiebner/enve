@@ -12,7 +12,7 @@ extern "C" {
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 struct RenderSettings {
     qreal resolution = 1.;

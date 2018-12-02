@@ -3,7 +3,7 @@
 #include "Animators/complexanimator.h"
 #include "Animators/qpointfanimator.h"
 #include "pointanimator.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include "skqtconversions.h"
 class TransformUpdater;
 class BoxPathPoint;

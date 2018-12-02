@@ -5,7 +5,7 @@
 #include <QPainter>
 #include "arraywidget.h"
 #include "brushwidget.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class BrushSelectionWidget;
 
 class BrushArrayWidget : public ArrayWidget {

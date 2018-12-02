@@ -8,7 +8,7 @@
 #include <QMatrix>
 struct PixmapEffectRenderData;
 class BoundingBox;
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public _ScheduledExecutor {

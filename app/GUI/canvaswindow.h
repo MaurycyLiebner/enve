@@ -5,7 +5,7 @@
 #include "glwindow.h"
 #include "singlewidgettarget.h"
 #include "keyfocustarget.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class Brush;
 class WindowSingleWidgetTarget;
 enum ColorMode : short;

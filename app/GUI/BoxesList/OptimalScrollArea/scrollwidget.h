@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "minimalscrollwidget.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
 class SingleWidgetAbstraction;

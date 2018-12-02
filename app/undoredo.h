@@ -8,7 +8,7 @@
 #include "skiaincludes.h"
 
 #include "Animators/PathAnimators/vectorpathanimator.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class MainWindow;
 class Tile;
 

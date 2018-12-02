@@ -1,11 +1,11 @@
 #ifndef BOUNDINGBOXRENDERCONTAINER_H
 #define BOUNDINGBOXRENDERCONTAINER_H
 class BoundingBox;
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include "skqtconversions.h"
 #include "skiaincludes.h"
 #include <QDebug>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include "updatable.h"
 class QTemporaryFile;
 class Canvas;

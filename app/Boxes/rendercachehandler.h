@@ -2,7 +2,7 @@
 #define RENDERCACHEHANDLER_H
 #include <QtCore>
 #include <memory>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class QPainter;
 class CacheContainer;
 class RenderCacheHandler;

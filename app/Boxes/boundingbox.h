@@ -18,7 +18,7 @@
 #include "boundingboxrenderdata.h"
 
 #include "renderdatahandler.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class Canvas;
 

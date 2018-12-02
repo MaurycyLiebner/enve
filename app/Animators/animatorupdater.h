@@ -1,6 +1,6 @@
 #ifndef ANIMATORUPDATER_H
 #define ANIMATORUPDATER_H
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class BoundingBox;
 

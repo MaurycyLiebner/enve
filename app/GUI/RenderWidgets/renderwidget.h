@@ -7,7 +7,7 @@
 #include <QProgressBar>
 #include <QLabel>
 #include <QPushButton>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class ScrollArea;
 class Canvas;
 class RenderInstanceWidget;

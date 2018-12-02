@@ -6,7 +6,7 @@
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QLabel>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class Canvas;
 class ColorAnimator;
 class ColorAnimatorButton;

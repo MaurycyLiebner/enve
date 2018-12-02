@@ -5,7 +5,7 @@ template <typename Item>
 class CollectionArea;
 #include <QTabWidget>
 #include "itemwidget.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class FlowLayout;
 class CollectionAreaQObject;
 

@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QFileInfo>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 stdsptr<BrushWrapper> BrushWrapper::createBrushWrapper(const QString &fileName,
                                                     const QString& collectionName) {

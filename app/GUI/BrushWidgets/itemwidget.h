@@ -1,7 +1,7 @@
 #ifndef ITEMWIDGET_H
 #define ITEMWIDGET_H
 #include <QWidget>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class ItemWidgetQObject : public QWidget {
     Q_OBJECT

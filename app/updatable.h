@@ -2,7 +2,7 @@
 #define UPDATABLE_H
 #include <QList>
 #include <QEventLoop>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class PaintControler;
 
 class MinimalExecutor : public StdSelfRef {

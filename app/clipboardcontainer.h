@@ -2,7 +2,7 @@
 #define CLIPBOARDCONTAINER_H
 #include <QList>
 #include <QWeakPointer>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class QrealAnimator;
 class BoundingBox;
 class BoxesGroup;

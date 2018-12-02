@@ -1,6 +1,6 @@
 #ifndef KEY_H
 #define KEY_H
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include <QtCore>
 
 class ComplexAnimator;

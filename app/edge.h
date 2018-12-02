@@ -1,7 +1,7 @@
 #ifndef EDGE_H
 #define EDGE_H
 #include <QPainter>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class NodePoint;
 class CtrlPoint;
 #include "skiaincludes.h"

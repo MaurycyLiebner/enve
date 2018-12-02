@@ -4,7 +4,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QToolTip>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 template <class Item>
 bool ItemWidget<Item>::event(QEvent *event) {

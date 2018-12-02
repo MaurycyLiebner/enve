@@ -9,7 +9,7 @@
 #include "Animators/intanimator.h"
 #include "skiaincludes.h"
 #include "Properties/boxtargetproperty.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class PathBox;
 class PathEffectAnimators;
 enum PathEffectType : short {

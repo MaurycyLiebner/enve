@@ -5,7 +5,7 @@
 #include <QPainter>
 #include "Animators/qpointfanimator.h"
 #include "skiaincludes.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class BoundingBox;
 class NodePoint;

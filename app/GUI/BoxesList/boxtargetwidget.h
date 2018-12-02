@@ -4,7 +4,7 @@
 #include <QWidget>
 class BoundingBox;
 class BoxTargetProperty;
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class BoxTargetWidget : public QWidget {
     Q_OBJECT

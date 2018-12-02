@@ -1,6 +1,6 @@
 #ifndef ITEMWRAPPER_H
 #define ITEMWRAPPER_H
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include "itemwidget.h"
 
 class ItemTarget : public StdSelfRef {

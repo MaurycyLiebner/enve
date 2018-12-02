@@ -8,7 +8,7 @@
 class EffectAnimators;
 class QIODevice;
 class BoundingBoxRenderData;
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 namespace fmt_filters {
     struct image;

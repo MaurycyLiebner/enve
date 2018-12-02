@@ -2,7 +2,7 @@
 #define QREALKEY_H
 #include "key.h"
 #include "pointhelpers.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class QPainter;
 class ComplexAnimator;

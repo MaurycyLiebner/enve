@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <mypaint-brush.h>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include "itemwidget.h"
 #include "itemwrapper.h"
 

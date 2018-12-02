@@ -3,7 +3,7 @@
 #include <QtCore>
 #include <QPainter>
 #include <QObject>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class Property;
 
 class DurationRectangleMovable : public SelfRef {

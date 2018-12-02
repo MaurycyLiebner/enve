@@ -2,7 +2,7 @@
 #define ANIMATiONWIDGETSCROLLBAR_H
 
 #include <QWidget>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class CacheHandler;
 
 class AnimationWidgetScrollBar : public QWidget {

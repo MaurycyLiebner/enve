@@ -3,7 +3,7 @@
 
 #include <QMouseEvent>
 #include <QScrollArea>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include "itemwidget.h"
 class QVBoxLayout;
 class FlowLayout;

@@ -5,7 +5,7 @@
 #include <QMimeData>
 #include <QFlags>
 #include <memory>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;

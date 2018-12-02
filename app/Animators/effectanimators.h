@@ -12,7 +12,7 @@ class SkBitmap;
 struct BoundingBoxRenderData;
 struct PixmapEffectRenderData;
 
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class EffectAnimators : public ComplexAnimator {
     friend class SelfRef;

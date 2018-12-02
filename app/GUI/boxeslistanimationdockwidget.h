@@ -15,7 +15,7 @@
 #include <QLineEdit>
 #include <QWidgetAction>
 #include <QToolBar>
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 class AnimationWidgetScrollBar;
 class BoxesListKeysViewWidget;
 class VerticalWidgetsStack;

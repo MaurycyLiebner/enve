@@ -1,7 +1,7 @@
 #ifndef PATHPIVOT_H
 #define PATHPIVOT_H
 #include "movablepoint.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class Canvas;
 

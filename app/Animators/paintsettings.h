@@ -5,7 +5,7 @@
 #include "coloranimator.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include "skiaincludes.h"
-#include "sharedpointerdefs.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 enum PaintType : short {
     NOPAINT,
