@@ -1,4 +1,5 @@
 #include "qrealanimatorvalueslider.h"
+#include <QMenu>
 #include "Animators/qrealanimator.h"
 #include "mainwindow.h"
 #include "Properties/intproperty.h"

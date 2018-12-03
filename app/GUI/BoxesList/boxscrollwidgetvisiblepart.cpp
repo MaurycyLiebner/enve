@@ -349,7 +349,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
             underMouseAnimator->getParentBox()->clearAllCache();
         }
     }
-    scheduledUpdateVisibleWidgetsContent();
+    scheduleUpdateVisibleWidgetsContent();
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 

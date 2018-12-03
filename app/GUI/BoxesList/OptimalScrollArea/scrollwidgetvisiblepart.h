@@ -7,18 +7,11 @@
 #include <QtMath>
 #include <memory>
 #include "smartPointers/sharedpointerdefs.h"
+#include "singlewidgettarget.h"
 class ScrollWidget;
-class SingleWidgetAbstraction;
-class SingleWidget;
 class SingleWidgetTarget;
 
 enum SWT_Rule : short;
-
-enum SWT_Target : short {
-    SWT_CurrentCanvas,
-    SWT_CurrentGroup,
-    SWT_All
-};
 
 typedef bool (SingleWidgetTarget::*SWT_Checker)();
 
@@ -79,11 +72,38 @@ public:
     void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
                                                 const SWT_Target &target);
     void setCurrentType(SWT_Checker type);
-
+    int getId() const { return mId; }
+    const UpdateFuncs& getUpdateFuncs() const {
+        return mUpdateFuncs;
+    }
 protected:
+    void setupUpdateFuncs() {
+        mUpdateFuncs.contentUpdateIfIsCurrentRule =
+                [this](const SWT_Rule &rule) {
+            scheduleContentUpdateIfIsCurrentRule(rule);
+        };
+        mUpdateFuncs.contentUpdateIfIsCurrentTarget =
+                [this](SingleWidgetTarget* targetP,
+                       const SWT_Target &target) {
+            scheduleContentUpdateIfIsCurrentTarget(targetP, target);
+        };
+        mUpdateFuncs.contentUpdateIfSearchNotEmpty = [this]() {
+            scheduleContentUpdateIfSearchNotEmpty();
+        };
+        mUpdateFuncs.updateParentHeight = [this]() {
+            scheduleUpdateParentHeight();
+        };
+        mUpdateFuncs.updateVisibleWidgetsContent = [this]() {
+            scheduleUpdateVisibleWidgetsContent();
+        };
+    }
+
+    UpdateFuncs mUpdateFuncs;
+    static int mNextId;
+    const int mId;
     bool mAlwaysShowChildren = false;
     SWT_RulesCollection mCurrentRulesCollection;
-    stdptr<SingleWidgetAbstraction>mMainAbstraction;
+    stdptr<SingleWidgetAbstraction> mMainAbstraction;
 };
 
 

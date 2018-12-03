@@ -2,6 +2,7 @@
 #include "qrealkey.h"
 #include "clipboardcontainer.h"
 #include <QPainter>
+#include <QMenu>
 #include "mainwindow.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 #include "durationrectangle.h"

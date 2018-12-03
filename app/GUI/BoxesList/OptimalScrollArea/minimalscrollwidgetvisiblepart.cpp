@@ -65,10 +65,10 @@ void MinimalScrollWidgetVisiblePart::removeInstance(
 
 void MinimalScrollWidgetVisiblePart::scheduleContentUpdate() {
     scheduleUpdateParentHeight();
-    scheduledUpdateVisibleWidgetsContent();
+    scheduleUpdateVisibleWidgetsContent();
 }
 
-void MinimalScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
+void MinimalScrollWidgetVisiblePart::scheduleUpdateVisibleWidgetsContent() {
     mVisibleWidgetsContentUpdateScheduled = true;
 }
 

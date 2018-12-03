@@ -10,10 +10,11 @@ public:
         return mWindow;
     }
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
-            ScrollWidgetVisiblePart *visiblePartWidget);
-    void SWT_addChildrenAbstractions(
-            SingleWidgetAbstraction *abstraction,
-            ScrollWidgetVisiblePart *visiblePartWidget);
+            const UpdateFuncs &updateFuncs,
+            const int& visiblePartWidgetId);
+    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
+                                     const UpdateFuncs &updateFuncs,
+                                     const int& visiblePartWidgetId);
 protected:
     WindowSingleWidgetTarget(CanvasWindow *window);
 

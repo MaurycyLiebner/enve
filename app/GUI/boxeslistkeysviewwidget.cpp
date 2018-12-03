@@ -186,14 +186,14 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 
     setLayout(mMainLayout);
 
-    WindowSingleWidgetTarget *window = mMainWindow->getCanvasWindow()->getWindowSWT();
-    window->SWT_getAbstractionForWidget(
-                mBoxesListWidget->getVisiblePartWidget());
-    mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(SWT_NoRule);
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                window->getCanvasWindow()->getCurrentCanvas(),
-                SWT_CurrentCanvas);
+    WindowSingleWidgetTarget *window =
+            mMainWindow->getCanvasWindow()->getWindowSWT();
+    auto visiblePartWidget = mBoxesListWidget->getVisiblePartWidget();
+    window->SWT_getAbstractionForWidget(visiblePartWidget->getUpdateFuncs(),
+                                        visiblePartWidget->getId());
+    visiblePartWidget->setCurrentRule(SWT_NoRule);
+    auto newTarget = window->getCanvasWindow()->getCurrentCanvas();
+    visiblePartWidget->setCurrentTarget(newTarget, SWT_CurrentCanvas);
 
     setTopWidget(topWidget);
 }

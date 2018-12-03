@@ -84,10 +84,11 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void addUpdatableAwaitingUpdate(const std::shared_ptr<_Executor> &updatable);
+    void addUpdatableAwaitingUpdate(const stdsptr<_Executor> &updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
-            ScrollWidgetVisiblePart *visiblePartWidget);
+            const UpdateFuncs &updateFuncs,
+            const int& visiblePartWidgetId);
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
     void updateHoveredElements();
@@ -136,7 +137,7 @@ public:
     bool shouldProcessAwaitingSchedulers();
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
-    void addFileUpdatableAwaitingUpdate(const std::shared_ptr<_Executor> &updatable);
+    void addFileUpdatableAwaitingUpdate(const stdsptr<_Executor> &updatable);
     WindowSingleWidgetTarget *getWindowSWT() {
         return mWindowSWTTarget.get();
     }
@@ -182,8 +183,8 @@ protected:
     QList<QThread*> mControlerThreads;
     QThread *mFileControlerThread;
     QList<PaintControler*> mPaintControlers;
-    QList<std::shared_ptr<_Executor> > mUpdatablesAwaitingUpdate;
-    QList<std::shared_ptr<_Executor> > mFileUpdatablesAwaitingUpdate;
+    QList<stdsptr<_Executor> > mUpdatablesAwaitingUpdate;
+    QList<stdsptr<_Executor> > mFileUpdatablesAwaitingUpdate;
 
 
 

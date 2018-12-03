@@ -1,5 +1,6 @@
 #include "Boxes/textbox.h"
 #include <QInputDialog>
+#include <QMenu>
 #include "GUI/mainwindow.h"
 #include "canvas.h"
 #include "gradientpoints.h"

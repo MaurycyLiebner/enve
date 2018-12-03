@@ -7,10 +7,13 @@
 #include "GUI/mainwindow.h"
 #include "global.h"
 
+int ScrollWidgetVisiblePart::mNextId = 0;
+
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(
         ScrollWidget *parent) :
-    MinimalScrollWidgetVisiblePart(parent) {
+    MinimalScrollWidgetVisiblePart(parent), mId(mNextId++) {
     mCurrentRulesCollection.rule = SWT_NoRule;
+    setupUpdateFuncs();
 }
 
 ScrollWidgetVisiblePart::~ScrollWidgetVisiblePart() {
@@ -66,7 +69,7 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
         const SWT_Rule &rule) {
     if(isCurrentRule(rule)) {
         scheduleUpdateParentHeight();
-        scheduledUpdateVisibleWidgetsContent();
+        scheduleUpdateVisibleWidgetsContent();
     }
 }
 
@@ -76,14 +79,14 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
     if(mCurrentRulesCollection.target == target) {
         static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
         scheduleUpdateParentHeight();
-        scheduledUpdateVisibleWidgetsContent();
+        scheduleUpdateVisibleWidgetsContent();
     }
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
     if(mCurrentRulesCollection.searchString.isEmpty()) return;
     scheduleUpdateParentHeight();
-    scheduledUpdateVisibleWidgetsContent();
+    scheduleUpdateVisibleWidgetsContent();
 }
 
 bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
@@ -93,27 +96,33 @@ bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
 void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     if(mMainAbstraction == nullptr) return;
     //updateParentHeight();
-    int idP = 0;
-    int currX;
-    int currY;
-//    if(mSkipMainAbstraction) {
-//        currX = -20;
-//        currY = -10;
-//    } else {
-        currX = 0;
-        currY = MIN_WIDGET_HEIGHT/2;
-//    }
+
+    int currentWidgetId = 0;
+    SetAbsFunc setAbsFunc = [this, &currentWidgetId](
+            SingleWidgetAbstraction* newAbs,
+            int currX) {
+        if(currentWidgetId < mSingleWidgets.count()) {
+            SingleWidget *currWidget =
+                    static_cast<SingleWidget*>(
+                        mSingleWidgets.at(currentWidgetId));
+            currWidget->setTargetAbstraction(newAbs);
+            int currWx = currWidget->x();
+            currWidget->move(currX, currWidget->y());
+            currWidget->setFixedWidth(currWx - currX + currWidget->width());
+            currentWidgetId = currentWidgetId + 1;
+        }
+    };
+    int currX = 0;
+    int currY = MIN_WIDGET_HEIGHT/2;
     mMainAbstraction->setSingleWidgetAbstractions(
                 mVisibleTop,
                 mVisibleTop + mVisibleHeight + currY,
-                &currY, currX,
-                &mSingleWidgets,
-                &idP,
+                currY, currX,
+                setAbsFunc,
                 mCurrentRulesCollection,
-                true,
-                false);
+                true, false);
 
-    for(int i = idP; i < mSingleWidgets.count(); i++) {
+    for(int i = currentWidgetId; i < mSingleWidgets.count(); i++) {
         mSingleWidgets.at(i)->hide();
     }
 }
@@ -121,7 +130,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 void ScrollWidgetVisiblePart::setMainAbstraction(
         SingleWidgetAbstraction* abs) {
     mMainAbstraction = abs;
-    scheduledUpdateVisibleWidgetsContent();
+    scheduleUpdateVisibleWidgetsContent();
 //    if(abs == nullptr) return;
 //    abs->setContentVisible(true);
 //    updateVisibleWidgetsContent();

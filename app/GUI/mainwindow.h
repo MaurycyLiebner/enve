@@ -266,7 +266,7 @@ private:
     CanvasWindow *mCanvasWindow;
     UndoRedoStack *mCurrentUndoRedoStack = nullptr;
 
-    QList<std::shared_ptr<_ScheduledExecutor> > mUpdateSchedulers;
+    QList<stdsptr<_ScheduledExecutor> > mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
 
@@ -286,7 +286,7 @@ private:
 
     QList<Gradient*> mLoadedGradientsList;
 
-    std::shared_ptr<VideoEncoder> mVideoEncoder;
+    stdsptr<VideoEncoder> mVideoEncoder;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *e);

@@ -1,5 +1,6 @@
 #include "Boxes/imagebox.h"
 #include <QFileDialog>
+#include <QMenu>
 #include "GUI/mainwindow.h"
 #include "filesourcescache.h"
 

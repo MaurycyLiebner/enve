@@ -134,7 +134,8 @@ public:
 //    QPointF getRelCenterPosition();
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
-                                     ScrollWidgetVisiblePart *visiblePartWidget);
+                                     const UpdateFuncs &updateFuncs,
+                                     const int& visiblePartWidgetId);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,

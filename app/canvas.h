@@ -626,8 +626,8 @@ protected:
     bool mRenderingOutput = false;
 
     bool mCurrentPreviewContainerOutdated = false;
-    std::shared_ptr<CacheContainer> mCurrentPreviewContainer;
-    std::shared_ptr<CacheContainer> mLoadingPreviewContainer;
+    stdsptr<CacheContainer> mCurrentPreviewContainer;
+    stdsptr<CacheContainer> mLoadingPreviewContainer;
 
     int mCurrentPreviewFrameId;
     int mMaxPreviewFrameId = 0;

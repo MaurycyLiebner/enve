@@ -478,7 +478,7 @@ MovablePoint *ParticleEmitter::getPosPoint() {
 
 EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
         const qreal &relFrame,
-        const std::shared_ptr<ParticleBoxRenderData> &particleData) {
+        const stdsptr<ParticleBoxRenderData> &particleData) {
     EmitterData data;
     auto qcol = mColorAnimator->getColorAtRelFrameF(relFrame);
     data.color = QColorToSkColor(qcol);

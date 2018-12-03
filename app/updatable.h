@@ -60,7 +60,7 @@ public:
 protected:
     bool mBeingProcessed = false;
     QPointer<PaintControler> mCurrentPaintControler;
-    std::shared_ptr<_Executor> mSelfRef;
+    stdsptr<_Executor> mSelfRef;
 
     QList<stdptr<MinimalExecutor>> mNextExecutionDependent;
 };

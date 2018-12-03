@@ -1027,14 +1027,16 @@ void BoxesGroup::moveContainedBoxAbove(BoundingBox *boxToMove,
 #include "singlewidgetabstraction.h"
 void BoxesGroup::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction* abstraction,
-        ScrollWidgetVisiblePart *visiblePartWidget) {
-    BoundingBox::SWT_addChildrenAbstractions(abstraction,
-                                             visiblePartWidget);
+        const UpdateFuncs &updateFuncs,
+        const int& visiblePartWidgetId) {
+    BoundingBox::SWT_addChildrenAbstractions(abstraction, updateFuncs,
+                                             visiblePartWidgetId);
 
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const qsptr<BoundingBox> &child = mContainedBoxes.at(i);
-        abstraction->addChildAbstraction(
-                    child->SWT_getAbstractionForWidget(visiblePartWidget));
+        auto abs = child->SWT_getAbstractionForWidget(updateFuncs,
+                                                      visiblePartWidgetId);
+        abstraction->addChildAbstraction(abs);
     }
 }
 

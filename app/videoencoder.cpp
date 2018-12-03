@@ -709,7 +709,7 @@ void VideoEncoder::finishEncodingNow() {
 }
 
 void VideoEncoder::clearContainers() {
-    foreach(const std::shared_ptr<CacheContainer> &cont,
+    foreach(const stdsptr<CacheContainer> &cont,
             _mContainers) {
         cont->setBlocked(false);
     }
@@ -728,7 +728,7 @@ void VideoEncoder::_processUpdate() {
                                     mAudioStream.enc->time_base) <= 0;
         }
         if(mEncodeVideo && encodeVideoT && avAligned) {
-            std::shared_ptr<CacheContainer> cacheCont =
+            stdsptr<CacheContainer> cacheCont =
                     _mContainers.at(_mCurrentContainerId);
             int nFrames = cacheCont->getMaxRelFrame() - cacheCont->getMinRelFrame() + 1;
             if(!write_video_frame(mFormatContext, &mVideoStream,
@@ -768,7 +768,7 @@ void VideoEncoder::beforeUpdate() {
 void VideoEncoder::afterUpdate() {
     bool firstT = true;
     for(int i = _mCurrentContainerId - 1; i >= 0; i--) {
-        const std::shared_ptr<CacheContainer> &cont =
+        const stdsptr<CacheContainer> &cont =
                 _mContainers.at(i);
         if(firstT) {
             Canvas *currCanvas = mRenderInstanceSettings->getTargetCanvas();

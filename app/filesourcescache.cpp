@@ -65,7 +65,7 @@ void FileSourcesCache::removeHandlerFromListWidgets(FileCacheHandler *handlerPtr
 }
 
 void FileSourcesCache::clearAll() {
-    Q_FOREACH(const std::shared_ptr<FileCacheHandler> &handler,
+    Q_FOREACH(const stdsptr<FileCacheHandler> &handler,
               mFileCacheHandlers) {
         handler->clearCache();
     }

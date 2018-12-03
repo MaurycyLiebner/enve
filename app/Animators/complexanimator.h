@@ -50,7 +50,8 @@ public:
     Property *ca_getChildAt(const int &i);
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
-                                     ScrollWidgetVisiblePart *visiblePartWidget);
+                                     const UpdateFuncs &updateFuncs,
+                                     const int& visiblePartWidgetId);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,

@@ -41,10 +41,12 @@ Property *ComplexAnimator::ca_getChildAt(const int &i) {
 #include "singlewidgetabstraction.h"
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction* abstraction,
-        ScrollWidgetVisiblePart *visiblePartWidget) {
+        const UpdateFuncs &updateFuncs,
+        const int& visiblePartWidgetId) {
     Q_FOREACH(const qsptr<Property> &property, ca_mChildAnimators) {
-        abstraction->addChildAbstraction(
-                    property->SWT_createAbstraction(visiblePartWidget));
+        auto newAbs = property->SWT_createAbstraction(updateFuncs,
+                                                      visiblePartWidgetId);
+        abstraction->addChildAbstraction(newAbs);
     }
 
 }

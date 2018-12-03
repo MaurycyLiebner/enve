@@ -113,7 +113,7 @@ protected:
     AVFormatContext *mFormatContext = nullptr;
     AVOutputFormat *mOutputFormat = nullptr;
     bool mCurrentlyEncoding = false;
-    QList<std::shared_ptr<CacheContainer> > mNextContainers;
+    QList<stdsptr<CacheContainer> > mNextContainers;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;
@@ -129,7 +129,7 @@ protected:
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
 
-    QList<std::shared_ptr<CacheContainer> > _mContainers;
+    QList<stdsptr<CacheContainer> > _mContainers;
 };
 
 #endif // VIDEOENCODER_H

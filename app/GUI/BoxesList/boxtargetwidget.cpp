@@ -1,6 +1,7 @@
 #include "boxtargetwidget.h"
 #include <QMimeData>
 #include <QPainter>
+#include <QMenu>
 #include "Boxes/boxesgroup.h"
 #include "Properties/boxtargetproperty.h"
 #include "GUI/mainwindow.h"

@@ -208,7 +208,7 @@ struct TileSkDrawerCollection {
 //protected:
 //    sk_sp<SkImage> mDataImg;
 //    uchar *mImgData = nullptr;
-//    std::shared_ptr<TileDataGetter> mSrcGetter;
+//    stdsptr<TileDataGetter> mSrcGetter;
 //};
 
 //class TileDataGetter : public GUI_ThreadExecutor {
@@ -351,7 +351,7 @@ private:
 
     bool mPaintInOtherThread;
 
-    std::shared_ptr<TileSkDrawer> mDrawer;
+    stdsptr<TileSkDrawer> mDrawer;
     SkBitmap mDataTileImage;
     SkBitmap mTmpDataTileImage;
     uchar *mDataTmp = nullptr;

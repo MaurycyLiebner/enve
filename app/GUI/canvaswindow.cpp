@@ -100,10 +100,12 @@ Canvas *CanvasWindow::getCurrentCanvas() {
 
 void CanvasWindow::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
-        ScrollWidgetVisiblePart *visiblePartWidget) {
+        const UpdateFuncs &updateFuncs,
+        const int& visiblePartWidgetId) {
     Q_FOREACH(const qsptr<Canvas> &child, mCanvasList) {
-        abstraction->addChildAbstraction(
-                    child->SWT_getAbstractionForWidget(visiblePartWidget));
+        auto abs = child->SWT_getAbstractionForWidget(updateFuncs,
+                                                      visiblePartWidgetId);
+        abstraction->addChildAbstraction(abs);
     }
 }
 
@@ -808,7 +810,7 @@ bool CanvasWindow::shouldProcessAwaitingSchedulers() {
     return mNoBoxesAwaitUpdate;// || !mFreeThreads.isEmpty();
 }
 
-void CanvasWindow::addUpdatableAwaitingUpdate(const std::shared_ptr<_Executor>& updatable) {
+void CanvasWindow::addUpdatableAwaitingUpdate(const stdsptr<_Executor>& updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
@@ -819,7 +821,7 @@ void CanvasWindow::addUpdatableAwaitingUpdate(const std::shared_ptr<_Executor>& 
     }
 }
 
-void CanvasWindow::addFileUpdatableAwaitingUpdate(const std::shared_ptr<_Executor>& updatable) {
+void CanvasWindow::addFileUpdatableAwaitingUpdate(const stdsptr<_Executor>& updatable) {
     mFileUpdatablesAwaitingUpdate << updatable;
 
     if(mNoFileAwaitUpdate) {

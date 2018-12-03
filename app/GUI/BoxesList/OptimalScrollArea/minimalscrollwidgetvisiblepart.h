@@ -14,7 +14,7 @@ public:
     void setVisibleTop(const int &top);
     void setVisibleHeight(const int &height);
 
-    void scheduledUpdateVisibleWidgetsContent();
+    void scheduleUpdateVisibleWidgetsContent();
     void updateVisibleWidgetsContentIfNeeded();
 
     void scheduleUpdateParentHeight();

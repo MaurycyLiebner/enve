@@ -1,6 +1,5 @@
 #include "singlewidgettarget.h"
 #include "singlewidgetabstraction.h"
-#include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 
 SingleWidgetTarget::SingleWidgetTarget() {
 }
@@ -10,7 +9,7 @@ SingleWidgetTarget::~SingleWidgetTarget() {
 
 //void SingleWidgetTarget::SWT_addChildrenAbstractions(
 //        const stdsptr<SingleWidgetAbstraction>&  SWT_Abstraction,
-//        ScrollWidgetVisiblePart *visiblePartWidget) {
+//        const int& visiblePartWidgetId) {
 //    Q_FOREACH(const qsptr<SingleWidgetTarget>& child, mChildren) {
 //        SWT_Abstraction->addChildAbstraction(
 //                    child->createAbstraction(visiblePartWidget));
@@ -18,11 +17,14 @@ SingleWidgetTarget::~SingleWidgetTarget() {
 //}
 
 SingleWidgetAbstraction* SingleWidgetTarget::SWT_createAbstraction(
-        ScrollWidgetVisiblePart *visiblePartWidget) {
+        const UpdateFuncs& updateFuncs,
+        const int& visiblePartWidgetId) {
     stdsptr<SingleWidgetAbstraction> SWT_Abstraction =
             SPtrCreate(SingleWidgetAbstraction)(
-                ref<SingleWidgetTarget>(), visiblePartWidget);
-    SWT_addChildrenAbstractions(SWT_Abstraction.get(), visiblePartWidget);
+                ref<SingleWidgetTarget>(), updateFuncs, visiblePartWidgetId);
+    SWT_addChildrenAbstractions(SWT_Abstraction.get(),
+                                updateFuncs,
+                                visiblePartWidgetId);
     mSWT_allAbstractions << SWT_Abstraction;
     return SWT_Abstraction.get();
 }
@@ -82,7 +84,7 @@ void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
 }
 
 void SingleWidgetTarget::SWT_afterContentVisibilityChanged() {
-    foreach(const std::shared_ptr<SingleWidgetAbstraction> &swa,
+    foreach(const stdsptr<SingleWidgetAbstraction> &swa,
             mSWT_allAbstractions) {
         swa->afterContentVisibilityChanged();
     }

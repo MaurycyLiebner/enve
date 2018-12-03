@@ -979,7 +979,7 @@ void MainWindow::callUpdateSchedulers() {
 
     //if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
         mCanvasWindow->processSchedulers();
-        foreach(const std::shared_ptr<_ScheduledExecutor> &updatable,
+        foreach(const stdsptr<_ScheduledExecutor> &updatable,
                 mUpdateSchedulers) {
             if(!updatable->isAwaitingUpdate()) {
                 updatable->schedulerProccessed();

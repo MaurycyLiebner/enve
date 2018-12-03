@@ -7,19 +7,21 @@ WindowSingleWidgetTarget::WindowSingleWidgetTarget(CanvasWindow *window) {
 }
 
 SingleWidgetAbstraction* WindowSingleWidgetTarget::SWT_getAbstractionForWidget(
-            ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
-        if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
+        const UpdateFuncs& updateFuncs,
+        const int& visiblePartWidgetId) {
+    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
+        if(abs->getParentVisiblePartWidgetId() == visiblePartWidgetId) {
             return abs.get();
         }
     }
-    SingleWidgetAbstraction *abs = SWT_createAbstraction(visiblePartWidget);
-    return abs;
+    return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
 }
 
 void WindowSingleWidgetTarget::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
-        ScrollWidgetVisiblePart *visiblePartWidget) {
-    mWindow->SWT_addChildrenAbstractions(abstraction, visiblePartWidget);
+        const UpdateFuncs &updateFuncs,
+        const int& visiblePartWidgetId) {
+    mWindow->SWT_addChildrenAbstractions(abstraction, updateFuncs,
+                                         visiblePartWidgetId);
 }
 

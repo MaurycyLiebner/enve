@@ -1,7 +1,7 @@
 #include "animatedsurface.h"
 #include "Boxes/paintbox.h"
 
-void getTileDrawers(const std::shared_ptr<TilesData> &drawTilesData,
+void getTileDrawers(const stdsptr<TilesData> &drawTilesData,
                     const int &drawTilesFrame,
                     const int &neighDrawerRelFrame,
                     const int &currRelFrame,
@@ -102,7 +102,7 @@ void AnimatedSurface::newEmptyPaintFrame() {
 
 void AnimatedSurface::updateTargetTiles() {
     mCurrentTiles->setCurrentlyUsed(false);
-    foreach(const std::shared_ptr<TilesData> &tilesDataT, mDrawTilesData) {
+    foreach(const stdsptr<TilesData> &tilesDataT, mDrawTilesData) {
         tilesDataT->setCurrentlyUsed(false);
     }
     mDrawTilesData.clear();
@@ -176,7 +176,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
         int prevRelFrame = INT_MIN;
         for(int i = 0; i < countT; i++) {
             const int &relFrame = mDrawTilesFrames.at(i);
-            std::shared_ptr<TilesData> tilesData = mDrawTilesData.at(i);
+            stdsptr<TilesData> tilesData = mDrawTilesData.at(i);
             int neighRelFrame;
             if(relFrame < anim_mCurrentRelFrame) {
                 if(i + 1 < countT) {

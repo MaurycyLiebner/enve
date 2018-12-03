@@ -2,19 +2,30 @@
 #define SINGLEWIDGETABSTRACTION_H
 
 #include "smartPointers/sharedpointerdefs.h"
-#include <QWidget>
 class SingleWidgetTarget;
-class SingleWidget;
-class ScrollWidgetVisiblePart;
 
 enum SWT_Rule : short;
 enum SWT_Target : short;
 struct SWT_RulesCollection;
 
+class SingleWidgetAbstraction;
+template <typename T> using stdfunc = std::function<T>;
+typedef std::function<void(SingleWidgetAbstraction*, int)> SetAbsFunc;
+
+struct UpdateFuncs {
+    stdfunc<void(const SWT_Rule &)> contentUpdateIfIsCurrentRule;
+    stdfunc<void(SingleWidgetTarget*, const SWT_Target &)>
+        contentUpdateIfIsCurrentTarget;
+    stdfunc<void()> contentUpdateIfSearchNotEmpty;
+    stdfunc<void()> updateParentHeight;
+    stdfunc<void()> updateVisibleWidgetsContent;
+};
+
 class SingleWidgetAbstraction : public StdSelfRef {
 public:
     SingleWidgetAbstraction(const qsptr<SingleWidgetTarget>& target,
-                            ScrollWidgetVisiblePart *visiblePart);
+                            const UpdateFuncs& updateFuncs,
+                            const int &visiblePartId);
     virtual ~SingleWidgetAbstraction();
 
     bool getAbstractions(const int &minY, const int &maxY,
@@ -24,9 +35,8 @@ public:
                          const bool &parentSatisfiesRule,
                          const bool &parentMainTarget);
     bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
-                                     int *currY, int currX,
-                                     QList<QWidget *> *widgets,
-                                     int *currentWidgetId,
+                                     int &currY, int currX,
+                                     const SetAbsFunc& setAbsFunc,
                                      const SWT_RulesCollection &rules,
                                      const bool &parentSatisfiesRule,
                                      const bool &parentMainTarget);
@@ -40,9 +50,8 @@ public:
     SingleWidgetTarget *getTarget();
 
     void addChildAbstractionForTarget(SingleWidgetTarget *target);
-    void addChildAbstractionForTargetAt(
-            SingleWidgetTarget *target,
-            const int &id);
+    void addChildAbstractionForTargetAt(SingleWidgetTarget *target,
+                                        const int &id);
     void addChildAbstraction(SingleWidgetAbstraction *abs);
     void addChildAbstractionAt(SingleWidgetAbstraction *abs,
                                const int &id);
@@ -54,8 +63,8 @@ public:
 
     bool contentVisible();
 
-    ScrollWidgetVisiblePart *getParentVisiblePartWidget() {
-        return mVisiblePartWidget;
+    int getParentVisiblePartWidgetId() {
+        return mVisiblePartWidgetId;
     }
 
     void scheduleWidgetContentUpdateIfIsCurrentRule(
@@ -81,10 +90,11 @@ public:
                                          const int &id);
     void afterContentVisibilityChanged();
 private:
-    ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;
     bool mContentVisible = false;
-    qptr<SingleWidgetTarget> mTarget;
+    const int mVisiblePartWidgetId;
+    const UpdateFuncs mUpdateFuncs;
+    const qptr<SingleWidgetTarget> mTarget;
 
     QList<stdptr<SingleWidgetAbstraction>> mChildren;
 };

@@ -3,6 +3,7 @@
 #include "undoredo.h"
 #include "Boxes/boxesgroup.h"
 #include <QDebug>
+#include <QMenu>
 #include "GUI/mainwindow.h"
 #include "GUI/keysview.h"
 #include "GUI/BoxesList/boxscrollwidget.h"
@@ -53,18 +54,15 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
 }
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
-            ScrollWidgetVisiblePart *visiblePartWidget) {
+            const UpdateFuncs &updateFuncs,
+            const int& visiblePartWidgetId) {
     Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs,
               mSWT_allAbstractions) {
-        if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
+        if(abs->getParentVisiblePartWidgetId() == visiblePartWidgetId) {
             return abs.get();
         }
     }
-    SingleWidgetAbstraction* abs = SWT_createAbstraction(visiblePartWidget);
-    if(visiblePartWidget->getCurrentRulesCollection().rule == SWT_Selected) {
-        abs->setContentVisible(true);
-    }
-    return abs;
+    return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
 }
 
 #include "linkbox.h"
@@ -1231,7 +1229,7 @@ void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
 
 void BoundingBox::processSchedulers() {
     mBlockedSchedule = true;
-    foreach(const std::shared_ptr<_ScheduledExecutor> &updatable, mSchedulers) {
+    foreach(const stdsptr<_ScheduledExecutor> &updatable, mSchedulers) {
         updatable->schedulerProccessed();
     }
 }
