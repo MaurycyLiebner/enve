@@ -117,7 +117,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     mMainAbstraction->setSingleWidgetAbstractions(
                 mVisibleTop,
                 mVisibleTop + mVisibleHeight + currY,
-                currY, currX,
+                currY, currX, MIN_WIDGET_HEIGHT,
                 setAbsFunc,
                 mCurrentRulesCollection,
                 true, false);

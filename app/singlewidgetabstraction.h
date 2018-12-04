@@ -30,12 +30,14 @@ public:
 
     bool getAbstractions(const int &minY, const int &maxY,
                          int& currY, int currX,
+                         const int &swtHeight,
                          QList<SingleWidgetAbstraction*>& abstractions,
                          const SWT_RulesCollection &rules,
                          const bool &parentSatisfiesRule,
                          const bool &parentMainTarget);
     bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
                                      int &currY, int currX,
+                                     const int &swtHeight,
                                      const SetAbsFunc& setAbsFunc,
                                      const SWT_RulesCollection &rules,
                                      const bool &parentSatisfiesRule,
@@ -43,7 +45,8 @@ public:
 
     int getHeight(const SWT_RulesCollection &rules,
                   const bool &parentSatisfiesRule,
-                  const bool &parentMainTarget);
+                  const bool &parentMainTarget,
+                  const int& swtHeight);
 
     void setContentVisible(const bool &bT);
 

@@ -102,10 +102,12 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
     selectionRect.adjust(0.5, 0., 0.5, 0.);
     int currY = 0;
+    int minX = qRound(selectionRect.top() - MIN_WIDGET_HEIGHT*0.5);
+    int minY = qRound(selectionRect.bottom() - MIN_WIDGET_HEIGHT*0.5);
+
     mMainAbstraction->getAbstractions(
-            qRound(selectionRect.top() - MIN_WIDGET_HEIGHT*0.5),
-            qRound(selectionRect.bottom() - MIN_WIDGET_HEIGHT*0.5),
-            currY, 0, abstractions, mCurrentRulesCollection, true, false);
+            minX, minY, currY, 0, MIN_WIDGET_HEIGHT,
+            abstractions, mCurrentRulesCollection, true, false);
 
     Q_FOREACH(SingleWidgetAbstraction *abs, abstractions) {
         SingleWidgetTarget *target = abs->getTarget();
@@ -431,8 +433,11 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
         int currentDragPosId = singleWidgetUnderMouse->y()/MIN_WIDGET_HEIGHT;
         if(below) {
             //currentDragPosId++;
-            currentDragPosId += singleWidgetUnderMouse->getTargetAbstraction()->
-                    getHeight(getCurrentRulesCollection(), true, false)/MIN_WIDGET_HEIGHT;
+            auto targetUnderMouse =
+                    singleWidgetUnderMouse->getTargetAbstraction();
+            currentDragPosId += targetUnderMouse->getHeight(
+                        getCurrentRulesCollection(), true, false,
+                        MIN_WIDGET_HEIGHT)/MIN_WIDGET_HEIGHT;
         }
         mDragging = true;
         mCurrentDragPosId = currentDragPosId;

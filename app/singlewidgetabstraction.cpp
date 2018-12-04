@@ -1,6 +1,5 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
-#include "global.h"
 
 SingleWidgetAbstraction::SingleWidgetAbstraction(
         const qsptr<SingleWidgetTarget>& target,
@@ -15,6 +14,7 @@ SingleWidgetAbstraction::~SingleWidgetAbstraction() {}
 bool SingleWidgetAbstraction::getAbstractions(
         const int &minY, const int &maxY,
         int& currY, int currX,
+        const int& swtHeight,
         QList<SingleWidgetAbstraction *> &abstractions,
         const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule,
@@ -27,17 +27,15 @@ bool SingleWidgetAbstraction::getAbstractions(
         abstractions.append(this);
     }
     if(satisfiesRule && !mIsMainTarget) {
-        currX += MIN_WIDGET_HEIGHT;
-        currY += MIN_WIDGET_HEIGHT;
+        currX += swtHeight;
+        currY += swtHeight;
     }
+    bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
     Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
         if(abs->getAbstractions(
-                    minY, maxY,
-                    currY, currX,
-                    abstractions,
-                    rules,
-                    (satisfiesRule && mContentVisible) || mIsMainTarget,
-                    mIsMainTarget)) {
+                    minY, maxY, currY, currX, swtHeight,
+                    abstractions, rules,
+                    childrenVisible, mIsMainTarget)) {
             return true;
         }
     }
@@ -48,7 +46,7 @@ bool SingleWidgetAbstraction::getAbstractions(
 
 bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         const int &minY, const int &maxY,
-        int &currY, int currX,
+        int &currY, int currX, const int &swtHeight,
         const SetAbsFunc& setAbsFunc,
         const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule,
@@ -62,16 +60,18 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         setAbsFunc(this, currX);
     }
     if(satisfiesRule && !mIsMainTarget) {
-        currX += MIN_WIDGET_HEIGHT;
-        currY += MIN_WIDGET_HEIGHT;
+        currX += swtHeight;
+        currY += swtHeight;
     }
+    bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
     Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
         if(abs->setSingleWidgetAbstractions(
                     minY, maxY,
                     currY, currX,
+                    swtHeight,
                     setAbsFunc,
                     rules,
-                    (satisfiesRule && mContentVisible) || mIsMainTarget,
+                    childrenVisible,
                     mIsMainTarget) ) {
             return true;
         }
@@ -83,20 +83,20 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
 int SingleWidgetAbstraction::getHeight(
         const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule,
-        const bool &parentMainTarget) {
+        const bool &parentMainTarget,
+        const int &swtHeight) {
     int height = 0;
     if(mTarget->SWT_isVisible()) {
         bool satisfiesRule = mTarget->SWT_shouldBeVisible(rules,
                                                           parentSatisfiesRule,
                                                           parentMainTarget);
         if(satisfiesRule && !mIsMainTarget) {
-            height += MIN_WIDGET_HEIGHT;
+            height += swtHeight;
         }
+        bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
         Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
-            height += abs->getHeight(
-                        rules,
-                        (satisfiesRule && mContentVisible) || mIsMainTarget,
-                        mIsMainTarget);
+            height += abs->getHeight(rules, childrenVisible,
+                                     mIsMainTarget, swtHeight);
         }
     }
 
