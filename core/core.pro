@@ -25,14 +25,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     smartPointers/stdpointer.cpp \
     smartPointers/selfref.cpp \
-    smartPointers/stdselfref.cpp
+    smartPointers/stdselfref.cpp \
+    singlewidgettarget.cpp \
+    singlewidgetabstraction.cpp
 
 HEADERS += \
         core_global.h \ 
     smartPointers/stdpointer.h \
     smartPointers/selfref.h \
     smartPointers/stdselfref.h \
-    smartPointers/sharedpointerdefs.h
+    smartPointers/sharedpointerdefs.h \
+    singlewidgettarget.h \
+    singlewidgetabstraction.h
 
 unix {
     target.path = /usr/lib

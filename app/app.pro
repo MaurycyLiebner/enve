@@ -231,8 +231,6 @@ SOURCES += main.cpp\
     GUI/customfpsdialog.cpp \
     GUI/durationrectsettingsdialog.cpp \
     GUI/fillstrokesettings.cpp \
-    singlewidgettarget.cpp \
-    singlewidgetabstraction.cpp \
     GUI/BrushWidgets/arraywidget.cpp \
     GUI/BrushWidgets/brusharraywidget.cpp \
     GUI/BrushWidgets/brushcollection.cpp \
@@ -429,8 +427,6 @@ HEADERS  += \
     GUI/noshortcutaction.h \
     GUI/qrealpointvaluedialog.h \
     GUI/renderoutputwidget.h \
-    singlewidgettarget.h \
-    singlewidgetabstraction.h \
     GUI/BrushWidgets/arraywidget.h \
     GUI/BrushWidgets/brusharraywidget.h \
     GUI/BrushWidgets/brushcollection.h \
