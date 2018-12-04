@@ -4,12 +4,12 @@
 #include <QDebug>
 #include "undoredo.h"
 #include "GUI/mainwindow.h"
-#include "pathpivot.h"
+#include "MovablePoints/pathpivot.h"
 #include "pointhelpers.h"
 #include "Animators/animatorupdater.h"
-#include "nodepoint.h"
+#include "MovablePoints/nodepoint.h"
 #include "Animators/pathanimator.h"
-#include "gradientpoints.h"
+#include "Animators/gradientpoints.h"
 
 VectorPath::VectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {

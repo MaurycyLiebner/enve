@@ -3,7 +3,7 @@
 #include <QMenu>
 #include "GUI/mainwindow.h"
 #include "canvas.h"
-#include "gradientpoints.h"
+#include "Animators/gradientpoints.h"
 #include "Animators/qstringanimator.h"
 #include "Animators/animatorupdater.h"
 

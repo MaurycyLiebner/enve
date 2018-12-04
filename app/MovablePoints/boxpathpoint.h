@@ -1,9 +1,9 @@
 #ifndef BOXPATHPOINT_H
 #define BOXPATHPOINT_H
-#include "pointanimator.h"
+#include "animatedpoint.h"
 class BoundingBox;
 class BoxTransformAnimator;
-class BoxPathPoint : public PointAnimatorMovablePoint {
+class BoxPathPoint : public AnimatedPoint {
     friend class StdSelfRef;
 public:
     BoxPathPoint(QPointFAnimator *associatedAnimator,

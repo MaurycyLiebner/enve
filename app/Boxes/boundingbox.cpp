@@ -14,6 +14,7 @@
 #include "pointhelpers.h"
 #include "skqtconversions.h"
 #include "global.h"
+#include "MovablePoints/movablepoint.h"
 
 QList<qptr<BoundingBox>> BoundingBox::mLoadedBoxes;
 QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::mFunctionsWaitingForBoxLoad;

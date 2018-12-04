@@ -5,7 +5,7 @@
 #include "GUI/ColorWidgets/colorvaluerect.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include "Animators/pathanimator.h"
-#include "nodepoint.h"
+#include "MovablePoints/nodepoint.h"
 #include "pointhelpers.h"
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"

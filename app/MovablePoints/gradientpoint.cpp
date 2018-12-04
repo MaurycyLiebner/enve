@@ -5,7 +5,7 @@
 
 GradientPoint::GradientPoint(QPointFAnimator* associatedAnimator,
                              PathBox* parent) :
-    PointAnimatorMovablePoint(associatedAnimator,
+    AnimatedPoint(associatedAnimator,
                               parent->getTransformAnimator(),
                               TYPE_GRADIENT_POINT) {
     mAssociatedAnimator_k->prp_setUpdater(
@@ -13,14 +13,14 @@ GradientPoint::GradientPoint(QPointFAnimator* associatedAnimator,
 }
 
 void GradientPoint::setRelativePos(const QPointF &relPos) {
-    PointAnimatorMovablePoint::setRelativePos(relPos);
+    AnimatedPoint::setRelativePos(relPos);
     BoxTransformAnimator* boxParent =
             GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     GetAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
 }
 
 void GradientPoint::moveByRel(const QPointF &relTranslatione) {
-    PointAnimatorMovablePoint::moveByRel(relTranslatione);
+    AnimatedPoint::moveByRel(relTranslatione);
     BoxTransformAnimator* boxParent =
             GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     GetAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();

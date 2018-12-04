@@ -1,19 +1,20 @@
 #include "Boxes/rectangle.h"
 #include "canvas.h"
 #include "Animators/animatorupdater.h"
-#include "gradientpoints.h"
+#include "Animators/gradientpoints.h"
+#include "MovablePoints/animatedpoint.h"
 
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     setName("Rectangle");
 
     mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
-    mTopLeftPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mTopLeftPoint = SPtrCreate(AnimatedPoint)(
                 mTopLeftAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
     mTopLeftPoint->setRelativePos(QPointF(0., 0.));
 
     mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom left");
-    mBottomRightPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mBottomRightPoint = SPtrCreate(AnimatedPoint)(
                 mTopLeftAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
     mBottomRightPoint->setRelativePos(QPointF(0., 0.));
@@ -30,7 +31,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     mRadiusAnimator = SPtrCreate(QPointFAnimator)("round radius");
     mRadiusAnimator->setValuesRange(0., 9999.);
 
-    mRadiusPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mRadiusPoint = SPtrCreate(AnimatedPoint)(
                 mRadiusAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
 

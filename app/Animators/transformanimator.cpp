@@ -1,10 +1,13 @@
 #include "undoredo.h"
 #include <QDebug>
-#include "boxpathpoint.h"
+#include "MovablePoints/boxpathpoint.h"
 #include "animatorupdater.h"
 #include "qrealanimator.h"
 #include "transformanimator.h"
 #include "Boxes/boundingbox.h"
+#include "Animators/qpointfanimator.h"
+#include "MovablePoints/animatedpoint.h"
+#include "skqtconversions.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     ComplexAnimator("transformation") {
@@ -121,6 +124,32 @@ QPointF BasicTransformAnimator::pos() {
     return mPosAnimator->getCurrentEffectivePointValue();
 }
 
+QPointF BasicTransformAnimator::mapAbsPosToRel(const QPointF &absPos) const {
+    return getCombinedTransform().
+            inverted().map(absPos);
+}
+
+QPointF BasicTransformAnimator::mapRelPosToAbs(const QPointF &relPos) const {
+    return getCombinedTransform().map(relPos);
+}
+
+QPointF BasicTransformAnimator::mapFromParent(const QPointF &parentRelPos) const {
+    return mapAbsPosToRel(
+                mParentTransformAnimator->mapRelPosToAbs(parentRelPos));
+}
+
+SkPoint BasicTransformAnimator::mapAbsPosToRel(const SkPoint &absPos) const {
+    return QPointFToSkPoint(mapAbsPosToRel(SkPointToQPointF(absPos)));
+}
+
+SkPoint BasicTransformAnimator::mapRelPosToAbs(const SkPoint &relPos) const {
+    return QPointFToSkPoint(mapRelPosToAbs(SkPointToQPointF(relPos)));
+}
+
+SkPoint BasicTransformAnimator::mapFromParent(const SkPoint &parentRelPos) const {
+    return QPointFToSkPoint(mapFromParent(SkPointToQPointF(parentRelPos)));
+}
+
 QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
     QMatrix matrix;
 
@@ -232,8 +261,10 @@ void BasicTransformAnimator::setParentTransformAnimator(
     updateCombinedTransform(Animator::USER_CHANGE);
 }
 
+bool BasicTransformAnimator::SWT_isBasicTransformAnimator() { return true; }
+
 void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
-                                                      const qreal &sy,
+                                                       const qreal &sy,
                                                       const QPointF &pivot) {
     QMatrix matrix;
 
@@ -486,6 +517,18 @@ QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrameF(
         return mParentTransformAnimator->
                 getCombinedTransformMatrixAtRelFrameF(parentRelFrame);
     }
+}
+
+QPointFAnimator *BasicTransformAnimator::getPosAnimator() {
+    return mPosAnimator.get();
+}
+
+QPointFAnimator *BasicTransformAnimator::getScaleAnimator() {
+    return mScaleAnimator.get();
+}
+
+QrealAnimator *BasicTransformAnimator::getRotAnimator() {
+    return mRotAnimator.get();
 }
 
 QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrameF(

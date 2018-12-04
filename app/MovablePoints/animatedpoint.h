@@ -1,5 +1,5 @@
-#ifndef POINTANIMATOR_H
-#define POINTANIMATOR_H
+#ifndef ANIMATEDPOINT_H
+#define ANIMATEDPOINT_H
 
 #include "movablepoint.h"
 #include <QPointF>
@@ -15,10 +15,10 @@ class AnimatorUpdater;
 
 class QPointFAnimator;
 
-class PointAnimatorMovablePoint : public MovablePoint {
+class AnimatedPoint : public MovablePoint {
     friend class StdSelfRef;
 public:
-    ~PointAnimatorMovablePoint() {}
+    ~AnimatedPoint() {}
 
     void startTransform();
     void finishTransform();
@@ -41,7 +41,7 @@ public:
 
     virtual QPointF getRelativePosAtRelFrame(const int &frame) const;
 protected:
-    PointAnimatorMovablePoint(
+    AnimatedPoint(
             QPointFAnimator* associatedAnimator,
             BasicTransformAnimator *parentTransform,
             const MovablePointType &type,
@@ -50,4 +50,4 @@ protected:
     QPointFAnimator* const mAssociatedAnimator_k;
 };
 
-#endif // POINTANIMATOR_H
+#endif // ANIMATEDPOINT_H

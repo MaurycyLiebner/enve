@@ -1,9 +1,9 @@
 #include "paintbox.h"
-#include "Paint//surface.h"
-#include "Paint//animatedsurface.h"
+#include "Paint/surface.h"
+#include "Paint/animatedsurface.h"
 #include "canvas.h"
 #include "Animators/animatorupdater.h"
-#include "pointanimator.h"
+#include "MovablePoints/animatedpoint.h"
 
 PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {
@@ -16,10 +16,10 @@ PaintBox::PaintBox() :
     mBottomRightAnimator->prp_setUpdater(
                 SPtrCreate(PaintBoxSizeUpdaterBR)(this));
 
-    mTopLeftPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mTopLeftPoint = SPtrCreate(AnimatedPoint)(
                 mTopLeftAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
-    mBottomRightPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mBottomRightPoint = SPtrCreate(AnimatedPoint)(
                 mBottomRightAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
 }

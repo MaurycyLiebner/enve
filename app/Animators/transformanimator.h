@@ -1,12 +1,13 @@
 #ifndef TRANSFORMANIMATOR_H
 #define TRANSFORMANIMATOR_H
+#include <QMatrix>
 #include "Animators/complexanimator.h"
-#include "Animators/qpointfanimator.h"
-#include "pointanimator.h"
-#include "smartPointers/sharedpointerdefs.h"
-#include "skqtconversions.h"
+#include "skiaincludes.h"
+
 class TransformUpdater;
 class BoxPathPoint;
+class MovablePoint;
+class QPointFAnimator;
 
 class BasicTransformAnimator : public ComplexAnimator {
     Q_OBJECT
@@ -52,31 +53,17 @@ public:
     qreal yScale();
     QPointF pos();
 
-    QPointF mapAbsPosToRel(const QPointF &absPos) const {
-        return getCombinedTransform().
-                inverted().map(absPos);
-    }
+    QPointF mapAbsPosToRel(const QPointF &absPos) const;
 
-    QPointF mapRelPosToAbs(const QPointF &relPos) const {
-        return getCombinedTransform().map(relPos);
-    }
+    QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
-    QPointF mapFromParent(const QPointF &parentRelPos) const {
-        return mapAbsPosToRel(
-                    mParentTransformAnimator->mapRelPosToAbs(parentRelPos));
-    }
+    QPointF mapFromParent(const QPointF &parentRelPos) const;
 
-    SkPoint mapAbsPosToRel(const SkPoint &absPos) const {
-        return QPointFToSkPoint(mapAbsPosToRel(SkPointToQPointF(absPos)));
-    }
+    SkPoint mapAbsPosToRel(const SkPoint &absPos) const;
 
-    SkPoint mapRelPosToAbs(const SkPoint &relPos) const {
-        return QPointFToSkPoint(mapRelPosToAbs(SkPointToQPointF(relPos)));
-    }
+    SkPoint mapRelPosToAbs(const SkPoint &relPos) const;
 
-    SkPoint mapFromParent(const SkPoint &parentRelPos) const {
-        return QPointFToSkPoint(mapFromParent(SkPointToQPointF(parentRelPos)));
-    }
+    SkPoint mapFromParent(const SkPoint &parentRelPos) const;
 
     void scaleRelativeToSavedValue(const qreal &sx,
                                    const qreal &sy,
@@ -90,7 +77,7 @@ public:
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
 
-    bool SWT_isBasicTransformAnimator() { return true; }
+    bool SWT_isBasicTransformAnimator();
 
     virtual QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
     QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
@@ -100,17 +87,11 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
-    QPointFAnimator *getPosAnimator() {
-        return mPosAnimator.get();
-    }
+    QPointFAnimator *getPosAnimator();
 
-    QPointFAnimator *getScaleAnimator() {
-        return mScaleAnimator.get();
-    }
+    QPointFAnimator *getScaleAnimator();
 
-    QrealAnimator *getRotAnimator() {
-        return mRotAnimator.get();
-    }
+    QrealAnimator *getRotAnimator();
 protected:
     QList<qsptr<BasicTransformAnimator>> mChildBoxes;
 

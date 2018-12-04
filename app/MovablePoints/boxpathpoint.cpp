@@ -4,7 +4,7 @@
 
 BoxPathPoint::BoxPathPoint(QPointFAnimator *associatedAnimator,
                           BoxTransformAnimator *box) :
-    PointAnimatorMovablePoint(associatedAnimator, box,
+    AnimatedPoint(associatedAnimator, box,
                               TYPE_PIVOT_POINT, 7.) {}
 
 void BoxPathPoint::startTransform() {

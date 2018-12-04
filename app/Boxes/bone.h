@@ -1,6 +1,7 @@
 #ifndef BONE_H
 #define BONE_H
 #include "boundingbox.h"
+#include "MovablePoints/movablepoint.h"
 class BonePt;
 class BonesBox;
 class Bone : public ComplexAnimator {

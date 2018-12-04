@@ -5,7 +5,7 @@
 #include <QApplication>
 #include "undoredo.h"
 #include "GUI/mainwindow.h"
-#include "pathpivot.h"
+#include "MovablePoints/pathpivot.h"
 #include "Boxes/imagebox.h"
 #include "edge.h"
 #include "Sound/soundcomposition.h"
@@ -14,12 +14,12 @@
 #include "Sound/singlesound.h"
 #include "global.h"
 #include "pointhelpers.h"
-#include "nodepoint.h"
+#include "MovablePoints/nodepoint.h"
 #include "Boxes/linkbox.h"
 #include "Animators/animatorupdater.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
-#include "Paint//brush.h"
+#include "Paint/brush.h"
 #include <QFile>
 #include "renderinstancesettings.h"
 #include "videoencoder.h"

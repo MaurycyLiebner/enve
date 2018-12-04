@@ -1,8 +1,8 @@
 #include "Boxes/circle.h"
 #include "canvas.h"
-#include "movablepoint.h"
+#include "MovablePoints/movablepoint.h"
 #include "Animators/animatorupdater.h"
-#include "gradientpoints.h"
+#include "Animators/gradientpoints.h"
 
 Circle::Circle() :
     PathBox(TYPE_CIRCLE) {
@@ -96,8 +96,10 @@ void Circle::drawSelectedSk(SkCanvas *canvas,
     }
 }
 
+bool Circle::SWT_isCircle() { return true; }
+
 MovablePoint *Circle::getPointAtAbsPos(
-                                const QPointF &absPtPos,
+        const QPointF &absPtPos,
                                 const CanvasMode &currentCanvasMode,
                                 const qreal &canvasScaleInv) {
     MovablePoint* pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
@@ -167,6 +169,22 @@ SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
     return path;
 }
 
+qreal Circle::getXRadiusAtRelFrame(const int &relFrame) {
+    return mHorizontalRadiusAnimator->getEffectiveXValueAtRelFrame(relFrame);
+}
+
+qreal Circle::getYRadiusAtRelFrame(const int &relFrame) {
+    return mVerticalRadiusAnimator->getEffectiveYValueAtRelFrame(relFrame);
+}
+
+qreal Circle::getCurrentXRadius() {
+    return mHorizontalRadiusAnimator->getEffectiveXValue();
+}
+
+qreal Circle::getCurrentYRadius() {
+    return mVerticalRadiusAnimator->getEffectiveYValue();
+}
+
 void Circle::getMotionBlurProperties(QList<Property*> &list) {
     PathBox::getMotionBlurProperties(list);
     list.append(mHorizontalRadiusAnimator.get());
@@ -183,7 +201,7 @@ bool Circle::differenceInEditPathBetweenFrames(
 CircleCenterPoint::CircleCenterPoint(QPointFAnimator* associatedAnimator,
                                      BasicTransformAnimator* parent,
                                      const MovablePointType& type) :
-    PointAnimatorMovablePoint(associatedAnimator, parent, type) {}
+    AnimatedPoint(associatedAnimator, parent, type) {}
 
 void CircleCenterPoint::setVerticalAndHorizontalPoints(
         MovablePoint* verticalPoint,
@@ -214,7 +232,7 @@ CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator *associatedAnimator,
                                      const MovablePointType &type,
                                      const bool &blockX,
                                      MovablePoint *centerPoint) :
-    PointAnimatorMovablePoint(associatedAnimator, parent, type) {
+    AnimatedPoint(associatedAnimator, parent, type) {
     mCenterPoint_cv = centerPoint;
     mXBlocked = blockX;
 }
@@ -227,7 +245,7 @@ void CircleRadiusPoint::moveByRel(const QPointF &relTranslation) {
     } else {
         relTranslationT.setY(0.);
     }
-    PointAnimatorMovablePoint::moveByRel(relTranslationT);
+    AnimatedPoint::moveByRel(relTranslationT);
 }
 
 //void CircleRadiusPoint::setAbsPosRadius(QPointF pos)
@@ -259,10 +277,10 @@ void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {
 
 void CircleRadiusPoint::startTransform() {
     if(mCenterPoint_cv->isSelected() ) return;
-    PointAnimatorMovablePoint::startTransform();
+    AnimatedPoint::startTransform();
 }
 
 void CircleRadiusPoint::finishTransform() {
     if(mCenterPoint_cv->isSelected() ) return;
-    PointAnimatorMovablePoint::finishTransform();
+    AnimatedPoint::finishTransform();
 }

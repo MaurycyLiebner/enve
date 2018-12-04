@@ -13,7 +13,7 @@ class BasicTransformAnimator;
 
 class AnimatorUpdater;
 
-enum MovablePointType {
+enum MovablePointType : short {
     TYPE_PATH_POINT,
     TYPE_CTRL_POINT,
     TYPE_PIVOT_POINT,

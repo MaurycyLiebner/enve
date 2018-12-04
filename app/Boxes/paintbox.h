@@ -1,12 +1,13 @@
 #ifndef PAINTBOX_H
 #define PAINTBOX_H
 #include "boundingbox.h"
-#include "Paint//tile.h"
+#include "Paint/tile.h"
 struct TileSkDrawer;
 class Surface;
 class Brush;
 class AnimatedSurface;
 class QPointFAnimator;
+class AnimatedPoint;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
     friend class StdSelfRef;
@@ -143,8 +144,8 @@ private:
     qsptr<QPointFAnimator> mTopLeftAnimator;
     qsptr<QPointFAnimator> mBottomRightAnimator;
 
-    stdsptr<PointAnimatorMovablePoint> mTopLeftPoint;
-    stdsptr<PointAnimatorMovablePoint> mBottomRightPoint;
+    stdsptr<AnimatedPoint> mTopLeftPoint;
+    stdsptr<AnimatedPoint> mBottomRightPoint;
 
     qsptr<AnimatedSurface> mMainHandler;
     Surface *mTemporaryHandler = nullptr;

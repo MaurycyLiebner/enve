@@ -4,7 +4,7 @@
 #include "Animators/animatorupdater.h"
 #include "canvas.h"
 #include "pointhelpers.h"
-#include "pointanimator.h"
+#include "MovablePoints/animatedpoint.h"
 
 double fRand(double fMin, double fMax) {
     double f = (double)rand() / RAND_MAX;
@@ -15,7 +15,7 @@ ParticleBox::ParticleBox() :
     BoundingBox(TYPE_PARTICLES) {
     setName("Particle Box");
     mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
-    mTopLeftPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mTopLeftPoint = SPtrCreate(AnimatedPoint)(
                 mTopLeftAnimator.data(),
                 mTransformAnimator.data(),
                 TYPE_PATH_POINT);
@@ -23,7 +23,7 @@ ParticleBox::ParticleBox() :
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
 
     mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom right");
-    mBottomRightPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mBottomRightPoint = SPtrCreate(AnimatedPoint)(
                 mBottomRightAnimator.data(),
                 mTransformAnimator.data(),
                 TYPE_PATH_POINT);
@@ -325,7 +325,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     ComplexAnimator("particle emitter") {
     setParentBox(parentBox);
 
-    mPosPoint = SPtrCreate(PointAnimatorMovablePoint)(
+    mPosPoint = SPtrCreate(AnimatedPoint)(
                 mPos.get(),
                 mParentBox_k->getTransformAnimator(),
                 TYPE_PATH_POINT);

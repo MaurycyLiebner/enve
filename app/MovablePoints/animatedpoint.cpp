@@ -1,4 +1,4 @@
-#include "pointanimator.h"
+#include "animatedpoint.h"
 
 #include "Boxes/vectorpath.h"
 #include "global.h"
@@ -7,7 +7,7 @@
 #include "skqtconversions.h"
 #include "pointhelpers.h"
 
-PointAnimatorMovablePoint::PointAnimatorMovablePoint(
+AnimatedPoint::AnimatedPoint(
         QPointFAnimator *associatedAnimator,
         BasicTransformAnimator* parentTransform,
         const MovablePointType &type,
@@ -15,47 +15,47 @@ PointAnimatorMovablePoint::PointAnimatorMovablePoint(
     MovablePoint(parentTransform, type, radius),
     mAssociatedAnimator_k(associatedAnimator) {}
 
-void PointAnimatorMovablePoint::startTransform() {
+void AnimatedPoint::startTransform() {
     mAssociatedAnimator_k->prp_startTransform();
     mTransformStarted = true;
     mSavedRelPos = getRelativePos();
 }
 
-void PointAnimatorMovablePoint::applyTransform(const QMatrix &transform){
+void AnimatedPoint::applyTransform(const QMatrix &transform){
     QPointF point = mAssociatedAnimator_k->getCurrentPointValue();
     mAssociatedAnimator_k->setCurrentPointValue(transform.map(point), true);
 }
 
-void PointAnimatorMovablePoint::finishTransform() {
+void AnimatedPoint::finishTransform() {
     if(mTransformStarted) {
         mTransformStarted = false;
         mAssociatedAnimator_k->prp_finishTransform();
     }
 }
 
-void PointAnimatorMovablePoint::setRelativePos(const QPointF &relPos) {
+void AnimatedPoint::setRelativePos(const QPointF &relPos) {
     mAssociatedAnimator_k->setCurrentPointValue(relPos);
 }
 
-QPointF PointAnimatorMovablePoint::getRelativePos() const {
+QPointF AnimatedPoint::getRelativePos() const {
     return mAssociatedAnimator_k->getCurrentPointValue();
 }
 
-QPointF PointAnimatorMovablePoint::getRelativePosAtRelFrame(const int &frame) const {
+QPointF AnimatedPoint::getRelativePosAtRelFrame(const int &frame) const {
     return mAssociatedAnimator_k->getCurrentPointValueAtRelFrame(frame);
 }
 
 
-void PointAnimatorMovablePoint::moveByRel(const QPointF &relTranslation) {
+void AnimatedPoint::moveByRel(const QPointF &relTranslation) {
     mAssociatedAnimator_k->incSavedValueToCurrentValue(relTranslation.x(),
                                                  relTranslation.y());
 }
 
-void PointAnimatorMovablePoint::cancelTransform() {
+void AnimatedPoint::cancelTransform() {
     mAssociatedAnimator_k->prp_cancelTransform();
     //setRelativePos(mSavedRelPos, false);
 }
 
-//void PointAnimatorMovablePoint::prp_setUpdater(AnimatorUpdater *updater) {
+//void AnimatedPoint::prp_setUpdater(AnimatorUpdater *updater) {
 //    prp_setUpdater(updater);
 //}

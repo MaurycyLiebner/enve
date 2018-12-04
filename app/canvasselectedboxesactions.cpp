@@ -1,7 +1,8 @@
 #include "canvas.h"
 #include "GUI/mainwindow.h"
-#include "pathpivot.h"
+#include "MovablePoints/pathpivot.h"
 #include "Boxes/bone.h"
+#include "MovablePoints/pathpivot.h"
 
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
@@ -640,7 +641,7 @@ void Canvas::deselectAllBoxes() {
         removeBoxFromSelection(box);
     }
 }
-#include "pathpivot.h"
+
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
                                  const CanvasMode &currentMode,
                                  const qreal &canvasScaleInv) {

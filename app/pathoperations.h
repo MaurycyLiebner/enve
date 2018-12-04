@@ -1,8 +1,9 @@
 #ifndef PATHOPERATIONS_H
 #define PATHOPERATIONS_H
 #include <QPainterPath>
-#include "Boxes/vectorpath.h"
-#include "nodepoint.h"
+class PathBox;
+class SkPath;
+class PathAnimator;
 
 extern void applyOperationF(const qreal &relFrame, const SkPath &src,
                             SkPath *dst, PathBox *srcBox,

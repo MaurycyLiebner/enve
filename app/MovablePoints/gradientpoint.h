@@ -1,9 +1,9 @@
 #ifndef GRADIENTPOINT_H
 #define GRADIENTPOINT_H
-#include "pointanimator.h"
+#include "animatedpoint.h"
 class PathBox;
 
-class GradientPoint : public PointAnimatorMovablePoint {
+class GradientPoint : public AnimatedPoint {
     friend class StdSelfRef;
 public:
     void setRelativePos(const QPointF &relPos);

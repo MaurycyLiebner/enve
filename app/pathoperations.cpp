@@ -3,6 +3,8 @@
 #include "edge.h"
 #include "Animators/pathanimator.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
+#include "Boxes/vectorpath.h"
+#include "MovablePoints/nodepoint.h"
 
 MinimalNodePoint::MinimalNodePoint() {}
 

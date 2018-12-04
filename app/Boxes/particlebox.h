@@ -3,8 +3,9 @@
 #include "boundingbox.h"
 #include "Properties/boxtargetproperty.h"
 #include "Animators/coloranimator.h"
+#include "Animators/qpointfanimator.h"
 class QPointFAnimator;
-
+class AnimatedPoint;
 class ParticleBox;
 
 struct ParticleState {
@@ -207,7 +208,7 @@ private:
     qsptr<QPointFAnimator> mPos =
             SPtrCreate(QPointFAnimator)("position");
 
-    stdsptr<PointAnimatorMovablePoint> mPosPoint;
+    stdsptr<AnimatedPoint> mPosPoint;
 
     qsptr<QrealAnimator> mWidth =
             SPtrCreate(QrealAnimator)("width");
@@ -313,8 +314,8 @@ private:
     qsptr<QPointFAnimator> mTopLeftAnimator;
     qsptr<QPointFAnimator> mBottomRightAnimator;
 
-    stdsptr<PointAnimatorMovablePoint> mTopLeftPoint;
-    stdsptr<PointAnimatorMovablePoint> mBottomRightPoint;
+    stdsptr<AnimatedPoint> mTopLeftPoint;
+    stdsptr<AnimatedPoint> mBottomRightPoint;
     QList<qsptr<ParticleEmitter>> mEmitters;
 };
 

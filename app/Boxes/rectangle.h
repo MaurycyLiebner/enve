@@ -1,7 +1,7 @@
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
 #include "Boxes/pathbox.h"
-
+class AnimatedPoint;
 class Rectangle : public PathBox {
     friend class SelfRef;
 public:
@@ -40,9 +40,9 @@ protected:
     qsptr<QPointFAnimator> mBottomRightAnimator;
     qsptr<QPointFAnimator> mRadiusAnimator;
 
-    stdsptr<PointAnimatorMovablePoint> mTopLeftPoint;
-    stdsptr<PointAnimatorMovablePoint> mBottomRightPoint;
-    stdsptr<PointAnimatorMovablePoint> mRadiusPoint;
+    stdsptr<AnimatedPoint> mTopLeftPoint;
+    stdsptr<AnimatedPoint> mBottomRightPoint;
+    stdsptr<AnimatedPoint> mRadiusPoint;
 
     void getMotionBlurProperties(QList<Property*> &list);
 };

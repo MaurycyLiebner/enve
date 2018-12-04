@@ -2,7 +2,7 @@
 #include "Animators/pathanimator.h"
 #include "Boxes/boundingbox.h"
 #include "edge.h"
-#include "nodepoint.h"
+#include "MovablePoints/nodepoint.h"
 #include "canvas.h"
 #include "undoredo.h"
 

@@ -1,6 +1,6 @@
 #include "edge.h"
-#include "nodepoint.h"
-#include "ctrlpoint.h"
+#include "MovablePoints/nodepoint.h"
+#include "MovablePoints/ctrlpoint.h"
 #include "Boxes/boundingbox.h"
 #include "global.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"

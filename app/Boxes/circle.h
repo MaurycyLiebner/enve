@@ -1,9 +1,10 @@
 #ifndef CIRCLE_H
 #define CIRCLE_H
-#include "Boxes/pathbox.h"
-#include "movablepoint.h"
+#include "MovablePoints/animatedpoint.h"
 
-class CircleCenterPoint : public PointAnimatorMovablePoint {
+enum CanvasMode : short;
+
+class CircleCenterPoint : public AnimatedPoint {
     friend class StdSelfRef;
 public:
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
@@ -24,7 +25,7 @@ private:
     stdptr<MovablePoint>mHorizontalPoint_cv;
 };
 
-class CircleRadiusPoint : public PointAnimatorMovablePoint {
+class CircleRadiusPoint : public AnimatedPoint {
     friend class StdSelfRef;
 public:
     void moveByRel(const QPointF &relTranslation);
@@ -42,8 +43,10 @@ protected:
                       MovablePoint *centerPoint);
 private:
     bool mXBlocked = false;
-    stdptr<MovablePoint>mCenterPoint_cv;
+    stdptr<MovablePoint> mCenterPoint_cv;
 };
+
+#include "Boxes/pathbox.h"
 
 class Circle : public PathBox {
     friend class SelfRef;
@@ -64,7 +67,7 @@ public:
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 
-    bool SWT_isCircle() { return true; }
+    bool SWT_isCircle();
 
     void startAllPointsTransform();
     SkPath getPathAtRelFrame(const int &relFrame);
@@ -72,21 +75,13 @@ public:
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 
-    qreal getXRadiusAtRelFrame(const int &relFrame) {
-        return mHorizontalRadiusAnimator->getEffectiveXValueAtRelFrame(relFrame);
-    }
+    qreal getXRadiusAtRelFrame(const int &relFrame);
 
-    qreal getYRadiusAtRelFrame(const int &relFrame) {
-        return mVerticalRadiusAnimator->getEffectiveYValueAtRelFrame(relFrame);
-    }
+    qreal getYRadiusAtRelFrame(const int &relFrame);
 
-    qreal getCurrentXRadius() {
-        return mHorizontalRadiusAnimator->getEffectiveXValue();
-    }
+    qreal getCurrentXRadius();
 
-    qreal getCurrentYRadius() {
-        return mVerticalRadiusAnimator->getEffectiveYValue();
-    }
+    qreal getCurrentYRadius();
 
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;

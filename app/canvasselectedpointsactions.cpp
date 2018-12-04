@@ -1,6 +1,6 @@
 #include "canvas.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
-#include "nodepoint.h"
+#include "MovablePoints/nodepoint.h"
 #include "Animators/pathanimator.h"
 
 void Canvas::connectPoints() {

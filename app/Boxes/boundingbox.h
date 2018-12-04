@@ -36,7 +36,7 @@ class BoxesGroup;
 class VectorPathEdge;
 class VectorPath;
 class DurationRectangle;
-class BoxesGroupRenderData;
+struct BoxesGroupRenderData;
 
 enum CanvasMode : short;
 

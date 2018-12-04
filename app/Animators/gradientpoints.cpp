@@ -1,5 +1,5 @@
 #include "gradientpoints.h"
-#include "gradientpoint.h"
+#include "MovablePoints/gradientpoint.h"
 #include "skqtconversions.h"
 #include "Boxes/pathbox.h"
 

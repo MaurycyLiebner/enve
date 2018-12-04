@@ -1,6 +1,6 @@
 #include "Animators/pathanimator.h"
 #include "PathAnimators/vectorpathanimator.h"
-#include "nodepoint.h"
+#include "MovablePoints/nodepoint.h"
 #include "undoredo.h"
 #include "edge.h"
 #include "skqtconversions.h"

@@ -708,7 +708,7 @@ void applyUNoise(qreal noise_t,
 #include <QString>
 #include <QFile>
 #include <QTextStream>
-#include "Paint//brush.h"
+#include "Paint/brush.h"
 void saveBrushDataAsFile(Brush *brush_t, QString file_path_t) {
     QFile file(file_path_t);
     file.open(QFile::WriteOnly);

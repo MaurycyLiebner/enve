@@ -54,10 +54,7 @@ TEMPLATE = app
 SOURCES += main.cpp\
     canvas.cpp \
     undoredo.cpp \
-    movablepoint.cpp \
-    pathpivot.cpp \
     canvasmouseinteractions.cpp \
-    ctrlpoint.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
     GUI/ColorWidgets/colorsettingswidget.cpp \
     GUI/ColorWidgets/colorvaluerect.cpp \
@@ -71,12 +68,10 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/helpers.cpp \
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
-    gradientpoint.cpp \
     svgimporter.cpp \
     qrealkey.cpp \
     qrealpoint.cpp \
     pointhelpers.cpp \
-    gradientpoints.cpp \
     paintcontroler.cpp \
     Animators/transformanimator.cpp \
     Animators/animator.cpp \
@@ -131,7 +126,6 @@ SOURCES += main.cpp\
     Boxes/rendercachehandler.cpp \
     memorychecker.cpp \
     memoryhandler.cpp \
-    boxpathpoint.cpp \
     outputgenerator.cpp \
     GUI/RenderWidgets/renderwidget.cpp \
     GUI/RenderWidgets/renderinstancewidget.cpp \
@@ -154,19 +148,17 @@ SOURCES += main.cpp\
     Properties/boxtargetproperty.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
-    Paint//brush.cpp \
-    Paint//surface.cpp \
-    Paint//tile.cpp \
+    Paint/brush.cpp \
+    Paint/surface.cpp \
+    Paint/tile.cpp \
     Boxes/paintbox.cpp \
-    Paint//animatedsurface.cpp \
+    Paint/animatedsurface.cpp \
     Animators/PathAnimators/pathkey.cpp \
     Animators/PathAnimators/vectorpathanimator.cpp \
-    pointanimator.cpp \
-    nodepoint.cpp \
     avfileio.cpp \
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
-    Paint//tilesdata.cpp \
+    Paint/tilesdata.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
     Properties/comboboxproperty.cpp \
     Animators/randomqrealgenerator.cpp \
@@ -240,13 +232,18 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/itemwrapper.cpp \
     qstringio.cpp \
     GUI/BrushWidgets/flowlayout.cpp \
-    GUI/BrushWidgets/itemwidget.cpp
+    GUI/BrushWidgets/itemwidget.cpp \
+    Animators/gradientpoints.cpp \
+    MovablePoints/ctrlpoint.cpp \
+    MovablePoints/gradientpoint.cpp \
+    MovablePoints/boxpathpoint.cpp \
+    MovablePoints/animatedpoint.cpp \
+    MovablePoints/nodepoint.cpp \
+    MovablePoints/pathpivot.cpp \
+    MovablePoints/movablepoint.cpp
 HEADERS  += \
     canvas.h \
     undoredo.h \
-    movablepoint.h \
-    pathpivot.h \
-    ctrlpoint.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \
     GUI/ColorWidgets/colorvaluerect.h \
@@ -260,12 +257,10 @@ HEADERS  += \
     GUI/ColorWidgets/helpers.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
-    gradientpoint.h \
     svgimporter.h \
     qrealkey.h \
     qrealpoint.h \
     pointhelpers.h \
-    gradientpoints.h \
     paintcontroler.h \
     keypoint.h \
     Animators/qstringanimator.h \
@@ -319,7 +314,6 @@ HEADERS  += \
     Boxes/rendercachehandler.h \
     memorychecker.h \
     memoryhandler.h \
-    boxpathpoint.h \
     outputgenerator.h \
     GUI/RenderWidgets/renderwidget.h \
     GUI/RenderWidgets/renderinstancewidget.h \
@@ -348,19 +342,17 @@ HEADERS  += \
     Properties/boxtargetproperty.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
-    Paint//brush.h \
-    Paint//surface.h \
-    Paint//tile.h \
+    Paint/brush.h \
+    Paint/surface.h \
+    Paint/tile.h \
     Boxes/paintbox.h \
-    Paint//animatedsurface.h \
+    Paint/animatedsurface.h \
     Animators/PathAnimators/pathkey.h \
     Animators/PathAnimators/vectorpathanimator.h \
-    pointanimator.h \
-    nodepoint.h \
     avfileio.h \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
-    Paint//tilesdata.h \
+    Paint/tilesdata.h \
     GUI/BoxesList/boxscrollarea.h \
     Properties/comboboxproperty.h \
     Animators/randomqrealgenerator.h \
@@ -437,7 +429,15 @@ HEADERS  += \
     GUI/BrushWidgets/itemwrapper.h \
     qstringio.h \
     GUI/BrushWidgets/flowlayout.h \
-    GUI/BrushWidgets/itemwidget.h
+    GUI/BrushWidgets/itemwidget.h \
+    Animators/gradientpoints.h \
+    MovablePoints/animatedpoint.h \
+    MovablePoints/ctrlpoint.h \
+    MovablePoints/pathpivot.h \
+    MovablePoints/nodepoint.h \
+    MovablePoints/movablepoint.h \
+    MovablePoints/gradientpoint.h \
+    MovablePoints/boxpathpoint.h
 
 RESOURCES += \
     resources.qrc

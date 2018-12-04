@@ -3,11 +3,11 @@
 #include "qrealkey.h"
 #include "canvas.h"
 #include "Boxes/vectorpath.h"
-#include "movablepoint.h"
+#include "MovablePoints/movablepoint.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "Animators/paintsettings.h"
-#include "nodepoint.h"
+#include "MovablePoints/nodepoint.h"
 #include "Animators/pathanimator.h"
 #include "Animators/qstringanimator.h"
 
