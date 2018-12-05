@@ -3,11 +3,6 @@
 
 #include <QList>
 #include "smartPointers/sharedpointerdefs.h"
-class MainWindow;
-class Tile;
-
-enum CtrlsMode : short;
-enum PaintType : short;
 
 class UndoRedo : public StdSelfRef {
 public:

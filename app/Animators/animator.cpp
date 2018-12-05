@@ -695,7 +695,9 @@ void Animator::anim_drawKey(QPainter *p,
                             Key *key,
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
-                            const int &startFrame) {
+                            const int &startFrame,
+                            const int &rowHeight,
+                            const int &keyRectSize) {
     if(key->isSelected()) {
         p->setBrush(Qt::yellow);
     } else {
@@ -709,23 +711,27 @@ void Animator::anim_drawKey(QPainter *p,
     p->drawEllipse(
         QRectF(
             QPointF((key->getRelFrame() - startFrame + 0.5)*
-                    pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                    drawY + (MIN_WIDGET_HEIGHT -
-                              KEY_RECT_SIZE)*0.5 ),
-            QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
+                    pixelsPerFrame - keyRectSize*0.5,
+                    drawY + (rowHeight -
+                              keyRectSize)*0.5 ),
+            QSize(keyRectSize, keyRectSize) ) );
 }
 
 void Animator::prp_drawKeys(QPainter *p,
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame,
-                            const int &endFrame) {
+                            const int &endFrame,
+                            const int &rowHeight,
+                            const int &keyRectSize) {
     p->save();
     p->translate(prp_getFrameShift()*pixelsPerFrame, 0.);
     Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
         if(key->getAbsFrame() >= startFrame &&
            key->getAbsFrame() <= endFrame) {
-            anim_drawKey(p, key.get(), pixelsPerFrame, drawY, startFrame);
+            anim_drawKey(p, key.get(), pixelsPerFrame,
+                         drawY, startFrame,
+                         rowHeight, keyRectSize);
         }
     }
     p->restore();

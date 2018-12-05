@@ -326,7 +326,9 @@ public:
                       const qreal &pixelsPerFrame,
                       const qreal &drawY,
                       const int &startFrame,
-                      const int &endFrame);
+                      const int &endFrame,
+                      const int &rowHeight,
+                      const int &keyRectSize);
     virtual void addPathEffect(const qsptr<PathEffect>&);
     virtual void addFillPathEffect(const qsptr<PathEffect>&);
     virtual void addOutlinePathEffect(const qsptr<PathEffect>&);

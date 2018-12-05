@@ -144,7 +144,9 @@ void SingleSound::prp_drawKeys(QPainter *p,
                                const qreal &pixelsPerFrame,
                                const qreal &drawY,
                                const int &startFrame,
-                               const int &endFrame) {
+                               const int &endFrame,
+                               const int &rowHeight,
+                               const int &keyRectSize) {
 //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
 //    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
 //    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
@@ -154,7 +156,8 @@ void SingleSound::prp_drawKeys(QPainter *p,
     mDurationRectangle->draw(p, pixelsPerFrame,
                              drawY, startFrame);
     ComplexAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
-                                  startFrame, endFrame);
+                                  startFrame, endFrame,
+                                  rowHeight, keyRectSize);
 }
 
 FixedLenAnimationRect *SingleSound::getDurationRect() {

@@ -69,12 +69,16 @@ public:
                               const qreal &pixelsPerFrame,
                               const qreal &drawY,
                               const int &startFrame,
-                              const int &endFrame) {
+                              const int &endFrame,
+                              const int &rowHeight,
+                              const int &keyRectSize) {
         Q_UNUSED(p);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(drawY);
         Q_UNUSED(startFrame);
         Q_UNUSED(endFrame);
+        Q_UNUSED(rowHeight);
+        Q_UNUSED(keyRectSize);
     }
     virtual void prp_getKeysInRect(const QRectF &selectionRect,
                                    const qreal &pixelsPerFrame,

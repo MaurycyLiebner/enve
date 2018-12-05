@@ -11,7 +11,9 @@ public:
                       const qreal &pixelsPerFrame,
                       const qreal &drawY,
                       const int &startFrame,
-                      const int &endFrame);
+                      const int &endFrame,
+                      const int &rowHeight,
+                      const int &keyRectSize);
 
     Key *prp_getKeyAtPos(const qreal &relX,
                          const int &minViewedFrame,

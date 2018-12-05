@@ -87,7 +87,9 @@ public:
                               const qreal &pixelsPerFrame,
                               const qreal &drawY,
                               const int &startFrame,
-                              const int &endFrame);
+                              const int &endFrame,
+                              const int &rowHeight,
+                              const int &keyRectSize);
     Key *anim_getKeyAtAbsFrame(const int &frame);
 
     virtual void anim_saveCurrentValueAsKey();
@@ -142,11 +144,12 @@ protected:
 
     int anim_getKeyIndex(Key *key);
 
-    virtual void anim_drawKey(QPainter *p,
-                         Key* key,
-                         const qreal &pixelsPerFrame,
-                         const qreal &drawY,
-                         const int &startFrame);
+    virtual void anim_drawKey(QPainter *p, Key* key,
+                              const qreal &pixelsPerFrame,
+                              const qreal &drawY,
+                              const int &startFrame,
+                              const int& rowHeight,
+                              const int& keyRectSize);
     bool anim_mIsComplexAnimator = false;
     bool anim_mIsCurrentAnimator = false;
     bool anim_mIsRecording = false;

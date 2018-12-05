@@ -14,11 +14,15 @@ void FakeComplexAnimator::prp_drawKeys(QPainter *p,
                                        const qreal &pixelsPerFrame,
                                        const qreal &drawY,
                                        const int &startFrame,
-                                       const int &endFrame) {
+                                       const int &endFrame,
+                                       const int &rowHeight,
+                                       const int &keyRectSize) {
     mTarget->prp_drawKeys(p, pixelsPerFrame, drawY,
-                          startFrame, endFrame);
+                          startFrame, endFrame,
+                          rowHeight, keyRectSize);
     ComplexAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
-                                  startFrame, endFrame);
+                                  startFrame, endFrame,
+                                  rowHeight, keyRectSize);
 }
 
 Key *FakeComplexAnimator::prp_getKeyAtPos(const qreal &relX,

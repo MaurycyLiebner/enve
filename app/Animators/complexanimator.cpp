@@ -1,6 +1,4 @@
 #include "Animators/complexanimator.h"
-#include "GUI/mainwindow.h"
-#include "GUI/BoxesList/boxsinglewidget.h"
 #include "global.h"
 #include "qrealanimator.h"
 
@@ -274,11 +272,12 @@ void ComplexAnimator::prp_setTransformed(const bool &bT) {
     }
 }
 
-void ComplexAnimator::anim_drawKey(QPainter *p,
-                            Key *key,
-                            const qreal &pixelsPerFrame,
-                            const qreal &drawY,
-                            const int &startFrame) {
+void ComplexAnimator::anim_drawKey(QPainter *p, Key *key,
+                                   const qreal &pixelsPerFrame,
+                                   const qreal &drawY,
+                                   const int &startFrame,
+                                   const int &rowHeight,
+                                   const int &keyRectSize) {
     if(key->areAllChildrenSelected()) {
         p->setBrush(Qt::yellow);
     } else {
@@ -289,12 +288,12 @@ void ComplexAnimator::anim_drawKey(QPainter *p,
     } else {
         p->setPen(QPen(Qt::black, 0.5));
     }
-    qreal keySize = KEY_RECT_SIZE*0.7;
+    qreal keySize = keyRectSize*0.7;
     p->drawEllipse(
         QRectF(
             QPointF((key->getRelFrame() - startFrame + 0.5)*
                     pixelsPerFrame - keySize*0.5,
-                    drawY + (MIN_WIDGET_HEIGHT -
+                    drawY + (rowHeight -
                               keySize)*0.5 ),
             QSizeF(keySize, keySize) ) );
 }

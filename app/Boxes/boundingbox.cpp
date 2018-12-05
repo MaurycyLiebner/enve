@@ -1058,18 +1058,21 @@ void BoundingBox::prp_drawKeys(QPainter *p,
                                const qreal &pixelsPerFrame,
                                const qreal &drawY,
                                const int &startFrame,
-                               const int &endFrame) {
+                               const int &endFrame,
+                               const int &rowHeight,
+                               const int &keyRectSize) {
     if(mDurationRectangle != nullptr) {
         p->save();
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
         mDurationRectangle->draw(p, pixelsPerFrame,
-                                drawY, startFrame);
+                                 drawY, startFrame);
         p->restore();
     }
 
     Animator::prp_drawKeys(p,
                            pixelsPerFrame, drawY,
-                           startFrame, endFrame);
+                           startFrame, endFrame,
+                           rowHeight, keyRectSize);
 }
 
 void BoundingBox::addPathEffect(const qsptr<PathEffect> &) {}

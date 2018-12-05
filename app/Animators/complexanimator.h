@@ -63,7 +63,9 @@ public:
                       Key* key,
                       const qreal &pixelsPerFrame,
                       const qreal &drawY,
-                      const int &startFrame);
+                      const int &startFrame,
+                      const int &rowHeight,
+                      const int &keyRectSize);
 
 
     void prp_setParentFrameShift(const int &shift,

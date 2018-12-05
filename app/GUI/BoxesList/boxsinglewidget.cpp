@@ -909,8 +909,9 @@ void BoxSingleWidget::drawKeys(QPainter *p, const qreal &pixelsPerFrame,
     if(target->SWT_isAnimator()) {
         Animator *anim_target = static_cast<Animator*>(target);
         anim_target->prp_drawKeys(p, pixelsPerFrame,
-                            containerTop,
-                            minViewedFrame, maxViewedFrame);
+                                  containerTop,
+                                  minViewedFrame, maxViewedFrame,
+                                  MIN_WIDGET_HEIGHT, KEY_RECT_SIZE);
     }
 }
 

@@ -31,7 +31,9 @@ public:
                       const qreal &pixelsPerFrame,
                       const qreal &drawY,
                       const int &startFrame,
-                      const int &endFrame);
+                      const int &endFrame,
+                      const int &rowHeight,
+                      const int &keyRectSize);
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
             const int &relX, const int &minViewedFrame,
             const qreal &pixelsPerFrame);
