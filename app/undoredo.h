@@ -15,19 +15,17 @@ class Tile;
 enum CtrlsMode : short;
 enum PaintType : short;
 
-class UndoRedo {
+class UndoRedo : public StdSelfRef {
 public:
-    UndoRedo(const QString &name/* = ""*/);
-    virtual ~UndoRedo() {
-        qDebug() << "DELETE " << mName;
-    }
-    virtual void undo() {}
-    virtual void redo() {}
-    void printName() { qDebug() << mName; }
-    void printUndoName() { qDebug() << "UNDO " << mName; }
-    void printRedoName() { qDebug() << "REDO " << mName; }
+    UndoRedo(const QString &name);
+    virtual ~UndoRedo();
+    virtual void undo();
+    virtual void redo();
+    void printName();
+    void printUndoName();
+    void printRedoName();
 
-    int getFrame() { return mFrame; }
+    int getFrame();
 private:
     int mFrame;
     QString mName;
@@ -35,130 +33,51 @@ private:
 
 class UndoRedoSet : public UndoRedo {
 public:
-    UndoRedoSet() : UndoRedo("UndoRedoSet") {
-    }
+    UndoRedoSet();
+    ~UndoRedoSet();
 
-    ~UndoRedoSet() {
-        Q_FOREACH(UndoRedo *undoRedo, mSet) {
-            delete undoRedo;
-        }
-    }
+    void undo();
+    void redo();
 
-    void undo() {
-        for(int i = mSet.length() - 1; i >= 0; i--) {
-            mSet.at(i)->undo();
-        }
-    }
-
-    void redo() {
-        Q_FOREACH(UndoRedo* undoRedo, mSet) {
-            undoRedo->redo();
-        }
-    }
-
-    void addUndoRedo(UndoRedo* undoRedo) {
-        mSet << undoRedo;
-    }
-
-    bool isEmpty() {
-        return mSet.isEmpty();
-    }
-
+    void addUndoRedo(const stdsptr<UndoRedo>& undoRedo);
+    bool isEmpty();
 private:
-    QList<UndoRedo*> mSet;
+    QList<stdsptr<UndoRedo>> mSet;
 };
 
 
-class UndoRedoStack {
+class UndoRedoStack : public StdSelfRef {
 public:
-    UndoRedoStack(MainWindow *mainWindow) {
-        mMainWindow = mainWindow;
-        startNewSet();
-    }
+    UndoRedoStack(MainWindow *mainWindow);
+    ~UndoRedoStack();
 
-    void startNewSet() {
-        mNumberOfSets++;
-    }
+    void startNewSet();
+    void finishSet();
 
-    ~UndoRedoStack() {
-        clearUndoStack();
-        clearRedoStack();
-    }
+    void clearRedoStack();
+    void clearUndoStack();
+    void clearAll();
 
-    void finishSet() {
-        mNumberOfSets--;
-        if(mNumberOfSets == 0) {
-            addSet();
-        }
-    }
-
-    void addSet() {
-        if((mCurrentSet == nullptr) ? true : mCurrentSet->isEmpty()) {
-            mCurrentSet = nullptr;
-            return;
-        }
-        addUndoRedo(mCurrentSet);
-        mCurrentSet = nullptr;
-    }
-
-    void addToSet(UndoRedo *undoRedo) {
-        if(mCurrentSet == nullptr) {
-            mCurrentSet = new UndoRedoSet();
-        }
-        mCurrentSet->addUndoRedo(undoRedo);
-    }
-
-    void clearRedoStack() {
-        Q_FOREACH (UndoRedo *redoStackItem, mRedoStack) {
-            delete redoStackItem;
-        }
-        mRedoStack.clear();
-    }
-
-    void clearUndoStack() {
-        Q_FOREACH (UndoRedo *undoStackItem, mUndoStack) {
-            delete undoStackItem;
-        }
-        mUndoStack.clear();
-    }
-
-    void emptySomeOfUndo() {
-        if(mUndoStack.length() > 150) {
-//            for(int i = 0; i < 50; i++) {
-                delete mUndoStack.takeFirst();
-//            }
-        }
-    }
-
-    void clearAll() {
-        clearRedoStack();
-        clearUndoStack();
-    }
-
-    void addUndoRedo(UndoRedo *undoRedo);
+    void addUndoRedo(const stdsptr<UndoRedo>& undoRedo);
 
     void redo();
-
     void undo();
+    void emptySomeOfUndo();
 
-    void blockUndoRedo() {
-        mUndoRedoBlocked = true;
-    }
-
-    void unblockUndoRedo() {
-        mUndoRedoBlocked = false;
-    }
-
-    bool undoRedoBlocked() {
-        return mUndoRedoBlocked;
-    }
+    void blockUndoRedo();
+    void unblockUndoRedo();
+    bool undoRedoBlocked();
 private:
+    void addSet();
+    void addToSet(const stdsptr<UndoRedo> &undoRedo);
+
     bool mUndoRedoBlocked = false;
     int mLastUndoRedoFrame = INT_MAX;
-    MainWindow *mMainWindow;
     int mNumberOfSets = 0;
-    UndoRedoSet *mCurrentSet = nullptr;
-    QList<UndoRedo*> mUndoStack;
-    QList<UndoRedo*> mRedoStack;
+
+    MainWindow *mMainWindow;
+    stdsptr<UndoRedoSet> mCurrentSet;
+    QList<stdsptr<UndoRedo>> mUndoStack;
+    QList<stdsptr<UndoRedo>> mRedoStack;
 };
 #endif // UNDOREDO_H

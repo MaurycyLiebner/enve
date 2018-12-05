@@ -29,7 +29,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &frameCount, const qreal &fps) :
     BoxesGroup(TYPE_CANVAS) {
     setCurrentBrush(mMainWindow->getCurrentBrush());
-    mUndoRedoStack = new UndoRedoStack(mMainWindow);
+    mUndoRedoStack = SPtrCreate(UndoRedoStack)(mMainWindow);
     mFps = fps;
     connect(this, SIGNAL(nameChanged(QString)),
             this, SLOT(emitCanvasNameChanged()));
@@ -51,6 +51,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     mVisibleHeight = mHeight;
     mCanvasWindow = canvasWidget;
     mCanvasWidget = mCanvasWindow->getCanvasWidget();
+    mMainWindow = MainWindow::getInstance();
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -68,9 +69,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     //setCanvasMode(MOVE_PATH);
 }
 
-Canvas::~Canvas() {
-    delete mUndoRedoStack;
-}
+Canvas::~Canvas() {}
 
 QRectF Canvas::getRelBoundingRectAtRelFrame(const int &) {
     return QRectF(0., 0., mWidth, mHeight);

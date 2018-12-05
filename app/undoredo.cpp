@@ -11,7 +11,65 @@
 #include "Animators/pathanimator.h"
 #include "Animators/qstringanimator.h"
 
-void UndoRedoStack::addUndoRedo(UndoRedo *undoRedo) {
+UndoRedoStack::UndoRedoStack(MainWindow *mainWindow) {
+    mMainWindow = mainWindow;
+    startNewSet();
+}
+
+void UndoRedoStack::startNewSet() {
+    mNumberOfSets++;
+}
+
+UndoRedoStack::~UndoRedoStack() {
+    clearUndoStack();
+    clearRedoStack();
+}
+
+void UndoRedoStack::finishSet() {
+    mNumberOfSets--;
+    if(mNumberOfSets == 0) {
+        addSet();
+    }
+}
+
+void UndoRedoStack::addSet() {
+    if((mCurrentSet == nullptr) ? true : mCurrentSet->isEmpty()) {
+        mCurrentSet = nullptr;
+        return;
+    }
+    addUndoRedo(mCurrentSet);
+    mCurrentSet = nullptr;
+}
+
+void UndoRedoStack::addToSet(const stdsptr<UndoRedo>& undoRedo) {
+    if(mCurrentSet == nullptr) {
+        mCurrentSet = SPtrCreate(UndoRedoSet)();
+    }
+    mCurrentSet->addUndoRedo(undoRedo);
+}
+
+void UndoRedoStack::clearRedoStack() {
+    mRedoStack.clear();
+}
+
+void UndoRedoStack::clearUndoStack() {
+    mUndoStack.clear();
+}
+
+void UndoRedoStack::emptySomeOfUndo() {
+    if(mUndoStack.length() > 150) {
+        //            for(int i = 0; i < 50; i++) {
+        mUndoStack.removeFirst();
+        //            }
+    }
+}
+
+void UndoRedoStack::clearAll() {
+    clearRedoStack();
+    clearUndoStack();
+}
+
+void UndoRedoStack::addUndoRedo(const stdsptr<UndoRedo> &undoRedo) {
     if(undoRedo == nullptr) {
         return;
     }
@@ -19,7 +77,7 @@ void UndoRedoStack::addUndoRedo(UndoRedo *undoRedo) {
     if(mNumberOfSets != 0) {
         addToSet(undoRedo);
     } else {
-//        int currentFrame = mMainWindow->getCurrentFrame();
+        //        int currentFrame = mMainWindow->getCurrentFrame();
 //        if(currentFrame != mLastUndoRedoFrame) {
 //            UndoRedo *frameChangeUndoRedo =
 //                    new ChangeViewedFrameUndoRedo(mLastUndoRedoFrame,
@@ -51,7 +109,7 @@ void UndoRedoStack::redo() {
     if(mRedoStack.isEmpty()) {
         return;
     }
-    UndoRedo *toRedo = mRedoStack.last();
+    stdsptr<UndoRedo> toRedo = mRedoStack.last();
     if(toRedo->getFrame() != mMainWindow->getCurrentFrame()) {
         mMainWindow->setCurrentFrameForAllWidgets(toRedo->getFrame());
         return;
@@ -66,7 +124,7 @@ void UndoRedoStack::undo() {
     if(mUndoStack.isEmpty()) {
         return;
     }
-    UndoRedo *toUndo = mUndoStack.last();
+    stdsptr<UndoRedo> toUndo = mUndoStack.last();
     if(toUndo->getFrame() != mMainWindow->getCurrentFrame()) {
         mMainWindow->setCurrentFrameForAllWidgets(toUndo->getFrame());
         return;
@@ -77,8 +135,61 @@ void UndoRedoStack::undo() {
     mRedoStack << toUndo;
 }
 
+void UndoRedoStack::blockUndoRedo() {
+    mUndoRedoBlocked = true;
+}
+
+void UndoRedoStack::unblockUndoRedo() {
+    mUndoRedoBlocked = false;
+}
+
+bool UndoRedoStack::undoRedoBlocked() {
+    return mUndoRedoBlocked;
+}
+
 UndoRedo::UndoRedo(const QString &name) {
     mName = name;
     printName();
     mFrame = MainWindow::getInstance()->getCurrentFrame();
+}
+
+UndoRedo::~UndoRedo() {
+    qDebug() << "DELETE " << mName;
+}
+
+void UndoRedo::undo() {}
+
+void UndoRedo::redo() {}
+
+void UndoRedo::printName() { qDebug() << mName; }
+
+void UndoRedo::printUndoName() { qDebug() << "UNDO " << mName; }
+
+void UndoRedo::printRedoName() { qDebug() << "REDO " << mName; }
+
+int UndoRedo::getFrame() { return mFrame; }
+
+UndoRedoSet::UndoRedoSet() : UndoRedo("UndoRedoSet") {
+}
+
+UndoRedoSet::~UndoRedoSet() {}
+
+void UndoRedoSet::undo() {
+    for(int i = mSet.length() - 1; i >= 0; i--) {
+        mSet.at(i)->undo();
+    }
+}
+
+void UndoRedoSet::redo() {
+    Q_FOREACH(const stdsptr<UndoRedo> & undoRedo, mSet) {
+        undoRedo->redo();
+    }
+}
+
+void UndoRedoSet::addUndoRedo(const stdsptr<UndoRedo> &undoRedo) {
+    mSet << undoRedo;
+}
+
+bool UndoRedoSet::isEmpty() {
+    return mSet.isEmpty();
 }

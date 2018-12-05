@@ -554,7 +554,7 @@ public:
     void moveMaxFrameForAllSelected(const int &dFrame);
 
     UndoRedoStack *getUndoRedoStack() {
-        return mUndoRedoStack;
+        return mUndoRedoStack.get();
     }
 
     void blockUndoRedo();
@@ -580,7 +580,7 @@ private:
     bool isAltPressed();
     bool isAltPressed(QKeyEvent *event);
 protected:
-    UndoRedoStack *mUndoRedoStack = nullptr;
+    stdsptr<UndoRedoStack> mUndoRedoStack;
 
     const Brush *mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
@@ -610,6 +610,7 @@ protected:
 
     qreal mResolutionFraction;
 
+    MainWindow *mMainWindow;
     CanvasWindow *mCanvasWindow;
     QWidget *mCanvasWidget;
 

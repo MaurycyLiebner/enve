@@ -11,6 +11,7 @@ class Key;
 class QPainter;
 class AnimatorUpdater;
 class BoundingBox;
+class UndoRedoStack;
 
 class InternalMimeData : public QMimeData {
 public:
@@ -190,7 +191,7 @@ public:
 
     //
 
-    void addUndoRedo(UndoRedo *undoRedo);
+    void addUndoRedo(const stdsptr<UndoRedo> &undoRedo);
 
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
@@ -207,7 +208,7 @@ public:
 protected:
     Property(const QString &name);
 
-    MainWindow *mMainWindow;
+    stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     QPointer<Property> mLastSetParent;
 public slots:
     void prp_callUpdater();

@@ -4,10 +4,8 @@
 #include "GUI/mainwindow.h"
 #include "Boxes/boundingbox.h"
 
-Property::Property(const QString& name) {
-    mMainWindow = MainWindow::getInstance();
-    prp_setName(name);
-}
+Property::Property(const QString& name) :
+    prp_mName(name) {}
 
 void Property::prp_valueChanged() {
     prp_updateInfluenceRangeAfterChanged();
@@ -100,15 +98,15 @@ void Property::prp_callFinishUpdater() {
     prp_mUpdater->updateFinal();
 }
 
-void Property::addUndoRedo(UndoRedo *undoRedo) {
-    UndoRedoStack *stack = mMainWindow->getUndoRedoStack();
-    if(stack == nullptr) return;
-    stack->addUndoRedo(undoRedo);
+void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
+    if(mParentCanvasUndoRedoStack == nullptr) return;
+    mParentCanvasUndoRedoStack->addUndoRedo(undoRedo);
 }
 
 BoundingBox *Property::getLastSetParentBoundingBoxAncestor() {
     if(mLastSetParent == nullptr) return nullptr;
-    if(mLastSetParent->SWT_isBoundingBox()) return GetAsPtr(mLastSetParent, BoundingBox);
+    if(mLastSetParent->SWT_isBoundingBox())
+        return GetAsPtr(mLastSetParent, BoundingBox);
     return mLastSetParent->getLastSetParentBoundingBoxAncestor();
 }
 
