@@ -1,7 +1,6 @@
 #include "animationbox.h"
 #include <QMenu>
 #include "GUI/BoxesList/boxsinglewidget.h"
-#include "Animators/animatorupdater.h"
 #include "canvas.h"
 #include "filesourcescache.h"
 #include "imagebox.h"

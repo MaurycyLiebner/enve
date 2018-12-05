@@ -1,8 +1,8 @@
 #include "Boxes/circle.h"
 #include "canvas.h"
 #include "MovablePoints/movablepoint.h"
-#include "Animators/animatorupdater.h"
 #include "Animators/gradientpoints.h"
+#include "PropertyUpdaters/nodepointupdater.h"
 
 Circle::Circle() :
     PathBox(TYPE_CIRCLE) {

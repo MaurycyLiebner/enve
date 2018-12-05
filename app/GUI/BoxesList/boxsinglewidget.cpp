@@ -15,9 +15,9 @@
 #include "Properties/comboboxproperty.h"
 #include "Animators/qstringanimator.h"
 #include "Animators/randomqrealgenerator.h"
-#include "Animators/animatorupdater.h"
 #include "Properties/boolproperty.h"
 #include "Properties/intproperty.h"
+#include "PropertyUpdaters/propertyupdater.h"
 
 QPixmap* BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap* BoxSingleWidget::INVISIBLE_PIXMAP;
@@ -782,7 +782,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 auto qrealTarget = GetAsPtr(target, QrealAnimator);
                 auto randGen = SPtrCreate(RandomQrealGenerator)(0, 9999);
                 auto updater = GetAsSPtr(qrealTarget->prp_getUpdater(),
-                                         AnimatorUpdater);
+                                         PropertyUpdater);
                 randGen->prp_setBlockedUpdater(updater);
                 qrealTarget->setGenerator(randGen);
             } else if(selectedAction->objectName() == "swt_remove_random_generator") {

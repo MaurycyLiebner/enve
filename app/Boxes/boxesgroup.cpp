@@ -13,9 +13,9 @@
 #include "Boxes/particlebox.h"
 #include "durationrectangle.h"
 #include "linkbox.h"
-#include "Animators/animatorupdater.h"
 #include "PathEffects/patheffectanimators.h"
 #include "PathEffects/patheffect.h"
+#include "PropertyUpdaters/groupallpathsupdater.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 

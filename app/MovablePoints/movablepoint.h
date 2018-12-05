@@ -11,7 +11,7 @@ class BoundingBox;
 class NodePoint;
 class BasicTransformAnimator;
 
-class AnimatorUpdater;
+class PropertyUpdater;
 
 enum MovablePointType : short {
     TYPE_PATH_POINT,

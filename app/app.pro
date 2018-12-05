@@ -81,7 +81,6 @@ SOURCES += main.cpp\
     Animators/pathanimator.cpp \
     Animators/qstringanimator.cpp \
     Animators/qpointfanimator.cpp \
-    Animators/animatorupdater.cpp \
     Boxes/circle.cpp \
     Boxes/textbox.cpp \
     Boxes/vectorpath.cpp \
@@ -240,7 +239,21 @@ SOURCES += main.cpp\
     MovablePoints/animatedpoint.cpp \
     MovablePoints/nodepoint.cpp \
     MovablePoints/pathpivot.cpp \
-    MovablePoints/movablepoint.cpp
+    MovablePoints/movablepoint.cpp \
+    PropertyUpdaters/propertyupdater.cpp \
+    PropertyUpdaters/transformupdater.cpp \
+    PropertyUpdaters/nodepointupdater.cpp \
+    PropertyUpdaters/gradientupdater.cpp \
+    PropertyUpdaters/strokewidthupdater.cpp \
+    PropertyUpdaters/displayedfillstrokesettingsupdater.cpp \
+    PropertyUpdaters/pixmapeffectupdater.cpp \
+    PropertyUpdaters/animationboxframeupdater.cpp \
+    PropertyUpdaters/particlesupdater.cpp \
+    PropertyUpdaters/gradientpointsupdater.cpp \
+    PropertyUpdaters/singlesoundupdater.cpp \
+    PropertyUpdaters/randomqrealgeneratorupdater.cpp \
+    PropertyUpdaters/paintboxsizeupdaters.cpp \
+    PropertyUpdaters/groupallpathsupdater.cpp
 HEADERS  += \
     canvas.h \
     undoredo.h \
@@ -271,7 +284,6 @@ HEADERS  += \
     Animators/qrealanimator.h \
     Animators/qpointfanimator.h \
     Animators/boolanimator.h \
-    Animators/animatorupdater.h \
     Animators/intanimator.h \
     Boxes/circle.h \
     Boxes/boundingbox.h \
@@ -437,7 +449,21 @@ HEADERS  += \
     MovablePoints/nodepoint.h \
     MovablePoints/movablepoint.h \
     MovablePoints/gradientpoint.h \
-    MovablePoints/boxpathpoint.h
+    MovablePoints/boxpathpoint.h \
+    PropertyUpdaters/propertyupdater.h \
+    PropertyUpdaters/transformupdater.h \
+    PropertyUpdaters/nodepointupdater.h \
+    PropertyUpdaters/gradientupdater.h \
+    PropertyUpdaters/strokewidthupdater.h \
+    PropertyUpdaters/displayedfillstrokesettingsupdater.h \
+    PropertyUpdaters/pixmapeffectupdater.h \
+    PropertyUpdaters/animationboxframeupdater.h \
+    PropertyUpdaters/particlesupdater.h \
+    PropertyUpdaters/gradientpointsupdater.h \
+    PropertyUpdaters/singlesoundupdater.h \
+    PropertyUpdaters/randomqrealgeneratorupdater.h \
+    PropertyUpdaters/paintboxsizeupdaters.h \
+    PropertyUpdaters/groupallpathsupdater.h
 
 RESOURCES += \
     resources.qrc

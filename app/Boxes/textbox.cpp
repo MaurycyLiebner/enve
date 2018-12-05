@@ -5,7 +5,7 @@
 #include "canvas.h"
 #include "Animators/gradientpoints.h"
 #include "Animators/qstringanimator.h"
-#include "Animators/animatorupdater.h"
+#include "PropertyUpdaters/nodepointupdater.h"
 
 TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mPivotAutoAdjust = false;

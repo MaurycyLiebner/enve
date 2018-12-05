@@ -4,11 +4,13 @@
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "GUI/mainwindow.h"
 #include "GUI/ColorWidgets/colorvaluerect.h"
-#include "Animators/animatorupdater.h"
+#include "PropertyUpdaters/gradientupdater.h"
+#include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 #include "skqtconversions.h"
 #include "skiaincludes.h"
 #include "Boxes/pathbox.h"
 #include "gradientpoints.h"
+#include "PropertyUpdaters/strokewidthupdater.h"
 
 ColorSetting::ColorSetting() {
     mChangedValue = CVR_ALL;

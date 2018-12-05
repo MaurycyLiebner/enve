@@ -6,9 +6,10 @@
 #include "GUI/mainwindow.h"
 #include "MovablePoints/pathpivot.h"
 #include "pointhelpers.h"
-#include "Animators/animatorupdater.h"
+#include "PropertyUpdaters/nodepointupdater.h"
 #include "MovablePoints/nodepoint.h"
 #include "Animators/pathanimator.h"
+#include "Animators/PathAnimators/vectorpathanimator.h"
 #include "Animators/gradientpoints.h"
 
 VectorPath::VectorPath() :

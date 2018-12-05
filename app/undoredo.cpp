@@ -1,5 +1,4 @@
 #include "undoredo.h"
-#include "GUI/mainwindow.h"
 
 UndoRedoStack::UndoRedoStack(const std::function<bool(int)> &changeFrameFunc) :
     mChangeFrameFunc(changeFrameFunc) {
@@ -35,7 +34,7 @@ bool UndoRedoStack::addSet() {
 
 void UndoRedoStack::addToSet(const stdsptr<UndoRedo>& undoRedo) {
     if(mCurrentSet == nullptr) {
-        mCurrentSet = SPtrCreate(UndoRedoSet)();
+        mCurrentSet = SPtrCreate(UndoRedoSet)(mCurrentAbsFrame);
     }
     mCurrentSet->addUndoRedo(undoRedo);
 }
@@ -63,6 +62,7 @@ void UndoRedoStack::clearAll() {
 
 void UndoRedoStack::addUndoRedo(const stdsptr<UndoRedo> &undoRedo) {
     if(undoRedo == nullptr) return;
+    undoRedo->setFrame(mCurrentAbsFrame);
     if(mNumberOfSets != 0) {
         addToSet(undoRedo);
     } else {
@@ -133,7 +133,6 @@ bool UndoRedoStack::undoRedoBlocked() {
 UndoRedo::UndoRedo(const QString &name) {
     mName = name;
     printName();
-    mFrame = MainWindow::getInstance()->getCurrentFrame();
 }
 
 UndoRedo::~UndoRedo() {
@@ -152,7 +151,9 @@ void UndoRedo::printRedoName() { qDebug() << "REDO " << mName; }
 
 int UndoRedo::getFrame() { return mFrame; }
 
-UndoRedoSet::UndoRedoSet() : UndoRedo("UndoRedoSet") {
+UndoRedoSet::UndoRedoSet(const int& absFrame) :
+    UndoRedo("UndoRedoSet") {
+    setFrame(absFrame);
 }
 
 UndoRedoSet::~UndoRedoSet() {}

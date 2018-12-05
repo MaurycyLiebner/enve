@@ -11,7 +11,7 @@
 class BoundingBox;
 class NodePoint;
 
-class AnimatorUpdater;
+class PropertyUpdater;
 
 class QPointFAnimator;
 

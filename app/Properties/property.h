@@ -7,7 +7,7 @@ class MainWindow;
 class ComplexAnimator;
 class Key;
 class QPainter;
-class AnimatorUpdater;
+class PropertyUpdater;
 class UndoRedoStack;
 
 class InternalMimeData : public QMimeData {
@@ -136,13 +136,13 @@ public:
     const QString &prp_getName();
     void prp_setName(const QString &newName);
 
-    virtual void prp_setUpdater(const stdsptr<AnimatorUpdater> &updater);
+    virtual void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
     void prp_blockUpdater();
     void prp_callFinishUpdater();
 
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
-    void prp_setBlockedUpdater(const stdsptr<AnimatorUpdater> &updater);
+    void prp_setBlockedUpdater(const stdsptr<PropertyUpdater> &updater);
 
     bool SWT_isProperty() { return true; }
 
@@ -182,7 +182,7 @@ public:
         Q_UNUSED(device);
     }
 
-    AnimatorUpdater *prp_getUpdater() {
+    PropertyUpdater *prp_getUpdater() {
         return prp_mUpdater.get();
     }
 
@@ -263,7 +263,7 @@ signals:
 protected:
     bool prp_mUpdaterBlocked = false;
     int prp_mParentFrameShift = 0;
-    stdsptr<AnimatorUpdater> prp_mUpdater;
+    stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName = "";
 };
 

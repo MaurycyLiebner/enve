@@ -10,11 +10,11 @@
 #include "singlewidgetabstraction.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
-#include "Animators/animatorupdater.h"
 #include "pointhelpers.h"
 #include "skqtconversions.h"
 #include "global.h"
 #include "MovablePoints/movablepoint.h"
+#include "PropertyUpdaters/pixmapeffectupdater.h"
 
 QList<qptr<BoundingBox>> BoundingBox::mLoadedBoxes;
 QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::mFunctionsWaitingForBoxLoad;

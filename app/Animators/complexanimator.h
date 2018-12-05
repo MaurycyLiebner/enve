@@ -29,7 +29,7 @@ public:
                            const bool &saveUndoRedo = true);
 
     void prp_startTransform();
-    void prp_setUpdater(const stdsptr<AnimatorUpdater>& updater);
+    void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
     void prp_setAbsFrame(const int &frame);
 
     void prp_retrieveSavedValue();

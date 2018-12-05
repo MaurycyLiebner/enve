@@ -1,8 +1,8 @@
 #include "Boxes/rectangle.h"
 #include "canvas.h"
-#include "Animators/animatorupdater.h"
 #include "Animators/gradientpoints.h"
 #include "MovablePoints/animatedpoint.h"
+#include "PropertyUpdaters/nodepointupdater.h"
 
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     setName("Rectangle");

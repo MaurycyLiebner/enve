@@ -4,8 +4,8 @@
 #include "key.h"
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "global.h"
-#include "Animators/animatorupdater.h"
 #include "fakecomplexanimator.h"
+#include "PropertyUpdaters/propertyupdater.h"
 
 Animator::Animator(const QString& name) : Property(name) {}
 

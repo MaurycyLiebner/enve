@@ -3,7 +3,7 @@
 #include "qrealanimator.h"
 #include "qrealkey.h"
 #include "pointhelpers.h"
-#include "animatorupdater.h"
+#include "PropertyUpdaters/randomqrealgeneratorupdater.h"
 #include "Properties/comboboxproperty.h"
 #include "Properties/intproperty.h"
 

@@ -1,7 +1,7 @@
 #include "undoredo.h"
 #include <QDebug>
 #include "MovablePoints/boxpathpoint.h"
-#include "animatorupdater.h"
+#include "PropertyUpdaters/transformupdater.h"
 #include "qrealanimator.h"
 #include "transformanimator.h"
 #include "Boxes/boundingbox.h"

@@ -1,13 +1,14 @@
 #include "particlebox.h"
 #include "GUI/mainwindow.h"
 #include "durationrectangle.h"
-#include "Animators/animatorupdater.h"
 #include "canvas.h"
 #include "pointhelpers.h"
 #include "MovablePoints/animatedpoint.h"
+#include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
+#include "PropertyUpdaters/particlesupdater.h"
 
-double fRand(double fMin, double fMax) {
-    double f = (double)rand() / RAND_MAX;
+double fRand(const double& fMin, const double& fMax) {
+    double f = static_cast<double>(rand()) / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 

@@ -105,7 +105,7 @@ protected:
     qsptr<QPointFAnimator> mScaleAnimator;
     qsptr<QrealAnimator> mRotAnimator;
 
-    stdsptr<AnimatorUpdater> mTransformUpdater;
+    stdsptr<PropertyUpdater> mTransformUpdater;
 public slots:
     virtual void updateCombinedTransform(const UpdateReason &reason);
 signals:

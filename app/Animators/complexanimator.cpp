@@ -315,7 +315,7 @@ void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
     prp_callUpdater();
 }
 
-void ComplexAnimator::prp_setUpdater(const stdsptr<AnimatorUpdater>& updater) {
+void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {
     if(prp_mUpdaterBlocked) return;
     Animator::prp_setUpdater(updater);
 

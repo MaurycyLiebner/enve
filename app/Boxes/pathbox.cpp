@@ -1,13 +1,14 @@
 #include "Boxes/pathbox.h"
 #include "GUI/mainwindow.h"
 #include "MovablePoints/gradientpoint.h"
-#include "Animators/animatorupdater.h"
 #include "Animators/gradientpoints.h"
 #include "skiaincludes.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
 #include "canvas.h"
 #include "vectorpath.h"
+#include "PropertyUpdaters/nodepointupdater.h"
+#include "PropertyUpdaters/gradientpointsupdater.h"
 
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {

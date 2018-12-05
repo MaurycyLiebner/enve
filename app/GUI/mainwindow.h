@@ -148,7 +148,6 @@ public:
         return mFontWidget;
     }
     void addFileUpdateScheduler(const stdsptr<_ScheduledExecutor>& scheduler);
-    void finishUndoRedoSet();
     Brush *getCurrentBrush();
 
     UsageWidget* getUsageWidget() {
@@ -264,7 +263,7 @@ private:
     QMenu *mRenderMenu;
 
     CanvasWindow *mCanvasWindow;
-    UndoRedoStack *mCurrentUndoRedoStack = nullptr;
+    stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
     QList<stdsptr<_ScheduledExecutor> > mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);

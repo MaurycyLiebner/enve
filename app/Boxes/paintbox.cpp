@@ -2,8 +2,8 @@
 #include "Paint/surface.h"
 #include "Paint/animatedsurface.h"
 #include "canvas.h"
-#include "Animators/animatorupdater.h"
 #include "MovablePoints/animatedpoint.h"
+#include "PropertyUpdaters/paintboxsizeupdaters.h"
 
 PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {

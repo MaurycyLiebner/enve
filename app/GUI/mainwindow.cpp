@@ -958,14 +958,6 @@ bool MainWindow::isAltPressed() {
     return QApplication::keyboardModifiers() & Qt::AltModifier;
 }
 
-void MainWindow::finishUndoRedoSet() {
-    if(mCurrentUndoRedoStack == nullptr) return;
-    if(mCurrentUndoRedoStack->finishSet()) {
-        setFileChangedSinceSaving(true);
-    }
-    mCurrentUndoRedoStack->startNewSet();
-}
-
 Brush *MainWindow::getCurrentBrush() {
 //    return mBrushSettingsWidget->getCurrentBrush();
     return nullptr;
@@ -975,8 +967,10 @@ void MainWindow::callUpdateSchedulers() {
     if(!isEnabled()) {
         return;
     }
-    if(mCurrentUndoRedoStack->finishSet()) {
-        setFileChangedSinceSaving(true);
+    if(mCurrentUndoRedoStack) {
+        if(mCurrentUndoRedoStack->finishSet()) {
+            setFileChangedSinceSaving(true);
+        }
     }
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
@@ -1004,7 +998,9 @@ void MainWindow::callUpdateSchedulers() {
     mFillStrokeSettings->update();
     emit updateAll();
 
-    mCurrentUndoRedoStack->startNewSet();
+    if(mCurrentUndoRedoStack) {
+        mCurrentUndoRedoStack->startNewSet();
+    }
 }
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {

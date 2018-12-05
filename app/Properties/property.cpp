@@ -1,7 +1,7 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
-#include "Animators/animatorupdater.h"
 #include "undoredo.h"
+#include "PropertyUpdaters/propertyupdater.h"
 
 Property::Property(const QString& name) :
     prp_mName(name) {}
@@ -61,7 +61,7 @@ void Property::prp_setName(const QString &newName) {
     prp_mName = newName;
 }
 
-void Property::prp_setUpdater(const stdsptr<AnimatorUpdater>& updater) {
+void Property::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {
     if(prp_mUpdaterBlocked) return;
     if(updater == nullptr) {
         prp_mUpdater.reset();
@@ -70,7 +70,7 @@ void Property::prp_setUpdater(const stdsptr<AnimatorUpdater>& updater) {
     }
 }
 
-void Property::prp_setBlockedUpdater(const stdsptr<AnimatorUpdater>& updater) {
+void Property::prp_setBlockedUpdater(const stdsptr<PropertyUpdater>& updater) {
     prp_mUpdaterBlocked = false;
     prp_setUpdater(updater);
     prp_blockUpdater();

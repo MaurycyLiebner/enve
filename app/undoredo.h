@@ -19,6 +19,9 @@ public:
     void printUndoName();
     void printRedoName();
 
+    void setFrame(const int& frame) {
+        mFrame = frame;
+    }
     int getFrame();
 private:
     int mFrame;
@@ -27,7 +30,7 @@ private:
 
 class UndoRedoSet : public UndoRedo {
 public:
-    UndoRedoSet();
+    UndoRedoSet(const int& absFrame);
     ~UndoRedoSet();
 
     void undo();
@@ -38,7 +41,6 @@ public:
 private:
     QList<stdsptr<UndoRedo>> mSet;
 };
-
 
 class UndoRedoStack : public StdSelfRef {
 public:
@@ -61,7 +63,12 @@ public:
     void blockUndoRedo();
     void unblockUndoRedo();
     bool undoRedoBlocked();
+
+    void setFrame(const int& frame) {
+        mCurrentAbsFrame = frame;
+    }
 private:
+    int mCurrentAbsFrame;
     std::function<bool(int)> mChangeFrameFunc;
     bool addSet();
     void addToSet(const stdsptr<UndoRedo> &undoRedo);

@@ -16,13 +16,13 @@
 #include "pointhelpers.h"
 #include "MovablePoints/nodepoint.h"
 #include "Boxes/linkbox.h"
-#include "Animators/animatorupdater.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
 #include "Paint/brush.h"
 #include <QFile>
 #include "renderinstancesettings.h"
 #include "videoencoder.h"
+#include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
                int canvasWidth, int canvasHeight,
@@ -38,7 +38,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
         }
         return false;
     };
-    mUndoRedoStack = SPtrCreate(UndoRedoStack)(changeFrameFunc, mMainWindow);
+    mUndoRedoStack = SPtrCreate(UndoRedoStack)(changeFrameFunc);
     mFps = fps;
     connect(this, SIGNAL(nameChanged(QString)),
             this, SLOT(emitCanvasNameChanged()));
@@ -866,6 +866,7 @@ void Canvas::prp_setAbsFrame(const int &frame) {
     Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
         box->prp_setAbsFrame(frame);
     }
+    mUndoRedoStack->setFrame(frame);
 }
 
 void Canvas::clearSelectionAction() {
