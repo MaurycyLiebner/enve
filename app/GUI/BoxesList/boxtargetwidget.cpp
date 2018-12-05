@@ -19,7 +19,8 @@ void BoxTargetWidget::setTargetProperty(BoxTargetProperty *property) {
 void BoxTargetWidget::dropEvent(
         QDropEvent *event) {
     if(event->mimeData()->hasFormat("boundingbox")) {
-        auto boxMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
+        auto boxMimeData = static_cast<
+                const BoundingBoxMimeData*>(event->mimeData());
         BoundingBox *targetT = boxMimeData->getTarget();
         mProperty->setTarget(targetT);
         mDragging = false;
@@ -31,11 +32,14 @@ void BoxTargetWidget::dropEvent(
 void BoxTargetWidget::dragEnterEvent(
         QDragEnterEvent *event) {
     if(event->mimeData()->hasFormat("boundingbox")) {
-        auto boxMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
+        auto boxMimeData = static_cast<
+                const BoundingBoxMimeData*>(event->mimeData());
         BoundingBox *targetT = boxMimeData->getTarget();
         BoundingBox *parentBox =
-                mProperty->getLastSetParentBoundingBoxAncestor();
+                GetAsPtr(mProperty->getLastSetBoundingBoxAncestor(),
+                         BoundingBox);
         if(parentBox == targetT) return;
+        if(parentBox->getParentGroup() != targetT->getParentGroup()) return;
         event->acceptProposedAction();
         mDragging = true;
         update();
@@ -51,7 +55,9 @@ void BoxTargetWidget::dragLeaveEvent(
 void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
     if(mProperty == nullptr) return;
     if(event->button() == Qt::LeftButton) {
-        BoundingBox *parentBox = mProperty->getLastSetParentBoundingBoxAncestor();
+        BoundingBox *parentBox =
+                GetAsPtr(mProperty->getLastSetBoundingBoxAncestor(),
+                         BoundingBox);
         if(parentBox == nullptr) return;
         BoxesGroup *srcGroup = parentBox->getParentGroup();
         if(srcGroup == nullptr) return;

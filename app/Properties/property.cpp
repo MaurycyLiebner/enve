@@ -1,8 +1,7 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
 #include "Animators/animatorupdater.h"
-#include "GUI/mainwindow.h"
-#include "Boxes/boundingbox.h"
+#include "undoredo.h"
 
 Property::Property(const QString& name) :
     prp_mName(name) {}
@@ -103,11 +102,10 @@ void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
     mParentCanvasUndoRedoStack->addUndoRedo(undoRedo);
 }
 
-BoundingBox *Property::getLastSetParentBoundingBoxAncestor() {
+Property *Property::getLastSetBoundingBoxAncestor() {
     if(mLastSetParent == nullptr) return nullptr;
-    if(mLastSetParent->SWT_isBoundingBox())
-        return GetAsPtr(mLastSetParent, BoundingBox);
-    return mLastSetParent->getLastSetParentBoundingBoxAncestor();
+    if(mLastSetParent->SWT_isBoundingBox()) mLastSetParent.data();
+    return mLastSetParent->getLastSetBoundingBoxAncestor();
 }
 
 void Property::graphUpdateAfterKeysChanged() {

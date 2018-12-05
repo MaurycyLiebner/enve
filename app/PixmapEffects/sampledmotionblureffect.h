@@ -1,6 +1,7 @@
 #ifndef SAMPLEDMOTIONBLUREFFECT_H
 #define SAMPLEDMOTIONBLUREFFECT_H
 #include "pixmapeffect.h"
+class BoundingBox;
 
 struct SampledMotionBlurEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;

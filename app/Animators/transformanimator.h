@@ -4,6 +4,7 @@
 #include "Animators/complexanimator.h"
 #include "skiaincludes.h"
 
+class BoundingBox;
 class TransformUpdater;
 class BoxPathPoint;
 class MovablePoint;

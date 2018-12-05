@@ -10,7 +10,6 @@ class ComplexAnimator;
 class Key;
 class QPainter;
 class AnimatorUpdater;
-class BoundingBox;
 class UndoRedoStack;
 
 class InternalMimeData : public QMimeData {
@@ -204,7 +203,7 @@ public:
         mLastSetParent = parent;
     }
 
-    BoundingBox *getLastSetParentBoundingBoxAncestor();
+    Property *getLastSetBoundingBoxAncestor();
 protected:
     Property(const QString &name);
 
