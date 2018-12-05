@@ -10,7 +10,7 @@ class ExternalLinkBox : public BoxesGroup {
 public:
     void reload();
 
-    void changeSrc();
+    void changeSrc(QWidget *dialogParent);
 
     void setSrc(const QString &src);
 private:

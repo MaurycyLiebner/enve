@@ -597,6 +597,28 @@ qsptr<BoundingBox> BoxesGroup::createLink() {
     return linkBox;
 }
 
+void processChildData(BoundingBox* child,
+                      BoxesGroupRenderData* parentData,
+                      const qreal& boxRelFrame) {
+    auto boxRenderData =
+            GetAsSPtr(child->getCurrentRenderData(qRound(boxRelFrame)),
+                      BoundingBoxRenderData);
+    if(boxRenderData == nullptr) {
+        boxRenderData = child->createRenderData();
+        boxRenderData->reason = parentData->reason;
+        //boxRenderData->parentIsTarget = false;
+        boxRenderData->useCustomRelFrame = true;
+        boxRenderData->customRelFrame = boxRelFrame;
+        boxRenderData->addScheduler();
+    } else {
+        if(boxRenderData->copied) {
+            child->nullifyCurrentRenderData(boxRenderData->relFrame);
+        }
+    }
+    boxRenderData->addDependent(parentData);
+    parentData->childrenRenderData << boxRenderData;
+}
+
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
@@ -611,22 +633,13 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         foreach(const qsptr<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                auto boxRenderData = box->createRenderData();
                 if(box->SWT_isPathBox()) {
                     idT = groupData->childrenRenderData.count();
                     lastPathBox = GetAsSPtr(box, PathBox);
                     continue;
                 }
-                boxRenderData->parentIsTarget = false;
-                boxRenderData->useCustomRelFrame = true;
-                boxRenderData->customRelFrame = boxRelFrame;
-                boxRenderData->addScheduler();
-                boxRenderData->addDependent(data);
-                boxRenderData->schedulerProccessed();
-                mMainWindow->getCanvasWindow()->addUpdatableAwaitingUpdate(boxRenderData);
+                processChildData(box.data(), groupData.get(), boxRelFrame);
 
-                groupData->childrenRenderData <<
-                        GetAsSPtr(boxRenderData, BoundingBoxRenderData);
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
                              childrenEffectsMargin);
@@ -647,23 +660,8 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         foreach(const qsptr<BoundingBox> &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                auto boxRenderData =
-                        GetAsSPtr(box->getCurrentRenderData(qRound(boxRelFrame)),
-                                  BoundingBoxRenderData);
-                if(boxRenderData == nullptr) {
-                    boxRenderData = box->createRenderData();
-                    boxRenderData->reason = data->reason;
-                    //boxRenderData->parentIsTarget = false;
-                    boxRenderData->useCustomRelFrame = true;
-                    boxRenderData->customRelFrame = boxRelFrame;
-                    boxRenderData->addScheduler();
-                } else {
-                    if(boxRenderData->copied) {
-                        box->nullifyCurrentRenderData(boxRenderData->relFrame);
-                    }
-                }
-                boxRenderData->addDependent(data);
-                groupData->childrenRenderData << boxRenderData;
+                processChildData(box.data(), groupData.get(), boxRelFrame);
+
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
                              childrenEffectsMargin);
@@ -901,7 +899,14 @@ void BoxesGroup::prp_setAbsFrame(const int &frame) {
 
 void BoxesGroup::removeContainedBoxFromList(const int &id,
                                             const bool &saveUndoRedo) {
-    qsptr<BoundingBox> box = mContainedBoxes.at(id);
+    qsptr<BoundingBox> box = mContainedBoxes.takeAt(id);
+    if(box->SWT_isBoxesGroup()) {
+        BoxesGroup* group = GetAsPtr(box, BoxesGroup);
+        if(group->isCurrentGroup()) {
+            emit group->setParentAsCurrentGroup();
+        }
+    }
+
     box->clearAllCache();
     if(box->isSelected()) {
         box->removeFromSelection();
@@ -911,18 +916,11 @@ void BoxesGroup::removeContainedBoxFromList(const int &id,
 //        addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
 //                                                   box) );
     }
-    mContainedBoxes.removeAt(id);
 
-    if(box->SWT_isBoxesGroup()) {
-        qsptr<BoxesGroup> group = GetAsSPtr(box, BoxesGroup);
-        if(group->isCurrentGroup()) {
-            mMainWindow->getCanvasWindow()->getCurrentCanvas()->
-                    setCurrentBoxesGroup(group->getParentGroup());
-        }
-    }
     updateContainedBoxIds(id, saveUndoRedo);
 
     SWT_removeChildAbstractionForTargetFromAll(box.get());
+    box->setParentGroup(nullptr);
 
     foreach(const qptr<BoundingBox>& box, mLinkingBoxes) {
         qsptr<InternalLinkGroupBox> internalLinkGroup =

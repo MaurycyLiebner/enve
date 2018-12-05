@@ -287,6 +287,7 @@ protected:
     void iniPathEffects();
     bool isLastPathBox(PathBox *pathBox);
 signals:
+    void setParentAsCurrentGroup();
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);
     void addAnimatedBoundingBoxSignal(BoundingBox*);

@@ -191,20 +191,9 @@ public:
     //
 
     void addUndoRedo(UndoRedo *undoRedo);
-    void callUpdateSchedulers();
-    MainWindow *getMainWindow();
-    virtual void schedulePivotUpdate();
-    bool isShiftPressed();
-    bool isCtrlPressed();
-    bool isAltPressed();
 
-    int getCurrentFrameFromMainWindow();
-    int getFrameCount();
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
-    bool isShiftPressed(QKeyEvent *event);
-    bool isCtrlPressed(QKeyEvent *event);
-    bool isAltPressed(QKeyEvent *event);
     Property *getLastSetParent() {
         if(mLastSetParent == nullptr) return nullptr;
         return mLastSetParent;

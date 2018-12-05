@@ -106,61 +106,16 @@ void Property::addUndoRedo(UndoRedo *undoRedo) {
     stack->addUndoRedo(undoRedo);
 }
 
-void Property::callUpdateSchedulers() {
-    mMainWindow->callUpdateSchedulers();
-}
-
-MainWindow *Property::getMainWindow() {
-    return mMainWindow;
-}
-
-bool Property::isShiftPressed() {
-    return mMainWindow->isShiftPressed();
-}
-
-bool Property::isShiftPressed(QKeyEvent *event) {
-    return event->modifiers() & Qt::ShiftModifier;
-}
-
-bool Property::isCtrlPressed() {
-    return mMainWindow->isCtrlPressed();
-}
-
-bool Property::isCtrlPressed(QKeyEvent *event) {
-    return event->modifiers() & Qt::ControlModifier;
-}
-
-bool Property::isAltPressed() {
-    return mMainWindow->isAltPressed();
-}
-
-bool Property::isAltPressed(QKeyEvent *event) {
-    return event->modifiers() & Qt::AltModifier;
-}
-
 BoundingBox *Property::getLastSetParentBoundingBoxAncestor() {
     if(mLastSetParent == nullptr) return nullptr;
     if(mLastSetParent->SWT_isBoundingBox()) return GetAsPtr(mLastSetParent, BoundingBox);
     return mLastSetParent->getLastSetParentBoundingBoxAncestor();
 }
 
-int Property::getCurrentFrameFromMainWindow() {
-    return mMainWindow->getCurrentFrame();
-}
-
-int Property::getFrameCount() {
-    return mMainWindow->getFrameCount();
-}
-
-void Property::graphUpdateAfterKeysChanged()
-{
+void Property::graphUpdateAfterKeysChanged() {
     //mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();
 }
 
 void Property::graphScheduleUpdateAfterKeysChanged() {
     //mMainWindow->getKeysView()->scheduleGraphUpdateAfterKeysChanged();
-}
-
-void Property::schedulePivotUpdate() {
-    mMainWindow->schedulePivotUpdate();
 }

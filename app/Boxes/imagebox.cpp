@@ -47,13 +47,11 @@ void ImageBox::addActionsToMenu(QMenu *menu) {
             setObjectName("ib_set_src_file");
 }
 
-void ImageBox::changeSourceFile() {
-    MainWindow::getInstance()->disableEventFilter();
+void ImageBox::changeSourceFile(QWidget* dialogParent) {
     QString importPath = QFileDialog::getOpenFileName(
-                                            MainWindow::getInstance(),
+                                            dialogParent,
                                             "Change Source", "",
                                             "Image Files (*.png *.jpg)");
-    MainWindow::getInstance()->enableEventFilter();
     if(!importPath.isEmpty()) {
         setFilePath(importPath);
     }
@@ -75,9 +73,10 @@ stdsptr<BoundingBoxRenderData> ImageBox::createRenderData() {
     return SPtrCreate(ImageBoxRenderData)(mImgCacheHandler, this);
 }
 
-bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
+bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction,
+                                          QWidget* widgetsParent) {
     if(selectedAction->objectName() == "ib_set_src_file") {
-        changeSourceFile();
+        changeSourceFile(widgetsParent);
     } else if(selectedAction->objectName() == "ib_reload") {
         if(mImgCacheHandler != nullptr) {
             mImgCacheHandler->clearCache();

@@ -1181,8 +1181,7 @@ void MainWindow::updateDisplayedFillStrokeSettingsIfNeeded() {
     }
 }
 
-void MainWindow::scheduleDisplayedFillStrokeSettingsUpdate()
-{
+void MainWindow::scheduleDisplayedFillStrokeSettingsUpdate() {
     mDisplayedFillStrokeSettingsUpdateNeeded = true;
 }
 

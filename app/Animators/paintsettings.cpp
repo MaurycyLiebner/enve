@@ -422,9 +422,7 @@ void PaintSettings::setGradient(Gradient* gradient,
     }
     setGradientVar(gradient);
 
-    if(mTarget_k->isSelected()) {
-        mMainWindow->scheduleDisplayedFillStrokeSettingsUpdate();
-    }
+    mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
 }
 
 void PaintSettings::setCurrentColor(const QColor &color) {
@@ -450,9 +448,7 @@ void PaintSettings::setPaintType(const PaintType &paintType,
 
     mPaintType = paintType;
     mTarget_k->updateDrawGradients();
-    if(mTarget_k->isSelected()) {
-        mMainWindow->scheduleDisplayedFillStrokeSettingsUpdate();
-    }
+    mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
 }
 
 ColorAnimator *PaintSettings::getColorAnimator() {

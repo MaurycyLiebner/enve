@@ -106,9 +106,10 @@ void AnimationBox::addActionsToMenu(QMenu *menu) {
             setObjectName("ab_set_src_file");
 }
 
-bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
+bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction,
+                                              QWidget* widgetsParent) {
     if(selectedAction->objectName() == "ab_set_src_file") {
-        changeSourceFile();
+        changeSourceFile(widgetsParent);
     } else if(selectedAction->objectName() == "ab_reload") {
         if(mAnimationCacheHandler != nullptr) {
             mAnimationCacheHandler->clearCache();

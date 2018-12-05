@@ -58,8 +58,9 @@ public:
 
     bool SWT_isImageBox() { return true; }
     void addActionsToMenu(QMenu *menu);
-    bool handleSelectedCanvasAction(QAction *selectedAction);
-    void changeSourceFile();
+    bool handleSelectedCanvasAction(QAction *selectedAction,
+                                    QWidget* widgetsParent);
+    void changeSourceFile(QWidget *dialogParent);
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);

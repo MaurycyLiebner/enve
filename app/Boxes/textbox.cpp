@@ -28,15 +28,14 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
 #include <QApplication>
 #include <QDesktopWidget>
 
-void TextBox::openTextEditor(const bool &saveUndoRedo) {
+void TextBox::openTextEditor(QWidget* dialogParent) {
     bool ok;
     QString text =
-            QInputDialog::getMultiLineText(mMainWindow, getName() + " text",
-                                           "Text:",
-                                           mText->getCurrentTextValue(), &ok);
+            QInputDialog::getMultiLineText(
+                dialogParent, getName() + " text",
+                "Text:", mText->getCurrentTextValue(), &ok);
     if(ok) {
-        mText->setCurrentTextValue(text, saveUndoRedo);
-        callUpdateSchedulers();
+        mText->setCurrentTextValue(text, true);
     }
 }
 
@@ -72,6 +71,10 @@ QString TextBox::getFontStyle() {
     return mFont.styleName();
 }
 
+QString TextBox::getCurrentTextValue() {
+    return mText->getCurrentTextValue();
+}
+
 MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
                                         const CanvasMode &currentCanvasMode,
                                         const qreal &canvasScaleInv) {
@@ -96,9 +99,10 @@ void TextBox::addActionsToMenu(QMenu *menu) {
     menu->addAction("Set Text...")->setObjectName("tb_set_text");
 }
 
-bool TextBox::handleSelectedCanvasAction(QAction *selectedAction) {
+bool TextBox::handleSelectedCanvasAction(QAction *selectedAction,
+                                         QWidget* widgetsParent) {
     if(selectedAction->objectName() == "tb_set_text") {
-        openTextEditor();
+        openTextEditor(widgetsParent);
     } else {
         return false;
     }

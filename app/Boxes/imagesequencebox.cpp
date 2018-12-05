@@ -20,12 +20,10 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     reloadCacheHandler();
 }
 
-void ImageSequenceBox::changeSourceFile() {
-    MainWindow::getInstance()->disableEventFilter();
+void ImageSequenceBox::changeSourceFile(QWidget *dialogParent) {
     QStringList importPaths = QFileDialog::getOpenFileNames(
-                MainWindow::getInstance(), "Import Image Sequence",
+                dialogParent, "Import Image Sequence",
                 "", "Images (*.png *.jpg)");
-    MainWindow::getInstance()->enableEventFilter();
     if(!importPaths.isEmpty()) {
         setListOfFrames(importPaths);
     }

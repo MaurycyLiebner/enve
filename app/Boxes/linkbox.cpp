@@ -17,8 +17,8 @@ void ExternalLinkBox::reload() {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-void ExternalLinkBox::changeSrc() {
-    QString src = QFileDialog::getOpenFileName(mMainWindow,
+void ExternalLinkBox::changeSrc(QWidget* dialogParent) {
+    QString src = QFileDialog::getOpenFileName(dialogParent,
                                                "Link File",
                                                "",
                                                "AniVect Files (*.av)");

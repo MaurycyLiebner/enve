@@ -41,13 +41,10 @@ void VideoBox::setParentGroup(BoxesGroup *parent) {
 }
 
 #include <QFileDialog>
-void VideoBox::changeSourceFile() {
-    MainWindow::getInstance()->disableEventFilter();
+void VideoBox::changeSourceFile(QWidget *dialogParent) {
     QString importPath = QFileDialog::getOpenFileName(
-                                            MainWindow::getInstance(),
-                                            "Change Source", "",
-                                            "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
-    MainWindow::getInstance()->enableEventFilter();
+                dialogParent, "Change Source", "",
+                "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     if(!importPath.isEmpty()) {
         setFilePath(importPath);
     }

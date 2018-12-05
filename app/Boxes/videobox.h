@@ -18,7 +18,7 @@ public:
     void reloadSound();
 
     bool SWT_isVideoBox() { return true; }
-    void changeSourceFile();
+    void changeSourceFile(QWidget* dialogParent);
 
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,

@@ -313,7 +313,7 @@ bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
 
 void BoundingBox::setParentGroup(BoxesGroup *parent) {
     mParentGroup = parent;
-
+    if(mParentGroup == nullptr) return;
     mParentTransform = parent->getTransformAnimator();
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
@@ -321,7 +321,7 @@ void BoundingBox::setParentGroup(BoxesGroup *parent) {
     mTransformAnimator->updateCombinedTransform(Animator::USER_CHANGE);
 }
 
-void BoundingBox::setParent(BasicTransformAnimator *parent) {
+void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
     if(parent == mParentTransform) return;
     mParentTransform = parent;
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
@@ -330,7 +330,7 @@ void BoundingBox::setParent(BasicTransformAnimator *parent) {
 }
 
 void BoundingBox::clearParent() {
-    setParent(mParentGroup->getTransformAnimator());
+    setParentTransform(mParentGroup->getTransformAnimator());
 }
 
 BoxesGroup *BoundingBox::getParentGroup() {
@@ -343,7 +343,7 @@ void BoundingBox::setPivotRelPos(const QPointF &relPos,
     mPivotAutoAdjust = pivotAutoAdjust;
     mTransformAnimator->setPivotWithoutChangingTransformation(relPos,
                                                               saveUndoRedo);
-    schedulePivotUpdate();
+    requestGlobalPivotUpdateIfSelected();
 }
 
 void BoundingBox::startPivotTransform() {
@@ -871,6 +871,18 @@ DurationRectangle *BoundingBox::getDurationRectangle() {
     return mDurationRectangle.get();
 }
 
+void BoundingBox::requestGlobalFillStrokeUpdateIfSelected() {
+    if(isSelected()) {
+        emit fillStrokeSettingsChanged();
+    }
+}
+
+void BoundingBox::requestGlobalPivotUpdateIfSelected() {
+    if(isSelected()) {
+        emit globalPivotInfluenced();
+    }
+}
+
 void BoundingBox::getMotionBlurProperties(QList<Property *> &list) {
     list.append(mTransformAnimator->getScaleAnimator());
     list.append(mTransformAnimator->getPosAnimator());
@@ -1074,7 +1086,7 @@ void BoundingBox::removeOutlinePathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::addActionsToMenu(QMenu *) {}
 
-bool BoundingBox::handleSelectedCanvasAction(QAction *) {
+bool BoundingBox::handleSelectedCanvasAction(QAction *, QWidget *) {
     return false;
 }
 

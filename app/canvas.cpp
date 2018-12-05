@@ -105,15 +105,25 @@ void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
     mLastPressPosAbs = mCanvasTransformMatrix.map(mLastPressPosRel);
 }
 
+void Canvas::setCurrentGroupParentAsCurrentGroup() {
+    setCurrentBoxesGroup(mCurrentBoxesGroup->getParentGroup());
+}
+
 #include "GUI/BoxesList/boxscrollwidget.h"
 void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
-    mCurrentBoxesGroup->setIsCurrentGroup(false);
+    if(mCurrentBoxesGroup) {
+        mCurrentBoxesGroup->setIsCurrentGroup(false);
+        disconnect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
+                   this, &Canvas::setCurrentGroupParentAsCurrentGroup);
+    }
     clearBoxesSelection();
     clearBonesSelection();
     clearPointsSelection();
     clearCurrentEndPoint();
     clearLastPressedPoint();
     mCurrentBoxesGroup = group;
+    connect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
+            this, &Canvas::setCurrentGroupParentAsCurrentGroup);
     group->setIsCurrentGroup(true);
 
     //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
@@ -589,6 +599,10 @@ SingleSound* Canvas::createSoundForPath(const QString &path) {
     return singleSound.get();
 }
 
+void Canvas::scheduleDisplayedFillStrokeSettingsUpdate() {
+    mMainWindow->scheduleDisplayedFillStrokeSettingsUpdate();
+}
+
 void Canvas::schedulePivotUpdate() {
     if(mRotPivot->isRotating() ||
         mRotPivot->isScaling() ||
@@ -896,13 +910,13 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
             BoundingBox* box = bone->getParentBox();
             foreach(const qptr<BoundingBox>& boxT, mSelectedBoxes) {
                 if(boxT == box) continue;
-                boxT->setParent(trans);
+                boxT->setParentTransform(trans);
             }
         } else if(mSelectedBoxes.count() > 1) {
             BoundingBox* lastBox = mSelectedBoxes.last();
             BasicTransformAnimator* trans = lastBox->getTransformAnimator();
             for(int i = 0; i < mSelectedBoxes.count() - 1; i++) {
-                mSelectedBoxes.at(i)->setParent(trans);
+                mSelectedBoxes.at(i)->setParentTransform(trans);
             }
         }
     } else if(event->modifiers() & Qt::AltModifier &&
@@ -1301,6 +1315,34 @@ void Canvas::blockUndoRedo() {
 
 void Canvas::unblockUndoRedo() {
     mUndoRedoStack->unblockUndoRedo();
+}
+
+void Canvas::callUpdateSchedulers() {
+    mMainWindow->callUpdateSchedulers();
+}
+
+bool Canvas::isShiftPressed() {
+    return mMainWindow->isShiftPressed();
+}
+
+bool Canvas::isShiftPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::ShiftModifier;
+}
+
+bool Canvas::isCtrlPressed() {
+    return mMainWindow->isCtrlPressed();
+}
+
+bool Canvas::isCtrlPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::ControlModifier;
+}
+
+bool Canvas::isAltPressed() {
+    return mMainWindow->isAltPressed();
+}
+
+bool Canvas::isAltPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::AltModifier;
 }
 
 SoundComposition *Canvas::getSoundComposition() {

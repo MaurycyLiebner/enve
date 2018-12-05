@@ -196,7 +196,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
     }
 }
 
-bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
+bool Canvas::handleSelectedCanvasAction(QAction *selectedAction, QWidget* widgetsParent) {
     if(selectedAction->objectName() == "canvas_copy") {
         copyAction();
     } if(selectedAction->objectName() == "canvas_cut") {
@@ -486,8 +486,10 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction) {
-                if(!handleSelectedCanvasAction(selectedAction)) {
-                    pressedBox->handleSelectedCanvasAction(selectedAction);
+                if(!handleSelectedCanvasAction(
+                            selectedAction, mMainWindow)) {
+                    pressedBox->handleSelectedCanvasAction(
+                                selectedAction, mMainWindow);
                 }
             } else {
 
@@ -577,7 +579,7 @@ void Canvas::handleLeftButtonMousePress() {
             clearBoxesSelection();
             addBoxToSelection(newPath.get());
 
-            mCurrentCircle = newPath;
+            mCurrentCircle = newPath.get();
 
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
             qsptr<Rectangle> newPath = SPtrCreate(Rectangle)();
@@ -587,7 +589,7 @@ void Canvas::handleLeftButtonMousePress() {
             clearBoxesSelection();
             addBoxToSelection(newPath.get());
 
-            mCurrentRectangle = newPath;
+            mCurrentRectangle = newPath.get();
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             qsptr<TextBox> newPath = SPtrCreate(TextBox)();
             FontsWidget *fonstWidget = mMainWindow->getFontsWidget();
@@ -598,7 +600,7 @@ void Canvas::handleLeftButtonMousePress() {
             mCurrentBoxesGroup->addContainedBox(newPath);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
 
-            mCurrentTextBox = newPath;
+            mCurrentTextBox = newPath.get();
 
             clearBoxesSelection();
             addBoxToSelection(newPath.get());
@@ -1004,7 +1006,7 @@ void Canvas::handleMouseRelease() {
             //mCanvasWindow->setCanvasMode(MOVE_PATH);
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             if(mCurrentTextBox != nullptr) {
-                mCurrentTextBox->openTextEditor();
+                mCurrentTextBox->openTextEditor(mMainWindow);
             }
         }
     }
@@ -1404,7 +1406,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
                        mCurrentMode == MOVE_POINT) &&
                       boxAt->SWT_isTextBox()) {
                 releaseMouseAndDontTrack();
-                GetAsPtr(boxAt, TextBox)->openTextEditor();
+                GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
             } else if(mCurrentMode == MOVE_PATH &&
                       boxAt->SWT_isVectorPath()) {
                 mCanvasWindow->setCanvasMode(MOVE_POINT);

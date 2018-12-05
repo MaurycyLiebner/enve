@@ -16,8 +16,9 @@ public:
     qreal getFontSize();
     QString getFontFamily();
     QString getFontStyle();
+    QString getCurrentTextValue();
 
-    void openTextEditor(const bool &saveUndoRedo = true);
+    void openTextEditor(QWidget* dialogParent);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
@@ -31,7 +32,8 @@ public:
 
     bool SWT_isTextBox() { return true; }
     void addActionsToMenu(QMenu *menu);
-    bool handleSelectedCanvasAction(QAction *selectedAction);
+    bool handleSelectedCanvasAction(QAction *selectedAction,
+                                    QWidget* widgetsParent);
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
     void setCurrentTextValue(const QString &text,

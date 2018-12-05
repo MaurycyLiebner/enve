@@ -235,7 +235,6 @@ void BasicTransformAnimator::updateCombinedTransform(const UpdateReason &reason)
                              mParentTransformAnimator->getCombinedTransform();
     }
     emit combinedTransformChanged(reason);
-    schedulePivotUpdate();
 }
 
 const QMatrix &BasicTransformAnimator::getCombinedTransform() const {
@@ -400,6 +399,7 @@ void BoxTransformAnimator::updateCombinedTransform(const UpdateReason &reason) {
 
     mParentBox_k->updateDrawRenderContainerTransform();
     mParentBox_k->scheduleUpdate(reason);
+    mParentBox_k->requestGlobalPivotUpdateIfSelected();
 }
 
 qreal BoxTransformAnimator::getPivotX() {

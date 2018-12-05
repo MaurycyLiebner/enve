@@ -32,10 +32,11 @@ public:
 
     bool SWT_isAnimationBox() { return true; }
     void addActionsToMenu(QMenu *menu);
-    bool handleSelectedCanvasAction(QAction *selectedAction);
-    virtual void changeSourceFile() = 0;
-    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
-                                                BoundingBoxRenderData* data);
+    bool handleSelectedCanvasAction(QAction *selectedAction,
+                                    QWidget* widgetsParent);
+    virtual void changeSourceFile(QWidget* dialogParent) = 0;
+    void setupBoundingBoxRenderDataForRelFrameF(
+            const qreal &relFrame, BoundingBoxRenderData* data);
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     void afterUpdate();

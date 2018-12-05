@@ -797,8 +797,10 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             } else if(target->SWT_isBoundingBox()) {
                 auto boxTarget = GetAsPtr(target, BoundingBox);
                 if(!boxTarget->getParentCanvas()->
-                        handleSelectedCanvasAction(selectedAction) ) {
-                    boxTarget->handleSelectedCanvasAction(selectedAction);
+                        handleSelectedCanvasAction(selectedAction,
+                                                   MainWindow::getInstance()) ) {
+                    boxTarget->handleSelectedCanvasAction(selectedAction,
+                                                          MainWindow::getInstance());
                 }
             }
         } else {

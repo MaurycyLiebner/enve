@@ -92,7 +92,6 @@ public:
 
     void updatePivot();
 
-    void schedulePivotUpdate();
     void updatePivotIfNeeded();
 
     void awaitUpdate() {}
@@ -371,6 +370,9 @@ signals:
 private slots:
     void emitCanvasNameChanged();
 public slots:
+    void schedulePivotUpdate();
+    void scheduleDisplayedFillStrokeSettingsUpdate();
+
     void nextPreviewFrame();
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
@@ -476,7 +478,7 @@ public:
     void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
 
     bool SWT_isCanvas() { return true; }
-    bool handleSelectedCanvasAction(QAction *selectedAction);
+    bool handleSelectedCanvasAction(QAction *selectedAction, QWidget* widgetsParent);
     void addCanvasActionToMenu(QMenu *menu);
     void deleteAction();
     void copyAction();
@@ -564,6 +566,19 @@ public:
             box->addEffect<T>();
         }
     }
+private:
+    void setCurrentGroupParentAsCurrentGroup();
+
+    void openTextEditorForTextBox(TextBox *textBox);
+    void callUpdateSchedulers();
+
+    bool isShiftPressed();
+
+    bool isShiftPressed(QKeyEvent *event);
+    bool isCtrlPressed();
+    bool isCtrlPressed(QKeyEvent *event);
+    bool isAltPressed();
+    bool isAltPressed(QKeyEvent *event);
 protected:
     UndoRedoStack *mUndoRedoStack = nullptr;
 
@@ -588,15 +603,6 @@ protected:
     QMatrix mCanvasTransformMatrix;
     qsptr<SoundComposition> mSoundComposition;
 
-    MovablePoint* mHoveredPoint_d = nullptr;
-    qptr<BoundingBox> mHoveredBox;
-    VectorPathEdge *mHoveredEdge_d = nullptr;
-    qptr<Bone> mHoveredBone;
-
-    QList<qptr<Bone>> mSelectedBones;
-    QList<stdptr<MovablePoint>> mSelectedPoints_d;
-    QList<qptr<BoundingBox>> mSelectedBoxes;
-
     bool mLocalPivot = false;
     bool mBonesSelectionEnabled = false;
     bool mIsCurrentCanvas = true;
@@ -607,10 +613,26 @@ protected:
     CanvasWindow *mCanvasWindow;
     QWidget *mCanvasWidget;
 
-    qsptr<Circle> mCurrentCircle;
-    qsptr<Rectangle> mCurrentRectangle;
-    qsptr<TextBox> mCurrentTextBox;
-    qsptr<ParticleBox> mCurrentParticleBox;
+    qptr<Circle> mCurrentCircle;
+    qptr<Rectangle> mCurrentRectangle;
+    qptr<TextBox> mCurrentTextBox;
+    qptr<ParticleBox> mCurrentParticleBox;
+    qptr<BoxesGroup> mCurrentBoxesGroup;
+
+    stdptr<MovablePoint> mHoveredPoint_d;
+    qptr<BoundingBox> mHoveredBox;
+    stdptr<VectorPathEdge> mHoveredEdge_d;
+    qptr<Bone> mHoveredBone;
+
+    QList<qptr<Bone>> mSelectedBones;
+    QList<stdptr<MovablePoint>> mSelectedPoints_d;
+    QList<qptr<BoundingBox>> mSelectedBoxes;
+
+    stdptr<MovablePoint> mLastPressedPoint;
+    stdptr<NodePoint> mCurrentEndPoint;
+    qptr<BoundingBox> mLastPressedBox;
+    qptr<Bone> mLastPressedBone;
+    stdsptr<PathPivot> mRotPivot;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
 
@@ -644,8 +666,6 @@ protected:
     QColor mFillColor;
     QColor mOutlineColor;
 
-    qptr<BoxesGroup> mCurrentBoxesGroup;
-
     int mWidth;
     int mHeight;
 
@@ -671,13 +691,7 @@ protected:
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
 
-    stdptr<MovablePoint>mLastPressedPoint;
-    stdptr<NodePoint>mCurrentEndPoint;
-    qptr<BoundingBox> mLastPressedBox;
-    qptr<Bone> mLastPressedBone;
-
     void setCtrlPointsEnabled(bool enabled);
-    stdsptr<PathPivot> mRotPivot;
     void handleMovePointMouseMove();
     void handleMovePathMouseMove();
     void handleAddPointMouseMove();

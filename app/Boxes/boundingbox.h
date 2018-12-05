@@ -137,7 +137,7 @@ public:
                                     const SkScalar &invScale);
 
     virtual void setParentGroup(BoxesGroup *parent);
-    virtual void setParent(BasicTransformAnimator *parent);
+    void setParentTransform(BasicTransformAnimator *parent);
     void clearParent();
 
     BoxesGroup *getParentGroup();
@@ -335,7 +335,7 @@ public:
     virtual void removeOutlinePathEffect(const qsptr<PathEffect>&);
 
     virtual void addActionsToMenu(QMenu *);
-    virtual bool handleSelectedCanvasAction(QAction *);
+    virtual bool handleSelectedCanvasAction(QAction *, QWidget*);
 
     virtual void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData *data);
@@ -444,6 +444,9 @@ public:
     void moveMaxFrame(const int &dFrame);
 
     DurationRectangle *getDurationRectangle();
+
+    void requestGlobalPivotUpdateIfSelected();
+    void requestGlobalFillStrokeUpdateIfSelected();
 protected:
     virtual void getMotionBlurProperties(QList<Property*>& list);
 
@@ -493,6 +496,8 @@ private:
 signals:
     void nameChanged(QString);
     void scheduledUpdate();
+    void globalPivotInfluenced();
+    void fillStrokeSettingsChanged();
 public slots:
     void scheduleUpdate(const UpdateReason &reason);
     void scheduleUpdate(const int& relFrame, const UpdateReason &reason);

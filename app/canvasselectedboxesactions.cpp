@@ -531,6 +531,10 @@ void Canvas::addBoxToSelection(BoundingBox *box) {
     if(box->isSelected()) {
         return;
     }
+    connect(box, &BoundingBox::globalPivotInfluenced,
+            this, &Canvas::schedulePivotUpdate);
+    connect(box, &BoundingBox::fillStrokeSettingsChanged,
+            this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
     box->select();
     mSelectedBoxes.append(box); schedulePivotUpdate();
     sortSelectedBoxesByZAscending();
@@ -539,6 +543,10 @@ void Canvas::addBoxToSelection(BoundingBox *box) {
 }
 
 void Canvas::removeBoxFromSelection(BoundingBox *box) {
+    disconnect(box, &BoundingBox::globalPivotInfluenced,
+               this, &Canvas::schedulePivotUpdate);
+    disconnect(box, &BoundingBox::fillStrokeSettingsChanged,
+               this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
     box->deselect();
     mSelectedBoxes.removeOne(box); schedulePivotUpdate();
     if(mSelectedBoxes.isEmpty()) {

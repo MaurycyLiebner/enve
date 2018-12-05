@@ -9,7 +9,7 @@ public:
 
     bool SWT_isImageSequenceBox() { return true; }
 
-    void changeSourceFile();
+    void changeSourceFile(QWidget* dialogParent);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 private:
