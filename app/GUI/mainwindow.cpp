@@ -960,7 +960,9 @@ bool MainWindow::isAltPressed() {
 
 void MainWindow::finishUndoRedoSet() {
     if(mCurrentUndoRedoStack == nullptr) return;
-    mCurrentUndoRedoStack->finishSet();
+    if(mCurrentUndoRedoStack->finishSet()) {
+        setFileChangedSinceSaving(true);
+    }
     mCurrentUndoRedoStack->startNewSet();
 }
 
@@ -973,7 +975,9 @@ void MainWindow::callUpdateSchedulers() {
     if(!isEnabled()) {
         return;
     }
-//    mCurrentUndoRedoStack->finishSet();
+    if(mCurrentUndoRedoStack->finishSet()) {
+        setFileChangedSinceSaving(true);
+    }
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
@@ -1000,7 +1004,7 @@ void MainWindow::callUpdateSchedulers() {
     mFillStrokeSettings->update();
     emit updateAll();
 
-//    mCurrentUndoRedoStack->startNewSet();
+    mCurrentUndoRedoStack->startNewSet();
 }
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
@@ -1144,9 +1148,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             return processKeyEvent(keyEvent);
         }
     } else if(e->type() == QEvent::KeyRelease) {
-        finishUndoRedoSet();
+        //finishUndoRedoSet();
     } else if(e->type() == QEvent::MouseButtonRelease) {
-        finishUndoRedoSet();
+        //finishUndoRedoSet();
     } else if(obj == mCanvasWindow->getCanvasWidget()) {
         if(e->type() == QEvent::Drop) {
             mCanvasWindow->dropEvent(static_cast<QDropEvent*>(e));

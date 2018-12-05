@@ -1,7 +1,5 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
-#include <QObject>
-#include <QColor>
 class UndoRedo;
 class MainWindow;
 #include "singlewidgettarget.h"
@@ -194,21 +192,34 @@ public:
 
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
-    Property *getLastSetParent() {
-        if(mLastSetParent == nullptr) return nullptr;
-        return mLastSetParent;
+    Property *getParent() {
+        if(mParent == nullptr) return nullptr;
+        return mParent;
     }
 
-    void setLastSetParent(Property *parent) {
-        mLastSetParent = parent;
+    void setParent(Property *parent) {
+        mParent = parent;
     }
 
-    Property *getLastSetBoundingBoxAncestor();
+
+    template <class T = Property>
+    T *getFirstAncestor(bool (Property::*tester)()) {
+        if(mParent == nullptr) return nullptr;
+        if((mParent->*tester)()) mParent.data();
+        return static_cast<T*>(mParent->getFirstAncestor(tester));
+    }
+
+    template <class T = Property>
+    T *getFirstAncestor(bool (*tester)(Property*)) {
+        if(mParent == nullptr) return nullptr;
+        if(tester(mParent)) mParent.data();
+        return static_cast<T*>(mParent->getFirstAncestor(tester));
+    }
 protected:
     Property(const QString &name);
 
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
-    QPointer<Property> mLastSetParent;
+    QPointer<Property> mParent;
 public slots:
     void prp_callUpdater();
 

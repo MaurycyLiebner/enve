@@ -28,8 +28,17 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
                int canvasWidth, int canvasHeight,
                const int &frameCount, const qreal &fps) :
     BoxesGroup(TYPE_CANVAS) {
+    mMainWindow = MainWindow::getInstance();
     setCurrentBrush(mMainWindow->getCurrentBrush());
-    mUndoRedoStack = SPtrCreate(UndoRedoStack)(mMainWindow);
+    std::function<bool(int)> changeFrameFunc =
+    [this](const int& undoRedoFrame) {
+        if(undoRedoFrame != mMainWindow->getCurrentFrame()) {
+            mMainWindow->setCurrentFrameForAllWidgets(undoRedoFrame);
+            return true;
+        }
+        return false;
+    };
+    mUndoRedoStack = SPtrCreate(UndoRedoStack)(changeFrameFunc, mMainWindow);
     mFps = fps;
     connect(this, SIGNAL(nameChanged(QString)),
             this, SLOT(emitCanvasNameChanged()));
@@ -51,7 +60,6 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     mVisibleHeight = mHeight;
     mCanvasWindow = canvasWidget;
     mCanvasWidget = mCanvasWindow->getCanvasWidget();
-    mMainWindow = MainWindow::getInstance();
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;

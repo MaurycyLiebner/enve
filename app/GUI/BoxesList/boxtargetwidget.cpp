@@ -35,9 +35,9 @@ void BoxTargetWidget::dragEnterEvent(
         auto boxMimeData = static_cast<
                 const BoundingBoxMimeData*>(event->mimeData());
         BoundingBox *targetT = boxMimeData->getTarget();
+        auto tester = &Property::SWT_isBoundingBox;
         BoundingBox *parentBox =
-                GetAsPtr(mProperty->getLastSetBoundingBoxAncestor(),
-                         BoundingBox);
+                mProperty->getFirstAncestor<BoundingBox>(tester);
         if(parentBox == targetT) return;
         if(parentBox->getParentGroup() != targetT->getParentGroup()) return;
         event->acceptProposedAction();
@@ -55,9 +55,9 @@ void BoxTargetWidget::dragLeaveEvent(
 void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
     if(mProperty == nullptr) return;
     if(event->button() == Qt::LeftButton) {
+        auto tester = &Property::SWT_isBoundingBox;
         BoundingBox *parentBox =
-                GetAsPtr(mProperty->getLastSetBoundingBoxAncestor(),
-                         BoundingBox);
+                mProperty->getFirstAncestor<BoundingBox>(tester);
         if(parentBox == nullptr) return;
         BoxesGroup *srcGroup = parentBox->getParentGroup();
         if(srcGroup == nullptr) return;

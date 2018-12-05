@@ -8,6 +8,7 @@ class Key;
 class QPainter;
 class DurationRectangleMovable;
 class FakeComplexAnimator;
+#include <QColor>
 
 class Animator : public Property {
     Q_OBJECT

@@ -2,12 +2,6 @@
 #define UNDOREDO_H
 
 #include <QList>
-#include <QDebug>
-#include <memory>
-#include <QFont>
-#include "skiaincludes.h"
-
-#include "Animators/PathAnimators/vectorpathanimator.h"
 #include "smartPointers/sharedpointerdefs.h"
 class MainWindow;
 class Tile;
@@ -48,11 +42,11 @@ private:
 
 class UndoRedoStack : public StdSelfRef {
 public:
-    UndoRedoStack(MainWindow *mainWindow);
+    UndoRedoStack(const std::function<bool(int)>& changeFrameFunc);
     ~UndoRedoStack();
 
     void startNewSet();
-    void finishSet();
+    bool finishSet();
 
     void clearRedoStack();
     void clearUndoStack();
@@ -68,14 +62,14 @@ public:
     void unblockUndoRedo();
     bool undoRedoBlocked();
 private:
-    void addSet();
+    std::function<bool(int)> mChangeFrameFunc;
+    bool addSet();
     void addToSet(const stdsptr<UndoRedo> &undoRedo);
 
     bool mUndoRedoBlocked = false;
     int mLastUndoRedoFrame = INT_MAX;
     int mNumberOfSets = 0;
 
-    MainWindow *mMainWindow;
     stdsptr<UndoRedoSet> mCurrentSet;
     QList<stdsptr<UndoRedo>> mUndoStack;
     QList<stdsptr<UndoRedo>> mRedoStack;

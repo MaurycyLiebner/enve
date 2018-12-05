@@ -102,12 +102,6 @@ void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
     mParentCanvasUndoRedoStack->addUndoRedo(undoRedo);
 }
 
-Property *Property::getLastSetBoundingBoxAncestor() {
-    if(mLastSetParent == nullptr) return nullptr;
-    if(mLastSetParent->SWT_isBoundingBox()) mLastSetParent.data();
-    return mLastSetParent->getLastSetBoundingBoxAncestor();
-}
-
 void Property::graphUpdateAfterKeysChanged() {
     //mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();
 }

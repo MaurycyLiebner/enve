@@ -1,18 +1,8 @@
 #include "undoredo.h"
 #include "GUI/mainwindow.h"
-#include "qrealkey.h"
-#include "canvas.h"
-#include "Boxes/vectorpath.h"
-#include "MovablePoints/movablepoint.h"
-#include "Animators/qrealanimator.h"
-#include "Animators/PathAnimators/vectorpathanimator.h"
-#include "Animators/paintsettings.h"
-#include "MovablePoints/nodepoint.h"
-#include "Animators/pathanimator.h"
-#include "Animators/qstringanimator.h"
 
-UndoRedoStack::UndoRedoStack(MainWindow *mainWindow) {
-    mMainWindow = mainWindow;
+UndoRedoStack::UndoRedoStack(const std::function<bool(int)> &changeFrameFunc) :
+    mChangeFrameFunc(changeFrameFunc) {
     startNewSet();
 }
 
@@ -25,20 +15,22 @@ UndoRedoStack::~UndoRedoStack() {
     clearRedoStack();
 }
 
-void UndoRedoStack::finishSet() {
+bool UndoRedoStack::finishSet() {
     mNumberOfSets--;
     if(mNumberOfSets == 0) {
-        addSet();
+        return addSet();
     }
+    return false; // !!! when is this needed??
 }
 
-void UndoRedoStack::addSet() {
+bool UndoRedoStack::addSet() {
     if((mCurrentSet == nullptr) ? true : mCurrentSet->isEmpty()) {
         mCurrentSet = nullptr;
-        return;
+        return false;
     }
     addUndoRedo(mCurrentSet);
     mCurrentSet = nullptr;
+    return true;
 }
 
 void UndoRedoStack::addToSet(const stdsptr<UndoRedo>& undoRedo) {
@@ -70,10 +62,7 @@ void UndoRedoStack::clearAll() {
 }
 
 void UndoRedoStack::addUndoRedo(const stdsptr<UndoRedo> &undoRedo) {
-    if(undoRedo == nullptr) {
-        return;
-    }
-    mMainWindow->setFileChangedSinceSaving(true);
+    if(undoRedo == nullptr) return;
     if(mNumberOfSets != 0) {
         addToSet(undoRedo);
     } else {
@@ -110,10 +99,7 @@ void UndoRedoStack::redo() {
         return;
     }
     stdsptr<UndoRedo> toRedo = mRedoStack.last();
-    if(toRedo->getFrame() != mMainWindow->getCurrentFrame()) {
-        mMainWindow->setCurrentFrameForAllWidgets(toRedo->getFrame());
-        return;
-    }
+    if(mChangeFrameFunc(toRedo->getFrame())) return;
     mRedoStack.removeLast();
     toRedo->printRedoName();
     toRedo->redo();
@@ -125,10 +111,7 @@ void UndoRedoStack::undo() {
         return;
     }
     stdsptr<UndoRedo> toUndo = mUndoStack.last();
-    if(toUndo->getFrame() != mMainWindow->getCurrentFrame()) {
-        mMainWindow->setCurrentFrameForAllWidgets(toUndo->getFrame());
-        return;
-    }
+    if(mChangeFrameFunc(toUndo->getFrame())) return;
     mUndoStack.removeLast();
     toUndo->printUndoName();
     toUndo->undo();
