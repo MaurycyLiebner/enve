@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
+#QT       -= gui
 
 TARGET = core
 TEMPLATE = lib
@@ -27,7 +27,14 @@ SOURCES += \
     smartPointers/selfref.cpp \
     smartPointers/stdselfref.cpp \
     singlewidgettarget.cpp \
-    singlewidgetabstraction.cpp
+    singlewidgetabstraction.cpp \
+    Properties/property.cpp \
+    Animators/complexanimator.cpp \
+    Animators/animator.cpp \
+    Animators/fakecomplexanimator.cpp \
+    Animators/key.cpp \
+    PropertyUpdaters/propertyupdater.cpp \
+    undoredo.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -36,7 +43,14 @@ HEADERS += \
     smartPointers/stdselfref.h \
     smartPointers/sharedpointerdefs.h \
     singlewidgettarget.h \
-    singlewidgetabstraction.h
+    singlewidgetabstraction.h \
+    Properties/property.h \
+    Animators/key.h \
+    Animators/complexanimator.h \
+    Animators/fakecomplexanimator.h \
+    Animators/animator.h \
+    PropertyUpdaters/propertyupdater.h \
+    undoredo.h
 
 unix {
     target.path = /usr/lib

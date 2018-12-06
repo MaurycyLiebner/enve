@@ -1,6 +1,6 @@
 #ifndef SINGLESOUNDUPDATER_H
 #define SINGLESOUNDUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class SingleSound;
 
 class SingleSoundUpdater : public PropertyUpdater {

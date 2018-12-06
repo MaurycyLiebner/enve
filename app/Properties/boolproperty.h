@@ -1,6 +1,6 @@
 #ifndef BOOLPROPERTY_H
 #define BOOLPROPERTY_H
-#include "property.h"
+#include "Properties/property.h"
 
 class BoolProperty : public Property {
     Q_OBJECT

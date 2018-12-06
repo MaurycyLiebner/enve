@@ -1,6 +1,6 @@
 #include "rendercachehandler.h"
 #include "boundingboxrendercontainer.h"
-#include "key.h"
+#include "Animators/key.h"
 #include "Animators/complexanimator.h"
 #include "durationrectangle.h"
 #include "global.h"

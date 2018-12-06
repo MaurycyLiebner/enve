@@ -1,6 +1,6 @@
 #ifndef QREALVALUEEFFECT_H
 #define QREALVALUEEFFECT_H
-#include "complexanimator.h"
+#include "Animators/complexanimator.h"
 
 class QrealValueEffect : public ComplexAnimator {
 public:

@@ -11,6 +11,7 @@
 #include "qrealpoint.h"
 #include "qrealkey.h"
 #include "randomqrealgenerator.h"
+#include "Animators/fakecomplexanimator.h"
 
 QrealAnimator::QrealAnimator(const QString &name) :
     Animator(name) {}
@@ -154,7 +155,7 @@ qreal QrealAnimator::qra_getEffectiveValueAtAbsFrame(const int &frame) {
 QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
     return (QrealKey*)anim_mKeys.at(id).get();
 }
-#include "fakecomplexanimator.h"
+
 void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
     if(generator == mRandomGenerator.data()) return;
     if(generator == nullptr) {

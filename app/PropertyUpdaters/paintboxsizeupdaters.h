@@ -1,6 +1,6 @@
 #ifndef PAINTBOXSIZEUPDATERBR_H
 #define PAINTBOXSIZEUPDATERBR_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class PaintBox;
 
 class PaintBoxSizeUpdaterBR : public PropertyUpdater {

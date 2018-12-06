@@ -1,7 +1,7 @@
 #ifndef QSTRINGANIMATOR_H
 #define QSTRINGANIMATOR_H
-#include "animator.h"
-#include "key.h"
+#include "Animators/animator.h"
+#include "Animators/key.h"
 class QStringAnimator;
 
 class QStringKey : public Key {

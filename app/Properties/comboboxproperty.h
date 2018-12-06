@@ -1,6 +1,6 @@
 #ifndef COMBOBOXPROPERTY_H
 #define COMBOBOXPROPERTY_H
-#include "property.h"
+#include "Properties/property.h"
 class ComboBoxProperty : public Property {
     Q_OBJECT
 public:

@@ -53,7 +53,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     canvas.cpp \
-    undoredo.cpp \
     canvasmouseinteractions.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
     GUI/ColorWidgets/colorsettingswidget.cpp \
@@ -74,10 +73,8 @@ SOURCES += main.cpp\
     pointhelpers.cpp \
     paintcontroler.cpp \
     Animators/transformanimator.cpp \
-    Animators/animator.cpp \
     Animators/boolanimator.cpp \
     Animators/coloranimator.cpp \
-    Animators/complexanimator.cpp \
     Animators/pathanimator.cpp \
     Animators/qstringanimator.cpp \
     Animators/qpointfanimator.cpp \
@@ -116,12 +113,10 @@ SOURCES += main.cpp\
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
     Boxes/boundingboxrendercontainer.cpp \
-    Properties/property.cpp \
     durationrectangle.cpp \
     Properties/boolproperty.cpp \
     GUI/BoxesList/boolpropertywidget.cpp \
     Boxes/imagesequencebox.cpp \
-    key.cpp \
     Boxes/rendercachehandler.cpp \
     memorychecker.cpp \
     memoryhandler.cpp \
@@ -161,7 +156,6 @@ SOURCES += main.cpp\
     GUI/BoxesList/boxscrollarea.cpp \
     Properties/comboboxproperty.cpp \
     Animators/randomqrealgenerator.cpp \
-    Animators/fakecomplexanimator.cpp \
     Animators/qrealvalueeffect.cpp \
     Properties/intproperty.cpp \
     windowsinglewidgettarget.cpp \
@@ -240,7 +234,6 @@ SOURCES += main.cpp\
     MovablePoints/nodepoint.cpp \
     MovablePoints/pathpivot.cpp \
     MovablePoints/movablepoint.cpp \
-    PropertyUpdaters/propertyupdater.cpp \
     PropertyUpdaters/transformupdater.cpp \
     PropertyUpdaters/nodepointupdater.cpp \
     PropertyUpdaters/gradientupdater.cpp \
@@ -256,7 +249,6 @@ SOURCES += main.cpp\
     PropertyUpdaters/groupallpathsupdater.cpp
 HEADERS  += \
     canvas.h \
-    undoredo.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \
     GUI/ColorWidgets/colorvaluerect.h \
@@ -278,9 +270,7 @@ HEADERS  += \
     keypoint.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
-    Animators/complexanimator.h \
     Animators/coloranimator.h \
-    Animators/animator.h \
     Animators/qrealanimator.h \
     Animators/qpointfanimator.h \
     Animators/boolanimator.h \
@@ -317,12 +307,10 @@ HEADERS  += \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
     Boxes/boundingboxrendercontainer.h \
-    Properties/property.h \
     durationrectangle.h \
     Properties/boolproperty.h \
     GUI/BoxesList/boolpropertywidget.h \
     Boxes/imagesequencebox.h \
-    key.h \
     Boxes/rendercachehandler.h \
     memorychecker.h \
     memoryhandler.h \
@@ -368,7 +356,6 @@ HEADERS  += \
     GUI/BoxesList/boxscrollarea.h \
     Properties/comboboxproperty.h \
     Animators/randomqrealgenerator.h \
-    Animators/fakecomplexanimator.h \
     Animators/qrealvalueeffect.h \
     Properties/intproperty.h \
     windowsinglewidgettarget.h \
@@ -450,7 +437,6 @@ HEADERS  += \
     MovablePoints/movablepoint.h \
     MovablePoints/gradientpoint.h \
     MovablePoints/boxpathpoint.h \
-    PropertyUpdaters/propertyupdater.h \
     PropertyUpdaters/transformupdater.h \
     PropertyUpdaters/nodepointupdater.h \
     PropertyUpdaters/gradientupdater.h \

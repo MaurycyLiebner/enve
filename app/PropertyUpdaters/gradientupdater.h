@@ -1,6 +1,6 @@
 #ifndef GRADIENTUPDATER_H
 #define GRADIENTUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class Gradient;
 
 class GradientUpdater : public PropertyUpdater {

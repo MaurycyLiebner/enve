@@ -1,6 +1,6 @@
 #ifndef TRANSFORMUPDATER_H
 #define TRANSFORMUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class BasicTransformAnimator;
 
 class TransformUpdater : public PropertyUpdater {

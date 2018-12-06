@@ -1,7 +1,7 @@
 #ifndef BOXTARGETPROPERTY_H
 #define BOXTARGETPROPERTY_H
 #include <QtCore>
-#include "property.h"
+#include "Properties/property.h"
 class BoundingBox;
 class QrealAnimator;
 

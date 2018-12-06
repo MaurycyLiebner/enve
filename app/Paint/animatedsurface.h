@@ -2,7 +2,7 @@
 #define ANIMATEDSURFACE_H
 #include "surface.h"
 #include "Animators/animator.h"
-#include "key.h"
+#include "Animators/key.h"
 class PaintBox;
 
 class SurfaceKey : public Key {

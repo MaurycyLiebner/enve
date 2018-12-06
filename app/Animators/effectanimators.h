@@ -1,6 +1,6 @@
 #ifndef EFFECTANIMATORS_H
 #define EFFECTANIMATORS_H
-#include "complexanimator.h"
+#include "Animators/complexanimator.h"
 
 namespace fmt_filters { struct image; }
 

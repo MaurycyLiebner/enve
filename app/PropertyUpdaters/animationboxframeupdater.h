@@ -1,6 +1,6 @@
 #ifndef ANIMATIONBOXFRAMEUPDATER_H
 #define ANIMATIONBOXFRAMEUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class AnimationBox;
 
 class AnimationBoxFrameUpdater : public PropertyUpdater {

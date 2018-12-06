@@ -1,6 +1,6 @@
 #ifndef PIXMAPEFFECTUPDATER_H
 #define PIXMAPEFFECTUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class BoundingBox;
 
 class PixmapEffectUpdater : public PropertyUpdater {

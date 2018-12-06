@@ -1,6 +1,6 @@
 #ifndef RANDOMQREALGENERATORUPDATER_H
 #define RANDOMQREALGENERATORUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class RandomQrealGenerator;
 
 class RandomQrealGeneratorUpdater : public PropertyUpdater {

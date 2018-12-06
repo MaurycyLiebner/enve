@@ -1,6 +1,6 @@
 #ifndef NODEPOINTUPDATER_H
 #define NODEPOINTUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class PathBox;
 
 class NodePointUpdater : public PropertyUpdater {

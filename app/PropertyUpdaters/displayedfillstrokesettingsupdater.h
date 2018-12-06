@@ -1,6 +1,6 @@
 #ifndef DISPLAYEDFILLSTROKESETTINGSUPDATER_H
 #define DISPLAYEDFILLSTROKESETTINGSUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class BoundingBox;
 
 class DisplayedFillStrokeSettingsUpdater : public PropertyUpdater {

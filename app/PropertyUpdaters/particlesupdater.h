@@ -1,6 +1,6 @@
 #ifndef PARTICLESUPDATER_H
 #define PARTICLESUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 
 class ParticleEmitter;
 class ParticlesUpdater : public PropertyUpdater {

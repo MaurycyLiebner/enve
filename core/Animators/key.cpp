@@ -1,6 +1,5 @@
 #include "key.h"
 
-#include "Animators/qrealanimator.h"
 #include "Animators/complexanimator.h"
 
 Key::Key(Animator* parentAnimator) {

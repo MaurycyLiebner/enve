@@ -6,7 +6,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include "float.h"
-#include "animator.h"
+#include "Animators/animator.h"
 class QrealKey;
 class QrealPoint;
 class QrealAnimatorValueSlider;

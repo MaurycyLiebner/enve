@@ -1,6 +1,6 @@
 #ifndef GROUPALLPATHSUPDATER_H
 #define GROUPALLPATHSUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class BoxesGroup;
 
 class GroupAllPathsUpdater : public PropertyUpdater {

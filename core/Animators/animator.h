@@ -2,6 +2,7 @@
 #define ANIMATOR_H
 
 #include <QColor>
+class QIODevice;
 #include "Properties/property.h"
 
 class ComplexAnimator;

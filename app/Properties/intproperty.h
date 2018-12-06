@@ -1,6 +1,6 @@
 #ifndef INTPROPERTY_H
 #define INTPROPERTY_H
-#include "property.h"
+#include "Properties/property.h"
 
 class IntProperty : public Property {
     Q_OBJECT

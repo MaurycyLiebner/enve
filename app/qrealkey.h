@@ -1,6 +1,6 @@
 #ifndef QREALKEY_H
 #define QREALKEY_H
-#include "key.h"
+#include "Animators/key.h"
 #include "pointhelpers.h"
 #include "smartPointers/sharedpointerdefs.h"
 

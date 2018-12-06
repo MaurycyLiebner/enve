@@ -1,6 +1,6 @@
 #ifndef GRADIENTPOINTSUPDATER_H
 #define GRADIENTPOINTSUPDATER_H
-#include "propertyupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class PathBox;
 
 class GradientPointsUpdater : public PropertyUpdater {
