@@ -2,7 +2,6 @@
 
 #include "Animators/qrealanimator.h"
 #include "Animators/complexanimator.h"
-#include "clipboardcontainer.h"
 
 Key::Key(Animator* parentAnimator) {
     mParentAnimator = parentAnimator;
@@ -100,7 +99,7 @@ void Key::scaleFrameAndUpdateParentAnimator(
 void Key::setSelected(const bool &bT) {
     mIsSelected = bT;
 }
-#include "undoredo.h"
+
 void Key::finishFrameTransform() {
     if(mParentAnimator == nullptr) return;
 //    mParentAnimator->addUndoRedo(
