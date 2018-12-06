@@ -1,5 +1,4 @@
 #include "pixmapeffect.h"
-#include "Animators/effectanimators.h"
 #include <QDrag>
 
 PixmapEffectRenderData::~PixmapEffectRenderData() {}
@@ -32,14 +31,6 @@ void PixmapEffect::prp_startDragging() {
 
 QMimeData *PixmapEffect::SWT_createMimeData() {
     return new PixmapEffectMimeData(this);
-}
-
-EffectAnimators *PixmapEffect::getParentEffectAnimators() {
-    return mParentEffects;
-}
-
-void PixmapEffect::setParentEffectAnimators(EffectAnimators *parentEffects) {
-    mParentEffects = parentEffects;
 }
 
 bool PixmapEffect::SWT_isPixmapEffect() { return true; }

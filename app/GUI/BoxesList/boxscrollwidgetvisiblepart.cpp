@@ -270,10 +270,8 @@ void BoxScrollWidgetVisiblePart::dropEvent(
         auto effectUnderMouse = GetAsSPtr(targetUnderMouse, PixmapEffect);
 
         if(effect != effectUnderMouse) {
-            EffectAnimators *underMouseAnimator =
-                                     effectUnderMouse->getParentEffectAnimators();
-            EffectAnimators *draggedAnimator =
-                                     effect->getParentEffectAnimators();
+            auto underMouseAnimator = effectUnderMouse->getParentEffectAnimators();
+            auto draggedAnimator = effect->getParentEffectAnimators();
             if(draggedAnimator != underMouseAnimator) {
                 qsptr<PixmapEffect> effectPtr = GetAsSPtr(effect, PixmapEffect);
                 underMouseAnimator->getParentBox()->addEffect(effectPtr);

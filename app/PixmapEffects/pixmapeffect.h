@@ -62,9 +62,15 @@ public:
 
     QMimeData *SWT_createMimeData();
 
-    EffectAnimators *getParentEffectAnimators();
+    template <class T = EffectAnimators>
+    T *getParentEffectAnimators() {
+        return mParentEffects;
+    }
 
-    void setParentEffectAnimators(EffectAnimators *parentEffects);
+    template <class T = EffectAnimators>
+    void setParentEffectAnimators(T *parentEffects) {
+        mParentEffects = parentEffects;
+    }
 
     virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data) = 0;

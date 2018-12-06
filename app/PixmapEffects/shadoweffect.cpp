@@ -48,7 +48,7 @@ stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFra
     renderData->translation = mTranslation->
             getCurrentEffectivePointValueAtRelFrameF(relFrame);
     renderData->opacity = mOpacity->getCurrentEffectiveValueAtRelFrameF(relFrame)/100.;
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
 void applyShadow(const SkBitmap &imgPtr,
