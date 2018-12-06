@@ -1,6 +1,7 @@
 #ifndef ANIMATOR_H
 #define ANIMATOR_H
 
+#include <QColor>
 #include "Properties/property.h"
 
 class ComplexAnimator;
@@ -8,7 +9,6 @@ class Key;
 class QPainter;
 class DurationRectangleMovable;
 class FakeComplexAnimator;
-#include <QColor>
 
 class Animator : public Property {
     Q_OBJECT
