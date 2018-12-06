@@ -73,7 +73,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
 
     if(pixId <= 0) {
         pixId = 0;
-    } else if(pixId > mAnimationCacheHandler->getFramesCount() - 1){
+    } else if(pixId > mAnimationCacheHandler->getFramesCount() - 1) {
         pixId = mAnimationCacheHandler->getFramesCount() - 1;
     }
 

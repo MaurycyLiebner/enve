@@ -127,7 +127,7 @@ protected:
 class NonAnimatedMovablePoint : public MovablePoint {
     friend class StdSelfRef;
 public:
-    void applyTransform(const QMatrix &transform){
+    void applyTransform(const QMatrix &transform) {
         setRelativePosVal(transform.map(mCurrentPos));
     }
 

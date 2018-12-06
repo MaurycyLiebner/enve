@@ -1,6 +1,6 @@
 #include "oileffect.h"
 #include "Animators/qrealanimator.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 
 OilEffect::OilEffect(qreal radius) : PixmapEffect("oil", EFFECT_OIL) {
     mRadiusAnimator = SPtrCreate(QrealAnimator)("radius");
@@ -14,13 +14,11 @@ stdsptr<PixmapEffectRenderData> OilEffect::getPixmapEffectRenderDataForRelFrameF
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(OilEffectRenderData)();
     renderData->radius = mRadiusAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void OilEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                         const fmt_filters::image &img,
+void OilEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                          const qreal &scale) {
-    Q_UNUSED(imgPtr)
     Q_UNUSED(scale)
-    fmt_filters::oil(img, radius);
+    RasterEffects::oil(bitmap, radius);
 }

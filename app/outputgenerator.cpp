@@ -71,21 +71,21 @@ static void video_encode_example(const char *filename,
         exit(1);
     }
     /* encode 1 second of video */
-    for (i = 0; i < 25; i++) {
+    for(i = 0; i < 25; i++) {
         av_init_packet(&pkt);
         pkt.data = nullptr;    // packet data will be allocated by the encoder
         pkt.size = 0;
         fflush(stdout);
         /* prepare a dummy image */
         /* Y */
-        for (y = 0; y < c->height; y++) {
-            for (x = 0; x < c->width; x++) {
+        for(y = 0; y < c->height; y++) {
+            for(x = 0; x < c->width; x++) {
                 frame->data[0][y * frame->linesize[0] + x] = x + y + i * 3;
             }
         }
         /* Cb and Cr */
-        for (y = 0; y < c->height/2; y++) {
-            for (x = 0; x < c->width/2; x++) {
+        for(y = 0; y < c->height/2; y++) {
+            for(x = 0; x < c->width/2; x++) {
                 frame->data[1][y * frame->linesize[1] + x] = 128 + y + i * 2;
                 frame->data[2][y * frame->linesize[2] + x] = 64 + x + i * 5;
             }
@@ -104,7 +104,7 @@ static void video_encode_example(const char *filename,
         }
     }
     /* get the delayed frames */
-    for (got_output = 1; got_output; i++) {
+    for(got_output = 1; got_output; i++) {
         fflush(stdout);
         ret = avcodec_encode_video2(c, &pkt, nullptr, &got_output);
         if (ret < 0) {
@@ -251,13 +251,13 @@ static void audio_encode_example(const char *filename) {
     /* encode a single tone sound */
     t = 0;
     tincr = 2 * M_PI * 440.0 / c->sample_rate;
-    for (i = 0; i < 200; i++) {
+    for(i = 0; i < 200; i++) {
         av_init_packet(&pkt);
         pkt.data = nullptr; // packet data will be allocated by the encoder
         pkt.size = 0;
-        for (j = 0; j < c->frame_size; j++) {
+        for(j = 0; j < c->frame_size; j++) {
             samples[2*j] = (int)(sin(t) * 10000);
-            for (k = 1; k < c->channels; k++)
+            for(k = 1; k < c->channels; k++)
                 samples[2*j + k] = samples[2*j];
             t += tincr;
         }
@@ -273,7 +273,7 @@ static void audio_encode_example(const char *filename) {
         }
     }
     /* get the delayed frames */
-    for (got_output = 1; got_output; i++) {
+    for(got_output = 1; got_output; i++) {
         ret = avcodec_encode_audio2(c, &pkt, nullptr, &got_output);
         if (ret < 0) {
             fprintf(stderr, "Error encoding frame\n");

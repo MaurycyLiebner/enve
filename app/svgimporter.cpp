@@ -584,7 +584,7 @@ void loadCircle(const QDomElement &pathElement,
     if(!rStr.isEmpty()) {
         circle = SPtrCreate(Circle)();
         circle->setRadius(rStr.toDouble());
-    } else if(!rXstr.isEmpty() && !rYstr.isEmpty()){
+    } else if(!rXstr.isEmpty() && !rYstr.isEmpty()) {
         circle = SPtrCreate(Circle)();
         circle->setHorizontalRadius(rXstr.toDouble());
         circle->setVerticalRadius(rYstr.toDouble());
@@ -1141,7 +1141,7 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
                     mTextAttributes.setFontAlignment(Qt::AlignLeft);
                 } else if(value == "middle") {
                     mTextAttributes.setFontAlignment(Qt::AlignHCenter);
-                } else if(value == "start"){
+                } else if(value == "start") {
                     mTextAttributes.setFontAlignment(Qt::AlignRight);
                 }
             } else if(name == "transform") {
@@ -1486,7 +1486,7 @@ bool resolveColor(const QStringRef &colorStr, QColor &color, QSvgHandler *handle
                     if (compo.size() == 1) {
                         s = colorStrTr.constData() + 4;
                         compo = parsePercentageList(s);
-                        for (int i = 0; i < compo.size(); ++i)
+                        for(int i = 0; i < compo.size(); ++i)
                             compo[i] *= (qreal)2.55;
                     }
 
@@ -2214,7 +2214,7 @@ void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
 
     n_segs = qCeil(qAbs(th_arc / (M_PI * 0.5 + 0.001)));
 
-    for (i = 0; i < n_segs; i++) {
+    for(i = 0; i < n_segs; i++) {
         pathArcSegment(xc, yc,
                        th0 + i * th_arc / n_segs,
                        th0 + (i + 1) * th_arc / n_segs,

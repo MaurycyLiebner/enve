@@ -5,8 +5,7 @@
 struct LinesEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
 
-    void applyEffectsSk(const SkBitmap &imgPtr,
-                        const fmt_filters::image &img,
+    void applyEffectsSk(const SkBitmap &bitmap,
                         const qreal &scale);
 
     bool vertical = false;

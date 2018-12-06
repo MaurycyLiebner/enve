@@ -23,13 +23,11 @@ stdsptr<PixmapEffectRenderData> LinesEffect::getPixmapEffectRenderDataForRelFram
     renderData->linesWidth = mLinesWidth->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->vertical = mVertical;
 
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void LinesEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                           const fmt_filters::image &img,
+void LinesEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                            const qreal &scale) {
-    Q_UNUSED(imgPtr)
-    Q_UNUSED(img)
+    Q_UNUSED(bitmap)
     Q_UNUSED(scale)
 }

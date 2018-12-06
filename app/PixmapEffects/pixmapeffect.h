@@ -8,13 +8,8 @@ class EffectAnimators;
 class QIODevice;
 class BoundingBoxRenderData;
 
-namespace fmt_filters {
-    struct image;
-}
-
 struct PixmapEffectRenderData : public StdSelfRef {
-    virtual void applyEffectsSk(const SkBitmap &imgPtr,
-                                const fmt_filters::image &img,
+    virtual void applyEffectsSk(const SkBitmap &bitmap,
                                 const qreal &scale) = 0;
     virtual ~PixmapEffectRenderData();
 };

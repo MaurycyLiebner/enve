@@ -170,7 +170,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
 
     /* check if we want to generate more frames */
 //    if (av_compare_ts(ost->next_pts, c->time_base,
-//                      STREAM_DURATION, (AVRational){ 1, 1 }) >= 0)
+//                      STREAM_DURATION, (AVRational) { 1, 1 }) >= 0)
 //        return nullptr;
 
     if(c->pix_fmt != AV_PIX_FMT_BGRA) {
@@ -312,7 +312,7 @@ static bool add_audio_stream(OutputStream *ost,
     c->channels       = av_get_channel_layout_nb_channels(c->channel_layout);
     c->bit_rate       = settings.audioBitrate;
 
-    ost->st->time_base = (AVRational){ 1, c->sample_rate };
+    ost->st->time_base = (AVRational) { 1, c->sample_rate };
 
     // some formats want stream headers to be separate
     if (oc->oformat->flags & AVFMT_GLOBALHEADER)
@@ -429,7 +429,7 @@ static AVFrame *get_audio_frame(OutputStream *ost) {
 
     /* check if we want to generate more frames */
 //    if(av_compare_ts(ost->next_pts, ost->enc->time_base,
-//                     STREAM_DURATION, (AVRational){ 1, 1 }) >= 0)
+//                     STREAM_DURATION, (AVRational) { 1, 1 }) >= 0)
 //        return nullptr;
 
 

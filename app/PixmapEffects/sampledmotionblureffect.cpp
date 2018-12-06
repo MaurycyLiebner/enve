@@ -59,7 +59,7 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
 
         relFrameT += frameStep;
     }
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
 void SampledMotionBlurEffect::prp_setAbsFrame(const int &frame) {
@@ -182,13 +182,11 @@ void replaceIfHigherAlpha(const int &x0, const int &y0,
     }
 }
 
-void SampledMotionBlurEffectRenderData::applyEffectsSk(
-        const SkBitmap &imgPtr, const fmt_filters::image &img,
-        const qreal &scale) {
-    Q_UNUSED(img)
+void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
+                                                       const qreal &scale) {
     Q_UNUSED(scale)
     SkBitmap motionBlur;
-    motionBlur.allocPixels(imgPtr.info());
+    motionBlur.allocPixels(bitmap.info());
     motionBlur.eraseColor(SK_ColorTRANSPARENT);
     //SkCanvas canvasSk(motionBlur);
     qreal opacityStepT = 1./(numberSamples + 1);
@@ -204,7 +202,7 @@ void SampledMotionBlurEffectRenderData::applyEffectsSk(
         opacityT += opacityStepT;
     }
 
-    replaceIfHigherAlpha(0, 0, imgPtr, motionBlur);
+    replaceIfHigherAlpha(0, 0, bitmap, motionBlur);
 //    SkCanvas canvasSk2(imgPtr);
 //    SkPaint paintT;
 //    paintT.setBlendMode(SkBlendMode::kDstOver);

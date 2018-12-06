@@ -1,5 +1,5 @@
 #include "shadoweffect.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 #include "Animators/coloranimator.h"
 #include "Properties/boolproperty.h"
 #include "Animators/qpointfanimator.h"
@@ -51,7 +51,7 @@ stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFra
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void applyShadow(const SkBitmap &imgPtr,
+void applyShadow(const SkBitmap &bitmap,
                  const qreal &scale,
                  const qreal &blurRadius,
                  const QColor &currentColor,
@@ -60,49 +60,39 @@ void applyShadow(const SkBitmap &imgPtr,
                  const bool &highQuality,
                  const qreal &opacity = 1.) {
     SkBitmap shadowBitmap;
-    shadowBitmap.allocPixels(imgPtr.info());
+    shadowBitmap.allocPixels(bitmap.info());
 
     SkPaint paint;
     paint.setBlendMode(SkBlendMode::kDstIn);
-    SkCanvas *shadowCanvas = new SkCanvas(shadowBitmap);
-    shadowCanvas->clear(QColorToSkColor(currentColor));
-    shadowCanvas->drawBitmap(imgPtr, 0, 0, &paint);
-    shadowCanvas->flush();
-    delete shadowCanvas;
-
-    SkPixmap shadowPixmap;
-    shadowBitmap.peekPixels(&shadowPixmap);
-    fmt_filters::image shadowImg(
-                static_cast<uint8_t*>(shadowPixmap.writable_addr()),
-                shadowBitmap.width(), shadowBitmap.height());
+    SkCanvas shadowCanvas(shadowBitmap);
+    shadowCanvas.clear(QColorToSkColor(currentColor));
+    shadowCanvas.drawBitmap(bitmap, 0, 0, &paint);
+    shadowCanvas.flush();
 
     if(opacity > 1.) {
-        fmt_filters::applyBlur(shadowImg, scale,
+        RasterEffects::applyBlur(shadowBitmap, scale,
                   blurRadius, highQuality,
                   hasKeys, opacity);
     } else {
-        fmt_filters::applyBlur(shadowImg, scale,
+        RasterEffects::applyBlur(shadowBitmap, scale,
                   blurRadius, highQuality,
                   hasKeys);
         int alphaT = qMin(255, qMax(0, qRound(opacity*255) ));
         paint.setAlpha(static_cast<U8CPU>(alphaT));
     }
 
-    SkCanvas *dstCanvas = new SkCanvas(imgPtr);
+    SkCanvas dstCanvas(bitmap);
     paint.setBlendMode(SkBlendMode::kDstOver);
-    dstCanvas->drawBitmap(shadowBitmap,
-                          qrealToSkScalar(trans.x()*scale),
-                          qrealToSkScalar(trans.y()*scale),
-                          &paint);
-    dstCanvas->flush();
-    delete dstCanvas;
+    dstCanvas.drawBitmap(shadowBitmap,
+                         qrealToSkScalar(trans.x()*scale),
+                         qrealToSkScalar(trans.y()*scale),
+                         &paint);
+    dstCanvas.flush();
 }
 
-void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                            const fmt_filters::image &img,
+void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                             const qreal &scale) {
-    Q_UNUSED(img);
-    applyShadow(imgPtr, scale,
+    applyShadow(bitmap, scale,
                 blurRadius,
                 color,
                 translation,

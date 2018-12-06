@@ -1,5 +1,5 @@
 #include "brightnesseffect.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 #include "Animators/qrealanimator.h"
 
 BrightnessEffect::BrightnessEffect(qreal brightness) :
@@ -18,17 +18,15 @@ stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRe
     renderData->brightness =
             mBrightnessAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->hasKeys = mBrightnessAnimator->prp_hasKeys();
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void BrightnessEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                                const fmt_filters::image &img,
+void BrightnessEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                                 const qreal &scale) {
-    Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
     if(hasKeys) {
-        fmt_filters::anim_brightness(img, brightness);
+        RasterEffects::anim_brightness(bitmap, brightness);
     } else {
-        fmt_filters::brightness(img, qRound(brightness));
+        RasterEffects::brightness(bitmap, qRound(brightness));
     }
 }

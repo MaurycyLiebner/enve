@@ -59,7 +59,7 @@ MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos,
     if(mEnabled) {
         if(mStartPoint->isPointAtAbsPos(absPos, canvasScaleInv) ) {
             return mStartPoint.get();
-        } else if (mEndPoint->isPointAtAbsPos(absPos, canvasScaleInv) ){
+        } else if (mEndPoint->isPointAtAbsPos(absPos, canvasScaleInv) ) {
             return mEndPoint.get();
         }
     }

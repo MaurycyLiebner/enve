@@ -1,6 +1,6 @@
 #include "desaturateeffect.h"
 #include "Animators/qrealanimator.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 
 DesaturateEffect::DesaturateEffect(qreal radius) :
     PixmapEffect("desaturate", EFFECT_DESATURATE) {
@@ -16,13 +16,11 @@ stdsptr<PixmapEffectRenderData> DesaturateEffect::getPixmapEffectRenderDataForRe
     auto renderData = SPtrCreate(DesaturateEffectRenderData)();
     renderData->influence =
             mInfluenceAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void DesaturateEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                                const fmt_filters::image &img,
+void DesaturateEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                                 const qreal &scale) {
-    Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
-    fmt_filters::desaturate(img, influence);
+    RasterEffects::desaturate(bitmap, influence);
 }

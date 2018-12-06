@@ -1,6 +1,6 @@
 #include "replacecoloreffect.h"
 #include "Animators/qrealanimator.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 #include "Animators/coloranimator.h"
 
 ReplaceColorEffect::ReplaceColorEffect() :
@@ -42,14 +42,13 @@ stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataFor
             getCurrentEffectiveValueAtRelFrameF(relFrame)*255);
     renderData->smoothness = mSmoothnessAnimator->
             getCurrentEffectiveValueAtRelFrameF(relFrame);
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void ReplaceColorEffectRenderData::applyEffectsSk(
-        const SkBitmap &imgPtr, const fmt_filters::image &img,
-        const qreal &scale) {
+void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
+                                                  const qreal &scale) {
     Q_UNUSED(imgPtr);
-    fmt_filters::replaceColor(img, redR, greenR, blueR, alphaR,
+    RasterEffects::replaceColor(img, redR, greenR, blueR, alphaR,
                               redT, greenT, blueT, alphaT,
                               tolerance, smoothness*scale);
 }

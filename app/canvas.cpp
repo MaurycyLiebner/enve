@@ -269,7 +269,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         canvas->saveLayer(nullptr, nullptr);
         if(!mClipToCanvasSize || !drawCanvas) {
-            Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes){
+            Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
                 box->drawPixmapSk(canvas);
             }
         }
@@ -1360,7 +1360,7 @@ SoundComposition *Canvas::getSoundComposition() {
 CanvasRenderData::CanvasRenderData(BoundingBox* parentBoxT) :
     BoxesGroupRenderData(parentBoxT) {}
 
-#include "PixmapEffects/fmt_filters.h"
+#include "PixmapEffects/rastereffects.h"
 void CanvasRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
@@ -1380,12 +1380,8 @@ void CanvasRenderData::renderToImage() {
     rasterCanvas->flush();
 
     if(!pixmapEffects.isEmpty()) {
-        SkPixmap pixmap;
-        bitmap.peekPixels(&pixmap);
-        fmt_filters::image img(static_cast<uint8_t*>(pixmap.writable_addr()),
-                               pixmap.width(), pixmap.height());
         foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, img, resolution);
+            effect->applyEffectsSk(bitmap, resolution);
         }
         clearPixmapEffects();
     }

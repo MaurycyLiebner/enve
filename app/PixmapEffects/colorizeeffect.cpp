@@ -1,6 +1,6 @@
 #include "colorizeeffect.h"
 #include "Animators/qrealanimator.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 
 stdsptr<PixmapEffectRenderData> ColorizeEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
@@ -13,7 +13,7 @@ stdsptr<PixmapEffectRenderData> ColorizeEffect::getPixmapEffectRenderDataForRelF
             mLightnessAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->alpha =
             mAlphaAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
 ColorizeEffect::ColorizeEffect() :
@@ -40,11 +40,9 @@ ColorizeEffect::ColorizeEffect() :
     ca_addChildAnimator(mAlphaAnimator);
 }
 
-void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                              const fmt_filters::image &img,
+void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                               const qreal &scale) {
-    Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
-    fmt_filters::colorizeHSV(img,
+    RasterEffects::colorizeHSV(img,
                              hue, saturation, lightness, alpha);
 }

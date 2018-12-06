@@ -1,6 +1,6 @@
 #include "implodeeffect.h"
 #include "Animators/qrealanimator.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 
 ImplodeEffect::ImplodeEffect(qreal radius) :
     PixmapEffect("implode", EFFECT_IMPLODE) {
@@ -14,14 +14,13 @@ ImplodeEffect::ImplodeEffect(qreal radius) :
 stdsptr<PixmapEffectRenderData> ImplodeEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ImplodeEffectRenderData)();
-    renderData->factor = mFactorAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
-    return renderData;
+    renderData->factor =
+            mFactorAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void ImplodeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                             const fmt_filters::image &img,
+void ImplodeEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                              const qreal &scale) {
-    Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
-    fmt_filters::implode(img, factor, fmt_filters::rgba(0, 0, 0, 0));
+    RasterEffects::implode(bitmap, factor, RasterEffects::rgba(0, 0, 0, 0));
 }

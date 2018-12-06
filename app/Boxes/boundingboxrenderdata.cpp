@@ -1,6 +1,6 @@
 #include "boundingboxrenderdata.h"
 #include "boundingbox.h"
-#include "PixmapEffects/fmt_filters.h"
+#include "PixmapEffects/rastereffects.h"
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
     if(parentBoxT == nullptr) return;
@@ -121,12 +121,8 @@ void BoundingBoxRenderData::renderToImage() {
                             qRound(globalBoundingRect.top()));
 
     if(!pixmapEffects.isEmpty()) {
-        SkPixmap pixmap;
-        bitmap.peekPixels(&pixmap);
-        fmt_filters::image img(static_cast<uint8_t*>(pixmap.writable_addr()),
-                               pixmap.width(), pixmap.height());
         foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, img, resolution);
+            effect->applyEffectsSk(bitmap, resolution);
         }
         clearPixmapEffects();
     }

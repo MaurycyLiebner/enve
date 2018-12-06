@@ -1,7 +1,7 @@
 #include "blureffect.h"
 #include "Animators/qrealanimator.h"
 #include "Properties/boolproperty.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 
 BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
     mBlurRadius = SPtrCreate(QrealAnimator)("radius");
@@ -15,11 +15,9 @@ BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
     ca_addChildAnimator(mBlurRadius);
 }
 
-void BlurEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                          const fmt_filters::image &img,
+void BlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                           const qreal &scale) {
-    Q_UNUSED(imgPtr)
-    fmt_filters::applyBlur(img, scale, blurRadius, highQuality, hasKeys);
+    RasterEffects::applyBlur(bitmap, scale, blurRadius, highQuality, hasKeys);
 }
 
 qreal BlurEffect::getMargin() {
@@ -36,5 +34,5 @@ stdsptr<PixmapEffectRenderData> BlurEffect::getPixmapEffectRenderDataForRelFrame
     renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->hasKeys = mBlurRadius->prp_hasKeys();
     renderData->highQuality = mHighQuality->getValue();
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

@@ -1,5 +1,5 @@
 #include "contrasteffect.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 #include "Animators/qrealanimator.h"
 
 ContrastEffect::ContrastEffect(qreal contrast) :
@@ -17,17 +17,15 @@ stdsptr<PixmapEffectRenderData> ContrastEffect::getPixmapEffectRenderDataForRelF
     renderData->contrast =
             mContrastAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
     renderData->hasKeys = mContrastAnimator->prp_hasKeys();
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void ContrastEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                              const fmt_filters::image &img,
+void ContrastEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                               const qreal &scale) {
-    Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
     if(hasKeys) {
-        fmt_filters::anim_contrast(img, contrast);
+        RasterEffects::anim_contrast(bitmap, contrast);
     } else {
-        fmt_filters::contrast(img, qRound(contrast));
+        RasterEffects::contrast(bitmap, qRound(contrast));
     }
 }

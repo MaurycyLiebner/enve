@@ -28,7 +28,7 @@ int decode_audio_file(const char* path,
 
     // Find the index of the first audio stream
     int audioStreamIndex = -1;
-    for (uint i = 0; i< format->nb_streams; i++) {
+    for(uint i = 0; i< format->nb_streams; i++) {
         AVStream *streamT = format->streams[i];
         const AVMediaType &mediaType = streamT->codecpar->codec_type;
         if(mediaType == AVMEDIA_TYPE_AUDIO) {

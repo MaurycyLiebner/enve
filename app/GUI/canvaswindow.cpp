@@ -1201,7 +1201,7 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
     if(mimeData->hasUrls()) {
         QList<QUrl> urlList = mimeData->urls();
 
-        for (int i = 0; i < urlList.size() && i < 32; i++) {
+        for(int i = 0; i < urlList.size() && i < 32; i++) {
             importFile(urlList.at(i).toLocalFile(),
                        mCurrentCanvas->mapCanvasAbsToRel(event->posF()));
         }

@@ -1,6 +1,6 @@
 #include "circleseffect.h"
 #include "Animators/qrealanimator.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 
 CirclesEffect::CirclesEffect(qreal circlesRadius,
                              qreal circlesDistance) :
@@ -25,13 +25,11 @@ stdsptr<PixmapEffectRenderData> CirclesEffect::getPixmapEffectRenderDataForRelFr
     renderData->circlesRadius =
             mCirclesRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);
 
-    return renderData;
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void CirclesEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                             const fmt_filters::image &img,
+void CirclesEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                              const qreal &scale) {
-    Q_UNUSED(imgPtr)
-    Q_UNUSED(img)
+    Q_UNUSED(bitmap)
     Q_UNUSED(scale)
 }

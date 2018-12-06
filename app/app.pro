@@ -93,7 +93,6 @@ SOURCES += main.cpp\
     pathoperations.cpp \
     Boxes/linkbox.cpp \
     Boxes/boxpainthandler.cpp \
-    PixmapEffects/fmt_filters.cpp \
     PixmapEffects/pixmapeffect.cpp \
     Boxes/particlebox.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollarea.cpp \
@@ -246,7 +245,8 @@ SOURCES += main.cpp\
     PropertyUpdaters/singlesoundupdater.cpp \
     PropertyUpdaters/randomqrealgeneratorupdater.cpp \
     PropertyUpdaters/paintboxsizeupdaters.cpp \
-    PropertyUpdaters/groupallpathsupdater.cpp
+    PropertyUpdaters/groupallpathsupdater.cpp \
+    PixmapEffects/rastereffects.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -290,7 +290,6 @@ HEADERS  += \
     Boxes/linkbox.h \
     Boxes/boxpainthandler.h \
     PixmapEffects/pixmapeffect.h \
-    PixmapEffects/fmt_filters.h \
     Boxes/particlebox.h \
     GUI/BoxesList/OptimalScrollArea/scrollarea.h \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.h \
@@ -449,7 +448,8 @@ HEADERS  += \
     PropertyUpdaters/singlesoundupdater.h \
     PropertyUpdaters/randomqrealgeneratorupdater.h \
     PropertyUpdaters/paintboxsizeupdaters.h \
-    PropertyUpdaters/groupallpathsupdater.h
+    PropertyUpdaters/groupallpathsupdater.h \
+    PixmapEffects/rastereffects.h
 
 RESOURCES += \
     resources.qrc

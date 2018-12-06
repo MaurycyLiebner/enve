@@ -378,7 +378,7 @@ void AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 SurfaceKey::SurfaceKey(Animator *parentAnimator) :
-    Key(parentAnimator){
+    Key(parentAnimator) {
 }
 
 SurfaceKey::~SurfaceKey() {

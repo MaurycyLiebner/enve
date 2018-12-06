@@ -3,8 +3,6 @@
 #include "Animators/complexanimator.h"
 #include "smartPointers/sharedpointerdefs.h"
 
-namespace fmt_filters { struct image; }
-
 class PixmapEffect;
 class BoundingBox;
 class SkImage;

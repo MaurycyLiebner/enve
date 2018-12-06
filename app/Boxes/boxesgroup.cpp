@@ -1052,7 +1052,7 @@ bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                             parentSatisfies,
                                             parentMainTarget);
 }
-#include "PixmapEffects/fmt_filters.h"
+#include "PixmapEffects/rastereffects.h"
 void BoxesGroupRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
@@ -1101,12 +1101,8 @@ void BoxesGroupRenderData::renderToImage() {
                             qRound(globalBoundingRect.top()));
 
     if(!pixmapEffects.isEmpty()) {
-        SkPixmap pixmap;
-        bitmap.peekPixels(&pixmap);
-        fmt_filters::image img(static_cast<uint8_t*>(pixmap.writable_addr()),
-                               pixmap.width(), pixmap.height());
         foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, img, resolution);
+            effect->applyEffectsSk(bitmap, resolution);
         }
         clearPixmapEffects();
     }

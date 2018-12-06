@@ -391,7 +391,7 @@ void Tile::getColor(qreal cx,
     int x_min = floor(cx - r);
     if(x_min > mMaxPaintX) {
         return;
-    } else if(x_min < 0){
+    } else if(x_min < 0) {
         x_min = 0;
     }
     int x_max = ceil(cx + r);

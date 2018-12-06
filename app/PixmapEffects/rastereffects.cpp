@@ -1,76 +1,4 @@
-/*
- * Copyright (c) 2005 Dmitry Baryshev <ksquirrel.iv@gmail.com>
- */
-
-/* This file is part of the KDE libraries
-    Copyright (C) 1998, 1999, 2001, 2002 Daniel M. Duley <mosfet@kde.org>
-    (C) 1998, 1999 Christian Tibirna <ctibirna@total.net>
-    (C) 1998, 1999 Dirk A. Mueller <mueller@kde.org>
-    (C) 1999 Geert Jansen <g.t.jansen@stud.tue.nl>
-    (C) 2000 Josef Weidendorfer <weidendo@in.tum.de>
-    (C) 2004 Zack Rusin <zack@kde.org>
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-*/
-
-//
-// ===================================================================
-// Effects originally ported from ImageMagick for PixiePlus, plus a few
-// new ones. (mosfet 05/26/2003)
-// ===================================================================
-//
-/*
- Portions of this software are based on ImageMagick. Such portions are clearly
-marked as being ported from ImageMagick. ImageMagick is copyrighted under the
-following conditions:
-
-Copyright (C) 2003 ImageMagick Studio, a non-profit organization dedicated to
-making software imaging solutions freely available.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files ("ImageMagick"), to deal
-in ImageMagick without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense,  and/or sell
-copies of ImageMagick, and to permit persons to whom the ImageMagick is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of ImageMagick.
-
-The software is provided "as is", without warranty of any kind, express or
-implied, including but not limited to the warranties of merchantability,
-fitness for a particular purpose and noninfringement.  In no event shall
-ImageMagick Studio be liable for any claim, damages or other liability,
-whether in an action of contract, tort or otherwise, arising from, out of or
-in connection with ImageMagick or the use or other dealings in ImageMagick.
-
-Except as contained in this notice, the name of the ImageMagick Studio shall
-not be used in advertising or otherwise to promote the sale, use or other
-dealings in ImageMagick without prior written authorization from the
-ImageMagick Studio.
-*/
-
-#include "fmt_filters.h"
+#include "rastereffects.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include <QColor>
 
@@ -80,7 +8,7 @@ ImageMagick Studio.
 using namespace std;
 #include <algorithm>
 
-namespace fmt_filters
+namespace RasterEffects
 {
 
 #define MaxRGB 255L
@@ -92,17 +20,17 @@ namespace fmt_filters
 #define F_MAX(a, b)  ((b) < (a) ? (a) : (b))
 #define F_MIN(a, b)  ((a) < (b) ? (a) : (b))
 
-static void rgb2hsv(const fmt_filters::rgb &rgb, s32 *h, s32 *s, s32 *v);
-static void hsv2rgb(s32 h, s32 s, s32 v, fmt_filters::rgb *rgb);
-static fmt_filters::rgba interpolateColor(const fmt_filters::image &image, qreal x_offset, qreal y_offset, const fmt_filters::rgba &background);
-static u32 generateNoise(u32 pixel, fmt_filters::NoiseType noise_type);
+static void rgb2hsv(const RasterEffects::rgb &rgb, s32 *h, s32 *s, s32 *v);
+static void hsv2rgb(s32 h, s32 s, s32 v, RasterEffects::rgb *rgb);
+static RasterEffects::rgba interpolateColor(const SkBitmap &SkBitmap, qreal x_offset, qreal y_offset, const RasterEffects::rgba &background);
+static u32 generateNoise(u32 pixel, RasterEffects::NoiseType noise_type);
 static u32 intensityValue(s32 r, s32 g, s32 b);
-static u32 intensityValue(const fmt_filters::rgba &rr);
+static u32 intensityValue(const RasterEffects::rgba &rr);
 static s32 getBlurKernel(s32 width, qreal sigma, qreal **kernel);
-static void blurScanLine(qreal *kernel, s32 width, fmt_filters::rgba *src, fmt_filters::rgba *dest, s32 columns);
+static void blurScanLine(qreal *kernel, s32 width, RasterEffects::rgba *src, RasterEffects::rgba *dest, s32 columns);
 static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, const s32 columns,
                         const s32 rows, u8 *f, u8 *g);
-static bool convolveImage(fmt_filters::image *image, fmt_filters::rgba **dest, const unsigned int order, const qreal *kernel);
+static bool convolveImage(SkBitmap *bitmap, RasterEffects::rgba **dest, const unsigned int order, const qreal *kernel);
 static int getOptimalKernelWidth(qreal radius, qreal sigma);
 
 template<class T>
@@ -124,31 +52,35 @@ struct short_packet
     unsigned short int alpha;
 };
 
-bool checkImage(const image &im)
-{
-    return (im.rw && im.rh && im.w && im.h && im.data);
+uchar floorQrealToUChar(const qreal &val) {
+    return static_cast<uchar>(qMin(255, qMax(0, qFloor(val))) );
 }
 
-u8 qrealToU8(const qreal &val) {
-    return (u8)qMin(255, qMax(0, qRound(val)));
+uchar roundQrealToUChar(const qreal &val) {
+    return static_cast<uchar>(qMin(255, qMax(0, qRound(val))) );
 }
 
-#include "GUI/ColorWidgets/helpers.h"
+uchar intToUChar(const int &val) {
+    return static_cast<uchar>(qMin(255, qMax(0, val)) );
+}
+
+
 // colorize tool
-void colorizeHSV(const image &im,
+void colorizeHSV(const SkBitmap &bitmap,
               const qreal &hue,
               const qreal &saturation,
               const qreal &lightness,
               const qreal &alpha) {
-    if(!checkImage(im)) return;
+    if(bitmap.empty()) return;
 
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     u8 *bits;
 
     if(alpha > 0.001) {
-        for(s32 y = 0; y < im.h; ++y) {
-            bits = im.data + im.rw * y * sizeof(rgba);
+        for(s32 y = 0; y < bitmap.height(); ++y) {
+            bits = pixels + bitmap.width() * y * sizeof(rgba);
 
-            for(s32 x = 0; x < im.w; x++) {
+            for(s32 x = 0; x < bitmap.width(); x++) {
                 u8 u8aT = *(bits + 3);
                 if(u8aT != 0) {
                     qreal aT = u8aT/255.;
@@ -164,13 +96,13 @@ void colorizeHSV(const image &im,
                     qhsl_to_rgb(&hT, &sT, &lT);
 
                     *(bits) =
-                        qrealToU8(
+                        roundQrealToUChar(
                             (alpha*lT*255. + (1. - alpha)*bT)*aT);
                     *(bits + 1) =
-                        qrealToU8(
+                        roundQrealToUChar(
                             (alpha*sT*255. + (1. - alpha)*gT)*aT);
                     *(bits + 2) =
-                        qrealToU8(
+                        roundQrealToUChar(
                             (alpha*hT*255. + (1. - alpha)*rT)*aT);
                 }
 
@@ -180,7 +112,7 @@ void colorizeHSV(const image &im,
     }
 }
 
-void replaceColor(const image &im,
+void replaceColor(const SkBitmap &bitmap,
               const int &redR,
               const int &greenR,
               const int &blueR,
@@ -191,18 +123,18 @@ void replaceColor(const image &im,
               const int &alphaT,
               const int &tolerance,
               const qreal &smooth) {
-    if(!checkImage(im)) return;
-
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     u8 *bits;
-    int dataW = im.w;
-    int dataH = im.h;
+    int dataW = bitmap.width();
+    int dataH = bitmap.height();
     qreal *imMap = new qreal[dataW * dataH];
 
     QColor colT(redR, greenR, blueR, alphaR);
-    for(s32 y = 0; y < im.h; ++y) {
-        bits = im.data + im.rw * y * sizeof(rgba);
+    for(s32 y = 0; y < bitmap.height(); ++y) {
+        bits = pixels + bitmap.width() * y * sizeof(rgba);
 
-        for(s32 x = 0; x < im.w; x++) {
+        for(s32 x = 0; x < bitmap.width(); x++) {
             int u8aT = (u8)*(bits + 3);
             int u8bT = (u8)*(bits);
             int u8gT = (u8)*(bits + 1);
@@ -225,10 +157,10 @@ void replaceColor(const image &im,
             bits += 4;
         }
     }
-//    for(s32 y = 0; y < im.h; ++y) {
-//        bits = im.data + im.rw * y * sizeof(rgba);
+//    for(s32 y = 0; y < bitmap.height(); ++y) {
+//        bits = bitmap.getPixels() + bitmap.width() * y * sizeof(rgba);
 
-//        for(s32 x = 0; x < im.w; x++) {
+//        for(s32 x = 0; x < bitmap.width(); x++) {
 //            int u8aT = (u8)*(bits + 3);
 //            int u8bT = (u8)*(bits);
 //            int u8gT = (u8)*(bits + 1);
@@ -248,10 +180,10 @@ void replaceColor(const image &im,
 //    }
 
     qspredMono(imMap, dataW, dataH, smooth*10.);
-    for(s32 y = 0; y < im.h; ++y) {
-        bits = im.data + im.rw * y * sizeof(rgba);
+    for(s32 y = 0; y < bitmap.height(); ++y) {
+        bits = pixels + bitmap.width() * y * sizeof(rgba);
 
-        for(s32 x = 0; x < im.w; x++) {
+        for(s32 x = 0; x < bitmap.width(); x++) {
             int u8aT = (u8)*(bits + 3);
             int u8bT = (u8)*(bits);
             int u8gT = (u8)*(bits + 1);
@@ -259,10 +191,10 @@ void replaceColor(const image &im,
             qreal inf = imMap[y * dataW + x];
             if(inf > 0.001) {
                 inf = qMin(1., 5*inf);
-                *(bits) = qrealToU8(u8bT*(1. - inf) + blueT*inf);
-                *(bits + 1) = qrealToU8(u8gT*(1. - inf) + greenT*inf);
-                *(bits + 2) = qrealToU8(u8rT*(1. - inf) + redT*inf);
-                *(bits + 3) = qrealToU8(u8aT*(1. - inf) + alphaT*inf);
+                *(bits) = roundQrealToUChar(u8bT*(1. - inf) + blueT*inf);
+                *(bits + 1) = roundQrealToUChar(u8gT*(1. - inf) + greenT*inf);
+                *(bits + 2) = roundQrealToUChar(u8rT*(1. - inf) + redT*inf);
+                *(bits + 3) = roundQrealToUChar(u8aT*(1. - inf) + alphaT*inf);
             }
 
             bits += 4;
@@ -283,14 +215,14 @@ void replaceColor(const image &im,
 //              const int &alphaT,
 //              const int &tolerance,
 //              const int &smooth) {
-//    if(!checkImage(im)) return;
+//    if(bitmap.empty()) return;
 
 //    u8 *bits;
 
-//    for(s32 y = 0; y < im.h; ++y) {
-//        bits = im.data + im.rw * y * sizeof(rgba);
+//    for(s32 y = 0; y < bitmap.height(); ++y) {
+//        bits = bitmap.getPixels() + bitmap.width() * y * sizeof(rgba);
 
-//        for(s32 x = 0; x < im.w; x++) {
+//        for(s32 x = 0; x < bitmap.width(); x++) {
 //            int u8aT = *(bits + 3);
 //            int u8bT = *(bits);
 //            int u8gT = *(bits + 1);
@@ -322,18 +254,17 @@ void replaceColor(const image &im,
 //}
 
 // brightness tool
-void anim_brightness(const image &im, qreal bn) {
+void anim_brightness(const SkBitmap &bitmap, qreal bn) {
     // check if all parameters are good
-    if(!checkImage(im))
-    return;
-
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     u8 *bits;
     s32 val;
 
     // add to all color components 'bn' value, and check if the result is out of bounds.
-    for(s32 y = 0; y < im.h; ++y) {
-        bits = im.data + im.rw * y * sizeof(rgba);
-        for(s32 x = 0; x < im.w; x++) {
+    for(s32 y = 0; y < bitmap.height(); ++y) {
+        bits = pixels + bitmap.width() * y * sizeof(rgba);
+        for(s32 x = 0; x < bitmap.width(); x++) {
             u8 uAlpha = *(bits + 3);
             qreal alpha = uAlpha/255.;
             if(uAlpha == 0) {
@@ -353,19 +284,18 @@ void anim_brightness(const image &im, qreal bn) {
 }
 
 // brightness tool
-void brightness(const image &im, s32 bn) {
+void brightness(const SkBitmap &bitmap, s32 bn) {
     // check if all parameters are good
-    if(!checkImage(im))
-    return;
-
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     u8 *bits;
     s32 val;
 
     // add to all color components 'bn' value, and check if the result is out of bounds.
-    for(s32 y = 0; y < im.h; ++y) {
-        bits = im.data + im.rw * y * sizeof(rgba);
+    for(s32 y = 0; y < bitmap.height(); ++y) {
+        bits = pixels + bitmap.width() * y * sizeof(rgba);
 
-        for(s32 x = 0; x < im.w; x++) {
+        for(s32 x = 0; x < bitmap.width(); x++) {
             u8 uAlpha = *(bits + 3);
             qreal alpha = uAlpha/255.;
             if(uAlpha == 0) {
@@ -385,11 +315,10 @@ void brightness(const image &im, s32 bn) {
 }
 
 // gamma tool
-void gamma(const image &im, qreal L) {
+void gamma(const SkBitmap &bitmap, qreal L) {
     // check if all parameters are good
-    if(!checkImage(im))
-    return;
-
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     if(L == 0 || L < 0) L = 0.01;
 
     rgba *_rgba;
@@ -399,14 +328,14 @@ void gamma(const image &im, qreal L) {
     GT[0] = 0;
 
     // fill the array with gamma koefficients
-    for (s32 x = 1; x < 256; ++x)
+    for(s32 x = 1; x < 256; ++x)
     GT[x] = (u8)round(255 * pow((double)x / 255.0, 1.0 / L));
 
     // now change gamma
-    for(s32 y = 0;y < im.h;++y) {
-        _rgba = (rgba *)im.data + im.rw * y;
+    for(s32 y = 0;y < bitmap.height();++y) {
+        _rgba = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++) {
+        for(s32 x = 0;x < bitmap.width();x++) {
             R = _rgba[x].r;
             G = _rgba[x].g;
             B = _rgba[x].b;
@@ -418,50 +347,50 @@ void gamma(const image &im, qreal L) {
     }
 }
 
-void anim_contrast(const image &im, qreal contrast) {
-    if(!checkImage(im) || !contrast) return;
+void anim_contrast(const SkBitmap &bitmap, qreal contrast) {
+    if(bitmap.empty() || isZero4Dec(contrast)) return;
 
     if(contrast < -255) contrast = -255;
     if(contrast >  255) contrast = 255;
 
     u8 Ravg, Gavg, Bavg;
     s32 Ra = 0, Ga = 0, Ba = 0, Rn, Gn, Bn;
-    unsigned char *pix = im.data;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
 
     // calculate the average values for RED, GREEN and BLUE
     // color components
     int p = 0;
-    for(s32 y = 0; y < im.h; y++) {
-        for(s32 x = 0; x < im.w; x++) {
-            u8 pA = pix[p + 3];
-            Ra += pix[p]*pA;
-            Ga += pix[p + 1]*pA;
-            Ba += pix[p + 2]*pA;
+    for(s32 y = 0; y < bitmap.height(); y++) {
+        for(s32 x = 0; x < bitmap.width(); x++) {
+            u8 pA = pixels[p + 3];
+            Ra += pixels[p]*pA;
+            Ga += pixels[p + 1]*pA;
+            Ba += pixels[p + 2]*pA;
 
             p += 4;
         }
     }
 
-    s32 S = im.w * im.h * 255;
+    s32 S = bitmap.width() * bitmap.height() * 255;
 
     Ravg = Ra / S;
     Gavg = Ga / S;
     Bavg = Ba / S;
 
     p = 0;
-    for(s32 y = 0;y < im.h;y++) {
-        for(s32 x = 0; x < im.w; x++) {
-            u8 pR = pix[p];
-            u8 pG = pix[p + 1];
-            u8 pB = pix[p + 2];
+    for(s32 y = 0;y < bitmap.height();y++) {
+        for(s32 x = 0; x < bitmap.width(); x++) {
+            u8 pR = pixels[p];
+            u8 pG = pixels[p + 1];
+            u8 pB = pixels[p + 2];
 
             Rn = (contrast > 0) ? ((pR - Ravg) * 256 / (256 - contrast) + Ravg) : ((pR - Ravg) * (256 + contrast) / 256 + Ravg);
             Gn = (contrast > 0) ? ((pG - Gavg) * 256 / (256 - contrast) + Gavg) : ((pG - Gavg) * (256 + contrast) / 256 + Gavg);
             Bn = (contrast > 0) ? ((pB - Bavg) * 256 / (256 - contrast) + Bavg) : ((pB - Bavg) * (256 + contrast) / 256 + Bavg);
 
-            pix[p] = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
-            pix[p + 1] = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
-            pix[p + 2] = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
+            pixels[p] = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
+            pixels[p + 1] = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
+            pixels[p + 2] = Bn < 0 ? 0 : (Bn > 255 ? 255 : Bn);
 
             p += 4;
         }
@@ -469,26 +398,26 @@ void anim_contrast(const image &im, qreal contrast) {
 }
 
 // contrast tool
-void contrast(const image &im, s32 contrast) {
-    if(!checkImage(im) || !contrast) return;
+void contrast(const SkBitmap &bitmap, s32 contrast) {
+    if(bitmap.empty() || !contrast) return;
 
     if(contrast < -255) contrast = -255;
     if(contrast >  255) contrast = 255;
-    unsigned char *pix = im.data;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
 
     qreal factor = (259. * (contrast + 255.)) / (255. * (259. - contrast));
 
     int p = 0;
-    for(s32 y = 0; y < im.h; y++) {
-        for(s32 x = 0; x < im.w; x++) {
-            u8 pA = pix[p + 3];
+    for(s32 y = 0; y < bitmap.height(); y++) {
+        for(s32 x = 0; x < bitmap.width(); x++) {
+            u8 pA = pixels[p + 3];
             if(pA == 0) {
                 p += 4;
                 continue;
             }
-            pix[p] = truncateU8(factor * (pix[p]*255/pA  - 128) + 128)*pA/255;
-            pix[p + 2] = truncateU8(factor * (pix[p + 2]*255/pA - 128) + 128)*pA/255;
-            pix[p + 1] = truncateU8(factor * (pix[p + 1]*255/pA  - 128) + 128)*pA/255;
+            pixels[p] = truncateU8(factor * (pixels[p]*255/pA  - 128) + 128)*pA/255;
+            pixels[p + 2] = truncateU8(factor * (pixels[p + 2]*255/pA - 128) + 128)*pA/255;
+            pixels[p + 1] = truncateU8(factor * (pixels[p + 1]*255/pA  - 128) + 128)*pA/255;
 
             p += 4;
         }
@@ -496,20 +425,17 @@ void contrast(const image &im, s32 contrast) {
 }
 
 // negative
-void negative(const image &im)
-{
+void negative(const SkBitmap &bitmap) {
     // check if all parameters are good
-    if(!checkImage(im))
-    return;
-
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
     u8 R, G, B;
 
-    for(s32 y = 0;y < im.h;y++)
-    {
-        bits = (rgba *)im.data + im.rw * y;
+    for(s32 y = 0; y < bitmap.height(); y++) {
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
+        for(s32 x = 0;x < bitmap.width();x++)
         {
         R = bits->r;
         G = bits->g;
@@ -525,20 +451,18 @@ void negative(const image &im)
 }
 
 // swap RGB values
-void swapRGB(const image &im, s32 type)
-{
+void swapRGB(const SkBitmap &bitmap, s32 type) {
     // check if all parameters are good
-    if(!checkImage(im) || (type != GBR && type != BRG))
-    return;
-
+    if(bitmap.empty() || (type != GBR && type != BRG)) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
     u8 R, G, B;
 
-    for(s32 y = 0;y < im.h;y++)
+    for(s32 y = 0;y < bitmap.height();y++)
     {
-        bits = (rgba *)im.data + im.rw * y;
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
+        for(s32 x = 0;x < bitmap.width();x++)
         {
         R = bits->r;
         G = bits->g;
@@ -554,24 +478,20 @@ void swapRGB(const image &im, s32 type)
 }
 
 // blend
-void blend(const image &im, const rgb &rgb, float opacity)
-{
+void blend(const SkBitmap &bitmap, const rgb &rgb, float opacity) {
     // check parameters
-    if(!checkImage(im))
-    return;
-
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     scaleDown(opacity, 0.0f, 1.0f);
 
     rgba *bits;
     s32 r = rgb.r, g = rgb.g, b = rgb.b;
 
     // blend!
-    for(s32 y = 0;y < im.h;++y)
-    {
-        bits = (rgba *)im.data + im.rw * y;
+    for(s32 y = 0;y < bitmap.height();++y) {
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
-        {
+        for(s32 x = 0;x < bitmap.width();x++) {
             bits->r = bits->r + (u8)((b - bits->r) * opacity);
             bits->g = bits->g + (u8)((g - bits->g) * opacity);
             bits->b = bits->b + (u8)((r - bits->b) * opacity);
@@ -581,24 +501,23 @@ void blend(const image &im, const rgb &rgb, float opacity)
     }
 }
 
-void replaceColor(const image &im,
+void replaceColor(const SkBitmap &bitmap,
                   const int &rInt,
                   const int &gInt,
                   const int &bInt) {
     // check parameters
-    if(!checkImage(im))
-    return;
-
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
-    unsigned char r = rInt;
-    unsigned char g = gInt;
-    unsigned char b = bInt;
+    uchar r = rInt;
+    uchar g = gInt;
+    uchar b = bInt;
 
     // blend!
-    for(s32 y = 0; y < im.h; ++y) {
-        bits = (rgba *)im.data + im.rw * y;
+    for(s32 y = 0; y < bitmap.height(); ++y) {
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0; x < im.w; x++) {
+        for(s32 x = 0; x < bitmap.width(); x++) {
             bits->r = b*bits->a/255;
             bits->g = g*bits->a/255;
             bits->b = r*bits->a/255;
@@ -608,11 +527,9 @@ void replaceColor(const image &im,
     }
 }
 
-void flatten(const image &im, const rgb &ca, const rgb &cb)
-{
-    if(!checkImage(im))
-      return;
-
+void flatten(const SkBitmap &bitmap, const rgb &ca, const rgb &cb) {
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     s32 r1 = ca.r; s32 r2 = cb.r;
     s32 g1 = ca.g; s32 g2 = cb.g;
     s32 b1 = ca.b; s32 b2 = cb.b;
@@ -622,12 +539,10 @@ void flatten(const image &im, const rgb &ca, const rgb &cb)
     rgba *bits;
     rgb _rgb;
 
-    for(s32 y = 0;y < im.h;++y)
-    {
-        bits = (rgba *)im.data + im.rw * y;
+    for(s32 y = 0; y < bitmap.height(); y++) {
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;++x)
-        {
+        for(s32 x = 0; x < bitmap.width(); x++) {
             mean = (bits->r + bits->g + bits->b) / 3;
             min = F_MIN(min, mean);
             max = F_MAX(max, mean);
@@ -641,11 +556,10 @@ void flatten(const image &im, const rgb &ca, const rgb &cb)
     float sb = ((float) b2 - b1) / (max - min);
 
     // Repaint the image
-    for(s32 y = 0;y < im.h;++y)
-    {
-        bits = (rgba *)im.data + im.w*y;
+    for(s32 y = 0;y < bitmap.height();++y) {
+        bits = (rgba*)pixels + bitmap.width()*y;
 
-        for(s32 x = 0;x < im.w;++x)
+        for(s32 x = 0;x < bitmap.width();++x)
         {
             mean = (bits->r + bits->g + bits->b) / 3;
 
@@ -658,25 +572,22 @@ void flatten(const image &im, const rgb &ca, const rgb &cb)
     }
 }
 
-void fade(const image &im, const rgb &rgb, float val)
-{
-    if(!checkImage(im))
-        return;
-
+void fade(const SkBitmap &bitmap, const rgb &rgb, float val) {
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     u8 tbl[256];
 
-    for (s32 i = 0;i < 256;i++)
+    for(s32 i = 0;i < 256;i++)
         tbl[i] = (s32)(val * i + 0.5);
 
     s32 r, g, b, cr, cg, cb;
 
     rgba *bits;
 
-    for(s32 y = 0;y < im.h;y++)
-    {
-        bits = (rgba *)im.data + im.rw * y;
+    for(s32 y = 0; y < bitmap.height(); y++) {
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
+        for(s32 x = 0;x < bitmap.width();x++)
         {
             cr = bits->r;
             cg = bits->g;
@@ -695,19 +606,17 @@ void fade(const image &im, const rgb &rgb, float val)
     }
 }
 
-void gray(const image &im)
-{
-    if(!checkImage(im))
-        return;
-
+void gray(const SkBitmap &bitmap) {
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
     s32 g;
 
-    for(s32 y = 0;y < im.h;y++)
+    for(s32 y = 0;y < bitmap.height();y++)
     {
-        bits = (rgba *)im.data + im.rw * y;
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
+        for(s32 x = 0;x < bitmap.width();x++)
         {
             g = (bits->r * 11 + bits->g * 16 + bits->b * 5)/32;
 
@@ -720,21 +629,18 @@ void gray(const image &im)
     }
 }
 
-void desaturate(const image &im, qreal desat) {
-    if(!checkImage(im))
-      return;
-
+void desaturate(const SkBitmap &bitmap, qreal desat) {
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     desat = qMax(0., qMin(1., desat));
 
     rgba *bits;
     s32 h = 0, s = 0, v = 0;
 
-    for(s32 y = 0;y < im.h;y++)
-    {
-        bits = (rgba *)im.data + im.rw * y;
+    for(s32 y = 0;y < bitmap.height();y++) {
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
-        {
+        for(s32 x = 0;x < bitmap.width();x++) {
             rgb _rgb(bits->r, bits->g, bits->b);
             rgb2hsv(_rgb, &h, &s, &v);
             hsv2rgb(h, (s32)(s * (1.0 - desat)), v, &_rgb);
@@ -748,20 +654,18 @@ void desaturate(const image &im, qreal desat) {
     }
 }
 
-void threshold(const image &im, u32 trh)
-{
-    if(!checkImage(im))
-        return;
-
+void threshold(const SkBitmap &bitmap, u32 trh) {
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     scaleDown(trh, (u32)0, (u32)255);
 
     rgba *bits;
 
-    for(s32 y = 0;y < im.h;y++)
+    for(s32 y = 0;y < bitmap.height();y++)
     {
-        bits = (rgba *)im.data + im.rw * y;
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
+        for(s32 x = 0;x < bitmap.width();x++)
         {
             if(intensityValue(bits->r, bits->g, bits->b) < trh)
                 bits->r = bits->g = bits->b = 0;
@@ -773,20 +677,19 @@ void threshold(const image &im, u32 trh)
     }
 }
 
-void solarize(const image &im, qreal factor) {
-    if(!checkImage(im))
-        return;
-
+void solarize(const SkBitmap &bitmap, qreal factor) {
+    if(bitmap.empty()) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     s32 threshold;
     rgba *bits;
 
     threshold = (s32)(factor * (MaxRGB+1)/100.0);
 
-    for(s32 y = 0;y < im.h;y++)
+    for(s32 y = 0;y < bitmap.height();y++)
     {
-        bits = (rgba *)im.data + im.rw * y;
+        bits = (rgba *)pixels + bitmap.width() * y;
 
-        for(s32 x = 0;x < im.w;x++)
+        for(s32 x = 0;x < bitmap.width();x++)
         {
             bits->r = bits->r > threshold ? MaxRGB-bits->r : bits->r;
             bits->g = bits->g > threshold ? MaxRGB-bits->g : bits->g;
@@ -797,87 +700,87 @@ void solarize(const image &im, qreal factor) {
     }
 }
 
-void spread(const image &im, u32 amount) {
-    if(!checkImage(im) || im.w < 3 || im.h < 3)
+void spread(const SkBitmap &bitmap, u32 amount) {
+    if(bitmap.empty() || bitmap.width() < 3 || bitmap.height() < 3)
         return;
-
-    rgba *n = new rgba [im.rw * im.rh];
+        uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    rgba *n = new rgba [bitmap.width() * bitmap.height()];
 
     if(!n)
         return;
 
     s32 quantum;
     s32 x_distance, y_distance;
-    rgba *bits = (rgba *)im.data, *q;
+    rgba *bits = (rgba *)pixels, *q;
 
-    memcpy(n, im.data, im.rw * im.rh * sizeof(rgba));
+    memcpy(n, bitmap.getPixels(), bitmap.width() * bitmap.height() * sizeof(rgba));
 
     quantum = (amount+1) >> 1;
 
-    for(s32 y = 0;y < im.h;y++)
+    for(s32 y = 0;y < bitmap.height(); y++)
     {
-        q = n + im.rw*y;
+        q = n + bitmap.width()*y;
 
-        for(s32 x = 0;x < im.w;x++)
+        for(s32 x = 0;x < bitmap.width();x++)
         {
             x_distance = x + ((rand() & (amount+1))-quantum);
             y_distance = y + ((rand() & (amount+1))-quantum);
-            x_distance = F_MIN(x_distance, im.w-1);
-            y_distance = F_MIN(y_distance, im.h-1);
+            x_distance = F_MIN(x_distance, bitmap.width()-1);
+            y_distance = F_MIN(y_distance, bitmap.height()-1);
 
             if(x_distance < 0) x_distance = 0;
             if(y_distance < 0) y_distance = 0;
 
-            *q++ = *(bits + y_distance*im.rw + x_distance);
+            *q++ = *(bits + y_distance*bitmap.width() + x_distance);
         }
     }
 
-    memcpy(im.data, n, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), n, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] n;
 }
 
-void swirl(const image &im, qreal degrees, const rgba &background) {
-    if(!checkImage(im))
+void swirl(const SkBitmap &bitmap, qreal degrees, const rgba &background) {
+    if(bitmap.empty())
         return;
-
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     qreal cosine, distance, factor, radius, sine, x_center, x_distance,
             x_scale, y_center, y_distance, y_scale;
     s32 x, y;
 
     rgba *q, *p;
-    rgba *bits = (rgba *)im.data;
-    rgba *dest = new rgba [im.rw * im.rh];
+    rgba *bits = (rgba *)pixels;
+    rgba *dest = new rgba [bitmap.width() * bitmap.height()];
 
     if(!dest)
         return;
 
-    memcpy(dest, im.data, im.rw * im.rh * sizeof(rgba));
+    memcpy(dest, bitmap.getPixels(), bitmap.width() * bitmap.height() * sizeof(rgba));
 
     // compute scaling factor
-    x_center = im.w / 2.0;
-    y_center = im.h / 2.0;
+    x_center = bitmap.width() / 2.0;
+    y_center = bitmap.height() / 2.0;
 
     radius = F_MAX(x_center, y_center);
-    x_scale=1.0;
-    y_scale=1.0;
+    x_scale = 1.0;
+    y_scale = 1.0;
 
-    if(im.w > im.h)
-        y_scale=(double)im.w / im.h;
-    else if(im.w < im.h)
-        x_scale=(double)im.h / im.w;
+    if(bitmap.width() > bitmap.height())
+        y_scale = (double)bitmap.width() / bitmap.height();
+    else if(bitmap.width() < bitmap.height())
+        x_scale = (double)bitmap.height() / bitmap.width();
 
     degrees = DegreesToRadians(degrees);
 
     // swirl each row
 
-    for(y = 0;y < im.h;y++)
+    for(y = 0;y < bitmap.height();y++)
     {
-        p = bits + im.rw * y;
-        q = dest + im.rw * y;
+        p = bits + bitmap.width() * y;
+        q = dest + bitmap.width() * y;
         y_distance = y_scale * (y-y_center);
 
-        for(x = 0;x < im.w;x++)
+        for(x = 0;x < bitmap.width();x++)
         {
             // determine if the pixel is within an ellipse
             *q = *p;
@@ -891,7 +794,7 @@ void swirl(const image &im, qreal degrees, const rgba &background) {
                 sine = sin(degrees*factor*factor);
                 cosine = cos(degrees*factor*factor);
 
-                *q = interpolateColor(im,
+                *q = interpolateColor(bitmap,
                                       (cosine*x_distance-sine*y_distance)/x_scale+x_center,
                                       (sine*x_distance+cosine*y_distance)/y_scale+y_center,
                                       background);
@@ -902,18 +805,18 @@ void swirl(const image &im, qreal degrees, const rgba &background) {
         }
     }
 
-    memcpy(im.data, dest, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), dest, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] dest;
 }
 
-void noise(const image &im, NoiseType noise_type)
+void noise(const SkBitmap &bitmap, NoiseType noise_type)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
-
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     s32 x, y;
-    rgba *dest = new rgba [im.rw * im.rh];
+    rgba *dest = new rgba [bitmap.width() * bitmap.height()];
 
     if(!dest)
         return;
@@ -921,12 +824,12 @@ void noise(const image &im, NoiseType noise_type)
     rgba *bits;
     rgba *destData;
 
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        bits = (rgba *)im.data + im.rw * y;
-        destData = dest + im.rw * y;
+        bits = (rgba *)pixels + bitmap.width() * y;
+        destData = dest + bitmap.width() * y;
 
-        for(x = 0;x < im.w;++x)
+        for(x = 0;x < bitmap.width();++x)
         {
             destData[x].r = generateNoise(bits->r, noise_type);
             destData[x].g = generateNoise(bits->g, noise_type);
@@ -937,14 +840,14 @@ void noise(const image &im, NoiseType noise_type)
         }
     }
 
-    memcpy(im.data, dest, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), dest, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] dest;
 }
 
-void implode(const image &im, qreal _factor, const rgba &background)
+void implode(const SkBitmap &bitmap, qreal _factor, const rgba &background)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
     qreal amount, distance, radius;
@@ -953,43 +856,42 @@ void implode(const image &im, qreal _factor, const rgba &background)
     rgba *dest;
     s32 x, y;
 
-    rgba *n = new rgba [im.rw * im.rh];
+    rgba *n = new rgba [bitmap.width() * bitmap.height()];
 
-    if(!n)
-        return;
-
+    if(!n) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
 
     // compute scaling factor
     x_scale = 1.0;
     y_scale = 1.0;
-    x_center = (double)0.5*im.w;
-    y_center = (double)0.5*im.h;
-    radius=x_center;
+    x_center = (double)0.5*bitmap.width();
+    y_center = (double)0.5*bitmap.height();
+    radius = x_center;
 
-    if(im.w > im.h)
-        y_scale = (double)im.w/im.h;
-    else if(im.w < im.h)
+    if(bitmap.width() > bitmap.height())
+        y_scale = (double)bitmap.width()/bitmap.height();
+    else if(bitmap.width() < bitmap.height())
     {
-        x_scale = (double)im.h/im.w;
+        x_scale = (double)bitmap.height()/bitmap.width();
         radius = y_center;
     }
 
-    amount=_factor/10.0;
+    amount = _factor/10.0;
 
     if(amount >= 0)
         amount/=10.0;
 
     qreal factor;
 
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        bits = (rgba *)im.data + im.rw * y;
-        dest =  n + im.rw * y;
+        bits = (rgba *)pixels + bitmap.width() * y;
+        dest =  n + bitmap.width() * y;
 
         y_distance = y_scale * (y-y_center);
 
-        for(x = 0;x < im.w;++x)
+        for(x = 0;x < bitmap.width();++x)
         {
             x_distance = x_scale*(x-x_center);
             distance= x_distance*x_distance+y_distance*y_distance;
@@ -1002,7 +904,7 @@ void implode(const image &im, qreal _factor, const rgba &background)
                 if(distance > 0.0)
                     factor = pow(sin(0.5000000000000001*M_PI*sqrt(distance)/radius),-amount);
 
-                *dest = interpolateColor(im, factor*x_distance/x_scale+x_center,
+                *dest = interpolateColor(bitmap, factor*x_distance/x_scale+x_center,
                                            factor*y_distance/y_scale+y_center,
                                            background);
             }
@@ -1014,14 +916,14 @@ void implode(const image &im, qreal _factor, const rgba &background)
         }
     }
 
-    memcpy(im.data, n, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), n, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] n;
 }
 
-void despeckle(const image &im)
+void despeckle(const SkBitmap &bitmap)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
     s32 i, j, x, y;
@@ -1032,12 +934,12 @@ void despeckle(const image &im)
                     X[4] = {0, 1, 1,-1},
                     Y[4] = {1, 0, 1, 1};
 
-    rgba *n = new rgba [im.rw * im.rh];
+    rgba *n = new rgba [bitmap.width() * bitmap.height()];
 
     if(!n)
         return;
 
-    packets = (im.w+2) * (im.h+2);
+    packets = (bitmap.width()+2) * (bitmap.height()+2);
 
     red_channel = new u8 [packets];
     green_channel = new u8 [packets];
@@ -1059,16 +961,16 @@ void despeckle(const image &im)
     }
 
     // copy image pixels to color component buffers
-    j = im.w+2;
-
+    j = bitmap.width()+2;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
 
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        bits = (rgba *)im.data + im.rw*y;
+        bits = (rgba *)pixels + bitmap.width()*y;
         ++j;
 
-        for(x = 0;x < im.w;++x)
+        for(x = 0;x < bitmap.width();++x)
         {
             red_channel[j] = bits->r;
             green_channel[j] = bits->g;
@@ -1085,10 +987,10 @@ void despeckle(const image &im)
     // reduce speckle in red channel
     for(i = 0;i < 4;i++)
     {
-        hull(X[i],Y[i],1,im.w,im.h,red_channel,buffer);
-        hull(-X[i],-Y[i],1,im.w,im.h,red_channel,buffer);
-        hull(-X[i],-Y[i],-1,im.w,im.h,red_channel,buffer);
-        hull(X[i],Y[i],-1,im.w,im.h,red_channel,buffer);
+        hull(X[i],Y[i],1,bitmap.width(),bitmap.height(),red_channel,buffer);
+        hull(-X[i],-Y[i],1,bitmap.width(),bitmap.height(),red_channel,buffer);
+        hull(-X[i],-Y[i],-1,bitmap.width(),bitmap.height(),red_channel,buffer);
+        hull(X[i],Y[i],-1,bitmap.width(),bitmap.height(),red_channel,buffer);
     }
 
     // reduce speckle in green channel
@@ -1097,10 +999,10 @@ void despeckle(const image &im)
 
     for(i = 0;i < 4;i++)
     {
-        hull(X[i],Y[i],1,im.w,im.h,green_channel,buffer);
-        hull(-X[i],-Y[i],1,im.w,im.h,green_channel,buffer);
-        hull(-X[i],-Y[i],-1,im.w,im.h,green_channel,buffer);
-        hull(X[i],Y[i],-1,im.w,im.h,green_channel,buffer);
+        hull(X[i],Y[i],1,bitmap.width(),bitmap.height(),green_channel,buffer);
+        hull(-X[i],-Y[i],1,bitmap.width(),bitmap.height(),green_channel,buffer);
+        hull(-X[i],-Y[i],-1,bitmap.width(),bitmap.height(),green_channel,buffer);
+        hull(X[i],Y[i],-1,bitmap.width(),bitmap.height(),green_channel,buffer);
     }
 
     // reduce speckle in blue channel
@@ -1109,21 +1011,21 @@ void despeckle(const image &im)
 
     for(i = 0;i < 4;i++)
     {
-        hull(X[i],Y[i],1,im.w,im.h,blue_channel,buffer);
-        hull(-X[i],-Y[i],1,im.w,im.h,blue_channel,buffer);
-        hull(-X[i],-Y[i],-1,im.w,im.h,blue_channel,buffer);
-        hull(X[i],Y[i],-1,im.w,im.h,blue_channel,buffer);
+        hull(X[i],Y[i],1,bitmap.width(),bitmap.height(),blue_channel,buffer);
+        hull(-X[i],-Y[i],1,bitmap.width(),bitmap.height(),blue_channel,buffer);
+        hull(-X[i],-Y[i],-1,bitmap.width(),bitmap.height(),blue_channel,buffer);
+        hull(X[i],Y[i],-1,bitmap.width(),bitmap.height(),blue_channel,buffer);
     }
 
     // copy color component buffers to despeckled image
-    j = im.w+2;
+    j = bitmap.width()+2;
 
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        bits = n + im.rw*y;
+        bits = n + bitmap.width()*y;
         ++j;
 
-        for(x = 0;x < im.w;++x)
+        for(x = 0;x < bitmap.width();++x)
         {
             *bits = rgba(red_channel[j], green_channel[j], blue_channel[j], alpha_channel[j]);
 
@@ -1140,22 +1042,22 @@ void despeckle(const image &im)
     delete [] blue_channel;
     delete [] alpha_channel;
 
-    memcpy(im.data, n, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), n, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] n;
 }
 
-void anim_fast_blur(const image &im,
+void anim_fast_blur(const SkBitmap &bitmap,
                     const qreal &fRadius,
                     const qreal &opacityT) {
     if(fRadius < 0.01) return;
-    unsigned char *pix = im.data;
-    int w = im.w;
-    int h = im.h;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    int w = bitmap.width();
+    int h = bitmap.height();
 
     qreal divF = fRadius + fRadius + 1.;
     qreal divFInv = 1./divF;
-    int iRadius = ceil(fRadius);
+    int iRadius = qCeil(fRadius);
     int nPoints = iRadius + iRadius + 1;
     qreal fracInf = 1. - iRadius + fRadius;
     qreal fracInfInv = 1. - fracInf;
@@ -1165,55 +1067,55 @@ void anim_fast_blur(const image &im,
     qreal *bLine = new double[nPoints];
     qreal *aLine = new double[nPoints];
 
-    int wm=w-1;
-    int hm=h-1;
-    int wh=w*h;
-    qreal *r=new double[wh];
-    qreal *g=new double[wh];
-    qreal *b=new double[wh];
-    qreal *a=new double[wh];
+    int wm = w-1;
+    int hm = h-1;
+    int wh = w*h;
+    qreal *r = new double[wh];
+    qreal *g = new double[wh];
+    qreal *b = new double[wh];
+    qreal *a = new double[wh];
     qreal rsum,gsum,bsum,asum;
     int x,y,i,p,p1,yp,yi,yw;
     int *vMIN = new int[qMax(w,h)];
     int *vMAX = new int[qMax(w,h)];
 
 
-    yw=yi=0;
+    yw = yi = 0;
 
-    for (y=0;y<h;y++){
+    for(y = 0; y<h; y++) {
         p = yi * 4;
-        rLine[0] = pix[p];
-        rsum = pix[p]*fracInf;
-        gLine[0] = pix[p + 1];
-        gsum = pix[p + 1]*fracInf;
-        bLine[0] = pix[p + 2];
-        bsum = pix[p + 2]*fracInf;
-        aLine[0] = pix[p + 3];
-        asum = pix[p + 3]*fracInf;
+        rLine[0] = pixels[p];
+        rsum = pixels[p]*fracInf;
+        gLine[0] = pixels[p + 1];
+        gsum = pixels[p + 1]*fracInf;
+        bLine[0] = pixels[p + 2];
+        bsum = pixels[p + 2]*fracInf;
+        aLine[0] = pixels[p + 3];
+        asum = pixels[p + 3]*fracInf;
 
-        for(i = 1 - iRadius; i < iRadius ; i++){
+        for(i = 1 - iRadius; i < iRadius ; i++) {
             p = (yi + qMin(wm, qMax(i,0))) * 4;
-            rLine[i + iRadius] = pix[p];
-            rsum += pix[p];
-            gLine[i + iRadius] = pix[p + 1];
-            gsum += pix[p + 1];
-            bLine[i + iRadius] = pix[p + 2];
-            bsum += pix[p + 2];
-            aLine[i + iRadius] = pix[p + 3];
-            asum += pix[p + 3];
+            rLine[i + iRadius] = pixels[p];
+            rsum += pixels[p];
+            gLine[i + iRadius] = pixels[p + 1];
+            gsum += pixels[p + 1];
+            bLine[i + iRadius] = pixels[p + 2];
+            bsum += pixels[p + 2];
+            aLine[i + iRadius] = pixels[p + 3];
+            asum += pixels[p + 3];
         }
 
         p = (yi + qMin(wm, iRadius)) * 4;
-        rLine[iRadius + iRadius] = pix[p];
-        rsum += pix[p]*fracInf;
-        gLine[iRadius + iRadius] = pix[p + 1];
-        gsum += pix[p + 1]* fracInf;
-        bLine[iRadius + iRadius] = pix[p + 2];
-        bsum += pix[p + 2]*fracInf;
-        aLine[iRadius + iRadius] = pix[p + 3];
-        asum += pix[p + 3]*fracInf;
+        rLine[iRadius + iRadius] = pixels[p];
+        rsum += pixels[p]*fracInf;
+        gLine[iRadius + iRadius] = pixels[p + 1];
+        gsum += pixels[p + 1]* fracInf;
+        bLine[iRadius + iRadius] = pixels[p + 2];
+        bsum += pixels[p + 2]*fracInf;
+        aLine[iRadius + iRadius] = pixels[p + 3];
+        asum += pixels[p + 3]*fracInf;
 
-        for (x = 0; x < w; x++){
+        for(x = 0; x < w; x++) {
             if(asum < 0.0001) {
                 r[yi] = rsum*divFInv;
                 g[yi] = gsum*divFInv;
@@ -1258,25 +1160,25 @@ void anim_fast_blur(const image &im,
             bsum += bLine[nPoints - 1]*fracInfInv;
             asum += aLine[nPoints - 1]*fracInfInv;
 
-            rLine[nPoints - 1] = pix[p1];
-            gLine[nPoints - 1] = pix[p1 + 1];
-            bLine[nPoints - 1] = pix[p1 + 2];
-            aLine[nPoints - 1] = pix[p1 + 3];
+            rLine[nPoints - 1] = pixels[p1];
+            gLine[nPoints - 1] = pixels[p1 + 1];
+            bLine[nPoints - 1] = pixels[p1 + 2];
+            aLine[nPoints - 1] = pixels[p1 + 3];
 
-            rsum += pix[p1]*fracInf;
-            gsum += pix[p1 + 1]*fracInf;
-            bsum += pix[p1 + 2]*fracInf;
-            asum += pix[p1 + 3]*fracInf;
+            rsum += pixels[p1]*fracInf;
+            gsum += pixels[p1 + 1]*fracInf;
+            bsum += pixels[p1 + 2]*fracInf;
+            asum += pixels[p1 + 3]*fracInf;
 
             yi++;
         }
         yw+=w;
     }
 
-    for (x=0;x<w;x++){
-        yp=-iRadius*w;
+    for(x = 0; x<w; x++) {
+        yp = -iRadius*w;
 
-        yi=qMax(0,yp)+x;
+        yi = qMax(0,yp)+x;
         rLine[0] = r[yi];
         rsum = r[yi]*fracInf;
         gLine[0] = g[yi];
@@ -1287,8 +1189,8 @@ void anim_fast_blur(const image &im,
         asum = a[yi]*fracInf;
         yp+=w;
 
-        for(i = 1 - iRadius; i < iRadius ; i++){
-            yi=qMax(0,yp)+x;
+        for(i = 1 - iRadius; i < iRadius ; i++) {
+            yi = qMax(0,yp)+x;
             rLine[i + iRadius] = r[yi];
             rsum += r[yi];
             gLine[i + iRadius] = g[yi];
@@ -1300,7 +1202,7 @@ void anim_fast_blur(const image &im,
             yp+=w;
         }
 
-        yi=qMax(0,yp)+x;
+        yi = qMax(0,yp)+x;
         rLine[iRadius + iRadius] = r[yi];
         rsum += r[yi]*fracInf;
         gLine[iRadius + iRadius] = g[yi];
@@ -1312,20 +1214,14 @@ void anim_fast_blur(const image &im,
         yp+=w;
 
 
-        yi=x;
-        for (y=0;y<h;y++){
-            unsigned char aVal = qMin(255, qMax(0, (int)(asum*divFInv)));
-            pix[yi*4]		= qMin(aVal,
-                                  (unsigned char)qMin(255,
-                                      qMax(0, (int)(rsum*divFInv))));
-            pix[yi*4 + 1]	= qMin(aVal,
-                                  (unsigned char)qMin(255,
-                                      qMax(0, (int)(gsum*divFInv))));
-            pix[yi*4 + 2]	= qMin(aVal,
-                                  (unsigned char)qMin(255,
-                                      qMax(0, (int)(bsum*divFInv))));
-            pix[yi*4 + 3]	= aVal;
-            if(x==0) {
+        yi = x;
+        for(y = 0; y < h; y++) {
+            uchar aVal = floorQrealToUChar(asum*divFInv);
+            pixels[yi*4] = floorQrealToUChar(rsum*divFInv);
+            pixels[yi*4 + 1] = floorQrealToUChar(gsum*divFInv);
+            pixels[yi*4 + 2] = floorQrealToUChar(bsum*divFInv);
+            pixels[yi*4 + 3] = aVal;
+            if(x == 0) {
                 vMIN[y]=qMin(y+iRadius+1,hm)*w;
                 vMAX[y]=qMax(y-iRadius,0)*w;
             }
@@ -1381,12 +1277,12 @@ void anim_fast_blur(const image &im,
     delete[] vMAX;
 }
 
-void anim_fast_blur(const image &im,
+void anim_fast_blur(const SkBitmap &bitmap,
                     const qreal &fRadius) {
     if(fRadius < 0.01) return;
-    unsigned char *pix = im.data;
-    int w = im.w;
-    int h = im.h;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    int w = bitmap.width();
+    int h = bitmap.height();
 
     qreal divF = fRadius + fRadius + 1.;
     qreal divFInv = 1./divF;
@@ -1400,55 +1296,55 @@ void anim_fast_blur(const image &im,
     qreal *bLine = new double[nPoints];
     qreal *aLine = new double[nPoints];
 
-    int wm=w-1;
-    int hm=h-1;
-    int wh=w*h;
-    qreal *r=new double[wh];
-    qreal *g=new double[wh];
-    qreal *b=new double[wh];
-    qreal *a=new double[wh];
+    int wm = w-1;
+    int hm = h-1;
+    int wh = w*h;
+    qreal *r = new double[wh];
+    qreal *g = new double[wh];
+    qreal *b = new double[wh];
+    qreal *a = new double[wh];
     qreal rsum,gsum,bsum,asum;
     int x,y,i,p,p1,yp,yi,yw;
     int *vMIN = new int[qMax(w,h)];
     int *vMAX = new int[qMax(w,h)];
 
 
-    yw=yi=0;
+    yw = yi = 0;
 
-    for (y=0;y<h;y++){
+    for(y = 0; y<h; y++) {
         p = yi * 4;
-        rLine[0] = pix[p];
-        rsum = pix[p]*fracInf;
-        gLine[0] = pix[p + 1];
-        gsum = pix[p + 1]*fracInf;
-        bLine[0] = pix[p + 2];
-        bsum = pix[p + 2]*fracInf;
-        aLine[0] = pix[p + 3];
-        asum = pix[p + 3]*fracInf;
+        rLine[0] = pixels[p];
+        rsum = pixels[p]*fracInf;
+        gLine[0] = pixels[p + 1];
+        gsum = pixels[p + 1]*fracInf;
+        bLine[0] = pixels[p + 2];
+        bsum = pixels[p + 2]*fracInf;
+        aLine[0] = pixels[p + 3];
+        asum = pixels[p + 3]*fracInf;
 
-        for(i = 1 - iRadius; i < iRadius ; i++){
+        for(i = 1 - iRadius; i < iRadius ; i++) {
             p = (yi + qMin(wm, qMax(i,0))) * 4;
-            rLine[i + iRadius] = pix[p];
-            rsum += pix[p];
-            gLine[i + iRadius] = pix[p + 1];
-            gsum += pix[p + 1];
-            bLine[i + iRadius] = pix[p + 2];
-            bsum += pix[p + 2];
-            aLine[i + iRadius] = pix[p + 3];
-            asum += pix[p + 3];
+            rLine[i + iRadius] = pixels[p];
+            rsum += pixels[p];
+            gLine[i + iRadius] = pixels[p + 1];
+            gsum += pixels[p + 1];
+            bLine[i + iRadius] = pixels[p + 2];
+            bsum += pixels[p + 2];
+            aLine[i + iRadius] = pixels[p + 3];
+            asum += pixels[p + 3];
         }
 
         p = (yi + qMin(wm, iRadius)) * 4;
-        rLine[iRadius + iRadius] = pix[p];
-        rsum += pix[p]*fracInf;
-        gLine[iRadius + iRadius] = pix[p + 1];
-        gsum += pix[p + 1]*fracInf;
-        bLine[iRadius + iRadius] = pix[p + 2];
-        bsum += pix[p + 2]*fracInf;
-        aLine[iRadius + iRadius] = pix[p + 3];
-        asum += pix[p + 3]*fracInf;
+        rLine[iRadius + iRadius] = pixels[p];
+        rsum += pixels[p]*fracInf;
+        gLine[iRadius + iRadius] = pixels[p + 1];
+        gsum += pixels[p + 1]*fracInf;
+        bLine[iRadius + iRadius] = pixels[p + 2];
+        bsum += pixels[p + 2]*fracInf;
+        aLine[iRadius + iRadius] = pixels[p + 3];
+        asum += pixels[p + 3]*fracInf;
 
-        for (x = 0; x < w; x++){
+        for(x = 0; x < w; x++) {
 
             r[yi] = rsum*divFInv;
             g[yi] = gsum*divFInv;
@@ -1483,25 +1379,25 @@ void anim_fast_blur(const image &im,
             bsum += bLine[nPoints - 1]*fracInfInv;
             asum += aLine[nPoints - 1]*fracInfInv;
 
-            rLine[nPoints - 1] = pix[p1];
-            gLine[nPoints - 1] = pix[p1 + 1];
-            bLine[nPoints - 1] = pix[p1 + 2];
-            aLine[nPoints - 1] = pix[p1 + 3];
+            rLine[nPoints - 1] = pixels[p1];
+            gLine[nPoints - 1] = pixels[p1 + 1];
+            bLine[nPoints - 1] = pixels[p1 + 2];
+            aLine[nPoints - 1] = pixels[p1 + 3];
 
-            rsum += pix[p1]*fracInf;
-            gsum += pix[p1 + 1]*fracInf;
-            bsum += pix[p1 + 2]*fracInf;
-            asum += pix[p1 + 3]*fracInf;
+            rsum += pixels[p1]*fracInf;
+            gsum += pixels[p1 + 1]*fracInf;
+            bsum += pixels[p1 + 2]*fracInf;
+            asum += pixels[p1 + 3]*fracInf;
 
             yi++;
         }
         yw+=w;
     }
 
-    for (x=0;x<w;x++){
-        yp=-iRadius*w;
+    for(x = 0; x<w; x++) {
+        yp = -iRadius*w;
 
-        yi=qMax(0,yp)+x;
+        yi = qMax(0,yp)+x;
         rLine[0] = r[yi];
         rsum = r[yi]*fracInf;
         gLine[0] = g[yi];
@@ -1512,8 +1408,8 @@ void anim_fast_blur(const image &im,
         asum = a[yi]*fracInf;
         yp+=w;
 
-        for(i = 1 - iRadius; i < iRadius ; i++){
-            yi=qMax(0,yp)+x;
+        for(i = 1 - iRadius; i < iRadius ; i++) {
+            yi = qMax(0,yp)+x;
             rLine[i + iRadius] = r[yi];
             rsum += r[yi];
             gLine[i + iRadius] = g[yi];
@@ -1525,7 +1421,7 @@ void anim_fast_blur(const image &im,
             yp+=w;
         }
 
-        yi=qMax(0,yp)+x;
+        yi = qMax(0,yp)+x;
         rLine[iRadius + iRadius] = r[yi];
         rsum += r[yi]*fracInf;
         gLine[iRadius + iRadius] = g[yi];
@@ -1537,20 +1433,14 @@ void anim_fast_blur(const image &im,
         yp+=w;
 
 
-        yi=x;
-        for (y=0;y<h;y++){
-            unsigned char aVal = qMin(255, qMax(0, (int)(asum*divFInv)));
-            pix[yi*4]		= qMin(aVal,
-                                  (unsigned char)qMin(255,
-                                      qMax(0, (int)(rsum*divFInv))));
-            pix[yi*4 + 1]	= qMin(aVal,
-                                  (unsigned char)qMin(255,
-                                      qMax(0, (int)(gsum*divFInv))));
-            pix[yi*4 + 2]	= qMin(aVal,
-                                  (unsigned char)qMin(255,
-                                      qMax(0, (int)(bsum*divFInv))));
-            pix[yi*4 + 3]	= aVal;
-            if(x==0) {
+        yi = x;
+        for(y = 0; y<h; y++) {
+            uchar aVal = floorQrealToUChar(asum*divFInv);
+            pixels[yi*4]		= qMin(aVal, floorQrealToUChar(rsum*divFInv));
+            pixels[yi*4 + 1]	= qMin(aVal, floorQrealToUChar(gsum*divFInv));
+            pixels[yi*4 + 2]	= qMin(aVal, floorQrealToUChar(bsum*divFInv));
+            pixels[yi*4 + 3]	= aVal;
+            if(x == 0) {
                 vMIN[y]=qMin(y+iRadius+1,hm)*w;
                 vMAX[y]=qMax(y-iRadius,0)*w;
             }
@@ -1606,16 +1496,16 @@ void anim_fast_blur(const image &im,
     delete[] vMAX;
 }
 
-void anim_fast_shadow(const image &im,
+void anim_fast_shadow(const SkBitmap &bitmap,
                       const qreal &fRed,
                       const qreal &fGreen,
                       const qreal &fBlue,
                       const qreal &fDx,
                       const qreal &fDy,
                       const qreal &fRadius) {
-    unsigned char *pix = im.data;
-    int w = im.w;
-    int h = im.h;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    int w = bitmap.width();
+    int h = bitmap.height();
 
     int iDx = floor(fDx);
     int iDy = floor(fDy);
@@ -1629,14 +1519,14 @@ void anim_fast_shadow(const image &im,
 
     qreal *aLine = new double[nPoints];
 
-    int wh=w*h;
+    int wh = w*h;
     qreal *a = new double[wh];
     qreal asum;
     int x,y,i,p,p1,yp,yi,yw,dp;
     int *vMIN = new int[qMax(w,h)];
     int *vMAX = new int[qMax(w,h)];
-    int wm=w-1;
-    int hm=h-1;
+    int wm = w-1;
+    int hm = h-1;
 
     yw = yi = 0;
 
@@ -1652,18 +1542,18 @@ void anim_fast_shadow(const image &im,
     for(y = yMin; y < yMax; y++) {
         yi += xMin;
         p = (yi + dp) * 4;
-        aLine[0] = pix[p + 3];
-        asum = pix[p + 3]*fracInf;
+        aLine[0] = pixels[p + 3];
+        asum = pixels[p + 3]*fracInf;
 
-        for(i = 1 - iRadius; i < iRadius ; i++){
+        for(i = 1 - iRadius; i < iRadius ; i++) {
             p = (yi + qMin(wm, qMax(i,0)) + dp) * 4;
-            aLine[i + iRadius] = pix[p + 3];
-            asum += pix[p + 3];
+            aLine[i + iRadius] = pixels[p + 3];
+            asum += pixels[p + 3];
         }
 
         p = (yi + qMin(wm, iRadius) + dp) * 4;
-        aLine[iRadius + iRadius] = pix[p + 3];
-        asum += pix[p + 3]*fracInf;
+        aLine[iRadius + iRadius] = pixels[p + 3];
+        asum += pixels[p + 3]*fracInf;
 
         for(x = xMin; x < xMax; x++) {
             a[yi] = asum*divFInv;
@@ -1684,9 +1574,9 @@ void anim_fast_shadow(const image &im,
 
             asum += aLine[nPoints - 1]*fracInfInv;
 
-            aLine[nPoints - 1] = pix[p1 + 3];
+            aLine[nPoints - 1] = pixels[p1 + 3];
 
-            asum += pix[p1 + 3]*fracInf;
+            asum += pixels[p1 + 3]*fracInf;
 
             yi++;
         }
@@ -1695,14 +1585,14 @@ void anim_fast_shadow(const image &im,
     }
 
     for(x = xMin; x < xMax; x++) {
-        yp=-iRadius*w;
+        yp = -iRadius*w;
 
-        yi=qMax(0,yp)+x;
+        yi = qMax(0,yp)+x;
         aLine[0] = a[yi];
         asum = a[yi]*fracInf;
         yp += w;
 
-        for(i = 1 - iRadius; i < iRadius; i++){
+        for(i = 1 - iRadius; i < iRadius; i++) {
             yi = qMax(0, yp)+x;
             aLine[i + iRadius] = a[yi];
             asum += a[yi];
@@ -1718,37 +1608,29 @@ void anim_fast_shadow(const image &im,
         yi = x;
         yi += yMin*w;
         for(y = yMin; y < yMax; y++) {
-            int pixA = pix[yi*4 + 3];
+            int pixA = pixels[yi*4 + 3];
             if(pixA != 255) {
                 qreal pixAFrac = pixA/255.;
                 qreal shadowAFrac = asum*divFInv/255.;
                 qreal aMult = shadowAFrac*pixAFrac;
                 qreal fAVal = (shadowAFrac + pixAFrac - aMult)*255.;
-                unsigned char aVal = qMin(255,
-                                         qMax(0,
-                                             qRound(fAVal)) );
-                unsigned char pixR = pix[yi*4];
+                uchar aVal = roundQrealToUChar(fAVal);
+                uchar pixR = pixels[yi*4];
                 int iRVal = round((pixR*aMult +
                             pixR*(1. - shadowAFrac) +
                             fRed*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4] = qMin(aVal,
-                                      (unsigned char)qMin(255,
-                                          qMax(0, iRVal)));
-                unsigned char pixG = pix[yi*4 + 1];
+                pixels[yi*4] = qMin(aVal, intToUChar(iRVal));
+                uchar pixG = pixels[yi*4 + 1];
                 int iGVal = round((pixG*aMult +
                             pixG*(1. - shadowAFrac) +
                             fGreen*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4 + 1] = qMin(aVal,
-                                      (unsigned char)qMin(255,
-                                          qMax(0, iGVal)));
-                unsigned char pixB = pix[yi*4 + 2];
+                pixels[yi*4 + 1] = qMin(aVal, intToUChar(iGVal));
+                uchar pixB = pixels[yi*4 + 2];
                 int iBVal = round((pixB*aMult +
                             pixB*(1. - shadowAFrac) +
                             fBlue*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4 + 2] = qMin(aVal,
-                                      (unsigned char)qMin(255,
-                                          qMax(0, iBVal)));
-                pix[yi*4 + 3] = aVal;
+                pixels[yi*4 + 2] = qMin(aVal, intToUChar(iBVal));
+                pixels[yi*4 + 3] = aVal;
             }
 
             if(x == xMin) {
@@ -1785,57 +1667,57 @@ void anim_fast_shadow(const image &im,
 
 //void fast_blur(const image &im, qreal radiusF)
 //{
-//    unsigned char *pix = im.data;
-//    int w = im.w;
-//    int h = im.h;
+//    uchar *pix = bitmap.getPixels();
+//    int w = bitmap.width();
+//    int h = bitmap.height();
 
 //    int maxRadius = ceil(radiusF);
 //    qreal fraqInf = maxRadius - radiusF;
 
 //    if (maxRadius<1) return;
-//    int wm=w-1;
-//    int hm=h-1;
-//    int wh=w*h;
-//    int div=maxRadius+maxRadius+1;
-//    unsigned char *r=new unsigned char[wh];
-//    unsigned char *g=new unsigned char[wh];
-//    unsigned char *b=new unsigned char[wh];
-//    unsigned char *a=new unsigned char[wh];
+//    int wm = w-1;
+//    int hm = h-1;
+//    int wh = w*h;
+//    int div = maxRadius+maxRadius+1;
+//    uchar *r = new uchar[wh];
+//    uchar *g = new uchar[wh];
+//    uchar *b = new uchar[wh];
+//    uchar *a = new uchar[wh];
 //    int rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
 //    int *vMIN = new int[qMax(w,h)];
 //    int *vMAX = new int[qMax(w,h)];
 
 //    qreal divF = radiusF + radiusF + 1.;
 //    int minFi = 256*div - ceil(256*divF);
-//    qreal *dv=new double[256*div];
-//    for(i=0; i< minFi; i++) {
+//    qreal *dv = new double[256*div];
+//    for(i = 0; i< minFi; i++) {
 //        dv[i] = 0.;
 //    }
-//    for (i=minFi;i<256*div;i++) {
+//    for(i = minFi; i<256*div; i++) {
 //        dv[i]= ((i - minFi)/divF);
 //        printf("%4.2f ", dv[i]);
 //    }
 
-//    yw=yi=0;
+//    yw = yi = 0;
 
-//    for (y=0;y<h;y++){
-//        rsum=gsum=bsum=asum=0;
+//    for(y = 0; y<h; y++) {
+//        rsum = gsum = bsum = asum = 0;
 
-//        for(i=-maxRadius;i<=maxRadius;i++){
+//        for(i = -maxRadius; i<=maxRadius; i++) {
 //            p = (yi + qMin(wm, qMax(i,0))) * 4;
 //            rsum += pix[p];
 //            gsum += pix[p+1];
 //            bsum += pix[p+2];
 //            asum += pix[p+3];
 //        }
-//        for (x=0;x<w;x++){
+//        for(x = 0; x<w; x++) {
 
 //            r[yi]=dv[rsum];
 //            g[yi]=dv[gsum];
 //            b[yi]=dv[bsum];
 //            a[yi]=dv[asum];
 
-//            if(y==0){
+//            if(y == 0) {
 //                vMIN[x]=qMin(x+maxRadius+1,wm);
 //                vMAX[x]=qMax(x-maxRadius,0);
 //            }
@@ -1852,24 +1734,24 @@ void anim_fast_shadow(const image &im,
 //        yw+=w;
 //    }
 
-//    for (x=0;x<w;x++){
-//        rsum=gsum=bsum=asum=0;
-//        yp=-maxRadius*w;
-//        for(i=-maxRadius;i<=maxRadius;i++){
-//            yi=qMax(0,yp)+x;
+//    for(x = 0; x<w; x++) {
+//        rsum = gsum = bsum = asum = 0;
+//        yp = -maxRadius*w;
+//        for(i = -maxRadius; i<=maxRadius; i++) {
+//            yi = qMax(0,yp)+x;
 //            rsum+=r[yi];
 //            gsum+=g[yi];
 //            bsum+=b[yi];
 //            asum+=a[yi];
 //            yp+=w;
 //        }
-//        yi=x;
-//        for (y=0;y<h;y++){
+//        yi = x;
+//        for(y = 0; y<h; y++) {
 //            pix[yi*4]		= dv[rsum];
 //            pix[yi*4 + 1]	= dv[gsum];
 //            pix[yi*4 + 2]	= dv[bsum];
 //            pix[yi*4 + 3]	= dv[asum];
-//            if(x==0){
+//            if(x == 0) {
 //                vMIN[y]=qMin(y+maxRadius+1,hm)*w;
 //                vMAX[y]=qMax(y-maxRadius,0)*w;
 //            }
@@ -1897,43 +1779,43 @@ void anim_fast_shadow(const image &im,
 
 
 
-void fast_blur(const image &im, int radius,
+void fast_blur(const SkBitmap &bitmap, int radius,
                const qreal &opacityT) {
-    unsigned char *pix = im.data;
-    int w = im.w;
-    int h = im.h;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    int w = bitmap.width();
+    int h = bitmap.height();
 
     if (radius<1) return;
-    int wm=w-1;
-    int hm=h-1;
-    int wh=w*h;
-    int div=radius+radius+1;
-    unsigned char *r=new unsigned char[wh];
-    unsigned char *g=new unsigned char[wh];
-    unsigned char *b=new unsigned char[wh];
-    unsigned char *a=new unsigned char[wh];
+    int wm = w-1;
+    int hm = h-1;
+    int wh = w*h;
+    int div = radius+radius+1;
+    uchar *r = new uchar[wh];
+    uchar *g = new uchar[wh];
+    uchar *b = new uchar[wh];
+    uchar *a = new uchar[wh];
     int rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
     int *vMIN = new int[qMax(w,h)];
     int *vMAX = new int[qMax(w,h)];
 
     int nDiv = 256*div;
-    unsigned char *dv=new unsigned char[nDiv];
+    uchar *dv = new uchar[nDiv];
     int nDivMinus1 = nDiv - 1;
-    for (i=0;i<256*div;i++) dv[i]=(i/div);
+    for(i = 0; i<256*div; i++) dv[i]=(i/div);
 
-    yw=yi=0;
+    yw = yi = 0;
 
-    for (y=0;y<h;y++){
-        rsum=gsum=bsum=asum=0;
-        for(i=-radius;i<=radius;i++){
+    for(y = 0; y<h; y++) {
+        rsum = gsum = bsum = asum = 0;
+        for(i = -radius; i<=radius; i++) {
             p = (yi + qMin(wm, qMax(i,0))) * 4;
-            rsum += pix[p];
-            gsum += pix[p+1];
-            bsum += pix[p+2];
-            asum += pix[p+3];
+            rsum += pixels[p];
+            gsum += pixels[p+1];
+            bsum += pixels[p+2];
+            asum += pixels[p+3];
         }
-        for (x=0;x<w;x++){
-            unsigned char aYiWithoutOp = dv[asum];
+        for(x = 0; x<w; x++) {
+            uchar aYiWithoutOp = dv[asum];
             if(aYiWithoutOp == 0) {
                 r[yi]=dv[rsum];
                 g[yi]=dv[gsum];
@@ -1947,41 +1829,41 @@ void fast_blur(const image &im, int radius,
                 a[yi]=dv[qMin(nDivMinus1, (int)(asum*opacityT))];
             }
 
-            if(y==0){
+            if(y == 0) {
                 vMIN[x]=qMin(x+radius+1,wm);
                 vMAX[x]=qMax(x-radius,0);
             }
             p1 = (yw+vMIN[x])*4;
             p2 = (yw+vMAX[x])*4;
 
-            rsum += pix[p1]		- pix[p2];
-            gsum += pix[p1+1]	- pix[p2+1];
-            bsum += pix[p1+2]	- pix[p2+2];
-            asum += pix[p1+3]	- pix[p2+3];
+            rsum += pixels[p1]		- pixels[p2];
+            gsum += pixels[p1+1]	- pixels[p2+1];
+            bsum += pixels[p1+2]	- pixels[p2+2];
+            asum += pixels[p1+3]	- pixels[p2+3];
 
             yi++;
         }
         yw+=w;
     }
 
-    for (x=0;x<w;x++){
-        rsum=gsum=bsum=asum=0;
-        yp=-radius*w;
-        for(i=-radius;i<=radius;i++){
-            yi=qMax(0,yp)+x;
+    for(x = 0; x<w; x++) {
+        rsum = gsum = bsum = asum = 0;
+        yp = -radius*w;
+        for(i = -radius; i<=radius; i++) {
+            yi = qMax(0,yp)+x;
             rsum+=r[yi];
             gsum+=g[yi];
             bsum+=b[yi];
             asum+=a[yi];
             yp+=w;
         }
-        yi=x;
-        for (y=0;y<h;y++){
-            pix[yi*4]		= dv[rsum];
-            pix[yi*4 + 1]	= dv[gsum];
-            pix[yi*4 + 2]	= dv[bsum];
-            pix[yi*4 + 3]	= dv[asum];
-            if(x==0){
+        yi = x;
+        for(y = 0; y<h; y++) {
+            pixels[yi*4]		= dv[rsum];
+            pixels[yi*4 + 1]	= dv[gsum];
+            pixels[yi*4 + 2]	= dv[bsum];
+            pixels[yi*4 + 3]	= dv[asum];
+            if(x == 0) {
                 vMIN[y]=qMin(y+radius+1,hm)*w;
                 vMAX[y]=qMax(y-radius,0)*w;
             }
@@ -2007,81 +1889,82 @@ void fast_blur(const image &im, int radius,
     delete[] dv;
 }
 
-void fast_blur(const image &im, int radius)
-{
-    unsigned char *pix = im.data;
-    int w = im.w;
-    int h = im.h;
+void fast_blur(const SkBitmap &bitmap, int radius) {
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    int w = bitmap.width();
+    int h = bitmap.height();
 
     if (radius<1) return;
-    int wm=w-1;
-    int hm=h-1;
-    int wh=w*h;
-    int div=radius+radius+1;
-    unsigned char *r=new unsigned char[wh];
-    unsigned char *g=new unsigned char[wh];
-    unsigned char *b=new unsigned char[wh];
-    unsigned char *a=new unsigned char[wh];
-    int rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
+    int wm = w-1;
+    int hm = h-1;
+    int wh = w*h;
+    int div = radius+radius+1;
+    uchar *r = new uchar[wh];
+    uchar *g = new uchar[wh];
+    uchar *b = new uchar[wh];
+    uchar *a = new uchar[wh];
+    int rsum, gsum, bsum, asum;
+    int x, y, i;
+    int p, p1, p2;
+    int yp, yi, yw;
     int *vMIN = new int[qMax(w,h)];
     int *vMAX = new int[qMax(w,h)];
 
-    unsigned char *dv=new unsigned char[256*div];
-    for (i=0;i<256*div;i++) dv[i]=(i/div);
+    uchar *dv = new uchar[256*div];
+    for(i = 0; i < 256*div; i++) dv[i] = (i/div);
 
-    yw=yi=0;
+    yw = yi = 0;
 
-    for (y=0;y<h;y++){
-        rsum=gsum=bsum=asum=0;
-        for(i=-radius;i<=radius;i++){
+    for(y = 0; y<h; y++) {
+        rsum = gsum = bsum = asum = 0;
+        for(i = -radius; i<=radius; i++) {
             p = (yi + qMin(wm, qMax(i,0))) * 4;
-            rsum += pix[p];
-            gsum += pix[p+1];
-            bsum += pix[p+2];
-            asum += pix[p+3];
+            rsum += pixels[p];
+            gsum += pixels[p+1];
+            bsum += pixels[p+2];
+            asum += pixels[p+3];
         }
-        for (x=0;x<w;x++){
-
+        for(x = 0; x<w; x++) {
             r[yi]=dv[rsum];
             g[yi]=dv[gsum];
             b[yi]=dv[bsum];
             a[yi]=dv[asum];
 
-            if(y==0){
+            if(y == 0) {
                 vMIN[x]=qMin(x+radius+1,wm);
                 vMAX[x]=qMax(x-radius,0);
             }
             p1 = (yw+vMIN[x])*4;
             p2 = (yw+vMAX[x])*4;
 
-            rsum += pix[p1]		- pix[p2];
-            gsum += pix[p1+1]	- pix[p2+1];
-            bsum += pix[p1+2]	- pix[p2+2];
-            asum += pix[p1+3]	- pix[p2+3];
+            rsum += pixels[p1]		- pixels[p2];
+            gsum += pixels[p1+1]	- pixels[p2+1];
+            bsum += pixels[p1+2]	- pixels[p2+2];
+            asum += pixels[p1+3]	- pixels[p2+3];
 
             yi++;
         }
         yw+=w;
     }
 
-    for (x=0;x<w;x++){
-        rsum=gsum=bsum=asum=0;
-        yp=-radius*w;
-        for(i=-radius;i<=radius;i++){
-            yi=qMax(0,yp)+x;
+    for(x = 0; x<w; x++) {
+        rsum = gsum = bsum = asum = 0;
+        yp = -radius*w;
+        for(i = -radius; i <= radius; i++) {
+            yi = qMax(0,yp)+x;
             rsum+=r[yi];
             gsum+=g[yi];
             bsum+=b[yi];
             asum+=a[yi];
             yp+=w;
         }
-        yi=x;
-        for (y=0;y<h;y++){
-            pix[yi*4]		= dv[rsum];
-            pix[yi*4 + 1]	= dv[gsum];
-            pix[yi*4 + 2]	= dv[bsum];
-            pix[yi*4 + 3]	= dv[asum];
-            if(x==0){
+        yi = x;
+        for(y = 0; y < h; y++) {
+            pixels[yi*4]		= dv[rsum];
+            pixels[yi*4 + 1]	= dv[gsum];
+            pixels[yi*4 + 2]	= dv[bsum];
+            pixels[yi*4 + 3]	= dv[asum];
+            if(x == 0) {
                 vMIN[y]=qMin(y+radius+1,hm)*w;
                 vMAX[y]=qMax(y-radius,0)*w;
             }
@@ -2107,9 +1990,9 @@ void fast_blur(const image &im, int radius)
     delete[] dv;
 }
 
-void blur(const image &im, qreal radius, qreal sigma)
+void blur(const SkBitmap &bitmap, qreal radius, qreal sigma)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
     qreal *kernel;
@@ -2157,7 +2040,7 @@ void blur(const image &im, qreal radius, qreal sigma)
         return;
     }
 
-    dest = new rgba [im.rw * im.rh];
+    dest = new rgba [bitmap.width() * bitmap.height()];
 
     if(!dest)
     {
@@ -2165,8 +2048,8 @@ void blur(const image &im, qreal radius, qreal sigma)
         return;
     }
 
-    scanline = new rgba [im.h];
-    temp = new rgba [im.h];
+    scanline = new rgba [bitmap.height()];
+    temp = new rgba [bitmap.height()];
 
     if(!scanline || !temp)
     {
@@ -2176,27 +2059,27 @@ void blur(const image &im, qreal radius, qreal sigma)
         delete [] kernel;
         return;
     }
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    rgba *bits = (rgba *)pixels;
 
-    rgba *bits = (rgba *)im.data;
-
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        p = bits + im.rw*y;
-        q = dest + im.rw*y;
+        p = bits + bitmap.width()*y;
+        q = dest + bitmap.width()*y;
 
-        blurScanLine(kernel, width, p, q, im.w);
+        blurScanLine(kernel, width, p, q, bitmap.width());
     }
 
-    for(x = 0;x < im.w;++x)
+    for(x = 0;x < bitmap.width();++x)
     {
-        for(y = 0;y < im.h;++y)
-            scanline[y] = *(dest + im.rw*y + x);
-            //scanline[y] = *(bits + im.rw*y + x);
+        for(y = 0;y < bitmap.height();++y)
+            scanline[y] = *(dest + bitmap.width()*y + x);
+            //scanline[y] = *(bits + bitmap.width()*y + x);
 
-        blurScanLine(kernel, width, scanline, temp, im.h);
+        blurScanLine(kernel, width, scanline, temp, bitmap.height());
 
-        for(y = 0;y < im.h;++y)
-            *(dest + im.rw*y + x) = temp[y];
+        for(y = 0;y < bitmap.height();++y)
+            *(dest + bitmap.width()*y + x) = temp[y];
 
     }
 
@@ -2204,14 +2087,14 @@ void blur(const image &im, qreal radius, qreal sigma)
     delete [] temp;
     delete [] kernel;
 
-    memcpy(im.data, dest, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), dest, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] dest;
 }
 
-void equalize(const image &im)
+void equalize(const SkBitmap &bitmap)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
     double_packet high, low, intensity, *map, *histogram;
@@ -2233,19 +2116,19 @@ void equalize(const image &im)
 
         return;
     }
-
-    rgba *bits = (rgba *)im.data;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    rgba *bits = (rgba *)pixels;
 
     /*
      *  Form histogram.
      */
     memset(histogram, 0, 256 * sizeof(double_packet));
 
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        p = bits + im.rw * y;
+        p = bits + bitmap.width() * y;
 
-        for(x = 0;x < im.w;++x)
+        for(x = 0;x < bitmap.width();++x)
         {
             histogram[p->r].red++;
             histogram[p->g].green++;
@@ -2270,23 +2153,23 @@ void equalize(const image &im)
         map[i] = intensity;
     }
 
-    low=map[0];
-    high=map[255];
+    low = map[0];
+    high = map[255];
     memset(equalize_map, 0, 256 * sizeof(short_packet));
 
     for(i = 0;i < 256;++i)
     {
         if(high.red != low.red)
-            equalize_map[i].red=(unsigned short)
+            equalize_map[i].red = (unsigned short)
                 ((65535*(map[i].red-low.red))/(high.red-low.red));
         if(high.green != low.green)
-            equalize_map[i].green=(unsigned short)
+            equalize_map[i].green = (unsigned short)
                 ((65535*(map[i].green-low.green))/(high.green-low.green));
         if(high.blue != low.blue)
-            equalize_map[i].blue=(unsigned short)
+            equalize_map[i].blue = (unsigned short)
                 ((65535*(map[i].blue-low.blue))/(high.blue-low.blue));
         if(high.alpha != low.alpha)
-            equalize_map[i].alpha=(unsigned short)
+            equalize_map[i].alpha = (unsigned short)
                 ((65535*(map[i].alpha-low.alpha))/(high.alpha-low.alpha));
     }
 
@@ -2296,11 +2179,11 @@ void equalize(const image &im)
     /*
      Stretch the histogram.
      */
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        q = bits + im.rw*y;
+        q = bits + bitmap.width()*y;
 
-        for(x = 0;x < im.w;++x)
+        for(x = 0;x < bitmap.width();++x)
         {
             if(low.red != high.red)
                 r = (equalize_map[(unsigned short)(q->r)].red/257);
@@ -2333,13 +2216,13 @@ struct PointInfo
     qreal x, y, z;
 };
 
-void shade(const image &im, bool color_shading, qreal azimuth,
+void shade(const SkBitmap &bitmap, bool color_shading, qreal azimuth,
              qreal elevation)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
-    rgba *n = new rgba [im.rw * im.rh];
+    rgba *n = new rgba [bitmap.width() * bitmap.height()];
 
     if(!n)
         return;
@@ -2348,7 +2231,7 @@ void shade(const image &im, bool color_shading, qreal azimuth,
     s32 x, y;
 
     struct PointInfo light, normal;
-
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
     rgba *q;
 
@@ -2361,20 +2244,20 @@ void shade(const image &im, bool color_shading, qreal azimuth,
 
     rgba *s0, *s1, *s2;
 
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
-        bits = (rgba *)im.data + im.rw * (F_MIN(F_MAX(y-1,0),im.h-3));
-        q = n + im.rw * y;
+        bits = (rgba *)pixels + bitmap.width() * (F_MIN(F_MAX(y-1,0),bitmap.height()-3));
+        q = n + bitmap.width() * y;
 
         // shade this row of pixels.
-        *q++ = (*(bits+im.rw));
+        *q++ = (*(bits+bitmap.width()));
         bits++;
 
         s0 = bits;
-        s1 = bits + im.rw;
-        s2 = bits + 2*im.rw;
+        s1 = bits + bitmap.width();
+        s2 = bits + 2*bitmap.width();
 
-        for(x = 1;x < im.w-1;++x)
+        for(x = 1;x < bitmap.width()-1;++x)
         {
             // determine the surface normal and compute shading.
             normal.x = intensityValue(*(s0-1))+intensityValue(*(s1-1))+intensityValue(*(s2-1))-
@@ -2397,7 +2280,7 @@ void shade(const image &im, bool color_shading, qreal azimuth,
                     normal_distance = normal.x*normal.x+normal.y*normal.y+normal.z*normal.z;
 
                     if(fabs(normal_distance) > 0.0000001)
-                        shade=distance/sqrt(normal_distance);
+                        shade = distance/sqrt(normal_distance);
                 }
             }
 
@@ -2425,29 +2308,27 @@ void shade(const image &im, bool color_shading, qreal azimuth,
         *q++ = (*s1);
     }
 
-    memcpy(im.data, n, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), n, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] n;
 }
 
-void edge(image &im, qreal radius)
-{
-    if(!checkImage(im))
-        return;
+void edge(SkBitmap &bitmap, qreal radius) {
+    if(bitmap.empty()) return;
 
     qreal *kernel;
     int width;
     long i;
-    rgba *dest = 0;
+    rgba *dest = nullptr;
 
     width = getOptimalKernelWidth(radius, 0.5);
 
     const int W = width*width;
 
-    if(im.w < width || im.h < width)
+    if(bitmap.width() < width || bitmap.height() < width)
         return;
 
-    kernel = new qreal [W];
+    kernel = new qreal[W];
 
     if(!kernel)
         return;
@@ -2457,7 +2338,7 @@ void edge(image &im, qreal radius)
 
     kernel[i/2] = W-1.0;
 
-    if(!convolveImage(&im, &dest, width, kernel))
+    if(!convolveImage(&bitmap, &dest, width, kernel))
     {
         delete [] kernel;
 
@@ -2469,30 +2350,30 @@ void edge(image &im, qreal radius)
 
     delete [] kernel;
 
-    memcpy(im.data, dest, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), dest, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] dest;
 }
 
-void emboss(image &im, qreal radius, qreal sigma)
+void emboss(SkBitmap &bitmap, qreal radius, qreal sigma)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
     qreal alpha, *kernel;
     int j, width;
     long i, u, v;
-    rgba *dest = 0;
+    rgba *dest = nullptr;
 
     if(sigma == 0.0)
         return;
 
     width = getOptimalKernelWidth(radius, sigma);
 
-    if(im.w < width || im.h < width)
+    if(bitmap.width() < width || bitmap.height() < width)
         return;
 
-    kernel = new qreal [width*width];
+    kernel = new qreal[width*width];
 
     if(!kernel)
         return;
@@ -2502,9 +2383,8 @@ void emboss(image &im, qreal radius, qreal sigma)
 
     const qreal S = sigma * sigma;
 
-    for(v = (-width/2);v <= (width/2);v++)
-    {
-        for(u=(-width/2); u <= (width/2); u++)
+    for(v = (-width/2);v <= (width/2);v++) {
+        for(u = (-width/2); u <= (width/2); u++)
         {
             alpha = exp(-((double) u*u+v*v)/(2.0*S));
 
@@ -2519,42 +2399,41 @@ void emboss(image &im, qreal radius, qreal sigma)
         j--;
     }
 
-    if(!convolveImage(&im, &dest, width, kernel))
-    {
+    if(!convolveImage(&bitmap, &dest, width, kernel)) {
         delete [] kernel;
         return;
     }
 
     delete [] kernel;
 
-    fmt_filters::image mm((u8 *)dest, im.w, im.h, im.rw, im.rh);
+    SkBitmap mm;
+    mm.installPixels(bitmap.info(), dest, bitmap.rowBytes());
 
     equalize(mm);
 
-    memcpy(im.data, dest, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), dest, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] dest;
 }
 
-void sharpen(image &im, qreal radius, qreal sigma)
-{
-    if(!checkImage(im))
+void sharpen(SkBitmap &bitmap, qreal radius, qreal sigma) {
+    if(bitmap.empty())
         return;
 
     qreal alpha, normalize, *kernel;
     int width;
     long i, u, v;
-    rgba *dest = 0;
+    rgba *dest = nullptr;
 
     if(sigma == 0.0)
         sigma = 0.01;
 
     width = getOptimalKernelWidth(radius, sigma);
 
-    if(im.w < width)
+    if(bitmap.width() < width)
         return;
 
-    kernel = new qreal [width*width];
+    kernel = new qreal[width*width];
 
     if(!kernel)
         return;
@@ -2578,7 +2457,7 @@ void sharpen(image &im, qreal radius, qreal sigma)
 
     kernel[i/2] = (-2.0)*normalize;
 
-    if(!convolveImage(&im, &dest, width, kernel))
+    if(!convolveImage(&bitmap, &dest, width, kernel))
     {
         delete [] kernel;
 
@@ -2590,14 +2469,14 @@ void sharpen(image &im, qreal radius, qreal sigma)
 
     delete [] kernel;
 
-    memcpy(im.data, dest, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), dest, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] dest;
 }
 
-void oil(const image &im, qreal radius)
+void oil(const SkBitmap &bitmap, qreal radius)
 {
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
     unsigned long count;
@@ -2610,29 +2489,29 @@ void oil(const image &im, qreal radius)
 
     scaleDown(radius, 1.0, 5.0);
 
-    rgba *n = new rgba [im.rw * im.rh];
+    rgba *n = new rgba [bitmap.width() * bitmap.height()];
 
     if(!n)
         return;
 
-    memcpy(n, im.data, im.rw * im.rh * sizeof(rgba));
+    memcpy(n, bitmap.getPixels(), bitmap.width() * bitmap.height() * sizeof(rgba));
 
     width = getOptimalKernelWidth(radius, 0.5);
 
-    if(im.w < width)
+    if(bitmap.width() < width)
     {
         delete [] n;
         return;
     }
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    rgba *bits = (rgba *)pixels;
 
-    rgba *bits = (rgba *)im.data;
-
-    for(y = 0;y < im.h;++y)
+    for(y = 0;y < bitmap.height();++y)
     {
         sy = y-(width/2);
-        q = n + im.rw*y;
+        q = n + bitmap.width()*y;
 
-        for(x = 0;x < im.w;++x)
+        for(x = 0;x < bitmap.width();++x)
         {
             count = 0;
             memset(histogram, 0, 256 * sizeof(unsigned long));
@@ -2640,14 +2519,14 @@ void oil(const image &im, qreal radius)
 
             for(mcy = 0;mcy < width;++mcy,++sy)
             {
-                my = sy < 0 ? 0 : sy > im.h-1 ? im.h-1 : sy;
+                my = sy < 0 ? 0 : sy > bitmap.height()-1 ? bitmap.height()-1 : sy;
                 sx = x+(-width/2);
 
                 for(mcx = 0; mcx < width;++mcx,++sx)
                 {
-                    mx = sx < 0 ? 0 : sx > im.w-1 ? im.w-1 : sx;
+                    mx = sx < 0 ? 0 : sx > bitmap.width()-1 ? bitmap.width()-1 : sx;
 
-                    k = intensityValue(*(bits + my*im.rw + mx));
+                    k = intensityValue(*(bits + my*bitmap.width() + mx));
 
                     if(k > 255) k = 255;
 
@@ -2656,7 +2535,7 @@ void oil(const image &im, qreal radius)
                     if(histogram[k] > count)
                     {
                         count = histogram[k];
-                        s = bits + my*im.rw + mx;
+                        s = bits + my*bitmap.width() + mx;
                     }
                 }
             }
@@ -2665,30 +2544,30 @@ void oil(const image &im, qreal radius)
         }
     }
 
-    memcpy(im.data, n, im.rw * im.rh * sizeof(rgba));
+    memcpy(bitmap.getPixels(), n, bitmap.width() * bitmap.height() * sizeof(rgba));
 
     delete [] n;
 }
 
-void redeye(const image &im, const int w, const int h, const int x, const int y, int th)
+void redeye(const SkBitmap &bitmap, const int w, const int h, const int x, const int y, int th)
 {
     const qreal RED_FACTOR = 0.5133333;
     const qreal GREEN_FACTOR = 1;
     const qreal BLUE_FACTOR = 0.1933333;
 
-    if(!checkImage(im))
+    if(bitmap.empty())
         return;
 
     scaleDown(th, 0, 255);
 
     int y1, x1;
     int adjusted_red, adjusted_green, adjusted_blue;
-
-    rgba *src = (rgba *)im.data, *s;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    rgba *src = (rgba *)pixels, *s;
 
     for(y1 = y;y1 < y+h;++y1)
     {
-        s = src + im.w*y1 + x;
+        s = src + bitmap.width()*y1 + x;
 
         for(x1 = x;x1 < x+w;x1++)
         {
@@ -2715,9 +2594,8 @@ void redeye(const image &im, const int w, const int h, const int x, const int y,
 
 /*************************************************************************/
 
-static bool convolveImage(image *image, rgba **dest, const unsigned int order,
-                                 const qreal *kernel)
-{
+static bool convolveImage(SkBitmap *bitmap, rgba **dest,
+                          const unsigned int order, const qreal *kernel) {
     long width;
     qreal red, green, blue;
     u8 alpha;
@@ -2735,12 +2613,12 @@ static bool convolveImage(image *image, rgba **dest, const unsigned int order,
 
     const int W = width*width;
 
-    normal_kernel = new qreal [W];
+    normal_kernel = new qreal[W];
 
     if(!normal_kernel)
         return false;
 
-    *dest = new rgba [image->rw * image->rh];
+    *dest = new rgba[bitmap->width() * bitmap->height()];
 
     if(!*dest)
     {
@@ -2756,36 +2634,35 @@ static bool convolveImage(image *image, rgba **dest, const unsigned int order,
     if(fabs(normalize) <= MagickEpsilon)
         normalize = 1.0;
 
-    normalize=1.0/normalize;
+    normalize = 1.0/normalize;
 
     for(i = 0;i < W;i++)
         normal_kernel[i] = normalize*kernel[i];
 
-    rgba *bits = (rgba *)image->data;
+    rgba *bits = static_cast<rgba*>(bitmap->getPixels());
 
-    for(y = 0;y < image->h;++y)
-    {
+    for(y = 0; y < bitmap->height(); y++) {
         sy = y-(width/2);
-        q = *dest + image->rw * y;
+        q = *dest + bitmap->width() * y;
 
-        for(x = 0;x < image->w;++x)
+        for(x = 0;x < bitmap->width();++x)
         {
             k = normal_kernel;
             red = green = blue = alpha = 0;
             sy = y-(width/2);
-            alpha = (bits + image->rw*y+x)->a;
+            alpha = (bits + bitmap->width()*y+x)->a;
 
-            for(mcy=0; mcy < width; ++mcy, ++sy)
+            for(mcy = 0; mcy < width; ++mcy, ++sy)
             {
-                my = sy < 0 ? 0 : sy > image->h-1 ? image->h-1 : sy;
+                my = sy < 0 ? 0 : sy > bitmap->height()-1 ? bitmap->height()-1 : sy;
                 sx = x+(-width/2);
 
-                for(mcx=0; mcx < width; ++mcx, ++sx)
+                for(mcx = 0; mcx < width; ++mcx, ++sx)
                 {
-                    mx = sx < 0 ? 0 : sx > image->w-1 ? image->w-1 : sx;
-                    red +=   (*k) * ((bits + image->rw*my+mx)->r*257);
-                    green += (*k) * ((bits + image->rw*my+mx)->g*257);
-                    blue +=  (*k) * ((bits + image->rw*my+mx)->b*257);
+                    mx = sx < 0 ? 0 : sx > bitmap->width()-1 ? bitmap->width()-1 : sx;
+                    red +=   (*k) * ((bits + bitmap->width()*my+mx)->r*257);
+                    green += (*k) * ((bits + bitmap->width()*my+mx)->g*257);
+                    blue +=  (*k) * ((bits + bitmap->width()*my+mx)->b*257);
 //                    alpha += (*k) * ((bits + image->rw*my+mx)->a*257);
 
                     ++k;
@@ -2797,9 +2674,9 @@ static bool convolveImage(image *image, rgba **dest, const unsigned int order,
             blue = blue < 0 ? 0 : blue > 65535 ? 65535 : blue+0.5;
 //            alpha = alpha < 0 ? 0 : alpha > 65535 ? 65535 : alpha+0.5;
 
-            *q++ = rgba((unsigned char)(red/257UL),
-                         (unsigned char)(green/257UL),
-                         (unsigned char)(blue/257UL),
+            *q++ = rgba((uchar)(red/257UL),
+                         (uchar)(green/257UL),
+                         (uchar)(blue/257UL),
                          alpha);
         }
     }
@@ -2819,7 +2696,7 @@ static void rgb2hsv(const rgb &rgb, s32 *h, s32 *s, s32 *v)
     s32 b = rgb.b;
 
     u32 max = r;
-    s32 whatmax = 0;                // r=>0, g=>1, b=>2
+    s32 whatmax = 0;                // r = >0, g = >1, b = >2
 
     if((u32)g > max)
     {
@@ -2899,9 +2776,9 @@ static void hsv2rgb(s32 h, s32 s, s32 v, rgb *rgb) {
 
             switch(h)
             {
-                case 1: r=(s32)q; g=(s32)v, b=(s32)p; break;
-                case 3: r=(s32)p; g=(s32)q, b=(s32)v; break;
-                case 5: r=(s32)v; g=(s32)p, b=(s32)q; break;
+                case 1: r = (s32)q; g = (s32)v, b = (s32)p; break;
+                case 3: r = (s32)p; g = (s32)q, b = (s32)v; break;
+                case 5: r = (s32)v; g = (s32)p, b = (s32)q; break;
             }
         }
         else
@@ -2910,9 +2787,9 @@ static void hsv2rgb(s32 h, s32 s, s32 v, rgb *rgb) {
 
             switch(h)
             {
-                case 0: r=(s32)v; g=(s32)t, b=(s32)p; break;
-                case 2: r=(s32)p; g=(s32)v, b=(s32)t; break;
-                case 4: r=(s32)t; g=(s32)p, b=(s32)v; break;
+                case 0: r = (s32)v; g = (s32)t, b = (s32)p; break;
+                case 2: r = (s32)p; g = (s32)v, b = (s32)t; break;
+                case 4: r = (s32)t; g = (s32)p, b = (s32)v; break;
             }
         }
     }
@@ -2922,34 +2799,35 @@ static void hsv2rgb(s32 h, s32 s, s32 v, rgb *rgb) {
     rgb->b = b;
 }
 
-static rgba interpolateColor(const image &im, qreal x_offset, qreal y_offset, const rgba &background)
+static rgba interpolateColor(const SkBitmap &bitmap, qreal x_offset, qreal y_offset, const rgba &background)
 {
     qreal alpha, beta;
     rgba p, q, r, s;
     s32 x, y;
-    rgba *bits = (rgba *)im.data;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    rgba *bits = (rgba *)pixels;
 
-    if(!checkImage(im))
+    if(bitmap.empty())
         return background;
 
     x = (s32)x_offset;
     y = (s32)y_offset;
 
-    if((x < -1) || (x >= im.w) || (y < -1) || (y >= im.h))
+    if((x < -1) || (x >= bitmap.width()) || (y < -1) || (y >= bitmap.height()))
         return background;
 
-    if((x >= 0) && (y >= 0) && (x < (im.w-1)) && (y < (im.h-1)))
+    if((x >= 0) && (y >= 0) && (x < (bitmap.width()-1)) && (y < (bitmap.height()-1)))
     {
-        rgba *t = bits + y * im.rw;
+        rgba *t = bits + y * bitmap.width();
 
         p = t[x];
         q = t[x+1];
-        r = t[x+im.rw];
-        s = t[x+im.rw+1];
+        r = t[x+bitmap.width()];
+        s = t[x+bitmap.width()+1];
     }
     else
     {
-        rgba *t = bits + y * im.rw;
+        rgba *t = bits + y * bitmap.width();
 
         p = background;
 
@@ -2958,23 +2836,23 @@ static rgba interpolateColor(const image &im, qreal x_offset, qreal y_offset, co
 
         q = background;
 
-        if(((x+1) < im.w) && (y >= 0))
+        if(((x+1) < bitmap.width()) && (y >= 0))
             q = t[x+1];
 
         r = background;
 
-        if((x >= 0) && ((y+1) < im.h))
+        if((x >= 0) && ((y+1) < bitmap.height()))
         {
-            t = bits + (y+1) * im.rw;
-            r = t[x+im.rw];
+            t = bits + (y+1) * bitmap.width();
+            r = t[x+bitmap.width()];
         }
 
         s = background;
 
-        if(((x+1) < im.w) && ((y+1) < im.h))
+        if(((x+1) < bitmap.width()) && ((y+1) < bitmap.height()))
         {
-            t = bits + (y+1) * im.rw;
-            s = t[x+im.rw+1];
+            t = bits + (y+1) * bitmap.width();
+            s = t[x+bitmap.width()+1];
         }
     }
 
@@ -3006,47 +2884,47 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
 #define TauGaussian  20.0
 
     qreal alpha, beta, sigma, value;
-    alpha=(double) (rand() & NoiseMask)/NoiseMask;
+    alpha = (double) (rand() & NoiseMask)/NoiseMask;
     if (alpha == 0.0)
-        alpha=1.0;
-    switch(noise_type){
+        alpha = 1.0;
+    switch(noise_type) {
     case UniformNoise:
     default:
         {
-            value=(double) pixel+SigmaUniform*(alpha-0.5);
+            value = (double) pixel+SigmaUniform*(alpha-0.5);
             break;
         }
     case GaussianNoise:
         {
             qreal tau;
 
-            beta=(double) (rand() & NoiseMask)/NoiseMask;
-            sigma=sqrt(-2.0*log(alpha))*cos(2.0*M_PI*beta);
-            tau=sqrt(-2.0*log(alpha))*sin(2.0*M_PI*beta);
-            value=(double) pixel+
+            beta = (double) (rand() & NoiseMask)/NoiseMask;
+            sigma = sqrt(-2.0*log(alpha))*cos(2.0*M_PI*beta);
+            tau = sqrt(-2.0*log(alpha))*sin(2.0*M_PI*beta);
+            value = (double) pixel+
                 (sqrt((double) pixel)*SigmaGaussian*sigma)+(TauGaussian*tau);
             break;
         }
     case MultiplicativeGaussianNoise:
         {
             if (alpha <= NoiseEpsilon)
-                sigma=MaxRGB;
+                sigma = MaxRGB;
             else
-                sigma=sqrt(-2.0*log(alpha));
-            beta=(rand() & NoiseMask)/NoiseMask;
-            value=(double) pixel+
+                sigma = sqrt(-2.0*log(alpha));
+            beta = (rand() & NoiseMask)/NoiseMask;
+            value = (double) pixel+
                 pixel*SigmaMultiplicativeGaussian*sigma*cos(2.0*M_PI*beta);
             break;
         }
     case ImpulseNoise:
         {
             if (alpha < (SigmaImpulse/2.0))
-                value=0;
+                value = 0;
             else
                 if (alpha >= (1.0-(SigmaImpulse/2.0)))
-                    value=MaxRGB;
+                    value = MaxRGB;
                 else
-                    value=pixel;
+                    value = pixel;
             break;
         }
     case LaplacianNoise:
@@ -3054,16 +2932,16 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
             if (alpha <= 0.5)
             {
                 if (alpha <= NoiseEpsilon)
-                    value=(double) pixel-MaxRGB;
+                    value = (double) pixel-MaxRGB;
                 else
-                    value=(double) pixel+SigmaLaplacian*log(2.0*alpha);
+                    value = (double) pixel+SigmaLaplacian*log(2.0*alpha);
                 break;
             }
-            beta=1.0-alpha;
+            beta = 1.0-alpha;
             if (beta <= (0.5*NoiseEpsilon))
-                value=(double) pixel+MaxRGB;
+                value = (double) pixel+MaxRGB;
             else
-                value=(double) pixel-SigmaLaplacian*log(2.0*beta);
+                value = (double) pixel-SigmaLaplacian*log(2.0*beta);
             break;
         }
     case PoissonNoise:
@@ -3071,12 +2949,12 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
             s32
                 i;
 
-            for (i=0; alpha > exp(-SigmaPoisson*pixel); i++)
+            for(i = 0; alpha > exp(-SigmaPoisson*pixel); i++)
             {
-                beta=(double) (rand() & NoiseMask)/NoiseMask;
-                alpha=alpha*beta;
+                beta = (double) (rand() & NoiseMask)/NoiseMask;
+                alpha = alpha*beta;
             }
-            value=i/SigmaPoisson;
+            value = i/SigmaPoisson;
             break;
         }
     }
@@ -3181,7 +3059,7 @@ static void blurScanLine(qreal *kernel, s32 width,
             q++;
         }
 
-        scale=1.0/scale;
+        scale = 1.0/scale;
 
         red = scale*(red+0.5);
         green = scale*(green+0.5);
@@ -3234,7 +3112,7 @@ static void blurScanLine(qreal *kernel, s32 width,
     for(;x < columns;++x)
     {
         red = blue = green = alpha = 0.0;
-        scale=0;
+        scale = 0;
         p = kernel;
         q = src+(x-width/2);
 
@@ -3249,7 +3127,7 @@ static void blurScanLine(qreal *kernel, s32 width,
             q++;
         }
 
-        scale=1.0/scale;
+        scale = 1.0/scale;
         red = scale*(red+0.5);
         green = scale*(green+0.5);
         blue = scale*(blue+0.5);
@@ -3283,7 +3161,7 @@ static s32 getBlurKernel(s32 width, qreal sigma, qreal **kernel)
     if(width == 0)
         width = 3;
 
-    *kernel = new qreal [width];
+    *kernel = new qreal[width];
 
     if(!*kernel)
         return 0;
@@ -3326,9 +3204,9 @@ void qblurMono(qreal *data,
 
     qreal *valLine = new qreal[nPoints];
 
-    int wm=w-1;
-    int hm=h-1;
-    int wh=w*h;
+    int wm = w-1;
+    int hm = h-1;
+    int wh = w*h;
     qreal *v = new qreal[wh];
     qreal vsum;
     int x,y,i,p,p1,yp,yi,yw;
@@ -3336,7 +3214,7 @@ void qblurMono(qreal *data,
     int *vMAX = new int[qMax(w,h)];
 
 
-    yw=yi=0;
+    yw = yi = 0;
 
     for(y = 0; y < h; y++) {
         p = yi;
@@ -3383,9 +3261,9 @@ void qblurMono(qreal *data,
     }
 
     for(x = 0; x < w; x++) {
-        yp=-iRadius*w;
+        yp = -iRadius*w;
 
-        yi=qMax(0,yp)+x;
+        yi = qMax(0,yp)+x;
         valLine[0] = v[yi];
         vsum = v[yi]*fracInf;
         yp+=w;
@@ -3403,11 +3281,11 @@ void qblurMono(qreal *data,
         yp+=w;
 
 
-        yi=x;
+        yi = x;
         for(y = 0; y < h; y++) {
             data[yi]	= vsum*divFInv;
 
-            if(x==0) {
+            if(x == 0) {
                 vMIN[y] = qMin(y+iRadius+1,hm)*w;
                 vMAX[y] = qMax(y-iRadius,0)*w;
             }
@@ -3454,9 +3332,9 @@ void qspredMono(qreal *data,
 
     qreal *valLine = new qreal[nPoints];
 
-    int wm=w-1;
-    int hm=h-1;
-    int wh=w*h;
+    int wm = w-1;
+    int hm = h-1;
+    int wh = w*h;
     qreal *v = new qreal[wh];
     qreal vsum;
     int x,y,i,p,p1,yp,yi,yw;
@@ -3464,7 +3342,7 @@ void qspredMono(qreal *data,
     int *vMAX = new int[qMax(w,h)];
 
 
-    yw=yi=0;
+    yw = yi = 0;
 
     for(y = 0; y < h; y++) {
         p = yi;
@@ -3511,9 +3389,9 @@ void qspredMono(qreal *data,
     }
 
     for(x = 0; x < w; x++) {
-        yp=-iRadius*w;
+        yp = -iRadius*w;
 
-        yi=qMax(0,yp)+x;
+        yi = qMax(0,yp)+x;
         valLine[0] = v[yi];
         vsum = v[yi]*fracInf;
         yp+=w;
@@ -3531,11 +3409,11 @@ void qspredMono(qreal *data,
         yp+=w;
 
 
-        yi=x;
+        yi = x;
         for(y = 0; y < h; y++) {
             data[yi] = qMax(data[yi], vsum*divFInv);
 
-            if(x==0) {
+            if(x == 0) {
                 vMIN[y] = qMin(y+iRadius+1,hm)*w;
                 vMAX[y] = qMax(y-iRadius,0)*w;
             }
@@ -3590,10 +3468,10 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
         if(polarity > 0)
             for(x = 0;x < columns;x++)
             {
-                v=(*p);
+                v = (*p);
                 if (*r > v)
                     v++;
-                *q=v > 255 ? 255 : v;
+                *q = v > 255 ? 255 : v;
                 p++;
                 q++;
                 r++;
@@ -3601,10 +3479,10 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
         else
             for(x = 0;x < columns;x++)
             {
-                v=(*p);
+                v = (*p);
                 if (v > (u32) (*r+1))
                     v--;
-                *q=v;
+                *q = v;
                 p++;
                 q++;
                 r++;
@@ -3627,24 +3505,24 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
         s++;
 
         if(polarity > 0)
-            for(x=0; x < (s32) columns; x++)
+            for(x = 0; x < (s32) columns; x++)
             {
-                v=(*q);
+                v = (*q);
                 if (((u32) (*s+1) > v) && (*r > v))
                     v++;
-                *p=v > 255 ? 255 : v;
+                *p = v > 255 ? 255 : v;
                 p++;
                 q++;
                 r++;
                 s++;
             }
         else
-            for (x=0; x < columns; x++)
+            for(x = 0; x < columns; x++)
             {
-                v=(*q);
+                v = (*q);
                 if (((u32) (*s+1) < v) && (*r < v))
                     v--;
-                *p=v;
+                *p = v;
                 p++;
                 q++;
                 r++;
@@ -3691,46 +3569,46 @@ static int getOptimalKernelWidth(qreal radius, qreal sigma)
     return ((int)width-2);
 }
 
-void applyBlur(const image &img, const qreal &scale,
+void applyBlur(const SkBitmap &bitmap, const qreal &scale,
                const qreal &blurRadius, const bool &highQuality,
                const bool &hasKeys) {
     qreal radius = blurRadius*scale;
 
     if(highQuality) {
         if(hasKeys) {
-            fmt_filters::anim_fast_blur(img, radius*0.5);
-            fmt_filters::anim_fast_blur(img, radius*0.5);
+            RasterEffects::anim_fast_blur(bitmap, radius*0.5);
+            RasterEffects::anim_fast_blur(bitmap, radius*0.5);
         } else {
-            fmt_filters::fast_blur(img, qRound(radius*0.5));
-            fmt_filters::fast_blur(img, qRound(radius*0.5));
+            RasterEffects::fast_blur(bitmap, qRound(radius*0.5));
+            RasterEffects::fast_blur(bitmap, qRound(radius*0.5));
         }
     } else {
         if(hasKeys) {
-            fmt_filters::anim_fast_blur(img, radius*0.8);
+            RasterEffects::anim_fast_blur(bitmap, radius*0.8);
         } else {
-            fmt_filters::fast_blur(img, qRound(radius*0.8));
+            RasterEffects::fast_blur(bitmap, qRound(radius*0.8));
         }
     }
 }
 
-void applyBlur(const image &img, const qreal &scale,
+void applyBlur(const SkBitmap &bitmap, const qreal &scale,
                const qreal &blurRadius, const bool &highQuality,
                const bool &hasKeys, const qreal &opacity) {
     qreal radius = blurRadius*scale;
 
     if(highQuality) {
         if(hasKeys) {
-            fmt_filters::anim_fast_blur(img, radius*0.5, opacity);
-            fmt_filters::anim_fast_blur(img, radius*0.5, opacity);
+            RasterEffects::anim_fast_blur(bitmap, radius*0.5, opacity);
+            RasterEffects::anim_fast_blur(bitmap, radius*0.5, opacity);
         } else {
-            fmt_filters::fast_blur(img, qRound(radius*0.5), opacity);
-            fmt_filters::fast_blur(img, qRound(radius*0.5), opacity);
+            RasterEffects::fast_blur(bitmap, qRound(radius*0.5), opacity);
+            RasterEffects::fast_blur(bitmap, qRound(radius*0.5), opacity);
         }
     } else {
         if(hasKeys) {
-            fmt_filters::anim_fast_blur(img, radius*0.8, opacity);
+            RasterEffects::anim_fast_blur(bitmap, radius*0.8, opacity);
         } else {
-            fmt_filters::fast_blur(img, qRound(radius*0.8), opacity);
+            RasterEffects::fast_blur(bitmap, qRound(radius*0.8), opacity);
         }
     }
 }

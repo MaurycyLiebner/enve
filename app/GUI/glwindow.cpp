@@ -158,7 +158,7 @@ void draw(SkCanvas* canvas) {
     size_t N = sizeof(modes) / sizeof(modes[0]);
     size_t K = (N - 1) / 3 + 1;
     SkASSERT(K * 64 == 640);  // tall enough
-    for (size_t i = 0; i < N; ++i) {
+    for(size_t i = 0; i < N; ++i) {
         SkAutoCanvasRestore autoCanvasRestore(canvas, true);
         canvas->translate(192.0f * (i / K), 64.0f * (i % K));
         const char* desc = SkBlendMode_Name(modes[i]);

@@ -1,6 +1,6 @@
 #include "swirleffect.h"
 #include "Animators/qrealanimator.h"
-#include "fmt_filters.h"
+#include "rastereffects.h"
 
 SwirlEffect::SwirlEffect(qreal degrees) :
     PixmapEffect("swirl", EFFECT_SWIRL) {
@@ -14,14 +14,13 @@ SwirlEffect::SwirlEffect(qreal degrees) :
 stdsptr<PixmapEffectRenderData> SwirlEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(SwirlEffectRenderData)();
-    renderData->degrees = mDegreesAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
-    return renderData;
+    renderData->degrees =
+            mDegreesAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
+    return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void SwirlEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
-                                           const fmt_filters::image &img,
+void SwirlEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                            const qreal &scale) {
-    Q_UNUSED(imgPtr)
     Q_UNUSED(scale)
-    fmt_filters::swirl(img, degrees, fmt_filters::rgba(0, 0, 0, 0));
+    RasterEffects::swirl(bitmap, degrees, RasterEffects::rgba(0, 0, 0, 0));
 }
