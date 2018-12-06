@@ -166,8 +166,12 @@ public:
             const int& frame1, const int& frame2) const;
     bool differenceInFillPathBetweenFrames(
             const int& frame1, const int& frame2) const;
-    void setPathsOutdated(const bool &bT) {
-        mCurrentPathsOutdated = bT;
+    void setPathsOutdated() {
+        mCurrentPathsOutdated = true;
+    }
+
+    void setOutlinePathOutdated() {
+        mCurrentOutlinePathOutdated = true;
     }
 protected:
     PathBox(const BoundingBoxType &type);
@@ -175,6 +179,7 @@ protected:
 
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;
+    bool mCurrentOutlinePathOutdated = true;
 
     int mCurrentPathsFrame = 0;
 

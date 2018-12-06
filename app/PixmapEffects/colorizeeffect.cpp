@@ -43,6 +43,5 @@ ColorizeEffect::ColorizeEffect() :
 void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                               const qreal &scale) {
     Q_UNUSED(scale);
-    RasterEffects::colorizeHSV(img,
-                             hue, saturation, lightness, alpha);
+    RasterEffects::colorizeHSV(bitmap, hue, saturation, lightness, alpha);
 }

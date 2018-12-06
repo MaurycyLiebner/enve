@@ -7,7 +7,7 @@ NodePointUpdater::NodePointUpdater(PathBox *vectorPath) {
 
 void NodePointUpdater::update() {
     mTarget->scheduleUpdate(Animator::USER_CHANGE);
-    mTarget->setPathsOutdated(true);
+    mTarget->setPathsOutdated();
 }
 
 void NodePointUpdater::frameChangeUpdate() {

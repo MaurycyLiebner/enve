@@ -47,8 +47,7 @@ stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataFor
 
 void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                                   const qreal &scale) {
-    Q_UNUSED(imgPtr);
-    RasterEffects::replaceColor(img, redR, greenR, blueR, alphaR,
-                              redT, greenT, blueT, alphaT,
-                              tolerance, smoothness*scale);
+    RasterEffects::replaceColor(bitmap, redR, greenR, blueR, alphaR,
+                                redT, greenT, blueT, alphaT,
+                                tolerance, smoothness*scale);
 }

@@ -108,7 +108,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             currentPathCompatible =
                     !differenceInPathBetweenFrames(
                         data->relFrame, mCurrentPathsFrame);
-            if(currentPathCompatible) {
+            if(currentPathCompatible && !mCurrentOutlinePathOutdated) {
                 currentOutlinePathCompatible =
                         !differenceInOutlinePathBetweenFrames(
                             data->relFrame, mCurrentPathsFrame);
@@ -617,6 +617,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
     mOutlinePathSk = pathRenderData->outlinePath;
     mFillPathSk = pathRenderData->fillPath;
     mCurrentPathsOutdated = false;
+    mCurrentOutlinePathOutdated = false;
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);
 }
 
