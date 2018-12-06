@@ -1,5 +1,4 @@
 #include "Animators/complexanimator.h"
-#include "global.h"
 #include "qrealanimator.h"
 
 ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {
@@ -231,16 +230,6 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
     return nullptr;
 }
 
-QrealAnimator *ComplexAnimator::getQrealAnimatorIfIsTheOnlyOne() {
-    if(ca_mChildAnimators.count() == 1) {
-        Property* prop = ca_mChildAnimators.first().get();
-        if(prop->SWT_isQrealAnimator()) {
-            return GetAsPtr(prop, QrealAnimator);
-        }
-    }
-    return nullptr;
-}
-
 void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
                                             Property *animator2) {
     int id1 = getChildPropertyIndex(animator1);
@@ -415,7 +404,7 @@ void ComplexAnimator::ca_addDescendantsKey(Key* key) {
 
 void ComplexAnimator::ca_removeDescendantsKey(Key* key) {
     ComplexKey* collection =
-            ca_getKeyCollectionAtRelFrame(key->getRelFrame());//key->getParentKey();//getKeyCollectionAtAbsFrame(key->getAbsFrame() );
+            ca_getKeyCollectionAtRelFrame(key->getRelFrame());
     if(collection == nullptr) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
@@ -455,29 +444,6 @@ void ComplexKey::removeAnimatorKey(Key* key) {
 bool ComplexKey::isEmpty() {
     return mKeys.isEmpty();
 }
-
-//QrealKey *ComplexKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
-//    ComplexKey *target = new ComplexKey((ComplexAnimator*)targetParent);
-//    target->setValue(mValue);
-//    target->setRelFrame(mRelFrame);
-//    target->setCtrlsMode(mCtrlsMode);
-//    target->setStartEnabled(mStartEnabled);
-//    target->setStartFrame(mStartFrame);
-//    target->setStartValue(mStartValue);
-//    target->setEndEnabled(mEndEnabled);
-//    target->setEndFrame(mEndFrame);
-//    target->setEndValue(mEndValue);
-//    //targetParent->appendKey(target);
-//    Q_FOREACH(QrealKey *key, mKeys) {
-//        if(key->isSelected()) continue;
-//        QrealKey *keyDuplicate = key->makeQrealKeyDuplicate(
-//                    key->getParentAnimator());
-//        target->addAnimatorKey(keyDuplicate);
-//        key->getParentAnimator()->anim_appendKey(keyDuplicate);
-//    }
-
-//    return target;
-//}
 
 void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);

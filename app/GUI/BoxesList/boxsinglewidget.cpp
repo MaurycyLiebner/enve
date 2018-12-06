@@ -474,7 +474,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                 ComplexAnimator *ca_target =
                         GetAsPtr(target, ComplexAnimator);
                 QrealAnimator *qatarget =
-                        ca_target->getQrealAnimatorIfIsTheOnlyOne();
+                        ca_target->getPropertyIfIsTheOnlyOne<QrealAnimator>(
+                            &Property::SWT_isQrealAnimator);
                 if(qatarget == nullptr) {
                     clearAndHideValueAnimators();
                 } else {

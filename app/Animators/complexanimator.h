@@ -79,7 +79,17 @@ public:
     void anim_saveCurrentValueAsKey();
     virtual void ca_removeAllChildAnimators();
     Property *ca_getFirstDescendantWithName(const QString &name);
-    QrealAnimator *getQrealAnimatorIfIsTheOnlyOne();
+
+    template <class T = Property>
+    T *getPropertyIfIsTheOnlyOne(bool (Property::*tester)()) {
+        if(ca_mChildAnimators.count() == 1) {
+            Property* prop = ca_mChildAnimators.first().get();
+            if((prop->*tester)()) {
+                return static_cast<T*>(prop);
+            }
+        }
+        return nullptr;
+    }
 
     void SWT_setChildrenAncestorDisabled(const bool &bT) {
         Q_FOREACH(const qsptr<Property> &prop, ca_mChildAnimators) {
@@ -127,8 +137,6 @@ public:
     void startFrameTransform();
     void finishFrameTransform();
     void cancelFrameTransform();
-    //void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame, const qreal &scaleFactor);
-    //QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     bool areAllChildrenSelected();
     void addToSelection(QList<stdptr<Key>> &selectedKeys,
