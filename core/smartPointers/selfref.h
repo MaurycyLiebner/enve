@@ -1,5 +1,6 @@
 #ifndef SELFREF_H
 #define SELFREF_H
+#include <QPointer>
 #include <QSharedPointer>
 #include <QObject>
 template <class T> using qsptr = QSharedPointer<T>;

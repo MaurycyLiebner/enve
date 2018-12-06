@@ -1,6 +1,7 @@
 #ifndef EFFECTANIMATORS_H
 #define EFFECTANIMATORS_H
 #include "Animators/complexanimator.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 namespace fmt_filters { struct image; }
 
@@ -12,7 +13,6 @@ class SkBitmap;
 struct BoundingBoxRenderData;
 struct PixmapEffectRenderData;
 
-#include "smartPointers/sharedpointerdefs.h"
 
 class EffectAnimators : public ComplexAnimator {
     friend class SelfRef;

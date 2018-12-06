@@ -19,6 +19,7 @@
 
 #include "renderdatahandler.h"
 #include "smartPointers/sharedpointerdefs.h"
+#include "GUI/ColorWidgets/helpers.h"
 
 class Canvas;
 

@@ -1,12 +1,6 @@
 #include "pixmapeffect.h"
+#include "Animators/effectanimators.h"
 #include <QDrag>
-#include <QDebug>
-#include "Boxes/boxesgroup.h"
-#include "fmt_filters.h"
-#include "pointhelpers.h"
-#include "Animators/coloranimator.h"
-#include "Animators/qpointfanimator.h"
-#include "Properties/boolproperty.h"
 
 PixmapEffectRenderData::~PixmapEffectRenderData() {}
 

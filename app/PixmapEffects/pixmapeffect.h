@@ -1,14 +1,12 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
 #include "skiaincludes.h"
-#include "GUI/ColorWidgets/helpers.h"
 #include "Animators/complexanimator.h"
 #include <QMimeData>
 #include <QPointF>
 class EffectAnimators;
 class QIODevice;
 class BoundingBoxRenderData;
-#include "smartPointers/sharedpointerdefs.h"
 
 namespace fmt_filters {
     struct image;
