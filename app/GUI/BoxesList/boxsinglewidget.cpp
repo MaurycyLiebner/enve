@@ -38,6 +38,8 @@ bool BoxSingleWidget::mStaticPixmapsLoaded = false;
 #include "clipboardcontainer.h"
 #include "durationrectangle.h"
 #include "boxeslistactionbutton.h"
+#include <QApplication>
+#include <QDrag>
 
 BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     SingleWidget(parent) {
@@ -827,8 +829,6 @@ bool BoxSingleWidget::isTargetDisabled() {
     return mTarget->getTarget()->SWT_isDisabled();
 }
 
-#include <QApplication>
-#include <QDrag>
 void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     if(!(event->buttons() & Qt::LeftButton)) {
         return;

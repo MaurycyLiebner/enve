@@ -1,5 +1,4 @@
 #include "Animators/complexanimator.h"
-#include "qrealanimator.h"
 
 ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {
     anim_mIsComplexAnimator = true;

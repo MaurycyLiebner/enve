@@ -1,7 +1,7 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
-#include "undoredo.h"
 #include "PropertyUpdaters/propertyupdater.h"
+#include "undoredo.h"
 
 Property::Property(const QString& name) :
     prp_mName(name) {}
