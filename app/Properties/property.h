@@ -82,18 +82,22 @@ public:
     }
     virtual void prp_getKeysInRect(const QRectF &selectionRect,
                                    const qreal &pixelsPerFrame,
-                                   QList<Key*>& keysList) {
+                                   QList<Key*>& keysList,
+                                   const int& keyRectSize) {
         Q_UNUSED(selectionRect);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(keysList);
+        Q_UNUSED(keyRectSize);
     }
 
     virtual Key *prp_getKeyAtPos(const qreal &relX,
                                  const int &minViewedFrame,
-                                 const qreal &pixelsPerFrame) {
+                                 const qreal &pixelsPerFrame,
+                                 const int& keyRectSize) {
         Q_UNUSED(relX);
         Q_UNUSED(minViewedFrame);
         Q_UNUSED(pixelsPerFrame);
+        Q_UNUSED(keyRectSize);
         return nullptr;
     }
 

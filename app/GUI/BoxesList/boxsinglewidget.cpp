@@ -925,8 +925,9 @@ Key* BoxSingleWidget::getKeyAtPos(const int &pressX,
     if(target->SWT_isAnimator()) {
         auto anim_target = static_cast<Animator*>(target);
         return anim_target->prp_getKeyAtPos(pressX,
-                               minViewedFrame,
-                               pixelsPerFrame);
+                                            minViewedFrame,
+                                            pixelsPerFrame,
+                                            KEY_RECT_SIZE);
     }
     return nullptr;
 }
@@ -957,9 +958,8 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
     if(target->SWT_isAnimator()) {
         auto anim_target = static_cast<Animator*>(target);
 
-        anim_target->prp_getKeysInRect(selectionRect,
-                                 pixelsPerFrame,
-                                 listKeys);
+        anim_target->prp_getKeysInRect(selectionRect, pixelsPerFrame,
+                                       listKeys, KEY_RECT_SIZE);
     }
 }
 

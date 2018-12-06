@@ -1,4 +1,6 @@
 #include "animator.h"
+
+#include <QPainter>
 #include "Animators/complexanimator.h"
 #include "key.h"
 #include "fakecomplexanimator.h"
@@ -407,10 +409,11 @@ DurationRectangleMovable *Animator::anim_getRectangleMovableAtPos(
 
 Key *Animator::prp_getKeyAtPos(const qreal &relX,
                                const int &minViewedFrame,
-                               const qreal &pixelsPerFrame) {
+                               const qreal &pixelsPerFrame,
+                               const int& keyRectSize) {
     qreal relFrame = relX/pixelsPerFrame - prp_getFrameShift();
     qreal pressFrame = relFrame + minViewedFrame;
-    qreal keySize = KEY_RECT_SIZE;
+    qreal keySize = keyRectSize;
     if(SWT_isComplexAnimator()) {
         keySize *= 0.75;
     }
@@ -488,15 +491,16 @@ bool Animator::prp_isKeyOnCurrentFrame() {
 
 void Animator::prp_getKeysInRect(const QRectF &selectionRect,
                                  const qreal &pixelsPerFrame,
-                                 QList<Key*> &keysList) {
+                                 QList<Key*> &keysList,
+                                 const int& keyRectSize) {
     //selectionRect.translate(-getFrameShift(), 0.);
     int selLeftFrame = qRound(selectionRect.left());
-    if(0.5*pixelsPerFrame + KEY_RECT_SIZE*0.5 <
+    if(0.5*pixelsPerFrame + keyRectSize*0.5 <
        selectionRect.left() - selLeftFrame*pixelsPerFrame) {
         selLeftFrame++;
     }
     int selRightFrame = qRound(selectionRect.right());
-    if(0.5*pixelsPerFrame - KEY_RECT_SIZE*0.5 >
+    if(0.5*pixelsPerFrame - keyRectSize*0.5 >
        selectionRect.right() - selRightFrame*pixelsPerFrame) {
         selRightFrame--;
     }

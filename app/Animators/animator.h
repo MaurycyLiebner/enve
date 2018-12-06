@@ -66,7 +66,8 @@ public:
 
     Key *prp_getKeyAtPos(const qreal &relX,
                          const int &minViewedFrame,
-                         const qreal &pixelsPerFrame);
+                         const qreal &pixelsPerFrame,
+                         const int &keyRectSize);
     void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     void prp_addAllKeysToComplexAnimator(ComplexAnimator *target);
     bool prp_hasKeys();
@@ -78,7 +79,8 @@ public:
     bool prp_isKeyOnCurrentFrame();
     void prp_getKeysInRect(const QRectF &selectionRect,
                            const qreal &pixelsPerFrame,
-                           QList<Key*>& keysList);
+                           QList<Key*>& keysList,
+                           const int &keyRectSize);
     bool anim_getNextAndPreviousKeyIdForRelFrame(
                                  int *prevIdP,
                                  int *nextIdP,
