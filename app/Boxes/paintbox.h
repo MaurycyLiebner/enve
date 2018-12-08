@@ -48,7 +48,8 @@ public:
 
     void finishSizeSetup();
     bool SWT_isPaintBox() { return true; }
-    void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
+    void drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+                      GrContext * const grContext);
     void processSchedulers();
     void renderDataFinished(BoundingBoxRenderData *renderData);
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,

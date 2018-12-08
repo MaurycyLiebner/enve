@@ -3,18 +3,11 @@
 #include <QSurfaceFormat>
 #include <QProcess>
 
-void setDefaultFormat()
-{
+void setDefaultFormat() {
     QSurfaceFormat format;
-#ifdef Q_OS_OSX
-    format.setVersion(3, 2);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-#else
-    // XXX This can be removed once we move to Qt5.7
     format.setVersion(3, 0);
-    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setProfile(QSurfaceFormat::CompatibilityProfile/*CoreProfile*/);
     format.setOptions(QSurfaceFormat::DeprecatedFunctions);
-#endif
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
@@ -25,16 +18,6 @@ void setDefaultFormat()
 int main(int argc, char *argv[]) {
     Application a(argc, argv);
     setDefaultFormat();
-//    QSurfaceFormat  format;
-
-//    //format.setVersion(3,2);
-//    format.setSamples(0);
-//    format.setStencilBufferSize(8);
-//    //format.setRenderableType(QSurfaceFormat::OpenGLES);
-//    //format.setSwapBehavior(QSurfaceFormat::SingleBuffer);
-
-//    //format.setProfile(QSurfaceFormat::CompatibilityProfile);
-//    QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
 //#ifdef QT_DEBUG

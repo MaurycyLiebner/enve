@@ -9,7 +9,7 @@ static const int kMsaaSampleCount = 0; //4;
 // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, kMsaaSampleCount);
 
 GLWindow::GLWindow(QScreen *screen)
-    : QWindow(screen), QOpenGLFunctions() {
+    : QWindow(screen) {
     setSurfaceType(OpenGLSurface);
 }
 
@@ -53,14 +53,49 @@ void GLWindow::resizeEvent(QResizeEvent *) {
     if(!mContext) return;
     bindSkia();
 }
+#include "texvertexdata.h"
+GLuint MY_GL_VAO;
+GLuint *MY_GL_VBOs;
+int MY_GL_nVBOs;
+
+void GLWindow::iniVertData() {
+    float vertices[] = {
+        // positions          // colors           // texture coords
+         1.f, -1.f, 0.0f,   1.0f, 0.0f,   // bottom right
+         1.f,  1.f, 0.0f,   1.0f, 1.0f,   // top right
+        -1.f, -1.f, 0.0f,   0.0f, 0.0f,   // bottom left
+        -1.f,  1.f, 0.0f,   0.0f, 1.0f    // top left
+    };
+
+    glGenVertexArrays(1, &MY_GL_VAO);
+
+    MY_GL_nVBOs = 1;
+    MY_GL_VBOs = new GLuint[MY_GL_nVBOs];
+    glGenBuffers(MY_GL_nVBOs, MY_GL_VBOs);
+
+    glBindVertexArray(MY_GL_VAO);
+
+    GLuint VBO0 = MY_GL_VBOs[0];
+    glBindBuffer(GL_ARRAY_BUFFER, VBO0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+                          5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+}
 
 void GLWindow::initialize() {
     glClearColor(1.f, 1.f, 1.f, 1.f);
 
     //Set blending
-    glEnable( GL_BLEND );
-    glDisable( GL_DEPTH_TEST );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable(GL_BLEND );
+    glDisable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // setup GrContext
     mInterface = GrGLMakeNativeInterface();
@@ -78,6 +113,8 @@ void GLWindow::initialize() {
     mFbInfo.fFormat = GR_GL_RGBA8;//buffer;
 
     bindSkia();
+
+    iniVertData();
 
 //    qDebug() << "OpenGL Info";
 //    qDebug() << "  Vendor: " << reinterpret_cast<const char *>(glGetString(GL_VENDOR));
@@ -200,7 +237,7 @@ void GLWindow::renderNow() {
 
     mCanvas->save();
     //draw(mCanvas);
-    renderSk(mCanvas);
+    renderSk(mCanvas, mGrContext.get());
 //    SkPaint paint;
 //    SkPoint gradPoints[2];
 //    gradPoints[0] = SkPoint::Make(0.f, 0.f);

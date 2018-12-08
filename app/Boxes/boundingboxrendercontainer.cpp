@@ -8,8 +8,9 @@
 RenderContainer::~RenderContainer() {
 
 }
-
-void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
+#include "skimagegpudraw.h"
+void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
+                             GrContext * const grContext) {
     if(mSrcRenderData == nullptr) return;
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
@@ -30,7 +31,8 @@ void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
     }
     //paint->setAntiAlias(true);
     //paint->setFilterQuality(kHigh_SkFilterQuality);
-    canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
+    drawImageGPU(canvas, mImageSk, mDrawPos.x(), mDrawPos.y(), paint, grContext);
+    //canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
     canvas->restore();
 }
 
@@ -225,13 +227,16 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
     mMinRelFrame = minFrame;
     mMaxRelFrame = maxFrame;
 }
-
-void CacheContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
+#include "skimagegpudraw.h"
+void CacheContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
+                            GrContext * const grContext) {
     Q_UNUSED(paint);
+    Q_UNUSED(grContext);
     //SkPaint paint;
     //paint.setAntiAlias(true);
     //paint.setFilterQuality(kHigh_SkFilterQuality);
-    canvas->drawImage(mImageSk, 0, 0/*, &paint*/);
+    drawImageGPU(canvas, mImageSk, 0.f, 0.f, paint, grContext);
+    //canvas->drawImage(mImageSk, 0, 0/*, &paint*/);
 }
 
 bool CacheContainer::storesDataInMemory() {

@@ -96,8 +96,10 @@ public:
             const bool &saveUndoRedo = false);
     virtual bool isContainedIn(const QRectF &absRect);
 
-    virtual void drawPixmapSk(SkCanvas *canvas);
-    virtual void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
+    virtual void drawPixmapSk(SkCanvas * const canvas,
+                              GrContext* const grContext);
+    virtual void drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+                              GrContext* const grContext);
     virtual void drawSelectedSk(SkCanvas *canvas,
                                 const CanvasMode &currentCanvasMode,
                                 const SkScalar &invScale);

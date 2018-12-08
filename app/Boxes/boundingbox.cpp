@@ -201,7 +201,8 @@ void BoundingBox::drawSelectedSk(SkCanvas *canvas,
     }
 }
 
-void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
+void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
+                               GrContext * const grContext) {
     if(isVisibleAndInVisibleDurationRect() &&
         mTransformAnimator->getOpacity() > 0.001) {
         canvas->save();
@@ -211,15 +212,16 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
         paint.setAlpha(static_cast<U8CPU>(intAlpha));
         paint.setBlendMode(mBlendModeSk);
         //paint.setFilterQuality(kHigh_SkFilterQuality);
-        drawPixmapSk(canvas, &paint);
+        drawPixmapSk(canvas, &paint, grContext);
         canvas->restore();
     }
 }
 
-void BoundingBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
+void BoundingBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+                               GrContext* const grContext) {
     if(mTransformAnimator->getOpacity() < 0.001) { return; }
     //paint->setFilterQuality(kHigh_SkFilterQuality);
-    mDrawRenderContainer->drawSk(canvas, paint);
+    mDrawRenderContainer->drawSk(canvas, paint, grContext);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {

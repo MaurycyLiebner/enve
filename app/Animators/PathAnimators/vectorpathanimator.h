@@ -230,6 +230,11 @@ public:
 
     const bool &isClosed() const;
     void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
+
+    void prp_updateInfluenceRangeAfterChanged() {
+        Animator::prp_updateInfluenceRangeAfterChanged();
+        prp_callUpdater();
+    }
 protected:
     VectorPathAnimator(PathAnimator *pathAnimator);
     VectorPathAnimator(const QList<const NodeSettings*> &settingsList,

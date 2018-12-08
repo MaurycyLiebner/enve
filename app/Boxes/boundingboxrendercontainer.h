@@ -123,7 +123,8 @@ public:
     void setMinRelFrame(const int &minFrame);
     void setRelFrameRange(const int &minFrame, const int &maxFrame);
     bool relFrameInRange(const int &relFrame);
-    virtual void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
+    virtual void drawSk(SkCanvas *canvas, SkPaint *paint,
+                        GrContext* const grContext);
     bool storesDataInMemory();
     void setDataSavedToTmpFile(const qsptr<QTemporaryFile> &tmpFile);
     void setAsCurrentPreviewContainerAfterFinishedLoading(Canvas *canvas);
@@ -157,7 +158,8 @@ class RenderContainer : public CacheContainer {
 public:
     virtual ~RenderContainer();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
+    void drawSk(SkCanvas *canvas, SkPaint *paint,
+                GrContext* const grContext);
 
     void updatePaintTransformGivenNewCombinedTransform(
             const QMatrix &combinedTransform);

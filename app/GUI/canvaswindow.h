@@ -153,9 +153,14 @@ public:
     void moveMaxFrameForAllSelected(const int &dFrame);
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
-protected:
+private:
+    //! @brief processes qued GPU rendering
+    void postProcessing();
+
+    //! @brief true if preview is currently playing
     bool mPreviewing = false;
-    bool mRendering = false;
+    //! @brief true if currently preview is being rendered
+    bool mRenderingPreview = false;
     bool mMouseGrabber = false;
     bool mHasFocus = false;
     bool mNoBoxesAwaitUpdate = true;
@@ -215,7 +220,8 @@ protected:
     // AUDIO
 
     void qRender(QPainter *p);
-    void renderSk(SkCanvas *canvas);
+    void renderSk(SkCanvas * const canvas,
+                  GrContext * const grContext);
     void tabletEvent(QTabletEvent *e);
 signals:
     void updateUpdatable(_Executor*, int);

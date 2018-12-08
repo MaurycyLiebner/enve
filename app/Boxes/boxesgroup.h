@@ -161,7 +161,7 @@ public:
         }
     }
     void clearAllCache();
-    void drawPixmapSk(SkCanvas *canvas);
+    void drawPixmapSk(SkCanvas *canvas, GrContext * const grContext);
     void setDescendantCurrentGroup(const bool &bT);
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();

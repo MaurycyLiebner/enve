@@ -216,7 +216,8 @@ void Canvas::drawTransparencyMesh(SkCanvas *canvas,
     }
 }
 
-void Canvas::renderSk(SkCanvas *canvas) {
+void Canvas::renderSk(SkCanvas * const canvas,
+                      GrContext* const grContext) {
     SkRect viewRect = QRectFToSkRect(getPixBoundingRect());
 
     SkPaint paint;
@@ -232,7 +233,11 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
             SkScalar reversedRes = 1.f/static_cast<SkScalar>(mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas);
+#ifdef CPU_ONLY_RENDER
+            mCurrentPreviewContainer->drawSk(canvas, nullptr, nullptr);
+#else
+            mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
+#endif
 
             canvas->restore();
         }
@@ -246,7 +251,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->save();
             SkScalar reversedRes = 1./mResolutionFraction;
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas);
+            mCurrentPreviewContainer->drawSk(canvas, nullptr, nullptr);
             canvas->restore();
         }
 #else
@@ -270,13 +275,13 @@ void Canvas::renderSk(SkCanvas *canvas) {
         canvas->saveLayer(nullptr, nullptr);
         if(!mClipToCanvasSize || !drawCanvas) {
             Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
-                box->drawPixmapSk(canvas);
+                box->drawPixmapSk(canvas, grContext);
             }
         }
         if(drawCanvas) {
             SkScalar reversedRes = 1.f/static_cast<SkScalar>(mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas);
+            mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
         }
         canvas->restore();
 #endif

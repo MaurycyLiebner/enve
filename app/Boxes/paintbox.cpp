@@ -249,9 +249,10 @@ void PaintBox::scheduleFinishSizeSetup() {
     mFinishSizeSetupScheduled = true;
 }
 
-void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
+void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+                            GrContext* const grContext) {
     canvas->saveLayer(nullptr, paint);
-    BoundingBox::drawPixmapSk(canvas, nullptr);
+    BoundingBox::drawPixmapSk(canvas, nullptr, grContext);
     if(mTemporaryHandler != nullptr) {
         canvas->concat(
                 QMatrixToSkMatrix(

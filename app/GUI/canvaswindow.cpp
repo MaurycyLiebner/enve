@@ -8,7 +8,6 @@
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
 #include "global.h"
-#include "canvaswidget.h"
 #include "renderinstancesettings.h"
 #include "newcanvasdialog.h"
 #include "Boxes/videobox.h"
@@ -58,12 +57,8 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     initializeAudio();
 
     mCanvasWidget = QWidget::createWindowContainer(this, parent);
-    //mCanvasWidget = new CanvasWidget(this, parent);
     mCanvasWidget->setAcceptDrops(true);
-//    mCanvasWidget->setMinimumSize(MIN_WIDGET_HEIGHT*10,
-//                                  MIN_WIDGET_HEIGHT*10);
-//    mCanvasWidget->setSizePolicy(QSizePolicy::Minimum,
-//                                 QSizePolicy::Minimum);
+
     mCanvasWidget->setMouseTracking(true);
 
 
@@ -285,12 +280,18 @@ void CanvasWindow::qRender(QPainter *p) {
     //mCurrentCanvas->drawInputText(p);
 }
 
-void CanvasWindow::renderSk(SkCanvas *canvas) {
+void CanvasWindow::postProcessing() {
+
+}
+
+void CanvasWindow::renderSk(SkCanvas * const canvas,
+                            GrContext* const grContext) {
     if(mCurrentCanvas == nullptr) {
         canvas->clear(SK_ColorBLACK);
         return;
     }
-    mCurrentCanvas->renderSk(canvas);
+    postProcessing();
+    mCurrentCanvas->renderSk(canvas, grContext);
 }
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
@@ -841,7 +842,7 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
         if(mFilesUpdateFinishedFunction != nullptr) {
             (*this.*mFilesUpdateFinishedFunction)();
         }
-        if(!mRendering) {
+        if(!mRenderingPreview) {
             callUpdateSchedulers();
         }
         if(!mFreeThreads.isEmpty() && !mUpdatablesAwaitingUpdate.isEmpty()) {
@@ -929,7 +930,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
 }
 
 void CanvasWindow::interruptPreview() {
-    if(mRendering) {
+    if(mRenderingPreview) {
         interruptPreviewRendering();
     } else if(mPreviewing) {
         stopPreview();
@@ -937,7 +938,7 @@ void CanvasWindow::interruptPreview() {
 }
 
 void CanvasWindow::outOfMemory() {
-    if(mRendering) {
+    if(mRenderingPreview) {
         if(mNoBoxesAwaitUpdate && mNoFileAwaitUpdate) {
             playPreview();
         } else if(mNoBoxesAwaitUpdate) {
@@ -951,7 +952,7 @@ void CanvasWindow::outOfMemory() {
 }
 
 void CanvasWindow::setRendering(const bool &bT) {
-    mRendering = bT;
+    mRenderingPreview = bT;
     mCurrentCanvas->setRenderingPreview(bT);
 }
 #include "memorychecker.h"
@@ -1029,7 +1030,7 @@ void CanvasWindow::playPreview() {
 
 void CanvasWindow::nextPreviewRenderFrame() {
     //mCurrentCanvas->renderCurrentFrameToPreview();
-    if(!mRendering) return;
+    if(!mRenderingPreview) return;
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         playPreview();
     } else {

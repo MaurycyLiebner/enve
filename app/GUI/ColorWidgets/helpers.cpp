@@ -1,8 +1,8 @@
 #include "helpers.h"
 #include <math.h>
-#include <GL/gl.h>
 #include <QString>
 #include <sys/sysinfo.h>
+#include <QOpenGLFunctions_3_0>
 
 
 //bool isnan(float var)

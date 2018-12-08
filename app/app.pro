@@ -245,7 +245,9 @@ SOURCES += main.cpp\
     PropertyUpdaters/randomqrealgeneratorupdater.cpp \
     PropertyUpdaters/paintboxsizeupdaters.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
-    PixmapEffects/rastereffects.cpp
+    PixmapEffects/rastereffects.cpp \
+    skimagegpudraw.cpp \
+    gpupostprocessor.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -447,7 +449,10 @@ HEADERS  += \
     PropertyUpdaters/randomqrealgeneratorupdater.h \
     PropertyUpdaters/paintboxsizeupdaters.h \
     PropertyUpdaters/groupallpathsupdater.h \
-    PixmapEffects/rastereffects.h
+    PixmapEffects/rastereffects.h \
+    skimagegpudraw.h \
+    gpupostprocessor.h \
+    texvertexdata.h
 
 RESOURCES += \
     resources.qrc

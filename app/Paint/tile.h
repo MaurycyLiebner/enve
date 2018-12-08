@@ -5,7 +5,6 @@
 
 #include <QList>
 #include <stdlib.h>
-#include <GL/gl.h>
 #include "GUI/ColorWidgets/helpers.h"
 #include <png++/png.hpp>
 #include "skiaincludes.h"

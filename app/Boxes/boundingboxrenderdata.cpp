@@ -106,16 +106,15 @@ void BoundingBoxRenderData::renderToImage() {
     bitmap.allocPixels(info);
     bitmap.eraseColor(SK_ColorTRANSPARENT);
     //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
+    SkCanvas rasterCanvas(bitmap);//rasterSurface->getCanvas();
     //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
-    rasterCanvas->translate(qrealToSkScalar(-globalBoundingRect.left()),
+    rasterCanvas.translate(qrealToSkScalar(-globalBoundingRect.left()),
                             qrealToSkScalar(-globalBoundingRect.top()));
-    rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
+    rasterCanvas.concat(QMatrixToSkMatrix(transformRes));
 
-    drawSk(rasterCanvas);
-    rasterCanvas->flush();
-    delete rasterCanvas;
+    drawSk(&rasterCanvas);
+    rasterCanvas.flush();
 
     drawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
                             qRound(globalBoundingRect.top()));

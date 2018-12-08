@@ -673,9 +673,10 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 
-void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {
+void BoxesGroup::drawPixmapSk(SkCanvas *canvas,
+                              GrContext* const grContext) {
     if(shouldPaintOnImage()) {
-        BoundingBox::drawPixmapSk(canvas);
+        BoundingBox::drawPixmapSk(canvas, grContext);
     } else {
         SkPaint paint;
         int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
@@ -684,7 +685,7 @@ void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {
         canvas->saveLayer(nullptr, &paint);
         Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
             //box->draw(p);
-            box->drawPixmapSk(canvas);
+            box->drawPixmapSk(canvas, grContext);
         }
         canvas->restore();
     }

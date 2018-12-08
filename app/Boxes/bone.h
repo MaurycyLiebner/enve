@@ -155,8 +155,9 @@ protected:
 class BonesBox : public BoundingBox {
     friend class SelfRef;
 public:
-    void drawPixmapSk(SkCanvas *canvas);
-    void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
+    void drawPixmapSk(SkCanvas *canvas, GrContext * const grContext);
+    void drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+                      GrContext* const grContext);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);

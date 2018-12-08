@@ -2,29 +2,28 @@
 #define GLWINDOW_H
 
 #include <QWindow>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_0>
 
 #include "skiaincludes.h"
 
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>
 
-class GLWindow : public QWindow, protected QOpenGLFunctions
-{
+class GLWindow : public QWindow, protected QOpenGLFunctions_3_0 {
     Q_OBJECT
 public:
     GLWindow(QScreen *screen = nullptr);
     ~GLWindow();
 protected:
+    void iniVertData();
     void initialize();
     void renderNow();
     virtual void qRender(QPainter *p) {
         Q_UNUSED(p);
     }
 
-    virtual void renderSk(SkCanvas *canvas) {
-        Q_UNUSED(canvas);
-    }
+    virtual void renderSk(SkCanvas * const canvas,
+                          GrContext * const grContext) = 0;
 
     void bindSkia();
     void resizeEvent(QResizeEvent *);

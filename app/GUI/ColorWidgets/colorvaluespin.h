@@ -3,12 +3,10 @@
 
 #include <QObject>
 #include <QDoubleSpinBox>
-#include <GL/gl.h>
-
+#include <QOpenGLFunctions_3_0>
 class QrealAnimatorValueSlider;
 
-class ColorValueSpin : public QObject
-{
+class ColorValueSpin : public QObject {
     Q_OBJECT
 public:
     ColorValueSpin(QWidget *parent = nullptr);

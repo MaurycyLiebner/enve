@@ -40,15 +40,18 @@ void BonesBox::removeBone(const qsptr<Bone>& bone) {
     ca_removeChildAnimator(bone);
 }
 
-void BonesBox::drawPixmapSk(SkCanvas *canvas) {
+void BonesBox::drawPixmapSk(SkCanvas *canvas,
+                            GrContext* const grContext) {
+    Q_UNUSED(grContext);
     foreach(const qsptr<Bone>& bone, mBones) {
         bone->drawOnCanvas(canvas);
     }
 }
 
-void BonesBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
+void BonesBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+                            GrContext* const grContext) {
     Q_UNUSED(paint);
-    drawPixmapSk(canvas);
+    drawPixmapSk(canvas, grContext);
 }
 
 void BonesBox::drawSelectedSk(SkCanvas *canvas,

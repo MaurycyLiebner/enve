@@ -2,7 +2,7 @@
 #define H_WHEEL_SV_TRIANGLE_H
 #include <QOpenGLWidget>
 #include "colorwidget.h"
-#include <GL/gl.h>
+#include <QOpenGLFunctions_3_0>
 
 enum VALUEFOCUS
 {
@@ -11,8 +11,7 @@ enum VALUEFOCUS
     NONE
 };
 
-class H_Wheel_SV_Triangle : public ColorWidget
-{
+class H_Wheel_SV_Triangle : public ColorWidget {
     Q_OBJECT
 public:
     H_Wheel_SV_Triangle(QWidget *parent_t = nullptr);

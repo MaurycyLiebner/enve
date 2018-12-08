@@ -296,7 +296,8 @@ public:
 
     void scheduleEffectsMarginUpdate() {}
 
-    void renderSk(SkCanvas *canvas);
+    void renderSk(SkCanvas * const canvas,
+                  GrContext * const grContext);
 
     void setCanvasSize(const int &width, const int &height) {
         if(width == mWidth && height == mHeight) return;
