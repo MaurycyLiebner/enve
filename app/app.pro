@@ -194,7 +194,6 @@ SOURCES += main.cpp\
     GUI/animationdockwidget.cpp \
     GUI/animationwidgetscrollbar.cpp \
     GUI/canvaswindow.cpp \
-    GUI/canvaswidget.cpp \
     GUI/graphboxeslist.cpp \
     GUI/keysview.cpp \
     GUI/mainwindow.cpp \
@@ -396,7 +395,6 @@ HEADERS  += \
     GUI/animationwidgetscrollbar.h \
     GUI/boxeslistanimationdockwidget.h \
     GUI/boxeslistkeysviewwidget.h \
-    GUI/canvaswidget.h \
     GUI/canvaswindow.h \
     GUI/customfpsdialog.h \
     GUI/durationrectsettingsdialog.h \
