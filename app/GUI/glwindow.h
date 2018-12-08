@@ -2,14 +2,15 @@
 #define GLWINDOW_H
 
 #include <QWindow>
-#include <QOpenGLFunctions_3_0>
+#include <QOpenGLFunctions_3_3_Core>
+#include <string>
 
 #include "skiaincludes.h"
 
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>
 
-class GLWindow : public QWindow, protected QOpenGLFunctions_3_0 {
+class GLWindow : public QWindow, protected QOpenGLFunctions_3_3_Core {
     Q_OBJECT
 public:
     GLWindow(QScreen *screen = nullptr);
@@ -39,6 +40,12 @@ protected:
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);
+private:
+    void checkCompileErrors(GLuint shader, std::string type);
+    void iniProgram(GLuint &program,
+                    const std::string &vShaderPath,
+                    const std::string &fShaderPath);
+    void iniBlurProgram();
 };
 
 #endif // GLWINDOW_H

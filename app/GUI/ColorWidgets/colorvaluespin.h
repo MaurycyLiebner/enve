@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDoubleSpinBox>
-#include <QOpenGLFunctions_3_0>
+#include <QOpenGLFunctions_3_3_Core>
 class QrealAnimatorValueSlider;
 
 class ColorValueSpin : public QObject {

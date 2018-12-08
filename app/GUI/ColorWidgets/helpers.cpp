@@ -2,7 +2,7 @@
 #include <math.h>
 #include <QString>
 #include <sys/sysinfo.h>
-#include <QOpenGLFunctions_3_0>
+#include <QOpenGLFunctions_3_3_Core>
 
 
 //bool isnan(float var)

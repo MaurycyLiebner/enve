@@ -452,6 +452,10 @@ public:
 
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
+
+    auto getDrawRenderContainer_TEST() { // !!!
+        return mDrawRenderContainer;
+    }
 protected:
     virtual void getMotionBlurProperties(QList<Property*>& list);
 

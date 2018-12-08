@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS = app \
-    core
+    core \
+    shaders
 
 app.depends = core

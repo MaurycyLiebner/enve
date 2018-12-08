@@ -54,6 +54,8 @@ void GLWindow::resizeEvent(QResizeEvent *) {
     bindSkia();
 }
 #include "texvertexdata.h"
+GLuint MY_GL_BLUR_PROGRAM;
+
 GLuint MY_GL_VAO;
 GLuint *MY_GL_VBOs;
 int MY_GL_nVBOs;
@@ -89,6 +91,89 @@ void GLWindow::iniVertData() {
     glEnableVertexAttribArray(1);
 }
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+void GLWindow::checkCompileErrors(GLuint shader, std::string type) {
+    GLint success;
+    GLchar infoLog[1024];
+    if(type != "PROGRAM") {
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if(!success) {
+            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
+            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        }
+    } else {
+        glGetProgramiv(shader, GL_LINK_STATUS, &success);
+        if(!success) {
+            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
+            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        }
+    }
+}
+
+void GLWindow::iniProgram(GLuint& program,
+                const std::string& vShaderPath,
+                const std::string& fShaderPath) {
+
+    std::string vertexCode;
+    std::string fragmentCode;
+    std::ifstream vShaderFile;
+    std::ifstream fShaderFile;
+    // ensure ifstream objects can throw exceptions:
+    vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    try {
+        // open files
+        vShaderFile.open(vShaderPath);
+        fShaderFile.open(fShaderPath);
+        std::stringstream vShaderStream, fShaderStream;
+        // read file's buffer contents into streams
+        vShaderStream << vShaderFile.rdbuf();
+        fShaderStream << fShaderFile.rdbuf();
+        // close file handlers
+        vShaderFile.close();
+        fShaderFile.close();
+        // convert stream into string
+        vertexCode = vShaderStream.str();
+        fragmentCode = fShaderStream.str();
+    } catch (std::ifstream::failure e) {
+        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+    }
+    const char* vShaderCode = vertexCode.c_str();
+    const char* fShaderCode = fragmentCode.c_str();
+
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vShaderCode, nullptr);
+    glCompileShader(vertexShader);
+    checkCompileErrors(vertexShader, "VERTEX");
+
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fShaderCode, nullptr);
+    glCompileShader(fragmentShader);
+    checkCompileErrors(fragmentShader, "FRAGMENT");
+
+    program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+    glLinkProgram(program);
+    checkCompileErrors(program, "PROGRAM");
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+}
+
+void GLWindow::iniBlurProgram() {
+    iniProgram(MY_GL_BLUR_PROGRAM,
+               "/home/ailuropoda/Dev/AniVect/src/shaders/tex.vert",
+               "/home/ailuropoda/Dev/AniVect/src/shaders/blur.frag");
+    glUseProgram(MY_GL_BLUR_PROGRAM);
+
+    GLint texLocation = glGetUniformLocation(MY_GL_BLUR_PROGRAM, "texture");
+    glUniform1i(texLocation, 0);
+}
+
 void GLWindow::initialize() {
     glClearColor(1.f, 1.f, 1.f, 1.f);
 
@@ -115,6 +200,7 @@ void GLWindow::initialize() {
     bindSkia();
 
     iniVertData();
+    iniBlurProgram();
 
 //    qDebug() << "OpenGL Info";
 //    qDebug() << "  Vendor: " << reinterpret_cast<const char *>(glGetString(GL_VENDOR));
@@ -217,7 +303,7 @@ void GLWindow::renderNow() {
     if(!isExposed()) return;
 
     bool needsInitialize = false;
-    if (!mContext) {
+    if(!mContext) {
         mContext = new QOpenGLContext(this);
         mContext->setFormat(QSurfaceFormat::defaultFormat());
         mContext->create();
@@ -231,7 +317,6 @@ void GLWindow::renderNow() {
         initializeOpenGLFunctions();
         initialize();
     }
-
 
     glOrthoAndViewportSet(width(), height());
 

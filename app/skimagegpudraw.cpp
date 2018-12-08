@@ -11,7 +11,5 @@ void drawImageGPU(SkCanvas* const canvas,
         return;
     }
     sk_sp<SkImage> texture(image->makeTextureImage(context, nullptr));
-    GrGLTextureInfo glTexInfo;
-    texture->getBackendTexture(false).getGLTextureInfo(&glTexInfo);
     canvas->drawImage(texture, x, y, paint);
 };

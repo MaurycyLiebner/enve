@@ -279,6 +279,19 @@ void CanvasWindow::qRender(QPainter *p) {
     if(mCurrentCanvas == nullptr) return;
     //mCurrentCanvas->drawInputText(p);
 }
+#include "texvertexdata.h"
+
+void CanvasWindow::processGPU(GrContext* const grContext) {
+    if(!mCurrentCanvas) return;
+    auto children = mCurrentCanvas->getContainedBoxesList();
+    if(!children.isEmpty()) {
+        auto child = children.takeFirst();
+        auto rendCont = child->getDrawRenderContainer_TEST();
+        auto img = rendCont->getImageSk();
+        mGpuPostProcessor.addToProcess(SPtrCreate(ShaderPostProcess)(img, MY_GL_BLUR_PROGRAM));
+    }
+    mGpuPostProcessor.process(grContext);
+}
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
@@ -286,7 +299,6 @@ void CanvasWindow::renderSk(SkCanvas * const canvas,
         canvas->clear(SK_ColorBLACK);
         return;
     }
-    mGpuPostProcessor.process(grContext);
     mCurrentCanvas->renderSk(canvas, grContext);
 }
 

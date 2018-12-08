@@ -2,7 +2,7 @@
 #define H_WHEEL_SV_TRIANGLE_H
 #include <QOpenGLWidget>
 #include "colorwidget.h"
-#include <QOpenGLFunctions_3_0>
+#include <QOpenGLFunctions_3_3_Core>
 
 enum VALUEFOCUS
 {

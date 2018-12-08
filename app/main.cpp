@@ -5,8 +5,8 @@
 
 void setDefaultFormat() {
     QSurfaceFormat format;
-    format.setVersion(3, 0);
-    format.setProfile(QSurfaceFormat::CompatibilityProfile/*CoreProfile*/);
+    format.setVersion(3, 3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
     format.setOptions(QSurfaceFormat::DeprecatedFunctions);
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
