@@ -280,17 +280,13 @@ void CanvasWindow::qRender(QPainter *p) {
     //mCurrentCanvas->drawInputText(p);
 }
 
-void CanvasWindow::postProcessing() {
-
-}
-
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
     if(mCurrentCanvas == nullptr) {
         canvas->clear(SK_ColorBLACK);
         return;
     }
-    postProcessing();
+    mGpuPostProcessor.process(grContext);
     mCurrentCanvas->renderSk(canvas, grContext);
 }
 

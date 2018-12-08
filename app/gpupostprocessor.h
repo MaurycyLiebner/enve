@@ -15,14 +15,23 @@ private:
     virtual void process(GrContext * const grContext) = 0;
 };
 
+typedef std::function<void(sk_sp<SkImage>)> ShaderFinishedFunc;
 class ShaderPostProcess : public ScheduledPostProcess {
 public:
-    ShaderPostProcess();
+    ShaderPostProcess(const sk_sp<SkImage>& srcImg,
+                      const GLuint &program,
+                      const ShaderFinishedFunc& finishedFunc) :
+        mProgram(program),
+        mFinishedFunc(finishedFunc),
+        mSrcImage(srcImg) {}
 private:
-    GLuint mProgram;
+    const GLuint mProgram;
+    //! @brief Gets called after processing finished, provides resulting image.
+    const ShaderFinishedFunc mFinishedFunc;
     sk_sp<SkImage> mSrcImage;
     sk_sp<SkImage> mFinalImage;
 
+    //! @brief Generates the texture processor will render to.
     void generateFinalTexture(const int& finalWidth,
                               const int& finalHeight,
                               GrGLTextureInfo& finalTexInfo) {
@@ -44,6 +53,20 @@ private:
             qDebug() << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
     }
 
+    //! @brief Wraps the resulting texture, called when finished processing.
+    void adoptTexture(GrContext * const grContext,
+                      const int& finalWidth,
+                      const int& finalHeight,
+                      const GrGLTextureInfo& finalTexInfo) {
+        GrBackendTexture finalTex(finalWidth, finalHeight,
+                                  GrMipMapped::kNo, finalTexInfo);
+        mFinalImage = SkImage::MakeFromAdoptedTexture(grContext, finalTex,
+                                                      kTopLeft_GrSurfaceOrigin,
+                                                      kBGRA_8888_SkColorType,
+                                                      kPremul_SkAlphaType);
+    }
+
+    //! @brief Uses shaders to draw the source image to the final texture.
     void process(GrContext * const grContext) {
         int margin = 0;
         int srcWidth = mSrcImage->width();
@@ -59,12 +82,8 @@ private:
         glBindVertexArray(MY_GL_VAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-        GrBackendTexture finalTex(finalWidth, finalHeight,
-                                  GrMipMapped::kNo, finalTexInfo);
-        mFinalImage = SkImage::MakeFromAdoptedTexture(grContext, finalTex,
-                                                      kTopLeft_GrSurfaceOrigin,
-                                                      kBGRA_8888_SkColorType,
-                                                      kPremul_SkAlphaType);
+        adoptTexture(grContext, finalWidth, finalHeight, finalTexInfo);
+        if(mFinishedFunc) mFinishedFunc(mFinalImage);
     }
 };
 
@@ -85,13 +104,19 @@ class GpuPostProcessor : protected QOpenGLFunctions_3_0 {
 public:
     GpuPostProcessor();
 
-    void process() {
+    void process(GrContext * const grContext) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferId);
+
+        foreach(const auto& scheduled, mScheduledProcesses) {
+            scheduled->process(grContext);
+        }
+        mScheduledProcesses.clear();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 protected:
     GLuint mFrameBufferId;
+    QList<stdsptr<ScheduledPostProcess>> mScheduledProcesses;
 };
 
 #endif // GPUPOSTPROCESSOR_H

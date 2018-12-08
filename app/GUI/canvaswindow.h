@@ -6,6 +6,7 @@
 #include "singlewidgettarget.h"
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
+#include "gpupostprocessor.h"
 class Brush;
 class WindowSingleWidgetTarget;
 enum ColorMode : short;
@@ -154,9 +155,6 @@ public:
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
 private:
-    //! @brief processes qued GPU rendering
-    void postProcessing();
-
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
     //! @brief true if currently preview is being rendered
@@ -174,6 +172,8 @@ private:
     QList<int> mFreeThreads;
 
     qreal mSavedResolutionFraction = 100.;
+
+    GpuPostProcessor mGpuPostProcessor;
 
     qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
     PaintControler *mFileControler = nullptr;
