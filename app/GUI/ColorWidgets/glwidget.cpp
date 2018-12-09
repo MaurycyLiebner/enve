@@ -431,9 +431,9 @@ void GLWidget::initializeGL() {
     glClearColor(mBgColor.fR, mBgColor.fG, mBgColor.fB, mBgColor.fA);
 
     //Set blending
-    glEnable( GL_BLEND );
-    glDisable( GL_DEPTH_TEST );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable(GL_BLEND );
+    glDisable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 

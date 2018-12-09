@@ -23,11 +23,11 @@ public:
 protected:
     bool mValueBlocked = false;
 
-    GLfloat hsl_saturaton_tmp = -1.f; // HSL saturation saved when changing lightness
+    GLfloat mHslSaturatonTmp = -1.f; // HSL saturation saved when changing lightness
 
-    GLfloat hue = 0.f;
-    GLfloat saturation = 0.f;
-    GLfloat value = 0.f;
+    GLfloat mHue = 0.f;
+    GLfloat mSaturation = 0.f;
+    GLfloat mValue = 0.f;
 public slots:
     void setHue_f(GLfloat h);
     void setHSVSaturation_f(GLfloat s);

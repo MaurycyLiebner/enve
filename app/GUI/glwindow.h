@@ -2,7 +2,7 @@
 #define GLWINDOW_H
 
 #include <QWindow>
-#include <QOpenGLFunctions_3_3_Core>
+#include "glhelpers.h"
 #include <string>
 
 #include "skiaincludes.h"
@@ -10,7 +10,7 @@
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>
 
-class GLWindow : public QWindow, protected QOpenGLFunctions_3_3_Core {
+class GLWindow : public QWindow, protected QGL33c {
     Q_OBJECT
 public:
     GLWindow(QScreen *screen = nullptr);
@@ -43,9 +43,6 @@ protected:
     virtual void processGPU(GrContext * const grContext) = 0;
 private:
     void checkCompileErrors(GLuint shader, std::string type);
-    void iniProgram(GLuint &program,
-                    const std::string &vShaderPath,
-                    const std::string &fShaderPath);
     void iniBlurProgram();
 };
 

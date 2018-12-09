@@ -53,124 +53,16 @@ void GLWindow::resizeEvent(QResizeEvent *) {
     if(!mContext) return;
     bindSkia();
 }
-#include "texvertexdata.h"
-GLuint MY_GL_BLUR_PROGRAM;
-
-GLuint MY_GL_VAO;
-GLuint *MY_GL_VBOs;
-int MY_GL_nVBOs;
-
-void GLWindow::iniVertData() {
-    float vertices[] = {
-        // positions          // colors           // texture coords
-         1.f, -1.f, 0.0f,   1.0f, 0.0f,   // bottom right
-         1.f,  1.f, 0.0f,   1.0f, 1.0f,   // top right
-        -1.f, -1.f, 0.0f,   0.0f, 0.0f,   // bottom left
-        -1.f,  1.f, 0.0f,   0.0f, 1.0f    // top left
-    };
-
-    glGenVertexArrays(1, &MY_GL_VAO);
-
-    MY_GL_nVBOs = 1;
-    MY_GL_VBOs = new GLuint[MY_GL_nVBOs];
-    glGenBuffers(MY_GL_nVBOs, MY_GL_VBOs);
-
-    glBindVertexArray(MY_GL_VAO);
-
-    GLuint VBO0 = MY_GL_VBOs[0];
-    glBindBuffer(GL_ARRAY_BUFFER, VBO0);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                          5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-}
-
-#include <fstream>
-#include <sstream>
-#include <iostream>
-
-void GLWindow::checkCompileErrors(GLuint shader, std::string type) {
-    GLint success;
-    GLchar infoLog[1024];
-    if(type != "PROGRAM") {
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if(!success) {
-            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-        }
-    } else {
-        glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if(!success) {
-            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-        }
-    }
-}
-
-void GLWindow::iniProgram(GLuint& program,
-                const std::string& vShaderPath,
-                const std::string& fShaderPath) {
-
-    std::string vertexCode;
-    std::string fragmentCode;
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
-    // ensure ifstream objects can throw exceptions:
-    vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    try {
-        // open files
-        vShaderFile.open(vShaderPath);
-        fShaderFile.open(fShaderPath);
-        std::stringstream vShaderStream, fShaderStream;
-        // read file's buffer contents into streams
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
-        // close file handlers
-        vShaderFile.close();
-        fShaderFile.close();
-        // convert stream into string
-        vertexCode = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure e) {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-    }
-    const char* vShaderCode = vertexCode.c_str();
-    const char* fShaderCode = fragmentCode.c_str();
-
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vShaderCode, nullptr);
-    glCompileShader(vertexShader);
-    checkCompileErrors(vertexShader, "VERTEX");
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fShaderCode, nullptr);
-    glCompileShader(fragmentShader);
-    checkCompileErrors(fragmentShader, "FRAGMENT");
-
-    program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-    checkCompileErrors(program, "PROGRAM");
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-}
+#include "glhelpers.h"
 
 void GLWindow::iniBlurProgram() {
-    iniProgram(MY_GL_BLUR_PROGRAM,
-               "/home/ailuropoda/Dev/AniVect/src/shaders/tex.vert",
+    iniProgram(this, GL_BLUR_PROGRAM,
+               GL_TEXTURED_VERT,
                "/home/ailuropoda/Dev/AniVect/src/shaders/blur.frag");
-    glUseProgram(MY_GL_BLUR_PROGRAM);
+    glUseProgram(GL_BLUR_PROGRAM);
 
-    GLint texLocation = glGetUniformLocation(MY_GL_BLUR_PROGRAM, "texture");
+    GLint texLocation = glGetUniformLocation(
+                GL_BLUR_PROGRAM, "texture");
     glUniform1i(texLocation, 0);
 }
 

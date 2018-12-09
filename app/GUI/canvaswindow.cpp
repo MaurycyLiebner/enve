@@ -279,8 +279,7 @@ void CanvasWindow::qRender(QPainter *p) {
     if(mCurrentCanvas == nullptr) return;
     //mCurrentCanvas->drawInputText(p);
 }
-#include "texvertexdata.h"
-
+#include "glhelpers.h"
 void CanvasWindow::processGPU(GrContext* const grContext) {
     if(!mCurrentCanvas) return;
     auto children = mCurrentCanvas->getContainedBoxesList();
@@ -294,7 +293,7 @@ void CanvasWindow::processGPU(GrContext* const grContext) {
         };
         mGpuPostProcessor.addToProcess(
                     SPtrCreate(ShaderPostProcess)(
-                        img, MY_GL_BLUR_PROGRAM, finishFunc));
+                        img, GL_BLUR_PROGRAM, finishFunc));
     }
     mGpuPostProcessor.process(grContext);
 }

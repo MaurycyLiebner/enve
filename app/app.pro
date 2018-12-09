@@ -247,7 +247,9 @@ SOURCES += main.cpp\
     PropertyUpdaters/groupallpathsupdater.cpp \
     PixmapEffects/rastereffects.cpp \
     skimagegpudraw.cpp \
-    gpupostprocessor.cpp
+    gpupostprocessor.cpp \
+    GUI/ColorWidgets/colorwidgetshaders.cpp \
+    glhelpers.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -452,7 +454,8 @@ HEADERS  += \
     PixmapEffects/rastereffects.h \
     skimagegpudraw.h \
     gpupostprocessor.h \
-    texvertexdata.h
+    GUI/ColorWidgets/colorwidgetshaders.h \
+    glhelpers.h
 
 RESOURCES += \
     resources.qrc

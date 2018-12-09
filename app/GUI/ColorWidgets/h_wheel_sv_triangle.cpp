@@ -63,9 +63,9 @@ void H_Wheel_SV_Triangle::paintGL() {
     //
     glPushMatrix();
 
-    glRotatef(-hue*360 + 180, 0.f, 0.f, 1.f);
+    glRotatef(-mHue*360 + 180, 0.f, 0.f, 1.f);
     glTranslatef(-outer_circle_r, -0.5f, 0.f);
-    if(shouldValPointerBeLightHSV(hue, 1.f, 1.f) ) {
+    if(shouldValPointerBeLightHSV(mHue, 1.f, 1.f) ) {
         drawSolidRectCenter(wheel_thickness*0.5f - 1.f, 0.f, wheel_thickness, 2.5f,
                             1.f, 1.f, 1.f, true, true, true, true);
     } else {
@@ -77,24 +77,24 @@ void H_Wheel_SV_Triangle::paintGL() {
     glPopMatrix();
     //
 
-    glRotatef(-hue*360 - 30, 0.0f, 0.0f, 1.0f);
+    glRotatef(-mHue*360 - 30, 0.0f, 0.0f, 1.0f);
     glTranslatef(-inner_circle_r, -inner_circle_r, 0.f);
     glColor3f(0.f, 0.f, 0.f);
 
-    float center_y = value*inner_circle_r*1.5f;
+    float center_y = mValue*inner_circle_r*1.5f;
     float row_width_t = center_y*2/sqrt_3f;
     float row_x_0 = inner_circle_r - row_width_t*0.5f;
-    float center_x = row_x_0 + row_width_t*saturation;
+    float center_x = row_x_0 + row_width_t*mSaturation;
 
     drawTriangle();
-    if(shouldValPointerBeLightHSV(hue, saturation, value) ) {
+    if(shouldValPointerBeLightHSV(mHue, mSaturation, mValue) ) {
         drawSolidCircle(5, center_x, center_y, 16, 1.f, 1.f, 1.f);
     } else {
         drawSolidCircle(5, center_x, center_y, 16, 0.f, 0.f, 0.f);
     }
-    float curr_h = hue;
-    float curr_s = saturation;
-    float curr_v = value;
+    float curr_h = mHue;
+    float curr_s = mSaturation;
+    float curr_v = mValue;
     hsv_to_rgb_float(&curr_h, &curr_s, &curr_v);
     drawSolidCircle(3, center_x, center_y, 16, curr_h, curr_s, curr_v);
 
@@ -126,11 +126,11 @@ void H_Wheel_SV_Triangle::drawTriangle() {
     GLfloat s3 = 1.f;
     GLfloat v3 = 1.f;
     drawSubTris(triangle_width*0.5f, 0.f,
-                hue, s1, v1,
+                mHue, s1, v1,
                 0.f, triangle_tex_height,
-                hue, s2, v2,
+                mHue, s2, v2,
                 triangle_width, triangle_tex_height,
-                hue, s3, v3,
+                mHue, s3, v3,
                 3.f, true, true, true);
     /*drawAATris(triangle_width*0.5, 0,
                    0, triangle_tex_height,
@@ -191,16 +191,16 @@ void H_Wheel_SV_Triangle::drawWheel() {
 
 void H_Wheel_SV_Triangle::wheelEvent(QWheelEvent *e) {
     if(e->delta() > 0) {
-        hue += 0.01;
-        if(hue > 1)
+        mHue += 0.01;
+        if(mHue > 1)
         {
-            hue -= 1;
+            mHue -= 1;
         }
     } else {
-        hue -= 0.01;
-        if(hue < 0)
+        mHue -= 0.01;
+        if(mHue < 0)
         {
-            hue += 1;
+            mHue += 1;
         }
     }
     //drawTriangle();
@@ -210,7 +210,7 @@ void H_Wheel_SV_Triangle::wheelEvent(QWheelEvent *e) {
 void H_Wheel_SV_Triangle::wheelInteraction(const int &x_t, const int &y_t) {
     double radial_x = x_t - wheel_dim*0.5;
     double radial_y = y_t - wheel_dim*0.5;
-    hue = getAngleF(1, 0, -radial_x, radial_y);
+    mHue = getAngleF(1, 0, -radial_x, radial_y);
     //drawTriangle();
     update();
 }
@@ -223,15 +223,15 @@ void H_Wheel_SV_Triangle::triangleInteraction(int x_t, int y_t) {
 
     float tr_x_t = x_t - inner_circle_r;
     float tr_y_t = y_t - inner_circle_r;
-    float hue_rad = (hue + 1/12.f)*2*PIf;
+    float hue_rad = (mHue + 1/12.f)*2*PIf;
     rotate(hue_rad, &tr_x_t, &tr_y_t);
     tr_x_t += inner_circle_r;
     tr_y_t += inner_circle_r;
     float row_width_t = tr_y_t*2/sqrt_3f;
     float row_x_0 = inner_circle_r - row_width_t*0.5f;
 
-    saturation = clamp( (tr_x_t - row_x_0)/row_width_t , 0.f, 1.f);
-    value = clamp(tr_y_t/(inner_circle_r*1.5f), 0.f, 1.f);
+    mSaturation = clamp( (tr_x_t - row_x_0)/row_width_t , 0.f, 1.f);
+    mValue = clamp(tr_y_t/(inner_circle_r*1.5f), 0.f, 1.f);
 
     update();
 }
@@ -299,7 +299,7 @@ bool H_Wheel_SV_Triangle::isInTriangle(const QPoint& pos_t) {
 
     float x_t = pos_t.x() - outer_circle_r;
     float y_t = pos_t.y() - outer_circle_r;
-    float hue_rad = (hue + 1/12.f)*2*PIf;
+    float hue_rad = (mHue + 1/12.f)*2*PIf;
     rotate(hue_rad, &x_t, &y_t);
     return pointInTriangle(static_cast<qreal>(x_t),
                            static_cast<qreal>(y_t),

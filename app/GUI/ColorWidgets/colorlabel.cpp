@@ -23,9 +23,9 @@ void ColorLabel::paintGL()
 {
     GLfloat half_width = width()*0.5f;
     GLfloat height_t = height();
-    GLfloat r = hue;
-    GLfloat g = saturation;
-    GLfloat b = value;
+    GLfloat r = mHue;
+    GLfloat g = mSaturation;
+    GLfloat b = mValue;
     hsv_to_rgb_float(&r, &g, &b);
 
     GLfloat val1 = 0.5f;

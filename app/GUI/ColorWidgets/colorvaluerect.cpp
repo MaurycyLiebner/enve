@@ -11,9 +11,9 @@ ColorValueRect::ColorValueRect(const CVR_TYPE& type_t, QWidget *parent) :
 }
 
 void ColorValueRect::paintGL() {
-    GLfloat r = hue;
-    GLfloat g = saturation;
-    GLfloat b = value;
+    GLfloat r = mHue;
+    GLfloat g = mSaturation;
+    GLfloat b = mValue;
     hsv_to_rgb_float(&r, &g, &b);
     if(mType == CVR_RED) {
         drawRect(0.f, 0.f, width(), height(),
@@ -41,8 +41,8 @@ void ColorValueRect::paintGL() {
         GLfloat hue_per_i = 1.f/mNumberSegments;
         for(int i = 0; i <= mNumberSegments; i++) {
             GLfloat c_r = i*hue_per_i;
-            GLfloat c_g = saturation;
-            GLfloat c_b = value;
+            GLfloat c_g = mSaturation;
+            GLfloat c_b = mValue;
             hsv_to_rgb_float(&c_r, &c_g, &c_b);
             if(i > 0) {
                 drawRect( (i - 1)*seg_width, 0.f, seg_width, height(),
@@ -63,9 +63,9 @@ void ColorValueRect::paintGL() {
         GLfloat last_b = 0.f;
         GLfloat saturation_per_i = 1.f/mNumberSegments;
         for(int i = 0; i <= mNumberSegments; i++) {
-            GLfloat c_r = hue;
+            GLfloat c_r = mHue;
             GLfloat c_g = i*saturation_per_i;
-            GLfloat c_b = value;
+            GLfloat c_b = mValue;
             hsv_to_rgb_float(&c_r, &c_g, &c_b);
             if(i > 0) {
                 drawRect( (i - 1)*seg_width, 0.f, seg_width, height(),
@@ -86,8 +86,8 @@ void ColorValueRect::paintGL() {
         GLfloat last_b = 0.f;
         GLfloat value_per_i = 1.f/mNumberSegments;
         for(int i = 0; i <= mNumberSegments; i++) {
-            GLfloat c_r = hue;
-            GLfloat c_g = saturation;
+            GLfloat c_r = mHue;
+            GLfloat c_g = mSaturation;
             GLfloat c_b = i*value_per_i;
             hsv_to_rgb_float(&c_r, &c_g, &c_b);
             if(i > 0) {
@@ -109,12 +109,12 @@ void ColorValueRect::paintGL() {
         GLfloat last_b = 0.f;
         GLfloat saturation_per_i = 1.f/mNumberSegments;
 
-        GLfloat h_t = hue;
-        GLfloat s_t = saturation;
-        GLfloat l_t = value;
+        GLfloat h_t = mHue;
+        GLfloat s_t = mSaturation;
+        GLfloat l_t = mValue;
         hsv_to_hsl(&h_t, &s_t, &l_t);
         for(int i = 1; i <= mNumberSegments; i++) {
-            GLfloat c_r = hue;
+            GLfloat c_r = mHue;
             GLfloat c_g = i*saturation_per_i;
             GLfloat c_b = l_t;
             hsl_to_rgb_float(&c_r, &c_g, &c_b);
@@ -137,12 +137,12 @@ void ColorValueRect::paintGL() {
         GLfloat last_b = 0.f;
         GLfloat lightness_per_i = 1.f/mNumberSegments;
 
-        GLfloat h_t = hue;
-        GLfloat s_t = saturation;
-        GLfloat l_t = value;
+        GLfloat h_t = mHue;
+        GLfloat s_t = mSaturation;
+        GLfloat l_t = mValue;
         hsv_to_hsl(&h_t, &s_t, &l_t);
         for(int i = 0; i <= mNumberSegments; i++) {
-            GLfloat c_r = hue;
+            GLfloat c_r = mHue;
             GLfloat c_g = s_t;
             GLfloat c_b = i*lightness_per_i;
             hsl_to_rgb_float(&c_r, &c_g, &c_b);
@@ -159,9 +159,9 @@ void ColorValueRect::paintGL() {
             last_b = c_b;
         }
     } else if(mType == CVR_ALPHA) {
-        GLfloat r = hue;
-        GLfloat g = saturation;
-        GLfloat b = value;
+        GLfloat r = mHue;
+        GLfloat g = mSaturation;
+        GLfloat b = mValue;
         hsv_to_rgb_float(&r, &g, &b);
         GLfloat val1 = 0.5f;
         GLfloat val2 = 0.25f;
@@ -180,7 +180,7 @@ void ColorValueRect::paintGL() {
                  false, false, false, false);
     }
 
-    if(shouldValPointerBeLightHSV(hue, saturation, value) ) {
+    if(shouldValPointerBeLightHSV(mHue, mSaturation, mValue) ) {
         drawSolidRectCenter(mVal*width(), height()*0.5f, 4.f, height(),
                             1.f, 1.f, 1.f, false, false, false, false);
 
@@ -206,7 +206,7 @@ void ColorValueRect::mousePressEvent(QMouseEvent *e) {
 }
 
 void ColorValueRect::mouseReleaseEvent(QMouseEvent *) {
-    hsl_saturaton_tmp = -1.f;
+    mHslSaturatonTmp = -1.f;
     emit editingFinished(qVal());
     MainWindow::getInstance()->callUpdateSchedulers();
 }

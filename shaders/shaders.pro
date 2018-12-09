@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 
 DISTFILES += \
-	tex.vert \
-	blur.frag
+	blur.frag \
+    textured.vert \
+    plain.vert

@@ -2,11 +2,10 @@
 #define GPUPOSTPROCESSOR_H
 #include "smartPointers/stdselfref.h"
 #include "skiaincludes.h"
-#include <QOpenGLFunctions_3_3_Core>
-#include "texvertexdata.h"
+#include "glhelpers.h"
 
 class ScheduledPostProcess : public StdSelfRef,
-        protected QOpenGLFunctions_3_3_Core {
+        protected QGL33c {
     friend class GpuPostProcessor;
     friend class ComplexScheduledPostProcess;
 public:
@@ -56,7 +55,7 @@ private:
     QList<stdsptr<ScheduledPostProcess>> mChildProcesses;
 };
 #include <QOpenGLFramebufferObject>
-class GpuPostProcessor : protected QOpenGLFunctions_3_3_Core {
+class GpuPostProcessor : protected QGL33c {
 public:
     GpuPostProcessor();
 

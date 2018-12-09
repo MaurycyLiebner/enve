@@ -81,7 +81,7 @@ void ShaderPostProcess::process(GrContext * const grContext) {
     glClear(GL_COLOR_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, srcTexID);
-    glBindVertexArray(MY_GL_VAO);
+    glBindVertexArray(GL_TEXTURED_SQUARE_VAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     assertNoGlErrors();
 
