@@ -529,4 +529,13 @@ DISTFILES += \
     pixmaps/cursor-tweak-scale-up.xpm \
     pixmaps/cursor-zoom-out.xpm \
     pixmaps/cursor-zoom.xpm \
-    pixmaps/handles.xpm
+    pixmaps/handles.xpm \
+    GUI/ColorWidgets/ColorWidgetShaders/hue.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/alpha.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/blue.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/green.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/hsl_saturation.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/hsv_saturation.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/lightness.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/red.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/value.frag
