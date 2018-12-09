@@ -7,7 +7,6 @@ void setDefaultFormat() {
     QSurfaceFormat format;
     format.setVersion(3, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setOptions(QSurfaceFormat::DeprecatedFunctions);
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
@@ -16,8 +15,9 @@ void setDefaultFormat() {
 }
 
 int main(int argc, char *argv[]) {
-    Application a(argc, argv);
     setDefaultFormat();
+    Application::setAttribute(Qt::AA_ShareOpenGLContexts);
+    Application a(argc, argv);
 
     MainWindow w;
 //#ifdef QT_DEBUG

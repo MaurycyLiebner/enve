@@ -34,27 +34,13 @@ public:
     int getGradientIndex(Gradient *child);
     void updateNumberOfGradients();
 
-    void drawGradients(const int &displayedTop,
-                       const int &topGradientId,
-                       const int &numberVisibleGradients,
-                       const int &scrollItemHeight);
-
     void gradientLeftPressed(const int &gradId);
     void gradientContextMenuReq(const int &gradId,
                                 const QPoint globalPos);
-    void drawHoveredGradientBorder(const int &displayedTop,
-                                   const int &topGradientId,
-                                   const int &hoveredGradId,
-                                   const int &scrollItemHeight);
-    void drawCurrentGradientColors(const int &x, const int &y,
-                                   const int &width, const int &height);
-    void drawCurrentGradient(const int &x, const int &y,
-                             const int &width, const int &height);
+
     void colorRightPress(const int &x, const QPoint &point);
     void colorLeftPress(const int &x);
     int getColorIdAtX(const int &x);
-    void drawHoveredColorBorder(const int &hoveredX,
-                                const int &colHeight);
 
     void updateAfterFrameChanged(const int &absFrame);
 

@@ -16,7 +16,6 @@ public:
     GLWindow(QScreen *screen = nullptr);
     ~GLWindow();
 protected:
-    void iniVertData();
     void initialize();
     void renderNow();
     virtual void qRender(QPainter *p) {

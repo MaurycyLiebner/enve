@@ -13,11 +13,6 @@ ShaderPostProcess::ShaderPostProcess(const sk_sp<SkImage> &srcImg,
     mFinishedFunc(finishedFunc),
     mSrcImage(srcImg) {}
 
-inline void assertNoGlErrors() {
-    GLenum glError = glGetError();
-    assert(glError == GL_NO_ERROR);
-}
-
 void ShaderPostProcess::generateFinalTexture(const int &finalWidth,
                                              const int &finalHeight,
                                              GrGLTextureInfo &finalTexInfo) {

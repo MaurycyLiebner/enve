@@ -41,7 +41,6 @@ signals:
     void editingFinished(const qreal&);
     void editingStarted(const qreal&);
 private:
-    GLushort mNumberSegments = 5;
     CVR_TYPE mType;
     GLfloat mVal = 0.f;
 };

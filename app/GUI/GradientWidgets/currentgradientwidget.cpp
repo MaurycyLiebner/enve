@@ -10,12 +10,7 @@ CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
 }
 
 void CurrentGradientWidget::paintGL() {
-    int halfHeight = height()/2;
-    drawMeshBg(0, 0, width(), height());
-    mGradientWidget->drawCurrentGradientColors(0, 0, width(), halfHeight);
-    mGradientWidget->drawHoveredColorBorder(mHoveredX, halfHeight);
-    mGradientWidget->drawCurrentGradient(0, halfHeight,
-                                         width(), height() - halfHeight);
+
 }
 
 void CurrentGradientWidget::mousePressEvent(QMouseEvent *event) {

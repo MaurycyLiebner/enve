@@ -54,6 +54,7 @@ void GLWindow::resizeEvent(QResizeEvent *) {
     bindSkia();
 }
 #include "glhelpers.h"
+#include "ColorWidgets/colorwidgetshaders.h"
 
 void GLWindow::iniBlurProgram() {
     iniProgram(this, GL_BLUR_PROGRAM,
@@ -91,7 +92,7 @@ void GLWindow::initialize() {
 
     bindSkia();
 
-    iniVertData();
+    iniTexturedVShaderData(this);
     iniBlurProgram();
 
 //    qDebug() << "OpenGL Info";
@@ -189,30 +190,32 @@ void draw(SkCanvas* canvas) {
     }
 }
 
-
-#include "GUI/ColorWidgets/colorwidget.h"
 void GLWindow::renderNow() {
     if(!isExposed()) return;
 
     bool needsInitialize = false;
     if(!mContext) {
         mContext = new QOpenGLContext(this);
-        mContext->setFormat(QSurfaceFormat::defaultFormat());
-        mContext->create();
+//        mContext->setFormat(QSurfaceFormat::defaultFormat());
+        //mContext->setShareContext(QOpenGLContext::globalShareContext());
+        Q_ASSERT(mContext->create());
 
         needsInitialize = true;
     }
-    mContext->makeCurrent(this);
+
+    Q_ASSERT(mContext->makeCurrent(this));
 
     if(needsInitialize) {
         Q_ASSERT(initializeOpenGLFunctions());
         initialize();
     }
+    return;
+
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
 
     glOrthoAndViewportSet(width(), height());
 
-    mCanvas->save();
+    //mCanvas->save();
     //draw(mCanvas);
     renderSk(mCanvas, mGrContext.get());
 //    SkPaint paint;
@@ -234,7 +237,7 @@ void GLWindow::renderNow() {
 
 //    mCanvas->drawRect(SkRect::MakeWH(width(), height()), paint);
 
-    mCanvas->restore();
+    //mCanvas->restore();
     mCanvas->flush();
 
 
@@ -260,12 +263,6 @@ bool GLWindow::event(QEvent *event) {
     case QEvent::WindowActivate:
     case QEvent::Expose:
     case QEvent::Resize:
-        if(mContext) {
-            if(mContext->makeCurrent(this)) {
-                //processGPU(mGrContext.get());
-                mContext->doneCurrent();
-            }
-        }
         requestUpdate();
         [[fallthrough]];
        // return true;

@@ -3,6 +3,8 @@
 #include <QOpenGLFunctions_3_3_Core>
 typedef QOpenGLFunctions_3_3_Core QGL33c;
 
+extern void assertNoGlErrors();
+
 //! @brief Creates a program, compiles, and attaches associated shaders.
 extern void iniProgram(QGL33c* gl,
                        GLuint& program,
@@ -21,5 +23,7 @@ extern GLuint GL_TEXTURED_SQUARE_VAO;
 extern GLuint GL_TEXTURED_SQUARE_VBO;
 
 extern GLuint GL_BLUR_PROGRAM;
+
+extern QOpenGLContext* GL_FIRST_CONTEXT;
 
 #endif // GLHELPERS_H

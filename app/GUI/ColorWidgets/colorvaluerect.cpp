@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QPainter>
 #include "GUI/mainwindow.h"
+#include "colorwidgetshaders.h"
 
 ColorValueRect::ColorValueRect(const CVR_TYPE& type_t, QWidget *parent) :
     ColorWidget(parent) {
@@ -11,184 +12,55 @@ ColorValueRect::ColorValueRect(const CVR_TYPE& type_t, QWidget *parent) :
 }
 
 void ColorValueRect::paintGL() {
-    GLfloat r = mHue;
-    GLfloat g = mSaturation;
-    GLfloat b = mValue;
-    hsv_to_rgb_float(&r, &g, &b);
+    iniPlainVShaderData(this);
+    iniColorPrograms(this);
+
+    assertNoGlErrors();
+    glClearColor(1.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    assertNoGlErrors();
+    ColorProgram programToUse;
     if(mType == CVR_RED) {
-        drawRect(0.f, 0.f, width(), height(),
-                 0.f, g, b,
-                 1.f, g, b,
-                 1.f, g, b,
-                 0.f, g, b);
+        programToUse = RED_PROGRAM;
     } else if(mType == CVR_GREEN) {
-        drawRect(0.f, 0.f, width(), height(),
-                 r, 0.f, b,
-                 r, 1.f, b,
-                 r, 1.f, b,
-                 r, 0.f, b);
+        programToUse = GREEN_PROGRAM;
     } else if(mType == CVR_BLUE) {
-        drawRect(0.f, 0.f, width(), height(),
-                 r, g, 0.f,
-                 r, g, 1.f,
-                 r, g, 1.f,
-                 r, g, 0.f);
+        programToUse = BLUE_PROGRAM;
     } else if(mType == CVR_HUE) {
-        GLfloat seg_width = static_cast<GLfloat>(width()/mNumberSegments);
-        GLfloat last_r = 0.f;
-        GLfloat last_g = 0.f;
-        GLfloat last_b = 0.f;
-        GLfloat hue_per_i = 1.f/mNumberSegments;
-        for(int i = 0; i <= mNumberSegments; i++) {
-            GLfloat c_r = i*hue_per_i;
-            GLfloat c_g = mSaturation;
-            GLfloat c_b = mValue;
-            hsv_to_rgb_float(&c_r, &c_g, &c_b);
-            if(i > 0) {
-                drawRect( (i - 1)*seg_width, 0.f, seg_width, height(),
-                          last_r, last_g, last_b,
-                          c_r, c_g, c_b,
-                          c_r, c_g, c_b,
-                          last_r, last_g, last_b,
-                          true, true, i == 1, i == mNumberSegments);
-            }
-            last_r = c_r;
-            last_g = c_g;
-            last_b = c_b;
-        }
+        programToUse = HUE_PROGRAM;
     } else if(mType == CVR_HSVSATURATION) {
-        GLfloat seg_width = static_cast<GLfloat>(width()/mNumberSegments);
-        GLfloat last_r = 0.f;
-        GLfloat last_g = 0.f;
-        GLfloat last_b = 0.f;
-        GLfloat saturation_per_i = 1.f/mNumberSegments;
-        for(int i = 0; i <= mNumberSegments; i++) {
-            GLfloat c_r = mHue;
-            GLfloat c_g = i*saturation_per_i;
-            GLfloat c_b = mValue;
-            hsv_to_rgb_float(&c_r, &c_g, &c_b);
-            if(i > 0) {
-                drawRect( (i - 1)*seg_width, 0.f, seg_width, height(),
-                          last_r, last_g, last_b,
-                          c_r, c_g, c_b,
-                          c_r, c_g, c_b,
-                          last_r, last_g, last_b,
-                          true, true, i == 1, i == mNumberSegments);
-            }
-            last_r = c_r;
-            last_g = c_g;
-            last_b = c_b;
-        }
+        programToUse = HSV_SATURATION_PROGRAM;
     } else if(mType == CVR_VALUE) {
-        GLfloat seg_width = static_cast<GLfloat>(width()/mNumberSegments);
-        GLfloat last_r = 0.f;
-        GLfloat last_g = 0.f;
-        GLfloat last_b = 0.f;
-        GLfloat value_per_i = 1.f/mNumberSegments;
-        for(int i = 0; i <= mNumberSegments; i++) {
-            GLfloat c_r = mHue;
-            GLfloat c_g = mSaturation;
-            GLfloat c_b = i*value_per_i;
-            hsv_to_rgb_float(&c_r, &c_g, &c_b);
-            if(i > 0) {
-                drawRect( (i - 1)*seg_width, 0.f, seg_width, height(),
-                          last_r, last_g, last_b,
-                          c_r, c_g, c_b,
-                          c_r, c_g, c_b,
-                          last_r, last_g, last_b,
-                          true, true, i == 1, i == mNumberSegments);
-            }
-            last_r = c_r;
-            last_g = c_g;
-            last_b = c_b;
-        }
+        programToUse = VALUE_PROGRAM;
     } else if(mType == CVR_HSLSATURATION) {
-        GLfloat seg_width = static_cast<GLfloat>(width()/mNumberSegments);
-        GLfloat last_r = 0.f;
-        GLfloat last_g = 0.f;
-        GLfloat last_b = 0.f;
-        GLfloat saturation_per_i = 1.f/mNumberSegments;
-
-        GLfloat h_t = mHue;
-        GLfloat s_t = mSaturation;
-        GLfloat l_t = mValue;
-        hsv_to_hsl(&h_t, &s_t, &l_t);
-        for(int i = 1; i <= mNumberSegments; i++) {
-            GLfloat c_r = mHue;
-            GLfloat c_g = i*saturation_per_i;
-            GLfloat c_b = l_t;
-            hsl_to_rgb_float(&c_r, &c_g, &c_b);
-            if(i > 0) {
-                drawRect((i - 1)*seg_width, 0.f, seg_width, height(),
-                         last_r, last_g, last_b,
-                         c_r, c_g, c_b,
-                         c_r, c_g, c_b,
-                         last_r, last_g, last_b,
-                         true, true, i == 1, i == mNumberSegments);
-            }
-            last_r = c_r;
-            last_g = c_g;
-            last_b = c_b;
-        }
+        programToUse = HSL_SATURATION_PROGRAM;
     } else if(mType == CVR_LIGHTNESS) {
-        GLfloat seg_width = static_cast<GLfloat>(width()/mNumberSegments);
-        GLfloat last_r = 0.f;
-        GLfloat last_g = 0.f;
-        GLfloat last_b = 0.f;
-        GLfloat lightness_per_i = 1.f/mNumberSegments;
-
-        GLfloat h_t = mHue;
-        GLfloat s_t = mSaturation;
-        GLfloat l_t = mValue;
-        hsv_to_hsl(&h_t, &s_t, &l_t);
-        for(int i = 0; i <= mNumberSegments; i++) {
-            GLfloat c_r = mHue;
-            GLfloat c_g = s_t;
-            GLfloat c_b = i*lightness_per_i;
-            hsl_to_rgb_float(&c_r, &c_g, &c_b);
-            if(i > 0) {
-                drawRect( (i - 1)*seg_width, 0.f, seg_width, height(),
-                          last_r, last_g, last_b,
-                          c_r, c_g, c_b,
-                          c_r, c_g, c_b,
-                          last_r, last_g, last_b,
-                          true, true, i == 1, i == mNumberSegments);
-            }
-            last_r = c_r;
-            last_g = c_g;
-            last_b = c_b;
-        }
+        programToUse = LIGHTNESS_PROGRAM;
     } else if(mType == CVR_ALPHA) {
-        GLfloat r = mHue;
-        GLfloat g = mSaturation;
-        GLfloat b = mValue;
-        hsv_to_rgb_float(&r, &g, &b);
-        GLfloat val1 = 0.5f;
-        GLfloat val2 = 0.25f;
-        for(int i = 0; i < width(); i += 7) {
-            for(int j = 0; j < height(); j += 7) {
-                GLfloat val = ((i + j) % 2 == 0) ? val1 : val2;
-                drawSolidRect(i, j, 7, 7, val, val, val,
-                              false, false, false, false);
-            }
-        }
-        drawRect(0.f, 0.f, width(), height(),
-                 r, g, b, 0.f,
-                 r, g, b, 1.f,
-                 r, g, b, 1.f,
-                 r, g, b, 0.f,
-                 false, false, false, false);
+        programToUse = ALPHA_PROGRAM;
     }
+    assertNoGlErrors();
+    glUseProgram(programToUse.fID);
+    assertNoGlErrors();
+    glUniform4f(programToUse.fCurrentHSVAColorLoc,
+                mHue, mSaturation, mValue, 1.f);
+    assertNoGlErrors();
+    glUniform1f(programToUse.fCurrentValueLoc,
+                mVal);
+    assertNoGlErrors();
+    glBindVertexArray(GL_PLAIN_SQUARE_VAO);
+    assertNoGlErrors();
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    assertNoGlErrors();
+//    if(shouldValPointerBeLightHSV(mHue, mSaturation, mValue) ) {
+//        drawSolidRectCenter(mVal*width(), height()*0.5f, 4.f, height(),
+//                            1.f, 1.f, 1.f, false, false, false, false);
 
-    if(shouldValPointerBeLightHSV(mHue, mSaturation, mValue) ) {
-        drawSolidRectCenter(mVal*width(), height()*0.5f, 4.f, height(),
-                            1.f, 1.f, 1.f, false, false, false, false);
+//    } else {
+//        drawSolidRectCenter(mVal*width(), height()*0.5f, 4.f, height(),
+//                            0.f, 0.f, 0.f, false, false, false, false);
 
-    } else {
-        drawSolidRectCenter(mVal*width(), height()*0.5f, 4.f, height(),
-                            0.f, 0.f, 0.f, false, false, false, false);
-
-    }
+//    }
 }
 
 void ColorValueRect::mouseMoveEvent(QMouseEvent *e) {

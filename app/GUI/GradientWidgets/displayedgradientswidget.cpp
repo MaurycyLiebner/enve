@@ -32,14 +32,7 @@ void DisplayedGradientsWidget::setNumberGradients(const int &n) {
 }
 
 void DisplayedGradientsWidget::paintGL() {
-    mGradientWidget->drawGradients(mDisplayedTop,
-                                   mTopGradientId,
-                                   mNumberVisibleGradients,
-                                   mScrollItemHeight);
-    mGradientWidget->drawHoveredGradientBorder(mDisplayedTop,
-                                               mTopGradientId,
-                                               mHoveredGradientId - mTopGradientId,
-                                               mScrollItemHeight);
+
 }
 
 void DisplayedGradientsWidget::mousePressEvent(QMouseEvent *event) {

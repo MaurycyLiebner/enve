@@ -2,18 +2,24 @@
 #define COLORWIDGETSHADERS_H
 #include "glhelpers.h"
 
-extern GLuint HUE_PROGRAM;
-extern GLuint HSV_SATURATION_PROGRAM;
-extern GLuint VALUE_PROGRAM;
+struct ColorProgram {
+    GLuint fID;
+    GLint fCurrentHSVAColorLoc;
+    GLint fCurrentValueLoc;
+};
 
-extern GLuint HSL_SATURATION_PROGRAM;
-extern GLuint LIGHTNESS_PROGRAM;
+extern ColorProgram HUE_PROGRAM;
+extern ColorProgram HSV_SATURATION_PROGRAM;
+extern ColorProgram VALUE_PROGRAM;
 
-extern GLuint RED_PROGRAM;
-extern GLuint GREEN_PROGRAM;
-extern GLuint BLUE_PROGRAM;
+extern ColorProgram HSL_SATURATION_PROGRAM;
+extern ColorProgram LIGHTNESS_PROGRAM;
 
-extern GLuint ALPHA_PROGRAM;
+extern ColorProgram RED_PROGRAM;
+extern ColorProgram GREEN_PROGRAM;
+extern ColorProgram BLUE_PROGRAM;
+
+extern ColorProgram ALPHA_PROGRAM;
 
 extern GLuint COLOR_WIDGET_VAO;
 extern GLuint COLOR_WIDGET_VBO;

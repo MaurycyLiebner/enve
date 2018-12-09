@@ -45,148 +45,12 @@ void H_Wheel_SV_Triangle::resizeGL(int w, int h) {
     ColorWidget::resizeGL(w, h);
 }
 
-void H_Wheel_SV_Triangle::paintGL() {
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //glViewport(0, 0, width(), height());
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    /*glColor3f(1.0, 0.0, 0.0);
-    glRects(50, 50, 50, -50);*/
-
-    glColor4f(1.f, 1.f, 1.f, 1.f);
-    drawWheel();
-
-    glPushMatrix();
-    glTranslatef(outer_circle_r, outer_circle_r, 0.f);
-
-    //
-    glPushMatrix();
-
-    glRotatef(-mHue*360 + 180, 0.f, 0.f, 1.f);
-    glTranslatef(-outer_circle_r, -0.5f, 0.f);
-    if(shouldValPointerBeLightHSV(mHue, 1.f, 1.f) ) {
-        drawSolidRectCenter(wheel_thickness*0.5f - 1.f, 0.f, wheel_thickness, 2.5f,
-                            1.f, 1.f, 1.f, true, true, true, true);
-    } else {
-        drawSolidRectCenter(wheel_thickness*0.5f - 1.f, 0.f, wheel_thickness, 2.5f,
-                            0.f, 0.f, 0.f, true, true, true, true);
-    }
-    //drawRectCenter(wheel_thickness*0.5, 0, wheel_thickness - 7.f, 2, curr_h_h, curr_h_s, curr_h_v);
-
-    glPopMatrix();
-    //
-
-    glRotatef(-mHue*360 - 30, 0.0f, 0.0f, 1.0f);
-    glTranslatef(-inner_circle_r, -inner_circle_r, 0.f);
-    glColor3f(0.f, 0.f, 0.f);
-
-    float center_y = mValue*inner_circle_r*1.5f;
-    float row_width_t = center_y*2/sqrt_3f;
-    float row_x_0 = inner_circle_r - row_width_t*0.5f;
-    float center_x = row_x_0 + row_width_t*mSaturation;
-
-    drawTriangle();
-    if(shouldValPointerBeLightHSV(mHue, mSaturation, mValue) ) {
-        drawSolidCircle(5, center_x, center_y, 16, 1.f, 1.f, 1.f);
-    } else {
-        drawSolidCircle(5, center_x, center_y, 16, 0.f, 0.f, 0.f);
-    }
-    float curr_h = mHue;
-    float curr_s = mSaturation;
-    float curr_v = mValue;
-    hsv_to_rgb_float(&curr_h, &curr_s, &curr_v);
-    drawSolidCircle(3, center_x, center_y, 16, curr_h, curr_s, curr_v);
-
-    //drawRect(inner_circle_r, 0, wheel_thickness, 2, 0.f, 0.f, 0.f);
-
-    glPopMatrix();
-
-    /*glColor3f(1.0, 0.0, 0.0);
-    glRects(0, 0, 50, 50);*/
-}
-
 void H_Wheel_SV_Triangle::drawTriangle() {
-    GLfloat x_mar = (triangle_tex_width - triangle_width)*0.5f;
-    glPushMatrix();
-    glTranslatef(x_mar, 0.f, 0.f);
 
-    /*glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_TRIANGLES);
-        glVertex2f(triangle_width*0.5, 0);
-        glVertex2f(0, triangle_tex_height);
-        glVertex2f(triangle_width, triangle_tex_height);
-    glEnd();*/
-    GLfloat s1 = 1.f;
-    GLfloat v1 = 0.f;
-
-    GLfloat s2 = 0.f;
-    GLfloat v2 = 1.f;
-
-    GLfloat s3 = 1.f;
-    GLfloat v3 = 1.f;
-    drawSubTris(triangle_width*0.5f, 0.f,
-                mHue, s1, v1,
-                0.f, triangle_tex_height,
-                mHue, s2, v2,
-                triangle_width, triangle_tex_height,
-                mHue, s3, v3,
-                3.f, true, true, true);
-    /*drawAATris(triangle_width*0.5, 0,
-                   0, triangle_tex_height,
-                   triangle_width, triangle_tex_height,
-                   1.f, 0.f, 0.f);*/
-    glPopMatrix();
 }
 
-void H_Wheel_SV_Triangle::drawWheel() {
-    float cx = outer_circle_r;
-    float cy = outer_circle_r;
-    float r = outer_circle_r - 1.f;
-    int num_seg = 128;
-    float theta = 2.f * PIf/num_seg;
-    float c = cosf(theta);//precalculate the sine and cosine
-    float s = sinf(theta);
-    float t;
+void H_Wheel_SV_Triangle::paintGL() {
 
-    float x = r;//we start at angle = 0
-    float y = 0;
-
-    // activate and specify pointer to vertex array
-
-    //glBegin(GL_LINE_LOOP);
-    float last_r = 1.f;
-    float last_g = 0.f;
-    float last_b = 0.f;
-    float last_x = x;
-    float last_y = y;
-    for(int ii = 0; ii < num_seg; ii++) {
-        //apply the rotation matrix
-        t = x;
-        x = c * x - s * y;
-        y = s * t + c * y;
-
-        float h2r = 1.f - (ii + 1.f)/num_seg;
-        float s2g = 1.f;
-        float v2b = 1.f;
-        hsv_to_rgb_float(&h2r, &s2g, &v2b);
-
-        drawAACircTris(last_x + cx, last_y + cy,
-                       x + cx, y + cy,
-                       cx, cy,
-                       last_r, last_g, last_b,
-                       h2r, s2g, v2b);
-        last_x = x;
-        last_y = y;
-        last_r = h2r;
-        last_g = s2g;
-        last_b = v2b;
-    }
-
-
-    drawSolidCircle(inner_circle_r, cx, cy,
-                    static_cast<GLuint>(num_seg),
-                    mBgColor.fR, mBgColor.fG, mBgColor.fB);
 }
 
 void H_Wheel_SV_Triangle::wheelEvent(QWheelEvent *e) {
@@ -205,6 +69,11 @@ void H_Wheel_SV_Triangle::wheelEvent(QWheelEvent *e) {
     }
     //drawTriangle();
     update();
+}
+
+void H_Wheel_SV_Triangle::drawWheel()
+{
+
 }
 
 void H_Wheel_SV_Triangle::wheelInteraction(const int &x_t, const int &y_t) {

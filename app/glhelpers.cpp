@@ -16,6 +16,13 @@ GLuint GL_TEXTURED_SQUARE_VBO;
 
 GLuint GL_BLUR_PROGRAM;
 
+QOpenGLContext* GL_FIRST_CONTEXT = nullptr;
+
+void assertNoGlErrors() {
+    GLenum glError = glGetError();
+    assert(glError == GL_NO_ERROR);
+}
+
 void iniTexturedVShaderData(QGL33c* gl) {
     float vertices[] = {
         // positions        // texture coords
@@ -37,7 +44,7 @@ void iniTexturedVShaderData(QGL33c* gl) {
 
     // position attribute
     gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              8 * sizeof(float), (void*)0);
+                              5 * sizeof(float), (void*)0);
     gl->glEnableVertexAttribArray(0);
     // texture coord attribute
     gl->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
@@ -54,19 +61,19 @@ void iniPlainVShaderData(QGL33c* gl) {
         -1.f,  1.f, 0.0f    // top left
     };
 
-    gl->glGenVertexArrays(1, &GL_TEXTURED_SQUARE_VAO);
+    gl->glGenVertexArrays(1, &GL_PLAIN_SQUARE_VAO);
 
-    gl->glGenBuffers(1, &GL_TEXTURED_SQUARE_VBO);
+    gl->glGenBuffers(1, &GL_PLAIN_SQUARE_VBO);
 
-    gl->glBindVertexArray(GL_TEXTURED_SQUARE_VAO);
+    gl->glBindVertexArray(GL_PLAIN_SQUARE_VAO);
 
-    gl->glBindBuffer(GL_ARRAY_BUFFER, GL_TEXTURED_SQUARE_VBO);
+    gl->glBindBuffer(GL_ARRAY_BUFFER, GL_PLAIN_SQUARE_VBO);
     gl->glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
                      vertices, GL_STATIC_DRAW);
 
     // position attribute
     gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              8 * sizeof(float), (void*)0);
+                              3 * sizeof(float), (void*)0);
     gl->glEnableVertexAttribArray(0);
 }
 

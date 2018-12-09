@@ -381,8 +381,7 @@ void ColorSettingsWidget::moveAlphaWidgetToTab(const int &tabId) {
                 mTabWidget->widget(tabId)->minimumSizeHint());
 }
 
-void ColorSettingsWidget::startColorPicking()
-{
+void ColorSettingsWidget::startColorPicking() {
     new ColorPickingWidget(this);
 }
 

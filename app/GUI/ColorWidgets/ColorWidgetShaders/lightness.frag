@@ -22,6 +22,10 @@ vec4 hsva2rgba(vec4 c) {
 }
 
 void main(void) {
+    if(abs(currentValue - pos.x) < 0.05) {
+        gl_FragColor = vec4(0.f, 0.f, 0.f, 1.f);
+        return;
+    }
     float fragHue = pos.x;
     vec4 hsvaColor = vec4(fragHue, currentHSVAColor.y,
                           currentHSVAColor.z, currentHSVAColor.w);
