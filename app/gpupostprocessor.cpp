@@ -2,7 +2,9 @@
 
 GpuPostProcessor::GpuPostProcessor() {}
 
-ScheduledPostProcess::ScheduledPostProcess() {}
+ScheduledPostProcess::ScheduledPostProcess() {
+    Q_ASSERT(initializeOpenGLFunctions());
+}
 
 ShaderPostProcess::ShaderPostProcess(const sk_sp<SkImage> &srcImg,
                                      const GLuint &program,
@@ -11,25 +13,35 @@ ShaderPostProcess::ShaderPostProcess(const sk_sp<SkImage> &srcImg,
     mFinishedFunc(finishedFunc),
     mSrcImage(srcImg) {}
 
+inline void assertNoGlErrors() {
+    GLenum glError = glGetError();
+    assert(glError == GL_NO_ERROR);
+}
+
 void ShaderPostProcess::generateFinalTexture(const int &finalWidth,
                                              const int &finalHeight,
                                              GrGLTextureInfo &finalTexInfo) {
-    finalTexInfo.fFormat = GL_RGBA;
+    finalTexInfo.fFormat = GL_BGRA;
     finalTexInfo.fTarget = GL_TEXTURE_2D;
 
     // create a color attachment texture
     glGenTextures(1, &finalTexInfo.fID);
     glBindTexture(GL_TEXTURE_2D, finalTexInfo.fID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, finalWidth, finalHeight,
-                 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    assertNoGlErrors();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, finalWidth, finalHeight,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    assertNoGlErrors();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    assertNoGlErrors();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                            GL_TEXTURE_2D, finalTexInfo.fID, 0);
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        qDebug() << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+    assertNoGlErrors();
+    auto frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if(frameBufferStatus != GL_FRAMEBUFFER_COMPLETE)
+        qDebug() << frameBufferStatus << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
 }
 
 void ShaderPostProcess::adoptTexture(GrContext * const grContext,
@@ -45,8 +57,11 @@ void ShaderPostProcess::adoptTexture(GrContext * const grContext,
 }
 
 void ShaderPostProcess::process(GrContext * const grContext) {
+    if(!mSrcImage) return;
     GLuint srcTexID;
     sk_sp<SkImage> srcTexture(mSrcImage->makeTextureImage(grContext, nullptr));
+    if(!srcTexture) return;
+    if(!srcTexture->isValid(grContext)) return;
     GrGLTextureInfo glTexInfo;
     auto backendTex = srcTexture->getBackendTexture(false);
     Q_ASSERT(backendTex.isValid());
@@ -68,6 +83,7 @@ void ShaderPostProcess::process(GrContext * const grContext) {
     glBindTexture(GL_TEXTURE_2D, srcTexID);
     glBindVertexArray(MY_GL_VAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    assertNoGlErrors();
 
     adoptTexture(grContext, finalWidth, finalHeight, finalTexInfo);
     if(mFinishedFunc) mFinishedFunc(mFinalImage);

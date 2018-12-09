@@ -310,13 +310,13 @@ void GLWindow::renderNow() {
 
         needsInitialize = true;
     }
-
     mContext->makeCurrent(this);
 
     if(needsInitialize) {
-        initializeOpenGLFunctions();
+        Q_ASSERT(initializeOpenGLFunctions());
         initialize();
     }
+    glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
 
     glOrthoAndViewportSet(width(), height());
 
@@ -368,6 +368,12 @@ bool GLWindow::event(QEvent *event) {
     case QEvent::WindowActivate:
     case QEvent::Expose:
     case QEvent::Resize:
+        if(mContext) {
+            if(mContext->makeCurrent(this)) {
+                //processGPU(mGrContext.get());
+                mContext->doneCurrent();
+            }
+        }
         requestUpdate();
         [[fallthrough]];
        // return true;

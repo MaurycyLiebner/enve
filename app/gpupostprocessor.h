@@ -55,7 +55,7 @@ private:
     }
     QList<stdsptr<ScheduledPostProcess>> mChildProcesses;
 };
-
+#include <QOpenGLFramebufferObject>
 class GpuPostProcessor : protected QOpenGLFunctions_3_3_Core {
 public:
     GpuPostProcessor();
@@ -63,9 +63,12 @@ public:
     void process(GrContext * const grContext) {
         if(mScheduledProcesses.isEmpty()) return;
         if(!mFrameBufferCreated) {
+            Q_ASSERT(initializeOpenGLFunctions());
+            //mFrameBuffer = new QOpenGLFramebufferObject(256, 256);
             glGenFramebuffers(1, &mFrameBufferId);
             mFrameBufferCreated = true;
         }
+       // mFrameBuffer->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferId);
 
         foreach(const auto& scheduled, mScheduledProcesses) {
@@ -73,7 +76,8 @@ public:
         }
         mScheduledProcesses.clear();
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //mFrameBuffer->bindDefault();
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void addToProcess(const stdsptr<ScheduledPostProcess>& scheduled) {
@@ -84,6 +88,7 @@ public:
         mScheduledProcesses.clear();
     }
 protected:
+    //QOpenGLFramebufferObject* mFrameBuffer = nullptr;
     bool mFrameBufferCreated = false;
     GLuint mFrameBufferId;
     QList<stdsptr<ScheduledPostProcess>> mScheduledProcesses;

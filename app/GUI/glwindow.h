@@ -40,6 +40,7 @@ protected:
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);
+    virtual void processGPU(GrContext * const grContext) = 0;
 private:
     void checkCompileErrors(GLuint shader, std::string type);
     void iniProgram(GLuint &program,

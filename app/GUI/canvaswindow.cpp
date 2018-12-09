@@ -288,7 +288,13 @@ void CanvasWindow::processGPU(GrContext* const grContext) {
         auto child = children.takeFirst();
         auto rendCont = child->getDrawRenderContainer_TEST();
         auto img = rendCont->getImageSk();
-        mGpuPostProcessor.addToProcess(SPtrCreate(ShaderPostProcess)(img, MY_GL_BLUR_PROGRAM));
+        ShaderFinishedFunc finishFunc = [&rendCont](const sk_sp<SkImage>& finished) {
+            if(!finished) return;
+            rendCont->replaceImageSk(finished);
+        };
+        mGpuPostProcessor.addToProcess(
+                    SPtrCreate(ShaderPostProcess)(
+                        img, MY_GL_BLUR_PROGRAM, finishFunc));
     }
     mGpuPostProcessor.process(grContext);
 }
