@@ -32,6 +32,14 @@ void iniColorProgram(QGL33c* gl,
                 program.fID, "currentValue");
     assertNoGlErrors();
     assert(program.fCurrentValueLoc >= 0);
+    program.fHandleWidthLoc = gl->glGetUniformLocation(
+                program.fID, "handleWidth");
+    assertNoGlErrors();
+    assert(program.fHandleWidthLoc >= 0);
+    program.fLightHandle = gl->glGetUniformLocation(
+                program.fID, "lightHandle");
+    assertNoGlErrors();
+    assert(program.fLightHandle >= 0);
 }
 
 void iniColorPrograms(QGL33c *gl) {

@@ -24,6 +24,4 @@ extern GLuint GL_TEXTURED_SQUARE_VBO;
 
 extern GLuint GL_BLUR_PROGRAM;
 
-extern QOpenGLContext* GL_FIRST_CONTEXT;
-
 #endif // GLHELPERS_H

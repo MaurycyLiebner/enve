@@ -92,6 +92,8 @@ void GLWindow::initialize() {
 
     bindSkia();
 
+    iniPlainVShaderData(this);
+    iniColorPrograms(this);
     iniTexturedVShaderData(this);
     iniBlurProgram();
 
@@ -197,7 +199,7 @@ void GLWindow::renderNow() {
     if(!mContext) {
         mContext = new QOpenGLContext(this);
 //        mContext->setFormat(QSurfaceFormat::defaultFormat());
-        //mContext->setShareContext(QOpenGLContext::globalShareContext());
+        mContext->setShareContext(QOpenGLContext::globalShareContext());
         Q_ASSERT(mContext->create());
 
         needsInitialize = true;
@@ -209,7 +211,6 @@ void GLWindow::renderNow() {
         Q_ASSERT(initializeOpenGLFunctions());
         initialize();
     }
-    return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
 

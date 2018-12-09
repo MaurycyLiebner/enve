@@ -16,8 +16,6 @@ GLuint GL_TEXTURED_SQUARE_VBO;
 
 GLuint GL_BLUR_PROGRAM;
 
-QOpenGLContext* GL_FIRST_CONTEXT = nullptr;
-
 void assertNoGlErrors() {
     GLenum glError = glGetError();
     assert(glError == GL_NO_ERROR);

@@ -6,6 +6,8 @@ struct ColorProgram {
     GLuint fID;
     GLint fCurrentHSVAColorLoc;
     GLint fCurrentValueLoc;
+    GLint fHandleWidthLoc;
+    GLint fLightHandle;
 };
 
 extern ColorProgram HUE_PROGRAM;

@@ -13,8 +13,6 @@ ColorValueRect::ColorValueRect(const CVR_TYPE& type_t, QWidget *parent) :
 
 void ColorValueRect::paintGL() {
     iniPlainVShaderData(this);
-    iniColorPrograms(this);
-
     assertNoGlErrors();
     glClearColor(1.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -48,19 +46,16 @@ void ColorValueRect::paintGL() {
     glUniform1f(programToUse.fCurrentValueLoc,
                 mVal);
     assertNoGlErrors();
+    glUniform1f(programToUse.fHandleWidthLoc,
+                4.f/width());
+    assertNoGlErrors();
+    glUniform1i(programToUse.fLightHandle,
+                shouldValPointerBeLightHSV(mHue, mSaturation, mValue));
+    assertNoGlErrors();
     glBindVertexArray(GL_PLAIN_SQUARE_VAO);
     assertNoGlErrors();
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     assertNoGlErrors();
-//    if(shouldValPointerBeLightHSV(mHue, mSaturation, mValue) ) {
-//        drawSolidRectCenter(mVal*width(), height()*0.5f, 4.f, height(),
-//                            1.f, 1.f, 1.f, false, false, false, false);
-
-//    } else {
-//        drawSolidRectCenter(mVal*width(), height()*0.5f, 4.f, height(),
-//                            0.f, 0.f, 0.f, false, false, false, false);
-
-//    }
 }
 
 void ColorValueRect::mouseMoveEvent(QMouseEvent *e) {

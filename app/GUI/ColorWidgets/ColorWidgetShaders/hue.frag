@@ -3,6 +3,8 @@ in vec3 pos;
 
 uniform vec4 currentHSVAColor;
 uniform float currentValue;
+uniform float handleWidth; // fraction of width
+uniform bool lightHandle;
 
 vec4 rgba2hsva(vec4 c) {
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -22,11 +24,15 @@ vec4 hsva2rgba(vec4 c) {
 }
 
 void main(void) {
-    if(abs(currentValue - pos.x) < 1.05) {
-        gl_FragColor = vec4(0.f, 0.f, 0.f, 1.f);
+    float fragHue = 0.5f*(1.f + pos.x);
+    if(abs(currentValue - fragHue) < handleWidth) {
+        if(lightHandle) {
+            gl_FragColor = vec4(1.f, 1.f, 1.f, 1.f);
+        } else {
+            gl_FragColor = vec4(0.f, 0.f, 0.f, 1.f);
+        }
         return;
     }
-    float fragHue = pos.x;
     vec4 hsvaColor = vec4(fragHue, currentHSVAColor.y,
                           currentHSVAColor.z, currentHSVAColor.w);
     gl_FragColor = hsva2rgba(hsvaColor);

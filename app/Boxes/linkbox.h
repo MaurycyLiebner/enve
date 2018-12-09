@@ -55,8 +55,8 @@ public:
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(qsptr<BoundingBox>)),
-                this, SLOT(setTargetSlot(qsptr<BoundingBox>)));
+        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
+                this, SLOT(setTargetSlot(BoundingBox*)));
     }
 
     bool relPointInsidePath(const QPointF &point);
@@ -148,8 +148,8 @@ public:
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(qsptr<BoundingBox>)),
-                this, SLOT(setTargetSlot(qsptr<BoundingBox>)));
+        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
+                this, SLOT(setTargetSlot(BoundingBox*)));
     }
 
     //bool relPointInsidePath(const QPointF &point);
