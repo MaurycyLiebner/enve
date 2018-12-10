@@ -47,7 +47,7 @@ void ColorValueRect::paintGL() {
                 mVal);
     assertNoGlErrors();
     glUniform1f(programToUse.fHandleWidthLoc,
-                4.f/width());
+                2.f/width());
     assertNoGlErrors();
     glUniform1i(programToUse.fLightHandle,
                 shouldValPointerBeLightHSV(mHue, mSaturation, mValue));
