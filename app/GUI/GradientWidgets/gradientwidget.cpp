@@ -31,9 +31,7 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
 //    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
 }
 
-GradientWidget::~GradientWidget() {
-    mGradients.clear();
-}
+GradientWidget::~GradientWidget() {}
 
 void GradientWidget::updateAll() {
     mCurrentGradientWidget->update();

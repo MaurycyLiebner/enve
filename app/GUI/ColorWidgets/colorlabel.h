@@ -17,7 +17,7 @@ public slots:
     void setAlpha(GLfloat alpha_t);
 private:
     void paintGL();
-    GLfloat alpha = 1.f;
+    GLfloat mAlpha = 1.f;
 };
 
 #endif // COLORLABEL_H

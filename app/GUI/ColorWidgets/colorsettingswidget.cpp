@@ -44,7 +44,7 @@ void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
     hsl_s_rect->setColorHSV_f(hueGl, satGl, valGl);
     l_rect->setColorHSV_f(hueGl, satGl, valGl);
 
-    color_label->setColorHSV_f(hueGl, satGl, valGl);
+    mColorLabel->setColorHSV_f(hueGl, satGl, valGl);
 
     qreal hue = h_t;
     qreal hsvSat = s_t;
@@ -78,7 +78,7 @@ void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
     lSpin->setValueExternal(lig);
 
     if(mAlphaHidden) return;
-    color_label->setAlpha(alphaGl);
+    mColorLabel->setAlpha(alphaGl);
     aRect->setColorHSV_f(hueGl, satGl, valGl);
     aRect->setDisplayedValue(a_t);
     aSpin->setValueExternal(a_t);
@@ -390,7 +390,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mWidgetsLayout->setAlignment(Qt::AlignTop);
     setLayout(mWidgetsLayout);
 
-    color_label = new ColorLabel(this);
+    mColorLabel = new ColorLabel(this);
 
 //    mWheelWidget->setLayout(mWheelLayout);
 //    mWheelLayout->setAlignment(Qt::AlignTop);
@@ -468,7 +468,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
                                      "", this);
     connect(mPickingButton, SIGNAL(released()),
             this, SLOT(startColorPicking()));
-    mColorLabelLayout->addWidget(color_label);
+    mColorLabelLayout->addWidget(mColorLabel);
     mColorLabelLayout->addWidget(mPickingButton);
     mWidgetsLayout->addLayout(mColorLabelLayout);
 
@@ -498,6 +498,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             this, SLOT(setValuesFromRGB()));
     connect(bSpin, SIGNAL(valueChanged(qreal)),
             this, SLOT(setValuesFromRGB()));
+
     connect(hSpin, SIGNAL(valueChanged(qreal)),
             this, SLOT(setValuesFromHSV()));
     connect(hsvSSpin, SIGNAL(valueChanged(qreal)),
@@ -517,16 +518,19 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             this, SLOT(updateValuesFromRGB()));
     connect(bSpin, SIGNAL(displayedValueChanged(qreal)),
             this, SLOT(updateValuesFromRGB()));
+
     connect(hSpin, SIGNAL(displayedValueChanged(qreal)),
             this, SLOT(updateValuesFromHSV()));
     connect(hsvSSpin, SIGNAL(displayedValueChanged(qreal)),
             this, SLOT(updateValuesFromHSV()));
     connect(vSpin, SIGNAL(displayedValueChanged(qreal)),
             this, SLOT(updateValuesFromHSV()));
+
     connect(hslSSpin, SIGNAL(displayedValueChanged(qreal)),
             this, SLOT(updateValuesFromHSL()));
     connect(lSpin, SIGNAL(displayedValueChanged(qreal)),
             this, SLOT(updateValuesFromHSL()));
+
     connect(aSpin, SIGNAL(displayedValueChanged(qreal)),
             this, SLOT(updateAlphaFromSpin()));
 
@@ -684,12 +688,14 @@ void ColorSettingsWidget::setRectValuesAndColor(
         aRect->setColorHSV_f(hueGl, satGl, valGl);
     }
 
-    color_label->setColorHSV_f(hueGl, satGl, valGl);
+    mColorLabel->setColorHSV_f(hueGl, satGl, valGl);
 
     //emit colorChangedHSVSignal(hueGl, satGl, valGl, aSpin->value());
 }
 
 void ColorSettingsWidget::updateValuesFromRGB() {
+    if(mBlockColorSettings) return;
+    mBlockColorSettings = true;
     qreal red = rSpin->value();
     qreal green = gSpin->value();
     qreal blue = bSpin->value();
@@ -714,9 +720,12 @@ void ColorSettingsWidget::updateValuesFromRGB() {
     setRectValuesAndColor(red, green, blue,
                           hue, hsvSaturation, value,
                           hslSaturation, lightness);
+    mBlockColorSettings = false;
 }
 
 void ColorSettingsWidget::updateValuesFromHSV() {
+    if(mBlockColorSettings) return;
+    mBlockColorSettings = true;
     qreal hue = hSpin->value();
     qreal hsvSaturation = hsvSSpin->value();
     qreal value = vSpin->value();
@@ -740,9 +749,12 @@ void ColorSettingsWidget::updateValuesFromHSV() {
     setRectValuesAndColor(red, green, blue,
                           hue, hsvSaturation, value,
                           hslSaturation, lightness);
+    mBlockColorSettings = false;
 }
 
 void ColorSettingsWidget::updateValuesFromHSL() {
+    if(mBlockColorSettings) return;
+    mBlockColorSettings = true;
     qreal hue = hSpin->value();
     qreal hslSaturation = hslSSpin->value();
     qreal lightness = lSpin->value();
@@ -766,6 +778,7 @@ void ColorSettingsWidget::updateValuesFromHSL() {
     setRectValuesAndColor(red, green, blue,
                           hue, hsvSaturation, value,
                           hslSaturation, lightness);
+    mBlockColorSettings = false;
 }
 
 void ColorSettingsWidget::setValuesFromRGB() {
@@ -785,7 +798,7 @@ void ColorSettingsWidget::setValuesFromHSL() {
 
 void ColorSettingsWidget::updateAlphaFromSpin() {
     if(mAlphaHidden) return;
-    color_label->setAlpha(aSpin->value());
+    mColorLabel->setAlpha(aSpin->value());
     aRect->setDisplayedValue(aSpin->value());
 }
 
@@ -799,7 +812,7 @@ void ColorSettingsWidget::setColorMode(const int &colorMode) {
 
 void ColorSettingsWidget::setAlphaFromSpin(const qreal &val) {
     if(mAlphaHidden) return;
-    color_label->setAlpha(val);
+    mColorLabel->setAlpha(val);
     aRect->setDisplayedValue(val);
 
     emitColorChangedSignal();

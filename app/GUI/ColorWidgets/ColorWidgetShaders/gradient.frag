@@ -1,12 +1,15 @@
 #version 330 core
 in vec3 pos;
 
-uniform vec4 RGBAColor;
+uniform vec4 RGBAColor1;
+uniform vec4 RGBAColor2;
+
 uniform vec2 meshSize;
 
 void main(void) {
     float posFrac = 0.5f*(1.f + pos.x);
-    if(RGBAColor.a < 0.99999f) {
+    vec4 colorMix = mix(RGBAColor1, RGBAColor2, posFrac);
+    if(colorMix.a < 0.99999f) {
         vec3 meshColor;
         int hId = int(floor(posFrac/meshSize.x));
         int vId = int(floor(0.5f*(1.f + pos.y)/meshSize.y));
@@ -15,8 +18,8 @@ void main(void) {
         } else {
             meshColor = vec3(0.4f, 0.4f, 0.4f);
         }
-        gl_FragColor = vec4(mix(meshColor, RGBAColor.rgb, RGBAColor.a), 1.f);
+        gl_FragColor = vec4(mix(meshColor, colorMix.rgb, colorMix.a), 1.f);
         return;
     }
-    gl_FragColor = vec4(RGBAColor.rgb, 1.f);
+    gl_FragColor = vec4(colorMix.rgb, 1.f);
 }

@@ -16,8 +16,7 @@
 class ColorLabel;
 class ActionButton;
 
-class ColorSettingsWidget : public QWidget
-{
+class ColorSettingsWidget : public QWidget {
     Q_OBJECT
 public:
     explicit ColorSettingsWidget(QWidget *parent = nullptr);
@@ -72,7 +71,27 @@ private slots:
     void nullifyAnimator();
 private:
     void connectSignalsAndSlots();
+    void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,
+                                        const char *slot,
+                                        ColorWidget *signal_src,
+                                        const char *signal);
+    void connectColorWidgetSignalToSlots(ColorWidget *signal_src,
+                                         const char *signal,
+                                         const char *slot );
+    void connectColorWidgetSignalToSlotsWithoutThis(ColorWidget *signal_src,
+                                                    const char *signal,
+                                                    const char *slot);
+    void setRectValuesAndColor(
+        const qreal &red,
+        const qreal &green,
+        const qreal &blue,
+        const qreal &hue,
+        const qreal &hsvSaturation,
+        const qreal &value,
+        const qreal &hslSaturation,
+        const qreal &lightness);
 
+    bool mBlockColorSettings = false;
     CVR_TYPE mLastTriggeredCVR;
 
     ColorAnimator *mTargetAnimator = nullptr;
@@ -148,26 +167,7 @@ private:
     QHBoxLayout *mColorLabelLayout = new QHBoxLayout();
     ActionButton *mPickingButton;
 
-    ColorLabel *color_label = nullptr;
-    void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,
-                                        const char *slot,
-                                        ColorWidget *signal_src,
-                                        const char *signal);
-    void connectColorWidgetSignalToSlots(ColorWidget *signal_src,
-                                         const char *signal,
-                                         const char *slot );
-    void connectColorWidgetSignalToSlotsWithoutThis(ColorWidget *signal_src,
-                                                    const char *signal,
-                                                    const char *slot);
-    void setRectValuesAndColor(
-        const qreal &red,
-        const qreal &green,
-        const qreal &blue,
-        const qreal &hue,
-        const qreal &hsvSaturation,
-        const qreal &value,
-        const qreal &hslSaturation,
-        const qreal &lightness);
+    ColorLabel *mColorLabel = nullptr;
 };
 
 #endif // COLORSETTINGSWIDGET_H

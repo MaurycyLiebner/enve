@@ -15,6 +15,7 @@ ColorProgram BLUE_PROGRAM;
 ColorProgram ALPHA_PROGRAM;
 
 PlainColorProgram PLAIN_PROGRAM;
+GradientProgram GRADIENT_PROGRAM;
 
 GLuint COLOR_WIDGET_VAO;
 GLuint COLOR_WIDGET_VBO;
@@ -66,6 +67,17 @@ void iniPlainColorProgram(QGL33c *gl, const std::string& colorShadersPath) {
     assert(PLAIN_PROGRAM.fMeshSizeLoc >= 0);
 }
 
+void iniGradientProgram(QGL33c *gl, const std::string& colorShadersPath) {
+    iniProgram(gl, GRADIENT_PROGRAM.fID, GL_PLAIN_VERT,
+               colorShadersPath + "gradient.frag");
+    GRADIENT_PROGRAM.fRGBAColor1Loc = gl->glGetUniformLocation(
+                GRADIENT_PROGRAM.fID, "RGBAColor1");
+    GRADIENT_PROGRAM.fRGBAColor2Loc = gl->glGetUniformLocation(
+                GRADIENT_PROGRAM.fID, "RGBAColor2");
+    GRADIENT_PROGRAM.fMeshSizeLoc = gl->glGetUniformLocation(
+                GRADIENT_PROGRAM.fID, "meshSize");
+}
+
 void iniColorPrograms(QGL33c *gl) {
     std::string colorShadersPath =
             "/home/ailuropoda/Dev/AniVect/src/app/GUI/"
@@ -91,4 +103,5 @@ void iniColorPrograms(QGL33c *gl) {
                     colorShadersPath + "alpha.frag");
 
     iniPlainColorProgram(gl, colorShadersPath);
+    iniGradientProgram(gl, colorShadersPath);
 }

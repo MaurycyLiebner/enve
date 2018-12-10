@@ -48,6 +48,14 @@ public:
     void setGradientLoadIds();
     void writeGradients(QIODevice *target);
     void readGradients(QIODevice *target);
+
+    int getGradientsCount() const {
+        return mGradients.count();
+    }
+
+    Gradient* getGradientAt(const int& id) const {
+        return mGradients.at(id).get();
+    }
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);

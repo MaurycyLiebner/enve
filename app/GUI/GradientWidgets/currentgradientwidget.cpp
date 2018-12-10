@@ -8,9 +8,34 @@ CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
     mGradientWidget = gradientWidget;
     setFixedHeight(60);
 }
-
+#include "GUI/ColorWidgets/colorwidgetshaders.h"
 void CurrentGradientWidget::paintGL() {
+    glClearColor(1.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUseProgram(PLAIN_PROGRAM.fID);
+    Gradient *gradient = mGradientWidget->getCurrentGradient();
+    int nColors = gradient->getColorCount();
+    qreal xT = 0.;
+    qreal xInc = static_cast<qreal>(width())/nColors;
+    glUniform2f(PLAIN_PROGRAM.fMeshSizeLoc,
+                height()/(3.f*xInc), 1.f/3);
+    for(int j = 0; j < nColors; j++) {
+        QColor currentColor = gradient->getCurrentColorAt(j);
+        glViewport(qRound(xT), 0, qRound(xInc), height());
 
+
+        glUniform4f(PLAIN_PROGRAM.fRGBAColorLoc,
+                    currentColor.redF(), currentColor.greenF(),
+                    currentColor.blueF(), currentColor.alphaF());
+
+        glBindVertexArray(mPlainSquareVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+//        if(gradient == mCurrentGradient) {
+//            GLWidget::drawBorder(0, yT,
+//                       width(), mScrollItemHeight);
+//        }
+        xT = qRound(xT) + xInc;
+    }
 }
 
 void CurrentGradientWidget::mousePressEvent(QMouseEvent *event) {

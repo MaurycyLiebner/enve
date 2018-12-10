@@ -269,7 +269,7 @@ void hsl_to_rgb_float(float &h_, float &s_, float &l_) {
     l_ = b;
 }
 
-void hsv_to_hsl(const float &h, float &s, float &v) {
+void hsv_to_hsl(float &h, float &s, float &v) {
     Q_UNUSED(h);
     float ss = s;
     float vv = v;
@@ -282,7 +282,7 @@ void hsv_to_hsl(const float &h, float &s, float &v) {
     }
 }
 
-void hsl_to_hsv(const float &h, float &s, float &l) {
+void hsl_to_hsv(float &h, float &s, float &l) {
     Q_UNUSED(h);
     float ss = s;
     float ll = l;
@@ -295,7 +295,7 @@ void hsl_to_hsv(const float &h, float &s, float &l) {
     }
 }
 
-void qhsv_to_hsl(const qreal &h, qreal &s, qreal &v) {
+void qhsv_to_hsl(qreal &h, qreal &s, qreal &v) {
     Q_UNUSED(h);
     qreal ss = s;
     qreal vv = v;
@@ -309,7 +309,7 @@ void qhsv_to_hsl(const qreal &h, qreal &s, qreal &v) {
     }
 }
 
-void qhsl_to_hsv(const qreal &h, qreal &s, qreal &l) {
+void qhsl_to_hsv(qreal &h, qreal &s, qreal &l) {
     Q_UNUSED(h);
     qreal ss = s;
     qreal ll = l;

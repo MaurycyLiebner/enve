@@ -539,4 +539,5 @@ DISTFILES += \
     GUI/ColorWidgets/ColorWidgetShaders/lightness.frag \
     GUI/ColorWidgets/ColorWidgetShaders/red.frag \
     GUI/ColorWidgets/ColorWidgetShaders/value.frag \
-    GUI/ColorWidgets/ColorWidgetShaders/plain.frag
+    GUI/ColorWidgets/ColorWidgetShaders/plain.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/gradient.frag
