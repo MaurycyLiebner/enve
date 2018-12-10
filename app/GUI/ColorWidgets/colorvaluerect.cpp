@@ -49,7 +49,7 @@ void ColorValueRect::paintGL() {
         float r = mHue;
         float g = mSaturation;
         float b = mValue;
-        hsv_to_rgb_float(&r, &g, &b);
+        hsv_to_rgb_float(r, g, b);
         glUniform3f(programToUse.fRGBColorLoc, r, g, b);
         assertNoGlErrors();
     }
@@ -57,7 +57,7 @@ void ColorValueRect::paintGL() {
         float h = mHue;
         float s = mSaturation;
         float l = mValue;
-        hsv_to_hsl(&h, &s, &l);
+        hsv_to_hsl(h, s, l);
         glUniform3f(programToUse.fHSLColorLoc, h, s, l);
         assertNoGlErrors();
     }

@@ -1030,7 +1030,7 @@ bool MainWindow::askForSaving() {
                                       "\"?", "Close without saving",
                                       "Cancel",
                                       "Save");
-        if (buttonId == 1) {
+        if(buttonId == 1) {
             return false;
         } else {
             if(buttonId == 2) {

@@ -83,7 +83,7 @@ void VideoBox::setFilePath(const QString &path) {
 bool hasSound(const char* path) {
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
-    if (avformat_open_input(&format, path, nullptr, nullptr) != 0) {
+    if(avformat_open_input(&format, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return false;
     }

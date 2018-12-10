@@ -8,46 +8,44 @@ enum ColorMode : short {
     HSLMODE
 };
 
-extern void glOrthoAndViewportSet(unsigned int w, unsigned int h);
+extern void rgb_to_hsv_float (float &r_ /*h*/, float &g_ /*s*/, float &b_ /*v*/);
+extern void hsv_to_rgb_float (float &h_, float &s_, float &v_);
+extern void rgb_to_hsl_float (float &r_, float &g_, float &b_);
+extern void hsl_to_rgb_float (float &h_, float &s_, float &l_);
+extern void hsv_to_hsl(float &h, float &s, float &v);
+extern void hsl_to_hsv(float &h, float &s, float &l);
 
-extern void rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/);
-extern void hsv_to_rgb_float (float *h_, float *s_, float *v_);
-extern void rgb_to_hsl_float (float *r_, float *g_, float *b_);
-extern void hsl_to_rgb_float (float *h_, float *s_, float *l_);
-extern void hsv_to_hsl(float* h, float* s, float *v);
-extern void hsl_to_hsv(float* h, float* s, float *l);
-
-extern void qrgb_to_hsv(double *r_ /*h*/, double *g_ /*s*/, double *b_ /*v*/);
-extern void qhsv_to_rgb(double *h_, double *s_, double *v_);
-extern void qrgb_to_hsl(double *r_, double *g_, double *b_);
-extern void qhsl_to_rgb(double *h_, double *s_, double *l_);
-extern void qhsv_to_hsl(double* h, double* s, double *v);
-extern void qhsl_to_hsv(double* h, double* s, double *l);
+extern void qrgb_to_hsv(qreal &r_ /*h*/, qreal &g_ /*s*/, qreal &b_ /*v*/);
+extern void qhsv_to_rgb(qreal &h_, qreal &s_, qreal &v_);
+extern void qrgb_to_hsl(qreal &r_, qreal &g_, qreal &b_);
+extern void qhsl_to_rgb(qreal &h_, qreal &s_, qreal &l_);
+extern void qhsv_to_hsl(qreal &h, qreal &s, qreal &v);
+extern void qhsl_to_hsv(qreal &h, qreal &s, qreal &l);
 
 
 extern qreal getUNoise(qreal noise_scale);
 extern qreal getNoise(qreal noise_scale);
 extern void applyXYNoise(qreal noise_t,
-                         qreal *previous_noise_x,
-                         qreal *next_noise_x,
-                         qreal *previous_noise_y,
-                         qreal *next_noise_y,
-                         qreal noise_frequency,
-                         uchar *noise_count,
-                         qreal *value_x,
-                         qreal *value_y);
+                         qreal &previous_noise_x,
+                         qreal &next_noise_x,
+                         qreal &previous_noise_y,
+                         qreal &next_noise_y,
+                         const qreal &noise_frequency,
+                         uchar &noise_count,
+                         qreal &value_x,
+                         qreal &value_y);
 extern void applyUNoise(qreal noise_t,
-                        qreal *previous_noise,
-                        qreal *next_noise,
-                        qreal noise_frequency,
-                        uchar *noise_count,
-                        qreal *value);
+                        qreal &previous_noise,
+                        qreal &next_noise,
+                        const qreal &noise_frequency,
+                        uchar &noise_count,
+                        qreal &value);
 extern void applyNoise(qreal noise_t,
-                       qreal *previous_noise,
-                       qreal *next_noise,
-                       qreal noise_frequency,
-                       uchar *noise_count,
-                       qreal *value);
+                       qreal &previous_noise,
+                       qreal &next_noise,
+                       const qreal &noise_frequency,
+                       uchar &noise_count,
+                       qreal &value);
 
 
 class Brush;

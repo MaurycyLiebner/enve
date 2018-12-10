@@ -7,12 +7,12 @@ bool shouldValPointerBeLightHSV(GLfloat hue, GLfloat saturation, GLfloat value) 
 }
 
 bool shouldValPointerBeLightHSL(GLfloat hue, GLfloat saturation, GLfloat lightness) {
-    hsl_to_hsv(&hue, &saturation, &lightness);
+    hsl_to_hsv(hue, saturation, lightness);
     return shouldValPointerBeLightHSV(hue, saturation, lightness);
 }
 
 bool shouldValPointerBeLightRGB(GLfloat r, GLfloat g, GLfloat b) {
-    rgb_to_hsv_float(&r, &g, &b);
+    rgb_to_hsv_float(r, g, b);
     return shouldValPointerBeLightHSV(r, g, b);
 }
 
@@ -67,7 +67,7 @@ void ColorWidget::setValue_i(GLushort v) {
 }
 
 void ColorWidget::setColorHSL_f(GLfloat h, GLfloat s, GLfloat l) {
-    hsl_to_hsv(&h, &s, &l);
+    hsl_to_hsv(h, s, l);
     setColorHSV_f(h, s, l);
 }
 
@@ -75,13 +75,13 @@ void ColorWidget::setLightness_f(GLfloat l) {
     GLfloat hsv_h = mHue;
     GLfloat hsv_s = mSaturation;
     GLfloat hsv_v = mValue;
-    hsv_to_hsl(&hsv_h, &hsv_s, &hsv_v);
+    hsv_to_hsl(hsv_h, hsv_s, hsv_v);
     if(mHslSaturatonTmp > -0.5f) {
         hsv_s = mHslSaturatonTmp;
     } else {
         mHslSaturatonTmp = hsv_s;
     }
-    hsl_to_hsv(&hsv_h, &hsv_s, &l);
+    hsl_to_hsv(hsv_h, hsv_s, l);
     setColorHSV_f(mHue, hsv_s, l);
 }
 
@@ -89,9 +89,9 @@ void ColorWidget::setHSLSaturation_f(GLfloat s) {
     GLfloat hsv_h = mHue;
     GLfloat hsv_s = mSaturation;
     GLfloat hsv_v = mValue;
-    hsv_to_hsl(&hsv_h, &hsv_s, &hsv_v);
+    hsv_to_hsl(hsv_h, hsv_s, hsv_v);
 
-    hsl_to_hsv(&hsv_h, &s, &hsv_v);
+    hsl_to_hsv(hsv_h, s, hsv_v);
 
     setColorHSV_f(mHue, s, hsv_v);
 }
@@ -114,7 +114,7 @@ void ColorWidget::setHSLSaturation_i(GLushort s) {
 }
 
 void ColorWidget::setColorRGB_f(GLfloat r, GLfloat g, GLfloat b) {
-    rgb_to_hsv_float(&r, &g, &b);
+    rgb_to_hsv_float(r, g, b);
     mHue = r;
     mSaturation = g;
     mValue = b;
@@ -125,7 +125,7 @@ void ColorWidget::setR_f(GLfloat r) {
     GLfloat c_r = mHue;
     GLfloat c_g = mSaturation;
     GLfloat c_b = mValue;
-    hsv_to_rgb_float(&c_r, &c_g, &c_b);
+    hsv_to_rgb_float(c_r, c_g, c_b);
     setColorRGB_f(r, c_g, c_b);
 }
 
@@ -133,7 +133,7 @@ void ColorWidget::setG_f(GLfloat g) {
     GLfloat c_r = mHue;
     GLfloat c_g = mSaturation;
     GLfloat c_b = mValue;
-    hsv_to_rgb_float(&c_r, &c_g, &c_b);
+    hsv_to_rgb_float(c_r, c_g, c_b);
     setColorRGB_f(c_r, g, c_b);
 }
 
@@ -141,7 +141,7 @@ void ColorWidget::setB_f(GLfloat b) {
     GLfloat c_r = mHue;
     GLfloat c_g = mSaturation;
     GLfloat c_b = mValue;
-    hsv_to_rgb_float(&c_r, &c_g, &c_b);
+    hsv_to_rgb_float(c_r, c_g, c_b);
     setColorRGB_f(c_r, c_g, b);
 }
 

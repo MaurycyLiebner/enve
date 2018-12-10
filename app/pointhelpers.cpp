@@ -364,7 +364,7 @@ QPointF getClosestPointOnLineSegment(const QPointF &a,
 
     if(distance < 0.) { //Check if P projection is over vectorAB
         return a;
-    } else if (distance > 1.) {
+    } else if(distance > 1.) {
         return b;
     } else {
         return a + (AB * distance).toPointF();

@@ -244,7 +244,7 @@ DONE:
 //    for(int i = 0; i < path.elementCount(); i++) {
 //        const QPainterPath::Element &elem = path.elementAt(i);
 
-//        if (elem.isMoveTo()) { // move
+//        if(elem.isMoveTo()) { // move
 //            if(lastPoint != firstPoint) {
 //                firstPoint->setPrevPoint(lastPoint);
 //                firstPoint->setStartCtrlPos(firstPoint->getPos());
@@ -258,7 +258,7 @@ DONE:
 //                                             QPointF());
 //            currentTarget->addPoint(lastPoint);
 //            firstPoint = lastPoint;
-//        } else if (elem.isLineTo()) { // line
+//        } else if(elem.isLineTo()) { // line
 //            if((QPointF(elem.x, elem.y) == firstPoint->getPos()) ?
 //                    ((path.elementCount() > i + 1) ?
 //                                path.elementAt(i + 1).isMoveTo() :
@@ -273,7 +273,7 @@ DONE:
 //                                                 QPointF());
 //                currentTarget->addPoint(lastPoint);
 //            }
-//        } else if (elem.isCurveTo()) { // curve
+//        } else if(elem.isCurveTo()) { // curve
 //            lastPoint->setEndCtrlPos(QPointF(elem.x, elem.y));
 //            firstOther = true;
 //        } else { // other

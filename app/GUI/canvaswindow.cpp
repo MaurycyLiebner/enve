@@ -1163,7 +1163,7 @@ void CanvasWindow::initializeAudio() {
     mAudioFormat.setSampleType(QAudioFormat::Float);
 
     QAudioDeviceInfo info(mAudioDevice);
-    if (!info.isFormatSupported(mAudioFormat)) {
+    if(!info.isFormatSupported(mAudioFormat)) {
         qWarning() << "Default format not supported - trying to use nearest";
         mAudioFormat = info.nearestFormat(mAudioFormat);
     }

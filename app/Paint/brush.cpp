@@ -141,7 +141,7 @@ void Brush::setHSV(qreal h_t, qreal s_t, qreal v_t) {
     red = h;
     green = s;
     blue = v;
-    qhsv_to_rgb(&red, &green, &blue);
+    qhsv_to_rgb(red, green, blue);
 }
 
 void Brush::setSetting(BrushSetting setting_t, qreal val_t) {

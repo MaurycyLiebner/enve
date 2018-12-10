@@ -17,11 +17,11 @@ int decode_audio_file(const char* path,
                       int* size) {
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
-    if (avformat_open_input(&format, path, nullptr, nullptr) != 0) {
+    if(avformat_open_input(&format, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
         return -1;
     }
-    if (avformat_find_stream_info(format, nullptr) < 0) {
+    if(avformat_find_stream_info(format, nullptr) < 0) {
         fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
         return -1;
     }
@@ -36,7 +36,7 @@ int decode_audio_file(const char* path,
             break;
         }
     }
-    if (audioStreamIndex == -1) {
+    if(audioStreamIndex == -1) {
         fprintf(stderr,
                 "Could not retrieve audio stream from file '%s'\n", path);
         return -1;
@@ -47,7 +47,7 @@ int decode_audio_file(const char* path,
     AVStream* audioStream = format->streams[audioStreamIndex];
     // find & open codec
     audioCodec = audioStream->codec;
-    if (avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), nullptr) < 0) {
+    if(avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), nullptr) < 0) {
         fprintf(stderr, "Failed to open decoder for stream #%u in file '%s'\n",
                 audioStreamIndex, path);
         return -1;
@@ -64,7 +64,7 @@ int decode_audio_file(const char* path,
     av_opt_set_sample_fmt(swr, "in_sample_fmt",  audioCodec->sample_fmt, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLT,  0);
     swr_init(swr);
-    if (!swr_is_initialized(swr)) {
+    if(!swr_is_initialized(swr)) {
         fprintf(stderr, "Resampler has not been properly initialized\n");
         return -1;
     }
@@ -73,7 +73,7 @@ int decode_audio_file(const char* path,
     AVPacket packet;
     av_init_packet(&packet);
     AVFrame* frame = av_frame_alloc();
-    if (!frame) {
+    if(!frame) {
         fprintf(stderr, "Error allocating the frame\n");
         return -1;
     }

@@ -76,21 +76,21 @@ void ColorSetting::changeColor(ColorAnimator *target) const {
         qreal val3 = mVal3;
         if(targetMode == RGBMODE) {
             if(mSettingMode == HSVMODE) {
-                qhsv_to_rgb(&val1, &val2, &val3);
+                qhsv_to_rgb(val1, val2, val3);
             } else {
-                qhsl_to_rgb(&val1, &val2, &val3);
+                qhsl_to_rgb(val1, val2, val3);
             }
         } else if(targetMode == HSVMODE) {
             if(mSettingMode == HSLMODE) {
-                qhsl_to_hsv(&val1, &val2, &val3);
+                qhsl_to_hsv(val1, val2, val3);
             } else {
-                qhsl_to_hsv(&val1, &val2, &val3);
+                qhsl_to_hsv(val1, val2, val3);
             }
         } else if(targetMode == HSLMODE) {
             if(mSettingMode == HSVMODE) {
-                qhsv_to_hsl(&val1, &val2, &val3);
+                qhsv_to_hsl(val1, val2, val3);
             } else {
-                qrgb_to_hsl(&val1, &val2, &val3);
+                qrgb_to_hsl(val1, val2, val3);
             }
         }
         target->setCurrentVal1Value(val1);

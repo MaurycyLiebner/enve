@@ -167,7 +167,7 @@ MovablePoint *NodePoint::getPointAtAbsPos(const QPointF &absPos,
         if(mStartCtrlPt->isPointAtAbsPos(absPos,
                                          canvasScaleInv)) {
             return mStartCtrlPt.get();
-        } else if (mEndCtrlPt->isPointAtAbsPos(absPos,
+        } else if(mEndCtrlPt->isPointAtAbsPos(absPos,
                                                canvasScaleInv)) {
             return mEndCtrlPt.get();
         }

@@ -2,12 +2,6 @@
 #include "GUI/ColorWidgets/helpers.h"
 #include <QPainter>
 
-static const int kStencilBits = 8;  // Skia needs 8 stencil bits
-// If you want multisampling, uncomment the below lines and set a sample count
-static const int kMsaaSampleCount = 0; //4;
-// SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-// SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, kMsaaSampleCount);
-
 GLWindow::GLWindow(QScreen *screen)
     : QWindow(screen) {
     setSurfaceType(OpenGLSurface);
@@ -27,7 +21,7 @@ GLWindow::~GLWindow() {
 void GLWindow::bindSkia() {
     GrBackendRenderTarget backendRT = GrBackendRenderTarget(
                                         width(), height(),
-                                        kMsaaSampleCount, kStencilBits,
+                                        0, 8, // (optional) 4, 8,
                                         mFbInfo
                                         /*kRGBA_half_GrPixelConfig*/
                                         /*kSkia8888_GrPixelConfig*/);
@@ -116,84 +110,6 @@ void GLWindow::initialize() {
 //    glMatrixMode(GL_MODELVIEW);
 //}
 
-void draw(SkCanvas* canvas) {
-    SkBlendMode modes[] = {
-        SkBlendMode::kClear,
-        SkBlendMode::kSrc,
-        SkBlendMode::kDst,
-        SkBlendMode::kSrcOver,
-        SkBlendMode::kDstOver,
-        SkBlendMode::kSrcIn,
-        SkBlendMode::kDstIn,
-        SkBlendMode::kSrcOut,
-        SkBlendMode::kDstOut,
-        SkBlendMode::kSrcATop,
-        SkBlendMode::kDstATop,
-        SkBlendMode::kXor,
-        SkBlendMode::kPlus,
-        SkBlendMode::kModulate,
-        SkBlendMode::kScreen,
-        SkBlendMode::kOverlay,
-        SkBlendMode::kDarken,
-        SkBlendMode::kLighten,
-        SkBlendMode::kColorDodge,
-        SkBlendMode::kColorBurn,
-        SkBlendMode::kHardLight,
-        SkBlendMode::kSoftLight,
-        SkBlendMode::kDifference,
-        SkBlendMode::kExclusion,
-        SkBlendMode::kMultiply,
-        SkBlendMode::kHue,
-        SkBlendMode::kSaturation,
-        SkBlendMode::kColor,
-        SkBlendMode::kLuminosity,
-    };
-    SkRect rect = SkRect::MakeWH(64.0f, 64.0f);
-    SkPaint text, stroke, src, dst;
-    stroke.setStyle(SkPaint::kStroke_Style);
-    text.setTextSize(24.0f);
-    text.setAntiAlias(true);
-    SkPoint srcPoints[2] = {
-        SkPoint::Make(0.0f, 0.0f),
-        SkPoint::Make(64.0f, 0.0f)
-    };
-    SkColor srcColors[2] = {
-        SK_ColorMAGENTA & 0x00FFFFFF,
-        SK_ColorMAGENTA};
-    src.setShader(SkGradientShader::MakeLinear(
-                srcPoints, srcColors, nullptr, 2,
-                SkShader::kClamp_TileMode, 0, nullptr));
-
-    SkPoint dstPoints[2] = {
-        SkPoint::Make(0.0f, 0.0f),
-        SkPoint::Make(0.0f, 64.0f)
-    };
-    SkColor dstColors[2] = {
-        SK_ColorCYAN & 0x00FFFFFF,
-        SK_ColorCYAN};
-    dst.setShader(SkGradientShader::MakeLinear(
-                dstPoints, dstColors, nullptr, 2,
-                SkShader::kClamp_TileMode, 0, nullptr));
-    canvas->clear(SK_ColorWHITE);
-    size_t N = sizeof(modes) / sizeof(modes[0]);
-    size_t K = (N - 1) / 3 + 1;
-    SkASSERT(K * 64 == 640);  // tall enough
-    for(size_t i = 0; i < N; ++i) {
-        SkAutoCanvasRestore autoCanvasRestore(canvas, true);
-        canvas->translate(192.0f * (i / K), 64.0f * (i % K));
-        const char* desc = SkBlendMode_Name(modes[i]);
-        canvas->drawText(desc, strlen(desc), 68.0f, 30.0f, text);
-        canvas->clipRect(SkRect::MakeWH(64.0f, 64.0f));
-        canvas->drawColor(SK_ColorLTGRAY);
-        (void)canvas->saveLayer(nullptr, nullptr);
-        canvas->clear(SK_ColorTRANSPARENT);
-        canvas->drawPaint(dst);
-        src.setBlendMode(modes[i]);
-        canvas->drawPaint(src);
-        canvas->drawRect(rect, stroke);
-    }
-}
-
 void GLWindow::renderNow() {
     if(!isExposed()) return;
 
@@ -213,14 +129,16 @@ void GLWindow::renderNow() {
         Q_ASSERT(initializeOpenGLFunctions());
         initialize();
     }
-
+    assertNoGlErrors();
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
+    assertNoGlErrors();
 
-    glOrthoAndViewportSet(width(), height());
+    glViewport(0, 0, width(), height());
 
     //mCanvas->save();
     //draw(mCanvas);
     renderSk(mCanvas, mGrContext.get());
+    assertNoGlErrors();
 //    SkPaint paint;
 //    SkPoint gradPoints[2];
 //    gradPoints[0] = SkPoint::Make(0.f, 0.f);
@@ -242,7 +160,7 @@ void GLWindow::renderNow() {
 
     //mCanvas->restore();
     mCanvas->flush();
-
+    assertNoGlErrors();
 
 //    if(!mDevice) mDevice = new QOpenGLPaintDevice;
 

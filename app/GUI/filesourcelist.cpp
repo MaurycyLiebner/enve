@@ -23,7 +23,7 @@ void FileSourceWidget::setTargetCache(FileCacheHandlerAbstraction *target) {
 }
 
 void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
-    if (!(event->buttons() & Qt::LeftButton)) {
+    if(!(event->buttons() & Qt::LeftButton)) {
         return;
     }
     if((event->pos() - mDragStartPos).manhattanLength()

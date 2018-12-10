@@ -211,12 +211,12 @@ void Surface::strokeTo(const Brush *brush,
     mLastEventStrokeVel = stroke_vel;
 
     applyXYNoise(brush->getStrokePositionNoisePx()*mScale,
-                 &mPreviousStrokeXNoise,
-                 &mNextStrokeXNoise,
-                 &mPreviousStrokeYNoise,
-                 &mNextStrokeYNoise,
+                 mPreviousStrokeXNoise,
+                 mNextStrokeXNoise,
+                 mPreviousStrokeYNoise,
+                 mNextStrokeYNoise,
                  brush->getStrokePositionNoiseFrequency(),
-                 &mStrokeNoiseCount, &x, &y);
+                 mStrokeNoiseCount, x, y);
 
     qreal dabs_to = countDabsTo(dist_between_dabs, x, y);
 
@@ -338,7 +338,7 @@ void Surface::strokeTo(const Brush *brush,
         stroke_h = stroke_red;
         stroke_s = stroke_green;
         stroke_v = stroke_blue;
-        qrgb_to_hsv(&stroke_h, &stroke_s, &stroke_v);
+        qrgb_to_hsv(stroke_h, stroke_s, stroke_v);
     }
     Tile ***tilesT = mCurrentTiles->getTiles();
     mCurrentTiles->dataChanged();
@@ -346,23 +346,23 @@ void Surface::strokeTo(const Brush *brush,
         if(!fixed_color) {
             dab_red = stroke_h;
             applyNoise(brush->getHueNoise(),
-                       &mPreviousHueNoise,
-                       &mNextHueNoise,
+                       mPreviousHueNoise,
+                       mNextHueNoise,
                        brush->getHueNoiseFrequency(),
-                       &mHueNoiseCount, &dab_red);
+                       mHueNoiseCount, dab_red);
             dab_green = stroke_s;
             applyNoise(brush->getSaturationNoise(),
-                       &mPreviousSaturationNoise,
-                       &mNextSaturationNoise,
+                       mPreviousSaturationNoise,
+                       mNextSaturationNoise,
                        brush->getSaturationNoiseFrequency(),
-                       &mSaturationNoiseCount, &dab_green);
+                       mSaturationNoiseCount, dab_green);
             dab_blue = stroke_v;
             applyNoise(brush->getValueNoise(),
-                       &mPreviousValueNoise,
-                       &mNextValueNoise,
+                       mPreviousValueNoise,
+                       mNextValueNoise,
                        brush->getValueNoiseFrequency(),
-                       &mValueNoiseCount, &dab_blue);
-            qhsv_to_rgb(&dab_red, &dab_green, &dab_blue);
+                       mValueNoiseCount, dab_blue);
+            qhsv_to_rgb(dab_red, dab_green, dab_blue);
         }
         qreal dab_x = first_dab_x + i*dabs_dx +
                 getNoise(brush->getDabPositionNoisePx()*mScale);

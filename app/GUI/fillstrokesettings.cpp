@@ -275,7 +275,7 @@ void FillStrokeSettingsWidget::setCurrentPaintType(
         const PaintType &paintType) {
     if(paintType == NOPAINT) {
         setNoPaintType();
-    } else if (paintType == FLATPAINT) {
+    } else if(paintType == FLATPAINT) {
         setFlatPaintType();
     } else {
         setGradientPaintType();

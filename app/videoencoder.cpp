@@ -169,7 +169,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
     AVCodecContext *c = ost->enc;
 
     /* check if we want to generate more frames */
-//    if (av_compare_ts(ost->next_pts, c->time_base,
+//    if(av_compare_ts(ost->next_pts, c->time_base,
 //                      STREAM_DURATION, (AVRational) { 1, 1 }) >= 0)
 //        return nullptr;
 
@@ -182,7 +182,7 @@ static AVFrame *get_video_frame(OutputStream *ost,
                                           c->width, c->height,
                                           c->pix_fmt,
                                           SWS_BICUBIC, nullptr, nullptr, nullptr);
-            if (!ost->sws_ctx) {
+            if(!ost->sws_ctx) {
                 error = "Cannot initialize the conversion context";
                 return nullptr;
             }
@@ -240,10 +240,10 @@ static bool write_video_frame(AVFormatContext *oc,
         av_init_packet(&pkt);
 
         ret = avcodec_receive_packet(c, &pkt);
-        if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+        if(ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
             error = "Error encoding a video frame";
             return false;
-        } else if (ret >= 0) {
+        } else if(ret >= 0) {
             av_packet_rescale_ts(&pkt, c->time_base, ost->st->time_base);
             pkt.stream_index = ost->st->index;
 
@@ -287,7 +287,7 @@ static bool add_audio_stream(OutputStream *ost,
 
 //    /* find the audio encoder */
 //    codec = avcodec_find_encoder(codec_id);
-//    if (!codec) {
+//    if(!codec) {
 //        fprintf(stderr, "codec not found\n");
 //        return false;
 //    }
@@ -315,7 +315,7 @@ static bool add_audio_stream(OutputStream *ost,
     ost->st->time_base = (AVRational) { 1, c->sample_rate };
 
     // some formats want stream headers to be separate
-    if (oc->oformat->flags & AVFMT_GLOBALHEADER)
+    if(oc->oformat->flags & AVFMT_GLOBALHEADER)
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     /* initialize sample format conversion;
@@ -324,7 +324,7 @@ static bool add_audio_stream(OutputStream *ost,
      * some extra data copying;
      */
     ost->avr = avresample_alloc_context();
-    if (!ost->avr) {
+    if(!ost->avr) {
         error = "Error allocating the resampling context";
         return false;
     }
@@ -504,7 +504,7 @@ static bool process_audio_stream(AVFormatContext *oc,
         ret = avresample_convert(ost->avr, nullptr, 0, 0,
                                  frame->extended_data, frame->linesize[0],
                                  frame->nb_samples);
-        if (ret < 0) {
+        if(ret < 0) {
             error = "Error feeding audio data to the resampler";
             return false;
         }
@@ -537,7 +537,7 @@ static bool process_audio_stream(AVFormatContext *oc,
         if(ret < 0) {
             error = "Error while resampling";
             return false;
-        } else if (frame && ret != ost->frame->nb_samples) {
+        } else if(frame && ret != ost->frame->nb_samples) {
             error = "Too few samples returned from resampler";
             return false;
         }

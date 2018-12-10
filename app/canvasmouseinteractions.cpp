@@ -566,9 +566,9 @@ void Canvas::handleLeftButtonMousePress() {
         if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMousePress();
         } // point adding mode
-        else if (mCurrentMode == CanvasMode::MOVE_POINT) {
+        else if(mCurrentMode == CanvasMode::MOVE_POINT) {
             handleMovePointMousePressEvent();
-        } else if (mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
+        } else if(mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
             mLastPressedBox = getPathAtFromAllAncestors(mLastPressPosRel);
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
 

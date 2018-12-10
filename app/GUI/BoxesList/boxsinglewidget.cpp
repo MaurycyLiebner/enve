@@ -834,7 +834,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
     if(isTargetDisabled()) return;
-    if ((event->pos() - mDragStartPos).manhattanLength()
+    if((event->pos() - mDragStartPos).manhattanLength()
          < QApplication::startDragDistance()) {
         return;
     }

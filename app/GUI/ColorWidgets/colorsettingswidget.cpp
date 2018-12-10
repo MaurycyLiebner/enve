@@ -53,7 +53,7 @@ void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
     qreal red = hue;
     qreal green = hsvSat;
     qreal blue = val;
-    qhsv_to_rgb(&red, &green, &blue);
+    qhsv_to_rgb(red, green, blue);
 
     r_rect->setDisplayedValue(red);
     g_rect->setDisplayedValue(green);
@@ -69,7 +69,7 @@ void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
 
     qreal hslSat = hsvSat;
     qreal lig = val;
-    qhsv_to_hsl(&hue, &hslSat, &lig);
+    qhsv_to_hsl(hue, hslSat, lig);
 
     hsl_s_rect->setDisplayedValue(hslSat);
     l_rect->setDisplayedValue(lig);
@@ -697,12 +697,12 @@ void ColorSettingsWidget::updateValuesFromRGB() {
     qreal hue = red;
     qreal hsvSaturation = green;
     qreal value = blue;
-    qrgb_to_hsv(&hue, &hsvSaturation, &value);
+    qrgb_to_hsv(hue, hsvSaturation, value);
 
     hue = red;
     qreal hslSaturation = green;
     qreal lightness = blue;
-    qrgb_to_hsl(&hue, &hslSaturation, &lightness);
+    qrgb_to_hsl(hue, hslSaturation, lightness);
 
     hSpin->setValueExternal(hue);
     hsvSSpin->setValueExternal(hsvSaturation);
@@ -724,11 +724,11 @@ void ColorSettingsWidget::updateValuesFromHSV() {
     qreal red = hue;
     qreal green = hsvSaturation;
     qreal blue = value;
-    qhsv_to_rgb(&red, &green, &blue);
+    qhsv_to_rgb(red, green, blue);
 
     qreal hslSaturation = hsvSaturation;
     qreal lightness = value;
-    qhsv_to_hsl(&hue, &hslSaturation, &lightness);
+    qhsv_to_hsl(hue, hslSaturation, lightness);
 
     rSpin->setValueExternal(red);
     gSpin->setValueExternal(green);
@@ -750,11 +750,11 @@ void ColorSettingsWidget::updateValuesFromHSL() {
     qreal red = hue;
     qreal green = hslSaturation;
     qreal blue = lightness;
-    qhsl_to_rgb(&red, &green, &blue);
+    qhsl_to_rgb(red, green, blue);
 
     qreal hsvSaturation = hslSaturation;
     qreal value = lightness;
-    qhsl_to_hsv(&hue, &hsvSaturation, &value);
+    qhsl_to_hsv(hue, hsvSaturation, value);
 
     rSpin->setValueExternal(red);
     gSpin->setValueExternal(green);

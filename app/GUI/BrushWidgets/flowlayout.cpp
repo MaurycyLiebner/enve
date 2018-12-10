@@ -27,7 +27,7 @@ void FlowLayout::addItem(QLayoutItem *item) {
 }
 
 int FlowLayout::horizontalSpacing() const {
-    if (mHSpace >= 0) {
+    if(mHSpace >= 0) {
         return mHSpace;
     } else {
         return smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
@@ -35,7 +35,7 @@ int FlowLayout::horizontalSpacing() const {
 }
 
 int FlowLayout::verticalSpacing() const {
-    if (mVSpace >= 0) {
+    if(mVSpace >= 0) {
         return mVSpace;
     } else {
         return smartSpacing(QStyle::PM_LayoutVerticalSpacing);
@@ -51,7 +51,7 @@ QLayoutItem *FlowLayout::itemAt(int index) const {
 }
 
 QLayoutItem *FlowLayout::takeAt(int index) {
-    if (index >= 0 && index < mItemList.size())
+    if(index >= 0 && index < mItemList.size())
         return mItemList.takeAt(index);
     else
         return nullptr;
@@ -101,22 +101,22 @@ int FlowLayout::doLayout(const QRect &rect, bool testOnly) const {
     foreach (item, mItemList) {
         QWidget *wid = item->widget();
         int spaceX = horizontalSpacing();
-        if (spaceX == -1)
+        if(spaceX == -1)
             spaceX = wid->style()->layoutSpacing(
                 QSizePolicy::DefaultType, QSizePolicy::DefaultType, Qt::Horizontal);
         int spaceY = verticalSpacing();
-        if (spaceY == -1)
+        if(spaceY == -1)
             spaceY = wid->style()->layoutSpacing(
                 QSizePolicy::DefaultType, QSizePolicy::DefaultType, Qt::Vertical);
         int nextX = x + item->sizeHint().width() + spaceX;
-        if (nextX - spaceX > effectiveRect.right() && lineHeight > 0) {
+        if(nextX - spaceX > effectiveRect.right() && lineHeight > 0) {
             x = effectiveRect.x();
             y = y + lineHeight + spaceY;
             nextX = x + item->sizeHint().width() + spaceX;
             lineHeight = 0;
         }
 
-        if (!testOnly)
+        if(!testOnly)
             item->setGeometry(QRect(QPoint(x, y), item->sizeHint()));
 
         x = nextX;
@@ -127,9 +127,9 @@ int FlowLayout::doLayout(const QRect &rect, bool testOnly) const {
 
 int FlowLayout::smartSpacing(QStyle::PixelMetric pm) const {
     QObject *parent = this->parent();
-    if (!parent) {
+    if(!parent) {
         return -1;
-    } else if (parent->isWidgetType()) {
+    } else if(parent->isWidgetType()) {
         QWidget *pw = static_cast<QWidget *>(parent);
         return pw->style()->pixelMetric(pm, nullptr, pw);
     } else {

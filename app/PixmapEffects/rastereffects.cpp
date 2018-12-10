@@ -93,7 +93,7 @@ void colorizeHSV(const SkBitmap &bitmap,
                     qreal hT = hue;
                     qreal sT = saturation;
                     qreal lT = (maxT + minT) / 510. + lightness;
-                    qhsl_to_rgb(&hT, &sT, &lT);
+                    qhsl_to_rgb(hT, sT, lT);
 
                     *(bits) =
                         roundQrealToUChar(
@@ -1674,7 +1674,7 @@ void anim_fast_shadow(const SkBitmap &bitmap,
 //    int maxRadius = ceil(radiusF);
 //    qreal fraqInf = maxRadius - radiusF;
 
-//    if (maxRadius<1) return;
+//    if(maxRadius<1) return;
 //    int wm = w-1;
 //    int hm = h-1;
 //    int wh = w*h;
@@ -1785,7 +1785,7 @@ void fast_blur(const SkBitmap &bitmap, int radius,
     int w = bitmap.width();
     int h = bitmap.height();
 
-    if (radius<1) return;
+    if(radius<1) return;
     int wm = w-1;
     int hm = h-1;
     int wh = w*h;
@@ -1894,7 +1894,7 @@ void fast_blur(const SkBitmap &bitmap, int radius) {
     int w = bitmap.width();
     int h = bitmap.height();
 
-    if (radius<1) return;
+    if(radius<1) return;
     int wm = w-1;
     int hm = h-1;
     int wh = w*h;
@@ -2390,7 +2390,7 @@ void emboss(SkBitmap &bitmap, qreal radius, qreal sigma)
 
             kernel[i] = ((u < 0) || (v < 0) ? -8.0 : 8.0)*alpha/(2.0*MagickPI*S);
 
-            if (u == j)
+            if(u == j)
                 kernel[i]=0.0;
 
             i++;
@@ -2885,7 +2885,7 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
 
     qreal alpha, beta, sigma, value;
     alpha = (double) (rand() & NoiseMask)/NoiseMask;
-    if (alpha == 0.0)
+    if(alpha == 0.0)
         alpha = 1.0;
     switch(noise_type) {
     case UniformNoise:
@@ -2907,7 +2907,7 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
         }
     case MultiplicativeGaussianNoise:
         {
-            if (alpha <= NoiseEpsilon)
+            if(alpha <= NoiseEpsilon)
                 sigma = MaxRGB;
             else
                 sigma = sqrt(-2.0*log(alpha));
@@ -2918,10 +2918,10 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
         }
     case ImpulseNoise:
         {
-            if (alpha < (SigmaImpulse/2.0))
+            if(alpha < (SigmaImpulse/2.0))
                 value = 0;
             else
-                if (alpha >= (1.0-(SigmaImpulse/2.0)))
+                if(alpha >= (1.0-(SigmaImpulse/2.0)))
                     value = MaxRGB;
                 else
                     value = pixel;
@@ -2929,16 +2929,16 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
         }
     case LaplacianNoise:
         {
-            if (alpha <= 0.5)
+            if(alpha <= 0.5)
             {
-                if (alpha <= NoiseEpsilon)
+                if(alpha <= NoiseEpsilon)
                     value = (double) pixel-MaxRGB;
                 else
                     value = (double) pixel+SigmaLaplacian*log(2.0*alpha);
                 break;
             }
             beta = 1.0-alpha;
-            if (beta <= (0.5*NoiseEpsilon))
+            if(beta <= (0.5*NoiseEpsilon))
                 value = (double) pixel+MaxRGB;
             else
                 value = (double) pixel-SigmaLaplacian*log(2.0*beta);
@@ -3469,7 +3469,7 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
             for(x = 0;x < columns;x++)
             {
                 v = (*p);
-                if (*r > v)
+                if(*r > v)
                     v++;
                 *q = v > 255 ? 255 : v;
                 p++;
@@ -3480,7 +3480,7 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
             for(x = 0;x < columns;x++)
             {
                 v = (*p);
-                if (v > (u32) (*r+1))
+                if(v > (u32) (*r+1))
                     v--;
                 *q = v;
                 p++;
@@ -3508,7 +3508,7 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
             for(x = 0; x < (s32) columns; x++)
             {
                 v = (*q);
-                if (((u32) (*s+1) > v) && (*r > v))
+                if(((u32) (*s+1) > v) && (*r > v))
                     v++;
                 *p = v > 255 ? 255 : v;
                 p++;
@@ -3520,7 +3520,7 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
             for(x = 0; x < columns; x++)
             {
                 v = (*q);
-                if (((u32) (*s+1) < v) && (*r < v))
+                if(((u32) (*s+1) < v) && (*r < v))
                     v--;
                 *p = v;
                 p++;

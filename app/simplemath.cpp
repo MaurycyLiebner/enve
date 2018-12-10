@@ -32,6 +32,10 @@ qreal qclamp(qreal val, qreal min, qreal max) {
     return val;
 }
 
+bool isZero4Dec(const float val) {
+    return abs(val) < 0.0001f;
+}
+
 bool isZero4Dec(const double& val) {
     return qAbs(val) < 0.0001;
 }

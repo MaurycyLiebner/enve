@@ -116,7 +116,7 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
     }
     if(mColorMode == colorMode) return;
 
-    void (*foo)(qreal*, qreal*, qreal*);
+    void (*foo)(qreal&, qreal&, qreal&);
     if(mColorMode == RGBMODE && colorMode == HSVMODE) {
         foo = &qrgb_to_hsv;
     } else if(mColorMode == RGBMODE && colorMode == HSLMODE) {
@@ -140,7 +140,7 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
         qreal gF = mVal2Animator->getCurrentValueAtAbsFrame(frame);
         qreal bF = mVal3Animator->getCurrentValueAtAbsFrame(frame);
 
-        foo(&rF, &gF, &bF);
+        foo(rF, gF, bF);
 
         mVal1Animator->qra_saveValueToKey(frame, rF);
         mVal2Animator->qra_saveValueToKey(frame, gF);
@@ -156,7 +156,7 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
         qreal cgF = mVal2Animator->qra_getCurrentValue();
         qreal cbF = mVal3Animator->qra_getCurrentValue();
 
-        foo(&crF, &cgF, &cbF);
+        foo(crF, cgF, cbF);
 
         mVal1Animator->qra_setCurrentValue(crF);
         mVal2Animator->qra_setCurrentValue(cgF);
