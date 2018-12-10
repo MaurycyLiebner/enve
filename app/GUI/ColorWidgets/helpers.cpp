@@ -11,7 +11,7 @@
 //    return d != d;
 //}
 
-void rgb_to_hsv_float (float &r_, float &g_, float &b_) {
+void rgb_to_hsv_float(float &r_, float &g_, float &b_) {
     float max, min, delta;
     float h, s, v;
     float r, g, b;
@@ -56,7 +56,7 @@ void rgb_to_hsv_float (float &r_, float &g_, float &b_) {
 }
 
 // (from gimp_hsv_to_rgb)
-void hsv_to_rgb_float (float &h_, float &s_, float &v_) {
+void hsv_to_rgb_float(float &h_, float &s_, float &v_) {
     int i;
     float f, w, q, t;
     float h, s, v;
@@ -130,7 +130,7 @@ void hsv_to_rgb_float (float &h_, float &s_, float &v_) {
 }
 
 // (from gimp_rgb_to_hsl)
-void rgb_to_hsl_float (float &r_, float &g_, float &b_) {
+void rgb_to_hsl_float(float &r_, float &g_, float &b_) {
     float max, min, delta;
 
     float h, s, l;
@@ -184,7 +184,7 @@ void rgb_to_hsl_float (float &r_, float &g_, float &b_) {
     b_ = l;
 }
 
-static double hsl_value (double n1, double n2, double hue) {
+static double hsl_value(double n1, double n2, double hue) {
     double val;
 
     if(hue > 6.0)
@@ -205,7 +205,7 @@ static double hsl_value (double n1, double n2, double hue) {
 }
 
 
-static float hsl_value (float n1, float n2, float hue) {
+static float hsl_value(float n1, float n2, float hue) {
     float val;
 
     if(hue > 6.f)
@@ -232,7 +232,7 @@ static float hsl_value (float n1, float n2, float hue) {
  *
  * Convert a HSL color value to an RGB color value.
  **/
-void hsl_to_rgb_float (float &h_, float &s_, float &l_) {
+void hsl_to_rgb_float(float &h_, float &s_, float &l_) {
     float h, s, l;
     float r, g, b;
 
@@ -269,11 +269,10 @@ void hsl_to_rgb_float (float &h_, float &s_, float &l_) {
     l_ = b;
 }
 
-void hsv_to_hsl(float &h, float &s, float &v) {
-    float hh = h;
+void hsv_to_hsl(const float &h, float &s, float &v) {
+    Q_UNUSED(h);
     float ss = s;
     float vv = v;
-    h = hh;
     v = (2.f - ss) * vv;
     s = ss * vv;
     s /= (v <= 1.f) ? (v) : 2.f - (v);
@@ -283,11 +282,10 @@ void hsv_to_hsl(float &h, float &s, float &v) {
     }
 }
 
-void hsl_to_hsv(float &h, float &s, float &l) {
-    float hh = h;
+void hsl_to_hsv(const float &h, float &s, float &l) {
+    Q_UNUSED(h);
     float ss = s;
     float ll = l;
-    h = hh;
     ll *= 2.f;
     ss *= (ll <= 1.f) ? ll : 2.f - ll;
     l = (ll + ss) *0.5f;
@@ -297,11 +295,10 @@ void hsl_to_hsv(float &h, float &s, float &l) {
     }
 }
 
-void qhsv_to_hsl(qreal &h, qreal &s, qreal &v) {
-    qreal hh = h;
+void qhsv_to_hsl(const qreal &h, qreal &s, qreal &v) {
+    Q_UNUSED(h);
     qreal ss = s;
     qreal vv = v;
-    h = hh;
     v = (2 - ss) * vv;
     s = ss * vv;
     s /= (v <= 1) ? (v) : 2 - (v);
@@ -312,11 +309,10 @@ void qhsv_to_hsl(qreal &h, qreal &s, qreal &v) {
     }
 }
 
-void qhsl_to_hsv(qreal &h, qreal &s, qreal &l) {
-    qreal hh = h;
+void qhsl_to_hsv(const qreal &h, qreal &s, qreal &l) {
+    Q_UNUSED(h);
     qreal ss = s;
     qreal ll = l;
-    h = hh;
     ll *= 2;
     ss *= (ll <= 1) ? ll : 2 - ll;
     l = (ll + ss) *0.5;
