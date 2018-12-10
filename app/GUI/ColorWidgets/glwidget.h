@@ -20,6 +20,7 @@ private:
     void initializeGL();
     bool mVisible = true;
 protected:
+    GLuint mPlainSquareVAO;
     void resizeGL(int w, int h);
     SkColor4f mBgColor;
 };

@@ -6,12 +6,10 @@
 
 std::string GL_PLAIN_VERT =
         "/home/ailuropoda/Dev/AniVect/src/shaders/plain.vert";
-GLuint GL_PLAIN_SQUARE_VAO;
 GLuint GL_PLAIN_SQUARE_VBO;
 
 std::string GL_TEXTURED_VERT =
         "/home/ailuropoda/Dev/AniVect/src/shaders/textured.vert";
-GLuint GL_TEXTURED_SQUARE_VAO;
 GLuint GL_TEXTURED_SQUARE_VBO;
 
 GLuint GL_BLUR_PROGRAM;
@@ -21,7 +19,7 @@ void assertNoGlErrors() {
     assert(glError == GL_NO_ERROR);
 }
 
-void iniTexturedVShaderData(QGL33c* gl) {
+void iniTexturedVShaderVBO(QGL33c* gl) {
     float vertices[] = {
         // positions        // texture coords
          1.f, -1.f, 0.0f,   1.0f, 0.0f,   // bottom right
@@ -30,15 +28,17 @@ void iniTexturedVShaderData(QGL33c* gl) {
         -1.f,  1.f, 0.0f,   0.0f, 1.0f    // top left
     };
 
-    gl->glGenVertexArrays(1, &GL_TEXTURED_SQUARE_VAO);
-
     gl->glGenBuffers(1, &GL_TEXTURED_SQUARE_VBO);
-
-    gl->glBindVertexArray(GL_TEXTURED_SQUARE_VAO);
-
     gl->glBindBuffer(GL_ARRAY_BUFFER, GL_TEXTURED_SQUARE_VBO);
     gl->glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
                      vertices, GL_STATIC_DRAW);
+}
+
+void iniTexturedVShaderVAO(QGL33c* gl, GLuint &VAO) {
+    gl->glGenVertexArrays(1, &VAO);
+    gl->glBindVertexArray(VAO);
+
+    gl->glBindBuffer(GL_ARRAY_BUFFER, GL_TEXTURED_SQUARE_VBO);
 
     // position attribute
     gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
@@ -50,7 +50,7 @@ void iniTexturedVShaderData(QGL33c* gl) {
     gl->glEnableVertexAttribArray(1);
 }
 
-void iniPlainVShaderData(QGL33c* gl) {
+void iniPlainVShaderVBO(QGL33c* gl) {
     float vertices[] = {
         // positions
          1.f, -1.f, 0.0f,   // bottom right
@@ -59,15 +59,17 @@ void iniPlainVShaderData(QGL33c* gl) {
         -1.f,  1.f, 0.0f    // top left
     };
 
-    gl->glGenVertexArrays(1, &GL_PLAIN_SQUARE_VAO);
-
     gl->glGenBuffers(1, &GL_PLAIN_SQUARE_VBO);
-
-    gl->glBindVertexArray(GL_PLAIN_SQUARE_VAO);
-
     gl->glBindBuffer(GL_ARRAY_BUFFER, GL_PLAIN_SQUARE_VBO);
     gl->glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
                      vertices, GL_STATIC_DRAW);
+}
+
+void iniPlainVShaderVAO(QGL33c* gl, GLuint &VAO) {
+    gl->glGenVertexArrays(1, &VAO);
+    gl->glBindVertexArray(VAO);
+
+    gl->glBindBuffer(GL_ARRAY_BUFFER, GL_PLAIN_SQUARE_VBO);
 
     // position attribute
     gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,

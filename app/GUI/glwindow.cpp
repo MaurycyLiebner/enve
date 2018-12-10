@@ -92,9 +92,11 @@ void GLWindow::initialize() {
 
     bindSkia();
 
-    iniPlainVShaderData(this);
+    iniPlainVShaderVBO(this);
+    iniPlainVShaderVAO(this, mPlainSquareVAO);
+    iniTexturedVShaderVBO(this);
+    iniTexturedVShaderVAO(this, mTexturedSquareVAO);
     iniColorPrograms(this);
-    iniTexturedVShaderData(this);
     iniBlurProgram();
 
 //    qDebug() << "OpenGL Info";

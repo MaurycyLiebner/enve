@@ -4,10 +4,20 @@
 
 struct ColorProgram {
     GLuint fID;
-    GLint fCurrentHSVAColorLoc;
+    GLint fHSVColorLoc;
+    GLint fRGBColorLoc;
+    GLint fHSLColorLoc;
+
     GLint fCurrentValueLoc;
     GLint fHandleWidthLoc;
-    GLint fLightHandle;
+    GLint fLightHandleLoc;
+    GLint fMeshSizeLoc;
+};
+
+struct PlainColorProgram {
+    GLuint fID;
+    GLint fRGBAColorLoc;
+    GLint fMeshSizeLoc;
 };
 
 extern ColorProgram HUE_PROGRAM;
@@ -22,6 +32,8 @@ extern ColorProgram GREEN_PROGRAM;
 extern ColorProgram BLUE_PROGRAM;
 
 extern ColorProgram ALPHA_PROGRAM;
+
+extern PlainColorProgram PLAIN_PROGRAM;
 
 extern GLuint COLOR_WIDGET_VAO;
 extern GLuint COLOR_WIDGET_VBO;

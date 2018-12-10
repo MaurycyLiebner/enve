@@ -538,4 +538,5 @@ DISTFILES += \
     GUI/ColorWidgets/ColorWidgetShaders/hsv_saturation.frag \
     GUI/ColorWidgets/ColorWidgetShaders/lightness.frag \
     GUI/ColorWidgets/ColorWidgetShaders/red.frag \
-    GUI/ColorWidgets/ColorWidgetShaders/value.frag
+    GUI/ColorWidgets/ColorWidgetShaders/value.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/plain.frag

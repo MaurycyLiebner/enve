@@ -307,8 +307,7 @@ void hsl_to_rgb_float (float *h_, float *s_, float *l_) {
   *l_ = b;
 }
 
-void hsv_to_hsl(float* h, float* s, float *v)
-{
+void hsv_to_hsl(float* h, float* s, float *v) {
     float hh = *h;
     float ss = *s;
     float vv = *v;
@@ -317,14 +316,12 @@ void hsv_to_hsl(float* h, float* s, float *v)
     *s = ss * vv;
     *s /= (*v <= 1.f) ? (*v) : 2.f - (*v);
     *v *= 0.5f;
-    if(isnan(*s) )
-    {
+    if(isnan(*s) ) {
         *s = 0.f;
     }
 }
 
-void hsl_to_hsv(float* h, float *s, float *l)
-{
+void hsl_to_hsv(float* h, float *s, float *l) {
     float hh = *h;
     float ss = *s;
     float ll = *l;
@@ -333,8 +330,7 @@ void hsl_to_hsv(float* h, float *s, float *l)
     ss *= (ll <= 1.f) ? ll : 2.f - ll;
     *l = (ll + ss) *0.5f;
     *s = (2.f * ss) / (ll + ss);
-    if(isnan(*s) )
-    {
+    if(isnan(*s)) {
         *s = 0.f;
     }
 }

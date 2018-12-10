@@ -14,6 +14,8 @@ ColorProgram BLUE_PROGRAM;
 
 ColorProgram ALPHA_PROGRAM;
 
+PlainColorProgram PLAIN_PROGRAM;
+
 GLuint COLOR_WIDGET_VAO;
 GLuint COLOR_WIDGET_VBO;
 
@@ -24,10 +26,15 @@ void iniColorProgram(QGL33c* gl,
     iniProgram(gl, program.fID, vShaderPath, fShaderPath);
     gl->glUseProgram(program.fID);
     assertNoGlErrors();
-    program.fCurrentHSVAColorLoc = gl->glGetUniformLocation(
-                program.fID, "currentHSVAColor");
+    program.fHSVColorLoc = gl->glGetUniformLocation(
+                program.fID, "HSVColor");
     assertNoGlErrors();
-    assert(program.fCurrentHSVAColorLoc >= 0);
+    program.fRGBColorLoc = gl->glGetUniformLocation(
+                program.fID, "RGBColor");
+    assertNoGlErrors();
+    program.fHSLColorLoc = gl->glGetUniformLocation(
+                program.fID, "HSLColor");
+    assertNoGlErrors();
     program.fCurrentValueLoc = gl->glGetUniformLocation(
                 program.fID, "currentValue");
     assertNoGlErrors();
@@ -36,10 +43,27 @@ void iniColorProgram(QGL33c* gl,
                 program.fID, "handleWidth");
     assertNoGlErrors();
     assert(program.fHandleWidthLoc >= 0);
-    program.fLightHandle = gl->glGetUniformLocation(
+    program.fLightHandleLoc = gl->glGetUniformLocation(
                 program.fID, "lightHandle");
     assertNoGlErrors();
-    assert(program.fLightHandle >= 0);
+    assert(program.fLightHandleLoc >= 0);
+    program.fMeshSizeLoc = gl->glGetUniformLocation(
+                program.fID, "meshSize");
+    assertNoGlErrors();
+}
+
+void iniPlainColorProgram(QGL33c *gl, const std::string& colorShadersPath) {
+    iniProgram(gl, PLAIN_PROGRAM.fID, GL_PLAIN_VERT,
+               colorShadersPath + "plain.frag");
+    PLAIN_PROGRAM.fRGBAColorLoc = gl->glGetUniformLocation(
+                PLAIN_PROGRAM.fID, "RGBAColor");
+    assertNoGlErrors();
+    assert(PLAIN_PROGRAM.fRGBAColorLoc >= 0);
+
+    PLAIN_PROGRAM.fMeshSizeLoc = gl->glGetUniformLocation(
+                PLAIN_PROGRAM.fID, "meshSize");
+    assertNoGlErrors();
+    assert(PLAIN_PROGRAM.fMeshSizeLoc >= 0);
 }
 
 void iniColorPrograms(QGL33c *gl) {
@@ -65,4 +89,6 @@ void iniColorPrograms(QGL33c *gl) {
 
     iniColorProgram(gl, ALPHA_PROGRAM, GL_PLAIN_VERT,
                     colorShadersPath + "alpha.frag");
+
+    iniPlainColorProgram(gl, colorShadersPath);
 }

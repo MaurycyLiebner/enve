@@ -11,7 +11,8 @@ class ScheduledPostProcess : public StdSelfRef,
 public:
     ScheduledPostProcess();
 private:
-    virtual void process(GrContext * const grContext) = 0;
+    virtual void process(GrContext * const grContext,
+                         const GLuint &texturedSquareVAO) = 0;
 };
 
 typedef std::function<void(sk_sp<SkImage>)> ShaderFinishedFunc;
@@ -39,7 +40,8 @@ private:
                       const GrGLTextureInfo& finalTexInfo);
 
     //! @brief Uses shaders to draw the source image to the final texture.
-    void process(GrContext * const grContext);
+    void process(GrContext * const grContext,
+                 const GLuint &texturedSquareVAO);
 };
 
 class ComplexScheduledPostProcess : public ScheduledPostProcess {
@@ -47,9 +49,10 @@ public:
     ComplexScheduledPostProcess();
 
 private:
-    void process(GrContext * const grContext) {
+    void process(GrContext * const grContext,
+                 const GLuint &texturedSquareVAO) {
         foreach(const auto& child, mChildProcesses) {
-            child->process(grContext);
+            child->process(grContext, texturedSquareVAO);
         }
     }
     QList<stdsptr<ScheduledPostProcess>> mChildProcesses;
@@ -59,7 +62,8 @@ class GpuPostProcessor : protected QGL33c {
 public:
     GpuPostProcessor();
 
-    void process(GrContext * const grContext) {
+    void process(GrContext * const grContext,
+                 const GLuint &texturedSquareVAO) {
         if(mScheduledProcesses.isEmpty()) return;
         if(!mFrameBufferCreated) {
             Q_ASSERT(initializeOpenGLFunctions());
@@ -71,7 +75,7 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferId);
 
         foreach(const auto& scheduled, mScheduledProcesses) {
-            scheduled->process(grContext);
+            scheduled->process(grContext, texturedSquareVAO);
         }
         mScheduledProcesses.clear();
 

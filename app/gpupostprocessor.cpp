@@ -51,7 +51,8 @@ void ShaderPostProcess::adoptTexture(GrContext * const grContext,
                                                   kPremul_SkAlphaType);
 }
 
-void ShaderPostProcess::process(GrContext * const grContext) {
+void ShaderPostProcess::process(GrContext * const grContext,
+                                const GLuint& texturedSquareVAO) {
     if(!mSrcImage) return;
     GLuint srcTexID;
     sk_sp<SkImage> srcTexture(mSrcImage->makeTextureImage(grContext, nullptr));
@@ -76,7 +77,7 @@ void ShaderPostProcess::process(GrContext * const grContext) {
     glClear(GL_COLOR_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, srcTexID);
-    glBindVertexArray(GL_TEXTURED_SQUARE_VAO);
+    glBindVertexArray(texturedSquareVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     assertNoGlErrors();
 

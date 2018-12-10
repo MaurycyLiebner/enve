@@ -295,7 +295,7 @@ void CanvasWindow::processGPU(GrContext* const grContext) {
                     SPtrCreate(ShaderPostProcess)(
                         img, GL_BLUR_PROGRAM, finishFunc));
     }
-    mGpuPostProcessor.process(grContext);
+    mGpuPostProcessor.process(grContext, mTexturedSquareVAO);
 }
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,

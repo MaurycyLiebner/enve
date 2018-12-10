@@ -28,6 +28,9 @@ protected:
     void bindSkia();
     void resizeEvent(QResizeEvent *);
 
+    GLuint mPlainSquareVAO;
+    GLuint mTexturedSquareVAO;
+
     sk_sp<const GrGLInterface> mInterface;
     sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
