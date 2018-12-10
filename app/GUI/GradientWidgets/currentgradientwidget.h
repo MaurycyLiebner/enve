@@ -4,8 +4,7 @@
 #include "GUI/ColorWidgets/glwidget.h"
 class GradientWidget;
 
-class CurrentGradientWidget : public GLWidget
-{
+class CurrentGradientWidget : public GLWidget {
     Q_OBJECT
 public:
     explicit CurrentGradientWidget(GradientWidget *gradientWidget,

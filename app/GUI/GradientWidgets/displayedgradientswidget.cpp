@@ -39,6 +39,8 @@ void DisplayedGradientsWidget::paintGL() {
     glClearColor(1.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(GRADIENT_PROGRAM.fID);
+    glBindVertexArray(mPlainSquareVAO);
+    Gradient* currentGradient = mGradientWidget->getCurrentGradient();
     for(int i = nGradients - 1; i >= mTopGradientId; i--) {
         Gradient *gradient = mGradientWidget->getGradientAt(i);
         int nColors = gradient->getColorCount();
@@ -58,12 +60,25 @@ void DisplayedGradientsWidget::paintGL() {
                         currentColor.redF(), currentColor.greenF(),
                         currentColor.blueF(), currentColor.alphaF());
 
-            glBindVertexArray(mPlainSquareVAO);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    //        if(gradient == mCurrentGradient) {
-    //            GLWidget::drawBorder(0, yT,
-    //                       width(), mScrollItemHeight);
-    //        }
+            if(gradient == currentGradient) {
+                glUseProgram(DOUBLE_BORDER_PROGRAM.fID);
+                glUniform2f(DOUBLE_BORDER_PROGRAM.fInnerBorderSizeLoc,
+                            1.f/xInc, 1.f/mScrollItemHeight);
+                glUniform4f(DOUBLE_BORDER_PROGRAM.fInnerBorderColorLoc,
+                            1.f, 1.f, 1.f, 1.f);
+                glUniform2f(DOUBLE_BORDER_PROGRAM.fOuterBorderSizeLoc,
+                            1.f/xInc, 1.f/mScrollItemHeight);
+                glUniform4f(DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc,
+                            0.f, 0.f, 0.f, 1.f);
+//                glUseProgram(BORDER_PROGRAM.fID);
+//                glUniform2f(BORDER_PROGRAM.fBorderSizeLoc,
+//                            2.f/xInc, 2.f/mScrollItemHeight);
+//                glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
+//                            0.f, 0.f, 0.f, 1.f);
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                glUseProgram(GRADIENT_PROGRAM.fID);
+            }
             xT = qRound(xT) + xInc;
             lastColor = currentColor;
             assertNoGlErrors();

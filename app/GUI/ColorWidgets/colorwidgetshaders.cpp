@@ -17,8 +17,8 @@ ColorProgram ALPHA_PROGRAM;
 PlainColorProgram PLAIN_PROGRAM;
 GradientProgram GRADIENT_PROGRAM;
 
-GLuint COLOR_WIDGET_VAO;
-GLuint COLOR_WIDGET_VBO;
+BorderProgram BORDER_PROGRAM;
+DoubleBorderProgram DOUBLE_BORDER_PROGRAM;
 
 void iniColorProgram(QGL33c* gl,
                      ColorProgram& program,
@@ -67,6 +67,28 @@ void iniPlainColorProgram(QGL33c *gl, const std::string& colorShadersPath) {
     assert(PLAIN_PROGRAM.fMeshSizeLoc >= 0);
 }
 
+void iniBorderProgram(QGL33c *gl, const std::string& colorShadersPath) {
+    iniProgram(gl, BORDER_PROGRAM.fID, GL_PLAIN_VERT,
+               colorShadersPath + "border.frag");
+    BORDER_PROGRAM.fBorderSizeLoc = gl->glGetUniformLocation(
+                BORDER_PROGRAM.fID, "borderSize");
+    BORDER_PROGRAM.fBorderColorLoc = gl->glGetUniformLocation(
+                BORDER_PROGRAM.fID, "borderColor");
+}
+
+void iniDoubleBorderProgram(QGL33c *gl, const std::string& colorShadersPath) {
+    iniProgram(gl, DOUBLE_BORDER_PROGRAM.fID, GL_PLAIN_VERT,
+               colorShadersPath + "doubleborder.frag");
+    DOUBLE_BORDER_PROGRAM.fInnerBorderSizeLoc = gl->glGetUniformLocation(
+                DOUBLE_BORDER_PROGRAM.fID, "innerBorderSize");
+    DOUBLE_BORDER_PROGRAM.fInnerBorderColorLoc = gl->glGetUniformLocation(
+                DOUBLE_BORDER_PROGRAM.fID, "innerBorderColor");
+    DOUBLE_BORDER_PROGRAM.fOuterBorderSizeLoc = gl->glGetUniformLocation(
+                DOUBLE_BORDER_PROGRAM.fID, "outerBorderSize");
+    DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc = gl->glGetUniformLocation(
+                DOUBLE_BORDER_PROGRAM.fID, "outerBorderColor");
+}
+
 void iniGradientProgram(QGL33c *gl, const std::string& colorShadersPath) {
     iniProgram(gl, GRADIENT_PROGRAM.fID, GL_PLAIN_VERT,
                colorShadersPath + "gradient.frag");
@@ -104,4 +126,6 @@ void iniColorPrograms(QGL33c *gl) {
 
     iniPlainColorProgram(gl, colorShadersPath);
     iniGradientProgram(gl, colorShadersPath);
+    iniBorderProgram(gl, colorShadersPath);
+    iniDoubleBorderProgram(gl, colorShadersPath);
 }

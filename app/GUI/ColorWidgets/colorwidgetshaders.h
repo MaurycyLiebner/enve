@@ -27,6 +27,20 @@ struct GradientProgram {
     GLint fMeshSizeLoc;
 };
 
+struct BorderProgram {
+    GLuint fID;
+    GLint fBorderSizeLoc;
+    GLint fBorderColorLoc;
+};
+
+struct DoubleBorderProgram {
+    GLuint fID;
+    GLint fInnerBorderSizeLoc;
+    GLint fInnerBorderColorLoc;
+    GLint fOuterBorderSizeLoc;
+    GLint fOuterBorderColorLoc;
+};
+
 extern ColorProgram HUE_PROGRAM;
 extern ColorProgram HSV_SATURATION_PROGRAM;
 extern ColorProgram VALUE_PROGRAM;
@@ -43,8 +57,8 @@ extern ColorProgram ALPHA_PROGRAM;
 extern PlainColorProgram PLAIN_PROGRAM;
 extern GradientProgram GRADIENT_PROGRAM;
 
-extern GLuint COLOR_WIDGET_VAO;
-extern GLuint COLOR_WIDGET_VBO;
+extern BorderProgram BORDER_PROGRAM;
+extern DoubleBorderProgram DOUBLE_BORDER_PROGRAM;
 
 extern void iniColorPrograms(QGL33c* gl);
 

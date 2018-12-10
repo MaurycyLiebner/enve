@@ -540,4 +540,6 @@ DISTFILES += \
     GUI/ColorWidgets/ColorWidgetShaders/red.frag \
     GUI/ColorWidgets/ColorWidgetShaders/value.frag \
     GUI/ColorWidgets/ColorWidgetShaders/plain.frag \
-    GUI/ColorWidgets/ColorWidgetShaders/gradient.frag
+    GUI/ColorWidgets/ColorWidgetShaders/gradient.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/border.frag \
+    GUI/ColorWidgets/ColorWidgetShaders/doubleborder.frag

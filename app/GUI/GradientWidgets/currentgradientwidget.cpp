@@ -1,14 +1,16 @@
 #include "currentgradientwidget.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
+#include "global.h"
+#include "GUI/ColorWidgets/colorwidgetshaders.h"
 
 CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
                                              QWidget *parent) :
     GLWidget(parent) {
     setMouseTracking(true);
     mGradientWidget = gradientWidget;
-    setFixedHeight(60);
+    setFixedHeight(MIN_WIDGET_HEIGHT);
 }
-#include "GUI/ColorWidgets/colorwidgetshaders.h"
+
 void CurrentGradientWidget::paintGL() {
     glClearColor(1.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -21,7 +23,7 @@ void CurrentGradientWidget::paintGL() {
                 height()/(3.f*xInc), 1.f/3);
     for(int j = 0; j < nColors; j++) {
         QColor currentColor = gradient->getCurrentColorAt(j);
-        glViewport(qRound(xT), 0, qRound(xInc), height());
+        glViewport(qRound(xT), 0, qCeil(xInc), height());
 
 
         glUniform4f(PLAIN_PROGRAM.fRGBAColorLoc,

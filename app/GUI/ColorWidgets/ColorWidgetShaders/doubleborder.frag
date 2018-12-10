@@ -1,0 +1,36 @@
+#version 330 core
+in vec3 pos;
+
+uniform vec2 outerBorderSize;
+uniform vec2 innerBorderSize;
+
+uniform vec4 outerBorderColor;
+uniform vec4 innerBorderColor;
+
+void main(void) {
+    float posXFrac = 0.5f*(1.f + pos.x);
+    float posYFrac = 0.5f*(1.f + pos.y);
+
+    vec2 combinedBorderSize = outerBorderSize + innerBorderSize;
+
+    bool noBorderH = posXFrac > combinedBorderSize.x &&
+            posXFrac < 1.f - combinedBorderSize.x;
+    bool noBorderV = posYFrac > combinedBorderSize.y &&
+            posYFrac < 1.f - combinedBorderSize.y;
+
+    if(noBorderH && noBorderV) {
+        gl_FragColor = vec4(0.f, 0.f, 0.f, 0.f);
+        return;
+    }
+
+    bool innerBorderH = posXFrac > outerBorderSize.x &&
+            posXFrac < 1.f - outerBorderSize.x;
+    bool innerBorderV = posYFrac > outerBorderSize.y &&
+            posYFrac < 1.f - outerBorderSize.y;
+
+    if(innerBorderH && innerBorderV) {
+        gl_FragColor = innerBorderColor;
+        return;
+    }
+    gl_FragColor = outerBorderColor;
+}
