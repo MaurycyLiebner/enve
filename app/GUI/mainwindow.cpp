@@ -79,14 +79,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCurrentPath("");
 
-    mRightDock = new QDockWidget(this);
+    mFillStrokeSettingsDock = new QDockWidget(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
-    mRightDock->setWidget(mFillStrokeSettings);
-    mRightDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    mRightDock->setTitleBarWidget(new QWidget());
-    addDockWidget(Qt::RightDockWidgetArea, mRightDock);
-    mRightDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
-    mRightDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+    QLabel *fillStrokeDockLabel = new QLabel("Fill and Stroke", this);
+    fillStrokeDockLabel->setObjectName("dockLabel");
+    fillStrokeDockLabel->setAlignment(Qt::AlignCenter);
+    mFillStrokeSettingsDock->setTitleBarWidget(fillStrokeDockLabel);
+    mFillStrokeSettingsDock->setWidget(mFillStrokeSettings);
+    mFillStrokeSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
+                                         QDockWidget::DockWidgetFloatable);
+    addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);
+    mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
+    mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
 
     mBottomDock = new QDockWidget(this);
 
@@ -106,19 +110,12 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBrushSettingsDock = new QDockWidget(this);
-    mBrushSettingsDock->setFeatures(mBrushSettingsDock->features().setFlag(
-                               QDockWidget::DockWidgetClosable, false));
+    mBrushSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
+                                    QDockWidget::DockWidgetFloatable);
     mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
     mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
     QLabel *brushDockLabel = new QLabel("Brush Settings", this);
-    brushDockLabel->setStyleSheet(
-                "QLabel {"
-                    "border-top: 0;"
-                    "border-bottom: 1px solid black;"
-                    "color: black;"
-                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                    "stop:0 lightgray, stop:1 darkgray);"
-                "}");
+    brushDockLabel->setObjectName("dockLabel");
     brushDockLabel->setAlignment(Qt::AlignCenter);
     mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
 
@@ -138,19 +135,12 @@ MainWindow::MainWindow(QWidget *parent)
     mFillStrokeSettings->setCanvasWindowPtr(mCanvasWindow);
 
     mLeftDock = new QDockWidget(this);
-    mLeftDock->setFeatures(mLeftDock->features().setFlag(
-                               QDockWidget::DockWidgetClosable, false));
+    mLeftDock->setFeatures(QDockWidget::DockWidgetMovable |
+                           QDockWidget::DockWidgetFloatable);
     mLeftDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
     mLeftDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
     QLabel *leftDockLabel = new QLabel("Current Object", this);
-    leftDockLabel->setStyleSheet(
-                "QLabel {"
-                    "border-top: 0;"
-                    "border-bottom: 1px solid black;"
-                    "color: black;"
-                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                    "stop:0 lightgray, stop:1 darkgray);"
-                "}");
+    leftDockLabel->setObjectName("dockLabel");
     leftDockLabel->setAlignment(Qt::AlignCenter);
     mLeftDock->setTitleBarWidget(leftDockLabel);
 
@@ -177,8 +167,8 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock);
 
     mLeftDock2 = new QDockWidget(this);
-    mLeftDock2->setFeatures(mLeftDock2->features().setFlag(
-                               QDockWidget::DockWidgetClosable, false));
+    mLeftDock2->setFeatures(QDockWidget::DockWidgetMovable |
+                            QDockWidget::DockWidgetFloatable);
     mLeftDock2->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
     mLeftDock2->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
 
@@ -438,7 +428,7 @@ void MainWindow::setupMenuBar() {
     mFillAndStrokeSettingsDock->setShortcut(QKeySequence(Qt::Key_E));
 
     connect(mFillAndStrokeSettingsDock, SIGNAL(toggled(bool)),
-            mRightDock,
+            mFillStrokeSettingsDock,
             SLOT(setVisible(bool)));
 
     mBrushSettingsDockAction = mPanelsMenu->addAction("Brush Settings");

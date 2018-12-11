@@ -198,7 +198,7 @@ private:
 //    QList<BoundingBox*> mBoxesAwaitingUpdate;
 //    bool mNoBoxesAwaitUpdate = true;
 
-    QDockWidget *mRightDock;
+    QDockWidget *mFillStrokeSettingsDock;
     QDockWidget *mBottomDock;
     QDockWidget *mLeftDock;
     QDockWidget *mLeftDock2;
