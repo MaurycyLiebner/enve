@@ -27,7 +27,6 @@ protected:
     int mTopGradientId = 0;
     int mHoveredGradientId = 0;
 
-    int mScrollItemHeight = MIN_WIDGET_HEIGHT;
     int mNumberVisibleGradients = 6;
 
     GradientWidget *mGradientWidget;
