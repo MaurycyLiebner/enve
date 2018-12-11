@@ -132,7 +132,7 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
 
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
-        emit changeFrameRange(0, getMaxFrame());
+        emit changeCanvasFrameRange(0, getMaxFrame());
         emit changeCurrentFrame(getCurrentFrame());
     }
     BoxesGroup *currentGroup;

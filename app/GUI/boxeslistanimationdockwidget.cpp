@@ -91,15 +91,19 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
                                                             10, MIN_WIDGET_HEIGHT,
                                                             false,
                                                             false, this);
-    connect(MemoryHandler::getInstance(), SIGNAL(memoryFreed()),
-            mAnimationWidgetScrollbar, SLOT(update()));
+    connect(MemoryHandler::getInstance(), &MemoryHandler::memoryFreed,
+            mAnimationWidgetScrollbar,
+            qOverload<>(&AnimationWidgetScrollBar::update));
     mAnimationWidgetScrollbar->setTopBorderVisible(false);
 
-    connect(mAnimationWidgetScrollbar, SIGNAL(viewedFramesChanged(int,int)),
-            parent, SLOT(setCurrentFrame(int)) );
+    connect(mAnimationWidgetScrollbar,
+            &AnimationWidgetScrollBar::viewedFrameRangeChanged,
+            parent, &MainWindow::setCurrentFrame);
 
-    connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
-            mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int,int)) );
+    connect(mFrameRangeScrollbar,
+            &AnimationWidgetScrollBar::viewedFrameRangeChanged,
+            this,
+            &BoxesListAnimationDockWidget::setViewedFrameRange);
 
 
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -218,8 +222,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mTimelineLayout->addWidget(mFrameRangeScrollbar, Qt::AlignBottom);
 
-    mFrameRangeScrollbar->emitChange();
-
     mChww = new ChangeWidthWidget(mBoxesListKeysViewStack);
 
     mChww->updatePos();
@@ -268,6 +270,8 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {
     }
     newWidget->connectToChangeWidthWidget(mChww);
     newWidget->connectToFrameWidget(mFrameRangeScrollbar);
+    connect(newWidget, &BoxesListKeysViewWidget::changedFrameRange,
+            this, &BoxesListAnimationDockWidget::setViewedFrameRange);
     mBoxesListKeysViewStack->insertWidget(id, newWidget);
     mBoxesListKeysViewWidgets.insert(id, newWidget);
 
@@ -434,7 +438,6 @@ void BoxesListAnimationDockWidget::setRenderMode() {
 
 void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
-    mAnimationWidgetScrollbar->emitChange();
     mAnimationWidgetScrollbar->update();
     mRenderWidget->setRenderedFrame(frame);
 }
@@ -454,8 +457,18 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
     }
 }
 
-void BoxesListAnimationDockWidget::setMinMaxFrame(
-                                    const int &minFrame,
-                                    const int &maxFrame) {
-    mFrameRangeScrollbar->setMinMaxFrames(minFrame, maxFrame);
+void BoxesListAnimationDockWidget::setViewedFrameRange(
+        const int &minFrame, const int &maxFrame) {
+    mFrameRangeScrollbar->setViewedFrameRange(minFrame, maxFrame);
+    mAnimationWidgetScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
+    foreach(const auto& keysView, mBoxesListKeysViewWidgets) {
+        keysView->setDisplayedFrameRange(minFrame, maxFrame);
+    }
+}
+
+void BoxesListAnimationDockWidget::setCanvasFrameRange(
+        const int &minFrame, const int &maxFrame) {
+    mFrameRangeScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
+    setViewedFrameRange(mFrameRangeScrollbar->getFirstViewedFrame(),
+                        mFrameRangeScrollbar->getLastViewedFrame());
 }

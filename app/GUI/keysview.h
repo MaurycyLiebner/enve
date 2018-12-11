@@ -132,7 +132,7 @@ public slots:
 
     void graphClearAnimatorSelection();
 
-    void setViewedRange(const int &top,
+    void setViewedVerticalRange(const int &top,
                         const int &bottom);
     void clearHovered();
 private slots:

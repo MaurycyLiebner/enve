@@ -30,8 +30,10 @@ public:
     void connectToFrameWidget(AnimationWidgetScrollBar *frameRange);
     void connectToChangeWidthWidget(
             ChangeWidthWidget *changeWidthWidget);
+    void setDisplayedFrameRange(const int& minFrame,
+                             const int& maxFrame);
 signals:
-
+    void changedFrameRange(const int&, const int&);
 public slots:
     void setRuleNone();
     void setRuleSelected();

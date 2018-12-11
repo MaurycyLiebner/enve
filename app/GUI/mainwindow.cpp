@@ -105,8 +105,9 @@ MainWindow::MainWindow(QWidget *parent)
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
     connect(mCanvasWindow, SIGNAL(changeCurrentFrame(int)),
             mBoxesListAnimationDockWidget, SLOT(setCurrentFrame(int)));
-    connect(mCanvasWindow, SIGNAL(changeFrameRange(int,int)),
-            mBoxesListAnimationDockWidget, SLOT(setMinMaxFrame(int,int)));
+    connect(mCanvasWindow, &CanvasWindow::changeCanvasFrameRange,
+            mBoxesListAnimationDockWidget,
+            &BoxesListAnimationDockWidget::setCanvasFrameRange);
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBrushSettingsDock = new QDockWidget(this);
@@ -1337,6 +1338,7 @@ void MainWindow::redo() {
 
 void MainWindow::setCurrentFrameForAllWidgets(const int &frame) {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
+    mCanvasWindow->changeCurrentFrame(frame);
 }
 
 Gradient *MainWindow::getLoadedGradientById(const int &id) {

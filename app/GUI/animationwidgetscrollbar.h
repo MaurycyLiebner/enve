@@ -31,6 +31,13 @@ public:
     }
 
     void setCacheHandler(CacheHandler *handler);
+
+    void setDisplayedFrameRange(const int &minFrame,
+                                const int &maxFrame);
+    void setViewedFrameRange(const int &minFrame,
+                             const int &maxFrame);
+    void setCanvasFrameRange(const int &minFrame,
+                             const int &maxFrame);
 protected:
     qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);
@@ -39,26 +46,18 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *);
 signals:
-    void viewedFramesChanged(int, int);
-public slots:
-    void setViewedFramesRange(const int &startFrame,
-                              const int &endFrame);
-
-    void setMinMaxFrames(const int &minFrame,
-                         const int &maxFrame);
+    void viewedFrameRangeChanged(int, int);
 private:
-    CacheHandler* mCacheHandler_d = nullptr;
     bool mTopBorderVisible = true;
     bool mClamp;
-
+    bool mDisplayTime = false;
     bool mRange;
     bool mPressed = false;
-    QColor mHandleColor = QColor(100, 100, 100);
-    qreal mLastMousePressFrame;
+
     int mSavedFirstFrame;
 
     int mFirstViewedFrame = 0;
-    int mFramesSpan = 50;
+    int mViewedFramesSpan = 50;
 
     int mMinFrame = 0;
     int mMaxFrame = 200;
@@ -66,6 +65,15 @@ private:
     int mMinSpan;
     int mMaxSpan;
     int mSpanInc;
+
+    int mMinCanvasFrame = 0;
+    int mMaxCanvasFrame = 200;
+
+    qreal mFps;
+    qreal mLastMousePressFrame;
+
+    QColor mHandleColor = QColor(100, 100, 100);
+    CacheHandler* mCacheHandler_d = nullptr;
 };
 
 #endif // ANIMATiONWIDGETSCROLLBAR_H

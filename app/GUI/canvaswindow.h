@@ -229,7 +229,7 @@ signals:
     void updateFileUpdatable(_Executor*, int);
 
     void changeCurrentFrame(int);
-    void changeFrameRange(int, int);
+    void changeCanvasFrameRange(int, int);
 public slots:
     void setCurrentBrush(const Brush *brush);
     void replaceBrush(const Brush *oldBrush,

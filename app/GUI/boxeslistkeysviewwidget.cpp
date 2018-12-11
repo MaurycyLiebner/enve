@@ -147,8 +147,9 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mMainLayout->addLayout(mBoxesListLayout);
 
     mKeysViewLayout = new QVBoxLayout();
-    mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(),
-                             this);
+    mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(), this);
+    connect(mKeysView, &KeysView::changedViewedFrames,
+            this, &BoxesListKeysViewWidget::changedFrameRange);
     mKeysViewLayout->addWidget(mKeysView);
     mAnimationDockWidget = new AnimationDockWidget(this, mKeysView);
     mAnimationDockWidget->hide();
@@ -180,8 +181,9 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     connect(mKeysView, SIGNAL(wheelEventSignal(QWheelEvent*)),
             mBoxesListScrollArea, SLOT(callWheelEvent(QWheelEvent*)));
 
-    connect(mBoxesListAnimationDockWidget, SIGNAL(visibleRangeChanged(int,int)),
-            mKeysView, SLOT(setViewedRange(int,int)) );
+    connect(mBoxesListAnimationDockWidget,
+            &BoxesListAnimationDockWidget::viewedVerticalRangeChanged,
+            mKeysView, &KeysView::setViewedVerticalRange);
     mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_HEIGHT);
 
     setLayout(mMainLayout);
@@ -227,17 +229,13 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
     }
-    emit mBoxesListAnimationDockWidget->visibleRangeChanged(
+    emit mBoxesListAnimationDockWidget->viewedVerticalRangeChanged(
                         val,
                         val + mBoxesListScrollArea->height());
 }
 
 void BoxesListKeysViewWidget::connectToFrameWidget(
         AnimationWidgetScrollBar *frameRange) {
-    connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
-            frameRange, SIGNAL(viewedFramesChanged(int,int)));
-    connect(frameRange, SIGNAL(viewedFramesChanged(int,int)),
-            mKeysView, SLOT(setFramesRange(int,int)) );
     mKeysView->setFramesRange(frameRange->getFirstViewedFrame(),
                               frameRange->getLastViewedFrame());
 }
@@ -247,6 +245,11 @@ void BoxesListKeysViewWidget::connectToChangeWidthWidget(
     connect(changeWidthWidget, SIGNAL(widthSet(int)),
             this, SLOT(setBoxesListWidth(int)));
     setBoxesListWidth(changeWidthWidget->getCurrentWidth());
+}
+
+void BoxesListKeysViewWidget::setDisplayedFrameRange(const int &minFrame,
+                                                  const int &maxFrame) {
+    mKeysView->setFramesRange(minFrame, maxFrame);
 }
 
 void BoxesListKeysViewWidget::setBoxesListWidth(const int &width) {

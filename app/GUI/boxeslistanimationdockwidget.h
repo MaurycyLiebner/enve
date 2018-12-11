@@ -74,13 +74,15 @@ public:
     RenderWidget *getRenderWidget();
 public slots:
     void setCurrentFrame(const int &frame);
-    void setMinMaxFrame(const int &minFrame,
-                        const int &maxFrame);
+    void setViewedFrameRange(const int &minFrame,
+                             const int &maxFrame);
+    void setCanvasFrameRange(const int &minFrame,
+                                const int &maxFrame);
     void addNewBoxesListKeysViewWidget(int id = 0);
     void removeBoxesListKeysViewWidget(
             BoxesListKeysViewWidget *widget);
 signals:
-    void visibleRangeChanged(int, int);
+    void viewedVerticalRangeChanged(int, int);
 private slots:
     void setResolutionFractionText(QString text);
 

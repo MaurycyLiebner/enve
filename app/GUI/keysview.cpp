@@ -40,7 +40,7 @@ void KeysView::middlePress(const QPointF &pressPos) {
     mMiddlePressPos = pressPos;
 }
 
-void KeysView::setViewedRange(const int &top,
+void KeysView::setViewedVerticalRange(const int &top,
                               const int &bottom) {
     mViewedTop = top;
     mViewedBottom = bottom;
