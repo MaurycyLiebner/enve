@@ -23,9 +23,10 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void leaveEvent(QEvent *);
 
+    int mContextMenuGradientId = -1;
     int mDisplayedTop = 0;
     int mTopGradientId = 0;
-    int mHoveredGradientId = 0;
+    int mHoveredGradientId = -1;
 
     int mNumberVisibleGradients = 6;
 

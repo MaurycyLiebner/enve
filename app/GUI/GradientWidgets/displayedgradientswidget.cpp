@@ -80,7 +80,7 @@ void DisplayedGradientsWidget::paintGL() {
             lastColor = currentColor;
             assertNoGlErrors();
         }
-        if(i == mHoveredGradientId) {
+        if(i == mHoveredGradientId || i == mContextMenuGradientId) {
             glUseProgram(BORDER_PROGRAM.fID);
             glUniform2f(BORDER_PROGRAM.fBorderSizeLoc,
                         1.f/width(), 1.f/MIN_WIDGET_HEIGHT);
@@ -98,7 +98,16 @@ void DisplayedGradientsWidget::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) {
         mGradientWidget->gradientLeftPressed(gradientId);
     } else if(event->button() == Qt::RightButton) {
+        mContextMenuGradientId = gradientId;
         mGradientWidget->gradientContextMenuReq(gradientId, event->globalPos());
+        mContextMenuGradientId = -1;
+        QPoint relCursorPos = mapFromGlobal(QCursor::pos());
+        if(relCursorPos.x() < 0 || relCursorPos.y() < 0 ||
+                relCursorPos.x() > width() || relCursorPos.y() > height()) {
+            mHoveredGradientId = -1;
+        } else {
+            mHoveredGradientId = relCursorPos.y()/MIN_WIDGET_HEIGHT;
+        }
     }
     update();
 }
