@@ -396,10 +396,14 @@ void KeysView::paintEvent(QPaintEvent *) {
     } else {
         p.save();
         p.setRenderHint(QPainter::Antialiasing);
+        qreal transDFrame = 0.5*MIN_WIDGET_HEIGHT/mPixelsPerFrame;
+        qreal frameAtZeroX = mMinViewedFrame - transDFrame;
+        int frameAtZeroXi = qFloor(frameAtZeroX);
+        p.translate((frameAtZeroXi - mMinViewedFrame)*mPixelsPerFrame, 0.);
         mBoxesListVisible->drawKeys(&p,
                                     mPixelsPerFrame,
-                                    mMinViewedFrame,
-                                    mMaxViewedFrame);
+                                    frameAtZeroXi,
+                                    qCeil(mMaxViewedFrame + 2*transDFrame));
         p.restore();
         if(mSelecting) {
             p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
@@ -472,25 +476,33 @@ void KeysView::clearHoveredMovable() {
 }
 
 void KeysView::scrollRight() {
-    int inc = qMax(1, (int)(2*MIN_WIDGET_HEIGHT/mPixelsPerFrame) );
+    int pixelInc = 2*MIN_WIDGET_HEIGHT;
+    int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame += inc;
     mMaxViewedFrame += inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
     if(mSelecting) {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() +
                                       QPointF(inc, 0.));
+    } else if(mMovingKeys) {
+        mLastPressPos.setX(mLastPressPos.x() - inc*mPixelsPerFrame);
+        handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     }
     update();
 }
 
 void KeysView::scrollLeft() {
-    int inc = qMax(1, (int)(2*MIN_WIDGET_HEIGHT/mPixelsPerFrame) );
+    int pixelInc = 2*MIN_WIDGET_HEIGHT;
+    int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame -= inc;
     mMaxViewedFrame -= inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
     if(mSelecting) {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() -
                                       QPointF(inc, 0.));
+    } else if(mMovingKeys) {
+        mLastPressPos.setX(mLastPressPos.x() + inc*mPixelsPerFrame);
+        handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     }
     update();
 }
