@@ -71,17 +71,22 @@ void DisplayedGradientsWidget::paintGL() {
                             1.f/xInc, 1.f/mScrollItemHeight);
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc,
                             0.f, 0.f, 0.f, 1.f);
-//                glUseProgram(BORDER_PROGRAM.fID);
-//                glUniform2f(BORDER_PROGRAM.fBorderSizeLoc,
-//                            2.f/xInc, 2.f/mScrollItemHeight);
-//                glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
-//                            0.f, 0.f, 0.f, 1.f);
+
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                 glUseProgram(GRADIENT_PROGRAM.fID);
             }
             xT = qRound(xT) + xInc;
             lastColor = currentColor;
             assertNoGlErrors();
+        }
+        if(i == mHoveredGradientId) {
+            glUseProgram(BORDER_PROGRAM.fID);
+            glUniform2f(BORDER_PROGRAM.fBorderSizeLoc,
+                        1.f/width(), 1.f/mScrollItemHeight);
+            glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
+                        1.f, 1.f, 1.f, 1.f);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glUseProgram(GRADIENT_PROGRAM.fID);
         }
         yT += mScrollItemHeight;
         if(yT > gradListHeight + mDisplayedTop) break;

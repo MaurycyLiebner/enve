@@ -493,7 +493,7 @@ void PathBox::drawHoveredSk(SkCanvas *canvas,
     drawHoveredPathSk(canvas, mPathSk, invScale);
 }
 
-void PathBox::applyPaintSetting( PaintSetting *setting) {
+void PathBox::applyPaintSetting(PaintSetting *setting) {
     setting->apply(this);
     scheduleUpdate(Animator::USER_CHANGE);
 }

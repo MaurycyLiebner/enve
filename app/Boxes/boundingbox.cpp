@@ -436,7 +436,8 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
     if(mParentGroup != nullptr) {
-        mParentGroup->scheduleUpdate(reason == USER_CHANGE ? CHILD_USER_CHANGE : reason);
+        mParentGroup->scheduleUpdate(reason == USER_CHANGE ?
+                                         CHILD_USER_CHANGE : reason);
     }
 
     emit scheduledUpdate();

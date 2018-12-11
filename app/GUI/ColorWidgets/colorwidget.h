@@ -3,10 +3,6 @@
 #include "glwidget.h"
 #include "GUI/ColorWidgets/helpers.h"
 
-extern bool shouldValPointerBeLightHSV(GLfloat hue, GLfloat saturation, GLfloat value);
-extern bool shouldValPointerBeLightHSL(GLfloat hue, GLfloat saturation, GLfloat lightness);
-extern bool shouldValPointerBeLightRGB(GLfloat r, GLfloat g, GLfloat b);
-
 class ColorWidget : public GLWidget {
     Q_OBJECT
 public:

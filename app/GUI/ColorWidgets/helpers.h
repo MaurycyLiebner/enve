@@ -8,6 +8,16 @@ enum ColorMode : short {
     HSLMODE
 };
 
+extern bool shouldValPointerBeLightHSV(const GLfloat &hue,
+                                       const GLfloat &saturation,
+                                       const GLfloat &value);
+extern bool shouldValPointerBeLightHSL(GLfloat hue,
+                                       GLfloat saturation,
+                                       GLfloat lightness);
+extern bool shouldValPointerBeLightRGB(GLfloat r,
+                                       GLfloat g,
+                                       GLfloat b);
+
 extern void rgb_to_hsv_float (float &r_ /*h*/, float &g_ /*s*/, float &b_ /*v*/);
 extern void hsv_to_rgb_float (float &h_, float &s_, float &v_);
 extern void rgb_to_hsl_float (float &r_, float &g_, float &b_);

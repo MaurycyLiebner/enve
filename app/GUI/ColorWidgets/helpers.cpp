@@ -5,6 +5,27 @@
 #include "glhelpers.h"
 
 
+bool shouldValPointerBeLightHSV(const GLfloat &hue,
+                                const GLfloat &saturation,
+                                const GLfloat &value) {
+    if(value < 0.6f) return true;
+    return hue > 0.55f && (saturation > 0.5f || value < 0.7f);
+}
+
+bool shouldValPointerBeLightHSL(GLfloat hue,
+                                GLfloat saturation,
+                                GLfloat lightness) {
+    hsl_to_hsv(hue, saturation, lightness);
+    return shouldValPointerBeLightHSV(hue, saturation, lightness);
+}
+
+bool shouldValPointerBeLightRGB(GLfloat r,
+                                GLfloat g,
+                                GLfloat b) {
+    rgb_to_hsv_float(r, g, b);
+    return shouldValPointerBeLightHSV(r, g, b);
+}
+
 //bool isnan(float var)
 //{
 //    volatile float d = var;

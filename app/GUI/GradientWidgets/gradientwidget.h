@@ -56,6 +56,10 @@ public:
     Gradient* getGradientAt(const int& id) const {
         return mGradients.at(id).get();
     }
+
+    int getCurrentColorId() const {
+        return mCurrentColorId;
+    }
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);
