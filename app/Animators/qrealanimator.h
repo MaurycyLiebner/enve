@@ -62,6 +62,8 @@ public:
 
     qreal qra_getPrevKeyValue(QrealKey *key);
     qreal qra_getNextKeyValue(QrealKey *key);
+    int qra_getPrevKeyRelFrame(QrealKey *key);
+    int qra_getNextKeyRelFrame(QrealKey *key);
 
     virtual void prp_retrieveSavedValue();
     void qra_incCurrentValue(const qreal &incBy,
@@ -185,7 +187,7 @@ public:
                                   QrealKey *nextKey) const;
     qreal getCurrentValueAtRelFrameF(const qreal &frame) const;
     qreal getCurrentValueAtAbsFrameF(const qreal &frame);
- protected:
+protected:
     QrealAnimator(const QString& name);
 
     bool mMinMaxValuesFrozen = false;

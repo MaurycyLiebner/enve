@@ -46,8 +46,9 @@ public:
     qreal getStartValueFrame();
     qreal getEndValueFrame();
 
-    virtual void setStartEnabled(const bool &bT);
+    void makeStarAndEndSmooth();
 
+    virtual void setStartEnabled(const bool &bT);
     virtual void setEndEnabled(const bool &bT);
 
     bool isInsideRect(const QRectF &valueFrameRect);
@@ -69,6 +70,9 @@ public:
 
     qreal getPrevKeyValue();
     qreal getNextKeyValue();
+
+    int getPrevKeyRelFrame();
+    int getNextKeyRelFrame();
 
     void incValue(const qreal &incBy,
                   const bool &saveUndoRedo = false,

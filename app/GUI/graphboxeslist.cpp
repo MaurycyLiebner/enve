@@ -25,6 +25,82 @@ void KeysView::graphSetCornerCtrl() {
     mMainWindow->callUpdateSchedulers();
 }
 
+void KeysView::getSelectedSegments(QList<QList<QrealKey*>>& segments) {
+    sortSelectedKeys();
+    QList<QrealKey*> currentSegment;
+    QrealAnimator* currentAnimator = nullptr;
+    bool currentAnimatorSelected = false;
+    QrealKey* lastKey = nullptr;
+    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
+        if(!currentAnimatorSelected) {
+            if(currentAnimator == key->getParentQrealAnimator()) {
+                continue;
+            }
+        }
+        if(!lastKey) {
+            currentAnimator = key->getParentQrealAnimator();
+            currentAnimatorSelected = mAnimators.contains(currentAnimator);
+            if(!currentAnimatorSelected) continue;
+            lastKey = key;
+            currentSegment << key;
+            continue;
+        }
+        if(lastKey->getNextKey() != key) {
+            if(currentSegment.count() >= 2) {
+                segments << currentSegment;
+            }
+            currentSegment.clear();
+            if(currentAnimator != key->getParentQrealAnimator()) {
+                currentAnimator = key->getParentQrealAnimator();
+                currentAnimatorSelected =
+                        mAnimators.contains(currentAnimator);
+                if(!currentAnimatorSelected) {
+                    lastKey = nullptr;
+                    continue;
+                }
+            }
+        }
+        currentSegment << key;
+        lastKey = key;
+    }
+    if(currentSegment.count() >= 2) {
+        segments << currentSegment;
+    }
+}
+
+void KeysView::graphMakeSegmentsSmooth(const bool& smooth) {
+    if(mSelectedKeys.isEmpty()) return;
+    QList<QList<QrealKey*>> segments;
+    getSelectedSegments(segments);
+
+    Q_FOREACH(const auto& segment, segments) {
+        Q_ASSERT(segment.length() > 1);
+        auto firstKey = segment.first();
+        auto lastKey = segment.last();
+        firstKey->setEndEnabled(smooth);
+        if(smooth) firstKey->makeStarAndEndSmooth();
+        for(int i = 1; i < segment.length() - 1; i++) {
+            auto innerKey = segment.at(i);
+            innerKey->setEndEnabled(smooth);
+            innerKey->setStartEnabled(smooth);
+            if(smooth) innerKey->makeStarAndEndSmooth();
+        }
+        lastKey->setStartEnabled(smooth);
+        if(smooth) firstKey->makeStarAndEndSmooth();
+    }
+
+    graphConstrainAnimatorCtrlsFrameValues();
+    mMainWindow->callUpdateSchedulers();
+}
+
+void KeysView::graphMakeSegmentsLinear() {
+    graphMakeSegmentsSmooth(false);
+}
+
+void KeysView::graphMakeSegmentsSmooth() {
+    graphMakeSegmentsSmooth(true);
+}
+
 void KeysView::graphPaint(QPainter *p) {
     p->setBrush(Qt::NoBrush);
 
@@ -95,7 +171,7 @@ void KeysView::graphPaint(QPainter *p) {
     p->setTransform(QTransform(transform), true);
 
     for(int i = 0; i < mAnimators.count(); i++) {
-        const QColor &col = ANIMATORCOLORS.at(i % ANIMATORCOLORS.length());
+        const QColor &col = ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
         QrealAnimator *animator = mAnimators.at(i);
         animator->drawKeysPath(p, col);
     }
@@ -258,8 +334,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
     }
 }
 
-void KeysView::graphMouseRelease()
-{
+void KeysView::graphMouseRelease() {
     if(mSelecting) {
         if(!mMainWindow->isShiftPressed()) {
             graphClearKeysSelection();
@@ -579,14 +654,13 @@ void KeysView::graphResetValueScaleAndMinShown() {
     graphUpdateDimensions();
 }
 
-#include "singlewidgetabstraction.h"
 void KeysView::updateAnimatorsColors() {
     int i = 0;
     Q_FOREACH(QrealAnimator *animator, mAnimators) {
         animator->setAnimatorColor(mBoxesListVisible,
-                                   ANIMATORCOLORS.at(
+                                   ANIMATOR_COLORS.at(
                                        i %
-                                       ANIMATORCOLORS.length()));
+                                       ANIMATOR_COLORS.length()));
         i++;
     }
 }

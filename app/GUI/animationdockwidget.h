@@ -19,8 +19,8 @@ public slots:
 
 private:
     QHBoxLayout *mButtonsLayout;
-    ActionButton *mActionLine;
-    ActionButton *mActionCurve;
+    ActionButton *mLineButton;
+    ActionButton *mCurveButton;
     ActionButton *mSmoothButton;
     ActionButton *mSymmetricButton;
     ActionButton *mCornerButton;

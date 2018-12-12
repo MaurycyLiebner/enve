@@ -621,6 +621,18 @@ qreal QrealAnimator::qra_getNextKeyValue(QrealKey *key) {
     return getQrealKeyAtId(keyId + 1)->getValue();
 }
 
+int QrealAnimator::qra_getPrevKeyRelFrame(QrealKey *key) {
+    int keyId = anim_getKeyIndex(key);
+    if(keyId == 0) return key->getRelFrame();
+    return getQrealKeyAtId(keyId - 1)->getRelFrame();
+}
+
+int QrealAnimator::qra_getNextKeyRelFrame(QrealKey *key) {
+    int keyId = anim_getKeyIndex(key);
+    if(keyId == anim_mKeys.count() - 1) return key->getRelFrame();
+    return getQrealKeyAtId(keyId + 1)->getRelFrame();
+}
+
 void QrealAnimator::prp_retrieveSavedValue() {
     qra_setCurrentValue(mSavedCurrentValue);
 }

@@ -10,82 +10,79 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     QToolBar(parent) {
     setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    setIconSize(QSize(1.25*MIN_WIDGET_HEIGHT,
-                      1.25*MIN_WIDGET_HEIGHT));
+    setIconSize(QSize(qRound(1.25*MIN_WIDGET_HEIGHT),
+                      qRound(1.25*MIN_WIDGET_HEIGHT)));
+    mLineButton = new ActionButton(
+                ":/icons/node_line.png",
+                "MAKE SEGMENT LINE", this);
+    connect(mLineButton, &ActionButton::pressed,
+            keysView, &KeysView::graphMakeSegmentsLinear);
+
+    mCurveButton = new ActionButton(
+                ":/icons/node_curve.png",
+                "MAKE SEGMENT CURVE", this);
+    connect(mCurveButton, &ActionButton::pressed,
+            keysView, qOverload<>(&KeysView::graphMakeSegmentsSmooth));
+
     mSymmetricButton = new ActionButton(
                 ":/icons/node_symmetric.png",
                 "", this);
-//    mSymmetricButton->setSizePolicy(QSizePolicy::Maximum,
-//                                    QSizePolicy::Maximum);
-    connect(mSymmetricButton, SIGNAL(pressed()),
-            keysView, SLOT(graphSetSymmetricCtrl()) );
+    connect(mSymmetricButton, &ActionButton::pressed,
+            keysView, &KeysView::graphSetSymmetricCtrl);
 
     mSmoothButton = new ActionButton(
                 ":/icons/node_smooth.png",
                 "", this);
-//    mSmoothButton->setSizePolicy(QSizePolicy::Maximum,
-//                                 QSizePolicy::Maximum);
-    connect(mSmoothButton, SIGNAL(pressed()),
-            keysView, SLOT(graphSetSmoothCtrl()) );
+    connect(mSmoothButton, &ActionButton::pressed,
+            keysView, &KeysView::graphSetSmoothCtrl);
 
     mCornerButton = new ActionButton(
                 ":/icons/node_cusp.png",
                 "", this);
-//    mCornerButton->setSizePolicy(QSizePolicy::Maximum,
-//                                 QSizePolicy::Maximum);
-    connect(mCornerButton, SIGNAL(pressed()),
-            keysView, SLOT(graphSetCornerCtrl()) );
+    connect(mCornerButton, &ActionButton::pressed,
+            keysView, &KeysView::graphSetCornerCtrl);
 
     mFitToHeightButton = new ActionButton(
                 ":/icons/zoom.png",
                 "", this);
-//    mCornerButton->setSizePolicy(QSizePolicy::Maximum,
-//                                 QSizePolicy::Maximum);
-    connect(mFitToHeightButton, SIGNAL(pressed()),
-            keysView, SLOT(graphResetValueScaleAndMinShownAction()) );
+    connect(mFitToHeightButton, &ActionButton::pressed,
+            keysView, &KeysView::graphResetValueScaleAndMinShownAction);
 
 //    mTwoSideCtrlButton = new ActionButton(
 //                ":/icons/two_side_ctrl_white.png",
 //                "", this);
 // //    mTwoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 // //                                     QSizePolicy::Maximum);
-//    connect(mTwoSideCtrlButton, SIGNAL(pressed()),
-//            keysView, SLOT(graphSetTwoSideCtrlForSelected()) );
+//    connect(mTwoSideCtrlButton, &ActionButton::pressed,
+//            keysView, &KeysView::graphSetTwoSideCtrlForSelected()) );
 
 //    mLeftSideCtrlButton = new ActionButton(
 //                ":/icons/left_side_ctrl_white.png",
 //                "", this);
 // //    mLeftSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 // //                                       QSizePolicy::Maximum);
-//    connect(mLeftSideCtrlButton, SIGNAL(pressed()),
-//            keysView, SLOT(graphSetLeftSideCtrlForSelected()) );
+//    connect(mLeftSideCtrlButton, &ActionButton::pressed,
+//            keysView, &KeysView::graphSetLeftSideCtrlForSelected()) );
 
 //    mRightSideCtrlButton = new ActionButton(
 //                ":/icons/right_side_ctrl_white.png",
 //                "", this);
 // //    mRightSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 // //                                        QSizePolicy::Maximum);
-//    connect(mRightSideCtrlButton, SIGNAL(pressed()),
-//            keysView, SLOT(graphSetRightSideCtrlForSelected()) );
+//    connect(mRightSideCtrlButton, &ActionButton::pressed,
+//            keysView, &KeysView::graphSetRightSideCtrlForSelected()) );
 
 //    mNoSideCtrlButton = new ActionButton(
 //                ":/icons/no_side_ctrl_white.png",
 //                "", this);
 // //    mNoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 // //                                     QSizePolicy::Maximum);
-//    connect(mNoSideCtrlButton, SIGNAL(pressed()),
-//            keysView, SLOT(graphSetNoSideCtrlForSelected()) );
-    mActionLine = new ActionButton(
-                ":/icons/node_line.png",
-                "MAKE SEGMENT LINE", this);
-    addWidget(mActionLine);
-
-    mActionCurve = new ActionButton(
-                ":/icons/node_curve.png",
-                "MAKE SEGMENT CURVE", this);
-    addWidget(mActionCurve);
+//    connect(mNoSideCtrlButton, &ActionButton::pressed,
+//            keysView, &KeysView::graphSetNoSideCtrlForSelected()) );
 
 
+    addWidget(mLineButton);
+    addWidget(mCurveButton);
     addSeparator();
     addWidget(mSymmetricButton);
     addWidget(mSmoothButton);

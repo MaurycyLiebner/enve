@@ -1075,12 +1075,6 @@ int MainWindow::getFrameCount() {
     return mCanvasWindow->getMaxFrame();
 }
 #include "GUI/GradientWidgets/gradientwidget.h"
-void MainWindow::setCurrentFrame(int frame) {
-    mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
-    mCanvasWindow->updateAfterFrameChanged(frame);
-
-    callUpdateSchedulers();
-}
 
 void MainWindow::newFile() {
     if(askForSaving()) {
@@ -1336,9 +1330,11 @@ void MainWindow::redo() {
     callUpdateSchedulers();
 }
 
-void MainWindow::setCurrentFrameForAllWidgets(const int &frame) {
+void MainWindow::setCurrentFrame(const int &frame) {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
-    mCanvasWindow->changeCurrentFrame(frame);
+    mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
+    mCanvasWindow->updateAfterFrameChanged(frame);
+    callUpdateSchedulers();
 }
 
 Gradient *MainWindow::getLoadedGradientById(const int &id) {

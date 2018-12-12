@@ -573,6 +573,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         }
                     }
                 } else if(mMovingRect) {
+                    auto canvasWindow = mMainWindow->getCanvasWindow();
                     if(mFirstMove) {
                         if(mLastPressedDurationRectangleMovable != nullptr) {
                             if(!mLastPressedDurationRectangleMovable->isSelected()) {
@@ -580,14 +581,11 @@ void KeysView::handleMouseMove(const QPoint &pos,
                                             mMainWindow->isShiftPressed());
                             }
                             if(mLastPressedDurationRectangleMovable->isDurationRect()) {
-                                mMainWindow->getCanvasWindow()->
-                                        startDurationRectPosTransformForAllSelected();
+                                canvasWindow->startDurationRectPosTransformForAllSelected();
                             } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
-                                mMainWindow->getCanvasWindow()->
-                                        startMaxFramePosTransformForAllSelected();
+                                canvasWindow->startMaxFramePosTransformForAllSelected();
                             } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
-                                mMainWindow->getCanvasWindow()->
-                                        startMinFramePosTransformForAllSelected();
+                                canvasWindow->startMinFramePosTransformForAllSelected();
                             }
                         }
                     }
@@ -602,11 +600,11 @@ void KeysView::handleMouseMove(const QPoint &pos,
                     if(dDFrame != 0) {
                         mMoveDFrame = dFrame;
                         if(mLastPressedDurationRectangleMovable->isDurationRect()) {
-                            mMainWindow->getCanvasWindow()->moveDurationRectForAllSelected(dDFrame);
+                            canvasWindow->moveDurationRectForAllSelected(dDFrame);
                         } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
-                            mMainWindow->getCanvasWindow()->moveMaxFrameForAllSelected(dDFrame);
+                            canvasWindow->moveMaxFrameForAllSelected(dDFrame);
                         } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
-                            mMainWindow->getCanvasWindow()->moveMinFrameForAllSelected(dDFrame);
+                            canvasWindow->moveMinFrameForAllSelected(dDFrame);
                         }
 //                        mLastPressedDurationRectangleMovable->changeFramePosBy(
 //                                    dDFrame);
@@ -697,12 +695,13 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 } else {
                     mMoveDFrame = 0;
                     mMovingRect = false;
+                    auto canvasWindow = mMainWindow->getCanvasWindow();
                     if(mLastPressedDurationRectangleMovable->isDurationRect()) {
-                        mMainWindow->getCanvasWindow()->finishDurationRectPosTransformForAllSelected();
+                        canvasWindow->finishDurationRectPosTransformForAllSelected();
                     } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
-                        mMainWindow->getCanvasWindow()->finishMinFramePosTransformForAllSelected();
+                        canvasWindow->finishMinFramePosTransformForAllSelected();
                     } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
-                        mMainWindow->getCanvasWindow()->finishMaxFramePosTransformForAllSelected();
+                        canvasWindow->finishMaxFramePosTransformForAllSelected();
                     }
                 }
             }
@@ -742,6 +741,18 @@ void KeysView::updatePixelsPerFrame() {
     qreal animWidth = width() - 2*MIN_WIDGET_HEIGHT;
     qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
     mPixelsPerFrame = animWidth/dFrame;
+}
+
+bool selectedKeysSort(const stdptr<Key> &key1,
+                      const stdptr<Key> &key2) {
+    if(key1->getParentAnimator() == key2->getParentAnimator()) {
+        return key1->getRelFrame() < key2->getRelFrame();
+    }
+    return key1->getParentAnimator() < key2->getParentAnimator();
+}
+
+void KeysView::sortSelectedKeys() {
+    std::sort(mSelectedKeys.begin(), mSelectedKeys.end(), selectedKeysSort);
 }
 
 void KeysView::addKeyToSelection(Key *key) {

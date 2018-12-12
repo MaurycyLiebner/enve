@@ -313,29 +313,33 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
         QKeyEvent *event) {
     if(event->key() == Qt::Key_Right &&
             !(event->modifiers() & Qt::ControlModifier)) {
-        setCurrentFrame(mMainWindow->getCurrentFrame() + 1);
+        mMainWindow->setCurrentFrame(
+                    mMainWindow->getCurrentFrame() + 1);
     } else if(event->key() == Qt::Key_Left &&
               !(event->modifiers() & Qt::ControlModifier)) {
-        setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
+        mMainWindow->setCurrentFrame(
+                    mMainWindow->getCurrentFrame() - 1);
     } else if(event->key() == Qt::Key_Down &&
               !(event->modifiers() & Qt::ControlModifier)) {
-        Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
+        Canvas *currCanvas =
+                mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(currCanvas == nullptr) return false;
         int targetFrame;
         if(currCanvas->prp_prevRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
                 targetFrame)) {
-            setCurrentFrame(targetFrame);
+            mMainWindow->setCurrentFrame(targetFrame);
         }
     } else if(event->key() == Qt::Key_Up &&
               !(event->modifiers() & Qt::ControlModifier)) {
-        Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
+        Canvas *currCanvas =
+                mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(currCanvas == nullptr) return false;
         int targetFrame;
         if(currCanvas->prp_nextRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
                 targetFrame)) {
-            setCurrentFrame(targetFrame);
+            mMainWindow->setCurrentFrame(targetFrame);
         }
     } else if(event->key() == Qt::Key_P &&
               !(event->modifiers() & Qt::ControlModifier) &&
@@ -440,6 +444,9 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
     mAnimationWidgetScrollbar->update();
     mRenderWidget->setRenderedFrame(frame);
+    foreach(const auto& keysView, mBoxesListKeysViewWidgets) {
+        keysView->update();
+    }
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(

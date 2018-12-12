@@ -55,8 +55,7 @@ private:
     int mPressX;
 };
 
-class BoxesListAnimationDockWidget : public QWidget
-{
+class BoxesListAnimationDockWidget : public QWidget {
     Q_OBJECT
 public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);

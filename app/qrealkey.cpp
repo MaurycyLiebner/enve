@@ -92,6 +92,16 @@ qreal QrealKey::getNextKeyValue() {
     return getParentQrealAnimator()->qra_getNextKeyValue(this);
 }
 
+int QrealKey::getPrevKeyRelFrame() {
+    if(mParentAnimator == nullptr) return mRelFrame;
+    return getParentQrealAnimator()->qra_getPrevKeyRelFrame(this);
+}
+
+int QrealKey::getNextKeyRelFrame() {
+    if(mParentAnimator == nullptr) return mRelFrame;
+    return getParentQrealAnimator()->qra_getNextKeyRelFrame(this);
+}
+
 void QrealKey::constrainStartCtrlMinFrame(const int &minFrame) {
     if(mStartFrame > minFrame || !mStartEnabled) return;
     qreal newFrame = clamp(mStartFrame, minFrame, mRelFrame);
@@ -309,6 +319,22 @@ qreal QrealKey::getStartValueFrame() {
 qreal QrealKey::getEndValueFrame() {
     if(mEndEnabled) return mEndFrame;
     return mRelFrame;
+}
+
+void QrealKey::makeStarAndEndSmooth() {
+    qreal nextKeyVal = getNextKeyValue();
+    qreal prevKeyVal = getPrevKeyValue();
+    int nextKeyFrame = getNextKeyRelFrame();
+    int prevKeyFrame = getPrevKeyRelFrame();
+    qreal valIncPerFrame;
+    if(nextKeyFrame == mRelFrame || prevKeyFrame == mRelFrame) {
+        valIncPerFrame = 0.;
+    } else {
+        valIncPerFrame =
+                (nextKeyVal - prevKeyVal)/(nextKeyFrame - prevKeyFrame);
+    }
+    mStartValue = mValue + (mStartFrame - mRelFrame)*valIncPerFrame;
+    mEndValue = mValue + (mEndFrame - mRelFrame)*valIncPerFrame;
 }
 
 void QrealKey::setStartEnabled(const bool &bT) {

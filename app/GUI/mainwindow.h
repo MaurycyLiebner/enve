@@ -127,7 +127,6 @@ public:
 
     void setResolutionFraction(qreal percent);
 
-    void setCurrentFrameForAllWidgets(const int &frame);
     void updateSettingsForCurrentCanvas();
 
     void replaceClipboard(const stdsptr<ClipboardContainer> &container);
@@ -154,7 +153,7 @@ public:
         return mUsageWidget;
     }
 public slots:
-    void setCurrentFrame(int frame);
+    void setCurrentFrame(const int &frame);
     //void playPreview();
    // void stopPreview();
     void setResolutionFractionValue(const qreal &value);

@@ -33,7 +33,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     std::function<bool(int)> changeFrameFunc =
     [this](const int& undoRedoFrame) {
         if(undoRedoFrame != mMainWindow->getCurrentFrame()) {
-            mMainWindow->setCurrentFrameForAllWidgets(undoRedoFrame);
+            mMainWindow->setCurrentFrame(undoRedoFrame);
             return true;
         }
         return false;

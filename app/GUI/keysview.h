@@ -6,7 +6,7 @@
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
 
-const QList<QColor> ANIMATORCOLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
+const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),
                                       QColor(0, 255, 0)};
 
@@ -122,6 +122,8 @@ public slots:
     void setFramesRange(const int &startFrame,
                         const int &endFrame);
 
+    void graphMakeSegmentsLinear();
+    void graphMakeSegmentsSmooth();
     void graphSetSmoothCtrl();
     void graphSetSymmetricCtrl();
     void graphSetCornerCtrl();
@@ -139,6 +141,13 @@ private slots:
     void scrollRight();
     void scrollLeft();
 private:
+    void graphConstrainAnimatorCtrlsFrameValues();
+    void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
+    void graphMakeSegmentsSmooth(const bool &smooth);
+    void getSelectedSegments(QList<QList<QrealKey *> > &segments);
+    void sortSelectedKeys();
+    void clearHoveredPoint();
+
     stdsptr<KeysClipboardContainer> getSelectedKeysClipboardContainer();
 
     QTimer *mScrollTimer;
@@ -194,9 +203,6 @@ private:
     qreal mSavedMinShownValue = 0.;
     qreal mValueInc = 0.;
     int mValuePrec = 2;
-    void graphConstrainAnimatorCtrlsFrameValues();
-    void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
-    void clearHoveredPoint();
 };
 
 #endif // KEYSVIEW_H
