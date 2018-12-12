@@ -154,6 +154,7 @@ public:
     void moveMaxFrameForAllSelected(const int &dFrame);
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
+    void scheduleGpuTask(const stdsptr<ScheduledPostProcess> &process);
 private:
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
@@ -222,7 +223,6 @@ private:
     void qRender(QPainter *p);
     void renderSk(SkCanvas * const canvas,
                   GrContext * const grContext);
-    void processGPU(GrContext * const grContext);
     void tabletEvent(QTabletEvent *e);
 signals:
     void updateUpdatable(_Executor*, int);

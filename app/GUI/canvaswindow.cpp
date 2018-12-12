@@ -280,23 +280,6 @@ void CanvasWindow::qRender(QPainter *p) {
     //mCurrentCanvas->drawInputText(p);
 }
 #include "glhelpers.h"
-void CanvasWindow::processGPU(GrContext* const grContext) {
-    if(!mCurrentCanvas) return;
-    auto children = mCurrentCanvas->getContainedBoxesList();
-    if(!children.isEmpty()) {
-        auto child = children.takeFirst();
-        auto rendCont = child->getDrawRenderContainer_TEST();
-        auto img = rendCont->getImageSk();
-        ShaderFinishedFunc finishFunc = [&rendCont](const sk_sp<SkImage>& finished) {
-            if(!finished) return;
-            rendCont->replaceImageSk(finished);
-        };
-        mGpuPostProcessor.addToProcess(
-                    SPtrCreate(ShaderPostProcess)(
-                        img, GL_BLUR_PROGRAM, finishFunc));
-    }
-    mGpuPostProcessor.process(grContext, mTexturedSquareVAO);
-}
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
@@ -304,7 +287,13 @@ void CanvasWindow::renderSk(SkCanvas * const canvas,
         canvas->clear(SK_ColorBLACK);
         return;
     }
+    mGpuPostProcessor.process(grContext, mTexturedSquareVAO);
     mCurrentCanvas->renderSk(canvas, grContext);
+}
+
+void CanvasWindow::scheduleGpuTask(
+        const stdsptr<ScheduledPostProcess>& process) {
+    mGpuPostProcessor.addToProcess(process);
 }
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
@@ -824,7 +813,8 @@ bool CanvasWindow::shouldProcessAwaitingSchedulers() {
     return mNoBoxesAwaitUpdate;// || !mFreeThreads.isEmpty();
 }
 
-void CanvasWindow::addUpdatableAwaitingUpdate(const stdsptr<_Executor>& updatable) {
+void CanvasWindow::addUpdatableAwaitingUpdate(
+        const stdsptr<_Executor>& updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
@@ -835,7 +825,8 @@ void CanvasWindow::addUpdatableAwaitingUpdate(const stdsptr<_Executor>& updatabl
     }
 }
 
-void CanvasWindow::addFileUpdatableAwaitingUpdate(const stdsptr<_Executor>& updatable) {
+void CanvasWindow::addFileUpdatableAwaitingUpdate(
+        const stdsptr<_Executor>& updatable) {
     mFileUpdatablesAwaitingUpdate << updatable;
 
     if(mNoFileAwaitUpdate) {
@@ -845,7 +836,7 @@ void CanvasWindow::addFileUpdatableAwaitingUpdate(const stdsptr<_Executor>& upda
 }
 
 void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
-                                              _Executor *lastUpdatable) {
+                                                  _Executor *lastUpdatable) {
     Q_UNUSED(threadId);
     if(lastUpdatable != nullptr) {
         lastUpdatable->updateFinished();

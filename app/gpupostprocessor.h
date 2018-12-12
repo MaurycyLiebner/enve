@@ -71,11 +71,14 @@ public:
             glGenFramebuffers(1, &mFrameBufferId);
             mFrameBufferCreated = true;
         }
+        assertNoGlErrors();
        // mFrameBuffer->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferId);
+        assertNoGlErrors();
 
         foreach(const auto& scheduled, mScheduledProcesses) {
             scheduled->process(grContext, texturedSquareVAO);
+            assertNoGlErrors();
         }
         mScheduledProcesses.clear();
 

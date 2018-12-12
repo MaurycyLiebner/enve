@@ -15,6 +15,14 @@ class GLWindow : public QWindow, protected QGL33c {
 public:
     GLWindow(QScreen *screen = nullptr);
     ~GLWindow();
+
+    void makeContextCurrent_TEST() {
+        Q_ASSERT(mContext->makeCurrent(this));
+    }
+
+    void contextDoneCurrent_TEST() {
+        mContext->doneCurrent();
+    }
 protected:
     void initialize();
     void renderNow();
@@ -42,7 +50,6 @@ protected:
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);
-    virtual void processGPU(GrContext * const grContext) = 0;
 private:
     void checkCompileErrors(GLuint shader, std::string type);
     void iniBlurProgram();

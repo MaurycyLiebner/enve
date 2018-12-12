@@ -1544,6 +1544,8 @@ QMimeData *BoundingBox::SWT_createMimeData() {
     return new BoundingBoxMimeData(this);
 }
 
+#include "gpupostprocessor.h"
+#include "skimagecopy.h"
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     mExpiredPixmap = 0;
     if(renderData->redo) {
@@ -1551,6 +1553,21 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     mDrawRenderContainer->setSrcRenderData(renderData);
     updateDrawRenderContainerTransform();
+
+    // !!! TEST
+    auto canvasWindow = MainWindow::getInstance()->getCanvasWindow();
+    canvasWindow->makeContextCurrent_TEST();
+    auto img = makeSkImageCopy(mDrawRenderContainer->getImageSk());
+    ShaderFinishedFunc finishFunc =
+    [this](const sk_sp<SkImage>& finished) {
+        if(!finished) return;
+        mDrawRenderContainer->replaceImageSk(finished);
+    };
+    canvasWindow->scheduleGpuTask(
+                SPtrCreate(ShaderPostProcess)(
+                    img, GL_BLUR_PROGRAM, finishFunc));
+    canvasWindow->contextDoneCurrent_TEST();
+    // !!! TEST
 }
 
 void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
