@@ -210,7 +210,7 @@ void AnimationWidgetScrollBar::mousePressEvent(QMouseEvent *event) {
         menu.addAction(timeAction);
 
         QAction *framesAction = new QAction("Display Frames", this);
-        timeAction->setEnabled(mDisplayTime);
+        framesAction->setEnabled(mDisplayTime);
         menu.addAction(framesAction);
 
         QAction* selectedAction = menu.exec(event->globalPos());

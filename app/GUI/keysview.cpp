@@ -68,7 +68,7 @@ void KeysView::deleteSelectedKeys() {
 
 void KeysView::selectKeysInSelectionRect() {
     QList<Key*> listKeys;
-    mBoxesListVisible->getKeysInRect(mSelectionRect,
+    mBoxesListVisible->getKeysInRect(mSelectionRect.translated(-0.5, 0.),
                                      mPixelsPerFrame,
                                      listKeys);
     Q_FOREACH(Key *key, listKeys) {

@@ -411,29 +411,30 @@ Key *Animator::prp_getKeyAtPos(const qreal &relX,
                                const int &minViewedFrame,
                                const qreal &pixelsPerFrame,
                                const int& keyRectSize) {
-    qreal relFrame = relX/pixelsPerFrame - prp_getFrameShift();
-    qreal pressFrame = relFrame + minViewedFrame;
+    qreal relFrame = relX/pixelsPerFrame - 0.5 - prp_getFrameShift();
+    qreal absX = relX + minViewedFrame*pixelsPerFrame;
+    qreal absFrame = relFrame + minViewedFrame;
     qreal keySize = keyRectSize;
     if(SWT_isComplexAnimator()) {
         keySize *= 0.75;
     }
     if(pixelsPerFrame > keySize) {
         int relFrameInt = qRound(relFrame);
-        if( qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX +
-                 prp_getFrameShift()*pixelsPerFrame) > keySize*0.5) {
+        qreal distToFrame = qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX);
+        if(2*distToFrame > keySize) {
             return nullptr;
         }
     }
-    if(pressFrame < 0) pressFrame -= 1.;
+    //if(pressFrame < 0) pressFrame -= 1.;
     qreal keyRectFramesSpan = 0.5*keySize/pixelsPerFrame;
-    int minPossibleKey = qFloor(pressFrame - keyRectFramesSpan);
-    int maxPossibleKey = qCeil(pressFrame + keyRectFramesSpan);
+    int minPossibleKey = qFloor(absFrame - keyRectFramesSpan);
+    int maxPossibleKey = qCeil(absFrame + keyRectFramesSpan);
     Key* keyAtPos = nullptr;
     for(int i = maxPossibleKey; i >= minPossibleKey; i--) {
+        qreal distToFrame = qAbs((i + 0.5)*pixelsPerFrame - absX);
+        if(2*distToFrame > keySize) continue;
         keyAtPos = anim_getKeyAtRelFrame(i);
-        if(keyAtPos != nullptr) {
-            return keyAtPos;
-        }
+        if(keyAtPos) return keyAtPos;
     }
     return nullptr;
 }
