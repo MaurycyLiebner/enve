@@ -1556,7 +1556,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 
     // !!! TEST
     auto canvasWindow = MainWindow::getInstance()->getCanvasWindow();
-    canvasWindow->makeContextCurrent_TEST();
+    //canvasWindow->makeContextCurrent_TEST();
     auto img = makeSkImageCopy(mDrawRenderContainer->getImageSk());
     ShaderFinishedFunc finishFunc =
     [this](const sk_sp<SkImage>& finished) {
@@ -1566,7 +1566,8 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     canvasWindow->scheduleGpuTask(
                 SPtrCreate(ShaderPostProcess)(
                     img, GL_BLUR_PROGRAM, finishFunc));
-    canvasWindow->contextDoneCurrent_TEST();
+    canvasWindow->processGpuTask();
+    //canvasWindow->contextDoneCurrent_TEST();
     // !!! TEST
 }
 

@@ -74,7 +74,6 @@ class BoundingBox : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
 public:
-
     BoundingBox(const BoundingBoxType &type);
     virtual ~BoundingBox();
 

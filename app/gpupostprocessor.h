@@ -1,5 +1,8 @@
 #ifndef GPUPOSTPROCESSOR_H
 #define GPUPOSTPROCESSOR_H
+#include <QOpenGLFramebufferObject>
+#include <QOffscreenSurface>
+#include <QOpenGLContext>
 #include "smartPointers/stdselfref.h"
 #include "skiaincludes.h"
 #include "glhelpers.h"
@@ -11,8 +14,7 @@ class ScheduledPostProcess : public StdSelfRef,
 public:
     ScheduledPostProcess();
 private:
-    virtual void process(GrContext * const grContext,
-                         const GLuint &texturedSquareVAO) = 0;
+    virtual void process(const GLuint &texturedSquareVAO) = 0;
 };
 
 typedef std::function<void(sk_sp<SkImage>)> ShaderFinishedFunc;
@@ -28,20 +30,8 @@ private:
     sk_sp<SkImage> mSrcImage;
     sk_sp<SkImage> mFinalImage;
 
-    //! @brief Generates the texture processor will render to.
-    void generateFinalTexture(const int& finalWidth,
-                              const int& finalHeight,
-                              GrGLTextureInfo& finalTexInfo);
-
-    //! @brief Wraps the resulting texture, called when finished processing.
-    void adoptTexture(GrContext * const grContext,
-                      const int& finalWidth,
-                      const int& finalHeight,
-                      const GrGLTextureInfo& finalTexInfo);
-
     //! @brief Uses shaders to draw the source image to the final texture.
-    void process(GrContext * const grContext,
-                 const GLuint &texturedSquareVAO);
+    void process(const GLuint &texturedSquareVAO);
 };
 
 class ComplexScheduledPostProcess : public ScheduledPostProcess {
@@ -49,10 +39,9 @@ public:
     ComplexScheduledPostProcess();
 
 private:
-    void process(GrContext * const grContext,
-                 const GLuint &texturedSquareVAO) {
+    void process(const GLuint &texturedSquareVAO) {
         foreach(const auto& child, mChildProcesses) {
-            child->process(grContext, texturedSquareVAO);
+            child->process(texturedSquareVAO);
         }
     }
     QList<stdsptr<ScheduledPostProcess>> mChildProcesses;
@@ -62,26 +51,27 @@ class GpuPostProcessor : protected QGL33c {
 public:
     GpuPostProcessor();
 
-    void process(GrContext * const grContext,
-                 const GLuint &texturedSquareVAO) {
+    void process() {
         if(mScheduledProcesses.isEmpty()) return;
-        if(!mFrameBufferCreated) {
+        Q_ASSERT(mContext->makeCurrent(mOffscreenSurface));
+        if(!mInitialized) {
             Q_ASSERT(initializeOpenGLFunctions());
-            //mFrameBuffer = new QOpenGLFramebufferObject(256, 256);
-            glGenFramebuffers(1, &mFrameBufferId);
-            mFrameBufferCreated = true;
+            iniTexturedVShaderVAO(this, mTextureSquareVAO);
+            mInitialized = true;
+
+            glEnable(GL_BLEND);
+            glDisable(GL_DEPTH_TEST);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
-        assertNoGlErrors();
-       // mFrameBuffer->bind();
-        glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferId);
+
         assertNoGlErrors();
 
         foreach(const auto& scheduled, mScheduledProcesses) {
-            scheduled->process(grContext, texturedSquareVAO);
+            scheduled->process(mTextureSquareVAO);
             assertNoGlErrors();
         }
         mScheduledProcesses.clear();
-
+        mContext->doneCurrent();
         //mFrameBuffer->bindDefault();
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -94,9 +84,12 @@ public:
         mScheduledProcesses.clear();
     }
 protected:
+    bool mInitialized = false;
+    GLuint mTextureSquareVAO;
+
+    QOffscreenSurface *mOffscreenSurface = nullptr;
+    QOpenGLContext* mContext = nullptr;
     //QOpenGLFramebufferObject* mFrameBuffer = nullptr;
-    bool mFrameBufferCreated = false;
-    GLuint mFrameBufferId;
     QList<stdsptr<ScheduledPostProcess>> mScheduledProcesses;
 };
 

@@ -155,6 +155,9 @@ public:
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
     void scheduleGpuTask(const stdsptr<ScheduledPostProcess> &process);
+    void processGpuTask() {
+        mGpuPostProcessor.process();
+    }
 private:
     //! @brief true if preview is currently playing
     bool mPreviewing = false;

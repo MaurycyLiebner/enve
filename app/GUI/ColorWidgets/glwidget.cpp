@@ -34,13 +34,6 @@ void GLWidget::hide() {
     QWidget::hide();
 }
 
-void GLWidget::resizeGL(int w, int h) {
-    assertNoGlErrors();
-//    glOrthoAndViewportSet(static_cast<uint>(w),
-//                          static_cast<uint>(h));
-    assertNoGlErrors();
-}
-
 void GLWidget::initializeGL() {
     initializeOpenGLFunctions();
 
@@ -51,5 +44,7 @@ void GLWidget::initializeGL() {
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     assertNoGlErrors();
+
     iniPlainVShaderVAO(this, mPlainSquareVAO);
+    assertNoGlErrors();
 }

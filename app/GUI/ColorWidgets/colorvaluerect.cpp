@@ -36,6 +36,8 @@ void ColorValueRect::paintGL() {
         programToUse = LIGHTNESS_PROGRAM;
     } else if(mType == CVR_ALPHA) {
         programToUse = ALPHA_PROGRAM;
+    } else {
+        assert(false);
     }
     assertNoGlErrors();
     glUseProgram(programToUse.fID);

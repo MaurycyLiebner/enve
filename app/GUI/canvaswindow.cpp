@@ -287,7 +287,6 @@ void CanvasWindow::renderSk(SkCanvas * const canvas,
         canvas->clear(SK_ColorBLACK);
         return;
     }
-    mGpuPostProcessor.process(grContext, mTexturedSquareVAO);
     mCurrentCanvas->renderSk(canvas, grContext);
 }
 

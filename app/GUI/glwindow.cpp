@@ -32,7 +32,7 @@ void GLWindow::bindSkia() {
     //                      SkSurfaceProps::kLegacyFontHost_InitType);
     SkSurfaceProps props(SkSurfaceProps::kLegacyFontHost_InitType);
 
-    sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGB();
+//    sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGB();
     mSurface = SkSurface::MakeFromBackendRenderTarget(
                                     mGrContext.get(),
                                     backendRT,
@@ -65,13 +65,13 @@ void GLWindow::initialize() {
     glClearColor(1.f, 1.f, 1.f, 1.f);
 
     //Set blending
-    glEnable(GL_BLEND );
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // setup GrContext
     mInterface = GrGLMakeNativeInterface();
-
+    SkASSERT(mInterface);
 //    GrContextOptions options;
     // setup contexts
     mGrContext = GrContext::MakeGL(mInterface/*, options*/);
