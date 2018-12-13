@@ -23,7 +23,15 @@ extern GLuint GL_PLAIN_SQUARE_VBO;
 extern std::string GL_TEXTURED_VERT;
 extern GLuint GL_TEXTURED_SQUARE_VBO;
 
-extern GLuint GL_BLUR_PROGRAM;
+struct ShaderProgram {
+    GLuint fID;
+};
+
+struct BlurProgram : public ShaderProgram {
+    GLint fBlurRadiusLoc;
+};
+
+extern BlurProgram GL_BLUR_PROGRAM;
 
 struct Texture {
     GLuint id;

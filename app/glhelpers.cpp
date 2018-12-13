@@ -15,7 +15,7 @@ std::string GL_TEXTURED_VERT =
         "/home/ailuropoda/Dev/AniVect/src/shaders/textured.vert";
 GLuint GL_TEXTURED_SQUARE_VBO;
 
-GLuint GL_BLUR_PROGRAM;
+BlurProgram GL_BLUR_PROGRAM;
 
 void assertNoGlErrors() {
     GLenum glError = glGetError();
@@ -210,7 +210,7 @@ sk_sp<SkImage> TextureFrameBuffer::toImage() {
                                          nullptr);
     btmp.allocPixels(info);
     glReadPixels(0, 0, width, height,
-                 GL_BGRA, GL_UNSIGNED_BYTE, btmp.getPixels());
+                 GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
     btmp.setImmutable();
     return SkImage::MakeFromBitmap(btmp);
 }

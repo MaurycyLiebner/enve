@@ -1557,15 +1557,17 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     // !!! TEST
     auto canvasWindow = MainWindow::getInstance()->getCanvasWindow();
     //canvasWindow->makeContextCurrent_TEST();
-    auto img = makeSkImageCopy(mDrawRenderContainer->getImageSk());
+    auto img = mDrawRenderContainer->getImageSk();
     ShaderFinishedFunc finishFunc =
     [this](const sk_sp<SkImage>& finished) {
         if(!finished) return;
         mDrawRenderContainer->replaceImageSk(finished);
     };
+    auto imgSize = QSize(img->width(), img->height());
+    auto program = SPtrCreate(BlurProgramCaller)(10., imgSize);
     canvasWindow->scheduleGpuTask(
                 SPtrCreate(ShaderPostProcess)(
-                    img, GL_BLUR_PROGRAM, finishFunc));
+                    img, program, finishFunc));
     canvasWindow->processGpuTask();
     //canvasWindow->contextDoneCurrent_TEST();
     // !!! TEST

@@ -7,6 +7,41 @@
 #include "skiaincludes.h"
 #include "glhelpers.h"
 
+
+class ShaderProgramCallerBase : public StdSelfRef {
+public:
+    ShaderProgramCallerBase() {}
+    virtual void use(QGL33c * const gl) = 0;
+};
+
+template<class T>
+class ShaderProgramCaller : public ShaderProgramCallerBase {
+    static_assert(std::is_base_of<ShaderProgram, T>::value,
+                  "No valid ShaderProgram derived class associated with ShaderProgramCaller.");
+public:
+    ShaderProgramCaller(const T * const program) :
+        mProgram(program) {}
+protected:
+    const T * const mProgram = nullptr;
+};
+
+class BlurProgramCaller : public ShaderProgramCaller<BlurProgram> {
+public:
+    BlurProgramCaller(const qreal& blurSize, const QSize& texSize) :
+        ShaderProgramCaller(&GL_BLUR_PROGRAM) {
+        mBlurRadiusX = static_cast<GLfloat>(blurSize/texSize.width());
+        mBlurRadiusY = static_cast<GLfloat>(blurSize/texSize.height());
+    }
+
+    void use(QGL33c * const gl) {
+        gl->glUseProgram(mProgram->fID);
+        gl->glUniform2f(mProgram->fBlurRadiusLoc, mBlurRadiusX, mBlurRadiusY);
+    }
+private:
+    GLfloat mBlurRadiusX;
+    GLfloat mBlurRadiusY;
+};
+
 class ScheduledPostProcess : public StdSelfRef,
         protected QGL33c {
     friend class GpuPostProcessor;
@@ -21,10 +56,10 @@ typedef std::function<void(sk_sp<SkImage>)> ShaderFinishedFunc;
 class ShaderPostProcess : public ScheduledPostProcess {
 public:
     ShaderPostProcess(const sk_sp<SkImage>& srcImg,
-                      const GLuint &program,
+                      const stdsptr<ShaderProgramCallerBase> &program,
                       const ShaderFinishedFunc& finishedFunc = ShaderFinishedFunc());
 private:
-    const GLuint mProgram;
+    const stdsptr<ShaderProgramCallerBase> mProgram;
     //! @brief Gets called after processing finished, provides resulting image.
     const ShaderFinishedFunc mFinishedFunc;
     sk_sp<SkImage> mSrcImage;

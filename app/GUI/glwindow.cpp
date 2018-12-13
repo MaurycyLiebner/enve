@@ -52,14 +52,16 @@ void GLWindow::resizeEvent(QResizeEvent *) {
 #include "ColorWidgets/colorwidgetshaders.h"
 
 void GLWindow::iniBlurProgram() {
-    iniProgram(this, GL_BLUR_PROGRAM,
+    iniProgram(this, GL_BLUR_PROGRAM.fID,
                GL_TEXTURED_VERT,
                "/home/ailuropoda/Dev/AniVect/src/shaders/blur.frag");
-    glUseProgram(GL_BLUR_PROGRAM);
+    glUseProgram(GL_BLUR_PROGRAM.fID);
 
-    GLint texLocation = glGetUniformLocation(
-                GL_BLUR_PROGRAM, "texture");
+    GLint texLocation = glGetUniformLocation(GL_BLUR_PROGRAM.fID, "texture");
     glUniform1i(texLocation, 0);
+
+    GL_BLUR_PROGRAM.fBlurRadiusLoc =
+            glGetUniformLocation(GL_BLUR_PROGRAM.fID, "blurRadius");
 }
 
 void GLWindow::initialize() {

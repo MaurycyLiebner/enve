@@ -14,7 +14,7 @@ GpuPostProcessor::GpuPostProcessor() {
 ScheduledPostProcess::ScheduledPostProcess() {}
 
 ShaderPostProcess::ShaderPostProcess(const sk_sp<SkImage> &srcImg,
-                                     const GLuint &program,
+                                     const stdsptr<ShaderProgramCallerBase> &program,
                                      const ShaderFinishedFunc &finishedFunc) :
     mProgram(program),
     mFinishedFunc(finishedFunc),
@@ -38,7 +38,7 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
     frameBufferObject.gen(this, srcWidth, srcHeight);
 
     glClear(GL_COLOR_BUFFER_BIT);
-    glUseProgram(mProgram);
+    mProgram->use(this);
     glActiveTexture(GL_TEXTURE0);
     srcTexture.bind(this);
     assertNoGlErrors();
