@@ -47,15 +47,16 @@ private:
     QList<stdsptr<ScheduledPostProcess>> mChildProcesses;
 };
 #include <QOpenGLFramebufferObject>
+#include "exceptions.h"
 class GpuPostProcessor : protected QGL33c {
 public:
     GpuPostProcessor();
 
     void process() {
         if(mScheduledProcesses.isEmpty()) return;
-        Q_ASSERT(mContext->makeCurrent(mOffscreenSurface));
+        MonoTry(mContext->makeCurrent(mOffscreenSurface), ContextCurrentFailed);
         if(!mInitialized) {
-            Q_ASSERT(initializeOpenGLFunctions());
+            MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
             iniTexturedVShaderVAO(this, mTextureSquareVAO);
             mInitialized = true;
 

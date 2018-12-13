@@ -8,7 +8,7 @@ GpuPostProcessor::GpuPostProcessor() {
     mOffscreenSurface->create();
     mContext = new QOpenGLContext(mOffscreenSurface);
     mContext->setShareContext(QOpenGLContext::globalShareContext());
-    Q_ASSERT(mContext->create());
+    MonoTry(mContext->create(), ContextCreateFailed);
 }
 
 ScheduledPostProcess::ScheduledPostProcess() {}
@@ -24,13 +24,13 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
 //    mFinalImage = mSrcImage;
 //    if(mFinishedFunc) mFinishedFunc(mFinalImage);
 //    return;
-    Q_ASSERT(initializeOpenGLFunctions());
+    MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
     if(!mSrcImage) return;
     int srcWidth = mSrcImage->width();
     int srcHeight = mSrcImage->height();
     glViewport(0, 0, srcWidth, srcHeight);
     SkPixmap pix;
-    SkASSERT(mSrcImage->peekPixels(&pix));
+    mSrcImage->peekPixels(&pix);
     Texture srcTexture;
     srcTexture.gen(this, srcWidth, srcHeight, pix.addr());
 

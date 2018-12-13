@@ -1,6 +1,7 @@
 #include "glwindow.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include <QPainter>
+#include "exceptions.h"
 
 GLWindow::GLWindow(QScreen *screen)
     : QWindow(screen) {
@@ -118,15 +119,15 @@ void GLWindow::renderNow() {
         mContext = new QOpenGLContext(this);
 //        mContext->setFormat(QSurfaceFormat::defaultFormat());
         mContext->setShareContext(QOpenGLContext::globalShareContext());
-        Q_ASSERT(mContext->create());
+        MonoTry(mContext->create(), ContextCreateFailed);
 
         needsInitialize = true;
     }
 
-    Q_ASSERT(mContext->makeCurrent(this));
+    MonoTry(mContext->makeCurrent(this), ContextCurrentFailed);
 
     if(needsInitialize) {
-        Q_ASSERT(initializeOpenGLFunctions());
+        MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
         initialize();
     }
     assertNoGlErrors();

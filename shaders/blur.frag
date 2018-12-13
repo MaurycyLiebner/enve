@@ -5,7 +5,7 @@ uniform sampler2D texture;
 //uniform float blurRadius;
 
 const vec3 size = vec3(256, 256, 30.);//width,height,radius
-const int Quality = 8;
+const int Quality = 16;
 const int Directions = 32;
 const float Pi = 6.28318530718;
 

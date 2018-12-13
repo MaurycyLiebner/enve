@@ -455,7 +455,8 @@ HEADERS  += \
     skimagegpudraw.h \
     gpupostprocessor.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
-    glhelpers.h
+    glhelpers.h \
+    exceptions.h
 
 RESOURCES += \
     resources.qrc
