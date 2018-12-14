@@ -83,34 +83,10 @@ private:
 };
 #include <QOpenGLFramebufferObject>
 #include "exceptions.h"
-class GpuPostProcessor : protected QGL33c {
+class GpuPostProcessor : public QThread, protected QGL33c {
+    Q_OBJECT
 public:
     GpuPostProcessor();
-
-    void process() {
-        if(mScheduledProcesses.isEmpty()) return;
-        MonoTry(mContext->makeCurrent(mOffscreenSurface), ContextCurrentFailed);
-        if(!mInitialized) {
-            MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
-            iniTexturedVShaderVAO(this, mTextureSquareVAO);
-            mInitialized = true;
-
-            glEnable(GL_BLEND);
-            glDisable(GL_DEPTH_TEST);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-
-        assertNoGlErrors();
-
-        foreach(const auto& scheduled, mScheduledProcesses) {
-            scheduled->process(mTextureSquareVAO);
-            assertNoGlErrors();
-        }
-        mScheduledProcesses.clear();
-        mContext->doneCurrent();
-        //mFrameBuffer->bindDefault();
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
 
     void addToProcess(const stdsptr<ScheduledPostProcess>& scheduled) {
         mScheduledProcesses << scheduled;
@@ -119,14 +95,60 @@ public:
     void clear() {
         mScheduledProcesses.clear();
     }
-protected:
-    bool mInitialized = false;
-    GLuint mTextureSquareVAO;
 
-    QOffscreenSurface *mOffscreenSurface = nullptr;
-    QOpenGLContext* mContext = nullptr;
-    //QOpenGLFramebufferObject* mFrameBuffer = nullptr;
+    void handleScheduledProcesses() {
+        if(mScheduledProcesses.isEmpty()) return;
+        if(isRunning()) return;
+        _mHandledProcesses = mScheduledProcesses;
+        mScheduledProcesses.clear();
+        start();
+    }
+signals:
+    void runFinished();
+private slots:
+    void finishedProcessing() {
+        handleScheduledProcesses();
+    }
+protected:
+    void _process() {
+        if(_mHandledProcesses.isEmpty()) return;
+        MonoTry(_mContext->makeCurrent(mOffscreenSurface), ContextCurrentFailed);
+        if(!_mInitialized) {
+            MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
+            iniTexturedVShaderVAO(this, _mTextureSquareVAO);
+            _mInitialized = true;
+
+            glEnable(GL_BLEND);
+            glDisable(GL_DEPTH_TEST);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+
+        assertNoGlErrors();
+
+        foreach(const auto& scheduled, _mHandledProcesses) {
+            scheduled->process(_mTextureSquareVAO);
+            assertNoGlErrors();
+        }
+        _mHandledProcesses.clear();
+        _mContext->doneCurrent();
+        //mFrameBuffer->bindDefault();
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void run() override {
+        _process();
+
+        emit runFinished();
+    }
+
+    bool _mInitialized = false;
+    GLuint _mTextureSquareVAO;
+    QOpenGLContext* _mContext = nullptr;
+    QList<stdsptr<ScheduledPostProcess>> _mHandledProcesses;
+
     QList<stdsptr<ScheduledPostProcess>> mScheduledProcesses;
+    QOffscreenSurface *mOffscreenSurface = nullptr;
+    //QOpenGLFramebufferObject* mFrameBuffer = nullptr;
 };
 
 #endif // GPUPOSTPROCESSOR_H

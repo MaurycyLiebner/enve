@@ -6,9 +6,12 @@
 GpuPostProcessor::GpuPostProcessor() {
     mOffscreenSurface = new QOffscreenSurface();
     mOffscreenSurface->create();
-    mContext = new QOpenGLContext(mOffscreenSurface);
-    mContext->setShareContext(QOpenGLContext::globalShareContext());
-    MonoTry(mContext->create(), ContextCreateFailed);
+    _mContext = new QOpenGLContext();
+    _mContext->setShareContext(QOpenGLContext::globalShareContext());
+    MonoTry(_mContext->create(), ContextCreateFailed);
+    _mContext->moveToThread(this);
+    connect(this, &GpuPostProcessor::runFinished,
+            this, &GpuPostProcessor::finishedProcessing);
 }
 
 ScheduledPostProcess::ScheduledPostProcess() {}
