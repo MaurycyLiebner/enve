@@ -1564,7 +1564,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
         mDrawRenderContainer->replaceImageSk(finished);
     };
     auto imgSize = QSize(img->width(), img->height());
-    auto program = SPtrCreate(BlurProgramCaller)(10., imgSize);
+    auto program = SPtrCreate(BlurProgramCaller)(50., imgSize);
     canvasWindow->scheduleGpuTask(
                 SPtrCreate(ShaderPostProcess)(
                     img, program, finishFunc));

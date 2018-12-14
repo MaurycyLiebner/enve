@@ -966,7 +966,7 @@ void MainWindow::callUpdateSchedulers() {
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
-    //if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
+    if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
         mCanvasWindow->processSchedulers();
         foreach(const stdsptr<_ScheduledExecutor> &updatable,
                 mUpdateSchedulers) {
@@ -976,7 +976,7 @@ void MainWindow::callUpdateSchedulers() {
             mCanvasWindow->addUpdatableAwaitingUpdate(updatable);
         }
         mUpdateSchedulers.clear();
-    //}
+    }
 
     mCanvasWindow->updateHoveredElements();
     mCanvasWindow->updatePivotIfNeeded();
