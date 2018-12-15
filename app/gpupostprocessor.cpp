@@ -4,13 +4,13 @@
 #include "skqtconversions.h"
 
 GpuPostProcessor::GpuPostProcessor() {
-    mOffscreenSurface = new QOffscreenSurface();
+    mOffscreenSurface = new QOffscreenSurface(nullptr, this);
     mOffscreenSurface->create();
     _mContext = new QOpenGLContext();
     _mContext->setShareContext(QOpenGLContext::globalShareContext());
     MonoTry(_mContext->create(), ContextCreateFailed);
     _mContext->moveToThread(this);
-    connect(this, &GpuPostProcessor::runFinished,
+    connect(this, &GpuPostProcessor::finished,
             this, &GpuPostProcessor::finishedProcessing);
 }
 
@@ -59,4 +59,60 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
     frameBufferObject.deleteTexture(this);
     srcTexture.deleteTexture(this);
     if(mFinishedFunc) mFinishedFunc(mFinalImage);
+}
+
+#include "Boxes/boundingboxrenderdata.h"
+BoxRenderDataScheduledPostProcess::BoxRenderDataScheduledPostProcess(
+        const stdsptr<BoundingBoxRenderData>& boxData) : mBoxData(boxData) {
+    assert(boxData->renderedToImage);
+}
+
+void BoxRenderDataScheduledPostProcess::afterProcessed() {
+    mBoxData->updateFinished();
+    mBoxData->fGpuFinished = false;
+}
+
+void BoxRenderDataScheduledPostProcess::process(
+        const GLuint &texturedSquareVAO) {
+    MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
+    auto srcImage = mBoxData->renderedImage;
+    if(!srcImage) return;
+    int srcWidth = srcImage->width();
+    int srcHeight = srcImage->height();
+    glViewport(0, 0, srcWidth, srcHeight);
+    SkPixmap pix;
+    srcImage->peekPixels(&pix);
+    Texture srcTexture;
+    srcTexture.gen(this, srcWidth, srcHeight, pix.addr());
+
+    TextureFrameBuffer frameBufferObject;
+    frameBufferObject.gen(this, srcWidth, srcHeight);
+
+    for(int i = 0; i < mBoxData->fGpuShaders.count(); i++) {
+        const auto& program = mBoxData->fGpuShaders.at(i);
+        glClear(GL_COLOR_BUFFER_BIT);
+        program->use(this);
+        glActiveTexture(GL_TEXTURE0);
+        srcTexture.bind(this);
+        assertNoGlErrors();
+
+        glBindVertexArray(texturedSquareVAO);
+        assertNoGlErrors();
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        assertNoGlErrors();
+        if(i == mBoxData->fGpuShaders.count() - 1) break;
+        frameBufferObject.swapTexture(this, srcTexture);
+        assertNoGlErrors();
+    }
+    mBoxData->fGpuShaders.clear();
+
+    frameBufferObject.bindTexture(this);
+    mBoxData->renderedImage = frameBufferObject.toImage();
+    assertNoGlErrors();
+    frameBufferObject.deleteFrameBuffer(this);
+    frameBufferObject.deleteTexture(this);
+    srcTexture.deleteTexture(this);
+
+    mBoxData->fGpuFinished = true;
 }

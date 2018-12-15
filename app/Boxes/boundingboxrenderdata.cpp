@@ -1,6 +1,7 @@
 #include "boundingboxrenderdata.h"
 #include "boundingbox.h"
 #include "PixmapEffects/rastereffects.h"
+#include "gpupostprocessor.h"
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
     if(parentBoxT == nullptr) return;
@@ -97,6 +98,14 @@ void BoundingBoxRenderData::renderToImage() {
             QPointF(qRound(globalBoundingRect.left()/**resolution*/),
                     qRound(globalBoundingRect.top()/**resolution*/));
     globalBoundingRect.translate(-transF);
+
+    // !!! TEST !!!
+    auto size = QSize(qCeil(globalBoundingRect.width()),
+                      qCeil(globalBoundingRect.height()));
+    auto blurProgram = SPtrCreate(BlurProgramCaller)(50., size);
+    fGpuShaders << blurProgram;
+    // !!! TEST !!!
+
     SkImageInfo info = SkImageInfo::Make(qCeil(globalBoundingRect.width()),
                                          qCeil(globalBoundingRect.height()),
                                          kBGRA_8888_SkColorType,
@@ -138,6 +147,7 @@ void BoundingBoxRenderData::beforeUpdate() {
     if(!mDataSet) {
         dataSet();
     }
+
     _ScheduledExecutor::beforeUpdate();
 
     BoundingBox *parentBoxT = parentBox.data();

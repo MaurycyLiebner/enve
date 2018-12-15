@@ -8,6 +8,7 @@
 #include <QMatrix>
 struct PixmapEffectRenderData;
 class BoundingBox;
+class ShaderProgramCallerBase;
 #include "smartPointers/sharedpointerdefs.h"
 
 class RenderDataCustomizerFunctor;
@@ -18,13 +19,21 @@ struct BoundingBoxRenderData : public _ScheduledExecutor {
     virtual ~BoundingBoxRenderData();
 
     virtual void copyFrom(BoundingBoxRenderData *src);
+    stdsptr<BoundingBoxRenderData> makeCopy();
     bool copied = false;
+
+    // gpu
+    bool needsGpuProcessing() const {
+        return !fGpuShaders.isEmpty();
+    }
+    bool fGpuFinished = false;
+    QList<stdsptr<ShaderProgramCallerBase>> fGpuShaders;
+    // gpu
+
 
     bool relBoundingRectSet = false;
 
     Animator::UpdateReason reason;
-
-    stdsptr<BoundingBoxRenderData> makeCopy();
 
     bool redo = false;
 

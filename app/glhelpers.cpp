@@ -161,16 +161,16 @@ Texture Texture::createTextureFromImage(QGL33c *gl,
 }
 
 void Texture::bind(QGL33c *gl) {
-    gl->glBindTexture(GL_TEXTURE_2D, id);
+    gl->glBindTexture(GL_TEXTURE_2D, fID);
 }
 
 void Texture::deleteTexture(QGL33c *gl) {
-    gl->glDeleteTextures(1, &id);
+    gl->glDeleteTextures(1, &fID);
 }
 
 void Texture::gen(QGL33c *gl) {
-    gl->glGenTextures(1, &id);
-    gl->glBindTexture(GL_TEXTURE_2D, id);
+    gl->glGenTextures(1, &fID);
+    gl->glBindTexture(GL_TEXTURE_2D, fID);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -188,10 +188,10 @@ void Texture::gen(QGL33c *gl,
 void Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
     int nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load(imagePath.c_str(), &width, &height,
+    unsigned char *data = stbi_load(imagePath.c_str(), &fWidth, &fHeight,
                                     &nrChannels, 0);
     if(data) {
-        gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+        gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fWidth, fHeight,
                          0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         gl->glGenerateMipmap(GL_TEXTURE_2D);
     } else {
@@ -204,50 +204,43 @@ void Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
 
 sk_sp<SkImage> TextureFrameBuffer::toImage() {
     SkBitmap btmp;
-    SkImageInfo info = SkImageInfo::Make(width, height,
+    SkImageInfo info = SkImageInfo::Make(fWidth, fHeight,
                                          kBGRA_8888_SkColorType,
                                          kPremul_SkAlphaType,
                                          nullptr);
     btmp.allocPixels(info);
-    glReadPixels(0, 0, width, height,
+    glReadPixels(0, 0, fWidth, fHeight,
                  GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
     btmp.setImmutable();
     return SkImage::MakeFromBitmap(btmp);
 }
 
 void TextureFrameBuffer::deleteTexture(QGL33c *gl) {
-    gl->glDeleteTextures(1, &textureId);
+    fTexture.deleteTexture(gl);
 }
 
 void TextureFrameBuffer::deleteFrameBuffer(QGL33c *gl) {
-    gl->glDeleteFramebuffers(1, &frameBufferId);
+    gl->glDeleteFramebuffers(1, &fFrameBufferId);
 }
 
 void TextureFrameBuffer::bindFrameBuffer(QGL33c *gl) {
-    gl->glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
+    gl->glBindFramebuffer(GL_FRAMEBUFFER, fFrameBufferId);
 }
 
 void TextureFrameBuffer::bindTexture(QGL33c *gl) {
-    gl->glBindTexture(GL_TEXTURE_2D, textureId);
+    fTexture.bind(gl);
 }
 
 void TextureFrameBuffer::gen(QGL33c *gl,
                              const int &widthT, const int &heightT) {
-    width = widthT;
-    height = heightT;
-    gl->glGenFramebuffers(1, &frameBufferId);
-    gl->glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
+    fWidth = widthT;
+    fHeight = heightT;
+    gl->glGenFramebuffers(1, &fFrameBufferId);
+    gl->glBindFramebuffer(GL_FRAMEBUFFER, fFrameBufferId);
     // create a color attachment texture
-    gl->glGenTextures(1, &textureId);
-    gl->glBindTexture(GL_TEXTURE_2D, textureId);
-    gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    fTexture.gen(gl, widthT, heightT, nullptr);
     gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                               GL_TEXTURE_2D, textureId, 0);
+                               GL_TEXTURE_2D, fTexture.fID, 0);
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
     if(gl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;

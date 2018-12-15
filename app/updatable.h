@@ -87,6 +87,8 @@ public:
 
     void clear();
     virtual bool isFileUpdatable() { return false; }
+
+    virtual bool needsGpuProcessing() const { return false; }
 protected:
     virtual void addSchedulerNow();
     bool mSchedulerAdded = false;

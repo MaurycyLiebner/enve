@@ -857,8 +857,9 @@ void BoxesGroup::addContainedBoxToListAt(
     if(saveUndoRedo) {
 //        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
-    connect(child.data(), SIGNAL(prp_absFrameRangeChanged(int,int)),
-            this, SLOT(prp_updateAfterChangedAbsFrameRange(int,int)));
+    connect(child.data(),
+            &BoundingBox::prp_absFrameRangeChanged,
+            this, &BoundingBox::prp_updateAfterChangedAbsFrameRange);
     updateContainedBoxIds(index, saveUndoRedo);
 
     //SWT_addChildAbstractionForTargetToAll(child);

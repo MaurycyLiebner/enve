@@ -46,8 +46,10 @@ class ScheduledPostProcess : public StdSelfRef,
         protected QGL33c {
     friend class GpuPostProcessor;
     friend class ComplexScheduledPostProcess;
+    friend class BoxRenderDataScheduledPostProcess;
 public:
     ScheduledPostProcess();
+    virtual void afterProcessed() {}
 private:
     virtual void process(const GLuint &texturedSquareVAO) = 0;
 };
@@ -67,6 +69,16 @@ private:
 
     //! @brief Uses shaders to draw the source image to the final texture.
     void process(const GLuint &texturedSquareVAO);
+};
+class BoundingBoxRenderData;
+class BoxRenderDataScheduledPostProcess : public ScheduledPostProcess {
+public:
+    BoxRenderDataScheduledPostProcess(
+            const stdsptr<BoundingBoxRenderData> &boxData);
+    void afterProcessed();
+private:
+    void process(const GLuint &texturedSquareVAO);
+    const stdsptr<BoundingBoxRenderData> mBoxData;
 };
 
 class ComplexScheduledPostProcess : public ScheduledPostProcess {
@@ -89,7 +101,9 @@ public:
     GpuPostProcessor();
 
     void addToProcess(const stdsptr<ScheduledPostProcess>& scheduled) {
+        //scheduled->afterProcessed(); return;
         mScheduledProcesses << scheduled;
+        handleScheduledProcesses();
     }
 
     void clear() {
@@ -98,19 +112,23 @@ public:
 
     void handleScheduledProcesses() {
         if(mScheduledProcesses.isEmpty()) return;
-        if(isRunning()) return;
+        if(mRunning) return;
+        mRunning = true;
         _mHandledProcesses = mScheduledProcesses;
         mScheduledProcesses.clear();
         start();
     }
-signals:
-    void runFinished();
 private slots:
     void finishedProcessing() {
+        mRunning = false;
+        foreach(const auto& process, _mHandledProcesses) {
+            process->afterProcessed();
+        }
+        _mHandledProcesses.clear();
         handleScheduledProcesses();
     }
 protected:
-    void _process() {
+    void run() override {
         if(_mHandledProcesses.isEmpty()) return;
         MonoTry(_mContext->makeCurrent(mOffscreenSurface), ContextCurrentFailed);
         if(!_mInitialized) {
@@ -129,18 +147,12 @@ protected:
             scheduled->process(_mTextureSquareVAO);
             assertNoGlErrors();
         }
-        _mHandledProcesses.clear();
         _mContext->doneCurrent();
         //mFrameBuffer->bindDefault();
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void run() override {
-        _process();
-
-        emit runFinished();
-    }
-
+    bool mRunning = false;
     bool _mInitialized = false;
     GLuint _mTextureSquareVAO;
     QOpenGLContext* _mContext = nullptr;

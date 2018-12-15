@@ -249,13 +249,16 @@ void BasicTransformAnimator::setParentTransformAnimator(
         BasicTransformAnimator* parent) {
     if(mParentTransformAnimator != nullptr) {
         disconnect(mParentTransformAnimator,
-                   SIGNAL(combinedTransformChanged(const UpdateReason&)),
-                   this, SLOT(updateCombinedTransform(const UpdateReason&)));
+                   &BasicTransformAnimator::combinedTransformChanged,
+                   this,
+                   &BasicTransformAnimator::updateCombinedTransform);
     }
     mParentTransformAnimator = parent;
     if(parent != nullptr) {
-        connect(parent, SIGNAL(combinedTransformChanged(const UpdateReason&)),
-                this, SLOT(updateCombinedTransform(const UpdateReason&)));
+        connect(parent,
+                &BasicTransformAnimator::combinedTransformChanged,
+                this,
+                &BasicTransformAnimator::updateCombinedTransform);
     }
     updateCombinedTransform(Animator::USER_CHANGE);
 }

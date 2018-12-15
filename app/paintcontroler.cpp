@@ -1,11 +1,11 @@
 #include "paintcontroler.h"
 
-PaintControler::PaintControler(const int &id,
-                               QObject *parent) : QObject(parent) {
+PaintControler::PaintControler(const int &id, QObject *parent) :
+    QObject(parent) {
     mId = id;
 }
 
-void PaintControler::updateUpdatable(_Executor *updatable,
+void PaintControler::updateUpdatable(_ScheduledExecutor * const updatable,
                                      const int &targetId) {
     if(targetId == mId) {
         //auto start = std::chrono::steady_clock::now();

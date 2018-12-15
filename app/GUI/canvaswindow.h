@@ -85,7 +85,8 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void addUpdatableAwaitingUpdate(const stdsptr<_Executor> &updatable);
+    void addUpdatableAwaitingUpdate(
+            const stdsptr<_ScheduledExecutor> &updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             const UpdateFuncs &updateFuncs,
@@ -138,7 +139,8 @@ public:
     bool shouldProcessAwaitingSchedulers();
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
-    void addFileUpdatableAwaitingUpdate(const stdsptr<_Executor> &updatable);
+    void addFileUpdatableAwaitingUpdate(
+            const stdsptr<_ScheduledExecutor> &updatable);
     WindowSingleWidgetTarget *getWindowSWT() {
         return mWindowSWTTarget.get();
     }
@@ -154,10 +156,6 @@ public:
     void moveMaxFrameForAllSelected(const int &dFrame);
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
-    void scheduleGpuTask(const stdsptr<ScheduledPostProcess> &process);
-    void processGpuTask() {
-        mGpuPostProcessor.handleScheduledProcesses();
-    }
 private:
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
@@ -192,8 +190,8 @@ private:
     QList<QThread*> mControlerThreads;
     QThread *mFileControlerThread;
     QList<PaintControler*> mPaintControlers;
-    QList<stdsptr<_Executor> > mUpdatablesAwaitingUpdate;
-    QList<stdsptr<_Executor> > mFileUpdatablesAwaitingUpdate;
+    QList<stdsptr<_ScheduledExecutor>> mUpdatablesAwaitingUpdate;
+    QList<stdsptr<_ScheduledExecutor>> mFileUpdatablesAwaitingUpdate;
 
 
 
@@ -228,8 +226,8 @@ private:
                   GrContext * const grContext);
     void tabletEvent(QTabletEvent *e);
 signals:
-    void updateUpdatable(_Executor*, int);
-    void updateFileUpdatable(_Executor*, int);
+    void updateUpdatable(_ScheduledExecutor*, int);
+    void updateFileUpdatable(_ScheduledExecutor*, int);
 
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
@@ -321,10 +319,12 @@ public slots:
     void flipHorizontalAction();
     void flipVerticalAction();
 private slots:
+    void tryProcessingNextUpdatable();
     void sendNextUpdatableForUpdate(const int &finishedThreadId,
-                                    _Executor *lastUpdatable = nullptr);
-    void sendNextFileUpdatableForUpdate(const int &threadId,
-                                    _Executor *lastUpdatable = nullptr);
+            _ScheduledExecutor * const lastUpdatable = nullptr);
+    void sendNextFileUpdatableForUpdate(
+            const int &threadId,
+            _ScheduledExecutor * const lastUpdatable = nullptr);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
 

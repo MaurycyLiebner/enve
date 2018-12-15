@@ -34,9 +34,9 @@ struct BlurProgram : public ShaderProgram {
 extern BlurProgram GL_BLUR_PROGRAM;
 
 struct Texture {
-    GLuint id;
-    int width;
-    int height;
+    GLuint fID;
+    int fWidth;
+    int fHeight;
 
     static Texture createTextureFromImage(QGL33c* gl,
                                           const std::string& imagePath);
@@ -50,17 +50,40 @@ struct Texture {
 
     //! @brief Generates, binds texture and sets data.
     void gen(QGL33c* gl,
-             const int& width, const int& height,
+             const int& fWidth, const int& fHeight,
              const void * const data);
+
+    void swap(Texture& otherTexture) {
+        GLuint id = fID;
+        int width = fWidth;
+        int height = fHeight;
+
+        fID = otherTexture.fID;
+        fWidth = otherTexture.fWidth;
+        fHeight = otherTexture.fHeight;
+
+        otherTexture.fID = id;
+        otherTexture.fWidth = width;
+        otherTexture.fHeight = height;
+    }
 private:
     void loadImage(QGL33c* gl, const std::string& imagePath);
 };
 
 struct TextureFrameBuffer {
-    GLuint textureId;
-    GLuint frameBufferId;
-    int width;
-    int height;
+    Texture fTexture;
+    GLuint fFrameBufferId;
+    int fWidth;
+    int fHeight;
+
+    void swapTexture(QGL33c* gl, Texture& otherTexture) {
+        fTexture.swap(otherTexture);
+
+        gl->glBindFramebuffer(GL_FRAMEBUFFER, fFrameBufferId);
+        // create a color attachment texture
+        gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                   GL_TEXTURE_2D, fTexture.fID, 0);
+    }
 
     sk_sp<SkImage> toImage();
 

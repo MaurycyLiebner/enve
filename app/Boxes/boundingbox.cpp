@@ -982,7 +982,8 @@ int BoundingBox::prp_getRelFrameShift() const {
     return mDurationRectangle->getFrameShift();
 }
 
-void BoundingBox::setDurationRectangle(const qsptr<DurationRectangle>& durationRect) {
+void BoundingBox::setDurationRectangle(
+        const qsptr<DurationRectangle>& durationRect) {
     if(durationRect == mDurationRectangle) return;
     if(mDurationRectangle != nullptr) {
         disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
@@ -995,15 +996,15 @@ void BoundingBox::setDurationRectangle(const qsptr<DurationRectangle>& durationR
     }
 
     if(mDurationRectangle == nullptr) return;
-    connect(mDurationRectangle.data(), SIGNAL(posChangedBy(int)),
-            this, SLOT(updateAfterDurationRectangleShifted(int)));
-    connect(mDurationRectangle.data(), SIGNAL(rangeChanged()),
-            this, SLOT(updateAfterDurationRectangleRangeChanged()));
+    connect(mDurationRectangle.data(), &DurationRectangle::posChangedBy,
+            this, &BoundingBox::updateAfterDurationRectangleShifted);
+    connect(mDurationRectangle.data(), &DurationRectangle::rangeChanged,
+            this, &BoundingBox::updateAfterDurationRectangleRangeChanged);
 
-    connect(mDurationRectangle.data(), SIGNAL(minFrameChangedBy(int)),
-            this, SLOT(updateAfterDurationMinFrameChangedBy(int)));
-    connect(mDurationRectangle.data(), SIGNAL(maxFrameChangedBy(int)),
-            this, SLOT(updateAfterDurationMaxFrameChangedBy(int)));
+    connect(mDurationRectangle.data(), &DurationRectangle::minFrameChangedBy,
+            this, &BoundingBox::updateAfterDurationMinFrameChangedBy);
+    connect(mDurationRectangle.data(), &DurationRectangle::maxFrameChangedBy,
+            this, &BoundingBox::updateAfterDurationMaxFrameChangedBy);
 }
 
 void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
@@ -1547,6 +1548,7 @@ QMimeData *BoundingBox::SWT_createMimeData() {
 #include "gpupostprocessor.h"
 #include "skimagecopy.h"
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
+    Q_ASSERT(renderData->fGpuFinished);
     mExpiredPixmap = 0;
     if(renderData->redo) {
         scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
@@ -1555,21 +1557,19 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     updateDrawRenderContainerTransform();
 
     // !!! TEST
-    auto canvasWindow = MainWindow::getInstance()->getCanvasWindow();
-    //canvasWindow->makeContextCurrent_TEST();
-    auto img = mDrawRenderContainer->getImageSk();
-    ShaderFinishedFunc finishFunc =
-    [this](const sk_sp<SkImage>& finished) {
-        if(!finished) return;
-        mDrawRenderContainer->replaceImageSk(finished);
-    };
-    auto imgSize = QSize(img->width(), img->height());
-    auto program = SPtrCreate(BlurProgramCaller)(50., imgSize);
-    canvasWindow->scheduleGpuTask(
-                SPtrCreate(ShaderPostProcess)(
-                    img, program, finishFunc));
-    canvasWindow->processGpuTask();
-    //canvasWindow->contextDoneCurrent_TEST();
+//    auto canvasWindow = MainWindow::getInstance()->getCanvasWindow();
+//    auto img = mDrawRenderContainer->getImageSk();
+//    ShaderFinishedFunc finishFunc =
+//    [this](const sk_sp<SkImage>& finished) {
+//        if(!finished) return;
+//        mDrawRenderContainer->replaceImageSk(finished);
+//    };
+//    auto imgSize = QSize(img->width(), img->height());
+//    auto program = SPtrCreate(BlurProgramCaller)(50., imgSize);
+//    canvasWindow->scheduleGpuTask(
+//                SPtrCreate(ShaderPostProcess)(
+//                    img, program, finishFunc));
+//    canvasWindow->processGpuTask();
     // !!! TEST
 }
 

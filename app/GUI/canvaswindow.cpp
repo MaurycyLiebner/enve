@@ -21,6 +21,8 @@
 #include "usagewidget.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
+    connect(&mGpuPostProcessor, &GpuPostProcessor::finished,
+            this, &CanvasWindow::tryProcessingNextUpdatable);
     mWindowSWTTarget = SPtrCreate(WindowSingleWidgetTarget)(this);
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     int numberThreads = qMax(1, QThread::idealThreadCount());
@@ -28,10 +30,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
         QThread *paintControlerThread = new QThread(this);
         PaintControler *paintControler = new PaintControler(i);
         paintControler->moveToThread(paintControlerThread);
-        connect(paintControler, SIGNAL(finishedUpdating(int, _Executor*)),
-                this, SLOT(sendNextUpdatableForUpdate(int, _Executor*)) );
-        connect(this, SIGNAL(updateUpdatable(_Executor*, int)),
-                paintControler, SLOT(updateUpdatable(_Executor*, int)) );
+        connect(paintControler, &PaintControler::finishedUpdating,
+                this, &CanvasWindow::sendNextUpdatableForUpdate);
+        connect(this, &CanvasWindow::updateUpdatable,
+                paintControler, &PaintControler::updateUpdatable);
 
         paintControlerThread->start();
 
@@ -44,10 +46,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mFileControlerThread = new QThread(this);
     mFileControler = new PaintControler(numberThreads);
     mFileControler->moveToThread(mFileControlerThread);
-    connect(mFileControler, SIGNAL(finishedUpdating(int, _Executor*)),
-            this, SLOT(sendNextFileUpdatableForUpdate(int, _Executor*)) );
-    connect(this, SIGNAL(updateFileUpdatable(_Executor*, int)),
-            mFileControler, SLOT(updateUpdatable(_Executor*, int)) );
+    connect(mFileControler, &PaintControler::finishedUpdating,
+            this, &CanvasWindow::sendNextFileUpdatableForUpdate);
+    connect(this, &CanvasWindow::updateFileUpdatable,
+            mFileControler, &PaintControler::updateUpdatable);
 
     mFileControlerThread->start();
     mControlerThreads << mFileControlerThread;
@@ -115,8 +117,8 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
 void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
     if(mCurrentCanvas != nullptr) {
         mCurrentCanvas->setIsCurrentCanvas(false);
-        disconnect(mPreviewFPSTimer, SIGNAL(timeout()),
-                   mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
+        disconnect(mPreviewFPSTimer, &QTimer::timeout,
+                   mCurrentCanvas.data(), &Canvas::nextPreviewFrame);
     }
 
     if(canvas == nullptr) {
@@ -125,8 +127,8 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
     } else {
         mCurrentCanvas = canvas;
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
-        connect(mPreviewFPSTimer, SIGNAL(timeout()),
-                mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
+        connect(mPreviewFPSTimer, &QTimer::timeout,
+                mCurrentCanvas.data(), &Canvas::nextPreviewFrame);
 
         mCurrentCanvas->setIsCurrentCanvas(true);
 
@@ -288,11 +290,6 @@ void CanvasWindow::renderSk(SkCanvas * const canvas,
         return;
     }
     mCurrentCanvas->renderSk(canvas, grContext);
-}
-
-void CanvasWindow::scheduleGpuTask(
-        const stdsptr<ScheduledPostProcess>& process) {
-    mGpuPostProcessor.addToProcess(process);
 }
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
@@ -813,19 +810,23 @@ bool CanvasWindow::shouldProcessAwaitingSchedulers() {
 }
 
 void CanvasWindow::addUpdatableAwaitingUpdate(
-        const stdsptr<_Executor>& updatable) {
+        const stdsptr<_ScheduledExecutor>& updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
 
     mUpdatablesAwaitingUpdate << updatable;
+    tryProcessingNextUpdatable();
+}
+
+void CanvasWindow::tryProcessingNextUpdatable() {
     if(!mFreeThreads.isEmpty()) {
         sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), nullptr);
     }
 }
 
 void CanvasWindow::addFileUpdatableAwaitingUpdate(
-        const stdsptr<_Executor>& updatable) {
+        const stdsptr<_ScheduledExecutor>& updatable) {
     mFileUpdatablesAwaitingUpdate << updatable;
 
     if(mNoFileAwaitUpdate) {
@@ -834,8 +835,8 @@ void CanvasWindow::addFileUpdatableAwaitingUpdate(
     }
 }
 
-void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
-                                                  _Executor *lastUpdatable) {
+void CanvasWindow::sendNextFileUpdatableForUpdate(
+        const int &threadId, _ScheduledExecutor * const lastUpdatable) {
     Q_UNUSED(threadId);
     if(lastUpdatable != nullptr) {
         lastUpdatable->updateFinished();
@@ -853,7 +854,8 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
         }
     } else {
         for(int i = 0; i < mFileUpdatablesAwaitingUpdate.count(); i++) {
-            _Executor *updatablaT = mFileUpdatablesAwaitingUpdate.at(i).get();
+            _ScheduledExecutor *updatablaT =
+                    mFileUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
                 updatablaT->setCurrentPaintControler(mFileControler);
                 updatablaT->beforeUpdate();
@@ -867,8 +869,8 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
 }
 
 #include <chrono>
-void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
-                                              _Executor *lastUpdatable) {
+void CanvasWindow::sendNextUpdatableForUpdate(
+        const int &finishedThreadId, _ScheduledExecutor *const lastUpdatable) {
     //auto start = std::chrono::steady_clock::now();
     //qDebug() << "sendNextUpdatableForUpdate::begin" << mFreeThreads.count();
     if(lastUpdatable != nullptr) {
@@ -876,7 +878,14 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
         if(mClearBeingUpdated) {
             lastUpdatable->clear();
         } else {
-            lastUpdatable->updateFinished();
+            if(lastUpdatable->needsGpuProcessing()) {
+                auto gpuProcess =
+                        SPtrCreate(BoxRenderDataScheduledPostProcess)(
+                            GetAsSPtr(lastUpdatable, BoundingBoxRenderData));
+                mGpuPostProcessor.addToProcess(gpuProcess);
+            } else {
+                lastUpdatable->updateFinished();
+            }
         }
         //qDebug() << "finished processing using: " << finishedThreadId;
     }
@@ -894,7 +903,8 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &finishedThreadId,
     } else {
         int threadId = finishedThreadId;
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
-            _Executor *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
+            _ScheduledExecutor *updatablaT =
+                    mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
                 mThreadsUsed++;
                 //qDebug() << "started processing using: " << threadId;
@@ -1141,8 +1151,8 @@ const int BufferSize = 32768;
 
 void CanvasWindow::initializeAudio() {
     mAudioBuffer = QByteArray(BufferSize, 0);
-    connect(mPreviewFPSTimer, SIGNAL(timeout()),
-            this, SLOT(pushTimerExpired()));
+    connect(mPreviewFPSTimer, &QTimer::timeout,
+            this, &CanvasWindow::pushTimerExpired);
 
     mAudioDevice = QAudioDeviceInfo::defaultOutputDevice();
     mAudioFormat.setSampleRate(SOUND_SAMPLERATE);
