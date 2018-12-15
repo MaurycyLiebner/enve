@@ -11,7 +11,7 @@ GpuPostProcessor::GpuPostProcessor() {
     MonoTry(_mContext->create(), ContextCreateFailed);
     _mContext->moveToThread(this);
     connect(this, &GpuPostProcessor::finished,
-            this, &GpuPostProcessor::finishedProcessing);
+            this, &GpuPostProcessor::afterProcessed);
 }
 
 ScheduledPostProcess::ScheduledPostProcess() {}

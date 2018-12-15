@@ -103,7 +103,7 @@ void iniGradientProgram(QGL33c *gl, const std::string& colorShadersPath) {
 void iniColorPrograms(QGL33c *gl) {
     std::string colorShadersPath =
             "/home/ailuropoda/Dev/AniVect/src/app/GUI/"
-            "ColorWidgets/ColorWidgetShaders/";
+            "ColorWidgets/colorwidgetshaders/";
     iniColorProgram(gl, HUE_PROGRAM, GL_PLAIN_VERT,
                     colorShadersPath + "hue.frag");
     iniColorProgram(gl, HSV_SATURATION_PROGRAM, GL_PLAIN_VERT,

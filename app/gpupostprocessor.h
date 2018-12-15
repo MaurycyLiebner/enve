@@ -100,6 +100,7 @@ class GpuPostProcessor : public QThread, protected QGL33c {
 public:
     GpuPostProcessor();
 
+    //! @brief Adds a new task and starts processing it if is not busy.
     void addToProcess(const stdsptr<ScheduledPostProcess>& scheduled) {
         //scheduled->afterProcessed(); return;
         mScheduledProcesses << scheduled;
@@ -110,22 +111,31 @@ public:
         mScheduledProcesses.clear();
     }
 
+    //! @brief Starts processing scheduled tasks if is not busy.
     void handleScheduledProcesses() {
         if(mScheduledProcesses.isEmpty()) return;
-        if(mRunning) return;
-        mRunning = true;
+        if(!mFinished) return;
+        mFinished = false;
         _mHandledProcesses = mScheduledProcesses;
         mScheduledProcesses.clear();
         start();
     }
+
+    //! @brief Returns true if nothing is waiting/being processed.
+    const bool& hasFinished() const {
+        return mFinished;
+    }
+signals:
+    void processedAll();
 private slots:
-    void finishedProcessing() {
-        mRunning = false;
+    void afterProcessed() {
+        mFinished = true;
         foreach(const auto& process, _mHandledProcesses) {
             process->afterProcessed();
         }
         _mHandledProcesses.clear();
         handleScheduledProcesses();
+        if(mFinished) emit processedAll();
     }
 protected:
     void run() override {
@@ -152,7 +162,7 @@ protected:
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    bool mRunning = false;
+    bool mFinished = false;
     bool _mInitialized = false;
     GLuint _mTextureSquareVAO;
     QOpenGLContext* _mContext = nullptr;

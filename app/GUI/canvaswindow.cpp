@@ -23,6 +23,8 @@
 CanvasWindow::CanvasWindow(QWidget *parent) {
     connect(&mGpuPostProcessor, &GpuPostProcessor::finished,
             this, &CanvasWindow::tryProcessingNextUpdatable);
+    connect(&mGpuPostProcessor, &GpuPostProcessor::processedAll,
+            MainWindow::getInstance(), &MainWindow::callUpdateSchedulers);
     mWindowSWTTarget = SPtrCreate(WindowSingleWidgetTarget)(this);
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     int numberThreads = qMax(1, QThread::idealThreadCount());
@@ -846,9 +848,9 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(
         if(mFilesUpdateFinishedFunction != nullptr) {
             (*this.*mFilesUpdateFinishedFunction)();
         }
-        if(!mRenderingPreview) {
-            callUpdateSchedulers();
-        }
+//        if(!mRenderingPreview) {
+//            callUpdateSchedulers();
+//        }
         if(!mFreeThreads.isEmpty() && !mUpdatablesAwaitingUpdate.isEmpty()) {
             sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), nullptr);
         }
@@ -897,9 +899,9 @@ void CanvasWindow::sendNextUpdatableForUpdate(
         if(mBoxesUpdateFinishedFunction != nullptr) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
-//        if(!mRendering) {
-//            callUpdateSchedulers();
-//        }
+        if(!mRenderingPreview) {
+            if(mGpuPostProcessor.hasFinished()) callUpdateSchedulers();
+        }
     } else {
         int threadId = finishedThreadId;
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
