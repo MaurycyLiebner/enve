@@ -162,7 +162,7 @@ protected:
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    bool mFinished = false;
+    bool mFinished = true;
     bool _mInitialized = false;
     GLuint _mTextureSquareVAO;
     QOpenGLContext* _mContext = nullptr;
