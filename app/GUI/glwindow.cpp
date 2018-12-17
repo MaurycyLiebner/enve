@@ -89,12 +89,15 @@ void GLWindow::initialize() {
 
     // setup GrContext
     mInterface = GrGLMakeNativeInterface();
-    SkASSERT(mInterface);
+    if(!mInterface) {
+        RuntimeThrow("Failed to make native interface.");
+    }
 //    GrContextOptions options;
     // setup contexts
     mGrContext = GrContext::MakeGL(mInterface/*, options*/);
-    SkASSERT(mGrContext);
-
+    if(!mGrContext) {
+        RuntimeThrow("Failed to make GrContext.");
+    }
     // Wrap the frame buffer object attached to the screen in
     // a Skia render target so Skia can render to it
     //GrGLint buffer;
@@ -104,11 +107,16 @@ void GLWindow::initialize() {
 
     bindSkia();
 
-    iniPlainVShaderVBO(this);
-    iniPlainVShaderVAO(this, mPlainSquareVAO);
-    iniTexturedVShaderVBO(this);
-    iniTexturedVShaderVAO(this, mTexturedSquareVAO);
-    iniColorPrograms(this);
+    try {
+        iniPlainVShaderVBO(this);
+        iniPlainVShaderVAO(this, mPlainSquareVAO);
+        iniTexturedVShaderVBO(this);
+        iniTexturedVShaderVAO(this, mTexturedSquareVAO);
+        iniColorPrograms(this);
+    } catch(...) {
+        RuntimeThrow("Error initializing programs.");
+    }
+
     iniBlurProgram();
 
 //    qDebug() << "OpenGL Info";
@@ -145,7 +153,11 @@ void GLWindow::renderNow() {
 
     if(needsInitialize) {
         MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
-        initialize();
+        try {
+            initialize();
+        } catch(const std::exception& e) {
+            gPrintExceptionFatal(e);
+        }
     }
     assertNoGlErrors();
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());

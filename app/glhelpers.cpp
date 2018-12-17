@@ -24,6 +24,12 @@ void assertNoGlErrors() {
     assert(glError == GL_NO_ERROR);
 }
 
+void checkGlErrors(const std::string& msg) {
+    GLenum glError = glGetError();
+    if(glError == GL_NO_ERROR) return;
+    RuntimeThrow("OpenGL error " + std::to_string(glError) + " " + msg);
+}
+
 void iniTexturedVShaderVBO(QGL33c* gl) {
     float vertices[] = {
         // positions        // texture coords
@@ -82,9 +88,8 @@ void iniPlainVShaderVAO(QGL33c* gl, GLuint &VAO) {
     gl->glEnableVertexAttribArray(0);
 }
 
-//! @brief Checks for errors after program linking and shader compilation,
-//! returns true if no errros found.
-bool checkCompileErrors(QGL33c* gl,
+//! @brief Checks for errors after program linking and shader compilation.
+void checkCompileErrors(QGL33c* gl,
                         const GLuint& shader,
                         const std::string& type) {
     GLint success;
@@ -93,19 +98,21 @@ bool checkCompileErrors(QGL33c* gl,
         gl->glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if(!success) {
             gl->glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << std::endl;
+            RuntimeThrow("ERROR::SHADER_COMPILATION_ERROR of type: " +
+                         type + "\n" + infoLog);
         }
     } else {
         gl->glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if(!success) {
             gl->glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << std::endl;
+            RuntimeThrow(
+                "ERROR::PROGRAM_LINKING_ERROR of type: " +
+                        type + "\n" + infoLog);
         }
     }
-    return success;
 }
 
-bool iniProgram(QGL33c* gl,
+void iniProgram(QGL33c* gl,
                 GLuint& program,
                 const std::string& vShaderPath,
                 const std::string& fShaderPath) {
@@ -130,9 +137,8 @@ bool iniProgram(QGL33c* gl,
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure e) {
-        ERROUT(e.what());
-        return false;
+    } catch(...) {
+        RuntimeThrow("Could not load shader data from file.");
     }
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
@@ -140,23 +146,33 @@ bool iniProgram(QGL33c* gl,
     GLuint vertexShader = gl->glCreateShader(GL_VERTEX_SHADER);
     gl->glShaderSource(vertexShader, 1, &vShaderCode, nullptr);
     gl->glCompileShader(vertexShader);
-    if(!checkCompileErrors(gl, vertexShader, "VERTEX")) return false;
+    try {
+        checkCompileErrors(gl, vertexShader, "VERTEX");
+    } catch(...) {
+        RuntimeThrow("Error compiling vertex shader.");
+    }
 
     GLuint fragmentShader = gl->glCreateShader(GL_FRAGMENT_SHADER);
     gl->glShaderSource(fragmentShader, 1, &fShaderCode, nullptr);
     gl->glCompileShader(fragmentShader);
-    if(!checkCompileErrors(gl, fragmentShader, "FRAGMENT")) return false;
+    try {
+        checkCompileErrors(gl, fragmentShader, "FRAGMENT");
+    } catch(...) {
+        RuntimeThrow("Error compiling fragment shader.");
+    }
 
     program = gl->glCreateProgram();
     gl->glAttachShader(program, vertexShader);
     gl->glAttachShader(program, fragmentShader);
     gl->glLinkProgram(program);
-    if(!checkCompileErrors(gl, program, "PROGRAM")) return false;
+    try {
+        checkCompileErrors(gl, program, "PROGRAM");
+    } catch(...) {
+        RuntimeThrow("Error linking program.");
+    }
 
     gl->glDeleteShader(vertexShader);
     gl->glDeleteShader(fragmentShader);
-
-    return true;
 }
 
 Texture Texture::createTextureFromImage(QGL33c *gl,

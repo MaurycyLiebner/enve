@@ -5,9 +5,10 @@ typedef QOpenGLFunctions_3_3_Core QGL33c;
 #include "skiaincludes.h"
 
 extern void assertNoGlErrors();
+extern void checkGlErrors(const std::string& msg = "");
 
 //! @brief Creates a program, compiles, and attaches associated shaders.
-extern bool iniProgram(QGL33c* gl,
+extern void iniProgram(QGL33c* gl,
                        GLuint& program,
                        const std::string& vShaderPath,
                        const std::string& fShaderPath);
