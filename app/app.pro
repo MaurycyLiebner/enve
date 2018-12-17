@@ -249,7 +249,8 @@ SOURCES += main.cpp\
     skimagegpudraw.cpp \
     gpupostprocessor.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
-    glhelpers.cpp
+    glhelpers.cpp \
+    exceptions.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \

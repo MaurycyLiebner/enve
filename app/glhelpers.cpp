@@ -1,4 +1,5 @@
 #include "glhelpers.h"
+#include "exceptions.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -16,6 +17,7 @@ std::string GL_TEXTURED_VERT =
 GLuint GL_TEXTURED_SQUARE_VBO;
 
 BlurProgram GL_BLUR_PROGRAM;
+DotProgram GL_DOT_PROGRAM;
 
 void assertNoGlErrors() {
     GLenum glError = glGetError();
@@ -80,7 +82,9 @@ void iniPlainVShaderVAO(QGL33c* gl, GLuint &VAO) {
     gl->glEnableVertexAttribArray(0);
 }
 
-void checkCompileErrors(QGL33c* gl,
+//! @brief Checks for errors after program linking and shader compilation,
+//! returns true if no errros found.
+bool checkCompileErrors(QGL33c* gl,
                         const GLuint& shader,
                         const std::string& type) {
     GLint success;
@@ -89,18 +93,19 @@ void checkCompileErrors(QGL33c* gl,
         gl->glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if(!success) {
             gl->glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << std::endl;
         }
     } else {
         gl->glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if(!success) {
             gl->glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << std::endl;
         }
     }
+    return success;
 }
 
-void iniProgram(QGL33c* gl,
+bool iniProgram(QGL33c* gl,
                 GLuint& program,
                 const std::string& vShaderPath,
                 const std::string& fShaderPath) {
@@ -126,7 +131,8 @@ void iniProgram(QGL33c* gl,
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
     } catch (std::ifstream::failure e) {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+        ERROUT(e.what());
+        return false;
     }
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
@@ -134,21 +140,23 @@ void iniProgram(QGL33c* gl,
     GLuint vertexShader = gl->glCreateShader(GL_VERTEX_SHADER);
     gl->glShaderSource(vertexShader, 1, &vShaderCode, nullptr);
     gl->glCompileShader(vertexShader);
-    checkCompileErrors(gl, vertexShader, "VERTEX");
+    if(!checkCompileErrors(gl, vertexShader, "VERTEX")) return false;
 
     GLuint fragmentShader = gl->glCreateShader(GL_FRAGMENT_SHADER);
     gl->glShaderSource(fragmentShader, 1, &fShaderCode, nullptr);
     gl->glCompileShader(fragmentShader);
-    checkCompileErrors(gl, fragmentShader, "FRAGMENT");
+    if(!checkCompileErrors(gl, fragmentShader, "FRAGMENT")) return false;
 
     program = gl->glCreateProgram();
     gl->glAttachShader(program, vertexShader);
     gl->glAttachShader(program, fragmentShader);
     gl->glLinkProgram(program);
-    checkCompileErrors(gl, program, "PROGRAM");
+    if(!checkCompileErrors(gl, program, "PROGRAM")) return false;
 
     gl->glDeleteShader(vertexShader);
     gl->glDeleteShader(fragmentShader);
+
+    return true;
 }
 
 Texture Texture::createTextureFromImage(QGL33c *gl,
@@ -185,7 +193,7 @@ void Texture::gen(QGL33c *gl,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 }
 
-void Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
+bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
     int nrChannels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(imagePath.c_str(), &fWidth, &fHeight,
@@ -195,11 +203,13 @@ void Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
                          0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         gl->glGenerateMipmap(GL_TEXTURE_2D);
     } else {
-        std::cout << "Failed to load texture" << imagePath << std::endl;
-        exit(EXIT_FAILURE);
+        std::string errMsg = "Failed to load texture" + imagePath;
+        ERROUT(errMsg);
+        return false;
     }
     stbi_image_free(data);
     assertNoGlErrors();
+    return true;
 }
 
 sk_sp<SkImage> TextureFrameBuffer::toImage() {

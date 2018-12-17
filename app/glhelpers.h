@@ -7,7 +7,7 @@ typedef QOpenGLFunctions_3_3_Core QGL33c;
 extern void assertNoGlErrors();
 
 //! @brief Creates a program, compiles, and attaches associated shaders.
-extern void iniProgram(QGL33c* gl,
+extern bool iniProgram(QGL33c* gl,
                        GLuint& program,
                        const std::string& vShaderPath,
                        const std::string& fShaderPath);
@@ -31,7 +31,15 @@ struct BlurProgram : public ShaderProgram {
     GLint fBlurRadiusLoc;
 };
 
+struct DotProgram : public ShaderProgram {
+    GLint fDotRadiusLoc;
+    GLint fDotDistanceLoc;
+    GLint fOnePixelLoc;
+    GLint fTranslateLoc;
+};
+
 extern BlurProgram GL_BLUR_PROGRAM;
+extern DotProgram GL_DOT_PROGRAM;
 
 struct Texture {
     GLuint fID;
@@ -67,7 +75,7 @@ struct Texture {
         otherTexture.fHeight = height;
     }
 private:
-    void loadImage(QGL33c* gl, const std::string& imagePath);
+    bool loadImage(QGL33c* gl, const std::string& imagePath);
 };
 
 struct TextureFrameBuffer {

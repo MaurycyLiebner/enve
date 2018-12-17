@@ -62,6 +62,21 @@ void GLWindow::iniBlurProgram() {
 
     GL_BLUR_PROGRAM.fBlurRadiusLoc =
             glGetUniformLocation(GL_BLUR_PROGRAM.fID, "blurRadius");
+
+    iniProgram(this, GL_DOT_PROGRAM.fID,
+               GL_TEXTURED_VERT,
+               "/home/ailuropoda/Dev/AniVect/src/shaders/dots.frag");
+    glUseProgram(GL_DOT_PROGRAM.fID);
+
+    GLint texLocation2 = glGetUniformLocation(GL_DOT_PROGRAM.fID, "texture");
+    glUniform1i(texLocation2, 0);
+
+    GL_DOT_PROGRAM.fDotRadiusLoc =
+            glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotRadius");
+    GL_DOT_PROGRAM.fDotDistanceLoc =
+            glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotDistance");
+    GL_DOT_PROGRAM.fTranslateLoc =
+            glGetUniformLocation(GL_DOT_PROGRAM.fID, "translate");
 }
 
 void GLWindow::initialize() {

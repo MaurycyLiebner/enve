@@ -41,6 +41,34 @@ private:
     GLfloat mBlurRadiusX;
     GLfloat mBlurRadiusY;
 };
+#include <QMatrix4x4>
+class DotProgramCaller : public ShaderProgramCaller<DotProgram> {
+public:
+    DotProgramCaller(const qreal& dotRadius,
+                     const qreal& dotDistance,
+                     const QPointF& transform) :
+        ShaderProgramCaller(&GL_DOT_PROGRAM) {
+        mDotRadius = static_cast<GLfloat>(dotRadius);
+        mDotDistance = static_cast<GLfloat>(dotDistance);
+        mTranslateX = static_cast<GLfloat>(transform.x());
+        mTranslateY = static_cast<GLfloat>(transform.y());
+    }
+
+    void use(QGL33c * const gl) {
+        gl->glUseProgram(mProgram->fID);
+        gl->glUniform1f(mProgram->fDotRadiusLoc,
+                        mDotRadius);
+        gl->glUniform1f(mProgram->fDotDistanceLoc,
+                        mDotDistance);
+        gl->glUniform2f(mProgram->fTranslateLoc,
+                        mTranslateX, mTranslateY);
+    }
+private:
+    GLfloat mDotRadius;
+    GLfloat mDotDistance;
+    GLfloat mTranslateX;
+    GLfloat mTranslateY;
+};
 
 class ScheduledPostProcess : public StdSelfRef,
         protected QGL33c {

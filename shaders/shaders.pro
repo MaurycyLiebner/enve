@@ -1,6 +1,9 @@
 TEMPLATE = subdirs
 
 DISTFILES += \
-	blur.frag \
+    blur.frag \
+    dots.frag \
     textured.vert \
-    plain.vert
+    plain.vert \
+    brightnesscontrast.frag \
+    palette.frag

@@ -100,10 +100,14 @@ void BoundingBoxRenderData::renderToImage() {
     globalBoundingRect.translate(-transF);
 
     // !!! TEST !!!
-    auto size = QSize(qCeil(globalBoundingRect.width()),
-                      qCeil(globalBoundingRect.height()));
-    auto blurProgram = SPtrCreate(BlurProgramCaller)(50., size);
-    fGpuShaders << blurProgram;
+    //auto blurProgram = SPtrCreate(BlurProgramCaller)(50., size);
+    //fGpuShaders << blurProgram;
+//    QMatrix4x4 dotTrans;
+//    dotTrans.translate(static_cast<float>(-globalBoundingRect.x()),
+//                       static_cast<float>(-globalBoundingRect.y()));
+    auto dotsProgram =
+            SPtrCreate(DotProgramCaller)(5., 5., globalBoundingRect.topLeft());
+    fGpuShaders << dotsProgram;
     // !!! TEST !!!
 
     SkImageInfo info = SkImageInfo::Make(qCeil(globalBoundingRect.width()),
