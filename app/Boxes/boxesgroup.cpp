@@ -937,7 +937,6 @@ int BoxesGroup::getContainedBoxIndex(BoundingBox *child) {
             return i;
         }
     }
-    Q_ASSERT(false);
     return -1;
 }
 

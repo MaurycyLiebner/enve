@@ -122,7 +122,7 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
     }
 }
 
-void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
+void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas != nullptr) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mPreviewFPSTimer, &QTimer::timeout,

@@ -41,7 +41,7 @@ public:
         return mCanvasList;
     }
 
-    void setCurrentCanvas(Canvas *canvas);
+    void setCurrentCanvas(Canvas * const canvas);
     void addCanvasToList(const qsptr<Canvas> &canvas);
     void removeCanvas(const int &id);
     void addCanvasToListAndSetAsCurrent(const qsptr<Canvas> &canvas);

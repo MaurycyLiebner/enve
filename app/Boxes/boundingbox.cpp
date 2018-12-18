@@ -1548,7 +1548,6 @@ QMimeData *BoundingBox::SWT_createMimeData() {
 #include "gpupostprocessor.h"
 #include "skimagecopy.h"
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
-    Q_ASSERT(renderData->fGpuFinished);
     mExpiredPixmap = 0;
     if(renderData->redo) {
         scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);

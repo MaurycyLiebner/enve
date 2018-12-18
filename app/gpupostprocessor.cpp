@@ -50,17 +50,13 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
     mProgram->use(this);
     glActiveTexture(GL_TEXTURE0);
     srcTexture.bind(this);
-    assertNoGlErrors();
 
     glBindVertexArray(texturedSquareVAO);
-    assertNoGlErrors();
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    assertNoGlErrors();
     frameBufferObject.bindTexture(this);
 
     mFinalImage = frameBufferObject.toImage();
-    assertNoGlErrors();
     frameBufferObject.deleteFrameBuffer(this);
     frameBufferObject.deleteTexture(this);
     srcTexture.deleteTexture(this);
@@ -102,22 +98,17 @@ void BoxRenderDataScheduledPostProcess::process(
         program->use(this);
         glActiveTexture(GL_TEXTURE0);
         srcTexture.bind(this);
-        assertNoGlErrors();
 
         glBindVertexArray(texturedSquareVAO);
-        assertNoGlErrors();
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        assertNoGlErrors();
         if(i == mBoxData->fGpuShaders.count() - 1) break;
         frameBufferObject.swapTexture(this, srcTexture);
-        assertNoGlErrors();
     }
     mBoxData->fGpuShaders.clear();
 
     frameBufferObject.bindTexture(this);
     mBoxData->renderedImage = frameBufferObject.toImage();
-    assertNoGlErrors();
     frameBufferObject.deleteFrameBuffer(this);
     frameBufferObject.deleteTexture(this);
     srcTexture.deleteTexture(this);

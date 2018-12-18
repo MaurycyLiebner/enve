@@ -78,7 +78,6 @@ void DisplayedGradientsWidget::paintGL() {
             }
             xT = qRound(xT) + xInc;
             lastColor = currentColor;
-            assertNoGlErrors();
         }
         if(i == mHoveredGradientId || i == mContextMenuGradientId) {
             glUseProgram(BORDER_PROGRAM.fID);

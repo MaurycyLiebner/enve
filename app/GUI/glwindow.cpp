@@ -192,16 +192,13 @@ void GLWindow::renderNow() {
         gPrintExceptionFatal(e);
     }
 
-    assertNoGlErrors();
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
-    assertNoGlErrors();
 
     glViewport(0, 0, width(), height());
 
     //mCanvas->save();
     //draw(mCanvas);
     renderSk(mCanvas, mGrContext.get());
-    assertNoGlErrors();
 //    SkPaint paint;
 //    SkPoint gradPoints[2];
 //    gradPoints[0] = SkPoint::Make(0.f, 0.f);
@@ -223,7 +220,6 @@ void GLWindow::renderNow() {
 
     //mCanvas->restore();
     mCanvas->flush();
-    assertNoGlErrors();
 
 //    if(!mDevice) mDevice = new QOpenGLPaintDevice;
 

@@ -184,11 +184,9 @@ protected:
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
 
-        assertNoGlErrors();
 
         foreach(const auto& scheduled, _mHandledProcesses) {
             scheduled->process(_mTextureSquareVAO);
-            assertNoGlErrors();
         }
         _mContext->doneCurrent();
         //mFrameBuffer->bindDefault();

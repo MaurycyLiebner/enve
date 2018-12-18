@@ -38,13 +38,10 @@ void GLWidget::initializeGL() {
     initializeOpenGLFunctions();
 
     glClearColor(mBgColor.fR, mBgColor.fG, mBgColor.fB, mBgColor.fA);
-    assertNoGlErrors();
     //Set blending
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    assertNoGlErrors();
 
     iniPlainVShaderVAO(this, mPlainSquareVAO);
-    assertNoGlErrors();
 }

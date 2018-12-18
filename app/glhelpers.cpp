@@ -224,7 +224,6 @@ bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
         return false;
     }
     stbi_image_free(data);
-    assertNoGlErrors();
     return true;
 }
 
