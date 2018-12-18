@@ -571,7 +571,7 @@ PathAnimator *VectorPathAnimator::getParentPathAnimator() {
 }
 
 void VectorPathAnimator::finalizeNodesRemove() {
-    qSort(mNodesToRemove.begin(), mNodesToRemove.end());
+    qSort(mNodesToRemove);
     for(int i = mNodesToRemove.count() - 1; i >= 0; i--) {
         const int &nodeId = mNodesToRemove.at(i);
         removeNodeSettingsAt(nodeId);

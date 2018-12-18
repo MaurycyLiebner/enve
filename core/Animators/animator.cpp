@@ -324,7 +324,7 @@ bool keysFrameSort(const stdsptr<Key> &key1,
 }
 
 void Animator::anim_sortKeys() {
-    qSort(anim_mKeys.begin(), anim_mKeys.end(), keysFrameSort);
+    std::sort(anim_mKeys.begin(), anim_mKeys.end(), keysFrameSort);
 }
 
 void Animator::anim_appendKey(const stdsptr<Key>& newKey,

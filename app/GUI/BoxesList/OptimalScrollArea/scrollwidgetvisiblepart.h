@@ -11,31 +11,6 @@
 class ScrollWidget;
 class SingleWidgetTarget;
 
-enum SWT_Rule : short;
-
-typedef bool (SingleWidgetTarget::*SWT_Checker)();
-
-struct SWT_RulesCollection {
-    SWT_RulesCollection();
-    SWT_RulesCollection(const SWT_Rule &ruleT,
-                        const bool &alwaysShowChildrenT,
-                        const SWT_Target &targetT,
-                        SWT_Checker typeT,
-                        const QString &searchStringT) {
-        rule = ruleT;
-        alwaysShowChildren = alwaysShowChildrenT;
-        target = targetT;
-        type = typeT;
-        searchString = searchStringT;
-    }
-
-    SWT_Rule rule;
-    bool alwaysShowChildren;
-    SWT_Target target;
-    SWT_Checker type;
-    QString searchString;
-};
-
 class ScrollWidgetVisiblePart :
         public MinimalScrollWidgetVisiblePart {
     Q_OBJECT

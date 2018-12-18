@@ -5,10 +5,7 @@
 #include <QDebug>
 #include <QMenu>
 #include "GUI/mainwindow.h"
-#include "GUI/keysview.h"
-#include "GUI/BoxesList/boxscrollwidget.h"
 #include "singlewidgetabstraction.h"
-#include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
 #include "pointhelpers.h"
 #include "skqtconversions.h"
@@ -1545,8 +1542,6 @@ QMimeData *BoundingBox::SWT_createMimeData() {
     return new BoundingBoxMimeData(this);
 }
 
-#include "gpupostprocessor.h"
-#include "skimagecopy.h"
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     mExpiredPixmap = 0;
     if(renderData->redo) {
@@ -1554,22 +1549,6 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     mDrawRenderContainer->setSrcRenderData(renderData);
     updateDrawRenderContainerTransform();
-
-    // !!! TEST
-//    auto canvasWindow = MainWindow::getInstance()->getCanvasWindow();
-//    auto img = mDrawRenderContainer->getImageSk();
-//    ShaderFinishedFunc finishFunc =
-//    [this](const sk_sp<SkImage>& finished) {
-//        if(!finished) return;
-//        mDrawRenderContainer->replaceImageSk(finished);
-//    };
-//    auto imgSize = QSize(img->width(), img->height());
-//    auto program = SPtrCreate(BlurProgramCaller)(50., imgSize);
-//    canvasWindow->scheduleGpuTask(
-//                SPtrCreate(ShaderPostProcess)(
-//                    img, program, finishFunc));
-//    canvasWindow->processGpuTask();
-    // !!! TEST
 }
 
 void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {

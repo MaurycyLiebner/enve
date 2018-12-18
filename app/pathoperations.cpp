@@ -786,7 +786,7 @@ bool PointsBezierCubic::intersects(PointsBezierCubic *bezier,
 
         lastThisPos = currentThisPos;
     }
-    qSort(otherBezierInterTs.begin(), otherBezierInterTs.end(), qrealIntSort);
+    std::sort(otherBezierInterTs.begin(), otherBezierInterTs.end(), qrealIntSort);
     foreach(const qrealInt &val, otherBezierInterTs) {
         bezierIntersectionPts->append(val.intV);
     }

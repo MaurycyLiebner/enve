@@ -794,7 +794,7 @@ void Canvas::copyAction() {
     int nBoxes = mSelectedBoxes.count();
     target.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
 
-    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
+    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
     Q_FOREACH(const QPointer<BoundingBox>& box, mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }

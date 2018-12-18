@@ -601,7 +601,7 @@ bool zLessThan(const qptr<BoundingBox>& box1, const qptr<BoundingBox>& box2) {
 }
 
 void Canvas::sortSelectedBoxesByZAscending() {
-    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
+    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
 }
 
 void Canvas::raiseSelectedBoxesToTop() {
@@ -753,7 +753,7 @@ void Canvas::duplicateSelectedBoxes() {
     int nBoxes = mSelectedBoxes.count();
     target.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
 
-    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
+    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
     Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }

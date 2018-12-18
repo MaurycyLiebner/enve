@@ -144,7 +144,7 @@ void DrawPath::decNodePosIdsForIdsBelow(const int &idT, const int &inc) {
 }
 
 void DrawPath::sortNodes() {
-    qSort(mNodes.begin(), mNodes.end(), drawPathNodeSort);
+    std::sort(mNodes.begin(), mNodes.end(), drawPathNodeSort);
 }
 
 void DrawPath::removePosForNode(const int &idT) {
