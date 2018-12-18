@@ -754,7 +754,7 @@ void VideoEncoder::_processUpdate() {
 }
 
 void VideoEncoder::beforeUpdate() {
-    _ScheduledExecutor::beforeUpdate();
+    _ScheduledTask::beforeUpdate();
     _mCurrentContainerId = 0;
     _mCurrentContainerFrame = 0;
     _mContainers.append(mNextContainers);
@@ -799,7 +799,7 @@ void VideoEncoder::afterUpdate() {
             finishEncodingSuccess();
         }
     }
-    _ScheduledExecutor::afterUpdate();
+    _ScheduledTask::afterUpdate();
 }
 
 VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {

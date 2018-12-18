@@ -43,7 +43,7 @@ protected:
 };
 #include "updatable.h"
 class CacheContainer;
-class CacheContainerTmpFileDataLoader : public _ScheduledExecutor {
+class CacheContainerTmpFileDataLoader : public _ScheduledTask {
     friend class StdSelfRef;
 public:
     void _processUpdate();
@@ -61,7 +61,7 @@ protected:
     sk_sp<SkImage> mImage;
 };
 
-class CacheContainerTmpFileDataSaver : public _ScheduledExecutor {
+class CacheContainerTmpFileDataSaver : public _ScheduledTask {
     friend class StdSelfRef;
 public:
     void _processUpdate();
@@ -79,7 +79,7 @@ protected:
     qsptr<QTemporaryFile> mTmpFile;
 };
 
-class CacheContainerTmpFileDataDeleter : public _ScheduledExecutor {
+class CacheContainerTmpFileDataDeleter : public _ScheduledTask {
     friend class StdSelfRef;
 public:
     void _processUpdate();
@@ -98,8 +98,8 @@ class CacheContainer : public MinimalCacheContainer {
 public:
     ~CacheContainer();
 
-    _ScheduledExecutor *scheduleLoadFromTmpFile(
-            _ScheduledExecutor* dependent = nullptr);
+    _ScheduledTask *scheduleLoadFromTmpFile(
+            _ScheduledTask* dependent = nullptr);
 
     bool cacheAndFree();
     bool freeAndRemove();
@@ -144,8 +144,8 @@ protected:
     int mMaxRelFrame = 0;
 
     qptr<Canvas> mTmpLoadTargetCanvas;
-    stdsptr<_ScheduledExecutor> mLoadingUpdatable;
-    stdsptr<_ScheduledExecutor> mSavingUpdatable;
+    stdsptr<_ScheduledTask> mLoadingUpdatable;
+    stdsptr<_ScheduledTask> mSavingUpdatable;
 
     qsptr<QTemporaryFile> mTmpFile;
 

@@ -461,7 +461,7 @@ void VideoCacheHandler::replace() {
 
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
-_ScheduledExecutor* VideoCacheHandler::scheduleFrameLoad(
+_ScheduledTask* VideoCacheHandler::scheduleFrameLoad(
         const int &frame) {
     if(mFramesCount <= 0 || frame >= mFramesCount) return nullptr;
     if(mFramesLoadScheduled.contains(frame) ||
@@ -522,7 +522,7 @@ void ImageSequenceCacheHandler::clearCache() {
     FileCacheHandler::clearCache();
 }
 
-_ScheduledExecutor *ImageSequenceCacheHandler::scheduleFrameLoad(
+_ScheduledTask *ImageSequenceCacheHandler::scheduleFrameLoad(
         const int &frame) {
     ImageCacheHandler* imageHandler = mFrameImageHandlers.at(frame);
     return imageHandler;

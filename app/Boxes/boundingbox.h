@@ -382,7 +382,7 @@ public:
                                                const int &relFrame,
                                                const bool &takeAncestorsIntoAccount = true);
     virtual void processSchedulers();
-    void addScheduler(const stdsptr<_ScheduledExecutor> &updatable);
+    void addScheduler(const stdsptr<_ScheduledTask> &updatable);
     virtual void addSchedulersToProcess();
 
     const int &getLoadId();
@@ -495,7 +495,7 @@ protected:
     qsptr<EffectAnimators> mEffectsAnimators;
     qsptr<BoxTransformAnimator> mTransformAnimator;
 
-    QList<stdsptr<_ScheduledExecutor>> mSchedulers;
+    QList<stdsptr<_ScheduledTask>> mSchedulers;
 
     static QList<qptr<BoundingBox>> mLoadedBoxes;
     static QList<stdsptr<FunctionWaitingForBoxLoad>> mFunctionsWaitingForBoxLoad;

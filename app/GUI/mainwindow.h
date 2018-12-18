@@ -24,7 +24,7 @@ class BrushSelectionWidget;
 class Canvas;
 class CanvasWindow;
 class MemoryHandler;
-class _ScheduledExecutor;
+class _ScheduledTask;
 
 class ObjectSettingsWidget;
 class BoxScrollWidget;
@@ -83,7 +83,7 @@ public:
     }
     UndoRedoStack *getUndoRedoStack();
 
-    void addUpdateScheduler(const stdsptr<_ScheduledExecutor> &scheduler);
+    void addUpdateScheduler(const stdsptr<_ScheduledTask> &scheduler);
 
     static bool isShiftPressed();
     static bool isCtrlPressed();
@@ -146,7 +146,7 @@ public:
     FontsWidget *getFontsWidget() {
         return mFontWidget;
     }
-    void addFileUpdateScheduler(const stdsptr<_ScheduledExecutor>& scheduler);
+    void addFileUpdateScheduler(const stdsptr<_ScheduledTask>& scheduler);
     Brush *getCurrentBrush();
 
     UsageWidget* getUsageWidget() {
@@ -264,7 +264,7 @@ private:
     CanvasWindow *mCanvasWindow;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
-    QList<stdsptr<_ScheduledExecutor> > mUpdateSchedulers;
+    QList<stdsptr<_ScheduledTask> > mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
 

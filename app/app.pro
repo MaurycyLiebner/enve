@@ -71,7 +71,6 @@ SOURCES += main.cpp\
     qrealkey.cpp \
     qrealpoint.cpp \
     pointhelpers.cpp \
-    paintcontroler.cpp \
     Animators/transformanimator.cpp \
     Animators/boolanimator.cpp \
     Animators/coloranimator.cpp \
@@ -250,7 +249,8 @@ SOURCES += main.cpp\
     gpupostprocessor.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
     glhelpers.cpp \
-    exceptions.cpp
+    exceptions.cpp \
+    taskexecutor.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -270,7 +270,6 @@ HEADERS  += \
     qrealkey.h \
     qrealpoint.h \
     pointhelpers.h \
-    paintcontroler.h \
     keypoint.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
@@ -457,7 +456,8 @@ HEADERS  += \
     gpupostprocessor.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
     glhelpers.h \
-    exceptions.h
+    exceptions.h \
+    taskexecutor.h
 
 RESOURCES += \
     resources.qrc

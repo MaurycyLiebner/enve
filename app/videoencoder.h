@@ -46,7 +46,7 @@ signals:
     void encodingFailed();
 };
 
-class VideoEncoder : public _ScheduledExecutor {
+class VideoEncoder : public _ScheduledTask {
 public:
     VideoEncoder();
 

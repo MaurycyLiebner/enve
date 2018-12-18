@@ -11,7 +11,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "boxeslistanimationdockwidget.h"
-#include "paintcontroler.h"
+#include "taskexecutor.h"
 #include "qdoubleslider.h"
 #include "svgimporter.h"
 #include "canvaswindow.h"
@@ -217,8 +217,8 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {
-//    mPaintControlerThread->terminate();
-//    mPaintControlerThread->quit();
+//    mtaskExecutorThread->terminate();
+//    mtaskExecutorThread->quit();
     replaceClipboard(nullptr);
     BoxSingleWidget::clearStaticPixmaps();
 }
@@ -929,11 +929,11 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
     updateTitle();
 }
 
-void MainWindow::addUpdateScheduler(const stdsptr<_ScheduledExecutor>& scheduler) {
+void MainWindow::addUpdateScheduler(const stdsptr<_ScheduledTask>& scheduler) {
     mUpdateSchedulers.append(scheduler);
 }
 
-void MainWindow::addFileUpdateScheduler(const stdsptr<_ScheduledExecutor>& scheduler) {
+void MainWindow::addFileUpdateScheduler(const stdsptr<_ScheduledTask>& scheduler) {
     mCanvasWindow->addFileUpdatableAwaitingUpdate(scheduler);
 }
 
@@ -968,7 +968,7 @@ void MainWindow::callUpdateSchedulers() {
 
     if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
         mCanvasWindow->processSchedulers();
-        foreach(const stdsptr<_ScheduledExecutor> &updatable,
+        foreach(const stdsptr<_ScheduledTask> &updatable,
                 mUpdateSchedulers) {
             if(!updatable->isAwaitingUpdate()) {
                 updatable->schedulerProccessed();

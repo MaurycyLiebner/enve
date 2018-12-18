@@ -152,7 +152,7 @@ void BoundingBoxRenderData::beforeUpdate() {
         dataSet();
     }
 
-    _ScheduledExecutor::beforeUpdate();
+    _ScheduledTask::beforeUpdate();
 
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr || !parentIsTarget) return;
@@ -171,7 +171,7 @@ void BoundingBoxRenderData::afterUpdate() {
         parentBoxT->renderDataFinished(this);
         // qDebug() << "box render finished:" << relFrame << parentBoxT->prp_getName();
     }
-    _ScheduledExecutor::afterUpdate();
+    _ScheduledTask::afterUpdate();
 }
 
 void BoundingBoxRenderData::parentBeingProcessed() {
@@ -198,13 +198,13 @@ void BoundingBoxRenderData::schedulerProccessed() {
     if(!mDelayDataSet) {
         dataSet();
     }
-    _ScheduledExecutor::schedulerProccessed();
+    _ScheduledTask::schedulerProccessed();
 }
 
 void BoundingBoxRenderData::addSchedulerNow() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return;
-    parentBoxT->addScheduler(GetAsSPtr(this, _ScheduledExecutor));
+    parentBoxT->addScheduler(GetAsSPtr(this, _ScheduledTask));
 }
 
 void BoundingBoxRenderData::dataSet() {

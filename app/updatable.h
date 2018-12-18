@@ -3,42 +3,13 @@
 #include <QList>
 #include <QEventLoop>
 #include "smartPointers/sharedpointerdefs.h"
-class PaintControler;
+class TaskExecutor;
 
-class MinimalExecutor : public StdSelfRef {
+class _Task : public StdSelfRef {
 public:
-    MinimalExecutor();
-    bool finished();
+    _Task();
 
-    virtual void addDependent(MinimalExecutor* updatable) = 0;
-
-    virtual void clear();
-
-    void decDependencies();
-    void incDependencies();
-protected:
-    virtual void GUI_process();
-    void tellDependentThatFinished();
-
-    bool mGUIThreadExecution = false;
-    bool mFinished = false;
-    int nDependancies = 0;
-    QList<stdptr<MinimalExecutor>> mCurrentExecutionDependent;
-};
-
-class GUI_ThreadExecutor : public MinimalExecutor {
-    GUI_ThreadExecutor();
-
-    void addDependent(MinimalExecutor* updatable);
-protected:
-    void GUI_process() = 0;
-};
-
-class _Executor : public MinimalExecutor {
-public:
-    _Executor();
-
-    void setCurrentPaintControler(PaintControler *paintControler);
+    void setCurrentTaskExecutor(TaskExecutor *taskExecutor);
 
     virtual void beforeUpdate();
 
@@ -54,23 +25,34 @@ public:
 
     bool readyToBeProcessed();
 
-    void clear();
+    virtual void clear();
 
-    void addDependent(MinimalExecutor* updatable);
+    virtual void addDependent(_Task* updatable);
+
+    bool finished();
+
+    void decDependencies();
+    void incDependencies();
 protected:
-    bool mBeingProcessed = false;
-    QPointer<PaintControler> mCurrentPaintControler;
-    stdsptr<_Executor> mSelfRef;
+    void tellDependentThatFinished();
 
-    QList<stdptr<MinimalExecutor>> mNextExecutionDependent;
+    bool mFinished = false;
+    bool mBeingProcessed = false;
+    int nDependancies = 0;
+
+    QPointer<TaskExecutor> mCurrentTaskExecutor;
+    stdsptr<_Task> mSelfRef;
+
+    QList<stdptr<_Task>> mNextExecutionDependent;
+    QList<stdptr<_Task>> mCurrentExecutionDependent;
 };
 
-class _ScheduledExecutor : public _Executor {
+class _ScheduledTask : public _Task {
 public:
-    _ScheduledExecutor() {
+    _ScheduledTask() {
         mFinished = true;
     }
-    ~_ScheduledExecutor();
+    ~_ScheduledTask();
 
     void beforeUpdate();
 

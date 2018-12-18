@@ -108,7 +108,7 @@ private:
     Tile ***mTiles = nullptr;
 };
 
-class SaveTilesDataToTmpFileExec : public _Executor {
+class SaveTilesDataToTmpFileExec : public _Task {
 public:
     SaveTilesDataToTmpFileExec(TilesData *targetTilesDataT) {
         mTargetTilesData = targetTilesDataT;
@@ -126,7 +126,7 @@ private:
     TilesData *mTargetTilesData;
 };
 
-class LoadTilesDataFromTmpFileExec : public _Executor {
+class LoadTilesDataFromTmpFileExec : public _Task {
 public:
     LoadTilesDataFromTmpFileExec(TilesData *targetTilesDataT) {
         mTargetTilesData = targetTilesDataT;

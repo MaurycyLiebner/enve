@@ -12,7 +12,7 @@ class ShaderProgramCallerBase;
 #include "smartPointers/sharedpointerdefs.h"
 
 class RenderDataCustomizerFunctor;
-struct BoundingBoxRenderData : public _ScheduledExecutor {
+struct BoundingBoxRenderData : public _ScheduledTask {
     friend class StdSelfRef;
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 

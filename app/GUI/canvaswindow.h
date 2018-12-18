@@ -14,13 +14,13 @@ enum CanvasMode : short;
 class Gradient;
 class BoundingBox;
 class BoxesGroup;
-class PaintControler;
+class TaskExecutor;
 class SoundComposition;
 class PaintSetting;
 class CanvasWidget;
 class RenderInstanceSettings;
-class _ScheduledExecutor;
-class _Executor;
+class _ScheduledTask;
+class _Task;
 class ImageBox;
 class SingleSound;
 class VideoBox;
@@ -86,7 +86,7 @@ public:
     int getCurrentFrame();
     int getMaxFrame();
     void addUpdatableAwaitingUpdate(
-            const stdsptr<_ScheduledExecutor> &updatable);
+            const stdsptr<_ScheduledTask> &updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             const UpdateFuncs &updateFuncs,
@@ -140,7 +140,7 @@ public:
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
     void addFileUpdatableAwaitingUpdate(
-            const stdsptr<_ScheduledExecutor> &updatable);
+            const stdsptr<_ScheduledTask> &updatable);
     WindowSingleWidgetTarget *getWindowSWT() {
         return mWindowSWTTarget.get();
     }
@@ -178,7 +178,7 @@ private:
     GpuPostProcessor mGpuPostProcessor;
 
     qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
-    PaintControler *mFileControler = nullptr;
+    TaskExecutor *mFileControler = nullptr;
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
 
     QWidget *mCanvasWidget;
@@ -189,9 +189,9 @@ private:
 
     QList<QThread*> mControlerThreads;
     QThread *mFileControlerThread;
-    QList<PaintControler*> mPaintControlers;
-    QList<stdsptr<_ScheduledExecutor>> mUpdatablesAwaitingUpdate;
-    QList<stdsptr<_ScheduledExecutor>> mFileUpdatablesAwaitingUpdate;
+    QList<TaskExecutor*> mTaskExecutors;
+    QList<stdsptr<_ScheduledTask>> mUpdatablesAwaitingUpdate;
+    QList<stdsptr<_ScheduledTask>> mFileUpdatablesAwaitingUpdate;
 
 
 
@@ -226,8 +226,8 @@ private:
                   GrContext * const grContext);
     void tabletEvent(QTabletEvent *e);
 signals:
-    void updateUpdatable(_ScheduledExecutor*, int);
-    void updateFileUpdatable(_ScheduledExecutor*, int);
+    void updateUpdatable(_ScheduledTask*, int);
+    void updateFileUpdatable(_ScheduledTask*, int);
 
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
@@ -321,10 +321,10 @@ public slots:
 private slots:
     void tryProcessingNextUpdatable();
     void sendNextUpdatableForUpdate(const int &finishedThreadId,
-            _ScheduledExecutor * const lastUpdatable = nullptr);
+            _ScheduledTask * const lastUpdatable = nullptr);
     void sendNextFileUpdatableForUpdate(
             const int &threadId,
-            _ScheduledExecutor * const lastUpdatable = nullptr);
+            _ScheduledTask * const lastUpdatable = nullptr);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
 

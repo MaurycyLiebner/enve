@@ -502,7 +502,7 @@ void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
 }
 
 void TileSkDrawer::schedulerProccessed() {
-    _ScheduledExecutor::schedulerProccessed();
+    _ScheduledTask::schedulerProccessed();
     if(parentTile != nullptr) {
         parentTile->setDabsForDrawer();
     }
@@ -519,7 +519,7 @@ void TileSkDrawer::afterUpdate() {
     if(parentTile != nullptr) {
         parentTile->updateTexFromDataArray();
     }
-    _ScheduledExecutor::afterUpdate();
+    _ScheduledTask::afterUpdate();
 }
 
 void TileSkDrawer::clearImg() {

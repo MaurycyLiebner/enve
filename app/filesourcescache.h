@@ -21,7 +21,7 @@ extern bool isVectorExt(const QString &extension);
 extern bool isImageExt(const QString &extension);
 extern bool isAvExt(const QString &extension);
 
-class FileCacheHandler : public _ScheduledExecutor {
+class FileCacheHandler : public _ScheduledTask {
 public:
     FileCacheHandler(const QString &filePath,
                      const bool &visibleInListWidgets = true);
@@ -117,7 +117,7 @@ public:
         return makeSkImageCopy(imageToCopy);
     }
 
-    virtual _ScheduledExecutor* scheduleFrameLoad(const int &frame) = 0;
+    virtual _ScheduledTask* scheduleFrameLoad(const int &frame) = 0;
     const int &getFramesCount() { return mFramesCount; }
 protected:
     AnimationCacheHandler(const QString &filePath) :
@@ -142,7 +142,7 @@ public:
 
     void clearCache();
 
-    _ScheduledExecutor* scheduleFrameLoad(const int &frame);
+    _ScheduledTask* scheduleFrameLoad(const int &frame);
 protected:
     ImageSequenceCacheHandler(const QStringList &framePaths);
 
@@ -169,7 +169,7 @@ public:
 
     const qreal &getFps();
 
-    virtual _ScheduledExecutor *scheduleFrameLoad(const int &frame);
+    virtual _ScheduledTask *scheduleFrameLoad(const int &frame);
 protected:
     VideoCacheHandler(const QString &filePath);
 
@@ -351,7 +351,7 @@ public:
 
     const qreal &getFps();
 
-    _ScheduledExecutor *scheduleSoundRangeLoad(int minRelFrame,
+    _ScheduledTask *scheduleSoundRangeLoad(int minRelFrame,
                                 int maxRelFrame) {
         SoundDataRange newDataRangeToLoad = SoundDataRange(minRelFrame,
                                                            maxRelFrame);

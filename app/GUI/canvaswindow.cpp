@@ -4,7 +4,7 @@
 #include "mainwindow.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 #include "singlewidgetabstraction.h"
-#include "paintcontroler.h"
+#include "taskexecutor.h"
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
 #include "global.h"
@@ -35,29 +35,29 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
-        QThread *paintControlerThread = new QThread(this);
-        PaintControler *paintControler = new PaintControler(i);
-        paintControler->moveToThread(paintControlerThread);
-        connect(paintControler, &PaintControler::finishedUpdating,
+        QThread *taskExecutorThread = new QThread(this);
+        TaskExecutor *taskExecutor = new TaskExecutor(i);
+        taskExecutor->moveToThread(taskExecutorThread);
+        connect(taskExecutor, &TaskExecutor::finishedUpdating,
                 this, &CanvasWindow::sendNextUpdatableForUpdate);
         connect(this, &CanvasWindow::updateUpdatable,
-                paintControler, &PaintControler::updateUpdatable);
+                taskExecutor, &TaskExecutor::updateUpdatable);
 
-        paintControlerThread->start();
+        taskExecutorThread->start();
 
-        mPaintControlers << paintControler;
-        mControlerThreads << paintControlerThread;
+        mTaskExecutors << taskExecutor;
+        mControlerThreads << taskExecutorThread;
 
         mFreeThreads << i;
     }
 
     mFileControlerThread = new QThread(this);
-    mFileControler = new PaintControler(numberThreads);
+    mFileControler = new TaskExecutor(numberThreads);
     mFileControler->moveToThread(mFileControlerThread);
-    connect(mFileControler, &PaintControler::finishedUpdating,
+    connect(mFileControler, &TaskExecutor::finishedUpdating,
             this, &CanvasWindow::sendNextFileUpdatableForUpdate);
     connect(this, &CanvasWindow::updateFileUpdatable,
-            mFileControler, &PaintControler::updateUpdatable);
+            mFileControler, &TaskExecutor::updateUpdatable);
 
     mFileControlerThread->start();
     mControlerThreads << mFileControlerThread;
@@ -91,8 +91,8 @@ CanvasWindow::~CanvasWindow() {
         thread->wait();
         delete thread;
     }
-    foreach(PaintControler *paintControler, mPaintControlers) {
-        delete paintControler;
+    foreach(TaskExecutor *taskExecutor, mTaskExecutors) {
+        delete taskExecutor;
     }
 //    mFileControlerThread->quit();
 //    mFileControlerThread->wait();
@@ -818,7 +818,7 @@ bool CanvasWindow::shouldProcessAwaitingSchedulers() {
 }
 
 void CanvasWindow::addUpdatableAwaitingUpdate(
-        const stdsptr<_ScheduledExecutor>& updatable) {
+        const stdsptr<_ScheduledTask>& updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
@@ -834,17 +834,17 @@ void CanvasWindow::tryProcessingNextUpdatable() {
 }
 
 void CanvasWindow::addFileUpdatableAwaitingUpdate(
-        const stdsptr<_ScheduledExecutor>& updatable) {
+        const stdsptr<_ScheduledTask>& updatable) {
     mFileUpdatablesAwaitingUpdate << updatable;
 
     if(mNoFileAwaitUpdate) {
         mNoFileAwaitUpdate = false;
-        sendNextFileUpdatableForUpdate(mPaintControlers.count(), nullptr);
+        sendNextFileUpdatableForUpdate(mTaskExecutors.count(), nullptr);
     }
 }
 
 void CanvasWindow::sendNextFileUpdatableForUpdate(
-        const int &threadId, _ScheduledExecutor * const lastUpdatable) {
+        const int &threadId, _ScheduledTask * const lastUpdatable) {
     Q_UNUSED(threadId);
     if(lastUpdatable != nullptr) {
         lastUpdatable->updateFinished();
@@ -862,12 +862,12 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(
         }
     } else {
         for(int i = 0; i < mFileUpdatablesAwaitingUpdate.count(); i++) {
-            _ScheduledExecutor *updatablaT =
+            _ScheduledTask *updatablaT =
                     mFileUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
-                updatablaT->setCurrentPaintControler(mFileControler);
+                updatablaT->setCurrentTaskExecutor(mFileControler);
                 updatablaT->beforeUpdate();
-                emit updateFileUpdatable(updatablaT, mPaintControlers.count());
+                emit updateFileUpdatable(updatablaT, mTaskExecutors.count());
                 mFileUpdatablesAwaitingUpdate.removeAt(i);
                 i--;
                 return;
@@ -878,7 +878,7 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(
 
 #include <chrono>
 void CanvasWindow::sendNextUpdatableForUpdate(
-        const int &finishedThreadId, _ScheduledExecutor *const lastUpdatable) {
+        const int &finishedThreadId, _ScheduledTask *const lastUpdatable) {
     //auto start = std::chrono::steady_clock::now();
     //qDebug() << "sendNextUpdatableForUpdate::begin" << mFreeThreads.count();
     if(lastUpdatable != nullptr) {
@@ -911,13 +911,13 @@ void CanvasWindow::sendNextUpdatableForUpdate(
     } else {
         int threadId = finishedThreadId;
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
-            _ScheduledExecutor *updatablaT =
+            _ScheduledTask *updatablaT =
                     mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
                 mThreadsUsed++;
                 //qDebug() << "started processing using: " << threadId;
-                updatablaT->setCurrentPaintControler(
-                            mPaintControlers.at(threadId));
+                updatablaT->setCurrentTaskExecutor(
+                            mTaskExecutors.at(threadId));
                 updatablaT->beforeUpdate();
                 mUpdatablesAwaitingUpdate.removeAt(i);
                 emit updateUpdatable(updatablaT, threadId);

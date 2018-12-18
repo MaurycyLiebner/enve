@@ -108,8 +108,8 @@ CacheContainer::~CacheContainer() {
     scheduleDeleteTmpFile();
 }
 
-_ScheduledExecutor* CacheContainer::scheduleLoadFromTmpFile(
-        _ScheduledExecutor *dependent) {
+_ScheduledTask* CacheContainer::scheduleLoadFromTmpFile(
+        _ScheduledTask *dependent) {
     if(mSavingToFile) {
         mCancelAfterSaveDataClear = true;
         return mSavingUpdatable.get();
@@ -177,7 +177,7 @@ sk_sp<SkImage> CacheContainer::getImageSk() {
 
 void CacheContainer::scheduleDeleteTmpFile() {
     if(mTmpFile == nullptr) return;
-    stdsptr<_ScheduledExecutor> updatable =
+    stdsptr<_ScheduledTask> updatable =
             SPtrCreate(CacheContainerTmpFileDataDeleter)(mTmpFile);
     mTmpFile.reset();
     updatable->addScheduler();
@@ -306,11 +306,11 @@ void CacheContainerTmpFileDataLoader::_processUpdate() {
 
 void CacheContainerTmpFileDataLoader::afterUpdate() {
     mTargetCont->setDataLoadedFromTmpFile(mImage);
-    _ScheduledExecutor::afterUpdate();
+    _ScheduledTask::afterUpdate();
 }
 
 void CacheContainerTmpFileDataLoader::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledExecutor>());
+    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledTask>());
 }
 
 CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
@@ -350,11 +350,11 @@ void CacheContainerTmpFileDataSaver::afterUpdate() {
     } else {
         mTargetCont->setDataSavedToTmpFile(mTmpFile);
     }
-    _ScheduledExecutor::afterUpdate();
+    _ScheduledTask::afterUpdate();
 }
 
 void CacheContainerTmpFileDataSaver::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledExecutor>());
+    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledTask>());
 }
 
 void CacheContainerTmpFileDataDeleter::_processUpdate() {
@@ -362,5 +362,5 @@ void CacheContainerTmpFileDataDeleter::_processUpdate() {
 }
 
 void CacheContainerTmpFileDataDeleter::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledExecutor>());
+    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledTask>());
 }

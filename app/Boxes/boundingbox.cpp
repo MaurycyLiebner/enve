@@ -1246,13 +1246,13 @@ void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
 
 void BoundingBox::processSchedulers() {
     mBlockedSchedule = true;
-    foreach(const stdsptr<_ScheduledExecutor> &updatable, mSchedulers) {
+    foreach(const stdsptr<_ScheduledTask> &updatable, mSchedulers) {
         updatable->schedulerProccessed();
     }
 }
 
 void BoundingBox::addSchedulersToProcess() {
-    foreach(const stdsptr<_ScheduledExecutor> &updatable, mSchedulers) {
+    foreach(const stdsptr<_ScheduledTask> &updatable, mSchedulers) {
         MainWindow::getInstance()->addUpdateScheduler(updatable);
     }
 
@@ -1316,7 +1316,7 @@ void BoundingBox::selectAllPoints(Canvas *canvas) {
     Q_UNUSED(canvas);
 }
 
-void BoundingBox::addScheduler(const stdsptr<_ScheduledExecutor>& updatable) {
+void BoundingBox::addScheduler(const stdsptr<_ScheduledTask>& updatable) {
     mSchedulers << updatable;
 }
 

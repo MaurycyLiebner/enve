@@ -54,7 +54,7 @@ extern void processPaintDabs(const QList<Dab> &dabs,
                              uchar *data);
 
 class Tile;
-struct TileSkDrawer : public _ScheduledExecutor {
+struct TileSkDrawer : public _ScheduledTask {
     TileSkDrawer(Tile *parentTileT,
                  const ushort &xT, const ushort &yT);
     ~TileSkDrawer();
@@ -66,7 +66,7 @@ struct TileSkDrawer : public _ScheduledExecutor {
     void schedulerProccessed();
 
     void beforeUpdate() {
-        _ScheduledExecutor::beforeUpdate();
+        _ScheduledTask::beforeUpdate();
         _maxPaintX = maxPaintX;
         _maxPaintY = maxPaintY;
     }
