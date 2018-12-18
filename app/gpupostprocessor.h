@@ -127,6 +127,7 @@ class GpuPostProcessor : public QThread, protected QGL33c {
     Q_OBJECT
 public:
     GpuPostProcessor();
+    void initialize();
 
     //! @brief Adds a new task and starts processing it if is not busy.
     void addToProcess(const stdsptr<ScheduledPostProcess>& scheduled) {
@@ -168,9 +169,13 @@ private slots:
 protected:
     void run() override {
         if(_mHandledProcesses.isEmpty()) return;
-        MonoTry(_mContext->makeCurrent(mOffscreenSurface), ContextCurrentFailed);
+        if(!_mContext->makeCurrent(mOffscreenSurface)) {
+            RuntimeThrow("Making GL context current failed.");
+        }
         if(!_mInitialized) {
-            MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
+            if(!initializeOpenGLFunctions()) {
+                RuntimeThrow("Initializing GL functions failed.");
+            }
             iniTexturedVShaderVAO(this, _mTextureSquareVAO);
             _mInitialized = true;
 

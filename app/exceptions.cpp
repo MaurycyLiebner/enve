@@ -19,7 +19,8 @@ void _gPrintException(const std::exception& e,
                       QString allText,
                       const uint& level,
                       const bool& fatal) {
-    if(allText.isEmpty()) allText = (std::to_string(level) + ") " + e.what()).c_str();
+    allText = (allText.isEmpty() ? "" : allText + "\n") +
+            (std::to_string(level) + ") ").c_str() + e.what();
     qCritical() << std::to_string(level) + ") " << e.what();
     try {
         if(!isExceptionNested(e)) {
@@ -28,7 +29,6 @@ void _gPrintException(const std::exception& e,
         }
         std::rethrow_if_nested(e);
     } catch(const std::exception& ne) {
-        allText = allText + "\n" + (std::to_string(level + 1) + ") ").c_str() + ne.what();
         _gPrintException(ne, allText, level + 1, fatal);
     } catch(...) {}
 }

@@ -19,8 +19,14 @@
 #include "windowsinglewidgettarget.h"
 #include "videoencoder.h"
 #include "usagewidget.h"
+#include "memorychecker.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
+    try {
+        mGpuPostProcessor.initialize();
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e, "Failed to initialize gpu for post-processing.\n");
+    }
     connect(&mGpuPostProcessor, &GpuPostProcessor::finished,
             this, &CanvasWindow::tryProcessingNextUpdatable);
     connect(&mGpuPostProcessor, &GpuPostProcessor::processedAll,
@@ -725,7 +731,7 @@ BoxesGroup *CanvasWindow::getCurrentGroup() {
     if(hasNoCanvas()) return nullptr;
     return mCurrentCanvas->getCurrentBoxesGroup();
 }
-#include "videoencoder.h"
+
 void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
     VideoEncoder::startEncodingStatic(settings);
     if(VideoEncoder::encodingSuccessfulyStartedStatic()) {
@@ -970,7 +976,7 @@ void CanvasWindow::setRendering(const bool &bT) {
     mRenderingPreview = bT;
     mCurrentCanvas->setRenderingPreview(bT);
 }
-#include "memorychecker.h"
+
 void CanvasWindow::setPreviewing(const bool &bT) {
     mPreviewing = bT;
     mCurrentCanvas->setPreviewing(bT);

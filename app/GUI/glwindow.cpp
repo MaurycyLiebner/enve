@@ -1,6 +1,7 @@
 #include "glwindow.h"
 #include "GUI/ColorWidgets/helpers.h"
 #include <QPainter>
+#include <QDebug>
 #include "exceptions.h"
 
 GLWindow::GLWindow(QScreen *screen)
@@ -18,7 +19,6 @@ GLWindow::~GLWindow() {
 //    mContext->doneCurrent();
 }
 
-#include <QDebug>
 void GLWindow::bindSkia() {
     GrBackendRenderTarget backendRT = GrBackendRenderTarget(
                                         width(), height(),
@@ -41,42 +41,62 @@ void GLWindow::bindSkia() {
                                     SkColorType::kRGBA_8888_SkColorType,
                                     nullptr/*colorSpace*/,
                                     &props);
+    if(!mSurface) RuntimeThrow("Failed to wrap buffer into SkSurface.");
     mCanvas = mSurface->getCanvas();
 }
 
 void GLWindow::resizeEvent(QResizeEvent *) {
     if(!mContext) return;
-    bindSkia();
+    try {
+        bindSkia();
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
 }
+
 #include "glhelpers.h"
 #include "ColorWidgets/colorwidgetshaders.h"
 
-void GLWindow::iniBlurProgram() {
-    iniProgram(this, GL_BLUR_PROGRAM.fID,
-               GL_TEXTURED_VERT,
-               "/home/ailuropoda/Dev/AniVect/src/shaders/blur.frag");
-    glUseProgram(GL_BLUR_PROGRAM.fID);
+void GLWindow::iniRasterEffectPrograms() {
+    try {
+        iniProgram(this, GL_BLUR_PROGRAM.fID,
+                   GL_TEXTURED_VERT,
+                   "/home/ailuropoda/Dev/AniVect/src/shaders/blur.frag");
+        glUseProgram(GL_BLUR_PROGRAM.fID);
 
-    GLint texLocation = glGetUniformLocation(GL_BLUR_PROGRAM.fID, "texture");
-    glUniform1i(texLocation, 0);
+        GLint texLocation = glGetUniformLocation(GL_BLUR_PROGRAM.fID, "texture");
+        glUniform1i(texLocation, 0);
+        CheckInvalidLocation(texLocation, "texture");
 
-    GL_BLUR_PROGRAM.fBlurRadiusLoc =
-            glGetUniformLocation(GL_BLUR_PROGRAM.fID, "blurRadius");
+        GL_BLUR_PROGRAM.fBlurRadiusLoc =
+                glGetUniformLocation(GL_BLUR_PROGRAM.fID, "blurRadius");
+        CheckInvalidLocation(GL_BLUR_PROGRAM.fBlurRadiusLoc, "blurRadius");
+    } catch(...) {
+        RuntimeThrow("Error while initializing blur program.");
+    }
 
-    iniProgram(this, GL_DOT_PROGRAM.fID,
-               GL_TEXTURED_VERT,
-               "/home/ailuropoda/Dev/AniVect/src/shaders/dots.frag");
-    glUseProgram(GL_DOT_PROGRAM.fID);
+    try {
+        iniProgram(this, GL_DOT_PROGRAM.fID,
+                   GL_TEXTURED_VERT,
+                   "/home/ailuropoda/Dev/AniVect/src/shaders/dots.frag");
+        glUseProgram(GL_DOT_PROGRAM.fID);
 
-    GLint texLocation2 = glGetUniformLocation(GL_DOT_PROGRAM.fID, "texture");
-    glUniform1i(texLocation2, 0);
+        GLint texLocation = glGetUniformLocation(GL_DOT_PROGRAM.fID, "texture");
+        glUniform1i(texLocation, 0);
+        CheckInvalidLocation(texLocation, "texture");
 
-    GL_DOT_PROGRAM.fDotRadiusLoc =
-            glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotRadius");
-    GL_DOT_PROGRAM.fDotDistanceLoc =
-            glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotDistance");
-    GL_DOT_PROGRAM.fTranslateLoc =
-            glGetUniformLocation(GL_DOT_PROGRAM.fID, "translate");
+        GL_DOT_PROGRAM.fDotRadiusLoc =
+                glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotRadius");
+        CheckInvalidLocation(GL_DOT_PROGRAM.fDotRadiusLoc, "dotRadius");
+        GL_DOT_PROGRAM.fDotDistanceLoc =
+                glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotDistance");
+        CheckInvalidLocation(GL_DOT_PROGRAM.fDotDistanceLoc, "dotDistance");
+        GL_DOT_PROGRAM.fTranslateLoc =
+                glGetUniformLocation(GL_DOT_PROGRAM.fID, "translate");
+        CheckInvalidLocation(GL_DOT_PROGRAM.fTranslateLoc, "translate");
+    } catch(...) {
+        RuntimeThrow("Error while initializing dots program.");
+    }
 }
 
 void GLWindow::initialize() {
@@ -105,7 +125,11 @@ void GLWindow::initialize() {
     mFbInfo.fFBOID = mContext->defaultFramebufferObject();//buffer;
     mFbInfo.fFormat = GR_GL_RGBA8;//buffer;
 
-    bindSkia();
+    try {
+        bindSkia();
+    } catch(...) {
+        RuntimeThrow("Failed to bind SKIA.");
+    }
 
     try {
         iniPlainVShaderVBO(this);
@@ -117,8 +141,11 @@ void GLWindow::initialize() {
         RuntimeThrow("Error initializing programs.");
     }
 
-    iniBlurProgram();
-
+    try {
+        iniRasterEffectPrograms();
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
 //    qDebug() << "OpenGL Info";
 //    qDebug() << "  Vendor: " << reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 //    qDebug() << "  Renderer: " << QString((const char*)glGetString(GL_RENDERER));;
@@ -139,26 +166,32 @@ void GLWindow::initialize() {
 void GLWindow::renderNow() {
     if(!isExposed()) return;
 
-    bool needsInitialize = false;
-    if(!mContext) {
-        mContext = new QOpenGLContext(this);
-//        mContext->setFormat(QSurfaceFormat::defaultFormat());
-        mContext->setShareContext(QOpenGLContext::globalShareContext());
-        MonoTry(mContext->create(), ContextCreateFailed);
+    try {
+        bool needsInitialize = false;
+        if(!mContext) {
+            mContext = new QOpenGLContext(this);
+    //        mContext->setFormat(QSurfaceFormat::defaultFormat());
+            mContext->setShareContext(QOpenGLContext::globalShareContext());
+            if(!mContext->create()) {
+                RuntimeThrow("Creating GL context failed.");
+            }
 
-        needsInitialize = true;
-    }
-
-    MonoTry(mContext->makeCurrent(this), ContextCurrentFailed);
-
-    if(needsInitialize) {
-        MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
-        try {
-            initialize();
-        } catch(const std::exception& e) {
-            gPrintExceptionFatal(e);
+            needsInitialize = true;
         }
+        if(!mContext->makeCurrent(this)) {
+            RuntimeThrow("Making GL context current failed.");
+        }
+
+        if(needsInitialize) {
+            if(!initializeOpenGLFunctions()) {
+                RuntimeThrow("Initializing GL functions failed.");
+            }
+            initialize();
+        }
+    } catch(const std::exception& e) {
+        gPrintExceptionFatal(e);
     }
+
     assertNoGlErrors();
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
     assertNoGlErrors();

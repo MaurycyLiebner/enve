@@ -3,12 +3,16 @@
 #include <QOpenGLTexture>
 #include "skqtconversions.h"
 
-GpuPostProcessor::GpuPostProcessor() {
+GpuPostProcessor::GpuPostProcessor() {}
+
+void GpuPostProcessor::initialize() {
     mOffscreenSurface = new QOffscreenSurface(nullptr, this);
     mOffscreenSurface->create();
     _mContext = new QOpenGLContext();
     _mContext->setShareContext(QOpenGLContext::globalShareContext());
-    MonoTry(_mContext->create(), ContextCreateFailed);
+    if(!_mContext->create()) {
+        RuntimeThrow("Creating GL context failed.");
+    }
     _mContext->moveToThread(this);
     connect(this, &GpuPostProcessor::finished,
             this, &GpuPostProcessor::afterProcessed);
@@ -27,7 +31,9 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
 //    mFinalImage = mSrcImage;
 //    if(mFinishedFunc) mFinishedFunc(mFinalImage);
 //    return;
-    MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
+    if(!initializeOpenGLFunctions()) {
+        RuntimeThrow("Initializing GL functions failed.");
+    }
     if(!mSrcImage) return;
     int srcWidth = mSrcImage->width();
     int srcHeight = mSrcImage->height();
@@ -74,7 +80,9 @@ void BoxRenderDataScheduledPostProcess::afterProcessed() {
 
 void BoxRenderDataScheduledPostProcess::process(
         const GLuint &texturedSquareVAO) {
-    MonoTry(initializeOpenGLFunctions(), InitializeGLFuncsFailed);
+    if(!initializeOpenGLFunctions()) {
+        RuntimeThrow("Initializing GL functions failed.");
+    }
     auto srcImage = mBoxData->renderedImage;
     if(!srcImage) return;
     int srcWidth = srcImage->width();

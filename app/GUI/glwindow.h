@@ -44,7 +44,7 @@ protected:
     //void exposeEvent(QExposeEvent *event);
 private:
     void checkCompileErrors(GLuint shader, std::string type);
-    void iniBlurProgram();
+    void iniRasterEffectPrograms();
 };
 
 #endif // GLWINDOW_H
