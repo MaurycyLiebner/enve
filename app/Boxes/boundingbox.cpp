@@ -1465,8 +1465,7 @@ bool BoundingBox::SWT_visibleOnlyIfParentDescendant() {
     return false;
 }
 
-void BoundingBox::SWT_addToContextMenu(
-        QMenu *menu) {
+void BoundingBox::SWT_addToContextMenu(QMenu *menu) {
     menu->addAction("Apply Transformation");
     menu->addAction("Create Link");
     menu->addAction("Center Pivot");
