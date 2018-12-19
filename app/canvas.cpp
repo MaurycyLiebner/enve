@@ -917,14 +917,13 @@ void Canvas::setParentToLastSelected() {
     }
 }
 
-bool Canvas::startRotatingAction() {
+bool Canvas::startRotatingAction(const QPointF &cursorPos) {
     if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
     if(mSelectedBoxes.isEmpty()) return false;
     if(mCurrentMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
     }
     mTransformationFinishedBeforeMouseRelease = false;
-    QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
     setLastMouseEventPosAbs(cursorPos);
     setLastMousePressPosAbs(cursorPos);
     mRotPivot->startRotating();
@@ -935,7 +934,7 @@ bool Canvas::startRotatingAction() {
     return true;
 }
 
-bool Canvas::startScalingAction() {
+bool Canvas::startScalingAction(const QPointF &cursorPos) {
     if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
     if(mSelectedBoxes.isEmpty()) return false;
     if(mCurrentMode == MOVE_POINT) {
@@ -945,7 +944,6 @@ bool Canvas::startScalingAction() {
     mXOnlyTransform = false;
     mYOnlyTransform = false;
 
-    QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
     setLastMouseEventPosAbs(cursorPos);
     setLastMousePressPosAbs(cursorPos);
     mRotPivot->startScaling();
@@ -956,13 +954,12 @@ bool Canvas::startScalingAction() {
     return true;
 }
 
-bool Canvas::startMovingAction() {
+bool Canvas::startMovingAction(const QPointF& cursorPos) {
     if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
     mTransformationFinishedBeforeMouseRelease = false;
     mXOnlyTransform = false;
     mYOnlyTransform = false;
 
-    QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
     setLastMouseEventPosAbs(cursorPos);
     setLastMousePressPosAbs(cursorPos);
     mDoubleClick = false;

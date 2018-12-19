@@ -463,12 +463,13 @@ bool CanvasWindow::handleRevertPathKeyPress(QKeyEvent *event) {
 }
 
 bool CanvasWindow::handleStartTransformKeyPress(QKeyEvent* event) {
+    auto relPos = mapFromGlobal(QCursor::pos());
     if(event->key() == Qt::Key_R && !isMouseGrabber()) {
-        return mCurrentCanvas->startRotatingAction();
+        return mCurrentCanvas->startRotatingAction(relPos);
     } else if(event->key() == Qt::Key_S && !isMouseGrabber()) {
-        return mCurrentCanvas->startScalingAction();
+        return mCurrentCanvas->startScalingAction(relPos);
     } else if(event->key() == Qt::Key_G && !isMouseGrabber()) {
-        return mCurrentCanvas->startMovingAction();
+        return mCurrentCanvas->startMovingAction(relPos);
     } else {
         return false;
     }

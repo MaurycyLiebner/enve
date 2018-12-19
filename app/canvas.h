@@ -570,9 +570,9 @@ public:
     }
     void setParentToLastSelected();
     void clearParentForSelected();
-    bool startRotatingAction();
-    bool startScalingAction();
-    bool startMovingAction();
+    bool startRotatingAction(const QPointF &cursorPos);
+    bool startScalingAction(const QPointF &cursorPos);
+    bool startMovingAction(const QPointF &cursorPos);
     void deselectAllBoxesAction();
     void selectAllBoxesAction();
     void selectAllPointsAction();
