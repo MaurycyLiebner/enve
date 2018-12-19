@@ -4,7 +4,6 @@
 #include "Boxes/boxesgroup.h"
 #include <QDebug>
 #include <QMenu>
-#include "GUI/mainwindow.h"
 #include "singlewidgetabstraction.h"
 #include "durationrectangle.h"
 #include "pointhelpers.h"
@@ -1246,14 +1245,14 @@ void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
 
 void BoundingBox::processSchedulers() {
     mBlockedSchedule = true;
-    foreach(const stdsptr<_ScheduledTask> &updatable, mScheduledTasks) {
-        updatable->schedulerProccessed();
+    foreach(const stdsptr<_ScheduledTask> &task, mScheduledTasks) {
+        task->schedulerProccessed();
     }
 }
 
 void BoundingBox::queScheduledTasks() {
-    foreach(const stdsptr<_ScheduledTask> &updatable, mScheduledTasks) {
-        TaskScheduler::sGetInstance()->scheduleCPUTask(updatable);
+    foreach(const stdsptr<_ScheduledTask> &task, mScheduledTasks) {
+        TaskScheduler::sGetInstance()->scheduleCPUTask(task);
     }
 
     mScheduledTasks.clear();

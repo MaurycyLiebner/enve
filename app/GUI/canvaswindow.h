@@ -85,8 +85,6 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void queCPUTask(
-            const stdsptr<_ScheduledTask> &updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             const UpdateFuncs &updateFuncs,
