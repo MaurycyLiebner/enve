@@ -85,7 +85,7 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void addUpdatableAwaitingUpdate(
+    void queCPUTask(
             const stdsptr<_ScheduledTask> &updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
@@ -135,12 +135,10 @@ public:
 
     void rotate90CCW();
     void rotate90CW();
-    void processSchedulers();
-    bool shouldProcessAwaitingSchedulers();
+
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
-    void addFileUpdatableAwaitingUpdate(
-            const stdsptr<_ScheduledTask> &updatable);
+
     WindowSingleWidgetTarget *getWindowSWT() {
         return mWindowSWTTarget.get();
     }
@@ -163,22 +161,14 @@ private:
     bool mRenderingPreview = false;
     bool mMouseGrabber = false;
     bool mHasFocus = false;
-    bool mNoBoxesAwaitUpdate = true;
-    bool mNoFileAwaitUpdate = true;
-    bool mClearBeingUpdated = false;
 
     int mCurrentRenderFrame;
     int mMaxRenderFrame = 0;
     int mSavedCurrentFrame = 0;
-    int mThreadsUsed = 0;
-    QList<int> mFreeThreads;
 
     qreal mSavedResolutionFraction = 100.;
 
-    GpuPostProcessor mGpuPostProcessor;
-
     qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
-    TaskExecutor *mFileControler = nullptr;
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
 
     QWidget *mCanvasWidget;
@@ -186,17 +176,6 @@ private:
     void setPreviewing(const bool &bT);
 
     QTimer *mPreviewFPSTimer = nullptr;
-
-    QList<QThread*> mControlerThreads;
-    QThread *mFileControlerThread;
-    QList<TaskExecutor*> mTaskExecutors;
-    QList<stdsptr<_ScheduledTask>> mUpdatablesAwaitingUpdate;
-    QList<stdsptr<_ScheduledTask>> mFileUpdatablesAwaitingUpdate;
-
-
-
-    void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
-    void (CanvasWindow::*mFilesUpdateFinishedFunction)(void) = nullptr;
 
     qptr<Canvas> mCurrentCanvas;
     QList<qsptr<Canvas>> mCanvasList;
@@ -319,12 +298,6 @@ public slots:
     void flipHorizontalAction();
     void flipVerticalAction();
 private slots:
-    void tryProcessingNextUpdatable();
-    void sendNextUpdatableForUpdate(const int &finishedThreadId,
-            _ScheduledTask * const lastUpdatable = nullptr);
-    void sendNextFileUpdatableForUpdate(
-            const int &threadId,
-            _ScheduledTask * const lastUpdatable = nullptr);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
 

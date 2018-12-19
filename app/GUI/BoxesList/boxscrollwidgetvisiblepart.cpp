@@ -350,7 +350,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
         }
     }
     scheduleUpdateVisibleWidgetsContent();
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void BoxScrollWidgetVisiblePart::dragEnterEvent(

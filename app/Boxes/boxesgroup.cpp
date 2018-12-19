@@ -331,11 +331,11 @@ void BoxesGroup::processSchedulers() {
     BoundingBox::processSchedulers();
 }
 
-void BoxesGroup::addSchedulersToProcess() {
+void BoxesGroup::queScheduledTasks() {
     Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
-        child->addSchedulersToProcess();
+        child->queScheduledTasks();
     }
-    BoundingBox::addSchedulersToProcess();
+    BoundingBox::queScheduledTasks();
 }
 
 void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {

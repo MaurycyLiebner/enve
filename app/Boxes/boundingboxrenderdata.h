@@ -99,8 +99,6 @@ struct BoundingBoxRenderData : public _ScheduledTask {
             const stdsptr<RenderDataCustomizerFunctor>& customizer) {
         mRenderDataCustomizerFunctors.prepend(customizer);
     }
-
-    void parentBeingProcessed();
 protected:
     void addSchedulerNow();
     QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;

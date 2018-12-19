@@ -13,6 +13,7 @@
 #include "boxeslistkeysviewwidget.h"
 #include "animationwidgetscrollbar.h"
 #include "global.h"
+#include "renderinstancesettings.h"
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     QWidget(parent) {
@@ -230,10 +231,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mTimelineWidget = new QWidget(this);
     mRenderWidget = new RenderWidget(this);
-    connect(mRenderWidget,
-            SIGNAL(renderFromSettings(RenderInstanceSettings*)),
-            mMainWindow->getCanvasWindow(),
-            SLOT(renderFromSettings(RenderInstanceSettings*)));
+    connect(mRenderWidget, &RenderWidget::renderFromSettings,
+            mMainWindow->getCanvasWindow(), &CanvasWindow::renderFromSettings);
     mTimelineWidget->setLayout(mTimelineLayout);
     mMainLayout->addWidget(mTimelineWidget);
     mMainLayout->addWidget(mRenderWidget);
@@ -414,12 +413,12 @@ void BoxesListAnimationDockWidget::interruptPreview() {
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {
     mMainWindow->getCanvasWindow()->setLocalPivot(bT);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListAnimationDockWidget::setBonesSelectionEnabled(const bool &bT) {
     mMainWindow->getCanvasWindow()->setBonesSelectionEnabled(bT);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListAnimationDockWidget::setTimelineMode() {

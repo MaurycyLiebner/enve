@@ -27,7 +27,7 @@ bool _ScheduledTask::addScheduler() {
 }
 
 void _ScheduledTask::addSchedulerNow() {
-    MainWindow::getInstance()->addUpdateScheduler(GetAsSPtr(this, _ScheduledTask));
+    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<_ScheduledTask>());
 }
 
 void _ScheduledTask::clear() {
@@ -43,7 +43,7 @@ void _Task::setCurrentTaskExecutor(TaskExecutor *taskExecutor) {
 }
 
 void _Task::beforeUpdate() {
-    mSelfRef = GetAsSPtr(this, _Task);
+    mSelfRef = ref<_Task>();
     mBeingProcessed = true;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();

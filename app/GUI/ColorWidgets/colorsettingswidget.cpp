@@ -807,7 +807,7 @@ void ColorSettingsWidget::setColorMode(const int &colorMode) {
         mTargetAnimator->setColorMode(static_cast<ColorMode>(colorMode));
     }
     emit colorModeChanged(static_cast<ColorMode>(colorMode));
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void ColorSettingsWidget::setAlphaFromSpin(const qreal &val) {

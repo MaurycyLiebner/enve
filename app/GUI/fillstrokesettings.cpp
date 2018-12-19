@@ -194,12 +194,12 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
 
 void FillStrokeSettingsWidget::setLinearGradientFill() {
     setGradientLinear(true);
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void FillStrokeSettingsWidget::setRadialGradientFill() {
     setGradientLinear(false);
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void FillStrokeSettingsWidget::setGradientFill() {
@@ -364,7 +364,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const int &id) {
     }
     mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
 
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(

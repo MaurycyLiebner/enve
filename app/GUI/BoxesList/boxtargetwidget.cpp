@@ -25,7 +25,7 @@ void BoxTargetWidget::dropEvent(
         mProperty->setTarget(targetT);
         mDragging = false;
         update();
-        MainWindow::getInstance()->callUpdateSchedulers();
+        MainWindow::getInstance()->queScheduledTasksAndUpdate();
     }
 }
 
@@ -93,7 +93,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
             } else {
                 mProperty->setTarget(nullptr);
             }
-            MainWindow::getInstance()->callUpdateSchedulers();
+            MainWindow::getInstance()->queScheduledTasksAndUpdate();
         } else {
 
         }

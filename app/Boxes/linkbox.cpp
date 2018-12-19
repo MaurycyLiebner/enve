@@ -243,9 +243,9 @@ InternalLinkCanvas::InternalLinkCanvas(BoxesGroup* linkTarget) :
                             mClipToCanvas);
 }
 
-void InternalLinkCanvas::addSchedulersToProcess() {
-    getLinkTarget()->addSchedulersToProcess();
-    BoxesGroup::addSchedulersToProcess();
+void InternalLinkCanvas::queScheduledTasks() {
+    getLinkTarget()->queScheduledTasks();
+    BoxesGroup::queScheduledTasks();
 }
 
 void InternalLinkCanvas::writeBoundingBox(QIODevice *target) {

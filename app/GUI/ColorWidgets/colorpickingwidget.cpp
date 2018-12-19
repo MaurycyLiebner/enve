@@ -39,7 +39,7 @@ void ColorPickingWidget::mouseReleaseEvent(QMouseEvent *e) {
     QColor pickedColor = colorFromPoint(pos_t.x(), pos_t.y());
     mColorSettingsWidget->setCurrentColor(pickedColor);
     mColorSettingsWidget->emitFullColorChangedSignal();
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
     endThis();
 }
 

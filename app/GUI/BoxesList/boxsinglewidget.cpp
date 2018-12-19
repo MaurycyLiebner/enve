@@ -242,7 +242,7 @@ void BoxSingleWidget::setCompositionMode(const int &id) {
         auto boxTarget = GetAsPtr(target, BoundingBox);
         boxTarget->setBlendModeSk(idToBlendModeSk(id));
     }
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void BoxSingleWidget::setBlendMode(const SkBlendMode &mode) {
@@ -819,7 +819,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
 //                                                Qt::ShiftModifier);
 //        }
     }
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 bool BoxSingleWidget::isTargetDisabled() {
@@ -859,7 +859,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
         auto boxTarget = GetAsPtr(target, BoundingBox);
         boxTarget->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);
-        MainWindow::getInstance()->callUpdateSchedulers();
+        MainWindow::getInstance()->queScheduledTasksAndUpdate();
     } else if(target->SWT_isQrealAnimator()) {
         auto qrealTarget = GetAsPtr(target, QrealAnimator);
         auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
@@ -870,7 +870,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
             } else {
                 keysView->graphAddViewedAnimator(qrealTarget);
             }
-            MainWindow::getInstance()->callUpdateSchedulers();
+            MainWindow::getInstance()->queScheduledTasksAndUpdate();
         }
     }
 }
@@ -881,7 +881,7 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
         //mousePressEvent(e);
     } else {
         rename();
-        MainWindow::getInstance()->callUpdateSchedulers();
+        MainWindow::getInstance()->queScheduledTasksAndUpdate();
     }
 }
 
@@ -1181,7 +1181,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 
 void BoxSingleWidget::switchContentVisibleAction() {
     mTarget->switchContentVisible();
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
     //mParent->callUpdaters();
 }
 
@@ -1192,7 +1192,7 @@ void BoxSingleWidget::switchRecordingAction() {
         target = GetAsPtr(fcaTarget->getTarget(), Animator);
     }
     target->prp_switchRecording();
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
 }
 
@@ -1205,13 +1205,13 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     } else if(target->SWT_isPathEffect()) {
         GetAsPtr(target, PathEffect)->switchVisible();
     }
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
 }
 
 void BoxSingleWidget::switchBoxLockedAction() {
     GetAsPtr(mTarget->getTarget(), BoundingBox)->switchLocked();
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
 }
 

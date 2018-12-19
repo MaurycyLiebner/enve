@@ -216,7 +216,7 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
             mSelectedList.first()->target->replace();
         }
 
-        MainWindow::getInstance()->callUpdateSchedulers();
+        MainWindow::getInstance()->queScheduledTasksAndUpdate();
     } else {
 
     }
@@ -251,7 +251,7 @@ void FileSourceList::dropEvent(QDropEvent *event) {
             }
         }
     }
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void FileSourceList::dragEnterEvent(QDragEnterEvent *event) {

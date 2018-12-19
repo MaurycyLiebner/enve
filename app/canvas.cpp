@@ -1331,7 +1331,7 @@ void Canvas::unblockUndoRedo() {
 }
 
 void Canvas::callUpdateSchedulers() {
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 bool Canvas::isShiftPressed() {

@@ -22,45 +22,8 @@
 #include "memorychecker.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
-    try {
-        mGpuPostProcessor.initialize();
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e, "Failed to initialize gpu for post-processing.\n");
-    }
-    connect(&mGpuPostProcessor, &GpuPostProcessor::finished,
-            this, &CanvasWindow::tryProcessingNextUpdatable);
-    connect(&mGpuPostProcessor, &GpuPostProcessor::processedAll,
-            MainWindow::getInstance(), &MainWindow::callUpdateSchedulers);
     mWindowSWTTarget = SPtrCreate(WindowSingleWidgetTarget)(this);
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
-    int numberThreads = qMax(1, QThread::idealThreadCount());
-    for(int i = 0; i < numberThreads; i++) {
-        QThread *taskExecutorThread = new QThread(this);
-        TaskExecutor *taskExecutor = new TaskExecutor(i);
-        taskExecutor->moveToThread(taskExecutorThread);
-        connect(taskExecutor, &TaskExecutor::finishedUpdating,
-                this, &CanvasWindow::sendNextUpdatableForUpdate);
-        connect(this, &CanvasWindow::updateUpdatable,
-                taskExecutor, &TaskExecutor::updateUpdatable);
-
-        taskExecutorThread->start();
-
-        mTaskExecutors << taskExecutor;
-        mControlerThreads << taskExecutorThread;
-
-        mFreeThreads << i;
-    }
-
-    mFileControlerThread = new QThread(this);
-    mFileControler = new TaskExecutor(numberThreads);
-    mFileControler->moveToThread(mFileControlerThread);
-    connect(mFileControler, &TaskExecutor::finishedUpdating,
-            this, &CanvasWindow::sendNextFileUpdatableForUpdate);
-    connect(this, &CanvasWindow::updateFileUpdatable,
-            mFileControler, &TaskExecutor::updateUpdatable);
-
-    mFileControlerThread->start();
-    mControlerThreads << mFileControlerThread;
 
     mPreviewFPSTimer = new QTimer(this);
 
@@ -85,19 +48,7 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
             this, &CanvasWindow::interruptOutputRendering);
 }
 
-CanvasWindow::~CanvasWindow() {
-    foreach(QThread *thread, mControlerThreads) {
-        thread->quit();
-        thread->wait();
-        delete thread;
-    }
-    foreach(TaskExecutor *taskExecutor, mTaskExecutors) {
-        delete taskExecutor;
-    }
-//    mFileControlerThread->quit();
-//    mFileControlerThread->wait();
-    delete mFileControler;
-}
+CanvasWindow::~CanvasWindow() {}
 
 Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas;
@@ -123,6 +74,7 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
 }
 
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
+    TaskScheduler::sSetCurrentCanvas(canvas);
     if(mCurrentCanvas != nullptr) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mPreviewFPSTimer, &QTimer::timeout,
@@ -212,7 +164,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
 }
 
 void CanvasWindow::callUpdateSchedulers() {
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setMovePathMode() {
@@ -746,7 +698,12 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 
         qreal resolutionFraction = renderSettings.resolution;
         mMaxRenderFrame = renderSettings.maxFrame;
-        mBoxesUpdateFinishedFunction = &CanvasWindow::nextSaveOutputFrame;
+
+        auto cpuFinishedFunc = [this]() {
+            nextSaveOutputFrame();
+        };
+        TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(cpuFinishedFunc);
+
         mCurrentCanvas->fitCanvasToSize();
         if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.00001) {
             mCurrentCanvas->setResolutionFraction(resolutionFraction);
@@ -756,7 +713,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
         mCurrentCanvas->prp_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
         mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-        if(mNoBoxesAwaitUpdate) {
+        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
             nextSaveOutputFrame();
         }
     }
@@ -788,7 +745,11 @@ void CanvasWindow::nextCurrentRenderFrame() {
 
 void CanvasWindow::renderPreview() {
     if(hasNoCanvas()) return;
-    mBoxesUpdateFinishedFunction = &CanvasWindow::nextPreviewRenderFrame;
+    auto cpuFinishedFunc = [this]() {
+        nextPreviewRenderFrame();
+    };
+    TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(cpuFinishedFunc);
+
     mSavedCurrentFrame = getCurrentFrame();
 
     mCurrentRenderFrame = mSavedCurrentFrame;
@@ -801,153 +762,10 @@ void CanvasWindow::renderPreview() {
     //mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
     //mCurrentCanvas->updateAllBoxes();
     //callUpdateSchedulers();
-    if(mNoBoxesAwaitUpdate) {
+    if(TaskScheduler::sAllQuedCPUTasksFinished()) {
         nextPreviewRenderFrame();
     }
     MainWindow::getInstance()->previewBeingRendered();
-}
-
-void CanvasWindow::processSchedulers() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->processSchedulers();
-    mCurrentCanvas->addSchedulersToProcess();
-}
-
-bool CanvasWindow::shouldProcessAwaitingSchedulers() {
-    return mNoBoxesAwaitUpdate;// || !mFreeThreads.isEmpty();
-}
-
-void CanvasWindow::addUpdatableAwaitingUpdate(
-        const stdsptr<_ScheduledTask>& updatable) {
-    if(mNoBoxesAwaitUpdate) {
-        mNoBoxesAwaitUpdate = false;
-    }
-
-    mUpdatablesAwaitingUpdate << updatable;
-    tryProcessingNextUpdatable();
-}
-
-void CanvasWindow::tryProcessingNextUpdatable() {
-    if(!mFreeThreads.isEmpty()) {
-        sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), nullptr);
-    }
-}
-
-void CanvasWindow::addFileUpdatableAwaitingUpdate(
-        const stdsptr<_ScheduledTask>& updatable) {
-    mFileUpdatablesAwaitingUpdate << updatable;
-
-    if(mNoFileAwaitUpdate) {
-        mNoFileAwaitUpdate = false;
-        sendNextFileUpdatableForUpdate(mTaskExecutors.count(), nullptr);
-    }
-}
-
-void CanvasWindow::sendNextFileUpdatableForUpdate(
-        const int &threadId, _ScheduledTask * const lastUpdatable) {
-    Q_UNUSED(threadId);
-    if(lastUpdatable != nullptr) {
-        lastUpdatable->updateFinished();
-    }
-    if(mFileUpdatablesAwaitingUpdate.isEmpty()) {
-        mNoFileAwaitUpdate = true;
-        if(mFilesUpdateFinishedFunction != nullptr) {
-            (*this.*mFilesUpdateFinishedFunction)();
-        }
-//        if(!mRenderingPreview) {
-//            callUpdateSchedulers();
-//        }
-        if(!mFreeThreads.isEmpty() && !mUpdatablesAwaitingUpdate.isEmpty()) {
-            sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), nullptr);
-        }
-    } else {
-        for(int i = 0; i < mFileUpdatablesAwaitingUpdate.count(); i++) {
-            _ScheduledTask *updatablaT =
-                    mFileUpdatablesAwaitingUpdate.at(i).get();
-            if(updatablaT->readyToBeProcessed()) {
-                updatablaT->setCurrentTaskExecutor(mFileControler);
-                updatablaT->beforeUpdate();
-                emit updateFileUpdatable(updatablaT, mTaskExecutors.count());
-                mFileUpdatablesAwaitingUpdate.removeAt(i);
-                i--;
-                return;
-            }
-        }
-    }
-}
-
-#include <chrono>
-void CanvasWindow::sendNextUpdatableForUpdate(
-        const int &finishedThreadId, _ScheduledTask *const lastUpdatable) {
-    //auto start = std::chrono::steady_clock::now();
-    //qDebug() << "sendNextUpdatableForUpdate::begin" << mFreeThreads.count();
-    if(lastUpdatable != nullptr) {
-        mThreadsUsed--;
-        if(mClearBeingUpdated) {
-            lastUpdatable->clear();
-        } else {
-            if(lastUpdatable->needsGpuProcessing()) {
-                auto gpuProcess =
-                        SPtrCreate(BoxRenderDataScheduledPostProcess)(
-                            GetAsSPtr(lastUpdatable, BoundingBoxRenderData));
-                mGpuPostProcessor.addToProcess(gpuProcess);
-            } else {
-                lastUpdatable->updateFinished();
-            }
-        }
-        //qDebug() << "finished processing using: " << finishedThreadId;
-    }
-    if(mUpdatablesAwaitingUpdate.isEmpty()) {
-        mClearBeingUpdated = false;
-        mNoBoxesAwaitUpdate = true;
-        mFreeThreads << finishedThreadId;
-        //qDebug() << "thread free: " << finishedThreadId;
-        if(mBoxesUpdateFinishedFunction != nullptr) {
-            (*this.*mBoxesUpdateFinishedFunction)();
-        }
-        if(!mRenderingPreview) {
-            if(mGpuPostProcessor.hasFinished()) callUpdateSchedulers();
-        }
-    } else {
-        int threadId = finishedThreadId;
-        for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
-            _ScheduledTask *updatablaT =
-                    mUpdatablesAwaitingUpdate.at(i).get();
-            if(updatablaT->readyToBeProcessed()) {
-                mThreadsUsed++;
-                //qDebug() << "started processing using: " << threadId;
-                updatablaT->setCurrentTaskExecutor(
-                            mTaskExecutors.at(threadId));
-                updatablaT->beforeUpdate();
-                mUpdatablesAwaitingUpdate.removeAt(i);
-                emit updateUpdatable(updatablaT, threadId);
-                i--;
-                //return;
-                if(mFreeThreads.isEmpty() || mUpdatablesAwaitingUpdate.isEmpty()) {
-                    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
-                    if(usageWidget != nullptr)
-                        usageWidget->setThreadsUsage(mThreadsUsed);
-                    //auto end = std::chrono::steady_clock::now();
-                    //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
-                    return;
-                }
-                threadId = mFreeThreads.takeFirst();
-            }
-        }
-        //qDebug() << "thread free, not ready: " << threadId;
-        mFreeThreads << threadId;
-        // !!! parallel
-        if(mBoxesUpdateFinishedFunction != nullptr) {
-            (*this.*mBoxesUpdateFinishedFunction)();
-        }
-        //qDebug() << "free";
-        // !!! parallel
-    }
-    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
-    if(usageWidget == nullptr) return;
-    usageWidget->setThreadsUsage(mThreadsUsed);
-    //auto end = std::chrono::steady_clock::now();
-    //qDebug() << "sendNextUpdatableForUpdate::end" << mFreeThreads.count() << std::chrono::duration <double, std::milli> (end - start).count() << " ms";;
 }
 
 void CanvasWindow::interruptPreview() {
@@ -960,14 +778,14 @@ void CanvasWindow::interruptPreview() {
 
 void CanvasWindow::outOfMemory() {
     if(mRenderingPreview) {
-        if(mNoBoxesAwaitUpdate && mNoFileAwaitUpdate) {
+        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
             playPreview();
-        } else if(mNoBoxesAwaitUpdate) {
-            mBoxesUpdateFinishedFunction = nullptr;
-            mFilesUpdateFinishedFunction = &CanvasWindow::playPreview;
-        } else if(mNoFileAwaitUpdate) {
-            mFilesUpdateFinishedFunction = nullptr;
-            mBoxesUpdateFinishedFunction = &CanvasWindow::playPreview;
+        } else {
+            auto allFinishedFunc = [this]() {
+                playPreview();
+                TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(nullptr);
+            };
+            TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(allFinishedFunc);
         }
     }
 }
@@ -984,8 +802,7 @@ void CanvasWindow::setPreviewing(const bool &bT) {
 
 void CanvasWindow::interruptPreviewRendering() {
     setRendering(false);
-    mBoxesUpdateFinishedFunction = nullptr;
-    mFilesUpdateFinishedFunction = nullptr;
+    TaskScheduler::sClearAllFinishedFuncs();
     mCurrentCanvas->clearPreview();
     mCurrentCanvas->getCacheHandler().
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
@@ -997,8 +814,7 @@ void CanvasWindow::interruptPreviewRendering() {
 
 void CanvasWindow::interruptOutputRendering() {
     mCurrentCanvas->setOutputRendering(false);
-    mBoxesUpdateFinishedFunction = nullptr;
-    mFilesUpdateFinishedFunction = nullptr;
+    TaskScheduler::sClearAllFinishedFuncs();
     mCurrentCanvas->clearPreview();
     emit changeCurrentFrame(mSavedCurrentFrame);
 }
@@ -1032,8 +848,7 @@ void CanvasWindow::resumePreview() {
 
 void CanvasWindow::playPreview() {
     //emit changeCurrentFrame(mSavedCurrentFrame);
-    mBoxesUpdateFinishedFunction = nullptr;
-    mFilesUpdateFinishedFunction = nullptr;
+    TaskScheduler::sClearAllFinishedFuncs();
     mCurrentCanvas->playPreview(mSavedCurrentFrame,
                                 mCurrentRenderFrame);
     setRendering(false);
@@ -1056,7 +871,7 @@ void CanvasWindow::nextPreviewRenderFrame() {
         playPreview();
     } else {
         nextCurrentRenderFrame();
-        if(mNoBoxesAwaitUpdate) {
+        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
             nextPreviewRenderFrame();
         }
     }
@@ -1066,8 +881,7 @@ void CanvasWindow::nextSaveOutputFrame() {
     //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         mCurrentRenderSettings = nullptr;
-        mBoxesUpdateFinishedFunction = nullptr;
-        mFilesUpdateFinishedFunction = nullptr;
+        TaskScheduler::sClearAllFinishedFuncs();
         mCurrentCanvas->setOutputRendering(false);
         emit changeCurrentFrame(mSavedCurrentFrame);
         if(qAbs(mSavedResolutionFraction -
@@ -1079,13 +893,13 @@ void CanvasWindow::nextSaveOutputFrame() {
         int lastIdentical;
         int firstIdentical;
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
-        mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(&firstIdentical, &lastIdentical,
-                                                             mCurrentRenderFrame);
+        mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(
+                    &firstIdentical, &lastIdentical, mCurrentRenderFrame);
         if(lastIdentical > mMaxRenderFrame) lastIdentical = mMaxRenderFrame;
         mCurrentRenderFrame = lastIdentical + 1;
         //mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
-        if(mNoBoxesAwaitUpdate) {
+        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
             // mCurrentCanvas->setCurrentPreviewContainer(); !!!
             nextSaveOutputFrame();
         }
@@ -1093,9 +907,6 @@ void CanvasWindow::nextSaveOutputFrame() {
 }
 
 void CanvasWindow::clearAll() {
-
-    mClearBeingUpdated = !mNoBoxesAwaitUpdate;
-    mUpdatablesAwaitingUpdate.clear();
     foreach(const qsptr<Canvas> &canvas, mCanvasList) {
         mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     }

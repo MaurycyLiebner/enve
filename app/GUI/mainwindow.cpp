@@ -213,6 +213,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     mEventFilterDisabled = false;
 
+    try {
+        mTaskScheduler.initializeGPU();
+    } catch(const std::exception& e) {
+        gPrintExceptionFatal(e, "Failed to initialize gpu for post-processing.\n");
+    }
+
+    connect(&mTaskScheduler, &TaskScheduler::finishedAllQuedTasks,
+            this, &MainWindow::queScheduledTasksAndUpdate);
+
     QApplication::instance()->installEventFilter(this);
 }
 
@@ -787,100 +796,6 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mPaintMode->setChecked(currentMode == PAINT_MODE);
 }
 
-//void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)
-//{
-//    if(mNoBoxesAwaitUpdate) {
-//        mNoBoxesAwaitUpdate = false;
-//        mLastUpdatedBox = box;
-//        emit updateBoxPixmaps(box);
-//    } else {
-//        mBoxesAwaitingUpdate << box;
-//    }
-//}
-
-//void MainWindow::sendNextBoxForUpdate()
-//{
-//    if(mLastUpdatedBox != nullptr) {
-//        mLastUpdatedBox->setAwaitingUpdate(false);
-//        if(mLastUpdatedBox->shouldRedoUpdate()) {
-//            mLastUpdatedBox->setRedoUpdateToFalse();
-//            mLastUpdatedBox->awaitUpdate();
-//        }
-//    }
-//    if(mBoxesAwaitingUpdate.isEmpty()) {
-//        mNoBoxesAwaitUpdate = true;
-//        mLastUpdatedBox = nullptr;
-//        callUpdateSchedulers();
-//        if(mBoxesUpdateFinishedFunction != nullptr) {
-//            (*this.*mBoxesUpdateFinishedFunction)();
-//        }
-//        //callUpdateSchedulers();
-//    } else {
-//        mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
-//        emit updateBoxPixmaps(mLastUpdatedBox);
-//    }
-//}
-
-//void MainWindow::playPreview()
-//{
-//    //mCanvas->clearPreview();
-//    mCanvas->updateRenderRect();
-//    mBoxesUpdateFinishedFunction = &MainWindow::nextPlayPreviewFrame;
-//    mSavedCurrentFrame = mCurrentFrame;
-
-//    mRendering = true;
-//    mPreviewInterrupted = false;
-//    mCurrentRenderFrame = mSavedCurrentFrame;
-//    setCurrentFrame(mSavedCurrentFrame);
-//    mCanvas->setPreviewing(true);
-//    mCanvas->updateAllBoxes();
-//    if(mNoBoxesAwaitUpdate) {
-//        nextPlayPreviewFrame();
-//    }
-//}
-
-//void MainWindow::nextPlayPreviewFrame() {
-//    mCanvas->renderCurrentFrameToPreview();
-//    if(mCurrentRenderFrame >= mMaxFrame || mPreviewInterrupted) {
-//        mRendering = false;
-//        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
-//        mBoxesUpdateFinishedFunction = nullptr;
-//            mCanvas->playPreview();
-//    } else {
-//        mCurrentRenderFrame++;
-//        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
-//        if(mNoBoxesAwaitUpdate) {
-//            nextPlayPreviewFrame();
-//        }
-//    }
-//}
-
-//void MainWindow::nextSaveOutputFrame() {
-//    mCanvas->renderCurrentFrameToOutput(mOutputString);
-//    if(mCurrentRenderFrame >= mMaxFrame) {
-//        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
-//        mBoxesUpdateFinishedFunction = nullptr;
-//    } else {
-//        mCurrentRenderFrame++;
-//        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
-//        if(mNoBoxesAwaitUpdate) {
-//            nextSaveOutputFrame();
-//        }
-//    }
-//}
-
-//void MainWindow::saveOutput(QString renderDest) {
-//    mOutputString = renderDest;
-//    mBoxesUpdateFinishedFunction = &MainWindow::nextSaveOutputFrame;
-//    mSavedCurrentFrame = mCurrentFrame;
-
-//    mCurrentRenderFrame = mMinFrame;
-//    mBoxesListAnimationDockWidget->setCurrentFrame(mMinFrame);
-//    if(mNoBoxesAwaitUpdate) {
-//        nextSaveOutputFrame();
-//    }
-//}
-
 void MainWindow::previewFinished() {
     mBoxesListAnimationDockWidget->previewFinished();
 }
@@ -929,14 +844,6 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
     updateTitle();
 }
 
-void MainWindow::addUpdateScheduler(const stdsptr<_ScheduledTask>& scheduler) {
-    mUpdateSchedulers.append(scheduler);
-}
-
-void MainWindow::addFileUpdateScheduler(const stdsptr<_ScheduledTask>& scheduler) {
-    mCanvasWindow->addFileUpdatableAwaitingUpdate(scheduler);
-}
-
 bool MainWindow::isShiftPressed() {
     return QApplication::keyboardModifiers() & Qt::ShiftModifier;
 }
@@ -954,10 +861,8 @@ Brush *MainWindow::getCurrentBrush() {
     return nullptr;
 }
 
-void MainWindow::callUpdateSchedulers() {
-    if(!isEnabled()) {
-        return;
-    }
+void MainWindow::queScheduledTasksAndUpdate() {
+    if(!isEnabled()) return;
     if(mCurrentUndoRedoStack) {
         if(mCurrentUndoRedoStack->finishSet()) {
             setFileChangedSinceSaving(true);
@@ -965,18 +870,18 @@ void MainWindow::callUpdateSchedulers() {
     }
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
-
-    if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
-        mCanvasWindow->processSchedulers();
-        foreach(const stdsptr<_ScheduledTask> &updatable,
-                mUpdateSchedulers) {
-            if(!updatable->isAwaitingUpdate()) {
-                updatable->schedulerProccessed();
-            }
-            mCanvasWindow->addUpdatableAwaitingUpdate(updatable);
-        }
-        mUpdateSchedulers.clear();
-    }
+    mTaskScheduler.queScheduledCPUTasks();
+//    if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
+//        mCanvasWindow->processSchedulers();
+//        foreach(const stdsptr<_ScheduledTask> &updatable,
+//                mUpdateSchedulers) {
+//            if(!updatable->isAwaitingUpdate()) {
+//                updatable->schedulerProccessed();
+//            }
+//            mCanvasWindow->queCPUTask(updatable);
+//        }
+//        mUpdateSchedulers.clear();
+//    }
 
     mCanvasWindow->updateHoveredElements();
     mCanvasWindow->updatePivotIfNeeded();
@@ -1064,7 +969,7 @@ void MainWindow::enable() {
     enableEventFilter();
     delete mGrayOutWidget;
     mGrayOutWidget = nullptr;
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 int MainWindow::getCurrentFrame() {
@@ -1178,7 +1083,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
         }
-        callUpdateSchedulers();
+        queScheduledTasksAndUpdate();
         return returnBool;
     }
     return false;
@@ -1189,7 +1094,7 @@ bool MainWindow::isEnabled() {
 }
 
 void MainWindow::clearAll() {
-    mUpdateSchedulers.clear();
+    mTaskScheduler.clearTasks();
     setFileChangedSinceSaving(false);
     mObjectSettingsWidget->setMainTarget(nullptr);
 
@@ -1296,7 +1201,7 @@ void MainWindow::importImageSequence() {
     if(!importPaths.isEmpty()) {
         mCanvasWindow->createAnimationBoxForPaths(importPaths);
     }
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 //void MainWindow::importVideo() {
@@ -1320,21 +1225,21 @@ void MainWindow::undo() {
     if(mCurrentUndoRedoStack == nullptr) return;
     getUndoRedoStack()->undo();
     mCanvasWindow->updateHoveredElements();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void MainWindow::redo() {
     if(mCurrentUndoRedoStack == nullptr) return;
     getUndoRedoStack()->redo();
     mCanvasWindow->updateHoveredElements();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void MainWindow::setCurrentFrame(const int &frame) {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
     mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
     mCanvasWindow->updateAfterFrameChanged(frame);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 Gradient *MainWindow::getLoadedGradientById(const int &id) {

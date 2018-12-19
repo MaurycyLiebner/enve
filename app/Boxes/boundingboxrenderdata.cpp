@@ -174,12 +174,6 @@ void BoundingBoxRenderData::afterUpdate() {
     _ScheduledTask::afterUpdate();
 }
 
-void BoundingBoxRenderData::parentBeingProcessed() {
-    mFinished = false;
-    mSchedulerAdded = true;
-    schedulerProccessed();
-}
-
 void BoundingBoxRenderData::schedulerProccessed() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != nullptr) {
@@ -204,7 +198,7 @@ void BoundingBoxRenderData::schedulerProccessed() {
 void BoundingBoxRenderData::addSchedulerNow() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return;
-    parentBoxT->addScheduler(GetAsSPtr(this, _ScheduledTask));
+    parentBoxT->scheduleTask(GetAsSPtr(this, _ScheduledTask));
 }
 
 void BoundingBoxRenderData::dataSet() {

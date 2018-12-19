@@ -277,49 +277,49 @@ void BoxesListKeysViewWidget::removeThis() {
 void BoxesListKeysViewWidget::setRuleNone() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_NoRule);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setRuleSelected() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Selected);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setRuleAnimated() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Animated);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setRuleNotAnimated() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_NotAnimated);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setRuleVisible() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Visible);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setRuleInvisible() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Invisible);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setRuleUnloced() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Unlocked);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setRuleLocked() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Locked);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setTargetAll() {
@@ -327,7 +327,7 @@ void BoxesListKeysViewWidget::setTargetAll() {
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getWindowSWT(),
                 SWT_All);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setTargetCurrentCanvas() {
@@ -335,7 +335,7 @@ void BoxesListKeysViewWidget::setTargetCurrentCanvas() {
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getCurrentCanvas(),
                 SWT_CurrentCanvas);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setTargetCurrentGroup() {
@@ -343,25 +343,25 @@ void BoxesListKeysViewWidget::setTargetCurrentGroup() {
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getCurrentGroup(),
                 SWT_CurrentGroup);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setTypeSound() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentType(&SingleWidgetTarget::SWT_isSingleSound);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setTypeAll() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentType(nullptr);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setSearchText(const QString &text) {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentSearchText(text);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 bool BoxesListKeysViewWidget::processFilteredKeyEvent(

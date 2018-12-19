@@ -310,7 +310,7 @@ void CacheContainerTmpFileDataLoader::afterUpdate() {
 }
 
 void CacheContainerTmpFileDataLoader::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledTask>());
+    TaskScheduler::sGetInstance()->queHDDTask(ref<_ScheduledTask>());
 }
 
 CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
@@ -354,7 +354,7 @@ void CacheContainerTmpFileDataSaver::afterUpdate() {
 }
 
 void CacheContainerTmpFileDataSaver::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledTask>());
+    TaskScheduler::sGetInstance()->queHDDTask(ref<_ScheduledTask>());
 }
 
 void CacheContainerTmpFileDataDeleter::_processUpdate() {
@@ -362,5 +362,5 @@ void CacheContainerTmpFileDataDeleter::_processUpdate() {
 }
 
 void CacheContainerTmpFileDataDeleter::addSchedulerNow() {
-    MainWindow::getInstance()->addFileUpdateScheduler(ref<_ScheduledTask>());
+    TaskScheduler::sGetInstance()->queHDDTask(ref<_ScheduledTask>());
 }

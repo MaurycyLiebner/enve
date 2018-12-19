@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include "undoredo.h"
 #include "clipboardcontainer.h"
+#include "taskscheduler.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
 
@@ -83,8 +84,6 @@ public:
     }
     UndoRedoStack *getUndoRedoStack();
 
-    void addUpdateScheduler(const stdsptr<_ScheduledTask> &scheduler);
-
     static bool isShiftPressed();
     static bool isCtrlPressed();
     static bool isAltPressed();
@@ -146,7 +145,6 @@ public:
     FontsWidget *getFontsWidget() {
         return mFontWidget;
     }
-    void addFileUpdateScheduler(const stdsptr<_ScheduledTask>& scheduler);
     Brush *getCurrentBrush();
 
     UsageWidget* getUsageWidget() {
@@ -159,7 +157,7 @@ public slots:
     void setResolutionFractionValue(const qreal &value);
     void createNewCanvas();
 
-    void callUpdateSchedulers();
+    void queScheduledTasksAndUpdate();
     void addCanvasToRenderQue();
     void canvasNameChanged(Canvas *canvas, const QString &name);
 private slots:
@@ -261,10 +259,10 @@ private:
     QMenu *mPanelsMenu;
     QMenu *mRenderMenu;
 
+    TaskScheduler mTaskScheduler;
     CanvasWindow *mCanvasWindow;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
-    QList<stdsptr<_ScheduledTask> > mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
 

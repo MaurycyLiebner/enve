@@ -193,7 +193,7 @@ public:
                                                const int &relFrame,
                                                const bool &takeAncestorsIntoAccount = true);
     void processSchedulers();
-    void addSchedulersToProcess();
+    void queScheduledTasks();
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);

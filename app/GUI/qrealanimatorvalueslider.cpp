@@ -195,6 +195,6 @@ void QrealAnimatorValueSlider::openContextMenu(
     if(selectedAction == nullptr) {
         return;
     } else {
-        MainWindow::getInstance()->callUpdateSchedulers();
+        MainWindow::getInstance()->queScheduledTasksAndUpdate();
     }
 }

@@ -305,7 +305,7 @@ class InternalLinkCanvas : public InternalLinkGroupBox {
     Q_OBJECT
     friend class SelfRef;
 public:
-    void addSchedulersToProcess();
+    void queScheduledTasks();
 
     void writeBoundingBox(QIODevice *target);
 

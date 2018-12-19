@@ -266,7 +266,7 @@ void GradientWidget::setGradientLoadIds() {
 void GradientWidget::gradientLeftPressed(const int &gradId) {
     if(gradId >= mGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
-    MainWindow::getInstance()->callUpdateSchedulers();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void GradientWidget::gradientContextMenuReq(const int &gradId,

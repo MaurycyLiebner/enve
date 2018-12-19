@@ -10,19 +10,19 @@
 void KeysView::graphSetSmoothCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphSetSymmetricCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphSetCornerCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_CORNER);
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::getSelectedSegments(QList<QList<QrealKey*>>& segments) {
@@ -90,7 +90,7 @@ void KeysView::graphMakeSegmentsSmooth(const bool& smooth) {
     }
 
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphMakeSegmentsLinear() {
@@ -420,7 +420,7 @@ void KeysView::graphSetTwoSideCtrlForSelected() {
         key->setStartEnabled(true);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphSetRightSideCtrlForSelected() {
@@ -430,7 +430,7 @@ void KeysView::graphSetRightSideCtrlForSelected() {
         key->setStartEnabled(false);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphSetLeftSideCtrlForSelected() {
@@ -440,7 +440,7 @@ void KeysView::graphSetLeftSideCtrlForSelected() {
         key->setStartEnabled(true);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphSetNoSideCtrlForSelected() {
@@ -450,7 +450,7 @@ void KeysView::graphSetNoSideCtrlForSelected() {
         key->setStartEnabled(false);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphClearAnimatorSelection() {
@@ -630,7 +630,7 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete) {
         graphDeletePressed();
-        mMainWindow->callUpdateSchedulers();
+        mMainWindow->queScheduledTasksAndUpdate();
     } else if(event->key() == Qt::Key_0 &&
               event->modifiers() & Qt::KeypadModifier) {
         graphResetValueScaleAndMinShownAction();
@@ -642,7 +642,7 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
 
 void KeysView::graphResetValueScaleAndMinShownAction() {
     graphResetValueScaleAndMinShown();
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphResetValueScaleAndMinShown() {
@@ -672,7 +672,7 @@ void KeysView::graphAddViewedAnimator(QrealAnimator *animator) {
     animator->qra_updateKeysPath();
     graphResetValueScaleAndMinShown();
 
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphRemoveViewedAnimator(QrealAnimator *animator) {
@@ -682,13 +682,13 @@ void KeysView::graphRemoveViewedAnimator(QrealAnimator *animator) {
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
 
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphUpdateAfterKeysChangedAndRepaint() {
     scheduleGraphUpdateAfterKeysChanged();
     
-    mMainWindow->callUpdateSchedulers();
+    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::scheduleGraphUpdateAfterKeysChanged() {

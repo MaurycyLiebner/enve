@@ -250,7 +250,8 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/colorwidgetshaders.cpp \
     glhelpers.cpp \
     exceptions.cpp \
-    taskexecutor.cpp
+    taskexecutor.cpp \
+    taskscheduler.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -457,7 +458,8 @@ HEADERS  += \
     GUI/ColorWidgets/colorwidgetshaders.h \
     glhelpers.h \
     exceptions.h \
-    taskexecutor.h
+    taskexecutor.h \
+    taskscheduler.h
 
 RESOURCES += \
     resources.qrc
