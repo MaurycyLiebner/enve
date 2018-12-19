@@ -1,7 +1,7 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 #include <QOpenGLWidget>
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include "skiaincludes.h"
 #include "glhelpers.h"
 class Gradient;

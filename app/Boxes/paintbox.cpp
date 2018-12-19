@@ -4,6 +4,7 @@
 #include "canvas.h"
 #include "MovablePoints/animatedpoint.h"
 #include "PropertyUpdaters/paintboxsizeupdaters.h"
+#include "Animators/transformanimator.h"
 
 PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {

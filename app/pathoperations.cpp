@@ -5,6 +5,7 @@
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "Boxes/vectorpath.h"
 #include "MovablePoints/nodepoint.h"
+#include "Animators/transformanimator.h"
 
 MinimalNodePoint::MinimalNodePoint() {}
 

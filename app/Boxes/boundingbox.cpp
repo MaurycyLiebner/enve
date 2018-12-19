@@ -11,6 +11,10 @@
 #include "global.h"
 #include "MovablePoints/movablepoint.h"
 #include "PropertyUpdaters/pixmapeffectupdater.h"
+#include "taskscheduler.h"
+#include "PixmapEffects/pixmapeffect.h"
+#include "Animators/effectanimators.h"
+#include "Animators/transformanimator.h"
 
 QList<qptr<BoundingBox>> BoundingBox::mLoadedBoxes;
 QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::mFunctionsWaitingForBoxLoad;

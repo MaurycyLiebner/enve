@@ -1,5 +1,5 @@
 #include "colorwidget.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include "global.h"
 
 ColorWidget::ColorWidget(QWidget *parent) : GLWidget(parent) {

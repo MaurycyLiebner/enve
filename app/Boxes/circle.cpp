@@ -3,6 +3,8 @@
 #include "MovablePoints/movablepoint.h"
 #include "Animators/gradientpoints.h"
 #include "PropertyUpdaters/nodepointupdater.h"
+#include "Animators/transformanimator.h"
+#include "Animators/effectanimators.h"
 
 Circle::Circle() :
     PathBox(TYPE_CIRCLE) {

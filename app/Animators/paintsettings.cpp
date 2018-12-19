@@ -1,6 +1,6 @@
 #include "paintsettings.h"
 #include "undoredo.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "GUI/mainwindow.h"
 #include "GUI/ColorWidgets/colorvaluerect.h"

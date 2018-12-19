@@ -6,6 +6,7 @@
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "pointhelpers.h"
 #include "GUI/mainwindow.h"
+#include "Animators/transformanimator.h"
 
 VectorPathEdge::VectorPathEdge(NodePoint *pt1, NodePoint *pt2) {
     setPoint1(pt1);

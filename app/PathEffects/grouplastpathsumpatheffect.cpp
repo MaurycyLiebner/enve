@@ -1,6 +1,7 @@
 #include "grouplastpathsumpatheffect.h"
 #include "Boxes/boxesgroup.h"
 #include "pathoperations.h"
+#include "Boxes/pathbox.h"
 
 GroupLastPathSumPathEffect::GroupLastPathSumPathEffect(
         BoxesGroup *parentGroup,

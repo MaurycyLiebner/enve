@@ -1,5 +1,5 @@
 #include "rastereffects.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include <QColor>
 
 #include <cmath>

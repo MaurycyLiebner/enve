@@ -11,6 +11,8 @@
 #include "Animators/pathanimator.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "Animators/gradientpoints.h"
+#include "Animators/effectanimators.h"
+#include "Animators/transformanimator.h"
 
 VectorPath::VectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {

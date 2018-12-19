@@ -1,5 +1,5 @@
 #include "colorlabel.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include <QPainter>
 #include <QMouseEvent>
 #include <QWidget>

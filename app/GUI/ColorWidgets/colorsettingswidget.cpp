@@ -3,7 +3,7 @@
 #include <QResizeEvent>
 #include <QMenu>
 #include "GUI/ColorWidgets/colorpickingwidget.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include "colorlabel.h"
 #include "global.h"
 #include "GUI/actionbutton.h"

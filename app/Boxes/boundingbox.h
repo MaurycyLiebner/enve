@@ -1,25 +1,12 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
-#include <QMatrix>
-#include "Animators/transformanimator.h"
-
-#include "PixmapEffects/pixmapeffect.h"
-
-#include "Animators/effectanimators.h"
-
-#include "singlewidgettarget.h"
-#include <unordered_map>
-
+#include "Animators/complexanimator.h"
 #include "boundingboxrendercontainer.h"
 #include "skiaincludes.h"
-#include "updatable.h"
-
-#include "boundingboxrenderdata.h"
-
 #include "renderdatahandler.h"
 #include "smartPointers/sharedpointerdefs.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 
 class Canvas;
 
@@ -32,6 +19,10 @@ class DurationRectangleMovable;
 class PaintSettings;
 class StrokeSettings;
 class PaintSetting;
+class EffectAnimators;
+class PixmapEffect;
+class BoxTransformAnimator;
+class BasicTransformAnimator;
 
 class BoxesGroup;
 class VectorPathEdge;

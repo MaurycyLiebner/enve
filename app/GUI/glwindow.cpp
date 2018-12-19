@@ -1,5 +1,5 @@
 #include "glwindow.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include <QPainter>
 #include <QDebug>
 #include "exceptions.h"

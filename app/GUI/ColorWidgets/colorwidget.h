@@ -1,7 +1,7 @@
 #ifndef COLORWIDGET_H
 #define COLORWIDGET_H
 #include "glwidget.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 
 class ColorWidget : public GLWidget {
     Q_OBJECT

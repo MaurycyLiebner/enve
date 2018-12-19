@@ -1,5 +1,5 @@
 #include "brush.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 qreal Brush::h = 0.;
 qreal Brush::s = 0.;
 qreal Brush::v = 0.;

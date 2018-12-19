@@ -1,11 +1,11 @@
 #include "boxpathpoint.h"
 #include "Boxes/boundingbox.h"
 #include "pointhelpers.h"
+#include "Animators/transformanimator.h"
 
 BoxPathPoint::BoxPathPoint(QPointFAnimator *associatedAnimator,
-                          BoxTransformAnimator *box) :
-    AnimatedPoint(associatedAnimator, box,
-                              TYPE_PIVOT_POINT, 7.) {}
+                           BoxTransformAnimator *box) :
+    AnimatedPoint(associatedAnimator, box, TYPE_PIVOT_POINT, 7.) {}
 
 void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();

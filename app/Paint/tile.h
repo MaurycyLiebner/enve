@@ -5,8 +5,9 @@
 
 #include <QList>
 #include <stdlib.h>
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include <png++/png.hpp>
+#include <SkColorMatrixFilter.h>
 #include "skiaincludes.h"
 #include "updatable.h"
 
@@ -85,8 +86,7 @@ struct TileSkDrawer : public _ScheduledTask {
     ushort _maxPaintY = 0;
     ushort _maxPaintX = 0;
 };
-#include <SkColorMatrixFilter.h>
-#include "GUI/ColorWidgets/helpers.h"
+
 struct TileSkDrawerCollection {
     TileSkDrawerCollection() {}
 //    ~TileSkDrawerCollection();

@@ -9,6 +9,8 @@
 #include "vectorpath.h"
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "PropertyUpdaters/gradientpointsupdater.h"
+#include "Animators/effectanimators.h"
+#include "Animators/transformanimator.h"
 
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {

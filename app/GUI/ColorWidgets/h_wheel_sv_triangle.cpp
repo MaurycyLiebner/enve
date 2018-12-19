@@ -1,6 +1,6 @@
 #include "h_wheel_sv_triangle.h"
 #include "GUI/mainwindow.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include <QDebug>
 #include <QMouseEvent>
 #include <QOpenGLContext>

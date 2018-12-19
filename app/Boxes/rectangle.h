@@ -2,6 +2,7 @@
 #define RECTANGLE_H
 #include "Boxes/pathbox.h"
 class AnimatedPoint;
+class QPointFAnimator;
 class Rectangle : public PathBox {
     friend class SelfRef;
 public:

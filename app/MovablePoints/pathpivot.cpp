@@ -1,6 +1,7 @@
 #include "pathpivot.h"
 #include "canvas.h"
 #include "pointhelpers.h"
+#include "Animators/transformanimator.h"
 
 PathPivot::PathPivot(Canvas *parent) :
     NonAnimatedMovablePoint(parent->getTransformAnimator(),

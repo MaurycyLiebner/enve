@@ -6,6 +6,7 @@
 #include "Animators/pathanimator.h"
 #include "Properties/boxtargetproperty.h"
 #include "GUI/keysview.h"
+#include "Animators/effectanimators.h"
 
 ClipboardContainer::ClipboardContainer(const ClipboardContainerType &type) {
     mType = type;

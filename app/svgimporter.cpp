@@ -3,7 +3,7 @@
 #include "Boxes/boxesgroup.h"
 #include "canvas.h"
 #include "GUI/ColorWidgets/colorvaluerect.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include "Animators/pathanimator.h"
 #include "MovablePoints/nodepoint.h"
 #include "pointhelpers.h"
@@ -12,6 +12,7 @@
 #include "Boxes/textbox.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "GUI/mainwindow.h"
+#include "Animators/transformanimator.h"
 
 // '0' is 0x30 and '9' is 0x39
 static bool isDigit(ushort ch) {

@@ -3,7 +3,7 @@
 #include "MovablePoints/pathpivot.h"
 #include "Boxes/bone.h"
 #include "MovablePoints/pathpivot.h"
-
+#include "Boxes/vectorpath.h"
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 

@@ -5,6 +5,7 @@
 #include "MovablePoints/nodepoint.h"
 #include "canvas.h"
 #include "undoredo.h"
+#include "Animators/transformanimator.h"
 
 VectorPathAnimator::VectorPathAnimator(PathAnimator *pathAnimator) :
     Animator("path") {

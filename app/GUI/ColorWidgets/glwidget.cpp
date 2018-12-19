@@ -1,5 +1,5 @@
 #include "glwidget.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include "global.h"
 #include "Animators/paintsettings.h"
 

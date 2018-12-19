@@ -2,7 +2,7 @@
 #define COLORANIMATOR_H
 
 #include "Animators/complexanimator.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include "qrealanimator.h"
 
 class ColorAnimator : public ComplexAnimator {

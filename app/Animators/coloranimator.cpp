@@ -1,5 +1,5 @@
 #include "Animators/coloranimator.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include <QDebug>
 
 ColorAnimator::ColorAnimator(const QString &name) : ComplexAnimator(name) {

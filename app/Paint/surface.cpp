@@ -2,7 +2,7 @@
 #include <math.h>
 #include <algorithm>
 #include "GL/gl.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 
 Surface::Surface(const ushort &widthT,
                  const ushort &heightT,

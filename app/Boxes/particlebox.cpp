@@ -6,6 +6,9 @@
 #include "MovablePoints/animatedpoint.h"
 #include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 #include "PropertyUpdaters/particlesupdater.h"
+#include "Animators/paintsettings.h"
+#include "Animators/transformanimator.h"
+#include "Animators/effectanimators.h"
 
 double fRand(const double& fMin, const double& fMax) {
     double f = static_cast<double>(rand()) / RAND_MAX;

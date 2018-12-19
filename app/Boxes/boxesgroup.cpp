@@ -16,6 +16,9 @@
 #include "PathEffects/patheffectanimators.h"
 #include "PathEffects/patheffect.h"
 #include "PropertyUpdaters/groupallpathsupdater.h"
+#include "Animators/transformanimator.h"
+#include "Animators/effectanimators.h"
+#include "PixmapEffects/pixmapeffect.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -178,6 +181,17 @@ void BoxesGroup::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
 
     clearAllCache();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
+}
+
+void BoxesGroup::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
+    foreach(const qsptr<BoundingBox> &box,
+                mContainedBoxes) {
+            if(box->SWT_isPathBox()) {
+                box->scheduleUpdate(reason);
+            } else if(box->SWT_isBoxesGroup()) {
+                static_cast<BoxesGroup*>(box.data())->updateAllChildPathBoxes(reason);
+            }
+        }
 }
 
 void BoxesGroup::filterPathForRelFrame(const int &relFrame,
@@ -343,6 +357,26 @@ void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {
         child->updateAllBoxes(reason);
     }
     scheduleUpdate(reason);
+}
+
+QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const int &relFrame) {
+    SkPath boundingPaths = SkPath();
+    int absFrame = prp_relFrameToAbsFrame(relFrame);
+    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+        int childRelFrame = child->prp_absFrameToRelFrame(absFrame);
+        if(child->isRelFrameVisibleAndInVisibleDurationRect(childRelFrame)) {
+            SkPath childPath;
+            childPath.addRect(
+                        QRectFToSkRect(
+                            child->getRelBoundingRectAtRelFrame(childRelFrame)));
+            childPath.transform(
+                        QMatrixToSkMatrix(
+                            child->getTransformAnimator()->
+                            getRelativeTransformAtRelFrame(childRelFrame)) );
+            boundingPaths.addPath(childPath);
+        }
+    }
+    return SkRectToQRectF(boundingPaths.computeTightBounds());
 }
 
 void BoxesGroup::clearAllCache() {
@@ -580,6 +614,24 @@ void BoxesGroup::startSelectedFillColorTransform() {
     }
 }
 
+void BoxesGroup::applyPaintSetting(PaintSetting *setting) {
+    Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
+        box->applyPaintSetting(setting);
+    }
+}
+
+void BoxesGroup::setFillColorMode(const ColorMode &colorMode) {
+    Q_FOREACH(const qsptr<BoundingBox> &box,  mContainedBoxes) {
+        box->setFillColorMode(colorMode);
+    }
+}
+
+void BoxesGroup::setStrokeColorMode(const ColorMode &colorMode) {
+    Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
+        box->setStrokeColorMode(colorMode);
+    }
+}
+
 void BoxesGroup::shiftAll(const int &shift) {
     if(hasDurationRectangle()) {
         mDurationRectangle->changeFramePosBy(shift);
@@ -589,6 +641,26 @@ void BoxesGroup::shiftAll(const int &shift) {
             box->shiftAll(shift);
         }
     }
+}
+
+int BoxesGroup::setBoxLoadId(const int &loadId) {
+    int loadIdT = BoundingBox::setBoxLoadId(loadId);
+        foreach(const qsptr<BoundingBox> &child, mContainedBoxes) {
+            loadIdT = child->setBoxLoadId(loadIdT);
+        }
+
+        return loadIdT;
+}
+
+void BoxesGroup::clearBoxLoadId() {
+    BoundingBox::clearBoxLoadId();
+        foreach(const qsptr<BoundingBox> &child, mContainedBoxes) {
+            child->clearBoxLoadId();
+        }
+}
+
+const QList<qsptr<BoundingBox> > &BoxesGroup::getContainedBoxesList() const {
+    return mContainedBoxes;
 }
 
 qsptr<BoundingBox> BoxesGroup::createLink() {
@@ -731,6 +803,8 @@ bool BoxesGroup::shouldPaintOnImage() {
             mFillPathEffectsAnimators->hasEffects()) &&
            !mIsDescendantCurrentGroup;
 }
+
+bool BoxesGroup::SWT_isBoxesGroup() { return true; }
 
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
@@ -897,6 +971,10 @@ void BoxesGroup::prp_setAbsFrame(const int &frame) {
     Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
         box->prp_setAbsFrame(frame);
     }
+}
+
+stdsptr<BoundingBoxRenderData> BoxesGroup::createRenderData() {
+    return SPtrCreate(BoxesGroupRenderData)(this);
 }
 
 void BoxesGroup::removeContainedBoxFromList(const int &id,

@@ -6,6 +6,7 @@
 #include "Animators/gradientpoints.h"
 #include "Animators/qstringanimator.h"
 #include "PropertyUpdaters/nodepointupdater.h"
+#include "Animators/effectanimators.h"
 
 TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mPivotAutoAdjust = false;

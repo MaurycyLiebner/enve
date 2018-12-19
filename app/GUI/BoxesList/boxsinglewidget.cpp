@@ -18,6 +18,9 @@
 #include "Properties/boolproperty.h"
 #include "Properties/intproperty.h"
 #include "PropertyUpdaters/propertyupdater.h"
+#include "Animators/effectanimators.h"
+#include "PixmapEffects/pixmapeffect.h"
+#include "Boxes/pathbox.h"
 
 QPixmap* BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap* BoxSingleWidget::INVISIBLE_PIXMAP;

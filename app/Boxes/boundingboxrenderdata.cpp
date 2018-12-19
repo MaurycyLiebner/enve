@@ -2,6 +2,8 @@
 #include "boundingbox.h"
 #include "PixmapEffects/rastereffects.h"
 #include "gpupostprocessor.h"
+#include "skimagecopy.h"
+#include "PixmapEffects/pixmapeffect.h"
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
     if(parentBoxT == nullptr) return;
@@ -10,7 +12,6 @@ BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
 
 BoundingBoxRenderData::~BoundingBoxRenderData() {}
 
-#include "skimagecopy.h"
 void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     globalBoundingRect = src->globalBoundingRect;
     transform = src->transform;

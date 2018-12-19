@@ -23,6 +23,8 @@
 #include "renderinstancesettings.h"
 #include "videoencoder.h"
 #include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
+#include "Animators/effectanimators.h"
+#include "PixmapEffects/pixmapeffect.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
                int canvasWidth, int canvasHeight,

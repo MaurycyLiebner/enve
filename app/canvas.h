@@ -2,12 +2,13 @@
 #define CANVAS_H
 
 #include "Boxes/boxesgroup.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
 #include "skiaincludes.h"
 #include "GUI/valueinput.h"
 #include "GUI/canvaswindow.h"
+#include "Animators/coloranimator.h"
 
 class TextBox;
 class Circle;
@@ -21,6 +22,7 @@ class Brush;
 class NodePoint;
 class UndoRedoStack;
 class ExternalLinkBox;
+class Bone;
 
 #define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? nullptr : (list).at( (index) ))
 

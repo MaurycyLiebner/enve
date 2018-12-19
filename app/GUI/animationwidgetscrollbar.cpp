@@ -2,7 +2,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include "global.h"
-#include "GUI/ColorWidgets/helpers.h"
+#include "colorhelpers.h"
 
 AnimationWidgetScrollBar::AnimationWidgetScrollBar(const int &minSpan,
                                                    const int &maxSpan,

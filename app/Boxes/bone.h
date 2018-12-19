@@ -2,6 +2,7 @@
 #define BONE_H
 #include "boundingbox.h"
 #include "MovablePoints/movablepoint.h"
+#include "Animators/transformanimator.h"
 class BonePt;
 class BonesBox;
 class Bone : public ComplexAnimator {

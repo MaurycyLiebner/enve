@@ -5,6 +5,7 @@
 #include "Boxes/boxesgroup.h"
 #include "skqtconversions.h"
 #include "pointhelpers.h"
+#include "Animators/transformanimator.h"
 
 MovablePoint::MovablePoint(BasicTransformAnimator* parentTransform,
                            const MovablePointType &type,

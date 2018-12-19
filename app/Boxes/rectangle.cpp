@@ -3,6 +3,8 @@
 #include "Animators/gradientpoints.h"
 #include "MovablePoints/animatedpoint.h"
 #include "PropertyUpdaters/nodepointupdater.h"
+#include "Animators/transformanimator.h"
+#include "Animators/effectanimators.h"
 
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     setName("Rectangle");

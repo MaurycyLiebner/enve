@@ -2,6 +2,7 @@
 #include "Boxes/vectorpath.h"
 #include "pointhelpers.h"
 #include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
+#include "Animators/transformanimator.h"
 
 GradientPoint::GradientPoint(QPointFAnimator* associatedAnimator,
                              PathBox* parent) :

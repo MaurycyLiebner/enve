@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include "GUI/paintboxsettingsdialog.h"
 #include "GUI/customfpsdialog.h"
+#include "Boxes/vectorpath.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);

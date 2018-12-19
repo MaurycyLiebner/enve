@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "colorhelpers.h"
 #include <math.h>
 #include <QString>
 #include <sys/sysinfo.h>

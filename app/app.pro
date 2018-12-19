@@ -64,7 +64,6 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/savedcolorbutton.cpp \
     GUI/ColorWidgets/savedcolorswidget.cpp \
     GUI/ColorWidgets/savedcolorwidgets.cpp \
-    GUI/ColorWidgets/helpers.cpp \
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     svgimporter.cpp \
@@ -251,7 +250,8 @@ SOURCES += main.cpp\
     glhelpers.cpp \
     exceptions.cpp \
     taskexecutor.cpp \
-    taskscheduler.cpp
+    taskscheduler.cpp \
+    colorhelpers.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -264,7 +264,6 @@ HEADERS  += \
     GUI/ColorWidgets/savedcolorbutton.h \
     GUI/ColorWidgets/savedcolorswidget.h \
     GUI/ColorWidgets/savedcolorwidgets.h \
-    GUI/ColorWidgets/helpers.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     svgimporter.h \
@@ -459,7 +458,8 @@ HEADERS  += \
     glhelpers.h \
     exceptions.h \
     taskexecutor.h \
-    taskscheduler.h
+    taskscheduler.h \
+    colorhelpers.h
 
 RESOURCES += \
     resources.qrc

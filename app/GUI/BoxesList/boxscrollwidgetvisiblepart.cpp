@@ -11,6 +11,8 @@
 #include "global.h"
 #include "singlewidgetabstraction.h"
 #include "GUI/keysview.h"
+#include "PixmapEffects/pixmapeffect.h"
+#include "Animators/effectanimators.h"
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
         ScrollWidget *parent) :
