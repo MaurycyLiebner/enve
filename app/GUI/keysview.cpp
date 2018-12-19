@@ -217,7 +217,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     } else {
         bool inputHandled = false;
         if(mMovingKeys) {
-            if(mValueInput.handleKeyPressEventWhileMouseGrabbing(event)) {
+            if(mValueInput.handleTransormationInputKeyEvent(event)) {
                 inputHandled = true;
             }
         }

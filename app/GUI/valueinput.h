@@ -14,7 +14,7 @@ public:
     const qreal &getValue() { return mInputTransformationValue; }
     void clearAndDisableInput();
     void updateInputValue();
-    bool handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event);
+    bool handleTransormationInputKeyEvent(QKeyEvent *event);
     void setName(const QString &str) {
         mName = str;
     }

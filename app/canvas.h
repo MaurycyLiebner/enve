@@ -365,7 +365,6 @@ protected:
     void handleMovePointMouseRelease();
 
     bool isMovingPath();
-    bool handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event);
     void handleRightButtonMousePress(QMouseEvent *event);
     void handleLeftButtonMousePress();
 signals:
@@ -569,6 +568,15 @@ public:
             box->addEffect<T>();
         }
     }
+    void setParentToLastSelected();
+    void clearParentForSelected();
+    bool startRotatingAction();
+    bool startScalingAction();
+    bool startMovingAction();
+    void deselectAllBoxesAction();
+    void selectAllBoxesAction();
+    void selectAllPointsAction();
+    bool handleTransormationInputKeyEvent(QKeyEvent *event);
 private:
     void setCurrentGroupParentAsCurrentGroup();
 

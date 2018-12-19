@@ -1373,12 +1373,6 @@ void Canvas::wheelEvent(QWheelEvent *event) {
     } else {
         zoomCanvas(0.9, event->posF());
     }
-    mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
-    mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
-    
-    if(mHoveredEdge_d != nullptr) {
-        mHoveredEdge_d->generatePainterPath();
-    }
 
     callUpdateSchedulers();
 }

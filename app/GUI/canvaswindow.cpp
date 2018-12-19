@@ -313,8 +313,7 @@ void CanvasWindow::rotate90CW() {
     //mCurrentCanvas->rotate90CW();
 }
 
-bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
-    if(hasNoCanvas()) return false;
+bool CanvasWindow::handleCanvasModeChangeKeyPress(QKeyEvent *event) {
     if(event->key() == Qt::Key_F1) {
         setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_F2) {
@@ -337,12 +336,215 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         setCanvasMode(CanvasMode::ADD_PAINT_BOX);
     } else if(event->key() == Qt::Key_F12) {
         setCanvasMode(CanvasMode::PAINT_MODE);
-    } else if(event->key() == Qt::Key_F13) {
+    //} else if(event->key() == Qt::Key_F13) {
         //setCanvasMode(CanvasMode::ADD_BONE);
-    } else if(mCurrentCanvas->keyPressEvent(event)) {
     } else {
         return false;
     }
+    return true;
+}
+
+bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
+    if(event->modifiers() & Qt::ControlModifier &&
+            event->key() == Qt::Key_V) {
+        if(event->isAutoRepeat()) return false;
+        pasteAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_C) {
+        if(event->isAutoRepeat()) return false;
+        copyAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_D) {
+        if(event->isAutoRepeat()) return false;
+        duplicateAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_X) {
+        if(event->isAutoRepeat()) return false;
+        cutAction();
+    } else if(event->key() == Qt::Key_Delete) {
+        deleteAction();
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleTransformationKeyPress(QKeyEvent *event) {
+    if(event->key() == Qt::Key_0 &&
+              event->modifiers() & Qt::KeypadModifier) {
+        mCurrentCanvas->fitCanvasToSize();
+    } else if(event->key() == Qt::Key_1 &&
+              event->modifiers() & Qt::KeypadModifier) {
+        mCurrentCanvas->resetTransormation();
+    } else if(event->key() == Qt::Key_Minus ||
+             event->key() == Qt::Key_Plus) {
+       if(mCurrentCanvas->isPreviewingOrRendering()) return false;
+       auto relPos = mapFromGlobal(QCursor::pos());
+       if(event->key() == Qt::Key_Plus) {
+           mCurrentCanvas->zoomCanvas(1.2, relPos);
+       } else {
+           mCurrentCanvas->zoomCanvas(0.8, relPos);
+       }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleZValueKeyPress(QKeyEvent *event) {
+    if(event->key() == Qt::Key_PageUp) {
+       mCurrentCanvas->raiseSelectedBoxes();
+    } else if(event->key() == Qt::Key_PageDown) {
+       mCurrentCanvas->lowerSelectedBoxes();
+    } else if(event->key() == Qt::Key_End) {
+       mCurrentCanvas->lowerSelectedBoxesToBottom();
+    } else if(event->key() == Qt::Key_Home) {
+       mCurrentCanvas->raiseSelectedBoxesToTop();
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleParentChangeKeyPress(QKeyEvent *event) {
+    if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_P) {
+        mCurrentCanvas->setParentToLastSelected();
+    } else if(event->modifiers() & Qt::AltModifier &&
+              event->key() == Qt::Key_P) {
+        mCurrentCanvas->clearParentForSelected();
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleGroupChangeKeyPress(QKeyEvent *event) {
+    if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_G) {
+       if(event->modifiers() & Qt::ShiftModifier) {
+           ungroupSelectedBoxes();
+       } else {
+           groupSelectedBoxes();
+       }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleResetTransformKeyPress(QKeyEvent *event) {
+    bool altPressed = event->modifiers() & Qt::AltModifier;
+    if(event->key() == Qt::Key_G && altPressed) {
+        mCurrentCanvas->resetSelectedTranslation();
+    } else if(event->key() == Qt::Key_S && altPressed) {
+        mCurrentCanvas->resetSelectedScale();
+    } else if(event->key() == Qt::Key_R && altPressed) {
+        mCurrentCanvas->resetSelectedRotation();
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleRevertPathKeyPress(QKeyEvent *event) {
+    if(event->modifiers() & Qt::ControlModifier &&
+              (event->key() == Qt::Key_Up ||
+               event->key() == Qt::Key_Down)) {
+       if(event->modifiers() & Qt::ShiftModifier) {
+           mCurrentCanvas->revertAllPointsForAllKeys();
+       } else {
+           mCurrentCanvas->revertAllPoints();
+       }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleStartTransformKeyPress(QKeyEvent* event) {
+    if(event->key() == Qt::Key_R && !isMouseGrabber()) {
+        return mCurrentCanvas->startRotatingAction();
+    } else if(event->key() == Qt::Key_S && !isMouseGrabber()) {
+        return mCurrentCanvas->startScalingAction();
+    } else if(event->key() == Qt::Key_G && !isMouseGrabber()) {
+        return mCurrentCanvas->startMovingAction();
+    } else {
+        return false;
+    }
+}
+
+bool CanvasWindow::handleSelectAllKeyPress(QKeyEvent* event) {
+    if(event->key() == Qt::Key_A && !isMouseGrabber()) {
+        bool altPressed = event->modifiers() & Qt::AltModifier;
+        auto currentMode = mCurrentCanvas->getCurrentCanvasMode();
+        if(currentMode == MOVE_PATH) {
+            if(altPressed) {
+               mCurrentCanvas->deselectAllBoxesAction();
+           } else {
+               mCurrentCanvas->selectAllBoxesAction();
+           }
+        } else if(currentMode == MOVE_POINT) {
+            if(altPressed) {
+                mCurrentCanvas->clearPointsSelection();
+            } else {
+                mCurrentCanvas->selectAllPointsAction();
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::handleShiftKeysKeyPress(QKeyEvent* event) {
+    if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_Right) {
+        if(event->modifiers() & Qt::ShiftModifier) {
+            mCurrentCanvas->shiftAllPointsForAllKeys(1);
+        } else {
+            mCurrentCanvas->shiftAllPoints(1);
+        }
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_Left) {
+        if(event->modifiers() & Qt::ShiftModifier) {
+            mCurrentCanvas->shiftAllPointsForAllKeys(-1);
+        } else {
+            mCurrentCanvas->shiftAllPoints(-1);
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
+    if(hasNoCanvas()) return false;
+    if(mCurrentCanvas->isPreviewingOrRendering()) return false;
+    if(isMouseGrabber()) {
+        if(mCurrentCanvas->handleTransormationInputKeyEvent(event)) return true;
+    }
+    if(handleCanvasModeChangeKeyPress(event)) return true;
+    if(handleCutCopyPasteKeyPress(event)) return true;
+    if(handleTransformationKeyPress(event)) return true;
+    if(handleZValueKeyPress(event)) return true;
+    if(handleParentChangeKeyPress(event)) return true;
+    if(handleGroupChangeKeyPress(event)) return true;
+    if(handleResetTransformKeyPress(event)) return true;
+    if(handleRevertPathKeyPress(event)) return true;
+    if(handleStartTransformKeyPress(event)) return true;
+    if(handleSelectAllKeyPress(event)) return true;
+    if(handleShiftKeysKeyPress(event)) return true;
+    if(event->key() == Qt::Key_I && !isMouseGrabber()) {
+        invertSelectionAction();
+    } else if(event->key() == Qt::Key_W) {
+        MainWindow::getInstance()->incBrushRadius();
+    } else if(event->key() == Qt::Key_Q) {
+        MainWindow::getInstance()->decBrushRadius();
+    }
+
     callUpdateSchedulers();
     return true;
 }

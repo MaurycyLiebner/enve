@@ -65,7 +65,7 @@ void ValueInput::updateInputValue() {
     }
 }
 #include <QKeyEvent>
-bool ValueInput::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
+bool ValueInput::handleTransormationInputKeyEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_Minus) {
         if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
             mInputText.remove("-");

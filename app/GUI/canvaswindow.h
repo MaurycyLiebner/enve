@@ -202,6 +202,18 @@ private:
     void renderSk(SkCanvas * const canvas,
                   GrContext * const grContext);
     void tabletEvent(QTabletEvent *e);
+
+    bool handleCanvasModeChangeKeyPress(QKeyEvent *event);
+    bool handleCutCopyPasteKeyPress(QKeyEvent *event);
+    bool handleTransformationKeyPress(QKeyEvent *event);
+    bool handleZValueKeyPress(QKeyEvent *event);
+    bool handleParentChangeKeyPress(QKeyEvent *event);
+    bool handleGroupChangeKeyPress(QKeyEvent *event);
+    bool handleResetTransformKeyPress(QKeyEvent *event);
+    bool handleRevertPathKeyPress(QKeyEvent *event);
+    bool handleStartTransformKeyPress(QKeyEvent *event);
+    bool handleSelectAllKeyPress(QKeyEvent *event);
+    bool handleShiftKeysKeyPress(QKeyEvent *event);
 signals:
     void updateUpdatable(_ScheduledTask*, int);
     void updateFileUpdatable(_ScheduledTask*, int);
