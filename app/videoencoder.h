@@ -57,7 +57,7 @@ public:
     }
 
     void interruptCurrentEncoding() {
-        if(!mBeingProcessed && !mSchedulerAdded && !mAwaitingUpdate) {
+        if(!mBeingProcessed && !mTaskScheduled && !mTaskQued) {
             interrupEncoding();
         } else {
             mInterruptEncoding = true;
@@ -65,7 +65,7 @@ public:
     }
 
     void finishCurrentEncoding() {
-        if(!mBeingProcessed && !mSchedulerAdded && !mAwaitingUpdate) {
+        if(!mBeingProcessed && !mTaskScheduled && !mTaskQued) {
             finishEncodingSuccess();
         } else {
             mEncodingFinished = true;
@@ -74,8 +74,8 @@ public:
 
     void addContainer(CacheContainer *cont);
     void _processUpdate();
-    void beforeUpdate();
-    void afterUpdate();
+    void beforeProcessingStarted();
+    void afterProcessingFinished();
 
     static VideoEncoder *mVideoEncoderInstance;
     static VideoEncoderEmitter *getVideoEncoderEmitter();
@@ -86,7 +86,7 @@ public:
     static void finishEncodingStatic();
     static bool encodingSuccessfulyStartedStatic();
 
-    bool shouldUpdate() { return !mAwaitingUpdate && mCurrentlyEncoding; }
+    bool shouldUpdate() { return !mTaskQued && mCurrentlyEncoding; }
 
     VideoEncoderEmitter *getEmitter() {
         return &mEmitter;

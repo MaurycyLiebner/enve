@@ -423,8 +423,10 @@ bool QrealKey::differsFromKey(Key *key) {
 }
 
 void QrealKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
-    setValue(frameValueChange.y() + mSavedValue);
     int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
+    bool frameChanged = newFrame != mRelFrame;
+    setValue(frameValueChange.y() + mSavedValue, false, !frameChanged);
+    if(!frameChanged) return;
     if(mParentAnimator != nullptr) {
         mParentAnimator->anim_moveKeyToRelFrame(this, newFrame, false);
     } else {

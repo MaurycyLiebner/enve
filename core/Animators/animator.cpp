@@ -121,8 +121,7 @@ void Animator::anim_updateAfterChangedKey(Key *key) {
     int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
     if(nextKeyRelFrame != INT_MAX) nextKeyRelFrame--;
 
-    prp_updateAfterChangedRelFrameRange(prevKeyRelFrame,
-                                        nextKeyRelFrame);
+    prp_updateAfterChangedRelFrameRange(prevKeyRelFrame, nextKeyRelFrame);
 }
 
 void Animator::prp_setAbsFrame(const int &frame) {

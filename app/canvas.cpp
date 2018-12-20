@@ -525,8 +525,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     int lId;
     //qDebug() << renderData->relFrame;
     prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);
-    CacheContainer *cont =
-          mCacheHandler.getRenderContainerAtRelFrame(fId);
+    CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(fId);
     if(cont == nullptr) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame(fId);
     }

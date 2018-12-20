@@ -130,8 +130,8 @@ void ImageCacheHandler::_processUpdate() {
     mUpdateImage = SkImage::MakeFromEncoded(data);
 }
 
-void ImageCacheHandler::afterUpdate() {
-    FileCacheHandler::afterUpdate();
+void ImageCacheHandler::afterProcessingFinished() {
+    FileCacheHandler::afterProcessingFinished();
     mImage = mUpdateImage;
     mUpdateImage.reset();
 }
@@ -157,8 +157,8 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int& relFrame) {
     return cont->getImageSk();
 }
 
-void VideoCacheHandler::beforeUpdate() {
-    FileCacheHandler::beforeUpdate();
+void VideoCacheHandler::beforeProcessingStarted() {
+    FileCacheHandler::beforeProcessingStarted();
     //qDebug() << "loading: " << mFramesLoadScheduled;
     mFramesBeingLoaded = mFramesLoadScheduled;
     mFramesBeingLoadedGUI = mFramesBeingLoaded;
@@ -413,8 +413,8 @@ void VideoCacheHandler::_processUpdate() {
     return;// 0;
 }
 
-void VideoCacheHandler::afterUpdate() {
-    FileCacheHandler::afterUpdate();
+void VideoCacheHandler::afterProcessingFinished() {
+    FileCacheHandler::afterProcessingFinished();
 //    qDebug() << "loaded: " << mFramesBeingLoaded;
     for(int i = 0; i < mFramesBeingLoaded.count() &&
         i < mLoadedFrames.count(); i++) {
@@ -474,7 +474,7 @@ _ScheduledTask* VideoCacheHandler::scheduleFrameLoad(
     } else {
         return contAtFrame->scheduleLoadFromTmpFile();
     }
-    addScheduler();
+    scheduleTask();
     return this;
 }
 

@@ -146,12 +146,12 @@ void BoundingBoxRenderData::_processUpdate() {
     renderToImage();
 }
 
-void BoundingBoxRenderData::beforeUpdate() {
+void BoundingBoxRenderData::beforeProcessingStarted() {
     if(!mDataSet) {
         dataSet();
     }
 
-    _ScheduledTask::beforeUpdate();
+    _ScheduledTask::beforeProcessingStarted();
 
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr || !parentIsTarget) return;
@@ -161,7 +161,7 @@ void BoundingBoxRenderData::beforeUpdate() {
     // qDebug() << "box render started:" << relFrame << parentBoxT->prp_getName();
 }
 
-void BoundingBoxRenderData::afterUpdate() {
+void BoundingBoxRenderData::afterProcessingFinished() {
     if(motionBlurTarget != nullptr) {
         motionBlurTarget->otherGlobalRects << globalBoundingRect;
     }
@@ -170,10 +170,10 @@ void BoundingBoxRenderData::afterUpdate() {
         parentBoxT->renderDataFinished(this);
         // qDebug() << "box render finished:" << relFrame << parentBoxT->prp_getName();
     }
-    _ScheduledTask::afterUpdate();
+    _ScheduledTask::afterProcessingFinished();
 }
 
-void BoundingBoxRenderData::schedulerProccessed() {
+void BoundingBoxRenderData::taskQued() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT != nullptr) {
         if(useCustomRelFrame) {
@@ -191,10 +191,10 @@ void BoundingBoxRenderData::schedulerProccessed() {
     if(!mDelayDataSet) {
         dataSet();
     }
-    _ScheduledTask::schedulerProccessed();
+    _ScheduledTask::taskQued();
 }
 
-void BoundingBoxRenderData::addSchedulerNow() {
+void BoundingBoxRenderData::scheduleTaskNow() {
     BoundingBox *parentBoxT = parentBox.data();
     if(parentBoxT == nullptr) return;
     parentBoxT->scheduleTask(GetAsSPtr(this, _ScheduledTask));

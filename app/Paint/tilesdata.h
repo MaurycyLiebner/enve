@@ -118,7 +118,7 @@ public:
         mTargetTilesData->_writeTilesDataToTmp();
     }
 
-    void afterUpdate() {
+    void afterProcessingFinished() {
         mTargetTilesData->afterSavedToTmpFile();
     }
 
@@ -137,7 +137,7 @@ public:
     }
 
 
-    void afterUpdate() {
+    void afterProcessingFinished() {
         mTargetTilesData->afterLoadedFromTmpFile();
     }
 

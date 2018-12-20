@@ -404,7 +404,8 @@ void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
     scheduleUpdate(anim_mCurrentRelFrame, reason);
 }
 
-void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason) {
+void BoundingBox::scheduleUpdate(const int &relFrame,
+                                 const UpdateReason& reason) {
     Q_ASSERT(!mBlockedSchedule);
     if(!shouldScheduleUpdate()) return;
     mExpiredPixmap = 1;
@@ -416,7 +417,7 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
         } else {
             if(!currentRenderData->redo && !currentRenderData->copied &&
                     reason != UpdateReason::FRAME_CHANGE) {
-                currentRenderData->redo = currentRenderData->isAwaitingUpdate();
+                currentRenderData->redo = currentRenderData->isQued();
             }
             return;
         }
@@ -430,12 +431,12 @@ void BoundingBox::scheduleUpdate(const int &relFrame, const UpdateReason& reason
             currentRenderData->reason = reason;
         }
         currentRenderData->redo = false;
-        currentRenderData->addScheduler();
+        currentRenderData->scheduleTask();
 //    }
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
-    if(mParentGroup != nullptr) {
+    if(mParentGroup) {
         mParentGroup->scheduleUpdate(reason == USER_CHANGE ?
                                          CHILD_USER_CHANGE : reason);
     }
@@ -578,7 +579,9 @@ void BoundingBox::scale(const qreal &scaleXBy, const qreal &scaleYBy) {
     mTransformAnimator->scale(scaleXBy, scaleYBy);
 }
 
-NodePoint *BoundingBox::createNewPointOnLineNear(const QPointF &absPos, const bool &adjust, const qreal &canvasScaleInv) {
+NodePoint *BoundingBox::createNewPointOnLineNear(const QPointF &absPos,
+                                                 const bool &adjust,
+                                                 const qreal &canvasScaleInv) {
     Q_UNUSED(absPos);
     Q_UNUSED(adjust);
     Q_UNUSED(canvasScaleInv);

@@ -64,14 +64,14 @@ struct TileSkDrawer : public _ScheduledTask {
 
     void _processUpdate();
 
-    void schedulerProccessed();
+    void taskQued();
 
-    void beforeUpdate() {
-        _ScheduledTask::beforeUpdate();
+    void beforeProcessingStarted() {
+        _ScheduledTask::beforeProcessingStarted();
         _maxPaintX = maxPaintX;
         _maxPaintY = maxPaintY;
     }
-    void afterUpdate();
+    void afterProcessingFinished();
 
     void clearImg();
 

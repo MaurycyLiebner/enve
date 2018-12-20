@@ -71,11 +71,11 @@ struct BoundingBoxRenderData : public _ScheduledTask {
 
     void _processUpdate();
 
-    void beforeUpdate();
+    void beforeProcessingStarted();
 
-    void afterUpdate();
+    void afterProcessingFinished();
 
-    void schedulerProccessed();
+    void taskQued();
 
     virtual bool allDataReady() { return true; }
 
@@ -100,7 +100,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
         mRenderDataCustomizerFunctors.prepend(customizer);
     }
 protected:
-    void addSchedulerNow();
+    void scheduleTaskNow();
     QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;

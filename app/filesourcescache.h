@@ -86,7 +86,7 @@ public:
     CacheHandlerCreatorDef(ImageCacheHandler)
 
     void _processUpdate();
-    void afterUpdate();
+    void afterProcessingFinished();
     void clearCache() {
         mImage.reset();
         FileCacheHandler::clearCache();
@@ -157,11 +157,11 @@ public:
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
 
-    void beforeUpdate();
+    void beforeProcessingStarted();
 
     void _processUpdate();
 
-    void afterUpdate();
+    void afterProcessingFinished();
 
     void clearCache();
 
@@ -310,8 +310,8 @@ public:
     };
     SoundCacheHandler(const QString &filePath);
 
-    void beforeUpdate() {
-        FileCacheHandler::beforeUpdate();
+    void beforeProcessingStarted() {
+        FileCacheHandler::beforeProcessingStarted();
         //qDebug() << "loading: " << mFramesLoadScheduled;
         mSoundBeingLoaded = mScheduledSoundLoad;
         mSoundBeingLoadedGUI = mSoundBeingLoaded;
@@ -324,7 +324,7 @@ public:
 
     void _processUpdate();
 
-    void afterUpdate() {
+    void afterProcessingFinished() {
         foreach(SoundDataRange rangeT, mSoundBeingLoadedGUI) {
             int targetIdT;
             getInsertIdForRelFrame(rangeT.minRelFrame, &targetIdT, mSoundData);

@@ -12,7 +12,7 @@ void VideoEncoder::addContainer(CacheContainer *cont) {
     if(cont == nullptr) return;
     cont->setBlocked(true);
     mNextContainers.append(GetAsSPtr(cont, CacheContainer));
-    addScheduler();
+    scheduleTask();
 }
 
 static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt,
@@ -753,8 +753,8 @@ void VideoEncoder::_processUpdate() {
     }
 }
 
-void VideoEncoder::beforeUpdate() {
-    _ScheduledTask::beforeUpdate();
+void VideoEncoder::beforeProcessingStarted() {
+    _ScheduledTask::beforeProcessingStarted();
     _mCurrentContainerId = 0;
     _mCurrentContainerFrame = 0;
     _mContainers.append(mNextContainers);
@@ -765,7 +765,7 @@ void VideoEncoder::beforeUpdate() {
 
 }
 
-void VideoEncoder::afterUpdate() {
+void VideoEncoder::afterProcessingFinished() {
     bool firstT = true;
     for(int i = _mCurrentContainerId - 1; i >= 0; i--) {
         const stdsptr<CacheContainer> &cont =
@@ -799,7 +799,7 @@ void VideoEncoder::afterUpdate() {
             finishEncodingSuccess();
         }
     }
-    _ScheduledTask::afterUpdate();
+    _ScheduledTask::afterProcessingFinished();
 }
 
 VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {

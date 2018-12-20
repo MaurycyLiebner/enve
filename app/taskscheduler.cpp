@@ -106,7 +106,7 @@ void TaskScheduler::processNextQuedHDDTask(
     if(mHDDThreadBusy && !finishedTask) return;
     mHDDThreadBusy = false;
     if(finishedTask != nullptr) {
-        finishedTask->updateFinished();
+        finishedTask->finishedProcessing();
     }
     if(mQuedHDDTasks.isEmpty()) {
         callAllQuedHDDTasksFinishedFunc();
@@ -143,7 +143,7 @@ void TaskScheduler::processNextQuedCPUTask(
                         GetAsSPtr(finishedTask, BoundingBoxRenderData));
             mGpuPostProcessor.addToProcess(gpuProcess);
         } else {
-            finishedTask->updateFinished();
+            finishedTask->finishedProcessing();
         }
     }
     if(mQuedCPUTasks.isEmpty()) {
@@ -160,7 +160,7 @@ void TaskScheduler::processNextQuedCPUTask(
             if(updatablaT->readyToBeProcessed()) {
                 updatablaT->setCurrentTaskExecutor(
                             mCPUTaskExecutors.at(threadId));
-                updatablaT->beforeUpdate();
+                updatablaT->beforeProcessingStarted();
                 mQuedCPUTasks.removeAt(i);
                 emit processCPUTask(updatablaT, threadId);
                 mBusyCPUThreads << threadId;

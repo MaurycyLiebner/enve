@@ -15,11 +15,11 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
 
     virtual void loadImageFromHandler();
 
-    void beforeUpdate() {
+    void beforeProcessingStarted() {
         if(!allDataReady()) {
             loadImageFromHandler();
         }
-        BoundingBoxRenderData::beforeUpdate();
+        BoundingBoxRenderData::beforeProcessingStarted();
         if(image.get() == nullptr) {
             qDebug() << "ImageBoxRenderData::beforeUpdate() - no image to render";
         }

@@ -681,7 +681,7 @@ void processChildData(BoundingBox* child,
         //boxRenderData->parentIsTarget = false;
         boxRenderData->useCustomRelFrame = true;
         boxRenderData->customRelFrame = boxRelFrame;
-        boxRenderData->addScheduler();
+        boxRenderData->scheduleTask();
     } else {
         if(boxRenderData->copied) {
             child->nullifyCurrentRenderData(boxRenderData->relFrame);
@@ -722,7 +722,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
             auto boxRenderData = SPtrCreate(PathBoxRenderData)(this);
             lastPathBox->setupBoundingBoxRenderDataForRelFrameF(
                 boxRelFrame, boxRenderData.get());
-            boxRenderData->addScheduler();
+            boxRenderData->scheduleTask();
             boxRenderData->addDependent(data);
             groupData->childrenRenderData.insert(idT,
                     GetAsSPtr(boxRenderData, BoundingBoxRenderData));

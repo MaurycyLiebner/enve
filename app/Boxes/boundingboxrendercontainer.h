@@ -48,13 +48,13 @@ class CacheContainerTmpFileDataLoader : public _ScheduledTask {
 public:
     void _processUpdate();
 
-    void afterUpdate();
+    void afterProcessingFinished();
 
-    bool isFileUpdatable() { return true; }
+    bool isHDDTask() { return true; }
 protected:
     CacheContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
                                     CacheContainer *target);
-    void addSchedulerNow();
+    void scheduleTaskNow();
 
     const stdptr<CacheContainer> mTargetCont;
     qsptr<QTemporaryFile> mTmpFile;
@@ -66,12 +66,12 @@ class CacheContainerTmpFileDataSaver : public _ScheduledTask {
 public:
     void _processUpdate();
 
-    void afterUpdate();
-    bool isFileUpdatable() { return true; }
+    void afterProcessingFinished();
+    bool isHDDTask() { return true; }
 protected:
     CacheContainerTmpFileDataSaver(const sk_sp<SkImage> &image,
                                    CacheContainer *target);
-    void addSchedulerNow();
+    void scheduleTaskNow();
 
     bool mSavingFailed = false;
     const stdptr<CacheContainer> mTargetCont;
@@ -84,12 +84,12 @@ class CacheContainerTmpFileDataDeleter : public _ScheduledTask {
 public:
     void _processUpdate();
 
-    bool isFileUpdatable() { return true; }
+    bool isHDDTask() { return true; }
 protected:
     CacheContainerTmpFileDataDeleter(const qsptr<QTemporaryFile> &file) {
         mTmpFile = file;
     }
-    void addSchedulerNow();
+    void scheduleTaskNow();
     qsptr<QTemporaryFile> mTmpFile;
 };
 

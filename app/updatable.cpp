@@ -6,33 +6,32 @@ _ScheduledTask::~_ScheduledTask() {
     clear();
 }
 
-void _ScheduledTask::beforeUpdate() {
-    _Task::beforeUpdate();
-    mAwaitingUpdate = false;
-
+void _ScheduledTask::beforeProcessingStarted() {
+    _Task::beforeProcessingStarted();
+    mTaskQued = false;
 }
 
-void _ScheduledTask::schedulerProccessed() {
-    mAwaitingUpdate = true;
-    mSchedulerAdded = false;
+void _ScheduledTask::taskQued() {
+    mTaskQued = true;
+    mTaskScheduled = false;
 }
 
-bool _ScheduledTask::addScheduler() {
-    if(!shouldUpdate() || mSchedulerAdded) return false;
+bool _ScheduledTask::scheduleTask() {
+    if(!shouldUpdate() || mTaskScheduled) return false;
 
     mFinished = false;
-    mSchedulerAdded = true;
-    addSchedulerNow();
+    mTaskScheduled = true;
+    scheduleTaskNow();
     return true;
 }
 
-void _ScheduledTask::addSchedulerNow() {
+void _ScheduledTask::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->scheduleCPUTask(ref<_ScheduledTask>());
 }
 
 void _ScheduledTask::clear() {
-    mSchedulerAdded = false;
-    mAwaitingUpdate = false;
+    mTaskScheduled = false;
+    mTaskQued = false;
     _Task::clear();
 }
 
@@ -42,21 +41,21 @@ void _Task::setCurrentTaskExecutor(TaskExecutor *taskExecutor) {
     mCurrentTaskExecutor = taskExecutor;
 }
 
-void _Task::beforeUpdate() {
+void _Task::beforeProcessingStarted() {
     mSelfRef = ref<_Task>();
     mBeingProcessed = true;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
 }
 
-void _Task::updateFinished() {
+void _Task::finishedProcessing() {
     mFinished = true;
     mBeingProcessed = false;
-    afterUpdate();
+    afterProcessingFinished();
     mSelfRef.reset();
 }
 
-void _Task::afterUpdate() {
+void _Task::afterProcessingFinished() {
     mCurrentTaskExecutor = nullptr;
     tellDependentThatFinished();
 }

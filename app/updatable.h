@@ -11,13 +11,13 @@ public:
 
     void setCurrentTaskExecutor(TaskExecutor *taskExecutor);
 
-    virtual void beforeUpdate();
+    virtual void beforeProcessingStarted();
 
     virtual void _processUpdate() = 0;
 
-    void updateFinished();
+    void finishedProcessing();
 
-    virtual void afterUpdate();
+    virtual void afterProcessingFinished();
 
     bool isBeingProcessed();
 
@@ -54,27 +54,27 @@ public:
     }
     ~_ScheduledTask();
 
-    void beforeUpdate();
+    void beforeProcessingStarted();
 
-    virtual void schedulerProccessed();
+    virtual void taskQued();
 
-    bool addScheduler();
+    bool scheduleTask();
 
     virtual bool shouldUpdate() {
         return true;
     }
 
-    bool isAwaitingUpdate() { return mAwaitingUpdate; }
-    bool schedulerAdded() { return mSchedulerAdded; }
+    bool isQued() { return mTaskQued; }
+    bool isScheduled() { return mTaskScheduled; }
 
     void clear();
-    virtual bool isFileUpdatable() { return false; }
+    virtual bool isHDDTask() { return false; }
 
     virtual bool needsGpuProcessing() const { return false; }
 protected:
-    virtual void addSchedulerNow();
-    bool mSchedulerAdded = false;
-    bool mAwaitingUpdate = false;
+    virtual void scheduleTaskNow();
+    bool mTaskScheduled = false;
+    bool mTaskQued = false;
 };
 
 #endif // UPDATABLE_H

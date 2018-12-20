@@ -64,7 +64,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
     auto imgData = GetAsPtr(data, ImageBoxRenderData);
     imgData->image = mImgCacheHandler->getImageCopy();
     if(imgData->image == nullptr) {
-        mImgCacheHandler->addScheduler();
+        mImgCacheHandler->scheduleTask();
         mImgCacheHandler->addDependent(imgData);
     }
 }

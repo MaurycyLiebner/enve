@@ -304,12 +304,12 @@ void CacheContainerTmpFileDataLoader::_processUpdate() {
     }
 }
 
-void CacheContainerTmpFileDataLoader::afterUpdate() {
+void CacheContainerTmpFileDataLoader::afterProcessingFinished() {
     mTargetCont->setDataLoadedFromTmpFile(mImage);
-    _ScheduledTask::afterUpdate();
+    _ScheduledTask::afterProcessingFinished();
 }
 
-void CacheContainerTmpFileDataLoader::addSchedulerNow() {
+void CacheContainerTmpFileDataLoader::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->queHDDTask(ref<_ScheduledTask>());
 }
 
@@ -342,7 +342,7 @@ void CacheContainerTmpFileDataSaver::_processUpdate() {
     }
 }
 
-void CacheContainerTmpFileDataSaver::afterUpdate() {
+void CacheContainerTmpFileDataSaver::afterProcessingFinished() {
     if(mSavingFailed) {
         if(!mTargetCont->freeAndRemove()) {
 
@@ -350,10 +350,10 @@ void CacheContainerTmpFileDataSaver::afterUpdate() {
     } else {
         mTargetCont->setDataSavedToTmpFile(mTmpFile);
     }
-    _ScheduledTask::afterUpdate();
+    _ScheduledTask::afterProcessingFinished();
 }
 
-void CacheContainerTmpFileDataSaver::addSchedulerNow() {
+void CacheContainerTmpFileDataSaver::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->queHDDTask(ref<_ScheduledTask>());
 }
 
@@ -361,6 +361,6 @@ void CacheContainerTmpFileDataDeleter::_processUpdate() {
     mTmpFile.reset();
 }
 
-void CacheContainerTmpFileDataDeleter::addSchedulerNow() {
+void CacheContainerTmpFileDataDeleter::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->queHDDTask(ref<_ScheduledTask>());
 }
