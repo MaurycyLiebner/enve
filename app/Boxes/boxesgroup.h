@@ -65,11 +65,11 @@ public:
 
     void addContainedBoxesToSelection(const QRectF &rect);
 
-    void setIsCurrentGroup(const bool &bT);
+    void setIsCurrentGroup_k(const bool &bT);
 
     BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
-    void ungroup();
+    void ungroup_k();
 
     bool isCurrentGroup();
     void addContainedBox(const qsptr<BoundingBox> &child);
@@ -81,6 +81,7 @@ public:
     void updateContainedBoxIds(const int &firstId,
                           const int &lastId,
                           const bool &saveUndoRedo = true);
+    void removeContainedBox_k(const qsptr<BoundingBox> &child);
     void removeContainedBox(const qsptr<BoundingBox> &child);
     void increaseContainedBoxZInList(BoundingBox *child);
     void decreaseContainedBoxZInList(BoundingBox *child);

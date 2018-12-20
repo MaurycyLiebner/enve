@@ -275,7 +275,7 @@ public:
 
     bool isAncestor(BoxesGroup *box) const;
     bool isAncestor(BoundingBox *box) const;
-    void removeFromParent();
+    void removeFromParent_k();
     void removeFromSelection();
     virtual void moveByAbs(const QPointF &trans);
     void copyBoundingBoxDataTo(BoundingBox *targetBox);

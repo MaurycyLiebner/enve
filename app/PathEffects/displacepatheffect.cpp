@@ -5,11 +5,11 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     PathEffect("displace effect", DISPLACE_PATH_EFFECT, outlinePathEffect) {
     mSegLength = SPtrCreate(QrealAnimator)("segment length");
     mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
-    mSmoothness = SPtrCreate(QrealAnimator)("smoothness");
+    mSmoothness = QrealAnimator::create0to1Animator("smoothness");
     mRandomize = SPtrCreate(BoolPropertyContainer)("randomize");
     mRandomizeStep = SPtrCreate(IntAnimator)("randomize step");
     mSmoothTransform = SPtrCreate(BoolPropertyContainer)("smooth progression");
-    mEasing = SPtrCreate(QrealAnimator)("ease in/out");
+    mEasing = QrealAnimator::create0to1Animator("ease in/out");
     mSeed = SPtrCreate(IntAnimator)("seed");
     mRepeat = SPtrCreate(BoolProperty)("repeat");
 
@@ -21,10 +21,6 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
 
     mMaxDev->qra_setValueRange(0., 1000.);
     mMaxDev->qra_setCurrentValue(20.);
-
-    mSmoothness->qra_setValueRange(0., 1.);
-
-    mEasing->qra_setValueRange(0., 1.);
 
     mRandomizeStep->setIntValueRange(1, 99);
 

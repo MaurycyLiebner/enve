@@ -32,7 +32,7 @@ public:
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
 protected:
-    ShadowEffect(qreal radius = 10.);
+    ShadowEffect();
 private:
 //    QrealAnimator mScale;
     qsptr<BoolProperty> mHighQuality;

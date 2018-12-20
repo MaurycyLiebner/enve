@@ -52,7 +52,7 @@ public:
     void revertAllPointsForAllKeys();
     void shiftAllPoints(const int &by);
     void revertAllPoints();
-    void breakPathsApart();
+    void breakPathsApart_k();
 
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;

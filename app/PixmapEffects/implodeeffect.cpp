@@ -2,11 +2,10 @@
 #include "Animators/qrealanimator.h"
 #include "rastereffects.h"
 
-ImplodeEffect::ImplodeEffect(qreal radius) :
+ImplodeEffect::ImplodeEffect() :
     PixmapEffect("implode", EFFECT_IMPLODE) {
-    mFactorAnimator = SPtrCreate(QrealAnimator)("factor");
-    mFactorAnimator->qra_setValueRange(0., 100.);
-    mFactorAnimator->qra_setCurrentValue(radius);
+    mFactorAnimator = SPtrCreate(QrealAnimator)(0., 100., 1., "factor");
+    mFactorAnimator->qra_setCurrentValue(10.);
 
     ca_addChildAnimator(mFactorAnimator);
 }

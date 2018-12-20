@@ -5,7 +5,7 @@
 #include "Animators/qpointfanimator.h"
 #include "pointhelpers.h"
 
-ShadowEffect::ShadowEffect(qreal radius) :
+ShadowEffect::ShadowEffect() :
     PixmapEffect("shadow", EFFECT_SHADOW) {
     mHighQuality = SPtrCreate(BoolProperty)("high quality");
     mBlurRadius = SPtrCreate(QrealAnimator)("blur radius");
@@ -13,7 +13,7 @@ ShadowEffect::ShadowEffect(qreal radius) :
     mColor = SPtrCreate(ColorAnimator)();
     mTranslation = SPtrCreate(QPointFAnimator)("translation");
 
-    mBlurRadius->qra_setCurrentValue(radius);
+    mBlurRadius->qra_setCurrentValue(10.);
 
     mHighQuality->setValue(false);
     ca_addChildAnimator(mHighQuality);

@@ -290,7 +290,7 @@ BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     mOpacityAnimator->qra_setValueRange(0., 100.);
     mOpacityAnimator->setPrefferedValueStep(5.);
     mOpacityAnimator->qra_setCurrentValue(100.);
-    mOpacityAnimator->freezeMinMaxValues();
+    mOpacityAnimator->graphFixMinMaxValues();
     mOpacityAnimator->prp_setBlockedUpdater(mTransformUpdater);
 
     ca_addChildAnimator(mPivotAnimator);

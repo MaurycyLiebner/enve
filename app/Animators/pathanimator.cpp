@@ -52,7 +52,7 @@ void PathAnimator::removeSinglePathAnimator(const qsptr<VectorPathAnimator>& pat
         }
         ca_removeChildAnimator(path);
         if(mSinglePaths.isEmpty()) {
-            mParentBox->removeFromParent();
+            mParentBox->removeFromParent_k();
         }
     }
 }

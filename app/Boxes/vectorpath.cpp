@@ -40,7 +40,7 @@ void VectorPath::revertAllPoints() {
     mPathAnimator->revertAllPoints();
 }
 
-void VectorPath::breakPathsApart() {
+void VectorPath::breakPathsApart_k() {
     QList<qsptr<VectorPathAnimator>> pathsList = mPathAnimator->getSinglePathsList();
     foreach(const qsptr<VectorPathAnimator>& path, pathsList) {
         qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
@@ -51,7 +51,7 @@ void VectorPath::breakPathsApart() {
         mPathAnimator->removeSinglePathAnimator(path);
         path->setParentPath(pathAnimator);
     }
-    removeFromParent();
+    removeFromParent_k();
 }
 
 bool VectorPath::differenceInEditPathBetweenFrames(

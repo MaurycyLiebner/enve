@@ -477,8 +477,6 @@ StrokeSettings::StrokeSettings(GradientPoints *grdPts,
     mLineWidth->qra_setCurrentValue(1.);
 
     ca_addChildAnimator(mLineWidth);
-
-    mLineWidth->qra_setValueRange(0., mLineWidth->getMaxPossibleValue());
 }
 
 void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {

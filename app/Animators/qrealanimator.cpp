@@ -13,11 +13,20 @@
 #include "randomqrealgenerator.h"
 #include "Animators/fakecomplexanimator.h"
 
-QrealAnimator::QrealAnimator(const QString &name) :
-    Animator(name) {}
-
-QrealAnimator::~QrealAnimator() {
+QrealAnimator::QrealAnimator(const qreal &minVal,
+                             const qreal &maxVal,
+                             const qreal &prefferdStep,
+                             const QString &name) :
+    Animator(name) {
+    mMinPossibleVal = minVal;
+    mMaxPossibleVal = maxVal;
+    mPrefferedValueStep = prefferdStep;
+    mCurrentValue = minVal;
 }
+
+QrealAnimator::QrealAnimator(const QString &name) : Animator(name) {}
+
+QrealAnimator::~QrealAnimator() {}
 
 void QrealAnimator::qra_setValueRange(const qreal &minVal,
                                       const qreal &maxVal) {
@@ -96,8 +105,8 @@ void QrealAnimator::prp_clearFromGraphView() {
     removeThisFromGraphAnimator();
 }
 
-void QrealAnimator::freezeMinMaxValues() {
-    mMinMaxValuesFrozen = true;
+void QrealAnimator::graphFixMinMaxValues() {
+    mGraphMinMaxValuesFixed = true;
 }
 
 qreal QrealAnimator::getCurrentValueAtAbsFrame(const int &frame) {
@@ -462,7 +471,7 @@ void QrealAnimator::qra_updateKeysPath() {
 
 void QrealAnimator::qra_getMinAndMaxValues(qreal *minValP,
                                            qreal *maxValP) {
-    if(mMinMaxValuesFrozen) {
+    if(mGraphMinMaxValuesFixed) {
         *minValP = mMinPossibleVal;
         *maxValP = mMaxPossibleVal;
         return;

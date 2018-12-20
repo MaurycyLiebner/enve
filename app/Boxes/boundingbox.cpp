@@ -1286,7 +1286,8 @@ BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
     return nullptr;
 }
 
-void BoundingBox::addFunctionWaitingForBoxLoad(const stdsptr<FunctionWaitingForBoxLoad> &func) {
+void BoundingBox::addFunctionWaitingForBoxLoad(
+        const stdsptr<FunctionWaitingForBoxLoad> &func) {
     mFunctionsWaitingForBoxLoad << func;
 }
 
@@ -1488,8 +1489,9 @@ void BoundingBox::SWT_addToContextMenu(QMenu *menu) {
     effectsMenu->addAction("Desaturate");
 }
 
-void BoundingBox::removeFromParent() {
-    mParentGroup->removeContainedBox(GetAsSPtr(this, BoundingBox));
+void BoundingBox::removeFromParent_k() {
+    if(!mParentGroup) return;
+    mParentGroup->removeContainedBox_k(ref<BoundingBox>());
 }
 
 void BoundingBox::removeFromSelection() {
@@ -1503,7 +1505,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
         QAction *selectedAction) {
     if(selectedAction != nullptr) {
         if(selectedAction->text() == "Delete") {
-            mParentGroup->removeContainedBox(GetAsSPtr(this, BoundingBox));
+            removeFromParent_k();
         } else if(selectedAction->text() == "Apply Transformation") {
             applyCurrentTransformation();
         } else if(selectedAction->text() == "Create Link") {

@@ -321,6 +321,6 @@ private:
             QPainter::CompositionMode_Source;
 
     qsptr<QrealAnimator> mLineWidth =
-            SPtrCreate(QrealAnimator)("thickness");
+            SPtrCreate(QrealAnimator)(0., 999., 1., "thickness");
 };
 #endif // PAINTSETTINGS_H

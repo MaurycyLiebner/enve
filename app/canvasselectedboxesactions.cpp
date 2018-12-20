@@ -508,7 +508,7 @@ bool Canvas::isSelectionEmpty() {
 void Canvas::ungroupSelectedBoxes() {
     Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
         if(box->SWT_isBoxesGroup()) {
-            GetAsPtr(box, BoxesGroup)->ungroup();
+            GetAsPtr(box, BoxesGroup)->ungroup_k();
         }
     }
 }
@@ -522,7 +522,7 @@ void Canvas::centerPivotForSelected() {
 void Canvas::removeSelectedBoxesAndClearList() {
     Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
         //box->deselect();
-        box->removeFromParent();
+        box->removeFromParent_k();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
 }
@@ -765,12 +765,12 @@ void Canvas::duplicateSelectedBoxes() {
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) return;
-    qsptr<BoxesGroup> newGroup = SPtrCreate(BoxesGroup)();
+    auto newGroup = SPtrCreate(BoxesGroup)();
     mCurrentBoxesGroup->addContainedBox(newGroup);
     BoundingBox* box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
-        qsptr<BoundingBox> boxSP = GetAsSPtr(box, BoundingBox);
-        box->removeFromParent();
+        auto boxSP = GetAsSPtr(box, BoundingBox);
+        box->removeFromParent_k();
         newGroup->addContainedBox(boxSP);
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
@@ -890,7 +890,7 @@ void Canvas::selectedPathsCombine() {
                 boxPath->getPathAnimator()->addAllSinglePathsToAnimator(
                             firstVectorPath->getPathAnimator());
             }
-            box->removeFromParent();
+            box->removeFromParent_k();
         }
     }
 }
@@ -899,7 +899,7 @@ void Canvas::selectedPathsBreakApart() {
     if(mSelectedBoxes.isEmpty()) return;
     foreach(const qptr<BoundingBox>& box, mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
-            GetAsPtr(box, VectorPath)->breakPathsApart();
+            GetAsPtr(box, VectorPath)->breakPathsApart_k();
         }
     }
 }

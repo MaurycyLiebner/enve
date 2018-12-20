@@ -777,12 +777,12 @@ void BoxesGroup::drawSelectedSk(SkCanvas *canvas,
     }
 }
 
-void BoxesGroup::setIsCurrentGroup(const bool &bT) {
+void BoxesGroup::setIsCurrentGroup_k(const bool &bT) {
     mIsCurrentGroup = bT;
     setDescendantCurrentGroup(bT);
     if(!bT) {
         if(mContainedBoxes.isEmpty() && mParentGroup != nullptr) {
-            mParentGroup->removeContainedBox(ref<BoxesGroup>());
+            removeFromParent_k();
         }
     }
 }
@@ -829,15 +829,14 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
     return boxAtPos;
 }
 
-void BoxesGroup::ungroup() {
+void BoxesGroup::ungroup_k() {
     //clearBoxesSelection();
     Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
         box->applyTransformation(mTransformAnimator.data());
         removeContainedBox(box);
         mParentGroup->addContainedBox(box);
     }
-// will be removed automatically when has no boxes
-//    mParentGroup->removeContainedBox(ref<BoundingBox>());
+    removeFromParent_k();
 }
 
 PaintSettings *BoxesGroup::getFillSettings() {
@@ -1025,13 +1024,15 @@ void BoxesGroup::removeContainedBox(const qsptr<BoundingBox>& child) {
     }
     child->removeFromSelection();
     removeContainedBoxFromList(index);
-    if(mContainedBoxes.isEmpty() &&
-       mParentGroup != nullptr) {
-        mParentGroup->removeContainedBox(ref<BoundingBox>());
-    }
     //child->setParent(nullptr);
 }
 
+void BoxesGroup::removeContainedBox_k(const qsptr<BoundingBox>& child) {
+    removeContainedBox(child);
+    if(mContainedBoxes.isEmpty() && mParentGroup != nullptr) {
+        removeFromParent_k();
+    }
+}
 
 void BoxesGroup::increaseContainedBoxZInList(BoundingBox *child) {
     const int &index = getContainedBoxIndex(child);

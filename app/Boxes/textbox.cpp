@@ -20,8 +20,7 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     ca_prependChildAnimator(mText.data(), mEffectsAnimators);
     mText->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
 
-    mLinesDist = SPtrCreate(QrealAnimator)("line dist");
-    mLinesDist->qra_setValueRange(0., 100.);
+    mLinesDist = SPtrCreate(QrealAnimator)(0., 100., 1., "line dist");
     mLinesDist->qra_setCurrentValue(100.);
     mLinesDist->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
 }

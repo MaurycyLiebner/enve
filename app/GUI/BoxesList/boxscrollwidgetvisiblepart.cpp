@@ -239,7 +239,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
            boxUnderMouse->isAncestor(box)) return;
         if(parentGroup != box->getParentGroup()) {
             auto boxSPtr = GetAsSPtr(box, BoundingBox);
-            box->getParentGroup()->removeContainedBox(boxSPtr);
+            box->getParentGroup()->removeContainedBox_k(boxSPtr);
             parentGroup->addContainedBox(boxSPtr);
             box->applyTransformationInverted(box->getTransformAnimator());
         }

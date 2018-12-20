@@ -2,11 +2,10 @@
 #include "Animators/qrealanimator.h"
 #include "rastereffects.h"
 
-DesaturateEffect::DesaturateEffect(qreal radius) :
+DesaturateEffect::DesaturateEffect() :
     PixmapEffect("desaturate", EFFECT_DESATURATE) {
-    mInfluenceAnimator = SPtrCreate(QrealAnimator)("factor");
-    mInfluenceAnimator->qra_setValueRange(0., 1.);
-    mInfluenceAnimator->qra_setCurrentValue(radius);
+    mInfluenceAnimator = QrealAnimator::create0to1Animator("factor");
+    mInfluenceAnimator->qra_setCurrentValue(0.2);
 
     ca_addChildAnimator(mInfluenceAnimator);
 }

@@ -128,7 +128,7 @@ void Canvas::setCurrentGroupParentAsCurrentGroup() {
 #include "GUI/BoxesList/boxscrollwidget.h"
 void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     if(mCurrentBoxesGroup) {
-        mCurrentBoxesGroup->setIsCurrentGroup(false);
+        mCurrentBoxesGroup->setIsCurrentGroup_k(false);
         disconnect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
                    this, &Canvas::setCurrentGroupParentAsCurrentGroup);
     }
@@ -140,7 +140,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     mCurrentBoxesGroup = group;
     connect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
             this, &Canvas::setCurrentGroupParentAsCurrentGroup);
-    group->setIsCurrentGroup(true);
+    group->setIsCurrentGroup_k(true);
 
     //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
     SWT_scheduleWidgetsContentUpdateWithTarget(mCurrentBoxesGroup,

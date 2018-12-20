@@ -115,7 +115,7 @@ public:
     virtual void setPrefferedValueStep(const qreal &valueStep);
     virtual void prp_clearFromGraphView();
 
-    void freezeMinMaxValues();
+    void graphFixMinMaxValues();
     void saveValueAtAbsFrameAsKey(const int &frame);
 
     virtual void prp_openContextMenu(const QPoint &pos);
@@ -187,10 +187,20 @@ public:
                                   QrealKey *nextKey) const;
     qreal getCurrentValueAtRelFrameF(const qreal &frame) const;
     qreal getCurrentValueAtAbsFrameF(const qreal &frame);
+
+    static auto create0to1Animator(const QString& name) {
+        auto anim = SPtrCreate(QrealAnimator)(0., 1., 0.01, name);
+        anim->graphFixMinMaxValues();
+        return anim;
+    }
 protected:
     QrealAnimator(const QString& name);
+    QrealAnimator(const qreal &minVal,
+                  const qreal &maxVal,
+                  const qreal &prefferdStep,
+                  const QString& name);
 
-    bool mMinMaxValuesFrozen = false;
+    bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;
 
     int mDecimals = 3;

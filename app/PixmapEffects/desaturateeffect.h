@@ -23,7 +23,7 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 protected:
-    DesaturateEffect(qreal influence = .5);
+    DesaturateEffect();
 private:
     qsptr<QrealAnimator> mInfluenceAnimator;
 };

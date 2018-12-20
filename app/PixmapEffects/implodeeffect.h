@@ -21,7 +21,7 @@ public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
 protected:
-    ImplodeEffect(qreal radius = 10.);
+    ImplodeEffect();
 private:
     qsptr<QrealAnimator> mFactorAnimator;
 };

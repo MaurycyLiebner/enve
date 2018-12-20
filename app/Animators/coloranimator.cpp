@@ -9,19 +9,6 @@ ColorAnimator::ColorAnimator(const QString &name) : ComplexAnimator(name) {
     ca_addChildAnimator(mVal2Animator);
     ca_addChildAnimator(mVal3Animator);
     ca_addChildAnimator(mAlphaAnimator);
-
-    mVal1Animator->qra_setValueRange(0., 1.);
-    mVal1Animator->setPrefferedValueStep(0.05);
-    mVal1Animator->freezeMinMaxValues();
-    mVal2Animator->qra_setValueRange(0., 1.);
-    mVal2Animator->setPrefferedValueStep(0.05);
-    mVal2Animator->freezeMinMaxValues();
-    mVal3Animator->qra_setValueRange(0., 1.);
-    mVal3Animator->setPrefferedValueStep(0.05);
-    mVal3Animator->freezeMinMaxValues();
-    mAlphaAnimator->qra_setValueRange(0., 1.);
-    mAlphaAnimator->setPrefferedValueStep(0.05);
-    mAlphaAnimator->freezeMinMaxValues();
 }
 
 void ColorAnimator::qra_setCurrentValue(const QColor &colorValue,

@@ -21,7 +21,7 @@ public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData*);
 protected:
-    OilEffect(qreal radius = 2.);
+    OilEffect();
 private:
     qsptr<QrealAnimator> mRadiusAnimator;
 };

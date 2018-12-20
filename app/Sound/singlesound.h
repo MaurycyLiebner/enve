@@ -66,7 +66,7 @@ private:
     FixedLenAnimationRect *mDurationRectangle = nullptr;
 
     qsptr<QrealAnimator> mVolumeAnimator =
-            SPtrCreate(QrealAnimator)("volume");
+            SPtrCreate(QrealAnimator)(0., 200., 1., "volume");
 };
 
 #endif // SINGLESOUND_H
