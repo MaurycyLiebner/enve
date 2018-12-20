@@ -1,5 +1,8 @@
 #ifndef PATHBOX_H
 #define PATHBOX_H
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QLabel>
 #include "Boxes/boundingbox.h"
 #include "Animators/paintsettings.h"
 class GradientPoints;
@@ -173,9 +176,35 @@ public:
     void setOutlinePathOutdated() {
         mCurrentOutlinePathOutdated = true;
     }
+
+//    void updateDialog_TEST() {
+//        if(!mDialog_TEST) {
+//            mDialog_TEST = new QDialog();
+//            mDialog_TEST->open();
+//            mDialog_TEST->setLayout(new QVBoxLayout());
+//            mLabel_TEST = new QLabel();
+//            mDialog_TEST->layout()->addWidget(mLabel_TEST);
+//        }
+//        QPixmap pix(200, 200);
+//        pix.fill(Qt::white);
+//        QPainter p(&pix);
+//        p.setPen(Qt::NoPen);
+//        p.setBrush(Qt::red);
+//        p.drawPath(SkPathToQPainterPath(mFillPathSk));
+//        p.setBrush(Qt::black);
+//        auto oPath = SkPathToQPainterPath(mOutlinePathSk);
+//        oPath.setFillRule(Qt::WindingFill);
+//        p.drawPath(oPath);
+//        p.end();
+
+//        mLabel_TEST->setPixmap(pix);
+//    }
 protected:
     PathBox(const BoundingBoxType &type);
     void getMotionBlurProperties(QList<Property*>& list);
+
+//    QDialog* mDialog_TEST = nullptr;
+//    QLabel* mLabel_TEST = nullptr;
 
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;

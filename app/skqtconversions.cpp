@@ -97,7 +97,8 @@ QPainterPath SkPathToQPainterPath(const SkPath& path) {
 
     SkPoint pts[4];
     for(;;) {
-        switch(iter.next(pts)) {
+        auto nextVerb = iter.next(pts);
+        switch(nextVerb) {
             case SkPath::kMove_Verb: {
                 SkPoint pt = pts[0];
                 qPath.moveTo(SkPointToQPointF(pt));
@@ -121,8 +122,20 @@ QPainterPath SkPathToQPainterPath(const SkPath& path) {
             case SkPath::kClose_Verb:
                 qPath.closeSubpath();
                 break;
-            case SkPath::kQuad_Verb:
-            case SkPath::kConic_Verb:
+            case SkPath::kQuad_Verb: {
+                SkPoint ctrlPt = pts[1];
+                SkPoint targetPt = pts[2];
+                qPath.quadTo(SkPointToQPointF(ctrlPt),
+                             SkPointToQPointF(targetPt));
+            }
+                break;
+            case SkPath::kConic_Verb: {
+                SkPoint ctrlPt = pts[1];
+                SkPoint targetPt = pts[2];
+                qPath.quadTo(SkPointToQPointF(ctrlPt),
+                             SkPointToQPointF(targetPt));
+            }
+            break;
             case SkPath::kDone_Verb:
                 return qPath;
         }

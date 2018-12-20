@@ -621,6 +621,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
     mCurrentPathsOutdated = false;
     mCurrentOutlinePathOutdated = false;
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);
+//    updateDialog_TEST();
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) {
