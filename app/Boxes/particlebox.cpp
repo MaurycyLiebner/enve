@@ -521,7 +521,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
                 renderData->parentIsTarget = false;
                 data.particleStates << stateT;
                 renderData->addDependent(particleData.get());
-                renderData->addScheduler();
+                renderData->scheduleTask();
             }
         }
     }

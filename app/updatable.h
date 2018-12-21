@@ -17,8 +17,6 @@ public:
 
     void finishedProcessing();
 
-    virtual void afterProcessingFinished();
-
     bool isBeingProcessed();
 
     void waitTillProcessed();
@@ -34,6 +32,7 @@ public:
     void decDependencies();
     void incDependencies();
 protected:
+    virtual void afterProcessingFinished();
     void tellDependentThatFinished();
 
     bool mFinished = false;

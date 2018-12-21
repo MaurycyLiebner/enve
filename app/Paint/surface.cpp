@@ -412,7 +412,7 @@ void Surface::strokeTo(const Brush *brush,
 
     for(int tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++) {
         for(int ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++) {
-            tilesT[ty][tx]->addScheduler();
+            tilesT[ty][tx]->scheduleTask();
         }
     }
 

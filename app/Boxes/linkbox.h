@@ -311,7 +311,7 @@ public:
 
     void readBoundingBox(QIODevice *target);
 
-    void processSchedulers();
+    void scheduleWaitingTasks();
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,

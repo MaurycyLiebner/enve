@@ -70,7 +70,7 @@ BoxRenderDataScheduledPostProcess::BoxRenderDataScheduledPostProcess(
 }
 
 void BoxRenderDataScheduledPostProcess::afterProcessed() {
-    mBoxData->updateFinished();
+    mBoxData->finishedProcessing();
     mBoxData->fGpuFinished = false;
 }
 

@@ -78,12 +78,12 @@ void TaskScheduler::queHDDTask(const stdsptr<_ScheduledTask>& task) {
 void TaskScheduler::queScheduledCPUTasks() {
     if(mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty()) {
         if(mCurrentCanvas) {
-            mCurrentCanvas->processSchedulers();
+            mCurrentCanvas->scheduleWaitingTasks();
             mCurrentCanvas->queScheduledTasks();
         }
         foreach(const auto &task, mScheduledCPUTasks) {
-            if(!task->isAwaitingUpdate()) {
-                task->schedulerProccessed();
+            if(!task->isQued()) {
+                task->taskQued();
             }
 
             mQuedCPUTasks << task;
@@ -121,7 +121,7 @@ void TaskScheduler::processNextQuedHDDTask(
             auto task = mQuedHDDTasks.at(i).get();
             if(task->readyToBeProcessed()) {
                 task->setCurrentTaskExecutor(mHDDExecutor);
-                task->beforeUpdate();
+                task->beforeProcessingStarted();
                 emit processHDDTask(task, mCPUTaskExecutors.count());
                 mQuedHDDTasks.takeAt(i);
                 i--;

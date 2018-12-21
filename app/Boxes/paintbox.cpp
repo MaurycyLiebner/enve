@@ -268,11 +268,11 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
     canvas->restore();
 }
 
-void PaintBox::processSchedulers() {
+void PaintBox::scheduleWaitingTasks() {
     if(mTemporaryHandler != nullptr) {
         mTemporaryHandler->saveToTmp();
     }
-    BoundingBox::processSchedulers();
+    BoundingBox::scheduleWaitingTasks();
 }
 
 void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {

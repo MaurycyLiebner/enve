@@ -338,11 +338,11 @@ void BoxesGroup::prp_setParentFrameShift(const int &shift,
     }
 }
 
-void BoxesGroup::processSchedulers() {
+void BoxesGroup::scheduleWaitingTasks() {
     Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
-        child->processSchedulers();
+        child->scheduleWaitingTasks();
     }
-    BoundingBox::processSchedulers();
+    BoundingBox::scheduleWaitingTasks();
 }
 
 void BoxesGroup::queScheduledTasks() {

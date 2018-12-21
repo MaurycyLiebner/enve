@@ -53,7 +53,7 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
         sampleRenderData->useCustomRelFrame = true;
         sampleRenderData->customRelFrame = relFrameT;
         sampleRenderData->motionBlurTarget = data;
-        sampleRenderData->addScheduler();
+        sampleRenderData->scheduleTask();
         sampleRenderData->addDependent(data);
         renderData->samples << sampleRenderData;
 

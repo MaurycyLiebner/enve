@@ -260,9 +260,9 @@ void InternalLinkCanvas::readBoundingBox(QIODevice *target) {
     mClipToCanvas->readProperty(target);
 }
 
-void InternalLinkCanvas::processSchedulers() {
-    getLinkTarget()->processSchedulers();
-    BoxesGroup::processSchedulers();
+void InternalLinkCanvas::scheduleWaitingTasks() {
+    getLinkTarget()->scheduleWaitingTasks();
+    BoxesGroup::scheduleWaitingTasks();
 }
 
 void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(

@@ -707,7 +707,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
         setupEffectsF(relFrame, data);
     }
     if(data->parentIsTarget && (data->reason == USER_CHANGE ||
-            data->reason != BoundingBox::CHILD_USER_CHANGE)) {
+            data->reason == BoundingBox::CHILD_USER_CHANGE)) {
         nullifyCurrentRenderData(data->relFrame);
     }
 }
@@ -1250,10 +1250,10 @@ void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
     }
 }
 
-void BoundingBox::processSchedulers() {
+void BoundingBox::scheduleWaitingTasks() {
     mBlockedSchedule = true;
     foreach(const stdsptr<_ScheduledTask> &task, mScheduledTasks) {
-        task->schedulerProccessed();
+        task->taskQued();
     }
 }
 

@@ -372,7 +372,7 @@ public:
                                                int *lastIdentical,
                                                const int &relFrame,
                                                const bool &takeAncestorsIntoAccount = true);
-    virtual void processSchedulers();
+    virtual void scheduleWaitingTasks();
     void scheduleTask(const stdsptr<_ScheduledTask> &task);
     virtual void queScheduledTasks();
 

@@ -159,7 +159,7 @@ public:
                                                int *lastIdentical,
                                                const int &relFrame,
                                                const bool &takeAncestorsIntoAccount = true);
-    void processSchedulers();
+    void scheduleWaitingTasks();
     void queScheduledTasks();
 
     void writeBoundingBox(QIODevice *target);

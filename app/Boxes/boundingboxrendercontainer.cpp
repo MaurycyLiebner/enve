@@ -123,7 +123,7 @@ _ScheduledTask* CacheContainer::scheduleLoadFromTmpFile(
     if(dependent != nullptr) {
         mLoadingUpdatable->addDependent(dependent);
     }
-    mLoadingUpdatable->addScheduler();
+    mLoadingUpdatable->scheduleTask();
     return mLoadingUpdatable.get();
 }
 
@@ -180,7 +180,7 @@ void CacheContainer::scheduleDeleteTmpFile() {
     stdsptr<_ScheduledTask> updatable =
             SPtrCreate(CacheContainerTmpFileDataDeleter)(mTmpFile);
     mTmpFile.reset();
-    updatable->addScheduler();
+    updatable->scheduleTask();
 }
 #include "canvas.h"
 void CacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
@@ -275,7 +275,7 @@ void CacheContainer::saveToTmpFile() {
     mNoDataInMemory = true;
     mCancelAfterSaveDataClear = false;
     mSavingUpdatable = SPtrCreate(CacheContainerTmpFileDataSaver)(mImageSk, this);
-    mSavingUpdatable->addScheduler();
+    mSavingUpdatable->scheduleTask();
 }
 
 CacheContainerTmpFileDataLoader::CacheContainerTmpFileDataLoader(

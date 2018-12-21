@@ -288,7 +288,7 @@ public:
     void resetTileSize();
     TileSkDrawer *getTexTileDrawer();
 
-    void addScheduler();
+    void scheduleTask();
 
     void setDabsForDrawer();
 

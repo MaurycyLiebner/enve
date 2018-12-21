@@ -179,7 +179,7 @@ void Tile::setTileWidth(const ushort &width_t) {
     mMaxPaintX = width_t;
     if(mDrawer != nullptr) {
         mDrawer->maxPaintX = mMaxPaintX;
-        addScheduler();
+        scheduleTask();
     }
 }
 
@@ -188,7 +188,7 @@ void Tile::setTileHeight(const ushort &height_t) {
     mMaxPaintY = height_t;
     if(mDrawer != nullptr) {
         mDrawer->maxPaintY = mMaxPaintY;
-        addScheduler();
+        scheduleTask();
     }
 }
 
@@ -201,11 +201,11 @@ TileSkDrawer *Tile::getTexTileDrawer() {
     return mDrawer.get();
 }
 
-void Tile::addScheduler() {
+void Tile::scheduleTask() {
     if(mPaintInOtherThread) {
         startTransform();
         mParentTilesData->incNumberTilesBeingProcessed();
-        mDrawer->addScheduler();
+        mDrawer->scheduleTask();
     } else {
         processPaintDabs(mDabsToPaint,
                          mMaxPaintX, mMaxPaintY, TILE_DIM,
