@@ -518,13 +518,13 @@ void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     mExpiredPixmap = 0;
-    if(renderData->redo) {
-        scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
+    if(renderData->fRedo) {
+        scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
     int fId;
     int lId;
     //qDebug() << renderData->relFrame;
-    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);
+    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->fRelFrame);
     CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(fId);
     if(cont == nullptr) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame(fId);
@@ -1268,8 +1268,8 @@ CanvasRenderData::CanvasRenderData(BoundingBox* parentBoxT) :
 
 #include "PixmapEffects/rastereffects.h"
 void CanvasRenderData::renderToImage() {
-    if(renderedToImage) return;
-    renderedToImage = true;
+    if(fRenderedToImage) return;
+    fRenderedToImage = true;
 
     SkImageInfo info = SkImageInfo::Make(qCeil(canvasWidth),
                                          qCeil(canvasHeight),
@@ -1285,9 +1285,9 @@ void CanvasRenderData::renderToImage() {
     drawSk(rasterCanvas);
     rasterCanvas->flush();
 
-    if(!pixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, resolution);
+    if(!fPixmapEffects.isEmpty()) {
+        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
+            effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
     }
@@ -1301,8 +1301,8 @@ void CanvasRenderData::renderToImage() {
 void CanvasRenderData::drawSk(SkCanvas *canvas) {
     canvas->save();
 
-    canvas->scale(qrealToSkScalar(resolution),
-                  qrealToSkScalar(resolution));
+    canvas->scale(qrealToSkScalar(fResolution),
+                  qrealToSkScalar(fResolution));
     Q_FOREACH(const stdsptr<BoundingBoxRenderData> &renderData,
               childrenRenderData) {
         //box->draw(p);
@@ -1313,5 +1313,5 @@ void CanvasRenderData::drawSk(SkCanvas *canvas) {
 }
 
 void CanvasRenderData::updateRelBoundingRect() {
-    relBoundingRect = QRectF(0., 0., canvasWidth, canvasHeight);
+    fRelBoundingRect = QRectF(0., 0., canvasWidth, canvasHeight);
 }

@@ -67,11 +67,11 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
     mNoDataInMemory = false;
     scheduleDeleteTmpFile();
 
-    mTransform = data->transform;
-    mResolutionFraction = data->resolution;
+    mTransform = data->fTransform;
+    mResolutionFraction = data->fResolution;
     mImageSk = data->renderedImage;
-    mDrawPos = data->drawPos;
-    mRelFrame = data->relFrame;
+    mDrawPos = data->fDrawPos;
+    mRelFrame = data->fRelFrame;
     mPaintTransform.reset();
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);

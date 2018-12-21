@@ -16,11 +16,11 @@ struct ParticleState {
                   const SkScalar &sizeT,
                   const unsigned char &opacityT,
                   const SkPath &path) {
-        pos = posT;
-        size = scaleT*sizeT;
-        opacity = opacityT;
+        fPos = posT;
+        fSize = scaleT*sizeT;
+        fOpacity = opacityT;
 
-        linePath = path;
+        fLinePath = path;
     }
 
     static ParticleState interpolate(const ParticleState &state1,
@@ -28,49 +28,49 @@ struct ParticleState {
                                      const SkScalar &weight2) {
         SkScalar weight1 = 1.f - weight2;
         SkPath pathT;
-        if(state2.linePath.isEmpty()) {
-            pathT = state1.linePath;
-        } else if(state1.linePath.isEmpty()) {
-            pathT = state2.linePath;
+        if(state2.fLinePath.isEmpty()) {
+            pathT = state1.fLinePath;
+        } else if(state1.fLinePath.isEmpty()) {
+            pathT = state2.fLinePath;
         } else {
-            state1.linePath.interpolate(state2.linePath,
+            state1.fLinePath.interpolate(state2.fLinePath,
                                         1.f - weight2, &pathT);
         }
-        uchar opacity1 = state1.opacity;
-        uchar opacity2 = state2.opacity;
+        uchar opacity1 = state1.fOpacity;
+        uchar opacity2 = state2.fOpacity;
         int iOpacity = qRound(opacity1*weight1 + opacity2*weight2);
         uchar opacityT = static_cast<uchar>(qMax(0, qMin(255, iOpacity)));
-        return ParticleState(state1.pos*weight1 + state2.pos*weight2, 1.,
-                             state1.size*weight1 + state2.size*weight2,
+        return ParticleState(state1.fPos*weight1 + state2.fPos*weight2, 1.,
+                             state1.fSize*weight1 + state2.fSize*weight2,
                              opacityT, pathT);
     }
 
     void drawSk(SkCanvas *canvas,
                 const SkPaint paint) const {
-        if(size < 0.f) return;
+        if(fSize < 0.f) return;
         SkPaint paintT = paint;
-        if(targetRenderData.get() == nullptr) {
-            paintT.setAlpha(opacity);
-            paintT.setStrokeWidth(size);
-            canvas->drawPath(linePath, paintT);
+        if(fTargetRenderData.get() == nullptr) {
+            paintT.setAlpha(fOpacity);
+            paintT.setStrokeWidth(fSize);
+            canvas->drawPath(fLinePath, paintT);
         } else {
-            int iAlpha = qRound(targetRenderData->opacity*2.55);
+            int iAlpha = qRound(fTargetRenderData->fOpacity*2.55);
             paintT.setAlpha(static_cast<U8CPU>(iAlpha));
-            sk_sp<SkImage> imageT = targetRenderData->renderedImage;
+            sk_sp<SkImage> imageT = fTargetRenderData->renderedImage;
             if(imageT.get() == nullptr) return;
             //paintT.setAntiAlias(true);
             //paintT.setFilterQuality(kHigh_SkFilterQuality);
-            SkScalar drawX = pos.x() - imageT->width()*0.5f;
-            SkScalar drawY = pos.y() - imageT->height()*0.5f;
+            SkScalar drawX = fPos.x() - imageT->width()*0.5f;
+            SkScalar drawY = fPos.y() - imageT->height()*0.5f;
             canvas->drawImage(imageT, drawX, drawY, &paintT);
         }
     }
 
-    stdsptr<BoundingBoxRenderData> targetRenderData;
-    SkPath linePath;
-    SkPoint pos;
-    SkScalar size;
-    unsigned char opacity;
+    stdsptr<BoundingBoxRenderData> fTargetRenderData;
+    SkPath fLinePath;
+    SkPoint fPos;
+    SkScalar fSize;
+    unsigned char fOpacity;
 };
 
 struct EmitterData {
@@ -100,7 +100,7 @@ struct ParticleBoxRenderData : public BoundingBoxRenderData {
 
     void updateRelBoundingRect() {
         BoundingBoxRenderData::updateRelBoundingRect();
-        clipRect = QRectFToSkRect(relBoundingRect);
+        clipRect = QRectFToSkRect(fRelBoundingRect);
     }
 
     QList<EmitterData> emittersData;
@@ -113,10 +113,10 @@ private:
             if(emitterData.boxDraw) {
                 canvas->save();
                 canvas->resetMatrix();
-                canvas->translate(qrealToSkScalar(-globalBoundingRect.left()),
-                                  qrealToSkScalar(-globalBoundingRect.top()));
+                canvas->translate(qrealToSkScalar(-fGlobalBoundingRect.left()),
+                                  qrealToSkScalar(-fGlobalBoundingRect.top()));
                 QMatrix scale;
-                scale.scale(resolution, resolution);
+                scale.scale(fResolution, fResolution);
                 canvas->concat(QMatrixToSkMatrix(scale));
                 emitterData.drawParticles(canvas);
                 canvas->restore();

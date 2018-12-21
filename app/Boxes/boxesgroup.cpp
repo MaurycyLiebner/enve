@@ -677,14 +677,14 @@ void processChildData(BoundingBox* child,
                       BoundingBoxRenderData);
     if(boxRenderData == nullptr) {
         boxRenderData = child->createRenderData();
-        boxRenderData->reason = parentData->reason;
+        boxRenderData->fReason = parentData->fReason;
         //boxRenderData->parentIsTarget = false;
-        boxRenderData->useCustomRelFrame = true;
-        boxRenderData->customRelFrame = boxRelFrame;
+        boxRenderData->fUseCustomRelFrame = true;
+        boxRenderData->fCustomRelFrame = boxRelFrame;
         boxRenderData->scheduleTask();
     } else {
-        if(boxRenderData->copied) {
-            child->nullifyCurrentRenderData(boxRenderData->relFrame);
+        if(boxRenderData->fCopied) {
+            child->nullifyCurrentRenderData(boxRenderData->fRelFrame);
         }
     }
     boxRenderData->addDependent(parentData);
@@ -726,7 +726,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
             boxRenderData->addDependent(data);
             groupData->childrenRenderData.insert(idT,
                     GetAsSPtr(boxRenderData, BoundingBoxRenderData));
-            boxRenderData->parentBox = nullptr;
+            boxRenderData->fParentBox = nullptr;
         }
     } else {
         foreach(const qsptr<BoundingBox> &box, mContainedBoxes) {
@@ -741,7 +741,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         }
     }
 
-    data->effectsMargin += childrenEffectsMargin;
+    data->fEffectsMargin += childrenEffectsMargin;
 }
 
 
@@ -1134,28 +1134,28 @@ bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 }
 #include "PixmapEffects/rastereffects.h"
 void BoxesGroupRenderData::renderToImage() {
-    if(renderedToImage) return;
-    renderedToImage = true;
+    if(fRenderedToImage) return;
+    fRenderedToImage = true;
     QMatrix scale;
-    scale.scale(resolution, resolution);
-    QMatrix transformRes = transform*scale;
+    scale.scale(fResolution, fResolution);
+    QMatrix transformRes = fTransform*scale;
     //transformRes.scale(resolution, resolution);
-    globalBoundingRect = transformRes.mapRect(relBoundingRect);
-    foreach(const QRectF &rectT, otherGlobalRects) {
-        globalBoundingRect = globalBoundingRect.united(rectT);
+    fGlobalBoundingRect = transformRes.mapRect(fRelBoundingRect);
+    foreach(const QRectF &rectT, fOtherGlobalRects) {
+        fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
     }
-    globalBoundingRect = globalBoundingRect.
-            adjusted(-effectsMargin, -effectsMargin,
-                     effectsMargin, effectsMargin);
-    if(maxBoundsEnabled) {
-        globalBoundingRect = globalBoundingRect.intersected(
-                    scale.mapRect(maxBoundsRect));
+    fGlobalBoundingRect = fGlobalBoundingRect.
+            adjusted(-fEffectsMargin, -fEffectsMargin,
+                     fEffectsMargin, fEffectsMargin);
+    if(fMaxBoundsEnabled) {
+        fGlobalBoundingRect = fGlobalBoundingRect.intersected(
+                    scale.mapRect(fMaxBoundsRect));
     }
-    QSizeF sizeF = globalBoundingRect.size();
-    QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(globalBoundingRect.left()/**resolution*/),
-                    qRound(globalBoundingRect.top()/**resolution*/));
-    globalBoundingRect.translate(-transF);
+    QSizeF sizeF = fGlobalBoundingRect.size();
+    QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
+            QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
+                    qRound(fGlobalBoundingRect.top()/**resolution*/));
+    fGlobalBoundingRect.translate(-transF);
     SkImageInfo info = SkImageInfo::Make(qCeil(sizeF.width()),
                                          qCeil(sizeF.height()),
                                          kBGRA_8888_SkColorType,
@@ -1169,20 +1169,20 @@ void BoxesGroupRenderData::renderToImage() {
     SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
     //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
-    rasterCanvas->translate(static_cast<SkScalar>(-globalBoundingRect.left()),
-                            static_cast<SkScalar>(-globalBoundingRect.top()));
+    rasterCanvas->translate(static_cast<SkScalar>(-fGlobalBoundingRect.left()),
+                            static_cast<SkScalar>(-fGlobalBoundingRect.top()));
     rasterCanvas->concat(QMatrixToSkMatrix(scale));
 
     drawSk(rasterCanvas);
     rasterCanvas->flush();
     delete rasterCanvas;
 
-    drawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
-                            qRound(globalBoundingRect.top()));
+    fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
+                            qRound(fGlobalBoundingRect.top()));
 
-    if(!pixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, resolution);
+    if(!fPixmapEffects.isEmpty()) {
+        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
+            effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
     }

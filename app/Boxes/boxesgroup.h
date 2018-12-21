@@ -24,13 +24,13 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
             SkPath childPath;
             childPath.addRect(
                     QRectFToSkRect(
-                        child->relBoundingRect));
+                        child->fRelBoundingRect));
             childPath.transform(
                         QMatrixToSkMatrix(
-                            child->relTransform) );
+                            child->fRelTransform) );
             boundingPaths.addPath(childPath);
         }
-        relBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
+        fRelBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
     }
     void renderToImage();
 

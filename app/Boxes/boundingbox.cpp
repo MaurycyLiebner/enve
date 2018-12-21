@@ -375,7 +375,7 @@ void BoundingBox::select() {
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
         BoundingBoxRenderData* renderData) {
-    mRelBoundingRect = renderData->relBoundingRect;
+    mRelBoundingRect = renderData->fRelBoundingRect;
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
@@ -415,22 +415,22 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
             currentRenderData = updateCurrentRenderData(relFrame, reason);
             if(currentRenderData == nullptr) return;
         } else {
-            if(!currentRenderData->redo && !currentRenderData->copied &&
+            if(!currentRenderData->fRedo && !currentRenderData->fCopied &&
                     reason != UpdateReason::FRAME_CHANGE) {
-                currentRenderData->redo = currentRenderData->isQued();
+                currentRenderData->fRedo = currentRenderData->isQued();
             }
             return;
         }
-        auto currentReason = currentRenderData->reason;
+        auto currentReason = currentRenderData->fReason;
         if(reason == USER_CHANGE &&
                 (currentReason == CHILD_USER_CHANGE ||
                  currentReason == FRAME_CHANGE)) {
-            currentRenderData->reason = reason;
+            currentRenderData->fReason = reason;
         } else if(reason == CHILD_USER_CHANGE &&
                   currentReason == FRAME_CHANGE) {
-            currentRenderData->reason = reason;
+            currentRenderData->fReason = reason;
         }
-        currentRenderData->redo = false;
+        currentRenderData->fRedo = false;
         currentRenderData->scheduleTask();
 //    }
 
@@ -444,12 +444,12 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
     emit scheduledUpdate();
 }
 
-BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(const int& relFrame,
-                                                            const UpdateReason& reason) {
+BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(
+        const int& relFrame, const UpdateReason& reason) {
     auto renderData = createRenderData();
     if(renderData == nullptr) return nullptr;
-    renderData->relFrame = relFrame;
-    renderData->reason = reason;
+    renderData->fRelFrame = relFrame;
+    renderData->fReason = reason;
     mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
     return renderData.get();
 }
@@ -462,9 +462,9 @@ BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
         if(currentRenderData == nullptr) return nullptr;
 //        if(currentRenderData->relFrame == relFrame) {
         if(!prp_differencesBetweenRelFramesIncludingInherited(
-                    currentRenderData->relFrame, relFrame)) {
+                    currentRenderData->fRelFrame, relFrame)) {
             auto copy = currentRenderData->makeCopy();
-            copy->relFrame = relFrame;
+            copy->fRelFrame = relFrame;
             mCurrentRenderDataHandler.addItemAtRelFrame(copy);
             return copy.get();
         }
@@ -684,31 +684,30 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
 void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
-    data->relFrame = qRound(relFrame);
-    data->renderedToImage = false;
-    data->relTransform = getRelativeTransformAtRelFrameF(relFrame);
-    data->parentTransform = mTransformAnimator->
+    data->fRelFrame = qRound(relFrame);
+    data->fRenderedToImage = false;
+    data->fRelTransform = getRelativeTransformAtRelFrameF(relFrame);
+    data->fParentTransform = mTransformAnimator->
             getParentCombinedTransformMatrixAtRelFrameF(relFrame);
-    data->transform = data->relTransform*data->parentTransform;
-    data->opacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
-    data->resolution = getParentCanvas()->getResolutionFraction();
+    data->fTransform = data->fRelTransform*data->fParentTransform;
+    data->fOpacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
+    data->fResolution = getParentCanvas()->getResolutionFraction();
     bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
     if(effectsVisible) {
-        data->effectsMargin = getEffectsMarginAtRelFrameF(relFrame)*
-                data->resolution + 2.;
+        data->fEffectsMargin = getEffectsMarginAtRelFrameF(relFrame)*
+                data->fResolution + 2.;
     } else {
-        data->effectsMargin = 2.;
+        data->fEffectsMargin = 2.;
     }
-    data->blendMode = getBlendMode();
+    data->fBlendMode = getBlendMode();
 
     Canvas* parentCanvas = getParentCanvas();
-    data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
-    if(data->opacity > 0.001 && effectsVisible) {
+    data->fMaxBoundsRect = parentCanvas->getMaxBoundsRect();
+    if(data->fOpacity > 0.001 && effectsVisible) {
         setupEffectsF(relFrame, data);
     }
-    if(data->parentIsTarget && (data->reason == USER_CHANGE ||
-            data->reason == BoundingBox::CHILD_USER_CHANGE)) {
-        nullifyCurrentRenderData(data->relFrame);
+    if(data->fParentIsTarget && !data->nullifyBeforeProcessing()) {
+        nullifyCurrentRenderData(data->fRelFrame);
     }
 }
 
@@ -1551,8 +1550,8 @@ QMimeData *BoundingBox::SWT_createMimeData() {
 
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     mExpiredPixmap = 0;
-    if(renderData->redo) {
-        scheduleUpdate(renderData->relFrame, Animator::USER_CHANGE);
+    if(renderData->fRedo) {
+        scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
     mDrawRenderContainer->setSrcRenderData(renderData);
     updateDrawRenderContainerTransform();

@@ -105,18 +105,18 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     if(!mCurrentPathsOutdated) {
         currentEditPathCompatible =
                 !differenceInEditPathBetweenFrames(
-                    data->relFrame, mCurrentPathsFrame);
+                    data->fRelFrame, mCurrentPathsFrame);
         if(currentEditPathCompatible) {
             currentPathCompatible =
                     !differenceInPathBetweenFrames(
-                        data->relFrame, mCurrentPathsFrame);
+                        data->fRelFrame, mCurrentPathsFrame);
             if(currentPathCompatible && !mCurrentOutlinePathOutdated) {
                 currentOutlinePathCompatible =
                         !differenceInOutlinePathBetweenFrames(
-                            data->relFrame, mCurrentPathsFrame);
+                            data->fRelFrame, mCurrentPathsFrame);
                 currentFillPathCompatible =
                         !differenceInFillPathBetweenFrames(
-                            data->relFrame, mCurrentPathsFrame);
+                            data->fRelFrame, mCurrentPathsFrame);
             }
         }
     }
@@ -137,7 +137,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                         prp_relFrameToAbsFrameF(relFrame));
             mParentGroup->filterPathForRelFrameF(parentRelFrame, &pathData->path,
-                                                data->parentBox.data());
+                                                data->fParentBox.data());
             // !!! reversed
             mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
         }
@@ -177,8 +177,8 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
-        data->relBoundingRectSet = true;
-        data->relBoundingRect = mRelBoundingRect;
+        data->fRelBoundingRectSet = true;
+        data->fRelBoundingRect = mRelBoundingRect;
     }
 
     UpdatePaintSettings *fillSettings = &pathData->paintSettings;
@@ -613,7 +613,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 void PathBox::updateCurrentPreviewDataFromRenderData(
         BoundingBoxRenderData* renderData) {
     auto pathRenderData = GetAsPtr(renderData, PathBoxRenderData);
-    mCurrentPathsFrame = renderData->relFrame;
+    mCurrentPathsFrame = renderData->fRelFrame;
     mEditPathSk = pathRenderData->editPath;
     mPathSk = pathRenderData->path;
     mOutlinePathSk = pathRenderData->outlinePath;

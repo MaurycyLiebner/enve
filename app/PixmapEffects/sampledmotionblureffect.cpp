@@ -25,7 +25,7 @@ SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
 stdsptr<PixmapEffectRenderData> SampledMotionBlurEffect::
 getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
                                      BoundingBoxRenderData* data) {
-    if(!data->parentIsTarget) return nullptr;
+    if(!data->fParentIsTarget) return nullptr;
     auto renderData = SPtrCreate(SampledMotionBlurEffectRenderData)();
     renderData->opacity =
             mOpacity->getCurrentEffectiveValueAtRelFrameF(relFrame)*0.01;
@@ -49,10 +49,10 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
         stdsptr<BoundingBoxRenderData> sampleRenderData =
                 mParentBox->createRenderData();
         //mParentBox->setupBoundingBoxRenderDataForRelFrameF(i, sampleRenderData);
-        sampleRenderData->parentIsTarget = false;
-        sampleRenderData->useCustomRelFrame = true;
-        sampleRenderData->customRelFrame = relFrameT;
-        sampleRenderData->motionBlurTarget = data;
+        sampleRenderData->fParentIsTarget = false;
+        sampleRenderData->fUseCustomRelFrame = true;
+        sampleRenderData->fCustomRelFrame = relFrameT;
+        sampleRenderData->fMotionBlurTarget = data;
         sampleRenderData->scheduleTask();
         sampleRenderData->addDependent(data);
         renderData->samples << sampleRenderData;
@@ -193,8 +193,8 @@ void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
     qreal opacityT = opacityStepT*(1. - qCeil(numberSamples) + numberSamples);
     foreach(const stdsptr<BoundingBoxRenderData> &sample, samples) {
         qreal sampleAlpha = opacityT*opacityT*opacity;
-        QPointF drawPosF = sample->globalBoundingRect.topLeft() -
-                boxData->globalBoundingRect.topLeft();//QPointF(0., 0.);
+        QPointF drawPosF = sample->fGlobalBoundingRect.topLeft() -
+                boxData->fGlobalBoundingRect.topLeft();//QPointF(0., 0.);
         QPoint drawPos = drawPosF.toPoint();
         replaceIfHigherAlpha(drawPos.x(), drawPos.y(),
                              motionBlur, sample->renderedImage,

@@ -20,7 +20,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
 
     virtual void copyFrom(BoundingBoxRenderData *src);
     stdsptr<BoundingBoxRenderData> makeCopy();
-    bool copied = false;
+    bool fCopied = false;
 
     // gpu
     bool needsGpuProcessing() const {
@@ -31,38 +31,38 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     // gpu
 
 
-    bool relBoundingRectSet = false;
+    bool fRelBoundingRectSet = false;
 
-    Animator::UpdateReason reason;
+    Animator::UpdateReason fReason;
 
-    bool redo = false;
+    bool fRedo = false;
 
-    bool renderedToImage = false;
-    QMatrix transform;
-    QMatrix parentTransform;
-    QMatrix relTransform;
-    QRectF relBoundingRect;
-    QRectF globalBoundingRect;
-    qreal opacity = 1.;
-    qreal resolution;
-    qreal effectsMargin;
-    int relFrame;
+    bool fRenderedToImage = false;
+    QMatrix fTransform;
+    QMatrix fParentTransform;
+    QMatrix fRelTransform;
+    QRectF fRelBoundingRect;
+    QRectF fGlobalBoundingRect;
+    qreal fOpacity = 1.;
+    qreal fResolution;
+    qreal fEffectsMargin;
+    int fRelFrame;
 
     // for motion blur
-    bool useCustomRelFrame = false;
-    qreal customRelFrame;
-    QList<QRectF> otherGlobalRects;
-    stdptr<BoundingBoxRenderData>motionBlurTarget;
+    bool fUseCustomRelFrame = false;
+    qreal fCustomRelFrame;
+    QList<QRectF> fOtherGlobalRects;
+    stdptr<BoundingBoxRenderData> fMotionBlurTarget;
     // for motion blur
 
-    QList<stdsptr<PixmapEffectRenderData>> pixmapEffects;
-    SkPoint drawPos = SkPoint::Make(0.f, 0.f);
-    SkBlendMode blendMode = SkBlendMode::kSrcOver;
-    QRectF maxBoundsRect;
-    bool maxBoundsEnabled = true;
+    QList<stdsptr<PixmapEffectRenderData>> fPixmapEffects;
+    SkPoint fDrawPos = SkPoint::Make(0.f, 0.f);
+    SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
+    QRectF fMaxBoundsRect;
+    bool fMaxBoundsEnabled = true;
 
-    bool parentIsTarget = true;
-    qptr<BoundingBox> parentBox;
+    bool fParentIsTarget = true;
+    qptr<BoundingBox> fParentBox;
 
     virtual void updateRelBoundingRect();
     void drawRenderedImageForParent(SkCanvas *canvas);
@@ -82,12 +82,12 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     void dataSet();
 
     void clearPixmapEffects() {
-        pixmapEffects.clear();
-        effectsMargin = 0.;
+        fPixmapEffects.clear();
+        fEffectsMargin = 0.;
     }
 
     virtual QPointF getCenterPosition() {
-        return relBoundingRect.center();
+        return fRelBoundingRect.center();
     }
 
     void appendRenderCustomizerFunctor(
@@ -99,6 +99,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
             const stdsptr<RenderDataCustomizerFunctor>& customizer) {
         mRenderDataCustomizerFunctors.prepend(customizer);
     }
+    bool nullifyBeforeProcessing();
 protected:
     void scheduleTaskNow();
     QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;

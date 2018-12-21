@@ -7,33 +7,33 @@
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
     if(parentBoxT == nullptr) return;
-    parentBox = parentBoxT;
+    fParentBox = parentBoxT;
 }
 
 BoundingBoxRenderData::~BoundingBoxRenderData() {}
 
 void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
-    globalBoundingRect = src->globalBoundingRect;
-    transform = src->transform;
-    parentTransform = src->parentTransform;
-    customRelFrame = src->customRelFrame;
-    useCustomRelFrame = src->useCustomRelFrame;
-    relFrame = src->relFrame;
-    relBoundingRect = src->relBoundingRect;
-    relTransform = src->relTransform;
-    renderedToImage = src->renderedToImage;
-    blendMode = src->blendMode;
-    drawPos = src->drawPos;
-    opacity = src->opacity;
-    resolution = src->resolution;
+    fGlobalBoundingRect = src->fGlobalBoundingRect;
+    fTransform = src->fTransform;
+    fParentTransform = src->fParentTransform;
+    fCustomRelFrame = src->fCustomRelFrame;
+    fUseCustomRelFrame = src->fUseCustomRelFrame;
+    fRelFrame = src->fRelFrame;
+    fRelBoundingRect = src->fRelBoundingRect;
+    fRelTransform = src->fRelTransform;
+    fRenderedToImage = src->fRenderedToImage;
+    fBlendMode = src->fBlendMode;
+    fDrawPos = src->fDrawPos;
+    fOpacity = src->fOpacity;
+    fResolution = src->fResolution;
     renderedImage = makeSkImageCopy(src->renderedImage);
     mFinished = true;
-    relBoundingRectSet = true;
-    copied = true;
+    fRelBoundingRectSet = true;
+    fCopied = true;
 }
 
 stdsptr<BoundingBoxRenderData> BoundingBoxRenderData::makeCopy() {
-    BoundingBox *parentBoxT = parentBox.data();
+    BoundingBox *parentBoxT = fParentBox.data();
     if(parentBoxT == nullptr) return nullptr;
     stdsptr<BoundingBoxRenderData> copy = parentBoxT->createRenderData();
     copy->copyFrom(this);
@@ -41,64 +41,64 @@ stdsptr<BoundingBoxRenderData> BoundingBoxRenderData::makeCopy() {
 }
 
 void BoundingBoxRenderData::updateRelBoundingRect() {
-    BoundingBox *parentBoxT = parentBox.data();
+    BoundingBox *parentBoxT = fParentBox.data();
     if(parentBoxT == nullptr) return;
-    relBoundingRect = parentBoxT->getRelBoundingRectAtRelFrame(relFrame);
+    fRelBoundingRect = parentBoxT->getRelBoundingRectAtRelFrame(fRelFrame);
 }
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
-    if(opacity < 0.001) return;
+    if(fOpacity < 0.001) return;
     canvas->save();
-    SkScalar invScale = 1.f/qrealToSkScalar(resolution);
+    SkScalar invScale = 1.f/qrealToSkScalar(fResolution);
     canvas->scale(invScale, invScale);
     renderToImage();
     SkPaint paint;
-    paint.setAlpha(static_cast<U8CPU>(qRound(opacity*2.55)));
-    paint.setBlendMode(blendMode);
+    paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
+    paint.setBlendMode(fBlendMode);
     //paint.setAntiAlias(true);
     //paint.setFilterQuality(kHigh_SkFilterQuality);
-    if(blendMode == SkBlendMode::kDstIn ||
-       blendMode == SkBlendMode::kSrcIn ||
-       blendMode == SkBlendMode::kDstATop) {
+    if(fBlendMode == SkBlendMode::kDstIn ||
+       fBlendMode == SkBlendMode::kSrcIn ||
+       fBlendMode == SkBlendMode::kDstATop) {
         SkPaint paintT;
-        paintT.setBlendMode(blendMode);
+        paintT.setBlendMode(fBlendMode);
         paintT.setColor(SK_ColorTRANSPARENT);
         SkPath path;
-        path.addRect(SkRect::MakeXYWH(drawPos.x(), drawPos.y(),
+        path.addRect(SkRect::MakeXYWH(fDrawPos.x(), fDrawPos.y(),
                                       renderedImage->width(),
                                       renderedImage->height()));
         path.toggleInverseFillType();
         canvas->drawPath(path, paintT);
     }
     canvas->drawImage(renderedImage,
-                      drawPos.x(), drawPos.y(),
+                      fDrawPos.x(), fDrawPos.y(),
                       &paint);
     canvas->restore();
 }
 
 void BoundingBoxRenderData::renderToImage() {
-    if(renderedToImage) return;
-    renderedToImage = true;
-    if(opacity < 0.001) return;
+    if(fRenderedToImage) return;
+    fRenderedToImage = true;
+    if(fOpacity < 0.001) return;
     QMatrix scale;
-    scale.scale(resolution, resolution);
-    QMatrix transformRes = transform*scale;
+    scale.scale(fResolution, fResolution);
+    QMatrix transformRes = fTransform*scale;
     //transformRes.scale(resolution, resolution);
-    globalBoundingRect = transformRes.mapRect(relBoundingRect);
-    foreach(const QRectF &rectT, otherGlobalRects) {
-        globalBoundingRect = globalBoundingRect.united(rectT);
+    fGlobalBoundingRect = transformRes.mapRect(fRelBoundingRect);
+    foreach(const QRectF &rectT, fOtherGlobalRects) {
+        fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
     }
-    globalBoundingRect = globalBoundingRect.
-            adjusted(-effectsMargin, -effectsMargin,
-                     effectsMargin, effectsMargin);
-    if(maxBoundsEnabled) {
-        globalBoundingRect = globalBoundingRect.intersected(
-                              scale.mapRect(maxBoundsRect));
+    fGlobalBoundingRect = fGlobalBoundingRect.
+            adjusted(-fEffectsMargin, -fEffectsMargin,
+                     fEffectsMargin, fEffectsMargin);
+    if(fMaxBoundsEnabled) {
+        fGlobalBoundingRect = fGlobalBoundingRect.intersected(
+                              scale.mapRect(fMaxBoundsRect));
     }
-    QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(globalBoundingRect.left()/**resolution*/),
-                    qRound(globalBoundingRect.top()/**resolution*/));
-    globalBoundingRect.translate(-transF);
+    QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
+            QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
+                    qRound(fGlobalBoundingRect.top()/**resolution*/));
+    fGlobalBoundingRect.translate(-transF);
 
     // !!! TEST !!!
     //auto blurProgram = SPtrCreate(BlurProgramCaller)(50., size);
@@ -109,8 +109,8 @@ void BoundingBoxRenderData::renderToImage() {
 //    fGpuShaders << dotsProgram;
     // !!! TEST !!!
 
-    SkImageInfo info = SkImageInfo::Make(qCeil(globalBoundingRect.width()),
-                                         qCeil(globalBoundingRect.height()),
+    SkImageInfo info = SkImageInfo::Make(qCeil(fGlobalBoundingRect.width()),
+                                         qCeil(fGlobalBoundingRect.height()),
                                          kBGRA_8888_SkColorType,
                                          kPremul_SkAlphaType,
                                          nullptr);
@@ -121,19 +121,19 @@ void BoundingBoxRenderData::renderToImage() {
     SkCanvas rasterCanvas(bitmap);//rasterSurface->getCanvas();
     //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
-    rasterCanvas.translate(qrealToSkScalar(-globalBoundingRect.left()),
-                            qrealToSkScalar(-globalBoundingRect.top()));
+    rasterCanvas.translate(qrealToSkScalar(-fGlobalBoundingRect.left()),
+                            qrealToSkScalar(-fGlobalBoundingRect.top()));
     rasterCanvas.concat(QMatrixToSkMatrix(transformRes));
 
     drawSk(&rasterCanvas);
     rasterCanvas.flush();
 
-    drawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
-                            qRound(globalBoundingRect.top()));
+    fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
+                            qRound(fGlobalBoundingRect.top()));
 
-    if(!pixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, resolution);
+    if(!fPixmapEffects.isEmpty()) {
+        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
+            effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
     }
@@ -153,20 +153,19 @@ void BoundingBoxRenderData::beforeProcessingStarted() {
 
     _ScheduledTask::beforeProcessingStarted();
 
-    BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT == nullptr || !parentIsTarget) return;
-    if(reason != BoundingBox::USER_CHANGE &&
-            reason != BoundingBox::CHILD_USER_CHANGE)
-        parentBoxT->nullifyCurrentRenderData(relFrame);
+    BoundingBox *parentBoxT = fParentBox.data();
+    if(parentBoxT == nullptr || !fParentIsTarget) return;
+    if(nullifyBeforeProcessing())
+        parentBoxT->nullifyCurrentRenderData(fRelFrame);
     // qDebug() << "box render started:" << relFrame << parentBoxT->prp_getName();
 }
 
 void BoundingBoxRenderData::afterProcessingFinished() {
-    if(motionBlurTarget != nullptr) {
-        motionBlurTarget->otherGlobalRects << globalBoundingRect;
+    if(fMotionBlurTarget != nullptr) {
+        fMotionBlurTarget->fOtherGlobalRects << fGlobalBoundingRect;
     }
-    BoundingBox *parentBoxT = parentBox.data();
-    if(parentBoxT != nullptr && parentIsTarget) {
+    BoundingBox *parentBoxT = fParentBox.data();
+    if(parentBoxT != nullptr && fParentIsTarget) {
         parentBoxT->renderDataFinished(this);
         // qDebug() << "box render finished:" << relFrame << parentBoxT->prp_getName();
     }
@@ -174,14 +173,14 @@ void BoundingBoxRenderData::afterProcessingFinished() {
 }
 
 void BoundingBoxRenderData::taskQued() {
-    BoundingBox *parentBoxT = parentBox.data();
+    BoundingBox *parentBoxT = fParentBox.data();
     if(parentBoxT != nullptr) {
-        if(useCustomRelFrame) {
+        if(fUseCustomRelFrame) {
             parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
-                        customRelFrame, this);
+                        fCustomRelFrame, this);
         } else {
             parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
-                        relFrame, this);
+                        fRelFrame, this);
         }
         foreach(const auto& customizer, mRenderDataCustomizerFunctors) {
             (*customizer)(this);
@@ -195,7 +194,7 @@ void BoundingBoxRenderData::taskQued() {
 }
 
 void BoundingBoxRenderData::scheduleTaskNow() {
-    BoundingBox *parentBoxT = parentBox.data();
+    BoundingBox *parentBoxT = fParentBox.data();
     if(parentBoxT == nullptr) return;
     parentBoxT->scheduleTask(GetAsSPtr(this, _ScheduledTask));
 }
@@ -203,14 +202,19 @@ void BoundingBoxRenderData::scheduleTaskNow() {
 void BoundingBoxRenderData::dataSet() {
     if(allDataReady()) {
         mDataSet = true;
-        if(!relBoundingRectSet) {
-            relBoundingRectSet = true;
+        if(!fRelBoundingRectSet) {
+            fRelBoundingRectSet = true;
             updateRelBoundingRect();
         }
-        BoundingBox *parentBoxT = parentBox.data();
-        if(parentBoxT == nullptr || !parentIsTarget) return;
+        BoundingBox *parentBoxT = fParentBox.data();
+        if(parentBoxT == nullptr || !fParentIsTarget) return;
         parentBoxT->updateCurrentPreviewDataFromRenderData(this);
     }
+}
+
+bool BoundingBoxRenderData::nullifyBeforeProcessing() {
+    return fReason != BoundingBox::USER_CHANGE &&
+            fReason != BoundingBox::CHILD_USER_CHANGE;
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
@@ -229,8 +233,8 @@ ReplaceTransformDisplacementCustomizer::ReplaceTransformDisplacementCustomizer(
 
 void ReplaceTransformDisplacementCustomizer::customize(
         BoundingBoxRenderData* data) {
-    QMatrix transformT = data->transform;
-    data->transform.setMatrix(transformT.m11(), transformT.m12(),
+    QMatrix transformT = data->fTransform;
+    data->fTransform.setMatrix(transformT.m11(), transformT.m12(),
                               transformT.m21(), transformT.m22(),
                               mDx, mDy);
 }
@@ -242,8 +246,8 @@ MultiplyTransformCustomizer::MultiplyTransformCustomizer(
 }
 
 void MultiplyTransformCustomizer::customize(BoundingBoxRenderData *data) {
-    data->transform = mTransform*data->transform;
-    data->opacity *= mOpacity;
+    data->fTransform = mTransform*data->fTransform;
+    data->fOpacity *= mOpacity;
 }
 
 MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal &opacity) {
@@ -251,5 +255,5 @@ MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal &opacity) {
 }
 
 void MultiplyOpacityCustomizer::customize(BoundingBoxRenderData *data) {
-    data->opacity *= mOpacity;
+    data->fOpacity *= mOpacity;
 }

@@ -30,7 +30,7 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
     }
 
     void updateRelBoundingRect() {
-        relBoundingRect = QRectF(0., 0., image->width(), image->height());
+        fRelBoundingRect = QRectF(0., 0., image->width(), image->height());
     }
 
     sk_sp<SkImage> image;

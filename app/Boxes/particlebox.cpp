@@ -269,7 +269,7 @@ void Particle::generatePathNextFrame(const int &frame,
     SkPoint lastPos = mLastPos;
     linePath.moveTo(lastPos);
     while(currId > -1) {
-        SkPoint currPos = mParticleStates[currId].pos;
+        SkPoint currPos = mParticleStates[currId].fPos;
         SkScalar lenInc = pointToLen(lastPos - currPos);
         SkScalar newLen = currLen + lenInc;
         if(newLen > length) {
@@ -505,20 +505,20 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
                 ParticleState stateT;
                 if(!particle->getParticleStateAtFrameF(relFrame, stateT)) continue;
                 stdsptr<BoundingBoxRenderData> renderData = targetT->createRenderData();
-                QMatrix multMatr = QMatrix(stateT.size, 0.,
-                                           0., stateT.size,
-                                           0., 0.)*particleData->transform;
+                QMatrix multMatr = QMatrix(stateT.fSize, 0.,
+                                           0., stateT.fSize,
+                                           0., 0.)*particleData->fTransform;
                 renderData->appendRenderCustomizerFunctor(
                             SPtrCreate(MultiplyTransformCustomizer)(
-                                multMatr, stateT.opacity/255.));
+                                multMatr, stateT.fOpacity/255.));
                 renderData->appendRenderCustomizerFunctor(
                             SPtrCreate(ReplaceTransformDisplacementCustomizer)(
-                                stateT.pos.x(), stateT.pos.y()));
+                                stateT.fPos.x(), stateT.fPos.y()));
 
-                stateT.targetRenderData =
+                stateT.fTargetRenderData =
                         GetAsSPtr(renderData, BoundingBoxRenderData);
-                renderData->maxBoundsEnabled = false;
-                renderData->parentIsTarget = false;
+                renderData->fMaxBoundsEnabled = false;
+                renderData->fParentIsTarget = false;
                 data.particleStates << stateT;
                 renderData->addDependent(particleData.get());
                 renderData->scheduleTask();

@@ -26,7 +26,7 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
         SkPath totalPath;
         totalPath.addPath(fillPath);
         totalPath.addPath(outlinePath);
-        relBoundingRect = SkRectToQRectF(totalPath.computeTightBounds());
+        fRelBoundingRect = SkRectToQRectF(totalPath.computeTightBounds());
     }
     QPointF getCenterPosition() {
         return SkRectToQRectF(editPath.getBounds()).center();

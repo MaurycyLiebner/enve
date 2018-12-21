@@ -53,7 +53,7 @@ qsptr<BoundingBox> InternalLinkBox::createLinkForLinkGroup() {
 
 stdsptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
     stdsptr<BoundingBoxRenderData> renderData = getLinkTarget()->createRenderData();
-    renderData->parentBox = this;
+    renderData->fParentBox = this;
     return renderData;
 }
 
@@ -231,7 +231,7 @@ qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
 
 stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
     auto renderData = getLinkTarget()->createRenderData();
-    renderData->parentBox = this;
+    renderData->fParentBox = this;
     return renderData;
 }
 
@@ -307,19 +307,19 @@ bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) {
 }
 
 void LinkCanvasRenderData::renderToImage() {
-    if(renderedToImage) return;
-    renderedToImage = true;
+    if(fRenderedToImage) return;
+    fRenderedToImage = true;
     QMatrix scale;
-    scale.scale(resolution, resolution);
-    QMatrix transformRes = transform*scale;
+    scale.scale(fResolution, fResolution);
+    QMatrix transformRes = fTransform*scale;
     //transformRes.scale(resolution, resolution);
     QRectF globalBoundingRect =
-            transformRes.mapRect(relBoundingRect).
-            adjusted(-effectsMargin, -effectsMargin,
-                     effectsMargin, effectsMargin);
-    if(maxBoundsEnabled) {
+            transformRes.mapRect(fRelBoundingRect).
+            adjusted(-fEffectsMargin, -fEffectsMargin,
+                     fEffectsMargin, fEffectsMargin);
+    if(fMaxBoundsEnabled) {
         globalBoundingRect = globalBoundingRect.intersected(
-                    scale.mapRect(maxBoundsRect));
+                    scale.mapRect(fMaxBoundsRect));
     }
     QSizeF sizeF = globalBoundingRect.size();
     QPointF transF = globalBoundingRect.topLeft()/**resolution*/ -
@@ -352,7 +352,7 @@ void LinkCanvasRenderData::renderToImage() {
         SkPaint fillP;
         fillP.setAntiAlias(true);
         fillP.setColor(bgColor);
-        rasterCanvas->drawRect(QRectFToSkRect(relBoundingRect), fillP);
+        rasterCanvas->drawRect(QRectFToSkRect(fRelBoundingRect), fillP);
         rasterCanvas->restore();
     }
 
@@ -365,7 +365,7 @@ void LinkCanvasRenderData::renderToImage() {
         paintT.setColor(SK_ColorTRANSPARENT);
         paintT.setAntiAlias(true);
         SkPath path;
-        path.addRect(QRectFToSkRect(relBoundingRect));
+        path.addRect(QRectFToSkRect(fRelBoundingRect));
         path.toggleInverseFillType();
         rasterCanvas->drawPath(path, paintT);
         rasterCanvas->restore();
@@ -373,12 +373,12 @@ void LinkCanvasRenderData::renderToImage() {
     rasterCanvas->flush();
     delete rasterCanvas;
 
-    drawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
+    fDrawPos = SkPoint::Make(qRound(globalBoundingRect.left()),
                             qRound(globalBoundingRect.top()));
 
-    if(!pixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, pixmapEffects) {
-            effect->applyEffectsSk(bitmap, resolution);
+    if(!fPixmapEffects.isEmpty()) {
+        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
+            effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
     }

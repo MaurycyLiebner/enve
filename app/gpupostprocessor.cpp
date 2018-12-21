@@ -66,7 +66,7 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
 #include "Boxes/boundingboxrenderdata.h"
 BoxRenderDataScheduledPostProcess::BoxRenderDataScheduledPostProcess(
         const stdsptr<BoundingBoxRenderData>& boxData) : mBoxData(boxData) {
-    assert(boxData->renderedToImage);
+    assert(boxData->fRenderedToImage);
 }
 
 void BoxRenderDataScheduledPostProcess::afterProcessed() {

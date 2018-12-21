@@ -242,7 +242,7 @@ public:
                              childrenEffectsMargin);
             }
         }
-        data->effectsMargin += childrenEffectsMargin;
+        data->fEffectsMargin += childrenEffectsMargin;
     }
 
     BoxesGroup *getFinalTarget() {
