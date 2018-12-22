@@ -10,14 +10,13 @@
 RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
                                            const int &lastFrame) :
     QrealValueEffect("noise") {
-    mPeriod = SPtrCreate(QrealAnimator)(1., 999., 1., "period");
-    mPeriod->qra_setCurrentValue(10.);
+    mPeriod = SPtrCreate(QrealAnimator)(10., 1., 999., 1., "period");
     mPeriod->prp_setBlockedUpdater(
                 SPtrCreate(RandomQrealGeneratorUpdater)(this));
     ca_addChildAnimator(mPeriod);
     mSmoothness = QrealAnimator::create0to1Animator("smoothness");
     ca_addChildAnimator(mSmoothness);
-    mMaxDev = SPtrCreate(QrealAnimator)(0., 999., 1., "amplitude");
+    mMaxDev = SPtrCreate(QrealAnimator)(0., 0., 999., 1., "amplitude");
     ca_addChildAnimator(mMaxDev);
     mType = SPtrCreate(ComboBoxProperty)("type",
                 QStringList() << "add" << "subtract" << "overlay");

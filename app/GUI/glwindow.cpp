@@ -56,7 +56,7 @@ void GLWindow::resizeEvent(QResizeEvent *) {
 
 #include "glhelpers.h"
 #include "ColorWidgets/colorwidgetshaders.h"
-
+#include "gpurastereffect.h"
 void GLWindow::iniRasterEffectPrograms() {
     try {
         iniProgram(this, GL_BLUR_PROGRAM.fID,
@@ -96,6 +96,20 @@ void GLWindow::iniRasterEffectPrograms() {
         CheckInvalidLocation(GL_DOT_PROGRAM.fTranslateLoc, "translate");
     } catch(...) {
         RuntimeThrow("Error while initializing dots program.");
+    }
+
+    QDirIterator dirIt(QDir::homePath() + "/.AniVect/GPURasterEffects", QDirIterator::NoIteratorFlags);
+    while(dirIt.hasNext()) {
+        QString path = dirIt.next();
+        QFileInfo fileInfo(path);
+        if(!fileInfo.isFile()) continue;
+        if(fileInfo.suffix() != "gre") continue;
+        try {
+            GPURasterEffectCreator::sLoadFromFile(this, path);
+        } catch(...) {
+            QString errMsg = "Error while loading GPURasterEffect from '" + path + "'.";
+            RuntimeThrow(errMsg.toStdString());
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 #include "renderdatahandler.h"
 
 bool RenderDataHandler::removeItem(const stdsptr<BoundingBoxRenderData>& item) {
-    return removeItemAtRelFrame(item->relFrame);
+    return removeItemAtRelFrame(item->fRelFrame);
 }
 
 bool RenderDataHandler::removeItemAtRelFrame(const int &frame) {
@@ -22,7 +22,7 @@ BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int &frame) {
 }
 
 void RenderDataHandler::addItemAtRelFrame(const stdsptr<BoundingBoxRenderData>& item) {
-    int itemId = getItemInsertIdAtRelFrame(item->relFrame);
+    int itemId = getItemInsertIdAtRelFrame(item->fRelFrame);
     mItems.insert(itemId, item);
 }
 
@@ -33,7 +33,7 @@ int RenderDataHandler::getItemInsertIdAtRelFrame(const int &relFrame) {
     while(minId < maxId) {
         int guess = (minId + maxId)/2;
         stdsptr<BoundingBoxRenderData> item = mItems.at(guess);
-        int contFrame = item->relFrame;
+        int contFrame = item->fRelFrame;
         Q_ASSERT(contFrame != relFrame);
         if(contFrame > relFrame) {
             if(guess == maxId) {
@@ -57,22 +57,22 @@ bool RenderDataHandler::getItemIdAtRelFrame(const int &relFrame, int *id) {
     while(minId <= maxId) {
         int guess = (minId + maxId)/2;
         stdsptr<BoundingBoxRenderData> item = mItems.at(guess);
-        if(item->relFrame == relFrame) {
+        if(item->fRelFrame == relFrame) {
             *id = guess;
             return true;
         }
-        int contFrame = item->relFrame;
+        int contFrame = item->fRelFrame;
         if(contFrame > relFrame) {
             if(maxId == guess) {
                 *id = minId;
-                return mItems.at(minId)->relFrame == relFrame;
+                return mItems.at(minId)->fRelFrame == relFrame;
             } else {
                 maxId = guess;
             }
         } else if(contFrame < relFrame) {
             if(minId == guess) {
                 *id = maxId;
-                return mItems.at(maxId)->relFrame == relFrame;
+                return mItems.at(maxId)->fRelFrame == relFrame;
             } else {
                 minId = guess;
             }

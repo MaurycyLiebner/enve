@@ -25,6 +25,7 @@
 #include "GUI/paintboxsettingsdialog.h"
 #include "GUI/customfpsdialog.h"
 #include "Boxes/vectorpath.h"
+#include "gpurastereffect.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -131,6 +132,12 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_effects_contrast");
     effectsMenu->addAction("Brightness")->setObjectName(
                 "canvas_effects_brightness");
+
+    QMenu *gpuEffectsMenu = menu->addMenu("GPU Effects");
+    foreach(const auto& effect, GPURasterEffectCreator::sEffectCreators) {
+        auto newAction = gpuEffectsMenu->addAction(effect->fName);
+        newAction->setObjectName("canvas_gpu_effect");
+    }
 
     if(hasPathBox || hasGroups) {
         QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
@@ -309,6 +316,12 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction, QWidget* widget
                         paintBox->loadFromImage(img);
                     }
                 }
+            }
+        }
+    } else if(selectedAction->objectName() == "canvas_gpu_effect") {
+        foreach(const auto& effect, GPURasterEffectCreator::sEffectCreators) {
+            if(effect->fName == selectedAction->text()) {
+                applyGPURasterEffectToSelected(effect);
             }
         }
     } else {

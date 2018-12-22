@@ -1,4 +1,4 @@
-#ifndef PAINTSETTINGS_H
+﻿#ifndef PAINTSETTINGS_H
 #define PAINTSETTINGS_H
 
 #include "qrealanimator.h"
@@ -321,6 +321,6 @@ private:
             QPainter::CompositionMode_Source;
 
     qsptr<QrealAnimator> mLineWidth =
-            SPtrCreate(QrealAnimator)(0., 999., 1., "thickness");
+            SPtrCreate(QrealAnimator)(1., 0., 999., 1., "thickness");
 };
 #endif // PAINTSETTINGS_H

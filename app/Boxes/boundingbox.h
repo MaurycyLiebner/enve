@@ -29,7 +29,7 @@ class VectorPathEdge;
 class VectorPath;
 class DurationRectangle;
 struct BoxesGroupRenderData;
-
+struct GPURasterEffect;
 enum CanvasMode : short;
 
 enum BoundingBoxType {
@@ -229,10 +229,11 @@ public:
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
     template <class T>
     void addEffect() {
-        addEffect(T::template create<T>());
+        addEffect(T::template createSPtr<T>());
     }
 
     void addEffect(const qsptr<PixmapEffect> &effect);
+    void addGPUEffect(const qsptr<GPURasterEffect> &rasterEffect);
     void removeEffect(const qsptr<PixmapEffect> &effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
@@ -480,6 +481,7 @@ protected:
     qsptr<DurationRectangle> mDurationRectangle;
 
     qsptr<EffectAnimators> mEffectsAnimators;
+    qsptr<ComplexAnimator> mGPUEffectsAnimators;
     qsptr<BoxTransformAnimator> mTransformAnimator;
 
     QList<stdsptr<_ScheduledTask>> mScheduledTasks;

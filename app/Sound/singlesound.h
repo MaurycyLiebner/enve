@@ -1,4 +1,4 @@
-#ifndef SINGLESOUND_H
+﻿#ifndef SINGLESOUND_H
 #define SINGLESOUND_H
 #include "Animators/complexanimator.h"
 #include "Animators/qrealanimator.h"
@@ -66,7 +66,7 @@ private:
     FixedLenAnimationRect *mDurationRectangle = nullptr;
 
     qsptr<QrealAnimator> mVolumeAnimator =
-            SPtrCreate(QrealAnimator)(0., 200., 1., "volume");
+            SPtrCreate(QrealAnimator)(100., 0., 200., 1., "volume");
 };
 
 #endif // SINGLESOUND_H

@@ -474,7 +474,6 @@ StrokeSettings::StrokeSettings(GradientPoints *grdPts,
     PaintSettings(grdPts, parent, colorT,
                   paintTypeT, gradientT) {
     prp_setName("stroke");
-    mLineWidth->qra_setCurrentValue(1.);
 
     ca_addChildAnimator(mLineWidth);
 }

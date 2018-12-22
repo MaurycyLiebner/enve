@@ -51,7 +51,7 @@ public:
     }
 
     template <class T, typename... Args>
-    static inline std::shared_ptr<T> create(Args && ...arguments) {
+    static inline std::shared_ptr<T> createSPtr(Args && ...arguments) {
         return (new T(arguments...))->template iniRef<T>();
     }
 protected:

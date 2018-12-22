@@ -189,13 +189,14 @@ public:
     qreal getCurrentValueAtAbsFrameF(const qreal &frame);
 
     static auto create0to1Animator(const QString& name) {
-        auto anim = SPtrCreate(QrealAnimator)(0., 1., 0.01, name);
+        auto anim = SPtrCreate(QrealAnimator)(0., 0., 1., 0.01, name);
         anim->graphFixMinMaxValues();
         return anim;
     }
 protected:
     QrealAnimator(const QString& name);
-    QrealAnimator(const qreal &minVal,
+    QrealAnimator(const qreal &iniVal,
+                  const qreal &minVal,
                   const qreal &maxVal,
                   const qreal &prefferdStep,
                   const QString& name);
@@ -223,6 +224,31 @@ public slots:
     void prp_setRecording(const bool& rec);
 
     void anim_saveCurrentValueAsKey();
+};
+
+struct QrealAnimatorCreator : public PropertyCreator {
+    friend class StdSelfRef;
+    qreal fIniVal;
+    qreal fMinVal;
+    qreal fMaxVal;
+    qreal fStep;
+
+    qsptr<Property> create() const {
+        return SPtrCreate(QrealAnimator)(
+                    fIniVal, fMinVal, fMaxVal, fStep, fName);
+    }
+
+private:
+    QrealAnimatorCreator(const qreal &iniVal,
+                         const qreal &minVal,
+                         const qreal &maxVal,
+                         const qreal &prefferdStep,
+                         const QString& name) : PropertyCreator(name) {
+        fIniVal = iniVal;
+        fMinVal = minVal;
+        fMaxVal = maxVal;
+        fStep = prefferdStep;
+    }
 };
 
 #endif // VALUEANIMATORS_H

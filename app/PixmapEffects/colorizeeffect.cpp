@@ -22,7 +22,7 @@ ColorizeEffect::ColorizeEffect() :
 
     mSaturationAnimator = QrealAnimator::create0to1Animator("saturation");
 
-    mLightnessAnimator = SPtrCreate(QrealAnimator)(-1., 1., 0.01, "lightness");
+    mLightnessAnimator = SPtrCreate(QrealAnimator)(0., -1., 1., 0.01, "lightness");
 
     mAlphaAnimator = QrealAnimator::create0to1Animator("alpha");
 

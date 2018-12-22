@@ -134,7 +134,6 @@ SingleSound::SingleSound(const QString &path,
     prp_blockUpdater();
 
     ca_addChildAnimator(mVolumeAnimator);
-    mVolumeAnimator->qra_setCurrentValue(100);
 
     setFilePath(path);
 }

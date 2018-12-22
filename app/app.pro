@@ -251,7 +251,8 @@ SOURCES += main.cpp\
     exceptions.cpp \
     taskexecutor.cpp \
     taskscheduler.cpp \
-    colorhelpers.cpp
+    colorhelpers.cpp \
+    gpurastereffect.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -459,7 +460,8 @@ HEADERS  += \
     exceptions.h \
     taskexecutor.h \
     taskscheduler.h \
-    colorhelpers.h
+    colorhelpers.h \
+    gpurastereffect.h
 
 RESOURCES += \
     resources.qrc

@@ -4,8 +4,7 @@
 
 ImplodeEffect::ImplodeEffect() :
     PixmapEffect("implode", EFFECT_IMPLODE) {
-    mFactorAnimator = SPtrCreate(QrealAnimator)(0., 100., 1., "factor");
-    mFactorAnimator->qra_setCurrentValue(10.);
+    mFactorAnimator = SPtrCreate(QrealAnimator)(10., 0., 100., 1., "factor");
 
     ca_addChildAnimator(mFactorAnimator);
 }

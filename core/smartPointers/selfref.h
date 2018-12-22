@@ -46,7 +46,7 @@ public:
     }
 
     template <class T, typename... Args>
-    static inline QSharedPointer<T> create(Args && ...arguments) {
+    static inline QSharedPointer<T> createSPtr(Args && ...arguments) {
         return (new T(arguments...))->template iniRef<T>();
     }
 protected:

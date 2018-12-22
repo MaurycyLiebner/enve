@@ -13,11 +13,13 @@
 #include "randomqrealgenerator.h"
 #include "Animators/fakecomplexanimator.h"
 
-QrealAnimator::QrealAnimator(const qreal &minVal,
+QrealAnimator::QrealAnimator(const qreal &iniVal,
+                             const qreal &minVal,
                              const qreal &maxVal,
                              const qreal &prefferdStep,
                              const QString &name) :
     Animator(name) {
+    mCurrentValue = iniVal;
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
     mPrefferedValueStep = prefferdStep;

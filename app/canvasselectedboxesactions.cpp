@@ -137,6 +137,13 @@ void Canvas::setSelectedFontSize(const qreal &size) {
         box->setSelectedFontSize(size);
     }
 }
+#include "gpurastereffect.h"
+void Canvas::applyGPURasterEffectToSelected(
+        const stdsptr<GPURasterEffectCreator>& creator) {
+    Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
+        box->addGPUEffect(GetAsSPtr(creator->create(), GPURasterEffect));
+    }
+}
 
 void Canvas::applySampledMotionBlurToSelected() {
     Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {

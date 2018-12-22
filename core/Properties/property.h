@@ -275,4 +275,11 @@ protected:
     QString prp_mName = "";
 };
 
+struct PropertyCreator : public StdSelfRef {
+    PropertyCreator(const QString& name) : fName(name) {}
+
+    QString fName;
+    virtual qsptr<Property> create() const = 0;
+};
+
 #endif // PROPERTY_H

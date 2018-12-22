@@ -3,8 +3,7 @@
 #include "rastereffects.h"
 
 OilEffect::OilEffect() : PixmapEffect("oil", EFFECT_OIL) {
-    mRadiusAnimator = SPtrCreate(QrealAnimator)(1., 5., 0.5, "radius");
-    mRadiusAnimator->qra_setCurrentValue(2.);
+    mRadiusAnimator = SPtrCreate(QrealAnimator)(2., 1., 5., 0.5, "radius");
 
     ca_addChildAnimator(mRadiusAnimator);
 }

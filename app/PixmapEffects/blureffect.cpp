@@ -4,8 +4,7 @@
 #include "rastereffects.h"
 
 BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
-    mBlurRadius = SPtrCreate(QrealAnimator)(0., 999., 1., "radius");
-    mBlurRadius->qra_setCurrentValue(10.);
+    mBlurRadius = SPtrCreate(QrealAnimator)(10., 0., 999., 1., "radius");
 
     mHighQuality = SPtrCreate(BoolProperty)("high quality");
     mHighQuality->setValue(false);

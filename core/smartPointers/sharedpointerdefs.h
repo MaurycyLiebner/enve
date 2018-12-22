@@ -16,6 +16,6 @@ extern inline bool listContainsSharedPtr(Ptr ptr, List list) {
 #define GetAsPtr(baseObjT, derivedClassT) derivedClassT::getAsPtr<derivedClassT>(baseObjT)
 #define GetAsSPtr(baseObjT, derivedClassT) derivedClassT::getAsSPtr<derivedClassT>(baseObjT)
 
-#define SPtrCreate(classT) classT::create<classT>
+#define SPtrCreate(classT) classT::createSPtr<classT>
 
 #endif // SHAREDPOINTERDEFS_H

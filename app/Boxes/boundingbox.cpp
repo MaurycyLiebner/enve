@@ -15,6 +15,7 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "Animators/effectanimators.h"
 #include "Animators/transformanimator.h"
+#include "gpurastereffect.h"
 
 QList<qptr<BoundingBox>> BoundingBox::mLoadedBoxes;
 QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::mFunctionsWaitingForBoxLoad;
@@ -29,6 +30,12 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     mEffectsAnimators->prp_blockUpdater();
     ca_addChildAnimator(mEffectsAnimators);
     mEffectsAnimators->SWT_hide();
+
+    mGPUEffectsAnimators = SPtrCreate(ComplexAnimator)("gpu effects");
+    mGPUEffectsAnimators->prp_setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
+    mGPUEffectsAnimators->prp_blockUpdater();
+    ca_addChildAnimator(mGPUEffectsAnimators);
+    mGPUEffectsAnimators->SWT_hide();
 
     mType = type;
 
@@ -460,7 +467,7 @@ BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
     if(currentRenderData == nullptr && mExpiredPixmap == 0) {
         currentRenderData = mDrawRenderContainer->getSrcRenderData();
         if(currentRenderData == nullptr) return nullptr;
-//        if(currentRenderData->relFrame == relFrame) {
+//        if(currentRenderData->fRelFrame == relFrame) {
         if(!prp_differencesBetweenRelFramesIncludingInherited(
                     currentRenderData->fRelFrame, relFrame)) {
             auto copy = currentRenderData->makeCopy();
@@ -918,6 +925,16 @@ void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
 }
 
 bool BoundingBox::isAnimated() { return prp_isDescendantRecording(); }
+
+void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
+    if(mGPUEffectsAnimators->ca_getNumberOfChildren() == 0) {
+        mGPUEffectsAnimators->SWT_show();
+    }
+    mGPUEffectsAnimators->ca_addChildAnimator(rasterEffect);
+    //effect->setParentEffectAnimators(mGPUEffectsAnimators.data());
+
+    clearAllCache();
+}
 
 void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));

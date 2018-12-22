@@ -35,7 +35,6 @@ struct BlurProgram : public ShaderProgram {
 struct DotProgram : public ShaderProgram {
     GLint fDotRadiusLoc;
     GLint fDotDistanceLoc;
-    GLint fOnePixelLoc;
     GLint fTranslateLoc;
 };
 

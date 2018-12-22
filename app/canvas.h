@@ -23,6 +23,7 @@ class NodePoint;
 class UndoRedoStack;
 class ExternalLinkBox;
 class Bone;
+struct GPURasterEffectCreator;
 
 #define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? nullptr : (list).at( (index) ))
 
@@ -561,6 +562,9 @@ public:
 
     void blockUndoRedo();
     void unblockUndoRedo();
+
+    void applyGPURasterEffectToSelected(
+            const stdsptr<GPURasterEffectCreator> &creator);
 
     template <class T>
     void applyEffectToSelected() {
