@@ -23,7 +23,6 @@ QrealAnimator::QrealAnimator(const qreal &iniVal,
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
     mPrefferedValueStep = prefferdStep;
-    mCurrentValue = minVal;
 }
 
 QrealAnimator::QrealAnimator(const QString &name) : Animator(name) {}

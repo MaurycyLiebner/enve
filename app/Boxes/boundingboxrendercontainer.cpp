@@ -4,11 +4,12 @@
 #include "memoryhandler.h"
 #include "rendercachehandler.h"
 #include "GUI/mainwindow.h"
+#include "skia/skimagegpudraw.h"
 
 RenderContainer::~RenderContainer() {
 
 }
-#include "skimagegpudraw.h"
+
 void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
                              GrContext * const grContext) {
     if(mSrcRenderData == nullptr) return;
@@ -227,7 +228,7 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
     mMinRelFrame = minFrame;
     mMaxRelFrame = maxFrame;
 }
-#include "skimagegpudraw.h"
+#include "skia/skimagegpudraw.h"
 void CacheContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
                             GrContext * const grContext) {
     Q_UNUSED(paint);

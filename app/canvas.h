@@ -5,7 +5,7 @@
 #include "colorhelpers.h"
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "GUI/valueinput.h"
 #include "GUI/canvaswindow.h"
 #include "Animators/coloranimator.h"

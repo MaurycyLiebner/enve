@@ -2,7 +2,7 @@
 #define VIDEOENCODER_H
 #include <QString>
 #include <QList>
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "updatable.h"
 #include "renderinstancesettings.h"
 extern "C" {

@@ -21,7 +21,7 @@
 #define sqrt3     1.73205080757
 #define v2to2div3 1.58740105197
 #include <QtCore>
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 
 extern unsigned char truncateU8(const int &val);
 extern int clampInt(int val, int min, int max);

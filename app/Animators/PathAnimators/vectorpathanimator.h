@@ -1,7 +1,7 @@
 #ifndef VECTORPATHANIMATOR_H
 #define VECTORPATHANIMATOR_H
 #include "Animators/animator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "pointhelpers.h"
 #include "pathkey.h"
 

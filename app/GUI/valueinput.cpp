@@ -1,6 +1,6 @@
 #include "valueinput.h"
 #include <QPainter>
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "global.h"
 ValueInput::ValueInput() {
 

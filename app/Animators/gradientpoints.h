@@ -5,7 +5,7 @@ class GradientPoint;
 class MovablePoint;
 class PathBox;
 class QPointFAnimator;
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 class GradientPoints : public ComplexAnimator {
     friend class SelfRef;

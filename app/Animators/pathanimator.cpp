@@ -3,7 +3,7 @@
 #include "MovablePoints/nodepoint.h"
 #include "undoredo.h"
 #include "edge.h"
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 #include "canvas.h"
 #include "boolanimator.h"
 

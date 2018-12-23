@@ -1,7 +1,7 @@
 #ifndef QPOINTFANIMATOR_H
 #define QPOINTFANIMATOR_H
 #include "Animators/complexanimator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 class QPointFAnimator : public ComplexAnimator {
     friend class SelfRef;

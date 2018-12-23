@@ -1,7 +1,7 @@
 #ifndef PATHKEY_H
 #define PATHKEY_H
 #include "Animators/key.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 struct NodeSettings;
 class VectorPathAnimator;
 

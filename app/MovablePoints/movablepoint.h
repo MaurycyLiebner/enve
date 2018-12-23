@@ -4,7 +4,7 @@
 #include <QRectF>
 #include <QPainter>
 #include "Animators/qpointfanimator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
 
 class BoundingBox;

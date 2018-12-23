@@ -8,7 +8,7 @@
 #include "colorhelpers.h"
 #include <png++/png.hpp>
 #include <SkColorMatrixFilter.h>
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "updatable.h"
 
 struct Dab {

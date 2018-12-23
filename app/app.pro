@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += multimedia core gui svg opengl sql xml concurrent #widgets-private # gui-private core-private
+QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -lmypaint-2.0
 
 QMAKE_RPATHDIR += ../core/
@@ -125,10 +125,6 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/displayedgradientswidget.cpp \
     GUI/GradientWidgets/currentgradientwidget.cpp \
     filesourcescache.cpp \
-    skqtconversions.cpp \
-    AddInclude/SkStroke.cpp \
-    AddInclude/SkGeometry.cpp \
-    AddInclude/SkStrokerPriv.cpp \
     GUI/RenderWidgets/closablecontainer.cpp \
     GUI/RenderWidgets/renderdestinationdialog.cpp \
     PathEffects/patheffect.cpp \
@@ -162,7 +158,6 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
-    skimagecopy.cpp \
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
     application.cpp \
@@ -244,15 +239,14 @@ SOURCES += main.cpp\
     PropertyUpdaters/paintboxsizeupdaters.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
     PixmapEffects/rastereffects.cpp \
-    skimagegpudraw.cpp \
     gpupostprocessor.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
-    glhelpers.cpp \
-    exceptions.cpp \
     taskexecutor.cpp \
     taskscheduler.cpp \
     colorhelpers.cpp \
-    gpurastereffect.cpp
+    gpurastereffect.cpp \
+    Animators/qrealanimatorcreator.cpp \
+    Animators/gpueffectanimators.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -326,15 +320,6 @@ HEADERS  += \
     GUI/GradientWidgets/currentgradientwidget.h \
     filesourcescache.h \
     global.h \
-    skqtconversions.h \
-    AddInclude/SkStroke.h \
-    AddInclude/SkPaintDefaults.h \
-    AddInclude/SkGeometry.h \
-    AddInclude/SkStrokerPriv.h \
-    AddInclude/SkNx.h \
-    skiaincludes.h \
-    AddInclude/SkPathPriv.h \
-    skiadefines.h \
     GUI/RenderWidgets/closablecontainer.h \
     GUI/RenderWidgets/renderdestinationdialog.h \
     PathEffects/patheffect.h \
@@ -368,8 +353,6 @@ HEADERS  += \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/outputsettingsprofilesdialog.h \
     GUI/RenderWidgets/outputsettingsdisplaywidget.h \
-    AddInclude/SkPointPriv.h \
-    skimagecopy.h \
     Boxes/renderdatahandler.h \
     Boxes/boundingboxrenderdata.h \
     application.h \
@@ -453,15 +436,15 @@ HEADERS  += \
     PropertyUpdaters/paintboxsizeupdaters.h \
     PropertyUpdaters/groupallpathsupdater.h \
     PixmapEffects/rastereffects.h \
-    skimagegpudraw.h \
     gpupostprocessor.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
-    glhelpers.h \
-    exceptions.h \
     taskexecutor.h \
     taskscheduler.h \
     colorhelpers.h \
-    gpurastereffect.h
+    gpurastereffect.h \
+    Animators/qrealanimatorcreator.h \
+    Animators/intanimatorcreator.h \
+    Animators/gpueffectanimators.h
 
 RESOURCES += \
     resources.qrc

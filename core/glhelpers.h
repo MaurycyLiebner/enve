@@ -2,7 +2,7 @@
 #define GLHELPERS_H
 #include <QOpenGLFunctions_3_3_Core>
 typedef QOpenGLFunctions_3_3_Core QGL33c;
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 extern void assertNoGlErrors();
 extern void checkGlErrors(const std::string& msg = "");

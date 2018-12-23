@@ -4,6 +4,13 @@ IntAnimator::IntAnimator(const QString& name) : QrealAnimator(name) {
     setNumberDecimals(0);
 }
 
+IntAnimator::IntAnimator(const int &iniVal,
+                         const int &minVal,
+                         const int &maxVal,
+                         const int &prefferdStep,
+                         const QString &name) :
+    QrealAnimator(iniVal, minVal, maxVal, prefferdStep, name) {}
+
 int IntAnimator::getCurrentIntValue() const {
     return qRound(qra_getCurrentValue());
 }

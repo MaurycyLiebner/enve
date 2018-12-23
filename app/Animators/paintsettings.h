@@ -4,7 +4,7 @@
 #include "qrealanimator.h"
 #include "coloranimator.h"
 #include "colorhelpers.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
 
 enum PaintType : short {

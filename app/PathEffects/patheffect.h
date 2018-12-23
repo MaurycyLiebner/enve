@@ -7,7 +7,7 @@
 #include "Properties/boolproperty.h"
 #include "Properties/comboboxproperty.h"
 #include "Animators/intanimator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "Properties/boxtargetproperty.h"
 #include "smartPointers/sharedpointerdefs.h"
 class PathBox;

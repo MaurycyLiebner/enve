@@ -16,6 +16,11 @@ public:
     int getCurrentIntEffectiveValueAtRelFrameF(const qreal &relFrame) const;
 protected:
     IntAnimator(const QString& name);
+    IntAnimator(const int &iniVal,
+                const int &minVal,
+                const int &maxVal,
+                const int &prefferdStep,
+                const QString& name);
 };
 
 #endif // INTANIMATOR_H

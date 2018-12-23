@@ -1,7 +1,7 @@
 #include "patheffect.h"
 #include "pointhelpers.h"
 #include "pathoperations.h"
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 #include "patheffectanimators.h"
 #include <QDrag>
 

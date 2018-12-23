@@ -3,7 +3,7 @@
 class PathEffect;
 class BoundingBox;
 #include "Animators/complexanimator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 class PathBox;
 
 class PathEffectAnimators : public ComplexAnimator {

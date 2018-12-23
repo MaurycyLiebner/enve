@@ -2,7 +2,7 @@
 #include "boundingbox.h"
 #include "PixmapEffects/rastereffects.h"
 #include "gpupostprocessor.h"
-#include "skimagecopy.h"
+#include "skia/skimagecopy.h"
 #include "PixmapEffects/pixmapeffect.h"
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {

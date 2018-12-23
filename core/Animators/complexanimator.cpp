@@ -32,6 +32,7 @@ int ComplexAnimator::ca_getNumberOfChildren() {
 }
 
 Property *ComplexAnimator::ca_getChildAt(const int &i) {
+    Q_ASSERT(i >= 0 && i < ca_mChildAnimators.count());
     return ca_mChildAnimators.at(i).data();
 }
 #include <QDebug>

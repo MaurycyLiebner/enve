@@ -7,7 +7,7 @@
 #include "Boxes/boundingbox.h"
 #include "Animators/qpointfanimator.h"
 #include "MovablePoints/animatedpoint.h"
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     ComplexAnimator("transformation") {

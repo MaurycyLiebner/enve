@@ -3,7 +3,7 @@
 
 #include "Animators/complexanimator.h"
 #include "boundingboxrendercontainer.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "renderdatahandler.h"
 #include "smartPointers/sharedpointerdefs.h"
 #include "colorhelpers.h"
@@ -20,6 +20,7 @@ class PaintSettings;
 class StrokeSettings;
 class PaintSetting;
 class EffectAnimators;
+class GPUEffectAnimators;
 class PixmapEffect;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
@@ -409,6 +410,8 @@ public:
     int prp_getRelFrameShift() const;
     virtual void setupEffectsF(const qreal &relFrame,
                                BoundingBoxRenderData* data);
+    virtual void setupGPUEffectsF(const qreal &relFrame,
+                                  BoundingBoxRenderData *data);
 
     void addLinkingBox(BoundingBox *box);
 
@@ -481,7 +484,7 @@ protected:
     qsptr<DurationRectangle> mDurationRectangle;
 
     qsptr<EffectAnimators> mEffectsAnimators;
-    qsptr<ComplexAnimator> mGPUEffectsAnimators;
+    qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
     qsptr<BoxTransformAnimator> mTransformAnimator;
 
     QList<stdsptr<_ScheduledTask>> mScheduledTasks;

@@ -1,7 +1,7 @@
 #include "pathkey.h"
 #include "vectorpathanimator.h"
 #include "GUI/mainwindow.h"
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 
 PathKey::PathKey(VectorPathAnimator* parentAnimator) :
     Key(parentAnimator) {

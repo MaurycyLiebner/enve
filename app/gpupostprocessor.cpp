@@ -1,7 +1,7 @@
 #include "gpupostprocessor.h"
 #include <QImage>
 #include <QOpenGLTexture>
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 
 GpuPostProcessor::GpuPostProcessor() {}
 
@@ -21,7 +21,7 @@ void GpuPostProcessor::initialize() {
 ScheduledPostProcess::ScheduledPostProcess() {}
 
 ShaderPostProcess::ShaderPostProcess(const sk_sp<SkImage> &srcImg,
-                                     const stdsptr<ShaderProgramCallerBase> &program,
+                                     const stdsptr<GPURasterEffectCaller> &program,
                                      const ShaderFinishedFunc &finishedFunc) :
     mProgram(program),
     mFinishedFunc(finishedFunc),
@@ -47,7 +47,8 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
     frameBufferObject.gen(this, srcWidth, srcHeight);
 
     glClear(GL_COLOR_BUFFER_BIT);
-    mProgram->use(this);
+    QJSEngine engine;
+    mProgram->use(this, engine);
     glActiveTexture(GL_TEXTURE0);
     srcTexture.bind(this);
 
@@ -71,7 +72,6 @@ BoxRenderDataScheduledPostProcess::BoxRenderDataScheduledPostProcess(
 
 void BoxRenderDataScheduledPostProcess::afterProcessed() {
     mBoxData->finishedProcessing();
-    mBoxData->fGpuFinished = false;
 }
 
 void BoxRenderDataScheduledPostProcess::process(
@@ -83,6 +83,14 @@ void BoxRenderDataScheduledPostProcess::process(
     if(!srcImage) return;
     int srcWidth = srcImage->width();
     int srcHeight = srcImage->height();
+
+    QJSEngine engine;
+    engine.evaluate("_texSize = [" + QString::number(srcWidth) + "," +
+                    QString::number(srcHeight) + "]");
+    QPointF gPos = mBoxData->fGlobalBoundingRect.topLeft();
+    engine.evaluate("_gPos = [" + QString::number(gPos.x()) + "," +
+                    QString::number(gPos.y()) + "]");
+
     glViewport(0, 0, srcWidth, srcHeight);
     SkPixmap pix;
     srcImage->peekPixels(&pix);
@@ -92,26 +100,25 @@ void BoxRenderDataScheduledPostProcess::process(
     TextureFrameBuffer frameBufferObject;
     frameBufferObject.gen(this, srcWidth, srcHeight);
 
-    for(int i = 0; i < mBoxData->fGpuShaders.count(); i++) {
-        const auto& program = mBoxData->fGpuShaders.at(i);
+    for(int i = 0; i < mBoxData->fGPUEffects.count(); i++) {
+        const auto& program = mBoxData->fGPUEffects.at(i);
         glClear(GL_COLOR_BUFFER_BIT);
-        program->use(this);
+        program->setGlobalPos(gPos);
+        program->use(this, engine);
         glActiveTexture(GL_TEXTURE0);
         srcTexture.bind(this);
 
         glBindVertexArray(texturedSquareVAO);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        if(i == mBoxData->fGpuShaders.count() - 1) break;
+        if(i == mBoxData->fGPUEffects.count() - 1) break;
         frameBufferObject.swapTexture(this, srcTexture);
     }
-    mBoxData->fGpuShaders.clear();
+    mBoxData->fGPUEffects.clear();
 
     frameBufferObject.bindTexture(this);
     mBoxData->renderedImage = frameBufferObject.toImage();
     frameBufferObject.deleteFrameBuffer(this);
     frameBufferObject.deleteTexture(this);
     srcTexture.deleteTexture(this);
-
-    mBoxData->fGpuFinished = true;
 }

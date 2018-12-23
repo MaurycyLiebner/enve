@@ -4,7 +4,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 class NodePoint;
 class CtrlPoint;
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 class VectorPathEdge : public StdSelfRef {
 public:

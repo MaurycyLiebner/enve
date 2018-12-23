@@ -2,7 +2,7 @@
 #define GLWIDGET_H
 #include <QOpenGLWidget>
 #include "colorhelpers.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "glhelpers.h"
 class Gradient;
 

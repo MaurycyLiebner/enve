@@ -2,7 +2,7 @@
 #define TRANSFORMANIMATOR_H
 #include <QMatrix>
 #include "Animators/complexanimator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 class BoundingBox;
 class TransformUpdater;

@@ -15,7 +15,7 @@ void Property::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
     emit prp_absFrameRangeChanged(minFrame, maxFrame);
 }
 
-const QString &Property::prp_getName() {
+const QString &Property::prp_getName() const {
     return prp_mName;
 }
 

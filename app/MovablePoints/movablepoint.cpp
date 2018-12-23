@@ -3,7 +3,7 @@
 #include "global.h"
 #include "undoredo.h"
 #include "Boxes/boxesgroup.h"
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 #include "pointhelpers.h"
 #include "Animators/transformanimator.h"
 

@@ -1,6 +1,6 @@
 #ifndef BOUNDINGBOXRENDERDATA_H
 #define BOUNDINGBOXRENDERDATA_H
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 #include <QWeakPointer>
 #include "updatable.h"
@@ -9,6 +9,7 @@
 struct PixmapEffectRenderData;
 class BoundingBox;
 class ShaderProgramCallerBase;
+class GPURasterEffectCaller;
 #include "smartPointers/sharedpointerdefs.h"
 
 class RenderDataCustomizerFunctor;
@@ -24,10 +25,9 @@ struct BoundingBoxRenderData : public _ScheduledTask {
 
     // gpu
     bool needsGpuProcessing() const {
-        return !fGpuShaders.isEmpty();
+        return !fGPUEffects.isEmpty();
     }
-    bool fGpuFinished = false;
-    QList<stdsptr<ShaderProgramCallerBase>> fGpuShaders;
+    QList<stdsptr<GPURasterEffectCaller>> fGPUEffects;
     // gpu
 
 

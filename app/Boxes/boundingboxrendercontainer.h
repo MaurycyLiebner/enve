@@ -2,8 +2,8 @@
 #define BOUNDINGBOXRENDERCONTAINER_H
 class BoundingBox;
 #include "smartPointers/sharedpointerdefs.h"
-#include "skqtconversions.h"
-#include "skiaincludes.h"
+#include "skia/skqtconversions.h"
+#include "skia/skiaincludes.h"
 #include <QDebug>
 #include "smartPointers/sharedpointerdefs.h"
 #include "updatable.h"

@@ -4,71 +4,9 @@
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include "smartPointers/stdselfref.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "glhelpers.h"
-
-
-class ShaderProgramCallerBase : public StdSelfRef {
-public:
-    ShaderProgramCallerBase() {}
-    virtual void use(QGL33c * const gl) = 0;
-};
-
-template<class T>
-class ShaderProgramCaller : public ShaderProgramCallerBase {
-    static_assert(std::is_base_of<ShaderProgram, T>::value,
-                  "No valid ShaderProgram derived class associated with ShaderProgramCaller.");
-public:
-    ShaderProgramCaller(const T * const program) :
-        mProgram(program) {}
-protected:
-    const T * const mProgram = nullptr;
-};
-
-class BlurProgramCaller : public ShaderProgramCaller<BlurProgram> {
-public:
-    BlurProgramCaller(const qreal& blurSize, const QSize& texSize) :
-        ShaderProgramCaller(&GL_BLUR_PROGRAM) {
-        mBlurRadiusX = static_cast<GLfloat>(blurSize/texSize.width());
-        mBlurRadiusY = static_cast<GLfloat>(blurSize/texSize.height());
-    }
-
-    void use(QGL33c * const gl) {
-        gl->glUseProgram(mProgram->fID);
-        gl->glUniform2f(mProgram->fBlurRadiusLoc, mBlurRadiusX, mBlurRadiusY);
-    }
-private:
-    GLfloat mBlurRadiusX;
-    GLfloat mBlurRadiusY;
-};
-#include <QMatrix4x4>
-class DotProgramCaller : public ShaderProgramCaller<DotProgram> {
-public:
-    DotProgramCaller(const qreal& dotRadius,
-                     const qreal& dotDistance,
-                     const QPointF& transform) :
-        ShaderProgramCaller(&GL_DOT_PROGRAM) {
-        mDotRadius = static_cast<GLfloat>(dotRadius);
-        mDotDistance = static_cast<GLfloat>(dotDistance);
-        mTranslateX = static_cast<GLfloat>(transform.x());
-        mTranslateY = static_cast<GLfloat>(transform.y());
-    }
-
-    void use(QGL33c * const gl) {
-        gl->glUseProgram(mProgram->fID);
-        gl->glUniform1f(mProgram->fDotRadiusLoc,
-                        mDotRadius);
-        gl->glUniform1f(mProgram->fDotDistanceLoc,
-                        mDotDistance);
-        gl->glUniform2f(mProgram->fTranslateLoc,
-                        mTranslateX, mTranslateY);
-    }
-private:
-    GLfloat mDotRadius;
-    GLfloat mDotDistance;
-    GLfloat mTranslateX;
-    GLfloat mTranslateY;
-};
+#include "gpurastereffect.h"
 
 class ScheduledPostProcess : public StdSelfRef,
         protected QGL33c {
@@ -86,10 +24,10 @@ typedef std::function<void(sk_sp<SkImage>)> ShaderFinishedFunc;
 class ShaderPostProcess : public ScheduledPostProcess {
 public:
     ShaderPostProcess(const sk_sp<SkImage>& srcImg,
-                      const stdsptr<ShaderProgramCallerBase> &program,
+                      const stdsptr<GPURasterEffectCaller> &program,
                       const ShaderFinishedFunc& finishedFunc = ShaderFinishedFunc());
 private:
-    const stdsptr<ShaderProgramCallerBase> mProgram;
+    const stdsptr<GPURasterEffectCaller> mProgram;
     //! @brief Gets called after processing finished, provides resulting image.
     const ShaderFinishedFunc mFinishedFunc;
     sk_sp<SkImage> mSrcImage;

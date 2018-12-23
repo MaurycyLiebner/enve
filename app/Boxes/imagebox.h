@@ -1,7 +1,7 @@
 #ifndef IMAGEBOX_H
 #define IMAGEBOX_H
 #include "Boxes/boundingbox.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 class FileCacheHandler;
 class ImageCacheHandler;
 

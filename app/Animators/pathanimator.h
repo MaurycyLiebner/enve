@@ -2,7 +2,7 @@
 #define PATHANIMATOR_H
 #include <QPainterPath>
 #include "Animators/complexanimator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 enum CanvasMode : short;
 

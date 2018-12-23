@@ -6,7 +6,7 @@
 #include <QRectF>
 #include <QPainter>
 #include "Animators/qpointfanimator.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 class BoundingBox;
 class NodePoint;

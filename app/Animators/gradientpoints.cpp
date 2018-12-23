@@ -1,6 +1,6 @@
 #include "gradientpoints.h"
 #include "MovablePoints/gradientpoint.h"
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 #include "Boxes/pathbox.h"
 
 GradientPoints::GradientPoints(PathBox *parentT) :

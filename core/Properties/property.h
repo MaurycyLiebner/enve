@@ -3,13 +3,13 @@
 class UndoRedo;
 class MainWindow;
 #include "singlewidgettarget.h"
+#include "glhelpers.h"
 
 class ComplexAnimator;
 class Key;
 class QPainter;
 class PropertyUpdater;
 class UndoRedoStack;
-
 class InternalMimeData : public QMimeData {
 public:
     enum Type : short {
@@ -141,7 +141,7 @@ public:
         Q_UNUSED(target);
     }
 
-    const QString &prp_getName();
+    const QString &prp_getName() const;
     void prp_setName(const QString &newName);
 
     virtual void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
@@ -273,13 +273,6 @@ protected:
     int prp_mParentFrameShift = 0;
     stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName = "";
-};
-
-struct PropertyCreator : public StdSelfRef {
-    PropertyCreator(const QString& name) : fName(name) {}
-
-    QString fName;
-    virtual qsptr<Property> create() const = 0;
 };
 
 #endif // PROPERTY_H

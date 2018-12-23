@@ -2,7 +2,7 @@
 #define DRAWPATH_H
 #include <QPainterPath>
 #include <QPainterPathStroker>
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 class DrawPath {
 public:

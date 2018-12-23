@@ -58,46 +58,6 @@ void GLWindow::resizeEvent(QResizeEvent *) {
 #include "ColorWidgets/colorwidgetshaders.h"
 #include "gpurastereffect.h"
 void GLWindow::iniRasterEffectPrograms() {
-    try {
-        iniProgram(this, GL_BLUR_PROGRAM.fID,
-                   GL_TEXTURED_VERT,
-                   "/home/ailuropoda/Dev/AniVect/src/shaders/blur.frag");
-        glUseProgram(GL_BLUR_PROGRAM.fID);
-
-        GLint texLocation = glGetUniformLocation(GL_BLUR_PROGRAM.fID, "texture");
-        glUniform1i(texLocation, 0);
-        CheckInvalidLocation(texLocation, "texture");
-
-        GL_BLUR_PROGRAM.fBlurRadiusLoc =
-                glGetUniformLocation(GL_BLUR_PROGRAM.fID, "blurRadius");
-        CheckInvalidLocation(GL_BLUR_PROGRAM.fBlurRadiusLoc, "blurRadius");
-    } catch(...) {
-        RuntimeThrow("Error while initializing blur program.");
-    }
-
-    try {
-        iniProgram(this, GL_DOT_PROGRAM.fID,
-                   GL_TEXTURED_VERT,
-                   "/home/ailuropoda/Dev/AniVect/src/shaders/dots.frag");
-        glUseProgram(GL_DOT_PROGRAM.fID);
-
-        GLint texLocation = glGetUniformLocation(GL_DOT_PROGRAM.fID, "texture");
-        glUniform1i(texLocation, 0);
-        CheckInvalidLocation(texLocation, "texture");
-
-        GL_DOT_PROGRAM.fDotRadiusLoc =
-                glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotRadius");
-        CheckInvalidLocation(GL_DOT_PROGRAM.fDotRadiusLoc, "dotRadius");
-        GL_DOT_PROGRAM.fDotDistanceLoc =
-                glGetUniformLocation(GL_DOT_PROGRAM.fID, "dotDistance");
-        CheckInvalidLocation(GL_DOT_PROGRAM.fDotDistanceLoc, "dotDistance");
-        GL_DOT_PROGRAM.fTranslateLoc =
-                glGetUniformLocation(GL_DOT_PROGRAM.fID, "translate");
-        CheckInvalidLocation(GL_DOT_PROGRAM.fTranslateLoc, "translate");
-    } catch(...) {
-        RuntimeThrow("Error while initializing dots program.");
-    }
-
     QDirIterator dirIt(QDir::homePath() + "/.AniVect/GPURasterEffects", QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) {
         QString path = dirIt.next();

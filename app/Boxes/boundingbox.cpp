@@ -7,13 +7,14 @@
 #include "singlewidgetabstraction.h"
 #include "durationrectangle.h"
 #include "pointhelpers.h"
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 #include "global.h"
 #include "MovablePoints/movablepoint.h"
 #include "PropertyUpdaters/pixmapeffectupdater.h"
 #include "taskscheduler.h"
 #include "PixmapEffects/pixmapeffect.h"
 #include "Animators/effectanimators.h"
+#include "Animators/gpueffectanimators.h"
 #include "Animators/transformanimator.h"
 #include "gpurastereffect.h"
 
@@ -31,7 +32,7 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ca_addChildAnimator(mEffectsAnimators);
     mEffectsAnimators->SWT_hide();
 
-    mGPUEffectsAnimators = SPtrCreate(ComplexAnimator)("gpu effects");
+    mGPUEffectsAnimators = SPtrCreate(GPUEffectAnimators)(this);
     mGPUEffectsAnimators->prp_setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     mGPUEffectsAnimators->prp_blockUpdater();
     ca_addChildAnimator(mGPUEffectsAnimators);
@@ -454,7 +455,7 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
 BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(
         const int& relFrame, const UpdateReason& reason) {
     auto renderData = createRenderData();
-    if(renderData == nullptr) return nullptr;
+    Q_ASSERT(renderData);
     renderData->fRelFrame = relFrame;
     renderData->fReason = reason;
     mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
@@ -712,6 +713,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     data->fMaxBoundsRect = parentCanvas->getMaxBoundsRect();
     if(data->fOpacity > 0.001 && effectsVisible) {
         setupEffectsF(relFrame, data);
+        setupGPUEffectsF(relFrame, data);
     }
     if(data->fParentIsTarget && !data->nullifyBeforeProcessing()) {
         nullifyCurrentRenderData(data->fRelFrame);
@@ -723,6 +725,11 @@ stdsptr<BoundingBoxRenderData> BoundingBox::createRenderData() { return nullptr;
 void BoundingBox::setupEffectsF(const qreal &relFrame,
                                 BoundingBoxRenderData *data) {
     mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
+}
+
+void BoundingBox::setupGPUEffectsF(const qreal &relFrame,
+                                   BoundingBoxRenderData *data) {
+    mGPUEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
 
 void BoundingBox::addLinkingBox(BoundingBox *box) {

@@ -2,7 +2,7 @@
 #include "GUI/mainwindow.h"
 #include "MovablePoints/gradientpoint.h"
 #include "Animators/gradientpoints.h"
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
 #include "canvas.h"

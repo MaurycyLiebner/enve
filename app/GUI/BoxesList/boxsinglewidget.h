@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QMimeData>
 #include <QComboBox>
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
 class QrealAnimatorValueSlider;
 class DurationRectangleMovable;

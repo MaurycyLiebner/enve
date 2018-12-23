@@ -226,29 +226,4 @@ public slots:
     void anim_saveCurrentValueAsKey();
 };
 
-struct QrealAnimatorCreator : public PropertyCreator {
-    friend class StdSelfRef;
-    qreal fIniVal;
-    qreal fMinVal;
-    qreal fMaxVal;
-    qreal fStep;
-
-    qsptr<Property> create() const {
-        return SPtrCreate(QrealAnimator)(
-                    fIniVal, fMinVal, fMaxVal, fStep, fName);
-    }
-
-private:
-    QrealAnimatorCreator(const qreal &iniVal,
-                         const qreal &minVal,
-                         const qreal &maxVal,
-                         const qreal &prefferdStep,
-                         const QString& name) : PropertyCreator(name) {
-        fIniVal = iniVal;
-        fMinVal = minVal;
-        fMaxVal = maxVal;
-        fStep = prefferdStep;
-    }
-};
-
 #endif // VALUEANIMATORS_H

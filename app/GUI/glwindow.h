@@ -5,7 +5,7 @@
 #include "glhelpers.h"
 #include <string>
 
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>

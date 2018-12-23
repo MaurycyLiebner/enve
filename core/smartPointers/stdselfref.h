@@ -60,7 +60,7 @@ protected:
     }
 
     template<class T>
-    inline std::shared_ptr<T> ref() {
+    inline std::shared_ptr<T> ref() const {
         Q_ASSERT_X(!mThisWeak.expired(), "StdSelfRef::ref",
                    "Called before initialization");
         return std::static_pointer_cast<T>(
@@ -68,7 +68,7 @@ protected:
     }
 
     template<class T>
-    inline std::weak_ptr<T> weakRef() {
+    inline std::weak_ptr<T> weakRef() const {
         return ref<T>();
     }
 

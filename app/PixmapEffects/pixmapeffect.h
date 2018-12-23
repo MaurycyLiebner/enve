@@ -1,6 +1,6 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
-#include "skiaincludes.h"
+#include "skia/skiaincludes.h"
 #include "Animators/complexanimator.h"
 #include <QMimeData>
 #include <QPointF>

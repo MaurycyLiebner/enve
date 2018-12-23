@@ -69,7 +69,7 @@ qreal minSquareDistanceSum(const QPointF &p0,
     }
     return errorSquaredSum;
 }
-#include "skqtconversions.h"
+#include "skia/skqtconversions.h"
 void DrawPath::updateFittedPath() {
     QPointF p0;
     QPointF p3;
