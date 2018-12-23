@@ -198,9 +198,7 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
     }
     program.fGPosLoc = gl->glGetUniformLocation(program.fID, "_gPos");
     program.fUniformCreators = uniCs;
-    assertNoGlErrors();
     program.fTexLocation = gl->glGetUniformLocation(program.fID, "texture");
-    assertNoGlErrors();
     CheckInvalidLocation(program.fTexLocation, "texture");
 
     auto rasterEffectCreator = SPtrCreate(GPURasterEffectCreator)(effectName);
