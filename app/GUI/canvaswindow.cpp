@@ -546,7 +546,6 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         MainWindow::getInstance()->decBrushRadius();
     }
 
-    callUpdateSchedulers();
     return true;
 }
 

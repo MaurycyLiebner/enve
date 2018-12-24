@@ -464,11 +464,11 @@ void KeysView::graphClearAnimatorSelection() {
 
 void KeysView::graphDeletePressed() {
     if(mCurrentPoint != nullptr) {
-            QrealKey *key = mCurrentPoint->getParentKey();
-            if(mCurrentPoint->isEndPoint()) {
-                key->setEndEnabled(false);
-            } else if(mCurrentPoint->isStartPoint()) {
-                key->setStartEnabled(false);
+        QrealKey *key = mCurrentPoint->getParentKey();
+        if(mCurrentPoint->isEndPoint()) {
+            key->setEndEnabled(false);
+        } else if(mCurrentPoint->isStartPoint()) {
+            key->setStartEnabled(false);
             }
     } else {
         QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
@@ -630,7 +630,6 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete) {
         graphDeletePressed();
-        mMainWindow->queScheduledTasksAndUpdate();
     } else if(event->key() == Qt::Key_0 &&
               event->modifiers() & Qt::KeypadModifier) {
         graphResetValueScaleAndMinShownAction();
