@@ -992,7 +992,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         return QMainWindow::eventFilter(obj, e);
     }
     QWidget *focusWidget = QApplication::focusWidget();
-    if(focusWidget != nullptr) {
+    if(focusWidget) {
         if(focusWidget->property("forceHandleEvent").isValid()) return false;
     }
     if(e->type() == QEvent::KeyPress) {
@@ -1024,12 +1024,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
              keyEvent->key() == Qt::Key_Delete*/) {
               return processKeyEvent(keyEvent);
         } else if(keyEvent->key() == Qt::Key_Delete) {
-            if(focusWidget != nullptr) {
-                mEventFilterDisabled = true;
-                bool widHandled = QCoreApplication::sendEvent(focusWidget, keyEvent);
-                mEventFilterDisabled = false;
-                if(widHandled) return QMainWindow::eventFilter(obj, e);
-            }
+//            if(focusWidget) {
+//                mEventFilterDisabled = true;
+//                bool widHandled = QCoreApplication::sendEvent(focusWidget, keyEvent);
+//                focusWidget->setParent(nullptr);
+//                focusWidget->show();
+//                mEventFilterDisabled = false;
+//                if(widHandled) return false;
+//            }
             return processKeyEvent(keyEvent);
         }
     } else if(e->type() == QEvent::KeyRelease) {
