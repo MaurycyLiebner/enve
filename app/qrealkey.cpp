@@ -240,6 +240,10 @@ void QrealKey::finishValueTransform() {
     }
 }
 
+void QrealKey::afterKeyChanged() {
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
 void QrealKey::startValueTransform() {
     mSavedValue = mValue;
 }
@@ -321,7 +325,7 @@ qreal QrealKey::getEndValueFrame() {
     return mRelFrame;
 }
 
-void QrealKey::makeStarAndEndSmooth() {
+void QrealKey::makeStartAndEndSmooth() {
     qreal nextKeyVal = getNextKeyValue();
     qreal prevKeyVal = getPrevKeyValue();
     int nextKeyFrame = getNextKeyRelFrame();

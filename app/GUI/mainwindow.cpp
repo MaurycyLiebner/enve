@@ -1020,19 +1020,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             }
         } else if(
              keyEvent->key() == Qt::Key_A ||
-             keyEvent->key() == Qt::Key_I/* ||
-             keyEvent->key() == Qt::Key_Delete*/) {
+             keyEvent->key() == Qt::Key_I ||
+             keyEvent->key() == Qt::Key_Delete) {
               return processKeyEvent(keyEvent);
-        } else if(keyEvent->key() == Qt::Key_Delete) {
-//            if(focusWidget) {
-//                mEventFilterDisabled = true;
-//                bool widHandled = QCoreApplication::sendEvent(focusWidget, keyEvent);
-//                focusWidget->setParent(nullptr);
-//                focusWidget->show();
-//                mEventFilterDisabled = false;
-//                if(widHandled) return false;
-//            }
-            return processKeyEvent(keyEvent);
         }
     } else if(e->type() == QEvent::KeyRelease) {
         //finishUndoRedoSet();

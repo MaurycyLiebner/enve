@@ -46,7 +46,7 @@ public:
     qreal getStartValueFrame();
     qreal getEndValueFrame();
 
-    void makeStarAndEndSmooth();
+    void makeStartAndEndSmooth();
 
     virtual void setStartEnabled(const bool &bT);
     virtual void setEndEnabled(const bool &bT);
@@ -105,6 +105,8 @@ public:
         mSavedStartFrame = mStartFrame;
         mSavedEndFrame = mEndFrame;
     }
+
+    void afterKeyChanged();
 protected:
     bool mStartEnabled = false;
     bool mEndEnabled = false;

@@ -765,8 +765,6 @@ void KeysView::removeKeyFromSelection(Key *key) {
 
 void KeysView::clearKeySelection() {
     Q_FOREACH(Key *key, mSelectedKeys) {
-        key->setSelected(false);
+        key->removeFromSelection(mSelectedKeys, mSelectedAnimators);
     }
-    mSelectedAnimators.clear();
-    mSelectedKeys.clear();
 }

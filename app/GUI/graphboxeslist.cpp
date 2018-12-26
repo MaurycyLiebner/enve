@@ -7,19 +7,19 @@
 #include "global.h"
 #include "qrealkey.h"
 
-void KeysView::graphSetSmoothCtrl() {
+void KeysView::graphSetSmoothCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void KeysView::graphSetSymmetricCtrl() {
+void KeysView::graphSetSymmetricCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void KeysView::graphSetCornerCtrl() {
+void KeysView::graphSetCornerCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_CORNER);
     mMainWindow->queScheduledTasksAndUpdate();
@@ -68,7 +68,7 @@ void KeysView::getSelectedSegments(QList<QList<QrealKey*>>& segments) {
     }
 }
 
-void KeysView::graphMakeSegmentsSmooth(const bool& smooth) {
+void KeysView::graphMakeSegmentsSmoothAction(const bool& smooth) {
     if(mSelectedKeys.isEmpty()) return;
     QList<QList<QrealKey*>> segments;
     getSelectedSegments(segments);
@@ -78,27 +78,30 @@ void KeysView::graphMakeSegmentsSmooth(const bool& smooth) {
         auto firstKey = segment.first();
         auto lastKey = segment.last();
         firstKey->setEndEnabled(smooth);
-        if(smooth) firstKey->makeStarAndEndSmooth();
+        if(smooth) firstKey->makeStartAndEndSmooth();
+        //firstKey->keyChanged();
         for(int i = 1; i < segment.length() - 1; i++) {
             auto innerKey = segment.at(i);
             innerKey->setEndEnabled(smooth);
             innerKey->setStartEnabled(smooth);
-            if(smooth) innerKey->makeStarAndEndSmooth();
+            if(smooth) innerKey->makeStartAndEndSmooth();
+            //innerKey->keyChanged();
         }
         lastKey->setStartEnabled(smooth);
-        if(smooth) firstKey->makeStarAndEndSmooth();
+        if(smooth) lastKey->makeStartAndEndSmooth();
+        lastKey->afterKeyChanged();
     }
 
     graphConstrainAnimatorCtrlsFrameValues();
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void KeysView::graphMakeSegmentsLinear() {
-    graphMakeSegmentsSmooth(false);
+void KeysView::graphMakeSegmentsLinearAction() {
+    graphMakeSegmentsSmoothAction(false);
 }
 
-void KeysView::graphMakeSegmentsSmooth() {
-    graphMakeSegmentsSmooth(true);
+void KeysView::graphMakeSegmentsSmoothAction() {
+    graphMakeSegmentsSmoothAction(true);
 }
 
 void KeysView::graphPaint(QPainter *p) {
@@ -313,14 +316,14 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         mPressFrameAndValue = QPointF(frame, value);
         if(mMainWindow->isShiftPressed()) {
             if(parentKey->isSelected()) {
-                graphRemoveKeyFromSelection(parentKey);
+                removeKeyFromSelection(parentKey);
             } else {
-                graphAddKeyToSelection(parentKey);
+                addKeyToSelection(parentKey);
             }
         } else {
             if(!parentKey->isSelected()) {
-                graphClearKeysSelection();
-                graphAddKeyToSelection(parentKey);
+                clearKeySelection();
+                addKeyToSelection(parentKey);
             }
         }
     } else {
@@ -337,7 +340,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
 void KeysView::graphMouseRelease() {
     if(mSelecting) {
         if(!mMainWindow->isShiftPressed()) {
-            graphClearKeysSelection();
+            clearKeySelection();
         }
 
         QList<QrealKey*> keysList;
@@ -345,7 +348,7 @@ void KeysView::graphMouseRelease() {
             animator->addKeysInRectToList(mSelectionRect, &keysList);
         }
         Q_FOREACH(QrealKey *key, keysList) {
-            graphAddKeyToSelection(key);
+            addKeyToSelection(key);
         }
 
         mSelecting = false;
@@ -353,8 +356,8 @@ void KeysView::graphMouseRelease() {
         if(mCurrentPoint->isKeyPoint()) {
             if(mFirstMove) {
                 if(!mMainWindow->isShiftPressed()) {
-                    graphClearKeysSelection();
-                    graphAddKeyToSelection(mCurrentPoint->getParentKey());
+                    clearKeySelection();
+                    addKeyToSelection(mCurrentPoint->getParentKey());
                 }
             } else {
                 QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
@@ -409,6 +412,7 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
     if(mSelectedKeys.isEmpty()) return;
     QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setCtrlsMode(mode);
+        key->afterKeyChanged();
     }
     graphConstrainAnimatorCtrlsFrameValues();
 }
@@ -418,43 +422,13 @@ void KeysView::graphSetTwoSideCtrlForSelected() {
     QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setEndEnabled(true);
         key->setStartEnabled(true);
+        key->afterKeyChanged();
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->queScheduledTasksAndUpdate();
-}
-
-void KeysView::graphSetRightSideCtrlForSelected() {
-    if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
-        key->setEndEnabled(true);
-        key->setStartEnabled(false);
-    }
-    graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->queScheduledTasksAndUpdate();
-}
-
-void KeysView::graphSetLeftSideCtrlForSelected() {
-    if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
-        key->setEndEnabled(false);
-        key->setStartEnabled(true);
-    }
-    graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->queScheduledTasksAndUpdate();
-}
-
-void KeysView::graphSetNoSideCtrlForSelected() {
-    if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
-        key->setEndEnabled(false);
-        key->setStartEnabled(false);
-    }
-    graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphClearAnimatorSelection() {
-    graphClearKeysSelection();
+    clearKeySelection();
 
 //    Q_FOREACH(QrealAnimator *animator, mAnimators) {
 //        animator->setIsCurrentAnimator(false);
@@ -469,7 +443,10 @@ void KeysView::graphDeletePressed() {
             key->setEndEnabled(false);
         } else if(mCurrentPoint->isStartPoint()) {
             key->setStartEnabled(false);
-            }
+        }
+        key->afterKeyChanged();
+        GetAsPtr(key->getParentAnimator(), QrealAnimator)->qra_updateKeysPath();
+        mCurrentPoint = nullptr;
     } else {
         QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
             key->removeFromAnimator();
@@ -481,27 +458,6 @@ void KeysView::graphDeletePressed() {
             animator->anim_sortKeys();
             animator->qra_updateKeysPath();
         }
-    }
-}
-
-void KeysView::graphClearKeysSelection() {
-    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
-        key->setSelected(false);
-    }
-
-    mSelectedKeys.clear();
-}
-
-void KeysView::graphAddKeyToSelection(QrealKey *key) {
-    if(key->isSelected()) return;
-    key->setSelected(true);
-    mSelectedKeys << GetAsPtr(key, Key);
-}
-
-void KeysView::graphRemoveKeyFromSelection(QrealKey *key) {
-    if(key->isSelected()) {
-        key->setSelected(false);
-        mSelectedKeys.removeOne(key);
     }
 }
 
@@ -540,9 +496,8 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             }
         } else {
             qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
-            QrealAnimator *parentAnimator =
-                    (QrealAnimator*)mCurrentPoint->getParentKey()->
-                                        getParentAnimator();
+            auto parentAnimator = GetAsPtr(mCurrentPoint->getParentKey()->
+                                        getParentAnimator(), QrealAnimator);
             mCurrentPoint->moveTo(clampedFrame,
                                   parentAnimator->qra_clampValue(value));
         }
@@ -568,10 +523,10 @@ void KeysView::graphMousePressEvent(const QPoint &eventPos,
         if(point == nullptr) return;
         QrealPointValueDialog *dialog = new QrealPointValueDialog(point, this);
         dialog->show();
-        connect(dialog, SIGNAL(repaintSignal()),
-                this, SLOT(graphUpdateAfterKeysChangedAndRepaint()) );
-        connect(dialog, SIGNAL(finished(int)),
-                this, SLOT(graphMergeKeysIfNeeded()) );
+        connect(dialog, &QrealPointValueDialog::repaintSignal,
+                this, &KeysView::graphUpdateAfterKeysChangedAndRepaint);
+        connect(dialog, &QrealPointValueDialog::finished,
+                this, &KeysView::graphMergeKeysIfNeeded);
     } else if(eventButton == Qt::MiddleButton) {
         graphMiddlePress(eventPos);
     } else {
@@ -702,8 +657,7 @@ void KeysView::graphUpdateAfterKeysChangedIfNeeded() {
     }
 }
 
-void KeysView::graphUpdateAfterKeysChanged()
-{
+void KeysView::graphUpdateAfterKeysChanged() {
     Q_FOREACH(QrealAnimator *animator, mAnimators) {
         animator->anim_sortKeys();
         animator->qra_updateKeysPath();

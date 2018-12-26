@@ -16,31 +16,31 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
                 ":/icons/node_line.png",
                 "MAKE SEGMENT LINE", this);
     connect(mLineButton, &ActionButton::pressed,
-            keysView, &KeysView::graphMakeSegmentsLinear);
+            keysView, &KeysView::graphMakeSegmentsLinearAction);
 
     mCurveButton = new ActionButton(
                 ":/icons/node_curve.png",
                 "MAKE SEGMENT CURVE", this);
     connect(mCurveButton, &ActionButton::pressed,
-            keysView, qOverload<>(&KeysView::graphMakeSegmentsSmooth));
+            keysView, qOverload<>(&KeysView::graphMakeSegmentsSmoothAction));
 
     mSymmetricButton = new ActionButton(
                 ":/icons/node_symmetric.png",
                 "", this);
     connect(mSymmetricButton, &ActionButton::pressed,
-            keysView, &KeysView::graphSetSymmetricCtrl);
+            keysView, &KeysView::graphSetSymmetricCtrlAction);
 
     mSmoothButton = new ActionButton(
                 ":/icons/node_smooth.png",
                 "", this);
     connect(mSmoothButton, &ActionButton::pressed,
-            keysView, &KeysView::graphSetSmoothCtrl);
+            keysView, &KeysView::graphSetSmoothCtrlAction);
 
     mCornerButton = new ActionButton(
                 ":/icons/node_cusp.png",
                 "", this);
     connect(mCornerButton, &ActionButton::pressed,
-            keysView, &KeysView::graphSetCornerCtrl);
+            keysView, &KeysView::graphSetCornerCtrlAction);
 
     mFitToHeightButton = new ActionButton(
                 ":/icons/zoom.png",

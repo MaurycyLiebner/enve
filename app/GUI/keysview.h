@@ -69,9 +69,6 @@ public:
     void graphMiddleRelease();
     void graphSetCtrlsModeForSelected(const CtrlsMode &mode);
     void graphDeletePressed();
-    void graphClearKeysSelection();
-    void graphAddKeyToSelection(QrealKey *key);
-    void graphRemoveKeyFromSelection(QrealKey *key);
     void graphMouseMove(const QPointF &mousePos);
     void graphResetValueScaleAndMinShown();
     void scheduleGraphUpdateAfterKeysChanged();
@@ -122,15 +119,12 @@ public slots:
     void setFramesRange(const int &startFrame,
                         const int &endFrame);
 
-    void graphMakeSegmentsLinear();
-    void graphMakeSegmentsSmooth();
-    void graphSetSmoothCtrl();
-    void graphSetSymmetricCtrl();
-    void graphSetCornerCtrl();
+    void graphMakeSegmentsLinearAction();
+    void graphMakeSegmentsSmoothAction();
+    void graphSetSmoothCtrlAction();
+    void graphSetSymmetricCtrlAction();
+    void graphSetCornerCtrlAction();
     void graphSetTwoSideCtrlForSelected();
-    void graphSetRightSideCtrlForSelected();
-    void graphSetLeftSideCtrlForSelected();
-    void graphSetNoSideCtrlForSelected();
 
     void graphClearAnimatorSelection();
 
@@ -143,7 +137,7 @@ private slots:
 private:
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
-    void graphMakeSegmentsSmooth(const bool &smooth);
+    void graphMakeSegmentsSmoothAction(const bool &smooth);
     void getSelectedSegments(QList<QList<QrealKey *> > &segments);
     void sortSelectedKeys();
     void clearHoveredPoint();

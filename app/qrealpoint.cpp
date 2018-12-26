@@ -108,7 +108,6 @@ bool QrealPoint::isEnabled() {
     /*if(isEndPoint() )*/ return mParentKey->isEndPointEnabled();
 }
 
-QrealKey *QrealPoint::getParentKey()
-{
+QrealKey *QrealPoint::getParentKey() {
     return mParentKey;
 }
