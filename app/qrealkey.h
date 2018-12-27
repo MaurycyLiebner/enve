@@ -1,7 +1,6 @@
 #ifndef QREALKEY_H
 #define QREALKEY_H
 #include "Animators/key.h"
-#include "pointhelpers.h"
 #include "smartPointers/sharedpointerdefs.h"
 
 class QPainter;
@@ -11,8 +10,6 @@ class ComplexKey;
 
 class QrealAnimator;
 class KeysClipboardContainer;
-class QrealPoint;
-enum QrealPointType : short;
 
 class QrealKey : public Key {
     friend class StdSelfRef;
@@ -21,16 +18,11 @@ public:
     QrealKey(const int &frame,
              const qreal &val,
              QrealAnimator* parentAnimator);
-    QrealPoint *mousePress(const qreal &frameT,
-                           const qreal &valueT,
-                           const qreal &pixelsPerFrame,
-                           const qreal &pixelsPerValue);
 
     stdsptr<QrealKey> makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
-    void updateCtrlFromCtrl(const QrealPointType &type);
 
-    virtual qreal getValue();
+    qreal getValue() const;
     virtual void setValue(qreal value,
                           const bool &saveUndoRedo = false,
                           const bool &finish = false,
@@ -41,55 +33,32 @@ public:
     void setStartFrameVar(const qreal &startFrame);
     void setEndFrameVar(const qreal &endFrame);
 
-    qreal getStartValue();
-    qreal getEndValue();
-    qreal getStartValueFrame();
-    qreal getEndValueFrame();
+    qreal getStartValue() const;
+    qreal getEndValue() const;
+    qreal getStartValueFrame() const;
+    qreal getEndValueFrame() const;
 
-    void makeStartAndEndSmooth();
+    void setStartEnabledForGraph(const bool &bT);
+    void setEndEnabledForGraph(const bool &bT);
 
-    virtual void setStartEnabled(const bool &bT);
-    virtual void setEndEnabled(const bool &bT);
-
-    bool isInsideRect(const QRectF &valueFrameRect);
-
-    void drawGraphKey(QPainter *p, const QColor &paintColor);
     void changeFrameAndValueBy(const QPointF &frameValueChange);
     void saveCurrentFrameAndValue();
-    virtual void setCtrlsMode(const CtrlsMode &mode);
 
-    void constrainStartCtrlMinFrame(const int &minFrame);
-    void constrainEndCtrlMaxFrame(const int &maxFrame);
+    bool getEndEnabledForGraph() const;
+    bool getStartEnabledForGraph() const;
 
-    QrealPoint *getStartPoint();
-    QrealPoint *getEndPoint();
-    QrealPoint *getGraphPoint();
-
-    bool isEndPointEnabled();
-    bool isStartPointEnabled();
-
-    qreal getPrevKeyValue();
-    qreal getNextKeyValue();
-
-    int getPrevKeyRelFrame();
-    int getNextKeyRelFrame();
+    qreal getPrevKeyValue() const;
+    qreal getNextKeyValue() const;
 
     void incValue(const qreal &incBy,
                   const bool &saveUndoRedo = false,
                   const bool &finish = false,
                   const bool &callUpdater = true);
 
-    CtrlsMode getCtrlsMode();
-
-    QrealAnimator *getParentQrealAnimator();
+    QrealAnimator *getParentQrealAnimator() const;
     void setRelFrame(const int &frame);
 
-    bool differsFromKey(Key *key);
-
-    void setEndFrame(const qreal &endFrame);
-    void setStartFrame(const qreal &startFrame);
-    void setStartValue(const qreal &value);
-    void setEndValue(const qreal &value);
+    bool differsFromKey(Key *key) const;
 
     void scaleFrameAndUpdateParentAnimator(
             const int &relativeToFrame,
@@ -106,12 +75,33 @@ public:
         mSavedEndFrame = mEndFrame;
     }
 
-    void afterKeyChanged();
+    qreal getValueForGraph() const {
+        return getValue();
+    }
+
+    qreal getEndValueForGraph() const {
+        return getEndValue();
+    }
+
+    qreal getStartValueForGraph() const {
+        return getStartValue();
+    }
+
+    qreal getStartValueFrameForGraph() const {
+        return getStartValueFrame();
+    }
+
+    qreal getEndValueFrameForGraph() const {
+        return getEndValueFrame();
+    }
+
+    void setEndValueFrameForGraph(const qreal &endFrame);
+    void setStartValueFrameForGraph(const qreal &startFrame);
+    void setStartValueForGraph(const qreal &value);
+    void setEndValueForGraph(const qreal &value);
 protected:
     bool mStartEnabled = false;
     bool mEndEnabled = false;
-
-    CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 
     qreal mValue;
     qreal mSavedValue;
@@ -123,10 +113,6 @@ protected:
     qreal mEndValue = 0.;
     qreal mStartFrame = 0.;
     qreal mEndFrame = 0.;
-
-    stdsptr<QrealPoint> mGraphPoint;
-    stdsptr<QrealPoint> mStartPoint;
-    stdsptr<QrealPoint> mEndPoint;
 };
 
 #endif // QREALKEY_H

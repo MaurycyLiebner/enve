@@ -1,10 +1,9 @@
 #include "qrealpointvaluedialog.h"
-#include "qrealpoint.h"
+#include "Animators/qrealpoint.h"
 
 QrealPointValueDialog::QrealPointValueDialog(QrealPoint *point,
                                              QWidget *parent) :
-    QDialog(parent)
-{
+    QDialog(parent) {
     setWindowTitle("Edit key");
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);

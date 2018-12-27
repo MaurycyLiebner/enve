@@ -117,6 +117,6 @@ QStringKey::QStringKey(const QString &stringT,
     mText = stringT;
 }
 
-bool QStringKey::differsFromKey(Key *key) {
+bool QStringKey::differsFromKey(Key *key) const {
     return GetAsPtr(key, QStringKey)->getText() != mText;
 }

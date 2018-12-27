@@ -442,7 +442,7 @@ void ComplexKey::removeAnimatorKey(Key* key) {
     mKeys.removeOne(key);
 }
 
-bool ComplexKey::isEmpty() {
+bool ComplexKey::isEmpty() const {
     return mKeys.isEmpty();
 }
 
@@ -468,7 +468,7 @@ void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
     }
 }
 
-bool ComplexKey::isDescendantSelected() {
+bool ComplexKey::isDescendantSelected() const {
     if(isSelected()) return true;
     Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->isDescendantSelected()) return true;
@@ -509,7 +509,7 @@ void ComplexKey::addToSelection(QList<qptr<Animator>> &selectedAnimators) {
     }
 }
 
-bool ComplexKey::hasKey(Key *key) {
+bool ComplexKey::hasKey(Key *key) const {
     Q_FOREACH(const stdptr<Key>& keyT, mKeys) {
         if(key == keyT) {
             return true;
@@ -518,7 +518,7 @@ bool ComplexKey::hasKey(Key *key) {
     return false;
 }
 
-bool ComplexKey::differsFromKey(Key *otherKey) {
+bool ComplexKey::differsFromKey(Key *otherKey) const {
     ComplexKey* otherComplexKey = GetAsPtr(otherKey, ComplexKey);
     if(getChildKeysCount() == otherComplexKey->getChildKeysCount()) {
         Q_FOREACH(const stdptr<Key>& key, mKeys) {
@@ -536,11 +536,11 @@ void ComplexKey::removeFromSelection(QList<qptr<Animator>> &selectedAnimators) {
     }
 }
 
-int ComplexKey::getChildKeysCount() {
+int ComplexKey::getChildKeysCount() const {
     return mKeys.count();
 }
 
-bool ComplexKey::hasSameKey(Key *otherKey) {
+bool ComplexKey::hasSameKey(Key *otherKey) const {
     Q_FOREACH(const stdptr<Key>& key, mKeys) {
         if(key->getParentAnimator() == otherKey->getParentAnimator()) {
             if(key->differsFromKey(otherKey)) return false;

@@ -5,6 +5,7 @@
 #include "key.h"
 #include "fakecomplexanimator.h"
 #include "PropertyUpdaters/propertyupdater.h"
+#include "qrealpoint.h"
 
 Animator::Animator(const QString& name) : Property(name) {}
 
@@ -72,7 +73,7 @@ void Animator::disableFakeComplexAnimatrIfNotNeeded() {
     }
 }
 
-int Animator::anim_getNextKeyRelFrame(Key *key) {
+int Animator::anim_getNextKeyRelFrame(const Key * const key) {
     if(key == nullptr) return INT_MAX;
     Key* nextKey = key->getNextKey();
     if(nextKey == nullptr) {
@@ -91,7 +92,7 @@ int Animator::anim_getNextKeyRelFrame(const int &relFrame) {
     return nextKey->getRelFrame();
 }
 
-int Animator::anim_getPrevKeyRelFrame(Key *key) {
+int Animator::anim_getPrevKeyRelFrame(const Key * const key) {
     if(key == nullptr) return INT_MIN;
     Key* prevKey = key->getPrevKey();
     if(prevKey == nullptr) {
@@ -154,8 +155,6 @@ bool Animator::prp_isDescendantRecording() { return anim_mIsRecording; }
 
 bool Animator::anim_isComplexAnimator() { return anim_mIsComplexAnimator; }
 
-bool Animator::prp_isAnimator() { return true; }
-
 void Animator::prp_startDragging() {}
 
 void Animator::anim_mergeKeysIfNeeded() {
@@ -210,7 +209,7 @@ void Animator::anim_saveCurrentValueAsKey() {}
 
 void Animator::anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
 
-int Animator::anim_getKeyIndex(Key* key) {
+int Animator::anim_getKeyIndex(const Key * const key) {
     int index = -1;
     for(int i = 0; i < anim_mKeys.count(); i++) {
         if(anim_mKeys.at(i).get() == key) {
@@ -220,13 +219,13 @@ int Animator::anim_getKeyIndex(Key* key) {
     return index;
 }
 
-Key* Animator::anim_getNextKey(Key *key) {
+Key* Animator::anim_getNextKey(const Key * const key) {
     int keyId = anim_getKeyIndex(key);
     if(keyId == anim_mKeys.count() - 1) return nullptr;
     return anim_mKeys.at(keyId + 1).get();
 }
 
-Key* Animator::anim_getPrevKey(Key* key) {
+Key* Animator::anim_getPrevKey(const Key * const key) {
     int keyId = anim_getKeyIndex(key);
     if(keyId <= 0) return nullptr;
     return anim_mKeys.at(keyId - 1).get();
@@ -290,13 +289,13 @@ Key *Animator::anim_getKeyAtRelFrame(const int &frame) {
     return nullptr;
 }
 
-bool Animator::anim_hasPrevKey(Key *key) {
+bool Animator::anim_hasPrevKey(const Key * const key) {
     int keyId = anim_getKeyIndex(key);
     if(keyId > 0) return true;
     return false;
 }
 
-bool Animator::anim_hasNextKey(Key *key) {
+bool Animator::anim_hasNextKey(const Key * const key) {
     int keyId = anim_getKeyIndex(key);
     if(keyId < anim_mKeys.count() - 1) return true;
     return false;
@@ -340,7 +339,7 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey,
     //mergeKeysIfNeeded();
     emit prp_addingKey(newKey.get());
 
-    if(anim_mIsCurrentAnimator) {
+    if(anim_mSelected) {
         graphScheduleUpdateAfterKeysChanged();
     }
 
@@ -368,7 +367,7 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove,
 
     anim_sortKeys();
 
-    if(anim_mIsCurrentAnimator) {
+    if(anim_mSelected) {
         graphScheduleUpdateAfterKeysChanged();
     }
 
@@ -769,8 +768,15 @@ void Animator::incSelectedKeysFrame(const int &dFrame) {
 
 void Animator::scaleSelectedKeysFrame(const int &absPivotFrame,
                                       const qreal &scale) {
-    Q_FOREACH(Key *key, anim_mSelectedKeys) {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
         key->scaleFrameAndUpdateParentAnimator(absPivotFrame, scale);
+    }
+}
+
+void Animator::setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->setCtrlsMode(mode);
+        anim_updateAfterChangedKey(key);
     }
 }
 
@@ -792,6 +798,29 @@ void Animator::startSelectedKeysTransform() {
     }
 }
 
+void Animator::changeSelectedKeysFrameAndValueStart(
+        const QPointF &frameVal) {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->saveCurrentFrameAndValue();
+        key->changeFrameAndValueBy(frameVal);
+    }
+}
+
+void Animator::changeSelectedKeysFrameAndValue(
+        const QPointF &frameVal) {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->changeFrameAndValueBy(frameVal);
+    }
+}
+
+void Animator::enableCtrlPtsForSelected() {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->setEndEnabledForGraph(true);
+        key->setStartEnabledForGraph(true);
+        anim_updateAfterChangedKey(key);
+    }
+}
+
 void Animator::deleteSelectedKeys() {
     Q_FOREACH(const auto& key, anim_mSelectedKeys) {
         key->deleteKey();
@@ -808,4 +837,157 @@ int Animator::getLowestAbsFrameForSelectedKey() {
         }
     }
     return lowestKey;
+}
+
+void Animator::drawKeysPath(QPainter * const p,
+                            const QColor &paintColor) const {
+    p->save();
+
+    QPen pen = QPen(Qt::black, 4.);
+    pen.setCosmetic(true);
+    p->setPen(pen);
+    p->drawPath(mKeysPath);
+    pen.setColor(paintColor);
+    pen.setWidthF(2.);
+    p->setPen(pen);
+    p->drawPath(mKeysPath);
+
+    p->setPen(Qt::NoPen);
+    Q_FOREACH(const auto &key, anim_mKeys) {
+        key->drawGraphKey(p, paintColor);
+    }
+
+    p->restore();
+}
+
+void Animator::getMinAndMaxMoveFrame(
+        Key *key, QrealPoint *currentPoint,
+        qreal &minMoveFrame, qreal &maxMoveFrame) {
+    if(currentPoint->isKeyPoint()) return;
+    qreal keyFrame = key->getAbsFrame();
+
+    qreal startMinMoveFrame;
+    qreal endMaxMoveFrame;
+    int keyId = anim_getKeyIndex(key);
+
+    if(keyId == anim_mKeys.count() - 1) {
+        endMaxMoveFrame = keyFrame + 5000.;
+    } else {
+        endMaxMoveFrame = anim_mKeys.at(keyId + 1)->getAbsFrame();
+    }
+
+    if(keyId == 0) {
+        startMinMoveFrame = keyFrame - 5000.;
+    } else {
+        Key *prevKey = anim_mKeys.at(keyId - 1).get();
+        startMinMoveFrame = prevKey->getAbsFrame();
+    }
+
+    if(key->getCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC) {
+        if(currentPoint->isEndPoint()) {
+            minMoveFrame = keyFrame;
+            maxMoveFrame = qMin(endMaxMoveFrame, 2*keyFrame - startMinMoveFrame);
+        } else {
+            minMoveFrame = qMax(startMinMoveFrame, 2*keyFrame - endMaxMoveFrame);
+            maxMoveFrame = keyFrame;
+        }
+    } else {
+        if(currentPoint->isEndPoint()) {
+            minMoveFrame = keyFrame;
+            maxMoveFrame = endMaxMoveFrame;
+        } else {
+            minMoveFrame = startMinMoveFrame;
+            maxMoveFrame = keyFrame;
+        }
+    }
+}
+
+void Animator::anim_updateKeysPath() {
+    mKeysPath = QPainterPath();
+    Key *lastKey = nullptr;
+    Q_FOREACH(const auto &key, anim_mKeys) {
+        int keyFrame = key->getAbsFrame();
+        qreal keyValue;
+        if(keyFrame == anim_mCurrentAbsFrame) {
+            keyValue = anim_mCurrentRelFrame;
+        } else {
+            keyValue = key->getValueForGraph();
+        }
+        if(lastKey == nullptr) {
+            mKeysPath.moveTo(-5000, keyValue);
+            mKeysPath.lineTo(keyFrame, keyValue);
+        } else {
+            mKeysPath.cubicTo(
+                        QPointF(lastKey->getEndValueFrameForGraph(),
+                                lastKey->getEndValueForGraph()),
+                        QPointF(key->getStartValueFrameForGraph(),
+                                key->getStartValueForGraph()),
+                        QPointF(keyFrame, keyValue));
+        }
+        lastKey = key.get();
+    }
+    if(lastKey == nullptr) {
+        mKeysPath.moveTo(-5000, -5000);
+        mKeysPath.lineTo(5000, 5000);
+    } else {
+        mKeysPath.lineTo(5000, lastKey->getValueForGraph());
+    }
+}
+
+void Animator::anim_constrainCtrlsFrameValues() {
+    Key *lastKey = nullptr;
+    Q_FOREACH(const auto &key, anim_mKeys) {
+        if(lastKey != nullptr) {
+            lastKey->constrainEndCtrlMaxFrame(key->getAbsFrame());
+            key->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
+        }
+        lastKey = key.get();
+    }
+    anim_updateKeysPath();
+}
+
+QrealPoint *Animator::anim_getPointAt(const qreal &value,
+                                      const qreal &frame,
+                                      const qreal &pixelsPerFrame,
+                                      const qreal &pixelsPerValUnit) {
+    QrealPoint *point = nullptr;
+    Q_FOREACH(const auto &key, anim_mKeys) {
+        point = key->mousePress(frame, value,
+                                pixelsPerFrame, pixelsPerValUnit);
+        if(point != nullptr) {
+            break;
+        }
+    }
+    return point;
+}
+
+void Animator::addKeysInRectToList(const QRectF &frameValueRect,
+                                   QList<Key*> &keys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
+        if(key->isInsideRect(frameValueRect)) {
+            keys.append(key.get());
+        }
+    }
+}
+void Animator::getSelectedSegments(QList<QList<Key*>>& segments) {
+//    sortSelectedKeys();
+    QList<Key*> currentSegment;
+    Key* lastKey = nullptr;
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        if(!lastKey) {
+            lastKey = key;
+            continue;
+        }
+        if(lastKey->getNextKey() != key) {
+            if(currentSegment.count() >= 2) {
+                segments << currentSegment;
+            }
+            currentSegment.clear();
+        }
+        currentSegment << key;
+        lastKey = key;
+    }
+    if(currentSegment.count() >= 2) {
+        segments << currentSegment;
+    }
 }

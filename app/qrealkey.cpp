@@ -2,7 +2,7 @@
 #include "Animators/qrealanimator.h"
 #include "Animators/complexanimator.h"
 #include "clipboardcontainer.h"
-#include "qrealpoint.h"
+#include "Animators/qrealpoint.h"
 
 QrealKey::QrealKey(const int &frame,
                    const qreal &val,
@@ -14,10 +14,6 @@ QrealKey::QrealKey(const int &frame,
     mStartFrame = mRelFrame - 5;
     mStartValue = mValue;
     mEndValue = mValue;
-
-    mGraphPoint = SPtrCreate(QrealPoint)(KEY_POINT, this, 6.);
-    mStartPoint = SPtrCreate(QrealPoint)(START_POINT, this, 4.);
-    mEndPoint = SPtrCreate(QrealPoint)(END_POINT, this, 4.);
 }
 
 QrealKey::QrealKey(QrealAnimator *parentAnimator) :
@@ -29,21 +25,14 @@ stdsptr<QrealKey> QrealKey::makeQrealKeyDuplicate(
     target->setValue(mValue);
     target->setRelFrame(mRelFrame);
     target->setCtrlsMode(mCtrlsMode);
-    target->setStartEnabled(mStartEnabled);
+    target->setStartEnabledForGraph(mStartEnabled);
     target->setStartFrameVar(mStartFrame);
     target->setStartValueVar(mStartValue);
-    target->setEndEnabled(mEndEnabled);
+    target->setEndEnabledForGraph(mEndEnabled);
     target->setEndFrameVar(mEndFrame);
     target->setEndValueVar(mEndValue);
     //targetParent->appendKey(target);
     return target;
-}
-
-void QrealKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
-    if(mEndFrame < maxFrame || !mEndEnabled) return;
-    qreal newFrame = clamp(mEndFrame, mRelFrame, maxFrame);
-    qreal change = (newFrame - mRelFrame)/(mEndFrame - mRelFrame);
-    mEndPoint->moveTo(newFrame, change*(mEndValue - mValue) + mValue);
 }
 
 void QrealKey::incValue(const qreal &incBy,
@@ -54,59 +43,26 @@ void QrealKey::incValue(const qreal &incBy,
              finish, callUpdater);
 }
 
-CtrlsMode QrealKey::getCtrlsMode() {
-    return mCtrlsMode;
-}
-
-QrealPoint *QrealKey::getStartPoint() {
-    return mStartPoint.get();
-}
-
-QrealPoint *QrealKey::getEndPoint() {
-    return mEndPoint.get();
-}
-
-QrealPoint *QrealKey::getGraphPoint() {
-    return mGraphPoint.get();
-}
-
-bool QrealKey::isEndPointEnabled() {
+bool QrealKey::getEndEnabledForGraph() const {
     return mEndEnabled;
 }
 
-bool QrealKey::isStartPointEnabled() {
+bool QrealKey::getStartEnabledForGraph() const {
     return mStartEnabled;
 }
 
-QrealAnimator *QrealKey::getParentQrealAnimator() {
+QrealAnimator *QrealKey::getParentQrealAnimator() const {
     return static_cast<QrealAnimator*>(mParentAnimator.data());
 }
 
-qreal QrealKey::getPrevKeyValue() {
+qreal QrealKey::getPrevKeyValue() const {
     if(mParentAnimator == nullptr) return mValue;
     return getParentQrealAnimator()->qra_getPrevKeyValue(this);
 }
 
-qreal QrealKey::getNextKeyValue() {
+qreal QrealKey::getNextKeyValue() const {
     if(mParentAnimator == nullptr) return mValue;
     return getParentQrealAnimator()->qra_getNextKeyValue(this);
-}
-
-int QrealKey::getPrevKeyRelFrame() {
-    if(mParentAnimator == nullptr) return mRelFrame;
-    return getParentQrealAnimator()->qra_getPrevKeyRelFrame(this);
-}
-
-int QrealKey::getNextKeyRelFrame() {
-    if(mParentAnimator == nullptr) return mRelFrame;
-    return getParentQrealAnimator()->qra_getNextKeyRelFrame(this);
-}
-
-void QrealKey::constrainStartCtrlMinFrame(const int &minFrame) {
-    if(mStartFrame > minFrame || !mStartEnabled) return;
-    qreal newFrame = clamp(mStartFrame, minFrame, mRelFrame);
-    qreal change = (mRelFrame - newFrame)/(mRelFrame - mStartFrame);
-    mStartPoint->moveTo(newFrame, change*(mStartValue - mValue) + mValue);
 }
 
 //bool QrealKey::isNear(qreal frameT, qreal valueT,
@@ -118,95 +74,9 @@ void QrealKey::constrainStartCtrlMinFrame(const int &minFrame) {
 //    return true;
 //}
 
-QrealPoint *QrealKey::mousePress(const qreal &frameT,
-                                 const qreal &valueT,
-                                 const qreal &pixelsPerFrame,
-                                 const qreal &pixelsPerValue) {
-    if(isSelected() ) {
-        if( (mStartEnabled && hasPrevKey()) ?
-            mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
-            false ) {
-            return mStartPoint.get();
-        }
-        if((mEndEnabled && hasNextKey()) ?
-            mEndPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
-            false ) {
-            return mEndPoint.get();
-        }
-    }
-    if(mGraphPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue)) {
-        return mGraphPoint.get();
-    }
-    return nullptr;
-}
 
-void QrealKey::setCtrlsMode(const CtrlsMode &mode) {
-    mCtrlsMode = mode;
-    if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-        QPointF newStartPos;
-        QPointF newEndPos;
-        getCtrlsSymmetricPos(QPointF(mEndFrame, mEndValue),
-                             QPointF(mStartFrame, mStartValue),
-                             QPointF(mRelFrame, mValue),
-                             &newEndPos,
-                             &newStartPos);
-        mStartFrame = newStartPos.x();
-        mStartValue = newStartPos.y();
-        mEndFrame = newEndPos.x();
-        mEndValue = newEndPos.y();
+qreal QrealKey::getValue() const { return mValue; }
 
-    } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
-        QPointF newStartPos;
-        QPointF newEndPos;
-        getCtrlsSmoothPos(QPointF(mEndFrame, mEndValue),
-                          QPointF(mStartFrame, mStartValue),
-                          QPointF(mRelFrame, mValue),
-                          &newEndPos,
-                          &newStartPos);
-        mStartFrame = newStartPos.x();
-        mStartValue = newStartPos.y();
-        mEndFrame = newEndPos.x();
-        mEndValue = newEndPos.y();
-    }
-}
-
-void QrealKey::updateCtrlFromCtrl(const QrealPointType &type) {
-    if(mCtrlsMode == CTRLS_CORNER) return;
-    QPointF fromPt;
-    QPointF toPt;
-    QrealPoint *targetPt;
-    if(type == END_POINT) {
-        fromPt = QPointF(mEndFrame, mEndValue);
-        toPt = QPointF(mStartFrame, mStartValue);
-        targetPt = mStartPoint.get();
-    } else {
-        toPt = QPointF(mEndFrame, mEndValue);
-        fromPt = QPointF(mStartFrame, mStartValue);
-        targetPt = mEndPoint.get();
-    }
-    QPointF newFrameValue;
-    if(mCtrlsMode == CTRLS_SMOOTH) {
-        // mFrame and mValue are of different units chence len is wrong
-        newFrameValue = symmetricToPosNewLen(
-            fromPt,
-            QPointF(mRelFrame, mValue),
-            pointToLen(toPt -
-                       QPointF(mRelFrame, mValue)) );
-
-    } else if(mCtrlsMode == CTRLS_SYMMETRIC) {
-        newFrameValue = symmetricToPos(
-            fromPt,
-            QPointF(mRelFrame, mValue));
-    }
-    targetPt->setValue(newFrameValue.y() );
-    targetPt->setFrame(newFrameValue.x() );
-
-    mParentAnimator->anim_updateAfterChangedKey(this);
-}
-
-qreal QrealKey::getValue() { return mValue; }
-
-#include "undoredo.h"
 void QrealKey::setValue(qreal value,
                         const bool &saveUndoRedo,
                         const bool &finish,
@@ -240,10 +110,6 @@ void QrealKey::finishValueTransform() {
     }
 }
 
-void QrealKey::afterKeyChanged() {
-    mParentAnimator->anim_updateAfterChangedKey(this);
-}
-
 void QrealKey::startValueTransform() {
     mSavedValue = mValue;
 }
@@ -264,22 +130,22 @@ void QrealKey::setEndFrameVar(const qreal &endFrame) {
     mEndFrame = endFrame;
 }
 
-void QrealKey::setEndFrame(const qreal &endFrame) {
+void QrealKey::setEndValueFrameForGraph(const qreal &endFrame) {
     setEndFrameVar(endFrame);
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void QrealKey::setStartFrame(const qreal &startFrame) {
+void QrealKey::setStartValueFrameForGraph(const qreal &startFrame) {
     setStartFrameVar(startFrame);
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void QrealKey::setStartValue(const qreal &value) {
+void QrealKey::setStartValueForGraph(const qreal &value) {
     setStartValueVar(value);
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void QrealKey::setEndValue(const qreal &value) {
+void QrealKey::setEndValueForGraph(const qreal &value) {
     setEndValueVar(value);
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
@@ -305,94 +171,48 @@ void QrealKey::scaleFrameAndUpdateParentAnimator(
     }
 }
 
-qreal QrealKey::getStartValue() {
+qreal QrealKey::getStartValue() const {
     if(mStartEnabled) return mStartValue;
     return mValue;
 }
 
-qreal QrealKey::getEndValue() {
+qreal QrealKey::getEndValue() const {
     if(mEndEnabled) return mEndValue;
     return mValue;
 }
 
-qreal QrealKey::getStartValueFrame() {
+qreal QrealKey::getStartValueFrame() const {
     if(mStartEnabled) return mStartFrame;
     return mRelFrame;
 }
 
-qreal QrealKey::getEndValueFrame() {
+qreal QrealKey::getEndValueFrame() const {
     if(mEndEnabled) return mEndFrame;
     return mRelFrame;
 }
 
-void QrealKey::makeStartAndEndSmooth() {
-    qreal nextKeyVal = getNextKeyValue();
-    qreal prevKeyVal = getPrevKeyValue();
-    int nextKeyFrame = getNextKeyRelFrame();
-    int prevKeyFrame = getPrevKeyRelFrame();
-    qreal valIncPerFrame;
-    if(nextKeyFrame == mRelFrame || prevKeyFrame == mRelFrame) {
-        valIncPerFrame = 0.;
-    } else {
-        valIncPerFrame =
-                (nextKeyVal - prevKeyVal)/(nextKeyFrame - prevKeyFrame);
-    }
-    mStartValue = mValue + (mStartFrame - mRelFrame)*valIncPerFrame;
-    mEndValue = mValue + (mEndFrame - mRelFrame)*valIncPerFrame;
-}
+//void QrealKey::makeStartAndEndSmooth() {
+//    qreal nextKeyVal = getNextKeyValue();
+//    qreal prevKeyVal = getPrevKeyValue();
+//    int nextKeyFrame = getNextKeyRelFrame();
+//    int prevKeyFrame = getPrevKeyRelFrame();
+//    qreal valIncPerFrame;
+//    if(nextKeyFrame == mRelFrame || prevKeyFrame == mRelFrame) {
+//        valIncPerFrame = 0.;
+//    } else {
+//        valIncPerFrame =
+//                (nextKeyVal - prevKeyVal)/(nextKeyFrame - prevKeyFrame);
+//    }
+//    mStartValue = mValue + (mStartFrame - mRelFrame)*valIncPerFrame;
+//    mEndValue = mValue + (mEndFrame - mRelFrame)*valIncPerFrame;
+//}
 
-void QrealKey::setStartEnabled(const bool &bT) {
+void QrealKey::setStartEnabledForGraph(const bool &bT) {
     mStartEnabled = bT;
 }
 
-void QrealKey::setEndEnabled(const bool &bT) {
+void QrealKey::setEndEnabledForGraph(const bool &bT) {
     mEndEnabled = bT;
-}
-
-bool QrealKey::isInsideRect(const QRectF &valueFrameRect) {
-    QPointF keyPoint = QPointF(getAbsFrame(), getValue());
-    return valueFrameRect.contains(keyPoint);
-}
-
-void QrealKey::drawGraphKey(QPainter *p,
-                            const QColor &paintColor) {
-    if(isSelected()) {
-        p->save();
-        QPen pen = QPen(Qt::black, 1.5);
-        pen.setCosmetic(true);
-
-        QPen pen2 = QPen(Qt::white, .75);
-        pen2.setCosmetic(true);
-        p->setPen(pen);
-        QPointF thisPos = QPointF(mRelFrame, mValue);
-        if(mStartEnabled) {
-            p->drawLine(thisPos,
-                        QPointF(mStartFrame, mStartValue));
-        }
-        if(mEndEnabled) {
-            p->drawLine(thisPos,
-                        QPointF(mEndFrame, mEndValue));
-        }
-        p->setPen(pen2);
-        if(mStartEnabled) {
-            p->drawLine(thisPos,
-                        QPointF(mStartFrame, mStartValue));
-        }
-        if(mEndEnabled) {
-            p->drawLine(thisPos,
-                        QPointF(mEndFrame, mEndValue));
-        }
-        p->restore();
-    }
-    mGraphPoint->draw(p, paintColor);
-    if(isSelected() ) {
-        if(mStartEnabled && hasPrevKey()) {
-            mStartPoint->draw(p, paintColor);
-        }
-        if(mEndEnabled && hasNextKey()) {
-            mEndPoint->draw(p, paintColor);
-        }
-    }
 }
 
 void QrealKey::saveCurrentFrameAndValue() {
@@ -410,16 +230,14 @@ void QrealKey::setRelFrame(const int &frame) {
     mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }
 
-bool QrealKey::differsFromKey(Key *key) {
+bool QrealKey::differsFromKey(Key *key) const {
     if(key == this) return false;
     stdsptr<QrealKey> qa_key = GetAsSPtr(key, QrealKey);
     if(isZero4Dec(qa_key->getValue() - mValue)) {
         if(key->getRelFrame() > mRelFrame) {
-            if(qa_key->isStartPointEnabled() ||
-               isEndPointEnabled()) return true;
+            if(qa_key->getStartEnabledForGraph() || mEndEnabled) return true;
         } else {
-            if(qa_key->isEndPointEnabled() ||
-               isStartPointEnabled()) return true;
+            if(qa_key->getEndEnabledForGraph() || mStartEnabled) return true;
         }
         return false;
     }

@@ -124,7 +124,7 @@ public:
 
     void removeAnimatorKey(Key *key);
 
-    bool isEmpty();
+    bool isEmpty() const;
 
     void setRelFrame(const int &frame);
 
@@ -132,7 +132,7 @@ public:
 
     void margeAllKeysToKey(ComplexKey *target);
 
-    bool isDescendantSelected();
+    bool isDescendantSelected() const;
 
     void startFrameTransform();
     void finishFrameTransform();
@@ -142,13 +142,13 @@ public:
     void addToSelection(QList<qptr<Animator>> &selectedAnimators);
     void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
 
-    bool hasKey(Key *key);
+    bool hasKey(Key *key) const;
 
-    bool differsFromKey(Key *otherKey);
+    bool differsFromKey(Key *otherKey) const;
 
-    int getChildKeysCount();
+    int getChildKeysCount() const;
 
-    bool hasSameKey(Key *otherKey);
+    bool hasSameKey(Key *otherKey) const;
 protected:
     ComplexKey(ComplexAnimator* parentAnimator);
 private:

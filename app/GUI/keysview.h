@@ -62,7 +62,7 @@ public:
     void graphMouseReleaseEvent(const Qt::MouseButton &eventButton);
     bool graphProcessFilteredKeyEvent(QKeyEvent *event);
     void graphResizeEvent(QResizeEvent *);
-    void graphAddViewedAnimator(QrealAnimator *animator);
+    void graphAddViewedAnimator(Animator * const animator);
     void graphIncScale(const qreal &inc);
     void graphSetScale(const qreal &scale);
     void graphUpdateDimensions();
@@ -86,7 +86,7 @@ public:
     void middlePress(const QPointF &pressPos);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *e);
-    void graphRemoveViewedAnimator(QrealAnimator *animator);
+    void graphRemoveViewedAnimator(Animator * const animator);
     void updateAnimatorsColors();
     void clearHoveredMovable();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
@@ -146,7 +146,6 @@ private:
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
     void graphMakeSegmentsSmoothAction(const bool &smooth);
-    void getSelectedSegments(QList<QList<QrealKey *> > &segments);
     void sortSelectedKeys();
     void clearHoveredPoint();
 
@@ -169,7 +168,6 @@ private:
     bool mGraphViewed = false;
     qreal mPixelsPerFrame;
     QPointF mMiddlePressPos;
-    QList<QPointer<QrealAnimator>> mAnimators;
 
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
@@ -183,8 +181,8 @@ private:
     bool mMovingRect = false;
 
     MainWindow *mMainWindow;
-    QList<stdptr<Key>> mSelectedKeys;
-    QList<qptr<Animator>> mSelectedAnimators;
+    QList<qptr<Animator>> mSelectedKeysAnimators;
+    QList<qptr<Animator>> mGraphAnimators;
 
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;

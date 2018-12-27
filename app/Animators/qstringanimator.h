@@ -8,7 +8,7 @@ class QStringKey : public Key {
     friend class StdSelfRef;
 public:
 
-    bool differsFromKey(Key *key);
+    bool differsFromKey(Key *key) const;
 
     const QString &getText() { return mText; }
     void setText(const QString &text) { mText = text; }

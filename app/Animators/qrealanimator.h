@@ -2,7 +2,6 @@
 #define VALUEANIMATORS_H
 #include <QPointF>
 #include <QList>
-#include <QPainterPath>
 #include <QPainter>
 #include <QMouseEvent>
 #include "float.h"
@@ -11,7 +10,6 @@ class QrealKey;
 class QrealPoint;
 class QrealAnimatorValueSlider;
 class RandomQrealGenerator;
-#define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = GetAsPtr(keyK, QrealKey);
 
 #include <QDoubleSpinBox>
 
@@ -24,7 +22,7 @@ public:
     void qra_setValueRange(const qreal &minVal,
                            const qreal &maxVal);
 
-    qreal qra_getValueAtAbsFrame(const int &frame);
+    qreal qra_getValueAtAbsFrame(const int &frame) const;
     qreal qra_getCurrentValue() const;
     qreal qra_getCurrentEffectiveValue();
     void qra_setCurrentValue(qreal newValue,
@@ -40,30 +38,17 @@ public:
                             const bool &finish = true);
 
     void prp_setAbsFrame(const int &frame);
-    virtual void qra_updateKeysPath();
 
-    void qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP);
-    void qra_getMinAndMaxValuesBetweenFrames(const int &startFrame,
-                                             const int &endFrame,
-                                             qreal *minValP,
-                                             qreal *maxValP);
-
-    QrealPoint *qra_getPointAt(const qreal &value,
-                               const qreal &frame,
-                               const qreal &pixelsPerFrame,
-                               const qreal &pixelsPerValUnit);
     qreal qra_getValueAtRelFrame(const int &frame,
                                  QrealKey *prevKey,
                                  QrealKey *nextKey) const;
 
-    void qra_constrainCtrlsFrameValues();
+    qreal clampGraphValue(const qreal &value);
 
-    qreal qra_clampValue(const qreal &value);
-
-    qreal qra_getPrevKeyValue(QrealKey *key);
-    qreal qra_getNextKeyValue(QrealKey *key);
-    int qra_getPrevKeyRelFrame(QrealKey *key);
-    int qra_getNextKeyRelFrame(QrealKey *key);
+    qreal qra_getPrevKeyValue(const QrealKey * const key);
+    qreal qra_getNextKeyValue(const QrealKey * const key);
+    int qra_getPrevKeyRelFrame(const QrealKey * const key);
+    int qra_getNextKeyRelFrame(const QrealKey * const key);
 
     virtual void prp_retrieveSavedValue();
     void qra_incCurrentValue(const qreal &incBy,
@@ -87,15 +72,6 @@ public:
                           const bool &callUpdater = true);
 
     virtual QString prp_getValueText();
-    void getMinAndMaxMoveFrame(QrealKey *key,
-                               QrealPoint *currentPoint,
-                               qreal *minMoveFrame,
-                               qreal *maxMoveFrame);
-    void drawKeysPath(QPainter *p,
-                      const QColor &paintColor);
-
-    void addKeysInRectToList(const QRectF &frameValueRect,
-                             QList<QrealKey*> *keys);
 
     qreal getMinPossibleValue();
     qreal getMaxPossibleValue();
@@ -125,26 +101,6 @@ public:
     void incSavedValueToCurrentValue(const qreal &incBy);
     void multSavedValueToCurrentValue(const qreal &multBy);
 
-    QColor getAnimatorColor(void *ptr) const {
-        for(const std::map<void*, QColor>::value_type& x : mAnimatorColors) {
-            if(x.first == ptr) {
-                return x.second;
-            }
-        }
-        return QColor();
-    }
-
-    void setAnimatorColor(void *ptr, const QColor &color) {
-        mAnimatorColors[ptr] = color;
-    }
-    void removeAnimatorColor(void *ptr) {
-        mAnimatorColors.erase(ptr);
-    }
-
-    bool isCurrentAnimator(void *ptr) const {
-        return mAnimatorColors.find(ptr) != mAnimatorColors.end();
-    }
-
     const int &getNumberDecimals() { return mDecimals; }
     void setNumberDecimals(const int &decimals) { mDecimals = decimals; }
 
@@ -154,7 +110,6 @@ public:
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     bool getBeingTransformed() { return mTransformed; }
     void anim_removeAllKeys();
-    QrealKey *getQrealKeyAtId(const int &id) const;
 
     void prp_updateAfterChangedRelFrameRange(const int &minFrame,
                                              const int &maxFrame) {
@@ -175,7 +130,7 @@ public:
     bool qra_hasNoise();
 
     qreal qra_getEffectiveValueAtRelFrame(const int &frame) const;
-    qreal qra_getEffectiveValueAtAbsFrame(const int &frame);
+    qreal qra_getEffectiveValueAtAbsFrame(const int &frame) const;
     qreal getCurrentEffectiveValueAtRelFrame(const int &frame) const;
     qreal getCurrentEffectiveValueAtAbsFrame(const int &frame);
     qreal qra_getValueAtRelFrameF(const qreal &frame) const;
@@ -193,6 +148,16 @@ public:
         anim->graphFixMinMaxValues();
         return anim;
     }
+
+    void anim_updateKeysPath();
+    void anim_getMinAndMaxValues(qreal &minValP, qreal &maxValP) const;
+    void anim_getMinAndMaxValuesBetweenFrames(const int &startFrame,
+                                              const int &endFrame,
+                                              qreal &minValP,
+                                              qreal &maxValP) const;
+    bool anim_graphValuesCorrespondToFrames() const {
+        return false;
+    }
 protected:
     QrealAnimator(const QString& name);
     QrealAnimator(const qreal &iniVal,
@@ -200,6 +165,7 @@ protected:
                   const qreal &maxVal,
                   const qreal &prefferdStep,
                   const QString& name);
+    QrealKey *getQrealKeyAtId(const int &id) const;
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;
@@ -213,9 +179,6 @@ protected:
     qreal mSavedCurrentValue = 0.;
 
     qsptr<RandomQrealGenerator> mRandomGenerator;
-    std::map<void*, QColor> mAnimatorColors;
-
-    QPainterPath mKeysPath;
 
     qreal mPrefferedValueStep = 1.;
 signals:

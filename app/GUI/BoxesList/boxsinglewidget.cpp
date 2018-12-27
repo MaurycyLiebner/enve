@@ -863,15 +863,15 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
         boxTarget->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);
         MainWindow::getInstance()->queScheduledTasksAndUpdate();
-    } else if(target->SWT_isQrealAnimator()) {
-        auto qrealTarget = GetAsPtr(target, QrealAnimator);
+    } else if(target->SWT_isAnimator()) {
+        auto animTarget = GetAsPtr(target, Animator);
         auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
         KeysView *keysView = bsvt->getKeysView();
         if(keysView != nullptr) {
-            if(qrealTarget->isCurrentAnimator(mParent)) {
-                keysView->graphRemoveViewedAnimator(qrealTarget);
+            if(animTarget->isCurrentAnimator(mParent)) {
+                keysView->graphRemoveViewedAnimator(animTarget);
             } else {
-                keysView->graphAddViewedAnimator(qrealTarget);
+                keysView->graphAddViewedAnimator(animTarget);
             }
             MainWindow::getInstance()->queScheduledTasksAndUpdate();
         }

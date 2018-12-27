@@ -2,14 +2,18 @@
 #define ANIMATOR_H
 
 #include <QColor>
+#include <QPainterPath>
+
 class QIODevice;
 #include "Properties/property.h"
 
 class ComplexAnimator;
 class Key;
+class QrealPoint;
 class QPainter;
 class DurationRectangleMovable;
 class FakeComplexAnimator;
+enum CtrlsMode : short;
 
 class Animator : public Property {
     Q_OBJECT
@@ -33,7 +37,6 @@ public:
 
     bool anim_isComplexAnimator();
 
-    virtual bool prp_isAnimator();
     virtual void prp_startDragging();
 
     void anim_updateRelFrame();
@@ -41,10 +44,10 @@ public:
     bool anim_getClosestsKeyOccupiedRelFrame(const int &frame,
                                              int &closest);
     Key *anim_getKeyAtRelFrame(const int &frame);
-    bool anim_hasPrevKey(Key *key);
-    bool anim_hasNextKey(Key *key);
+    bool anim_hasPrevKey(const Key * const key);
+    bool anim_hasNextKey(const Key * const key);
     virtual void anim_callFrameChangeUpdater();
-    virtual void anim_sortKeys();
+    void anim_sortKeys();
 
     virtual void anim_appendKey(const stdsptr<Key> &newKey,
                                 const bool &saveUndoRedo = true,
@@ -98,10 +101,10 @@ public:
     virtual void anim_saveCurrentValueAsKey();
     virtual void anim_addKeyAtRelFrame(const int &relFrame);
 
-    Key *anim_getNextKey(Key* key);
-    Key* anim_getPrevKey(Key* key);
-    int anim_getNextKeyRelFrame(Key* key);
-    int anim_getPrevKeyRelFrame(Key* key);
+    Key *anim_getNextKey(const Key * const key);
+    Key* anim_getPrevKey(const Key * const key);
+    int anim_getNextKeyRelFrame(const Key * const key);
+    int anim_getPrevKeyRelFrame(const Key * const key);
     void anim_setRecordingValue(const bool &rec);
 
     bool SWT_isAnimator();
@@ -149,10 +152,14 @@ public:
 
     void scaleSelectedKeysFrame(const int& absPivotFrame,
                                 const qreal& scale);
+    void setCtrlsModeForSelectedKeys(const CtrlsMode &mode);
 
     void cancelSelectedKeysTransform();
     void finishSelectedKeysTransform();
     void startSelectedKeysTransform();
+    void changeSelectedKeysFrameAndValueStart(const QPointF &frameVal);
+    void changeSelectedKeysFrameAndValue(const QPointF& frameVal);
+    void enableCtrlPtsForSelected();
 
     void deleteSelectedKeys();
 
@@ -161,13 +168,70 @@ public:
     const QList<stdptr<Key>>& getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
+
+    void incSelectedForGraph() {
+        if(!anim_mSelected) anim_updateKeysPath();
+        anim_mSelected++;
+    }
+
+    void decSelectedForGraph() {
+        anim_mSelected--;
+    }
+
+    QColor getAnimatorColor(void *ptr) const {
+        for(const std::map<void*, QColor>::value_type& x : mAnimatorColors) {
+            if(x.first == ptr) {
+                return x.second;
+            }
+        }
+        return QColor();
+    }
+
+    void setAnimatorColor(void *ptr, const QColor &color) {
+        mAnimatorColors[ptr] = color;
+    }
+    void removeAnimatorColor(void *ptr) {
+        mAnimatorColors.erase(ptr);
+    }
+
+    bool isCurrentAnimator(void *ptr) const {
+        return mAnimatorColors.find(ptr) != mAnimatorColors.end();
+    }
+    virtual void anim_updateKeysPath();
+    void drawKeysPath(QPainter * const p,
+                      const QColor &paintColor) const;
+    void getMinAndMaxMoveFrame(Key *key, QrealPoint *currentPoint,
+                               qreal &minMoveFrame, qreal &maxMoveFrame);
+    void anim_constrainCtrlsFrameValues();
+
+    QrealPoint *anim_getPointAt(const qreal &value,
+                                const qreal &frame,
+                                const qreal &pixelsPerFrame,
+                                const qreal &pixelsPerValUnit);
+    virtual void anim_getMinAndMaxValues(
+            qreal &minValP, qreal &maxValP) const {
+        Q_UNUSED(minValP); Q_UNUSED(maxValP);
+    }
+    virtual void anim_getMinAndMaxValuesBetweenFrames(
+            const int &startFrame, const int &endFrame,
+            qreal &minValP, qreal &maxValP) const {
+        Q_UNUSED(startFrame); Q_UNUSED(endFrame);
+        Q_UNUSED(minValP); Q_UNUSED(maxValP);
+    }
+    virtual bool anim_graphValuesCorrespondToFrames() const {
+        return true;
+    }
+    void addKeysInRectToList(const QRectF &frameValueRect,
+                             QList<Key*> &keys);
+    virtual qreal clampGraphValue(const qreal &value) { return value; }
+    void getSelectedSegments(QList<QList<Key*>> &segments);
 private:
     void sortSelectedKeys();
-
 protected:
     Animator(const QString &name);
 
-    int anim_getKeyIndex(Key *key);
+
+    int anim_getKeyIndex(const Key * const key);
 
     virtual void anim_drawKey(QPainter *p, Key* key,
                               const qreal &pixelsPerFrame,
@@ -176,13 +240,14 @@ protected:
                               const int& rowHeight,
                               const int& keyRectSize);
     bool anim_mIsComplexAnimator = false;
-    bool anim_mIsCurrentAnimator = false;
     bool anim_mIsRecording = false;
+    int anim_mSelected = 0;
 
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
 
-    QColor anim_mAnimatorColor;
+    std::map<void*, QColor> mAnimatorColors;
+    QPainterPath mKeysPath;
 
     QList<stdsptr<Key>> anim_mKeys;
     QList<stdptr<Key>> anim_mSelectedKeys;

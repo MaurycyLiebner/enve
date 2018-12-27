@@ -197,7 +197,7 @@ class PathKey : public Key, public PathContainer {
     friend class StdSelfRef;
 public:
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
-    bool differsFromKey(Key *key) { return key != this; }
+    bool differsFromKey(Key *key) const { return key != this; }
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
 

@@ -1,8 +1,8 @@
 #include "qrealpoint.h"
-#include "qrealkey.h"
+#include "Animators/key.h"
 
 QrealPoint::QrealPoint(QrealPointType type,
-                       QrealKey *parentKey,
+                       Key *parentKey,
                        const qreal &radius) {
     mRadius = radius;
     mType = type;
@@ -11,17 +11,16 @@ QrealPoint::QrealPoint(QrealPointType type,
 
 qreal QrealPoint::getFrame() {
     if(mType == KEY_POINT) return mParentKey->getAbsFrame();
-    if(mType == START_POINT) return mParentKey->getStartValueFrame();
-    /*if(mType == END_POINT)*/ return mParentKey->getEndValueFrame();
+    if(mType == START_POINT) return mParentKey->getStartValueFrameForGraph();
+    /*if(mType == END_POINT)*/ return mParentKey->getEndValueFrameForGraph();
 }
 
 void QrealPoint::setFrame(const qreal &frame) {
     if(mType == KEY_POINT) {
-        return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame),
-                                                           false);
+        return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame), false);
     }
-    if(mType == START_POINT) return mParentKey->setStartFrame(frame);
-    if(mType == END_POINT) return mParentKey->setEndFrame(frame);
+    if(mType == START_POINT) return mParentKey->setStartValueFrameForGraph(frame);
+    if(mType == END_POINT) return mParentKey->setEndValueFrameForGraph(frame);
 }
 
 void QrealPoint::startFrameTransform() {
@@ -33,15 +32,15 @@ void QrealPoint::finishFrameTransform() {
 }
 
 qreal QrealPoint::getValue() {
-    if(mType == KEY_POINT) return mParentKey->getValue();
-    if(mType == START_POINT) return mParentKey->getStartValue();
-    /*if(mType == END_POINT)*/ return mParentKey->getEndValue();
+    if(mType == KEY_POINT) return mParentKey->getValueForGraph();
+    if(mType == START_POINT) return mParentKey->getStartValueForGraph();
+    /*if(mType == END_POINT)*/ return mParentKey->getEndValueForGraph();
 }
 
 void QrealPoint::setValue(const qreal &value) {
-    if(mType == KEY_POINT) return mParentKey->setValue(value, false);
-    if(mType == START_POINT) return mParentKey->setStartValue(value);
-    if(mType == END_POINT) return mParentKey->setEndValue(value);
+    if(mType == KEY_POINT) return mParentKey->setValueForGraph(value);
+    if(mType == START_POINT) return mParentKey->setStartValueForGraph(value);
+    if(mType == END_POINT) return mParentKey->setEndValueForGraph(value);
 }
 
 bool QrealPoint::isSelected() {
@@ -105,10 +104,10 @@ bool QrealPoint::isEndPoint() { return mType == END_POINT; }
 
 bool QrealPoint::isEnabled() {
     if(isKeyPoint() ) return true;
-    if(isStartPoint() ) return mParentKey->isStartPointEnabled();
-    /*if(isEndPoint() )*/ return mParentKey->isEndPointEnabled();
+    if(isStartPoint() ) return mParentKey->getStartEnabledForGraph();
+    /*if(isEndPoint() )*/ return mParentKey->getEndEnabledForGraph();
 }
 
-QrealKey *QrealPoint::getParentKey() {
+Key *QrealPoint::getParentKey() {
     return mParentKey;
 }

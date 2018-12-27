@@ -127,7 +127,6 @@ public:
 
     virtual bool prp_hasKeys() { return false; }
 
-    virtual bool prp_isAnimator() { return false; }
     virtual void prp_startDragging() {}
 
     virtual bool prp_isRecording() { return false; }

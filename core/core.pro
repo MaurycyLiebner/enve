@@ -72,7 +72,10 @@ SOURCES += \
     skia/skqtconversions.cpp \
     skia/AddInclude/SkGeometry.cpp \
     skia/AddInclude/SkStroke.cpp \
-    skia/AddInclude/SkStrokerPriv.cpp
+    skia/AddInclude/SkStrokerPriv.cpp \
+    pointhelpers.cpp \
+    simplemath.cpp \
+    Animators/qrealpoint.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -103,7 +106,10 @@ HEADERS += \
     skia/AddInclude/SkPathPriv.h \
     skia/AddInclude/SkPointPriv.h \
     skia/AddInclude/SkStroke.h \
-    skia/AddInclude/SkStrokerPriv.h
+    skia/AddInclude/SkStrokerPriv.h \
+    pointhelpers.h \
+    simplemath.h \
+    Animators/qrealpoint.h
 
 unix {
     target.path = /usr/lib

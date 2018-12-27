@@ -23,7 +23,7 @@ public:
     void setTiles(const stdsptr<TilesData>& tiles) {
         mTiles = tiles;
     }
-    bool differsFromKey(Key *key) { return key != this; }
+    bool differsFromKey(Key *key) const { return key != this; }
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
     void duplicateTilesContentFrom(TilesData *tilesSrc) {

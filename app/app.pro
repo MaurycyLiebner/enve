@@ -68,8 +68,6 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/glwidget.cpp \
     svgimporter.cpp \
     qrealkey.cpp \
-    qrealpoint.cpp \
-    pointhelpers.cpp \
     Animators/transformanimator.cpp \
     Animators/boolanimator.cpp \
     Animators/coloranimator.cpp \
@@ -180,7 +178,6 @@ SOURCES += main.cpp\
     PixmapEffects/contrasteffect.cpp \
     PixmapEffects/brightnesseffect.cpp \
     PixmapEffects/sampledmotionblureffect.cpp \
-    simplemath.cpp \
     GUI/boxeslistkeysviewwidget.cpp \
     GUI/boxeslistanimationdockwidget.cpp \
     GUI/actionbutton.cpp \
@@ -263,8 +260,6 @@ HEADERS  += \
     GUI/ColorWidgets/glwidget.h \
     svgimporter.h \
     qrealkey.h \
-    qrealpoint.h \
-    pointhelpers.h \
     keypoint.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
@@ -377,7 +372,6 @@ HEADERS  += \
     PixmapEffects/sampledmotionblureffect.h \
     PathEffects/patheffectsinclude.h \
     PixmapEffects/pixmapeffectsinclude.h \
-    simplemath.h \
     GUI/actionbutton.h \
     GUI/animationdockwidget.h \
     GUI/animationwidgetscrollbar.h \
