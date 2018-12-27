@@ -60,10 +60,9 @@ void KeysView::deleteSelectedKeys() {
             clearHoveredPoint();
         }
     }
-    Q_FOREACH(Key *key, mSelectedKeys) {
-        key->deleteKey();
+    foreach(const auto& anim, mSelectedAnimators) {
+        anim->deleteSelectedKeys();
     }
-    mSelectedKeys.clear();
 }
 
 void KeysView::selectKeysInSelectionRect() {
@@ -153,16 +152,9 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         } else {
             if(mMovingKeys) {
                 if(!mFirstMove) {
-                    QList<Animator*> animators;
-                    Q_FOREACH(Key *key, mSelectedKeys) {
-                        key->cancelFrameTransform();
-                        Animator *keyAnimator = key->getParentAnimator();
-                        if(!animators.contains(keyAnimator)) {
-                            animators << keyAnimator;
-                        }
-                    }
-                    foreach(Animator *animator, animators) {
-                        animator->anim_mergeKeysIfNeeded();
+                    foreach(const auto& anim, mSelectedAnimators) {
+                        anim->cancelSelectedKeysTransform();
+                        anim->anim_mergeKeysIfNeeded();
                     }
                 }
 
@@ -231,7 +223,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                     GetAsPtr(cont, KeysClipboardContainer);
             if(container == nullptr) return false;
             container->paste(mMainWindow->getCurrentFrame(), this, true, true);
-        } else if(!mSelectedKeys.isEmpty()) {
+        } else if(!mSelectedAnimators.isEmpty()) {
             if(event->modifiers() & Qt::ControlModifier &&
                       event->key() == Qt::Key_C) {
                 if(event->isAutoRepeat()) return false;
@@ -264,10 +256,10 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                      event->key() == Qt::Key_D) {
                 auto container = getSelectedKeysClipboardContainer();
                 int lowestKey = INT_MAX;
-                Q_FOREACH(Key *key, mSelectedKeys) {
-                    int keyAbsFrame = key->getAbsFrame();
-                    if(keyAbsFrame < lowestKey) {
-                        lowestKey = keyAbsFrame;
+                foreach(const auto& anim, mSelectedAnimators) {
+                    int animLowest = anim->getLowestAbsFrameForSelectedKey();
+                    if(animLowest < lowestKey) {
+                        lowestKey = animLowest;
                     }
                 }
                 container->paste(lowestKey, this, false, true);
@@ -289,13 +281,13 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 update();
             } else if(event->modifiers() & Qt::ControlModifier &&
                       event->key() == Qt::Key_Right) {
-                Q_FOREACH(Key *key, mSelectedKeys) {
-                    key->incFrameAndUpdateParentAnimator(1);
+                foreach(const auto& anim, mSelectedAnimators) {
+                    anim->incSelectedKeysFrame(1);
                 }
             } else if(event->modifiers() & Qt::ControlModifier &&
                       event->key() == Qt::Key_Left) {
-                Q_FOREACH(Key *key, mSelectedKeys) {
-                    key->incFrameAndUpdateParentAnimator(-1);
+                foreach(const auto& anim, mSelectedAnimators) {
+                    anim->incSelectedKeysFrame(-1);
                 }
             } else {
                 return false;
@@ -541,8 +533,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
                 }
                 if(mMovingKeys) {
                     if(mFirstMove) {
-                        Q_FOREACH(Key *key, mSelectedKeys) {
-                            key->startFrameTransform();
+                        foreach(const auto& anim, mSelectedAnimators) {
+                            anim->startSelectedKeysTransform();
                         }
                     }
                     if(mScalingKeys) {
@@ -550,10 +542,9 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         if(mValueInput.inputEnabled()) {
                             keysScale = mValueInput.getValue();
                         }
-                        Q_FOREACH(Key *key, mSelectedKeys) {
-                            key->scaleFrameAndUpdateParentAnimator(
-                                        mMainWindow->getCurrentFrame(),
-                                        keysScale);
+                        int absFrame = mMainWindow->getCurrentFrame();
+                        foreach(const auto& anim, mSelectedAnimators) {
+                            anim->scaleSelectedKeysFrame(absFrame, keysScale);
                         }
                     } else {
 
@@ -561,14 +552,14 @@ void KeysView::handleMouseMove(const QPoint &pos,
                                 qRound((posU.x() - mLastPressPos.x())/
                                        mPixelsPerFrame);
                         if(mValueInput.inputEnabled()) {
-                            dFrame = mValueInput.getValue();
+                            dFrame = qRound(mValueInput.getValue());
                         }
                         int dDFrame = dFrame - mMoveDFrame;
 
                         if(dDFrame != 0) {
                             mMoveDFrame = dFrame;
-                            Q_FOREACH(Key *key, mSelectedKeys) {
-                                key->incFrameAndUpdateParentAnimator(dDFrame);
+                            foreach(const auto& anim, mSelectedAnimators) {
+                                anim->incSelectedKeysFrame(dDFrame);
                             }
                         }
                     }
@@ -593,7 +584,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                             qRound((posU.x() - mLastPressPos.x())/
                                    mPixelsPerFrame);
                     if(mValueInput.inputEnabled()) {
-                        dFrame = mValueInput.getValue();
+                        dFrame = qRound(mValueInput.getValue());
                     }
                     int dDFrame = dFrame - mMoveDFrame;
 
@@ -669,15 +660,9 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                         addKeyToSelection(mLastPressedKey);
                     }
                 }
-                QList<Animator*> parentAnimators;
-                Q_FOREACH(Key *key, mSelectedKeys) {
-                    key->finishFrameTransform();
-                    if(parentAnimators.contains(
-                                key->getParentAnimator()) ) continue;
-                    parentAnimators << key->getParentAnimator();
-                }
-                Q_FOREACH(Animator *animator, parentAnimators) {
-                    animator->anim_mergeKeysIfNeeded();
+                Q_FOREACH(const auto& anim, mSelectedAnimators) {
+                    anim->finishSelectedKeysTransform();
+                    anim->anim_mergeKeysIfNeeded();
                 }
 
                 mMoveDFrame = 0;
@@ -751,20 +736,17 @@ bool selectedKeysSort(const stdptr<Key> &key1,
     return key1->getParentAnimator() < key2->getParentAnimator();
 }
 
-void KeysView::sortSelectedKeys() {
-    std::sort(mSelectedKeys.begin(), mSelectedKeys.end(), selectedKeysSort);
-}
-
 void KeysView::addKeyToSelection(Key *key) {
-    key->addToSelection(mSelectedKeys, mSelectedAnimators);
+    key->addToSelection(mSelectedAnimators);
 }
 
 void KeysView::removeKeyFromSelection(Key *key) {
-    key->removeFromSelection(mSelectedKeys, mSelectedAnimators);
+    key->removeFromSelection(mSelectedAnimators);
 }
 
 void KeysView::clearKeySelection() {
-    Q_FOREACH(Key *key, mSelectedKeys) {
-        key->removeFromSelection(mSelectedKeys, mSelectedAnimators);
+    foreach(const auto& anim, mSelectedAnimators) {
+        anim->deselectAllKeys();
     }
+    mSelectedAnimators.clear();
 }

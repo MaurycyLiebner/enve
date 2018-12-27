@@ -139,10 +139,8 @@ public:
     void cancelFrameTransform();
 
     bool areAllChildrenSelected();
-    void addToSelection(QList<stdptr<Key>> &selectedKeys,
-                        QList<qptr<Animator>> &selectedAnimators);
-    void removeFromSelection(QList<stdptr<Key>> &selectedKeys,
-                             QList<qptr<Animator>> &selectedAnimators);
+    void addToSelection(QList<qptr<Animator>> &selectedAnimators);
+    void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
 
     bool hasKey(Key *key);
 

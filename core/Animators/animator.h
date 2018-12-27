@@ -137,11 +137,33 @@ public:
                                                   const qreal &frame) const;
     bool hasSelectedKeys() const;
 
-    void addSelectedKey(Key* key);
-
-    void removeSelectedKey(Key* key);
+    void addKeyToSelected(Key* key);
+    void removeKeyFromSelected(Key* key);
 
     void writeSelectedKeys(QIODevice* target);
+
+    void deselectAllKeys();
+    void selectAllKeys();
+
+    void incSelectedKeysFrame(const int& dFrame);
+
+    void scaleSelectedKeysFrame(const int& absPivotFrame,
+                                const qreal& scale);
+
+    void cancelSelectedKeysTransform();
+    void finishSelectedKeysTransform();
+    void startSelectedKeysTransform();
+
+    void deleteSelectedKeys();
+
+    int getLowestAbsFrameForSelectedKey();
+
+    const QList<stdptr<Key>>& getSelectedKeys() const {
+        return anim_mSelectedKeys;
+    }
+private:
+    void sortSelectedKeys();
+
 protected:
     Animator(const QString &name);
 

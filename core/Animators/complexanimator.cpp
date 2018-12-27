@@ -503,10 +503,9 @@ bool ComplexKey::areAllChildrenSelected() {
     return true;
 }
 
-void ComplexKey::addToSelection(QList<stdptr<Key>> &selectedKeys,
-                                QList<qptr<Animator>> &selectedAnimators) {
+void ComplexKey::addToSelection(QList<qptr<Animator>> &selectedAnimators) {
     Q_FOREACH(const stdptr<Key>& key, mKeys) {
-        key->addToSelection(selectedKeys, selectedAnimators);
+        key->addToSelection(selectedAnimators);
     }
 }
 
@@ -531,6 +530,12 @@ bool ComplexKey::differsFromKey(Key *otherKey) {
     return true;
 }
 
+void ComplexKey::removeFromSelection(QList<qptr<Animator>> &selectedAnimators) {
+    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+        key->removeFromSelection(selectedAnimators);
+    }
+}
+
 int ComplexKey::getChildKeysCount() {
     return mKeys.count();
 }
@@ -543,13 +548,6 @@ bool ComplexKey::hasSameKey(Key *otherKey) {
         }
     }
     return false;
-}
-
-void ComplexKey::removeFromSelection(QList<stdptr<Key>> &selectedKeys,
-                                     QList<qptr<Animator>> &selectedAnimators) {
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
-        key->removeFromSelection(selectedKeys, selectedAnimators);
-    }
 }
 
 void ComplexKey::startFrameTransform() {

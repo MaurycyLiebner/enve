@@ -606,18 +606,6 @@ bool Animator::anim_getNextAndPreviousKeyIdForRelFrameF(
     return true;
 }
 
-bool Animator::hasSelectedKeys() const {
-    return !anim_mSelectedKeys.isEmpty();
-}
-
-void Animator::addSelectedKey(Key *key) {
-    anim_mSelectedKeys << key;
-}
-
-void Animator::removeSelectedKey(Key *key) {
-    anim_mSelectedKeys.removeOne(key);
-}
-
 bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                const int &relFrame2) {
     if(relFrame1 == relFrame2) return false;
@@ -736,4 +724,88 @@ void Animator::prp_drawKeys(QPainter *p,
         }
     }
     p->restore();
+}
+
+
+bool Animator::hasSelectedKeys() const {
+    return !anim_mSelectedKeys.isEmpty();
+}
+
+void Animator::addKeyToSelected(Key *key) {
+    anim_mSelectedKeys << key;
+    key->setSelected(true);
+}
+
+void Animator::removeKeyFromSelected(Key *key) {
+    key->setSelected(false);
+    anim_mSelectedKeys.removeOne(key);
+}
+
+void Animator::sortSelectedKeys() {
+//    std::sort(anim_mSelectedKeys.begin(),
+//              anim_mSelectedKeys.end(),
+//              keysFrameSort);
+}
+
+void Animator::deselectAllKeys() {
+    foreach(const auto& key, anim_mSelectedKeys) {
+        key->setSelected(false);
+    }
+    anim_mSelectedKeys.clear();
+}
+
+void Animator::selectAllKeys() {
+    foreach(const auto& key, anim_mKeys) {
+        anim_mSelectedKeys.append(key.get());
+        key->setSelected(true);
+    }
+}
+
+void Animator::incSelectedKeysFrame(const int &dFrame) {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->incFrameAndUpdateParentAnimator(dFrame);
+    }
+}
+
+void Animator::scaleSelectedKeysFrame(const int &absPivotFrame,
+                                      const qreal &scale) {
+    Q_FOREACH(Key *key, anim_mSelectedKeys) {
+        key->scaleFrameAndUpdateParentAnimator(absPivotFrame, scale);
+    }
+}
+
+void Animator::cancelSelectedKeysTransform() {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->cancelFrameTransform();
+    }
+}
+
+void Animator::finishSelectedKeysTransform() {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->finishFrameTransform();
+    }
+}
+
+void Animator::startSelectedKeysTransform() {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->startFrameTransform();
+    }
+}
+
+void Animator::deleteSelectedKeys() {
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        key->deleteKey();
+    }
+    anim_mSelectedKeys.clear();
+}
+
+int Animator::getLowestAbsFrameForSelectedKey() {
+    int lowestKey = INT_MAX;
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        int keyAbsFrame = key->getAbsFrame();
+        if(keyAbsFrame < lowestKey) {
+            lowestKey = keyAbsFrame;
+        }
+    }
+    return lowestKey;
 }

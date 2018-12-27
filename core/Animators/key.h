@@ -55,10 +55,8 @@ public:
         return false;
     }
 
-    virtual void addToSelection(QList<stdptr<Key>> &selectedKeys,
-                                QList<qptr<Animator>> &selectedAnimators);
-    virtual void removeFromSelection(QList<stdptr<Key>> &selectedKeys,
-                                     QList<qptr<Animator>> &selectedAnimators);
+    virtual void addToSelection(QList<qptr<Animator>> &selectedAnimators);
+    virtual void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
 
     bool isHovered() {
         return mHovered;

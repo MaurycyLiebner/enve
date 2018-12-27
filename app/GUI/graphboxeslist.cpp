@@ -26,7 +26,6 @@ void KeysView::graphSetCornerCtrlAction() {
 }
 
 void KeysView::getSelectedSegments(QList<QList<QrealKey*>>& segments) {
-    sortSelectedKeys();
     QList<QrealKey*> currentSegment;
     QrealAnimator* currentAnimator = nullptr;
     bool currentAnimatorSelected = false;
@@ -69,7 +68,7 @@ void KeysView::getSelectedSegments(QList<QList<QrealKey*>>& segments) {
 }
 
 void KeysView::graphMakeSegmentsSmoothAction(const bool& smooth) {
-    if(mSelectedKeys.isEmpty()) return;
+    if(mSelectedAnimators.isEmpty()) return;
     QList<QList<QrealKey*>> segments;
     getSelectedSegments(segments);
 
@@ -409,7 +408,7 @@ void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
 }
 
 void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
-    if(mSelectedKeys.isEmpty()) return;
+    if(mSelectedAnimators.isEmpty()) return;
     QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setCtrlsMode(mode);
         key->afterKeyChanged();
@@ -418,7 +417,7 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
 }
 
 void KeysView::graphSetTwoSideCtrlForSelected() {
-    if(mSelectedKeys.isEmpty()) return;
+    if(mSelectedAnimators.isEmpty()) return;
     QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setEndEnabled(true);
         key->setStartEnabled(true);
@@ -448,11 +447,10 @@ void KeysView::graphDeletePressed() {
         GetAsPtr(key->getParentAnimator(), QrealAnimator)->qra_updateKeysPath();
         mCurrentPoint = nullptr;
     } else {
-        QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
-            key->removeFromAnimator();
-            key->setSelected(false);
+        foreach(const auto& anim, mSelectedAnimators) {
+            //if(!mAnimators.contains(anim)) continue;
+            anim->deleteSelectedKeys();
         }
-        mSelectedKeys.clear();
 
         Q_FOREACH(QrealAnimator *animator, mAnimators) {
             animator->anim_sortKeys();

@@ -6,6 +6,14 @@
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
 
+#define foreachSelectedKey(keyDef, ops) \
+    Q_FOREACH(const qptr<Animator>& anim, mSelectedAnimators) { \
+        const auto& animKeys = anim->getSelectedKeys(); \
+        Q_FOREACH(const qptr<Key>& key, animKeys) { \
+            ops \
+        } \
+    }
+
 const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),
                                       QColor(0, 255, 0)};

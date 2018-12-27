@@ -90,6 +90,7 @@ void QrealPoint::draw(QPainter *p, const QColor &paintColor) {
 
 void QrealPoint::setSelected(const bool &bT) {
     if(mType == KEY_POINT) {
+        Q_ASSERT(false); // key selection handled differently
         mParentKey->setSelected(bT);
     } else {
         mIsSelected = bT;
