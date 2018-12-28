@@ -260,7 +260,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
     if(prp_hasKeys()) {
         int n_tile_cols_t = qCeil(width_t/static_cast<qreal>(TILE_DIM));
         int n_tile_rows_t = qCeil(height_t/static_cast<qreal>(TILE_DIM));
-        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const auto &key, anim_mKeys) {
             SurfaceKey *frameT = GetAsPtr(key, SurfaceKey);
             frameT->setSize(width_t,
                             height_t);
@@ -276,7 +276,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
 
 void AnimatedSurface::move(const int &xT, const int &yT) {
     if(prp_hasKeys()) {
-        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const auto &key, anim_mKeys) {
             SurfaceKey *frameT = GetAsPtr(key, SurfaceKey);
             frameT->getTilesData()->move(xT, yT);
         }

@@ -7,7 +7,7 @@
 QrealKey::QrealKey(const int &frame,
                    const qreal &val,
                    QrealAnimator* parentAnimator) :
-    Key(parentAnimator) {
+    GraphKey(parentAnimator) {
     mValue = val;
     mRelFrame = frame;
     mEndFrame = mRelFrame + 5;

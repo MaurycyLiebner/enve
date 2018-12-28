@@ -1,7 +1,8 @@
 #ifndef GRAPHANIMATOR_H
 #define GRAPHANIMATOR_H
 #include "animator.h"
-
+#define GetAsGK(key) GetAsPtr(key, GraphKey)
+class GraphKey;
 class GraphAnimator : public Animator {
 public:
     GraphAnimator(const QString& name);
@@ -19,7 +20,7 @@ public:
     virtual void anim_updateKeysPath();
 
     void addKeysInRectToList(const QRectF &frameValueRect,
-                             QList<Key*> &keys);
+                             QList<GraphKey*> &keys);
 
 
     void incSelectedForGraph() {
@@ -56,7 +57,7 @@ public:
     }
     void drawKeysPath(QPainter * const p,
                       const QColor &paintColor) const;
-    void getMinAndMaxMoveFrame(Key *key,
+    void getMinAndMaxMoveFrame(GraphKey *key,
                                QrealPoint * const currentPoint,
                                qreal &minMoveFrame,
                                qreal &maxMoveFrame);
@@ -76,6 +77,7 @@ public:
                         const bool &update);
     void anim_removeKey(const stdsptr<Key> &keyToRemove,
                         const bool &saveUndoRedo);
+    void getSelectedSegments(QList<QList<GraphKey*>> &segments);
 protected:
     QPainterPath mKeysPath;
 private:

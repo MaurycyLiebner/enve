@@ -5,6 +5,7 @@
 #include "pointhelpers.h"
 #include "pathkey.h"
 #include "nodesettings.h"
+#define GetAsPK(key) GetAsPtr(key, PathKey)
 
 class PathAnimator;
 class NodePoint;

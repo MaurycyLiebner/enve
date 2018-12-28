@@ -1,8 +1,8 @@
 #include "qrealpoint.h"
-#include "Animators/key.h"
+#include "Animators/graphkey.h"
 
 QrealPoint::QrealPoint(const QrealPointType& type,
-                       Key *parentKey,
+                       GraphKey * const parentKey,
                        const qreal &radius) {
     mRadius = radius;
     mType = type;
@@ -108,6 +108,6 @@ bool QrealPoint::isEnabled() {
     /*if(isEndPoint())*/ return mParentKey->getEndEnabledForGraph();
 }
 
-Key *QrealPoint::getParentKey() {
+GraphKey *QrealPoint::getParentKey() {
     return mParentKey;
 }

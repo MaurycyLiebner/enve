@@ -40,7 +40,7 @@ void QrealAnimator::qra_incAllValues(const qreal &valInc,
                                      const bool &saveUndoRedo,
                                      const bool &finish,
                                      const bool &callUpdater) {
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         GetAsPtr(key.get(), QrealKey)->incValue(valInc, saveUndoRedo,
                                                  finish, callUpdater);
     }
@@ -440,7 +440,7 @@ void QrealAnimator::anim_moveKeyToRelFrame(Key *key,
 void QrealAnimator::anim_updateKeysPath() {
     mKeysPath = QPainterPath();
     QrealKey *lastKey = nullptr;
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         QrealKey *qaKey = GetAsPtr(key.get(), QrealKey);
         int keyFrame = key->getAbsFrame();
         qreal keyValue;
@@ -483,7 +483,7 @@ void QrealAnimator::anim_getMinAndMaxValues(qreal &minValP,
         minValP = mCurrentValue - mPrefferedValueStep;
         maxValP = mCurrentValue + mPrefferedValueStep;
     } else {
-        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const auto &key, anim_mKeys) {
             QrealKey *qaKey = GetAsPtr(key.get(), QrealKey);
             qreal keyVal = qaKey->getValue();
             qreal startVal = qaKey->getStartValue();
@@ -509,7 +509,7 @@ void QrealAnimator::anim_getMinAndMaxValuesBetweenFrames(
         maxValP = mCurrentValue;
     } else {
         bool first = true;
-        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const auto &key, anim_mKeys) {
             QrealKey *qaKey = GetAsPtr(key.get(), QrealKey);
             int keyFrame = key->getAbsFrame();
             if(keyFrame > endFrame || keyFrame < startFrame) continue;

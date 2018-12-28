@@ -1,6 +1,6 @@
 #ifndef QREALKEY_H
 #define QREALKEY_H
-#include "Animators/key.h"
+#include "Animators/graphkey.h"
 #include "smartPointers/sharedpointerdefs.h"
 
 class QPainter;
@@ -11,7 +11,7 @@ class ComplexKey;
 class QrealAnimator;
 class KeysClipboardContainer;
 
-class QrealKey : public Key {
+class QrealKey : public GraphKey {
     friend class StdSelfRef;
 public:
     QrealKey(QrealAnimator* parentAnimator);

@@ -3,7 +3,7 @@
 #include <QPainter>
 #include "smartPointers/sharedpointerdefs.h"
 
-class Key;
+class GraphKey;
 
 enum QrealPointType : short {
     START_POINT,
@@ -43,16 +43,16 @@ public:
 
     bool isEnabled();
 
-    Key *getParentKey();
+    GraphKey *getParentKey();
     void startFrameTransform();
     void finishFrameTransform();
 private:
     QrealPoint(const QrealPointType &type,
-               Key *parentKey,
+               GraphKey * const parentKey,
                const qreal &radius = 10.);
     bool mIsSelected = false;
     QrealPointType mType;
-    Key *mParentKey;
+    GraphKey *mParentKey;
     qreal mRadius;
 };
 

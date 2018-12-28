@@ -10,13 +10,13 @@
 Animator::Animator(const QString& name) : Property(name) {}
 
 void Animator::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         key->scaleFrameAndUpdateParentAnimator(pivotAbsFrame, scale, false);
     }
 }
 
 void Animator::anim_shiftAllKeys(const int &shift) {
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         anim_moveKeyToRelFrame(key.get(),
                                key->getRelFrame() + shift);
     }
@@ -160,7 +160,7 @@ void Animator::prp_startDragging() {}
 void Animator::anim_mergeKeysIfNeeded() {
     Key* lastKey = nullptr;
     QList<KeyPair> keyPairsToMerge;
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         Key* keyPtr = key.get();
         if(lastKey != nullptr) {
             if(keyPtr->getAbsFrame() == lastKey->getAbsFrame() ) {
@@ -310,7 +310,7 @@ void Animator::anim_callFrameChangeUpdater() {
 }
 
 void Animator::anim_updateAfterShifted() {
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         emit prp_removingKey(key.get());
         emit prp_addingKey(key.get());
     }
@@ -430,13 +430,13 @@ Key *Animator::prp_getKeyAtPos(const qreal &relX,
 }
 
 void Animator::prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         target->ca_addDescendantsKey(key.get());
     }
 }
 
 void Animator::prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         target->ca_removeDescendantsKey(key.get());
     }
 }
@@ -706,7 +706,7 @@ void Animator::prp_drawKeys(QPainter *p,
                             const int &keyRectSize) {
     p->save();
     p->translate(prp_getFrameShift()*pixelsPerFrame, 0.);
-    Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const auto &key, anim_mKeys) {
         if(key->getAbsFrame() >= startFrame &&
            key->getAbsFrame() <= endFrame) {
             anim_drawKey(p, key.get(), pixelsPerFrame,
@@ -799,27 +799,4 @@ int Animator::getLowestAbsFrameForSelectedKey() {
         }
     }
     return lowestKey;
-}
-
-void Animator::getSelectedSegments(QList<QList<Key*>>& segments) {
-//    sortSelectedKeys();
-    QList<Key*> currentSegment;
-    Key* lastKey = nullptr;
-    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
-        if(!lastKey) {
-            lastKey = key;
-            continue;
-        }
-        if(lastKey->getNextKey() != key) {
-            if(currentSegment.count() >= 2) {
-                segments << currentSegment;
-            }
-            currentSegment.clear();
-        }
-        currentSegment << key;
-        lastKey = key;
-    }
-    if(currentSegment.count() >= 2) {
-        segments << currentSegment;
-    }
 }

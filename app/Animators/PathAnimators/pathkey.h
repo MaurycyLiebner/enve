@@ -1,10 +1,10 @@
 #ifndef PATHKEY_H
 #define PATHKEY_H
-#include "Animators/key.h"
+#include "Animators/graphkey.h"
 #include "pathcontainer.h"
 class VectorPathAnimator;
 
-class PathKey : public Key, public PathContainer {
+class PathKey : public GraphKey, public PathContainer {
     friend class StdSelfRef;
 public:
     NodeSettings *getNodeSettingsForPtId(const int &ptId);

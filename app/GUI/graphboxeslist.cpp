@@ -27,8 +27,8 @@ void KeysView::graphSetCornerCtrlAction() {
 
 void KeysView::graphMakeSegmentsSmoothAction(const bool& smooth) {
     if(mSelectedKeysAnimators.isEmpty()) return;
-    QList<QList<Key*>> segments;
-    foreach(const auto& anim, mSelectedKeysAnimators) {
+    QList<QList<GraphKey*>> segments;
+    foreach(const auto& anim, mGraphAnimators) {
         //if(!mAnimators.contains(anim)) continue;
         anim->getSelectedSegments(segments);
     }
@@ -308,11 +308,11 @@ void KeysView::graphMouseRelease() {
             clearKeySelection();
         }
 
-        QList<Key*> keysList;
+        QList<GraphKey*> keysList;
         Q_FOREACH(const auto& anim, mGraphAnimators) {
             anim->addKeysInRectToList(mSelectionRect, keysList);
         }
-        Q_FOREACH(Key *const key, keysList) {
+        Q_FOREACH(GraphKey *const key, keysList) {
             addKeyToSelection(key);
         }
 
@@ -405,7 +405,7 @@ void KeysView::graphClearAnimatorSelection() {
 
 void KeysView::graphDeletePressed() {
     if(mPressedPoint && !mPressedKeyPoint) {
-        Key *key = mPressedPoint->getParentKey();
+        GraphKey *key = mPressedPoint->getParentKey();
         if(mPressedPoint->isEndPoint()) {
             key->setEndEnabledForGraph(false);
         } else if(mPressedPoint->isStartPoint()) {

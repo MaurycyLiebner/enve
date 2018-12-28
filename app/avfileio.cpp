@@ -168,7 +168,7 @@ void VectorPathAnimator::writeProperty(QIODevice *target) {
 
     int nKeys = anim_mKeys.count();
     target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
-    foreach(const stdsptr<Key> &key, anim_mKeys) {
+    foreach(const auto &key, anim_mKeys) {
         key->writeKey(target);
     }
 
@@ -259,7 +259,7 @@ void QrealKey::readKey(QIODevice *target) {
 void QrealAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
     target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
-    foreach(const stdsptr<Key> &key, anim_mKeys) {
+    foreach(const auto &key, anim_mKeys) {
         key->writeKey(target);
     }
 
@@ -353,7 +353,7 @@ void QStringKey::readKey(QIODevice *target) {
 void QStringAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
     target->write(reinterpret_cast<char*>(&nKeys), sizeof(int));
-    foreach(const stdsptr<Key> &key, anim_mKeys) {
+    foreach(const auto &key, anim_mKeys) {
         key->writeKey(target);
     }
     writeQString(target, mCurrentText);
@@ -1122,7 +1122,7 @@ void AnimatedSurface::writeProperty(QIODevice *target) {
     if(nKeys == 0) {
         mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
     } else {
-        foreach(const stdsptr<Key> &key, anim_mKeys) {
+        foreach(const auto &key, anim_mKeys) {
             key->writeKey(target);
         }
     }

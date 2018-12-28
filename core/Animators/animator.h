@@ -164,8 +164,6 @@ public:
     const QList<stdptr<Key>>& getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
-
-    void getSelectedSegments(QList<QList<Key*>> &segments);
 private:
     void sortSelectedKeys();
 protected:

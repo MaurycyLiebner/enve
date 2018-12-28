@@ -205,7 +205,7 @@ public:
                                  ComplexAnimator* parentAnimator = nullptr) {
         Q_UNUSED(shift);
         if(parentAnimator == nullptr) return;
-        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const auto &key, anim_mKeys) {
             parentAnimator->ca_updateDescendatKeyFrame(key.get());
         }
     }

@@ -87,6 +87,10 @@ template<class T>
 inline bool operator==(const StdPointer<T> &p1, const StdPointer<T> &p2)
 { return p1.operator->() == p2.operator->(); }
 
+template<class T1, class T2>
+inline bool operator==(const StdPointer<T1> &p1, const StdPointer<T2> &p2)
+{ return p1.operator->() == p2.operator->(); }
+
 template <class T>
 inline bool operator!=(const T *o, const StdPointer<T> &p)
 { return o != p.operator->(); }

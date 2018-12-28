@@ -1,5 +1,5 @@
 #include "graphanimator.h"
-#include "key.h"
+#include "graphkey.h"
 #include "qrealpoint.h"
 
 GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {}
@@ -23,7 +23,7 @@ void GraphAnimator::anim_removeKey(const stdsptr<Key>& keyToRemove,
 
 void GraphAnimator::setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
     Q_FOREACH(const auto& key, anim_mSelectedKeys) {
-        key->setCtrlsMode(mode);
+        GetAsGK(key)->setCtrlsMode(mode);
         anim_updateAfterChangedKey(key);
     }
 }
@@ -31,22 +31,22 @@ void GraphAnimator::setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
 void GraphAnimator::changeSelectedKeysFrameAndValueStart(
         const QPointF &frameVal) {
     Q_FOREACH(const auto& key, anim_mSelectedKeys) {
-        key->saveCurrentFrameAndValue();
-        key->changeFrameAndValueBy(frameVal);
+        GetAsGK(key)->saveCurrentFrameAndValue();
+        GetAsGK(key)->changeFrameAndValueBy(frameVal);
     }
 }
 
 void GraphAnimator::changeSelectedKeysFrameAndValue(
         const QPointF &frameVal) {
     Q_FOREACH(const auto& key, anim_mSelectedKeys) {
-        key->changeFrameAndValueBy(frameVal);
+        GetAsGK(key)->changeFrameAndValueBy(frameVal);
     }
 }
 
 void GraphAnimator::enableCtrlPtsForSelected() {
     Q_FOREACH(const auto& key, anim_mSelectedKeys) {
-        key->setEndEnabledForGraph(true);
-        key->setStartEnabledForGraph(true);
+        GetAsGK(key)->setEndEnabledForGraph(true);
+        GetAsGK(key)->setStartEnabledForGraph(true);
         anim_updateAfterChangedKey(key);
     }
 }
@@ -66,14 +66,14 @@ void GraphAnimator::drawKeysPath(QPainter * const p,
 
     p->setPen(Qt::NoPen);
     Q_FOREACH(const auto &key, anim_mKeys) {
-        key->drawGraphKey(p, paintColor);
+        GetAsGK(key)->drawGraphKey(p, paintColor);
     }
 
     p->restore();
 }
 
 void GraphAnimator::getMinAndMaxMoveFrame(
-        Key *key, QrealPoint * const currentPoint,
+        GraphKey *key, QrealPoint * const currentPoint,
         qreal &minMoveFrame, qreal &maxMoveFrame) {
     if(currentPoint->isKeyPoint()) return;
     qreal keyFrame = key->getAbsFrame();
@@ -125,17 +125,17 @@ void GraphAnimator::anim_updateKeysPath() {
         if(keyFrame == anim_mCurrentAbsFrame) {
             keyValue = anim_mCurrentRelFrame;
         } else {
-            keyValue = key->getValueForGraph();
+            keyValue = GetAsGK(key)->getValueForGraph();
         }
         if(lastKey == nullptr) {
             mKeysPath.moveTo(-5000, keyValue);
             mKeysPath.lineTo(keyFrame, keyValue);
         } else {
             mKeysPath.cubicTo(
-                        QPointF(lastKey->getEndFrameForGraph(),
-                                lastKey->getEndValueForGraph()),
-                        QPointF(key->getStartFrameForGraph(),
-                                key->getStartValueForGraph()),
+                        QPointF(GetAsGK(lastKey)->getEndFrameForGraph(),
+                                GetAsGK(lastKey)->getEndValueForGraph()),
+                        QPointF(GetAsGK(key)->getStartFrameForGraph(),
+                                GetAsGK(key)->getStartValueForGraph()),
                         QPointF(keyFrame, keyValue));
         }
         lastKey = key.get();
@@ -144,7 +144,7 @@ void GraphAnimator::anim_updateKeysPath() {
         mKeysPath.moveTo(-5000, -5000);
         mKeysPath.lineTo(5000, 5000);
     } else {
-        mKeysPath.lineTo(5000, lastKey->getValueForGraph());
+        mKeysPath.lineTo(5000, GetAsGK(lastKey)->getValueForGraph());
     }
 }
 
@@ -152,8 +152,8 @@ void GraphAnimator::anim_constrainCtrlsFrameValues() {
     Key *lastKey = nullptr;
     Q_FOREACH(const auto &key, anim_mKeys) {
         if(lastKey != nullptr) {
-            lastKey->constrainEndCtrlMaxFrame(key->getAbsFrame());
-            key->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
+            GetAsGK(lastKey)->constrainEndCtrlMaxFrame(GetAsGK(key)->getAbsFrame());
+            GetAsGK(key)->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
         }
         lastKey = key.get();
     }
@@ -166,7 +166,7 @@ QrealPoint *GraphAnimator::anim_getPointAt(const qreal &value,
                                       const qreal &pixelsPerValUnit) {
     QrealPoint *point = nullptr;
     Q_FOREACH(const auto &key, anim_mKeys) {
-        point = key->mousePress(frame, value,
+        point = GetAsGK(key)->mousePress(frame, value,
                                 pixelsPerFrame, pixelsPerValUnit);
         if(point != nullptr) {
             break;
@@ -180,10 +180,10 @@ void GraphAnimator::anim_getMinAndMaxValues(
     if(!anim_mKeys.isEmpty()) {
         qreal minVal = 100000.;
         qreal maxVal = -100000.;
-        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
-            qreal keyVal = key->getValueForGraph();
-            qreal startVal = key->getStartValueForGraph();
-            qreal endVal = key->getEndValueForGraph();
+        Q_FOREACH(const auto &key, anim_mKeys) {
+            qreal keyVal = GetAsGK(key)->getValueForGraph();
+            qreal startVal = GetAsGK(key)->getStartValueForGraph();
+            qreal endVal = GetAsGK(key)->getEndValueForGraph();
             qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
             qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
             if(maxKeyVal > maxVal) maxVal = maxKeyVal;
@@ -202,13 +202,13 @@ void GraphAnimator::anim_getMinAndMaxValuesBetweenFrames(
     if(!anim_mKeys.isEmpty()) {
         qreal minVal = 100000.;
         qreal maxVal = -100000.;
-        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const auto &key, anim_mKeys) {
             int keyAbsFrame = key->getAbsFrame();
             if(keyAbsFrame < startFrame) continue;
             if(keyAbsFrame > endFrame) break;
-            qreal keyVal = key->getValueForGraph();
-            qreal startVal = key->getStartValueForGraph();
-            qreal endVal = key->getEndValueForGraph();
+            qreal keyVal = GetAsGK(key)->getValueForGraph();
+            qreal startVal = GetAsGK(key)->getStartValueForGraph();
+            qreal endVal = GetAsGK(key)->getEndValueForGraph();
             qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
             qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
             if(maxKeyVal > maxVal) maxVal = maxKeyVal;
@@ -223,10 +223,33 @@ void GraphAnimator::anim_getMinAndMaxValuesBetweenFrames(
 
 
 void GraphAnimator::addKeysInRectToList(const QRectF &frameValueRect,
-                                   QList<Key*> &keys) {
+                                   QList<GraphKey *> &keys) {
     Q_FOREACH(const auto &key, anim_mKeys) {
-        if(key->isInsideRect(frameValueRect)) {
-            keys.append(key.get());
+        if(GetAsGK(key)->isInsideRect(frameValueRect)) {
+            keys.append(GetAsGK(key));
         }
+    }
+}
+
+void GraphAnimator::getSelectedSegments(QList<QList<GraphKey*>> &segments) {
+//    sortSelectedKeys();
+    QList<GraphKey*> currentSegment;
+    GraphKey* lastKey = nullptr;
+    Q_FOREACH(const auto& key, anim_mSelectedKeys) {
+        if(!lastKey) {
+            lastKey = GetAsGK(key);
+            continue;
+        }
+        if(lastKey->getNextKey() != key) {
+            if(currentSegment.count() >= 2) {
+                segments << currentSegment;
+            }
+            currentSegment.clear();
+        }
+        currentSegment << GetAsGK(key);
+        lastKey = GetAsGK(key);
+    }
+    if(currentSegment.count() >= 2) {
+        segments << currentSegment;
     }
 }
