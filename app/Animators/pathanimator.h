@@ -72,7 +72,6 @@ public:
 //    }
     QMatrix getCombinedTransform();
 private:
-    qsptr<BoolAnimator> mSmoothTransformation;
     BoundingBox *mParentBox = nullptr;
     QList<qsptr<VectorPathAnimator>> mSinglePaths;
 signals:

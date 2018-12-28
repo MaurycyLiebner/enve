@@ -5,7 +5,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include "float.h"
-#include "Animators/animator.h"
+#include "Animators/graphanimator.h"
 class QrealKey;
 class QrealPoint;
 class QrealAnimatorValueSlider;
@@ -13,7 +13,7 @@ class RandomQrealGenerator;
 
 #include <QDoubleSpinBox>
 
-class QrealAnimator :  public Animator {
+class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
     friend class SelfRef;
 public:

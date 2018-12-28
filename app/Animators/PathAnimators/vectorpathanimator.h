@@ -1,9 +1,10 @@
 #ifndef VECTORPATHANIMATOR_H
 #define VECTORPATHANIMATOR_H
-#include "Animators/animator.h"
+#include "Animators/graphanimator.h"
 #include "skia/skiaincludes.h"
 #include "pointhelpers.h"
 #include "pathkey.h"
+#include "nodesettings.h"
 
 class PathAnimator;
 class NodePoint;
@@ -13,59 +14,15 @@ class MovablePoint;
 class SvgNodePoint;
 class BasicTransformAnimator;
 enum CanvasMode : short;
-struct NodeSettings : public StdSelfRef {
-    friend class StdSelfRef;
-    NodeSettings() {}
-    NodeSettings(const NodeSettings *settings) {
-        if(settings == nullptr) return;
-        copyFrom(settings);
-    }
-    NodeSettings(const bool &startEnabledT,
-                 const bool &endEnabledT,
-                 const CtrlsMode &ctrlsModeT) {
-        set(startEnabledT, endEnabledT, ctrlsModeT);
-    }
 
-    void copyFrom(const NodeSettings *settings) {
-        if(settings == nullptr) {
-            startEnabled = false;
-            endEnabled = false;
-            ctrlsMode = CtrlsMode::CTRLS_CORNER;
-        } else {
-            startEnabled = settings->startEnabled;
-            endEnabled = settings->endEnabled;
-            ctrlsMode = settings->ctrlsMode;
-        }
-    }
-
-    void set(const bool &startEnabledT,
-             const bool &endEnabledT,
-             const CtrlsMode &ctrlsModeT) {
-        startEnabled = startEnabledT;
-        endEnabled = endEnabledT;
-        ctrlsMode = ctrlsModeT;
-    }
-
-    bool startEnabled = false;
-    bool endEnabled = false;
-    CtrlsMode ctrlsMode = CtrlsMode::CTRLS_CORNER;
-
-    void write(QIODevice *target);
-    void read(QIODevice *target);
-};
-
-class VectorPathAnimator : public Animator,
+class VectorPathAnimator : public GraphAnimator,
                            public PathContainer {
     Q_OBJECT
     friend class SelfRef;
 public:
     void prp_setAbsFrame(const int &frame);
-    SkPath getPathAtRelFrame(const int &relFrame,
-                             const bool &considerCurrent = true,
-                             const bool &interpolate = true);
-    SkPath getPathAtRelFrameF(const qreal &relFrame,
-                              const bool &considerCurrent = true,
-                              const bool &interpolate = true);
+    SkPath getPathAtRelFrame(const int &relFrame);
+    SkPath getPathAtRelFrameF(const qreal &relFrame);
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
 

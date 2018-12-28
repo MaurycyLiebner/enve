@@ -6,14 +6,6 @@
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
 
-#define foreachSelectedKey(keyDef, ops) \
-    Q_FOREACH(const qptr<Animator>& anim, mSelectedAnimators) { \
-        const auto& animKeys = anim->getSelectedKeys(); \
-        Q_FOREACH(const qptr<Key>& key, animKeys) { \
-            ops \
-        } \
-    }
-
 const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),
                                       QColor(0, 255, 0)};
@@ -21,6 +13,7 @@ const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
 class Key;
 class QrealKey;
 class QrealAnimator;
+class GraphAnimator;
 class QrealPoint;
 class Canvas;
 class MainWindow;
@@ -62,7 +55,7 @@ public:
     void graphMouseReleaseEvent(const Qt::MouseButton &eventButton);
     bool graphProcessFilteredKeyEvent(QKeyEvent *event);
     void graphResizeEvent(QResizeEvent *);
-    void graphAddViewedAnimator(Animator * const animator);
+    void graphAddViewedAnimator(GraphAnimator * const animator);
     void graphIncScale(const qreal &inc);
     void graphSetScale(const qreal &scale);
     void graphUpdateDimensions();
@@ -86,7 +79,7 @@ public:
     void middlePress(const QPointF &pressPos);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *e);
-    void graphRemoveViewedAnimator(Animator * const animator);
+    void graphRemoveViewedAnimator(GraphAnimator * const animator);
     void updateAnimatorsColors();
     void clearHoveredMovable();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
@@ -183,7 +176,7 @@ private:
 
     MainWindow *mMainWindow;
     QList<qptr<Animator>> mSelectedKeysAnimators;
-    QList<qptr<Animator>> mGraphAnimators;
+    QList<qptr<GraphAnimator>> mGraphAnimators;
 
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;

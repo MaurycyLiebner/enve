@@ -63,10 +63,6 @@ void Key::removeFromSelection(QList<qptr<Animator>> &selectedAnimators) {
     }
 }
 
-Animator* Key::getParentAnimator() const {
-    return mParentAnimator;
-}
-
 void Key::startFrameTransform() {
     mSavedRelFrame = mRelFrame;
 }

@@ -75,7 +75,8 @@ SOURCES += \
     skia/AddInclude/SkStrokerPriv.cpp \
     pointhelpers.cpp \
     simplemath.cpp \
-    Animators/qrealpoint.cpp
+    Animators/qrealpoint.cpp \
+    Animators/graphanimator.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -109,7 +110,8 @@ HEADERS += \
     skia/AddInclude/SkStrokerPriv.h \
     pointhelpers.h \
     simplemath.h \
-    Animators/qrealpoint.h
+    Animators/qrealpoint.h \
+    Animators/graphanimator.h
 
 unix {
     target.path = /usr/lib

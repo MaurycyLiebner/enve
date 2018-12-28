@@ -243,7 +243,9 @@ SOURCES += main.cpp\
     colorhelpers.cpp \
     gpurastereffect.cpp \
     Animators/qrealanimatorcreator.cpp \
-    Animators/gpueffectanimators.cpp
+    Animators/gpueffectanimators.cpp \
+    Animators/PathAnimators/pathcontainer.cpp \
+    Animators/PathAnimators/nodesettings.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -438,7 +440,9 @@ HEADERS  += \
     gpurastereffect.h \
     Animators/qrealanimatorcreator.h \
     Animators/intanimatorcreator.h \
-    Animators/gpueffectanimators.h
+    Animators/gpueffectanimators.h \
+    Animators/PathAnimators/pathcontainer.h \
+    Animators/PathAnimators/nodesettings.h
 
 RESOURCES += \
     resources.qrc

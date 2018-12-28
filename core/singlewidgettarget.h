@@ -155,9 +155,9 @@ public:
 
     void SWT_afterContentVisibilityChanged();
 
-
     // Animators
     virtual bool SWT_isAnimator() { return false; }
+    virtual bool SWT_isGraphAnimator() { return false; }
     virtual bool SWT_isBoolAnimator() { return false; }
     virtual bool SWT_isColorAnimator() { return false; }
     virtual bool SWT_isComplexAnimator() { return false; }

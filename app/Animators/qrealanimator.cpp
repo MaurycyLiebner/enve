@@ -18,14 +18,14 @@ QrealAnimator::QrealAnimator(const qreal &iniVal,
                              const qreal &maxVal,
                              const qreal &prefferdStep,
                              const QString &name) :
-    Animator(name) {
+    GraphAnimator(name) {
     mCurrentValue = iniVal;
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
     mPrefferedValueStep = prefferdStep;
 }
 
-QrealAnimator::QrealAnimator(const QString &name) : Animator(name) {}
+QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 
 QrealAnimator::~QrealAnimator() {}
 
@@ -346,7 +346,7 @@ void QrealAnimator::qra_saveValueToKey(QrealKey *key,
                                        const bool &finish) {
     key->setValue(value, saveUndoRedo, finish);
 
-    if(anim_mSelected) {
+    if(isSelectedForGraph()) {
         graphScheduleUpdateAfterKeysChanged();
     }
     anim_updateKeysPath();
@@ -606,7 +606,7 @@ void QrealAnimator::prp_finishTransform() {
         }
         mTransformed = false;
 
-        if(anim_mSelected) {
+        if(isSelectedForGraph()) {
             graphScheduleUpdateAfterKeysChanged();
         }
         prp_callFinishUpdater();

@@ -863,8 +863,8 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
         boxTarget->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);
         MainWindow::getInstance()->queScheduledTasksAndUpdate();
-    } else if(target->SWT_isAnimator()) {
-        auto animTarget = GetAsPtr(target, Animator);
+    } else if(target->SWT_isGraphAnimator()) {
+        auto animTarget = GetAsPtr(target, GraphAnimator);
         auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
         KeysView *keysView = bsvt->getKeysView();
         if(keysView != nullptr) {
@@ -1062,14 +1062,14 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 //        font.setBold(true);
 //        p.setFont(font);
     } /*else if(type == SWT_BoxesGroup) {
-    } */else if(target->SWT_isQrealAnimator()) {
-        QrealAnimator *qa_target = static_cast<QrealAnimator*>(target);
-        if(qa_target->isCurrentAnimator(mParent)) {
+    } */else if(target->SWT_isGraphAnimator()) {
+        auto graphAnim = static_cast<GraphAnimator*>(target);
+        if(graphAnim->isCurrentAnimator(mParent)) {
             p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
                        MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
-                       qa_target->getAnimatorColor(mParent));
+                       graphAnim->getAnimatorColor(mParent));
         }
-        name = qa_target->prp_getName();
+        name = graphAnim->prp_getName();
         if(fakeComplexAnimator) {
             if(mTarget->contentVisible()) {
                 drawPixmapCentered(&p, mContentButton->geometry(),
@@ -1081,7 +1081,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         } else {
             nameX += MIN_WIDGET_HEIGHT;
         }
-        if(qa_target->prp_isRecording()) {
+        if(graphAnim->prp_isRecording()) {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {

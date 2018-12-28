@@ -35,8 +35,10 @@ public:
                                          const bool &finish = true);
     void setRelFrameAndUpdateParentAnimator(const int &relFrame,
                                          const bool &finish = true);
-
-    Animator* getParentAnimator() const;
+    template <class T = Animator>
+    T* getParentAnimator() const {
+        return static_cast<T*>(mParentAnimator.data());
+    }
 
     virtual void mergeWith(const stdsptr<Key>& key) { key->removeFromAnimator(); }
 

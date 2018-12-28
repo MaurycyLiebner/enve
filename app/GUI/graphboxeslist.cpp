@@ -290,8 +290,9 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         }
         mPressedKeyPoint = true;
     } else {
+        auto parentKey = pressedPoint->getParentKey();
         auto parentAnimator =
-                pressedPoint->getParentKey()->getParentAnimator();
+                parentKey->getParentAnimator<GraphAnimator>();
         parentAnimator->
                 getMinAndMaxMoveFrame(
                     pressedPoint->getParentKey(), pressedPoint,
@@ -325,8 +326,8 @@ void KeysView::graphMouseRelease() {
                     addKeyToSelection(mPressedPoint->getParentKey());
                 }
             } else {
-                foreach(const auto& anim, mSelectedKeysAnimators) {
-                    if(!mGraphAnimators.contains(anim)) continue;
+                foreach(const auto& anim, mGraphAnimators) {
+                    if(!anim->hasSelectedKeys()) continue;
                     anim->finishSelectedKeysTransform();
 //                    key->finishValueTransform();
                 }
@@ -377,8 +378,8 @@ void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
 void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
     if(mSelectedKeysAnimators.isEmpty()) return;
 
-    foreach(const auto& anim, mSelectedKeysAnimators) {
-        //if(!mAnimators.contains(anim)) continue;
+    foreach(const auto& anim, mGraphAnimators) {
+        if(!anim->hasSelectedKeys()) continue;
         anim->setCtrlsModeForSelectedKeys(mode);
     }
     graphConstrainAnimatorCtrlsFrameValues();
@@ -386,8 +387,8 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
 
 void KeysView::graphSetTwoSideCtrlForSelected() {
     if(mSelectedKeysAnimators.isEmpty()) return;
-    foreach(const auto& anim, mSelectedKeysAnimators) {
-        //if(!mAnimators.contains(anim)) continue;
+    foreach(const auto& anim, mGraphAnimators) {
+        if(!anim->hasSelectedKeys()) continue;
         anim->enableCtrlPtsForSelected();
     }
     graphConstrainAnimatorCtrlsFrameValues();
@@ -413,7 +414,7 @@ void KeysView::graphDeletePressed() {
             Q_ASSERT(false);
         }
         key->afterKeyChanged();
-        key->getParentAnimator()->anim_updateKeysPath();
+        key->getParentAnimator<GraphAnimator>()->anim_updateKeysPath();
     } else {
         foreach(const auto& anim, mSelectedKeysAnimators) {
             //if(!mAnimators.contains(anim)) continue;
@@ -443,17 +444,18 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             QPointF frameValueChange = currentFrameAndValue -
                     mPressFrameAndValue;
             if(mFirstMove) {
-                foreach(const auto& anim, mSelectedKeysAnimators) {
-                    //if(!mAnimators.contains(anim)) continue;
+                foreach(const auto& anim, mGraphAnimators) {
+                    if(!anim->hasSelectedKeys()) continue;
                     anim->changeSelectedKeysFrameAndValueStart(frameValueChange);
                 }
             } else {
-                foreach(const auto& anim, mSelectedKeysAnimators) {
-                    //if(!mAnimators.contains(anim)) continue;
+                foreach(const auto& anim, mGraphAnimators) {
+                    if(!anim->hasSelectedKeys()) continue;
                     anim->changeSelectedKeysFrameAndValue(frameValueChange);
                 }
             }
-            Q_FOREACH(const auto& anim, mGraphAnimators) {
+            foreach(const auto& anim, mGraphAnimators) {
+                if(!anim->hasSelectedKeys()) continue;
                 anim->anim_sortKeys();
             }
         } else {
@@ -465,7 +467,7 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             //        }
             qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
             auto parentAnimator = mPressedPoint->getParentKey()->
-                                        getParentAnimator();
+                                        getParentAnimator<GraphAnimator>();
             mPressedPoint->moveTo(clampedFrame,
                                   parentAnimator->clampGraphValue(value));
         }
@@ -587,7 +589,7 @@ void KeysView::updateAnimatorsColors() {
     }
 }
 
-void KeysView::graphAddViewedAnimator(Animator * const animator) {
+void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
     mGraphAnimators << animator;
     animator->incSelectedForGraph();
     updateAnimatorsColors();
@@ -598,7 +600,7 @@ void KeysView::graphAddViewedAnimator(Animator * const animator) {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void KeysView::graphRemoveViewedAnimator(Animator * const animator) {
+void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
     mGraphAnimators.removeOne(animator);
     animator->decSelectedForGraph();
     animator->removeAnimatorColor(mBoxesListVisible);

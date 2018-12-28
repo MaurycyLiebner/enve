@@ -7,10 +7,7 @@
 #include "canvas.h"
 #include "boolanimator.h"
 
-PathAnimator::PathAnimator() : ComplexAnimator("path") {
-    mSmoothTransformation = SPtrCreate(BoolAnimator)("interpolate");
-    ca_addChildAnimator(mSmoothTransformation);
-}
+PathAnimator::PathAnimator() : ComplexAnimator("path") {}
 
 PathAnimator::PathAnimator(BoundingBox *parentBox) :
     PathAnimator() {
@@ -200,8 +197,7 @@ SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
     SkPath path = SkPath();
 
     Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
-        bool interpolate = mSmoothTransformation->getCurrentBoolValueAtRelFrame(relFrame);
-        path.addPath(singlePath->getPathAtRelFrame(relFrame, true, interpolate));
+        path.addPath(singlePath->getPathAtRelFrame(relFrame));
     }
 
     return path;
@@ -211,8 +207,7 @@ SkPath PathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
     SkPath path = SkPath();
 
     Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
-        bool interpolate = mSmoothTransformation->getCurrentBoolValueAtRelFrameF(relFrame);
-        path.addPath(singlePath->getPathAtRelFrameF(relFrame, true, interpolate));
+        path.addPath(singlePath->getPathAtRelFrameF(relFrame));
     }
 
     return path;

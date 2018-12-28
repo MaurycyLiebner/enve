@@ -8,7 +8,7 @@
 #include "Animators/transformanimator.h"
 
 VectorPathAnimator::VectorPathAnimator(PathAnimator *pathAnimator) :
-    Animator("path") {
+    GraphAnimator("path") {
     setParentPath(pathAnimator);
 }
 
@@ -35,7 +35,7 @@ void VectorPathAnimator::prp_setAbsFrame(const int &frame) {
     Animator::prp_setAbsFrame(frame);
     //setCurrentPath(getPathAtRelFrame(frame));
     if(prp_hasKeys()) {
-        setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
+        setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
     }
 }
 
@@ -173,11 +173,7 @@ void VectorPathAnimator::anim_saveCurrentValueAsKey() {
     }
 }
 
-SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
-                                             const bool &considerCurrent,
-                                             const bool &interpolate) {
-    Q_UNUSED(considerCurrent);
-    Q_UNUSED(interpolate);
+SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame) {
     if(mElementsUpdateNeeded) {
         finalizeNodesRemove();
     }
@@ -213,15 +209,10 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
     return pathToRuturn;
 }
 
-SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame,
-                                              const bool &considerCurrent,
-                                              const bool &interpolate) {
-    Q_UNUSED(considerCurrent);
-    Q_UNUSED(interpolate);
+SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
     if(mElementsUpdateNeeded) {
         finalizeNodesRemove();
     }
-    //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
     SkPath pathToRuturn;
     int prevId;
     int nextId;
@@ -1089,7 +1080,7 @@ void VectorPathAnimator::shiftAllPointsForAllKeys(const int &by) {
     foreach(const stdsptr<Key> &key, anim_mKeys) {
         GetAsPtr(key, PathKey)->shiftAllPoints(by);
     }
-    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
+    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
 }
 
 void VectorPathAnimator::revertAllPointsForAllKeys() {
@@ -1098,7 +1089,7 @@ void VectorPathAnimator::revertAllPointsForAllKeys() {
     foreach(const stdsptr<Key> &key, anim_mKeys) {
         GetAsPtr(key, PathKey)->revertAllPoints();
     }
-    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
+    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
 }
 
 void VectorPathAnimator::shiftAllNodeSettings(const int &by) {
@@ -1163,7 +1154,7 @@ void VectorPathAnimator::mergeNodes(const int &nodeId1,
         GetAsPtr(key, PathKey)->mergeNodes(nodeId1, nodeId2);
     }
 
-    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
+    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
     prp_updateInfluenceRangeAfterChanged();
 }
 
