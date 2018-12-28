@@ -1,7 +1,7 @@
 #include "qrealpoint.h"
 #include "Animators/key.h"
 
-QrealPoint::QrealPoint(QrealPointType type,
+QrealPoint::QrealPoint(const QrealPointType& type,
                        Key *parentKey,
                        const qreal &radius) {
     mRadius = radius;
@@ -103,9 +103,9 @@ bool QrealPoint::isStartPoint() { return mType == START_POINT; }
 bool QrealPoint::isEndPoint() { return mType == END_POINT; }
 
 bool QrealPoint::isEnabled() {
-    if(isKeyPoint() ) return true;
-    if(isStartPoint() ) return mParentKey->getStartEnabledForGraph();
-    /*if(isEndPoint() )*/ return mParentKey->getEndEnabledForGraph();
+    if(isKeyPoint()) return true;
+    if(isStartPoint()) return mParentKey->getStartEnabledForGraph();
+    /*if(isEndPoint())*/ return mParentKey->getEndEnabledForGraph();
 }
 
 Key *QrealPoint::getParentKey() {

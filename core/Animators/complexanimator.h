@@ -103,8 +103,8 @@ public slots:
                                  const qsptr<Property>& replaceWith);
     void prp_setRecording(const bool &rec);
 
-    void ca_addDescendantsKey(Key* key);
-    void ca_removeDescendantsKey(Key *key);
+    void ca_addDescendantsKey(Key * const key);
+    void ca_removeDescendantsKey(Key * const key);
     virtual void ca_childAnimatorIsRecordingChanged();
 protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
@@ -116,13 +116,13 @@ protected:
 class ComplexKey : public Key {
     friend class StdSelfRef;
 public:
-    void addAnimatorKey(Key *key);
+    void addAnimatorKey(Key * const key);
 
     void addOrMergeKey(const stdsptr<Key> &keyAdd);
 
     void deleteKey();
 
-    void removeAnimatorKey(Key *key);
+    void removeAnimatorKey(Key * const key);
 
     bool isEmpty() const;
 
@@ -130,7 +130,7 @@ public:
 
     void mergeWith(const stdsptr<Key> &key);
 
-    void margeAllKeysToKey(ComplexKey *target);
+    void margeAllKeysToKey(ComplexKey * const target);
 
     bool isDescendantSelected() const;
 
@@ -138,7 +138,7 @@ public:
     void finishFrameTransform();
     void cancelFrameTransform();
 
-    bool areAllChildrenSelected();
+    bool areAllChildrenSelected() const;
     void addToSelection(QList<qptr<Animator>> &selectedAnimators);
     void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
 

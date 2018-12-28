@@ -392,7 +392,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     }
 }
 
-void ComplexAnimator::ca_addDescendantsKey(Key* key) {
+void ComplexAnimator::ca_addDescendantsKey(Key * const key) {
     ComplexKey* collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());
     if(collection == nullptr) {
         auto newCollection = SPtrCreate(ComplexKey)(this);
@@ -403,12 +403,12 @@ void ComplexAnimator::ca_addDescendantsKey(Key* key) {
     collection->addAnimatorKey(key);
 }
 
-void ComplexAnimator::ca_removeDescendantsKey(Key* key) {
+void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
     ComplexKey* collection =
             ca_getKeyCollectionAtRelFrame(key->getRelFrame());
     if(collection == nullptr) return;
     collection->removeAnimatorKey(key);
-    if(collection->isEmpty() ) {
+    if(collection->isEmpty()) {
         anim_removeKey(GetAsSPtr(collection, ComplexKey));
     }
 }
@@ -417,7 +417,7 @@ ComplexKey::ComplexKey(ComplexAnimator* parentAnimator) :
     Key(parentAnimator) {
 }
 
-void ComplexKey::addAnimatorKey(Key* key) {
+void ComplexKey::addAnimatorKey(Key * const key) {
     mKeys << key;
 }
 
@@ -438,7 +438,7 @@ void ComplexKey::deleteKey() {
     }
 }
 
-void ComplexKey::removeAnimatorKey(Key* key) {
+void ComplexKey::removeAnimatorKey(Key * const key) {
     mKeys.removeOne(key);
 }
 
@@ -460,7 +460,7 @@ void ComplexKey::mergeWith(const stdsptr<Key>& key) {
     key->removeFromAnimator();
 }
 
-void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
+void ComplexKey::margeAllKeysToKey(ComplexKey * const target) {
     QList<stdptr<Key>> keys = mKeys;
     Q_FOREACH(const stdptr<Key>& key, keys) {
         removeAnimatorKey(key);
@@ -493,10 +493,9 @@ void ComplexKey::cancelFrameTransform() {
 //    }
 }
 
-bool ComplexKey::areAllChildrenSelected() {
+bool ComplexKey::areAllChildrenSelected() const {
     Q_FOREACH(const stdptr<Key>& key, mKeys) {
-        if(key->isSelected() ||
-                key->areAllChildrenSelected()) continue;
+        if(key->isSelected() || key->areAllChildrenSelected()) continue;
         return false;
     }
 

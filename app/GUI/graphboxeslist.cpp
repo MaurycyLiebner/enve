@@ -160,38 +160,38 @@ void KeysView::graphPaint(QPainter *p) {
 */
 }
 
-void KeysView::graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal) {
-    qreal minValT;
-    qreal maxValT;
+void KeysView::graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal) {
     if(mGraphAnimators.isEmpty()) {
-        minValT = 0.;
-        maxValT = 0.;
+        minVal = 0.;
+        maxVal = 0.;
     } else {
-        minValT = 1000000;
-        maxValT = -1000000;
+        minVal = 1000000;
+        maxVal = -1000000;
 
         Q_FOREACH(const auto& anim, mGraphAnimators) {
             qreal animMinVal;
             qreal animMaxVal;
-            anim->anim_getMinAndMaxValues(animMinVal, animMaxVal);
-            if(animMaxVal > maxValT) {
-                maxValT = animMaxVal;
+            if(anim->anim_graphValuesCorrespondToFrames()) {
+                animMinVal = mMinViewedFrame;
+                animMaxVal = mMaxViewedFrame;
+            } else {
+                anim->anim_getMinAndMaxValues(animMinVal, animMaxVal);
             }
-            if(animMinVal < minValT) {
-                minValT = animMinVal;
+            if(animMaxVal > maxVal) {
+                maxVal = animMaxVal;
+            }
+            if(animMinVal < minVal) {
+                minVal = animMinVal;
             }
         }
     }
-    if(qAbs(minValT - maxValT) < 0.1 ) {
-        minValT -= 0.05;
-        maxValT += 0.05;
+    if(qAbs(minVal - maxVal) < 0.1 ) {
+        minVal -= 0.05;
+        maxVal += 0.05;
     }
-    qreal valRange = maxValT - minValT;
-    maxValT += valRange*0.05;
-    minValT -= valRange*0.05;
-
-    *minVal = minValT;
-    *maxVal = maxValT;
+    qreal valRange = maxVal - minVal;
+    maxVal += valRange*0.05;
+    minVal -= valRange*0.05;
 }
 
 const QList<qreal> validIncs = {7.5, 5., 2.5, 1.};
@@ -562,7 +562,7 @@ void KeysView::graphResetValueScaleAndMinShownAction() {
 void KeysView::graphResetValueScaleAndMinShown() {
     qreal minVal;
     qreal maxVal;
-    graphGetAnimatorsMinMaxValue(&minVal, &maxVal);
+    graphGetAnimatorsMinMaxValue(minVal, maxVal);
     graphSetMinShownVal(minVal);
     mPixelsPerValUnit = height()/(maxVal - minVal);
     graphUpdateDimensions();

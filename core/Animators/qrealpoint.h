@@ -12,10 +12,8 @@ enum QrealPointType : short {
 };
 
 class QrealPoint : public StdSelfRef {
+    friend class StdSelfRef;
 public:
-    QrealPoint(QrealPointType type,
-               Key *parentKey,
-               const qreal &radius = 10.);
     ~QrealPoint() {}
 
     qreal getFrame();
@@ -49,6 +47,9 @@ public:
     void startFrameTransform();
     void finishFrameTransform();
 private:
+    QrealPoint(const QrealPointType &type,
+               Key *parentKey,
+               const qreal &radius = 10.);
     bool mIsSelected = false;
     QrealPointType mType;
     Key *mParentKey;

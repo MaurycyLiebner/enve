@@ -144,7 +144,7 @@ private slots:
     void scrollLeft();
 private:
     void graphConstrainAnimatorCtrlsFrameValues();
-    void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
+    void graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal);
     void graphMakeSegmentsSmoothAction(const bool &smooth);
     void sortSelectedKeys();
     void clearHoveredPoint();

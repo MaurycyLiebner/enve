@@ -56,7 +56,7 @@ public:
     void setSelected(const bool &bT);
     bool isSelected() const;
 
-    virtual bool areAllChildrenSelected() {
+    virtual bool areAllChildrenSelected() const {
         return false;
     }
 

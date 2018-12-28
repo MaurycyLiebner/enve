@@ -124,7 +124,7 @@ QrealPoint *Key::mousePress(const qreal &frameT,
                             const qreal &valueT,
                             const qreal &pixelsPerFrame,
                             const qreal &pixelsPerValue) {
-    if(isSelected() ) {
+    if(isSelected() || areAllChildrenSelected()) {
         if((getStartEnabledForGraph() && hasPrevKey()) ?
             mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
             false ) {
@@ -213,7 +213,7 @@ const CtrlsMode &Key::getCtrlsMode() const {
 
 void Key::drawGraphKey(QPainter *p,
                        const QColor &paintColor) const {
-    if(isSelected()) {
+    if(isSelected() || areAllChildrenSelected()) {
         p->save();
         QPen pen = QPen(Qt::black, 1.5);
         pen.setCosmetic(true);
@@ -241,7 +241,7 @@ void Key::drawGraphKey(QPainter *p,
         p->restore();
     }
     mGraphPoint->draw(p, paintColor);
-    if(isSelected()) {
+    if(isSelected() || areAllChildrenSelected()) {
         if(getStartEnabledForGraph() && hasPrevKey()) {
             mStartPoint->draw(p, paintColor);
         }
