@@ -179,6 +179,7 @@ private:
     bool mMovingKeys = false;
     bool mScalingKeys = false;
     bool mMovingRect = false;
+    bool mPressedKeyPoint = false;
 
     MainWindow *mMainWindow;
     QList<qptr<Animator>> mSelectedKeysAnimators;
@@ -192,7 +193,7 @@ private:
 
     qreal mPixelsPerValUnit = 0.;
     qreal mMinShownVal = 0.;
-    QrealPoint *mCurrentPoint = nullptr;
+    stdptr<QrealPoint> mPressedPoint;
     qreal mMinVal = 0.;
     qreal mMaxVal = 0.;
     qreal mMinMoveFrame = 0.;

@@ -47,8 +47,8 @@ public:
     bool getEndEnabledForGraph() const;
     bool getStartEnabledForGraph() const;
 
-    qreal getPrevKeyValue() const;
-    qreal getNextKeyValue() const;
+    qreal getPrevKeyValueForGraph() const;
+    qreal getNextKeyValueForGraph() const;
 
     void incValue(const qreal &incBy,
                   const bool &saveUndoRedo = false,
@@ -87,18 +87,31 @@ public:
         return getStartValue();
     }
 
-    qreal getStartValueFrameForGraph() const {
+    qreal getStartFrameForGraph() const {
         return getStartValueFrame();
     }
 
-    qreal getEndValueFrameForGraph() const {
+    qreal getEndFrameForGraph() const {
         return getEndValueFrame();
     }
 
-    void setEndValueFrameForGraph(const qreal &endFrame);
-    void setStartValueFrameForGraph(const qreal &startFrame);
+    void setEndFrameForGraph(const qreal &endFrame);
+    void setStartFrameForGraph(const qreal &startFrame);
     void setStartValueForGraph(const qreal &value);
     void setEndValueForGraph(const qreal &value);
+
+    void setEndValueDirectionForGraph(const qreal &value) {
+        if(!hasNextKey()) return;
+        setEndValueForGraph(
+                    getEndValueForGraphEndValueDirection(value));
+    }
+
+    void setStartValueDirectionForGraph(const qreal &value) {
+        if(!hasPrevKey()) return;
+        setStartValueForGraph(
+                    getStartValueForGraphStartValueDirection(value));
+    }
+
 protected:
     bool mStartEnabled = false;
     bool mEndEnabled = false;

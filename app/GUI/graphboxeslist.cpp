@@ -172,11 +172,14 @@ void KeysView::graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal) {
             qreal animMinVal;
             qreal animMaxVal;
             if(anim->anim_graphValuesCorrespondToFrames()) {
-                animMinVal = mMinViewedFrame;
-                animMaxVal = mMaxViewedFrame;
-            } else {
-                anim->anim_getMinAndMaxValues(animMinVal, animMaxVal);
+                qreal margin = (mMaxViewedFrame - mMinViewedFrame)*0.01;
+                margin = qMax(1., margin);
+                animMinVal = mMinViewedFrame - margin;
+                animMaxVal = mMaxViewedFrame + margin;
             }
+//            } else {
+                anim->anim_getMinAndMaxValues(animMinVal, animMaxVal);
+//            }
             if(animMaxVal > maxVal) {
                 maxVal = animMaxVal;
             }
@@ -239,21 +242,21 @@ void KeysView::graphGetValueAndFrameFromPos(const QPointF &pos,
 }
 
 void KeysView::graphMousePress(const QPointF &pressPos) {
+    mPressedKeyPoint = false;
     mFirstMove = true;
     qreal value;
     qreal frame;
     graphGetValueAndFrameFromPos(pressPos, &value, &frame);
 
+    QrealPoint* pressedPoint = nullptr;
     Q_FOREACH(const auto& anim, mGraphAnimators) {
-        mCurrentPoint = anim->anim_getPointAt(value, frame,
-                                              mPixelsPerFrame,
-                                              mPixelsPerValUnit);
-        if(mCurrentPoint != nullptr) break;
+        pressedPoint = anim->anim_getPointAt(value, frame,
+                                             mPixelsPerFrame,
+                                             mPixelsPerValUnit);
+        if(pressedPoint) break;
     }
-    Key *parentKey = (mCurrentPoint == nullptr) ?
-                nullptr :
-                mCurrentPoint->getParentKey();
-    if(mCurrentPoint == nullptr) {
+    Key *parentKey = pressedPoint ? pressedPoint->getParentKey() : nullptr;
+    if(!pressedPoint) {
         if(mMainWindow->isCtrlPressed() ) {
 //            graphClearKeysSelection();
 //            QrealKey *newKey = new QrealKey(qRound(frame), mAnimator, value);
@@ -271,7 +274,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
             mSelectionRect.setBottomRight(QPointF(frame, value));
             mSelectionRect.setTopLeft(QPointF(frame, value));
         }
-    } else if(mCurrentPoint->isKeyPoint()) {
+    } else if(pressedPoint->isKeyPoint()) {
         mPressFrameAndValue = QPointF(frame, value);
         if(mMainWindow->isShiftPressed()) {
             if(parentKey->isSelected()) {
@@ -285,15 +288,17 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
                 addKeyToSelection(parentKey);
             }
         }
+        mPressedKeyPoint = true;
     } else {
         auto parentAnimator =
-                mCurrentPoint->getParentKey()->getParentAnimator();
+                pressedPoint->getParentKey()->getParentAnimator();
         parentAnimator->
                 getMinAndMaxMoveFrame(
-                    mCurrentPoint->getParentKey(), mCurrentPoint,
+                    pressedPoint->getParentKey(), pressedPoint,
                     mMinMoveFrame, mMaxMoveFrame);
-        mCurrentPoint->setSelected(true);
+        pressedPoint->setSelected(true);
     }
+    mPressedPoint = pressedPoint;
 }
 
 void KeysView::graphMouseRelease() {
@@ -311,12 +316,13 @@ void KeysView::graphMouseRelease() {
         }
 
         mSelecting = false;
-    } else if(mCurrentPoint != nullptr) {
-        if(mCurrentPoint->isKeyPoint()) {
+    } else if(mPressedPoint || mPressedKeyPoint) {
+        if(mPressedKeyPoint) {
             if(mFirstMove) {
+                Q_ASSERT(mPressedPoint);
                 if(!mMainWindow->isShiftPressed()) {
                     clearKeySelection();
-                    addKeyToSelection(mCurrentPoint->getParentKey());
+                    addKeyToSelection(mPressedPoint->getParentKey());
                 }
             } else {
                 foreach(const auto& anim, mSelectedKeysAnimators) {
@@ -327,9 +333,9 @@ void KeysView::graphMouseRelease() {
             }
             graphMergeKeysIfNeeded();
         } else {
-               mCurrentPoint->setSelected(false);
+            mPressedPoint->setSelected(false);
         }
-        mCurrentPoint = nullptr;
+        mPressedPoint = nullptr;
 
         Q_FOREACH(const auto& anim, mGraphAnimators) {
             anim->anim_constrainCtrlsFrameValues();
@@ -397,16 +403,17 @@ void KeysView::graphClearAnimatorSelection() {
 }
 
 void KeysView::graphDeletePressed() {
-    if(mCurrentPoint != nullptr) {
-        Key *key = mCurrentPoint->getParentKey();
-        if(mCurrentPoint->isEndPoint()) {
+    if(mPressedPoint && !mPressedKeyPoint) {
+        Key *key = mPressedPoint->getParentKey();
+        if(mPressedPoint->isEndPoint()) {
             key->setEndEnabledForGraph(false);
-        } else if(mCurrentPoint->isStartPoint()) {
+        } else if(mPressedPoint->isStartPoint()) {
             key->setStartEnabledForGraph(false);
+        } else {
+            Q_ASSERT(false);
         }
         key->afterKeyChanged();
         key->getParentAnimator()->anim_updateKeysPath();
-        mCurrentPoint = nullptr;
     } else {
         foreach(const auto& anim, mSelectedKeysAnimators) {
             //if(!mAnimators.contains(anim)) continue;
@@ -418,6 +425,7 @@ void KeysView::graphDeletePressed() {
             anim->anim_updateKeysPath();
         }
     }
+    mPressedPoint = nullptr;
 }
 
 void KeysView::graphMouseMove(const QPointF &mousePos) {
@@ -426,17 +434,11 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
         qreal frame;
         graphGetValueAndFrameFromPos(mousePos, &value, &frame);
         mSelectionRect.setBottomRight(QPointF(frame, value));
-    } else if(mCurrentPoint != nullptr) {
-        if(!mCurrentPoint->isEnabled()) {
-            Key *parentKey = mCurrentPoint->getParentKey();
-            parentKey->setEndEnabledForGraph(true);
-            parentKey->setStartEnabledForGraph(true);
-            parentKey->setCtrlsMode(CTRLS_SYMMETRIC);
-        }
+    } else if(mPressedPoint || mPressedKeyPoint) {
         qreal value;
         qreal frame;
         graphGetValueAndFrameFromPos(mousePos, &value, &frame);
-        if(mCurrentPoint->isKeyPoint()) {
+        if(mPressedKeyPoint) {
             QPointF currentFrameAndValue = QPointF(frame, value);
             QPointF frameValueChange = currentFrameAndValue -
                     mPressFrameAndValue;
@@ -455,10 +457,16 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
                 anim->anim_sortKeys();
             }
         } else {
+            //        if(!mPressedPoint->isEnabled()) {
+            //            Key *parentKey = mPressedPoint->getParentKey();
+            //            parentKey->setEndEnabledForGraph(true);
+            //            parentKey->setStartEnabledForGraph(true);
+            //            parentKey->setCtrlsMode(CTRLS_SYMMETRIC);
+            //        }
             qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
-            auto parentAnimator = mCurrentPoint->getParentKey()->
+            auto parentAnimator = mPressedPoint->getParentKey()->
                                         getParentAnimator();
-            mCurrentPoint->moveTo(clampedFrame,
+            mPressedPoint->moveTo(clampedFrame,
                                   parentAnimator->clampGraphValue(value));
         }
         Q_FOREACH(const auto& anim, mGraphAnimators) {

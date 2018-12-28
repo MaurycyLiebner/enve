@@ -477,11 +477,6 @@ void QrealAnimator::anim_getMinAndMaxValues(qreal &minValP,
         maxValP = mMaxPossibleVal;
         return;
     }
-    if(anim_mIsComplexAnimator) {
-//        *minValP = mMainWindow->getKeysView()->getMinViewedFrame();
-//        *maxValP = mMainWindow->getKeysView()->getMaxViewedFrame();
-        return;
-    }
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
     if(anim_mKeys.isEmpty()) {

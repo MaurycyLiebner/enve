@@ -11,16 +11,16 @@ QrealPoint::QrealPoint(const QrealPointType& type,
 
 qreal QrealPoint::getFrame() {
     if(mType == KEY_POINT) return mParentKey->getAbsFrame();
-    if(mType == START_POINT) return mParentKey->getStartValueFrameForGraph();
-    /*if(mType == END_POINT)*/ return mParentKey->getEndValueFrameForGraph();
+    if(mType == START_POINT) return mParentKey->getStartFrameForGraph();
+    /*if(mType == END_POINT)*/ return mParentKey->getEndFrameForGraph();
 }
 
 void QrealPoint::setFrame(const qreal &frame) {
     if(mType == KEY_POINT) {
         return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame), false);
     }
-    if(mType == START_POINT) return mParentKey->setStartValueFrameForGraph(frame);
-    if(mType == END_POINT) return mParentKey->setEndValueFrameForGraph(frame);
+    if(mType == START_POINT) return mParentKey->setStartFrameForGraph(frame);
+    if(mType == END_POINT) return mParentKey->setEndFrameForGraph(frame);
 }
 
 void QrealPoint::startFrameTransform() {

@@ -12,6 +12,7 @@
 #include "durationrectsettingsdialog.h"
 #include <QApplication>
 #include "clipboardcontainer.h"
+#include "Animators/qrealpoint.h"
 
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
@@ -40,7 +41,7 @@ void KeysView::middlePress(const QPointF &pressPos) {
 }
 
 void KeysView::setViewedVerticalRange(const int &top,
-                              const int &bottom) {
+                                      const int &bottom) {
     mViewedTop = top;
     mViewedBottom = bottom;
     update();
@@ -54,7 +55,7 @@ void KeysView::middleMove(const QPointF &movePos) {
 }
 
 void KeysView::deleteSelectedKeys() {
-    if(mHoveredKey != nullptr) {
+    if(mHoveredKey) {
         if(mHoveredKey->isSelected()) {
             clearHoveredPoint();
         }
@@ -132,13 +133,11 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 }
             } else {
                 if(!mMainWindow->isShiftPressed() &&
-                    !(mLastPressedKey->isSelected() ||
-                      mLastPressedKey->areAllChildrenSelected())) {
+                    !mLastPressedKey->isSelected()) {
                     clearKeySelection();
                 }
                 if(mMainWindow->isShiftPressed() &&
-                    (mLastPressedKey->isSelected() ||
-                     mLastPressedKey->areAllChildrenSelected())) {
+                    mLastPressedKey->isSelected()) {
                     removeKeyFromSelection(mLastPressedKey);
                 } else {
                     clearHoveredPoint();

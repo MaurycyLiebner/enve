@@ -54,11 +54,7 @@ public:
             const qreal &scaleFactor,
             const bool &useSavedFrame = true);
     void setSelected(const bool &bT);
-    bool isSelected() const;
-
-    virtual bool areAllChildrenSelected() const {
-        return false;
-    }
+    virtual bool isSelected() const;
 
     virtual void addToSelection(QList<qptr<Animator>> &selectedAnimators);
     virtual void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
@@ -104,11 +100,21 @@ public:
         return mRelFrame;
     }
 
-    virtual qreal getStartValueFrameForGraph() const {
+    qreal getEndValueDirectionForGraph() const {
+        return getEndValueDirectionForGraphForEndValue(
+                    getEndValueForGraph());
+    }
+
+    qreal getStartValueDirectionForGraph() const {
+        return getStartValueDirectionForGraphForStartValue(
+                    getStartValueForGraph());
+    }
+
+    virtual qreal getStartFrameForGraph() const {
         return mRelFrame;
     }
 
-    virtual qreal getEndValueFrameForGraph() const {
+    virtual qreal getEndFrameForGraph() const {
         return mRelFrame;
     }
 
@@ -132,11 +138,19 @@ public:
         Q_UNUSED(value);
     }
 
-    virtual void setStartValueFrameForGraph(const qreal& frame) {
+    virtual void setEndValueDirectionForGraph(const qreal& value) {
+        Q_UNUSED(value);
+    }
+
+    virtual void setStartValueDirectionForGraph(const qreal& value) {
+        Q_UNUSED(value);
+    }
+
+    virtual void setStartFrameForGraph(const qreal& frame) {
         Q_UNUSED(frame);
     }
 
-    virtual void setEndValueFrameForGraph(const qreal& frame) {
+    virtual void setEndFrameForGraph(const qreal& frame) {
         Q_UNUSED(frame);
     }
 
@@ -166,12 +180,12 @@ public:
         mSavedRelFrame = mRelFrame;
     }
 
-    virtual qreal getPrevKeyValue() const {
+    virtual qreal getPrevKeyValueForGraph() const {
         auto prevKey = getPrevKey();
         if(!prevKey) return getValueForGraph();
         return prevKey->getValueForGraph();
     }
-    virtual qreal getNextKeyValue() const {
+    virtual qreal getNextKeyValueForGraph() const {
         auto nextKey = getNextKey();
         if(!nextKey) return getValueForGraph();
         return nextKey->getValueForGraph();
@@ -189,6 +203,38 @@ public:
     }
     void makeStartAndEndSmooth();
 protected:
+    qreal getEndValueDirectionForGraphForEndValue(const qreal& endVal) const {
+        if(!hasNextKey()) return 0.;
+        qreal nextValue = getNextKeyValueForGraph();
+        qreal valG = getValueForGraph();
+        int dFrame = getNextKeyRelFrame() - mRelFrame;
+        return (endVal - valG)/(nextValue - valG)/dFrame;
+    }
+
+    qreal getStartValueDirectionForGraphForStartValue(const qreal& startVal) const {
+        if(!hasPrevKey()) return 0.;
+        qreal prevValue = getPrevKeyValueForGraph();
+        qreal valG = getValueForGraph();
+        int dFrame = mRelFrame - getPrevKeyRelFrame();
+        return (startVal - valG)/(prevValue - valG)/dFrame;
+    }
+
+    qreal getStartValueForGraphStartValueDirection(const qreal& value) const {
+        if(!hasPrevKey()) return 0.;
+        qreal prevValue = getPrevKeyValueForGraph();
+        qreal valG = getValueForGraph();
+        int dFrame = mRelFrame - getPrevKeyRelFrame();
+        return valG + (prevValue - valG)*value*dFrame;
+    }
+
+    qreal getEndValueForGraphEndValueDirection(const qreal& value) const {
+        if(!hasNextKey()) return 0.;
+        qreal nextValue = getNextKeyValueForGraph();
+        qreal valG = getValueForGraph();
+        int dFrame = getNextKeyRelFrame() - mRelFrame;
+        return valG + (nextValue - valG)*value*dFrame;
+    }
+
     bool mIsSelected = false;
     bool mHovered = false;
 

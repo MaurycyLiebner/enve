@@ -268,7 +268,7 @@ void ComplexAnimator::anim_drawKey(QPainter *p, Key *key,
                                    const int &startFrame,
                                    const int &rowHeight,
                                    const int &keyRectSize) {
-    if(key->areAllChildrenSelected()) {
+    if(key->isSelected()) {
         p->setBrush(Qt::yellow);
     } else {
         p->setBrush(Qt::red);
@@ -422,7 +422,7 @@ void ComplexKey::addAnimatorKey(Key * const key) {
 }
 
 void ComplexKey::addOrMergeKey(const stdsptr<Key>& keyAdd) {
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         if(key->getParentAnimator() == keyAdd->getParentAnimator() ) {
             key->mergeWith(keyAdd);
             return;
@@ -450,7 +450,7 @@ void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);
 
     int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         key->setAbsFrame(absFrame);
     }
 }
@@ -470,7 +470,7 @@ void ComplexKey::margeAllKeysToKey(ComplexKey * const target) {
 
 bool ComplexKey::isDescendantSelected() const {
     if(isSelected()) return true;
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         if(key->isDescendantSelected()) return true;
     }
     return false;
@@ -493,9 +493,9 @@ void ComplexKey::cancelFrameTransform() {
 //    }
 }
 
-bool ComplexKey::areAllChildrenSelected() const {
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
-        if(key->isSelected() || key->areAllChildrenSelected()) continue;
+bool ComplexKey::isSelected() const {
+    Q_FOREACH(const auto& key, mKeys) {
+        if(key->isSelected()) continue;
         return false;
     }
 
@@ -503,13 +503,13 @@ bool ComplexKey::areAllChildrenSelected() const {
 }
 
 void ComplexKey::addToSelection(QList<qptr<Animator>> &selectedAnimators) {
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         key->addToSelection(selectedAnimators);
     }
 }
 
 bool ComplexKey::hasKey(Key *key) const {
-    Q_FOREACH(const stdptr<Key>& keyT, mKeys) {
+    Q_FOREACH(const auto& keyT, mKeys) {
         if(key == keyT) {
             return true;
         }
@@ -520,7 +520,7 @@ bool ComplexKey::hasKey(Key *key) const {
 bool ComplexKey::differsFromKey(Key *otherKey) const {
     ComplexKey* otherComplexKey = GetAsPtr(otherKey, ComplexKey);
     if(getChildKeysCount() == otherComplexKey->getChildKeysCount()) {
-        Q_FOREACH(const stdptr<Key>& key, mKeys) {
+        Q_FOREACH(const auto& key, mKeys) {
             if(otherComplexKey->hasSameKey(key)) continue;
             return true;
         }
@@ -530,7 +530,7 @@ bool ComplexKey::differsFromKey(Key *otherKey) const {
 }
 
 void ComplexKey::removeFromSelection(QList<qptr<Animator>> &selectedAnimators) {
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         key->removeFromSelection(selectedAnimators);
     }
 }
@@ -540,7 +540,7 @@ int ComplexKey::getChildKeysCount() const {
 }
 
 bool ComplexKey::hasSameKey(Key *otherKey) const {
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         if(key->getParentAnimator() == otherKey->getParentAnimator()) {
             if(key->differsFromKey(otherKey)) return false;
             return true;
@@ -551,14 +551,14 @@ bool ComplexKey::hasSameKey(Key *otherKey) const {
 
 void ComplexKey::startFrameTransform() {
     Key::startFrameTransform();
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         if(key->isSelected()) continue;
         key->startFrameTransform();
     }
 }
 
 void ComplexKey::finishFrameTransform() {
-    Q_FOREACH(const stdptr<Key>& key, mKeys) {
+    Q_FOREACH(const auto& key, mKeys) {
         if(key->isSelected()) continue;
         key->finishFrameTransform();
     }

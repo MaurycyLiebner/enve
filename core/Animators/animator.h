@@ -209,9 +209,7 @@ public:
                                 const qreal &pixelsPerFrame,
                                 const qreal &pixelsPerValUnit);
     virtual void anim_getMinAndMaxValues(
-            qreal &minValP, qreal &maxValP) const {
-        Q_UNUSED(minValP); Q_UNUSED(maxValP);
-    }
+            qreal &minValP, qreal &maxValP) const;
     virtual void anim_getMinAndMaxValuesBetweenFrames(
             const int &startFrame, const int &endFrame,
             qreal &minValP, qreal &maxValP) const {

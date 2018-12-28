@@ -55,12 +55,12 @@ QrealAnimator *QrealKey::getParentQrealAnimator() const {
     return static_cast<QrealAnimator*>(mParentAnimator.data());
 }
 
-qreal QrealKey::getPrevKeyValue() const {
+qreal QrealKey::getPrevKeyValueForGraph() const {
     if(mParentAnimator == nullptr) return mValue;
     return getParentQrealAnimator()->qra_getPrevKeyValue(this);
 }
 
-qreal QrealKey::getNextKeyValue() const {
+qreal QrealKey::getNextKeyValueForGraph() const {
     if(mParentAnimator == nullptr) return mValue;
     return getParentQrealAnimator()->qra_getNextKeyValue(this);
 }
@@ -130,12 +130,12 @@ void QrealKey::setEndFrameVar(const qreal &endFrame) {
     mEndFrame = endFrame;
 }
 
-void QrealKey::setEndValueFrameForGraph(const qreal &endFrame) {
+void QrealKey::setEndFrameForGraph(const qreal &endFrame) {
     setEndFrameVar(endFrame);
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void QrealKey::setStartValueFrameForGraph(const qreal &startFrame) {
+void QrealKey::setStartFrameForGraph(const qreal &startFrame) {
     setStartFrameVar(startFrame);
     mParentAnimator->anim_updateAfterChangedKey(this);
 }

@@ -124,7 +124,7 @@ QrealPoint *Key::mousePress(const qreal &frameT,
                             const qreal &valueT,
                             const qreal &pixelsPerFrame,
                             const qreal &pixelsPerValue) {
-    if(isSelected() || areAllChildrenSelected()) {
+    if(isSelected()) {
         if((getStartEnabledForGraph() && hasPrevKey()) ?
             mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
             false ) {
@@ -148,15 +148,15 @@ void Key::updateCtrlFromCtrl(const QrealPointType &type) {
     QPointF toPt;
     QrealPoint *targetPt;
     if(type == END_POINT) {
-        fromPt = QPointF(getEndValueFrameForGraph(),
+        fromPt = QPointF(getEndFrameForGraph(),
                          getEndValueForGraph());
-        toPt = QPointF(getStartValueFrameForGraph(),
+        toPt = QPointF(getStartFrameForGraph(),
                        getStartValueForGraph());
         targetPt = mStartPoint.get();
     } else {
-        toPt = QPointF(getEndValueFrameForGraph(),
+        toPt = QPointF(getEndFrameForGraph(),
                        getEndValueForGraph());
-        fromPt = QPointF(getStartValueFrameForGraph(),
+        fromPt = QPointF(getStartFrameForGraph(),
                          getStartValueForGraph());
         targetPt = mEndPoint.get();
     }
@@ -187,9 +187,9 @@ void Key::afterKeyChanged() {
 void Key::setCtrlsMode(const CtrlsMode &mode) {
     mCtrlsMode = mode;
     QPointF pos(mRelFrame, getValueForGraph());
-    QPointF startPos(getStartValueFrameForGraph(),
+    QPointF startPos(getStartFrameForGraph(),
                      getStartValueForGraph());
-    QPointF endPos(getEndValueFrameForGraph(),
+    QPointF endPos(getEndFrameForGraph(),
                    getEndValueForGraph());
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
         getCtrlsSymmetricPos(endPos, startPos, pos,
@@ -201,9 +201,9 @@ void Key::setCtrlsMode(const CtrlsMode &mode) {
     } else {
         return;
     }
-    setStartValueFrameForGraph(startPos.x());
+    setStartFrameForGraph(startPos.x());
     setStartValueForGraph(startPos.y());
-    setEndValueFrameForGraph(endPos.x());
+    setEndFrameForGraph(endPos.x());
     setEndValueForGraph(endPos.y());
 }
 
@@ -213,7 +213,7 @@ const CtrlsMode &Key::getCtrlsMode() const {
 
 void Key::drawGraphKey(QPainter *p,
                        const QColor &paintColor) const {
-    if(isSelected() || areAllChildrenSelected()) {
+    if(isSelected()) {
         p->save();
         QPen pen = QPen(Qt::black, 1.5);
         pen.setCosmetic(true);
@@ -223,7 +223,7 @@ void Key::drawGraphKey(QPainter *p,
 
         QPointF thisPos = QPointF(mRelFrame, getValueForGraph());
         if(getStartEnabledForGraph()) {
-            QPointF startPos = QPointF(getStartValueFrameForGraph(),
+            QPointF startPos = QPointF(getStartFrameForGraph(),
                                        getStartValueForGraph());
             p->setPen(pen);
             p->drawLine(thisPos, startPos);
@@ -231,7 +231,7 @@ void Key::drawGraphKey(QPainter *p,
             p->drawLine(thisPos, startPos);
         }
         if(getEndEnabledForGraph()) {
-            QPointF endPos = QPointF(getEndValueFrameForGraph(),
+            QPointF endPos = QPointF(getEndFrameForGraph(),
                                      getEndValueForGraph());
             p->setPen(pen);
             p->drawLine(thisPos, endPos);
@@ -241,7 +241,7 @@ void Key::drawGraphKey(QPainter *p,
         p->restore();
     }
     mGraphPoint->draw(p, paintColor);
-    if(isSelected() || areAllChildrenSelected()) {
+    if(isSelected()) {
         if(getStartEnabledForGraph() && hasPrevKey()) {
             mStartPoint->draw(p, paintColor);
         }
@@ -252,7 +252,7 @@ void Key::drawGraphKey(QPainter *p,
 }
 
 void Key::constrainEndCtrlMaxFrame(const int &maxFrame) {
-    qreal endFrame = getEndValueFrameForGraph();
+    qreal endFrame = getEndFrameForGraph();
     if(endFrame < maxFrame ||
             !getEndEnabledForGraph()) return;
     qreal endValue = getEndValueForGraph();
@@ -263,8 +263,8 @@ void Key::constrainEndCtrlMaxFrame(const int &maxFrame) {
 }
 
 void Key::constrainStartCtrlMinFrame(const int &minFrame) {
-    qreal startFrame = getStartValueFrameForGraph();
-    if(getStartValueFrameForGraph() > minFrame ||
+    qreal startFrame = getStartFrameForGraph();
+    if(getStartFrameForGraph() > minFrame ||
             !getStartEnabledForGraph()) return;
     qreal startValue = getStartValueForGraph();
     qreal value = getValueForGraph();
@@ -290,8 +290,8 @@ bool Key::isInsideRect(const QRectF &valueFrameRect) const {
 }
 
 void Key::makeStartAndEndSmooth() {
-    qreal nextKeyVal = getNextKeyValue();
-    qreal prevKeyVal = getPrevKeyValue();
+    qreal nextKeyVal = getNextKeyValueForGraph();
+    qreal prevKeyVal = getPrevKeyValueForGraph();
     int nextKeyFrame = getNextKeyRelFrame();
     int prevKeyFrame = getPrevKeyRelFrame();
     qreal valIncPerFrame;
@@ -302,9 +302,9 @@ void Key::makeStartAndEndSmooth() {
                 (nextKeyVal - prevKeyVal)/(nextKeyFrame - prevKeyFrame);
     }
     qreal newStartVal = getValueForGraph() +
-            (getStartValueFrameForGraph() - mRelFrame)*valIncPerFrame;
+            (getStartFrameForGraph() - mRelFrame)*valIncPerFrame;
     qreal newEndVal = getValueForGraph() +
-            (getEndValueFrameForGraph() - mRelFrame)*valIncPerFrame;
+            (getEndFrameForGraph() - mRelFrame)*valIncPerFrame;
     setStartValueForGraph(newStartVal);
     setEndValueForGraph(newEndVal);
 }

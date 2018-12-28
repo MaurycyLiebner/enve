@@ -918,9 +918,9 @@ void Animator::anim_updateKeysPath() {
             mKeysPath.lineTo(keyFrame, keyValue);
         } else {
             mKeysPath.cubicTo(
-                        QPointF(lastKey->getEndValueFrameForGraph(),
+                        QPointF(lastKey->getEndFrameForGraph(),
                                 lastKey->getEndValueForGraph()),
-                        QPointF(key->getStartValueFrameForGraph(),
+                        QPointF(key->getStartFrameForGraph(),
                                 key->getStartValueForGraph()),
                         QPointF(keyFrame, keyValue));
         }
@@ -960,6 +960,29 @@ QrealPoint *Animator::anim_getPointAt(const qreal &value,
     }
     return point;
 }
+
+void Animator::anim_getMinAndMaxValues(qreal &minValP,
+                                       qreal &maxValP) const {
+
+    qreal minVal = 100000.;
+    qreal maxVal = -100000.;
+    if(!anim_mKeys.isEmpty()) {
+        Q_FOREACH(const stdsptr<Key> &key, anim_mKeys) {
+            qreal keyVal = key->getValueForGraph();
+            qreal startVal = key->getStartValueForGraph();
+            qreal endVal = key->getEndValueForGraph();
+            qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
+            qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
+            if(maxKeyVal > maxVal) maxVal = maxKeyVal;
+            if(minKeyVal < minVal) minVal = minKeyVal;
+        }
+
+        qreal margin = qMax(1., (maxVal - minVal)*0.01);
+        minValP = minVal - margin;
+        maxValP = maxVal + margin;
+    }
+}
+
 
 void Animator::addKeysInRectToList(const QRectF &frameValueRect,
                                    QList<Key*> &keys) {
