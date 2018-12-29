@@ -3,9 +3,14 @@
 #include "animator.h"
 #define GetAsGK(key) GetAsPtr(key, GraphKey)
 class GraphKey;
+enum QrealPointType : short;
 class GraphAnimator : public Animator {
 public:
     GraphAnimator(const QString& name);
+
+    virtual void getValueConstraints(
+            GraphKey *key, const QrealPointType& type,
+            qreal &minMoveValue, qreal &maxMoveValue) const = 0;
 
     bool SWT_isGraphAnimator() { return true; }
     virtual void anim_getMinAndMaxValues(
@@ -57,10 +62,17 @@ public:
     }
     void drawKeysPath(QPainter * const p,
                       const QColor &paintColor) const;
-    void getMinAndMaxMoveFrame(GraphKey *key,
-                               QrealPoint * const currentPoint,
-                               qreal &minMoveFrame,
-                               qreal &maxMoveFrame);
+
+    void getFrameConstraints(
+            GraphKey *key, const QrealPointType& type,
+            qreal &minMoveFrame, qreal &maxMoveFrame) const;
+
+    void getFrameValueConstraints(GraphKey *key,
+                                  const QrealPointType& type,
+                                  qreal &minMoveFrame,
+                                  qreal &maxMoveFrame,
+                                  qreal &minMoveValue,
+                                  qreal &maxMoveValue) const;
     void anim_constrainCtrlsFrameValues();
 
     QrealPoint *anim_getPointAt(const qreal &value,

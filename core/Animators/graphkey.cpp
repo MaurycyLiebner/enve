@@ -276,3 +276,31 @@ void GraphKey::setRelFrame(const int &frame) {
     if(mParentAnimator == nullptr) return;
     mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }
+
+void GraphKey::setStartValueVar(const qreal &value) {
+    mStartValue = value;
+}
+
+void GraphKey::setEndValueVar(const qreal &value) {
+    mEndValue = value;
+}
+
+void GraphKey::setStartValueForGraph(const qreal &value) {
+    setStartValueVar(value);
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
+void GraphKey::setEndValueForGraph(const qreal &value) {
+    setEndValueVar(value);
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
+qreal GraphKey::getStartValue() const {
+    if(mStartEnabled) return mStartValue;
+    return getValueForGraph();
+}
+
+qreal GraphKey::getEndValue() const {
+    if(mEndEnabled) return mEndValue;
+    return getValueForGraph();
+}

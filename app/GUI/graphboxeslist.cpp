@@ -294,9 +294,10 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         auto parentAnimator =
                 parentKey->getParentAnimator<GraphAnimator>();
         parentAnimator->
-                getMinAndMaxMoveFrame(
-                    pressedPoint->getParentKey(), pressedPoint,
-                    mMinMoveFrame, mMaxMoveFrame);
+                getFrameValueConstraints(
+                    parentKey, pressedPoint->getType(),
+                    mMinMoveFrame, mMaxMoveFrame,
+                    mMinMoveVal, mMaxMoveVal);
         pressedPoint->setSelected(true);
     }
     mPressedPoint = pressedPoint;
@@ -466,10 +467,8 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             //            parentKey->setCtrlsMode(CTRLS_SYMMETRIC);
             //        }
             qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
-            auto parentAnimator = mPressedPoint->getParentKey()->
-                                        getParentAnimator<GraphAnimator>();
-            mPressedPoint->moveTo(clampedFrame,
-                                  parentAnimator->clampGraphValue(value));
+            qreal clamedValue = clamp(value, mMinMoveVal, mMaxMoveVal);
+            mPressedPoint->moveTo(clampedFrame, clamedValue);
         }
         Q_FOREACH(const auto& anim, mGraphAnimators) {
             anim->anim_updateKeysPath();

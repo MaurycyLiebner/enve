@@ -93,34 +93,6 @@ void QrealKey::startValueTransform() {
     mSavedValue = mValue;
 }
 
-void QrealKey::setStartValueVar(const qreal &value) {
-    mStartValue = value;
-}
-
-void QrealKey::setEndValueVar(const qreal &value) {
-    mEndValue = value;
-}
-
-void QrealKey::setStartValueForGraph(const qreal &value) {
-    setStartValueVar(value);
-    mParentAnimator->anim_updateAfterChangedKey(this);
-}
-
-void QrealKey::setEndValueForGraph(const qreal &value) {
-    setEndValueVar(value);
-    mParentAnimator->anim_updateAfterChangedKey(this);
-}
-
-qreal QrealKey::getStartValue() const {
-    if(mStartEnabled) return mStartValue;
-    return mValue;
-}
-
-qreal QrealKey::getEndValue() const {
-    if(mEndEnabled) return mEndValue;
-    return mValue;
-}
-
 void QrealKey::saveCurrentFrameAndValue() {
     mSavedRelFrame = getRelFrame();
     mSavedValue = getValue();

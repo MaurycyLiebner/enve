@@ -4,7 +4,7 @@
 #include "skia/skqtconversions.h"
 
 PathKey::PathKey(VectorPathAnimator* parentAnimator) :
-    GraphKey(parentAnimator) {}
+    InterpolationKey(parentAnimator) {}
 
 PathKey::PathKey(const int &relFrame,
                  const SkPath &path,

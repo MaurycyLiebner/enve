@@ -187,8 +187,8 @@ private:
     qreal mPixelsPerValUnit = 0.;
     qreal mMinShownVal = 0.;
     stdptr<QrealPoint> mPressedPoint;
-    qreal mMinVal = 0.;
-    qreal mMaxVal = 0.;
+    qreal mMinMoveVal = 0.;
+    qreal mMaxMoveVal = 0.;
     qreal mMinMoveFrame = 0.;
     qreal mMaxMoveFrame = 0.;
     QPointF mPressFrameAndValue = QPointF(0., 0.);

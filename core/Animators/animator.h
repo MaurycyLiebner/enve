@@ -170,7 +170,7 @@ protected:
     Animator(const QString &name);
 
 
-    int anim_getKeyIndex(const Key * const key);
+    int anim_getKeyIndex(const Key * const key) const;
 
     virtual void anim_drawKey(QPainter *p, Key* key,
                               const qreal &pixelsPerFrame,

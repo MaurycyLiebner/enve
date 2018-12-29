@@ -46,6 +46,9 @@ public:
     GraphKey *getParentKey();
     void startFrameTransform();
     void finishFrameTransform();
+    const QrealPointType& getType() const {
+        return mType;
+    }
 private:
     QrealPoint(const QrealPointType &type,
                GraphKey * const parentKey,

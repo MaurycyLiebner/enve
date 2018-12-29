@@ -1,6 +1,6 @@
 #ifndef VECTORPATHANIMATOR_H
 #define VECTORPATHANIMATOR_H
-#include "Animators/graphanimator.h"
+#include "Animators/interpolationanimator.h"
 #include "skia/skiaincludes.h"
 #include "pointhelpers.h"
 #include "pathkey.h"
@@ -16,7 +16,7 @@ class SvgNodePoint;
 class BasicTransformAnimator;
 enum CanvasMode : short;
 
-class VectorPathAnimator : public GraphAnimator,
+class VectorPathAnimator : public InterpolationAnimator,
                            public PathContainer {
     Q_OBJECT
     friend class SelfRef;

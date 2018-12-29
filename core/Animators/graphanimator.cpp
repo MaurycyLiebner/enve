@@ -72,10 +72,14 @@ void GraphAnimator::drawKeysPath(QPainter * const p,
     p->restore();
 }
 
-void GraphAnimator::getMinAndMaxMoveFrame(
-        GraphKey *key, QrealPoint * const currentPoint,
-        qreal &minMoveFrame, qreal &maxMoveFrame) {
-    if(currentPoint->isKeyPoint()) return;
+void GraphAnimator::getFrameConstraints(
+        GraphKey *key, const QrealPointType& type,
+        qreal &minMoveFrame, qreal &maxMoveFrame) const {
+    if(type == QrealPointType::KEY_POINT) {
+        minMoveFrame = DBL_MIN;
+        maxMoveFrame = DBL_MAX;
+        return;
+    }
     qreal keyFrame = key->getAbsFrame();
 
     qreal startMinMoveFrame;
@@ -96,7 +100,7 @@ void GraphAnimator::getMinAndMaxMoveFrame(
     }
 
     if(key->getCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC) {
-        if(currentPoint->isEndPoint()) {
+        if(type == QrealPointType::END_POINT) {
             minMoveFrame = keyFrame;
             maxMoveFrame = 2*keyFrame - startMinMoveFrame;
             maxMoveFrame = qMin(endMaxMoveFrame, maxMoveFrame);
@@ -106,7 +110,7 @@ void GraphAnimator::getMinAndMaxMoveFrame(
             maxMoveFrame = keyFrame;
         }
     } else {
-        if(currentPoint->isEndPoint()) {
+        if(type == QrealPointType::END_POINT) {
             minMoveFrame = keyFrame;
             maxMoveFrame = endMaxMoveFrame;
         } else {
@@ -114,6 +118,14 @@ void GraphAnimator::getMinAndMaxMoveFrame(
             maxMoveFrame = keyFrame;
         }
     }
+}
+
+void GraphAnimator::getFrameValueConstraints(
+        GraphKey *key, const QrealPointType& type,
+        qreal &minMoveFrame, qreal &maxMoveFrame,
+        qreal &minMoveValue, qreal &maxMoveValue) const {
+    getFrameConstraints(key, type, minMoveFrame, maxMoveFrame);
+    getValueConstraints(key, type, minMoveValue, maxMoveValue);
 }
 
 void GraphAnimator::anim_updateKeysPath() {
@@ -152,8 +164,10 @@ void GraphAnimator::anim_constrainCtrlsFrameValues() {
     Key *lastKey = nullptr;
     Q_FOREACH(const auto &key, anim_mKeys) {
         if(lastKey != nullptr) {
-            GetAsGK(lastKey)->constrainEndCtrlMaxFrame(GetAsGK(key)->getAbsFrame());
-            GetAsGK(key)->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
+            GetAsGK(lastKey)->constrainEndCtrlMaxFrame(
+                        key->getAbsFrame());
+            GetAsGK(key)->constrainStartCtrlMinFrame(
+                        lastKey->getAbsFrame());
         }
         lastKey = key.get();
     }

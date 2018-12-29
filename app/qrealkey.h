@@ -27,8 +27,6 @@ public:
                           const bool &saveUndoRedo = false,
                           const bool &finish = false,
                           const bool &callUpdater = true);
-    void setStartValueVar(const qreal &value);
-    void setEndValueVar(const qreal &value);
 
     void changeFrameAndValueBy(const QPointF &frameValueChange);
     void saveCurrentFrameAndValue();
@@ -51,17 +49,12 @@ public:
         return getValue();
     }
 
-    qreal getStartValue() const;
-    qreal getEndValue() const;
-
-    void setStartValueForGraph(const qreal &value);
-    void setEndValueForGraph(const qreal &value);
+    void setValueForGraph(const qreal& value) {
+        setValue(value);
+    }
 protected:
     qreal mValue;
     qreal mSavedValue;
-
-    qreal mStartValue = 0.;
-    qreal mEndValue = 0.;
 };
 
 #endif // QREALKEY_H

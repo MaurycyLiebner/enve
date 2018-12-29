@@ -209,7 +209,7 @@ void Animator::anim_saveCurrentValueAsKey() {}
 
 void Animator::anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
 
-int Animator::anim_getKeyIndex(const Key * const key) {
+int Animator::anim_getKeyIndex(const Key * const key) const {
     int index = -1;
     for(int i = 0; i < anim_mKeys.count(); i++) {
         if(anim_mKeys.at(i).get() == key) {

@@ -19,6 +19,15 @@ class QrealAnimator :  public GraphAnimator {
 public:
     virtual ~QrealAnimator();
 
+    void getValueConstraints(
+            GraphKey *key, const QrealPointType& type,
+            qreal &minMoveValue, qreal &maxMoveValue) const {
+        Q_UNUSED(key);
+        Q_UNUSED(type);
+        minMoveValue = mMinPossibleVal;
+        maxMoveValue = mMaxPossibleVal;
+    }
+
     void qra_setValueRange(const qreal &minVal,
                            const qreal &maxVal);
 

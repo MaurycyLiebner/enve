@@ -77,7 +77,9 @@ SOURCES += \
     simplemath.cpp \
     Animators/qrealpoint.cpp \
     Animators/graphanimator.cpp \
-    Animators/graphkey.cpp
+    Animators/graphkey.cpp \
+    Animators/interpolationkey.cpp \
+    Animators/interpolationanimator.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -113,7 +115,9 @@ HEADERS += \
     simplemath.h \
     Animators/qrealpoint.h \
     Animators/graphanimator.h \
-    Animators/graphkey.h
+    Animators/graphkey.h \
+    Animators/interpolationkey.h \
+    Animators/interpolationanimator.h
 
 unix {
     target.path = /usr/lib

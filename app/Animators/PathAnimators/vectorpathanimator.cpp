@@ -8,7 +8,7 @@
 #include "Animators/transformanimator.h"
 
 VectorPathAnimator::VectorPathAnimator(PathAnimator *pathAnimator) :
-    GraphAnimator("path") {
+    InterpolationAnimator("path") {
     setParentPath(pathAnimator);
 }
 
