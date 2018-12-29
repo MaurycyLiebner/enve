@@ -10,6 +10,11 @@ public:
             qreal &minMoveValue, qreal &maxMoveValue) const {
         getFrameConstraints(key, type, minMoveValue, maxMoveValue);
     }
+    qreal getInterpolatedFrameAtRelFrameF(const qreal &frame) const;
+private:
+    qreal getInterpolatedFrameAtRelFrameF(const qreal &frame,
+                                          GraphKey *prevKey,
+                                          GraphKey *nextKey) const;
 };
 
 #endif // INTERPOLATIONANIMATOR_H

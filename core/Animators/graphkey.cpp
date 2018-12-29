@@ -142,10 +142,28 @@ void GraphKey::drawGraphKey(QPainter *p,
     }
 }
 
+void GraphKey::constrainEndCtrlValue(const qreal &minVal,
+                                     const qreal &maxVal) {
+    if(!getEndEnabledForGraph()) return;
+    qreal endValue = getEndValue();
+    if(endValue > minVal && endValue < maxVal) return;
+    qreal newValue = clamp(endValue, minVal, maxVal);
+    mEndPoint->moveTo(getEndFrame(), newValue);
+}
+
+void GraphKey::constrainStartCtrlValue(const qreal &minVal,
+                                       const qreal &maxVal) {
+    if(!getStartEnabledForGraph()) return;
+    qreal startValue = getStartValue();
+    if(startValue > minVal && startValue < maxVal) return;
+    qreal newValue = clamp(startValue, minVal, maxVal);
+    mStartPoint->moveTo(getStartFrame(), newValue);
+}
+
+
 void GraphKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
     qreal endFrame = getEndFrame();
-    if(endFrame < maxFrame ||
-            !getEndEnabledForGraph()) return;
+    if(endFrame < maxFrame || !getEndEnabledForGraph()) return;
     qreal endValue = getEndValue();
     qreal value = getValueForGraph();
     qreal newFrame = clamp(endFrame, mRelFrame, maxFrame);
@@ -155,8 +173,7 @@ void GraphKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
 
 void GraphKey::constrainStartCtrlMinFrame(const int &minFrame) {
     qreal startFrame = getStartFrame();
-    if(getStartFrame() > minFrame ||
-            !getStartEnabledForGraph()) return;
+    if(startFrame > minFrame || !getStartEnabledForGraph()) return;
     qreal startValue = getStartValue();
     qreal value = getValueForGraph();
     qreal newFrame = clamp(startFrame, minFrame, mRelFrame);

@@ -339,9 +339,7 @@ void KeysView::graphMouseRelease() {
         }
         mPressedPoint = nullptr;
 
-        Q_FOREACH(const auto& anim, mGraphAnimators) {
-            anim->anim_constrainCtrlsFrameValues();
-        }
+        graphConstrainAnimatorCtrlsFrameValues();
         //graphConstrainAnimatorCtrlsFrameValues();
 
         // needed ?

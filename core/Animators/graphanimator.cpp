@@ -161,15 +161,23 @@ void GraphAnimator::anim_updateKeysPath() {
 }
 
 void GraphAnimator::anim_constrainCtrlsFrameValues() {
-    Key *lastKey = nullptr;
+    GraphKey *lastKey = nullptr;
     Q_FOREACH(const auto &key, anim_mKeys) {
+        auto gKey = GetAsGK(key);
         if(lastKey != nullptr) {
-            GetAsGK(lastKey)->constrainEndCtrlMaxFrame(
-                        key->getAbsFrame());
-            GetAsGK(key)->constrainStartCtrlMinFrame(
-                        lastKey->getAbsFrame());
+            lastKey->constrainEndCtrlMaxFrame(key->getAbsFrame());
+            qreal endMin; qreal endMax;
+            getValueConstraints(lastKey, QrealPointType::END_POINT,
+                                endMin, endMax);
+            lastKey->constrainEndCtrlValue(endMin, endMax);
+
+            gKey->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
+            qreal startMin; qreal startMax;
+            getValueConstraints(gKey, QrealPointType::START_POINT,
+                                startMin, startMax);
+            gKey->constrainStartCtrlValue(startMin, startMax);
         }
-        lastKey = key.get();
+        lastKey = gKey;
     }
     anim_updateKeysPath();
 }

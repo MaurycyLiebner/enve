@@ -189,10 +189,13 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame) {
             PathKey* nextKey = GetAsPK(anim_mKeys.at(nextId));
             int prevRelFrame = prevKey->getRelFrame();
             int nextRelFrame = nextKey->getRelFrame();
-            SkScalar weight = (static_cast<SkScalar>(relFrame) - prevRelFrame)/
+            qreal intRelFrame = getInterpolatedFrameAtRelFrameF(relFrame);
+            qreal weight = (intRelFrame - prevRelFrame)/
                     (nextRelFrame - prevRelFrame);
-            nextKey->getPath().interpolate(prevKey->getPath(),
-                                           weight, &pathToRuturn);
+            nextKey->getPath().interpolate(
+                        prevKey->getPath(),
+                        qrealToSkScalar(weight),
+                        &pathToRuturn);
         }
     } else {
         pathToRuturn = getPath();
@@ -224,10 +227,12 @@ SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
             PathKey* nextKey = GetAsPK(anim_mKeys.at(nextId));
             int prevRelFrame = prevKey->getRelFrame();
             int nextRelFrame = nextKey->getRelFrame();
-            SkScalar weight = (static_cast<SkScalar>(relFrame) - prevRelFrame)/
+            qreal intRelFrame = getInterpolatedFrameAtRelFrameF(relFrame);
+            qreal weight = (intRelFrame - prevRelFrame)/
                     (nextRelFrame - prevRelFrame);
             nextKey->getPath().interpolate(prevKey->getPath(),
-                                           weight, &pathToRuturn);
+                                           qrealToSkScalar(weight),
+                                           &pathToRuturn);
         }
     } else {
         pathToRuturn = getPath();

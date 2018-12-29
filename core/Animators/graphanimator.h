@@ -27,7 +27,6 @@ public:
     void addKeysInRectToList(const QRectF &frameValueRect,
                              QList<GraphKey*> &keys);
 
-
     void incSelectedForGraph() {
         if(!anim_mSelected) anim_updateKeysPath();
         anim_mSelected++;
@@ -73,7 +72,7 @@ public:
                                   qreal &maxMoveFrame,
                                   qreal &minMoveValue,
                                   qreal &maxMoveValue) const;
-    void anim_constrainCtrlsFrameValues();
+    virtual void anim_constrainCtrlsFrameValues();
 
     QrealPoint *anim_getPointAt(const qreal &value,
                                 const qreal &frame,

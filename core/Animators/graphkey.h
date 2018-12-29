@@ -103,6 +103,10 @@ public:
     void setRelFrame(const int &frame);
     void setStartValueVar(const qreal &value);
     void setEndValueVar(const qreal &value);
+    void constrainEndCtrlValue(const qreal &minVal,
+                               const qreal &maxVal);
+    void constrainStartCtrlValue(const qreal &minVal,
+                                 const qreal &maxVal);
 protected:
     qreal getEndValueDirectionForGraphForEndValue(const qreal& endVal) const {
         if(!hasNextKey()) return 0.;
