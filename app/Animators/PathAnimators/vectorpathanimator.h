@@ -225,7 +225,7 @@ private:
 
     qptr<BasicTransformAnimator> mParentTransform;
     qptr<PathAnimator> mParentPathAnimator;
-    stdptr<NodePoint>mFirstPoint;
+    stdptr<NodePoint> mFirstPoint;
 
     QList<int> mNodesToRemove;
     QList<stdsptr<NodeSettings>> mNodeSettings;

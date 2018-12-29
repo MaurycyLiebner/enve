@@ -47,8 +47,7 @@ BoundingBox::~BoundingBox() {}
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                       const int &maxFrame) {
-    Property::prp_updateAfterChangedAbsFrameRange(minFrame,
-                                                  maxFrame);
+    Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
     if(anim_mCurrentAbsFrame >= minFrame) {
         if(anim_mCurrentAbsFrame <= maxFrame) {
             scheduleUpdate(Animator::USER_CHANGE);

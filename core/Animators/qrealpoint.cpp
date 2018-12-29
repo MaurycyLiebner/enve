@@ -62,7 +62,7 @@ bool QrealPoint::isNear(const qreal &frameT,
 void QrealPoint::moveTo(const qreal &frameT, const qreal &valueT) {
     setFrame(frameT);
     setValue(valueT);
-    if(isKeyPoint() ) return;
+    if(isKeyPoint()) return;
     mParentKey->updateCtrlFromCtrl(mType);
 }
 

@@ -69,8 +69,8 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
             fromPt,
             QPointF(mRelFrame, getValueForGraph()));
     }
-    targetPt->setValue(newFrameValue.y() );
-    targetPt->setFrame(newFrameValue.x() );
+    targetPt->setValue(newFrameValue.y());
+    targetPt->setFrame(newFrameValue.x());
 
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
