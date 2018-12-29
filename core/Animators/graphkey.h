@@ -6,8 +6,9 @@ class QrealPoint;
 
 class GraphKey : public Key {
 public:
+    GraphKey(const int &frame,
+             Animator * const parentAnimator);
     GraphKey(Animator * const parentAnimator);
-
     void drawGraphKey(QPainter * const p,
                       const QColor &paintColor) const;
 
@@ -15,38 +16,22 @@ public:
         return mRelFrame;
     }
 
-    virtual qreal getEndValueForGraph() const {
+    virtual qreal getEndValue() const {
         return mRelFrame;
     }
 
-    virtual qreal getStartValueForGraph() const {
+    virtual qreal getStartValue() const {
         return mRelFrame;
     }
 
     qreal getEndValueDirectionForGraph() const {
         return getEndValueDirectionForGraphForEndValue(
-                    getEndValueForGraph());
+                    getEndValue());
     }
 
     qreal getStartValueDirectionForGraph() const {
         return getStartValueDirectionForGraphForStartValue(
-                    getStartValueForGraph());
-    }
-
-    virtual qreal getStartFrameForGraph() const {
-        return mRelFrame;
-    }
-
-    virtual qreal getEndFrameForGraph() const {
-        return mRelFrame;
-    }
-
-    virtual bool getStartEnabledForGraph() const {
-        return false;
-    }
-
-    virtual bool getEndEnabledForGraph() const {
-        return false;
+                    getStartValue());
     }
 
     virtual void setValueForGraph(const qreal& value) {
@@ -61,29 +46,20 @@ public:
         Q_UNUSED(value);
     }
 
-    virtual void setEndValueDirectionForGraph(const qreal& value) {
-        Q_UNUSED(value);
+    void setEndValueDirectionForGraph(const qreal &value) {
+        if(!hasNextKey()) return;
+        setEndValueForGraph(
+                    getEndValueForGraphEndValueDirection(value));
     }
 
-    virtual void setStartValueDirectionForGraph(const qreal& value) {
-        Q_UNUSED(value);
+    void setStartValueDirectionForGraph(const qreal &value) {
+        if(!hasPrevKey()) return;
+        setStartValueForGraph(
+                    getStartValueForGraphStartValueDirection(value));
     }
 
-    virtual void setStartFrameForGraph(const qreal& frame) {
-        Q_UNUSED(frame);
-    }
-
-    virtual void setEndFrameForGraph(const qreal& frame) {
-        Q_UNUSED(frame);
-    }
-
-    virtual void setStartEnabledForGraph(const bool& enabled) {
-        Q_UNUSED(enabled);
-    }
-
-    virtual void setEndEnabledForGraph(const bool& enabled) {
-        Q_UNUSED(enabled);
-    }
+    void setStartFrame(const qreal& frame);
+    void setEndFrame(const qreal& frame);
 
     QrealPoint *mousePress(const qreal &frameT,
                            const qreal &valueT,
@@ -98,12 +74,12 @@ public:
     void constrainEndCtrlMaxFrame(const int &maxFrame);
     virtual void changeFrameAndValueBy(const QPointF &frameValueChange);
 
-    virtual qreal getPrevKeyValueForGraph() const {
+    qreal getPrevKeyValueForGraph() const {
         auto prevKey = getPrevKey<GraphKey>();
         if(!prevKey) return getValueForGraph();
         return prevKey->getValueForGraph();
     }
-    virtual qreal getNextKeyValueForGraph() const {
+    qreal getNextKeyValueForGraph() const {
         auto nextKey = getNextKey<GraphKey>();
         if(!nextKey) return getValueForGraph();
         return nextKey->getValueForGraph();
@@ -111,6 +87,34 @@ public:
 
     void makeStartAndEndSmooth();
     bool isInsideRect(const QRectF &valueFrameRect) const;
+
+    void setStartFrameVar(const qreal &startFrame);
+    void setEndFrameVar(const qreal &endFrame);
+
+    qreal getStartFrame() const;
+    qreal getEndFrame() const;
+
+    void setStartEnabledForGraph(const bool &bT);
+    void setEndEnabledForGraph(const bool &bT);
+
+    bool getEndEnabledForGraph() const;
+    bool getStartEnabledForGraph() const;
+
+    virtual void saveCurrentFrameAndValue() {
+        mSavedRelFrame = mRelFrame;
+    }
+
+    void startFrameTransform() {
+        Key::startFrameTransform();
+        mSavedStartFrame = mStartFrame;
+        mSavedEndFrame = mEndFrame;
+    }
+
+    void scaleFrameAndUpdateParentAnimator(
+            const int &relativeToFrame,
+            const qreal &scaleFactor,
+            const bool& useSavedFrame);
+    void setRelFrame(const int &frame);
 protected:
     qreal getEndValueDirectionForGraphForEndValue(const qreal& endVal) const {
         if(!hasNextKey()) return 0.;
@@ -143,6 +147,14 @@ protected:
         int dFrame = getNextKeyRelFrame() - mRelFrame;
         return valG + (nextValue - valG)*value*dFrame;
     }
+
+    bool mStartEnabled = false;
+    bool mEndEnabled = false;
+
+    qreal mSavedStartFrame;
+    qreal mSavedEndFrame;
+    qreal mStartFrame = 0.;
+    qreal mEndFrame = 0.;
 
     stdsptr<QrealPoint> mGraphPoint;
     stdsptr<QrealPoint> mStartPoint;

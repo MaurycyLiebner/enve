@@ -761,7 +761,7 @@ void Animator::incSelectedKeysFrame(const int &dFrame) {
 void Animator::scaleSelectedKeysFrame(const int &absPivotFrame,
                                       const qreal &scale) {
     Q_FOREACH(const auto& key, anim_mSelectedKeys) {
-        key->scaleFrameAndUpdateParentAnimator(absPivotFrame, scale);
+        key->scaleFrameAndUpdateParentAnimator(absPivotFrame, scale, true);
     }
 }
 

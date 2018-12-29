@@ -48,7 +48,7 @@ public:
     virtual void scaleFrameAndUpdateParentAnimator(
             const int &relativeToFrame,
             const qreal &scaleFactor,
-            const bool &useSavedFrame = true);
+            const bool& useSavedFrame);
     void setSelected(const bool &bT);
     virtual bool isSelected() const;
 
@@ -89,11 +89,6 @@ public:
     virtual void readKey(QIODevice *target);
 
     void afterKeyChanged();
-
-    virtual void saveCurrentFrameAndValue() {
-        mSavedRelFrame = mRelFrame;
-    }
-
 
     int getPrevKeyRelFrame() const {
         auto prevKey = getPrevKey();

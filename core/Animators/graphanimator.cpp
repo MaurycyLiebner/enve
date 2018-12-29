@@ -132,10 +132,10 @@ void GraphAnimator::anim_updateKeysPath() {
             mKeysPath.lineTo(keyFrame, keyValue);
         } else {
             mKeysPath.cubicTo(
-                        QPointF(GetAsGK(lastKey)->getEndFrameForGraph(),
-                                GetAsGK(lastKey)->getEndValueForGraph()),
-                        QPointF(GetAsGK(key)->getStartFrameForGraph(),
-                                GetAsGK(key)->getStartValueForGraph()),
+                        QPointF(GetAsGK(lastKey)->getEndFrame(),
+                                GetAsGK(lastKey)->getEndValue()),
+                        QPointF(GetAsGK(key)->getStartFrame(),
+                                GetAsGK(key)->getStartValue()),
                         QPointF(keyFrame, keyValue));
         }
         lastKey = key.get();
@@ -182,8 +182,8 @@ void GraphAnimator::anim_getMinAndMaxValues(
         qreal maxVal = -100000.;
         Q_FOREACH(const auto &key, anim_mKeys) {
             qreal keyVal = GetAsGK(key)->getValueForGraph();
-            qreal startVal = GetAsGK(key)->getStartValueForGraph();
-            qreal endVal = GetAsGK(key)->getEndValueForGraph();
+            qreal startVal = GetAsGK(key)->getStartValue();
+            qreal endVal = GetAsGK(key)->getEndValue();
             qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
             qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
             if(maxKeyVal > maxVal) maxVal = maxKeyVal;
@@ -207,8 +207,8 @@ void GraphAnimator::anim_getMinAndMaxValuesBetweenFrames(
             if(keyAbsFrame < startFrame) continue;
             if(keyAbsFrame > endFrame) break;
             qreal keyVal = GetAsGK(key)->getValueForGraph();
-            qreal startVal = GetAsGK(key)->getStartValueForGraph();
-            qreal endVal = GetAsGK(key)->getEndValueForGraph();
+            qreal startVal = GetAsGK(key)->getStartValue();
+            qreal endVal = GetAsGK(key)->getEndValue();
             qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
             qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
             if(maxKeyVal > maxVal) maxVal = maxKeyVal;

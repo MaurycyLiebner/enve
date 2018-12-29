@@ -1,11 +1,19 @@
 #include "graphkey.h"
 #include "qrealpoint.h"
 
-GraphKey::GraphKey(Animator * const parentAnimator) : Key(parentAnimator) {
+GraphKey::GraphKey(const int &frame,
+                   Animator * const parentAnimator) :
+    Key(parentAnimator) {
+    mRelFrame = frame;
+    mEndFrame = mRelFrame + 5;
+    mStartFrame = mRelFrame - 5;
     mGraphPoint = SPtrCreate(QrealPoint)(KEY_POINT, this, 6.);
     mStartPoint = SPtrCreate(QrealPoint)(START_POINT, this, 4.);
     mEndPoint = SPtrCreate(QrealPoint)(END_POINT, this, 4.);
 }
+
+GraphKey::GraphKey(Animator * const parentAnimator) :
+    GraphKey(0, parentAnimator) {}
 
 QrealPoint *GraphKey::mousePress(const qreal &frameT,
                             const qreal &valueT,
@@ -35,16 +43,16 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
     QPointF toPt;
     QrealPoint *targetPt;
     if(type == END_POINT) {
-        fromPt = QPointF(getEndFrameForGraph(),
-                         getEndValueForGraph());
-        toPt = QPointF(getStartFrameForGraph(),
-                       getStartValueForGraph());
+        fromPt = QPointF(getEndFrame(),
+                         getEndValue());
+        toPt = QPointF(getStartFrame(),
+                       getStartValue());
         targetPt = mStartPoint.get();
     } else {
-        toPt = QPointF(getEndFrameForGraph(),
-                       getEndValueForGraph());
-        fromPt = QPointF(getStartFrameForGraph(),
-                         getStartValueForGraph());
+        toPt = QPointF(getEndFrame(),
+                       getEndValue());
+        fromPt = QPointF(getStartFrame(),
+                         getStartValue());
         targetPt = mEndPoint.get();
     }
     QPointF newFrameValue;
@@ -70,10 +78,10 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
 void GraphKey::setCtrlsMode(const CtrlsMode &mode) {
     mCtrlsMode = mode;
     QPointF pos(mRelFrame, getValueForGraph());
-    QPointF startPos(getStartFrameForGraph(),
-                     getStartValueForGraph());
-    QPointF endPos(getEndFrameForGraph(),
-                   getEndValueForGraph());
+    QPointF startPos(getStartFrame(),
+                     getStartValue());
+    QPointF endPos(getEndFrame(),
+                   getEndValue());
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
         getCtrlsSymmetricPos(endPos, startPos, pos,
                              &endPos, &startPos);
@@ -84,9 +92,9 @@ void GraphKey::setCtrlsMode(const CtrlsMode &mode) {
     } else {
         return;
     }
-    setStartFrameForGraph(startPos.x());
+    setStartFrame(startPos.x());
     setStartValueForGraph(startPos.y());
-    setEndFrameForGraph(endPos.x());
+    setEndFrame(endPos.x());
     setEndValueForGraph(endPos.y());
 }
 
@@ -106,16 +114,16 @@ void GraphKey::drawGraphKey(QPainter *p,
 
         QPointF thisPos = QPointF(mRelFrame, getValueForGraph());
         if(getStartEnabledForGraph()) {
-            QPointF startPos = QPointF(getStartFrameForGraph(),
-                                       getStartValueForGraph());
+            QPointF startPos = QPointF(getStartFrame(),
+                                       getStartValue());
             p->setPen(pen);
             p->drawLine(thisPos, startPos);
             p->setPen(pen2);
             p->drawLine(thisPos, startPos);
         }
         if(getEndEnabledForGraph()) {
-            QPointF endPos = QPointF(getEndFrameForGraph(),
-                                     getEndValueForGraph());
+            QPointF endPos = QPointF(getEndFrame(),
+                                     getEndValue());
             p->setPen(pen);
             p->drawLine(thisPos, endPos);
             p->setPen(pen2);
@@ -135,10 +143,10 @@ void GraphKey::drawGraphKey(QPainter *p,
 }
 
 void GraphKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
-    qreal endFrame = getEndFrameForGraph();
+    qreal endFrame = getEndFrame();
     if(endFrame < maxFrame ||
             !getEndEnabledForGraph()) return;
-    qreal endValue = getEndValueForGraph();
+    qreal endValue = getEndValue();
     qreal value = getValueForGraph();
     qreal newFrame = clamp(endFrame, mRelFrame, maxFrame);
     qreal change = (newFrame - mRelFrame)/(endFrame - mRelFrame);
@@ -146,10 +154,10 @@ void GraphKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
 }
 
 void GraphKey::constrainStartCtrlMinFrame(const int &minFrame) {
-    qreal startFrame = getStartFrameForGraph();
-    if(getStartFrameForGraph() > minFrame ||
+    qreal startFrame = getStartFrame();
+    if(getStartFrame() > minFrame ||
             !getStartEnabledForGraph()) return;
-    qreal startValue = getStartValueForGraph();
+    qreal startValue = getStartValue();
     qreal value = getValueForGraph();
     qreal newFrame = clamp(startFrame, minFrame, mRelFrame);
     qreal change = (mRelFrame - newFrame)/(mRelFrame - startFrame);
@@ -185,9 +193,86 @@ void GraphKey::makeStartAndEndSmooth() {
                 (nextKeyVal - prevKeyVal)/(nextKeyFrame - prevKeyFrame);
     }
     qreal newStartVal = getValueForGraph() +
-            (getStartFrameForGraph() - mRelFrame)*valIncPerFrame;
+            (getStartFrame() - mRelFrame)*valIncPerFrame;
     qreal newEndVal = getValueForGraph() +
-            (getEndFrameForGraph() - mRelFrame)*valIncPerFrame;
+            (getEndFrame() - mRelFrame)*valIncPerFrame;
     setStartValueForGraph(newStartVal);
     setEndValueForGraph(newEndVal);
+}
+
+
+void GraphKey::setStartEnabledForGraph(const bool &bT) {
+    mStartEnabled = bT;
+}
+
+void GraphKey::setEndEnabledForGraph(const bool &bT) {
+    mEndEnabled = bT;
+}
+
+qreal GraphKey::getStartFrame() const {
+    if(mStartEnabled) return mStartFrame;
+    return mRelFrame;
+}
+
+qreal GraphKey::getEndFrame() const {
+    if(mEndEnabled) return mEndFrame;
+    return mRelFrame;
+}
+
+bool GraphKey::getEndEnabledForGraph() const {
+    return mEndEnabled;
+}
+
+bool GraphKey::getStartEnabledForGraph() const {
+    return mStartEnabled;
+}
+
+void GraphKey::setStartFrameVar(const qreal &startFrame) {
+    mStartFrame = startFrame;
+}
+
+void GraphKey::setEndFrameVar(const qreal &endFrame) {
+    mEndFrame = endFrame;
+}
+
+void GraphKey::setEndFrame(const qreal &endFrame) {
+    setEndFrameVar(endFrame);
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
+void GraphKey::setStartFrame(const qreal &startFrame) {
+    setStartFrameVar(startFrame);
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
+void GraphKey::scaleFrameAndUpdateParentAnimator(
+        const int &relativeToFrame,
+        const qreal &scaleFactor,
+        const bool& useSavedFrame) {
+    int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
+    qreal startRelFrame = useSavedFrame ? mSavedStartFrame : mStartFrame;
+    qreal endRelFrame = useSavedFrame ? mSavedEndFrame : mEndFrame;
+
+    setStartFrameVar(thisRelFrame + (startRelFrame - thisRelFrame)*scaleFactor);
+    setEndFrameVar(thisRelFrame + (endRelFrame - thisRelFrame)*scaleFactor);
+
+    int relativeToRelFrame =
+            mParentAnimator->prp_absFrameToRelFrame(relativeToFrame);
+    int newFrame = qRound(relativeToRelFrame +
+                          (thisRelFrame - relativeToRelFrame)*scaleFactor);
+    if(newFrame != mRelFrame) {
+        incFrameAndUpdateParentAnimator(newFrame - mRelFrame);
+    } else {
+        mParentAnimator->anim_updateAfterChangedKey(this);
+    }
+}
+
+void GraphKey::setRelFrame(const int &frame) {
+    if(frame == mRelFrame) return;
+    int dFrame = frame - mRelFrame;
+    setEndFrameVar(mEndFrame + dFrame);
+    setStartFrameVar(mStartFrame + dFrame);
+    mRelFrame = frame;
+    if(mParentAnimator == nullptr) return;
+    mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }

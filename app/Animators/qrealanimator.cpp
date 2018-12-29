@@ -246,8 +246,8 @@ qreal QrealAnimator::qra_getValueAtRelFrameF(const qreal &frame,
                                              QrealKey *prevKey,
                                              QrealKey *nextKey) const {
     qreal t = tFromX(prevKey->getRelFrame(),
-                     prevKey->getEndValueFrame(),
-                     nextKey->getStartValueFrame(),
+                     prevKey->getEndFrame(),
+                     nextKey->getStartFrame(),
                      nextKey->getRelFrame(), frame);
     qreal p0y = prevKey->getValue();
     qreal p1y = prevKey->getEndValue();
@@ -262,8 +262,8 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame,
                                             QrealKey *prevKey,
                                             QrealKey *nextKey) const {
     qreal t = tFromX(prevKey->getRelFrame(),
-                     prevKey->getEndValueFrame(),
-                     nextKey->getStartValueFrame(),
+                     prevKey->getEndFrame(),
+                     nextKey->getStartFrame(),
                      nextKey->getRelFrame(), frame);
     qreal p0y = prevKey->getValue();
     qreal p1y = prevKey->getEndValue();
@@ -454,9 +454,9 @@ void QrealAnimator::anim_updateKeysPath() {
             mKeysPath.lineTo(keyFrame, keyValue);
         } else {
             mKeysPath.cubicTo(
-                        QPointF(lastKey->getEndValueFrame(),
+                        QPointF(lastKey->getEndFrame(),
                                 lastKey->getEndValue()),
-                        QPointF(qaKey->getStartValueFrame(),
+                        QPointF(qaKey->getStartFrame(),
                                 qaKey->getStartValue()),
                         QPointF(keyFrame, keyValue));
         }
