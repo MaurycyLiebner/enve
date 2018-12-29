@@ -507,8 +507,8 @@ void Canvas::nextPreviewFrame() {
 }
 
 void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                   int *lastIdentical,
-                                                   const int &relFrame) {
+                                                  int *lastIdentical,
+                                                  const int &relFrame) {
     int fId;
     int lId;
     BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);

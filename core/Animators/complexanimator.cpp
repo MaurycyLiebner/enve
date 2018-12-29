@@ -57,7 +57,7 @@ void ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
     int lId = INT_MAX;
 
     Q_FOREACH(const qsptr<Property> &child, ca_mChildAnimators) {
-        if(fId > lId) {
+        if(fId >= lId) {
             break;
         }
         int fIdT;

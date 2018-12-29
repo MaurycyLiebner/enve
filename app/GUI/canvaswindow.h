@@ -50,7 +50,7 @@ public:
     bool hasNoCanvas();
     void setCanvasMode(const CanvasMode &mode);
 
-    void callUpdateSchedulers();
+    void queScheduledTasksAndUpdate();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
     void KFT_setFocusToWidget() {
         setFocus();
@@ -153,6 +153,8 @@ public:
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
 private:
+    void changeCurrentFrameAction(const int &frame);
+
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
     //! @brief true if currently preview is being rendered

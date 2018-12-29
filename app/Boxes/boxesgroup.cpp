@@ -428,7 +428,7 @@ void BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     BoundingBox::prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
     int absFrame = prp_relFrameToAbsFrame(relFrame);
     Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
-        if(fId > lId) {
+        if(fId >= lId) {
             break;
         }
         int fIdT;

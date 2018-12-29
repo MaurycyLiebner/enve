@@ -102,8 +102,9 @@ MainWindow::MainWindow(QWidget *parent)
             mCanvasWindow, SLOT(outOfMemory()));
 
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
-    connect(mCanvasWindow, SIGNAL(changeCurrentFrame(int)),
-            mBoxesListAnimationDockWidget, SLOT(setCurrentFrame(int)));
+    connect(mCanvasWindow, &CanvasWindow::changeCurrentFrame,
+            mBoxesListAnimationDockWidget,
+            &BoxesListAnimationDockWidget::setCurrentFrame);
     connect(mCanvasWindow, &CanvasWindow::changeCanvasFrameRange,
             mBoxesListAnimationDockWidget,
             &BoxesListAnimationDockWidget::setCanvasFrameRange);

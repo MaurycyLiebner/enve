@@ -95,7 +95,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
         emit changeCanvasFrameRange(0, getMaxFrame());
-        emit changeCurrentFrame(getCurrentFrame());
+        changeCurrentFrameAction(getCurrentFrame());
     }
     BoxesGroup *currentGroup;
     if(mCurrentCanvas == nullptr) {
@@ -113,7 +113,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
                 mCurrentCanvas.data(),
                 SWT_CurrentCanvas);
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::addCanvasToList(const qsptr<Canvas>& canvas) {
@@ -163,7 +163,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
     MainWindow::getInstance()->updateCanvasModeButtonsChecked();
 }
 
-void CanvasWindow::callUpdateSchedulers() {
+void CanvasWindow::queScheduledTasksAndUpdate() {
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
@@ -552,61 +552,61 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
 void CanvasWindow::raiseAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->raiseSelectedBoxes();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::lowerAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->lowerSelectedBoxes();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::raiseToTopAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->raiseSelectedBoxesToTop();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::lowerToBottomAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->lowerSelectedBoxesToBottom();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::objectsToPathAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->convertSelectedBoxesToPath();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::strokeToPathAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->convertSelectedPathStrokesToPath();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::rotate90CWAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->rotateSelectedBoxesStartAndFinish(90.);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::rotate90CCWAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->rotateSelectedBoxesStartAndFinish(-90.);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::flipHorizontalAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->flipSelectedBoxesHorizontally();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::flipVerticalAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->flipSelectedBoxesVertically();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setCurrentBrush(const Brush *brush) {
@@ -626,110 +626,110 @@ void CanvasWindow::replaceBrush(const Brush *oldBrush,
 void CanvasWindow::pathsUnionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsUnion();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::pathsDifferenceAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsDifference();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::pathsIntersectionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsIntersection();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::pathsDivisionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsDivision();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::pathsExclusionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsExclusion();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::pathsCombineAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsCombine();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::pathsBreakApartAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsBreakApart();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setFontFamilyAndStyle(const QString& family,
                                          const QString& style) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontFamilyAndStyle(family, style);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setFontSize(const qreal& size) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontSize(size);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::connectPointsSlot() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->connectPoints();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::disconnectPointsSlot() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->disconnectPoints();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::mergePointsSlot() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->mergePoints();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::makePointCtrlsSymmetric() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makePointCtrlsSymmetric();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::makePointCtrlsSmooth() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makePointCtrlsSmooth();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::makePointCtrlsCorner() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makePointCtrlsCorner();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::makeSegmentLine() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makeSegmentLine();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::makeSegmentCurve() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makeSegmentCurve();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::startSelectedStrokeWidthTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedStrokeWidthTransform();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::deleteAction() {
@@ -775,44 +775,44 @@ void CanvasWindow::clearSelectionAction() {
 void CanvasWindow::groupSelectedBoxes() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->groupSelectedBoxes();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::ungroupSelectedBoxes() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->ungroupSelectedBoxes();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::startSelectedStrokeColorTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedStrokeColorTransform();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::startSelectedFillColorTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedFillColorTransform();
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::strokeCapStyleChanged(const Qt::PenCapStyle &capStyle) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedCapStyle(capStyle);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedJoinStyle(joinStyle);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth,
                                       const bool &finish) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeWidth(strokeWidth, finish);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::applyPaintSettingToSelected(PaintSetting *setting) {
@@ -842,25 +842,31 @@ void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
                 fillSetings, strokeSettings);
 }
 
+void CanvasWindow::changeCurrentFrameAction(const int& frame) {
+    emit changeCurrentFrame(frame);
+    updateAfterFrameChanged(frame);
+    queScheduledTasksAndUpdate();
+}
+
 void CanvasWindow::setClipToCanvas(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setClipToCanvas(bT);
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setRasterEffectsVisible(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setRasterEffectsVisible(bT);
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setPathEffectsVisible(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setPathEffectsVisible(bT);
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setResolutionFraction(const qreal &percent) {
@@ -868,7 +874,7 @@ void CanvasWindow::setResolutionFraction(const qreal &percent) {
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->clearAllCache();
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-    callUpdateSchedulers();
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::updatePivotIfNeeded() {
@@ -896,7 +902,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
         const RenderSettings &renderSettings = settings->getRenderSettings();
         Canvas *canvas = settings->getTargetCanvas();
         setCurrentCanvas(canvas);
-        emit changeCurrentFrame(renderSettings.minFrame);
+        changeCurrentFrameAction(renderSettings.minFrame);
 
         qreal resolutionFraction = renderSettings.resolution;
         mMaxRenderFrame = renderSettings.maxFrame;
@@ -942,7 +948,7 @@ void CanvasWindow::nextCurrentRenderFrame() {
     }
 
     mCurrentRenderFrame = newCurrentRenderFrame;
-    emit changeCurrentFrame(mCurrentRenderFrame);
+    changeCurrentFrameAction(mCurrentRenderFrame);
 }
 
 void CanvasWindow::renderPreview() {
@@ -1010,7 +1016,7 @@ void CanvasWindow::interruptPreviewRendering() {
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
                                          mMaxRenderFrame,
                                          false);
-    emit changeCurrentFrame(mSavedCurrentFrame);
+    changeCurrentFrameAction(mSavedCurrentFrame);
     MainWindow::getInstance()->previewFinished();
 }
 
@@ -1018,7 +1024,7 @@ void CanvasWindow::interruptOutputRendering() {
     mCurrentCanvas->setOutputRendering(false);
     TaskScheduler::sClearAllFinishedFuncs();
     mCurrentCanvas->clearPreview();
-    emit changeCurrentFrame(mSavedCurrentFrame);
+    changeCurrentFrameAction(mSavedCurrentFrame);
 }
 
 void CanvasWindow::stopPreview() {
@@ -1027,7 +1033,7 @@ void CanvasWindow::stopPreview() {
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
                                          mMaxRenderFrame,
                                          false);
-    emit changeCurrentFrame(mSavedCurrentFrame);
+    changeCurrentFrameAction(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
     stopAudio();
     requestUpdate();
@@ -1049,7 +1055,7 @@ void CanvasWindow::resumePreview() {
 }
 
 void CanvasWindow::playPreview() {
-    //emit changeCurrentFrame(mSavedCurrentFrame);
+    //changeCurrentFrameAction(mSavedCurrentFrame);
     TaskScheduler::sClearAllFinishedFuncs();
     mCurrentCanvas->playPreview(mSavedCurrentFrame,
                                 mCurrentRenderFrame);
@@ -1085,7 +1091,7 @@ void CanvasWindow::nextSaveOutputFrame() {
         mCurrentRenderSettings = nullptr;
         TaskScheduler::sClearAllFinishedFuncs();
         mCurrentCanvas->setOutputRendering(false);
-        emit changeCurrentFrame(mSavedCurrentFrame);
+        changeCurrentFrameAction(mSavedCurrentFrame);
         if(qAbs(mSavedResolutionFraction -
                 mCurrentCanvas->getResolutionFraction()) > 0.1) {
             mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
@@ -1100,7 +1106,7 @@ void CanvasWindow::nextSaveOutputFrame() {
         if(lastIdentical > mMaxRenderFrame) lastIdentical = mMaxRenderFrame;
         mCurrentRenderFrame = lastIdentical + 1;
         //mCurrentRenderFrame++;
-        emit changeCurrentFrame(mCurrentRenderFrame);
+        changeCurrentFrameAction(mCurrentRenderFrame);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {
             // mCurrentCanvas->setCurrentPreviewContainer(); !!!
             nextSaveOutputFrame();
