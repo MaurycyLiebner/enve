@@ -14,14 +14,13 @@ class BasicTransformAnimator : public ComplexAnimator {
     Q_OBJECT
 public:
     BasicTransformAnimator();
-    void resetScale(const bool &finish = false);
-    void resetTranslation(const bool &finish = false);
-    void resetRotation(const bool &finish = false);
-    virtual void reset(const bool &finish = false);
+    void resetScale();
+    void resetTranslation();
+    void resetRotation();
+    virtual void reset();
 
     void setScale(const qreal &sx, const qreal &sy);
-    void setPosition(const qreal &x, const qreal &y,
-                     const bool &saveUndoRedo);
+    void setPosition(const qreal &x, const qreal &y);
     void setRotation(const qreal &rot);
 
     void startRotTransform();
@@ -31,10 +30,8 @@ public:
     qreal getYScale();
     qreal getXScale();
 
-    void setRelativePos(const QPointF &relPos,
-                        const bool &saveUndoRedo = false);
-    void setAbsolutePos(const QPointF &pos,
-                        const bool &saveUndoRedo);
+    void setRelativePos(const QPointF &relPos);
+    void setAbsolutePos(const QPointF &pos);
     void moveToAbs(const QPointF &absPos);
     void moveByAbs(const QPointF &absTrans);
 
@@ -130,16 +127,14 @@ class BoxTransformAnimator : public BasicTransformAnimator {
 public:
     BoxTransformAnimator(BoundingBox *parent);
 
-    void resetPivot(const bool &finish = false);
-    void reset(const bool &finish = false);
+    void resetPivot();
+    void reset();
     QMatrix getCurrentTransformationMatrix();
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
-    QMatrix getCombinedTransformMatrixAtRelFrame(
-                                        const int &relFrame);
+    QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
 
-    void setPivotWithoutChangingTransformation(const QPointF &point,
-                                               const bool &saveUndoRedo = false);
+    void setPivotWithoutChangingTransformation(const QPointF &point);
     QPointF getPivot();
 
     qreal getPivotX();

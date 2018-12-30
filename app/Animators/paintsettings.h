@@ -98,13 +98,11 @@ public:
 
     Gradient *getGradient() const;
 
-    void setGradient(Gradient *gradient,
-                     const bool &saveUndoRedo = true);
+    void setGradient(Gradient *gradient);
 
     void setCurrentColor(const QColor &color);
 
-    void setPaintType(const PaintType &paintType,
-                      const bool &saveUndoRedo = true);
+    void setPaintType(const PaintType &paintType);
 
     ColorAnimator *getColorAnimator();
 
@@ -149,11 +147,9 @@ class Gradient : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
 public:
-    void swapColors(const int &id1, const int &id2,
-                    const bool &saveUndoRedo = true);
+    void swapColors(const int &id1, const int &id2);
 
-    void removeColor(const qsptr<ColorAnimator> &color,
-                     const bool &saveUndoRedo = true);
+    void removeColor(const qsptr<ColorAnimator> &color);
 
     void addColor(const QColor &color);
 
@@ -179,8 +175,7 @@ public:
     int getLoadId();
     void setLoadId(const int &id);
 
-    void addColorToList(const QColor &color,
-                        const bool &saveUndoRedo = true);
+    void addColorToList(const QColor &color);
 
     QColor getCurrentColorAt(const int &id);
 
@@ -191,8 +186,7 @@ public:
 
     QGradientStops getQGradientStops();
     void startColorIdTransform(int id);
-    void addColorToList(const qsptr<ColorAnimator> &newColorAnimator,
-                        const bool &saveUndoRedo = true);
+    void addColorToList(const qsptr<ColorAnimator> &newColorAnimator);
     ColorAnimator *getColorAnimatorAt(const int &id);
     void removeColor(const int &id);
 

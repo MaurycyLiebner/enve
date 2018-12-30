@@ -525,16 +525,16 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
 
 void FillStrokeSettingsWidget::setCanvasWindowPtr(CanvasWindow *canvasWidget) {
     mCanvasWindow = canvasWidget;
-    connect(mLineWidthSpin, SIGNAL(editingStarted(qreal)),
-            mCanvasWindow, SLOT(startSelectedStrokeWidthTransform()));
+    connect(mLineWidthSpin, &QrealAnimatorValueSlider::editingStarted,
+            mCanvasWindow, &CanvasWindow::startSelectedStrokeWidthTransform);
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChanged() {
-    mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth, true);
+    mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth);
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChangedTMP() {
-    mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth, false);
+    mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {

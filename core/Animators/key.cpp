@@ -23,15 +23,13 @@ bool Key::hasNextKey() const {
     return mParentAnimator->anim_hasNextKey(this);
 }
 
-void Key::incFrameAndUpdateParentAnimator(const int &inc,
-                                          const bool &finish) {
-    setRelFrameAndUpdateParentAnimator(mRelFrame + inc, finish);
+void Key::incFrameAndUpdateParentAnimator(const int &inc) {
+    setRelFrameAndUpdateParentAnimator(mRelFrame + inc);
 }
 
-void Key::setRelFrameAndUpdateParentAnimator(const int &relFrame,
-                                          const bool &finish) {
+void Key::setRelFrameAndUpdateParentAnimator(const int &relFrame) {
     if(mParentAnimator == nullptr) return;
-    mParentAnimator->anim_moveKeyToRelFrame(this, relFrame, finish);
+    mParentAnimator->anim_moveKeyToRelFrame(this, relFrame);
 }
 
 void Key::addToSelection(QList<qptr<Animator>> &selectedAnimators) {
@@ -56,9 +54,7 @@ void Key::startFrameTransform() {
 }
 
 void Key::cancelFrameTransform() {
-    mParentAnimator->anim_moveKeyToRelFrame(this,
-                                            mSavedRelFrame,
-                                            false);
+    mParentAnimator->anim_moveKeyToRelFrame(this, mSavedRelFrame);
 }
 
 void Key::scaleFrameAndUpdateParentAnimator(

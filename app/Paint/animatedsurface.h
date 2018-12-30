@@ -55,15 +55,10 @@ public:
 
     void updateTargetTiles();
 
-    void anim_removeKey(const stdsptr<Key> &keyToRemove,
-                        const bool &saveUndoRedo = true);
-    void anim_appendKey(const stdsptr<Key> &newKey,
-                        const bool &saveUndoRedo = true,
-                        const bool &update = true);
+    void anim_removeKey(const stdsptr<Key> &keyToRemove);
+    void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_moveKeyToRelFrame(Key *key,
-                                const int &newFrame,
-                                const bool &saveUndoRedo = true,
-                                const bool &finish = true);
+                                const int &newFrame);
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);

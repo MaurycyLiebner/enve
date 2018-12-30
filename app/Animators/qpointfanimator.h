@@ -14,9 +14,7 @@ public:
     qreal getXValueAtRelFrameF(const qreal &relFrame);
     qreal getYValueAtRelFrameF(const qreal &relFrame);
 
-    void setCurrentPointValue(const QPointF &val,
-                              const bool &saveUndoRedo = false,
-                              const bool &finish = false);
+    void setCurrentPointValue(const QPointF &val);
     void incCurrentValues(const qreal &x, const qreal &y);
     void multCurrentValues(qreal sx, qreal sy);
 
@@ -24,10 +22,7 @@ public:
     qreal getSavedXValue();
     qreal getSavedYValue();
 
-    void incAllValues(const qreal &x,
-                      const qreal &y,
-                      const bool &saveUndoRedo = false,
-                      const bool &finish = false);
+    void incAllValues(const qreal &x, const qreal &y);
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();

@@ -49,15 +49,9 @@ public:
     virtual void anim_callFrameChangeUpdater();
     void anim_sortKeys();
 
-    virtual void anim_appendKey(const stdsptr<Key> &newKey,
-                                const bool &saveUndoRedo = true,
-                                const bool &update = true);
-    virtual void anim_removeKey(const stdsptr<Key>& keyToRemove,
-                                const bool &saveUndoRedo = true);
-    virtual void anim_moveKeyToRelFrame(Key *key,
-                                        const int &newFrame,
-                                        const bool &saveUndoRedo = true,
-                                        const bool &finish = true);
+    virtual void anim_appendKey(const stdsptr<Key> &newKey);
+    virtual void anim_removeKey(const stdsptr<Key>& keyToRemove);
+    virtual void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
 
     virtual void anim_keyValueChanged(Key *key);
 
@@ -76,8 +70,7 @@ public:
     void prp_addAllKeysToComplexAnimator(ComplexAnimator *target);
     bool prp_hasKeys();
 
-    void anim_setRecordingWithoutChangingKeys(const bool &rec,
-                                              const bool &saveUndoRedo = true);
+    void anim_setRecordingWithoutChangingKeys(const bool &rec);
     bool prp_isRecording();
     virtual void anim_removeAllKeys();
     bool prp_isKeyOnCurrentFrame();

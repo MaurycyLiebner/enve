@@ -9,9 +9,7 @@ class ColorAnimator : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
 public:
-    void qra_setCurrentValue(const QColor &qcolorValue,
-                             const bool &saveUndoRedo = false,
-                             const bool &finish = false);
+    void qra_setCurrentValue(const QColor &qcolorValue);
 
     QColor getCurrentColor() const;
     QColor getColorAtRelFrame(const int &relFrame);
@@ -23,14 +21,10 @@ public:
     void startVal3Transform();
     void startAlphaTransform();
 
-    void setCurrentVal1Value(const qreal &val1,
-                             const bool &finish = false);
-    void setCurrentVal2Value(const qreal &val2,
-                             const bool &finish = false);
-    void setCurrentVal3Value(const qreal &val3,
-                             const bool &finish = false);
-    void setCurrentAlphaValue(const qreal &alpha,
-                              const bool &finish = false);
+    void setCurrentVal1Value(const qreal &val1);
+    void setCurrentVal2Value(const qreal &val2);
+    void setCurrentVal3Value(const qreal &val3);
+    void setCurrentAlphaValue(const qreal &alpha);
 
     void prp_openContextMenu(const QPoint &pos);
 

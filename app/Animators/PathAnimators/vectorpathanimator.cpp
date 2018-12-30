@@ -150,7 +150,7 @@ void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
     if(newKey == nullptr) {
         newKey = SPtrCreate(PathKey)(relFrame, getPathAtRelFrame(relFrame),
                                           this, mPathClosed);
-        anim_appendKey(newKey, true, false);
+        anim_appendKey(newKey);
     } else {
         newKey->setElementsFromSkPath(getPathAtRelFrame(relFrame));
     }
@@ -165,7 +165,7 @@ void VectorPathAnimator::anim_saveCurrentValueAsKey() {
                                           mElementsPos,
                                           this,
                                           mPathClosed);
-        anim_appendKey(newKey, true, false);
+        anim_appendKey(newKey);
         anim_mKeyOnCurrentFrame = newKey.get();
     } else {
         anim_saveCurrentValueToKey(GetAsPK(anim_mKeyOnCurrentFrame));
@@ -260,60 +260,39 @@ void VectorPathAnimator::replaceNodeSettingsForPtId(
 }
 
 void VectorPathAnimator::replaceNodeSettingsForNodeId(
-        const int &nodeId, const NodeSettings *settings,
-        const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-//        addUndoRedo(new VectorPathAnimatorReplaceNodeSettingsUR(
-//                        this, nodeId,
-//                        *mNodeSettings.at(nodeId),
-//                        settings));
-    }
+        const int &nodeId, const NodeSettings *settings) {
     mNodeSettings.at(nodeId)->copyFrom(settings);
 }
 
 NodeSettings* VectorPathAnimator::insertNodeSettingsForNodeId(
         const int &nodeId,
-        const NodeSettings* settings,
-        const bool &saveUndoRedo) {
+        const NodeSettings* settings) {
     stdsptr<NodeSettings> newSettings = SPtrCreate(NodeSettings)(settings);
-    insertNodeSettingsForNodeId(nodeId, newSettings, saveUndoRedo);
+    insertNodeSettingsForNodeId(nodeId, newSettings);
     return newSettings.get();
 }
 
 void VectorPathAnimator::insertNodeSettingsForNodeId(
         const int &nodeId,
-        const stdsptr<NodeSettings>& newSettings,
-        const bool &saveUndoRedo) {
+        const stdsptr<NodeSettings>& newSettings) {
     mNodeSettings.insert(nodeId, newSettings);
-    if(saveUndoRedo) {
-//        addUndoRedo(new VectorPathAnimatorInsertNodeSettingsUR(this,
-//                                                               nodeId,
-//                                                               settings));
-    }
 }
 
-void VectorPathAnimator::anim_removeKey(const stdsptr<Key>& keyToRemove,
-                                        const bool &saveUndoRedo) {
-    Animator::anim_removeKey(keyToRemove, saveUndoRedo);
+void VectorPathAnimator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
+    Animator::anim_removeKey(keyToRemove);
     mElementsUpdateNeeded = true;
     //    if(anim_mKeys.count() == 0) {
     //        setElementsFromSkPath(getPath());
     //    }
 }
 
-void VectorPathAnimator::anim_moveKeyToRelFrame(Key *key,
-                                                const int &newFrame,
-                                                const bool &saveUndoRedo,
-                                                const bool &finish) {
-    Animator::anim_moveKeyToRelFrame(key, newFrame,
-                                     saveUndoRedo, finish);
+void VectorPathAnimator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
+    Animator::anim_moveKeyToRelFrame(key, newFrame);
     mElementsUpdateNeeded = true;
 }
 
-void VectorPathAnimator::anim_appendKey(const stdsptr<Key>& newKey,
-                                        const bool &saveUndoRedo,
-                                        const bool &update) {
-    Animator::anim_appendKey(newKey, saveUndoRedo, update);
+void VectorPathAnimator::anim_appendKey(const stdsptr<Key>& newKey) {
+    Animator::anim_appendKey(newKey);
     mElementsUpdateNeeded = true;
 }
 
@@ -579,7 +558,7 @@ void VectorPathAnimator::finalizeNodesRemove() {
 
 void VectorPathAnimator::removeNodeAtAndApproximate(const int &nodeId) {
     if(nodeId <= 0 || nodeId >= mElementsPos.count()/3) return;
-    removeNodeSettingsAt(nodeId, true);
+    removeNodeSettingsAt(nodeId);
 
     setNodeCtrlsMode(nodeId + 1, CtrlsMode::CTRLS_CORNER);
     setNodeCtrlsMode(nodeId - 1, CtrlsMode::CTRLS_CORNER);
@@ -590,16 +569,8 @@ void VectorPathAnimator::removeNodeAtAndApproximate(const int &nodeId) {
     mElementsUpdateNeeded = true;
 }
 
-void VectorPathAnimator::removeNodeSettingsAt(const int &id,
-                                              const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-        NodeSettings nodeSettings = *mNodeSettings.takeAt(id);
-//        addUndoRedo(new VectorPathAnimatorRemoveNodeSettingsUR(this,
-//                                                               id,
-//                                                               nodeSettings));
-    } else {
-        mNodeSettings.removeAt(id);
-    }
+void VectorPathAnimator::removeNodeSettingsAt(const int &id) {
+    mNodeSettings.removeAt(id);
 }
 
 void VectorPathAnimator::setNodeStartEnabled(const int &nodeId,
@@ -635,9 +606,7 @@ const CtrlsMode &VectorPathAnimator::getNodeCtrlsMode(const int &nodeId) {
     return getNodeSettingsForNodeId(nodeId)->ctrlsMode;
 }
 
-void VectorPathAnimator::removeNodeAt(const int &nodeId,
-                                      const bool &saveUndoRedo) {
-    Q_UNUSED(saveUndoRedo)
+void VectorPathAnimator::removeNodeAt(const int &nodeId) {
     if(nodeId < 0 || nodeId >= mElementsPos.count()/3) return;
     mNodesToRemove.append(nodeId);
     mElementsUpdateNeeded = true;
@@ -896,7 +865,7 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
 
             for(int i = 0; i < countNds; i++) {
                 nodeSettings.append(mNodeSettings.at(firstNodeForNew).get());
-                removeNodeSettingsAt(firstNodeForNew, true);
+                removeNodeSettingsAt(firstNodeForNew);
             }
         }
         if(prp_hasKeys()) {
@@ -966,9 +935,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         const bool& startEnabled,
         const bool& endEnabled,
         const CtrlsMode& ctrlsMode,
-        NodePoint *targetPt,
-        const bool &saveUndoRedo) {
-    Q_UNUSED(saveUndoRedo);
+        NodePoint *targetPt) {
     int targetNodeId;
     bool changeFirstPt = false;
     if(targetPt == nullptr) {
@@ -996,18 +963,6 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
     }
     updateNodePointIds();
     prp_updateInfluenceRangeAfterChanged();
-
-//    if(saveUndoRedo) {
-//        int targetPtId = -1;
-//        if(targetPt != nullptr) targetPtId = targetPt->getPtId();
-//        addUndoRedo(new AddPointToVectorPathAnimatorUndoRedo(this,
-//                                                             startRelPos,
-//                                                             relPos,
-//                                                             endRelPos,
-//                                                             targetPtId,
-//                                                             nodeSettings,
-//                                                             newP->getPtId()));
-//    }
 
     return newP;
 }
@@ -1040,7 +995,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
                          svgPoint->getStartPointEnabled(),
                          svgPoint->getEndPointEnabled(),
                          svgPoint->getCtrlsMode(),
-                         targetPt, false);
+                         targetPt);
 }
 
 NodePoint *VectorPathAnimator::addNodeRelPos(
@@ -1050,8 +1005,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         const bool& startEnabled,
         const bool& endEnabled,
         const CtrlsMode& ctrlsMode,
-        const int &targetPtId,
-        const bool &saveUndoRedo) {
+        const int &targetPtId) {
     NodePoint* ptT = nullptr;
     if(!mPoints.isEmpty()) {
         if(targetPtId == -1) {
@@ -1062,7 +1016,7 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
     }
     return addNodeRelPos(startRelPos, relPos, endRelPos,
                          startEnabled, endEnabled, ctrlsMode,
-                         ptT, saveUndoRedo);
+                         ptT);
 }
 
 void VectorPathAnimator::updateNodePointIds() {

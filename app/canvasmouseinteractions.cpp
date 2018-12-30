@@ -588,7 +588,7 @@ void Canvas::handleLeftButtonMousePress() {
 
             qsptr<Circle> newPath = SPtrCreate(Circle)();
             mCurrentBoxesGroup->addContainedBox(newPath);
-            newPath->setAbsolutePos(mLastMouseEventPosRel, false);
+            newPath->setAbsolutePos(mLastMouseEventPosRel);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
             addBoxToSelection(newPath.get());
@@ -598,7 +598,7 @@ void Canvas::handleLeftButtonMousePress() {
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
             qsptr<Rectangle> newPath = SPtrCreate(Rectangle)();
             mCurrentBoxesGroup->addContainedBox(newPath);
-            newPath->setAbsolutePos(mLastMouseEventPosRel, false);
+            newPath->setAbsolutePos(mLastMouseEventPosRel);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
             addBoxToSelection(newPath.get());
@@ -612,7 +612,7 @@ void Canvas::handleLeftButtonMousePress() {
                         fonstWidget->getCurrentFontStyle());
             newPath->setSelectedFontSize(fonstWidget->getCurrentFontSize());
             mCurrentBoxesGroup->addContainedBox(newPath);
-            newPath->setAbsolutePos(mLastMouseEventPosRel, false);
+            newPath->setAbsolutePos(mLastMouseEventPosRel);
 
             mCurrentTextBox = newPath.get();
 
@@ -622,7 +622,7 @@ void Canvas::handleLeftButtonMousePress() {
             //setCanvasMode(CanvasMode::MOVE_POINT);
             qsptr<ParticleBox> partBox = SPtrCreate(ParticleBox)();
             mCurrentBoxesGroup->addContainedBox(partBox);
-            partBox->setAbsolutePos(mLastMouseEventPosRel, false);
+            partBox->setAbsolutePos(mLastMouseEventPosRel);
             clearBoxesSelection();
             addBoxToSelection(partBox.get());
 
@@ -641,7 +641,7 @@ void Canvas::handleLeftButtonMousePress() {
             //setCanvasMode(CanvasMode::MOVE_POINT);
             qsptr<PaintBox> paintBox = SPtrCreate(PaintBox)();
             mCurrentBoxesGroup->addContainedBox(paintBox);
-            paintBox->setAbsolutePos(mLastMouseEventPosRel, false);
+            paintBox->setAbsolutePos(mLastMouseEventPosRel);
             clearBoxesSelection();
             clearPointsSelection();
             addBoxToSelection(paintBox.get());
@@ -681,7 +681,7 @@ void Canvas::handleLeftButtonMousePress() {
                 if(boneBox == nullptr) {
                     boneBox = SPtrCreate(BonesBox)();
                     mCurrentBoxesGroup->addContainedBox(boneBox);
-                    boneBox->setAbsolutePos(mLastMouseEventPosRel, false);
+                    boneBox->setAbsolutePos(mLastMouseEventPosRel);
                     clearBoxesSelection();
                     addBoxToSelection(boneBox.get());
                     newBone = Bone::createBone(boneBox.data());

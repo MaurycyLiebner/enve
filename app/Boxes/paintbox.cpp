@@ -28,7 +28,7 @@ PaintBox::PaintBox() :
 PaintBox::PaintBox(const ushort &canvasWidthT,
                    const ushort &canvasHeightT) : PaintBox() {
     mBottomRightAnimator->setCurrentPointValue(
-                QPointF(canvasWidthT, canvasHeightT), false, true);
+                QPointF(canvasWidthT, canvasHeightT));
     finishSizeSetup();
 }
 

@@ -14,7 +14,7 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRepeat = SPtrCreate(BoolProperty)("repeat");
 
     mSeed->setIntValueRange(0, 9999);
-    mSeed->setCurrentIntValue(qrand() % 9999, false);
+    mSeed->setCurrentIntValue(qrand() % 9999);
 
     mSegLength->qra_setValueRange(1., 1000.);
     mSegLength->qra_setCurrentValue(20.);

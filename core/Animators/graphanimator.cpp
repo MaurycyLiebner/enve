@@ -4,18 +4,15 @@
 
 GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {}
 
-void GraphAnimator::anim_appendKey(const stdsptr<Key>& newKey,
-                              const bool &saveUndoRedo,
-                              const bool &update) {
-    Animator::anim_appendKey(newKey, saveUndoRedo, update);
+void GraphAnimator::anim_appendKey(const stdsptr<Key>& newKey) {
+    Animator::anim_appendKey(newKey);
     if(anim_mSelected) {
         graphScheduleUpdateAfterKeysChanged();
     }
 }
 
-void GraphAnimator::anim_removeKey(const stdsptr<Key>& keyToRemove,
-                                   const bool &saveUndoRedo) {
-    Animator::anim_removeKey(keyToRemove, saveUndoRedo);
+void GraphAnimator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
+    Animator::anim_removeKey(keyToRemove);
     if(anim_mSelected) {
         graphScheduleUpdateAfterKeysChanged();
     }

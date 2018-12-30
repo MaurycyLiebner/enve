@@ -26,8 +26,7 @@ class QStringAnimator : public Animator {
     friend class SelfRef;
 public:
     void prp_setAbsFrame(const int &frame);
-    void setCurrentTextValue(const QString &text,
-                             const bool &saveUndoRedo = true);
+    void setCurrentTextValue(const QString &text);
     QString getCurrentTextValue();
 
     bool SWT_isQStringAnimator() { return true; }

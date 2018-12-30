@@ -34,7 +34,7 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
                 dialogParent, getName() + " text",
                 "Text:", mText->getCurrentTextValue(), &ok);
     if(ok) {
-        mText->setCurrentTextValue(text, true);
+        mText->setCurrentTextValue(text);
     }
 }
 
@@ -162,9 +162,8 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     return QPainterPathToSkPath(qPath);
 }
 
-void TextBox::setCurrentTextValue(const QString &text,
-                                  const bool &saveUndoRedo) {
-    mText->setCurrentTextValue(text, saveUndoRedo);
+void TextBox::setCurrentTextValue(const QString &text) {
+    mText->setCurrentTextValue(text);
 }
 
 bool TextBox::differenceInEditPathBetweenFrames(

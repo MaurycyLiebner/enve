@@ -81,10 +81,8 @@ public:
 
     virtual QPointF getRelCenterPosition();
 
-    virtual void centerPivotPosition(const bool &saveUndoRedo = false);
-    virtual void setPivotPosition(
-            const QPointF &pos,
-            const bool &saveUndoRedo = false);
+    virtual void centerPivotPosition();
+    virtual void setPivotPosition(const QPointF &pos);
     virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
@@ -117,8 +115,7 @@ public:
     void bringToFront();
     void bringToEnd();
 
-    void setZListIndex(const int &z,
-                       const bool &saveUndoRedo = true);
+    void setZListIndex(const int &z);
 
     virtual void selectAndAddContainedPointsToList(
             const QRectF &, QList<stdptr<MovablePoint>>&);
@@ -142,11 +139,9 @@ public:
     virtual StrokeSettings *getStrokeSettings();
 
     void setPivotAbsPos(const QPointF &absPos,
-                        const bool &saveUndoRedo = true,
                         const bool &pivotChanged = true);
 
     void setPivotRelPos(const QPointF &relPos,
-                        const bool &saveUndoRedo = true,
                         const bool &pivotAutoAdjust = true);
 
     virtual void cancelTransform();
@@ -163,8 +158,7 @@ public:
     void hide();
     void show();
     bool isVisible();
-    void setVisibile(const bool &visible,
-                     const bool &saveUndoRedo = true);
+    void setVisibile(const bool &visible);
     void switchVisible();
     bool isParentLinkBox();
     void lock();
@@ -188,8 +182,7 @@ public:
 
     virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    virtual void setStrokeWidth(const qreal &strokeWidth,
-                                const bool &finish);
+    virtual void setStrokeWidth(const qreal &strokeWidth);
 
     virtual void startSelectedStrokeWidthTransform();
     virtual void startSelectedStrokeColorTransform();
@@ -197,10 +190,8 @@ public:
 
     virtual VectorPathEdge *getEdge(const QPointF &absPos,
                                     const qreal &canvasScaleInv);
-    void setAbsolutePos(const QPointF &pos,
-                        const bool &saveUndoRedo = false);
-    void setRelativePos(const QPointF &relPos,
-                        const bool &saveUndoRedo = false);
+    void setAbsolutePos(const QPointF &pos);
+    void setRelativePos(const QPointF &relPos);
 
 
     void scaleRelativeToSavedPivot(const qreal &scaleXBy,

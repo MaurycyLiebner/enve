@@ -23,16 +23,12 @@ public:
 
 
     qreal getValue() const;
-    virtual void setValue(qreal value,
-                          const bool &saveUndoRedo = false,
-                          const bool &finish = false);
+    virtual void setValue(qreal value);
 
     void changeFrameAndValueBy(const QPointF &frameValueChange);
     void saveCurrentFrameAndValue();
 
-    void incValue(const qreal &incBy,
-                  const bool &saveUndoRedo = false,
-                  const bool &finish = false);
+    void incValue(const qreal &incBy);
 
     QrealAnimator *getParentQrealAnimator() const;
 

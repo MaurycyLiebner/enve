@@ -25,10 +25,8 @@ public:
 
     bool hasPrevKey() const;
     bool hasNextKey() const;
-    void incFrameAndUpdateParentAnimator(const int &inc,
-                                         const bool &finish = true);
-    void setRelFrameAndUpdateParentAnimator(const int &relFrame,
-                                         const bool &finish = true);
+    void incFrameAndUpdateParentAnimator(const int &inc);
+    void setRelFrameAndUpdateParentAnimator(const int &relFrame);
     template <class T = Animator>
     T* getParentAnimator() const {
         return static_cast<T*>(mParentAnimator.data());

@@ -186,7 +186,7 @@ void GraphKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
     bool frameChanged = newFrame != mRelFrame;
     if(!frameChanged) return;
     if(mParentAnimator != nullptr) {
-        mParentAnimator->anim_moveKeyToRelFrame(this, newFrame, false);
+        mParentAnimator->anim_moveKeyToRelFrame(this, newFrame);
     } else {
         setRelFrame(newFrame);
     }

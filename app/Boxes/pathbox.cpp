@@ -55,8 +55,7 @@ PathBox::PathBox(const BoundingBoxType &type) :
     ca_addChildAnimator(mFillSettings);
     ca_addChildAnimator(mStrokeSettings);
     ca_moveChildAbove(mEffectsAnimators.data(),
-                      mStrokeSettings.data(),
-                      false);
+                      mStrokeSettings.data());
     ca_addChildAnimator(mPathEffectsAnimators);
     ca_addChildAnimator(mFillPathEffectsAnimators);
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
@@ -341,11 +340,8 @@ void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-void PathBox::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
+void PathBox::setStrokeWidth(const qreal &strokeWidth) {
     mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
-    if(finish) {
-        mStrokeSettings->getStrokeWidthAnimator()->prp_finishTransform();
-    }
     //scheduleOutlinePathUpdate();
 }
 
@@ -478,7 +474,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(StrokeSettings *strokeSetti
         mStrokeSettings->setPaintType(paintType);
         if(paintType == FLATPAINT) {
             mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
-                        strokeSettings->getCurrentColor(), true, true);
+                        strokeSettings->getCurrentColor());
         } else if(paintType == GRADIENTPAINT) {
             mStrokeSettings->setGradient(
                         strokeSettings->getGradient());
@@ -486,7 +482,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(StrokeSettings *strokeSetti
                         strokeSettings->getGradientLinear());
         }
         mStrokeSettings->getStrokeWidthAnimator()->qra_setCurrentValue(
-                    strokeSettings->getCurrentStrokeWidth(), true, true);
+                    strokeSettings->getCurrentStrokeWidth());
     }
 }
 

@@ -16,8 +16,7 @@ void PathContainer::setElementPos(const int &index,
 void PathContainer::addNodeElements(int startPtIndex,
                                     const SkPoint &startPos,
                                     const SkPoint &pos,
-                                    const SkPoint &endPos,
-                                    const bool &saveUndoRedo) {
+                                    const SkPoint &endPos) {
     if(startPtIndex == -1 || startPtIndex > mElementsPos.count()) {
         startPtIndex = mElementsPos.count();
     }
@@ -25,33 +24,14 @@ void PathContainer::addNodeElements(int startPtIndex,
     mElementsPos.insert(startPtIndex, pos);
     mElementsPos.insert(startPtIndex, startPos);
     mPathUpdateNeeded = true;
-    if(saveUndoRedo) {
-//        MainWindow::addUndoRedo(
-//            new PathContainerAddNodeElementsUR(this,
-//                                               startPtIndex,
-//                                               startPos,
-//                                               pos,
-//                                               endPos));
-    }
 }
 
-void PathContainer::removeNodeElements(const int &startPtIndex,
-                                       const bool &saveUndoRedo) {
-    Q_UNUSED(saveUndoRedo);
-
+void PathContainer::removeNodeElements(const int &startPtIndex) {
     mPathUpdateNeeded = true;
-//    if(saveUndoRedo) {
-//        MainWindow::addUndoRedo(
-//            new PathContainerdRemoveNodeElementsUR(this,
-//                                                   startPtIndex,
-//                                                   mElementsPos.takeAt(startPtIndex),
-//                                                   mElementsPos.takeAt(startPtIndex),
-//                                                   mElementsPos.takeAt(startPtIndex)));
-//    } else {
-        mElementsPos.removeAt(startPtIndex);
-        mElementsPos.removeAt(startPtIndex);
-        mElementsPos.removeAt(startPtIndex);
-//    }
+
+    mElementsPos.removeAt(startPtIndex);
+    mElementsPos.removeAt(startPtIndex);
+    mElementsPos.removeAt(startPtIndex);
 }
 
 const SkPath &PathContainer::getPath() {

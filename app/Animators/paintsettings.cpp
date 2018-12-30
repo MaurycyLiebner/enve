@@ -166,8 +166,8 @@ Gradient::Gradient(const QColor &color1, const QColor &color2) :
     ComplexAnimator("gradient") {
     prp_setUpdater(SPtrCreate(GradientUpdater)(this));
     prp_blockUpdater();
-    addColorToList(color1, false);
-    addColorToList(color2, false);
+    addColorToList(color1);
+    addColorToList(color2);
     updateQGradientStops(Animator::USER_CHANGE);
 }
 
@@ -179,23 +179,16 @@ void Gradient::prp_startTransform() {
     //savedColors = colors;
 }
 
-void Gradient::addColorToList(const QColor &color,
-                              const bool &saveUndoRedo) {
+void Gradient::addColorToList(const QColor &color) {
     qsptr<ColorAnimator> newColorAnimator = SPtrCreate(ColorAnimator)();
     newColorAnimator->qra_setCurrentValue(color);
-    addColorToList(newColorAnimator, saveUndoRedo);
+    addColorToList(newColorAnimator);
 }
 
-void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator,
-                              const bool &saveUndoRedo) {
+void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator) {
     mColors << newColorAnimator;
 
     ca_addChildAnimator(newColorAnimator);
-
-    if(saveUndoRedo) {
-//        addUndoRedo(new GradientColorAddedToListUndoRedo(this,
-//                                                         newColorAnimator));
-    }
 }
 
 QColor Gradient::getCurrentColorAt(const int &id) {
@@ -222,11 +215,7 @@ QGradientStops Gradient::getQGradientStops() {
     return mQGradientStops;
 }
 
-void Gradient::swapColors(const int &id1, const int &id2,
-                          const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-//        addUndoRedo(new GradientSwapColorsUndoRedo(this, id1, id2));
-    }
+void Gradient::swapColors(const int &id1, const int &id2) {
     ca_swapChildAnimators(mColors.at(id1).get(),
                           mColors.at(id2).get());
     mColors.swap(id1, id2);
@@ -237,12 +226,7 @@ void Gradient::removeColor(const int &id) {
     removeColor(mColors.at(id));
 }
 
-void Gradient::removeColor(const qsptr<ColorAnimator>& color,
-                           const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-//        addUndoRedo(new GradientColorRemovedFromListUndoRedo(
-//                        this, color));
-    }
+void Gradient::removeColor(const qsptr<ColorAnimator>& color) {
     ca_removeChildAnimator(color);
     emit resetGradientWidgetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
@@ -415,13 +399,9 @@ Gradient *PaintSettings::getGradient() const {
     return mGradient.data();
 }
 
-void PaintSettings::setGradient(Gradient* gradient,
-                                const bool &saveUndoRedo) {
+void PaintSettings::setGradient(Gradient* gradient) {
     if(gradient == mGradient) return;
 
-    if(saveUndoRedo) {
-//        addUndoRedo(new GradientChangeUndoRedo(mGradient.data(), gradient, this));
-    }
     setGradientVar(gradient);
 
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
@@ -431,21 +411,13 @@ void PaintSettings::setCurrentColor(const QColor &color) {
     mColor->qra_setCurrentValue(color);
 }
 
-void PaintSettings::setPaintType(const PaintType &paintType,
-                                 const bool &saveUndoRedo) {
+void PaintSettings::setPaintType(const PaintType &paintType) {
     if(paintType == mPaintType) return;
 
     if(mPaintType == FLATPAINT) {
         ca_removeChildAnimator(mColor);
     } else if(paintType == FLATPAINT) {
         ca_addChildAnimator(mColor);
-    }
-    if(saveUndoRedo) {
-//        addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
-//                                                this));
-        if(mPaintType == GRADIENTPAINT) {
-            setGradient(nullptr);
-        }
     }
 
     mPaintType = paintType;

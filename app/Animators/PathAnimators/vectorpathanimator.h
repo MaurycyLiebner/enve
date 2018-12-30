@@ -33,18 +33,14 @@ public:
                                     const NodeSettings *settings);
 
     void replaceNodeSettingsForNodeId(const int &nodeId,
-                                      const NodeSettings *settings,
-                                      const bool &saveUndoRedo = true);
+                                      const NodeSettings *settings);
 
     NodeSettings* insertNodeSettingsForNodeId(const int &nodeId,
-                                     const NodeSettings *settings,
-                                     const bool &saveUndoRedo = true);
+                                     const NodeSettings *settings);
     void insertNodeSettingsForNodeId(const int &nodeId,
-                                     const stdsptr<NodeSettings> &newSettings,
-                                     const bool &saveUndoRedo = true);
+                                     const stdsptr<NodeSettings> &newSettings);
 
-    void removeNodeSettingsAt(const int &id,
-                              const bool &saveUndoRedo = true);
+    void removeNodeSettingsAt(const int &id);
 
     void setNodeStartEnabled(const int &nodeId,
                              const bool &enabled);
@@ -65,8 +61,7 @@ public:
     void anim_saveCurrentValueAsKey();
     void anim_addKeyAtRelFrame(const int &relFrame);
 
-    void anim_removeKey(const stdsptr<Key> &keyToRemove,
-                        const bool &saveUndoRedo);
+    void anim_removeKey(const stdsptr<Key> &keyToRemove);
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
@@ -76,8 +71,7 @@ public:
     void finalizeNodesRemove();
 
     void removeNodeAtAndApproximate(const int &nodeId);
-    void removeNodeAt(const int &nodeId,
-                      const bool &saveUndoRedo = true);
+    void removeNodeAt(const int &nodeId);
 
     NodePoint *addNodeRelPos(const SvgNodePoint *svgPoint,
                              NodePoint *targetPt);
@@ -96,16 +90,14 @@ public:
                              const bool &startEnabled,
                              const bool &endEnabled,
                              const CtrlsMode &ctrlsMode,
-                             NodePoint* targetPt,
-                             const bool &saveUndoRedo = true);
+                             NodePoint* targetPt);
     NodePoint *addNodeRelPos(const QPointF &startRelPos,
                              const QPointF &relPos,
                              const QPointF &endRelPos,
                              const bool& startEnabled,
                              const bool& endEnabled,
                              const CtrlsMode& ctrlsMode,
-                             const int &targetPtId,
-                             const bool &saveUndoRedo = true);
+                             const int &targetPtId);
     VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
     void selectAllPoints(Canvas *canvas);
@@ -139,12 +131,8 @@ public:
 
     bool SWT_isVectorPathAnimator();
     void anim_moveKeyToRelFrame(Key *key,
-                                const int &newFrame,
-                                const bool &saveUndoRedo = true,
-                                const bool &finish = true);
-    void anim_appendKey(const stdsptr<Key> &newKey,
-                        const bool &saveUndoRedo = true,
-                        const bool &update = true);
+                                const int &newFrame);
+    void anim_appendKey(const stdsptr<Key> &newKey);
 
     void moveElementPosSubset(int firstId, int count, int targetId);
     void revertElementPosSubset(const int &firstId, int count);

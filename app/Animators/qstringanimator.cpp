@@ -25,15 +25,9 @@ void QStringAnimator::anim_saveCurrentValueAsKey() {
     }
 }
 
-void QStringAnimator::setCurrentTextValue(const QString &text,
-                                          const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-//        addUndoRedo(new ChangeTextUndoRedo(this,
-//                                           mCurrentText,
-//                                           text));
-    }
+void QStringAnimator::setCurrentTextValue(const QString &text) {
     mCurrentText = text;
-    if(prp_isRecording() && saveUndoRedo) {
+    if(prp_isRecording()) {
         anim_saveCurrentValueAsKey();
     } else {
         prp_updateInfluenceRangeAfterChanged();

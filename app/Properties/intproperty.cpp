@@ -9,25 +9,12 @@ void IntProperty::setValueRange(const int &minValue,
     mMaxValue = maxValue;
 }
 
-void IntProperty::setCurrentValue(const int &value,
-                                  const bool &saveUndoRedo,
-                                  const bool &finish) {
+void IntProperty::setCurrentValue(const int &value) {
     int newValue = qMin(qMax(value, mMinValue), mMaxValue);
     if(newValue == mValue) return;
 
-    if(saveUndoRedo) {
-        prp_startTransform();
-        mValue = newValue;
-        emit valueChangedSignal(mValue);
-        prp_finishTransform();
-        return;
-    }
-
     mValue = newValue;
-    if(finish) {
-        prp_updateInfluenceRangeAfterChanged();
-        prp_callFinishUpdater();
-    }
+    prp_updateInfluenceRangeAfterChanged();
 
     emit valueChangedSignal(mValue);
 }

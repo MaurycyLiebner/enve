@@ -642,7 +642,7 @@ void loadText(const QDomElement &pathElement,
 
     textBox->moveByRel(QPointF(xStr.toDouble(),
                                yStr.toDouble()));
-    textBox->setCurrentTextValue(pathElement.text(), false);
+    textBox->setCurrentTextValue(pathElement.text());
 
     attributes->apply(textBox.data());
     parentGroup->addContainedBox(textBox);
@@ -2050,7 +2050,7 @@ void StrokeSvgAttributes::setOutlineCompositionMode(
 }
 
 void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
-    box->setStrokeWidth(mLineWidth*scale, false);
+    box->setStrokeWidth(mLineWidth*scale);
     FillSvgAttributes::apply(box, false);
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
 }
@@ -2083,7 +2083,7 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
         qsptr<VectorPathAnimator> singlePath =
                 SPtrCreate(VectorPathAnimator)(pathAnimator);
         separatePath->apply(singlePath.get());
-        pathAnimator->addSinglePathAnimator(singlePath, false);
+        pathAnimator->addSinglePathAnimator(singlePath);
     }
 
     BoundingBoxSvgAttributes::apply(path);

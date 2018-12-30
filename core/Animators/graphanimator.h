@@ -83,11 +83,8 @@ public:
     void enableCtrlPtsForSelected();
     void setCtrlsModeForSelectedKeys(const CtrlsMode &mode);
 
-    void anim_appendKey(const stdsptr<Key> &newKey,
-                        const bool &saveUndoRedo,
-                        const bool &update);
-    void anim_removeKey(const stdsptr<Key> &keyToRemove,
-                        const bool &saveUndoRedo);
+    void anim_appendKey(const stdsptr<Key> &newKey);
+    void anim_removeKey(const stdsptr<Key> &keyToRemove);
     void getSelectedSegments(QList<QList<GraphKey*>> &segments);
 protected:
     QPainterPath mKeysPath;

@@ -808,10 +808,9 @@ void CanvasWindow::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth,
-                                      const bool &finish) {
+void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeWidth(strokeWidth, finish);
+    mCurrentCanvas->setSelectedStrokeWidth(strokeWidth);
     queScheduledTasksAndUpdate();
 }
 

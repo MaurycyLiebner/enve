@@ -32,10 +32,8 @@ stdsptr<QrealKey> QrealKey::makeQrealKeyDuplicate(
     return target;
 }
 
-void QrealKey::incValue(const qreal &incBy,
-                        const bool &saveUndoRedo,
-                        const bool &finish) {
-    setValue(mValue + incBy, saveUndoRedo, finish);
+void QrealKey::incValue(const qreal &incBy) {
+    setValue(mValue + incBy);
 }
 
 QrealAnimator *QrealKey::getParentQrealAnimator() const {
@@ -54,9 +52,7 @@ QrealAnimator *QrealKey::getParentQrealAnimator() const {
 
 qreal QrealKey::getValue() const { return mValue; }
 
-void QrealKey::setValue(qreal value,
-                        const bool &finish,
-                        const bool &callUpdater) {
+void QrealKey::setValue(qreal value) {
     if(mParentAnimator != nullptr) {
         value = clamp(value,
                       getParentQrealAnimator()->getMinPossibleValue(),
@@ -67,9 +63,7 @@ void QrealKey::setValue(qreal value,
     setStartValueVar(mStartValue + dVal);
 
     mValue = value;
-    if(callUpdater) {
-        mParentAnimator->anim_updateAfterChangedKey(this);
-    }
+    mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
 void QrealKey::finishValueTransform() {
@@ -107,10 +101,10 @@ bool QrealKey::differsFromKey(Key *key) const {
 void QrealKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
     int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
     bool frameChanged = newFrame != mRelFrame;
-    setValue(frameValueChange.y() + mSavedValue, false, !frameChanged);
+    setValue(frameValueChange.y() + mSavedValue);
     if(!frameChanged) return;
     if(mParentAnimator != nullptr) {
-        mParentAnimator->anim_moveKeyToRelFrame(this, newFrame, false);
+        mParentAnimator->anim_moveKeyToRelFrame(this, newFrame);
     } else {
         setRelFrame(newFrame);
     }

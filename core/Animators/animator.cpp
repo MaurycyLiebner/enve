@@ -330,12 +330,7 @@ void Animator::anim_sortKeys() {
     std::sort(anim_mKeys.begin(), anim_mKeys.end(), keysFrameSort);
 }
 
-void Animator::anim_appendKey(const stdsptr<Key>& newKey,
-                              const bool &saveUndoRedo,
-                              const bool &update) {
-    if(saveUndoRedo && !anim_isComplexAnimator()) {
-//        addUndoRedo(new AddKeyToAnimatorUndoRedo(newKey, this));
-    }
+void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     if(!anim_mIsRecording) {
         anim_mIsRecording = true;
     }
@@ -346,22 +341,15 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey,
 
     anim_updateKeyOnCurrrentFrame();
 
-    if(update) {
-        anim_updateAfterChangedKey(newKey.get());
-    }
+    anim_updateAfterChangedKey(newKey.get());
 }
 
-void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove,
-                              const bool &saveUndoRedo) {
+void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     Key* keyPtr = keyToRemove.get();
     keyToRemove->setSelected(false);
 
     anim_updateAfterChangedKey(keyPtr);
 
-    if(saveUndoRedo && !anim_isComplexAnimator()) {
-//        addUndoRedo(new RemoveKeyFromAnimatorUndoRedo(
-//                                keyPtr, this));
-    }
     emit prp_removingKey(keyPtr);
 
     anim_mKeys.removeAt(anim_getKeyIndex(keyPtr));
@@ -371,12 +359,7 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove,
     anim_updateKeyOnCurrrentFrame();
 }
 
-void Animator::anim_moveKeyToRelFrame(Key *key,
-                                      const int &newFrame,
-                                      const bool &saveUndoRedo,
-                                      const bool &finish) {
-    Q_UNUSED(finish);
-    Q_UNUSED(saveUndoRedo);
+void Animator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
     anim_updateAfterChangedKey(key);
     emit prp_removingKey(key);
     key->setRelFrame(newFrame);
@@ -450,14 +433,7 @@ bool Animator::prp_hasKeys() {
     return !anim_mKeys.isEmpty();
 }
 
-void Animator::anim_setRecordingWithoutChangingKeys(const bool &rec,
-                                                    const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-//        addUndoRedo(new AnimatorRecordingSetUndoRedo(anim_mIsRecording,
-//                                                     rec,
-//                                                     this));
-    }
-
+void Animator::anim_setRecordingWithoutChangingKeys(const bool &rec) {
     anim_setRecordingValue(rec);
 }
 

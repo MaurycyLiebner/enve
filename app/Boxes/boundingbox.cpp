@@ -97,14 +97,13 @@ QPointF BoundingBox::getRelCenterPosition() {
     return mRelBoundingRect.center();
 }
 
-void BoundingBox::centerPivotPosition(const bool &saveUndoRedo) {
+void BoundingBox::centerPivotPosition() {
     mTransformAnimator->setPivotWithoutChangingTransformation(
-                getRelCenterPosition(), saveUndoRedo);
+                getRelCenterPosition());
 }
 
-void BoundingBox::setPivotPosition(const QPointF &pos, const bool &saveUndoRedo) {
-    mTransformAnimator->setPivotWithoutChangingTransformation(
-                pos, saveUndoRedo);
+void BoundingBox::setPivotPosition(const QPointF &pos) {
+    mTransformAnimator->setPivotWithoutChangingTransformation(pos);
 }
 
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox *targetBox) {
@@ -235,15 +234,15 @@ const SkBlendMode &BoundingBox::getBlendMode() {
 }
 
 void BoundingBox::resetScale() {
-    mTransformAnimator->resetScale(true);
+    mTransformAnimator->resetScale();
 }
 
 void BoundingBox::resetTranslation() {
-    mTransformAnimator->resetTranslation(true);
+    mTransformAnimator->resetTranslation();
 }
 
 void BoundingBox::resetRotation() {
-    mTransformAnimator->resetRotation(true);
+    mTransformAnimator->resetRotation();
 }
 
 void BoundingBox::prp_setAbsFrame(const int &frame) {
@@ -275,8 +274,9 @@ void BoundingBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
 void BoundingBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     Q_UNUSED(joinStyle); }
 
-void BoundingBox::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
-    Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
+void BoundingBox::setStrokeWidth(const qreal &strokeWidth) {
+    Q_UNUSED(strokeWidth);
+}
 
 void BoundingBox::startSelectedStrokeWidthTransform() {}
 
@@ -341,11 +341,9 @@ BoxesGroup *BoundingBox::getParentGroup() {
 }
 
 void BoundingBox::setPivotRelPos(const QPointF &relPos,
-                                 const bool &saveUndoRedo,
                                  const bool &pivotAutoAdjust) {
     mPivotAutoAdjust = pivotAutoAdjust;
-    mTransformAnimator->setPivotWithoutChangingTransformation(relPos,
-                                                              saveUndoRedo);
+    mTransformAnimator->setPivotWithoutChangingTransformation(relPos);
     requestGlobalPivotUpdateIfSelected();
 }
 
@@ -358,9 +356,8 @@ void BoundingBox::finishPivotTransform() {
 }
 
 void BoundingBox::setPivotAbsPos(const QPointF &absPos,
-                                 const bool &saveUndoRedo,
                                  const bool &pivotChanged) {
-    setPivotRelPos(mapAbsPosToRel(absPos), saveUndoRedo, pivotChanged);
+    setPivotRelPos(mapAbsPosToRel(absPos), pivotChanged);
     //updateCombinedTransform();
 }
 
@@ -383,7 +380,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
 
     if(mPivotAutoAdjust &&
        !mTransformAnimator->rotOrScaleOrPivotRecording()) {
-        setPivotPosition(renderData->getCenterPosition(), false);
+        setPivotPosition(renderData->getCenterPosition());
     }
 }
 
@@ -407,7 +404,8 @@ void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
 
 void BoundingBox::scheduleUpdate(const int &relFrame,
                                  const UpdateReason& reason) {
-    Q_ASSERT(!mBlockedSchedule);
+    //Q_ASSERT(!mBlockedSchedule);
+    if(mBlockedSchedule) return;
     if(!shouldScheduleUpdate()) return;
     mExpiredPixmap = 1;
 //    if(SWT_isCanvas()) {
@@ -637,14 +635,12 @@ void BoundingBox::moveByRel(const QPointF &trans) {
     mTransformAnimator->moveRelativeToSavedValue(trans.x(), trans.y());
 }
 
-void BoundingBox::setAbsolutePos(const QPointF &pos,
-                                 const bool &saveUndoRedo) {
-    setRelativePos(mParentTransform->mapAbsPosToRel(pos), saveUndoRedo);
+void BoundingBox::setAbsolutePos(const QPointF &pos) {
+    setRelativePos(mParentTransform->mapAbsPosToRel(pos));
 }
 
-void BoundingBox::setRelativePos(const QPointF &relPos,
-                                 const bool &saveUndoRedo) {
-    mTransformAnimator->setPosition(relPos.x(), relPos.y(), saveUndoRedo);
+void BoundingBox::setRelativePos(const QPointF &relPos) {
+    mTransformAnimator->setPosition(relPos.x(), relPos.y());
 }
 
 void BoundingBox::saveTransformPivotAbsPos(const QPointF &absPivot) {
@@ -792,15 +788,12 @@ void BoundingBox::bringToEnd() {
     mParentGroup->bringContainedBoxToFrontList(this);
 }
 
-void BoundingBox::setZListIndex(const int &z,
-                                const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-//        addUndoRedo(new SetBoundingBoxZListIndexUnoRedo(mZListIndex, z, this));
-    }
+void BoundingBox::setZListIndex(const int &z) {
     mZListIndex = z;
 }
 
-void BoundingBox::selectAndAddContainedPointsToList(const QRectF &, QList<stdptr<MovablePoint>> &) {}
+void BoundingBox::selectAndAddContainedPointsToList(
+        const QRectF &, QList<stdptr<MovablePoint>> &) {}
 
 int BoundingBox::getZIndex() {
     return mZListIndex;
@@ -1273,14 +1266,10 @@ void BoundingBox::scheduleTask(const stdsptr<_ScheduledTask>& task) {
     mScheduledTasks << task;
 }
 
-void BoundingBox::setVisibile(const bool &visible,
-                              const bool &saveUndoRedo) {
+void BoundingBox::setVisibile(const bool &visible) {
     if(mVisible == visible) return;
     if(mSelected) {
         removeFromSelection();
-    }
-    if(saveUndoRedo) {
-        //        addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
     }
     mVisible = visible;
 
@@ -1292,7 +1281,7 @@ void BoundingBox::setVisibile(const bool &visible,
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
     Q_FOREACH(BoundingBox* box, mLinkingBoxes) {
         if(box->isParentLinkBox()) {
-            box->setVisibile(visible, false);
+            box->setVisibile(visible);
         }
     }
 }

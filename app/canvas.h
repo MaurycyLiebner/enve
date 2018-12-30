@@ -113,7 +113,7 @@ public:
 
     void clearPreview();
 
-    void centerPivotPosition(const bool &finish = false) { Q_UNUSED(finish); }
+    void centerPivotPosition() {}
 
     //
     void finishSelectedPointsTransform();
@@ -180,7 +180,7 @@ public:
 
     void setSelectedCapStyle(const Qt::PenCapStyle& capStyle);
     void setSelectedJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    void setSelectedStrokeWidth(const qreal &strokeWidth, const bool &finish);
+    void setSelectedStrokeWidth(const qreal &strokeWidth);
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();

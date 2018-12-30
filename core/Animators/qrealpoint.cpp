@@ -17,7 +17,7 @@ qreal QrealPoint::getFrame() {
 
 void QrealPoint::setFrame(const qreal &frame) {
     if(mType == KEY_POINT) {
-        return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame), false);
+        return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame));
     }
     if(mType == START_POINT) return mParentKey->setStartFrame(frame);
     if(mType == END_POINT) return mParentKey->setEndFrame(frame);

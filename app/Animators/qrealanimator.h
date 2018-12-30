@@ -34,16 +34,10 @@ public:
     qreal qra_getValueAtAbsFrame(const int &frame) const;
     qreal qra_getCurrentValue() const;
     qreal qra_getCurrentEffectiveValue();
-    void qra_setCurrentValue(qreal newValue,
-                             const bool &finish,
-                             const bool &callUpdater);
+    void qra_setCurrentValue(qreal newValue);
     void qra_updateValueFromCurrentFrame();
-    void qra_saveCurrentValueToKey(QrealKey *key,
-                                   const bool &finish,
-                                   const bool &callUpdater);
-    void qra_saveValueToKey(QrealKey *key,
-                            const qreal &value,
-                            const bool &callUpdater = true);
+    void qra_saveCurrentValueToKey(QrealKey *key);
+    void qra_saveValueToKey(QrealKey *key, const qreal &value);
 
     void prp_setAbsFrame(const int &frame);
 
@@ -59,9 +53,7 @@ public:
     int qra_getNextKeyRelFrame(const QrealKey * const key);
 
     virtual void prp_retrieveSavedValue();
-    void qra_incCurrentValue(const qreal &incBy,
-                             const bool &saveUndoRedo = false,
-                             const bool &finish = false);
+    void qra_incCurrentValue(const qreal &incBy);
 
     virtual void prp_startTransform();
 
@@ -73,9 +65,7 @@ public:
 
     virtual void prp_cancelTransform();  
 
-    void qra_incAllValues(const qreal &valInc,
-                          const bool &saveUndoRedo = false,
-                          const bool &finish = false);
+    void qra_incAllValues(const qreal &valInc);
 
     virtual QString prp_getValueText();
 
@@ -83,15 +73,9 @@ public:
     qreal getMaxPossibleValue();
 
     void anim_mergeKeysIfNeeded();
-    void anim_appendKey(const stdsptr<Key> &newKey,
-                        const bool &saveUndoRedo = true,
-                        const bool &update = true);
-    void anim_removeKey(const stdsptr<Key> &keyToRemove,
-                        const bool &saveUndoRedo = true);
-    void anim_moveKeyToRelFrame(Key *key,
-                                const int &newFrame,
-                                const bool &saveUndoRedo,
-                                const bool &finish);
+    void anim_appendKey(const stdsptr<Key> &newKey);
+    void anim_removeKey(const stdsptr<Key> &keyToRemove);
+    void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
 
     qreal getPrefferedValueStep();
     virtual void setPrefferedValueStep(const qreal &valueStep);

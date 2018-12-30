@@ -11,9 +11,7 @@ ColorAnimator::ColorAnimator(const QString &name) : ComplexAnimator(name) {
     ca_addChildAnimator(mAlphaAnimator);
 }
 
-void ColorAnimator::qra_setCurrentValue(const QColor &colorValue,
-                                        const bool &saveUndoRedo,
-                                        const bool &finish) {
+void ColorAnimator::qra_setCurrentValue(const QColor &colorValue) {
     qreal val1, val2, val3;
     if(mColorMode == RGBMODE) {
         val1 = colorValue.redF();
@@ -30,10 +28,10 @@ void ColorAnimator::qra_setCurrentValue(const QColor &colorValue,
     }
     qreal alpha = colorValue.alphaF();
 
-    mVal1Animator->qra_setCurrentValue(val1, saveUndoRedo, finish);
-    mVal2Animator->qra_setCurrentValue(val2, saveUndoRedo, finish);
-    mVal3Animator->qra_setCurrentValue(val3, saveUndoRedo, finish);
-    mAlphaAnimator->qra_setCurrentValue(alpha, saveUndoRedo, finish);
+    mVal1Animator->qra_setCurrentValue(val1);
+    mVal2Animator->qra_setCurrentValue(val2);
+    mVal3Animator->qra_setCurrentValue(val3);
+    mAlphaAnimator->qra_setCurrentValue(alpha);
 }
 
 QColor ColorAnimator::getCurrentColor() const {
@@ -171,24 +169,20 @@ void ColorAnimator::startAlphaTransform() {
     mAlphaAnimator->prp_startTransform();
 }
 
-void ColorAnimator::setCurrentVal1Value(const qreal &val1,
-                                        const bool &finish) {
-    mVal1Animator->qra_setCurrentValue(val1, finish);
+void ColorAnimator::setCurrentVal1Value(const qreal &val1) {
+    mVal1Animator->qra_setCurrentValue(val1);
 }
 
-void ColorAnimator::setCurrentVal2Value(const qreal &val2,
-                                        const bool &finish) {
-    mVal2Animator->qra_setCurrentValue(val2, finish);
+void ColorAnimator::setCurrentVal2Value(const qreal &val2) {
+    mVal2Animator->qra_setCurrentValue(val2);
 }
 
-void ColorAnimator::setCurrentVal3Value(const qreal &val3,
-                                        const bool &finish) {
-    mVal3Animator->qra_setCurrentValue(val3, finish);
+void ColorAnimator::setCurrentVal3Value(const qreal &val3) {
+    mVal3Animator->qra_setCurrentValue(val3);
 }
 
-void ColorAnimator::setCurrentAlphaValue(const qreal &alpha,
-                                         const bool &finish) {
-    mAlphaAnimator->qra_setCurrentValue(alpha, finish);
+void ColorAnimator::setCurrentAlphaValue(const qreal &alpha) {
+    mAlphaAnimator->qra_setCurrentValue(alpha);
 }
 
 #include <QMenu>

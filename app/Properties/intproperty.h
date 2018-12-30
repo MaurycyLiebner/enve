@@ -9,9 +9,7 @@ public:
     void setValueRange(const int &minValue,
                        const int &maxValue);
 
-    void setCurrentValue(const int &value,
-                         const bool &saveUndoRedo = false,
-                         const bool &finish = false);
+    void setCurrentValue(const int &value);
 
     bool SWT_isIntProperty();
 

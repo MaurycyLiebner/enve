@@ -19,10 +19,8 @@ public:
     void addNodeElements(int startPtIndex,
                  const SkPoint &startPos,
                  const SkPoint &pos,
-                 const SkPoint &endPos,
-                 const bool &saveUndoRedo = true);
-    void removeElementPosAt(const int &index,
-                            const bool &saveUndoRedo = true);
+                 const SkPoint &endPos);
+    void removeElementPosAt(const int &index);
     const SkPath &getPath();
     void updatePath();
     virtual void setPathClosed(const bool &bT);
@@ -47,10 +45,9 @@ public:
         return nodeId*3 + 1;
     }
 
-    virtual void removeNodeAt(const int &nodeId,
-                              const bool &saveUndoRedo = true) {
+    virtual void removeNodeAt(const int &nodeId) {
         int nodePtId = nodeIdToPointId(nodeId);
-        removeNodeElements(nodePtId, saveUndoRedo);
+        removeNodeElements(nodePtId);
     }
 
     virtual void removeNodeAtAndApproximate(const int &nodeId) {
@@ -166,18 +163,10 @@ public:
 
     virtual void finishedPathChange();
 
-    void setElementsPos(const QList<SkPoint> &newElementsPos,
-                        const bool &saveUndoRedo) {
-        if(saveUndoRedo) {
-            startPathChange();
-        }
+    void setElementsPos(const QList<SkPoint> &newElementsPos) {
         mElementsPos = newElementsPos;
-        if(saveUndoRedo) {
-            finishedPathChange();
-        }
     }
-    void removeNodeElements(const int &startPtIndex,
-                            const bool &saveUndoRedo = true);
+    void removeNodeElements(const int &startPtIndex);
 
     virtual void updateAfterChangedFromInside() = 0;
 

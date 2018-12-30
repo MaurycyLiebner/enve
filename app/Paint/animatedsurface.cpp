@@ -230,26 +230,19 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
     }
 }
 
-void AnimatedSurface::anim_removeKey(const stdsptr<Key>& keyToRemove,
-                                     const bool &saveUndoRedo) {
-    Animator::anim_removeKey(keyToRemove, saveUndoRedo);
+void AnimatedSurface::anim_removeKey(const stdsptr<Key>& keyToRemove) {
+    Animator::anim_removeKey(keyToRemove);
     updateTargetTiles();
 }
 
-void AnimatedSurface::anim_appendKey(
-                    const stdsptr<Key>& newKey,
-                    const bool &saveUndoRedo,
-                    const bool &update) {
-    Animator::anim_appendKey(newKey, saveUndoRedo, update);
+void AnimatedSurface::anim_appendKey(const stdsptr<Key>& newKey) {
+    Animator::anim_appendKey(newKey);
     updateTargetTiles();
 }
 
 void AnimatedSurface::anim_moveKeyToRelFrame(Key *key,
-                            const int &newFrame,
-                            const bool &saveUndoRedo,
-                            const bool &finish) {
-    Animator::anim_moveKeyToRelFrame(key, newFrame,
-                                     saveUndoRedo, finish);
+                            const int &newFrame) {
+    Animator::anim_moveKeyToRelFrame(key, newFrame);
     updateTargetTiles();
 }
 

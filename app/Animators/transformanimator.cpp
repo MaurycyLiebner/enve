@@ -32,31 +32,30 @@ BasicTransformAnimator::BasicTransformAnimator() :
     ca_addChildAnimator(mScaleAnimator);
 }
 
-void BasicTransformAnimator::resetScale(const bool &finish) {
-    mScaleAnimator->setCurrentPointValue(QPointF(1., 1.), finish);
+void BasicTransformAnimator::resetScale() {
+    mScaleAnimator->setCurrentPointValue(QPointF(1., 1.));
 }
 
-void BasicTransformAnimator::resetTranslation(const bool &finish) {
-    mPosAnimator->setCurrentPointValue(QPointF(0., 0.), finish);
+void BasicTransformAnimator::resetTranslation() {
+    mPosAnimator->setCurrentPointValue(QPointF(0., 0.));
 }
 
-void BasicTransformAnimator::resetRotation(const bool &finish) {
-    mRotAnimator->qra_setCurrentValue(0., finish);
+void BasicTransformAnimator::resetRotation() {
+    mRotAnimator->qra_setCurrentValue(0.);
 }
 
-void BasicTransformAnimator::reset(const bool &finish) {
-    resetScale(finish);
-    resetTranslation(finish);
-    resetRotation(finish);
+void BasicTransformAnimator::reset() {
+    resetScale();
+    resetTranslation();
+    resetRotation();
 }
 
 void BasicTransformAnimator::setScale(const qreal &sx, const qreal &sy) {
     mScaleAnimator->setCurrentPointValue(QPointF(sx, sy) );
 }
 
-void BasicTransformAnimator::setPosition(const qreal &x, const qreal &y,
-                                         const bool &saveUndoRedo) {
-    mPosAnimator->setCurrentPointValue(QPointF(x, y), saveUndoRedo);
+void BasicTransformAnimator::setPosition(const qreal &x, const qreal &y) {
+    mPosAnimator->setCurrentPointValue(QPointF(x, y));
 }
 
 void BasicTransformAnimator::setRotation(const qreal &rot) {
@@ -188,26 +187,21 @@ QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrameF(
     return matrix;
 }
 
-void BasicTransformAnimator::moveByAbs(
-                        const QPointF &absTrans) {
+void BasicTransformAnimator::moveByAbs(const QPointF &absTrans) {
     moveToAbs(mParentTransformAnimator->mapRelPosToAbs(mPosAnimator->getSavedPointValue()) +
               absTrans);
 }
 
-void BasicTransformAnimator::moveToAbs(
-                        const QPointF &absPos) {
-    setAbsolutePos(absPos, false);
+void BasicTransformAnimator::moveToAbs(const QPointF &absPos) {
+    setAbsolutePos(absPos);
 }
 
-void BasicTransformAnimator::setAbsolutePos(
-                        const QPointF &pos,
-                        const bool &saveUndoRedo) {
-    setRelativePos(mParentTransformAnimator->mapAbsPosToRel(pos), saveUndoRedo);
+void BasicTransformAnimator::setAbsolutePos(const QPointF &pos) {
+    setRelativePos(mParentTransformAnimator->mapAbsPosToRel(pos));
 }
 
-void BasicTransformAnimator::setRelativePos(const QPointF &relPos,
-                                            const bool &saveUndoRedo) {
-    mPosAnimator->setCurrentPointValue(relPos, saveUndoRedo);
+void BasicTransformAnimator::setRelativePos(const QPointF &relPos) {
+    mPosAnimator->setCurrentPointValue(relPos);
 }
 
 void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
@@ -304,13 +298,13 @@ MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
     return mPivotPoint.get();
 }
 
-void BoxTransformAnimator::resetPivot(const bool &finish) {
-    mPivotAnimator->setCurrentPointValue(QPointF(0., 0.), finish);
+void BoxTransformAnimator::resetPivot() {
+    mPivotAnimator->setCurrentPointValue(QPointF(0., 0.));
 }
 
-void BoxTransformAnimator::reset(const bool &finish) {
-    BasicTransformAnimator::reset(finish);
-    resetPivot(finish);
+void BoxTransformAnimator::reset() {
+    BasicTransformAnimator::reset();
+    resetPivot();
 }
 
 void BoxTransformAnimator::startOpacityTransform() {
@@ -335,9 +329,7 @@ void BoxTransformAnimator::finishPivotTransform() {
     mPivotAnimator->prp_finishTransform();
 }
 
-void BoxTransformAnimator::setPivotWithoutChangingTransformation(
-                                const QPointF &point,
-                                const bool &saveUndoRedo) {
+void BoxTransformAnimator::setPivotWithoutChangingTransformation(const QPointF &point) {
     QMatrix currentMatrix;
     qreal pivotX = mPivotAnimator->getEffectiveXValue();
     qreal pivotY = mPivotAnimator->getEffectiveYValue();
@@ -362,10 +354,9 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
 
 
     mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
-                               currentMatrix.dy() - futureMatrix.dy(),
-                               saveUndoRedo, false);
+                               currentMatrix.dy() - futureMatrix.dy());
 
-    mPivotAnimator->setCurrentPointValue(point, saveUndoRedo, false);
+    mPivotAnimator->setCurrentPointValue(point);
 }
 
 QPointF BoxTransformAnimator::getPivot() {

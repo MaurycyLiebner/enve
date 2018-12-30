@@ -36,8 +36,7 @@ public:
                                     QWidget* widgetsParent);
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
-    void setCurrentTextValue(const QString &text,
-                             const bool &saveUndoRedo = true);
+    void setCurrentTextValue(const QString &text);
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);

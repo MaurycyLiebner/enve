@@ -79,11 +79,9 @@ public:
 
     void moveByRel(const QPointF &trans);
 
-    void setAbsolutePos(const QPointF &pos,
-                                     const bool &saveUndoRedo);
+    void setAbsolutePos(const QPointF &pos);
 
-    void setRelativePos(const QPointF &relPos,
-                                     const bool &saveUndoRedo);
+    void setRelativePos(const QPointF &relPos);
 
     void saveTransformPivotAbsPos(const QPointF &absPivot);
 

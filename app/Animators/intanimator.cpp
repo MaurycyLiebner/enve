@@ -27,10 +27,8 @@ int IntAnimator::getCurrentIntEffectiveValueAtRelFrameF(const qreal &relFrame) c
     return qRound(getCurrentEffectiveValueAtRelFrameF(relFrame));
 }
 
-void IntAnimator::setCurrentIntValue(const int &value,
-                                     const bool &saveUndoRedo,
-                                     const bool &finish) {
-    qra_setCurrentValue(value, saveUndoRedo, finish);
+void IntAnimator::setCurrentIntValue(const int &value) {
+    qra_setCurrentValue(value);
 }
 
 void IntAnimator::setIntValueRange(const int &minVal,

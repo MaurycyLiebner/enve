@@ -47,7 +47,7 @@ void VectorPath::breakPathsApart_k() {
         copyPathBoxDataTo(newPath.get());
         mParentGroup->addContainedBox(newPath);
         PathAnimator *pathAnimator = newPath->getPathAnimator();
-        pathAnimator->addSinglePathAnimator(path, false);
+        pathAnimator->addSinglePathAnimator(path);
         mPathAnimator->removeSinglePathAnimator(path);
         path->setParentPath(pathAnimator);
     }
@@ -83,8 +83,8 @@ void VectorPath::applyCurrentTransformation() {
     mPathAnimator->applyTransformToPoints(
                 mTransformAnimator->getCurrentTransformationMatrix());
 
-    mTransformAnimator->reset(true);
-    centerPivotPosition(true);
+    mTransformAnimator->reset();
+    centerPivotPosition();
     mNReasonsNotToApplyUglyTransform--;
 }
 

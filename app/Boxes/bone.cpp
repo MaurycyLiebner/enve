@@ -172,12 +172,12 @@ void Bone::moveByRel(const QPointF &trans) {
     mTransformAnimator->moveRelativeToSavedValue(trans.x(), trans.y());
 }
 
-void Bone::setAbsolutePos(const QPointF &pos, const bool &saveUndoRedo) {
-    setRelativePos(mParentBone->mapAbsPosToRel(pos), saveUndoRedo);
+void Bone::setAbsolutePos(const QPointF &pos) {
+    setRelativePos(mParentBone->mapAbsPosToRel(pos));
 }
 
-void Bone::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo) {
-    mTransformAnimator->setPosition(relPos.x(), relPos.y(), saveUndoRedo);
+void Bone::setRelativePos(const QPointF &relPos) {
+    mTransformAnimator->setPosition(relPos.x(), relPos.y());
 }
 
 void Bone::saveTransformPivotAbsPos(const QPointF &absPivot) {

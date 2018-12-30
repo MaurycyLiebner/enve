@@ -6,8 +6,7 @@ class BoolAnimator : public IntAnimator {
     friend class SelfRef;
 public:
     bool getCurrentBoolValue();
-    void setCurrentBoolValue(const bool &bT,
-                             const bool &finish = false);
+    void setCurrentBoolValue(const bool &bT);
     bool getCurrentBoolValueAtRelFrame(const int &relFrame) {
         return getCurrentIntValueAtRelFrame(relFrame) == 1;
     }

@@ -32,21 +32,13 @@ VectorPathEdge *PathAnimator::getEdge(const QPointF &absPos,
     return nullptr;
 }
 
-void PathAnimator::addSinglePathAnimator(const qsptr<VectorPathAnimator>& path,
-                                         const bool &saveUndoRedo) {
+void PathAnimator::addSinglePathAnimator(const qsptr<VectorPathAnimator>& path) {
     mSinglePaths << path;
     ca_addChildAnimator(path);
-    if(saveUndoRedo) {
-//        addUndoRedo(new AddSinglePathAnimatorUndoRedo(this, path));
-    }
 }
 
-void PathAnimator::removeSinglePathAnimator(const qsptr<VectorPathAnimator>& path,
-                                            const bool &saveUndoRedo) {
+void PathAnimator::removeSinglePathAnimator(const qsptr<VectorPathAnimator>& path) {
     if(mSinglePaths.removeOne(path) ) {
-        if(saveUndoRedo) {
-//            addUndoRedo(new RemoveSinglePathAnimatorUndoRedo(this, path));
-        }
         ca_removeChildAnimator(path);
         if(mSinglePaths.isEmpty()) {
             mParentBox->removeFromParent_k();

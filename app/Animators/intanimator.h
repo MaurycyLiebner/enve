@@ -6,8 +6,7 @@ class IntAnimator : public QrealAnimator {
     friend class SelfRef;
 public:
     int getCurrentIntValue() const;
-    void setCurrentIntValue(const int &value, const bool &saveUndoRedo,
-                            const bool &finish = false);
+    void setCurrentIntValue(const int &value);
     void setIntValueRange(const int &minVal, const int &maxVal);
 
     bool SWT_isIntAnimator() { return true; }

@@ -509,9 +509,9 @@ void BoxesGroup::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     }
 }
 
-void BoxesGroup::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
+void BoxesGroup::setStrokeWidth(const qreal &strokeWidth) {
     Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
-        box->setStrokeWidth(strokeWidth, finish);
+        box->setStrokeWidth(strokeWidth);
     }
 }
 
@@ -787,9 +787,9 @@ void BoxesGroup::applyCurrentTransformation() {
         box->finishTransform();
     }
 
-    mTransformAnimator->resetRotation(true);
-    mTransformAnimator->resetScale(true);
-    mTransformAnimator->resetTranslation(true);
+    mTransformAnimator->resetRotation();
+    mTransformAnimator->resetScale();
+    mTransformAnimator->resetTranslation();
     mNReasonsNotToApplyUglyTransform--;
 }
 
@@ -842,17 +842,13 @@ void BoxesGroup::addContainedBox(const qsptr<BoundingBox>& child) {
 
 void BoxesGroup::addContainedBoxToListAt(
         const int &index,
-        const qsptr<BoundingBox>& child,
-        const bool &saveUndoRedo) {
+        const qsptr<BoundingBox>& child) {
     mContainedBoxes.insert(index, GetAsSPtr(child, BoundingBox));
     child->setParentGroup(this);
-    if(saveUndoRedo) {
-//        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
-    }
     connect(child.data(),
             &BoundingBox::prp_absFrameRangeChanged,
             this, &BoundingBox::prp_updateAfterChangedAbsFrameRange);
-    updateContainedBoxIds(index, saveUndoRedo);
+    updateContainedBoxIds(index);
 
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(
@@ -865,20 +861,18 @@ void BoxesGroup::addContainedBoxToListAt(
         qsptr<InternalLinkGroupBox> internalLinkGroup =
                 GetAsSPtr(box, InternalLinkGroupBox);
         internalLinkGroup->addContainedBoxToListAt(
-                    index, child->createLinkForLinkGroup(), false);
+                    index, child->createLinkForLinkGroup());
     }
 }
 
-void BoxesGroup::updateContainedBoxIds(const int &firstId,
-                                  const bool &saveUndoRedo) {
-    updateContainedBoxIds(firstId, mContainedBoxes.length() - 1, saveUndoRedo);
+void BoxesGroup::updateContainedBoxIds(const int &firstId) {
+    updateContainedBoxIds(firstId, mContainedBoxes.length() - 1);
 }
 
 void BoxesGroup::updateContainedBoxIds(const int &firstId,
-                                  const int &lastId,
-                                  const bool &saveUndoRedo) {
+                                       const int &lastId) {
     for(int i = firstId; i <= lastId; i++) {
-        mContainedBoxes.at(i)->setZListIndex(i, saveUndoRedo);
+        mContainedBoxes.at(i)->setZListIndex(i);
     }
 }
 
@@ -895,8 +889,7 @@ stdsptr<BoundingBoxRenderData> BoxesGroup::createRenderData() {
     return SPtrCreate(BoxesGroupRenderData)(this);
 }
 
-void BoxesGroup::removeContainedBoxFromList(const int &id,
-                                            const bool &saveUndoRedo) {
+void BoxesGroup::removeContainedBoxFromList(const int &id) {
     qsptr<BoundingBox> box = mContainedBoxes.takeAt(id);
     if(box->SWT_isBoxesGroup()) {
         BoxesGroup* group = GetAsPtr(box, BoxesGroup);
@@ -910,12 +903,8 @@ void BoxesGroup::removeContainedBoxFromList(const int &id,
         box->removeFromSelection();
     }
     disconnect(box.data(), nullptr, this, nullptr);
-    if(saveUndoRedo) {
-//        addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
-//                                                   box) );
-    }
 
-    updateContainedBoxIds(id, saveUndoRedo);
+    updateContainedBoxIds(id);
 
     SWT_removeChildAbstractionForTargetFromAll(box.get());
     box->setParentGroup(nullptr);
@@ -923,7 +912,7 @@ void BoxesGroup::removeContainedBoxFromList(const int &id,
     foreach(const qptr<BoundingBox>& box, mLinkingBoxes) {
         qsptr<InternalLinkGroupBox> internalLinkGroup =
                 GetAsSPtr(box, InternalLinkGroupBox);
-        internalLinkGroup->removeContainedBoxFromList(id, false);
+        internalLinkGroup->removeContainedBoxFromList(id);
     }
 }
 
@@ -986,16 +975,11 @@ void BoxesGroup::bringContainedBoxToFrontList(BoundingBox *child) {
 }
 
 void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
-                                 const int &from, const int &to,
-                                 const bool &saveUndoRedo) {
+                                        const int &from, const int &to) {
     mContainedBoxes.move(from, to);
-    updateContainedBoxIds(qMin(from, to), qMax(from, to), saveUndoRedo);
+    updateContainedBoxIds(qMin(from, to), qMax(from, to));
     SWT_moveChildAbstractionForTargetToInAll(child, mContainedBoxes.count() - to - 1
                                                     + ca_mChildAnimators.count());
-    if(saveUndoRedo) {
-//        addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
-    }
-
     scheduleUpdate(Animator::USER_CHANGE);
 
     clearAllCache();

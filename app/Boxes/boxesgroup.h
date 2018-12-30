@@ -74,13 +74,10 @@ public:
     bool isCurrentGroup();
     void addContainedBox(const qsptr<BoundingBox> &child);
     void addContainedBoxToListAt(const int &index,
-                                 const qsptr<BoundingBox> &child,
-                                 const bool &saveUndoRedo = true);
+                                 const qsptr<BoundingBox> &child);
+    void updateContainedBoxIds(const int &firstId);
     void updateContainedBoxIds(const int &firstId,
-                          const bool &saveUndoRedo = true);
-    void updateContainedBoxIds(const int &firstId,
-                          const int &lastId,
-                          const bool &saveUndoRedo = true);
+                              const int &lastId);
     void removeContainedBox_k(const qsptr<BoundingBox> &child);
     void removeContainedBox(const qsptr<BoundingBox> &child);
     void increaseContainedBoxZInList(BoundingBox *child);
@@ -88,20 +85,18 @@ public:
     void bringContainedBoxToEndList(BoundingBox *child);
     void bringContainedBoxToFrontList(BoundingBox *child);
     void moveContainedBoxInList(BoundingBox *child,
-                         const int &from,
-                         const int &to,
-                         const bool &saveUndoRedo = true);
+                                const int &from,
+                                const int &to);
     void moveContainedBoxBelow(BoundingBox *boxToMove,
                                BoundingBox *below);
     void moveContainedBoxAbove(BoundingBox *boxToMove,
                         BoundingBox *above);
 
-    void removeContainedBoxFromList(const int &id,
-                             const bool &saveUndoRedo = true);
+    void removeContainedBoxFromList(const int &id);
 
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    void setStrokeWidth(const qreal &strokeWidth, const bool &finish);
+    void setStrokeWidth(const qreal &strokeWidth);
 
     PaintSettings *getFillSettings();
     StrokeSettings *getStrokeSettings();

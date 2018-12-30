@@ -46,10 +46,8 @@ public:
     void loadPathFromSkPath(const SkPath &path);
 
     void setParentBox(BoundingBox *parent);
-    void addSinglePathAnimator(const qsptr<VectorPathAnimator> &path,
-                               const bool &saveUndoRedo = true);
-    void removeSinglePathAnimator(const qsptr<VectorPathAnimator> &path,
-                                  const bool &saveUndoRedo = true);
+    void addSinglePathAnimator(const qsptr<VectorPathAnimator> &path);
+    void removeSinglePathAnimator(const qsptr<VectorPathAnimator> &path);
     void selectAllPoints(Canvas *canvas);
     bool SWT_isPathAnimator();
     SkPath getPathAtRelFrame(const int &relFrame);

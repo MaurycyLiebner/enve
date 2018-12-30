@@ -26,7 +26,7 @@ void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
     QPointF absPos = mSavedAbsPos + absTranslatione;
     BoxTransformAnimator *boxTrans =
             GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    boxTrans->getParentBox()->setPivotAbsPos(absPos, false, false);
+    boxTrans->getParentBox()->setPivotAbsPos(absPos);
 }
 
 void BoxPathPoint::drawSk(SkCanvas *canvas,

@@ -66,8 +66,7 @@ public:
 
     void strokeCapStyleChanged(const Qt::PenCapStyle &capStyle);
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
-    void strokeWidthChanged(const qreal &strokeWidth,
-                            const bool &finish);
+    void strokeWidthChanged(const qreal &strokeWidth);
 
     void setResolutionFraction(const qreal &percent);
     void updatePivotIfNeeded();

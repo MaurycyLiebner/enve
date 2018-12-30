@@ -18,15 +18,9 @@ public:
                              const int &id = INT_MAX);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
-    void ca_moveChildInList(Property *child,
-                            const int &from,
-                            const int &to,
-                            const bool &saveUndoRedo = true);
-    void ca_moveChildBelow(Property *move,
-                           Property *below);
-    void ca_moveChildAbove(Property *move,
-                           Property *above,
-                           const bool &saveUndoRedo = true);
+    void ca_moveChildInList(Property *child, const int &from, const int &to);
+    void ca_moveChildBelow(Property *move, Property *below);
+    void ca_moveChildAbove(Property *move, Property *above);
 
     void prp_startTransform();
     void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
@@ -44,8 +38,7 @@ public:
 
     void prp_setTransformed(const bool &bT);
 
-    void ca_changeChildAnimatorZ(const int &oldIndex,
-                                 const int &newIndex);
+    void ca_changeChildAnimatorZ(const int &oldIndex, const int &newIndex);
     int ca_getNumberOfChildren();
     Property *ca_getChildAt(const int &i);
 

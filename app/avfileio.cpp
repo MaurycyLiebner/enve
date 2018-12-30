@@ -179,7 +179,7 @@ stdsptr<Key> VectorPathAnimator::readKey(QIODevice *target) {
     stdsptr<PathKey> newKey = SPtrCreate(PathKey)(this);
 
     newKey->readKey(target);
-    return newKey;
+    return std::move(newKey);
 }
 
 void NodeSettings::write(QIODevice* target) {
@@ -213,9 +213,7 @@ void VectorPathAnimator::readProperty(QIODevice *target) {
     int nKeys;
     target->read(reinterpret_cast<char*>(&nKeys), sizeof(int));
     for(int i = 0; i < nKeys; i++) {
-        anim_appendKey(readKey(target),
-                       false,
-                       false);
+        anim_appendKey(readKey(target));
     }
 
     readPathContainer(target);
@@ -275,7 +273,7 @@ void QrealAnimator::writeProperty(QIODevice *target) {
 stdsptr<Key> QrealAnimator::readKey(QIODevice *target) {
     stdsptr<QrealKey> newKey = SPtrCreate(QrealKey)(this);
     newKey->readKey(target);
-    return newKey;
+    return std::move(newKey);
 }
 
 void RandomQrealGenerator::writeProperty(QIODevice *target) {
@@ -297,7 +295,7 @@ void QrealAnimator::readProperty(QIODevice *target) {
     int nKeys;
     target->read(reinterpret_cast<char*>(&nKeys), sizeof(int));
     for(int i = 0; i < nKeys; i++) {
-        anim_appendKey(readKey(target), false, false);
+        anim_appendKey(readKey(target));
     }
 
     qreal val;
@@ -365,7 +363,7 @@ void QStringAnimator::readProperty(QIODevice *target) {
     for(int i = 0; i < nKeys; i++) {
         stdsptr<QStringKey> newKey = SPtrCreate(QStringKey)("", 0, this);
         newKey->readKey(target);
-        anim_appendKey(newKey, false, false);
+        anim_appendKey(newKey);
     }
     readQString(target, mCurrentText);
 }
@@ -580,7 +578,7 @@ void Gradient::readProperty(QIODevice *target) {
     for(int i = 0; i < nColors; i++) {
         qsptr<ColorAnimator> colorAnim = SPtrCreate(ColorAnimator)();
         colorAnim->readProperty(target);
-        addColorToList(colorAnim, false);
+        addColorToList(colorAnim);
     }
 }
 
@@ -1132,7 +1130,7 @@ stdsptr<Key> AnimatedSurface::readKey(QIODevice *target) {
     stdsptr<SurfaceKey> newKey = SPtrCreate(SurfaceKey)(this);
     newKey->setTiles(SPtrCreate(TilesData)(0, 0, true));
     newKey->readKey(target);
-    return newKey;
+    return std::move(newKey);
 }
 
 void AnimatedSurface::readProperty(QIODevice *target) {
@@ -1145,7 +1143,7 @@ void AnimatedSurface::readProperty(QIODevice *target) {
         mCurrentTiles->readTilesData(target);
     } else {
         for(int i = 0; i < nKeys; i++) {
-            anim_appendKey(readKey(target), false, false);
+            anim_appendKey(readKey(target));
         }
     }
     setSize(mParentBox->getWidth(), mParentBox->getHeight());
@@ -1288,7 +1286,7 @@ void PathAnimator::readVectorPathAnimator(QIODevice *target) {
     qsptr<VectorPathAnimator> pathAnimator =
             SPtrCreate(VectorPathAnimator)(this);
     pathAnimator->readProperty(target);
-    addSinglePathAnimator(pathAnimator, false);
+    addSinglePathAnimator(pathAnimator);
 }
 
 QMatrix PathAnimator::getCombinedTransform() {

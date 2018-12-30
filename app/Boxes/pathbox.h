@@ -68,7 +68,7 @@ public:
 
     virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
 
-    virtual void setStrokeWidth(const qreal &strokeWidth, const bool &finish);
+    virtual void setStrokeWidth(const qreal &strokeWidth);
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);
