@@ -1,5 +1,4 @@
 #include "durationrectangle.h"
-#include "Properties/property.h"
 #include "Boxes/rendercachehandler.h"
 #include "global.h"
 #include "Boxes/boundingbox.h"
@@ -260,9 +259,9 @@ void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
             int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
             int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
             mChildProperty->prp_updateAfterChangedRelFrameRange(
-                        minMinFrame, maxMinFrame);
+                                    {minMinFrame, maxMinFrame});
             mChildProperty->prp_updateAfterChangedRelFrameRange(
-                        minMaxFrame, maxMaxFrame);
+                                    {minMaxFrame, maxMaxFrame});
         }
         delete dialog;
     }
@@ -311,9 +310,9 @@ void AnimationRect::setAnimationFrameDuration(const int &frameDuration) {
     int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
     int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
     mChildProperty->prp_updateAfterChangedRelFrameRange(
-                minMinFrame, maxMinFrame);
+                            {minMinFrame, maxMinFrame});
     mChildProperty->prp_updateAfterChangedRelFrameRange(
-                minMaxFrame, maxMaxFrame);
+                            {minMaxFrame, maxMaxFrame});
 
     int minMinAnimationFrame = qMin(oldMinAnimationFrame,
                                     newMinAnimationFrame);
@@ -324,9 +323,9 @@ void AnimationRect::setAnimationFrameDuration(const int &frameDuration) {
     int maxMaxAnimationFrame = qMax(oldMaxAnimationFrame,
                                     newMaxAnimationFrame);
     mChildProperty->prp_updateAfterChangedRelFrameRange(
-                minMinAnimationFrame, maxMinAnimationFrame);
+                {minMinAnimationFrame, maxMinAnimationFrame});
     mChildProperty->prp_updateAfterChangedRelFrameRange(
-                minMaxAnimationFrame, maxMaxAnimationFrame);
+                {minMaxAnimationFrame, maxMaxAnimationFrame});
 }
 
 int AnimationRect::getAnimationFrameDuration() {
@@ -339,9 +338,9 @@ void AnimationRect::draw(
     p->save();
 
     int startDFrame = getMinAnimationFrame() - startFrame;
-    int xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
-    int widthT = getAnimationFrameDuration()*pixelsPerFrame - pixelsPerFrame;
-    QRect drawRect = QRect(xT, drawY,
+    int xT = qFloor(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5);
+    int widthT = qFloor(getAnimationFrameDuration()*pixelsPerFrame - pixelsPerFrame);
+    QRect drawRect = QRect(xT, qFloor(drawY),
                            widthT,
                            MIN_WIDGET_HEIGHT);
     p->fillRect(drawRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
@@ -387,9 +386,9 @@ void FixedLenAnimationRect::openDurationSettingsDialog(QWidget *parent) {
             int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
             int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
             mChildProperty->prp_updateAfterChangedRelFrameRange(
-                        minMinFrame, maxMinFrame);
+                        {minMinFrame, maxMinFrame});
             mChildProperty->prp_updateAfterChangedRelFrameRange(
-                        minMaxFrame, maxMaxFrame);
+                        {minMaxFrame, maxMaxFrame});
 
             int minMinAnimationFrame = qMin(oldMinAnimationFrame,
                                             newMinAnimationFrame);
@@ -400,8 +399,8 @@ void FixedLenAnimationRect::openDurationSettingsDialog(QWidget *parent) {
             int maxMaxAnimationFrame = qMax(oldMaxAnimationFrame,
                                             newMaxAnimationFrame);
             mChildProperty->prp_updateAfterChangedRelFrameRange(
-                        qMin(minMinAnimationFrame, minMaxAnimationFrame),
-                        qMax(maxMinAnimationFrame, maxMaxAnimationFrame));
+                        {qMin(minMinAnimationFrame, minMaxAnimationFrame),
+                        qMax(maxMinAnimationFrame, maxMaxAnimationFrame)});
         }
         delete dialog;
     }

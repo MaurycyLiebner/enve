@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QObject>
 #include "smartPointers/sharedpointerdefs.h"
+#include "framerange.h"
 class Property;
 
 class DurationRectangleMovable : public SelfRef {
@@ -41,7 +42,7 @@ public:
 
     void pressed(const bool &shiftPressed);
 
-    void setChildProperty(Property *childProp) {
+    void setChildProperty(Property * const childProp) {
         mChildProperty = childProp;
     }
 
@@ -108,8 +109,32 @@ public:
     int getMinFrameAsRelFrame() const;
     int getMaxFrameAsRelFrame() const;
 
+    FrameRange getRelFrameRange() const{
+        return {getMinFrameAsRelFrame(), getMaxFrameAsRelFrame()};
+    }
+
+    FrameRange getRelFrameRangeToTheRight() {
+        return {getMaxFrameAsRelFrame() + 1, INT_MAX};
+    }
+
+    FrameRange getRelFrameRangeToTheLeft() {
+        return {INT_MIN, getMinFrameAsRelFrame() - 1};
+    }
+
     int getMinFrameAsAbsFrame() const;
     int getMaxFrameAsAbsFrame() const;
+
+    FrameRange getAbsFrameRange() const{
+        return {getMinFrameAsAbsFrame(), getMaxFrameAsAbsFrame()};
+    }
+
+    FrameRange getAbsFrameRangeToTheRight() {
+        return {getMaxFrameAsAbsFrame() + 1, INT_MAX};
+    }
+
+    FrameRange getAbsFrameRangeToTheLeft() {
+        return {INT_MIN, getMinFrameAsAbsFrame() - 1};
+    }
 
     virtual void draw(QPainter *p,
                       const qreal &pixelsPerFrame,

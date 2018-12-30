@@ -115,16 +115,13 @@ qreal QPointFAnimator::getEffectiveYValueAtRelFrameF(const qreal &relFrame) {
 
 void QPointFAnimator::setCurrentPointValue(const QPointF &val,
                                            const bool &saveUndoRedo,
-                                           const bool &finish,
-                                           const bool &callUpdater) {
+                                           const bool &finish) {
     mXAnimator->qra_setCurrentValue(val.x(),
                                     saveUndoRedo,
-                                    finish,
-                                    callUpdater);
+                                    finish);
     mYAnimator->qra_setCurrentValue(val.y(),
                                     saveUndoRedo,
-                                    finish,
-                                    callUpdater);
+                                    finish);
 }
 
 void QPointFAnimator::setValuesRange(const qreal &minVal,
@@ -142,12 +139,9 @@ void QPointFAnimator::incCurrentValues(const qreal &x,
 void QPointFAnimator::incAllValues(const qreal &x,
                                    const qreal &y,
                                    const bool &saveUndoRedo,
-                                   const bool &finish,
-                                   const bool &callUpdater) {
-    mXAnimator->qra_incAllValues(x, saveUndoRedo,
-                                 finish, callUpdater);
-    mYAnimator->qra_incAllValues(y, saveUndoRedo,
-                                 finish, callUpdater);
+                                   const bool &finish) {
+    mXAnimator->qra_incAllValues(x, saveUndoRedo, finish);
+    mYAnimator->qra_incAllValues(y, saveUndoRedo, finish);
 }
 
 void QPointFAnimator::incSavedValueToCurrentValue(const qreal &incXBy,

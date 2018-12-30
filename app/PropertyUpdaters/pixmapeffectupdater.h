@@ -9,7 +9,7 @@ public:
 
     void update();
     void frameChangeUpdate();
-    void updateFinal();
+    void finishedChange();
 private:
     BoundingBox *mTarget;
 };

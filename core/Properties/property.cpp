@@ -6,13 +6,14 @@
 Property::Property(const QString& name) :
     prp_mName(name) {}
 
-void Property::prp_valueChanged() {
-    prp_updateInfluenceRangeAfterChanged();
+void Property::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
+    prp_currentFrameChanged();
+    emit prp_absFrameRangeChanged(range);
 }
 
-void Property::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                                   const int &maxFrame) {
-    emit prp_absFrameRangeChanged(minFrame, maxFrame);
+void Property::prp_updateInfluenceRangeAfterChanged() {
+    prp_currentFrameChanged();
+    emit prp_updateWholeInfluenceRange();
 }
 
 const QString &Property::prp_getName() const {
@@ -31,6 +32,16 @@ void Property::prp_setParentFrameShift(const int &shift,
                                        ComplexAnimator *parentAnimator) {
     Q_UNUSED(parentAnimator);
     prp_mParentFrameShift = shift;
+}
+
+FrameRange Property::prp_relRangeToAbsRange(const FrameRange& range) const {
+    return {prp_relFrameToAbsFrame(range.min),
+            prp_relFrameToAbsFrame(range.max)};
+}
+
+FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {
+    return {prp_absFrameToRelFrame(range.min),
+            prp_absFrameToRelFrame(range.max)};
 }
 
 int Property::prp_absFrameToRelFrame(const int &absFrame) const {
@@ -76,25 +87,16 @@ void Property::prp_setBlockedUpdater(const stdsptr<PropertyUpdater>& updater) {
     prp_blockUpdater();
 }
 
-void Property::prp_updateInfluenceRangeAfterChanged() {
-    emit prp_updateWholeInfluenceRange();
-}
-
 void Property::prp_blockUpdater() {
     prp_mUpdaterBlocked = true;
 }
 
-void Property::prp_callUpdater() {
-    if(prp_mUpdater.get() == nullptr) {
-        return;
-    } else {
-        prp_mUpdater->update();
-    }
+void Property::prp_currentFrameChanged() {
+    if(prp_mUpdater) prp_mUpdater->update();
 }
 
 void Property::prp_callFinishUpdater() {
-    if(prp_mUpdater.get() == nullptr) return;
-    prp_mUpdater->updateFinal();
+    if(prp_mUpdater) prp_mUpdater->finishedChange();
 }
 
 void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {

@@ -29,8 +29,6 @@ public slots:
         mCurrentValue = id;
         emit valueChanged(id);
         prp_updateInfluenceRangeAfterChanged();
-        prp_callUpdater();
-        prp_callFinishUpdater();
     }
 private:
     int mCurrentValue = 0;

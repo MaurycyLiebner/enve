@@ -348,8 +348,7 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
     currentMatrix.scale(mScaleAnimator->getEffectiveXValue(),
                         mScaleAnimator->getEffectiveYValue() );
 
-    currentMatrix.translate(-pivotX,
-                            -pivotY);
+    currentMatrix.translate(-pivotX, -pivotY);
 
     QMatrix futureMatrix;
     futureMatrix.translate(point.x() + mPosAnimator->getEffectiveXValue(),
@@ -359,20 +358,14 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
     futureMatrix.scale(mScaleAnimator->getEffectiveXValue(),
                        mScaleAnimator->getEffectiveYValue() );
 
-    futureMatrix.translate(-point.x(),
-                           -point.y());
+    futureMatrix.translate(-point.x(), -point.y());
 
 
     mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
                                currentMatrix.dy() - futureMatrix.dy(),
-                               saveUndoRedo,
-                               false,
-                               saveUndoRedo);
+                               saveUndoRedo, false);
 
-    mPivotAnimator->setCurrentPointValue(point,
-                                         saveUndoRedo,
-                                         false,
-                                         saveUndoRedo);
+    mPivotAnimator->setCurrentPointValue(point, saveUndoRedo, false);
 }
 
 QPointF BoxTransformAnimator::getPivot() {
@@ -429,8 +422,7 @@ QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
     matrix.scale(mScaleAnimator->getEffectiveXValue(),
                  mScaleAnimator->getEffectiveYValue() );
 
-    matrix.translate(-pivotX,
-                     -pivotY);
+    matrix.translate(-pivotX, -pivotY);
     return matrix;
 }
 

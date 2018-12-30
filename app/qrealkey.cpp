@@ -34,10 +34,8 @@ stdsptr<QrealKey> QrealKey::makeQrealKeyDuplicate(
 
 void QrealKey::incValue(const qreal &incBy,
                         const bool &saveUndoRedo,
-                        const bool &finish,
-                        const bool &callUpdater) {
-    setValue(mValue + incBy, saveUndoRedo,
-             finish, callUpdater);
+                        const bool &finish) {
+    setValue(mValue + incBy, saveUndoRedo, finish);
 }
 
 QrealAnimator *QrealKey::getParentQrealAnimator() const {
@@ -57,7 +55,6 @@ QrealAnimator *QrealKey::getParentQrealAnimator() const {
 qreal QrealKey::getValue() const { return mValue; }
 
 void QrealKey::setValue(qreal value,
-                        const bool &saveUndoRedo,
                         const bool &finish,
                         const bool &callUpdater) {
     if(mParentAnimator != nullptr) {
@@ -68,14 +65,9 @@ void QrealKey::setValue(qreal value,
     qreal dVal = value - mValue;
     setEndValueVar(mEndValue + dVal);
     setStartValueVar(mStartValue + dVal);
-    if(saveUndoRedo) {
-        if(mParentAnimator != nullptr) {
-//            mParentAnimator->addUndoRedo(
-//                    new ChangeQrealKeyValueUndoRedo(mValue, value, this) );
-        }
-    }
+
     mValue = value;
-    if(finish && callUpdater) {
+    if(callUpdater) {
         mParentAnimator->anim_updateAfterChangedKey(this);
     }
 }

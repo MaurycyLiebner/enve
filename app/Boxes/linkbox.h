@@ -86,9 +86,7 @@ public:
     }
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                              int *lastIdentical,
-                                              const int &relFrame);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
     bool SWT_isLinkBox() { return true; }
@@ -177,9 +175,7 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                              int *lastIdentical,
-                                              const int &relFrame);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
 

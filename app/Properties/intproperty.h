@@ -11,8 +11,7 @@ public:
 
     void setCurrentValue(const int &value,
                          const bool &saveUndoRedo = false,
-                         const bool &finish = false,
-                         const bool &callUpdater = true);
+                         const bool &finish = false);
 
     bool SWT_isIntProperty();
 

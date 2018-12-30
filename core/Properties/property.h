@@ -4,6 +4,7 @@ class UndoRedo;
 class MainWindow;
 #include "singlewidgettarget.h"
 #include "glhelpers.h"
+#include "framerange.h"
 
 class ComplexAnimator;
 class Key;
@@ -52,14 +53,14 @@ public:
         emit beingDeleted();
     }
 
-    virtual void prp_valueChanged();
-
     virtual int prp_getRelFrameShift() const {
         return 0;
     }
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 
+    FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
+    FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
     int prp_absFrameToRelFrame(const int &absFrame) const;
     int prp_relFrameToAbsFrame(const int &relFrame) const;
     qreal prp_absFrameToRelFrameF(const qreal &absFrame) const;
@@ -145,7 +146,6 @@ public:
 
     virtual void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
     void prp_blockUpdater();
-    void prp_callFinishUpdater();
 
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
@@ -158,13 +158,9 @@ public:
         return false;
     }
 
-    virtual void prp_getFirstAndLastIdenticalRelFrame(
-            int *firstIdentical,
-            int *lastIdentical,
-            const int &relFrame) {
-        *firstIdentical = INT_MIN;
-        *lastIdentical = INT_MAX;
+    virtual FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
         Q_UNUSED(relFrame);
+        return {INT_MIN, INT_MAX};
     }
 
     virtual bool prp_nextRelFrameWithKey(const int &relFrame,
@@ -224,44 +220,26 @@ public:
     }
 protected:
     Property(const QString &name);
+    void prp_currentFrameChanged();
+    void prp_callFinishUpdater();
 
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     QPointer<Property> mParent;
 public slots:
-    void prp_callUpdater();
-
     virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 
-    virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                                     const int &maxFrame);
+    virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
 
-    virtual void prp_updateAfterChangedRelFrameRange(const int &minFrame,
-                                                     const int &maxFrame) {
-        int minFrameT = minFrame;
-        int maxFrameT = maxFrame;
-
-        if(minFrameT != INT_MIN && minFrameT != INT_MAX) {
-            minFrameT = prp_relFrameToAbsFrame(minFrameT);
-        }
-        if(maxFrameT != INT_MAX && maxFrameT != INT_MIN) {
-            maxFrameT = prp_relFrameToAbsFrame(maxFrameT);
-        }
-
-        if(maxFrameT < minFrameT) {
-            prp_updateAfterChangedAbsFrameRange(maxFrameT,
-                                                minFrameT);
-        } else {
-            prp_updateAfterChangedAbsFrameRange(minFrameT,
-                                                maxFrameT);
-        }
+    virtual void prp_updateAfterChangedRelFrameRange(const FrameRange &range) {
+        auto absRange = prp_relRangeToAbsRange(range);
+        prp_updateAfterChangedAbsFrameRange(absRange);
     }
 
     virtual void prp_updateInfluenceRangeAfterChanged();
 signals:
     void prp_updateWholeInfluenceRange();
     void prp_isRecordingChanged();
-    void prp_absFrameRangeChanged(const int &minFrame,
-                                  const int &maxFrame);
+    void prp_absFrameRangeChanged(const FrameRange &range);
     void prp_removingKey(Key*);
     void prp_addingKey(Key*);
     void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);

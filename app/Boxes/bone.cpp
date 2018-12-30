@@ -306,7 +306,6 @@ const QPointF &Bone::getTipRelPos() { return mRelTipPos; }
 
 void Bone::setRelRootPos(const QPointF &pos) {
     mRelRootPos = pos;
-    mTransformAnimator->prp_callUpdater();
 }
 
 void Bone::setRelTipPos(const QPointF &pos) {

@@ -38,8 +38,6 @@ void QStringAnimator::setCurrentTextValue(const QString &text,
     } else {
         prp_updateInfluenceRangeAfterChanged();
     }
-
-    prp_callUpdater();
 }
 
 QString QStringAnimator::getCurrentTextValue() {
@@ -62,18 +60,13 @@ QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
     return GetAsPtr(key, QStringKey)->getText();
 }
 
-void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
-                            int *firstIdentical,
-                            int *lastIdentical,
-                            const int &relFrame) {
+FrameRange QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
     if(anim_mKeys.isEmpty()) {
-        *firstIdentical = INT_MIN;
-        *lastIdentical = INT_MAX;
+        return {INT_MIN, INT_MAX};
     } else {
         int prevId;
         int nextId;
-        anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
-                                                relFrame);
+        anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame);
 
         Key *prevKey = anim_mKeys.at(prevId).get();
         Key *nextKey = anim_mKeys.at(nextId).get();
@@ -104,8 +97,8 @@ void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
                 break;
             }
         }
-        *firstIdentical = fId;
-        *lastIdentical = lId;
+
+        return {fId, lId};
     }
 }
 

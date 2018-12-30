@@ -33,9 +33,7 @@ public:
     bool SWT_isQStringAnimator() { return true; }
     QString getTextValueAtRelFrame(const int &relFrame);
     void anim_saveCurrentValueAsKey();
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                               int *lastIdentical,
-                                              const int &relFrame);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);

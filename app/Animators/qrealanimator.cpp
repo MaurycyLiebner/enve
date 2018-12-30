@@ -38,14 +38,11 @@ void QrealAnimator::qra_setValueRange(const qreal &minVal,
 
 void QrealAnimator::qra_incAllValues(const qreal &valInc,
                                      const bool &saveUndoRedo,
-                                     const bool &finish,
-                                     const bool &callUpdater) {
+                                     const bool &finish) {
     Q_FOREACH(const auto &key, anim_mKeys) {
-        GetAsPtr(key.get(), QrealKey)->incValue(valInc, saveUndoRedo,
-                                                 finish, callUpdater);
+        GetAsPtr(key.get(), QrealKey)->incValue(valInc, saveUndoRedo, finish);
     }
-    qra_incCurrentValue(valInc, saveUndoRedo,
-                        finish, callUpdater);
+    qra_incCurrentValue(valInc, saveUndoRedo, finish);
 }
 
 QString QrealAnimator::prp_getValueText() {
@@ -196,7 +193,7 @@ bool QrealAnimator::qra_hasNoise() {
 qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame) const {
     int prevId;
     int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, frame) ) {
+    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, frame) ) {
         if(nextId == prevId) {
             return getQrealKeyAtId(nextId)->getValue();
         } else {
@@ -211,7 +208,7 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame) const {
 qreal QrealAnimator::qra_getValueAtRelFrameF(const qreal &frame) const {
     int prevId;
     int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrameF(&prevId, &nextId, frame) ) {
+    if(anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId, frame) ) {
         if(nextId == prevId) {
             return getQrealKeyAtId(nextId)->getValue();
         } else {
@@ -286,32 +283,21 @@ qreal QrealAnimator::qra_getCurrentEffectiveValue() {
 }
 
 void QrealAnimator::qra_setCurrentValue(qreal newValue,
-                                        const bool &saveUndoRedo,
                                         const bool &finish,
                                         const bool &callUpdater) {
     newValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
 
-    if(saveUndoRedo) {
-        prp_startTransform();
-        mCurrentValue = newValue;
-        emit valueChangedSignal(mCurrentValue);
-        prp_finishTransform();
-        return;
-    }
-
-    if(newValue == mCurrentValue) return;
+    if(isZero4Dec(newValue - mCurrentValue)) return;
     mCurrentValue = newValue;
     if(prp_isKeyOnCurrentFrame()) {
         qra_saveCurrentValueToKey(GetAsPtr(anim_mKeyOnCurrentFrame, QrealKey),
-                                  finish);
-    } else if(finish) {
+                                  finish, callUpdater);
+    } else if(callUpdater) {
         prp_updateInfluenceRangeAfterChanged();
+        if(finish) prp_callFinishUpdater();
     }
 
     emit valueChangedSignal(mCurrentValue);
-    if(callUpdater) {
-        prp_callUpdater();
-    }
 
     //anim_updateKeysPath();
 }
@@ -321,8 +307,9 @@ void QrealAnimator::qra_updateValueFromCurrentFrame() {
 }
 
 void QrealAnimator::qra_saveCurrentValueToKey(QrealKey *key,
-                                              const bool &finish) {
-    qra_saveValueToKey(key, mCurrentValue, finish);
+                                              const bool &finish,
+                                              const bool &callUpdater) {
+    qra_saveValueToKey(key, mCurrentValue, finish, callUpdater);
 }
 
 void QrealAnimator::qra_saveValueToKey(const int &frame,
@@ -341,9 +328,8 @@ void QrealAnimator::qra_saveValueToKey(const int &frame,
 
 void QrealAnimator::qra_saveValueToKey(QrealKey *key,
                                        const qreal &value,
-                                       const bool &saveUndoRedo,
-                                       const bool &finish) {
-    key->setValue(value, saveUndoRedo, finish);
+                                       const bool &callUpdater) {
+    key->setValue(value, callUpdater);
 
     if(isSelectedForGraph()) {
         graphScheduleUpdateAfterKeysChanged();
@@ -354,7 +340,7 @@ void QrealAnimator::qra_saveValueToKey(QrealKey *key,
 void QrealAnimator::prp_setAbsFrame(const int &frame) {
     Animator::prp_setAbsFrame(frame);
     qreal newValue = qra_getValueAtRelFrame(anim_mCurrentRelFrame);
-    if(newValue == mCurrentValue) return;
+    if(isZero4Dec(newValue - mCurrentValue)) return;
     mCurrentValue = newValue;
 
     emit valueChangedSignal(mCurrentValue);
@@ -575,11 +561,9 @@ void QrealAnimator::multSavedValueToCurrentValue(const qreal &multBy) {
 
 void QrealAnimator::qra_incCurrentValue(const qreal &incBy,
                                         const bool &saveUndoRedo,
-                                        const bool &finish,
-                                        const bool &callUpdater) {
+                                        const bool &finish) {
     qra_setCurrentValue(mCurrentValue + incBy,
-                        saveUndoRedo, finish,
-                        callUpdater);
+                        saveUndoRedo, finish);
 }
 
 void QrealAnimator::prp_startTransform() {

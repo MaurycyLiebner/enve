@@ -49,37 +49,16 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
-void ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
-                           int *firstIdentical,
-                           int *lastIdentical,
-                           const int &relFrame) {
-    int fId = INT_MIN;
-    int lId = INT_MAX;
-
+FrameRange ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    FrameRange range{INT_MIN, INT_MAX};
     Q_FOREACH(const qsptr<Property> &child, ca_mChildAnimators) {
-        if(fId >= lId) {
-            break;
-        }
-        int fIdT;
-        int lIdT;
-        child->prp_getFirstAndLastIdenticalRelFrame(
-                    &fIdT, &lIdT,
-                    relFrame);
-        if(fIdT > fId) {
-            fId = fIdT;
-        }
-        if(lIdT < lId) {
-            lId = lIdT;
-        }
+        auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+        range *= childRange;
+        Q_ASSERT(!range.isValid());
+        if(range.singleFrame()) return range;
     }
 
-    if(lId > fId) {
-        *firstIdentical = fId;
-        *lastIdentical = lId;
-    } else {
-        *firstIdentical = relFrame;
-        *lastIdentical = relFrame;
-    }
+    return range;
 }
 
 
@@ -117,7 +96,7 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childAnimator,
     connect(childAnimator.data(), &Property::prp_isRecordingChanged,
             this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
     connect(childAnimator.data(), &Property::prp_absFrameRangeChanged,
-            this, &Property::prp_updateAfterChangedAbsFrameRange);
+            this, &ComplexAnimator::prp_updateAfterChangedAbsFrameRange);
     connect(childAnimator.data(), &Property::prp_addingKey,
             this, &ComplexAnimator::ca_addDescendantsKey);
     connect(childAnimator.data(), &Property::prp_removingKey,
@@ -133,8 +112,6 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childAnimator,
     //updateKeysPath();
 
     SWT_addChildAbstractionForTargetToAllAt(childAnimator.get(), id);
-
-    prp_callUpdater();
 }
 
 int ComplexAnimator::getChildPropertyIndex(Property *child) {
@@ -194,8 +171,6 @@ void ComplexAnimator::ca_moveChildInList(
 //        addUndoRedo(new MoveChildAnimatorInListUndoRedo(
 //                        child, from, to, this) );
     }
-
-    prp_callUpdater();
 }
 
 void ComplexAnimator::ca_removeChildAnimator(
@@ -208,8 +183,6 @@ void ComplexAnimator::ca_removeChildAnimator(
 
     ca_mChildAnimators.removeAt(getChildPropertyIndex(removeAnimator.get()));
     ca_childAnimatorIsRecordingChanged();
-
-    prp_callUpdater();
 }
 
 void ComplexAnimator::ca_removeAllChildAnimators() {
@@ -236,8 +209,6 @@ void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
     int id1 = getChildPropertyIndex(animator1);
     int id2 = getChildPropertyIndex(animator2);
     ca_mChildAnimators.swap(id1, id2);
-
-    prp_callUpdater();
 }
 
 void ComplexAnimator::prp_clearFromGraphView() {
@@ -300,8 +271,6 @@ void ComplexAnimator::prp_setParentFrameShift(const int &shift,
 void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
                                               const int &newIndex) {
     ca_mChildAnimators.move(oldIndex, newIndex);
-
-    prp_callUpdater();
 }
 
 void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {

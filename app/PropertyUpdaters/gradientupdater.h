@@ -8,7 +8,7 @@ public:
     GradientUpdater(Gradient *gradient);
 
     void update();
-    void updateFinal();
+    void finishedChange();
 
     void frameChangeUpdate();
 private:

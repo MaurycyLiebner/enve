@@ -3,6 +3,7 @@
 #include <QtCore>
 #include <memory>
 #include "smartPointers/sharedpointerdefs.h"
+#include "framerange.h"
 class QPainter;
 class CacheContainer;
 class RenderCacheHandler;
@@ -41,8 +42,7 @@ public:
     void updateAllAfterFrameInMemoryHandler(const int &relFrame);
     int getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
                                              CacheContainer **contP = nullptr);
-    void clearCacheForRelFrameRange(const int &minFrame,
-                                    const int &maxFrame);
+    void clearCacheForRelFrameRange(const FrameRange &range);
 protected:
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
     bool getRenderContainterIdAtRelFrame(const int &relFrame, int *id);

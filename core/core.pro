@@ -79,7 +79,8 @@ SOURCES += \
     Animators/graphanimator.cpp \
     Animators/graphkey.cpp \
     Animators/interpolationkey.cpp \
-    Animators/interpolationanimator.cpp
+    Animators/interpolationanimator.cpp \
+    framerange.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -117,7 +118,8 @@ HEADERS += \
     Animators/graphanimator.h \
     Animators/graphkey.h \
     Animators/interpolationkey.h \
-    Animators/interpolationanimator.h
+    Animators/interpolationanimator.h \
+    framerange.h
 
 unix {
     target.path = /usr/lib

@@ -40,18 +40,11 @@ void RandomQrealGenerator::prp_setAbsFrame(const int &frame) {
     anim_callFrameChangeUpdater();
 }
 
-void RandomQrealGenerator::prp_getFirstAndLastIdenticalRelFrame(
-                            int *firstIdentical,
-                            int *lastIdentical,
-                            const int &relFrame) {
+FrameRange RandomQrealGenerator::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
     if(mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame) < 0.001) {
-        ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(firstIdentical,
-                                                       lastIdentical,
-                                                       relFrame);
-    } else {
-        *firstIdentical = relFrame;
-        *lastIdentical = relFrame;
+        return ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(relFrame);
     }
+    return {relFrame, relFrame};
 }
 
 qreal RandomQrealGenerator::getDevAtRelFrameF(const qreal &relFrame) {
@@ -245,6 +238,5 @@ void RandomQrealGenerator::generateData() {
         mFrameValues << FrameValue(currFrame, qRandF(0., 1.));
         currFrame += getDeltaX(currFrame);
     }
-    prp_callUpdater();
     prp_updateInfluenceRangeAfterChanged();
 }

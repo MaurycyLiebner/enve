@@ -109,7 +109,7 @@ void AnimatedSurface::updateTargetTiles() {
     mDrawTilesFrames.clear();
     int prevId;
     int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
+    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId,
                                                anim_mCurrentRelFrame)) {
         SurfaceKey *prevKey = GetAsPtr(anim_mKeys.at(prevId), SurfaceKey);
         SurfaceKey *nextKey = GetAsPtr(anim_mKeys.at(nextId), SurfaceKey);
@@ -311,9 +311,9 @@ bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,
     return false;
 }
 
-void AnimatedSurface::anim_updateAfterChangedKey(Key *key) {
+void AnimatedSurface::anim_updateAfterChangedKey(Key * const key) {
     if(anim_mIsComplexAnimator) return;
-    if(key == nullptr) {
+    if(!key) {
         prp_updateInfluenceRangeAfterChanged();
         return;
     }
@@ -328,50 +328,26 @@ void AnimatedSurface::anim_updateAfterChangedKey(Key *key) {
         nextKeyRelFrame += mOverlapFrames;
     }
 
-    prp_updateAfterChangedRelFrameRange(prevKeyRelFrame,
-                                        nextKeyRelFrame);
+    prp_updateAfterChangedRelFrameRange({prevKeyRelFrame, nextKeyRelFrame});
 }
 
-void AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                           int *lastIdentical,
-                                                           const int &relFrame) {
-    Animator::prp_getFirstAndLastIdenticalRelFrame(
-                                firstIdentical,
-                                lastIdentical,
-                                relFrame);
-    if(!mIsDraft) return;
+FrameRange AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    auto range = Animator::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+    if(!mIsDraft) return range;
     if(anim_mKeys.count() > 1) {
-//        if(anim_mKeys.count() == 1) {
-//            int keyFrame = anim_mKeys.first()->getRelFrame();
-//            if(relFrame > keyFrame - mAdditionalFrames &&
-//               relFrame < keyFrame + mAdditionalFrames) {
-//                *firstIdentical = relFrame;
-//                *lastIdentical = relFrame;
-//            } else {
-//                if(relFrame > keyFrame) {
-//                    *firstIdentical = keyFrame + mAdditionalFrames;
-//                } else {
-//                    *lastIdentical = keyFrame - mAdditionalFrames;
-//                }
-//            }
-//            return;
-//        }
-        if(*firstIdentical == INT_MIN) {
+        if(range.min == INT_MIN) {
             int firstKeyFrame = anim_mKeys.first()->getRelFrame();
             if(firstKeyFrame - mOverlapFrames < relFrame) {
-                *firstIdentical = relFrame;
-                *lastIdentical = relFrame;
-                return;
+                return {relFrame, relFrame};
             } else {
-                *lastIdentical = firstKeyFrame - mOverlapFrames;
+                return {range.min, firstKeyFrame - mOverlapFrames};
             }
-        } else if(*lastIdentical == INT_MAX) {
+        } else if(range.max == INT_MAX) {
             int lastKeyFrame = anim_mKeys.last()->getRelFrame();
             if(lastKeyFrame + mOverlapFrames > relFrame) {
-                *firstIdentical = relFrame;
-                *lastIdentical = relFrame;
+                return {relFrame, relFrame};
             } else {
-                *firstIdentical = lastKeyFrame + mOverlapFrames;
+                return {lastKeyFrame + mOverlapFrames, range.max};
             }
         }
     }

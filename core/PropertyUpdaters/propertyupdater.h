@@ -9,7 +9,7 @@ public:
 
     virtual void update();
     virtual void frameChangeUpdate();
-    virtual void updateFinal();
+    virtual void finishedChange();
 };
 
 #endif // PROPERTYUPDATER_H

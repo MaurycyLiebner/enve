@@ -152,13 +152,9 @@ public:
                                          const int &relFrame2);
     bool prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
             const int &relFrame1, const int &relFrame2);
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                              int *lastIdentical,
-                                              const int &relFrame);
-    void getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
-                                               int *lastIdentical,
-                                               const int &relFrame,
-                                               const bool &takeAncestorsIntoAccount = true);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange getFirstAndLastIdenticalForMotionBlur(
+            const int &relFrame, const bool &takeAncestorsIntoAccount = true);
     void scheduleWaitingTasks();
     void queScheduledTasks();
 

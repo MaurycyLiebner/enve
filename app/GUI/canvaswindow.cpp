@@ -930,15 +930,11 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler().
             getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
-    int firstIdT;
-    int lastIdT;
-    mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(&firstIdT,
-                                                         &lastIdT,
-                                                         newCurrentRenderFrame);
-    if(mCurrentRenderFrame >= firstIdT) {
-        newCurrentRenderFrame = lastIdT + 1;
+    auto range = mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(newCurrentRenderFrame);
+    if(mCurrentRenderFrame >= range.min) {
+        newCurrentRenderFrame = range.max + 1;
     } else {
-        newCurrentRenderFrame = firstIdT;
+        newCurrentRenderFrame = range.min;
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         mCurrentCanvas->getCacheHandler().
@@ -1098,13 +1094,10 @@ void CanvasWindow::nextSaveOutputFrame() {
         }
         VideoEncoder::finishEncodingStatic();
     } else {
-        int lastIdentical;
-        int firstIdentical;
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
-        mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(
-                    &firstIdentical, &lastIdentical, mCurrentRenderFrame);
-        if(lastIdentical > mMaxRenderFrame) lastIdentical = mMaxRenderFrame;
-        mCurrentRenderFrame = lastIdentical + 1;
+        auto range = mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(mCurrentRenderFrame);
+        if(range.max > mMaxRenderFrame) range.max = mMaxRenderFrame;
+        mCurrentRenderFrame = range.max + 1;
         //mCurrentRenderFrame++;
         changeCurrentFrameAction(mCurrentRenderFrame);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {

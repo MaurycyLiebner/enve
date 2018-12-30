@@ -377,8 +377,7 @@ public slots:
     void scheduleDisplayedFillStrokeSettingsUpdate();
 
     void nextPreviewFrame();
-    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                             const int &maxFrame);
+    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
     void setClipToCanvas(const bool &bT) { mClipToCanvasSize = bT; }
     void setRasterEffectsVisible(const bool &bT) { mRasterEffectsVisible = bT; }
     void setPathEffectsVisible(const bool &bT) { mPathEffectsVisible = bT; }
@@ -498,9 +497,7 @@ public:
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                               int *lastIdentical,
-                                               const int &relFrame);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
     void setPickingFromPath(const bool &pickFill,
                             const bool &pickStroke) {
         mPickFillFromPath = pickFill;

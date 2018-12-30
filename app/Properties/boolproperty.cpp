@@ -10,8 +10,6 @@ bool BoolProperty::getValue() {
 void BoolProperty::setValue(const bool &value) {
     mValue = value;
     prp_updateInfluenceRangeAfterChanged();
-    prp_callUpdater();
-    prp_callFinishUpdater();
 }
 
 
@@ -25,8 +23,6 @@ bool BoolPropertyContainer::getValue() {
 void BoolPropertyContainer::setValue(const bool &value) {
     mValue = value;
     prp_updateInfluenceRangeAfterChanged();
-    prp_callUpdater();
-    prp_callFinishUpdater();
 
     Q_FOREACH(const qsptr<Property> &prop, ca_mChildAnimators) {
         //prop->SWT_setVisible(value);

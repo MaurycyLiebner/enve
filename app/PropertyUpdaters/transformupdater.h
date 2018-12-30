@@ -7,7 +7,7 @@ class TransformUpdater : public PropertyUpdater {
 public:
     TransformUpdater(BasicTransformAnimator *transformAnimator);
     void update();
-    void updateFinal();
+    void finishedChange();
 
     void frameChangeUpdate();
 private:

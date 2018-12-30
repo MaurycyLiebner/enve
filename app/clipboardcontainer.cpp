@@ -151,8 +151,6 @@ void PropertyClipboardContainer::paste(Property *targetProperty) {
         } else {
             targetProperty->readProperty(&target);
         }
-        targetProperty->prp_callUpdater();
-        targetProperty->prp_callFinishUpdater();
     }
     target.close();
 }

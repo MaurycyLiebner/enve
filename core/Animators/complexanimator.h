@@ -73,9 +73,7 @@ public:
     int getChildPropertyIndex(Property *child);
 
     void ca_updateDescendatKeyFrame(Key* key);
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                              int *lastIdentical,
-                                              const int &relFrame);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
     void anim_saveCurrentValueAsKey();
     virtual void ca_removeAllChildAnimators();
     Property *ca_getFirstDescendantWithName(const QString &name);

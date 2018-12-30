@@ -286,15 +286,14 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     }
 }
 
-void CacheHandler::clearCacheForRelFrameRange(const int &minFrame,
-                                              const int &maxFrame) {
+void CacheHandler::clearCacheForRelFrameRange(const FrameRange& range) {
     int minId;
-    if(!getRenderContainterIdAtRelFrame(minFrame, &minId)) {
-        minId = getRenderContainterInsertIdAtRelFrame(minFrame);
+    if(!getRenderContainterIdAtRelFrame(range.min, &minId)) {
+        minId = getRenderContainterInsertIdAtRelFrame(range.min);
     }
     int maxId;
-    if(!getRenderContainterIdAtRelFrame(maxFrame, &maxId)) {
-        maxId = getRenderContainterInsertIdAtRelFrame(maxFrame) - 1;
+    if(!getRenderContainterIdAtRelFrame(range.max, &maxId)) {
+        maxId = getRenderContainterInsertIdAtRelFrame(range.max) - 1;
     }
     for(int i = minId; i <= maxId; i++) {
         mRenderContainers.removeAt(minId);

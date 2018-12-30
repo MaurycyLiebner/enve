@@ -16,8 +16,7 @@ public:
 
     void setCurrentPointValue(const QPointF &val,
                               const bool &saveUndoRedo = false,
-                              const bool &finish = false,
-                              const bool &callUpdater = true);
+                              const bool &finish = false);
     void incCurrentValues(const qreal &x, const qreal &y);
     void multCurrentValues(qreal sx, qreal sy);
 
@@ -28,8 +27,7 @@ public:
     void incAllValues(const qreal &x,
                       const qreal &y,
                       const bool &saveUndoRedo = false,
-                      const bool &finish = false,
-                      const bool &callUpdater = true);
+                      const bool &finish = false);
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();

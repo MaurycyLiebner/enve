@@ -11,8 +11,7 @@ void IntProperty::setValueRange(const int &minValue,
 
 void IntProperty::setCurrentValue(const int &value,
                                   const bool &saveUndoRedo,
-                                  const bool &finish,
-                                  const bool &callUpdater) {
+                                  const bool &finish) {
     int newValue = qMin(qMax(value, mMinValue), mMaxValue);
     if(newValue == mValue) return;
 
@@ -31,9 +30,6 @@ void IntProperty::setCurrentValue(const int &value,
     }
 
     emit valueChangedSignal(mValue);
-    if(callUpdater) {
-        prp_callUpdater();
-    }
 }
 
 void IntProperty::prp_startTransform() {

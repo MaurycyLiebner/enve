@@ -20,23 +20,17 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                              int *lastIdentical,
-                                              const int &relFrame) {
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
         if(mRandomize->getValue()) {
             if(mSmoothTransform->getValue()) {
-                *firstIdentical = relFrame;
-                *lastIdentical = relFrame;
+                return {relFrame, relFrame};
             } else {
                 int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
-                *firstIdentical = relFrame - relFrame % frameStep;
-                *lastIdentical = *firstIdentical + frameStep;
+                int min = relFrame - relFrame % frameStep;
+                return {min, min + frameStep};
             }
-        } else {
-            PathEffect::prp_getFirstAndLastIdenticalRelFrame(firstIdentical,
-                                                             lastIdentical,
-                                                             relFrame);
         }
+        return PathEffect::prp_getFirstAndLastIdenticalRelFrame(relFrame);
     }
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
@@ -49,13 +43,6 @@ public:
         }
         return PathEffect::prp_differencesBetweenRelFrames(relFrame1,
                                                            relFrame2);
-    }
-
-    void prp_setAbsFrame(const int &frame) {
-        ComplexAnimator::prp_setAbsFrame(frame);
-        if(mRandomize->getValue()) {
-            prp_callUpdater();
-        }
     }
 private:
     uint32_t mSeedAssist = 0;

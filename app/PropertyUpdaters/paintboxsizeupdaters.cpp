@@ -15,7 +15,7 @@ void PaintBoxSizeUpdaterBR::frameChangeUpdate() {
     //mTarget->scheduleUpdate();
 }
 
-void PaintBoxSizeUpdaterBR::updateFinal() {
+void PaintBoxSizeUpdaterBR::finishedChange() {
     mTarget->scheduleFinishSizeSetup();
     mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
@@ -34,7 +34,7 @@ void PaintBoxSizeUpdaterTL::frameChangeUpdate() {
     //mTarget->scheduleUpdate();
 }
 
-void PaintBoxSizeUpdaterTL::updateFinal() {
+void PaintBoxSizeUpdaterTL::finishedChange() {
     mTarget->scheduleFinishSizeAndPosSetup();
     mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }

@@ -91,44 +91,22 @@ bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
             getLinkTarget()->isRelFrameFInVisibleDurationRect(relFrame);
 }
 
-void InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                        int *lastIdentical,
-                                                        const int &relFrame) {
-    int fIdLT;
-    int lIdLT;
-
-    getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
-                                                      &lIdLT,
-                                                      relFrame);
-    int fId;
-    int lId;
+FrameRange InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            BoundingBox::prp_getFirstAndLastIdenticalRelFrame(&fId,
-                                                            &lId,
-                                                            relFrame);
+            range *= BoundingBox::prp_getFirstAndLastIdenticalRelFrame(relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                fId = mDurationRectangle->getMaxFrameAsRelFrame();
-                lId = INT_MAX;
+                range = mDurationRectangle->getRelFrameRangeToTheRight();
             } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
-                fId = INT_MIN;
-                lId = mDurationRectangle->getMinFrameAsRelFrame();
+                range = mDurationRectangle->getRelFrameRangeToTheLeft();
             }
         }
-    } else {
-        fId = INT_MIN;
-        lId = INT_MAX;
     }
-    fId = qMax(fId, fIdLT);
-    lId = qMin(lId, lIdLT);
-    if(lId > fId) {
-        *firstIdentical = fId;
-        *lastIdentical = lId;
-    } else {
-        *firstIdentical = relFrame;
-        *lastIdentical = relFrame;
-    }
+    auto targetRange = getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+
+    return range*targetRange;
 }
 
 bool InternalLinkBox::prp_differencesBetweenRelFrames(const int &relFrame1,
@@ -162,43 +140,22 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
 //    return mLinkTarget->relPointInsidePath(point);
 //}
 
-void InternalLinkGroupBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                        int *lastIdentical,
-                                                        const int &relFrame) {
-    int fIdLT;
-    int lIdLT;
-    getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
-                                                      &lIdLT,
-                                                      relFrame);
-    int fId;
-    int lId;
+FrameRange InternalLinkGroupBox::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            Animator::prp_getFirstAndLastIdenticalRelFrame(&fId,
-                                                            &lId,
-                                                            relFrame);
+            range *= BoundingBox::prp_getFirstAndLastIdenticalRelFrame(relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                fId = mDurationRectangle->getMaxFrameAsRelFrame();
-                lId = INT_MAX;
+                range = mDurationRectangle->getRelFrameRangeToTheRight();
             } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
-                fId = INT_MIN;
-                lId = mDurationRectangle->getMinFrameAsRelFrame();
+                range = mDurationRectangle->getRelFrameRangeToTheLeft();
             }
         }
-    } else {
-        fId = INT_MIN;
-        lId = INT_MAX;
     }
-    fId = qMax(fId, fIdLT);
-    lId = qMin(lId, lIdLT);
-    if(lId > fId) {
-        *firstIdentical = fId;
-        *lastIdentical = lId;
-    } else {
-        *firstIdentical = relFrame;
-        *lastIdentical = relFrame;
-    }
+    auto targetRange = getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+
+    return range*targetRange;
 }
 
 bool InternalLinkGroupBox::prp_differencesBetweenRelFrames(const int &relFrame1,

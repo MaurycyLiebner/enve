@@ -9,7 +9,7 @@ void GradientUpdater::update() {
     mTarget->updateQGradientStopsFinal(Animator::USER_CHANGE);
 }
 
-void GradientUpdater::updateFinal() {
+void GradientUpdater::finishedChange() {
     mTarget->updateQGradientStopsFinal(Animator::USER_CHANGE);
 }
 

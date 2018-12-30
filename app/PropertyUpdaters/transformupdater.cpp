@@ -9,7 +9,7 @@ void TransformUpdater::update() {
     mTarget->updateRelativeTransform(Animator::USER_CHANGE);
 }
 
-void TransformUpdater::updateFinal() {
+void TransformUpdater::finishedChange() {
     mTarget->updateRelativeTransform(Animator::USER_CHANGE);
 }
 

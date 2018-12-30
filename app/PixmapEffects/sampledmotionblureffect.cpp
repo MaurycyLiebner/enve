@@ -62,71 +62,35 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-void SampledMotionBlurEffect::prp_setAbsFrame(const int &frame) {
-    PixmapEffect::prp_setAbsFrame(frame);
-    int margin = qCeil(mNumberSamples->getCurrentEffectiveValueAtRelFrame(anim_mCurrentRelFrame)*
-                       mFrameStep->getCurrentEffectiveValueAtRelFrame(anim_mCurrentRelFrame));
-    int first, last;
-    getParentBoxFirstLastMarginAjusted(&first, &last, anim_mCurrentRelFrame);
-    if((frame >= first && frame < first + margin) ||
-       (frame <= last && frame > last - margin)) {
-        prp_callUpdater();
-    }
-}
-
-void SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(int *firstT,
-                                                                 int *lastT,
-                                                                 const int &relFrame) {
-    int boxFirst;
-    int boxLast;
-    mParentBox->getFirstAndLastIdenticalForMotionBlur(&boxFirst,
-                                                      &boxLast,
-                                                      relFrame);
+FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int &relFrame) {
+    auto boxRange = mParentBox->getFirstAndLastIdenticalForMotionBlur(relFrame);
     int margin = qCeil(mNumberSamples->getCurrentEffectiveValueAtRelFrame(relFrame)*
                        mFrameStep->getCurrentEffectiveValueAtRelFrame(relFrame));
-    if(boxFirst == INT_MIN) {
-        if(boxLast != INT_MAX) {
-            if(boxLast - margin < relFrame) {
-                boxFirst = relFrame;
+    if(boxRange.min == INT_MIN) {
+        if(boxRange.max != INT_MAX) {
+            if(boxRange.max - margin < relFrame) {
+                boxRange.min = relFrame;
             }
         }
     } else {
-        boxFirst += margin;
+        boxRange.min += margin;
     }
-    if(boxLast == INT_MAX) {
-        if(boxFirst != INT_MIN) {
-            if(boxFirst > relFrame) {
-                boxLast = relFrame;
+    if(boxRange.max == INT_MAX) {
+        if(boxRange.min != INT_MIN) {
+            if(boxRange.min > relFrame) {
+                boxRange.max = relFrame;
             }
         }
     } else {
-        boxLast -= margin;
+        boxRange.max -= margin;
     }
-    *firstT = boxFirst;
-    *lastT = boxLast;
+    return boxRange;
 }
 
-void SampledMotionBlurEffect::prp_getFirstAndLastIdenticalRelFrame(
-        int *firstIdentical,
-        int *lastIdentical,
-        const int &relFrame) {
-    int boxFirst;
-    int boxLast;
-    getParentBoxFirstLastMarginAjusted(&boxFirst, &boxLast, relFrame);
-    int fId;
-    int lId;
-    PixmapEffect::prp_getFirstAndLastIdenticalRelFrame(&fId,
-                                                       &lId,
-                                                       relFrame);
-    fId = qMax(fId, boxFirst);
-    lId = qMin(lId, boxLast);
-    if(lId > fId) {
-        *firstIdentical = fId;
-        *lastIdentical = lId;
-    } else {
-        *firstIdentical = relFrame;
-        *lastIdentical = relFrame;
-    }
+FrameRange SampledMotionBlurEffect::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    auto boxRange = getParentBoxFirstLastMarginAjusted(relFrame);
+    auto effectRange = PixmapEffect::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+    return boxRange*effectRange;
 }
 
 void replaceIfHigherAlpha(const int &x0, const int &y0,

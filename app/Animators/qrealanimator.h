@@ -35,16 +35,15 @@ public:
     qreal qra_getCurrentValue() const;
     qreal qra_getCurrentEffectiveValue();
     void qra_setCurrentValue(qreal newValue,
-                             const bool &saveUndoRedo = false,
-                             const bool &finish = false,
-                             const bool &callUpdater = true);
+                             const bool &finish,
+                             const bool &callUpdater);
     void qra_updateValueFromCurrentFrame();
     void qra_saveCurrentValueToKey(QrealKey *key,
-                                   const bool &finish = true);
+                                   const bool &finish,
+                                   const bool &callUpdater);
     void qra_saveValueToKey(QrealKey *key,
                             const qreal &value,
-                            const bool &saveUndoRedo = true,
-                            const bool &finish = true);
+                            const bool &callUpdater = true);
 
     void prp_setAbsFrame(const int &frame);
 
@@ -62,8 +61,7 @@ public:
     virtual void prp_retrieveSavedValue();
     void qra_incCurrentValue(const qreal &incBy,
                              const bool &saveUndoRedo = false,
-                             const bool &finish = false,
-                             const bool &callUpdater = true);
+                             const bool &finish = false);
 
     virtual void prp_startTransform();
 
@@ -77,8 +75,7 @@ public:
 
     void qra_incAllValues(const qreal &valInc,
                           const bool &saveUndoRedo = false,
-                          const bool &finish = false,
-                          const bool &callUpdater = true);
+                          const bool &finish = false);
 
     virtual QString prp_getValueText();
 
@@ -120,14 +117,11 @@ public:
     bool getBeingTransformed() { return mTransformed; }
     void anim_removeAllKeys();
 
-    void prp_updateAfterChangedRelFrameRange(const int &minFrame,
-                                             const int &maxFrame) {
-        if(anim_mCurrentRelFrame >= minFrame) {
-            if(anim_mCurrentRelFrame <= maxFrame) {
-                qra_updateValueFromCurrentFrame();
-            }
+    void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
+        if(range.contains(anim_mCurrentRelFrame)) {
+            qra_updateValueFromCurrentFrame();
         }
-        Property::prp_updateAfterChangedRelFrameRange(minFrame, maxFrame);
+        Animator::prp_updateAfterChangedRelFrameRange(range);
     }
 
     void setGenerator(const qsptr<RandomQrealGenerator> &generator);

@@ -405,12 +405,8 @@ void Canvas::setOutputRendering(const bool &bT) {
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
                                         const bool &frameEncoded) {
     if(mRenderingOutput && !frameEncoded) {
-        int firstIdentical;
-        int lastIdentical;
-        prp_getFirstAndLastIdenticalRelFrame(&firstIdentical, &lastIdentical,
-                                             cont->getMinRelFrame());
-        if(lastIdentical > mMaxFrame) lastIdentical = mMaxFrame;
-        cont->setMaxRelFrame(lastIdentical);
+        auto range = prp_getFirstAndLastIdenticalRelFrame(cont->getMinRelFrame());
+        cont->setMaxRelFrame(range.max);
         VideoEncoder::addCacheContainerToEncoderStatic(cont);
         return;
     }
@@ -461,31 +457,31 @@ void Canvas::playPreview(const int &minPreviewFrameId,
 }
 
 #include "memorychecker.h"
-int Canvas::getMaxPreviewFrame(const int &minFrame,
-                               const int &maxFrame) {
+int Canvas::getMaxPreviewFrame(const int &minFrame, const int &maxFrame) {
     unsigned long long frameSize =
             static_cast<unsigned long long>(getByteCountPerFrame());
     unsigned long long freeRam = getFreeRam() -
             MemoryChecker::getInstance()->getLowFreeRam();
     int maxNewFrames = static_cast<int>(freeRam/frameSize);
     int maxFrameT = minFrame + maxNewFrames;
-    int firstF = minFrame, lastF = minFrame, frameT = minFrame;
+    FrameRange range{minFrame, minFrame};
+    int frameT = minFrame;
     maxFrameT += mCacheHandler.getNumberNotCachedBeforeRelFrame(minFrame);
-    while(lastF < maxFrameT && lastF < maxFrame) {
-        prp_getFirstAndLastIdenticalRelFrame(&firstF, &lastF, frameT);
+    while(range.max < maxFrameT && range.max < maxFrame) {
+        auto range = prp_getFirstAndLastIdenticalRelFrame(frameT);
 //        if(frameT == minFrame) {
 //            mCacheHandler.cacheDataBeforeRelFrame(firstF);
 //        }
-        CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(firstF);
+        CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(range.min);
         if(cont != nullptr) {
             if(cont->storesDataInMemory()) {
                 maxFrameT++;
             }
             cont->setBlocked(true);
         }
-        frameT = lastF + 1;
+        frameT = range.max + 1;
     }
-    mCacheHandler.updateAllAfterFrameInMemoryHandler(firstF);
+    mCacheHandler.updateAllAfterFrameInMemoryHandler(range.min);
     return qMin(maxFrame, qMax(minFrame, maxFrameT));
 }
 
@@ -506,14 +502,10 @@ void Canvas::nextPreviewFrame() {
     mCanvasWindow->requestUpdate();
 }
 
-void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                  int *lastIdentical,
-                                                  const int &relFrame) {
-    int fId;
-    int lId;
-    BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
-    *firstIdentical = qMax(fId, 0);
-    *lastIdentical = qMin(lId, getMaxFrame());
+FrameRange Canvas::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    FrameRange groupRange = BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+    FrameRange canvasRange{0, mMaxFrame};
+    return groupRange*canvasRange;
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
@@ -521,13 +513,11 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(renderData->fRedo) {
         scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
-    int fId;
-    int lId;
     //qDebug() << renderData->fRelFrame;
-    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->fRelFrame);
-    CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(fId);
-    if(cont == nullptr) {
-        cont = mCacheHandler.createNewRenderContainerAtRelFrame(fId);
+    auto range = prp_getFirstAndLastIdenticalRelFrame(renderData->fRelFrame);
+    auto cont = mCacheHandler.getRenderContainerAtRelFrame(range.min);
+    if(!cont) {
+        cont = mCacheHandler.createNewRenderContainerAtRelFrame(range.min);
     }
     cont->replaceImageSk(renderData->renderedImage);
     if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
@@ -539,21 +529,15 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     callUpdateSchedulers();
 }
 
-void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                                 const int &maxFrame) {
-    if(anim_mCurrentAbsFrame >= minFrame && anim_mCurrentAbsFrame <= maxFrame) {
+void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
+    if(range.contains(anim_mCurrentAbsFrame)) {
         mCurrentPreviewContainerOutdated = true;
     }
     mCacheHandler.clearCacheForRelFrameRange(
-                prp_absFrameToRelFrame(minFrame),
-                prp_absFrameToRelFrame(maxFrame));
-    Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
-    int fId;
-    int lId;
-    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId,
-                                          anim_mCurrentRelFrame);
-    if(fId < minFrame && fId > maxFrame) return;
-    scheduleUpdate(Animator::USER_CHANGE);
+                prp_absRangeToRelRange(range));
+    Property::prp_updateAfterChangedAbsFrameRange(range);
+    auto rangeT = prp_getFirstAndLastIdenticalRelFrame(anim_mCurrentRelFrame);
+    if(range.overlaps(rangeT)) scheduleUpdate(Animator::USER_CHANGE);
 }
 
 //void Canvas::updatePixmaps() {

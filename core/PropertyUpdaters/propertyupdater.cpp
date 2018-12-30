@@ -10,4 +10,4 @@ void PropertyUpdater::frameChangeUpdate() {
     update();
 }
 
-void PropertyUpdater::updateFinal() {}
+void PropertyUpdater::finishedChange() {}

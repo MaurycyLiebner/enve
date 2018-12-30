@@ -13,6 +13,6 @@ void PixmapEffectUpdater::frameChangeUpdate() {
     mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
-void PixmapEffectUpdater::updateFinal() {
+void PixmapEffectUpdater::finishedChange() {
     mTarget->clearAllCache();
 }

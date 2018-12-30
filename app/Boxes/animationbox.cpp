@@ -28,15 +28,13 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
     //qreal fpsRatio = getParentCanvas()->getFps()/mFps;
     //qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
-    int oldMinARelFrame = getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
-    int oldMaxARelFrame = getAnimationDurationRect()->getMaxAnimationFrameAsRelFrame();
+    auto oldRange = getAnimationDurationRect()->getRelFrameRange();
     getAnimationDurationRect()->setAnimationFrameDuration(
             mAnimationCacheHandler->getFramesCount());
-    int newMinARelFrame = getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
-    int newMaxARelFrame = getAnimationDurationRect()->getMaxAnimationFrameAsRelFrame();
+    auto newRange = getAnimationDurationRect()->getRelFrameRange();
 
-    prp_updateAfterChangedRelFrameRange(oldMinARelFrame, newMinARelFrame);
-    prp_updateAfterChangedRelFrameRange(oldMaxARelFrame, newMaxARelFrame);
+    prp_updateAfterChangedRelFrameRange({oldRange.min, newRange.min});
+    prp_updateAfterChangedRelFrameRange({oldRange.max, newRange.max});
 }
 
 void AnimationBox::reloadCacheHandler() {

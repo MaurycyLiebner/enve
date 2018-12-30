@@ -419,144 +419,63 @@ bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingConta
     return diffThis || diffInherited;
 }
 
-void BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                       int *lastIdentical,
-                                                       const int &relFrame) {
-    int fId;
-    int lId;
-
-    BoundingBox::prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
+FrameRange BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    auto range = BoundingBox::prp_getFirstAndLastIdenticalRelFrame(relFrame);
     int absFrame = prp_relFrameToAbsFrame(relFrame);
     Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
-        if(fId >= lId) {
-            break;
-        }
-        int fIdT;
-        int lIdT;
-        child->prp_getFirstAndLastIdenticalRelFrame(
-                    &fIdT, &lIdT,
+        Q_ASSERT(!range.isValid());
+        if(range.singleFrame()) return range;
+        auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(
                     child->prp_absFrameToRelFrame(absFrame));
-        int fIdAbsT = child->prp_relFrameToAbsFrame(fIdT);
-        int lIdAbsT = child->prp_relFrameToAbsFrame(lIdT);
-        fIdT = prp_absFrameToRelFrame(fIdAbsT);
-        lIdT = prp_absFrameToRelFrame(lIdAbsT);
-        if(fIdT > fId) {
-            fId = fIdT;
-        }
-        if(lIdT < lId) {
-            lId = lIdT;
-        }
+        auto childAbsRange = child->prp_relRangeToAbsRange(childRange);
+        auto childParentRange = prp_absRangeToRelRange(childAbsRange);
+        range *= childParentRange;
     }
 
-    if(lId > fId) {
-        *firstIdentical = fId;
-        *lastIdentical = lId;
-    } else {
-        *firstIdentical = relFrame;
-        *lastIdentical = relFrame;
-    }
+    return range;
 }
 
-void BoxesGroup::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
-                                                       int *lastIdentical,
-                                                       const int &relFrame,
-                                                       const bool &takeAncestorsIntoAccount) {
+FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
+        const int &relFrame, const bool &takeAncestorsIntoAccount) {
+    FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            int fId = INT_MIN;
-            int lId = INT_MAX;
-            {
-                int fId_ = INT_MIN;
-                int lId_ = INT_MAX;
-
-                QList<Property*> propertiesT;
-                getMotionBlurProperties(propertiesT);
-                Q_FOREACH(Property* child, propertiesT) {
-                    if(fId_ > lId_) {
-                        break;
-                    }
-                    int fIdT_;
-                    int lIdT_;
-                    child->prp_getFirstAndLastIdenticalRelFrame(
-                                &fIdT_, &lIdT_,
-                                relFrame);
-                    if(fIdT_ > fId_) {
-                        fId_ = fIdT_;
-                    }
-                    if(lIdT_ < lId_) {
-                        lId_ = lIdT_;
-                    }
-                }
-
-                Q_FOREACH(const qsptr<BoundingBox> &child,
-                          mContainedBoxes) {
-                    if(fId_ > lId_) {
-                        break;
-                    }
-                    int fIdT_;
-                    int lIdT_;
-                    child->getFirstAndLastIdenticalForMotionBlur(
-                                &fIdT_, &lIdT_,
-                                relFrame, false);
-                    if(fIdT_ > fId_) {
-                        fId_ = fIdT_;
-                    }
-                    if(lIdT_ < lId_) {
-                        lId_ = lIdT_;
-                    }
-                }
-
-                if(lId_ > fId_) {
-                    fId = fId_;
-                    lId = lId_;
-                } else {
-                    fId = relFrame;
-                    lId = relFrame;
-                }
+            QList<Property*> propertiesT;
+            getMotionBlurProperties(propertiesT);
+            Q_FOREACH(const auto& child, propertiesT) {
+                Q_ASSERT(!range.isValid());
+                if(range.singleFrame()) return range;
+                auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+                range *= childRange;
             }
-            *firstIdentical = fId;
-            *lastIdentical = lId;
-            if(mDurationRectangle != nullptr) {
-                if(fId < mDurationRectangle->getMinFrameAsRelFrame()) {
-                    *firstIdentical = relFrame;
-                }
-                if(lId > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                    *lastIdentical = relFrame;
-                }
+
+            Q_FOREACH(const auto &child, mContainedBoxes) {
+                if(range.singleFrame()) return range;
+                auto childRange = child->getFirstAndLastIdenticalForMotionBlur(
+                            relFrame, false);
+                range *= childRange;
+            }
+
+            if(mDurationRectangle) {
+                range *= mDurationRectangle->getRelFrameRange();
             }
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame() + 1;
-                *lastIdentical = INT_MAX;
+                range = mDurationRectangle->getRelFrameRangeToTheRight();
             } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
-                *firstIdentical = INT_MIN;
-                *lastIdentical = mDurationRectangle->getMinFrameAsRelFrame() - 1;
+                range = mDurationRectangle->getRelFrameRangeToTheLeft();
             }
         }
-    } else {
-        *firstIdentical = INT_MIN;
-        *lastIdentical = INT_MAX;
     }
-    if(mParentGroup == nullptr || takeAncestorsIntoAccount) return;
-    if(*firstIdentical == relFrame && *lastIdentical == relFrame) return;
-    int parentFirst;
-    int parentLast;
+    if(!mParentGroup || takeAncestorsIntoAccount) return range;
+    if(range.singleFrame()) return range;
     int parentRel = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
-    mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(
-                  &parentFirst,
-                  &parentLast,
-                  parentRel);
-    if(parentFirst > *firstIdentical) {
-        *firstIdentical = parentFirst;
-    }
-    if(parentLast < *lastIdentical) {
-        *lastIdentical = parentLast;
-    }
+    auto parentRange = mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
+    return range*parentRange;
 }
 
-BoxesGroup::~BoxesGroup() {
-}
+BoxesGroup::~BoxesGroup() {}
 
 void BoxesGroup::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
     BoundingBox::scaleTime(pivotAbsFrame, scale);
@@ -666,7 +585,7 @@ const QList<qsptr<BoundingBox> > &BoxesGroup::getContainedBoxesList() const {
 qsptr<BoundingBox> BoxesGroup::createLink() {
     qsptr<InternalLinkGroupBox> linkBox = SPtrCreate(InternalLinkGroupBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
-    return linkBox;
+    return std::move(linkBox);
 }
 
 void processChildData(BoundingBox* child,

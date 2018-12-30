@@ -8,7 +8,7 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrameF(
         const qreal &frame) const {
     int prevId;
     int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrameF(&prevId, &nextId, frame) ) {
+    if(anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId, frame) ) {
         if(nextId == prevId) {
             return GetAsGK(anim_mKeys.at(nextId))->getRelFrame();
         } else {

@@ -27,7 +27,7 @@ public:
 
     virtual void scaleTime(const int &pivotAbsFrame, const qreal &scale);
 
-    virtual void anim_updateAfterChangedKey(Key *key);
+    virtual void anim_updateAfterChangedKey(Key * const key);
 
     virtual void prp_setAbsFrame(const int &frame);
 
@@ -86,9 +86,7 @@ public:
                            QList<Key*>& keysList,
                            const int &keyRectSize);
     bool anim_getNextAndPreviousKeyIdForRelFrame(
-                                 int *prevIdP,
-                                 int *nextIdP,
-                                 const int &frame) const;
+            int &prevIdP, int &nextIdP, const int &frame) const;
     virtual void prp_drawKeys(QPainter *p,
                               const qreal &pixelsPerFrame,
                               const qreal &drawY,
@@ -112,9 +110,7 @@ public:
                                          const int &relFrame2);
     int anim_getCurrentAbsFrame();
     int anim_getCurrentRelFrame();
-    virtual void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                      int *lastIdentical,
-                                                      const int &relFrame);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
     Key* anim_getPrevKey(const int &relFrame);
     Key* anim_getNextKey(const int &relFrame);
     void anim_shiftAllKeys(const int &shift);
@@ -135,8 +131,7 @@ public:
     void disableFakeComplexAnimatrIfNotNeeded();
     int anim_getPrevKeyRelFrame(const int &relFrame);
     int anim_getNextKeyRelFrame(const int &relFrame);
-    bool anim_getNextAndPreviousKeyIdForRelFrameF(int *prevIdP,
-                                                  int *nextIdP,
+    bool anim_getNextAndPreviousKeyIdForRelFrameF(int &prevIdP, int &nextIdP,
                                                   const qreal &frame) const;
     bool hasSelectedKeys() const;
 
@@ -164,6 +159,7 @@ public:
     const QList<stdptr<Key>>& getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
+    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
 private:
     void sortSelectedKeys();
 protected:

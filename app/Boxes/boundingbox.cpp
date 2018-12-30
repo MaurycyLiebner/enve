@@ -45,13 +45,10 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
 
 BoundingBox::~BoundingBox() {}
 
-void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                                      const int &maxFrame) {
-    Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
-    if(anim_mCurrentAbsFrame >= minFrame) {
-        if(anim_mCurrentAbsFrame <= maxFrame) {
-            scheduleUpdate(Animator::USER_CHANGE);
-        }
+void BoundingBox::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
+    Property::prp_updateAfterChangedAbsFrameRange(range);
+    if(range.contains(anim_mCurrentAbsFrame)) {
+        scheduleUpdate(Animator::USER_CHANGE);
     }
 }
 
@@ -183,11 +180,8 @@ void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
 }
 
 void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
-    int minAbsUpdateFrame;
-    int maxAbsUpdateFrame;
-    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
-    prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame,
-                                        maxAbsUpdateFrame);
+    auto visRange = getVisibleAbsFrameRange();
+    prp_updateAfterChangedAbsFrameRange(visRange);
 }
 
 void BoundingBox::clearAllCache() {
@@ -1035,42 +1029,36 @@ void BoundingBox::setDurationRectangle(
 void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_setParentFrameShift(prp_mParentFrameShift);
     prp_setAbsFrame(anim_mCurrentAbsFrame);
-    int minAbsUpdateFrame;
-    int maxAbsUpdateFrame;
-    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
+    auto visRange = getVisibleAbsFrameRange();
     if(dFrame > 0) {
-        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame - dFrame,
-                                            maxAbsUpdateFrame);
+        visRange.min -= dFrame;
     } else {
-        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame,
-                                            maxAbsUpdateFrame - dFrame);
+        visRange.max -= dFrame;
     }
+    prp_updateAfterChangedAbsFrameRange(visRange);
 }
 
 void BoundingBox::updateAfterDurationMinFrameChangedBy(const int &by) {
-    int minAbsUpdateFrame;
-    int maxAbsUpdateFrame;
-    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
+    auto visRange = getVisibleAbsFrameRange();
     if(by > 0) {
-        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame - by,
-                                            minAbsUpdateFrame - 1);
+        visRange.min -= by;
+        visRange.max = visRange.min - 1;
     } else {
-        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame,
-                                            minAbsUpdateFrame - by - 1);
+        visRange.max = visRange.min - by - 1;
     }
+    prp_updateAfterChangedAbsFrameRange(visRange);
 }
 
 void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
-    int minAbsUpdateFrame;
-    int maxAbsUpdateFrame;
-    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
+    auto visRange = getVisibleAbsFrameRange();
+
     if(by > 0) {
-        prp_updateAfterChangedAbsFrameRange(maxAbsUpdateFrame - by + 1,
-                                            maxAbsUpdateFrame);
+        visRange.min = visRange.max - by + 1;
     } else {
-        prp_updateAfterChangedAbsFrameRange(maxAbsUpdateFrame + 1,
-                                            maxAbsUpdateFrame - by);
+        visRange.min = visRange.max + 1;
+        visRange.max -= by;
     }
+    prp_updateAfterChangedAbsFrameRange(visRange);
 }
 
 void BoundingBox::updateAfterDurationRectangleRangeChanged() {}
@@ -1159,117 +1147,53 @@ bool BoundingBox::isRelFrameFVisibleAndInVisibleDurationRect(
     return isRelFrameFInVisibleDurationRect(relFrame) && mVisible;
 }
 
-void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                       int *lastIdentical,
-                                                       const int &relFrame) {
+FrameRange BoundingBox::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
-                                        firstIdentical,
-                                        lastIdentical,
-                                        relFrame);
-            if(mDurationRectangle != nullptr) {
-                if(relFrame == mDurationRectangle->getMinFrameAsRelFrame()) {
-                    *firstIdentical = relFrame;
-                }
-                if(relFrame == mDurationRectangle->getMaxFrameAsRelFrame()) {
-                    *lastIdentical = relFrame;
-                }
-            }
-        } else {
-            if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame() + 1;
-                *lastIdentical = INT_MAX;
-            } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
-                *firstIdentical = INT_MIN;
-                *lastIdentical = mDurationRectangle->getMinFrameAsRelFrame() - 1;
-            }
+            return ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(relFrame);
         }
-    } else {
-        *firstIdentical = INT_MIN;
-        *lastIdentical = INT_MAX;
+        if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+            return {mDurationRectangle->getMaxFrameAsRelFrame() + 1, INT_MAX};
+        } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
+            return {INT_MIN, mDurationRectangle->getMinFrameAsRelFrame() - 1};
+        }
     }
+    return {INT_MIN, INT_MAX};
 }
 
 
-void BoundingBox::getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
-                                                        int *lastIdentical,
-                                                        const int &relFrame,
-                                                        const bool &takeAncestorsIntoAccount) {
+FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
+        const int &relFrame, const bool &takeAncestorsIntoAccount) {
+    FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            int fId = INT_MIN;
-            int lId = INT_MAX;
-            {
-                int fId_ = INT_MIN;
-                int lId_ = INT_MAX;
-
-                QList<Property*> propertiesT;
-                getMotionBlurProperties(propertiesT);
-                Q_FOREACH(Property* child, propertiesT) {
-                    if(fId_ > lId_) {
-                        break;
-                    }
-                    int fIdT_;
-                    int lIdT_;
-                    child->prp_getFirstAndLastIdenticalRelFrame(
-                                &fIdT_, &lIdT_,
-                                relFrame);
-                    if(fIdT_ > fId_) {
-                        fId_ = fIdT_;
-                    }
-                    if(lIdT_ < lId_) {
-                        lId_ = lIdT_;
-                    }
-                }
-
-                if(lId_ > fId_) {
-                    fId = fId_;
-                    lId = lId_;
-                } else {
-                    fId = relFrame;
-                    lId = relFrame;
-                }
+            QList<Property*> propertiesT;
+            getMotionBlurProperties(propertiesT);
+            Q_FOREACH(const auto& child, propertiesT) {
+                Q_ASSERT(!range.isValid());
+                if(range.singleFrame()) break;
+                auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+                range *= childRange;
             }
-            *firstIdentical = fId;
-            *lastIdentical = lId;
-            if(mDurationRectangle != nullptr) {
-                if(fId < mDurationRectangle->getMinFrameAsRelFrame()) {
-                    *firstIdentical = relFrame;
-                }
-                if(lId > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                    *lastIdentical = relFrame;
-                }
-            }
+
+            range *= mDurationRectangle->getRelFrameRange();
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame() + 1;
-                *lastIdentical = INT_MAX;
+                return mDurationRectangle->getAbsFrameRangeToTheRight();
             } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
-                *firstIdentical = INT_MIN;
-                *lastIdentical = mDurationRectangle->getMinFrameAsRelFrame() - 1;
+                return mDurationRectangle->getAbsFrameRangeToTheLeft();
             }
         }
     } else {
-        *firstIdentical = INT_MIN;
-        *lastIdentical = INT_MAX;
+        return {INT_MIN, INT_MAX};
     }
-    if(mParentGroup == nullptr || takeAncestorsIntoAccount) return;
-    if(*firstIdentical == relFrame && *lastIdentical == relFrame) return;
-    int parentFirst;
-    int parentLast;
+    if(mParentGroup == nullptr || takeAncestorsIntoAccount) return range;
+    if(range.singleFrame()) return range;
     int parentRel = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
-    mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(
-                  &parentFirst,
-                  &parentLast,
-                  parentRel);
-    if(parentFirst > *firstIdentical) {
-        *firstIdentical = parentFirst;
-    }
-    if(parentLast < *lastIdentical) {
-        *lastIdentical = parentLast;
-    }
+    auto parentRange = mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
+
+    return range*parentRange;
 }
 
 void BoundingBox::scheduleWaitingTasks() {
@@ -1580,14 +1504,11 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     updateDrawRenderContainerTransform();
 }
 
-void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
+FrameRange BoundingBox::getVisibleAbsFrameRange() const {
     if(mDurationRectangle == nullptr) {
-        *minFrame = INT_MIN;
-        *maxFrame = INT_MAX;
-    } else {
-        *minFrame = mDurationRectangle->getMinFrameAsAbsFrame();
-        *maxFrame = mDurationRectangle->getMaxFrameAsAbsFrame();
+        return {INT_MIN, INT_MAX};
     }
+    return mDurationRectangle->getAbsFrameRange();
 }
 
 FunctionWaitingForBoxLoad::FunctionWaitingForBoxLoad(const int &boxIdT) {

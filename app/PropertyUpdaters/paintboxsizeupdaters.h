@@ -10,7 +10,7 @@ public:
 
     void update();
     void frameChangeUpdate();
-    void updateFinal();
+    void finishedChange();
 private:
     PaintBox *mTarget;
 };
@@ -22,7 +22,7 @@ public:
 
     void update();
     void frameChangeUpdate();
-    void updateFinal();
+    void finishedChange();
 private:
     PaintBox *mTarget;
 };

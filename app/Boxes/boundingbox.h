@@ -367,13 +367,9 @@ public:
     virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
     bool isRelFrameFVisibleAndInVisibleDurationRect(const qreal &relFrame);
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                              int *lastIdentical,
-                                              const int &relFrame);
-    virtual void getFirstAndLastIdenticalForMotionBlur(int *firstIdentical,
-                                               int *lastIdentical,
-                                               const int &relFrame,
-                                               const bool &takeAncestorsIntoAccount = true);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
+            const int &relFrame, const bool &takeAncestorsIntoAccount = true);
     virtual void scheduleWaitingTasks();
     void scheduleTask(const stdsptr<_ScheduledTask> &task);
     virtual void queScheduledTasks();
@@ -492,7 +488,7 @@ protected:
     static QList<qptr<BoundingBox>> mLoadedBoxes;
     static QList<stdsptr<FunctionWaitingForBoxLoad>> mFunctionsWaitingForBoxLoad;
 private:
-    void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);
+    FrameRange getVisibleAbsFrameRange() const;
 signals:
     void nameChanged(QString);
     void scheduledUpdate();
@@ -507,8 +503,7 @@ public slots:
     void updateAfterDurationMaxFrameChangedBy(const int &by);
     virtual void updateAfterDurationRectangleRangeChanged();
 
-    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                             const int &maxFrame);
+    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
     void prp_updateInfluenceRangeAfterChanged();
 };
 

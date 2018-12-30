@@ -20,9 +20,7 @@ public:
     qreal getDevAtRelFrameF(const qreal &relFrame);
     void generateData();
     void prp_setAbsFrame(const int &frame);
-    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                              int *lastIdentical,
-                                              const int &relFrame);
+    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
 
     void writeProperty(QIODevice *device);
     void readProperty(QIODevice *device);

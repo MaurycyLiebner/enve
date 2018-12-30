@@ -14,6 +14,6 @@ void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
     mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
-void DisplayedFillStrokeSettingsUpdater::updateFinal() {
+void DisplayedFillStrokeSettingsUpdater::finishedChange() {
     mTarget->clearAllCache();
 }
