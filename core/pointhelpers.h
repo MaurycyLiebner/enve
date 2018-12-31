@@ -10,6 +10,21 @@ enum CtrlsMode : short {
     CTRLS_SYMMETRIC,
     CTRLS_CORNER
 };
+extern qreal gSolveForP2(const qreal& p0, const qreal& p1,
+                        const qreal& p3, const qreal& t,
+                          const qreal& value);
+
+extern qreal gSolveForP1(const qreal& p0, const qreal& p2,
+                         const qreal& p3, const qreal& t,
+                         const qreal& value);
+
+extern qreal gSolveForP2(const qreal& p0, const qreal& p1,
+                        const qreal& p3, const qreal& t,
+                          const qreal& value);
+
+extern qreal gSolveForP1(const qreal& p0, const qreal& p2,
+                         const qreal& p3, const qreal& t,
+                         const qreal& value);
 
 extern void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
                                  QPointF centerPos, QPointF *newEndPos,

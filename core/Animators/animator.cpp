@@ -582,15 +582,15 @@ bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                const int &relFrame2) {
     if(relFrame1 == relFrame2) return false;
     if(anim_mKeys.isEmpty()) return false;
-    int nextFrame = qMax(relFrame1, relFrame2);
     int prevFrame = qMin(relFrame1, relFrame2);
+    int nextFrame = qMax(relFrame1, relFrame2);
     int prevId1;
     int nextId1;
     anim_getNextAndPreviousKeyIdForRelFrame(prevId1, nextId1, prevFrame);
     int prevId2;
     int nextId2;
     anim_getNextAndPreviousKeyIdForRelFrame(prevId2, nextId2, nextFrame);
-    if(prevId1 == nextId2) return false;
+    if(prevId1 != prevId2) return true;
     return anim_mKeys.at(prevId1)->differsFromKey(
                 anim_mKeys.at(nextId2).get());
 }

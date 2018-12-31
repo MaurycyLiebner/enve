@@ -29,6 +29,60 @@ QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 
 QrealAnimator::~QrealAnimator() {}
 
+void QrealAnimator::getValueConstraints(
+        GraphKey *key, const QrealPointType &type,
+        qreal &minMoveValue, qreal &maxMoveValue) const {
+    Q_UNUSED(key);
+    if(type == QrealPointType::END_POINT) {
+        minMoveValue = DBL_MIN;
+        maxMoveValue = DBL_MAX;
+//        auto nextKey = key->getNextKey<GraphKey>();
+//        if(!nextKey) {
+//            minMoveValue = mMinPossibleVal;
+//            maxMoveValue = mMaxPossibleVal;
+//            return;
+//        }
+//        qreal p0 = key->getValueForGraph();
+//        qreal p2 = nextKey->getStartValue();
+//        qreal p3 = nextKey->getValueForGraph();
+//        int iMax = 2*(nextKey->getRelFrame() - key->getRelFrame());
+//        minMoveValue = DBL_MIN;
+//        maxMoveValue = DBL_MAX;
+//        for(int i = 1; i < iMax; i++) {
+//            qreal t = static_cast<qreal>(i)/iMax;
+//            qreal maxVal = gSolveForP1(p0, p2, p3, t, mMaxPossibleVal);
+//            maxMoveValue = qMin(maxMoveValue, maxVal);
+//            qreal minVal = gSolveForP1(p0, p2, p3, t, mMinPossibleVal);
+//            minMoveValue = qMax(minMoveValue, minVal);
+//        }
+    } else if(type == QrealPointType::START_POINT) {
+        minMoveValue = DBL_MIN;
+        maxMoveValue = DBL_MAX;
+//        auto prevKey = key->getPrevKey<GraphKey>();
+//        if(!prevKey) {
+//            minMoveValue = mMinPossibleVal;
+//            maxMoveValue = mMaxPossibleVal;
+//            return;
+//        }
+//        qreal p0 = prevKey->getValueForGraph();
+//        qreal p1 = prevKey->getEndValue();
+//        qreal p3 = key->getValueForGraph();
+//        int iMax = 2*(key->getRelFrame() - prevKey->getRelFrame());
+//        minMoveValue = DBL_MIN;
+//        maxMoveValue = DBL_MAX;
+//        for(int i = 1; i < iMax; i++) {
+//            qreal t = static_cast<qreal>(i)/iMax;
+//            qreal maxVal = gSolveForP2(p0, p1, p3, t, mMaxPossibleVal);
+//            maxMoveValue = qMin(maxMoveValue, maxVal);
+//            qreal minVal = gSolveForP2(p0, p1, p3, t, mMinPossibleVal);
+//            minMoveValue = qMax(minMoveValue, minVal);
+//        }
+    } else { // KEY_POINT
+        minMoveValue = mMinPossibleVal;
+        maxMoveValue = mMaxPossibleVal;
+    }
+}
+
 void QrealAnimator::qra_setValueRange(const qreal &minVal,
                                       const qreal &maxVal) {
     mMinPossibleVal = minVal;

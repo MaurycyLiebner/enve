@@ -468,7 +468,7 @@ int Canvas::getMaxPreviewFrame(const int &minFrame, const int &maxFrame) {
     int frameT = minFrame;
     maxFrameT += mCacheHandler.getNumberNotCachedBeforeRelFrame(minFrame);
     while(range.max < maxFrameT && range.max < maxFrame) {
-        auto range = prp_getFirstAndLastIdenticalRelFrame(frameT);
+        range = prp_getFirstAndLastIdenticalRelFrame(frameT);
 //        if(frameT == minFrame) {
 //            mCacheHandler.cacheDataBeforeRelFrame(firstF);
 //        }

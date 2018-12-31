@@ -49,7 +49,7 @@ void GraphAnimator::enableCtrlPtsForSelected() {
 }
 
 void GraphAnimator::drawKeysPath(QPainter * const p,
-                            const QColor &paintColor) const {
+                                 const QColor &paintColor) const {
     p->save();
 
     QPen pen = QPen(Qt::black, 4.);
@@ -165,13 +165,13 @@ void GraphAnimator::anim_constrainCtrlsFrameValues() {
             lastKey->constrainEndCtrlMaxFrame(key->getAbsFrame());
             qreal endMin; qreal endMax;
             getValueConstraints(lastKey, QrealPointType::END_POINT,
-                                endMin, endMax);
+                                        endMin, endMax);
             lastKey->constrainEndCtrlValue(endMin, endMax);
 
             gKey->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
             qreal startMin; qreal startMax;
             getValueConstraints(gKey, QrealPointType::START_POINT,
-                                startMin, startMax);
+                                        startMin, startMax);
             gKey->constrainStartCtrlValue(startMin, startMax);
         }
         lastKey = gKey;

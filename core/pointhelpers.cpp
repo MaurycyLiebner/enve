@@ -1,4 +1,6 @@
 #include "pointhelpers.h"
+#include "exceptions.h"
+
 #include <QtMath>
 #include <complex>
 #include <QDebug>
@@ -32,6 +34,22 @@ qreal calcCubicBezierVal(qreal p0, qreal p1,
             3*qPow(1 - t, 2)*t*p1 +
             3*(1 - t)*t*t*p2 +
             t*t*t*p3;
+}
+
+qreal gSolveForP2(const qreal& p0, const qreal& p1,
+                  const qreal& p3, const qreal& t,
+                  const qreal& value) {
+    if(isZero4Dec(t*t - t)) RuntimeThrow("Cannot solve with t*t == t.");
+    qreal tm1 = t - 1.;
+    return -(p0*tm1*tm1*tm1 - 3.*p1*t*tm1*tm1 - p3*t*t*t + value)/(3*tm1*t*t);
+}
+
+qreal gSolveForP1(const qreal& p0, const qreal& p2,
+                  const qreal& p3, const qreal& t,
+                  const qreal& value) {
+    if(isZero4Dec(t*t - t)) RuntimeThrow("Cannot solve with t*t == t.");
+    qreal tm1 = t - 1.;
+    return (p0*tm1*tm1*tm1 + 3.*p2*t*t*tm1 - p3*t*t*t + value)/(3*tm1*tm1*t);
 }
 
 // only for beziers that do not have multiple points of the same x value
