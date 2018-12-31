@@ -250,8 +250,13 @@ void FileSourceList::dropEvent(QDropEvent *event) {
                 }
             }
         }
+        event->acceptProposedAction();
     }
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
+}
+
+void FileSourceList::dragMoveEvent(QDragMoveEvent *event) {
+    event->acceptProposedAction();
 }
 
 void FileSourceList::dragEnterEvent(QDragEnterEvent *event) {

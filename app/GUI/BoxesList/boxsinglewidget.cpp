@@ -157,8 +157,9 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
                                     "Luminosity");
     mCompositionModeCombo->insertSeparator(10);
     mCompositionModeCombo->insertSeparator(22);
-    connect(mCompositionModeCombo, SIGNAL(activated(int)),
-            this, SLOT(setCompositionMode(int)));
+    connect(mCompositionModeCombo,
+            qOverload<int>(&QComboBox::activated),
+            this, &BoxSingleWidget::setCompositionMode);
     mCompositionModeCombo->setSizePolicy(QSizePolicy::Maximum,
                     mCompositionModeCombo->sizePolicy().horizontalPolicy());
     mPropertyComboBox->setSizePolicy(QSizePolicy::Maximum,
@@ -384,20 +385,22 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
             disconnect(mLastComboBoxProperty.data(), nullptr,
                        mPropertyComboBox, nullptr);
         }
-        ComboBoxProperty *comboBoxProperty =
-                GetAsPtr(target, ComboBoxProperty);
+        auto comboBoxProperty = GetAsPtr(target, ComboBoxProperty);
         mLastComboBoxProperty = comboBoxProperty;
         mPropertyComboBox->clear();
         mPropertyComboBox->addItems(comboBoxProperty->getValueNames());
         mPropertyComboBox->setCurrentIndex(
                     comboBoxProperty->getCurrentValue());
         mPropertyComboBox->show();
-        connect(mPropertyComboBox, SIGNAL(activated(int)),
-                comboBoxProperty, SLOT(setCurrentValue(int)));
-        connect(comboBoxProperty, SIGNAL(valueChanged(int)),
-                mPropertyComboBox, SLOT(setCurrentIndex(int)));
-        connect(mPropertyComboBox, SIGNAL(activated(int)),
-                MainWindow::getInstance(), SLOT(callUpdateSchedulers()));
+        connect(mPropertyComboBox,
+                qOverload<int>(&QComboBox::activated),
+                comboBoxProperty, &ComboBoxProperty::setCurrentValue);
+        connect(comboBoxProperty, &ComboBoxProperty::valueChanged,
+                mPropertyComboBox, &QComboBox::setCurrentIndex);
+        connect(mPropertyComboBox,
+                qOverload<int>(&QComboBox::activated),
+                MainWindow::getInstance(),
+                &MainWindow::queScheduledTasksAndUpdate);
         clearAndHideValueAnimators();
     } else if(target->SWT_isQrealAnimator()) {
         mRecordButton->show();

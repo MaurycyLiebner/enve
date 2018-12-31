@@ -115,6 +115,7 @@ public:
 protected:
     void dropEvent(QDropEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
 private:
     FileSourceListScrollWidget *mScrollWidget;
 };

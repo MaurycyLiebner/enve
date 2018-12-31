@@ -11,6 +11,8 @@ class Key;
 class QPainter;
 class PropertyUpdater;
 class UndoRedoStack;
+
+//! @brief Use only as base class for PropertyMimeData.
 class InternalMimeData : public QMimeData {
 public:
     enum Type : short {
@@ -21,13 +23,13 @@ public:
 
     InternalMimeData(const Type& type) : mType(type) {}
 
+    bool hasType(const Type& type) const {
+        return type == mType;
+    }
+protected:
     bool hasFormat(const QString &mimetype) const {
         if(mimetype == "av_internal_format") return true;
         return false;
-    }
-
-    bool hasType(const Type& type) const {
-        return type == mType;
     }
 private:
     const Type mType;
@@ -41,6 +43,12 @@ public:
 
     T *getTarget() const {
         return mTarget;
+    }
+
+    static bool hasFormat(const QMimeData * const data) {
+        if(!data->hasFormat("av_internal_format")) return false;
+        auto internalData = static_cast<const InternalMimeData*>(data);
+        return internalData->hasType(type);
     }
 private:
     const QPointer<T> mTarget;
@@ -205,15 +213,15 @@ public:
 
     template <class T = Property>
     T *getFirstAncestor(bool (Property::*tester)() const) {
-        if(mParent == nullptr) return nullptr;
-        if((mParent->*tester)()) mParent.data();
+        if(!mParent) return nullptr;
+        if((mParent->*tester)()) return static_cast<T*>(mParent.data());
         return static_cast<T*>(mParent->getFirstAncestor(tester));
     }
 
     template <class T = Property>
     T *getFirstAncestor(bool (*tester)(const Property*)) {
-        if(mParent == nullptr) return nullptr;
-        if(tester(mParent)) mParent.data();
+        if(!mParent) return nullptr;
+        if(tester(mParent)) return static_cast<T*>(mParent.data());
         return static_cast<T*>(mParent->getFirstAncestor(tester));
     }
 protected:

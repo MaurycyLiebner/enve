@@ -1238,6 +1238,7 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
             importFile(urlList.at(i).toLocalFile(),
                        mCurrentCanvas->mapCanvasAbsToRel(event->posF()));
         }
+        event->acceptProposedAction();
     }
 }
 
@@ -1245,6 +1246,10 @@ void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
     }
+}
+
+void CanvasWindow::dragMoveEvent(QDragMoveEvent *event) {
+    event->acceptProposedAction();
 }
 
 void CanvasWindow::importFile(const QString &path,

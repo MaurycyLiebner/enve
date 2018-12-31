@@ -1034,8 +1034,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             mCanvasWindow->dropEvent(static_cast<QDropEvent*>(e));
         } else if(e->type() == QEvent::DragEnter) {
             mCanvasWindow->dragEnterEvent(static_cast<QDragEnterEvent*>(e));
+        } else if(e->type() == QEvent::DragMove) {
+            mCanvasWindow->dragMoveEvent(static_cast<QDragMoveEvent*>(e));
         } else if(e->type() == QEvent::FocusIn) {
-            mCanvasWindow->getCanvasWidget();
+            //mCanvasWindow->getCanvasWidget();
         }
     }
     return QMainWindow::eventFilter(obj, e);

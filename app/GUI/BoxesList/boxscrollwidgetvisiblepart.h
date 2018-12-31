@@ -49,8 +49,9 @@ public:
     }
 protected:
     void dropEvent(QDropEvent *event);
-    void dragLeaveEvent(QDragLeaveEvent *);
+    void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
 
     bool mDragging = false;
 
@@ -61,7 +62,6 @@ protected:
     QTimer *mScrollTimer = nullptr;
     KeysView *mKeysView = nullptr;
 
-    void dragEnterEvent(QDragEnterEvent *event);
 signals:
 
 public slots:

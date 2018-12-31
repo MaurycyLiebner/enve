@@ -211,11 +211,10 @@ void BoxScrollWidgetVisiblePart::stopScrolling() {
 }
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
-void BoxScrollWidgetVisiblePart::dropEvent(
-        QDropEvent *event) {
+void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
     stopScrolling();
     mDragging = false;
-    if(event->mimeData()->hasFormat("boundingbox")) {
+    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
         int yPos = event->pos().y();
         bool below;
 
@@ -252,7 +251,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                         box,
                         boxUnderMouse);
         }
-    } else if(event->mimeData()->hasFormat("pixmapeffect")) {
+    } else if(PixmapEffectMimeData::hasFormat(event->mimeData())) {
         int yPos = event->pos().y();
         bool below;
 
@@ -290,7 +289,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
             }
             underMouseAnimator->getParentBox()->clearAllCache();
         }
-    } else if(event->mimeData()->hasFormat("patheffect")) {
+    } else if(PathEffectMimeData::hasFormat(event->mimeData())) {
         int yPos = event->pos().y();
         bool below;
 
@@ -305,8 +304,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
         if(singleWidgetUnderMouse == nullptr) return;
 
         auto pathEffectMimeData =
-                static_cast<const PathEffectMimeData*>(
-                    event->mimeData());
+                static_cast<const PathEffectMimeData*>(event->mimeData());
         qsptr<PathEffect> effect =
                 GetAsSPtr(pathEffectMimeData->getTarget(), PathEffect);
         auto targetUnderMouse = singleWidgetUnderMouse->
@@ -355,19 +353,16 @@ void BoxScrollWidgetVisiblePart::dropEvent(
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
-void BoxScrollWidgetVisiblePart::dragEnterEvent(
-        QDragEnterEvent *event)
-{
+void BoxScrollWidgetVisiblePart::dragEnterEvent(QDragEnterEvent *event) {
     //mDragging = true;
-    if(event->mimeData()->hasFormat("boundingbox") ||
-       event->mimeData()->hasFormat("pixmapeffect") ||
-       event->mimeData()->hasFormat("patheffect")) {
+    if(BoundingBoxMimeData::hasFormat(event->mimeData()) ||
+       PixmapEffectMimeData::hasFormat(event->mimeData()) ||
+       PathEffectMimeData::hasFormat(event->mimeData())) {
         event->acceptProposedAction();
     }
 }
 
-void BoxScrollWidgetVisiblePart::dragLeaveEvent(
-        QDragLeaveEvent *) {
+void BoxScrollWidgetVisiblePart::dragLeaveEvent(QDragLeaveEvent *event) {
     mDragging = false;
     stopScrolling();
 //    if(mScrollTimer->isActive()) {
@@ -380,11 +375,12 @@ void BoxScrollWidgetVisiblePart::dragLeaveEvent(
 //        }
 //    }
     update();
+    event->accept();
 }
 
 #include <QDebug>
-void BoxScrollWidgetVisiblePart::dragMoveEvent(
-        QDragMoveEvent *event) {    
+void BoxScrollWidgetVisiblePart::dragMoveEvent(QDragMoveEvent *event) {
+    event->acceptProposedAction();
     int yPos = event->pos().y();
 
     if(yPos < 30) {
@@ -404,16 +400,16 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(
         mScrollTimer->stop();
     }
     mLastDragMoveY = yPos;
-    if(event->mimeData()->hasFormat("boundingbox")) {
+    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
         mLastDragMoveTargetTypes.targetsFunctionList =
                 QList<SWT_Checker>(
                         {&SingleWidgetTarget::SWT_isBoundingBox,
                          &SingleWidgetTarget::SWT_isBoxesGroup});
-    } else if(event->mimeData()->hasFormat("pixmapeffect")) {
+    } else if(PixmapEffectMimeData::hasFormat(event->mimeData())) {
         mLastDragMoveTargetTypes.targetsFunctionList =
                 QList<SWT_Checker>(
                         {&SingleWidgetTarget::SWT_isPixmapEffect});
-    } else if(event->mimeData()->hasFormat("patheffect")) {
+    } else if(PathEffectMimeData::hasFormat(event->mimeData())) {
         mLastDragMoveTargetTypes.targetsFunctionList =
                 QList<SWT_Checker>(
                         {&SingleWidgetTarget::SWT_isPathEffect});

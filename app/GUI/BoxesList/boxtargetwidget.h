@@ -22,8 +22,9 @@ protected:
     void dropEvent(QDropEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void paintEvent(QPaintEvent *);
-    void dragLeaveEvent(QDragLeaveEvent *);
+    void dragLeaveEvent(QDragLeaveEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
 };
 
 #endif // BOXTARGETWIDGET_H

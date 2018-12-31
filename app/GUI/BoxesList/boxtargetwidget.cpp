@@ -16,9 +16,8 @@ void BoxTargetWidget::setTargetProperty(BoxTargetProperty *property) {
     update();
 }
 
-void BoxTargetWidget::dropEvent(
-        QDropEvent *event) {
-    if(event->mimeData()->hasFormat("boundingbox")) {
+void BoxTargetWidget::dropEvent(QDropEvent *event) {
+    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
         auto boxMimeData = static_cast<
                 const BoundingBoxMimeData*>(event->mimeData());
         BoundingBox *targetT = boxMimeData->getTarget();
@@ -29,15 +28,15 @@ void BoxTargetWidget::dropEvent(
     }
 }
 
-void BoxTargetWidget::dragEnterEvent(
-        QDragEnterEvent *event) {
-    if(event->mimeData()->hasFormat("boundingbox")) {
+void BoxTargetWidget::dragEnterEvent(QDragEnterEvent *event) {
+    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
         auto boxMimeData = static_cast<
                 const BoundingBoxMimeData*>(event->mimeData());
         BoundingBox *targetT = boxMimeData->getTarget();
         auto tester = &Property::SWT_isBoundingBox;
-        BoundingBox *parentBox =
-                mProperty->getFirstAncestor<BoundingBox>(tester);
+        BoundingBox *parentBox = mProperty->getFirstAncestor<BoundingBox>(tester);
+        Q_ASSERT(parentBox);
+        Q_ASSERT(targetT);
         if(parentBox == targetT) return;
         if(parentBox->getParentGroup() != targetT->getParentGroup()) return;
         event->acceptProposedAction();
@@ -46,10 +45,14 @@ void BoxTargetWidget::dragEnterEvent(
     }
 }
 
-void BoxTargetWidget::dragLeaveEvent(
-        QDragLeaveEvent *) {
+void BoxTargetWidget::dragMoveEvent(QDragMoveEvent *event) {
+    event->acceptProposedAction();
+}
+
+void BoxTargetWidget::dragLeaveEvent(QDragLeaveEvent *event) {
     mDragging = false;
     update();
+    event->accept();
 }
 
 void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
