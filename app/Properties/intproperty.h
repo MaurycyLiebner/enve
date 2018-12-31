@@ -11,13 +11,13 @@ public:
 
     void setCurrentValue(const int &value);
 
-    bool SWT_isIntProperty();
+    bool SWT_isIntProperty() const;
 
     int getValue();
 
     int getMaxValue();
     int getMinValue();
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
     void prp_startTransform();
     void prp_finishTransform();

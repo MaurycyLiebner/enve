@@ -56,7 +56,7 @@ public:
 
     void setFilePath(const QString &path);
 
-    bool SWT_isImageBox() { return true; }
+    bool SWT_isImageBox() const { return true; }
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction,
                                     QWidget* widgetsParent);

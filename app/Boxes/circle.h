@@ -67,7 +67,7 @@ public:
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 
-    bool SWT_isCircle();
+    bool SWT_isCircle() const;
 
     void startAllPointsTransform();
     SkPath getPathAtRelFrame(const int &relFrame);

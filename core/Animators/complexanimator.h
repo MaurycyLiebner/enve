@@ -50,7 +50,7 @@ public:
                              const bool &parentSatisfies,
                              const bool &parentMainTarget);
 
-    bool SWT_isComplexAnimator();
+    bool SWT_isComplexAnimator() const;
 
     void anim_drawKey(QPainter *p,
                       Key* key,
@@ -66,13 +66,13 @@ public:
     int getChildPropertyIndex(Property *child);
 
     void ca_updateDescendatKeyFrame(Key* key);
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     void anim_saveCurrentValueAsKey();
     virtual void ca_removeAllChildAnimators();
     Property *ca_getFirstDescendantWithName(const QString &name);
 
     template <class T = Property>
-    T *getPropertyIfIsTheOnlyOne(bool (Property::*tester)()) {
+    T *getPropertyIfIsTheOnlyOne(bool (Property::*tester)() const) {
         if(ca_mChildAnimators.count() == 1) {
             Property* prop = ca_mChildAnimators.first().get();
             if((prop->*tester)()) {

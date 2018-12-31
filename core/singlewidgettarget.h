@@ -18,7 +18,7 @@ enum SWT_Rule : short {
     SWT_NotAnimated
 };
 
-typedef bool (SingleWidgetTarget::*SWT_Checker)();
+typedef bool (SingleWidgetTarget::*SWT_Checker)() const;
 
 struct SWT_RulesCollection {
     SWT_RulesCollection();
@@ -110,7 +110,7 @@ public:
         return nullptr;
     }
 
-    bool SWT_isVisible() {
+    bool SWT_isVisible() const {
         return SWT_mVisible;
     }
 
@@ -144,7 +144,7 @@ public:
         SWT_setDisabled(false);
     }
 
-    bool SWT_isDisabled() {
+    bool SWT_isDisabled() const {
         return SWT_mDisabled || SWT_mAncestorDisabled;
     }
 
@@ -156,63 +156,61 @@ public:
     void SWT_afterContentVisibilityChanged();
 
     // Animators
-    virtual bool SWT_isAnimator() { return false; }
-    virtual bool SWT_isGraphAnimator() { return false; }
-    virtual bool SWT_isBoolAnimator() { return false; }
-    virtual bool SWT_isColorAnimator() { return false; }
-    virtual bool SWT_isComplexAnimator() { return false; }
-    virtual bool SWT_isFakeComplexAnimator() { return false; }
-    virtual bool SWT_isPixmapEffectAnimators() { return false; }
-    virtual bool SWT_isPathEffectAnimators() { return false; }
-    virtual bool SWT_isPixmapEffect() { return false; }
-    virtual bool SWT_isPathEffect() { return false; }
-    virtual bool SWT_isIntAnimator() { return false; }
-    virtual bool SWT_isGradient() { return false; }
-    virtual bool SWT_isPaintSettings() { return false; }
-    virtual bool SWT_isStrokeSettings() { return false; }
-    virtual bool SWT_isPathAnimator() { return false; }
-    virtual bool SWT_isQPointFAnimator() { return false; }
-    virtual bool SWT_isQrealAnimator() { return false; }
-    virtual bool SWT_isQStringAnimator() { return false; }
-    virtual bool SWT_isBasicTransformAnimator() { return false; }
-    virtual bool SWT_isBoxTransformAnimator() { return false; }
-    virtual bool SWT_isVectorPathAnimator() { return false; }
-    virtual bool SWT_isAnimatedSurface() { return false; }
+    virtual bool SWT_isAnimator() const { return false; }
+    virtual bool SWT_isGraphAnimator() const { return false; }
+    virtual bool SWT_isBoolAnimator() const { return false; }
+    virtual bool SWT_isColorAnimator() const { return false; }
+    virtual bool SWT_isComplexAnimator() const { return false; }
+    virtual bool SWT_isFakeComplexAnimator() const { return false; }
+    virtual bool SWT_isPixmapEffectAnimators() const { return false; }
+    virtual bool SWT_isPathEffectAnimators() const { return false; }
+    virtual bool SWT_isPixmapEffect() const { return false; }
+    virtual bool SWT_isPathEffect() const { return false; }
+    virtual bool SWT_isIntAnimator() const { return false; }
+    virtual bool SWT_isGradient() const { return false; }
+    virtual bool SWT_isPaintSettings() const { return false; }
+    virtual bool SWT_isStrokeSettings() const { return false; }
+    virtual bool SWT_isPathAnimator() const { return false; }
+    virtual bool SWT_isQPointFAnimator() const { return false; }
+    virtual bool SWT_isQrealAnimator() const { return false; }
+    virtual bool SWT_isQStringAnimator() const { return false; }
+    virtual bool SWT_isBasicTransformAnimator() const { return false; }
+    virtual bool SWT_isBoxTransformAnimator() const { return false; }
+    virtual bool SWT_isVectorPathAnimator() const { return false; }
+    virtual bool SWT_isAnimatedSurface() const { return false; }
     // Boxes
-    virtual bool SWT_isCanvas() { return false; }
-    virtual bool SWT_isAnimationBox() { return false; }
-    virtual bool SWT_isBoundingBox() { return false; }
-    virtual bool SWT_isBonesBox() { return false; }
-    virtual bool SWT_isBone() { return false; }
-    virtual bool SWT_isBoxesGroup() { return false; }
-    virtual bool SWT_isCircle() { return false; }
-    virtual bool SWT_isImageBox() { return false; }
-    virtual bool SWT_isImageSequenceBox() { return false; }
-    virtual bool SWT_isLinkBox() { return false; }
-    virtual bool SWT_isParticleBox() { return false; }
-    virtual bool SWT_isPathBox() { return false; }
-    virtual bool SWT_isRectangle() { return false; }
-    virtual bool SWT_isTextBox() { return false; }
-    virtual bool SWT_isVectorPath() { return false; }
-    virtual bool SWT_isVideoBox() { return false; }
-    virtual bool SWT_isPaintBox() { return false; }
+    virtual bool SWT_isCanvas() const { return false; }
+    virtual bool SWT_isAnimationBox() const { return false; }
+    virtual bool SWT_isBoundingBox() const { return false; }
+    virtual bool SWT_isBonesBox() const { return false; }
+    virtual bool SWT_isBone() const { return false; }
+    virtual bool SWT_isBoxesGroup() const { return false; }
+    virtual bool SWT_isCircle() const { return false; }
+    virtual bool SWT_isImageBox() const { return false; }
+    virtual bool SWT_isImageSequenceBox() const { return false; }
+    virtual bool SWT_isLinkBox() const { return false; }
+    virtual bool SWT_isParticleBox() const { return false; }
+    virtual bool SWT_isPathBox() const { return false; }
+    virtual bool SWT_isRectangle() const { return false; }
+    virtual bool SWT_isTextBox() const { return false; }
+    virtual bool SWT_isVectorPath() const { return false; }
+    virtual bool SWT_isVideoBox() const { return false; }
+    virtual bool SWT_isPaintBox() const { return false; }
     // Properties
-    virtual bool SWT_isBoolProperty() { return false; }
-    virtual bool SWT_isBoolPropertyContainer() { return false; }
-    virtual bool SWT_isComboBoxProperty() { return false; }
-    virtual bool SWT_isBoxTargetProperty() { return false; }
-    virtual bool SWT_isProperty() { return false; }
-    virtual bool SWT_isIntProperty() { return false; }
+    virtual bool SWT_isBoolProperty() const { return false; }
+    virtual bool SWT_isBoolPropertyContainer() const { return false; }
+    virtual bool SWT_isComboBoxProperty() const { return false; }
+    virtual bool SWT_isBoxTargetProperty() const { return false; }
+    virtual bool SWT_isProperty() const { return false; }
+    virtual bool SWT_isIntProperty() const { return false; }
     // Sound
-    virtual bool SWT_isSingleSound() { return false; }
+    virtual bool SWT_isSingleSound() const { return false; }
 protected:
     bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
     QList<stdsptr<SingleWidgetAbstraction>> mSWT_allAbstractions;
 };
-
-typedef bool (SingleWidgetTarget::*SWT_Checker)();
 
 struct SWT_TargetTypes {
     bool isTargeted(SingleWidgetTarget *target) const {

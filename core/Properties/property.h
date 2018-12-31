@@ -151,14 +151,14 @@ public:
                                          ComplexAnimator* parentAnimator = nullptr);
     void prp_setBlockedUpdater(const stdsptr<PropertyUpdater> &updater);
 
-    bool SWT_isProperty() { return true; }
+    bool SWT_isProperty() const { return true; }
 
-    virtual bool prp_differencesBetweenRelFrames(const int &,
-                                                 const int &) {
-        return false;
+    bool prp_differencesBetweenRelFrames(const int &frame1,
+                                         const int &frame2) {
+        return !prp_getIdenticalRelFrameRange(frame1).contains(frame2);
     }
 
-    virtual FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) {
         Q_UNUSED(relFrame);
         return {INT_MIN, INT_MAX};
     }
@@ -181,11 +181,11 @@ public:
         Q_UNUSED(device);
     }
 
-    virtual void writeProperty(QIODevice *device) {
+    virtual void writeProperty(QIODevice * const device) const {
         Q_UNUSED(device);
     }
 
-    PropertyUpdater *prp_getUpdater() {
+    PropertyUpdater *prp_getUpdater() const {
         return prp_mUpdater.get();
     }
 
@@ -195,25 +195,23 @@ public:
 
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
-    Property *getParent() {
-        if(mParent == nullptr) return nullptr;
+    Property *getParent() const {
         return mParent;
     }
 
-    void setParent(Property *parent) {
+    void setParent(Property * const parent) {
         mParent = parent;
     }
 
-
     template <class T = Property>
-    T *getFirstAncestor(bool (Property::*tester)()) {
+    T *getFirstAncestor(bool (Property::*tester)() const) {
         if(mParent == nullptr) return nullptr;
         if((mParent->*tester)()) mParent.data();
         return static_cast<T*>(mParent->getFirstAncestor(tester));
     }
 
     template <class T = Property>
-    T *getFirstAncestor(bool (*tester)(Property*)) {
+    T *getFirstAncestor(bool (*tester)(const Property*)) {
         if(mParent == nullptr) return nullptr;
         if(tester(mParent)) mParent.data();
         return static_cast<T*>(mParent->getFirstAncestor(tester));

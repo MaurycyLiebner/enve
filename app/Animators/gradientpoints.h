@@ -29,7 +29,7 @@ public:
     QPointF getEndPointAtRelFrame(const int &relFrame);
     QPointF getStartPointAtRelFrameF(const qreal &relFrame);
     QPointF getEndPointAtRelFrameF(const qreal &relFrame);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     bool enabled() const {

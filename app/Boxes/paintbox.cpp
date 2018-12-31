@@ -313,20 +313,6 @@ stdsptr<BoundingBoxRenderData> PaintBox::createRenderData() {
     return SPtrCreate(PaintBoxRenderData)(this);
 }
 
-bool PaintBox::prp_differencesBetweenRelFrames(const int &relFrame1,
-                                               const int &relFrame2) {
-    if(ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1, relFrame2)) {
-        return true;
-    }
-    if(mMainHandler != nullptr) {
-        if(mMainHandler->prp_differencesBetweenRelFrames(relFrame1,
-                                                         relFrame2)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 void PaintBox::tabletMoveEvent(const qreal &xT,
                            const qreal &yT,
                            const ulong &time_stamp,

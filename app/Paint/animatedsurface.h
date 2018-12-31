@@ -60,15 +60,13 @@ public:
     void anim_moveKeyToRelFrame(Key *key,
                                 const int &newFrame);
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
     void currentDataModified();
-    bool SWT_isAnimatedSurface() { return true; }
+    bool SWT_isAnimatedSurface() const { return true; }
     void anim_saveCurrentValueAsKey();
     void newEmptyPaintFrame();
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     void anim_updateAfterChangedKey(Key * const key);
     void newEmptyPaintFrame(const int &relFrame);
     void setOverlapFrames(const int &overlapFrames) {

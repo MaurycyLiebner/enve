@@ -12,7 +12,7 @@ public:
             GraphKey *key, const QrealPointType& type,
             qreal &minMoveValue, qreal &maxMoveValue) const = 0;
 
-    bool SWT_isGraphAnimator() { return true; }
+    bool SWT_isGraphAnimator() const { return true; }
     virtual void anim_getMinAndMaxValues(
             qreal &minValP, qreal &maxValP) const;
     virtual void anim_getMinAndMaxValuesBetweenFrames(

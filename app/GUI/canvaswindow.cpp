@@ -929,7 +929,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler().
             getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
-    auto range = mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(newCurrentRenderFrame);
+    auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(newCurrentRenderFrame);
     if(mCurrentRenderFrame >= range.min) {
         newCurrentRenderFrame = range.max + 1;
     } else {
@@ -1094,7 +1094,7 @@ void CanvasWindow::nextSaveOutputFrame() {
         VideoEncoder::finishEncodingStatic();
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
-        auto range = mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(mCurrentRenderFrame);
+        auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(mCurrentRenderFrame);
         if(range.max > mMaxRenderFrame) range.max = mMaxRenderFrame;
         mCurrentRenderFrame = range.max + 1;
         //mCurrentRenderFrame++;

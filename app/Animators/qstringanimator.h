@@ -29,12 +29,12 @@ public:
     void setCurrentTextValue(const QString &text);
     QString getCurrentTextValue();
 
-    bool SWT_isQStringAnimator() { return true; }
+    bool SWT_isQStringAnimator() const { return true; }
     QString getTextValueAtRelFrame(const int &relFrame);
     void anim_saveCurrentValueAsKey();
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 protected:
     QStringAnimator(const QString& name);

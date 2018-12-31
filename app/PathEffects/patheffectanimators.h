@@ -12,7 +12,7 @@ public:
     void addEffect(const qsptr<PathEffect> &effect);
     bool hasEffects();
 
-    bool SWT_isPathEffectAnimators();
+    bool SWT_isPathEffectAnimators() const;
 
     void filterPathForRelFrame(const int &relFrame,
                                SkPath *srcDstPath,
@@ -34,7 +34,7 @@ public:
 
 
     void readProperty(QIODevice *target);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void removeEffect(const qsptr<PathEffect>& effect);
     BoundingBox *getParentBox();
     const bool &isOutline() const;

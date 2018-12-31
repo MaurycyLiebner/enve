@@ -42,8 +42,8 @@ public:
 
     void setPrefferedValueStep(const qreal &valueStep);
 
-    bool SWT_isQPointFAnimator() { return true; }
-    void writeProperty(QIODevice *target);
+    bool SWT_isQPointFAnimator() const { return true; }
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     bool getBeingTransformed();

@@ -30,7 +30,7 @@ public:
         scheduleUpdate(Animator::USER_CHANGE);
     }
 
-    bool SWT_isTextBox() { return true; }
+    bool SWT_isTextBox() const { return true; }
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction,
                                     QWidget* widgetsParent);

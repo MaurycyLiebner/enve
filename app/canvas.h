@@ -480,7 +480,7 @@ public:
     }
     void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
 
-    bool SWT_isCanvas() { return true; }
+    bool SWT_isCanvas() const { return true; }
     bool handleSelectedCanvasAction(QAction *selectedAction, QWidget* widgetsParent);
     void addCanvasActionToMenu(QMenu *menu);
     void deleteAction();
@@ -498,7 +498,7 @@ public:
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     void setPickingFromPath(const bool &pickFill,
                             const bool &pickStroke) {
         mPickFillFromPath = pickFill;

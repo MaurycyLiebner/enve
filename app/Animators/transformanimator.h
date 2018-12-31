@@ -75,14 +75,14 @@ public:
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
 
-    bool SWT_isBasicTransformAnimator();
+    bool SWT_isBasicTransformAnimator() const;
 
     virtual QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
     QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
     virtual QMatrix getCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
     QMatrix getParentCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     QPointFAnimator *getPosAnimator();
@@ -150,13 +150,13 @@ public:
     void finishPivotTransform();
     QPointF getPivotAbs();
 
-    bool SWT_isBoxTransformAnimator() { return true; }
+    bool SWT_isBoxTransformAnimator() const { return true; }
 
     qreal getOpacityAtRelFrame(const int &relFrame);
     qreal getOpacityAtRelFrameF(const qreal &relFrame);
 
     bool rotOrScaleOrPivotRecording();
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     QPointFAnimator *getPivotAnimator() {

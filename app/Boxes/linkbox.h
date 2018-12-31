@@ -86,10 +86,9 @@ public:
     }
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2);
-    bool SWT_isLinkBox() { return true; }
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+
+    bool SWT_isLinkBox() const { return true; }
 
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         if(mParentGroup == nullptr ? false : mParentGroup->SWT_isLinkBox()) {
@@ -161,7 +160,7 @@ public:
 
     qsptr<BoundingBox> createLinkForLinkGroup();
 
-    bool SWT_isLinkBox() { return true; }
+    bool SWT_isLinkBox() const { return true; }
 
     qsptr<BoundingBox> createNewDuplicate() {
         return SPtrCreate(InternalLinkGroupBox)(getLinkTarget());
@@ -175,11 +174,9 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
 
-    bool SWT_isBoxesGroup() { return false; }
+    bool SWT_isBoxesGroup() const { return false; }
 
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         if(getLinkTarget()->SWT_isLinkBox()) {

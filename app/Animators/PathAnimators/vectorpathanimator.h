@@ -127,9 +127,9 @@ public:
     void startPathChange();
     void cancelPathChange();
     void readProperty(QIODevice *target);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
 
-    bool SWT_isVectorPathAnimator();
+    bool SWT_isVectorPathAnimator() const;
     void anim_moveKeyToRelFrame(Key *key,
                                 const int &newFrame);
     void anim_appendKey(const stdsptr<Key> &newKey);

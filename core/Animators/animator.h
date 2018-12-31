@@ -98,12 +98,10 @@ public:
     int anim_getPrevKeyRelFrame(const Key * const key);
     void anim_setRecordingValue(const bool &rec);
 
-    bool SWT_isAnimator();
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2);
+    bool SWT_isAnimator() const;
     int anim_getCurrentAbsFrame();
     int anim_getCurrentRelFrame();
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     Key* anim_getPrevKey(const int &relFrame);
     Key* anim_getNextKey(const int &relFrame);
     void anim_shiftAllKeys(const int &shift);

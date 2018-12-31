@@ -190,7 +190,7 @@ public:
             const qreal &relFrame,
             const stdsptr<ParticleBoxRenderData>& particleData);
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 private:
     bool mGenerateParticlesScheduled = false;
@@ -281,7 +281,7 @@ public:
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
 
-    bool SWT_isParticleBox();
+    bool SWT_isParticleBox() const;
 
     stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(ParticleBoxRenderData)(this);
@@ -303,7 +303,7 @@ public:
 
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 public slots:

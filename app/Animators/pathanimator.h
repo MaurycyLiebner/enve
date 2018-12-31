@@ -49,11 +49,11 @@ public:
     void addSinglePathAnimator(const qsptr<VectorPathAnimator> &path);
     void removeSinglePathAnimator(const qsptr<VectorPathAnimator> &path);
     void selectAllPoints(Canvas *canvas);
-    bool SWT_isPathAnimator();
+    bool SWT_isPathAnimator() const;
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
     void readProperty(QIODevice *target);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void shiftAllPoints(const int &by);
     void revertAllPoints();
     void shiftAllPointsForAllKeys(const int &by);

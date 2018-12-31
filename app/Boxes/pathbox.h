@@ -112,7 +112,7 @@ public:
     void drawBoundingRectSk(SkCanvas *canvas,
                             const SkScalar &invScale);
 
-    bool SWT_isPathBox() { return true; }
+    bool SWT_isPathBox() const { return true; }
 
     void setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,

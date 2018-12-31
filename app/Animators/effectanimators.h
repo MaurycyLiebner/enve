@@ -26,7 +26,7 @@ public:
 
     bool hasEffects();
 
-    bool SWT_isPixmapEffectAnimators() { return true; }
+    bool SWT_isPixmapEffectAnimators() const { return true; }
     qreal getEffectsMarginAtRelFrame(const int &relFrame) const;
     qreal getEffectsMarginAtRelFrameF(const qreal &relFrame) const;
 
@@ -35,7 +35,7 @@ public:
 
     void ca_removeAllChildAnimators();
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
     void readPixmapEffect(QIODevice *target);
 protected:

@@ -20,7 +20,7 @@ bool BonesBox::relPointInsidePath(const QPointF &relPos) {
     return false;
 }
 
-bool BonesBox::SWT_isBonesBox() { return true; }
+bool BonesBox::SWT_isBonesBox() const { return true; }
 
 void BonesBox::selectAndAddContainedPointsToList(
         const QRectF &absRect, QList<stdptr<MovablePoint>> &list) {

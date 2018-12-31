@@ -20,7 +20,7 @@ public:
     void solidify(const qreal &widthT,
                   const SkPath &src,
                   SkPath *dst);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 private:
     qsptr<QrealAnimator> mDisplacement;

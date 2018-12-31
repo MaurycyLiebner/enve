@@ -173,7 +173,7 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos);
 
-    bool SWT_isBonesBox();
+    bool SWT_isBonesBox() const;
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<stdptr<MovablePoint>>& list);

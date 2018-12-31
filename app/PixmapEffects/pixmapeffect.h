@@ -70,9 +70,9 @@ public:
     virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data) = 0;
 
-    bool SWT_isPixmapEffect();
+    bool SWT_isPixmapEffect() const;
 
-    virtual void writeProperty(QIODevice *target);
+    virtual void writeProperty(QIODevice * const target) const;
     void switchVisible();
 
     void setVisible(const bool &visible);

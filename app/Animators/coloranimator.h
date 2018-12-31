@@ -53,9 +53,9 @@ public:
         return mAlphaAnimator.get();
     }
 
-    bool SWT_isColorAnimator() { return true; }
+    bool SWT_isColorAnimator() const { return true; }
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 protected:
     ColorAnimator(const QString& name = "color");

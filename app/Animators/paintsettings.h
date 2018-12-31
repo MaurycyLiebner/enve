@@ -115,7 +115,7 @@ public:
 
     void setGradientVar(Gradient *grad);
 
-    bool SWT_isPaintSettings() { return true; }
+    bool SWT_isPaintSettings() const { return true; }
     QColor getColorAtRelFrame(const int &relFrame) const;
     QColor getColorAtRelFrameF(const qreal &relFrame) const;
     const bool &getGradientLinear() { return mGradientLinear; }
@@ -123,7 +123,7 @@ public:
         mGradientLinear = linear;
     }
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 protected:
     PaintSettings(GradientPoints* grdPts, PathBox *parent);
@@ -193,7 +193,7 @@ public:
     void updateQGradientStopsFinal(const UpdateReason &reason);
     bool isEmpty() const;
 
-    bool SWT_isGradient() { return true; }
+    bool SWT_isGradient() const { return true; }
 
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator* parentAnimator = nullptr) {
@@ -213,7 +213,7 @@ public:
     }
     QGradientStops getQGradientStopsAtAbsFrame(const int &absFrame);
     QGradientStops getQGradientStopsAtAbsFrameF(const qreal &absFrame);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
 signals:
@@ -293,12 +293,12 @@ public:
 
     QrealAnimator *getLineWidthAnimator();
 
-    bool SWT_isStrokeSettings() { return true; }
+    bool SWT_isStrokeSettings() const { return true; }
     void setStrokerSettingsForRelFrameSk(const int &relFrame,
                                          SkStroke *stroker);
     void setStrokerSettingsForRelFrameSkF(const qreal &relFrame,
                                           SkStroke *stroker);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 protected:
     StrokeSettings(GradientPoints* grdPts, PathBox *parent);

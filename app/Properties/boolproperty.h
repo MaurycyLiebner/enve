@@ -8,8 +8,8 @@ class BoolProperty : public Property {
 public:
     bool getValue();
 
-    bool SWT_isBoolProperty() { return true; }
-    void writeProperty(QIODevice *target);
+    bool SWT_isBoolProperty() const { return true; }
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 public slots:
     void setValue(const bool &value);
@@ -26,8 +26,8 @@ class BoolPropertyContainer : public ComplexAnimator {
 public:
     bool getValue();
 
-    bool SWT_isBoolPropertyContainer() { return true; }
-    void writeProperty(QIODevice *target);
+    bool SWT_isBoolPropertyContainer() const { return true; }
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 public slots:
     void setValue(const bool &value);

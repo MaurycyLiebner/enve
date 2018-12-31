@@ -47,4 +47,4 @@ void FakeComplexAnimator::prp_getKeysInRect(const QRectF &selectionRect,
                                        keysList, keyRectSize);
 }
 
-bool FakeComplexAnimator::SWT_isFakeComplexAnimator() { return true; }
+bool FakeComplexAnimator::SWT_isFakeComplexAnimator() const { return true; }

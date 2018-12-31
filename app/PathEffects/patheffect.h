@@ -45,7 +45,7 @@ public:
                                        const SkPath &,
                                        SkPath *,
                                        const bool &) = 0;
-    virtual void writeProperty(QIODevice *target);
+    virtual void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     bool applyBeforeThickness();
@@ -55,7 +55,7 @@ public:
 
     QMimeData *SWT_createMimeData();
 
-    bool SWT_isPathEffect();
+    bool SWT_isPathEffect() const;
 
     void setIsOutlineEffect(const bool &bT);
 

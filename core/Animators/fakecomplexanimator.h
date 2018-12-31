@@ -25,7 +25,7 @@ public:
                            QList<Key *>& keysList,
                            const int& keyRectSize);
 
-    bool SWT_isFakeComplexAnimator();
+    bool SWT_isFakeComplexAnimator() const;
 protected:
     FakeComplexAnimator(const QString& name, Property *target);
 private:

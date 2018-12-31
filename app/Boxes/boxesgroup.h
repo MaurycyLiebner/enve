@@ -130,7 +130,7 @@ public:
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
 
-    bool SWT_isBoxesGroup();
+    bool SWT_isBoxesGroup() const;
     void drawSk(SkCanvas *canvas);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
@@ -143,11 +143,9 @@ public:
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);
 
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2);
     bool prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
             const int &relFrame1, const int &relFrame2);
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int &relFrame, const bool &takeAncestorsIntoAccount = true);
     void scheduleWaitingTasks();

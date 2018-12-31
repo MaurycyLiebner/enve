@@ -257,7 +257,7 @@ void BasicTransformAnimator::setParentTransformAnimator(
     updateCombinedTransform(Animator::USER_CHANGE);
 }
 
-bool BasicTransformAnimator::SWT_isBasicTransformAnimator() { return true; }
+bool BasicTransformAnimator::SWT_isBasicTransformAnimator() const { return true; }
 
 void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
                                                        const qreal &sy,

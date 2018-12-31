@@ -7,7 +7,7 @@ public:
     ImageSequenceBox();
     void setListOfFrames(const QStringList &listOfFrames);
 
-    bool SWT_isImageSequenceBox() { return true; }
+    bool SWT_isImageSequenceBox() const { return true; }
 
     void changeSourceFile(QWidget* dialogParent);
     void writeBoundingBox(QIODevice *target);

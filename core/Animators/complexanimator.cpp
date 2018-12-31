@@ -49,10 +49,10 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
-FrameRange ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+FrameRange ComplexAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) {
     FrameRange range{INT_MIN, INT_MAX};
     Q_FOREACH(const qsptr<Property> &child, ca_mChildAnimators) {
-        auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+        auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
         range *= childRange;
         Q_ASSERT(!range.isValid());
         if(range.singleFrame()) return range;
@@ -75,7 +75,7 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     }
 }
 
-bool ComplexAnimator::SWT_isComplexAnimator() { return true; }
+bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
 
 ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(const int &frame) {
     return GetAsPtr(anim_getKeyAtAbsFrame(frame), ComplexKey);

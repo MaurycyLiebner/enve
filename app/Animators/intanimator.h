@@ -9,7 +9,7 @@ public:
     void setCurrentIntValue(const int &value);
     void setIntValueRange(const int &minVal, const int &maxVal);
 
-    bool SWT_isIntAnimator() { return true; }
+    bool SWT_isIntAnimator() const { return true; }
     int getCurrentIntValueAtRelFrame(const int &relFrame) const;
     int getCurrentIntValueAtRelFrameF(const qreal &relFrame) const;
     int getCurrentIntEffectiveValueAtRelFrameF(const qreal &relFrame) const;

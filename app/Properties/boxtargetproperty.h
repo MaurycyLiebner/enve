@@ -25,8 +25,8 @@ public:
     BoundingBox *getTarget() const;
     void setTarget(BoundingBox *box);
 
-    bool SWT_isBoxTargetProperty() { return true; }
-    void writeProperty(QIODevice *target);
+    bool SWT_isBoxTargetProperty() const { return true; }
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 signals:
     void targetSet(BoundingBox*);

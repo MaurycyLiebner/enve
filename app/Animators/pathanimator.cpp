@@ -46,7 +46,7 @@ void PathAnimator::removeSinglePathAnimator(const qsptr<VectorPathAnimator>& pat
     }
 }
 
-bool PathAnimator::SWT_isPathAnimator() { return true; }
+bool PathAnimator::SWT_isPathAnimator() const { return true; }
 
 void PathAnimator::loadPathFromSkPath(const SkPath &path) {
     NodePoint *firstPoint = nullptr;

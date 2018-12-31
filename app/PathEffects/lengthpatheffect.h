@@ -16,7 +16,7 @@ public:
                                 const SkPath &src,
                                 SkPath *dst,
                                 const bool &);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 private:
     qsptr<QrealAnimator> mLength;

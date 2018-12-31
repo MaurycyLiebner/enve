@@ -386,27 +386,10 @@ void BoxesGroup::clearAllCache() {
     }
 }
 
-bool BoxesGroup::prp_differencesBetweenRelFrames(const int &relFrame1,
-                                                 const int &relFrame2) {
-    bool differences =
-            BoundingBox::prp_differencesBetweenRelFrames(relFrame1,
-                                                         relFrame2);
-    if(differences) return true;
-    int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
-    int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
-        if(child->prp_differencesBetweenRelFrames(
-                    child->prp_absFrameToRelFrame(absFrame1),
-                    child->prp_absFrameToRelFrame(absFrame2))) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
         const int &relFrame1, const int &relFrame2) {
-    bool diffThis = BoundingBox::prp_differencesBetweenRelFrames(relFrame1, relFrame2);
+    auto idRange = BoundingBox::prp_getIdenticalRelFrameRange(relFrame1);
+    bool diffThis = !idRange.contains(relFrame2);
     if(mParentGroup == nullptr || diffThis) return diffThis;
     int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
     int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
@@ -419,13 +402,13 @@ bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingConta
     return diffThis || diffInherited;
 }
 
-FrameRange BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
-    auto range = BoundingBox::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+FrameRange BoxesGroup::prp_getIdenticalRelFrameRange(const int &relFrame) {
+    auto range = BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
     int absFrame = prp_relFrameToAbsFrame(relFrame);
     Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
         Q_ASSERT(!range.isValid());
         if(range.singleFrame()) return range;
-        auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(
+        auto childRange = child->prp_getIdenticalRelFrameRange(
                     child->prp_absFrameToRelFrame(absFrame));
         auto childAbsRange = child->prp_relRangeToAbsRange(childRange);
         auto childParentRange = prp_absRangeToRelRange(childAbsRange);
@@ -445,7 +428,7 @@ FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
             Q_FOREACH(const auto& child, propertiesT) {
                 Q_ASSERT(!range.isValid());
                 if(range.singleFrame()) return range;
-                auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+                auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
                 range *= childRange;
             }
 
@@ -723,7 +706,7 @@ bool BoxesGroup::shouldPaintOnImage() {
            !mIsDescendantCurrentGroup;
 }
 
-bool BoxesGroup::SWT_isBoxesGroup() { return true; }
+bool BoxesGroup::SWT_isBoxesGroup() const { return true; }
 
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;

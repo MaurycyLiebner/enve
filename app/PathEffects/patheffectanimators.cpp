@@ -73,7 +73,7 @@ bool PathEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }
 
-bool PathEffectAnimators::SWT_isPathEffectAnimators() {
+bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
     return true;
 }
 

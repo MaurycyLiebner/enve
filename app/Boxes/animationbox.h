@@ -30,7 +30,7 @@ public:
     virtual void reloadSound() {}
     FixedLenAnimationRect *getAnimationDurationRect();
 
-    bool SWT_isAnimationBox() { return true; }
+    bool SWT_isAnimationBox() const { return true; }
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction,
                                     QWidget* widgetsParent);

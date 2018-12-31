@@ -290,20 +290,6 @@ void AnimatedSurface::tabletPressEvent(const qreal &xT, const qreal &yT,
                               pressure, erase, brush);
 }
 
-bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,
-                                                      const int &relFrame2) {
-    if(anim_mKeys.count() > 1) {
-        int firstKeyRelFrame = anim_mKeys.first()->getRelFrame();
-        int lastKeyRelFrame = anim_mKeys.last()->getRelFrame();
-        if(relFrame1 >= lastKeyRelFrame + mOverlapFrames &&
-           relFrame2 >= lastKeyRelFrame + mOverlapFrames) return false;
-        if(relFrame1 <= firstKeyRelFrame - mOverlapFrames &&
-           relFrame2 <= firstKeyRelFrame - mOverlapFrames) return false;
-        return true;
-    }
-    return false;
-}
-
 void AnimatedSurface::anim_updateAfterChangedKey(Key * const key) {
     if(anim_mIsComplexAnimator) return;
     if(!key) {
@@ -324,8 +310,8 @@ void AnimatedSurface::anim_updateAfterChangedKey(Key * const key) {
     prp_updateAfterChangedRelFrameRange({prevKeyRelFrame, nextKeyRelFrame});
 }
 
-FrameRange AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
-    auto range = Animator::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+FrameRange AnimatedSurface::prp_getIdenticalRelFrameRange(const int &relFrame) {
+    auto range = Animator::prp_getIdenticalRelFrameRange(relFrame);
     if(!mIsDraft) return range;
     if(anim_mKeys.count() > 1) {
         if(range.min == INT_MIN) {

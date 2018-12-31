@@ -405,7 +405,7 @@ void Canvas::setOutputRendering(const bool &bT) {
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
                                         const bool &frameEncoded) {
     if(mRenderingOutput && !frameEncoded) {
-        auto range = prp_getFirstAndLastIdenticalRelFrame(cont->getMinRelFrame());
+        auto range = prp_getIdenticalRelFrameRange(cont->getMinRelFrame());
         cont->setMaxRelFrame(range.max);
         VideoEncoder::addCacheContainerToEncoderStatic(cont);
         return;
@@ -468,7 +468,7 @@ int Canvas::getMaxPreviewFrame(const int &minFrame, const int &maxFrame) {
     int frameT = minFrame;
     maxFrameT += mCacheHandler.getNumberNotCachedBeforeRelFrame(minFrame);
     while(range.max < maxFrameT && range.max < maxFrame) {
-        range = prp_getFirstAndLastIdenticalRelFrame(frameT);
+        range = prp_getIdenticalRelFrameRange(frameT);
 //        if(frameT == minFrame) {
 //            mCacheHandler.cacheDataBeforeRelFrame(firstF);
 //        }
@@ -502,8 +502,8 @@ void Canvas::nextPreviewFrame() {
     mCanvasWindow->requestUpdate();
 }
 
-FrameRange Canvas::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
-    FrameRange groupRange = BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+FrameRange Canvas::prp_getIdenticalRelFrameRange(const int &relFrame) {
+    FrameRange groupRange = BoxesGroup::prp_getIdenticalRelFrameRange(relFrame);
     FrameRange canvasRange{0, mMaxFrame};
     return groupRange*canvasRange;
 }
@@ -514,7 +514,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
         scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
     //qDebug() << renderData->fRelFrame;
-    auto range = prp_getFirstAndLastIdenticalRelFrame(renderData->fRelFrame);
+    auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
     auto cont = mCacheHandler.getRenderContainerAtRelFrame(range.min);
     if(!cont) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame(range.min);
@@ -536,7 +536,7 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     mCacheHandler.clearCacheForRelFrameRange(
                 prp_absRangeToRelRange(range));
     Property::prp_updateAfterChangedAbsFrameRange(range);
-    auto rangeT = prp_getFirstAndLastIdenticalRelFrame(anim_mCurrentRelFrame);
+    auto rangeT = prp_getIdenticalRelFrameRange(anim_mCurrentRelFrame);
     if(range.overlaps(rangeT)) scheduleUpdate(Animator::USER_CHANGE);
 }
 

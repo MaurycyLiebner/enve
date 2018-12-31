@@ -47,7 +47,7 @@ public:
     void prp_setAbsFrame(const int &frame);
 
     void finishSizeSetup();
-    bool SWT_isPaintBox() { return true; }
+    bool SWT_isPaintBox() const { return true; }
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
                       GrContext * const grContext);
     void scheduleWaitingTasks();
@@ -102,8 +102,6 @@ public:
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     void newEmptyPaintFrameOnCurrentFrame();
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2);
     void newEmptyPaintFrameAtFrame(const int &relFrame);
 
     void setOverlapFrames(const int &overlapFrames);

@@ -18,7 +18,7 @@ public:
                                 const SkPath &src,
                                 SkPath *dst,
                                 const bool &groupPathSum);
-    void writeProperty(QIODevice *target) {
+    void writeProperty(QIODevice * const target) const {
         Q_UNUSED(target);
     }
     void readProperty(QIODevice *target) {

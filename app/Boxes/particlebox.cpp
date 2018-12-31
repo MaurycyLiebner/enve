@@ -85,11 +85,11 @@ void ParticleBox::removeEmitter(const qsptr<ParticleEmitter>& emitter) {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-FrameRange ParticleBox::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+FrameRange ParticleBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
     if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
         return {relFrame, relFrame};
     }
-    return BoundingBox::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+    return BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
@@ -98,7 +98,7 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     addEmitter(emitter);
 }
 
-bool ParticleBox::SWT_isParticleBox() { return true; }
+bool ParticleBox::SWT_isParticleBox() const { return true; }
 
 QRectF ParticleBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),

@@ -21,14 +21,14 @@ class SampledMotionBlurEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
 
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     void setParentBox(BoundingBox *box) {
         mParentBox = box;
     }
 
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data);

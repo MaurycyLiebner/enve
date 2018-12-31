@@ -98,7 +98,7 @@ void Circle::drawSelectedSk(SkCanvas *canvas,
     }
 }
 
-bool Circle::SWT_isCircle() { return true; }
+bool Circle::SWT_isCircle() const { return true; }
 
 MovablePoint *Circle::getPointAtAbsPos(
         const QPointF &absPtPos,

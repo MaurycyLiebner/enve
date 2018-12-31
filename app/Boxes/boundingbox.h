@@ -249,7 +249,7 @@ public:
     virtual Canvas *getParentCanvas();
     virtual void reloadCacheHandler();
 
-    bool SWT_isBoundingBox();
+    bool SWT_isBoundingBox() const;
 
     SingleWidgetAbstraction* SWT_getAbstractionForWidget(
             const UpdateFuncs &updateFuncs,
@@ -333,8 +333,6 @@ public:
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
     virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
 
-    bool prp_differencesBetweenRelFrames(const int &relFrame1, const int &relFrame2);
-
     bool prp_differencesBetweenRelFramesIncludingInherited(
             const int &relFrame1, const int &relFrame2);
     virtual void renderDataFinished(BoundingBoxRenderData *renderData);
@@ -358,7 +356,7 @@ public:
     virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
     bool isRelFrameFVisibleAndInVisibleDurationRect(const qreal &relFrame);
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int &relFrame, const bool &takeAncestorsIntoAccount = true);
     virtual void scheduleWaitingTasks();

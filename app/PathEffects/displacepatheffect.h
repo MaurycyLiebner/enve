@@ -17,10 +17,10 @@ public:
                                 const SkPath &src,
                                 SkPath *dst,
                                 const bool &);
-    void writeProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) {
         if(mRandomize->getValue()) {
             if(mSmoothTransform->getValue()) {
                 return {relFrame, relFrame};
@@ -30,19 +30,7 @@ public:
                 return {min, min + frameStep};
             }
         }
-        return PathEffect::prp_getFirstAndLastIdenticalRelFrame(relFrame);
-    }
-
-    bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2) {
-        if(mRandomize->getValue()) {
-            int frameStep1 = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame1);
-            int frameStep2 = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame2);
-            return relFrame1 - relFrame1 % frameStep1 ==
-                    relFrame2 - relFrame2 % frameStep2;
-        }
-        return PathEffect::prp_differencesBetweenRelFrames(relFrame1,
-                                                           relFrame2);
+        return PathEffect::prp_getIdenticalRelFrameRange(relFrame);
     }
 private:
     uint32_t mSeedAssist = 0;

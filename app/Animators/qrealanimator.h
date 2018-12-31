@@ -101,8 +101,8 @@ public:
 
     void setGenerator(const qsptr<RandomQrealGenerator> &generator);
 
-    bool SWT_isQrealAnimator() { return true; }
-    void writeProperty(QIODevice *target);
+    bool SWT_isQrealAnimator() const { return true; }
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
     stdsptr<Key> readKey(QIODevice *target);
     bool qra_hasNoise();

@@ -172,7 +172,7 @@ Canvas *BoundingBox::getParentCanvas() {
 
 void BoundingBox::reloadCacheHandler() { clearAllCache(); }
 
-bool BoundingBox::SWT_isBoundingBox() { return true; }
+bool BoundingBox::SWT_isBoundingBox() const { return true; }
 
 void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
     scheduleUpdate(reason);
@@ -258,8 +258,7 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
         }
         mUpdateDrawOnParentBox = isInVisRange;
     }
-    if(prp_differencesBetweenRelFrames(lastRelFrame,
-                                       anim_mCurrentRelFrame)) {
+    if(prp_differencesBetweenRelFrames(lastRelFrame, anim_mCurrentRelFrame)) {
         scheduleUpdate(Animator::FRAME_CHANGE);
     }
 }
@@ -288,15 +287,6 @@ VectorPathEdge *BoundingBox::getEdge(const QPointF &absPos, const qreal &canvasS
     Q_UNUSED(absPos);
     Q_UNUSED(canvasScaleInv);
     return nullptr;
-}
-
-bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
-                                                  const int &relFrame2) {
-    bool differences =
-            ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
-                                                             relFrame2);
-    if(differences || mDurationRectangle == nullptr) return differences;
-    return mDurationRectangle->hasAnimationFrameRange();
 }
 
 bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
@@ -1140,10 +1130,10 @@ bool BoundingBox::isRelFrameFVisibleAndInVisibleDurationRect(
     return isRelFrameFInVisibleDurationRect(relFrame) && mVisible;
 }
 
-FrameRange BoundingBox::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+FrameRange BoundingBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            return ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+            return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
         }
         if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
             return {mDurationRectangle->getMaxFrameAsRelFrame() + 1, INT_MAX};
@@ -1165,7 +1155,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
             Q_FOREACH(const auto& child, propertiesT) {
                 Q_ASSERT(!range.isValid());
                 if(range.singleFrame()) break;
-                auto childRange = child->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+                auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
                 range *= childRange;
             }
 

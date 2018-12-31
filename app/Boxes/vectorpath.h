@@ -35,7 +35,7 @@ public:
 
     PathAnimator *getPathAnimator();
 
-    bool SWT_isVectorPath() { return true; }
+    bool SWT_isVectorPath() const { return true; }
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);

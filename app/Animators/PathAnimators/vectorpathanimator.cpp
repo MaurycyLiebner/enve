@@ -116,7 +116,7 @@ void VectorPathAnimator::cancelPathChange() {
     mPathChanged = false;
 }
 
-bool VectorPathAnimator::SWT_isVectorPathAnimator() { return true; }
+bool VectorPathAnimator::SWT_isVectorPathAnimator() const { return true; }
 
 void VectorPathAnimator::finishedPathChange() {
     if(!mPathChanged) return;

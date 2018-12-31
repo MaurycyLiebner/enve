@@ -42,7 +42,7 @@ QMimeData *PathEffect::SWT_createMimeData() {
     return new PathEffectMimeData(this);
 }
 
-bool PathEffect::SWT_isPathEffect() { return true; }
+bool PathEffect::SWT_isPathEffect() const { return true; }
 
 void PathEffect::setIsOutlineEffect(const bool &bT) {
     if(bT == mOutlineEffect) return;

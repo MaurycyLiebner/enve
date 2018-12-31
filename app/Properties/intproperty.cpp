@@ -37,7 +37,7 @@ void IntProperty::prp_finishTransform() {
     }
 }
 
-bool IntProperty::SWT_isIntProperty() { return true; }
+bool IntProperty::SWT_isIntProperty() const { return true; }
 
 int IntProperty::getValue() {
     return mValue;

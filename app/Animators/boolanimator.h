@@ -14,7 +14,7 @@ public:
         return getCurrentIntValueAtRelFrameF(relFrame) == 1;
     }
 
-    bool SWT_isBoolAnimator() { return true; }
+    bool SWT_isBoolAnimator() const { return true; }
 protected:
     BoolAnimator(const QString& name);
 };

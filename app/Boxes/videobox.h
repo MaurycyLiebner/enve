@@ -17,10 +17,10 @@ public:
     void setFilePath(const QString &path);
     void reloadSound();
 
-    bool SWT_isVideoBox() { return true; }
+    bool SWT_isVideoBox() const { return true; }
     void changeSourceFile(QWidget* dialogParent);
 
-    FrameRange prp_getFirstAndLastIdenticalRelFrame(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 protected:

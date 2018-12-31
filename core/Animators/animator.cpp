@@ -443,7 +443,7 @@ void Animator::anim_setRecordingValue(const bool &rec) {
     emit prp_isRecordingChanged();
 }
 
-bool Animator::SWT_isAnimator() { return true; }
+bool Animator::SWT_isAnimator() const { return true; }
 
 bool Animator::prp_isRecording() {
     return anim_mIsRecording;
@@ -578,23 +578,6 @@ bool Animator::anim_getNextAndPreviousKeyIdForRelFrameF(
     return true;
 }
 
-bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
-                                               const int &relFrame2) {
-    if(relFrame1 == relFrame2) return false;
-    if(anim_mKeys.isEmpty()) return false;
-    int prevFrame = qMin(relFrame1, relFrame2);
-    int nextFrame = qMax(relFrame1, relFrame2);
-    int prevId1;
-    int nextId1;
-    anim_getNextAndPreviousKeyIdForRelFrame(prevId1, nextId1, prevFrame);
-    int prevId2;
-    int nextId2;
-    anim_getNextAndPreviousKeyIdForRelFrame(prevId2, nextId2, nextFrame);
-    if(prevId1 != prevId2) return true;
-    return anim_mKeys.at(prevId1)->differsFromKey(
-                anim_mKeys.at(nextId2).get());
-}
-
 int Animator::anim_getCurrentAbsFrame() {
     return anim_mCurrentAbsFrame;
 }
@@ -603,7 +586,7 @@ int Animator::anim_getCurrentRelFrame() {
     return anim_mCurrentRelFrame;
 }
 
-FrameRange Animator::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) {
     if(anim_mKeys.isEmpty()) {
         return {INT_MIN, INT_MAX};
     } else {

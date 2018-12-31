@@ -124,7 +124,7 @@ public:
     }
 
     void readPathContainer(QIODevice *target);
-    void writePathContainer(QIODevice *target);
+    void writePathContainer(QIODevice * const target) const;
     static QList<SkPoint> extractElementsFromSkPath(const SkPath &path);
 
     virtual void shiftAllPoints(const int &by) {

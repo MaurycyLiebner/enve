@@ -33,7 +33,7 @@ QMimeData *PixmapEffect::SWT_createMimeData() {
     return new PixmapEffectMimeData(this);
 }
 
-bool PixmapEffect::SWT_isPixmapEffect() { return true; }
+bool PixmapEffect::SWT_isPixmapEffect() const { return true; }
 
 void PixmapEffect::switchVisible() {
     setVisible(!mVisible);

@@ -18,8 +18,8 @@ public:
         if(mCurrentValue >= mValueNames.count()) return "null";
         return mValueNames.at(mCurrentValue);
     }
-    bool SWT_isComboBoxProperty() { return true; }
-    void writeProperty(QIODevice *target);
+    bool SWT_isComboBoxProperty() const { return true; }
+    void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 signals:
     void valueChanged(int);

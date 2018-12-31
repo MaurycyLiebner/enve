@@ -91,11 +91,11 @@ bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
             getLinkTarget()->isRelFrameFInVisibleDurationRect(relFrame);
 }
 
-FrameRange InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+FrameRange InternalLinkBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
     FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            range *= BoundingBox::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+            range *= BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheRight();
@@ -104,22 +104,10 @@ FrameRange InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(const int &relF
             }
         }
     }
-    auto targetRange = getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+    auto targetRange = getLinkTarget()->prp_getIdenticalRelFrameRange(relFrame);
 
     return range*targetRange;
 }
-
-bool InternalLinkBox::prp_differencesBetweenRelFrames(const int &relFrame1,
-                                                      const int &relFrame2) {
-    bool differences =
-            ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
-                                                             relFrame2) ||
-            getLinkTarget()->prp_differencesBetweenRelFrames(relFrame1,
-                                                         relFrame2);
-    if(differences || mDurationRectangle == nullptr) return differences;
-    return mDurationRectangle->hasAnimationFrameRange();
-}
-
 
 InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
     BoxesGroup() {
@@ -140,11 +128,11 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
 //    return mLinkTarget->relPointInsidePath(point);
 //}
 
-FrameRange InternalLinkGroupBox::prp_getFirstAndLastIdenticalRelFrame(const int &relFrame) {
+FrameRange InternalLinkGroupBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
     FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            range *= BoundingBox::prp_getFirstAndLastIdenticalRelFrame(relFrame);
+            range *= BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheRight();
@@ -153,22 +141,10 @@ FrameRange InternalLinkGroupBox::prp_getFirstAndLastIdenticalRelFrame(const int 
             }
         }
     }
-    auto targetRange = getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(relFrame);
+    auto targetRange = getLinkTarget()->prp_getIdenticalRelFrameRange(relFrame);
 
     return range*targetRange;
 }
-
-bool InternalLinkGroupBox::prp_differencesBetweenRelFrames(const int &relFrame1,
-                                                           const int &relFrame2) {
-    bool differences =
-            ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
-                                                             relFrame2) ||
-            getLinkTarget()->prp_differencesBetweenRelFrames(relFrame1,
-                                                         relFrame2);
-    if(differences || mDurationRectangle == nullptr) return differences;
-    return mDurationRectangle->hasAnimationFrameRange();
-}
-
 
 QPointF InternalLinkGroupBox::getRelCenterPosition() {
     return getLinkTarget()->getRelCenterPosition();
