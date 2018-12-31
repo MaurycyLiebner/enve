@@ -784,68 +784,54 @@ void Canvas::groupSelectedBoxes() {
     addBoxToSelection(newGroup.get());
 }
 
-#include "pathoperations.h"
 VectorPath *Canvas::getPathResultingFromOperation(
-                                const bool &unionInterThis,
-                                const bool &unionInterOther) {
+        const SkPathOp& pathOp) {
     qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
-    QList<FullVectorPath*> pathsT;
-    FullVectorPath *targetPath = new FullVectorPath();
-    pathsT << targetPath;
-    FullVectorPath *addToPath = nullptr;
-    FullVectorPath *addedPath = nullptr;
-
+    SkOpBuilder builder;
+    bool first = true;
     Q_FOREACH(const auto &box, mSelectedBoxes) {
         if(box->SWT_isPathBox()) {
             SkPath boxPath = GetAsPtr(box, PathBox)->getRelativePath();
             QMatrix boxTrans = box->getRelativeTransformAtCurrentFrame();
             boxPath.transform(QMatrixToSkMatrix(boxTrans));
-            addToPath = targetPath;
-            addToPath->generateSinglePathPaths();
-            addedPath = new FullVectorPath();
-            pathsT << addedPath;
-            addedPath->generateFromPath(boxPath);
-            addToPath->intersectWith(addedPath,
-                                     unionInterThis,
-                                     unionInterOther);
-            targetPath = new FullVectorPath();
-            pathsT << targetPath;
-            targetPath->getSeparatePathsFromOther(addToPath);
-            targetPath->getSeparatePathsFromOther(addedPath);
+            if(first) {
+                builder.add(boxPath, SkPathOp::kUnion_SkPathOp);
+                first = false;
+            } else {
+                builder.add(boxPath, pathOp);
+            }
         }
     }
-    targetPath->generateSinglePathPaths();
-
-    newPath->loadPathFromSkPath(QPainterPathToSkPath(targetPath->getPath()));
+    SkPath resultingPath;
+    builder.resolve(&resultingPath);
+    newPath->loadPathFromSkPath(resultingPath);
     mCurrentBoxesGroup->addContainedBox(newPath);
-    foreach(FullVectorPath *pathT, pathsT) {
-        delete pathT;
-    }
     return newPath.get();
 }
 
 void Canvas::selectedPathsDifference() {
-    VectorPath *newPath = getPathResultingFromOperation(false,
-                                                        true);
+    VectorPath *newPath =
+            getPathResultingFromOperation(
+                SkPathOp::kDifference_SkPathOp);
 
     clearBoxesSelection();
     addBoxToSelection(newPath);
 }
 
 void Canvas::selectedPathsIntersection() {
-    VectorPath *newPath = getPathResultingFromOperation(false,
-                                                        false);
+    VectorPath *newPath = getPathResultingFromOperation(
+                SkPathOp::kIntersect_SkPathOp);
 
     clearBoxesSelection();
     addBoxToSelection(newPath);
 }
 
 void Canvas::selectedPathsDivision() {
-    VectorPath *newPath1 = getPathResultingFromOperation(false,
-                                                        false);
+    VectorPath *newPath1 = getPathResultingFromOperation(
+                SkPathOp::kDifference_SkPathOp);
 
-    VectorPath *newPath2 = getPathResultingFromOperation(false,
-                                                        true);
+    VectorPath *newPath2 = getPathResultingFromOperation(
+                SkPathOp::kIntersect_SkPathOp);
 
     clearBoxesSelection();
     addBoxToSelection(newPath1);
@@ -853,15 +839,34 @@ void Canvas::selectedPathsDivision() {
 }
 
 void Canvas::selectedPathsExclusion() {
-    VectorPath *newPath1 = getPathResultingFromOperation(false,
-                                                         true);
-    VectorPath *newPath2 = getPathResultingFromOperation(true,
-                                                         false);
+    VectorPath *newPath1 = getPathResultingFromOperation(
+                SkPathOp::kDifference_SkPathOp);
+    VectorPath *newPath2 = getPathResultingFromOperation(
+                SkPathOp::kReverseDifference_SkPathOp);
 
     clearBoxesSelection();
     addBoxToSelection(newPath1);
     addBoxToSelection(newPath2);
 }
+
+
+void Canvas::selectedPathsBreakApart() {
+    if(mSelectedBoxes.isEmpty()) return;
+    foreach(const auto &box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            GetAsPtr(box, VectorPath)->breakPathsApart_k();
+        }
+    }
+}
+
+void Canvas::selectedPathsUnion() {
+    VectorPath *newPath = getPathResultingFromOperation(
+                SkPathOp::kUnion_SkPathOp);
+
+    clearBoxesSelection();
+    addBoxToSelection(newPath);
+}
+
 #include "Animators/pathanimator.h"
 void Canvas::selectedPathsCombine() {
     if(mSelectedBoxes.isEmpty()) return;
@@ -900,21 +905,4 @@ void Canvas::selectedPathsCombine() {
             box->removeFromParent_k();
         }
     }
-}
-
-void Canvas::selectedPathsBreakApart() {
-    if(mSelectedBoxes.isEmpty()) return;
-    foreach(const auto &box, mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            GetAsPtr(box, VectorPath)->breakPathsApart_k();
-        }
-    }
-}
-
-void Canvas::selectedPathsUnion() {
-    VectorPath *newPath = getPathResultingFromOperation(true,
-                                                        true);
-
-    clearBoxesSelection();
-    addBoxToSelection(newPath);
 }

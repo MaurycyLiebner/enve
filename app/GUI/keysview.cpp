@@ -98,6 +98,7 @@ void KeysView::wheelEvent(QWheelEvent *e) {
 }
 
 void KeysView::mousePressEvent(QMouseEvent *e) {
+    KFT_setFocus();
     QPoint posU = e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
     if(mGraphViewed) {
         graphMousePressEvent(posU, e->button());

@@ -9,6 +9,7 @@
 #include "GUI/valueinput.h"
 #include "GUI/canvaswindow.h"
 #include "Animators/coloranimator.h"
+#include "SkPathOps.h"
 
 class TextBox;
 class Circle;
@@ -608,8 +609,7 @@ protected:
     qsptr<ColorAnimator> mBackgroundColor =
             SPtrCreate(ColorAnimator)();
 
-    VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
-                                              const bool &unionInterOther);
+    VectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
 
     void sortSelectedBoxesByZAscending();
 

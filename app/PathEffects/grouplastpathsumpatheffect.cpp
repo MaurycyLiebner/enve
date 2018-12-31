@@ -34,7 +34,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(
     PathBox *lastPath = pathBoxes.takeLast();
     SkPath srcT = src;
     foreach(PathBox *pathBox, pathBoxes) {
-        applyOperation(relFrame, srcT, dst, pathBox,
+        gApplyOperation(relFrame, srcT, dst, pathBox,
                  lastPath, operation, true);
         srcT = *dst;
     }
@@ -64,8 +64,8 @@ void GroupLastPathSumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
     PathBox *lastPath = pathBoxes.takeLast();
     SkPath srcT = src;
     foreach(PathBox *pathBox, pathBoxes) {
-        applyOperationF(relFrame, srcT, dst, pathBox,
-                  lastPath, operation, true);
+        gApplyOperationF(relFrame, srcT, dst, pathBox,
+                        lastPath, operation, true);
         srcT = *dst;
     }
 }

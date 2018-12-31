@@ -879,16 +879,20 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
                 SPtrCreate(DuplicatePathEffect)(mIsOutline);
     } else if(typeT == SUM_PATH_EFFECT) {
         pathEffect =
-                SPtrCreate(OperationPathEffect)(GetAsPtr(mParentBox, PathBox), mIsOutline);
+                SPtrCreate(OperationPathEffect)(
+                    GetAsPtr(mParentBox, PathBox), mIsOutline);
     } else if(typeT == GROUP_SUM_PATH_EFFECT) {
         pathEffect =
                 SPtrCreate(GroupLastPathSumPathEffect)(
-                    GetAsPtr(mParentBox, BoxesGroup),
-                    mIsOutline);
+                    GetAsPtr(mParentBox, BoxesGroup), mIsOutline);
     } else if(typeT == LENGTH_PATH_EFFECT) {
         pathEffect = SPtrCreate(LengthPathEffect)(mIsOutline);
+    } else if(typeT == SOLIDIFY_PATH_EFFECT) {
+        pathEffect = SPtrCreate(SolidifyPathEffect)(mIsOutline);
     } else {
-        return;
+        QString errMsg = "Invalid path effect type '" +
+                QString::number(typeT) + "'.";
+        RuntimeThrow(errMsg.toStdString());
     }
     pathEffect->readProperty(target);
     addEffect(pathEffect);
