@@ -274,7 +274,7 @@ public:
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &);
+                             const bool &parentMainTarget) const;
 
     BoxesGroup *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
@@ -498,7 +498,7 @@ public:
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void setPickingFromPath(const bool &pickFill,
                             const bool &pickStroke) {
         mPickFillFromPath = pickFill;

@@ -187,7 +187,7 @@ qreal Circle::getCurrentYRadius() {
     return mVerticalRadiusAnimator->getEffectiveYValue();
 }
 
-void Circle::getMotionBlurProperties(QList<Property*> &list) {
+void Circle::getMotionBlurProperties(QList<Property*> &list) const {
     PathBox::getMotionBlurProperties(list);
     list.append(mHorizontalRadiusAnimator.get());
     list.append(mVerticalRadiusAnimator.get());

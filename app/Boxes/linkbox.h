@@ -37,7 +37,7 @@ public:
         mBoxTarget->readProperty(target);
     }
 
-    void setLinkTarget(BoundingBox *linkTarget) {
+    void setLinkTarget(BoundingBox * const linkTarget) {
         disconnect(mBoxTarget.data(), nullptr, this, nullptr);
         if(getLinkTarget() != nullptr) {
             disconnect(getLinkTarget(), nullptr, this, nullptr);
@@ -59,7 +59,7 @@ public:
                 this, SLOT(setTargetSlot(BoundingBox*)));
     }
 
-    bool relPointInsidePath(const QPointF &point);
+    bool relPointInsidePath(const QPointF &relPos) const;
     QPointF getRelCenterPosition();
 
     BoundingBox *getLinkTarget() const;
@@ -86,7 +86,7 @@ public:
     }
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     bool SWT_isLinkBox() const { return true; }
 
@@ -97,14 +97,14 @@ public:
             return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
         }
     }
-    bool isRelFrameInVisibleDurationRect(const int &relFrame);
-    bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);
+    bool isRelFrameInVisibleDurationRect(const int &relFrame) const;
+    bool isRelFrameFInVisibleDurationRect(const qreal &relFrame) const;
 public slots:
     void setTargetSlot(BoundingBox *target) {
         setLinkTarget(target);
     }
 protected:
-    InternalLinkBox(BoundingBox *linkTarget);
+    InternalLinkBox(BoundingBox * const linkTarget);
     qsptr<BoxTargetProperty> mBoxTarget =
             SPtrCreate(BoxTargetProperty)("link target");
 };
@@ -149,7 +149,7 @@ public:
                 this, SLOT(setTargetSlot(BoundingBox*)));
     }
 
-    //bool relPointInsidePath(const QPointF &point);
+    //bool relPointInsidePath(const QPointF &relPos);
     QPointF getRelCenterPosition();
 
     BoxesGroup *getLinkTarget() const;
@@ -166,7 +166,7 @@ public:
         return SPtrCreate(InternalLinkGroupBox)(getLinkTarget());
     }
 
-    bool isRelFrameInVisibleDurationRect(const int &relFrame) {
+    bool isRelFrameInVisibleDurationRect(const int &relFrame) const {
         if(getLinkTarget() == nullptr) return false;
         return BoxesGroup::isRelFrameInVisibleDurationRect(relFrame) &&
                 getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
@@ -174,7 +174,7 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     bool SWT_isBoxesGroup() const { return false; }
 
@@ -238,7 +238,7 @@ public:
         data->fEffectsMargin += childrenEffectsMargin;
     }
 
-    BoxesGroup *getFinalTarget() {
+    BoxesGroup *getFinalTarget() const {
         if(getLinkTarget()->SWT_isLinkBox()) {
             return GetAsPtr(getLinkTarget(), InternalLinkGroupBox)->getFinalTarget();
         }
@@ -254,7 +254,7 @@ public:
         return BoxesGroup::prp_getRelFrameShift();
     }
 
-    bool relPointInsidePath(const QPointF &relPos) {
+    bool relPointInsidePath(const QPointF &relPos) const {
         if(mRelBoundingRect.contains(relPos)) {
             QPointF relPosT = getLinkTarget()->getRelativeTransformAtCurrentFrame().
                     inverted().map(relPos);
@@ -315,7 +315,7 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
 
-    bool relPointInsidePath(const QPointF &relPos);
+    bool relPointInsidePath(const QPointF &relPos) const;
 protected:
     InternalLinkCanvas(BoxesGroup* linkTarget);
     qsptr<BoolProperty> mClipToCanvas =

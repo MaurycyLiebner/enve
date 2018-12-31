@@ -502,7 +502,7 @@ void Canvas::nextPreviewFrame() {
     mCanvasWindow->requestUpdate();
 }
 
-FrameRange Canvas::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange Canvas::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     FrameRange groupRange = BoxesGroup::prp_getIdenticalRelFrameRange(relFrame);
     FrameRange canvasRange{0, mMaxFrame};
     return groupRange*canvasRange;
@@ -1105,8 +1105,9 @@ void Canvas::connectPointsFromDifferentPaths(NodePoint *pointSrc,
 
 bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                  const bool &parentSatisfies,
-                                 const bool &) {
+                                 const bool &parentMainTarget) const {
     Q_UNUSED(parentSatisfies);
+    Q_UNUSED(parentMainTarget);
     const SWT_Rule &rule = rules.rule;
     const bool &alwaysShowChildren = rules.alwaysShowChildren;
     if(alwaysShowChildren) {

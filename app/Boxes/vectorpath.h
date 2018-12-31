@@ -57,7 +57,7 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;
 protected:
-    void getMotionBlurProperties(QList<Property *> &list);
+    void getMotionBlurProperties(QList<Property*> &list) const;
     qsptr<PathAnimator> mPathAnimator;
 };
 

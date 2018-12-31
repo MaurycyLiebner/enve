@@ -62,7 +62,7 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int &relFrame) {
+FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int &relFrame) const {
     auto boxRange = mParentBox->getFirstAndLastIdenticalForMotionBlur(relFrame);
     int margin = qCeil(mNumberSamples->getCurrentEffectiveValueAtRelFrame(relFrame)*
                        mFrameStep->getCurrentEffectiveValueAtRelFrame(relFrame));
@@ -87,7 +87,7 @@ FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int
     return boxRange;
 }
 
-FrameRange SampledMotionBlurEffect::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange SampledMotionBlurEffect::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     auto boxRange = getParentBoxFirstLastMarginAjusted(relFrame);
     auto effectRange = PixmapEffect::prp_getIdenticalRelFrameRange(relFrame);
     return boxRange*effectRange;

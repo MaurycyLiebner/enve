@@ -45,7 +45,7 @@ protected:
     stdsptr<AnimatedPoint> mBottomRightPoint;
     stdsptr<AnimatedPoint> mRadiusPoint;
 
-    void getMotionBlurProperties(QList<Property*> &list);
+    void getMotionBlurProperties(QList<Property*> &list) const;
 };
 
 #endif // RECTANGLE_H

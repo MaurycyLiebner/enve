@@ -88,7 +88,7 @@ public:
 protected:
     Circle();
 
-    void getMotionBlurProperties(QList<Property*>& list);
+    void getMotionBlurProperties(QList<Property*> &list) const;
 
     stdsptr<CircleCenterPoint> mCenterPoint;
     stdsptr<CircleRadiusPoint> mHorizontalRadiusPoint;

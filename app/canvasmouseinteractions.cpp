@@ -25,7 +25,7 @@
 #include "GUI/paintboxsettingsdialog.h"
 #include "GUI/customfpsdialog.h"
 #include "Boxes/vectorpath.h"
-#include "gpurastereffect.h"
+#include "GPUEffects/gpurastereffect.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);

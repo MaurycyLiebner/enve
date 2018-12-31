@@ -66,7 +66,7 @@ void PathEffect::setVisible(const bool &bT) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
-const bool &PathEffect::isVisible() {
+const bool &PathEffect::isVisible() const {
     return mVisible;
 }
 

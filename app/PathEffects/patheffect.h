@@ -63,7 +63,7 @@ public:
 
     void setVisible(const bool &bT);
 
-    const bool &isVisible();
+    const bool &isVisible() const;
 
     virtual bool hasReasonsNotToApplyUglyTransform();
     void prp_startDragging();

@@ -1,6 +1,6 @@
 #include "taskscheduler.h"
 #include "Boxes/boundingboxrenderdata.h"
-#include "gpupostprocessor.h"
+#include "GPUEffects/gpupostprocessor.h"
 #include "canvas.h"
 #include "taskexecutor.h"
 #include <QThread>

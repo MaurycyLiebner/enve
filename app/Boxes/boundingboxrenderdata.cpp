@@ -1,7 +1,7 @@
 #include "boundingboxrenderdata.h"
 #include "boundingbox.h"
 #include "PixmapEffects/rastereffects.h"
-#include "gpupostprocessor.h"
+#include "GPUEffects/gpupostprocessor.h"
 #include "skia/skimagecopy.h"
 #include "PixmapEffects/pixmapeffect.h"
 

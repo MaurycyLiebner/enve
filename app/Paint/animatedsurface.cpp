@@ -310,7 +310,7 @@ void AnimatedSurface::anim_updateAfterChangedKey(Key * const key) {
     prp_updateAfterChangedRelFrameRange({prevKeyRelFrame, nextKeyRelFrame});
 }
 
-FrameRange AnimatedSurface::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange AnimatedSurface::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     auto range = Animator::prp_getIdenticalRelFrameRange(relFrame);
     if(!mIsDraft) return range;
     if(anim_mKeys.count() > 1) {

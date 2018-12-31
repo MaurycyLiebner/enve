@@ -6,7 +6,7 @@
 #include "singlewidgettarget.h"
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
-#include "gpupostprocessor.h"
+#include "GPUEffects/gpupostprocessor.h"
 class Brush;
 class WindowSingleWidgetTarget;
 enum ColorMode : short;

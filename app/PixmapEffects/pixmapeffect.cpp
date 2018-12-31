@@ -45,7 +45,7 @@ void PixmapEffect::setVisible(const bool &visible) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
-const bool &PixmapEffect::isVisible() {
+const bool &PixmapEffect::isVisible() const {
     return mVisible;
 }
 

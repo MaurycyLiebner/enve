@@ -71,7 +71,7 @@ public:
 
     void ungroup_k();
 
-    bool isCurrentGroup();
+    bool isCurrentGroup() const;
     void addContainedBox(const qsptr<BoundingBox> &child);
     void addContainedBoxToListAt(const int &index,
                                  const qsptr<BoundingBox> &child);
@@ -98,15 +98,15 @@ public:
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokeWidth(const qreal &strokeWidth);
 
-    PaintSettings *getFillSettings();
-    StrokeSettings *getStrokeSettings();
+    PaintSettings *getFillSettings() const;
+    StrokeSettings *getStrokeSettings() const;
     void updateAllBoxes(const UpdateReason &reason);
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
     void applyCurrentTransformation();
 
-    bool relPointInsidePath(const QPointF &relPos);
+    bool relPointInsidePath(const QPointF &relPos) const;
 //    QPointF getRelCenterPosition();
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
@@ -115,7 +115,7 @@ public:
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &parentMainTarget);
+                             const bool &parentMainTarget) const;
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
@@ -145,7 +145,7 @@ public:
 
     bool prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
             const int &relFrame1, const int &relFrame2);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int &relFrame, const bool &takeAncestorsIntoAccount = true);
     void scheduleWaitingTasks();

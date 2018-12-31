@@ -78,7 +78,7 @@ public:
 
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool &parentSatisfies,
-                                     const bool &parentMainTarget) {
+                                     const bool &parentMainTarget) const {
         Q_UNUSED(rules);
         return parentSatisfies && !parentMainTarget;
     }
@@ -86,7 +86,7 @@ public:
     void SWT_scheduleWidgetsContentUpdateWithRule(
             const SWT_Rule &rule);
 
-    virtual bool SWT_visibleOnlyIfParentDescendant() {
+    virtual bool SWT_visibleOnlyIfParentDescendant() const {
         return true;
     }
 

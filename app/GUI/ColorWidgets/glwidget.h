@@ -11,7 +11,7 @@ public:
     GLWidget(QWidget *parent);
     ~GLWidget() {}
 
-    bool isVisible();
+    bool isVisible() const;
     bool isHidden();
     void setVisible(bool b_t);
     void show();

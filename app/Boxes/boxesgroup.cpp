@@ -402,7 +402,7 @@ bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingConta
     return diffThis || diffInherited;
 }
 
-FrameRange BoxesGroup::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange BoxesGroup::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     auto range = BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
     int absFrame = prp_relFrameToAbsFrame(relFrame);
     Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
@@ -468,7 +468,7 @@ void BoxesGroup::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
     }
 }
 
-bool BoxesGroup::relPointInsidePath(const QPointF &relPos) {
+bool BoxesGroup::relPointInsidePath(const QPointF &relPos) const {
     if(mRelBoundingRect.contains(relPos)) {
         QPointF absPos = mapRelPosToAbs(relPos);
         Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
@@ -689,7 +689,7 @@ void BoxesGroup::setIsCurrentGroup_k(const bool &bT) {
     }
 }
 
-bool BoxesGroup::isCurrentGroup() {
+bool BoxesGroup::isCurrentGroup() const {
     return mIsCurrentGroup;
 }
 
@@ -741,12 +741,12 @@ void BoxesGroup::ungroup_k() {
     removeFromParent_k();
 }
 
-PaintSettings *BoxesGroup::getFillSettings() {
+PaintSettings *BoxesGroup::getFillSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getFillSettings();
 }
 
-StrokeSettings *BoxesGroup::getStrokeSettings() {
+StrokeSettings *BoxesGroup::getStrokeSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getStrokeSettings();
 }
@@ -811,7 +811,7 @@ void BoxesGroup::addContainedBoxesToSelection(const QRectF &rect) {
     Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
             box->isVisibleAndInVisibleDurationRect()) {
-            if(box->isContainedIn(rect) ) {
+            if(box->isContainedIn(rect)) {
                 getParentCanvas()->addBoxToSelection(box.get());
             }
         }
@@ -1006,7 +1006,7 @@ void BoxesGroup::SWT_addChildrenAbstractions(
 
 bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool &parentSatisfies,
-                                     const bool &parentMainTarget) {
+                                     const bool &parentMainTarget) const {
     const SWT_Rule &rule = rules.rule;
     if(rule == SWT_Selected) {
         return BoundingBox::SWT_shouldBeVisible(rules,

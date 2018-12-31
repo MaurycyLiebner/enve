@@ -16,7 +16,8 @@
 #include "Animators/effectanimators.h"
 #include "Animators/gpueffectanimators.h"
 #include "Animators/transformanimator.h"
-#include "gpurastereffect.h"
+#include "GPUEffects/gpurastereffect.h"
+#include "linkbox.h"
 
 QList<qptr<BoundingBox>> BoundingBox::mLoadedBoxes;
 QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::mFunctionsWaitingForBoxLoad;
@@ -70,7 +71,6 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
     return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
 }
 
-#include "linkbox.h"
 qsptr<BoundingBox> BoundingBox::createLink() {
     qsptr<BoundingBox> linkBox = SPtrCreate(InternalLinkBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
@@ -106,7 +106,7 @@ void BoundingBox::setPivotPosition(const QPointF &pos) {
     mTransformAnimator->setPivotWithoutChangingTransformation(pos);
 }
 
-void BoundingBox::copyBoundingBoxDataTo(BoundingBox *targetBox) {
+void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) const {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     BoundingBox::writeBoundingBoxDataForLink(&buffer);
@@ -166,7 +166,7 @@ bool BoundingBox::isAncestor(BoundingBox *box) const {
 }
 
 Canvas *BoundingBox::getParentCanvas() {
-    if(mParentGroup == nullptr) return nullptr;
+    if(!mParentGroup) return nullptr;
     return mParentGroup->getParentCanvas();
 }
 
@@ -326,7 +326,7 @@ void BoundingBox::clearParent() {
     setParentTransform(mParentGroup->getTransformAnimator());
 }
 
-BoxesGroup *BoundingBox::getParentGroup() {
+BoxesGroup *BoundingBox::getParentGroup() const {
     return mParentGroup;
 }
 
@@ -473,7 +473,7 @@ void BoundingBox::deselect() {
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
 }
 
-bool BoundingBox::isContainedIn(const QRectF &absRect) {
+bool BoundingBox::isContainedIn(const QRectF &absRect) const {
     return absRect.contains(getCombinedTransform().mapRect(mRelBoundingRect));
 }
 
@@ -489,11 +489,11 @@ QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
     return mTransformAnimator->mapAbsPosToRel(absPos);
 }
 
-PaintSettings *BoundingBox::getFillSettings() {
+PaintSettings *BoundingBox::getFillSettings() const {
     return nullptr;
 }
 
-StrokeSettings *BoundingBox::getStrokeSettings() {
+StrokeSettings *BoundingBox::getStrokeSettings() const {
     return nullptr;
 }
 
@@ -735,10 +735,10 @@ void BoundingBox::decReasonsNotToApplyUglyTransform() {
     mNReasonsNotToApplyUglyTransform--;
 }
 
-bool BoundingBox::isSelected() { return mSelected; }
+bool BoundingBox::isSelected() const { return mSelected; }
 
-bool BoundingBox::relPointInsidePath(const QPointF &point) {
-    return mRelBoundingRect.contains(point.toPoint());
+bool BoundingBox::relPointInsidePath(const QPointF &relPos) const {
+    return mRelBoundingRect.contains(relPos.toPoint());
 }
 
 bool BoundingBox::absPointInsidePath(const QPointF &absPoint) {
@@ -785,11 +785,11 @@ void BoundingBox::setZListIndex(const int &z) {
 void BoundingBox::selectAndAddContainedPointsToList(
         const QRectF &, QList<stdptr<MovablePoint>> &) {}
 
-int BoundingBox::getZIndex() {
+int BoundingBox::getZIndex() const {
     return mZListIndex;
 }
 
-QPointF BoundingBox::getAbsolutePos() {
+QPointF BoundingBox::getAbsolutePos() const {
     return QPointF(mTransformAnimator->getCombinedTransform().dx(),
                    mTransformAnimator->getCombinedTransform().dy());
 }
@@ -806,7 +806,7 @@ void BoundingBox::setPivotAutoAdjust(const bool &bT) {
     mPivotAutoAdjust = bT;
 }
 
-const BoundingBoxType &BoundingBox::getBoxType() { return mType; }
+const BoundingBoxType &BoundingBox::getBoxType() const { return mType; }
 
 void BoundingBox::startDurationRectPosTransform() {
     if(hasDurationRectangle()) {
@@ -878,7 +878,7 @@ void BoundingBox::requestGlobalPivotUpdateIfSelected() {
     }
 }
 
-void BoundingBox::getMotionBlurProperties(QList<Property *> &list) {
+void BoundingBox::getMotionBlurProperties(QList<Property*> &list) const {
     list.append(mTransformAnimator->getScaleAnimator());
     list.append(mTransformAnimator->getPosAnimator());
     list.append(mTransformAnimator->getPivotAnimator());
@@ -907,7 +907,9 @@ void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
     }
 }
 
-bool BoundingBox::isAnimated() { return prp_isDescendantRecording(); }
+bool BoundingBox::isAnimated() const {
+    return prp_isDescendantRecording();
+}
 
 void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
     if(mGPUEffectsAnimators->ca_getNumberOfChildren() == 0) {
@@ -1100,37 +1102,37 @@ void BoundingBox::setName(const QString &name) {
     emit nameChanged(name);
 }
 
-const QString &BoundingBox::getName() {
+const QString &BoundingBox::getName() const {
     return prp_mName;
 }
 
-bool BoundingBox::isVisibleAndInVisibleDurationRect() {
+bool BoundingBox::isVisibleAndInVisibleDurationRect() const {
     return isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame) && mVisible;
 }
 
-bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
+bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
     if(mDurationRectangle == nullptr) return true;
     return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
-bool BoundingBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
+bool BoundingBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) const {
     if(mDurationRectangle == nullptr) return true;
     return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
 bool BoundingBox::isRelFrameVisibleAndInVisibleDurationRect(
-        const int &relFrame) {
+        const int &relFrame) const {
     return isRelFrameInVisibleDurationRect(relFrame) && mVisible;
 }
 
 bool BoundingBox::isRelFrameFVisibleAndInVisibleDurationRect(
-        const qreal &relFrame) {
+        const qreal &relFrame) const {
     return isRelFrameFInVisibleDurationRect(relFrame) && mVisible;
 }
 
-FrameRange BoundingBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange BoundingBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
@@ -1195,7 +1197,7 @@ void BoundingBox::queScheduledTasks() {
     mBlockedSchedule = false;
 }
 
-const int &BoundingBox::getLoadId() {
+const int &BoundingBox::getLoadId() const {
     return mLoadId;
 }
 
@@ -1288,25 +1290,23 @@ void BoundingBox::switchLocked() {
     setLocked(!mLocked);
 }
 
-void BoundingBox::hide()
-{
+void BoundingBox::hide() {
     setVisibile(false);
 }
 
-void BoundingBox::show()
-{
+void BoundingBox::show() {
     setVisibile(true);
 }
 
-bool BoundingBox::isVisibleAndUnlocked() {
+bool BoundingBox::isVisibleAndUnlocked() const {
     return isVisible() && !mLocked;
 }
 
-bool BoundingBox::isVisible() {
+bool BoundingBox::isVisible() const {
     return mVisible;
 }
 
-bool BoundingBox::isLocked() {
+bool BoundingBox::isLocked() const {
     return mLocked;
 }
 
@@ -1330,7 +1330,7 @@ void BoundingBox::setLocked(const bool &bt) {
 
 bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool &parentSatisfies,
-                                      const bool &parentMainTarget) {
+                                      const bool &parentMainTarget) const {
     const SWT_Rule &rule = rules.rule;
     bool satisfies = false;
     bool alwaysShowChildren = rules.alwaysShowChildren;
@@ -1390,7 +1390,7 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return satisfies;
 }
 
-bool BoundingBox::SWT_visibleOnlyIfParentDescendant() {
+bool BoundingBox::SWT_visibleOnlyIfParentDescendant() const {
     return false;
 }
 

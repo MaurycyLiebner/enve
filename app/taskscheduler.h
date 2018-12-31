@@ -2,7 +2,7 @@
 #define TASKSCHEDULER_H
 #include <QObject>
 #include "updatable.h"
-#include "gpupostprocessor.h"
+#include "GPUEffects/gpupostprocessor.h"
 class Canvas;
 
 class TaskScheduler : public QObject {

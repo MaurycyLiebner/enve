@@ -54,7 +54,7 @@ QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
     return GetAsPtr(key, QStringKey)->getText();
 }
 
-FrameRange QStringAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange QStringAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     if(anim_mKeys.isEmpty()) {
         return {INT_MIN, INT_MAX};
     } else {

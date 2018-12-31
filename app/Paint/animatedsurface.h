@@ -66,7 +66,7 @@ public:
     bool SWT_isAnimatedSurface() const { return true; }
     void anim_saveCurrentValueAsKey();
     void newEmptyPaintFrame();
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void anim_updateAfterChangedKey(Key * const key);
     void newEmptyPaintFrame(const int &relFrame);
     void setOverlapFrames(const int &overlapFrames) {

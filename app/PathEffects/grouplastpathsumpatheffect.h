@@ -32,7 +32,7 @@ public:
     void setParentGroup(BoxesGroup *parent);
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &parentMainTarget);
+                             const bool &parentMainTarget) const;
 private:
     qptr<BoxesGroup> mParentGroup;
 };

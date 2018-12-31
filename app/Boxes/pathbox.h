@@ -79,8 +79,8 @@ public:
 
     void startSelectedFillColorTransform();
 
-    StrokeSettings *getStrokeSettings();
-    PaintSettings *getFillSettings();
+    StrokeSettings *getStrokeSettings() const;
+    PaintSettings *getFillSettings() const;
     void updateDrawGradients();
 
     void setOutlineAffectedByScale(const bool &bT);
@@ -91,7 +91,7 @@ public:
     VectorPath *strokeToVectorPathBox();
 
     const SkPath &getRelativePath() const;
-    bool relPointInsidePath(const QPointF &relPos);
+    bool relPointInsidePath(const QPointF &relPos) const;
 
     void duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                     StrokeSettings *strokeSettings);
@@ -201,7 +201,7 @@ public:
 //    }
 protected:
     PathBox(const BoundingBoxType &type);
-    void getMotionBlurProperties(QList<Property*>& list);
+    void getMotionBlurProperties(QList<Property*> &list) const;
 
 //    QDialog* mDialog_TEST = nullptr;
 //    QLabel* mLabel_TEST = nullptr;

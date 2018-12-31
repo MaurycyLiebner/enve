@@ -238,11 +238,11 @@ void MovablePoint::show() {
     mHidden = false;
 }
 
-bool MovablePoint::isHidden() {
+bool MovablePoint::isHidden() const {
     return mHidden;
 }
 
-bool MovablePoint::isVisible() {
+bool MovablePoint::isVisible() const {
     return !isHidden();
 }
 

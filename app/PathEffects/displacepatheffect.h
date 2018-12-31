@@ -20,7 +20,7 @@ public:
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) {
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
         if(mRandomize->getValue()) {
             if(mSmoothTransform->getValue()) {
                 return {relFrame, relFrame};

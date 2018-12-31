@@ -33,7 +33,7 @@ public:
 
     virtual void prp_switchRecording();
 
-    virtual bool prp_isDescendantRecording();
+    virtual bool prp_isDescendantRecording() const;
 
     bool anim_isComplexAnimator();
 
@@ -68,12 +68,12 @@ public:
                          const int &keyRectSize);
     void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     void prp_addAllKeysToComplexAnimator(ComplexAnimator *target);
-    bool prp_hasKeys();
+    bool prp_hasKeys() const;
 
     void anim_setRecordingWithoutChangingKeys(const bool &rec);
     bool prp_isRecording();
     virtual void anim_removeAllKeys();
-    bool prp_isKeyOnCurrentFrame();
+    bool prp_isKeyOnCurrentFrame() const;
     void prp_getKeysInRect(const QRectF &selectionRect,
                            const qreal &pixelsPerFrame,
                            QList<Key*>& keysList,
@@ -101,7 +101,7 @@ public:
     bool SWT_isAnimator() const;
     int anim_getCurrentAbsFrame();
     int anim_getCurrentRelFrame();
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     Key* anim_getPrevKey(const int &relFrame);
     Key* anim_getNextKey(const int &relFrame);
     void anim_shiftAllKeys(const int &shift);

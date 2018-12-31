@@ -49,7 +49,7 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
-FrameRange ComplexAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange ComplexAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     FrameRange range{INT_MIN, INT_MAX};
     Q_FOREACH(const qsptr<Property> &child, ca_mChildAnimators) {
         auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
@@ -64,7 +64,7 @@ FrameRange ComplexAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) {
 
 bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                           const bool &parentSatisfies,
-                                          const bool &parentMainTarget) {
+                                          const bool &parentMainTarget) const {
     if(hasChildAnimators()) {
         return Animator::SWT_shouldBeVisible(
                     rules,
@@ -205,7 +205,7 @@ void ComplexAnimator::prp_clearFromGraphView() {
     }
 }
 
-bool ComplexAnimator::hasChildAnimators() {
+bool ComplexAnimator::hasChildAnimators() const {
     return !ca_mChildAnimators.isEmpty();
 }
 
@@ -297,7 +297,7 @@ void ComplexAnimator::prp_cancelTransform() {
     }
 }
 
-bool ComplexAnimator::prp_isDescendantRecording() {
+bool ComplexAnimator::prp_isDescendantRecording() const {
     return ca_mChildAnimatorRecording;
 }
 

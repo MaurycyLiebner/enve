@@ -715,7 +715,7 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     mPivotAutoAdjust = pivotAutoAdjust;
 }
 
-void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) {
+void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) const {
     target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
     writeQString(target, prp_mName);
     target->write(rcConstChar(&mLoadId), sizeof(int));

@@ -392,7 +392,7 @@ SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame) {
 }
 
 
-void PathBox::getMotionBlurProperties(QList<Property *> &list) {
+void PathBox::getMotionBlurProperties(QList<Property*> &list) const {
     BoundingBox::getMotionBlurProperties(list);
     list.append(mPathEffectsAnimators.get());
     list.append(mFillPathEffectsAnimators.get());
@@ -620,7 +620,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
 //    updateDialog_TEST();
 }
 
-bool PathBox::relPointInsidePath(const QPointF &relPos) {
+bool PathBox::relPointInsidePath(const QPointF &relPos) const {
     SkPoint relPosSk = QPointFToSkPoint(relPos);
     if(mSkRelBoundingRectPath.contains(relPosSk.x(), relPosSk.y()) ) {
         if(mFillPathSk.contains(relPosSk.x(), relPosSk.y())) {
@@ -637,10 +637,10 @@ void PathBox::setOutlineAffectedByScale(const bool &bT) {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-PaintSettings *PathBox::getFillSettings() {
+PaintSettings *PathBox::getFillSettings() const {
     return mFillSettings.data();
 }
 
-StrokeSettings *PathBox::getStrokeSettings() {
+StrokeSettings *PathBox::getStrokeSettings() const {
     return mStrokeSettings.data();
 }

@@ -52,7 +52,7 @@ void CtrlPoint::scale(const qreal &sx,
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
 }
 
-int CtrlPoint::getPtId() {
+int CtrlPoint::getPtId() const {
     if(mIsStartCtrlPt) {
         return mParentPoint_k->getPtId() - 1;
     }
@@ -115,7 +115,7 @@ void CtrlPoint::removeFromVectorPath() {
     mParentPoint_k->setCtrlPtEnabled(false, mIsStartCtrlPt);
 }
 
-bool CtrlPoint::isHidden() {
+bool CtrlPoint::isHidden() const {
     return NonAnimatedMovablePoint::isHidden() ||
            (!mParentPoint_k->isNeighbourSelected() );
 }

@@ -156,7 +156,7 @@ void Animator::prp_switchRecording() {
     prp_setRecording(!anim_mIsRecording);
 }
 
-bool Animator::prp_isDescendantRecording() { return anim_mIsRecording; }
+bool Animator::prp_isDescendantRecording() const { return anim_mIsRecording; }
 
 bool Animator::anim_isComplexAnimator() { return anim_mIsComplexAnimator; }
 
@@ -429,7 +429,7 @@ void Animator::prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
     }
 }
 
-bool Animator::prp_hasKeys() {
+bool Animator::prp_hasKeys() const {
     return !anim_mKeys.isEmpty();
 }
 
@@ -457,7 +457,7 @@ void Animator::anim_removeAllKeys() {
     }
 }
 
-bool Animator::prp_isKeyOnCurrentFrame() {
+bool Animator::prp_isKeyOnCurrentFrame() const {
     return anim_mKeyOnCurrentFrame != nullptr;
 }
 
@@ -586,7 +586,7 @@ int Animator::anim_getCurrentRelFrame() {
     return anim_mCurrentRelFrame;
 }
 
-FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     if(anim_mKeys.isEmpty()) {
         return {INT_MIN, INT_MAX};
     } else {

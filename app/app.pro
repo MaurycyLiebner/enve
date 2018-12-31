@@ -236,16 +236,17 @@ SOURCES += main.cpp\
     PropertyUpdaters/paintboxsizeupdaters.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
     PixmapEffects/rastereffects.cpp \
-    gpupostprocessor.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
     taskexecutor.cpp \
     taskscheduler.cpp \
     colorhelpers.cpp \
-    gpurastereffect.cpp \
     Animators/qrealanimatorcreator.cpp \
     Animators/gpueffectanimators.cpp \
     Animators/PathAnimators/pathcontainer.cpp \
-    Animators/PathAnimators/nodesettings.cpp
+    Animators/PathAnimators/nodesettings.cpp \
+    GPUEffects/gpurastereffect.cpp \
+    GPUEffects/gpupostprocessor.cpp \
+    GPUEffects/gpurastereffectcreator.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -432,17 +433,18 @@ HEADERS  += \
     PropertyUpdaters/paintboxsizeupdaters.h \
     PropertyUpdaters/groupallpathsupdater.h \
     PixmapEffects/rastereffects.h \
-    gpupostprocessor.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
     taskexecutor.h \
     taskscheduler.h \
     colorhelpers.h \
-    gpurastereffect.h \
     Animators/qrealanimatorcreator.h \
     Animators/intanimatorcreator.h \
     Animators/gpueffectanimators.h \
     Animators/PathAnimators/pathcontainer.h \
-    Animators/PathAnimators/nodesettings.h
+    Animators/PathAnimators/nodesettings.h \
+    GPUEffects/gpurastereffect.h \
+    GPUEffects/gpupostprocessor.h \
+    GPUEffects/gpurastereffectcreator.h
 
 RESOURCES += \
     resources.qrc

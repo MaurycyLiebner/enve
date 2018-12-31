@@ -1,7 +1,8 @@
-#include "gpurastereffect.h"
+#include "gpurastereffectcreator.h"
 #include "exceptions.h"
-#include "Animators/qrealanimator.h"
+#include "gpurastereffect.h"
 #include <QDomDocument>
+
 QList<stdsptr<GPURasterEffectCreator>> GPURasterEffectCreator::sEffectCreators;
 
 qsptr<Property> GPURasterEffectCreator::create() const {
@@ -12,21 +13,15 @@ qsptr<Property> GPURasterEffectCreator::create() const {
     return std::move(rasterEffect);
 }
 
-GPURasterEffect::GPURasterEffect(
-        const GPURasterEffectProgram &program,
-        const QString& name) :
-    ComplexAnimator(name), mProgram(program) {
-
-}
 
 qreal stringToDouble(const QString& str) {
     if(str.isEmpty()) {
-        RuntimeThrow("Can not convert an empty string to float.");
+        RuntimeThrow("Can not convert an empty string to double.");
     }
     bool ok;
     qreal val = str.toDouble(&ok);
     if(!ok) {
-        QString errMsg = "Can not convert '" + str + "' to float.";
+        QString errMsg = "Can not convert '" + str + "' to double.";
         RuntimeThrow(errMsg.toStdString());
     }
     return val;
@@ -34,12 +29,12 @@ qreal stringToDouble(const QString& str) {
 
 int stringToInt(const QString& str) {
     if(str.isEmpty()) {
-        RuntimeThrow("Can not convert an empty string to float.");
+        RuntimeThrow("Can not convert an empty string to int.");
     }
     bool ok;
     int val = str.toInt(&ok);
     if(!ok) {
-        QString errMsg = "Can not convert '" + str + "' to float.";
+        QString errMsg = "Can not convert '" + str + "' to int.";
         RuntimeThrow(errMsg.toStdString());
     }
     return val;
@@ -59,8 +54,8 @@ qreal tryConvertingAttrToDouble(const QDomElement &elem,
 }
 
 int tryConvertingAttrToInt(const QDomElement &elem,
-                             const QString& elemName,
-                             const QString& attr) {
+                           const QString& elemName,
+                           const QString& attr) {
     try {
         QString valS = elem.attribute(attr);
         int val = stringToInt(valS);

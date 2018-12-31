@@ -59,8 +59,8 @@ public:
 
     void hide();
     void show();
-    virtual bool isHidden();
-    bool isVisible();
+    virtual bool isHidden() const;
+    bool isVisible() const;
     void setVisible(const bool &bT);
 
     bool isNodePoint();

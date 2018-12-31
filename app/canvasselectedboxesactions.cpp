@@ -137,7 +137,7 @@ void Canvas::setSelectedFontSize(const qreal &size) {
         box->setSelectedFontSize(size);
     }
 }
-#include "gpurastereffect.h"
+#include "GPUEffects/gpurastereffect.h"
 void Canvas::applyGPURasterEffectToSelected(
         const stdsptr<GPURasterEffectCreator>& creator) {
     Q_FOREACH(const auto &box, mSelectedBoxes) {

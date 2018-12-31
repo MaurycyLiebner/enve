@@ -264,7 +264,7 @@ public:
                            const int &frame,
                            QPointF *acc);
     void prp_setAbsFrame(const int &frame);
-    bool relPointInsidePath(const QPointF &relPos);
+    bool relPointInsidePath(const QPointF &relPos) const;
 
     void addEmitter(const qsptr<ParticleEmitter> &emitter);
     void drawSelectedSk(SkCanvas *canvas,
@@ -303,7 +303,7 @@ public:
 
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 public slots:

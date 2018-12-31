@@ -67,31 +67,31 @@ QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }
 
-InternalLinkBox::InternalLinkBox(BoundingBox* linkTarget) :
+InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget) :
     BoundingBox(TYPE_INTERNAL_LINK) {
     setLinkTarget(linkTarget);
     ca_prependChildAnimator(mTransformAnimator.data(), mBoxTarget);
-    connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
-            this, SLOT(setTargetSlot(BoundingBox*)));
+    connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
+            this, &InternalLinkBox::setTargetSlot);
 }
 
-bool InternalLinkBox::relPointInsidePath(const QPointF &point) {
-    return getLinkTarget()->relPointInsidePath(point);
+bool InternalLinkBox::relPointInsidePath(const QPointF &relPos) const {
+    return getLinkTarget()->relPointInsidePath(relPos);
 }
 
-bool InternalLinkBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
+bool InternalLinkBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
     if(getLinkTarget() == nullptr) return false;
     return BoundingBox::isRelFrameInVisibleDurationRect(relFrame) &&
             getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
 }
 
-bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) {
+bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) const {
     if(getLinkTarget() == nullptr) return false;
     return BoundingBox::isRelFrameFInVisibleDurationRect(relFrame) &&
             getLinkTarget()->isRelFrameFInVisibleDurationRect(relFrame);
 }
 
-FrameRange InternalLinkBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange InternalLinkBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
@@ -124,11 +124,11 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
             this, SLOT(setTargetSlot(BoundingBox*)));
 }
 
-//bool InternalLinkGroupBox::relPointInsidePath(const QPointF &point) {
+//bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) {
 //    return mLinkTarget->relPointInsidePath(point);
 //}
 
-FrameRange InternalLinkGroupBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange InternalLinkGroupBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     FrameRange range{INT_MIN, INT_MAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
@@ -234,7 +234,7 @@ stdsptr<BoundingBoxRenderData> InternalLinkCanvas::createRenderData() {
     return SPtrCreate(LinkCanvasRenderData)(this);
 }
 
-bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) {
+bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) const {
     if(mClipToCanvas->getValue()) return mRelBoundingRect.contains(relPos);
     return InternalLinkGroupBox::relPointInsidePath(relPos);
 }

@@ -30,11 +30,11 @@ public:
     void prp_finishTransform();
     void prp_cancelTransform();
 
-    bool prp_isDescendantRecording();
+    bool prp_isDescendantRecording() const;
     QString prp_getValueText();
     void prp_clearFromGraphView();
 
-    bool hasChildAnimators();
+    bool hasChildAnimators() const;
 
     void prp_setTransformed(const bool &bT);
 
@@ -48,7 +48,7 @@ public:
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &parentMainTarget);
+                             const bool &parentMainTarget) const;
 
     bool SWT_isComplexAnimator() const;
 
@@ -66,7 +66,7 @@ public:
     int getChildPropertyIndex(Property *child);
 
     void ca_updateDescendatKeyFrame(Key* key);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void anim_saveCurrentValueAsKey();
     virtual void ca_removeAllChildAnimators();
     Property *ca_getFirstDescendantWithName(const QString &name);

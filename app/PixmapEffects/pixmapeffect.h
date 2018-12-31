@@ -77,7 +77,7 @@ public:
 
     void setVisible(const bool &visible);
 
-    const bool &isVisible();
+    const bool &isVisible() const;
     void readProperty(QIODevice *target);
 public slots:
     void interrupt();

@@ -116,9 +116,9 @@ public:
 
     virtual void anim_updateKeyOnCurrrentFrame() {}
 
-    virtual bool prp_isKeyOnCurrentFrame() { return false; }
+    virtual bool prp_isKeyOnCurrentFrame() const { return false; }
 
-    virtual bool prp_isDescendantRecording() { return false; }
+    virtual bool prp_isDescendantRecording() const { return false; }
 
     virtual QString prp_getValueText() { return ""; }
 
@@ -126,7 +126,7 @@ public:
 
     virtual void prp_openContextMenu(const QPoint &pos) { Q_UNUSED(pos); }
 
-    virtual bool prp_hasKeys() { return false; }
+    virtual bool prp_hasKeys() const { return false; }
 
     virtual void prp_startDragging() {}
 
@@ -154,11 +154,11 @@ public:
     bool SWT_isProperty() const { return true; }
 
     bool prp_differencesBetweenRelFrames(const int &frame1,
-                                         const int &frame2) {
+                                         const int &frame2) const {
         return !prp_getIdenticalRelFrameRange(frame1).contains(frame2);
     }
 
-    virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) {
+    virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
         Q_UNUSED(relFrame);
         return {INT_MIN, INT_MAX};
     }

@@ -11,7 +11,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
     mBgColor = SkColor4f::FromColor(bgColor);
 }
 
-bool GLWidget::isVisible() {
+bool GLWidget::isVisible() const {
     return mVisible;
 }
 

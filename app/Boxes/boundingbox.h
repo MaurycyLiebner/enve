@@ -83,7 +83,7 @@ public:
 
     virtual void centerPivotPosition();
     virtual void setPivotPosition(const QPointF &pos);
-    virtual bool isContainedIn(const QRectF &absRect);
+    bool isContainedIn(const QRectF &absRect) const;
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
                               GrContext* const grContext);
@@ -97,14 +97,14 @@ public:
     void applyTransformation(BoxTransformAnimator *transAnimator);
     void applyTransformationInverted(BoxTransformAnimator *transAnimator);
 
-    QPointF getAbsolutePos();
+    QPointF getAbsolutePos() const;
 
     virtual void moveByRel(const QPointF &trans);
 
     virtual void startTransform();
     virtual void finishTransform();
 
-    virtual bool relPointInsidePath(const QPointF &);
+    virtual bool relPointInsidePath(const QPointF &relPos) const;
     bool absPointInsidePath(const QPointF &absPos);
     virtual MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                      const CanvasMode &currentCanvasMode,
@@ -123,7 +123,7 @@ public:
     QPointF getPivotAbsPos();
     virtual void select();
     void deselect();
-    int getZIndex();
+    int getZIndex() const;
     virtual void drawBoundingRectSk(SkCanvas *canvas,
                                     const SkScalar &invScale);
 
@@ -131,12 +131,12 @@ public:
     void setParentTransform(BasicTransformAnimator *parent);
     void clearParent();
 
-    BoxesGroup *getParentGroup();
+    BoxesGroup *getParentGroup() const;
 
     virtual BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
-    virtual PaintSettings *getFillSettings();
-    virtual StrokeSettings *getStrokeSettings();
+    virtual PaintSettings *getFillSettings() const;
+    virtual StrokeSettings *getStrokeSettings() const;
 
     void setPivotAbsPos(const QPointF &absPos,
                         const bool &pivotChanged = true);
@@ -153,19 +153,19 @@ public:
     virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     void setName(const QString &name);
-    const QString &getName();
+    const QString &getName() const;
 
     void hide();
     void show();
-    bool isVisible();
+    bool isVisible() const;
     void setVisibile(const bool &visible);
     void switchVisible();
     bool isParentLinkBox();
     void lock();
     void unlock();
     void setLocked(const bool &bt);
-    bool isLocked();
-    bool isVisibleAndUnlocked();
+    bool isLocked() const;
+    bool isVisibleAndUnlocked() const;
     virtual void rotateBy(const qreal &rot);
     virtual void scale(const qreal &scaleBy);
 
@@ -234,7 +234,7 @@ public:
     virtual void updateAllBoxes(const UpdateReason &reason);
     void selectionChangeTriggered(const bool &shiftPressed);
 
-    bool isAnimated();
+    bool isAnimated() const;
 
     virtual const SkPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransformAtCurrentFrame();
@@ -257,9 +257,9 @@ public:
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &parentMainTarget);
+                             const bool &parentMainTarget) const;
 
-    bool SWT_visibleOnlyIfParentDescendant();
+    bool SWT_visibleOnlyIfParentDescendant() const;
 
     void SWT_addToContextMenu(QMenu *menu);
     bool SWT_handleContextMenuActionSelected(QAction *selectedAction);
@@ -271,7 +271,7 @@ public:
     void removeFromParent_k();
     void removeFromSelection();
     virtual void moveByAbs(const QPointF &trans);
-    void copyBoundingBoxDataTo(BoundingBox *targetBox);
+    void copyBoundingBoxDataTo(BoundingBox * const targetBox) const;
 
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const SkScalar &invScale);
@@ -288,7 +288,6 @@ public:
 
     virtual QMatrix getCombinedTransform() const;
 
-    bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
             const int &relX, const int &minViewedFrame,
             const qreal &pixelsPerFrame);
@@ -297,7 +296,7 @@ public:
 
     void setDurationRectangle(const qsptr<DurationRectangle> &durationRect);
 
-    bool isVisibleAndInVisibleDurationRect();
+    bool isVisibleAndInVisibleDurationRect() const;
     void incUsedAsTarget();
     void decUsedAsTarget();
     void ca_childAnimatorIsRecordingChanged();
@@ -352,18 +351,18 @@ public:
     BoundingBoxRenderData *updateCurrentRenderData(const int& relFrame,
                                                       const UpdateReason &reason);
     void nullifyCurrentRenderData(const int& relFrame);
-    virtual bool isRelFrameInVisibleDurationRect(const int &relFrame);
-    virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame);
-    bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
-    bool isRelFrameFVisibleAndInVisibleDurationRect(const qreal &relFrame);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    virtual bool isRelFrameInVisibleDurationRect(const int &relFrame) const;
+    virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame) const;
+    bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame) const;
+    bool isRelFrameFVisibleAndInVisibleDurationRect(const qreal &relFrame) const;
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int &relFrame, const bool &takeAncestorsIntoAccount = true);
     virtual void scheduleWaitingTasks();
     void scheduleTask(const stdsptr<_ScheduledTask> &task);
     virtual void queScheduledTasks();
 
-    const int &getLoadId();
+    const int &getLoadId() const;
 
     virtual int setBoxLoadId(const int &loadId);
 
@@ -384,7 +383,7 @@ public:
     virtual void writeBoundingBox(QIODevice *target);
     virtual void readBoundingBox(QIODevice *target);
 
-    void writeBoundingBoxDataForLink(QIODevice *target);
+    void writeBoundingBoxDataForLink(QIODevice *target) const;
     void readBoundingBoxDataForLink(QIODevice *target);
 
     virtual void shiftAll(const int &shift);
@@ -410,12 +409,12 @@ public:
 
     void decReasonsNotToApplyUglyTransform();
 
-    bool isSelected();
+    bool isSelected() const;
 
     void updateDrawRenderContainerTransform();
     void setPivotAutoAdjust(const bool &bT);
 
-    const BoundingBoxType &getBoxType();
+    const BoundingBoxType &getBoxType() const;
 
     void startDurationRectPosTransform();
     void finishDurationRectPosTransform();
@@ -432,7 +431,7 @@ public:
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
 protected:
-    virtual void getMotionBlurProperties(QList<Property*>& list);
+    virtual void getMotionBlurProperties(QList<Property*> &list) const;
 
     bool mSelected = false;
     bool mBlockedSchedule = false;

@@ -44,7 +44,7 @@ public:
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &parentMainTarget);
+                             const bool &parentMainTarget) const;
     FixedLenAnimationRect *getDurationRect();
 public slots:
     void scheduleFinalDataUpdate();

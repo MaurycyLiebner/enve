@@ -13,7 +13,7 @@ void BonesBox::drawHoveredSk(SkCanvas *canvas,
     }
 }
 
-bool BonesBox::relPointInsidePath(const QPointF &relPos) {
+bool BonesBox::relPointInsidePath(const QPointF &relPos) const {
     foreach(const qsptr<Bone>& bone, mBones) {
         if(bone->getBoneAtRelPos(relPos) != nullptr) { return true; }
     }

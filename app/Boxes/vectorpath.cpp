@@ -170,7 +170,7 @@ SkPath VectorPath::getPathAtRelFrameF(const qreal &relFrame) {
      return mPathAnimator->getPathAtRelFrameF(relFrame);
 }
 
-void VectorPath::getMotionBlurProperties(QList<Property*> &list) {
+void VectorPath::getMotionBlurProperties(QList<Property*> &list) const {
     PathBox::getMotionBlurProperties(list);
     list.append(mPathAnimator.get());
 }

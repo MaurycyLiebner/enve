@@ -18,14 +18,14 @@ public:
     void setOtherCtrlPt(CtrlPoint *ctrlPt);
     void removeFromVectorPath();
 
-    bool isHidden();
+    bool isHidden() const;
     void setIsStartCtrlPt(const bool &bT);
     void cancelTransform();
 
     void rotate(const qreal &rotate);
     void scale(const qreal &sx, const qreal &sy);
 
-    int getPtId();
+    int getPtId() const;
 
     void setRelativePosVal(const QPointF &relPos);
 protected:

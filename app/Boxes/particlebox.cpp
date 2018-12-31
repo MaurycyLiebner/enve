@@ -59,7 +59,7 @@ void ParticleBox::prp_setAbsFrame(const int &frame) {
     scheduleUpdate(Animator::FRAME_CHANGE);
 }
 
-bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
+bool ParticleBox::relPointInsidePath(const QPointF &relPos) const {
     if(mRelBoundingRect.contains(relPos.x(), relPos.y())) {
         /*if(mEmitters.isEmpty()) */return true;
 //        Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
@@ -85,7 +85,7 @@ void ParticleBox::removeEmitter(const qsptr<ParticleEmitter>& emitter) {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-FrameRange ParticleBox::prp_getIdenticalRelFrameRange(const int &relFrame) {
+FrameRange ParticleBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
         return {relFrame, relFrame};
     }

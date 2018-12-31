@@ -171,7 +171,7 @@ public:
 
     Bone *getBoneAtRelPos(const QPointF &relPos);
 
-    bool relPointInsidePath(const QPointF &relPos);
+    bool relPointInsidePath(const QPointF &relPos) const;
 
     bool SWT_isBonesBox() const;
 

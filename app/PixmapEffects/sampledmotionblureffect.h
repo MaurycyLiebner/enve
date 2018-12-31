@@ -28,14 +28,14 @@ public:
         mParentBox = box;
     }
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data);
 protected:
     SampledMotionBlurEffect(BoundingBox *box = nullptr);
 private:
-    FrameRange getParentBoxFirstLastMarginAjusted(const int &relFrame);
+    FrameRange getParentBoxFirstLastMarginAjusted(const int &relFrame) const;
     qptr<BoundingBox> mParentBox;
     qsptr<QrealAnimator> mOpacity;
     qsptr<QrealAnimator> mNumberSamples;

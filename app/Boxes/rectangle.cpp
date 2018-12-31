@@ -165,7 +165,7 @@ void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
     }
 }
 
-void Rectangle::getMotionBlurProperties(QList<Property *> &list) {
+void Rectangle::getMotionBlurProperties(QList<Property*> &list) const {
     PathBox::getMotionBlurProperties(list);
     list.append(mTopLeftAnimator.get());
     list.append(mBottomRightAnimator.get());

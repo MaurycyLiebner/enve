@@ -78,7 +78,7 @@ void GroupLastPathSumPathEffect::setParentGroup(BoxesGroup *parent) {
 bool GroupLastPathSumPathEffect::SWT_shouldBeVisible(
                         const SWT_RulesCollection &rules,
                         const bool &parentSatisfies,
-                        const bool &parentMainTarget) {
+                        const bool &parentMainTarget) const {
     return Animator::SWT_shouldBeVisible(
                 rules,
                 parentSatisfies,
