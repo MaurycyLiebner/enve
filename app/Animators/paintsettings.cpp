@@ -658,7 +658,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         SkScalar radius = static_cast<SkScalar>(
                     qSqrt(distPt.x()*distPt.x() + distPt.y()*distPt.y()));
         gradientSk = SkGradientShader::MakeRadial(
-                        QPointFToSkPoint(start),
+                        qPointToSk(start),
                         radius,
                         gradColors,
                         gradPos,

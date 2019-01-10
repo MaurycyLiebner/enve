@@ -533,13 +533,14 @@ VectorPath *PathBox::objectToVectorPathBox() {
     qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
-        Circle* circleT = GetAsPtr(this, Circle);
+        auto circleT = GetAsPtr(this, Circle);
         pathT.addEllipse(QPointF(0., 0.),
                          circleT->getCurrentXRadius(),
                          circleT->getCurrentYRadius());
         newPath->loadPathFromSkPath(QPainterPathToSkPath(pathT));
     } else {
-        newPath->loadPathFromSkPath(mEditPathSk);
+        //newPath->loadPathFromSkPath(mEditPathSk);
+        newPath->loadPathFromSkPath(mPathSk);
     }
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
@@ -621,7 +622,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) const {
-    SkPoint relPosSk = QPointFToSkPoint(relPos);
+    SkPoint relPosSk = qPointToSk(relPos);
     if(mSkRelBoundingRectPath.contains(relPosSk.x(), relPosSk.y()) ) {
         if(mFillPathSk.contains(relPosSk.x(), relPosSk.y())) {
             return true;

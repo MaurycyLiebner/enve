@@ -612,7 +612,7 @@ void ParticleEmitter::generateParticles() {
                                             SkPoint::Make(
                                                 pos.x() + xTrans,
                                                 pos.y()),
-                                            QPointFToSkPoint(partVel),
+                                            qPointToSk(partVel),
                                             partSize);
             notFinishedParticles << newParticle;
         }
@@ -625,7 +625,7 @@ void ParticleEmitter::generateParticles() {
                 particle->generatePathNextFrame(i,
                                                 velocityVar,
                                                 velocityVarPeriod,
-                                                QPointFToSkPoint(acceleration),
+                                                qPointToSk(acceleration),
                                                 finalScale,
                                                 finalOpacity,
                                                 decayFrames,

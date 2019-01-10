@@ -34,7 +34,7 @@ void BoxPathPoint::drawSk(SkCanvas *canvas,
     if(isHidden()) {
         return;
     }
-    SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
+    SkPoint absPos = qPointToSk(getAbsolutePos());
     if(mSelected) {
         drawOnAbsPosSk(canvas, absPos, invScale,
                        255, 255, 0);

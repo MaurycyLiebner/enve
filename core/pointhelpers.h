@@ -1,15 +1,46 @@
-#ifndef POINTHELPERS_H
+﻿#ifndef POINTHELPERS_H
 #define POINTHELPERS_H
 #include <QPointF>
 #include <QString>
 #include <QRectF>
 #include <QPainter>
+#include <type_traits>
+#include <experimental/type_traits>
 #include "simplemath.h"
+#include "Segments/conicsegment.h"
+#include "Segments/cubicsegment.h"
+#include "Segments/quadsegment.h"
+
+typedef std::pair<qCubicSegment2D, qCubicSegment2D> CubicPair;
+typedef std::pair<qreal, qreal> qrealPair;
+typedef QList<qCubicSegment2D> CubicList;
+typedef std::pair<CubicList, CubicList> CubicListPair;
+#define pow2(val) val*val
+#define pow3(val) val*val*val
+
 enum CtrlsMode : short {
     CTRLS_SMOOTH,
     CTRLS_SYMMETRIC,
     CTRLS_CORNER
 };
+
+//template <typename T>
+//struct Solution {
+//    Solution(const bool& valid, const T& value = T()) :
+//        fValid(valid), fValue(value) {}
+
+//    operator const bool&() const {
+//        return fValid;
+//    }
+
+//    operator const T&() const {
+//        return fValue;
+//    }
+
+//    const bool fValid;
+//    const T fValue;
+//};
+
 extern qreal gSolveForP2(const qreal& p0, const qreal& p1,
                         const qreal& p3, const qreal& t,
                           const qreal& value);
@@ -26,115 +57,114 @@ extern qreal gSolveForP1(const qreal& p0, const qreal& p2,
                          const qreal& p3, const qreal& t,
                          const qreal& value);
 
-extern void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
-                                 QPointF centerPos, QPointF *newEndPos,
-                                 QPointF *newStartPos);
-extern void getCtrlsSmoothPos(QPointF endPos, QPointF startPos,
-                              QPointF centerPos, QPointF *newEndPos,
-                              QPointF *newStartPos);
+extern void gGetCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
+                                  QPointF centerPos, QPointF *newEndPos,
+                                  QPointF *newStartPos);
+extern void gGetCtrlsSmoothPos(QPointF endPos, QPointF startPos,
+                               QPointF centerPos, QPointF *newEndPos,
+                               QPointF *newStartPos);
 
-extern qreal calcCubicBezierVal(qreal p0, qreal p1,
-                                qreal p2, qreal p3, qreal t);
-extern QPointF calcCubicBezierVal(QPointF p0, QPointF p1,
-                                  QPointF p2, QPointF p3, qreal t);
+extern qreal gCalcCubicBezierVal(const qCubicSegment1D &seg,
+                                 const qreal &t);
+extern QPointF gCalcCubicBezierVal(const qCubicSegment2D &seg,
+                                   const qreal& t);
 
-extern qreal tFromX(qreal p0x, qreal p1x,
-                       qreal p2x, qreal p3x,
-                       qreal x);
-
-
-extern QPointF getClosestPointOnLineSegment(const QPointF &a,
-                                            const QPointF &b,
-                                            const QPointF &p);
-extern QPointF closestPointOnRect(const QRectF &rect,
-                                  const QPointF &point,
-                                  qreal *dist = nullptr);
-
-extern qreal getTforBezierPoint(const qreal &x0,
-                                const qreal &x1,
-                                const qreal &x2,
-                                const qreal &x3,
-                                const qreal &x,
-                                const qreal &y0,
-                                const qreal &y1,
-                                const qreal &y2,
-                                const qreal &y3,
-                                const qreal &y,
-                                qreal *error = nullptr,
-                                QPointF *bestPosPtr = nullptr,
-                                const bool &fineTune = true);
-
-extern qreal getTforBezierPoint(const QPointF &p0,
-                                const QPointF &p1,
-                                const QPointF &p2,
-                                const QPointF &p3,
-                                const QPointF &p,
-                                qreal *error = nullptr,
-                                QPointF *bestPosPtr = nullptr);
-
-extern void getClosestTValuesBezier1D(const qreal &v0n,
-                                      const qreal &v1n,
-                                      const qreal &v2n,
-                                      const qreal &v3n,
-                                      const qreal &vn,
-                                      QList<qreal> *list);
-
-extern qreal getClosestTValueBezier2D(const QPointF &p0,
-                                      const QPointF &p1,
-                                      const QPointF &p2,
-                                      const QPointF &p3,
-                                      const QPointF &p,
-                                      QPointF *bestPosPtr = nullptr,
-                                      qreal *errorPtr = nullptr);
-
-extern qreal getBezierTValueForX(const qreal &x0,
-                                 const qreal &x1,
-                                 const qreal &x2,
-                                 const qreal &x3,
-                                 const qreal &x,
-                                 qreal *error = nullptr);
-extern void bezierLeastSquareV1V2(const QPointF &v0,
-                                  QPointF &v1, QPointF &v2,
-                                  const QPointF &v3,
-                                  const QList<QPointF> &vs,
-                                  const int &minVs,
-                                  const int &maxVs);
+extern qreal gTFromX(const qCubicSegment1D &seg,
+                    const qreal &x);
 
 
-extern void drawCosmeticEllipse(QPainter *p,
-                                const QPointF &absPos,
-                                qreal rX, qreal rY);
+extern QPointF gGetClosestPointOnLineSegment(const QPointF &a,
+                                             const QPointF &b,
+                                             const QPointF &p);
+extern QPointF gClosestPointOnRect(const QRectF &rect,
+                                   const QPointF &point,
+                                   qreal *dist = nullptr);
 
-extern qreal distBetweenTwoPoints(QPointF point1, QPointF point2);
+extern qreal gGetTforBezierPoint(const qCubicSegment2D &seg,
+                                 const QPointF &pos,
+                                 qreal *error = nullptr,
+                                 QPointF *bestPosPtr = nullptr,
+                                 const bool &fineTune = true);
+
+extern qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
+                                       const QPointF &p,
+                                       QPointF *bestPosPtr = nullptr,
+                                       qreal *errorPtr = nullptr);
+
+extern qreal gGetBezierTValueForX(const qCubicSegment1D &seg,
+                                  const qreal &x,
+                                  qreal *error = nullptr);
+extern qCubicSegment2D gBezierLeastSquareV1V2(
+        const qCubicSegment2D &seg, const QList<QPointF> &vs,
+        const int &minVs, const int &maxVs);
 
 
-extern bool doesPathIntersectWithCircle(const QPainterPath &path,
-                                 qreal xRadius, qreal yRadius,
-                                 QPointF center);
+extern void gDrawCosmeticEllipse(QPainter *p,
+                                 const QPointF &absPos,
+                                 qreal rX, qreal rY);
 
-extern bool doesPathNotContainCircle(const QPainterPath &path,
+extern qreal gDistBetweenTwoPoints(QPointF point1, QPointF point2);
+
+
+extern bool gDoesPathIntersectWithCircle(const QPainterPath &path,
+                                  qreal xRadius, qreal yRadius,
+                                  QPointF center);
+
+extern bool gDoesPathNotContainCircle(const QPainterPath &path,
                               qreal xRadius, qreal yRadius,
                               QPointF center);
 
-extern QPointF getCenterOfPathIntersectionWithCircle(const QPainterPath &path,
+extern QPointF gGetCenterOfPathIntersectionWithCircle(const QPainterPath &path,
                                               qreal xRadius, qreal yRadius,
                                               QPointF center);
 
-extern QPointF getCenterOfPathDifferenceWithCircle(const QPainterPath &path,
+extern QPointF gGetCenterOfPathDifferenceWithCircle(const QPainterPath &path,
                                             qreal xRadius, qreal yRadius,
                                             QPointF center);
 
-extern QPointF getPointClosestOnPathTo(const QPainterPath &path,
+extern QPointF gGetPointClosestOnPathTo(const QPainterPath &path,
                                        QPointF relPos,
                                        qreal xRadiusScaling,
                                        qreal yRadiusScaling);
 
-extern qreal getBezierTValueForXAssumeNoOverlapGrowingOnly(const qreal &x0,
-                                                           const qreal &x1,
-                                                           const qreal &x2,
-                                                           const qreal &x3,
-                                                           const qreal &x,
-                                                           const qreal &maxError,
-                                                           qreal *error = nullptr);
+extern qreal gGetBezierTValueForXAssumeNoOverlapGrowingOnly(
+        const qCubicSegment1D &seg,
+        const qreal &x,
+        const qreal &maxError, qreal *error = nullptr);
 
+extern qreal gMinDistanceToPath(const SkPoint& pos, const SkPath& path);
+
+extern QList<qCubicSegment2D> gPathToQCubicSegs2D(const SkPath& path);
+
+
+extern void gSegmentLengthLoop(const qCubicSegment2D& seg,
+                               const uint &div,
+                               const bool& closedInterval,
+                               const std::function<void(const qreal&)> &func);
+
+
+//! @brief Splits segments at intersections.
+//! Returns pair of lists of segments corresponding to each input segment.
+extern CubicListPair gSplitAtIntersections(const qCubicSegment2D& seg1,
+                                           const qCubicSegment2D& seg2);
+extern SkPath gCubicListToSkPath(const CubicList& list);
+
+extern CubicList gSplitSelfAtIntersections(const qCubicSegment2D& seg);
+
+extern CubicList gRemoveAllPointsCloserThan(const qreal& minDist,
+                                            const SkPath& distTo,
+                                            const CubicList &src);
+
+extern CubicList gCubicIntersectList(CubicList targetList);
+
+extern CubicList gCubicIntersectListAndRemoveExt(CubicList targetList);
+
+extern CubicList gRemoveAllPointsOutsidePath(const SkPath& path,
+                                             const CubicList &src);
+extern CubicList gRemoveAllPointsInsidePath(const SkPath& path,
+                                            const CubicList &src);
+
+extern qreal gCubicLength(const qCubicSegment2D& seg);
+extern qreal gCubicTimeAtLength(const qCubicSegment2D& seg,
+                                const qreal& length);
 #endif // POINTHELPERS_H

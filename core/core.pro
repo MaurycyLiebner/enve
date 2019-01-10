@@ -80,7 +80,10 @@ SOURCES += \
     Animators/graphkey.cpp \
     Animators/interpolationkey.cpp \
     Animators/interpolationanimator.cpp \
-    framerange.cpp
+    framerange.cpp \
+    Segments/cubicsegment.cpp \
+    Segments/quadsegment.cpp \
+    Segments/conicsegment.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -119,7 +122,10 @@ HEADERS += \
     Animators/graphkey.h \
     Animators/interpolationkey.h \
     Animators/interpolationanimator.h \
-    framerange.h
+    framerange.h \
+    Segments/cubicsegment.h \
+    Segments/quadsegment.h \
+    Segments/conicsegment.h
 
 unix {
     target.path = /usr/lib

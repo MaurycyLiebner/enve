@@ -15,20 +15,20 @@ ImageBox::ImageBox(const QString &filePath) :
 }
 
 ImageBox::~ImageBox() {
-    if(mImgCacheHandler != nullptr) {
+    if(mImgCacheHandler) {
         mImgCacheHandler->removeDependentBox(this);
     }
 }
 
 void ImageBox::setFilePath(const QString &path) {
     mImageFilePath = path;
-    if(mImgCacheHandler != nullptr) {
+    if(mImgCacheHandler) {
         mImgCacheHandler->removeDependentBox(this);
     }
     auto handlerT = FileSourcesCache::getHandlerForFilePath(path);
     mImgCacheHandler = GetAsPtr(handlerT, ImageCacheHandler);
 
-    if(mImgCacheHandler == nullptr) {
+    if(!mImgCacheHandler) {
         QFile file(path);
         if(file.exists()) {
             mImgCacheHandler = ImageCacheHandler::createNewHandler(path);
@@ -63,7 +63,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     auto imgData = GetAsPtr(data, ImageBoxRenderData);
     imgData->image = mImgCacheHandler->getImageCopy();
-    if(imgData->image == nullptr) {
+    if(!imgData->image) {
         mImgCacheHandler->scheduleTask();
         mImgCacheHandler->addDependent(imgData);
     }

@@ -40,6 +40,10 @@ bool isZero4Dec(const double& val) {
     return qAbs(val) < 0.0001;
 }
 
+bool isZero6Dec(const double &val) {
+    return qAbs(val) < 0.000001;
+}
+
 bool isZero2Dec(qreal val) {
     return qAbs(val) < 0.01;
 }

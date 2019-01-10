@@ -5,6 +5,7 @@
 class NodePoint;
 class CtrlPoint;
 #include "skia/skiaincludes.h"
+#include "Segments/cubicsegment.h"
 
 class VectorPathEdge : public StdSelfRef {
 public:
@@ -55,7 +56,8 @@ public:
     QPointF getRelPosAtT(const qreal &t);
     QPointF getAbsPosAtT(const qreal &t);
 
-    void makePassThrough(const QPointF &absPos);
+    void makePassThroughAbs(const QPointF &absPos);
+    void makePassThroughRel(const QPointF &relPos);
 
     void finishPassThroughTransform();
     void startPassThroughTransform();
@@ -87,13 +89,15 @@ public:
                               QPointF *nearestPoint,
                               qreal *t, qreal *error);
 private:
+    qCubicSegment2D getAsAbsSegment() const;
+    qCubicSegment2D getAsRelSegment() const;
+
     SkPath mSkPath;
 
     NodePoint *mPoint1;
     CtrlPoint *mPoint1EndPt;
     NodePoint *mPoint2;
     CtrlPoint *mPoint2StartPt;
-    bool mEditPath = true;
 
     qreal mPressedT;
 };

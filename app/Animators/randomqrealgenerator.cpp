@@ -96,73 +96,14 @@ qreal RandomQrealGenerator::getDevAtRelFrameF(const qreal &relFrame) {
         qreal c1F = frameBefore + smoothnessBefore*(frameAfter - frameBefore);
         qreal c2F = frameAfter - smoothnessAfter*(frameAfter - frameBefore);
 
-        t = getBezierTValueForXAssumeNoOverlapGrowingOnly(
-                    frameBefore, c1F, c2F, frameAfter, relFrameRel, 0.01);
+        t = gGetBezierTValueForXAssumeNoOverlapGrowingOnly(
+            {frameBefore, c1F, c2F, frameAfter}, relFrameRel, 0.01);
     }
     return t*valueAfter + (1. - t)*valueBefore;
-    qreal c1V = valueBefore + smoothnessBefore*(valueAfter - valueBefore);
-    qreal c2V = valueAfter - smoothnessAfter*(valueAfter - valueBefore);
-    return calcCubicBezierVal(valueBefore, c1V,
-                              c2V, valueAfter, t);
 }
 
 qreal RandomQrealGenerator::getDevAtRelFrame(const int &relFrame) {
-//    if(relFrame > mLastFrame) {
-//        mLastFrame = relFrame;
-//        generateData();
-//    }
-//    if(relFrame < mFirstFrame) {
-//        mFirstFrame = relFrame;
-//        generateData();
-//    }
-    int relFrameRel = relFrame % (mLastFrame - 1);
-
-    qreal maxDev = mMaxDev->getCurrentEffectiveValueAtRelFrame(relFrameRel);
-    int idBefore = getClosestLowerFrameId(0, mFrameValues.count() - 1, relFrameRel);
-    const FrameValue &frameValueBefore = mFrameValues.at(idBefore);
-    qreal frameBefore = frameValueBefore.frame;
-    qreal valueBefore = frameValueBefore.value;
-    qreal smoothnessBefore =
-            mSmoothness->qra_getEffectiveValueAtRelFrame(frameBefore);
-
-    int idAfter = idBefore + 1;
-    const FrameValue &frameValueAfter = mFrameValues.at(idAfter);
-    qreal frameAfter = frameValueAfter.frame;
-    qreal valueAfter = frameValueAfter.value;
-
-    int currentType = mType->getCurrentValue();
-    if(currentType == 2) { // overlay
-        valueBefore = valueBefore - .5;
-        valueAfter = valueAfter - .5;
-    } else if(currentType == 1) { // subtract
-        valueBefore = -valueBefore;
-        valueAfter = -valueAfter;
-    }
-
-    valueBefore = valueBefore*maxDev;
-    valueAfter = valueAfter*maxDev;
-
-    if(qAbs(relFrameRel - frameBefore) < 0.01) return valueBefore;
-    if(qAbs(relFrameRel - frameAfter) < 0.01) return valueAfter;
-    qreal smoothnessAfter =
-            mSmoothness->qra_getEffectiveValueAtRelFrame(frameAfter);
-
-    qreal t;
-    if(smoothnessBefore < 0.001 && smoothnessAfter < 0.001) {
-        qreal dVal = (valueAfter - valueBefore)/(frameAfter - frameBefore);
-        return (relFrameRel - frameBefore)*dVal + valueBefore;
-    } else {
-        qreal c1F = frameBefore + smoothnessBefore*(frameAfter - frameBefore);
-        qreal c2F = frameAfter - smoothnessAfter*(frameAfter - frameBefore);
-
-        t = getBezierTValueForXAssumeNoOverlapGrowingOnly(
-                    frameBefore, c1F, c2F, frameAfter, relFrameRel, 0.01);
-    }
-    return t*valueAfter + (1. - t)*valueBefore;
-    qreal c1V = valueBefore + smoothnessBefore*(valueAfter - valueBefore);
-    qreal c2V = valueAfter - smoothnessAfter*(valueAfter - valueBefore);
-    return calcCubicBezierVal(valueBefore, c1V,
-                              c2V, valueAfter, t);
+    return getDevAtRelFrameF(relFrame);
 }
 
 int RandomQrealGenerator::getClosestLowerFrameId(const int &minId,

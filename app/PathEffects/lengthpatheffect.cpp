@@ -65,8 +65,9 @@ void LengthPathEffect::filterPathForRelFrameF(const qreal &relFrame,
         } else if(elem.isLineTo()) { // line
             QPointF nearestPtT;
             qreal errorT;
-            qreal nearestT = getClosestTValueBezier2D(lastPt, lastPt,
-                                     QPointF(elem.x, elem.y), QPointF(elem.x, elem.y),
+            qreal nearestT = gGetClosestTValueOnBezier(
+                                {lastPt, lastPt,
+                                 QPointF(elem.x, elem.y), QPointF(elem.x, elem.y)},
                                      finalPt, &nearestPtT, &errorT);
             if(errorT < 0.01) {
                 QPainterPath dstT3 = dstT2;
@@ -92,8 +93,8 @@ void LengthPathEffect::filterPathForRelFrameF(const qreal &relFrame,
             } else {
                 QPointF nearestPtT;
                 qreal errorT;
-                qreal nearestT = getClosestTValueBezier2D(lastPt, endPt,
-                                         startPt, QPointF(elem.x, elem.y),
+                qreal nearestT = gGetClosestTValueOnBezier({lastPt, endPt,
+                                         startPt, QPointF(elem.x, elem.y)},
                                          finalPt, &nearestPtT, &errorT);
                 if(errorT < 0.01) {
                     QPainterPath dstT3 = dstT2;

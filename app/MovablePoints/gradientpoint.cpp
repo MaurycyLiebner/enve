@@ -37,7 +37,7 @@ void GradientPoint::drawSk(SkCanvas *canvas,
         return;
     }
 
-    SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
+    SkPoint absPos = qPointToSk(getAbsolutePos());
     canvas->save();
 
     SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;

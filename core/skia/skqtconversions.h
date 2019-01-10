@@ -27,12 +27,12 @@ extern QMatrix SkMatrixToQMatrix(const SkMatrix &matrix);
 
 extern SkMatrix QMatrixToSkMatrix(const QMatrix &matrix);
 
-extern inline QPointF SkPointToQPointF(const SkPoint &point) {
+extern inline QPointF skPointToQ(const SkPoint &point) {
     return QPointF(SkScalarToQreal(point.x()),
                    SkScalarToQreal(point.y()));
 }
 
-extern inline SkPoint QPointFToSkPoint(const QPointF &point) {
+extern inline SkPoint qPointToSk(const QPointF &point) {
     return SkPoint::Make(qrealToSkScalar(point.x()),
                          qrealToSkScalar(point.y()));
 }
@@ -50,8 +50,10 @@ extern bool skRectContainesSkPoint(const SkRect &absRect,
 extern SkPath QPainterPathToSkPath(const QPainterPath &qPath);
 extern QPainterPath SkPathToQPainterPath(const SkPath &path);
 
-
-
+extern void switchSkQ(const QPointF& qPos, SkPoint& skPos);
+extern void switchSkQ(const SkPoint& skPos, QPointF& qPos);
+extern void switchSkQ(const qreal& q, SkScalar& sk);
+extern void switchSkQ(const SkScalar& sk, qreal& q);
 //struct SkLine {
 //    SkLine(const SkPoint &p1T,
 //           const SkPoint &p2T) {

@@ -131,17 +131,7 @@ QPointF VectorPathEdge::getPosBetweenPointsAtT(const qreal &t,
                                      const QPointF &p1EndPos,
                                      const QPointF &p2StartPos,
                                      const QPointF &p3Pos) {
-    qreal x0 = p0Pos.x();
-    qreal y0 = p0Pos.y();
-    qreal x1 = p1EndPos.x();
-    qreal y1 = p1EndPos.y();
-    qreal x2 = p2StartPos.x();
-    qreal y2 = p2StartPos.y();
-    qreal x3 = p3Pos.x();
-    qreal y3 = p3Pos.y();
-
-    return QPointF(calcCubicBezierVal(x0, x1, x2, x3, t),
-                   calcCubicBezierVal(y0, y1, y2, y3, t) );
+    return gCalcCubicBezierVal({p0Pos, p1EndPos, p2StartPos, p3Pos}, t);
 }
 
 QPointF VectorPathEdge::getRelPosBetweenPointsAtT(const qreal &t,
@@ -184,7 +174,7 @@ QPointF VectorPathEdge::getAbsPosAtT(const qreal &t) {
     return getAbsPosBetweenPointsAtT(t, mPoint1, mPoint2);
 }
 
-void VectorPathEdge::makePassThrough(const QPointF &absPos) {
+void VectorPathEdge::makePassThroughAbs(const QPointF &absPos) {
     if(!mPoint2->isStartCtrlPtEnabled() ) {
         mPoint2->setStartCtrlPtEnabled(true);
     }
@@ -192,53 +182,40 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
         mPoint1->setEndCtrlPtEnabled(true);
     }
 
+    auto absSeg = getAsAbsSegment();
 
-    QPointF p0Pos = mPoint1->getAbsolutePos();
-    QPointF p1Pos = mPoint1EndPt->getAbsolutePos();
-    QPointF p2Pos = mPoint2StartPt->getAbsolutePos();
-    QPointF p3Pos = mPoint2->getAbsolutePos();
+    QPointF dPos = absPos - gCalcCubicBezierVal(absSeg, mPressedT);
+    while(pointToLen(dPos) > 1.) {
+        absSeg.fP1 += (1. - mPressedT)*dPos;
+        absSeg.fP2 += mPressedT*dPos;
 
-    if(!mEditPath) {
-        auto parentTransform =
-                GetAsPtr(mPoint1->getParentTransform(),
-                         BoxTransformAnimator);
-        BoundingBox* parentBox = parentTransform->getParentBox();
-        NodePointValues p1Values = mPoint1->getPointValues();
-        p0Pos = parentBox->getCombinedTransform().map(
-                    p1Values.pointRelPos);
-        p1Pos = parentBox->getCombinedTransform().map(
-                    p1Values.endRelPos);
-        NodePointValues p2Values = mPoint2->getPointValues();
-        p2Pos = parentBox->getCombinedTransform().map(
-                    p2Values.startRelPos);
-        p3Pos = parentBox->getCombinedTransform().map(
-                    p2Values.pointRelPos);
+        dPos = absPos - gCalcCubicBezierVal(absSeg, mPressedT);
     }
 
-    qreal x0 = p0Pos.x();
-    qreal y0 = p0Pos.y();
-    qreal x1 = p1Pos.x();
-    qreal y1 = p1Pos.y();
-    qreal x2 = p2Pos.x();
-    qreal y2 = p2Pos.y();
-    qreal x3 = p3Pos.x();
-    qreal y3 = p3Pos.y();
+    mPoint1EndPt->moveToAbs(absSeg.fP1);
+    mPoint2StartPt->moveToAbs(absSeg.fP2);
+}
 
-    qreal dx = absPos.x() - calcCubicBezierVal(x0, x1, x2, x3, mPressedT);
-    qreal dy = absPos.y() - calcCubicBezierVal(y0, y1, y2, y3, mPressedT);
-    while(dx*dx + dy*dy > 1.) {
-        x1 += (1. - mPressedT)*dx;
-        y1 += (1. - mPressedT)*dy;
-        x2 += mPressedT*dx;
-        y2 += mPressedT*dy;
-
-        dx = absPos.x() - calcCubicBezierVal(x0, x1, x2, x3, mPressedT);
-        dy = absPos.y() - calcCubicBezierVal(y0, y1, y2, y3, mPressedT);
+void VectorPathEdge::makePassThroughRel(const QPointF &relPos) {
+    if(!mPoint2->isStartCtrlPtEnabled() ) {
+        mPoint2->setStartCtrlPtEnabled(true);
+    }
+    if(!mPoint1->isEndCtrlPtEnabled() ) {
+        mPoint1->setEndCtrlPtEnabled(true);
     }
 
+    auto relSeg = getAsAbsSegment();
 
-    mPoint1EndPt->moveToAbs(QPointF(x1, y1) );
-    mPoint2StartPt->moveToAbs(QPointF(x2, y2) );
+    QPointF dPos = relPos - gCalcCubicBezierVal(relSeg, mPressedT);
+    while(pointToLen(dPos) > 1.) {
+        relSeg.fP1 += (1. - mPressedT)*dPos;
+        relSeg.fP2 += mPressedT*dPos;
+
+        dPos = relPos - gCalcCubicBezierVal(relSeg, mPressedT);
+    }
+
+    mPoint1EndPt->moveToRel(relSeg.fP1);
+    mPoint2StartPt->moveToRel(relSeg.fP2);
 }
 
 void VectorPathEdge::finishPassThroughTransform() {
@@ -256,16 +233,12 @@ void VectorPathEdge::cancelPassThroughTransform() {
     mPoint2StartPt->cancelTransform();
 }
 
-void VectorPathEdge::setEditPath(const bool &bT) {
-    mEditPath = bT;
-}
-
 void VectorPathEdge::generatePainterPath() {
     mSkPath = SkPath();
-    mSkPath.moveTo(QPointFToSkPoint(mPoint1->getAbsolutePos()));
-    mSkPath.cubicTo(QPointFToSkPoint(mPoint1->getEndCtrlPtAbsPos()),
-                    QPointFToSkPoint(mPoint2->getStartCtrlPtAbsPos()),
-                    QPointFToSkPoint(mPoint2->getAbsolutePos()));
+    mSkPath.moveTo(qPointToSk(mPoint1->getAbsolutePos()));
+    mSkPath.cubicTo(qPointToSk(mPoint1->getEndCtrlPtAbsPos()),
+                    qPointToSk(mPoint2->getStartCtrlPtAbsPos()),
+                    qPointToSk(mPoint2->getAbsolutePos()));
 }
 
 void VectorPathEdge::drawHoveredSk(SkCanvas *canvas,
@@ -307,25 +280,32 @@ void VectorPathEdge::setPressedT(const qreal &t) {
 void VectorPathEdge::getNearestAbsPosAndT(const QPointF &absPos,
                                 QPointF *nearestPoint,
                                 qreal *t) {
-    *t = getClosestTValueBezier2D(mPoint1->getAbsolutePos(),
-                                  mPoint1->getEndCtrlPtAbsPos(),
-                                  mPoint2->getStartCtrlPtAbsPos(),
-                                  mPoint2->getAbsolutePos(),
-                                  absPos,
-                                  nearestPoint);
+    *t = gGetClosestTValueOnBezier(getAsAbsSegment(), absPos,
+                                   nearestPoint);
 }
 
 void VectorPathEdge::getNearestRelPosAndT(const QPointF &relPos,
                                 QPointF *nearestPoint,
                                 qreal *t,
                                 qreal *error) {
-    *t = getClosestTValueBezier2D(mPoint1->getRelativePos(),
-                            mPoint1->getEndCtrlPtValue(),
-                            mPoint2->getStartCtrlPtValue(),
-                            mPoint2->getRelativePos(),
-                            relPos,
-                            nearestPoint,
-                            error);
+    *t = gGetClosestTValueOnBezier(getAsRelSegment(), relPos,
+                                   nearestPoint, error);
+}
+
+qCubicSegment2D VectorPathEdge::getAsAbsSegment() const {
+    Q_ASSERT(mPoint1 && mPoint2);
+    return {mPoint1->getAbsolutePos(),
+            mPoint1->getEndCtrlPtAbsPos(),
+            mPoint2->getStartCtrlPtAbsPos(),
+            mPoint2->getAbsolutePos()};
+}
+
+qCubicSegment2D VectorPathEdge::getAsRelSegment() const {
+    Q_ASSERT(mPoint1 && mPoint2);
+    return {mPoint1->getRelativePos(),
+            mPoint1->getEndCtrlPtValue(),
+            mPoint2->getStartCtrlPtValue(),
+            mPoint2->getRelativePos()};
 }
 
 QPointF VectorPathEdge::getSlopeVector(const qreal &t) {

@@ -37,8 +37,8 @@ void GradientPoints::disable() {
 void GradientPoints::drawGradientPointsSk(SkCanvas *canvas,
                                           const SkScalar &invScale) {
     if(mEnabled) {
-        SkPoint startPos = QPointFToSkPoint(mStartPoint->getAbsolutePos());
-        SkPoint endPos = QPointFToSkPoint(mEndPoint->getAbsolutePos());
+        SkPoint startPos = qPointToSk(mStartPoint->getAbsolutePos());
+        SkPoint endPos = qPointToSk(mEndPoint->getAbsolutePos());
         SkPaint paint;
         paint.setAntiAlias(true);
         paint.setColor(SK_ColorBLACK);

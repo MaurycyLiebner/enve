@@ -58,10 +58,10 @@ void Rectangle::finishAllPointsTransform() {
 SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
     SkPath path;
     SkPoint topLeft =
-            QPointFToSkPoint(mTopLeftAnimator->
+            qPointToSk(mTopLeftAnimator->
                                 getCurrentEffectivePointValueAtRelFrame(relFrame));
     SkPoint bottomRight =
-            QPointFToSkPoint(mBottomRightAnimator->
+            qPointToSk(mBottomRightAnimator->
                                 getCurrentEffectivePointValueAtRelFrame(relFrame));
     QPointF radiusAtFrame =
             mRadiusAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
@@ -74,10 +74,10 @@ SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
 SkPath Rectangle::getPathAtRelFrameF(const qreal &relFrame) {
     SkPath path;
     SkPoint topLeft =
-            QPointFToSkPoint(mTopLeftAnimator->
+            qPointToSk(mTopLeftAnimator->
                                 getCurrentEffectivePointValueAtRelFrameF(relFrame));
     SkPoint bottomRight =
-            QPointFToSkPoint(mBottomRightAnimator->
+            qPointToSk(mBottomRightAnimator->
                                 getCurrentEffectivePointValueAtRelFrameF(relFrame));
     QPointF radiusAtFrame =
             mRadiusAnimator->getCurrentEffectivePointValueAtRelFrameF(relFrame);

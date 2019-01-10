@@ -75,14 +75,14 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 }
                 singlePathAnimator = SPtrCreate(VectorPathAnimator)(this);
                 lastPoint = singlePathAnimator->addNodeRelPos(
-                                        SkPointToQPointF(pt),
+                                        skPointToQ(pt),
                             nullptr);
                 firstPoint = lastPoint;
             }
                 break;
             case SkPath::kLine_Verb: {
                 SkPoint pt = pts[1];
-                bool sameAsFirstPoint = pointToLen(SkPointToQPointF(pt) -
+                bool sameAsFirstPoint = pointToLen(skPointToQ(pt) -
                                         firstPoint->getRelativePos()) < 0.1;
 
                 bool connectOnly = false;
@@ -102,7 +102,7 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                     lastPoint = firstPoint;
                 } else {
                     lastPoint = singlePathAnimator->
-                            addNodeRelPos(SkPointToQPointF(pt),
+                            addNodeRelPos(skPointToQ(pt),
                                           lastPoint);
                 }
             }
@@ -128,9 +128,9 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 SkPoint targetPt = pts[3];
                 lastPoint->setEndCtrlPtEnabled(true);
                 lastPoint->moveEndCtrlPtToRelPos(
-                            SkPointToQPointF(endPt));
+                            skPointToQ(endPt));
 
-                bool sameAsFirstPoint = pointToLen(SkPointToQPointF(targetPt) -
+                bool sameAsFirstPoint = pointToLen(skPointToQ(targetPt) -
                                             firstPoint->getRelativePos()) < 0.1;
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
@@ -150,12 +150,12 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                     singlePathAnimator->setPathClosed(true);
                 } else {
                     lastPoint = singlePathAnimator->
-                            addNodeRelPos(SkPointToQPointF(targetPt),
+                            addNodeRelPos(skPointToQ(targetPt),
                                           lastPoint);
                 }
                 lastPoint->setStartCtrlPtEnabled(true);
                 lastPoint->moveStartCtrlPtToRelPos(
-                            SkPointToQPointF(startPt));
+                            skPointToQ(startPt));
             }
                 break;
             case SkPath::kClose_Verb:

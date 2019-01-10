@@ -44,27 +44,21 @@ void DrawPath::drawPath(SkCanvas *canvas) {
     canvas->drawPath(mDrawFitted, paintT);
 }
 
-qreal minSquareDistance(const QPointF &p0,
-                        const QPointF &p1,
-                        const QPointF &p2,
-                        const QPointF &p3,
+qreal minSquareDistance(const qCubicSegment2D &seg,
                         const QPointF &p) {
     qreal error;
-    getClosestTValueBezier2D(p0, p1, p2, p3, p, nullptr, &error);
+    gGetClosestTValueOnBezier(seg, p, nullptr, &error);
     return error*error;
 }
 
-qreal minSquareDistanceSum(const QPointF &p0,
-                           const QPointF &p1,
-                           const QPointF &p2,
-                           const QPointF &p3,
+qreal minSquareDistanceSum(const qCubicSegment2D &seg,
                            QList<QPointF> &pts,
                            const int &minPtId,
                            const int &maxPtId) {
     qreal errorSquaredSum = 0.;
     for(int i = minPtId; i <= maxPtId; i++) {
         qreal error;
-        getClosestTValueBezier2D(p0, p1, p2, p3, pts.at(i), nullptr, &error);
+        gGetClosestTValueOnBezier(seg, pts.at(i), nullptr, &error);
         errorSquaredSum += error*error;
     }
     return errorSquaredSum;
@@ -80,18 +74,18 @@ void DrawPath::updateFittedPath() {
 
         p0 = thisNode.pos;
         if(nodeId == 0) {
-            mDrawFitted.moveTo(QPointFToSkPoint(p0));
+            mDrawFitted.moveTo(qPointToSk(p0));
         }
         p3 = nextNode.pos;
         int minDataId = thisNode.posId;
         int maxDataId = nextNode.posId;
         QPointF p1 = p0;
         QPointF p2 = p3;
-        bezierLeastSquareV1V2(p0, p1, p2, p3, mOriginalPoses,
-                              minDataId, maxDataId);
-        mDrawFitted.cubicTo(QPointFToSkPoint(p1),
-                            QPointFToSkPoint(p2),
-                            QPointFToSkPoint(p3));
+        gBezierLeastSquareV1V2({p0, p1, p2, p3}, mOriginalPoses,
+                               minDataId, maxDataId);
+        mDrawFitted.cubicTo(qPointToSk(p1),
+                            qPointToSk(p2),
+                            qPointToSk(p3));
     }
 }
 
@@ -104,7 +98,7 @@ void DrawPath::addNodeAt(const QPointF &pos) {
     foreach(const QPointF &posT, mOriginalPoses) {
         if(idT > 0) {
             QPointF closestT =
-                    getClosestPointOnLineSegment(lastPos, posT, pos);
+                    gGetClosestPointOnLineSegment(lastPos, posT, pos);
             qreal distT = pointToLen(pos - closestT);
             if(distT < minDist) {
                 minDist = distT;

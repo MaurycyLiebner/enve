@@ -36,15 +36,15 @@ void InterpolationAnimator::getValueConstraints(
 }
 
 qreal InterpolationAnimator::getInterpolatedFrameAtRelFrameF(
-        const qreal &frame,
-        GraphKey *prevKey, GraphKey *nextKey) const {
-    qreal t = tFromX(prevKey->getRelFrame(),
-                     prevKey->getEndFrame(),
-                     nextKey->getStartFrame(),
-                     nextKey->getRelFrame(), frame);
+        const qreal &frame, GraphKey *prevKey, GraphKey *nextKey) const {
+    qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
+                         prevKey->getEndFrame(),
+                         nextKey->getStartFrame(),
+                         qreal(nextKey->getRelFrame())};
+    qreal t = gTFromX(seg, frame);
     qreal p0y = prevKey->getValueForGraph();
     qreal p1y = prevKey->getEndValue();
     qreal p2y = nextKey->getStartValue();
     qreal p3y = nextKey->getValueForGraph();
-    return calcCubicBezierVal(p0y, p1y, p2y, p3y, t);
+    return gCalcCubicBezierVal({p0y, p1y, p2y, p3y}, t);
 }

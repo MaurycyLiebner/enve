@@ -260,7 +260,7 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
                     mTransformAnimator->getCombinedTransform()) );
         QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
                     anim_mCurrentRelFrame);
-        SkPoint transkSk = QPointFToSkPoint(trans);
+        SkPoint transkSk = qPointToSk(trans);
         canvas->translate(transkSk.x(), transkSk.y());
         mTemporaryHandler->drawSk(canvas, paint);
     }
@@ -306,7 +306,7 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
     } else {
         topLeft = mTopLeftPoint->getRelativePosAtRelFrame(relFrame);
     }
-    paintData->trans = QPointFToSkPoint(topLeft);
+    paintData->trans = qPointToSk(topLeft);
 }
 
 stdsptr<BoundingBoxRenderData> PaintBox::createRenderData() {

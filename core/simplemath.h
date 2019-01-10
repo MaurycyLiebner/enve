@@ -31,6 +31,8 @@ extern bool isNonZero(const float &val);
 extern bool isZero4Dec(const float val);
 extern bool isZero4Dec(const double &val);
 
+extern bool isZero6Dec(const double &val);
+
 extern bool isZero2Dec(qreal val);
 
 extern bool isZero1Dec(qreal val);

@@ -138,15 +138,15 @@ QPointF BasicTransformAnimator::mapFromParent(const QPointF &parentRelPos) const
 }
 
 SkPoint BasicTransformAnimator::mapAbsPosToRel(const SkPoint &absPos) const {
-    return QPointFToSkPoint(mapAbsPosToRel(SkPointToQPointF(absPos)));
+    return qPointToSk(mapAbsPosToRel(skPointToQ(absPos)));
 }
 
 SkPoint BasicTransformAnimator::mapRelPosToAbs(const SkPoint &relPos) const {
-    return QPointFToSkPoint(mapRelPosToAbs(SkPointToQPointF(relPos)));
+    return qPointToSk(mapRelPosToAbs(skPointToQ(relPos)));
 }
 
 SkPoint BasicTransformAnimator::mapFromParent(const SkPoint &parentRelPos) const {
-    return QPointFToSkPoint(mapFromParent(SkPointToQPointF(parentRelPos)));
+    return qPointToSk(mapFromParent(skPointToQ(parentRelPos)));
 }
 
 QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {

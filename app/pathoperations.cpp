@@ -3,6 +3,7 @@
 #include "Animators/transformanimator.h"
 #include "exceptions.h"
 #include "SkPathOps.h"
+#include "pointhelpers.h"
 
 void gApplyOperation(const int &relFrame, const SkPath &src,
                      SkPath *dst, PathBox *srcBox,
@@ -71,7 +72,9 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
         return;
     }
     SkStroke strokerSk;
-    strokerSk.setWidth(static_cast<SkScalar>(qAbs(widthT)));
+    strokerSk.setJoin(SkPaint::kRound_Join);
+    strokerSk.setCap(SkPaint::kRound_Cap);
+    strokerSk.setWidth(static_cast<SkScalar>(qAbs(widthT*2.)));
     SkPath outline;
     strokerSk.strokePath(src, &outline);
     SkPath extOutlineOnly;
@@ -82,7 +85,7 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
     bool wantOuter = widthT > 0.;
     for(;;) {
         SkPoint  pts[4];
-        switch (iter.next(pts, false)) {
+        switch(iter.next(pts, true, true)) {
             case SkPath::kLine_Verb:
                 if(isOuter == wantOuter) {
                     extOutlineOnly.lineTo(pts[1]);
@@ -116,12 +119,23 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
                     isOuter = true;
                     i++;
                 }
-                if(isOuter == wantOuter) extOutlineOnly.moveTo(pts[0]);
+                /*if(isOuter == wantOuter) */extOutlineOnly.moveTo(pts[0]);
                 break;
             case SkPath::kDone_Verb:
                 goto DONE;
         }
     }
 DONE:
+    auto cubicList = gPathToQCubicSegs2D(extOutlineOnly);
+    cubicList = gCubicIntersectList(cubicList);
+    cubicList = gRemoveAllPointsCloserThan(
+                qMax(0., abs(widthT) - 1.), src, cubicList);
+    if(wantOuter) {
+        cubicList = gRemoveAllPointsInsidePath(src, cubicList);
+    } else {
+        cubicList = gRemoveAllPointsOutsidePath(src, cubicList);
+    }
+    extOutlineOnly = gCubicListToSkPath(cubicList);
+
     *dst = extOutlineOnly;
 }

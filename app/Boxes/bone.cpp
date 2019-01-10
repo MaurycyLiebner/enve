@@ -279,8 +279,8 @@ void Bone::drawOnCanvas(SkCanvas *canvas) {
         paintT.setPathEffect(
                     SkDashPathEffect::Make(intervals,
                                            SK_ARRAY_COUNT(intervals), 1));
-        canvas->drawLine(QPointFToSkPoint(rootAbs),
-                         QPointFToSkPoint(parentTipAbs),
+        canvas->drawLine(qPointToSk(rootAbs),
+                         qPointToSk(parentTipAbs),
                          paintT);
     }
     SkPath path = getCurrentRelPath();

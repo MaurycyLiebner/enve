@@ -83,11 +83,11 @@ void GraphKey::setCtrlsMode(const CtrlsMode &mode) {
     QPointF endPos(getEndFrame(),
                    getEndValue());
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-        getCtrlsSymmetricPos(endPos, startPos, pos,
+        gGetCtrlsSymmetricPos(endPos, startPos, pos,
                              &endPos, &startPos);
 
     } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
-        getCtrlsSmoothPos(endPos, startPos, pos,
+        gGetCtrlsSmoothPos(endPos, startPos, pos,
                           &endPos, &startPos);
     } else {
         return;

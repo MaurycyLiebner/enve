@@ -161,7 +161,7 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                     "canvas_fill_effects_discrete");
         fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                     "canvas_fill_effects_duplicate");
-        pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+        fillPathEffectsMenu->addAction("Solidify Effect")->setObjectName(
                     "canvas_fill_effects_solidify");
         fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
                     "canvas_fill_effect_sum");
@@ -171,11 +171,11 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                     "canvas_outline_effects_discrete");
         outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                     "canvas_outline_effects_duplicate");
-        pathEffectsMenu->addAction("Length Effect")->setObjectName(
-                    "canvas_path_effects_length");
+        outlinePathEffectsMenu->addAction("Length Effect")->setObjectName(
+                    "canvas_outline_effects_length");
         outlinePathEffectsMenu->addAction("Operation Effect")->setObjectName(
                     "canvas_outline_effect_sum");
-        pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+        outlinePathEffectsMenu->addAction("Solidify Effect")->setObjectName(
                     "canvas_outline_effects_solidify");
     }
 
@@ -1152,7 +1152,7 @@ void Canvas::handleMovePointMouseMove() {
         if(mFirstMouseMove) {
             mCurrentEdge->startPassThroughTransform();
         }
-        mCurrentEdge->makePassThrough(mCurrentMouseEventPosRel);
+        mCurrentEdge->makePassThroughAbs(mCurrentMouseEventPosRel);
     } else {
         if(mLastPressedPoint != nullptr) {
             addPointToSelection(mLastPressedPoint);

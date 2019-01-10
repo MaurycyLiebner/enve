@@ -359,8 +359,8 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
         qreal weight = qAbs(relFrame % randStep)*1./randStep;
         qreal easing = mEasing->getCurrentEffectiveValueAtRelFrame(relFrame);
         if(easing > 0.0001) {
-            qreal tT = getBezierTValueForX(0., easing, 1. - easing, 1., weight);
-            weight = calcCubicBezierVal(0., 0., 1., 1., tT);
+            qreal tT = gGetBezierTValueForX({0., easing, 1. - easing, 1.}, weight);
+            weight = gCalcCubicBezierVal({0., 0., 1., 1.}, tT);
         }
         path1.interpolate(path2, weight, dst);
     } else {
@@ -408,8 +408,8 @@ void DisplacePathEffect::filterPathForRelFrameF(const qreal &relFrame,
         qreal weight = qAbs(qFloor(relFrame) % randStep)*1./randStep;
         qreal easing = mEasing->getCurrentEffectiveValueAtRelFrameF(relFrame);
         if(easing > 0.0001) {
-            qreal tT = getBezierTValueForX(0., easing, 1. - easing, 1., weight);
-            weight = calcCubicBezierVal(0., 0., 1., 1., tT);
+            qreal tT = gGetBezierTValueForX({0., easing, 1. - easing, 1.}, weight);
+            weight = gCalcCubicBezierVal({0., 0., 1., 1.}, tT);
         }
         path1.interpolate(path2, weight, dst);
     } else {

@@ -15,7 +15,7 @@ PathPivot::PathPivot(Canvas *parent) :
 
 void PathPivot::drawSk(SkCanvas *canvas,
                        const SkScalar &invScale) {
-    SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
+    SkPoint absPos = qPointToSk(getAbsolutePos());
     if(!isHidden()) {
         if(mSelected) {
             drawOnAbsPosSk(canvas, absPos, invScale,

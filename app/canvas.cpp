@@ -312,8 +312,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
                 SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
                                          MIN_WIDGET_HEIGHT*0.25f*invScale};
                 paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-                canvas->drawLine(QPointFToSkPoint(mRotPivot->getAbsolutePos()),
-                                 QPointFToSkPoint(mLastMouseEventPosRel),
+                canvas->drawLine(qPointToSk(mRotPivot->getAbsolutePos()),
+                                 qPointToSk(mLastMouseEventPosRel),
                                  paint);
                 paint.setPathEffect(nullptr);
             } else if(!mIsMouseGrabbing || mRotPivot->isSelected()) {

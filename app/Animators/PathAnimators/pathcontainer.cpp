@@ -363,40 +363,40 @@ void PathContainer::addNewPointAtTBetweenPts(const SkScalar &tVal,
 void PathContainer::setCtrlsModeForNode(const int &nodeId,
                                         const CtrlsMode &mode) {
     int nodePtId = nodeIdToPointId(nodeId);
-    QPointF startPos = SkPointToQPointF(mElementsPos.at(nodePtId - 1));
-    QPointF pos = SkPointToQPointF(mElementsPos.at(nodePtId));
-    QPointF endPos = SkPointToQPointF(mElementsPos.at(nodePtId + 1));
+    QPointF startPos = skPointToQ(mElementsPos.at(nodePtId - 1));
+    QPointF pos = skPointToQ(mElementsPos.at(nodePtId));
+    QPointF endPos = skPointToQ(mElementsPos.at(nodePtId + 1));
     QPointF newStartPos;
     QPointF newEndPos;
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
-        getCtrlsSymmetricPos(endPos,
+        gGetCtrlsSymmetricPos(endPos,
                              startPos,
                              pos,
                              &newEndPos,
                              &newStartPos);
-        mElementsPos.replace(nodePtId - 1, QPointFToSkPoint(newStartPos));
-        mElementsPos.replace(nodePtId + 1, QPointFToSkPoint(newEndPos));
+        mElementsPos.replace(nodePtId - 1, qPointToSk(newStartPos));
+        mElementsPos.replace(nodePtId + 1, qPointToSk(newEndPos));
     } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
-        getCtrlsSmoothPos(endPos,
+        gGetCtrlsSmoothPos(endPos,
                           startPos,
                           pos,
                           &newEndPos,
                           &newStartPos);
-        mElementsPos.replace(nodePtId - 1, QPointFToSkPoint(newStartPos));
+        mElementsPos.replace(nodePtId - 1, qPointToSk(newStartPos));
     }
 }
 
 void PathContainer::applyTransformToPoints(const QMatrix &transform) {
     for(int i = 1; i < mElementsPos.count(); i += 3) {
-        QPointF nodePos = SkPointToQPointF(mElementsPos.at(i));
+        QPointF nodePos = skPointToQ(mElementsPos.at(i));
         QPointF newNodePos = transform.map(nodePos);
-        setElementPos(i, QPointFToSkPoint(
+        setElementPos(i, qPointToSk(
                           newNodePos) );
-        QPointF startPos = nodePos + SkPointToQPointF(mElementsPos.at(i - 1));
-        setElementPos(i - 1, QPointFToSkPoint(
+        QPointF startPos = nodePos + skPointToQ(mElementsPos.at(i - 1));
+        setElementPos(i - 1, qPointToSk(
                           transform.map(startPos) - newNodePos) );
-        QPointF endPos = nodePos + SkPointToQPointF(mElementsPos.at(i + 1));
-        setElementPos(i + 1, QPointFToSkPoint(
+        QPointF endPos = nodePos + skPointToQ(mElementsPos.at(i + 1));
+        setElementPos(i + 1, qPointToSk(
                           transform.map(endPos) - newNodePos));
     }
     mPathUpdateNeeded = true;
