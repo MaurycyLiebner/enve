@@ -44,6 +44,12 @@ bool isZero6Dec(const double &val) {
     return qAbs(val) < 0.000001;
 }
 
+bool isZeroOrOne6Dec(const double &val) {
+    if(isZero6Dec(val)) return true;
+    if(isZero6Dec(val - 1)) return true;
+    return false;
+}
+
 bool isZero2Dec(qreal val) {
     return qAbs(val) < 0.01;
 }

@@ -82,7 +82,8 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
 
     int i = 0;
     bool isOuter = false;
-    bool wantOuter = widthT > 0.;
+    auto srcCubicList = gPathToQCubicSegs2D(src);
+    bool wantOuter = ((widthT > 0) == gCubicListClockWise(srcCubicList));
     for(;;) {
         SkPoint  pts[4];
         switch(iter.next(pts, true, true)) {
@@ -130,7 +131,7 @@ DONE:
     cubicList = gCubicIntersectList(cubicList);
     cubicList = gRemoveAllPointsCloserThan(
                 qMax(0., abs(widthT) - 1.), src, cubicList);
-    if(wantOuter) {
+    if(widthT > 0) {
         cubicList = gRemoveAllPointsInsidePath(src, cubicList);
     } else {
         cubicList = gRemoveAllPointsOutsidePath(src, cubicList);

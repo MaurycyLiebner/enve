@@ -80,11 +80,12 @@ extern QPointF gClosestPointOnRect(const QRectF &rect,
                                    const QPointF &point,
                                    qreal *dist = nullptr);
 
-extern qreal gGetTforBezierPoint(const qCubicSegment2D &seg,
-                                 const QPointF &pos,
-                                 qreal *error = nullptr,
-                                 QPointF *bestPosPtr = nullptr,
-                                 const bool &fineTune = true);
+extern qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
+                                       const QPointF &p,
+                                       const qreal &minT,
+                                       const qreal &maxT,
+                                       QPointF *bestPosPtr = nullptr,
+                                       qreal *errorPtr = nullptr);
 
 extern qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
                                        const QPointF &p,
@@ -102,30 +103,6 @@ extern qCubicSegment2D gBezierLeastSquareV1V2(
 extern void gDrawCosmeticEllipse(QPainter *p,
                                  const QPointF &absPos,
                                  qreal rX, qreal rY);
-
-extern qreal gDistBetweenTwoPoints(QPointF point1, QPointF point2);
-
-
-extern bool gDoesPathIntersectWithCircle(const QPainterPath &path,
-                                  qreal xRadius, qreal yRadius,
-                                  QPointF center);
-
-extern bool gDoesPathNotContainCircle(const QPainterPath &path,
-                              qreal xRadius, qreal yRadius,
-                              QPointF center);
-
-extern QPointF gGetCenterOfPathIntersectionWithCircle(const QPainterPath &path,
-                                              qreal xRadius, qreal yRadius,
-                                              QPointF center);
-
-extern QPointF gGetCenterOfPathDifferenceWithCircle(const QPainterPath &path,
-                                            qreal xRadius, qreal yRadius,
-                                            QPointF center);
-
-extern QPointF gGetPointClosestOnPathTo(const QPainterPath &path,
-                                       QPointF relPos,
-                                       qreal xRadiusScaling,
-                                       qreal yRadiusScaling);
 
 extern qreal gGetBezierTValueForXAssumeNoOverlapGrowingOnly(
         const qCubicSegment1D &seg,
@@ -167,4 +144,9 @@ extern CubicList gRemoveAllPointsInsidePath(const SkPath& path,
 extern qreal gCubicLength(const qCubicSegment2D& seg);
 extern qreal gCubicTimeAtLength(const qCubicSegment2D& seg,
                                 const qreal& length);
+extern qreal gCubicLengthAtT(const qCubicSegment2D& seg, qreal t);
+
+extern qreal gCubicGetTFurthestInDirection(const qCubicSegment2D& seg,
+                                           const qreal &deg);
+extern bool gCubicListClockWise(const CubicList &list);
 #endif // POINTHELPERS_H

@@ -326,10 +326,12 @@ qreal gGetClosestTValueOnBezier(const SkCubicSegment2D &seg,
     const qreal& p2y = seg.fP2.y(); \
     const qreal& p3x = seg.fP3.x(); \
     const qreal& p3y = seg.fP3.y();
+
 qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
                                 const QPointF &p,
                                 QPointF *bestPosPtr,
                                 qreal *errorPtr) {
+    //return gGetClosestTValueOnBezier(seg, p, 0, 1, bestPosPtr, errorPtr);
     qreal totalLen = gCubicLength(seg);
     qreal bestT = 0;
     QPointF bestPt = seg.fP0;
@@ -368,11 +370,88 @@ qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
                                  6*(p0y*pow2TMinusOne + t*(-2*p2y + 3*p2y*t - p3y*t) +
                                     p1y*v4)*
                                   (-p.y() - p0y*pow3TMinusOne + v3);
-                    if(isZero6Dec(den)) break;
+                    if(isZero6Dec(den)) {
+                        break;
+                    }
                     qreal newT = t - num/den;
                     pt = gCalcCubicBezierVal(seg, newT);
                     dist = pointToLen(pt - p);
                     t = newT;
+                }
+            }
+            if(minError < 0.01) break;
+        }
+
+        len += dist*0.8;
+    }
+    if(bestPosPtr != nullptr) {
+        *bestPosPtr = bestPt;
+    }
+    if(errorPtr != nullptr) {
+        *errorPtr = minError;
+    }
+    return bestT;
+}
+
+qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
+                                const QPointF &p,
+                                const qreal& minT,
+                                const qreal& maxT,
+                                QPointF *bestPosPtr,
+                                qreal *errorPtr) {
+    qreal totalLen = gCubicLengthAtT(seg, maxT);//gCubicLength(seg);
+    qreal bestT = 0;
+    QPointF bestPt = seg.fP0;
+    qreal minError = DBL_MAX;
+    for(qreal len = gCubicLengthAtT(seg, minT); len < totalLen;) { // t ∈ [0., 1.]
+        qreal t = gCubicTimeAtLength(seg, len);
+        QPointF pt = gCalcCubicBezierVal(seg, t);
+        qreal dist = pointToLen(pt - p);
+        if(dist < minError) {
+            bestT = t;
+            bestPt = pt;
+            minError = dist;
+            if(minError < 1) {
+                qCubicToVals(seg);
+                bool first = true;
+                while(dist < minError || first) {
+                    bestT = t;
+                    bestPt = pt;
+                    minError = dist;
+                    qreal tMinusOne = t - 1;
+                    qreal pow2TMinusOne = pow2(tMinusOne);
+                    qreal pow3TMinusOne = pow3(tMinusOne);
+
+                    qreal v0 = 3*p2x - 3*p2x*t + p3x*t;
+                    qreal v1 = 3*p2y - 3*p2y*t + p3y*t;
+
+                    qreal v2 = 3*p1x*pow2TMinusOne + t*v0;
+                    qreal v3 = t*(3*p1y*pow2TMinusOne + t*v1);
+
+                    qreal v4 = -1 + 4*t - 3*pow2(t);
+
+                    qreal num = pow2(p.x() + p0x*pow3TMinusOne - t*v2) +
+                                    pow2(p.y() + p0y*pow3TMinusOne - v3);
+                    qreal den = -6*(p0x*pow2TMinusOne + t*(-2*p2x + 3*p2x*t - p3x*t) +
+                                    p1x*v4)*
+                                  (-p.x() - p0x*pow3TMinusOne +  t*v2) -
+                                 6*(p0y*pow2TMinusOne + t*(-2*p2y + 3*p2y*t - p3y*t) +
+                                    p1y*v4)*
+                                  (-p.y() - p0y*pow3TMinusOne + v3);
+                    if(isZero6Dec(den)) {
+//                        if(first && minError > 0.01 && !isZeroOrOne6Dec(t)) {
+//                            t = gCubicTimeAtLength(seg, len + dist*0.5);
+//                            pt = gCalcCubicBezierVal(seg, t);
+//                            dist = pointToLen(pt - p);
+//                            continue;
+//                        }
+                        break;
+                    }
+                    qreal newT = t - num/den;
+                    pt = gCalcCubicBezierVal(seg, newT);
+                    dist = pointToLen(pt - p);
+                    t = newT;
+                    if(first) first = false;
                 }
             }
             if(minError < 0.01) break;
@@ -555,79 +634,6 @@ QPointF gClosestPointOnRect(const QRectF &rect,
     return bestPos;
 }
 
-qreal gGetTforBezierPoint(const qCubicSegment2D &seg,
-                         const QPointF& pos,
-                         qreal *error,
-                         QPointF *bestPosPtr,
-                         const bool &fineTune) {
-    QList<qreal> xValues;
-    QList<qreal> yValues;
-
-
-    solveOnSegmnet(xSeg(seg), pos.x(), &xValues);
-    solveOnSegmnet(ySeg(seg), pos.y(), &yValues);
-    qreal bestT = 0.;
-    QPointF bestPos;
-    qreal minErrorT = 1000000.;
-    Q_FOREACH(const qreal &yVal, yValues) {
-        QPointF posT = gCalcCubicBezierVal(seg, yVal);
-        qreal errorT = pointToLen(posT - pos);
-        if(errorT < minErrorT) {
-            bestPos = posT;
-            minErrorT = errorT;
-            bestT = yVal;
-        }
-    }
-    Q_FOREACH(const qreal &xVal, xValues) {
-        QPointF posT = gCalcCubicBezierVal(seg, xVal);
-        qreal errorT = pointToLen(posT - pos);
-        if(errorT < minErrorT) {
-            bestPos = posT;
-            minErrorT = errorT;
-            bestT = xVal;
-        }
-    }
-
-    if(fineTune) {
-        if(minErrorT < 999999.) { // check if found
-            qreal incT = 0.1;
-            qreal lastDisplacement = 100000.;
-            while(lastDisplacement > 1.) {
-                bool foundBetter = false;
-                qreal nextT = clamp(bestT + incT, 0., 1.);
-                QPointF nextPosT = gCalcCubicBezierVal(seg, nextT);
-                lastDisplacement = pointToLen(nextPosT - bestPos);
-                qreal nextErrorT = pointToLen(nextPosT - pos);
-                if(nextErrorT < minErrorT) {
-                    bestPos = nextPosT;
-                    minErrorT = nextErrorT;
-                    bestT = nextT;
-                    foundBetter = true;
-                }
-
-                qreal prevT = clamp(bestT - incT, 0., 1.);
-                QPointF prevPosT = gCalcCubicBezierVal(seg, prevT);
-                lastDisplacement = qMax(lastDisplacement,
-                                        pointToLen(prevPosT - bestPos));
-                qreal prevErrorT = pointToLen(prevPosT - pos);
-                if(prevErrorT < minErrorT) {
-                    bestPos = prevPosT;
-                    minErrorT = prevErrorT;
-                    bestT = prevT;
-                    foundBetter = true;
-                }
-
-                if(!foundBetter) incT *= 0.5;
-            }
-        }
-    }
-
-    if(error != nullptr) *error = minErrorT;
-    if(bestPosPtr != nullptr) *bestPosPtr = bestPos;
-    return bestT;
-}
-
-
 qreal gGetBezierTValueForX(const qCubicSegment1D &seg,
                           const qreal &x,
                           qreal *error) {
@@ -699,73 +705,6 @@ void gDrawCosmeticEllipse(QPainter *p,
                    rY/transform.m22());
 }
 
-
-qreal gDistBetweenTwoPoints(QPointF point1, QPointF point2) {
-    QPointF dPoint = point1 - point2;
-    return sqrt(dPoint.x()*dPoint.x() + dPoint.y()*dPoint.y());
-}
-
-
-bool gDoesPathIntersectWithCircle(const QPainterPath &path,
-                                 qreal xRadius, qreal yRadius,
-                                 QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return circlePath.intersects(path);
-}
-
-bool gDoesPathNotContainCircle(const QPainterPath &path,
-                              qreal xRadius, qreal yRadius,
-                              QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return !path.contains(circlePath);
-}
-
-QPointF gGetCenterOfPathIntersectionWithCircle(const QPainterPath &path,
-                                              qreal xRadius, qreal yRadius,
-                                              QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return circlePath.intersected(path).boundingRect().center();
-}
-
-QPointF gGetCenterOfPathDifferenceWithCircle(const QPainterPath &path,
-                                            qreal xRadius, qreal yRadius,
-                                            QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return circlePath.subtracted(path).boundingRect().center();
-}
-
-QPointF gGetPointClosestOnPathTo(const QPainterPath &path,
-                                 QPointF relPos,
-                                 qreal xRadiusScaling,
-                                 qreal yRadiusScaling) {
-    bool (*checkerFunc)(const QPainterPath &, qreal, qreal, QPointF);
-    QPointF (*centerFunc)(const QPainterPath &, qreal, qreal, QPointF);
-    if(path.contains(relPos)) {
-        checkerFunc = &gDoesPathNotContainCircle;
-        centerFunc = &gGetCenterOfPathDifferenceWithCircle;
-    } else {
-        checkerFunc = &gDoesPathIntersectWithCircle;
-        centerFunc = &gGetCenterOfPathIntersectionWithCircle;
-    }
-    qreal radius = 1.;
-    while(true) {
-        if(checkerFunc(path,
-                       xRadiusScaling*radius,
-                       yRadiusScaling*radius,
-                       relPos)) {
-            return centerFunc(path,
-                              xRadiusScaling*radius,
-                              yRadiusScaling*radius,
-                              relPos);
-        }
-        radius += 1.;
-    }
-}
-
 qreal gMinDistanceToPath(const SkPoint &pos, const SkPath &path) {
     QPointF qPos = skPointToQ(pos);
     qreal smallestDist = __DBL_MAX__;
@@ -778,140 +717,6 @@ qreal gMinDistanceToPath(const SkPoint &pos, const SkPath &path) {
     return smallestDist;
 }
 
-qreal gLengthTDerivative(const qCubicSegment2D& seg, const qreal& t) {
-    if(isZero6Dec(t)) return gLengthTDerivative(seg, 0.001);
-    if(isZero6Dec(t - 1)) return gLengthTDerivative(seg, 0.999);
-    qCubicToVals(seg);
-
-    qreal v0 = t - 1;
-    qreal pow2v0 = pow2(v0);
-    qreal pow3v0 = pow3(v0);
-    qreal v1 = t*(3*p2x - 3*p2x*t + p3x*t);
-    qreal v2 = t*(3*p2y - 3*p2y*t + p3y*t);
-    qreal v3 = t*(3*p1y*pow2v0 + v2);
-    qreal v4 = p0y*pow3v0 - v3;
-    qreal v5 = -1 + 4*t - 3*pow2(t);
-    qreal v6 = p0x*pow3v0 - t*(3*p1x*pow2v0 + v1);
-    qreal v7 = (2.*sqrt(pow2(v6) + pow2(v4)));
-    qreal v8 = t*(-2*p2x + 3*p2x*t - p3x*t);
-    qreal v9 = t*(-2*p2y + 3*p2y*t - p3y*t);
-    qreal v10 = v6*(p0x*pow2v0 + v8 + p1x*(v5));
-    qreal v11 = v4*(p0y*pow2v0 + v9 + p1y*(v5));
-    return 6*(v10 + v11)/v7;
-}
-
-//#define qCubicLenVarsABCDE(type) \
-//    type a, type b, type c, type d, type e
-
-//void qCubicToLenABCDE(const qCubicSegment2D& seg,
-//                      qCubicLenVarsABCDE(qreal&)) {
-//    qCubicToVals(seg);
-//    e = pow2(p0x) + pow2(p0y) + 9*pow2(p1x) + 9*pow2(p1y) -
-//              18*p1x*p2x + 9*pow2(p2x) -
-//              18*p1y*p2y + 9*pow2(p2y) +
-//              6*p1x*p3x - 6*p2x*p3x + pow2(p3x) - 2*p0x*(3*p1x - 3*p2x + p3x) +
-//              6*p1y*p3y - 6*p2y*p3y + pow2(p3y) - 2*p0y*(3*p1y - 3*p2y + p3y);
-//    d = -4*(pow2(p0x) - pow2(p0y) - 6*pow2(p1x) - 6*pow2(p1y) +
-//                  9*p1x*p2x - 3*pow2(p2x) +
-//                  9*p1y*p2y - 3*pow2(p2y) -
-//                  2*p1x*p3x + p2x*p3x + p0x*(5*p1x - 4*p2x + p3x) -
-//                  2*p1y*p3y + p2y*p3y + p0y*(5*p1y - 4*p2y + p3y));
-//    c = 2*(3*pow2(p0x) + 3*pow2(p0y) +
-//                 11*pow2(p1x) + 11*pow2(p1y) -
-//                 11*p1x*p2x + 2*pow2(p2x) -
-//                 11*p1y*p2y +  2*pow2(p2y) +
-//                 p1x*p3x - p0x*(12*p1x - 7*p2x + p3x) +
-//                 p1y*p3y - p0y*(12*p1y - 7*p2y + p3y));
-//    b = -4*(pow2(p0x) + pow2(p0y) +
-//                  2*pow2(p1x) + 2*pow2(p1y) -
-//                  p1x*p2x + p0x*(-3*p1x + p2x) -
-//                  p1y*p2y + p0y*(-3*p1y + p2y));
-//    a = pow2(p0x) + pow2(p0y) -
-//              2*p0x*p1x + pow2(p1x) -
-//              2*p0y*p1y + pow2(p1y);
-//}
-
-//qreal gCubicLenDerivative(qCubicLenVarsABCDE(const qreal&),
-//                          const qreal& t) {
-//    return 3*sqrt(a + (b + ((c + (d + e * t) * t) * t)) * t);
-//}
-
-//std::vector<qreal> gGetLenDerivativeCriticalTs(
-//        qCubicLenVarsABCDE(const qreal&)) {
-//    (void)a;
-//    qreal v8 = c*e;
-//    qreal v9 = v8*d;
-//    qreal v10 = 8*b*pow2(e);
-//    qreal v11 = pow3(d);
-//    qreal v4 = -9*pow2(d) + 24*v8;
-//    cmplx v0 = pow(-54*v11 + 216*v9 - 54*v10 +
-//                   2.*sqrt(cmplx(pow3(v4) +
-//                   729*pow2(v11 - 4*v9 + v10))), 1./3);
-//    cmplx v1 = 6.*pow(2, 2./3)*e*v0;
-//    cmplx v2 = 1. + cmplx(0, 1)*sqrt3;
-//    cmplx v3 = 1. - cmplx(0, 1)*sqrt3;
-//    cmplx v5 = v4/v1;
-//    qreal v6 = 12.*pow(2, 1./3)*e;
-//    qreal v7 = -d/(4.*e);
-
-//    cmplx sol1 = v7 - v5 + v0/v6;
-//    cmplx sol2 = v7 + v2*v5/2. - (v3*v0)/(2.*v6);
-//    cmplx sol3 = v7 + v3*v5/2. - (v2*v0)/(2.*v6);
-
-//    std::vector<qreal> sols;
-
-//    if(sol1.imag() < 0.01 && 1. > sol1.real() && sol1.real() > 0.) {
-//        sols.push_back(sol1.real());
-//    }
-//    if(sol2.imag() < 0.01 && 1. > sol2.real() && sol2.real() > 0.) {
-//        sols.push_back(sol2.real());
-//    }
-//    if(sol3.imag() < 0.01 && 1. > sol3.real() && sol3.real() > 0.) {
-//        sols.push_back(sol3.real());
-//    }
-
-//    return sols;
-//}
-
-//qreal gIntegrateCubicLength(const qCubicSegment2D& seg,
-//                            const uint& samples) {
-//    Q_ASSERT(samples > 1);
-//    qreal a, b, c, d, e;
-//    qCubicToLenABCDE(seg, qCubicLenVarsABCDE());
-//    auto criticalTs = gGetLenDerivativeCriticalTs(qCubicLenVarsABCDE());
-
-//    qreal totalLen = 0.;
-//    qreal tInc = 1./(samples - 1);
-//    if(!criticalTs.empty()) {
-//        std::vector<qreal> ts;
-//        ts.resize(samples + criticalTs.size());
-//        for(uint i = 0; i < samples; i++) {
-//            ts[i] = i*tInc;
-//        }
-//        for(uint i = 0; i < criticalTs.size(); i++) {
-//            ts[samples + i] = criticalTs[i];
-//        }
-//        std::sort(ts.begin(), ts.end());
-
-//        qreal* tPtr = ts.data();
-//        QPointF nextPt = gCalcCubicBezierVal(seg, *(tPtr++));
-//        for(uint i = 1; i < ts.size(); i++) {
-//            QPointF pt = nextPt;
-//            nextPt = gCalcCubicBezierVal(seg, *(tPtr++));
-//            totalLen += pointToLen(pt - nextPt);
-//        }
-//    } else {
-//        QPointF nextPt = gCalcCubicBezierVal(seg, 0.);
-//        for(uint i = 1; i < samples; i++) {
-//            QPointF pt = nextPt;
-//            nextPt = gCalcCubicBezierVal(seg, i*tInc);
-//            totalLen += pointToLen(pt - nextPt);
-//        }
-//    }
-
-//    return totalLen;
-//}
-
 qreal gCubicLength(const qCubicSegment2D& seg) {
     QPainterPath path;
     path.moveTo(seg.fP0);
@@ -920,7 +725,8 @@ qreal gCubicLength(const qCubicSegment2D& seg) {
 }
 
 CubicPair gDivideCubicAtT(const qCubicSegment2D& seg,
-                          const qreal& t) {
+                          qreal t) {
+    t = CLAMP(t, 0, 1);
     qreal oneMinusT = 1 - t;
     QPointF P0_1 = seg.fP0*oneMinusT + seg.fP1*t;
     QPointF P1_2 = seg.fP1*oneMinusT + seg.fP2*t;
@@ -938,18 +744,20 @@ CubicPair gDivideCubicAtT(const qCubicSegment2D& seg,
 }
 
 
-qreal gCubicLengthAtT(const qCubicSegment2D& seg,
-                      const qreal& t) {
+qreal gCubicLengthAtT(const qCubicSegment2D& seg, qreal t) {
+    t = CLAMP(t, 0, 1);
+    if(isZero6Dec(qMax(0., t))) return 0;
+    if(isZero6Dec(qMin(1., t) - 1)) return gCubicLength(seg);
     auto divSeg = gDivideCubicAtT(seg, t);
     return gCubicLength(divSeg.first);
 }
 
-qreal gCubicLengthFracAtT(const qCubicSegment2D& seg,
-                             const qreal& t) {
+qreal gCubicLengthFracAtT(const qCubicSegment2D& seg, qreal t) {
+    t = CLAMP(t, 0, 1);
     if(isZero6Dec(t)) return 0;
-    if(isZero6Dec(t - 1)) return 1;
+    if(isZero6Dec(t - 1)) return gCubicLength(seg);
     qreal totLen = gCubicLength(seg);
-    if(isZero6Dec(totLen)) return 1.;
+    if(isZero6Dec(totLen)) return 1;
     return gCubicLengthAtT(seg, t)/totLen;
 }
 
@@ -1071,12 +879,6 @@ QList<QPointF> gIntersectionPts(const qCubicSegment2D& seg1,
     auto tPairs = gIntersectionTs(seg1, seg2);
 }
 
-bool isZeroOrOne6Dec(const qreal &val) {
-    if(isZero6Dec(val)) return true;
-    if(isZero6Dec(val - 1)) return true;
-    return false;
-}
-
 void gSeperateIntersectionTs(const qCubicSegment2D& seg1,
                              const qCubicSegment2D& seg2,
                              QList<qreal>& seg1Ts,
@@ -1163,10 +965,8 @@ QList<qrealPair> gSelfIntersectionTs(const qCubicSegment2D& seg) {
         foreach(const auto& ySol, ySols) {
             if(isZero6Dec(xSol.first - ySol.first)) {
                 if(isZero6Dec(xSol.second - ySol.second)) {
-                    if(isZero6Dec(xSol.first) ||
-                        isZero6Dec(xSol.first - 1)) continue;
-                    if(isZero6Dec(xSol.second) ||
-                        isZero6Dec(xSol.second - 1)) continue;
+                    if(isZeroOrOne6Dec(xSol.first)) continue;
+                    if(isZeroOrOne6Dec(xSol.second)) continue;
                     sols.append({xSol.first, xSol.second});
                 }
             }
@@ -1183,10 +983,8 @@ QList<qreal> gSelfIntersectionPlainListTs(const qCubicSegment2D& seg) {
         foreach(const auto& ySol, ySols) {
             if(isZero6Dec(xSol.first - ySol.first)) {
                 if(isZero6Dec(xSol.second - ySol.second)) {
-                    if(isZero6Dec(xSol.first) ||
-                        isZero6Dec(xSol.first - 1)) continue;
-                    if(isZero6Dec(xSol.second) ||
-                        isZero6Dec(xSol.second - 1)) continue;
+                    if(isZeroOrOne6Dec(xSol.first)) continue;
+                    if(isZeroOrOne6Dec(xSol.second)) continue;
                     sols << xSol.first;
                     sols << xSol.second;
                 }
@@ -1205,7 +1003,7 @@ CubicList gSplitAtTs(const qCubicSegment2D& seg,
     qCubicSegment2D segRem = seg;
     qreal lastT = 0.;
     foreach(const auto& seg1T, segTs) {
-        if(isZero6Dec(seg1T) || isZero6Dec(seg1T - 1)) continue;
+        if(isZeroOrOne6Dec(seg1T)) continue;
         qreal currT = (seg1T - lastT)/(1 - lastT);
         auto divRes = gDivideCubicAtT(segRem, currT);
         segList << divRes.first;
@@ -1236,22 +1034,30 @@ CubicListPair gSplitAtIntersections(const qCubicSegment2D& seg1,
 }
 
 SkPath gCubicListToSkPath(const CubicList& list) {
+    if(list.isEmpty()) return SkPath();
     SkPath path;
     bool first = true;
+    QPointF lastPos;
     QPointF firstPos;
     foreach(const auto& cubic, list) {
         if(first) {
             first = false;
             firstPos = cubic.fP0;
             path.moveTo(qPointToSk(firstPos));
+        } else if(pointToLen(cubic.fP0 - lastPos) > 0.1)  {
+            //if(isZero2Dec(pointToLen(firstPos - lastPos))) path.close();
+            firstPos = cubic.fP0;
+            path.moveTo(qPointToSk(firstPos));
         }
         path.cubicTo(qPointToSk(cubic.fP1),
                      qPointToSk(cubic.fP2),
                      qPointToSk(cubic.fP3));
+        lastPos = cubic.fP3;
     }
-    //if(isZero2Dec(pointToLen(firstPos - list.last().fP3))) path.close();
+    //if(isZero2Dec(pointToLen(firstPos - lastPos))) path.close();
     return path;
 }
+
 #define SkPointToXY(point) point.x(), point.y()
 
 CubicList gRemoveAllPointsOutsidePath(const SkPath &path,
@@ -1367,4 +1173,48 @@ CubicList gCubicIntersectListAndRemoveExt(CubicList targetList) {
 
     }
     return targetList;
+}
+
+QPointF rotPt(const QPointF& pt, const qreal& deg) {
+    return {pt.x() * cos(deg*PI/180) - pt.y() * sin(deg*PI/180),
+            pt.x() * sin(deg*PI/180) + pt.y() * cos(deg*PI/180)};
+}
+
+qCubicSegment2D gCubicRotate(const qCubicSegment2D &seg,
+                             const qreal& deg) {
+    if(isZero6Dec(deg)) return seg;
+    return { rotPt(seg.fP0, deg), rotPt(seg.fP1, deg),
+             rotPt(seg.fP2, deg), rotPt(seg.fP3, deg) };
+}
+
+// -90 is y direction 0 is x direction
+qreal gCubicGetTFurthestInDirection(const qCubicSegment2D &seg,
+                                    const qreal& deg) {
+    auto rotSeg = gCubicRotate(seg, deg);
+    auto xS = xSeg(rotSeg);
+    qCubic1DToNamedVals(xS, x);
+    bool p0Further = px0 >= px1 && px0 >= px2;
+    bool p3Further = px3 >= px1 && px3 >= px2;
+    if(p0Further || p3Further) {
+        if(px3 > px0) return 1;
+        else return 0;
+    }
+    qreal den = px0 - 3*px1 + 3*px2 - px3;
+    qreal num0 = px0 - 2*px1 + px2;
+    qreal numSqrt = sqrt(pow2(px1) - px0*px2 - px1*px2 +
+                         pow2(px2) + px0*px3 - px1*px3);
+    qreal t1 = (num0 + numSqrt)/den;
+    qreal t2 = (num0 - numSqrt)/den;
+    if(t1 > 0 || t1 < 1) return t1;
+    if(t2 > 0 || t2 < 1) return t2;
+    Q_ASSERT(false);
+    return 0;
+}
+
+bool gCubicListClockWise(const CubicList &list) {
+    qreal sum = 0;
+    foreach(const auto& seg, list) {
+        sum += (seg.fP3.x() - seg.fP0.x())*(seg.fP3.y() + seg.fP0.y());
+    }
+    return sum > 0;
 }
