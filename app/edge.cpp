@@ -131,7 +131,7 @@ QPointF VectorPathEdge::getPosBetweenPointsAtT(const qreal &t,
                                      const QPointF &p1EndPos,
                                      const QPointF &p2StartPos,
                                      const QPointF &p3Pos) {
-    return gCalcCubicBezierVal({p0Pos, p1EndPos, p2StartPos, p3Pos}, t);
+    return gCubicValueAtT({p0Pos, p1EndPos, p2StartPos, p3Pos}, t);
 }
 
 QPointF VectorPathEdge::getRelPosBetweenPointsAtT(const qreal &t,
@@ -184,12 +184,12 @@ void VectorPathEdge::makePassThroughAbs(const QPointF &absPos) {
 
     auto absSeg = getAsAbsSegment();
 
-    QPointF dPos = absPos - gCalcCubicBezierVal(absSeg, mPressedT);
+    QPointF dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
     while(pointToLen(dPos) > 1.) {
         absSeg.fP1 += (1. - mPressedT)*dPos;
         absSeg.fP2 += mPressedT*dPos;
 
-        dPos = absPos - gCalcCubicBezierVal(absSeg, mPressedT);
+        dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
     }
 
     mPoint1EndPt->moveToAbs(absSeg.fP1);
@@ -206,12 +206,12 @@ void VectorPathEdge::makePassThroughRel(const QPointF &relPos) {
 
     auto relSeg = getAsAbsSegment();
 
-    QPointF dPos = relPos - gCalcCubicBezierVal(relSeg, mPressedT);
+    QPointF dPos = relPos - gCubicValueAtT(relSeg, mPressedT);
     while(pointToLen(dPos) > 1.) {
         relSeg.fP1 += (1. - mPressedT)*dPos;
         relSeg.fP2 += mPressedT*dPos;
 
-        dPos = relPos - gCalcCubicBezierVal(relSeg, mPressedT);
+        dPos = relPos - gCubicValueAtT(relSeg, mPressedT);
     }
 
     mPoint1EndPt->moveToRel(relSeg.fP1);

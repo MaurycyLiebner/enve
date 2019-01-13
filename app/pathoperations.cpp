@@ -67,76 +67,25 @@ void gApplyOperationF(const qreal &relFrame, const SkPath &src,
 }
 
 void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
+    *dst = gSmoothyPath(src, widthT);
+    return;
     if(isZero4Dec(widthT)) {
         *dst = src;
         return;
     }
-    SkStroke strokerSk;
-    strokerSk.setJoin(SkPaint::kRound_Join);
-    strokerSk.setCap(SkPaint::kRound_Cap);
-    strokerSk.setWidth(static_cast<SkScalar>(qAbs(widthT*2.)));
     SkPath outline;
-    strokerSk.strokePath(src, &outline);
-    SkPath extOutlineOnly;
-    SkPath::Iter iter(outline, false);
 
-    int i = 0;
-    bool isOuter = false;
-    auto srcCubicList = gPathToQCubicSegs2D(src);
-    bool wantOuter = ((widthT > 0) == gCubicListClockWise(srcCubicList));
-    for(;;) {
-        SkPoint  pts[4];
-        switch(iter.next(pts, true, true)) {
-            case SkPath::kLine_Verb:
-                if(isOuter == wantOuter) {
-                    extOutlineOnly.lineTo(pts[1]);
-                }
-                break;
-            case SkPath::kQuad_Verb:
-                if(isOuter == wantOuter) {
-                    extOutlineOnly.quadTo(pts[1], pts[2]);
-                }
-                break;
-            case SkPath::kConic_Verb:
-                if(isOuter == wantOuter) {
-                    extOutlineOnly.conicTo(pts[1], pts[2], iter.conicWeight());
-                }
-                break;
-            case SkPath::kCubic_Verb:
-                if(isOuter == wantOuter) {
-                    extOutlineOnly.cubicTo(pts[1], pts[2], pts[3]);
-                }
-                break;
-            case SkPath::kClose_Verb:
-                if(isOuter == wantOuter) {
-                    extOutlineOnly.close();
-                }
-                break;
-            case SkPath::kMove_Verb:
-                if(i % 2 == 0) {
-                    isOuter = false;
-                    i++;
-                } else {
-                    isOuter = true;
-                    i++;
-                }
-                /*if(isOuter == wantOuter) */extOutlineOnly.moveTo(pts[0]);
-                break;
-            case SkPath::kDone_Verb:
-                goto DONE;
-        }
-    }
-DONE:
-    auto cubicList = gPathToQCubicSegs2D(extOutlineOnly);
-    cubicList = gCubicIntersectList(cubicList);
-    cubicList = gRemoveAllPointsCloserThan(
-                qMax(0., abs(widthT) - 1.), src, cubicList);
-    if(widthT > 0) {
-        cubicList = gRemoveAllPointsInsidePath(src, cubicList);
-    } else {
-        cubicList = gRemoveAllPointsOutsidePath(src, cubicList);
-    }
-    extOutlineOnly = gCubicListToSkPath(cubicList);
+    SkPathOp op = widthT < 0 ? SkPathOp::kDifference_SkPathOp :
+                               SkPathOp::kUnion_SkPathOp;
+    auto cubicList = gPathToQCubicSegs2D(src);
+    auto skPaths = gSolidifyCubicList(cubicList, qAbs(widthT*2));
+    SkOpBuilder builder;
 
-    *dst = extOutlineOnly;
+    builder.add(src, SkPathOp::kUnion_SkPathOp);
+
+    foreach(const auto& path, skPaths) {
+        builder.add(path, op);
+    }
+
+    builder.resolve(dst);
 }

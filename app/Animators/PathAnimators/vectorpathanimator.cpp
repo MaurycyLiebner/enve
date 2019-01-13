@@ -61,19 +61,13 @@ void VectorPathAnimator::setCtrlsModeForNode(const int &nodeId,
     QPointF newStartPos;
     QPointF newEndPos;
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
-        gGetCtrlsSymmetricPos(endPos,
-                             startPos,
-                             pos,
-                             &newEndPos,
-                             &newStartPos);
+        gGetCtrlsSymmetricPos(endPos, startPos, pos,
+                              newEndPos, newStartPos);
         mElementsPos.replace(nodePtId - 1, qPointToSk(newStartPos - pos));
         mElementsPos.replace(nodePtId + 1, qPointToSk(newEndPos));
     } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
-        gGetCtrlsSmoothPos(endPos,
-                          startPos,
-                          pos,
-                          &newEndPos,
-                          &newStartPos);
+        gGetCtrlsSmoothPos(endPos, startPos, pos,
+                           newEndPos, newStartPos);
         mElementsPos.replace(nodePtId - 1, qPointToSk(newStartPos - pos));
     }
 

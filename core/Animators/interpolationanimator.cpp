@@ -46,5 +46,5 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrameF(
     qreal p1y = prevKey->getEndValue();
     qreal p2y = nextKey->getStartValue();
     qreal p3y = nextKey->getValueForGraph();
-    return gCalcCubicBezierVal({p0y, p1y, p2y, p3y}, t);
+    return gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
 }

@@ -284,7 +284,7 @@ qreal QrealAnimator::qra_getValueAtRelFrameF(const qreal &frame,
     qreal p1y = prevKey->getEndValue();
     qreal p2y = nextKey->getStartValue();
     qreal p3y = nextKey->getValue();
-    return qclamp(gCalcCubicBezierVal({p0y, p1y, p2y, p3y}, t),
+    return qclamp(gCubicValueAtT({p0y, p1y, p2y, p3y}, t),
                   mMinPossibleVal, mMaxPossibleVal);
 }
 
@@ -319,7 +319,7 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame,
     qreal p1y = prevKey->getEndValue();
     qreal p2y = nextKey->getStartValue();
     qreal p3y = nextKey->getValue();
-    return qclamp(gCalcCubicBezierVal({p0y, p1y, p2y, p3y}, t),
+    return qclamp(gCubicValueAtT({p0y, p1y, p2y, p3y}, t),
                   mMinPossibleVal, mMaxPossibleVal);
 }
 

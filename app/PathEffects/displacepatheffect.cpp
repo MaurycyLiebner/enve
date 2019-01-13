@@ -65,7 +65,7 @@ private:
 
     /** Return the next pseudo random number as a signed 32bit value.
      */
-    int32_t nextS() { return (int32_t)this->nextU(); }
+    int32_t nextS() { return static_cast<int32_t>(this->nextU()); }
 
     /** Return the next pseudo random number expressed as a signed SkFixed
      in the range [-SK_Fixed1..SK_Fixed1).
@@ -80,40 +80,8 @@ private:
     uint32_t fSeed;
 };
 
-void getC1AndC2(const SkPoint &lastP,
-                const SkPoint &currP,
-                const SkPoint &nextP,
-                SkPoint *c1, SkPoint *c2,
-                const SkScalar &smoothLen) {
-    SkPoint sLastP = lastP - currP;
-    sLastP.setLength(1.f);
-    SkPoint sNextP = nextP - currP;
-    sNextP.setLength(1.f);
-    SkPoint vectP = (sLastP + sNextP)*0.5f;
-    vectP.set(vectP.y(), -vectP.x());
-    if(vectP.dot(lastP - currP) > 0) vectP.negate();
-
-    SkScalar nextDist = (currP - nextP).length()*0.4f;
-    if(smoothLen < nextDist) {
-        vectP.setLength(smoothLen);
-    } else {
-        vectP.setLength(nextDist);
-    }
-
-    *c1 = currP + vectP;
-
-    vectP.negate();
-    SkScalar lastDist = (currP - lastP).length()*0.5f;
-    if(smoothLen < lastDist) {
-        vectP.setLength(smoothLen);
-    } else {
-        vectP.setLength(lastDist);
-    }
-    *c2 = currP + vectP;
-}
-
 float randFloat() {
-    return static_cast<float>(qRandF(-1., 1.));
+    return static_cast<float>(qRandF(-1, 1));
 }
 
 bool displaceFilterPath(SkPath* dst, const SkPath& src,
@@ -141,7 +109,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
             }
             int nTot = SkScalarCeilToInt(length / segLen);
             int n = nTot;
-            SkScalar distance = 0.f;
+            SkScalar distance = 0;
             SkScalar remLen = segLen*nTot - length;
             SkPoint firstP;
             if(meas.isClosed()) {
@@ -158,7 +126,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 distance += segLen;
                 if(meas.getPosTan(distance, &p, &v)) {
                     if(n == 0) {
-                        SkScalar scaleT = 1.f - remLen/segLen;
+                        SkScalar scaleT = 1 - remLen/segLen;
                         Perterb(&p, v, randFloat() * scale * scaleT);
 
                     } else {
@@ -173,7 +141,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 while(--n >= 0) {
                     if(meas.getPosTan(distance, &p, &v)) {
                         if(n == 0) {
-                            SkScalar scaleT = 1.f - remLen/segLen;
+                            SkScalar scaleT = 1 - remLen/segLen;
                             Perterb(&p, v, randFloat() * scale * scaleT);
                         } else {
                             Perterb(&p, v, randFloat() * scale);
@@ -233,8 +201,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                     n--;
                     thirdP = nextP;
 
-                    getC1AndC2(lastP, currP, nextP,
-                               &c1, &c2, smoothLen);
+                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
 
                     lastC1 = c1;
 
@@ -256,8 +223,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                     } else {
                         Perterb(&nextP, v, randFloat() * scale);
                     }
-                    getC1AndC2(lastP, currP, nextP,
-                               &c1, &c2, smoothLen);
+                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
 
 
                     dst->cubicTo(lastC1, c2, currP);
@@ -283,8 +249,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                         } else {
                             Perterb(&nextP, v, randFloat() * scale);
                         }
-                        getC1AndC2(lastP, currP, nextP,
-                                   &c1, &c2, smoothLen);
+                        gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
 
 
                         dst->cubicTo(lastC1, c2, currP);
@@ -301,8 +266,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 //                currP = nextP;
                 nextP = firstP;
 
-                getC1AndC2(lastP, currP, nextP,
-                           &c1, &c2, smoothLen);
+                gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
 
                 dst->cubicTo(lastC1, c2, currP);
                 lastC1 = c1;
@@ -310,8 +274,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 lastP = currP;
                 currP = nextP;
                 nextP = secondP;
-                getC1AndC2(lastP, currP, nextP,
-                           &c1, &c2, smoothLen);
+                gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
                 dst->cubicTo(lastC1, c2, currP);
 
                 dst->close();
@@ -360,7 +323,7 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
         qreal easing = mEasing->getCurrentEffectiveValueAtRelFrame(relFrame);
         if(easing > 0.0001) {
             qreal tT = gGetBezierTValueForX({0., easing, 1. - easing, 1.}, weight);
-            weight = gCalcCubicBezierVal({0., 0., 1., 1.}, tT);
+            weight = gCubicValueAtT({0., 0., 1., 1.}, tT);
         }
         path1.interpolate(path2, weight, dst);
     } else {
@@ -409,7 +372,7 @@ void DisplacePathEffect::filterPathForRelFrameF(const qreal &relFrame,
         qreal easing = mEasing->getCurrentEffectiveValueAtRelFrameF(relFrame);
         if(easing > 0.0001) {
             qreal tT = gGetBezierTValueForX({0., easing, 1. - easing, 1.}, weight);
-            weight = gCalcCubicBezierVal({0., 0., 1., 1.}, tT);
+            weight = gCubicValueAtT({0., 0., 1., 1.}, tT);
         }
         path1.interpolate(path2, weight, dst);
     } else {

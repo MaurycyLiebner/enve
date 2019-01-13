@@ -41,32 +41,29 @@ enum CtrlsMode : short {
 //    const T fValue;
 //};
 
-extern qreal gSolveForP2(const qreal& p0, const qreal& p1,
-                        const qreal& p3, const qreal& t,
-                          const qreal& value);
-
 extern qreal gSolveForP1(const qreal& p0, const qreal& p2,
                          const qreal& p3, const qreal& t,
                          const qreal& value);
 
 extern qreal gSolveForP2(const qreal& p0, const qreal& p1,
-                        const qreal& p3, const qreal& t,
-                          const qreal& value);
-
-extern qreal gSolveForP1(const qreal& p0, const qreal& p2,
                          const qreal& p3, const qreal& t,
                          const qreal& value);
 
-extern void gGetCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
-                                  QPointF centerPos, QPointF *newEndPos,
-                                  QPointF *newStartPos);
-extern void gGetCtrlsSmoothPos(QPointF endPos, QPointF startPos,
-                               QPointF centerPos, QPointF *newEndPos,
-                               QPointF *newStartPos);
+extern void gGetCtrlsSymmetricPos(const QPointF& endPos,
+                                  const QPointF& startPos,
+                                  const QPointF& centerPos,
+                                  QPointF &newEndPos,
+                                  QPointF &newStartPos);
 
-extern qreal gCalcCubicBezierVal(const qCubicSegment1D &seg,
+extern void gGetCtrlsSmoothPos(const QPointF &endPos,
+                               const QPointF &startPos,
+                               const QPointF &centerPos,
+                               QPointF &newEndPos,
+                               QPointF &newStartPos);
+
+extern qreal gCubicValueAtT(const qCubicSegment1D &seg,
                                  const qreal &t);
-extern QPointF gCalcCubicBezierVal(const qCubicSegment2D &seg,
+extern QPointF gCubicValueAtT(const qCubicSegment2D &seg,
                                    const qreal& t);
 
 extern qreal gTFromX(const qCubicSegment1D &seg,
@@ -114,12 +111,6 @@ extern qreal gMinDistanceToPath(const SkPoint& pos, const SkPath& path);
 extern QList<qCubicSegment2D> gPathToQCubicSegs2D(const SkPath& path);
 
 
-extern void gSegmentLengthLoop(const qCubicSegment2D& seg,
-                               const uint &div,
-                               const bool& closedInterval,
-                               const std::function<void(const qreal&)> &func);
-
-
 //! @brief Splits segments at intersections.
 //! Returns pair of lists of segments corresponding to each input segment.
 extern CubicListPair gSplitAtIntersections(const qCubicSegment2D& seg1,
@@ -128,18 +119,7 @@ extern SkPath gCubicListToSkPath(const CubicList& list);
 
 extern CubicList gSplitSelfAtIntersections(const qCubicSegment2D& seg);
 
-extern CubicList gRemoveAllPointsCloserThan(const qreal& minDist,
-                                            const SkPath& distTo,
-                                            const CubicList &src);
-
 extern CubicList gCubicIntersectList(CubicList targetList);
-
-extern CubicList gCubicIntersectListAndRemoveExt(CubicList targetList);
-
-extern CubicList gRemoveAllPointsOutsidePath(const SkPath& path,
-                                             const CubicList &src);
-extern CubicList gRemoveAllPointsInsidePath(const SkPath& path,
-                                            const CubicList &src);
 
 extern qreal gCubicLength(const qCubicSegment2D& seg);
 extern qreal gCubicTimeAtLength(const qCubicSegment2D& seg,
@@ -149,4 +129,16 @@ extern qreal gCubicLengthAtT(const qCubicSegment2D& seg, qreal t);
 extern qreal gCubicGetTFurthestInDirection(const qCubicSegment2D& seg,
                                            const qreal &deg);
 extern bool gCubicListClockWise(const CubicList &list);
+
+extern QList<SkPath> gSolidifyCubicList(const CubicList& list,
+                                        const qreal &width);
+extern SkPath gCubicToSkPath(const qCubicSegment2D& seg);
+extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &lastP,
+                                        const SkPoint &currP,
+                                        const SkPoint &nextP,
+                                        SkPoint &c1, SkPoint &c2,
+                                        const SkScalar &smoothLen);
+
+extern SkPath gSmoothyPath(const SkPath& path,
+                           const SkScalar& smootness);
 #endif // POINTHELPERS_H

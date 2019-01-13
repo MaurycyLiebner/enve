@@ -246,7 +246,8 @@ SOURCES += main.cpp\
     Animators/PathAnimators/nodesettings.cpp \
     GPUEffects/gpurastereffect.cpp \
     GPUEffects/gpupostprocessor.cpp \
-    GPUEffects/gpurastereffectcreator.cpp
+    GPUEffects/gpurastereffectcreator.cpp \
+    Paint/fixedtiledsurface.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -444,7 +445,8 @@ HEADERS  += \
     Animators/PathAnimators/nodesettings.h \
     GPUEffects/gpurastereffect.h \
     GPUEffects/gpupostprocessor.h \
-    GPUEffects/gpurastereffectcreator.h
+    GPUEffects/gpurastereffectcreator.h \
+    Paint/fixedtiledsurface.h
 
 RESOURCES += \
     resources.qrc

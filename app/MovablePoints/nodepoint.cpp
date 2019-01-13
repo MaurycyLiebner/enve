@@ -498,20 +498,20 @@ void NodePoint::setCtrlsMode(const CtrlsMode &mode) {
         QPointF newStartPos;
         QPointF newEndPos;
         gGetCtrlsSymmetricPos(mEndCtrlPt->getRelativePos(),
-                             mStartCtrlPt->getRelativePos(),
-                             getRelativePos(),
-                             &newEndPos,
-                             &newStartPos);
+                              mStartCtrlPt->getRelativePos(),
+                              getRelativePos(),
+                              newEndPos,
+                              newStartPos);
         mStartCtrlPt->setRelativePosStartAndFinish(newStartPos);
         mEndCtrlPt->setRelativePosStartAndFinish(newEndPos);
     } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
         QPointF newStartPos;
         QPointF newEndPos;
         gGetCtrlsSmoothPos(mEndCtrlPt->getRelativePos(),
-                          mStartCtrlPt->getRelativePos(),
-                          getRelativePos(),
-                          &newEndPos,
-                          &newStartPos);
+                           mStartCtrlPt->getRelativePos(),
+                           getRelativePos(),
+                           newEndPos,
+                           newStartPos);
         mStartCtrlPt->setRelativePosStartAndFinish(newStartPos);
     } else {
         return;
