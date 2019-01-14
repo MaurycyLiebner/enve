@@ -141,4 +141,9 @@ extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &lastP,
 
 extern SkPath gSmoothyPath(const SkPath& path,
                            const SkScalar& smootness);
+
+extern QList<CubicList> gPathToQCubicSegs2DBreakApart(const SkPath& path);
+
+extern qCubicSegment2D gCubicRandomDisplace(const qCubicSegment2D& seg,
+                                            const qreal& displ);
 #endif // POINTHELPERS_H

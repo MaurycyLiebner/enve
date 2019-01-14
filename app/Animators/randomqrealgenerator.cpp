@@ -176,7 +176,7 @@ void RandomQrealGenerator::generateData() {
     qreal currFrame = mFirstFrame;
     while(currFrame < mLastFrame) {
         //qreal maxDev = mMaxDev->qra_getValueAtRelFrame(currFrame);
-        mFrameValues << FrameValue(currFrame, qRandF(0., 1.));
+        mFrameValues << FrameValue(currFrame, gRandF(0., 1.));
         currFrame += getDeltaX(currFrame);
     }
     prp_updateInfluenceRangeAfterChanged();

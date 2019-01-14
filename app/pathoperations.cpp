@@ -67,8 +67,6 @@ void gApplyOperationF(const qreal &relFrame, const SkPath &src,
 }
 
 void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
-    *dst = gSmoothyPath(src, widthT);
-    return;
     if(isZero4Dec(widthT)) {
         *dst = src;
         return;

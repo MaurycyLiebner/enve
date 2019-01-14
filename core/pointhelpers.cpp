@@ -814,11 +814,6 @@ QList<qrealPair> gIntersectionTs(const qCubicSegment2D& seg1,
     return sols;
 }
 
-QList<QPointF> gIntersectionPts(const qCubicSegment2D& seg1,
-                                const qCubicSegment2D& seg2) {
-    auto tPairs = gIntersectionTs(seg1, seg2);
-}
-
 void gSeperateIntersectionTs(const qCubicSegment2D& seg1,
                              const qCubicSegment2D& seg2,
                              QList<qreal>& seg1Ts,
@@ -1065,12 +1060,12 @@ void gGetMaxSmoothAbsCtrlsForPtBetween(
     SkScalar nextDist = (currP - nextP).length()*0.5f;
     vectP.setLength(nextDist);
 
-    c1 = currP + vectP;
+    c2 = currP + vectP;
 
     vectP.negate();
     SkScalar lastDist = (currP - lastP).length()*0.5f;
     vectP.setLength(lastDist);
-    c2 = currP + vectP;
+    c1 = currP + vectP;
 }
 
 void gSmoothyAbsCtrlsForPtBetween(
@@ -1162,14 +1157,22 @@ SkPath gSmoothyPath(const SkPath& path, const SkScalar& smootness) {
 
     auto segLists = gPathToQCubicSegs2DBreakApart(path);
     foreach(const auto& segList, segLists) {
-        if(segList.isEmpty()) continue;
+        if(segList.count() < 2) continue;
         bool closed = cubicListClosed(segList);
         qCubicSegment2D prevSeg;
-        SkPoint c1;
+        SkPoint lastC2;
         if(closed) {
-            prevSeg = segList.last();
-            c1 = qPointToSk(prevSeg.fP2);
-            result.moveTo(qPointToSk(prevSeg.fP0));
+            prevSeg = segList.at(segList.count() - 2);
+            auto seg = segList.last();
+            SkPoint c1 = qPointToSk(prevSeg.fP2);
+            SkPoint c2 = qPointToSk(seg.fP1);
+            gSmoothyAbsCtrlsForPtBetween(qPointToSk(prevSeg.fP0),
+                                         qPointToSk(seg.fP0),
+                                         qPointToSk(seg.fP3),
+                                         c1, c2, smootness);
+            lastC2 = c2;
+            result.moveTo(qPointToSk(seg.fP0));
+            prevSeg = seg;
         }
 
         for(int i = 0; i < segList.count(); i++) {
@@ -1177,26 +1180,50 @@ SkPath gSmoothyPath(const SkPath& path, const SkScalar& smootness) {
             if(!closed) {
                 if(i == 0) {
                     prevSeg = seg;
-                    c1 = qPointToSk(prevSeg.fP2);
+                    lastC2 = qPointToSk(prevSeg.fP1);
                     result.moveTo(qPointToSk(prevSeg.fP0));
                     continue;
                 }
             }
+            SkPoint c1 = qPointToSk(prevSeg.fP2);
             SkPoint c2 = qPointToSk(seg.fP1);
             gSmoothyAbsCtrlsForPtBetween(qPointToSk(prevSeg.fP0),
-                                      qPointToSk(seg.fP0),
-                                      qPointToSk(seg.fP3),
-                                      c1, c2, smootness);
-            result.cubicTo(c1, c2, qPointToSk(seg.fP0));
-            c1 = qPointToSk(seg.fP2);
+                                         qPointToSk(seg.fP0),
+                                         qPointToSk(seg.fP3),
+                                         c1, c2, smootness);
+            result.cubicTo(lastC2, c1, qPointToSk(seg.fP0));
+            lastC2 = c2;
             prevSeg = seg;
         }
         if(!closed) {
             const auto& seg = segList.last();
-            SkPoint c2 = qPointToSk(seg.fP3);
-            result.cubicTo(c1, c2, qPointToSk(seg.fP3));
+            SkPoint p3 = qPointToSk(seg.fP3);
+            SkPoint c1;
+            if(smootness > 0) {
+                c1 = (qPointToSk(seg.fP2) - p3)*(1 - smootness) + p3;
+            } else {
+                c1 = (qPointToSk(seg.fP2) - p3)*(1 + smootness) + p3;
+            }
+            result.cubicTo(lastC2, c1, p3);
         }
     }
 
     return result;
+}
+
+QPointF gQPointFDisplace(const QPointF& pt, const qreal &displ) {
+    return QPointF(pt.x() + gRandF(-displ, displ),
+                   pt.y() + gRandF(-displ, displ));
+}
+
+qCubicSegment2D gCubicRandomDisplace(const qCubicSegment2D &seg,
+                                     const qreal &displ) {
+    return {gQPointFDisplace(seg.fP0, displ),
+            gQPointFDisplace(seg.fP1, displ),
+            gQPointFDisplace(seg.fP2, displ),
+            gQPointFDisplace(seg.fP3, displ)};
+}
+
+CubicList gAlternativeVersion(const CubicList& src) {
+
 }

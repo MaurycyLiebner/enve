@@ -1,6 +1,6 @@
 #include "simplemath.h"
 
-qreal qRandF(const qreal &fMin, const qreal &fMax) {
+qreal gRandF(const qreal &fMin, const qreal &fMax) {
     qreal f = static_cast<qreal>(qrand())/RAND_MAX;
     return fMin + f * (fMax - fMin);
 }

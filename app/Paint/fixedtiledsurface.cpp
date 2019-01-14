@@ -74,7 +74,8 @@ bool FixedTiledSurface::resize(const int &width, const int &height) {
     fRealHeight = realHeight;
     SkImageInfo info = SkImageInfo::Make(realWidth, realHeight,
                                          kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
+                                         kUnpremul_SkAlphaType,
+                                         //kPremul_SkAlphaType,
                                          nullptr);
     fBitmap.allocPixels(info);
     fBitmap.eraseColor(SK_ColorTRANSPARENT);

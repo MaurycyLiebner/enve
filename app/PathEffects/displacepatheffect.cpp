@@ -81,7 +81,7 @@ private:
 };
 
 float randFloat() {
-    return static_cast<float>(qRandF(-1, 1));
+    return static_cast<float>(gRandF(-1, 1));
 }
 
 bool displaceFilterPath(SkPath* dst, const SkPath& src,

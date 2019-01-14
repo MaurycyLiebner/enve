@@ -10,11 +10,6 @@
 #include "Animators/transformanimator.h"
 #include "Animators/effectanimators.h"
 
-double fRand(const double& fMin, const double& fMax) {
-    double f = static_cast<double>(rand()) / RAND_MAX;
-    return fMin + f * (fMax - fMin);
-}
-
 ParticleBox::ParticleBox() :
     BoundingBox(TYPE_PARTICLES) {
     setName("Particle Box");

@@ -8,6 +8,7 @@
 #include "canvas.h"
 #include "Paint/fixedtiledsurface.h"
 #include "GUI/BrushWidgets/brushwidget.h"
+#include <mypaint-brush.h>
 class GradientPoints;
 class SkStroke;
 class PathEffectAnimators;
@@ -41,21 +42,28 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
         SkBitmap bit;
         bit.installPixels(pix);
         SkCanvas canvas(bit);
-        auto brush = fParentBox->getParentCanvas()->getCurrentBrush();
+        auto brush = const_cast<BrushWrapper*>(
+                    fParentBox->getParentCanvas()->getCurrentBrush());
         FixedTiledSurface surf;
 
         surf.initialize(qCeil(fGlobalBoundingRect.width()),
                         qCeil(fGlobalBoundingRect.height()));
-        //auto brushSet = BrushStrokeSet::outlineStrokesForSkPath(fillPath, 5, 5);
-        //        foreach(const auto& set, brushSet) {
-        //            set.execute(brush->getItem(), &surf, 5);
-        //        }
         SkPath pathT;
         fillPath.offset(-qCeil(fGlobalBoundingRect.x()),
                         -qCeil(fGlobalBoundingRect.y()),
                         &pathT);
-        auto brushSet = BrushStrokeSet::fromSkPath(pathT);
-        brushSet.execute(brush->getItem(), &surf, 5);
+        auto brushSet = BrushStrokeSet::fillStrokesForSkPath(pathT, 5);
+        brush->setColor(0, 0, 1);
+        foreach(const auto& set, brushSet) {
+            set.execute(brush->getItem(), &surf, 5);
+        }
+        brushSet = BrushStrokeSet::outlineStrokesForSkPath(pathT, 5, 5);
+        brush->setColor(0, 0, 0);
+        foreach(const auto& set, brushSet) {
+            set.execute(brush->getItem(), &surf, 5);
+        }
+
+
         surf.draw(&canvas, 0, 0);
         canvas.flush();
         BoundingBoxRenderData::afterProcessingFinished();

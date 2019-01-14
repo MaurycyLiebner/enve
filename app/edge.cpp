@@ -204,7 +204,7 @@ void VectorPathEdge::makePassThroughRel(const QPointF &relPos) {
         mPoint1->setEndCtrlPtEnabled(true);
     }
 
-    auto relSeg = getAsAbsSegment();
+    auto relSeg = getAsRelSegment();
 
     QPointF dPos = relPos - gCubicValueAtT(relSeg, mPressedT);
     while(pointToLen(dPos) > 1.) {

@@ -159,25 +159,28 @@ private:
     QRect execute(MyPaintBrush * const brush,
                   FixedTiledSurface * const surface,
                   const bool& press,
-                  const double& dLen) const {
+                  double dLen) const {
         QRect changedRect;
         if(press) {
             changedRect = executePress(brush, surface);
         }
         const double totalLength = gCubicLength(fStrokePath);
-        double lastT = 0;
-        for(double len = dLen; len < totalLength; len += dLen) {
-            double t = gCubicTimeAtLength(fStrokePath, len);
-            QRect roi = executeMove(brush, surface, t, lastT);
+        const int iMax = qCeil(totalLength/dLen);
+        dLen = totalLength/iMax;
+        const double lenFrag = 1./iMax;
+
+        for(int i = 0; i < iMax; i++) {
+            double t = gCubicTimeAtLength(fStrokePath, i*dLen);
+            QRect roi = executeMove(brush, surface, t, lenFrag);
             changedRect = changedRect.united(roi);
-            lastT = t;
         }
         return changedRect;
     }
 
     QRect executeMove(MyPaintBrush * const brush,
                       FixedTiledSurface * const surface,
-                      const double& t, const double& lastT) const {
+                      const double& t,
+                      const double& lenFrag) const {
         QPointF pos = gCubicValueAtT(fStrokePath, t);
         qreal pressure = gCubicValueAtT(fPressure, t);
         qreal xTilt = gCubicValueAtT(fXTilt, t);
@@ -192,7 +195,7 @@ private:
                                 static_cast<float>(pressure),
                                 static_cast<float>(xTilt),
                                 static_cast<float>(yTilt),
-                                time*(t - lastT),
+                                time*lenFrag,
                                 static_cast<float>(1.),
                                 static_cast<float>(0.));
         MyPaintRectangle roi;
@@ -229,37 +232,48 @@ private:
 };
 
 struct BrushStrokeSet {
-    static BrushStrokeSet fromSkPath(const SkPath& path) {
-        BrushStrokeSet set;
-        auto segs = gPathToQCubicSegs2D(path);
+    static QList<BrushStrokeSet> fromSkPath(const SkPath& path) {
+        QList<BrushStrokeSet> result;
+
+        auto segLists = gPathToQCubicSegs2DBreakApart(path);
+        if(segLists.isEmpty()) return result;
         bool first = true;
-        foreach(const auto& seg, segs) {
-            if(first) {
-                first = false;
+        foreach(const auto& segs, segLists) {
+            if(segs.isEmpty()) continue;
+            BrushStrokeSet set;
+            foreach(const auto& seg, segs) {
+                if(first) {
+                    first = false;
+                    set.fStrokes << BrushStroke{seg,
+                                     DefaultMoveStrokePressure(0.8),//DefaultPressStrokePressure(0, 0.8, 0.5),
+                                     DefaultTiltCurve,
+                                     DefaultTiltCurve,
+                                     DefaultTimeCurve};
+                    continue;
+                }
                 set.fStrokes << BrushStroke{seg,
-                                 DefaultPressStrokePressure(0, 0.8, 0.5),
+                                 DefaultMoveStrokePressure(0.8),
                                  DefaultTiltCurve,
                                  DefaultTiltCurve,
                                  DefaultTimeCurve};
-                continue;
             }
-            set.fStrokes << BrushStroke{seg,
-                             DefaultMoveStrokePressure(0.8),
-                             DefaultTiltCurve,
-                             DefaultTiltCurve,
-                             DefaultTimeCurve};
+            result << set;
         }
-        return set;
+        return result;
     }
 
     static QList<BrushStrokeSet> fillStrokesForSkPath(
             const SkPath& path, const qreal& distInc) {
+        auto pathBounds = path.getBounds();
+        int maxI = qMax(qCeil(static_cast<double>(pathBounds.width())/distInc),
+                        qCeil(static_cast<double>(pathBounds.height())/distInc));
         QList<BrushStrokeSet> result;
         //result << BrushStrokeSet::fromSkPath(path);
-        for(qreal dist = distInc*0.5;; dist += distInc*0.5) {
+        for(int i = 1; i < maxI; i++) {
             SkPath strokePath;
-            gSolidify(-dist, path, &strokePath);
-            if(strokePath.isEmpty()) break;
+            gSolidify(-i*distInc, path, &strokePath);
+            strokePath = gSmoothyPath(strokePath, static_cast<float>(i - 1)/maxI);
+            if(strokePath.isEmpty()) continue;
             result << BrushStrokeSet::fromSkPath(strokePath);
         }
         return result;
@@ -287,13 +301,15 @@ struct BrushStrokeSet {
                  const double& dLen) const {
         if(fStrokes.isEmpty()) return;
         QRect updateRect = fStrokes.first().execute(brush, surface, true, dLen);
-        foreach(const auto& stroke, fStrokes) {
+        for(int i = 1; i < fStrokes.count(); i++) {
+            const auto& stroke = fStrokes.at(i);
             QRect roi = stroke.execute(brush, surface, false, dLen);
             updateRect = updateRect.united(roi);
         }
         surface->updateImage(updateRect);
     }
     QList<BrushStroke> fStrokes;
+    bool fClosed;
 };
 
 G_END_DECLS
