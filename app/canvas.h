@@ -348,8 +348,8 @@ public:
 
     bool clipToCanvas() { return mClipToCanvasSize; }
 
-    const Brush *getCurrentBrush() const;
-    void setCurrentBrush(const Brush *brush) {
+    const BrushWrapper * getCurrentBrush() const;
+    void setCurrentBrush(const BrushWrapper * const brush) {
         mCurrentBrush = brush;
     }
 protected:
@@ -596,7 +596,7 @@ private:
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
-    const Brush *mCurrentBrush = nullptr;
+    const BrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;

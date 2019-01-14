@@ -50,7 +50,7 @@ public:
         mItem = item;
     }
 
-    Item getItem() {
+    Item getItem() const {
         return mItem;
     }
 private:

@@ -9,6 +9,7 @@
 #include "skia/skiaincludes.h"
 #include "smartPointers/stdselfref.h"
 #include "pointhelpers.h"
+#include "pathoperations.h"
 
 typedef qCubicSegment2D BrushStrokePath;
 typedef qCubicSegment1D BrushPressureCurve;
@@ -28,13 +29,12 @@ G_BEGIN_DECLS
 struct FixedTiledSurface {
     friend struct BrushStroke;
     friend struct BrushStrokeSet;
+    ~FixedTiledSurface();
     void _free() {
         mypaint_tiled_surface_destroy(&fParent);
 
-        free(fTileBuffer);
-        free(fNullTile);
-
-        free(this);
+        if(fTileBuffer) free(fTileBuffer);
+        if(fNullTile) free(fNullTile);
     }
     void _startRequest(MyPaintTileRequest * const request);
     void _endRequest(MyPaintTileRequest * const request);
@@ -65,7 +65,7 @@ struct FixedTiledSurface {
                                 static_cast<float>(0.));
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
-        updateImage(roi);
+        updateImage(QRect(roi.x, roi.y, roi.width, roi.height));
     }
 
     void paintMoveEvent(MyPaintBrush * const brush,
@@ -87,7 +87,7 @@ struct FixedTiledSurface {
                                 static_cast<float>(0.));
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
-        updateImage(roi);
+        updateImage(QRect(roi.x, roi.y, roi.width, roi.height));
     }
 
     void draw(SkCanvas * const canvas,
@@ -111,21 +111,22 @@ protected:
     int fRealHeight;
     SkBitmap fBitmap;
 
-    void updateImage(const MyPaintRectangle& roi) {
-        if(roi.width <= 0) return;
-        if(roi.height <= 0) return;
-        if(roi.x + roi.width < 0) return;
-        if(roi.y + roi.height < 0) return;
-        if(roi.x >= fRealWidth) return;
-        if(roi.y >= fRealHeight) return;
+    void updateImage(const QRect& roi) {
+        if(roi.isNull() || !roi.isValid()) return;
+        if(roi.width() <= 0) return;
+        if(roi.height() <= 0) return;
+        if(roi.x() + roi.width() < 0) return;
+        if(roi.y() + roi.height() < 0) return;
+        if(roi.x() >= fRealWidth) return;
+        if(roi.y() >= fRealHeight) return;
         const int tileSize = fParent.tile_size;
         const int tilesWidth = fTilesWidth;
         const int tilesHeight = fTilesHeight;
 
-        int minTileX = std::max(0, roi.x/tileSize);
-        int minTileY = std::max(0, roi.y/tileSize);
-        int maxTileX = qCeil(static_cast<double>(roi.x + roi.width)/tileSize);
-        int maxTileY = qCeil(static_cast<double>(roi.y + roi.height)/tileSize);
+        int minTileX = std::max(0, roi.x()/tileSize);
+        int minTileY = std::max(0, roi.y()/tileSize);
+        int maxTileX = qCeil(static_cast<double>(roi.x() + roi.width())/tileSize);
+        int maxTileY = qCeil(static_cast<double>(roi.y() + roi.height())/tileSize);
         maxTileX = std::min(tilesWidth, maxTileX);
         maxTileY = std::min(tilesHeight, maxTileY);
 
@@ -155,39 +156,28 @@ struct BrushStroke {
     BrushYTiltCurve fYTilt;
     BrushTimeCurve fTimeCurve;
 private:
-    void execute(MyPaintBrush * const brush,
-                 FixedTiledSurface * const surface,
-                 const bool& press,
-                 MyPaintRectangle * const roiTotal,
-                 const double& dLen) const {
-        MyPaintRectangle roiSum;
+    QRect execute(MyPaintBrush * const brush,
+                  FixedTiledSurface * const surface,
+                  const bool& press,
+                  const double& dLen) const {
+        QRect changedRect;
         if(press) {
-            executePress(brush, surface, &roiSum);
+            changedRect = executePress(brush, surface);
         }
         const double totalLength = gCubicLength(fStrokePath);
         double lastT = 0;
         for(double len = dLen; len < totalLength; len += dLen) {
             double t = gCubicTimeAtLength(fStrokePath, len);
-            MyPaintRectangle roi;
-            executeMove(brush, surface, t, lastT, &roi);
-            mypaint_rectangle_expand_to_include_point(
-                        &roiSum, roi.x, roi.y);
-            mypaint_rectangle_expand_to_include_point(
-                        &roiSum, roi.x + roi.width,
-                        roi.y + roi.height);
+            QRect roi = executeMove(brush, surface, t, lastT);
+            changedRect = changedRect.united(roi);
             lastT = t;
         }
-        mypaint_rectangle_expand_to_include_point(
-                    roiTotal, roiSum.x, roiSum.y);
-        mypaint_rectangle_expand_to_include_point(
-                    roiTotal, roiSum.x + roiSum.width,
-                    roiSum.y + roiSum.height);
+        return changedRect;
     }
 
-    void executeMove(MyPaintBrush * const brush,
-                     FixedTiledSurface * const surface,
-                     const double& t, const double& lastT,
-                     MyPaintRectangle * const roi) const {
+    QRect executeMove(MyPaintBrush * const brush,
+                      FixedTiledSurface * const surface,
+                      const double& t, const double& lastT) const {
         QPointF pos = gCubicValueAtT(fStrokePath, t);
         qreal pressure = gCubicValueAtT(fPressure, t);
         qreal xTilt = gCubicValueAtT(fXTilt, t);
@@ -205,12 +195,13 @@ private:
                                 time*(t - lastT),
                                 static_cast<float>(1.),
                                 static_cast<float>(0.));
-        mypaint_surface_end_atomic(surface->fMyPaintSurface, roi);
+        MyPaintRectangle roi;
+        mypaint_surface_end_atomic(surface->fMyPaintSurface, &roi);
+        return QRect(roi.x, roi.y, roi.width, roi.height);
     }
 
-    void executePress(MyPaintBrush * const brush,
-                      FixedTiledSurface * const surface,
-                      MyPaintRectangle * const roi) const {
+    QRect executePress(MyPaintBrush * const brush,
+                       FixedTiledSurface * const surface) const {
         QPointF pos = gCubicValueAtT(fStrokePath, 0);
         qreal pressure = gCubicValueAtT(fPressure, 0);
         qreal xTilt = gCubicValueAtT(fXTilt, 0);
@@ -231,7 +222,9 @@ private:
                                 1,
                                 static_cast<float>(1.),
                                 static_cast<float>(0.));
-        mypaint_surface_end_atomic(surface->fMyPaintSurface, roi);
+        MyPaintRectangle roi;
+        mypaint_surface_end_atomic(surface->fMyPaintSurface, &roi);
+        return QRect(roi.x, roi.y, roi.width, roi.height);
     }
 };
 
@@ -259,16 +252,46 @@ struct BrushStrokeSet {
         return set;
     }
 
+    static QList<BrushStrokeSet> fillStrokesForSkPath(
+            const SkPath& path, const qreal& distInc) {
+        QList<BrushStrokeSet> result;
+        //result << BrushStrokeSet::fromSkPath(path);
+        for(qreal dist = distInc*0.5;; dist += distInc*0.5) {
+            SkPath strokePath;
+            gSolidify(-dist, path, &strokePath);
+            if(strokePath.isEmpty()) break;
+            result << BrushStrokeSet::fromSkPath(strokePath);
+        }
+        return result;
+    }
+
+    static QList<BrushStrokeSet> outlineStrokesForSkPath(
+            const SkPath& path, const qreal& distInc,
+            const qreal& outlineWidth) {
+        QList<BrushStrokeSet> result;
+        result << BrushStrokeSet::fromSkPath(path);
+        qreal halfWidth = 0.5*outlineWidth;
+        qreal min = -halfWidth + distInc*0.5;
+        qreal max = halfWidth - distInc*0.5;
+        for(qreal dist = min; dist < max; dist += distInc*0.5) {
+            SkPath strokePath;
+            gSolidify(dist, path, &strokePath);
+            if(strokePath.isEmpty()) continue;
+            result << BrushStrokeSet::fromSkPath(strokePath);
+        }
+        return result;
+    }
+
     void execute(MyPaintBrush * const brush,
                  FixedTiledSurface * const surface,
                  const double& dLen) const {
         if(fStrokes.isEmpty()) return;
-        MyPaintRectangle roiSum;
-        fStrokes.first().execute(brush, surface, true, &roiSum, dLen);
+        QRect updateRect = fStrokes.first().execute(brush, surface, true, dLen);
         foreach(const auto& stroke, fStrokes) {
-            stroke.execute(brush, surface, false, &roiSum, dLen);
+            QRect roi = stroke.execute(brush, surface, false, dLen);
+            updateRect = updateRect.united(roi);
         }
-        surface->updateImage(roiSum);
+        surface->updateImage(updateRect);
     }
     QList<BrushStroke> fStrokes;
 };

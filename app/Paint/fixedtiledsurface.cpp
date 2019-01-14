@@ -26,7 +26,8 @@ void tileRequestEnd(MyPaintTiledSurface *tiled_surface,
 
 void FixedTiledSurface::resetNullTile() {
     if(!fNullTile) {
-        fNullTile = new uint16_t[static_cast<size_t>(fParent.tile_size)];
+        int size = fParent.tile_size*fParent.tile_size*4;
+        fNullTile = new uint16_t[static_cast<size_t>(size)];
     }
     memset(fNullTile, 0, fTileSize);
 }
@@ -93,6 +94,10 @@ bool FixedTiledSurface::initialize(const int &width, const int &height) {
     fParent.parent.destroy = freeSimpleTiledSurf;
 
     return resize(width, height);
+}
+
+FixedTiledSurface::~FixedTiledSurface() {
+    _free();
 }
 
 void FixedTiledSurface::_startRequest(MyPaintTileRequest * const request) {

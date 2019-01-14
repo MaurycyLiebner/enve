@@ -13,14 +13,9 @@ public:
     BrushWrapper(const QString& name,
                  const QString& collectionName,
                  MyPaintBrush* brush,
-                 const QImage& icon)  :
-            ItemWrapper<MyPaintBrush*>(name, collectionName,
-                                       brush, icon) {
-    }
+                 const QImage& icon);
 
-    ~BrushWrapper() {
-        mypaint_brush_unref(getItem());
-    }
+    ~BrushWrapper();
 
     static stdsptr<BrushWrapper> createBrushWrapper(const QString& fileName,
                                                  const QString &collectionName);

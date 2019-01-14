@@ -114,8 +114,8 @@ MovablePoint *PaintBox::getPointAtAbsPos(const QPointF &absPtPos,
     return nullptr;
 }
 
-void PaintBox::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                 QList<MovablePoint*> &list) {
+void PaintBox::selectAndAddContainedPointsToList(
+        const QRectF &absRect, QList<stdptr<MovablePoint> > &list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
@@ -314,35 +314,35 @@ stdsptr<BoundingBoxRenderData> PaintBox::createRenderData() {
 }
 
 void PaintBox::tabletMoveEvent(const qreal &xT,
-                           const qreal &yT,
-                           const ulong &time_stamp,
-                           const qreal &pressure,
-                           const bool &erase,
-                           const Brush *brush) {
+                               const qreal &yT,
+                               const ulong &time_stamp,
+                               const qreal &pressure,
+                               const bool &erase,
+                               const BrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
                         anim_mCurrentRelFrame);
     int seedT = rand() % 1000;
     srand(seedT);
-    mMainHandler->tabletMoveEvent(relPos.x(), relPos.y(),
-                              time_stamp, pressure,
-                              erase, brush);
-    qreal pRed, pGreen, pBlue, pAlpha;
-    mMainHandler->getPickedUpRGBA(&pRed, &pGreen,
-                                  &pBlue, &pAlpha);
-    mTemporaryHandler->setPickedUpRGBA(pRed, pGreen,
-                                       pBlue, pAlpha);
-    srand(seedT);
-    mTemporaryHandler->tabletMoveEvent(relPos.x(), relPos.y(),
-                              time_stamp, pressure,
-                              erase, brush);
+//    mMainHandler->tabletMoveEvent(relPos.x(), relPos.y(),
+//                              time_stamp, pressure,
+//                              erase, brush);
+//    qreal pRed, pGreen, pBlue, pAlpha;
+//    mMainHandler->getPickedUpRGBA(&pRed, &pGreen,
+//                                  &pBlue, &pAlpha);
+//    mTemporaryHandler->setPickedUpRGBA(pRed, pGreen,
+//                                       pBlue, pAlpha);
+//    srand(seedT);
+//    mTemporaryHandler->tabletMoveEvent(relPos.x(), relPos.y(),
+//                              time_stamp, pressure,
+//                              erase, brush);
 }
 
 void PaintBox::mouseMoveEvent(const qreal &xT,
                               const qreal &yT,
                               const ulong &time_stamp,
                               const bool &erase,
-                              const Brush *brush) {
+                              const BrushWrapper * const brush) {
     tabletMoveEvent(xT, yT,
                     time_stamp, 1.0,
                     erase, brush);
@@ -358,24 +358,24 @@ void PaintBox::tabletPressEvent(const qreal &xT,
                                 const ulong &time_stamp,
                                 const qreal &pressure,
                                 const bool &erase,
-                                const Brush *brush) {
+                                const BrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
                         anim_mCurrentRelFrame);
 
-    mMainHandler->tabletPressEvent(relPos.x(), relPos.y(),
-                                   time_stamp, pressure,
-                                   erase, brush);
-    mTemporaryHandler->tabletPressEvent(relPos.x(), relPos.y(),
-                                   time_stamp, pressure,
-                                   erase, brush);
+//    mMainHandler->tabletPressEvent(relPos.x(), relPos.y(),
+//                                   time_stamp, pressure,
+//                                   erase, brush);
+//    mTemporaryHandler->tabletPressEvent(relPos.x(), relPos.y(),
+//                                   time_stamp, pressure,
+//                                   erase, brush);
 }
 
 void PaintBox::mousePressEvent(const qreal &xT,
                                const qreal &yT,
                                const ulong &timestamp,
                                const qreal &pressure,
-                               const Brush *brush) {
+                               const BrushWrapper * const brush) {
     tabletPressEvent(xT, yT, timestamp, pressure, false, brush);
 }
 

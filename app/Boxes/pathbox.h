@@ -1,10 +1,13 @@
-#ifndef PATHBOX_H
+﻿#ifndef PATHBOX_H
 #define PATHBOX_H
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QLabel>
 #include "Boxes/boundingbox.h"
 #include "Animators/paintsettings.h"
+#include "canvas.h"
+#include "Paint/fixedtiledsurface.h"
+#include "GUI/BrushWidgets/brushwidget.h"
 class GradientPoints;
 class SkStroke;
 class PathEffectAnimators;
@@ -31,6 +34,33 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
     QPointF getCenterPosition() {
         return SkRectToQRectF(editPath.getBounds()).center();
     }
+
+    void afterProcessingFinished() {
+        SkPixmap pix;
+        renderedImage->peekPixels(&pix);
+        SkBitmap bit;
+        bit.installPixels(pix);
+        SkCanvas canvas(bit);
+        auto brush = fParentBox->getParentCanvas()->getCurrentBrush();
+        FixedTiledSurface surf;
+
+        surf.initialize(qCeil(fGlobalBoundingRect.width()),
+                        qCeil(fGlobalBoundingRect.height()));
+        //auto brushSet = BrushStrokeSet::outlineStrokesForSkPath(fillPath, 5, 5);
+        //        foreach(const auto& set, brushSet) {
+        //            set.execute(brush->getItem(), &surf, 5);
+        //        }
+        SkPath pathT;
+        fillPath.offset(-qCeil(fGlobalBoundingRect.x()),
+                        -qCeil(fGlobalBoundingRect.y()),
+                        &pathT);
+        auto brushSet = BrushStrokeSet::fromSkPath(pathT);
+        brushSet.execute(brush->getItem(), &surf, 5);
+        surf.draw(&canvas, 0, 0);
+        canvas.flush();
+        BoundingBoxRenderData::afterProcessingFinished();
+    }
+
 private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();

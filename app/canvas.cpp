@@ -378,7 +378,7 @@ stdsptr<BoundingBoxRenderData> Canvas::createRenderData() {
     return SPtrCreate(CanvasRenderData)(this);
 }
 
-const Brush *Canvas::getCurrentBrush() const {
+const BrushWrapper *Canvas::getCurrentBrush() const {
     return mCurrentBrush;
 }
 

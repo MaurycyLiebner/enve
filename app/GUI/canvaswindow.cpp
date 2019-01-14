@@ -609,18 +609,9 @@ void CanvasWindow::flipVerticalAction() {
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setCurrentBrush(const Brush *brush) {
+void CanvasWindow::setCurrentBrush(const BrushWrapper * const brush) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setCurrentBrush(brush);
-}
-
-void CanvasWindow::replaceBrush(const Brush *oldBrush,
-                                const Brush *newBrush) {
-    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
-        if(canvas->getCurrentBrush() == oldBrush) {
-            canvas->setCurrentBrush(newBrush);
-        }
-    }
 }
 
 void CanvasWindow::pathsUnionAction() {

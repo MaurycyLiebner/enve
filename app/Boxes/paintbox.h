@@ -8,6 +8,7 @@ class Brush;
 class AnimatedSurface;
 class QPointFAnimator;
 class AnimatedPoint;
+class BrushWrapper;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
     friend class StdSelfRef;
@@ -61,36 +62,36 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     void tabletMoveEvent(const qreal &xT,
-                     const qreal &yT,
-                     const ulong &time_stamp,
-                     const qreal &pressure,
-                     const bool &erase,
-                         const Brush *brush);
+                         const qreal &yT,
+                         const ulong &time_stamp,
+                         const qreal &pressure,
+                         const bool &erase,
+                         const BrushWrapper * const brush);
     void tabletReleaseEvent();
     void tabletPressEvent(const qreal &xT,
                           const qreal &yT,
                           const ulong &time_stamp,
                           const qreal &pressure,
                           const bool &erase,
-                          const Brush *brush);
+                          const BrushWrapper * const brush);
     void mouseReleaseEvent();
     void mousePressEvent(const qreal &xT,
                          const qreal &yT,
                          const ulong &timestamp,
                          const qreal &pressure,
-                         const Brush *brush);
+                         const BrushWrapper * const brush);
     void mouseMoveEvent(const qreal &xT,
                         const qreal &yT,
                         const ulong &time_stamp,
                         const bool &erase,
-                        const Brush *brush);
+                        const BrushWrapper * const brush);
     MovablePoint *getTopLeftPoint();
     MovablePoint *getBottomRightPoint();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<MovablePoint *> &list);
+                                           QList<stdptr<MovablePoint>>& list);
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
     void drawSelectedSk(SkCanvas *canvas,

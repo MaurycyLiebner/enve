@@ -27,6 +27,7 @@ class VideoBox;
 class Canvas;
 class PaintSettings;
 class StrokeSettings;
+class BrushWrapper;
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow,
@@ -224,9 +225,7 @@ signals:
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
 public slots:
-    void setCurrentBrush(const Brush *brush);
-    void replaceBrush(const Brush *oldBrush,
-                      const Brush *newBrush);
+    void setCurrentBrush(const BrushWrapper * const brush);
 
     void setMovePathMode();
     void setMovePointMode();
