@@ -161,7 +161,7 @@ void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                 boxData->fGlobalBoundingRect.topLeft();//QPointF(0., 0.);
         QPoint drawPos = drawPosF.toPoint();
         replaceIfHigherAlpha(drawPos.x(), drawPos.y(),
-                             motionBlur, sample->renderedImage,
+                             motionBlur, sample->fRenderedImage,
                              sampleAlpha);
         opacityT += opacityStepT;
     }

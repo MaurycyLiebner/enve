@@ -56,7 +56,7 @@ struct ParticleState {
         } else {
             int iAlpha = qRound(fTargetRenderData->fOpacity*2.55);
             paintT.setAlpha(static_cast<U8CPU>(iAlpha));
-            sk_sp<SkImage> imageT = fTargetRenderData->renderedImage;
+            sk_sp<SkImage> imageT = fTargetRenderData->fRenderedImage;
             if(imageT.get() == nullptr) return;
             //paintT.setAntiAlias(true);
             //paintT.setFilterQuality(kHigh_SkFilterQuality);
@@ -100,16 +100,16 @@ struct ParticleBoxRenderData : public BoundingBoxRenderData {
 
     void updateRelBoundingRect() {
         BoundingBoxRenderData::updateRelBoundingRect();
-        clipRect = QRectFToSkRect(fRelBoundingRect);
+        fClipRect = QRectFToSkRect(fRelBoundingRect);
     }
 
-    QList<EmitterData> emittersData;
-    SkRect clipRect;
+    QList<EmitterData> fEmittersData;
+    SkRect fClipRect;
 private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
-        canvas->clipRect(clipRect);
-        Q_FOREACH(const EmitterData &emitterData, emittersData) {
+        canvas->clipRect(fClipRect);
+        Q_FOREACH(const EmitterData &emitterData, fEmittersData) {
             if(emitterData.boxDraw) {
                 canvas->save();
                 canvas->resetMatrix();
@@ -291,10 +291,10 @@ public:
                                                BoundingBoxRenderData* data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
-        particleData->emittersData.clear();
+        particleData->fEmittersData.clear();
         foreach(const qsptr<ParticleEmitter>& emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();
-            particleData->emittersData << emitter->getEmitterDataAtRelFrameF(
+            particleData->fEmittersData << emitter->getEmitterDataAtRelFrameF(
                                               relFrame, particleData);
         }
     }

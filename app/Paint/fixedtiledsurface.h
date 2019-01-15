@@ -232,6 +232,28 @@ private:
 };
 
 struct BrushStrokeSet {
+    static BrushStrokeSet fromCubicList(const CubicList& segs) {
+        BrushStrokeSet set;
+        bool first = true;
+        foreach(const auto& seg, segs) {
+            if(first) {
+                first = false;
+                set.fStrokes << BrushStroke{seg,
+                                 DefaultMoveStrokePressure(0.8),//DefaultPressStrokePressure(0, 0.8, 0.5),
+                                 DefaultTiltCurve,
+                                 DefaultTiltCurve,
+                                 DefaultTimeCurve};
+                continue;
+            }
+            set.fStrokes << BrushStroke{seg,
+                             DefaultMoveStrokePressure(0.8),
+                             DefaultTiltCurve,
+                             DefaultTiltCurve,
+                             DefaultTimeCurve};
+        }
+        return set;
+    }
+
     static QList<BrushStrokeSet> fromSkPath(const SkPath& path) {
         QList<BrushStrokeSet> result;
 
@@ -272,9 +294,12 @@ struct BrushStrokeSet {
         for(int i = 1; i < maxI; i++) {
             SkPath strokePath;
             gSolidify(-i*distInc, path, &strokePath);
-            strokePath = gSmoothyPath(strokePath, static_cast<float>(i - 1)/maxI);
-            if(strokePath.isEmpty()) continue;
-            result << BrushStrokeSet::fromSkPath(strokePath);
+            for(int j = 0; j < 10; j++) {
+                if(strokePath.isEmpty()) continue;
+                result << BrushStrokeSet::fromSkPath(strokePath);
+            }
+            //strokePath = gSmoothyPath(strokePath, 1/*static_cast<float>(i - 1)/maxI*/);
+
         }
         return result;
     }

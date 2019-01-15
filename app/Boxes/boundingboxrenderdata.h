@@ -16,7 +16,6 @@ class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public _ScheduledTask {
     friend class StdSelfRef;
     BoundingBoxRenderData(BoundingBox *parentBoxT);
-
     virtual ~BoundingBoxRenderData();
 
     virtual void copyFrom(BoundingBoxRenderData *src);
@@ -63,11 +62,11 @@ struct BoundingBoxRenderData : public _ScheduledTask {
 
     bool fParentIsTarget = true;
     qptr<BoundingBox> fParentBox;
+    sk_sp<SkImage> fRenderedImage;
 
     virtual void updateRelBoundingRect();
     void drawRenderedImageForParent(SkCanvas *canvas);
     virtual void renderToImage();
-    sk_sp<SkImage> renderedImage;
 
     void _processUpdate();
 

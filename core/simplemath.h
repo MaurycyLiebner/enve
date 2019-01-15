@@ -68,7 +68,7 @@ extern qreal clamp(qreal val, qreal min, qreal max);
 extern qreal qclamp(qreal val, qreal min, qreal max);
 
 extern qreal gRandF(const qreal &fMin = 0., const qreal &fMax = 1.);
-
+extern SkScalar gSkRandF(const SkScalar &fMin = 0.f, const SkScalar &fMax = 1.f);
 extern QPointF symmetricToPos(QPointF toMirror,
                               QPointF mirrorCenter);
 extern QPointF symmetricToPosNewLen(QPointF toMirror,

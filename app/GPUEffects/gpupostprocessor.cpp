@@ -79,7 +79,7 @@ void BoxRenderDataScheduledPostProcess::process(
     if(!initializeOpenGLFunctions()) {
         RuntimeThrow("Initializing GL functions failed.");
     }
-    auto srcImage = mBoxData->renderedImage;
+    auto srcImage = mBoxData->fRenderedImage;
     if(!srcImage) return;
     int srcWidth = srcImage->width();
     int srcHeight = srcImage->height();
@@ -117,7 +117,7 @@ void BoxRenderDataScheduledPostProcess::process(
     mBoxData->fGPUEffects.clear();
 
     frameBufferObject.bindTexture(this);
-    mBoxData->renderedImage = frameBufferObject.toImage();
+    mBoxData->fRenderedImage = frameBufferObject.toImage();
     frameBufferObject.deleteFrameBuffer(this);
     frameBufferObject.deleteTexture(this);
     srcTexture.deleteTexture(this);

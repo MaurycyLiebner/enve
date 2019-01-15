@@ -5,6 +5,11 @@ qreal gRandF(const qreal &fMin, const qreal &fMax) {
     return fMin + f * (fMax - fMin);
 }
 
+SkScalar gSkRandF(const SkScalar &fMin, const SkScalar &fMax) {
+    SkScalar f = static_cast<SkScalar>(qrand())/RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
 qreal pointToLen(QPointF point) {
     return qSqrt(point.x()*point.x() + point.y()*point.y());
 }

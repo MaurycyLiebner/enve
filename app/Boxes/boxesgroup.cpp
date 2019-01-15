@@ -1073,6 +1073,6 @@ void BoxesGroupRenderData::renderToImage() {
         clearPixmapEffects();
     }
     bitmap.setImmutable();
-    renderedImage = SkImage::MakeFromBitmap(bitmap);
+    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
 }

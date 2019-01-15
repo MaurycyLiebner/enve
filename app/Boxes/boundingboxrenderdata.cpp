@@ -26,7 +26,7 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fDrawPos = src->fDrawPos;
     fOpacity = src->fOpacity;
     fResolution = src->fResolution;
-    renderedImage = makeSkImageCopy(src->renderedImage);
+    fRenderedImage = makeSkImageCopy(src->fRenderedImage);
     mFinished = true;
     fRelBoundingRectSet = true;
     fCopied = true;
@@ -65,12 +65,12 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
         paintT.setColor(SK_ColorTRANSPARENT);
         SkPath path;
         path.addRect(SkRect::MakeXYWH(fDrawPos.x(), fDrawPos.y(),
-                                      renderedImage->width(),
-                                      renderedImage->height()));
+                                      fRenderedImage->width(),
+                                      fRenderedImage->height()));
         path.toggleInverseFillType();
         canvas->drawPath(path, paintT);
     }
-    canvas->drawImage(renderedImage,
+    canvas->drawImage(fRenderedImage,
                       fDrawPos.x(), fDrawPos.y(),
                       &paint);
     canvas->restore();
@@ -138,7 +138,7 @@ void BoundingBoxRenderData::renderToImage() {
         clearPixmapEffects();
     }
     bitmap.setImmutable();
-    renderedImage = SkImage::MakeFromBitmap(bitmap);
+    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
 }
 

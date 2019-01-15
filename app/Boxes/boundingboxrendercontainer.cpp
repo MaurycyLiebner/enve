@@ -70,7 +70,7 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
 
     mTransform = data->fTransform;
     mResolutionFraction = data->fResolution;
-    mImageSk = data->renderedImage;
+    mImageSk = data->fRenderedImage;
     mDrawPos = data->fDrawPos;
     mRelFrame = data->fRelFrame;
     mPaintTransform.reset();

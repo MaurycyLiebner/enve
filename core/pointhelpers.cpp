@@ -1224,6 +1224,9 @@ qCubicSegment2D gCubicRandomDisplace(const qCubicSegment2D &seg,
             gQPointFDisplace(seg.fP3, displ)};
 }
 
-CubicList gAlternativeVersion(const CubicList& src) {
+
+CubicList gCubicListFragment(const CubicList &src,
+                             const double &minLenFrac,
+                             const double &maxLenFrac) {
 
 }

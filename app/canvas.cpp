@@ -519,7 +519,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(!cont) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame(range.min);
     }
-    cont->replaceImageSk(renderData->renderedImage);
+    cont->replaceImageSk(renderData->fRenderedImage);
     if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
         mCurrentPreviewContainerOutdated = false;
         setCurrentPreviewContainer(cont);
@@ -1278,7 +1278,7 @@ void CanvasRenderData::renderToImage() {
     }
 
     bitmap.setImmutable();
-    renderedImage = SkImage::MakeFromBitmap(bitmap);
+    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
     delete rasterCanvas;
 }

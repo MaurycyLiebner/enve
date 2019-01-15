@@ -38,7 +38,7 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
 
     void afterProcessingFinished() {
         SkPixmap pix;
-        renderedImage->peekPixels(&pix);
+        fRenderedImage->peekPixels(&pix);
         SkBitmap bit;
         bit.installPixels(pix);
         SkCanvas canvas(bit);

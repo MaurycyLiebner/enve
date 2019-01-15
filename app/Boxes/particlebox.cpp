@@ -233,15 +233,15 @@ void Particle::generatePathNextFrame(const int &frame,
                                      const SkScalar &length) {
     if(mPrevVelocityDuration > velocityVarPeriod) {
         mPrevVelocityVar = mNextVelocityVar;
-        mNextVelocityVar = SkPoint::Make(fRand(-velocityVar, velocityVar),
-                                         fRand(-velocityVar, velocityVar));
+        mNextVelocityVar = SkPoint::Make(gRandF(-velocityVar, velocityVar),
+                                         gRandF(-velocityVar, velocityVar));
         mPrevVelocityDuration = 0.;
     }
 
     int arrayId = frame - mFirstFrame;
 
     if(arrayId == 0) {
-        SkScalar iniTime = fRand(0., 1.);
+        SkScalar iniTime = gRandF(0., 1.);
         mLastPos += mLastVel*iniTime;
         mLastVel += acc*iniTime;
     }
@@ -588,20 +588,20 @@ void ParticleEmitter::generateParticles() {
                 newParticle = new Particle(mParentBox_k);
                 mParticles << newParticle;
             }
-            qreal partVelAmp = fRand(iniVelocity - iniVelocityVar,
-                                     iniVelocity + iniVelocityVar);
+            qreal partVelAmp = gRandF(iniVelocity - iniVelocityVar,
+                                      iniVelocity + iniVelocityVar);
 
 
             QMatrix rotVelM;
-            qreal velDeg = fRand(iniVelocityAngle - iniVelocityAngleVar,
-                                 iniVelocityAngle + iniVelocityAngleVar);
+            qreal velDeg = gRandF(iniVelocityAngle - iniVelocityAngleVar,
+                                  iniVelocityAngle + iniVelocityAngleVar);
             rotVelM.rotate(velDeg);
             QPointF partVel = rotVelM.map(QPointF(partVelAmp, 0.)) + srcVel;
 
-            qreal partSize = fRand(particleSize - particleSizeVar,
-                                   particleSize + particleSizeVar);
+            qreal partSize = gRandF(particleSize - particleSizeVar,
+                                    particleSize + particleSizeVar);
 
-            qreal xTrans = fRand(-width, width);
+            qreal xTrans = gRandF(-width, width);
 
             newParticle->initializeParticle(i, particlesFrameLifetime,
                                             SkPoint::Make(

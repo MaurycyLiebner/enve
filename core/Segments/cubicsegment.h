@@ -21,6 +21,16 @@ struct CubicSegment {
     }
 };
 
+template <typename T>
+struct MeasuredCubicSegment {
+    CubicSegment<T> fSeg;
+    qreal fLength;
+
+    template <typename T2> explicit operator MeasuredCubicSegment<T2> () const {
+        return { CubicSegment<T2>(fSeg), fLength };
+    }
+};
+
 typedef CubicSegment<qreal> qCubicSegment1D;
 typedef CubicSegment<SkScalar> SkCubicSegment1D;
 typedef CubicSegment<QPointF> qCubicSegment2D;

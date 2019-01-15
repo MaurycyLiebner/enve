@@ -317,6 +317,6 @@ void LinkCanvasRenderData::renderToImage() {
     }
 
     bitmap.setImmutable();
-    renderedImage = SkImage::MakeFromBitmap(bitmap);
+    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
 }

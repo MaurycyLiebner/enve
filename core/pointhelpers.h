@@ -146,4 +146,7 @@ extern QList<CubicList> gPathToQCubicSegs2DBreakApart(const SkPath& path);
 
 extern qCubicSegment2D gCubicRandomDisplace(const qCubicSegment2D& seg,
                                             const qreal& displ);
+extern CubicList gCubicListFragment(const CubicList& src,
+                                    const double& minLenFrac,
+                                    const double& maxLenFrac);
 #endif // POINTHELPERS_H
