@@ -186,14 +186,14 @@ void VectorPathEdge::makePassThroughAbs(const QPointF &absPos) {
 
     QPointF dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
     while(pointToLen(dPos) > 1.) {
-        absSeg.fP1 += (1. - mPressedT)*dPos;
-        absSeg.fP2 += mPressedT*dPos;
+        absSeg.setP1(absSeg.p1() + (1. - mPressedT)*dPos);
+        absSeg.setP2(absSeg.p2() + mPressedT*dPos);
 
         dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
     }
 
-    mPoint1EndPt->moveToAbs(absSeg.fP1);
-    mPoint2StartPt->moveToAbs(absSeg.fP2);
+    mPoint1EndPt->moveToAbs(absSeg.p1());
+    mPoint2StartPt->moveToAbs(absSeg.p2());
 }
 
 void VectorPathEdge::makePassThroughRel(const QPointF &relPos) {
@@ -208,14 +208,14 @@ void VectorPathEdge::makePassThroughRel(const QPointF &relPos) {
 
     QPointF dPos = relPos - gCubicValueAtT(relSeg, mPressedT);
     while(pointToLen(dPos) > 1.) {
-        relSeg.fP1 += (1. - mPressedT)*dPos;
-        relSeg.fP2 += mPressedT*dPos;
+        relSeg.setP1(relSeg.p1() + (1. - mPressedT)*dPos);
+        relSeg.setP2(relSeg.p2() + mPressedT*dPos);
 
         dPos = relPos - gCubicValueAtT(relSeg, mPressedT);
     }
 
-    mPoint1EndPt->moveToRel(relSeg.fP1);
-    mPoint2StartPt->moveToRel(relSeg.fP2);
+    mPoint1EndPt->moveToRel(relSeg.p1());
+    mPoint2StartPt->moveToRel(relSeg.p2());
 }
 
 void VectorPathEdge::finishPassThroughTransform() {

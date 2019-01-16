@@ -382,6 +382,14 @@ const BrushWrapper *Canvas::getCurrentBrush() const {
     return mCurrentBrush;
 }
 
+void Canvas::incBrushRadius() {
+    mCurrentBrush->incPaintBrushSize(0.3);
+}
+
+void Canvas::decBrushRadius() {
+    mCurrentBrush->decPaintBrushSize(0.3);
+}
+
 bool Canvas::isMovingPath() {
     return mCurrentMode == CanvasMode::MOVE_PATH;
 }

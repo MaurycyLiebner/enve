@@ -2,38 +2,70 @@
 #define CUBICSEGMENT_H
 #include <skia/skiaincludes.h>
 #include <QPointF>
+#include <QPainterPath>
+typedef std::pair<qreal, qreal> qrealPair;
 
-template <typename T>
-struct CubicSegment {
-    T fP0;
-    T fP1;
-    T fP2;
-    T fP3;
+#define qCubicVals \
+    const qreal& p0x = p0().x(); \
+    const qreal& p0y = p0().y(); \
+    const qreal& p1x = p1().x(); \
+    const qreal& p1y = p1().y(); \
+    const qreal& p2x = p2().x(); \
+    const qreal& p2y = p2().y(); \
+    const qreal& p3x = p3().x(); \
+    const qreal& p3y = p3().y();
 
-    //T closestPointTo(const T& point);
+struct qCubicSegment2D {
+    typedef std::pair<qCubicSegment2D, qCubicSegment2D> Pair;
 
-    template <typename T2> explicit operator CubicSegment<T2> () const {
-        T2 nP0; switchSkQ(fP0, nP0);
-        T2 nP1; switchSkQ(fP1, nP1);
-        T2 nP2; switchSkQ(fP2, nP2);
-        T2 nP3; switchSkQ(fP3, nP3);
-        return { nP0, nP1, nP2, nP3 };
-    }
-};
+    qCubicSegment2D(const QPointF& p0, const QPointF& p1,
+                    const QPointF& p2, const QPointF& p3);
 
-template <typename T>
-struct MeasuredCubicSegment {
-    CubicSegment<T> fSeg;
+    QPointF posAtT(const qreal& t) const;
+
+    qreal getLength();
+
+    qreal tAtLength(const qreal& length);
+
+    qreal lengthAtT(qreal t);
+
+    qreal lengthFracAtT(qreal t);
+
+    Pair dividedAtT(qreal t);
+
+    const QPointF &p0() const;
+    const QPointF &p1() const;
+    const QPointF &p2() const;
+    const QPointF &p3() const;
+
+    void setP0(const QPointF& p0);
+    void setP1(const QPointF& p1);
+    void setP2(const QPointF& p2);
+    void setP3(const QPointF& p3);
+
+    qreal minDistanceTo(const QPointF &p,
+                        qreal * const pBestT,
+                        QPointF * const pBestPos);
+    qreal minDistanceTo(const QPointF &p,
+                        const qreal &minT,
+                        const qreal &maxT,
+                        qreal * const pBestT,
+                        QPointF * const pBestPos);
+
+//    static QList<qrealPair> sIntersectionTs(qCubicSegment2D& seg1,
+//                                            qCubicSegment2D& seg2);
+private:
+    qreal tAtLength(const qreal& length, const qreal& maxLenErr,
+                    const qreal& minT, const qreal& maxT);
+
+    void updateLength();
+    bool mLengthUpToDate = false;
     qreal fLength;
 
-    template <typename T2> explicit operator MeasuredCubicSegment<T2> () const {
-        return { CubicSegment<T2>(fSeg), fLength };
-    }
+    QPointF mP0;
+    QPointF mP1;
+    QPointF mP2;
+    QPointF mP3;
 };
-
-typedef CubicSegment<qreal> qCubicSegment1D;
-typedef CubicSegment<SkScalar> SkCubicSegment1D;
-typedef CubicSegment<QPointF> qCubicSegment2D;
-typedef CubicSegment<SkPoint> SkCubicSegment2D;
 
 #endif // CUBICSEGMENT_H

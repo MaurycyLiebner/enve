@@ -20,6 +20,10 @@
 #define v2to1div3 1.25992104989
 #define sqrt3     1.73205080757
 #define v2to2div3 1.58740105197
+
+#define pow2(val) val*val
+#define pow3(val) val*val*val
+
 #include <QtCore>
 #include "skia/skqtconversions.h"
 

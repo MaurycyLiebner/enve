@@ -140,8 +140,6 @@ public:
     void previewBeingRendered();
     void previewPaused();
 
-    void incBrushRadius();
-    void decBrushRadius();
     void addLoadedGradient(Gradient *gradient);
     FontsWidget *getFontsWidget() {
         return mFontWidget;

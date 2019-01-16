@@ -7,7 +7,8 @@
 
 BrushWrapper::BrushWrapper(const QString &name,
                            const QString &collectionName,
-                           MyPaintBrush *brush, const QImage &icon)  :
+                           MyPaintBrush * const brush,
+                           const QImage &icon)  :
     ItemWrapper<MyPaintBrush*>(name, collectionName,
                                brush, icon) {
 }

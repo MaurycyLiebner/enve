@@ -83,7 +83,8 @@ SOURCES += \
     framerange.cpp \
     Segments/cubicsegment.cpp \
     Segments/quadsegment.cpp \
-    Segments/conicsegment.cpp
+    Segments/conicsegment.cpp \
+    Segments/cubiclist.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -125,7 +126,8 @@ HEADERS += \
     framerange.h \
     Segments/cubicsegment.h \
     Segments/quadsegment.h \
-    Segments/conicsegment.h
+    Segments/conicsegment.h \
+    Segments/cubiclist.h
 
 unix {
     target.path = /usr/lib

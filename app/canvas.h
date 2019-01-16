@@ -352,6 +352,9 @@ public:
     void setCurrentBrush(const BrushWrapper * const brush) {
         mCurrentBrush = brush;
     }
+
+    void incBrushRadius();
+    void decBrushRadius();
 protected:
 //    void updateAfterCombinedTransformationChanged() {
 ////        Q_FOREACH(const qsptr<BoundingBox>& child, mChildBoxes) {

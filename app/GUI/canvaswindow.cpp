@@ -541,9 +541,9 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(event->key() == Qt::Key_I && !isMouseGrabber()) {
         invertSelectionAction();
     } else if(event->key() == Qt::Key_W) {
-        MainWindow::getInstance()->incBrushRadius();
+        mCurrentCanvas->incBrushRadius();
     } else if(event->key() == Qt::Key_Q) {
-        MainWindow::getInstance()->decBrushRadius();
+        mCurrentCanvas->decBrushRadius();
     }
 
     return true;

@@ -15,8 +15,6 @@ typedef std::pair<qCubicSegment2D, qCubicSegment2D> CubicPair;
 typedef std::pair<qreal, qreal> qrealPair;
 typedef QList<qCubicSegment2D> CubicList;
 typedef std::pair<CubicList, CubicList> CubicListPair;
-#define pow2(val) val*val
-#define pow3(val) val*val*val
 
 enum CtrlsMode : short {
     CTRLS_SMOOTH,
