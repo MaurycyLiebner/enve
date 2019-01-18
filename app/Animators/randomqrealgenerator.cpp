@@ -96,10 +96,10 @@ qreal RandomQrealGenerator::getDevAtRelFrameF(const qreal &relFrame) {
         qreal c1F = frameBefore + smoothnessBefore*(frameAfter - frameBefore);
         qreal c2F = frameAfter - smoothnessAfter*(frameAfter - frameBefore);
 
-        t = gGetBezierTValueForXAssumeNoOverlapGrowingOnly(
-            {frameBefore, c1F, c2F, frameAfter}, relFrameRel, 0.01);
+        qCubicSegment1D seg(frameBefore, c1F, c2F, frameAfter);
+        seg.minDistanceTo(relFrameRel, &t);
     }
-    return t*valueAfter + (1. - t)*valueBefore;
+    return t*valueAfter + (1 - t)*valueBefore;
 }
 
 qreal RandomQrealGenerator::getDevAtRelFrame(const int &relFrame) {
@@ -123,8 +123,8 @@ int RandomQrealGenerator::getClosestLowerFrameId(const int &minId,
 }
 
 qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
-    qreal totDeltaX = 0.;
-    qreal A = 0.;
+    qreal totDeltaX = 0;
+    qreal A = 0;
     qreal prevPeriod = mPeriod->qra_getEffectiveValueAtRelFrame(relFrame);
     int prevFrame = relFrame;
     int nextFrame = relFrame;

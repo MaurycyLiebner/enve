@@ -9,58 +9,11 @@
 typedef std::complex<double> cmplx;
 
 qCubicSegment1D xSeg(const qCubicSegment2D &seg) {
-    return {seg.p0().x(), seg.p1().x(), seg.p2().x(), seg.p3().x()};
+    return {seg.p0().x(), seg.c1().x(), seg.c2().x(), seg.p1().x()};
 }
 
 qCubicSegment1D ySeg(const qCubicSegment2D &seg) {
-    return {seg.p0().y(), seg.p1().y(), seg.p2().y(), seg.p3().y()};
-}
-
-CubicList gPathToQCubicSegs2D(const SkPath& path) {
-    CubicList segs;
-
-    SkPoint lastMovePos;
-    SkPoint lastPos;
-    SkPath::Iter iter(path, false);
-    for(;;) {
-        SkPoint pts[4];
-        switch(iter.next(pts, true, true)) {
-            case SkPath::kLine_Verb: {
-                const SkPoint& pt1 = pts[1];
-                SkCubicSegment2D seg{lastPos, lastPos, pt1, pt1};
-                segs << qCubicSegment2D(seg);
-                lastPos = pt1;
-            } break;
-            case SkPath::kQuad_Verb: {
-                const SkPoint& pt2 = pts[2];
-                SkQuadSegment2D seg{lastPos, pts[1], pt2};
-                segs << qQuadSegment2D(seg).toCubic();
-                lastPos = pt2;
-            } break;
-            case SkPath::kConic_Verb: {
-                const SkPoint& pt2 = pts[2];
-                SkConicSegment2D seg{lastPos, pts[1], pt2, iter.conicWeight()};
-                segs << qConicSegment2D(seg).toCubic();
-                lastPos = pt2;
-            } break;
-            case SkPath::kCubic_Verb: {
-                const SkPoint& pt3 = pts[3];
-                SkCubicSegment2D seg{lastPos, pts[1], pts[2], pt3};
-                segs << qCubicSegment2D(seg);
-                lastPos = pt3;
-            } break;
-            case SkPath::kClose_Verb: {
-//                SkCubicSegment2D seg{lastPos, lastPos, lastMovePos, lastMovePos};
-//                segs << qCubicSegment2D(seg);
-            } break;
-            case SkPath::kMove_Verb: {
-                lastMovePos = pts[0];
-                lastPos = lastMovePos;
-            } break;
-            case SkPath::kDone_Verb:
-                return segs;
-        }
-    }
+    return {seg.p0().y(), seg.c1().y(), seg.c2().y(), seg.p1().y()};
 }
 
 QPointF symmetricToPos(QPointF toMirror,
@@ -85,9 +38,9 @@ QPointF gCubicValueAtT(const qCubicSegment2D &seg,
 qreal gCubicValueAtT(const qCubicSegment1D &seg,
                          const qreal& t) {
     return qPow(1 - t, 3)*seg.p0() +
-            3*qPow(1 - t, 2)*t*seg.p1() +
-            3*(1 - t)*t*t*seg.p2() +
-            t*t*t*seg.p3();
+            3*qPow(1 - t, 2)*t*seg.c1() +
+            3*(1 - t)*t*t*seg.c2() +
+            t*t*t*seg.p1();
 }
 
 qreal gSolveForP2(const qreal& p0, const qreal& p1,
@@ -140,7 +93,7 @@ void gGetCtrlsSymmetricPos(const QPointF& endPos,
 }
 
 void gGetCtrlsSmoothPos(const QPointF& endPos,
-                        const QPointF&startPos,
+                        const QPointF& startPos,
                         const QPointF& centerPos,
                         QPointF &newEndPos,
                         QPointF &newStartPos) {
@@ -165,9 +118,9 @@ void solveClosestToSegment(const qCubicSegment1D &seg,
                            const qreal &vn,
                            QList<qreal> *list) {
     cmplx v0 = cmplx(seg.p0(), 0.);
-    cmplx v1 = cmplx(seg.p1(), 0.);
-    cmplx v2 = cmplx(seg.p2(), 0.);
-    cmplx v3 = cmplx(seg.p3(), 0.);
+    cmplx v1 = cmplx(seg.c1(), 0.);
+    cmplx v2 = cmplx(seg.c2(), 0.);
+    cmplx v3 = cmplx(seg.p1(), 0.);
     cmplx v = cmplx(vn, 0.);
     cmplx var1 = sqrt(pow(v1, 2.) + pow(v2, 2.) - v1*(v2 + v3) -
                                  v0*(v3 - v2));
@@ -234,9 +187,9 @@ void solveOnSegmnet(const qCubicSegment1D &seg,
                     QList<qreal> *list) {
     cmplx i = cmplx(0., 1.);
     cmplx x0 = cmplx(seg.p0(), 0.);
-    cmplx x1 = cmplx(seg.p1(), 0.);
-    cmplx x2 = cmplx(seg.p2(), 0.);
-    cmplx x3 = cmplx(seg.p3(), 0.);
+    cmplx x1 = cmplx(seg.c1(), 0.);
+    cmplx x2 = cmplx(seg.c2(), 0.);
+    cmplx x3 = cmplx(seg.p1(), 0.);
     cmplx x = cmplx(xn, 0.);
     cmplx x0sq = pow(x0, 2.);
     cmplx x1sq = pow(x1, 2.);
@@ -306,108 +259,6 @@ qreal gGetClosestTValueOnBezier(const qCubicSegment1D &seg,
     return bestT;
 }
 
-qreal gGetClosestTValueOnBezier(const SkCubicSegment2D &seg,
-                                const SkPoint &p,
-                                SkPoint *bestPosPtr,
-                                qreal *errorPtr) {
-    QPointF qBestPos;
-    qreal t = gGetClosestTValueOnBezier(qCubicSegment2D(seg),
-                                       skPointToQ(p),
-                                       &qBestPos,
-                                       errorPtr);
-    if(bestPosPtr) *bestPosPtr = qPointToSk(qBestPos);
-    return t;
-}
-#define qCubicToVals(seg) \
-    const qreal& p0x = seg.p0().x(); \
-    const qreal& p0y = seg.p0().y(); \
-    const qreal& p1x = seg.p1().x(); \
-    const qreal& p1y = seg.p1().y(); \
-    const qreal& p2x = seg.p2().x(); \
-    const qreal& p2y = seg.p2().y(); \
-    const qreal& p3x = seg.p3().x(); \
-    const qreal& p3y = seg.p3().y();
-
-qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
-                                const QPointF &p,
-                                QPointF *bestPosPtr,
-                                qreal *errorPtr) {
-    return gGetClosestTValueOnBezier(seg, p, 0, 1, bestPosPtr, errorPtr);
-}
-
-qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
-                                const QPointF &p,
-                                const qreal& minT,
-                                const qreal& maxT,
-                                QPointF *bestPosPtr,
-                                qreal *errorPtr) {
-    qreal totalLen = gCubicLengthAtT(seg, maxT);//gCubicLength(seg);
-    qreal bestT = 0;
-    QPointF bestPt = seg.p0();
-    qreal minError = DBL_MAX;
-    for(qreal len = gCubicLengthAtT(seg, minT); len < totalLen;) { // t ∈ [0., 1.]
-        qreal t = gCubicTimeAtLength(seg, len);
-        QPointF pt = gCubicValueAtT(seg, t);
-        qreal dist = pointToLen(pt - p);
-        if(dist < minError) {
-            bestT = t;
-            bestPt = pt;
-            minError = dist;
-            if(minError < 1) {
-                qCubicToVals(seg);
-                while(dist < minError) {
-                    bestT = t;
-                    bestPt = pt;
-                    minError = dist;
-                    qreal tMinusOne = t - 1;
-                    qreal pow2TMinusOne = pow2(tMinusOne);
-                    qreal pow3TMinusOne = pow3(tMinusOne);
-
-                    qreal v0 = 3*p2x - 3*p2x*t + p3x*t;
-                    qreal v1 = 3*p2y - 3*p2y*t + p3y*t;
-
-                    qreal v2 = 3*p1x*pow2TMinusOne + t*v0;
-                    qreal v3 = t*(3*p1y*pow2TMinusOne + t*v1);
-
-                    qreal v4 = -1 + 4*t - 3*pow2(t);
-
-                    qreal num = pow2(p.x() + p0x*pow3TMinusOne - t*v2) +
-                                    pow2(p.y() + p0y*pow3TMinusOne - v3);
-                    qreal den = -6*(p0x*pow2TMinusOne + t*(-2*p2x + 3*p2x*t - p3x*t) +
-                                    p1x*v4)*
-                                  (-p.x() - p0x*pow3TMinusOne +  t*v2) -
-                                 6*(p0y*pow2TMinusOne + t*(-2*p2y + 3*p2y*t - p3y*t) +
-                                    p1y*v4)*
-                                  (-p.y() - p0y*pow3TMinusOne + v3);
-                    if(isZero6Dec(den)) {
-//                        if(first && minError > 0.01 && !isZeroOrOne6Dec(t)) {
-//                            t = gCubicTimeAtLength(seg, len + dist*0.5);
-//                            pt = gCalcCubicBezierVal(seg, t);
-//                            dist = pointToLen(pt - p);
-//                            continue;
-//                        }
-                        break;
-                    }
-                    qreal newT = t - num/den;
-                    pt = gCubicValueAtT(seg, newT);
-                    dist = pointToLen(pt - p);
-                    t = newT;
-                }
-            }
-            if(minError < 0.01) break;
-        }
-
-        len += dist*0.8;
-    }
-    if(bestPosPtr != nullptr) {
-        *bestPosPtr = bestPt;
-    }
-    if(errorPtr != nullptr) {
-        *errorPtr = minError;
-    }
-    return bestT;
-}
-
 //void VectorPathAnimator::bezierLeastSquareV1V2(const qreal &v0,
 //                                               qreal &v1, qreal &v2,
 //                                               const qreal &v3,
@@ -443,19 +294,19 @@ qCubicSegment2D gBezierLeastSquareV1V2(const qCubicSegment2D &seg,
     for(int i = 0; i < vs.count(); i++) {
         const QPointF &val = vs.at(i);
         const qreal &t = ts.at(i);
-        v1XInc += pow(1. - t, 2.)*t*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.p2().x()*(1. - t)*pow(t, 2.) -
-                 seg.p3().x()*pow(t, 3.) + val.x());
-        v2XInc += (1. - t)*pow(t, 2.)*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.p1().x()*pow(1. - t, 2.)*t -
-                 seg.p3().x()*pow(t, 3.) + val.x());
-        v1YInc += pow(1. - t, 2.)*t*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.p2().y()*(1. - t)*pow(t, 2.) -
-                 seg.p3().y()*pow(t, 3.) + val.y());
-        v2YInc += (1. - t)*pow(t, 2.)*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.p1().y()*pow(1. - t, 2.)*t -
-                 seg.p3().y()*pow(t, 3.) + val.y());
+        v1XInc += pow(1. - t, 2.)*t*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c2().x()*(1. - t)*pow(t, 2.) -
+                 seg.p1().x()*pow(t, 3.) + val.x());
+        v2XInc += (1. - t)*pow(t, 2.)*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c1().x()*pow(1. - t, 2.)*t -
+                 seg.p1().x()*pow(t, 3.) + val.x());
+        v1YInc += pow(1. - t, 2.)*t*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c2().y()*(1. - t)*pow(t, 2.) -
+                 seg.p1().y()*pow(t, 3.) + val.y());
+        v2YInc += (1. - t)*pow(t, 2.)*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c1().y()*pow(1. - t, 2.)*t -
+                 seg.p1().y()*pow(t, 3.) + val.y());
         v1Dec = (1. - t)*pow(t, 2.)*(3.*t*pow(1. - t, 2.));
         v2Dec = (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
     }
     return qCubicSegment2D(seg.p0(), QPointF(v1XInc/v1Dec, v1YInc/v1Dec),
-                           QPointF(v2XInc/v2Dec, v2YInc/v2Dec), seg.p3());
+                           QPointF(v2XInc/v2Dec, v2YInc/v2Dec), seg.p1());
 }
 
 qCubicSegment2D gBezierLeastSquareV1V2(
@@ -475,21 +326,21 @@ qCubicSegment2D gBezierLeastSquareV1V2(
             const QPointF &val = vs.at(i);
             qreal t = (static_cast<qreal>(i) - minVs)/(maxVs - minVs);
             //qreal t = getClosestTValueBezier2D(seg.p0, seg.p1, seg.p2, seg.p3, val);
-            v1XInc += pow(1. - t, 2.)*t*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.p2().x()*(1. - t)*pow(t, 2.) -
-                     seg.p3().x()*pow(t, 3.) + val.x());
-            v2XInc += (1. - t)*pow(t, 2.)*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.p1().x()*pow(1. - t, 2.)*t -
-                     seg.p3().x()*pow(t, 3.) + val.x());
-            v1YInc += pow(1. - t, 2.)*t*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.p2().y()*(1. - t)*pow(t, 2.) -
-                     seg.p3().y()*pow(t, 3.) + val.y());
-            v2YInc += (1. - t)*pow(t, 2.)*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.p1().y()*pow(1. - t, 2.)*t -
-                     seg.p3().y()*pow(t, 3.) + val.y());
+            v1XInc += pow(1. - t, 2.)*t*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c2().x()*(1. - t)*pow(t, 2.) -
+                     seg.p1().x()*pow(t, 3.) + val.x());
+            v2XInc += (1. - t)*pow(t, 2.)*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c1().x()*pow(1. - t, 2.)*t -
+                     seg.p1().x()*pow(t, 3.) + val.x());
+            v1YInc += pow(1. - t, 2.)*t*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c2().y()*(1. - t)*pow(t, 2.) -
+                     seg.p1().y()*pow(t, 3.) + val.y());
+            v2YInc += (1. - t)*pow(t, 2.)*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c1().y()*pow(1. - t, 2.)*t -
+                     seg.p1().y()*pow(t, 3.) + val.y());
             v1Dec += pow(1. - t, 2.)*t*(3.*t*pow(1. - t, 2.));
             v2Dec += (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
         }
         v1 = QPointF(v1XInc/v1Dec, v1YInc/v1Dec);
         v2 = QPointF(v2XInc/v2Dec, v2YInc/v2Dec);
     }
-    return {seg.p0(), v1, v2, seg.p3()};
+    return {seg.p0(), v1, v2, seg.p1()};
 }
 
 qreal get1DAccuracyValue(const qreal &x0,
@@ -570,68 +421,6 @@ QPointF gClosestPointOnRect(const QRectF &rect,
     return bestPos;
 }
 
-qreal gGetBezierTValueForX(const qCubicSegment1D &seg,
-                          const qreal &x,
-                          qreal *error) {
-    if(qAbs(seg.p0() - x) < 0.01) return seg.p0();
-    if(qAbs(seg.p3() - x) < 0.01) return seg.p3();
-
-    QList<qreal> xValues;
-
-    solveOnSegmnet(seg, x, &xValues);
-    qreal bestT = 0.;
-    qreal minErrorT = 1000000.;
-
-    Q_FOREACH(const qreal &xVal, xValues) {
-        qreal errorT = qAbs(gCubicValueAtT(seg, xVal) - x);
-        if(errorT < minErrorT) {
-            minErrorT = errorT;
-            bestT = xVal;
-        }
-    }
-
-    if(error != nullptr) *error = minErrorT;
-
-    return bestT;
-}
-
-qreal gGetBezierTValueForXAssumeNoOverlapGrowingOnly(
-        const qCubicSegment1D &seg,
-        const qreal &x,
-        const qreal &minT, const qreal &maxT,
-        const qreal &maxError, qreal *error) {
-    qreal tGuess = (maxT + minT)*0.5;
-    qreal guessVal = gCubicValueAtT(seg, tGuess);
-    qreal errorT = qAbs(guessVal - x);
-    if(errorT < maxError) {
-        if(error != nullptr) {
-            *error = errorT;
-        }
-        return tGuess;
-    }
-    if(guessVal > x) {
-        return gGetBezierTValueForXAssumeNoOverlapGrowingOnly(seg, x,
-                                           minT, tGuess, maxError, error);
-    }
-    return gGetBezierTValueForXAssumeNoOverlapGrowingOnly(seg, x,
-                                       tGuess, maxT, maxError, error);
-}
-
-qreal gGetBezierTValueForXAssumeNoOverlapGrowingOnly(
-        const qCubicSegment1D &seg,
-        const qreal &x,
-        const qreal &maxError, qreal *error) {
-    if(seg.p0() > seg.p3()) {
-        return gGetBezierTValueForXAssumeNoOverlapGrowingOnly(seg, x,
-                                                             maxError, error);
-    }
-    if(qAbs(seg.p0() - x) < 0.01) return seg.p0();
-    if(qAbs(seg.p3() - x) < 0.01) return seg.p3();
-    return gGetBezierTValueForXAssumeNoOverlapGrowingOnly(seg,
-                                                         x, 0., 1., maxError,
-                                                         error);
-}
-
 void gDrawCosmeticEllipse(QPainter *p,
                          const QPointF &absPos,
                          qreal rX, qreal rY) {
@@ -639,372 +428,6 @@ void gDrawCosmeticEllipse(QPainter *p,
     p->drawEllipse(absPos,
                    rX/transform.m11(),
                    rY/transform.m22());
-}
-
-qreal gMinDistanceToPath(const SkPoint &pos, const SkPath &path) {
-    QPointF qPos = skPointToQ(pos);
-    qreal smallestDist = __DBL_MAX__;
-    CubicList segs = gPathToQCubicSegs2D(path);
-    foreach(const auto& seg, segs) {
-        qreal thisDist;
-        gGetClosestTValueOnBezier(seg, qPos, nullptr, &thisDist);
-        if(thisDist < smallestDist) smallestDist = thisDist;
-    }
-    return smallestDist;
-}
-
-qreal gCubicLength(const qCubicSegment2D& seg) {
-    QPainterPath path;
-    path.moveTo(seg.p0());
-    path.cubicTo(seg.p1(), seg.p2(), seg.p3());
-    return path.length();
-}
-
-CubicPair gDivideCubicAtT(const qCubicSegment2D& seg,
-                          qreal t) {
-    t = CLAMP(t, 0, 1);
-    qreal oneMinusT = 1 - t;
-    QPointF P0_1 = seg.p0()*oneMinusT + seg.p1()*t;
-    QPointF P1_2 = seg.p1()*oneMinusT + seg.p2()*t;
-    QPointF P2_3 = seg.p2()*oneMinusT + seg.p3()*t;
-
-    QPointF P01_12 = P0_1*oneMinusT + P1_2*t;
-    QPointF P12_23 = P1_2*oneMinusT + P2_3*t;
-
-    QPointF P0112_1223 = P01_12*oneMinusT + P12_23*t;
-
-    qCubicSegment2D seg1{seg.p0(), P0_1, P01_12, P0112_1223};
-    qCubicSegment2D seg2{P0112_1223, P12_23, P2_3, seg.p3()};
-
-    return {seg1, seg2};
-}
-
-
-qreal gCubicLengthAtT(const qCubicSegment2D& seg, qreal t) {
-    t = CLAMP(t, 0, 1);
-    if(isZero6Dec(qMax(0., t))) return 0;
-    if(isZero6Dec(qMin(1., t) - 1)) return gCubicLength(seg);
-    auto divSeg = gDivideCubicAtT(seg, t);
-    return gCubicLength(divSeg.first);
-}
-
-qreal gCubicLengthFracAtT(const qCubicSegment2D& seg, qreal t) {
-    t = CLAMP(t, 0, 1);
-    if(isZero6Dec(t)) return 0;
-    if(isZero6Dec(t - 1)) return gCubicLength(seg);
-    qreal totLen = gCubicLength(seg);
-    if(isZero6Dec(totLen)) return 1;
-    return gCubicLengthAtT(seg, t)/totLen;
-}
-
-qreal cubicTimeAtLength(const qCubicSegment2D& seg,
-                        const qreal& length, const qreal& maxLenErr,
-                        const qreal& minT, const qreal& maxT) {
-    qreal guessT = (maxT + minT)*0.5;
-    qreal lenAtGuess = gCubicLengthAtT(seg, guessT);
-    if(abs(lenAtGuess - length) < maxLenErr) return guessT;
-    if(lenAtGuess > length) {
-        return cubicTimeAtLength(seg, length, maxLenErr, minT, guessT);
-    } else {
-        return cubicTimeAtLength(seg, length, maxLenErr, guessT, maxT);
-    }
-}
-
-qreal gCubicTimeAtLength(const qCubicSegment2D& seg,
-                         const qreal& length) {
-    if(isZero6Dec(length) || length < 0) return 0;
-    qreal totLen = gCubicLength(seg);
-    if(isZero6Dec(length - totLen) || length > totLen) return 1;
-    return cubicTimeAtLength(seg, length, 0.01, 0, 1);
-}
-
-//! @brief Loop through the segment length using length/div intervals.
-//! Returns length increment that was actually used.
-qreal fixedDivSegmentLengthLoop(
-        const qCubicSegment2D& seg, const uint &div,
-        const bool& closedInterval,
-        const std::function<void(const qreal&)> &func,
-        const qreal& totalLen) {
-    if(closedInterval) func(0.);
-    for(uint i = 1; i < div; i++) { // t ∈ (0., 1.)
-        func(gCubicTimeAtLength(seg, i*totalLen/div));
-    }
-    if(closedInterval) func(1.);
-    return totalLen/div;
-}
-
-//! @brief Loop through the segment length using length/div intervals.
-//! Returns length increment that was actually used.
-qreal gFixedDivSegmentLengthLoop(
-        const qCubicSegment2D& seg, const uint &div,
-        const bool& closedInterval,
-        const std::function<void(const qreal&)> &func) {
-    return fixedDivSegmentLengthLoop(seg, div, closedInterval,
-                                     func, gCubicLength(seg));
-}
-
-//! @brief Loop through the segment using length intervals.
-//! Returns length increment that was actually used.
-qreal gFixedIncSegmentLengthLoop(
-        const qCubicSegment2D& seg, const qreal &lenInc,
-        const bool& closedInterval,
-        const std::function<void(const qreal&)> &func) {
-    if(lenInc < 0 || isZero6Dec(lenInc)) return 0;
-    qreal totalLen = gCubicLength(seg);
-    uint div = static_cast<uint>(qCeil(totalLen/lenInc));
-    return fixedDivSegmentLengthLoop(seg, div, closedInterval,
-                                     func, totalLen);
-}
-
-//! @brief Loop through the segment using length intervals
-//! starting with t = 0, and ending with t = 1.
-//! Returns length increment that was actually used.
-void gVaryingIncSegmentLengthLoop(
-        const qCubicSegment2D& seg,
-        const std::function<qreal()> &lenInc,
-        const std::function<void(const qreal&)> &func) {
-    qreal totalLen = gCubicLength(seg);
-    func(0.);
-    for(qreal len = lenInc(); len < totalLen; len += lenInc()) { // t ∈ (0., 1.)
-        func(gCubicTimeAtLength(seg, len));
-    }
-    func(1.);
-}
-
-#define qCubic1DToNamedVals(seg, add) \
-    const qreal& p##add##0 = seg.p0(); \
-    const qreal& p##add##1 = seg.p1(); \
-    const qreal& p##add##2 = seg.p2(); \
-    const qreal& p##add##3 = seg.p3();
-
-QList<qrealPair> gIntersectionTs(const qCubicSegment2D& seg1,
-                                 const qCubicSegment2D& seg2) {
-    QList<qrealPair> sols;
-    qreal totalLen1 = gCubicLength(seg1);
-    qreal totalLen2 = gCubicLength(seg2);
-
-    for(qreal len1 = 0; len1 < totalLen1;) { // t ∈ (0., 1.)
-        qreal t1 = gCubicTimeAtLength(seg1, len1);
-        QPointF pt1 = gCubicValueAtT(seg1, t1);
-
-        qreal smallestDist = DBL_MAX;
-        for(qreal len2 = 0; len2 < totalLen2;) { // t ∈ (0., 1.)
-            qreal t2 = gCubicTimeAtLength(seg2, len2);
-            QPointF pt2 = gCubicValueAtT(seg2, t2);
-            qreal dist = pointToLen(pt1 - pt2);
-            if(dist < smallestDist) smallestDist = dist;
-
-            if(dist < .5) {
-                sols.append({t1, t2});
-                len2 += 1.;
-                smallestDist += 1;
-                break;
-            }
-
-            len2 += dist*0.5;
-        }
-
-        len1 += smallestDist*0.5;
-    }
-
-    return sols;
-}
-
-void gSeperateIntersectionTs(const qCubicSegment2D& seg1,
-                             const qCubicSegment2D& seg2,
-                             QList<qreal>& seg1Ts,
-                             QList<qreal>& seg2Ts) {
-    qreal totalLen1 = gCubicLength(seg1);
-    //qreal totalLen2 = gCubicLength(seg1);
-
-    for(qreal len1 = 0; len1 < totalLen1;) { // t ∈ (0., 1.)
-        qreal t1 = gCubicTimeAtLength(seg1, len1);
-        QPointF pt1 = gCubicValueAtT(seg1, t1);
-
-        qreal dist;
-        QPointF pt2;
-        qreal t2 = gGetClosestTValueOnBezier(seg2, pt1, &pt2, &dist);
-        if(dist < 0.01) {
-            if(!isZeroOrOne6Dec(t1) && !isZeroOrOne6Dec(t2)) {
-                seg1Ts << t1;
-                seg2Ts << t2;
-            }
-            len1 += 1;
-        }
-
-        len1 += dist*0.8;
-    }
-}
-
-//! @brief Splits segment at provided t values.
-//! Provided list of t values must be sorted.
-//! Returns list of segments.
-CubicList gSplitAtTs(const qCubicSegment2D& seg,
-                     const QList<qreal>& segTs) {
-    CubicList segList;
-    qCubicSegment2D segRem = seg;
-    qreal lastT = 0.;
-    foreach(const auto& seg1T, segTs) {
-        if(isZeroOrOne6Dec(seg1T)) continue;
-        qreal currT = (seg1T - lastT)/(1 - lastT);
-        auto divRes = gDivideCubicAtT(segRem, currT);
-        segList << divRes.first;
-        segRem = divRes.second;
-        lastT = currT;
-    }
-    segList << segRem;
-    return segList;
-}
-
-CubicList gSplitSelfAtIntersections(const qCubicSegment2D& seg) {
-    QList<qreal> segTs;
-    if(segTs.isEmpty()) return CubicList() << seg;
-    std::sort(segTs.begin(), segTs.end());
-    return gSplitAtTs(seg, segTs);
-}
-
-CubicListPair gSplitAtIntersections(const qCubicSegment2D& seg1,
-                                    const qCubicSegment2D& seg2) {
-    QList<qreal> seg1Ts, seg2Ts;
-    gSeperateIntersectionTs(seg1, seg2, seg1Ts, seg2Ts);
-    std::sort(seg1Ts.begin(), seg1Ts.end());
-    std::sort(seg2Ts.begin(), seg2Ts.end());
-    CubicList seg1List = gSplitAtTs(seg1, seg1Ts);
-    CubicList seg2List = gSplitAtTs(seg2, seg2Ts);
-
-    return {seg1List, seg2List};
-}
-
-SkPath gCubicListToSkPath(const CubicList& list) {
-    if(list.isEmpty()) return SkPath();
-    SkPath path;
-    bool first = true;
-    QPointF lastPos;
-    QPointF firstPos;
-    foreach(const auto& cubic, list) {
-        if(first) {
-            first = false;
-            firstPos = cubic.p0();
-            path.moveTo(qPointToSk(firstPos));
-        } else if(pointToLen(cubic.p0() - lastPos) > 0.1)  {
-            firstPos = cubic.p0();
-            path.moveTo(qPointToSk(firstPos));
-        }
-        path.cubicTo(qPointToSk(cubic.p1()),
-                     qPointToSk(cubic.p2()),
-                     qPointToSk(cubic.p3()));
-        lastPos = cubic.p3();
-    }
-    return path;
-}
-
-CubicList gCubicIntersectList(CubicList targetList) {
-    for(int i = 0; i < targetList.count(); i++) {
-        qCubicSegment2D iCubic = targetList.at(i);
-        for(int j = 0; j < targetList.count(); j++) {
-            bool same = i == j;
-            qCubicSegment2D jCubic = targetList.at(j);
-            CubicListPair inter;
-            if(same) {
-                inter = {gSplitSelfAtIntersections(iCubic), CubicList()};
-            } else {
-                inter = gSplitAtIntersections(iCubic, jCubic);
-            }
-
-            bool foundInter = inter.first.count() > 1;
-            if(foundInter) {
-                targetList.removeAt(i--);
-                if(j > i) j--;
-
-                for(int k = 0; k < inter.first.count(); k++) {
-                    targetList.insert(++i, inter.first.at(k));
-                    if(j >= i) j++;
-                }
-                if(!same) {
-                    targetList.removeAt(j--);
-                    if(i > j) i--;
-                    for(int k = 0; k < inter.second.count(); k++) {
-                        targetList.insert(++j, inter.second.at(k));
-                        if(i >= j) i++;
-                    }
-                }
-
-                break;
-            }
-            if(foundInter) break;
-        }
-
-    }
-    return targetList;
-}
-
-QPointF rotPt(const QPointF& pt, const qreal& deg) {
-    return {pt.x() * cos(deg*PI/180) - pt.y() * sin(deg*PI/180),
-            pt.x() * sin(deg*PI/180) + pt.y() * cos(deg*PI/180)};
-}
-
-qCubicSegment2D gCubicRotate(const qCubicSegment2D &seg,
-                             const qreal& deg) {
-    if(isZero6Dec(deg)) return seg;
-    return { rotPt(seg.p0(), deg), rotPt(seg.p1(), deg),
-             rotPt(seg.p2(), deg), rotPt(seg.p3(), deg) };
-}
-
-// -90 is y direction 0 is x direction
-qreal gCubicGetTFurthestInDirection(const qCubicSegment2D &seg,
-                                    const qreal& deg) {
-    auto rotSeg = gCubicRotate(seg, deg);
-    auto xS = xSeg(rotSeg);
-    qCubic1DToNamedVals(xS, x);
-    bool p0Further = px0 >= px1 && px0 >= px2;
-    bool p3Further = px3 >= px1 && px3 >= px2;
-    if(p0Further || p3Further) {
-        if(px3 > px0) return 1;
-        else return 0;
-    }
-    qreal den = px0 - 3*px1 + 3*px2 - px3;
-    qreal num0 = px0 - 2*px1 + px2;
-    qreal numSqrt = sqrt(pow2(px1) - px0*px2 - px1*px2 +
-                         pow2(px2) + px0*px3 - px1*px3);
-    qreal t1 = (num0 + numSqrt)/den;
-    qreal t2 = (num0 - numSqrt)/den;
-    if(t1 > 0 || t1 < 1) return t1;
-    if(t2 > 0 || t2 < 1) return t2;
-    Q_ASSERT(false);
-    return 0;
-}
-
-bool gCubicListClockWise(const CubicList &list) {
-    qreal sum = 0;
-    foreach(const auto& seg, list) {
-        sum += (seg.p3().x() - seg.p0().x())*(seg.p3().y() + seg.p0().y());
-    }
-    return sum > 0;
-}
-
-QList<SkPath> gSolidifyCubicList(const CubicList &list,
-                                 const qreal& width) {
-    QList<SkPath> result;
-    foreach(const auto& cubic, list) {
-        SkStroke strokerSk;
-        strokerSk.setJoin(SkPaint::kRound_Join);
-        strokerSk.setCap(SkPaint::kRound_Cap);
-        strokerSk.setWidth(static_cast<SkScalar>(qAbs(width*2)));
-        SkPath outline;
-        strokerSk.strokePath(gCubicToSkPath(cubic), &outline);
-
-        result << outline;
-    }
-    return result;
-}
-
-SkPath gCubicToSkPath(const qCubicSegment2D &seg) {
-    SkPath path;
-    path.moveTo(qPointToSk(seg.p0()));
-    path.cubicTo(qPointToSk(seg.p1()),
-                 qPointToSk(seg.p2()),
-                 qPointToSk(seg.p3()));
-    return path;
 }
 
 void gGetSmoothAbsCtrlsForPtBetween(
@@ -1051,6 +474,7 @@ void gGetMaxSmoothAbsCtrlsForPtBetween(
     sNextP.setLength(1);
     SkPoint vectP = (sLastP + sNextP)*0.5f;
     vectP.set(vectP.y(), -vectP.x());
+
     if(vectP.dot(lastP - currP) > 0) vectP.negate();
 
     SkScalar nextDist = (currP - nextP).length()*0.5f;
@@ -1064,165 +488,330 @@ void gGetMaxSmoothAbsCtrlsForPtBetween(
     c1 = currP + vectP;
 }
 
-void gSmoothyAbsCtrlsForPtBetween(
-        const SkPoint &lastP,
-        const SkPoint &currP,
-        const SkPoint &nextP,
-        SkPoint &c1, SkPoint &c2,
-        SkScalar smoothness) {
-    if(smoothness > 1) smoothness = 1;
-    if(smoothness < -1) smoothness = -1;
+void gGetMaxSmoothAbsCtrlsForPtBetween(
+        const QPointF &lastP,
+        const QPointF &currP,
+        const QPointF &nextP,
+        QPointF &c1, QPointF &c2) {
+    QPointF sLastP = lastP - currP;
+    sLastP = scalePointToNewLen(sLastP, 1);
+    QPointF sNextP = nextP - currP;
+    sNextP = scalePointToNewLen(sNextP, 1);
+    QPointF vectP = (sLastP + sNextP)*0.5;
+    vectP = QPointF(vectP.y(), -vectP.x());
+
+    if(QPointF::dotProduct(vectP, lastP - currP) > 0) vectP = -vectP;
+
+    qreal nextDist = pointToLen(currP - nextP)*0.5;
+    vectP = scalePointToNewLen(vectP, nextDist);
+
+    c2 = currP + vectP;
+
+    vectP = -vectP;
+    qreal lastDist = pointToLen(currP - lastP)*0.5;
+    vectP = scalePointToNewLen(vectP, lastDist);
+    c1 = currP + vectP;
+}
+
+template <typename T1, typename T2>
+void smoothyAbsCtrlsForPtBetween(const T1 &lastP, const T1 &currP,
+                                 const T1 &nextP, T1 &c1, T1 &c2,
+                                 T2 smoothness) {
+    smoothness = CLAMP(smoothness, -1, 1);
 
     if(smoothness > 0) {
-        SkPoint maxC1; SkPoint maxC2;
+        T1 maxC1; T1 maxC2;
         gGetMaxSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, maxC1, maxC2);
         c1 = currP + (c1 - currP)*(1 - smoothness) + (maxC1 - currP)*smoothness;
         c2 = currP + (c2 - currP)*(1 - smoothness) + (maxC2 - currP)*smoothness;
     } else {
-        SkScalar smoothnessDec = smoothness + 1;
+        T2 smoothnessDec = smoothness + 1;
         c1 = currP + (c1 - currP)*smoothnessDec;
         c2 = currP + (c2 - currP)*smoothnessDec;
     }
 }
 
-QList<CubicList> gPathToQCubicSegs2DBreakApart(const SkPath& path) {
-    QList<CubicList> result;
-    CubicList segs;
+void gSmoothyAbsCtrlsForPtBetween(const QPointF &lastP,
+                                  const QPointF &currP,
+                                  const QPointF &nextP,
+                                  QPointF &c1, QPointF &c2,
+                                  qreal smoothness) {
+    smoothyAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothness);
+}
 
+void gSmoothyAbsCtrlsForPtBetween(const SkPoint &lastP,
+                                  const SkPoint &currP,
+                                  const SkPoint &nextP,
+                                  SkPoint &c1, SkPoint &c2,
+                                  SkScalar smoothness) {
+    smoothyAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothness);
+}
+
+void gForEverySegmentInPath(
+        const SkPath& path,
+        const std::function<void(const SkPath&)>& func) {
     SkPoint lastMovePos;
     SkPoint lastPos;
     SkPath::Iter iter(path, false);
     for(;;) {
         SkPoint pts[4];
         switch(iter.next(pts, true, true)) {
-            case SkPath::kLine_Verb: {
-                const SkPoint& pt1 = pts[1];
-                SkCubicSegment2D seg{lastPos, lastPos, pt1, pt1};
-                segs << qCubicSegment2D(seg);
-                lastPos = pt1;
-            } break;
-            case SkPath::kQuad_Verb: {
-                const SkPoint& pt2 = pts[2];
-                SkQuadSegment2D seg{lastPos, pts[1], pt2};
-                segs << qQuadSegment2D(seg).toCubic();
-                lastPos = pt2;
-            } break;
-            case SkPath::kConic_Verb: {
-                const SkPoint& pt2 = pts[2];
-                SkConicSegment2D seg{lastPos, pts[1], pt2, iter.conicWeight()};
-                segs << qConicSegment2D(seg).toCubic();
-                lastPos = pt2;
-            } break;
-            case SkPath::kCubic_Verb: {
-                const SkPoint& pt3 = pts[3];
-                SkCubicSegment2D seg{lastPos, pts[1], pts[2], pt3};
-                segs << qCubicSegment2D(seg);
-                lastPos = pt3;
-            } break;
-            case SkPath::kClose_Verb: {
-//                SkCubicSegment2D seg{lastPos, lastPos, lastMovePos, lastMovePos};
-//                segs << qCubicSegment2D(seg);
-            } break;
-            case SkPath::kMove_Verb: {
-                if(!segs.isEmpty()) {
-                    result << segs;
-                    segs.clear();
-                }
-                lastMovePos = pts[0];
-                lastPos = lastMovePos;
-            } break;
-            case SkPath::kDone_Verb: {
-                if(!segs.isEmpty()) {
-                    result << segs;
-                    segs.clear();
-                }
-                return result;
-            }
+        case SkPath::kLine_Verb: {
+            SkPoint pt1 = pts[1];
+            SkPath seg;
+            seg.moveTo(lastPos);
+            seg.lineTo(pt1);
+            func(seg);
+            lastPos = pt1;
+        } break;
+        case SkPath::kQuad_Verb: {
+            SkPoint pt2 = pts[2];
+            SkPath seg;
+            seg.moveTo(lastPos);
+            seg.quadTo(pts[1], pt2);
+            func(seg);
+            lastPos = pt2;
+        } break;
+        case SkPath::kConic_Verb: {
+            SkPoint pt2 = pts[2];
+            SkPath seg;
+            seg.moveTo(lastPos);
+            seg.conicTo(pts[1], pt2, iter.conicWeight());
+            func(seg);
+            lastPos = pt2;
+        } break;
+        case SkPath::kCubic_Verb: {
+            SkPoint pt3 = pts[3];
+            SkPath seg;
+            seg.moveTo(lastPos);
+            seg.cubicTo(pts[1], pts[2], pt3);
+            func(seg);
+            lastPos = pt3;
+        } break;
+        case SkPath::kClose_Verb: {
+//            SkCubicSegment2D seg{lastPos, lastPos, lastMovePos, lastMovePos};
+//            segs << qCubicSegment2D(seg);
+        } break;
+        case SkPath::kMove_Verb: {
+            lastMovePos = pts[0];
+            lastPos = lastMovePos;
+        } break;
+        case SkPath::kDone_Verb:
+            return;
         }
     }
 }
 
-bool cubicListClosed(const CubicList& list) {
-    if(list.isEmpty()) return false;
-    if(pointToLen(list.first().p0() - list.last().p3()) < 0.1) return true;
-    return false;
+
+static void Perterb(SkPoint* p,
+                    const SkVector& tangent,
+                    SkScalar scale) {
+    SkVector normal = tangent;
+    SkPointPriv::RotateCCW(&normal);
+    normal.setLength(scale);
+    *p += normal;
 }
 
-SkPath gSmoothyPath(const SkPath& path, const SkScalar& smootness) {
-    SkPath result;
+float randFloat() {
+    return static_cast<float>(gRandF(-1, 1));
+}
 
-    auto segLists = gPathToQCubicSegs2DBreakApart(path);
-    foreach(const auto& segList, segLists) {
-        if(segList.count() < 2) continue;
-        bool closed = cubicListClosed(segList);
-        const qCubicSegment2D * prevSeg = nullptr;
-        SkPoint lastC2;
-        if(closed) {
-            prevSeg = &segList.at(segList.count() - 2);
-            const auto& seg = segList.last();
-            SkPoint c1 = qPointToSk(prevSeg->p2());
-            SkPoint c2 = qPointToSk(seg.p1());
-            gSmoothyAbsCtrlsForPtBetween(qPointToSk(prevSeg->p0()),
-                                         qPointToSk(seg.p0()),
-                                         qPointToSk(seg.p3()),
-                                         c1, c2, smootness);
-            lastC2 = c2;
-            result.moveTo(qPointToSk(seg.p0()));
-            prevSeg = &seg;
-        }
+bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
+                         const SkScalar &maxDev,
+                         const SkScalar &segLen,
+                         const SkScalar &smoothness,
+                         const uint32_t &seedAssist) {
+    if(segLen < 0.01f) return false;
+    dst->reset();
+    SkPathMeasure meas(src, false);
 
-        for(int i = 0; i < segList.count(); i++) {
-            const auto& seg = segList.at(i);
-            if(!closed) {
-                if(i == 0) {
-                    prevSeg = &seg;
-                    lastC2 = qPointToSk(prevSeg->p1());
-                    result.moveTo(qPointToSk(prevSeg->p0()));
-                    continue;
-                }
+    SkScalar scale = maxDev;
+    SkPoint p;
+    SkVector v;
+
+    uint32_t seedContourInc = 0;;
+    if(smoothness < 0.001f) {
+        do {
+            qsrand(seedAssist + seedContourInc);
+            seedContourInc += 100;
+            SkScalar length = meas.getLength();
+            if(segLen * 2 > length) {
+                meas.getSegment(0, length, dst, true);  // to short for us to mangle
+                continue;
             }
-            SkPoint c1 = qPointToSk(prevSeg->p2());
-            SkPoint c2 = qPointToSk(seg.p1());
-            gSmoothyAbsCtrlsForPtBetween(qPointToSk(prevSeg->p0()),
-                                         qPointToSk(seg.p0()),
-                                         qPointToSk(seg.p3()),
-                                         c1, c2, smootness);
-            result.cubicTo(lastC2, c1, qPointToSk(seg.p0()));
-            lastC2 = c2;
-            prevSeg = &seg;
-        }
-        if(!closed) {
-            const auto& seg = segList.last();
-            SkPoint p3 = qPointToSk(seg.p3());
-            SkPoint c1;
-            if(smootness > 0) {
-                c1 = (qPointToSk(seg.p2()) - p3)*(1 - smootness) + p3;
+            int nTot = SkScalarCeilToInt(length / segLen);
+            int n = nTot;
+            SkScalar distance = 0;
+            SkScalar remLen = segLen*nTot - length;
+            SkPoint firstP;
+            if(meas.isClosed()) {
+                n--;
+                distance += (length + segLen)*0.5f;
+            }
+
+            if(meas.getPosTan(distance, &p, &v)) {
+                //Perterb(&p, v, randFloat() * scale);
+                dst->moveTo(p);
+                firstP = p;
+            }
+            while(--n >= 0) {
+                distance += segLen;
+                if(meas.getPosTan(distance, &p, &v)) {
+                    if(n == 0) {
+                        SkScalar scaleT = 1 - remLen/segLen;
+                        Perterb(&p, v, randFloat() * scale * scaleT);
+
+                    } else {
+                        Perterb(&p, v, randFloat() * scale);
+                    }
+                    dst->lineTo(p);
+                }
+                if(distance + segLen > length) break;
+            }
+            if(meas.isClosed()) {
+                distance = distance + segLen - length;
+                while(--n >= 0) {
+                    if(meas.getPosTan(distance, &p, &v)) {
+                        if(n == 0) {
+                            SkScalar scaleT = 1 - remLen/segLen;
+                            Perterb(&p, v, randFloat() * scale * scaleT);
+                        } else {
+                            Perterb(&p, v, randFloat() * scale);
+                        }
+                        dst->lineTo(p);
+                    }
+                    distance += segLen;
+                }
+                dst->close();
+            }
+        } while(meas.nextContour());
+    } else {
+        SkPoint firstP;
+        SkPoint secondP;
+        SkPoint thirdP;
+        SkPoint lastP;
+        SkPoint nextP;
+        SkPoint currP;
+        SkPoint lastC1;
+        SkPoint c1;
+        SkPoint c2;
+
+        do {
+            qsrand(seedAssist + seedContourInc);
+            seedContourInc += 100;
+            SkScalar length = meas.getLength();
+            if(segLen * 2 > length) {
+                meas.getSegment(0, length, dst, true);  // to short for us to mangle
+                continue;
+            }
+            int nTot = SkScalarCeilToInt(length / segLen);
+            int n = nTot;
+            SkScalar distance = 0.f;
+            SkScalar remLen = segLen*nTot - length;
+            SkScalar smoothLen = smoothness * segLen * 0.5f;
+
+            if(meas.isClosed()) {
+                n--;
+                distance += (length + segLen)*0.5f;
+            }
+
+            if(meas.getPosTan(distance, &firstP, &v)) {
+                //Perterb(&firstP, v, randFloat() * scale);
+                lastP = firstP;
+            }
+
+            if(meas.isClosed()) {
+                distance += segLen;
+                if(meas.getPosTan(distance, &currP, &v)) {
+                    Perterb(&currP, v, randFloat() * scale);
+                    n--;
+                    secondP = currP;
+                }
+                distance += segLen;
+                if(meas.getPosTan(distance, &nextP, &v)) {
+                    Perterb(&nextP, v, randFloat() * scale);
+                    n--;
+                    thirdP = nextP;
+
+                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
+
+                    lastC1 = c1;
+
+                    lastP = currP;
+                    currP = nextP;
+                }
             } else {
-                c1 = (qPointToSk(seg.p2()) - p3)*(1 + smootness) + p3;
+                currP = lastP;
+                lastC1 = currP;
             }
-            result.cubicTo(lastC2, c1, p3);
-        }
+            dst->moveTo(lastP);
+            while(--n >= 0) {
+                distance += segLen;
+                if(meas.getPosTan(distance, &nextP, &v)) {
+                    if(n == 0) {
+                        SkScalar scaleT = 1.f - remLen/segLen;
+                        Perterb(&nextP, v, randFloat() * scale * scaleT);
+
+                    } else {
+                        Perterb(&nextP, v, randFloat() * scale);
+                    }
+                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
+
+
+                    dst->cubicTo(lastC1, c2, currP);
+                    lastC1 = c1;
+
+                    lastP = currP;
+                    currP = nextP;
+                }
+                if(distance + segLen > length) break;
+            }
+
+//            nextP = firstP;
+//            getC1AndC2(lastP, currP, nextP,
+//                       &c1, &c2, smoothLen);
+//            dst->cubicTo(lastC1, c2, currP);
+            if(meas.isClosed()) {
+                distance = distance + segLen - length;
+                while(--n >= 0) {
+                    if(meas.getPosTan(distance, &nextP, &v)) {
+                        if(n == 0) {
+                            SkScalar scaleT = 1.f - remLen/segLen;
+                            Perterb(&nextP, v, randFloat() * scale * scaleT);
+                        } else {
+                            Perterb(&nextP, v, randFloat() * scale);
+                        }
+                        gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
+
+
+                        dst->cubicTo(lastC1, c2, currP);
+                        lastC1 = c1;
+
+                        lastP = currP;
+                        currP = nextP;
+                    }
+                    distance += segLen;
+                }
+                lastC1 = c1;
+
+//                lastP = currP;
+//                currP = nextP;
+                nextP = firstP;
+
+                gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
+
+                dst->cubicTo(lastC1, c2, currP);
+                lastC1 = c1;
+
+                lastP = currP;
+                currP = nextP;
+                nextP = secondP;
+                gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
+                dst->cubicTo(lastC1, c2, currP);
+
+                dst->close();
+            }
+        } while(meas.nextContour());
     }
-
-    return result;
-}
-
-QPointF gQPointFDisplace(const QPointF& pt, const qreal &displ) {
-    return QPointF(pt.x() + gRandF(-displ, displ),
-                   pt.y() + gRandF(-displ, displ));
-}
-
-qCubicSegment2D gCubicRandomDisplace(const qCubicSegment2D &seg,
-                                     const qreal &displ) {
-    return {gQPointFDisplace(seg.p0(), displ),
-            gQPointFDisplace(seg.p1(), displ),
-            gQPointFDisplace(seg.p2(), displ),
-            gQPointFDisplace(seg.p3(), displ)};
-}
-
-
-CubicList gCubicListFragment(const CubicList &src,
-                             const double &minLenFrac,
-                             const double &maxLenFrac) {
-
+    return true;
 }

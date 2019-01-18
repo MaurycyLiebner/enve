@@ -8,13 +8,12 @@
 #include <experimental/type_traits>
 #include "simplemath.h"
 #include "Segments/conicsegment.h"
-#include "Segments/cubicsegment.h"
+#include "Segments/qcubicsegment1d.h"
+#include "Segments/qcubicsegment2d.h"
 #include "Segments/quadsegment.h"
+#include "Segments/cubiclist.h"
 
-typedef std::pair<qCubicSegment2D, qCubicSegment2D> CubicPair;
 typedef std::pair<qreal, qreal> qrealPair;
-typedef QList<qCubicSegment2D> CubicList;
-typedef std::pair<CubicList, CubicList> CubicListPair;
 
 enum CtrlsMode : short {
     CTRLS_SMOOTH,
@@ -75,21 +74,6 @@ extern QPointF gClosestPointOnRect(const QRectF &rect,
                                    const QPointF &point,
                                    qreal *dist = nullptr);
 
-extern qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
-                                       const QPointF &p,
-                                       const qreal &minT,
-                                       const qreal &maxT,
-                                       QPointF *bestPosPtr = nullptr,
-                                       qreal *errorPtr = nullptr);
-
-extern qreal gGetClosestTValueOnBezier(const qCubicSegment2D &seg,
-                                       const QPointF &p,
-                                       QPointF *bestPosPtr = nullptr,
-                                       qreal *errorPtr = nullptr);
-
-extern qreal gGetBezierTValueForX(const qCubicSegment1D &seg,
-                                  const qreal &x,
-                                  qreal *error = nullptr);
 extern qCubicSegment2D gBezierLeastSquareV1V2(
         const qCubicSegment2D &seg, const QList<QPointF> &vs,
         const int &minVs, const int &maxVs);
@@ -99,52 +83,33 @@ extern void gDrawCosmeticEllipse(QPainter *p,
                                  const QPointF &absPos,
                                  qreal rX, qreal rY);
 
-extern qreal gGetBezierTValueForXAssumeNoOverlapGrowingOnly(
-        const qCubicSegment1D &seg,
-        const qreal &x,
-        const qreal &maxError, qreal *error = nullptr);
-
-extern qreal gMinDistanceToPath(const SkPoint& pos, const SkPath& path);
-
-extern QList<qCubicSegment2D> gPathToQCubicSegs2D(const SkPath& path);
-
-
-//! @brief Splits segments at intersections.
-//! Returns pair of lists of segments corresponding to each input segment.
-extern CubicListPair gSplitAtIntersections(const qCubicSegment2D& seg1,
-                                           const qCubicSegment2D& seg2);
-extern SkPath gCubicListToSkPath(const CubicList& list);
-
-extern CubicList gSplitSelfAtIntersections(const qCubicSegment2D& seg);
-
-extern CubicList gCubicIntersectList(CubicList targetList);
-
-extern qreal gCubicLength(const qCubicSegment2D& seg);
-extern qreal gCubicTimeAtLength(const qCubicSegment2D& seg,
-                                const qreal& length);
-extern qreal gCubicLengthAtT(const qCubicSegment2D& seg, qreal t);
 
 extern qreal gCubicGetTFurthestInDirection(const qCubicSegment2D& seg,
                                            const qreal &deg);
-extern bool gCubicListClockWise(const CubicList &list);
 
-extern QList<SkPath> gSolidifyCubicList(const CubicList& list,
-                                        const qreal &width);
-extern SkPath gCubicToSkPath(const qCubicSegment2D& seg);
-extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &lastP,
-                                        const SkPoint &currP,
-                                        const SkPoint &nextP,
-                                        SkPoint &c1, SkPoint &c2,
-                                        const SkScalar &smoothLen);
+extern void gSmoothyAbsCtrlsForPtBetween(
+        const QPointF &lastP, const QPointF &currP,
+        const QPointF &nextP, QPointF &c1, QPointF &c2,
+        qreal smoothness);
+extern void gSmoothyAbsCtrlsForPtBetween(
+        const SkPoint &lastP, const SkPoint &currP,
+        const SkPoint &nextP, SkPoint &c1, SkPoint &c2,
+        SkScalar smoothness);
 
-extern SkPath gSmoothyPath(const SkPath& path,
-                           const SkScalar& smootness);
+extern void gForEverySegmentInPath(
+        const SkPath& path,
+        const std::function<void(const SkPath&)>& func);
 
-extern QList<CubicList> gPathToQCubicSegs2DBreakApart(const SkPath& path);
+extern void gGetSmoothAbsCtrlsForPtBetween(
+        const SkPoint &lastP,
+        const SkPoint &currP,
+        const SkPoint &nextP,
+        SkPoint &c1, SkPoint &c2,
+        const SkScalar &smoothLen);
 
-extern qCubicSegment2D gCubicRandomDisplace(const qCubicSegment2D& seg,
-                                            const qreal& displ);
-extern CubicList gCubicListFragment(const CubicList& src,
-                                    const double& minLenFrac,
-                                    const double& maxLenFrac);
+extern bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
+                                const SkScalar &maxDev,
+                                const SkScalar &segLen,
+                                const SkScalar &smoothness,
+                                const uint32_t &seedAssist);
 #endif // POINTHELPERS_H

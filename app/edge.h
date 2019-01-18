@@ -5,7 +5,7 @@
 class NodePoint;
 class CtrlPoint;
 #include "skia/skiaincludes.h"
-#include "Segments/cubicsegment.h"
+#include "Segments/qcubicsegment2d.h"
 
 class VectorPathEdge : public StdSelfRef {
 public:

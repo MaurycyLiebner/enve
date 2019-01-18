@@ -54,12 +54,12 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
                         &pathT);
         auto brushSet = BrushStrokeSet::fillStrokesForSkPath(pathT, 5);
         brush->setColor(0, 0, 1);
-        foreach(const auto& set, brushSet) {
+        for(auto& set : brushSet) {
             set.execute(brush->getItem(), &surf, 5);
         }
         brushSet = BrushStrokeSet::outlineStrokesForSkPath(pathT, 5, 5);
         brush->setColor(0, 0, 0);
-        foreach(const auto& set, brushSet) {
+        for(auto& set : brushSet) {
             set.execute(brush->getItem(), &surf, 5);
         }
 

@@ -1,2 +1,2 @@
 #include "quadsegment.h"
-#include "cubicsegment.h"
+#include "qcubicsegment2d.h"

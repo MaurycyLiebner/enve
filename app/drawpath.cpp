@@ -44,25 +44,6 @@ void DrawPath::drawPath(SkCanvas *canvas) {
     canvas->drawPath(mDrawFitted, paintT);
 }
 
-qreal minSquareDistance(const qCubicSegment2D &seg,
-                        const QPointF &p) {
-    qreal error;
-    gGetClosestTValueOnBezier(seg, p, nullptr, &error);
-    return error*error;
-}
-
-qreal minSquareDistanceSum(const qCubicSegment2D &seg,
-                           QList<QPointF> &pts,
-                           const int &minPtId,
-                           const int &maxPtId) {
-    qreal errorSquaredSum = 0.;
-    for(int i = minPtId; i <= maxPtId; i++) {
-        qreal error;
-        gGetClosestTValueOnBezier(seg, pts.at(i), nullptr, &error);
-        errorSquaredSum += error*error;
-    }
-    return errorSquaredSum;
-}
 #include "skia/skqtconversions.h"
 void DrawPath::updateFittedPath() {
     QPointF p0;

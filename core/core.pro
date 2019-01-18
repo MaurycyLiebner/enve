@@ -81,10 +81,12 @@ SOURCES += \
     Animators/interpolationkey.cpp \
     Animators/interpolationanimator.cpp \
     framerange.cpp \
-    Segments/cubicsegment.cpp \
     Segments/quadsegment.cpp \
     Segments/conicsegment.cpp \
-    Segments/cubiclist.cpp
+    Segments/cubiclist.cpp \
+    Segments/cubicnode.cpp \
+    Segments/qcubicsegment2d.cpp \
+    Segments/qcubicsegment1d.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -124,10 +126,12 @@ HEADERS += \
     Animators/interpolationkey.h \
     Animators/interpolationanimator.h \
     framerange.h \
-    Segments/cubicsegment.h \
     Segments/quadsegment.h \
     Segments/conicsegment.h \
-    Segments/cubiclist.h
+    Segments/cubiclist.h \
+    Segments/cubicnode.h \
+    Segments/qcubicsegment2d.h \
+    Segments/qcubicsegment1d.h
 
 unix {
     target.path = /usr/lib

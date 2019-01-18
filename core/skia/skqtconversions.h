@@ -6,7 +6,7 @@
 
 #include "skiaincludes.h"
 
-extern inline qreal SkScalarToQreal(const SkScalar &ss) {
+extern inline qreal skScalarToQ(const SkScalar &ss) {
     return static_cast<qreal>(ss);
 }
 
@@ -28,8 +28,8 @@ extern QMatrix SkMatrixToQMatrix(const SkMatrix &matrix);
 extern SkMatrix QMatrixToSkMatrix(const QMatrix &matrix);
 
 extern inline QPointF skPointToQ(const SkPoint &point) {
-    return QPointF(SkScalarToQreal(point.x()),
-                   SkScalarToQreal(point.y()));
+    return QPointF(skScalarToQ(point.x()),
+                   skScalarToQ(point.y()));
 }
 
 extern inline SkPoint qPointToSk(const QPointF &point) {

@@ -75,15 +75,22 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
 
     SkPathOp op = widthT < 0 ? SkPathOp::kDifference_SkPathOp :
                                SkPathOp::kUnion_SkPathOp;
-    auto cubicList = gPathToQCubicSegs2D(src);
-    auto skPaths = gSolidifyCubicList(cubicList, qAbs(widthT*2));
-    SkOpBuilder builder;
 
+
+    SkOpBuilder builder;
     builder.add(src, SkPathOp::kUnion_SkPathOp);
 
-    foreach(const auto& path, skPaths) {
-        builder.add(path, op);
-    }
+    qreal aWidth2 = qAbs(widthT*2);
+    SkStroke strokerSk;
+    strokerSk.setJoin(SkPaint::kRound_Join);
+    strokerSk.setCap(SkPaint::kRound_Cap);
+    strokerSk.setWidth(static_cast<SkScalar>(aWidth2));
+    auto func = [&builder, &strokerSk, &op](const SkPath& seg) {
+        SkPath outline;
+        strokerSk.strokePath(seg, &outline);
+        builder.add(outline, op);
+    };
+    gForEverySegmentInPath(src, func);
 
     builder.resolve(dst);
 }

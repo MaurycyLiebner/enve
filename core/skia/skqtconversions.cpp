@@ -1,10 +1,10 @@
 #include "skqtconversions.h"
 
 QRectF SkRectToQRectF(const SkRect &rect) {
-    return QRectF(SkScalarToQreal(rect.x()),
-                  SkScalarToQreal(rect.y()),
-                  SkScalarToQreal(rect.width()),
-                  SkScalarToQreal(rect.height()));
+    return QRectF(skScalarToQ(rect.x()),
+                  skScalarToQ(rect.y()),
+                  skScalarToQ(rect.width()),
+                  skScalarToQ(rect.height()));
 }
 
 SkRect QRectFToSkRect(const QRectF &rect) {
@@ -18,12 +18,12 @@ SkRect QRectFToSkRect(const QRectF &rect) {
 // m21 - skewX
 // m22 - scaleY
 QMatrix SkMatrixToQMatrix(const SkMatrix &matrix) {
-    return QMatrix(SkScalarToQreal(matrix.getScaleX()),
-                   SkScalarToQreal(matrix.getSkewY()),
-                   SkScalarToQreal(matrix.getSkewX()),
-                   SkScalarToQreal(matrix.getScaleY()),
-                   SkScalarToQreal(matrix.getTranslateX()),
-                   SkScalarToQreal(matrix.getTranslateY()));
+    return QMatrix(skScalarToQ(matrix.getScaleX()),
+                   skScalarToQ(matrix.getSkewY()),
+                   skScalarToQ(matrix.getSkewX()),
+                   skScalarToQ(matrix.getScaleY()),
+                   skScalarToQ(matrix.getTranslateX()),
+                   skScalarToQ(matrix.getTranslateY()));
 }
 
 SkMatrix QMatrixToSkMatrix(const QMatrix &matrix) {
@@ -206,5 +206,5 @@ void switchSkQ(const qreal &q, SkScalar &sk) {
 }
 
 void switchSkQ(const SkScalar &sk, qreal &q) {
-    q = SkScalarToQreal(sk);
+    q = skScalarToQ(sk);
 }

@@ -186,14 +186,14 @@ void VectorPathEdge::makePassThroughAbs(const QPointF &absPos) {
 
     QPointF dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
     while(pointToLen(dPos) > 1.) {
-        absSeg.setP1(absSeg.p1() + (1. - mPressedT)*dPos);
-        absSeg.setP2(absSeg.p2() + mPressedT*dPos);
+        absSeg.setC1(absSeg.c1() + (1. - mPressedT)*dPos);
+        absSeg.setC2(absSeg.c2() + mPressedT*dPos);
 
         dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
     }
 
-    mPoint1EndPt->moveToAbs(absSeg.p1());
-    mPoint2StartPt->moveToAbs(absSeg.p2());
+    mPoint1EndPt->moveToAbs(absSeg.c1());
+    mPoint2StartPt->moveToAbs(absSeg.c2());
 }
 
 void VectorPathEdge::makePassThroughRel(const QPointF &relPos) {
@@ -208,14 +208,14 @@ void VectorPathEdge::makePassThroughRel(const QPointF &relPos) {
 
     QPointF dPos = relPos - gCubicValueAtT(relSeg, mPressedT);
     while(pointToLen(dPos) > 1.) {
-        relSeg.setP1(relSeg.p1() + (1. - mPressedT)*dPos);
-        relSeg.setP2(relSeg.p2() + mPressedT*dPos);
+        relSeg.setC1(relSeg.c1() + (1. - mPressedT)*dPos);
+        relSeg.setC2(relSeg.c2() + mPressedT*dPos);
 
         dPos = relPos - gCubicValueAtT(relSeg, mPressedT);
     }
 
-    mPoint1EndPt->moveToRel(relSeg.p1());
-    mPoint2StartPt->moveToRel(relSeg.p2());
+    mPoint1EndPt->moveToRel(relSeg.c1());
+    mPoint2StartPt->moveToRel(relSeg.c2());
 }
 
 void VectorPathEdge::finishPassThroughTransform() {
@@ -277,19 +277,16 @@ void VectorPathEdge::setPressedT(const qreal &t) {
     mPressedT = t;
 }
 
-void VectorPathEdge::getNearestAbsPosAndT(const QPointF &absPos,
-                                QPointF *nearestPoint,
-                                qreal *t) {
-    *t = gGetClosestTValueOnBezier(getAsAbsSegment(), absPos,
-                                   nearestPoint);
+void VectorPathEdge::getNearestAbsPosAndT(
+        const QPointF &absPos, QPointF *nearestPoint,
+        qreal *t) {
+    getAsAbsSegment().minDistanceTo(absPos, t, nearestPoint);
 }
 
-void VectorPathEdge::getNearestRelPosAndT(const QPointF &relPos,
-                                QPointF *nearestPoint,
-                                qreal *t,
-                                qreal *error) {
-    *t = gGetClosestTValueOnBezier(getAsRelSegment(), relPos,
-                                   nearestPoint, error);
+void VectorPathEdge::getNearestRelPosAndT(
+        const QPointF &relPos, QPointF *nearestPoint,
+        qreal *t, qreal *error) {
+    *error = getAsRelSegment().minDistanceTo(relPos, t, nearestPoint);
 }
 
 qCubicSegment2D VectorPathEdge::getAsAbsSegment() const {

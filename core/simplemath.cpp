@@ -18,10 +18,9 @@ SkScalar pointToLen(SkPoint point) {
     return SkScalarSqrt(point.x()*point.x() + point.y()*point.y());
 }
 
-QPointF scalePointToNewLen(QPointF point, qreal newLen) {
-    if(isPointZero(point)) {
-        return point;
-    }
+QPointF scalePointToNewLen(const QPointF& point,
+                           const qreal& newLen) {
+    if(isPointZero(point)) return point;
     return point * newLen / pointToLen(point);
 }
 
@@ -178,4 +177,14 @@ qreal radiansBetweenVectors(const QPointF &pt1,
     qreal dot = pt1.x()*pt2.x() + pt1.y()*pt2.y();
     qreal det = pt1.x()*pt2.y() - pt1.y()*pt2.x();
     return atan2(det, dot);
+}
+
+QPointF gRotPt(const QPointF &pt, const qreal &deg) {
+    return {pt.x() * cos(deg*PI/180) - pt.y() * sin(deg*PI/180),
+            pt.x() * sin(deg*PI/180) + pt.y() * cos(deg*PI/180)};
+}
+
+QPointF gQPointFDisplace(const QPointF& pt, const qreal &displ) {
+    return QPointF(pt.x() + gRandF(-displ, displ),
+                   pt.y() + gRandF(-displ, displ));
 }

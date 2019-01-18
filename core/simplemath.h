@@ -6,6 +6,7 @@
 #define SIGN(x) ((x)>0?1:(-1))
 #define SQR(x) ((x)*(x))
 #define CLAMP(x, low, high)  x > high ? high : (x < low ? low : x)
+#define CLAMP01(x)  x > 1 ? 1 : (x < 0 ? 0 : x)
 #define MAX3(a, b, c) ((a)>(b)?MAX((a),(c)):MAX((b),(c)))
 #define MIN3(a, b, c) ((a)<(b)?MIN((a),(c)):MIN((b),(c)))
 
@@ -80,7 +81,10 @@ extern QPointF symmetricToPosNewLen(QPointF toMirror,
                                     qreal newLen);
 extern qreal pointToLen(QPointF point);
 extern SkScalar pointToLen(SkPoint point);
-extern QPointF scalePointToNewLen(QPointF point, qreal newLen);
+extern QPointF scalePointToNewLen(const QPointF &point,
+                                  const qreal &newLen);
+extern QPointF gRotPt(const QPointF& pt, const qreal& deg);
+extern QPointF gQPointFDisplace(const QPointF& pt, const qreal &displ);
 
 extern bool isPointZero(QPointF pos);
 #endif // SIMPLEMATH_H

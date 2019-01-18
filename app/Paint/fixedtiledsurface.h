@@ -159,18 +159,18 @@ private:
     QRect execute(MyPaintBrush * const brush,
                   FixedTiledSurface * const surface,
                   const bool& press,
-                  double dLen) const {
+                  double dLen) {
         QRect changedRect;
         if(press) {
             changedRect = executePress(brush, surface);
         }
-        const double totalLength = gCubicLength(fStrokePath);
+        const double totalLength = fStrokePath.length();
         const int iMax = qCeil(totalLength/dLen);
         dLen = totalLength/iMax;
         const double lenFrag = 1./iMax;
 
         for(int i = 0; i < iMax; i++) {
-            double t = gCubicTimeAtLength(fStrokePath, i*dLen);
+            double t = fStrokePath.tAtLength(i*dLen);
             QRect roi = executeMove(brush, surface, t, lenFrag);
             changedRect = changedRect.united(roi);
         }
@@ -257,29 +257,11 @@ struct BrushStrokeSet {
     static QList<BrushStrokeSet> fromSkPath(const SkPath& path) {
         QList<BrushStrokeSet> result;
 
-        auto segLists = gPathToQCubicSegs2DBreakApart(path);
+        auto segLists = CubicList::makeFromSkPath(path);
         if(segLists.isEmpty()) return result;
-        bool first = true;
         foreach(const auto& segs, segLists) {
             if(segs.isEmpty()) continue;
-            BrushStrokeSet set;
-            foreach(const auto& seg, segs) {
-                if(first) {
-                    first = false;
-                    set.fStrokes << BrushStroke{seg,
-                                     DefaultMoveStrokePressure(0.8),//DefaultPressStrokePressure(0, 0.8, 0.5),
-                                     DefaultTiltCurve,
-                                     DefaultTiltCurve,
-                                     DefaultTimeCurve};
-                    continue;
-                }
-                set.fStrokes << BrushStroke{seg,
-                                 DefaultMoveStrokePressure(0.8),
-                                 DefaultTiltCurve,
-                                 DefaultTiltCurve,
-                                 DefaultTimeCurve};
-            }
-            result << set;
+            result << fromCubicList(segs);
         }
         return result;
     }
@@ -294,6 +276,8 @@ struct BrushStrokeSet {
         for(int i = 1; i < maxI; i++) {
             SkPath strokePath;
             gSolidify(-i*distInc, path, &strokePath);
+//            gDisplaceFilterPath(&strokePath, SkPath(strokePath),
+//                                1, 100, 1, 1);
             for(int j = 0; j < 10; j++) {
                 if(strokePath.isEmpty()) continue;
                 result << BrushStrokeSet::fromSkPath(strokePath);
@@ -323,11 +307,11 @@ struct BrushStrokeSet {
 
     void execute(MyPaintBrush * const brush,
                  FixedTiledSurface * const surface,
-                 const double& dLen) const {
+                 const double& dLen) {
         if(fStrokes.isEmpty()) return;
-        QRect updateRect = fStrokes.first().execute(brush, surface, true, dLen);
+        QRect updateRect = fStrokes[0].execute(brush, surface, true, dLen);
         for(int i = 1; i < fStrokes.count(); i++) {
-            const auto& stroke = fStrokes.at(i);
+            auto& stroke = fStrokes[i];
             QRect roi = stroke.execute(brush, surface, false, dLen);
             updateRect = updateRect.united(roi);
         }

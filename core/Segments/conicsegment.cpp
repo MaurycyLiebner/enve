@@ -1,6 +1,6 @@
 #include "conicsegment.h"
 #include "quadsegment.h"
-#include "cubicsegment.h"
+#include "qcubicsegment2d.h"
 #include <QList>
 
 //template<typename T, typename Tw>
