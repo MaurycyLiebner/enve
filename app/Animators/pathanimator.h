@@ -12,7 +12,6 @@ class NodePoint;
 class VectorPathAnimator;
 class BoundingBox;
 class Canvas;
-class BoolAnimator;
 
 class PathAnimator : public ComplexAnimator {
     Q_OBJECT

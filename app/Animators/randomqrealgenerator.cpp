@@ -1,7 +1,7 @@
 #include "randomqrealgenerator.h"
 #include "pointhelpers.h"
 #include "qrealanimator.h"
-#include "qrealkey.h"
+#include "Animators/qrealkey.h"
 #include "pointhelpers.h"
 #include "PropertyUpdaters/randomqrealgeneratorupdater.h"
 #include "Properties/comboboxproperty.h"

@@ -122,32 +122,32 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
 
     auto pathData = GetAsPtr(data, PathBoxRenderData);
     if(currentEditPathCompatible) {
-        pathData->editPath = mEditPathSk;
+        pathData->fEditPath = mEditPathSk;
     } else {
-        pathData->editPath = getPathAtRelFrameF(relFrame);
+        pathData->fEditPath = getPathAtRelFrameF(relFrame);
     }
     if(currentPathCompatible) {
-        pathData->path = mPathSk;
+        pathData->fPath = mPathSk;
     } else {
-        pathData->path = pathData->editPath;
+        pathData->fPath = pathData->fEditPath;
         if(getParentCanvas()->getPathEffectsVisible()) {
             // !!! reversed
             //mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
             qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                         prp_relFrameToAbsFrameF(relFrame));
-            mParentGroup->filterPathForRelFrameF(parentRelFrame, &pathData->path,
+            mParentGroup->filterPathForRelFrameF(parentRelFrame, &pathData->fPath,
                                                 data->fParentBox.data());
             // !!! reversed
-            mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
+            mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->fPath);
         }
     }
 
     if(currentOutlinePathCompatible) {
-        pathData->outlinePath = mOutlinePathSk;
+        pathData->fOutlinePath = mOutlinePathSk;
     } else {
         SkPath outline;
         if(mStrokeSettings->nonZeroLineWidth()) {
-            SkPath outlineBase = pathData->path;
+            SkPath outlineBase = pathData->fPath;
             mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThicknessF(
                         relFrame, &outlineBase);
             mParentGroup->filterOutlinePathBeforeThicknessForRelFrameF(
@@ -163,16 +163,16 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             mOutlinePathEffectsAnimators->filterPathForRelFrameF(relFrame, &outline);
             mParentGroup->filterOutlinePathForRelFrameF(relFrame, &outline);
         }
-        pathData->outlinePath = outline;
-        outline.addPath(pathData->path);
+        pathData->fOutlinePath = outline;
+        outline.addPath(pathData->fPath);
     }
 
     if(currentFillPathCompatible) {
-        pathData->fillPath = mFillPathSk;
+        pathData->fFillPath = mFillPathSk;
     } else {
-        pathData->fillPath = pathData->path;
-        mFillPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
-        mParentGroup->filterFillPathForRelFrameF(relFrame, &pathData->path);
+        pathData->fFillPath = pathData->fPath;
+        mFillPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->fPath);
+        mParentGroup->filterFillPathForRelFrameF(relFrame, &pathData->fPath);
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
@@ -180,14 +180,14 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         data->fRelBoundingRect = mRelBoundingRect;
     }
 
-    UpdatePaintSettings *fillSettings = &pathData->paintSettings;
+    UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
 
-    fillSettings->paintColor = mFillSettings->
+    fillSettings.fPaintColor = mFillSettings->
             getColorAtRelFrameF(relFrame);
-    fillSettings->paintType = mFillSettings->getPaintType();
+    fillSettings.fPaintType = mFillSettings->getPaintType();
     Gradient *grad = mFillSettings->getGradient();
     if(grad != nullptr) {
-        fillSettings->updateGradient(
+        fillSettings.updateGradient(
                     grad->getQGradientStopsAtAbsFrameF(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mFillGradientPoints->getStartPointAtRelFrameF(relFrame),
@@ -195,13 +195,29 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
                     mFillSettings->getGradientLinear());
     }
 
-    UpdateStrokeSettings *strokeSettings = &pathData->strokeSettings;
-    strokeSettings->paintColor = mStrokeSettings->
+    UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
+    auto brushSettings = mStrokeSettings->getBrushSettings();
+    if(brushSettings) {
+        auto brush = brushSettings->getBrush();
+        if(brush) {
+            strokeSettings.fStrokeBrush = brush->createDuplicate();
+            strokeSettings.fTimeCurve =
+                    brushSettings->getTimeAnimator()->
+                        getValueAtRelFrame(relFrame);
+            strokeSettings.fWidthCurve =
+                    brushSettings->getWidthAnimator()->
+                        getValueAtRelFrame(relFrame);
+            strokeSettings.fPressureCurve =
+                    brushSettings->getPressureAnimator()->
+                        getValueAtRelFrame(relFrame);
+        }
+    }
+    strokeSettings.fPaintColor = mStrokeSettings->
             getColorAtRelFrameF(relFrame);
-    strokeSettings->paintType = mStrokeSettings->getPaintType();
+    strokeSettings.fPaintType = mStrokeSettings->getPaintType();
     grad = mStrokeSettings->getGradient();
     if(grad != nullptr) {
-        strokeSettings->updateGradient(
+        strokeSettings.updateGradient(
                     grad->getQGradientStopsAtAbsFrameF(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
@@ -466,13 +482,14 @@ void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) 
     }
 }
 
-void PathBox::duplicateStrokeSettingsNotAnimatedFrom(StrokeSettings *strokeSettings) {
+void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
+        StrokeSettings *strokeSettings) {
     if(strokeSettings == nullptr) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
         PaintType paintType = strokeSettings->getPaintType();
         mStrokeSettings->setPaintType(paintType);
-        if(paintType == FLATPAINT) {
+        if(paintType == FLATPAINT || paintType == BRUSHPAINT) {
             mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
                         strokeSettings->getCurrentColor());
         } else if(paintType == GRADIENTPAINT) {
@@ -611,10 +628,10 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
         BoundingBoxRenderData* renderData) {
     auto pathRenderData = GetAsPtr(renderData, PathBoxRenderData);
     mCurrentPathsFrame = renderData->fRelFrame;
-    mEditPathSk = pathRenderData->editPath;
-    mPathSk = pathRenderData->path;
-    mOutlinePathSk = pathRenderData->outlinePath;
-    mFillPathSk = pathRenderData->fillPath;
+    mEditPathSk = pathRenderData->fEditPath;
+    mPathSk = pathRenderData->fPath;
+    mOutlinePathSk = pathRenderData->fOutlinePath;
+    mFillPathSk = pathRenderData->fFillPath;
     mCurrentPathsOutdated = false;
     mCurrentOutlinePathOutdated = false;
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);

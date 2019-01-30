@@ -6,11 +6,8 @@
 #include "PixmapEffects/pixmapeffect.h"
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
-    if(parentBoxT == nullptr) return;
     fParentBox = parentBoxT;
 }
-
-BoundingBoxRenderData::~BoundingBoxRenderData() {}
 
 void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fGlobalBoundingRect = src->fGlobalBoundingRect;
@@ -33,23 +30,21 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
 }
 
 stdsptr<BoundingBoxRenderData> BoundingBoxRenderData::makeCopy() {
-    BoundingBox *parentBoxT = fParentBox.data();
-    if(parentBoxT == nullptr) return nullptr;
-    stdsptr<BoundingBoxRenderData> copy = parentBoxT->createRenderData();
+    if(!fParentBox) return nullptr;
+    stdsptr<BoundingBoxRenderData> copy = fParentBox->createRenderData();
     copy->copyFrom(this);
     return copy;
 }
 
 void BoundingBoxRenderData::updateRelBoundingRect() {
-    BoundingBox *parentBoxT = fParentBox.data();
-    if(parentBoxT == nullptr) return;
-    fRelBoundingRect = parentBoxT->getRelBoundingRectAtRelFrame(fRelFrame);
+    if(!fParentBox) return;
+    fRelBoundingRect = fParentBox->getRelBoundingRectAtRelFrame(fRelFrame);
 }
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     if(fOpacity < 0.001) return;
     canvas->save();
-    SkScalar invScale = 1.f/qrealToSkScalar(fResolution);
+    SkScalar invScale = qrealToSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
     renderToImage();
     SkPaint paint;
@@ -82,9 +77,9 @@ void BoundingBoxRenderData::renderToImage() {
     if(fOpacity < 0.001) return;
     QMatrix scale;
     scale.scale(fResolution, fResolution);
-    QMatrix transformRes = fTransform*scale;
+    fScaledTransform = fTransform*scale;
     //transformRes.scale(resolution, resolution);
-    fGlobalBoundingRect = transformRes.mapRect(fRelBoundingRect);
+    fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
     foreach(const QRectF &rectT, fOtherGlobalRects) {
         fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
     }
@@ -100,46 +95,36 @@ void BoundingBoxRenderData::renderToImage() {
                     qRound(fGlobalBoundingRect.top()/**resolution*/));
     fGlobalBoundingRect.translate(-transF);
 
-    // !!! TEST !!!
-    //auto blurProgram = SPtrCreate(BlurProgramCaller)(50., size);
-    //fGpuShaders << blurProgram;
-
-//    auto dotsProgram =
-//            SPtrCreate(DotProgramCaller)(5., 5., globalBoundingRect.topLeft());
-//    fGpuShaders << dotsProgram;
-    // !!! TEST !!!
-
     SkImageInfo info = SkImageInfo::Make(qCeil(fGlobalBoundingRect.width()),
                                          qCeil(fGlobalBoundingRect.height()),
                                          kBGRA_8888_SkColorType,
                                          kPremul_SkAlphaType,
                                          nullptr);
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    bitmap.eraseColor(SK_ColorTRANSPARENT);
+    fBitmapTMP.allocPixels(info);
+    fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
     //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas rasterCanvas(bitmap);//rasterSurface->getCanvas();
+    SkCanvas rasterCanvas(fBitmapTMP);//rasterSurface->getCanvas();
     //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
     rasterCanvas.translate(qrealToSkScalar(-fGlobalBoundingRect.left()),
-                            qrealToSkScalar(-fGlobalBoundingRect.top()));
-    rasterCanvas.concat(QMatrixToSkMatrix(transformRes));
+                           qrealToSkScalar(-fGlobalBoundingRect.top()));
+    rasterCanvas.concat(QMatrixToSkMatrix(fScaledTransform));
 
     drawSk(&rasterCanvas);
-    rasterCanvas.flush();
+    // rasterCanvas.flush(); does not use gpu anyway
 
     fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
-                            qRound(fGlobalBoundingRect.top()));
+                             qRound(fGlobalBoundingRect.top()));
 
     if(!fPixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
-            effect->applyEffectsSk(bitmap, fResolution);
+        foreach(const auto& effect, fPixmapEffects) {
+            effect->applyEffectsSk(fBitmapTMP, fResolution);
         }
         clearPixmapEffects();
     }
-    bitmap.setImmutable();
-    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
-    bitmap.reset();
+    fBitmapTMP.setImmutable();
+    fRenderedImage = SkImage::MakeFromBitmap(fBitmapTMP);
+    fBitmapTMP.reset();
 }
 
 void BoundingBoxRenderData::_processUpdate() {
@@ -147,39 +132,33 @@ void BoundingBoxRenderData::_processUpdate() {
 }
 
 void BoundingBoxRenderData::beforeProcessingStarted() {
-    if(!mDataSet) {
-        dataSet();
-    }
+    if(!mDataSet) dataSet();
 
     _ScheduledTask::beforeProcessingStarted();
 
-    BoundingBox *parentBoxT = fParentBox.data();
-    if(parentBoxT == nullptr || !fParentIsTarget) return;
+    if(!fParentBox || !fParentIsTarget) return;
     if(nullifyBeforeProcessing())
-        parentBoxT->nullifyCurrentRenderData(fRelFrame);
-    // qDebug() << "box render started:" << relFrame << parentBoxT->prp_getName();
+        fParentBox->nullifyCurrentRenderData(fRelFrame);
 }
 
 void BoundingBoxRenderData::afterProcessingFinished() {
-    if(fMotionBlurTarget != nullptr) {
+    if(fMotionBlurTarget) {
         fMotionBlurTarget->fOtherGlobalRects << fGlobalBoundingRect;
     }
-    BoundingBox *parentBoxT = fParentBox.data();
-    if(parentBoxT != nullptr && fParentIsTarget) {
-        parentBoxT->renderDataFinished(this);
-        // qDebug() << "box render finished:" << relFrame << parentBoxT->prp_getName();
+    if(fParentBox && fParentIsTarget) {
+        //qDebug() << fParentBox->prp_getName();
+        fParentBox->renderDataFinished(this);
     }
     _ScheduledTask::afterProcessingFinished();
 }
 
 void BoundingBoxRenderData::taskQued() {
-    BoundingBox *parentBoxT = fParentBox.data();
-    if(parentBoxT != nullptr) {
+    if(fParentBox) {
         if(fUseCustomRelFrame) {
-            parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
+            fParentBox->setupBoundingBoxRenderDataForRelFrameF(
                         fCustomRelFrame, this);
         } else {
-            parentBoxT->setupBoundingBoxRenderDataForRelFrameF(
+            fParentBox->setupBoundingBoxRenderDataForRelFrameF(
                         fRelFrame, this);
         }
         foreach(const auto& customizer, mRenderDataCustomizerFunctors) {
@@ -187,16 +166,16 @@ void BoundingBoxRenderData::taskQued() {
         }
     }
     mDataSet = false;
-    if(!mDelayDataSet) {
-        dataSet();
-    }
+    if(!mDelayDataSet) dataSet();
     _ScheduledTask::taskQued();
 }
 
 void BoundingBoxRenderData::scheduleTaskNow() {
-    BoundingBox *parentBoxT = fParentBox.data();
-    if(parentBoxT == nullptr) return;
-    parentBoxT->scheduleTask(GetAsSPtr(this, _ScheduledTask));
+    if(!fParentBox) {
+        clear();
+        return;
+    }
+    fParentBox->scheduleTask(GetAsSPtr(this, _ScheduledTask));
 }
 
 void BoundingBoxRenderData::dataSet() {
@@ -206,9 +185,8 @@ void BoundingBoxRenderData::dataSet() {
             fRelBoundingRectSet = true;
             updateRelBoundingRect();
         }
-        BoundingBox *parentBoxT = fParentBox.data();
-        if(parentBoxT == nullptr || !fParentIsTarget) return;
-        parentBoxT->updateCurrentPreviewDataFromRenderData(this);
+        if(!fParentBox || !fParentIsTarget) return;
+        fParentBox->updateCurrentPreviewDataFromRenderData(this);
     }
 }
 
@@ -218,8 +196,6 @@ bool BoundingBoxRenderData::nullifyBeforeProcessing() {
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
-
-RenderDataCustomizerFunctor::~RenderDataCustomizerFunctor() {}
 
 void RenderDataCustomizerFunctor::operator()(BoundingBoxRenderData* data) {
     customize(data);

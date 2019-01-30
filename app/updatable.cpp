@@ -2,10 +2,6 @@
 #include "GUI/mainwindow.h"
 #include "taskexecutor.h"
 
-_ScheduledTask::~_ScheduledTask() {
-    clear();
-}
-
 void _ScheduledTask::beforeProcessingStarted() {
     _Task::beforeProcessingStarted();
     mTaskQued = false;
@@ -35,6 +31,10 @@ void _ScheduledTask::clear() {
     _Task::clear();
 }
 
+void _HDDTask::scheduleTaskNow() {
+    TaskScheduler::sGetInstance()->scheduleHDDTask(ref<_ScheduledTask>());
+}
+
 _Task::_Task() {}
 
 void _Task::setCurrentTaskExecutor(TaskExecutor *taskExecutor) {
@@ -44,6 +44,7 @@ void _Task::setCurrentTaskExecutor(TaskExecutor *taskExecutor) {
 void _Task::beforeProcessingStarted() {
     mSelfRef = ref<_Task>();
     mBeingProcessed = true;
+    Q_ASSERT(mCurrentExecutionDependent.isEmpty());
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
 }
@@ -63,36 +64,30 @@ void _Task::afterProcessingFinished() {
 bool _Task::isBeingProcessed() { return mBeingProcessed; }
 
 void _Task::waitTillProcessed() {
-    if(mCurrentTaskExecutor == nullptr) {
-        return;
-    }
+    if(!mCurrentTaskExecutor) return;
     {
         QEventLoop loop;
-        loop.connect(mCurrentTaskExecutor,
-                     SIGNAL(finishedUpdating(int, _Task*)),
-                     SLOT(quit()));
+        QObject::connect(
+                    mCurrentTaskExecutor, &TaskExecutor::finishedUpdating,
+                    &loop, &QEventLoop::quit);
         loop.exec();
     }
 }
 
 bool _Task::readyToBeProcessed() {
-    return nDependancies == 0 && !mBeingProcessed;
+    return mNDependancies == 0 && !mBeingProcessed;
 }
 
 void _Task::clear() {
     mFinished = false;
     tellDependentThatFinished();
+    tellNextDependentThatFinished();
     mBeingProcessed = false;
     mSelfRef.reset();
-    foreach(const stdptr<_Task>& dependent, mNextExecutionDependent) {
-        if(dependent == nullptr) continue;
-        dependent->decDependencies();
-    }
-    mNextExecutionDependent.clear();
 }
 
-void _Task::addDependent(_Task *updatable) {
-    if(updatable == nullptr) return;
+void _Task::addDependent(_Task * const updatable) {
+    if(!updatable) return;
     if(!finished()) {
         if(listContainsSharedPtr(updatable, mNextExecutionDependent)) return;
         mNextExecutionDependent << updatable;
@@ -103,17 +98,23 @@ void _Task::addDependent(_Task *updatable) {
 bool _Task::finished() { return mFinished; }
 
 void _Task::decDependencies() {
-    nDependancies--;
+    mNDependancies--;
 }
 
 void _Task::incDependencies() {
-    nDependancies++;
+    mNDependancies++;
 }
 
 void _Task::tellDependentThatFinished() {
-    foreach(const stdptr<_Task>& dependent, mCurrentExecutionDependent) {
-        if(dependent == nullptr) continue;
-        dependent->decDependencies();
+    foreach(const auto& dependent, mCurrentExecutionDependent) {
+        if(dependent) dependent->decDependencies();
     }
     mCurrentExecutionDependent.clear();
+}
+
+void _Task::tellNextDependentThatFinished() {
+    foreach(const auto& dependent, mNextExecutionDependent) {
+        if(dependent) dependent->decDependencies();
+    }
+    mNextExecutionDependent.clear();
 }

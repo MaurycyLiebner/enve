@@ -34,7 +34,7 @@ class ScrollArea;
 class Brush;
 class UsageWidget;
 class Gradient;
-class BrushWrapper;
+class _SimpleBrushWrapper;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -140,13 +140,13 @@ public:
     void previewBeingRendered();
     void previewPaused();
 
-    void addLoadedGradient(Gradient *gradient);
-    FontsWidget *getFontsWidget() {
+    void addLoadedGradient(Gradient * const gradient);
+    FontsWidget *getFontsWidget() const {
         return mFontWidget;
     }
-    BrushWrapper *getCurrentBrush() const;
+    _SimpleBrushWrapper *getCurrentBrush() const;
 
-    UsageWidget* getUsageWidget() {
+    UsageWidget* getUsageWidget() const {
         return mUsageWidget;
     }
 public slots:

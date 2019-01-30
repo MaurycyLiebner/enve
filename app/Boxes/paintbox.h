@@ -8,7 +8,7 @@ class Brush;
 class AnimatedSurface;
 class QPointFAnimator;
 class AnimatedPoint;
-class BrushWrapper;
+class _SimpleBrushWrapper;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
     friend class StdSelfRef;
@@ -66,25 +66,25 @@ public:
                          const ulong &time_stamp,
                          const qreal &pressure,
                          const bool &erase,
-                         const BrushWrapper * const brush);
+                         const _SimpleBrushWrapper * const brush);
     void tabletReleaseEvent();
     void tabletPressEvent(const qreal &xT,
                           const qreal &yT,
                           const ulong &time_stamp,
                           const qreal &pressure,
                           const bool &erase,
-                          const BrushWrapper * const brush);
+                          const _SimpleBrushWrapper * const brush);
     void mouseReleaseEvent();
     void mousePressEvent(const qreal &xT,
                          const qreal &yT,
                          const ulong &timestamp,
                          const qreal &pressure,
-                         const BrushWrapper * const brush);
+                         const _SimpleBrushWrapper * const brush);
     void mouseMoveEvent(const qreal &xT,
                         const qreal &yT,
                         const ulong &time_stamp,
                         const bool &erase,
-                        const BrushWrapper * const brush);
+                        const _SimpleBrushWrapper * const brush);
     MovablePoint *getTopLeftPoint();
     MovablePoint *getBottomRightPoint();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

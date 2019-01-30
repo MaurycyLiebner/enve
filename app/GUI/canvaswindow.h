@@ -27,7 +27,7 @@ class VideoBox;
 class Canvas;
 class PaintSettings;
 class StrokeSettings;
-class BrushWrapper;
+class _SimpleBrushWrapper;
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow,
@@ -69,6 +69,14 @@ public:
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
     void strokeWidthChanged(const qreal &strokeWidth);
 
+    void strokeBrushChanged(_SimpleBrushWrapper * const brush);
+    void strokeBrushPressureCurveChanged(
+            const qCubicSegment1D& curve);
+    void strokeBrushWidthCurveChanged(
+            const qCubicSegment1D& curve);
+    void strokeBrushTimeCurveChanged(
+            const qCubicSegment1D& curve);
+
     void setResolutionFraction(const qreal &percent);
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
@@ -97,7 +105,7 @@ public:
     void setBonesSelectionEnabled(const bool &bT);
 
     void importFile(const QString &path,
-                    const QPointF &relDropPos = QPointF(0., 0.));
+                    const QPointF &relDropPos = QPointF(0, 0));
 
     QWidget *getCanvasWidget();
 
@@ -218,6 +226,10 @@ private:
     bool handleStartTransformKeyPress(QKeyEvent *event);
     bool handleSelectAllKeyPress(QKeyEvent *event);
     bool handleShiftKeysKeyPress(QKeyEvent *event);
+
+    void clearPreview();
+    int mMaxPreviewFrame;
+    int mCurrentPreviewFrame;
 signals:
     void updateUpdatable(_ScheduledTask*, int);
     void updateFileUpdatable(_ScheduledTask*, int);
@@ -225,7 +237,7 @@ signals:
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
 public slots:
-    void setCurrentBrush(const BrushWrapper * const brush);
+    void setCurrentBrush(const _SimpleBrushWrapper * const brush);
 
     void setMovePathMode();
     void setMovePointMode();
@@ -312,6 +324,7 @@ public slots:
 private slots:
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
+    void nextPreviewFrame();
 
     void pushTimerExpired();
 };

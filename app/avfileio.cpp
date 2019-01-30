@@ -36,13 +36,13 @@
 #include "durationrectangle.h"
 #include "Animators/gradientpoints.h"
 #include "MovablePoints/gradientpoint.h"
-#include "qrealkey.h"
+#include "Animators/qrealkey.h"
 #include "GUI/mainwindow.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include <QMessageBox>
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
-#include "qstringio.h"
+#include "basicreadwrite.h"
 #define FORMAT_STR "AniVect av"
 #define CREATOR_VERSION "0.1a"
 #define CREATOR_APPLICATION "AniVect"
@@ -337,36 +337,6 @@ void ColorAnimator::readProperty(QIODevice *target) {
     mVal2Animator->readProperty(target);
     mVal3Animator->readProperty(target);
     mAlphaAnimator->readProperty(target);
-}
-
-void QStringKey::writeKey(QIODevice *target) {
-    Key::writeKey(target);
-    writeQString(target, mText);
-}
-
-void QStringKey::readKey(QIODevice *target) {
-    Key::readKey(target);
-    readQString(target, mText);
-}
-
-void QStringAnimator::writeProperty(QIODevice * const target) const {
-    int nKeys = anim_mKeys.count();
-    target->write(rcConstChar(&nKeys), sizeof(int));
-    foreach(const auto &key, anim_mKeys) {
-        key->writeKey(target);
-    }
-    writeQString(target, mCurrentText);
-}
-
-void QStringAnimator::readProperty(QIODevice *target) {
-    int nKeys;
-    target->read(rcChar(&nKeys), sizeof(int));
-    for(int i = 0; i < nKeys; i++) {
-        stdsptr<QStringKey> newKey = SPtrCreate(QStringKey)("", 0, this);
-        newKey->readKey(target);
-        anim_appendKey(newKey);
-    }
-    readQString(target, mCurrentText);
 }
 
 void PixmapEffect::writeProperty(QIODevice * const target) const {
@@ -670,7 +640,7 @@ void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
 
 void BoundingBox::writeBoundingBox(QIODevice *target) {
     target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
-    writeQString(target, prp_mName);
+    gWrite(target, prp_mName);
     target->write(rcConstChar(&mLoadId), sizeof(int));
     target->write(rcConstChar(&mPivotAutoAdjust), sizeof(bool));
     target->write(rcConstChar(&mVisible), sizeof(bool));
@@ -689,7 +659,7 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
 
 void BoundingBox::readBoundingBox(QIODevice *target) {
     mPivotAutoAdjust = false; // pivot will be read anyway, so temporarly disable adjusting
-    readQString(target, prp_mName);
+    gRead(target, prp_mName);
     target->read(rcChar(&mLoadId), sizeof(int));
     bool pivotAutoAdjust;
     target->read(rcChar(&pivotAutoAdjust), sizeof(bool));
@@ -717,7 +687,7 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
 
 void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) const {
     target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
-    writeQString(target, prp_mName);
+    gWrite(target, prp_mName);
     target->write(rcConstChar(&mLoadId), sizeof(int));
     target->write(rcConstChar(&mPivotAutoAdjust), sizeof(bool));
     target->write(rcConstChar(&mVisible), sizeof(bool));
@@ -735,7 +705,7 @@ void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) const {
 }
 
 void BoundingBox::readBoundingBoxDataForLink(QIODevice *target) {
-    readQString(target, prp_mName);
+    gRead(target, prp_mName);
     target->read(rcChar(&mLoadId), sizeof(int));
     target->read(rcChar(&mPivotAutoAdjust), sizeof(bool));
     target->read(rcChar(&mVisible), sizeof(bool));
@@ -998,13 +968,13 @@ void ParticleBox::readBoundingBox(QIODevice *target) {
 
 void ImageBox::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
-    writeQString(target, mImageFilePath);
+    gWrite(target, mImageFilePath);
 }
 
 void ImageBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
     QString path;
-    readQString(target, path);
+    gRead(target, path);
     setFilePath(path);
 }
 
@@ -1036,13 +1006,13 @@ void Rectangle::readBoundingBox(QIODevice *target) {
 
 void VideoBox::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
-    writeQString(target, mSrcFilePath);
+    gWrite(target, mSrcFilePath);
 }
 
 void VideoBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
     QString path;
-    readQString(target, path);
+    gRead(target, path);
     setFilePath(path);
 }
 
@@ -1174,7 +1144,7 @@ void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
     int nFrames = mListOfFrames.count();
     target->write(rcConstChar(&nFrames), sizeof(int));
     foreach(const QString &frame, mListOfFrames) {
-        writeQString(target, frame);
+        gWrite(target, frame);
     }
 }
 
@@ -1184,7 +1154,7 @@ void ImageSequenceBox::readBoundingBox(QIODevice *target) {
     target->read(rcChar(&nFrames), sizeof(int));
     for(int i = 0; i < nFrames; i++) {
         QString frame;
-        readQString(target, frame);
+        gRead(target, frame);
         mListOfFrames << frame;
     }
 }
@@ -1197,8 +1167,8 @@ void TextBox::writeBoundingBox(QIODevice *target) {
     QString fontFamily = mFont.family();
     QString fontStyle = mFont.styleName();
     target->write(rcConstChar(&fontSize), sizeof(qreal));
-    writeQString(target, fontFamily);
-    writeQString(target, fontStyle);
+    gWrite(target, fontFamily);
+    gWrite(target, fontStyle);
 }
 
 void TextBox::readBoundingBox(QIODevice *target) {
@@ -1209,8 +1179,8 @@ void TextBox::readBoundingBox(QIODevice *target) {
     QString fontFamily;
     QString fontStyle;
     target->read(rcChar(&fontSize), sizeof(qreal));
-    readQString(target, fontFamily);
-    readQString(target, fontStyle);
+    gRead(target, fontFamily);
+    gRead(target, fontStyle);
     mFont.setPointSizeF(fontSize);
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);
@@ -1362,8 +1332,8 @@ void GradientWidget::readGradients(QIODevice *target) {
 }
 
 void Brush::writeBrush(QIODevice *write) {
-    writeQString(write, brush_name);
-    writeQString(write, collection_name);
+    gWrite(write, brush_name);
+    gWrite(write, collection_name);
 
     for(uchar i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
         BrushSettingInfo setting_info = brush_settings_info[i];
@@ -1373,8 +1343,8 @@ void Brush::writeBrush(QIODevice *write) {
 }
 
 void Brush::readBrush(QIODevice *read) {
-    readQString(read, brush_name);
-    readQString(read, collection_name);
+    gRead(read, brush_name);
+    gRead(read, collection_name);
 
     for(uchar i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
         qreal value;
@@ -1429,7 +1399,7 @@ void CanvasWindow::readCanvases(QIODevice *target) {
 
 void MainWindow::loadAVFile(const QString &path) {
     QFile target(path);
-    if(target.open(QIODevice::ReadOnly) ) {
+    if(target.open(QIODevice::ReadOnly)) {
         FileFooter footer;
         footer.read(&target);
         if(footer.combatybilityMode() ==
@@ -1450,25 +1420,22 @@ void MainWindow::loadAVFile(const QString &path) {
             gradientWidget->clearGradientsLoadIds();
             BoundingBox::clearLoadedBoxes();
         } else {
-            QMessageBox::critical(this, tr("File Load Fail"),
-                                  tr("The target you tried to load is incompatible,\n"
-                                     "or damaged."),
-                                  QMessageBox::Ok,
-                                  QMessageBox::Ok);
+            RuntimeThrow("File incompatible or incomplete " + path.toStdString() + ".");
         }
 
         target.close();
+    } else {
+        RuntimeThrow("Could not open file " + path.toStdString() + ".");
     }
 }
 
 void MainWindow::saveToFile(const QString &path) {
-    disable();
     QFile target(path);
     if(target.exists()) {
         target.remove();
     }
 
-    if(target.open(QIODevice::WriteOnly) ) {
+    if(target.open(QIODevice::WriteOnly)) {
 //        QColor color = mBrushSettingsWidget->getCurrentQColor();
 //        target.write(rcChar(&color), sizeof(QColor));
 
@@ -1486,9 +1453,10 @@ void MainWindow::saveToFile(const QString &path) {
         footer.write(&target);
 
         target.close();
+    } else {
+        RuntimeThrow("Could not open file for writing " +
+                     path.toStdString() + ".");
     }
 
     BoundingBox::clearLoadedBoxes();
-
-    enable();
 }

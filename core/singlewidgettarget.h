@@ -178,6 +178,7 @@ public:
     virtual bool SWT_isBoxTransformAnimator() const { return false; }
     virtual bool SWT_isVectorPathAnimator() const { return false; }
     virtual bool SWT_isAnimatedSurface() const { return false; }
+    virtual bool SWT_isQCubicSegment1DAnimator() const { return false; }
     // Boxes
     virtual bool SWT_isCanvas() const { return false; }
     virtual bool SWT_isAnimationBox() const { return false; }

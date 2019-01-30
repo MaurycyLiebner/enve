@@ -1,4 +1,4 @@
-#include "qrealkey.h"
+#include "Animators/qrealkey.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/complexanimator.h"
 #include "clipboardcontainer.h"

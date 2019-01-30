@@ -108,7 +108,7 @@ void ColorSettingsWidget::nullifyAnimator() {
 }
 
 void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
-    if(mTargetAnimator != nullptr) {
+    if(mTargetAnimator) {
         disconnect(mTargetAnimator, nullptr, this, nullptr);
     }
     mTargetAnimator = target;
@@ -123,7 +123,7 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
     if(!mAlphaHidden) {
         aSpin->clearAnimator();
     }
-    if(target != nullptr) {
+    if(target) {
         disconnect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(setColorMode(int)));
         mColorModeCombo->setCurrentIndex(target->getColorMode());

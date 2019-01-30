@@ -156,7 +156,7 @@ void RenderWidget::render() {
 void RenderWidget::stopRendering() {
     disableButtons();
     clearAwaitingRender();
-    VideoEncoder::interruptEncodingStatic();
+    VideoEncoder::sInterruptEncoding();
 }
 
 void RenderWidget::clearAwaitingRender() {

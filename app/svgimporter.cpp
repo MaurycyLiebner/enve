@@ -642,7 +642,7 @@ void loadText(const QDomElement &pathElement,
 
     textBox->moveByRel(QPointF(xStr.toDouble(),
                                yStr.toDouble()));
-    textBox->setCurrentTextValue(pathElement.text());
+    textBox->setCurrentValue(pathElement.text());
 
     attributes->apply(textBox.data());
     parentGroup->addContainedBox(textBox);
@@ -1993,7 +1993,7 @@ void FillSvgAttributes::apply(BoundingBox *box, const bool& isFill) {
     } else if(mPaintType == GRADIENTPAINT) {
         setting = SPtrCreate(PaintSetting)(isFill, true, mGradient);
     } else {
-        setting = SPtrCreate(PaintSetting)(isFill);
+        setting = SPtrCreate(PaintSetting)(isFill, NOPAINT);
     }
     if(box->SWT_isPathBox()) {
         setting->apply(GetAsPtr(box, PathBox));

@@ -98,8 +98,9 @@ protected:
     CollectionArea<Item>* getItemCollectionWithName(const QString& name) const;
 
     void setCurrentItem(Item* item) {
-        if(mCurrentItem != nullptr) mCurrentItem->deselect();
-        if(item == nullptr) item = mDefaultItem.get();
+        if(mCurrentItem) mCurrentItem->deselect();
+        if(!item) item = mDefaultItem.get();
+        if(!item) return;
         mCurrentItem = item;
         emitCurrentItemChanged(item);
         mCurrentItem->select();

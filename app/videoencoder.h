@@ -15,7 +15,7 @@ extern "C" {
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
-class CacheContainer;
+class ImageCacheContainer;
 
 typedef struct OutputStream {
     AVStream *st = nullptr;
@@ -72,7 +72,7 @@ public:
         }
     }
 
-    void addContainer(CacheContainer *cont);
+    void addContainer(const stdsptr<ImageCacheContainer> &cont);
     void _processUpdate();
     void beforeProcessingStarted();
     void afterProcessingFinished();
@@ -80,11 +80,11 @@ public:
     static VideoEncoder *mVideoEncoderInstance;
     static VideoEncoderEmitter *getVideoEncoderEmitter();
 
-    static void interruptEncodingStatic();
-    static void startEncodingStatic(RenderInstanceSettings *settings);
-    static void addCacheContainerToEncoderStatic(CacheContainer *cont);
-    static void finishEncodingStatic();
-    static bool encodingSuccessfulyStartedStatic();
+    static void sInterruptEncoding();
+    static void sStartEncoding(RenderInstanceSettings *settings);
+    static void sAddCacheContainerToEncoder(const stdsptr<ImageCacheContainer> &cont);
+    static void sFinishEncoding();
+    static bool sEncodingSuccessfulyStarted();
 
     bool shouldUpdate() { return !mTaskQued && mCurrentlyEncoding; }
 
@@ -92,7 +92,7 @@ public:
         return &mEmitter;
     }
 
-    bool getCurrentlyEncoding() {
+    const bool& getCurrentlyEncoding() const {
         return mCurrentlyEncoding;
     }
 protected:
@@ -113,7 +113,7 @@ protected:
     AVFormatContext *mFormatContext = nullptr;
     AVOutputFormat *mOutputFormat = nullptr;
     bool mCurrentlyEncoding = false;
-    QList<stdsptr<CacheContainer> > mNextContainers;
+    QList<stdsptr<ImageCacheContainer> > mNextContainers;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;
@@ -129,7 +129,7 @@ protected:
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
 
-    QList<stdsptr<CacheContainer> > _mContainers;
+    QList<stdsptr<ImageCacheContainer> > _mContainers;
 };
 
 #endif // VIDEOENCODER_H

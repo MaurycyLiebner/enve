@@ -5,7 +5,7 @@
 #include "keysview.h"
 #include "Animators/qrealpoint.h"
 #include "global.h"
-#include "qrealkey.h"
+#include "Animators/qrealkey.h"
 
 void KeysView::graphSetSmoothCtrlAction() {
     graphSetTwoSideCtrlForSelected();
@@ -415,13 +415,9 @@ void KeysView::graphDeletePressed() {
         key->afterKeyChanged();
         key->getParentAnimator<GraphAnimator>()->anim_updateKeysPath();
     } else {
-        foreach(const auto& anim, mSelectedKeysAnimators) {
-            //if(!mAnimators.contains(anim)) continue;
-            anim->deleteSelectedKeys();
-        }
+        deleteSelectedKeys();
 
         Q_FOREACH(const auto& anim, mGraphAnimators) {
-            anim->anim_sortKeys();
             anim->anim_updateKeysPath();
         }
     }
@@ -549,11 +545,8 @@ void KeysView::graphWheelEvent(QWheelEvent *event) {
 }
 
 bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
-    if(!hasFocus() ) return false;
-    if(event->key() == Qt::Key_Delete) {
-        graphDeletePressed();
-    } else if(event->key() == Qt::Key_0 &&
-              event->modifiers() & Qt::KeypadModifier) {
+    if(event->key() == Qt::Key_0 &&
+       event->modifiers() & Qt::KeypadModifier) {
         graphResetValueScaleAndMinShownAction();
     } else {
         return false;

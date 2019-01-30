@@ -93,7 +93,7 @@ private:
 
     bool mClosedUpToDate = true;
     bool mClosed = false;
-    bool mTotalLengthUpToDate = true;
+    bool mTotalLengthUpToDate = false;
     qreal mTotalLength = 0;
     QList<qCubicSegment2D> mSegments;
 };

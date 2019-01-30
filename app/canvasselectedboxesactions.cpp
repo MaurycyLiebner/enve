@@ -322,6 +322,35 @@ void Canvas::setSelectedStrokeWidth(const qreal &strokeWidth) {
     }
 }
 
+void Canvas::setSelectedStrokeBrush(_SimpleBrushWrapper * const brush) {
+    Q_FOREACH(const auto &box, mSelectedBoxes) {
+        box->setStrokeBrush(brush);
+    }
+}
+
+void Canvas::setSelectedStrokeBrushWidthCurve(
+        const qCubicSegment1D& curve) {
+    Q_FOREACH(const auto &box, mSelectedBoxes) {
+        box->setStrokeBrushWidthCurve(curve);
+    }
+}
+
+
+void Canvas::setSelectedStrokeBrushTimeCurve(
+        const qCubicSegment1D& curve) {
+    Q_FOREACH(const auto &box, mSelectedBoxes) {
+        box->setStrokeBrushTimeCurve(curve);
+    }
+}
+
+
+void Canvas::setSelectedStrokeBrushPressureCurve(
+        const qCubicSegment1D& curve) {
+    Q_FOREACH(const auto &box, mSelectedBoxes) {
+        box->setStrokeBrushPressureCurve(curve);
+    }
+}
+
 void Canvas::startSelectedStrokeWidthTransform() {
     Q_FOREACH(const auto &box, mSelectedBoxes) {
         box->startSelectedStrokeWidthTransform();
@@ -773,13 +802,13 @@ void Canvas::duplicateSelectedBoxes() {
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) return;
     auto newGroup = SPtrCreate(BoxesGroup)();
-    mCurrentBoxesGroup->addContainedBox(newGroup);
     BoundingBox* box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
         auto boxSP = GetAsSPtr(box, BoundingBox);
         box->removeFromParent_k();
         newGroup->addContainedBox(boxSP);
     }
+    mCurrentBoxesGroup->addContainedBox(newGroup);
     mSelectedBoxes.clear(); schedulePivotUpdate();
     addBoxToSelection(newGroup.get());
 }

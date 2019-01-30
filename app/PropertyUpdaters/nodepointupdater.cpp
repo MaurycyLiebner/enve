@@ -12,4 +12,5 @@ void NodePointUpdater::update() {
 
 void NodePointUpdater::frameChangeUpdate() {
     mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
+    mTarget->setPathsOutdated();
 }

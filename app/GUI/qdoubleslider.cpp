@@ -5,9 +5,9 @@
 #include "mainwindow.h"
 #include "global.h"
 
-QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
-                             qreal prefferedStep,
-                             QWidget *parent) : QWidget(parent) {
+QDoubleSlider::QDoubleSlider(const qreal &minVal, const qreal &maxVal,
+                             const qreal &prefferedStep,
+                             QWidget * const parent) : QWidget(parent) {
     mValue = minVal;
     mMinValue = minVal;
     mMaxValue = maxVal;
@@ -34,10 +34,11 @@ QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
     setContentsMargins(0, 0, 0, 0);
 }
 
-QDoubleSlider::QDoubleSlider(QString name,
-                             qreal minVal, qreal maxVal,
-                             qreal prefferedStep,
-                             QWidget *parent) :
+QDoubleSlider::QDoubleSlider(const QString &name,
+                             const qreal &minVal,
+                             const qreal &maxVal,
+                             const qreal &prefferedStep,
+                             QWidget * const parent) :
     QDoubleSlider(minVal, maxVal, prefferedStep, parent) {
     setName(name);
 }

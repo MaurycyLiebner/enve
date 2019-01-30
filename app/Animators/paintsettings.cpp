@@ -391,7 +391,7 @@ QColor PaintSettings::getColorAtRelFrameF(const qreal &relFrame) const {
     return mColor->getColorAtRelFrameF(relFrame);
 }
 
-PaintType PaintSettings::getPaintType() const {
+const PaintType& PaintSettings::getPaintType() const {
     return mPaintType;
 }
 
@@ -411,14 +411,21 @@ void PaintSettings::setCurrentColor(const QColor &color) {
     mColor->qra_setCurrentValue(color);
 }
 
+void PaintSettings::showHideChildrenBeforeChaningPaintType(
+        const PaintType &newPaintType) {
+    if(mPaintType == FLATPAINT || mPaintType == BRUSHPAINT) {
+        ca_removeChildAnimator(mColor);
+    }
+
+    if(newPaintType == FLATPAINT || newPaintType == BRUSHPAINT) {
+        ca_addChildAnimator(mColor);
+    }
+}
+
 void PaintSettings::setPaintType(const PaintType &paintType) {
     if(paintType == mPaintType) return;
 
-    if(mPaintType == FLATPAINT) {
-        ca_removeChildAnimator(mColor);
-    } else if(paintType == FLATPAINT) {
-        ca_addChildAnimator(mColor);
-    }
+    showHideChildrenBeforeChaningPaintType(paintType);
 
     mPaintType = paintType;
     mTarget_k->updateDrawGradients();
@@ -448,6 +455,18 @@ StrokeSettings::StrokeSettings(GradientPoints *grdPts,
     prp_setName("stroke");
 
     ca_addChildAnimator(mLineWidth);
+}
+
+void StrokeSettings::showHideChildrenBeforeChaningPaintType(
+        const PaintType &newPaintType) {
+    PaintSettings::showHideChildrenBeforeChaningPaintType(newPaintType);
+    if(getPaintType() == BRUSHPAINT) {
+        ca_removeChildAnimator(mBrushSettings);
+    }
+
+    if(newPaintType == BRUSHPAINT) {
+        ca_addChildAnimator(mBrushSettings);
+    }
 }
 
 void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
@@ -529,24 +548,30 @@ QrealAnimator *StrokeSettings::getLineWidthAnimator() {
     return mLineWidth.data();
 }
 
-PaintSetting::PaintSetting(const bool &targetFillSettings) :
+PaintSetting::PaintSetting(const bool &targetFillSettings,
+                           const PaintType &paintType) :
     mTargetFillSettings(targetFillSettings) {
-    mPaintType = NOPAINT;
+    mPaintType = paintType;
+}
+
+PaintSetting::PaintSetting(const bool &targetFillSettings,
+                           const ColorSetting &colorSetting,
+                           const PaintType &paintType) :
+    PaintSetting(targetFillSettings, paintType) {
+    mColorSetting = colorSetting;
 }
 
 PaintSetting::PaintSetting(const bool &targetFillSettings,
                            const ColorSetting &colorSetting) :
-    PaintSetting(targetFillSettings) {
+    PaintSetting(targetFillSettings, FLATPAINT) {
     mColorSetting = colorSetting;
-    mPaintType = FLATPAINT;
 }
 
 PaintSetting::PaintSetting(const bool &targetFillSettings,
                            const bool &linearGradient,
                            Gradient* gradient) :
-    PaintSetting(targetFillSettings) {
+    PaintSetting(targetFillSettings, GRADIENTPAINT) {
     mLinearGradient = linearGradient;
-    mPaintType = GRADIENTPAINT;
     mGradient = gradient;
 }
 
@@ -560,7 +585,7 @@ void PaintSetting::apply(PathBox *box) const {
     bool paintTypeChanged = paintSettings->getPaintType() != mPaintType;
     bool gradientChanged = false;
 
-    if(mPaintType == FLATPAINT) {
+    if(mPaintType == FLATPAINT || mPaintType == BRUSHPAINT) {
         mColorSetting.apply(paintSettings->getColorAnimator());
     } else if(mPaintType == GRADIENTPAINT) {
         if(paintTypeChanged) {
@@ -601,8 +626,8 @@ void PaintSetting::applyColorSetting(ColorAnimator *animator) const {
 
 UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColorT,
                                          const PaintType &paintTypeT) {
-    paintColor = paintColorT;
-    paintType = paintTypeT;
+    fPaintColor = paintColorT;
+    fPaintType = paintTypeT;
 }
 
 UpdatePaintSettings::UpdatePaintSettings() {}
@@ -610,12 +635,12 @@ UpdatePaintSettings::UpdatePaintSettings() {}
 UpdatePaintSettings::~UpdatePaintSettings() {}
 
 void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
-    if(paintType == GRADIENTPAINT) {
+    if(fPaintType == GRADIENTPAINT) {
         //p->setBrush(gradient);
-        paint->setShader(gradientSk);
+        paint->setShader(fGradient);
         paint->setAlpha(255);
-    } else if(paintType == FLATPAINT) {
-        paint->setColor(QColorToSkColor(paintColor));
+    } else if(fPaintType == FLATPAINT) {
+        paint->setColor(QColorToSkColor(fPaintColor));
     } else {
         paint->setColor(SkColorSetARGB(0, 0, 0, 0));
     }
@@ -648,7 +673,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         currT += tInc;
     }
     if(linearGradient) {
-        gradientSk = SkGradientShader::MakeLinear(gradPoints,
+        fGradient = SkGradientShader::MakeLinear(gradPoints,
                                                   gradColors,
                                                   gradPos,
                                                   nStops,
@@ -657,7 +682,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         QPointF distPt = finalStop - start;
         SkScalar radius = static_cast<SkScalar>(
                     qSqrt(distPt.x()*distPt.x() + distPt.y()*distPt.y()));
-        gradientSk = SkGradientShader::MakeRadial(
+        fGradient = SkGradientShader::MakeRadial(
                         qPointToSk(start),
                         radius,
                         gradColors,

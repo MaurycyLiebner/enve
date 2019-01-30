@@ -5,7 +5,6 @@
 #include "edge.h"
 #include "skia/skqtconversions.h"
 #include "canvas.h"
-#include "boolanimator.h"
 
 PathAnimator::PathAnimator() : ComplexAnimator("path") {}
 

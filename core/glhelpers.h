@@ -4,7 +4,6 @@
 typedef QOpenGLFunctions_3_3_Core QGL33c;
 #include "skia/skiaincludes.h"
 
-extern void assertNoGlErrors();
 extern void checkGlErrors(const std::string& msg = "");
 
 //! @brief Creates a program, compiles, and attaches associated shaders.

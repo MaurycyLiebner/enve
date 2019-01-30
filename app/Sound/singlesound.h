@@ -4,13 +4,7 @@
 #include "Animators/qrealanimator.h"
 class FixedLenAnimationRect;
 
-extern int decode_audio_file(const char* path,
-                             const int sample_rate,
-                             float** audioData,
-                             int* size);
-
-class SingleSound : public ComplexAnimator
-{
+class SingleSound : public ComplexAnimator {
     Q_OBJECT
 public:
     SingleSound(const QString &path,

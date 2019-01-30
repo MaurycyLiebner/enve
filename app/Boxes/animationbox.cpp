@@ -2,7 +2,7 @@
 #include <QMenu>
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "canvas.h"
-#include "filesourcescache.h"
+#include "FileCacheHandlers/animationcachehandler.h"
 #include "imagebox.h"
 #include "undoredo.h"
 
@@ -33,8 +33,8 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
             mAnimationCacheHandler->getFramesCount());
     auto newRange = getAnimationDurationRect()->getRelFrameRange();
 
-    prp_updateAfterChangedRelFrameRange({oldRange.min, newRange.min});
-    prp_updateAfterChangedRelFrameRange({oldRange.max, newRange.max});
+    prp_updateAfterChangedRelFrameRange({oldRange.fMin, newRange.fMin});
+    prp_updateAfterChangedRelFrameRange({oldRange.fMax, newRange.fMax});
 }
 
 void AnimationBox::reloadCacheHandler() {
@@ -125,11 +125,10 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
     auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
     imageData->animationFrame = animationFrame;
-    imageData->image = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
-    if(imageData->image.get() == nullptr) {
-        _ScheduledTask* upd = mAnimationCacheHandler->
-                scheduleFrameLoad(animationFrame);
-        if(upd != nullptr) {
+    imageData->fImage = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
+    if(!imageData->fImage) {
+        auto upd = mAnimationCacheHandler->scheduleFrameLoad(animationFrame);
+        if(upd) {
             upd->addDependent(imageData);
         }
     }
@@ -140,6 +139,6 @@ stdsptr<BoundingBoxRenderData> AnimationBox::createRenderData() {
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    image = GetAsPtr(srcCacheHandler, AnimationCacheHandler)->
+    fImage = GetAsPtr(srcCacheHandler, AnimationCacheHandler)->
             getFrameCopyAtOrBeforeFrame(animationFrame);
 }

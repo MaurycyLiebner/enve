@@ -19,11 +19,6 @@ GLuint GL_TEXTURED_SQUARE_VBO;
 BlurProgram GL_BLUR_PROGRAM;
 DotProgram GL_DOT_PROGRAM;
 
-void assertNoGlErrors() {
-    GLenum glError = glGetError();
-    assert(glError == GL_NO_ERROR);
-}
-
 void checkGlErrors(const std::string& msg) {
     GLenum glError = glGetError();
     if(glError == GL_NO_ERROR) return;

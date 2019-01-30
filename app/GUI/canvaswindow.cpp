@@ -26,6 +26,8 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
 
     mPreviewFPSTimer = new QTimer(this);
+    connect(mPreviewFPSTimer, &QTimer::timeout,
+            this, &CanvasWindow::nextPreviewFrame);
 
     initializeAudio();
 
@@ -75,20 +77,13 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
 
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     TaskScheduler::sSetCurrentCanvas(canvas);
-    if(mCurrentCanvas != nullptr) {
+    if(mCurrentCanvas) {
         mCurrentCanvas->setIsCurrentCanvas(false);
-        disconnect(mPreviewFPSTimer, &QTimer::timeout,
-                   mCurrentCanvas.data(), &Canvas::nextPreviewFrame);
     }
 
-    if(canvas == nullptr) {
-        mCurrentSoundComposition = nullptr;
-        mCurrentCanvas.clear();
-    } else {
+    if(canvas) {
         mCurrentCanvas = canvas;
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
-        connect(mPreviewFPSTimer, &QTimer::timeout,
-                mCurrentCanvas.data(), &Canvas::nextPreviewFrame);
 
         mCurrentCanvas->setIsCurrentCanvas(true);
 
@@ -96,15 +91,18 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
 
         emit changeCanvasFrameRange(0, getMaxFrame());
         changeCurrentFrameAction(getCurrentFrame());
+    } else {
+        mCurrentSoundComposition = nullptr;
+        mCurrentCanvas.clear();
     }
     BoxesGroup *currentGroup;
-    if(mCurrentCanvas == nullptr) {
-        MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
-        currentGroup = nullptr;
-    } else {
+    if(mCurrentCanvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
         currentGroup = mCurrentCanvas->getCurrentBoxesGroup();
+    } else {
+        MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
+        currentGroup = nullptr;
     }
     mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
                 currentGroup,
@@ -228,24 +226,24 @@ void CanvasWindow::renameCanvas(const int &id,
 }
 
 bool CanvasWindow::hasNoCanvas() {
-    return mCurrentCanvas == nullptr;
+    return !mCurrentCanvas;
 }
 
 void CanvasWindow::renameCurrentCanvas(const QString &newName) {
-    if(mCurrentCanvas == nullptr) return;
+    if(!mCurrentCanvas) return;
     renameCanvas(mCurrentCanvas.data(), newName);
 }
 
 void CanvasWindow::qRender(QPainter *p) {
     Q_UNUSED(p);
-    if(mCurrentCanvas == nullptr) return;
+    if(!mCurrentCanvas) return;
     //mCurrentCanvas->drawInputText(p);
 }
 #include "glhelpers.h"
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
-    if(mCurrentCanvas == nullptr) {
+    if(!mCurrentCanvas) {
         canvas->clear(SK_ColorBLACK);
         return;
     }
@@ -609,7 +607,7 @@ void CanvasWindow::flipVerticalAction() {
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setCurrentBrush(const BrushWrapper * const brush) {
+void CanvasWindow::setCurrentBrush(const _SimpleBrushWrapper * const brush) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setCurrentBrush(brush);
 }
@@ -799,6 +797,33 @@ void CanvasWindow::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
     queScheduledTasksAndUpdate();
 }
 
+void CanvasWindow::strokeBrushChanged(_SimpleBrushWrapper * const brush) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setSelectedStrokeBrush(brush);
+    queScheduledTasksAndUpdate();
+}
+
+void CanvasWindow::strokeBrushWidthCurveChanged(
+        const qCubicSegment1D& curve) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setSelectedStrokeBrushWidthCurve(curve);
+    queScheduledTasksAndUpdate();
+}
+
+void CanvasWindow::strokeBrushTimeCurveChanged(
+        const qCubicSegment1D& curve) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setSelectedStrokeBrushTimeCurve(curve);
+    queScheduledTasksAndUpdate();
+}
+
+void CanvasWindow::strokeBrushPressureCurveChanged(
+        const qCubicSegment1D& curve) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setSelectedStrokeBrushPressureCurve(curve);
+    queScheduledTasksAndUpdate();
+}
+
 void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeWidth(strokeWidth);
@@ -883,8 +908,8 @@ BoxesGroup *CanvasWindow::getCurrentGroup() {
 }
 
 void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
-    VideoEncoder::startEncodingStatic(settings);
-    if(VideoEncoder::encodingSuccessfulyStartedStatic()) {
+    VideoEncoder::sStartEncoding(settings);
+    if(VideoEncoder::sEncodingSuccessfulyStarted()) {
         mSavedCurrentFrame = getCurrentFrame();
         mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
 
@@ -920,11 +945,14 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler().
             getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
-    auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(newCurrentRenderFrame);
-    if(mCurrentRenderFrame >= range.min) {
-        newCurrentRenderFrame = range.max + 1;
-    } else {
-        newCurrentRenderFrame = range.min;
+    if(newCurrentRenderFrame < mMaxRenderFrame) {
+        auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(
+                    newCurrentRenderFrame);
+        if(mCurrentRenderFrame >= range.fMin) {
+            newCurrentRenderFrame = range.fMax + 1;
+        } else {
+            newCurrentRenderFrame = range.fMin;
+        }
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         mCurrentCanvas->getCacheHandler().
@@ -934,7 +962,8 @@ void CanvasWindow::nextCurrentRenderFrame() {
     }
 
     mCurrentRenderFrame = newCurrentRenderFrame;
-    changeCurrentFrameAction(mCurrentRenderFrame);
+    if(mCurrentRenderFrame < mMaxRenderFrame)
+        changeCurrentFrameAction(mCurrentRenderFrame);
 }
 
 void CanvasWindow::renderPreview() {
@@ -945,17 +974,10 @@ void CanvasWindow::renderPreview() {
     TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(cpuFinishedFunc);
 
     mSavedCurrentFrame = getCurrentFrame();
-
     mCurrentRenderFrame = mSavedCurrentFrame;
-    mMaxRenderFrame =
-            mCurrentCanvas->getMaxPreviewFrame(mCurrentRenderFrame,
-                                               getMaxFrame());
     mMaxRenderFrame = getMaxFrame();
     setRendering(true);
 
-    //mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
-    //mCurrentCanvas->updateAllBoxes();
-    //callUpdateSchedulers();
     if(TaskScheduler::sAllQuedCPUTasksFinished()) {
         nextPreviewRenderFrame();
     }
@@ -980,6 +1002,7 @@ void CanvasWindow::outOfMemory() {
                 TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(nullptr);
             };
             TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(allFinishedFunc);
+            TaskScheduler::sClearTasks();
         }
     }
 }
@@ -997,7 +1020,7 @@ void CanvasWindow::setPreviewing(const bool &bT) {
 void CanvasWindow::interruptPreviewRendering() {
     setRendering(false);
     TaskScheduler::sClearAllFinishedFuncs();
-    mCurrentCanvas->clearPreview();
+    clearPreview();
     mCurrentCanvas->getCacheHandler().
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
                                          mMaxRenderFrame,
@@ -1009,7 +1032,7 @@ void CanvasWindow::interruptPreviewRendering() {
 void CanvasWindow::interruptOutputRendering() {
     mCurrentCanvas->setOutputRendering(false);
     TaskScheduler::sClearAllFinishedFuncs();
-    mCurrentCanvas->clearPreview();
+    clearPreview();
     changeCurrentFrameAction(mSavedCurrentFrame);
 }
 
@@ -1041,14 +1064,21 @@ void CanvasWindow::resumePreview() {
 }
 
 void CanvasWindow::playPreview() {
+    if(hasNoCanvas()) return;
     //changeCurrentFrameAction(mSavedCurrentFrame);
     TaskScheduler::sClearAllFinishedFuncs();
-    mCurrentCanvas->playPreview(mSavedCurrentFrame,
-                                mCurrentRenderFrame);
+    const int minPreviewFrame = mSavedCurrentFrame;
+    const int maxPreviewFrame = mCurrentRenderFrame;
+    if(minPreviewFrame >= maxPreviewFrame) return;
+    mMaxPreviewFrame = mCurrentRenderFrame;
+    mCurrentPreviewFrame = mSavedCurrentFrame;
+    mCurrentCanvas->setCurrentPreviewContainer(mCurrentPreviewFrame);
+    mCurrentCanvas->setPreviewing(true);
+
     setRendering(false);
     setPreviewing(true);
-    mCurrentSoundComposition->generateData(mSavedCurrentFrame,
-                                           mCurrentRenderFrame,
+    mCurrentSoundComposition->generateData(minPreviewFrame,
+                                           maxPreviewFrame,
                                            mCurrentCanvas->getFps());
     startAudio();
     int mSecInterval = qRound(1000/mCurrentCanvas->getFps());
@@ -1071,6 +1101,23 @@ void CanvasWindow::nextPreviewRenderFrame() {
     }
 }
 
+void CanvasWindow::clearPreview() {
+    MainWindow::getInstance()->previewFinished();
+    stopPreview();
+}
+
+void CanvasWindow::nextPreviewFrame() {
+    if(hasNoCanvas()) return;
+    mCurrentPreviewFrame++;
+    if(mCurrentPreviewFrame > mMaxPreviewFrame) {
+        clearPreview();
+    } else {
+        mCurrentCanvas->setCurrentPreviewContainer(
+                    mCurrentPreviewFrame);
+    }
+    requestUpdate();
+}
+
 void CanvasWindow::nextSaveOutputFrame() {
     //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
@@ -1082,12 +1129,12 @@ void CanvasWindow::nextSaveOutputFrame() {
                 mCurrentCanvas->getResolutionFraction()) > 0.1) {
             mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
         }
-        VideoEncoder::finishEncodingStatic();
+        VideoEncoder::sFinishEncoding();
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
         auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(mCurrentRenderFrame);
-        if(range.max > mMaxRenderFrame) range.max = mMaxRenderFrame;
-        mCurrentRenderFrame = range.max + 1;
+        if(range.fMax > mMaxRenderFrame) range.fMax = mMaxRenderFrame;
+        mCurrentRenderFrame = range.fMax + 1;
         //mCurrentRenderFrame++;
         changeCurrentFrameAction(mCurrentRenderFrame);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {
@@ -1226,8 +1273,14 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
         QList<QUrl> urlList = mimeData->urls();
 
         for(int i = 0; i < urlList.size() && i < 32; i++) {
-            importFile(urlList.at(i).toLocalFile(),
-                       mCurrentCanvas->mapCanvasAbsToRel(event->posF()));
+            try {
+                const QPointF absPos =
+                        mCurrentCanvas->mapCanvasAbsToRel(
+                            event->posF());
+                importFile(urlList.at(i).toLocalFile(), absPos);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         }
         event->acceptProposedAction();
     }
@@ -1249,9 +1302,9 @@ void CanvasWindow::importFile(const QString &path,
 
     QFile file(path);
     if(!file.exists()) {
-        return;
+        RuntimeThrow("File " + path.toStdString() +
+                     " does not exit.");
     }
-    MainWindow::getInstance()->disable();
 
     QString extension = path.split(".").last();
     if(isSoundExt(extension)) {
@@ -1271,10 +1324,14 @@ void CanvasWindow::importFile(const QString &path,
             vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {
             MainWindow::getInstance()->loadAVFile(path);
+        } else {
+            mCurrentCanvas->unblockUndoRedo();
+            RuntimeThrow("Unrecognized file extension " +
+                         path.toStdString() + ".");
         }
         mCurrentCanvas->unblockUndoRedo();
 
-        if(importedBox != nullptr) {
+        if(importedBox) {
             mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(
                         importedBox);
             QPointF trans = relDropPos;
@@ -1284,7 +1341,6 @@ void CanvasWindow::importFile(const QString &path,
         }
         updateHoveredElements();
     }
-    MainWindow::getInstance()->enable();
 }
 
 QWidget *CanvasWindow::getCanvasWidget() {
@@ -1326,7 +1382,11 @@ void CanvasWindow::importFile() {
     if(!importPaths.isEmpty()) {
         Q_FOREACH(const QString &path, importPaths) {
             if(path.isEmpty()) continue;
-            importFile(path);
+            try {
+                importFile(path);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         }
     }
 }

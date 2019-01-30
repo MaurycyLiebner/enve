@@ -14,6 +14,8 @@
 #include <QHBoxLayout>
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettings.h"
+#include "Animators/brushsettings.h"
+#include "GUI/BrushWidgets/brushselectionwidget.h"
 
 class GradientWidget;
 class MainWindow;
@@ -21,6 +23,7 @@ class CanvasWindow;
 class ColorSettingsWidget;
 class QrealAnimatorValueSlider;
 class ActionButton;
+class Segment1DEditor;
 
 class FillStrokeSettingsWidget : public QWidget {
     Q_OBJECT
@@ -40,7 +43,13 @@ public:
 
     void setCanvasWindowPtr(CanvasWindow *canvasWidget);
     void updateColorAnimator();
+    void setCurrentBrushSettings(BrushSettings * const brushSettings);
 public slots:
+    void emitStrokeBrushChanged();
+    void emitStrokeBrushWidthCurveChanged();
+    void emitStrokeBrushTimeCurveChanged();
+    void emitStrokeBrushPressureCurveChanged();
+
     void emitStrokeWidthChanged();
     void emitStrokeWidthChangedTMP();
     void emitCapStyleChanged();
@@ -49,9 +58,13 @@ private slots:
     void setLinearGradientFill();
     void setRadialGradientFill();
 
+    void setStrokeBrush(_SimpleBrushWrapper * const brush);
+    void setBrushTimeCurve(const qCubicSegment1D& seg);
+    void setBrushWidthCurve(const qCubicSegment1D& seg);
+    void setBrushPressureCurve(const qCubicSegment1D& seg);
     void setStrokeWidth(const qreal &width);
 
-    void colorTypeSet(const int &id);
+    void colorTypeSet(const PaintType &type);
     void setFillTarget();
     void setStrokeTarget();
 
@@ -72,6 +85,7 @@ private slots:
     void startTransform(const char *slot);
 
     void setGradientFill();
+    void setBrushFill();
     void setFlatFill();
     void setNoneFill();
 
@@ -97,7 +111,7 @@ private:
     void setCapStyle(Qt::PenCapStyle capStyle);
 
 
-    int mTargetId = 0;
+    enum { FILL, STROKE } mTarget = FILL;
 
     //
 
@@ -112,7 +126,7 @@ private:
     Gradient *getCurrentGradientVal();
 
     const bool &getCurrentGradientLinearVal() {
-        if(mTargetId == 0) {
+        if(mTarget == FILL) {
             return mCurrentFillGradientLinear;
         } else {
             return mCurrentStrokeGradientLinear;
@@ -137,9 +151,14 @@ private:
     Qt::PenCapStyle mCurrentCapStyle;
     Qt::PenJoinStyle mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;
+    _SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
+    qCubicSegment1D mCurrentStrokeBrushWidthCurve;
+    qCubicSegment1D mCurrentStrokeBrushTimeCurve;
+    qCubicSegment1D mCurrentStrokeBrushPressureCurve;
 
     //
 
+    void setBrushPaintType();
     void setNoPaintType();
     void setFlatPaintType();
     void setGradientPaintType();
@@ -154,6 +173,7 @@ private:
     QPushButton *mFillNoneButton = nullptr;
     QPushButton *mFillFlatButton = nullptr;
     QPushButton *mFillGradientButton = nullptr;
+    QPushButton *mFillBrushButton = nullptr;
 
     QWidget *mStrokeSettingsWidget;
     QVBoxLayout *mStrokeSettingsLayout = new QVBoxLayout();
@@ -180,6 +200,12 @@ private:
     QPushButton *mLinearGradientButton;
     QPushButton *mRadialGradientButton;
     QWidget *mGradientTypeWidget;
+
+    BrushSelectionWidget* mBrushSelectionWidget;
+    Segment1DEditor* mBrushWidthCurveEditor;
+    Segment1DEditor* mBrushPressureCurveEditor;
+    Segment1DEditor* mBrushTimeCurveEditor;
+    QWidget* mBrushSettingsWidget;
 };
 
 #endif // FILLSTROKESETTINGS_H

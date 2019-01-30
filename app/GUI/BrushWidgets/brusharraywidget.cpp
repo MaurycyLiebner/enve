@@ -1,6 +1,6 @@
 #include "brusharraywidget.h"
 #include "brushselectionwidget.h"
-#include "qstringio.h"
+#include "basicreadwrite.h"
 
 BrushArrayWidget::BrushArrayWidget(
         const Qt::Orientation& orientation,
@@ -10,14 +10,14 @@ BrushArrayWidget::BrushArrayWidget(
 bool BrushArrayWidget::readBinary(QIODevice *src,
                                   BrushSelectionWidget* brushes) {
     int count = widgetsCount();
-    if(src->read((char*)&count, sizeof(int)) <= 0) {
+    if(src->read(rcChar(&count), sizeof(int)) <= 0) {
         return false;
     }
     for(int i = 0; i < count; i++) {
         QString collectionName;
         QString brushName;
-        if(!readQString(src, collectionName)) return false;
-        if(!readQString(src, brushName)) return false;
+        if(!gRead(src, collectionName)) return false;
+        if(!gRead(src, brushName)) return false;
         BrushWrapper* brush = brushes->getItem(collectionName, brushName);
         if(brush == nullptr) continue;
         appendBrush(GetAsSPtr(brush, BrushWrapper));
@@ -27,18 +27,18 @@ bool BrushArrayWidget::readBinary(QIODevice *src,
 
 bool BrushArrayWidget::writeBinary(QIODevice *dst) {
     int count = widgetsCount();
-    if(dst->write((char*)&count, sizeof(int)) <= 0) {
+    if(dst->write(rcChar(&count), sizeof(int)) <= 0) {
         return false;
     }
     for(int i = 0; i < count; i++) {
-        BrushWidget* wid = (BrushWidget*)getWidgetAt(i);
+        BrushWidget* wid = static_cast<BrushWidget*>(getWidgetAt(i));
         BrushWrapper* brush = wid->getItem();
         QString collectionName = brush->getCollectionName();
         QString brushName = brush->getName();
-        if(!writeQString(dst, collectionName)) {
+        if(!gWrite(dst, collectionName)) {
             return false;
         }
-        if(!writeQString(dst, brushName)) {
+        if(!gWrite(dst, brushName)) {
             return false;
         }
     }

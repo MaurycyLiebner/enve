@@ -16,7 +16,7 @@ public:
     qreal getFontSize();
     QString getFontFamily();
     QString getFontStyle();
-    QString getCurrentTextValue();
+    QString getCurrentValue();
 
     void openTextEditor(QWidget* dialogParent);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
@@ -36,7 +36,7 @@ public:
                                     QWidget* widgetsParent);
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
-    void setCurrentTextValue(const QString &text);
+    void setCurrentValue(const QString &text);
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);

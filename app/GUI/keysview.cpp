@@ -1,5 +1,5 @@
 #include "keysview.h"
-#include "qrealkey.h"
+#include "Animators/qrealkey.h"
 #include "clipboardcontainer.h"
 #include <QPainter>
 #include <QMenu>
@@ -203,66 +203,43 @@ stdsptr<KeysClipboardContainer> KeysView::getSelectedKeysClipboardContainer() {
 }
 
 bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
-    if(mGraphViewed) {
-        return graphProcessFilteredKeyEvent(event);
-    } else {
-        bool inputHandled = false;
-        if(mMovingKeys) {
-            if(mValueInput.handleTransormationInputKeyEvent(event)) {
-                inputHandled = true;
-            }
+    bool inputHandled = false;
+    if(mMovingKeys) {
+        if(mValueInput.handleTransormationInputKeyEvent(event)) {
+            inputHandled = true;
         }
-        if(inputHandled) {
-            handleMouseMove(mLastMovePos, QApplication::mouseButtons());
-        } else if(event->modifiers() & Qt::ControlModifier &&
-           event->key() == Qt::Key_V) {
+    }
+    if(inputHandled) {
+        handleMouseMove(mLastMovePos, QApplication::mouseButtons());
+    } else if(graphProcessFilteredKeyEvent(event)) {
+    } else if(event->modifiers() & Qt::ControlModifier &&
+       event->key() == Qt::Key_V) {
+        if(event->isAutoRepeat()) return false;
+        auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
+        KeysClipboardContainer* container =
+                GetAsPtr(cont, KeysClipboardContainer);
+        if(container == nullptr) return false;
+        container->paste(mMainWindow->getCurrentFrame(), this, true, true);
+    } else if(!mSelectedKeysAnimators.isEmpty()) {
+        if(event->modifiers() & Qt::ControlModifier &&
+                  event->key() == Qt::Key_C) {
             if(event->isAutoRepeat()) return false;
-            auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
-            KeysClipboardContainer* container =
-                    GetAsPtr(cont, KeysClipboardContainer);
-            if(container == nullptr) return false;
-            container->paste(mMainWindow->getCurrentFrame(), this, true, true);
-        } else if(!mSelectedKeysAnimators.isEmpty()) {
-            if(event->modifiers() & Qt::ControlModifier &&
-                      event->key() == Qt::Key_C) {
-                if(event->isAutoRepeat()) return false;
-                auto container = getSelectedKeysClipboardContainer();
-                mMainWindow->replaceClipboard(container);
-            } else if(event->key() == Qt::Key_S) {
-                if(!mMovingKeys) {
-                    mValueInput.setName("scale");
-                    mScalingKeys = true;
-                    mMovingKeys = true;
-                    mFirstMove = true;
-                    mLastPressPos = mapFromGlobal(QCursor::pos()) +
-                            QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
-                    mIsMouseGrabbing = true;
-                    //setMouseTracking(true);
-                    grabMouse();
-                }
-            } else if(event->key() == Qt::Key_G) {
-                if(!mMovingKeys) {
-                    mValueInput.setName("move");
-                    mMovingKeys = true;
-                    mFirstMove = true;
-                    mLastPressPos = mapFromGlobal(QCursor::pos()) +
-                            QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
-                    mIsMouseGrabbing = true;
-                    //setMouseTracking(true);
-                    grabMouse();
-                }
-            } else if(mMainWindow->isShiftPressed() &&
-                     event->key() == Qt::Key_D) {
-                auto container = getSelectedKeysClipboardContainer();
-                int lowestKey = INT_MAX;
-                foreach(const auto& anim, mSelectedKeysAnimators) {
-                    int animLowest = anim->getLowestAbsFrameForSelectedKey();
-                    if(animLowest < lowestKey) {
-                        lowestKey = animLowest;
-                    }
-                }
-                container->paste(lowestKey, this, false, true);
-
+            auto container = getSelectedKeysClipboardContainer();
+            mMainWindow->replaceClipboard(container);
+        } else if(event->key() == Qt::Key_S) {
+            if(!mMovingKeys) {
+                mValueInput.setName("scale");
+                mScalingKeys = true;
+                mMovingKeys = true;
+                mFirstMove = true;
+                mLastPressPos = mapFromGlobal(QCursor::pos()) +
+                        QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
+                mIsMouseGrabbing = true;
+                //setMouseTracking(true);
+                grabMouse();
+            }
+        } else if(event->key() == Qt::Key_G) {
+            if(!mMovingKeys) {
                 mValueInput.setName("move");
                 mMovingKeys = true;
                 mFirstMove = true;
@@ -271,29 +248,53 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mIsMouseGrabbing = true;
                 //setMouseTracking(true);
                 grabMouse();
-            } else if(mMainWindow->isCtrlPressed() &&
-                      event->key() == Qt::Key_D) {
-                auto container = getSelectedKeysClipboardContainer();
-                container->paste(mMainWindow->getCurrentFrame(), this, true, true);
-             } else if(event->key() == Qt::Key_Delete) {
-                deleteSelectedKeys();
-                update();
-            } else if(event->modifiers() & Qt::ControlModifier &&
-                      event->key() == Qt::Key_Right) {
-                foreach(const auto& anim, mSelectedKeysAnimators) {
-                    anim->incSelectedKeysFrame(1);
+            }
+        } else if(mMainWindow->isShiftPressed() &&
+                 event->key() == Qt::Key_D) {
+            auto container = getSelectedKeysClipboardContainer();
+            int lowestKey = INT_MAX;
+            foreach(const auto& anim, mSelectedKeysAnimators) {
+                int animLowest = anim->getLowestAbsFrameForSelectedKey();
+                if(animLowest < lowestKey) {
+                    lowestKey = animLowest;
                 }
-            } else if(event->modifiers() & Qt::ControlModifier &&
-                      event->key() == Qt::Key_Left) {
-                foreach(const auto& anim, mSelectedKeysAnimators) {
-                    anim->incSelectedKeysFrame(-1);
-                }
+            }
+            container->paste(lowestKey, this, false, true);
+
+            mValueInput.setName("move");
+            mMovingKeys = true;
+            mFirstMove = true;
+            mLastPressPos = mapFromGlobal(QCursor::pos()) +
+                    QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
+            mIsMouseGrabbing = true;
+            //setMouseTracking(true);
+            grabMouse();
+        } else if(mMainWindow->isCtrlPressed() &&
+                  event->key() == Qt::Key_D) {
+            auto container = getSelectedKeysClipboardContainer();
+            container->paste(mMainWindow->getCurrentFrame(), this, true, true);
+         } else if(event->key() == Qt::Key_Delete) {
+            if(mGraphViewed) {
+                graphDeletePressed();
             } else {
-                return false;
+                deleteSelectedKeys();
+            }
+            update();
+        } else if(event->modifiers() & Qt::ControlModifier &&
+                  event->key() == Qt::Key_Right) {
+            foreach(const auto& anim, mSelectedKeysAnimators) {
+                anim->incSelectedKeysFrame(1);
+            }
+        } else if(event->modifiers() & Qt::ControlModifier &&
+                  event->key() == Qt::Key_Left) {
+            foreach(const auto& anim, mSelectedKeysAnimators) {
+                anim->incSelectedKeysFrame(-1);
             }
         } else {
             return false;
         }
+    } else {
+        return false;
     }
     return true;
 }

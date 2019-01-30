@@ -9,7 +9,7 @@
 #include <QWidgetAction>
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "Animators/qrealpoint.h"
-#include "qrealkey.h"
+#include "Animators/qrealkey.h"
 #include "randomqrealgenerator.h"
 #include "Animators/fakecomplexanimator.h"
 

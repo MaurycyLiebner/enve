@@ -3,6 +3,7 @@
 #include <QMenu>
 #include "GUI/mainwindow.h"
 #include "filesourcescache.h"
+#include "FileCacheHandlers/imagecachehandler.h"
 
 ImageBox::ImageBox() :
     BoundingBox(TYPE_IMAGE) {
@@ -31,7 +32,8 @@ void ImageBox::setFilePath(const QString &path) {
     if(!mImgCacheHandler) {
         QFile file(path);
         if(file.exists()) {
-            mImgCacheHandler = ImageCacheHandler::createNewHandler(path);
+            mImgCacheHandler = FileSourcesCache::
+                    createNewHandler<ImageCacheHandler>(path);
         }
     } else {
         mImgCacheHandler->setVisibleInListWidgets(true);
@@ -62,8 +64,8 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
                                     BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     auto imgData = GetAsPtr(data, ImageBoxRenderData);
-    imgData->image = mImgCacheHandler->getImageCopy();
-    if(!imgData->image) {
+    imgData->fImage = mImgCacheHandler->getImageCopy();
+    if(!imgData->fImage) {
         mImgCacheHandler->scheduleTask();
         mImgCacheHandler->addDependent(imgData);
     }
@@ -88,5 +90,5 @@ bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction,
 }
 #include "filesourcescache.h"
 void ImageBoxRenderData::loadImageFromHandler() {
-    image = GetAsPtr(srcCacheHandler, ImageCacheHandler)->getImageCopy();
+    fImage = GetAsPtr(srcCacheHandler, ImageCacheHandler)->getImageCopy();
 }

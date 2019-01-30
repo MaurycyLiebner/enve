@@ -55,7 +55,7 @@ FrameRange ComplexAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) c
         auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
         range *= childRange;
         Q_ASSERT(!range.isValid());
-        if(range.singleFrame()) return range;
+        if(range.isUnary()) return range;
     }
 
     return range;

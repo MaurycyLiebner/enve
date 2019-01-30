@@ -33,7 +33,7 @@ void AnimationWidgetScrollBar::setTopBorderVisible(const bool &bT) {
     mTopBorderVisible = bT;
 }
 
-void AnimationWidgetScrollBar::setCacheHandler(CacheHandler *handler) {
+void AnimationWidgetScrollBar::setCacheHandler(RenderCacheHandler *handler) {
     mCacheHandler_d = handler;
 }
 
@@ -79,7 +79,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
 //               2*MIN_WIDGET_HEIGHT - MIN_WIDGET_HEIGHT/2, height(),
 //               QColor(30, 30, 30));
 
-    if(mCacheHandler_d != nullptr) {
+    if(mCacheHandler_d) {
         mCacheHandler_d->drawCacheOnTimeline(&p, pixPerFrame, 0.,
                                            mMinFrame, mMaxFrame);
     }
@@ -115,7 +115,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     qreal threeFourthsHeight = height()*0.75;
     qreal fullHeight = height();
     qreal maxX = width() + MIN_WIDGET_HEIGHT;
-    while(xL < maxX ) {
+    while(xL < maxX) {
 //        p.drawLine(QPointF(xL, 0.), QPointF(xL, qorterHeight - 2 ));
         p.drawText(QRectF(xL - inc, qorterHeight, 2*inc, halfHeight),
                    Qt::AlignCenter, QString::number(currentFrame));

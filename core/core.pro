@@ -86,7 +86,12 @@ SOURCES += \
     Segments/cubiclist.cpp \
     Segments/cubicnode.cpp \
     Segments/qcubicsegment2d.cpp \
-    Segments/qcubicsegment1d.cpp
+    Segments/qcubicsegment1d.cpp \
+    Animators/animatort.cpp \
+    Animators/interpolatedanimator.cpp \
+    Animators/steppedanimator.cpp \
+    basicreadwrite.cpp \
+    differsinterpolate.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -131,7 +136,12 @@ HEADERS += \
     Segments/cubiclist.h \
     Segments/cubicnode.h \
     Segments/qcubicsegment2d.h \
-    Segments/qcubicsegment1d.h
+    Segments/qcubicsegment1d.h \
+    Animators/animatort.h \
+    Animators/interpolatedanimator.h \
+    Animators/steppedanimator.h \
+    basicreadwrite.h \
+    differsinterpolate.h
 
 unix {
     target.path = /usr/lib

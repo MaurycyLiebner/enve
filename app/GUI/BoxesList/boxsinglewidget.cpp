@@ -518,7 +518,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCheckBox->hide();
 
         clearAndHideValueAnimators();
-    } else if(target->SWT_isQStringAnimator()) {
+    } else if(target->SWT_isQStringAnimator() ||
+              target->SWT_isQCubicSegment1DAnimator()) {
         mRecordButton->show();
 
         mContentButton->show();
@@ -526,12 +527,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mVisibleButton->hide();
 
         mLockedButton->hide();
-
-        if(target->SWT_isColorAnimator()) {
-            mColorButton->show();
-        } else {
-            mColorButton->hide();
-        }
+        mColorButton->hide();
 
         mCompositionModeCombo->hide();
         mPropertyComboBox->hide();
@@ -1153,7 +1149,8 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
     } else if(target->SWT_isQStringAnimator() ||
               target->SWT_isVectorPathAnimator() ||
-              target->SWT_isAnimatedSurface()) {
+              target->SWT_isAnimatedSurface() ||
+              target->SWT_isQCubicSegment1DAnimator()) {
         Animator *aTarget = GetAsPtr(target, Animator);
         name = aTarget->prp_getName();
 

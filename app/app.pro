@@ -67,7 +67,6 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     svgimporter.cpp \
-    qrealkey.cpp \
     Animators/transformanimator.cpp \
     Animators/boolanimator.cpp \
     Animators/coloranimator.cpp \
@@ -211,7 +210,6 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/brushwidget.cpp \
     GUI/BrushWidgets/itemselectionwidget.cpp \
     GUI/BrushWidgets/itemwrapper.cpp \
-    qstringio.cpp \
     GUI/BrushWidgets/flowlayout.cpp \
     GUI/BrushWidgets/itemwidget.cpp \
     Animators/gradientpoints.cpp \
@@ -247,7 +245,32 @@ SOURCES += main.cpp\
     GPUEffects/gpurastereffect.cpp \
     GPUEffects/gpupostprocessor.cpp \
     GPUEffects/gpurastereffectcreator.cpp \
-    Paint/fixedtiledsurface.cpp
+    Paint/fixedtiledsurface.cpp \
+    GUI/segment1deditor.cpp \
+    GUI/namedcontainer.cpp \
+    Animators/brushsettings.cpp \
+    Animators/qcubicsegment1danimator.cpp \
+    Animators/qrealkey.cpp \
+    Paint/autotiledsurface.cpp \
+    Paint/brushstroke.cpp \
+    Paint/colorconversions.cpp \
+    Paint/autotilesdata.cpp \
+    FileCacheHandlers/filecachehandler.cpp \
+    FileCacheHandlers/imagecachehandler.cpp \
+    FileCacheHandlers/imagesequencecachehandler.cpp \
+    FileCacheHandlers/animationcachehandler.cpp \
+    FileCacheHandlers/videocachehandler.cpp \
+    Decode/audiodecode.cpp \
+    CacheHandlers/minimalcachecontainer.cpp \
+    CacheHandlers/rangecachecontainer.cpp \
+    CacheHandlers/imagecachecontainer.cpp \
+    CacheHandlers/tmpfilehandlers.cpp \
+    CacheHandlers/hddcachablerangecontainer.cpp \
+    CacheHandlers/soundcachecontainer.cpp \
+    CacheHandlers/soundtmpfilehandlers.cpp \
+    Sound/soundcachehandler.cpp \
+    CacheHandlers/hddcachablecachehandler.cpp \
+    CacheHandlers/minimalcachehandler.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -263,7 +286,6 @@ HEADERS  += \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     svgimporter.h \
-    qrealkey.h \
     keypoint.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
@@ -409,7 +431,6 @@ HEADERS  += \
     GUI/BrushWidgets/collectionarea.h \
     GUI/BrushWidgets/itemselectionwidget.h \
     GUI/BrushWidgets/itemwrapper.h \
-    qstringio.h \
     GUI/BrushWidgets/flowlayout.h \
     GUI/BrushWidgets/itemwidget.h \
     Animators/gradientpoints.h \
@@ -446,7 +467,32 @@ HEADERS  += \
     GPUEffects/gpurastereffect.h \
     GPUEffects/gpupostprocessor.h \
     GPUEffects/gpurastereffectcreator.h \
-    Paint/fixedtiledsurface.h
+    Paint/fixedtiledsurface.h \
+    GUI/segment1deditor.h \
+    GUI/namedcontainer.h \
+    Animators/brushsettings.h \
+    Animators/qcubicsegment1danimator.h \
+    Animators/qrealkey.h \
+    Paint/autotiledsurface.h \
+    Paint/brushstroke.h \
+    Paint/colorconversions.h \
+    Paint/autotilesdata.h \
+    FileCacheHandlers/filecachehandler.h \
+    FileCacheHandlers/imagecachehandler.h \
+    FileCacheHandlers/imagesequencecachehandler.h \
+    FileCacheHandlers/animationcachehandler.h \
+    FileCacheHandlers/videocachehandler.h \
+    Decode/audiodecode.h \
+    CacheHandlers/minimalcachecontainer.h \
+    CacheHandlers/rangecachecontainer.h \
+    CacheHandlers/imagecachecontainer.h \
+    CacheHandlers/tmpfilehandlers.h \
+    CacheHandlers/hddcachablerangecontainer.h \
+    CacheHandlers/soundcachecontainer.h \
+    CacheHandlers/soundtmpfilehandlers.h \
+    Sound/soundcachehandler.h \
+    CacheHandlers/hddcachablecachehandler.h \
+    CacheHandlers/minimalcachehandler.h
 
 RESOURCES += \
     resources.qrc

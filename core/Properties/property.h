@@ -163,7 +163,7 @@ public:
 
     bool prp_differencesBetweenRelFrames(const int &frame1,
                                          const int &frame2) const {
-        return !prp_getIdenticalRelFrameRange(frame1).contains(frame2);
+        return !prp_getIdenticalRelFrameRange(frame1).inRange(frame2);
     }
 
     virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {

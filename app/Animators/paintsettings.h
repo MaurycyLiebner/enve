@@ -6,11 +6,13 @@
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
+#include "brushsettings.h"
 
 enum PaintType : short {
     NOPAINT,
     FLATPAINT,
-    GRADIENTPAINT
+    GRADIENTPAINT,
+    BRUSHPAINT
 };
 
 class PathBox;
@@ -76,7 +78,12 @@ protected:
     PaintSetting(const bool &targetFillSettings,
                  const ColorSetting &colorSetting);
 
-    PaintSetting(const bool &targetFillSettings);
+    PaintSetting(const bool &targetFillSettings,
+                 const PaintType& paintType);
+
+    PaintSetting(const bool &targetFillSettings,
+                 const ColorSetting &colorSetting,
+                 const PaintType& paintType);
 
     PaintSetting(const bool &targetFillSettings,
                  const bool &linearGradient,
@@ -94,7 +101,7 @@ class PaintSettings : public ComplexAnimator {
 public:
     QColor getCurrentColor() const;
 
-    PaintType getPaintType() const;
+    const PaintType &getPaintType() const;
 
     Gradient *getGradient() const;
 
@@ -133,6 +140,8 @@ protected:
                   const QColor &colorT,
                   const PaintType &paintTypeT,
                   Gradient *gradientT = nullptr);
+    virtual void showHideChildrenBeforeChaningPaintType(
+            const PaintType &newPaintType);
 private:
     bool mGradientLinear = true;
     PaintType mPaintType = FLATPAINT;
@@ -244,9 +253,9 @@ struct UpdatePaintSettings {
                         const QPointF &start,
                         const QPointF &finalStop,
                         const bool &linearGradient = true);
-    PaintType paintType;
-    QColor paintColor;
-    sk_sp<SkShader> gradientSk;
+    PaintType fPaintType;
+    QColor fPaintColor;
+    sk_sp<SkShader> fGradient;
 };
 
 struct UpdateStrokeSettings : UpdatePaintSettings {
@@ -261,6 +270,11 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
 
     QPainter::CompositionMode outlineCompositionMode =
             QPainter::CompositionMode_Source;
+
+    stdsptr<SimpleBrushWrapper> fStrokeBrush;
+    qCubicSegment1D fTimeCurve;
+    qCubicSegment1D fPressureCurve;
+    qCubicSegment1D fWidthCurve;
 };
 
 class StrokeSettings : public PaintSettings {
@@ -275,6 +289,25 @@ public:
     void setStrokerSettings(QPainterPathStroker *stroker);
     void setStrokerSettingsSk(SkStroke *stroker);
 
+    void setStrokeBrushPressureCurve(
+            const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushPressureCurve(curve);
+    }
+
+    void setStrokeBrushTimeCurve(
+            const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushTimeCurve(curve);
+    }
+
+    void setStrokeBrushWidthCurve(
+            const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushWidthCurve(curve);
+    }
+
+    void setStrokeBrush(_SimpleBrushWrapper* const brush) {
+        mBrushSettings->setBrush(brush);
+    }
+
     qreal getCurrentStrokeWidth() const;
 
     Qt::PenCapStyle getCapStyle() const;
@@ -282,6 +315,10 @@ public:
     Qt::PenJoinStyle getJoinStyle() const;
 
     QrealAnimator *getStrokeWidthAnimator();
+
+    BrushSettings *getBrushSettings() {
+        return mBrushSettings.get();
+    }
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);
@@ -308,12 +345,15 @@ protected:
                    const QColor &colorT,
                    const PaintType &paintTypeT,
                    Gradient* gradientT = nullptr);
+    void showHideChildrenBeforeChaningPaintType(
+                const PaintType &newPaintType);
 private:
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
-
+    qsptr<BrushSettings> mBrushSettings =
+            SPtrCreate(BrushSettings)();
     qsptr<QrealAnimator> mLineWidth =
             SPtrCreate(QrealAnimator)(1., 0., 999., 1., "thickness");
 };

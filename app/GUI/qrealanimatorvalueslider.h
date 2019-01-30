@@ -22,8 +22,8 @@ public:
 
     void paint(QPainter *p);
 
-    void setAnimator(QrealAnimator *animator);
-    void setIntAnimator(IntProperty *animator);
+    void setAnimator(QrealAnimator * const animator);
+    void setIntAnimator(IntProperty * const animator);
 
     bool hasTargetAnimator();
 

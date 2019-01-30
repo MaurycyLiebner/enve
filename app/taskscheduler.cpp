@@ -40,12 +40,12 @@ TaskScheduler::TaskScheduler() {
 }
 
 TaskScheduler::~TaskScheduler() {
-    foreach(QThread *thread, mExecutorThreads) {
+    foreach(const auto& thread, mExecutorThreads) {
         thread->quit();
         thread->wait();
         delete thread;
     }
-    foreach(TaskExecutor *taskExecutor, mCPUTaskExecutors) {
+    foreach(const auto& taskExecutor, mCPUTaskExecutors) {
         delete taskExecutor;
     }
 //    mFileControlerThread->quit();
@@ -57,7 +57,7 @@ void TaskScheduler::initializeGPU() {
     try {
         mGpuPostProcessor.initialize();
     } catch(const std::exception& e) {
-        gPrintExceptionCritical(e, "Failed to initialize gpu for post-processing.\n");
+        gPrintExceptionCritical(e, "Failed to initialize gpu for post-processing.");
     }
 
     connect(&mGpuPostProcessor, &GpuPostProcessor::finished,
@@ -70,26 +70,46 @@ void TaskScheduler::scheduleCPUTask(const stdsptr<_ScheduledTask>& task) {
     mScheduledCPUTasks << task;
 }
 
-void TaskScheduler::queHDDTask(const stdsptr<_ScheduledTask>& task) {
-    mQuedHDDTasks << task;
-    processNextQuedHDDTask(mCPUTaskExecutors.count(), nullptr);
+void TaskScheduler::scheduleHDDTask(const stdsptr<_ScheduledTask>& task) {
+    mScheduledHDDTasks << task;
+}
+
+void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
+    if(!task->isQued()) task->taskQued();
+
+    mQuedCPUTasks << task;
+    tryProcessingNextQuedCPUTask();
 }
 
 void TaskScheduler::queScheduledCPUTasks() {
-    if(mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty()) {
+    // if(mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty()) { !!! failes when creating BoxesGroup
+    if(mBusyCPUThreads.isEmpty()) {
         if(mCurrentCanvas) {
             mCurrentCanvas->scheduleWaitingTasks();
             mCurrentCanvas->queScheduledTasks();
         }
         foreach(const auto &task, mScheduledCPUTasks) {
-            if(!task->isQued()) {
-                task->taskQued();
-            }
-
-            mQuedCPUTasks << task;
-            tryProcessingNextQuedCPUTask();
+            queCPUTask(task);
         }
         mScheduledCPUTasks.clear();
+    }
+}
+
+void TaskScheduler::queScheduledHDDTasks() {
+    if(!mHDDThreadBusy) {
+        foreach(const auto &task, mScheduledHDDTasks) {
+            if(!task->isQued()) task->taskQued();
+
+            mQuedHDDTasks << task;
+            tryProcessingNextQuedHDDTask();
+        }
+        mScheduledHDDTasks.clear();
+    }
+}
+
+void TaskScheduler::tryProcessingNextQuedHDDTask() {
+    if(!mHDDThreadBusy) {
+        processNextQuedHDDTask(mCPUTaskExecutors.count(), nullptr);
     }
 }
 
@@ -105,17 +125,18 @@ void TaskScheduler::processNextQuedHDDTask(
     Q_UNUSED(finishedThreadId);
     if(mHDDThreadBusy && !finishedTask) return;
     mHDDThreadBusy = false;
-    if(finishedTask != nullptr) {
-        finishedTask->finishedProcessing();
+    if(finishedTask) finishedTask->finishedProcessing();
+    if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks.isEmpty()) {
+        processNextQuedCPUTask(mFreeCPUThreads.takeFirst(), nullptr);
     }
     if(mQuedHDDTasks.isEmpty()) {
         callAllQuedHDDTasksFinishedFunc();
 //        if(!mRenderingPreview) {
 //            callUpdateSchedulers();
 //        }
-        if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks.isEmpty()) {
-            processNextQuedCPUTask(mFreeCPUThreads.takeFirst(), nullptr);
-        }
+//        if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks.isEmpty()) {
+//            processNextQuedCPUTask(mFreeCPUThreads.takeFirst(), nullptr);
+//        }
     } else {
         for(int i = 0; i < mQuedHDDTasks.count(); i++) {
             auto task = mQuedHDDTasks.at(i).get();
@@ -135,7 +156,7 @@ void TaskScheduler::processNextQuedHDDTask(
 void TaskScheduler::processNextQuedCPUTask(
         const int &finishedThreadId,
         _ScheduledTask *const finishedTask) {
-    if(finishedTask != nullptr) {
+    if(finishedTask) {
         mBusyCPUThreads.removeOne(finishedThreadId);
         if(finishedTask->needsGpuProcessing()) {
             auto gpuProcess =
@@ -155,8 +176,7 @@ void TaskScheduler::processNextQuedCPUTask(
     } else {
         int threadId = finishedThreadId;
         for(int i = 0; i < mQuedCPUTasks.count(); i++) {
-            _ScheduledTask *updatablaT =
-                    mQuedCPUTasks.at(i).get();
+            auto updatablaT = mQuedCPUTasks.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
                 updatablaT->setCurrentTaskExecutor(
                             mCPUTaskExecutors.at(threadId));
@@ -175,8 +195,9 @@ void TaskScheduler::processNextQuedCPUTask(
                 threadId = mFreeCPUThreads.takeFirst();
             }
         }
+
         mFreeCPUThreads << threadId;
-        callAllQuedCPUTasksFinishedFunc();
+        //callAllQuedCPUTasksFinishedFunc();
     }
 //    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
 //    if(usageWidget == nullptr) return;

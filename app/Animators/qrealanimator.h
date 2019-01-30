@@ -93,7 +93,7 @@ public:
     void anim_removeAllKeys();
 
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
-        if(range.contains(anim_mCurrentRelFrame)) {
+        if(range.inRange(anim_mCurrentRelFrame)) {
             qra_updateValueFromCurrentFrame();
         }
         Animator::prp_updateAfterChangedRelFrameRange(range);

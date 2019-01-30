@@ -7,7 +7,7 @@
 TilesData::TilesData(const ushort &width,
                      const ushort &height,
                      const bool &paintInOtherThread) :
-    MinimalCacheContainer(false) {
+    MinimalCacheContainer() {
     mPaintInOtherThread = paintInOtherThread;
     setSize(width, height);
 }

@@ -34,25 +34,48 @@ public:
     static bool sAllQuedCPUTasksFinished() {
         return sInstance->allQuedCPUTasksFinished();
     }
+
+    static bool sCPUTasksBeingProcessed() {
+        return sInstance->CPUTasksBeingProcessed();
+    }
+
+    static bool sHDDTasksBeingProcessed() {
+        return sInstance->HDDTaskBeingProcessed();
+    }
+
     static bool sAllQuedHDDTasksFinished() {
         return sInstance->allQuedHDDTasksFinished();
     }
+
     static void sSetCurrentCanvas(Canvas* const canvas) {
         sInstance->setCurrentCanvas(canvas);
     }
 
+    static void sClearTasks() {
+        sInstance->clearTasks();
+    }
+
     void initializeGPU();
 
+    void queCPUTask(const stdsptr<_ScheduledTask> &task);
     void scheduleCPUTask(const stdsptr<_ScheduledTask> &task);
-    void queHDDTask(const stdsptr<_ScheduledTask> &task);
+    void scheduleHDDTask(const stdsptr<_ScheduledTask> &task);
+
+    void queScheduledCPUTasks();
+    void queScheduledHDDTasks();
 
     void clearTasks() {
         mScheduledCPUTasks.clear();
+        mScheduledHDDTasks.clear();
+        mQuedCPUTasks.clear();
         mQuedHDDTasks.clear();
+        if(!mHDDThreadBusy) {
+            callAllQuedHDDTasksFinishedFunc();
+        }
+        if(mBusyCPUThreads.isEmpty()) {
+            callAllQuedCPUTasksFinishedFunc();
+        }
     }
-
-    void queScheduledCPUTasks();
-    void processQuedCPUTasks();
 
     void processNextQuedHDDTask(
             const int &finishedThreadId,
@@ -85,10 +108,18 @@ public:
     }
 
     bool allQuedCPUTasksFinished() const {
-        return mBusyCPUThreads.isEmpty();
+        return mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty();
     }
 
     bool allQuedHDDTasksFinished() const {
+        return !mHDDThreadBusy && mQuedHDDTasks.isEmpty();
+    }
+
+    bool CPUTasksBeingProcessed() const {
+        return !mBusyCPUThreads.isEmpty();
+    }
+
+    bool HDDTaskBeingProcessed() const {
         return !mHDDThreadBusy;
     }
 signals:
@@ -99,6 +130,8 @@ private slots:
     void tryProcessingNextQuedCPUTask();
 private:
     static TaskScheduler* sInstance;
+
+    void tryProcessingNextQuedHDDTask();
 
     void callAllQuedCPUTasksFinishedFunc() const {
         if(mAllQuedCPUTasksFinishedFunc) {
@@ -129,6 +162,7 @@ private:
 
     QList<stdsptr<_ScheduledTask>> mScheduledCPUTasks;
     QList<stdsptr<_ScheduledTask>> mQuedCPUTasks;
+    QList<stdsptr<_ScheduledTask>> mScheduledHDDTasks;
     QList<stdsptr<_ScheduledTask>> mQuedHDDTasks;
 
     QList<QThread*> mExecutorThreads;

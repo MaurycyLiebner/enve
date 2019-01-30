@@ -25,9 +25,10 @@
 #include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 #include "Animators/effectanimators.h"
 #include "PixmapEffects/pixmapeffect.h"
+#include "PixmapEffects/rastereffects.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
-               int canvasWidth, int canvasHeight,
+               const int &canvasWidth, const int &canvasHeight,
                const int &frameCount, const qreal &fps) :
     BoxesGroup(TYPE_CANVAS) {
     mMainWindow = MainWindow::getInstance();
@@ -54,7 +55,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
 
     mMaxFrame = frameCount;
 
-    mResolutionFraction = 1.;
+    mResolutionFraction = 1;
 
     mWidth = canvasWidth;
     mHeight = canvasHeight;
@@ -82,7 +83,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
 Canvas::~Canvas() {}
 
 QRectF Canvas::getRelBoundingRectAtRelFrame(const int &) {
-    return QRectF(0., 0., mWidth, mHeight);
+    return QRectF(0, 0, mWidth, mHeight);
 }
 
 void Canvas::emitCanvasNameChanged() {
@@ -116,9 +117,7 @@ void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
 
-    if(mHoveredEdge_d != nullptr) {
-        mHoveredEdge_d->generatePainterPath();
-    }
+    if(mHoveredEdge_d) mHoveredEdge_d->generatePainterPath();
 }
 
 void Canvas::setCurrentGroupParentAsCurrentGroup() {
@@ -150,7 +149,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
 void Canvas::drawSelectedSk(SkCanvas *canvas,
                             const CanvasMode &currentCanvasMode,
                             const SkScalar &invScale) {
-    Q_FOREACH(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    Q_FOREACH(const auto& box, mSelectedBoxes) {
         box->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }
 }
@@ -158,7 +157,7 @@ void Canvas::drawSelectedSk(SkCanvas *canvas,
 void Canvas::updateHoveredBox() {
     mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
     mHoveredBone = nullptr;
-    if(mHoveredBox != nullptr && mBonesSelectionEnabled) {
+    if(mHoveredBox && mBonesSelectionEnabled) {
         if(mHoveredBox->SWT_isBonesBox()) {
             mHoveredBone = GetAsPtr(mHoveredBox, BonesBox)->getBoneAtAbsPos(
                         mCurrentMouseEventPosRel);
@@ -169,7 +168,7 @@ void Canvas::updateHoveredBox() {
 void Canvas::updateHoveredPoint() {
     mHoveredPoint_d = getPointAtAbsPos(mCurrentMouseEventPosRel,
                                mCurrentMode,
-                               1./mCanvasTransformMatrix.m11());
+                               1/mCanvasTransformMatrix.m11());
 }
 
 void Canvas::updateHoveredEdge() {
@@ -198,7 +197,8 @@ void Canvas::drawTransparencyMesh(SkCanvas *canvas,
         paint.setColor(SkColorSetARGB(125, 255, 255, 255));
         SkScalar currX = viewRect.left();
         SkScalar currY = viewRect.top();
-        SkScalar widthT = MIN_WIDGET_HEIGHT*0.5f*static_cast<SkScalar>(mCanvasTransformMatrix.m11());
+        SkScalar widthT = static_cast<SkScalar>(
+                    MIN_WIDGET_HEIGHT*0.5*mCanvasTransformMatrix.m11());
         SkScalar heightT = widthT;
         bool isOdd = false;
         while(currY < viewRect.bottom()) {
@@ -240,7 +240,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->save();
 
             canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
-            SkScalar reversedRes = 1.f/static_cast<SkScalar>(mResolutionFraction);
+            SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
 #ifdef CPU_ONLY_RENDER
             mCurrentPreviewContainer->drawSk(canvas, nullptr, nullptr);
@@ -251,14 +251,14 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->restore();
         }
     } else {
-        SkScalar invScale = 1.f/static_cast<SkScalar>(mCanvasTransformMatrix.m11());
+        SkScalar invScale = static_cast<SkScalar>(1/mCanvasTransformMatrix.m11());
 #ifdef CPU_ONLY_RENDER
         drawTransparencyMesh(canvas, viewRect);
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
 
         if(mCurrentPreviewContainer != nullptr) {
             canvas->save();
-            SkScalar reversedRes = 1./mResolutionFraction;
+            SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, nullptr, nullptr);
             canvas->restore();
@@ -271,9 +271,10 @@ void Canvas::renderSk(SkCanvas * const canvas,
                              paint);
         }
         bool drawCanvas =
-                mEffectsAnimators->hasEffects() &&
-                mCurrentPreviewContainer != nullptr &&
-                mExpiredPixmap == 0;
+//                mEffectsAnimators->hasEffects() &&
+                mCurrentPreviewContainer &&
+                !mCurrentPreviewContainerOutdated;
+                //mExpiredPixmap == 0;
         drawTransparencyMesh(canvas, viewRect);
         if(!drawCanvas) {
             paint.setColor(QColorToSkColor(mBackgroundColor->getCurrentColor()));
@@ -288,7 +289,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             }
         }
         if(drawCanvas) {
-            SkScalar reversedRes = 1.f/static_cast<SkScalar>(mResolutionFraction);
+            SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
         }
@@ -297,9 +298,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 //        QPen pen = QPen(Qt::black, 1.5);
 //        pen.setCosmetic(true);
 //        p->setPen(pen);
-        mCurrentBoxesGroup->drawSelectedSk(canvas,
-                                           mCurrentMode,
-                                           invScale);
+        mCurrentBoxesGroup->drawSelectedSk(canvas, mCurrentMode, invScale);
         drawSelectedSk(canvas, mCurrentMode, invScale);
 
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
@@ -362,7 +361,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     if(mCanvasWindow->hasFocus()) {
         paint.setColor(SK_ColorRED);
-        paint.setStrokeWidth(4.);
+        paint.setStrokeWidth(4);
         paint.setStyle(SkPaint::kStroke_Style);
         canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width(),
                                         mCanvasWidget->height()),
@@ -378,7 +377,7 @@ stdsptr<BoundingBoxRenderData> Canvas::createRenderData() {
     return SPtrCreate(CanvasRenderData)(this);
 }
 
-const BrushWrapper *Canvas::getCurrentBrush() const {
+const _SimpleBrushWrapper *Canvas::getCurrentBrush() const {
     return mCurrentBrush;
 }
 
@@ -410,17 +409,26 @@ void Canvas::setOutputRendering(const bool &bT) {
     mRenderingOutput = bT;
 }
 
-void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
+void Canvas::setCurrentPreviewContainer(const int& relFrame,
                                         const bool &frameEncoded) {
+    auto cont = mCacheHandler.getRenderContainerAtRelFrame(relFrame);
+    setCurrentPreviewContainer(
+                GetAsSPtr(cont, ImageCacheContainer),
+                frameEncoded);
+}
+
+void Canvas::setCurrentPreviewContainer(
+        const stdsptr<ImageCacheContainer>& cont,
+        const bool &frameEncoded) {
     if(mRenderingOutput && !frameEncoded) {
-        auto range = prp_getIdenticalRelFrameRange(cont->getMinRelFrame());
-        cont->setMaxRelFrame(range.max);
-        VideoEncoder::addCacheContainerToEncoderStatic(cont);
+        auto range = prp_getIdenticalRelFrameRange(cont->getRangeMin());
+        cont->setRangeMax(range.fMax);
+        VideoEncoder::sAddCacheContainerToEncoder(cont);
         return;
     }
     setLoadingPreviewContainer(nullptr);
-    if(cont == mCurrentPreviewContainer.get()) return;
-    if(mCurrentPreviewContainer.get() != nullptr) {
+    if(cont == mCurrentPreviewContainer) return;
+    if(mCurrentPreviewContainer) {
         if(!mRenderingPreview || mRenderingOutput) {
             mCurrentPreviewContainer->setBlocked(false);
 //            if(mRenderingOutput) { // !!! dont keep frames in memory when rendering output
@@ -428,109 +436,77 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont,
 //            }
         }
     }
-    if(cont == nullptr) {
+    if(!cont) {
         mCurrentPreviewContainer.reset();
         return;
     }
-    mCurrentPreviewContainer = GetAsSPtr(cont, CacheContainer);
+    mCurrentPreviewContainer = cont;
     mCurrentPreviewContainer->setBlocked(true);
 }
 
-void Canvas::setLoadingPreviewContainer(CacheContainer *cont) {
-    if(cont == mLoadingPreviewContainer.get()) return;
-    if(mLoadingPreviewContainer.get() != nullptr) {
-        mLoadingPreviewContainer->setAsCurrentPreviewContainerAfterFinishedLoading(nullptr);
+void Canvas::setLoadingPreviewContainer(
+        const stdsptr<ImageCacheContainer>& cont) {
+    if(cont == mLoadingPreviewContainer) return;
+    if(mLoadingPreviewContainer.get()) {
+        mLoadingPreviewContainer->setLoadTargetCanvas(nullptr);
         if(!mRenderingPreview || mRenderingOutput) {
             mLoadingPreviewContainer->setBlocked(false);
         }
     }
-    if(cont == nullptr) {
+    if(!cont) {
         mLoadingPreviewContainer.reset();
         return;
     }
-    mLoadingPreviewContainer = GetAsSPtr(cont, CacheContainer);
-    cont->setAsCurrentPreviewContainerAfterFinishedLoading(this);
+    mLoadingPreviewContainer = cont;
+    cont->setLoadTargetCanvas(this);
     mLoadingPreviewContainer->setBlocked(true);
 }
 
-void Canvas::playPreview(const int &minPreviewFrameId,
-                         const int &maxPreviewFrameId) {
-    if(minPreviewFrameId >= maxPreviewFrameId) return;
-    mMaxPreviewFrameId = maxPreviewFrameId;
-    mCurrentPreviewFrameId = minPreviewFrameId;
-    setCurrentPreviewContainer(mCacheHandler.getRenderContainerAtRelFrame(
-                                    mCurrentPreviewFrameId));
-    setPreviewing(true);
-    mCanvasWindow->requestUpdate();
-}
-
-#include "memorychecker.h"
-int Canvas::getMaxPreviewFrame(const int &minFrame, const int &maxFrame) {
-    unsigned long long frameSize =
-            static_cast<unsigned long long>(getByteCountPerFrame());
-    unsigned long long freeRam = getFreeRam() -
-            MemoryChecker::getInstance()->getLowFreeRam();
-    int maxNewFrames = static_cast<int>(freeRam/frameSize);
-    int maxFrameT = minFrame + maxNewFrames;
-    FrameRange range{minFrame, minFrame};
-    int frameT = minFrame;
-    maxFrameT += mCacheHandler.getNumberNotCachedBeforeRelFrame(minFrame);
-    while(range.max < maxFrameT && range.max < maxFrame) {
-        range = prp_getIdenticalRelFrameRange(frameT);
-//        if(frameT == minFrame) {
-//            mCacheHandler.cacheDataBeforeRelFrame(firstF);
-//        }
-        CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(range.min);
-        if(cont != nullptr) {
-            if(cont->storesDataInMemory()) {
-                maxFrameT++;
-            }
-            cont->setBlocked(true);
-        }
-        frameT = range.max + 1;
-    }
-    mCacheHandler.updateAllAfterFrameInMemoryHandler(range.min);
-    return qMin(maxFrame, qMax(minFrame, maxFrameT));
-}
-
-void Canvas::clearPreview() {
-    mMainWindow->previewFinished();
-    mCanvasWindow->stopPreview();
-}
-
-void Canvas::nextPreviewFrame() {
-    mCurrentPreviewFrameId++;
-    if(mCurrentPreviewFrameId > mMaxPreviewFrameId) {
-        clearPreview();
-    } else {
-        setCurrentPreviewContainer(
-                mCacheHandler.getRenderContainerAtOrBeforeRelFrame(
-                                    mCurrentPreviewFrameId));
-    }
-    mCanvasWindow->requestUpdate();
-}
-
 FrameRange Canvas::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    FrameRange groupRange = BoxesGroup::prp_getIdenticalRelFrameRange(relFrame);
+    FrameRange groupRange =
+            BoxesGroup::prp_getIdenticalRelFrameRange(relFrame);
     FrameRange canvasRange{0, mMaxFrame};
     return groupRange*canvasRange;
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
-    mExpiredPixmap = 0;
     if(renderData->fRedo) {
         scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
     //qDebug() << renderData->fRelFrame;
     auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
-    auto cont = mCacheHandler.getRenderContainerAtRelFrame(range.min);
-    if(!cont) {
-        cont = mCacheHandler.createNewRenderContainerAtRelFrame(range.min);
+    auto cont = mCacheHandler.getRenderContainerAtRelFrame(range.fMin);
+    if(cont) {
+        cont->replaceImageSk(renderData->fRenderedImage);
+    } else {
+        cont = mCacheHandler.createNewRenderContainerAtRelFrame(
+                    range, renderData->fRenderedImage);
     }
-    cont->replaceImageSk(renderData->fRenderedImage);
+    //cont->setRelFrameRange(range);
     if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
-        mCurrentPreviewContainerOutdated = false;
-        setCurrentPreviewContainer(cont);
+        auto currentRenderData = mDrawRenderContainer->getSrcRenderData();
+        bool newerSate = true;
+        bool closerFrame = true;
+        if(currentRenderData) {
+            newerSate = currentRenderData->fBoxStateId <
+                    renderData->fBoxStateId;
+            const int finishedFrameDist =
+                    qAbs(anim_mCurrentRelFrame - renderData->fRelFrame);
+            const int oldFrameDist =
+                    qAbs(anim_mCurrentRelFrame - currentRenderData->fRelFrame);
+            closerFrame = finishedFrameDist < oldFrameDist;
+        }
+        if(newerSate || closerFrame) {
+            mDrawRenderContainer->setSrcRenderData(renderData);
+            const bool currentState =
+                    renderData->fBoxStateId == mStateId;
+            const bool currentFrame =
+                    renderData->fRelFrame == anim_mCurrentRelFrame;
+            mDrawRenderContainer->setExpired(!currentState || !currentFrame);
+            mCurrentPreviewContainerOutdated =
+                    mDrawRenderContainer->isExpired();
+            setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
+        }
     } else if(mPreviewing) {
         cont->setBlocked(true);
     }
@@ -538,7 +514,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
-    if(range.contains(anim_mCurrentAbsFrame)) {
+    if(range.inRange(anim_mCurrentAbsFrame)) {
         mCurrentPreviewContainerOutdated = true;
     }
     mCacheHandler.clearCacheForRelFrameRange(
@@ -619,7 +595,7 @@ void Canvas::schedulePivotUpdate() {
     if(mRotPivot->isRotating() ||
         mRotPivot->isScaling() ||
         mRotPivot->isSelected()) return;
-    if(mLastPressedPoint != nullptr) {
+    if(mLastPressedPoint) {
         if(mLastPressedPoint->isCtrlPoint()) {
             return;
         }
@@ -691,9 +667,7 @@ void Canvas::updatePivot() {
 }
 
 void Canvas::setCanvasMode(const CanvasMode &mode) {
-    if(mIsMouseGrabbing) {
-        handleMouseRelease();
-    }
+    if(mIsMouseGrabbing) handleMouseRelease();
 
     mCurrentMode = mode;
     mSelecting = false;
@@ -755,7 +729,7 @@ bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
         }
         updateTransformation();
     } else if(event->key() == Qt::Key_N) {
-        Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
+        Q_FOREACH(const auto& box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = GetAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
@@ -795,7 +769,7 @@ void Canvas::copyAction() {
     target.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
 
     std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
-    Q_FOREACH(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    Q_FOREACH(const auto& box, mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }
     target.close();
@@ -805,7 +779,7 @@ void Canvas::pasteAction() {
     BoxesClipboardContainer *container =
             static_cast<BoxesClipboardContainer*>(
             mMainWindow->getClipboardContainer(CCT_BOXES));
-    if(container == nullptr) return;
+    if(!container) return;
     clearBoxesSelection();
     container->pasteTo(mCurrentBoxesGroup);
 }
@@ -822,7 +796,7 @@ void Canvas::duplicateAction() {
 
 void Canvas::selectAllAction() {
     if(mCurrentMode == MOVE_POINT) {
-        foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+        foreach(const auto& box, mSelectedBoxes) {
             box->selectAllPoints(this);
         }
     } else {//if(mCurrentMode == MOVE_PATH) {
@@ -849,26 +823,29 @@ void Canvas::invertSelectionAction() {
 }
 
 void Canvas::prp_setAbsFrame(const int &frame) {
+    if(frame == anim_mCurrentAbsFrame) return;
     int lastRelFrame = anim_mCurrentRelFrame;
     ComplexAnimator::prp_setAbsFrame(frame);
-    CacheContainer *cont =
+    ImageCacheContainer * const cont =
             mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
-    if(cont == nullptr) {
-        bool difference = prp_differencesBetweenRelFrames(lastRelFrame,
-                                                          anim_mCurrentRelFrame);
-        mCurrentPreviewContainerOutdated = difference;
-        if(difference) {
-            scheduleUpdate(Animator::FRAME_CHANGE);
-        }
-    } else {
+    if(cont) {
         if(cont->storesDataInMemory()) { // !!!
-            setCurrentPreviewContainer(cont);
+            setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
         } else {// !!!
-            setLoadingPreviewContainer(cont);
+            setLoadingPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
         }// !!!
+        mCurrentPreviewContainerOutdated = !cont->storesDataInMemory();
+    } else {
+        const bool difference =
+                prp_differencesBetweenRelFrames(lastRelFrame,
+                                                anim_mCurrentRelFrame);
+        if(difference) {
+            mCurrentPreviewContainerOutdated = true;
+        }
+        if(difference) scheduleUpdate(Animator::FRAME_CHANGE);
     }
 
-    Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
+    Q_FOREACH(const auto &box, mContainedBoxes) {
         box->prp_setAbsFrame(frame);
     }
     mUndoRedoStack->setFrame(frame);
@@ -894,14 +871,14 @@ void Canvas::setParentToLastSelected() {
     if(!mSelectedBones.isEmpty()) {
         Bone *bone = mSelectedBones.last();
         BasicTransformAnimator *trans = bone->getTransformAnimator();
-        BoundingBox* box = bone->getParentBox();
-        foreach(const qptr<BoundingBox>& boxT, mSelectedBoxes) {
+        auto box = bone->getParentBox();
+        foreach(const auto& boxT, mSelectedBoxes) {
             if(boxT == box) continue;
             boxT->setParentTransform(trans);
         }
     } else if(mSelectedBoxes.count() > 1) {
-        BoundingBox* lastBox = mSelectedBoxes.last();
-        BasicTransformAnimator* trans = lastBox->getTransformAnimator();
+        const auto& lastBox = mSelectedBoxes.last();
+        auto trans = lastBox->getTransformAnimator();
         for(int i = 0; i < mSelectedBoxes.count() - 1; i++) {
             mSelectedBoxes.at(i)->setParentTransform(trans);
         }
@@ -969,43 +946,33 @@ void Canvas::deselectAllBoxesAction() {
 }
 
 void Canvas::selectAllPointsAction() {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->selectAllPoints(this);
     }
 }
 
 void Canvas::setCurrentEndPoint(NodePoint *point) {
-    if(mCurrentEndPoint != nullptr) {
-        mCurrentEndPoint->deselect();
-    }
-    if(point != nullptr) {
-        point->select();
-    }
+    if(mCurrentEndPoint) mCurrentEndPoint->deselect();
+    if(point) point->select();
     mCurrentEndPoint = point;
 }
 
 void Canvas::selectOnlyLastPressedBone() {
     clearBonesSelection();
-    if(mLastPressedBone == nullptr) {
-        return;
-    }
-    addBoneToSelection(mLastPressedBone);
+    if(mLastPressedBone)
+        addBoneToSelection(mLastPressedBone);
 }
 
 void Canvas::selectOnlyLastPressedBox() {
     clearBoxesSelection();
-    if(mLastPressedBox == nullptr) {
-        return;
-    }
-    addBoxToSelection(mLastPressedBox);
+    if(mLastPressedBox)
+        addBoxToSelection(mLastPressedBox);
 }
 
 void Canvas::selectOnlyLastPressedPoint() {
     clearPointsSelection();
-    if(mLastPressedPoint == nullptr) {
-        return;
-    }
-    addPointToSelection(mLastPressedPoint);
+    if(mLastPressedPoint)
+        addPointToSelection(mLastPressedPoint);
 }
 
 void Canvas::resetTransormation() {
@@ -1121,7 +1088,7 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     if(alwaysShowChildren) {
         return false;
     } else {
-        if(rules.type == nullptr) {
+        if(!rules.type) {
         } else if(rules.type == &SingleWidgetTarget::SWT_isSingleSound) {
             return false;
         }
@@ -1163,55 +1130,55 @@ int Canvas::getMaxFrame() {
 }
 
 void Canvas::startDurationRectPosTransformForAllSelected() {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->startDurationRectPosTransform();
     }
 }
 
 void Canvas::finishDurationRectPosTransformForAllSelected() {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->finishDurationRectPosTransform();
     }
 }
 
 void Canvas::moveDurationRectForAllSelected(const int &dFrame) {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->moveDurationRect(dFrame);
     }
 }
 
 void Canvas::startMinFramePosTransformForAllSelected() {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->startMinFramePosTransform();
     }
 }
 
 void Canvas::finishMinFramePosTransformForAllSelected() {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->finishMinFramePosTransform();
     }
 }
 
 void Canvas::moveMinFrameForAllSelected(const int &dFrame) {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->moveMinFrame(dFrame);
     }
 }
 
 void Canvas::startMaxFramePosTransformForAllSelected() {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->startMaxFramePosTransform();
     }
 }
 
 void Canvas::finishMaxFramePosTransformForAllSelected() {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->finishMaxFramePosTransform();
     }
 }
 
 void Canvas::moveMaxFrameForAllSelected(const int &dFrame) {
-    foreach(const QPointer<BoundingBox>& box, mSelectedBoxes) {
+    foreach(const auto& box, mSelectedBoxes) {
         box->moveMaxFrame(dFrame);
     }
 }
@@ -1259,7 +1226,6 @@ SoundComposition *Canvas::getSoundComposition() {
 CanvasRenderData::CanvasRenderData(BoundingBox* parentBoxT) :
     BoxesGroupRenderData(parentBoxT) {}
 
-#include "PixmapEffects/rastereffects.h"
 void CanvasRenderData::renderToImage() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;
@@ -1271,15 +1237,15 @@ void CanvasRenderData::renderToImage() {
                                          nullptr);
     SkBitmap bitmap;
     bitmap.allocPixels(info);
-    bitmap.eraseColor(bgColor);
-    SkCanvas *rasterCanvas = new SkCanvas(bitmap);
+    bitmap.eraseColor(fBgColor);
+    SkCanvas rasterCanvas(bitmap);
     //rasterCanvas->clear(bgColor);
 
-    drawSk(rasterCanvas);
-    rasterCanvas->flush();
+    drawSk(&rasterCanvas);
+    rasterCanvas.flush();
 
     if(!fPixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
+        foreach(const auto& effect, fPixmapEffects) {
             effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
@@ -1288,7 +1254,6 @@ void CanvasRenderData::renderToImage() {
     bitmap.setImmutable();
     fRenderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
-    delete rasterCanvas;
 }
 
 void CanvasRenderData::drawSk(SkCanvas *canvas) {
@@ -1296,8 +1261,7 @@ void CanvasRenderData::drawSk(SkCanvas *canvas) {
 
     canvas->scale(qrealToSkScalar(fResolution),
                   qrealToSkScalar(fResolution));
-    Q_FOREACH(const stdsptr<BoundingBoxRenderData> &renderData,
-              childrenRenderData) {
+    Q_FOREACH(const auto &renderData, fChildrenRenderData) {
         //box->draw(p);
         renderData->drawRenderedImageForParent(canvas);
     }
@@ -1306,5 +1270,5 @@ void CanvasRenderData::drawSk(SkCanvas *canvas) {
 }
 
 void CanvasRenderData::updateRelBoundingRect() {
-    fRelBoundingRect = QRectF(0., 0., canvasWidth, canvasHeight);
+    fRelBoundingRect = QRectF(0, 0, canvasWidth, canvasHeight);
 }

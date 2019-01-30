@@ -43,7 +43,7 @@ public:
     virtual void anim_mergeKeysIfNeeded();
     bool anim_getClosestsKeyOccupiedRelFrame(const int &frame,
                                              int &closest);
-    Key *anim_getKeyAtRelFrame(const int &frame);
+    Key *anim_getKeyAtRelFrame(const int &frame) const;
     bool anim_hasPrevKey(const Key * const key);
     bool anim_hasNextKey(const Key * const key);
     virtual void anim_callFrameChangeUpdater();
@@ -92,18 +92,18 @@ public:
     virtual void anim_saveCurrentValueAsKey();
     virtual void anim_addKeyAtRelFrame(const int &relFrame);
 
-    Key *anim_getNextKey(const Key * const key);
-    Key* anim_getPrevKey(const Key * const key);
-    int anim_getNextKeyRelFrame(const Key * const key);
-    int anim_getPrevKeyRelFrame(const Key * const key);
+    Key *anim_getNextKey(const Key * const key) const;
+    Key* anim_getPrevKey(const Key * const key) const;
+    int anim_getNextKeyRelFrame(const Key * const key) const;
+    int anim_getPrevKeyRelFrame(const Key * const key) const;
     void anim_setRecordingValue(const bool &rec);
 
     bool SWT_isAnimator() const;
     int anim_getCurrentAbsFrame();
     int anim_getCurrentRelFrame();
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
-    Key* anim_getPrevKey(const int &relFrame);
-    Key* anim_getNextKey(const int &relFrame);
+    Key* anim_getPrevKey(const int &relFrame) const;
+    Key* anim_getNextKey(const int &relFrame) const;
     void anim_shiftAllKeys(const int &shift);
 
     bool prp_nextRelFrameWithKey(const int &relFrame,
@@ -120,8 +120,8 @@ public:
 
     void disableFakeComplexAnimator();
     void disableFakeComplexAnimatrIfNotNeeded();
-    int anim_getPrevKeyRelFrame(const int &relFrame);
-    int anim_getNextKeyRelFrame(const int &relFrame);
+    int anim_getPrevKeyRelFrame(const int &relFrame) const;
+    int anim_getNextKeyRelFrame(const int &relFrame) const;
     bool anim_getNextAndPreviousKeyIdForRelFrameF(int &prevIdP, int &nextIdP,
                                                   const qreal &frame) const;
     bool hasSelectedKeys() const;

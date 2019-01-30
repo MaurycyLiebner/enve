@@ -6,116 +6,121 @@
 #include "smartPointers/sharedpointerdefs.h"
 #include "itemwidget.h"
 #include "itemwrapper.h"
+class SimpleBrushWrapper;
+struct BrushData;
 
-
-class BrushWrapper : public ItemWrapper<MyPaintBrush*> {
+class _SimpleBrushWrapper {
 public:
-    BrushWrapper(const QString& name,
-                 const QString& collectionName,
-                 MyPaintBrush* const brush,
-                 const QImage& icon);
+    virtual ~_SimpleBrushWrapper();
 
-    ~BrushWrapper();
-
-    static MyPaintBrush * createBrushDuplicate(
-            const BrushWrapper * const src) {
-        auto cpy = mypaint_brush_new();
-        for(int i = 0; i < MYPAINT_BRUSH_SETTINGS_COUNT; i++) {
-            auto id = static_cast<MyPaintBrushSetting>(i);
-            auto val = src->getValue(id);
-            mypaint_brush_set_base_value(cpy, id, val);
-        }
-        return cpy;
+    stdsptr<SimpleBrushWrapper> createDuplicate();
+    MyPaintBrush * getBrush() const {
+        return mBrush;
     }
-
-    static stdsptr<BrushWrapper> createBrushWrapper(
-            const QString& fileName, const QString &collectionName);
     void setColor(const float& hue,
                   const float& saturation,
                   const float& value) const {
-        auto brush = getItem();
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_COLOR_H,
                                      hue);
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_COLOR_S,
                                      saturation);
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_COLOR_V,
                                      value);
     }
 
     float getValue(const MyPaintBrushSetting& id) const {
-        return mypaint_brush_get_base_value(getItem(), id);
+        return mypaint_brush_get_base_value(mBrush, id);
     }
 
     void setValue(const MyPaintBrushSetting& id, const float& val) const {
-        mypaint_brush_set_base_value(getItem(), id, val);
+        mypaint_brush_set_base_value(mBrush, id, val);
     }
 
     void setPaintBrushSize(const qreal &size) const {
-        auto brush = getItem();
         float brushSize = static_cast<float>(size);
         mypaint_brush_set_base_value(
-                    brush, MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                    mBrush, MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
                     brushSize);
     }
 
     void incPaintBrushSize(const qreal &inc) const {
-        auto brush = getItem();
         float sizeF = mypaint_brush_get_base_value(
-                    brush, MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
+                    mBrush, MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
         setPaintBrushSize(static_cast<qreal>(sizeF) + inc);
     }
 
     void decPaintBrushSize(const qreal &dec) const {
-        auto brush = getItem();
         float sizeF = mypaint_brush_get_base_value(
-                    brush, MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
+                    mBrush, MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
         setPaintBrushSize(static_cast<qreal>(sizeF) - dec);
     }
 
     void startEraseMode() const {
-        auto brush = getItem();
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_ERASER,
-                                     1.f);
+                                     1);
     }
 
     void finishEraseMode() const {
-        auto brush = getItem();
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_ERASER,
-                                     0.f);
+                                     0);
     }
 
     void startAlphaLockMode() const {
-        auto brush = getItem();
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_LOCK_ALPHA,
-                                     1.f);
+                                     1);
     }
 
     void finishAlphaLockMode() const {
-        auto brush = getItem();
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_LOCK_ALPHA,
-                                     0.f);
+                                     0);
     }
 
     void startColorizeMode() const {
-        auto brush = getItem();
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_COLORIZE,
-                                     1.f);
+                                     1);
     }
 
     void finishColorizeMode() const {
-        auto brush = getItem();
-        mypaint_brush_set_base_value(brush,
+        mypaint_brush_set_base_value(mBrush,
                                      MYPAINT_BRUSH_SETTING_COLORIZE,
-                                     0.f);
+                                     0);
     }
+protected:
+    _SimpleBrushWrapper(MyPaintBrush * const brush,
+                        const QByteArray& wholeFile);
+private:
+    MyPaintBrush *mBrush;
+    QByteArray mWholeFile;
+};
+
+class SimpleBrushWrapper :
+        public _SimpleBrushWrapper,
+        public StdSelfRef {
+    friend class StdSelfRef;
+protected:
+    SimpleBrushWrapper(MyPaintBrush * const brush,
+                       const QByteArray &wholeFile);
+};
+
+class BrushWrapper : public _SimpleBrushWrapper,
+        public ItemWrapper<stdsptr<SimpleBrushWrapper>> {
+    friend class StdSelfRef;
+public:
+    static stdsptr<BrushWrapper> createBrushWrapper(const BrushData &brushD, const QString &collectionName);
+protected:
+    BrushWrapper(const QString& name,
+                 const QString& collectionName,
+                 const stdsptr<SimpleBrushWrapper>& brush,
+                 const QImage& icon,
+                 const QByteArray &wholeFile);
 };
 
 typedef ItemWidget<BrushWrapper> BrushWidget;

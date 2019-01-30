@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "smartPointers/sharedpointerdefs.h"
-class CacheHandler;
+class RenderCacheHandler;
 
 class AnimationWidgetScrollBar : public QWidget {
     Q_OBJECT
@@ -30,7 +30,7 @@ public:
         mHandleColor = col;
     }
 
-    void setCacheHandler(CacheHandler *handler);
+    void setCacheHandler(RenderCacheHandler *handler);
 
     void setDisplayedFrameRange(const int &minFrame,
                                 const int &maxFrame);
@@ -73,7 +73,7 @@ private:
     qreal mLastMousePressFrame;
 
     QColor mHandleColor = QColor(100, 100, 100);
-    CacheHandler* mCacheHandler_d = nullptr;
+    RenderCacheHandler* mCacheHandler_d = nullptr;
 };
 
 #endif // ANIMATiONWIDGETSCROLLBAR_H

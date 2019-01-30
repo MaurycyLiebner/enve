@@ -73,7 +73,7 @@ void Animator::disableFakeComplexAnimatrIfNotNeeded() {
     }
 }
 
-int Animator::anim_getNextKeyRelFrame(const Key * const key) {
+int Animator::anim_getNextKeyRelFrame(const Key * const key) const {
     if(key == nullptr) return INT_MAX;
     Key* nextKey = key->getNextKey();
     if(nextKey == nullptr) {
@@ -82,7 +82,7 @@ int Animator::anim_getNextKeyRelFrame(const Key * const key) {
     return nextKey->getRelFrame();
 }
 
-int Animator::anim_getNextKeyRelFrame(const int &relFrame) {
+int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
     Key* key = anim_getNextKey(relFrame);
     if(key == nullptr) return INT_MAX;
     Key* nextKey = key->getNextKey();
@@ -92,7 +92,7 @@ int Animator::anim_getNextKeyRelFrame(const int &relFrame) {
     return nextKey->getRelFrame();
 }
 
-int Animator::anim_getPrevKeyRelFrame(const Key * const key) {
+int Animator::anim_getPrevKeyRelFrame(const Key * const key) const {
     if(key == nullptr) return INT_MIN;
     Key* prevKey = key->getPrevKey();
     if(prevKey == nullptr) {
@@ -101,7 +101,7 @@ int Animator::anim_getPrevKeyRelFrame(const Key * const key) {
     return prevKey->getRelFrame();
 }
 
-int Animator::anim_getPrevKeyRelFrame(const int &relFrame) {
+int Animator::anim_getPrevKeyRelFrame(const int &relFrame) const {
     Key* key = anim_getPrevKey(relFrame);
     if(key == nullptr) return INT_MIN;
     Key* prevKey = key->getPrevKey();
@@ -112,7 +112,7 @@ int Animator::anim_getPrevKeyRelFrame(const int &relFrame) {
 }
 
 void Animator::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
-    if(range.contains(anim_mCurrentAbsFrame)) {
+    if(range.inRange(anim_mCurrentAbsFrame)) {
         prp_currentFrameChanged();
     }
     emit prp_absFrameRangeChanged(range);
@@ -224,19 +224,19 @@ int Animator::anim_getKeyIndex(const Key * const key) const {
     return index;
 }
 
-Key* Animator::anim_getNextKey(const Key * const key) {
+Key* Animator::anim_getNextKey(const Key * const key) const {
     int keyId = anim_getKeyIndex(key);
     if(keyId == anim_mKeys.count() - 1) return nullptr;
     return anim_mKeys.at(keyId + 1).get();
 }
 
-Key* Animator::anim_getPrevKey(const Key * const key) {
+Key* Animator::anim_getPrevKey(const Key * const key) const {
     int keyId = anim_getKeyIndex(key);
     if(keyId <= 0) return nullptr;
     return anim_mKeys.at(keyId - 1).get();
 }
 
-Key *Animator::anim_getNextKey(const int &relFrame) {
+Key *Animator::anim_getNextKey(const int &relFrame) const {
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
@@ -252,7 +252,7 @@ Key *Animator::anim_getNextKey(const int &relFrame) {
     return nullptr;
 }
 
-Key *Animator::anim_getPrevKey(const int &relFrame) {
+Key *Animator::anim_getPrevKey(const int &relFrame) const {
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
@@ -273,7 +273,7 @@ void Animator::anim_deleteCurrentKey() {
     anim_mKeyOnCurrentFrame->deleteKey();
 }
 
-Key *Animator::anim_getKeyAtRelFrame(const int &frame) {
+Key *Animator::anim_getKeyAtRelFrame(const int &frame) const {
     if(anim_mKeys.isEmpty()) return nullptr;
     if(frame > anim_mKeys.last()->getRelFrame()) return nullptr;
     if(frame < anim_mKeys.first()->getRelFrame()) return nullptr;

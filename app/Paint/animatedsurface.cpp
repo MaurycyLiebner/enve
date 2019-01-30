@@ -314,19 +314,19 @@ FrameRange AnimatedSurface::prp_getIdenticalRelFrameRange(const int &relFrame) c
     auto range = Animator::prp_getIdenticalRelFrameRange(relFrame);
     if(!mIsDraft) return range;
     if(anim_mKeys.count() > 1) {
-        if(range.min == INT_MIN) {
+        if(range.fMin == INT_MIN) {
             int firstKeyFrame = anim_mKeys.first()->getRelFrame();
             if(firstKeyFrame - mOverlapFrames < relFrame) {
                 return {relFrame, relFrame};
             } else {
-                return {range.min, firstKeyFrame - mOverlapFrames};
+                return {range.fMin, firstKeyFrame - mOverlapFrames};
             }
-        } else if(range.max == INT_MAX) {
+        } else if(range.fMax == INT_MAX) {
             int lastKeyFrame = anim_mKeys.last()->getRelFrame();
             if(lastKeyFrame + mOverlapFrames > relFrame) {
                 return {relFrame, relFrame};
             } else {
-                return {lastKeyFrame + mOverlapFrames, range.max};
+                return {lastKeyFrame + mOverlapFrames, range.fMax};
             }
         }
     }

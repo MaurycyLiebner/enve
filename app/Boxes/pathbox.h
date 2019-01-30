@@ -1,4 +1,4 @@
-﻿#ifndef PATHBOX_H
+#ifndef PATHBOX_H
 #define PATHBOX_H
 #include <QDialog>
 #include <QVBoxLayout>
@@ -6,7 +6,7 @@
 #include "Boxes/boundingbox.h"
 #include "Animators/paintsettings.h"
 #include "canvas.h"
-#include "Paint/fixedtiledsurface.h"
+#include "Paint/autotiledsurface.h"
 #include "GUI/BrushWidgets/brushwidget.h"
 #include <mypaint-brush.h>
 class GradientPoints;
@@ -19,57 +19,23 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
         BoundingBoxRenderData(parentBoxT) {
     }
 
-    SkPath editPath;
-    SkPath path;
-    SkPath fillPath;
-    SkPath outlinePath;
-    UpdatePaintSettings paintSettings;
-    UpdateStrokeSettings strokeSettings;
+    SkPath fEditPath;
+    SkPath fPath;
+    SkPath fFillPath;
+    SkPath fOutlinePath;
+    UpdatePaintSettings fPaintSettings;
+    UpdateStrokeSettings fStrokeSettings;
 
     void updateRelBoundingRect() {
         SkPath totalPath;
-        totalPath.addPath(fillPath);
-        totalPath.addPath(outlinePath);
+        totalPath.addPath(fFillPath);
+        totalPath.addPath(fOutlinePath);
         fRelBoundingRect = SkRectToQRectF(totalPath.computeTightBounds());
     }
     QPointF getCenterPosition() {
-        return SkRectToQRectF(editPath.getBounds()).center();
+        return SkRectToQRectF(fEditPath.getBounds()).center();
     }
-
-    void afterProcessingFinished() {
-        SkPixmap pix;
-        fRenderedImage->peekPixels(&pix);
-        SkBitmap bit;
-        bit.installPixels(pix);
-        SkCanvas canvas(bit);
-        auto brush = const_cast<BrushWrapper*>(
-                    fParentBox->getParentCanvas()->getCurrentBrush());
-        FixedTiledSurface surf;
-
-        surf.initialize(qCeil(fGlobalBoundingRect.width()),
-                        qCeil(fGlobalBoundingRect.height()));
-        SkPath pathT;
-        fillPath.offset(-qCeil(fGlobalBoundingRect.x()),
-                        -qCeil(fGlobalBoundingRect.y()),
-                        &pathT);
-        auto brushSet = BrushStrokeSet::fillStrokesForSkPath(pathT, 5);
-        brush->setColor(0, 0, 1);
-        for(auto& set : brushSet) {
-            set.execute(brush->getItem(), &surf, 5);
-        }
-        brushSet = BrushStrokeSet::outlineStrokesForSkPath(pathT, 5, 5);
-        brush->setColor(0, 0, 0);
-        for(auto& set : brushSet) {
-            set.execute(brush->getItem(), &surf, 5);
-        }
-
-
-        surf.draw(&canvas, 0, 0);
-        canvas.flush();
-        BoundingBoxRenderData::afterProcessingFinished();
-    }
-
-private:
+protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
@@ -77,16 +43,59 @@ private:
         paint.setAntiAlias(true);
         paint.setStyle(SkPaint::kFill_Style);
 
-        if(!fillPath.isEmpty()) {
-            paintSettings.applyPainterSettingsSk(&paint);
+        if(!fFillPath.isEmpty()) {
+            fPaintSettings.applyPainterSettingsSk(&paint);
 
-            canvas->drawPath(fillPath, paint);
+            canvas->drawPath(fFillPath, paint);
         }
-        if(!outlinePath.isEmpty()) {
-            paint.setShader(nullptr);
-            strokeSettings.applyPainterSettingsSk(&paint);
+        if(!fOutlinePath.isEmpty()) {
+            if(fStrokeSettings.fPaintType == PaintType::BRUSHPAINT
+                    /*strokeSettings.fStrokeBrush*/) {
+                if(!fStrokeSettings.fStrokeBrush) {
+                    canvas->restore();
+                    return;
+                }
+                canvas->resetMatrix();
+                AutoTiledSurface surf;
+                surf.loadBitmap(fBitmapTMP);
 
-            canvas->drawPath(outlinePath, paint);
+                SkPath pathT;
+                QMatrix trans;
+                trans.translate(-fGlobalBoundingRect.left(),
+                                -fGlobalBoundingRect.top());
+                trans = fScaledTransform*trans;
+                fPath.transform(QMatrixToSkMatrix(trans), &pathT);
+//                auto brushSet = BrushStrokeSet::fillStrokesForSkPath(pathT, 5);
+//                brush->setColor(0, 0, 1);
+//                for(auto& set : brushSet) {
+//                    set.execute(brush->getItem(), &surf, 5);
+//                }
+                auto brushSet = BrushStrokeSet::outlineStrokesForSkPath(
+                            pathT,
+                            fStrokeSettings.fTimeCurve,
+                            fStrokeSettings.fPressureCurve,
+                            fStrokeSettings.fWidthCurve, 5, 5);
+                QColor col = fStrokeSettings.fPaintColor;
+                col.setRgbF(col.blueF(), col.greenF(),
+                            col.redF(), col.alphaF());
+                fStrokeSettings.fStrokeBrush->setColor(
+                            qrealToSkScalar(col.hueF()),
+                            qrealToSkScalar(col.saturationF()),
+                            qrealToSkScalar(col.valueF()));
+                auto brush = fStrokeSettings.fStrokeBrush->getBrush();
+                for(auto& set : brushSet) {
+                    surf.execute(brush, set);
+                }
+
+                fBitmapTMP.reset();
+                fBitmapTMP = surf.toBitmap();
+                fGlobalBoundingRect.translate(-surf.zeroTilePos());
+            } else {
+                paint.setShader(nullptr);
+                fStrokeSettings.applyPainterSettingsSk(&paint);
+
+                canvas->drawPath(fOutlinePath, paint);
+            }
         }
 
         canvas->restore();
@@ -102,11 +111,27 @@ public:
 
     void resetFillGradientPointsPos();
 
-    virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
+    void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
+    void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
+    void setStrokeWidth(const qreal &strokeWidth);
 
-    virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
-
-    virtual void setStrokeWidth(const qreal &strokeWidth);
+    void setStrokeBrush(_SimpleBrushWrapper * const brush) {
+        mStrokeSettings->setStrokeBrush(brush);
+        clearAllCache();
+        scheduleUpdate(Animator::USER_CHANGE);
+    }
+    void setStrokeBrushWidthCurve(
+            const qCubicSegment1D& curve) {
+        mStrokeSettings->setStrokeBrushWidthCurve(curve);
+    }
+    void setStrokeBrushTimeCurve(
+            const qCubicSegment1D& curve) {
+        mStrokeSettings->setStrokeBrushTimeCurve(curve);
+    }
+    void setStrokeBrushPressureCurve(
+            const qCubicSegment1D& curve) {
+        mStrokeSettings->setStrokeBrushPressureCurve(curve);
+    }
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);
@@ -236,7 +261,7 @@ public:
 //        p.end();
 
 //        mLabel_TEST->setPixmap(pix);
-//    }
+    //    }
 protected:
     PathBox(const BoundingBoxType &type);
     void getMotionBlurProperties(QList<Property*> &list) const;

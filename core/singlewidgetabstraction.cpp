@@ -132,7 +132,7 @@ SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
 void SingleWidgetAbstraction::removeChildAbstractionForTarget(
         SingleWidgetTarget* target) {
     auto childAbs = getChildAbstractionForTarget(target);
-    removeChildAbstraction(childAbs);
+    if(childAbs) removeChildAbstraction(childAbs);
 }
 
 void SingleWidgetAbstraction::removeChildAbstraction(

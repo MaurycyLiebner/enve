@@ -19,28 +19,26 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
 
     void updateRelBoundingRect() {
         SkPath boundingPaths = SkPath();
-        Q_FOREACH(const stdsptr<BoundingBoxRenderData> &child,
-                  childrenRenderData) {
+        Q_FOREACH(const auto &child, fChildrenRenderData) {
             SkPath childPath;
             childPath.addRect(
                     QRectFToSkRect(
                         child->fRelBoundingRect));
             childPath.transform(
                         QMatrixToSkMatrix(
-                            child->fRelTransform) );
+                            child->fRelTransform));
             boundingPaths.addPath(childPath);
         }
         fRelBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
     }
     void renderToImage();
 
-    QList<stdsptr<BoundingBoxRenderData>> childrenRenderData;
+    QList<stdsptr<BoundingBoxRenderData>> fChildrenRenderData;
 protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
-        Q_FOREACH(const stdsptr<BoundingBoxRenderData> &child,
-                  childrenRenderData) {
+        Q_FOREACH(const auto &child, fChildrenRenderData) {
             child->drawRenderedImageForParent(canvas);
         }
 
@@ -79,7 +77,6 @@ public:
     void updateContainedBoxIds(const int &firstId,
                               const int &lastId);
     void removeContainedBox_k(const qsptr<BoundingBox> &child);
-    void removeContainedBox(const qsptr<BoundingBox> &child);
     void increaseContainedBoxZInList(BoundingBox *child);
     void decreaseContainedBoxZInList(BoundingBox *child);
     void bringContainedBoxToEndList(BoundingBox *child);
@@ -97,7 +94,29 @@ public:
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokeWidth(const qreal &strokeWidth);
-
+    void setStrokeBrush(_SimpleBrushWrapper * const brush) {
+        for(const auto& box : mContainedBoxes) {
+            box->setStrokeBrush(brush);
+        }
+    }
+    void setStrokeBrushWidthCurve(
+            const qCubicSegment1D& curve) {
+        for(const auto& box : mContainedBoxes) {
+            box->setStrokeBrushWidthCurve(curve);
+        }
+    }
+    void setStrokeBrushTimeCurve(
+            const qCubicSegment1D& curve) {
+        for(const auto& box : mContainedBoxes) {
+            box->setStrokeBrushTimeCurve(curve);
+        }
+    }
+    void setStrokeBrushPressureCurve(
+            const qCubicSegment1D& curve) {
+        for(const auto& box : mContainedBoxes) {
+            box->setStrokeBrushPressureCurve(curve);
+        }
+    }
     PaintSettings *getFillSettings() const;
     StrokeSettings *getStrokeSettings() const;
     void updateAllBoxes(const UpdateReason &reason);
@@ -125,10 +144,11 @@ public:
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
     void clearAllCache();
-    void drawPixmapSk(SkCanvas *canvas, GrContext * const grContext);
+    void drawPixmapSk(SkCanvas * const canvas,
+                      GrContext * const grContext);
     void setDescendantCurrentGroup(const bool &bT);
-    bool isDescendantCurrentGroup();
-    bool shouldPaintOnImage();
+    bool isDescendantCurrentGroup() const;
+    bool shouldPaintOnImage() const;
 
     bool SWT_isBoxesGroup() const;
     void drawSk(SkCanvas *canvas);
@@ -205,6 +225,8 @@ public:
 //                                 int &prevRelFrame);
     bool enabledGroupPathSumEffectPresent();
 protected:
+    void removeContainedBox(const qsptr<BoundingBox> &child);
+
     QList<qsptr<PathEffect>> mGroupPathSumEffects;
     qsptr<PathEffectAnimators> mPathEffectsAnimators;
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;

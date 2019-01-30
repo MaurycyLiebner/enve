@@ -20,31 +20,31 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
             loadImageFromHandler();
         }
         BoundingBoxRenderData::beforeProcessingStarted();
-        if(image.get() == nullptr) {
+        if(fImage.get() == nullptr) {
             qDebug() << "ImageBoxRenderData::beforeUpdate() - no image to render";
         }
     }
 
     bool allDataReady() {
-        return image.get() != nullptr;
+        return fImage.get() != nullptr;
     }
 
     void updateRelBoundingRect() {
-        fRelBoundingRect = QRectF(0., 0., image->width(), image->height());
+        fRelBoundingRect = QRectF(0., 0., fImage->width(), fImage->height());
     }
 
-    sk_sp<SkImage> image;
+    sk_sp<SkImage> fImage;
 
     FileCacheHandler *srcCacheHandler;
 private:
     void drawSk(SkCanvas *canvas) {
         SkPaint paint;
-        paint.setFilterQuality(kHigh_SkFilterQuality);
-        paint.setAntiAlias(true);
-        if(image == nullptr) {
+        //paint.setFilterQuality(kHigh_SkFilterQuality);
+        //paint.setAntiAlias(true);
+        if(!fImage) {
             qDebug() << "ImageBoxRenderData::drawSk() - no image to draw";
         }
-        canvas->drawImage(image, 0, 0, &paint);
+        canvas->drawImage(fImage, 0, 0, &paint);
     }
 };
 

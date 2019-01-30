@@ -35,13 +35,13 @@ void Property::prp_setParentFrameShift(const int &shift,
 }
 
 FrameRange Property::prp_relRangeToAbsRange(const FrameRange& range) const {
-    return {prp_relFrameToAbsFrame(range.min),
-            prp_relFrameToAbsFrame(range.max)};
+    return {prp_relFrameToAbsFrame(range.fMin),
+            prp_relFrameToAbsFrame(range.fMax)};
 }
 
 FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {
-    return {prp_absFrameToRelFrame(range.min),
-            prp_absFrameToRelFrame(range.max)};
+    return {prp_absFrameToRelFrame(range.fMin),
+            prp_absFrameToRelFrame(range.fMax)};
 }
 
 int Property::prp_absFrameToRelFrame(const int &absFrame) const {

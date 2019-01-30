@@ -51,12 +51,12 @@ public:
             setName(linkTarget->getName() + " link");
             mBoxTarget->setTarget(linkTarget);
             linkTarget->addLinkingBox(this);
-            connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
-                    this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
+            connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
+                    this, &BoundingBox::prp_updateAfterChangedRelFrameRange);
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
-                this, SLOT(setTargetSlot(BoundingBox*)));
+        connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
+                this, &InternalLinkBox::setTargetSlot);
     }
 
     bool relPointInsidePath(const QPointF &relPos) const;
@@ -141,12 +141,12 @@ public:
             setName(linkTarget->getName() + " link");
             mBoxTarget->setTarget(linkTarget);
             linkTarget->addLinkingBox(this);
-            connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
-                    this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
+            connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
+                    this, &BoundingBox::prp_updateAfterChangedRelFrameRange);
         }
         scheduleUpdate(Animator::USER_CHANGE);
-        connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
-                this, SLOT(setTargetSlot(BoundingBox*)));
+        connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
+                this, &InternalLinkGroupBox::setTargetSlot);
     }
 
     //bool relPointInsidePath(const QPointF &relPos);
@@ -216,19 +216,17 @@ public:
                             BoundingBoxRenderData* data) {
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto groupData = GetAsPtr(data, BoxesGroupRenderData);
-        groupData->childrenRenderData.clear();
+        groupData->fChildrenRenderData.clear();
         qreal childrenEffectsMargin = 0.;
         qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        foreach(const qsptr<BoundingBox> &box, mContainedBoxes) {
+        foreach(const auto &box, mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 BoundingBoxRenderData* boxRenderData =
                         box->getCurrentRenderData(qRound(boxRelFrame));
-                if(boxRenderData == nullptr) {
-                    continue;
-                }
+                if(!boxRenderData) continue;
                 boxRenderData->addDependent(data);
-                groupData->childrenRenderData <<
+                groupData->fChildrenRenderData <<
                         GetAsSPtr(boxRenderData, BoundingBoxRenderData);
                 childrenEffectsMargin =
                         qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
@@ -247,7 +245,7 @@ public:
 
     int prp_getRelFrameShift() const {
         if(getLinkTarget()->SWT_isLinkBox() ||
-           (mParentGroup == nullptr ? false : mParentGroup->SWT_isLinkBox())) {
+           (mParentGroup ? mParentGroup->SWT_isLinkBox() : false)) {
             return BoxesGroup::prp_getRelFrameShift() +
                     getLinkTarget()->prp_getRelFrameShift();
         }
@@ -279,14 +277,14 @@ struct LinkCanvasRenderData : public CanvasRenderData {
     friend class StdSelfRef;
 
     void updateRelBoundingRect() {
-        if(clipToCanvas) {
+        if(fClipToCanvas) {
             CanvasRenderData::updateRelBoundingRect();
         } else {
             BoxesGroupRenderData::updateRelBoundingRect();
         }
     }
 
-    bool clipToCanvas = false;
+    bool fClipToCanvas = false;
 protected:
     LinkCanvasRenderData(BoundingBox* parentBoxT) :
         CanvasRenderData(parentBoxT) {}

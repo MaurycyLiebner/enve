@@ -8,10 +8,11 @@ VideoEncoder::VideoEncoder() {
     mVideoEncoderInstance = this;
 }
 
-void VideoEncoder::addContainer(CacheContainer *cont) {
-    if(cont == nullptr) return;
+void VideoEncoder::addContainer(
+        const stdsptr<ImageCacheContainer>& cont) {
+    if(!cont) return;
     cont->setBlocked(true);
-    mNextContainers.append(GetAsSPtr(cont, CacheContainer));
+    mNextContainers.append(cont);
     scheduleTask();
 }
 
@@ -709,7 +710,7 @@ void VideoEncoder::finishEncodingNow() {
 }
 
 void VideoEncoder::clearContainers() {
-    foreach(const stdsptr<CacheContainer> &cont,
+    foreach(const stdsptr<ImageCacheContainer> &cont,
             _mContainers) {
         cont->setBlocked(false);
     }
@@ -723,14 +724,14 @@ void VideoEncoder::_processUpdate() {
         bool avAligned = true;
         if(mEncodeAudio) {
             avAligned = av_compare_ts(mVideoStream.next_pts,
-                                    mVideoStream.enc->time_base,
-                                    mAudioStream.next_pts,
-                                    mAudioStream.enc->time_base) <= 0;
+                                      mVideoStream.enc->time_base,
+                                      mAudioStream.next_pts,
+                                      mAudioStream.enc->time_base) <= 0;
         }
         if(mEncodeVideo && encodeVideoT && avAligned) {
-            stdsptr<CacheContainer> cacheCont =
+            stdsptr<ImageCacheContainer> cacheCont =
                     _mContainers.at(_mCurrentContainerId);
-            int nFrames = cacheCont->getMaxRelFrame() - cacheCont->getMinRelFrame() + 1;
+            const int nFrames = cacheCont->rangeSpan();
             if(!write_video_frame(mFormatContext, &mVideoStream,
                                   cacheCont->getImageSk(),
                                   &mEncodeVideo, mUpdateError) ) {
@@ -759,20 +760,16 @@ void VideoEncoder::beforeProcessingStarted() {
     _mCurrentContainerFrame = 0;
     _mContainers.append(mNextContainers);
     mNextContainers.clear();
-    if(!mCurrentlyEncoding) {
-        clearContainers();
-    }
-
+    if(!mCurrentlyEncoding) clearContainers();
 }
 
 void VideoEncoder::afterProcessingFinished() {
     bool firstT = true;
     for(int i = _mCurrentContainerId - 1; i >= 0; i--) {
-        const stdsptr<CacheContainer> &cont =
-                _mContainers.at(i);
+        const auto &cont = _mContainers.at(i);
         if(firstT) {
-            Canvas *currCanvas = mRenderInstanceSettings->getTargetCanvas();
-            currCanvas->setCurrentPreviewContainer(cont.get(), true);
+            auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
+            currCanvas->setCurrentPreviewContainer(cont, true);
             firstT = false;
         } else {
             cont->setBlocked(false);
@@ -806,22 +803,23 @@ VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {
     return mVideoEncoderInstance->getEmitter();
 }
 
-void VideoEncoder::finishEncodingStatic() {
+void VideoEncoder::sFinishEncoding() {
     mVideoEncoderInstance->finishCurrentEncoding();
 }
 
-bool VideoEncoder::encodingSuccessfulyStartedStatic() {
+bool VideoEncoder::sEncodingSuccessfulyStarted() {
     return mVideoEncoderInstance->getCurrentlyEncoding();
 }
 
-void VideoEncoder::interruptEncodingStatic() {
+void VideoEncoder::sInterruptEncoding() {
     mVideoEncoderInstance->interruptCurrentEncoding();
 }
 
-void VideoEncoder::startEncodingStatic(RenderInstanceSettings *settings) {
+void VideoEncoder::sStartEncoding(RenderInstanceSettings *settings) {
     mVideoEncoderInstance->startNewEncoding(settings);
 }
 
-void VideoEncoder::addCacheContainerToEncoderStatic(CacheContainer *cont) {
+void VideoEncoder::sAddCacheContainerToEncoder(
+        const stdsptr<ImageCacheContainer> &cont) {
     mVideoEncoderInstance->addContainer(cont);
 }

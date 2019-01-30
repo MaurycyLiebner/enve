@@ -11,6 +11,7 @@ extern "C" {
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
 #include "filesourcescache.h"
+#include "FileCacheHandlers/videocachehandler.h"
 
 VideoBox::VideoBox() :
     AnimationBox() {
@@ -18,24 +19,24 @@ VideoBox::VideoBox() :
     setName("Video");
 }
 
-VideoBox::~VideoBox() {
-    Canvas *parentCanvas = getParentCanvas();
-    if(parentCanvas != nullptr && mSound != nullptr) {
-        parentCanvas->getSoundComposition()->removeSound(mSound);
-    }
-}
-
 VideoBox::VideoBox(const QString &filePath) :
     VideoBox() {
     setFilePath(filePath);
 }
 
+VideoBox::~VideoBox() {
+    auto parentCanvas = getParentCanvas();
+    if(parentCanvas && mSound) {
+        parentCanvas->getSoundComposition()->removeSound(mSound);
+    }
+}
+
 void VideoBox::setParentGroup(BoxesGroup *parent) {
-    if(mParentGroup != nullptr && mSound != nullptr) {
+    if(mParentGroup && mSound) {
         getParentCanvas()->getSoundComposition()->removeSound(mSound);
     }
     AnimationBox::setParentGroup(parent);
-    if(mParentGroup != nullptr && mSound != nullptr) {
+    if(mParentGroup && mSound) {
         getParentCanvas()->getSoundComposition()->addSound(mSound);
     }
 }
@@ -59,14 +60,15 @@ FrameRange VideoBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
 
 void VideoBox::setFilePath(const QString &path) {
     mSrcFilePath = path;
-    if(mAnimationCacheHandler == nullptr) {
+    if(!mAnimationCacheHandler) {
         auto currentHandler =
                 FileSourcesCache::getHandlerForFilePath(mSrcFilePath);
         mAnimationCacheHandler =
                 GetAsPtr(currentHandler, AnimationCacheHandler);
-        if(mAnimationCacheHandler == nullptr) {
-            VideoCacheHandler* newHandler =
-                    VideoCacheHandler::createNewHandler(mSrcFilePath);
+        if(!mAnimationCacheHandler) {
+            auto newHandler = FileSourcesCache::
+                    createNewHandler<VideoCacheHandler>(
+                        mSrcFilePath);
             mAnimationCacheHandler = newHandler;
         }
         mAnimationCacheHandler->addDependentBox(this);
@@ -103,15 +105,15 @@ bool hasSound(const char* path) {
 
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
-        if(mSound == nullptr) {
+        if(mSound) {
+            mSound->reloadDataFromFile();
+        } else {
             auto flar = GetAsPtr(mDurationRectangle, FixedLenAnimationRect);
             mSound = SPtrCreate(SingleSound)(mSrcFilePath, flar);
             ca_addChildAnimator(mSound);
-            if(mParentGroup != nullptr) {
+            if(mParentGroup) {
                 getParentCanvas()->getSoundComposition()->addSound(mSound);
             }
-        } else {
-            mSound->reloadDataFromFile();
         }
     } else {
     }

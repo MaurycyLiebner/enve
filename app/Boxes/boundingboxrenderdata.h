@@ -16,7 +16,6 @@ class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public _ScheduledTask {
     friend class StdSelfRef;
     BoundingBoxRenderData(BoundingBox *parentBoxT);
-    virtual ~BoundingBoxRenderData();
 
     virtual void copyFrom(BoundingBoxRenderData *src);
     stdsptr<BoundingBoxRenderData> makeCopy();
@@ -35,14 +34,16 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     Animator::UpdateReason fReason;
 
     bool fRedo = false;
+    uint fBoxStateId = 0;
 
     bool fRenderedToImage = false;
+    QMatrix fScaledTransform;
     QMatrix fTransform;
     QMatrix fParentTransform;
     QMatrix fRelTransform;
     QRectF fRelBoundingRect;
     QRectF fGlobalBoundingRect;
-    qreal fOpacity = 1.;
+    qreal fOpacity = 1;
     qreal fResolution;
     qreal fEffectsMargin;
     int fRelFrame;
@@ -55,7 +56,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     // for motion blur
 
     QList<stdsptr<PixmapEffectRenderData>> fPixmapEffects;
-    SkPoint fDrawPos = SkPoint::Make(0.f, 0.f);
+    SkPoint fDrawPos = SkPoint::Make(0, 0);
     SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
     QRectF fMaxBoundsRect;
     bool fMaxBoundsEnabled = true;
@@ -63,6 +64,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     bool fParentIsTarget = true;
     qptr<BoundingBox> fParentBox;
     sk_sp<SkImage> fRenderedImage;
+    SkBitmap fBitmapTMP;
 
     virtual void updateRelBoundingRect();
     void drawRenderedImageForParent(SkCanvas *canvas);
@@ -82,7 +84,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
 
     void clearPixmapEffects() {
         fPixmapEffects.clear();
-        fEffectsMargin = 0.;
+        fEffectsMargin = 0;
     }
 
     virtual QPointF getCenterPosition() {
@@ -110,7 +112,6 @@ protected:
 class RenderDataCustomizerFunctor : public StdSelfRef {
 public:
     RenderDataCustomizerFunctor();
-    virtual ~RenderDataCustomizerFunctor();
     virtual void customize(BoundingBoxRenderData *data) = 0;
     void operator()(BoundingBoxRenderData* data);
 };
@@ -133,7 +134,7 @@ public:
     void customize(BoundingBoxRenderData *data);
 protected:
     QMatrix mTransform;
-    qreal mOpacity = 1.;
+    qreal mOpacity = 1;
 };
 
 class MultiplyOpacityCustomizer : public RenderDataCustomizerFunctor {

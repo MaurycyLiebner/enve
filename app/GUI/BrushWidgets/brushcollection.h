@@ -7,14 +7,12 @@
 class QVBoxLayout;
 class FlowLayout;
 struct MyPaintBrush;
+struct BrushCollectionData;
 
 class BrushCollection : public CollectionArea<BrushWrapper> {
 public:
-    BrushCollection(const QString& dirPath,
+    BrushCollection(const BrushCollectionData& data,
                     QWidget* parent);
-
-    void loadCollectionFromDir(const QString& mainDirPath);
-    bool loadBrushFromFile(const QString& path);
 };
 
 #endif // BRUSHCOLLECTION_H

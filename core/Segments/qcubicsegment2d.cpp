@@ -1,6 +1,7 @@
 #include "qcubicsegment2d.h"
 #include "qcubicsegment1d.h"
 #include "simplemath.h"
+#include "exceptions.h"
 
 qCubicSegment2D::qCubicSegment2D(const qCubicSegment1D &xSeg,
                                  const qCubicSegment1D &ySeg) {
@@ -178,26 +179,9 @@ qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
 
 qreal qCubicSegment2D::tFurthestInDirection(const qreal &deg) const {
     auto rotSeg = rotated(deg);
-    auto xS = rotSeg.xSeg();
-    qCubic1DToNamedVals(xS, x);
-    bool p0Further = px0 >= cx1 && px0 >= cx2;
-    bool p3Further = px1 >= cx1 && px1 >= cx2;
-    if(p0Further || p3Further) {
-        if(px1 > px0) return 1;
-        else return 0;
-    }
-    qreal den = px0 - 3*cx1 + 3*cx2 - px1;
-    qreal num0 = px0 - 2*cx1 + cx2;
-    qreal numSqrt = sqrt(pow2(cx1) - px0*cx2 - cx1*cx2 +
-                         pow2(cx2) + px0*px1 - cx1*px1);
-    qreal t1 = (num0 + numSqrt)/den;
-    qreal t2 = (num0 - numSqrt)/den;
-    if(t1 > 0 || t1 < 1) return t1;
-    if(t2 > 0 || t2 < 1) return t2;
-    Q_ASSERT(false);
-    return 0;
+    return rotSeg.xSeg().tWithBiggestValue();
 }
-#include "exceptions.h"
+
 qCubicSegment2D qCubicSegment2D::tFragment(qreal minT, qreal maxT) const {
     maxT = CLAMP01(maxT);
     minT = CLAMP01(minT);

@@ -11,19 +11,19 @@ ColorAnimatorButton::ColorAnimatorButton(ColorAnimator *colorTarget,
     mColorTarget = colorTarget;
     if(colorTarget != nullptr) {
         connect(colorTarget->getVal1Animator(),
-                SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(update()));
+                &QrealAnimator::valueChangedSignal,
+                this, qOverload<>(&ColorAnimatorButton::update));
         connect(colorTarget->getVal2Animator(),
-                SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(update()));
+                &QrealAnimator::valueChangedSignal,
+                this, qOverload<>(&ColorAnimatorButton::update));
         connect(colorTarget->getVal3Animator(),
-                SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(update()));
+                &QrealAnimator::valueChangedSignal,
+                this, qOverload<>(&ColorAnimatorButton::update));
     }
 }
 
 void ColorAnimatorButton::paintEvent(QPaintEvent *) {
-    if(mColorTarget == nullptr) return;
+    if(!mColorTarget) return;
     QPainter p(this);
     if(mHover) {
         p.setPen(Qt::red);
@@ -45,8 +45,8 @@ void ColorAnimatorButton::openColorSettingsDialog() {
             new ColorSettingsWidget(dialog);
     colorSettingsWidget->setColorAnimatorTarget(mColorTarget);
     dialog->layout()->addWidget(colorSettingsWidget);
-    connect(MainWindow::getInstance(), SIGNAL(updateAll()),
-            dialog, SLOT(update()));
-
-    dialog->show();
+    connect(MainWindow::getInstance(), &MainWindow::updateAll,
+            dialog, qOverload<>(&QDialog::update));
+    dialog->raise();
+    dialog->exec();
 }

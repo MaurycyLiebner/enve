@@ -3,9 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-
+#include "colorconversions.h"
 #include "fixedtiledsurface.h"
-
 
 void freeSimpleTiledSurf(MyPaintSurface *surface) {
     FixedTiledSurface *self = (FixedTiledSurface*)surface;
@@ -74,8 +73,8 @@ bool FixedTiledSurface::resize(const int &width, const int &height) {
     fRealHeight = realHeight;
     SkImageInfo info = SkImageInfo::Make(realWidth, realHeight,
                                          kBGRA_8888_SkColorType,
-                                         kUnpremul_SkAlphaType,
-                                         //kPremul_SkAlphaType,
+                                         //kUnpremul_SkAlphaType,
+                                         kPremul_SkAlphaType,
                                          nullptr);
     fBitmap.allocPixels(info);
     fBitmap.eraseColor(SK_ColorTRANSPARENT);
@@ -105,19 +104,19 @@ void FixedTiledSurface::_startRequest(MyPaintTileRequest * const request) {
     const int tx = request->tx;
     const int ty = request->ty;
 
-    uint16_t* tile_pointer = nullptr;
+    uint16_t* tilePointer = nullptr;
 
     if (tx >= fTilesWidth || ty >= fTilesHeight || tx < 0 || ty < 0) {
         // Give it a tile which we will ignore writes to
-        tile_pointer = fNullTile;
+        tilePointer = fNullTile;
     } else {
         // Compute the offset for the tile into our linear memory buffer of tiles
         size_t offset = static_cast<size_t>(tx * fTilesHeight + ty) * fTileSize;
 
-        tile_pointer = fTileBuffer + offset/sizeof(uint16_t);
+        tilePointer = fTileBuffer + offset/sizeof(uint16_t);
     }
 
-    request->buffer = tile_pointer;
+    request->buffer = tilePointer;
 }
 
 void FixedTiledSurface::_endRequest(MyPaintTileRequest * const request) {
@@ -132,52 +131,6 @@ void FixedTiledSurface::_endRequest(MyPaintTileRequest * const request) {
     }
 }
 
-// Naive conversion code from the internal MyPaint format and 8 bit RGB
-void fix15_to_rgba8(uint16_t* src,
-                    const int& srcWidth,
-                    uint8_t* dst,
-                    const int& dstWidth,
-                    const int& height) {
-    for(int i = 0; i < height; i++) {
-        uint16_t *srcLine = src + i * srcWidth * 4;
-        uint8_t *dstLine = dst + i * dstWidth * 4;
-        for(int j = 0; j < srcWidth; j++) {
-            uint32_t r, g, b, a;
-
-            r = *srcLine++;
-            g = *srcLine++;
-            b = *srcLine++;
-            a = *srcLine++;
-
-            // un-premultiply alpha (with rounding)
-            if(a != 0) {
-//                r = ((r << 15)) / a;
-//                g = ((g << 15)) / a;
-//                b = ((b << 15)) / a;
-                r = ((r << 15) + a/2) / a;
-                g = ((g << 15) + a/2) / a;
-                b = ((b << 15) + a/2) / a;
-            } else {
-                r = g = b = 0;
-            }
-
-            // Variant A) rounding
-            const uint32_t add_r = (1<<15)/2;
-            const uint32_t add_g = (1<<15)/2;
-            const uint32_t add_b = (1<<15)/2;
-            const uint32_t add_a = (1<<15)/2;
-            *dstLine++ = (r * 255 + add_r) / (1<<15);
-            *dstLine++ = (g * 255 + add_g) / (1<<15);
-            *dstLine++ = (b * 255 + add_b) / (1<<15);
-            *dstLine++ = (a * 255 + add_a) / (1<<15);
-//            *dstLine++ = (r * 255) / (1<<15);
-//            *dstLine++ = (g * 255) / (1<<15);
-//            *dstLine++ = (b * 255) / (1<<15);
-//            *dstLine++ = (a * 255) / (1<<15);
-        }
-    }
-}
-
 void FixedTiledSurface::updateImage(const int &tx, const int &ty) {
     MyPaintTileRequest request;
     request.tx = tx; request.ty = ty;
@@ -185,8 +138,22 @@ void FixedTiledSurface::updateImage(const int &tx, const int &ty) {
     int tileSize = fParent.tile_size;
     uint8_t* dst = static_cast<uint8_t*>(fBitmap.getPixels()) +
             (ty*tileSize*fRealWidth + tx*tileSize)*4;
-    fix15_to_rgba8(request.buffer, tileSize,
+    rgba16_to_rgba8_premultiplied(request.buffer, tileSize,
                    dst, fRealWidth, tileSize);
 
     _endRequest(&request);
+}
+
+void FixedTiledSurface::loadBitmap(const SkBitmap& bitmap) {
+    uint8_t * const srcBits = static_cast<uint8_t*>(bitmap.getPixels());
+    int tileSize = fParent.tile_size;
+
+    int nCols = fTilesWidth;
+    for(int i = 0; i < nCols; i++) {
+        uint16_t* dst = fTileBuffer + i*tileSize*fRealHeight*4;
+        uint8_t* src = srcBits + i*tileSize*4;
+        rgba8_to_rgba16(src, fRealWidth,
+                        dst, tileSize,
+                        fRealHeight);
+    }
 }

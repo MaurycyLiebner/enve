@@ -1,4 +1,5 @@
 #include "imagesequencebox.h"
+#include "FileCacheHandlers/imagesequencecachehandler.h"
 #include "filesourcescache.h"
 #include "GUI/mainwindow.h"
 #include <QFileDialog>
@@ -10,11 +11,12 @@ ImageSequenceBox::ImageSequenceBox() :
 
 void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     mListOfFrames = listOfFrames;
-    if(mAnimationCacheHandler != nullptr) {
+    if(mAnimationCacheHandler) {
         mAnimationCacheHandler->removeDependentBox(this);
     }
-    mAnimationCacheHandler =
-            ImageSequenceCacheHandler::createNewHandler(mListOfFrames);
+    mAnimationCacheHandler = FileSourcesCache::
+            createNewHandler<ImageSequenceCacheHandler>(
+                mListOfFrames);
     mAnimationCacheHandler->addDependentBox(this);
 
     reloadCacheHandler();

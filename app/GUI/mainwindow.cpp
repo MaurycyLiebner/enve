@@ -241,11 +241,11 @@ void MainWindow::setupMenuBar() {
                          this, SLOT(newFile()),
                          Qt::CTRL + Qt::Key_N);
     mFileMenu->addAction("Open...",
-                         this, SLOT(openFile()),
+                         this, &MainWindow::openFile,
                          Qt::CTRL + Qt::Key_O);
     mFileMenu->addSeparator();
     mFileMenu->addAction("Link...",
-                         this, SLOT(linkFile()),
+                         this, &MainWindow::linkFile,
                          Qt::CTRL + Qt::Key_L);
     mFileMenu->addAction("Import File...",
                          mCanvasWindow, SLOT(importFile()),
@@ -253,30 +253,28 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addAction("Import Image Sequence...",
                          this, SLOT(importImageSequence()));
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Revert", this, SLOT(revert()));
+    mFileMenu->addAction("Revert", this, &MainWindow::revert);
     mFileMenu->addSeparator();
     mFileMenu->addAction("Save",
-                         this, SLOT(saveFile()),
+                         this, &MainWindow::saveFile,
                          Qt::CTRL + Qt::Key_S);
     mFileMenu->addAction("Save As...",
-                         this, SLOT(saveFileAs()),
+                         this, &MainWindow::saveFileAs,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     mFileMenu->addAction("Save Backup",
                          this, SLOT(saveBackup()));
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Close",
-                         this, SLOT(closeProject()));
+    mFileMenu->addAction("Close", this, &MainWindow::closeProject);
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Exit",
-                         this, SLOT(close()));
+    mFileMenu->addAction("Exit", this, &MainWindow::close);
 
     mEditMenu = mMenuBar->addMenu("Edit");
 
     mEditMenu->addAction("Undo",
-                         this, SLOT(undo()),
+                         this, &MainWindow::undo,
                          Qt::CTRL + Qt::Key_Z);
     mEditMenu->addAction("Redo",
-                         this, SLOT(redo()),
+                         this, &MainWindow::redo,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
     mEditMenu->addAction("Undo History...");
     mEditMenu->addSeparator();
@@ -848,7 +846,7 @@ bool MainWindow::isAltPressed() {
     return QApplication::keyboardModifiers() & Qt::AltModifier;
 }
 
-BrushWrapper *MainWindow::getCurrentBrush() const {
+_SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
     return mBrushSelectionWidget->getCurrentItem();
 }
 
@@ -862,6 +860,7 @@ void MainWindow::queScheduledTasksAndUpdate() {
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
     mTaskScheduler.queScheduledCPUTasks();
+    mTaskScheduler.queScheduledHDDTasks();
 //    if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
 //        mCanvasWindow->processSchedulers();
 //        foreach(const stdsptr<_ScheduledTask> &updatable,
@@ -1068,7 +1067,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
         }
-        queScheduledTasksAndUpdate();
+        if(event->key() != Qt::Key_Control) queScheduledTasksAndUpdate();
         return returnBool;
     }
     return false;
@@ -1114,8 +1113,12 @@ void MainWindow::openFile() {
             "Open File", mCurrentFilePath, "AniVect Files (*.av)");
         if(!openPath.isEmpty()) {
             clearAll();
-            setCurrentPath(openPath);
-            loadAVFile(mCurrentFilePath);
+            try {
+                loadAVFile(mCurrentFilePath);
+                setCurrentPath(openPath);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         }
         enable();
         setFileChangedSinceSaving(false);
@@ -1127,8 +1130,12 @@ void MainWindow::saveFile() {
         saveFileAs();
         return;
     }
-    saveToFile(mCurrentFilePath);
-    setFileChangedSinceSaving(false);
+    try {
+        saveToFile(mCurrentFilePath);
+        setFileChangedSinceSaving(false);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
 }
 
 void MainWindow::saveFileAs() {
@@ -1138,10 +1145,14 @@ void MainWindow::saveFileAs() {
                                "AniVect Files (*.av)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {
-        setCurrentPath(saveAs);
-        saveToFile(mCurrentFilePath);
+        try {
+            saveToFile(mCurrentFilePath);
+            setCurrentPath(saveAs);
+            setFileChangedSinceSaving(false);
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+        }
     }
-    setFileChangedSinceSaving(false);
 }
 
 void MainWindow::saveBackup() {
@@ -1152,14 +1163,17 @@ void MainWindow::saveBackup() {
         id++;
         backupFile.setFileName(backupPath.arg(id) );
     }
-    saveToFile(backupPath.arg(id));
+    try {
+        saveToFile(backupPath.arg(id));
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
 }
 
 bool MainWindow::closeProject() {
     if(askForSaving()) {
         setCurrentPath("");
         clearAll();
-        setFileChangedSinceSaving(false);
         return true;
     }
     return false;
@@ -1202,7 +1216,11 @@ void MainWindow::importImageSequence() {
 
 void MainWindow::revert() {
     clearAll();
-    loadAVFile(mCurrentFilePath);
+    try {
+        loadAVFile(mCurrentFilePath);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
     setFileChangedSinceSaving(false);
 }
 
@@ -1228,7 +1246,7 @@ void MainWindow::setCurrentFrame(const int &frame) {
 }
 
 Gradient *MainWindow::getLoadedGradientById(const int &id) {
-    Q_FOREACH(Gradient *gradient, mLoadedGradientsList) {
+    for(Gradient * const gradient : mLoadedGradientsList) {
         if(gradient->getLoadId() == id) {
             return gradient;
         }
@@ -1240,6 +1258,6 @@ void MainWindow::clearLoadedGradientsList() {
     mLoadedGradientsList.clear();
 }
 
-void MainWindow::addLoadedGradient(Gradient *gradient) {
+void MainWindow::addLoadedGradient(Gradient * const gradient) {
     mLoadedGradientsList << gradient;
 }

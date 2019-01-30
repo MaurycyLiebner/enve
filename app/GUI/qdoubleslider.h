@@ -8,10 +8,15 @@
 class QDoubleSlider : public QWidget {
     Q_OBJECT
 public:
-    QDoubleSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
-                  QWidget *parent = nullptr);
-    QDoubleSlider(QString name, qreal minVal, qreal maxVal, qreal prefferedStep,
-                  QWidget *parent = nullptr);
+    QDoubleSlider(const qreal& minVal,
+                  const qreal& maxVal,
+                  const qreal& prefferedStep,
+                  QWidget * const parent = nullptr);
+    QDoubleSlider(const QString& name,
+                  const qreal& minVal,
+                  const qreal& maxVal,
+                  const qreal& prefferedStep,
+                  QWidget * const parent = nullptr);
     QDoubleSlider(QWidget *parent = nullptr);
     virtual ~QDoubleSlider();
 

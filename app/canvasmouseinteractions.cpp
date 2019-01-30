@@ -204,7 +204,9 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
     }
 }
 
-bool Canvas::handleSelectedCanvasAction(QAction *selectedAction, QWidget* widgetsParent) {
+bool Canvas::handleSelectedCanvasAction(QAction *selectedAction,
+                                        QWidget* widgetsParent) {
+    Q_UNUSED(widgetsParent);
     if(selectedAction->objectName() == "canvas_copy") {
         copyAction();
     } if(selectedAction->objectName() == "canvas_cut") {

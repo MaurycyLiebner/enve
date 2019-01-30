@@ -87,10 +87,10 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
     mButtonsLayout->addWidget(mOkButton);
     mButtonsLayout->addWidget(mCancelButton);
 
-    connect(mOkButton, SIGNAL(released()),
-            this, SLOT(accept()));
-    connect(mCancelButton, SIGNAL(released()),
-            this, SLOT(reject()));
+    connect(mOkButton, &QPushButton::released,
+            this, &CanvasSettingsDialog::accept);
+    connect(mCancelButton, &QPushButton::released,
+            this, &CanvasSettingsDialog::reject);
 }
 
 int CanvasSettingsDialog::getCanvasWidth() {

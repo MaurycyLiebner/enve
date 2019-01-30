@@ -119,7 +119,8 @@ void QrealAnimatorValueSlider::clearAnimator() {
     mAnimator = nullptr;
 }
 
-void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
+void QrealAnimatorValueSlider::setAnimator(
+        QrealAnimator * const animator) {
     if(animator == mAnimator) return;
     clearAnimator();
     mAnimator = animator;
@@ -138,7 +139,8 @@ void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
     }
 }
 
-void QrealAnimatorValueSlider::setIntAnimator(IntProperty *animator) {
+void QrealAnimatorValueSlider::setIntAnimator(
+        IntProperty * const animator) {
     if(animator == mAnimator) return;
     clearAnimator();
     if(animator != nullptr) {

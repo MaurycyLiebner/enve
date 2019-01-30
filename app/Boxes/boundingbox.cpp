@@ -48,7 +48,7 @@ BoundingBox::~BoundingBox() {}
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     Property::prp_updateAfterChangedAbsFrameRange(range);
-    if(range.contains(anim_mCurrentAbsFrame)) {
+    if(range.inRange(anim_mCurrentAbsFrame)) {
         scheduleUpdate(Animator::USER_CHANGE);
     }
 }
@@ -154,7 +154,7 @@ void BoundingBox::setStrokeColorMode(const ColorMode &colorMode) {
 
 bool BoundingBox::isAncestor(BoxesGroup *box) const {
     if(mParentGroup == box) return true;
-    if(mParentGroup == nullptr) return false;
+    if(!mParentGroup) return false;
     return mParentGroup->isAncestor(box);
 }
 
@@ -252,7 +252,7 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
                 anim_mCurrentRelFrame);
     if(mUpdateDrawOnParentBox != isInVisRange) {
         if(mUpdateDrawOnParentBox) {
-            if(mParentGroup != nullptr) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
+            if(mParentGroup) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
         } else {
             scheduleUpdate(Animator::FRAME_CHANGE);
         }
@@ -292,7 +292,7 @@ VectorPathEdge *BoundingBox::getEdge(const QPointF &absPos, const qreal &canvasS
 bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
         const int &relFrame1, const int &relFrame2) {
     bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
-    if(mParentGroup == nullptr || diffThis) return diffThis;
+    if(!mParentGroup || diffThis) return diffThis;
     int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
     int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
     int parentRelFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
@@ -306,7 +306,7 @@ bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
 
 void BoundingBox::setParentGroup(BoxesGroup *parent) {
     mParentGroup = parent;
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     mParentTransform = parent->getTransformAnimator();
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
@@ -368,8 +368,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(mPivotAutoAdjust &&
-       !mTransformAnimator->rotOrScaleOrPivotRecording()) {
+    if(mPivotAutoAdjust && !prp_isDescendantRecording()) {
         setPivotPosition(renderData->getCenterPosition());
     }
 }
@@ -380,7 +379,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 }
 
 bool BoundingBox::shouldScheduleUpdate() {
-    if(mParentGroup == nullptr) return false;
+    if(!mParentGroup) return false;
     if((isVisibleAndInVisibleDurationRect()) ||
             (isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame))) {
         return true;
@@ -394,34 +393,28 @@ void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
 
 void BoundingBox::scheduleUpdate(const int &relFrame,
                                  const UpdateReason& reason) {
-    //Q_ASSERT(!mBlockedSchedule);
-    if(mBlockedSchedule) return;
     if(!shouldScheduleUpdate()) return;
-    mExpiredPixmap = 1;
-//    if(SWT_isCanvas()) {
-        auto currentRenderData = getCurrentRenderData(relFrame);
-        if(currentRenderData == nullptr) {
-            currentRenderData = updateCurrentRenderData(relFrame, reason);
-            if(currentRenderData == nullptr) return;
-        } else {
-            if(!currentRenderData->fRedo && !currentRenderData->fCopied &&
-                    reason != UpdateReason::FRAME_CHANGE) {
-                currentRenderData->fRedo = currentRenderData->isQued();
-            }
-            return;
-        }
-        auto currentReason = currentRenderData->fReason;
-        if(reason == USER_CHANGE &&
-                (currentReason == CHILD_USER_CHANGE ||
-                 currentReason == FRAME_CHANGE)) {
-            currentRenderData->fReason = reason;
-        } else if(reason == CHILD_USER_CHANGE &&
-                  currentReason == FRAME_CHANGE) {
-            currentRenderData->fReason = reason;
-        }
-        currentRenderData->fRedo = false;
-        currentRenderData->scheduleTask();
-//    }
+    if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
+    mDrawRenderContainer->setExpired(true);
+    auto currentRenderData = getCurrentRenderData(relFrame);
+    if(currentRenderData) {
+        if(currentRenderData->fRedo) return;
+        if(reason != UpdateReason::FRAME_CHANGE) return;
+        currentRenderData->fRedo = currentRenderData->isQued();
+        return;
+    }
+    currentRenderData = updateCurrentRenderData(relFrame, reason);
+    auto currentReason = currentRenderData->fReason;
+    if(reason == USER_CHANGE &&
+            (currentReason == CHILD_USER_CHANGE ||
+             currentReason == FRAME_CHANGE)) {
+        currentRenderData->fReason = reason;
+    } else if(reason == CHILD_USER_CHANGE &&
+              currentReason == FRAME_CHANGE) {
+        currentRenderData->fReason = reason;
+    }
+    currentRenderData->fRedo = false;
+    currentRenderData->scheduleTask();
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
@@ -446,9 +439,10 @@ BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
     BoundingBoxRenderData* currentRenderData =
             mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
-    if(currentRenderData == nullptr && mExpiredPixmap == 0) {
+    if(!currentRenderData) {
+        if(mDrawRenderContainer->isExpired()) return nullptr;
         currentRenderData = mDrawRenderContainer->getSrcRenderData();
-        if(currentRenderData == nullptr) return nullptr;
+        if(!currentRenderData) return nullptr;
 //        if(currentRenderData->fRelFrame == relFrame) {
         if(!prp_differencesBetweenRelFramesIncludingInherited(
                     currentRenderData->fRelFrame, relFrame)) {
@@ -478,11 +472,8 @@ bool BoundingBox::isContainedIn(const QRectF &absRect) const {
 }
 
 BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
-    if(absPointInsidePath(absPos)) {
-        return this;
-    } else {
-        return nullptr;
-    }
+    if(absPointInsidePath(absPos)) return this;
+    return nullptr;
 }
 
 QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
@@ -671,6 +662,7 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
 void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
+    data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fRenderedToImage = false;
     data->fRelTransform = getRelativeTransformAtRelFrameF(relFrame);
@@ -959,7 +951,7 @@ void BoundingBox::createDurationRectangle() {
             SPtrCreate(DurationRectangle)(this);
     durRect->setMinFrame(0);
     Canvas* parentCanvas = getParentCanvas();
-    if(parentCanvas != nullptr) {
+    if(parentCanvas) {
         durRect->setFramesDuration(getParentCanvas()->getFrameCount());
     }
     setDurationRectangle(durRect);
@@ -982,24 +974,24 @@ QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {
 }
 
 int BoundingBox::prp_getRelFrameShift() const {
-    if(mDurationRectangle == nullptr) return 0;
+    if(!mDurationRectangle) return 0;
     return mDurationRectangle->getFrameShift();
 }
 
 void BoundingBox::setDurationRectangle(
         const qsptr<DurationRectangle>& durationRect) {
     if(durationRect == mDurationRectangle) return;
-    if(mDurationRectangle != nullptr) {
+    if(mDurationRectangle) {
         disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
     }
     qsptr<DurationRectangle> oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted();
-    if(durationRect == nullptr) {
+    if(!mDurationRectangle) {
         shiftAll(oldDurRect->getFrameShift());
+        return;
     }
 
-    if(mDurationRectangle == nullptr) return;
     connect(mDurationRectangle.data(), &DurationRectangle::posChangedBy,
             this, &BoundingBox::updateAfterDurationRectangleShifted);
     connect(mDurationRectangle.data(), &DurationRectangle::rangeChanged,
@@ -1016,9 +1008,9 @@ void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_setAbsFrame(anim_mCurrentAbsFrame);
     auto visRange = getVisibleAbsFrameRange();
     if(dFrame > 0) {
-        visRange.min -= dFrame;
+        visRange.fMin -= dFrame;
     } else {
-        visRange.max -= dFrame;
+        visRange.fMax -= dFrame;
     }
     prp_updateAfterChangedAbsFrameRange(visRange);
 }
@@ -1026,10 +1018,10 @@ void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
 void BoundingBox::updateAfterDurationMinFrameChangedBy(const int &by) {
     auto visRange = getVisibleAbsFrameRange();
     if(by > 0) {
-        visRange.min -= by;
-        visRange.max = visRange.min - 1;
+        visRange.fMin -= by;
+        visRange.fMax = visRange.fMin - 1;
     } else {
-        visRange.max = visRange.min - by - 1;
+        visRange.fMax = visRange.fMin - by - 1;
     }
     prp_updateAfterChangedAbsFrameRange(visRange);
 }
@@ -1038,10 +1030,10 @@ void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
     auto visRange = getVisibleAbsFrameRange();
 
     if(by > 0) {
-        visRange.min = visRange.max - by + 1;
+        visRange.fMin = visRange.fMax - by + 1;
     } else {
-        visRange.min = visRange.max + 1;
-        visRange.max -= by;
+        visRange.fMin = visRange.fMax + 1;
+        visRange.fMax -= by;
     }
     prp_updateAfterChangedAbsFrameRange(visRange);
 }
@@ -1051,7 +1043,7 @@ void BoundingBox::updateAfterDurationRectangleRangeChanged() {}
 DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
         const int &relX, const int &minViewedFrame,
         const qreal &pixelsPerFrame) {
-    if(mDurationRectangle == nullptr) return nullptr;
+    if(!mDurationRectangle) return nullptr;
     return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
                                             minViewedFrame);
 }
@@ -1063,7 +1055,7 @@ void BoundingBox::prp_drawKeys(QPainter *p,
                                const int &endFrame,
                                const int &rowHeight,
                                const int &keyRectSize) {
-    if(mDurationRectangle != nullptr) {
+    if(mDurationRectangle) {
         p->save();
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
         mDurationRectangle->draw(p, pixelsPerFrame,
@@ -1111,13 +1103,13 @@ bool BoundingBox::isVisibleAndInVisibleDurationRect() const {
 }
 
 bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
-    if(mDurationRectangle == nullptr) return true;
+    if(!mDurationRectangle) return true;
     return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
 bool BoundingBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) const {
-    if(mDurationRectangle == nullptr) return true;
+    if(!mDurationRectangle) return true;
     return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
@@ -1155,8 +1147,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
             QList<Property*> propertiesT;
             getMotionBlurProperties(propertiesT);
             Q_FOREACH(const auto& child, propertiesT) {
-                Q_ASSERT(!range.isValid());
-                if(range.singleFrame()) break;
+                if(range.isUnary()) break;
                 auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
                 range *= childRange;
             }
@@ -1173,7 +1164,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
         return {INT_MIN, INT_MAX};
     }
     if(mParentGroup == nullptr || takeAncestorsIntoAccount) return range;
-    if(range.singleFrame()) return range;
+    if(range.isUnary()) return range;
     int parentRel = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
     auto parentRange = mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
@@ -1182,19 +1173,17 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
 }
 
 void BoundingBox::scheduleWaitingTasks() {
-    mBlockedSchedule = true;
-    foreach(const stdsptr<_ScheduledTask> &task, mScheduledTasks) {
+    foreach(const auto &task, mScheduledTasks) {
         task->taskQued();
     }
 }
 
 void BoundingBox::queScheduledTasks() {
-    foreach(const stdsptr<_ScheduledTask> &task, mScheduledTasks) {
-        TaskScheduler::sGetInstance()->scheduleCPUTask(task);
+    foreach(const auto &task, mScheduledTasks) {
+        TaskScheduler::sGetInstance()->queCPUTask(task);
     }
 
     mScheduledTasks.clear();
-    mBlockedSchedule = false;
 }
 
 const int &BoundingBox::getLoadId() const {
@@ -1211,8 +1200,8 @@ void BoundingBox::clearBoxLoadId() {
 }
 
 BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
-    foreach(const qptr<BoundingBox>& box, mLoadedBoxes) {
-        if(box == nullptr) return nullptr;
+    foreach(const auto& box, mLoadedBoxes) {
+        if(!box) return nullptr;
         if(box->getLoadId() == loadId) {
             return box;
         }
@@ -1228,8 +1217,7 @@ void BoundingBox::addFunctionWaitingForBoxLoad(
 void BoundingBox::addLoadedBox(BoundingBox *box) {
     mLoadedBoxes << box;
     for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
-        stdsptr<FunctionWaitingForBoxLoad> funcT =
-                mFunctionsWaitingForBoxLoad.at(i);
+        auto funcT = mFunctionsWaitingForBoxLoad.at(i);
         if(funcT->loadBoxId == box->getLoadId()) {
             funcT->boxLoaded(box);
             mFunctionsWaitingForBoxLoad.removeAt(i);
@@ -1243,7 +1231,7 @@ int BoundingBox::getLoadedBoxesCount() {
 }
 
 void BoundingBox::clearLoadedBoxes() {
-    foreach(const qptr<BoundingBox>& box, mLoadedBoxes) {
+    foreach(const auto& box, mLoadedBoxes) {
         box->clearBoxLoadId();
     }
     mLoadedBoxes.clear();
@@ -1431,7 +1419,7 @@ void BoundingBox::removeFromSelection() {
 
 bool BoundingBox::SWT_handleContextMenuActionSelected(
         QAction *selectedAction) {
-    if(selectedAction != nullptr) {
+    if(selectedAction) {
         if(selectedAction->text() == "Delete") {
             removeFromParent_k();
         } else if(selectedAction->text() == "Apply Transformation") {
@@ -1475,18 +1463,33 @@ QMimeData *BoundingBox::SWT_createMimeData() {
 }
 
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
-    mExpiredPixmap = 0;
     if(renderData->fRedo) {
         scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
-    mDrawRenderContainer->setSrcRenderData(renderData);
-    updateDrawRenderContainerTransform();
+    auto currentRenderData = mDrawRenderContainer->getSrcRenderData();
+    bool newerSate = true;
+    bool closerFrame = true;
+    if(currentRenderData) {
+        newerSate = currentRenderData->fBoxStateId <
+                renderData->fBoxStateId;
+        const int finishedFrameDist =
+                qAbs(anim_mCurrentRelFrame - renderData->fRelFrame);
+        const int oldFrameDist =
+                qAbs(anim_mCurrentRelFrame - currentRenderData->fRelFrame);
+        closerFrame = finishedFrameDist < oldFrameDist;
+    }
+    if(newerSate || closerFrame) {
+        mDrawRenderContainer->setSrcRenderData(renderData);
+        const bool currentState =
+                renderData->fBoxStateId == mStateId;
+        const bool currentFrame =
+                renderData->fRelFrame == anim_mCurrentRelFrame;
+        mDrawRenderContainer->setExpired(!currentState || !currentFrame);
+    }
 }
 
 FrameRange BoundingBox::getVisibleAbsFrameRange() const {
-    if(mDurationRectangle == nullptr) {
-        return {INT_MIN, INT_MAX};
-    }
+    if(!mDurationRectangle) return {INT_MIN, INT_MAX};
     return mDurationRectangle->getAbsFrameRange();
 }
 

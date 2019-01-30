@@ -33,6 +33,8 @@ struct BoxesGroupRenderData;
 struct GPURasterEffect;
 enum CanvasMode : short;
 
+class _SimpleBrushWrapper;
+
 enum BoundingBoxType {
     TYPE_VECTOR_PATH,
     TYPE_CIRCLE,
@@ -184,6 +186,22 @@ public:
     virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     virtual void setStrokeWidth(const qreal &strokeWidth);
 
+    virtual void setStrokeBrush(_SimpleBrushWrapper * const brush) {
+        Q_UNUSED(brush);
+    }
+    virtual void setStrokeBrushWidthCurve(
+            const qCubicSegment1D& curve) {
+        Q_UNUSED(curve);
+    }
+    virtual void setStrokeBrushTimeCurve(
+            const qCubicSegment1D& curve) {
+        Q_UNUSED(curve);
+    }
+    virtual void setStrokeBrushPressureCurve(
+            const qCubicSegment1D& curve) {
+        Q_UNUSED(curve);
+    }
+
     virtual void startSelectedStrokeWidthTransform();
     virtual void startSelectedStrokeColorTransform();
     virtual void startSelectedFillColorTransform();
@@ -221,7 +239,7 @@ public:
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
     template <class T>
     void addEffect() {
-        addEffect(T::template createSPtr<T>());
+        addEffect(SPtrCreateTemplated(T)());
     }
 
     void addEffect(const qsptr<PixmapEffect> &effect);
@@ -434,11 +452,11 @@ protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 
     bool mSelected = false;
-    bool mBlockedSchedule = false;
     bool mUpdateDrawOnParentBox = true;
     bool mPivotAutoAdjust = true;
     bool mVisible = true;
     bool mLocked = false;
+    uint mStateId = 0;
 
     int mZListIndex = 0;
     int mNReasonsNotToApplyUglyTransform = 0;

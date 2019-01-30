@@ -87,7 +87,6 @@ public:
     void anim_removeKey(const stdsptr<Key> &keyToRemove);
     void getSelectedSegments(QList<QList<GraphKey*>> &segments);
 protected:
-
     QPainterPath mKeysPath;
 private:
     int anim_mSelected = 0;

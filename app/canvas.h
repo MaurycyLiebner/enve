@@ -59,7 +59,7 @@ struct CanvasRenderData : public BoxesGroupRenderData {
     void renderToImage();
     qreal canvasWidth;
     qreal canvasHeight;
-    SkColor bgColor;
+    SkColor fBgColor;
 protected:
     void drawSk(SkCanvas *canvas);
 
@@ -74,8 +74,8 @@ class Canvas : public BoxesGroup {
     friend class SelfRef;
 public:
     explicit Canvas(CanvasWindow *canvasWidget,
-                    int canvasWidth = 1920,
-                    int canvasHeight = 1080,
+                    const int &canvasWidth = 1920,
+                    const int &canvasHeight = 1080,
                     const int &frameCount = 200,
                     const qreal &fps = 24.);
     ~Canvas();
@@ -108,11 +108,6 @@ public:
     //void updateAfterFrameChanged(const int &currentFrame);
 
     QSize getCanvasSize();
-
-    void playPreview(const int &minPreviewFrameId,
-                     const int &maxPreviewFrameId);
-
-    void clearPreview();
 
     void centerPivotPosition() {}
 
@@ -182,6 +177,14 @@ public:
     void setSelectedCapStyle(const Qt::PenCapStyle& capStyle);
     void setSelectedJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setSelectedStrokeWidth(const qreal &strokeWidth);
+    void setSelectedStrokeBrush(_SimpleBrushWrapper * const brush);
+    void setSelectedStrokeBrushWidthCurve(
+            const qCubicSegment1D& curve);
+    void setSelectedStrokeBrushTimeCurve(
+            const qCubicSegment1D& curve);
+    void setSelectedStrokeBrushPressureCurve(
+            const qCubicSegment1D& curve);
+
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
@@ -341,20 +344,25 @@ public:
                                                 BoundingBoxRenderData* data) {
         BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
-        canvasData->bgColor = QColorToSkColor(mBackgroundColor->getCurrentColor());
+        canvasData->fBgColor = QColorToSkColor(mBackgroundColor->getCurrentColor());
         canvasData->canvasHeight = mHeight*mResolutionFraction;
         canvasData->canvasWidth = mWidth*mResolutionFraction;
     }
 
     bool clipToCanvas() { return mClipToCanvasSize; }
 
-    const BrushWrapper * getCurrentBrush() const;
-    void setCurrentBrush(const BrushWrapper * const brush) {
+    const _SimpleBrushWrapper * getCurrentBrush() const;
+    void setCurrentBrush(const _SimpleBrushWrapper * const brush) {
         mCurrentBrush = brush;
     }
 
     void incBrushRadius();
     void decBrushRadius();
+
+    void schedulePivotUpdate();
+    void setClipToCanvas(const bool &bT) { mClipToCanvasSize = bT; }
+    void setRasterEffectsVisible(const bool &bT) { mRasterEffectsVisible = bT; }
+    void setPathEffectsVisible(const bool &bT) { mPathEffectsVisible = bT; }
 protected:
 //    void updateAfterCombinedTransformationChanged() {
 ////        Q_FOREACH(const qsptr<BoundingBox>& child, mChildBoxes) {
@@ -378,14 +386,9 @@ signals:
 private slots:
     void emitCanvasNameChanged();
 public slots:
-    void schedulePivotUpdate();
     void scheduleDisplayedFillStrokeSettingsUpdate();
 
-    void nextPreviewFrame();
     void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
-    void setClipToCanvas(const bool &bT) { mClipToCanvasSize = bT; }
-    void setRasterEffectsVisible(const bool &bT) { mRasterEffectsVisible = bT; }
-    void setPathEffectsVisible(const bool &bT) { mPathEffectsVisible = bT; }
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -437,13 +440,17 @@ public:
     void beforeCurrentFrameRender();
     void afterCurrentFrameRender();
     //void updatePixmaps();
-    CacheHandler& getCacheHandler() {
+    RenderCacheHandler& getCacheHandler() {
         return mCacheHandler;
     }
 
-    void setCurrentPreviewContainer(CacheContainer *cont,
+    void setCurrentPreviewContainer(const int& relFrame,
                                     const bool &frameEncoded = false);
-    void setLoadingPreviewContainer(CacheContainer *cont);
+    void setCurrentPreviewContainer(
+            const stdsptr<ImageCacheContainer> &cont,
+            const bool &frameEncoded = false);
+    void setLoadingPreviewContainer(
+            const stdsptr<ImageCacheContainer> &cont);
 
     void setRenderingPreview(const bool &bT);
 
@@ -599,12 +606,12 @@ private:
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
-    const BrushWrapper * mCurrentBrush = nullptr;
+    const _SimpleBrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;
 
-    CacheHandler mCacheHandler;
+    RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 
     sk_sp<SkImage> mRenderImageSk;
@@ -665,8 +672,8 @@ protected:
     bool mRenderingOutput = false;
 
     bool mCurrentPreviewContainerOutdated = false;
-    stdsptr<CacheContainer> mCurrentPreviewContainer;
-    stdsptr<CacheContainer> mLoadingPreviewContainer;
+    stdsptr<ImageCacheContainer> mCurrentPreviewContainer;
+    stdsptr<ImageCacheContainer> mLoadingPreviewContainer;
 
     int mCurrentPreviewFrameId;
     int mMaxPreviewFrameId = 0;
@@ -686,7 +693,7 @@ protected:
     int mWidth;
     int mHeight;
 
-    qreal mFps = 24.;
+    qreal mFps = 24;
 
     qreal mVisibleWidth;
     qreal mVisibleHeight;

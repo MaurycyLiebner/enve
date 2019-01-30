@@ -32,9 +32,9 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
     QString text =
             QInputDialog::getMultiLineText(
                 dialogParent, getName() + " text",
-                "Text:", mText->getCurrentTextValue(), &ok);
+                "Text:", mText->getCurrentValue(), &ok);
     if(ok) {
-        mText->setCurrentTextValue(text);
+        mText->setCurrentValue(text);
     }
 }
 
@@ -70,8 +70,8 @@ QString TextBox::getFontStyle() {
     return mFont.styleName();
 }
 
-QString TextBox::getCurrentTextValue() {
-    return mText->getCurrentTextValue();
+QString TextBox::getCurrentValue() {
+    return mText->getCurrentValue();
 }
 
 MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
@@ -112,7 +112,7 @@ SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
     QPainterPath qPath = QPainterPath();
 
     qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
-    QString textAtFrame = mText->getTextValueAtRelFrame(relFrame);
+    QString textAtFrame = mText->getValueAtRelFrame(relFrame);
     QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
     qreal yT = 0.;
@@ -140,7 +140,7 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     QPainterPath qPath = QPainterPath();
 
     qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrameF(relFrame)*0.01;
-    QString textAtFrame = mText->getTextValueAtRelFrame(relFrame);
+    QString textAtFrame = mText->getValueAtRelFrame(relFrame);
     QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
     qreal yT = 0.;
@@ -162,8 +162,8 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     return QPainterPathToSkPath(qPath);
 }
 
-void TextBox::setCurrentTextValue(const QString &text) {
-    mText->setCurrentTextValue(text);
+void TextBox::setCurrentValue(const QString &text) {
+    mText->setCurrentValue(text);
 }
 
 bool TextBox::differenceInEditPathBetweenFrames(

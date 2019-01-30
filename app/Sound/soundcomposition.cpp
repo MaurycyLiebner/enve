@@ -19,8 +19,8 @@ void SoundComposition::generateData(const int &startAbsFrame,
                                     const qreal &fps) {
     if(mSounds.isEmpty()) return;
 
-    uint nSamples =
-            static_cast<uint>(qCeil((endAbsFrame - startAbsFrame)*SOUND_SAMPLERATE/fps));
+    uint nSamples = static_cast<uint>(
+                qCeil((endAbsFrame - startAbsFrame)*SOUND_SAMPLERATE/fps));
     //float *data1 = nullptr;
     float *data = new float[nSamples];
     for(uint i = 0; i < nSamples; i++) {
@@ -37,7 +37,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
 //    }
 //    free(data1);
 
-    Q_FOREACH(const qsptr<SingleSound> &sound, mSounds) {
+    Q_FOREACH(const auto &sound, mSounds) {
         sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);
         const int &soundStartFrame = sound->getStartAbsFrame();
         const int &soundSampleCount = sound->getSampleCount();

@@ -8,6 +8,18 @@ class BrushCollection;
 class FlowLayout;
 #include "itemselectionwidget.h"
 
+struct BrushData {
+    QString fName;
+    stdsptr<SimpleBrushWrapper> fWrapper;
+    QImage fIcon;
+    QByteArray fWholeFile;
+};
+
+struct BrushCollectionData {
+    QString fName;
+    QList<BrushData> fBrushes;
+};
+
 class BrushSelectionWidget : public ItemSelectionWidget<BrushWrapper> {
     Q_OBJECT
 public:
@@ -24,7 +36,9 @@ protected:
         emit currentBrushChanged(brushWrapper);
     }
 private:
-    void loadCollectionFromDir(const QString& mainDirPath);
+    static void sLoadCollectionsFromDir(const QString& mainDirPath);
+    static QList<BrushCollectionData> sData;
+    static bool sLoaded;
 };
 
 #endif // BRUSHSELECTIONWIDGET_H

@@ -1,5 +1,6 @@
 #include "qcubicsegment1d.h"
 #include "simplemath.h"
+#include "qcubicsegment2d.h"
 
 qreal qCubicSegment1D::valAtT(const qreal &t) const {
     return qPow(1 - t, 3)*p0() +
@@ -53,6 +54,21 @@ qCubicSegment1D::Pair qCubicSegment1D::dividedAtT(qreal t) {
     qCubicSegment1D seg2(P0112_1223, P12_23, P2_3, p1());
 
     return {seg1, seg2};
+}
+#include "exceptions.h"
+
+qCubicSegment1D qCubicSegment1D::tFragment(qreal minT, qreal maxT) {
+    maxT = CLAMP01(maxT);
+    minT = CLAMP01(minT);
+    if(isZero6Dec(minT - maxT)) return qCubicSegment1D(valAtT(minT));
+    if(minT > maxT) {
+        RuntimeThrow("Wrong t range. Min value larger than max.");
+    }
+    if(isZero6Dec(minT - 1)) return qCubicSegment1D(mP1);
+    qCubicSegment1D div1 = dividedAtT(minT).second;
+    if(isZero6Dec(maxT - 1)) return div1;
+    qreal mappedMaxT = (maxT - minT)/(1 - minT);
+    return div1.dividedAtT(mappedMaxT).first;
 }
 
 const qreal &qCubicSegment1D::p0() const { return mP0; }
@@ -136,6 +152,69 @@ qreal qCubicSegment1D::minDistanceTo(const qreal &p,
     return minError;
 }
 
+qreal qCubicSegment1D::maxValue() const {
+    return valAtT(tWithBiggestValue());
+}
+
+qreal qCubicSegment1D::minValue() const {
+    return valAtT(tWithSmallestValue());
+}
+
+void qCubicSegment1D::solveDerivativeZero(
+        qreal &t1, qreal &t2, qreal &t3) const {
+    const qreal den = 3*c1() - 3*c2() + p1() - p0();
+    const qreal num0 = 2*c1() - c2() - p0();
+    const qreal numSqrt = sqrt(pow2(c1()) - p0()*c2() - c1()*c2() +
+                         pow2(c2()) + p0()*p1() - c1()*p1());
+    t1 = CLAMP01((num0 + numSqrt)/den);
+    t2 = CLAMP01((num0 - numSqrt)/den);
+    t3 = CLAMP01((3*c2() - 2*p0() - p1())/(6*c2() - 2*p0() - 4*p1()));
+}
+
+qreal qCubicSegment1D::tWithBiggestValue() const {
+    const bool p0Further = p0() >= c1() && p0() >= c2();
+    const bool p1Further = p1() >= c1() && p1() >= c2();
+    if(p0Further || p1Further) {
+        if(p1() > p0()) return 1;
+        return 0;
+    }
+    qreal t1, t2, t3;
+    solveDerivativeZero(t1, t2, t3);
+
+    qreal maxVal = DBL_MIN;
+    qreal bestT = 0;
+    for(const qreal& t : { 0., 1., t1, t2, t3}) {
+        const qreal valT = valAtT(t);
+        if(valT > maxVal) {
+            maxVal = valT;
+            bestT = t;
+        }
+    }
+    return bestT;
+}
+
+qreal qCubicSegment1D::tWithSmallestValue() const {
+    const bool p0Further = p0() <= c1() && p0() <= c2();
+    const bool p1Further = p1() <= c1() && p1() <= c2();
+    if(p0Further || p1Further) {
+        if(p1() < p0()) return 1;
+        else return 0;
+    }
+    qreal t1, t2, t3;
+    solveDerivativeZero(t1, t2, t3);
+
+    qreal minVal = DBL_MAX;
+    qreal bestT = 0;
+    for(const qreal& t : { 0., 1., t1, t2, t3}) {
+        const qreal valT = valAtT(t);
+        if(valT < minVal) {
+            minVal = valT;
+            bestT = t;
+        }
+    }
+    return bestT;
+}
+
 //QList<qrealPair> _qCubicSegment1D::sIntersectionTs(
 //        _qCubicSegment1D &seg1, _qCubicSegment1D &seg2) {
 //    QList<qrealPair> sols;
@@ -173,8 +252,8 @@ qreal qCubicSegment1D::tAtLength(const qreal &length,
                                  const qreal &maxLenErr,
                                  const qreal &minT,
                                  const qreal &maxT) {
-    qreal guessT = (maxT + minT)*0.5;
-    qreal lenAtGuess = lengthAtT(guessT);
+    const qreal guessT = (maxT + minT)*0.5;
+    const qreal lenAtGuess = lengthAtT(guessT);
     if(abs(lenAtGuess - length) < maxLenErr) return guessT;
     if(lenAtGuess > length) {
         return tAtLength(length, maxLenErr, minT, guessT);

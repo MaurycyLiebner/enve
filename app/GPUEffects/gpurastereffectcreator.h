@@ -60,6 +60,7 @@ struct GPURasterEffectCreator : public PropertyCreator {
         Q_UNUSED(gl);
         Q_UNUSED(program);
         Q_ASSERT(false);
+        return 0;
     }
     static stdsptr<GPURasterEffectCreator> sLoadFromFile(
             QGL33c * const gl,
