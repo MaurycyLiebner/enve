@@ -53,9 +53,9 @@ struct FileFooter {
         NonCompatible
     };
 
-    char formatStr[15] = FORMAT_STR;
-    char creatorVersion[15] = CREATOR_VERSION;
-    char creatorApplication[15] = CREATOR_APPLICATION;
+    const char formatStr[15] = FORMAT_STR;
+    const char creatorVersion[15] = CREATOR_VERSION;
+    const char creatorApplication[15] = CREATOR_APPLICATION;
 
     CompatybilityMode combatybilityMode() const {
         if(!std::strcmp(formatStr, FORMAT_STR)) {
@@ -69,7 +69,7 @@ struct FileFooter {
     }
 
     void read(QIODevice *target) {
-        qint64 pos = target->size() - static_cast<qint64>(sizeof(FileFooter));
+        const qint64 pos = target->size() - static_cast<qint64>(sizeof(FileFooter));
         target->seek(pos);
         target->read(rcChar(this), sizeof(FileFooter));
         target->seek(0);
@@ -126,9 +126,9 @@ void Key::readKey(QIODevice *target) {
 }
 
 void PathContainer::writePathContainer(QIODevice * const target) const {
-    int nPts = mElementsPos.count();
+    const int nPts = mElementsPos.count();
     target->write(rcConstChar(&nPts), sizeof(int)); // number pts
-    foreach(const SkPoint &pos, mElementsPos) {
+    for(const SkPoint &pos : mElementsPos) {
         SkScalar xT, yT;
         xT = pos.x(); yT = pos.y();
         target->write(rcConstChar(&xT), sizeof(SkScalar));
@@ -161,15 +161,15 @@ void PathKey::readKey(QIODevice *target) {
 }
 
 void VectorPathAnimator::writeProperty(QIODevice * const target) const {
-    int nNodes = mNodeSettings.count();
+    const int nNodes = mNodeSettings.count();
     target->write(rcConstChar(&nNodes), sizeof(int));
-    foreach(const stdsptr<NodeSettings> &nodeSettings, mNodeSettings) {
+    for(const auto &nodeSettings : mNodeSettings) {
         nodeSettings->write(target);
     }
 
-    int nKeys = anim_mKeys.count();
+    const int nKeys = anim_mKeys.count();
     target->write(rcConstChar(&nKeys), sizeof(int));
-    foreach(const auto &key, anim_mKeys) {
+    for(const auto &key : anim_mKeys) {
         key->writeKey(target);
     }
 
@@ -177,8 +177,7 @@ void VectorPathAnimator::writeProperty(QIODevice * const target) const {
 }
 
 stdsptr<Key> VectorPathAnimator::readKey(QIODevice *target) {
-    stdsptr<PathKey> newKey = SPtrCreate(PathKey)(this);
-
+    const auto newKey = SPtrCreate(PathKey)(this);
     newKey->readKey(target);
     return std::move(newKey);
 }
@@ -193,20 +192,16 @@ void NodeSettings::write(QIODevice* target) {
 }
 
 void NodeSettings::read(QIODevice* target) {
-    target->read(rcChar(&ctrlsMode),
-                 sizeof(CtrlsMode));
-    target->read(rcChar(&startEnabled),
-                 sizeof(bool));
-    target->read(rcChar(&endEnabled),
-                 sizeof(bool));
+    target->read(rcChar(&ctrlsMode), sizeof(CtrlsMode));
+    target->read(rcChar(&startEnabled), sizeof(bool));
+    target->read(rcChar(&endEnabled), sizeof(bool));
 }
 
 void VectorPathAnimator::readProperty(QIODevice *target) {
     int nNodes;
     target->read(rcChar(&nNodes), sizeof(int));
     for(int i = 0; i < nNodes; i++) {
-        stdsptr<NodeSettings> nodeSettings =
-                SPtrCreate(NodeSettings)();
+        auto nodeSettings = SPtrCreate(NodeSettings)();
         nodeSettings->read(target);
         insertNodeSettingsForNodeId(i, nodeSettings);
     }
@@ -222,9 +217,9 @@ void VectorPathAnimator::readProperty(QIODevice *target) {
 }
 
 void Animator::writeSelectedKeys(QIODevice* target) {
-    int nKeys = anim_mSelectedKeys.count();
+    const int nKeys = anim_mSelectedKeys.count();
     target->write(rcConstChar(&nKeys), sizeof(int));
-    Q_FOREACH(Key *key, anim_mSelectedKeys) {
+    for(const auto& key : anim_mSelectedKeys) {
         key->writeKey(target);
     }
 }
@@ -256,23 +251,21 @@ void QrealKey::readKey(QIODevice *target) {
 }
 
 void QrealAnimator::writeProperty(QIODevice * const target) const {
-    int nKeys = anim_mKeys.count();
+    const int nKeys = anim_mKeys.count();
     target->write(rcConstChar(&nKeys), sizeof(int));
-    foreach(const auto &key, anim_mKeys) {
+    for(const auto &key : anim_mKeys) {
         key->writeKey(target);
     }
 
     target->write(rcConstChar(&mCurrentValue), sizeof(qreal));
 
-    bool hasRandomGenerator = !mRandomGenerator.isNull();
+    const bool hasRandomGenerator = !mRandomGenerator.isNull();
     target->write(rcConstChar(&hasRandomGenerator), sizeof(bool));
-    if(hasRandomGenerator) {
-        mRandomGenerator->writeProperty(target);
-    }
+    if(hasRandomGenerator) mRandomGenerator->writeProperty(target);
 }
 
 stdsptr<Key> QrealAnimator::readKey(QIODevice *target) {
-    stdsptr<QrealKey> newKey = SPtrCreate(QrealKey)(this);
+    auto newKey = SPtrCreate(QrealKey)(this);
     newKey->readKey(target);
     return std::move(newKey);
 }
@@ -305,8 +298,7 @@ void QrealAnimator::readProperty(QIODevice *target) {
     bool hasRandomGenerator;
     target->read(rcChar(&hasRandomGenerator), sizeof(bool));
     if(hasRandomGenerator) {
-        qsptr<RandomQrealGenerator> generator =
-                SPtrCreate(RandomQrealGenerator)(0, 9999);
+        auto generator = SPtrCreate(RandomQrealGenerator)(0, 9999);
         generator->readProperty(target);
         setGenerator(generator);
     }
@@ -455,9 +447,9 @@ void SampledMotionBlurEffect::writeProperty(QIODevice * const target) const {
 }
 
 void EffectAnimators::writeProperty(QIODevice * const target) const {
-    int nEffects = ca_mChildAnimators.count();
+    const int nEffects = ca_mChildAnimators.count();
     target->write(rcConstChar(&nEffects), sizeof(int));
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto &effect : ca_mChildAnimators) {
         effect->writeProperty(target);
     }
 }
@@ -483,7 +475,9 @@ void EffectAnimators::readPixmapEffect(QIODevice *target) {
     } else if(typeT == EFFECT_MOTION_BLUR) {
         effect = SPtrCreate(SampledMotionBlurEffect)(mParentBox_k);
     } else {
-        return;
+        QString errMsg = "Invalid pixmap effect type '" +
+                QString::number(typeT) + "'.";
+        RuntimeThrow(errMsg.toStdString());
     }
     effect->readProperty(target);
     addEffect(effect);
@@ -535,9 +529,9 @@ void GradientPoints::readProperty(QIODevice *target) {
 
 void Gradient::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mLoadId), sizeof(int));
-    int nColors = mColors.count();
+    const int nColors = mColors.count();
     target->write(rcConstChar(&nColors), sizeof(int));
-    foreach(const qsptr<ColorAnimator>& color, mColors) {
+    for(const auto& color : mColors) {
         color->writeProperty(target);
     }
 }
@@ -547,7 +541,7 @@ void Gradient::readProperty(QIODevice *target) {
     int nColors;
     target->read(rcChar(&nColors), sizeof(int));
     for(int i = 0; i < nColors; i++) {
-        qsptr<ColorAnimator> colorAnim = SPtrCreate(ColorAnimator)();
+        auto colorAnim = SPtrCreate(ColorAnimator)();
         colorAnim->readProperty(target);
         addColorToList(colorAnim);
     }
@@ -576,10 +570,10 @@ void PaintSettings::writeProperty(QIODevice * const target) const {
     mColor->writeProperty(target);
     target->write(rcConstChar(&mPaintType), sizeof(PaintType));
     int gradId;
-    if(mGradient == nullptr) {
-        gradId = -1;
-    } else {
+    if(mGradient) {
         gradId = mGradient->getLoadId();
+    } else {
+        gradId = -1;
     }
     target->write(rcConstChar(&mGradientLinear), sizeof(bool));
     target->write(rcConstChar(&gradId), sizeof(int));
@@ -794,15 +788,15 @@ void SolidifyPathEffect::readProperty(QIODevice *target) {
 void BoxTargetProperty::writeProperty(QIODevice * const target) const {
     BoundingBox *targetBox = mTarget_d.data();
     int targetId;
-    if(targetBox == nullptr) {
-        targetId = -1;
-    } else {
+    if(targetBox) {
         targetId = targetBox->getLoadId();
         if(targetId < 0) {
             targetId = BoundingBox::getLoadedBoxesCount();
             targetBox->setBoxLoadId(targetId);
             BoundingBox::addLoadedBox(targetBox);
         }
+    } else {
+        targetId = -1;
     }
     target->write(rcConstChar(&targetId), sizeof(int));
 }
@@ -810,8 +804,8 @@ void BoxTargetProperty::writeProperty(QIODevice * const target) const {
 void BoxTargetProperty::readProperty(QIODevice *target) {
     int targetId;
     target->read(rcChar(&targetId), sizeof(int));
-    BoundingBox* targetBox = BoundingBox::getLoadedBoxById(targetId);
-    if(targetBox == nullptr && targetId >= 0) {
+    auto targetBox = BoundingBox::getLoadedBoxById(targetId);
+    if(!targetBox && targetId >= 0) {
         BoundingBox::addFunctionWaitingForBoxLoad(
                     SPtrCreate(BoxTargetPropertyWaitingForBoxLoad)(targetId, this) );
     } else {
@@ -830,9 +824,9 @@ void OperationPathEffect::readProperty(QIODevice *target) {
 }
 
 void PathEffectAnimators::writeProperty(QIODevice * const target) const {   
-    int nEffects = ca_mChildAnimators.count();
+    const int nEffects = ca_mChildAnimators.count();
     target->write(rcConstChar(&nEffects), sizeof(int));
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto &effect : ca_mChildAnimators) {
         effect->writeProperty(target);
     }
 }
@@ -860,7 +854,7 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
     } else if(typeT == SOLIDIFY_PATH_EFFECT) {
         pathEffect = SPtrCreate(SolidifyPathEffect)(mIsOutline);
     } else {
-        QString errMsg = "Invalid path effect type '" +
+        const QString errMsg = "Invalid path effect type '" +
                 QString::number(typeT) + "'.";
         RuntimeThrow(errMsg.toStdString());
     }
@@ -960,7 +954,7 @@ void ParticleBox::readBoundingBox(QIODevice *target) {
     int nEmitters;
     target->read(rcChar(&nEmitters), sizeof(int));
     for(int i = 0; i < nEmitters; i++) {
-        qsptr<ParticleEmitter> emitter = SPtrCreate(ParticleEmitter)(this);
+        auto emitter = SPtrCreate(ParticleEmitter)(this);
         emitter->readProperty(target);
         addEmitter(emitter);
     }
@@ -1017,7 +1011,8 @@ void VideoBox::readBoundingBox(QIODevice *target) {
 }
 
 bool Tile::writeTile(QIODevice *target) {
-    return target->write(rcConstChar(mData), TILE_DIM*TILE_DIM*4*sizeof(uchar)) > 0;
+    return target->write(rcConstChar(mData),
+                         TILE_DIM*TILE_DIM*4*sizeof(uchar)) > 0;
 }
 
 void Tile::readTile(QIODevice *target) {
@@ -1102,7 +1097,7 @@ void AnimatedSurface::writeProperty(QIODevice * const target) const {
 }
 
 stdsptr<Key> AnimatedSurface::readKey(QIODevice *target) {
-    stdsptr<SurfaceKey> newKey = SPtrCreate(SurfaceKey)(this);
+    auto newKey = SPtrCreate(SurfaceKey)(this);
     newKey->setTiles(SPtrCreate(TilesData)(0, 0, true));
     newKey->readKey(target);
     return std::move(newKey);
@@ -1143,7 +1138,7 @@ void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
     int nFrames = mListOfFrames.count();
     target->write(rcConstChar(&nFrames), sizeof(int));
-    foreach(const QString &frame, mListOfFrames) {
+    for(const QString &frame : mListOfFrames) {
         gWrite(target, frame);
     }
 }
@@ -1193,7 +1188,7 @@ void BoxesGroup::writeBoundingBox(QIODevice *target) {
     mOutlinePathEffectsAnimators->writeProperty(target);
     int nChildBoxes = mContainedBoxes.count();
     target->write(rcConstChar(&nChildBoxes), sizeof(int));
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         child->writeBoundingBox(target);
     }
 }
@@ -1232,8 +1227,9 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
         } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
             box = SPtrCreate(InternalLinkCanvas)(nullptr);
         } else {
-            qDebug() << "Corrupted file - invalid box type";
-            break;
+            QString errMsg = "Invalid box type '" +
+                    QString::number(boxType) + "'.";
+            RuntimeThrow(errMsg.toStdString());
         }
 
         box->readBoundingBox(target);
@@ -1252,21 +1248,20 @@ void BoxesGroup::readBoundingBox(QIODevice *target) {
 void PathAnimator::writeProperty(QIODevice * const target) const {
     int nPaths = mSinglePaths.count();
     target->write(rcConstChar(&nPaths), sizeof(int));
-    foreach(const qsptr<VectorPathAnimator>& pathAnimator, mSinglePaths) {
+    for(const auto& pathAnimator : mSinglePaths) {
         pathAnimator->writeProperty(target);
     }
 }
 
 void PathAnimator::readVectorPathAnimator(QIODevice *target) {
-    qsptr<VectorPathAnimator> pathAnimator =
-            SPtrCreate(VectorPathAnimator)(this);
+    auto pathAnimator = SPtrCreate(VectorPathAnimator)(this);
     pathAnimator->readProperty(target);
     addSinglePathAnimator(pathAnimator);
 }
 
 QMatrix PathAnimator::getCombinedTransform() {
-    if(mParentBox == nullptr) return QMatrix();
-    return mParentBox->getCombinedTransform();
+    if(mParentBox) mParentBox->getCombinedTransform();
+    return QMatrix();
 }
 
 void PathAnimator::readProperty(QIODevice *target) {
@@ -1295,7 +1290,8 @@ void Canvas::writeBoundingBox(QIODevice *target) {
     target->write(rcConstChar(&mFps), sizeof(qreal));
     mBackgroundColor->writeProperty(target);
     target->write(rcConstChar(&mMaxFrame), sizeof(int));
-    target->write(rcConstChar(&mCanvasTransformMatrix), sizeof(QMatrix));
+    target->write(rcConstChar(&mCanvasTransformMatrix),
+                  sizeof(QMatrix));
 }
 
 void Canvas::readBoundingBox(QIODevice *target) {
@@ -1313,9 +1309,9 @@ void Canvas::readBoundingBox(QIODevice *target) {
 }
 
 void GradientWidget::writeGradients(QIODevice *target) {
-    int nGradients = mGradients.count();
+    const int nGradients = mGradients.count();
     target->write(rcConstChar(&nGradients), sizeof(int));
-    foreach(const qsptr<Gradient> &gradient, mGradients) {
+    for(const auto &gradient : mGradients) {
         gradient->writeProperty(target);
     }
 }
@@ -1324,7 +1320,7 @@ void GradientWidget::readGradients(QIODevice *target) {
     int nGradients;
     target->read(rcChar(&nGradients), sizeof(int));
     for(int i = 0; i < nGradients; i++) {
-        qsptr<Gradient> gradient = SPtrCreate(Gradient)();
+        auto gradient = SPtrCreate(Gradient)();
         gradient->readProperty(target);
         addGradientToList(gradient);
         MainWindow::getInstance()->addLoadedGradient(gradient.get());
@@ -1369,7 +1365,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
     target->write(rcConstChar(&nCanvases), sizeof(int));
     int currentCanvasId = -1;
     int boxLoadId = 0;
-    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
+    for(const auto &canvas : mCanvasList) {
         boxLoadId = canvas->setBoxLoadId(boxLoadId);
         canvas->writeBoundingBox(target);
         if(canvas.get() == mCurrentCanvas) {
@@ -1377,7 +1373,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
         }
     }
     target->write(rcConstChar(&currentCanvasId), sizeof(int));
-    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
+    for(const auto &canvas : mCanvasList) {
         canvas->clearBoxLoadId();
     }
 }
@@ -1386,15 +1382,14 @@ void CanvasWindow::readCanvases(QIODevice *target) {
     int nCanvases;
     target->read(rcChar(&nCanvases), sizeof(int));
     for(int i = 0; i < nCanvases; i++) {
-        qsptr<Canvas> canvas =
-                SPtrCreate(Canvas)(this);
+        auto canvas = SPtrCreate(Canvas)(this);
         canvas->readBoundingBox(target);
         MainWindow::getInstance()->addCanvas(canvas);
     }
     int currentCanvasId;
     target->read(rcChar(&currentCanvasId), sizeof(int));
-    setCurrentCanvas(
-                GetAsPtr(BoundingBox::getLoadedBoxById(currentCanvasId), Canvas));
+    auto currentCanvas = BoundingBox::getLoadedBoxById(currentCanvasId);
+    setCurrentCanvas(GetAsPtr(currentCanvas, Canvas));
 }
 
 void MainWindow::loadAVFile(const QString &path) {
@@ -1411,8 +1406,7 @@ void MainWindow::loadAVFile(const QString &path) {
                           qcolT.saturationF(),
                           qcolT.valueF());
 //            mBrushSettingsWidget->readBrushesForProject(&target);
-            GradientWidget *gradientWidget =
-                    mFillStrokeSettings->getGradientWidget();
+            auto gradientWidget = mFillStrokeSettings->getGradientWidget();
             gradientWidget->readGradients(&target);
             mCanvasWindow->readCanvases(&target);
 
@@ -1431,17 +1425,14 @@ void MainWindow::loadAVFile(const QString &path) {
 
 void MainWindow::saveToFile(const QString &path) {
     QFile target(path);
-    if(target.exists()) {
-        target.remove();
-    }
+    if(target.exists()) target.remove();
 
     if(target.open(QIODevice::WriteOnly)) {
 //        QColor color = mBrushSettingsWidget->getCurrentQColor();
 //        target.write(rcChar(&color), sizeof(QColor));
 
 //        mBrushSettingsWidget->saveBrushesForProject(&target);
-        GradientWidget *gradientWidget =
-                mFillStrokeSettings->getGradientWidget();
+        auto gradientWidget = mFillStrokeSettings->getGradientWidget();
         gradientWidget->setGradientLoadIds();
         gradientWidget->writeGradients(&target);
         mCanvasWindow->writeCanvases(&target);

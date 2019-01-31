@@ -121,10 +121,10 @@ void GLWindow::initialize() {
         gPrintExceptionCritical(e);
     }
 //    qDebug() << "OpenGL Info";
-//    qDebug() << "  Vendor: " << reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+//    qDebug() << "  Vendor: " << rcConstChar(glGetString(GL_VENDOR));
 //    qDebug() << "  Renderer: " << QString((const char*)glGetString(GL_RENDERER));;
-//    qDebug() << "  Version: " << reinterpret_cast<const char *>(glGetString(GL_VERSION));
-//    qDebug() << "  Shading language: " << reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+//    qDebug() << "  Version: " << rcConstChar(glGetString(GL_VERSION));
+//    qDebug() << "  Shading language: " << rcConstChar(glGetString(GL_SHADING_LANGUAGE_VERSION));
 //    qDebug() << "  Requested format: " << QSurfaceFormat::defaultFormat();
 //    qDebug() << "  Current format:   " << mContext->format();
 }

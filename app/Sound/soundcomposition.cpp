@@ -1,8 +1,9 @@
 #include "soundcomposition.h"
 #include "singlesound.h"
+#include "castmacros.h"
 
-SoundComposition::SoundComposition(QObject *parent)
-    :   QIODevice(parent) {}
+SoundComposition::SoundComposition(QObject *parent) :
+    QIODevice(parent) {}
 
 void SoundComposition::start() {
     open(QIODevice::ReadOnly);
@@ -24,7 +25,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
     //float *data1 = nullptr;
     float *data = new float[nSamples];
     for(uint i = 0; i < nSamples; i++) {
-        data[i] = 0.f;
+        data[i] = 0;
     }
 //    int size;
 //    decode_audio_file("/home/ailuropoda/lektor.wav",
@@ -37,7 +38,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
 //    }
 //    free(data1);
 
-    Q_FOREACH(const auto &sound, mSounds) {
+    for(const auto &sound : mSounds) {
         sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);
         const int &soundStartFrame = sound->getStartAbsFrame();
         const int &soundSampleCount = sound->getSampleCount();
@@ -61,7 +62,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
                                      samplesInSoundFrameRange);
         }
         if(sampleCountNeeded <= 0) continue;
-        int lastSampleFromSound = firstSampleFromSound + sampleCountNeeded;
+        const int lastSampleFromSound = firstSampleFromSound + sampleCountNeeded;
         int currTargetSample = firstTargetSample;
         const float *soundData = sound->getFinalData();
         for(int i = firstSampleFromSound; i < lastSampleFromSound; i++) {
@@ -70,7 +71,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
         }
     }
 
-    mBuffer.setRawData(reinterpret_cast<char*>(data), nSamples*sizeof(float));
+    mBuffer.setRawData(rcChar(data), nSamples*sizeof(float));
     mPos = 0;
 }
 

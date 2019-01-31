@@ -3,6 +3,7 @@
 #include <QPointer>
 #include <QSharedPointer>
 #include <QObject>
+
 template <class T> using qsptr = QSharedPointer<T>;
 template <class T> using qptr = QPointer<T>;
 class SelfRef : public QObject {

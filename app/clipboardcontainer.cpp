@@ -58,7 +58,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
         int nKeys;
         QBuffer target(const_cast<QByteArray*>(&animData.second));
         target.open(QIODevice::ReadOnly);
-        target.read(reinterpret_cast<char*>(&nKeys), sizeof(int));
+        target.read(rcChar(&nKeys), sizeof(int));
         for(int i = 0; i < nKeys; i++) {
             stdsptr<Key> keyT = animator->readKey(&target);
             if(keyT->getAbsFrame() < firstKeyFrame) {

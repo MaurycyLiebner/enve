@@ -6,7 +6,7 @@ struct Samples : public StdSelfRef {
     Samples() : fData(nullptr), fSamplesCount(0) {}
 
     Samples(const int& size) :
-        fData(static_cast<float*>(malloc(size*sizeof(float)))),
+        fData(static_cast<float*>(malloc(static_cast<size_t>(size)*sizeof(float)))),
         fSamplesCount(size) {}
 
     Samples(float * const data, const int& size) :

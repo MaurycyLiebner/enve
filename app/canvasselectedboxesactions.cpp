@@ -787,7 +787,7 @@ void Canvas::duplicateSelectedBoxes() {
     QBuffer target(container->getBytesArray());
     target.open(QIODevice::WriteOnly);
     int nBoxes = mSelectedBoxes.count();
-    target.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
+    target.write(rcChar(&nBoxes), sizeof(int));
 
     std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
     Q_FOREACH(const auto &box, mSelectedBoxes) {

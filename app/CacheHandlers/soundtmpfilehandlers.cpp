@@ -1,5 +1,6 @@
 #include "soundtmpfilehandlers.h"
 #include "soundcachecontainer.h"
+#include "castmacros.h"
 
 SoundContainerTmpFileDataLoader::SoundContainerTmpFileDataLoader(
         const qsptr<QTemporaryFile> &file,
@@ -10,10 +11,10 @@ SoundContainerTmpFileDataLoader::SoundContainerTmpFileDataLoader(
 void SoundContainerTmpFileDataLoader::_processUpdate() {
     if(mTmpFile->open()) {
         int size;
-        mTmpFile->read(reinterpret_cast<char*>(&size), sizeof(int));
+        mTmpFile->read(rcChar(&size), sizeof(int));
         mSamples = SPtrCreate(Samples)(size);
-        mTmpFile->read(reinterpret_cast<char*>(mSamples->fData),
-                       size*sizeof(float));
+        mTmpFile->read(rcChar(mSamples->fData),
+                       size*static_cast<qint64>(sizeof(float)));
 
         mTmpFile->close();
     }
@@ -34,10 +35,11 @@ void SoundContainerTmpFileDataSaver::_processUpdate() {
     // mSavingFailed = true; return; // NO TMP FILES !!!
     mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
     if(mTmpFile->open()) {
-        mTmpFile->write(reinterpret_cast<const char*>(&mSamples->fSamplesCount),
+        mTmpFile->write(rcConstChar(&mSamples->fSamplesCount),
                         sizeof(int));
-        mTmpFile->write(reinterpret_cast<char*>(mSamples->fData),
-                        mSamples->fSamplesCount*sizeof(float));
+        const qint64 writeBytes = mSamples->fSamplesCount*
+                static_cast<qint64>(sizeof(float));
+        mTmpFile->write(rcChar(mSamples->fData), writeBytes);
 
         mTmpFile->close();
     } else {

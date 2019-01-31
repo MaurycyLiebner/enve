@@ -3,8 +3,7 @@
 #include <QString>
 #include <QIODevice>
 #include <Segments/qcubicsegment1d.h>
-#define rcConstChar(ptr) reinterpret_cast<const char*>(ptr)
-#define rcChar(ptr) reinterpret_cast<char*>(ptr)
+#include "castmacros.h"
 
 extern bool gRead(QIODevice* src, QString& targetStr);
 extern bool gWrite(QIODevice* dst, const QString& strToWrite);

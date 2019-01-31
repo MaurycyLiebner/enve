@@ -141,7 +141,8 @@ HEADERS += \
     Animators/interpolatedanimator.h \
     Animators/steppedanimator.h \
     basicreadwrite.h \
-    differsinterpolate.h
+    differsinterpolate.h \
+    castmacros.h
 
 unix {
     target.path = /usr/lib

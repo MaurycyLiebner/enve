@@ -709,7 +709,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     QBuffer targetT(container->getBytesArray());
                     targetT.open(QIODevice::WriteOnly);
                     int nBoxes = 1;
-                    targetT.write(reinterpret_cast<char*>(&nBoxes), sizeof(int));
+                    targetT.write(rcChar(&nBoxes), sizeof(int));
                     auto boxTarget = GetAsPtr(target, BoundingBox);
                     boxTarget->writeBoundingBox(&targetT);
                     targetT.close();
