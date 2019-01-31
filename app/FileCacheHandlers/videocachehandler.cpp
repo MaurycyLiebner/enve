@@ -240,18 +240,16 @@ void VideoCacheHandler::_processUpdate() {
     // SKIA
 
         if(frameReceived) {
-            SkImageInfo info = SkImageInfo::Make(codecContext->width,
-                                                 codecContext->height,
-                                                 kBGRA_8888_SkColorType,
-                                                 kPremul_SkAlphaType,
-                                                 nullptr);
+            const auto info = SkiaHelpers::getPremulBGRAInfo(
+                        codecContext->width, codecContext->height);
             SkBitmap bitmap;
             bitmap.allocPixels(info);
 
             SkPixmap pixmap;
             bitmap.peekPixels(&pixmap);
 
-            uint8_t *dstSk[] = {(unsigned char*)pixmap.writable_addr()};
+            void * const addr = pixmap.writable_addr();
+            uint8_t *dstSk[] = { static_cast<unsigned char*>(addr) };
             int linesizesSk[4];
 
             av_image_fill_linesizes(linesizesSk,

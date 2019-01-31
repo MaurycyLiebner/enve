@@ -95,11 +95,9 @@ void BoundingBoxRenderData::renderToImage() {
                     qRound(fGlobalBoundingRect.top()/**resolution*/));
     fGlobalBoundingRect.translate(-transF);
 
-    SkImageInfo info = SkImageInfo::Make(qCeil(fGlobalBoundingRect.width()),
-                                         qCeil(fGlobalBoundingRect.height()),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
+    const auto info = SkiaHelpers::getPremulBGRAInfo(
+                qCeil(fGlobalBoundingRect.width()),
+                qCeil(fGlobalBoundingRect.height()));
     fBitmapTMP.allocPixels(info);
     fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
     //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));

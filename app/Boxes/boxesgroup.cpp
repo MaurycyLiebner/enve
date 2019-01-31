@@ -1022,11 +1022,8 @@ void BoxesGroupRenderData::renderToImage() {
             QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
                     qRound(fGlobalBoundingRect.top()/**resolution*/));
     fGlobalBoundingRect.translate(-transF);
-    SkImageInfo info = SkImageInfo::Make(qCeil(sizeF.width()),
-                                         qCeil(sizeF.height()),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
+    const auto info = SkiaHelpers::getPremulBGRAInfo(
+                qCeil(sizeF.width()), qCeil(sizeF.height()));
     SkBitmap bitmap;
     bitmap.allocPixels(info);
     bitmap.eraseColor(SK_ColorTRANSPARENT);

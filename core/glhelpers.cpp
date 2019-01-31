@@ -224,10 +224,7 @@ bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
 
 sk_sp<SkImage> TextureFrameBuffer::toImage() {
     SkBitmap btmp;
-    SkImageInfo info = SkImageInfo::Make(fWidth, fHeight,
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
+    const auto info = SkiaHelpers::getPremulBGRAInfo(fWidth, fHeight);
     btmp.allocPixels(info);
     glReadPixels(0, 0, fWidth, fHeight,
                  GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());

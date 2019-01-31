@@ -1230,11 +1230,8 @@ void CanvasRenderData::renderToImage() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;
 
-    SkImageInfo info = SkImageInfo::Make(qCeil(canvasWidth),
-                                         qCeil(canvasHeight),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
+    const auto info = SkiaHelpers::getPremulBGRAInfo(
+                qCeil(canvasWidth), qCeil(canvasHeight));
     SkBitmap bitmap;
     bitmap.allocPixels(info);
     bitmap.eraseColor(fBgColor);

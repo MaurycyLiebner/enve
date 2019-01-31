@@ -259,11 +259,8 @@ void LinkCanvasRenderData::renderToImage() {
             QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
                     qRound(fGlobalBoundingRect.top()/**resolution*/));
 
-    SkImageInfo info = SkImageInfo::Make(qCeil(sizeF.width()),
-                                         qCeil(sizeF.height()),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
+    SkImageInfo info = SkiaHelpers::getPremulBGRAInfo(
+                qCeil(sizeF.width()), qCeil(sizeF.height()));
     SkBitmap bitmap;
     bitmap.allocPixels(info);
     bitmap.eraseColor(SK_ColorTRANSPARENT);

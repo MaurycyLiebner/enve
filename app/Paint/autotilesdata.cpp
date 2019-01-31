@@ -114,10 +114,7 @@ int AutoTilesData::height() const {
 }
 
 SkBitmap AutoTilesData::toBitmap() const {
-    SkImageInfo info = SkImageInfo::Make(width(), height(),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
+    const auto info = SkiaHelpers::getPremulBGRAInfo(width(), height());
     SkBitmap dst;
     dst.allocPixels(info);
 

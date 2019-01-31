@@ -14,11 +14,7 @@ void CacheContainerTmpFileDataLoader::_processUpdate() {
         mTmpFile->read(rcChar(&width), sizeof(int));
         mTmpFile->read(rcChar(&height), sizeof(int));
         SkBitmap btmp;
-        const SkImageInfo info =
-                SkImageInfo::Make(width, height,
-                                  kBGRA_8888_SkColorType,
-                                  kPremul_SkAlphaType,
-                                  nullptr);
+        const auto info = SkiaHelpers::getPremulBGRAInfo(width, height);
         btmp.allocPixels(info);
         const qint64 readBytes = width*height*4*
                 static_cast<qint64>(sizeof(uchar));
