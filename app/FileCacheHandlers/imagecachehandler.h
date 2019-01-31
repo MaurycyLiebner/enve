@@ -1,6 +1,6 @@
 #ifndef IMAGECACHEHANDLER_H
 #define IMAGECACHEHANDLER_H
-#include "skia/skimagecopy.h"
+#include "skia/skiahelpers.h"
 #include "filecachehandler.h"
 
 class ImageCacheHandler : public FileCacheHandler {
@@ -14,7 +14,7 @@ public:
     }
     sk_sp<SkImage> getImage() { return mImage; }
     sk_sp<SkImage> getImageCopy() {
-        return makeSkImageCopy(mImage);
+        return SkiaHelpers::makeSkImageCopy(mImage);
     }
 protected:
     ImageCacheHandler(const QString &filePath,

@@ -1,6 +1,7 @@
 #include "imagecachecontainer.h"
 #include "tmpfilehandlers.h"
 #include "canvas.h"
+#include "skia/skiahelpers.h"
 
 ImageCacheContainer::ImageCacheContainer() : Base() {}
 
@@ -52,7 +53,7 @@ void ImageCacheContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
     //SkPaint paint;
     //paint.setAntiAlias(true);
     //paint.setFilterQuality(kHigh_SkFilterQuality);
-    drawImageGPU(canvas, mImageSk, 0, 0, paint, grContext);
+    SkiaHelpers::drawImageGPU(canvas, mImageSk, 0, 0, paint, grContext);
     //canvas->drawImage(mImageSk, 0, 0/*, &paint*/);
 }
 

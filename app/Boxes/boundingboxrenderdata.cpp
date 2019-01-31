@@ -2,7 +2,7 @@
 #include "boundingbox.h"
 #include "PixmapEffects/rastereffects.h"
 #include "GPUEffects/gpupostprocessor.h"
-#include "skia/skimagecopy.h"
+#include "skia/skiahelpers.h"
 #include "PixmapEffects/pixmapeffect.h"
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
@@ -23,7 +23,7 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fDrawPos = src->fDrawPos;
     fOpacity = src->fOpacity;
     fResolution = src->fResolution;
-    fRenderedImage = makeSkImageCopy(src->fRenderedImage);
+    fRenderedImage = SkiaHelpers::makeSkImageCopy(src->fRenderedImage);
     mFinished = true;
     fRelBoundingRectSet = true;
     fCopied = true;

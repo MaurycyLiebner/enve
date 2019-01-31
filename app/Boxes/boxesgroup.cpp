@@ -184,20 +184,19 @@ void BoxesGroup::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
 }
 
 void BoxesGroup::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
-    foreach(const auto& box,
-                mContainedBoxes) {
-            if(box->SWT_isPathBox()) {
-                box->scheduleUpdate(reason);
-            } else if(box->SWT_isBoxesGroup()) {
-                static_cast<BoxesGroup*>(box.data())->updateAllChildPathBoxes(reason);
-            }
+    for(const auto& box : mContainedBoxes) {
+        if(box->SWT_isPathBox()) {
+            box->scheduleUpdate(reason);
+        } else if(box->SWT_isBoxesGroup()) {
+            GetAsPtr(box, BoxesGroup)->updateAllChildPathBoxes(reason);
         }
+    }
 }
 
 void BoxesGroup::filterPathForRelFrame(const int &relFrame,
                                        SkPath *srcDstPath,
                                        BoundingBox *box) {
-    if(mParentGroup != nullptr) {
+    if(mParentGroup) {
         int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                     prp_relFrameToAbsFrame(relFrame));
         mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
@@ -206,7 +205,7 @@ void BoxesGroup::filterPathForRelFrame(const int &relFrame,
                                                  qAbs(box->getCombinedTransform().m11()),
                                                  box == this);
 
-//    if(mParentGroup == nullptr) return;
+//    if(!mParentGroup) return;
 //    int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
 //                prp_relFrameToAbsFrame(relFrame));
 //    mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
@@ -219,7 +218,7 @@ void BoxesGroup::filterPathForRelFrameUntilGroupSum(const int &relFrame,
                                                               srcDstPath,
                                                               qAbs(box->getCombinedTransform().m11()));
 
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
     mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, srcDstPath, box);
@@ -231,7 +230,7 @@ void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
     mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThickness(relFrame,
                                                                        srcDstPath,
                                                                        qAbs(box->getCombinedTransform().m11()));
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
     mParentGroup->filterOutlinePathBeforeThicknessForRelFrame(parentRelFrame,
@@ -241,7 +240,7 @@ void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
 void BoxesGroup::filterPathForRelFrameF(const qreal &relFrame,
                                        SkPath *srcDstPath,
                                        BoundingBox *box) {
-    if(mParentGroup != nullptr) {
+    if(mParentGroup) {
         qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                     prp_relFrameToAbsFrameF(relFrame));
         mParentGroup->filterPathForRelFrameF(parentRelFrame, srcDstPath, box);
@@ -249,7 +248,7 @@ void BoxesGroup::filterPathForRelFrameF(const qreal &relFrame,
     mPathEffectsAnimators->filterPathForRelFrameF(relFrame, srcDstPath,
                                                  box == this);
 
-//    if(mParentGroup == nullptr) return;
+//    if(!mParentGroup) return;
 //    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
 //                prp_relFrameToAbsFrameF(relFrame));
 //    mParentGroup->filterPathForRelFrameF(parentRelFrame, srcDstPath, box);
@@ -260,7 +259,7 @@ void BoxesGroup::filterPathForRelFrameUntilGroupSumF(const qreal &relFrame,
     mPathEffectsAnimators->filterPathForRelFrameUntilGroupSumF(relFrame,
                                                               srcDstPath);
 
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterPathForRelFrameUntilGroupSumF(parentRelFrame, srcDstPath);
@@ -270,7 +269,7 @@ void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrameF(
         const qreal &relFrame, SkPath *srcDstPath) {
     mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThicknessF(relFrame,
                                                                        srcDstPath);
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterOutlinePathBeforeThicknessForRelFrameF(parentRelFrame,
@@ -289,7 +288,7 @@ bool BoxesGroup::isLastPathBox(PathBox *pathBox) {
 void BoxesGroup::filterOutlinePathForRelFrame(const int &relFrame,
                                               SkPath *srcDstPath) {
     mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
     mParentGroup->filterOutlinePathForRelFrame(parentRelFrame, srcDstPath);
@@ -298,7 +297,7 @@ void BoxesGroup::filterOutlinePathForRelFrame(const int &relFrame,
 void BoxesGroup::filterFillPathForRelFrame(const int &relFrame,
                                            SkPath *srcDstPath) {
     mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
     mParentGroup->filterFillPathForRelFrame(parentRelFrame, srcDstPath);
@@ -307,7 +306,7 @@ void BoxesGroup::filterFillPathForRelFrame(const int &relFrame,
 void BoxesGroup::filterOutlinePathForRelFrameF(const qreal &relFrame,
                                               SkPath *srcDstPath) {
     mOutlinePathEffectsAnimators->filterPathForRelFrameF(relFrame, srcDstPath);
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterOutlinePathForRelFrameF(parentRelFrame, srcDstPath);
@@ -316,14 +315,14 @@ void BoxesGroup::filterOutlinePathForRelFrameF(const qreal &relFrame,
 void BoxesGroup::filterFillPathForRelFrameF(const qreal &relFrame,
                                            SkPath *srcDstPath) {
     mFillPathEffectsAnimators->filterPathForRelFrameF(relFrame, srcDstPath);
-    if(mParentGroup == nullptr) return;
+    if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterFillPathForRelFrameF(parentRelFrame, srcDstPath);
 }
 
 bool BoxesGroup::enabledGroupPathSumEffectPresent() {
-    foreach(const auto& effect, mGroupPathSumEffects) {
+    for(const auto& effect : mGroupPathSumEffects) {
         if(effect->isVisible()) return true;
     }
     return false;
@@ -333,27 +332,27 @@ void BoxesGroup::prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator *parentAnimator) {
     ComplexAnimator::prp_setParentFrameShift(shift, parentAnimator);
     int thisShift = prp_getFrameShift();
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         child->prp_setParentFrameShift(thisShift, this);
     }
 }
 
 void BoxesGroup::scheduleWaitingTasks() {
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         child->scheduleWaitingTasks();
     }
     BoundingBox::scheduleWaitingTasks();
 }
 
 void BoxesGroup::queScheduledTasks() {
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         child->queScheduledTasks();
     }
     BoundingBox::queScheduledTasks();
 }
 
 void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         child->updateAllBoxes(reason);
     }
     scheduleUpdate(reason);
@@ -362,7 +361,7 @@ void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {
 QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const int &relFrame) {
     SkPath boundingPaths = SkPath();
     int absFrame = prp_relFrameToAbsFrame(relFrame);
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         int childRelFrame = child->prp_absFrameToRelFrame(absFrame);
         if(child->isRelFrameVisibleAndInVisibleDurationRect(childRelFrame)) {
             SkPath childPath;
@@ -381,7 +380,7 @@ QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const int &relFrame) {
 
 void BoxesGroup::clearAllCache() {
     BoundingBox::clearAllCache();
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         child->clearAllCache();
     }
 }
@@ -405,7 +404,7 @@ bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingConta
 FrameRange BoxesGroup::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     auto range = BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
     int absFrame = prp_relFrameToAbsFrame(relFrame);
-    Q_FOREACH(const qsptr<BoundingBox> &child, mContainedBoxes) {
+    for(const auto &child : mContainedBoxes) {
         if(range.isUnary()) return range;
         auto childRange = child->prp_getIdenticalRelFrameRange(
                     child->prp_absFrameToRelFrame(absFrame));
@@ -424,13 +423,13 @@ FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             QList<Property*> propertiesT;
             getMotionBlurProperties(propertiesT);
-            Q_FOREACH(const auto& child, propertiesT) {
+            for(const auto& child : propertiesT) {
                 if(range.isUnary()) return range;
                 auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
                 range *= childRange;
             }
 
-            Q_FOREACH(const auto &child, mContainedBoxes) {
+            for(const auto &child : mContainedBoxes) {
                 if(range.isUnary()) return range;
                 auto childRange = child->getFirstAndLastIdenticalForMotionBlur(
                             relFrame, false);
@@ -468,7 +467,7 @@ void BoxesGroup::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
 
 bool BoxesGroup::relPointInsidePath(const QPointF &relPos) const {
     if(mRelBoundingRect.contains(relPos)) {
-        QPointF absPos = mapRelPosToAbs(relPos);
+        const QPointF absPos = mapRelPosToAbs(relPos);
         for(const auto& box : mContainedBoxes) {
             if(box->absPointInsidePath(absPos)) {
                 return true;
@@ -537,7 +536,7 @@ void BoxesGroup::shiftAll(const int &shift) {
         mDurationRectangle->changeFramePosBy(shift);
     } else {
         anim_shiftAllKeys(shift);
-        foreach(const auto& box, mContainedBoxes) {
+        for(const auto& box : mContainedBoxes) {
             box->shiftAll(shift);
         }
     }
@@ -545,7 +544,7 @@ void BoxesGroup::shiftAll(const int &shift) {
 
 int BoxesGroup::setBoxLoadId(const int &loadId) {
     int loadIdT = BoundingBox::setBoxLoadId(loadId);
-        foreach(const qsptr<BoundingBox> &child, mContainedBoxes) {
+        for(const auto &child : mContainedBoxes) {
             loadIdT = child->setBoxLoadId(loadIdT);
         }
 
@@ -554,7 +553,7 @@ int BoxesGroup::setBoxLoadId(const int &loadId) {
 
 void BoxesGroup::clearBoxLoadId() {
     BoundingBox::clearBoxLoadId();
-        foreach(const qsptr<BoundingBox> &child, mContainedBoxes) {
+        for(const auto &child : mContainedBoxes) {
             child->clearBoxLoadId();
         }
 }
@@ -602,7 +601,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
     if(enabledGroupPathSumEffectPresent()) {
         int idT = 0;
         qsptr<PathBox> lastPathBox;
-        foreach(const auto& box, mContainedBoxes) {
+        for(const auto& box : mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 if(box->SWT_isPathBox()) {
@@ -629,7 +628,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
             boxRenderData->fParentBox = nullptr;
         }
     } else {
-        foreach(const auto& box, mContainedBoxes) {
+        for(const auto& box : mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 processChildData(box.data(), groupData.get(), boxRelFrame);
@@ -681,7 +680,7 @@ void BoxesGroup::setIsCurrentGroup_k(const bool &bT) {
     mIsCurrentGroup = bT;
     setDescendantCurrentGroup(bT);
     if(!bT) {
-        if(mContainedBoxes.isEmpty() && mParentGroup != nullptr) {
+        if(mContainedBoxes.isEmpty() && mParentGroup) {
             removeFromParent_k();
         }
     }
@@ -709,10 +708,8 @@ bool BoxesGroup::SWT_isBoxesGroup() const { return true; }
 
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
-    if(!bT) {
-        scheduleUpdate(Animator::USER_CHANGE);
-    }
-    if(mParentGroup == nullptr) return;
+    if(!bT) scheduleUpdate(Animator::USER_CHANGE);
+    if(!mParentGroup) return;
     mParentGroup->setDescendantCurrentGroup(bT);
 }
 
@@ -732,7 +729,7 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
 
 void BoxesGroup::ungroup_k() {
     //clearBoxesSelection();
-    for(qsptr<BoundingBox> box : mContainedBoxes) {
+    for(auto box : mContainedBoxes) {
         box->applyTransformation(mTransformAnimator.data());
         removeContainedBox(box);
         mParentGroup->addContainedBox(box);
@@ -839,9 +836,8 @@ void BoxesGroup::addContainedBoxToListAt(
 
     child->prp_updateInfluenceRangeAfterChanged();
 
-    foreach(const qptr<BoundingBox>& box, mLinkingBoxes) {
-        qsptr<InternalLinkGroupBox> internalLinkGroup =
-                GetAsSPtr(box, InternalLinkGroupBox);
+    for(const auto& box : mLinkingBoxes) {
+        auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
         internalLinkGroup->addContainedBoxToListAt(
                     index, child->createLinkForLinkGroup());
     }
@@ -872,9 +868,9 @@ stdsptr<BoundingBoxRenderData> BoxesGroup::createRenderData() {
 }
 
 void BoxesGroup::removeContainedBoxFromList(const int &id) {
-    qsptr<BoundingBox> box = mContainedBoxes.takeAt(id);
+    auto box = mContainedBoxes.takeAt(id);
     if(box->SWT_isBoxesGroup()) {
-        BoxesGroup* group = GetAsPtr(box, BoxesGroup);
+        auto group = GetAsPtr(box, BoxesGroup);
         if(group->isCurrentGroup()) {
             emit group->setParentAsCurrentGroup();
         }
@@ -889,18 +885,15 @@ void BoxesGroup::removeContainedBoxFromList(const int &id) {
     SWT_removeChildAbstractionForTargetFromAll(box.get());
     box->setParentGroup(nullptr);
 
-    foreach(const qptr<BoundingBox>& box, mLinkingBoxes) {
-        qsptr<InternalLinkGroupBox> internalLinkGroup =
-                GetAsSPtr(box, InternalLinkGroupBox);
+    for(const auto& box : mLinkingBoxes) {
+        auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
         internalLinkGroup->removeContainedBoxFromList(id);
     }
 }
 
 int BoxesGroup::getContainedBoxIndex(BoundingBox *child) {
     for(int i = 0; i < mContainedBoxes.count(); i++) {
-        if(mContainedBoxes.at(i) == child) {
-            return i;
-        }
+        if(mContainedBoxes.at(i) == child) return i;
     }
     return -1;
 }
@@ -922,25 +915,19 @@ void BoxesGroup::removeContainedBox_k(const qsptr<BoundingBox>& child) {
 
 void BoxesGroup::increaseContainedBoxZInList(BoundingBox *child) {
     const int &index = getContainedBoxIndex(child);
-    if(index == mContainedBoxes.count() - 1) {
-        return;
-    }
+    if(index == mContainedBoxes.count() - 1) return;
     moveContainedBoxInList(child, index, index + 1);
 }
 
 void BoxesGroup::decreaseContainedBoxZInList(BoundingBox *child) {
     const int &index = getContainedBoxIndex(child);
-    if(index == 0) {
-        return;
-    }
+    if(index == 0) return;
     moveContainedBoxInList(child, index, index - 1);
 }
 
 void BoxesGroup::bringContainedBoxToEndList(BoundingBox *child) {
     const int &index = getContainedBoxIndex(child);
-    if(index == mContainedBoxes.count() - 1) {
-        return;
-    }
+    if(index == mContainedBoxes.count() - 1) return;
     moveContainedBoxInList(child, index, mContainedBoxes.length() - 1);
 }
 
@@ -990,7 +977,7 @@ void BoxesGroup::SWT_addChildrenAbstractions(
                                              visiblePartWidgetId);
 
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
-        const qsptr<BoundingBox> &child = mContainedBoxes.at(i);
+        const auto &child = mContainedBoxes.at(i);
         auto abs = child->SWT_getAbstractionForWidget(updateFuncs,
                                                       visiblePartWidgetId);
         abstraction->addChildAbstraction(abs);
@@ -1059,7 +1046,7 @@ void BoxesGroupRenderData::renderToImage() {
                             qRound(fGlobalBoundingRect.top()));
 
     if(!fPixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
+        for(const auto& effect : fPixmapEffects) {
             effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();

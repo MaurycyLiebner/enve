@@ -91,7 +91,8 @@ SOURCES += \
     Animators/interpolatedanimator.cpp \
     Animators/steppedanimator.cpp \
     basicreadwrite.cpp \
-    differsinterpolate.cpp
+    differsinterpolate.cpp \
+    skia/skiahelpers.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -142,7 +143,8 @@ HEADERS += \
     Animators/steppedanimator.h \
     basicreadwrite.h \
     differsinterpolate.h \
-    castmacros.h
+    castmacros.h \
+    skia/skiahelpers.h
 
 unix {
     target.path = /usr/lib

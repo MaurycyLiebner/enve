@@ -33,8 +33,7 @@
 
 #define foreach Q_FOREACH
 
-#include "skimagegpudraw.h"
-#include "skimagecopy.h"
+#include "skiahelpers.h"
 #include "skqtconversions.h"
 
 #endif // SKIAINCLUDES_H

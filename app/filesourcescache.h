@@ -1,6 +1,5 @@
 #ifndef FILESOURCESCACHE_H
 #define FILESOURCESCACHE_H
-#include "skia/skimagecopy.h"
 #include <unordered_map>
 #include <QString>
 #include <QList>

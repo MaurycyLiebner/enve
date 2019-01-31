@@ -5,6 +5,7 @@
 #include "rendercachehandler.h"
 #include "GUI/mainwindow.h"
 #include "canvas.h"
+#include "skia/skiahelpers.h"
 
 RenderContainer::~RenderContainer() {}
 
@@ -30,7 +31,7 @@ void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
     }
     //paint->setAntiAlias(true);
     //paint->setFilterQuality(kHigh_SkFilterQuality);
-    drawImageGPU(canvas, mImageSk, mDrawPos.x(), mDrawPos.y(), paint, grContext);
+    SkiaHelpers::drawImageGPU(canvas, mImageSk, mDrawPos.x(), mDrawPos.y(), paint, grContext);
     //canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
     canvas->restore();
 }

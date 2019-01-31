@@ -7,6 +7,7 @@
 #include "Properties/boxtargetproperty.h"
 #include "GUI/keysview.h"
 #include "Animators/effectanimators.h"
+#include "castmacros.h"
 
 ClipboardContainer::ClipboardContainer(const ClipboardContainerType &type) {
     mType = type;
@@ -51,7 +52,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     int firstKeyFrame = INT_MAX;
 
     QList<QList<stdsptr<Key>>> animatorKeys;
-    Q_FOREACH(const auto &animData, mAnimatorData) {
+    for(const auto &animData : mAnimatorData) {
         Animator *animator = animData.first;
         if(animator == nullptr) continue;
         QList<stdsptr<Key>> keys;
@@ -74,10 +75,10 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     int dFrame = pasteFrame - firstKeyFrame;
 
     int keysId = 0;
-    Q_FOREACH(const auto &animData, mAnimatorData) {
-        Animator *animator = animData.first;
-        const QList<stdsptr<Key>>& keys = animatorKeys.at(keysId);
-        Q_FOREACH(const auto& key, keys) {
+    for(const auto &animData : mAnimatorData) {
+        Animator * const animator = animData.first;
+        const auto& keys = animatorKeys.at(keysId);
+        for(const auto& key : keys) {
             key->setRelFrame(key->getRelFrame() + dFrame);
             animator->anim_appendKey(key);
             rKeys.append(key.get());
@@ -86,10 +87,9 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
         keysId++;
     }
     if(merge) {
-        Q_FOREACH(const auto &animData, mAnimatorData) {
-            Animator *animator = animData.first;
-            if(animator == nullptr) continue;
-            animator->anim_mergeKeysIfNeeded();
+        for(const auto &animData : mAnimatorData) {
+            Animator * const animator = animData.first;
+            if(animator) animator->anim_mergeKeysIfNeeded();
         }
     }
 }

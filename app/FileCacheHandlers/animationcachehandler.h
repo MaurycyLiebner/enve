@@ -1,6 +1,6 @@
 #ifndef ANIMATIONCACHEHANDLER_H
 #define ANIMATIONCACHEHANDLER_H
-#include "skia/skimagecopy.h"
+#include "skia/skiahelpers.h"
 #include "filecachehandler.h"
 
 class AnimationCacheHandler : public FileCacheHandler {
@@ -9,12 +9,12 @@ public:
     virtual sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame) = 0;
     sk_sp<SkImage> getFrameCopyAtFrame(const int &relFrame) {
         sk_sp<SkImage> imageToCopy = getFrameAtFrame(relFrame);
-        return makeSkImageCopy(imageToCopy);
+        return SkiaHelpers::makeSkImageCopy(imageToCopy);
     }
 
     sk_sp<SkImage> getFrameCopyAtOrBeforeFrame(const int &relFrame) {
         sk_sp<SkImage> imageToCopy = getFrameAtOrBeforeFrame(relFrame);
-        return makeSkImageCopy(imageToCopy);
+        return SkiaHelpers::makeSkImageCopy(imageToCopy);
     }
 
     virtual _ScheduledTask* scheduleFrameLoad(const int &frame) = 0;
