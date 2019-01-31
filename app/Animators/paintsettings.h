@@ -157,24 +157,16 @@ class Gradient : public ComplexAnimator {
     friend class SelfRef;
 public:
     void swapColors(const int &id1, const int &id2);
-
     void removeColor(const qsptr<ColorAnimator> &color);
-
     void addColor(const QColor &color);
-
-    void replaceColor(const int &id,
-                      const QColor &color);
+    void replaceColor(const int &id, const QColor &color);
 
     void prp_startTransform();
 
     bool isInPaths(PathBox *path);
-
     void addPath(PathBox *path);
-
     void removePath(PathBox *path);
-
     bool affectsPaths();
-
     void updatePaths(const UpdateReason &reason);
 
     //void finishTransform();
@@ -185,9 +177,7 @@ public:
     void setLoadId(const int &id);
 
     void addColorToList(const QColor &color);
-
     QColor getCurrentColorAt(const int &id);
-
     int getColorCount();
 
     QColor getLastQGradientStopQColor();
@@ -229,8 +219,7 @@ signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 protected:
     Gradient();
-    Gradient(const QColor &color1,
-             const QColor &color2);
+    Gradient(const QColor &color1, const QColor &color2);
 private:
     int mLoadId = -1;
     QGradientStops mQGradientStops;
@@ -281,26 +270,20 @@ class StrokeSettings : public PaintSettings {
     friend class SelfRef;
 public:
     void setCurrentStrokeWidth(const qreal &newWidth);
-
     void setCapStyle(const Qt::PenCapStyle &capStyle);
-
     void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
-
     void setStrokerSettings(QPainterPathStroker *stroker);
     void setStrokerSettingsSk(SkStroke *stroker);
 
-    void setStrokeBrushPressureCurve(
-            const qCubicSegment1D& curve) {
+    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve) {
         mBrushSettings->setStrokeBrushPressureCurve(curve);
     }
 
-    void setStrokeBrushTimeCurve(
-            const qCubicSegment1D& curve) {
+    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
         mBrushSettings->setStrokeBrushTimeCurve(curve);
     }
 
-    void setStrokeBrushWidthCurve(
-            const qCubicSegment1D& curve) {
+    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve) {
         mBrushSettings->setStrokeBrushWidthCurve(curve);
     }
 
@@ -311,11 +294,9 @@ public:
     qreal getCurrentStrokeWidth() const;
 
     Qt::PenCapStyle getCapStyle() const;
-
     Qt::PenJoinStyle getJoinStyle() const;
 
     QrealAnimator *getStrokeWidthAnimator();
-
     BrushSettings *getBrushSettings() {
         return mBrushSettings.get();
     }
@@ -355,6 +336,6 @@ private:
     qsptr<BrushSettings> mBrushSettings =
             SPtrCreate(BrushSettings)();
     qsptr<QrealAnimator> mLineWidth =
-            SPtrCreate(QrealAnimator)(1., 0., 999., 1., "thickness");
+            SPtrCreate(QrealAnimator)(1, 0, 999, 1, "thickness");
 };
 #endif // PAINTSETTINGS_H

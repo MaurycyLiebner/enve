@@ -260,7 +260,7 @@ bool Gradient::affectsPaths() {
 }
 
 void Gradient::updatePaths(const UpdateReason &reason) {
-    Q_FOREACH (PathBox *path, mAffectedPaths) {
+    for(const auto& path : mAffectedPaths) {
         //path->replaceCurrentFrameCache();
         path->updateDrawGradients();
         path->scheduleUpdate(reason);
@@ -281,7 +281,7 @@ void Gradient::startColorIdTransform(int id) {
 
 QGradientStops Gradient::getQGradientStopsAtAbsFrame(const int &absFrame) {
     QGradientStops stops;
-    qreal inc = 1./(mColors.length() - 1.);
+    const qreal inc = 1./(mColors.length() - 1.);
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
@@ -293,7 +293,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const int &absFrame) {
 
 QGradientStops Gradient::getQGradientStopsAtAbsFrameF(const qreal &absFrame) {
     QGradientStops stops;
-    qreal inc = 1./(mColors.length() - 1.);
+    const qreal inc = 1./(mColors.length() - 1.);
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
@@ -305,7 +305,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrameF(const qreal &absFrame) {
 
 void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
     mQGradientStops.clear();
-    qreal inc = 1./(mColors.length() - 1.);
+    const qreal inc = 1./(mColors.length() - 1.);
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
@@ -317,14 +317,14 @@ void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
 
 void Gradient::updateQGradientStopsFinal(const Animator::UpdateReason& reason) {
     mQGradientStops.clear();
-    qreal inc = 1./(mColors.length() - 1.);
+    const qreal inc = 1./(mColors.length() - 1.);
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
                                mColors.at(i)->getCurrentColor()) );
         cPos += inc;
     }
-    for(PathBox *path : mAffectedPaths) {
+    for(const auto& path : mAffectedPaths) {
         path->updateDrawGradients();
         path->scheduleUpdate(reason);
     }
@@ -507,7 +507,7 @@ void StrokeSettings::setStrokerSettingsForRelFrameSk(const int &relFrame,
 }
 
 void StrokeSettings::setStrokerSettingsForRelFrameSkF(const qreal &relFrame,
-                                                     SkStroke *stroker) {
+                                                      SkStroke *stroker) {
     qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrameF(relFrame);
     stroker->setWidth(qrealToSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
