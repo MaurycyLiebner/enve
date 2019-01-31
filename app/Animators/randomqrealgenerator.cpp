@@ -132,7 +132,7 @@ qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
     while(true) {
         QrealKey *nextKey =
                 GetAsPtr(mPeriod->anim_getNextKey(nextFrame), QrealKey);
-        if(nextKey == nullptr) {
+        if(!nextKey) {
             totDeltaX += qMax(0., prevPeriod - A/prevPeriod);
             break;
         } else {

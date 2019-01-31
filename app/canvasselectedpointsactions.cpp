@@ -5,7 +5,7 @@
 
 void Canvas::connectPoints() {
     QList<NodePoint*> selectedNodePoints;
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             if(asNodePt->isEndPoint()) {
@@ -64,7 +64,7 @@ void Canvas::connectPoints() {
 
             newSinglePath = firstSinglePath->connectWith(secondSinglePath);
         }
-        if(newSinglePath != nullptr) {
+        if(newSinglePath) {
             NodePoint *nodePt1 = newSinglePath->getNodePtWithNodeId(nodeToSelectId);
             NodePoint *nodePt2 = newSinglePath->getNodePtWithNodeId(nodeToSelectId + 1);
             addPointToSelection(nodePt1);
@@ -75,11 +75,11 @@ void Canvas::connectPoints() {
 
 void Canvas::disconnectPoints() {
     QList<NodePoint*> selectedNodePoints;
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             NodePoint *nextPoint = asNodePt->getNextPoint();
-            if(nextPoint == nullptr) continue;
+            if(!nextPoint) continue;
             if(nextPoint->isSelected()) {
                 selectedNodePoints.append(asNodePt);
             }
@@ -87,7 +87,7 @@ void Canvas::disconnectPoints() {
     }
     if(selectedNodePoints.count() != 1) return;
     clearPointsSelection();
-    Q_FOREACH(NodePoint *point, selectedNodePoints) {
+    for(NodePoint *point : selectedNodePoints) {
         NodePoint *secondPoint = point->getNextPoint();
         VectorPathAnimator *parentPath = point->getParentPath();
         bool wasClosed = parentPath->isClosed();
@@ -102,7 +102,7 @@ void Canvas::disconnectPoints() {
 
 //void Canvas::mergePoints() {
 //    QList<NodePoint*> selectedNodePoints;
-//    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
+//    for(MovablePoint *point : mSelectedPoints) {
 //        if(point->isNodePoint()) {
 //            if(((NodePoint*)point)->isEndPoint()) {
 //                selectedNodePoints.append( (NodePoint*) point);
@@ -181,7 +181,7 @@ void Canvas::disconnectPoints() {
 
 void Canvas::mergePoints() {
     QList<NodePoint*> selectedNodePoints;
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             //if(((NodePoint*)point)->isEndPoint()) {
@@ -218,7 +218,7 @@ void Canvas::mergePoints() {
 }
 
 void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             asNodePt->setCtrlsMode(mode);
@@ -228,7 +228,7 @@ void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
 
 void Canvas::makeSelectedPointsSegmentsCurves() {
     QList<NodePoint*> selectedNodePoints;
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             selectedNodePoints.append(asNodePt);
@@ -249,7 +249,7 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
 
 void Canvas::makeSelectedPointsSegmentsLines() {
     QList<NodePoint*> selectedNodePoints;
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             selectedNodePoints.append(asNodePt);
@@ -269,19 +269,19 @@ void Canvas::makeSelectedPointsSegmentsLines() {
 }
 
 void Canvas::finishSelectedPointsTransform() {
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         point->finishTransform();
     }
 }
 
 void Canvas::startSelectedPointsTransform() {
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         point->startTransform();
     }
 }
 
 void Canvas::cancelSelectedPointsTransform() {
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         point->cancelTransform();
     }
 }
@@ -290,18 +290,18 @@ void Canvas::moveSelectedPointsByAbs(const QPointF &by,
                                      const bool &startTransform) {
     if(startTransform) {
         startSelectedPointsTransform();
-        Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+        for(MovablePoint *point : mSelectedPoints_d) {
             point->moveByAbs(by);
         }
     } else {
-        Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+        for(MovablePoint *point : mSelectedPoints_d) {
             point->moveByAbs(by);
         }
     }
 }
 
 void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+    for(BoundingBox *box : mSelectedBoxes) {
         box->selectAndAddContainedPointsToList(absRect, mSelectedPoints_d);
     }
 }
@@ -322,17 +322,17 @@ void Canvas::removePointFromSelection(MovablePoint *point) {
 void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
     if(!BoxesGroup::mCtrlsAlwaysVisible) {
         QList<MovablePoint*> pointsToDeselect;
-        Q_FOREACH(MovablePoint* point, mSelectedPoints_d) {
+        for(MovablePoint* point : mSelectedPoints_d) {
             pointsToDeselect << point;
         }
-        Q_FOREACH(MovablePoint* point, pointsToDeselect) {
+        for(MovablePoint* point : pointsToDeselect) {
             removePointFromSelection(point);
         }
     }
 }
 
 void Canvas::removeSelectedPointsApproximateAndClearList() {
-    Q_FOREACH(MovablePoint* point, mSelectedPoints_d) {
+    for(MovablePoint* point : mSelectedPoints_d) {
         point->deselect();
         point->removeApproximate();
     }
@@ -343,7 +343,7 @@ void Canvas::removeSelectedPointsAndClearList() {
     if(mIsMouseGrabbing) {
         if(!BoxesGroup::mCtrlsAlwaysVisible ||
             mSelectedPoints_d.count() == 1) {
-            if(mLastPressedPoint != nullptr) {
+            if(mLastPressedPoint) {
                 if(mLastPressedPoint->isCtrlPoint()) {
                     mLastPressedPoint->cancelTransform();
                     mLastPressedPoint->deselect();
@@ -356,7 +356,7 @@ void Canvas::removeSelectedPointsAndClearList() {
         }
     }
 
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         point->deselect();
         point->removeFromVectorPath();
     }
@@ -364,14 +364,14 @@ void Canvas::removeSelectedPointsAndClearList() {
 }
 
 void Canvas::clearPointsSelection() {
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         point->deselect();
     }
     mSelectedPoints_d.clear();
     if(mCurrentMode == MOVE_POINT) {
         schedulePivotUpdate();
     }
-//    if(mLastPressedPoint != nullptr) {
+//    if(mLastPressedPoint) {
 //        mLastPressedPoint->deselect();
 //        mLastPressedPoint = nullptr;
 //    }
@@ -379,7 +379,7 @@ void Canvas::clearPointsSelection() {
 }
 
 void Canvas::clearLastPressedPoint() {
-    if(mLastPressedPoint != nullptr) {
+    if(mLastPressedPoint) {
         mLastPressedPoint->deselect();
         mLastPressedPoint = nullptr;
     }
@@ -392,7 +392,7 @@ void Canvas::clearCurrentEndPoint() {
 QPointF Canvas::getSelectedPointsAbsPivotPos() {
     if(mSelectedPoints_d.isEmpty()) return QPointF(0., 0.);
     QPointF posSum = QPointF(0., 0.);
-    Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+    for(MovablePoint *point : mSelectedPoints_d) {
         posSum += point->getAbsolutePos();
     }
     qreal invCount = 1./mSelectedPoints_d.length();
@@ -413,25 +413,25 @@ void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
     if(mSelectedPoints_d.isEmpty()) return;
     if(mLocalPivot) {
         if(startTrans) {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         }
     } else {
         if(startTrans) {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         }
@@ -445,25 +445,25 @@ void Canvas::scaleSelectedPointsBy(const qreal &scaleXBy,
     if(mSelectedPoints_d.isEmpty()) return;
     if(mLocalPivot) {
         if(startTrans) {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy );
             }
         } else {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         }
     } else {
         if(startTrans) {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         } else {
-            Q_FOREACH(MovablePoint *point, mSelectedPoints_d) {
+            for(MovablePoint *point : mSelectedPoints_d) {
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         }

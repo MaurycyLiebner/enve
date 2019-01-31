@@ -117,11 +117,11 @@ SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
     QFontMetricsF fm(mFont);
     qreal yT = 0.;
     qreal maxWidth = 0.;
-    Q_FOREACH(QString line, lines) {
+    for(QString line : lines) {
         qreal lineWidth = fm.width(line);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
-    Q_FOREACH(QString line, lines) {
+    for(QString line : lines) {
         qreal lineWidth = fm.width(line);
         qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
                       yT, mFont, line);
@@ -145,11 +145,11 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     QFontMetricsF fm(mFont);
     qreal yT = 0.;
     qreal maxWidth = 0.;
-    Q_FOREACH(QString line, lines) {
+    for(QString line : lines) {
         qreal lineWidth = fm.width(line);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
-    Q_FOREACH(QString line, lines) {
+    for(QString line : lines) {
         qreal lineWidth = fm.width(line);
         qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
                       yT, mFont, line);

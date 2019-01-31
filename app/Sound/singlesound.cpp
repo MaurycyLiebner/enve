@@ -44,10 +44,10 @@ FixedLenAnimationRect *SingleSound::getDurationRect() {
 }
 
 void SingleSound::setDurationRect(FixedLenAnimationRect *durRect) {
-    if(mDurationRectangle != nullptr) {
+    if(mDurationRectangle) {
         delete mDurationRectangle;
     }
-    if(durRect == nullptr) {
+    if(!durRect) {
         mOwnDurationRectangle = true;
         mDurationRectangle = new FixedLenAnimationRect(this);
         mDurationRectangle->setBindToAnimationFrameRange();

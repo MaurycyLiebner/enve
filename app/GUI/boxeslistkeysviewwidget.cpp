@@ -210,10 +210,10 @@ void BoxesListKeysViewWidget::setGraphEnabled(const bool &bT) {
 }
 
 void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
-    if(mTopWidget != nullptr) {
+    if(mTopWidget) {
         delete mTopWidget;
     }
-    if(topWidget == nullptr) {
+    if(!topWidget) {
         mTopWidget = new QWidget(this);
         mTopWidget->setFixedHeight(MIN_WIDGET_HEIGHT);
         mTopWidget->setStyleSheet("background-color: rgb(50, 50, 50)");

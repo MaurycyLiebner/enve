@@ -481,7 +481,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
 }
 
 void MainWindow::replaceClipboard(const stdsptr<ClipboardContainer>& container) {
-    if(mClipboardContainer != nullptr) {
+    if(mClipboardContainer) {
         BoundingBox::clearLoadedBoxes();
     }
     mClipboardContainer = container;
@@ -489,7 +489,7 @@ void MainWindow::replaceClipboard(const stdsptr<ClipboardContainer>& container) 
 
 ClipboardContainer *MainWindow::getClipboardContainer(
         const ClipboardContainerType &type) {
-    if(mClipboardContainer == nullptr) return nullptr;
+    if(!mClipboardContainer) return nullptr;
     if(type == mClipboardContainer->getType()) {
         return mClipboardContainer.get();
     }
@@ -766,7 +766,7 @@ void MainWindow::canvasNameChanged(Canvas *canvas,
                                    const QString &name) {
     const QList<qsptr<Canvas>> &canvasList = mCanvasWindow->getCanvasList();
     int idT = 0;
-    foreach(const qsptr<Canvas> &canvasPtr, canvasList) {
+    for(const auto& canvasPtr : canvasList) {
         if(canvasPtr == canvas) {
             break;
         }
@@ -890,7 +890,7 @@ void MainWindow::queScheduledTasksAndUpdate() {
 }
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
-    if(box == nullptr) {
+    if(!box) {
         mFillStrokeSettings->setCurrentSettings(nullptr,
                                                 nullptr);
     } else {
@@ -955,7 +955,7 @@ void MainWindow::disable() {
 }
 
 void MainWindow::enable() {
-    if(mGrayOutWidget == nullptr) return;
+    if(!mGrayOutWidget) return;
     enableEventFilter();
     delete mGrayOutWidget;
     mGrayOutWidget = nullptr;
@@ -1086,7 +1086,7 @@ void MainWindow::clearAll() {
     mCurrentCanvasComboBox->clear();
     mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
-//    foreach(ClipboardContainer *cont, mClipboardContainers) {
+//    for(ClipboardContainer *cont : mClipboardContainers) {
 //        delete cont;
 //    }
 //    mClipboardContainers.clear();
@@ -1185,7 +1185,7 @@ void MainWindow::linkFile() {
         "Link File", "", "AniVect Files (*.av)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
-        Q_FOREACH(const QString &path, importPaths) {
+        for(const QString &path : importPaths) {
             if(path.isEmpty()) continue;
             mCanvasWindow->createLinkToFileWithPath(path);
         }
@@ -1208,7 +1208,7 @@ void MainWindow::importImageSequence() {
 //    QStringList importPaths = QFileDialog::getOpenFileNames(this,
 //        "Import Video", "", "Video (*.mp4 *.mov *.avi)");
 //    enableEventFilter();
-//    Q_FOREACH(const QString &path, importPaths) {
+//    for(const QString &path : importPaths) {
 //        mCanvasWindow->createVideoForPath(path);
 //    }
 //    callUpdateSchedulers();
@@ -1225,14 +1225,14 @@ void MainWindow::revert() {
 }
 
 void MainWindow::undo() {
-    if(mCurrentUndoRedoStack == nullptr) return;
+    if(!mCurrentUndoRedoStack) return;
     getUndoRedoStack()->undo();
     mCanvasWindow->updateHoveredElements();
     queScheduledTasksAndUpdate();
 }
 
 void MainWindow::redo() {
-    if(mCurrentUndoRedoStack == nullptr) return;
+    if(!mCurrentUndoRedoStack) return;
     getUndoRedoStack()->redo();
     mCanvasWindow->updateHoveredElements();
     queScheduledTasksAndUpdate();

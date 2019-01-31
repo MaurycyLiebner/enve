@@ -15,7 +15,7 @@ FileSourceWidget::FileSourceWidget(FileSourceListVisibleWidget *parent) :
 
 void FileSourceWidget::setTargetCache(FileCacheHandlerAbstraction *target) {
     mTargetCache = target;
-    if(mTargetCache == nullptr) {
+    if(!mTargetCache) {
         setToolTip("");
     } else {
         setToolTip(mTargetCache->getFilePath());
@@ -93,7 +93,7 @@ void FileSourceWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void FileSourceWidget::mouseReleaseEvent(QMouseEvent *event) {
-    if(mTargetCache == nullptr) return;
+    if(!mTargetCache) return;
     if(event->button() == Qt::LeftButton) {
         if(event->modifiers() & Qt::ShiftModifier) {
             mTargetCache->switchSelected();
@@ -209,7 +209,7 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
     QAction *selected_action = menu.exec(globalPos);
     if(selected_action != nullptr) {
         if(selected_action->text() == "reload") {
-            foreach(FileCacheHandlerAbstraction *abs, mSelectedList) {
+            for(FileCacheHandlerAbstraction *abs : mSelectedList) {
                 abs->target->clearCache();
             }
         } else if(selected_action->text() == "replace...") {
@@ -241,7 +241,7 @@ FileSourceList::FileSourceList(QWidget *parent) : ScrollArea(parent) {
 void FileSourceList::dropEvent(QDropEvent *event) {
     if(event->mimeData()->hasUrls()) {
         QList<QUrl> urlList = event->mimeData()->urls();
-        foreach(const QUrl &url, urlList) {
+        for(const QUrl &url : urlList) {
             if(url.isLocalFile()) {
                 QString urlStr = url.toLocalFile();
                 QString ext = urlStr.split(".").last();

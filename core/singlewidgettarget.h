@@ -215,7 +215,7 @@ protected:
 
 struct SWT_TargetTypes {
     bool isTargeted(SingleWidgetTarget *target) const {
-        Q_FOREACH(SWT_Checker func, targetsFunctionList) {
+        for(SWT_Checker func : targetsFunctionList) {
             if((target->*func)()) {
                 return true;
             }

@@ -11,9 +11,9 @@ BrushCollection::BrushCollection(const BrushCollectionData &data,
     for(const BrushData& brushD : data.fBrushes) {
         stdsptr<BrushWrapper> itemSptr =
                 BrushWrapper::createBrushWrapper(brushD, getName());
-        if(itemSptr == nullptr) continue;
+        if(!itemSptr) continue;
         auto brushWidget = BrushWidget::createWidget(itemSptr, this);
-        if(brushWidget == nullptr) continue;
+        if(!brushWidget) continue;
         addWidget(brushWidget);
     }
 }

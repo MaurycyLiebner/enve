@@ -80,7 +80,7 @@ bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction,
     if(selectedAction->objectName() == "ib_set_src_file") {
         changeSourceFile(widgetsParent);
     } else if(selectedAction->objectName() == "ib_reload") {
-        if(mImgCacheHandler != nullptr) {
+        if(mImgCacheHandler) {
             mImgCacheHandler->clearCache();
         }
     } else {

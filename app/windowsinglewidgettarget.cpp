@@ -9,7 +9,7 @@ WindowSingleWidgetTarget::WindowSingleWidgetTarget(CanvasWindow *window) {
 SingleWidgetAbstraction* WindowSingleWidgetTarget::SWT_getAbstractionForWidget(
         const UpdateFuncs& updateFuncs,
         const int& visiblePartWidgetId) {
-    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
+    for(const auto& abs : mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidgetId() == visiblePartWidgetId) {
             return abs.get();
         }

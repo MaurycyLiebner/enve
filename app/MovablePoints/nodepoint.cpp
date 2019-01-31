@@ -105,7 +105,7 @@ void NodePoint::setRelativePos(const QPointF &relPos) {
 }
 
 void NodePoint::connectToPoint(NodePoint *point) {
-    if(point == nullptr) {
+    if(!point) {
         return;
     }
     if(!hasNextPoint()) {
@@ -118,7 +118,7 @@ void NodePoint::connectToPoint(NodePoint *point) {
 }
 
 void NodePoint::disconnectFromPoint(NodePoint *point) {
-    if(point == nullptr) {
+    if(!point) {
         return;
     }
     if(point == mNextPoint) {
@@ -369,7 +369,7 @@ NodePoint *NodePoint::getConnectedSeparateNodePoint() {
 
 void NodePoint::setNextPoint(NodePoint *nextPoint) {
     mNextPoint = nextPoint;
-    if(mNextPoint == nullptr) {
+    if(!mNextPoint) {
         if(mNextEdge.get() != nullptr) {
             mNextEdge.reset();
         }
@@ -385,7 +385,7 @@ void NodePoint::setNextPoint(NodePoint *nextPoint) {
 }
 
 void NodePoint::updateStartCtrlPtVisibility() {
-    if(mPreviousPoint == nullptr) {
+    if(!mPreviousPoint) {
         mStartCtrlPt->hide();
     } else {
         mStartCtrlPt->setVisible(mCurrentNodeSettings->startEnabled);
@@ -393,7 +393,7 @@ void NodePoint::updateStartCtrlPtVisibility() {
 }
 
 void NodePoint::updateEndCtrlPtVisibility() {
-    if(mNextPoint == nullptr) {
+    if(!mNextPoint) {
         mEndCtrlPt->hide();
     } else {
         mEndCtrlPt->setVisible(mCurrentNodeSettings->endEnabled);
@@ -541,7 +541,7 @@ void NodePoint::setPointAsNext(NodePoint *pointToSet) {
         mNextPoint->setPreviousPoint(nullptr);
     }
     setNextPoint(pointToSet);
-    if(pointToSet != nullptr) {
+    if(pointToSet) {
         pointToSet->setPreviousPoint(this);
     }
 }
@@ -551,7 +551,7 @@ void NodePoint::setPointAsPrevious(NodePoint *pointToSet) {
         mPreviousPoint->setNextPoint(nullptr);
     }
     setPreviousPoint(pointToSet);
-    if(pointToSet != nullptr) {
+    if(pointToSet) {
         pointToSet->setNextPoint(this);
     }
 }

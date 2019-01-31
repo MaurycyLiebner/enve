@@ -12,7 +12,7 @@ public:
 
     void setSize(const ushort &width,
                  const ushort &height) {
-        if(mTiles == nullptr) {
+        if(!mTiles) {
             mTiles = SPtrCreate(TilesData)(width, height, true);
         } else {
             mTiles->setSize(width, height);

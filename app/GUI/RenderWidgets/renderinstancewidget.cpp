@@ -160,9 +160,9 @@ void RenderInstanceWidget::updateFromSettings() {
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     OutputSettingsProfile *outputProfile = mSettings->getOutputSettingsProfile();
     QString outputTxt;
-    if(outputProfile == nullptr) {
+    if(!outputProfile) {
         AVOutputFormat *formatT = outputSettings.outputFormat;
-        if(formatT != nullptr) {
+        if(formatT) {
             outputTxt = "Custom " + QString(formatT->long_name);
         } else {
             outputTxt = "Settings";
@@ -188,7 +188,7 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
         OutputSettings outputSettings = dialog->getSettings();
         mSettings->setOutputRenderSettings(outputSettings);
         AVOutputFormat *outputFormat = outputSettings.outputFormat;
-        if(outputFormat == nullptr) {
+        if(!outputFormat) {
             mOutputSettingsButton->setText("Settings");
         } else {
             mOutputSettingsButton->setText("Custom " +
@@ -207,7 +207,7 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     }
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     AVOutputFormat *format = outputSettings.outputFormat;
-    if(format == nullptr) return;
+    if(!format) return;
     QString tmpStr = QString(format->extensions);
     QStringList supportedExt = tmpStr.split(",");
     QString fileName = outputDst.split("/").last();
@@ -249,7 +249,7 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString selectedExt;
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     AVOutputFormat *format = outputSettings.outputFormat;
-    if(format != nullptr) {
+    if(format) {
         QString tmpStr = QString(format->extensions);
         selectedExt = "." + tmpStr.split(",").first();
         tmpStr.replace(",", " *.");
@@ -297,7 +297,7 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
         menu.addAction(actionT);
 
         QAction *selectedAction = menu.exec(mapToGlobal(QPoint(0, height())));
-        if(selectedAction != nullptr) {
+        if(selectedAction) {
             int profileId = selectedAction->data().toInt();
             if(profileId == -1) {
                 const OutputSettings &outputSettings =

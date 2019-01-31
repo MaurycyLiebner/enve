@@ -664,7 +664,7 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     target->read(rcChar(&hasDurRect), sizeof(bool));
 
     if(hasDurRect) {
-        if(mDurationRectangle == nullptr) createDurationRectangle();
+        if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(target);
         updateAfterDurationRectangleShifted();
     }
@@ -709,7 +709,7 @@ void BoundingBox::readBoundingBoxDataForLink(QIODevice *target) {
 //    target->read(rcChar(&hasDurRect), sizeof(bool));
 
 //    if(hasDurRect) {
-//        if(mDurationRectangle == nullptr) createDurationRectangle();
+//        if(!mDurationRectangle) createDurationRectangle();
 //        mDurationRectangle->readDurationRectangle(target);
 //    }
 
@@ -942,7 +942,7 @@ void ParticleBox::writeBoundingBox(QIODevice *target) {
     mBottomRightAnimator->writeProperty(target);
     int nEmitters = mEmitters.count();
     target->write(rcConstChar(&nEmitters), sizeof(int));
-    foreach(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+    for(const auto& emitter : mEmitters) {
         emitter->writeProperty(target);
     }
 }
@@ -1090,7 +1090,7 @@ void AnimatedSurface::writeProperty(QIODevice * const target) const {
     if(nKeys == 0) {
         mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
     } else {
-        foreach(const auto &key, anim_mKeys) {
+        for(const auto &key : anim_mKeys) {
             key->writeKey(target);
         }
     }

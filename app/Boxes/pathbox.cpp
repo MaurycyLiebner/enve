@@ -186,7 +186,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             getColorAtRelFrameF(relFrame);
     fillSettings.fPaintType = mFillSettings->getPaintType();
     Gradient *grad = mFillSettings->getGradient();
-    if(grad != nullptr) {
+    if(grad) {
         fillSettings.updateGradient(
                     grad->getQGradientStopsAtAbsFrameF(
                         prp_relFrameToAbsFrameF(relFrame)),
@@ -216,7 +216,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             getColorAtRelFrameF(relFrame);
     strokeSettings.fPaintType = mStrokeSettings->getPaintType();
     grad = mStrokeSettings->getGradient();
-    if(grad != nullptr) {
+    if(grad) {
         strokeSettings.updateGradient(
                     grad->getQGradientStopsAtAbsFrameF(
                         prp_relFrameToAbsFrameF(relFrame)),
@@ -233,7 +233,7 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
     if(currentCanvasMode == MOVE_POINT) {
         pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
                                                               canvasScaleInv);
-        if(pointToReturn == nullptr) {
+        if(!pointToReturn) {
             pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
                                                                 canvasScaleInv);
         }
@@ -394,7 +394,7 @@ SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame) {
 SkPath PathBox::getPathWithEffectsUntilGroupSumAtRelFrame(const int &relFrame) {
     SkPath path = getPathAtRelFrame(relFrame);
     mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path);
-    if(mParentGroup == nullptr) return path;
+    if(!mParentGroup) return path;
     int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
     mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, &path, this);
@@ -418,7 +418,7 @@ void PathBox::getMotionBlurProperties(QList<Property*> &list) const {
 SkPath PathBox::getPathWithEffectsUntilGroupSumAtRelFrameF(const qreal &relFrame) {
     SkPath path = getPathAtRelFrameF(relFrame);
     mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &path);
-    if(mParentGroup == nullptr) return path;
+    if(!mParentGroup) return path;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterPathForRelFrameUntilGroupSumF(parentRelFrame, &path);
@@ -437,7 +437,7 @@ void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
 }
 
 void PathBox::duplicateFillSettingsFrom(PaintSettings *fillSettings) {
-    if(fillSettings == nullptr) {
+    if(!fillSettings) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
         QBuffer buffer;
@@ -451,7 +451,7 @@ void PathBox::duplicateFillSettingsFrom(PaintSettings *fillSettings) {
 }
 
 void PathBox::duplicateStrokeSettingsFrom(StrokeSettings *strokeSettings) {
-    if(strokeSettings == nullptr) {
+    if(!strokeSettings) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
         QBuffer buffer;
@@ -465,7 +465,7 @@ void PathBox::duplicateStrokeSettingsFrom(StrokeSettings *strokeSettings) {
 }
 
 void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) {
-    if(fillSettings == nullptr) {
+    if(!fillSettings) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
         PaintType paintType = fillSettings->getPaintType();
@@ -484,7 +484,7 @@ void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) 
 
 void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
         StrokeSettings *strokeSettings) {
-    if(strokeSettings == nullptr) {
+    if(!strokeSettings) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
         PaintType paintType = strokeSettings->getPaintType();
@@ -547,7 +547,7 @@ bool PathBox::differenceInFillPathBetweenFrames(const int &frame1, const int &fr
 
 #include "circle.h"
 VectorPath *PathBox::objectToVectorPathBox() {
-    qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
+    auto newPath = SPtrCreate(VectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
         auto circleT = GetAsPtr(this, Circle);
@@ -566,7 +566,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
 
 VectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return nullptr;
-    qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
+    auto newPath = SPtrCreate(VectorPath)();
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
     return newPath.get();

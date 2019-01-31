@@ -31,7 +31,7 @@ bool SingleWidgetAbstraction::getAbstractions(
         currY += swtHeight;
     }
     bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
-    Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
+    for(const auto& abs : mChildren) {
         if(abs->getAbstractions(
                     minY, maxY, currY, currX, swtHeight,
                     abstractions, rules,
@@ -64,7 +64,7 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         currY += swtHeight;
     }
     bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
-    Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
+    for(const auto& abs : mChildren) {
         if(abs->setSingleWidgetAbstractions(
                     minY, maxY,
                     currY, currX,
@@ -94,7 +94,7 @@ int SingleWidgetAbstraction::getHeight(
             height += swtHeight;
         }
         bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
-        Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
+        for(const auto& abs : mChildren) {
             height += abs->getHeight(rules, childrenVisible,
                                      mIsMainTarget, swtHeight);
         }
@@ -121,7 +121,7 @@ void SingleWidgetAbstraction::addChildAbstractionAt(
 
 SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
         SingleWidgetTarget* target) {
-    Q_FOREACH(const stdptr<SingleWidgetAbstraction> &abs, mChildren) {
+    for(const auto& abs : mChildren) {
         if(abs->getTarget() == target) {
             return abs;
         }
@@ -173,7 +173,7 @@ void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
 }
 
 SingleWidgetTarget *SingleWidgetAbstraction::getTarget() {
-    if(mTarget == nullptr) return nullptr;
+    if(!mTarget) return nullptr;
     return mTarget;
 }
 

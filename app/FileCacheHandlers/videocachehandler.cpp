@@ -20,7 +20,7 @@ VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
 
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     ImageCacheContainer *cont = mFramesCache.getRenderContainerAtRelFrame(relFrame);
-    if(cont == nullptr) return sk_sp<SkImage>();
+    if(!cont) return sk_sp<SkImage>();
     //cont->neededInMemory();
     return cont->getImageSk();
 }
@@ -29,7 +29,7 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int& relFrame) {
     ImageCacheContainer *cont =
             mFramesCache.getRenderContainerAtOrBeforeRelFrame(
                 relFrame);
-    if(cont == nullptr) return sk_sp<SkImage>();
+    if(!cont) return sk_sp<SkImage>();
     //cont->neededInMemory();
     return cont->getImageSk();
 }
@@ -142,7 +142,7 @@ void VideoCacheHandler::_processUpdate() {
         return;// -1;
     }
 
-    if(codec == nullptr) {
+    if(!codec) {
         fprintf(stderr, "Unsuported codec\n");
         return;
     }
@@ -179,7 +179,7 @@ void VideoCacheHandler::_processUpdate() {
     }
 
     bool frameReceived = false;
-    foreach(const int &frameId, mFramesBeingLoaded) {
+    for(const int &frameId : mFramesBeingLoaded) {
         int tsms = qRound(frameId * 1000 / mUpdateFps);
 
         int64_t frame = av_rescale(tsms, videoStream->time_base.den,
@@ -293,7 +293,7 @@ void VideoCacheHandler::afterProcessingFinished() {
             mFramesCache.createNewRenderContainerAtRelFrame(frameId, imgT);
         } else {
             mFramesCount = frameId;
-            foreach(const auto &box, mDependentBoxes) {
+            for(const auto &box : mDependentBoxes) {
                 if(!box) continue;
                 GetAsPtr(box, VideoBox)->updateDurationRectangleAnimationRange();
             }

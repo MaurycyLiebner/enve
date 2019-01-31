@@ -36,11 +36,11 @@ void BoxesListKeysViewWidgetResizer::displace(int totDy) {
     qDebug() << totDy << dY;
     if(totDy != dY) {
         if(totDy > 0) {
-            if(mBelowResizer != nullptr) {
+            if(mBelowResizer) {
                 mBelowResizer->displace(totDy - dY);
             }
         } else {
-            if(mAboveResizer != nullptr) {
+            if(mAboveResizer) {
                 mAboveResizer->displace(totDy - dY);
             }
         }
@@ -148,12 +148,12 @@ void VerticalWidgetsStack::updateResizers() {
         resId++;
         res->move(0, nextWid->y());
         res->setAboveResizer(lastRes);
-        if(lastRes != nullptr) {
+        if(lastRes) {
             lastRes->setBelowResizer(res);
         }
         lastRes = res;
     }
-    if(lastRes != nullptr) {
+    if(lastRes) {
         lastRes->setBelowResizer(nullptr);
     }
     for(int i = resId; i < mResizers.count(); i++) {
@@ -167,7 +167,7 @@ int VerticalWidgetsStack::getIdOf(QWidget *idOf) {
 
 void VerticalWidgetsStack::updatePercent() {
     qreal totHeight = 0.;
-    Q_FOREACH(QWidget *wid, mWidgets) {
+    for(QWidget *wid : mWidgets) {
         totHeight += wid->height();
         if(wid->height() == 0) totHeight += 2*MIN_WIDGET_HEIGHT;
     }

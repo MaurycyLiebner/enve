@@ -138,7 +138,7 @@ MovablePoint *Rectangle::getPointAtAbsPos(const QPointF &absPtPos,
     MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
-    if(pointToReturn == nullptr) {
+    if(!pointToReturn) {
         if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return mTopLeftPoint.get();
         }

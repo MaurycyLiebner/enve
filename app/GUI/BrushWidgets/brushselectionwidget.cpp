@@ -16,11 +16,11 @@ BrushSelectionWidget::BrushSelectionWidget(QWidget* parent) :
                                  CollectionAreaQObject*,
                                  StdSelfRef* item,
                                  QPoint globalPos) {
-        if(item == nullptr) return;
+        if(!item) return;
         QMenu menu(selectionWidget);
         menu.addAction("Bookmark");
         QAction* selectedAction = menu.exec(globalPos);
-        if(selectedAction == nullptr) return;
+        if(!selectedAction) return;
         if(selectedAction->text() == "Bookmark") {
             emit this->brushBookmarked(GetAsPtr(item, BrushWrapper));
         }

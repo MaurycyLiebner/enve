@@ -83,7 +83,7 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mMainLayout->addWidget(mOutputSettingsDisplayWidget);
     mMainLayout->addLayout(mButtonsLayout);
 
-    foreach(const auto& profile, OUTPUT_SETTINGS_PROFILES) {
+    for(const auto& profile : OUTPUT_SETTINGS_PROFILES) {
         mProfilesComboBox->addItem(profile->getName());
     }
 
@@ -117,7 +117,7 @@ void OutputSettingsProfilesDialog::updateButtonsEnabled() {
 
 void OutputSettingsProfilesDialog::currentProfileChanged() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
-    if(currentProfile == nullptr) {
+    if(!currentProfile) {
         mOutputSettingsDisplayWidget->hide();
         return;
     }
@@ -127,7 +127,7 @@ void OutputSettingsProfilesDialog::currentProfileChanged() {
 
 void OutputSettingsProfilesDialog::setCurrentProfileName(const QString &name) {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
-    if(currentProfile == nullptr) return;
+    if(!currentProfile) return;
     currentProfile->setName(name);
     mProfilesComboBox->setItemText(mProfilesComboBox->currentIndex(),
                                    name);
@@ -135,7 +135,7 @@ void OutputSettingsProfilesDialog::setCurrentProfileName(const QString &name) {
 
 void OutputSettingsProfilesDialog::deleteCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
-    if(currentProfile == nullptr) return;
+    if(!currentProfile) return;
     int currentId = mProfilesComboBox->currentIndex();
     mProfilesComboBox->removeItem(currentId);
     OUTPUT_SETTINGS_PROFILES.removeAt(currentId);
@@ -145,7 +145,7 @@ void OutputSettingsProfilesDialog::deleteCurrentProfile() {
 
 void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
-    if(currentProfile == nullptr) return;
+    if(!currentProfile) return;
     auto newProfile = SPtrCreate(OutputSettingsProfile)();
     newProfile->setSettings(currentProfile->getSettings());
     newProfile->setName(currentProfile->getName() + "1");
@@ -172,7 +172,7 @@ void OutputSettingsProfilesDialog::createAndEditNewProfile() {
 
 void OutputSettingsProfilesDialog::editCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
-    if(currentProfile == nullptr) return;
+    if(!currentProfile) return;
     const OutputSettings &outputSettings = currentProfile->getSettings();
     RenderSettingsDialog *dialog = new RenderSettingsDialog(outputSettings,
                                                             this);

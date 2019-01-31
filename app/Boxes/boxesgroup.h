@@ -19,7 +19,7 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
 
     void updateRelBoundingRect() {
         SkPath boundingPaths = SkPath();
-        Q_FOREACH(const auto &child, fChildrenRenderData) {
+        for(const auto &child : fChildrenRenderData) {
             SkPath childPath;
             childPath.addRect(
                     QRectFToSkRect(
@@ -38,7 +38,7 @@ protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
-        Q_FOREACH(const auto &child, fChildrenRenderData) {
+        for(const auto &child : fChildrenRenderData) {
             child->drawRenderedImageForParent(canvas);
         }
 

@@ -27,7 +27,7 @@ public:
             setVideoCodecText(QString(settings.videoCodec->long_name));
         }
         const char *pixelFormat = av_get_pix_fmt_name(settings.videoPixelFormat);
-        if(pixelFormat == nullptr) {
+        if(!pixelFormat) {
             setPixelFormatText("-");
         } else {
             setPixelFormatText(QString(pixelFormat));

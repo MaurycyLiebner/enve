@@ -40,7 +40,7 @@ void AnimatedSurface::currentDataModified() {
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
         } else {
             Key *key = anim_getPrevKey(anim_mCurrentRelFrame);
-            if(key == nullptr) {
+            if(!key) {
                 key = anim_getNextKey(anim_mCurrentRelFrame);
             }
             anim_updateAfterChangedKey(key);
@@ -56,7 +56,7 @@ void AnimatedSurface::anim_saveCurrentValueAsKey() {
     SurfaceKey *key = GetAsPtr(anim_mKeyOnCurrentFrame, SurfaceKey);
     SurfaceKey *prevKey = GetAsPtr(anim_getPrevKey(key), SurfaceKey);
     TilesData *tiles;
-    if(prevKey == nullptr) {
+    if(!prevKey) {
         tiles = mCurrentTiles.get();
     } else {
         tiles = prevKey->getTilesData();
@@ -69,20 +69,20 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
         anim_setRecordingValue(true);
     }
     Key *keyAtFrame = anim_getKeyAtRelFrame(relFrame);
-    if(keyAtFrame != nullptr) {
+    if(keyAtFrame) {
         GetAsPtr(keyAtFrame, SurfaceKey)->getTilesData()->clearTiles();
         return;
     }
 
     SurfaceKey *prevKey = GetAsPtr(anim_getPrevKey(relFrame), SurfaceKey);
-    if(prevKey != nullptr) {
+    if(prevKey) {
         if(prevKey->getRelFrame() == relFrame) {
             prevKey->getTilesData()->clearTiles();
             return;
         }
     }
 
-    stdsptr<SurfaceKey> frameT = SPtrCreate(SurfaceKey)(this);
+    auto frameT = SPtrCreate(SurfaceKey)(this);
     frameT->setRelFrame(relFrame);
     if(prp_hasKeys()) {
         frameT->setSize(static_cast<ushort>(mWidth),
@@ -102,7 +102,7 @@ void AnimatedSurface::newEmptyPaintFrame() {
 
 void AnimatedSurface::updateTargetTiles() {
     mCurrentTiles->setCurrentlyUsed(false);
-    foreach(const stdsptr<TilesData> &tilesDataT, mDrawTilesData) {
+    for(const auto& tilesDataT : mDrawTilesData) {
         tilesDataT->setCurrentlyUsed(false);
     }
     mDrawTilesData.clear();
@@ -253,7 +253,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
     if(prp_hasKeys()) {
         int n_tile_cols_t = qCeil(width_t/static_cast<qreal>(TILE_DIM));
         int n_tile_rows_t = qCeil(height_t/static_cast<qreal>(TILE_DIM));
-        Q_FOREACH(const auto &key, anim_mKeys) {
+        for(const auto &key : anim_mKeys) {
             SurfaceKey *frameT = GetAsPtr(key, SurfaceKey);
             frameT->setSize(width_t,
                             height_t);
@@ -269,7 +269,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
 
 void AnimatedSurface::move(const int &xT, const int &yT) {
     if(prp_hasKeys()) {
-        Q_FOREACH(const auto &key, anim_mKeys) {
+        for(const auto &key : anim_mKeys) {
             SurfaceKey *frameT = GetAsPtr(key, SurfaceKey);
             frameT->getTilesData()->move(xT, yT);
         }

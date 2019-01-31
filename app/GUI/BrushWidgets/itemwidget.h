@@ -35,7 +35,7 @@ public:
                                     QWidget *parent);
     ~ItemWidget() {
         if(mSelected) emit selected(nullptr);
-        if(mItem == nullptr) return;
+        if(!mItem) return;
         mItem->removeItemWidget(this);
     }
 

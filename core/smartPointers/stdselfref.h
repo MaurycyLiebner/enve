@@ -34,7 +34,7 @@ public:
     static inline std::shared_ptr<D> getAsSPtr(B* base) {
         static_assert(std::is_base_of<B, D>::value ||
                       std::is_base_of<D, B>::value, "Classes not related");
-        if(base == nullptr) return nullptr;
+        if(!base) return nullptr;
         return base->template ref<D>();
     }
 

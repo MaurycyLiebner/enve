@@ -40,12 +40,12 @@ TaskScheduler::TaskScheduler() {
 }
 
 TaskScheduler::~TaskScheduler() {
-    foreach(const auto& thread, mExecutorThreads) {
+    for(const auto& thread : mExecutorThreads) {
         thread->quit();
         thread->wait();
         delete thread;
     }
-    foreach(const auto& taskExecutor, mCPUTaskExecutors) {
+    for(const auto& taskExecutor : mCPUTaskExecutors) {
         delete taskExecutor;
     }
 //    mFileControlerThread->quit();
@@ -88,7 +88,7 @@ void TaskScheduler::queScheduledCPUTasks() {
             mCurrentCanvas->scheduleWaitingTasks();
             mCurrentCanvas->queScheduledTasks();
         }
-        foreach(const auto &task, mScheduledCPUTasks) {
+        for(const auto &task : mScheduledCPUTasks) {
             queCPUTask(task);
         }
         mScheduledCPUTasks.clear();
@@ -97,7 +97,7 @@ void TaskScheduler::queScheduledCPUTasks() {
 
 void TaskScheduler::queScheduledHDDTasks() {
     if(!mHDDThreadBusy) {
-        foreach(const auto &task, mScheduledHDDTasks) {
+        for(const auto &task : mScheduledHDDTasks) {
             if(!task->isQued()) task->taskQued();
 
             mQuedHDDTasks << task;
@@ -188,7 +188,7 @@ void TaskScheduler::processNextQuedCPUTask(
                 //return;
                 if(mFreeCPUThreads.isEmpty() || mQuedCPUTasks.isEmpty()) {
 //                    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
-//                    if(usageWidget != nullptr)
+//                    if(usageWidget)
 //                        usageWidget->setThreadsUsage(mThreadsUsed);
                     return;
                 }
@@ -200,6 +200,6 @@ void TaskScheduler::processNextQuedCPUTask(
         //callAllQuedCPUTasksFinishedFunc();
     }
 //    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
-//    if(usageWidget == nullptr) return;
+//    if(!usageWidget) return;
 //    usageWidget->setThreadsUsage(mThreadsUsed);
 }

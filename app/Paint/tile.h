@@ -93,7 +93,7 @@ struct TileSkDrawerCollection {
 
     void drawSk(SkCanvas *canvas) const {
         QRectF rect;
-        foreach(TileSkDrawer *drawer, drawers) {
+        for(TileSkDrawer *drawer : drawers) {
             if(rect.isNull()) {
                 rect = QRectF(drawer->posX,
                               drawer->posY,
@@ -128,14 +128,14 @@ struct TileSkDrawerCollection {
 //            paint.setBlendMode(SkBlendMode::kDstIn);
 //            canvas->saveLayer(nullptr, nullptr);
 //            canvas->clear(hueCol);
-            foreach(TileSkDrawer *drawer, drawers) {
+            for(TileSkDrawer *drawer : drawers) {
                 drawer->drawSk(bitmapCanvas, &paint);
             }
             //canvas->restore();
         } else {
             SkPaint paint;
             paint.setAlpha(alpha);
-            foreach(TileSkDrawer *drawer, drawers) {
+            for(TileSkDrawer *drawer : drawers) {
                 drawer->drawSk(bitmapCanvas, &paint);
             }
         }

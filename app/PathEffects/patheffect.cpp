@@ -26,7 +26,7 @@ const PathEffectType &PathEffect::getEffectType() {
 }
 
 bool PathEffect::applyBeforeThickness() {
-    if(mApplyBeforeThickness == nullptr) return false;
+    if(!mApplyBeforeThickness) return false;
     return mApplyBeforeThickness->getValue();
 }
 
@@ -50,7 +50,7 @@ void PathEffect::setIsOutlineEffect(const bool &bT) {
     if(mOutlineEffect) {
         mApplyBeforeThickness = SPtrCreate(BoolProperty)("pre-thickness");
         ca_addChildAnimator(mApplyBeforeThickness);
-    } else if(mApplyBeforeThickness != nullptr) {
+    } else if(mApplyBeforeThickness) {
         ca_removeChildAnimator(mApplyBeforeThickness);
         mApplyBeforeThickness.reset();
     }

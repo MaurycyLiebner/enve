@@ -236,7 +236,7 @@ public:
     VectorPathSvgAttributes() {}
 
     SvgSeparatePath *newSeparatePath() {
-        stdsptr<SvgSeparatePath> lastPath = SPtrCreate(SvgSeparatePath)();
+        auto lastPath = SPtrCreate(SvgSeparatePath)();
         mSvgSeparatePaths << lastPath;
         return lastPath.get();
     }

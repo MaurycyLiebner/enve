@@ -28,12 +28,12 @@ void KeysView::graphSetCornerCtrlAction() {
 void KeysView::graphMakeSegmentsSmoothAction(const bool& smooth) {
     if(mSelectedKeysAnimators.isEmpty()) return;
     QList<QList<GraphKey*>> segments;
-    foreach(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         //if(!mAnimators.contains(anim)) continue;
         anim->getSelectedSegments(segments);
     }
 
-    Q_FOREACH(const auto& segment, segments) {
+    for(const auto& segment : segments) {
         Q_ASSERT(segment.length() > 1);
         auto firstKey = segment.first();
         auto lastKey = segment.last();
@@ -71,7 +71,7 @@ void KeysView::graphPaint(QPainter *p) {
     int currAlpha = 75;
     qreal lineWidth = 1.;
     QList<int> incFrameList = { 1, 5, 10, 100 };
-    Q_FOREACH(int incFrame, incFrameList) {
+    for(int incFrame : incFrameList) {
         if(mPixelsPerFrame*incFrame < 15.) continue;
         bool drawText = mPixelsPerFrame*incFrame > 30.;
         p->setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
@@ -168,7 +168,7 @@ void KeysView::graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal) {
         minVal = 1000000;
         maxVal = -1000000;
 
-        Q_FOREACH(const auto& anim, mGraphAnimators) {
+        for(const auto& anim : mGraphAnimators) {
             qreal animMinVal;
             qreal animMaxVal;
             if(anim->anim_graphValuesCorrespondToFrames()) {
@@ -249,7 +249,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
     graphGetValueAndFrameFromPos(pressPos, &value, &frame);
 
     QrealPoint* pressedPoint = nullptr;
-    Q_FOREACH(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         pressedPoint = anim->anim_getPointAt(value, frame,
                                              mPixelsPerFrame,
                                              mPixelsPerValUnit);
@@ -310,10 +310,10 @@ void KeysView::graphMouseRelease() {
         }
 
         QList<GraphKey*> keysList;
-        Q_FOREACH(const auto& anim, mGraphAnimators) {
+        for(const auto& anim : mGraphAnimators) {
             anim->addKeysInRectToList(mSelectionRect, keysList);
         }
-        Q_FOREACH(GraphKey *const key, keysList) {
+        for(GraphKey *const key : keysList) {
             addKeyToSelection(key);
         }
 
@@ -327,7 +327,7 @@ void KeysView::graphMouseRelease() {
                     addKeyToSelection(mPressedPoint->getParentKey());
                 }
             } else {
-                foreach(const auto& anim, mGraphAnimators) {
+                for(const auto& anim : mGraphAnimators) {
                     if(!anim->hasSelectedKeys()) continue;
                     anim->finishSelectedKeysTransform();
 //                    key->finishValueTransform();
@@ -369,7 +369,7 @@ void KeysView::graphMiddleRelease() {
 }
 
 void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
-    Q_FOREACH(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         anim->anim_constrainCtrlsFrameValues();
     }
 }
@@ -377,7 +377,7 @@ void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
 void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
     if(mSelectedKeysAnimators.isEmpty()) return;
 
-    foreach(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         if(!anim->hasSelectedKeys()) continue;
         anim->setCtrlsModeForSelectedKeys(mode);
     }
@@ -386,7 +386,7 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
 
 void KeysView::graphSetTwoSideCtrlForSelected() {
     if(mSelectedKeysAnimators.isEmpty()) return;
-    foreach(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         if(!anim->hasSelectedKeys()) continue;
         anim->enableCtrlPtsForSelected();
     }
@@ -396,7 +396,7 @@ void KeysView::graphSetTwoSideCtrlForSelected() {
 void KeysView::graphClearAnimatorSelection() {
     clearKeySelection();
 
-//    Q_FOREACH(QrealAnimator *animator, mAnimators) {
+//    for(QrealAnimator *animator : mAnimators) {
 //        animator->setIsCurrentAnimator(false);
 //    }
     mGraphAnimators.clear();
@@ -417,7 +417,7 @@ void KeysView::graphDeletePressed() {
     } else {
         deleteSelectedKeys();
 
-        Q_FOREACH(const auto& anim, mGraphAnimators) {
+        for(const auto& anim : mGraphAnimators) {
             anim->anim_updateKeysPath();
         }
     }
@@ -439,17 +439,17 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             QPointF frameValueChange = currentFrameAndValue -
                     mPressFrameAndValue;
             if(mFirstMove) {
-                foreach(const auto& anim, mGraphAnimators) {
+                for(const auto& anim : mGraphAnimators) {
                     if(!anim->hasSelectedKeys()) continue;
                     anim->changeSelectedKeysFrameAndValueStart(frameValueChange);
                 }
             } else {
-                foreach(const auto& anim, mGraphAnimators) {
+                for(const auto& anim : mGraphAnimators) {
                     if(!anim->hasSelectedKeys()) continue;
                     anim->changeSelectedKeysFrameAndValue(frameValueChange);
                 }
             }
-            foreach(const auto& anim, mGraphAnimators) {
+            for(const auto& anim : mGraphAnimators) {
                 if(!anim->hasSelectedKeys()) continue;
                 anim->anim_sortKeys();
             }
@@ -464,7 +464,7 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             qreal clamedValue = clamp(value, mMinMoveVal, mMaxMoveVal);
             mPressedPoint->moveTo(clampedFrame, clamedValue);
         }
-        Q_FOREACH(const auto& anim, mGraphAnimators) {
+        for(const auto& anim : mGraphAnimators) {
             anim->anim_updateKeysPath();
         }
     }
@@ -478,12 +478,12 @@ void KeysView::graphMousePressEvent(const QPoint &eventPos,
         qreal frame;
         graphGetValueAndFrameFromPos(eventPos, &value, &frame);
         QrealPoint *point = nullptr;
-        Q_FOREACH(const auto& anim, mGraphAnimators) {
+        for(const auto& anim : mGraphAnimators) {
             point = anim->anim_getPointAt(value, frame,
                                          mPixelsPerFrame, mPixelsPerValUnit);
-            if(point != nullptr) break;
+            if(point) break;
         }
-        if(point == nullptr) return;
+        if(!point) return;
         QrealPointValueDialog *dialog = new QrealPointValueDialog(point, this);
         dialog->show();
         connect(dialog, &QrealPointValueDialog::repaintSignal,
@@ -570,7 +570,7 @@ void KeysView::graphResetValueScaleAndMinShown() {
 
 void KeysView::updateAnimatorsColors() {
     int i = 0;
-    Q_FOREACH(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         anim->setAnimatorColor(mBoxesListVisible,
                                    ANIMATOR_COLORS.at(
                                        i %
@@ -620,7 +620,7 @@ void KeysView::graphUpdateAfterKeysChangedIfNeeded() {
 }
 
 void KeysView::graphUpdateAfterKeysChanged() {
-    Q_FOREACH(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         anim->anim_sortKeys();
         anim->anim_updateKeysPath();
     }
@@ -629,7 +629,7 @@ void KeysView::graphUpdateAfterKeysChanged() {
 }
 
 void KeysView::graphMergeKeysIfNeeded() {
-    Q_FOREACH(const auto& anim, mGraphAnimators) {
+    for(const auto& anim : mGraphAnimators) {
         anim->anim_mergeKeysIfNeeded();
     }
 }

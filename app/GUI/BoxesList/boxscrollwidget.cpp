@@ -11,7 +11,7 @@ BoxScrollWidget::BoxScrollWidget(ScrollArea *parent) :
 }
 
 //void BoxScrollWidget::updateAbstraction() {
-//    if(mMainTarget == nullptr) {
+//    if(!mMainTarget) {
 //        mMainAbstraction = nullptr;
 //    } else {
 //        mMainAbstraction = mMainTarget->

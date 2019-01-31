@@ -14,13 +14,13 @@ ScrollWidget::ScrollWidget(ScrollArea *parent) :
 }
 
 void ScrollWidget::updateAbstraction() {
-    if(mMainAbstraction != nullptr) {
+    if(mMainAbstraction) {
         mMainAbstraction->setIsMainTarget(false);
 //        if(mMainAbstraction->isDeletable()) {
 //            delete mMainAbstraction;
 //        }
     }
-    if(mMainTarget == nullptr) {
+    if(!mMainTarget) {
         mMainAbstraction = nullptr;
     } else {
         int widId = mVisiblePartWidget->getId();
@@ -44,7 +44,7 @@ void ScrollWidget::setMainTarget(SingleWidgetTarget *target) {
 }
 
 void ScrollWidget::updateHeight() {
-    if(mMainAbstraction == nullptr) {
+    if(!mMainAbstraction) {
         hide();
         return;
     }

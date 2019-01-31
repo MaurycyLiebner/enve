@@ -92,7 +92,7 @@ public:
     void writeProperty(QIODevice * const target) const {
         int nKeys = anim_mKeys.count();
         target->write(rcConstChar(&nKeys), sizeof(int));
-        foreach(const auto &key, anim_mKeys) {
+        for(const auto &key : anim_mKeys) {
             key->writeKey(target);
         }
         gWrite(target, mCurrentValue);

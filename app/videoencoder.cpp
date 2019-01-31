@@ -76,7 +76,7 @@ static bool add_video_stream(OutputStream *ost,
     AVCodecContext *c;
     AVCodec *codec = outSettings.videoCodec;
 
-//    if(codec == nullptr) {
+//    if(!codec) {
 //        /* find the video encoder */
 //        codec = avcodec_find_encoder(codec_id);
 //        if(!codec) {
@@ -226,7 +226,7 @@ static bool write_video_frame(AVFormatContext *oc,
     c = ost->enc;
 
     AVFrame *frame = get_video_frame(ost, image, error);
-    if(frame == nullptr) return false;
+    if(!frame) return false;
 
     /* encode the image */
     ret = avcodec_send_frame(c, frame);
@@ -558,15 +558,15 @@ static bool process_audio_stream(AVFormatContext *oc,
 }
 
 bool VideoEncoder::startEncodingNow(QString &error) {
-    if(mOutputFormat == nullptr) {
+    if(!mOutputFormat) {
         mOutputFormat = av_guess_format(nullptr, mPathByteArray.data(), nullptr);
-        if(mOutputFormat == nullptr) {
+        if(!mOutputFormat) {
             error = "No AVOutputFormat provided. "
                     "Could not guess AVOutputFormat from file extension";
             return false;
 //            mOutputFormat = av_guess_format("mpeg", nullptr, nullptr);
         }
-//        if(mOutputFormat == nullptr) {
+//        if(!mOutputFormat) {
 //            fprintf(stderr, "MPEG format not available.\n");
 //            return false;
 //        }

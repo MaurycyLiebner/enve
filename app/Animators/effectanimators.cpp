@@ -12,7 +12,7 @@ void EffectAnimators::addEffect(const qsptr<PixmapEffect>& effect) {
 
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMargin();
@@ -23,7 +23,7 @@ qreal EffectAnimators::getEffectsMargin() const {
 
 qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
     qreal newMargin = 0.;
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
@@ -34,7 +34,7 @@ qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
 
 qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const {
     qreal newMargin = 0.;
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(qRound(relFrame));
@@ -46,12 +46,12 @@ qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const 
 void EffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
         BoundingBoxRenderData* data) {
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {
             stdsptr<PixmapEffectRenderData> effectRenderData =
                     pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame, data);
-            if(effectRenderData == nullptr) continue;
+            if(!effectRenderData) continue;
             data->fPixmapEffects.append(effectRenderData);
         }
     }

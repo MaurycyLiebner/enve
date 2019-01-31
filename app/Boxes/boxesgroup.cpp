@@ -563,7 +563,7 @@ const QList<qsptr<BoundingBox> > &BoxesGroup::getContainedBoxesList() const {
 }
 
 qsptr<BoundingBox> BoxesGroup::createLink() {
-    qsptr<InternalLinkGroupBox> linkBox = SPtrCreate(InternalLinkGroupBox)(this);
+    auto linkBox = SPtrCreate(InternalLinkGroupBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
     return std::move(linkBox);
 }
@@ -616,7 +616,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                              childrenEffectsMargin);
             }
         }
-        if(lastPathBox != nullptr) {
+        if(lastPathBox) {
             qreal boxRelFrame = lastPathBox->prp_absFrameToRelFrameF(absFrame);
             auto boxRenderData = SPtrCreate(PathBoxRenderData)(this);
             lastPathBox->setupBoundingBoxRenderDataForRelFrameF(
@@ -1008,7 +1008,7 @@ void BoxesGroupRenderData::renderToImage() {
     fScaledTransform = fTransform*scale;
     //transformRes.scale(resolution, resolution);
     fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
-    foreach(const QRectF &rectT, fOtherGlobalRects) {
+    for(const QRectF &rectT : fOtherGlobalRects) {
         fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
     }
     fGlobalBoundingRect = fGlobalBoundingRect.

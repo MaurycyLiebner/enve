@@ -76,7 +76,7 @@ void DrawPath::addNodeAt(const QPointF &pos) {
     int closestPosId = 0;
     int idT = 0;
     QPointF lastPos;
-    foreach(const QPointF &posT, mOriginalPoses) {
+    for(const QPointF &posT : mOriginalPoses) {
         if(idT > 0) {
             QPointF closestT =
                     gGetClosestPointOnLineSegment(lastPos, posT, pos);

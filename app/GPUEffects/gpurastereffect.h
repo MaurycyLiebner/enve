@@ -18,7 +18,7 @@ public:
 
     void use(QGL33c * const gl, QJSEngine& engine) {
         gl->glUseProgram(mProgram.fID);
-        Q_FOREACH(const auto& uni, mUniformSpecifiers) {
+        for(const auto& uni : mUniformSpecifiers) {
             uni(gl, engine);
         }
         if(mProgram.fGPosLoc >= 0) {

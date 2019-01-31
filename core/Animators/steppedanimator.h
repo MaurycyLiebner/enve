@@ -15,7 +15,7 @@ public:
         } else {
             key = this->anim_getPrevKey(relFrame);
         }
-        if(key == nullptr) {
+        if(!key) {
             key = this->anim_getNextKey(relFrame);
         }
         return static_cast<KeyT<T>*>(key)->getValue();
@@ -39,7 +39,7 @@ public:
             fId = prevKey->getRelFrame();
             prevPrevKey = prevKey;
             prevKey = prevKey->getPrevKey();
-            if(prevKey == nullptr) {
+            if(!prevKey) {
                 fId = INT_MIN;
                 break;
             }
@@ -51,7 +51,7 @@ public:
             if(nextKey->differsFromKey(prevNextKey)) break;
             prevNextKey = nextKey;
             nextKey = nextKey->getNextKey();
-            if(nextKey == nullptr) {
+            if(!nextKey) {
                 lId = INT_MAX;
                 break;
             }

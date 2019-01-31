@@ -149,7 +149,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
 void Canvas::drawSelectedSk(SkCanvas *canvas,
                             const CanvasMode &currentCanvasMode,
                             const SkScalar &invScale) {
-    Q_FOREACH(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }
 }
@@ -236,7 +236,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     if(isPreviewingOrRendering()) {
         drawTransparencyMesh(canvas, viewRect);
-        if(mCurrentPreviewContainer != nullptr) {
+        if(mCurrentPreviewContainer) {
             canvas->save();
 
             canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
@@ -256,7 +256,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         drawTransparencyMesh(canvas, viewRect);
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
 
-        if(mCurrentPreviewContainer != nullptr) {
+        if(mCurrentPreviewContainer) {
             canvas->save();
             SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
@@ -284,7 +284,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         canvas->saveLayer(nullptr, nullptr);
         if(!mClipToCanvasSize || !drawCanvas) {
-            Q_FOREACH(const qsptr<BoundingBox> &box, mContainedBoxes) {
+            for(const auto& box : mContainedBoxes) {
                 box->drawPixmapSk(canvas, grContext);
             }
         }
@@ -340,10 +340,10 @@ void Canvas::renderSk(SkCanvas * const canvas,
             mHoveredPoint_d->drawHovered(canvas, invScale);
         } else if(mHoveredEdge_d != nullptr) {
             mHoveredEdge_d->drawHoveredSk(canvas, invScale);
-        } else if(mHoveredBone != nullptr) {
+        } else if(mHoveredBone) {
             mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invScale);
-        } else if(mHoveredBox != nullptr) {
-            if(mCurrentEdge == nullptr) {
+        } else if(mHoveredBox) {
+            if(!mCurrentEdge) {
                 mHoveredBox->drawHoveredSk(canvas, invScale);
             }
         }
@@ -553,14 +553,14 @@ qsptr<BoundingBox> Canvas::createLink() {
 }
 
 ImageBox *Canvas::createImageBox(const QString &path) {
-    qsptr<ImageBox> img = SPtrCreate(ImageBox)(path);
+    auto img = SPtrCreate(ImageBox)(path);
     mCurrentBoxesGroup->addContainedBox(img);
     return img.get();
 }
 
 #include "Boxes/imagesequencebox.h"
 ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
-    qsptr<ImageSequenceBox> aniBox = SPtrCreate(ImageSequenceBox)();
+    auto aniBox = SPtrCreate(ImageSequenceBox)();
     aniBox->setListOfFrames(paths);
     mCurrentBoxesGroup->addContainedBox(aniBox);
     return aniBox.get();
@@ -568,21 +568,21 @@ ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 
 #include "Boxes/videobox.h"
 VideoBox* Canvas::createVideoForPath(const QString &path) {
-    qsptr<VideoBox> vidBox = SPtrCreate(VideoBox)(path);
+    auto vidBox = SPtrCreate(VideoBox)(path);
     mCurrentBoxesGroup->addContainedBox(vidBox);
     return vidBox.get();
 }
 
 #include "Boxes/linkbox.h"
 ExternalLinkBox* Canvas::createLinkToFileWithPath(const QString &path) {
-    qsptr<ExternalLinkBox> extLinkBox = SPtrCreate(ExternalLinkBox)();
+    auto extLinkBox = SPtrCreate(ExternalLinkBox)();
     extLinkBox->setSrc(path);
     mCurrentBoxesGroup->addContainedBox(extLinkBox);
     return extLinkBox.get();
 }
 
 SingleSound* Canvas::createSoundForPath(const QString &path) {
-    qsptr<SingleSound> singleSound = SPtrCreate(SingleSound)(path);
+    auto singleSound = SPtrCreate(SingleSound)(path);
     getSoundComposition()->addSoundAnimator(singleSound);
     return singleSound.get();
 }
@@ -729,7 +729,7 @@ bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
         }
         updateTransformation();
     } else if(event->key() == Qt::Key_N) {
-        Q_FOREACH(const auto& box, mSelectedBoxes) {
+        for(const auto& box : mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = GetAsPtr(box, PaintBox);
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
@@ -769,7 +769,7 @@ void Canvas::copyAction() {
     target.write(rcChar(&nBoxes), sizeof(int));
 
     std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
-    Q_FOREACH(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }
     target.close();
@@ -796,7 +796,7 @@ void Canvas::duplicateAction() {
 
 void Canvas::selectAllAction() {
     if(mCurrentMode == MOVE_POINT) {
-        foreach(const auto& box, mSelectedBoxes) {
+        for(const auto& box : mSelectedBoxes) {
             box->selectAllPoints(this);
         }
     } else {//if(mCurrentMode == MOVE_PATH) {
@@ -807,16 +807,16 @@ void Canvas::selectAllAction() {
 void Canvas::invertSelectionAction() {
     if(mCurrentMode == MOVE_POINT) {
         QList<stdptr<MovablePoint>> selectedPts = mSelectedPoints_d;
-        foreach(const qptr<BoundingBox>& box, mSelectedBoxes) {
+        for(const auto& box : mSelectedBoxes) {
             box->selectAllPoints(this);
         }
-        foreach(const stdptr<MovablePoint>& pt, selectedPts) {
+        for(const auto& pt : selectedPts) {
             removePointFromSelection(pt);
         }
     } else {//if(mCurrentMode == MOVE_PATH) {
         QList<qptr<BoundingBox>> boxes = mSelectedBoxes;
         selectAllBoxesFromBoxesGroup();
-        foreach(const qptr<BoundingBox>& box, boxes) {
+        for(const auto& box : boxes) {
             box->removeFromSelection();
         }
     }
@@ -845,7 +845,7 @@ void Canvas::prp_setAbsFrame(const int &frame) {
         if(difference) scheduleUpdate(Animator::FRAME_CHANGE);
     }
 
-    Q_FOREACH(const auto &box, mContainedBoxes) {
+    for(const auto &box : mContainedBoxes) {
         box->prp_setAbsFrame(frame);
     }
     mUndoRedoStack->setFrame(frame);
@@ -872,7 +872,7 @@ void Canvas::setParentToLastSelected() {
         Bone *bone = mSelectedBones.last();
         BasicTransformAnimator *trans = bone->getTransformAnimator();
         auto box = bone->getParentBox();
-        foreach(const auto& boxT, mSelectedBoxes) {
+        for(const auto& boxT : mSelectedBoxes) {
             if(boxT == box) continue;
             boxT->setParentTransform(trans);
         }
@@ -946,7 +946,7 @@ void Canvas::deselectAllBoxesAction() {
 }
 
 void Canvas::selectAllPointsAction() {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->selectAllPoints(this);
     }
 }
@@ -1010,7 +1010,7 @@ void Canvas::moveByRel(const QPointF &trans) {
 //void Canvas::updateAfterFrameChanged(const int &currentFrame) {
 //    anim_mCurrentAbsFrame = currentFrame;
 
-//    Q_FOREACH(const qsptr<BoundingBox> &box, mChildBoxes) {
+//    for(const auto& box : mChildBoxes) {
 //        box->prp_setAbsFrame(currentFrame);
 //    }
 
@@ -1130,55 +1130,55 @@ int Canvas::getMaxFrame() {
 }
 
 void Canvas::startDurationRectPosTransformForAllSelected() {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->startDurationRectPosTransform();
     }
 }
 
 void Canvas::finishDurationRectPosTransformForAllSelected() {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->finishDurationRectPosTransform();
     }
 }
 
 void Canvas::moveDurationRectForAllSelected(const int &dFrame) {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->moveDurationRect(dFrame);
     }
 }
 
 void Canvas::startMinFramePosTransformForAllSelected() {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->startMinFramePosTransform();
     }
 }
 
 void Canvas::finishMinFramePosTransformForAllSelected() {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->finishMinFramePosTransform();
     }
 }
 
 void Canvas::moveMinFrameForAllSelected(const int &dFrame) {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->moveMinFrame(dFrame);
     }
 }
 
 void Canvas::startMaxFramePosTransformForAllSelected() {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->startMaxFramePosTransform();
     }
 }
 
 void Canvas::finishMaxFramePosTransformForAllSelected() {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->finishMaxFramePosTransform();
     }
 }
 
 void Canvas::moveMaxFrameForAllSelected(const int &dFrame) {
-    foreach(const auto& box, mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->moveMaxFrame(dFrame);
     }
 }
@@ -1243,7 +1243,7 @@ void CanvasRenderData::renderToImage() {
     rasterCanvas.flush();
 
     if(!fPixmapEffects.isEmpty()) {
-        foreach(const auto& effect, fPixmapEffects) {
+        for(const auto& effect : fPixmapEffects) {
             effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
@@ -1259,7 +1259,7 @@ void CanvasRenderData::drawSk(SkCanvas *canvas) {
 
     canvas->scale(qrealToSkScalar(fResolution),
                   qrealToSkScalar(fResolution));
-    Q_FOREACH(const auto &renderData, fChildrenRenderData) {
+    for(const auto &renderData : fChildrenRenderData) {
         //box->draw(p);
         renderData->drawRenderedImageForParent(canvas);
     }

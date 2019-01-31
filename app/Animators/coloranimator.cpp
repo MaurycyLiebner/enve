@@ -118,7 +118,7 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
         return;
     }
 
-    Q_FOREACH(const auto &key, anim_mKeys) {
+    for(const auto &key : anim_mKeys) {
         int frame = key->getAbsFrame();
 
         qreal rF = mVal1Animator->getCurrentValueAtAbsFrame(frame);

@@ -76,7 +76,7 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
     mFontSizeCombo->clear();
     QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
                                                  getCurrentFontStyle() );
-    Q_FOREACH(const int &size, sizes) {
+    for(const int &size : sizes) {
         mFontSizeCombo->addItem(QString::number(size) );
     }
 

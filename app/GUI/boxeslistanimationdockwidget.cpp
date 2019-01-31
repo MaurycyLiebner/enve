@@ -299,7 +299,7 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
 
 void BoxesListAnimationDockWidget::clearAll() {
     QList<BoxesListKeysViewWidget*> widgets = mBoxesListKeysViewWidgets;
-    Q_FOREACH(BoxesListKeysViewWidget *widget, widgets) {
+    for(BoxesListKeysViewWidget *widget : widgets) {
         removeBoxesListKeysViewWidget(widget);
     }
 }
@@ -322,7 +322,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
               !(event->modifiers() & Qt::ControlModifier)) {
         Canvas *currCanvas =
                 mMainWindow->getCanvasWindow()->getCurrentCanvas();
-        if(currCanvas == nullptr) return false;
+        if(!currCanvas) return false;
         int targetFrame;
         if(currCanvas->prp_prevRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
@@ -333,7 +333,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
               !(event->modifiers() & Qt::ControlModifier)) {
         Canvas *currCanvas =
                 mMainWindow->getCanvasWindow()->getCurrentCanvas();
-        if(currCanvas == nullptr) return false;
+        if(!currCanvas) return false;
         int targetFrame;
         if(currCanvas->prp_nextRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
@@ -443,14 +443,14 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
     mAnimationWidgetScrollbar->update();
     mRenderWidget->setRenderedFrame(frame);
-    foreach(const auto& keysView, mBoxesListKeysViewWidgets) {
+    for(const auto& keysView : mBoxesListKeysViewWidgets) {
         keysView->update();
     }
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
         Canvas* canvas) {
-    if(canvas == nullptr) {
+    if(!canvas) {
         mAnimationWidgetScrollbar->setCacheHandler(nullptr);
     } else {
         disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
@@ -467,7 +467,7 @@ void BoxesListAnimationDockWidget::setViewedFrameRange(
         const int &minFrame, const int &maxFrame) {
     mFrameRangeScrollbar->setViewedFrameRange(minFrame, maxFrame);
     mAnimationWidgetScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
-    foreach(const auto& keysView, mBoxesListKeysViewWidgets) {
+    for(const auto& keysView : mBoxesListKeysViewWidgets) {
         keysView->setDisplayedFrameRange(minFrame, maxFrame);
     }
 }

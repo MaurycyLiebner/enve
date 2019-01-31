@@ -45,13 +45,13 @@ void ClosableContainer::setCheckable(const bool &check) {
 }
 
 void ClosableContainer::setChecked(const bool &check) {
-    if(mCheckBox == nullptr) return;
+    if(!mCheckBox) return;
     if(mCheckBox->isChecked() == check) return;
     mCheckBox->setChecked(true);
 }
 
 bool ClosableContainer::isChecked() {
-    if(mCheckBox == nullptr) return true;
+    if(!mCheckBox) return true;
     return mCheckBox->isChecked();
 }
 
@@ -61,7 +61,7 @@ void ClosableContainer::setContentVisible(const bool &bT) {
     } else {
         mContentArrow->setIcon(QIcon(":/icons/list_show_children.png"));
     }
-    foreach(QWidget *widget, mContWidgets) {
+    for(QWidget *widget : mContWidgets) {
         widget->setVisible(bT);
     }
 }

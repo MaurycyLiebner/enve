@@ -60,7 +60,7 @@ void CanvasWindow::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         const UpdateFuncs &updateFuncs,
         const int& visiblePartWidgetId) {
-    Q_FOREACH(const qsptr<Canvas> &child, mCanvasList) {
+    for(const auto& child : mCanvasList) {
         auto abs = child->SWT_getAbstractionForWidget(updateFuncs,
                                                       visiblePartWidgetId);
         abstraction->addChildAbstraction(abs);
@@ -260,27 +260,27 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     KFT_setFocus();
-    if(mCurrentCanvas == nullptr) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->mousePressEvent(event);
 }
 
 void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
-    if(mCurrentCanvas == nullptr) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->mouseReleaseEvent(event);
 }
 
 void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
-    if(mCurrentCanvas == nullptr) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->mouseMoveEvent(event);
 }
 
 void CanvasWindow::wheelEvent(QWheelEvent *event) {
-    if(mCurrentCanvas == nullptr) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->wheelEvent(event);
 }
 
 void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
-    if(mCurrentCanvas == nullptr) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->mouseDoubleClickEvent(event);
 }
 
@@ -1145,7 +1145,7 @@ void CanvasWindow::nextSaveOutputFrame() {
 }
 
 void CanvasWindow::clearAll() {
-    foreach(const qsptr<Canvas> &canvas, mCanvasList) {
+    for(const auto& canvas : mCanvasList) {
         mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     }
 
@@ -1315,11 +1315,11 @@ void CanvasWindow::importFile(const QString &path,
         if(isVectorExt(extension)) {
             importedBox = loadSVGFile(path);
         } else if(isImageExt(extension)) {
-            qsptr<ImageBox> imgBox = SPtrCreate(ImageBox)();
+            auto imgBox = SPtrCreate(ImageBox)();
             importedBox = GetAsSPtr(imgBox, BoundingBox);
             imgBox->setFilePath(path);
         } else if(isVideoExt(extension)) {
-            qsptr<VideoBox> vidBox = SPtrCreate(VideoBox)();
+            auto vidBox = SPtrCreate(VideoBox)();
             importedBox = GetAsSPtr(vidBox, BoundingBox);
             vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {
@@ -1380,7 +1380,7 @@ void CanvasWindow::importFile() {
                                                    "*.wav *.mp3)");
     MainWindow::getInstance()->enableEventFilter();
     if(!importPaths.isEmpty()) {
-        Q_FOREACH(const QString &path, importPaths) {
+        for(const QString &path : importPaths) {
             if(path.isEmpty()) continue;
             try {
                 importFile(path);

@@ -81,7 +81,7 @@ struct EmitterData {
         paint.setColor(color);
         paint.setStrokeCap(SkPaint::kRound_Cap);
         paint.setStyle(SkPaint::kStroke_Style);
-        Q_FOREACH(const ParticleState &state, particleStates) {
+        for(const ParticleState &state : particleStates) {
             state.drawSk(canvas, paint);
         }
         canvas->restore();
@@ -109,7 +109,7 @@ private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
         canvas->clipRect(fClipRect);
-        Q_FOREACH(const EmitterData &emitterData, fEmittersData) {
+        for(const EmitterData &emitterData : fEmittersData) {
             if(emitterData.boxDraw) {
                 canvas->save();
                 canvas->resetMatrix();
@@ -292,7 +292,7 @@ public:
         BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
         particleData->fEmittersData.clear();
-        foreach(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+        for(const auto& emitter : mEmitters) {
             emitter->generateParticlesIfNeeded();
             particleData->fEmittersData << emitter->getEmitterDataAtRelFrameF(
                                               relFrame, particleData);

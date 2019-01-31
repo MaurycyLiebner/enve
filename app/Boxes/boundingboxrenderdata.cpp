@@ -80,7 +80,7 @@ void BoundingBoxRenderData::renderToImage() {
     fScaledTransform = fTransform*scale;
     //transformRes.scale(resolution, resolution);
     fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
-    foreach(const QRectF &rectT, fOtherGlobalRects) {
+    for(const QRectF &rectT : fOtherGlobalRects) {
         fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
     }
     fGlobalBoundingRect = fGlobalBoundingRect.
@@ -115,7 +115,7 @@ void BoundingBoxRenderData::renderToImage() {
                              qRound(fGlobalBoundingRect.top()));
 
     if(!fPixmapEffects.isEmpty()) {
-        foreach(const auto& effect, fPixmapEffects) {
+        for(const auto& effect : fPixmapEffects) {
             effect->applyEffectsSk(fBitmapTMP, fResolution);
         }
         clearPixmapEffects();
@@ -158,7 +158,7 @@ void BoundingBoxRenderData::taskQued() {
             fParentBox->setupBoundingBoxRenderDataForRelFrameF(
                         fRelFrame, this);
         }
-        foreach(const auto& customizer, mRenderDataCustomizerFunctors) {
+        for(const auto& customizer : mRenderDataCustomizerFunctors) {
             (*customizer)(this);
         }
     }

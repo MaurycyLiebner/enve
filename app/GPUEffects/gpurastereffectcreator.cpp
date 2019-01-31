@@ -7,7 +7,7 @@ QList<stdsptr<GPURasterEffectCreator>> GPURasterEffectCreator::sEffectCreators;
 
 qsptr<Property> GPURasterEffectCreator::create() const {
     auto rasterEffect = SPtrCreate(GPURasterEffect)(fProgram, fName);
-    Q_FOREACH(const auto& property, fProperties) {
+    for(const auto& property : fProperties) {
         rasterEffect->ca_addChildAnimator(property->create());
     }
     return std::move(rasterEffect);
@@ -182,7 +182,7 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
         RuntimeThrow(errMsg.toStdString());
     }
 
-    foreach(const auto& propC, propCs) {
+    for(const auto& propC : propCs) {
         GLint loc = propC->getUniformLocation(gl, program.fID);
         if(loc < 0) {
             gl->glDeleteProgram(program.fID);

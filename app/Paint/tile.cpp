@@ -12,7 +12,7 @@ void processPaintDabs(const QList<Dab> &dabs,
                       const ushort &dataWidth,
                       uchar *data) {
 
-    foreach(const Dab &dab_t, dabs) {
+    for(const Dab &dab_t : dabs) {
         qreal cs = cos(dab_t.beta_deg*2*PI/360);
         qreal sn = sin(dab_t.beta_deg*2*PI/360);
 
@@ -177,7 +177,7 @@ void Tile::clear() {
 void Tile::setTileWidth(const ushort &width_t) {
     if(width_t == mMaxPaintX) return;
     mMaxPaintX = width_t;
-    if(mDrawer != nullptr) {
+    if(mDrawer) {
         mDrawer->maxPaintX = mMaxPaintX;
         scheduleTask();
     }
@@ -186,7 +186,7 @@ void Tile::setTileWidth(const ushort &width_t) {
 void Tile::setTileHeight(const ushort &height_t) {
     if(height_t == mMaxPaintY) return;
     mMaxPaintY = height_t;
-    if(mDrawer != nullptr) {
+    if(mDrawer) {
         mDrawer->maxPaintY = mMaxPaintY;
         scheduleTask();
     }
@@ -246,7 +246,7 @@ Tile::Tile(const ushort &x_t, const ushort &y_t,
 }
 
 Tile::~Tile() {
-    if(mDrawer == nullptr) return;
+    if(!mDrawer) return;
     mDrawer->parentTile = nullptr;
 }
 
@@ -503,7 +503,7 @@ void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
 
 void TileSkDrawer::taskQued() {
     _ScheduledTask::taskQued();
-    if(parentTile != nullptr) {
+    if(parentTile) {
         parentTile->setDabsForDrawer();
     }
 }
@@ -516,7 +516,7 @@ void TileSkDrawer::_processUpdate() {
 }
 
 void TileSkDrawer::afterProcessingFinished() {
-    if(parentTile != nullptr) {
+    if(parentTile) {
         parentTile->updateTexFromDataArray();
     }
 }

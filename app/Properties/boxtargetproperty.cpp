@@ -13,7 +13,7 @@ void BoxTargetProperty::setTarget(BoundingBox* box) {
     if(mTarget_d != nullptr) {
         QObject::disconnect(mTarget_d, nullptr, this, nullptr);
     }
-    if(box == nullptr) {
+    if(!box) {
         mTarget_d.clear();
     } else {
         mTarget_d = box;
@@ -33,6 +33,6 @@ BoxTargetPropertyWaitingForBoxLoad::BoxTargetPropertyWaitingForBoxLoad(
 }
 
 void BoxTargetPropertyWaitingForBoxLoad::boxLoaded(BoundingBox *box) {
-    if(targetProperty == nullptr) return;
+    if(!targetProperty) return;
     targetProperty->setTarget(box);
 }

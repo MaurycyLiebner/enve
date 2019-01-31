@@ -23,9 +23,9 @@ void PathAnimator::setParentBox(BoundingBox *parent) {
 
 VectorPathEdge *PathAnimator::getEdge(const QPointF &absPos,
                                       const qreal &canvasScaleInv) {
-    Q_FOREACH(const qsptr<VectorPathAnimator> &path, mSinglePaths) {
+    for(const auto& path : mSinglePaths) {
         VectorPathEdge *edge = path->getEdge(absPos, canvasScaleInv);
-        if(edge == nullptr) continue;
+        if(!edge) continue;
         return edge;
     }
     return nullptr;
@@ -69,7 +69,7 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
         switch(verbT) {
             case SkPath::kMove_Verb: {
                 SkPoint pt = pts[0];
-                if(singlePathAnimator != nullptr) {
+                if(singlePathAnimator) {
                     addSinglePathAnimator(singlePathAnimator);
                 }
                 singlePathAnimator = SPtrCreate(VectorPathAnimator)(this);
@@ -179,7 +179,7 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
         }
     }
 DONE:
-    if(singlePathAnimator != nullptr) {
+    if(singlePathAnimator) {
         addSinglePathAnimator(singlePathAnimator);
     }
 }
@@ -187,7 +187,7 @@ DONE:
 SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
     SkPath path = SkPath();
 
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         path.addPath(singlePath->getPathAtRelFrame(relFrame));
     }
 
@@ -197,7 +197,7 @@ SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
 SkPath PathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
     SkPath path = SkPath();
 
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         path.addPath(singlePath->getPathAtRelFrameF(relFrame));
     }
 
@@ -205,7 +205,7 @@ SkPath PathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
 }
 
 void PathAnimator::selectAllPoints(Canvas *canvas) {
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         singlePath->selectAllPoints(canvas);
     }
 }
@@ -213,18 +213,18 @@ void PathAnimator::selectAllPoints(Canvas *canvas) {
 NodePoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
                                                   const bool &adjust,
                                                   const qreal &canvasScaleInv) {
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         NodePoint *pt = singlePath->createNewPointOnLineNear(absPos,
                                                              adjust,
                                                              canvasScaleInv);
-        if(pt == nullptr) continue;
+        if(!pt) continue;
         return pt;
     }
     return nullptr;
 }
 
 void PathAnimator::applyTransformToPoints(const QMatrix &transform) {
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         singlePath->applyTransformToPoints(transform);
     }
 }
@@ -233,11 +233,11 @@ MovablePoint *PathAnimator::getPointAtAbsPos(
                                     const QPointF &absPtPos,
                                     const CanvasMode &currentCanvasMode,
                                     const qreal &canvasScaleInv) {
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         MovablePoint* pt = singlePath->getPointAtAbsPos(absPtPos,
                                                      currentCanvasMode,
                                                      canvasScaleInv);
-        if(pt == nullptr) continue;
+        if(!pt) continue;
         return pt;
     }
 
@@ -248,7 +248,7 @@ void PathAnimator::drawSelected(SkCanvas *canvas,
                                 const CanvasMode &currentCanvasMode,
                                 const SkScalar &invScale,
                                 const SkMatrix &combinedTransform) {
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         singlePath->drawSelected(canvas,
                                  currentCanvasMode,
                                  invScale,
@@ -258,7 +258,7 @@ void PathAnimator::drawSelected(SkCanvas *canvas,
 
 void PathAnimator::selectAndAddContainedPointsToList(
         const QRectF &absRect, QList<stdptr<MovablePoint>> &list) {
-    Q_FOREACH(const qsptr<VectorPathAnimator>& singlePath, mSinglePaths) {
+    for(const auto& singlePath : mSinglePaths) {
         singlePath->selectAndAddContainedPointsToList(absRect, list);
     }
 }
@@ -268,13 +268,13 @@ BoundingBox *PathAnimator::getParentBox() {
 }
 
 void PathAnimator::shiftAllPointsForAllKeys(const int &by) {
-    Q_FOREACH(const qsptr<VectorPathAnimator> &path, mSinglePaths) {
+    for(const auto& path : mSinglePaths) {
         path->shiftAllPointsForAllKeys(by);
     }
 }
 
 void PathAnimator::revertAllPointsForAllKeys() {
-    Q_FOREACH(const qsptr<VectorPathAnimator> &path, mSinglePaths) {
+    for(const auto& path : mSinglePaths) {
         path->revertAllPointsForAllKeys();
     }
 }
@@ -289,13 +289,13 @@ void PathAnimator::addAllSinglePathsToAnimator(PathAnimator *target) {
 }
 
 void PathAnimator::shiftAllPoints(const int &by) {
-    Q_FOREACH(const qsptr<VectorPathAnimator> &path, mSinglePaths) {
+    for(const auto& path : mSinglePaths) {
         path->shiftAllPoints(by);
     }
 }
 
 void PathAnimator::revertAllPoints() {
-    Q_FOREACH(const qsptr<VectorPathAnimator> &path, mSinglePaths) {
+    for(const auto& path : mSinglePaths) {
         path->revertAllPoints();
     }
 }

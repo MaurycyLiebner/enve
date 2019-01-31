@@ -11,7 +11,7 @@ SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
 
 void SingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     mTarget = abs;
-    if(abs == nullptr) {
+    if(!abs) {
         hide();
     } else {
         if(isHidden()) show();

@@ -31,7 +31,7 @@ public:
     }
 
     int getFirstAnimationFrame() {
-        if(mFirstAnimationFrameSpinBox == nullptr) return 0;
+        if(!mFirstAnimationFrameSpinBox) return 0;
         return mFirstAnimationFrameSpinBox->value();
     }
 protected:

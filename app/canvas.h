@@ -365,7 +365,7 @@ public:
     void setPathEffectsVisible(const bool &bT) { mPathEffectsVisible = bT; }
 protected:
 //    void updateAfterCombinedTransformationChanged() {
-////        Q_FOREACH(const qsptr<BoundingBox>& child, mChildBoxes) {
+////        for(const auto& child : mChildBoxes) {
 ////            child->updateCombinedTransformTmp();
 ////            child->scheduleSoftUpdate();
 ////        }
@@ -577,7 +577,7 @@ public:
 
     template <class T>
     void applyEffectToSelected() {
-        Q_FOREACH(const qptr<BoundingBox>& box, mSelectedBoxes) {
+        for(const auto& box : mSelectedBoxes) {
             box->addEffect<T>();
         }
     }

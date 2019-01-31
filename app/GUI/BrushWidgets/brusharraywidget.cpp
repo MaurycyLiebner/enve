@@ -19,7 +19,7 @@ bool BrushArrayWidget::readBinary(QIODevice *src,
         if(!gRead(src, collectionName)) return false;
         if(!gRead(src, brushName)) return false;
         BrushWrapper* brush = brushes->getItem(collectionName, brushName);
-        if(brush == nullptr) continue;
+        if(!brush) continue;
         appendBrush(GetAsSPtr(brush, BrushWrapper));
     }
     return true;

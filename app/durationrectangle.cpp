@@ -48,14 +48,14 @@ bool DurationRectangleMovable::isHovered() {
 }
 
 void DurationRectangleMovable::pressed(const bool &shiftPressed) {
-    if(mChildProperty == nullptr) return;
+    if(!mChildProperty) return;
     if(mChildProperty->SWT_isBoundingBox()) {
         ((BoundingBox*)mChildProperty)->selectionChangeTriggered(shiftPressed);
     }
 }
 
 bool DurationRectangleMovable::isSelected() {
-    if(mChildProperty != nullptr) {
+    if(mChildProperty) {
         if(mChildProperty->SWT_isBoundingBox()) {
             return ((BoundingBox*)mChildProperty)->isSelected();
         }
@@ -249,7 +249,7 @@ void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
         setMaxFrame(dialog->getMaxFrame());
     }
 
-    if(dialog != nullptr) {
+    if(dialog) {
         if(dialog->result() == QDialog::Accepted) {
             int newMinFrame = getMinFrame();
             int newMaxFrame = getMaxFrame();
@@ -375,7 +375,7 @@ void FixedLenAnimationRect::openDurationSettingsDialog(QWidget *parent) {
         setFirstAnimationFrame(dialog->getFirstAnimationFrame());
     }
 
-    if(dialog != nullptr) {
+    if(dialog) {
         if(dialog->result() == QDialog::Accepted) {
             int newMinFrame = getMinFrame();
             int newMaxFrame = getMaxFrame();

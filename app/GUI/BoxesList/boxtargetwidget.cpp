@@ -56,14 +56,14 @@ void BoxTargetWidget::dragLeaveEvent(QDragLeaveEvent *event) {
 }
 
 void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
-    if(mProperty == nullptr) return;
+    if(!mProperty) return;
     if(event->button() == Qt::LeftButton) {
         auto tester = &Property::SWT_isBoundingBox;
         BoundingBox *parentBox =
                 mProperty->getFirstAncestor<BoundingBox>(tester);
-        if(parentBox == nullptr) return;
+        if(!parentBox) return;
         BoxesGroup *srcGroup = parentBox->getParentGroup();
-        if(srcGroup == nullptr) return;
+        if(!srcGroup) return;
         QList<qsptr<BoundingBox> > boxesT =
                 srcGroup->getContainedBoxesList();
         QMenu menu(this);
@@ -72,12 +72,12 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         BoundingBox *currentTarget = mProperty->getTarget();
         int i = -1;
         QAction *act = menu.addAction("-none-");
-        if(currentTarget == nullptr) {
+        if(!currentTarget) {
             act->setCheckable(true);
             act->setChecked(true);
             act->setDisabled(true);
         }
-        foreach(const qsptr<BoundingBox> &boxT, boxesT) {
+        for(const auto& boxT : boxesT) {
             i++;
             if(boxT.data() == parentBox) continue;
             QAction *act2 = menu.addAction(boxT->prp_getName());
@@ -106,7 +106,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void BoxTargetWidget::paintEvent(QPaintEvent *) {
-    if(mProperty == nullptr) return;
+    if(!mProperty) return;
     QPainter p(this);
     if(mProperty->SWT_isDisabled()) p.setOpacity(.5);
     p.setRenderHint(QPainter::Antialiasing);
@@ -121,7 +121,7 @@ void BoxTargetWidget::paintEvent(QPaintEvent *) {
     p.setPen(Qt::black);
     if(mProperty) {
         BoundingBox *target = mProperty->getTarget();
-        if(target == nullptr) {
+        if(!target) {
             p.drawText(rect(), Qt::AlignCenter, "-none-");
         } else {
             p.drawText(rect(), Qt::AlignCenter, target->getName());

@@ -180,7 +180,7 @@ void Gradient::prp_startTransform() {
 }
 
 void Gradient::addColorToList(const QColor &color) {
-    qsptr<ColorAnimator> newColorAnimator = SPtrCreate(ColorAnimator)();
+    auto newColorAnimator = SPtrCreate(ColorAnimator)();
     newColorAnimator->qra_setCurrentValue(color);
     addColorToList(newColorAnimator);
 }
@@ -324,7 +324,7 @@ void Gradient::updateQGradientStopsFinal(const Animator::UpdateReason& reason) {
                                mColors.at(i)->getCurrentColor()) );
         cPos += inc;
     }
-    Q_FOREACH(PathBox *path, mAffectedPaths) {
+    for(PathBox *path : mAffectedPaths) {
         path->updateDrawGradients();
         path->scheduleUpdate(reason);
     }
@@ -369,7 +369,7 @@ void PaintSettings::setGradientVar(Gradient* grad) {
                     GetAsSPtr(mGradientPoints, GradientPoints));
         mGradient->removePath(mTarget_k);
     }
-    if(grad == nullptr) {
+    if(!grad) {
         mGradient.clear();
     } else {
         ca_addChildAnimator(GetAsSPtr(grad, Gradient));

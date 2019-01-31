@@ -69,7 +69,7 @@ public:
     ItemSelectionWidget(QWidget* parent = nullptr) :
         ItemSelectionWidgetQObject(parent) {}
     ~ItemSelectionWidget() {
-        if(mCurrentItem != nullptr) mCurrentItem->deselect();
+        if(mCurrentItem) mCurrentItem->deselect();
     }
 
     Item* getCurrentItem() const {
@@ -82,7 +82,7 @@ public:
     void setDefaultItem(stdsptr<Item> item) {
         if(mCurrentItem == mDefaultItem) mCurrentItem = nullptr;
         mDefaultItem = item;
-        if(mCurrentItem == nullptr) mCurrentItem = mDefaultItem;
+        if(!mCurrentItem) mCurrentItem = mDefaultItem;
     }
 
     CollectionArea<Item>* getCurrentCollectionArea() {
@@ -129,14 +129,14 @@ private:
 template <typename Item>
 Item* ItemSelectionWidget<Item>::getItem(const QString &collectionName,
                                          const QString &itemName) const {
-    CollectionArea<Item>* itemColl = getItemCollectionWithName(collectionName);
-    if(itemColl == nullptr) return nullptr;
+    auto itemColl = getItemCollectionWithName(collectionName);
+    if(!itemColl) return nullptr;
     return itemColl->getItemWithName(itemName);
 }
 template <typename Item>
 CollectionArea<Item> *ItemSelectionWidget<Item>::getItemCollectionWithName(
         const QString &name) const {
-    for(CollectionArea<Item>* collection : mChildCollections) {
+    for(const auto& collection : mChildCollections) {
         if(collection->getName() == name) return collection;
     }
     return nullptr;

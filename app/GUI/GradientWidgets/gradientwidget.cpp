@@ -58,7 +58,7 @@ void GradientWidget::addGradientToList(const qsptr<Gradient>& gradient) {
 
 void GradientWidget::newGradient(const QColor &color1,
                                  const QColor &color2) {
-    qsptr<Gradient> newGradient = SPtrCreate(Gradient)(color1, color2);
+    auto newGradient = SPtrCreate(Gradient)(color1, color2);
     addGradientToList(newGradient);
     setCurrentGradient(newGradient.get());
     updateAll();
@@ -66,7 +66,7 @@ void GradientWidget::newGradient(const QColor &color1,
 
 void GradientWidget::newGradient(const int &fromGradientId) {
     Gradient *fromGradient = mGradients.at(fromGradientId).data();
-    qsptr<Gradient> newGradient = SPtrCreate(Gradient)();
+    auto newGradient = SPtrCreate(Gradient)();
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     fromGradient->writeProperty(&buffer);
@@ -126,13 +126,13 @@ void GradientWidget::setCurrentColor(const QColor& col) {
 
 void GradientWidget::setCurrentGradient(Gradient *gradient,
                                         const bool &emitChange) {
-    if(mCurrentGradient != nullptr) {
+    if(mCurrentGradient) {
         disconnect(mCurrentGradient,
                    SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
                    this,
                    SLOT(resetColorIdIfEquals(Gradient*,int)));
     }
-    if(gradient == nullptr) {
+    if(!gradient) {
         if(mGradients.isEmpty()) newGradient();
         setCurrentGradient(0);
         return;
@@ -140,7 +140,7 @@ void GradientWidget::setCurrentGradient(Gradient *gradient,
         return;
     }
     mCurrentGradient = gradient;
-    if(mCurrentGradient != nullptr) {
+    if(mCurrentGradient) {
         connect(mCurrentGradient,
                 SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
                 this,
@@ -158,12 +158,12 @@ Gradient *GradientWidget::getCurrentGradient() {
 }
 
 QColor GradientWidget::getCurrentColor() {
-    if(mCurrentGradient == nullptr) return QColor();
+    if(!mCurrentGradient) return QColor();
     return mCurrentGradient->getCurrentColorAt(mCurrentColorId);
 }
 
 ColorAnimator *GradientWidget::getCurrentColorAnimator() {
-    if(mCurrentGradient == nullptr) return nullptr;
+    if(!mCurrentGradient) return nullptr;
     return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
 }
 
@@ -183,7 +183,7 @@ void GradientWidget::setCurrentGradient(const int &listId) {
 void GradientWidget::colorRightPress(const int &x,
                                      const QPoint &point) {
     colorLeftPress(x);
-    if(mCurrentGradient != nullptr) {
+    if(mCurrentGradient) {
         QMenu menu(this);
         menu.addAction("Delete Color");
         menu.addAction("Add Color");
@@ -222,14 +222,14 @@ int GradientWidget::getColorIdAtX(const int &x) {
 }
 
 void GradientWidget::colorLeftPress(const int &x) {
-    if(mCurrentGradient != nullptr) {
+    if(mCurrentGradient) {
         setCurrentColorId(getColorIdAtX(x));
     }
     updateAll();
 }
 
 void GradientWidget::moveColor(const int &x) {
-    if(mCurrentGradient != nullptr) {
+    if(mCurrentGradient) {
         int nCols = mCurrentGradient->getColorCount();
             int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
             if(colorId != mCurrentColorId) {
@@ -244,20 +244,20 @@ void GradientWidget::moveColor(const int &x) {
 }
 
 void GradientWidget::updateAfterFrameChanged(const int &absFrame) {
-    Q_FOREACH(const qsptr<Gradient> &gradient, mGradients) {
+    for(const auto& gradient : mGradients) {
         gradient->prp_setAbsFrame(absFrame);
     }
 }
 
 void GradientWidget::clearGradientsLoadIds() {
-    foreach(const qsptr<Gradient> &gradient, mGradients) {
+    for(const auto& gradient : mGradients) {
         gradient->setLoadId(-1);
     }
 }
 
 void GradientWidget::setGradientLoadIds() {
     int id = 0;
-    foreach(const qsptr<Gradient> &gradient, mGradients) {
+    for(const auto& gradient : mGradients) {
         gradient->setLoadId(id);
         id++;
     }
@@ -293,16 +293,16 @@ void GradientWidget::gradientContextMenuReq(const int &gradId,
 }
 
 void GradientWidget::startSelectedColorTransform() {
-    if(mCurrentGradient == nullptr) return;
+    if(!mCurrentGradient) return;
     mCurrentGradient->startColorIdTransform(mCurrentColorId);
 }
 
 void GradientWidget::finishGradientTransform() {
-    if(mCurrentGradient == nullptr) return;
+    if(!mCurrentGradient) return;
     mCurrentGradient->prp_finishTransform();
 }
 
 void GradientWidget::startGradientTransform() {
-    if(mCurrentGradient == nullptr) return;
+    if(!mCurrentGradient) return;
     mCurrentGradient->prp_startTransform();
 }

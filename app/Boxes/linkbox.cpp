@@ -116,7 +116,7 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
     setLinkTarget(linkTarget);
     const QList<qsptr<BoundingBox>> &boxesList =
             linkTarget->getContainedBoxesList();
-    foreach(const qsptr<BoundingBox> &child, boxesList) {
+    for(const auto& child : boxesList) {
         qsptr<BoundingBox> newLink = child->createLinkForLinkGroup();
         addContainedBox(newLink);
     }
@@ -307,7 +307,7 @@ void LinkCanvasRenderData::renderToImage() {
                              qRound(fGlobalBoundingRect.top()));
 
     if(!fPixmapEffects.isEmpty()) {
-        foreach(const stdsptr<PixmapEffectRenderData>& effect, fPixmapEffects) {
+        for(const auto& effect : fPixmapEffects) {
             effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();

@@ -183,7 +183,7 @@ public:
 
     T *getRenderContainerAtOrAfterRelFrame(const int &frame) const {
         T *cont = getRenderContainerAtRelFrame(frame);
-        if(cont == nullptr) {
+        if(!cont) {
             int id = getRenderContainterInsertIdAtRelFrame(frame);
             if(id >= 0 && id < mRenderContainers.length()) {
                 cont = mRenderContainers.at(id).get();
@@ -202,7 +202,7 @@ public:
         int lastDrawnFrame = startFrame;
         int lastDrawX = 0;
         bool lastStoresInMemory = true;
-        Q_FOREACH(const auto &cont, mRenderContainers) {
+        for(const auto &cont : mRenderContainers) {
             int afterMaxFrame = cont->getRangeMax() + 1;
             if(afterMaxFrame < startFrame) continue;
             int minFrame = cont->getRangeMin();

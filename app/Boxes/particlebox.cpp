@@ -57,7 +57,7 @@ void ParticleBox::prp_setAbsFrame(const int &frame) {
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) const {
     if(mRelBoundingRect.contains(relPos.x(), relPos.y())) {
         /*if(mEmitters.isEmpty()) */return true;
-//        Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+//        for(const auto& emitter : mEmitters) {
 //            if(emitter->relPointInsidePath(relPos)) {
 //                return true;
 //            }
@@ -88,7 +88,7 @@ FrameRange ParticleBox::prp_getIdenticalRelFrameRange(const int &relFrame) const
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
-    qsptr<ParticleEmitter> emitter = SPtrCreate(ParticleEmitter)(this);
+    auto emitter = SPtrCreate(ParticleEmitter)(this);
     emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos));
     addEmitter(emitter);
 }
@@ -103,14 +103,14 @@ QRectF ParticleBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
     int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
-    Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+    for(const auto& emitter : mEmitters) {
         emitter->setFrameRange(minFrame, maxFrame);
     }
 }
 
 void ParticleBox::applyPaintSetting(PaintSetting *setting) {
     if(setting->targetsFill()) {
-        Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+        for(const auto& emitter : mEmitters) {
             setting->applyColorSetting(emitter->getColorAnimator());
         }
     }
@@ -131,7 +131,7 @@ void ParticleBox::drawSelectedSk(SkCanvas *canvas,
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             mTopLeftPoint->drawSk(canvas, invScale);
             mBottomRightPoint->drawSk(canvas, invScale);
-            Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+            for(const auto& emitter : mEmitters) {
                 MovablePoint *pt = emitter->getPosPoint();
                 pt->drawSk(canvas, invScale);
             }
@@ -153,7 +153,7 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
         if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mBottomRightPoint.get();
         }
-        Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+        for(const auto& emitter : mEmitters) {
             MovablePoint *pt = emitter->getPosPoint();
             if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
                 return pt;
@@ -183,7 +183,7 @@ void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
             list.append(mBottomRightPoint.get());
         }
     }
-    Q_FOREACH(const qsptr<ParticleEmitter>& emitter, mEmitters) {
+    for(const auto& emitter : mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
         if(pt->isContainedInRect(absRect)) {
             pt->select();
@@ -215,7 +215,7 @@ void Particle::initializeParticle(const int &firstFrame,
     mFirstFrame = firstFrame;
     mLastPos = iniPos;
     mLastVel = iniVel;
-    if(mParticleStates != nullptr) {
+    if(mParticleStates) {
         if(nFrames == mNumberFrames) return;
         delete[] mParticleStates;
     }
@@ -418,7 +418,7 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
     mParentBox_k = parentBox;
 
     scheduleGenerateParticles();
-    if(parentBox == nullptr) {
+    if(!parentBox) {
         mColorAnimator->prp_setUpdater(nullptr);
     } else {
         mColorAnimator->prp_setUpdater(
@@ -477,9 +477,9 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
     data.color = QColorToSkColor(qcol);
 
     BoundingBox *targetT = mBoxTargetProperty->getTarget();
-    if(targetT == nullptr) {
+    if(!targetT) {
         data.boxDraw = false;
-        Q_FOREACH(Particle *particle, mParticles) {
+        for(Particle *particle : mParticles) {
             if(particle->isVisibleAtFrame(relFrame)) {
                 ParticleState stateT;
                 if(particle->getParticleStateAtFrameF(relFrame, stateT)) {
@@ -489,7 +489,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
         }
     } else {
         data.boxDraw = true;
-        Q_FOREACH(Particle *particle, mParticles) {
+        for(Particle *particle : mParticles) {
             if(particle->isVisibleAtFrame(relFrame)) {
                 ParticleState stateT;
                 if(!particle->getParticleStateAtFrameF(relFrame, stateT)) continue;

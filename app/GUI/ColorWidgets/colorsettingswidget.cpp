@@ -198,7 +198,7 @@ void ColorSettingsWidget::emitColorChangedSignal() {
 
 void ColorSettingsWidget::emitEditingFinishedSignal() {
     int tabId = mTabWidget->currentIndex();
-    if(mTargetAnimator != nullptr) {
+    if(mTargetAnimator) {
         if(mTargetAnimator->getColorMode() != tabId) {
             mTargetAnimator->prp_finishTransform();
         }
@@ -235,7 +235,7 @@ void ColorSettingsWidget::emitEditingFinishedSignal() {
 
 void ColorSettingsWidget::emitEditingStartedSignal() {
     int tabId = mTabWidget->currentIndex();
-    if(mTargetAnimator != nullptr) {
+    if(mTargetAnimator) {
         if(mTargetAnimator->getColorMode() != tabId) {
             mTargetAnimator->startVal1Transform();
             mTargetAnimator->startVal2Transform();
@@ -319,12 +319,12 @@ void ColorSettingsWidget::emitEditingStartedAlpha() {
 
 void ColorSettingsWidget::emitFullColorChangedSignal() {
     mLastTriggeredCVR = CVR_ALL;
-    if(mTargetAnimator != nullptr) {
+    if(mTargetAnimator) {
         mTargetAnimator->prp_startTransform();
     }
     updateValuesFromHSV();
     updateAlphaFromSpin();
-    if(mTargetAnimator != nullptr) {
+    if(mTargetAnimator) {
         mTargetAnimator->prp_finishTransform();
     }
     emitEditingStartedSignal();
@@ -803,7 +803,7 @@ void ColorSettingsWidget::updateAlphaFromSpin() {
 }
 
 void ColorSettingsWidget::setColorMode(const int &colorMode) {
-    if(mTargetAnimator != nullptr) {
+    if(mTargetAnimator) {
         mTargetAnimator->setColorMode(static_cast<ColorMode>(colorMode));
     }
     emit colorModeChanged(static_cast<ColorMode>(colorMode));

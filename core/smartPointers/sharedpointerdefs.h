@@ -7,7 +7,7 @@
 
 template <typename Ptr, typename List>
 extern inline bool listContainsSharedPtr(Ptr ptr, List list) {
-    foreach(Ptr ptrT, list) {
+    for(Ptr ptrT : list) {
         if(ptrT == ptr) return true;
     }
     return false;

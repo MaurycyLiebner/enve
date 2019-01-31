@@ -207,8 +207,8 @@ public:
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator* parentAnimator = nullptr) {
         Q_UNUSED(shift);
-        if(parentAnimator == nullptr) return;
-        Q_FOREACH(const auto &key, anim_mKeys) {
+        if(!parentAnimator) return;
+        for(const auto &key : anim_mKeys) {
             parentAnimator->ca_updateDescendatKeyFrame(key.get());
         }
     }

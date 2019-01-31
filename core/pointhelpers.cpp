@@ -241,7 +241,7 @@ qreal gGetClosestTValueOnBezier(const qCubicSegment1D &seg,
     qreal bestT = 0.;
     qreal bestPos = seg.p0();;
     qreal minErrorT = DBL_MAX;
-    Q_FOREACH(const qreal &val, values) {
+    for(const qreal &val : values) {
         qreal posT = gCubicValueAtT(seg, val);
         qreal errorT = qAbs(posT - p);
         if(errorT < minErrorT) {
@@ -250,10 +250,10 @@ qreal gGetClosestTValueOnBezier(const qCubicSegment1D &seg,
             bestT = val;
         }
     }
-    if(bestPosPtr != nullptr) {
+    if(bestPosPtr) {
         *bestPosPtr = bestPos;
     }
-    if(errorPtr != nullptr) {
+    if(errorPtr) {
         *errorPtr = minErrorT;
     }
     return bestT;
@@ -417,7 +417,7 @@ QPointF gClosestPointOnRect(const QRectF &rect,
             bestPos = pt;
         }
     }
-    if(dist != nullptr) *dist = minDist;
+    if(dist) *dist = minDist;
     return bestPos;
 }
 

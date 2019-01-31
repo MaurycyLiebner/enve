@@ -83,7 +83,7 @@ public:
     }
 
     void SWT_setChildrenAncestorDisabled(const bool &bT) {
-        Q_FOREACH(const qsptr<Property> &prop, ca_mChildAnimators) {
+        for(const auto& prop : ca_mChildAnimators) {
             prop->SWT_setAncestorDisabled(bT);
         }
     }

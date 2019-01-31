@@ -25,14 +25,14 @@ void FileSourcesCache::addHandlerToHandlersList(
 }
 
 void FileSourcesCache::addHandlerToListWidgets(FileCacheHandler *handlerPtr) {
-    foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
+    for(FileSourceListVisibleWidget *wid : mFileSourceListVisibleWidgets) {
         wid->addCacheHandlerToList(handlerPtr);
     }
 }
 
 FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
         const QString &filePath) {
-    Q_FOREACH(const auto &handler, mFileCacheHandlers) {
+    for(const auto &handler : mFileCacheHandlers) {
         if(handler->getFilePath() == filePath) {
             return handler.get();
         }
@@ -50,19 +50,19 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
 
 void FileSourcesCache::removeHandler(const stdsptr<FileCacheHandler>& handler) {
     mFileCacheHandlers.removeOne(handler);
-    foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
+    for(FileSourceListVisibleWidget *wid : mFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handler.get());
     }
 }
 
 void FileSourcesCache::removeHandlerFromListWidgets(FileCacheHandler *handlerPtr) {
-    foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
+    for(FileSourceListVisibleWidget *wid : mFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handlerPtr);
     }
 }
 
 void FileSourcesCache::clearAll() {
-    Q_FOREACH(const auto &handler, mFileCacheHandlers) {
+    for(const auto &handler : mFileCacheHandlers) {
         handler->clearCache();
     }
     mFileCacheHandlers.clear();

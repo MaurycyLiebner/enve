@@ -76,7 +76,7 @@ public:
     static MainWindow *getInstance();
     static void addUndoRedo(const stdsptr<UndoRedo>& uR) {
         UndoRedoStack *stack = MainWindow::getInstance()->getUndoRedoStack();
-        if(stack == nullptr) return;
+        if(!stack) return;
         stack->addUndoRedo(uR);
     }
 

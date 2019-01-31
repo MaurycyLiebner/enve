@@ -712,7 +712,7 @@ void FillStrokeSettingsWidget::applyGradient() {
         currentGradient = mCurrentStrokeGradient;
         currentGradientLinear = mCurrentStrokeGradientLinear;
     }
-    stdsptr<PaintSetting> paintSetting = SPtrCreate(PaintSetting)(
+    auto paintSetting = SPtrCreate(PaintSetting)(
                 isFill, currentGradientLinear, currentGradient);
     mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
 }

@@ -54,7 +54,7 @@ void BoxScrollWidgetVisiblePart::drawKeys(QPainter *p,
                                           const int &maxViewedFrame) {
     //p->setPen(QPen(Qt::black, 1.));
     p->setPen(Qt::NoPen);
-    Q_FOREACH(QWidget *container, mSingleWidgets) {
+    for(QWidget *container : mSingleWidgets) {
         static_cast<BoxSingleWidget*>(container)->drawKeys(
                             p, pixelsPerFrame,
                             container->y(),
@@ -69,7 +69,7 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
     int remaining = pressY % MIN_WIDGET_HEIGHT;
     if(remaining < (MIN_WIDGET_HEIGHT - KEY_RECT_SIZE)/2 ||
        remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return nullptr;
-    Q_FOREACH(QWidget *container, mSingleWidgets) {
+    for(QWidget *container : mSingleWidgets) {
         int containerTop = container->y();
         int containerBottom = containerTop + container->height();
         if(containerTop > pressY || containerBottom < pressY) continue;
@@ -85,7 +85,7 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
         const int &pressY,
         const qreal &pixelsPerFrame,
         const int &minViewedFrame) {
-    Q_FOREACH(QWidget *container, mSingleWidgets) {
+    for(QWidget *container : mSingleWidgets) {
         int containerTop = container->y();
         int containerBottom = containerTop + container->height();
         if(containerTop > pressY || containerBottom < pressY) continue;
@@ -111,7 +111,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
             minX, minY, currY, 0, MIN_WIDGET_HEIGHT,
             abstractions, mCurrentRulesCollection, true, false);
 
-    Q_FOREACH(SingleWidgetAbstraction *abs, abstractions) {
+    for(SingleWidgetAbstraction *abs : abstractions) {
         SingleWidgetTarget *target = abs->getTarget();
         if(target->SWT_isAnimator()) {
             Animator *anim_target = GetAsPtr(target, Animator);
@@ -119,7 +119,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
                                            listKeys, KEY_RECT_SIZE);
         }
     }
-//    Q_FOREACH(SingleWidget *container, mSingleWidgets) {
+//    for(SingleWidget *container : mSingleWidgets) {
 //        int containerTop = container->y();
 //        int containerBottom = containerTop + container->height();
 //        if(containerTop > selectionRect.bottom() ||
@@ -226,7 +226,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
                     type,
                     yPos,
                     &below);
-        if(singleWidgetUnderMouse == nullptr) return;
+        if(!singleWidgetUnderMouse) return;
 
         auto bbMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
         BoundingBox* box = bbMimeData->getTarget();
@@ -263,7 +263,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
                     type,
                     yPos,
                     &below);
-        if(singleWidgetUnderMouse == nullptr) return;
+        if(!singleWidgetUnderMouse) return;
 
         auto peMimeData = static_cast<const PixmapEffectMimeData*>(event->mimeData());
         PixmapEffect* effect = peMimeData->getTarget();
@@ -301,7 +301,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
                     type,
                     yPos,
                     &below);
-        if(singleWidgetUnderMouse == nullptr) return;
+        if(!singleWidgetUnderMouse) return;
 
         auto pathEffectMimeData =
                 static_cast<const PathEffectMimeData*>(event->mimeData());
@@ -425,7 +425,7 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
             getClosestsSingleWidgetWithTargetType(mLastDragMoveTargetTypes,
                                                   mLastDragMoveY,
                                                   &below);
-    if(singleWidgetUnderMouse != nullptr) {
+    if(singleWidgetUnderMouse) {
         int currentDragPosId = singleWidgetUnderMouse->y()/MIN_WIDGET_HEIGHT;
         if(below) {
             //currentDragPosId++;

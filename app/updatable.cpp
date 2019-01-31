@@ -107,14 +107,14 @@ void _Task::incDependencies() {
 }
 
 void _Task::tellDependentThatFinished() {
-    foreach(const auto& dependent, mCurrentExecutionDependent) {
+    for(const auto& dependent : mCurrentExecutionDependent) {
         if(dependent) dependent->decDependencies();
     }
     mCurrentExecutionDependent.clear();
 }
 
 void _Task::tellNextDependentThatFinished() {
-    foreach(const auto& dependent, mNextExecutionDependent) {
+    for(const auto& dependent : mNextExecutionDependent) {
         if(dependent) dependent->decDependencies();
     }
     mNextExecutionDependent.clear();

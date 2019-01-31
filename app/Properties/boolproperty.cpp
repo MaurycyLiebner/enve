@@ -24,7 +24,7 @@ void BoolPropertyContainer::setValue(const bool &value) {
     mValue = value;
     prp_updateInfluenceRangeAfterChanged();
 
-    Q_FOREACH(const qsptr<Property> &prop, ca_mChildAnimators) {
+    for(const auto& prop : ca_mChildAnimators) {
         //prop->SWT_setVisible(value);
         prop->SWT_setDisabled(!value);
     }

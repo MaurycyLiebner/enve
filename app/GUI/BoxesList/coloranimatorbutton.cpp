@@ -9,7 +9,7 @@ ColorAnimatorButton::ColorAnimatorButton(ColorAnimator *colorTarget,
                                          QWidget *parent) :
     BoxesListActionButton(parent) {
     mColorTarget = colorTarget;
-    if(colorTarget != nullptr) {
+    if(colorTarget) {
         connect(colorTarget->getVal1Animator(),
                 &QrealAnimator::valueChangedSignal,
                 this, qOverload<>(&ColorAnimatorButton::update));

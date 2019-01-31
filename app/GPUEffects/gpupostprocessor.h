@@ -53,7 +53,7 @@ public:
 
 private:
     void process(const GLuint &texturedSquareVAO) {
-        foreach(const auto& child, mChildProcesses) {
+        for(const auto& child : mChildProcesses) {
             child->process(texturedSquareVAO);
         }
     }
@@ -97,7 +97,7 @@ signals:
 private slots:
     void afterProcessed() {
         mFinished = true;
-        foreach(const auto& process, _mHandledProcesses) {
+        for(const auto& process : _mHandledProcesses) {
             process->afterProcessed();
         }
         _mHandledProcesses.clear();
@@ -123,7 +123,7 @@ protected:
         }
 
 
-        foreach(const auto& scheduled, _mHandledProcesses) {
+        for(const auto& scheduled : _mHandledProcesses) {
             scheduled->process(_mTextureSquareVAO);
         }
         _mContext->doneCurrent();

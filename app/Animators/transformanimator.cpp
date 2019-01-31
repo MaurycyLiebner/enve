@@ -241,14 +241,14 @@ const QMatrix &BasicTransformAnimator::getRelativeTransform() const {
 
 void BasicTransformAnimator::setParentTransformAnimator(
         BasicTransformAnimator* parent) {
-    if(mParentTransformAnimator != nullptr) {
+    if(mParentTransformAnimator) {
         disconnect(mParentTransformAnimator,
                    &BasicTransformAnimator::combinedTransformChanged,
                    this,
                    &BasicTransformAnimator::updateCombinedTransform);
     }
     mParentTransformAnimator = parent;
-    if(parent != nullptr) {
+    if(parent) {
         connect(parent,
                 &BasicTransformAnimator::combinedTransformChanged,
                 this,

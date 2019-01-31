@@ -25,7 +25,7 @@ ItemWidget<Item>::ItemWidget(const stdsptr<Item>& itemSptr,
 
     setFixedSize(64, 64);
 
-    if(mItem == nullptr) return;
+    if(!mItem) return;
     mItem->addItemWidget(this);
 }
 
@@ -33,7 +33,7 @@ template <class Item>
 void ItemWidget<Item>::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
-    if(mItem != nullptr) {
+    if(mItem) {
         const QImage& icon = mItem->getIcon();
         p.drawImage((64 - icon.width())/2, (64 - icon.height())/2, icon);
         if(mDrawName) {
@@ -72,7 +72,7 @@ void ItemWidget<Item>::leaveEvent(QEvent*) {
 
 template <class Item>
 void ItemWidget<Item>::mousePressEvent(QMouseEvent *event) {
-    if(mItem == nullptr) return;
+    if(!mItem) return;
     if(event->button() == Qt::LeftButton) {
         if(isSelected()) return;
         emit selected(GetAsPtr(mItem, StdSelfRef));
@@ -84,7 +84,7 @@ void ItemWidget<Item>::mousePressEvent(QMouseEvent *event) {
 
 //template <class Item>
 //void CollectionWidget::tabletEvent(QTabletEvent *event) {
-//    if(mItem == nullptr) return;
+//    if(!mItem) return;
 //    if(event->type() == QTabletEvent::TabletPress) {
 //        if(event->button() == Qt::LeftButton) {
 //            if(mSelected) return;
@@ -96,7 +96,7 @@ void ItemWidget<Item>::mousePressEvent(QMouseEvent *event) {
 template <class Item>
 ItemWidget<Item> *ItemWidget<Item>::createWidget(const stdsptr<Item>& itemSptr,
                                                  QWidget *parent) {
-    if(itemSptr == nullptr) return nullptr;
+    if(!itemSptr) return nullptr;
     ItemWidget* newWidget = new ItemWidget(itemSptr, parent);
     newWidget->setSelected(itemSptr->selected());
     return newWidget;

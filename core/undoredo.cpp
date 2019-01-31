@@ -33,7 +33,7 @@ bool UndoRedoStack::addSet() {
 }
 
 void UndoRedoStack::addToSet(const stdsptr<UndoRedo>& undoRedo) {
-    if(mCurrentSet == nullptr) {
+    if(!mCurrentSet) {
         mCurrentSet = SPtrCreate(UndoRedoSet)(mCurrentAbsFrame);
     }
     mCurrentSet->addUndoRedo(undoRedo);
@@ -61,7 +61,7 @@ void UndoRedoStack::clearAll() {
 }
 
 void UndoRedoStack::addUndoRedo(const stdsptr<UndoRedo> &undoRedo) {
-    if(undoRedo == nullptr) return;
+    if(!undoRedo) return;
     undoRedo->setFrame(mCurrentAbsFrame);
     if(mNumberOfSets != 0) {
         addToSet(undoRedo);
@@ -165,7 +165,7 @@ void UndoRedoSet::undo() {
 }
 
 void UndoRedoSet::redo() {
-    Q_FOREACH(const stdsptr<UndoRedo> & undoRedo, mSet) {
+    for(const auto& undoRedo : mSet) {
         undoRedo->redo();
     }
 }

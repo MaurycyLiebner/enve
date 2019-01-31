@@ -12,7 +12,7 @@ void GPUEffectAnimators::addEffect(const qsptr<GPURasterEffect>& effect) {
 
 qreal GPUEffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMargin();
@@ -23,7 +23,7 @@ qreal GPUEffectAnimators::getEffectsMargin() const {
 
 qreal GPUEffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
     qreal newMargin = 0.;
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
@@ -34,7 +34,7 @@ qreal GPUEffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const 
 
 qreal GPUEffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const {
     qreal newMargin = 0.;
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(qRound(relFrame));
@@ -46,12 +46,12 @@ qreal GPUEffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) con
 void GPUEffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
         BoundingBoxRenderData* data) {
-    Q_FOREACH(const qsptr<Property> &effect, ca_mChildAnimators) {
+    for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, GPURasterEffect);
         if(pixmapEffect->isVisible()) {
             stdsptr<GPURasterEffectCaller> effectRenderData =
                     pixmapEffect->getGPURasterEffectCaller(relFrame);
-            if(effectRenderData == nullptr) continue;
+            if(!effectRenderData) continue;
             data->fGPUEffects.append(effectRenderData);
         }
     }

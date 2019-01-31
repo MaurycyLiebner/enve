@@ -4,7 +4,7 @@
 NodeSettings::NodeSettings() : ctrlsMode(CtrlsMode::CTRLS_CORNER) {}
 
 NodeSettings::NodeSettings(const NodeSettings *settings) {
-    if(settings == nullptr) return;
+    if(!settings) return;
     copyFrom(settings);
 }
 
@@ -15,7 +15,7 @@ NodeSettings::NodeSettings(const bool &startEnabledT,
 }
 
 void NodeSettings::copyFrom(const NodeSettings *settings) {
-    if(settings == nullptr) {
+    if(!settings) {
         startEnabled = false;
         endEnabled = false;
         ctrlsMode = CtrlsMode::CTRLS_CORNER;

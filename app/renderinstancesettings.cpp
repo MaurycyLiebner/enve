@@ -203,13 +203,13 @@ const RenderInstanceSettings::RenderState &RenderInstanceSettings::getCurrentSta
 
 void RenderInstanceSettings::copySettingsFromOutputSettingsProfile() {
     OutputSettingsProfile *profileT = mOutputSettingsProfile;
-    if(profileT == nullptr) return;
+    if(!profileT) return;
     mOutputSettings = profileT->getSettings();
 }
 
 void RenderInstanceSettings::setOutputSettingsProfile(
         OutputSettingsProfile *profile) {
-    if(profile == nullptr) {
+    if(!profile) {
         mOutputSettingsProfile.clear();
     } else {
         mOutputSettingsProfile = profile;

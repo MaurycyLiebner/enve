@@ -37,7 +37,7 @@ bool PaintBox::prp_nextRelFrameWithKey(const int &relFrame,
     int bbNext;
     bool bbHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
                                                           bbNext);
-    if(mMainHandler != nullptr) {
+    if(mMainHandler) {
         if(mMainHandler->prp_hasKeys()) {
             int clostestFrame;
             mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
@@ -59,7 +59,7 @@ bool PaintBox::prp_prevRelFrameWithKey(const int &relFrame,
     int bbPrev;
     bool bbHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
                                                           bbPrev);
-    if(mMainHandler != nullptr) {
+    if(mMainHandler) {
         if(mMainHandler->prp_hasKeys()) {
             int clostestFrame;
             mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
@@ -91,7 +91,7 @@ bool PaintBox::isSurfaceAnimated() {
 void PaintBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
 
-    if(mMainHandler == nullptr) return;
+    if(!mMainHandler) return;
     mMainHandler->setCurrentRelFrame(frame);
 }
 
@@ -196,14 +196,14 @@ void PaintBox::finishSizeSetup() {
     if(widthT == mWidth && heightT == mHeight) return;
     mWidth = widthT;
     mHeight = heightT;
-    if(mMainHandler == nullptr) {
+    if(!mMainHandler) {
         mMainHandler = SPtrCreate(AnimatedSurface)(mWidth, mHeight, 1., this);
         mMainHandler->setCurrentRelFrame(anim_mCurrentRelFrame);
         ca_addChildAnimator(mMainHandler);
     } else {
         mMainHandler->setSize(mWidth, mHeight);
     }
-    if(mTemporaryHandler == nullptr) {
+    if(!mTemporaryHandler) {
         mTemporaryHandler = new Surface(mWidth/4, mHeight/4, 0.25, false);
     } else {
         mTemporaryHandler->setSize(mWidth/4, mHeight/4);
@@ -254,7 +254,7 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
                             GrContext* const grContext) {
     canvas->saveLayer(nullptr, paint);
     BoundingBox::drawPixmapSk(canvas, nullptr, grContext);
-    if(mTemporaryHandler != nullptr) {
+    if(mTemporaryHandler) {
         canvas->concat(
                 QMatrixToSkMatrix(
                     mTransformAnimator->getCombinedTransform()) );
@@ -269,7 +269,7 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
 }
 
 void PaintBox::scheduleWaitingTasks() {
-    if(mTemporaryHandler != nullptr) {
+    if(mTemporaryHandler) {
         mTemporaryHandler->saveToTmp();
     }
     BoundingBox::scheduleWaitingTasks();
@@ -277,7 +277,7 @@ void PaintBox::scheduleWaitingTasks() {
 
 void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     BoundingBox::renderDataFinished(renderData);
-    if(mTemporaryHandler != nullptr) {
+    if(mTemporaryHandler) {
         mTemporaryHandler->clearTmp();
     }
 }
@@ -293,10 +293,10 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
     }
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     auto paintData = GetAsSPtr(data, PaintBoxRenderData);
-    if(mMainHandler == nullptr) return;
+    if(!mMainHandler) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
-    foreach(const TileSkDrawerCollection &drawer, paintData->tileDrawers) {
-        foreach(TileSkDrawer *drawerT, drawer.drawers) {
+    for(const TileSkDrawerCollection &drawer : paintData->tileDrawers) {
+        for(TileSkDrawer *drawerT : drawer.drawers) {
             drawerT->addDependent(paintData.get());
         }
     }
@@ -387,7 +387,7 @@ void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
     //SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->translate(trans.x(), trans.y());
-    foreach(const TileSkDrawerCollection &tile, tileDrawers) {
+    for(const TileSkDrawerCollection &tile : tileDrawers) {
         tile.drawSk(canvas);
     }
 }

@@ -155,7 +155,7 @@ void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
     //SkCanvas canvasSk(motionBlur);
     qreal opacityStepT = 1./(numberSamples + 1);
     qreal opacityT = opacityStepT*(1. - qCeil(numberSamples) + numberSamples);
-    foreach(const stdsptr<BoundingBoxRenderData> &sample, samples) {
+    for(const auto& sample : samples) {
         qreal sampleAlpha = opacityT*opacityT*opacity;
         QPointF drawPosF = sample->fGlobalBoundingRect.topLeft() -
                 boxData->fGlobalBoundingRect.topLeft();//QPointF(0., 0.);

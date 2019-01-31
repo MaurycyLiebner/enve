@@ -42,8 +42,8 @@ void VectorPath::revertAllPoints() {
 
 void VectorPath::breakPathsApart_k() {
     QList<qsptr<VectorPathAnimator>> pathsList = mPathAnimator->getSinglePathsList();
-    foreach(const qsptr<VectorPathAnimator>& path, pathsList) {
-        qsptr<VectorPath> newPath = SPtrCreate(VectorPath)();
+    for(const auto& path : pathsList) {
+        auto newPath = SPtrCreate(VectorPath)();
         copyPathBoxDataTo(newPath.get());
         mParentGroup->addContainedBox(newPath);
         PathAnimator *pathAnimator = newPath->getPathAnimator();
@@ -149,7 +149,7 @@ MovablePoint *VectorPath::getPointAtAbsPos(const QPointF &absPtPos,
     MovablePoint* pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
-    if(pointToReturn == nullptr) {
+    if(!pointToReturn) {
         pointToReturn = mPathAnimator->getPointAtAbsPos(absPtPos,
                                                       currentCanvasMode,
                                                       canvasScaleInv);

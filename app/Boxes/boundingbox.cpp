@@ -72,7 +72,7 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 }
 
 qsptr<BoundingBox> BoundingBox::createLink() {
-    qsptr<BoundingBox> linkBox = SPtrCreate(InternalLinkBox)(this);
+    auto linkBox = SPtrCreate(InternalLinkBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
     return linkBox;
 }
@@ -935,7 +935,7 @@ void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
 }
 
 //int BoundingBox::prp_getParentFrameShift() const {
-//    if(mParentGroup == nullptr) {
+//    if(!mParentGroup) {
 //        return 0;
 //    } else {
 //        return mParentGroup->prp_getFrameShift();
@@ -1146,7 +1146,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             QList<Property*> propertiesT;
             getMotionBlurProperties(propertiesT);
-            Q_FOREACH(const auto& child, propertiesT) {
+            for(const auto& child : propertiesT) {
                 if(range.isUnary()) break;
                 auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
                 range *= childRange;
@@ -1173,13 +1173,13 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
 }
 
 void BoundingBox::scheduleWaitingTasks() {
-    foreach(const auto &task, mScheduledTasks) {
+    for(const auto &task : mScheduledTasks) {
         task->taskQued();
     }
 }
 
 void BoundingBox::queScheduledTasks() {
-    foreach(const auto &task, mScheduledTasks) {
+    for(const auto &task : mScheduledTasks) {
         TaskScheduler::sGetInstance()->queCPUTask(task);
     }
 
@@ -1200,7 +1200,7 @@ void BoundingBox::clearBoxLoadId() {
 }
 
 BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
-    foreach(const auto& box, mLoadedBoxes) {
+    for(const auto& box : mLoadedBoxes) {
         if(!box) return nullptr;
         if(box->getLoadId() == loadId) {
             return box;
@@ -1231,7 +1231,7 @@ int BoundingBox::getLoadedBoxesCount() {
 }
 
 void BoundingBox::clearLoadedBoxes() {
-    foreach(const auto& box, mLoadedBoxes) {
+    for(const auto& box : mLoadedBoxes) {
         box->clearBoxLoadId();
     }
     mLoadedBoxes.clear();
@@ -1259,7 +1259,7 @@ void BoundingBox::setVisibile(const bool &visible) {
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
-    Q_FOREACH(BoundingBox* box, mLinkingBoxes) {
+    for(BoundingBox* box : mLinkingBoxes) {
         if(box->isParentLinkBox()) {
             box->setVisibile(visible);
         }

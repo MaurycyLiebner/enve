@@ -94,7 +94,7 @@ bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
 }
 
 void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
-    if(mMainAbstraction == nullptr) return;
+    if(!mMainAbstraction) return;
     //updateParentHeight();
 
     int currentWidgetId = 0;
@@ -131,7 +131,7 @@ void ScrollWidgetVisiblePart::setMainAbstraction(
         SingleWidgetAbstraction* abs) {
     mMainAbstraction = abs;
     scheduleUpdateVisibleWidgetsContent();
-//    if(abs == nullptr) return;
+//    if(!abs) return;
 //    abs->setContentVisible(true);
 //    updateVisibleWidgetsContent();
 //    updateParentHeight();

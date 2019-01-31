@@ -534,7 +534,7 @@ qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
        hasTransform || parentGroup == nullptr) {
         boxesGroup = SPtrCreate(BoxesGroup)();
         attributes->apply(boxesGroup.get());
-        if(parentGroup != nullptr) {
+        if(parentGroup) {
             parentGroup->addContainedBox(boxesGroup);
         }
     } else {
@@ -553,7 +553,7 @@ qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
 void loadVectorPath(const QDomElement &pathElement,
                     BoxesGroup *parentGroup,
                     VectorPathSvgAttributes *attributes) {
-    qsptr<VectorPath> vectorPath = SPtrCreate(VectorPath)();
+    auto vectorPath = SPtrCreate(VectorPath)();
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
     attributes->apply(vectorPath.get());
@@ -563,7 +563,7 @@ void loadVectorPath(const QDomElement &pathElement,
 void loadPolyline(const QDomElement &pathElement,
                   BoxesGroup *parentGroup,
                   VectorPathSvgAttributes *attributes) {
-    qsptr<VectorPath> vectorPath = SPtrCreate(VectorPath)();
+    auto vectorPath = SPtrCreate(VectorPath)();
 
     QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
@@ -616,7 +616,7 @@ void loadRect(const QDomElement &pathElement,
         rXstr = rYstr;
     }
 
-    qsptr<Rectangle> rect = SPtrCreate(Rectangle)();
+    auto rect = SPtrCreate(Rectangle)();
 
     rect->moveByRel(QPointF(xStr.toDouble(),
                             yStr.toDouble()));
@@ -638,7 +638,7 @@ void loadText(const QDomElement &pathElement,
     QString xStr = pathElement.attribute("x");
     QString yStr = pathElement.attribute("y");
 
-    qsptr<TextBox> textBox = SPtrCreate(TextBox)();
+    auto textBox = SPtrCreate(TextBox)();
 
     textBox->moveByRel(QPointF(xStr.toDouble(),
                                yStr.toDouble()));
@@ -711,7 +711,7 @@ bool getGradientFromString(const QString &colorStr, FillSvgAttributes *target,
         return false;
     }
 
-    if(gradient != nullptr) {
+    if(gradient) {
         target->setPaintType(GRADIENTPAINT);
         target->setGradient(gradient);
     }
@@ -940,7 +940,7 @@ struct SvgAttribute {
 void extractSvgAttributes(const QString &string,
                           QList<SvgAttribute> *attributesList) {
     QStringList attributesStrList = string.split(";");
-    Q_FOREACH(const QString &attributeStr, attributesStrList) {
+    for(const QString &attributeStr : attributesStrList) {
         attributesList->append(SvgAttribute(attributeStr));
     }
 }
@@ -996,7 +996,7 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
     QList<SvgAttribute> styleAttributes;
     QString styleAttributesStr = element.attribute("style");
     extractSvgAttributes(styleAttributesStr, &styleAttributes);
-    Q_FOREACH(const SvgAttribute &attribute, styleAttributes) {
+    for(const SvgAttribute &attribute : styleAttributes) {
         QString name = attribute.getName();
         if(name.isEmpty()) continue;
         QString value = attribute.getValue();
@@ -1574,7 +1574,7 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
         while (count > 0) {
             qreal offsetX = x;        // correction offsets
             qreal offsetY = y;        // for relative commands
-            if(firstPointAfterM == nullptr) {
+            if(!firstPointAfterM) {
                 firstPointAfterM = lastAddedPoint;
             }
             switch (pathElem.unicode()) {
@@ -1967,7 +1967,7 @@ void FillSvgAttributes::setPaintType(const PaintType &type) {
 
 void FillSvgAttributes::setGradient(Gradient *gradient) {
     mGradient = gradient;
-    if(gradient == nullptr) return;
+    if(!gradient) return;
     setPaintType(GRADIENTPAINT);
 }
 
@@ -2078,7 +2078,7 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
 
 void VectorPathSvgAttributes::apply(VectorPath *path) {
     PathAnimator* pathAnimator = path->getPathAnimator();
-    Q_FOREACH(const stdsptr<SvgSeparatePath>& separatePath, mSvgSeparatePaths) {
+    for(const auto& separatePath : mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
         qsptr<VectorPathAnimator> singlePath =
                 SPtrCreate(VectorPathAnimator)(pathAnimator);
@@ -2092,9 +2092,9 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
 void SvgSeparatePath::apply(VectorPathAnimator *path) {
     NodePoint *lastPoint = nullptr;
     NodePoint *firstPoint = nullptr;
-    Q_FOREACH(const stdsptr<SvgNodePoint>& point, mPoints) {
+    for(const auto& point : mPoints) {
         lastPoint = path->addNodeRelPos(point.get(), lastPoint);
-        if(firstPoint == nullptr) firstPoint = lastPoint;
+        if(!firstPoint) firstPoint = lastPoint;
     }
     if(mClosedPath) {
         lastPoint->connectToPoint(firstPoint);
@@ -2145,7 +2145,7 @@ void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
 }
 
 void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
-    Q_FOREACH(const stdsptr<SvgNodePoint>& point, mPoints) {
+    for(const auto& point : mPoints) {
         point->applyTransfromation(transformation);
     }
 }

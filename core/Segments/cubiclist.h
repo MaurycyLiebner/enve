@@ -20,7 +20,7 @@ struct CubicList {
         bool first = true;
         QPointF lastPos;
         QPointF firstPos;
-        foreach(const auto& cubic, mSegments) {
+        for(const auto& cubic : mSegments) {
             if(first) {
                 first = false;
                 firstPos = cubic.p0();
@@ -56,7 +56,7 @@ struct CubicList {
 
     bool isClockWise() const {
         qreal sum = 0;
-        foreach(const auto& seg, mSegments) {
+        for(const auto& seg : mSegments) {
             sum += (seg.p1().x() - seg.p0().x())*(seg.p1().y() + seg.p0().y());
         }
         return sum > 0;

@@ -36,7 +36,7 @@ public:
 
     inline StdPointer<T> &operator=(T* p) {
         rp = p;
-        if(p == nullptr) {
+        if(!p) {
             wp.reset();
         } else {
             wp = static_cast<StdSelfRef*>(p)->weakRef<StdSelfRef>();

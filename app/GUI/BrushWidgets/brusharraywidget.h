@@ -47,7 +47,7 @@ public slots:
     void prependBrush(const stdsptr<BrushWrapper>& brush) {
         BrushWidget* newWidget = BrushWidget::createWidget(brush, this);
         if(mNoDuplicated) removeBrush(brush);
-        if(newWidget == nullptr) return;
+        if(!newWidget) return;
         prependWidget(newWidget);
     }
 signals:

@@ -39,7 +39,7 @@ public:
     Item *getItemWithName(const QString &name) const;
     void setName(const QString& name) { mName = name; }
     ItemWidget<Item>* getWidgetForItem(Item* item) const {
-        for(ItemWidget<Item>* widget : mItemWidgets) {
+        for(const auto& widget : mItemWidgets) {
             if(widget->getItem() == item) return widget;
         }
         return nullptr;
@@ -81,9 +81,9 @@ CollectionArea<Item>::CollectionArea(const QString& name, QWidget *parent) :
 
 template <class Item>
 Item* CollectionArea<Item>::getItemWithName(const QString &name) const {
-    for(ItemWidget<Item>* widget : mItemWidgets) {
+    for(const auto& widget : mItemWidgets) {
         Item* itemSptr = widget->getItem();
-        if(itemSptr == nullptr) continue;
+        if(!itemSptr) continue;
         if(itemSptr->getName() != name) continue;
         return itemSptr;
     }

@@ -22,7 +22,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(
     const QList<qsptr<BoundingBox>> &boxList =
             mParentGroup->getContainedBoxesList();
     QList<PathBox*> pathBoxes;
-    foreach(const qsptr<BoundingBox> &pathBox, boxList) {
+    for(const auto& pathBox : boxList) {
         if(pathBox->SWT_isPathBox()) {
             pathBoxes << GetAsPtr(pathBox.data(), PathBox);
         }
@@ -33,7 +33,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(
     }
     PathBox *lastPath = pathBoxes.takeLast();
     SkPath srcT = src;
-    foreach(PathBox *pathBox, pathBoxes) {
+    for(PathBox *pathBox : pathBoxes) {
         gApplyOperation(relFrame, srcT, dst, pathBox,
                  lastPath, operation, true);
         srcT = *dst;
@@ -52,7 +52,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
     const QList<qsptr<BoundingBox> > &boxList =
             mParentGroup->getContainedBoxesList();
     QList<PathBox*> pathBoxes;
-    foreach(const qsptr<BoundingBox> &pathBox, boxList) {
+    for(const auto& pathBox : boxList) {
         if(pathBox->SWT_isPathBox()) {
             pathBoxes << GetAsPtr(pathBox, PathBox);
         }
@@ -63,7 +63,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
     }
     PathBox *lastPath = pathBoxes.takeLast();
     SkPath srcT = src;
-    foreach(PathBox *pathBox, pathBoxes) {
+    for(PathBox *pathBox : pathBoxes) {
         gApplyOperationF(relFrame, srcT, dst, pathBox,
                         lastPath, operation, true);
         srcT = *dst;

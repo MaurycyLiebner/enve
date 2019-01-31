@@ -74,7 +74,7 @@ void Property::prp_setName(const QString &newName) {
 
 void Property::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {
     if(prp_mUpdaterBlocked) return;
-    if(updater == nullptr) {
+    if(!updater) {
         prp_mUpdater.reset();
     } else {
         prp_mUpdater = updater;
@@ -100,7 +100,7 @@ void Property::prp_callFinishUpdater() {
 }
 
 void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
-    if(mParentCanvasUndoRedoStack == nullptr) return;
+    if(!mParentCanvasUndoRedoStack) return;
     mParentCanvasUndoRedoStack->addUndoRedo(undoRedo);
 }
 

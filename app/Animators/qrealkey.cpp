@@ -18,7 +18,7 @@ QrealKey::QrealKey(QrealAnimator *parentAnimator) :
 
 stdsptr<QrealKey> QrealKey::makeQrealKeyDuplicate(
         QrealAnimator* targetParent) {
-    stdsptr<QrealKey> target = SPtrCreate(QrealKey)(targetParent);
+    auto target = SPtrCreate(QrealKey)(targetParent);
     target->setValue(mValue);
     target->setRelFrame(mRelFrame);
     target->setCtrlsMode(mCtrlsMode);
@@ -53,7 +53,7 @@ QrealAnimator *QrealKey::getParentQrealAnimator() const {
 qreal QrealKey::getValue() const { return mValue; }
 
 void QrealKey::setValue(qreal value) {
-    if(mParentAnimator != nullptr) {
+    if(mParentAnimator) {
         value = clamp(value,
                       getParentQrealAnimator()->getMinPossibleValue(),
                       getParentQrealAnimator()->getMaxPossibleValue());
@@ -67,7 +67,7 @@ void QrealKey::setValue(qreal value) {
 }
 
 void QrealKey::finishValueTransform() {
-    if(mParentAnimator != nullptr) {
+    if(mParentAnimator) {
 //        mParentAnimator->addUndoRedo(
 //                    new ChangeQrealKeyValueUndoRedo(mSavedValue,
 //                                                    mValue, this) );
@@ -103,7 +103,7 @@ void QrealKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
     bool frameChanged = newFrame != mRelFrame;
     setValue(frameValueChange.y() + mSavedValue);
     if(!frameChanged) return;
-    if(mParentAnimator != nullptr) {
+    if(mParentAnimator) {
         mParentAnimator->anim_moveKeyToRelFrame(this, newFrame);
     } else {
         setRelFrame(newFrame);

@@ -17,7 +17,7 @@ void gApplyOperationF(const qreal &relFrame, const SkPath &src,
                       SkPath *dst, PathBox *srcBox,
                       PathBox *dstBox, const QString &operation,
                       const bool &groupSum) {
-    if(srcBox == nullptr) {
+    if(!srcBox) {
         *dst = src;
         return;
     }

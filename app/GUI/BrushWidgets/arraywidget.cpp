@@ -24,7 +24,7 @@ ArrayWidget::ArrayWidget(const Qt::Orientation& orientation,
 }
 
 void ArrayWidget::setOrientation(const Qt::Orientation &orientation) {
-    if(mMainLayout != nullptr) {
+    if(mMainLayout) {
         delete mMainLayout;
     }
 

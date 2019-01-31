@@ -38,7 +38,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 }
 
 void AnimationBox::reloadCacheHandler() {
-    //if(mParentGroup != nullptr) {
+    //if(mParentGroup) {
         updateDurationRectangleAnimationRange();
     //}
     reloadSound();
@@ -80,7 +80,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
 
 void AnimationBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
-    if(mAnimationCacheHandler == nullptr) return;
+    if(!mAnimationCacheHandler) return;
 
     mNewCurrentFrameUpdateNeeded = true;
 
@@ -108,7 +108,7 @@ bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction,
     if(selectedAction->objectName() == "ab_set_src_file") {
         changeSourceFile(widgetsParent);
     } else if(selectedAction->objectName() == "ab_reload") {
-        if(mAnimationCacheHandler != nullptr) {
+        if(mAnimationCacheHandler) {
             mAnimationCacheHandler->clearCache();
         }
     } else {

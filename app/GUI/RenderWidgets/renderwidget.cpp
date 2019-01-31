@@ -98,7 +98,7 @@ void RenderWidget::removeRenderInstanceWidget(RenderInstanceWidget *wid) {
 }
 
 void RenderWidget::setRenderedFrame(const int &frame) {
-    if(mCurrentRenderedSettings == nullptr) return;
+    if(!mCurrentRenderedSettings) return;
     mRenderProgressBar->setValue(frame);
 }
 
@@ -137,16 +137,16 @@ void RenderWidget::enableButtons() {
 
 void RenderWidget::render() {
     RenderInstanceWidget *firstWid = nullptr;
-    foreach(RenderInstanceWidget *wid, mRenderInstanceWidgets) {
+    for(RenderInstanceWidget *wid : mRenderInstanceWidgets) {
         if(!wid->isChecked()) continue;
-        if(firstWid == nullptr) {
+        if(!firstWid) {
             firstWid = wid;
         } else {
             mAwaitingSettings << wid;
             wid->getSettings()->setCurrentState(RenderInstanceSettings::WAITING);
         }
     }
-    if(firstWid != nullptr) {
+    if(firstWid) {
         disableButtons();
         firstWid->setDisabled(true);
         render(firstWid->getSettings());
@@ -160,7 +160,7 @@ void RenderWidget::stopRendering() {
 }
 
 void RenderWidget::clearAwaitingRender() {
-    foreach(RenderInstanceWidget *wid, mAwaitingSettings) {
+    for(RenderInstanceWidget *wid : mAwaitingSettings) {
         wid->getSettings()->setCurrentState(RenderInstanceSettings::NONE);
     }
     mAwaitingSettings.clear();

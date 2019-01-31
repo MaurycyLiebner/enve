@@ -43,7 +43,7 @@ public:
             disconnect(getLinkTarget(), nullptr, this, nullptr);
             getLinkTarget()->removeLinkingBox(this);
         }
-        if(linkTarget == nullptr) {
+        if(!linkTarget) {
             setName("empty link");
 
             mBoxTarget->setTarget(nullptr);
@@ -133,7 +133,7 @@ public:
             disconnect(getLinkTarget(), nullptr, this, nullptr);
             getLinkTarget()->removeLinkingBox(this);
         }
-        if(linkTarget == nullptr) {
+        if(!linkTarget) {
             setName("empty link");
 
             mBoxTarget->setTarget(nullptr);
@@ -219,7 +219,7 @@ public:
         groupData->fChildrenRenderData.clear();
         qreal childrenEffectsMargin = 0.;
         qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        foreach(const auto &box, mContainedBoxes) {
+        for(const auto &box : mContainedBoxes) {
             qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 BoundingBoxRenderData* boxRenderData =

@@ -54,7 +54,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     QList<QList<stdsptr<Key>>> animatorKeys;
     for(const auto &animData : mAnimatorData) {
         Animator *animator = animData.first;
-        if(animator == nullptr) continue;
+        if(!animator) continue;
         QList<stdsptr<Key>> keys;
         int nKeys;
         QBuffer target(const_cast<QByteArray*>(&animData.second));

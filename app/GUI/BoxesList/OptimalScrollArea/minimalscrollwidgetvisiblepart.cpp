@@ -33,7 +33,7 @@ void MinimalScrollWidgetVisiblePart::setVisibleHeight(const int &height) {
 }
 
 void MinimalScrollWidgetVisiblePart::updateWidgetsWidth() {
-    Q_FOREACH(QWidget *widget, mSingleWidgets) {
+    for(QWidget *widget : mSingleWidgets) {
         widget->setFixedWidth(width() - widget->x());
     }
 }
@@ -48,7 +48,7 @@ void MinimalScrollWidgetVisiblePart::callUpdaters() {
 }
 
 void MinimalScrollWidgetVisiblePart::callAllInstanceUpdaters() {
-    Q_FOREACH(MinimalScrollWidgetVisiblePart *instance, mAllInstances) {
+    for(MinimalScrollWidgetVisiblePart *instance : mAllInstances) {
         instance->callUpdaters();
     }
 }
@@ -107,7 +107,7 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
     }
 
     int yT = 0;
-    Q_FOREACH(QWidget *widget, mSingleWidgets) {
+    for(QWidget *widget : mSingleWidgets) {
         widget->move(widget->x(), yT);
         widget->setFixedWidth(width() - widget->x());
         yT += MIN_WIDGET_HEIGHT;

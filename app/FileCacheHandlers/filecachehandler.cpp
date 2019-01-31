@@ -23,7 +23,7 @@ void FileCacheHandler::setVisibleInListWidgets(const bool &bT) {
 void FileCacheHandler::clearCache() {
     QFile file(mFilePath);
     mFileMissing = !file.exists();
-    foreach(const auto &boxPtr, mDependentBoxes) {
+    for(const auto &boxPtr : mDependentBoxes) {
         BoundingBox *box = boxPtr.data();
         if(!box) continue;
         box->reloadCacheHandler();

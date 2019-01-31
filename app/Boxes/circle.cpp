@@ -107,7 +107,7 @@ MovablePoint *Circle::getPointAtAbsPos(
     MovablePoint* pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
-    if(pointToReturn == nullptr) {
+    if(!pointToReturn) {
         if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mHorizontalRadiusPoint.get();
         }

@@ -4,7 +4,7 @@
 ImageSequenceCacheHandler::ImageSequenceCacheHandler(
         const QStringList &framePaths) {
     mFramePaths = framePaths;
-    foreach(const QString &path, framePaths) {
+    for(const QString &path : framePaths) {
         auto imgCacheHandler = GetAsPtr(
                 FileSourcesCache::getHandlerForFilePath(path),
                     ImageCacheHandler);
@@ -40,7 +40,7 @@ void ImageSequenceCacheHandler::updateFrameCount() {
 }
 
 void ImageSequenceCacheHandler::clearCache() {
-    foreach(const auto &cacheHandler, mFrameImageHandlers) {
+    for(const auto &cacheHandler : mFrameImageHandlers) {
         cacheHandler->clearCache();
     }
     FileCacheHandler::clearCache();

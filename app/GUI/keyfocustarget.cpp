@@ -24,7 +24,7 @@ bool KeyFocusTarget::KFT_handleKeyEvent(QKeyEvent *e) {
             return true;
         }
     }
-    foreach(KeyFocusTarget *target, KFT_mAllTargets) {
+    for(KeyFocusTarget *target : KFT_mAllTargets) {
         if(target == KFT_mCurrentTarget) continue;
         if(target->KFT_handleKeyEventForTarget(e)) {
             target->KFT_setFocus();
