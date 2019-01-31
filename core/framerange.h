@@ -87,15 +87,13 @@ struct _ValueRange {
     }
 };
 
-typedef int Frame;
-typedef int RelFrame;
-typedef int AbsFrame;
 //! @brief Inclusive frame range
-typedef _ValueRange<Frame> FrameRange;
-typedef _ValueRange<AbsFrame> AbsFrameRange;
-typedef _ValueRange<RelFrame> RelFrameRange;
+typedef _ValueRange<int> FrameRange;
+typedef _ValueRange<int> AbsFrameRange;
+typedef _ValueRange<int> RelFrameRange;
 
-typedef int Sample;
+typedef _ValueRange<int> IdRange;
+
 //! @brief Inclusive sample range
-typedef _ValueRange<Sample> SampleRange;
+typedef _ValueRange<int> SampleRange;
 #endif // FRAMERANGE_H

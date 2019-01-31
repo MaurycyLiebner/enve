@@ -8,6 +8,7 @@ class SoundCacheHandler : public HDDCachableCacheHandler<SoundCacheContainer> {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 public:
     void rangeNeeded(const SampleRange& range) {
+        setContainersInFrameRangeBlocked(range, true);
         auto missings = getMissingRanges(range);
         if(missings.isEmpty()) return;
         for(const auto& missing : missings) {

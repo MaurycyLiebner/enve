@@ -268,9 +268,9 @@ SOURCES += main.cpp\
     CacheHandlers/hddcachablerangecontainer.cpp \
     CacheHandlers/soundcachecontainer.cpp \
     CacheHandlers/soundtmpfilehandlers.cpp \
-    Sound/soundcachehandler.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
-    CacheHandlers/minimalcachehandler.cpp
+    CacheHandlers/minimalcachehandler.cpp \
+    CacheHandlers/soundcachehandler.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -490,9 +490,9 @@ HEADERS  += \
     CacheHandlers/hddcachablerangecontainer.h \
     CacheHandlers/soundcachecontainer.h \
     CacheHandlers/soundtmpfilehandlers.h \
-    Sound/soundcachehandler.h \
     CacheHandlers/hddcachablecachehandler.h \
-    CacheHandlers/minimalcachehandler.h
+    CacheHandlers/minimalcachehandler.h \
+    CacheHandlers/soundcachehandler.h
 
 RESOURCES += \
     resources.qrc

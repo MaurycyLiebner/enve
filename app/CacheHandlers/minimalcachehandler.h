@@ -93,18 +93,10 @@ public:
         }
     }
 
-    void setContainersInFrameRangeBlocked(const int &minFrame,
-                                          const int &maxFrame,
+    void setContainersInFrameRangeBlocked(const FrameRange &range,
                                           const bool &blocked) {
-        int minId;
-        if(!getRenderContainterIdAtRelFrame(minFrame, &minId)) {
-            minId = getRenderContainterInsertIdAtRelFrame(minFrame);
-        }
-        int maxId;
-        if(!getRenderContainterIdAtRelFrame(maxFrame, &maxId)) {
-            maxId = getRenderContainterInsertIdAtRelFrame(maxFrame) - 1;
-        }
-        for(int i = minId; i <= maxId; i++) {
+        IdRange idRange = rangeToListIdRange(range);
+        for(int i = idRange.fMin; i <= idRange.fMax; i++) {
             mRenderContainers.at(i)->setBlocked(blocked);
         }
     }
@@ -294,6 +286,18 @@ public:
         return result;
     }
 protected:
+    IdRange rangeToListIdRange(const FrameRange &range) {
+        int minId;
+        if(!getRenderContainterIdAtRelFrame(range.fMin, &minId)) {
+            minId = getRenderContainterInsertIdAtRelFrame(range.fMin);
+        }
+        int maxId;
+        if(!getRenderContainterIdAtRelFrame(range.fMax, &maxId)) {
+            maxId = getRenderContainterInsertIdAtRelFrame(range.fMax) - 1;
+        }
+        return {minId, maxId};
+    }
+
     QList<stdsptr<T>> mRenderContainers;
 };
 

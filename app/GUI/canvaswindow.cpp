@@ -956,8 +956,8 @@ void CanvasWindow::nextCurrentRenderFrame() {
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         mCurrentCanvas->getCacheHandler().
-            setContainersInFrameRangeBlocked(mCurrentRenderFrame + 1,
-                                             newCurrentRenderFrame - 1,
+            setContainersInFrameRangeBlocked({mCurrentRenderFrame + 1,
+                                              newCurrentRenderFrame - 1},
                                              true);
     }
 
@@ -1022,8 +1022,8 @@ void CanvasWindow::interruptPreviewRendering() {
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
     mCurrentCanvas->getCacheHandler().
-        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
-                                         mMaxRenderFrame,
+        setContainersInFrameRangeBlocked({mSavedCurrentFrame + 1,
+                                          mMaxRenderFrame},
                                          false);
     changeCurrentFrameAction(mSavedCurrentFrame);
     MainWindow::getInstance()->previewFinished();
@@ -1039,8 +1039,8 @@ void CanvasWindow::interruptOutputRendering() {
 void CanvasWindow::stopPreview() {
     setPreviewing(false);
     mCurrentCanvas->getCacheHandler().
-        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
-                                         mMaxRenderFrame,
+        setContainersInFrameRangeBlocked({mSavedCurrentFrame + 1,
+                                          mMaxRenderFrame},
                                          false);
     changeCurrentFrameAction(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
