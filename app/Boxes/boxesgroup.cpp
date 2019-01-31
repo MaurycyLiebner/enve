@@ -999,6 +999,7 @@ bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                             parentMainTarget);
 }
 #include "PixmapEffects/rastereffects.h"
+#include "skia/skiahelpers.h"
 void BoxesGroupRenderData::renderToImage() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;

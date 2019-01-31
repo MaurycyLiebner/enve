@@ -5,6 +5,7 @@
 #include <string.h>
 #include "colorconversions.h"
 #include "fixedtiledsurface.h"
+#include "skia/skiahelpers.h"
 
 void freeSimpleTiledSurf(MyPaintSurface *surface) {
     FixedTiledSurface *self = (FixedTiledSurface*)surface;

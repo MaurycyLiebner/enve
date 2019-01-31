@@ -6,6 +6,7 @@
 #include "PixmapEffects/rastereffects.h"
 #include "Animators/transformanimator.h"
 #include "PixmapEffects/pixmapeffect.h"
+#include "skia/skiahelpers.h"
 
 ExternalLinkBox::ExternalLinkBox() :
     BoxesGroup() {
@@ -259,7 +260,7 @@ void LinkCanvasRenderData::renderToImage() {
             QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
                     qRound(fGlobalBoundingRect.top()/**resolution*/));
 
-    SkImageInfo info = SkiaHelpers::getPremulBGRAInfo(
+    const auto info = SkiaHelpers::getPremulBGRAInfo(
                 qCeil(sizeF.width()), qCeil(sizeF.height()));
     SkBitmap bitmap;
     bitmap.allocPixels(info);

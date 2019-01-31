@@ -33,7 +33,4 @@
 
 #define foreach Q_FOREACH
 
-#include "skiahelpers.h"
-#include "skqtconversions.h"
-
 #endif // SKIAINCLUDES_H

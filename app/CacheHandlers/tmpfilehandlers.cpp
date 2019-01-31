@@ -1,6 +1,7 @@
 #include "tmpfilehandlers.h"
 #include "imagecachecontainer.h"
 #include "castmacros.h"
+#include "skia/skiahelpers.h"
 
 CacheContainerTmpFileDataLoader::CacheContainerTmpFileDataLoader(
         const qsptr<QTemporaryFile> &file,

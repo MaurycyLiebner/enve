@@ -1226,6 +1226,7 @@ SoundComposition *Canvas::getSoundComposition() {
 CanvasRenderData::CanvasRenderData(BoundingBox* parentBoxT) :
     BoxesGroupRenderData(parentBoxT) {}
 
+#include "skia/skiahelpers.h"
 void CanvasRenderData::renderToImage() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;

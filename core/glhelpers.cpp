@@ -221,7 +221,7 @@ bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
     stbi_image_free(data);
     return true;
 }
-
+#include "skia/skiahelpers.h"
 sk_sp<SkImage> TextureFrameBuffer::toImage() {
     SkBitmap btmp;
     const auto info = SkiaHelpers::getPremulBGRAInfo(fWidth, fHeight);

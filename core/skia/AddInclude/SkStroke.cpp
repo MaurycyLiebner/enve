@@ -11,6 +11,7 @@
 #include "SkMacros.h"
 #include "SkPathPriv.h"
 #include "SkPointPriv.h"
+#include "SkStrokerPriv.h"
 #include "SkTo.h"
 
 #include <utility>

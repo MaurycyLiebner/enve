@@ -11,7 +11,7 @@
 #include "SkPaint.h"
 #include "SkPath.h"
 #include "SkPoint.h"
-#include "SkStrokerPriv.h"
+//#include "SkStrokerPriv.h"
 #include "SkTo.h"
 
 #ifdef SK_DEBUG

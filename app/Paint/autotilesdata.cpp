@@ -1,5 +1,6 @@
 #include "autotilesdata.h"
 #include "exceptions.h"
+#include "skia/skiahelpers.h"
 
 uint16_t *allocateTile(const size_t& size) {
     auto ptr = new uint16_t[size];

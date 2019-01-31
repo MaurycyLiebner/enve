@@ -1,5 +1,6 @@
 #ifndef SKIAHELPERS_H
 #define SKIAHELPERS_H
+
 #include "skiaincludes.h"
 
 namespace SkiaHelpers {
