@@ -147,7 +147,6 @@ void BoundingBoxRenderData::afterProcessingFinished() {
         //qDebug() << fParentBox->prp_getName();
         fParentBox->renderDataFinished(this);
     }
-    _ScheduledTask::afterProcessingFinished();
 }
 
 void BoundingBoxRenderData::taskQued() {

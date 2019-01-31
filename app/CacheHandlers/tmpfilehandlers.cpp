@@ -28,7 +28,6 @@ void CacheContainerTmpFileDataLoader::_processUpdate() {
 
 void CacheContainerTmpFileDataLoader::afterProcessingFinished() {
     mTargetCont->setDataLoadedFromTmpFile(mImage);
-    _ScheduledTask::afterProcessingFinished();
 }
 
 CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
@@ -69,7 +68,6 @@ void CacheContainerTmpFileDataSaver::afterProcessingFinished() {
     } else {
         mTargetCont->setDataSavedToTmpFile(mTmpFile);
     }
-    _ScheduledTask::afterProcessingFinished();
 }
 
 void CacheContainerTmpFileDataDeleter::_processUpdate() {

@@ -519,7 +519,6 @@ void TileSkDrawer::afterProcessingFinished() {
     if(parentTile != nullptr) {
         parentTile->updateTexFromDataArray();
     }
-    _ScheduledTask::afterProcessingFinished();
 }
 
 void TileSkDrawer::clearImg() {

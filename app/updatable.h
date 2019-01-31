@@ -99,7 +99,6 @@ public:
 
 protected:
     void afterProcessingFinished() {
-        _ScheduledTask::afterProcessingFinished();
         if(mAfter) mAfter();
     }
 

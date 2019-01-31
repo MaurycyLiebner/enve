@@ -14,7 +14,6 @@ void ImageCacheHandler::_processUpdate() {
 }
 
 void ImageCacheHandler::afterProcessingFinished() {
-    FileCacheHandler::afterProcessingFinished();
     mImage = mUpdateImage;
     mUpdateImage.reset();
 }

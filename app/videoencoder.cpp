@@ -796,7 +796,6 @@ void VideoEncoder::afterProcessingFinished() {
             finishEncodingSuccess();
         }
     }
-    _ScheduledTask::afterProcessingFinished();
 }
 
 VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {

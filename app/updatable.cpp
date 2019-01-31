@@ -52,13 +52,14 @@ void _Task::beforeProcessingStarted() {
 void _Task::finishedProcessing() {
     mFinished = true;
     mBeingProcessed = false;
+    mCurrentTaskExecutor = nullptr;
+    tellDependentThatFinished();
     afterProcessingFinished();
     mSelfRef.reset();
 }
 
 void _Task::afterProcessingFinished() {
-    mCurrentTaskExecutor = nullptr;
-    tellDependentThatFinished();
+
 }
 
 bool _Task::isBeingProcessed() { return mBeingProcessed; }

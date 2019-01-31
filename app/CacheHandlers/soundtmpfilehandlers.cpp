@@ -22,7 +22,6 @@ void SoundContainerTmpFileDataLoader::_processUpdate() {
 
 void SoundContainerTmpFileDataLoader::afterProcessingFinished() {
     mTargetCont->setDataLoadedFromTmpFile(mSamples);
-    _ScheduledTask::afterProcessingFinished();
 }
 
 SoundContainerTmpFileDataSaver::SoundContainerTmpFileDataSaver(
@@ -55,5 +54,4 @@ void SoundContainerTmpFileDataSaver::afterProcessingFinished() {
     } else {
         mTargetCont->setDataSavedToTmpFile(mTmpFile);
     }
-    _ScheduledTask::afterProcessingFinished();
 }

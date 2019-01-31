@@ -284,7 +284,6 @@ void VideoCacheHandler::_processUpdate() {
 }
 
 void VideoCacheHandler::afterProcessingFinished() {
-    FileCacheHandler::afterProcessingFinished();
 //    qDebug() << "loaded: " << mFramesBeingLoaded;
     for(int i = 0; i < mFramesBeingLoaded.count() &&
         i < mLoadedFrames.count(); i++) {
