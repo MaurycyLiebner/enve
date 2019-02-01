@@ -339,7 +339,6 @@ void AnimationRect::draw(QPainter * const p,
                          const int &endFrame) {
     p->save();
 
-
     const int firstRelDrawFrame =
             qMax(startFrame, getMinAnimationFrame()) - startFrame;
     const int lastRelDrawFrame =

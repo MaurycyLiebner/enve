@@ -16,8 +16,7 @@ class ScrollArea;
 class AnimationDockWidget;
 class BoxScrollWidget;
 
-class BoxesListKeysViewWidget : public QWidget
-{
+class BoxesListKeysViewWidget : public QWidget {
     Q_OBJECT
 public:
     explicit BoxesListKeysViewWidget(QWidget *topWidget,
