@@ -44,13 +44,31 @@ bool isZero4Dec(const double& val) {
     return qAbs(val) < 0.0001;
 }
 
+bool isInteger4Dec(const double& val) {
+    return isZero4Dec(val - qRound(val));
+}
+
+double floor4Dec(const double& val) {
+    const double roundVal = qRound(val);
+    if(isZero4Dec(val - roundVal)) return roundVal;
+    return qFloor(val);
+}
+
 bool isZero6Dec(const double &val) {
     return qAbs(val) < 0.000001;
 }
 
+bool isOne4Dec(const double &val) {
+    return isZero4Dec(val - 1);
+}
+
+bool isOne6Dec(const double &val) {
+    return isZero6Dec(val - 1);
+}
+
 bool isZeroOrOne6Dec(const double &val) {
     if(isZero6Dec(val)) return true;
-    if(isZero6Dec(val - 1)) return true;
+    if(isOne6Dec(val)) return true;
     return false;
 }
 

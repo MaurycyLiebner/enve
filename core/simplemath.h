@@ -3,7 +3,7 @@
 #define MAX(a, b)  (((a) > (b)) ? (a) : (b))
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 #define ROUND(x) ((int) ((x) + 0.5))
-#define SIGN(x) ((x)>0?1:(-1))
+#define SIGN(x) (x > 0 ? 1 : -1)
 #define SQR(x) ((x)*(x))
 #define CLAMP(x, low, high)  x > high ? high : (x < low ? low : x)
 #define CLAMP01(x)  x > 1 ? 1 : (x < 0 ? 0 : x)
@@ -36,8 +36,15 @@ extern bool isNonZero(const float &val);
 extern bool isZero4Dec(const float val);
 extern bool isZero4Dec(const double &val);
 
+extern double floor4Dec(const double& val);
+
+extern bool isInteger4Dec(const double& val);
+
 extern bool isZero6Dec(const double &val);
 extern bool isZeroOrOne6Dec(const double &val);
+
+extern bool isOne4Dec(const double &val);
+extern bool isOne6Dec(const double &val);
 
 extern bool isZero2Dec(qreal val);
 

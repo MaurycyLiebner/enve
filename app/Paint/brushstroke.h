@@ -134,7 +134,10 @@ struct BrushStrokeSet {
         if(segLists.isEmpty()) return result;
         for(auto& segs : segLists) {
             if(segs.isEmpty()) continue;
-            result << fromCubicList(segs,
+            const double minL = 0;
+            const double maxL = 1.3;
+            auto segsT = segs.getFragmentUnbound(minL, maxL);
+            result << fromCubicList(segsT,
                                     timeCurve,
                                     pressureCurve,
                                     widthCurve);

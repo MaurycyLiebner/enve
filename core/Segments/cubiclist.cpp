@@ -17,10 +17,11 @@ CubicList::CubicList(const CubicList &src) {
 
 CubicList CubicList::getFragment(const double &minLenFrac,
                                  const double &maxLenFrac) {
-    Q_ASSERT(minLenFrac > 0 && minLenFrac < maxLenFrac);
-    Q_ASSERT(maxLenFrac < 1);
-    const double minLen = getTotalLength()*minLenFrac;
-    const double maxLen = getTotalLength()*maxLenFrac;
+    if(minLenFrac > maxLenFrac) return CubicList();
+    //Q_ASSERT(minLenFrac > 0);
+    //Q_ASSERT(maxLenFrac < 1);
+    const double minLen = getTotalLength()*CLAMP01(minLenFrac);
+    const double maxLen = getTotalLength()*CLAMP01(maxLenFrac);
     double minT = 0, maxT = 0;
     int minI = -1, maxI = -1;
     double currLen = 0;
@@ -53,6 +54,32 @@ CubicList CubicList::getFragment(const double &minLenFrac,
         fragSegs << static_cast<qCubicSegment2D>(mSegments[i]);
     }
     fragSegs << mSegments[maxI].dividedAtT(maxT).first;
+    return CubicList(fragSegs);
+}
+
+CubicList CubicList::getFragmentUnbound(const double &minLenFrac,
+                                        const double &maxLenFrac) {
+    if(minLenFrac > maxLenFrac) return CubicList();
+    const double shiftToPos = -floor4Dec(minLenFrac);
+    const double posMinLenFrac = minLenFrac + shiftToPos; // always between 0 and 1
+    const double posMaxLenFrac = maxLenFrac + shiftToPos;
+    if((isZero4Dec(posMinLenFrac) || posMinLenFrac > 0) &&
+       (isZero4Dec(posMaxLenFrac) || posMaxLenFrac < 1)) {
+        return getFragment(posMinLenFrac, posMaxLenFrac);
+    }
+
+    QList<qCubicSegment2D> fragSegs;
+    if(!isInteger4Dec(posMinLenFrac)) {
+        fragSegs << getFragment(posMinLenFrac, qCeil(posMinLenFrac)).getSegments();
+    }
+    const int nFull = qFloor(posMaxLenFrac - posMinLenFrac);
+    for(int i = 0; i < nFull; i++) {
+        fragSegs << mSegments;
+    }
+    if(!isInteger4Dec(posMaxLenFrac)) {
+        fragSegs << getFragmentUnbound(
+                        qFloor(posMaxLenFrac), posMaxLenFrac).getSegments();
+    }
     return CubicList(fragSegs);
 }
 

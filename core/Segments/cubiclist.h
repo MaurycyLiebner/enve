@@ -12,6 +12,9 @@ struct CubicList {
     CubicList getFragment(const double &minLenFrac,
                           const double &maxLenFrac);
 
+    CubicList getFragmentUnbound(const double &minLenFrac,
+                                 const double &maxLenFrac);
+
     static QList<CubicList> makeFromSkPath(const SkPath& src);
 
     SkPath toSkPath() {
