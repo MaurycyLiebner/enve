@@ -93,7 +93,7 @@ bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) co
 }
 
 FrameRange InternalLinkBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    FrameRange range{INT_MIN, INT_MAX};
+    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             range *= BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
@@ -130,7 +130,7 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
 //}
 
 FrameRange InternalLinkGroupBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    FrameRange range{INT_MIN, INT_MAX};
+    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             range *= BoundingBox::prp_getIdenticalRelFrameRange(relFrame);

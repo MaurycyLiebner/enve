@@ -3,6 +3,7 @@
 
 #include <QList>
 #include "smartPointers/sharedpointerdefs.h"
+#include "framerange.h"
 
 class UndoRedo : public StdSelfRef {
 public:
@@ -69,7 +70,7 @@ private:
     void addToSet(const stdsptr<UndoRedo> &undoRedo);
 
     bool mUndoRedoBlocked = false;
-    int mLastUndoRedoFrame = INT_MAX;
+    int mLastUndoRedoFrame = FrameRange::EMAX;
     int mNumberOfSets = 0;
 
     stdsptr<UndoRedoSet> mCurrentSet;

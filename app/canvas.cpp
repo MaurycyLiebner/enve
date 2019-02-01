@@ -465,8 +465,8 @@ void Canvas::setLoadingPreviewContainer(
 FrameRange Canvas::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     FrameRange groupRange =
             BoxesGroup::prp_getIdenticalRelFrameRange(relFrame);
-    FrameRange canvasRange{0, mMaxFrame};
-    return groupRange*canvasRange;
+    //FrameRange canvasRange{0, mMaxFrame};
+    return groupRange;//*canvasRange;
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {

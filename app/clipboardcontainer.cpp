@@ -49,7 +49,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     keysView->clearKeySelection();
 
     QList<Key*> rKeys;
-    int firstKeyFrame = INT_MAX;
+    int firstKeyFrame = FrameRange::EMAX;
 
     QList<QList<stdsptr<Key>>> animatorKeys;
     for(const auto &animData : mAnimatorData) {
@@ -71,7 +71,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
 
         animatorKeys << keys;
     }
-    if(firstKeyFrame == INT_MAX) return;
+    if(firstKeyFrame == FrameRange::EMAX) return;
     int dFrame = pasteFrame - firstKeyFrame;
 
     int keysId = 0;

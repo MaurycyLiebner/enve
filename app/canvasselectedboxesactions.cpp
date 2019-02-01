@@ -12,7 +12,7 @@ bool Canvas::prp_nextRelFrameWithKey(const int &relFrame,
     int thisNext;
     bool thisHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
                                                             thisNext);
-    int minNextFrame = INT_MAX;
+    int minNextFrame = FrameRange::EMAX;
     for(const auto &box : mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxNext;
@@ -23,7 +23,7 @@ bool Canvas::prp_nextRelFrameWithKey(const int &relFrame,
             }
         }
     }
-    if(minNextFrame == INT_MAX) {
+    if(minNextFrame == FrameRange::EMAX) {
         if(thisHasNext) {
             nextRelFrame = thisNext;
         }
@@ -42,7 +42,7 @@ bool Canvas::prp_prevRelFrameWithKey(const int &relFrame,
     int thisPrev;
     bool thisHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
                                                             thisPrev);
-    int minPrevFrame = INT_MIN;
+    int minPrevFrame = FrameRange::EMIN;
     for(const auto &box : mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxPrev;
@@ -53,7 +53,7 @@ bool Canvas::prp_prevRelFrameWithKey(const int &relFrame,
             }
         }
     }
-    if(minPrevFrame == INT_MIN) {
+    if(minPrevFrame == FrameRange::EMIN) {
         if(thisHasPrev) {
             prevRelFrame = thisPrev;
         }

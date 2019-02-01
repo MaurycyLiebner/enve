@@ -45,26 +45,26 @@ FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {
 }
 
 int Property::prp_absFrameToRelFrame(const int &absFrame) const {
-    if(absFrame == INT_MIN) return INT_MIN;
-    if(absFrame == INT_MAX) return INT_MAX;
+    if(absFrame == FrameRange::EMIN) return FrameRange::EMIN;
+    if(absFrame == FrameRange::EMAX) return FrameRange::EMAX;
     return absFrame - prp_getFrameShift();
 }
 
 qreal Property::prp_absFrameToRelFrameF(const qreal &absFrame) const {
-    if(qRound(absFrame) == INT_MIN) return INT_MIN;
-    if(qRound(absFrame) == INT_MAX) return INT_MAX;
+    if(qRound(absFrame) == FrameRange::EMIN) return FrameRange::EMIN;
+    if(qRound(absFrame) == FrameRange::EMAX) return FrameRange::EMAX;
     return absFrame - prp_getFrameShift();
 }
 
 int Property::prp_relFrameToAbsFrame(const int &relFrame) const {
-    if(relFrame == INT_MIN) return INT_MIN;
-    if(relFrame == INT_MAX) return INT_MAX;
+    if(relFrame == FrameRange::EMIN) return FrameRange::EMIN;
+    if(relFrame == FrameRange::EMAX) return FrameRange::EMAX;
     return relFrame + prp_getFrameShift();
 }
 
 qreal Property::prp_relFrameToAbsFrameF(const qreal &relFrame) const {
-    if(qRound(relFrame) == INT_MIN) return INT_MIN;
-    if(qRound(relFrame) == INT_MAX) return INT_MAX;
+    if(qRound(relFrame) == FrameRange::EMIN) return FrameRange::EMIN;
+    if(qRound(relFrame) == FrameRange::EMAX) return FrameRange::EMAX;
     return relFrame + prp_getFrameShift();
 }
 

@@ -148,17 +148,20 @@ int DurationRectangle::getMaxFrameAsAbsFrame() const {
                 getMaxFrameAsRelFrame());
 }
 
-void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
-                             const qreal &drawY, const int &startFrame) {
+void DurationRectangle::draw(QPainter * const p,
+                             const QRect& drawRect,
+                             const qreal &pixelsPerFrame,
+                             const int &startFrame,
+                             const int &endFrame) {
     p->save();
-    int startDFrame;
-    int xT;
-    int widthT;
-    QRect drawRect;
 
-    startDFrame = getMinFrame() - startFrame;
-    xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
-    widthT = getFrameDuration()*pixelsPerFrame - pixelsPerFrame;
+    const int firstRelDrawFrame = qMax(startFrame, getMinFrame()) - startFrame;
+    const int lastRelDrawFrame = qMin(endFrame, getMaxFrame()) - startFrame;
+    const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
+
+    QRect durRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
+                  qCeil(drawFrameSpan*pixelsPerFrame), drawRect.height());
+
     QColor fillColor;
     bool selected = isSelected();
 
@@ -167,13 +170,11 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
     } else {
         fillColor = QColor(0, 0, 255, 120);
     }
-    drawRect = QRect(xT, drawY,
-                     widthT, MIN_WIDGET_HEIGHT);
 
-    p->fillRect(drawRect.adjusted(0, 1, 0, -1), fillColor);
+    p->fillRect(durRect.adjusted(0, 1, 0, -1), fillColor);
     if(mHovered) {
         p->setPen(QPen(Qt::white, .5));
-        p->drawRect(drawRect);
+        p->drawRect(durRect);
     }
 
     if(mMinFrame.isHovered()) {
@@ -181,14 +182,13 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
     } else {
         p->setPen(QPen(Qt::black));
     }
-    p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + MIN_WIDGET_HEIGHT));
-    xT += widthT;
+    p->drawLine(durRect.topLeft(), durRect.bottomLeft());
     if(mMaxFrame.isHovered()) {
         p->setPen(QPen(Qt::white));
     } else {
         p->setPen(QPen(Qt::black));
     }
-    p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + MIN_WIDGET_HEIGHT));
+    p->drawLine(durRect.topRight(), durRect.bottomRight());
 //    p->setPen(Qt::black);
 //    p->setBrush(Qt::NoBrush);
     //p->drawRect(drawRect);
@@ -332,21 +332,25 @@ int AnimationRect::getAnimationFrameDuration() {
     return getMaxAnimationFrame() - getMinAnimationFrame() + 1;
 }
 
-void AnimationRect::draw(
-        QPainter *p, const qreal &pixelsPerFrame,
-        const qreal &drawY, const int &startFrame) {
+void AnimationRect::draw(QPainter * const p,
+                         const QRect& drawRect,
+                         const qreal &pixelsPerFrame,
+                         const int &startFrame,
+                         const int &endFrame) {
     p->save();
 
-    int startDFrame = getMinAnimationFrame() - startFrame;
-    int xT = qFloor(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5);
-    int widthT = qFloor(getAnimationFrameDuration()*pixelsPerFrame - pixelsPerFrame);
-    QRect drawRect = QRect(xT, qFloor(drawY),
-                           widthT,
-                           MIN_WIDGET_HEIGHT);
-    p->fillRect(drawRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
 
-    DurationRectangle::draw(p, pixelsPerFrame,
-                            drawY, startFrame);
+    const int firstRelDrawFrame =
+            qMax(startFrame, getMinAnimationFrame()) - startFrame;
+    const int lastRelDrawFrame =
+            qMin(endFrame, getMaxAnimationFrame()) - startFrame;
+    const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
+    QRect animDurRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
+                      qCeil(drawFrameSpan*pixelsPerFrame), drawRect.height());
+
+    p->fillRect(animDurRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
+
+    DurationRectangle::draw(p, drawRect, pixelsPerFrame, startFrame, endFrame);
     p->restore();
 }
 

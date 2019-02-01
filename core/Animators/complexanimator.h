@@ -15,7 +15,7 @@ public:
     ~ComplexAnimator();
 
     void ca_addChildAnimator(const qsptr<Property> &childAnimator,
-                             const int &id = INT_MAX);
+                             const int &id = FrameRange::EMAX);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
     void ca_moveChildInList(Property *child, const int &from, const int &to);

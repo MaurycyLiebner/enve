@@ -32,8 +32,10 @@ void SingleSound::prp_drawKeys(QPainter *p,
 //    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
 //                frameWidth*pixelsPerFrame - pixelsPerFrame,
 //                BOX_HEIGHT, QColor(0, 0, 255, 125));
-    mDurationRectangle->draw(p, pixelsPerFrame,
-                             drawY, startFrame);
+    QRect drawRect(0, drawY, (endFrame - startFrame)*pixelsPerFrame,
+                   rowHeight);
+    mDurationRectangle->draw(p, drawRect,pixelsPerFrame,
+                             startFrame, endFrame);
     ComplexAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
                                   startFrame, endFrame,
                                   rowHeight, keyRectSize);

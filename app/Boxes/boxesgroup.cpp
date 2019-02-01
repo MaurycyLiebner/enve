@@ -37,7 +37,7 @@ BoxesGroup::BoxesGroup(const BoundingBoxType &type) :
 //                                         int &nextRelFrame) {
 //    int thisMinNextFrame = BoundingBox::prp_nextRelFrameWithKey(relFrame);
 //    return thisMinNextFrame;
-//    int minNextAbsFrame = INT_MAX;
+//    int minNextAbsFrame = FrameRange::EMAX;
 //    for(const auto& box : mContainedBoxes) {
 //        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
 //        int boxNext = box->prp_nextRelFrameWithKey(boxRelFrame);
@@ -54,7 +54,7 @@ BoxesGroup::BoxesGroup(const BoundingBoxType &type) :
 //                                        int &prevRelFrame) {
 //    int thisMaxPrevFrame = BoundingBox::prp_nextRelFrameWithKey(relFrame);
 //    return thisMaxPrevFrame;
-//    int maxPrevAbsFrame = INT_MIN;
+//    int maxPrevAbsFrame = FrameRange::EMIN;
 //    for(const auto& box : mContainedBoxes) {
 //        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
 //        int boxPrev = box->prp_prevRelFrameWithKey(boxRelFrame);
@@ -418,7 +418,7 @@ FrameRange BoxesGroup::prp_getIdenticalRelFrameRange(const int &relFrame) const 
 
 FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
         const int &relFrame, const bool &takeAncestorsIntoAccount) {
-    FrameRange range{INT_MIN, INT_MAX};
+    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             QList<Property*> propertiesT;

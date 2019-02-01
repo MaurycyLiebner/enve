@@ -1058,13 +1058,14 @@ void BoundingBox::prp_drawKeys(QPainter *p,
     if(mDurationRectangle) {
         p->save();
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
-        mDurationRectangle->draw(p, pixelsPerFrame,
-                                 drawY, startFrame);
+        QRect drawRect(0, drawY, (endFrame - startFrame)*pixelsPerFrame,
+                       rowHeight);
+        mDurationRectangle->draw(p, drawRect, pixelsPerFrame,
+                                 startFrame, endFrame);
         p->restore();
     }
 
-    Animator::prp_drawKeys(p,
-                           pixelsPerFrame, drawY,
+    Animator::prp_drawKeys(p, pixelsPerFrame, drawY,
                            startFrame, endFrame,
                            rowHeight, keyRectSize);
 }
@@ -1130,18 +1131,20 @@ FrameRange BoundingBox::prp_getIdenticalRelFrameRange(const int &relFrame) const
             return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
         }
         if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-            return {mDurationRectangle->getMaxFrameAsRelFrame() + 1, INT_MAX};
+            return {mDurationRectangle->getMaxFrameAsRelFrame() + 1,
+                        FrameRange::EMAX};
         } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
-            return {INT_MIN, mDurationRectangle->getMinFrameAsRelFrame() - 1};
+            return {FrameRange::EMIN,
+                    mDurationRectangle->getMinFrameAsRelFrame() - 1};
         }
     }
-    return {INT_MIN, INT_MAX};
+    return {FrameRange::EMIN, FrameRange::EMAX};
 }
 
 
 FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
         const int &relFrame, const bool &takeAncestorsIntoAccount) {
-    FrameRange range{INT_MIN, INT_MAX};
+    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             QList<Property*> propertiesT;
@@ -1161,7 +1164,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
             }
         }
     } else {
-        return {INT_MIN, INT_MAX};
+        return {FrameRange::EMIN, FrameRange::EMAX};
     }
     if(mParentGroup == nullptr || takeAncestorsIntoAccount) return range;
     if(range.isUnary()) return range;
@@ -1489,7 +1492,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 FrameRange BoundingBox::getVisibleAbsFrameRange() const {
-    if(!mDurationRectangle) return {INT_MIN, INT_MAX};
+    if(!mDurationRectangle) return {FrameRange::EMIN, FrameRange::EMAX};
     return mDurationRectangle->getAbsFrameRange();
 }
 

@@ -77,9 +77,7 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
 
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     TaskScheduler::sSetCurrentCanvas(canvas);
-    if(mCurrentCanvas) {
-        mCurrentCanvas->setIsCurrentCanvas(false);
-    }
+    if(mCurrentCanvas) mCurrentCanvas->setIsCurrentCanvas(false);
 
     if(canvas) {
         mCurrentCanvas = canvas;
@@ -243,11 +241,11 @@ void CanvasWindow::qRender(QPainter *p) {
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
-    if(!mCurrentCanvas) {
+    if(mCurrentCanvas) {
+        mCurrentCanvas->renderSk(canvas, grContext);
+    } else {
         canvas->clear(SK_ColorBLACK);
-        return;
     }
-    mCurrentCanvas->renderSk(canvas, grContext);
 }
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
@@ -1068,10 +1066,10 @@ void CanvasWindow::playPreview() {
     //changeCurrentFrameAction(mSavedCurrentFrame);
     TaskScheduler::sClearAllFinishedFuncs();
     const int minPreviewFrame = mSavedCurrentFrame;
-    const int maxPreviewFrame = mCurrentRenderFrame;
+    const int maxPreviewFrame = qMin(mMaxRenderFrame, mCurrentRenderFrame);
     if(minPreviewFrame >= maxPreviewFrame) return;
-    mMaxPreviewFrame = mCurrentRenderFrame;
-    mCurrentPreviewFrame = mSavedCurrentFrame;
+    mMaxPreviewFrame = maxPreviewFrame;
+    mCurrentPreviewFrame = minPreviewFrame;
     mCurrentCanvas->setCurrentPreviewContainer(mCurrentPreviewFrame);
     mCurrentCanvas->setPreviewing(true);
 
@@ -1089,7 +1087,6 @@ void CanvasWindow::playPreview() {
 }
 
 void CanvasWindow::nextPreviewRenderFrame() {
-    //mCurrentCanvas->renderCurrentFrameToPreview();
     if(!mRenderingPreview) return;
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         playPreview();
@@ -1221,7 +1218,7 @@ void CanvasWindow::initializeAudio() {
 
     QAudioDeviceInfo info(mAudioDevice);
     if(!info.isFormatSupported(mAudioFormat)) {
-        qWarning() << "Default format not supported - trying to use nearest";
+        //RuntimeThrow("Default format not supported - trying to use nearest");
         mAudioFormat = info.nearestFormat(mAudioFormat);
     }
 
@@ -1255,12 +1252,8 @@ void CanvasWindow::pushTimerExpired() {
            const qint64 len = mCurrentSoundComposition->read(
                                                 mAudioBuffer.data(),
                                                 mAudioOutput->periodSize());
-           if(len) {
-               mAudioIOOutput->write(mAudioBuffer.data(), len);
-           }
-           if(len != mAudioOutput->periodSize()) {
-               break;
-           }
+           if(len) mAudioIOOutput->write(mAudioBuffer.data(), len);
+           if(len != mAudioOutput->periodSize()) break;
            --chunks;
         }
     }

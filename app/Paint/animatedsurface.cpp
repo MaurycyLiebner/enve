@@ -8,8 +8,8 @@ void getTileDrawers(const stdsptr<TilesData> &drawTilesData,
                     const int &additionalFrames,
                     QList<TileSkDrawerCollection> *tileDrawers) {
     int alpha;
-    if(neighDrawerRelFrame == INT_MIN ||
-       neighDrawerRelFrame == INT_MAX) {
+    if(neighDrawerRelFrame == FrameRange::EMIN ||
+       neighDrawerRelFrame == FrameRange::EMAX) {
         alpha = 255;
     } else {
         int dR = qAbs(drawTilesFrame - neighDrawerRelFrame) + additionalFrames;
@@ -173,7 +173,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
         tileDrawers->append(coll);
     } else {
         int countT = mDrawTilesFrames.count();
-        int prevRelFrame = INT_MIN;
+        int prevRelFrame = FrameRange::EMIN;
         for(int i = 0; i < countT; i++) {
             const int &relFrame = mDrawTilesFrames.at(i);
             stdsptr<TilesData> tilesData = mDrawTilesData.at(i);
@@ -182,7 +182,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
                 if(i + 1 < countT) {
                     neighRelFrame = mDrawTilesFrames.at(i + 1);
                 } else {
-                    neighRelFrame = INT_MAX;
+                    neighRelFrame = FrameRange::EMAX;
                 }
 
             } else {
@@ -197,8 +197,8 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
             tilesData->getTileDrawers(&coll.drawers);
             if(mIsDraft) {
                 int alpha;
-                if(neighRelFrame == INT_MIN ||
-                   neighRelFrame == INT_MAX) {
+                if(neighRelFrame == FrameRange::EMIN ||
+                   neighRelFrame == FrameRange::EMAX) {
                     alpha = 255;
                 } else {
     //                int dR = qAbs(relFrame - neighRelFrame) + mOverlapFrames;
@@ -297,12 +297,12 @@ void AnimatedSurface::anim_updateAfterChangedKey(Key * const key) {
         return;
     }
     int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
-    if(prevKeyRelFrame != INT_MIN) {
+    if(prevKeyRelFrame != FrameRange::EMIN) {
         prevKeyRelFrame++;
         prevKeyRelFrame -= mOverlapFrames;
     }
     int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
-    if(nextKeyRelFrame != INT_MAX) {
+    if(nextKeyRelFrame != FrameRange::EMAX) {
         nextKeyRelFrame--;
         nextKeyRelFrame += mOverlapFrames;
     }
@@ -314,14 +314,14 @@ FrameRange AnimatedSurface::prp_getIdenticalRelFrameRange(const int &relFrame) c
     auto range = Animator::prp_getIdenticalRelFrameRange(relFrame);
     if(!mIsDraft) return range;
     if(anim_mKeys.count() > 1) {
-        if(range.fMin == INT_MIN) {
+        if(range.fMin == FrameRange::EMIN) {
             int firstKeyFrame = anim_mKeys.first()->getRelFrame();
             if(firstKeyFrame - mOverlapFrames < relFrame) {
                 return {relFrame, relFrame};
             } else {
                 return {range.fMin, firstKeyFrame - mOverlapFrames};
             }
-        } else if(range.fMax == INT_MAX) {
+        } else if(range.fMax == FrameRange::EMAX) {
             int lastKeyFrame = anim_mKeys.last()->getRelFrame();
             if(lastKeyFrame + mOverlapFrames > relFrame) {
                 return {relFrame, relFrame};

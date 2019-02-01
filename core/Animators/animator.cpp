@@ -74,40 +74,32 @@ void Animator::disableFakeComplexAnimatrIfNotNeeded() {
 }
 
 int Animator::anim_getNextKeyRelFrame(const Key * const key) const {
-    if(!key) return INT_MAX;
+    if(!key) return FrameRange::EMAX;
     Key* nextKey = key->getNextKey();
-    if(!nextKey) {
-        return INT_MAX;
-    }
+    if(!nextKey) return FrameRange::EMAX;
     return nextKey->getRelFrame();
 }
 
 int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
     Key* key = anim_getNextKey(relFrame);
-    if(!key) return INT_MAX;
+    if(!key) return FrameRange::EMAX;
     Key* nextKey = key->getNextKey();
-    if(!nextKey) {
-        return INT_MAX;
-    }
+    if(!nextKey) return FrameRange::EMAX;
     return nextKey->getRelFrame();
 }
 
 int Animator::anim_getPrevKeyRelFrame(const Key * const key) const {
-    if(!key) return INT_MIN;
+    if(!key) return FrameRange::EMIN;
     Key* prevKey = key->getPrevKey();
-    if(!prevKey) {
-        return INT_MIN;
-    }
+    if(!prevKey) return FrameRange::EMIN;
     return prevKey->getRelFrame();
 }
 
 int Animator::anim_getPrevKeyRelFrame(const int &relFrame) const {
     Key* key = anim_getPrevKey(relFrame);
-    if(!key) return INT_MIN;
+    if(!key) return FrameRange::EMIN;
     Key* prevKey = key->getPrevKey();
-    if(!prevKey) {
-        return INT_MIN;
-    }
+    if(!prevKey) return FrameRange::EMIN;
     return prevKey->getRelFrame();
 }
 
@@ -125,9 +117,9 @@ void Animator::anim_updateAfterChangedKey(Key *key) {
         return;
     }
     int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
-    if(prevKeyRelFrame != INT_MIN) prevKeyRelFrame++;
+    if(prevKeyRelFrame != FrameRange::EMIN) prevKeyRelFrame++;
     int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
-    if(nextKeyRelFrame != INT_MAX) nextKeyRelFrame--;
+    if(nextKeyRelFrame != FrameRange::EMAX) nextKeyRelFrame--;
     prp_updateAfterChangedRelFrameRange({prevKeyRelFrame, nextKeyRelFrame});
 }
 
@@ -588,7 +580,7 @@ int Animator::anim_getCurrentRelFrame() {
 
 FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     if(anim_mKeys.isEmpty()) {
-        return {INT_MIN, INT_MAX};
+        return {FrameRange::EMIN, FrameRange::EMAX};
     } else {
         int prevId;
         int nextId;
@@ -608,7 +600,7 @@ FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
             prevPrevKey = prevKey;
             prevKey = prevKey->getPrevKey();
             if(!prevKey) {
-                fId = INT_MIN;
+                fId = FrameRange::EMIN;
                 break;
             }
         }
@@ -619,7 +611,7 @@ FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
             prevNextKey = nextKey;
             nextKey = nextKey->getNextKey();
             if(!nextKey) {
-                lId = INT_MAX;
+                lId = FrameRange::EMAX;
                 break;
             }
         }
@@ -748,7 +740,7 @@ void Animator::deleteSelectedKeys() {
 }
 
 int Animator::getLowestAbsFrameForSelectedKey() {
-    int lowestKey = INT_MAX;
+    int lowestKey = FrameRange::EMAX;
     for(const auto& key : anim_mSelectedKeys) {
         int keyAbsFrame = key->getAbsFrame();
         if(keyAbsFrame < lowestKey) {

@@ -252,7 +252,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         } else if(mMainWindow->isShiftPressed() &&
                  event->key() == Qt::Key_D) {
             auto container = getSelectedKeysClipboardContainer();
-            int lowestKey = INT_MAX;
+            int lowestKey = FrameRange::EMAX;
             for(const auto& anim : mSelectedKeysAnimators) {
                 int animLowest = anim->getLowestAbsFrameForSelectedKey();
                 if(animLowest < lowestKey) {

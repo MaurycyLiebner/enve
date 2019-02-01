@@ -168,7 +168,7 @@ public:
 
     virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
         Q_UNUSED(relFrame);
-        return {INT_MIN, INT_MAX};
+        return {FrameRange::EMIN, FrameRange::EMAX};
     }
 
     virtual bool prp_nextRelFrameWithKey(const int &relFrame,

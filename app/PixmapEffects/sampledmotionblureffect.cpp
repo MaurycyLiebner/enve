@@ -66,8 +66,8 @@ FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int
     auto boxRange = mParentBox->getFirstAndLastIdenticalForMotionBlur(relFrame);
     int margin = qCeil(mNumberSamples->getCurrentEffectiveValueAtRelFrame(relFrame)*
                        mFrameStep->getCurrentEffectiveValueAtRelFrame(relFrame));
-    if(boxRange.fMin == INT_MIN) {
-        if(boxRange.fMax != INT_MAX) {
+    if(boxRange.fMin == FrameRange::EMIN) {
+        if(boxRange.fMax != FrameRange::EMAX) {
             if(boxRange.fMax - margin < relFrame) {
                 boxRange.fMin = relFrame;
             }
@@ -75,8 +75,8 @@ FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int
     } else {
         boxRange.fMin += margin;
     }
-    if(boxRange.fMax == INT_MAX) {
-        if(boxRange.fMin != INT_MIN) {
+    if(boxRange.fMax == FrameRange::EMAX) {
+        if(boxRange.fMin != FrameRange::EMIN) {
             if(boxRange.fMin > relFrame) {
                 boxRange.fMax = relFrame;
             }

@@ -50,7 +50,7 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 }
 
 FrameRange ComplexAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    FrameRange range{INT_MIN, INT_MAX};
+    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     for(const auto& child : ca_mChildAnimators) {
         auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
         range *= childRange;

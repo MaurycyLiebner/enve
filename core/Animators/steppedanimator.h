@@ -22,7 +22,7 @@ public:
     }
 
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
-        if(this->anim_mKeys.isEmpty()) return {INT_MIN, INT_MAX};
+        if(this->anim_mKeys.isEmpty()) return {FrameRange::EMIN, FrameRange::EMAX};
         int prevId;
         int nextId;
         this->anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame);
@@ -40,7 +40,7 @@ public:
             prevPrevKey = prevKey;
             prevKey = prevKey->getPrevKey();
             if(!prevKey) {
-                fId = INT_MIN;
+                fId = FrameRange::EMIN;
                 break;
             }
             if(prevKey->differsFromKey(prevPrevKey)) break;
@@ -52,7 +52,7 @@ public:
             prevNextKey = nextKey;
             nextKey = nextKey->getNextKey();
             if(!nextKey) {
-                lId = INT_MAX;
+                lId = FrameRange::EMAX;
                 break;
             }
         }

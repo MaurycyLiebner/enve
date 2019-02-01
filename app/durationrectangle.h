@@ -114,11 +114,11 @@ public:
     }
 
     FrameRange getRelFrameRangeToTheRight() {
-        return {getMaxFrameAsRelFrame() + 1, INT_MAX};
+        return {getMaxFrameAsRelFrame() + 1, FrameRange::EMAX};
     }
 
     FrameRange getRelFrameRangeToTheLeft() {
-        return {INT_MIN, getMinFrameAsRelFrame() - 1};
+        return {FrameRange::EMIN, getMinFrameAsRelFrame() - 1};
     }
 
     int getMinFrameAsAbsFrame() const;
@@ -129,17 +129,18 @@ public:
     }
 
     FrameRange getAbsFrameRangeToTheRight() {
-        return {getMaxFrameAsAbsFrame() + 1, INT_MAX};
+        return {getMaxFrameAsAbsFrame() + 1, FrameRange::EMAX};
     }
 
     FrameRange getAbsFrameRangeToTheLeft() {
-        return {INT_MIN, getMinFrameAsAbsFrame() - 1};
+        return {FrameRange::EMIN, getMinFrameAsAbsFrame() - 1};
     }
 
-    virtual void draw(QPainter *p,
+    virtual void draw(QPainter * const p,
+                      const QRect &drawRect,
                       const qreal &pixelsPerFrame,
-                      const qreal &drawY,
-                      const int &startFrame);
+                      const int &startFrame,
+                      const int &endFrame);
 
     virtual DurationRectangleMovable *getMovableAt(
                       const int &pressX,
@@ -181,10 +182,11 @@ public:
 
     bool hasAnimationFrameRange() { return true; }
 
-    void draw(QPainter *p,
+    void draw(QPainter * const p,
+              const QRect &drawRect,
               const qreal &pixelsPerFrame,
-              const qreal &drawY,
-              const int &startFrame);
+              const int &startFrame,
+              const int &endFrame);
 
     virtual int getMinAnimationFrame() const = 0;
     virtual int getMaxAnimationFrame() const = 0;
