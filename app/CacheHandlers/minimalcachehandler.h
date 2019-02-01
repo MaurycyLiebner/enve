@@ -192,13 +192,15 @@ public:
         return cont;
     }
 
-    void drawCacheOnTimeline(QPainter *p,
-                             const qreal &pixelsPerFrame,
-                             const qreal &drawY,
+    void drawCacheOnTimeline(QPainter * const p,
+                             const QRect drawRect,
                              const int &startFrame,
                              const int &endFrame) const {
+        if(startFrame > endFrame) return;
         p->setBrush(QColor(0, 255, 0, 75));
         p->setPen(Qt::NoPen);
+        const qreal pixelsPerFrame = static_cast<qreal>(drawRect.width())/
+                (endFrame - startFrame + 1);
         int lastDrawnFrame = startFrame;
         int lastDrawX = 0;
         bool lastStoresInMemory = true;
@@ -229,7 +231,7 @@ public:
                 lastStoresInMemory = storesInMemory;
             }
 
-            p->drawRect(xT, qRound(drawY), widthT, MIN_WIDGET_HEIGHT);
+            p->drawRect(xT, drawRect.top(), widthT, drawRect.height());
             lastDrawnFrame = afterMaxFrame;
             lastDrawX = xT + widthT;
         }

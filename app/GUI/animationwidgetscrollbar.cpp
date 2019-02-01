@@ -45,11 +45,13 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
 
     int dFrame = mMaxFrame - mMinFrame;
     if(!mRange) dFrame++;
-    qreal pixPerFrame = ((qreal)width() - 2*MIN_WIDGET_HEIGHT)/dFrame;
+    const qreal pixPerFrame =
+            static_cast<qreal>(width() - 2*MIN_WIDGET_HEIGHT)/dFrame;
     p.translate(MIN_WIDGET_HEIGHT/2, 0.);
 
-    int canvasMinX = (mMinCanvasFrame - mMinFrame)*pixPerFrame;
-    int canvasMaxX = (mMaxCanvasFrame - mMinFrame + (mRange ? 0 : 1))*pixPerFrame;
+    const int canvasMinX = (mMinCanvasFrame - mMinFrame)*pixPerFrame;
+    const int canvasMaxX = (mMaxCanvasFrame - mMinFrame +
+                            (mRange ? 0 : 1))*pixPerFrame;
 
     if(canvasMinX > -1) {
         p.fillRect(-MIN_WIDGET_HEIGHT, 0,
@@ -80,8 +82,10 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
 //               QColor(30, 30, 30));
 
     if(mCacheHandler_d) {
-        mCacheHandler_d->drawCacheOnTimeline(&p, pixPerFrame, 0.,
-                                           mMinFrame, mMaxFrame);
+        const QRect cacheRect(0, 0, width() - 2*MIN_WIDGET_HEIGHT,
+                              MIN_WIDGET_HEIGHT);
+        mCacheHandler_d->drawCacheOnTimeline(&p, cacheRect,
+                                             mMinFrame, mMaxFrame);
     }
 
     p.setPen(Qt::white);
@@ -137,7 +141,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     }
 
     p.restore();
-    p.setPen(QPen(Qt::black, 1.));
+    p.setPen(QPen(Qt::black, 1));
     p.drawLine(0, height() - 1, width(), height() - 1);
     if(mTopBorderVisible) {
         p.drawLine(0, 0, width(), 0);

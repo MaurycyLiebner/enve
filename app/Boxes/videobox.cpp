@@ -72,6 +72,7 @@ void VideoBox::setFilePath(const QString &path) {
             mAnimationCacheHandler = newHandler;
         }
         mAnimationCacheHandler->addDependentBox(this);
+        //getAnimationDurationRect()->setCacheHandler(mAnimationCacheHandler);
     }
     reloadCacheHandler();
 }
