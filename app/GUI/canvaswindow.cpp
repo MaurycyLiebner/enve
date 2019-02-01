@@ -1111,6 +1111,7 @@ void CanvasWindow::nextPreviewFrame() {
     } else {
         mCurrentCanvas->setCurrentPreviewContainer(
                     mCurrentPreviewFrame);
+        emit changeCurrentFrame(mCurrentPreviewFrame);
     }
     requestUpdate();
 }
