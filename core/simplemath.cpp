@@ -66,6 +66,18 @@ bool isOne6Dec(const double &val) {
     return isZero6Dec(val - 1);
 }
 
+bool isZero6Dec(const float &val) {
+    return qAbs(val) < 0.000001f;
+}
+
+bool isOne4Dec(const float &val) {
+    return isZero4Dec(val - 1);
+}
+
+bool isOne6Dec(const float &val) {
+    return isZero6Dec(val - 1);
+}
+
 bool isZeroOrOne6Dec(const double &val) {
     if(isZero6Dec(val)) return true;
     if(isOne6Dec(val)) return true;

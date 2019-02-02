@@ -540,6 +540,14 @@ public:
         NodeIterator mNode2Iterator;
     };
 
+    NodesHandler interpolate(const NodesHandler& src1,
+                             const NodesHandler& src2,
+                             const SkScalar& src2Weight) {
+        if(isZero6Dec(src2Weight)/* || src2Weight < 0*/) return src1;
+        if(isOne6Dec(src2Weight)/* || src2Weight > 1*/) return src2;
+        const SkScalar src1Weigth = 1 - src2Weight;
+    }
+
     SkPath toSkPath(const bool& skipShadow) {
         SkPath path;
         SegmentIterator iterator(*this, skipShadow);

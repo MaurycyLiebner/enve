@@ -46,6 +46,10 @@ extern bool isZeroOrOne6Dec(const double &val);
 extern bool isOne4Dec(const double &val);
 extern bool isOne6Dec(const double &val);
 
+extern bool isZero6Dec(const float &val);
+extern bool isOne4Dec(const float &val);
+extern bool isOne6Dec(const float &val);
+
 extern bool isZero2Dec(qreal val);
 
 extern bool isZero1Dec(qreal val);
