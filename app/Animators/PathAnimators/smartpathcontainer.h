@@ -540,12 +540,24 @@ public:
         NodeIterator mNode2Iterator;
     };
 
-    NodesHandler interpolate(const NodesHandler& src1,
-                             const NodesHandler& src2,
-                             const SkScalar& src2Weight) {
-        if(isZero6Dec(src2Weight)/* || src2Weight < 0*/) return src1;
-        if(isOne6Dec(src2Weight)/* || src2Weight > 1*/) return src2;
-        const SkScalar src1Weigth = 1 - src2Weight;
+    SkPath interpolate(NodesHandler& src1,
+                       NodesHandler& src2,
+                       const SkScalar& src2Weight) {
+        if(isZero6Dec(src2Weight)/* || src2Weight < 0*/) return src1.toSkPath(true);
+        if(isOne6Dec(src2Weight)/* || src2Weight > 1*/) return src2.toSkPath(true);
+        auto src1Paths = src1.toSkPathList(false);
+        auto src2Paths = src2.toSkPathList(false);
+        Q_ASSERT(src1Paths.count() == src2Paths.count());
+        SkPath result;
+        for(int i = 0; i < src1Paths.count(); i++) {
+            const SkPath& path1 = src1Paths.at(i);
+            const SkPath& path2 = src2Paths.at(i);
+            SkPath path;
+            bool success = path1.interpolate(path2, src2Weight, &path);
+            Q_ASSERT(success);
+            result.addPath(path);
+        }
+        return result;
     }
 
     SkPath toSkPath(const bool& skipShadow) {
@@ -578,6 +590,42 @@ public:
             }
         }
         return path;
+    }
+
+    QList<SkPath> toSkPathList(const bool& skipShadow) {
+        QList<SkPath> result;
+        SkPath path;
+        SegmentIterator iterator(*this, skipShadow);
+        bool move = true;
+        while(iterator.next()) {
+            if(iterator.currentType() == NORMAL) {
+                auto seg = iterator.getCurrentAsNormalSegment();
+                const bool moved = move;
+                if(move) {
+                    move = false;
+                    result << path;
+                    path.reset();
+                    path.moveTo(seg.fPrevNormal.p1());
+                    continue;
+                }
+                seg.cubicTo(path, skipShadow || !moved, false);
+            } else if(iterator.currentType() == SHADOW) {
+                auto seg = iterator.getCurrentAsShadowSegment();
+                const bool moved = move;
+                if(move) {
+                    result << path;
+                    path.reset();
+                    path.moveTo(seg.fPrevNormal.p1());
+                    continue;
+                }
+                seg.cubicTo(path, skipShadow || !moved, false);
+            } else if(iterator.currentType() == MOVE) {
+                move = true;
+            } else {
+                Q_ASSERT(false);
+            }
+        }
+        return result;
     }
 private:
 //    void sortShadowNodesStartingAt(const int& firstId) {
