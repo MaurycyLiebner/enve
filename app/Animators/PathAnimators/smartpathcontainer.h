@@ -6,7 +6,19 @@
 
 class NodesHandler {
 public:
+    ~NodesHandler() {
+        if(mValues) free(mValues);
+    }
     enum VerbType { NORMAL, DUPLICATE, SHADOW, MOVE, NONE };
+
+    struct TRange {
+        SkScalar fMin;
+        SkScalar fMax;
+
+        SkScalar middle() const {
+            return (fMin + fMax)*0.5f;
+        }
+    };
 
     struct NodeValues {
         SkPoint fC0;
@@ -231,6 +243,12 @@ public:
         setShadowNodeValue(verbId, t);
     }
 
+    void replaceWithMoveVerb(const int& verbId,
+                             const SkPoint& moveTo) {
+        mVerbTypes.replace(verbId, MOVE);
+        setMoveVerbValue(verbId, moveTo);
+    }
+
     void insertNormalNode(const int& verbId,
                           const SkPoint& c0,
                           const SkPoint& p1,
@@ -277,6 +295,23 @@ public:
     void insertShadowNode(const int& verbId, const SkScalar& t) {
         makeSpaceForNew(verbId, SHADOW);
         setShadowNodeValue(verbId, t);
+    }
+
+    void insertShadowNodeInTheMiddle(const int& verbId) {
+        makeSpaceForNew(verbId, SHADOW);
+        setShadowNodeValue(verbId, getShadowNodeTRange(verbId).middle());
+    }
+
+    void convertShadowNodeToNormalNode(const int& verbId) {
+        auto vals = getAsShadowNode(verbId).toNodeValues();
+        mVerbTypes.replace(verbId, NORMAL);
+        setNormalNodeValues(verbId, vals.fC0, vals.fP1, vals.fC2);
+    }
+
+    void setNumberOfDuplicates(const int& verbId, const int& duplicates) {
+        auto vals = getAsShadowNode(verbId).toNodeValues();
+        mVerbTypes.replace(verbId, NORMAL);
+        setNormalNodeValues(verbId, vals.fC0, vals.fP1, vals.fC2);
     }
 
     void appendShadowNode(const SkScalar& t) {
@@ -339,17 +374,42 @@ public:
     ShadowPathNode getAsShadowNode(const int& verbId) {
         const int prevNormalId = prevId(verbId, NORMAL);
         const int nextNormalId = nextId(verbId, NORMAL);
-        return ShadowPathNode(getValuesForNormalNode(prevNormalId),
-                              getValuesForShadowNode(verbId),
-                              getValuesForNormalNode(nextNormalId));
+        return ShadowPathNode(getValuesAsSkPoint(prevNormalId),
+                              getValuesAsSkScalar(verbId),
+                              getValuesAsSkPoint(nextNormalId));
     }
 
     NormalPathNode getAsNormalNode(const int& verbId) {
-        return NormalPathNode(getValuesForNormalNode(verbId));
+        return NormalPathNode(getValuesAsSkPoint(verbId));
     }
 
     DuplicatePathNode getAsDuplicateNode(const int& verbId) {
-        return DuplicatePathNode(getValuesForNormalNode(verbId));
+        return DuplicatePathNode(getValuesAsSkPoint(verbId));
+    }
+
+    TRange getShadowNodeTRange(const int& verbId) const {
+        if(verbId == 0) return {1, 1};
+        if(verbId == mNVerbs - 1) return {0, 0};
+        SkScalar min;
+        SkScalar max;
+        auto prevType = getType(verbId - 1);
+        if(prevType == SHADOW) {
+            min = *getValuesAsSkScalar(verbId - 1);
+        } else if(prevType == MOVE) {
+            return {1, 1};
+        } else {
+            min = 0;
+        }
+
+        auto nextType = getType(verbId + 1);
+        if(nextType == SHADOW) {
+            max = *getValuesAsSkScalar(verbId + 1);
+        } else if(nextType == MOVE) {
+            return {0, 0};
+        } else {
+            max = 1;
+        }
+        return {min, max};
     }
 
     struct NodeIterator {
@@ -511,21 +571,25 @@ public:
         return path;
     }
 private:
-    void sortShadowNodesStartingAt(const int& firstId) {
-        int i = firstId;
-        QList<SkScalar> ts;
-        while(getType(firstId) == SHADOW) {
-            auto node = getAsShadowNode(i++);
-            ts << node.t();
-        }
+//    void sortShadowNodesStartingAt(const int& firstId) {
+//        int i = firstId;
+//        QList<SkScalar> ts;
+//        while(getType(i) == SHADOW) {
+//            auto node = getAsShadowNode(i++);
+//            ts << node.t();
+//        }
+//        std::sort(ts.begin(), ts.end());
+//        i = firstId;
+//        while(getType(i) == SHADOW) {
+//            setShadowNodeValue(i, ts.at(i));
+//        }
+//    }
+
+    SkPoint * getValuesAsSkPoint(const int& verbId) const {
+        return reinterpret_cast<SkPoint*>(mValues) + verbId;
     }
 
-
-    SkPoint * getValuesForNormalNode(const int& verbId) {
-        return reinterpret_cast<SkPoint*>(mValues + verbId*VALUES_PER_VERB);
-    }
-
-    SkScalar * getValuesForShadowNode(const int& verbId) {
+    SkScalar * getValuesAsSkScalar(const int& verbId) const {
         return mValues + verbId*VALUES_PER_VERB;
     }
 
@@ -567,7 +631,7 @@ private:
                                 const SkPoint& p1,
                                 const SkPoint& c2,
                                 const int& nDupl) {
-        SkPoint * dst = getValuesForNormalNode(verbId);
+        SkPoint * dst = getValuesAsSkPoint(verbId);
         *(dst++) = c0;
         *(dst++) = p1;
         *(dst++) = c2;
@@ -576,7 +640,12 @@ private:
 
     void setShadowNodeValue(const int& verbId,
                             const SkScalar& t) {
-        *getValuesForShadowNode(verbId) = t;
+        *getValuesAsSkScalar(verbId) = t;
+    }
+
+    void setMoveVerbValue(const int& verbId,
+                          const SkPoint& moveTo) {
+        *getValuesAsSkPoint(verbId) = moveTo;
     }
 
     QList<VerbType> mVerbTypes;
