@@ -6,7 +6,7 @@
 
 class NodesHandler {
 public:
-    enum VerbType { NORMAL, DUPLICATE, SHADOW, NONE };
+    enum VerbType { NORMAL, DUPLICATE, SHADOW, MOVE, NONE };
 
     struct NodeValues {
         SkPoint fC0;
@@ -228,6 +228,29 @@ public:
         insertNormalNode(mNVerbs, c0, p1, c2);
     }
 
+    void insertDuplicateNode(const int& nodeId,
+                             const SkPoint& c0,
+                             const SkPoint& p1,
+                             const SkPoint& c2,
+                             const int& nDupl) {
+        makeSpaceForNew(nodeId, DUPLICATE);
+        setDuplicateNodeValues(nodeId, c0, p1, c2, nDupl);
+    }
+
+    void prependDuplicateNode(const SkPoint& c0,
+                              const SkPoint& p1,
+                              const SkPoint& c2,
+                              const int& nDupl) {
+        insertDuplicateNode(0, c0, p1, c2, nDupl);
+    }
+
+    void appendDuplicateNode(const SkPoint& c0,
+                             const SkPoint& p1,
+                             const SkPoint& c2,
+                             const int& nDupl) {
+        insertDuplicateNode(mNVerbs, c0, p1, c2, nDupl);
+    }
+
     void insertShadowNode(const int& nodeId,
                           const SkScalar& t) {
         Q_ASSERT(nodeId > 0 && nodeId < mNVerbs);
@@ -235,16 +258,14 @@ public:
         setShadowNodeValue(nodeId, t);
     }
 
-    int prevId(const int& beforeId,
-               const VerbType& type) const {
+    int prevId(const int& beforeId, const VerbType& type) const {
         for(int i = beforeId - 1; i >= 0; i--) {
             if(getType(i) == type) return i;
         }
         return -1;
     }
 
-    int nextId(const int& afterId,
-               const VerbType& type) const {
+    int nextId(const int& afterId, const VerbType& type) const {
         for(int i = afterId + 1; i < mNVerbs; i++) {
             if(getType(i) == type) return i;
         }
