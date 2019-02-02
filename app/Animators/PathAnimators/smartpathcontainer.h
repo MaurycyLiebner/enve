@@ -2,10 +2,11 @@
 #define SMARTPATHCONTAINER_H
 #include "simplemath.h"
 #include "skia/skiaincludes.h"
+#define VALUES_PER_VERB 7
 
 class NodesHandler {
 public:
-    enum NodeSegType { NORMAL, DUPLICATE, SHADOW, NONE };
+    enum VerbType { NORMAL, DUPLICATE, SHADOW, NONE };
 
     struct NodeValues {
         SkPoint fC0;
@@ -58,51 +59,40 @@ public:
         SkPoint* fC2;
     };
 
-    struct DuplicatePathNode {
+    struct DuplicatePathNode : public NormalPathNode {
         DuplicatePathNode(SkPoint * const src) :
-            fMainNode(src + 1) {
-            const auto srcS = reinterpret_cast<SkScalar*>(src);
-            fDuplBefore = srcS;
-            fDuplAfter = srcS + 1;
+            NormalPathNode(src) {
+            const auto srcS = reinterpret_cast<SkScalar*>(src) + 6;
+            fNDuplicates = srcS;
         }
 
-        void setDuplAfter(const int& count) const {
-            *fDuplAfter = count;
+        void setDuplCount(const int& count) const {
+            *fNDuplicates = count;
         }
 
-        void setDuplBefore(const int& count) const {
-            *fDuplBefore = count;
-        }
-
-        int duplBefore() const {
-            return qRound(*fDuplBefore);
-        }
-
-        int duplAfter() const {
-            return qRound(*fDuplAfter);
+        int duplCount() const {
+            return qRound(*fNDuplicates);
         }
 
         int totalNodesCount() const {
-            return duplBefore() + duplAfter() + 1;
+            return duplCount() + 1;
         }
 
         QList<NodeValues> toNodeValues() const {
             QList<NodeValues> result;
 
-            const int iMax = duplBefore() + duplAfter();
+            const int iMax = duplCount();
             for(int i = 0; i <= iMax; i++) {
                 NodeValues values;
-                values.fC0 = (i == 0 ? fMainNode.c0() : fMainNode.p1());
-                values.fP1 = fMainNode.p1();
-                values.fC2 = (i == iMax ? fMainNode.c2() : fMainNode.p1());
+                values.fC0 = (i == 0 ? c0() : p1());
+                values.fP1 = p1();
+                values.fC2 = (i == iMax ? c2() : p1());
             }
 
             return result;
         }
 
-        NormalPathNode fMainNode;
-        SkScalar *fDuplBefore;
-        SkScalar *fDuplAfter;
+        SkScalar *fNDuplicates;
     };
 
     struct ShadowPathNode {
@@ -169,6 +159,28 @@ public:
         NormalPathNode fNextNormal;
     };
 
+    struct DuplicateSegment {
+        DuplicateSegment(const DuplicatePathNode& prev,
+                         const DuplicatePathNode& next) :
+            fPrevDuplicate(prev), fNextDuplicate(next) {}
+
+        void cubicTo(SkPath &path) {
+            for(int i = 0; i < fPrevDuplicate.duplCount(); i++) {
+                path.cubicTo(fPrevDuplicate.p1(), fPrevDuplicate.p1(),
+                             fPrevDuplicate.p1());
+            }
+            path.cubicTo(fPrevDuplicate.c2(), fNextDuplicate.c0(),
+                         fNextDuplicate.p1());
+            for(int i = 0; i < fNextDuplicate.duplCount(); i++) {
+                path.cubicTo(fNextDuplicate.p1(), fNextDuplicate.p1(),
+                             fNextDuplicate.p1());
+            }
+        }
+
+        DuplicatePathNode fPrevDuplicate;
+        DuplicatePathNode fNextDuplicate;
+    };
+
     // should also handle multiple shadow nodes
     struct ShadowSegment {
         ShadowSegment(const NormalPathNode& prev,
@@ -213,18 +225,18 @@ public:
     void appendNormalNode(const SkPoint& c0,
                           const SkPoint& p1,
                           const SkPoint& c2) {
-        insertNormalNode(mNNodes, c0, p1, c2);
+        insertNormalNode(mNVerbs, c0, p1, c2);
     }
 
     void insertShadowNode(const int& nodeId,
                           const SkScalar& t) {
-        Q_ASSERT(nodeId > 0 && nodeId < mNNodes);
+        Q_ASSERT(nodeId > 0 && nodeId < mNVerbs);
         makeSpaceForNew(nodeId, SHADOW);
         setShadowNodeValue(nodeId, t);
     }
 
     int prevId(const int& beforeId,
-               const NodeSegType& type) const {
+               const VerbType& type) const {
         for(int i = beforeId - 1; i >= 0; i--) {
             if(getType(i) == type) return i;
         }
@@ -232,19 +244,19 @@ public:
     }
 
     int nextId(const int& afterId,
-               const NodeSegType& type) const {
-        for(int i = afterId + 1; i < mNNodes; i++) {
+               const VerbType& type) const {
+        for(int i = afterId + 1; i < mNVerbs; i++) {
             if(getType(i) == type) return i;
         }
         return -1;
     }
 
-    const NodeSegType& getType(const int& id) const {
-        return mTypes.at(static_cast<int>(id));
+    const VerbType& getType(const int& id) const {
+        return mVerbTypes.at(static_cast<int>(id));
     }
 
     const int& getNodeCount() const {
-        return mNNodes;
+        return mNVerbs;
     }
 
     ShadowPathNode getAsShadowNode(const int& nodeId) {
@@ -255,17 +267,20 @@ public:
                               getValuesForNormalNode(nextNormalId));
     }
 
-
     NormalPathNode getAsNormalNode(const int& nodeId) {
         return NormalPathNode(getValuesForNormalNode(nodeId));
+    }
+
+    DuplicatePathNode getAsDuplicateNode(const int& nodeId) {
+        return DuplicatePathNode(getValuesForNormalNode(nodeId));
     }
 
     struct NodeIterator {
         NodeIterator(const int& startI,
                      NodesHandler& targetT,
-                     const bool& skipShadow) :
-            i(startI - 1), mTarget(targetT), mSkipShadow(skipShadow) {
-            if(mSkipShadow) {
+                     const bool& simplified) :
+            i(startI - 1), mTarget(targetT), mSimplified(simplified) {
+            if(mSimplified) {
                 if(currentType() == SHADOW) {
                     next();
                 }
@@ -273,13 +288,17 @@ public:
         }
 
         NodeIterator(NodesHandler& targetT,
-                     const bool& skipShadow) :
-            NodeIterator(-1, targetT, skipShadow) {
+                     const bool& simplified) :
+            NodeIterator(-1, targetT, simplified) {
 
         }
 
-        const NodeSegType& currentType() const {
-            return mTarget.getType(i);
+        VerbType currentType() const {
+            const VerbType& type = mTarget.getType(i);
+            if(mSimplified) { // if simplified treat duplicates as normal
+                if(type == DUPLICATE) return NORMAL;
+            }
+            return type;
         }
 
         ShadowPathNode getCurrentAsShadowNode() {
@@ -290,6 +309,10 @@ public:
             return mTarget.getAsNormalNode(i);
         }
 
+        DuplicatePathNode getCurrentAsDuplicateNode() {
+            return mTarget.getAsDuplicateNode(i);
+        }
+
         bool hasNext() const {
             return i < mTarget.getNodeCount() - 1;
         }
@@ -297,7 +320,7 @@ public:
         bool next() {
             if(hasNext()) {
                 i++;
-                if(mSkipShadow) {
+                if(mSimplified) {
                     if(currentType() == SHADOW) {
                         return next();
                     }
@@ -308,20 +331,20 @@ public:
         }
 
         NodeIterator peekNext() {
-            return NodeIterator(i + 1, mTarget, mSkipShadow);
+            return NodeIterator(i + 1, mTarget, mSimplified);
         }
     private:
         int i;
         NodesHandler& mTarget;
-        bool mSkipShadow;
+        bool mSimplified;
     };
 
     struct SegmentIterator {
         SegmentIterator(const int& startI, NodesHandler& targetT,
-                        const bool& skipShadow) :
-           mNode1Iterator(startI - 1, targetT, skipShadow),
-           mNode2Iterator(startI, targetT, skipShadow) {
-            updateShadowNodes();
+                        const bool& simplified) :
+           mNode1Iterator(startI - 1, targetT, simplified),
+           mNode2Iterator(startI, targetT, simplified) {
+            updateCurrentType();
         }
 
         SegmentIterator(NodesHandler& targetT,
@@ -340,10 +363,13 @@ public:
                                  mNode2Iterator.getCurrentAsNormalNode());
         }
 
+        DuplicateSegment getCurrentAsDuplicateSegment() {
+            return DuplicateSegment(mNode2Iterator.getCurrentAsDuplicateNode(),
+                                    mNode1Iterator.getCurrentAsDuplicateNode());
+        }
 
-        NodeSegType currentType() const {
-            if(mCurrentShadowNodes.isEmpty()) return NORMAL;
-            return SHADOW;
+        VerbType currentType() const {
+            return mCurrentType;
         }
 
         bool hasNext() const {
@@ -354,28 +380,30 @@ public:
             if(hasNext()) {
                 mNode1Iterator.next();
                 mNode2Iterator.next();
-                updateShadowNodes();
+                updateCurrentType();
                 return true;
             }
             return false;
         }
-
-        void updateShadowNodes() {
+    private:
+        void updateCurrentType() {
             mCurrentShadowNodes.clear();
+            mCurrentType = mNode2Iterator.currentType();
             while(mNode2Iterator.currentType() == SHADOW) {
                 mCurrentShadowNodes << mNode2Iterator.getCurrentAsShadowNode();
                 mNode2Iterator.next();
             }
         }
-    private:
+
+        VerbType mCurrentType = NONE;
         QList<ShadowPathNode> mCurrentShadowNodes;
         NodeIterator mNode1Iterator;
         NodeIterator mNode2Iterator;
     };
 
-    SkPath toSkPath(const bool& skipShadow) {
+    SkPath toSkPath(const bool& simplified) {
         SkPath path;
-        SegmentIterator iterator(*this, skipShadow);
+        SegmentIterator iterator(*this, simplified);
         bool first = true;
         while(iterator.next()) {
             if(iterator.currentType() == NORMAL) {
@@ -385,13 +413,22 @@ public:
                     continue;
                 }
                 seg.cubicTo(path);
-            } else {
+            } else if(iterator.currentType() == DUPLICATE) {
+                auto seg = iterator.getCurrentAsDuplicateSegment();
+                if(first) {
+                    path.moveTo(seg.fPrevDuplicate.p1());
+                    continue;
+                }
+                seg.cubicTo(path);
+            } else if(iterator.currentType() == SHADOW) {
                 auto seg = iterator.getCurrentAsShadowSegment();
                 if(first) {
                     path.moveTo(seg.fPrevNormal.p1());
                     continue;
                 }
                 seg.cubicTo(path);
+            } else {
+                Q_ASSERT(false);
             }
         }
         return path;
@@ -408,29 +445,29 @@ private:
 
 
     SkPoint * getValuesForNormalNode(const int& nodeId) {
-        return reinterpret_cast<SkPoint*>(mValues + nodeId*6);
+        return reinterpret_cast<SkPoint*>(mValues + nodeId*VALUES_PER_VERB);
     }
 
     SkScalar * getValuesForShadowNode(const int& nodeId) {
-        return mValues + nodeId*6;
+        return mValues + nodeId*VALUES_PER_VERB;
     }
 
-    void makeSpaceForNew(int newId, const NodeSegType& nodeType) {
-        newId = qMax(0, qMin(newId, mNNodes));
-        mTypes.insert(static_cast<int>(newId), nodeType);
-        const int newNValues = mNValues + 6;
+    void makeSpaceForNew(int newId, const VerbType& nodeType) {
+        newId = qMax(0, qMin(newId, mNVerbs));
+        mVerbTypes.insert(static_cast<int>(newId), nodeType);
+        const int newNValues = mNValues + VALUES_PER_VERB;
         const size_t newDataSize = static_cast<size_t>(newNValues)*sizeof(SkScalar);
         void * const newData = malloc(newDataSize);
         SkScalar * const newValues = static_cast<SkScalar*>(newData);
         if(mNValues == 0) {
-            const int firstValId = newId*6;
+            const int firstValId = newId*VALUES_PER_VERB;
             const size_t cpy1Size = static_cast<size_t>(firstValId)*
                     sizeof(SkScalar);
             if(firstValId) memcpy(newValues, mValues, cpy1Size);
             if(firstValId != mNValues) {
                 const size_t cpy2Size = static_cast<size_t>(
                             mNValues - firstValId)*sizeof(SkScalar);
-                memcpy(newValues + firstValId + 6,
+                memcpy(newValues + firstValId + VALUES_PER_VERB,
                        mValues + firstValId,
                        cpy2Size);
             }
@@ -438,17 +475,26 @@ private:
         free(mValues);
         mValues = newValues;
         mNValues = newNValues;
-        mNNodes++;
+        mNVerbs++;
     }
 
     void setNormalNodeValues(const int& nodeId,
                              const SkPoint& c0,
                              const SkPoint& p1,
                              const SkPoint& c2) {
+        setDuplicateNodeValues(nodeId, c0, p1, c2, 0);
+    }
+
+    void setDuplicateNodeValues(const int& nodeId,
+                                const SkPoint& c0,
+                                const SkPoint& p1,
+                                const SkPoint& c2,
+                                const int& nDupl) {
         SkPoint * dst = getValuesForNormalNode(nodeId);
         *(dst++) = c0;
         *(dst++) = p1;
-        *dst = c2;
+        *(dst++) = c2;
+        *reinterpret_cast<SkScalar*>(dst) = nDupl;
     }
 
     void setShadowNodeValue(const int& nodeId,
@@ -456,10 +502,10 @@ private:
         *getValuesForShadowNode(nodeId) = t;
     }
 
-    QList<NodeSegType> mTypes;
+    QList<VerbType> mVerbTypes;
     SkScalar* mValues = nullptr;
     int mNValues = 0;
-    int mNNodes = 0;
+    int mNVerbs = 0;
 };
 
 #endif // SMARTPATHCONTAINER_H
