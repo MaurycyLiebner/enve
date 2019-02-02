@@ -208,12 +208,35 @@ public:
         NormalPathNode fNextNormal;
     };
 
-    void insertNormalNode(const int& nodeId,
+    void replaceWithNormalNode(const int& verbId,
+                               const SkPoint& c0,
+                               const SkPoint& p1,
+                               const SkPoint& c2) {
+        mVerbTypes.replace(verbId, NORMAL);
+        setNormalNodeValues(verbId, c0, p1, c2);
+    }
+
+    void replaceWithDuplicateNode(const int& verbId,
+                                  const SkPoint& c0,
+                                  const SkPoint& p1,
+                                  const SkPoint& c2,
+                                  const int& nDupli) {
+        mVerbTypes.replace(verbId, DUPLICATE);
+        setDuplicateNodeValues(verbId, c0, p1, c2, nDupli);
+    }
+
+    void replaceWithShadowNode(const int& verbId,
+                               const SkScalar& t) {
+        mVerbTypes.replace(verbId, SHADOW);
+        setShadowNodeValue(verbId, t);
+    }
+
+    void insertNormalNode(const int& verbId,
                           const SkPoint& c0,
                           const SkPoint& p1,
                           const SkPoint& c2) {
-        makeSpaceForNew(nodeId, NORMAL);
-        setNormalNodeValues(nodeId, c0, p1, c2);
+        makeSpaceForNew(verbId, NORMAL);
+        setNormalNodeValues(verbId, c0, p1, c2);
     }
 
     void prependNormalNode(const SkPoint& c0,
@@ -228,13 +251,13 @@ public:
         insertNormalNode(mNVerbs, c0, p1, c2);
     }
 
-    void insertDuplicateNode(const int& nodeId,
+    void insertDuplicateNode(const int& verbId,
                              const SkPoint& c0,
                              const SkPoint& p1,
                              const SkPoint& c2,
                              const int& nDupl) {
-        makeSpaceForNew(nodeId, DUPLICATE);
-        setDuplicateNodeValues(nodeId, c0, p1, c2, nDupl);
+        makeSpaceForNew(verbId, DUPLICATE);
+        setDuplicateNodeValues(verbId, c0, p1, c2, nDupl);
     }
 
     void prependDuplicateNode(const SkPoint& c0,
@@ -251,11 +274,44 @@ public:
         insertDuplicateNode(mNVerbs, c0, p1, c2, nDupl);
     }
 
-    void insertShadowNode(const int& nodeId,
-                          const SkScalar& t) {
-        Q_ASSERT(nodeId > 0 && nodeId < mNVerbs);
-        makeSpaceForNew(nodeId, SHADOW);
-        setShadowNodeValue(nodeId, t);
+    void insertShadowNode(const int& verbId, const SkScalar& t) {
+        makeSpaceForNew(verbId, SHADOW);
+        setShadowNodeValue(verbId, t);
+    }
+
+    void appendShadowNode(const SkScalar& t) {
+        insertShadowNode(mNVerbs, t);
+    }
+
+    void prependShadowNode(const SkScalar& t) {
+        insertShadowNode(0, t);
+    }
+
+    void removeVerb(const int& verbId) {
+        if(verbId < 0) return;
+        if(verbId >= mNVerbs) return;
+        mVerbTypes.removeAt(verbId);
+        const int newNValues = mNValues - VALUES_PER_VERB;
+        const size_t newDataSize = static_cast<size_t>(newNValues)*sizeof(SkScalar);
+        void * const newData = malloc(newDataSize);
+        SkScalar * const newValues = static_cast<SkScalar*>(newData);
+        if(mNValues == 0) {
+            const int firstValId = verbId*VALUES_PER_VERB;
+            const size_t cpy1Size = static_cast<size_t>(firstValId)*
+                    sizeof(SkScalar);
+            if(firstValId) memcpy(newValues, mValues, cpy1Size);
+            if(firstValId != mNValues - VALUES_PER_VERB) {
+                const size_t cpy2Size = static_cast<size_t>(
+                            mNValues - firstValId - VALUES_PER_VERB)*sizeof(SkScalar);
+                memcpy(newValues + firstValId,
+                       mValues + firstValId + VALUES_PER_VERB,
+                       cpy2Size);
+            }
+        }
+        free(mValues);
+        mValues = newValues;
+        mNValues = newNValues;
+        mNVerbs--;
     }
 
     int prevId(const int& beforeId, const VerbType& type) const {
@@ -280,20 +336,20 @@ public:
         return mNVerbs;
     }
 
-    ShadowPathNode getAsShadowNode(const int& nodeId) {
-        const int prevNormalId = prevId(nodeId, NORMAL);
-        const int nextNormalId = nextId(nodeId, NORMAL);
+    ShadowPathNode getAsShadowNode(const int& verbId) {
+        const int prevNormalId = prevId(verbId, NORMAL);
+        const int nextNormalId = nextId(verbId, NORMAL);
         return ShadowPathNode(getValuesForNormalNode(prevNormalId),
-                              getValuesForShadowNode(nodeId),
+                              getValuesForShadowNode(verbId),
                               getValuesForNormalNode(nextNormalId));
     }
 
-    NormalPathNode getAsNormalNode(const int& nodeId) {
-        return NormalPathNode(getValuesForNormalNode(nodeId));
+    NormalPathNode getAsNormalNode(const int& verbId) {
+        return NormalPathNode(getValuesForNormalNode(verbId));
     }
 
-    DuplicatePathNode getAsDuplicateNode(const int& nodeId) {
-        return DuplicatePathNode(getValuesForNormalNode(nodeId));
+    DuplicatePathNode getAsDuplicateNode(const int& verbId) {
+        return DuplicatePathNode(getValuesForNormalNode(verbId));
     }
 
     struct NodeIterator {
@@ -465,12 +521,12 @@ private:
     }
 
 
-    SkPoint * getValuesForNormalNode(const int& nodeId) {
-        return reinterpret_cast<SkPoint*>(mValues + nodeId*VALUES_PER_VERB);
+    SkPoint * getValuesForNormalNode(const int& verbId) {
+        return reinterpret_cast<SkPoint*>(mValues + verbId*VALUES_PER_VERB);
     }
 
-    SkScalar * getValuesForShadowNode(const int& nodeId) {
-        return mValues + nodeId*VALUES_PER_VERB;
+    SkScalar * getValuesForShadowNode(const int& verbId) {
+        return mValues + verbId*VALUES_PER_VERB;
     }
 
     void makeSpaceForNew(int newId, const VerbType& nodeType) {
@@ -499,28 +555,28 @@ private:
         mNVerbs++;
     }
 
-    void setNormalNodeValues(const int& nodeId,
+    void setNormalNodeValues(const int& verbId,
                              const SkPoint& c0,
                              const SkPoint& p1,
                              const SkPoint& c2) {
-        setDuplicateNodeValues(nodeId, c0, p1, c2, 0);
+        setDuplicateNodeValues(verbId, c0, p1, c2, 0);
     }
 
-    void setDuplicateNodeValues(const int& nodeId,
+    void setDuplicateNodeValues(const int& verbId,
                                 const SkPoint& c0,
                                 const SkPoint& p1,
                                 const SkPoint& c2,
                                 const int& nDupl) {
-        SkPoint * dst = getValuesForNormalNode(nodeId);
+        SkPoint * dst = getValuesForNormalNode(verbId);
         *(dst++) = c0;
         *(dst++) = p1;
         *(dst++) = c2;
         *reinterpret_cast<SkScalar*>(dst) = nDupl;
     }
 
-    void setShadowNodeValue(const int& nodeId,
+    void setShadowNodeValue(const int& verbId,
                             const SkScalar& t) {
-        *getValuesForShadowNode(nodeId) = t;
+        *getValuesForShadowNode(verbId) = t;
     }
 
     QList<VerbType> mVerbTypes;
