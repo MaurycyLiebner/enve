@@ -177,7 +177,7 @@ public:
         NodeIterator(const int& startI,
                      NodesHandler& targetT,
                      const bool& skipShadow) :
-            i(startI), mTarget(targetT), mSkipShadow(skipShadow) {
+            i(startI - 1), mTarget(targetT), mSkipShadow(skipShadow) {
             if(mSkipShadow) {
                 if(currentType() == SHADOW) {
                     next();
@@ -187,7 +187,7 @@ public:
 
         NodeIterator(NodesHandler& targetT,
                      const bool& skipShadow) :
-            NodeIterator(0, targetT, skipShadow) {
+            NodeIterator(-1, targetT, skipShadow) {
 
         }
 
@@ -225,7 +225,7 @@ public:
         }
 
         NodeIterator peekNext() {
-            return NodeIterator(i + 1, mTarget);
+            return NodeIterator(i + 1, mTarget, mSkipShadow);
         }
     private:
         int i;
@@ -236,14 +236,14 @@ public:
     struct SegmentIterator {
         SegmentIterator(const int& startI, NodesHandler& targetT,
                         const bool& skipShadow) :
-           mNode1Iterator(startI, targetT, skipShadow),
-           mNode2Iterator(startI + 1, targetT, skipShadow) {
+           mNode1Iterator(startI - 1, targetT, skipShadow),
+           mNode2Iterator(startI, targetT, skipShadow) {
             updateShadowNodes();
         }
 
         SegmentIterator(NodesHandler& targetT,
                         const bool& skipShadow) :
-            SegmentIterator(0, targetT, skipShadow) {}
+            SegmentIterator(-1, targetT, skipShadow) {}
 
 
         ShadowSegment getCurrentAsShadowSegment() {
@@ -289,6 +289,30 @@ public:
         NodeIterator mNode1Iterator;
         NodeIterator mNode2Iterator;
     };
+
+    SkPath toSkPath(const bool& skipShadow) {
+        SkPath path;
+        SegmentIterator iterator(*this, skipShadow);
+        bool first = true;
+        while(iterator.next()) {
+            if(iterator.currentType() == NORMAL) {
+                auto seg = iterator.getCurrentAsNormalSegment();
+                if(first) {
+                    path.moveTo(seg.fPrevNormal.fP1);
+                    continue;
+                }
+                seg.cubicTo(path);
+            } else {
+                auto seg = iterator.getCurrentAsShadowSegment();
+                if(first) {
+                    path.moveTo(seg.fPrevNormal.fP1);
+                    continue;
+                }
+                seg.cubicTo(path);
+            }
+        }
+        return path;
+    }
 private:
     void makeSpaceForNew(int newId, const NodeSegType& nodeType) {
         newId = qMax(0, qMin(newId, mNNodes));
@@ -296,12 +320,14 @@ private:
         const int newNValues = mNValues + 6;
         void * const newData = malloc(newNValues*sizeof(SkScalar));
         SkScalar * const newValues = static_cast<SkScalar*>(newData);
-        const int firstValId = newId*6;
-        if(firstValId) memcpy(newValues, mValues, firstValId*sizeof(SkScalar));
-        if(firstValId != mNValues) {
-            memcpy(newValues + firstValId + 6,
-                   mValues + firstValId,
-                   (mNValues - firstValId)*sizeof(SkScalar));
+        if(mNValues == 0) {
+            const int firstValId = newId*6;
+            if(firstValId) memcpy(newValues, mValues, firstValId*sizeof(SkScalar));
+            if(firstValId != mNValues) {
+                memcpy(newValues + firstValId + 6,
+                       mValues + firstValId,
+                       (mNValues - firstValId)*sizeof(SkScalar));
+            }
         }
         free(mValues);
         mValues = newValues;
