@@ -5,7 +5,7 @@
 
 class NodesHandler {
 public:
-    enum NodeSegType { NORMAL, SHADOW, NONE };
+    enum NodeSegType { NORMAL, DUPLICATE, SHADOW, NONE };
 
     struct NodeValues {
         SkPoint fC0;
@@ -29,33 +29,80 @@ public:
             return *fC2;
         }
 
-        void setC0(const SkScalar& c0x, const SkScalar& c0y) {
+        void setC0(const SkScalar& c0x, const SkScalar& c0y) const {
             setC0(SkPoint::Make(c0x, c0y));
         }
 
-        void setP1(const SkScalar& p1x, const SkScalar& p1y) {
+        void setP1(const SkScalar& p1x, const SkScalar& p1y) const {
             setP1(SkPoint::Make(p1x, p1y));
         }
 
-        void setC2(const SkScalar& c2x, const SkScalar& c2y) {
+        void setC2(const SkScalar& c2x, const SkScalar& c2y) const {
             setC2(SkPoint::Make(c2x, c2y));
         }
 
-        void setC0(const SkPoint& c0V) {
+        void setC0(const SkPoint& c0V) const {
             *fC0 = c0V;
         }
 
-        void setP1(const SkPoint& p1V) {
+        void setP1(const SkPoint& p1V) const {
             *fP1 = p1V;
         }
 
-        void setC2(const SkPoint& c2V) {
+        void setC2(const SkPoint& c2V) const {
             *fC2 = c2V;
         }
 
         SkPoint* fC0;
         SkPoint* fP1;
         SkPoint* fC2;
+    };
+
+    struct DuplicatePathNode {
+        DuplicatePathNode(SkPoint * const src) :
+            fMainNode(src + 1) {
+            const auto srcS = reinterpret_cast<SkScalar*>(src);
+            fDuplBefore = srcS;
+            fDuplAfter = srcS + 1;
+        }
+
+        void setDuplAfter(const int& count) const {
+            *fDuplAfter = count;
+        }
+
+        void setDuplBefore(const int& count) const {
+            *fDuplBefore = count;
+        }
+
+        int duplBefore() const {
+            return qRound(*fDuplBefore);
+        }
+
+        int duplAfter() const {
+            return qRound(*fDuplAfter);
+        }
+
+        int totalNodesCount() const {
+            return duplBefore() + duplAfter() + 1;
+        }
+
+        QList<NodeValues> toNodeValues() const {
+            QList<NodeValues> result;
+
+            const int iMax = duplBefore() + duplAfter();
+            for(int i = 0; i <= iMax; i++) {
+                NodeValues values;
+                values.fC0 = (i == 0 ? fMainNode.c0() : fMainNode.p1());
+                values.fP1 = fMainNode.p1();
+                values.fC2 = (i == iMax ? fMainNode.c2() : fMainNode.p1());
+            }
+
+            return result;
+        }
+
+        NormalPathNode fMainNode;
+        SkScalar *fDuplBefore;
+        SkScalar *fDuplAfter;
     };
 
     struct ShadowPathNode {
@@ -68,11 +115,11 @@ public:
             return *fT;
         }
 
-        void setT(const SkScalar& tV) {
+        void setT(const SkScalar& tV) const {
             *fT = tV;
         }
 
-        NodeValues getNodeValues() const {
+        NodeValues toNodeValues() const {
             qreal qt = CLAMP(static_cast<qreal>(t()), 0, 1);
             if(isZero6Dec(qt)) {
                 SkPoint val = fPrevNormal.p1();
@@ -134,10 +181,10 @@ public:
                 path.cubicTo(fPrevNormal.c2(), fNextNormal.c0(), fNextNormal.p1());
                 return;
             }
-            auto lastPtValues = fShadowNodes.first().getNodeValues();
+            auto lastPtValues = fShadowNodes.first().toNodeValues();
             path.cubicTo(fPrevNormal.c2(), lastPtValues.fC0, lastPtValues.fP1);
             for(int i = 1; i < fShadowNodes.count(); i++) {
-                auto ptValues = fShadowNodes.first().getNodeValues();
+                auto ptValues = fShadowNodes.first().toNodeValues();
                 path.cubicTo(lastPtValues.fC2, ptValues.fC0, ptValues.fP1);
                 lastPtValues = ptValues;
             }
