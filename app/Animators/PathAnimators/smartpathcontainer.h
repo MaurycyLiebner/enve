@@ -4,17 +4,48 @@
 #include "skia/skiaincludes.h"
 #include "exceptions.h"
 
+#define EQUAL_3_OR(val, or1, or2, or3) val == or1 || val == or2 || val == or3
+
 struct Node {
     enum Type {
-        NORMAL_MIDDLE, NORMAL_START, NORMAL_END, NORMAL_START_AND_END, DISSOLVED,
+        NORMAL_MIDDLE, NORMAL_START, NORMAL_END,
+        NORMAL_START_AND_END, DISSOLVED, INVALID
     };
 
-    SkScalar fC0;
-    SkScalar fP1;
-    SkScalar fC2;
+    bool isNormal() const {
+        return EQUAL_3_OR(fType, NORMAL_MIDDLE, NORMAL_START, NORMAL_END);
+    }
+
+    SkPoint fC0;
+    SkPoint fP1;
+    SkPoint fC2;
     SkScalar fT;
-    Type fType;
+    Type fType = INVALID;
 };
+
+Node prevNormalNode(const int& id, const QList<Node>& list, int *resultId) {
+    for(int i = id - 1; i >= 0; i--) {
+        const Node& node = list.at(i);
+        if(node.isNormal()) {
+            if(resultId) *resultId = i;
+            return node;
+        }
+    }
+    if(resultId) *resultId = -1;
+    return Node();
+}
+
+Node nextNormalNode(const int& id, const QList<Node>& list, int *resultId) {
+    for(int i = id + 1; i < list.count(); i++) {
+        const Node& node = list.at(i);
+        if(node.isNormal()) {
+            if(resultId) *resultId = i;
+            return node;
+        }
+    }
+    if(resultId) *resultId = -1;
+    return Node();
+}
 
 class NodeAction {
 public:
