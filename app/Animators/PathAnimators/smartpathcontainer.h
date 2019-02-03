@@ -3,6 +3,7 @@
 #include "simplemath.h"
 #include "skia/skiaincludes.h"
 #include "exceptions.h"
+#include "pointhelpers.h"
 
 #define EQUAL_3_OR(val, or1, or2, or3) val == or1 || val == or2 || val == or3
 
@@ -16,10 +17,25 @@ struct Node {
         return EQUAL_3_OR(fType, NORMAL_MIDDLE, NORMAL_START, NORMAL_END);
     }
 
-    SkPoint fC0;
-    SkPoint fP1;
-    SkPoint fC2;
-    SkScalar fT;
+
+
+    static Node sCreateDissolved(Node &prevNode, Node &nextNode, const qreal& t) {
+        const qreal prevT = prevNode.isNormal() ? 0 : prevNode.fT;
+        const qreal nextT = nextNode.isNormal() ? 1 : nextNode.fT;
+
+        const qreal mappedT = gMapTToFragment(prevT, nextT, t);
+        Node result;
+        result.fT = t;
+        gGetValuesForNodeInsertion(prevNode.fP1, prevNode.fC2,
+                                   result.fC0, result.fP1, result.fC2,
+                                   nextNode.fC0, nextNode.fP1, mappedT);
+        return result;
+    }
+
+    QPointF fC0;
+    QPointF fP1;
+    QPointF fC2;
+    qreal fT;
     Type fType = INVALID;
 };
 
@@ -162,17 +178,28 @@ private:
 
 class DissolveNode : public NodeAction {
 public:
-    DissolveNode(const int& nodeId, const SkScalar& t) :
+    DissolveNode(const int& nodeId, const qreal& t) :
         NodeAction(DISSOLVE), mNodeId(nodeId), mT(t) {}
 
     void apply(QList<Node>& nodes) const {
         Node& node = nodes[mNodeId];
         node.fType = Node::DISSOLVED;
         node.fT = mT;
+        // fix t values for surrounding dissolved nodes
+        for(int i = mNodeId - 1; i >= 0; i--) {
+            Node& iNode = nodes[i];
+            if(iNode.isNormal()) break;
+            iNode.fT = mT*iNode.fT;
+        }
+        for(int i = mNodeId + 1; i < nodes.count(); i++) {
+            Node& iNode = nodes[i];
+            if(iNode.isNormal()) break;
+            iNode.fT = mT + (1 - mT)*iNode.fT;
+        }
     }
 private:
     int mNodeId;
-    SkScalar mT;
+    qreal mT;
 };
 
 class RemoveDissolvedNode : public NodeAction {
@@ -184,6 +211,12 @@ public:
         const Node& node = nodes[mNodeId];
         if(node.fType != Node::DISSOLVED)
             RuntimeThrow("RemoveDissolvedNode: Unsupported Node Type");
+        Node& prevNode = nodes[mNodeId - 1];
+        Node& nextNode = nodes[mNodeId + 1];
+        gGetValuesForNodeRemoval(prevNode.fP1, prevNode.fC2,
+                                 node.fC0, node.fP1, node.fC2,
+                                 nextNode.fC0, nextNode.fP1,
+                                 node.fT);
         nodes.removeAt(mNodeId);
     }
 private:
@@ -192,17 +225,21 @@ private:
 
 class AddDissolvedNode : public NodeAction {
 public:
-    AddDissolvedNode(const int& node1Id, const int& node2Id, const SkScalar& t) :
+    AddDissolvedNode(const int& node1Id, const int& node2Id, const qreal& t) :
         NodeAction(ADD_DISSOLVED), mNode1Id(node1Id), mNode2Id(node2Id), mT(t) {}
 
     void apply(QList<Node>& nodes) const {
-        Node prevNormalNode = nodes.at(mNode1Id);
-        Node nextNormalNode = nodes.at(mNode2Id);
+        if(mNode1Id + 1 != mNode2Id)
+            RuntimeThrow("Cannot add node between non-adjacent nodes");
+        Node prevNode = nodes.at(mNode1Id);
+        Node nextNode = nodes.at(mNode2Id);
+        Node newNode = Node::sCreateDissolved(prevNode, nextNode, mT);
+        nodes.insert(mNode1Id + 1, newNode);
     }
 private:
     int mNode1Id;
     int mNode2Id;
-    SkScalar mT;
+    qreal mT;
 };
 
 class NormalizeDissolvedNode : public NodeAction {
@@ -215,7 +252,17 @@ public:
         if(node.fType != Node::DISSOLVED)
              RuntimeThrow("NormalizeDissolvedNode: Unsupported Node Type");
         node.fType = Node::NORMAL_MIDDLE;
-        // !!! fix t values for surrounding dissolved nodes
+        // fix t values for surrounding dissolved nodes
+        for(int i = mNodeId - 1; i >= 0; i--) {
+            Node& iNode = nodes[i];
+            if(iNode.isNormal()) break;
+            iNode.fT = gMapTToFragment(0, node.fT, iNode.fT);
+        }
+        for(int i = mNodeId + 1; i < nodes.count(); i++) {
+            Node& iNode = nodes[i];
+            if(iNode.isNormal()) break;
+            iNode.fT = gMapTToFragment(node.fT, 1, iNode.fT);
+        }
     }
 private:
     int mNodeId;

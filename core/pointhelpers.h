@@ -112,4 +112,18 @@ extern bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
                                 const SkScalar &segLen,
                                 const SkScalar &smoothness,
                                 const uint32_t &seedAssist);
+qreal gMapTToFragment(const qreal& minT,
+                      const qreal& maxT,
+                      const qreal& t);
+void gGetValuesForNodeInsertion(
+        const QPointF& prevP1, QPointF& prevC2,
+        QPointF& newC0, QPointF& newP1, QPointF& newC2,
+        QPointF &nextC0, const QPointF& nextP1,
+        qreal t);
+
+void gGetValuesForNodeRemoval(
+        const QPointF &prevP1, QPointF &prevC2,
+        const QPointF &pC0, const QPointF &pP1, const QPointF &pC2,
+        QPointF &nextC0, const QPointF &nextP1,
+        qreal t);
 #endif // POINTHELPERS_H
