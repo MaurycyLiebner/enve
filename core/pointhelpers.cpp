@@ -816,25 +816,25 @@ bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
     return true;
 }
 
-qreal gMapTToFragment(const qreal &minAbs,
-                      const qreal &maxAbs,
-                      const qreal &t) {
-    const qreal tFrag = maxAbs - minAbs;
+qreal gMapTToFragment(const qreal &minAbsT,
+                      const qreal &maxAbsT,
+                      const qreal &absT) {
+    const qreal tFrag = maxAbsT - minAbsT;
     if(isZero6Dec(tFrag)) {
-        if(isZero4Dec(t - minAbs)) return 0.5;
+        if(isZero4Dec(absT - minAbsT)) return 0.5;
         RuntimeThrow("Cannot map to zero range");
     }
     if(tFrag < 0) RuntimeThrow("Cannot map to negative range");
-    return (t - minAbs + (1 - maxAbs))/tFrag;
+    return (absT - minAbsT + (1 - maxAbsT))/tFrag;
 }
 
-qreal gMapTFromFragment(const qreal &minAbs,
-                        const qreal &maxAbs,
+qreal gMapTFromFragment(const qreal &minAbsT,
+                        const qreal &maxAbsT,
                         const qreal &relT) {
-    const qreal tFrag = maxAbs - minAbs;
-    if(isZero6Dec(tFrag)) return minAbs;
+    const qreal tFrag = maxAbsT - minAbsT;
+    if(isZero6Dec(tFrag)) return minAbsT;
     if(tFrag < 0) RuntimeThrow("Cannot map to negative range");
-    return minAbs + relT*tFrag + maxAbs - 1;
+    return minAbsT + relT*tFrag + maxAbsT - 1;
 }
 
 void gGetValuesForNodeInsertion(

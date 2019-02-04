@@ -25,7 +25,7 @@ struct Node {
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
          const qreal& t) : Node(c0, p1, c2, DISSOLVED) {
-        fT = t;
+        fRelT = t;
     }
 
     bool isNormal() const {
@@ -37,7 +37,7 @@ struct Node {
     QPointF fC2;
 
     //! @brief T value for segment defined by previous and next node
-    qreal fT;
+    qreal fRelT;
     Type fType = INVALID;
 };
 
@@ -63,6 +63,7 @@ private:
     Type mType;
 };
 
+// !!! should be able to marge last node with first node
 class MergeNodesAction : public NodeAction {
 public:
     MergeNodesAction(const int& firstNodeId, const int& lastNodeId) :
@@ -100,6 +101,8 @@ public:
             RuntimeThrow("Cannot disconnect non-adjacent nodes");
         Node& node1 = nodes[mNode1Id];
         Node& node2 = nodes[mNode2Id];
+        if(!node1.isNormal() || !node2.isNormal())
+            RuntimeThrow("Unsupported node type(s)");
         if(node1.fType == Node::NORMAL_START) {
             node1.fType = Node::NORMAL_START_AND_END;
         } else {
@@ -124,9 +127,11 @@ public:
 
     void apply(QList<Node>& nodes) const {
         if(mNode1Id + 1 != mNode2Id)
-            RuntimeThrow("Cannot disconnect non-adjacent nodes");
+            RuntimeThrow("Cannot connect non-adjacent nodes");
         Node& node1 = nodes[mNode1Id];
         Node& node2 = nodes[mNode2Id];
+        if(!node1.isNormal() || !node2.isNormal())
+            RuntimeThrow("Unsupported node type(s)");
         if(node1.fType == Node::NORMAL_START_AND_END) {
             node1.fType = Node::NORMAL_START;
         } else {
@@ -196,21 +201,23 @@ private:
 
 class DissolveNode : public NodeAction {
 public:
-    DissolveNode(const int& nodeId) :
-        NodeAction(DISSOLVE), mNodeId(nodeId) {}
+    DissolveNode(const int& nodeId, const qreal& t) :
+        NodeAction(DISSOLVE), mNodeId(nodeId), mT(t) {}
 
     void apply(QList<Node>& nodes) const {
         Node& node = nodes[mNodeId];
-        Node& prevNode = nodes[mNodeId - 1];
-        Node& nextNode = nodes[mNodeId + 1];
-        qCubicSegment2D surrSeg(prevNode.fP1, prevNode.fC2,
-                                nextNode.fC0, nextNode.fP1);
 
         node.fType = Node::DISSOLVED;
-        node.fT = surrSeg.tAtPos(node.fP1);
+        node.fRelT = mT;
+//        Node& prevNode = nodes[mNodeId - 1];
+//        Node& nextNode = nodes[mNodeId + 1];
+//        qCubicSegment2D surrSeg(prevNode.fP1, prevNode.fC2,
+//                                nextNode.fC0, nextNode.fP1);
+//        node.fRelT = surrSeg.tAtPos(node.fP1);
     }
 private:
     int mNodeId;
+    qreal mT;
 };
 
 class RemoveDissolvedNode : public NodeAction {
@@ -227,18 +234,34 @@ public:
         gGetValuesForNodeRemoval(prevNode.fP1, prevNode.fC2,
                                  node.fC0, node.fP1, node.fC2,
                                  nextNode.fC0, nextNode.fP1,
-                                 node.fT);
+                                 node.fRelT);
         if(prevNode.fType == Node::DISSOLVED) {
-            Node& prevPrevNode = nodes[mNodeId - 2];
-            qCubicSegment2D seg(prevPrevNode.fP1, prevPrevNode.fC2,
-                                nextNode.fC0, nextNode.fP1);
-            prevNode.fT = seg.tAtPos(prevNode.fP1);
+            const qreal a = prevNode.fRelT;
+            const qreal b = node.fRelT;
+            const qreal div = 1 + a*b - a;
+            if(isZero6Dec(div)) {
+                prevNode.fRelT = 0.5;
+            } else {
+                prevNode.fRelT = a*b/div;
+            }
+//            Node& prevPrevNode = nodes[mNodeId - 2];
+//            qCubicSegment2D seg(prevPrevNode.fP1, prevPrevNode.fC2,
+//                                nextNode.fC0, nextNode.fP1);
+//            prevNode.fRelT = seg.tAtPos(prevNode.fP1);
         }
         if(nextNode.fType == Node::DISSOLVED) {
-            Node& nextNextNode = nodes[mNodeId + 2];
-            qCubicSegment2D seg(prevNode.fP1, prevNode.fC2,
-                                nextNextNode.fC0, nextNextNode.fP1);
-            nextNode.fT = seg.tAtPos(prevNode.fP1);
+            const qreal a = node.fRelT;
+            const qreal b = nextNode.fRelT;
+            const qreal div = 1 + a*b - a;
+            if(isZero6Dec(div)) {
+                prevNode.fRelT = 0.5;
+            } else {
+                 nextNode.fRelT = b/div;
+            }
+//            Node& nextNextNode = nodes[mNodeId + 2];
+//            qCubicSegment2D seg(prevNode.fP1, prevNode.fC2,
+//                                nextNextNode.fC0, nextNextNode.fP1);
+//            nextNode.fRelT = seg.tAtPos(prevNode.fP1);
         }
         nodes.removeAt(mNodeId);
     }
@@ -257,21 +280,18 @@ public:
         Node &prevNode = nodes[mNode1Id];
         Node &nextNode = nodes[mNode2Id];
         Node newNode;
-        newNode.fT = mT;
+        newNode.fRelT = mT;
+        newNode.fType = Node::DISSOLVED;
         gGetValuesForNodeInsertion(prevNode.fP1, prevNode.fC2,
                                    newNode.fC0, newNode.fP1, newNode.fC2,
                                    nextNode.fC0, nextNode.fP1, mT);
         if(prevNode.fType == Node::DISSOLVED) {
-            Node& prevPrevNode = nodes[mNode1Id - 1];
-            qCubicSegment2D seg(prevPrevNode.fP1, prevPrevNode.fC2,
-                                nextNode.fC0, nextNode.fP1);
-            prevNode.fT = seg.tAtPos(prevNode.fP1);
+            const qreal mNewNodeT = gMapTFromFragment(prevNode.fRelT, 1, mT);
+            prevNode.fRelT = gMapTToFragment(0, mNewNodeT, prevNode.fRelT);
         }
         if(nextNode.fType == Node::DISSOLVED) {
-            Node& nextNextNode = nodes[mNode2Id + 1];
-            qCubicSegment2D seg(prevNode.fP1, prevNode.fC2,
-                                nextNextNode.fC0, nextNextNode.fP1);
-            nextNode.fT = seg.tAtPos(prevNode.fP1);
+            const qreal mNewNodeT = gMapTFromFragment(0, nextNode.fRelT, mT);
+            nextNode.fRelT = gMapTToFragment(mNewNodeT, 1, nextNode.fRelT);
         }
         nodes.insert(mNode2Id, newNode);
     }

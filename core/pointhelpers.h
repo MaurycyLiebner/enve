@@ -113,12 +113,12 @@ extern bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
                                 const SkScalar &smoothness,
                                 const uint32_t &seedAssist);
 
-qreal gMapTToFragment(const qreal& minT,
-                      const qreal& maxAbs,
-                      const qreal& t);
+qreal gMapTToFragment(const qreal& minAbsT,
+                      const qreal& maxAbsT,
+                      const qreal& absT);
 
-qreal gMapTFromFragment(const qreal& minAbs,
-                        const qreal& maxAbs,
+qreal gMapTFromFragment(const qreal& minAbsT,
+                        const qreal& maxAbsT,
                         const qreal& relT);
 
 void gGetValuesForNodeInsertion(
