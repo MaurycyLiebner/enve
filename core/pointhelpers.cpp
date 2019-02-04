@@ -816,11 +816,25 @@ bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
     return true;
 }
 
-qreal gMapTToFragment(const qreal &minT, const qreal &maxT, const qreal &t) {
-    const qreal tFrag = maxT - minT;
-    if(isZero6Dec(tFrag)) RuntimeThrow("Cannot map to zero range");
+qreal gMapTToFragment(const qreal &minAbs,
+                      const qreal &maxAbs,
+                      const qreal &t) {
+    const qreal tFrag = maxAbs - minAbs;
+    if(isZero6Dec(tFrag)) {
+        if(isZero4Dec(t - minAbs)) return 0.5;
+        RuntimeThrow("Cannot map to zero range");
+    }
     if(tFrag < 0) RuntimeThrow("Cannot map to negative range");
-    return (t - minT + (1 - maxT))/tFrag;
+    return (t - minAbs + (1 - maxAbs))/tFrag;
+}
+
+qreal gMapTFromFragment(const qreal &minAbs,
+                        const qreal &maxAbs,
+                        const qreal &relT) {
+    const qreal tFrag = maxAbs - minAbs;
+    if(isZero6Dec(tFrag)) return minAbs;
+    if(tFrag < 0) RuntimeThrow("Cannot map to negative range");
+    return minAbs + relT*tFrag + maxAbs - 1;
 }
 
 void gGetValuesForNodeInsertion(
@@ -831,15 +845,15 @@ void gGetValuesForNodeInsertion(
     const qreal oneMinusT = 1 - t;
     const QPointF P1_2 = prevC2*oneMinusT + nextC0*t;
 
-    QPointF newPrevC2 = prevP1*oneMinusT + prevC2*t;
-    QPointF newNextC0 = nextC0*oneMinusT + nextP1*t;
+    const QPointF newPrevC2 = prevP1*oneMinusT + prevC2*t;
+    const QPointF newNextC0 = nextC0*oneMinusT + nextP1*t;
 
     newC0 = newPrevC2*oneMinusT + P1_2*t;
     newC2 = P1_2*oneMinusT + newNextC0*t;
     newP1 = newC0*oneMinusT + newC2*t;
 
     prevC2 = newPrevC2;
-    newNextC0 = nextC0;
+    nextC0 = newNextC0;
 }
 
 void gGetValuesForNodeRemoval(
