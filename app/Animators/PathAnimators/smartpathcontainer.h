@@ -13,6 +13,21 @@ struct Node {
         NORMAL_START_AND_END, DISSOLVED, INVALID
     };
 
+    Node() {}
+
+    Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
+         const Type& type) {
+        fC0 = c0;
+        fP1 = p1;
+        fC2 = c2;
+        fType = type;
+    }
+
+    Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
+         const qreal& t) : Node(c0, p1, c2, DISSOLVED) {
+        fT = t;
+    }
+
     bool isNormal() const {
         return EQUAL_3_OR(fType, NORMAL_MIDDLE, NORMAL_START, NORMAL_END);
     }
@@ -20,15 +35,11 @@ struct Node {
 
 
     static Node sCreateDissolved(Node &prevNode, Node &nextNode, const qreal& t) {
-        const qreal prevT = prevNode.isNormal() ? 0 : prevNode.fT;
-        const qreal nextT = nextNode.isNormal() ? 1 : nextNode.fT;
-
-        const qreal mappedT = gMapTToFragment(prevT, nextT, t);
         Node result;
         result.fT = t;
         gGetValuesForNodeInsertion(prevNode.fP1, prevNode.fC2,
                                    result.fC0, result.fP1, result.fC2,
-                                   nextNode.fC0, nextNode.fP1, mappedT);
+                                   nextNode.fC0, nextNode.fP1, t);
         return result;
     }
 
@@ -38,30 +49,6 @@ struct Node {
     qreal fT;
     Type fType = INVALID;
 };
-
-Node prevNormalNode(const int& id, const QList<Node>& list, int *resultId) {
-    for(int i = id - 1; i >= 0; i--) {
-        const Node& node = list.at(i);
-        if(node.isNormal()) {
-            if(resultId) *resultId = i;
-            return node;
-        }
-    }
-    if(resultId) *resultId = -1;
-    return Node();
-}
-
-Node nextNormalNode(const int& id, const QList<Node>& list, int *resultId) {
-    for(int i = id + 1; i < list.count(); i++) {
-        const Node& node = list.at(i);
-        if(node.isNormal()) {
-            if(resultId) *resultId = i;
-            return node;
-        }
-    }
-    if(resultId) *resultId = -1;
-    return Node();
-}
 
 class NodeAction {
 public:
@@ -85,17 +72,24 @@ private:
     Type mType;
 };
 
-class MergeNodeAction : public NodeAction {
+class MergeNodesAction : public NodeAction {
 public:
-    MergeNodeAction(const int& node1Id, const int& node2Id) :
-        NodeAction(MERGE), mNode1Id(node1Id), mNode2Id(node2Id) {}
+    MergeNodesAction(const int& firstNodeId, const int& lastNodeId) :
+        NodeAction(MERGE), mFirstNodeId(firstNodeId), mLastNodeId(lastNodeId) {}
 
     void apply(QList<Node>& nodes) const {
-        nodes.removeAt(mNode1Id);
+        if(mFirstNodeId >= mLastNodeId)
+            RuntimeThrow("Invalid merging range");
+        auto& firstNode = nodes[mFirstNodeId];
+        auto& lastNode = nodes[mLastNodeId];
+        firstNode.fC2 = lastNode.fC2;
+        for(int i = mFirstNodeId + 1; i <= mLastNodeId; i++) {
+            nodes.removeAt(i);
+        }
     }
 private:
-    int mNode1Id;
-    int mNode2Id;
+    int mFirstNodeId;
+    int mLastNodeId;
 };
 
 class DisconnectNodeAction : public NodeAction {
@@ -104,8 +98,21 @@ public:
         NodeAction(DISCONNECT), mNode1Id(node1Id), mNode2Id(node2Id) {}
 
     void apply(QList<Node>& nodes) const {
-        nodes[mNode1Id].fType = Node::NORMAL_END;
-        nodes[mNode2Id].fType = Node::NORMAL_START;
+        if(mNode1Id + 1 != mNode2Id)
+            RuntimeThrow("Cannot disconnect non-adjacent nodes");
+        Node& node1 = nodes[mNode1Id];
+        Node& node2 = nodes[mNode2Id];
+        if(node1.fType == Node::NORMAL_START) {
+            node1.fType = Node::NORMAL_START_AND_END;
+        } else {
+            node1.fType = Node::NORMAL_END;
+        }
+
+        if(node2.fType == Node::NORMAL_END) {
+            node2.fType = Node::NORMAL_START_AND_END;
+        } else {
+            node2.fType = Node::NORMAL_START;
+        }
     }
 private:
     int mNode1Id;
@@ -118,6 +125,8 @@ public:
         NodeAction(CONNECT), mNode1Id(node1Id), mNode2Id(node2Id) {}
 
     void apply(QList<Node>& nodes) const {
+        if(mNode1Id + 1 != mNode2Id)
+            RuntimeThrow("Cannot disconnect non-adjacent nodes");
         Node& node1 = nodes[mNode1Id];
         Node& node2 = nodes[mNode2Id];
         if(node1.fType == Node::NORMAL_START_AND_END) {
@@ -150,23 +159,33 @@ public:
 
     // !!! should also handle NORMAL_END and NORMAL_START nodes
     void apply(QList<Node>& nodes) const {
-        Node toSplit = nodes.at(mNodeId);
-        Node split1 = toSplit;
-        Node split2 = toSplit;
+        Node toSplit = nodes.takeAt(mNodeId);
+
+        const int iMax = mDuplicatesBefore + 1 + mDuplicatesAfter;
+        for(int i = 0; i <= iMax; i++) {
+            Node node;
+            node.fC0 = (i == 0 ? toSplit.fC0 : toSplit.fP1);
+            node.fP1 = toSplit.fP1;
+            node.fC2 = (i == iMax ? toSplit.fC2 : toSplit.fP1);
+            nodes.insert(mNodeId, node);
+        }
+
+        Node& split1 = nodes[mDuplicatesBefore + mNodeId];
+        Node& split2 = nodes[mDuplicatesBefore + mNodeId + 1];
         if(mDisconnect) {
             if(toSplit.fType == Node::DISSOLVED)
                 RuntimeThrow("SplitNodeAction: Unsupported Node Type DISSOLVED");
-            split1.fType = Node::NORMAL_END;
-            split2.fType = Node::NORMAL_START;
-        }
+            if(split1.fType == Node::NORMAL_START) {
+                split1.fType = Node::NORMAL_START_AND_END;
+            } else {
+                split1.fType = Node::NORMAL_END;
+            }
 
-        nodes.replace(mNodeId, split1);
-        nodes.insert(mNodeId + 1, split2);
-        for(int i = 0; i < mDuplicatesAfter; i++) {
-            nodes.insert(mNodeId + 2, toSplit);
-        }
-        for(int i = 0; i < mDuplicatesBefore; i++) {
-            nodes.insert(mNodeId, toSplit);
+            if(split2.fType == Node::NORMAL_END) {
+                split2.fType = Node::NORMAL_START_AND_END;
+            } else {
+                split2.fType = Node::NORMAL_START;
+            }
         }
     }
 private:
