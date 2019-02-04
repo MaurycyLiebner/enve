@@ -26,6 +26,12 @@ QPointF qCubicSegment2D::posAtT(const qreal &t) const {
             t*t*t*p1();
 }
 
+qreal qCubicSegment2D::tAtPos(const QPointF &pos) {
+    qreal t;
+    minDistanceTo(pos, &t);
+    return t;
+}
+
 qreal qCubicSegment2D::length() {
     if(!mLengthUpToDate) updateLength();
     return fLength;

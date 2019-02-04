@@ -58,6 +58,7 @@ struct qCubicSegment2D {
     qCubicSegment1D ySeg() const;
 
     QPointF posAtT(const qreal& t) const;
+    qreal tAtPos(const QPointF& pos);
 
     qreal length();
     qreal tAtLength(const qreal& len);

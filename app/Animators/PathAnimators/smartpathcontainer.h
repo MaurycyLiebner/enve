@@ -33,19 +33,11 @@ struct Node {
     }
 
 
-
-    static Node sCreateDissolved(Node &prevNode, Node &nextNode, const qreal& t) {
-        Node result;
-        result.fT = t;
-        gGetValuesForNodeInsertion(prevNode.fP1, prevNode.fC2,
-                                   result.fC0, result.fP1, result.fC2,
-                                   nextNode.fC0, nextNode.fP1, t);
-        return result;
-    }
-
     QPointF fC0;
     QPointF fP1;
     QPointF fC2;
+
+    //! @brief T value for segment defined by previous and next normal nodes
     qreal fT;
     Type fType = INVALID;
 };
@@ -72,6 +64,56 @@ private:
     Type mType;
 };
 
+Node& prevNormalNodeRef(const int& id, QList<Node>& list,
+                        int *resultId = nullptr) {
+    for(int i = id - 1; i >= 0; i--) {
+        Node& node = list[i];
+        if(node.isNormal()) {
+            if(resultId) *resultId = i;
+            return node;
+        }
+    }
+    RuntimeThrow("No previus normal node found");
+}
+
+Node& nextNormalNodeRef(const int& id, QList<Node>& list,
+                        int *resultId = nullptr) {
+    for(int i = id + 1; i < list.count(); i++) {
+        Node& node = list[i];
+        if(node.isNormal()) {
+            if(resultId) *resultId = i;
+            return node;
+        }
+    }
+    RuntimeThrow("No next normal node found");
+}
+
+Node prevNormalNode(const int& id, const QList<Node>& list,
+                    int *resultId = nullptr) {
+    for(int i = id - 1; i >= 0; i--) {
+        const Node& node = list.at(i);
+        if(node.isNormal()) {
+            if(resultId) *resultId = i;
+            return node;
+        }
+    }
+    if(resultId) *resultId = -1;
+    return Node();
+}
+
+Node nextNormalNode(const int& id, const QList<Node>& list,
+                    int *resultId = nullptr) {
+    for(int i = id + 1; i < list.count(); i++) {
+        const Node& node = list.at(i);
+        if(node.isNormal()) {
+            if(resultId) *resultId = i;
+            return node;
+        }
+    }
+    if(resultId) *resultId = -1;
+    return Node();
+}
+
 class MergeNodesAction : public NodeAction {
 public:
     MergeNodesAction(const int& firstNodeId, const int& lastNodeId) :
@@ -83,6 +125,13 @@ public:
         auto& firstNode = nodes[mFirstNodeId];
         auto& lastNode = nodes[mLastNodeId];
         firstNode.fC2 = lastNode.fC2;
+        if(lastNode.fType == Node::NORMAL_END) {
+            if(firstNode.fType == Node::NORMAL_START) {
+                firstNode.fType = Node::NORMAL_START_AND_END;
+            } else {
+                firstNode.fType = Node::NORMAL_END;
+            }
+        }
         for(int i = mFirstNodeId + 1; i <= mLastNodeId; i++) {
             nodes.removeAt(i);
         }
@@ -167,6 +216,7 @@ public:
             node.fC0 = (i == 0 ? toSplit.fC0 : toSplit.fP1);
             node.fP1 = toSplit.fP1;
             node.fC2 = (i == iMax ? toSplit.fC2 : toSplit.fP1);
+            node.fType = Node::NORMAL_MIDDLE;
             nodes.insert(mNodeId, node);
         }
 
@@ -197,28 +247,32 @@ private:
 
 class DissolveNode : public NodeAction {
 public:
-    DissolveNode(const int& nodeId, const qreal& t) :
-        NodeAction(DISSOLVE), mNodeId(nodeId), mT(t) {}
+    DissolveNode(const int& nodeId) :
+        NodeAction(DISSOLVE), mNodeId(nodeId) {}
 
     void apply(QList<Node>& nodes) const {
         Node& node = nodes[mNodeId];
+        Node& prevNormal = prevNormalNodeRef(mNodeId, nodes);
+        Node& nextNormal = nextNormalNodeRef(mNodeId, nodes);
+        qCubicSegment2D seg(prevNormal.fP1, prevNormal.fC2,
+                            nextNormal.fC0, nextNormal.fP1);
+        const qreal t = seg.tAtPos(node.fP1);
         node.fType = Node::DISSOLVED;
-        node.fT = mT;
+        node.fT = t;
         // fix t values for surrounding dissolved nodes
         for(int i = mNodeId - 1; i >= 0; i--) {
             Node& iNode = nodes[i];
             if(iNode.isNormal()) break;
-            iNode.fT = mT*iNode.fT;
+            iNode.fT = t*iNode.fT;
         }
         for(int i = mNodeId + 1; i < nodes.count(); i++) {
             Node& iNode = nodes[i];
             if(iNode.isNormal()) break;
-            iNode.fT = mT + (1 - mT)*iNode.fT;
+            iNode.fT = t + (1 - t)*iNode.fT;
         }
     }
 private:
     int mNodeId;
-    qreal mT;
 };
 
 class RemoveDissolvedNode : public NodeAction {
@@ -250,9 +304,17 @@ public:
     void apply(QList<Node>& nodes) const {
         if(mNode1Id + 1 != mNode2Id)
             RuntimeThrow("Cannot add node between non-adjacent nodes");
-        Node prevNode = nodes.at(mNode1Id);
-        Node nextNode = nodes.at(mNode2Id);
-        Node newNode = Node::sCreateDissolved(prevNode, nextNode, mT);
+        Node &prevNode = nodes[mNode1Id];
+        Node &nextNode = nodes[mNode2Id];
+        Node newNode;
+        newNode.fT = mT;
+        const qreal prevT = prevNode.isNormal() ? 0 : prevNode.fT;
+        const qreal nextT = nextNode.isNormal() ? 1 : nextNode.fT;
+
+        const qreal mappedT = gMapTToFragment(prevT, nextT, mT);
+        gGetValuesForNodeInsertion(prevNode.fP1, prevNode.fC2,
+                                   newNode.fC0, newNode.fP1, newNode.fC2,
+                                   nextNode.fC0, nextNode.fP1, mappedT);
         nodes.insert(mNode1Id + 1, newNode);
     }
 private:
