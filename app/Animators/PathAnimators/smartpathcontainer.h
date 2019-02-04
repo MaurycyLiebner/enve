@@ -63,33 +63,94 @@ private:
     Type mType;
 };
 
-// !!! should be able to marge last node with first node
-class MergeNodesAction : public NodeAction {
-public:
-    MergeNodesAction(const int& firstNodeId, const int& lastNodeId) :
-        NodeAction(MERGE), mFirstNodeId(firstNodeId), mLastNodeId(lastNodeId) {}
+//class MergeNodesAction : public NodeAction {
+//public:
+//    //! @brief FirstNodeId can be negative.
+//    MergeNodesAction(const int& firstNodeId, const int& lastNodeId) :
+//        NodeAction(MERGE), mFirstNodeId(firstNodeId), mLastNodeId(lastNodeId) {}
 
-    void apply(QList<Node>& nodes) const {
-        if(mFirstNodeId >= mLastNodeId)
-            RuntimeThrow("Invalid merging range");
-        auto& firstNode = nodes[mFirstNodeId];
-        auto& lastNode = nodes[mLastNodeId];
-        firstNode.fC2 = lastNode.fC2;
-        if(lastNode.fType == Node::NORMAL_END) {
-            if(firstNode.fType == Node::NORMAL_START) {
-                firstNode.fType = Node::NORMAL_START_AND_END;
-            } else {
-                firstNode.fType = Node::NORMAL_END;
-            }
-        }
-        for(int i = mFirstNodeId + 1; i <= mLastNodeId; i++) {
-            nodes.removeAt(i);
-        }
-    }
-private:
-    int mFirstNodeId;
-    int mLastNodeId;
-};
+//    void apply(QList<Node>& nodes) const {
+//        if(mFirstNodeId >= mLastNodeId)
+//            RuntimeThrow("Invalid merging range");
+//        const int fixedFirstId = mFirstNodeId < 0 ?
+//                    nodes.count() + mFirstNodeId :
+//                    mFirstNodeId;
+//        auto& firstNode = nodes[fixedFirstId];
+//        auto& lastNode = nodes[mLastNodeId];
+//        firstNode.fC2 = lastNode.fC2;
+//        if(lastNode.fType == Node::NORMAL_END) {
+//            if(firstNode.fType == Node::NORMAL_START) {
+//                firstNode.fType = Node::NORMAL_START_AND_END;
+//            } else {
+//                firstNode.fType = Node::NORMAL_END;
+//            }
+//        }
+//        for(int i = mFirstNodeId + 1; i <= mLastNodeId; i++) {
+//            const int fixedI = i < 0 ? nodes.count() + i : i;
+//            nodes.removeAt(fixedI);
+//        }
+//    }
+//private:
+//    int mFirstNodeId;
+//    int mLastNodeId;
+//};
+
+//class SplitNodeAction : public NodeAction {
+//public:
+//    SplitNodeAction(const int& nodeId,
+//                    const int& duplicatesBefore,
+//                    const int& duplicatesAfter,
+//                    const bool& disconnect) :
+//        NodeAction(SPLIT), mNodeId(nodeId),
+//        mDuplicatesBefore(duplicatesBefore),
+//        mDuplicatesAfter(duplicatesAfter),
+//        mDisconnect(disconnect) {}
+
+//    // !!! should also handle NORMAL_END and NORMAL_START nodes
+//    void apply(QList<Node>& nodes) const {
+//        Node toSplit = nodes.takeAt(mNodeId);
+
+//        const int iMax = mDuplicatesBefore + 1 + mDuplicatesAfter;
+//        for(int i = 0; i <= iMax; i++) {
+//            Node node;
+//            node.fC0 = (i == 0 ? toSplit.fC0 : toSplit.fP1);
+//            node.fP1 = toSplit.fP1;
+//            node.fC2 = (i == iMax ? toSplit.fC2 : toSplit.fP1);
+//            node.fType = Node::NORMAL_MIDDLE;
+//            nodes.insert(mNodeId, node);
+//        }
+
+//        Node& split1 = nodes[mDuplicatesBefore + mNodeId];
+//        Node& split2 = nodes[mDuplicatesBefore + mNodeId + 1];
+//        if(mDisconnect) {
+//            if(toSplit.fType == Node::DISSOLVED)
+//                RuntimeThrow("SplitNodeAction: Unsupported Node Type DISSOLVED");
+//            if(split1.fType == Node::NORMAL_START) {
+//                split1.fType = Node::NORMAL_START_AND_END;
+//            } else {
+//                split1.fType = Node::NORMAL_END;
+//            }
+
+//            if(split2.fType == Node::NORMAL_END) {
+//                split2.fType = Node::NORMAL_START_AND_END;
+//            } else {
+//                split2.fType = Node::NORMAL_START;
+//            }
+//        }
+//    }
+//private:
+//    int mNodeId;
+//    int mDuplicatesBefore;
+//    int mDuplicatesAfter;
+//    bool mDisconnect;
+//};
+
+//! @brief Assumes node1Id is before node2Id
+bool areNodesAdjecent(const int& node1Id, const int& node2Id,
+                      const QList<Node>& nodes) {
+    if(node1Id + 1 == node2Id) return true;
+    return node1Id == nodes.count() - 1 && node2Id == 0;;
+}
 
 class DisconnectNodeAction : public NodeAction {
 public:
@@ -97,7 +158,7 @@ public:
         NodeAction(DISCONNECT), mNode1Id(node1Id), mNode2Id(node2Id) {}
 
     void apply(QList<Node>& nodes) const {
-        if(mNode1Id + 1 != mNode2Id)
+        if(!areNodesAdjecent(mNode1Id, mNode2Id, nodes))
             RuntimeThrow("Cannot disconnect non-adjacent nodes");
         Node& node1 = nodes[mNode1Id];
         Node& node2 = nodes[mNode2Id];
@@ -126,7 +187,7 @@ public:
         NodeAction(CONNECT), mNode1Id(node1Id), mNode2Id(node2Id) {}
 
     void apply(QList<Node>& nodes) const {
-        if(mNode1Id + 1 != mNode2Id)
+        if(!areNodesAdjecent(mNode1Id, mNode2Id, nodes))
             RuntimeThrow("Cannot connect non-adjacent nodes");
         Node& node1 = nodes[mNode1Id];
         Node& node2 = nodes[mNode2Id];
@@ -147,56 +208,6 @@ public:
 private:
     int mNode1Id;
     int mNode2Id;
-};
-
-class SplitNodeAction : public NodeAction {
-public:
-    SplitNodeAction(const int& nodeId,
-                    const int& duplicatesBefore,
-                    const int& duplicatesAfter,
-                    const bool& disconnect) :
-        NodeAction(SPLIT), mNodeId(nodeId),
-        mDuplicatesBefore(duplicatesBefore),
-        mDuplicatesAfter(duplicatesAfter),
-        mDisconnect(disconnect) {}
-
-    // !!! should also handle NORMAL_END and NORMAL_START nodes
-    void apply(QList<Node>& nodes) const {
-        Node toSplit = nodes.takeAt(mNodeId);
-
-        const int iMax = mDuplicatesBefore + 1 + mDuplicatesAfter;
-        for(int i = 0; i <= iMax; i++) {
-            Node node;
-            node.fC0 = (i == 0 ? toSplit.fC0 : toSplit.fP1);
-            node.fP1 = toSplit.fP1;
-            node.fC2 = (i == iMax ? toSplit.fC2 : toSplit.fP1);
-            node.fType = Node::NORMAL_MIDDLE;
-            nodes.insert(mNodeId, node);
-        }
-
-        Node& split1 = nodes[mDuplicatesBefore + mNodeId];
-        Node& split2 = nodes[mDuplicatesBefore + mNodeId + 1];
-        if(mDisconnect) {
-            if(toSplit.fType == Node::DISSOLVED)
-                RuntimeThrow("SplitNodeAction: Unsupported Node Type DISSOLVED");
-            if(split1.fType == Node::NORMAL_START) {
-                split1.fType = Node::NORMAL_START_AND_END;
-            } else {
-                split1.fType = Node::NORMAL_END;
-            }
-
-            if(split2.fType == Node::NORMAL_END) {
-                split2.fType = Node::NORMAL_START_AND_END;
-            } else {
-                split2.fType = Node::NORMAL_START;
-            }
-        }
-    }
-private:
-    int mNodeId;
-    int mDuplicatesBefore;
-    int mDuplicatesAfter;
-    bool mDisconnect;
 };
 
 class DissolveNode : public NodeAction {
