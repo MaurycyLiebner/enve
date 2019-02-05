@@ -1,4 +1,4 @@
-﻿#ifndef SMARTPATHCONTAINER_H
+#ifndef SMARTPATHCONTAINER_H
 #define SMARTPATHCONTAINER_H
 #include "simplemath.h"
 #include "skia/skiaincludes.h"
@@ -26,7 +26,7 @@ struct Node {
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
          const qreal& t) : Node(c0, p1, c2, DISSOLVED) {
-        fRelT = t;
+        fT = t;
     }
 
     bool isNormal() const {
@@ -45,8 +45,8 @@ struct Node {
     QPointF fP1;
     QPointF fC2;
 
-    //! @brief T value for segment defined by previous and next node
-    qreal fRelT;
+    //! @brief T value for segment defined by previous and next normal node
+    qreal fT;
     Type fType = DUMMY;
 };
 
@@ -152,17 +152,27 @@ public:
         }
     }
 
-    void actionInsertNormalNode(const int& nodeId, const qreal& t) {
-        mNodes.insert(nodeId, Node());
-        Node &node = mNodes[nodeId];
-        auto seg = segmentFromNodes(prevNonDummy(nodeId),
-                                    nextNonDummy(nodeId));
-        auto div = seg.dividedAtT(t);
+    void updateNodeValuesBasedOnT(const int& nodeId) {
+        Node& node = mNodes[nodeId];
+        updateNodeValuesBasedOnT(node, nodeId);
+    }
+
+    void updateNodeValuesBasedOnT(Node& node, const int& nodeId) {
+        auto seg = segmentFromNodes(prevNormal(nodeId), nextNormal(nodeId));
+        auto div = seg.dividedAtT(node.fT);
         const auto& first = div.first;
         const auto& second = div.second;
         node.fC0 = first.c2();
         node.fP1 = first.p1();
         node.fC2 = second.c1();
+    }
+
+
+    void actionInsertNormalNode(const int& nodeId, const qreal& t) {
+        mNodes.insert(nodeId, Node());
+        Node &node = mNodes[nodeId];
+        node.fT = t;
+        updateNodeValuesBasedOnT(node, nodeId);
         node.fType = Node::NORMAL_MIDDLE;
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
@@ -179,14 +189,7 @@ public:
 
     void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
         Node &node = mNodes[nodeId];
-        auto seg = segmentFromNodes(prevNonDummy(nodeId),
-                                    nextNonDummy(nodeId));
-        auto div = seg.dividedAtT(node.fRelT);
-        const auto& first = div.first;
-        const auto& second = div.second;
-        node.fC0 = first.c2();
-        node.fP1 = first.p1();
-        node.fC2 = second.c1();
+        updateNodeValuesBasedOnT(node, nodeId);
         node.fType = Node::NORMAL_MIDDLE;
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
@@ -276,7 +279,24 @@ public:
         return changed;
     }
 
-    Node prevNonDummy(const int& nodeId) {
+    Node prevNormal(const int& nodeId) const {
+        for(int i = nodeId - 1; i >= 0; i--) {
+            const Node& node = mNodes.at(i);
+            if(node.isNormal()) return node;
+        }
+        return Node();
+    }
+
+    Node nextNormal(const int& nodeId) const {
+        for(int i = nodeId + 1; i < mNodes.count(); i++) {
+            const Node& node = mNodes.at(i);
+            if(node.isNormal()) return node;
+        }
+        return Node();
+    }
+
+
+    Node prevNonDummy(const int& nodeId) const {
         for(int i = nodeId - 1; i >= 0; i--) {
             const Node& node = mNodes.at(i);
             if(node.fType != Node::DUMMY) return node;
@@ -284,12 +304,24 @@ public:
         return Node();
     }
 
-    Node nextNonDummy(const int& nodeId) {
+    Node nextNonDummy(const int& nodeId) const {
         for(int i = nodeId + 1; i < mNodes.count(); i++) {
             const Node& node = mNodes.at(i);
             if(node.fType != Node::DUMMY) return node;
         }
         return Node();
+    }
+
+    qreal prevT(const int& nodeId) const {
+        Node node = prevNonDummy(nodeId);
+        if(node.isNormal()) return 0;
+        return node.fT;
+    }
+
+    qreal nextT(const int& nodeId) const {
+        Node node = nextNonDummy(nodeId);
+        if(node.isNormal()) return 1;
+        return node.fT;
     }
 
     //! @brief Returns true if changed.
@@ -300,15 +332,8 @@ public:
         const Node::Type nextType = mNext ? mNext->nodeType(nodeId) : Node::DUMMY;
         if(NODE_TYPE_NORMAL(prevType) || NODE_TYPE_NORMAL(nextType)) {
             if(node.fType != Node::DISSOLVED) {
-                node.fRelT = 0.5;
-                auto seg = segmentFromNodes(prevNonDummy(nodeId),
-                                            nextNonDummy(nodeId));
-                auto div = seg.dividedAtT(node.fRelT);
-                const auto& first = div.first;
-                const auto& second = div.second;
-                node.fC0 = first.c2();
-                node.fP1 = first.p1();
-                node.fC2 = second.c1();
+                node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
+                updateNodeValuesBasedOnT(nodeId);
                 node.fType = Node::DISSOLVED;
                 return true;
             }
