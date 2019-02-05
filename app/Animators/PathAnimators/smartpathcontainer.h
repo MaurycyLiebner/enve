@@ -102,8 +102,114 @@ qCubicSegment2D segmentFromNodes(const Node& prevNode,
 #include "framerange.h"
 #include "smartPointers/stdselfref.h"
 #include "smartPointers/stdpointer.h"
-class SmartPath : public StdSelfRef {
+
+class NodeIdUsage : public StdSelfRef {
 public:
+    //! @brief Increments and returns current usage.
+    const int& incUsage(const int& id) {
+        int& usage = mUsage[id];
+        return ++usage;
+    }
+
+    //! @brief Decrements and returns current usage.
+    const int& decUsage(const int& id) {
+        int& usage = mUsage[id];
+        if(usage == 0)
+            RuntimeThrow("Node id usage reached negative value");
+        return --usage;
+    }
+
+    void remove(const int& id) {
+        if(mUsage.takeAt(id) != 0)
+            RuntimeThrow("Non-zero usage removed");
+    }
+
+    void insertFirstUsage(const int& id) {
+        mUsage.insert(id, 1);
+    }
+private:
+    QList<int> mUsage;
+};
+
+class SmartPath : public StdSelfRef {
+    enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
+public:
+    void actionRemoveNormalNode(const int& nodeId) {
+        Node& node = mNodes[nodeId];
+        if(!node.isNormal())
+            RuntimeThrow("Invalid node type. "
+                         "Only normal nodes can be removed.");
+
+        if(mIdUsage->decUsage(nodeId) == 0) {
+            mIdUsage->remove(nodeId);
+            if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
+            if(mNext) mNext->removeNodeWithIdAndTellNextToDoSame(nodeId);
+        } else {
+            node.fType = Node::DUMMY;
+            if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
+            if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
+            updateNodeTypeAfterNeighbourChanged(nodeId);
+        }
+    }
+
+    void actionInsertNormalNode(const int& nodeId, const qreal& t) {
+        mNodes.insert(nodeId, Node());
+        Node &node = mNodes[nodeId];
+        auto seg = segmentFromNodes(prevNonDummy(nodeId),
+                                    nextNonDummy(nodeId));
+        auto div = seg.dividedAtT(t);
+        const auto& first = div.first;
+        const auto& second = div.second;
+        node.fC0 = first.c2();
+        node.fP1 = first.p1();
+        node.fC2 = second.c1();
+        node.fType = Node::NORMAL_MIDDLE;
+        if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
+        if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
+    }
+
+    void actionInsertNormalNode(const int& nodeId,
+                                const QPointF& c0,
+                                const QPointF& p1,
+                                const QPointF& c2) {
+        mNodes.insert(nodeId, Node(c0, p1, c2, Node::NORMAL_MIDDLE));
+        if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
+        if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
+    }
+
+    void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
+        Node &node = mNodes[nodeId];
+        auto seg = segmentFromNodes(prevNonDummy(nodeId),
+                                    nextNonDummy(nodeId));
+        auto div = seg.dividedAtT(node.fRelT);
+        const auto& first = div.first;
+        const auto& second = div.second;
+        node.fC0 = first.c2();
+        node.fP1 = first.p1();
+        node.fC2 = second.c1();
+        node.fType = Node::NORMAL_MIDDLE;
+        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
+        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
+    }
+
+//    Neighbour nodeDissolvedFor(const int& nodeId) {
+//        Node& node = mNodes[nodeId];
+//        if(!node.isDissolved())
+//            RuntimeThrow("Accepts only nodes with type DISSOLVED");
+//        Neighbour neigh = NONE;
+//        if(mPrev) {
+//            if(NODE_TYPE_NORMAL(mPrev->nodeType(nodeId))) {
+//                neigh = static_cast<Neighbour>(neigh | PREV);
+//            }
+//        }
+//        if(mNext) {
+//            if(NODE_TYPE_NORMAL(mNext->nodeType(nodeId))) {
+//                neigh = static_cast<Neighbour>(neigh | NEXT);
+//            }
+//        }
+//        return neigh;
+//    }
+
     void normalNodeInsertedToPrev(const int& insertedNodeId) {
         mNodes.insert(insertedNodeId, Node());
         updateNodeTypeAfterNeighbourChanged(insertedNodeId);
@@ -134,6 +240,16 @@ public:
     void dummyNodeInsertedToNext(const int& insertedNodeId) {
         mNodes.insert(insertedNodeId, Node());
         if(mPrev) mPrev->dummyNodeInsertedToNext(insertedNodeId);
+    }
+
+    void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId) {
+        mNodes.removeAt(nodeId);
+        if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
+    }
+
+    void removeNodeWithIdAndTellNextToDoSame(const int& nodeId) {
+        mNodes.removeAt(nodeId);
+        if(mNext) mNext->removeNodeWithIdAndTellNextToDoSame(nodeId);
     }
 
     Node::Type nodeType(const int& nodeId) const {
@@ -185,16 +301,15 @@ public:
         if(NODE_TYPE_NORMAL(prevType) || NODE_TYPE_NORMAL(nextType)) {
             if(node.fType != Node::DISSOLVED) {
                 node.fRelT = 0.5;
+                auto seg = segmentFromNodes(prevNonDummy(nodeId),
+                                            nextNonDummy(nodeId));
+                auto div = seg.dividedAtT(node.fRelT);
+                const auto& first = div.first;
+                const auto& second = div.second;
+                node.fC0 = first.c2();
+                node.fP1 = first.p1();
+                node.fC2 = second.c1();
                 node.fType = Node::DISSOLVED;
-//                auto seg = segmentFromNodes(prevNonDummy(nodeId),
-//                                            nextNonDummy(nodeId));
-//                auto div = seg.dividedAtT(node.fRelT);
-//                const auto& first = div.first;
-//                const auto& second = div.second;
-//                node.fC0 = first.c2();
-//                node.fP1 = first.p1();
-//                node.fC2 = second.c1();
-
                 return true;
             }
             return false;
@@ -258,6 +373,7 @@ private:
         return result;
     }
 
+    stdsptr<NodeIdUsage> mIdUsage;
     stdptr<SmartPath> mPrev;
     QList<Node> mNodes;
     stdptr<SmartPath> mNext;
