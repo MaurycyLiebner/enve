@@ -280,10 +280,22 @@ public:
         }
     }
 
+    void splitNode(const int& nodeId, QList<Node>& nodes) const {
+        Node& node = nodes[nodeId];
+        splitNode(node, nodeId, nodes);
+    }
+
+    void splitNode(Node& node, const int& nodeId, QList<Node>& nodes) const {
+        Node newNode = node;
+        node.fC2 = node.fP1;
+        newNode.fC0 = newNode.fP1;
+        nodes.insert(nodeId + 1, newNode);
+    }
+
     void splitNodeAndDisconnect(const int& nodeId,
                                 QList<Node>& nodes) const {
+        splitNode(nodeId, nodes);
         nodes.insert(nodeId + 1, Node(Node::MOVE));
-        nodes.insert(nodeId + 2, nodes.at(nodeId));
     }
 
     void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
@@ -481,36 +493,59 @@ public:
         return mNodes;
     }
 
-    QList<Node> getNodesForPrev() {
-        if(mPrev) return getNodesFor(mPrev->getNodes());
-        return QList<Node>();
+    SkPath getPathForPrev() const {
+        if(mPrev) return getPathFor(mPrev);
+        return nodesToSkPath(mNodes);
     }
 
-    QList<Node> getNodesForNext() {
-        if(mNext) return getNodesFor(mNext->getNodes());
-        return QList<Node>();
+    SkPath getPathForNext() const {
+        if(mNext) return getPathFor(mNext);
+        return nodesToSkPath(mNodes);
+    }
+    SkPath getPathAt() const {
+        return nodesToSkPath(mNodes);
+    }
+
+    SkPath interpolateWithNext(const qreal& nextWeight) const {
+        if(!mNext) return getPathAt();
+        SkPath result;
+        getPathForNext().interpolate(mNext->getPathForPrev(),
+                                     qrealToSkScalar(nextWeight),
+                                     &result);
+        return result;
+    }
+
+    SkPath interpolateWithPrev(const qreal& nextWeight) const {
+        if(!mPrev) return getPathAt();
+        SkPath result;
+        getPathForPrev().interpolate(mPrev->getPathForNext(),
+                                     qrealToSkScalar(nextWeight),
+                                     &result);
+        return result;
     }
 private:
-    QList<Node> getNodesFor(const QList<Node>& neighbour) const {
+    SkPath getPathFor(SmartPath * const neighbour) const {
+        const auto& neighNodes = neighbour->getNodes();
         QList<Node> result = mNodes;
 
-        int iMax = neighbour.count() - 1;
+        int iMax = neighNodes.count() - 1;
+        if(result.count() - 1 != iMax)
+            RuntimeThrow("Nodes count does not match");
+
         int iShift = 0;
         bool duplicateNext = false;
-        QPointF prevNormalP1;
+        int prevNormalId = -1;
         for(int i = 0; i <= iMax; i++) {
             const int resI = i + iShift;
             Node& resultNode = result[resI];
-            const Node& neighbourNode = neighbour.at(i);
+            const Node& neighbourNode = neighNodes.at(i);
 
             if((neighbourNode.isDummy() || neighbourNode.isDissolved()) &&
                     (resultNode.isDummy() || resultNode.isDissolved())) {
                 iShift--;
                 result.removeAt(resI);
             } else if(neighbourNode.isDissolved() && resultNode.isMove()) {
-                result.insert(resI, Node(prevNormalP1,
-                                         prevNormalP1,
-                                         prevNormalP1));
+                splitNode(prevNormalId, result);
                 iShift++;
                 duplicateNext = true;
             } else if(resultNode.isDissolved() && neighbourNode.isMove()) {
@@ -518,17 +553,15 @@ private:
                 splitNodeAndDisconnect(resI, result);
                 iShift += 2;
             } else if(resultNode.isNormal()) {
-                prevNormalP1 = resultNode.fP1;
+                prevNormalId = resI;
                 if(duplicateNext) {
-                    result.insert(resI, Node(resultNode.fP1,
-                                             resultNode.fP1,
-                                             resultNode.fP1));
+                    splitNode(resultNode, resI, result);
                     iShift++;
                     duplicateNext = false;
                 }
             }
         }
-        return result;
+        return nodesToSkPath(result);
     }
 
     stdsptr<NodeIdUsage> mIdUsage;
