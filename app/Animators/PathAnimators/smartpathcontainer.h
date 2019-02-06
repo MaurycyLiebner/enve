@@ -7,7 +7,7 @@
 
 struct Node {
     enum Type {
-        NORMAL, START, END, CLOSE, DISSOLVED, DUMMY, MOVE
+        NORMAL, CLOSE, WRAP, DISSOLVED, DUMMY, MOVE
     };
 
     Node() : Node(DUMMY) {}
@@ -30,13 +30,11 @@ struct Node {
         fType = DISSOLVED;
     }
 
+    bool isMove() const { return fType == MOVE; }
+
     bool isClose() const { return fType == CLOSE; }
 
-    bool isStart() const { return fType == START; }
-
-    bool isEnd() const { return fType == END; }
-
-    bool isMove() const { return fType == MOVE; }
+    bool isWrap() const { return fType == WRAP; }
 
     bool isNormal() const { return fType == NORMAL; }
 
@@ -68,30 +66,43 @@ int fixNegativeId(const int& id, const QList<Node>& nodes) {
 SkPath nodesToSkPath(const QList<Node>& nodes) {
     SkPath result;
     QPointF lastC2;
-    bool first = true;
+    bool move = true;
+    QList<qreal> dissolvedTs;
     Node firstMoveNode;
     Node prevNormalNode;
+    Node firstNormalNode;
     for(const Node& node : nodes) {
         if(node.isDummy()) continue;
-
-        const bool move = first || node.fType == Node::START;
-        if(first) first = false;
+        if(node.isNormal() && firstNormalNode.isDummy()) {
+            firstNormalNode = node;
+        }
         if(move) {
+            if(!node.isNormal()) continue;
             firstMoveNode = node;
             result.moveTo(qPointToSk(node.fP1));
             lastC2 = node.fC2;
-            continue;
-        }
-        result.cubicTo(qPointToSk(lastC2),
-                       qPointToSk(node.fC0),
-                       qPointToSk(node.fP1));
-        if(node.fType == Node::END) {
-            result.cubicTo(qPointToSk(node.fC2),
-                           qPointToSk(firstMoveNode.fC0),
-                           qPointToSk(firstMoveNode.fP1));
+            move = false;
         } else {
-            lastC2 = node.fC2;
+            if(node.fType == Node::NORMAL) {
+                result.cubicTo(qPointToSk(prevNormalNode.fC2),
+                               qPointToSk(node.fC0),
+                               qPointToSk(node.fP1));
+            } if(node.fType == Node::CLOSE) {
+                result.cubicTo(qPointToSk(prevNormalNode.fC2),
+                               qPointToSk(firstMoveNode.fC0),
+                               qPointToSk(firstMoveNode.fP1));
+            } else if(node.fType == Node::WRAP) {
+                result.cubicTo(qPointToSk(prevNormalNode.fC2),
+                               qPointToSk(firstNormalNode.fC0),
+                               qPointToSk(firstNormalNode.fP1));
+            } else if(node.fType == Node::MOVE) {
+                move = true;
+            } else {
+                lastC2 = node.fC2;
+            }
         }
+
+        if(node.isNormal()) prevNormalNode = node;
 
     }
     return result;
