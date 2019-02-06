@@ -65,46 +65,80 @@ int fixNegativeId(const int& id, const QList<Node>& nodes) {
 
 SkPath nodesToSkPath(const QList<Node>& nodes) {
     SkPath result;
-    QPointF lastC2;
     bool move = true;
-    QList<qreal> dissolvedTs;
+
     Node firstMoveNode;
     Node prevNormalNode;
     Node firstNormalNode;
+
+    bool currentSegmentWaiting = false;
+    qCubicSegment2D currentNormalSegment;
+    qreal lastT = 0;
     for(const Node& node : nodes) {
         if(node.isDummy()) continue;
         if(node.isNormal() && firstNormalNode.isDummy()) {
             firstNormalNode = node;
         }
         if(move) {
-            if(!node.isNormal()) continue;
+            if(!node.isNormal())
+                RuntimeThrow("Segment starts with an unsupported type");
             firstMoveNode = node;
             result.moveTo(qPointToSk(node.fP1));
-            lastC2 = node.fC2;
             move = false;
         } else {
-            if(node.fType == Node::NORMAL) {
-                result.cubicTo(qPointToSk(prevNormalNode.fC2),
-                               qPointToSk(node.fC0),
-                               qPointToSk(node.fP1));
-            } if(node.fType == Node::CLOSE) {
-                result.cubicTo(qPointToSk(prevNormalNode.fC2),
-                               qPointToSk(firstMoveNode.fC0),
-                               qPointToSk(firstMoveNode.fP1));
-            } else if(node.fType == Node::WRAP) {
-                result.cubicTo(qPointToSk(prevNormalNode.fC2),
-                               qPointToSk(firstNormalNode.fC0),
-                               qPointToSk(firstNormalNode.fP1));
-            } else if(node.fType == Node::MOVE) {
-                move = true;
-            } else {
-                lastC2 = node.fC2;
-            }
-        }
+            if(node.fType == Node::DISSOLVED) {
+                if(!currentSegmentWaiting)
+                    RuntimeThrow("No segment to divide");
+                auto div = currentNormalSegment.dividedAtT(
+                            gMapTToFragment(lastT, 1, node.fT));
+                const auto& first = div.first;
+                result.cubicTo(qPointToSk(first.c1()),
+                               qPointToSk(first.c2()),
+                               qPointToSk(first.p1()));
+                currentNormalSegment = div.second;
+                lastT = node.fT;
+            } else { // if not dissolved
+                if(currentSegmentWaiting) {
+                    result.cubicTo(qPointToSk(currentNormalSegment.c1()),
+                                   qPointToSk(currentNormalSegment.c2()),
+                                   qPointToSk(currentNormalSegment.p1()));
+                    currentSegmentWaiting = false;
+                }
+                if(node.fType == Node::NORMAL) {
+                    currentNormalSegment = qCubicSegment2D(prevNormalNode.fP1,
+                                                           prevNormalNode.fC2,
+                                                           node.fC0, node.fP1);
+                    currentSegmentWaiting = true;
+                } else if(node.fType == Node::CLOSE) {
+                    currentNormalSegment = qCubicSegment2D(prevNormalNode.fP1,
+                                                           prevNormalNode.fC2,
+                                                           firstMoveNode.fC0,
+                                                           firstMoveNode.fP1);
+                    currentSegmentWaiting = true;
+                } else if(node.fType == Node::WRAP) {
+                    currentNormalSegment = qCubicSegment2D(prevNormalNode.fP1,
+                                                           prevNormalNode.fC2,
+                                                           firstNormalNode.fC0,
+                                                           firstNormalNode.fP1);
+                    currentSegmentWaiting = true;
+                } else if(node.fType == Node::MOVE) {
+                    move = true;
+                } else {
+                    RuntimeThrow("Unrecognized node type");
+                }
+            } // if/else dissolved
+        } // if/else move
 
         if(node.isNormal()) prevNormalNode = node;
+    } // for each node
 
+    if(currentSegmentWaiting) {
+        result.cubicTo(qPointToSk(currentNormalSegment.c1()),
+                       qPointToSk(currentNormalSegment.c2()),
+                       qPointToSk(currentNormalSegment.p1()));
+        currentSegmentWaiting = false;
     }
+
     return result;
 }
 

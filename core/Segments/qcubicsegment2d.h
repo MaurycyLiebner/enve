@@ -33,6 +33,8 @@ struct qCubicSegment2D {
         mP0 = p; mC1 = p; mC2 = p; mP1 = p;
     }
 
+    qCubicSegment2D() {}
+
     qCubicSegment2D(const qCubicSegment1D& xSeg,
                     const qCubicSegment1D& ySeg);
 
