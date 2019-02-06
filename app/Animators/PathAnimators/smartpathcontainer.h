@@ -6,8 +6,8 @@
 #include "pointhelpers.h"
 
 struct Node {
-    enum Type {
-        NORMAL, NORMAL_CLOSE_AFTER, NORMAL_WRAP_AFTER, DISSOLVED, DUMMY, MOVE
+    enum Type : char {
+        DUMMY, DISSOLVED, NORMAL, NORMAL_CLOSE_AFTER, NORMAL_WRAP_AFTER, MOVE
     };
 
     Node() : Node(DUMMY) {}
@@ -36,7 +36,9 @@ struct Node {
 
     bool wrapAfter() const { return fType == NORMAL_WRAP_AFTER; }
 
-    bool isNormal() const { return fType == NORMAL; }
+    bool isNormal() const { return fType == NORMAL ||
+                                   fType == NORMAL_WRAP_AFTER ||
+                                   fType == NORMAL_CLOSE_AFTER; }
 
     bool isDummy() const { return fType == DUMMY; }
 
@@ -50,6 +52,12 @@ struct Node {
     qreal fT;
     Type fType;
 };
+
+bool isNormal(const Node::Type& type) {
+    return type == Node::NORMAL ||
+           type == Node::NORMAL_WRAP_AFTER ||
+           type == Node::NORMAL_CLOSE_AFTER;
+}
 
 //! @brief Assumes node1Id is before node2Id
 bool areNodesAdjecent(const int& node1Id, const int& node2Id,
@@ -215,7 +223,6 @@ public:
         node.fC2 = second.c1();
     }
 
-
     void actionInsertNormalNode(const int& nodeId, const qreal& t) {
         mNodes.insert(nodeId, Node());
         Node &node = mNodes[nodeId];
@@ -235,10 +242,52 @@ public:
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
     }
 
-    void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
-        Node &node = mNodes[nodeId];
-        updateNodeValuesBasedOnT(node, nodeId);
+    void promoteDissolvedNodeToNormal(const int& nodeId,
+                                      QList<Node>& nodes) const {
+        Node& node = nodes[nodeId];
+        promoteDissolvedNodeToNormal(nodeId, node, nodes);
+    }
+
+    void promoteDissolvedNodeToNormal(const int& nodeId,
+                                      Node& node,
+                                      QList<Node>& nodes) const {
+        const int prevNormalIdV = prevNormalId(nodeId, nodes);
+        const int nextNormalIdV = nextNormalId(nodeId, nodes);
+        Node& prevNormal = nodes[prevNormalIdV];
+        Node& nextNormal = nodes[nextNormalIdV];
+
+        auto seg = segmentFromNodes(prevNormal, nextNormal);
+        auto div = seg.dividedAtT(node.fT);
+        const auto& first = div.first;
+        const auto& second = div.second;
+        prevNormal.fC2 = first.c1();
+        node.fC0 = first.c2();
+        node.fP1 = first.p1();
+        node.fC2 = second.c1();
         node.fType = Node::NORMAL;
+        nextNormal.fC0 = second.c2();
+        for(int i = prevNormalIdV + 1; i < nodeId; i++) {
+            Node& iNode = nodes[i];
+            if(iNode.isDissolved()) {
+                iNode.fT = gMapTToFragment(0, node.fT, iNode.fT);
+            }
+        }
+        for(int i = nodeId + 1; i < nextNormalIdV; i++) {
+            Node& iNode = nodes[i];
+            if(iNode.isDissolved()) {
+                iNode.fT = gMapTToFragment(node.fT, 1, iNode.fT);
+            }
+        }
+    }
+
+    void splitNodeAndDisconnect(const int& nodeId,
+                                QList<Node>& nodes) const {
+        nodes.insert(nodeId + 1, Node(Node::MOVE));
+        nodes.insert(nodeId + 2, nodes.at(nodeId));
+    }
+
+    void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
+        promoteDissolvedNodeToNormal(nodeId, mNodes);
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
     }
@@ -328,21 +377,44 @@ public:
     }
 
     Node prevNormal(const int& nodeId) const {
-        for(int i = nodeId - 1; i >= 0; i--) {
-            const Node& node = mNodes.at(i);
-            if(node.isNormal()) return node;
-        }
-        return Node();
+        return prevNormal(nodeId, mNodes);
     }
 
     Node nextNormal(const int& nodeId) const {
-        for(int i = nodeId + 1; i < mNodes.count(); i++) {
-            const Node& node = mNodes.at(i);
+        return nextNormal(nodeId, mNodes);
+    }
+
+    int prevNormalId(const int& nodeId, const QList<Node>& nodes) const {
+        for(int i = nodeId - 1; i >= 0; i--) {
+            const Node& node = nodes.at(i);
+            if(node.isNormal()) return i;
+        }
+        return -1;
+    }
+
+    int nextNormalId(const int& nodeId, const QList<Node>& nodes) const {
+        for(int i = nodeId + 1; i < nodes.count(); i++) {
+            const Node& node = nodes.at(i);
+            if(node.isNormal()) return i;
+        }
+        return -1;
+    }
+
+    Node prevNormal(const int& nodeId, const QList<Node>& nodes) const {
+        for(int i = nodeId - 1; i >= 0; i--) {
+            const Node& node = nodes.at(i);
             if(node.isNormal()) return node;
         }
         return Node();
     }
 
+    Node nextNormal(const int& nodeId, const QList<Node>& nodes) const {
+        for(int i = nodeId + 1; i < nodes.count(); i++) {
+            const Node& node = nodes.at(i);
+            if(node.isNormal()) return node;
+        }
+        return Node();
+    }
 
     Node prevNonDummy(const int& nodeId) const {
         for(int i = nodeId - 1; i >= 0; i--) {
@@ -375,10 +447,11 @@ public:
     //! @brief Returns true if changed.
     bool updateNodeTypeAfterNeighbourChanged(const int& nodeId) {
         Node& node = mNodes[nodeId];
-        if(node.isNormal()) return false;
+        if(node.isNormal() || node.isMove()) return false;
         const Node::Type prevType = mPrev ? mPrev->nodeType(nodeId) : Node::DUMMY;
         const Node::Type nextType = mNext ? mNext->nodeType(nodeId) : Node::DUMMY;
-        if(prevType == Node::NORMAL || nextType == Node::NORMAL) {
+        if(isNormal(prevType) || isNormal(nextType) ||
+                prevType == Node::MOVE || nextType == Node::MOVE) {
             if(node.fType != Node::DISSOLVED) {
                 node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
                 updateNodeValuesBasedOnT(nodeId);
@@ -423,25 +496,36 @@ private:
 
         int iMax = neighbour.count() - 1;
         int iShift = 0;
+        bool duplicateNext = false;
+        QPointF prevNormalP1;
         for(int i = 0; i <= iMax; i++) {
-            Node& resultNode = result[i + iShift];
+            const int resI = i + iShift;
+            Node& resultNode = result[resI];
             const Node& neighbourNode = neighbour.at(i);
 
-            if(resultNode.fType == neighbourNode.fType) continue;
-            if(neighbourNode.fType == Node::NORMAL &&
-                    resultNode.isDissolved()) continue;
-
-            if(neighbourNode.isNormal() && resultNode.isDissolved()) {
-                resultNode.fType = neighbourNode.fType;
-                continue;
-            }
-            if(neighbourNode.isDummy() && resultNode.isDissolved()) {
-                resultNode.fType = Node::DUMMY;
-                continue;
-            }
-            if(resultNode.fType == Node::NORMAL &&
-                    neighbourNode.isNormal()) {
-                resultNode.fType = neighbourNode.fType;
+            if((neighbourNode.isDummy() || neighbourNode.isDissolved()) &&
+                    (resultNode.isDummy() || resultNode.isDissolved())) {
+                iShift--;
+                result.removeAt(resI);
+            } else if(neighbourNode.isDissolved() && resultNode.isMove()) {
+                result.insert(resI, Node(prevNormalP1,
+                                         prevNormalP1,
+                                         prevNormalP1));
+                iShift++;
+                duplicateNext = true;
+            } else if(resultNode.isDissolved() && neighbourNode.isMove()) {
+                promoteDissolvedNodeToNormal(resI, result);
+                splitNodeAndDisconnect(resI, result);
+                iShift += 2;
+            } else if(resultNode.isNormal()) {
+                prevNormalP1 = resultNode.fP1;
+                if(duplicateNext) {
+                    result.insert(resI, Node(resultNode.fP1,
+                                             resultNode.fP1,
+                                             resultNode.fP1));
+                    iShift++;
+                    duplicateNext = false;
+                }
             }
         }
         return result;
