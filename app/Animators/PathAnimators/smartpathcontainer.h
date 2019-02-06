@@ -7,7 +7,7 @@
 
 struct Node {
     enum Type {
-        NORMAL, CLOSE, WRAP, DISSOLVED, DUMMY, MOVE
+        NORMAL, NORMAL_CLOSE_AFTER, NORMAL_WRAP_AFTER, DISSOLVED, DUMMY, MOVE
     };
 
     Node() : Node(DUMMY) {}
@@ -32,9 +32,9 @@ struct Node {
 
     bool isMove() const { return fType == MOVE; }
 
-    bool isClose() const { return fType == CLOSE; }
+    bool closeAfter() const { return fType == NORMAL_CLOSE_AFTER; }
 
-    bool isWrap() const { return fType == WRAP; }
+    bool wrapAfter() const { return fType == NORMAL_WRAP_AFTER; }
 
     bool isNormal() const { return fType == NORMAL; }
 
@@ -109,13 +109,13 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
                                                            prevNormalNode.fC2,
                                                            node.fC0, node.fP1);
                     currentSegmentWaiting = true;
-                } else if(node.fType == Node::CLOSE) {
+                } else if(node.fType == Node::NORMAL_CLOSE_AFTER) {
                     currentNormalSegment = qCubicSegment2D(prevNormalNode.fP1,
                                                            prevNormalNode.fC2,
                                                            firstMoveNode.fC0,
                                                            firstMoveNode.fP1);
                     currentSegmentWaiting = true;
-                } else if(node.fType == Node::WRAP) {
+                } else if(node.fType == Node::NORMAL_WRAP_AFTER) {
                     currentNormalSegment = qCubicSegment2D(prevNormalNode.fP1,
                                                            prevNormalNode.fC2,
                                                            firstNormalNode.fC0,
