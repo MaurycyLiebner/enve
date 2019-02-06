@@ -5,41 +5,44 @@
 #include "exceptions.h"
 #include "pointhelpers.h"
 
-#define EQUAL_3_OR(val, or1, or2, or3) val == or1 || val == or2 || val == or3
-#define NODE_TYPE_NORMAL(type) \
-    EQUAL_3_OR(type, Node::NORMAL_MIDDLE, Node::NORMAL_START, Node::NORMAL_END)
 struct Node {
     enum Type {
-        NORMAL_MIDDLE, NORMAL_START, NORMAL_END,
-        NORMAL_START_AND_END, DISSOLVED, DUMMY
+        NORMAL, START, END, CLOSE, DISSOLVED, DUMMY, MOVE
     };
 
-    Node() {}
+    Node() : Node(DUMMY) {}
 
-    Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
-         const Type& type) {
+    Node(const Type& type) { fType = type; }
+
+    Node(const QPointF& c0, const QPointF& p1, const QPointF& c2) {
         fC0 = c0;
         fP1 = p1;
         fC2 = c2;
-        fType = type;
+        fType = NORMAL;
     }
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
-         const qreal& t) : Node(c0, p1, c2, DISSOLVED) {
+         const qreal& t) {
+        fC0 = c0;
+        fP1 = p1;
+        fC2 = c2;
         fT = t;
+        fType = DISSOLVED;
     }
 
-    bool isNormal() const {
-        return NODE_TYPE_NORMAL(fType);
-    }
+    bool isClose() const { return fType == CLOSE; }
 
-    bool isDummy() const {
-        return fType == DUMMY;
-    }
+    bool isStart() const { return fType == START; }
 
-    bool isDissolved() const {
-        return fType == DISSOLVED;
-    }
+    bool isEnd() const { return fType == END; }
+
+    bool isMove() const { return fType == MOVE; }
+
+    bool isNormal() const { return fType == NORMAL; }
+
+    bool isDummy() const { return fType == DUMMY; }
+
+    bool isDissolved() const { return fType == DISSOLVED; }
 
     QPointF fC0;
     QPointF fP1;
@@ -47,7 +50,7 @@ struct Node {
 
     //! @brief T value for segment defined by previous and next normal node
     qreal fT;
-    Type fType = DUMMY;
+    Type fType;
 };
 
 //! @brief Assumes node1Id is before node2Id
@@ -71,7 +74,7 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
     for(const Node& node : nodes) {
         if(node.isDummy()) continue;
 
-        const bool move = first || node.fType == Node::NORMAL_START;
+        const bool move = first || node.fType == Node::START;
         if(first) first = false;
         if(move) {
             firstMoveNode = node;
@@ -82,7 +85,7 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
         result.cubicTo(qPointToSk(lastC2),
                        qPointToSk(node.fC0),
                        qPointToSk(node.fP1));
-        if(node.fType == Node::NORMAL_END) {
+        if(node.fType == Node::END) {
             result.cubicTo(qPointToSk(node.fC2),
                            qPointToSk(firstMoveNode.fC0),
                            qPointToSk(firstMoveNode.fP1));
@@ -173,7 +176,7 @@ public:
         Node &node = mNodes[nodeId];
         node.fT = t;
         updateNodeValuesBasedOnT(node, nodeId);
-        node.fType = Node::NORMAL_MIDDLE;
+        node.fType = Node::NORMAL;
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
     }
@@ -182,7 +185,7 @@ public:
                                 const QPointF& c0,
                                 const QPointF& p1,
                                 const QPointF& c2) {
-        mNodes.insert(nodeId, Node(c0, p1, c2, Node::NORMAL_MIDDLE));
+        mNodes.insert(nodeId, Node(c0, p1, c2, Node::NORMAL));
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
     }
@@ -190,7 +193,7 @@ public:
     void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
         Node &node = mNodes[nodeId];
         updateNodeValuesBasedOnT(node, nodeId);
-        node.fType = Node::NORMAL_MIDDLE;
+        node.fType = Node::NORMAL;
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
     }
@@ -330,7 +333,7 @@ public:
         if(node.isNormal()) return false;
         const Node::Type prevType = mPrev ? mPrev->nodeType(nodeId) : Node::DUMMY;
         const Node::Type nextType = mNext ? mNext->nodeType(nodeId) : Node::DUMMY;
-        if(NODE_TYPE_NORMAL(prevType) || NODE_TYPE_NORMAL(nextType)) {
+        if(prevType == Node::NORMAL || nextType == Node::NORMAL) {
             if(node.fType != Node::DISSOLVED) {
                 node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
                 updateNodeValuesBasedOnT(nodeId);
@@ -374,23 +377,24 @@ private:
         QList<Node> result = mNodes;
 
         int iMax = neighbour.count() - 1;
+        int iShift = 0;
         for(int i = 0; i <= iMax; i++) {
-            Node& resultNode = result[i];
+            Node& resultNode = result[i + iShift];
             const Node& neighbourNode = neighbour.at(i);
 
             if(resultNode.fType == neighbourNode.fType) continue;
-            if(neighbourNode.fType == Node::NORMAL_MIDDLE &&
+            if(neighbourNode.fType == Node::NORMAL &&
                     resultNode.isDissolved()) continue;
-            if(neighbourNode.isNormal() &&
-                    resultNode.isDissolved()) {
+
+            if(neighbourNode.isNormal() && resultNode.isDissolved()) {
                 resultNode.fType = neighbourNode.fType;
                 continue;
             }
             if(neighbourNode.isDummy() && resultNode.isDissolved()) {
-                    resultNode.fType = Node::DUMMY;
+                resultNode.fType = Node::DUMMY;
                 continue;
             }
-            if(resultNode.fType == Node::NORMAL_MIDDLE &&
+            if(resultNode.fType == Node::NORMAL &&
                     neighbourNode.isNormal()) {
                 resultNode.fType = neighbourNode.fType;
             }
