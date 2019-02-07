@@ -21,11 +21,7 @@ struct Node {
         mType = NORMAL;
     }
 
-    Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
-         const qreal& t) {
-        fC0 = c0;
-        fP1 = p1;
-        fC2 = c2;
+    Node(const qreal& t) {
         fT = t;
         mType = DISSOLVED;
     }
@@ -313,10 +309,9 @@ public:
             RuntimeThrow("Invalid node type. "
                          "Only normal nodes can be removed.");
 
-        removeNodeFromList(nodeId);
-
         if(mIdUsage->decUsage(nodeId) == 0) {
             mIdUsage->remove(nodeId);
+            removeNodeFromList(nodeId);
             if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
             if(mNext) mNext->removeNodeWithIdAndTellNextToDoSame(nodeId);
         } else {
@@ -328,9 +323,7 @@ public:
     }
 
     void actionInsertNormalNode(const int& nodeId, const qreal& t) {
-        Node &node = insertNodeToList(nodeId, Node());
-        node.fT = t;
-        node.setType(Node::DISSOLVED);
+        Node &node = insertNodeToList(nodeId, Node(t));
         promoteDissolvedNodeToNormal(nodeId, node, mNodes);
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
@@ -340,9 +333,24 @@ public:
                                   const QPointF& c0,
                                   const QPointF& p1,
                                   const QPointF& c2) {
-        insertNodeToList(nodeId, Node(c0, p1, c2, Node::NORMAL));
-        if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
-        if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
+        Node& endNode = mNodes[nodeId];
+        bool isNext;
+        if(!endNode.getNextNodeId()) {
+            endNode.setNextNodeId(nodeId);
+            isNext = true;
+        } else if(!endNode.getPrevNodeId()) {
+            endNode.setPrevNodeId(nodeId);
+            isNext = false;
+        } else RuntimeThrow("Wrong assumptions. Node is not and end node.");
+        const int insertId = isNext ? nodeId + 1 : nodeId;
+        Node& newNode = insertNodeToList(insertId, Node(c0, p1, c2));
+        if(isNext) {
+            newNode.setPrevNodeId(nodeId);
+        } else {
+            newNode.setNextNodeId(nodeId + 1);
+        }
+        if(mPrev) mPrev->normalNodeInsertedToNext(insertId);
+        if(mNext) mNext->normalNodeInsertedToPrev(insertId);
     }
 
     void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
@@ -421,32 +429,13 @@ public:
         }
     }
 
-    void splitNodeAndDisconnect(const int& nodeId,
-                                QList<Node>& nodes) const {
+    void splitNodeAndDisconnect(const int& nodeId, QList<Node>& nodes) const {
         Node& node = nodes[nodeId];
         if(!node.isNormal())
             RuntimeThrow("Can only disconnect normal nodes.");
         splitNode(node, nodeId, nodes);
         nodes.insert(nodeId + 1, Node(Node::MOVE));
     }
-
-//    Neighbour nodeDissolvedFor(const int& nodeId) {
-//        Node& node = mNodes[nodeId];
-//        if(!node.isDissolved())
-//            RuntimeThrow("Accepts only nodes with type DISSOLVED");
-//        Neighbour neigh = NONE;
-//        if(mPrev) {
-//            if(NODE_TYPE_NORMAL(mPrev->nodeType(nodeId))) {
-//                neigh = static_cast<Neighbour>(neigh | PREV);
-//            }
-//        }
-//        if(mNext) {
-//            if(NODE_TYPE_NORMAL(mNext->nodeType(nodeId))) {
-//                neigh = static_cast<Neighbour>(neigh | NEXT);
-//            }
-//        }
-//        return neigh;
-//    }
 
     void normalNodeInsertedToPrev(const int& insertedNodeId) {
         insertNodeToList(insertedNodeId, Node());
