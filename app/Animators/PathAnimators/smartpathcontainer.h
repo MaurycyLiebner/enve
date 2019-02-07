@@ -7,7 +7,8 @@
 
 struct Node {
     enum Type : char {
-        DUMMY, DISSOLVED, NORMAL, NORMAL_CLOSE_AFTER, NORMAL_WRAP_AFTER, MOVE
+        DUMMY, DISSOLVED, NORMAL,
+        NORMAL_CLOSE_AFTER, NORMAL_WRAP_AFTER, MOVE
     };
 
     Node() : Node(DUMMY) {}
@@ -51,6 +52,9 @@ struct Node {
     //! @brief T value for segment defined by previous and next normal node
     qreal fT;
     Type fType;
+    //! @brief Next connected node id in the list.
+    //! Used with dissolved node and all normal nodes
+    int fNextNodeId;
 };
 
 bool isNormal(const Node::Type& type) {
@@ -283,14 +287,21 @@ public:
 
     void splitNode(Node& node, const int& nodeId, QList<Node>& nodes) const {
         Node newNode = node;
-        node.fC2 = node.fP1;
-        newNode.fC0 = newNode.fP1;
-        nodes.insert(nodeId + 1, newNode);
+        if(node.isNormal()) {
+            node.fC2 = node.fP1;
+            newNode.fC0 = newNode.fP1;
+            nodes.insert(nodeId + 1, newNode);
+        } else if(node.isDissolved()) {
+            nodes.insert(nodeId + 1, newNode);
+        }
     }
 
     void splitNodeAndDisconnect(const int& nodeId,
                                 QList<Node>& nodes) const {
-        splitNode(nodeId, nodes);
+        Node& node = nodes[nodeId];
+        if(!node.isNormal())
+            RuntimeThrow("Can only disconnect normal nodes.");
+        splitNode(node, nodeId, nodes);
         nodes.insert(nodeId + 1, Node(Node::MOVE));
     }
 
@@ -450,10 +461,24 @@ public:
     bool updateNodeTypeAfterNeighbourChanged(const int& nodeId) {
         Node& node = mNodes[nodeId];
         if(node.isNormal() || node.isMove()) return false;
-        const Node::Type prevType = mPrev ? mPrev->nodeType(nodeId) : Node::DUMMY;
-        const Node::Type nextType = mNext ? mNext->nodeType(nodeId) : Node::DUMMY;
+        Node::Type prevType = Node::DUMMY;
+        Node::Type nextType = Node::DUMMY;
+        int prevNextId = -1;
+        int nextNextId = -1;
+        if(mPrev) {
+            const Node& prevNode = mPrev->getNodes().at(nodeId);
+            prevType = prevNode.fType;
+            prevNextId = prevNode.fNextNodeId;
+        }
+        if(mNext) {
+            const Node& nextNode = mNext->getNodes().at(nodeId);
+            nextType = nextNode.fType;
+            nextNextId = nextNode.fNextNodeId;
+        }
         if(isNormal(prevType) || isNormal(nextType) ||
-           prevType == Node::MOVE || nextType == Node::MOVE) {
+           prevType == Node::MOVE || nextType == Node::MOVE ||
+           (node.fNextNodeId != nextNextId && nextType != Node::DUMMY) ||
+           (node.fNextNodeId != prevNextId && prevType != Node::DUMMY)) {
             if(node.fType != Node::DISSOLVED) {
                 node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
                 node.fType = Node::DISSOLVED;
