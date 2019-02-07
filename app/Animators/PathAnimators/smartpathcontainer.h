@@ -7,8 +7,7 @@
 
 struct Node {
     enum Type : char {
-        DUMMY, DISSOLVED, NORMAL,
-        NORMAL_CLOSE_AFTER, NORMAL_WRAP_AFTER, MOVE
+        DUMMY, DISSOLVED, NORMAL, MOVE
     };
 
     Node() : Node(DUMMY) {}
@@ -33,14 +32,7 @@ struct Node {
 
     bool isMove() const { return fType == MOVE; }
 
-    bool closeAfter() const { return fType == NORMAL_CLOSE_AFTER; }
-
-    bool wrapAfter() const { return fType == NORMAL_WRAP_AFTER; }
-
-
-    bool isNormal() const { return fType == NORMAL ||
-                                   fType == NORMAL_WRAP_AFTER ||
-                                   fType == NORMAL_CLOSE_AFTER; }
+    bool isNormal() const { return fType == NORMAL; }
 
     bool isDummy() const { return fType == DUMMY; }
 
@@ -81,26 +73,29 @@ private:
 };
 
 bool isNormal(const Node::Type& type) {
-    return type == Node::NORMAL ||
-           type == Node::NORMAL_WRAP_AFTER ||
-           type == Node::NORMAL_CLOSE_AFTER;
+    return type == Node::NORMAL;
 }
 
-int firstConnectedNodeId(const Node& node, const int& nodeId,
-                         const QList<Node> &nodes);
 int firstConnectedNodeId(const int& nodeId, const QList<Node>& nodes) {
-    const Node& node = nodes[nodeId];
-    return firstConnectedNodeId(node, nodeId, nodes);
-}
-
-int firstConnectedNodeId(const Node& node, const int& nodeId,
-                         const QList<Node>& nodes) {
-    if(node.isDissolved() || node.isNormal()) {
-        if(!node.getPrevNodeId()) return nodeId;
-        const Node& prevNode = nodes.at(node.getPrevNodeId());
-        if(prevNode.closeAfter()) return nodeId;
+    if(nodeId < 0) return -1;
+    if(nodeId >= nodes.count()) return -1;
+    const Node * currNode = &nodes.at(nodeId);
+    if(currNode->isDummy() || currNode->isMove()) return -1;
+    int smallestId = nodeId;
+    int currId = nodeId;
+    while(true) {
+        if(currNode->isDummy())
+            RuntimeThrow("Dummy used as a previous node(should be skipped)");
+        //if(currNode->isDissolved() || currNode->isNormal())
+        const int prevId = currNode->getPrevNodeId();
+        if(prevId == currId)
+            RuntimeThrow("Node points to itself");
+        if(!prevId) return nodeId;
+        if(prevId == smallestId) return smallestId;
+        smallestId = qMin(prevId, smallestId);
+        currNode = &nodes.at(prevId);
+        currId = prevId;
     }
-    return firstConnectedNodeId(nodeId - 1, nodes);
 }
 
 QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
@@ -111,7 +106,10 @@ QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
     }
     while(!srcIds.isEmpty()) {
         const int firstSrcId = firstConnectedNodeId(srcIds.first(), srcList);
-
+        if(!firstSrcId) {
+            srcIds.removeFirst();
+            continue;
+        }
         const int firstResultId = result.count();
         int nextSrcId = firstSrcId;
         bool first = true;
@@ -139,16 +137,15 @@ QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
     return result;
 }
 
-
 SkPath nodesToSkPath(const QList<Node>& nodes) {
     QList<Node> sortedNodes = sortNodeListAccoringToConnetions(nodes);
     SkPath result;
     bool move = true;
 
-    Node firstMoveNode;
+    bool close = false;
+    Node firstNode;
     Node prevNormalNode;
 
-    bool currentSegmentWaiting = false;
     qCubicSegment2D currentNormalSegment;
     QList<qreal> dissolvedTs;
 
@@ -156,21 +153,38 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
         const Node& node = sortedNodes.at(i);
         if(node.isDummy()) continue;
         if(move) {
+            if(close) {
+                qCubicSegment2D currentNormalSegment(prevNormalNode.fP1,
+                                                     prevNormalNode.fC2,
+                                                     firstNode.fC0,
+                                                     firstNode.fP1);
+                qreal lastT = 0;
+                for(const qreal& t : dissolvedTs) {
+                    auto div = currentNormalSegment.dividedAtT(
+                                gMapTToFragment(lastT, 1, t));
+                    const auto& first = div.first;
+                    result.cubicTo(qPointToSk(first.c1()),
+                                   qPointToSk(first.c2()),
+                                   qPointToSk(first.p1()));
+                    currentNormalSegment = div.second;
+                    lastT = t;
+                }
+                result.cubicTo(qPointToSk(currentNormalSegment.c1()),
+                               qPointToSk(currentNormalSegment.c2()),
+                               qPointToSk(currentNormalSegment.p1()));
+                dissolvedTs.clear();
+            }
             if(!node.isNormal())
                 RuntimeThrow("Segment starts with an unsupported type");
-            firstMoveNode = node;
+            firstNode = node;
+            prevNormalNode = node;
+            close = firstNode.getPrevNodeId();
             result.moveTo(qPointToSk(node.fP1));
             move = false;
         } else {
             if(node.fType == Node::DISSOLVED) {
                 dissolvedTs << node.fT;
             } else { // if not dissolved
-                if(currentSegmentWaiting) {
-                    result.cubicTo(qPointToSk(currentNormalSegment.c1()),
-                                   qPointToSk(currentNormalSegment.c2()),
-                                   qPointToSk(currentNormalSegment.p1()));
-                    currentSegmentWaiting = false;
-                }
                 if(node.isNormal()) {
                     qCubicSegment2D currentNormalSegment(prevNormalNode.fP1,
                                                          prevNormalNode.fC2,
@@ -200,13 +214,6 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
 
         if(node.isNormal()) prevNormalNode = node;
     } // for each node
-
-    if(currentSegmentWaiting) {
-        result.cubicTo(qPointToSk(currentNormalSegment.c1()),
-                       qPointToSk(currentNormalSegment.c2()),
-                       qPointToSk(currentNormalSegment.p1()));
-        currentSegmentWaiting = false;
-    }
 
     return result;
 }
@@ -295,7 +302,19 @@ public:
     }
 
     void actionDisconnectNodes(const int& node1Id, const int& node2Id) {
-        nodes.insert(node1Id + 1, Node(Node::MOVE));
+        Node& node1 = mNodes[node1Id];
+        Node& node2 = mNodes[node2Id];
+        if(node1.getNextNodeId() == node2Id) {
+            node1.setNextNodeId(-1);
+            node2.setPrevNodeId(-1);
+        } else if(node2.getNextNodeId() == node1Id) {
+            node1.setPrevNodeId(-1);
+            node2.setNextNodeId(-1);
+        } else {
+            RuntimeThrow("Trying to disconnect not connected nodes");
+        }
+
+        mNodes.insert(node1Id + 1, Node(Node::MOVE));
     }
 
     void promoteDissolvedNodeToNormal(const int& nodeId,
@@ -563,15 +582,6 @@ public:
         return mNodes;
     }
 
-    SkPath getPathForPrev() const {
-        if(mPrev) return getPathFor(mPrev);
-        return nodesToSkPath(mNodes);
-    }
-
-    SkPath getPathForNext() const {
-        if(mNext) return getPathFor(mNext);
-        return nodesToSkPath(mNodes);
-    }
     SkPath getPathAt() const {
         return nodesToSkPath(mNodes);
     }
@@ -594,6 +604,16 @@ public:
         return result;
     }
 private:
+    SkPath getPathForPrev() const {
+        if(mPrev) return getPathFor(mPrev);
+        return nodesToSkPath(mNodes);
+    }
+
+    SkPath getPathForNext() const {
+        if(mNext) return getPathFor(mNext);
+        return nodesToSkPath(mNodes);
+    }
+
     bool shouldSplitThisNode(const Node& thisNode, const Node& neighNode) const {
         const bool prevDiffers = thisNode.getPrevNodeId() !=
                 neighNode.getPrevNodeId();
