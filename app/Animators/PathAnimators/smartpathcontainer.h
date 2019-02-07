@@ -208,38 +208,34 @@ public:
         }
     }
 
-    void updateNodeValuesBasedOnT(const int& nodeId) {
-        Node& node = mNodes[nodeId];
-        updateNodeValuesBasedOnT(node, nodeId);
-    }
-
-    void updateNodeValuesBasedOnT(Node& node, const int& nodeId) {
-        auto seg = segmentFromNodes(prevNormal(nodeId), nextNormal(nodeId));
-        auto div = seg.dividedAtT(node.fT);
-        const auto& first = div.first;
-        const auto& second = div.second;
-        node.fC0 = first.c2();
-        node.fP1 = first.p1();
-        node.fC2 = second.c1();
-    }
-
     void actionInsertNormalNode(const int& nodeId, const qreal& t) {
         mNodes.insert(nodeId, Node());
         Node &node = mNodes[nodeId];
         node.fT = t;
-        updateNodeValuesBasedOnT(node, nodeId);
-        node.fType = Node::NORMAL;
+        node.fType = Node::DISSOLVED;
+        promoteDissolvedNodeToNormal(nodeId, node, mNodes);
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
     }
 
-    void actionInsertNormalNode(const int& nodeId,
-                                const QPointF& c0,
-                                const QPointF& p1,
-                                const QPointF& c2) {
+    void actionAddNormalNodeAtEnd(const int& nodeId,
+                                  const QPointF& c0,
+                                  const QPointF& p1,
+                                  const QPointF& c2) {
         mNodes.insert(nodeId, Node(c0, p1, c2, Node::NORMAL));
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
+    }
+
+    void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
+        promoteDissolvedNodeToNormal(nodeId, mNodes);
+        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
+        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
+    }
+
+    void actionDisconnectNodes(const int& node1Id, const int& node2Id) {
+        firstNodeIdInLoopWithNode(node1Id);
+        nodes.insert(node1Id + 1, Node(Node::MOVE));
     }
 
     void promoteDissolvedNodeToNormal(const int& nodeId,
@@ -296,12 +292,6 @@ public:
                                 QList<Node>& nodes) const {
         splitNode(nodeId, nodes);
         nodes.insert(nodeId + 1, Node(Node::MOVE));
-    }
-
-    void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
-        promoteDissolvedNodeToNormal(nodeId, mNodes);
-        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
-        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
     }
 
 //    Neighbour nodeDissolvedFor(const int& nodeId) {
@@ -463,10 +453,9 @@ public:
         const Node::Type prevType = mPrev ? mPrev->nodeType(nodeId) : Node::DUMMY;
         const Node::Type nextType = mNext ? mNext->nodeType(nodeId) : Node::DUMMY;
         if(isNormal(prevType) || isNormal(nextType) ||
-                prevType == Node::MOVE || nextType == Node::MOVE) {
+           prevType == Node::MOVE || nextType == Node::MOVE) {
             if(node.fType != Node::DISSOLVED) {
                 node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
-                updateNodeValuesBasedOnT(nodeId);
                 node.fType = Node::DISSOLVED;
                 return true;
             }
