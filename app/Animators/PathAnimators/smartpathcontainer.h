@@ -12,13 +12,13 @@ struct Node {
 
     Node() : Node(DUMMY) {}
 
-    Node(const Type& type) { fType = type; }
+    Node(const Type& type) { mType = type; }
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2) {
         fC0 = c0;
         fP1 = p1;
         fC2 = c2;
-        fType = NORMAL;
+        mType = NORMAL;
     }
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2,
@@ -27,16 +27,16 @@ struct Node {
         fP1 = p1;
         fC2 = c2;
         fT = t;
-        fType = DISSOLVED;
+        mType = DISSOLVED;
     }
 
-    bool isMove() const { return fType == MOVE; }
+    bool isMove() const { return mType == MOVE; }
 
-    bool isNormal() const { return fType == NORMAL; }
+    bool isNormal() const { return mType == NORMAL; }
 
-    bool isDummy() const { return fType == DUMMY; }
+    bool isDummy() const { return mType == DUMMY; }
 
-    bool isDissolved() const { return fType == DISSOLVED; }
+    bool isDissolved() const { return mType == DISSOLVED; }
 
     int getNextNodeId() const {
         if(isDummy() || isMove()) return -1;
@@ -61,20 +61,44 @@ struct Node {
 
     //! @brief T value for segment defined by previous and next normal node
     qreal fT;
-    Type fType;
+
+    void setType(const Type& type) {
+        mType = type;
+        if(isDummy() || isMove()) {
+            mNextNodeId = -1;
+            mPrevNodeId = -1;
+        }
+    }
+
+    const Type& getType() const { return mType; }
+
+    void shiftIdsGreaterThan(const int& greater, const int& shiftBy) {
+        if(mNextNodeId) if(mNextNodeId > greater) mNextNodeId += shiftBy;
+        if(mPrevNodeId) if(mPrevNodeId > greater) mPrevNodeId += shiftBy;
+    }
+
+    void shiftIdsSmallerThan(const int& smaller, const int& shiftBy) {
+        if(mNextNodeId) if(mNextNodeId < smaller) mNextNodeId += shiftBy;
+        if(mPrevNodeId) if(mPrevNodeId < smaller) mPrevNodeId += shiftBy;
+    }
 private:
+    Type mType;
+
     //! @brief Next connected node id in the list.
     //! Used with dissolved node and all normal nodes
-    int mNextNodeId;
+    int mNextNodeId = -1;
 
     //! @brief Previous connected node id in the list.
     //! Used with dissolved node and all normal nodes
-    int mPrevNodeId;
+    int mPrevNodeId = -1;
 };
 
-bool isNormal(const Node::Type& type) {
-    return type == Node::NORMAL;
-}
+//class NodesListHandler {
+
+//    void in
+//public:
+//    QList<Node> mNodes;
+//};
 
 int firstConnectedNodeId(const int& nodeId, const QList<Node>& nodes) {
     if(nodeId < 0) return -1;
@@ -182,7 +206,7 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
             result.moveTo(qPointToSk(node.fP1));
             move = false;
         } else {
-            if(node.fType == Node::DISSOLVED) {
+            if(node.getType() == Node::DISSOLVED) {
                 dissolvedTs << node.fT;
             } else { // if not dissolved
                 if(node.isNormal()) {
@@ -204,7 +228,7 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
                                    qPointToSk(currentNormalSegment.c2()),
                                    qPointToSk(currentNormalSegment.p1()));
                     dissolvedTs.clear();
-                } else if(node.fType == Node::MOVE) {
+                } else if(node.getType() == Node::MOVE) {
                     move = true;
                 } else {
                     RuntimeThrow("Unrecognized node type");
@@ -258,18 +282,45 @@ private:
 class SmartPath : public StdSelfRef {
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
+    void removeNodeFromList(const int& nodeId) {
+        mNodes.removeAt(nodeId);
+        for(int i = nodeId; i < mNodes.count(); i++) {
+            Node& iNode = mNodes[i];
+            iNode.shiftIdsGreaterThan(nodeId, -1);
+        }
+    }
+
+    Node& insertNodeToList(const int& nodeId, const Node& node) {
+        mNodes.insert(nodeId, node);
+        for(int i = nodeId; i < mNodes.count(); i++) {
+            Node& iNode = mNodes[i];
+            iNode.shiftIdsGreaterThan(nodeId - 1, 1);
+        }
+        return mNodes[nodeId];
+    }
+
+    Node& prependNodeToList(const Node& node) {
+        return insertNodeToList(0, node);
+    }
+
+    Node& appendNodeToList(const Node& node) {
+        return insertNodeToList(mNodes.count(), node);
+    }
+
     void actionRemoveNormalNode(const int& nodeId) {
         Node& node = mNodes[nodeId];
         if(!node.isNormal())
             RuntimeThrow("Invalid node type. "
                          "Only normal nodes can be removed.");
 
+        removeNodeFromList(nodeId);
+
         if(mIdUsage->decUsage(nodeId) == 0) {
             mIdUsage->remove(nodeId);
             if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
             if(mNext) mNext->removeNodeWithIdAndTellNextToDoSame(nodeId);
         } else {
-            node.fType = Node::DUMMY;
+            node.setType(Node::DUMMY);
             if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
             if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
             updateNodeTypeAfterNeighbourChanged(nodeId);
@@ -277,10 +328,9 @@ public:
     }
 
     void actionInsertNormalNode(const int& nodeId, const qreal& t) {
-        mNodes.insert(nodeId, Node());
-        Node &node = mNodes[nodeId];
+        Node &node = insertNodeToList(nodeId, Node());
         node.fT = t;
-        node.fType = Node::DISSOLVED;
+        node.setType(Node::DISSOLVED);
         promoteDissolvedNodeToNormal(nodeId, node, mNodes);
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
@@ -290,7 +340,7 @@ public:
                                   const QPointF& c0,
                                   const QPointF& p1,
                                   const QPointF& c2) {
-        mNodes.insert(nodeId, Node(c0, p1, c2, Node::NORMAL));
+        insertNodeToList(nodeId, Node(c0, p1, c2, Node::NORMAL));
         if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
         if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
     }
@@ -314,7 +364,7 @@ public:
             RuntimeThrow("Trying to disconnect not connected nodes");
         }
 
-        mNodes.insert(node1Id + 1, Node(Node::MOVE));
+        insertNodeToList(node1Id + 1, Node(Node::MOVE));
     }
 
     void promoteDissolvedNodeToNormal(const int& nodeId,
@@ -339,7 +389,7 @@ public:
         node.fC0 = first.c2();
         node.fP1 = first.p1();
         node.fC2 = second.c1();
-        node.fType = Node::NORMAL;
+        node.setType(Node::NORMAL);
         nextNormal.fC0 = second.c2();
         for(int i = prevNormalIdV + 1; i < nodeId; i++) {
             Node& iNode = nodes[i];
@@ -399,49 +449,49 @@ public:
 //    }
 
     void normalNodeInsertedToPrev(const int& insertedNodeId) {
-        mNodes.insert(insertedNodeId, Node());
+        insertNodeToList(insertedNodeId, Node());
         updateNodeTypeAfterNeighbourChanged(insertedNodeId);
         if(mNext) mNext->dissolvedNodeInsertedToPrev(insertedNodeId);
     }
 
     void dissolvedNodeInsertedToPrev(const int& insertedNodeId) {
-        mNodes.insert(insertedNodeId, Node());
+        insertNodeToList(insertedNodeId, Node());
         if(mNext) mNext->dummyNodeInsertedToPrev(insertedNodeId);
     }
 
     void dummyNodeInsertedToPrev(const int& insertedNodeId) {
-        mNodes.insert(insertedNodeId, Node());
+        insertNodeToList(insertedNodeId, Node());
         if(mNext) mNext->dummyNodeInsertedToPrev(insertedNodeId);
     }
 
     void normalNodeInsertedToNext(const int& insertedNodeId) {
-        mNodes.insert(insertedNodeId, Node());
+        insertNodeToList(insertedNodeId, Node());
         updateNodeTypeAfterNeighbourChanged(insertedNodeId);
         if(mPrev) mPrev->dissolvedNodeInsertedToNext(insertedNodeId);
     }
 
     void dissolvedNodeInsertedToNext(const int& insertedNodeId) {
-        mNodes.insert(insertedNodeId, Node());
+        insertNodeToList(insertedNodeId, Node());
         if(mPrev) mPrev->dummyNodeInsertedToNext(insertedNodeId);
     }
 
     void dummyNodeInsertedToNext(const int& insertedNodeId) {
-        mNodes.insert(insertedNodeId, Node());
+        insertNodeToList(insertedNodeId, Node());
         if(mPrev) mPrev->dummyNodeInsertedToNext(insertedNodeId);
     }
 
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId) {
-        mNodes.removeAt(nodeId);
+        removeNodeFromList(nodeId);
         if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
     }
 
     void removeNodeWithIdAndTellNextToDoSame(const int& nodeId) {
-        mNodes.removeAt(nodeId);
+        removeNodeFromList(nodeId);
         if(mNext) mNext->removeNodeWithIdAndTellNextToDoSame(nodeId);
     }
 
-    Node::Type nodeType(const int& nodeId) const {
-        return mNodes.at(nodeId).fType;
+    const Node::Type& nodeType(const int& nodeId) const {
+        return mNodes.at(nodeId).getType();
     }
 
     bool isNodeNormal(const int& nodeId) const {
@@ -507,7 +557,7 @@ public:
     Node prevNonDummy(const int& nodeId) const {
         for(int i = nodeId - 1; i >= 0; i--) {
             const Node& node = mNodes.at(i);
-            if(node.fType != Node::DUMMY) return node;
+            if(node.getType() != Node::DUMMY) return node;
         }
         return Node();
     }
@@ -515,7 +565,7 @@ public:
     Node nextNonDummy(const int& nodeId) const {
         for(int i = nodeId + 1; i < mNodes.count(); i++) {
             const Node& node = mNodes.at(i);
-            if(node.fType != Node::DUMMY) return node;
+            if(node.getType() != Node::DUMMY) return node;
         }
         return Node();
     }
@@ -542,27 +592,27 @@ public:
         int nextNextId = -1;
         if(mPrev) {
             const Node& prevNode = mPrev->getNodes().at(nodeId);
-            prevType = prevNode.fType;
+            prevType = prevNode.getType();
             prevNextId = prevNode.getNextNodeId();
         }
         if(mNext) {
             const Node& nextNode = mNext->getNodes().at(nodeId);
-            nextType = nextNode.fType;
+            nextType = nextNode.getType();
             nextNextId = nextNode.getNextNodeId();
         }
-        if(isNormal(prevType) || isNormal(nextType) ||
+        if(prevType == Node::NORMAL || nextType == Node::NORMAL ||
            prevType == Node::MOVE || nextType == Node::MOVE ||
            (node.getNextNodeId() != nextNextId && nextType != Node::DUMMY) ||
            (node.getNextNodeId() != prevNextId && prevType != Node::DUMMY)) {
-            if(node.fType != Node::DISSOLVED) {
+            if(node.getType() != Node::DISSOLVED) {
                 node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
-                node.fType = Node::DISSOLVED;
+                node.setType(Node::DISSOLVED);
                 return true;
             }
             return false;
         }
-        if(node.fType != Node::DUMMY) {
-            node.fType = Node::DUMMY;
+        if(node.getType() != Node::DUMMY) {
+            node.setType(Node::DUMMY);
             return true;
         }
         return false;
