@@ -236,49 +236,41 @@ void cubicTo(const Node& prevNode, const Node& nextNode,
 }
 
 SkPath nodesToSkPath(const QList<Node>& nodes) {
-    QList<Node> sortedNodes = sortNodeListAccoringToConnetions(nodes);
+    const auto sortedNodes = sortNodeListAccoringToConnetions(nodes);
     SkPath result;
     bool move = true;
 
     bool close = false;
-    Node firstNode;
-    Node prevNormalNode;
+    const Node * firstNode = nullptr;
+    const Node * prevNormalNode = nullptr;
 
-    qCubicSegment2D currentNormalSegment;
     QList<qreal> dissolvedTs;
 
     for(int i = 0; i < sortedNodes.count(); i++) {
         const Node& node = sortedNodes.at(i);
         if(node.isDummy()) continue;
-        if(move) {
-            if(close) {
-                cubicTo(prevNormalNode, firstNode, dissolvedTs, result);
+        else if(node.isDissolved()) dissolvedTs << node.fT;
+        else if(node.isMove()) move = true;
+        else if(node.isNormal()) {
+            if(move) {
+                if(close) cubicTo(*prevNormalNode, *firstNode,
+                                  dissolvedTs, result);
+                firstNode = &node;
+                close = firstNode->getPrevNodeId();
+                result.moveTo(qPointToSk(node.fP1));
+                move = false;
+            } else {
+                cubicTo(*prevNormalNode, node,
+                        dissolvedTs, result);
             }
-            if(!node.isNormal())
-                RuntimeThrow("Segment starts with an unsupported type");
-            firstNode = node;
-            prevNormalNode = node;
-            close = firstNode.getPrevNodeId();
-            result.moveTo(qPointToSk(node.fP1));
-            move = false;
+            prevNormalNode = &node;
         } else {
-            if(node.getType() == Node::DISSOLVED) {
-                dissolvedTs << node.fT;
-            } else { // if not dissolved
-                if(node.isNormal()) {
-                    cubicTo(prevNormalNode, node, dissolvedTs, result);
-                } else if(node.getType() == Node::MOVE) {
-                    move = true;
-                } else {
-                    RuntimeThrow("Unrecognized node type");
-                }
-            } // if/else dissolved
-        } // if/else move
-
-        if(node.isNormal()) prevNormalNode = node;
+            RuntimeThrow("Unrecognized node type");
+        }
     } // for each node
     if(close) {
-        cubicTo(prevNormalNode, firstNode, dissolvedTs, result);
+        cubicTo(*prevNormalNode, *firstNode,
+                dissolvedTs, result);
     }
     return result;
 }
