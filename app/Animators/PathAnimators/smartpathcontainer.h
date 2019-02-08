@@ -330,6 +330,21 @@ public:
         updateNodeTypeAfterNeighbourChanged(nodeId);
     }
 
+    void actionAddFirstNode(const QPointF& c0,
+                            const QPointF& p1,
+                            const QPointF& c2) {
+        int insertId = mNodes.count();
+        if(!mNodes.isEmpty()) {
+            insertNodeToList(insertId, Node(Node::MOVE));
+            if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
+            if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
+            insertId++;
+        }
+        insertNodeToList(insertId, Node(c0, p1, c2));
+        if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
+        if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
+    }
+
     void actionInsertNormalNode(const int& nodeId, const qreal& t) {
         Node &node = insertNodeToList(nodeId, Node(t));
         promoteDissolvedNodeToNormal(nodeId, node, mNodes);
@@ -551,6 +566,12 @@ public:
                                      &result);
         return result;
     }
+protected:
+    SmartPath() {}
+    SmartPath(SmartPath * const prev,
+              SmartPath * const next,
+              const QList<Node>& nodes) :
+        mPrev(prev), mNext(next), mNodes(nodes) {}
 private:
     int prevNormalId(const int& nodeId, const QList<Node>& nodes) const {
         const Node * currNode = &nodes.at(nodeId);
@@ -700,7 +721,7 @@ private:
             Node& resultNode = result[resI];
             const Node& neighbourNode = neighNodes.at(i);
 
-            // Remove nodes is not needed
+            // Remove nodes if not needed
             if((neighbourNode.isDummy() || neighbourNode.isDissolved()) &&
                (resultNode.isDummy() || resultNode.isDissolved())) {
                 iShift--;
@@ -723,8 +744,8 @@ private:
     }
 
     stdptr<SmartPath> mPrev;
-    QList<Node> mNodes;
     stdptr<SmartPath> mNext;
+    QList<Node> mNodes;
 };
 
 #endif // SMARTPATHCONTAINER_H
