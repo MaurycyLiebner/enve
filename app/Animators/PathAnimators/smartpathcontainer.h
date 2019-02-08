@@ -1,4 +1,4 @@
-#ifndef SMARTPATHCONTAINER_H
+﻿#ifndef SMARTPATHCONTAINER_H
 #define SMARTPATHCONTAINER_H
 #include "simplemath.h"
 #include "skia/skiaincludes.h"
@@ -157,6 +157,27 @@ QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
     return result;
 }
 
+void cubicTo(const Node& prevNode, const Node& nextNode,
+             QList<qreal>& dissolvedTs, SkPath& result) {
+    qCubicSegment2D seg(prevNode.fP1, prevNode.fC2,
+                        nextNode.fC0, nextNode.fP1);
+    qreal lastT = 0;
+    for(const qreal& t : dissolvedTs) {
+        const qreal mappedT = gMapTToFragment(lastT, 1, t);
+        auto div = seg.dividedAtT(mappedT);
+        const auto& first = div.first;
+        result.cubicTo(qPointToSk(first.c1()),
+                       qPointToSk(first.c2()),
+                       qPointToSk(first.p1()));
+        seg = div.second;
+        lastT = t;
+    }
+    result.cubicTo(qPointToSk(seg.c1()),
+                   qPointToSk(seg.c2()),
+                   qPointToSk(seg.p1()));
+    dissolvedTs.clear();
+}
+
 SkPath nodesToSkPath(const QList<Node>& nodes) {
     QList<Node> sortedNodes = sortNodeListAccoringToConnetions(nodes);
     SkPath result;
@@ -174,25 +195,7 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
         if(node.isDummy()) continue;
         if(move) {
             if(close) {
-                qCubicSegment2D currentNormalSegment(prevNormalNode.fP1,
-                                                     prevNormalNode.fC2,
-                                                     firstNode.fC0,
-                                                     firstNode.fP1);
-                qreal lastT = 0;
-                for(const qreal& t : dissolvedTs) {
-                    auto div = currentNormalSegment.dividedAtT(
-                                gMapTToFragment(lastT, 1, t));
-                    const auto& first = div.first;
-                    result.cubicTo(qPointToSk(first.c1()),
-                                   qPointToSk(first.c2()),
-                                   qPointToSk(first.p1()));
-                    currentNormalSegment = div.second;
-                    lastT = t;
-                }
-                result.cubicTo(qPointToSk(currentNormalSegment.c1()),
-                               qPointToSk(currentNormalSegment.c2()),
-                               qPointToSk(currentNormalSegment.p1()));
-                dissolvedTs.clear();
+                cubicTo(prevNormalNode, firstNode, dissolvedTs, result);
             }
             if(!node.isNormal())
                 RuntimeThrow("Segment starts with an unsupported type");
@@ -206,24 +209,7 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
                 dissolvedTs << node.fT;
             } else { // if not dissolved
                 if(node.isNormal()) {
-                    qCubicSegment2D currentNormalSegment(prevNormalNode.fP1,
-                                                         prevNormalNode.fC2,
-                                                         node.fC0, node.fP1);
-                    qreal lastT = 0;
-                    for(const qreal& t : dissolvedTs) {
-                        auto div = currentNormalSegment.dividedAtT(
-                                    gMapTToFragment(lastT, 1, t));
-                        const auto& first = div.first;
-                        result.cubicTo(qPointToSk(first.c1()),
-                                       qPointToSk(first.c2()),
-                                       qPointToSk(first.p1()));
-                        currentNormalSegment = div.second;
-                        lastT = t;
-                    }
-                    result.cubicTo(qPointToSk(currentNormalSegment.c1()),
-                                   qPointToSk(currentNormalSegment.c2()),
-                                   qPointToSk(currentNormalSegment.p1()));
-                    dissolvedTs.clear();
+                    cubicTo(prevNormalNode, node, dissolvedTs, result);
                 } else if(node.getType() == Node::MOVE) {
                     move = true;
                 } else {
@@ -234,7 +220,9 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
 
         if(node.isNormal()) prevNormalNode = node;
     } // for each node
-
+    if(close) {
+        cubicTo(prevNormalNode, firstNode, dissolvedTs, result);
+    }
     return result;
 }
 
@@ -246,34 +234,6 @@ qCubicSegment2D segmentFromNodes(const Node& prevNode,
 #include "framerange.h"
 #include "smartPointers/stdselfref.h"
 #include "smartPointers/stdpointer.h"
-
-class NodeIdUsage : public StdSelfRef {
-public:
-    //! @brief Increments and returns current usage.
-    const int& incUsage(const int& id) {
-        int& usage = mUsage[id];
-        return ++usage;
-    }
-
-    //! @brief Decrements and returns current usage.
-    const int& decUsage(const int& id) {
-        int& usage = mUsage[id];
-        if(usage == 0)
-            RuntimeThrow("Node id usage reached negative value");
-        return --usage;
-    }
-
-    void remove(const int& id) {
-        if(mUsage.takeAt(id) != 0)
-            RuntimeThrow("Non-zero usage removed");
-    }
-
-    void insertFirstUsage(const int& id) {
-        mUsage.insert(id, 1);
-    }
-private:
-    QList<int> mUsage;
-};
 
 class SmartPath : public StdSelfRef {
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
@@ -309,17 +269,24 @@ public:
             RuntimeThrow("Invalid node type. "
                          "Only normal nodes can be removed.");
 
-        if(mIdUsage->decUsage(nodeId) == 0) {
-            mIdUsage->remove(nodeId);
-            removeNodeFromList(nodeId);
-            if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
-            if(mNext) mNext->removeNodeWithIdAndTellNextToDoSame(nodeId);
-        } else {
-            node.setType(Node::DUMMY);
-            if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
-            if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
-            updateNodeTypeAfterNeighbourChanged(nodeId);
+        int nextPrevId = node.getPrevNodeId();
+        while(const int prevId = nextPrevId) {
+            Node &prevNode = mNodes[prevId];
+            if(prevNode.isNormal()) break;
+            prevNode.fT *= 0.5;
+            nextPrevId = prevNode.getPrevNodeId();
         }
+        int nextNextId = node.getNextNodeId();
+        while(const int nextId = nextNextId) {
+            Node &nextNode = mNodes[nextId];
+            if(nextNode.isNormal()) break;
+            nextNode.fT = nextNode.fT*0.5 + 0.5;
+            nextPrevId = nextNode.getNextNodeId();
+        }
+        node.setType(Node::DUMMY);
+        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
+        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
+        updateNodeTypeAfterNeighbourChanged(nodeId);
     }
 
     void actionInsertNormalNode(const int& nodeId, const qreal& t) {
@@ -341,7 +308,7 @@ public:
         } else if(!endNode.getPrevNodeId()) {
             endNode.setPrevNodeId(nodeId);
             isNext = false;
-        } else RuntimeThrow("Wrong assumptions. Node is not and end node.");
+        } else RuntimeThrow("Assumption not met: Node is not and end node.");
         const int insertId = isNext ? nodeId + 1 : nodeId;
         Node& newNode = insertNodeToList(insertId, Node(c0, p1, c2));
         if(isNext) {
@@ -373,6 +340,20 @@ public:
         }
 
         insertNodeToList(node1Id + 1, Node(Node::MOVE));
+    }
+
+    void actionConnectNodes(const int& node1Id, const int& node2Id) {
+        Node& node1 = mNodes[node1Id];
+        Node& node2 = mNodes[node2Id];
+        if(!node1.getNextNodeId() && !node2.getPrevNodeId()) {
+            node1.setNextNodeId(-1);
+            node2.setPrevNodeId(-1);
+        } else if(!node1.getPrevNodeId() && !node2.getNextNodeId()) {
+            node1.setPrevNodeId(-1);
+            node2.setNextNodeId(-1);
+        } else {
+            RuntimeThrow("Trying to connect nodes that already have connections");
+        }
     }
 
     void promoteDissolvedNodeToNormal(const int& nodeId,
@@ -707,7 +688,6 @@ private:
         return nodesToSkPath(result);
     }
 
-    stdsptr<NodeIdUsage> mIdUsage;
     stdptr<SmartPath> mPrev;
     QList<Node> mNodes;
     stdptr<SmartPath> mNext;
