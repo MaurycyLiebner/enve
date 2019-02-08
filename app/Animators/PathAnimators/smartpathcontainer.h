@@ -304,14 +304,6 @@ public:
         return mNodes[nodeId];
     }
 
-    Node& prependNodeToList(const Node& node) {
-        return insertNodeToList(0, node);
-    }
-
-    Node& appendNodeToList(const Node& node) {
-        return insertNodeToList(mNodes.count(), node);
-    }
-
     void actionRemoveNormalNode(const int& nodeId) {
         Node& node = mNodes[nodeId];
         if(!node.isNormal())
@@ -341,8 +333,8 @@ public:
     void actionInsertNormalNode(const int& nodeId, const qreal& t) {
         Node &node = insertNodeToList(nodeId, Node(t));
         promoteDissolvedNodeToNormal(nodeId, node, mNodes);
-        if(mPrev) mPrev->normalNodeInsertedToNext(nodeId);
-        if(mNext) mNext->normalNodeInsertedToPrev(nodeId);
+        if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(nodeId);
+        if(mNext) mNext->normalOrMoveNodeInsertedToPrev(nodeId);
     }
 
     void actionAddNormalNodeAtEnd(const int& nodeId,
@@ -365,8 +357,8 @@ public:
         } else {
             newNode.setNextNodeId(nodeId + 1);
         }
-        if(mPrev) mPrev->normalNodeInsertedToNext(insertId);
-        if(mNext) mNext->normalNodeInsertedToPrev(insertId);
+        if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
+        if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
     }
 
     void actionPromoteDissolvedNodeToNormal(const int& nodeId) {
@@ -378,123 +370,66 @@ public:
     void actionDisconnectNodes(const int& node1Id, const int& node2Id) {
         Node& node1 = mNodes[node1Id];
         Node& node2 = mNodes[node2Id];
+        int moveInsertId;
         if(node1.getNextNodeId() == node2Id) {
             node1.setNextNodeId(-1);
             node2.setPrevNodeId(-1);
+            moveInsertId = node1Id + 1;
         } else if(node2.getNextNodeId() == node1Id) {
             node1.setPrevNodeId(-1);
             node2.setNextNodeId(-1);
+            moveInsertId = node2Id + 1;
         } else {
             RuntimeThrow("Trying to disconnect not connected nodes");
         }
+        insertNodeToList(moveInsertId, Node(Node::MOVE));
+        if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(moveInsertId);
+        if(mNext) mNext->normalOrMoveNodeInsertedToPrev(moveInsertId);
     }
 
     void actionConnectNodes(const int& node1Id, const int& node2Id) {
         Node& node1 = mNodes[node1Id];
         Node& node2 = mNodes[node2Id];
-        if(!node1.getNextNodeId() && !node2.getPrevNodeId()) {
-            node1.setNextNodeId(-1);
-            node2.setPrevNodeId(-1);
-        } else if(!node1.getPrevNodeId() && !node2.getNextNodeId()) {
-            node1.setPrevNodeId(-1);
-            node2.setNextNodeId(-1);
+        if(!node1.hasNextNode() && !node2.hasPreviousNode()) {
+            node1.setNextNodeId(node2Id);
+            node2.setPrevNodeId(node1Id);
+        } else if(!node1.hasPreviousNode() && !node2.hasNextNode()) {
+            node1.setPrevNodeId(node2Id);
+            node2.setNextNodeId(node1Id);
+        } else if(!node1.hasPreviousNode() && !node2.hasPreviousNode()) {
+            reverseSegment(node1Id, mNodes);
+            node1.setNextNodeId(node2Id);
+            node2.setPrevNodeId(node1Id);
+        } else if(!node1.hasNextNode() && !node2.hasNextNode()) {
+            reverseSegment(node1Id, mNodes);
+            node1.setPrevNodeId(node2Id);
+            node2.setNextNodeId(node1Id);
         } else {
-            RuntimeThrow("Trying to connect nodes that already have connections");
+            RuntimeThrow("Trying to connect nodes "
+                         "that already have two connections");
         }
     }
 
-    void promoteDissolvedNodeToNormal(const int& nodeId,
-                                      QList<Node>& nodes) const {
-        Node& node = nodes[nodeId];
-        promoteDissolvedNodeToNormal(nodeId, node, nodes);
-    }
-
-    void promoteDissolvedNodeToNormal(const int& nodeId,
-                                      Node& node,
-                                      QList<Node>& nodes) const {
-        const int prevNormalIdV = prevNormalId(nodeId, nodes);
-        const int nextNormalIdV = nextNormalId(nodeId, nodes);
-        Node& prevNormal = nodes[prevNormalIdV];
-        Node& nextNormal = nodes[nextNormalIdV];
-
-        auto seg = segmentFromNodes(prevNormal, nextNormal);
-        auto div = seg.dividedAtT(node.fT);
-        const auto& first = div.first;
-        const auto& second = div.second;
-        prevNormal.fC2 = first.c1();
-        node.fC0 = first.c2();
-        node.fP1 = first.p1();
-        node.fC2 = second.c1();
-        node.setType(Node::NORMAL);
-        nextNormal.fC0 = second.c2();
-        for(int i = prevNormalIdV + 1; i < nodeId; i++) {
-            Node& iNode = nodes[i];
-            if(iNode.isDissolved()) {
-                iNode.fT = gMapTToFragment(0, node.fT, iNode.fT);
-            }
-        }
-        for(int i = nodeId + 1; i < nextNormalIdV; i++) {
-            Node& iNode = nodes[i];
-            if(iNode.isDissolved()) {
-                iNode.fT = gMapTToFragment(node.fT, 1, iNode.fT);
-            }
-        }
-    }
-
-    void splitNode(const int& nodeId, QList<Node>& nodes) const {
-        Node& node = nodes[nodeId];
-        splitNode(node, nodeId, nodes);
-    }
-
-    void splitNode(Node& node, const int& nodeId, QList<Node>& nodes) const {
-        Node newNode = node;
-        if(node.isNormal()) {
-            node.fC2 = node.fP1;
-            newNode.fC0 = newNode.fP1;
-            nodes.insert(nodeId + 1, newNode);
-        } else if(node.isDissolved()) {
-            nodes.insert(nodeId + 1, newNode);
-        }
-    }
-
-    void splitNodeAndDisconnect(const int& nodeId, QList<Node>& nodes) const {
-        Node& node = nodes[nodeId];
-        if(!node.isNormal())
-            RuntimeThrow("Can only disconnect normal nodes.");
-        splitNode(node, nodeId, nodes);
-        nodes.insert(nodeId + 1, Node(Node::MOVE));
-    }
-
-    void normalNodeInsertedToPrev(const int& insertedNodeId) {
+    void normalOrMoveNodeInsertedToPrev(const int& insertedNodeId) {
         insertNodeToList(insertedNodeId, Node());
         updateNodeTypeAfterNeighbourChanged(insertedNodeId);
-        if(mNext) mNext->dissolvedNodeInsertedToPrev(insertedNodeId);
+        if(mNext) mNext->dissolvedOrDummyNodeInsertedToPrev(insertedNodeId);
     }
 
-    void dissolvedNodeInsertedToPrev(const int& insertedNodeId) {
+    void dissolvedOrDummyNodeInsertedToPrev(const int& insertedNodeId) {
         insertNodeToList(insertedNodeId, Node());
-        if(mNext) mNext->dummyNodeInsertedToPrev(insertedNodeId);
+        if(mNext) mNext->dissolvedOrDummyNodeInsertedToPrev(insertedNodeId);
     }
 
-    void dummyNodeInsertedToPrev(const int& insertedNodeId) {
-        insertNodeToList(insertedNodeId, Node());
-        if(mNext) mNext->dummyNodeInsertedToPrev(insertedNodeId);
-    }
-
-    void normalNodeInsertedToNext(const int& insertedNodeId) {
+    void normalOrMoveNodeInsertedToNext(const int& insertedNodeId) {
         insertNodeToList(insertedNodeId, Node());
         updateNodeTypeAfterNeighbourChanged(insertedNodeId);
-        if(mPrev) mPrev->dissolvedNodeInsertedToNext(insertedNodeId);
+        if(mPrev) mPrev->dissolvedOrDummyNodeInsertedToNext(insertedNodeId);
     }
 
-    void dissolvedNodeInsertedToNext(const int& insertedNodeId) {
+    void dissolvedOrDummyNodeInsertedToNext(const int& insertedNodeId) {
         insertNodeToList(insertedNodeId, Node());
-        if(mPrev) mPrev->dummyNodeInsertedToNext(insertedNodeId);
-    }
-
-    void dummyNodeInsertedToNext(const int& insertedNodeId) {
-        insertNodeToList(insertedNodeId, Node());
-        if(mPrev) mPrev->dummyNodeInsertedToNext(insertedNodeId);
+        if(mPrev) mPrev->dissolvedOrDummyNodeInsertedToNext(insertedNodeId);
     }
 
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId) {
@@ -531,70 +466,16 @@ public:
         return changed;
     }
 
-    Node prevNormal(const int& nodeId) const {
-        return prevNormal(nodeId, mNodes);
-    }
-
-    Node nextNormal(const int& nodeId) const {
-        return nextNormal(nodeId, mNodes);
-    }
-
-    int prevNormalId(const int& nodeId, const QList<Node>& nodes) const {
-        for(int i = nodeId - 1; i >= 0; i--) {
-            const Node& node = nodes.at(i);
-            if(node.isNormal()) return i;
-        }
-        return -1;
-    }
-
-    int nextNormalId(const int& nodeId, const QList<Node>& nodes) const {
-        for(int i = nodeId + 1; i < nodes.count(); i++) {
-            const Node& node = nodes.at(i);
-            if(node.isNormal()) return i;
-        }
-        return -1;
-    }
-
-    Node prevNormal(const int& nodeId, const QList<Node>& nodes) const {
-        for(int i = nodeId - 1; i >= 0; i--) {
-            const Node& node = nodes.at(i);
-            if(node.isNormal()) return node;
-        }
-        return Node();
-    }
-
-    Node nextNormal(const int& nodeId, const QList<Node>& nodes) const {
-        for(int i = nodeId + 1; i < nodes.count(); i++) {
-            const Node& node = nodes.at(i);
-            if(node.isNormal()) return node;
-        }
-        return Node();
-    }
-
-    Node prevNonDummy(const int& nodeId) const {
-        for(int i = nodeId - 1; i >= 0; i--) {
-            const Node& node = mNodes.at(i);
-            if(node.getType() != Node::DUMMY) return node;
-        }
-        return Node();
-    }
-
-    Node nextNonDummy(const int& nodeId) const {
-        for(int i = nodeId + 1; i < mNodes.count(); i++) {
-            const Node& node = mNodes.at(i);
-            if(node.getType() != Node::DUMMY) return node;
-        }
-        return Node();
-    }
-
     qreal prevT(const int& nodeId) const {
-        Node node = prevNonDummy(nodeId);
+        const int &prevId = prevNonDummyId(nodeId, mNodes);
+        const Node& node = mNodes.at(prevId);
         if(node.isNormal()) return 0;
         return node.fT;
     }
 
     qreal nextT(const int& nodeId) const {
-        Node node = nextNonDummy(nodeId);
+        const int &nextId = nextNonDummyId(nodeId, mNodes);
+        const Node& node = mNodes.at(nextId);
         if(node.isNormal()) return 1;
         return node.fT;
     }
@@ -671,6 +552,112 @@ public:
         return result;
     }
 private:
+    int prevNormalId(const int& nodeId, const QList<Node>& nodes) const {
+        const Node * currNode = &nodes.at(nodeId);
+        int nextNodeId = currNode->getPrevNodeId();
+        while(nextNodeId) {
+            currNode = &nodes.at(nextNodeId);
+            if(currNode->isNormal()) return nextNodeId;
+            nextNodeId = currNode->getPrevNodeId();
+        }
+        return -1;
+    }
+
+    int nextNormalId(const int& nodeId, const QList<Node>& nodes) const {
+        const Node * currNode = &nodes.at(nodeId);
+        int nextNodeId = currNode->getNextNodeId();
+        while(nextNodeId) {
+            currNode = &nodes.at(nextNodeId);
+            if(currNode->isNormal()) return nextNodeId;
+            nextNodeId = currNode->getNextNodeId();
+        }
+        return -1;
+    }
+
+    int prevNonDummyId(const int& nodeId, const QList<Node>& nodes) const {
+        const Node * currNode = &nodes.at(nodeId);
+        int nextNodeId = currNode->getPrevNodeId();
+        while(nextNodeId) {
+            currNode = &nodes.at(nextNodeId);
+            if(!currNode->isDummy()) return nextNodeId;
+            nextNodeId = currNode->getPrevNodeId();
+        }
+        return -1;
+    }
+
+    int nextNonDummyId(const int& nodeId, const QList<Node>& nodes) const {
+        const Node * currNode = &nodes.at(nodeId);
+        int nextNodeId = currNode->getNextNodeId();
+        while(nextNodeId) {
+            currNode = &nodes.at(nextNodeId);
+            if(!currNode->isDummy()) return nextNodeId;
+            nextNodeId = currNode->getNextNodeId();
+        }
+        return -1;
+    }
+
+    void promoteDissolvedNodeToNormal(const int& nodeId,
+                                      QList<Node>& nodes) const {
+        Node& node = nodes[nodeId];
+        promoteDissolvedNodeToNormal(nodeId, node, nodes);
+    }
+
+    void promoteDissolvedNodeToNormal(const int& nodeId,
+                                      Node& node,
+                                      QList<Node>& nodes) const {
+        const int prevNormalIdV = prevNormalId(nodeId, nodes);
+        const int nextNormalIdV = nextNormalId(nodeId, nodes);
+        Node& prevNormal = nodes[prevNormalIdV];
+        Node& nextNormal = nodes[nextNormalIdV];
+
+        auto seg = segmentFromNodes(prevNormal, nextNormal);
+        auto div = seg.dividedAtT(node.fT);
+        const auto& first = div.first;
+        const auto& second = div.second;
+        prevNormal.fC2 = first.c1();
+        node.fC0 = first.c2();
+        node.fP1 = first.p1();
+        node.fC2 = second.c1();
+        node.setType(Node::NORMAL);
+        nextNormal.fC0 = second.c2();
+        for(int i = prevNormalIdV + 1; i < nodeId; i++) {
+            Node& iNode = nodes[i];
+            if(iNode.isDissolved()) {
+                iNode.fT = gMapTToFragment(0, node.fT, iNode.fT);
+            }
+        }
+        for(int i = nodeId + 1; i < nextNormalIdV; i++) {
+            Node& iNode = nodes[i];
+            if(iNode.isDissolved()) {
+                iNode.fT = gMapTToFragment(node.fT, 1, iNode.fT);
+            }
+        }
+    }
+
+    void splitNode(const int& nodeId, QList<Node>& nodes) const {
+        Node& node = nodes[nodeId];
+        splitNode(node, nodeId, nodes);
+    }
+
+    void splitNode(Node& node, const int& nodeId, QList<Node>& nodes) const {
+        Node newNode = node;
+        if(node.isNormal()) {
+            node.fC2 = node.fP1;
+            newNode.fC0 = newNode.fP1;
+            nodes.insert(nodeId + 1, newNode);
+        } else if(node.isDissolved()) {
+            nodes.insert(nodeId + 1, newNode);
+        }
+    }
+
+    void splitNodeAndDisconnect(const int& nodeId, QList<Node>& nodes) const {
+        Node& node = nodes[nodeId];
+        if(!node.isNormal())
+            RuntimeThrow("Can only disconnect normal nodes.");
+        splitNode(node, nodeId, nodes);
+        nodes.insert(nodeId + 1, Node(Node::MOVE));
+    }
+
     SkPath getPathForPrev() const {
         if(mPrev) return getPathFor(mPrev);
         return nodesToSkPath(mNodes);
