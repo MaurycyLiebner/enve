@@ -34,6 +34,12 @@ struct Node {
 
     bool isDissolved() const { return mType == DISSOLVED; }
 
+    void switchPrevAndNext() {
+        const int prevT = mPrevNodeId;
+        mPrevNodeId = mNextNodeId;
+        mNextNodeId = prevT;
+    }
+
     int getNextNodeId() const {
         if(isDummy() || isMove()) return -1;
         return mNextNodeId;
@@ -41,6 +47,14 @@ struct Node {
     int getPrevNodeId() const {
         if(isDummy() || isMove()) return -1;
         return mPrevNodeId;
+    }
+
+    bool hasPreviousNode() const {
+        return getPrevNodeId() >= 0;
+    }
+
+    bool hasNextNode() const {
+        return getNextNodeId() >= 0;
     }
 
     void setNextNodeId(const int& nextNodeId) {
@@ -89,14 +103,7 @@ private:
     int mPrevNodeId = -1;
 };
 
-//class NodesListHandler {
-
-//    void in
-//public:
-//    QList<Node> mNodes;
-//};
-
-int firstConnectedNodeId(const int& nodeId, const QList<Node>& nodes) {
+int firstSegmentNode(const int& nodeId, const QList<Node>& nodes) {
     if(nodeId < 0) return -1;
     if(nodeId >= nodes.count()) return -1;
     const Node * currNode = &nodes.at(nodeId);
@@ -118,6 +125,56 @@ int firstConnectedNodeId(const int& nodeId, const QList<Node>& nodes) {
     }
 }
 
+int lastSegmentNode(const int& nodeId, const QList<Node>& nodes) {
+    if(nodeId < 0) return -1;
+    if(nodeId >= nodes.count()) return -1;
+    const Node * currNode = &nodes.at(nodeId);
+    if(currNode->isDummy() || currNode->isMove()) return -1;
+    int smallestId = nodeId;
+    int currId = nodeId;
+    while(true) {
+        if(currNode->isDummy())
+            RuntimeThrow("Dummy used as a next node(should be skipped)");
+        //if(currNode->isDissolved() || currNode->isNormal())
+        const int nextId = currNode->getNextNodeId();
+        if(nextId == currId)
+            RuntimeThrow("Node points to itself");
+        if(!nextId) return nodeId;
+        if(nextId == smallestId) return nodeId;
+        smallestId = qMin(nextId, smallestId);
+        currNode = &nodes.at(nextId);
+        currId = nextId;
+    }
+}
+
+int nodesInSameSagment(const int& node1Id,
+                       const int& node2Id,
+                       const QList<Node>& nodes) {
+    const int firstSegment1 = firstSegmentNode(node1Id, nodes);
+    const int firstSegment2 = firstSegmentNode(node2Id, nodes);
+    return firstSegment1 && firstSegment1 == firstSegment2;
+}
+
+void reverseSegment(const int& nodeId, QList<Node>& nodes) {
+    const int firstNodeId = firstSegmentNode(nodeId, nodes);
+    if(!firstNodeId) return;
+    Node& firstNode = nodes[firstNodeId];
+    int nextSegId = firstNode.getNextNodeId();
+    firstNode.switchPrevAndNext();
+    while(const int currNodeId = nextSegId) {
+        if(currNodeId == firstNodeId) break;
+        Node& currNode = nodes[nextSegId];
+        nextSegId = currNode.getNextNodeId();
+        currNode.switchPrevAndNext();
+    }
+}
+
+bool segmentClosed(const int& nodeId, const QList<Node>& nodes) {
+    const int firstNodeId = firstSegmentNode(nodeId, nodes);
+    if(!firstNodeId) return false;
+    return nodes.at(firstNodeId).hasPreviousNode();
+}
+
 QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
     QList<Node> result;
     QList<int> srcIds;
@@ -125,7 +182,7 @@ QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
         srcIds << i;
     }
     while(!srcIds.isEmpty()) {
-        const int firstSrcId = firstConnectedNodeId(srcIds.first(), srcList);
+        const int firstSrcId = firstSegmentNode(srcIds.first(), srcList);
         if(!firstSrcId) {
             srcIds.removeFirst();
             continue;
@@ -338,8 +395,6 @@ public:
         } else {
             RuntimeThrow("Trying to disconnect not connected nodes");
         }
-
-        insertNodeToList(node1Id + 1, Node(Node::MOVE));
     }
 
     void actionConnectNodes(const int& node1Id, const int& node2Id) {
