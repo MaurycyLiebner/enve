@@ -170,20 +170,15 @@ public:
     const QList<Node>& getNodes() const;
 
     SkPath getPathAt() const;
+    SkPath getPathForPrev() const;
+    SkPath getPathForNext() const;
 
     SkPath interpolateWithNext(const qreal& nextWeight) const;
-
     SkPath interpolateWithPrev(const qreal& nextWeight) const;
 protected:
     SmartPath();
-    SmartPath(SmartPath * const prev,
-              SmartPath * const next,
-              const QList<Node>& nodes);
+    SmartPath(const QList<Node>& nodes);
 private:
-    SkPath getPathForPrev() const;
-
-    SkPath getPathForNext() const;
-
     SkPath getPathFor(SmartPath * const neighbour) const;
 
     stdptr<SmartPath> mPrev;

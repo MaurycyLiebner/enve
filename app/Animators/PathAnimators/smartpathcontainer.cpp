@@ -11,10 +11,10 @@ int firstSegmentNode(const int& nodeId, const QList<Node>& nodes) {
         if(currNode->isDummy())
             RuntimeThrow("Dummy used as a previous node(should be skipped)");
         //if(currNode->isDissolved() || currNode->isNormal())
+        if(!currNode->hasPreviousNode()) return currId;
         const int prevId = currNode->getPrevNodeId();
         if(prevId == currId)
             RuntimeThrow("Node points to itself");
-        if(!prevId) return nodeId;
         if(prevId == smallestId) return smallestId;
         smallestId = qMin(prevId, smallestId);
         currNode = &nodes.at(prevId);
@@ -33,15 +33,30 @@ int lastSegmentNode(const int& nodeId, const QList<Node>& nodes) {
         if(currNode->isDummy())
             RuntimeThrow("Dummy used as a next node(should be skipped)");
         //if(currNode->isDissolved() || currNode->isNormal())
+        if(!currNode->hasNextNode()) return currId;
         const int nextId = currNode->getNextNodeId();
         if(nextId == currId)
             RuntimeThrow("Node points to itself");
-        if(!nextId) return nodeId;
-        if(nextId == smallestId) return nodeId;
+        if(nextId == smallestId) return currId;
         smallestId = qMin(nextId, smallestId);
         currNode = &nodes.at(nextId);
         currId = nextId;
     }
+}
+
+int moveNodeAfterSegment(const int& nodeId, const QList<Node>& nodes) {
+    const int lastNodeId = lastSegmentNode(nodeId, nodes);
+    if(lastNodeId == -1) return -1;
+    const Node& lastNode = nodes.at(lastNodeId);
+    if(lastNode.hasNextNode()) return -1;
+    for(int i = lastNodeId + 1; i < nodes.count(); i++) {
+        const Node& iNode = nodes.at(i);
+        if(iNode.isMove()) return i;
+        if(iNode.isNormal())
+            RuntimeThrow("MOVE node not found after open segment");
+    }
+    RuntimeThrow("MOVE node not found after open segment");
+    //return -1;
 }
 
 int nodesInSameSagment(const int& node1Id,
@@ -54,7 +69,7 @@ int nodesInSameSagment(const int& node1Id,
 
 void reverseSegment(const int& nodeId, QList<Node>& nodes) {
     const int firstNodeId = firstSegmentNode(nodeId, nodes);
-    if(!firstNodeId) return;
+    if(firstNodeId == -1) return;
     Node& firstNode = nodes[firstNodeId];
     int nextSegId = firstNode.getNextNodeId();
     firstNode.switchPrevAndNext();
@@ -68,23 +83,24 @@ void reverseSegment(const int& nodeId, QList<Node>& nodes) {
 
 bool segmentClosed(const int& nodeId, const QList<Node>& nodes) {
     const int firstNodeId = firstSegmentNode(nodeId, nodes);
-    if(!firstNodeId) return false;
+    if(firstNodeId == -1) return false;
     return nodes.at(firstNodeId).hasPreviousNode();
 }
 
-QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
-    QList<Node> result;
+QList<QList<Node>> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
+    QList<QList<Node>> result;
+    QList<Node> segment;
     QList<int> srcIds;
     for(int i = 0; i < srcList.count(); i++) {
         srcIds << i;
     }
     while(!srcIds.isEmpty()) {
         const int firstSrcId = firstSegmentNode(srcIds.first(), srcList);
-        if(!firstSrcId) {
+        if(firstSrcId == -1) {
             srcIds.removeFirst();
             continue;
         }
-        const int firstResultId = result.count();
+        const int firstResultId = segment.count();
         int nextSrcId = firstSrcId;
         bool first = true;
         while(true) {
@@ -92,22 +108,27 @@ QList<Node> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
             const Node& srcNode = srcList.at(nextSrcId);
             Node newNode = srcNode;
             if(first) first = false;
-            else newNode.setPrevNodeId(result.count() - 1);
+            else newNode.setPrevNodeId(segment.count() - 1);
 
-            if(newNode.getNextNodeId())
-                newNode.setNextNodeId(result.count() + 1);
+            if(newNode.hasNextNode())
+                newNode.setNextNodeId(segment.count() + 1);
 
-            result << newNode;
+            segment << newNode;
 
+            if(!srcNode.hasNextNode()) break;
             nextSrcId = srcNode.getNextNodeId();
-            if(!nextSrcId) break;
             if(nextSrcId == firstSrcId) {
-                result[result.count() - 1].setNextNodeId(firstResultId);
-                result[firstResultId].setPrevNodeId(result.count() - 1);
+                segment[segment.count() - 1].setNextNodeId(firstResultId);
+                segment[firstResultId].setPrevNodeId(segment.count() - 1);
                 break;
             }
         }
+        if(!segment.isEmpty()) {
+            result << segment;
+            segment.clear();
+        }
     }
+    if(!segment.isEmpty()) result << segment;
     return result;
 }
 
@@ -135,42 +156,45 @@ void cubicTo(const Node& prevNode, const Node& nextNode,
 }
 
 SkPath nodesToSkPath(const QList<Node>& nodes) {
-    const auto sortedNodes = sortNodeListAccoringToConnetions(nodes);
+    const auto segments = sortNodeListAccoringToConnetions(nodes);
     SkPath result;
-    bool move = true;
 
-    bool close = false;
     const Node * firstNode = nullptr;
     const Node * prevNormalNode = nullptr;
 
     QList<qreal> dissolvedTs;
 
-    for(int i = 0; i < sortedNodes.count(); i++) {
-        const Node& node = sortedNodes.at(i);
-        if(node.isDummy()) continue;
-        else if(node.isDissolved()) dissolvedTs << node.fT;
-        else if(node.isMove()) move = true;
-        else if(node.isNormal()) {
-            if(move) {
-                if(close) cubicTo(*prevNormalNode, *firstNode,
-                                  dissolvedTs, result);
-                firstNode = &node;
-                close = firstNode->getPrevNodeId();
-                result.moveTo(qPointToSk(node.fP1));
-                qDebug() << "Move to:" << node.fP1;
-                move = false;
+    for(const auto& segment : segments) {
+        SkPath currPath;
+        bool move = true;
+        bool close = false;
+        for(int i = 0; i < segment.count(); i++) {
+            const Node& node = segment.at(i);
+            if(node.isDummy()) continue;
+            else if(node.isDissolved()) dissolvedTs << node.fT;
+            else if(node.isMove()) RuntimeThrow("No MOVE node should have gotten here");
+            else if(node.isNormal()) {
+                if(move) {
+                    firstNode = &node;
+                    close = firstNode->hasPreviousNode();
+                    currPath.moveTo(qPointToSk(node.fP1));
+                    qDebug() << "Move to:" << node.fP1;
+                    move = false;
+                } else {
+                    cubicTo(*prevNormalNode, node,
+                            dissolvedTs, currPath);
+                }
+                prevNormalNode = &node;
             } else {
-                cubicTo(*prevNormalNode, node,
-                        dissolvedTs, result);
+                RuntimeThrow("Unrecognized node type");
             }
-            prevNormalNode = &node;
-        } else {
-            RuntimeThrow("Unrecognized node type");
+        } // for each node
+        if(close) {
+            cubicTo(*prevNormalNode, *firstNode,
+                    dissolvedTs, currPath);
+            currPath.close();
         }
-    } // for each node
-    if(close) {
-        cubicTo(*prevNormalNode, *firstNode,
-                dissolvedTs, result);
+        result.addPath(currPath);
     }
     return result;
 }
@@ -183,44 +207,40 @@ qCubicSegment2D segmentFromNodes(const Node& prevNode,
 
 int prevNormalId(const int& nodeId, const QList<Node>& nodes) {
     const Node * currNode = &nodes.at(nodeId);
-    int nextNodeId = currNode->getPrevNodeId();
-    while(nextNodeId) {
-        currNode = &nodes.at(nextNodeId);
-        if(currNode->isNormal()) return nextNodeId;
-        nextNodeId = currNode->getPrevNodeId();
+    while(currNode->hasPreviousNode()) {
+        const int currId = currNode->getPrevNodeId();
+        currNode = &nodes.at(currId);
+        if(currNode->isNormal()) return currId;
     }
     return -1;
 }
 
 int nextNormalId(const int& nodeId, const QList<Node>& nodes) {
     const Node * currNode = &nodes.at(nodeId);
-    int nextNodeId = currNode->getNextNodeId();
-    while(nextNodeId) {
-        currNode = &nodes.at(nextNodeId);
-        if(currNode->isNormal()) return nextNodeId;
-        nextNodeId = currNode->getNextNodeId();
+    while(currNode->hasNextNode()) {
+        const int currId = currNode->getNextNodeId();
+        currNode = &nodes.at(currId);
+        if(currNode->isNormal()) return currId;
     }
     return -1;
 }
 
 int prevNonDummyId(const int& nodeId, const QList<Node>& nodes) {
     const Node * currNode = &nodes.at(nodeId);
-    int nextNodeId = currNode->getPrevNodeId();
-    while(nextNodeId) {
-        currNode = &nodes.at(nextNodeId);
-        if(!currNode->isDummy()) return nextNodeId;
-        nextNodeId = currNode->getPrevNodeId();
+    while(currNode->hasPreviousNode()) {
+        const int currId = currNode->getPrevNodeId();
+        currNode = &nodes.at(currId);
+        if(!currNode->isDummy()) return currId;
     }
     return -1;
 }
 
 int nextNonDummyId(const int& nodeId, const QList<Node>& nodes) {
     const Node * currNode = &nodes.at(nodeId);
-    int nextNodeId = currNode->getNextNodeId();
-    while(nextNodeId) {
-        currNode = &nodes.at(nextNodeId);
-        if(!currNode->isDummy()) return nextNodeId;
-        nextNodeId = currNode->getNextNodeId();
+    while(currNode->hasNextNode()) {
+        const int currId = currNode->getNextNodeId();
+        currNode = &nodes.at(currId);
+        if(!currNode->isDummy()) return currId;
     }
     return -1;
 }
@@ -295,7 +315,7 @@ bool shouldSplitThisNode(const Node& thisNode, const Node& neighNode) {
     // if node is normal
     if(thisNode.isNormal()) {
         // if node is in the middle(has both previous and next node)
-        if(thisNode.getNextNodeId() && thisNode.getPrevNodeId()) {
+        if(thisNode.hasNextNode() && thisNode.hasPreviousNode()) {
             // split node only if both nodes differ
             return prevDiffers && nextDiffers;
         }
@@ -328,19 +348,19 @@ void SmartPath::actionRemoveNormalNode(const int &nodeId) {
         RuntimeThrow("Invalid node type. "
                      "Only normal nodes can be removed.");
 
-    int nextPrevId = node.getPrevNodeId();
-    while(const int prevId = nextPrevId) {
-        Node &prevNode = mNodes[prevId];
-        if(prevNode.isNormal()) break;
-        prevNode.fT *= 0.5;
-        nextPrevId = prevNode.getPrevNodeId();
+    Node * currNode = &node;
+    while(currNode->hasPreviousNode()) {
+        const int prevId = currNode->getPrevNodeId();
+        currNode = &mNodes[prevId];
+        if(currNode->isNormal()) break;
+        currNode->fT *= 0.5;
     }
-    int nextNextId = node.getNextNodeId();
-    while(const int nextId = nextNextId) {
-        Node &nextNode = mNodes[nextId];
-        if(nextNode.isNormal()) break;
-        nextNode.fT = nextNode.fT*0.5 + 0.5;
-        nextPrevId = nextNode.getNextNodeId();
+    currNode = &node;
+    while(currNode->hasNextNode()) {
+        const int nextId = currNode->getNextNodeId();
+        currNode = &mNodes[nextId];
+        if(currNode->isNormal()) break;
+        currNode->fT = currNode->fT*0.5 + 0.5;
     }
     node.setType(Node::DUMMY);
     if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
@@ -352,13 +372,11 @@ void SmartPath::actionAddFirstNode(const QPointF &c0,
                                    const QPointF &p1,
                                    const QPointF &c2) {
     int insertId = mNodes.count();
-    //if(!mNodes.isEmpty()) {
-    insertNodeToList(insertId, Node(Node::MOVE));
+    insertNodeToList(insertId, Node(c0, p1, c2));
     if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
     if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
     insertId++;
-    //}
-    insertNodeToList(insertId, Node(c0, p1, c2));
+    insertNodeToList(insertId, Node(Node::MOVE));
     if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
     if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
 }
@@ -375,7 +393,7 @@ void SmartPath::actionInsertNormalNodeAfter(const int &afterId,
     prevNode.setNextNodeId(insertId);
     node.setPrevNodeId(afterId);
     const int nextId = nextNonDummyId(insertId, mNodes);
-    if(nextId) {
+    if(nextId != -1) {
         Node &nextNode = mNodes[nextId];
         nextNode.setPrevNodeId(insertId);
     }
@@ -389,18 +407,18 @@ void SmartPath::actionAddNormalNodeAtEnd(const int &nodeId,
                                          const QPointF &c2) {
     Node& endNode = mNodes[nodeId];
     bool isNext;
-    if(!endNode.getNextNodeId()) {
-        endNode.setNextNodeId(nodeId);
+    if(!endNode.hasNextNode()) {
         isNext = true;
-    } else if(!endNode.getPrevNodeId()) {
-        endNode.setPrevNodeId(nodeId);
+    } else if(!endNode.hasPreviousNode()) {
         isNext = false;
     } else RuntimeThrow("Assumption not met: Node is not and end node.");
     const int insertId = isNext ? nodeId + 1 : nodeId;
     Node& newNode = insertNodeToList(insertId, Node(c0, p1, c2));
     if(isNext) {
+        endNode.setNextNodeId(nodeId + 1);
         newNode.setPrevNodeId(nodeId);
     } else {
+        endNode.setPrevNodeId(nodeId);
         newNode.setNextNodeId(nodeId + 1);
     }
     if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
@@ -436,6 +454,8 @@ void SmartPath::actionDisconnectNodes(const int &node1Id,
 
 void SmartPath::actionConnectNodes(const int &node1Id,
                                    const int &node2Id) {
+    const int moveNode1Id = moveNodeAfterSegment(node1Id, mNodes);
+    const int moveNode2Id = moveNodeAfterSegment(node2Id, mNodes);
     Node& node1 = mNodes[node1Id];
     Node& node2 = mNodes[node2Id];
     if(!node1.hasNextNode() && !node2.hasPreviousNode()) {
@@ -456,12 +476,21 @@ void SmartPath::actionConnectNodes(const int &node1Id,
         RuntimeThrow("Trying to connect nodes "
                      "that already have two connections");
     }
+
+    mNodes[moveNode1Id].setType(Node::DUMMY);
+    if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
+    if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
+    if(moveNode1Id != moveNode2Id) { // connecting two segments
+        mNodes[moveNode2Id].setType(Node::DUMMY);
+        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
+        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
+    }
 }
 
 void SmartPath::normalOrMoveNodeInsertedToPrev(const int &insertedNodeId) {
     insertNodeToList(insertedNodeId, Node());
-    updateNodeTypeAfterNeighbourChanged(insertedNodeId);
     if(mNext) mNext->dissolvedOrDummyNodeInsertedToPrev(insertedNodeId);
+    updateNodeTypeAfterNeighbourChanged(insertedNodeId);
 }
 
 void SmartPath::dissolvedOrDummyNodeInsertedToPrev(const int &insertedNodeId) {
@@ -471,8 +500,8 @@ void SmartPath::dissolvedOrDummyNodeInsertedToPrev(const int &insertedNodeId) {
 
 void SmartPath::normalOrMoveNodeInsertedToNext(const int &insertedNodeId) {
     insertNodeToList(insertedNodeId, Node());
-    updateNodeTypeAfterNeighbourChanged(insertedNodeId);
     if(mPrev) mPrev->dissolvedOrDummyNodeInsertedToNext(insertedNodeId);
+    updateNodeTypeAfterNeighbourChanged(insertedNodeId);
 }
 
 void SmartPath::dissolvedOrDummyNodeInsertedToNext(const int &insertedNodeId) {
@@ -601,10 +630,8 @@ SkPath SmartPath::interpolateWithPrev(const qreal &nextWeight) const {
 
 SmartPath::SmartPath() {}
 
-SmartPath::SmartPath(SmartPath * const prev,
-                     SmartPath * const next,
-                     const QList<Node> &nodes) :
-    mPrev(prev), mNext(next), mNodes(nodes) {}
+SmartPath::SmartPath(const QList<Node> &nodes) :
+    mNodes(nodes) {}
 
 SkPath SmartPath::getPathForPrev() const {
     if(mPrev) return getPathFor(mPrev);

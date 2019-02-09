@@ -35,14 +35,23 @@ int main(int argc, char *argv[]) {
     pt.setY(1);
     prevPath->actionAddFirstNode(pt, pt, pt);
     pt.setX(3);
-    prevPath->actionAddNormalNodeAtEnd(4, pt, pt, pt);
+    prevPath->actionAddNormalNodeAtEnd(4 + 1, pt, pt, pt);
     pt.setY(0);
-    prevPath->actionAddNormalNodeAtEnd(5, pt, pt, pt);
+    prevPath->actionAddNormalNodeAtEnd(5 + 1, pt, pt, pt);
     pt.setX(2);
-    prevPath->actionAddNormalNodeAtEnd(6, pt, pt, pt);
-    prevPath->actionConnectNodes(4, 7);
+    prevPath->actionAddNormalNodeAtEnd(6 + 1, pt, pt, pt);
+    prevPath->actionConnectNodes(4 + 1, 7 + 1);
 
-    prevPath->getPathAt();
+    //prevPath->getPathAt();
+
+    auto nextPath = SPtrCreate(SmartPath)(prevPath->getNodes());
+
+    prevPath->setNext(nextPath.get());
+    nextPath->setPrev(prevPath.get());
+
+    nextPath->actionDisconnectNodes(2, 3);
+    nextPath->getPathAt();
+    prevPath->getPathForNext();
 
     MainWindow w;
 #ifdef QT_DEBUG
