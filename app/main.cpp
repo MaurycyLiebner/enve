@@ -31,22 +31,22 @@ int main(int argc, char *argv[]) {
     QPointF pt(0, 0);
     prevPath->actionAddFirstNode(pt, pt, pt);
     pt.setY(1);
-    prevPath->actionAddNormalNodeAtEnd(0, pt, pt, pt);
+    prevPath->actionInsertNodeBetween(0, 1, pt, pt, pt);
     pt.setX(1);
-    prevPath->actionAddNormalNodeAtEnd(1, pt, pt, pt);
+    prevPath->actionInsertNodeBetween(1, 2, pt, pt, pt);
     pt.setY(0);
-    prevPath->actionAddNormalNodeAtEnd(2, pt, pt, pt);
+    prevPath->actionInsertNodeBetween(2, 3, pt, pt, pt);
     prevPath->actionConnectNodes(0, 3);
 
     pt.setX(2);
     pt.setY(1);
     prevPath->actionAddFirstNode(pt, pt, pt);
     pt.setX(3);
-    prevPath->actionAddNormalNodeAtEnd(4 + 1, pt, pt, pt);
+    prevPath->actionInsertNodeBetween(4 + 1, 5 + 1, pt, pt, pt);
     pt.setY(0);
-    prevPath->actionAddNormalNodeAtEnd(5 + 1, pt, pt, pt);
+    prevPath->actionInsertNodeBetween(5 + 1, 6 + 1, pt, pt, pt);
     pt.setX(2);
-    prevPath->actionAddNormalNodeAtEnd(6 + 1, pt, pt, pt);
+    prevPath->actionInsertNodeBetween(6 + 1, 7 + 1, pt, pt, pt);
     prevPath->actionConnectNodes(4 + 1, 7 + 1);
 
     //prevPath->getPathAt();

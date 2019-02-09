@@ -113,12 +113,14 @@ public:
                             const QPointF& p1,
                             const QPointF& c2);
 
-    void actionInsertNormalNodeAfter(const int& afterId, const qreal& t);
-
-    void actionAddNormalNodeAtEnd(const int& afterId,
-                                  const QPointF& c0,
-                                  const QPointF& p1,
-                                  const QPointF& c2);
+    void actionInsertNodeBetween(const int &prevId,
+                                 const int& nextId,
+                                 const QPointF &c0,
+                                 const QPointF &p1,
+                                 const QPointF &c2);
+    void actionInsertNodeBetween(const int &prevId,
+                                 const int& nextId,
+                                 const qreal& t);
 
     void actionPromoteDissolvedNodeToNormal(const int& nodeId);
 
@@ -172,7 +174,8 @@ protected:
     SmartPath(const QList<Node>& nodes);
 private:
     SkPath getPathFor(SmartPath * const neighbour) const;
-    void insertNodeAfter(const int &afterId, const Node &nodeBlueprint);
+    void insertNodeBetween(const int &prevId, const int &nextId,
+                           const Node &nodeBlueprint);
 
     stdptr<SmartPath> mPrev;
     stdptr<SmartPath> mNext;

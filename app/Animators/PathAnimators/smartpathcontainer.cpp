@@ -69,6 +69,23 @@ bool segmentClosed(const int& nodeId, const QList<Node>& nodes) {
     return nodes.at(firstNodeId).hasPreviousNode();
 }
 
+void fixIdsAfterInsertBetween(const int& prevId, const int& nextId,
+                              const int& insertedId, QList<Node>& nodes) {
+    Node& prevNode = nodes[prevId];
+    Node& nextNode = nodes[nextId];
+    Node& insertedNode = nodes[insertedId];
+    if(prevNode.getNextNodeId() != nextId)
+        RuntimeThrow("Provided nextId does not correspond to next node");
+    if(nextNode.getPrevNodeId() != prevId)
+        RuntimeThrow("Provided prevId does not correspond to previous node");
+    if(insertedNode.hasNextNode() || insertedNode.hasNextNode())
+        RuntimeThrow("Function wrongly assumes inserted node has no connections");
+    prevNode.setNextNodeId(insertedId);
+    insertedNode.setPrevNodeId(prevId);
+    insertedNode.setNextNodeId(nextId);
+    nextNode.setPrevNodeId(insertedId);
+}
+
 QList<QList<Node>> sortNodeListAccoringToConnetions(const QList<Node>& srcList) {
     QList<QList<Node>> result;
     QList<Node> segment;
@@ -347,6 +364,14 @@ void connectTo(const int& toId, const int& nodeId,
     }
 }
 
+bool nodesConnected(const int& node1Id, const int& node2Id,
+                    const QList<Node>& nodes) {
+    const Node& node1 = nodes.at(node1Id);
+    if(node1.getNextNodeId() == node2Id) return true;
+    if(node1.getPrevNodeId() == node2Id) return true;
+    return false;
+}
+
 void SmartPath::removeNodeFromList(const int &nodeId) {
     mNodes.removeAt(nodeId);
     for(int i = 0; i < mNodes.count(); i++) {
@@ -403,36 +428,34 @@ void SmartPath::actionAddFirstNode(const QPointF &c0,
     if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
 }
 
-void SmartPath::insertNodeAfter(const int &afterId,
-                                const Node &nodeBlueprint) {
-    Node& prevNode = mNodes[afterId];
-    if(prevNode.isMove())
-        RuntimeThrow("Unsupported previous node type");
-    const int insertId = afterId + 1;
+void SmartPath::insertNodeBetween(const int& prevId,
+                                  const int& nextId,
+                                  const Node& nodeBlueprint) {
+    if(!nodesConnected(prevId, nextId, mNodes))
+        RuntimeThrow("Cannot insert between not connected nodes");
+    const int insertId = prevId + 1;
     Node &node = insertNodeToList(insertId, nodeBlueprint);
-    const int nextNodeId = prevNode.getNextNodeId();
-    node.setNextNodeId(nextNodeId);
-    prevNode.setNextNodeId(insertId);
-    node.setPrevNodeId(afterId);
-    Node& nextNode = mNodes[nextNodeId];
-    nextNode.setPrevNodeId(insertId);
+    fixIdsAfterInsertBetween(prevId, nextId + (nextId >= insertId ? 1 : 0),
+                             insertId, mNodes);
     if(nodeBlueprint.isDissolved())
         promoteDissolvedNodeToNormal(insertId, node, mNodes);
 
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(afterId);
-    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(afterId);
+    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(prevId);
+    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(prevId);
 }
 
-void SmartPath::actionInsertNormalNodeAfter(const int &afterId,
-                                            const qreal &t) {
-    insertNodeAfter(afterId, Node(t));
+void SmartPath::actionInsertNodeBetween(const int &prevId,
+                                        const int& nextId,
+                                        const qreal& t) {
+    insertNodeBetween(prevId, nextId, Node(t));
 }
 
-void SmartPath::actionAddNormalNodeAtEnd(const int &afterId,
-                                         const QPointF &c0,
-                                         const QPointF &p1,
-                                         const QPointF &c2) {
-    insertNodeAfter(afterId, Node(c0, p1, c2));
+void SmartPath::actionInsertNodeBetween(const int &prevId,
+                                        const int& nextId,
+                                        const QPointF &c0,
+                                        const QPointF &p1,
+                                        const QPointF &c2) {
+    insertNodeBetween(prevId, nextId, Node(c0, p1, c2));
 }
 
 void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
@@ -455,19 +478,13 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     } else {
         RuntimeThrow("Trying to disconnect not connected nodes");
     }
-    {
-        Node& nextNode = mNodes[nextId];
-        nextNode.setPrevNodeId(-1);
-    }
+    Node& nextNode = mNodes[nextId];
+    nextNode.setPrevNodeId(-1);
     const int moveInsertId = prevId + 1;
-    {
-        Node& moveNode = insertNodeToList(moveInsertId, Node(Node::MOVE));
-        moveNode.setPrevNodeId(prevId);
-    }
-    {
-        Node& prevNode = mNodes[prevId];
-        prevNode.setNextNodeId(moveInsertId);
-    }
+    Node& moveNode = insertNodeToList(moveInsertId, Node(Node::MOVE));
+    moveNode.setPrevNodeId(prevId);
+    Node& prevNode = mNodes[prevId];
+    prevNode.setNextNodeId(moveInsertId);
     if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(moveInsertId - 1);
     if(mNext) mNext->normalOrMoveNodeInsertedToPrev(moveInsertId - 1);
 }
@@ -492,6 +509,7 @@ void SmartPath::actionConnectNodes(const int &node1Id,
     if(!moveNode1.isMove())
         RuntimeThrow("Last node in not closed segment has to be MOVE node");
     moveNode1.setType(Node::DUMMY);
+    moveNode1.setPrevNodeId(-1);
     if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
     if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
     if(moveNode1Id != moveNode2Id) { // connecting two segments
@@ -499,6 +517,7 @@ void SmartPath::actionConnectNodes(const int &node1Id,
         if(!moveNode2.isMove())
             RuntimeThrow("Last node in not closed segment has to be MOVE node");
         moveNode2.setType(Node::DUMMY);
+        moveNode2.setPrevNodeId(-1);
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
     }
