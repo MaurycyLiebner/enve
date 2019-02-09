@@ -20,6 +20,13 @@ int main(int argc, char *argv[]) {
     Application::setAttribute(Qt::AA_ShareOpenGLContexts);
     Application a(argc, argv);
 
+    MainWindow w;
+#ifdef QT_DEBUG
+    qint64 pId = QCoreApplication::applicationPid();
+    QProcess *process = new QProcess(&w);
+    process->start("prlimit --data=4500000000 --pid " + QString::number(pId));
+#endif
+
     auto prevPath = SPtrCreate(SmartPath)();
     QPointF pt(0, 0);
     prevPath->actionAddFirstNode(pt, pt, pt);
@@ -52,13 +59,6 @@ int main(int argc, char *argv[]) {
     nextPath->actionDisconnectNodes(2, 3);
     nextPath->getPathAt();
     prevPath->getPathForNext();
-
-    MainWindow w;
-#ifdef QT_DEBUG
-    qint64 pId = QCoreApplication::applicationPid();
-    QProcess *process = new QProcess(&w);
-    process->start("prlimit --data=4500000000 --pid " + QString::number(pId));
-#endif
 
     w.show();
 
