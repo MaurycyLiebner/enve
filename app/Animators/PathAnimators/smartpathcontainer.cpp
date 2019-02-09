@@ -4,12 +4,9 @@ int firstSegmentNode(const int& nodeId, const QList<Node>& nodes) {
     if(nodeId < 0) return -1;
     if(nodeId >= nodes.count()) return -1;
     const Node * currNode = &nodes.at(nodeId);
-    if(currNode->isDummy() || currNode->isMove()) return -1;
     int smallestId = nodeId;
     int currId = nodeId;
     while(true) {
-        if(currNode->isDummy())
-            RuntimeThrow("Dummy used as a previous node(should be skipped)");
         //if(currNode->isDissolved() || currNode->isNormal())
         if(!currNode->hasPreviousNode()) return currId;
         const int prevId = currNode->getPrevNodeId();
@@ -42,21 +39,6 @@ int lastSegmentNode(const int& nodeId, const QList<Node>& nodes) {
         currNode = &nodes.at(nextId);
         currId = nextId;
     }
-}
-
-int moveNodeAfterSegment(const int& nodeId, const QList<Node>& nodes) {
-    const int lastNodeId = lastSegmentNode(nodeId, nodes);
-    if(lastNodeId == -1) return -1;
-    const Node& lastNode = nodes.at(lastNodeId);
-    if(lastNode.hasNextNode()) return -1;
-    for(int i = lastNodeId + 1; i < nodes.count(); i++) {
-        const Node& iNode = nodes.at(i);
-        if(iNode.isMove()) return i;
-        if(iNode.isNormal())
-            RuntimeThrow("MOVE node not found after open segment");
-    }
-    RuntimeThrow("MOVE node not found after open segment");
-    //return -1;
 }
 
 int nodesInSameSagment(const int& node1Id,
@@ -325,6 +307,30 @@ bool shouldSplitThisNode(const Node& thisNode, const Node& neighNode) {
     return prevDiffers || nextDiffers;
 }
 
+void connectNodes(const int& node1Id, const int& node2Id,
+                  QList<Node>& nodes) {
+    Node& node1 = nodes[node1Id];
+    Node& node2 = nodes[node2Id];
+    if(!node1.hasNextNode() && !node2.hasPreviousNode()) {
+        node1.setNextNodeId(node2Id);
+        node2.setPrevNodeId(node1Id);
+    } else if(!node1.hasPreviousNode() && !node2.hasNextNode()) {
+        node1.setPrevNodeId(node2Id);
+        node2.setNextNodeId(node1Id);
+    } else if(!node1.hasPreviousNode() && !node2.hasPreviousNode()) {
+        reverseSegment(node1Id, nodes);
+        node1.setNextNodeId(node2Id);
+        node2.setPrevNodeId(node1Id);
+    } else if(!node1.hasNextNode() && !node2.hasNextNode()) {
+        reverseSegment(node1Id, nodes);
+        node1.setPrevNodeId(node2Id);
+        node2.setNextNodeId(node1Id);
+    } else {
+        RuntimeThrow("Trying to connect nodes "
+                     "that already have two connections");
+    }
+}
+
 void SmartPath::removeNodeFromList(const int &nodeId) {
     mNodes.removeAt(nodeId);
     for(int i = 0; i < mNodes.count(); i++) {
@@ -352,15 +358,15 @@ void SmartPath::actionRemoveNormalNode(const int &nodeId) {
     while(currNode->hasPreviousNode()) {
         const int prevId = currNode->getPrevNodeId();
         currNode = &mNodes[prevId];
-        if(currNode->isNormal()) break;
-        currNode->fT *= 0.5;
+        if(currNode->isNormal() || currNode->isMove()) break;
+        if(currNode->isDissolved()) currNode->fT *= 0.5;
     }
     currNode = &node;
     while(currNode->hasNextNode()) {
         const int nextId = currNode->getNextNodeId();
         currNode = &mNodes[nextId];
-        if(currNode->isNormal()) break;
-        currNode->fT = currNode->fT*0.5 + 0.5;
+        if(currNode->isNormal() || currNode->isMove()) break;
+        if(currNode->isDissolved()) currNode->fT = currNode->fT*0.5 + 0.5;
     }
     node.setType(Node::DUMMY);
     if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
@@ -371,58 +377,46 @@ void SmartPath::actionRemoveNormalNode(const int &nodeId) {
 void SmartPath::actionAddFirstNode(const QPointF &c0,
                                    const QPointF &p1,
                                    const QPointF &c2) {
-    int insertId = mNodes.count();
+    const int insertId = mNodes.count();
     insertNodeToList(insertId, Node(c0, p1, c2));
+    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(-1);
+    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(-1);
+    insertNodeToList(insertId + 1, Node(Node::MOVE));
+    connectNodes(insertId, insertId + 1, mNodes);
     if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
     if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
-    insertId++;
-    insertNodeToList(insertId, Node(Node::MOVE));
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
-    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
+}
+
+void SmartPath::insertNodeAfter(const int &afterId,
+                                const Node &nodeBlueprint) {
+    Node& prevNode = mNodes[afterId];
+    if(prevNode.isMove())
+        RuntimeThrow("Unsupported previous node type");
+    const int insertId = afterId + 1;
+    Node &node = insertNodeToList(insertId, nodeBlueprint);
+    const int nextNodeId = prevNode.getNextNodeId();
+    node.setNextNodeId(nextNodeId);
+    prevNode.setNextNodeId(insertId);
+    node.setPrevNodeId(afterId);
+    Node& nextNode = mNodes[nextNodeId];
+    nextNode.setPrevNodeId(insertId);
+    if(nodeBlueprint.isDissolved())
+        promoteDissolvedNodeToNormal(insertId, node, mNodes);
+
+    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(afterId);
+    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(afterId);
 }
 
 void SmartPath::actionInsertNormalNodeAfter(const int &afterId,
                                             const qreal &t) {
-    const int insertId = afterId + 1;
-    Node& prevNode = mNodes[afterId];
-    if(prevNode.isDummy() || prevNode.isMove())
-        RuntimeThrow("Unsupported previous node type");
-    Node &node = insertNodeToList(insertId, Node(t));
-    promoteDissolvedNodeToNormal(insertId, node, mNodes);
-    node.setNextNodeId(prevNode.getNextNodeId());
-    prevNode.setNextNodeId(insertId);
-    node.setPrevNodeId(afterId);
-    const int nextId = nextNonDummyId(insertId, mNodes);
-    if(nextId != -1) {
-        Node &nextNode = mNodes[nextId];
-        nextNode.setPrevNodeId(insertId);
-    }
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
-    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
+    insertNodeAfter(afterId, Node(t));
 }
 
-void SmartPath::actionAddNormalNodeAtEnd(const int &nodeId,
+void SmartPath::actionAddNormalNodeAtEnd(const int &afterId,
                                          const QPointF &c0,
                                          const QPointF &p1,
                                          const QPointF &c2) {
-    Node& endNode = mNodes[nodeId];
-    bool isNext;
-    if(!endNode.hasNextNode()) {
-        isNext = true;
-    } else if(!endNode.hasPreviousNode()) {
-        isNext = false;
-    } else RuntimeThrow("Assumption not met: Node is not and end node.");
-    const int insertId = isNext ? nodeId + 1 : nodeId;
-    Node& newNode = insertNodeToList(insertId, Node(c0, p1, c2));
-    if(isNext) {
-        endNode.setNextNodeId(nodeId + 1);
-        newNode.setPrevNodeId(nodeId);
-    } else {
-        endNode.setPrevNodeId(nodeId);
-        newNode.setNextNodeId(nodeId + 1);
-    }
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(insertId);
-    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(insertId);
+    insertNodeAfter(afterId, Node(c0, p1, c2));
 }
 
 void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
@@ -431,82 +425,83 @@ void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
     if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
 }
 
-void SmartPath::actionDisconnectNodes(const int &node1Id,
-                                      const int &node2Id) {
+void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     Node& node1 = mNodes[node1Id];
     Node& node2 = mNodes[node2Id];
     int moveInsertId;
     if(node1.getNextNodeId() == node2Id) {
-        node1.setNextNodeId(-1);
-        node2.setPrevNodeId(-1);
         moveInsertId = node1Id + 1;
+        node1.setNextNodeId(moveInsertId);
+        node2.setPrevNodeId(-1);
     } else if(node2.getNextNodeId() == node1Id) {
-        node1.setPrevNodeId(-1);
-        node2.setNextNodeId(-1);
         moveInsertId = node2Id + 1;
+        node1.setPrevNodeId(-1);
+        node2.setNextNodeId(moveInsertId);
     } else {
         RuntimeThrow("Trying to disconnect not connected nodes");
     }
-    insertNodeToList(moveInsertId, Node(Node::MOVE));
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(moveInsertId);
-    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(moveInsertId);
+    Node& moveNode = insertNodeToList(moveInsertId, Node(Node::MOVE));
+    moveNode.setPrevNodeId(moveInsertId - 1);
+    if(mPrev) mPrev->normalOrMoveNodeInsertedToNext(moveInsertId - 1);
+    if(mNext) mNext->normalOrMoveNodeInsertedToPrev(moveInsertId - 1);
 }
 
 void SmartPath::actionConnectNodes(const int &node1Id,
                                    const int &node2Id) {
-    const int moveNode1Id = moveNodeAfterSegment(node1Id, mNodes);
-    const int moveNode2Id = moveNodeAfterSegment(node2Id, mNodes);
-    Node& node1 = mNodes[node1Id];
-    Node& node2 = mNodes[node2Id];
-    if(!node1.hasNextNode() && !node2.hasPreviousNode()) {
-        node1.setNextNodeId(node2Id);
-        node2.setPrevNodeId(node1Id);
-    } else if(!node1.hasPreviousNode() && !node2.hasNextNode()) {
-        node1.setPrevNodeId(node2Id);
-        node2.setNextNodeId(node1Id);
-    } else if(!node1.hasPreviousNode() && !node2.hasPreviousNode()) {
-        reverseSegment(node1Id, mNodes);
-        node1.setNextNodeId(node2Id);
-        node2.setPrevNodeId(node1Id);
-    } else if(!node1.hasNextNode() && !node2.hasNextNode()) {
-        reverseSegment(node1Id, mNodes);
-        node1.setPrevNodeId(node2Id);
-        node2.setNextNodeId(node1Id);
-    } else {
-        RuntimeThrow("Trying to connect nodes "
-                     "that already have two connections");
+    const int moveNode1Id = lastSegmentNode(node1Id, mNodes);
+    const int moveNode2Id = lastSegmentNode(node2Id, mNodes);
+    {
+        Node& node1 = mNodes[node1Id];
+        if(node1.getNextNodeId() == moveNode1Id) {
+            node1.setNextNodeId(-1);
+        }
+        Node& node2 = mNodes[node2Id];
+        if(node2.getNextNodeId() == moveNode2Id) {
+            node2.setNextNodeId(-1);
+        }
     }
+    connectNodes(node1Id, node2Id, mNodes);
 
-    mNodes[moveNode1Id].setType(Node::DUMMY);
+    Node& moveNode1 = mNodes[moveNode1Id];
+    if(!moveNode1.isMove())
+        RuntimeThrow("Last node in not closed segment has to be MOVE node");
+    moveNode1.setType(Node::DUMMY);
     if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
     if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
     if(moveNode1Id != moveNode2Id) { // connecting two segments
-        mNodes[moveNode2Id].setType(Node::DUMMY);
+        Node& moveNode2 = mNodes[moveNode2Id];
+        if(!moveNode2.isMove())
+            RuntimeThrow("Last node in not closed segment has to be MOVE node");
+        moveNode2.setType(Node::DUMMY);
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
     }
 }
 
-void SmartPath::normalOrMoveNodeInsertedToPrev(const int &insertedNodeId) {
-    insertNodeToList(insertedNodeId, Node());
-    if(mNext) mNext->dissolvedOrDummyNodeInsertedToPrev(insertedNodeId);
-    updateNodeTypeAfterNeighbourChanged(insertedNodeId);
+void SmartPath::normalOrMoveNodeInsertedToPrev(const int &targetNodeId) {
+    dissolvedOrDummyNodeInsertedToPrev(targetNodeId);
+    const int insertId = targetNodeId == -1 ? mNodes.count() : targetNodeId + 1;
+    updateNodeTypeAfterNeighbourChanged(insertId);
 }
 
-void SmartPath::dissolvedOrDummyNodeInsertedToPrev(const int &insertedNodeId) {
-    insertNodeToList(insertedNodeId, Node());
-    if(mNext) mNext->dissolvedOrDummyNodeInsertedToPrev(insertedNodeId);
+void SmartPath::dissolvedOrDummyNodeInsertedToPrev(const int &targetNodeId) {
+    const int insertId = targetNodeId == -1 ? mNodes.count() : targetNodeId + 1;
+    insertNodeToList(insertId, Node());
+    if(targetNodeId != -1) connectNodes(targetNodeId, insertId, mNodes);
+    if(mNext) mNext->dissolvedOrDummyNodeInsertedToPrev(targetNodeId);
 }
 
-void SmartPath::normalOrMoveNodeInsertedToNext(const int &insertedNodeId) {
-    insertNodeToList(insertedNodeId, Node());
-    if(mPrev) mPrev->dissolvedOrDummyNodeInsertedToNext(insertedNodeId);
-    updateNodeTypeAfterNeighbourChanged(insertedNodeId);
+void SmartPath::normalOrMoveNodeInsertedToNext(const int &targetNodeId) {
+    dissolvedOrDummyNodeInsertedToNext(targetNodeId);
+    const int insertId = targetNodeId == -1 ? mNodes.count() : targetNodeId + 1;
+    updateNodeTypeAfterNeighbourChanged(insertId);
 }
 
-void SmartPath::dissolvedOrDummyNodeInsertedToNext(const int &insertedNodeId) {
-    insertNodeToList(insertedNodeId, Node());
-    if(mPrev) mPrev->dissolvedOrDummyNodeInsertedToNext(insertedNodeId);
+void SmartPath::dissolvedOrDummyNodeInsertedToNext(const int &targetNodeId) {
+    const int insertId = targetNodeId == -1 ? mNodes.count() : targetNodeId + 1;
+    insertNodeToList(insertId, Node());
+    if(targetNodeId != -1) connectNodes(targetNodeId, insertId, mNodes);
+    if(mPrev) mPrev->dissolvedOrDummyNodeInsertedToNext(targetNodeId);
 }
 
 void SmartPath::removeNodeWithIdAndTellPrevToDoSame(const int &nodeId) {

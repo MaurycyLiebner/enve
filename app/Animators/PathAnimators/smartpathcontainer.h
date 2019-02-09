@@ -41,11 +41,9 @@ struct Node {
     }
 
     int getNextNodeId() const {
-        if(isDummy() || isMove()) return -1;
         return mNextNodeId;
     }
     int getPrevNodeId() const {
-        if(isDummy() || isMove()) return -1;
         return mPrevNodeId;
     }
 
@@ -74,10 +72,6 @@ struct Node {
 
     void setType(const Type& type) {
         mType = type;
-        if(isDummy() || isMove()) {
-            mNextNodeId = -1;
-            mPrevNodeId = -1;
-        }
     }
 
     const Type& getType() const { return mType; }
@@ -95,11 +89,9 @@ private:
     Type mType;
 
     //! @brief Next connected node id in the list.
-    //! Used with dissolved node and all normal nodes
     int mNextNodeId = -1;
 
     //! @brief Previous connected node id in the list.
-    //! Used with dissolved node and all normal nodes
     int mPrevNodeId = -1;
 };
 
@@ -123,7 +115,7 @@ public:
 
     void actionInsertNormalNodeAfter(const int& afterId, const qreal& t);
 
-    void actionAddNormalNodeAtEnd(const int& nodeId,
+    void actionAddNormalNodeAtEnd(const int& afterId,
                                   const QPointF& c0,
                                   const QPointF& p1,
                                   const QPointF& c2);
@@ -134,13 +126,13 @@ public:
 
     void actionConnectNodes(const int& node1Id, const int& node2Id);
 
-    void normalOrMoveNodeInsertedToPrev(const int& insertedNodeId);
+    void normalOrMoveNodeInsertedToPrev(const int& targetNodeId);
 
-    void dissolvedOrDummyNodeInsertedToPrev(const int& insertedNodeId);
+    void dissolvedOrDummyNodeInsertedToPrev(const int& targetNodeId);
 
-    void normalOrMoveNodeInsertedToNext(const int& insertedNodeId);
+    void normalOrMoveNodeInsertedToNext(const int& targetNodeId);
 
-    void dissolvedOrDummyNodeInsertedToNext(const int& insertedNodeId);
+    void dissolvedOrDummyNodeInsertedToNext(const int& targetNodeId);
 
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
 
@@ -180,6 +172,7 @@ protected:
     SmartPath(const QList<Node>& nodes);
 private:
     SkPath getPathFor(SmartPath * const neighbour) const;
+    void insertNodeAfter(const int &afterId, const Node &nodeBlueprint);
 
     stdptr<SmartPath> mPrev;
     stdptr<SmartPath> mNext;
