@@ -112,7 +112,7 @@ QList<QList<Node>> sortNodeListAccoringToConnetions(const QList<Node>& srcList) 
             if(newNode.hasNextNode())
                 newNode.setNextNodeId(segment.count() + 1);
 
-            segment << newNode;
+            if(!newNode.isMove() && !newNode.isDummy()) segment << newNode;
 
             if(!srcNode.hasNextNode()) break;
             nextSrcId = srcNode.getNextNodeId();
