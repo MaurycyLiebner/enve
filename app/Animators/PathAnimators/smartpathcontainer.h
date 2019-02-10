@@ -103,10 +103,6 @@ class SmartPath : public StdSelfRef {
     friend class StdSelfRef;
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
-    void removeNodeFromList(const int& nodeId);
-
-    Node& insertNodeToList(const int& nodeId, const Node& node);
-
     void actionRemoveNormalNode(const int& nodeId);
 
     void actionAddFirstNode(const QPointF& c0,
@@ -128,13 +124,10 @@ public:
 
     void actionConnectNodes(const int& node1Id, const int& node2Id);
 
-    void normalOrMoveNodeInsertedToPrev(const int& targetNodeId);
-
-    void dissolvedOrDummyNodeInsertedToPrev(const int& targetNodeId);
-
-    void normalOrMoveNodeInsertedToNext(const int& targetNodeId);
-
-    void dissolvedOrDummyNodeInsertedToNext(const int& targetNodeId);
+    int dissolvedOrDummyNodeInsertedToNeigh(const int &targetNodeId,
+                                            const Neighbour &neigh);
+    void normalOrMoveNodeInsertedToNeigh(const int &targetNodeId,
+                                         const Neighbour& neigh);
 
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
 
