@@ -348,8 +348,12 @@ void splitNodeAndDisconnect(const int& nodeId, QList<Node>& nodes) {
     insertNodeAfter(nodeId, Node(Node::MOVE), nodes);
 }
 
-bool shouldSplitThisNode(const Node& thisNode,
-                         const Node& neighNode) {
+bool shouldSplitThisNode(const int& thisNodeId,
+                         const int& neighNodeId,
+                         const Node& thisNode,
+                         const Node& neighNode,
+                         const QList<Node>& thisNodes,
+                         const QList<Node>& neighNodes) {
     const bool prevDiffers = thisNode.getPrevNodeId() !=
             neighNode.getPrevNodeId();
     const bool nextDiffers = thisNode.getNextNodeId() !=
@@ -358,8 +362,11 @@ bool shouldSplitThisNode(const Node& thisNode,
     if(thisNode.isNormal()) {
         // if node is in the middle(has both previous and next node)
         if(thisNode.hasNextNode() && thisNode.hasPreviousNode()) {
+            if(nextNormalId(thisNodeId, thisNodes) == -1 &&
+               nextNormalId(neighNodeId, neighNodes) != -1) return true;
+            const Node& thisNextNode = thisNodes.at(thisNode.getNextNodeId());
             // split node only if both nodes differ
-            return prevDiffers && nextDiffers;
+            if(!thisNextNode.isMove()) return prevDiffers && nextDiffers;
         }
     }
     // if node is not normal and in the middle
@@ -715,7 +722,8 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
         }
 
         // Create splits for connecting/disconnecting
-        if(shouldSplitThisNode(thisNode, neighbourNode)) {
+        if(shouldSplitThisNode(resI, i, thisNode, neighbourNode,
+                               mNodes, neighNodes)) {
             if(thisNode.isDissolved()) {
                 promoteDissolvedNodeToNormal(resI, result);
                 splitNodeAndDisconnect(resI, result);
