@@ -56,12 +56,44 @@ int main(int argc, char *argv[]) {
     prevPath->setNext(nextPath.get());
     nextPath->setPrev(prevPath.get());
 
+    qDebug() << "DISCONNECT";
     nextPath->actionDisconnectNodes(2, 3);
 
+    qDebug() << "prevPath at:";
     prevPath->getPathAt();
+    qDebug() << "nextPath at:";
     nextPath->getPathAt();
 
+    qDebug() << "prevPath for next:";
     prevPath->getPathForNext();
+    qDebug() << "nextPath for prev:";
+    nextPath->getPathForPrev();
+
+    qDebug() << "ADD NODE";
+    pt = QPointF(1.5, 0.5);
+    nextPath->actionInsertNodeBetween(2, 3, pt, pt, pt);
+
+    qDebug() << "prevPath at:";
+    prevPath->getPathAt();
+    qDebug() << "nextPath at:";
+    nextPath->getPathAt();
+
+    qDebug() << "prevPath for next:";
+    prevPath->getPathForNext();
+    qDebug() << "nextPath for prev:";
+    nextPath->getPathForPrev();
+
+    qDebug() << "CONNECT";
+    nextPath->actionConnectNodes(3, 5);
+
+    qDebug() << "prevPath at:";
+    prevPath->getPathAt();
+    qDebug() << "nextPath at:";
+    nextPath->getPathAt();
+
+    qDebug() << "prevPath for next:";
+    prevPath->getPathForNext();
+    qDebug() << "nextPath for prev:";
     nextPath->getPathForPrev();
 
     w.show();
