@@ -329,31 +329,19 @@ void promoteDissolvedNodeToNormal(const int& nodeId,
     promoteDissolvedNodeToNormal(nodeId, node, nodes);
 }
 
-void splitNode(Node& node, const int& nodeId, QList<Node>& nodes) {
+void splitNode(const int& nodeId, QList<Node>& nodes) {
+    Node& node = nodes[nodeId];
     Node newNode = node;
-    const int insertId = nodeId + 1;
     if(node.isNormal()) {
         node.fC2 = node.fP1;
         newNode.fC0 = newNode.fP1;
-        insertNodeToList(insertId, newNode, nodes);
-        nodes.insert(insertId, newNode);
-    } else if(node.isDissolved()) {
-        insertNodeToList(insertId, newNode, nodes);
     }
-    fixIdsAfterInsertAfter(nodeId);
-}
-
-void splitNode(const int& nodeId, QList<Node>& nodes) {
-    Node& node = nodes[nodeId];
-    splitNode(node, nodeId, nodes);
+    insertNodeAfter(nodeId, newNode, nodes);
 }
 
 void splitNodeAndDisconnect(const int& nodeId, QList<Node>& nodes) {
-    Node& node = nodes[nodeId];
-    if(!node.isNormal())
-        RuntimeThrow("Can only disconnect normal nodes.");
-    splitNode(node, nodeId, nodes);
-    insertNodeToList(nodeId + 1, Node(Node::MOVE), nodes);
+    splitNode(nodeId, nodes);
+    insertNodeAfter(nodeId, Node(Node::MOVE), nodes);
 }
 
 bool shouldSplitThisNode(const Node& thisNode, const Node& neighNode) {
@@ -727,7 +715,7 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
                 splitNodeAndDisconnect(resI, result);
                 iShift += 2;
             } else if(resultNode.isNormal()) {
-                splitNode(resultNode, resI, result);
+                splitNode(resI, result);
                 iShift++;
             }
         }
