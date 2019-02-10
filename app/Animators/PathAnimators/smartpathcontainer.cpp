@@ -344,10 +344,12 @@ void splitNodeAndDisconnect(const int& nodeId, QList<Node>& nodes) {
     insertNodeAfter(nodeId, Node(Node::MOVE), nodes);
 }
 
-bool shouldSplitThisNode(const Node& thisNode, const Node& neighNode) {
-    const bool prevDiffers = thisNode.getPrevNodeId() !=
+bool shouldSplitThisNode(const Node& thisNode,
+                         const int& thisShift,
+                         const Node& neighNode) {
+    const bool prevDiffers = thisNode.getPrevNodeId() - thisShift !=
             neighNode.getPrevNodeId();
-    const bool nextDiffers = thisNode.getNextNodeId() !=
+    const bool nextDiffers = thisNode.getNextNodeId() - thisShift !=
             neighNode.getNextNodeId();
     // if node is normal
     if(thisNode.isNormal()) {
@@ -709,7 +711,7 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
         }
 
         // Create splits for connecting/disconnecting
-        if(shouldSplitThisNode(resultNode, neighbourNode)) {
+        if(shouldSplitThisNode(resultNode, iShift, neighbourNode)) {
             if(resultNode.isDissolved()) {
                 promoteDissolvedNodeToNormal(resI, result);
                 splitNodeAndDisconnect(resI, result);
