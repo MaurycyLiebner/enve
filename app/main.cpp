@@ -57,8 +57,12 @@ int main(int argc, char *argv[]) {
     nextPath->setPrev(prevPath.get());
 
     nextPath->actionDisconnectNodes(2, 3);
+
+    prevPath->getPathAt();
     nextPath->getPathAt();
+
     prevPath->getPathForNext();
+    nextPath->getPathForPrev();
 
     w.show();
 

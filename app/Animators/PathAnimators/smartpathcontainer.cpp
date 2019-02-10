@@ -125,11 +125,14 @@ int insertNodeAfter(const int& prevId,
     const int nextId = prevNode.getNextNodeId();
     if(nextId != -1) {
         Node& nextNode = nodes[nextId];
-        nextNode.setPrevNodeId(insertId);
+        if(nodeBlueprint.isMove()) nextNode.setPrevNodeId(-1);
+        else nextNode.setPrevNodeId(insertId);
     }
     prevNode.setNextNodeId(insertId);
     insertedNode.setPrevNodeId(prevId);
-    insertedNode.setNextNodeId(nextId);
+    if(nodeBlueprint.isMove()) insertedNode.setNextNodeId(-1);
+    else insertedNode.setNextNodeId(nextId);
+
     return insertId;
 }
 
@@ -242,6 +245,7 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
         }
         result.addPath(currPath);
     }
+    qDebug() << "";
     return result;
 }
 
@@ -345,11 +349,10 @@ void splitNodeAndDisconnect(const int& nodeId, QList<Node>& nodes) {
 }
 
 bool shouldSplitThisNode(const Node& thisNode,
-                         const int& thisShift,
                          const Node& neighNode) {
-    const bool prevDiffers = thisNode.getPrevNodeId() - thisShift !=
+    const bool prevDiffers = thisNode.getPrevNodeId() !=
             neighNode.getPrevNodeId();
-    const bool nextDiffers = thisNode.getNextNodeId() - thisShift !=
+    const bool nextDiffers = thisNode.getNextNodeId() !=
             neighNode.getNextNodeId();
     // if node is normal
     if(thisNode.isNormal()) {
@@ -702,17 +705,18 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
         const int resI = i + iShift;
         Node& resultNode = result[resI];
         const Node& neighbourNode = neighNodes.at(i);
+        const Node& thisNode = mNodes.at(i);
 
         // Remove nodes if not needed
         if((neighbourNode.isDummy() || neighbourNode.isDissolved()) &&
-                (resultNode.isDummy() || resultNode.isDissolved())) {
+                (thisNode.isDummy() || thisNode.isDissolved())) {
             iShift--;
             removeNodeFromList(resI, result);
         }
 
         // Create splits for connecting/disconnecting
-        if(shouldSplitThisNode(resultNode, iShift, neighbourNode)) {
-            if(resultNode.isDissolved()) {
+        if(shouldSplitThisNode(thisNode, neighbourNode)) {
+            if(thisNode.isDissolved()) {
                 promoteDissolvedNodeToNormal(resI, result);
                 splitNodeAndDisconnect(resI, result);
                 iShift += 2;
