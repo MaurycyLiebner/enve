@@ -529,8 +529,12 @@ void SmartPath::actionConnectNodes(const int &node1Id,
         Node& moveNode2 = mNodes[moveNode2Id];
         if(!moveNode1.isMove() || !moveNode2.isMove())
             RuntimeThrow("Trying to connect a closed segment");
+        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
+        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
         RuntimeThrow("Not yet finished");
     }
+    if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
+    if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
 }
 
 int SmartPath::dissolvedOrDummyNodeInsertedToNeigh(const int &targetNodeId,
