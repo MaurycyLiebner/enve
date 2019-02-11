@@ -1,6 +1,15 @@
 #include "smartpathcontainer.h"
 
 void removeNodeFromList(const int &nodeId, QList<Node>& nodes) {
+    const Node& nodeToRemove = nodes.at(nodeId);
+    if(nodeToRemove.hasPreviousNode()) {
+        Node& prevNode = nodes[nodeToRemove.getPrevNodeId()];
+        prevNode.setNextNodeId(nodeToRemove.getNextNodeId());
+    }
+    if(nodeToRemove.hasNextNode()) {
+        Node& nextNode = nodes[nodeToRemove.getNextNodeId()];
+        nextNode.setPrevNodeId(nodeToRemove.getPrevNodeId());
+    }
     nodes.removeAt(nodeId);
     for(int i = 0; i < nodes.count(); i++) {
         Node& iNode = nodes[i];
@@ -25,7 +34,6 @@ int firstSegmentNode(const int& nodeId, const QList<Node>& nodes) {
     int smallestId = nodeId;
     int currId = nodeId;
     while(true) {
-        //if(currNode->isDissolved() || currNode->isNormal())
         if(!currNode->hasPreviousNode()) return currId;
         const int prevId = currNode->getPrevNodeId();
         if(prevId == currId)
@@ -33,6 +41,7 @@ int firstSegmentNode(const int& nodeId, const QList<Node>& nodes) {
         if(prevId == smallestId) return smallestId;
         smallestId = qMin(prevId, smallestId);
         currNode = &nodes.at(prevId);
+        if(currNode->isMove()) return currId;
         currId = prevId;
     }
 }
@@ -41,14 +50,10 @@ int lastSegmentNode(const int& nodeId, const QList<Node>& nodes) {
     if(nodeId < 0) return -1;
     if(nodeId >= nodes.count()) return -1;
     const Node * currNode = &nodes.at(nodeId);
-    if(currNode->isDummy() || currNode->isMove()) return -1;
     int smallestId = nodeId;
     int currId = nodeId;
     while(true) {
-        if(currNode->isDummy())
-            RuntimeThrow("Dummy used as a next node(should be skipped)");
-        //if(currNode->isDissolved() || currNode->isNormal())
-        if(!currNode->hasNextNode()) return currId;
+        if(currNode->isMove()) return currId;
         const int nextId = currNode->getNextNodeId();
         if(nextId == currId)
             RuntimeThrow("Node points to itself");
@@ -94,11 +99,6 @@ int insertNodeAfter(const int& prevId,
 int insertNodeBefore(const int& nextId,
                      const Node& nodeBlueprint,
                      QList<Node>& nodes) {
-    {
-        Node& nextNode = nodes[nextId];
-        if(nextNode.isMove()) return insertNodeAfter(nextId - 1, nodeBlueprint,
-                                                     nodes);
-    }
     const int insertId = nextId;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint, nodes);
     const int shiftedNextId = nextId + 1;
@@ -108,7 +108,7 @@ int insertNodeBefore(const int& nextId,
         Node& prevNode = nodes[prevId];
         prevNode.setNextNodeId(insertId);
     }
-    nextNode.setNextNodeId(insertId);
+    nextNode.setPrevNodeId(insertId);
     insertedNode.setPrevNodeId(prevId);
     insertedNode.setNextNodeId(shiftedNextId);
     return insertId;
@@ -221,7 +221,8 @@ SkPath nodesToSkPath(const QList<Node>& nodes) {
             const Node& node = segment.at(i);
             if(node.isDummy()) continue;
             else if(node.isDissolved()) dissolvedTs << node.fT;
-            else if(node.isMove()) RuntimeThrow("No MOVE node should have gotten here");
+            else if(node.isMove())
+                RuntimeThrow("No MOVE node should have gotten here");
             else if(node.isNormal()) {
                 if(move) {
                     firstNode = &node;
@@ -511,33 +512,24 @@ void SmartPath::actionConnectNodes(const int &node1Id,
                                    const int &node2Id) {
     const int moveNode1Id = lastSegmentNode(node1Id, mNodes);
     const int moveNode2Id = lastSegmentNode(node2Id, mNodes);
-    {
-        Node& node1 = mNodes[node1Id];
-        if(node1.getNextNodeId() == moveNode1Id) {
-            node1.setNextNodeId(-1);
-        }
-        Node& node2 = mNodes[node2Id];
-        if(node2.getNextNodeId() == moveNode2Id) {
-            node2.setNextNodeId(-1);
-        }
-    }
-    connectNodes(node1Id, node2Id, mNodes);
-
-    Node& moveNode1 = mNodes[moveNode1Id];
-    if(!moveNode1.isMove())
-        RuntimeThrow("Last node in not closed segment has to be MOVE node");
-    moveNode1.setType(Node::DUMMY);
-    moveNode1.setPrevNodeId(-1);
-    if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
-    if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
-    if(moveNode1Id != moveNode2Id) { // connecting two segments
+    if(moveNode1Id == -1 || moveNode2Id == -1)
+        RuntimeThrow("Node is not part of a segment");
+    // if closing single segment
+    if(moveNode1Id == moveNode2Id) {
+        Node& moveNode = mNodes[moveNode1Id];
+        if(!moveNode.isMove())
+            RuntimeThrow("Trying to connect a closed segment");
+        moveNode.setType(Node::DUMMY);
+        const int firstNodeId = firstSegmentNode(node1Id, mNodes);
+        Node& firstNode = mNodes[firstNodeId];
+        moveNode.setNextNodeId(firstNodeId);
+        firstNode.setPrevNodeId(moveNode1Id);
+    } else { // if connecting two seperate segments
+        Node& moveNode1 = mNodes[moveNode1Id];
         Node& moveNode2 = mNodes[moveNode2Id];
-        if(!moveNode2.isMove())
-            RuntimeThrow("Last node in not closed segment has to be MOVE node");
-        moveNode2.setType(Node::DUMMY);
-        moveNode2.setPrevNodeId(-1);
-        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
-        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
+        if(!moveNode1.isMove() || !moveNode2.isMove())
+            RuntimeThrow("Trying to connect a closed segment");
+        RuntimeThrow("Not yet finished");
     }
 }
 
