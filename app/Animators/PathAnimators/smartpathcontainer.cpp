@@ -463,8 +463,8 @@ void SmartPath::insertNodeBetween(const int& prevId,
         promoteDissolvedNodeToNormal(insertId, newNode, mNodes);
     }
 
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNeigh(prevId - 1, NEXT);
-    if(mNext) mNext->normalOrMoveNodeInsertedToNeigh(prevId - 1, PREV);
+    if(mPrev) mPrev->normalOrMoveNodeInsertedToNeigh(prevId, NEXT);
+    if(mNext) mNext->normalOrMoveNodeInsertedToNeigh(prevId, PREV);
 }
 
 void SmartPath::actionInsertNodeBetween(const int &prevId,
