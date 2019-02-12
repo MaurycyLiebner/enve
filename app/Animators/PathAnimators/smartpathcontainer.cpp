@@ -718,7 +718,7 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
         }
 
         // Create splits for connecting/disconnecting
-        if(shouldSplitThisNode(resI, i, thisNode, neighbourNode,
+        if(shouldSplitThisNode(i, i, thisNode, neighbourNode,
                                mNodes, neighNodes)) {
             if(thisNode.isDissolved()) {
                 promoteDissolvedNodeToNormal(resI, result);

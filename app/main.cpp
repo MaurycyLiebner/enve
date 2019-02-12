@@ -96,6 +96,44 @@ int main(int argc, char *argv[]) {
     qDebug() << "nextPath for prev:";
     nextPath->getPathForPrev();
 
+    qDebug() << "INSERT NODE";
+    nextPath->actionInsertNodeBetween(0, 1, 0.5);
+
+    qDebug() << "prevPath at:";
+    prevPath->getPathAt();
+    qDebug() << "nextPath at:";
+    nextPath->getPathAt();
+
+    qDebug() << "prevPath for next:";
+    prevPath->getPathForNext();
+    qDebug() << "nextPath for prev:";
+    nextPath->getPathForPrev();
+
+    qDebug() << "REMOVE NODE";
+    nextPath->actionRemoveNormalNode(3);
+
+    qDebug() << "prevPath at:";
+    prevPath->getPathAt();
+    qDebug() << "nextPath at:";
+    nextPath->getPathAt();
+
+    qDebug() << "prevPath for next:";
+    prevPath->getPathForNext();
+    qDebug() << "nextPath for prev:";
+    nextPath->getPathForPrev();
+
+    qDebug() << "DISCONNECT";
+    nextPath->actionDisconnectNodes(3, 4);
+
+    qDebug() << "prevPath at:";
+    prevPath->getPathAt();
+    qDebug() << "nextPath at:";
+    nextPath->getPathAt();
+
+    qDebug() << "prevPath for next:";
+    prevPath->getPathForNext();
+    qDebug() << "nextPath for prev:";
+    nextPath->getPathForPrev();
     w.show();
 
     return a.exec();
