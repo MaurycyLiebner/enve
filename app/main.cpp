@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     nextPath->getPathForPrev();
 
     qDebug() << "REMOVE NODE";
-    nextPath->actionRemoveNormalNode(3);
+    prevPath->actionRemoveNormalNode(3);
 
     qDebug() << "prevPath at:";
     prevPath->getPathAt();
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
     nextPath->getPathForPrev();
 
     qDebug() << "DISCONNECT";
-    nextPath->actionDisconnectNodes(3, 4);
+    prevPath->actionDisconnectNodes(3, 4);
 
     qDebug() << "prevPath at:";
     prevPath->getPathAt();
