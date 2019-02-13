@@ -167,6 +167,7 @@ protected:
     SmartPath(const QList<Node>& nodes);
 private:
     void setNodeType(const int& nodeId, const Node::Type& type) {
+        if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeType(nodeId, mNodes[nodeId], type);
     }
 
@@ -177,6 +178,7 @@ private:
     }
 
     void setNodeNextId(const int& nodeId, const int& nextId) {
+        if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeNextId(nodeId, mNodes[nodeId], nextId);
     }
 
@@ -187,6 +189,7 @@ private:
     }
 
     void setNodePrevId(const int& nodeId, const int& prevId) {
+        if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodePrevId(nodeId, mNodes[nodeId], prevId);
     }
 
@@ -198,6 +201,7 @@ private:
 
     void setNodePrevAndNextId(const int& nodeId,
                               const int& prevId, const int& nextId) {
+        if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodePrevAndNextId(nodeId, mNodes[nodeId], prevId, nextId);
     }
 

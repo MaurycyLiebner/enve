@@ -378,30 +378,6 @@ bool shouldSplitThisNode(const int& nodeId,
     return prevDiffers || nextDiffers;
 }
 
-void connectNodes(const int& node1Id, const int& node2Id,
-                  QList<Node>& nodes) {
-    Node& node1 = nodes[node1Id];
-    Node& node2 = nodes[node2Id];
-    if(!node1.hasNextNode() && !node2.hasPreviousNode()) {
-        node1.setNextNodeId(node2Id);
-        node2.setPrevNodeId(node1Id);
-    } else if(!node1.hasPreviousNode() && !node2.hasNextNode()) {
-        node1.setPrevNodeId(node2Id);
-        node2.setNextNodeId(node1Id);
-    } else if(!node1.hasPreviousNode() && !node2.hasPreviousNode()) {
-        reverseSegment(node1Id, nodes);
-        node1.setNextNodeId(node2Id);
-        node2.setPrevNodeId(node1Id);
-    } else if(!node1.hasNextNode() && !node2.hasNextNode()) {
-        reverseSegment(node1Id, nodes);
-        node1.setPrevNodeId(node2Id);
-        node2.setNextNodeId(node1Id);
-    } else {
-        RuntimeThrow("Trying to connect nodes "
-                     "that already have two connections");
-    }
-}
-
 bool nodesConnected(const int& node1Id, const int& node2Id,
                     const QList<Node>& nodes) {
     const Node& node1 = nodes.at(node1Id);
@@ -487,44 +463,26 @@ void SmartPath::moveNodeAfter(const int& moveNodeId, Node& moveNode,
                               const int& afterNodeId, Node& afterNode) {
     const int movePrevId = moveNode.getPrevNodeId();
     const int moveNextId = moveNode.getNextNodeId();
-    if(movePrevId != -1) {
-        Node& movePrev = mNodes[movePrevId];
-        movePrev.setNextNodeId(moveNextId);
-    }
-    if(moveNextId != -1) {
-        Node& moveNext = mNodes[moveNextId];
-        moveNext.setPrevNodeId(movePrevId);
-    }
+    setNodeNextId(movePrevId, moveNextId);
+    setNodePrevId(moveNextId, movePrevId);
+
     const int afterNextId = afterNode.getNextNodeId();
-    moveNode.setPrevNodeId(afterNodeId);
-    afterNode.setNextNodeId(moveNodeId);
-    moveNode.setNextNodeId(afterNextId);
-    if(afterNextId != -1) {
-        Node& afterNext = mNodes[afterNextId];
-        afterNext.setPrevNodeId(moveNodeId);
-    }
+    setNodeNextId(afterNodeId, afterNode, moveNodeId);
+    setNodePrevAndNextId(moveNodeId, moveNode, afterNodeId, afterNextId);
+    setNodePrevId(afterNextId, moveNodeId);
 }
 
 void SmartPath::moveNodeBefore(const int& moveNodeId, Node& moveNode,
                                const int& beforeNodeId, Node& beforeNode) {
     const int movePrevId = moveNode.getPrevNodeId();
     const int moveNextId = moveNode.getNextNodeId();
-    if(movePrevId != -1) {
-        Node& movePrev = mNodes[movePrevId];
-        movePrev.setNextNodeId(moveNextId);
-    }
-    if(moveNextId != -1) {
-        Node& moveNext = mNodes[moveNextId];
-        moveNext.setPrevNodeId(movePrevId);
-    }
+    setNodeNextId(movePrevId, moveNextId);
+    setNodePrevId(moveNextId, movePrevId);
+
     const int beforePrevId = beforeNode.getPrevNodeId();
-    moveNode.setNextNodeId(beforeNodeId);
-    beforeNode.setPrevNodeId(moveNodeId);
-    moveNode.setPrevNodeId(beforePrevId);
-    if(beforePrevId != -1) {
-        Node& beforePrev = mNodes[beforePrevId];
-        beforePrev.setNextNodeId(moveNodeId);
-    }
+    setNodePrevId(beforeNodeId, beforeNode, moveNodeId);
+    setNodePrevAndNextId(moveNodeId, moveNode, beforePrevId, beforeNodeId);
+    setNodeNextId(beforePrevId, moveNodeId);
 }
 
 void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
