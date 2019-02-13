@@ -354,10 +354,14 @@ bool shouldSplitThisNode(const int& nodeId,
                          const Node& neighNode,
                          const QList<Node>& thisNodes,
                          const QList<Node>& neighNodes) {
-    const bool prevDiffers = thisNode.getPrevNodeId() !=
-            neighNode.getPrevNodeId();
-    const bool nextDiffers = thisNode.getNextNodeId() !=
-            neighNode.getNextNodeId();
+    const int thisPrevId = thisNode.getPrevNodeId();
+    const int thisNextId = thisNode.getNextNodeId();
+    const int neighPrevId = neighNode.getPrevNodeId();
+    const int neighNextId = neighNode.getNextNodeId();
+    const bool prevDiffers = thisPrevId != neighPrevId &&
+                             thisPrevId != neighNextId;
+    const bool nextDiffers = thisNextId != neighNextId &&
+                             thisNextId != neighPrevId;
     // if node is normal
     if(thisNode.isNormal()) {
         // if node is in the middle(has both previous and next node)
@@ -396,14 +400,6 @@ void connectNodes(const int& node1Id, const int& node2Id,
         RuntimeThrow("Trying to connect nodes "
                      "that already have two connections");
     }
-}
-
-void disconnectNodes(const int& prevId, const int& nextId,
-                     QList<Node>& mNodes) {
-    Node& nextNode = mNodes[nextId];
-    nextNode.setPrevNodeId(-1);
-    Node& prevNode = mNodes[prevId];
-    prevNode.setNextNodeId(-1);
 }
 
 bool nodesConnected(const int& node1Id, const int& node2Id,
@@ -487,9 +483,55 @@ void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
     if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
 }
 
+void SmartPath::moveNodeAfter(const int& moveNodeId, Node& moveNode,
+                              const int& afterNodeId, Node& afterNode) {
+    const int movePrevId = moveNode.getPrevNodeId();
+    const int moveNextId = moveNode.getNextNodeId();
+    if(movePrevId != -1) {
+        Node& movePrev = mNodes[movePrevId];
+        movePrev.setNextNodeId(moveNextId);
+    }
+    if(moveNextId != -1) {
+        Node& moveNext = mNodes[moveNextId];
+        moveNext.setPrevNodeId(movePrevId);
+    }
+    const int afterNextId = afterNode.getNextNodeId();
+    moveNode.setPrevNodeId(afterNodeId);
+    afterNode.setNextNodeId(moveNodeId);
+    moveNode.setNextNodeId(afterNextId);
+    if(afterNextId != -1) {
+        Node& afterNext = mNodes[afterNextId];
+        afterNext.setPrevNodeId(moveNodeId);
+    }
+}
+
+void SmartPath::moveNodeBefore(const int& moveNodeId, Node& moveNode,
+                               const int& beforeNodeId, Node& beforeNode) {
+    const int movePrevId = moveNode.getPrevNodeId();
+    const int moveNextId = moveNode.getNextNodeId();
+    if(movePrevId != -1) {
+        Node& movePrev = mNodes[movePrevId];
+        movePrev.setNextNodeId(moveNextId);
+    }
+    if(moveNextId != -1) {
+        Node& moveNext = mNodes[moveNextId];
+        moveNext.setPrevNodeId(movePrevId);
+    }
+    const int beforePrevId = beforeNode.getPrevNodeId();
+    moveNode.setNextNodeId(beforeNodeId);
+    beforeNode.setPrevNodeId(moveNodeId);
+    moveNode.setPrevNodeId(beforePrevId);
+    if(beforePrevId != -1) {
+        Node& beforePrev = mNodes[beforePrevId];
+        beforePrev.setNextNodeId(moveNodeId);
+    }
+}
+
 void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     Node& node1 = mNodes[node1Id];
     Node& node2 = mNodes[node2Id];
+    if(node1.isMove() || node2.isMove())
+        RuntimeThrow("Cannot disconnect move node");
     int nextId;
     int prevId;
     if(node1.getNextNodeId() == node2Id) {
@@ -501,7 +543,36 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     } else {
         RuntimeThrow("Trying to disconnect not connected nodes");
     }
-    disconnectNodes(prevId, nextId, mNodes);
+    Node& prevNode = mNodes[prevId];
+    if(!prevNode.isNormal()) {
+        const int prevNormalIdV = prevNormalId(prevId, mNodes);
+        Node& prevNormalNode = mNodes[prevNormalIdV];
+        int currNodeId = prevId;
+        while(true) {
+            if(currNodeId == -1) break;
+            Node& currNode = mNodes[currNodeId];
+            if(currNode.isNormal() || currNode.isMove()) break;
+            const int prevNodeId = currNode.getPrevNodeId();
+            moveNodeBefore(currNodeId, currNode,
+                           prevNormalIdV, prevNormalNode);
+            currNodeId = prevNodeId;
+        }
+    }
+    Node& nextNode = mNodes[nextId];
+    if(!nextNode.isNormal()) {
+        const int nextNormalIdV = nextNormalId(nextId, mNodes);
+        Node& nextNormalNode = mNodes[nextNormalIdV];
+        int currNodeId = nextNormalNode.getPrevNodeId();
+        while(true) {
+            if(currNodeId == -1) break;
+            Node& currNode = mNodes[currNodeId];
+            if(currNode.isNormal() || currNode.isMove()) break;
+            const int nextNodeId = currNode.getPrevNodeId();
+            moveNodeAfter(currNodeId, currNode,
+                          nextNormalIdV, nextNormalNode);
+            currNodeId = nextNodeId;
+        }
+    }
     insertNodeAfter(prevId, Node(Node::MOVE), mNodes);
     if(mPrev) mPrev->normalOrMoveNodeInsertedToNeigh(prevId, NEXT);
     if(mNext) mNext->normalOrMoveNodeInsertedToNeigh(prevId, PREV);
