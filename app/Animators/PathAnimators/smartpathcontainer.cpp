@@ -685,21 +685,26 @@ bool SmartPath::updateNodeTypeAfterNeighbourChanged(const int &nodeId) {
     Node::Type prevType = Node::DUMMY;
     Node::Type nextType = Node::DUMMY;
     int prevNextId = -1;
-    int nextNextId = -1;
+    int prevPrevId = -1;
     if(mPrev) {
         const Node& prevNode = mPrev->getNodes().at(nodeId);
         prevType = prevNode.getType();
         prevNextId = prevNode.getNextNodeId();
+        prevPrevId = prevNode.getPrevNodeId();
     }
+    int nextNextId = -1;
+    int nextPrevId = -1;
     if(mNext) {
         const Node& nextNode = mNext->getNodes().at(nodeId);
         nextType = nextNode.getType();
         nextNextId = nextNode.getNextNodeId();
+        nextPrevId = nextNode.getPrevNodeId();
     }
+    const int nodeNextId = node.getNextNodeId();
     if(prevType == Node::NORMAL || nextType == Node::NORMAL ||
             prevType == Node::MOVE || nextType == Node::MOVE ||
-            (node.getNextNodeId() != nextNextId && nextType != Node::DUMMY) ||
-            (node.getNextNodeId() != prevNextId && prevType != Node::DUMMY)) {
+            ((nodeNextId != nextNextId && nodeNextId != nextPrevId) && nextType != Node::DUMMY) ||
+            ((nodeNextId != prevNextId && nodeNextId != prevPrevId) && prevType != Node::DUMMY)) {
         if(node.getType() != Node::DISSOLVED) {
             node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
             node.setType(Node::DISSOLVED);

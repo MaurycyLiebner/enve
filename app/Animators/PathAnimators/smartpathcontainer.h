@@ -166,6 +166,54 @@ protected:
     SmartPath();
     SmartPath(const QList<Node>& nodes);
 private:
+    void setNodeType(const int& nodeId, const Node::Type& type) {
+        setNodeType(nodeId, mNodes[nodeId], type);
+    }
+
+    void setNodeType(const int& nodeId, Node& node,
+                     const Node::Type& type) {
+        node.setType(type);
+        updateAfterNodeChanged(nodeId);
+    }
+
+    void setNodeNextId(const int& nodeId, const int& nextId) {
+        setNodeNextId(nodeId, mNodes[nodeId], nextId);
+    }
+
+    void setNodeNextId(const int& nodeId, Node& node,
+                       const int& nextId) {
+        node.setNextNodeId(nextId);
+        updateAfterNodeChanged(nodeId);
+    }
+
+    void setNodePrevId(const int& nodeId, const int& prevId) {
+        setNodePrevId(nodeId, mNodes[nodeId], prevId);
+    }
+
+    void setNodePrevId(const int& nodeId, Node& node,
+                       const int& prevId) {
+        node.setPrevNodeId(prevId);
+        updateAfterNodeChanged(nodeId);
+    }
+
+    void setNodePrevAndNextId(const int& nodeId,
+                              const int& prevId, const int& nextId) {
+        setNodePrevAndNextId(nodeId, mNodes[nodeId], prevId, nextId);
+    }
+
+    void setNodePrevAndNextId(const int& nodeId, Node& node,
+                              const int& prevId, const int& nextId) {
+        node.setPrevNodeId(prevId);
+        node.setNextNodeId(nextId);
+        updateAfterNodeChanged(nodeId);
+    }
+
+    void updateAfterNodeChanged(const int& nodeId) {
+        updateNodeTypeAfterNeighbourChanged(nodeId);
+        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
+        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
+    }
+
     SkPath getPathFor(SmartPath * const neighbour) const;
     void insertNodeBetween(const int &prevId, const int &nextId,
                            const Node &nodeBlueprint);
