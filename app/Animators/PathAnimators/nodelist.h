@@ -6,6 +6,7 @@
 class SkPath;
 class NodeList : public StdSelfRef {
     friend class StdSelfRef;
+    enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
     Node& operator[](const int& i) {
         return mNodes[i];
@@ -90,12 +91,11 @@ public:
     int firstSegmentNode(const int &nodeId) const;
     int lastSegmentNode(const int &nodeId) const;
     void removeNodeFromList(const int &nodeId);
-    Node &insertNodeToList(const int &nodeId, const Node &node);
     int nodesInSameSagment(const int &node1Id, const int &node2Id) const;
     void reverseSegment(const int &nodeId);
     bool segmentClosed(const int &nodeId) const;
-    int insertNodeBefore(const int &nextId, const Node &nodeBlueprint);
-    int insertNodeAfter(const int &prevId, const Node &nodeBlueprint);
+
+    int insertFirstNode(const Node &nodeBlueprint);
     void promoteDissolvedNodeToNormal(const int &nodeId, Node &node);
     void promoteDissolvedNodeToNormal(const int &nodeId);
     void splitNode(const int &nodeId);
@@ -121,6 +121,18 @@ public:
                        const int &afterNodeId, Node &afterNode);
     void moveNodeBefore(const int &moveNodeId, Node &moveNode,
                         const int &beforeNodeId, Node &beforeNode);
+
+    int insertNodeBefore(const int &nextId, const Node &nodeBlueprint) {
+        return insertNodeBefore(nextId, nodeBlueprint, BOTH);
+    }
+
+    int insertNodeAfter(const int &prevId, const Node &nodeBlueprint) {
+        return insertNodeAfter(prevId, nodeBlueprint, BOTH);
+    }
+
+    int appendNode(const Node &nodeBlueprint) {
+        return appendNode(nodeBlueprint, BOTH);
+    }
 protected:
     NodeList() {}
     NodeList(const QList<Node>& list) : mNodes(list) {}
@@ -129,9 +141,15 @@ protected:
     const QList<Node>& getList() const {
         return mNodes;
     }
+    int insertNodeBefore(const int &nextId, const Node &nodeBlueprint,
+                         const Neighbour& neigh);
+    int insertNodeAfter(const int &prevId, const Node &nodeBlueprint,
+                        const Neighbour& neigh);
+    int appendNode(const Node &nodeBlueprint, const Neighbour &neigh);
 private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;
+    Node &insertNodeToList(const int &nodeId, const Node &node);
 
     stdptr<NodeList> mPrev;
     stdptr<NodeList> mNext;

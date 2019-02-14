@@ -27,13 +27,8 @@ void SmartPath::actionRemoveNormalNode(const int &nodeId) {
 void SmartPath::actionAddFirstNode(const QPointF &c0,
                                    const QPointF &p1,
                                    const QPointF &c2) {
-    const int insertId = mNodes->count();
-    mNodes->insertNodeToList(insertId, Node(c0, p1, c2));
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNeigh(-1, NEXT);
-    if(mNext) mNext->normalOrMoveNodeInsertedToNeigh(-1, PREV);
+    const int insertId = mNodes->appendNode(Node(c0, p1, c2));
     mNodes->insertNodeAfter(insertId, Node(Node::MOVE));
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNeigh(insertId, NEXT);
-    if(mNext) mNext->normalOrMoveNodeInsertedToNeigh(insertId, PREV);
 }
 
 void SmartPath::insertNodeBetween(const int& prevId,
@@ -46,9 +41,6 @@ void SmartPath::insertNodeBetween(const int& prevId,
         Node& newNode = mNodes->at(insertId);
         mNodes->promoteDissolvedNodeToNormal(insertId, newNode);
     }
-
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNeigh(prevId, NEXT);
-    if(mNext) mNext->normalOrMoveNodeInsertedToNeigh(prevId, PREV);
 }
 
 void SmartPath::actionInsertNodeBetween(const int &prevId,
@@ -116,8 +108,6 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
         }
     }
     mNodes->insertNodeAfter(prevId, Node(Node::MOVE));
-    if(mPrev) mPrev->normalOrMoveNodeInsertedToNeigh(prevId, NEXT);
-    if(mNext) mNext->normalOrMoveNodeInsertedToNeigh(prevId, PREV);
 }
 
 void SmartPath::actionConnectNodes(const int &node1Id,
@@ -144,28 +134,6 @@ void SmartPath::actionConnectNodes(const int &node1Id,
     }
 }
 
-int SmartPath::dissolvedOrDummyNodeInsertedToNeigh(const int &targetNodeId,
-                                                   const Neighbour& neigh) {
-    int insertId;
-    if(targetNodeId < 0 || targetNodeId >= mNodes->count()) {
-        insertId = mNodes->count();
-        mNodes->insertNodeToList(mNodes->count(), Node());
-    } else {
-        insertId = mNodes->insertNodeAfter(targetNodeId, Node());
-    }
-    if((neigh & PREV) && mNext)
-        mNext->dissolvedOrDummyNodeInsertedToNeigh(targetNodeId, PREV);
-    if((neigh & NEXT) && mPrev)
-        mPrev->dissolvedOrDummyNodeInsertedToNeigh(targetNodeId, NEXT);
-
-    return insertId;
-}
-
-void SmartPath::normalOrMoveNodeInsertedToNeigh(const int &targetNodeId,
-                                                const Neighbour& neigh) {
-    dissolvedOrDummyNodeInsertedToNeigh(targetNodeId, neigh);
-}
-
 void SmartPath::removeNodeWithIdAndTellPrevToDoSame(const int &nodeId) {
     mNodes->removeNodeFromList(nodeId);
     if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
@@ -178,8 +146,8 @@ void SmartPath::removeNodeWithIdAndTellNextToDoSame(const int &nodeId) {
 
 void SmartPath::setPrev(SmartPath * const prev) {
     mPrev = prev;
-    if(mPrev) mNodes->setNext(mNext->getNodes());
-    else mNodes->setNext(nullptr);
+    if(mPrev) mNodes->setPrev(mPrev->getNodes());
+    else mNodes->setPrev(nullptr);
 }
 
 void SmartPath::setNext(SmartPath * const next) {
@@ -214,7 +182,9 @@ SkPath SmartPath::interpolateWithPrev(const qreal &nextWeight) const {
     return result;
 }
 
-SmartPath::SmartPath() {}
+SmartPath::SmartPath() {
+    mNodes = SPtrCreate(NodeList)();
+}
 
 SmartPath::SmartPath(const NodeList * const nodes) {
     mNodes = SPtrCreate(NodeList)(nodes);

@@ -121,7 +121,8 @@ bool NodeList::segmentClosed(const int& nodeId) const {
 }
 
 int NodeList::insertNodeBefore(const int& nextId,
-                               const Node& nodeBlueprint) {
+                               const Node& nodeBlueprint,
+                               const Neighbour& neigh) {
     const int insertId = nextId;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint);
     const int shiftedNextId = nextId + 1;
@@ -130,13 +131,17 @@ int NodeList::insertNodeBefore(const int& nextId,
     setNodeNextId(prevId, insertId);
     setNodePrevId(shiftedNextId, nextNode, insertId);
     setNodePrevAndNextId(insertId, insertedNode, prevId, shiftedNextId);
+    if((neigh & NEXT) && mNext)
+        mNext->insertNodeBefore(nextId, Node(), NEXT);
+    if((neigh & PREV) && mPrev)
+        mPrev->insertNodeBefore(nextId, Node(), PREV);
     return insertId;
 }
 
 int NodeList::insertNodeAfter(const int& prevId,
-                              const Node& nodeBlueprint) {
+                              const Node& nodeBlueprint,
+                              const Neighbour& neigh) {
     Node& prevNode = mNodes[prevId];
-    if(prevNode.isMove()) return insertNodeBefore(prevId + 1, nodeBlueprint);
     const int insertId = prevId + 1;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint);
     const int nextId = prevNode.getNextNodeId();
@@ -144,7 +149,21 @@ int NodeList::insertNodeAfter(const int& prevId,
     setNodeNextId(prevId, prevNode, insertId);
     setNodePrevAndNextId(insertId, insertedNode, prevId,
                          insertedNode.isMove() ? -1 : nextId);
+    if((neigh & NEXT) && mNext)
+        mNext->insertNodeAfter(nextId, Node(), NEXT);
+    if((neigh & PREV) && mPrev)
+        mPrev->insertNodeAfter(nextId, Node(), PREV);
+    return insertId;
+}
 
+int NodeList::appendNode(const Node &nodeBlueprint,
+                         const Neighbour& neigh) {
+    const int insertId = mNodes.count();
+    insertNodeToList(insertId, nodeBlueprint);
+    if((neigh & NEXT) && mNext)
+        mNext->appendNode(Node(), NEXT);
+    if((neigh & PREV) && mPrev)
+        mPrev->appendNode(Node(), PREV);
     return insertId;
 }
 
@@ -291,21 +310,10 @@ SkPath NodeList::toSkPath() const {
             srcIds.removeOne(nextSrcId);
             const Node& node = at(nextSrcId);
 
-            if(node.isDummy()) continue;
-            else if(node.isDissolved()) dissolvedTs << node.fT;
-            else if(node.isMove()) {
-                if(!currPath.isEmpty()) {
-                    if(close) {
-                        gCubicTo(*prevNormalNode, *firstNode,
-                                dissolvedTs, currPath);
-                        currPath.close();
-                    }
-                    result.addPath(currPath);
-                    currPath.reset();
-                }
-                close = false;
-                move = true;
-            } else if(node.isNormal()) {
+            if(node.isDummy()) {
+            } else if(node.isDissolved()) dissolvedTs << node.fT;
+            else if(node.isMove()) break;
+            else if(node.isNormal()) {
                 if(move) {
                     firstNode = &node;
                     close = firstNode->hasPreviousNode();
