@@ -59,15 +59,11 @@ public:
     SkPath interpolateWithPrev(const qreal& nextWeight) const;
 protected:
     SmartPath();
-    SmartPath(const QList<Node>& nodes);
+    SmartPath(const NodeList * const nodes);
 private:
     SkPath getPathFor(SmartPath * const neighbour) const;
     void insertNodeBetween(const int &prevId, const int &nextId,
                            const Node &nodeBlueprint);
-    void moveNodeBefore(const int &moveNodeId, Node &moveNode,
-                        const int &beforeNodeId, Node &beforeNode);
-    void moveNodeAfter(const int &moveNodeId, Node &moveNode,
-                       const int &afterNodeId, Node &afterNode);
 
     stdptr<SmartPath> mPrev;
     stdptr<SmartPath> mNext;

@@ -95,8 +95,8 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
             Node& currNode = mNodes->at(currNodeId);
             if(currNode.isNormal() || currNode.isMove()) break;
             const int prevNodeId = currNode.getPrevNodeId();
-            moveNodeBefore(currNodeId, currNode,
-                           prevNormalIdV, prevNormalNode);
+            mNodes->moveNodeBefore(currNodeId, currNode,
+                                   prevNormalIdV, prevNormalNode);
             currNodeId = prevNodeId;
         }
     }
@@ -110,8 +110,8 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
             Node& currNode = mNodes->at(currNodeId);
             if(currNode.isNormal() || currNode.isMove()) break;
             const int nextNodeId = currNode.getPrevNodeId();
-            moveNodeAfter(currNodeId, currNode,
-                          nextNormalIdV, nextNormalNode);
+            mNodes->moveNodeAfter(currNodeId, currNode,
+                                  nextNormalIdV, nextNormalNode);
             currNodeId = nextNodeId;
         }
     }
@@ -216,7 +216,9 @@ SkPath SmartPath::interpolateWithPrev(const qreal &nextWeight) const {
 
 SmartPath::SmartPath() {}
 
-SmartPath::SmartPath(const QList<Node> &nodes) {}
+SmartPath::SmartPath(const NodeList * const nodes) {
+    mNodes = SPtrCreate(NodeList)(nodes);
+}
 
 SkPath SmartPath::getPathForPrev() const {
     if(mPrev) return getPathFor(mPrev);
@@ -230,7 +232,7 @@ SkPath SmartPath::getPathForNext() const {
 
 SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
     const auto& neighNodes = neighbour->getNodes();
-    auto result = SPtrCreate(NodeList)(mNodes);
+    auto result = SPtrCreate(NodeList)(mNodes.get());
 
     int iMax = neighNodes->count() - 1;
     if(result->count() - 1 != iMax)

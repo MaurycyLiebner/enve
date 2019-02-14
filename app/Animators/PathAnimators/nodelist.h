@@ -5,8 +5,8 @@
 #include "smartPointers/stdpointer.h"
 class SkPath;
 class NodeList : public StdSelfRef {
+    friend class StdSelfRef;
 public:
-
     Node& operator[](const int& i) {
         return mNodes[i];
     }
@@ -121,6 +121,14 @@ public:
                        const int &afterNodeId, Node &afterNode);
     void moveNodeBefore(const int &moveNodeId, Node &moveNode,
                         const int &beforeNodeId, Node &beforeNode);
+protected:
+    NodeList() {}
+    NodeList(const QList<Node>& list) : mNodes(list) {}
+    NodeList(const NodeList * const list) : mNodes(list->getList()) {}
+
+    const QList<Node>& getList() const {
+        return mNodes;
+    }
 private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;
