@@ -23,6 +23,10 @@ public:
         return mNodes[i];
     }
 
+    int count() const {
+        return mNodes.count();
+    }
+
     void setNodeType(const int& nodeId, const Node::Type& type) {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeType(nodeId, mNodes[nodeId], type);
@@ -76,6 +80,7 @@ public:
     }
 
     bool updateNodeTypeAfterNeighbourChanged(const int &nodeId);
+    QList<int> updateAllNodesTypeAfterNeighbourChanged();
 
     int prevNormalId(const int &nodeId) const;
     int nextNormalId(const int &nodeId) const;
@@ -101,6 +106,21 @@ public:
                              const NodeList * const thisNodes,
                              const NodeList * const neighNodes) const;
     bool nodesConnected(const int &node1Id, const int &node2Id) const;
+
+    void setPrev(NodeList * const prev) {
+        mPrev = prev;
+        updateAllNodesTypeAfterNeighbourChanged();
+    }
+
+    void setNext(NodeList * const next) {
+        mNext = next;
+        updateAllNodesTypeAfterNeighbourChanged();
+    }
+
+    void moveNodeAfter(const int &moveNodeId, Node &moveNode,
+                       const int &afterNodeId, Node &afterNode);
+    void moveNodeBefore(const int &moveNodeId, Node &moveNode,
+                        const int &beforeNodeId, Node &beforeNode);
 private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;

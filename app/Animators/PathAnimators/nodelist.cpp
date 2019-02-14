@@ -3,6 +3,32 @@
 #include "pointhelpers.h"
 #include "exceptions.h"
 
+void NodeList::moveNodeAfter(const int& moveNodeId, Node& moveNode,
+                             const int& afterNodeId, Node& afterNode) {
+    const int movePrevId = moveNode.getPrevNodeId();
+    const int moveNextId = moveNode.getNextNodeId();
+    setNodeNextId(movePrevId, moveNextId);
+    setNodePrevId(moveNextId, movePrevId);
+
+    const int afterNextId = afterNode.getNextNodeId();
+    setNodeNextId(afterNodeId, afterNode, moveNodeId);
+    setNodePrevAndNextId(moveNodeId, moveNode, afterNodeId, afterNextId);
+    setNodePrevId(afterNextId, moveNodeId);
+}
+
+void NodeList::moveNodeBefore(const int& moveNodeId, Node& moveNode,
+                              const int& beforeNodeId, Node& beforeNode) {
+    const int movePrevId = moveNode.getPrevNodeId();
+    const int moveNextId = moveNode.getNextNodeId();
+    setNodeNextId(movePrevId, moveNextId);
+    setNodePrevId(moveNextId, movePrevId);
+
+    const int beforePrevId = beforeNode.getPrevNodeId();
+    setNodePrevId(beforeNodeId, beforeNode, moveNodeId);
+    setNodePrevAndNextId(moveNodeId, moveNode, beforePrevId, beforeNodeId);
+    setNodeNextId(beforePrevId, moveNodeId);
+}
+
 int NodeList::firstSegmentNode(const int& nodeId) const {
     if(nodeId < 0) return -1;
     if(nodeId >= mNodes.count()) return -1;
@@ -152,7 +178,7 @@ void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
     node.fC0 = first.c2();
     node.fP1 = first.p1();
     node.fC2 = second.c1();
-    node.setType(Node::NORMAL);
+    setNodeType(nodeId, node, Node::NORMAL);
     nextNormal.fC0 = second.c2();
     for(int i = prevNormalIdV + 1; i < nodeId; i++) {
         Node& iNode = mNodes[i];
@@ -372,6 +398,14 @@ int NodeList::nextNonDummyId(const int& nodeId) const {
         if(!currNode->isDummy()) return currId;
     }
     return -1;
+}
+
+QList<int> NodeList::updateAllNodesTypeAfterNeighbourChanged() {
+    QList<int> changed;
+    for(int i = 0; i < mNodes.count(); i++) {
+        if(updateNodeTypeAfterNeighbourChanged(i)) changed << i;
+    }
+    return changed;
 }
 
 bool NodeList::updateNodeTypeAfterNeighbourChanged(const int &nodeId) {
