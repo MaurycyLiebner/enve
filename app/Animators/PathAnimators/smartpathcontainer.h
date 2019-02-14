@@ -4,6 +4,7 @@
 #include "skia/skiaincludes.h"
 #include "exceptions.h"
 #include "pointhelpers.h"
+#include "node.h"
 
 #include "framerange.h"
 #include "smartPointers/stdselfref.h"

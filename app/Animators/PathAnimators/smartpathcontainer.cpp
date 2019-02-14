@@ -1,5 +1,4 @@
 #include "smartpathcontainer.h"
-#include "node.h"
 
 void SmartPath::actionRemoveNormalNode(const int &nodeId) {
     Node& node = mNodes[nodeId];

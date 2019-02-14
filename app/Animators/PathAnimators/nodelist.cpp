@@ -247,7 +247,7 @@ void gCubicTo(const Node& prevNode, const Node& nextNode,
     dissolvedTs.clear();
 }
 
-SkPath NodeList::toSkPath() const{
+SkPath NodeList::toSkPath() const {
     SkPath result;
 
     const Node * firstNode = nullptr;
@@ -255,17 +255,40 @@ SkPath NodeList::toSkPath() const{
 
     QList<qreal> dissolvedTs;
 
-    for(const auto& segment : segments) {
+    QList<int> srcIds;
+    for(int i = 0; i < mNodes.count(); i++) {
+        srcIds << i;
+    }
+
+    while(!srcIds.isEmpty()) {
+        const int firstSrcId = firstSegmentNode(srcIds.first());
+        if(firstSrcId == -1) {
+            srcIds.removeFirst();
+            continue;
+        }
         SkPath currPath;
-        bool move = true;
+        int nextSrcId = firstSrcId;
         bool close = false;
-        for(int i = 0; i < segment.count(); i++) {
-            const Node& node = segment.at(i);
+        bool move = true;
+        while(true) {
+            srcIds.removeOne(nextSrcId);
+            const Node& node = at(nextSrcId);
+
             if(node.isDummy()) continue;
             else if(node.isDissolved()) dissolvedTs << node.fT;
-            else if(node.isMove())
-                RuntimeThrow("No MOVE node should have gotten here");
-            else if(node.isNormal()) {
+            else if(node.isMove()) {
+                if(!currPath.isEmpty()) {
+                    if(close) {
+                        gCubicTo(*prevNormalNode, *firstNode,
+                                dissolvedTs, currPath);
+                        currPath.close();
+                    }
+                    result.addPath(currPath);
+                    currPath.reset();
+                }
+                close = false;
+                move = true;
+            } else if(node.isNormal()) {
                 if(move) {
                     firstNode = &node;
                     close = firstNode->hasPreviousNode();
@@ -280,15 +303,20 @@ SkPath NodeList::toSkPath() const{
             } else {
                 RuntimeThrow("Unrecognized node type");
             }
-        } // for each node
-        if(close) {
-            gCubicTo(*prevNormalNode, *firstNode,
-                    dissolvedTs, currPath);
-            currPath.close();
+
+            if(!node.hasNextNode()) break;
+            nextSrcId = node.getNextNodeId();
+            if(nextSrcId == firstSrcId) break;
         }
-        result.addPath(currPath);
+        if(!currPath.isEmpty()) {
+            if(close) {
+                gCubicTo(*prevNormalNode, *firstNode,
+                        dissolvedTs, currPath);
+                currPath.close();
+            }
+            result.addPath(currPath);
+        }
     }
-    qDebug() << "";
     return result;
 }
 
