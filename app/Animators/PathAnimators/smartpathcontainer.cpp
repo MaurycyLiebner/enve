@@ -134,11 +134,10 @@ void SmartPath::actionConnectNodes(const int &node1Id,
         Node& moveNode = mNodes->at(moveNode1Id);
         if(!moveNode.isMove())
             RuntimeThrow("Trying to connect a closed segment");
-        moveNode.setType(Node::DUMMY);
+        mNodes->setNodeType(moveNode1Id, moveNode, Node::DUMMY);
         const int firstNodeId = mNodes->firstSegmentNode(node1Id);
-        Node& firstNode = mNodes->at(firstNodeId);
-        moveNode.setNextNodeId(firstNodeId);
-        firstNode.setPrevNodeId(moveNode1Id);
+        mNodes->setNodeNextId(moveNode1Id, moveNode, firstNodeId);
+        mNodes->setNodePrevId(firstNodeId, moveNode1Id);
     } else { // if connecting two seperate segments
         Node& moveNode1 = mNodes->at(moveNode1Id);
         Node& moveNode2 = mNodes->at(moveNode2Id);

@@ -70,12 +70,12 @@ int NodeList::lastSegmentNode(const int& nodeId) const {
 void NodeList::removeNodeFromList(const int &nodeId) {
     const Node& nodeToRemove = mNodes.at(nodeId);
     if(nodeToRemove.hasPreviousNode()) {
-        Node& prevNode = mNodes[nodeToRemove.getPrevNodeId()];
-        prevNode.setNextNodeId(nodeToRemove.getNextNodeId());
+        setNodePrevId(nodeToRemove.getPrevNodeId(),
+                      nodeToRemove.getNextNodeId());
     }
     if(nodeToRemove.hasNextNode()) {
-        Node& nextNode = mNodes[nodeToRemove.getNextNodeId()];
-        nextNode.setPrevNodeId(nodeToRemove.getPrevNodeId());
+        setNodePrevId(nodeToRemove.getNextNodeId(),
+                      nodeToRemove.getPrevNodeId());
     }
     mNodes.removeAt(nodeId);
     for(int i = 0; i < mNodes.count(); i++) {
@@ -127,13 +127,9 @@ int NodeList::insertNodeBefore(const int& nextId,
     const int shiftedNextId = nextId + 1;
     Node& nextNode = mNodes[shiftedNextId];
     const int prevId = nextNode.getPrevNodeId();
-    if(prevId != -1) {
-        Node& prevNode = mNodes[prevId];
-        prevNode.setNextNodeId(insertId);
-    }
-    nextNode.setPrevNodeId(insertId);
-    insertedNode.setPrevNodeId(prevId);
-    insertedNode.setNextNodeId(shiftedNextId);
+    setNodeNextId(prevId, insertId);
+    setNodePrevId(shiftedNextId, nextNode, insertId);
+    setNodePrevAndNextId(insertId, insertedNode, prevId, shiftedNextId);
     return insertId;
 }
 
@@ -144,15 +140,10 @@ int NodeList::insertNodeAfter(const int& prevId,
     const int insertId = prevId + 1;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint);
     const int nextId = prevNode.getNextNodeId();
-    if(nextId != -1) {
-        Node& nextNode = mNodes[nextId];
-        if(nodeBlueprint.isMove()) nextNode.setPrevNodeId(-1);
-        else nextNode.setPrevNodeId(insertId);
-    }
-    prevNode.setNextNodeId(insertId);
-    insertedNode.setPrevNodeId(prevId);
-    if(nodeBlueprint.isMove()) insertedNode.setNextNodeId(-1);
-    else insertedNode.setNextNodeId(nextId);
+    setNodePrevId(nextId, insertedNode.isMove() ? -1 : insertId);
+    setNodeNextId(prevId, prevNode, insertId);
+    setNodePrevAndNextId(insertId, insertedNode, prevId,
+                         insertedNode.isMove() ? -1 : nextId);
 
     return insertId;
 }
