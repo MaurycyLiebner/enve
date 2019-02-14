@@ -125,34 +125,31 @@ int NodeList::insertNodeBefore(const int& nextId,
                                const Neighbour& neigh) {
     const int insertId = nextId;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint);
-    const int shiftedNextId = nextId + 1;
-    Node& nextNode = mNodes[shiftedNextId];
-    const int prevId = nextNode.getPrevNodeId();
-    setNodeNextId(prevId, insertId);
-    setNodePrevId(shiftedNextId, nextNode, insertId);
-    setNodePrevAndNextId(insertId, insertedNode, prevId, shiftedNextId);
     if((neigh & NEXT) && mNext)
         mNext->insertNodeBefore(nextId, Node(), NEXT);
     if((neigh & PREV) && mPrev)
         mPrev->insertNodeBefore(nextId, Node(), PREV);
+    insertedNode.setPrevNodeId(-1);
+    insertedNode.setNextNodeId(-1);
+    const int shiftedNextId = nextId + 1;
+    Node& nextNode = mNodes[shiftedNextId];
+    moveNodeBefore(insertId, insertedNode, shiftedNextId, nextNode);
     return insertId;
 }
 
 int NodeList::insertNodeAfter(const int& prevId,
                               const Node& nodeBlueprint,
                               const Neighbour& neigh) {
-    Node& prevNode = mNodes[prevId];
     const int insertId = prevId + 1;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint);
-    const int nextId = prevNode.getNextNodeId();
-    setNodePrevId(nextId, insertedNode.isMove() ? -1 : insertId);
-    setNodeNextId(prevId, prevNode, insertId);
-    setNodePrevAndNextId(insertId, insertedNode, prevId,
-                         insertedNode.isMove() ? -1 : nextId);
     if((neigh & NEXT) && mNext)
-        mNext->insertNodeAfter(nextId, Node(), NEXT);
+        mNext->insertNodeAfter(prevId, Node(), NEXT);
     if((neigh & PREV) && mPrev)
-        mPrev->insertNodeAfter(nextId, Node(), PREV);
+        mPrev->insertNodeAfter(prevId, Node(), PREV);
+    insertedNode.setPrevNodeId(-1);
+    insertedNode.setNextNodeId(-1);
+    Node& prevNode = mNodes[prevId];
+    moveNodeAfter(insertId, insertedNode, prevId, prevNode);
     return insertId;
 }
 
