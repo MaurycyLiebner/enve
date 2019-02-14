@@ -3,6 +3,7 @@
 #include <QPointF>
 
 struct Node {
+    friend class NodeList;
     enum Type : char {
         DUMMY, DISSOLVED, NORMAL, MOVE
     };
@@ -31,12 +32,6 @@ struct Node {
 
     bool isDissolved() const { return mType == DISSOLVED; }
 
-    void switchPrevAndNext() {
-        const int prevT = mPrevNodeId;
-        mPrevNodeId = mNextNodeId;
-        mNextNodeId = prevT;
-    }
-
     int getNextNodeId() const {
         return mNextNodeId;
     }
@@ -52,14 +47,6 @@ struct Node {
         return getNextNodeId() >= 0;
     }
 
-    void setNextNodeId(const int& nextNodeId) {
-        mNextNodeId = nextNodeId;
-    }
-
-    void setPrevNodeId(const int& prevNodeId) {
-        mPrevNodeId = prevNodeId;
-    }
-
     QPointF fC0;
     QPointF fP1;
     QPointF fC2;
@@ -67,11 +54,13 @@ struct Node {
     //! @brief T value for segment defined by previous and next normal node
     qreal fT;
 
-    void setType(const Type& type) {
-        mType = type;
-    }
-
     const Type& getType() const { return mType; }
+protected:
+    void switchPrevAndNext() {
+        const int prevT = mPrevNodeId;
+        mPrevNodeId = mNextNodeId;
+        mNextNodeId = prevT;
+    }
 
     void shiftIdsGreaterThan(const int& greater, const int& shiftBy) {
         if(mNextNodeId) if(mNextNodeId > greater) mNextNodeId += shiftBy;
@@ -81,6 +70,18 @@ struct Node {
     void shiftIdsSmallerThan(const int& smaller, const int& shiftBy) {
         if(mNextNodeId) if(mNextNodeId < smaller) mNextNodeId += shiftBy;
         if(mPrevNodeId) if(mPrevNodeId < smaller) mPrevNodeId += shiftBy;
+    }
+
+    void setNextNodeId(const int& nextNodeId) {
+        mNextNodeId = nextNodeId;
+    }
+
+    void setPrevNodeId(const int& prevNodeId) {
+        mPrevNodeId = prevNodeId;
+    }
+
+    void setType(const Type& type) {
+        mType = type;
     }
 private:
     Type mType;

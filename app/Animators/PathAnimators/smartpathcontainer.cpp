@@ -1,4 +1,4 @@
-#include "smartpathcontainer.h"
+﻿#include "smartpathcontainer.h"
 #include "smartPointers/sharedpointerdefs.h"
 
 void SmartPath::actionRemoveNormalNode(const int &nodeId) {
@@ -21,10 +21,7 @@ void SmartPath::actionRemoveNormalNode(const int &nodeId) {
         if(currNode->isNormal() || currNode->isMove()) break;
         if(currNode->isDissolved()) currNode->fT = currNode->fT*0.5 + 0.5;
     }
-    node.setType(Node::DUMMY);
-    if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
-    if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
-    updateNodeTypeAfterNeighbourChanged(nodeId);
+    mNodes->setNodeType(nodeId, node, Node::DUMMY);
 }
 
 void SmartPath::actionAddFirstNode(const QPointF &c0,
@@ -143,12 +140,8 @@ void SmartPath::actionConnectNodes(const int &node1Id,
         Node& moveNode2 = mNodes->at(moveNode2Id);
         if(!moveNode1.isMove() || !moveNode2.isMove())
             RuntimeThrow("Trying to connect a closed segment");
-        if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
-        if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode1Id);
         RuntimeThrow("Not yet finished");
     }
-    if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
-    if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(moveNode2Id);
 }
 
 int SmartPath::dissolvedOrDummyNodeInsertedToNeigh(const int &targetNodeId,
@@ -170,9 +163,7 @@ int SmartPath::dissolvedOrDummyNodeInsertedToNeigh(const int &targetNodeId,
 
 void SmartPath::normalOrMoveNodeInsertedToNeigh(const int &targetNodeId,
                                                 const Neighbour& neigh) {
-    const int insertId = dissolvedOrDummyNodeInsertedToNeigh(
-                targetNodeId, neigh);
-    updateNodeTypeAfterNeighbourChanged(insertId);
+    dissolvedOrDummyNodeInsertedToNeigh(targetNodeId, neigh);
 }
 
 void SmartPath::removeNodeWithIdAndTellPrevToDoSame(const int &nodeId) {

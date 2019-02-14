@@ -46,11 +46,7 @@ public:
 
     QList<int> updateAllNodesTypeAfterNeighbourChanged();
 
-    //! @brief Returns true if changed.
-    bool updateNodeTypeAfterNeighbourChanged(const int& nodeId);
-
     void setPrev(SmartPath * const prev);
-
     void setNext(SmartPath * const next);
 
     NodeList *getNodes() const;
