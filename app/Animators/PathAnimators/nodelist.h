@@ -75,6 +75,7 @@ public:
     }
 
     void updateAfterNodeChanged(const int& nodeId) {
+        if(mNoUpdates) return;
         updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
@@ -134,9 +135,16 @@ public:
         return appendNode(nodeBlueprint, BOTH);
     }
 protected:
-    NodeList() {}
-    NodeList(const QList<Node>& list) : mNodes(list) {}
-    NodeList(const NodeList * const list) : mNodes(list->getList()) {}
+    NodeList(const bool& noUpdates = false) :
+        mNoUpdates(noUpdates) {}
+
+    NodeList(const QList<Node>& list,
+             const bool& noUpdates = false) :
+        mNoUpdates(noUpdates), mNodes(list) {}
+
+    NodeList(const NodeList * const list,
+             const bool& noUpdates = false) :
+        NodeList(list->getList(), noUpdates) {}
 
     const QList<Node>& getList() const {
         return mNodes;
@@ -151,6 +159,7 @@ private:
     qreal nextT(const int &nodeId) const;
     Node &insertNodeToList(const int &nodeId, const Node &node);
 
+    const bool mNoUpdates;
     stdptr<NodeList> mPrev;
     stdptr<NodeList> mNext;
     QList<Node> mNodes;

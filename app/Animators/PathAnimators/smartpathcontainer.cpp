@@ -212,7 +212,7 @@ SkPath SmartPath::getPathForNext() const {
 
 SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
     const auto& neighNodes = neighbour->getNodes();
-    auto result = SPtrCreate(NodeList)(mNodes.get());
+    auto result = SPtrCreate(NodeList)(mNodes.get(), true);
 
     int iMax = neighNodes->count() - 1;
     if(result->count() - 1 != iMax)

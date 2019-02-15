@@ -230,6 +230,15 @@ bool NodeList::shouldSplitThisNode(const int& nodeId,
                                    const Node& neighNode,
                                    const NodeList * const thisNodes,
                                    const NodeList * const neighNodes) const {
+    if(!thisNodes->segmentClosed(nodeId)) {
+        const int thisLastId = thisNodes->lastSegmentNode(nodeId);
+        const int neighLastId = neighNodes->lastSegmentNode(nodeId);
+        if(thisLastId == thisNode.getNextNodeId() &&
+           neighLastId != neighNode.getNextNodeId()) return true;
+        const int thisFirstId = thisNodes->firstSegmentNode(nodeId);
+        const int neighFirstId = neighNodes->firstSegmentNode(nodeId);
+        if(thisFirstId == nodeId && neighFirstId != nodeId) return true;
+    }
     const int thisPrevId = thisNode.getPrevNodeId();
     const int thisNextId = thisNode.getNextNodeId();
     const int neighPrevId = neighNode.getPrevNodeId();
