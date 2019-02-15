@@ -77,36 +77,36 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     } else {
         RuntimeThrow("Trying to disconnect not connected nodes");
     }
-Node& prevNode = mNodes->at(prevId);
-if(!prevNode.isNormal()) {
-    const int prevNormalIdV = mNodes->prevNormalId(prevId);
-    Node& prevNormalNode = mNodes->at(prevNormalIdV);
-    int currNodeId = prevId;
-    while(true) {
-        if(currNodeId == -1) break;
-        Node& currNode = mNodes->at(currNodeId);
-        if(currNode.isNormal() || currNode.isMove()) break;
-        const int prevNodeId = currNode.getPrevNodeId();
-        mNodes->moveNodeBefore(currNodeId, currNode,
-                               prevNormalIdV, prevNormalNode);
-        currNodeId = prevNodeId;
+    Node& prevNode = mNodes->at(prevId);
+    if(!prevNode.isNormal()) {
+        const int prevNormalIdV = mNodes->prevNormalId(prevId);
+        Node& prevNormalNode = mNodes->at(prevNormalIdV);
+        int currNodeId = prevId;
+        while(true) {
+            if(currNodeId == -1) break;
+            Node& currNode = mNodes->at(currNodeId);
+            if(currNode.isNormal() || currNode.isMove()) break;
+            const int prevNodeId = currNode.getPrevNodeId();
+            mNodes->moveNodeBefore(currNodeId, currNode,
+                                   prevNormalIdV, prevNormalNode);
+            currNodeId = prevNodeId;
+        }
     }
-}
-Node& nextNode = mNodes->at(nextId);
-if(!nextNode.isNormal()) {
-    const int nextNormalIdV = mNodes->nextNormalId(nextId);
-    Node& nextNormalNode = mNodes->at(nextNormalIdV);
-    int currNodeId = nextNormalNode.getPrevNodeId();
-    while(true) {
-        if(currNodeId == -1) break;
-        Node& currNode = mNodes->at(currNodeId);
-        if(currNode.isNormal() || currNode.isMove()) break;
-        const int nextNodeId = currNode.getPrevNodeId();
-        mNodes->moveNodeAfter(currNodeId, currNode,
-                              nextNormalIdV, nextNormalNode);
-        currNodeId = nextNodeId;
+    Node& nextNode = mNodes->at(nextId);
+    if(!nextNode.isNormal()) {
+        const int nextNormalIdV = mNodes->nextNormalId(nextId);
+        Node& nextNormalNode = mNodes->at(nextNormalIdV);
+        int currNodeId = nextNormalNode.getPrevNodeId();
+        while(true) {
+            if(currNodeId == -1) break;
+            Node& currNode = mNodes->at(currNodeId);
+            if(currNode.isNormal() || currNode.isMove()) break;
+            const int nextNodeId = currNode.getPrevNodeId();
+            mNodes->moveNodeAfter(currNodeId, currNode,
+                                  nextNormalIdV, nextNormalNode);
+            currNodeId = nextNodeId;
+        }
     }
-}
     mNodes->insertNodeAfter(prevId, Node(Node::MOVE));
 }
 
