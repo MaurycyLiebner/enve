@@ -84,33 +84,39 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     if(!prevNode.isNormal()) {
         const int prevNormalIdV = mNodes->prevNormalId(prevId);
         Node& prevNormalNode = mNodes->at(prevNormalIdV);
-        int currNodeId = prevId;
+        mNodes->setNodeType(prevId, prevNode, Node::NORMAL);
+        prevNode.fC0 = prevNormalNode.fC0;
+        prevNode.fP1 = prevNormalNode.fP1;
+        prevNode.fC2 = prevNormalNode.fC2;
+
+        int currNodeId = prevNode.getPrevNodeId();
         while(true) {
             if(currNodeId == -1) break;
             Node& currNode = mNodes->at(currNodeId);
             if(currNode.isNormal() || currNode.isMove()) break;
-            if(currNode.isDissolved()) currNode.fT = 1;
-            const int prevNodeId = currNode.getPrevNodeId();
-            mNodes->moveNodeBefore(currNodeId, currNode,
-                                   prevNormalIdV, prevNormalNode);
-            currNodeId = prevNodeId;
+            mNodes->setNodeType(currNodeId, currNode, Node::DUMMY);
+            currNodeId = currNode.getPrevNodeId();
         }
+        mNodes->setNodeType(prevNormalIdV, prevNormalNode, Node::DUMMY);
     }
     Node& nextNode = mNodes->at(nextId);
     if(!nextNode.isNormal()) {
         const int nextNormalIdV = mNodes->nextNormalId(nextId);
         Node& nextNormalNode = mNodes->at(nextNormalIdV);
-        int currNodeId = nextNormalNode.getPrevNodeId();
+        mNodes->setNodeType(nextId, nextNode, Node::NORMAL);
+        nextNode.fC0 = nextNormalNode.fC0;
+        nextNode.fP1 = nextNormalNode.fP1;
+        nextNode.fC2 = nextNormalNode.fC2;
+
+        int currNodeId = nextNode.getNextNodeId();
         while(true) {
             if(currNodeId == -1) break;
             Node& currNode = mNodes->at(currNodeId);
             if(currNode.isNormal() || currNode.isMove()) break;
-            if(currNode.isDissolved()) currNode.fT = 0;
-            const int nextNodeId = currNode.getPrevNodeId();
-            mNodes->moveNodeAfter(currNodeId, currNode,
-                                  nextNormalIdV, nextNormalNode);
-            currNodeId = nextNodeId;
+            mNodes->setNodeType(currNodeId, currNode, Node::DUMMY);
+            currNodeId = currNode.getNextNodeId();
         }
+        mNodes->setNodeType(nextNormalIdV, nextNormalNode, Node::DUMMY);
     }
 }
 
