@@ -66,47 +66,47 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     Node& node2 = mNodes->at(node2Id);
     if(node1.isMove() || node2.isMove())
         RuntimeThrow("Cannot disconnect move node");
-    int nextId;
     int prevId;
+    int nextId;
     if(node1.getNextNodeId() == node2Id) {
-        nextId = node2Id;
         prevId = node1Id;
+        nextId = node2Id;
     } else if(node2.getNextNodeId() == node1Id) {
-        nextId = node1Id;
         prevId = node2Id;
+        nextId = node1Id;
     } else {
         RuntimeThrow("Trying to disconnect not connected nodes");
     }
-    Node& prevNode = mNodes->at(prevId);
-    if(!prevNode.isNormal()) {
-        const int prevNormalIdV = mNodes->prevNormalId(prevId);
-        Node& prevNormalNode = mNodes->at(prevNormalIdV);
-        int currNodeId = prevId;
-        while(true) {
-            if(currNodeId == -1) break;
-            Node& currNode = mNodes->at(currNodeId);
-            if(currNode.isNormal() || currNode.isMove()) break;
-            const int prevNodeId = currNode.getPrevNodeId();
-            mNodes->moveNodeBefore(currNodeId, currNode,
-                                   prevNormalIdV, prevNormalNode);
-            currNodeId = prevNodeId;
-        }
+Node& prevNode = mNodes->at(prevId);
+if(!prevNode.isNormal()) {
+    const int prevNormalIdV = mNodes->prevNormalId(prevId);
+    Node& prevNormalNode = mNodes->at(prevNormalIdV);
+    int currNodeId = prevId;
+    while(true) {
+        if(currNodeId == -1) break;
+        Node& currNode = mNodes->at(currNodeId);
+        if(currNode.isNormal() || currNode.isMove()) break;
+        const int prevNodeId = currNode.getPrevNodeId();
+        mNodes->moveNodeBefore(currNodeId, currNode,
+                               prevNormalIdV, prevNormalNode);
+        currNodeId = prevNodeId;
     }
-    Node& nextNode = mNodes->at(nextId);
-    if(!nextNode.isNormal()) {
-        const int nextNormalIdV = mNodes->nextNormalId(nextId);
-        Node& nextNormalNode = mNodes->at(nextNormalIdV);
-        int currNodeId = nextNormalNode.getPrevNodeId();
-        while(true) {
-            if(currNodeId == -1) break;
-            Node& currNode = mNodes->at(currNodeId);
-            if(currNode.isNormal() || currNode.isMove()) break;
-            const int nextNodeId = currNode.getPrevNodeId();
-            mNodes->moveNodeAfter(currNodeId, currNode,
-                                  nextNormalIdV, nextNormalNode);
-            currNodeId = nextNodeId;
-        }
+}
+Node& nextNode = mNodes->at(nextId);
+if(!nextNode.isNormal()) {
+    const int nextNormalIdV = mNodes->nextNormalId(nextId);
+    Node& nextNormalNode = mNodes->at(nextNormalIdV);
+    int currNodeId = nextNormalNode.getPrevNodeId();
+    while(true) {
+        if(currNodeId == -1) break;
+        Node& currNode = mNodes->at(currNodeId);
+        if(currNode.isNormal() || currNode.isMove()) break;
+        const int nextNodeId = currNode.getPrevNodeId();
+        mNodes->moveNodeAfter(currNodeId, currNode,
+                              nextNormalIdV, nextNormalNode);
+        currNodeId = nextNodeId;
     }
+}
     mNodes->insertNodeAfter(prevId, Node(Node::MOVE));
 }
 
@@ -121,8 +121,8 @@ void SmartPath::actionConnectNodes(const int &node1Id,
         Node& moveNode = mNodes->at(moveNode1Id);
         if(!moveNode.isMove())
             RuntimeThrow("Trying to connect a closed segment");
-        mNodes->setNodeType(moveNode1Id, moveNode, Node::DUMMY);
         const int firstNodeId = mNodes->firstSegmentNode(node1Id);
+        mNodes->setNodeType(moveNode1Id, moveNode, Node::DUMMY);
         mNodes->setNodeNextId(moveNode1Id, moveNode, firstNodeId);
         mNodes->setNodePrevId(firstNodeId, moveNode1Id);
     } else { // if connecting two seperate segments
@@ -217,7 +217,7 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
 
         // Remove nodes if not needed
         if((neighbourNode.isDummy() || neighbourNode.isDissolved()) &&
-                (thisNode.isDummy() || thisNode.isDissolved())) {
+           (thisNode.isDummy() || thisNode.isDissolved())) {
             iShift--;
             result->removeNodeFromList(resI);
         }

@@ -70,7 +70,7 @@ int NodeList::lastSegmentNode(const int& nodeId) const {
 void NodeList::removeNodeFromList(const int &nodeId) {
     const Node& nodeToRemove = mNodes.at(nodeId);
     if(nodeToRemove.hasPreviousNode()) {
-        setNodePrevId(nodeToRemove.getPrevNodeId(),
+        setNodeNextId(nodeToRemove.getPrevNodeId(),
                       nodeToRemove.getNextNodeId());
     }
     if(nodeToRemove.hasNextNode()) {
