@@ -117,7 +117,12 @@ void NodeList::reverseSegment(const int& nodeId) {
 bool NodeList::segmentClosed(const int& nodeId) const {
     const int firstNodeId = firstSegmentNode(nodeId);
     if(firstNodeId == -1) return false;
-    return mNodes.at(firstNodeId).hasPreviousNode();
+    const Node& firstNode = mNodes.at(firstNodeId);
+    if(!firstNode.hasPreviousNode()) return false;
+    const int prevId = firstNode.getPrevNodeId();
+    const Node& prevNode = mNodes.at(prevId);
+    if(prevNode.isMove()) return false;
+    return true;
 }
 
 int NodeList::insertNodeBefore(const int& nextId,
@@ -301,7 +306,7 @@ SkPath NodeList::toSkPath() const {
         }
         SkPath currPath;
         int nextSrcId = firstSrcId;
-        bool close = false;
+        const bool close = segmentClosed(firstSrcId);
         bool move = true;
         while(true) {
             srcIds.removeOne(nextSrcId);
@@ -313,7 +318,6 @@ SkPath NodeList::toSkPath() const {
             else if(node.isNormal()) {
                 if(move) {
                     firstNode = &node;
-                    close = firstNode->hasPreviousNode();
                     currPath.moveTo(qPointToSk(node.fP1));
                     qDebug() << "Move to:" << node.fP1;
                     move = false;

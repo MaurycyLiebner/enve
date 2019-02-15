@@ -77,6 +77,9 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     } else {
         RuntimeThrow("Trying to disconnect not connected nodes");
     }
+    mNodes->insertNodeAfter(prevId, Node(Node::MOVE));
+    if(nextId > prevId) nextId++;
+
     Node& prevNode = mNodes->at(prevId);
     if(!prevNode.isNormal()) {
         const int prevNormalIdV = mNodes->prevNormalId(prevId);
@@ -86,6 +89,7 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
             if(currNodeId == -1) break;
             Node& currNode = mNodes->at(currNodeId);
             if(currNode.isNormal() || currNode.isMove()) break;
+            if(currNode.isDissolved()) currNode.fT = 1;
             const int prevNodeId = currNode.getPrevNodeId();
             mNodes->moveNodeBefore(currNodeId, currNode,
                                    prevNormalIdV, prevNormalNode);
@@ -101,13 +105,13 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
             if(currNodeId == -1) break;
             Node& currNode = mNodes->at(currNodeId);
             if(currNode.isNormal() || currNode.isMove()) break;
+            if(currNode.isDissolved()) currNode.fT = 0;
             const int nextNodeId = currNode.getPrevNodeId();
             mNodes->moveNodeAfter(currNodeId, currNode,
                                   nextNormalIdV, nextNormalNode);
             currNodeId = nextNodeId;
         }
     }
-    mNodes->insertNodeAfter(prevId, Node(Node::MOVE));
 }
 
 void SmartPath::actionConnectNodes(const int &node1Id,
