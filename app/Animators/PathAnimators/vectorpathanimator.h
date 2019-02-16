@@ -21,11 +21,40 @@ class VectorPathAnimator : public InterpolationAnimator,
     Q_OBJECT
     friend class SelfRef;
 public:
+    NodeSettings *getNodeSettingsForPtId(const int &ptId);
+
+    void setPathClosed(const bool &bT);
+    void finishedPathChange();
+    void removeNodeAtAndApproximate(const int &nodeId);
+    void removeNodeAt(const int &nodeId);
+    void applyTransformToPoints(const QMatrix &transform);
+    void setElementPos(const int &index, const SkPoint &pos);
+    void setElementsFromSkPath(const SkPath &path);
+    void startPathChange();
+    void cancelPathChange();
+    void moveElementPosSubset(int firstId, int count, int targetId);
+    void revertElementPosSubset(const int &firstId, int count);
+    void shiftAllPoints(const int &by);
+    void revertAllPoints();
+    void updateAfterChangedFromInside();
+    void mergeNodes(const int &nodeId1, const int &nodeId2);
+    void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
+
     void prp_setAbsFrame(const int &frame);
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
+
+    void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
+    void anim_appendKey(const stdsptr<Key> &newKey);
+    void anim_saveCurrentValueAsKey();
+    void anim_addKeyAtRelFrame(const int &relFrame);
+    void anim_removeKey(const stdsptr<Key> &keyToRemove);
+    stdsptr<Key> readKey(QIODevice *target);
+    bool SWT_isVectorPathAnimator() const { return true; }
+
+
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
-
-    NodeSettings *getNodeSettingsForPtId(const int &ptId);
 
     NodeSettings *getNodeSettingsForNodeId(const int &nodeId);
 
@@ -51,17 +80,9 @@ public:
     void setNodeCtrlsMode(const int &nodeId,
                           const CtrlsMode &ctrlsMode);
 
-    void setPathClosed(const bool &bT);
-
     const CtrlsMode &getNodeCtrlsMode(const int &nodeId);
     void anim_saveCurrentValueToKey(PathKey *key);
 
-    void finishedPathChange();
-
-    void anim_saveCurrentValueAsKey();
-    void anim_addKeyAtRelFrame(const int &relFrame);
-
-    void anim_removeKey(const stdsptr<Key> &keyToRemove);
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
@@ -69,9 +90,6 @@ public:
     PathAnimator *getParentPathAnimator();
 
     void finalizeNodesRemove();
-
-    void removeNodeAtAndApproximate(const int &nodeId);
-    void removeNodeAt(const int &nodeId);
 
     NodePoint *addNodeRelPos(const SvgNodePoint *svgPoint,
                              NodePoint *targetPt);
@@ -101,7 +119,6 @@ public:
     VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
     void selectAllPoints(Canvas *canvas);
-    void applyTransformToPoints(const QMatrix &transform);
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale,
@@ -121,21 +138,6 @@ public:
                        NodePoint *pt2);
     void appendToPointsList(const stdsptr<NodePoint> &pt);
 
-    void setElementPos(const int &index,
-                       const SkPoint &pos);
-    void setElementsFromSkPath(const SkPath &path);
-    void startPathChange();
-    void cancelPathChange();
-    void readProperty(QIODevice *target);
-    void writeProperty(QIODevice * const target) const;
-
-    bool SWT_isVectorPathAnimator() const;
-    void anim_moveKeyToRelFrame(Key *key,
-                                const int &newFrame);
-    void anim_appendKey(const stdsptr<Key> &newKey);
-
-    void moveElementPosSubset(int firstId, int count, int targetId);
-    void revertElementPosSubset(const int &firstId, int count);
     void revertNodeSettingsSubset(const int &firstId, int count);
 
     void getNodeSettingsList(QList<stdsptr<NodeSettings>>& nodeSettingsList);
@@ -153,17 +155,10 @@ public:
                                   const bool &addSrcFirst);
 
     VectorPathAnimator *connectWith(VectorPathAnimator *srcPath);
-    stdsptr<Key> readKey(QIODevice *target);
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
 
     void shiftAllNodeSettings(const int &by);
-
-    void shiftAllPoints(const int &by);
-
-    void revertAllPoints();
-
-    void updateAfterChangedFromInside();
 
     void removeFromParent();
 
@@ -171,11 +166,7 @@ public:
 
     int getNodeCount();
 
-    void mergeNodes(const int &nodeId1,
-                    const int &nodeId2);
-
     const bool &isClosed() const;
-    void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
 protected:
     VectorPathAnimator(PathAnimator *pathAnimator);
     VectorPathAnimator(const QList<const NodeSettings*> &settingsList,
