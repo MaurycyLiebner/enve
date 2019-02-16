@@ -11,7 +11,8 @@ protected:
         BasedKeyT<Key, T>(value, relFrame, parentAnimator) {}
 
     GraphKeyT(AnimatorT<T> * const parentAnimator = nullptr) :
-        BasedKeyT<Key, T>(parentAnimator) {}
+        BasedKeyT<Key, T>(parentAnimator) {
+    }
 };
 
 #endif // GRAPHKEYT_H
