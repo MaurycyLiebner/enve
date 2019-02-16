@@ -6,6 +6,7 @@
 class SkPath;
 class NodeList : public StdSelfRef {
     friend class StdSelfRef;
+    friend class SmartPath;
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
     Node& operator[](const int& i) {
@@ -161,6 +162,10 @@ protected:
     int insertNodeAfter(const int &prevId, const Node &nodeBlueprint,
                         const Neighbour& neigh);
     int appendNode(const Node &nodeBlueprint, const Neighbour &neigh);
+
+    static stdsptr<NodeList> sInterpolate(const NodeList * const list1,
+                                          const NodeList * const list2,
+                                          const qreal &weight2);
 private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;

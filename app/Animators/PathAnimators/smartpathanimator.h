@@ -2,58 +2,64 @@
 #define SMARTPATHANIMATOR_H
 #include "Animators/interpolationanimator.h"
 #include "smartpathcontainer.h"
+#include "Animators/animatort.h"
 
-#define GetAsSP(key) GetAsPtr(key, SmartPath)
+//class SmartPathKey : public KeyT<stdsptr<SmartPath>> {
+//    friend class StdSelfRef;
+//public:
+//    SmartPath * get() {
+//        return getValue().get();
+//    }
+//protected:
+//    SmartPathKey() {
+//        setValue(SPtrCreate(SmartPath)());
+//    }
+//};
 
-class SmartPathAnimator : public InterpolationAnimator {
-    friend class SelfRef;
-public:
+//#define GetAsSPK(key) GetAsPtr(key, SmartPathKey)
 
-    void startPathChange() {
-        if(mPathChanged) return;
-        if(prp_isRecording()) {
-            if(prp_isKeyOnCurrentFrame()) return;
-            anim_saveCurrentValueAsKey();
-        }
-        if(prp_isKeyOnCurrentFrame()) {
-            GetAsSP(anim_mKeyOnCurrentFrame)->startPathChange();
-            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
-        } else {
-            mCurrentPath->startPathChange();
-            prp_updateInfluenceRangeAfterChanged();
-        }
-        mPathChanged = true;
-    }
+//class SmartPathAnimator : public InterpolationAnimator {
+//    friend class SelfRef;
+//public:
 
-    void cancelPathChange() {
-        if(!mPathChanged) return;
-        if(prp_isKeyOnCurrentFrame()) {
-            GetAsSP(anim_mKeyOnCurrentFrame)->cancelPathChange();
-            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
-        } else {
-            mCurrentPath->cancelPathChange();
-            prp_updateInfluenceRangeAfterChanged();
-        }
-        mPathChanged = false;
-    }
+//    void startPathChange() {
+//        if(mPathChanged) return;
+//        if(prp_isRecording()) {
+//            if(prp_isKeyOnCurrentFrame()) return;
+//            anim_saveCurrentValueAsKey();
+//        }
+//        if(prp_isKeyOnCurrentFrame()) {
+//            GetAsSPK(anim_mKeyOnCurrentFrame)->get()->save();
+//            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+//        } else {
+//            mCurrentPath->save();
+//            prp_updateInfluenceRangeAfterChanged();
+//        }
+//        mPathChanged = true;
+//    }
 
-    void finishedPathChange() {
-        if(!mPathChanged) return;
-        if(prp_isKeyOnCurrentFrame()) {
-            GetAsSP(anim_mKeyOnCurrentFrame)->finishedPathChange();
-            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
-        } else {
-            mCurrentPath->finishedPathChange();
-            prp_updateInfluenceRangeAfterChanged();
-        }
-        mPathChanged = false;
-        prp_callFinishUpdater();
-    }
-protected:
-    SmartPathAnimator();
-private:
-    bool mPathChanged = false;
-    stdsptr<SmartPath> mCurrentPath;
-};
+//    void cancelPathChange() {
+//        if(!mPathChanged) return;
+//        if(prp_isKeyOnCurrentFrame()) {
+//            GetAsSPK(anim_mKeyOnCurrentFrame)->get()->restore();
+//            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+//        } else {
+//            mCurrentPath->restore();
+//            prp_updateInfluenceRangeAfterChanged();
+//        }
+//        mPathChanged = false;
+//    }
+
+//    void finishedPathChange() {
+//        if(!mPathChanged) return;
+//        mPathChanged = false;
+//        prp_callFinishUpdater();
+//    }
+//protected:
+//    SmartPathAnimator();
+//private:
+//    bool mPathChanged = false;
+//    stdsptr<SmartPath> mCurrentPath;
+//};
 
 #endif // SMARTPATHANIMATOR_H

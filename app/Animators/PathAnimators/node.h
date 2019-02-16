@@ -63,6 +63,9 @@ struct Node {
     const bool& getC2Enabled() const {
         return mC2Enabled;
     }
+
+    static Node sInterpolateNormal(const Node& node1, const Node& node2,
+                                   const qreal &weight2);
 protected:
     void switchPrevAndNext() {
         const int prevT = mPrevNodeId;

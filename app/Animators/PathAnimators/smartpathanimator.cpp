@@ -1,5 +1,5 @@
 #include "smartpathanimator.h"
 
-SmartPathAnimator::SmartPathAnimator() : InterpolationAnimator("smart path"){
-    mCurrentPath = SPtrCreate(SmartPath)();
-}
+//SmartPathAnimator::SmartPathAnimator() : InterpolationAnimator("smart path"){
+//    mCurrentPath = SPtrCreate(SmartPath)();
+//}

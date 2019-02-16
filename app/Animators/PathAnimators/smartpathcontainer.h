@@ -9,6 +9,7 @@
 #include "framerange.h"
 #include "smartPointers/stdselfref.h"
 #include "smartPointers/stdpointer.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class SmartPath : public StdSelfRef {
     friend class StdSelfRef;
@@ -38,8 +39,6 @@ public:
 
     void removeNodeWithIdAndTellNextToDoSame(const int& nodeId);
 
-    QList<int> updateAllNodesTypeAfterNeighbourChanged();
-
     void setPrev(SmartPath * const prev);
     void setNext(SmartPath * const next);
 
@@ -62,18 +61,51 @@ public:
         node.fC2 = c2;
     }
 
-    NodeList *getNodes() const;
-
     SkPath getPathAt() const;
     SkPath getPathForPrev() const;
     SkPath getPathForNext() const;
 
+    stdsptr<NodeList> getNodesListForPrev() const {
+        if(!mPrev) return SPtrCreate(NodeList)(mNodes.get());
+        return getNodesListFor(mPrev);
+    }
+
+    stdsptr<NodeList> getNodesListForNext() const {
+        if(!mNext) return SPtrCreate(NodeList)(mNodes.get());
+        return getNodesListFor(mNext);
+    }
+
     SkPath interpolateWithNext(const qreal& nextWeight) const;
     SkPath interpolateWithPrev(const qreal& prevWeight) const;
+    stdsptr<NodeList> interpolateNodesListWithNext(
+            const qreal& nextWeight) const;
+    stdsptr<NodeList> interpolateNodesListWithPrev(
+            const qreal& prevWeight) const;
+
+    void save() {
+        mSaved = SPtrCreate(NodeList)(mNodes.get());
+    }
+
+    void restore() {
+        if(mSaved == nullptr) return;
+        mNodes = mSaved;
+        mSaved.reset();
+
+        updateAllNodesTypeAfterNeighbourChanged();
+        if(mPrev) mPrev->updateAllNodesTypeAfterNeighbourChanged();
+        if(mNext) mNext->updateAllNodesTypeAfterNeighbourChanged();
+    }
 protected:
     SmartPath();
-    SmartPath(const NodeList * const nodes);
+    SmartPath(const SmartPath * const src);
+
+    void updateAllNodesTypeAfterNeighbourChanged() {
+        mNodes->updateAllNodesTypeAfterNeighbourChanged();
+    }
+
+    NodeList *getNodes() const;
 private:
+    stdsptr<NodeList> getNodesListFor(SmartPath * const neighbour) const;
     SkPath getPathFor(SmartPath * const neighbour) const;
     void insertNodeBetween(const int &prevId, const int &nextId,
                            const Node &nodeBlueprint);
@@ -81,6 +113,7 @@ private:
     stdptr<SmartPath> mPrev;
     stdptr<SmartPath> mNext;
     stdsptr<NodeList> mNodes;
+    stdsptr<NodeList> mSaved;
 };
 
 #endif // SMARTPATHCONTAINER_H

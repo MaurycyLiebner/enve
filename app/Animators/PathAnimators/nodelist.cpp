@@ -2,6 +2,7 @@
 #include "skia/skiaincludes.h"
 #include "pointhelpers.h"
 #include "exceptions.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 void NodeList::moveNodeAfter(const int& moveNodeId, Node& moveNode,
                              const int& afterNodeId, Node& afterNode) {
@@ -27,6 +28,23 @@ void NodeList::moveNodeBefore(const int& moveNodeId, Node& moveNode,
     setNodePrevId(beforeNodeId, beforeNode, moveNodeId);
     setNodePrevAndNextId(moveNodeId, moveNode, beforePrevId, beforeNodeId);
     setNodeNextId(beforePrevId, moveNodeId);
+}
+
+stdsptr<NodeList> NodeList::sInterpolate(const NodeList * const list1,
+                                         const NodeList * const list2,
+                                         const qreal& weight2) {
+    QList<Node> resultList;
+    const auto list1v = list1->getList();
+    const auto list2v = list2->getList();
+    if(list1v.count() != list2v.count())
+        RuntimeThrow("Cannot interpolate paths with different node count");
+    const int listCount = list1v.count();
+    for(int i = 0; i < listCount; i++) {
+        const Node& node1 = list1v.at(i);
+        const Node& node2 = list2v.at(i);
+        resultList.append(Node::sInterpolateNormal(node1, node2, weight2));
+    }
+    return SPtrCreate(NodeList)(resultList);
 }
 
 int NodeList::firstSegmentNode(const int& nodeId) const {

@@ -1,5 +1,4 @@
 ﻿#include "smartpathcontainer.h"
-#include "smartPointers/sharedpointerdefs.h"
 
 void SmartPath::actionRemoveNormalNode(const int &nodeId) {
     Node& node = mNodes->at(nodeId);
@@ -198,12 +197,26 @@ SkPath SmartPath::interpolateWithPrev(const qreal &prevWeight) const {
     return result;
 }
 
+stdsptr<NodeList> SmartPath::interpolateNodesListWithNext(
+        const qreal &nextWeight) const {
+    const auto list1 = getNodesListForNext();
+    const auto list2 = mNext->getNodesListForPrev();
+    return NodeList::sInterpolate(list1.get(), list2.get(), nextWeight);
+}
+
+stdsptr<NodeList> SmartPath::interpolateNodesListWithPrev(
+        const qreal &prevWeight) const {
+    const auto list1 = getNodesListForPrev();
+    const auto list2 = mPrev->getNodesListForNext();
+    return NodeList::sInterpolate(list1.get(), list2.get(), prevWeight);
+}
+
 SmartPath::SmartPath() {
     mNodes = SPtrCreate(NodeList)();
 }
 
-SmartPath::SmartPath(const NodeList * const nodes) {
-    mNodes = SPtrCreate(NodeList)(nodes);
+SmartPath::SmartPath(const SmartPath * const src) {
+    mNodes = SPtrCreate(NodeList)(src->getNodes());
 }
 
 SkPath SmartPath::getPathForPrev() const {
@@ -248,7 +261,7 @@ bool shouldSplitThisNode(const int& nodeId,
     return false;
 }
 
-SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
+stdsptr<NodeList> SmartPath::getNodesListFor(SmartPath * const neighbour) const {
     const auto& neighNodes = neighbour->getNodes();
     auto result = SPtrCreate(NodeList)(mNodes.get(), true);
 
@@ -283,5 +296,9 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
             }
         }
     }
-    return result->toSkPath();
+    return result;
+}
+
+SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
+    return getNodesListFor(neighbour)->toSkPath();
 }

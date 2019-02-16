@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
     //prevPath->getPathAt();
 
-    auto nextPath = SPtrCreate(SmartPath)(prevPath->getNodes());
+    auto nextPath = SPtrCreate(SmartPath)(prevPath.get());
 
     prevPath->setNext(nextPath.get());
     nextPath->setPrev(prevPath.get());
