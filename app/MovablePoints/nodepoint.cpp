@@ -277,7 +277,7 @@ CtrlPoint *NodePoint::getEndCtrlPt() {
     return mEndCtrlPt.get();
 }
 
-void NodePoint::drawSk(SkCanvas *canvas,
+void NodePoint::drawNodePoint(SkCanvas *canvas,
                      const CanvasMode &mode,
                      const SkScalar &invScale,
                      const bool &keyOnCurrent) {

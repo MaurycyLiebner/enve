@@ -85,7 +85,7 @@ public:
     QPointF getEndCtrlPtValue() const;
     CtrlPoint *getEndCtrlPt();
 
-    void drawSk(SkCanvas *canvas,
+    void drawNodePoint(SkCanvas *canvas,
                 const CanvasMode &mode,
                 const SkScalar &invScale,
                 const bool &keyOnCurrent);

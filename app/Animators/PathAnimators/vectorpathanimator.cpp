@@ -669,18 +669,19 @@ void VectorPathAnimator::drawSelected(SkCanvas *canvas,
                                       const SkMatrix &combinedTransform) {
     Q_UNUSED(combinedTransform);
 
+    const bool keyOnCurrentFrame = prp_isKeyOnCurrentFrame();
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             auto point = getNodePtWithNodeId(i);
-            point->drawSk(canvas, currentCanvasMode, invScale,
-                          prp_isKeyOnCurrentFrame());
+            point->drawNodePoint(canvas, currentCanvasMode, invScale,
+                                 keyOnCurrentFrame);
         }
     } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             auto point = getNodePtWithNodeId(i);
             if(point->isEndPoint() || point->isSelected()) {
-                point->drawSk(canvas, currentCanvasMode, invScale,
-                              prp_isKeyOnCurrentFrame());
+                point->drawNodePoint(canvas, currentCanvasMode, invScale,
+                                     keyOnCurrentFrame);
             }
         }
     }
@@ -697,13 +698,9 @@ void VectorPathAnimator::appendToPointsList(const stdsptr<NodePoint>& pt) {
 }
 
 void VectorPathAnimator::setFirstPoint(NodePoint* pt) {
-    if(mFirstPoint) {
-        mFirstPoint->setSeparateNodePoint(false);
-    }
+    if(mFirstPoint) mFirstPoint->setSeparateNodePoint(false);
     mFirstPoint = pt;
-    if(mFirstPoint) {
-        mFirstPoint->setSeparateNodePoint(true);
-    }
+    if(mFirstPoint) mFirstPoint->setSeparateNodePoint(true);
 }
 
 void VectorPathAnimator::moveElementPosSubset(int firstId,
@@ -715,12 +712,9 @@ void VectorPathAnimator::moveElementPosSubset(int firstId,
     }
 }
 
-void VectorPathAnimator::revertNodeSettingsSubset(
-            const int &firstId,
-            int count) {
-    if(count == -1) {
-        count = mNodeSettings.count() - firstId;
-    }
+void VectorPathAnimator::revertNodeSettingsSubset(const int &firstId,
+                                                  int count) {
+    if(count == -1) count = mNodeSettings.count() - firstId;
     int lastId = firstId + count - 1;
     for(int i = 0; i < count; i++) {
         mNodeSettings.move(lastId, firstId + i);

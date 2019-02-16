@@ -103,9 +103,7 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
 
 void MovablePoint::drawSk(SkCanvas *canvas,
                           const SkScalar &invScale) {
-    if(isHidden()) {
-        return;
-    }
+    if(isHidden()) return;
     if(mSelected) {
         drawOnAbsPosSk(canvas,
                        qPointToSk(getAbsolutePos()),
