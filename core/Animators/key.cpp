@@ -1,9 +1,12 @@
 #include "key.h"
 #include "qrealpoint.h"
 
-Key::Key(Animator * const parentAnimator) {
+Key::Key(Animator * const parentAnimator) :
+    Key(0, parentAnimator) {}
+
+Key::Key(const int &frame, Animator * const parentAnimator) {
     mParentAnimator = parentAnimator;
-    mRelFrame = 0;
+    mRelFrame = frame;
 }
 
 bool Key::isSelected() const { return mIsSelected; }

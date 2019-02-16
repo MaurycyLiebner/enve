@@ -92,7 +92,10 @@ SOURCES += \
     Animators/steppedanimator.cpp \
     basicreadwrite.cpp \
     differsinterpolate.cpp \
-    skia/skiahelpers.cpp
+    skia/skiahelpers.cpp \
+    Animators/keyt.cpp \
+    Animators/basedkeyt.cpp \
+    Animators/graphkeyt.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -144,7 +147,10 @@ HEADERS += \
     basicreadwrite.h \
     differsinterpolate.h \
     castmacros.h \
-    skia/skiahelpers.h
+    skia/skiahelpers.h \
+    Animators/keyt.h \
+    Animators/basedkeyt.h \
+    Animators/graphkeyt.h
 
 unix {
     target.path = /usr/lib

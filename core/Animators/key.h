@@ -13,12 +13,36 @@ class KeysClipboardContainer;
 class Key : public StdSelfRef {
 public:
     Key(Animator * const parentAnimator);
+    Key(const int &frame, Animator * const parentAnimator);
+
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~Key() {}
 
     virtual void startFrameTransform();
     virtual void finishFrameTransform();
+    virtual void mergeWith(const stdsptr<Key>& key) { key->removeFromAnimator(); }
+
+    virtual void deleteKey() {
+        removeFromAnimator();
+    }
+
+    virtual bool differsFromKey(Key* key) const = 0;
+    virtual void writeKey(QIODevice *target);
+    virtual void readKey(QIODevice *target);
+
+
+    virtual void cancelFrameTransform();
+    virtual void scaleFrameAndUpdateParentAnimator(
+            const int &relativeToFrame,
+            const qreal &scaleFactor,
+            const bool& useSavedFrame);
+
+    virtual bool isSelected() const;
+    virtual void addToSelection(QList<qptr<Animator>> &selectedAnimators);
+    virtual void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
+    virtual bool isDescendantSelected() const { return isSelected(); }
+
 
     int getAbsFrame() const;
     virtual void setRelFrame(const int &frame);
@@ -31,27 +55,9 @@ public:
     T* getParentAnimator() const {
         return static_cast<T*>(mParentAnimator.data());
     }
-
-    virtual void mergeWith(const stdsptr<Key>& key) { key->removeFromAnimator(); }
-
-    virtual bool isDescendantSelected() const { return isSelected(); }
-
     void removeFromAnimator();
 
-    virtual void deleteKey() {
-        removeFromAnimator();
-    }
-
-    virtual void cancelFrameTransform();
-    virtual void scaleFrameAndUpdateParentAnimator(
-            const int &relativeToFrame,
-            const qreal &scaleFactor,
-            const bool& useSavedFrame);
     void setSelected(const bool &bT);
-    virtual bool isSelected() const;
-
-    virtual void addToSelection(QList<qptr<Animator>> &selectedAnimators);
-    virtual void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
 
     bool isHovered() const {
         return mHovered;
@@ -81,10 +87,6 @@ public:
     bool differesFromPrevKey() const {
         return differsFromKey(getPrevKey());
     }
-
-    virtual bool differsFromKey(Key* key) const = 0;
-    virtual void writeKey(QIODevice *target);
-    virtual void readKey(QIODevice *target);
 
     void afterKeyChanged();
 

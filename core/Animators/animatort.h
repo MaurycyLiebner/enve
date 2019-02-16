@@ -4,41 +4,7 @@
 #include "Animators/key.h"
 #include "basicreadwrite.h"
 #include "differsinterpolate.h"
-template <typename T>
-class AnimatorT;
-
-template <typename T>
-class KeyT : public Key {
-    friend class StdSelfRef;
-public:
-    bool differsFromKey(Key *key) const {
-        return gDiffers(static_cast<KeyT<T>*>(key)->getValue(), mValue);
-    }
-
-    const T &getValue() { return mValue; }
-    void setValue(const T &value) { mValue = value; }
-    void writeKey(QIODevice *target) {
-        Key::writeKey(target);
-        gWrite(target, mValue);
-    }
-    void readKey(QIODevice *target) {
-        Key::readKey(target);
-        gRead(target, mValue);
-    }
-protected:
-    KeyT(const T &value,
-         const int &relFrame,
-         AnimatorT<T> *parentAnimator = nullptr) :
-        Key(parentAnimator) {
-        mRelFrame = relFrame;
-        mValue = value;
-    }
-
-    KeyT(AnimatorT<T> *parentAnimator = nullptr) :
-        Key(parentAnimator) {}
-private:
-    T mValue;
-};
+#include "keyt.h"
 
 template <typename T>
 class AnimatorT : public Animator {
