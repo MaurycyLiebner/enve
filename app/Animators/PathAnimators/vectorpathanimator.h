@@ -52,7 +52,6 @@ public:
     stdsptr<Key> readKey(QIODevice *target);
     bool SWT_isVectorPathAnimator() const { return true; }
 
-
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 

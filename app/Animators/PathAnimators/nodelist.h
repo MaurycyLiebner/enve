@@ -39,6 +39,18 @@ public:
         updateAfterNodeChanged(nodeId);
     }
 
+    void setNodeCtrlsMode(const int& nodeId, const CtrlsMode& ctrlsMode) {
+        if(nodeId < 0 || nodeId >= mNodes.count()) return;
+        setNodeCtrlsMode(nodeId, mNodes[nodeId], ctrlsMode);
+    }
+
+    void setNodeCtrlsMode(const int& nodeId, Node& node,
+                          const CtrlsMode& ctrlsMode) {
+        Q_UNUSED(nodeId);
+        node.setCtrlsMode(ctrlsMode);
+        //updateAfterNodeChanged(nodeId);
+    }
+
     void setNodeNextId(const int& nodeId, const int& nextId) {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeNextId(nodeId, mNodes[nodeId], nextId);

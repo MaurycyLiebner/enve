@@ -1,6 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
-#include <QPointF>
+#include "pointhelpers.h"
 
 struct Node {
     friend class NodeList;
@@ -55,6 +55,7 @@ struct Node {
     qreal fT;
 
     const Type& getType() const { return mType; }
+    const CtrlsMode& getCtrlsMode() const { return mCtrlsMode; }
 protected:
     void switchPrevAndNext() {
         const int prevT = mPrevNodeId;
@@ -63,34 +64,33 @@ protected:
     }
 
     void shiftIdsGreaterThan(const int& greater, const int& shiftBy) {
-        if(mNextNodeId) if(mNextNodeId > greater) mNextNodeId += shiftBy;
         if(mPrevNodeId) if(mPrevNodeId > greater) mPrevNodeId += shiftBy;
-    }
-
-    void shiftIdsSmallerThan(const int& smaller, const int& shiftBy) {
-        if(mNextNodeId) if(mNextNodeId < smaller) mNextNodeId += shiftBy;
-        if(mPrevNodeId) if(mPrevNodeId < smaller) mPrevNodeId += shiftBy;
-    }
-
-    void setNextNodeId(const int& nextNodeId) {
-        mNextNodeId = nextNodeId;
+        if(mNextNodeId) if(mNextNodeId > greater) mNextNodeId += shiftBy;
     }
 
     void setPrevNodeId(const int& prevNodeId) {
         mPrevNodeId = prevNodeId;
     }
 
+    void setNextNodeId(const int& nextNodeId) {
+        mNextNodeId = nextNodeId;
+    }
+
     void setType(const Type& type) {
         mType = type;
     }
+
+    void setCtrlsMode(const CtrlsMode& ctrlsMode) {
+        mCtrlsMode = ctrlsMode;
+    }
 private:
     Type mType;
-
-    //! @brief Next connected node id in the list.
-    int mNextNodeId = -1;
+    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 
     //! @brief Previous connected node id in the list.
     int mPrevNodeId = -1;
+    //! @brief Next connected node id in the list.
+    int mNextNodeId = -1;
 };
 
 #endif // NODE_H
