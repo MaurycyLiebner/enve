@@ -177,18 +177,24 @@ SkPath SmartPath::getPathAt() const {
 SkPath SmartPath::interpolateWithNext(const qreal &nextWeight) const {
     if(!mNext) return getPathAt();
     SkPath result;
-    getPathForNext().interpolate(mNext->getPathForPrev(),
-                                 qrealToSkScalar(nextWeight),
-                                 &result);
+    const SkPath thisPath = getPathForNext();
+    const SkPath nextPath = mNext->getPathForPrev();
+    const bool ok = thisPath.interpolate(nextPath,
+                                         qrealToSkScalar(nextWeight),
+                                         &result);
+    if(!ok) RuntimeThrow("Cannot interpolate paths with different verb count");
     return result;
 }
 
-SkPath SmartPath::interpolateWithPrev(const qreal &nextWeight) const {
+SkPath SmartPath::interpolateWithPrev(const qreal &prevWeight) const {
     if(!mPrev) return getPathAt();
     SkPath result;
-    getPathForPrev().interpolate(mPrev->getPathForNext(),
-                                 qrealToSkScalar(nextWeight),
-                                 &result);
+    const SkPath thisPath = getPathForPrev();
+    const SkPath prevPath = mPrev->getPathForNext();
+    const bool ok = thisPath.interpolate(prevPath,
+                                         qrealToSkScalar(prevWeight),
+                                         &result);
+    if(!ok) RuntimeThrow("Cannot interpolate paths with different verb count");
     return result;
 }
 
@@ -208,6 +214,38 @@ SkPath SmartPath::getPathForPrev() const {
 SkPath SmartPath::getPathForNext() const {
     if(mNext) return getPathFor(mNext);
     return mNodes->toSkPath();
+}
+
+bool isEndPointAndShouldBeSplit(const int& nodeId,
+                         const Node& thisNode,
+                         const Node& neighNode,
+                         const NodeList * const thisNodes,
+                         const NodeList * const neighNodes) {
+    if(!thisNodes->segmentClosed(nodeId)) {
+        const int thisLastId = thisNodes->lastSegmentNode(nodeId);
+        const int neighLastId = neighNodes->lastSegmentNode(nodeId);
+        if(thisLastId == thisNode.getNextNodeId() &&
+           neighLastId != neighNode.getNextNodeId()) return true;
+        const int thisFirstId = thisNodes->firstSegmentNode(nodeId);
+        const int neighFirstId = neighNodes->firstSegmentNode(nodeId);
+        if(thisFirstId == nodeId && neighFirstId != nodeId) return true;
+    }
+    return false;
+}
+
+bool shouldSplitThisNode(const int& nodeId,
+                         const Node& thisNode,
+                         const Node& neighNode,
+                         const NodeList * const thisNodes,
+                         const NodeList * const neighNodes) {
+    if(thisNode.isNormal()) {
+        return isEndPointAndShouldBeSplit(nodeId, thisNode, neighNode,
+                                          thisNodes, neighNodes);
+    } else if(thisNode.isDissolved()) {
+        return isEndPointAndShouldBeSplit(nodeId, neighNode, thisNode,
+                                          neighNodes, thisNodes);
+    }
+    return false;
 }
 
 SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
@@ -233,8 +271,8 @@ SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
         }
 
         // Create splits for connecting/disconnecting
-        if(mNodes->shouldSplitThisNode(i, thisNode, neighbourNode,
-                                       mNodes.get(), neighNodes)) {
+        if(shouldSplitThisNode(i, thisNode, neighbourNode,
+                               mNodes.get(), neighNodes)) {
             if(thisNode.isDissolved()) {
                 result->promoteDissolvedNodeToNormal(resI);
                 result->splitNodeAndDisconnect(resI);

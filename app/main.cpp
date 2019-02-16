@@ -56,84 +56,50 @@ int main(int argc, char *argv[]) {
     prevPath->setNext(nextPath.get());
     nextPath->setPrev(prevPath.get());
 
+    nextPath->interpolateWithPrev(0.5);
+    prevPath->interpolateWithNext(0.5);
+
     qDebug() << "DISCONNECT";
     nextPath->actionDisconnectNodes(2, 3);
 
-    qDebug() << "prevPath at:";
-    prevPath->getPathAt();
-    qDebug() << "nextPath at:";
-    nextPath->getPathAt();
+    nextPath->interpolateWithPrev(0.5);
+    prevPath->interpolateWithNext(0.5);
+//    qDebug() << "prevPath at:";
+//    prevPath->getPathAt();
+//    qDebug() << "nextPath at:";
+//    nextPath->getPathAt();
 
-    qDebug() << "prevPath for next:";
-    prevPath->getPathForNext();
-    qDebug() << "nextPath for prev:";
-    nextPath->getPathForPrev();
+//    qDebug() << "prevPath for next:";
+//    prevPath->getPathForNext();
+//    qDebug() << "nextPath for prev:";
+//    nextPath->getPathForPrev();
 
     qDebug() << "ADD NODE";
     pt = QPointF(1.5, 0.5);
     nextPath->actionInsertNodeBetween(2, 3, pt, pt, pt);
-
-    qDebug() << "prevPath at:";
-    prevPath->getPathAt();
-    qDebug() << "nextPath at:";
-    nextPath->getPathAt();
-
-    qDebug() << "prevPath for next:";
-    prevPath->getPathForNext();
-    qDebug() << "nextPath for prev:";
-    nextPath->getPathForPrev();
+    nextPath->interpolateWithPrev(0.5);
+    prevPath->interpolateWithNext(0.5);
 
     qDebug() << "CONNECT";
     nextPath->actionConnectNodes(3, 5);
-
-    qDebug() << "prevPath at:";
-    prevPath->getPathAt();
-    qDebug() << "nextPath at:";
-    nextPath->getPathAt();
-
-    qDebug() << "prevPath for next:";
-    prevPath->getPathForNext();
-    qDebug() << "nextPath for prev:";
-    nextPath->getPathForPrev();
+    nextPath->interpolateWithPrev(0.5);
+    prevPath->interpolateWithNext(0.5);
 
     qDebug() << "INSERT NODE";
     nextPath->actionInsertNodeBetween(0, 1, 0.5);
-
-    qDebug() << "prevPath at:";
-    prevPath->getPathAt();
-    qDebug() << "nextPath at:";
-    nextPath->getPathAt();
-
-    qDebug() << "prevPath for next:";
-    prevPath->getPathForNext();
-    qDebug() << "nextPath for prev:";
-    nextPath->getPathForPrev();
+    nextPath->interpolateWithPrev(0.5);
+    prevPath->interpolateWithNext(0.5);
 
     qDebug() << "REMOVE NODE";
     prevPath->actionRemoveNormalNode(3);
-
-    qDebug() << "prevPath at:";
-    prevPath->getPathAt();
-    qDebug() << "nextPath at:";
-    nextPath->getPathAt();
-
-    qDebug() << "prevPath for next:";
-    prevPath->getPathForNext();
-    qDebug() << "nextPath for prev:";
-    nextPath->getPathForPrev();
+    nextPath->interpolateWithPrev(0.5);
+    prevPath->interpolateWithNext(0.5);
 
     qDebug() << "DISCONNECT";
     prevPath->actionDisconnectNodes(3, 4);
+    nextPath->interpolateWithPrev(0.5);
+    prevPath->interpolateWithNext(0.5);
 
-    qDebug() << "prevPath at:";
-    prevPath->getPathAt();
-    qDebug() << "nextPath at:";
-    nextPath->getPathAt();
-
-    qDebug() << "prevPath for next:";
-    prevPath->getPathForNext();
-    qDebug() << "nextPath for prev:";
-    nextPath->getPathForPrev();
     w.show();
 
     return a.exec();

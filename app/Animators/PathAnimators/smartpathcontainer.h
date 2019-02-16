@@ -50,7 +50,7 @@ public:
     SkPath getPathForNext() const;
 
     SkPath interpolateWithNext(const qreal& nextWeight) const;
-    SkPath interpolateWithPrev(const qreal& nextWeight) const;
+    SkPath interpolateWithPrev(const qreal& prevWeight) const;
 protected:
     SmartPath();
     SmartPath(const NodeList * const nodes);

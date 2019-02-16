@@ -225,44 +225,6 @@ void NodeList::splitNodeAndDisconnect(const int& nodeId) {
     insertNodeAfter(nodeId, Node(Node::MOVE));
 }
 
-bool NodeList::shouldSplitThisNode(const int& nodeId,
-                                   const Node& thisNode,
-                                   const Node& neighNode,
-                                   const NodeList * const thisNodes,
-                                   const NodeList * const neighNodes) const {
-    if(!thisNodes->segmentClosed(nodeId)) {
-        const int thisLastId = thisNodes->lastSegmentNode(nodeId);
-        const int neighLastId = neighNodes->lastSegmentNode(nodeId);
-        if(thisLastId == thisNode.getNextNodeId() &&
-           neighLastId != neighNode.getNextNodeId()) return true;
-        const int thisFirstId = thisNodes->firstSegmentNode(nodeId);
-        const int neighFirstId = neighNodes->firstSegmentNode(nodeId);
-        if(thisFirstId == nodeId && neighFirstId != nodeId) return true;
-    }
-    const int thisPrevId = thisNode.getPrevNodeId();
-    const int thisNextId = thisNode.getNextNodeId();
-    const int neighPrevId = neighNode.getPrevNodeId();
-    const int neighNextId = neighNode.getNextNodeId();
-    const bool prevDiffers = thisPrevId != neighPrevId &&
-                             thisPrevId != neighNextId;
-    const bool nextDiffers = thisNextId != neighNextId &&
-                             thisNextId != neighPrevId;
-    // if node is normal
-    if(thisNode.isNormal()) {
-        // if node is in the middle(has both previous and next node)
-        if(thisNode.hasNextNode() && thisNode.hasPreviousNode()) {
-            if(thisNodes->nextNormalId(nodeId) == -1 &&
-               neighNodes->nextNormalId(nodeId) != -1) return true;
-            const Node& thisNextNode = thisNodes->at(thisNode.getNextNodeId());
-            // split node only if both nodes differ
-            if(!thisNextNode.isMove()) return prevDiffers && nextDiffers;
-        }
-    }
-    // if node is not normal and in the middle
-    // split if previous or next node differs
-    return prevDiffers || nextDiffers;
-}
-
 bool NodeList::nodesConnected(const int& node1Id,
                               const int& node2Id) const {
     const Node& node1 = mNodes.at(node1Id);

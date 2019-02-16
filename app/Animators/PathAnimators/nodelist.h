@@ -101,11 +101,6 @@ public:
     void promoteDissolvedNodeToNormal(const int &nodeId);
     void splitNode(const int &nodeId);
     void splitNodeAndDisconnect(const int &nodeId);
-    bool shouldSplitThisNode(const int &nodeId,
-                             const Node &thisNode,
-                             const Node &neighNode,
-                             const NodeList * const thisNodes,
-                             const NodeList * const neighNodes) const;
     bool nodesConnected(const int &node1Id, const int &node2Id) const;
 
     void setPrev(NodeList * const prev) {
