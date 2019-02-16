@@ -56,6 +56,13 @@ struct Node {
 
     const Type& getType() const { return mType; }
     const CtrlsMode& getCtrlsMode() const { return mCtrlsMode; }
+    const bool& getC0Enabled() const {
+        return mC0Enabled;
+    }
+
+    const bool& getC2Enabled() const {
+        return mC2Enabled;
+    }
 protected:
     void switchPrevAndNext() {
         const int prevT = mPrevNodeId;
@@ -83,8 +90,18 @@ protected:
     void setCtrlsMode(const CtrlsMode& ctrlsMode) {
         mCtrlsMode = ctrlsMode;
     }
+
+    void setC0Enabled(const bool& enabled) {
+        mC0Enabled = enabled;
+    }
+
+    void setC2Enabled(const bool& enabled) {
+        mC2Enabled = enabled;
+    }
 private:
     Type mType;
+    bool mC0Enabled = true;
+    bool mC2Enabled = true;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 
     //! @brief Previous connected node id in the list.

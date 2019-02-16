@@ -141,7 +141,7 @@ void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
 
     if(!newKey) {
         newKey = SPtrCreate(PathKey)(relFrame, getPathAtRelFrame(relFrame),
-                                          this, mPathClosed);
+                                     this, mPathClosed);
         anim_appendKey(newKey);
     } else {
         newKey->setElementsFromSkPath(getPathAtRelFrame(relFrame));
