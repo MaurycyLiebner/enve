@@ -43,6 +43,25 @@ public:
     void setPrev(SmartPath * const prev);
     void setNext(SmartPath * const next);
 
+    void setDissolvedNodeT(const int& nodeId, const qreal& t) {
+        Node& node = mNodes->at(nodeId);
+        if(!node.isDissolved()) RuntimeThrow("Setting dissolved node value "
+                                             "on a node of a different type");
+        node.fT = t;
+    }
+
+    void setNormalNodeValues(const int& nodeId,
+                             const QPointF& c0,
+                             const QPointF& p1,
+                             const QPointF& c2) {
+        Node& node = mNodes->at(nodeId);
+        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+                                          "on a node of a different type");
+        node.fC0 = c0;
+        node.fP1 = p1;
+        node.fC2 = c2;
+    }
+
     NodeList *getNodes() const;
 
     SkPath getPathAt() const;
