@@ -867,7 +867,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
         auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
         KeysView *keysView = bsvt->getKeysView();
         if(keysView) {
-            if(animTarget->isCurrentAnimator(mParent)) {
+            if(animTarget->graph_isCurrentAnimator(mParent)) {
                 keysView->graphRemoveViewedAnimator(animTarget);
             } else {
                 keysView->graphAddViewedAnimator(animTarget);
@@ -1063,10 +1063,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     } /*else if(type == SWT_BoxesGroup) {
     } */else if(target->SWT_isGraphAnimator()) {
         auto graphAnim = static_cast<GraphAnimator*>(target);
-        if(graphAnim->isCurrentAnimator(mParent)) {
+        if(graphAnim->graph_isCurrentAnimator(mParent)) {
             p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
                        MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
-                       graphAnim->getAnimatorColor(mParent));
+                       graphAnim->graph_getAnimatorColor(mParent));
         }
         name = graphAnim->prp_getName();
         if(fakeComplexAnimator) {

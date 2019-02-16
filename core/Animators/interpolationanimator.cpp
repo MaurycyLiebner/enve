@@ -22,7 +22,7 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrameF(
     return frame;
 }
 
-void InterpolationAnimator::getValueConstraints(
+void InterpolationAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType &type,
         qreal &minValue, qreal &maxValue) const {
     if(type == QrealPointType::KEY_POINT) {

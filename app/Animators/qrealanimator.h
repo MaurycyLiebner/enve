@@ -17,7 +17,7 @@ class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
     friend class SelfRef;
 public:
-    virtual ~QrealAnimator();
+    ~QrealAnimator();
 
     void prp_setAbsFrame(const int &frame);
     void prp_retrieveSavedValue();
@@ -40,17 +40,17 @@ public:
     void anim_removeKey(const stdsptr<Key> &keyToRemove);
     void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
     void anim_removeAllKeys();
-    void anim_updateKeysPath();
-    void anim_getMinAndMaxValues(qreal &minValP, qreal &maxValP) const;
-    void anim_getMinAndMaxValuesBetweenFrames(const int &startFrame,
+    void graph_updateKeysPath();
+    void graph_getMinAndMaxValues(qreal &minValP, qreal &maxValP) const;
+    void graph_getMinAndMaxValuesBetweenFrames(const int &startFrame,
                                               const int &endFrame,
                                               qreal &minValP,
                                               qreal &maxValP) const;
-    bool anim_graphValuesCorrespondToFrames() const {
+    bool graph_graphValuesCorrespondToFrames() const {
         return false;
     }
 
-    qreal clampGraphValue(const qreal &value);
+    qreal graph_clampGraphValue(const qreal &value);
 
     bool SWT_isQrealAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
@@ -145,7 +145,7 @@ protected:
                   const qreal &prefferdStep,
                   const QString& name);
     QrealKey *getQrealKeyAtId(const int &id) const;
-    void getValueConstraints(GraphKey *key, const QrealPointType& type,
+    void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
                              qreal &minMoveValue, qreal &maxMoveValue) const;
 
     bool mGraphMinMaxValuesFixed = false;
@@ -154,14 +154,14 @@ protected:
     int mDecimals = 3;
 
     qreal mMaxPossibleVal = DBL_MAX;
-    qreal mMinPossibleVal = -DBL_MAX;
+    qreal mMinPossibleVal = DBL_MIN;
 
-    qreal mCurrentValue = 0.;
-    qreal mSavedCurrentValue = 0.;
+    qreal mCurrentValue = 0;
+    qreal mSavedCurrentValue = 0;
 
     qsptr<RandomQrealGenerator> mRandomGenerator;
 
-    qreal mPrefferedValueStep = 1.;
+    qreal mPrefferedValueStep = 1;
 signals:
     void valueChangedSignal(qreal);
 };

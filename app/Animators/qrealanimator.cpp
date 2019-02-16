@@ -29,7 +29,7 @@ QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 
 QrealAnimator::~QrealAnimator() {}
 
-void QrealAnimator::getValueConstraints(
+void QrealAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType &type,
         qreal &minMoveValue, qreal &maxMoveValue) const {
     Q_UNUSED(key);
@@ -142,7 +142,7 @@ void QrealAnimator::prp_setRecording(const bool &rec) {
         anim_saveCurrentValueAsKey();
     } else {
         anim_removeAllKeys();
-        anim_updateKeysPath();
+        graph_updateKeysPath();
         anim_setRecordingWithoutChangingKeys(rec);
     }
 }
@@ -368,7 +368,7 @@ void QrealAnimator::qra_saveValueToKey(const int &frame,
         newKey->setRelFrame(frame);
         newKey->setValue(value);
         anim_appendKey(newKey);
-        anim_updateKeysPath();
+        graph_updateKeysPath();
     } else {
         qra_saveValueToKey(keyAtFrame, value);
     }
@@ -377,10 +377,10 @@ void QrealAnimator::qra_saveValueToKey(const int &frame,
 void QrealAnimator::qra_saveValueToKey(QrealKey *key, const qreal &value) {
     key->setValue(value);
 
-    if(isSelectedForGraph()) {
+    if(graph_isSelectedForGraph()) {
         graphScheduleUpdateAfterKeysChanged();
     }
-    anim_updateKeysPath();
+    graph_updateKeysPath();
 }
 
 void QrealAnimator::prp_setAbsFrame(const int &frame) {
@@ -402,7 +402,7 @@ void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
         newKey->setRelFrame(frame);
         newKey->setValue(value);
         anim_appendKey(newKey);
-        anim_updateKeysPath();
+        graph_updateKeysPath();
     } else {
         qra_saveCurrentValueToKey(keyAtFrame);
     }
@@ -419,7 +419,7 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
                                            mCurrentValue, this);
         anim_appendKey(newKey);
         anim_mKeyOnCurrentFrame = newKey.get();
-        anim_updateKeysPath();
+        graph_updateKeysPath();
     } else {
         qra_saveCurrentValueToKey(GetAsPtr(anim_mKeyOnCurrentFrame, QrealKey));
     }
@@ -439,30 +439,30 @@ void QrealAnimator::anim_removeAllKeys() {
 
 void QrealAnimator::anim_mergeKeysIfNeeded() {
     Animator::anim_mergeKeysIfNeeded();
-    anim_updateKeysPath();
+    graph_updateKeysPath();
 }
 
 void QrealAnimator::anim_appendKey(const stdsptr<Key>& newKey) {
     Animator::anim_appendKey(newKey);
     //anim_updateKeysPath();
-    anim_constrainCtrlsFrameValues();
+    graph_constrainCtrlsFrameValues();
     qra_updateValueFromCurrentFrame();
 }
 
 void QrealAnimator::anim_removeKey(const stdsptr<Key> &keyToRemove) {
     Animator::anim_removeKey(keyToRemove);
-    anim_updateKeysPath();
+    graph_updateKeysPath();
     qra_updateValueFromCurrentFrame();
 }
 
 void QrealAnimator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
     Animator::anim_moveKeyToRelFrame(key, newFrame);
 
-    anim_updateKeysPath();
+    graph_updateKeysPath();
     qra_updateValueFromCurrentFrame();
 }
 
-void QrealAnimator::anim_updateKeysPath() {
+void QrealAnimator::graph_updateKeysPath() {
     mKeysPath = QPainterPath();
     QrealKey *lastKey = nullptr;
     for(const auto &key : anim_mKeys) {
@@ -495,7 +495,7 @@ void QrealAnimator::anim_updateKeysPath() {
     }
 }
 
-void QrealAnimator::anim_getMinAndMaxValues(qreal &minValP,
+void QrealAnimator::graph_getMinAndMaxValues(qreal &minValP,
                                             qreal &maxValP) const {
     if(mGraphMinMaxValuesFixed) {
         minValP = mMinPossibleVal;
@@ -524,7 +524,7 @@ void QrealAnimator::anim_getMinAndMaxValues(qreal &minValP,
     }
 }
 
-void QrealAnimator::anim_getMinAndMaxValuesBetweenFrames(
+void QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
                     const int &startFrame, const int &endFrame,
                     qreal &minValP, qreal &maxValP) const {
     qreal minVal = 100000.;
@@ -559,7 +559,7 @@ void QrealAnimator::anim_getMinAndMaxValuesBetweenFrames(
     }
 }
 
-qreal QrealAnimator::clampGraphValue(const qreal &value) {
+qreal QrealAnimator::graph_clampGraphValue(const qreal &value) {
     return value;
 }
 
@@ -626,7 +626,7 @@ void QrealAnimator::prp_finishTransform() {
         }
         mTransformed = false;
 
-        if(isSelectedForGraph()) {
+        if(graph_isSelectedForGraph()) {
             graphScheduleUpdateAfterKeysChanged();
         }
         prp_callFinishUpdater();
