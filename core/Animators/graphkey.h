@@ -13,6 +13,22 @@ public:
     virtual void setValueForGraph(const qreal& value) = 0;
     virtual qreal getValueForGraph() const = 0;
 
+    virtual void saveCurrentFrameAndValue() {
+        mSavedRelFrame = mRelFrame;
+    }
+
+    void startFrameTransform() {
+        Key::startFrameTransform();
+        mSavedStartFrame = mStartFrame;
+        mSavedEndFrame = mEndFrame;
+    }
+
+    void scaleFrameAndUpdateParentAnimator(
+            const int &relativeToFrame,
+            const qreal &scaleFactor,
+            const bool& useSavedFrame);
+    void setRelFrame(const int &frame);
+
     qreal getEndValue() const;
     qreal getStartValue() const;
 
@@ -86,21 +102,6 @@ public:
     bool getEndEnabledForGraph() const;
     bool getStartEnabledForGraph() const;
 
-    virtual void saveCurrentFrameAndValue() {
-        mSavedRelFrame = mRelFrame;
-    }
-
-    void startFrameTransform() {
-        Key::startFrameTransform();
-        mSavedStartFrame = mStartFrame;
-        mSavedEndFrame = mEndFrame;
-    }
-
-    void scaleFrameAndUpdateParentAnimator(
-            const int &relativeToFrame,
-            const qreal &scaleFactor,
-            const bool& useSavedFrame);
-    void setRelFrame(const int &frame);
     void setStartValueVar(const qreal &value);
     void setEndValueVar(const qreal &value);
     void constrainEndCtrlValue(const qreal &minVal,
