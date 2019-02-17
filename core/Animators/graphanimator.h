@@ -31,20 +31,20 @@ public:
                                    QList<GraphKey*> &keys);
 
     void graph_incSelectedForGraph() {
-        if(!anim_mSelected) graph_updateKeysPath();
-        anim_mSelected++;
+        if(!graph_mSelected) graph_updateKeysPath();
+        graph_mSelected++;
     }
 
     void graph_decSelectedForGraph() {
-        anim_mSelected--;
+        graph_mSelected--;
     }
 
     bool graph_isSelectedForGraph() {
-        return anim_mSelected;
+        return graph_mSelected;
     }
 
     QColor graph_getAnimatorColor(void *ptr) const {
-        for(const auto& x : mAnimatorColors) {
+        for(const auto& x : graph_mAnimatorColors) {
             if(x.first == ptr) {
                 return x.second;
             }
@@ -53,15 +53,15 @@ public:
     }
 
     void graph_setAnimatorColor(void *ptr, const QColor &color) {
-        mAnimatorColors[ptr] = color;
+        graph_mAnimatorColors[ptr] = color;
     }
 
     void graph_removeAnimatorColor(void *ptr) {
-        mAnimatorColors.erase(ptr);
+        graph_mAnimatorColors.erase(ptr);
     }
 
     bool graph_isCurrentAnimator(void *ptr) const {
-        return mAnimatorColors.find(ptr) != mAnimatorColors.end();
+        return graph_mAnimatorColors.find(ptr) != graph_mAnimatorColors.end();
     }
 
     void graph_drawKeysPath(QPainter * const p,
@@ -84,15 +84,15 @@ public:
     void graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode);
     void graph_getSelectedSegments(QList<QList<GraphKey*>> &segments);
 protected:
-    QPainterPath mKeysPath;
+    QPainterPath graph_mKeysPath;
 private:
     void graph_getFrameConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minMoveFrame, qreal &maxMoveFrame) const;
 
-    int anim_mSelected = 0;
+    int graph_mSelected = 0;
 
-    std::map<void*, QColor> mAnimatorColors;
+    std::map<void*, QColor> graph_mAnimatorColors;
 };
 
 #endif // GRAPHANIMATOR_H

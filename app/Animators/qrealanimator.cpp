@@ -463,7 +463,7 @@ void QrealAnimator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
 }
 
 void QrealAnimator::graph_updateKeysPath() {
-    mKeysPath = QPainterPath();
+    graph_mKeysPath = QPainterPath();
     QrealKey *lastKey = nullptr;
     for(const auto &key : anim_mKeys) {
         QrealKey *qaKey = GetAsPtr(key.get(), QrealKey);
@@ -475,10 +475,10 @@ void QrealAnimator::graph_updateKeysPath() {
             keyValue = qaKey->getValue();
         }
         if(!lastKey) {
-            mKeysPath.moveTo(-5000, keyValue);
-            mKeysPath.lineTo(keyFrame, keyValue);
+            graph_mKeysPath.moveTo(-5000, keyValue);
+            graph_mKeysPath.lineTo(keyFrame, keyValue);
         } else {
-            mKeysPath.cubicTo(
+            graph_mKeysPath.cubicTo(
                         QPointF(lastKey->getEndFrame(),
                                 lastKey->getEndValue()),
                         QPointF(qaKey->getStartFrame(),
@@ -488,10 +488,10 @@ void QrealAnimator::graph_updateKeysPath() {
         lastKey = qaKey;
     }
     if(!lastKey) {
-        mKeysPath.moveTo(-5000, mCurrentValue);
-        mKeysPath.lineTo(5000, mCurrentValue);
+        graph_mKeysPath.moveTo(-5000, mCurrentValue);
+        graph_mKeysPath.lineTo(5000, mCurrentValue);
     } else {
-        mKeysPath.lineTo(5000, lastKey->getValue());
+        graph_mKeysPath.lineTo(5000, lastKey->getValue());
     }
 }
 

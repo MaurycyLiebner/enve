@@ -95,7 +95,9 @@ SOURCES += \
     skia/skiahelpers.cpp \
     Animators/keyt.cpp \
     Animators/basedkeyt.cpp \
-    Animators/graphkeyt.cpp
+    Animators/graphkeyt.cpp \
+    Animators/basedanimatort.cpp \
+    Animators/graphanimatort.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -150,7 +152,9 @@ HEADERS += \
     skia/skiahelpers.h \
     Animators/keyt.h \
     Animators/basedkeyt.h \
-    Animators/graphkeyt.h
+    Animators/graphkeyt.h \
+    Animators/basedanimatort.h \
+    Animators/graphanimatort.h
 
 unix {
     target.path = /usr/lib

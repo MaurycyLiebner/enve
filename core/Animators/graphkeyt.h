@@ -8,10 +8,10 @@ class GraphKeyT : public BasedKeyT<GraphKey, T> {
     friend class StdSelfRef;
 protected:
     GraphKeyT(const T &value, const int &relFrame,
-         AnimatorT<T> * const parentAnimator = nullptr) :
+         Animator * const parentAnimator = nullptr) :
         BasedKeyT<GraphKey, T>(value, relFrame, parentAnimator) {}
 
-    GraphKeyT(AnimatorT<T> * const parentAnimator = nullptr) :
+    GraphKeyT(Animator * const parentAnimator = nullptr) :
         BasedKeyT<GraphKey, T>(parentAnimator) {}
 };
 

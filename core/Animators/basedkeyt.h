@@ -1,8 +1,6 @@
 #ifndef BASEDKEYT_H
 #define BASEDKEYT_H
 #include "key.h"
-template <typename T>
-class AnimatorT;
 
 template <typename B, typename T>
 class BasedKeyT : public B {
@@ -25,12 +23,12 @@ public:
     }
 protected:
     BasedKeyT(const T &value, const int &relFrame,
-              AnimatorT<T> * const parentAnimator = nullptr) :
+              Animator * const parentAnimator = nullptr) :
         B(relFrame, parentAnimator) {
         mValue = value;
     }
 
-    BasedKeyT(AnimatorT<T> * const parentAnimator = nullptr) :
+    BasedKeyT(Animator * const parentAnimator = nullptr) :
         B(parentAnimator) {}
 private:
     T mValue;

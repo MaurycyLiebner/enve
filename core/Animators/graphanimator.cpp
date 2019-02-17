@@ -6,14 +6,14 @@ GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {}
 
 void GraphAnimator::anim_appendKey(const stdsptr<Key>& newKey) {
     Animator::anim_appendKey(newKey);
-    if(anim_mSelected) {
+    if(graph_mSelected) {
         graphScheduleUpdateAfterKeysChanged();
     }
 }
 
 void GraphAnimator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     Animator::anim_removeKey(keyToRemove);
-    if(anim_mSelected) {
+    if(graph_mSelected) {
         graphScheduleUpdateAfterKeysChanged();
     }
 }
@@ -55,11 +55,11 @@ void GraphAnimator::graph_drawKeysPath(QPainter * const p,
     QPen pen = QPen(Qt::black, 4.);
     pen.setCosmetic(true);
     p->setPen(pen);
-    p->drawPath(mKeysPath);
+    p->drawPath(graph_mKeysPath);
     pen.setColor(paintColor);
     pen.setWidthF(2.);
     p->setPen(pen);
-    p->drawPath(mKeysPath);
+    p->drawPath(graph_mKeysPath);
 
     p->setPen(Qt::NoPen);
     for(const auto &key : anim_mKeys) {
@@ -126,7 +126,7 @@ void GraphAnimator::graph_getFrameValueConstraints(
 }
 
 void GraphAnimator::graph_updateKeysPath() {
-    mKeysPath = QPainterPath();
+    graph_mKeysPath = QPainterPath();
     Key *lastKey = nullptr;
     for(const auto &key : anim_mKeys) {
         int keyFrame = key->getAbsFrame();
@@ -137,10 +137,10 @@ void GraphAnimator::graph_updateKeysPath() {
             keyValue = GetAsGK(key)->getValueForGraph();
         }
         if(!lastKey) {
-            mKeysPath.moveTo(-5000, keyValue);
-            mKeysPath.lineTo(keyFrame, keyValue);
+            graph_mKeysPath.moveTo(-5000, keyValue);
+            graph_mKeysPath.lineTo(keyFrame, keyValue);
         } else {
-            mKeysPath.cubicTo(
+            graph_mKeysPath.cubicTo(
                         QPointF(GetAsGK(lastKey)->getEndFrame(),
                                 GetAsGK(lastKey)->getEndValue()),
                         QPointF(GetAsGK(key)->getStartFrame(),
@@ -150,10 +150,10 @@ void GraphAnimator::graph_updateKeysPath() {
         lastKey = key.get();
     }
     if(!lastKey) {
-        mKeysPath.moveTo(-5000, -5000);
-        mKeysPath.lineTo(5000, 5000);
+        graph_mKeysPath.moveTo(-5000, -5000);
+        graph_mKeysPath.lineTo(5000, 5000);
     } else {
-        mKeysPath.lineTo(5000, GetAsGK(lastKey)->getValueForGraph());
+        graph_mKeysPath.lineTo(5000, GetAsGK(lastKey)->getValueForGraph());
     }
 }
 
