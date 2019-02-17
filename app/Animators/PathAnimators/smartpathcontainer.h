@@ -7,13 +7,12 @@
 #include "nodelist.h"
 
 #include "framerange.h"
-#include "smartPointers/stdselfref.h"
-#include "smartPointers/stdpointer.h"
 #include "smartPointers/sharedpointerdefs.h"
 
-class SmartPath : public StdSelfRef {
-    friend class StdSelfRef;
+class SmartPath {
 public:
+    SmartPath();
+    SmartPath(const SmartPath & src);
     void actionRemoveNormalNode(const int& nodeId);
 
     void actionAddFirstNode(const QPointF& c0,
@@ -96,9 +95,6 @@ public:
         if(mNext) mNext->updateAllNodesTypeAfterNeighbourChanged();
     }
 protected:
-    SmartPath();
-    SmartPath(const SmartPath * const src);
-
     void updateAllNodesTypeAfterNeighbourChanged() {
         mNodes->updateAllNodesTypeAfterNeighbourChanged();
     }
@@ -110,8 +106,8 @@ private:
     void insertNodeBetween(const int &prevId, const int &nextId,
                            const Node &nodeBlueprint);
 
-    stdptr<SmartPath> mPrev;
-    stdptr<SmartPath> mNext;
+    SmartPath * mPrev = nullptr;
+    SmartPath * mNext = nullptr;
     stdsptr<NodeList> mNodes;
     stdsptr<NodeList> mSaved;
 };

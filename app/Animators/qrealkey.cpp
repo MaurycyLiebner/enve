@@ -16,22 +16,6 @@ QrealKey::QrealKey(const int &frame,
 QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     QrealKey(0, 0., parentAnimator) { }
 
-stdsptr<QrealKey> QrealKey::makeQrealKeyDuplicate(
-        QrealAnimator* targetParent) {
-    auto target = SPtrCreate(QrealKey)(targetParent);
-    target->setValue(mValue);
-    target->setRelFrame(mRelFrame);
-    target->setCtrlsMode(mCtrlsMode);
-    target->setStartEnabledForGraph(mStartEnabled);
-    target->setStartFrameVar(mStartFrame);
-    target->setStartValueVar(mStartValue);
-    target->setEndEnabledForGraph(mEndEnabled);
-    target->setEndFrameVar(mEndFrame);
-    target->setEndValueVar(mEndValue);
-    //targetParent->appendKey(target);
-    return target;
-}
-
 void QrealKey::incValue(const qreal &incBy) {
     setValue(mValue + incBy);
 }
@@ -52,13 +36,8 @@ QrealAnimator *QrealKey::getParentQrealAnimator() const {
 
 qreal QrealKey::getValue() const { return mValue; }
 
-void QrealKey::setValue(qreal value) {
-    if(mParentAnimator) {
-        value = clamp(value,
-                      getParentQrealAnimator()->getMinPossibleValue(),
-                      getParentQrealAnimator()->getMaxPossibleValue());
-    }
-    qreal dVal = value - mValue;
+void QrealKey::setValue(const qreal& value) {
+    const qreal dVal = value - mValue;
     setEndValueVar(mEndValue + dVal);
     setStartValueVar(mStartValue + dVal);
 
@@ -68,9 +47,6 @@ void QrealKey::setValue(qreal value) {
 
 void QrealKey::finishValueTransform() {
     if(mParentAnimator) {
-//        mParentAnimator->addUndoRedo(
-//                    new ChangeQrealKeyValueUndoRedo(mSavedValue,
-//                                                    mValue, this) );
         mParentAnimator->anim_updateAfterChangedKey(this);
     }
 }

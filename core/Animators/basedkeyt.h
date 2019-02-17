@@ -6,6 +6,7 @@ template <typename B, typename T>
 class BasedKeyT : public B {
 public:
     bool differsFromKey(Key *key) const {
+        if(key == this) return false;
         const auto bk = static_cast<BasedKeyT<B, T>*>(key);
         return gDiffers(bk->getValue(), mValue);
     }

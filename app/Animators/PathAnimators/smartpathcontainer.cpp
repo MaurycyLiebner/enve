@@ -215,8 +215,8 @@ SmartPath::SmartPath() {
     mNodes = SPtrCreate(NodeList)();
 }
 
-SmartPath::SmartPath(const SmartPath * const src) {
-    mNodes = SPtrCreate(NodeList)(src->getNodes());
+SmartPath::SmartPath(const SmartPath &src) {
+    mNodes = SPtrCreate(NodeList)(src.getNodes());
 }
 
 SkPath SmartPath::getPathForPrev() const {

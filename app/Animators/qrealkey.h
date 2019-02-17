@@ -19,11 +19,9 @@ public:
              const qreal &val,
              QrealAnimator* parentAnimator);
 
-    stdsptr<QrealKey> makeQrealKeyDuplicate(QrealAnimator *targetParent);
-
 
     qreal getValue() const;
-    virtual void setValue(qreal value);
+    void setValue(const qreal &value);
 
     void changeFrameAndValueBy(const QPointF &frameValueChange);
     void saveCurrentFrameAndValue();
