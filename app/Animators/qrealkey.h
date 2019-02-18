@@ -14,11 +14,10 @@ class KeysClipboardContainer;
 class QrealKey : public GraphKey {
     friend class StdSelfRef;
 public:
-    QrealKey(QrealAnimator* parentAnimator);
-    QrealKey(const int &frame,
-             const qreal &val,
-             QrealAnimator* parentAnimator);
-
+    QrealKey(QrealAnimator * const parentAnimator);
+    QrealKey(const qreal &value,
+             const int &frame,
+             QrealAnimator * const parentAnimator);
 
     qreal getValue() const;
     void setValue(const qreal &value);

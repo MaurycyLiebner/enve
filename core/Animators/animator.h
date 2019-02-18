@@ -102,6 +102,7 @@ public:
     int anim_getCurrentAbsFrame();
     int anim_getCurrentRelFrame();
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    std::pair<Key*, Key*> anim_getPrevAndNextKey(const int &relFrame) const;
     Key* anim_getPrevKey(const int &relFrame) const;
     Key* anim_getNextKey(const int &relFrame) const;
     void anim_shiftAllKeys(const int &shift);

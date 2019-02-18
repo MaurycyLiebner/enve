@@ -364,9 +364,7 @@ void QrealAnimator::qra_saveValueToKey(const int &frame,
                                        const qreal &value) {
     QrealKey *keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
     if(!keyAtFrame) {
-        auto newKey = SPtrCreate(QrealKey)(this);
-        newKey->setRelFrame(frame);
-        newKey->setValue(value);
+        auto newKey = SPtrCreate(QrealKey)(value, frame, this);
         anim_appendKey(newKey);
         graph_updateKeysPath();
     } else {

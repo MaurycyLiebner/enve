@@ -10,8 +10,8 @@ public:
         const auto bk = static_cast<BasedKeyT<B, T>*>(key);
         return gDiffers(bk->getValue(), mValue);
     }
-
-    const T &getValue() { return mValue; }
+    T &getValue() { return mValue; }
+    const T &getValue() const { return mValue; }
     void setValue(const T &value) { mValue = value; }
     void writeKey(QIODevice *target) {
         B::writeKey(target);
@@ -25,13 +25,15 @@ public:
 protected:
     BasedKeyT(const T &value, const int &relFrame,
               Animator * const parentAnimator = nullptr) :
-        B(relFrame, parentAnimator) {
-        mValue = value;
-    }
+        B(relFrame, parentAnimator), mValue(value) {}
+
+    BasedKeyT(const int &relFrame,
+              Animator * const parentAnimator = nullptr) :
+        B(relFrame, parentAnimator) {}
 
     BasedKeyT(Animator * const parentAnimator = nullptr) :
         B(parentAnimator) {}
-private:
+
     T mValue;
 };
 

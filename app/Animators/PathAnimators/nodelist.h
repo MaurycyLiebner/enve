@@ -176,7 +176,7 @@ private:
     qreal nextT(const int &nodeId) const;
     Node &insertNodeToList(const int &nodeId, const Node &node);
 
-    const bool mNoUpdates;
+    bool mNoUpdates;
     NodeList * mPrev = nullptr;
     NodeList * mNext = nullptr;
     QList<Node> mNodes;

@@ -95,10 +95,17 @@ public:
         if(!prevKey) return mRelFrame;
         return prevKey->getRelFrame();
     }
+
     int getNextKeyRelFrame() const {
         auto nextKey = getNextKey();
         if(!nextKey) return mRelFrame;
         return getNextKey()->getRelFrame();
+    }
+
+    virtual void updateAfterNeighbouringKeysChanged(Key * const prevKey,
+                                                    Key * const nextKey) {
+        Q_UNUSED(prevKey);
+        Q_UNUSED(nextKey);
     }
 protected:
     bool mIsSelected = false;

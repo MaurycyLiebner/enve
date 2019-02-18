@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
     //prevPath.getPathAt();
 
-    auto nextPath = SmartPath(prevPath);
+    auto nextPath = prevPath.createCopy();
 
     prevPath.setNext(&nextPath);
     nextPath.setPrev(&prevPath);

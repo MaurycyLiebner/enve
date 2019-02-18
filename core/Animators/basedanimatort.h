@@ -75,7 +75,7 @@ public:
 
 protected:
     BasedAnimatorT(const QString& name) : B(name) {}
-private:
+
     T mCurrentValue;
 };
 

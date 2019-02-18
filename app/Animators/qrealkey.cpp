@@ -4,17 +4,16 @@
 #include "clipboardcontainer.h"
 #include "Animators/qrealpoint.h"
 
-QrealKey::QrealKey(const int &frame,
-                   const qreal &val,
-                   QrealAnimator* parentAnimator) :
+QrealKey::QrealKey(const qreal &value, const int &frame,
+                   QrealAnimator * const parentAnimator) :
     GraphKey(frame, parentAnimator) {
-    mValue = val;
+    mValue = value;
     mStartValue = mValue;
     mEndValue = mValue;
 }
 
-QrealKey::QrealKey(QrealAnimator *parentAnimator) :
-    QrealKey(0, 0., parentAnimator) { }
+QrealKey::QrealKey(QrealAnimator * const parentAnimator) :
+    QrealKey(0, 0, parentAnimator) { }
 
 void QrealKey::incValue(const qreal &incBy) {
     setValue(mValue + incBy);

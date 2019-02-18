@@ -12,7 +12,6 @@
 class SmartPath {
 public:
     SmartPath();
-    SmartPath(const QList<Node> &list);
     void actionRemoveNormalNode(const int& nodeId);
 
     void actionAddFirstNode(const QPointF& c0,
@@ -64,20 +63,8 @@ public:
     SkPath getPathForPrev() const;
     SkPath getPathForNext() const;
 
-    NodeList getNodesListForPrev() const {
-        if(!mPrev) return mNodesList;
-        return getNodesListFor(mPrev);
-    }
-
-    NodeList getNodesListForNext() const {
-        if(!mNext) return mNodesList;
-        return getNodesListFor(mNext);
-    }
-
     SkPath interpolateWithNext(const qreal& nextWeight) const;
     SkPath interpolateWithPrev(const qreal& prevWeight) const;
-    NodeList interpolateNodesListWithNext(const qreal& nextWeight) const;
-    NodeList interpolateNodesListWithPrev(const qreal& prevWeight) const;
 
     void save() {
         mSavedList = mNodesList.getList();
@@ -90,7 +77,13 @@ public:
         if(mPrev) mPrev->updateAllNodesTypeAfterNeighbourChanged();
         if(mNext) mNext->updateAllNodesTypeAfterNeighbourChanged();
     }
+
+    SmartPath createCopy() const {
+        return SmartPath(mNodesList.getList());
+    }
 protected:
+    SmartPath(const QList<Node> &list);
+
     void updateAllNodesTypeAfterNeighbourChanged() {
         mNodesList.updateAllNodesTypeAfterNeighbourChanged();
     }
@@ -104,6 +97,18 @@ protected:
     NodeList& getNodesRef() {
         return mNodesList;
     }
+
+    NodeList getNodesListForPrev() const {
+        if(!mPrev) return mNodesList;
+        return getNodesListFor(mPrev);
+    }
+
+    NodeList getNodesListForNext() const {
+        if(!mNext) return mNodesList;
+        return getNodesListFor(mNext);
+    }
+    NodeList interpolateNodesListWithNext(const qreal& nextWeight) const;
+    NodeList interpolateNodesListWithPrev(const qreal& prevWeight) const;
 private:
     NodeList getNodesListFor(SmartPath * const neighbour) const;
     SkPath getPathFor(SmartPath * const neighbour) const;

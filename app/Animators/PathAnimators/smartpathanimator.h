@@ -2,64 +2,93 @@
 #define SMARTPATHANIMATOR_H
 #include "Animators/interpolationanimator.h"
 #include "smartpathcontainer.h"
-#include "Animators/animatort.h"
+#include "Animators/graphanimatort.h"
 
-//class SmartPathKey : public KeyT<stdsptr<SmartPath>> {
-//    friend class StdSelfRef;
-//public:
-//    SmartPath * get() {
-//        return getValue().get();
-//    }
-//protected:
-//    SmartPathKey() {
-//        setValue(SPtrCreate(SmartPath)());
-//    }
-//};
+class SmartPathKey : public GraphKeyT<SmartPath> {
+    friend class StdSelfRef;
+public:
+    void save() {
+        mValue.save();
+    }
 
-//#define GetAsSPK(key) GetAsPtr(key, SmartPathKey)
+    void restore() {
+        mValue.restore();
+    }
 
-//class SmartPathAnimator : public InterpolationAnimator {
-//    friend class SelfRef;
-//public:
+    qreal getValueForGraph() const {
+        return mRelFrame;
+    }
 
-//    void startPathChange() {
-//        if(mPathChanged) return;
-//        if(prp_isRecording()) {
-//            if(prp_isKeyOnCurrentFrame()) return;
-//            anim_saveCurrentValueAsKey();
-//        }
-//        if(prp_isKeyOnCurrentFrame()) {
-//            GetAsSPK(anim_mKeyOnCurrentFrame)->get()->save();
-//            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
-//        } else {
-//            mCurrentPath->save();
-//            prp_updateInfluenceRangeAfterChanged();
-//        }
-//        mPathChanged = true;
-//    }
+    void setValueForGraph(const qreal& value) {
+        Q_UNUSED(value);
+    }
 
-//    void cancelPathChange() {
-//        if(!mPathChanged) return;
-//        if(prp_isKeyOnCurrentFrame()) {
-//            GetAsSPK(anim_mKeyOnCurrentFrame)->get()->restore();
-//            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
-//        } else {
-//            mCurrentPath->restore();
-//            prp_updateInfluenceRangeAfterChanged();
-//        }
-//        mPathChanged = false;
-//    }
+    void setRelFrame(const int &frame) {
+        if(frame == mRelFrame) return;
+        const int dFrame = frame - mRelFrame;
+        GraphKey::setRelFrame(frame);
+        mEndValue += dFrame;
+        mStartValue += dFrame;
+    }
 
-//    void finishedPathChange() {
-//        if(!mPathChanged) return;
-//        mPathChanged = false;
-//        prp_callFinishUpdater();
-//    }
-//protected:
-//    SmartPathAnimator();
-//private:
-//    bool mPathChanged = false;
-//    stdsptr<SmartPath> mCurrentPath;
-//};
+    void updateAfterNeighbouringKeysChanged(Key * const prevKey,
+                                            Key * const nextKey) {
+        mValue.setPrev(&static_cast<SmartPathKey*>(prevKey)->getValue());
+        mValue.setNext(&static_cast<SmartPathKey*>(nextKey)->getValue());
+    }
+protected:
+    SmartPathKey(const SmartPath& value, const int &relFrame,
+                 Animator * const parentAnimator) :
+        GraphKeyT<SmartPath>(value, relFrame, parentAnimator) {}
+};
+
+typedef BasedAnimatorT<GraphAnimator,
+                       SmartPathKey,
+                       SmartPath> SmartPathAnimatorBase;
+
+class SmartPathAnimator : public SmartPathAnimatorBase {
+    friend class SelfRef;
+public:
+
+    void startPathChange() {
+        if(mPathChanged) return;
+        if(prp_isRecording()) {
+            if(prp_isKeyOnCurrentFrame()) return;
+            anim_saveCurrentValueAsKey();
+        }
+        if(prp_isKeyOnCurrentFrame()) {
+            const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame, SmartPathKey);
+            spk->save();
+            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        } else {
+            mCurrentValue.save();
+            prp_updateInfluenceRangeAfterChanged();
+        }
+        mPathChanged = true;
+    }
+
+    void cancelPathChange() {
+        if(!mPathChanged) return;
+        if(prp_isKeyOnCurrentFrame()) {
+            const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame, SmartPathKey);
+            spk->restore();
+            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        } else {
+            mCurrentValue.restore();
+            prp_updateInfluenceRangeAfterChanged();
+        }
+        mPathChanged = false;
+    }
+
+    void finishedPathChange() {
+        if(!mPathChanged) return;
+        mPathChanged = false;
+        prp_callFinishUpdater();
+    }
+protected:
+    SmartPathAnimator();
+private:
+    bool mPathChanged = false;
+};
 
 #endif // SMARTPATHANIMATOR_H
