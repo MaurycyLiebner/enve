@@ -81,9 +81,7 @@ int Animator::anim_getNextKeyRelFrame(const Key * const key) const {
 }
 
 int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
-    Key* key = anim_getNextKey(relFrame);
-    if(!key) return FrameRange::EMAX;
-    Key* nextKey = key->getNextKey();
+    Key* nextKey = anim_getNextKey(relFrame);
     if(!nextKey) return FrameRange::EMAX;
     return nextKey->getRelFrame();
 }
@@ -297,7 +295,7 @@ Key *Animator::anim_getKeyAtRelFrame(const int &frame) const {
     int minId = 0;
     int maxId = anim_mKeys.count() - 1;
     while(maxId - minId > 1) {
-        int guess = (maxId + minId)/2;
+        const int guess = (maxId + minId)/2;
         if(anim_mKeys.at(guess)->getRelFrame() > frame) {
             maxId = guess;
         } else {
@@ -347,10 +345,30 @@ void Animator::anim_sortKeys() {
     std::sort(anim_mKeys.begin(), anim_mKeys.end(), keysFrameSort);
 }
 
+int Animator::getInsertIdForKeyRelFrame(const int& relFrame) const {
+    return getInsertIdForKeyRelFrame(relFrame, 0, anim_mKeys.count() - 1);
+}
+
+int Animator::getInsertIdForKeyRelFrame(
+        const int& relFrame, const int& min, const int& max) const {
+    if(min == max) return min;
+    const int guess = (max + min)/2;
+    const Key * const key = anim_mKeys.at(guess).get();
+    const int guessFrame = key->getRelFrame();
+    if(guessFrame > relFrame) {
+        return getInsertIdForKeyRelFrame(relFrame, min, guess);
+    } else if(guessFrame < relFrame) {
+        return getInsertIdForKeyRelFrame(relFrame, guess + 1, max);
+    }
+    // guessFrame == relFrame
+    return guess;
+}
+
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     if(!anim_mIsRecording) anim_mIsRecording = true;
-    anim_mKeys.append(newKey);
-    anim_sortKeys();
+    const int insertId = getInsertIdForKeyRelFrame(newKey->getRelFrame());
+    anim_mKeys.insert(insertId, newKey);
+    //anim_sortKeys();
     //mergeKeysIfNeeded();
     emit prp_addingKey(newKey.get());
 
@@ -369,7 +387,7 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
 
     anim_mKeys.removeAt(anim_getKeyIndex(keyPtr));
 
-    anim_sortKeys();
+    //anim_sortKeys();
 
     anim_updateKeyOnCurrrentFrame();
 }

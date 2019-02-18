@@ -152,6 +152,7 @@ public:
         return anim_mSelectedKeys;
     }
     void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
+    int getInsertIdForKeyRelFrame(const int &relFrame) const;
 private:
     void sortSelectedKeys();
 protected:
@@ -180,6 +181,10 @@ public slots:
     void anim_deleteCurrentKey();
     virtual void anim_updateAfterShifted();
     void prp_setRecording(const bool &rec);
+
+private:
+    int getInsertIdForKeyRelFrame(const int &relFrame,
+                                  const int &min, const int &max) const;
 };
 
 #endif // ANIMATOR_H
