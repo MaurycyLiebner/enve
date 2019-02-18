@@ -81,6 +81,19 @@ public:
     SmartPath createCopy() const {
         return SmartPath(mNodesList.getList());
     }
+
+    static bool sDifferent(const SmartPath& path1, const SmartPath& path2) {
+        return NodeList::sDifferent(path1.getNodesRef(),
+                                    path2.getNodesRef());
+    }
+
+    void read(QIODevice * const src) {
+        mNodesList.read(src);
+    }
+
+    void write(QIODevice * const dst) const {
+        mNodesList.write(dst);
+    }
 protected:
     SmartPath(const QList<Node> &list);
 

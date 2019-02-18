@@ -1,4 +1,6 @@
 #include "basicreadwrite.h"
+#include "Segments/qcubicsegment1d.h"
+#include "Animators/SmartPath/smartpathcontainer.h"
 
 bool gRead(QIODevice* src, QString& targetStr) {
     uint nChars;
@@ -45,4 +47,12 @@ bool gRead(QIODevice *src, qCubicSegment1D &value) {
 
 bool gWrite(QIODevice *dst, const qCubicSegment1D &value) {
     return dst->write(rcConstChar(&value), sizeof(qCubicSegment1D)) > 0;
+}
+
+bool gRead(QIODevice *src, SmartPath &value) {
+    value.read(src);
+}
+
+bool gWrite(QIODevice *dst, const SmartPath &value) {
+    value.write(dst);
 }

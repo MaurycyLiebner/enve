@@ -3,6 +3,8 @@
 #include "Animators/interpolationanimator.h"
 #include "smartpathcontainer.h"
 #include "Animators/graphanimatort.h"
+#include "differsinterpolate.h"
+#include "basicreadwrite.h"
 
 class SmartPathKey : public GraphKeyT<SmartPath> {
     friend class StdSelfRef;

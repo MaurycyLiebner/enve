@@ -1,6 +1,6 @@
 #include "differsinterpolate.h"
 #include "Segments/qcubicsegment1d.h"
-//#include "Animators/
+#include "Animators/SmartPath/smartpathcontainer.h"
 
 bool gDiffers(const QString &val1, const QString &val2) {
     return val1 != val2;
@@ -27,5 +27,5 @@ void gInterpolate(const qCubicSegment1D &val1,
 }
 
 bool gDiffers(const SmartPath &path1, const SmartPath &path2) {
-    path1.
+    return SmartPath::sDifferent(path1, path2);
 }

@@ -2,7 +2,7 @@
 #include "application.h"
 #include <QSurfaceFormat>
 #include <QProcess>
-#include "Animators/PathAnimators/smartpathcontainer.h"
+#include "Animators/SmartPath/smartpathcontainer.h"
 
 void setDefaultFormat() {
     QSurfaceFormat format;

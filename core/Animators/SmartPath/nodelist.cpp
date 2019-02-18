@@ -30,6 +30,33 @@ void NodeList::moveNodeBefore(const int& moveNodeId, Node& moveNode,
     setNodeNextId(beforePrevId, moveNodeId);
 }
 
+void NodeList::read(QIODevice * const src) {
+    int nNodes;
+    src->read(rcChar(&nNodes), sizeof(int));
+    if(mPrev) {
+        if(mPrev->getList().count() != nNodes)
+            RuntimeThrow("Reading from src would break number of nodes");
+    }
+    if(mNext) {
+        if(mNext->getList().count() != nNodes)
+            RuntimeThrow("Reading from src would break number of nodes");
+    }
+    mNodes.clear();
+    for(int i = 0; i < nNodes; i++) {
+        Node node;
+        src->read(rcChar(&node), sizeof(Node));
+        mNodes.append(node);
+    }
+}
+
+void NodeList::write(QIODevice * const dst) const {
+    int nNodes = mNodes.count();
+    dst->write(rcConstChar(&nNodes), sizeof(int));
+    for(const Node& node : mNodes) {
+        dst->write(rcConstChar(&node), sizeof(Node));
+    }
+}
+
 NodeList NodeList::sInterpolate(const NodeList &list1,
                                 const NodeList &list2,
                                 const qreal& weight2) {

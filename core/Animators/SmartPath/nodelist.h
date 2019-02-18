@@ -3,6 +3,7 @@
 #include "node.h"
 #include "smartPointers/stdselfref.h"
 #include "smartPointers/stdpointer.h"
+#include "basicreadwrite.h"
 class SkPath;
 class NodeList {
     friend class SmartPath;
@@ -147,6 +148,10 @@ public:
     NodeList createCopy() const {
         return NodeList(mNodes, true);
     }
+
+    void read(QIODevice * const src);
+
+    void write(QIODevice * const dst) const;
 protected:
     NodeList(const bool& noUpdates = false) : mNoUpdates(noUpdates) {}
 
@@ -171,6 +176,16 @@ protected:
     static NodeList sInterpolate(const NodeList &list1,
                                  const NodeList &list2,
                                  const qreal &weight2);
+
+    static bool sDifferent(const NodeList& list1, const NodeList& list2) {
+        const auto list1v = list1.getList();
+        const auto list2v = list2.getList();
+        if(list1v.count() != list2v.count()) return false;
+        for(int i = 0; i < list1.count(); i++) {
+            if(list1v.at(i) != list2v.at(i)) return true;
+        }
+        return false;
+    }
 private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;
