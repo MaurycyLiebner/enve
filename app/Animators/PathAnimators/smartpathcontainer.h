@@ -12,7 +12,7 @@
 class SmartPath {
 public:
     SmartPath();
-    SmartPath(const SmartPath & src);
+    SmartPath(const QList<Node> &list);
     void actionRemoveNormalNode(const int& nodeId);
 
     void actionAddFirstNode(const QPointF& c0,
@@ -42,7 +42,7 @@ public:
     void setNext(SmartPath * const next);
 
     void setDissolvedNodeT(const int& nodeId, const qreal& t) {
-        Node& node = mNodes->at(nodeId);
+        Node& node = mNodesList.at(nodeId);
         if(!node.isDissolved()) RuntimeThrow("Setting dissolved node value "
                                              "on a node of a different type");
         node.fT = t;
@@ -52,7 +52,7 @@ public:
                              const QPointF& c0,
                              const QPointF& p1,
                              const QPointF& c2) {
-        Node& node = mNodes->at(nodeId);
+        Node& node = mNodesList.at(nodeId);
         if(!node.isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         node.fC0 = c0;
@@ -64,31 +64,27 @@ public:
     SkPath getPathForPrev() const;
     SkPath getPathForNext() const;
 
-    stdsptr<NodeList> getNodesListForPrev() const {
-        if(!mPrev) return SPtrCreate(NodeList)(mNodes.get());
+    NodeList getNodesListForPrev() const {
+        if(!mPrev) return mNodesList;
         return getNodesListFor(mPrev);
     }
 
-    stdsptr<NodeList> getNodesListForNext() const {
-        if(!mNext) return SPtrCreate(NodeList)(mNodes.get());
+    NodeList getNodesListForNext() const {
+        if(!mNext) return mNodesList;
         return getNodesListFor(mNext);
     }
 
     SkPath interpolateWithNext(const qreal& nextWeight) const;
     SkPath interpolateWithPrev(const qreal& prevWeight) const;
-    stdsptr<NodeList> interpolateNodesListWithNext(
-            const qreal& nextWeight) const;
-    stdsptr<NodeList> interpolateNodesListWithPrev(
-            const qreal& prevWeight) const;
+    NodeList interpolateNodesListWithNext(const qreal& nextWeight) const;
+    NodeList interpolateNodesListWithPrev(const qreal& prevWeight) const;
 
     void save() {
-        mSaved = SPtrCreate(NodeList)(mNodes.get());
+        mSavedList = mNodesList.getList();
     }
 
     void restore() {
-        if(mSaved == nullptr) return;
-        mNodes = mSaved;
-        mSaved.reset();
+        mNodesList.setNodeList(mSavedList);
 
         updateAllNodesTypeAfterNeighbourChanged();
         if(mPrev) mPrev->updateAllNodesTypeAfterNeighbourChanged();
@@ -96,20 +92,29 @@ public:
     }
 protected:
     void updateAllNodesTypeAfterNeighbourChanged() {
-        mNodes->updateAllNodesTypeAfterNeighbourChanged();
+        mNodesList.updateAllNodesTypeAfterNeighbourChanged();
     }
 
-    NodeList *getNodes() const;
+    NodeList *getNodesPtr();
+
+    const NodeList& getNodesRef() const {
+        return mNodesList;
+    }
+
+    NodeList& getNodesRef() {
+        return mNodesList;
+    }
 private:
-    stdsptr<NodeList> getNodesListFor(SmartPath * const neighbour) const;
+    NodeList getNodesListFor(SmartPath * const neighbour) const;
     SkPath getPathFor(SmartPath * const neighbour) const;
     void insertNodeBetween(const int &prevId, const int &nextId,
                            const Node &nodeBlueprint);
 
     SmartPath * mPrev = nullptr;
     SmartPath * mNext = nullptr;
-    stdsptr<NodeList> mNodes;
-    stdsptr<NodeList> mSaved;
+
+    NodeList mNodesList;
+    QList<Node> mSavedList;
 };
 
 #endif // SMARTPATHCONTAINER_H

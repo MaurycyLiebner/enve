@@ -4,8 +4,7 @@
 #include "smartPointers/stdselfref.h"
 #include "smartPointers/stdpointer.h"
 class SkPath;
-class NodeList : public StdSelfRef {
-    friend class StdSelfRef;
+class NodeList {
     friend class SmartPath;
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
@@ -118,11 +117,13 @@ public:
 
     void setPrev(NodeList * const prev) {
         mPrev = prev;
+        if(mNoUpdates) return;
         updateAllNodesTypeAfterNeighbourChanged();
     }
 
     void setNext(NodeList * const next) {
         mNext = next;
+        if(mNoUpdates) return;
         updateAllNodesTypeAfterNeighbourChanged();
     }
 
@@ -142,38 +143,42 @@ public:
     int appendNode(const Node &nodeBlueprint) {
         return appendNode(nodeBlueprint, BOTH);
     }
+
+    NodeList createCopy() const {
+        return NodeList(mNodes, true);
+    }
 protected:
-    NodeList(const bool& noUpdates = false) :
-        mNoUpdates(noUpdates) {}
+    NodeList(const bool& noUpdates = false) : mNoUpdates(noUpdates) {}
 
     NodeList(const QList<Node>& list,
              const bool& noUpdates = false) :
         mNoUpdates(noUpdates), mNodes(list) {}
 
-    NodeList(const NodeList * const list,
-             const bool& noUpdates = false) :
-        NodeList(list->getList(), noUpdates) {}
-
     const QList<Node>& getList() const {
         return mNodes;
     }
+
+    void setNodeList(const QList<Node>& list) {
+        mNodes = list;
+    }
+
     int insertNodeBefore(const int &nextId, const Node &nodeBlueprint,
                          const Neighbour& neigh);
     int insertNodeAfter(const int &prevId, const Node &nodeBlueprint,
                         const Neighbour& neigh);
     int appendNode(const Node &nodeBlueprint, const Neighbour &neigh);
 
-    static stdsptr<NodeList> sInterpolate(const NodeList * const list1,
-                                          const NodeList * const list2,
-                                          const qreal &weight2);
+    static NodeList sInterpolate(const NodeList &list1,
+                                 const NodeList &list2,
+                                 const qreal &weight2);
 private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;
     Node &insertNodeToList(const int &nodeId, const Node &node);
 
     const bool mNoUpdates;
-    stdptr<NodeList> mPrev;
-    stdptr<NodeList> mNext;
+    NodeList * mPrev = nullptr;
+    NodeList * mNext = nullptr;
     QList<Node> mNodes;
 };
 

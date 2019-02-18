@@ -30,12 +30,12 @@ void NodeList::moveNodeBefore(const int& moveNodeId, Node& moveNode,
     setNodeNextId(beforePrevId, moveNodeId);
 }
 
-stdsptr<NodeList> NodeList::sInterpolate(const NodeList * const list1,
-                                         const NodeList * const list2,
-                                         const qreal& weight2) {
+NodeList NodeList::sInterpolate(const NodeList &list1,
+                                const NodeList &list2,
+                                const qreal& weight2) {
     QList<Node> resultList;
-    const auto list1v = list1->getList();
-    const auto list2v = list2->getList();
+    const auto list1v = list1.getList();
+    const auto list2v = list2.getList();
     if(list1v.count() != list2v.count())
         RuntimeThrow("Cannot interpolate paths with different node count");
     const int listCount = list1v.count();
@@ -44,7 +44,7 @@ stdsptr<NodeList> NodeList::sInterpolate(const NodeList * const list1,
         const Node& node2 = list2v.at(i);
         resultList.append(Node::sInterpolateNormal(node1, node2, weight2));
     }
-    return SPtrCreate(NodeList)(resultList);
+    return NodeList(resultList);
 }
 
 int NodeList::firstSegmentNode(const int& nodeId) const {
@@ -420,9 +420,9 @@ bool NodeList::updateNodeTypeAfterNeighbourChanged(const int &nodeId) {
     }
     const int nodeNextId = node.getNextNodeId();
     if(prevType == Node::NORMAL || nextType == Node::NORMAL ||
-            prevType == Node::MOVE || nextType == Node::MOVE ||
-            ((nodeNextId != nextNextId && nodeNextId != nextPrevId) && nextType != Node::DUMMY) ||
-            ((nodeNextId != prevNextId && nodeNextId != prevPrevId) && prevType != Node::DUMMY)) {
+       prevType == Node::MOVE || nextType == Node::MOVE ||
+       ((nodeNextId != nextNextId && nodeNextId != nextPrevId) && nextType != Node::DUMMY) ||
+       ((nodeNextId != prevNextId && nodeNextId != prevPrevId) && prevType != Node::DUMMY)) {
         if(node.getType() != Node::DISSOLVED) {
             node.fT = 0.5*(prevT(nodeId) + nextT(nodeId));
             node.setType(Node::DISSOLVED);
