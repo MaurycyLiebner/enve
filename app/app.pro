@@ -270,11 +270,7 @@ SOURCES += main.cpp\
     CacheHandlers/soundtmpfilehandlers.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
     CacheHandlers/minimalcachehandler.cpp \
-    CacheHandlers/soundcachehandler.cpp \
-    Animators/PathAnimators/smartpathcontainer.cpp \
-    Animators/PathAnimators/nodelist.cpp \
-    Animators/PathAnimators/node.cpp \
-    Animators/PathAnimators/smartpathanimator.cpp
+    CacheHandlers/soundcachehandler.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -496,11 +492,7 @@ HEADERS  += \
     CacheHandlers/soundtmpfilehandlers.h \
     CacheHandlers/hddcachablecachehandler.h \
     CacheHandlers/minimalcachehandler.h \
-    CacheHandlers/soundcachehandler.h \
-    Animators/PathAnimators/smartpathcontainer.h \
-    Animators/PathAnimators/nodelist.h \
-    Animators/PathAnimators/node.h \
-    Animators/PathAnimators/smartpathanimator.h
+    CacheHandlers/soundcachehandler.h
 
 RESOURCES += \
     resources.qrc

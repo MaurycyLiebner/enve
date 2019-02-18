@@ -97,7 +97,11 @@ SOURCES += \
     Animators/basedkeyt.cpp \
     Animators/graphkeyt.cpp \
     Animators/basedanimatort.cpp \
-    Animators/graphanimatort.cpp
+    Animators/graphanimatort.cpp \
+    Animators/SmartPath/node.cpp \
+    Animators/SmartPath/nodelist.cpp \
+    Animators/SmartPath/smartpathanimator.cpp \
+    Animators/SmartPath/smartpathcontainer.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -154,7 +158,11 @@ HEADERS += \
     Animators/basedkeyt.h \
     Animators/graphkeyt.h \
     Animators/basedanimatort.h \
-    Animators/graphanimatort.h
+    Animators/graphanimatort.h \
+    Animators/SmartPath/node.h \
+    Animators/SmartPath/nodelist.h \
+    Animators/SmartPath/smartpathanimator.h \
+    Animators/SmartPath/smartpathcontainer.h
 
 unix {
     target.path = /usr/lib
