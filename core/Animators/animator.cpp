@@ -229,7 +229,7 @@ std::pair<Key*, Key*> Animator::anim_getPrevAndNextKey(const int &relFrame) cons
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        Key* prevKey = anim_mKeys.at(prevId).get();
+        Key * const prevKey = anim_mKeys.at(prevId).get();
         if(prevKey->getRelFrame() < relFrame) {
             result.first = prevKey;
         } else if(prevKey->getRelFrame() == relFrame) {
@@ -237,7 +237,7 @@ std::pair<Key*, Key*> Animator::anim_getPrevAndNextKey(const int &relFrame) cons
                 result.first = anim_mKeys.at(prevId - 1).get();
             }
         }
-        Key* nextKey = anim_mKeys.at(nextId).get();
+        Key * const nextKey = anim_mKeys.at(nextId).get();
         if(nextKey->getRelFrame() > relFrame) {
             result.second = prevKey;
         } else if(nextKey->getRelFrame() == relFrame) {
@@ -253,7 +253,7 @@ Key *Animator::anim_getPrevKey(const int &relFrame) const {
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        Key* key = anim_mKeys.at(prevId).get();
+        Key * const key = anim_mKeys.at(prevId).get();
         if(key->getRelFrame() < relFrame) {
             return key;
         } else if(key->getRelFrame() == relFrame) {
@@ -269,7 +269,7 @@ Key *Animator::anim_getNextKey(const int &relFrame) const {
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        Key* key = anim_mKeys.at(nextId).get();
+        Key * const key = anim_mKeys.at(nextId).get();
         if(key->getRelFrame() > relFrame) {
             return key;
         } else if(key->getRelFrame() == relFrame) {
@@ -299,21 +299,21 @@ Key *Animator::anim_getKeyAtRelFrame(const int &frame) const {
             minId = guess;
         }
     }
-    Key* minIdKey = anim_mKeys.at(minId).get();
+    Key * const minIdKey = anim_mKeys.at(minId).get();
     if(minIdKey->getRelFrame() == frame) return minIdKey;
-    Key* maxIdKey = anim_mKeys.at(maxId).get();
+    Key * const maxIdKey = anim_mKeys.at(maxId).get();
     if(maxIdKey->getRelFrame() == frame) return maxIdKey;
     return nullptr;
 }
 
 bool Animator::anim_hasPrevKey(const Key * const key) {
-    int keyId = anim_getKeyIndex(key);
+    const int keyId = anim_getKeyIndex(key);
     if(keyId > 0) return true;
     return false;
 }
 
 bool Animator::anim_hasNextKey(const Key * const key) {
-    int keyId = anim_getKeyIndex(key);
+    const int keyId = anim_getKeyIndex(key);
     if(keyId < anim_mKeys.count() - 1) return true;
     return false;
 }
@@ -427,27 +427,26 @@ Key *Animator::prp_getKeyAtPos(const qreal &relX,
                                const int &minViewedFrame,
                                const qreal &pixelsPerFrame,
                                const int& keyRectSize) {
-    qreal relFrame = relX/pixelsPerFrame - 0.5 - prp_getFrameShift();
-    qreal absX = relX + minViewedFrame*pixelsPerFrame;
-    qreal absFrame = relFrame + minViewedFrame;
+    const qreal relFrame = relX/pixelsPerFrame - 0.5 - prp_getFrameShift();
+    const qreal absX = relX + minViewedFrame*pixelsPerFrame;
+    const qreal absFrame = relFrame + minViewedFrame;
     qreal keySize = keyRectSize;
     if(SWT_isComplexAnimator()) {
         keySize *= 0.75;
     }
     if(pixelsPerFrame > keySize) {
         int relFrameInt = qRound(relFrame);
-        qreal distToFrame = qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX);
-        if(2*distToFrame > keySize) {
-            return nullptr;
-        }
+        const qreal distToFrame =
+                qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX);
+        if(2*distToFrame > keySize) return nullptr;
     }
     //if(pressFrame < 0) pressFrame -= 1.;
-    qreal keyRectFramesSpan = 0.5*keySize/pixelsPerFrame;
-    int minPossibleKey = qFloor(absFrame - keyRectFramesSpan);
-    int maxPossibleKey = qCeil(absFrame + keyRectFramesSpan);
+    const qreal keyRectFramesSpan = 0.5*keySize/pixelsPerFrame;
+    const int minPossibleKey = qFloor(absFrame - keyRectFramesSpan);
+    const int maxPossibleKey = qCeil(absFrame + keyRectFramesSpan);
     Key* keyAtPos = nullptr;
     for(int i = maxPossibleKey; i >= minPossibleKey; i--) {
-        qreal distToFrame = qAbs((i + 0.5)*pixelsPerFrame - absX);
+        const qreal distToFrame = qAbs((i + 0.5)*pixelsPerFrame - absX);
         if(2*distToFrame > keySize) continue;
         keyAtPos = anim_getKeyAtRelFrame(i);
         if(keyAtPos) return keyAtPos;
@@ -489,7 +488,7 @@ bool Animator::prp_isRecording() {
 
 void Animator::anim_removeAllKeys() {
     if(anim_mKeys.isEmpty()) return;
-    QList<stdsptr<Key>> keys = anim_mKeys;
+    const auto keys = anim_mKeys;
     for(const auto& key : keys) {
         anim_removeKey(key);
     }
@@ -515,10 +514,8 @@ void Animator::prp_getKeysInRect(const QRectF &selectionRect,
         selRightFrame--;
     }
     for(int i = selRightFrame; i >= selLeftFrame; i--) {
-        Key* keyAtPos = anim_getKeyAtAbsFrame(i);
-        if(keyAtPos) {
-            keysList.append(keyAtPos);
-        }
+        Key * const keyAtPos = anim_getKeyAtAbsFrame(i);
+        if(keyAtPos) keysList.append(keyAtPos);
     }
 }
 
