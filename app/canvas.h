@@ -477,8 +477,8 @@ public:
         return BoxesGroup::getBoxAt(absPos);
     }
 
-    void scaleTime(const int &pivotAbsFrame, const qreal &scale) {
-        BoxesGroup::scaleTime(pivotAbsFrame, scale);
+    void anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+        BoxesGroup::anim_scaleTime(pivotAbsFrame, scale);
 //        int newAbsPos = qRound(scale*pivotAbsFrame);
 //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
         setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
@@ -486,7 +486,7 @@ public:
     }
 
     void changeFpsTo(const qreal& fps) {
-        scaleTime(0, fps/mFps);
+        anim_scaleTime(0, fps/mFps);
         setFps(fps);
     }
     void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
@@ -520,8 +520,8 @@ public:
     QRectF getRelBoundingRectAtRelFrame(const int &);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
-    bool prp_prevRelFrameWithKey(const int &relFrame, int &prevRelFrame);
-    bool prp_nextRelFrameWithKey(const int &relFrame, int &nextRelFrame);
+    bool anim_prevRelFrameWithKey(const int &relFrame, int &prevRelFrame);
+    bool anim_nextRelFrameWithKey(const int &relFrame, int &nextRelFrame);
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         Q_UNUSED(relFrame);
         return QMatrix();

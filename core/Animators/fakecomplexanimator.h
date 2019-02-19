@@ -7,7 +7,7 @@ class FakeComplexAnimator : public ComplexAnimator {
 public:
     Property *getTarget();
 
-    void prp_drawKeys(QPainter *p,
+    void anim_drawKeys(QPainter *p,
                       const qreal &pixelsPerFrame,
                       const qreal &drawY,
                       const int &startFrame,
@@ -20,7 +20,7 @@ public:
                          const qreal &pixelsPerFrame,
                          const int& keyRectSize);
 
-    void prp_getKeysInRect(const QRectF &selectionRect,
+    void anim_getKeysInRect(const QRectF &selectionRect,
                            const qreal &pixelsPerFrame,
                            QList<Key *>& keysList,
                            const int& keyRectSize);

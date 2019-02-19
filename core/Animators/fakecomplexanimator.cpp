@@ -10,17 +10,20 @@ Property *FakeComplexAnimator::getTarget() {
     return mTarget;
 }
 
-void FakeComplexAnimator::prp_drawKeys(QPainter *p,
+void FakeComplexAnimator::anim_drawKeys(QPainter *p,
                                        const qreal &pixelsPerFrame,
                                        const qreal &drawY,
                                        const int &startFrame,
                                        const int &endFrame,
                                        const int &rowHeight,
                                        const int &keyRectSize) {
-    mTarget->prp_drawKeys(p, pixelsPerFrame, drawY,
-                          startFrame, endFrame,
-                          rowHeight, keyRectSize);
-    ComplexAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
+    if(mTarget->SWT_isAnimator()) {
+        const auto aTarget = GetAsPtr(mTarget, Animator);
+        aTarget->anim_drawKeys(p, pixelsPerFrame, drawY,
+                              startFrame, endFrame,
+                              rowHeight, keyRectSize);
+    }
+    ComplexAnimator::anim_drawKeys(p, pixelsPerFrame, drawY,
                                   startFrame, endFrame,
                                   rowHeight, keyRectSize);
 }
@@ -37,13 +40,16 @@ Key *FakeComplexAnimator::prp_getKeyAtPos(const qreal &relX,
                                     pixelsPerFrame, keyRectSize);
 }
 
-void FakeComplexAnimator::prp_getKeysInRect(const QRectF &selectionRect,
+void FakeComplexAnimator::anim_getKeysInRect(const QRectF &selectionRect,
                                             const qreal &pixelsPerFrame,
                                             QList<Key *> &keysList,
                                             const int &keyRectSize) {
-    mTarget->prp_getKeysInRect(selectionRect, pixelsPerFrame,
-                               keysList, keyRectSize);
-    ComplexAnimator::prp_getKeysInRect(selectionRect, pixelsPerFrame,
+    if(mTarget->SWT_isAnimator()) {
+        const auto aTarget = GetAsPtr(mTarget, Animator);
+        aTarget->anim_getKeysInRect(selectionRect, pixelsPerFrame,
+                                   keysList, keyRectSize);
+    }
+    ComplexAnimator::anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                        keysList, keyRectSize);
 }
 

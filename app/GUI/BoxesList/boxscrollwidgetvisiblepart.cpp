@@ -115,7 +115,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
         SingleWidgetTarget *target = abs->getTarget();
         if(target->SWT_isAnimator()) {
             Animator *anim_target = GetAsPtr(target, Animator);
-            anim_target->prp_getKeysInRect(selectionRect, pixelsPerFrame,
+            anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                            listKeys, KEY_RECT_SIZE);
         }
     }

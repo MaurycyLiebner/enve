@@ -1048,7 +1048,7 @@ DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
                                             minViewedFrame);
 }
 
-void BoundingBox::prp_drawKeys(QPainter *p,
+void BoundingBox::anim_drawKeys(QPainter *p,
                                const qreal &pixelsPerFrame,
                                const qreal &drawY,
                                const int &startFrame,
@@ -1065,7 +1065,7 @@ void BoundingBox::prp_drawKeys(QPainter *p,
         p->restore();
     }
 
-    Animator::prp_drawKeys(p, pixelsPerFrame, drawY,
+    Animator::anim_drawKeys(p, pixelsPerFrame, drawY,
                            startFrame, endFrame,
                            rowHeight, keyRectSize);
 }

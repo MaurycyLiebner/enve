@@ -158,7 +158,10 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
 void ComplexAnimator::ca_removeChildAnimator(
         const qsptr<Property>& removeAnimator) {
     removeAnimator->prp_setUpdater(nullptr);
-    removeAnimator->prp_removeAllKeysFromComplexAnimator(this);
+    if(removeAnimator->SWT_isAnimator()) {
+        const auto aRemove = GetAsPtr(removeAnimator, Animator);
+        aRemove->anim_removeAllKeysFromComplexAnimator(this);
+    }
     disconnect(removeAnimator.get(), nullptr, this, nullptr);
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator.get());

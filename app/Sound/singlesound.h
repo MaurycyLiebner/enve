@@ -21,7 +21,7 @@ public:
     void prepareFinalData(const float &fps,
                           const int &minAbsFrame,
                           const int &maxAbsFrame);
-    void prp_drawKeys(QPainter *p,
+    void anim_drawKeys(QPainter *p,
                       const qreal &pixelsPerFrame,
                       const qreal &drawY,
                       const int &startFrame,

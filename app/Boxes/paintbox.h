@@ -122,9 +122,9 @@ public:
     void scheduleFinishSizeSetup();
     void scheduleFinishSizeAndPosSetup();
     void loadFromImage(const QImage &img);
-    bool prp_nextRelFrameWithKey(const int &relFrame,
+    bool anim_nextRelFrameWithKey(const int &relFrame,
                                  int &nextRelFrame);
-    bool prp_prevRelFrameWithKey(const int &relFrame,
+    bool anim_prevRelFrameWithKey(const int &relFrame,
                                  int &prevRelFrame);
 
     const bool &isDraft() const;

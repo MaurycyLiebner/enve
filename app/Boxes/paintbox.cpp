@@ -32,10 +32,10 @@ PaintBox::PaintBox(const ushort &canvasWidthT,
     finishSizeSetup();
 }
 
-bool PaintBox::prp_nextRelFrameWithKey(const int &relFrame,
+bool PaintBox::anim_nextRelFrameWithKey(const int &relFrame,
                                        int &nextRelFrame) {
     int bbNext;
-    bool bbHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
+    bool bbHasNext = BoundingBox::anim_nextRelFrameWithKey(relFrame,
                                                           bbNext);
     if(mMainHandler) {
         if(mMainHandler->anim_hasKeys()) {
@@ -54,10 +54,10 @@ bool PaintBox::prp_nextRelFrameWithKey(const int &relFrame,
     return bbHasNext;
 }
 
-bool PaintBox::prp_prevRelFrameWithKey(const int &relFrame,
+bool PaintBox::anim_prevRelFrameWithKey(const int &relFrame,
                                        int &prevRelFrame) {
     int bbPrev;
-    bool bbHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
+    bool bbHasPrev = BoundingBox::anim_prevRelFrameWithKey(relFrame,
                                                           bbPrev);
     if(mMainHandler) {
         if(mMainHandler->anim_hasKeys()) {

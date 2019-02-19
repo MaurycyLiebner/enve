@@ -74,31 +74,6 @@ public:
     qreal prp_absFrameToRelFrameF(const qreal &absFrame) const;
     qreal prp_relFrameToAbsFrameF(const qreal &relFrame) const;
 
-    virtual void prp_drawKeys(QPainter *p,
-                              const qreal &pixelsPerFrame,
-                              const qreal &drawY,
-                              const int &startFrame,
-                              const int &endFrame,
-                              const int &rowHeight,
-                              const int &keyRectSize) {
-        Q_UNUSED(p);
-        Q_UNUSED(pixelsPerFrame);
-        Q_UNUSED(drawY);
-        Q_UNUSED(startFrame);
-        Q_UNUSED(endFrame);
-        Q_UNUSED(rowHeight);
-        Q_UNUSED(keyRectSize);
-    }
-    virtual void prp_getKeysInRect(const QRectF &selectionRect,
-                                   const qreal &pixelsPerFrame,
-                                   QList<Key*>& keysList,
-                                   const int& keyRectSize) {
-        Q_UNUSED(selectionRect);
-        Q_UNUSED(pixelsPerFrame);
-        Q_UNUSED(keysList);
-        Q_UNUSED(keyRectSize);
-    }
-
     virtual Key *prp_getKeyAtPos(const qreal &relX,
                                  const int &minViewedFrame,
                                  const qreal &pixelsPerFrame,
@@ -126,10 +101,6 @@ public:
 
     virtual void prp_startDragging() {}
 
-    virtual void prp_removeAllKeysFromComplexAnimator(
-            ComplexAnimator* target) {
-        Q_UNUSED(target);
-    }
     virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
 
     const QString &prp_getName() const;
@@ -152,20 +123,6 @@ public:
     virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
         Q_UNUSED(relFrame);
         return {FrameRange::EMIN, FrameRange::EMAX};
-    }
-
-    virtual bool prp_nextRelFrameWithKey(const int &relFrame,
-                                         int &nextRelFrame) {
-        Q_UNUSED(relFrame);
-        Q_UNUSED(nextRelFrame);
-        return false;
-    }
-
-    virtual bool prp_prevRelFrameWithKey(const int &relFrame,
-                                         int &prevRelFrame) {
-        Q_UNUSED(relFrame);
-        Q_UNUSED(prevRelFrame);
-        return false;
     }
 
     virtual void readProperty(QIODevice *device) {

@@ -911,7 +911,7 @@ void BoxSingleWidget::drawKeys(QPainter *p, const qreal &pixelsPerFrame,
     Q_ASSERT(target);
     if(target->SWT_isAnimator()) {
         Animator *anim_target = static_cast<Animator*>(target);
-        anim_target->prp_drawKeys(p, pixelsPerFrame,
+        anim_target->anim_drawKeys(p, pixelsPerFrame,
                                   containerTop,
                                   minViewedFrame, maxViewedFrame,
                                   MIN_WIDGET_HEIGHT, KEY_RECT_SIZE);
@@ -960,7 +960,7 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
     if(target->SWT_isAnimator()) {
         auto anim_target = static_cast<Animator*>(target);
 
-        anim_target->prp_getKeysInRect(selectionRect, pixelsPerFrame,
+        anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                        listKeys, KEY_RECT_SIZE);
     }
 }

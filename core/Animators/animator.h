@@ -25,20 +25,69 @@ public:
         PARENT_USER_CHANGE
     };
 
-    virtual void scaleTime(const int &pivotAbsFrame, const qreal &scale);
+    void prp_startDragging();
+    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    virtual void anim_scaleTime(const int &pivotAbsFrame,
+                                const qreal &scale);
 
+    virtual bool anim_prevRelFrameWithKey(const int &relFrame,
+                                          int &prevRelFrame);
+    virtual bool anim_nextRelFrameWithKey(const int &relFrame,
+                                          int &nextRelFrame);
+    virtual stdsptr<Key> readKey(QIODevice *target);
+    virtual Key *prp_getKeyAtPos(const qreal &relX,
+                                 const int &minViewedFrame,
+                                 const qreal &pixelsPerFrame,
+                                 const int &keyRectSize);
+    virtual void anim_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     virtual void anim_updateAfterChangedKey(Key * const key);
-
     virtual void anim_setAbsFrame(const int &frame);
-
-    void anim_switchRecording();
-
     virtual bool anim_isDescendantRecording() const;
+    virtual void anim_mergeKeysIfNeeded();
+    virtual void anim_appendKey(const stdsptr<Key> &newKey);
+    virtual void anim_removeKey(const stdsptr<Key>& keyToRemove);
+    virtual void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
+    virtual void anim_keyValueChanged(Key *key);
+    virtual void anim_updateKeyOnCurrrentFrame();
+    virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
+                                           const int &relX,
+                                           const int &minViewedFrame,
+                                           const qreal &pixelsPerFrame);
+    virtual bool anim_hasKeys() const;
+    virtual bool anim_isRecording();
+    virtual void anim_removeAllKeys();
+    virtual bool anim_isKeyOnCurrentFrame() const;
+    virtual void anim_getKeysInRect(const QRectF &selectionRect,
+                                    const qreal &pixelsPerFrame,
+                                    QList<Key*>& keysList,
+                                    const int &keyRectSize);
+    virtual void anim_drawKeys(QPainter *p,
+                              const qreal &pixelsPerFrame,
+                              const qreal &drawY,
+                              const int &startFrame,
+                              const int &endFrame,
+                              const int &rowHeight,
+                              const int &keyRectSize);
 
-    virtual void prp_startDragging();
+    virtual void anim_saveCurrentValueAsKey();
+    virtual void anim_addKeyAtRelFrame(const int &relFrame);
+    bool SWT_isAnimator() const;
+protected:
+    virtual void anim_drawKey(QPainter *p, Key* key,
+                              const qreal &pixelsPerFrame,
+                              const qreal &drawY,
+                              const int &startFrame,
+                              const int& rowHeight,
+                              const int& keyRectSize);
+public slots:
+    virtual void anim_updateAfterShifted();
+    virtual void anim_setRecording(const bool &rec);
+public:
 
     void anim_updateRelFrame();
-    virtual void anim_mergeKeysIfNeeded();
+    void anim_switchRecording();
+
     bool anim_getClosestsKeyOccupiedRelFrame(const int &frame,
                                              int &closest);
     Key *anim_getKeyAtRelFrame(const int &frame) const;
@@ -47,48 +96,14 @@ public:
     void anim_callFrameChangeUpdater();
     void anim_sortKeys();
 
-    virtual void anim_appendKey(const stdsptr<Key> &newKey);
-    virtual void anim_removeKey(const stdsptr<Key>& keyToRemove);
-    virtual void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
-
-    virtual void anim_keyValueChanged(Key *key);
-
-    virtual void anim_updateKeyOnCurrrentFrame();
-
-    virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
-                                           const int &relX,
-                                           const int &minViewedFrame,
-                                           const qreal &pixelsPerFrame);
-
-    Key *prp_getKeyAtPos(const qreal &relX,
-                         const int &minViewedFrame,
-                         const qreal &pixelsPerFrame,
-                         const int &keyRectSize);
-    void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     void anim_addAllKeysToComplexAnimator(ComplexAnimator *target);
-    virtual bool anim_hasKeys() const;
 
     void anim_setRecordingWithoutChangingKeys(const bool &rec);
-    virtual bool anim_isRecording();
-    virtual void anim_removeAllKeys();
-    virtual bool anim_isKeyOnCurrentFrame() const;
-    void prp_getKeysInRect(const QRectF &selectionRect,
-                           const qreal &pixelsPerFrame,
-                           QList<Key*>& keysList,
-                           const int &keyRectSize);
+
     bool anim_getNextAndPreviousKeyIdForRelFrame(
             int &prevIdP, int &nextIdP, const int &frame) const;
-    virtual void prp_drawKeys(QPainter *p,
-                              const qreal &pixelsPerFrame,
-                              const qreal &drawY,
-                              const int &startFrame,
-                              const int &endFrame,
-                              const int &rowHeight,
-                              const int &keyRectSize);
-    Key *anim_getKeyAtAbsFrame(const int &frame);
 
-    virtual void anim_saveCurrentValueAsKey();
-    virtual void anim_addKeyAtRelFrame(const int &relFrame);
+    Key *anim_getKeyAtAbsFrame(const int &frame);
 
     Key *anim_getNextKey(const Key * const key) const;
     Key* anim_getPrevKey(const Key * const key) const;
@@ -96,20 +111,12 @@ public:
     int anim_getPrevKeyRelFrame(const Key * const key) const;
     void anim_setRecordingValue(const bool &rec);
 
-    bool SWT_isAnimator() const;
     int anim_getCurrentAbsFrame();
     int anim_getCurrentRelFrame();
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     std::pair<Key*, Key*> anim_getPrevAndNextKey(const int &relFrame) const;
     Key* anim_getPrevKey(const int &relFrame) const;
     Key* anim_getNextKey(const int &relFrame) const;
     void anim_shiftAllKeys(const int &shift);
-
-    bool prp_nextRelFrameWithKey(const int &relFrame,
-                                 int &nextRelFrame);
-    bool prp_prevRelFrameWithKey(const int &relFrame,
-                                 int &prevRelFrame);
-    virtual stdsptr<Key> readKey(QIODevice *target);
 
     bool hasFakeComplexAnimator();
 
@@ -149,7 +156,6 @@ public:
     const QList<stdptr<Key>>& getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
-    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
     int getInsertIdForKeyRelFrame(const int &relFrame) const;
 private:
     void sortSelectedKeys();
@@ -159,12 +165,6 @@ protected:
 
     int anim_getKeyIndex(const Key * const key) const;
 
-    virtual void anim_drawKey(QPainter *p, Key* key,
-                              const qreal &pixelsPerFrame,
-                              const qreal &drawY,
-                              const int &startFrame,
-                              const int& rowHeight,
-                              const int& keyRectSize);
     bool anim_mIsRecording = false;
 
     int anim_mCurrentAbsFrame = 0;
@@ -176,8 +176,6 @@ protected:
     qsptr<FakeComplexAnimator> mFakeComplexAnimator;
 public slots:
     void anim_deleteCurrentKey();
-    virtual void anim_updateAfterShifted();
-    virtual void anim_setRecording(const bool &rec);
 signals:
     void anim_isRecordingChanged();
 private:

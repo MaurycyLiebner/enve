@@ -33,14 +33,14 @@ BoxesGroup::BoxesGroup(const BoundingBoxType &type) :
     iniPathEffects();
 }
 
-//bool BoxesGroup::prp_nextRelFrameWithKey(const int &relFrame,
+//bool BoxesGroup::anim_nextRelFrameWithKey(const int &relFrame,
 //                                         int &nextRelFrame) {
-//    int thisMinNextFrame = BoundingBox::prp_nextRelFrameWithKey(relFrame);
+//    int thisMinNextFrame = BoundingBox::anim_nextRelFrameWithKey(relFrame);
 //    return thisMinNextFrame;
 //    int minNextAbsFrame = FrameRange::EMAX;
 //    for(const auto& box : mContainedBoxes) {
 //        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
-//        int boxNext = box->prp_nextRelFrameWithKey(boxRelFrame);
+//        int boxNext = box->anim_nextRelFrameWithKey(boxRelFrame);
 //        int absNext = box->prp_relFrameToAbsFrame(boxNext);
 //        if(minNextAbsFrame > absNext) {
 //            minNextAbsFrame = absNext;
@@ -50,14 +50,14 @@ BoxesGroup::BoxesGroup(const BoundingBoxType &type) :
 //    return qMin(prp_absFrameToRelFrame(minNextAbsFrame), thisMinNextFrame);
 //}
 
-//int BoxesGroup::prp_prevRelFrameWithKey(const int &relFrame,
+//int BoxesGroup::anim_prevRelFrameWithKey(const int &relFrame,
 //                                        int &prevRelFrame) {
-//    int thisMaxPrevFrame = BoundingBox::prp_nextRelFrameWithKey(relFrame);
+//    int thisMaxPrevFrame = BoundingBox::anim_nextRelFrameWithKey(relFrame);
 //    return thisMaxPrevFrame;
 //    int maxPrevAbsFrame = FrameRange::EMIN;
 //    for(const auto& box : mContainedBoxes) {
 //        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
-//        int boxPrev = box->prp_prevRelFrameWithKey(boxRelFrame);
+//        int boxPrev = box->anim_prevRelFrameWithKey(boxRelFrame);
 //        int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
 //        if(maxPrevAbsFrame < absPrev) {
 //            maxPrevAbsFrame = absPrev;
@@ -457,11 +457,11 @@ FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
 
 BoxesGroup::~BoxesGroup() {}
 
-void BoxesGroup::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
-    BoundingBox::scaleTime(pivotAbsFrame, scale);
+void BoxesGroup::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+    BoundingBox::anim_scaleTime(pivotAbsFrame, scale);
 
     for(const auto& box : mContainedBoxes) {
-        box->scaleTime(pivotAbsFrame, scale);
+        box->anim_scaleTime(pivotAbsFrame, scale);
     }
 }
 

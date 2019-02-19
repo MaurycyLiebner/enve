@@ -9,7 +9,7 @@
 
 Animator::Animator(const QString& name) : Property(name) {}
 
-void Animator::scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+void Animator::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
     for(const auto &key : anim_mKeys) {
         key->scaleFrameAndUpdateParentAnimator(pivotAbsFrame, scale, false);
     }
@@ -22,7 +22,7 @@ void Animator::anim_shiftAllKeys(const int &shift) {
     }
 }
 
-bool Animator::prp_nextRelFrameWithKey(const int &relFrame,
+bool Animator::anim_nextRelFrameWithKey(const int &relFrame,
                                        int &nextRelFrame) {
     Key *key = anim_getNextKey(relFrame);
     if(!key) return false;
@@ -30,7 +30,7 @@ bool Animator::prp_nextRelFrameWithKey(const int &relFrame,
     return true;
 }
 
-bool Animator::prp_prevRelFrameWithKey(const int &relFrame,
+bool Animator::anim_prevRelFrameWithKey(const int &relFrame,
                                        int &prevRelFrame) {
     Key *key = anim_getPrevKey(relFrame);
     if(!key) return false;
@@ -173,9 +173,9 @@ void Animator::anim_mergeKeysIfNeeded() {
 bool Animator::anim_getClosestsKeyOccupiedRelFrame(const int &frame,
                                                    int &closest) {
     int nextT;
-    const bool hasNext = prp_nextRelFrameWithKey(frame, nextT);
+    const bool hasNext = anim_nextRelFrameWithKey(frame, nextT);
     int prevT;
-    const bool hasPrev = prp_prevRelFrameWithKey(frame, prevT);
+    const bool hasPrev = anim_prevRelFrameWithKey(frame, prevT);
     if(hasPrev && hasNext) {
         if(nextT - frame > frame - prevT) {
             closest = prevT;
@@ -458,7 +458,7 @@ void Animator::anim_addAllKeysToComplexAnimator(ComplexAnimator *target) {
     }
 }
 
-void Animator::prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
+void Animator::anim_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
     for(const auto &key : anim_mKeys) {
         target->ca_removeDescendantsKey(key.get());
     }
@@ -496,7 +496,7 @@ bool Animator::anim_isKeyOnCurrentFrame() const {
     return anim_mKeyOnCurrentFrame != nullptr;
 }
 
-void Animator::prp_getKeysInRect(const QRectF &selectionRect,
+void Animator::anim_getKeysInRect(const QRectF &selectionRect,
                                  const qreal &pixelsPerFrame,
                                  QList<Key*> &keysList,
                                  const int& keyRectSize) {
@@ -687,7 +687,7 @@ void Animator::anim_drawKey(QPainter *p,
             QSize(keyRectSize, keyRectSize) ) );
 }
 
-void Animator::prp_drawKeys(QPainter *p,
+void Animator::anim_drawKeys(QPainter *p,
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame,

@@ -19,7 +19,7 @@ SingleSound::SingleSound(const QString &path,
     setFilePath(path);
 }
 
-void SingleSound::prp_drawKeys(QPainter *p,
+void SingleSound::anim_drawKeys(QPainter *p,
                                const qreal &pixelsPerFrame,
                                const qreal &drawY,
                                const int &startFrame,
@@ -36,7 +36,7 @@ void SingleSound::prp_drawKeys(QPainter *p,
                    rowHeight);
     mDurationRectangle->draw(p, drawRect,pixelsPerFrame,
                              startFrame, endFrame);
-    ComplexAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
+    ComplexAnimator::anim_drawKeys(p, pixelsPerFrame, drawY,
                                   startFrame, endFrame,
                                   rowHeight, keyRectSize);
 }

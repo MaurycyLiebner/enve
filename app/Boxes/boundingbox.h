@@ -325,7 +325,7 @@ public:
     void finishPivotTransform();
     bool hasDurationRectangle() const;
     void createDurationRectangle();
-    void prp_drawKeys(QPainter *p,
+    void anim_drawKeys(QPainter *p,
                       const qreal &pixelsPerFrame,
                       const qreal &drawY,
                       const int &startFrame,

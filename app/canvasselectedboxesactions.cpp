@@ -7,16 +7,16 @@
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 
-bool Canvas::prp_nextRelFrameWithKey(const int &relFrame,
+bool Canvas::anim_nextRelFrameWithKey(const int &relFrame,
                                      int &nextRelFrame) {
     int thisNext;
-    bool thisHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
+    bool thisHasNext = BoundingBox::anim_nextRelFrameWithKey(relFrame,
                                                             thisNext);
     int minNextFrame = FrameRange::EMAX;
     for(const auto &box : mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxNext;
-        if(box->prp_nextRelFrameWithKey(boxRelFrame, boxNext)) {
+        if(box->anim_nextRelFrameWithKey(boxRelFrame, boxNext)) {
             int absNext = box->prp_relFrameToAbsFrame(boxNext);
             if(minNextFrame > absNext) {
                 minNextFrame = absNext;
@@ -37,16 +37,16 @@ bool Canvas::prp_nextRelFrameWithKey(const int &relFrame,
     return true;
 }
 
-bool Canvas::prp_prevRelFrameWithKey(const int &relFrame,
+bool Canvas::anim_prevRelFrameWithKey(const int &relFrame,
                                      int &prevRelFrame) {
     int thisPrev;
-    bool thisHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
+    bool thisHasPrev = BoundingBox::anim_prevRelFrameWithKey(relFrame,
                                                             thisPrev);
     int minPrevFrame = FrameRange::EMIN;
     for(const auto &box : mSelectedBoxes) {
         int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxPrev;
-        if(box->prp_prevRelFrameWithKey(boxRelFrame, boxPrev)) {
+        if(box->anim_prevRelFrameWithKey(boxRelFrame, boxPrev)) {
             int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
             if(minPrevFrame < absPrev) {
                 minPrevFrame = absPrev;

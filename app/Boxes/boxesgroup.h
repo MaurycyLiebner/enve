@@ -53,7 +53,7 @@ public:
     BoxesGroup(const BoundingBoxType& type = TYPE_GROUP);
     ~BoxesGroup();
 
-    void scaleTime(const int& pivotAbsFrame, const qreal& scale);
+    void anim_scaleTime(const int& pivotAbsFrame, const qreal& scale);
 
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
@@ -219,9 +219,9 @@ public:
                                       SkPath *srcDstPath);
     void filterFillPathForRelFrameF(const qreal &relFrame,
                                    SkPath *srcDstPath);
-//    bool prp_nextRelFrameWithKey(const int &relFrame,
+//    bool anim_nextRelFrameWithKey(const int &relFrame,
 //                                 int &nextRelFrame);
-//    bool prp_prevRelFrameWithKey(const int &relFrame,
+//    bool anim_prevRelFrameWithKey(const int &relFrame,
 //                                 int &prevRelFrame);
     bool enabledGroupPathSumEffectPresent();
 protected:

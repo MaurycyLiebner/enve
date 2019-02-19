@@ -324,7 +324,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
                 mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(!currCanvas) return false;
         int targetFrame;
-        if(currCanvas->prp_prevRelFrameWithKey(
+        if(currCanvas->anim_prevRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
                 targetFrame)) {
             mMainWindow->setCurrentFrame(targetFrame);
@@ -335,7 +335,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
                 mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(!currCanvas) return false;
         int targetFrame;
-        if(currCanvas->prp_nextRelFrameWithKey(
+        if(currCanvas->anim_nextRelFrameWithKey(
                 mMainWindow->getCurrentFrame(),
                 targetFrame)) {
             mMainWindow->setCurrentFrame(targetFrame);
