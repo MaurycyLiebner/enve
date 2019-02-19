@@ -77,8 +77,6 @@ public:
 
     virtual QString prp_getValueText() { return ""; }
 
-    virtual void prp_clearFromGraphView() {}
-
     virtual void prp_openContextMenu(const QPoint &pos) { Q_UNUSED(pos); }
 
     virtual void prp_startDragging() {}

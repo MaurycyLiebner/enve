@@ -196,12 +196,6 @@ void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
     ca_mChildAnimators.swap(id1, id2);
 }
 
-void ComplexAnimator::prp_clearFromGraphView() {
-    for(const auto &property : ca_mChildAnimators) {
-        property->prp_clearFromGraphView();
-    }
-}
-
 bool ComplexAnimator::hasChildAnimators() const {
     return !ca_mChildAnimators.isEmpty();
 }

@@ -32,7 +32,6 @@ public:
 
     bool anim_isDescendantRecording() const;
     QString prp_getValueText();
-    void prp_clearFromGraphView();
 
     bool hasChildAnimators() const;
 

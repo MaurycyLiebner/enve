@@ -25,7 +25,6 @@ public:
     void prp_finishTransform();
     void prp_cancelTransform();
     QString prp_getValueText();
-    void prp_clearFromGraphView();
     void prp_openContextMenu(const QPoint &pos);
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
@@ -74,8 +73,8 @@ public:
     void qra_saveValueToKey(QrealKey *key, const qreal &value);
 
     qreal qra_getValueAtRelFrame(const int &frame,
-                                 QrealKey *prevKey,
-                                 QrealKey *nextKey) const;
+                                 const QrealKey * const prevKey,
+                                 const QrealKey * const nextKey) const;
 
 
     qreal qra_getPrevKeyValue(const QrealKey * const key);
@@ -127,8 +126,8 @@ public:
     qreal getCurrentEffectiveValueAtRelFrameF(const qreal &frame) const;
     qreal getCurrentEffectiveValueAtAbsFrameF(const qreal &frame);
     qreal qra_getValueAtRelFrameF(const qreal &frame,
-                                  QrealKey *prevKey,
-                                  QrealKey *nextKey) const;
+                                  const QrealKey * const prevKey,
+                                  const QrealKey * const nextKey) const;
     qreal getCurrentValueAtRelFrameF(const qreal &frame) const;
     qreal getCurrentValueAtAbsFrameF(const qreal &frame);
 
