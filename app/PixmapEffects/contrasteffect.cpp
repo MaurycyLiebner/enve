@@ -16,7 +16,7 @@ stdsptr<PixmapEffectRenderData> ContrastEffect::getPixmapEffectRenderDataForRelF
     auto renderData = SPtrCreate(ContrastEffectRenderData)();
     renderData->contrast =
             mContrastAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
-    renderData->hasKeys = mContrastAnimator->prp_hasKeys();
+    renderData->hasKeys = mContrastAnimator->anim_hasKeys();
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

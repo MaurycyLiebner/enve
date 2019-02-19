@@ -245,9 +245,9 @@ void BoundingBox::resetRotation() {
     mTransformAnimator->resetRotation();
 }
 
-void BoundingBox::prp_setAbsFrame(const int &frame) {
+void BoundingBox::anim_setAbsFrame(const int &frame) {
     int lastRelFrame = anim_mCurrentRelFrame;
-    ComplexAnimator::prp_setAbsFrame(frame);
+    ComplexAnimator::anim_setAbsFrame(frame);
     bool isInVisRange = isRelFrameInVisibleDurationRect(
                 anim_mCurrentRelFrame);
     if(mUpdateDrawOnParentBox != isInVisRange) {
@@ -310,7 +310,7 @@ void BoundingBox::setParentGroup(BoxesGroup *parent) {
     mParentTransform = parent->getTransformAnimator();
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
-    prp_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
+    anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
     mTransformAnimator->updateCombinedTransform(Animator::USER_CHANGE);
 }
 
@@ -368,7 +368,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(mPivotAutoAdjust && !prp_isDescendantRecording()) {
+    if(mPivotAutoAdjust && !anim_isDescendantRecording()) {
         setPivotPosition(renderData->getCenterPosition());
     }
 }
@@ -900,7 +900,7 @@ void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
 }
 
 bool BoundingBox::isAnimated() const {
-    return prp_isDescendantRecording();
+    return anim_isDescendantRecording();
 }
 
 void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
@@ -1005,7 +1005,7 @@ void BoundingBox::setDurationRectangle(
 
 void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_setParentFrameShift(prp_mParentFrameShift);
-    prp_setAbsFrame(anim_mCurrentAbsFrame);
+    anim_setAbsFrame(anim_mCurrentAbsFrame);
     auto visRange = getVisibleAbsFrameRange();
     if(dFrame > 0) {
         visRange.fMin -= dFrame;

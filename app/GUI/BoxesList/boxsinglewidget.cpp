@@ -255,9 +255,9 @@ void BoxSingleWidget::setBlendMode(const SkBlendMode &mode) {
 }
 
 void BoxSingleWidget::clearAndHideValueAnimators() {
-    mValueSlider->clearAnimator();
+    mValueSlider->clearTarget();
     mValueSlider->hide();
-    mSecondValueSlider->clearAnimator();
+    mSecondValueSlider->clearTarget();
     mSecondValueSlider->hide();
 }
 
@@ -420,11 +420,11 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->setAnimator(GetAsPtr(target, QrealAnimator));
+        mValueSlider->setTarget(GetAsPtr(target, QrealAnimator));
         mValueSlider->show();
         mValueSlider->setNeighbouringSliderToTheRight(false);
         mSecondValueSlider->hide();
-        mSecondValueSlider->clearAnimator();
+        mSecondValueSlider->clearTarget();
     } else if(target->SWT_isIntProperty()) {
         mRecordButton->hide();
 
@@ -443,7 +443,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        mValueSlider->setIntAnimator(GetAsPtr(target, IntProperty));
+        mValueSlider->setTarget(GetAsPtr(target, IntProperty));
         mValueSlider->show();
     } else if(target->SWT_isComplexAnimator() ||
               target->SWT_isVectorPathAnimator() ||
@@ -487,11 +487,11 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                 if(!qatarget) {
                     clearAndHideValueAnimators();
                 } else {
-                    mValueSlider->setAnimator(qatarget);
+                    mValueSlider->setTarget(qatarget);
                     mValueSlider->show();
                     mValueSlider->setNeighbouringSliderToTheRight(false);
                     mSecondValueSlider->hide();
-                    mSecondValueSlider->clearAnimator();
+                    mSecondValueSlider->clearTarget();
                 }
             }
         } else {
@@ -664,7 +664,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();
                 Animator *animTarget = GetAsPtr(target, Animator);
-                if(animTarget->prp_isKeyOnCurrentFrame()) {
+                if(animTarget->anim_isKeyOnCurrentFrame()) {
                     menu.addAction("Add Key")->setDisabled(true);
                     menu.addAction("Delete Key")->setObjectName("swt_delete_key");
                 } else {
@@ -1080,7 +1080,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         } else {
             nameX += MIN_WIDGET_HEIGHT;
         }
-        if(graphAnim->prp_isRecording()) {
+        if(graphAnim->anim_isRecording()) {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {
@@ -1093,13 +1093,13 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         ComplexAnimator *caTarget = GetAsPtr(target, ComplexAnimator);
         name = caTarget->prp_getName();
 
-        if(caTarget->prp_isRecording()) {
+        if(caTarget->anim_isRecording()) {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
-            if(caTarget->prp_isDescendantRecording()) {
+            if(caTarget->anim_isDescendantRecording()) {
                 p.save();
                 p.setRenderHint(QPainter::Antialiasing);
                 p.setBrush(Qt::red);
@@ -1154,7 +1154,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         Animator *aTarget = GetAsPtr(target, Animator);
         name = aTarget->prp_getName();
 
-        if(aTarget->prp_isRecording()) {
+        if(aTarget->anim_isRecording()) {
             drawPixmapCentered(&p, mRecordButton->geometry(),
                                *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {
@@ -1194,7 +1194,7 @@ void BoxSingleWidget::switchRecordingAction() {
         auto fcaTarget = GetAsPtr(target, FakeComplexAnimator);
         target = GetAsPtr(fcaTarget->getTarget(), Animator);
     }
-    target->prp_switchRecording();
+    target->anim_switchRecording();
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
 }
@@ -1243,10 +1243,10 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     if(width() - nameRightX > slidersWidth) {
         QPointFAnimator *pt_target =
                 GetAsPtr(target, QPointFAnimator);
-        mValueSlider->setAnimator(pt_target->getXAnimator());
+        mValueSlider->setTarget(pt_target->getXAnimator());
         mValueSlider->show();
         mValueSlider->setNeighbouringSliderToTheRight(true);
-        mSecondValueSlider->setAnimator(pt_target->getYAnimator());
+        mSecondValueSlider->setTarget(pt_target->getYAnimator());
         mSecondValueSlider->show();
         mSecondValueSlider->setNeighbouringSliderToTheLeft(true);
     } else {

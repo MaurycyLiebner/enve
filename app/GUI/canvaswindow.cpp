@@ -845,7 +845,7 @@ void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
 
 void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->prp_setAbsFrame(currentFrame);
+    mCurrentCanvas->anim_setAbsFrame(currentFrame);
 }
 
 void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
@@ -931,7 +931,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
         }
 
         mCurrentRenderFrame = renderSettings.minFrame;
-        mCurrentCanvas->prp_setAbsFrame(mCurrentRenderFrame);
+        mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
         mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {

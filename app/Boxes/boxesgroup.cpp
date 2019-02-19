@@ -832,7 +832,7 @@ void BoxesGroup::addContainedBoxToListAt(
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(
                 child.get(), ca_mChildAnimators.count());
-    child->prp_setAbsFrame(anim_mCurrentAbsFrame);
+    child->anim_setAbsFrame(anim_mCurrentAbsFrame);
 
     child->prp_updateInfluenceRangeAfterChanged();
 
@@ -854,12 +854,12 @@ void BoxesGroup::updateContainedBoxIds(const int &firstId,
     }
 }
 
-void BoxesGroup::prp_setAbsFrame(const int &frame) {
-    BoundingBox::prp_setAbsFrame(frame);
+void BoxesGroup::anim_setAbsFrame(const int &frame) {
+    BoundingBox::anim_setAbsFrame(frame);
 
     updateDrawRenderContainerTransform();
     for(const auto& box : mContainedBoxes) {
-        box->prp_setAbsFrame(frame);
+        box->anim_setAbsFrame(frame);
     }
 }
 

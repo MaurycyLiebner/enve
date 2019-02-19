@@ -245,7 +245,7 @@ void GradientWidget::moveColor(const int &x) {
 
 void GradientWidget::updateAfterFrameChanged(const int &absFrame) {
     for(const auto& gradient : mGradients) {
-        gradient->prp_setAbsFrame(absFrame);
+        gradient->anim_setAbsFrame(absFrame);
     }
 }
 

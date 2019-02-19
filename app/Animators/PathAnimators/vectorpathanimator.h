@@ -40,7 +40,7 @@ public:
     void mergeNodes(const int &nodeId1, const int &nodeId2);
     void setCtrlsModeForNode(const int &nodeId, const CtrlsMode &mode);
 
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice * const target) const;
 

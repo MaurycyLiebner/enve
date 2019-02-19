@@ -16,13 +16,13 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                                                    QrealAnimator *animator,
                                                    QWidget *parent) :
     QDoubleSlider(minVal, maxVal, prefferedStep, parent) {
-    setAnimator(animator);
+    setTarget(animator);
 }
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(QrealAnimator *animator,
                                                    QWidget *parent) :
     QDoubleSlider(parent) {
-    setAnimator(animator);
+    setTarget(animator);
 }
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(QWidget *parent) :
@@ -39,9 +39,9 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 }
 
 void QrealAnimatorValueSlider::emitEditingStarted(qreal value) {
-    if(mAnimator) {
+    if(mTarget) {
         mBlockAnimatorSignals = true;
-        mAnimator->prp_startTransform();
+        mTarget->prp_startTransform();
     }
     QDoubleSlider::emitEditingStarted(value);
 }
@@ -52,23 +52,23 @@ void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
 }
 
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
-    if(mAnimator) {
-        if(mAnimator->SWT_isQrealAnimator()) {
-            GetAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
-        } else if(mAnimator->SWT_isIntProperty()) {
-            GetAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
+    if(mTarget) {
+        if(mTarget->SWT_isQrealAnimator()) {
+            GetAsPtr(mTarget, QrealAnimator)->qra_setCurrentValue(value);
+        } else if(mTarget->SWT_isIntProperty()) {
+            GetAsPtr(mTarget, IntProperty)->setCurrentValue(qRound(value));
         }
     }
     QDoubleSlider::emitValueChanged(value);
 }
 
 void QrealAnimatorValueSlider::setValueExternal(qreal value) {
-    if(mAnimator) {
+    if(mTarget) {
         mBlockAnimatorSignals = true;
-        if(mAnimator->SWT_isQrealAnimator()) {
-            GetAsPtr(mAnimator, QrealAnimator)->qra_setCurrentValue(value);
-        } else if(mAnimator->SWT_isIntProperty()) {
-            GetAsPtr(mAnimator, IntProperty)->setCurrentValue(qRound(value));
+        if(mTarget->SWT_isQrealAnimator()) {
+            GetAsPtr(mTarget, QrealAnimator)->qra_setCurrentValue(value);
+        } else if(mTarget->SWT_isIntProperty()) {
+            GetAsPtr(mTarget, IntProperty)->setCurrentValue(qRound(value));
         }
         mBlockAnimatorSignals = false;
     }
@@ -76,15 +76,15 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
 }
 
 void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
-    if(mAnimator) {
-        mAnimator->prp_finishTransform();
+    if(mTarget) {
+        mTarget->prp_finishTransform();
         mBlockAnimatorSignals = false;
     }
     QDoubleSlider::emitEditingFinished(value);
 }
 
 void QrealAnimatorValueSlider::nullifyAnimator() {
-    clearAnimator();
+    clearTarget();
 }
 
 void QrealAnimatorValueSlider::setValueFromAnimator(qreal val) {
@@ -94,37 +94,36 @@ void QrealAnimatorValueSlider::setValueFromAnimator(qreal val) {
 }
 
 void QrealAnimatorValueSlider::paint(QPainter *p) {
-    if(!mAnimator) {
+    if(!mTarget) {
         QDoubleSlider::paint(p);
     } else {
-        if(isTargetDisabled()) {
-            p->setOpacity(.5);
+        if(isTargetDisabled()) p->setOpacity(.5);
+        bool rec = false;
+        bool key = false;
+        if(mTarget->SWT_isAnimator()) {
+            const auto aTarget = GetAsPtr(mTarget, Animator);
+            rec = aTarget->anim_isRecording();
+            key = aTarget->anim_isKeyOnCurrentFrame();
         }
         QDoubleSlider::paint(p,
-                       (mAnimator->prp_isRecording() ? QColor(255, 200, 200) :
-                                                   QColor(255, 255, 255)),
-                       (mAnimator->prp_isRecording() ? QColor(255, 160, 160) :
-                                                   QColor(220, 220, 220)),
-                       ((mAnimator->prp_isRecording() &&
-                        mAnimator->prp_isKeyOnCurrentFrame()) ? Qt::red :
-                                                            Qt::black));
+                    rec ? QColor(255, 200, 200) : QColor(255, 255, 255),
+                    rec ? QColor(255, 160, 160) : QColor(220, 220, 220),
+                    rec && key ? Qt::red : Qt::black);
         p->setOpacity(1.);
     }
 }
 
-void QrealAnimatorValueSlider::clearAnimator() {
-    if(mAnimator) {
-        disconnect(mAnimator, nullptr, this, nullptr);
-    }
-    mAnimator = nullptr;
+void QrealAnimatorValueSlider::clearTarget() {
+    if(mTarget) disconnect(mTarget, nullptr, this, nullptr);
+    mTarget = nullptr;
 }
 
-void QrealAnimatorValueSlider::setAnimator(
+void QrealAnimatorValueSlider::setTarget(
         QrealAnimator * const animator) {
-    if(animator == mAnimator) return;
-    clearAnimator();
-    mAnimator = animator;
-    if(mAnimator) {
+    if(animator == mTarget) return;
+    clearTarget();
+    mTarget = animator;
+    if(mTarget) {
         setNumberDecimals(animator->getNumberDecimals());
         connect(animator, SIGNAL(valueChangedSignal(qreal)),
                 this, SLOT(setValueFromAnimator(qreal)));
@@ -139,10 +138,10 @@ void QrealAnimatorValueSlider::setAnimator(
     }
 }
 
-void QrealAnimatorValueSlider::setIntAnimator(
+void QrealAnimatorValueSlider::setTarget(
         IntProperty * const animator) {
-    if(animator == mAnimator) return;
-    clearAnimator();
+    if(animator == mTarget) return;
+    clearTarget();
     if(animator) {
         setNumberDecimals(0);
         connect(animator, SIGNAL(valueChangedSignal(qreal)),
@@ -155,45 +154,47 @@ void QrealAnimatorValueSlider::setIntAnimator(
         setPrefferedValueStep(1);
 
         setDisplayedValue(animator->getValue());
-        mAnimator = animator;
+        mTarget = animator;
     }
 }
 
-bool QrealAnimatorValueSlider::hasTargetAnimator() {
-    return mAnimator != nullptr;
+bool QrealAnimatorValueSlider::hasTarget() {
+    return mTarget != nullptr;
 }
 
 bool QrealAnimatorValueSlider::isTargetDisabled() {
-    if(hasTargetAnimator()) {
-        return mAnimator->SWT_isDisabled();
+    if(hasTarget()) {
+        return mTarget->SWT_isDisabled();
     }
     return true;
 }
 
 void QrealAnimatorValueSlider::openContextMenu(
         const QPoint &globalPos) {
-    if(!mAnimator) return;
+    if(!mTarget) return;
+    if(!mTarget->SWT_isAnimator()) return;
+    const auto aTarget = GetAsPtr(mTarget, Animator);
     QMenu menu(this);
 
-    if(mAnimator->prp_isKeyOnCurrentFrame()) {
+    if(aTarget->anim_isKeyOnCurrentFrame()) {
         menu.addAction("Delete Keyframe",
-                       mAnimator,
-                       SLOT(anim_deleteCurrentKey()));
+                       aTarget,
+                       &Animator::anim_deleteCurrentKey);
     } else {
         menu.addAction("Add Keyframe",
-                       mAnimator,
-                       SLOT(anim_saveCurrentValueAsKey()));
+                       aTarget,
+                       &Animator::anim_saveCurrentValueAsKey);
     }
 
     menu.addSeparator();
 
-    QAction *recAct = menu.addAction("Recording");
+    QAction * const recAct = menu.addAction("Recording");
     recAct->setCheckable(true);
-    recAct->setChecked(mAnimator->prp_isRecording());
-    connect(recAct, SIGNAL(toggled(bool)),
-            mAnimator, SLOT(prp_setRecording(bool)));
+    recAct->setChecked(aTarget->anim_isRecording());
+    connect(recAct, &QAction::toggled,
+            aTarget, &Animator::anim_setRecording);
 
-    QAction *selectedAction = menu.exec(globalPos);
+    QAction * const selectedAction = menu.exec(globalPos);
     if(!selectedAction) {
         return;
     } else {

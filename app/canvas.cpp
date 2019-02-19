@@ -74,7 +74,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
 
     ca_removeChildAnimator(mTransformAnimator);
 
-    prp_setAbsFrame(0);
+    anim_setAbsFrame(0);
 
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
@@ -822,10 +822,10 @@ void Canvas::invertSelectionAction() {
     }
 }
 
-void Canvas::prp_setAbsFrame(const int &frame) {
+void Canvas::anim_setAbsFrame(const int &frame) {
     if(frame == anim_mCurrentAbsFrame) return;
     int lastRelFrame = anim_mCurrentRelFrame;
-    ComplexAnimator::prp_setAbsFrame(frame);
+    ComplexAnimator::anim_setAbsFrame(frame);
     ImageCacheContainer * const cont =
             mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
     if(cont) {
@@ -846,7 +846,7 @@ void Canvas::prp_setAbsFrame(const int &frame) {
     }
 
     for(const auto &box : mContainedBoxes) {
-        box->prp_setAbsFrame(frame);
+        box->anim_setAbsFrame(frame);
     }
     mUndoRedoStack->setFrame(frame);
 }
@@ -1011,11 +1011,11 @@ void Canvas::moveByRel(const QPointF &trans) {
 //    anim_mCurrentAbsFrame = currentFrame;
 
 //    for(const auto& box : mChildBoxes) {
-//        box->prp_setAbsFrame(currentFrame);
+//        box->anim_setAbsFrame(currentFrame);
 //    }
 
-//    BoxesGroup::prp_setAbsFrame(currentFrame);
-//    //mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
+//    BoxesGroup::anim_setAbsFrame(currentFrame);
+//    //mSoundComposition->getSoundsAnimatorContainer()->anim_setAbsFrame(currentFrame);
 //}
 
 void getMirroredCtrlPtAbsPos(bool mirror,

@@ -78,8 +78,8 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
     return pixId;
 }
 
-void AnimationBox::prp_setAbsFrame(const int &frame) {
-    BoundingBox::prp_setAbsFrame(frame);
+void AnimationBox::anim_setAbsFrame(const int &frame) {
+    BoundingBox::anim_setAbsFrame(frame);
     if(!mAnimationCacheHandler) return;
 
     mNewCurrentFrameUpdateNeeded = true;

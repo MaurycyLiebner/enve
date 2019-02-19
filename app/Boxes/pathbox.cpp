@@ -333,13 +333,13 @@ void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
 }
 
 void PathBox::resetStrokeGradientPointsPos() {
-    mStrokeGradientPoints->prp_setRecording(false);
+    mStrokeGradientPoints->anim_setRecording(false);
     mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),
                                         mRelBoundingRect.bottomRight());
 }
 
 void PathBox::resetFillGradientPointsPos() {
-    mFillGradientPoints->prp_setRecording(false);
+    mFillGradientPoints->anim_setRecording(false);
     mFillGradientPoints->setPositions(mRelBoundingRect.topLeft(),
                                       mRelBoundingRect.bottomRight());
 }

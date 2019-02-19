@@ -22,15 +22,15 @@ public:
 
     void paint(QPainter *p);
 
-    void setAnimator(QrealAnimator * const animator);
-    void setIntAnimator(IntProperty * const animator);
+    void setTarget(QrealAnimator * const animator);
+    void setTarget(IntProperty * const animator);
 
-    bool hasTargetAnimator();
+    bool hasTarget();
 
     bool isTargetDisabled();
 
     void openContextMenu(const QPoint &globalPos);
-    void clearAnimator();
+    void clearTarget();
 public slots:
     void setValueExternal(qreal value);
 
@@ -44,7 +44,7 @@ protected:
     void emitValueChanged(qreal value);
 private:
     bool mBlockAnimatorSignals = false;
-    qptr<Property> mAnimator;
+    qptr<Property> mTarget;
 signals:
     void displayedValueChanged(qreal);
 };

@@ -263,7 +263,7 @@ public:
     void getAccelerationAt(const QPointF &pos,
                            const int &frame,
                            QPointF *acc);
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
     bool relPointInsidePath(const QPointF &relPos) const;
 
     void addEmitter(const qsptr<ParticleEmitter> &emitter);

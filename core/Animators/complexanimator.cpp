@@ -1,9 +1,7 @@
 #include "Animators/complexanimator.h"
 #include <QPainter>
 
-ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {
-    anim_mIsComplexAnimator = true;
-}
+ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {}
 
 ComplexAnimator::~ComplexAnimator() {
     anim_removeAllKeys();
@@ -84,33 +82,36 @@ ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
     return GetAsPtr(anim_getKeyAtRelFrame(frame), ComplexKey);
 }
 
-void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childAnimator,
+void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
                                           const int &id) {
-    ca_mChildAnimators.insert(id, childAnimator);
-    childAnimator->setParent(this);
-    childAnimator->prp_setUpdater(prp_mUpdater);
-    childAnimator->prp_setParentFrameShift(prp_getFrameShift());
-    connect(childAnimator.data(), &Property::prp_updateWholeInfluenceRange,
+    ca_mChildAnimators.insert(id, childProperty);
+    childProperty->setParent(this);
+    childProperty->prp_setUpdater(prp_mUpdater);
+    childProperty->prp_setParentFrameShift(prp_getFrameShift());
+    connect(childProperty.data(), &Property::prp_updateWholeInfluenceRange,
             this, &Property::prp_updateInfluenceRangeAfterChanged);
-    connect(childAnimator.data(), &Property::prp_isRecordingChanged,
-            this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
-    connect(childAnimator.data(), &Property::prp_absFrameRangeChanged,
+    if(childProperty->SWT_isAnimator()) {
+        const auto childAnimator = GetAsPtr(childProperty, Animator);
+        connect(childAnimator, &Animator::anim_isRecordingChanged,
+                this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
+        connect(childAnimator, &Animator::prp_addingKey,
+                this, &ComplexAnimator::ca_addDescendantsKey);
+        connect(childAnimator, &Animator::prp_removingKey,
+                this, &ComplexAnimator::ca_removeDescendantsKey);
+        childAnimator->anim_addAllKeysToComplexAnimator(this);
+        ca_childAnimatorIsRecordingChanged();
+        childAnimator->anim_setAbsFrame(anim_mCurrentAbsFrame);
+    }
+    connect(childProperty.data(), &Property::prp_absFrameRangeChanged,
             this, &ComplexAnimator::prp_updateAfterChangedAbsFrameRange);
-    connect(childAnimator.data(), &Property::prp_addingKey,
-            this, &ComplexAnimator::ca_addDescendantsKey);
-    connect(childAnimator.data(), &Property::prp_removingKey,
-            this, &ComplexAnimator::ca_removeDescendantsKey);
-    connect(childAnimator.data(), &Property::prp_replaceWith,
+    connect(childProperty.data(), &Property::prp_replaceWith,
             this, &ComplexAnimator::ca_replaceChildAnimator);
-    connect(childAnimator.data(), &Property::prp_prependWith,
+    connect(childProperty.data(), &Property::prp_prependWith,
             this, &ComplexAnimator::ca_prependChildAnimator);
 
-    childAnimator->prp_addAllKeysToComplexAnimator(this);
-    ca_childAnimatorIsRecordingChanged();
-    childAnimator->prp_setAbsFrame(anim_mCurrentAbsFrame);
     //updateKeysPath();
 
-    SWT_addChildAbstractionForTargetToAllAt(childAnimator.get(), id);
+    SWT_addChildAbstractionForTargetToAllAt(childProperty.get(), id);
 }
 
 int ComplexAnimator::getChildPropertyIndex(Property *child) {
@@ -263,12 +264,13 @@ void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {
     }
 }
 
-void ComplexAnimator::prp_setAbsFrame(const int &frame) {
-    //if(!prp_isDescendantRecording()) return;
-    Animator::prp_setAbsFrame(frame);
+void ComplexAnimator::anim_setAbsFrame(const int &frame) {
+    //if(!anim_isDescendantRecording()) return;
+    Animator::anim_setAbsFrame(frame);
 
     for(const auto &property : ca_mChildAnimators) {
-        property->prp_setAbsFrame(frame);
+        if(!property->SWT_isAnimator()) continue;
+        GetAsPtr(property, Animator)->anim_setAbsFrame(frame);
     }
 }
 
@@ -290,7 +292,7 @@ void ComplexAnimator::prp_cancelTransform() {
     }
 }
 
-bool ComplexAnimator::prp_isDescendantRecording() const {
+bool ComplexAnimator::anim_isDescendantRecording() const {
     return ca_mChildAnimatorRecording;
 }
 
@@ -300,7 +302,7 @@ QString ComplexAnimator::prp_getValueText() {
 
 void ComplexAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) {
-        prp_setRecording(true);
+        anim_setRecording(true);
     } else {
         for(const auto &property : ca_mChildAnimators) {
             if(property->SWT_isAnimator()) {
@@ -310,9 +312,10 @@ void ComplexAnimator::anim_saveCurrentValueAsKey() {
     }
 }
 
-void ComplexAnimator::prp_setRecording(const bool &rec) {
+void ComplexAnimator::anim_setRecording(const bool &rec) {
     for(const auto &property : ca_mChildAnimators) {
-        property->prp_setRecording(rec);
+        if(!property->SWT_isAnimator()) continue;
+        GetAsPtr(property, Animator)->anim_setRecording(rec);
     }
     anim_setRecordingValue(rec);
 }
@@ -321,8 +324,10 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     bool rec = true;
     bool childRecordingT = false;
     for(const auto &property : ca_mChildAnimators) {
-        const bool isChildRec = property->prp_isRecording();
-        const bool isChildDescRec = property->prp_isDescendantRecording();
+        if(!property->SWT_isAnimator()) continue;
+        const auto animator = GetAsPtr(property, Animator);
+        const bool isChildRec = animator->anim_isRecording();
+        const bool isChildDescRec = animator->anim_isDescendantRecording();
         if(isChildDescRec) childRecordingT = true;
         if(!isChildRec) rec = false;
     }
@@ -331,7 +336,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
         if(rec != anim_mIsRecording) {
             anim_setRecordingValue(rec);
         } else {
-            emit prp_isRecordingChanged();
+            emit anim_isRecordingChanged();
         }
     } else if(rec != anim_mIsRecording) {
         anim_setRecordingValue(rec);

@@ -155,7 +155,7 @@ public:
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
     void schedulerProccessed();
 
     stdsptr<BoundingBoxRenderData> createRenderData();

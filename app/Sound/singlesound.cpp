@@ -67,7 +67,7 @@ void SingleSound::setDurationRect(FixedLenAnimationRect *durRect) {
 
 void SingleSound::updateAfterDurationRectangleShifted() {
     prp_setParentFrameShift(prp_mParentFrameShift);
-    prp_setAbsFrame(anim_mCurrentAbsFrame);
+    anim_setAbsFrame(anim_mCurrentAbsFrame);
     scheduleFinalDataUpdate();
 }
 
@@ -163,7 +163,7 @@ void SingleSound::prepareFinalData(const float &fps,
         ulong dataSize = static_cast<ulong>(mFinalSampleCount)*sizeof(float);
         void* data = malloc(dataSize);
         mFinalData = static_cast<float*>(data);
-        if(mVolumeAnimator->prp_hasKeys()) {
+        if(mVolumeAnimator->anim_hasKeys()) {
             int j = 0;
             int frame = 0;
             qreal volVal = mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame);

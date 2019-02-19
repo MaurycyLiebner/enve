@@ -44,6 +44,8 @@ protected:
     SmartPathKey(const SmartPath& value, const int &relFrame,
                  Animator * const parentAnimator) :
         GraphKeyT<SmartPath>(value, relFrame, parentAnimator) {}
+    SmartPathKey(Animator * const parentAnimator) :
+        GraphKeyT<SmartPath>(parentAnimator) {}
 };
 
 typedef BasedAnimatorT<GraphAnimator,
@@ -69,11 +71,12 @@ public:
 
     void startPathChange() {
         if(mPathBeingChanged_d) return;
-        if(prp_isRecording() && !anim_mKeyOnCurrentFrame) {
+        if(anim_isRecording() && !anim_mKeyOnCurrentFrame) {
             anim_saveCurrentValueAsKey();
         }
         if(anim_mKeyOnCurrentFrame) {
-            const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame, SmartPathKey);
+            const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame,
+                                      SmartPathKey);
             spk->save();
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
             mPathBeingChanged_d = &spk->getValue();
@@ -87,7 +90,8 @@ public:
     void cancelPathChange() {
         if(!mPathBeingChanged_d) return;
         if(anim_mKeyOnCurrentFrame) {
-            const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame, SmartPathKey);
+            const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame,
+                                      SmartPathKey);
             spk->restore();
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
         } else {
@@ -99,7 +103,7 @@ public:
 
     void finishPathChange() {
         if(!mPathBeingChanged_d) return;
-        if(prp_isKeyOnCurrentFrame()) {
+        if(anim_isKeyOnCurrentFrame()) {
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
         } else {
             prp_updateInfluenceRangeAfterChanged();

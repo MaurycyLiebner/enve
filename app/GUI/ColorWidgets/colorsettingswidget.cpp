@@ -112,16 +112,16 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
         disconnect(mTargetAnimator, nullptr, this, nullptr);
     }
     mTargetAnimator = target;
-    rSpin->clearAnimator();
-    gSpin->clearAnimator();
-    bSpin->clearAnimator();
-    hSpin->clearAnimator();
-    hslSSpin->clearAnimator();
-    lSpin->clearAnimator();
-    hsvSSpin->clearAnimator();
-    vSpin->clearAnimator();
+    rSpin->clearTarget();
+    gSpin->clearTarget();
+    bSpin->clearTarget();
+    hSpin->clearTarget();
+    hslSSpin->clearTarget();
+    lSpin->clearTarget();
+    hsvSSpin->clearTarget();
+    vSpin->clearTarget();
     if(!mAlphaHidden) {
-        aSpin->clearAnimator();
+        aSpin->clearTarget();
     }
     if(target) {
         disconnect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
@@ -130,24 +130,24 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
         connect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(setColorMode(int)));
         if(!mAlphaHidden) {
-            aSpin->setAnimator(target->getAlphaAnimator());
+            aSpin->setTarget(target->getAlphaAnimator());
         }
         if(target->getColorMode() == RGBMODE) {
-            rSpin->setAnimator(target->getVal1Animator());
-            gSpin->setAnimator(target->getVal2Animator());
-            bSpin->setAnimator(target->getVal3Animator());
+            rSpin->setTarget(target->getVal1Animator());
+            gSpin->setTarget(target->getVal2Animator());
+            bSpin->setTarget(target->getVal3Animator());
 
             updateValuesFromRGB();
         } else if(target->getColorMode() == HSLMODE) {
-            hSpin->setAnimator(target->getVal1Animator());
-            hslSSpin->setAnimator(target->getVal2Animator());
-            lSpin->setAnimator(target->getVal3Animator());
+            hSpin->setTarget(target->getVal1Animator());
+            hslSSpin->setTarget(target->getVal2Animator());
+            lSpin->setTarget(target->getVal3Animator());
 
             updateValuesFromHSL();
         } else { // HSVMODE
-            hSpin->setAnimator(target->getVal1Animator());
-            hsvSSpin->setAnimator(target->getVal2Animator());
-            vSpin->setAnimator(target->getVal3Animator());
+            hSpin->setTarget(target->getVal1Animator());
+            hsvSSpin->setTarget(target->getVal2Animator());
+            vSpin->setTarget(target->getVal3Animator());
 
             updateValuesFromHSV();
         }

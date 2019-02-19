@@ -107,7 +107,7 @@ void Animator::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
 }
 
 void Animator::anim_updateAfterChangedKey(Key *key) {
-    if(anim_mIsComplexAnimator) return;
+    if(SWT_isComplexAnimator()) return;
     if(!key) {
         prp_updateInfluenceRangeAfterChanged();
         return;
@@ -119,7 +119,7 @@ void Animator::anim_updateAfterChangedKey(Key *key) {
     prp_updateAfterChangedRelFrameRange({prevKeyRelFrame, nextKeyRelFrame});
 }
 
-void Animator::prp_setAbsFrame(const int &frame) {
+void Animator::anim_setAbsFrame(const int &frame) {
     anim_mCurrentAbsFrame = frame;
     anim_updateRelFrame();
     anim_updateKeyOnCurrrentFrame();
@@ -130,7 +130,7 @@ void Animator::anim_updateRelFrame() {
     anim_mCurrentRelFrame = anim_mCurrentAbsFrame - prp_getFrameShift();
 }
 
-void Animator::prp_setRecording(const bool &rec) {
+void Animator::anim_setRecording(const bool &rec) {
     if(rec) {
         anim_setRecordingWithoutChangingKeys(rec);
         anim_saveCurrentValueAsKey();
@@ -140,13 +140,11 @@ void Animator::prp_setRecording(const bool &rec) {
     }
 }
 
-void Animator::prp_switchRecording() {
-    prp_setRecording(!anim_mIsRecording);
+void Animator::anim_switchRecording() {
+    anim_setRecording(!anim_mIsRecording);
 }
 
-bool Animator::prp_isDescendantRecording() const { return anim_mIsRecording; }
-
-bool Animator::anim_isComplexAnimator() { return anim_mIsComplexAnimator; }
+bool Animator::anim_isDescendantRecording() const { return anim_mIsRecording; }
 
 void Animator::prp_startDragging() {}
 
@@ -454,7 +452,7 @@ Key *Animator::prp_getKeyAtPos(const qreal &relX,
     return nullptr;
 }
 
-void Animator::prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
+void Animator::anim_addAllKeysToComplexAnimator(ComplexAnimator *target) {
     for(const auto &key : anim_mKeys) {
         target->ca_addDescendantsKey(key.get());
     }
@@ -466,7 +464,7 @@ void Animator::prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
     }
 }
 
-bool Animator::prp_hasKeys() const {
+bool Animator::anim_hasKeys() const {
     return !anim_mKeys.isEmpty();
 }
 
@@ -477,12 +475,12 @@ void Animator::anim_setRecordingWithoutChangingKeys(const bool &rec) {
 void Animator::anim_setRecordingValue(const bool &rec) {
     if(rec == anim_mIsRecording) return;
     anim_mIsRecording = rec;
-    emit prp_isRecordingChanged();
+    emit anim_isRecordingChanged();
 }
 
 bool Animator::SWT_isAnimator() const { return true; }
 
-bool Animator::prp_isRecording() {
+bool Animator::anim_isRecording() {
     return anim_mIsRecording;
 }
 
@@ -494,7 +492,7 @@ void Animator::anim_removeAllKeys() {
     }
 }
 
-bool Animator::prp_isKeyOnCurrentFrame() const {
+bool Animator::anim_isKeyOnCurrentFrame() const {
     return anim_mKeyOnCurrentFrame != nullptr;
 }
 

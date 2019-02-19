@@ -49,8 +49,8 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
     *acc = QPointF(0., 9.8)/24.;
 }
 
-void ParticleBox::prp_setAbsFrame(const int &frame) {
-    BoundingBox::prp_setAbsFrame(frame);
+void ParticleBox::anim_setAbsFrame(const int &frame) {
+    BoundingBox::anim_setAbsFrame(frame);
     scheduleUpdate(Animator::FRAME_CHANGE);
 }
 

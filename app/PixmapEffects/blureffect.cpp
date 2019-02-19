@@ -30,7 +30,7 @@ stdsptr<PixmapEffectRenderData> BlurEffect::getPixmapEffectRenderDataForRelFrame
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(BlurEffectRenderData)();
     renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);
-    renderData->hasKeys = mBlurRadius->prp_hasKeys();
+    renderData->hasKeys = mBlurRadius->anim_hasKeys();
     renderData->highQuality = mHighQuality->getValue();
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

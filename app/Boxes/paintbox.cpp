@@ -38,7 +38,7 @@ bool PaintBox::prp_nextRelFrameWithKey(const int &relFrame,
     bool bbHasNext = BoundingBox::prp_nextRelFrameWithKey(relFrame,
                                                           bbNext);
     if(mMainHandler) {
-        if(mMainHandler->prp_hasKeys()) {
+        if(mMainHandler->anim_hasKeys()) {
             int clostestFrame;
             mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
                                                               clostestFrame);
@@ -60,7 +60,7 @@ bool PaintBox::prp_prevRelFrameWithKey(const int &relFrame,
     bool bbHasPrev = BoundingBox::prp_prevRelFrameWithKey(relFrame,
                                                           bbPrev);
     if(mMainHandler) {
-        if(mMainHandler->prp_hasKeys()) {
+        if(mMainHandler->anim_hasKeys()) {
             int clostestFrame;
             mMainHandler->anim_getClosestsKeyOccupiedRelFrame(relFrame,
                                                               clostestFrame);
@@ -85,11 +85,11 @@ void PaintBox::setIsDraft(const bool &bT) {
 }
 
 bool PaintBox::isSurfaceAnimated() {
-    return mMainHandler->prp_hasKeys();
+    return mMainHandler->anim_hasKeys();
 }
 
-void PaintBox::prp_setAbsFrame(const int &frame) {
-    BoundingBox::prp_setAbsFrame(frame);
+void PaintBox::anim_setAbsFrame(const int &frame) {
+    BoundingBox::anim_setAbsFrame(frame);
 
     if(!mMainHandler) return;
     mMainHandler->setCurrentRelFrame(frame);
@@ -237,7 +237,7 @@ void PaintBox::scheduleFinishSizeAndPosSetup() {
 }
 
 void PaintBox::loadFromImage(const QImage &img) {
-    if(!prp_hasKeys()) {
+    if(!anim_hasKeys()) {
         mBottomRightPoint->setRelativePos(mTopLeftPoint->getRelativePos() +
                                           QPointF(img.width(), img.height()));
         finishSizeSetup();

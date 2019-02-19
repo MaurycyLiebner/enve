@@ -23,7 +23,7 @@ class AnimationBox : public BoundingBox {
 public:
     AnimationBox();
     ~AnimationBox();
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
 
     void updateDurationRectangleAnimationRange();
     void reloadCacheHandler();

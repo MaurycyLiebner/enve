@@ -112,7 +112,7 @@ void QrealAnimator::prp_openContextMenu(const QPoint &pos) {
             if(anim_mIsRecording) {
                 anim_saveCurrentValueAsKey();
             } else {
-                prp_setRecording(true);
+                anim_setRecording(true);
             }
         }
     } else {
@@ -136,7 +136,7 @@ void QrealAnimator::setPrefferedValueStep(const qreal &valueStep) {
     mPrefferedValueStep = valueStep;
 }
 
-void QrealAnimator::prp_setRecording(const bool &rec) {
+void QrealAnimator::anim_setRecording(const bool &rec) {
     if(rec) {
         anim_setRecordingWithoutChangingKeys(rec);
         anim_saveCurrentValueAsKey();
@@ -341,7 +341,7 @@ void QrealAnimator::qra_setCurrentValue(qreal newValue) {
 
     if(isZero4Dec(newValue - mCurrentValue)) return;
     mCurrentValue = newValue;
-    if(prp_isKeyOnCurrentFrame()) {
+    if(anim_isKeyOnCurrentFrame()) {
         qra_saveCurrentValueToKey(GetAsPtr(anim_mKeyOnCurrentFrame, QrealKey));
     } else {
         prp_updateInfluenceRangeAfterChanged();
@@ -381,8 +381,8 @@ void QrealAnimator::qra_saveValueToKey(QrealKey *key, const qreal &value) {
     graph_updateKeysPath();
 }
 
-void QrealAnimator::prp_setAbsFrame(const int &frame) {
-    Animator::prp_setAbsFrame(frame);
+void QrealAnimator::anim_setAbsFrame(const int &frame) {
+    Animator::anim_setAbsFrame(frame);
     qreal newValue = qra_getValueAtRelFrame(anim_mCurrentRelFrame);
     if(isZero4Dec(newValue - mCurrentValue)) return;
     mCurrentValue = newValue;
@@ -406,7 +406,7 @@ void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
 
 void QrealAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) {
-        prp_setRecording(true);
+        anim_setRecording(true);
         return;
     }
 
@@ -603,7 +603,7 @@ void QrealAnimator::qra_incCurrentValue(const qreal &incBy) {
 void QrealAnimator::prp_startTransform() {
     if(mTransformed) return;
     if(anim_mIsRecording) {
-        if(!prp_isKeyOnCurrentFrame()) {
+        if(!anim_isKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
         }
     }

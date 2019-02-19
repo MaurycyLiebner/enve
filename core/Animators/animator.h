@@ -29,13 +29,11 @@ public:
 
     virtual void anim_updateAfterChangedKey(Key * const key);
 
-    virtual void prp_setAbsFrame(const int &frame);
+    virtual void anim_setAbsFrame(const int &frame);
 
-    virtual void prp_switchRecording();
+    void anim_switchRecording();
 
-    virtual bool prp_isDescendantRecording() const;
-
-    bool anim_isComplexAnimator();
+    virtual bool anim_isDescendantRecording() const;
 
     virtual void prp_startDragging();
 
@@ -55,7 +53,7 @@ public:
 
     virtual void anim_keyValueChanged(Key *key);
 
-    void anim_updateKeyOnCurrrentFrame();
+    virtual void anim_updateKeyOnCurrrentFrame();
 
     virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                            const int &relX,
@@ -67,13 +65,13 @@ public:
                          const qreal &pixelsPerFrame,
                          const int &keyRectSize);
     void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
-    void prp_addAllKeysToComplexAnimator(ComplexAnimator *target);
-    bool prp_hasKeys() const;
+    void anim_addAllKeysToComplexAnimator(ComplexAnimator *target);
+    virtual bool anim_hasKeys() const;
 
     void anim_setRecordingWithoutChangingKeys(const bool &rec);
-    bool prp_isRecording();
+    virtual bool anim_isRecording();
     virtual void anim_removeAllKeys();
-    bool prp_isKeyOnCurrentFrame() const;
+    virtual bool anim_isKeyOnCurrentFrame() const;
     void prp_getKeysInRect(const QRectF &selectionRect,
                            const qreal &pixelsPerFrame,
                            QList<Key*>& keysList,
@@ -167,7 +165,6 @@ protected:
                               const int &startFrame,
                               const int& rowHeight,
                               const int& keyRectSize);
-    bool anim_mIsComplexAnimator = false;
     bool anim_mIsRecording = false;
 
     int anim_mCurrentAbsFrame = 0;
@@ -180,8 +177,9 @@ protected:
 public slots:
     void anim_deleteCurrentKey();
     virtual void anim_updateAfterShifted();
-    void prp_setRecording(const bool &rec);
-
+    virtual void anim_setRecording(const bool &rec);
+signals:
+    void anim_isRecordingChanged();
 private:
     int getInsertIdForKeyRelFrame(const int &relFrame,
                                   const int &min, const int &max) const;

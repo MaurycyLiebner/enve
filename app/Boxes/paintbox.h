@@ -45,7 +45,7 @@ public:
         return mHeight;
     }
 
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
 
     void finishSizeSetup();
     bool SWT_isPaintBox() const { return true; }

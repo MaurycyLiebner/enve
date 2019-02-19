@@ -10,7 +10,7 @@ public:
             return this->getCurrentValue();
         }
         Key *key;
-        if(this->prp_isKeyOnCurrentFrame()) {
+        if(this->anim_isKeyOnCurrentFrame()) {
             key = this->anim_mKeyOnCurrentFrame;
         } else {
             key = this->anim_getPrevKey(relFrame);

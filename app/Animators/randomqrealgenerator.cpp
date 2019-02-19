@@ -34,8 +34,8 @@ RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
     generateData();
 }
 
-void RandomQrealGenerator::prp_setAbsFrame(const int &frame) {
-    ComplexAnimator::prp_setAbsFrame(frame);
+void RandomQrealGenerator::anim_setAbsFrame(const int &frame) {
+    ComplexAnimator::anim_setAbsFrame(frame);
     if(mMaxDev->qra_getCurrentEffectiveValue() < 0.001) return;
     anim_callFrameChangeUpdater();
 }

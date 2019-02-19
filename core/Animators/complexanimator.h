@@ -24,13 +24,13 @@ public:
 
     void prp_startTransform();
     void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
 
     void prp_retrieveSavedValue();
     void prp_finishTransform();
     void prp_cancelTransform();
 
-    bool prp_isDescendantRecording() const;
+    bool anim_isDescendantRecording() const;
     QString prp_getValueText();
     void prp_clearFromGraphView();
 
@@ -92,7 +92,7 @@ public slots:
                                  const qsptr<Property>& prependWith);
     void ca_replaceChildAnimator(const qsptr<Property> &childAnimator,
                                  const qsptr<Property>& replaceWith);
-    void prp_setRecording(const bool &rec);
+    void anim_setRecording(const bool &rec);
 
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);

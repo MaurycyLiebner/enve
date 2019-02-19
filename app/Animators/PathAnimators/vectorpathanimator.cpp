@@ -31,10 +31,10 @@ VectorPathAnimator::VectorPathAnimator(
     updateNodePointsFromElements();
 }
 
-void VectorPathAnimator::prp_setAbsFrame(const int &frame) {
-    Animator::prp_setAbsFrame(frame);
+void VectorPathAnimator::anim_setAbsFrame(const int &frame) {
+    Animator::anim_setAbsFrame(frame);
     //setCurrentPath(getPathAtRelFrame(frame));
-    if(prp_hasKeys()) {
+    if(anim_hasKeys()) {
         setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
     }
 }
@@ -84,11 +84,11 @@ void VectorPathAnimator::revertAllNodeSettings() {
 
 void VectorPathAnimator::startPathChange() {
     if(mPathChanged) return;
-    if(prp_isRecording()) {
-        if(prp_isKeyOnCurrentFrame()) return;
+    if(anim_isRecording()) {
+        if(anim_isKeyOnCurrentFrame()) return;
         anim_saveCurrentValueAsKey();
     }
-    if(prp_isKeyOnCurrentFrame()) {
+    if(anim_isKeyOnCurrentFrame()) {
         GetAsPK(anim_mKeyOnCurrentFrame)->startPathChange();
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
@@ -100,7 +100,7 @@ void VectorPathAnimator::startPathChange() {
 
 void VectorPathAnimator::cancelPathChange() {
     if(!mPathChanged) return;
-    if(prp_isKeyOnCurrentFrame()) {
+    if(anim_isKeyOnCurrentFrame()) {
         GetAsPK(anim_mKeyOnCurrentFrame)->cancelPathChange();
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
@@ -112,7 +112,7 @@ void VectorPathAnimator::cancelPathChange() {
 
 void VectorPathAnimator::finishedPathChange() {
     if(!mPathChanged) return;
-    if(prp_isKeyOnCurrentFrame()) {
+    if(anim_isKeyOnCurrentFrame()) {
         GetAsPK(anim_mKeyOnCurrentFrame)->finishedPathChange();
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
@@ -125,7 +125,7 @@ void VectorPathAnimator::finishedPathChange() {
 
 void VectorPathAnimator::setElementPos(const int &index,
                                        const SkPoint &pos) {
-    if(prp_isKeyOnCurrentFrame()) {
+    if(anim_isKeyOnCurrentFrame()) {
         GetAsPK(anim_mKeyOnCurrentFrame)->setElementPos(index, pos);
         anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
@@ -135,7 +135,7 @@ void VectorPathAnimator::setElementPos(const int &index,
 }
 
 void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
-    if(!anim_mIsRecording) prp_setRecording(true);
+    if(!anim_mIsRecording) anim_setRecording(true);
 
     auto newKey = GetAsSPtr(anim_getKeyAtRelFrame(relFrame), PathKey);
 
@@ -149,7 +149,7 @@ void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
 }
 
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {
-    if(!anim_mIsRecording) prp_setRecording(true);
+    if(!anim_mIsRecording) anim_setRecording(true);
 
     if(anim_mKeyOnCurrentFrame == nullptr) {
         auto newKey = SPtrCreate(PathKey)(anim_mCurrentRelFrame,
@@ -584,7 +584,7 @@ void VectorPathAnimator::setPathClosed(const bool &bT) {
     for(const auto &key : anim_mKeys) {
         GetAsPK(key)->setPathClosed(bT);
     }
-    if(prp_hasKeys()) {
+    if(anim_hasKeys()) {
         setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
     }
     prp_updateInfluenceRangeAfterChanged();
@@ -669,7 +669,7 @@ void VectorPathAnimator::drawSelected(SkCanvas *canvas,
                                       const SkMatrix &combinedTransform) {
     Q_UNUSED(combinedTransform);
 
-    const bool keyOnCurrentFrame = prp_isKeyOnCurrentFrame();
+    const bool keyOnCurrentFrame = anim_isKeyOnCurrentFrame();
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             auto point = getNodePtWithNodeId(i);
@@ -849,7 +849,7 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
                 removeNodeSettingsAt(firstNodeForNew);
             }
         }
-        if(prp_hasKeys()) {
+        if(anim_hasKeys()) {
             newSinglePath = SPtrCreate(VectorPathAnimator)(
                         nodeSettings, mParentPathAnimator);
             for(const auto &key : anim_mKeys) {

@@ -316,14 +316,14 @@ void BoxTransformAnimator::setOpacity(const qreal &newOpacity) {
 }
 
 void BoxTransformAnimator::startPivotTransform() {
-    if(!mPosAnimator->prp_isDescendantRecording()) {
+    if(!mPosAnimator->anim_isDescendantRecording()) {
         mPosAnimator->prp_startTransform();
     }
     mPivotAnimator->prp_startTransform();
 }
 
 void BoxTransformAnimator::finishPivotTransform() {
-    if(!mPosAnimator->prp_isDescendantRecording()) {
+    if(!mPosAnimator->anim_isDescendantRecording()) {
         mPosAnimator->prp_finishTransform();
     }
     mPivotAnimator->prp_finishTransform();
@@ -376,9 +376,9 @@ qreal BoxTransformAnimator::getOpacityAtRelFrameF(const qreal &relFrame) {
 }
 
 bool BoxTransformAnimator::rotOrScaleOrPivotRecording() {
-    return mRotAnimator->prp_isDescendantRecording() ||
-           mScaleAnimator->prp_isDescendantRecording() ||
-           mPivotAnimator->prp_isDescendantRecording();
+    return mRotAnimator->anim_isDescendantRecording() ||
+           mScaleAnimator->anim_isDescendantRecording() ||
+           mPivotAnimator->anim_isDescendantRecording();
 }
 
 void BoxTransformAnimator::updateCombinedTransform(const UpdateReason &reason) {

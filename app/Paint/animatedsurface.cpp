@@ -35,8 +35,8 @@ AnimatedSurface::AnimatedSurface(const ushort &widthT,
 AnimatedSurface::~AnimatedSurface() {}
 
 void AnimatedSurface::currentDataModified() {
-    if(prp_hasKeys()) {
-        if(prp_isKeyOnCurrentFrame()) {
+    if(anim_hasKeys()) {
+        if(anim_isKeyOnCurrentFrame()) {
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
         } else {
             Key *key = anim_getPrevKey(anim_mCurrentRelFrame);
@@ -51,7 +51,7 @@ void AnimatedSurface::currentDataModified() {
 }
 
 void AnimatedSurface::anim_saveCurrentValueAsKey() {
-    if(prp_isKeyOnCurrentFrame()) return;
+    if(anim_isKeyOnCurrentFrame()) return;
     newEmptyPaintFrame();
     SurfaceKey *key = GetAsPtr(anim_mKeyOnCurrentFrame, SurfaceKey);
     SurfaceKey *prevKey = GetAsPtr(anim_getPrevKey(key), SurfaceKey);
@@ -83,7 +83,7 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
     }
 
     auto frameT = SPtrCreate(SurfaceKey)(relFrame, this);
-    if(prp_hasKeys()) {
+    if(anim_hasKeys()) {
         frameT->setSize(static_cast<ushort>(mWidth),
                         static_cast<ushort>(mHeight));
     } else {
@@ -249,7 +249,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
                               const ushort &height_t) {
     // initialize tiles
     if(width_t == mWidth && height_t == mHeight) return;
-    if(prp_hasKeys()) {
+    if(anim_hasKeys()) {
         int n_tile_cols_t = qCeil(width_t/static_cast<qreal>(TILE_DIM));
         int n_tile_rows_t = qCeil(height_t/static_cast<qreal>(TILE_DIM));
         for(const auto &key : anim_mKeys) {
@@ -267,7 +267,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
 }
 
 void AnimatedSurface::move(const int &xT, const int &yT) {
-    if(prp_hasKeys()) {
+    if(anim_hasKeys()) {
         for(const auto &key : anim_mKeys) {
             SurfaceKey *frameT = GetAsPtr(key, SurfaceKey);
             frameT->getTilesData()->move(xT, yT);
@@ -282,7 +282,7 @@ void AnimatedSurface::tabletPressEvent(const qreal &xT, const qreal &yT,
                                        const qreal &pressure,
                                        const bool &erase,
                                        const Brush *brush) {
-    if(prp_isRecording() && !prp_isKeyOnCurrentFrame()) {
+    if(anim_isRecording() && !anim_isKeyOnCurrentFrame()) {
         newEmptyPaintFrame();
     }
     Surface::tabletPressEvent(xT, yT, time_stamp,
@@ -290,7 +290,7 @@ void AnimatedSurface::tabletPressEvent(const qreal &xT, const qreal &yT,
 }
 
 void AnimatedSurface::anim_updateAfterChangedKey(Key * const key) {
-    if(anim_mIsComplexAnimator) return;
+    if(SWT_isComplexAnimator()) return;
     if(!key) {
         prp_updateInfluenceRangeAfterChanged();
         return;

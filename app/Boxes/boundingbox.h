@@ -177,7 +177,7 @@ public:
     virtual void startPosTransform();
     virtual void startRotTransform();
     virtual void startScaleTransform();
-    virtual void prp_setAbsFrame(const int &frame);
+    virtual void anim_setAbsFrame(const int &frame);
 
     virtual void startAllPointsTransform();
     virtual void finishAllPointsTransform();

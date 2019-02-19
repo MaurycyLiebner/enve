@@ -118,36 +118,19 @@ public:
 
     virtual void prp_retrieveSavedValue() {}
 
-    virtual void prp_setAbsFrame(const int &frame) { Q_UNUSED(frame); }
-
-    virtual void prp_switchRecording() {}
-
-    virtual void anim_updateKeyOnCurrrentFrame() {}
-
-    virtual bool prp_isKeyOnCurrentFrame() const { return false; }
-
-    virtual bool prp_isDescendantRecording() const { return false; }
-
     virtual QString prp_getValueText() { return ""; }
 
     virtual void prp_clearFromGraphView() {}
 
     virtual void prp_openContextMenu(const QPoint &pos) { Q_UNUSED(pos); }
 
-    virtual bool prp_hasKeys() const { return false; }
-
     virtual void prp_startDragging() {}
 
-    virtual bool prp_isRecording() { return false; }
     virtual void prp_removeAllKeysFromComplexAnimator(
             ComplexAnimator* target) {
         Q_UNUSED(target);
     }
     virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
-    virtual void prp_addAllKeysToComplexAnimator(
-            ComplexAnimator* target) {
-        Q_UNUSED(target);
-    }
 
     const QString &prp_getName() const;
     void prp_setName(const QString &newName);
@@ -232,8 +215,6 @@ protected:
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     QPointer<Property> mParent;
 public slots:
-    virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
-
     virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
 
     virtual void prp_updateAfterChangedRelFrameRange(const FrameRange &range) {
@@ -244,7 +225,6 @@ public slots:
     virtual void prp_updateInfluenceRangeAfterChanged();
 signals:
     void prp_updateWholeInfluenceRange();
-    void prp_isRecordingChanged();
     void prp_absFrameRangeChanged(const FrameRange &range);
     void prp_removingKey(Key*);
     void prp_addingKey(Key*);

@@ -19,7 +19,7 @@ class QrealAnimator :  public GraphAnimator {
 public:
     ~QrealAnimator();
 
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
     void prp_retrieveSavedValue();
     void prp_startTransform();
     void prp_finishTransform();
@@ -57,7 +57,7 @@ public:
     void readProperty(QIODevice *target);
     stdsptr<Key> readKey(QIODevice *target);
 public slots:
-    void prp_setRecording(const bool& rec);
+    void anim_setRecording(const bool& rec);
     void anim_saveCurrentValueAsKey();
 public:
     void setPrefferedValueStep(const qreal &valueStep);

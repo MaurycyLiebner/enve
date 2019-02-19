@@ -630,13 +630,13 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         setCurrentBrushSettings(settings->getBrushSettings());
         mCurrentStrokePaintType = settings->getPaintType();
         mCurrentStrokeWidth = settings->getCurrentStrokeWidth();
-        mLineWidthSpin->setAnimator(settings->getLineWidthAnimator());
+        mLineWidthSpin->setTarget(settings->getLineWidthAnimator());
         mCurrentCapStyle = settings->getCapStyle();
         mCurrentJoinStyle = settings->getJoinStyle();
     } else {
         setCurrentBrushSettings(nullptr);
         mCurrentStrokeColorAnimator = nullptr;
-        mLineWidthSpin->clearAnimator();
+        mLineWidthSpin->clearTarget();
     }
 }
 

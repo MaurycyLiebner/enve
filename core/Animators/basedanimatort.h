@@ -9,9 +9,9 @@ class BasedAnimatorT : public B {
 public:
     virtual T getValueAtRelFrame(const int &relFrame) const = 0;
 
-    void prp_setAbsFrame(const int &frame) {
-        Animator::prp_setAbsFrame(frame);
-        if(this->prp_hasKeys()) {
+    void anim_setAbsFrame(const int &frame) {
+        Animator::anim_setAbsFrame(frame);
+        if(this->anim_hasKeys()) {
             const T newVal = getValueAtRelFrame(this->anim_mCurrentRelFrame);
             if(gDiffers(newVal, mCurrentValue)) {
                 mCurrentValue = newVal;
@@ -22,7 +22,7 @@ public:
 
     void setCurrentValue(const T &value) {
         mCurrentValue = value;
-        if(this->prp_isRecording()) {
+        if(this->anim_isRecording()) {
             anim_saveCurrentValueAsKey();
         } else {
             this->prp_updateInfluenceRangeAfterChanged();
@@ -38,7 +38,7 @@ public:
     }
 
     void anim_saveCurrentValueAsKey() {
-        if(!this->anim_mIsRecording) this->prp_setRecording(true);
+        if(!this->anim_mIsRecording) this->anim_setRecording(true);
 
         if(this->anim_mKeyOnCurrentFrame) {
             static_cast<K*>(this->anim_mKeyOnCurrentFrame.data())->

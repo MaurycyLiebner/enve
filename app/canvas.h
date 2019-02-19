@@ -553,7 +553,7 @@ public:
         return mPathEffectsVisible;
     }
 
-    void prp_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int &frame);
 
     void moveDurationRectForAllSelected(const int &dFrame);
     void startDurationRectPosTransformForAllSelected();
