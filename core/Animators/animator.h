@@ -185,6 +185,10 @@ public slots:
 private:
     int getInsertIdForKeyRelFrame(const int &relFrame,
                                   const int &min, const int &max) const;
+    void anim_afterInsertedKey(const int &insertId,
+                               Key * const insertedKey) const;
+    void anim_afterRemovedKey(const int &removedId) const;
+
 };
 
 #endif // ANIMATOR_H

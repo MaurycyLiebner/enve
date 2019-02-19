@@ -33,9 +33,11 @@ public:
         mStartValue += dFrame;
     }
 
-    void updateAfterNeighbouringKeysChanged(Key * const prevKey,
-                                            Key * const nextKey) {
+    void updateAfterPrevKeyChanged(Key * const prevKey) {
         mValue.setPrev(&static_cast<SmartPathKey*>(prevKey)->getValue());
+    }
+
+    void updateAfterNextKeyChanged(Key * const nextKey) {
         mValue.setNext(&static_cast<SmartPathKey*>(nextKey)->getValue());
     }
 protected:

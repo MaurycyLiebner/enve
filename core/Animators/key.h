@@ -102,10 +102,18 @@ public:
         return getNextKey()->getRelFrame();
     }
 
-    virtual void updateAfterNeighbouringKeysChanged(Key * const prevKey,
-                                                    Key * const nextKey) {
+    virtual void  updateAfterPrevKeyChanged(Key * const prevKey) {
         Q_UNUSED(prevKey);
+    }
+
+    virtual void  updateAfterNextKeyChanged(Key * const nextKey) {
         Q_UNUSED(nextKey);
+    }
+
+    void updateAfterNeighbouringKeysChanged(Key * const prevKey,
+                                            Key * const nextKey) {
+        updateAfterPrevKeyChanged(prevKey);
+        updateAfterNextKeyChanged(nextKey);
     }
 protected:
     bool mIsSelected = false;
