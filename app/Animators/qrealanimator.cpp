@@ -239,8 +239,8 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame) const {
         if(nextId == prevId) {
             return getQrealKeyAtId(nextId)->getValue();
         } else {
-            QrealKey * const prevKey = getQrealKeyAtId(prevId);
-            QrealKey * const nextKey = getQrealKeyAtId(nextId);
+            const QrealKey * const prevKey = getQrealKeyAtId(prevId);
+            const QrealKey * const nextKey = getQrealKeyAtId(nextId);
             return qra_getValueAtRelFrame(frame, prevKey, nextKey);
         }
     }
@@ -254,8 +254,8 @@ qreal QrealAnimator::qra_getValueAtRelFrameF(const qreal &frame) const {
         if(nextId == prevId) {
             return getQrealKeyAtId(nextId)->getValue();
         } else {
-            QrealKey *prevKey = getQrealKeyAtId(prevId);
-            QrealKey *nextKey = getQrealKeyAtId(nextId);
+            const QrealKey * const prevKey = getQrealKeyAtId(prevId);
+            const QrealKey * const nextKey = getQrealKeyAtId(nextId);
             return qra_getValueAtRelFrameF(frame, prevKey, nextKey);
         }
     }
