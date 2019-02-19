@@ -12,7 +12,7 @@ ComplexAnimator::~ComplexAnimator() {
 void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
                                               const qsptr<Property> &prependWith) {
     if(!prependWith) return;
-    int id = getChildPropertyIndex(childAnimator);
+    const int id = getChildPropertyIndex(childAnimator);
     if(id == -1) return;
     ca_addChildAnimator(prependWith, id);
 }
@@ -20,7 +20,7 @@ void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
 
 void ComplexAnimator::ca_replaceChildAnimator(const qsptr<Property>& childAnimator,
                                               const qsptr<Property> &replaceWith) {
-    int id = getChildPropertyIndex(childAnimator.get());
+    const int id = getChildPropertyIndex(childAnimator.get());
     if(id == -1) return;
     ca_removeChildAnimator(childAnimator);
     if(!replaceWith) return;
@@ -35,6 +35,7 @@ Property *ComplexAnimator::ca_getChildAt(const int &i) {
     Q_ASSERT(i >= 0 && i < ca_mChildAnimators.count());
     return ca_mChildAnimators.at(i).data();
 }
+
 #include <QDebug>
 #include "singlewidgetabstraction.h"
 void ComplexAnimator::SWT_addChildrenAbstractions(
@@ -66,10 +67,8 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                           const bool &parentSatisfies,
                                           const bool &parentMainTarget) const {
     if(hasChildAnimators()) {
-        return Animator::SWT_shouldBeVisible(
-                    rules,
-                    parentSatisfies,
-                    parentMainTarget);
+        return Animator::SWT_shouldBeVisible(rules, parentSatisfies,
+                                             parentMainTarget);
     } else {
         return false;
     }
@@ -125,12 +124,10 @@ int ComplexAnimator::getChildPropertyIndex(Property *child) {
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
     for(const auto& ckey : anim_mKeys) {
-        stdsptr<ComplexKey> complexKey = GetAsSPtr(ckey, ComplexKey);
+        const auto complexKey = GetAsSPtr(ckey, ComplexKey);
         if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
-            if(complexKey->isEmpty() ) {
-                anim_removeKey(complexKey);
-            }
+            if(complexKey->isEmpty()) anim_removeKey(complexKey);
             ca_addDescendantsKey(key);
             break;
         }
@@ -138,20 +135,16 @@ void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
 }
 
 void ComplexAnimator::ca_moveChildAbove(Property *move, Property *above) {
-    int indexFrom = getChildPropertyIndex(move);
+    const int indexFrom = getChildPropertyIndex(move);
     int indexTo = getChildPropertyIndex(above);
-    if(indexFrom > indexTo) {
-        indexTo++;
-    }
+    if(indexFrom > indexTo) indexTo++;
     ca_moveChildInList(move, indexFrom, indexTo);
 }
 
 void ComplexAnimator::ca_moveChildBelow(Property *move, Property *below) {
-    int indexFrom = getChildPropertyIndex(move);
+    const int indexFrom = getChildPropertyIndex(move);
     int indexTo = getChildPropertyIndex(below);
-    if(indexFrom < indexTo) {
-        indexTo--;
-    }
+    if(indexFrom < indexTo) indexTo--;
     ca_moveChildInList(move, indexFrom, indexTo);
 }
 
@@ -184,7 +177,7 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
         if(property->prp_getName() == name) {
             return property.get();
         } else if(property->SWT_isComplexAnimator()) {
-            Property* propT = GetAsPtr(property, ComplexAnimator)->
+            const auto propT = GetAsPtr(property, ComplexAnimator)->
                     ca_getFirstDescendantWithName(name);
             if(propT) return propT;
         }
@@ -194,8 +187,8 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
 
 void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
                                             Property *animator2) {
-    int id1 = getChildPropertyIndex(animator1);
-    int id2 = getChildPropertyIndex(animator2);
+    const int id1 = getChildPropertyIndex(animator1);
+    const int id2 = getChildPropertyIndex(animator2);
     ca_mChildAnimators.swap(id1, id2);
 }
 
@@ -237,7 +230,7 @@ void ComplexAnimator::anim_drawKey(QPainter *p, Key *key,
     } else {
         p->setPen(QPen(Qt::black, 0.5));
     }
-    qreal keySize = keyRectSize*0.7;
+    const qreal keySize = keyRectSize*0.7;
     p->drawEllipse(
         QRectF(
             QPointF((key->getRelFrame() - startFrame + 0.5)*
@@ -250,7 +243,7 @@ void ComplexAnimator::anim_drawKey(QPainter *p, Key *key,
 void ComplexAnimator::prp_setParentFrameShift(const int &shift,
                                               ComplexAnimator* parentAnimator) {
     Property::prp_setParentFrameShift(shift, parentAnimator);
-    int thisShift = prp_getFrameShift();
+    const int thisShift = prp_getFrameShift();
     for(const auto &property : ca_mChildAnimators) {
         property->prp_setParentFrameShift(thisShift, this);
     }
@@ -328,14 +321,10 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     bool rec = true;
     bool childRecordingT = false;
     for(const auto &property : ca_mChildAnimators) {
-        bool isChildRec = property->prp_isRecording();
-        bool isChildDescRec = property->prp_isDescendantRecording();
-        if(isChildDescRec) {
-            childRecordingT = true;
-        }
-        if(!isChildRec) {
-            rec = false;
-        }
+        const bool isChildRec = property->prp_isRecording();
+        const bool isChildDescRec = property->prp_isDescendantRecording();
+        if(isChildDescRec) childRecordingT = true;
+        if(!isChildRec) rec = false;
     }
     if(childRecordingT != ca_mChildAnimatorRecording) {
         ca_mChildAnimatorRecording = childRecordingT;
@@ -350,7 +339,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
 }
 
 void ComplexAnimator::ca_addDescendantsKey(Key * const key) {
-    ComplexKey* collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());
+    auto collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());
     if(!collection) {
         auto newCollection = SPtrCreate(ComplexKey)(this);
         collection = newCollection.get();
@@ -361,8 +350,7 @@ void ComplexAnimator::ca_addDescendantsKey(Key * const key) {
 }
 
 void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
-    ComplexKey* collection =
-            ca_getKeyCollectionAtRelFrame(key->getRelFrame());
+    const auto collection = ca_getKeyCollectionAtRelFrame(key->getRelFrame());
     if(!collection) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty()) {
@@ -389,7 +377,7 @@ void ComplexKey::addOrMergeKey(const stdsptr<Key>& keyAdd) {
 }
 
 void ComplexKey::deleteKey() {
-    QList<stdptr<Key>> keys = mKeys;
+    const auto keys = mKeys;
     for(const auto& key : keys) {
         key->deleteKey();
     }
@@ -406,7 +394,7 @@ bool ComplexKey::isEmpty() const {
 void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);
 
-    int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
+    const int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
     for(const auto& key : mKeys) {
         key->setAbsFrame(absFrame);
     }
@@ -418,7 +406,7 @@ void ComplexKey::mergeWith(const stdsptr<Key>& key) {
 }
 
 void ComplexKey::margeAllKeysToKey(ComplexKey * const target) {
-    QList<stdptr<Key>> keys = mKeys;
+    const auto keys = mKeys;
     for(const auto& key : keys) {
         removeAnimatorKey(key);
         target->addOrMergeKey(GetAsSPtr(key, Key));
@@ -467,15 +455,13 @@ void ComplexKey::addToSelection(QList<qptr<Animator>> &selectedAnimators) {
 
 bool ComplexKey::hasKey(Key *key) const {
     for(const auto& keyT : mKeys) {
-        if(key == keyT) {
-            return true;
-        }
+        if(key == keyT) return true;
     }
     return false;
 }
 
 bool ComplexKey::differsFromKey(Key *otherKey) const {
-    ComplexKey* otherComplexKey = GetAsPtr(otherKey, ComplexKey);
+    const auto otherComplexKey = GetAsPtr(otherKey, ComplexKey);
     if(getChildKeysCount() == otherComplexKey->getChildKeysCount()) {
         for(const auto& key : mKeys) {
             if(otherComplexKey->hasSameKey(key)) continue;

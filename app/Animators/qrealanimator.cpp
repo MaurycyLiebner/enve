@@ -393,12 +393,10 @@ void QrealAnimator::prp_setAbsFrame(const int &frame) {
 }
 
 void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
-    QrealKey *keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
+    const auto keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
     if(!keyAtFrame) {
-        qreal value = qra_getValueAtAbsFrame(frame);
-        auto newKey = SPtrCreate(QrealKey)(this);
-        newKey->setRelFrame(frame);
-        newKey->setValue(value);
+        const qreal value = qra_getValueAtAbsFrame(frame);
+        const auto newKey = SPtrCreate(QrealKey)(value, frame, this);
         anim_appendKey(newKey);
         graph_updateKeysPath();
     } else {
@@ -413,8 +411,9 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
     }
 
     if(anim_mKeyOnCurrentFrame == nullptr) {
-        auto newKey = SPtrCreate(QrealKey)(anim_mCurrentRelFrame,
-                                           mCurrentValue, this);
+        auto newKey = SPtrCreate(QrealKey)(mCurrentValue,
+                                           anim_mCurrentRelFrame,
+                                           this);
         anim_appendKey(newKey);
         anim_mKeyOnCurrentFrame = newKey.get();
         graph_updateKeysPath();
