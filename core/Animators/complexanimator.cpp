@@ -341,9 +341,8 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
 void ComplexAnimator::ca_addDescendantsKey(Key * const key) {
     auto collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());
     if(!collection) {
-        auto newCollection = SPtrCreate(ComplexKey)(this);
+        auto newCollection = SPtrCreate(ComplexKey)(key->getAbsFrame(), this);
         collection = newCollection.get();
-        collection->setAbsFrame(key->getAbsFrame());
         anim_appendKey(newCollection);
     }
     collection->addAnimatorKey(key);
@@ -358,8 +357,10 @@ void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
     }
 }
 
-ComplexKey::ComplexKey(ComplexAnimator* parentAnimator) :
+ComplexKey::ComplexKey(const int &absFrame,
+                       ComplexAnimator * const parentAnimator) :
     Key(parentAnimator) {
+    setAbsFrame(absFrame);
 }
 
 void ComplexKey::addAnimatorKey(Key * const key) {
@@ -391,14 +392,14 @@ bool ComplexKey::isEmpty() const {
     return mKeys.isEmpty();
 }
 
-void ComplexKey::setRelFrame(const int &frame) {
-    Key::setRelFrame(frame);
+//void ComplexKey::setRelFrame(const int &frame) {
+//    Key::setRelFrame(frame);
 
-    const int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
-    for(const auto& key : mKeys) {
-        key->setAbsFrame(absFrame);
-    }
-}
+//    const int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
+//    for(const auto& key : mKeys) {
+//        key->setAbsFrame(absFrame);
+//    }
+//}
 
 void ComplexKey::mergeWith(const stdsptr<Key>& key) {
     GetAsPtr(key, ComplexKey)->margeAllKeysToKey(this);

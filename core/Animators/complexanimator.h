@@ -117,7 +117,7 @@ public:
 
     bool isEmpty() const;
 
-    void setRelFrame(const int &frame);
+//    void setRelFrame(const int &frame);
 
     void mergeWith(const stdsptr<Key> &key);
 
@@ -141,7 +141,8 @@ public:
 
     bool hasSameKey(Key *otherKey) const;
 protected:
-    ComplexKey(ComplexAnimator* parentAnimator);
+    ComplexKey(const int& absFrame,
+               ComplexAnimator * const parentAnimator);
 private:
     QList<stdptr<Key>> mKeys;
 };
