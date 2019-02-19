@@ -27,7 +27,6 @@ public:
             const int &relativeToFrame,
             const qreal &scaleFactor,
             const bool& useSavedFrame);
-    void setRelFrame(const int &frame);
 
     qreal getEndValue() const;
     qreal getStartValue() const;
@@ -109,6 +108,8 @@ public:
     void constrainStartCtrlValue(const qreal &minVal,
                                  const qreal &maxVal);
 protected:
+    void setRelFrame(const int &frame);
+
     qreal getEndValueDirectionForGraphForEndValue(const qreal& endVal) const {
         if(!hasNextKey()) return 0.;
         qreal nextValue = getNextKeyValueForGraph();

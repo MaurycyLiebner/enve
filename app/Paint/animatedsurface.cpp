@@ -82,8 +82,7 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
         }
     }
 
-    auto frameT = SPtrCreate(SurfaceKey)(this);
-    frameT->setRelFrame(relFrame);
+    auto frameT = SPtrCreate(SurfaceKey)(relFrame, this);
     if(prp_hasKeys()) {
         frameT->setSize(static_cast<ushort>(mWidth),
                         static_cast<ushort>(mHeight));
@@ -330,11 +329,14 @@ FrameRange AnimatedSurface::prp_getIdenticalRelFrameRange(const int &relFrame) c
             }
         }
     }
+    return range;
 }
 
-SurfaceKey::SurfaceKey(Animator *parentAnimator) :
-    Key(parentAnimator) {
-}
+SurfaceKey::SurfaceKey(Animator * const parentAnimator) :
+    Key(parentAnimator) {}
 
-SurfaceKey::~SurfaceKey() {
-}
+SurfaceKey::SurfaceKey(const int &relFrame,
+                       Animator * const parentAnimator) :
+    Key(relFrame, parentAnimator) {}
+
+SurfaceKey::~SurfaceKey() {}

@@ -11,6 +11,8 @@ class KeyCloner;
 class KeysClipboardContainer;
 
 class Key : public StdSelfRef {
+    friend class Animator;
+    friend class KeysClipboardContainer;
 public:
     Key(Animator * const parentAnimator);
     Key(const int &frame, Animator * const parentAnimator);
@@ -45,7 +47,6 @@ public:
 
 
     int getAbsFrame() const;
-    virtual void setRelFrame(const int &frame);
 
     bool hasPrevKey() const;
     bool hasNextKey() const;
@@ -116,6 +117,7 @@ public:
         updateAfterNextKeyChanged(nextKey);
     }
 protected:
+    virtual void setRelFrame(const int &frame);
     bool mIsSelected = false;
     bool mHovered = false;
 

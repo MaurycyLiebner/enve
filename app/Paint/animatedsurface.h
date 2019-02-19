@@ -30,7 +30,9 @@ public:
         mTiles->duplicateTilesContentFrom(tilesSrc);
     }
 protected:
-    SurfaceKey(Animator *parentAnimator);
+    SurfaceKey(Animator * const parentAnimator);
+    SurfaceKey(const int& relFrame,
+               Animator * const parentAnimator);
 private:
     stdsptr<TilesData> mTiles;
 };
