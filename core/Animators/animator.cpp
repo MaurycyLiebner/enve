@@ -73,32 +73,30 @@ void Animator::disableFakeComplexAnimatrIfNotNeeded() {
     }
 }
 
-int Animator::anim_getNextKeyRelFrame(const Key * const key) const {
-    if(!key) return FrameRange::EMAX;
-    Key* nextKey = key->getNextKey();
-    if(!nextKey) return FrameRange::EMAX;
-    return nextKey->getRelFrame();
-}
-
-int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
-    Key* nextKey = anim_getNextKey(relFrame);
-    if(!nextKey) return FrameRange::EMAX;
-    return nextKey->getRelFrame();
-}
-
 int Animator::anim_getPrevKeyRelFrame(const Key * const key) const {
     if(!key) return FrameRange::EMIN;
-    Key* prevKey = key->getPrevKey();
+    Key * const prevKey = key->getPrevKey();
     if(!prevKey) return FrameRange::EMIN;
     return prevKey->getRelFrame();
+}
+
+int Animator::anim_getNextKeyRelFrame(const Key * const key) const {
+    if(!key) return FrameRange::EMAX;
+    Key * const nextKey = key->getNextKey();
+    if(!nextKey) return FrameRange::EMAX;
+    return nextKey->getRelFrame();
 }
 
 int Animator::anim_getPrevKeyRelFrame(const int &relFrame) const {
-    Key* key = anim_getPrevKey(relFrame);
-    if(!key) return FrameRange::EMIN;
-    Key* prevKey = key->getPrevKey();
+    Key * const prevKey = anim_getPrevKey(relFrame);
     if(!prevKey) return FrameRange::EMIN;
     return prevKey->getRelFrame();
+}
+
+int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
+    Key * const nextKey = anim_getNextKey(relFrame);
+    if(!nextKey) return FrameRange::EMAX;
+    return nextKey->getRelFrame();
 }
 
 void Animator::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
@@ -177,9 +175,9 @@ void Animator::anim_mergeKeysIfNeeded() {
 bool Animator::anim_getClosestsKeyOccupiedRelFrame(const int &frame,
                                                    int &closest) {
     int nextT;
-    bool hasNext = prp_nextRelFrameWithKey(frame, nextT);
+    const bool hasNext = prp_nextRelFrameWithKey(frame, nextT);
     int prevT;
-    bool hasPrev = prp_prevRelFrameWithKey(frame, prevT);
+    const bool hasPrev = prp_prevRelFrameWithKey(frame, prevT);
     if(hasPrev && hasNext) {
         if(nextT - frame > frame - prevT) {
             closest = prevT;
@@ -215,13 +213,13 @@ int Animator::anim_getKeyIndex(const Key * const key) const {
 }
 
 Key* Animator::anim_getNextKey(const Key * const key) const {
-    int keyId = anim_getKeyIndex(key);
+    const int keyId = anim_getKeyIndex(key);
     if(keyId == anim_mKeys.count() - 1) return nullptr;
     return anim_mKeys.at(keyId + 1).get();
 }
 
 Key* Animator::anim_getPrevKey(const Key * const key) const {
-    int keyId = anim_getKeyIndex(key);
+    const int keyId = anim_getKeyIndex(key);
     if(keyId <= 0) return nullptr;
     return anim_mKeys.at(keyId - 1).get();
 }
@@ -284,8 +282,7 @@ Key *Animator::anim_getNextKey(const int &relFrame) const {
 }
 
 void Animator::anim_deleteCurrentKey() {
-    if(anim_mKeyOnCurrentFrame == nullptr) return;
-    anim_mKeyOnCurrentFrame->deleteKey();
+    if(anim_mKeyOnCurrentFrame) anim_mKeyOnCurrentFrame->deleteKey();
 }
 
 Key *Animator::anim_getKeyAtRelFrame(const int &frame) const {
@@ -322,11 +319,7 @@ bool Animator::anim_hasNextKey(const Key * const key) {
 }
 
 void Animator::anim_callFrameChangeUpdater() {
-    if(prp_mUpdater == nullptr) {
-        return;
-    } else {
-        prp_mUpdater->frameChangeUpdate();
-    }
+    if(prp_mUpdater) prp_mUpdater->frameChangeUpdate();
 }
 
 void Animator::anim_updateAfterShifted() {
@@ -378,17 +371,12 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
 }
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
-    Key* keyPtr = keyToRemove.get();
+    Key * const keyPtr = keyToRemove.get();
     keyToRemove->setSelected(false);
-
     anim_updateAfterChangedKey(keyPtr);
-
     emit prp_removingKey(keyPtr);
-
     anim_mKeys.removeAt(anim_getKeyIndex(keyPtr));
-
     //anim_sortKeys();
-
     anim_updateKeyOnCurrrentFrame();
 }
 

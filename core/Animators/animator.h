@@ -46,7 +46,7 @@ public:
     Key *anim_getKeyAtRelFrame(const int &frame) const;
     bool anim_hasPrevKey(const Key * const key);
     bool anim_hasNextKey(const Key * const key);
-    virtual void anim_callFrameChangeUpdater();
+    void anim_callFrameChangeUpdater();
     void anim_sortKeys();
 
     virtual void anim_appendKey(const stdsptr<Key> &newKey);
