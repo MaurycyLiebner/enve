@@ -339,12 +339,12 @@ void Animator::anim_sortKeys() {
 }
 
 int Animator::getInsertIdForKeyRelFrame(const int& relFrame) const {
-    return getInsertIdForKeyRelFrame(relFrame, 0, anim_mKeys.count() - 1);
+    return getInsertIdForKeyRelFrame(relFrame, 0, anim_mKeys.count());
 }
 
 int Animator::getInsertIdForKeyRelFrame(
         const int& relFrame, const int& min, const int& max) const {
-    if(min == max) return min;
+    if(min >= max) return min;
     const int guess = (max + min)/2;
     const Key * const key = anim_mKeys.at(guess).get();
     const int guessFrame = key->getRelFrame();
@@ -361,7 +361,7 @@ void Animator::anim_afterInsertedKey(const int& insertId,
                                      Key * const insertedKey) const {
     const auto prevKey = insertId == 0 ?
                 nullptr : anim_mKeys.at(insertId - 1).get();
-    const auto nextKey = insertId >= anim_mKeys.count() ?
+    const auto nextKey = insertId + 1 >= anim_mKeys.count() ?
                 nullptr : anim_mKeys.at(insertId + 1).get();
     if(prevKey) prevKey->updateAfterNextKeyChanged(insertedKey);
     insertedKey->updateAfterNeighbouringKeysChanged(prevKey, nextKey);
