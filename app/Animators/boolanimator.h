@@ -7,11 +7,8 @@ class BoolAnimator : public IntAnimator {
 public:
     bool getCurrentBoolValue();
     void setCurrentBoolValue(const bool &bT);
-    bool getCurrentBoolValueAtRelFrame(const int &relFrame) {
+    bool getCurrentBoolValueAtRelFrame(const qreal &relFrame) {
         return getCurrentIntValueAtRelFrame(relFrame) == 1;
-    }
-    bool getCurrentBoolValueAtRelFrameF(const qreal &relFrame) {
-        return getCurrentIntValueAtRelFrameF(relFrame) == 1;
     }
 
     bool SWT_isBoolAnimator() const { return true; }

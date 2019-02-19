@@ -34,7 +34,6 @@ public:
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction,
                                     QWidget* widgetsParent);
-    SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
     void setCurrentValue(const QString &text);
 

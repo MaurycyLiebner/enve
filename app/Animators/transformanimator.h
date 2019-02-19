@@ -41,7 +41,6 @@ public:
     void moveRelativeToSavedValue(const qreal &dX,
                                   const qreal &dY);
     virtual QMatrix getCurrentTransformationMatrix();
-    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
     virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 
     qreal dx();
@@ -77,8 +76,6 @@ public:
 
     bool SWT_isBasicTransformAnimator() const;
 
-    virtual QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
-    QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
     virtual QMatrix getCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
     QMatrix getParentCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
 
@@ -117,7 +114,6 @@ public:
     }
 
     QMatrix getCurrentTransformationMatrix();
-    QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 protected:
     Bone *mParentBone = nullptr;
@@ -130,9 +126,7 @@ public:
     void resetPivot();
     void reset();
     QMatrix getCurrentTransformationMatrix();
-    QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
-    QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
 
     void setPivotWithoutChangingTransformation(const QPointF &point);
     QPointF getPivot();
@@ -152,7 +146,6 @@ public:
 
     bool SWT_isBoxTransformAnimator() const { return true; }
 
-    qreal getOpacityAtRelFrame(const int &relFrame);
     qreal getOpacityAtRelFrameF(const qreal &relFrame);
 
     bool rotOrScaleOrPivotRecording();

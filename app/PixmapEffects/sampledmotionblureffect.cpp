@@ -28,13 +28,13 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
     if(!data->fParentIsTarget) return nullptr;
     auto renderData = SPtrCreate(SampledMotionBlurEffectRenderData)();
     renderData->opacity =
-            mOpacity->getCurrentEffectiveValueAtRelFrameF(relFrame)*0.01;
+            mOpacity->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
     renderData->numberSamples =
-            mNumberSamples->getCurrentEffectiveValueAtRelFrameF(relFrame);
+            mNumberSamples->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->boxData = data;
 
     int numberFrames = qCeil(renderData->numberSamples);
-    qreal frameStep = mFrameStep->getCurrentEffectiveValueAtRelFrameF(relFrame);
+    qreal frameStep = mFrameStep->getCurrentEffectiveValueAtRelFrame(relFrame);
     qreal relFrameT = relFrame - numberFrames*frameStep;
     for(int i = 0; i < numberFrames; i++) {
         if(!mParentBox->isRelFrameFVisibleAndInVisibleDurationRect(relFrameT)) {

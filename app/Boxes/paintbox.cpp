@@ -130,7 +130,7 @@ void PaintBox::selectAndAddContainedPointsToList(
     }
 }
 
-QRectF PaintBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+QRectF PaintBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
                   mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
 }

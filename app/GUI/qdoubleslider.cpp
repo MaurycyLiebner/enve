@@ -81,7 +81,7 @@ void QDoubleSlider::setNumberDecimals(int decimals) {
 }
 
 void QDoubleSlider::setValueNoUpdate(const qreal& value) {
-    mValue = qclamp(value, mMinValue, mMaxValue);
+    mValue = clamp(value, mMinValue, mMaxValue);
 }
 
 void QDoubleSlider::updateLineEditFromValue() {
@@ -136,7 +136,7 @@ void QDoubleSlider::paint(QPainter *p,
     if(!mTextEdit) {
         if(mShowValueSlider) {
             p->setPen(Qt::NoPen);
-            qreal valWidth = qclamp((mValue - mMinValue)*width()/(mMaxValue - mMinValue),
+            qreal valWidth = clamp((mValue - mMinValue)*width()/(mMaxValue - mMinValue),
                                     0., width() - 3.);
             p->setBrush(sliderFill);
             qreal heightRemoval = qMax(0., MIN_WIDGET_HEIGHT/2 - valWidth)*0.5;

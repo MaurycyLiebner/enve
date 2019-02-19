@@ -12,8 +12,7 @@ public:
     void qra_setCurrentValue(const QColor &qcolorValue);
 
     QColor getCurrentColor() const;
-    QColor getColorAtRelFrame(const int &relFrame);
-    QColor getColorAtRelFrameF(const qreal &relFrame);
+    QColor getColorAtRelFrame(const qreal &relFrame);
     void setColorMode(const ColorMode &colorMode);
 
     void startVal1Transform();

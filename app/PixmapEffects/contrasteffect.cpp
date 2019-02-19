@@ -15,7 +15,7 @@ stdsptr<PixmapEffectRenderData> ContrastEffect::getPixmapEffectRenderDataForRelF
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ContrastEffectRenderData)();
     renderData->contrast =
-            mContrastAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
+            mContrastAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mContrastAnimator->anim_hasKeys();
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

@@ -135,7 +135,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             //mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->path);
             qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                         prp_relFrameToAbsFrameF(relFrame));
-            mParentGroup->filterPathForRelFrameF(parentRelFrame, &pathData->fPath,
+            mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->fPath,
                                                 data->fParentBox.data());
             // !!! reversed
             mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->fPath);
@@ -150,10 +150,10 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             SkPath outlineBase = pathData->fPath;
             mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThicknessF(
                         relFrame, &outlineBase);
-            mParentGroup->filterOutlinePathBeforeThicknessForRelFrameF(
+            mParentGroup->filterOutlinePathBeforeThicknessForRelFrame(
                         relFrame, &outlineBase);
             SkStroke strokerSk;
-            mStrokeSettings->setStrokerSettingsForRelFrameSkF(relFrame, &strokerSk);
+            mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
             outline = SkPath();
             strokerSk.strokePath(outlineBase, &outline);
         } else {
@@ -161,7 +161,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         }
         if(getParentCanvas()->getPathEffectsVisible()) {
             mOutlinePathEffectsAnimators->filterPathForRelFrameF(relFrame, &outline);
-            mParentGroup->filterOutlinePathForRelFrameF(relFrame, &outline);
+            mParentGroup->filterOutlinePathForRelFrame(relFrame, &outline);
         }
         pathData->fOutlinePath = outline;
         outline.addPath(pathData->fPath);
@@ -172,7 +172,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     } else {
         pathData->fFillPath = pathData->fPath;
         mFillPathEffectsAnimators->filterPathForRelFrameF(relFrame, &pathData->fPath);
-        mParentGroup->filterFillPathForRelFrameF(relFrame, &pathData->fPath);
+        mParentGroup->filterFillPathForRelFrame(relFrame, &pathData->fPath);
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
@@ -183,12 +183,12 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
 
     fillSettings.fPaintColor = mFillSettings->
-            getColorAtRelFrameF(relFrame);
+            getColorAtRelFrame(relFrame);
     fillSettings.fPaintType = mFillSettings->getPaintType();
     Gradient *grad = mFillSettings->getGradient();
     if(grad) {
         fillSettings.updateGradient(
-                    grad->getQGradientStopsAtAbsFrameF(
+                    grad->getQGradientStopsAtAbsFrame(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mFillGradientPoints->getStartPointAtRelFrameF(relFrame),
                     mFillGradientPoints->getEndPointAtRelFrameF(relFrame),
@@ -213,12 +213,12 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         }
     }
     strokeSettings.fPaintColor = mStrokeSettings->
-            getColorAtRelFrameF(relFrame);
+            getColorAtRelFrame(relFrame);
     strokeSettings.fPaintType = mStrokeSettings->getPaintType();
     grad = mStrokeSettings->getGradient();
     if(grad) {
         strokeSettings.updateGradient(
-                    grad->getQGradientStopsAtAbsFrameF(
+                    grad->getQGradientStopsAtAbsFrame(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
                     mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
@@ -385,22 +385,6 @@ GradientPoints *PathBox::getStrokeGradientPoints() {
     return mStrokeGradientPoints.data();
 }
 
-SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame) {
-    SkPath path = getPathAtRelFrame(relFrame);
-    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path);
-    return path;
-}
-
-SkPath PathBox::getPathWithEffectsUntilGroupSumAtRelFrame(const int &relFrame) {
-    SkPath path = getPathAtRelFrame(relFrame);
-    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path);
-    if(!mParentGroup) return path;
-    int parentRelFrame = mParentGroup->prp_absFrameToRelFrame(
-                prp_relFrameToAbsFrame(relFrame));
-    mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, &path, this);
-    return path;
-}
-
 SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame) {
     SkPath path = getPathAtRelFrameF(relFrame);
     mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &path);
@@ -419,9 +403,9 @@ SkPath PathBox::getPathWithEffectsUntilGroupSumAtRelFrameF(const qreal &relFrame
     SkPath path = getPathAtRelFrameF(relFrame);
     mPathEffectsAnimators->filterPathForRelFrameF(relFrame, &path);
     if(!mParentGroup) return path;
-    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
+    const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
-    mParentGroup->filterPathForRelFrameUntilGroupSumF(parentRelFrame, &path);
+    mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, &path);
     return path;
 }
 
@@ -468,7 +452,7 @@ void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) 
     if(!fillSettings) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
-        PaintType paintType = fillSettings->getPaintType();
+        const PaintType paintType = fillSettings->getPaintType();
         mFillSettings->setPaintType(paintType);
         if(paintType == FLATPAINT) {
             mFillSettings->setCurrentColor(
@@ -487,7 +471,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
     if(!strokeSettings) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
-        PaintType paintType = strokeSettings->getPaintType();
+        const PaintType paintType = strokeSettings->getPaintType();
         mStrokeSettings->setPaintType(paintType);
         if(paintType == FLATPAINT || paintType == BRUSHPAINT) {
             mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
@@ -550,8 +534,8 @@ VectorPath *PathBox::objectToVectorPathBox() {
     auto newPath = SPtrCreate(VectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
-        auto circleT = GetAsPtr(this, Circle);
-        pathT.addEllipse(QPointF(0., 0.),
+        const auto circleT = GetAsPtr(this, Circle);
+        pathT.addEllipse(QPointF(0, 0),
                          circleT->getCurrentXRadius(),
                          circleT->getCurrentYRadius());
         newPath->loadPathFromSkPath(QPainterPathToSkPath(pathT));
@@ -593,7 +577,7 @@ void PathBox::updateStrokeDrawGradient() {
         Gradient *gradient = mStrokeSettings->getGradient();
 
         mStrokeGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
-                                         gradient->getLastQGradientStopQColor() );
+                                         gradient->getLastQGradientStopQColor());
 
         if(!mStrokeGradientPoints->enabled()) {
             mStrokeGradientPoints->enable();
@@ -608,8 +592,8 @@ void PathBox::updateDrawGradients() {
     updateStrokeDrawGradient();
 }
 
-QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
-    SkPath path = getPathAtRelFrame(relFrame);
+QRectF PathBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
+    const SkPath path = getPathAtRelFrameF(relFrame);
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {
         SkStroke strokerSk;
@@ -619,7 +603,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     } else {
         outline = SkPath();
     }
-    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
+    mOutlinePathEffectsAnimators->filterPathForRelFrameF(relFrame, &outline);
     outline.addPath(path);
     return SkRectToQRectF(outline.computeTightBounds());
 }
@@ -639,7 +623,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) const {
-    SkPoint relPosSk = qPointToSk(relPos);
+    const SkPoint relPosSk = qPointToSk(relPos);
     if(mSkRelBoundingRectPath.contains(relPosSk.x(), relPosSk.y()) ) {
         if(mFillPathSk.contains(relPosSk.x(), relPosSk.y())) {
             return true;

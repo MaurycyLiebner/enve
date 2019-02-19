@@ -15,16 +15,12 @@ int IntAnimator::getCurrentIntValue() const {
     return qRound(qra_getCurrentValue());
 }
 
-int IntAnimator::getCurrentIntValueAtRelFrame(const int &relFrame) const {
+int IntAnimator::getCurrentIntValueAtRelFrame(const qreal &relFrame) const {
     return qRound(getCurrentValueAtRelFrame(relFrame));
 }
 
-int IntAnimator::getCurrentIntValueAtRelFrameF(const qreal &relFrame) const {
-    return qRound(getCurrentValueAtRelFrameF(relFrame));
-}
-
-int IntAnimator::getCurrentIntEffectiveValueAtRelFrameF(const qreal &relFrame) const {
-    return qRound(getCurrentEffectiveValueAtRelFrameF(relFrame));
+int IntAnimator::getCurrentIntEffectiveValueAtRelFrame(const qreal &relFrame) const {
+    return qRound(getCurrentEffectiveValueAtRelFrame(relFrame));
 }
 
 void IntAnimator::setCurrentIntValue(const int &value) {

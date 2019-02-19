@@ -55,32 +55,16 @@ void Rectangle::finishAllPointsTransform() {
     finishTransform();
 }
 
-SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
-    SkPath path;
-    SkPoint topLeft =
-            qPointToSk(mTopLeftAnimator->
-                                getCurrentEffectivePointValueAtRelFrame(relFrame));
-    SkPoint bottomRight =
-            qPointToSk(mBottomRightAnimator->
-                                getCurrentEffectivePointValueAtRelFrame(relFrame));
-    QPointF radiusAtFrame =
-            mRadiusAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
-    path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
-                                       bottomRight.x(), bottomRight.y()),
-                      radiusAtFrame.x(), radiusAtFrame.y());
-    return path;
-}
-
 SkPath Rectangle::getPathAtRelFrameF(const qreal &relFrame) {
     SkPath path;
-    SkPoint topLeft =
+    const SkPoint topLeft =
             qPointToSk(mTopLeftAnimator->
-                                getCurrentEffectivePointValueAtRelFrameF(relFrame));
-    SkPoint bottomRight =
+                                getCurrentEffectivePointValueAtRelFrame(relFrame));
+    const SkPoint bottomRight =
             qPointToSk(mBottomRightAnimator->
-                                getCurrentEffectivePointValueAtRelFrameF(relFrame));
-    QPointF radiusAtFrame =
-            mRadiusAnimator->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+                                getCurrentEffectivePointValueAtRelFrame(relFrame));
+    const QPointF radiusAtFrame =
+            mRadiusAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
     path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
                                        bottomRight.x(), bottomRight.y()),
                       radiusAtFrame.x(), radiusAtFrame.y());

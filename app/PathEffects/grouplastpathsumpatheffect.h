@@ -8,12 +8,6 @@ public:
     GroupLastPathSumPathEffect(BoxesGroup *parentPath,
                                const bool &outlinePathEffect);
 
-
-    void filterPathForRelFrame(const int &relFrame,
-                               const SkPath &src,
-                               SkPath *dst,
-                               const qreal &,
-                               const bool &groupPathSum);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath *dst,

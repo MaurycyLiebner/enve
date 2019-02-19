@@ -10,9 +10,8 @@ public:
     void setIntValueRange(const int &minVal, const int &maxVal);
 
     bool SWT_isIntAnimator() const { return true; }
-    int getCurrentIntValueAtRelFrame(const int &relFrame) const;
-    int getCurrentIntValueAtRelFrameF(const qreal &relFrame) const;
-    int getCurrentIntEffectiveValueAtRelFrameF(const qreal &relFrame) const;
+    int getCurrentIntValueAtRelFrame(const qreal &relFrame) const;
+    int getCurrentIntEffectiveValueAtRelFrame(const qreal &relFrame) const;
 protected:
     IntAnimator(const QString& name);
     IntAnimator(const int &iniVal,

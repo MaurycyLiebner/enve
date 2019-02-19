@@ -25,9 +25,7 @@ void ExternalLinkBox::changeSrc(QWidget* dialogParent) {
                                                "Link File",
                                                "",
                                                "AniVect Files (*.av)");
-    if(!src.isEmpty()) {
-        setSrc(src);
-    }
+    if(!src.isEmpty()) setSrc(src);
 }
 
 void ExternalLinkBox::setSrc(const QString &src) {
@@ -64,7 +62,7 @@ void InternalLinkBox::setupBoundingBoxRenderDataForRelFrameF(
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
 }
 
-QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }
 
@@ -169,7 +167,7 @@ stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
     return renderData;
 }
 
-QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }
 
@@ -207,7 +205,7 @@ void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
     auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
     qsptr<Canvas> canvasTarget = GetAsSPtr(finalTarget, Canvas);
     canvasData->fBgColor = QColorToSkColor(canvasTarget->getBgColorAnimator()->
-            getColorAtRelFrameF(relFrame));
+            getColorAtRelFrame(relFrame));
     //qreal res = getParentCanvas()->getResolutionFraction();
     canvasData->canvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->canvasWidth = canvasTarget->getCanvasWidth();//*res;

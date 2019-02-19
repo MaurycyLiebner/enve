@@ -9,10 +9,8 @@ public:
     qreal getXValue();
     qreal getYValue();
 
-    qreal getXValueAtRelFrame(const int &relFrame);
-    qreal getYValueAtRelFrame(const int &relFrame);
-    qreal getXValueAtRelFrameF(const qreal &relFrame);
-    qreal getYValueAtRelFrameF(const qreal &relFrame);
+    qreal getXValueAtRelFrame(const qreal &relFrame);
+    qreal getYValueAtRelFrame(const qreal &relFrame);
 
     void setCurrentPointValue(const QPointF &val);
     void incCurrentValues(const qreal &x, const qreal &y);
@@ -35,10 +33,8 @@ public:
     void setValuesRange(const qreal &minVal,
                         const qreal &maxVal);
     QPointF getCurrentPointValue() const;
-    QPointF getCurrentPointValueAtAbsFrame(const int &frame) const;
-    QPointF getCurrentPointValueAtRelFrame(const int &frame) const;
     QPointF getCurrentPointValueAtAbsFrameF(const qreal &frame) const;
-    QPointF getCurrentPointValueAtRelFrameF(const qreal &frame) const;
+    QPointF getCurrentPointValueAtRelFrame(const qreal &frame) const;
 
     void setPrefferedValueStep(const qreal &valueStep);
 
@@ -47,15 +43,11 @@ public:
     void readProperty(QIODevice *target);
 
     bool getBeingTransformed();
-    QPointF getCurrentEffectivePointValueAtAbsFrame(const int &frame) const;
-    QPointF getCurrentEffectivePointValueAtRelFrame(const int &frame) const;
     QPointF getCurrentEffectivePointValueAtAbsFrameF(const qreal &frame) const;
-    QPointF getCurrentEffectivePointValueAtRelFrameF(const qreal &frame) const;
+    QPointF getCurrentEffectivePointValueAtRelFrame(const qreal &frame) const;
     QPointF getCurrentEffectivePointValue() const;
-    qreal getEffectiveXValueAtRelFrame(const int &relFrame);
-    qreal getEffectiveYValueAtRelFrame(const int &relFrame);
-    qreal getEffectiveXValueAtRelFrameF(const qreal &relFrame);
-    qreal getEffectiveYValueAtRelFrameF(const qreal &relFrame);
+    qreal getEffectiveXValueAtRelFrame(const qreal &relFrame);
+    qreal getEffectiveYValueAtRelFrame(const qreal &relFrame);
     qreal getEffectiveXValue();
     qreal getEffectiveYValue();
 protected:

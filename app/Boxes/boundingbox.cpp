@@ -540,7 +540,7 @@ QMatrix BoundingBox::getCombinedTransform() const {
 }
 
 QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() {
-    return getRelativeTransformAtRelFrame(anim_mCurrentRelFrame);
+    return getRelativeTransformAtRelFrameF(anim_mCurrentRelFrame);
 }
 
 void BoundingBox::applyTransformation(BoxTransformAnimator *transAnimator) {
@@ -595,7 +595,7 @@ QRectF BoundingBox::getRelBoundingRect() const {
     return mRelBoundingRect;
 }
 
-QRectF BoundingBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+QRectF BoundingBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     Q_UNUSED(relFrame);
     return getRelBoundingRect();
 }
@@ -963,10 +963,6 @@ void BoundingBox::shiftAll(const int &shift) {
     } else {
         anim_shiftAllKeys(shift);
     }
-}
-
-QMatrix BoundingBox::getRelativeTransformAtRelFrame(const int &relFrame) {
-    return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
 }
 
 QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {

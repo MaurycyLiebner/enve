@@ -85,16 +85,16 @@ public:
         return margin;
     }
 
-    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     bool SWT_isLinkBox() const { return true; }
 
-    QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
+    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {
         if(mParentGroup == nullptr ? false : mParentGroup->SWT_isLinkBox()) {
-            return getLinkTarget()->getRelativeTransformAtRelFrame(relFrame);
+            return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
         } else {
-            return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
+            return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
         }
     }
     bool isRelFrameInVisibleDurationRect(const int &relFrame) const;
@@ -173,17 +173,17 @@ public:
     }
 
     stdsptr<BoundingBoxRenderData> createRenderData();
-    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     bool SWT_isBoxesGroup() const { return false; }
 
-    QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
+    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {
         if(getLinkTarget()->SWT_isLinkBox()) {
-            return BoundingBox::getRelativeTransformAtRelFrame(relFrame)*
-                    getLinkTarget()->getRelativeTransformAtRelFrame(relFrame);
+            return BoundingBox::getRelativeTransformAtRelFrameF(relFrame)*
+                    getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
         } else {
-            return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
+            return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
         }
     }
 
@@ -197,11 +197,11 @@ public:
         }
     }
 
-    qreal getEffectsMarginAtRelFrame(const int &relFrame) {
+    qreal getEffectsMarginAtRelFrameF(const qreal &relFrame) {
         if(mParentGroup->SWT_isLinkBox()) {
-            return getLinkTarget()->getEffectsMarginAtRelFrame(relFrame);
+            return getLinkTarget()->getEffectsMarginAtRelFrameF(relFrame);
         }
-        return BoxesGroup::getEffectsMarginAtRelFrame(relFrame);
+        return BoxesGroup::getEffectsMarginAtRelFrameF(relFrame);
     }
 
     const SkBlendMode &getBlendMode() {

@@ -517,15 +517,11 @@ public:
     }
 
     void tabletEvent(QTabletEvent *e, const QPointF &absPos);
-    QRectF getRelBoundingRectAtRelFrame(const int &);
+    QRectF getRelBoundingRectAtRelFrame(const qreal &);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     bool anim_prevRelFrameWithKey(const int &relFrame, int &prevRelFrame);
     bool anim_nextRelFrameWithKey(const int &relFrame, int &nextRelFrame);
-    QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
-        Q_UNUSED(relFrame);
-        return QMatrix();
-    }
     void applyDiscreteFillPathEffectToSelected();
     void applyDuplicateFillPathEffectToSelected();
     void applySumFillPathEffectToSelected();

@@ -64,17 +64,23 @@ public:
     void qra_setValueRange(const qreal &minVal,
                            const qreal &maxVal);
 
-    qreal qra_getValueAtAbsFrame(const int &frame) const;
+    qreal qra_getValueAtAbsFrame(const qreal &frame) const;
     qreal qra_getCurrentValue() const;
     qreal qra_getCurrentEffectiveValue();
+    qreal qra_getValueAtRelFrame(const qreal &frame) const;
+    qreal qra_getEffectiveValueAtRelFrame(const qreal &frame) const;
+    qreal getCurrentEffectiveValueAtRelFrame(const qreal &frame) const;
+    qreal getCurrentEffectiveValueAtAbsFrameF(const qreal &frame);
+    qreal qra_getValueAtRelFrame(const qreal &frame,
+                                  const QrealKey * const prevKey,
+                                  const QrealKey * const nextKey) const;
+    qreal getCurrentValueAtRelFrame(const qreal &frame) const;
+    qreal getCurrentValueAtAbsFrameF(const qreal &frame);
+
     void qra_setCurrentValue(qreal newValue);
     void qra_updateValueFromCurrentFrame();
     void qra_saveCurrentValueToKey(QrealKey *key);
     void qra_saveValueToKey(QrealKey *key, const qreal &value);
-
-    qreal qra_getValueAtRelFrame(const int &frame,
-                                 const QrealKey * const prevKey,
-                                 const QrealKey * const nextKey) const;
 
 
     qreal qra_getPrevKeyValue(const QrealKey * const key);
@@ -107,29 +113,11 @@ public:
     const int &getNumberDecimals() { return mDecimals; }
     void setNumberDecimals(const int &decimals) { mDecimals = decimals; }
 
-    qreal getCurrentValueAtAbsFrame(const int &frame);
-    qreal getCurrentValueAtRelFrame(const int &frame) const;
-    qreal qra_getValueAtRelFrame(const int &frame) const;
-
     bool getBeingTransformed() { return mTransformed; }
 
     void setGenerator(const qsptr<RandomQrealGenerator> &generator);
 
     bool qra_hasNoise();
-
-    qreal qra_getEffectiveValueAtRelFrame(const int &frame) const;
-    qreal qra_getEffectiveValueAtAbsFrame(const int &frame) const;
-    qreal getCurrentEffectiveValueAtRelFrame(const int &frame) const;
-    qreal getCurrentEffectiveValueAtAbsFrame(const int &frame);
-    qreal qra_getValueAtRelFrameF(const qreal &frame) const;
-    qreal qra_getEffectiveValueAtRelFrameF(const qreal &frame) const;
-    qreal getCurrentEffectiveValueAtRelFrameF(const qreal &frame) const;
-    qreal getCurrentEffectiveValueAtAbsFrameF(const qreal &frame);
-    qreal qra_getValueAtRelFrameF(const qreal &frame,
-                                  const QrealKey * const prevKey,
-                                  const QrealKey * const nextKey) const;
-    qreal getCurrentValueAtRelFrameF(const qreal &frame) const;
-    qreal getCurrentValueAtAbsFrameF(const qreal &frame);
 
     static auto create0to1Animator(const QString& name) {
         auto anim = SPtrCreate(QrealAnimator)(0., 0., 1., 0.01, name);

@@ -108,38 +108,10 @@ bool TextBox::handleSelectedCanvasAction(QAction *selectedAction,
     return true;
 }
 
-SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
-    QPainterPath qPath = QPainterPath();
-
-    qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
-    QString textAtFrame = mText->getValueAtRelFrame(relFrame);
-    QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
-    QFontMetricsF fm(mFont);
-    qreal yT = 0.;
-    qreal maxWidth = 0.;
-    for(QString line : lines) {
-        qreal lineWidth = fm.width(line);
-        if(lineWidth > maxWidth) maxWidth = lineWidth;
-    }
-    for(QString line : lines) {
-        qreal lineWidth = fm.width(line);
-        qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
-                      yT, mFont, line);
-        yT += fm.height()*linesDistAtFrame;
-    }
-
-    // !!! remove so that text stays at the same position after changing string
-    // QRectF boundingRect = qPath.boundingRect();
-    // qPath.translate(-boundingRect.center());
-    //
-
-    return QPainterPathToSkPath(qPath);
-}
-
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     QPainterPath qPath = QPainterPath();
 
-    qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrameF(relFrame)*0.01;
+    qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
     QString textAtFrame = mText->getValueAtRelFrame(relFrame);
     QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);

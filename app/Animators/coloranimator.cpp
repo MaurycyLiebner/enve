@@ -51,28 +51,11 @@ QColor ColorAnimator::getCurrentColor() const {
     return color;
 }
 
-QColor ColorAnimator::getColorAtRelFrame(const int &relFrame) {
+QColor ColorAnimator::getColorAtRelFrame(const qreal &relFrame) {
     qreal val1 = mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame);
     qreal val2 = mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame);
     qreal val3 = mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame);
     qreal alpha = mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
-
-    QColor color;
-    if(mColorMode == RGBMODE) {
-        color.setRgbF(val1, val2, val3, alpha);
-    } else if(mColorMode == HSVMODE) {
-        color.setHsvF(val1, val2, val3, alpha);
-    } else { // HSLMODE
-        color.setHslF(val1, val2, val3, alpha);
-    }
-    return color;
-}
-
-QColor ColorAnimator::getColorAtRelFrameF(const qreal &relFrame) {
-    qreal val1 = mVal1Animator->qra_getEffectiveValueAtRelFrameF(relFrame);
-    qreal val2 = mVal2Animator->qra_getEffectiveValueAtRelFrameF(relFrame);
-    qreal val3 = mVal3Animator->qra_getEffectiveValueAtRelFrameF(relFrame);
-    qreal alpha = mAlphaAnimator->qra_getEffectiveValueAtRelFrameF(relFrame);
 
     QColor color;
     if(mColorMode == RGBMODE) {
@@ -121,9 +104,9 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
     for(const auto &key : anim_mKeys) {
         int frame = key->getAbsFrame();
 
-        qreal rF = mVal1Animator->getCurrentValueAtAbsFrame(frame);
-        qreal gF = mVal2Animator->getCurrentValueAtAbsFrame(frame);
-        qreal bF = mVal3Animator->getCurrentValueAtAbsFrame(frame);
+        qreal rF = mVal1Animator->getCurrentValueAtAbsFrameF(frame);
+        qreal gF = mVal2Animator->getCurrentValueAtAbsFrameF(frame);
+        qreal bF = mVal3Animator->getCurrentValueAtAbsFrameF(frame);
 
         foo(rF, gF, bF);
 

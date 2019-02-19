@@ -41,7 +41,7 @@ QPointF AnimatedPoint::getRelativePos() const {
     return mAssociatedAnimator_k->getCurrentPointValue();
 }
 
-QPointF AnimatedPoint::getRelativePosAtRelFrame(const int &frame) const {
+QPointF AnimatedPoint::getRelativePosAtRelFrame(const qreal &frame) const {
     return mAssociatedAnimator_k->getCurrentPointValueAtRelFrame(frame);
 }
 

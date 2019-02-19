@@ -23,7 +23,6 @@ public:
     void finishAllPointsTransform();
 
     bool SWT_isRectangle() const { return true; }
-    SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
     void setTopLeftPos(const QPointF &pos);

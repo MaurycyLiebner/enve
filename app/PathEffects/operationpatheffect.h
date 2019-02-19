@@ -9,12 +9,6 @@ public:
     OperationPathEffect(PathBox *parentPath,
                         const bool &outlinePathEffect);
 
-
-    void filterPathForRelFrame(const int &relFrame,
-                               const SkPath &src,
-                               SkPath *dst,
-                               const qreal &,
-                               const bool &);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath *dst,

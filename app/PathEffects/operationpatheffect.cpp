@@ -18,17 +18,6 @@ OperationPathEffect::OperationPathEffect(PathBox *parentPath,
     ca_addChildAnimator(mOperationType);
 }
 
-void OperationPathEffect::filterPathForRelFrame(const int &relFrame,
-                                          const SkPath &src,
-                                          SkPath *dst,
-                                          const qreal &,
-                                          const bool &) {
-    PathBox *pathBox = GetAsPtr(mBoxTarget->getTarget(), PathBox);
-    QString operation = mOperationType->getCurrentValueName();
-    gApplyOperation(relFrame, src, dst, pathBox,
-             mParentPathBox, operation);
-}
-
 void OperationPathEffect::filterPathForRelFrameF(const qreal &relFrame,
                                            const SkPath &src,
                                            SkPath *dst,

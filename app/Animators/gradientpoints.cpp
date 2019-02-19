@@ -75,11 +75,11 @@ QPointF GradientPoints::getEndPointAtRelFrame(const int &relFrame) {
 }
 
 QPointF GradientPoints::getStartPointAtRelFrameF(const qreal &relFrame) {
-    return mStartAnimator->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+    return mStartAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrameF(const qreal &relFrame) {
-    return mEndAnimator->getCurrentEffectivePointValueAtRelFrameF(relFrame);
+    return mEndAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
 }
 
 void GradientPoints::setColors(const QColor& startColor,

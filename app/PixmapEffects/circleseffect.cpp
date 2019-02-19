@@ -21,9 +21,9 @@ stdsptr<PixmapEffectRenderData> CirclesEffect::getPixmapEffectRenderDataForRelFr
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(CirclesEffectRenderData)();
     renderData->circlesDistance =
-            mCirclesDistance->getCurrentEffectiveValueAtRelFrameF(relFrame);
+            mCirclesDistance->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->circlesRadius =
-            mCirclesRadius->getCurrentEffectiveValueAtRelFrameF(relFrame);
+            mCirclesRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
 
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

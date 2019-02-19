@@ -8,11 +8,6 @@ class SolidifyPathEffect : public PathEffect {
 public:
     SolidifyPathEffect(const bool &outlinePathEffect);
 
-    void filterPathForRelFrame(const int &relFrame,
-                               const SkPath &src,
-                               SkPath *dst,
-                               const qreal &scale = 1.,
-                               const bool & = false);
     void filterPathForRelFrameF(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath *dst,

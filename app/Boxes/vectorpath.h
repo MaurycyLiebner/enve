@@ -41,7 +41,6 @@ public:
                                    const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<stdptr<MovablePoint>> &list);
-    SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
 

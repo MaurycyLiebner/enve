@@ -121,7 +121,7 @@ public:
     StrokeSettings *getStrokeSettings() const;
     void updateAllBoxes(const UpdateReason &reason);
 
-    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
     void applyCurrentTransformation();
 
@@ -194,30 +194,16 @@ public:
 
     void updateAllChildPathBoxes(const UpdateReason &reason);
 
-    void filterPathForRelFrame(const int &relFrame,
+    void filterPathForRelFrame(const qreal &relFrame,
                                SkPath *srcDstPath,
                                BoundingBox *box);
-    void filterPathForRelFrameUntilGroupSum(const int &relFrame,
-                                            SkPath *srcDstPath,
-                                            BoundingBox *box);
-    void filterOutlinePathBeforeThicknessForRelFrame(const int &relFrame,
-                                                     SkPath *srcDstPath,
-                                                     BoundingBox *box);
-    void filterOutlinePathForRelFrame(const int &relFrame,
-                                      SkPath *srcDstPath);
-    void filterFillPathForRelFrame(const int &relFrame,
-                                   SkPath *srcDstPath);
-
-    void filterPathForRelFrameF(const qreal &relFrame,
-                               SkPath *srcDstPath,
-                               BoundingBox *box);
-    void filterPathForRelFrameUntilGroupSumF(const qreal &relFrame,
+    void filterPathForRelFrameUntilGroupSum(const qreal &relFrame,
                                             SkPath *srcDstPath);
-    void filterOutlinePathBeforeThicknessForRelFrameF(const qreal &relFrame,
+    void filterOutlinePathBeforeThicknessForRelFrame(const qreal &relFrame,
                                                      SkPath *srcDstPath);
-    void filterOutlinePathForRelFrameF(const qreal &relFrame,
+    void filterOutlinePathForRelFrame(const qreal &relFrame,
                                       SkPath *srcDstPath);
-    void filterFillPathForRelFrameF(const qreal &relFrame,
+    void filterFillPathForRelFrame(const qreal &relFrame,
                                    SkPath *srcDstPath);
 //    bool anim_nextRelFrameWithKey(const int &relFrame,
 //                                 int &nextRelFrame);

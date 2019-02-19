@@ -162,10 +162,6 @@ void VectorPath::selectAndAddContainedPointsToList(const QRectF &absRect,
     mPathAnimator->selectAndAddContainedPointsToList(absRect, list);
 }
 
-SkPath VectorPath::getPathAtRelFrame(const int &relFrame) {
-     return mPathAnimator->getPathAtRelFrame(relFrame);
-}
-
 SkPath VectorPath::getPathAtRelFrameF(const qreal &relFrame) {
      return mPathAnimator->getPathAtRelFrameF(relFrame);
 }

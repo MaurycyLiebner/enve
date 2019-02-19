@@ -70,17 +70,11 @@ public:
     bool SWT_isCircle() const;
 
     void startAllPointsTransform();
-    SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 
-    qreal getXRadiusAtRelFrame(const int &relFrame);
-
-    qreal getYRadiusAtRelFrame(const int &relFrame);
-
     qreal getCurrentXRadius();
-
     qreal getCurrentYRadius();
 
     bool differenceInEditPathBetweenFrames(

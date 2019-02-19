@@ -279,25 +279,13 @@ void Gradient::startColorIdTransform(int id) {
     mColors.at(id)->prp_startTransform();
 }
 
-QGradientStops Gradient::getQGradientStopsAtAbsFrame(const int &absFrame) {
+QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal &absFrame) {
     QGradientStops stops;
-    const qreal inc = 1./(mColors.length() - 1.);
+    const qreal inc = 1./(mColors.length() - 1);
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
-        stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
+        stops.append(QPair<qreal, QColor>(clamp(cPos, 0, 1),
                      mColors.at(i)->getColorAtRelFrame(absFrame)) );
-        cPos += inc;
-    }
-    return stops;
-}
-
-QGradientStops Gradient::getQGradientStopsAtAbsFrameF(const qreal &absFrame) {
-    QGradientStops stops;
-    const qreal inc = 1./(mColors.length() - 1.);
-    qreal cPos = 0.;
-    for(int i = 0; i < mColors.length(); i++) {
-        stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                     mColors.at(i)->getColorAtRelFrameF(absFrame)) );
         cPos += inc;
     }
     return stops;
@@ -383,12 +371,8 @@ QColor PaintSettings::getCurrentColor() const {
     return mColor->getCurrentColor();
 }
 
-QColor PaintSettings::getColorAtRelFrame(const int &relFrame) const {
+QColor PaintSettings::getColorAtRelFrame(const qreal &relFrame) const {
     return mColor->getColorAtRelFrame(relFrame);
-}
-
-QColor PaintSettings::getColorAtRelFrameF(const qreal &relFrame) const {
-    return mColor->getColorAtRelFrameF(relFrame);
 }
 
 const PaintType& PaintSettings::getPaintType() const {
@@ -498,17 +482,9 @@ void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
-void StrokeSettings::setStrokerSettingsForRelFrameSk(const int &relFrame,
+void StrokeSettings::setStrokerSettingsForRelFrameSk(const qreal &relFrame,
                                                      SkStroke *stroker) {
     qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame);
-    stroker->setWidth(qrealToSkScalar(widthT));
-    stroker->setCap(QCapToSkCap(mCapStyle));
-    stroker->setJoin(QJoinToSkJoin(mJoinStyle));
-}
-
-void StrokeSettings::setStrokerSettingsForRelFrameSkF(const qreal &relFrame,
-                                                      SkStroke *stroker) {
-    qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrameF(relFrame);
     stroker->setWidth(qrealToSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));

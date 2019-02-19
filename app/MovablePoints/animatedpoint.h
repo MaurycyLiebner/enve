@@ -39,7 +39,7 @@ public:
 
     virtual void applyTransform(const QMatrix &transform);
 
-    virtual QPointF getRelativePosAtRelFrame(const int &frame) const;
+    QPointF getRelativePosAtRelFrame(const qreal &frame) const;
 protected:
     AnimatedPoint(
             QPointFAnimator* associatedAnimator,

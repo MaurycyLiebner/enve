@@ -79,9 +79,7 @@ extern qreal degreesBetweenVectors(const QPointF &pt1,
 extern qreal radiansBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
 
-extern qreal clamp(qreal val, qreal min, qreal max);
-
-extern qreal qclamp(qreal val, qreal min, qreal max);
+extern qreal clamp(const qreal &val, const qreal &min, const qreal &max);
 
 extern qreal gRandF(const qreal &fMin = 0., const qreal &fMax = 1.);
 extern SkScalar gSkRandF(const SkScalar &fMin = 0.f, const SkScalar &fMax = 1.f);

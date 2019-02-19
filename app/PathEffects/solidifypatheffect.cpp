@@ -10,19 +10,10 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mDisplacement);
 }
 
-void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
-                                               const SkPath &src,
-                                               SkPath *dst,
-                                               const qreal &scale,
-                                               const bool &) {
-    qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame)/scale;
-    gSolidify(widthT, src, dst);
-}
-
 void SolidifyPathEffect::filterPathForRelFrameF(const qreal &relFrame,
                                                 const SkPath &src,
                                                 SkPath *dst,
                                                 const bool &) {
-    qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrameF(relFrame);
+    qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame);
     gSolidify(widthT, src, dst);
 }

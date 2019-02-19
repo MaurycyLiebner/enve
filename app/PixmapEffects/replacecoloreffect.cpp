@@ -21,8 +21,8 @@ ReplaceColorEffect::ReplaceColorEffect() :
 stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ReplaceColorEffectRenderData)();
-    QColor fromColor = mFromColor->getColorAtRelFrameF(relFrame);
-    QColor toColor = mToColor->getColorAtRelFrameF(relFrame);
+    QColor fromColor = mFromColor->getColorAtRelFrame(relFrame);
+    QColor toColor = mToColor->getColorAtRelFrame(relFrame);
 
     renderData->redR = qRound(fromColor.red()*fromColor.alphaF());
     renderData->greenR = qRound(fromColor.green()*fromColor.alphaF());
@@ -35,9 +35,9 @@ stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataFor
     renderData->alphaT = toColor.alpha();
 
     renderData->tolerance = qRound(mToleranceAnimator->
-            getCurrentEffectiveValueAtRelFrameF(relFrame)*255);
+            getCurrentEffectiveValueAtRelFrame(relFrame)*255);
     renderData->smoothness = mSmoothnessAnimator->
-            getCurrentEffectiveValueAtRelFrameF(relFrame);
+            getCurrentEffectiveValueAtRelFrame(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

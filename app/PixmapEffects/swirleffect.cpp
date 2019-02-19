@@ -15,7 +15,7 @@ stdsptr<PixmapEffectRenderData> SwirlEffect::getPixmapEffectRenderDataForRelFram
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(SwirlEffectRenderData)();
     renderData->degrees =
-            mDegreesAnimator->getCurrentEffectiveValueAtRelFrameF(relFrame);
+            mDegreesAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

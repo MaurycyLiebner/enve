@@ -143,40 +143,15 @@ void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
     }
 }
 
-SkPath Circle::getPathAtRelFrame(const int &relFrame) {
+SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
     SkScalar xRadius = static_cast<SkScalar>(
                 mHorizontalRadiusAnimator->getEffectiveXValueAtRelFrame(relFrame));
     SkScalar yRadius = static_cast<SkScalar>(
                 mVerticalRadiusAnimator->getEffectiveYValueAtRelFrame(relFrame));
-//    QPainterPath pathT;
-//    pathT.addEllipse(QPointF(0., 0.), xRadius, yRadius);
-//    return QPainterPathToSkPath(pathT);
     SkPath path;
     path.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
                                   2*xRadius, 2*yRadius));
     return path;
-}
-
-SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
-    SkScalar xRadius = static_cast<SkScalar>(
-                mHorizontalRadiusAnimator->getEffectiveXValueAtRelFrameF(relFrame));
-    SkScalar yRadius = static_cast<SkScalar>(
-                mVerticalRadiusAnimator->getEffectiveYValueAtRelFrameF(relFrame));
-//    QPainterPath pathT;
-//    pathT.addEllipse(QPointF(0., 0.), xRadius, yRadius);
-//    return QPainterPathToSkPath(pathT);
-    SkPath path;
-    path.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
-                                  2*xRadius, 2*yRadius));
-    return path;
-}
-
-qreal Circle::getXRadiusAtRelFrame(const int &relFrame) {
-    return mHorizontalRadiusAnimator->getEffectiveXValueAtRelFrame(relFrame);
-}
-
-qreal Circle::getYRadiusAtRelFrame(const int &relFrame) {
-    return mVerticalRadiusAnimator->getEffectiveYValueAtRelFrame(relFrame);
 }
 
 qreal Circle::getCurrentXRadius() {

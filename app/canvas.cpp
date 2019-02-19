@@ -82,7 +82,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
 
 Canvas::~Canvas() {}
 
-QRectF Canvas::getRelBoundingRectAtRelFrame(const int &) {
+QRectF Canvas::getRelBoundingRectAtRelFrame(const qreal &) {
     return QRectF(0, 0, mWidth, mHeight);
 }
 

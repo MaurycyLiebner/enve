@@ -260,7 +260,7 @@ public:
 
     QRectF getRelBoundingRect() const;
 
-    virtual QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    virtual QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
     virtual void applyCurrentTransformation();
 
@@ -405,7 +405,6 @@ public:
     void readBoundingBoxDataForLink(QIODevice *target);
 
     virtual void shiftAll(const int &shift);
-    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
 
     virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 

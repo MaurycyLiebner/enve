@@ -15,19 +15,11 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mReverse);
 }
 
-void LengthPathEffect::filterPathForRelFrame(const int &relFrame,
-                                                const SkPath &src,
-                                                SkPath *dst,
-                                                const qreal &,
-                                                const bool &) {
-    filterPathForRelFrameF(relFrame, src, dst, false);
-}
-
 void LengthPathEffect::filterPathForRelFrameF(const qreal &relFrame,
                                                  const SkPath &src,
                                                  SkPath *dst,
                                                  const bool &) {
-    qreal targetLen = mLength->getCurrentEffectiveValueAtRelFrameF(relFrame);
+    qreal targetLen = mLength->getCurrentEffectiveValueAtRelFrame(relFrame);
     if(targetLen < 0.001) {
         *dst = SkPath();
         return;

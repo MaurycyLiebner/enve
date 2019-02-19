@@ -92,7 +92,7 @@ public:
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<stdptr<MovablePoint>>& list);
-    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,

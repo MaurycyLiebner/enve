@@ -95,7 +95,7 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 
 bool ParticleBox::SWT_isParticleBox() const { return true; }
 
-QRectF ParticleBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+QRectF ParticleBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
                   mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
 }
@@ -473,7 +473,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
         const qreal &relFrame,
         const stdsptr<ParticleBoxRenderData> &particleData) {
     EmitterData data;
-    auto qcol = mColorAnimator->getColorAtRelFrameF(relFrame);
+    auto qcol = mColorAnimator->getColorAtRelFrame(relFrame);
     data.color = QColorToSkColor(qcol);
 
     BoundingBox *targetT = mBoxTargetProperty->getTarget();
@@ -548,8 +548,8 @@ void ParticleEmitter::generateParticles() {
                 mIniVelocityAngleVar->getCurrentEffectiveValueAtRelFrame(i);
         qreal particlesPerFrame =
                 mParticlesPerSecond->getCurrentEffectiveValueAtRelFrame(i)/24.;
-        qreal particlesFrameLifetime =
-                mParticlesFrameLifetime->getCurrentEffectiveValueAtRelFrame(i);
+        int particlesFrameLifetime = qRound(
+                    mParticlesFrameLifetime->getCurrentEffectiveValueAtRelFrame(i));
         QPointF pos =
                 mPos->getCurrentEffectivePointValueAtRelFrame(i);
         qreal width =
@@ -574,7 +574,7 @@ void ParticleEmitter::generateParticles() {
 
         QPointF srcVel = (pos - lastPos)*srcVelInfl;
 
-        int particlesToCreate = remainingPartFromFrame + particlesPerFrame;
+        int particlesToCreate = qRound(remainingPartFromFrame + particlesPerFrame);
         remainingPartFromFrame += particlesPerFrame - particlesToCreate;
         if(remainingPartFromFrame < 0.) remainingPartFromFrame = 0.;
 
@@ -604,9 +604,8 @@ void ParticleEmitter::generateParticles() {
             qreal xTrans = gRandF(-width, width);
 
             newParticle->initializeParticle(i, particlesFrameLifetime,
-                                            SkPoint::Make(
-                                                pos.x() + xTrans,
-                                                pos.y()),
+                                            SkPoint::Make(pos.x() + xTrans,
+                                                          pos.y()),
                                             qPointToSk(partVel),
                                             partSize);
             notFinishedParticles << newParticle;

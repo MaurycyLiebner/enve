@@ -148,7 +148,7 @@ public:
 
     void setOutlineAffectedByScale(const bool &bT);
 
-    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
     VectorPath *objectToVectorPathBox();
     VectorPath *strokeToVectorPathBox();
@@ -195,10 +195,7 @@ public:
 
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
-    virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
     virtual SkPath getPathAtRelFrameF(const qreal &relFrame) = 0;
-    SkPath getPathWithThisOnlyEffectsAtRelFrame(const int &relFrame);
-    SkPath getPathWithEffectsUntilGroupSumAtRelFrame(const int &relFrame);
     SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame);
     SkPath getPathWithEffectsUntilGroupSumAtRelFrameF(const qreal &relFrame);
 
