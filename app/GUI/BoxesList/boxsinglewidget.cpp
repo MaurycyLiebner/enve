@@ -926,7 +926,7 @@ Key* BoxSingleWidget::getKeyAtPos(const int &pressX,
     Q_ASSERT(target);
     if(target->SWT_isAnimator()) {
         auto anim_target = static_cast<Animator*>(target);
-        return anim_target->prp_getKeyAtPos(pressX,
+        return anim_target->anim_getKeyAtPos(pressX,
                                             minViewedFrame,
                                             pixelsPerFrame,
                                             KEY_RECT_SIZE);

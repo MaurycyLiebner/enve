@@ -28,16 +28,18 @@ void FakeComplexAnimator::anim_drawKeys(QPainter *p,
                                   rowHeight, keyRectSize);
 }
 
-Key *FakeComplexAnimator::prp_getKeyAtPos(const qreal &relX,
+Key *FakeComplexAnimator::anim_getKeyAtPos(const qreal &relX,
                                           const int &minViewedFrame,
                                           const qreal &pixelsPerFrame,
                                           const int &keyRectSize) {
-    Key *key = ComplexAnimator::prp_getKeyAtPos(relX, minViewedFrame,
+    Key *key = ComplexAnimator::anim_getKeyAtPos(relX, minViewedFrame,
                                                 pixelsPerFrame,
                                                 keyRectSize);
     if(key) return key;
-    return mTarget->prp_getKeyAtPos(relX, minViewedFrame,
-                                    pixelsPerFrame, keyRectSize);
+    if(!mTarget->SWT_isAnimator()) return nullptr;
+    const auto aTarget = GetAsPtr(mTarget, Animator);
+    return aTarget->anim_getKeyAtPos(relX, minViewedFrame,
+                                     pixelsPerFrame, keyRectSize);
 }
 
 void FakeComplexAnimator::anim_getKeysInRect(const QRectF &selectionRect,

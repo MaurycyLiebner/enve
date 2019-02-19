@@ -36,7 +36,7 @@ public:
     virtual bool anim_nextRelFrameWithKey(const int &relFrame,
                                           int &nextRelFrame);
     virtual stdsptr<Key> readKey(QIODevice *target);
-    virtual Key *prp_getKeyAtPos(const qreal &relX,
+    virtual Key *anim_getKeyAtPos(const qreal &relX,
                                  const int &minViewedFrame,
                                  const qreal &pixelsPerFrame,
                                  const int &keyRectSize);

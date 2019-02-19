@@ -67,24 +67,6 @@ public:
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 
-    FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
-    FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
-    int prp_absFrameToRelFrame(const int &absFrame) const;
-    int prp_relFrameToAbsFrame(const int &relFrame) const;
-    qreal prp_absFrameToRelFrameF(const qreal &absFrame) const;
-    qreal prp_relFrameToAbsFrameF(const qreal &relFrame) const;
-
-    virtual Key *prp_getKeyAtPos(const qreal &relX,
-                                 const int &minViewedFrame,
-                                 const qreal &pixelsPerFrame,
-                                 const int& keyRectSize) {
-        Q_UNUSED(relX);
-        Q_UNUSED(minViewedFrame);
-        Q_UNUSED(pixelsPerFrame);
-        Q_UNUSED(keyRectSize);
-        return nullptr;
-    }
-
     virtual void prp_cancelTransform() {}
 
     virtual void prp_startTransform() {}
@@ -102,24 +84,10 @@ public:
     virtual void prp_startDragging() {}
 
     virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
-
-    const QString &prp_getName() const;
-    void prp_setName(const QString &newName);
-
     virtual void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
-    void prp_blockUpdater();
 
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
-    void prp_setBlockedUpdater(const stdsptr<PropertyUpdater> &updater);
-
-    bool SWT_isProperty() const { return true; }
-
-    bool prp_differencesBetweenRelFrames(const int &frame1,
-                                         const int &frame2) const {
-        return !prp_getIdenticalRelFrameRange(frame1).inRange(frame2);
-    }
-
     virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
         Q_UNUSED(relFrame);
         return {FrameRange::EMIN, FrameRange::EMAX};
@@ -131,6 +99,35 @@ public:
 
     virtual void writeProperty(QIODevice * const device) const {
         Q_UNUSED(device);
+    }
+
+    bool SWT_isProperty() const { return true; }
+public slots:
+    virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
+
+    virtual void prp_updateAfterChangedRelFrameRange(const FrameRange &range) {
+        auto absRange = prp_relRangeToAbsRange(range);
+        prp_updateAfterChangedAbsFrameRange(absRange);
+    }
+
+    virtual void prp_updateInfluenceRangeAfterChanged();
+public:
+    void prp_blockUpdater();
+    FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
+    FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
+    int prp_absFrameToRelFrame(const int &absFrame) const;
+    int prp_relFrameToAbsFrame(const int &relFrame) const;
+    qreal prp_absFrameToRelFrameF(const qreal &absFrame) const;
+    qreal prp_relFrameToAbsFrameF(const qreal &relFrame) const;
+    const QString &prp_getName() const;
+    void prp_setName(const QString &newName);
+
+    void prp_setBlockedUpdater(const stdsptr<PropertyUpdater> &updater);
+
+
+    bool prp_differencesBetweenRelFrames(const int &frame1,
+                                         const int &frame2) const {
+        return !prp_getIdenticalRelFrameRange(frame1).inRange(frame2);
     }
 
     PropertyUpdater *prp_getUpdater() const {
@@ -171,15 +168,6 @@ protected:
 
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     QPointer<Property> mParent;
-public slots:
-    virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
-
-    virtual void prp_updateAfterChangedRelFrameRange(const FrameRange &range) {
-        auto absRange = prp_relRangeToAbsRange(range);
-        prp_updateAfterChangedAbsFrameRange(absRange);
-    }
-
-    virtual void prp_updateInfluenceRangeAfterChanged();
 signals:
     void prp_updateWholeInfluenceRange();
     void prp_absFrameRangeChanged(const FrameRange &range);

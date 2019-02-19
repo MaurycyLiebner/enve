@@ -421,7 +421,7 @@ DurationRectangleMovable *Animator::anim_getRectangleMovableAtPos(
     return nullptr;
 }
 
-Key *Animator::prp_getKeyAtPos(const qreal &relX,
+Key *Animator::anim_getKeyAtPos(const qreal &relX,
                                const int &minViewedFrame,
                                const qreal &pixelsPerFrame,
                                const int& keyRectSize) {

@@ -15,7 +15,7 @@ public:
                       const int &rowHeight,
                       const int &keyRectSize);
 
-    Key *prp_getKeyAtPos(const qreal &relX,
+    Key *anim_getKeyAtPos(const qreal &relX,
                          const int &minViewedFrame,
                          const qreal &pixelsPerFrame,
                          const int& keyRectSize);
