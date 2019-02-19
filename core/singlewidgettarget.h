@@ -177,6 +177,7 @@ public:
     virtual bool SWT_isBasicTransformAnimator() const { return false; }
     virtual bool SWT_isBoxTransformAnimator() const { return false; }
     virtual bool SWT_isVectorPathAnimator() const { return false; }
+    virtual bool SWT_isSmartPathAnimator() const { return false; }
     virtual bool SWT_isAnimatedSurface() const { return false; }
     virtual bool SWT_isQCubicSegment1DAnimator() const { return false; }
     // Boxes
@@ -216,11 +217,8 @@ protected:
 struct SWT_TargetTypes {
     bool isTargeted(SingleWidgetTarget *target) const {
         for(SWT_Checker func : targetsFunctionList) {
-            if((target->*func)()) {
-                return true;
-            }
+            if((target->*func)()) return true;
         }
-
         return false;
     }
 

@@ -5,7 +5,7 @@
 #include "Animators/graphanimatort.h"
 #include "differsinterpolate.h"
 #include "basicreadwrite.h"
-
+class PathAnimator;
 class SmartPathKey : public GraphKeyT<SmartPath> {
     friend class StdSelfRef;
 public:
@@ -53,27 +53,40 @@ typedef BasedAnimatorT<GraphAnimator,
 class SmartPathAnimator : public SmartPathAnimatorBase {
     friend class SelfRef;
 public:
+    bool SWT_isSmartPathAnimator() const { return true; }
+
+    SmartPath * getCurrentlyEditedPath() const {
+        return mPathBeingChanged_d;
+    }
+
+    void currentlyEditedPathChanged() {
+        if(anim_mKeyOnCurrentFrame) {
+            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        } else {
+            prp_updateInfluenceRangeAfterChanged();
+        }
+    }
 
     void startPathChange() {
-        if(mPathChanged) return;
-        if(prp_isRecording()) {
-            if(prp_isKeyOnCurrentFrame()) return;
+        if(mPathBeingChanged_d) return;
+        if(prp_isRecording() && !anim_mKeyOnCurrentFrame) {
             anim_saveCurrentValueAsKey();
         }
-        if(prp_isKeyOnCurrentFrame()) {
+        if(anim_mKeyOnCurrentFrame) {
             const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame, SmartPathKey);
             spk->save();
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+            mPathBeingChanged_d = &spk->getValue();
         } else {
             mCurrentValue.save();
             prp_updateInfluenceRangeAfterChanged();
+            mPathBeingChanged_d = &mCurrentValue;
         }
-        mPathChanged = true;
     }
 
     void cancelPathChange() {
-        if(!mPathChanged) return;
-        if(prp_isKeyOnCurrentFrame()) {
+        if(!mPathBeingChanged_d) return;
+        if(anim_mKeyOnCurrentFrame) {
             const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame, SmartPathKey);
             spk->restore();
             anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
@@ -81,18 +94,22 @@ public:
             mCurrentValue.restore();
             prp_updateInfluenceRangeAfterChanged();
         }
-        mPathChanged = false;
+        mPathBeingChanged_d = nullptr;
     }
 
-    void finishedPathChange() {
-        if(!mPathChanged) return;
-        mPathChanged = false;
-        prp_callFinishUpdater();
+    void finishPathChange() {
+        if(!mPathBeingChanged_d) return;
+        if(prp_isKeyOnCurrentFrame()) {
+            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        } else {
+            prp_updateInfluenceRangeAfterChanged();
+        }
+        mPathBeingChanged_d = nullptr;
     }
 protected:
-    SmartPathAnimator();
+    SmartPathAnimator(PathAnimator * const pathAnimator);
 private:
-    bool mPathChanged = false;
+    SmartPath * mPathBeingChanged_d = nullptr;
 };
 
 #endif // SMARTPATHANIMATOR_H
