@@ -34,7 +34,7 @@ void QrealAnimator::graph_getValueConstraints(
         qreal &minMoveValue, qreal &maxMoveValue) const {
     Q_UNUSED(key);
     if(type == QrealPointType::END_POINT) {
-        minMoveValue = DBL_MIN;
+        minMoveValue = -DBL_MAX;
         maxMoveValue = DBL_MAX;
 //        auto nextKey = key->getNextKey<GraphKey>();
 //        if(!nextKey) {
@@ -56,7 +56,7 @@ void QrealAnimator::graph_getValueConstraints(
 //            minMoveValue = qMax(minMoveValue, minVal);
 //        }
     } else if(type == QrealPointType::START_POINT) {
-        minMoveValue = DBL_MIN;
+        minMoveValue = -DBL_MAX;
         maxMoveValue = DBL_MAX;
 //        auto prevKey = key->getPrevKey<GraphKey>();
 //        if(!prevKey) {
@@ -222,8 +222,8 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const qreal &frame) const {
 }
 
 qreal QrealAnimator::qra_getValueAtRelFrame(const qreal &frame,
-                                             const QrealKey * const prevKey,
-                                             const QrealKey * const nextKey) const {
+                                            const QrealKey * const prevKey,
+                                            const QrealKey * const nextKey) const {
     const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
                               prevKey->getEndFrame(),
                               nextKey->getStartFrame(),
@@ -276,7 +276,8 @@ void QrealAnimator::qra_setCurrentValue(qreal newValue) {
 }
 
 void QrealAnimator::qra_updateValueFromCurrentFrame() {
-    qra_setCurrentValue(qra_getValueAtAbsFrame(anim_mCurrentAbsFrame));
+    mCurrentValue = qra_getValueAtAbsFrame(anim_mCurrentAbsFrame);
+    emit valueChangedSignal(mCurrentValue);
 }
 
 void QrealAnimator::qra_saveCurrentValueToKey(QrealKey *key) {
@@ -366,20 +367,17 @@ void QrealAnimator::anim_appendKey(const stdsptr<Key>& newKey) {
     Animator::anim_appendKey(newKey);
     //anim_updateKeysPath();
     graph_constrainCtrlsFrameValues();
-    qra_updateValueFromCurrentFrame();
 }
 
 void QrealAnimator::anim_removeKey(const stdsptr<Key> &keyToRemove) {
     Animator::anim_removeKey(keyToRemove);
     graph_updateKeysPath();
-    qra_updateValueFromCurrentFrame();
 }
 
 void QrealAnimator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
     Animator::anim_moveKeyToRelFrame(key, newFrame);
 
     graph_updateKeysPath();
-    qra_updateValueFromCurrentFrame();
 }
 
 void QrealAnimator::graph_updateKeysPath() {

@@ -1,14 +1,11 @@
 #ifndef QCUBICSEGMENT1DANIMATOR_H
 #define QCUBICSEGMENT1DANIMATOR_H
-#include "Animators/interpolatedanimator.h"
+#include "Animators/graphanimatort.h"
 #include "Segments/qcubicsegment1d.h"
 #include "basicreadwrite.h"
 class qCubicSegment1DAnimator;
 
-typedef KeyT<qCubicSegment1D> qCubicSegment1DKey;
-
-class qCubicSegment1DAnimator :
-        public InterpolatedAnimator<qCubicSegment1D> {
+class qCubicSegment1DAnimator : public GraphAnimatorT<qCubicSegment1D> {
     friend class SelfRef;
 public:
     bool SWT_isQCubicSegment1DAnimator() const { return true; }

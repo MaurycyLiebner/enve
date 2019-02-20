@@ -76,7 +76,6 @@ public:
     qreal getCurrentValueAtAbsFrameF(const qreal &frame);
 
     void qra_setCurrentValue(qreal newValue);
-    void qra_updateValueFromCurrentFrame();
     void qra_saveCurrentValueToKey(QrealKey *key);
     void qra_saveValueToKey(QrealKey *key, const qreal &value);
 
@@ -136,8 +135,8 @@ protected:
 
     int mDecimals = 3;
 
-    qreal mMaxPossibleVal = DBL_MAX;
-    qreal mMinPossibleVal = DBL_MIN;
+    qreal mMaxPossibleVal = TEN_MIL;
+    qreal mMinPossibleVal = -TEN_MIL;
 
     qreal mCurrentValue = 0;
     qreal mSavedCurrentValue = 0;
@@ -145,6 +144,7 @@ protected:
     qsptr<RandomQrealGenerator> mRandomGenerator;
 
     qreal mPrefferedValueStep = 1;
+    void qra_updateValueFromCurrentFrame();
 signals:
     void valueChangedSignal(qreal);
 };

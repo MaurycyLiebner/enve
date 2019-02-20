@@ -5,7 +5,7 @@
 InterpolationAnimator::InterpolationAnimator(const QString &name) :
     GraphAnimator(name) {}
 
-qreal InterpolationAnimator::getInterpolatedFrameAtRelFrameF(
+qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
         const qreal &frame) const {
     int prevId;
     int nextId;
@@ -15,7 +15,7 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrameF(
         } else {
             GraphKey *prevKey = GetAsGK(anim_mKeys.at(prevId));
             GraphKey *nextKey = GetAsGK(anim_mKeys.at(nextId));
-            return getInterpolatedFrameAtRelFrameF(
+            return getInterpolatedFrameAtRelFrame(
                         frame, prevKey, nextKey);
         }
     }
@@ -30,12 +30,12 @@ void InterpolationAnimator::graph_getValueConstraints(
         maxValue = minValue;
         //getFrameConstraints(key, type, minValue, maxValue);
     } else {
-        minValue = DBL_MIN;
+        minValue = -DBL_MAX;
         maxValue = DBL_MAX;
     }
 }
 
-qreal InterpolationAnimator::getInterpolatedFrameAtRelFrameF(
+qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
         const qreal &frame, GraphKey *prevKey, GraphKey *nextKey) const {
     qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
                          prevKey->getEndFrame(),

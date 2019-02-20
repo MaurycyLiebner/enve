@@ -6,8 +6,16 @@
 
 template <typename B, typename K, typename T>
 class BasedAnimatorT : public B {
+    static_assert(std::is_base_of<Animator, B>::value,
+                  "BasedAnimatorT can only be used with Animator derived classes");
+
 public:
-    virtual T getValueAtRelFrame(const int &relFrame) const = 0;
+    void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
+        if(range.inRange(this->anim_mCurrentRelFrame)) {
+            this->updateValueFromCurrentFrame();
+        }
+        Animator::prp_updateAfterChangedRelFrameRange(range);
+    }
 
     void anim_setAbsFrame(const int &frame) {
         Animator::anim_setAbsFrame(frame);
@@ -18,6 +26,26 @@ public:
                 this->anim_callFrameChangeUpdater();
             }
         }
+    }
+
+    T getValueAtAbsFrame(const qreal &frame) const {
+        return getValueAtRelFrame(this->prp_absFrameToRelFrameF(frame));
+    }
+
+    T getValueAtRelFrame(const qreal &frame) const {
+        int prevId;
+        int nextId;
+        if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId,
+                                                          frame)) {
+            if(nextId == prevId) {
+                return getKeyAtId(nextId)->getValue();
+            } else {
+                const K * const prevKey = getKeyAtId(prevId);
+                const K * const nextKey = getKeyAtId(nextId);
+                return getValueAtRelFrame(frame, prevKey, nextKey);
+            }
+        }
+        return mCurrentValue;
     }
 
     void setCurrentValue(const T &value) {
@@ -75,6 +103,14 @@ public:
 
 protected:
     BasedAnimatorT(const QString& name) : B(name) {}
+
+    virtual T getValueAtRelFrame(const qreal &frame,
+                                 const K * const prevKey,
+                                 const K * const nextKey) const = 0;
+
+    void updateValueFromCurrentFrame() {
+        mCurrentValue = getValueAtAbsFrame(this->anim_mCurrentAbsFrame);
+    }
 
     T mCurrentValue;
 };

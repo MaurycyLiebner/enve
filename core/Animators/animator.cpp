@@ -688,12 +688,12 @@ void Animator::anim_drawKey(QPainter *p,
 }
 
 void Animator::anim_drawKeys(QPainter *p,
-                            const qreal &pixelsPerFrame,
-                            const qreal &drawY,
-                            const int &startFrame,
-                            const int &endFrame,
-                            const int &rowHeight,
-                            const int &keyRectSize) {
+                             const qreal &pixelsPerFrame,
+                             const qreal &drawY,
+                             const int &startFrame,
+                             const int &endFrame,
+                             const int &rowHeight,
+                             const int &keyRectSize) {
     p->save();
     p->translate(prp_getFrameShift()*pixelsPerFrame, 0.);
     for(const auto &key : anim_mKeys) {

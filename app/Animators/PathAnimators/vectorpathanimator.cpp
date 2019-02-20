@@ -178,7 +178,7 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame) {
             const auto nextKey = GetAsPK(anim_mKeys.at(nextId));
             int prevRelFrame = prevKey->getRelFrame();
             int nextRelFrame = nextKey->getRelFrame();
-            const qreal intRelFrame = getInterpolatedFrameAtRelFrameF(relFrame);
+            const qreal intRelFrame = getInterpolatedFrameAtRelFrame(relFrame);
             const qreal weight = (intRelFrame - prevRelFrame)/
                     (nextRelFrame - prevRelFrame);
             nextKey->getPath().interpolate(
@@ -214,7 +214,7 @@ SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
             const auto nextKey = GetAsPK(anim_mKeys.at(nextId));
             int prevRelFrame = prevKey->getRelFrame();
             int nextRelFrame = nextKey->getRelFrame();
-            const qreal intRelFrame = getInterpolatedFrameAtRelFrameF(relFrame);
+            const qreal intRelFrame = getInterpolatedFrameAtRelFrame(relFrame);
             const qreal weight = (intRelFrame - prevRelFrame)/
                                  (nextRelFrame - prevRelFrame);
             nextKey->getPath().interpolate(prevKey->getPath(),
