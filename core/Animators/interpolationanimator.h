@@ -5,11 +5,11 @@
 class InterpolationAnimator : public GraphAnimator {
 public:
     InterpolationAnimator(const QString& name);
-    qreal getInterpolatedFrameAtRelFrame(const qreal &frame) const;
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minValue, qreal &maxValue) const;
+    qreal getInterpolatedFrameAtRelFrame(const qreal &frame) const;
 private:
     qreal getInterpolatedFrameAtRelFrame(const qreal &frame,
                                          GraphKey *prevKey,

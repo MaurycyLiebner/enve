@@ -33,6 +33,9 @@ public:
     }
 
     T getValueAtRelFrame(const qreal &frame) const {
+        if(this->anim_mKeys.isEmpty()) {
+            return this->getCurrentValue();
+        }
         int prevId;
         int nextId;
         if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId,
@@ -42,7 +45,7 @@ public:
             } else {
                 const K * const prevKey = getKeyAtId(prevId);
                 const K * const nextKey = getKeyAtId(nextId);
-                return getValueAtRelFrame(frame, prevKey, nextKey);
+                return getValueAtRelFrameK(frame, prevKey, nextKey);
             }
         }
         return mCurrentValue;
@@ -104,9 +107,9 @@ public:
 protected:
     BasedAnimatorT(const QString& name) : B(name) {}
 
-    virtual T getValueAtRelFrame(const qreal &frame,
-                                 const K * const prevKey,
-                                 const K * const nextKey) const = 0;
+    virtual T getValueAtRelFrameK(const qreal &frame,
+                                  const K * const prevKey,
+                                  const K * const nextKey) const = 0;
 
     void updateValueFromCurrentFrame() {
         mCurrentValue = getValueAtAbsFrame(this->anim_mCurrentAbsFrame);

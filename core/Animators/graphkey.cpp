@@ -286,7 +286,7 @@ void GraphKey::scaleFrameAndUpdateParentAnimator(
 
 void GraphKey::setRelFrame(const int &frame) {
     if(frame == mRelFrame) return;
-    int dFrame = frame - mRelFrame;
+    const int dFrame = frame - mRelFrame;
     setEndFrameVar(mEndFrame + dFrame);
     setStartFrameVar(mStartFrame + dFrame);
     mRelFrame = frame;

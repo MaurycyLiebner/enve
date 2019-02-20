@@ -5,24 +5,9 @@
 template <typename T>
 class SteppedAnimator : public AnimatorT<T> {
 public:
-    T getValueAtRelFrame(const int &relFrame) const {
-        if(this->anim_mKeys.isEmpty()) {
-            return this->getCurrentValue();
-        }
-        Key *key;
-        if(this->anim_isKeyOnCurrentFrame()) {
-            key = this->anim_mKeyOnCurrentFrame;
-        } else {
-            key = this->anim_getPrevKey(relFrame);
-        }
-        if(!key) {
-            key = this->anim_getNextKey(relFrame);
-        }
-        return static_cast<KeyT<T>*>(key)->getValue();
-    }
-
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
-        if(this->anim_mKeys.isEmpty()) return {FrameRange::EMIN, FrameRange::EMAX};
+        if(this->anim_mKeys.isEmpty())
+            return {FrameRange::EMIN, FrameRange::EMAX};
         int prevId;
         int nextId;
         this->anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame);
@@ -62,6 +47,14 @@ public:
 protected:
     SteppedAnimator(const QString& name) :
         AnimatorT<T>(name) {}
+
+    T getValueAtRelFrameK(const qreal &frame,
+                          const KeyT<T> * const prevKey,
+                          const KeyT<T> * const nextKey) const {
+        Q_UNUSED(frame);
+        if(prevKey) return prevKey->getValue();
+        return nextKey->getValue();
+    }
 };
 
 #endif // STEPPEDANIMATOR_H

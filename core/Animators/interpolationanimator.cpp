@@ -22,19 +22,6 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
     return frame;
 }
 
-void InterpolationAnimator::graph_getValueConstraints(
-        GraphKey *key, const QrealPointType &type,
-        qreal &minValue, qreal &maxValue) const {
-    if(type == QrealPointType::KEY_POINT) {
-        minValue = key->getRelFrame();
-        maxValue = minValue;
-        //getFrameConstraints(key, type, minValue, maxValue);
-    } else {
-        minValue = -DBL_MAX;
-        maxValue = DBL_MAX;
-    }
-}
-
 qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
         const qreal &frame, GraphKey *prevKey, GraphKey *nextKey) const {
     qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
@@ -47,4 +34,17 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
     qreal p2y = nextKey->getStartValue();
     qreal p3y = nextKey->getValueForGraph();
     return gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
+}
+
+void InterpolationAnimator::graph_getValueConstraints(
+        GraphKey *key, const QrealPointType &type,
+        qreal &minValue, qreal &maxValue) const {
+    if(type == QrealPointType::KEY_POINT) {
+        minValue = key->getRelFrame();
+        maxValue = minValue;
+        //getFrameConstraints(key, type, minValue, maxValue);
+    } else {
+        minValue = -DBL_MAX;
+        maxValue = DBL_MAX;
+    }
 }

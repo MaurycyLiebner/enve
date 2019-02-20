@@ -101,7 +101,8 @@ SOURCES += \
     Animators/SmartPath/node.cpp \
     Animators/SmartPath/nodelist.cpp \
     Animators/SmartPath/smartpathanimator.cpp \
-    Animators/SmartPath/smartpathcontainer.cpp
+    Animators/SmartPath/smartpathcontainer.cpp \
+    Animators/interpolationanimatort.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -162,7 +163,8 @@ HEADERS += \
     Animators/SmartPath/node.h \
     Animators/SmartPath/nodelist.h \
     Animators/SmartPath/smartpathanimator.h \
-    Animators/SmartPath/smartpathcontainer.h
+    Animators/SmartPath/smartpathcontainer.h \
+    Animators/interpolationanimatort.h
 
 unix {
     target.path = /usr/lib

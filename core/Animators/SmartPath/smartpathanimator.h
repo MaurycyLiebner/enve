@@ -2,11 +2,11 @@
 #define SMARTPATHANIMATOR_H
 #include "Animators/interpolationanimator.h"
 #include "smartpathcontainer.h"
-#include "Animators/graphanimatort.h"
+#include "Animators/interpolationanimatort.h"
 #include "differsinterpolate.h"
 #include "basicreadwrite.h"
 class PathAnimator;
-class SmartPathKey : public GraphKeyT<SmartPath> {
+class SmartPathKey : public InterpolationKeyT<SmartPath> {
     friend class StdSelfRef;
 public:
     void save() {
@@ -15,22 +15,6 @@ public:
 
     void restore() {
         mValue.restore();
-    }
-
-    qreal getValueForGraph() const {
-        return mRelFrame;
-    }
-
-    void setValueForGraph(const qreal& value) {
-        Q_UNUSED(value);
-    }
-
-    void setRelFrame(const int &frame) {
-        if(frame == mRelFrame) return;
-        const int dFrame = frame - mRelFrame;
-        GraphKey::setRelFrame(frame);
-        mEndValue += dFrame;
-        mStartValue += dFrame;
     }
 
     void updateAfterPrevKeyChanged(Key * const prevKey) {
@@ -43,14 +27,12 @@ public:
 protected:
     SmartPathKey(const SmartPath& value, const int &relFrame,
                  Animator * const parentAnimator) :
-        GraphKeyT<SmartPath>(value, relFrame, parentAnimator) {}
+        InterpolationKeyT<SmartPath>(value, relFrame, parentAnimator) {}
     SmartPathKey(Animator * const parentAnimator) :
-        GraphKeyT<SmartPath>(parentAnimator) {}
+        InterpolationKeyT<SmartPath>(parentAnimator) {}
 };
 
-typedef BasedAnimatorT<GraphAnimator,
-                       SmartPathKey,
-                       SmartPath> SmartPathAnimatorBase;
+typedef InterpolationAnimatorT<SmartPath, SmartPathKey> SmartPathAnimatorBase;
 
 class SmartPathAnimator : public SmartPathAnimatorBase {
     friend class SelfRef;
