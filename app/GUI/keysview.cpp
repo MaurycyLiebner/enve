@@ -48,10 +48,11 @@ void KeysView::setViewedVerticalRange(const int &top,
 }
 
 void KeysView::middleMove(const QPointF &movePos) {
-    qreal diffFrame = (movePos.x() - mMiddlePressPos.x() ) / mPixelsPerFrame;
-    int roundX = qRound(diffFrame );
+    const qreal diffFrame = (movePos.x() - mMiddlePressPos.x())/
+                                    mPixelsPerFrame;
+    const int roundX = qRound(diffFrame);
     setFramesRange(mSavedMinViewedFrame - roundX,
-                   mSavedMaxViewedFrame - roundX );
+                   mSavedMaxViewedFrame - roundX);
 }
 
 void KeysView::deleteSelectedKeys() {
@@ -67,10 +68,10 @@ void KeysView::deleteSelectedKeys() {
 
 void KeysView::selectKeysInSelectionRect() {
     QList<Key*> listKeys;
-    mBoxesListVisible->getKeysInRect(mSelectionRect.translated(-0.5, 0.),
+    mBoxesListVisible->getKeysInRect(mSelectionRect.translated(-0.5, 0),
                                      mPixelsPerFrame,
                                      listKeys);
-    for(Key *key : listKeys) {
+    for(const auto& key : listKeys) {
         addKeyToSelection(key);
     }
 }
@@ -89,7 +90,7 @@ void KeysView::wheelEvent(QWheelEvent *e) {
     } else {
         emit wheelEventSignal(e);
         if(mSelecting) {
-            QPointF posU = mapFromGlobal(QCursor::pos()) +
+            const QPointF posU = mapFromGlobal(QCursor::pos()) +
                            QPointF(-MIN_WIDGET_HEIGHT/2, 0.);
             mSelectionRect.setBottom(posU.y() + mViewedTop);
         }
@@ -99,16 +100,14 @@ void KeysView::wheelEvent(QWheelEvent *e) {
 
 void KeysView::mousePressEvent(QMouseEvent *e) {
     KFT_setFocus();
-    QPoint posU = e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
+    const QPoint posU = e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
     if(mGraphViewed) {
         graphMousePressEvent(posU, e->button());
     } else {
         if(e->button() == Qt::MiddleButton) {
             middlePress(posU);
         } else if(e->button() == Qt::LeftButton) {
-            if(mIsMouseGrabbing) {
-                return;
-            }
+            if(mIsMouseGrabbing) return;
             mFirstMove = true;
             mLastPressPos = posU;
 
@@ -124,11 +123,11 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                                             mMinViewedFrame);
                 if(!mLastPressedDurationRectangleMovable) {
                     mSelecting = true;
-                    qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
-                    mSelectionRect.setTopLeft(QPointF(posUXFrame,
-                                                      posU.y() + mViewedTop));
-                    mSelectionRect.setBottomRight(QPointF(posUXFrame,
-                                                          posU.y() + mViewedTop));
+                    const qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
+                    const QPointF xFramePos(posUXFrame,
+                                            posU.y() + mViewedTop);
+                    mSelectionRect.setTopLeft(xFramePos);
+                    mSelectionRect.setBottomRight(xFramePos);
                 } else {
                     mMovingRect = true;
                 }
@@ -174,9 +173,9 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 } else if(movable->isDurationRect()) {
                     QMenu menu;
                     menu.addAction("Settings...");
-                    QAction *selectedAction = menu.exec(e->globalPos());
+                    const QAction * const selectedAction = menu.exec(e->globalPos());
                     if(selectedAction) {
-                        auto durRect = GetAsPtr(movable, DurationRectangle);
+                        const auto durRect = GetAsPtr(movable, DurationRectangle);
                         durRect->openDurationSettingsDialog(this);
                     }
                 }
@@ -216,7 +215,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
        event->key() == Qt::Key_V) {
         if(event->isAutoRepeat()) return false;
         auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
-        KeysClipboardContainer* container =
+        const auto container =
                 GetAsPtr(cont, KeysClipboardContainer);
         if(!container) return false;
         container->paste(mMainWindow->getCurrentFrame(), this, true, true);
@@ -367,7 +366,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     minFrame = minFrame - minFrame%iInc - 1;
     maxFrame += floor((width() - 40. - xT)/mPixelsPerFrame) - maxFrame%iInc;
     for(int i = minFrame; i <= maxFrame; i += iInc) {
-        qreal xTT = xT + (i - mMinViewedFrame + 1)*mPixelsPerFrame;
+        const qreal xTT = xT + (i - mMinViewedFrame + 1)*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, height()) );
     }
 
@@ -388,9 +387,9 @@ void KeysView::paintEvent(QPaintEvent *) {
     } else {
         p.save();
         p.setRenderHint(QPainter::Antialiasing);
-        qreal transDFrame = 0.5*MIN_WIDGET_HEIGHT/mPixelsPerFrame;
-        qreal frameAtZeroX = mMinViewedFrame - transDFrame;
-        int frameAtZeroXi = qFloor(frameAtZeroX);
+        const qreal transDFrame = 0.5*MIN_WIDGET_HEIGHT/mPixelsPerFrame;
+        const qreal frameAtZeroX = mMinViewedFrame - transDFrame;
+        const int frameAtZeroXi = qFloor(frameAtZeroX);
         p.translate((frameAtZeroXi - mMinViewedFrame)*mPixelsPerFrame, 0.);
         mBoxesListVisible->drawKeys(&p,
                                     mPixelsPerFrame,
@@ -429,7 +428,7 @@ void KeysView::updateHoveredPointFromPos(const QPoint &posU) {
         mHoveredKey->setHovered(true);
         clearHoveredMovable();
     } else {
-        DurationRectangleMovable *lastMovable = mHoveredMovable;
+        const auto lastMovable = mHoveredMovable;
         mHoveredMovable = mBoxesListVisible->getRectangleMovableAtPos(
                             posU.x(), posU.y(),
                             mPixelsPerFrame,
@@ -468,8 +467,8 @@ void KeysView::clearHoveredMovable() {
 }
 
 void KeysView::scrollRight() {
-    int pixelInc = 2*MIN_WIDGET_HEIGHT;
-    int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
+    const int pixelInc = 2*MIN_WIDGET_HEIGHT;
+    const int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame += inc;
     mMaxViewedFrame += inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
@@ -484,8 +483,8 @@ void KeysView::scrollRight() {
 }
 
 void KeysView::scrollLeft() {
-    int pixelInc = 2*MIN_WIDGET_HEIGHT;
-    int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
+    const int pixelInc = 2*MIN_WIDGET_HEIGHT;
+    const int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame -= inc;
     mMaxViewedFrame -= inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
@@ -501,7 +500,7 @@ void KeysView::scrollLeft() {
 
 void KeysView::handleMouseMove(const QPoint &pos,
                                const Qt::MouseButtons &buttons) {
-    QPoint posU = pos + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
+    const QPoint posU = pos + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
 
     if(mIsMouseGrabbing ||
        (buttons & Qt::LeftButton ||
@@ -538,7 +537,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         }
                     }
                     if(mScalingKeys) {
-                        qreal keysScale = 1. + (posU.x() - mLastPressPos.x())/150.;
+                        qreal keysScale = 1 + (posU.x() - mLastPressPos.x())/150.;
                         if(mValueInput.inputEnabled()) {
                             keysScale = mValueInput.getValue();
                         }
@@ -554,7 +553,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         if(mValueInput.inputEnabled()) {
                             dFrame = qRound(mValueInput.getValue());
                         }
-                        int dDFrame = dFrame - mMoveDFrame;
+                        const int dDFrame = dFrame - mMoveDFrame;
 
                         if(dDFrame != 0) {
                             mMoveDFrame = dFrame;
@@ -586,7 +585,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                     if(mValueInput.inputEnabled()) {
                         dFrame = qRound(mValueInput.getValue());
                     }
-                    int dDFrame = dFrame - mMoveDFrame;
+                    const int dDFrame = dFrame - mMoveDFrame;
 
                     if(dDFrame != 0) {
                         mMoveDFrame = dFrame;
@@ -601,7 +600,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
 //                                    dDFrame);
                     }
                 } else if(mSelecting) {
-                    qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
+                    const qreal posUXFrame = posU.x()/mPixelsPerFrame +
+                            mMinViewedFrame;
                     mSelectionRect.setBottomRight(
                                     QPointF(posUXFrame, posU.y() + mViewedTop));
                 }
@@ -636,14 +636,14 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                     }
                 } else {
                     if(mSelectionRect.left() > mSelectionRect.right()) {
-                        qreal rightT = mSelectionRect.right();
-                        qreal leftT = mSelectionRect.left();
+                        const qreal rightT = mSelectionRect.right();
+                        const qreal leftT = mSelectionRect.left();
                         mSelectionRect.setLeft(rightT);
                         mSelectionRect.setRight(leftT);
                     }
                     if(mSelectionRect.top() > mSelectionRect.bottom()) {
-                        qreal bottomT = mSelectionRect.bottom();
-                        qreal topT = mSelectionRect.top();
+                        const qreal bottomT = mSelectionRect.bottom();
+                        const qreal topT = mSelectionRect.top();
                         mSelectionRect.setTop(bottomT);
                         mSelectionRect.setBottom(topT);
                     }
@@ -723,8 +723,8 @@ qreal KeysView::getPixelsPerFrame() {
 }
 
 void KeysView::updatePixelsPerFrame() {
-    qreal animWidth = width() - 2*MIN_WIDGET_HEIGHT;
-    qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
+    const qreal animWidth = width() - 2*MIN_WIDGET_HEIGHT;
+    const qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
     mPixelsPerFrame = animWidth/dFrame;
 }
 

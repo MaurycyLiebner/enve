@@ -181,6 +181,8 @@ private:
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;
 
+    int mSavedMinViewedFrame = 0;
+    int mSavedMaxViewedFrame = 0;
 
     // graph
 
@@ -192,8 +194,6 @@ private:
     qreal mMinMoveFrame = 0.;
     qreal mMaxMoveFrame = 0.;
     QPointF mPressFrameAndValue = QPointF(0., 0.);
-    qreal mSavedMinViewedFrame = 0.;
-    qreal mSavedMaxViewedFrame = 0.;
     qreal mSavedMinShownValue = 0.;
     qreal mValueInc = 0.;
     int mValuePrec = 2;
