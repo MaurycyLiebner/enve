@@ -415,68 +415,55 @@ void QrealAnimator::graph_updateKeysPath() {
     }
 }
 
-void QrealAnimator::graph_getMinAndMaxValues(qreal &minValP,
-                                            qreal &maxValP) const {
+ValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     if(mGraphMinMaxValuesFixed) {
-        minValP = mMinPossibleVal;
-        maxValP = mMaxPossibleVal;
-        return;
+        return {mMinPossibleVal, mMaxPossibleVal};
     }
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
     if(anim_mKeys.isEmpty()) {
-        minValP = mCurrentValue - mPrefferedValueStep;
-        maxValP = mCurrentValue + mPrefferedValueStep;
-    } else {
-        for(const auto &key : anim_mKeys) {
-            const  auto qaKey = GetAsPtr(key.get(), QrealKey);
-            const qreal keyVal = qaKey->getValue();
-            const qreal startVal = qaKey->getStartValue();
-            const qreal endVal = qaKey->getEndValue();
-            const qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
-            const qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
-            if(maxKeyVal > maxVal) maxVal = maxKeyVal;
-            if(minKeyVal < minVal) minVal = minKeyVal;
-        }
-
-        minValP = minVal - mPrefferedValueStep;
-        maxValP = maxVal + mPrefferedValueStep;
+        return {mCurrentValue - mPrefferedValueStep,
+                mCurrentValue + mPrefferedValueStep};
     }
+    for(const auto &key : anim_mKeys) {
+        const auto qaKey = GetAsPtr(key.get(), QrealKey);
+        const qreal keyVal = qaKey->getValue();
+        const qreal startVal = qaKey->getStartValue();
+        const qreal endVal = qaKey->getEndValue();
+        const qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
+        const qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
+        if(maxKeyVal > maxVal) maxVal = maxKeyVal;
+        if(minKeyVal < minVal) minVal = minKeyVal;
+    }
+
+    return {minVal - mPrefferedValueStep, maxVal + mPrefferedValueStep};
 }
 
-void QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
-                    const int &startFrame, const int &endFrame,
-                    qreal &minValP, qreal &maxValP) const {
+ValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
+        const int &startFrame, const int &endFrame) const {
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
-    if(anim_mKeys.isEmpty()) {
-        minValP = mCurrentValue;
-        maxValP = mCurrentValue;
-    } else {
-        bool first = true;
-        for(const auto &key : anim_mKeys) {
-            const auto qaKey = GetAsPtr(key.get(), QrealKey);
-            int keyFrame = key->getAbsFrame();
-            if(keyFrame > endFrame || keyFrame < startFrame) continue;
-            if(first) first = false;
-            const qreal keyVal = qaKey->getValue();
-            const qreal startVal = qaKey->getStartValue();
-            const qreal endVal = qaKey->getEndValue();
-            const qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
-            const qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
-            if(maxKeyVal > maxVal) maxVal = maxKeyVal;
-            if(minKeyVal < minVal) minVal = minKeyVal;
-        }
-        if(first) {
-            int midFrame = (startFrame + endFrame)/2;
-            const qreal value = qra_getValueAtAbsFrame(midFrame);
-            minValP = value;
-            maxValP = value;
-        } else {
-            minValP = minVal;
-            maxValP = maxVal;
-        }
+    if(anim_mKeys.isEmpty()) return {mCurrentValue, mCurrentValue};
+    bool first = true;
+    for(const auto &key : anim_mKeys) {
+        const auto qaKey = GetAsPtr(key.get(), QrealKey);
+        const int keyFrame = key->getAbsFrame();
+        if(keyFrame > endFrame || keyFrame < startFrame) continue;
+        if(first) first = false;
+        const qreal keyVal = qaKey->getValue();
+        const qreal startVal = qaKey->getStartValue();
+        const qreal endVal = qaKey->getEndValue();
+        const qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
+        const qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
+        if(maxKeyVal > maxVal) maxVal = maxKeyVal;
+        if(minKeyVal < minVal) minVal = minKeyVal;
     }
+    if(first) {
+        const int midFrame = (startFrame + endFrame)/2;
+        const qreal value = qra_getValueAtAbsFrame(midFrame);
+        return {value, value};
+    }
+    return {minVal, maxVal};
 }
 
 qreal QrealAnimator::graph_clampGraphValue(const qreal &value) {

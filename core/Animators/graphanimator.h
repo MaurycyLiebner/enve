@@ -14,15 +14,10 @@ public:
     virtual void graph_getValueConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minMoveValue, qreal &maxMoveValue) const = 0;
-    virtual void graph_getMinAndMaxValues(
-            qreal &minValP, qreal &maxValP) const;
-    virtual void graph_getMinAndMaxValuesBetweenFrames(
-            const int &startFrame, const int &endFrame,
-            qreal &minValP, qreal &maxValP) const;
+    virtual ValueRange graph_getMinAndMaxValues() const;
+    virtual ValueRange graph_getMinAndMaxValuesBetweenFrames(
+            const int &startFrame, const int &endFrame) const;
     virtual qreal graph_clampGraphValue(const qreal &value) { return value; }
-    virtual bool graph_graphValuesCorrespondToFrames() const {
-        return true;
-    }
     virtual void graph_updateKeysPath();
     virtual void graph_constrainCtrlsFrameValues();
     bool SWT_isGraphAnimator() const { return true; }

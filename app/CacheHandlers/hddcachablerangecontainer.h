@@ -102,7 +102,7 @@ protected:
         mParentCacheHandler_k(nullptr) {}
     HDDCachableRangeContainer(const FrameRange &range,
                               Handler * const parent) :
-        mParentCacheHandler_k(parent), RangeCacheContainer(range) {}
+        RangeCacheContainer(range), mParentCacheHandler_k(parent) {}
     virtual stdsptr<_HDDTask> createTmpFileDataSaver() = 0;
     virtual stdsptr<_HDDTask> createTmpFileDataLoader() = 0;
     virtual void clearDataAfterSaved() = 0;

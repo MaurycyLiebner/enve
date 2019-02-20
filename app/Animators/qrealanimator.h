@@ -40,14 +40,9 @@ public:
     void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
     void anim_removeAllKeys();
     void graph_updateKeysPath();
-    void graph_getMinAndMaxValues(qreal &minValP, qreal &maxValP) const;
-    void graph_getMinAndMaxValuesBetweenFrames(const int &startFrame,
-                                              const int &endFrame,
-                                              qreal &minValP,
-                                              qreal &maxValP) const;
-    bool graph_graphValuesCorrespondToFrames() const {
-        return false;
-    }
+    ValueRange graph_getMinAndMaxValues() const;
+    ValueRange graph_getMinAndMaxValuesBetweenFrames(
+            const int &startFrame, const int &endFrame) const;
 
     qreal graph_clampGraphValue(const qreal &value);
 
@@ -58,6 +53,9 @@ public:
 public slots:
     void anim_setRecording(const bool& rec);
     void anim_saveCurrentValueAsKey();
+protected:
+    void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
+                                   qreal &minMoveValue, qreal &maxMoveValue) const;
 public:
     void setPrefferedValueStep(const qreal &valueStep);
 
@@ -132,8 +130,6 @@ protected:
                   const qreal &prefferdStep,
                   const QString& name);
     QrealKey *getQrealKeyAtId(const int &id) const;
-    void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
-                             qreal &minMoveValue, qreal &maxMoveValue) const;
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;

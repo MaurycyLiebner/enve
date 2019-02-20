@@ -1,11 +1,11 @@
 #ifndef FRAMERANGE_H
 #define FRAMERANGE_H
 #include <QtCore>
-#define TenMil 10000000
+#define TEN_MIL 10000000
 //! @brief Inclusive range
 template <typename T>
 struct _ValueRange {
-    enum Extrema { EMIN = -TenMil, EMAX = TenMil };
+    enum Extrema { EMIN = -TEN_MIL, EMAX = TEN_MIL };
     static_assert(std::is_same<T, char>::value ||
                   std::is_same<T, uchar>::value ||
                   std::is_same<T, int>::value ||
@@ -86,6 +86,13 @@ struct _ValueRange {
         this->fMax = qMax(this->fMax, b.fMax);
         return *this;
     }
+};
+
+//typedef _ValueRange<qreal> ValueRange;
+
+struct ValueRange {
+    qreal fMin;
+    qreal fMax;
 };
 
 //! @brief Inclusive frame range

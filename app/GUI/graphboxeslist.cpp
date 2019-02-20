@@ -169,30 +169,16 @@ void KeysView::graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal) {
         maxVal = -1000000;
 
         for(const auto& anim : mGraphAnimators) {
-            qreal animMinVal;
-            qreal animMaxVal;
-            if(anim->graph_graphValuesCorrespondToFrames()) {
-                qreal margin = (mMaxViewedFrame - mMinViewedFrame)*0.01;
-                margin = qMax(1., margin);
-                animMinVal = mMinViewedFrame - margin;
-                animMaxVal = mMaxViewedFrame + margin;
-            }
-//            } else {
-                anim->graph_getMinAndMaxValues(animMinVal, animMaxVal);
-//            }
-            if(animMaxVal > maxVal) {
-                maxVal = animMaxVal;
-            }
-            if(animMinVal < minVal) {
-                minVal = animMinVal;
-            }
+            const auto valRange = anim->graph_getMinAndMaxValues();
+            minVal = qMin(minVal, valRange.fMin);
+            maxVal = qMax(maxVal, valRange.fMax);
         }
     }
-    if(qAbs(minVal - maxVal) < 0.1 ) {
+    if(qAbs(minVal - maxVal) < 0.1) {
         minVal -= 0.05;
         maxVal += 0.05;
     }
-    qreal valRange = maxVal - minVal;
+    const qreal valRange = maxVal - minVal;
     maxVal += valRange*0.05;
     minVal -= valRange*0.05;
 }

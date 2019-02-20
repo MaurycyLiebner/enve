@@ -194,30 +194,26 @@ QrealPoint *GraphAnimator::graph_getPointAt(const qreal &value,
     return point;
 }
 
-void GraphAnimator::graph_getMinAndMaxValues(
-        qreal &minValP, qreal &maxValP) const {
-    if(!anim_mKeys.isEmpty()) {
-        qreal minVal = 100000.;
-        qreal maxVal = -100000.;
-        for(const auto &key : anim_mKeys) {
-            qreal keyVal = GetAsGK(key)->getValueForGraph();
-            qreal startVal = GetAsGK(key)->getStartValue();
-            qreal endVal = GetAsGK(key)->getEndValue();
-            qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
-            qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
-            if(maxKeyVal > maxVal) maxVal = maxKeyVal;
-            if(minKeyVal < minVal) minVal = minKeyVal;
-        }
-
-        qreal margin = qMax(1., (maxVal - minVal)*0.01);
-        minValP = minVal - margin;
-        maxValP = maxVal + margin;
+ValueRange GraphAnimator::graph_getMinAndMaxValues() const {
+    if(anim_mKeys.isEmpty()) return {0, 0};
+    qreal minVal = 100000.;
+    qreal maxVal = -100000.;
+    for(const auto &key : anim_mKeys) {
+        const qreal keyVal = GetAsGK(key)->getValueForGraph();
+        const qreal startVal = GetAsGK(key)->getStartValue();
+        const qreal endVal = GetAsGK(key)->getEndValue();
+        const qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
+        const qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
+        if(maxKeyVal > maxVal) maxVal = maxKeyVal;
+        if(minKeyVal < minVal) minVal = minKeyVal;
     }
+
+    const qreal margin = qMax(1., (maxVal - minVal)*0.01);
+    return {minVal - margin, maxVal + margin};
 }
 
-void GraphAnimator::graph_getMinAndMaxValuesBetweenFrames(
-        const int &startFrame, const int &endFrame,
-        qreal &minValP, qreal &maxValP) const {
+ValueRange GraphAnimator::graph_getMinAndMaxValuesBetweenFrames(
+        const int &startFrame, const int &endFrame) const {
     if(!anim_mKeys.isEmpty()) {
         qreal minVal = 100000.;
         qreal maxVal = -100000.;
@@ -235,9 +231,9 @@ void GraphAnimator::graph_getMinAndMaxValuesBetweenFrames(
         }
 
         qreal margin = qMax(1., (maxVal - minVal)*0.01);
-        minValP = minVal - margin;
-        maxValP = maxVal + margin;
+        return {minVal - margin, maxVal + margin};
     }
+    return {0, 0};
 }
 
 
