@@ -270,7 +270,9 @@ SOURCES += main.cpp\
     CacheHandlers/soundtmpfilehandlers.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
     CacheHandlers/minimalcachehandler.cpp \
-    CacheHandlers/soundcachehandler.cpp
+    CacheHandlers/soundcachehandler.cpp \
+    MovablePoints/smartnodepoint.cpp \
+    MovablePoints/nodepointvalues.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -492,7 +494,9 @@ HEADERS  += \
     CacheHandlers/soundtmpfilehandlers.h \
     CacheHandlers/hddcachablecachehandler.h \
     CacheHandlers/minimalcachehandler.h \
-    CacheHandlers/soundcachehandler.h
+    CacheHandlers/soundcachehandler.h \
+    MovablePoints/smartnodepoint.h \
+    MovablePoints/nodepointvalues.h
 
 RESOURCES += \
     resources.qrc

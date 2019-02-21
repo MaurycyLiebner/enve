@@ -441,7 +441,7 @@ const int &NodePoint::getNodeId() {
 NodePointValues NodePoint::getPointValues() const {
     return NodePointValues(getStartCtrlPtValue(),
                            getRelativePos(),
-                           getEndCtrlPtValue() );
+                           getEndCtrlPtValue());
 }
 
 CtrlsMode NodePoint::getCurrentCtrlsMode() {
@@ -585,38 +585,4 @@ void NodePoint::setElementsPos(const QPointF &startPos,
 
 bool NodePoint::isEndPoint() {
     return mNextPoint == nullptr || mPreviousPoint == nullptr;
-}
-
-NodePointValues operator-(const NodePointValues &ppv1,
-                          const NodePointValues &ppv2) {
-    return NodePointValues(ppv1.startRelPos - ppv2.startRelPos,
-                           ppv1.pointRelPos - ppv2.pointRelPos,
-                           ppv1.endRelPos - ppv2.endRelPos);
-}
-
-NodePointValues operator+(const NodePointValues &ppv1,
-                          const NodePointValues &ppv2) {
-    return NodePointValues(ppv1.startRelPos + ppv2.startRelPos,
-                           ppv1.pointRelPos + ppv2.pointRelPos,
-                           ppv1.endRelPos + ppv2.endRelPos);
-}
-
-NodePointValues operator/(const NodePointValues &ppv,
-                          const qreal &val) {
-    qreal invVal = 1./val;
-    return NodePointValues(ppv.startRelPos * invVal,
-                           ppv.pointRelPos * invVal,
-                           ppv.endRelPos * invVal);
-}
-
-NodePointValues operator*(const qreal &val,
-                          const NodePointValues &ppv) {
-    return ppv*val;
-}
-
-NodePointValues operator*(const NodePointValues &ppv,
-                          const qreal &val) {
-    return NodePointValues(ppv.startRelPos * val,
-                           ppv.pointRelPos * val,
-                           ppv.endRelPos * val);
 }

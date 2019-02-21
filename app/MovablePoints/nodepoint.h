@@ -1,7 +1,7 @@
 #ifndef NODEPOINT_H
 #define NODEPOINT_H
 #include "movablepoint.h"
-
+#include "nodepointvalues.h"
 class UndoRedoStack;
 struct NodeSettings;
 class VectorPath;
@@ -15,55 +15,6 @@ enum CtrlsMode : short;
 
 class NodePoint;
 class VectorPathEdge;
-
-struct NodePointValues {
-    NodePointValues(const QPointF &startPosT,
-                    const QPointF &pointPosT,
-                    const QPointF &endPosT) {
-        startRelPos = startPosT;
-        pointRelPos = pointPosT;
-        endRelPos = endPosT;
-    }
-
-    NodePointValues() {}    
-
-    QPointF startRelPos;
-    QPointF pointRelPos;
-    QPointF endRelPos;
-
-    NodePointValues &operator/=(const qreal &val) {
-        qreal inv = 1./val;
-        startRelPos *= inv;
-        pointRelPos *= inv;
-        endRelPos *= inv;
-        return *this;
-    }
-    NodePointValues &operator*=(const qreal &val) {
-        startRelPos *= val;
-        pointRelPos *= val;
-        endRelPos *= val;
-        return *this;
-    }
-    NodePointValues &operator+=(const NodePointValues &ppv) {
-        startRelPos += ppv.startRelPos;
-        pointRelPos += ppv.pointRelPos;
-        endRelPos += ppv.endRelPos;
-        return *this;
-    }
-    NodePointValues &operator-=(const NodePointValues &ppv)
-    {
-        startRelPos -= ppv.startRelPos;
-        pointRelPos -= ppv.pointRelPos;
-        endRelPos -= ppv.endRelPos;
-        return *this;
-    }
-};
-
-NodePointValues operator+(const NodePointValues &ppv1, const NodePointValues &ppv2);
-NodePointValues operator-(const NodePointValues &ppv1, const NodePointValues &ppv2);
-NodePointValues operator/(const NodePointValues &ppv, const qreal &val);
-NodePointValues operator*(const NodePointValues &ppv, const qreal &val);
-NodePointValues operator*(const qreal &val, const NodePointValues &ppv);
 
 class NodePoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
