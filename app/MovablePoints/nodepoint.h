@@ -12,8 +12,6 @@ class VectorPathAnimator;
 
 enum CanvasMode : short;
 enum CtrlsMode : short;
-
-class NodePoint;
 class VectorPathEdge;
 
 class NodePoint : public NonAnimatedMovablePoint {

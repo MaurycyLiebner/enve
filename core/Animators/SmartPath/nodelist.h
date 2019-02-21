@@ -52,6 +52,28 @@ public:
         //updateAfterNodeChanged(nodeId);
     }
 
+    void setNodeC0Enabled(const int& nodeId, const bool& enabled) {
+        if(nodeId < 0 || nodeId >= mNodes.count()) return;
+        setNodeC0Enabled(nodeId, mNodes[nodeId], enabled);
+    }
+
+    void setNodeC0Enabled(const int& nodeId, Node& node,
+                          const bool& enabled) {
+        Q_UNUSED(nodeId);
+        node.setC0Enabled(enabled);
+    }
+
+    void setNodeC2Enabled(const int& nodeId, const bool& enabled) {
+        if(nodeId < 0 || nodeId >= mNodes.count()) return;
+        setNodeC2Enabled(nodeId, mNodes[nodeId], enabled);
+    }
+
+    void setNodeC2Enabled(const int& nodeId, Node& node,
+                          const bool& enabled) {
+        Q_UNUSED(nodeId);
+        node.setC2Enabled(enabled);
+    }
+
     void setNodeNextId(const int& nodeId, const int& nextId) {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeNextId(nodeId, mNodes[nodeId], nextId);

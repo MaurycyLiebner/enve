@@ -176,8 +176,8 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame) {
         } else {
             const auto prevKey = GetAsPK(anim_mKeys.at(prevId));
             const auto nextKey = GetAsPK(anim_mKeys.at(nextId));
-            int prevRelFrame = prevKey->getRelFrame();
-            int nextRelFrame = nextKey->getRelFrame();
+            const int prevRelFrame = prevKey->getRelFrame();
+            const int nextRelFrame = nextKey->getRelFrame();
             const qreal intRelFrame = getInterpolatedFrameAtRelFrame(relFrame);
             const qreal weight = (intRelFrame - prevRelFrame)/
                     (nextRelFrame - prevRelFrame);
@@ -212,8 +212,8 @@ SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
         } else {
             const auto prevKey = GetAsPK(anim_mKeys.at(prevId));
             const auto nextKey = GetAsPK(anim_mKeys.at(nextId));
-            int prevRelFrame = prevKey->getRelFrame();
-            int nextRelFrame = nextKey->getRelFrame();
+            const int prevRelFrame = prevKey->getRelFrame();
+            const int nextRelFrame = nextKey->getRelFrame();
             const qreal intRelFrame = getInterpolatedFrameAtRelFrame(relFrame);
             const qreal weight = (intRelFrame - prevRelFrame)/
                                  (nextRelFrame - prevRelFrame);
@@ -936,12 +936,8 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
                               startRelPos, relPos, endRelPos,
                               startEnabled, endEnabled, ctrlsMode);
 
-    if(changeFirstPt) {
-        setFirstPoint(newP);
-    }
-    if(targetPt) {
-        targetPt->connectToPoint(newP);
-    }
+    if(changeFirstPt) setFirstPoint(newP);
+    if(targetPt) targetPt->connectToPoint(newP);
     updateNodePointIds();
     prp_updateInfluenceRangeAfterChanged();
 
@@ -989,11 +985,8 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         const int &targetPtId) {
     NodePoint* ptT = nullptr;
     if(!mPoints.isEmpty()) {
-        if(targetPtId == -1) {
-            ptT = mPoints.last().get();
-        } else {
-            ptT = mPoints.at(targetPtId).get();
-        }
+        if(targetPtId == -1) ptT = mPoints.last().get();
+        else ptT = mPoints.at(targetPtId).get();
     }
     return addNodeRelPos(startRelPos, relPos, endRelPos,
                          startEnabled, endEnabled, ctrlsMode,

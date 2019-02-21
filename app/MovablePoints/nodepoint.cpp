@@ -105,28 +105,20 @@ void NodePoint::setRelativePos(const QPointF &relPos) {
 }
 
 void NodePoint::connectToPoint(NodePoint *point) {
-    if(!point) {
-        return;
-    }
+    if(!point) return;
     if(!hasNextPoint()) {
         setPointAsNext(point);
     } else if(!hasPreviousPoint()) {
         setPointAsPrevious(point);
-    } else {
-        return;
     }
 }
 
 void NodePoint::disconnectFromPoint(NodePoint *point) {
-    if(!point) {
-        return;
-    }
+    if(!point) return;
     if(point == mNextPoint) {
         setPointAsNext(nullptr);
     } else if(point == mPreviousPoint) {
         setPointAsPrevious(nullptr);
-    } else {
-        return;
     }
 }
 
@@ -164,11 +156,9 @@ MovablePoint *NodePoint::getPointAtAbsPos(const QPointF &absPos,
                                           const CanvasMode &canvasMode,
                                           const qreal &canvasScaleInv) {
     if(canvasMode == CanvasMode::MOVE_POINT) {
-        if(mStartCtrlPt->isPointAtAbsPos(absPos,
-                                         canvasScaleInv)) {
+        if(mStartCtrlPt->isPointAtAbsPos(absPos, canvasScaleInv)) {
             return mStartCtrlPt.get();
-        } else if(mEndCtrlPt->isPointAtAbsPos(absPos,
-                                               canvasScaleInv)) {
+        } else if(mEndCtrlPt->isPointAtAbsPos(absPos, canvasScaleInv)) {
             return mEndCtrlPt.get();
         }
     } else {
@@ -176,8 +166,7 @@ MovablePoint *NodePoint::getPointAtAbsPos(const QPointF &absPos,
             return nullptr;
         }
     }
-    if(isPointAtAbsPos(absPos,
-                       canvasScaleInv)) {
+    if(isPointAtAbsPos(absPos, canvasScaleInv)) {
         return this;
     }
     return nullptr;
@@ -284,22 +273,15 @@ void NodePoint::drawNodePoint(SkCanvas *canvas,
     canvas->save();
     SkPoint absPos = qPointToSk(getAbsolutePos());
     if(mSelected) {
-        drawOnAbsPosSk(canvas,
-                     absPos,
-                     invScale,
-                     0, 200, 255,
-                     keyOnCurrent);
+        drawOnAbsPosSk(canvas, absPos, invScale,
+                      0, 200, 255, keyOnCurrent);
     } else {
-        drawOnAbsPosSk(canvas,
-                     absPos,
-                     invScale,
-                     170, 240, 255,
-                     keyOnCurrent);
+        drawOnAbsPosSk(canvas, absPos, invScale,
+                       170, 240, 255, keyOnCurrent);
     }
 
-    if((mode == CanvasMode::MOVE_POINT &&
-        (isNeighbourSelected() ) ) ||
-            (mode == CanvasMode::ADD_POINT && mSelected)) {
+    if((mode == CanvasMode::MOVE_POINT && isNeighbourSelected()) ||
+       (mode == CanvasMode::ADD_POINT && mSelected)) {
         SkPaint paint;
         paint.setAntiAlias(true);
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
@@ -362,19 +344,16 @@ NodePoint *NodePoint::getPreviousPoint() {
 }
 
 NodePoint *NodePoint::getConnectedSeparateNodePoint() {
-    if(isSeparateNodePoint() ||
-       mPreviousPoint == nullptr) return this;
+    if(isSeparateNodePoint() || !mPreviousPoint) return this;
     return mPreviousPoint->getConnectedSeparateNodePoint();
 }
 
 void NodePoint::setNextPoint(NodePoint *nextPoint) {
     mNextPoint = nextPoint;
     if(!mNextPoint) {
-        if(mNextEdge.get() != nullptr) {
-            mNextEdge.reset();
-        }
+        if(mNextEdge) mNextEdge.reset();
     } else {
-        if(mNextEdge.get() == nullptr) {
+        if(!mNextEdge) {
             mNextEdge = SPtrCreate(VectorPathEdge)(this, mNextPoint);
         } else {
             mNextEdge->setPoint2(mNextPoint);
@@ -529,11 +508,11 @@ void NodePoint::setPreviousPoint(NodePoint *previousPoint) {
 }
 
 bool NodePoint::hasNextPoint() {
-    return mNextPoint != nullptr;
+    return mNextPoint;
 }
 
 bool NodePoint::hasPreviousPoint() {
-    return mPreviousPoint != nullptr;
+    return mPreviousPoint;
 }
 
 void NodePoint::setPointAsNext(NodePoint *pointToSet) {
@@ -557,9 +536,7 @@ void NodePoint::setPointAsPrevious(NodePoint *pointToSet) {
 }
 
 NodePoint *NodePoint::addPointRelPos(const QPointF &relPos) {
-    NodePoint *newPt =
-            mParentPath->addNodeRelPos(relPos,
-                                       this);
+    const auto newPt = mParentPath->addNodeRelPos(relPos, this);
     if(mNodeId == 0 && hasNextPoint()) {
         setPointAsPrevious(newPt);
     } else {
@@ -569,9 +546,7 @@ NodePoint *NodePoint::addPointRelPos(const QPointF &relPos) {
 }
 
 NodePoint *NodePoint::addPointAbsPos(const QPointF &absPos) {
-    NodePoint *newPt =
-            mParentPath->addNodeAbsPos(absPos,
-                                       this);
+    const auto newPt = mParentPath->addNodeAbsPos(absPos, this);
     return newPt;
 }
 

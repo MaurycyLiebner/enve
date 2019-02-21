@@ -117,8 +117,8 @@ public:
         }
     }
 
-    void startPathChange() {
-        if(mPathBeingChanged_d) return;
+    SmartPath* startPathChange() {
+        if(mPathBeingChanged_d) return mPathBeingChanged_d;
         if(anim_isRecording() && !anim_mKeyOnCurrentFrame) {
             anim_saveCurrentValueAsKey();
         }
@@ -130,6 +130,7 @@ public:
             mPathBeingChanged_d = &mBaseValue;
         }
         mPathBeingChanged_d->save();
+        return mPathBeingChanged_d;
     }
 
     void cancelPathChange() {
