@@ -76,12 +76,11 @@ qreal VectorPathEdge::getLength(const QPointF &p0Pos,
     qreal t = 0.;
     QPointF lastPoint = p0Pos;
     while(true) {
-        QPointF currentPoint = getPosBetweenPointsAtT(t + tInc,
-                                                      p0Pos,
-                                                      p1EndPos,
-                                                      p2StartPos,
-                                                      p3Pos);
-        qreal lenInc = pointToLen(currentPoint - lastPoint);
+        const QPointF currentPoint =
+                getPosBetweenPointsAtT(t + tInc,
+                                       p0Pos, p1EndPos,
+                                       p2StartPos, p3Pos);
+        const qreal lenInc = pointToLen(currentPoint - lastPoint);
         if(lenInc > 5) {
             tInc = tInc * 4 / lenInc;
             continue;
@@ -94,9 +93,7 @@ qreal VectorPathEdge::getLength(const QPointF &p0Pos,
         }
         length += lenInc;
         lastPoint = currentPoint;
-        if(t > 0.999) {
-            break;
-        }
+        if(t > 0.999) break;
     }
 
     return length;
@@ -112,12 +109,10 @@ qreal VectorPathEdge::getLength(const QPointF &p0Pos,
 
     QPointF lastPoint = p0Pos;
     for(int i = 1; i < divisions; i++) {
-        qreal t = i/static_cast<qreal>(divisions);
-        QPointF currentPoint = getPosBetweenPointsAtT(t,
-                                                      p0Pos,
-                                                      p1EndPos,
-                                                      p2StartPos,
-                                                      p3Pos);
+        const qreal t = i/static_cast<qreal>(divisions);
+        const QPointF currentPoint =
+                getPosBetweenPointsAtT(t, p0Pos, p1EndPos,
+                                       p2StartPos, p3Pos);
         length += pointToLen(currentPoint - lastPoint);
         lastPoint = currentPoint;
     }
@@ -137,31 +132,31 @@ QPointF VectorPathEdge::getPosBetweenPointsAtT(const qreal &t,
 QPointF VectorPathEdge::getRelPosBetweenPointsAtT(const qreal &t,
                                         NodePoint *point1,
                                         NodePoint *point2) {
-    if(point1 == nullptr) return point2->getRelativePos();
-    if(point2 == nullptr) return point1->getRelativePos();
+    if(!point1) return point2->getRelativePos();
+    if(!point2) return point1->getRelativePos();
 
-    CtrlPoint *point1EndPt = point1->getEndCtrlPt();
-    CtrlPoint *point2StartPt = point2->getStartCtrlPt();
-    QPointF p0Pos = point1->getRelativePos();
-    QPointF p1Pos = point1EndPt->getRelativePos();
-    QPointF p2Pos = point2StartPt->getRelativePos();
-    QPointF p3Pos = point2->getRelativePos();
+    const CtrlPoint * const point1EndPt = point1->getEndCtrlPt();
+    const CtrlPoint * const point2StartPt = point2->getStartCtrlPt();
+    const QPointF p0Pos = point1->getRelativePos();
+    const QPointF p1Pos = point1EndPt->getRelativePos();
+    const QPointF p2Pos = point2StartPt->getRelativePos();
+    const QPointF p3Pos = point2->getRelativePos();
 
     return getPosBetweenPointsAtT(t, p0Pos, p1Pos, p2Pos, p3Pos);
 }
 
 QPointF VectorPathEdge::getAbsPosBetweenPointsAtT(const qreal &t,
-                                        NodePoint *point1,
-                                        NodePoint *point2) {
-    if(point1 == nullptr) return point2->getAbsolutePos();
-    if(point2 == nullptr) return point1->getAbsolutePos();
+                                                  NodePoint *point1,
+                                                  NodePoint *point2) {
+    if(!point1) return point2->getAbsolutePos();
+    if(!point2) return point1->getAbsolutePos();
 
-    CtrlPoint *point1EndPt = point1->getEndCtrlPt();
-    CtrlPoint *point2StartPt = point2->getStartCtrlPt();
-    QPointF p0Pos = point1->getAbsolutePos();
-    QPointF p1Pos = point1EndPt->getAbsolutePos();
-    QPointF p2Pos = point2StartPt->getAbsolutePos();
-    QPointF p3Pos = point2->getAbsolutePos();
+    const CtrlPoint * const point1EndPt = point1->getEndCtrlPt();
+    const CtrlPoint * const point2StartPt = point2->getStartCtrlPt();
+    const QPointF p0Pos = point1->getAbsolutePos();
+    const QPointF p1Pos = point1EndPt->getAbsolutePos();
+    const QPointF p2Pos = point2StartPt->getAbsolutePos();
+    const QPointF p3Pos = point2->getAbsolutePos();
 
     return getPosBetweenPointsAtT(t, p0Pos, p1Pos, p2Pos, p3Pos);
 }
@@ -175,18 +170,18 @@ QPointF VectorPathEdge::getAbsPosAtT(const qreal &t) {
 }
 
 void VectorPathEdge::makePassThroughAbs(const QPointF &absPos) {
-    if(!mPoint2->isStartCtrlPtEnabled() ) {
+    if(!mPoint2->isStartCtrlPtEnabled()) {
         mPoint2->setStartCtrlPtEnabled(true);
     }
-    if(!mPoint1->isEndCtrlPtEnabled() ) {
+    if(!mPoint1->isEndCtrlPtEnabled()) {
         mPoint1->setEndCtrlPtEnabled(true);
     }
 
     auto absSeg = getAsAbsSegment();
 
     QPointF dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
-    while(pointToLen(dPos) > 1.) {
-        absSeg.setC1(absSeg.c1() + (1. - mPressedT)*dPos);
+    while(pointToLen(dPos) > 1) {
+        absSeg.setC1(absSeg.c1() + (1 - mPressedT)*dPos);
         absSeg.setC2(absSeg.c2() + mPressedT*dPos);
 
         dPos = absPos - gCubicValueAtT(absSeg, mPressedT);
