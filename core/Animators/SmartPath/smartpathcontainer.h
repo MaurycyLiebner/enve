@@ -133,11 +133,18 @@ public:
                                     path2.getNodesRef());
     }
 
+    static NodeList::Type sReadType(QIODevice * const src) {
+        NodeList::Type type;
+        src->read(rcChar(&type), sizeof(NodeList::Type));
+        return type;
+    }
+
     bool read(QIODevice * const src) {
         return mNodesList.read(src);
     }
 
     bool write(QIODevice * const dst) const {
+        dst->write(rcConstChar(&mType), sizeof(NodeList::Type));
         return mNodesList.write(dst);
     }
 protected:

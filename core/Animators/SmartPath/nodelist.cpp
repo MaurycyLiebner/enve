@@ -180,14 +180,20 @@ int NodeList::insertNodeBefore(const int& nextId,
     const int insertId = nextId;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint);
     if((neigh & NEXT) && mNext)
-        mNext->insertNodeBefore(nextId, Node(), NEXT);
+        mNext->insertNodeBefore(nextId,
+                                mType == SMART ? Node() : nodeBlueprint,
+                                NEXT);
     if((neigh & PREV) && mPrev)
-        mPrev->insertNodeBefore(nextId, Node(), PREV);
+        mPrev->insertNodeBefore(nextId,
+                                mType == SMART ? Node() : nodeBlueprint,
+                                PREV);
     insertedNode.setPrevNodeId(-1);
     insertedNode.setNextNodeId(-1);
     const int shiftedNextId = nextId + 1;
     Node& nextNode = mNodes[shiftedNextId];
     moveNodeBefore(insertId, insertedNode, shiftedNextId, nextNode);
+    if(insertedNode.isDissolved())
+        promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
 }
 
