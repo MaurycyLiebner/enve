@@ -49,10 +49,10 @@ bool gWrite(QIODevice *dst, const qCubicSegment1D &value) {
     return dst->write(rcConstChar(&value), sizeof(qCubicSegment1D)) > 0;
 }
 
-bool gRead(QIODevice *src, SmartPath &value) {
+bool gRead(QIODevice *src, PathBase &value) {
     return value.read(src);
 }
 
-bool gWrite(QIODevice *dst, const SmartPath &value) {
+bool gWrite(QIODevice *dst, const PathBase &value) {
     return value.write(dst);
 }

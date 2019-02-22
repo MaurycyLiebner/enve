@@ -15,5 +15,5 @@ void SmartPathAnimator::graph_getValueConstraints(
 }
 
 SmartPathAnimator::SmartPathAnimator(PathAnimator * const pathAnimator) :
-    GraphAnimator("smart path"), mBaseValue(NodeList::SMART) {
+    GraphAnimator("smart path") {
 }

@@ -6,7 +6,7 @@
 #include "basicreadwrite.h"
 class SkPath;
 class NodeList {
-    friend class SmartPath;
+    friend class PathBase;
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
     enum Type { SMART, NORMAL };
