@@ -9,6 +9,8 @@ class NodeList {
     friend class SmartPath;
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
+    enum Type { SMART, NORMAL };
+
     Node& operator[](const int& i) {
         return mNodes[i];
     }
@@ -110,7 +112,7 @@ public:
     }
 
     void updateAfterNodeChanged(const int& nodeId) {
-        if(mNoUpdates) return;
+        if(mNoUpdates || mType == NORMAL) return;
         updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
@@ -140,13 +142,11 @@ public:
 
     void setPrev(NodeList * const prev) {
         mPrev = prev;
-        if(mNoUpdates) return;
         updateAllNodesTypeAfterNeighbourChanged();
     }
 
     void setNext(NodeList * const next) {
         mNext = next;
-        if(mNoUpdates) return;
         updateAllNodesTypeAfterNeighbourChanged();
     }
 
@@ -167,19 +167,29 @@ public:
         return appendNode(nodeBlueprint, BOTH);
     }
 
-    NodeList createCopy() const {
-        return NodeList(mNodes, true);
+    NodeList createCopy(const bool& noUpdates) const {
+        return NodeList(mNodes, mType, noUpdates);
     }
 
-    void read(QIODevice * const src);
+    NodeList createCopy() const {
+        return NodeList(mNodes, mType, mNoUpdates);
+    }
 
-    void write(QIODevice * const dst) const;
+    const Type& type() const {
+        return mType;
+    }
+
+    bool read(QIODevice * const src);
+    bool write(QIODevice * const dst) const;
 protected:
-    NodeList(const bool& noUpdates = false) : mNoUpdates(noUpdates) {}
+    NodeList(const Type& type,
+             const bool& noUpdates = false) :
+        mType(type), mNoUpdates(noUpdates) {}
 
     NodeList(const QList<Node>& list,
+             const Type& type,
              const bool& noUpdates = false) :
-        mNoUpdates(noUpdates), mNodes(list) {}
+        mType(type), mNoUpdates(noUpdates), mNodes(list) {}
 
     const QList<Node>& getList() const {
         return mNodes;
@@ -213,7 +223,8 @@ private:
     qreal nextT(const int &nodeId) const;
     Node &insertNodeToList(const int &nodeId, const Node &node);
 
-    bool mNoUpdates;
+    const Type mType;
+    const bool mNoUpdates;
     NodeList * mPrev = nullptr;
     NodeList * mNext = nullptr;
     QList<Node> mNodes;

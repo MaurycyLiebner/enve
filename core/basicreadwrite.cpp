@@ -50,9 +50,9 @@ bool gWrite(QIODevice *dst, const qCubicSegment1D &value) {
 }
 
 bool gRead(QIODevice *src, SmartPath &value) {
-    value.read(src);
+    return value.read(src);
 }
 
 bool gWrite(QIODevice *dst, const SmartPath &value) {
-    value.write(dst);
+    return value.write(dst);
 }

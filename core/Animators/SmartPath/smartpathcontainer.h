@@ -11,7 +11,7 @@
 
 class SmartPath {
 public:
-    SmartPath();
+    SmartPath(const NodeList::Type &type);
     void actionRemoveNormalNode(const int& nodeId);
 
     void actionAddFirstNode(const QPointF& c0,
@@ -118,14 +118,14 @@ public:
 
     void restore() {
         mNodesList.setNodeList(mSavedList);
-
+        if(mType == NodeList::NORMAL) return;
         updateAllNodesTypeAfterNeighbourChanged();
         if(mPrev) mPrev->updateAllNodesTypeAfterNeighbourChanged();
         if(mNext) mNext->updateAllNodesTypeAfterNeighbourChanged();
     }
 
     SmartPath createCopy() const {
-        return SmartPath(mNodesList.getList());
+        return SmartPath(mNodesList.getList(), mType);
     }
 
     static bool sDifferent(const SmartPath& path1, const SmartPath& path2) {
@@ -133,17 +133,19 @@ public:
                                     path2.getNodesRef());
     }
 
-    void read(QIODevice * const src) {
-        mNodesList.read(src);
+    bool read(QIODevice * const src) {
+        return mNodesList.read(src);
     }
 
-    void write(QIODevice * const dst) const {
-        mNodesList.write(dst);
+    bool write(QIODevice * const dst) const {
+        return mNodesList.write(dst);
     }
 protected:
-    SmartPath(const QList<Node> &list);
+    SmartPath(const QList<Node> &list,
+              const NodeList::Type& type);
 
     void updateAllNodesTypeAfterNeighbourChanged() {
+        if(mType == NodeList::NORMAL) return;
         mNodesList.updateAllNodesTypeAfterNeighbourChanged();
     }
 
@@ -158,12 +160,12 @@ protected:
     }
 
     NodeList getNodesListForPrev() const {
-        if(!mPrev) return mNodesList;
+        if(!mPrev || mType == NodeList::NORMAL) return mNodesList;
         return getNodesListFor(mPrev);
     }
 
     NodeList getNodesListForNext() const {
-        if(!mNext) return mNodesList;
+        if(!mNext || mType == NodeList::NORMAL) return mNodesList;
         return getNodesListFor(mNext);
     }
     NodeList interpolateNodesListWithNext(const qreal& nextWeight) const;
@@ -177,6 +179,7 @@ private:
     SmartPath * mPrev = nullptr;
     SmartPath * mNext = nullptr;
 
+    const NodeList::Type mType;
     NodeList mNodesList;
     QList<Node> mSavedList;
 };

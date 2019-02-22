@@ -207,19 +207,22 @@ NodeList SmartPath::interpolateNodesListWithPrev(
                                   prevWeight);
 }
 
-SmartPath::SmartPath() : SmartPath(QList<Node>()) {}
+SmartPath::SmartPath(const NodeList::Type &type) :
+    SmartPath(QList<Node>(), type) {}
 
-SmartPath::SmartPath(const QList<Node> &list) {
+SmartPath::SmartPath(const QList<Node> &list,
+                     const NodeList::Type &type) :
+    mType(type), mNodesList(type, true) {
     mNodesList.setNodeList(list);
 }
 
 SkPath SmartPath::getPathForPrev() const {
-    if(mPrev) return getPathFor(mPrev);
+    if(mPrev && mType == NodeList::SMART) return getPathFor(mPrev);
     return mNodesList.toSkPath();
 }
 
 SkPath SmartPath::getPathForNext() const {
-    if(mNext) return getPathFor(mNext);
+    if(mNext && mType == NodeList::SMART) return getPathFor(mNext);
     return mNodesList.toSkPath();
 }
 
@@ -258,7 +261,7 @@ bool shouldSplitThisNode(const int& nodeId,
 
 NodeList SmartPath::getNodesListFor(SmartPath * const neighbour) const {
     const NodeList& neighNodes = neighbour->getNodesRef();
-    NodeList result = mNodesList.createCopy();
+    NodeList result = mNodesList.createCopy(true);
 
     int iMax = neighNodes.count() - 1;
     if(result.count() - 1 != iMax)

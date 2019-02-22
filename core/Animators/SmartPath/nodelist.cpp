@@ -30,7 +30,7 @@ void NodeList::moveNodeBefore(const int& moveNodeId, Node& moveNode,
     setNodeNextId(beforePrevId, moveNodeId);
 }
 
-void NodeList::read(QIODevice * const src) {
+bool NodeList::read(QIODevice * const src) {
     int nNodes;
     src->read(rcChar(&nNodes), sizeof(int));
     if(mPrev) {
@@ -47,19 +47,23 @@ void NodeList::read(QIODevice * const src) {
         src->read(rcChar(&node), sizeof(Node));
         mNodes.append(node);
     }
+    return true;
 }
 
-void NodeList::write(QIODevice * const dst) const {
+bool NodeList::write(QIODevice * const dst) const {
     int nNodes = mNodes.count();
     dst->write(rcConstChar(&nNodes), sizeof(int));
     for(const Node& node : mNodes) {
         dst->write(rcConstChar(&node), sizeof(Node));
     }
+    return true;
 }
 
 NodeList NodeList::sInterpolate(const NodeList &list1,
                                 const NodeList &list2,
                                 const qreal& weight2) {
+    if(list1.type() != list2.type())
+        RuntimeThrow("Cannot interpolate paths of different types");
     QList<Node> resultList;
     const auto list1v = list1.getList();
     const auto list2v = list2.getList();
@@ -71,7 +75,7 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
         const Node& node2 = list2v.at(i);
         resultList.append(Node::sInterpolateNormal(node1, node2, weight2));
     }
-    return NodeList(resultList);
+    return NodeList(resultList, list1.type());
 }
 
 int NodeList::firstSegmentNode(const int& nodeId) const {
@@ -193,16 +197,19 @@ int NodeList::insertNodeAfter(const int& prevId,
     const int insertId = prevId + 1;
     Node& insertedNode = insertNodeToList(insertId, nodeBlueprint);
     if((neigh & NEXT) && mNext)
-        mNext->insertNodeAfter(prevId, Node(), NEXT);
+        mNext->insertNodeAfter(prevId,
+                               mType == SMART ? Node() : nodeBlueprint,
+                               NEXT);
     if((neigh & PREV) && mPrev)
-        mPrev->insertNodeAfter(prevId, Node(), PREV);
+        mPrev->insertNodeAfter(prevId,
+                               mType == SMART ? Node() : nodeBlueprint,
+                               PREV);
     insertedNode.setPrevNodeId(-1);
     insertedNode.setNextNodeId(-1);
     Node& prevNode = mNodes[prevId];
     moveNodeAfter(insertId, insertedNode, prevId, prevNode);
-    if(insertedNode.isDissolved()) {
+    if(insertedNode.isDissolved())
         promoteDissolvedNodeToNormal(insertId, insertedNode);
-    }
     return insertId;
 }
 
@@ -211,9 +218,9 @@ int NodeList::appendNode(const Node &nodeBlueprint,
     const int insertId = mNodes.count();
     insertNodeToList(insertId, nodeBlueprint);
     if((neigh & NEXT) && mNext)
-        mNext->appendNode(Node(), NEXT);
+        mNext->appendNode(mType == SMART ? Node() : nodeBlueprint, NEXT);
     if((neigh & PREV) && mPrev)
-        mPrev->appendNode(Node(), PREV);
+        mPrev->appendNode(mType == SMART ? Node() : nodeBlueprint, PREV);
     return insertId;
 }
 
@@ -420,6 +427,7 @@ int NodeList::nextNonDummyId(const int& nodeId) const {
 }
 
 QList<int> NodeList::updateAllNodesTypeAfterNeighbourChanged() {
+    if(mNoUpdates || mType == NORMAL) return QList<int>();
     QList<int> changed;
     for(int i = 0; i < mNodes.count(); i++) {
         if(updateNodeTypeAfterNeighbourChanged(i)) changed << i;
@@ -428,6 +436,7 @@ QList<int> NodeList::updateAllNodesTypeAfterNeighbourChanged() {
 }
 
 bool NodeList::updateNodeTypeAfterNeighbourChanged(const int &nodeId) {
+    if(mNoUpdates || mType == NORMAL) return false;
     Node& node = mNodes[nodeId];
     if(node.isNormal() || node.isMove()) return false;
     Node::Type prevType = Node::DUMMY;
