@@ -35,11 +35,7 @@ void SmartPath::insertNodeBetween(const int& prevId,
                                   const Node& nodeBlueprint) {
     if(!mNodesList.nodesConnected(prevId, nextId))
         RuntimeThrow("Cannot insert between not connected nodes");
-    const int insertId = mNodesList.insertNodeAfter(prevId, nodeBlueprint);
-    if(nodeBlueprint.isDissolved()) {
-        Node& newNode = mNodesList.at(insertId);
-        mNodesList.promoteDissolvedNodeToNormal(insertId, newNode);
-    }
+    mNodesList.insertNodeAfter(prevId, nodeBlueprint);
 }
 
 void SmartPath::actionInsertNodeBetween(const int &prevId,

@@ -200,6 +200,9 @@ int NodeList::insertNodeAfter(const int& prevId,
     insertedNode.setNextNodeId(-1);
     Node& prevNode = mNodes[prevId];
     moveNodeAfter(insertId, insertedNode, prevId, prevNode);
+    if(insertedNode.isDissolved()) {
+        promoteDissolvedNodeToNormal(insertId, insertedNode);
+    }
     return insertId;
 }
 
