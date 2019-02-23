@@ -212,8 +212,8 @@ PathBase::PathBase(const NodeList::Type &type) :
     PathBase(QList<Node>(), type) {}
 
 PathBase::PathBase(const QList<Node> &list,
-                     const NodeList::Type &type) :
-    mType(type), mNodesList(type, true) {
+                   const NodeList::Type &type) :
+    mType(type), mNodesList(type, false) {
     mNodesList.setNodeList(list);
 }
 

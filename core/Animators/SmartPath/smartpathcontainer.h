@@ -153,7 +153,7 @@ public:
     }
 protected:
     PathBase(const QList<Node> &list,
-              const NodeList::Type& type);
+             const NodeList::Type& type);
 
     void updateAllNodesTypeAfterNeighbourChanged() {
         if(mType == NodeList::NORMAL) return;
