@@ -1,178 +1,180 @@
-//#ifndef SMARTNODEPOINT_H
-//#define SMARTNODEPOINT_H
-//#include "movablepoint.h"
-//#include "nodepointvalues.h"
-//#include "Animators/SmartPath/smartpathcontainer.h"
-//class UndoRedoStack;
-//struct NodeSettings;
-//class VectorPath;
-//class SkCanvas;
-//class CtrlPoint;
+﻿#ifndef SMARTNODEPOINT_H
+#define SMARTNODEPOINT_H
+#include "movablepoint.h"
+#include "nodepointvalues.h"
+#include "segment.h"
+#include "Animators/SmartPath/smartpathcontainer.h"
+class UndoRedoStack;
+struct NodeSettings;
+class VectorPath;
+class SkCanvas;
+class SmartCtrlPoint;
+class PathPointsHandler;
+class SmartPathAnimator;
 
-//class SmartPathAnimator;
+enum CanvasMode : short;
+enum CtrlsMode : short;
 
-//enum CanvasMode : short;
-//enum CtrlsMode : short;
+class SmartNodePoint : public NonAnimatedMovablePoint {
+    friend class StdSelfRef;
+public:
+    void applyTransform(const QMatrix &transform);
 
-//class VectorPathEdge;
+    void startTransform();
+    void finishTransform();
 
-//class SmartNodePoint : public NonAnimatedMovablePoint {
-//    friend class StdSelfRef;
-//public:
-//    void applyTransform(const QMatrix &transform);
+    void setRelativePos(const QPointF &relPos);
 
-//    void startTransform();
-//    void finishTransform();
+    //void moveByRel(const QPointF &relTranslation);
 
-//    void setRelativePos(const QPointF &relPos);
+    QPointF getC0AbsPos() const;
+    QPointF getC0Value() const;
+    SmartCtrlPoint *getC0Pt();
 
-//    //void moveByRel(const QPointF &relTranslation);
+    QPointF getC2AbsPos();
+    QPointF getC2Value() const;
+    SmartCtrlPoint *getC2Pt();
 
-//    QPointF getStartCtrlPtAbsPos() const;
-//    QPointF getStartCtrlPtValue() const;
-//    CtrlPoint *getStartCtrlPt();
+    void drawNodePoint(SkCanvas *canvas,
+                const CanvasMode &mode,
+                const SkScalar &invScale,
+                const bool &keyOnCurrent);
 
-//    QPointF getEndCtrlPtAbsPos();
-//    QPointF getEndCtrlPtValue() const;
-//    CtrlPoint *getEndCtrlPt();
+    SmartNodePoint *getNextPoint();
+    SmartNodePoint *getPreviousPoint();
 
-//    void drawNodePoint(SkCanvas *canvas,
-//                const CanvasMode &mode,
-//                const SkScalar &invScale,
-//                const bool &keyOnCurrent);
+    bool isEndPoint();
 
-//    SmartNodePoint *getNextPoint();
-//    SmartNodePoint *getPreviousPoint();
+    bool hasNextPoint();
+    bool hasPreviousPoint();
 
-//    bool isEndPoint();
+    SmartNodePoint *addPointRelPos(const QPointF &relPos);
 
-//    void setPointAsPrevious(SmartNodePoint *pointToSet);
-//    void setPointAsNext(SmartNodePoint *pointToSet);
-//    void setNextPoint(SmartNodePoint *mNextPoint);
-//    void setPreviousPoint(SmartNodePoint *mPreviousPoint);
+    void connectToPoint(SmartNodePoint * const point);
+    void disconnectFromPoint(SmartNodePoint * const point);
 
-//    bool hasNextPoint();
-//    bool hasPreviousPoint();
+    void removeFromVectorPath();
+    void removeApproximate();
 
-//    SmartNodePoint *addPointRelPos(const QPointF &relPos);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                                   const CanvasMode &canvasMode,
+                                   const qreal &canvasScaleInv);
+    void rectPointsSelection(const QRectF &absRect,
+                             QList<stdptr<MovablePoint>> &list);
+    void updateC0PtVisibility();
+    void updatec2Visibility();
 
-//    void connectToPoint(SmartNodePoint *point);
-//    void disconnectFromPoint(SmartNodePoint *point);
+    void setSeparateNodePoint(const bool &separateNodePoint);
+    bool isSeparateNodePoint();
 
-//    void removeFromVectorPath();
-//    void removeApproximate();
+    void setCtrlsMode(const CtrlsMode &mode);
+    QPointF symmetricToAbsPos(const QPointF &absPosToMirror);
+    QPointF symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
+                                    const qreal &newLen);
+    void c0PtPosChanged();
+    void c2PtPosChanged();
 
-//    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-//                                   const CanvasMode &canvasMode,
-//                                   const qreal &canvasScaleInv);
-//    void rectPointsSelection(const QRectF &absRect,
-//                             QList<stdptr<MovablePoint>> &list);
-//    void updateStartCtrlPtVisibility();
-//    void updateEndCtrlPtVisibility();
+    void moveC2ToAbsPos(const QPointF &c2);
+    void moveC0ToAbsPos(const QPointF &c0);
+    void moveC2ToRelPos(const QPointF &c2);
+    void moveC0ToRelPos(const QPointF &c0);
 
-//    void setSeparateNodePoint(const bool &separateNodePoint);
-//    bool isSeparateNodePoint();
+    SmartPathAnimator *getTargetAnimator() const;
+    SmartPath *getTargetPath() const {
+        return mTargetPath_d;
+    }
 
-//    void setCtrlsMode(const CtrlsMode &mode);
-//    QPointF symmetricToAbsPos(const QPointF &absPosToMirror);
-//    QPointF symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
-//                                    const qreal &newLen);
-//    void ctrlPointPosChanged(const bool &startPtChanged);
-//    void moveEndCtrlPtToAbsPos(const QPointF &endCtrlPt);
-//    void moveStartCtrlPtToAbsPos(const QPointF &startCtrlPt);
-//    void moveEndCtrlPtToRelPos(const QPointF &endCtrlPt);
-//    void moveStartCtrlPtToRelPos(const QPointF &startCtrlPt);
-//    void setCtrlPtEnabled(const bool &enabled,
-//                          const bool &isStartPt);
-//    SmartPathAnimator *getParentPath();
+    void cancelTransform();
 
-//    void cancelTransform();
+    void setC0Enabled(const bool &enabled);
+    void setC2Enabled(const bool &enabled);
+    void resetC0();
+    void resetC2();
 
-//    void setEndCtrlPtEnabled(const bool &enabled);
-//    void setStartCtrlPtEnabled(const bool &enabled);
+    void setNodeId(const int &idT);
+    const int &getNodeId();
 
-//    void resetEndCtrlPt();
-//    void resetStartCtrlPt();
+    NodePointValues getPointValues() const;
 
-//    void setNodeId(const int &idT);
-//    const int &getNodeId();
-//    int getPtId() {
-//        return getNodeId()*3 + 1;
-//    }
+    bool isNeighbourSelected();
+    //void moveByAbs(const QPointF &absTranslatione);
 
-//    NodePointValues getPointValues() const;
+    SmartNodePoint *getConnectedSeparateNodePoint();
 
-//    bool isNeighbourSelected();
-//    //void moveByAbs(const QPointF &absTranslatione);
+    void saveTransformPivotAbsPos(const QPointF &absPivot);
+    void rotateRelativeToSavedPivot(const qreal &rot);
+    void scaleRelativeToSavedPivot(const qreal &sx,
+                                   const qreal &sy);
 
-//    SmartNodePoint *getConnectedSeparateNodePoint();
+    const Segment& getNextEdge() {
+        return mSegment;
+    }
 
-//    void saveTransformPivotAbsPos(const QPointF &absPivot);
-//    void rotateRelativeToSavedPivot(const qreal &rot);
-//    void scaleRelativeToSavedPivot(const qreal &sx,
-//                                   const qreal &sy);
+    SmartNodePoint *addPointAbsPos(const QPointF &absPos);
 
-//    VectorPathEdge *getNextEdge() {
-//        return mNextEdge.get();
-//    }
+    void setElementsPos(const QPointF &c0,
+                        const QPointF &p1,
+                        const QPointF &c2);
 
-//    SmartNodePoint *addPointAbsPos(const QPointF &absPos);
+    const QPointF& getC0() const {
+        return mNode_d->fC0;
+    }
 
-//    void setElementsPos(const QPointF &startPos,
-//                        const QPointF &targetPos,
-//                        const QPointF &endPos);
+    const QPointF& getP1() const {
+        return mNode_d->fP1;
+    }
 
-//    const QPointF& getC0() const {
-//        return mNode_d->fC0;
-//    }
+    const QPointF& getC2() const {
+        return mNode_d->fC2;
+    }
 
-//    const QPointF& getP1() const {
-//        return mNode_d->fP1;
-//    }
+    const bool &getC0Enabled() const {
+        return mNode_d->getC0Enabled();
+    }
 
-//    const QPointF& getC2() const {
-//        return mNode_d->fC2;
-//    }
+    const bool &getC2Enabled() const {
+        return mNode_d->getC2Enabled();
+    }
 
-//    const bool &getC0Enabled() const {
-//        return mNode_d->getC0Enabled();
-//    }
+    const CtrlsMode& getCtrlsMode() const {
+        return mNode_d->getCtrlsMode();
+    }
 
-//    const bool &getC2Enabled() const {
-//        return mNode_d->getC2Enabled();
-//    }
+    const Node::Type& getType() const {
+        return mNode_d->getType();
+    }
 
-//    const CtrlsMode& getCtrlsMode() const {
-//        return mNode_d->getCtrlsMode();
-//    }
+    void updateNode() {
+        if(!mTargetPath_d) mNode_d = nullptr;
+        else mNode_d = mTargetPath_d->getNodePtr(mNodeId);
+    }
+protected:
+    SmartNodePoint(const int& nodeId,
+                   PathPointsHandler * const handler,
+                   SmartPathAnimator * const parentAnimator,
+                   BasicTransformAnimator * const parentTransform);
 
-//    Node::Type getType() const {
-//        return mNode_d->getType();
-//    }
+    void setPointAsPrevious(SmartNodePoint *pointToSet);
+    void setPointAsNext(SmartNodePoint *pointToSet);
+    void setNextPoint(SmartNodePoint *mNextPoint);
+    void setPreviousPoint(SmartNodePoint *mPreviousPoint);
+private:
+    bool mSeparateNodePoint = false;
+    int mNodeId;
+    const Node * mNode_d = nullptr;
 
-//    void updateNode() {
-//        if(!mTargetPath_d) mNode_d = nullptr;
-//        else mNode_d = mTargetPath_d->getNodePtr(mNodeId);
-//    }
-//protected:
-//    SmartNodePoint(SmartPathAnimator *parentAnimator,
-//                   BasicTransformAnimator* parentTransform);
-//private:
-//    bool mSeparateNodePoint = false;
-//    int mNodeId;
-//    const Node * mNode_d = nullptr;
+    SmartPath * mTargetPath_d = nullptr;
+    Segment mSegment;
+    const stdptr<PathPointsHandler> mHandler_k;
+    const qptr<SmartPathAnimator> mParentPath;
 
-//    SmartPath * mTargetPath_d = nullptr;
-//    stdsptr<VectorPathEdge> mNextEdge;
-//    const qptr<SmartPathAnimator> mParentPath;
+    stdptr<SmartNodePoint> mNextPoint;
+    stdptr<SmartNodePoint> mPreviousPoint;
+    stdsptr<SmartCtrlPoint> mC0Pt;
+    stdsptr<SmartCtrlPoint> mC2Pt;
 
-//    stdptr<SmartNodePoint> mNextPoint;
-//    stdptr<SmartNodePoint> mPreviousPoint;
-//    stdsptr<CtrlPoint> mStartCtrlPt;
-//    stdsptr<CtrlPoint> mEndCtrlPt;
+    void ctrlPointPosChanged(const SmartCtrlPoint * const pointChanged,
+                             SmartCtrlPoint * const pointToUpdate);
+};
 
-//    void ctrlPointPosChanged(CtrlPoint *pointChanged,
-//                             CtrlPoint *pointToUpdate);
-//};
-
-//#endif // SMARTNODEPOINT_H
+#endif // SMARTNODEPOINT_H

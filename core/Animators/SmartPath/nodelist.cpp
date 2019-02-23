@@ -139,7 +139,9 @@ Node &NodeList::insertNodeToList(const int &nodeId, const Node &node) {
         Node& iNode = mNodes[i];
         iNode.shiftIdsGreaterThan(nodeId - 1, 1);
     }
-    return mNodes[nodeId];
+    Node& insertedNode = mNodes[nodeId];
+    insertedNode.setNodeId(nodeId);
+    return insertedNode;
 }
 
 int NodeList::nodesInSameSagment(const int& node1Id,

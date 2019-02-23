@@ -272,7 +272,10 @@ SOURCES += main.cpp\
     CacheHandlers/minimalcachehandler.cpp \
     CacheHandlers/soundcachehandler.cpp \
     MovablePoints/smartnodepoint.cpp \
-    MovablePoints/nodepointvalues.cpp
+    MovablePoints/nodepointvalues.cpp \
+    MovablePoints/pathpointshandler.cpp \
+    MovablePoints/segment.cpp \
+    MovablePoints/smartctrlpoint.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -496,7 +499,10 @@ HEADERS  += \
     CacheHandlers/minimalcachehandler.h \
     CacheHandlers/soundcachehandler.h \
     MovablePoints/smartnodepoint.h \
-    MovablePoints/nodepointvalues.h
+    MovablePoints/nodepointvalues.h \
+    MovablePoints/pathpointshandler.h \
+    MovablePoints/segment.h \
+    MovablePoints/smartctrlpoint.h
 
 RESOURCES += \
     resources.qrc

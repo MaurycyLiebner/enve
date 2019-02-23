@@ -66,61 +66,6 @@ void VectorPathEdge::getNewRelPosForKnotInsertionAtTSk(const SkPoint &P0,
     *P2_ptr = P2_3;
 }
 
-qreal VectorPathEdge::getLength(const QPointF &p0Pos,
-                      const QPointF &p1EndPos,
-                      const QPointF &p2StartPos,
-                      const QPointF &p3Pos) {
-    qreal length = 0.;
-
-    qreal tInc = 0.01;
-    qreal t = 0.;
-    QPointF lastPoint = p0Pos;
-    while(true) {
-        const QPointF currentPoint =
-                getPosBetweenPointsAtT(t + tInc,
-                                       p0Pos, p1EndPos,
-                                       p2StartPos, p3Pos);
-        const qreal lenInc = pointToLen(currentPoint - lastPoint);
-        if(lenInc > 5) {
-            tInc = tInc * 4 / lenInc;
-            continue;
-        }
-        if(lenInc < 3) {
-            t += tInc;
-            tInc = tInc * 4 / lenInc;
-        } else {
-            t += tInc;
-        }
-        length += lenInc;
-        lastPoint = currentPoint;
-        if(t > 0.999) break;
-    }
-
-    return length;
-}
-
-qreal VectorPathEdge::getLength(const QPointF &p0Pos,
-                        const QPointF &p1EndPos,
-                        const QPointF &p2StartPos,
-                        const QPointF &p3Pos,
-                        int divisions) {
-    divisions++; // so that 'i' starts at 1, not 0
-    qreal length = 0.;
-
-    QPointF lastPoint = p0Pos;
-    for(int i = 1; i < divisions; i++) {
-        const qreal t = i/static_cast<qreal>(divisions);
-        const QPointF currentPoint =
-                getPosBetweenPointsAtT(t, p0Pos, p1EndPos,
-                                       p2StartPos, p3Pos);
-        length += pointToLen(currentPoint - lastPoint);
-        lastPoint = currentPoint;
-    }
-    length += pointToLen(p3Pos - lastPoint);
-
-    return length;
-}
-
 QPointF VectorPathEdge::getPosBetweenPointsAtT(const qreal &t,
                                      const QPointF &p0Pos,
                                      const QPointF &p1EndPos,

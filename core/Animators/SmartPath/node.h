@@ -32,11 +32,16 @@ struct Node {
 
     bool isDissolved() const { return fType == DISSOLVED; }
 
-    int getNextNodeId() const {
+    const int &getNextNodeId() const {
         return fNextNodeId;
     }
-    int getPrevNodeId() const {
+
+    const int &getPrevNodeId() const {
         return fPrevNodeId;
+    }
+
+    const int &getNodeId() const {
+        return fId;
     }
 
     bool hasPreviousNode() const {
@@ -94,6 +99,7 @@ protected:
     }
 
     void shiftIdsGreaterThan(const int& greater, const int& shiftBy) {
+        if(fId > greater) fId += shiftBy;
         if(fPrevNodeId) if(fPrevNodeId > greater) fPrevNodeId += shiftBy;
         if(fNextNodeId) if(fNextNodeId > greater) fNextNodeId += shiftBy;
     }
@@ -104,6 +110,10 @@ protected:
 
     void setNextNodeId(const int& nextNodeId) {
         fNextNodeId = nextNodeId;
+    }
+
+    void setNodeId(const int& nodeId) {
+        fId = nodeId;
     }
 
     void setType(const Type& type) {
@@ -127,6 +137,7 @@ protected:
     bool fC2Enabled = true;
     CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 
+    int fId = -1;
     //! @brief Previous connected node id in the list.
     int fPrevNodeId = -1;
     //! @brief Next connected node id in the list.

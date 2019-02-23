@@ -14,18 +14,18 @@ public:
     PathBase(const NodeList::Type &type);
     void actionRemoveNormalNode(const int& nodeId);
 
-    void actionAddFirstNode(const QPointF& c0,
-                            const QPointF& p1,
-                            const QPointF& c2);
+    int actionAddFirstNode(const QPointF& c0,
+                           const QPointF& p1,
+                           const QPointF& c2);
 
-    void actionInsertNodeBetween(const int &prevId,
-                                 const int& nextId,
-                                 const QPointF &c0,
-                                 const QPointF &p1,
-                                 const QPointF &c2);
-    void actionInsertNodeBetween(const int &prevId,
-                                 const int& nextId,
-                                 const qreal& t);
+    int actionInsertNodeBetween(const int &prevId,
+                                const int& nextId,
+                                const QPointF &c0,
+                                const QPointF &p1,
+                                const QPointF &c2);
+    int actionInsertNodeBetween(const int &prevId,
+                                const int& nextId,
+                                const qreal& t);
 
     void actionPromoteDissolvedNodeToNormal(const int& nodeId);
 
@@ -128,6 +128,10 @@ public:
         return PathBase(mNodesList.getList(), mType);
     }
 
+    int getNodeCount() const {
+        return mNodesList.getList().count();
+    }
+
     static bool sDifferent(const PathBase& path1, const PathBase& path2) {
         return NodeList::sDifferent(path1.getNodesRef(),
                                     path2.getNodesRef());
@@ -180,8 +184,8 @@ protected:
 private:
     NodeList getNodesListFor(PathBase * const neighbour) const;
     SkPath getPathFor(PathBase * const neighbour) const;
-    void insertNodeBetween(const int &prevId, const int &nextId,
-                           const Node &nodeBlueprint);
+    int insertNodeBetween(const int &prevId, const int &nextId,
+                          const Node &nodeBlueprint);
 
     PathBase * mPrev = nullptr;
     PathBase * mNext = nullptr;

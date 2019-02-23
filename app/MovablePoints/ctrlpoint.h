@@ -10,7 +10,7 @@ public:
     void moveByAbs(const QPointF &absTranslatione);
     void setRelativePos(const QPointF &relPos);
     void moveToAbsWithoutUpdatingTheOther(const QPointF &absPos);
-    void moveToAbs(QPointF absPos);
+    void moveToAbs(const QPointF& absPos);
     //void moveByWithoutUpdatingTheOther(QPointF absTranslation);
     void moveByRel(const QPointF &relTranslation);
     void startTransform();

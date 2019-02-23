@@ -47,7 +47,7 @@ public:
     BasicTransformAnimator *getParentTransform();
 
     bool isContainedInRect(const QRectF &absRect);
-    virtual void moveToAbs(QPointF absPos);
+    virtual void moveToAbs(const QPointF& absPos);
     virtual void moveByAbs(const QPointF &absTranslatione);
 
     virtual void removeApproximate() {}

@@ -23,33 +23,34 @@ void PathBase::actionRemoveNormalNode(const int &nodeId) {
     mNodesList.setNodeType(nodeId, node, Node::DUMMY);
 }
 
-void PathBase::actionAddFirstNode(const QPointF &c0,
-                                   const QPointF &p1,
-                                   const QPointF &c2) {
+int PathBase::actionAddFirstNode(const QPointF &c0,
+                                 const QPointF &p1,
+                                 const QPointF &c2) {
     const int insertId = mNodesList.appendNode(Node(c0, p1, c2));
     mNodesList.insertNodeAfter(insertId, Node(Node::MOVE));
+    return insertId;
 }
 
-void PathBase::insertNodeBetween(const int& prevId,
-                                  const int& nextId,
-                                  const Node& nodeBlueprint) {
+int PathBase::insertNodeBetween(const int& prevId,
+                                const int& nextId,
+                                const Node& nodeBlueprint) {
     if(!mNodesList.nodesConnected(prevId, nextId))
         RuntimeThrow("Cannot insert between not connected nodes");
-    mNodesList.insertNodeAfter(prevId, nodeBlueprint);
+    return mNodesList.insertNodeAfter(prevId, nodeBlueprint);
 }
 
-void PathBase::actionInsertNodeBetween(const int &prevId,
-                                        const int& nextId,
-                                        const qreal& t) {
-    insertNodeBetween(prevId, nextId, Node(t));
+int PathBase::actionInsertNodeBetween(const int &prevId,
+                                      const int& nextId,
+                                      const qreal& t) {
+    return insertNodeBetween(prevId, nextId, Node(t));
 }
 
-void PathBase::actionInsertNodeBetween(const int &prevId,
-                                        const int& nextId,
-                                        const QPointF &c0,
-                                        const QPointF &p1,
-                                        const QPointF &c2) {
-    insertNodeBetween(prevId, nextId, Node(c0, p1, c2));
+int PathBase::actionInsertNodeBetween(const int &prevId,
+                                      const int& nextId,
+                                      const QPointF &c0,
+                                      const QPointF &p1,
+                                      const QPointF &c2) {
+    return insertNodeBetween(prevId, nextId, Node(c0, p1, c2));
 }
 
 void PathBase::actionPromoteDissolvedNodeToNormal(const int &nodeId) {

@@ -35,17 +35,6 @@ public:
                                           const QPointF &p2StartPos,
                                           const QPointF &p3Pos);
 
-    static qreal getLength(const QPointF &p0Pos,
-                           const QPointF &p1EndPos,
-                           const QPointF &p2StartPos,
-                           const QPointF &p3Pos,
-                           int divisions);
-
-    static qreal getLength(const QPointF &p0Pos,
-                           const QPointF &p1EndPos,
-                           const QPointF &p2StartPos,
-                           const QPointF &p3Pos);
-
     static QPointF getRelPosBetweenPointsAtT(const qreal &t,
                                              NodePoint *point1,
                                              NodePoint *point2);

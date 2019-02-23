@@ -194,7 +194,7 @@ void MovablePoint::moveByAbs(const QPointF &absTranslatione) {
               absTranslatione);
 }
 
-void MovablePoint::moveToAbs(QPointF absPos) {
+void MovablePoint::moveToAbs(const QPointF& absPos) {
     setAbsolutePos(absPos);
 }
 

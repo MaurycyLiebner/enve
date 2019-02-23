@@ -4,7 +4,6 @@
 #include "Boxes/boxesgroup.h"
 #include "pointhelpers.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
-#include "nodepoint.h"
 
 CtrlPoint::CtrlPoint(NodePoint *parentPoint, bool isStartCtrlPt) :
     NonAnimatedMovablePoint(parentPoint->getParentTransform(),
@@ -64,7 +63,7 @@ void CtrlPoint::moveByAbs(const QPointF &absTranslatione) {
               absTranslatione);
 }
 
-void CtrlPoint::moveToAbs(QPointF absPos) {
+void CtrlPoint::moveToAbs(const QPointF& absPos) {
     NonAnimatedMovablePoint::moveToAbs(absPos);
     if(mOtherCtrlPt_cv->isSelected()) {
         return;
