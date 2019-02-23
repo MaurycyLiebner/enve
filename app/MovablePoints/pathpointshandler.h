@@ -16,7 +16,10 @@ public:
                     const CanvasMode &currentCanvasMode,
                     const SkScalar &invScale,
                     const SkMatrix &combinedTransform) const;
-    SmartNodePoint* createNewNodePoint(const int& nodeId);
+
+    SmartNodePoint* getPointWithId(const int& id) const {
+        return mPoints.at(id).get();
+    }
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
@@ -27,7 +30,9 @@ protected:
         updatePoints();
     }
 private:
+    void updatePoint(const int& nodeId);
     void updatePoints();
+    SmartNodePoint* createNewNodePoint(const int& nodeId);
 
     QList<stdsptr<SmartNodePoint>> mPoints;
     PathBase* mCurrentTarget;

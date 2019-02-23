@@ -50,9 +50,6 @@ public:
 
     SmartNodePoint *addPointRelPos(const QPointF &relPos);
 
-    void connectToPoint(SmartNodePoint * const point);
-    void disconnectFromPoint(SmartNodePoint * const point);
-
     void removeFromVectorPath();
     void removeApproximate();
 
@@ -61,8 +58,8 @@ public:
                                    const qreal &canvasScaleInv);
     void rectPointsSelection(const QRectF &absRect,
                              QList<stdptr<MovablePoint>> &list);
-    void updateC0PtVisibility();
-    void updatec2Visibility();
+    void updateC0Visibility();
+    void updateC2Visibility();
 
     void setSeparateNodePoint(const bool &separateNodePoint);
     bool isSeparateNodePoint();
@@ -107,7 +104,7 @@ public:
                                    const qreal &sy);
 
     const Segment& getNextEdge() {
-        return mSegment;
+        return mNextSegment;
     }
 
     SmartNodePoint *addPointAbsPos(const QPointF &absPos);
@@ -147,24 +144,27 @@ public:
     void updateNode() {
         if(!mTargetPath_d) mNode_d = nullptr;
         else mNode_d = mTargetPath_d->getNodePtr(mNodeId);
+        updateFromNodeData();
     }
+
+    void updateFromNodeData();
 protected:
     SmartNodePoint(const int& nodeId,
                    PathPointsHandler * const handler,
                    SmartPathAnimator * const parentAnimator,
                    BasicTransformAnimator * const parentTransform);
 
-    void setPointAsPrevious(SmartNodePoint *pointToSet);
-    void setPointAsNext(SmartNodePoint *pointToSet);
-    void setNextPoint(SmartNodePoint *mNextPoint);
-    void setPreviousPoint(SmartNodePoint *mPreviousPoint);
+    void setPointAsPrevious(SmartNodePoint * const pointToSet);
+    void setPointAsNext(SmartNodePoint * const pointToSet);
+    void setNextPoint(SmartNodePoint * const mNextPoint);
+    void setPreviousPoint(SmartNodePoint * const mPreviousPoint);
 private:
     bool mSeparateNodePoint = false;
     int mNodeId;
     const Node * mNode_d = nullptr;
 
     SmartPath * mTargetPath_d = nullptr;
-    Segment mSegment;
+    Segment mNextSegment;
     const stdptr<PathPointsHandler> mHandler_k;
     const qptr<SmartPathAnimator> mParentAnimator;
 

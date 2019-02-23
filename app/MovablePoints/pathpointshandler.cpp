@@ -7,7 +7,9 @@ PathPointsHandler::PathPointsHandler(
         BasicTransformAnimator * const parentTransform) :
     mCurrentTarget(targetAnimator->getCurrentlyEditedPath()),
     mTargetAnimator(targetAnimator),
-    mParentTransform(parentTransform) {}
+    mParentTransform(parentTransform) {
+    updatePoints();
+}
 
 MovablePoint *PathPointsHandler::getPointAtAbsPos(
         const QPointF &absPtPos,
@@ -61,10 +63,20 @@ SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
     return newPt.get();
 }
 
+void PathPointsHandler::updatePoint(const int &nodeId) {
+    mPoints.at(nodeId)->updateFromNodeData();
+}
+
 void PathPointsHandler::updatePoints() {
-    mPoints.clear();
+    int j = 0;
     const int nodeCount = mCurrentTarget->getNodeCount();
-    for(int i = 0; i < nodeCount; i++) {
-        createNewNodePoint(i);
+    while(j < mPoints.count() && j < nodeCount) {
+        updatePoint(j++);
+    }
+    while(j < nodeCount) {
+        createNewNodePoint(j++);
+    }
+    while(j < mPoints.count()) {
+        mPoints.removeAt(j++);
     }
 }
