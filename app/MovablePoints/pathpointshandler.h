@@ -12,10 +12,10 @@ public:
     void selectAndAddContainedPointsToList(
             const QRectF &absRect,
             QList<stdptr<MovablePoint>> &list) const;
-    void drawSelected(SkCanvas * const canvas,
-                      const CanvasMode &currentCanvasMode,
-                      const SkScalar &invScale,
-                      const SkMatrix &combinedTransform) const;
+    void drawPoints(SkCanvas * const canvas,
+                    const CanvasMode &currentCanvasMode,
+                    const SkScalar &invScale,
+                    const SkMatrix &combinedTransform) const;
     SmartNodePoint* createNewNodePoint(const int& nodeId);
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator,

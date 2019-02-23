@@ -118,10 +118,6 @@ public:
 
     void restore() {
         mNodesList.setNodeList(mSavedList);
-        if(mType == NodeList::NORMAL) return;
-        updateAllNodesTypeAfterNeighbourChanged();
-        if(mPrev) mPrev->updateAllNodesTypeAfterNeighbourChanged();
-        if(mNext) mNext->updateAllNodesTypeAfterNeighbourChanged();
     }
 
     PathBase createCopy() const {
@@ -130,6 +126,10 @@ public:
 
     int getNodeCount() const {
         return mNodesList.getList().count();
+    }
+
+    void assign(const PathBase& src) {
+        mNodesList.setNodeList(src.getNodesRef().getList());
     }
 
     static bool sDifferent(const PathBase& path1, const PathBase& path2) {

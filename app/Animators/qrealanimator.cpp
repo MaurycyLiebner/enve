@@ -334,10 +334,10 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
         return;
     }
 
-    if(anim_mKeyOnCurrentFrame == nullptr) {
+    if(!anim_mKeyOnCurrentFrame) {
         const auto newKey = SPtrCreate(QrealKey)(mCurrentValue,
-                                           anim_mCurrentRelFrame,
-                                           this);
+                                                 anim_mCurrentRelFrame,
+                                                 this);
         anim_appendKey(newKey);
         anim_mKeyOnCurrentFrame = newKey.get();
         graph_updateKeysPath();

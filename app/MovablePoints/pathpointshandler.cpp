@@ -29,10 +29,10 @@ void PathPointsHandler::selectAndAddContainedPointsToList(
     }
 }
 
-void PathPointsHandler::drawSelected(SkCanvas * const canvas,
-                                     const CanvasMode &currentCanvasMode,
-                                     const SkScalar &invScale,
-                                     const SkMatrix &combinedTransform) const {
+void PathPointsHandler::drawPoints(SkCanvas * const canvas,
+                                   const CanvasMode &currentCanvasMode,
+                                   const SkScalar &invScale,
+                                   const SkMatrix &combinedTransform) const {
     Q_UNUSED(combinedTransform);
 
     const bool keyOnCurrentFrame = mKeyOnCurrentFrame;

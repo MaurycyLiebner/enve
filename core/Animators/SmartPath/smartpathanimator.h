@@ -1,11 +1,10 @@
-#ifndef SMARTPATHANIMATOR_H
+﻿#ifndef SMARTPATHANIMATOR_H
 #define SMARTPATHANIMATOR_H
-#include "Animators/interpolationanimator.h"
 #include "smartpathcontainer.h"
 #include "Animators/interpolationanimatort.h"
 #include "differsinterpolate.h"
 #include "basicreadwrite.h"
-class PathAnimator;
+
 class SmartPathKey : public InterpolationKeyT<SmartPath> {
     friend class StdSelfRef;
 public:
@@ -24,6 +23,10 @@ public:
     void updateAfterNextKeyChanged(Key * const nextKey) {
         mValue.setNext(&static_cast<SmartPathKey*>(nextKey)->getValue());
     }
+
+    void assignValue(const SmartPath& value) {
+        mValue.assign(value);
+    }
 protected:
     SmartPathKey(const SmartPath& value, const int &relFrame,
                  Animator * const parentAnimator) :
@@ -31,40 +34,27 @@ protected:
     SmartPathKey(Animator * const parentAnimator) :
         InterpolationKeyT<SmartPath>(parentAnimator) {}
 };
-
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
 public:
     bool SWT_isSmartPathAnimator() const { return true; }
 
-    SkPath getPathAtAbsFrame(const qreal &frame) const {
-        return getPathAtRelFrame(this->prp_absFrameToRelFrameF(frame));
+    void anim_setAbsFrame(const int &frame) {
+        const int lastRelFrame = anim_mCurrentRelFrame;
+        Animator::anim_setAbsFrame(frame);
+        if(this->anim_hasKeys()) {
+            const auto prevK1 = anim_getPrevKey(lastRelFrame);
+            const auto prevK2 = anim_getPrevKey(anim_mCurrentRelFrame);
+            const auto nextK1 = anim_getNextKey(lastRelFrame);
+            const auto nextK2 = anim_getNextKey(anim_mCurrentRelFrame);
+            if(prevK1 == nullptr && prevK2 == nullptr) return;
+            if(nextK1 == nullptr && nextK2 == nullptr) return;
+            this->anim_callFrameChangeUpdater();
+        }
     }
 
-    qreal getInterpolatedFrameAtRelFrame(
-            const qreal &frame) const {
-        int prevId;
-        int nextId;
-        if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId, frame)) {
-            if(nextId == prevId) {
-                return GetAsGK(this->anim_mKeys.at(nextId))->getRelFrame();
-            } else {
-                GraphKey *prevKey = GetAsGK(this->anim_mKeys.at(prevId));
-                GraphKey *nextKey = GetAsGK(this->anim_mKeys.at(nextId));
-
-                qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                                     prevKey->getEndFrame(),
-                                     nextKey->getStartFrame(),
-                                     qreal(nextKey->getRelFrame())};
-                qreal t = gTFromX(seg, frame);
-                qreal p0y = prevKey->getValueForGraph();
-                qreal p1y = prevKey->getEndValue();
-                qreal p2y = nextKey->getStartValue();
-                qreal p3y = nextKey->getValueForGraph();
-                return gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
-            }
-        }
-        return frame;
+    SkPath getPathAtAbsFrame(const qreal &frame) const {
+        return getPathAtRelFrame(this->prp_absFrameToRelFrameF(frame));
     }
 
     void graph_getValueConstraints(
@@ -153,15 +143,50 @@ public:
         }
         mPathBeingChanged_d = nullptr;
     }
+
+    SmartPathKey* getKeyAtId(const int& id) const {
+        return GetAsPtr(this->anim_mKeys.at(id), SmartPathKey);
+    }
+
+    void anim_saveCurrentValueAsKey() {
+        if(!this->anim_mIsRecording) this->anim_setRecording(true);
+
+        if(this->anim_mKeyOnCurrentFrame) {
+            const auto spk = GetAsPtr(this->anim_mKeyOnCurrentFrame,
+                                      SmartPathKey);
+            spk->assignValue(mBaseValue);
+        } else {
+            const auto newKey = SPtrCreate(SmartPathKey)(
+                        mBaseValue, this->anim_mCurrentRelFrame, this);
+            this->anim_appendKey(GetAsSPtr(newKey, Key));
+            this->anim_mKeyOnCurrentFrame = newKey.get();
+        }
+    }
+
+    void writeProperty(QIODevice * const target) const {
+        int nKeys = this->anim_mKeys.count();
+        target->write(rcConstChar(&nKeys), sizeof(int));
+        for(const auto &key : this->anim_mKeys) {
+            key->writeKey(target);
+        }
+        gWrite(target, mBaseValue);
+    }
+
+    void readProperty(QIODevice *target) {
+        int nKeys;
+        target->read(rcChar(&nKeys), sizeof(int));
+        for(int i = 0; i < nKeys; i++) {
+            auto newKey = SPtrCreate(SmartPathKey)(this);
+            newKey->readKey(target);
+            this->anim_appendKey(newKey);
+        }
+        gRead(target, mBaseValue);
+    }
 protected:
-    SmartPathAnimator(PathAnimator * const pathAnimator);
+    SmartPathAnimator();
 private:
     SmartPath * mPathBeingChanged_d = nullptr;
     SmartPath mBaseValue;
-
-    SmartPathKey* getKeyAtId(const int& id) const {
-        return GetAsPtrTemplated(this->anim_mKeys.at(id), SmartPathKey);
-    }
 };
 
 #endif // SMARTPATHANIMATOR_H

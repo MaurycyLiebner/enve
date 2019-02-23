@@ -166,7 +166,7 @@ private:
     SmartPath * mTargetPath_d = nullptr;
     Segment mSegment;
     const stdptr<PathPointsHandler> mHandler_k;
-    const qptr<SmartPathAnimator> mParentPath;
+    const qptr<SmartPathAnimator> mParentAnimator;
 
     stdptr<SmartNodePoint> mNextPoint;
     stdptr<SmartNodePoint> mPreviousPoint;

@@ -197,6 +197,10 @@ protected:
 
     void setNodeList(const QList<Node>& list) {
         mNodes = list;
+        if(mNoUpdates || mType == NORMAL) return;
+        updateAllNodesTypeAfterNeighbourChanged();
+        if(mPrev) mPrev->updateAllNodesTypeAfterNeighbourChanged();
+        if(mNext) mNext->updateAllNodesTypeAfterNeighbourChanged();
     }
 
     int insertNodeBefore(const int &nextId, const Node &nodeBlueprint,
