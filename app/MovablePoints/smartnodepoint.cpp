@@ -337,12 +337,14 @@ SmartNodePoint *SmartNodePoint::getConnectedSeparateNodePoint() {
 
 void SmartNodePoint::updateC0Visibility() {
     if(!mPreviousPoint) mC0Pt->hide();
-    else mC0Pt->setVisible(mNode_d->getC0Enabled());
+    else mC0Pt->setVisible(mNode_d->getC0Enabled() &&
+                           mNode_d->isNormal());
 }
 
 void SmartNodePoint::updateC2Visibility() {
     if(!mNextPoint) mC2Pt->hide();
-    else mC2Pt->setVisible(mNode_d->getC2Enabled());
+    else mC2Pt->setVisible(mNode_d->getC2Enabled() &&
+                           mNode_d->isNormal());
 }
 
 void SmartNodePoint::setC2Enabled(const bool &enabled) {
@@ -398,8 +400,8 @@ SmartPathAnimator *SmartNodePoint::getTargetAnimator() const {
     return mParentAnimator;
 }
 
-void SmartNodePoint::setSeparateNodePoint(const bool &SeparateNodePoint) {
-    mSeparateNodePoint = SeparateNodePoint;
+void SmartNodePoint::setSeparateNodePoint(const bool &separateNodePoint) {
+    mSeparateNodePoint = separateNodePoint;
 }
 
 bool SmartNodePoint::isSeparateNodePoint() {
@@ -469,7 +471,19 @@ void SmartNodePoint::setPointAsPrevious(SmartNodePoint * const pointToSet) {
     if(pointToSet) pointToSet->setNextPoint(this);
 }
 
-SmartNodePoint *SmartNodePoint::addPointRelPos(const QPointF &relPos) {
+void SmartNodePoint::actionConnectToPoint(SmartNodePoint * const point) {
+    mTargetPath_d->actionConnectNodes(mNodeId, point->getNodeId());
+    updateFromNodeData();
+    point->updateFromNodeData();
+}
+
+void SmartNodePoint::actionDisconnectFromPoint(SmartNodePoint * const point) {
+    mTargetPath_d->actionDisconnectNodes(mNodeId, point->getNodeId());
+    updateFromNodeData();
+    point->updateFromNodeData();
+}
+
+SmartNodePoint *SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
     const int insertId = mTargetPath_d->actionInsertNodeBetween(
                 mNodeId, mNode_d->getNextNodeId(), relPos, relPos, relPos);
     const auto newPt = mHandler_k->createNewNodePoint(insertId);
@@ -478,8 +492,8 @@ SmartNodePoint *SmartNodePoint::addPointRelPos(const QPointF &relPos) {
     return newPt;
 }
 
-SmartNodePoint *SmartNodePoint::addPointAbsPos(const QPointF &absPos) {
-    return addPointRelPos(mapAbsoluteToRelative(absPos));
+SmartNodePoint *SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {
+    return actionAddPointRelPos(mapAbsoluteToRelative(absPos));
 }
 
 void SmartNodePoint::setElementsPos(const QPointF &c0,
@@ -496,9 +510,17 @@ void SmartNodePoint::updateFromNodeData() {
         setPointAsNext(nullptr);
         return;
     }
-    mC0Pt->setRelativePosVal(mNode_d->fC0);
-    setRelativePosVal(mNode_d->fP1);
-    mC2Pt->setRelativePosVal(mNode_d->fC2);
+    if(mNode_d->isNormal()) {
+        mC0Pt->setRelativePosVal(mNode_d->fC0);
+        setRelativePosVal(mNode_d->fP1);
+        mC2Pt->setRelativePosVal(mNode_d->fC2);
+        setVisible(true);
+    } else if(mNode_d->isDissolved() || mNode_d->isDummy()) {
+        setRelativePosVal(mNode_d->fP1);
+        setVisible(true);
+    } else {
+        setVisible(false);
+    }
 
     const int prevNodeId = mNode_d->getPrevNodeId();
     const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
@@ -513,5 +535,8 @@ void SmartNodePoint::updateFromNodeData() {
 }
 
 bool SmartNodePoint::isEndPoint() {
+    if(mPreviousPoint) if(mPreviousPoint->getType() == Node::MOVE) return true;
+    if(mNextPoint) if(mNextPoint->getType() == Node::MOVE) return true;
+
     return !mNextPoint || !mPreviousPoint;
 }

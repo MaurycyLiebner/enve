@@ -45,6 +45,7 @@ public:
         if(!node.isDissolved()) RuntimeThrow("Setting dissolved node value "
                                              "on a node of a different type");
         node.fT = t;
+        updateDissolvedNodePosition(nodeId, node);
     }
 
     void actionSetNormalNodeValues(const int& nodeId,
@@ -109,7 +110,25 @@ public:
     SkPath interpolateWithPrev(const qreal& prevWeight) const;
 
     const Node * getNodePtr(const int& id) const {
+        if(id < 0) return nullptr;
+        if(id >= mNodesList.count()) return nullptr;
         return &mNodesList[id];
+    }
+
+    int prevNormalId(const int &nodeId) const {
+        return mNodesList.prevNormalId(nodeId);
+    }
+
+    int nextNormalId(const int &nodeId) const {
+        return mNodesList.nextNormalId(nodeId);
+    }
+
+    void updateDissolvedNodePosition(const int& nodeId) {
+        mNodesList.updateDissolvedNodePosition(nodeId);
+    }
+
+    void updateDissolvedNodePosition(const int& nodeId, Node& node) {
+        mNodesList.updateDissolvedNodePosition(nodeId, node);
     }
 
     void save() {

@@ -4,6 +4,12 @@
 #include "exceptions.h"
 #include "smartPointers/sharedpointerdefs.h"
 
+qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
+                                  const Node& nextNode) {
+    return qCubicSegment2D(prevNode.fP1, prevNode.fC2,
+                           nextNode.fC0, nextNode.fP1);
+}
+
 void NodeList::moveNodeAfter(const int& moveNodeId, Node& moveNode,
                              const int& afterNodeId, Node& afterNode) {
     const int movePrevId = moveNode.getPrevNodeId();
@@ -28,6 +34,49 @@ void NodeList::moveNodeBefore(const int& moveNodeId, Node& moveNode,
     setNodePrevId(beforeNodeId, beforeNode, moveNodeId);
     setNodePrevAndNextId(moveNodeId, moveNode, beforePrevId, beforeNodeId);
     setNodeNextId(beforePrevId, moveNodeId);
+}
+
+void NodeList::updateDissolvedNodePosition(const int &nodeId) {
+    Node& node = at(nodeId);
+    updateDissolvedNodePosition(nodeId, node);
+}
+
+void NodeList::updateDissolvedNodePosition(const int &nodeId, Node& node) {
+    const int prevId = prevNormalId(nodeId);
+    const int nextId = nextNormalId(nodeId);
+    const Node& prevNode = at(prevId);
+    const Node& nextNode = at(nextId);
+    const auto normalSeg = gSegmentFromNodes(prevNode, nextNode);
+    node.fP1 = normalSeg.posAtT(node.fT);
+}
+
+void NodeList::updateDummyNodePosition(const int& nodeId) {
+    Node& node = at(nodeId);
+    updateDummyNodePosition(nodeId, node);
+}
+
+void NodeList::updateDummyNodePosition(const int &nodeId, Node &node) {
+    int nPrev = 0;
+    int nDummies = 1;
+    const Node * cNode = &node;
+    while(cNode->getPrevNodeId() != -1) {
+        const int prevId = cNode->getPrevNodeId();
+        cNode = &at(prevId);
+        if(!cNode->isDummy()) break;
+        nDummies++;
+        nPrev++;
+    }
+    cNode = &node;
+    while(cNode->getNextNodeId() != -1) {
+        const int nextId = cNode->getNextNodeId();
+        cNode = &at(nextId);
+        if(!cNode->isDummy()) break;
+        nDummies++;
+    }
+    const qreal prevTv = prevT(nodeId);
+    const qreal nextTv = nextT(nodeId);
+    node.fT = prevTv + (nPrev + 1)*(nextTv - prevTv)/(nDummies + 1);
+    updateDissolvedNodePosition(nodeId, node);
 }
 
 bool NodeList::read(QIODevice * const src) {
@@ -232,12 +281,6 @@ int NodeList::appendNode(const Node &nodeBlueprint,
     return insertId;
 }
 
-qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
-                                  const Node& nextNode) {
-    return qCubicSegment2D(prevNode.fP1, prevNode.fC2,
-                           nextNode.fC0, nextNode.fP1);
-}
-
 void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
                                             Node& node) {
     const int prevNormalIdV = prevNormalId(nodeId);
@@ -254,6 +297,7 @@ void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
     node.fP1 = first.p1();
     node.fC2 = second.c1();
     setNodeType(nodeId, node, Node::NORMAL);
+    setNodeCtrlsMode(nodeId, node, CtrlsMode::CTRLS_SMOOTH);
     nextNormal.fC0 = second.c2();
     for(int i = prevNormalIdV + 1; i < nodeId; i++) {
         Node& iNode = mNodes[i];

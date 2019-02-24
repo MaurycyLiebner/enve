@@ -245,11 +245,8 @@ bool MovablePoint::isVisible() const {
 }
 
 void MovablePoint::setVisible(const bool &bT) {
-    if(bT) {
-        show();
-    } else {
-        hide();
-    }
+    if(bT) show();
+    else hide();
 }
 
 bool MovablePoint::isNodePoint() {

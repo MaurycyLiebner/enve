@@ -20,6 +20,8 @@ public:
     SmartNodePoint* getPointWithId(const int& id) const {
         return mPoints.at(id).get();
     }
+
+    SmartNodePoint* createNewNodePoint(const int& nodeId);
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
@@ -32,7 +34,6 @@ protected:
 private:
     void updatePoint(const int& nodeId);
     void updatePoints();
-    SmartNodePoint* createNewNodePoint(const int& nodeId);
 
     QList<stdsptr<SmartNodePoint>> mPoints;
     PathBase* mCurrentTarget;

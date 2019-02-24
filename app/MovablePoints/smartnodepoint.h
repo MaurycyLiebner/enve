@@ -25,6 +25,11 @@ public:
 
     void setRelativePos(const QPointF &relPos);
 
+    SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
+    SmartNodePoint *actionAddPointAbsPos(const QPointF &absPos);
+    void actionConnectToPoint(SmartNodePoint * const point);
+    void actionDisconnectFromPoint(SmartNodePoint * const point);
+
     //void moveByRel(const QPointF &relTranslation);
 
     QPointF getC0AbsPos() const;
@@ -47,8 +52,6 @@ public:
 
     bool hasNextPoint();
     bool hasPreviousPoint();
-
-    SmartNodePoint *addPointRelPos(const QPointF &relPos);
 
     void removeFromVectorPath();
     void removeApproximate();
@@ -106,8 +109,6 @@ public:
     const Segment& getNextEdge() {
         return mNextSegment;
     }
-
-    SmartNodePoint *addPointAbsPos(const QPointF &absPos);
 
     void setElementsPos(const QPointF &c0,
                         const QPointF &p1,

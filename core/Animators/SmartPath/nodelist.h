@@ -163,6 +163,12 @@ public:
         return insertNodeAfter(prevId, nodeBlueprint, BOTH);
     }
 
+    void updateDissolvedNodePosition(const int& nodeId);
+    void updateDissolvedNodePosition(const int &nodeId, Node &node);
+
+    void updateDummyNodePosition(const int& nodeId);
+    void updateDummyNodePosition(const int &nodeId, Node &node);
+
     int appendNode(const Node &nodeBlueprint) {
         return appendNode(nodeBlueprint, BOTH);
     }
