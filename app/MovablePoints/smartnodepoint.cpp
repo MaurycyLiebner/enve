@@ -16,7 +16,8 @@ SmartNodePoint::SmartNodePoint(const int& nodeId,
                                SmartPathAnimator * const parentAnimator,
                                BasicTransformAnimator * const parentTransform) :
     NonAnimatedMovablePoint(parentTransform, TYPE_PATH_POINT, 6.5),
-    mHandler_k(handler), mParentAnimator(parentAnimator) {
+    mHandler_k(handler), mParentAnimator(parentAnimator),
+    mNextSegment(handler) {
     mNextSegment.setPoint1(this);
     setNodeId(nodeId);
     mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);

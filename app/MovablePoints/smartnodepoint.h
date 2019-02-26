@@ -17,6 +17,7 @@ enum CtrlsMode : short;
 
 class SmartNodePoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
+    friend class Segment;
 public:
     void applyTransform(const QMatrix &transform);
 
@@ -165,9 +166,9 @@ private:
     const Node * mNode_d = nullptr;
 
     SmartPath * mTargetPath_d = nullptr;
-    Segment mNextSegment;
     const stdptr<PathPointsHandler> mHandler_k;
     const qptr<SmartPathAnimator> mParentAnimator;
+    Segment mNextSegment;
 
     stdptr<SmartNodePoint> mNextPoint;
     stdptr<SmartNodePoint> mPreviousPoint;

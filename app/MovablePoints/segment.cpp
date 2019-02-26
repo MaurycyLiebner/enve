@@ -7,14 +7,17 @@
 #include "pointhelpers.h"
 #include "GUI/mainwindow.h"
 #include "Animators/transformanimator.h"
+#include "pathpointshandler.h"
 
-Segment::Segment() :
+Segment::Segment(PathPointsHandler * const handler) :
+    mHandler_k(handler),
     mPoint1(nullptr),
     mPoint1C2Pt(nullptr),
     mPoint2C0Pt(nullptr),
     mPoint2(nullptr) {}
 
-Segment::Segment(SmartNodePoint * const pt1, SmartNodePoint * const pt2) {
+Segment::Segment(SmartNodePoint * const pt1, SmartNodePoint * const pt2,
+                 PathPointsHandler * const handler) : mHandler_k(handler) {
     setPoint1(pt1);
     setPoint2(pt2);
 }
@@ -27,6 +30,10 @@ void Segment::setPoint1(SmartNodePoint * const pt1) {
 void Segment::setPoint2(SmartNodePoint * const pt2) {
     mPoint2 = pt2;
     if(mPoint2) mPoint2C0Pt = mPoint2->getC0Pt();
+}
+
+void Segment::disconnect() const {
+    mPoint1->setPointAsNext(nullptr);
 }
 
 QPointF Segment::getRelPosAtT(const qreal &t) const {

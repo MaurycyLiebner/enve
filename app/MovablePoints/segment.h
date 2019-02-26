@@ -3,6 +3,8 @@
 
 class SmartNodePoint;
 class SmartCtrlPoint;
+class PathPointsHandler;
+
 #include "smartPointers/stdpointer.h"
 #include "Segments/qcubicsegment2d.h"
 
@@ -13,8 +15,9 @@ struct PointOnSegment {
 
 class Segment {
 public:
-    Segment();
-    Segment(SmartNodePoint * const pt1, SmartNodePoint * const pt2);
+    Segment(PathPointsHandler * const handler);
+    Segment(SmartNodePoint * const pt1, SmartNodePoint * const pt2,
+            PathPointsHandler * const handler);
 
     QPointF getRelPosAtT(const qreal &t) const;
     QPointF getAbsPosAtT(const qreal &t) const;
@@ -45,12 +48,14 @@ public:
 
     void setPoint1(SmartNodePoint * const pt1);
     void setPoint2(SmartNodePoint * const pt2);
+
+    void disconnect() const;
 private:
     qCubicSegment2D getAsAbsSegment() const;
     qCubicSegment2D getAsRelSegment() const;
 
     SkPath mSkPath;
-
+    const stdptr<PathPointsHandler> mHandler_k;
     SmartNodePoint* mPoint1;
     SmartCtrlPoint* mPoint1C2Pt;
     SmartCtrlPoint* mPoint2C0Pt;
