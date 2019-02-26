@@ -59,23 +59,15 @@ void SmartNodePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
 
 void SmartNodePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     NonAnimatedMovablePoint::rotateRelativeToSavedPivot(rot);
-    if(!mC0Pt->isSelected()) {
-        mC0Pt->rotate(rot);
-    }
-    if(!mC2Pt->isSelected()) {
-        mC2Pt->rotate(rot);
-    }
+    if(!mC0Pt->isSelected()) mC0Pt->rotate(rot);
+    if(!mC2Pt->isSelected()) mC2Pt->rotate(rot);
 }
 
 void SmartNodePoint::scaleRelativeToSavedPivot(const qreal &sx,
                                           const qreal &sy) {
     NonAnimatedMovablePoint::scaleRelativeToSavedPivot(sx, sy);
-    if(!mC0Pt->isSelected()) {
-        mC0Pt->scale(sx, sy);
-    }
-    if(!mC2Pt->isSelected()) {
-        mC2Pt->scale(sx, sy);
-    }
+    if(!mC0Pt->isSelected()) mC0Pt->scale(sx, sy);
+    if(!mC2Pt->isSelected()) mC2Pt->scale(sx, sy);
 }
 
 void SmartNodePoint::cancelTransform() {
