@@ -497,36 +497,11 @@ void SmartNodePoint::updateFromNodeData() {
         return;
     }
 
-    const int prevNodeId = mNode_d->getPrevNodeId();
-    const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
-    setPointAsPrev(prevNode);
-
-    const int nextNodeId = mNode_d->getNextNodeId();
-    const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
-    setPointAsNext(nextNode);
-
     if(mNode_d->isNormal()) {
         mC0Pt->setRelativePosVal(mNode_d->fC0);
         setRelativePosVal(mNode_d->fP1);
         mC2Pt->setRelativePosVal(mNode_d->fC2);
         setVisible(true);
-
-        if(prevNode->getType() == Node::NORMAL) {
-            setPointAsPrevNormal(prevNode);
-        } else {
-            const auto prevNormalNode =
-                    mHandler_k->getPrevNormalNode(prevNodeId);
-            setPointAsPrevNormal(prevNormalNode);
-        }
-
-
-        if(nextNode->getType() == Node::NORMAL) {
-            setPointAsNextNormal(nextNode);
-        } else {
-            const auto nextNormalNode =
-                    mHandler_k->getNextNormalNode(nextNodeId);
-            setPointAsNextNormal(nextNormalNode);
-        }
     } else if(mNode_d->isDissolved() || mNode_d->isDummy()) {
         if(mNode_d->isDissolved())
             mTargetPath_d->updateDissolvedNodePosition(mNodeId);
@@ -536,6 +511,30 @@ void SmartNodePoint::updateFromNodeData() {
         setVisible(true);
     } else {
         setVisible(false);
+    }
+
+    const int prevNodeId = mNode_d->getPrevNodeId();
+    const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
+    setPointAsPrev(prevNode);
+
+    const int nextNodeId = mNode_d->getNextNodeId();
+    const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
+    setPointAsNext(nextNode);
+
+    if(prevNode->getType() == Node::NORMAL) {
+        setPointAsPrevNormal(prevNode);
+    } else {
+        const auto prevNormalNode =
+                mHandler_k->getPrevNormalNode(prevNodeId);
+        setPointAsPrevNormal(prevNormalNode);
+    }
+
+    if(nextNode->getType() == Node::NORMAL) {
+        setPointAsNextNormal(nextNode);
+    } else {
+        const auto nextNormalNode =
+                mHandler_k->getNextNormalNode(nextNodeId);
+        setPointAsNextNormal(nextNormalNode);
     }
 
     updateC0Visibility();
