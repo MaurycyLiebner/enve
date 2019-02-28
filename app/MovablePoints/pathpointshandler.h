@@ -24,7 +24,7 @@ public:
     // actions on NORMAL
     void setCtrlsMode(const int& nodeId, const CtrlsMode& mode);
     void removeNode(const int& nodeId);
-    void addNewAtEnd(const int& nodeId, const NodePointValues& values);
+    void addNewAtEnd(const int& nodeId, const QPointF &relPos);
 
     // actions on DISSOLVED
     void setT(const int& nodeId, const qreal& t);
@@ -40,6 +40,14 @@ public:
     void removeSegment(const NormalSegment &segment);
 
     SmartNodePoint* createNewNodePoint(const int& nodeId);
+
+    SmartNodePoint* getPrevNormalNode(const int& startId) const {
+        return getPointWithId(mCurrentTarget->prevNormalId(startId));
+    }
+
+    SmartNodePoint* getNextNormalNode(const int& startId) const {
+        return getPointWithId(mCurrentTarget->nextNormalId(startId));
+    }
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);

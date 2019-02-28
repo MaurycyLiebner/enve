@@ -26,10 +26,10 @@ public:
 
     void setRelativePos(const QPointF &relPos);
 
-    SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
-    SmartNodePoint *actionAddPointAbsPos(const QPointF &absPos);
-    void actionConnectToPoint(SmartNodePoint * const point);
-    void actionDisconnectFromPoint(SmartNodePoint * const point);
+    void actionAddPointRelPos(const QPointF &relPos);
+    void actionAddPointAbsPos(const QPointF &absPos);
+    void actionConnectToNormalPoint(SmartNodePoint * const point);
+    void actionDisconnectFromNormalPoint(SmartNodePoint * const point);
 
     //void moveByRel(const QPointF &relTranslation);
 
@@ -105,7 +105,7 @@ public:
                                    const qreal &sy);
 
     const NormalSegment& getNextEdge() {
-        return mNextSegment;
+        return mNextNormalSegment;
     }
 
     void setElementsPos(const QPointF &c0,
@@ -152,7 +152,7 @@ public:
 
     void c2Moved(const QPointF& c2) {
         mTargetPath_d->actionSetNormalNodeC2(mNodeId, c2);
-        mNextSegment.afterChanged();
+        mNextNormalSegment.afterChanged();
     }
 
     void updateNode() {
@@ -163,7 +163,7 @@ public:
 
     void updateFromNodeData();
     void afterNextNodeC0P1Changed() {
-        mNextSegment.afterChanged();
+        mNextNormalSegment.afterChanged();
     }
 protected:
     SmartNodePoint(const int& nodeId,
@@ -192,7 +192,7 @@ private:
     SmartPath * mTargetPath_d = nullptr;
     const stdptr<PathPointsHandler> mHandler_k;
     const qptr<SmartPathAnimator> mParentAnimator;
-    NormalSegment mNextSegment;
+    NormalSegment mNextNormalSegment;
 
     stdsptr<SmartCtrlPoint> mC0Pt;
     stdsptr<SmartCtrlPoint> mC2Pt;

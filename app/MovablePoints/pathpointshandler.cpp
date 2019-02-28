@@ -93,8 +93,9 @@ void PathPointsHandler::removeNode(const int &nodeId) {
 }
 
 void PathPointsHandler::addNewAtEnd(const int &nodeId,
-                                    const NodePointValues &values) {
-    mCurrentTarget->actionAppendNodeAtEndNode(nodeId, values);
+                                    const QPointF &relPos) {
+    mCurrentTarget->actionAppendNodeAtEndNode(
+                nodeId, {relPos, relPos, relPos});
     updatePoints();
 }
 
@@ -138,13 +139,13 @@ void PathPointsHandler::divideSegment(const int &node1Id,
                                       const int &node2Id,
                                       const qreal &t) {
     mCurrentTarget->actionInsertNodeBetween(node1Id, node2Id, t);
+    updatePoints();
 }
 
 void PathPointsHandler::createSegment(const int &node1Id,
                                       const int &node2Id) {
     mCurrentTarget->actionConnectNodes(node1Id, node2Id);
-    updatePoint(node1Id);
-    updatePoint(node2Id);
+    updatePoints();
 }
 
 void PathPointsHandler::removeSegment(const NormalSegment &segment) {
@@ -155,6 +156,5 @@ void PathPointsHandler::removeSegment(const NormalSegment &segment) {
     const int node1Id = node1->getNodeId();
     const int node2Id = node2->getNodeId();
     mCurrentTarget->actionDisconnectNodes(node1Id, node2Id);
-    updatePoint(node1Id);
-    updatePoint(node2Id);
+    updatePoints();
 }
