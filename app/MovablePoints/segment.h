@@ -88,6 +88,8 @@ public:
         return subSegmentAtT(closestT);
     }
 private:
+    void updateDnDPos();
+
     qCubicSegment2D getAsAbsSegment() const;
     qCubicSegment2D getAsRelSegment() const;
     void updateInnerDnD();

@@ -422,8 +422,8 @@ QPointF gClosestPointOnRect(const QRectF &rect,
 }
 
 void gDrawCosmeticEllipse(QPainter *p,
-                         const QPointF &absPos,
-                         qreal rX, qreal rY) {
+                          const QPointF &absPos,
+                          const qreal& rX, const qreal& rY) {
     const QTransform &transform = p->transform();
     p->drawEllipse(absPos,
                    rX/transform.m11(),
@@ -444,7 +444,7 @@ void gGetSmoothAbsCtrlsForPtBetween(
     vectP.set(vectP.y(), -vectP.x());
     if(vectP.dot(lastP - currP) > 0) vectP.negate();
 
-    SkScalar nextDist = (currP - nextP).length()*0.5f;
+    const SkScalar nextDist = (currP - nextP).length()*0.5f;
     if(smoothLen < nextDist) {
         vectP.setLength(smoothLen);
     } else {
@@ -454,7 +454,7 @@ void gGetSmoothAbsCtrlsForPtBetween(
     c1 = currP + vectP;
 
     vectP.negate();
-    SkScalar lastDist = (currP - lastP).length()*0.5f;
+    const SkScalar lastDist = (currP - lastP).length()*0.5f;
     if(smoothLen < lastDist) {
         vectP.setLength(smoothLen);
     } else {
@@ -477,13 +477,13 @@ void gGetMaxSmoothAbsCtrlsForPtBetween(
 
     if(vectP.dot(lastP - currP) > 0) vectP.negate();
 
-    SkScalar nextDist = (currP - nextP).length()*0.5f;
+    const SkScalar nextDist = (currP - nextP).length()*0.5f;
     vectP.setLength(nextDist);
 
     c2 = currP + vectP;
 
     vectP.negate();
-    SkScalar lastDist = (currP - lastP).length()*0.5f;
+    const SkScalar lastDist = (currP - lastP).length()*0.5f;
     vectP.setLength(lastDist);
     c1 = currP + vectP;
 }
@@ -502,13 +502,13 @@ void gGetMaxSmoothAbsCtrlsForPtBetween(
 
     if(QPointF::dotProduct(vectP, lastP - currP) > 0) vectP = -vectP;
 
-    qreal nextDist = pointToLen(currP - nextP)*0.5;
+    const qreal nextDist = pointToLen(currP - nextP)*0.5;
     vectP = scalePointToNewLen(vectP, nextDist);
 
     c2 = currP + vectP;
 
     vectP = -vectP;
-    qreal lastDist = pointToLen(currP - lastP)*0.5;
+    const qreal lastDist = pointToLen(currP - lastP)*0.5;
     vectP = scalePointToNewLen(vectP, lastDist);
     c1 = currP + vectP;
 }
@@ -525,7 +525,7 @@ void smoothyAbsCtrlsForPtBetween(const T1 &lastP, const T1 &currP,
         c1 = currP + (c1 - currP)*(1 - smoothness) + (maxC1 - currP)*smoothness;
         c2 = currP + (c2 - currP)*(1 - smoothness) + (maxC2 - currP)*smoothness;
     } else {
-        T2 smoothnessDec = smoothness + 1;
+        const T2 smoothnessDec = smoothness + 1;
         c1 = currP + (c1 - currP)*smoothnessDec;
         c2 = currP + (c2 - currP)*smoothnessDec;
     }
@@ -557,7 +557,7 @@ void gForEverySegmentInPath(
         SkPoint pts[4];
         switch(iter.next(pts, true, true)) {
         case SkPath::kLine_Verb: {
-            SkPoint pt1 = pts[1];
+            const SkPoint pt1 = pts[1];
             SkPath seg;
             seg.moveTo(lastPos);
             seg.lineTo(pt1);
@@ -565,7 +565,7 @@ void gForEverySegmentInPath(
             lastPos = pt1;
         } break;
         case SkPath::kQuad_Verb: {
-            SkPoint pt2 = pts[2];
+            const SkPoint pt2 = pts[2];
             SkPath seg;
             seg.moveTo(lastPos);
             seg.quadTo(pts[1], pt2);
@@ -573,7 +573,7 @@ void gForEverySegmentInPath(
             lastPos = pt2;
         } break;
         case SkPath::kConic_Verb: {
-            SkPoint pt2 = pts[2];
+            const SkPoint pt2 = pts[2];
             SkPath seg;
             seg.moveTo(lastPos);
             seg.conicTo(pts[1], pt2, iter.conicWeight());
@@ -581,7 +581,7 @@ void gForEverySegmentInPath(
             lastPos = pt2;
         } break;
         case SkPath::kCubic_Verb: {
-            SkPoint pt3 = pts[3];
+            const SkPoint pt3 = pts[3];
             SkPath seg;
             seg.moveTo(lastPos);
             seg.cubicTo(pts[1], pts[2], pt3);
@@ -625,7 +625,7 @@ bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
     dst->reset();
     SkPathMeasure meas(src, false);
 
-    SkScalar scale = maxDev;
+    const SkScalar scale = maxDev;
     SkPoint p;
     SkVector v;
 
@@ -699,7 +699,7 @@ bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
         do {
             qsrand(seedAssist + seedContourInc);
             seedContourInc += 100;
-            SkScalar length = meas.getLength();
+            const SkScalar length = meas.getLength();
             if(segLen * 2 > length) {
                 meas.getSegment(0, length, dst, true);  // to short for us to mangle
                 continue;
@@ -707,8 +707,8 @@ bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
             int nTot = SkScalarCeilToInt(length / segLen);
             int n = nTot;
             SkScalar distance = 0.f;
-            SkScalar remLen = segLen*nTot - length;
-            SkScalar smoothLen = smoothness * segLen * 0.5f;
+            const SkScalar remLen = segLen*nTot - length;
+            const SkScalar smoothLen = smoothness * segLen * 0.5f;
 
             if(meas.isClosed()) {
                 n--;
@@ -749,7 +749,7 @@ bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
                 distance += segLen;
                 if(meas.getPosTan(distance, &nextP, &v)) {
                     if(n == 0) {
-                        SkScalar scaleT = 1.f - remLen/segLen;
+                        const SkScalar scaleT = 1.f - remLen/segLen;
                         Perterb(&nextP, v, randFloat() * scale * scaleT);
 
                     } else {
@@ -776,7 +776,7 @@ bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
                 while(--n >= 0) {
                     if(meas.getPosTan(distance, &nextP, &v)) {
                         if(n == 0) {
-                            SkScalar scaleT = 1.f - remLen/segLen;
+                            const SkScalar scaleT = 1.f - remLen/segLen;
                             Perterb(&nextP, v, randFloat() * scale * scaleT);
                         } else {
                             Perterb(&nextP, v, randFloat() * scale);

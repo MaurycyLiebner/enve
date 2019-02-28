@@ -81,21 +81,6 @@ void PathPointsHandler::updatePoints() {
     }
 }
 
-void PathPointsHandler::setC0(const int &nodeId, const QPointF &c0) {
-    mCurrentTarget->actionSetNormalNodeC0(nodeId, c0);
-    updatePoint(nodeId);
-}
-
-void PathPointsHandler::setP1(const int &nodeId, const QPointF &p1) {
-    mCurrentTarget->actionSetNormalNodeP1(nodeId, p1);
-    updatePoint(nodeId);
-}
-
-void PathPointsHandler::setC2(const int &nodeId, const QPointF &c2) {
-    mCurrentTarget->actionSetNormalNodeC2(nodeId, c2);
-    updatePoint(nodeId);
-}
-
 void PathPointsHandler::setCtrlsMode(const int &nodeId,
                                      const CtrlsMode &mode) {
     mCurrentTarget->actionSetNormalNodeCtrlsMode(nodeId, mode);

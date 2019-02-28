@@ -174,14 +174,12 @@ void SmartNodePoint::moveC2ToAbsPos(const QPointF &c2) {
 
 void SmartNodePoint::moveC2ToRelPos(const QPointF &c2) {
     if(!getC2Enabled()) setC2Enabled(true);
-    mTargetPath_d->actionSetNormalNodeC2(mNodeId, c2);
     mC2Pt->setRelativePos(c2);
     ctrlPointPosChanged(mC2Pt.get(), mC0Pt.get());
 }
 
 void SmartNodePoint::moveC0ToRelPos(const QPointF &c0) {
     if(!getC0Enabled()) setC0Enabled(true);
-    mTargetPath_d->actionSetNormalNodeC0(mNodeId, c0);
     mC0Pt->setRelativePos(c0);
     ctrlPointPosChanged(mC0Pt.get(), mC2Pt.get());
 }
@@ -191,11 +189,8 @@ QPointF SmartNodePoint::getC0AbsPos() const {
 }
 
 QPointF SmartNodePoint::getC0Value() const {
-    if(getC0Enabled()) {
-        return mC0Pt->getRelativePos();
-    } else {
-        return getRelativePos();
-    }
+    if(getC0Enabled()) return mC0Pt->getRelativePos();
+    return getRelativePos();
 }
 
 SmartCtrlPoint *SmartNodePoint::getC0Pt() {
@@ -225,11 +220,8 @@ QPointF SmartNodePoint::getC2AbsPos() {
 }
 
 QPointF SmartNodePoint::getC2Value() const {
-    if(mNode_d->getC2Enabled()) {
-        return mC2Pt->getRelativePos();
-    } else {
-        return getRelativePos();
-    }
+    mNode_d->getC2Enabled() return mC2Pt->getRelativePos();
+    return getRelativePos();
 }
 
 SmartCtrlPoint *SmartNodePoint::getC2Pt() {
@@ -486,6 +478,10 @@ void SmartNodePoint::updateFromNodeData() {
         mC2Pt->setRelativePosVal(mNode_d->fC2);
         setVisible(true);
     } else if(mNode_d->isDissolved() || mNode_d->isDummy()) {
+        if(mNode_d->isDissolved())
+            mTargetPath_d->updateDissolvedNodePosition(mNodeId);
+        else mTargetPath_d->updateDummyNodePosition(mNodeId);
+
         setRelativePosVal(mNode_d->fP1);
         setVisible(true);
     } else {

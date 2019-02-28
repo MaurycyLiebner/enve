@@ -22,9 +22,6 @@ public:
     }
 
     // actions on NORMAL
-    void setC0(const int& nodeId, const QPointF& c0);
-    void setP1(const int& nodeId, const QPointF& p1);
-    void setC2(const int& nodeId, const QPointF& c2);
     void setCtrlsMode(const int& nodeId, const CtrlsMode& mode);
     void removeNode(const int& nodeId);
     void addNewAtEnd(const int& nodeId, const NodePointValues& values);

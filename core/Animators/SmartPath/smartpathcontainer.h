@@ -134,6 +134,14 @@ public:
         mNodesList.updateDissolvedNodePosition(nodeId, node);
     }
 
+    void updateDummyNodePosition(const int& nodeId) {
+        mNodesList.updateDummyNodePosition(nodeId);
+    }
+
+    void updateDummyNodePosition(const int& nodeId, Node& node) {
+        mNodesList.updateDummyNodePosition(nodeId, node);
+    }
+
     void save() {
         mSavedList = mNodesList.getList();
     }

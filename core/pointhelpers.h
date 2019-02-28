@@ -81,7 +81,7 @@ extern qCubicSegment2D gBezierLeastSquareV1V2(
 
 extern void gDrawCosmeticEllipse(QPainter *p,
                                  const QPointF &absPos,
-                                 qreal rX, qreal rY);
+                                 const qreal &rX, const qreal &rY);
 
 
 extern qreal gCubicGetTFurthestInDirection(const qCubicSegment2D& seg,

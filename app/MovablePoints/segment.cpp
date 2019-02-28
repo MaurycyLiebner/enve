@@ -42,6 +42,12 @@ void NormalSegment::disconnect() const {
     mHandler_k->removeSegment(*this);
 }
 
+void NormalSegment::updateDnDPos() {
+    for(const auto& inner : mInnerDnD) {
+        inner->updateFromNodeData();
+    }
+}
+
 QPointF NormalSegment::getRelPosAtT(const qreal &t) const {
     return getAsRelSegment().posAtT(t);
 }
