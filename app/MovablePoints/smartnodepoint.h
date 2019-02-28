@@ -17,7 +17,7 @@ enum CtrlsMode : short;
 
 class SmartNodePoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
-    friend class Segment;
+    friend class NormalSegment;
 public:
     void applyTransform(const QMatrix &transform);
 
@@ -107,13 +107,17 @@ public:
     void scaleRelativeToSavedPivot(const qreal &sx,
                                    const qreal &sy);
 
-    const Segment& getNextEdge() {
+    const NormalSegment& getNextEdge() {
         return mNextSegment;
     }
 
     void setElementsPos(const QPointF &c0,
                         const QPointF &p1,
                         const QPointF &c2);
+
+    const qreal& getT() const {
+        return mNode_d->fT;
+    }
 
     const QPointF& getC0() const {
         return mNode_d->fC0;
@@ -168,7 +172,7 @@ private:
     SmartPath * mTargetPath_d = nullptr;
     const stdptr<PathPointsHandler> mHandler_k;
     const qptr<SmartPathAnimator> mParentAnimator;
-    Segment mNextSegment;
+    NormalSegment mNextSegment;
 
     stdptr<SmartNodePoint> mNextPoint;
     stdptr<SmartNodePoint> mPreviousPoint;

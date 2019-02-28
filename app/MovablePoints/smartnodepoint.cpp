@@ -18,7 +18,7 @@ SmartNodePoint::SmartNodePoint(const int& nodeId,
     NonAnimatedMovablePoint(parentTransform, TYPE_PATH_POINT, 6.5),
     mHandler_k(handler), mParentAnimator(parentAnimator),
     mNextSegment(handler) {
-    mNextSegment.setPoint1(this);
+    mNextSegment.setFirstNode(this);
     setNodeId(nodeId);
     mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);
     mC2Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C2);
@@ -376,9 +376,7 @@ const int &SmartNodePoint::getNodeId() {
 }
 
 NodePointValues SmartNodePoint::getPointValues() const {
-    return NodePointValues(getC0Value(),
-                           getRelativePos(),
-                           getC2Value());
+    return {getC0Value(), getRelativePos(), getC2Value()};
 }
 
 bool SmartNodePoint::isNeighbourSelected() {
@@ -437,7 +435,7 @@ void SmartNodePoint::setPreviousPoint(SmartNodePoint * const previousPoint) {
 
 void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
     mNextPoint = nextPoint;
-    mNextSegment.setPoint2(nextPoint);
+    mNextSegment.setLastNode(nextPoint);
     updateC2Visibility();
     //mParentPath->schedulePathUpdate();
 }

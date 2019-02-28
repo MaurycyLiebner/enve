@@ -9,44 +9,50 @@
 #include "Animators/transformanimator.h"
 #include "pathpointshandler.h"
 
-Segment::Segment(PathPointsHandler * const handler) :
+NormalSegment::NormalSegment(PathPointsHandler * const handler) :
     mHandler_k(handler),
-    mPoint1(nullptr),
-    mPoint1C2Pt(nullptr),
-    mPoint2C0Pt(nullptr),
-    mPoint2(nullptr) {}
+    mFirstNode(nullptr),
+    mFirstNodeC2(nullptr),
+    mLastNodeC0(nullptr),
+    mLastNode(nullptr) {}
 
-Segment::Segment(SmartNodePoint * const pt1, SmartNodePoint * const pt2,
-                 PathPointsHandler * const handler) : mHandler_k(handler) {
-    setPoint1(pt1);
-    setPoint2(pt2);
+NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
+                             SmartNodePoint * const lastNode,
+                             PathPointsHandler * const handler) :
+    mHandler_k(handler) {
+    setFirstNode(firstNode);
+    setLastNode(lastNode);
 }
 
-void Segment::setPoint1(SmartNodePoint * const pt1) {
-    mPoint1 = pt1;
-    if(mPoint1) mPoint1C2Pt = mPoint1->getC2Pt();
+void NormalSegment::setFirstNode(SmartNodePoint * const firstNode) {
+    if(mFirstNode == firstNode) return;
+    mFirstNode = firstNode;
+    if(mFirstNode) mFirstNodeC2 = mFirstNode->getC2Pt();
+    updateInnerDnD();
 }
 
-void Segment::setPoint2(SmartNodePoint * const pt2) {
-    mPoint2 = pt2;
-    if(mPoint2) mPoint2C0Pt = mPoint2->getC0Pt();
+void NormalSegment::setLastNode(SmartNodePoint * const lastNode) {
+    if(mLastNode == lastNode) return;
+    mLastNode = lastNode;
+    if(mLastNode) mLastNodeC0 = mLastNode->getC0Pt();
+    updateInnerDnD();
 }
 
-void Segment::disconnect() const {
-    mPoint1->setPointAsNext(nullptr);
+void NormalSegment::disconnect() const {
+    mHandler_k->removeSegment(*this);
 }
 
-QPointF Segment::getRelPosAtT(const qreal &t) const {
+QPointF NormalSegment::getRelPosAtT(const qreal &t) const {
     return getAsRelSegment().posAtT(t);
 }
 
-QPointF Segment::getAbsPosAtT(const qreal &t) const {
+QPointF NormalSegment::getAbsPosAtT(const qreal &t) const {
     return getAsAbsSegment().posAtT(t);
 }
 
-void Segment::makePassThroughAbs(const QPointF &absPos, const qreal& t) {
-    if(!mPoint2->getC0Enabled()) mPoint2->setC0Enabled(true);
-    if(!mPoint1->getC2Enabled()) mPoint1->setC2Enabled(true);
+void NormalSegment::makePassThroughAbs(const QPointF &absPos, const qreal& t) {
+    if(!mLastNode->getC0Enabled()) mLastNode->setC0Enabled(true);
+    if(!mFirstNode->getC2Enabled()) mFirstNode->setC2Enabled(true);
 
     auto absSeg = getAsAbsSegment();
 
@@ -58,13 +64,13 @@ void Segment::makePassThroughAbs(const QPointF &absPos, const qreal& t) {
         dPos = absPos - gCubicValueAtT(absSeg, t);
     }
 
-    mPoint1C2Pt->moveToAbs(absSeg.c1());
-    mPoint2C0Pt->moveToAbs(absSeg.c2());
+    mFirstNodeC2->moveToAbs(absSeg.c1());
+    mLastNodeC0->moveToAbs(absSeg.c2());
 }
 
-void Segment::makePassThroughRel(const QPointF &relPos, const qreal &t) {
-    if(!mPoint2->getC0Enabled()) mPoint2->setC0Enabled(true);
-    if(!mPoint1->getC2Enabled()) mPoint1->setC2Enabled(true);
+void NormalSegment::makePassThroughRel(const QPointF &relPos, const qreal &t) {
+    if(!mLastNode->getC0Enabled()) mLastNode->setC0Enabled(true);
+    if(!mFirstNode->getC2Enabled()) mFirstNode->setC2Enabled(true);
 
     auto relSeg = getAsRelSegment();
 
@@ -76,34 +82,34 @@ void Segment::makePassThroughRel(const QPointF &relPos, const qreal &t) {
         dPos = relPos - gCubicValueAtT(relSeg, t);
     }
 
-    mPoint1C2Pt->moveToRel(relSeg.c1());
-    mPoint2C0Pt->moveToRel(relSeg.c2());
+    mFirstNodeC2->moveToRel(relSeg.c1());
+    mLastNodeC0->moveToRel(relSeg.c2());
 }
 
-void Segment::finishPassThroughTransform() {
-    mPoint1C2Pt->finishTransform();
-    mPoint2C0Pt->finishTransform();
+void NormalSegment::finishPassThroughTransform() {
+    mFirstNodeC2->finishTransform();
+    mLastNodeC0->finishTransform();
 }
 
-void Segment::startPassThroughTransform() {
-    mPoint1C2Pt->startTransform();
-    mPoint2C0Pt->startTransform();
+void NormalSegment::startPassThroughTransform() {
+    mFirstNodeC2->startTransform();
+    mLastNodeC0->startTransform();
 }
 
-void Segment::cancelPassThroughTransform() {
-    mPoint1C2Pt->cancelTransform();
-    mPoint2C0Pt->cancelTransform();
+void NormalSegment::cancelPassThroughTransform() {
+    mFirstNodeC2->cancelTransform();
+    mLastNodeC0->cancelTransform();
 }
 
-void Segment::generateSkPath() {
+void NormalSegment::generateSkPath() {
     mSkPath = SkPath();
-    mSkPath.moveTo(qPointToSk(mPoint1->getAbsolutePos()));
-    mSkPath.cubicTo(qPointToSk(mPoint1->getC2AbsPos()),
-                    qPointToSk(mPoint2->getC0AbsPos()),
-                    qPointToSk(mPoint2->getAbsolutePos()));
+    mSkPath.moveTo(qPointToSk(mFirstNode->getAbsolutePos()));
+    mSkPath.cubicTo(qPointToSk(mFirstNode->getC2AbsPos()),
+                    qPointToSk(mLastNode->getC0AbsPos()),
+                    qPointToSk(mLastNode->getAbsolutePos()));
 }
 
-void Segment::drawHoveredSk(SkCanvas * const canvas,
+void NormalSegment::drawHoveredSk(SkCanvas * const canvas,
                             const SkScalar &invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
@@ -117,32 +123,77 @@ void Segment::drawHoveredSk(SkCanvas * const canvas,
     canvas->drawPath(mSkPath, paint);
 }
 
-SmartNodePoint *Segment::getPoint1() const {
-    return mPoint1;
+SmartNodePoint *NormalSegment::getFirstNode() const {
+    return mFirstNode;
 }
 
-SmartNodePoint *Segment::getPoint2() const {
-    return mPoint2;
+SmartNodePoint *NormalSegment::getLastNode() const {
+    return mLastNode;
 }
 
-qCubicSegment2D Segment::getAsAbsSegment() const {
-    Q_ASSERT(mPoint1 && mPoint2);
-    return {mPoint1->getAbsolutePos(),
-            mPoint1->getC2AbsPos(),
-            mPoint2->getC0AbsPos(),
-            mPoint2->getAbsolutePos()};
+qCubicSegment2D NormalSegment::getAsAbsSegment() const {
+    Q_ASSERT(mFirstNode && mLastNode);
+    return {mFirstNode->getAbsolutePos(),
+            mFirstNode->getC2AbsPos(),
+            mLastNode->getC0AbsPos(),
+            mLastNode->getAbsolutePos()};
 }
 
-qCubicSegment2D Segment::getAsRelSegment() const {
-    Q_ASSERT(mPoint1 && mPoint2);
-    return {mPoint1->getRelativePos(),
-            mPoint1->getC2Value(),
-            mPoint2->getC0Value(),
-            mPoint2->getRelativePos()};
+qCubicSegment2D NormalSegment::getAsRelSegment() const {
+    Q_ASSERT(mFirstNode && mLastNode);
+    return {mFirstNode->getRelativePos(),
+            mFirstNode->getC2Value(),
+            mLastNode->getC0Value(),
+            mLastNode->getRelativePos()};
 }
 
-QPointF Segment::getSlopeVector(const qreal &t) {
-    QPointF posAtT = getRelPosAtT(t);
-    QPointF posAtTPlus = getRelPosAtT(t + 0.01);
+void NormalSegment::updateInnerDnD() {
+    mInnerDnD.clear();
+    if(!mFirstNode || !mLastNode) return;
+    auto currNode = mFirstNode->getNextPoint();
+    while(currNode && currNode != mLastNode) {
+        mInnerDnD << currNode;
+    }
+}
+
+NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {
+    SmartNodePoint* firstNode = mFirstNode;
+    SmartNodePoint* lastNode = mLastNode;
+    qreal firstNodeT = 0;
+    qreal lastNodeT = 1;
+    for(const auto inner : mInnerDnD) {
+        const qreal innerT = inner->getT();
+        if(innerT < t && innerT > firstNodeT) {
+            firstNodeT = innerT;
+            firstNode = inner;
+        }
+        if(innerT > t && innerT < lastNodeT) {
+            lastNodeT = innerT;
+            lastNode = inner;
+        }
+    }
+    return {firstNode, lastNode, this};
+}
+
+QPointF NormalSegment::getSlopeVector(const qreal &t) {
+    const QPointF posAtT = getRelPosAtT(t);
+    const QPointF posAtTPlus = getRelPosAtT(t + 0.01);
     return scalePointToNewLen(posAtTPlus - posAtT, 1);
+}
+
+qreal NormalSegment::SubSegment::getMinT() const {
+    return fFirstPt->getT();
+}
+
+qreal NormalSegment::SubSegment::getMaxT() const {
+    return fLastPt->getT();
+}
+
+qreal NormalSegment::SubSegment::getParentTAtThisT(const qreal& thisT) const {
+    return gMapTFromFragment(getMinT(), getMaxT(), thisT);
+}
+
+QPointF NormalSegment::SubSegment::getRelPosAtT(const qreal& thisT) const {
+    const qreal parentT = getParentTAtThisT(thisT);
+    return fParentSeg->getRelPosAtT(parentT);
 }

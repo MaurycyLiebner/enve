@@ -34,15 +34,13 @@ public:
 
     // actions on DUMMY and DISSOLVED
     void promoteToNormal(const int& nodeId);
-    void moveToDifferentSegment(const int& nodeId, const QPointF& pos);
+    void moveToClosestSegment(const int& nodeId, const QPointF& relPos);
 
     // actions on normal-normal segments
-    void dragSegment(const int& node1Id, const int& node2Id,
-                     const qreal& t);
     void divideSegment(const int& node1Id, const int& node2Id,
                        const qreal& t);
     void createSegment(const int& node1Id, const int& node2Id);
-    void removeSegment(const int& node1Id, const int& node2Id);
+    void removeSegment(const NormalSegment &segment);
 
     SmartNodePoint* createNewNodePoint(const int& nodeId);
 protected:

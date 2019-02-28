@@ -80,3 +80,96 @@ void PathPointsHandler::updatePoints() {
         mPoints.removeAt(j++);
     }
 }
+
+void PathPointsHandler::setC0(const int &nodeId, const QPointF &c0) {
+    mCurrentTarget->actionSetNormalNodeC0(nodeId, c0);
+    updatePoint(nodeId);
+}
+
+void PathPointsHandler::setP1(const int &nodeId, const QPointF &p1) {
+    mCurrentTarget->actionSetNormalNodeP1(nodeId, p1);
+    updatePoint(nodeId);
+}
+
+void PathPointsHandler::setC2(const int &nodeId, const QPointF &c2) {
+    mCurrentTarget->actionSetNormalNodeC2(nodeId, c2);
+    updatePoint(nodeId);
+}
+
+void PathPointsHandler::setCtrlsMode(const int &nodeId,
+                                     const CtrlsMode &mode) {
+    mCurrentTarget->actionSetNormalNodeCtrlsMode(nodeId, mode);
+    updatePoint(nodeId);
+}
+
+void PathPointsHandler::removeNode(const int &nodeId) {
+    mCurrentTarget->actionRemoveNormalNode(nodeId);
+    updatePoints();
+}
+
+void PathPointsHandler::addNewAtEnd(const int &nodeId,
+                                    const NodePointValues &values) {
+    mCurrentTarget->actionAppendNodeAtEndNode(nodeId, values);
+    updatePoints();
+}
+
+void PathPointsHandler::setT(const int &nodeId, const qreal &t) {
+    mCurrentTarget->actionSetDissolvedNodeT(nodeId, t);
+    updatePoint(nodeId);
+}
+
+void PathPointsHandler::promoteToNormal(const int &nodeId) {
+    mCurrentTarget->actionPromoteDissolvedNodeToNormal(nodeId);
+    updatePoint(nodeId);
+}
+
+void PathPointsHandler::moveToClosestSegment(const int &nodeId,
+                                             const QPointF &relPos) {
+    NormalSegment::SubSegment minSubSeg{nullptr, nullptr, nullptr};
+    qreal minDist = TEN_MIL;
+    for(const auto& pt : mPoints) {
+        const auto seg = pt->getNextEdge();
+        qreal dist;
+        const auto subSeg = seg.getClosestSubSegment(relPos, dist);
+        if(dist < minDist) {
+            minDist = dist;
+            minSubSeg = subSeg;
+        }
+    }
+    if(!minSubSeg.isValid()) return;
+    const auto prevPt = minSubSeg.fFirstPt;
+    const int prevNodeId = prevPt->getNodeId();
+    if(prevNodeId == nodeId) return;
+    const auto nextPt = minSubSeg.fLastPt;
+    const int nextNodeId = nextPt->getNodeId();
+    if(nextNodeId == nodeId) return;
+    mCurrentTarget->actionMoveNodeBetween(nodeId, prevNodeId, nextNodeId);
+    updatePoint(nodeId);
+    updatePoint(prevNodeId);
+    updatePoint(nextNodeId);
+}
+
+void PathPointsHandler::divideSegment(const int &node1Id,
+                                      const int &node2Id,
+                                      const qreal &t) {
+    mCurrentTarget->actionInsertNodeBetween(node1Id, node2Id, t);
+}
+
+void PathPointsHandler::createSegment(const int &node1Id,
+                                      const int &node2Id) {
+    mCurrentTarget->actionConnectNodes(node1Id, node2Id);
+    updatePoint(node1Id);
+    updatePoint(node2Id);
+}
+
+void PathPointsHandler::removeSegment(const NormalSegment &segment) {
+    if(!segment.isValid()) return;
+    const auto node1 = segment.getNodeAt(0);
+    const auto node2 = segment.getNodeAt(1);
+    if(!node1 || !node2) return;
+    const int node1Id = node1->getNodeId();
+    const int node2Id = node2->getNodeId();
+    mCurrentTarget->actionDisconnectNodes(node1Id, node2Id);
+    updatePoint(node1Id);
+    updatePoint(node2Id);
+}

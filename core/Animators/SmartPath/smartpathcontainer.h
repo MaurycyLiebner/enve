@@ -5,7 +5,7 @@
 #include "exceptions.h"
 #include "pointhelpers.h"
 #include "nodelist.h"
-
+#include "nodepointvalues.h"
 #include "framerange.h"
 #include "smartPointers/sharedpointerdefs.h"
 
@@ -17,6 +17,13 @@ public:
     int actionAddFirstNode(const QPointF& c0,
                            const QPointF& p1,
                            const QPointF& c2);
+
+    void actionMoveNodeBetween(const int& movedNodeId,
+                               const int& prevNodeId,
+                               const int& nextNodeId);
+
+    int actionAppendNodeAtEndNode(const int& endNodeId,
+                                  const NodePointValues &values);
 
     int actionInsertNodeBetween(const int &prevId,
                                 const int& nextId,
@@ -32,13 +39,6 @@ public:
     void actionDisconnectNodes(const int& node1Id, const int& node2Id);
 
     void actionConnectNodes(const int& node1Id, const int& node2Id);
-
-    void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
-
-    void removeNodeWithIdAndTellNextToDoSame(const int& nodeId);
-
-    void setPrev(PathBase * const prev);
-    void setNext(PathBase * const next);
 
     void actionSetDissolvedNodeT(const int& nodeId, const qreal& t) {
         Node& node = mNodesList.at(nodeId);
@@ -101,6 +101,9 @@ public:
                                           "on a node of a different type");
         mNodesList.setNodeC2Enabled(nodeId, node, enabled);
     }
+
+    void setPrev(PathBase * const prev);
+    void setNext(PathBase * const next);
 
     SkPath getPathAt() const;
     SkPath getPathForPrev() const;
@@ -173,6 +176,10 @@ public:
 protected:
     PathBase(const QList<Node> &list,
              const NodeList::Type& type);
+
+    void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
+
+    void removeNodeWithIdAndTellNextToDoSame(const int& nodeId);
 
     void updateAllNodesTypeAfterNeighbourChanged() {
         if(mType == NodeList::NORMAL) return;

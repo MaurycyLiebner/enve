@@ -3,22 +3,12 @@
 #include <QPointF>
 
 struct NodePointValues {
-    NodePointValues(const QPointF &c0,
-                    const QPointF &p1,
-                    const QPointF &c2) {
-        fC0 = c0;
-        fP1 = p1;
-        fC2 = c2;
-    }
-
-    NodePointValues() {}
-
     QPointF fC0;
     QPointF fP1;
     QPointF fC2;
 
     NodePointValues &operator/=(const qreal &val) {
-        qreal inv = 1./val;
+        qreal inv = 1/val;
         fC0 *= inv;
         fP1 *= inv;
         fC2 *= inv;

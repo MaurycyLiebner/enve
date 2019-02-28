@@ -79,6 +79,7 @@ struct qCubicSegment2D {
     void setC2(const QPointF& c2);
     void setP1(const QPointF& p1);
 
+    qreal tValueForPointClosestTo(const QPointF& p);
     qreal minDistanceTo(const QPointF &p,
                         qreal * const pBestT = nullptr,
                         QPointF * const pBestPos = nullptr);

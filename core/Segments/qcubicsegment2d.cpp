@@ -109,9 +109,15 @@ void qCubicSegment2D::setP1(const QPointF &p1) {
     mLengthUpToDate = false;
 }
 
+qreal qCubicSegment2D::tValueForPointClosestTo(const QPointF &p) {
+    qreal bestT;
+    minDistanceTo(p, 0, 1, &bestT);
+    return bestT;
+}
+
 qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
-                                         qreal * const pBestT,
-                                         QPointF * const pBestPos) {
+                                     qreal * const pBestT,
+                                     QPointF * const pBestPos) {
     return minDistanceTo(p, 0, 1, pBestT, pBestPos);
 }
 

@@ -418,9 +418,9 @@ const int &NodePoint::getNodeId() {
 }
 
 NodePointValues NodePoint::getPointValues() const {
-    return NodePointValues(getStartCtrlPtValue(),
-                           getRelativePos(),
-                           getEndCtrlPtValue());
+    return {getStartCtrlPtValue(),
+            getRelativePos(),
+            getEndCtrlPtValue()};
 }
 
 CtrlsMode NodePoint::getCurrentCtrlsMode() {

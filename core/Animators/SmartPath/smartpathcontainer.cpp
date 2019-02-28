@@ -31,6 +31,20 @@ int PathBase::actionAddFirstNode(const QPointF &c0,
     return insertId;
 }
 
+int PathBase::actionAppendNodeAtEndNode(const int &endNodeId,
+                                        const NodePointValues &values) {
+    Node& endNode = mNodesList.at(endNodeId);
+    if(!endNode.isNormal())
+        RuntimeThrow("Invalid node type. "
+                     "End nodes should always be NORMAL.");
+    const Node& moveNode = endNode.getNextNodeId();
+    if(!moveNode.isMove())
+        RuntimeThrow("Invalid node type. "
+                     "End nodes should have MOVE node as next.");
+    return mNodesList.insertNodeAfter(endNodeId,
+                                      Node(values.fC0, values.fP1, values.fC2));
+}
+
 int PathBase::insertNodeBetween(const int& prevId,
                                 const int& nextId,
                                 const Node& nodeBlueprint) {
@@ -55,6 +69,16 @@ int PathBase::actionInsertNodeBetween(const int &prevId,
 
 void PathBase::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
     mNodesList.promoteDissolvedNodeToNormal(nodeId);
+}
+
+void PathBase::actionMoveNodeBetween(const int& movedNodeId,
+                                     const int& prevNodeId,
+                                     const int& nextNodeId) {
+    Node& prevNode = mNodesList.at(prevNodeId);
+    if(prevNode.getNextNodeId() != nextNodeId)
+        RuntimeThrow("Trying to move between not connected nodes");
+    mNodesList.moveNodeAfter(movedNodeId, mNodesList.at(movedNodeId),
+                             prevNodeId, prevNode);
 }
 
 void PathBase::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
@@ -117,7 +141,7 @@ void PathBase::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
 }
 
 void PathBase::actionConnectNodes(const int &node1Id,
-                                   const int &node2Id) {
+                                  const int &node2Id) {
     const int moveNode1Id = mNodesList.lastSegmentNode(node1Id);
     const int moveNode2Id = mNodesList.lastSegmentNode(node2Id);
     if(moveNode1Id == -1 || moveNode2Id == -1)
