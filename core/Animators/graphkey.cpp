@@ -77,21 +77,17 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
 
 void GraphKey::setCtrlsMode(const CtrlsMode &mode) {
     mCtrlsMode = mode;
-    QPointF pos(mRelFrame, getValueForGraph());
-    QPointF startPos(getStartFrame(),
-                     getStartValue());
-    QPointF endPos(getEndFrame(),
-                   getEndValue());
+    const QPointF pos(mRelFrame, getValueForGraph());
+    QPointF startPos(getStartFrame(), getStartValue());
+    QPointF endPos(getEndFrame(), getEndValue());
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-        gGetCtrlsSymmetricPos(endPos, startPos, pos,
-                              endPos, startPos);
+        gGetCtrlsSymmetricPos(startPos, pos, endPos,
+                              startPos, endPos);
 
     } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
-        gGetCtrlsSmoothPos(endPos, startPos, pos,
-                           endPos, startPos);
-    } else {
-        return;
-    }
+        gGetCtrlsSmoothPos(startPos, pos, endPos,
+                           startPos, endPos);
+    } else return;
     setStartFrame(startPos.x());
     setStartValueForGraph(startPos.y());
     setEndFrame(endPos.x());

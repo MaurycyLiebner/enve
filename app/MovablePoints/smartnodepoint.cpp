@@ -401,28 +401,7 @@ bool SmartNodePoint::isSeparateNodePoint() {
 
 void SmartNodePoint::setCtrlsMode(const CtrlsMode &mode) {
     mTargetPath_d->actionSetNormalNodeCtrlsMode(mNodeId, mode);
-    if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
-        QPointF newStartPos;
-        QPointF newEndPos;
-        gGetCtrlsSymmetricPos(mC2Pt->getRelativePos(),
-                              mC0Pt->getRelativePos(),
-                              getRelativePos(),
-                              newEndPos,
-                              newStartPos);
-        mC0Pt->setRelativePosStartAndFinish(newStartPos);
-        mC2Pt->setRelativePosStartAndFinish(newEndPos);
-    } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
-        QPointF newStartPos;
-        QPointF newEndPos;
-        gGetCtrlsSmoothPos(mC2Pt->getRelativePos(),
-                           mC0Pt->getRelativePos(),
-                           getRelativePos(),
-                           newEndPos,
-                           newStartPos);
-        mC0Pt->setRelativePosStartAndFinish(newStartPos);
-    } else return;
-    setC0Enabled(true);
-    setC2Enabled(true);
+    updateFromNodeData();
 
     //mParentPath->schedulePathUpdate();
 }

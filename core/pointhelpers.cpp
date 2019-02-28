@@ -79,37 +79,37 @@ qreal gTFromX(const qCubicSegment1D &seg,
     return guessT;
 }
 
-void gGetCtrlsSymmetricPos(const QPointF& endPos,
-                           const QPointF& startPos,
+void gGetCtrlsSymmetricPos(const QPointF& startPos,
                            const QPointF& centerPos,
-                           QPointF &newEndPos,
-                           QPointF &newStartPos) {
-    QPointF symStartPos = symmetricToPos(endPos, centerPos);
-    qreal len1 = pointToLen(symStartPos);
-    qreal len2 = pointToLen(startPos);
-    qreal lenSum = len1 + len2;
+                           const QPointF& endPos,
+                           QPointF &newStartPos,
+                           QPointF &newEndPos) {
+    const QPointF symStartPos = symmetricToPos(endPos, centerPos);
+    const qreal len1 = pointToLen(symStartPos);
+    const qreal len2 = pointToLen(startPos);
+    const qreal lenSum = len1 + len2;
     newStartPos = (symStartPos*len1 + startPos*len2)/lenSum;
     newEndPos = symmetricToPos(newStartPos, centerPos);
 }
 
-void gGetCtrlsSmoothPos(const QPointF& endPos,
-                        const QPointF& startPos,
+void gGetCtrlsSmoothPos(const QPointF& startPos,
                         const QPointF& centerPos,
-                        QPointF &newEndPos,
-                        QPointF &newStartPos) {
-    QPointF symEndPos = symmetricToPos(endPos, centerPos);
-    qreal len1 = pointToLen(symEndPos);
-    qreal len2 = pointToLen(startPos);
-    qreal lenSum = len1 + len2;
-    QPointF point1Rel = endPos - centerPos;
-    QPointF point2Rel = startPos - centerPos;
-    QPointF newStartDirection =
+                        const QPointF& endPos,
+                        QPointF &newStartPos,
+                        QPointF &newEndPos) {
+    const QPointF symEndPos = symmetricToPos(endPos, centerPos);
+    const qreal len1 = pointToLen(symEndPos);
+    const qreal len2 = pointToLen(startPos);
+    const qreal lenSum = len1 + len2;
+    const QPointF point1Rel = endPos - centerPos;
+    const QPointF point2Rel = startPos - centerPos;
+    const QPointF newStartDirection =
             scalePointToNewLen(
-                (symEndPos*len1 + startPos*len2)/lenSum - centerPos, 1.);
-    qreal startCtrlPtLen =
+                (symEndPos*len1 + startPos*len2)/lenSum - centerPos, 1);
+    const qreal startCtrlPtLen =
             qAbs(QPointF::dotProduct(point2Rel, newStartDirection));
     newStartPos = newStartDirection*startCtrlPtLen + centerPos;
-    qreal endCtrlPtLen =
+    const qreal endCtrlPtLen =
             qAbs(QPointF::dotProduct(point1Rel, newStartDirection));
     newEndPos = -newStartDirection*endCtrlPtLen + centerPos;
 }
@@ -117,19 +117,19 @@ void gGetCtrlsSmoothPos(const QPointF& endPos,
 void solveClosestToSegment(const qCubicSegment1D &seg,
                            const qreal &vn,
                            QList<qreal> *list) {
-    cmplx v0 = cmplx(seg.p0(), 0.);
-    cmplx v1 = cmplx(seg.c1(), 0.);
-    cmplx v2 = cmplx(seg.c2(), 0.);
-    cmplx v3 = cmplx(seg.p1(), 0.);
-    cmplx v = cmplx(vn, 0.);
-    cmplx var1 = sqrt(pow(v1, 2.) + pow(v2, 2.) - v1*(v2 + v3) -
+    const cmplx v0 = cmplx(seg.p0(), 0.);
+    const cmplx v1 = cmplx(seg.c1(), 0.);
+    const cmplx v2 = cmplx(seg.c2(), 0.);
+    const cmplx v3 = cmplx(seg.p1(), 0.);
+    const cmplx v = cmplx(vn, 0.);
+    const cmplx var1 = sqrt(pow(v1, 2.) + pow(v2, 2.) - v1*(v2 + v3) -
                                  v0*(v3 - v2));
-    cmplx var2 = v0 - 3.*v1 + 3.*v2 - v3;
-    cmplx var3 = v0 - 2.*v1 + v2;
-    cmplx sol1 = (var1 - var3)/-var2;
-    cmplx sol2 = (var1 + var3)/var2;
+    const cmplx var2 = v0 - 3.*v1 + 3.*v2 - v3;
+    const cmplx var3 = v0 - 2.*v1 + v2;
+    const cmplx sol1 = (var1 - var3)/-var2;
+    const cmplx sol2 = (var1 + var3)/var2;
 
-    cmplx var4 =
+    const cmplx var4 =
             pow(-2.*pow(v1,3.) + 3.*v0*v1*v2 + 3.*pow(v1,2.)*v2 -
               6.*v0*pow(v2,2.) + 3.*v1*pow(v2,2.) - 2.*pow(v2,3.) +
               v*pow(v0 - 3.*v1 + 3.*v2 - v3,2.) - pow(v0,2.)*v3 + 3.*v0*v1*v3 -
@@ -144,11 +144,11 @@ void solveClosestToSegment(const qCubicSegment1D &seg,
                      v0*(6.*pow(v2,2.) - 3.*v2*v3 + pow(v3,2.))))),
              1./3.);
 
-    cmplx sol3 = (-2.*(v0 - 2.*v1 + v2) + (2.*v2to1div3*
+    const cmplx sol3 = (-2.*(v0 - 2.*v1 + v2) + (2.*v2to1div3*
                     (pow(v1,2.) + pow(v2,2.) + v0*(-v2 + v3) - v1*(v2 + v3)))/
                   var4 + v2to2div3*
                   var4)/(2.*(-v0 + 3.*v1 - 3.*v2 + v3));
-    cmplx sol4 =
+    const cmplx sol4 =
             (-36.*(v0 - 2.*v1 + v2) - (cmplx(0.,18.)*v2to1div3*
                      (cmplx(0.,-1.) + sqrt(3.))*
                      (pow(v1,2.) + pow(v2,2.) + v0*(-v2 + v3) - v1*(v2 + v3)))/
@@ -156,67 +156,67 @@ void solveClosestToSegment(const qCubicSegment1D &seg,
                    (cmplx(0.,1.) + sqrt(3.))*
                    var4)/(36.*(-v0 + 3.*v1 - 3.*v2 + v3));
 
-    cmplx sol5 =
+    const cmplx sol5 =
             (-36.*(v0 - 2.*v1 + v2) + (cmplx(0.,18.)*v2to1div3*
            (cmplx(0.,1.) + sqrt(3.))*
            (pow(v1,2.) + pow(v2,2.) + v0*(-v2 + v3) - v1*(v2 + v3)))/
          var4 - 9.*v2to2div3*
          (1. + cmplx(0.,1.)*sqrt(3.))*var4)/
             (36.*(-v0 + 3.*v1 - 3.*v2 + v3));
-    if(sol1.real() > 0. && sol1.real() < 1.) {
+    if(sol1.real() > 0 && sol1.real() < 1) {
         list->append(sol1.real());
     }
-    if(sol2.real() > 0. && sol2.real() < 1.) {
+    if(sol2.real() > 0 && sol2.real() < 1) {
         list->append(sol2.real());
     }
-    if(sol3.real() > 0. && sol3.real() < 1.) {
+    if(sol3.real() > 0 && sol3.real() < 1) {
         list->append(sol3.real());
     }
-    if(sol4.real() > 0. && sol4.real() < 1.) {
+    if(sol4.real() > 0 && sol4.real() < 1) {
         list->append(sol4.real());
     }
-    if(sol5.real() > 0. && sol5.real() < 1.) {
+    if(sol5.real() > 0 && sol5.real() < 1) {
         list->append(sol5.real());
     }
-    list->append(0.);
-    list->append(1.);
+    list->append(0);
+    list->append(1);
 }
 
 void solveOnSegmnet(const qCubicSegment1D &seg,
                     const qreal &xn,
                     QList<qreal> *list) {
-    cmplx i = cmplx(0., 1.);
-    cmplx x0 = cmplx(seg.p0(), 0.);
-    cmplx x1 = cmplx(seg.c1(), 0.);
-    cmplx x2 = cmplx(seg.c2(), 0.);
-    cmplx x3 = cmplx(seg.p1(), 0.);
-    cmplx x = cmplx(xn, 0.);
-    cmplx x0sq = pow(x0, 2.);
-    cmplx x1sq = pow(x1, 2.);
-    cmplx x2sq = pow(x2, 2.);
-    cmplx x3sq = pow(x3, 2.);
-    cmplx xsq = pow(x, 2.);
-    cmplx x1th = pow(x1, 3.);
-    cmplx x2th = pow(x2, 3.);
-    cmplx _3x2x3 = 3.*x2*x3;
-    cmplx _x0x1 = x0*x1;
-    cmplx var1 = pow(x0 - 3.*x1 + 3.*x2 - x3, 2.);
-    cmplx var2 = sqrt(var1*(-3.*x1sq*x2sq + 4.*x0*x2th + xsq*var1 +
+    const cmplx i = cmplx(0., 1.);
+    const cmplx x0 = cmplx(seg.p0(), 0.);
+    const cmplx x1 = cmplx(seg.c1(), 0.);
+    const cmplx x2 = cmplx(seg.c2(), 0.);
+    const cmplx x3 = cmplx(seg.p1(), 0.);
+    const cmplx x = cmplx(xn, 0.);
+    const cmplx x0sq = pow(x0, 2.);
+    const cmplx x1sq = pow(x1, 2.);
+    const cmplx x2sq = pow(x2, 2.);
+    const cmplx x3sq = pow(x3, 2.);
+    const cmplx xsq = pow(x, 2.);
+    const cmplx x1th = pow(x1, 3.);
+    const cmplx x2th = pow(x2, 3.);
+    const cmplx _3x2x3 = 3.*x2*x3;
+    const cmplx _x0x1 = x0*x1;
+    const cmplx var1 = pow(x0 - 3.*x1 + 3.*x2 - x3, 2.);
+    const cmplx var2 = sqrt(var1*(-3.*x1sq*x2sq + 4.*x0*x2th + xsq*var1 +
                                 4.*x1th*x3 - 2.*_x0x1*_3x2x3 + x0sq*x3sq -
                                 2.*x*(2.*x1th + 2.*x2th - 3.*x1sq*(x2 - 2.*x3) +
                                 x0sq*x3 - 3.*x1*(x0 + x2)*(x2 + x3) +
                                 x0*(6.*x2sq - _3x2x3 + x3sq))) );
-    cmplx var3 = pow(-2.*x1th + 3.*_x0x1*x2 + 3.*x1sq*x2 -
+    const cmplx var3 = pow(-2.*x1th + 3.*_x0x1*x2 + 3.*x1sq*x2 -
                                 6.*x0*x2sq + 3.*x1*x2sq - 2.*x2th + x*var1 -
                                 x0sq*x3 + 3.*_x0x1*x3 - 6.*x1sq*x3 + x0*_3x2x3 +
                                 x1*_3x2x3 - x0*x3sq + var2, 1./3.);
-    cmplx var4 = x1sq + x2sq + x0*(-x2 + x3) - x1*(x2 + x3);
-    cmplx var5 = -x0 + 3.*x1 - 3.*x2 + x3;
-    cmplx var6 = x0 - 2.*x1 + x2;
-    cmplx t1 = (-var6 + (v2to1div3*var4)/var3 + v2to2div3*var3*0.5) / var5;
-    cmplx t2 = (-4.*var6 - (2.*i*v2to1div3*(-i + sqrt3)*var4)/var3 +
+    const cmplx var4 = x1sq + x2sq + x0*(-x2 + x3) - x1*(x2 + x3);
+    const cmplx var5 = -x0 + 3.*x1 - 3.*x2 + x3;
+    const cmplx var6 = x0 - 2.*x1 + x2;
+    const cmplx t1 = (-var6 + (v2to1div3*var4)/var3 + v2to2div3*var3*0.5) / var5;
+    const cmplx t2 = (-4.*var6 - (2.*i*v2to1div3*(-i + sqrt3)*var4)/var3 +
                  i*v2to2div3*(i + sqrt3)*var3) / (4.*var5);
-    cmplx t3 = (-4.*var6 + (2.*i*v2to1div3*(i + sqrt3)*var4)/var3 -
+    const cmplx t3 = (-4.*var6 + (2.*i*v2to1div3*(i + sqrt3)*var4)/var3 -
                  v2to2div3*(1. + i*sqrt3)*var3 ) / (4.*var5);
     if(t1.real() > 0. && t1.real() < 1.) {
         list->append(t1.real());

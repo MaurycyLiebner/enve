@@ -369,13 +369,13 @@ void PathContainer::setCtrlsModeForNode(const int &nodeId,
     QPointF newStartPos;
     QPointF newEndPos;
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
-        gGetCtrlsSymmetricPos(endPos, startPos, pos,
-                              newEndPos, newStartPos);
+        gGetCtrlsSymmetricPos(startPos, pos, endPos,
+                              newStartPos, newEndPos);
         mElementsPos.replace(nodePtId - 1, qPointToSk(newStartPos));
         mElementsPos.replace(nodePtId + 1, qPointToSk(newEndPos));
     } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
-        gGetCtrlsSmoothPos(endPos, startPos, pos,
-                           newEndPos,  newStartPos);
+        gGetCtrlsSmoothPos(startPos, pos, endPos,
+                           newStartPos, newEndPos);
         mElementsPos.replace(nodePtId - 1, qPointToSk(newStartPos));
     }
 }

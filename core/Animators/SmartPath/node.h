@@ -122,6 +122,13 @@ protected:
 
     void setCtrlsMode(const CtrlsMode& ctrlsMode) {
         fCtrlsMode = ctrlsMode;
+        if(ctrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
+            gGetCtrlsSymmetricPos(fC0, fP1, fC2, fC0, fC2);
+        } else if(ctrlsMode == CtrlsMode::CTRLS_SMOOTH) {
+            gGetCtrlsSmoothPos(fC0, fP1, fC2, fC0, fC2);
+        } else return;
+        setC0Enabled(true);
+        setC2Enabled(true);
     }
 
     void setC0Enabled(const bool& enabled) {

@@ -46,25 +46,25 @@ extern qreal gSolveForP2(const qreal& p0, const qreal& p1,
                          const qreal& p3, const qreal& t,
                          const qreal& value);
 
-extern void gGetCtrlsSymmetricPos(const QPointF& endPos,
-                                  const QPointF& startPos,
+extern void gGetCtrlsSymmetricPos(const QPointF& startPos,
                                   const QPointF& centerPos,
-                                  QPointF &newEndPos,
-                                  QPointF &newStartPos);
+                                  const QPointF& endPos,
+                                  QPointF &newStartPos,
+                                  QPointF &newEndPos);
 
-extern void gGetCtrlsSmoothPos(const QPointF &endPos,
-                               const QPointF &startPos,
-                               const QPointF &centerPos,
-                               QPointF &newEndPos,
-                               QPointF &newStartPos);
+extern void gGetCtrlsSmoothPos(const QPointF& startPos,
+                               const QPointF& centerPos,
+                               const QPointF& endPos,
+                               QPointF &newStartPos,
+                               QPointF &newEndPos);
 
 extern qreal gCubicValueAtT(const qCubicSegment1D &seg,
-                                 const qreal &t);
+                            const qreal &t);
 extern QPointF gCubicValueAtT(const qCubicSegment2D &seg,
-                                   const qreal& t);
+                              const qreal& t);
 
 extern qreal gTFromX(const qCubicSegment1D &seg,
-                    const qreal &x);
+                     const qreal &x);
 
 
 extern QPointF gGetClosestPointOnLineSegment(const QPointF &a,

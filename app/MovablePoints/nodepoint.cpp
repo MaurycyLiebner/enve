@@ -473,28 +473,23 @@ bool NodePoint::isSeparateNodePoint() {
 void NodePoint::setCtrlsMode(const CtrlsMode &mode) {
     NodeSettings newSettings = *mCurrentNodeSettings;
     mCurrentNodeSettings->ctrlsMode = mode;
+    QPointF newStartPos;
+    QPointF newEndPos;
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
-        QPointF newStartPos;
-        QPointF newEndPos;
-        gGetCtrlsSymmetricPos(mEndCtrlPt->getRelativePos(),
-                              mStartCtrlPt->getRelativePos(),
+        gGetCtrlsSymmetricPos(mStartCtrlPt->getRelativePos(),
                               getRelativePos(),
+                              mEndCtrlPt->getRelativePos(),
                               newEndPos,
                               newStartPos);
-        mStartCtrlPt->setRelativePosStartAndFinish(newStartPos);
-        mEndCtrlPt->setRelativePosStartAndFinish(newEndPos);
     } else if(mode == CtrlsMode::CTRLS_SMOOTH) {
-        QPointF newStartPos;
-        QPointF newEndPos;
-        gGetCtrlsSmoothPos(mEndCtrlPt->getRelativePos(),
-                           mStartCtrlPt->getRelativePos(),
+        gGetCtrlsSmoothPos(mStartCtrlPt->getRelativePos(),
                            getRelativePos(),
+                           mEndCtrlPt->getRelativePos(),
                            newEndPos,
                            newStartPos);
-        mStartCtrlPt->setRelativePosStartAndFinish(newStartPos);
-    } else {
-        return;
-    }
+    } else return;
+    mStartCtrlPt->setRelativePosStartAndFinish(newStartPos);
+    mEndCtrlPt->setRelativePosStartAndFinish(newEndPos);
     setCtrlPtEnabled(true, true);
     setCtrlPtEnabled(true, false);
 
