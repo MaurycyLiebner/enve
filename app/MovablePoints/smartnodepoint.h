@@ -51,9 +51,6 @@ public:
 
     bool isEndPoint();
 
-    bool hasNextPoint();
-    bool hasPreviousPoint();
-
     void removeFromVectorPath();
     void removeApproximate();
 
@@ -97,7 +94,7 @@ public:
 
     NodePointValues getPointValues() const;
 
-    bool isNeighbourSelected();
+    bool isNeighbourNormalSelected();
     //void moveByAbs(const QPointF &absTranslatione);
 
     SmartNodePoint *getConnectedSeparateNodePoint();
@@ -174,10 +171,19 @@ protected:
                    SmartPathAnimator * const parentAnimator,
                    BasicTransformAnimator * const parentTransform);
 
-    void setPointAsPrevious(SmartNodePoint * const pointToSet);
+    bool hasNextPoint() const;
+    bool hasPrevPoint() const;
+    void setNextPoint(SmartNodePoint * const nextPoint);
+    void setPrevPoint(SmartNodePoint * const prevPoint);
+    void setPointAsPrev(SmartNodePoint * const pointToSet);
     void setPointAsNext(SmartNodePoint * const pointToSet);
-    void setNextPoint(SmartNodePoint * const mNextPoint);
-    void setPreviousPoint(SmartNodePoint * const mPreviousPoint);
+
+    bool hasNextNormalPoint() const;
+    bool hasPrevNormalPoint() const;
+    void setNextNormalPoint(SmartNodePoint * const nextPoint);
+    void setPrevNormalPoint(SmartNodePoint * const prevPoint);
+    void setPointAsNextNormal(SmartNodePoint * const pointToSet);
+    void setPointAsPrevNormal(SmartNodePoint * const pointToSet);
 private:
     bool mSeparateNodePoint = false;
     int mNodeId;
@@ -194,7 +200,7 @@ private:
     stdptr<SmartNodePoint> mPrevNormalPoint;
     stdptr<SmartNodePoint> mNextNormalPoint;
 
-    stdptr<SmartNodePoint> mPreviousPoint;
+    stdptr<SmartNodePoint> mPrevPoint;
     stdptr<SmartNodePoint> mNextPoint;
 
     void ctrlPointPosChanged(const SmartCtrlPoint * const pointChanged,

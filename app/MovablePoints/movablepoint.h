@@ -115,13 +115,12 @@ protected:
     QPointF mSavedRelPos;
     BasicTransformAnimator* mParentTransform_cv = nullptr;
 
-    virtual void drawOnAbsPosSk(SkCanvas *canvas,
-                const SkPoint &absPos,
-                const SkScalar &invScale,
-                const unsigned char &r,
-                const unsigned char &g,
-                const unsigned char &b,
-                const bool &keyOnCurrent = false);
+    virtual void drawOnAbsPosSk(
+            SkCanvas * const canvas,
+            const SkPoint &absPos,
+            const SkScalar &invScale,
+            const SkColor &fillColor,
+            const bool &keyOnCurrent = false);
 };
 
 class NonAnimatedMovablePoint : public MovablePoint {

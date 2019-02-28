@@ -223,7 +223,7 @@ QPointF SmartNodePoint::getC2AbsPos() {
 }
 
 QPointF SmartNodePoint::getC2Value() const {
-    mNode_d->getC2Enabled() return mC2Pt->getRelativePos();
+    if(mNode_d->getC2Enabled()) return mC2Pt->getRelativePos();
     return getRelativePos();
 }
 
@@ -236,24 +236,14 @@ void SmartNodePoint::drawNodePoint(SkCanvas *canvas,
                      const SkScalar &invScale,
                      const bool &keyOnCurrent) {
     canvas->save();
-    SkPoint absPos = qPointToSk(getAbsolutePos());
-    if(mSelected) {
-        drawOnAbsPosSk(canvas,
-                     absPos,
-                     invScale,
-                     0, 200, 255,
-                     keyOnCurrent);
-    } else {
-        drawOnAbsPosSk(canvas,
-                     absPos,
-                     invScale,
-                     170, 240, 255,
-                     keyOnCurrent);
-    }
+    const SkColor fillCol = mSelected ?
+                SkColorSetRGB(0, 200, 255) :
+                SkColorSetRGB(170, 240, 255);
+    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
 
-    if((mode == CanvasMode::MOVE_POINT &&
-        (isNeighbourSelected() ) ) ||
-            (mode == CanvasMode::ADD_POINT && mSelected)) {
+    if((mode == CanvasMode::MOVE_POINT && isNeighbourNormalSelected()) ||
+       (mode == CanvasMode::ADD_POINT && mSelected)) {
         SkPaint paint;
         paint.setAntiAlias(true);
         if(mC2Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
@@ -315,22 +305,22 @@ SmartNodePoint* SmartNodePoint::getNextPoint() {
 }
 
 SmartNodePoint *SmartNodePoint::getPreviousPoint() {
-    return mPreviousPoint;
+    return mPrevPoint;
 }
 
 SmartNodePoint *SmartNodePoint::getConnectedSeparateNodePoint() {
-    if(isSeparateNodePoint() || !mPreviousPoint) return this;
-    return mPreviousPoint->getConnectedSeparateNodePoint();
+    if(isSeparateNodePoint() || !mPrevNormalPoint) return this;
+    return mPrevNormalPoint->getConnectedSeparateNodePoint();
 }
 
 void SmartNodePoint::updateC0Visibility() {
-    if(!mPreviousPoint) mC0Pt->hide();
+    if(!mPrevNormalPoint) mC0Pt->hide();
     else mC0Pt->setVisible(mNode_d->getC0Enabled() &&
                            mNode_d->isNormal());
 }
 
 void SmartNodePoint::updateC2Visibility() {
-    if(!mNextPoint) mC2Pt->hide();
+    if(!mNextNormalPoint) mC2Pt->hide();
     else mC2Pt->setVisible(mNode_d->getC2Enabled() &&
                            mNode_d->isNormal());
 }
@@ -374,11 +364,11 @@ NodePointValues SmartNodePoint::getPointValues() const {
     return {getC0Value(), getRelativePos(), getC2Value()};
 }
 
-bool SmartNodePoint::isNeighbourSelected() {
-    const bool nextSelected = mNextPoint ?
-                mNextPoint->isSelected() : false;
-    const bool prevSelected = mPreviousPoint ?
-                mPreviousPoint->isSelected() : false;
+bool SmartNodePoint::isNeighbourNormalSelected() {
+    const bool nextSelected = mNextNormalPoint ?
+                mNextNormalPoint->isSelected() : false;
+    const bool prevSelected = mPrevNormalPoint ?
+                mPrevNormalPoint->isSelected() : false;
     return isSelected() || nextSelected || prevSelected;
 }
 
@@ -401,38 +391,68 @@ void SmartNodePoint::setCtrlsMode(const CtrlsMode &mode) {
     //mParentPath->schedulePathUpdate();
 }
 
-void SmartNodePoint::setPreviousPoint(SmartNodePoint * const previousPoint) {
-    mPreviousPoint = previousPoint;
+bool SmartNodePoint::hasNextNormalPoint() const {
+    return mNextNormalPoint;
+}
+
+bool SmartNodePoint::hasPrevNormalPoint() const {
+    return mPrevNormalPoint;
+}
+
+void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
+    mPrevNormalPoint = prevPoint;
     updateC0Visibility();
     //mParentPath->schedulePathUpdate();
 }
 
-void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
-    mNextPoint = nextPoint;
+void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
+    mNextNormalPoint = nextPoint;
     mNextSegment.setLastNode(nextPoint);
     updateC2Visibility();
     //mParentPath->schedulePathUpdate();
 }
 
-bool SmartNodePoint::hasNextPoint() {
+void SmartNodePoint::setPointAsNextNormal(SmartNodePoint * const pointToSet) {
+    if(pointToSet == mNextNormalPoint) return;
+    if(hasNextNormalPoint()) mNextNormalPoint->setPrevNormalPoint(nullptr);
+    setNextNormalPoint(pointToSet);
+    if(pointToSet) pointToSet->setPrevNormalPoint(this);
+}
+
+void SmartNodePoint::setPointAsPrevNormal(SmartNodePoint * const pointToSet) {
+    if(pointToSet == mPrevNormalPoint) return;
+    if(hasPrevNormalPoint()) mPrevNormalPoint->setNextNormalPoint(nullptr);
+    setPrevNormalPoint(pointToSet);
+    if(pointToSet) pointToSet->setNextNormalPoint(this);
+}
+
+bool SmartNodePoint::hasNextPoint() const {
     return mNextPoint;
 }
 
-bool SmartNodePoint::hasPreviousPoint() {
-    return mPreviousPoint;
+bool SmartNodePoint::hasPrevPoint() const {
+    return mPrevPoint;
+}
+
+void SmartNodePoint::setPrevPoint(SmartNodePoint * const prevPoint) {
+    mPrevPoint = prevPoint;
+}
+
+void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
+    mNextPoint = nextPoint;
 }
 
 void SmartNodePoint::setPointAsNext(SmartNodePoint * const pointToSet) {
     if(pointToSet == mNextPoint) return;
-    if(hasNextPoint()) mNextPoint->setPreviousPoint(nullptr);
+    if(hasNextPoint()) mNextPoint->setPrevPoint(nullptr);
     setNextPoint(pointToSet);
-    if(pointToSet) pointToSet->setPreviousPoint(this);
+    if(pointToSet) pointToSet->setPrevPoint(this);
 }
 
-void SmartNodePoint::setPointAsPrevious(SmartNodePoint * const pointToSet) {
-    if(pointToSet == mPreviousPoint) return;
-    if(hasPreviousPoint()) mPreviousPoint->setNextPoint(nullptr);
-    setPreviousPoint(pointToSet);
+void SmartNodePoint::setPointAsPrev(SmartNodePoint * const pointToSet) {
+    if(pointToSet == mPrevPoint) return;
+    if(hasPrevPoint()) mPrevPoint->setNextPoint(nullptr);
+    setPrevPoint(pointToSet);
     if(pointToSet) pointToSet->setNextPoint(this);
 }
 
@@ -452,7 +472,7 @@ SmartNodePoint *SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
     const int insertId = mTargetPath_d->actionInsertNodeBetween(
                 mNodeId, mNode_d->getNextNodeId(), relPos, relPos, relPos);
     const auto newPt = mHandler_k->createNewNodePoint(insertId);
-    if(hasNextPoint()) setPointAsPrevious(newPt);
+    if(hasNextPoint()) setPointAsPrev(newPt);
     else setPointAsNext(newPt);
     return newPt;
 }
@@ -471,7 +491,7 @@ void SmartNodePoint::setElementsPos(const QPointF &c0,
 
 void SmartNodePoint::updateFromNodeData() {
     if(!mNode_d) {
-        setPointAsPrevious(nullptr);
+        setPointAsPrev(nullptr);
         setPointAsNext(nullptr);
         return;
     }
@@ -493,7 +513,7 @@ void SmartNodePoint::updateFromNodeData() {
 
     const int prevNodeId = mNode_d->getPrevNodeId();
     const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
-    setPointAsPrevious(prevNode);
+    setPointAsPrev(prevNode);
 
     const int nextNodeId = mNode_d->getNextNodeId();
     const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
@@ -504,8 +524,5 @@ void SmartNodePoint::updateFromNodeData() {
 }
 
 bool SmartNodePoint::isEndPoint() {
-    if(mPreviousPoint) if(mPreviousPoint->getType() == Node::MOVE) return true;
-    if(mNextPoint) if(mNextPoint->getType() == Node::MOVE) return true;
-
-    return !mNextPoint || !mPreviousPoint;
+    return !mPrevNormalPoint || !mNextNormalPoint;
 }

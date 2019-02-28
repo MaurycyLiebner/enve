@@ -271,14 +271,11 @@ void NodePoint::drawNodePoint(SkCanvas *canvas,
                      const SkScalar &invScale,
                      const bool &keyOnCurrent) {
     canvas->save();
-    SkPoint absPos = qPointToSk(getAbsolutePos());
-    if(mSelected) {
-        drawOnAbsPosSk(canvas, absPos, invScale,
-                      0, 200, 255, keyOnCurrent);
-    } else {
-        drawOnAbsPosSk(canvas, absPos, invScale,
-                       170, 240, 255, keyOnCurrent);
-    }
+    const SkColor fillCol = mSelected ?
+                SkColorSetRGB(0, 200, 255) :
+                SkColorSetRGB(170, 240, 255);
+    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
 
     if((mode == CanvasMode::MOVE_POINT && isNeighbourSelected()) ||
        (mode == CanvasMode::ADD_POINT && mSelected)) {

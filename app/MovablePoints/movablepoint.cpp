@@ -61,24 +61,22 @@ QPointF MovablePoint::getAbsolutePos() const {
     return mapRelativeToAbsolute(getRelativePos());
 }
 
-void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
-                const SkPoint &absPos,
-                const SkScalar &invScale,
-                const unsigned char &r,
-                const unsigned char &g,
-                const unsigned char &b,
-                const bool &keyOnCurrent) {
+void MovablePoint::drawOnAbsPosSk(
+        SkCanvas * const canvas,
+        const SkPoint &absPos,
+        const SkScalar &invScale,
+        const SkColor& fillColor,
+        const bool &keyOnCurrent) {
     canvas->save();
 
-    SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;
+    const SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;
 
     SkPaint paint;
     paint.setAntiAlias(true);
-    paint.setColor(SkColorSetARGB(255, r, g, b));
+    paint.setColor(fillColor);
 
     paint.setStyle(SkPaint::kFill_Style);
-    canvas->drawCircle(absPos,
-                       scaledRadius, paint);
+    canvas->drawCircle(absPos, scaledRadius, paint);
 
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
@@ -104,17 +102,11 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
 void MovablePoint::drawSk(SkCanvas *canvas,
                           const SkScalar &invScale) {
     if(isHidden()) return;
-    if(mSelected) {
-        drawOnAbsPosSk(canvas,
-                       qPointToSk(getAbsolutePos()),
-                       invScale,
-                       255, 0, 0);
-    } else {
-        drawOnAbsPosSk(canvas,
-                       qPointToSk(getAbsolutePos()),
-                       invScale,
-                       255, 175, 175);
-    }
+    const SkColor fillCol = mSelected ?
+                SkColorSetRGB(255, 0, 0) :
+                SkColorSetRGB(255, 175, 175);
+    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    drawOnAbsPosSk(canvas, absPos, invScale, fillCol);
 }
 
 BasicTransformAnimator *MovablePoint::getParentTransform() {

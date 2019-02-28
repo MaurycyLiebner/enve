@@ -34,14 +34,11 @@ void BoxPathPoint::drawSk(SkCanvas *canvas,
     if(isHidden()) {
         return;
     }
-    SkPoint absPos = qPointToSk(getAbsolutePos());
-    if(mSelected) {
-        drawOnAbsPosSk(canvas, absPos, invScale,
-                       255, 255, 0);
-    } else {
-        drawOnAbsPosSk(canvas, absPos, invScale,
-                       255, 255, 125);
-    }
+    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    const SkColor fillCol = mSelected ?
+                SkColorSetRGB(255, 255, 0) :
+                SkColorSetRGB(255, 255, 125);
+    drawOnAbsPosSk(canvas, absPos, invScale, fillCol);
 
     canvas->save();
     canvas->translate(absPos.x(), absPos.y());

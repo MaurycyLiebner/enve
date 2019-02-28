@@ -113,5 +113,5 @@ void SmartCtrlPoint::removeFromVectorPath() {
 
 bool SmartCtrlPoint::isHidden() const {
     return NonAnimatedMovablePoint::isHidden() ||
-           (!mParentPoint_k->isNeighbourSelected() );
+           !mParentPoint_k->isNeighbourNormalSelected();
 }
