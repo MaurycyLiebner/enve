@@ -24,13 +24,8 @@ void SmartCtrlPoint::setRelativePosVal(const QPointF &relPos) {
 
 void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
-    if(mCtrlType == C0) {
-        mParentPoint_k->getTargetPath()->actionSetNormalNodeC0(
-                    mParentPoint_k->getNodeId(), mCurrentPos);
-    } else {
-        mParentPoint_k->getTargetPath()->actionSetNormalNodeC2(
-                    mParentPoint_k->getNodeId(), mCurrentPos);
-    }
+    if(mCtrlType == C0) mParentPoint_k->c0Moved(mCurrentPos);
+    else mParentPoint_k->c2Moved(mCurrentPos);
 }
 
 void SmartCtrlPoint::moveToAbsWithoutUpdatingTheOther(const QPointF &absPos) {

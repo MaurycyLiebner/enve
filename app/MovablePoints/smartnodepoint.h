@@ -147,6 +147,17 @@ public:
         return mNode_d->getType();
     }
 
+    void c0Moved(const QPointF& c0) {
+        mTargetPath_d->actionSetNormalNodeC0(mNodeId, c0);
+        if(mPrevNormalPoint)
+            mPrevNormalPoint->afterNextNodeC0P1Changed();
+    }
+
+    void c2Moved(const QPointF& c2) {
+        mTargetPath_d->actionSetNormalNodeC2(mNodeId, c2);
+        mNextSegment.afterChanged();
+    }
+
     void updateNode() {
         if(!mTargetPath_d) mNode_d = nullptr;
         else mNode_d = mTargetPath_d->getNodePtr(mNodeId);
@@ -154,6 +165,9 @@ public:
     }
 
     void updateFromNodeData();
+    void afterNextNodeC0P1Changed() {
+        mNextSegment.afterChanged();
+    }
 protected:
     SmartNodePoint(const int& nodeId,
                    PathPointsHandler * const handler,
@@ -174,10 +188,14 @@ private:
     const qptr<SmartPathAnimator> mParentAnimator;
     NormalSegment mNextSegment;
 
-    stdptr<SmartNodePoint> mNextPoint;
-    stdptr<SmartNodePoint> mPreviousPoint;
     stdsptr<SmartCtrlPoint> mC0Pt;
     stdsptr<SmartCtrlPoint> mC2Pt;
+
+    stdptr<SmartNodePoint> mPrevNormalPoint;
+    stdptr<SmartNodePoint> mNextNormalPoint;
+
+    stdptr<SmartNodePoint> mPreviousPoint;
+    stdptr<SmartNodePoint> mNextPoint;
 
     void ctrlPointPosChanged(const SmartCtrlPoint * const pointChanged,
                              SmartCtrlPoint * const pointToUpdate);

@@ -42,7 +42,7 @@ void NormalSegment::disconnect() const {
     mHandler_k->removeSegment(*this);
 }
 
-void NormalSegment::updateDnDPos() {
+void NormalSegment::updateDnDPos() const {
     for(const auto& inner : mInnerDnD) {
         inner->updateFromNodeData();
     }

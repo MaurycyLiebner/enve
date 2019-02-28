@@ -87,8 +87,12 @@ public:
         minDist = relSeg.minDistanceTo(relPos, &closestT);
         return subSegmentAtT(closestT);
     }
+
+    void afterChanged() const {
+        updateDnDPos();
+    }
 private:
-    void updateDnDPos();
+    void updateDnDPos() const;
 
     qCubicSegment2D getAsAbsSegment() const;
     qCubicSegment2D getAsRelSegment() const;

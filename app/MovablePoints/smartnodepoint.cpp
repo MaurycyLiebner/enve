@@ -95,6 +95,9 @@ void SmartNodePoint::finishTransform() {
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
     mTargetPath_d->actionSetNormalNodeP1(mNodeId, relPos);
+    mNextSegment.afterChanged();
+    if(mPrevNormalPoint)
+        mPrevNormalPoint->afterNextNodeC0P1Changed();
 }
 
 void SmartNodePoint::removeFromVectorPath() {
