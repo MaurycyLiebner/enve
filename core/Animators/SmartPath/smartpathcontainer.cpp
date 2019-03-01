@@ -1,6 +1,6 @@
 ﻿#include "smartpathcontainer.h"
 
-void PathBase::actionRemoveNormalNode(const int &nodeId) {
+void SmartPath::actionRemoveNormalNode(const int &nodeId) {
     Node& node = mNodesList.at(nodeId);
     if(!node.isNormal())
         RuntimeThrow("Invalid node type. "
@@ -23,7 +23,7 @@ void PathBase::actionRemoveNormalNode(const int &nodeId) {
     mNodesList.setNodeType(nodeId, node, Node::DUMMY);
 }
 
-int PathBase::actionAddFirstNode(const QPointF &c0,
+int SmartPath::actionAddFirstNode(const QPointF &c0,
                                  const QPointF &p1,
                                  const QPointF &c2) {
     const int insertId = mNodesList.appendNode(Node(c0, p1, c2));
@@ -31,7 +31,7 @@ int PathBase::actionAddFirstNode(const QPointF &c0,
     return insertId;
 }
 
-int PathBase::actionAppendNodeAtEndNode(const int &endNodeId,
+int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId,
                                         const NodePointValues &values) {
     Node& endNode = mNodesList.at(endNodeId);
     if(!endNode.isNormal())
@@ -45,7 +45,7 @@ int PathBase::actionAppendNodeAtEndNode(const int &endNodeId,
                                       Node(values.fC0, values.fP1, values.fC2));
 }
 
-int PathBase::insertNodeBetween(const int& prevId,
+int SmartPath::insertNodeBetween(const int& prevId,
                                 const int& nextId,
                                 const Node& nodeBlueprint) {
     if(!mNodesList.nodesConnected(prevId, nextId))
@@ -53,13 +53,13 @@ int PathBase::insertNodeBetween(const int& prevId,
     return mNodesList.insertNodeAfter(prevId, nodeBlueprint);
 }
 
-int PathBase::actionInsertNodeBetween(const int &prevId,
+int SmartPath::actionInsertNodeBetween(const int &prevId,
                                       const int& nextId,
                                       const qreal& t) {
     return insertNodeBetween(prevId, nextId, Node(t));
 }
 
-int PathBase::actionInsertNodeBetween(const int &prevId,
+int SmartPath::actionInsertNodeBetween(const int &prevId,
                                       const int& nextId,
                                       const QPointF &c0,
                                       const QPointF &p1,
@@ -67,11 +67,11 @@ int PathBase::actionInsertNodeBetween(const int &prevId,
     return insertNodeBetween(prevId, nextId, Node(c0, p1, c2));
 }
 
-void PathBase::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
+void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
     mNodesList.promoteDissolvedNodeToNormal(nodeId);
 }
 
-void PathBase::actionMoveNodeBetween(const int& movedNodeId,
+void SmartPath::actionMoveNodeBetween(const int& movedNodeId,
                                      const int& prevNodeId,
                                      const int& nextNodeId) {
     Node& prevNode = mNodesList.at(prevNodeId);
@@ -81,7 +81,7 @@ void PathBase::actionMoveNodeBetween(const int& movedNodeId,
                              prevNodeId, prevNode);
 }
 
-void PathBase::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
+void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     Node& node1 = mNodesList.at(node1Id);
     Node& node2 = mNodesList.at(node2Id);
     if(node1.isMove() || node2.isMove())
@@ -140,7 +140,7 @@ void PathBase::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     }
 }
 
-void PathBase::actionConnectNodes(const int &node1Id,
+void SmartPath::actionConnectNodes(const int &node1Id,
                                   const int &node2Id) {
     const int moveNode1Id = mNodesList.lastSegmentNode(node1Id);
     const int moveNode2Id = mNodesList.lastSegmentNode(node2Id);
@@ -164,37 +164,37 @@ void PathBase::actionConnectNodes(const int &node1Id,
     }
 }
 
-void PathBase::removeNodeWithIdAndTellPrevToDoSame(const int &nodeId) {
+void SmartPath::removeNodeWithIdAndTellPrevToDoSame(const int &nodeId) {
     mNodesList.removeNodeFromList(nodeId);
     if(mPrev) mPrev->removeNodeWithIdAndTellPrevToDoSame(nodeId);
 }
 
-void PathBase::removeNodeWithIdAndTellNextToDoSame(const int &nodeId) {
+void SmartPath::removeNodeWithIdAndTellNextToDoSame(const int &nodeId) {
     mNodesList.removeNodeFromList(nodeId);
     if(mNext) mNext->removeNodeWithIdAndTellNextToDoSame(nodeId);
 }
 
-void PathBase::setPrev(PathBase * const prev) {
+void SmartPath::setPrev(SmartPath * const prev) {
     mPrev = prev;
     if(mPrev) mNodesList.setPrev(mPrev->getNodesPtr());
     else mNodesList.setPrev(nullptr);
 }
 
-void PathBase::setNext(PathBase * const next) {
+void SmartPath::setNext(SmartPath * const next) {
     mNext = next;
     if(mNext) mNodesList.setNext(mNext->getNodesPtr());
     else mNodesList.setNext(nullptr);
 }
 
-NodeList *PathBase::getNodesPtr() {
+NodeList *SmartPath::getNodesPtr() {
     return &mNodesList;
 }
 
-SkPath PathBase::getPathAt() const {
+SkPath SmartPath::getPathAt() const {
     return mNodesList.toSkPath();
 }
 
-SkPath PathBase::interpolateWithNext(const qreal &nextWeight) const {
+SkPath SmartPath::interpolateWithNext(const qreal &nextWeight) const {
     if(!mNext) return getPathAt();
     SkPath result;
     const SkPath thisPath = getPathForNext();
@@ -206,7 +206,7 @@ SkPath PathBase::interpolateWithNext(const qreal &nextWeight) const {
     return result;
 }
 
-SkPath PathBase::interpolateWithPrev(const qreal &prevWeight) const {
+SkPath SmartPath::interpolateWithPrev(const qreal &prevWeight) const {
     if(!mPrev) return getPathAt();
     SkPath result;
     const SkPath thisPath = getPathForPrev();
@@ -218,40 +218,38 @@ SkPath PathBase::interpolateWithPrev(const qreal &prevWeight) const {
     return result;
 }
 
-ValueRange PathBase::dissolvedTRange(const int &nodeId) {
+ValueRange SmartPath::dissolvedTRange(const int &nodeId) {
     return {mNodesList.prevT(nodeId), mNodesList.nextT(nodeId)};
 }
 
-NodeList PathBase::interpolateNodesListWithNext(
+NodeList SmartPath::interpolateNodesListWithNext(
         const qreal &nextWeight) const {
     return NodeList::sInterpolate(getNodesListForNext(),
                                   mNext->getNodesListForPrev(),
                                   nextWeight);
 }
 
-NodeList PathBase::interpolateNodesListWithPrev(
+NodeList SmartPath::interpolateNodesListWithPrev(
         const qreal &prevWeight) const {
     return NodeList::sInterpolate(getNodesListForPrev(),
                                   mPrev->getNodesListForNext(),
                                   prevWeight);
 }
 
-PathBase::PathBase(const NodeList::Type &type) :
-    PathBase(QList<Node>(), type) {}
+SmartPath::SmartPath() : SmartPath(QList<Node>()) {}
 
-PathBase::PathBase(const QList<Node> &list,
-                   const NodeList::Type &type) :
-    mType(type), mNodesList(type, false) {
+SmartPath::SmartPath(const QList<Node> &list) :
+    mNodesList(false) {
     mNodesList.setNodeList(list);
 }
 
-SkPath PathBase::getPathForPrev() const {
-    if(mPrev && mType == NodeList::SMART) return getPathFor(mPrev);
+SkPath SmartPath::getPathForPrev() const {
+    if(mPrev) return getPathFor(mPrev);
     return mNodesList.toSkPath();
 }
 
-SkPath PathBase::getPathForNext() const {
-    if(mNext && mType == NodeList::SMART) return getPathFor(mNext);
+SkPath SmartPath::getPathForNext() const {
+    if(mNext) return getPathFor(mNext);
     return mNodesList.toSkPath();
 }
 
@@ -288,7 +286,7 @@ bool shouldSplitThisNode(const int& nodeId,
     return false;
 }
 
-NodeList PathBase::getNodesListFor(PathBase * const neighbour) const {
+NodeList SmartPath::getNodesListFor(SmartPath * const neighbour) const {
     const NodeList& neighNodes = neighbour->getNodesRef();
     NodeList result = mNodesList.createCopy(true);
 
@@ -326,6 +324,6 @@ NodeList PathBase::getNodesListFor(PathBase * const neighbour) const {
     return result;
 }
 
-SkPath PathBase::getPathFor(PathBase * const neighbour) const {
+SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
     return getNodesListFor(neighbour).toSkPath();
 }

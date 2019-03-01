@@ -2,7 +2,7 @@
 #define DIFFERSINTERPOLATE_H
 #include <QString>
 class qCubicSegment1D;
-class PathBase;
+class SmartPath;
 extern bool gDiffers(const QString& val1, const QString& val2);
 extern bool gDiffers(const bool& val1, const bool& val2);
 
@@ -17,6 +17,6 @@ extern void gInterpolate(const qCubicSegment1D& val1,
                          qCubicSegment1D& val);
 
 
-extern bool gDiffers(const PathBase& path1, const PathBase& path2);
+extern bool gDiffers(const SmartPath& path1, const SmartPath& path2);
 
 #endif // DIFFERSINTERPOLATE_H

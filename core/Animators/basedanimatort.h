@@ -8,7 +8,6 @@ template <typename B, typename K, typename T>
 class BasedAnimatorT : public B {
     static_assert(std::is_base_of<Animator, B>::value,
                   "BasedAnimatorT can only be used with Animator derived classes");
-
 public:
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
         if(range.inRange(this->anim_mCurrentRelFrame)) {

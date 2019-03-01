@@ -9,9 +9,9 @@
 #include "framerange.h"
 #include "smartPointers/sharedpointerdefs.h"
 
-class PathBase {
+class SmartPath {
 public:
-    PathBase(const NodeList::Type &type);
+    SmartPath();
     void actionRemoveNormalNode(const int& nodeId);
 
     int actionAddFirstNode(const QPointF& c0,
@@ -102,8 +102,8 @@ public:
         mNodesList.setNodeC2Enabled(nodeId, node, enabled);
     }
 
-    void setPrev(PathBase * const prev);
-    void setNext(PathBase * const next);
+    void setPrev(SmartPath * const prev);
+    void setNext(SmartPath * const next);
 
     SkPath getPathAt() const;
     SkPath getPathForPrev() const;
@@ -152,47 +152,37 @@ public:
         mNodesList.setNodeList(mSavedList);
     }
 
-    PathBase createCopy() const {
-        return PathBase(mNodesList.getList(), mType);
+    SmartPath createCopy() const {
+        return SmartPath(mNodesList.getList());
     }
 
     int getNodeCount() const {
         return mNodesList.getList().count();
     }
 
-    void assign(const PathBase& src) {
+    void assign(const SmartPath& src) {
         mNodesList.setNodeList(src.getNodesRef().getList());
     }
 
-    static bool sDifferent(const PathBase& path1, const PathBase& path2) {
+    static bool sDifferent(const SmartPath& path1, const SmartPath& path2) {
         return NodeList::sDifferent(path1.getNodesRef(),
                                     path2.getNodesRef());
     }
-
-    static NodeList::Type sReadType(QIODevice * const src) {
-        NodeList::Type type;
-        src->read(rcChar(&type), sizeof(NodeList::Type));
-        return type;
-    }
-
     bool read(QIODevice * const src) {
         return mNodesList.read(src);
     }
 
     bool write(QIODevice * const dst) const {
-        dst->write(rcConstChar(&mType), sizeof(NodeList::Type));
         return mNodesList.write(dst);
     }
 protected:
-    PathBase(const QList<Node> &list,
-             const NodeList::Type& type);
+    SmartPath(const QList<Node> &list);
 
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
 
     void removeNodeWithIdAndTellNextToDoSame(const int& nodeId);
 
     void updateAllNodesTypeAfterNeighbourChanged() {
-        if(mType == NodeList::NORMAL) return;
         mNodesList.updateAllNodesTypeAfterNeighbourChanged();
     }
 
@@ -207,44 +197,27 @@ protected:
     }
 
     NodeList getNodesListForPrev() const {
-        if(!mPrev || mType == NodeList::NORMAL) return mNodesList;
+        if(!mPrev) return mNodesList;
         return getNodesListFor(mPrev);
     }
 
     NodeList getNodesListForNext() const {
-        if(!mNext || mType == NodeList::NORMAL) return mNodesList;
+        if(!mNext) return mNodesList;
         return getNodesListFor(mNext);
     }
     NodeList interpolateNodesListWithNext(const qreal& nextWeight) const;
     NodeList interpolateNodesListWithPrev(const qreal& prevWeight) const;
 private:
-    NodeList getNodesListFor(PathBase * const neighbour) const;
-    SkPath getPathFor(PathBase * const neighbour) const;
+    NodeList getNodesListFor(SmartPath * const neighbour) const;
+    SkPath getPathFor(SmartPath * const neighbour) const;
     int insertNodeBetween(const int &prevId, const int &nextId,
                           const Node &nodeBlueprint);
 
-    PathBase * mPrev = nullptr;
-    PathBase * mNext = nullptr;
+    SmartPath * mPrev = nullptr;
+    SmartPath * mNext = nullptr;
 
-    const NodeList::Type mType;
     NodeList mNodesList;
     QList<Node> mSavedList;
-};
-
-class SmartPath : public PathBase {
-public:
-    SmartPath() : PathBase(NodeList::SMART) {}
-protected:
-    SmartPath(const QList<Node> &list) :
-        PathBase(list, NodeList::SMART) {}
-};
-
-class NormalPath : public PathBase {
-public:
-    NormalPath() : PathBase(NodeList::NORMAL) {}
-protected:
-    NormalPath(const QList<Node> &list) :
-        PathBase(list, NodeList::NORMAL) {}
 };
 
 #endif // SMARTPATHCONTAINER_H

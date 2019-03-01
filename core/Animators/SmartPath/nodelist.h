@@ -6,11 +6,9 @@
 #include "basicreadwrite.h"
 class SkPath;
 class NodeList {
-    friend class PathBase;
+    friend class SmartPath;
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
-    enum Type { SMART, NORMAL };
-
     Node& operator[](const int& i) {
         return mNodes[i];
     }
@@ -112,7 +110,7 @@ public:
     }
 
     void updateAfterNodeChanged(const int& nodeId) {
-        if(mNoUpdates || mType == NORMAL) return;
+        if(mNoUpdates) return;
         updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
@@ -174,28 +172,22 @@ public:
     }
 
     NodeList createCopy(const bool& noUpdates) const {
-        return NodeList(mNodes, mType, noUpdates);
+        return NodeList(mNodes, noUpdates);
     }
 
     NodeList createCopy() const {
-        return NodeList(mNodes, mType, mNoUpdates);
-    }
-
-    const Type& type() const {
-        return mType;
+        return NodeList(mNodes, mNoUpdates);
     }
 
     bool read(QIODevice * const src);
     bool write(QIODevice * const dst) const;
 protected:
-    NodeList(const Type& type,
-             const bool& noUpdates = false) :
-        mType(type), mNoUpdates(noUpdates) {}
+    NodeList(const bool& noUpdates = false) :
+        mNoUpdates(noUpdates) {}
 
     NodeList(const QList<Node>& list,
-             const Type& type,
              const bool& noUpdates = false) :
-        mType(type), mNoUpdates(noUpdates), mNodes(list) {}
+        mNoUpdates(noUpdates), mNodes(list) {}
 
     const QList<Node>& getList() const {
         return mNodes;
@@ -203,7 +195,7 @@ protected:
 
     void setNodeList(const QList<Node>& list) {
         mNodes = list;
-        if(mNoUpdates || mType == NORMAL) return;
+        if(mNoUpdates) return;
         updateAllNodesTypeAfterNeighbourChanged();
         if(mPrev) mPrev->updateAllNodesTypeAfterNeighbourChanged();
         if(mNext) mNext->updateAllNodesTypeAfterNeighbourChanged();
@@ -233,7 +225,6 @@ private:
     qreal nextT(const int &nodeId) const;
     Node &insertNodeToList(const int &nodeId, const Node &node);
 
-    const Type mType;
     const bool mNoUpdates;
     NodeList * mPrev = nullptr;
     NodeList * mNext = nullptr;

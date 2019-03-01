@@ -51,7 +51,7 @@ protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
 
-    void setCurrentlyEditedPath(PathBase * const currentTarget) {
+    void setCurrentlyEditedPath(SmartPath * const currentTarget) {
         if(currentTarget == mCurrentTarget) return;
         mCurrentTarget = currentTarget;
         updatePoints();
@@ -61,7 +61,7 @@ private:
     void updatePoints();
 
     QList<stdsptr<SmartNodePoint>> mPoints;
-    PathBase* mCurrentTarget;
+    SmartPath* mCurrentTarget;
     SmartPathAnimator * const mTargetAnimator;
     BasicTransformAnimator * const mParentTransform;
     bool mKeyOnCurrentFrame = false;

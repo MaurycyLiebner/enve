@@ -34,6 +34,7 @@ protected:
     SmartPathKey(Animator * const parentAnimator) :
         InterpolationKeyT<SmartPath>(parentAnimator) {}
 };
+
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
 public:

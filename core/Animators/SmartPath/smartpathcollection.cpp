@@ -1,6 +1,4 @@
 #include "smartpathcollection.h"
 
-SmartPathCollection::SmartPathCollection()
-{
-
-}
+SmartPathCollection::SmartPathCollection() :
+    ComplexAnimator("paths") {}
