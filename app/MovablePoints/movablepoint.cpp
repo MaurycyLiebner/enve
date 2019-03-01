@@ -258,8 +258,5 @@ bool MovablePoint::isBonePoint() {
 }
 
 void NonAnimatedMovablePoint::setRelativePosVal(const QPointF &relPos) {
-    if(qIsNaN(relPos.x()) || qIsNaN(relPos.y())) {
-        mCurrentPos = relPos;
-    }
     mCurrentPos = relPos;
 }

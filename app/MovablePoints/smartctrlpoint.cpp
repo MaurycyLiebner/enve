@@ -13,15 +13,6 @@ SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
     mParentTransform_cv = mParentPoint_k->getParentTransform();
 }
 
-QPointF SmartCtrlPoint::getRelativePos() const {
-    return mParentPoint_k->getRelativePos() + mCurrentPos;
-}
-
-void SmartCtrlPoint::setRelativePosVal(const QPointF &relPos) {
-    NonAnimatedMovablePoint::setRelativePosVal(
-                relPos - mParentPoint_k->getRelativePos());
-}
-
 void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
     if(mCtrlType == C0) mParentPoint_k->c0Moved(mCurrentPos);
@@ -33,7 +24,7 @@ void SmartCtrlPoint::moveToAbsWithoutUpdatingTheOther(const QPointF &absPos) {
 }
 
 void SmartCtrlPoint::rotate(const qreal &rotate) {
-    QPointF savedValue = mSavedRelPos - mParentPoint_k->getSavedRelPos();
+    const QPointF savedValue = mSavedRelPos - mParentPoint_k->getSavedRelPos();
     QMatrix mat;
     mat.rotate(rotate);
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
@@ -41,35 +32,28 @@ void SmartCtrlPoint::rotate(const qreal &rotate) {
 
 void SmartCtrlPoint::scale(const qreal &sx,
                       const qreal &sy) {
-    QPointF savedValue = mSavedRelPos - mParentPoint_k->getSavedRelPos();
+    const QPointF savedValue = mSavedRelPos - mParentPoint_k->getSavedRelPos();
     QMatrix mat;
     mat.scale(sx, sy);
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
 }
 
 void SmartCtrlPoint::moveByAbs(const QPointF &absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) +
-              absTranslatione);
+    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) + absTranslatione);
 }
 
 void SmartCtrlPoint::moveToAbs(const QPointF& absPos) {
     NonAnimatedMovablePoint::moveToAbs(absPos);
     if(mOtherCtrlPt_cv->isSelected()) return;
-    if(mCtrlType == C0) {
-        mParentPoint_k->c0PtPosChanged();
-    } else {
-        mParentPoint_k->c2PtPosChanged();
-    }
+    if(mCtrlType == C0) mParentPoint_k->c0PtPosChanged();
+    else mParentPoint_k->c2PtPosChanged();
 }
 
 void SmartCtrlPoint::moveByRel(const QPointF &relTranslation) {
     NonAnimatedMovablePoint::moveByRel(relTranslation);
     if(mOtherCtrlPt_cv->isSelected()) return;
-    if(mCtrlType == C0) {
-        mParentPoint_k->c0PtPosChanged();
-    } else {
-        mParentPoint_k->c2PtPosChanged();
-    }
+    if(mCtrlType == C0) mParentPoint_k->c0PtPosChanged();
+    else mParentPoint_k->c2PtPosChanged();
 }
 
 void SmartCtrlPoint::startTransform() {
@@ -104,11 +88,8 @@ void SmartCtrlPoint::setOtherCtrlPt(SmartCtrlPoint * const ctrlPt) {
 }
 
 void SmartCtrlPoint::removeFromVectorPath() {
-    if(mCtrlType == C0) {
-        mParentPoint_k->setC0Enabled(false);
-    } else {
-        mParentPoint_k->setC2Enabled(false);
-    }
+    if(mCtrlType == C0) mParentPoint_k->setC0Enabled(false);
+    else mParentPoint_k->setC2Enabled(false);
 }
 
 bool SmartCtrlPoint::isHidden() const {

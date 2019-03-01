@@ -23,6 +23,11 @@ struct qCubicSegment1D;
     const qreal& p##add##1 = seg.p1();
 
 struct qCubicSegment2D {
+    struct PosAndT {
+        qreal fT;
+        QPointF fPos;
+    };
+
     typedef std::pair<qCubicSegment2D, qCubicSegment2D> Pair;
     qCubicSegment2D(const QPointF& p0, const QPointF& c1,
                     const QPointF& c2, const QPointF& p1) {
@@ -80,6 +85,7 @@ struct qCubicSegment2D {
     void setP1(const QPointF& p1);
 
     qreal tValueForPointClosestTo(const QPointF& p);
+    PosAndT closestPosAndT(const QPointF& p);
     qreal minDistanceTo(const QPointF &p,
                         qreal * const pBestT = nullptr,
                         QPointF * const pBestPos = nullptr);

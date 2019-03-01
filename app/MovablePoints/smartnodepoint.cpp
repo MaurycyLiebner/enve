@@ -38,23 +38,15 @@ void SmartNodePoint::applyTransform(const QMatrix &transform) {
 
 void SmartNodePoint::startTransform() {
     NonAnimatedMovablePoint::startTransform();
-    if(!mC0Pt->isSelected()) {
-        mC0Pt->NonAnimatedMovablePoint::startTransform();
-    }
-    if(!mC2Pt->isSelected()) {
-        mC2Pt->NonAnimatedMovablePoint::startTransform();
-    }
-    getTargetAnimator()->startPathChange();
+    if(!mC0Pt->isSelected()) mC0Pt->NonAnimatedMovablePoint::startTransform();
+    if(!mC2Pt->isSelected()) mC2Pt->NonAnimatedMovablePoint::startTransform();
+    mParentAnimator->startPathChange();
 }
 
 void SmartNodePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
     NonAnimatedMovablePoint::saveTransformPivotAbsPos(absPivot);
-    if(!mC0Pt->isSelected()) {
-        mC0Pt->saveTransformPivotAbsPos(absPivot);
-    }
-    if(!mC2Pt->isSelected()) {
-        mC2Pt->saveTransformPivotAbsPos(absPivot);
-    }
+    if(!mC0Pt->isSelected()) mC0Pt->saveTransformPivotAbsPos(absPivot);
+    if(!mC2Pt->isSelected()) mC2Pt->saveTransformPivotAbsPos(absPivot);
 }
 
 void SmartNodePoint::rotateRelativeToSavedPivot(const qreal &rot) {
@@ -72,32 +64,31 @@ void SmartNodePoint::scaleRelativeToSavedPivot(const qreal &sx,
 
 void SmartNodePoint::cancelTransform() {
     NonAnimatedMovablePoint::cancelTransform();
-    if(!mC0Pt->isSelected()) {
-        mC0Pt->NonAnimatedMovablePoint::cancelTransform();
-    }
-    if(!mC2Pt->isSelected()) {
-        mC2Pt->NonAnimatedMovablePoint::cancelTransform();
-    }
-    getTargetAnimator()->cancelPathChange();
+    if(!mC0Pt->isSelected()) mC0Pt->NonAnimatedMovablePoint::cancelTransform();
+    if(!mC2Pt->isSelected()) mC2Pt->NonAnimatedMovablePoint::cancelTransform();
+    mParentAnimator->cancelPathChange();
 }
 
 void SmartNodePoint::finishTransform() {
     NonAnimatedMovablePoint::finishTransform();
-    if(!mC0Pt->isSelected()) {
+    if(!mC0Pt->isSelected())
         mC0Pt->NonAnimatedMovablePoint::finishTransform();
-    }
-    if(!mC2Pt->isSelected()) {
+    if(!mC2Pt->isSelected())
         mC2Pt->NonAnimatedMovablePoint::finishTransform();
-    }
     mParentAnimator->finishPathChange();
 }
 
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
-    setRelativePosVal(relPos);
-    mTargetPath_d->actionSetNormalNodeP1(mNodeId, relPos);
+    if(getType() == Node::NORMAL) setRelativePosVal(relPos);
+    else if(getType() == Node::DISSOLVED || getType() == Node::DUMMY) {
+        const auto parentSeg = mPrevNormalPoint->getNextNormalSegment();
+        auto seg = parentSeg.getAsRelSegment();
+        const auto closest = seg.closestPosAndT(relPos);
+        mHandler_k->setT(mNodeId, closest.fT);
+    }
+    mTargetPath_d->actionSetNormalNodeP1(mNodeId, mCurrentPos);
     mNextNormalSegment.afterChanged();
-    if(mPrevNormalPoint)
-        mPrevNormalPoint->afterNextNodeC0P1Changed();
+    if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
 }
 
 void SmartNodePoint::removeFromVectorPath() {
@@ -139,14 +130,10 @@ MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
         } else if(mC2Pt->isPointAtAbsPos(absPos, canvasScaleInv)) {
             return mC2Pt.get();
         }
-    } else {
-        if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
-            return nullptr;
-        }
+    } else if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
+        return nullptr;
     }
-    if(isPointAtAbsPos(absPos, canvasScaleInv)) {
-        return this;
-    }
+    if(isPointAtAbsPos(absPos, canvasScaleInv)) return this;
     return nullptr;
 }
 
@@ -155,7 +142,7 @@ QPointF SmartNodePoint::symmetricToAbsPos(const QPointF &absPosToMirror) {
 }
 
 QPointF SmartNodePoint::symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
-                                           const qreal &newLen) {
+                                                const qreal &newLen) {
     return symmetricToPosNewLen(absPosToMirror, getAbsolutePos(), newLen);
 }
 
@@ -231,10 +218,11 @@ SmartCtrlPoint *SmartNodePoint::getC2Pt() {
     return mC2Pt.get();
 }
 
-void SmartNodePoint::drawNodePoint(SkCanvas *canvas,
-                     const CanvasMode &mode,
-                     const SkScalar &invScale,
-                     const bool &keyOnCurrent) {
+void SmartNodePoint::drawNodePoint(
+        SkCanvas * const canvas,
+        const CanvasMode &mode,
+        const SkScalar &invScale,
+        const bool &keyOnCurrent) {
     canvas->save();
     const SkColor fillCol = mSelected ?
                 SkColorSetRGB(0, 200, 255) :
@@ -247,8 +235,7 @@ void SmartNodePoint::drawNodePoint(SkCanvas *canvas,
         SkPaint paint;
         paint.setAntiAlias(true);
         if(mC2Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            const SkPoint endAbsPos = qPointToSk(
-                        mC2Pt->getAbsolutePos());
+            const SkPoint endAbsPos = qPointToSk(mC2Pt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
@@ -259,8 +246,7 @@ void SmartNodePoint::drawNodePoint(SkCanvas *canvas,
             canvas->drawLine(absPos, endAbsPos, paint);
         }
         if(mC0Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            const SkPoint startAbsPos = qPointToSk(
-                        mC0Pt->getAbsolutePos());
+            const SkPoint startAbsPos = qPointToSk(mC0Pt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
@@ -278,18 +264,15 @@ void SmartNodePoint::drawNodePoint(SkCanvas *canvas,
         paint.setAntiAlias(true);
         paint.setTextSize(FONT_HEIGHT*invScale);
         SkRect bounds;
-        const ulong sizeT = static_cast<ulong>(
-                    QString::number(mNodeId).size());
+        const auto nodeIdStr = QString::number(mNodeId);
+        const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
         paint.measureText(QString::number(mNodeId).toStdString().c_str(),
-                          sizeT*sizeof(char),
-                          &bounds);
+                          sizeT*sizeof(char), &bounds);
         paint.setColor(SK_ColorBLACK);
-        const SkFontStyle fontStyle =
-                SkFontStyle(SkFontStyle::kBold_Weight,
-                            SkFontStyle::kNormal_Width,
-                            SkFontStyle::kUpright_Slant);
-        const sk_sp<SkTypeface> typeFace =
-                SkTypeface::MakeFromName(nullptr, fontStyle);
+        const auto fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
+                                           SkFontStyle::kNormal_Width,
+                                           SkFontStyle::kUpright_Slant);
+        const auto typeFace = SkTypeface::MakeFromName(nullptr, fontStyle);
         paint.setTypeface(typeFace);
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawString(QString::number(mNodeId).toStdString().c_str(),
@@ -524,16 +507,14 @@ void SmartNodePoint::updateFromNodeData() {
     if(prevNode->getType() == Node::NORMAL) {
         setPointAsPrevNormal(prevNode);
     } else {
-        const auto prevNormalNode =
-                mHandler_k->getPrevNormalNode(prevNodeId);
+        const auto prevNormalNode = mHandler_k->getPrevNormalNode(prevNodeId);
         setPointAsPrevNormal(prevNormalNode);
     }
 
     if(nextNode->getType() == Node::NORMAL) {
         setPointAsNextNormal(nextNode);
     } else {
-        const auto nextNormalNode =
-                mHandler_k->getNextNormalNode(nextNodeId);
+        const auto nextNormalNode = mHandler_k->getNextNormalNode(nextNodeId);
         setPointAsNextNormal(nextNormalNode);
     }
 

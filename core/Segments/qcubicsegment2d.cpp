@@ -115,6 +115,13 @@ qreal qCubicSegment2D::tValueForPointClosestTo(const QPointF &p) {
     return bestT;
 }
 
+qCubicSegment2D::PosAndT qCubicSegment2D::closestPosAndT(const QPointF &p) {
+    qreal bestT;
+    QPointF bestPos;
+    minDistanceTo(p, 0, 1, &bestT, &bestPos);
+    return {bestT, bestPos};
+}
+
 qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
                                      qreal * const pBestT,
                                      QPointF * const pBestPos) {

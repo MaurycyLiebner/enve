@@ -91,11 +91,12 @@ public:
     void afterChanged() const {
         updateDnDPos();
     }
-private:
-    void updateDnDPos() const;
 
     qCubicSegment2D getAsAbsSegment() const;
     qCubicSegment2D getAsRelSegment() const;
+private:
+    void updateDnDPos() const;
+
     void updateInnerDnD();
     SubSegment subSegmentAtT(const qreal& t) const;
 

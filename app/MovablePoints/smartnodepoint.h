@@ -23,8 +23,12 @@ public:
 
     void startTransform();
     void finishTransform();
+    void cancelTransform();
 
     void setRelativePos(const QPointF &relPos);
+
+    void removeFromVectorPath();
+    void removeApproximate();
 
     void actionAddPointRelPos(const QPointF &relPos);
     void actionAddPointAbsPos(const QPointF &absPos);
@@ -41,18 +45,15 @@ public:
     QPointF getC2Value() const;
     SmartCtrlPoint *getC2Pt();
 
-    void drawNodePoint(SkCanvas *canvas,
-                const CanvasMode &mode,
-                const SkScalar &invScale,
-                const bool &keyOnCurrent);
+    void drawNodePoint(SkCanvas * const canvas,
+                       const CanvasMode &mode,
+                       const SkScalar &invScale,
+                       const bool &keyOnCurrent);
 
     SmartNodePoint *getNextPoint();
     SmartNodePoint *getPreviousPoint();
 
     bool isEndPoint();
-
-    void removeFromVectorPath();
-    void removeApproximate();
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &canvasMode,
@@ -82,8 +83,6 @@ public:
         return mTargetPath_d;
     }
 
-    void cancelTransform();
-
     void setC0Enabled(const bool &enabled);
     void setC2Enabled(const bool &enabled);
     void resetC0();
@@ -104,7 +103,7 @@ public:
     void scaleRelativeToSavedPivot(const qreal &sx,
                                    const qreal &sy);
 
-    const NormalSegment& getNextEdge() {
+    const NormalSegment& getNextNormalSegment() {
         return mNextNormalSegment;
     }
 

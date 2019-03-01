@@ -114,7 +114,7 @@ void PathPointsHandler::moveToClosestSegment(const int &nodeId,
     NormalSegment::SubSegment minSubSeg{nullptr, nullptr, nullptr};
     qreal minDist = TEN_MIL;
     for(const auto& pt : mPoints) {
-        const auto seg = pt->getNextEdge();
+        const auto seg = pt->getNextNormalSegment();
         qreal dist;
         const auto subSeg = seg.getClosestSubSegment(relPos, dist);
         if(dist < minDist) {
