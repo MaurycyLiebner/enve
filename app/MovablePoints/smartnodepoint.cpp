@@ -515,14 +515,16 @@ void SmartNodePoint::updateFromNodeData() {
     if(prevNode->getType() == Node::NORMAL) {
         setPointAsPrevNormal(prevNode);
     } else {
-        const auto prevNormalNode = mHandler_k->getPrevNormalNode(prevNodeId);
+        const auto prevNormalNode =
+                mHandler_k->getPrevNormalNode(prevNodeId);
         setPointAsPrevNormal(prevNormalNode);
     }
 
     if(nextNode->getType() == Node::NORMAL) {
         setPointAsNextNormal(nextNode);
     } else {
-        const auto nextNormalNode = mHandler_k->getNextNormalNode(nextNodeId);
+        const auto nextNormalNode =
+                mHandler_k->getNextNormalNode(nextNodeId);
         setPointAsNextNormal(nextNormalNode);
     }
 

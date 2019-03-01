@@ -50,14 +50,15 @@ void Canvas::connectPoints() {
             if(!secondPoint->isSeparateNodePoint()) {
                 secondSinglePath->revertAllPointsForAllKeys();
             }
-            QMatrix firstMatrix =
+            const QMatrix firstMatrix =
                     firstParentPath->getCombinedTransform();
-            QMatrix secondMatrix =
+            const QMatrix secondMatrix =
                     secondParentPath->getCombinedTransform();
-            QMatrix effectiveMatrix =
+            const QMatrix effectiveMatrix =
                     secondMatrix*firstMatrix.inverted();
             secondSinglePath->applyTransformToPoints(effectiveMatrix);
-            auto secondSinglePathSPtr = GetAsSPtr(secondSinglePath, VectorPathAnimator);
+            const auto secondSinglePathSPtr =
+                    GetAsSPtr(secondSinglePath, VectorPathAnimator);
             firstParentPath->addSinglePathAnimator(secondSinglePathSPtr);
             secondSinglePath->removeFromParent();
             secondSinglePath->setParentPath(firstParentPath);
@@ -65,8 +66,10 @@ void Canvas::connectPoints() {
             newSinglePath = firstSinglePath->connectWith(secondSinglePath);
         }
         if(newSinglePath) {
-            NodePoint *nodePt1 = newSinglePath->getNodePtWithNodeId(nodeToSelectId);
-            NodePoint *nodePt2 = newSinglePath->getNodePtWithNodeId(nodeToSelectId + 1);
+            NodePoint * const nodePt1 =
+                    newSinglePath->getNodePtWithNodeId(nodeToSelectId);
+            NodePoint * const nodePt2 =
+                    newSinglePath->getNodePtWithNodeId(nodeToSelectId + 1);
             addPointToSelection(nodePt1);
             addPointToSelection(nodePt2);
         }

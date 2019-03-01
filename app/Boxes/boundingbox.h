@@ -14,7 +14,6 @@ class MovablePoint;
 
 class NodePoint;
 class PathEffect;
-class PathAnimator;
 class DurationRectangleMovable;
 class PaintSettings;
 class StrokeSettings;
