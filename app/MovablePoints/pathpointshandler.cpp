@@ -99,11 +99,6 @@ void PathPointsHandler::addNewAtEnd(const int &nodeId,
     updatePoints();
 }
 
-void PathPointsHandler::setT(const int &nodeId, const qreal &t) {
-    mCurrentTarget->actionSetDissolvedNodeT(nodeId, t);
-    updatePoint(nodeId);
-}
-
 void PathPointsHandler::promoteToNormal(const int &nodeId) {
     mCurrentTarget->actionPromoteDissolvedNodeToNormal(nodeId);
     updatePoint(nodeId);

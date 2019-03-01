@@ -218,6 +218,10 @@ SkPath PathBase::interpolateWithPrev(const qreal &prevWeight) const {
     return result;
 }
 
+ValueRange PathBase::dissolvedTRange(const int &nodeId) {
+    return {mNodesList.prevT(nodeId), mNodesList.nextT(nodeId)};
+}
+
 NodeList PathBase::interpolateNodesListWithNext(
         const qreal &nextWeight) const {
     return NodeList::sInterpolate(getNodesListForNext(),

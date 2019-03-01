@@ -27,7 +27,6 @@ public:
     void addNewAtEnd(const int& nodeId, const QPointF &relPos);
 
     // actions on DISSOLVED
-    void setT(const int& nodeId, const qreal& t);
 
     // actions on DUMMY and DISSOLVED
     void promoteToNormal(const int& nodeId);

@@ -79,16 +79,24 @@ void SmartNodePoint::finishTransform() {
 }
 
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
-    if(getType() == Node::NORMAL) setRelativePosVal(relPos);
-    else if(getType() == Node::DISSOLVED || getType() == Node::DUMMY) {
+    if(getType() == Node::NORMAL) {
+        setRelativePosVal(relPos);
+        mTargetPath_d->actionSetNormalNodeP1(mNodeId, mCurrentPos);
+        mNextNormalSegment.afterChanged();
+        if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
+    } else if(getType() == Node::DISSOLVED) {
         const auto parentSeg = mPrevNormalPoint->getNextNormalSegment();
-        auto seg = parentSeg.getAsRelSegment();
+        const auto tRange = mTargetPath_d->dissolvedTRange(mNodeId);
+        auto seg = parentSeg.getAsRelSegment().tFragment(tRange.fMin,
+                                                         tRange.fMax);
         const auto closest = seg.closestPosAndT(relPos);
-        mHandler_k->setT(mNodeId, closest.fT);
+        const qreal mappedT = gMapTFromFragment(tRange.fMin, tRange.fMax,
+                                                closest.fT);
+        mTargetPath_d->actionSetDissolvedNodeT(mNodeId, mappedT);
+        setRelativePosVal(closest.fPos);
+    } else if(getType() == Node::DUMMY) {
+        mHandler_k->moveToClosestSegment(mNodeId, relPos);
     }
-    mTargetPath_d->actionSetNormalNodeP1(mNodeId, mCurrentPos);
-    mNextNormalSegment.afterChanged();
-    if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
 }
 
 void SmartNodePoint::removeFromVectorPath() {

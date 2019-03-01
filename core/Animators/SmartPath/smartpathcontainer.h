@@ -126,6 +126,8 @@ public:
         return mNodesList.nextNormalId(nodeId);
     }
 
+    ValueRange dissolvedTRange(const int& nodeId);
+
     void updateDissolvedNodePosition(const int& nodeId) {
         mNodesList.updateDissolvedNodePosition(nodeId);
     }
