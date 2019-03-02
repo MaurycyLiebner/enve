@@ -250,11 +250,11 @@ public:
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *e);
+    void mousePressEvent(const QMouseEvent * const event);
+    void mouseReleaseEvent(const QMouseEvent * const event);
+    void mouseMoveEvent(const QMouseEvent * const event);
+    void wheelEvent(const QWheelEvent * const event);
+    void mouseDoubleClickEvent(const QMouseEvent * const e);
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -379,7 +379,7 @@ protected:
     void handleMovePointMouseRelease();
 
     bool isMovingPath();
-    void handleRightButtonMousePress(QMouseEvent *event);
+    void handleRightButtonMousePress(const QMouseEvent * const event);
     void handleLeftButtonMousePress();
 signals:
     void canvasNameChanged(Canvas *, QString);
@@ -519,7 +519,8 @@ public:
         mPickStrokeFromPath = pickStroke;
     }
 
-    void tabletEvent(QTabletEvent *e, const QPointF &absPos);
+    void tabletEvent(const QTabletEvent * const e,
+                     const QPointF &absPos);
     QRectF getRelBoundingRectAtRelFrame(const qreal &);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);

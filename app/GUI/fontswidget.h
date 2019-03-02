@@ -6,15 +6,14 @@
 #include <QComboBox>
 #include <QFontDatabase>
 
-class FontsWidget : public QWidget
-{
+class FontsWidget : public QWidget {
     Q_OBJECT
 public:
     FontsWidget(QWidget *parent = nullptr);
 
-    qreal getCurrentFontSize();
-    QString getCurrentFontStyle();
-    QString getCurrentFontFamily();
+    qreal getCurrentFontSize() const;
+    QString getCurrentFontStyle() const;
+    QString getCurrentFontFamily() const;
 
     void setCurrentFontSize(const qreal &size);
     void setCurrentFontFamily(const QString &family);

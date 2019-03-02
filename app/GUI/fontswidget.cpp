@@ -90,25 +90,25 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
 }
 
 void FontsWidget::updateStylesFromCurrentFamilyAndEmit() {
-    updateStylesFromCurrentFamilyAndEmit(getCurrentFontFamily() );
+    updateStylesFromCurrentFamilyAndEmit(getCurrentFontFamily());
 }
 
-qreal FontsWidget::getCurrentFontSize() {
+qreal FontsWidget::getCurrentFontSize() const {
     return mFontSizeCombo->currentText().toDouble();
 }
 
-QString FontsWidget::getCurrentFontStyle() {
+QString FontsWidget::getCurrentFontStyle() const {
     return mFontStyleCombo->currentText();
 }
 
-QString FontsWidget::getCurrentFontFamily() {
+QString FontsWidget::getCurrentFontFamily() const {
     return mFontFamilyCombo->currentText();
 }
 
 void FontsWidget::setCurrentFontSize(const qreal &size) {
     disconnect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
             this, SLOT(emitSizeChanged()) );
-    mFontSizeCombo->setCurrentText(QString::number((int)size));
+    mFontSizeCombo->setCurrentText(QString::number(qRound(size)));
     connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
             this, SLOT(emitSizeChanged()) );
 }
