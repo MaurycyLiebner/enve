@@ -34,7 +34,10 @@ public:
                     const SkScalar &invScale,
                     const SkMatrix &combinedTransform) const;
 
-    SkPath getPathAtRelFrame(const qreal &relFrame);
+    SkPath getPathAtRelFrame(const qreal &relFrame) const;
+    SmartPathCollection* getAnimator() const {
+        return mAnimator.get();
+    }
 private:
     const qsptr<SmartPathCollection> mAnimator;
     QList<stdsptr<PathPointsHandler>> mPointsHandlers;

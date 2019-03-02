@@ -40,16 +40,22 @@ MovablePoint *SmartPathCollectionHandler::getPointAtAbsPos(
 }
 
 void SmartPathCollectionHandler::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<stdptr<MovablePoint> > &list) const {
-
+        const QRectF &absRect, QList<stdptr<MovablePoint>> &list) const {
+    for(const auto& handler : mPointsHandlers) {
+        handler->selectAndAddContainedPointsToList(absRect, list);
+    }
 }
 
 void SmartPathCollectionHandler::drawPoints(
         SkCanvas * const canvas, const CanvasMode &currentCanvasMode,
         const SkScalar &invScale, const SkMatrix &combinedTransform) const {
-
+    for(const auto& handler : mPointsHandlers) {
+        handler->drawPoints(canvas, currentCanvasMode,
+                            invScale, combinedTransform);
+    }
 }
 
-SkPath SmartPathCollectionHandler::getPathAtRelFrame(const qreal &relFrame) {
-
+SkPath SmartPathCollectionHandler::getPathAtRelFrame(
+        const qreal &relFrame) const {
+    return mAnimator->getPathAtRelFrame(relFrame);
 }

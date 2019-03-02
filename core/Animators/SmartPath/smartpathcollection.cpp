@@ -9,3 +9,11 @@ SmartPathAnimator *SmartPathCollection::createNewPath() {
     mPaths.append(newPath);
     return newPath.get();
 }
+
+SkPath SmartPathCollection::getPathAtRelFrame(const qreal &relFrame) {
+    SkPath result;
+    for(const auto& path : mPaths) {
+        result.addPath(path->getPathAtRelFrame(relFrame));
+    }
+    return result;
+}
