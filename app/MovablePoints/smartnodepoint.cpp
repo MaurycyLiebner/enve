@@ -18,7 +18,6 @@ SmartNodePoint::SmartNodePoint(const int& nodeId,
     NonAnimatedMovablePoint(parentTransform, TYPE_PATH_POINT, 6.5),
     mHandler_k(handler), mParentAnimator(parentAnimator),
     mNextNormalSegment(handler) {
-    mNextNormalSegment.setFirstNode(this);
     setNodeId(nodeId);
     mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);
     mC2Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C2);
@@ -403,7 +402,7 @@ void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
 
 void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
     mNextNormalPoint = nextPoint;
-    mNextNormalSegment.setLastNode(nextPoint);
+    mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
     updateC2Visibility();
     //mParentPath->schedulePathUpdate();
 }

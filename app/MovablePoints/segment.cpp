@@ -9,33 +9,26 @@
 #include "Animators/transformanimator.h"
 #include "pathpointshandler.h"
 
+NormalSegment::NormalSegment() :
+    NormalSegment(nullptr) {}
+
 NormalSegment::NormalSegment(PathPointsHandler * const handler) :
-    mHandler_k(handler),
-    mFirstNode(nullptr),
-    mFirstNodeC2(nullptr),
-    mLastNodeC0(nullptr),
-    mLastNode(nullptr) {}
+    NormalSegment(nullptr, nullptr, handler) {}
 
 NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
                              SmartNodePoint * const lastNode,
                              PathPointsHandler * const handler) :
     mHandler_k(handler) {
-    setFirstNode(firstNode);
-    setLastNode(lastNode);
-}
-
-void NormalSegment::setFirstNode(SmartNodePoint * const firstNode) {
-    if(mFirstNode == firstNode) return;
     mFirstNode = firstNode;
     if(mFirstNode) mFirstNodeC2 = mFirstNode->getC2Pt();
-    updateInnerDnD();
-}
-
-void NormalSegment::setLastNode(SmartNodePoint * const lastNode) {
-    if(mLastNode == lastNode) return;
     mLastNode = lastNode;
     if(mLastNode) mLastNodeC0 = mLastNode->getC0Pt();
-    updateInnerDnD();
+    if(!mFirstNode || !mLastNode) return;
+    auto currNode = mFirstNode->getNextPoint();
+    while(currNode && currNode != mLastNode) {
+        mInnerDnD << currNode;
+        currNode = currNode->getNextPoint();
+    }
 }
 
 void NormalSegment::disconnect() const {
@@ -153,15 +146,6 @@ qCubicSegment2D NormalSegment::getAsRelSegment() const {
             mLastNode->getRelativePos()};
 }
 
-void NormalSegment::updateInnerDnD() {
-    mInnerDnD.clear();
-    if(!mFirstNode || !mLastNode) return;
-    auto currNode = mFirstNode->getNextPoint();
-    while(currNode && currNode != mLastNode) {
-        mInnerDnD << currNode;
-    }
-}
-
 NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {
     SmartNodePoint* firstNode = mFirstNode;
     SmartNodePoint* lastNode = mLastNode;
@@ -185,6 +169,10 @@ QPointF NormalSegment::getSlopeVector(const qreal &t) {
     const QPointF posAtT = getRelPosAtT(t);
     const QPointF posAtTPlus = getRelPosAtT(t + 0.01);
     return scalePointToNewLen(posAtTPlus - posAtT, 1);
+}
+
+bool NormalSegment::isValid() const {
+    return mFirstNode && mLastNode && mHandler_k;
 }
 
 qreal NormalSegment::SubSegment::getMinT() const {

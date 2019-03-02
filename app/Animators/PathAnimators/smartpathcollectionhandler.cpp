@@ -2,6 +2,7 @@
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "MovablePoints/pathpointshandler.h"
 #include "MovablePoints/segment.h"
+#include "Animators/transformanimator.h"
 
 SmartPathCollectionHandler::SmartPathCollectionHandler(
         BasicTransformAnimator * const parentTransform) :
@@ -21,11 +22,10 @@ PathPointsHandler *SmartPathCollectionHandler::createNewPath() {
 NormalSegment SmartPathCollectionHandler::getNormalSegmentAtAbsPos(
         const QPointF &absPos, const qreal &canvasScaleInv) {
     for(const auto& handler : mPointsHandlers) {
-        const auto pt = handler->getPointAtAbsPos(
-                    absPtPos, currentCanvasMode, canvasScaleInv);
-        if(pt) return pt;
+        const auto seg = handler->getNormalSegmentAtAbsPos(absPos, canvasScaleInv);
+        if(seg.isValid()) return seg;
     }
-    return nullptr;
+    return NormalSegment();
 }
 
 MovablePoint *SmartPathCollectionHandler::getPointAtAbsPos(

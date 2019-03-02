@@ -115,19 +115,13 @@ BasicTransformAnimator *MovablePoint::getParentTransform() {
 
 bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
                                    const qreal &canvasScaleInv) {
-    if(isHidden()) {
-        return false;
-    }
-    QPointF dist = getAbsolutePos() - absPoint;
-    return (dist.x()*dist.x() + dist.y()*dist.y() <
-            mRadius*mRadius*canvasScaleInv*canvasScaleInv);
+    if(isHidden()) return false;
+    const QPointF dist = getAbsolutePos() - absPoint;
+    return pointToLen(dist) < mRadius*canvasScaleInv;
 }
 
 bool MovablePoint::isContainedInRect(const QRectF &absRect) {
-    if(isHidden() ||
-            (isCtrlPoint()) ) {
-        return false;
-    }
+    if(isHidden() || isCtrlPoint()) return false;
     return absRect.contains(getAbsolutePos());
 }
 

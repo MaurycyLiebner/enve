@@ -30,6 +30,7 @@ public:
         qreal getParentTAtThisT(const qreal& thisT) const;
         QPointF getRelPosAtT(const qreal &thisT) const;
     };
+    NormalSegment();
     NormalSegment(PathPointsHandler * const handler);
     NormalSegment(SmartNodePoint * const firstNode,
                   SmartNodePoint * const lastNode,
@@ -55,12 +56,17 @@ public:
 
     QPointF getSlopeVector(const qreal &t);
 
-    bool isValid() const {
-        return mFirstNode && mLastNode && mFirstNodeC2 && mLastNodeC0;
+    bool isValid() const;
+
+    void setFirstAndLastNode(SmartNodePoint * const firstNode,
+                             SmartNodePoint * const lastNode);
+    void reset() {
+        clear();
     }
 
-    void setFirstNode(SmartNodePoint * const firstNode);
-    void setLastNode(SmartNodePoint * const lastNode);
+    void clear() {
+        setFirstAndLastNode(nullptr, nullptr);
+    }
 
     void disconnect() const;
 
@@ -96,12 +102,10 @@ public:
     qCubicSegment2D getAsRelSegment() const;
 private:
     void updateDnDPos() const;
-
-    void updateInnerDnD();
     SubSegment subSegmentAtT(const qreal& t) const;
 
     SkPath mSkPath;
-    const stdptr<PathPointsHandler> mHandler_k;
+    stdptr<PathPointsHandler> mHandler_k;
     SmartNodePoint* mFirstNode;
     SmartCtrlPoint* mFirstNodeC2;
     QList<SmartNodePoint*> mInnerDnD;
