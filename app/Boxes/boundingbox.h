@@ -338,8 +338,8 @@ public:
     virtual void removeFillPathEffect(const qsptr<PathEffect>&);
     virtual void removeOutlinePathEffect(const qsptr<PathEffect>&);
 
-    virtual void addActionsToMenu(QMenu *);
-    virtual bool handleSelectedCanvasAction(QAction *, QWidget*);
+    virtual void addActionsToMenu(QMenu * const menu,
+                                  QWidget* const widgetsParent);
 
     virtual void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData *data);

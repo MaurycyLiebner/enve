@@ -43,10 +43,13 @@ void ImageBox::setFilePath(const QString &path) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
-void ImageBox::addActionsToMenu(QMenu *menu) {
-    menu->addAction("Reload")->setObjectName("ib_reload");
-    menu->addAction("Set Source File...")->
-            setObjectName("ib_set_src_file");
+void ImageBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent) {
+    menu->addAction("Reload", [this]() {
+        if(mImgCacheHandler) mImgCacheHandler->clearCache();
+    });
+    menu->addAction("Set Source File...", [this, widgetsParent]() {
+        changeSourceFile(widgetsParent);
+    });
 }
 
 void ImageBox::changeSourceFile(QWidget* dialogParent) {
@@ -75,19 +78,6 @@ stdsptr<BoundingBoxRenderData> ImageBox::createRenderData() {
     return SPtrCreate(ImageBoxRenderData)(mImgCacheHandler, this);
 }
 
-bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction,
-                                          QWidget* widgetsParent) {
-    if(selectedAction->objectName() == "ib_set_src_file") {
-        changeSourceFile(widgetsParent);
-    } else if(selectedAction->objectName() == "ib_reload") {
-        if(mImgCacheHandler) {
-            mImgCacheHandler->clearCache();
-        }
-    } else {
-        return false;
-    }
-    return true;
-}
 #include "filesourcescache.h"
 void ImageBoxRenderData::loadImageFromHandler() {
     fImage = GetAsPtr(srcCacheHandler, ImageCacheHandler)->getImageCopy();

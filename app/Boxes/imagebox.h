@@ -57,9 +57,7 @@ public:
     void setFilePath(const QString &path);
 
     bool SWT_isImageBox() const { return true; }
-    void addActionsToMenu(QMenu *menu);
-    bool handleSelectedCanvasAction(QAction *selectedAction,
-                                    QWidget* widgetsParent);
+    void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
     void changeSourceFile(QWidget *dialogParent);
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,

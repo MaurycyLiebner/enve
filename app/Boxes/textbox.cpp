@@ -94,18 +94,10 @@ qreal textForQPainterPath(const Qt::Alignment &alignment,
     }
 }
 
-void TextBox::addActionsToMenu(QMenu *menu) {
-    menu->addAction("Set Text...")->setObjectName("tb_set_text");
-}
-
-bool TextBox::handleSelectedCanvasAction(QAction *selectedAction,
-                                         QWidget* widgetsParent) {
-    if(selectedAction->objectName() == "tb_set_text") {
+void TextBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent) {
+    menu->addAction("Set Text...", [this, widgetsParent]() {
         openTextEditor(widgetsParent);
-    } else {
-        return false;
-    }
-    return true;
+    });
 }
 
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {

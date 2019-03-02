@@ -492,8 +492,11 @@ public:
     void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
 
     bool SWT_isCanvas() const { return true; }
-    bool handleSelectedCanvasAction(QAction *selectedAction, QWidget* widgetsParent);
-    void addCanvasActionToMenu(QMenu *menu);
+
+    void addSelectedBoxesActions(QMenu * const menu);
+    void addActionsToMenu(QMenu * const menu, QWidget * const widgetsParent);
+
+
     void deleteAction();
     void copyAction();
     void pasteAction();

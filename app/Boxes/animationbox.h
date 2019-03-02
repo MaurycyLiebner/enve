@@ -31,9 +31,7 @@ public:
     FixedLenAnimationRect *getAnimationDurationRect();
 
     bool SWT_isAnimationBox() const { return true; }
-    void addActionsToMenu(QMenu *menu);
-    bool handleSelectedCanvasAction(QAction *selectedAction,
-                                    QWidget* widgetsParent);
+    void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
     virtual void changeSourceFile(QWidget* dialogParent) = 0;
     void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data);

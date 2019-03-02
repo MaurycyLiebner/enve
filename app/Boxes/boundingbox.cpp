@@ -1078,10 +1078,10 @@ void BoundingBox::removeFillPathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::removeOutlinePathEffect(const qsptr<PathEffect> &) {}
 
-void BoundingBox::addActionsToMenu(QMenu *) {}
-
-bool BoundingBox::handleSelectedCanvasAction(QAction *, QWidget *) {
-    return false;
+void BoundingBox::addActionsToMenu(QMenu * const menu,
+                                   QWidget* const widgetsParent) {
+    Q_UNUSED(menu);
+    Q_UNUSED(widgetsParent);
 }
 
 void BoundingBox::setName(const QString &name) {

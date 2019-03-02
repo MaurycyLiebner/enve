@@ -97,24 +97,17 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
 //    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
 //}
 
-void AnimationBox::addActionsToMenu(QMenu *menu) {
-    menu->addAction("Reload")->setObjectName("ab_reload");
-    menu->addAction("Set Source File...")->
-            setObjectName("ab_set_src_file");
-}
-
-bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction,
-                                              QWidget* widgetsParent) {
-    if(selectedAction->objectName() == "ab_set_src_file") {
-        changeSourceFile(widgetsParent);
-    } else if(selectedAction->objectName() == "ab_reload") {
+void AnimationBox::addActionsToMenu(QMenu * const menu,
+                                    QWidget* const widgetsParent) {
+    menu->addAction("Reload", [this]() {
         if(mAnimationCacheHandler) {
             mAnimationCacheHandler->clearCache();
         }
-    } else {
-        return false;
-    }
-    return true;
+    });
+
+    menu->addAction("Set Source File...", [this, widgetsParent]() {
+        changeSourceFile(widgetsParent);
+    });
 }
 
 void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(

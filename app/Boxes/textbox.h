@@ -31,9 +31,7 @@ public:
     }
 
     bool SWT_isTextBox() const { return true; }
-    void addActionsToMenu(QMenu *menu);
-    bool handleSelectedCanvasAction(QAction *selectedAction,
-                                    QWidget* widgetsParent);
+    void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
     void setCurrentValue(const QString &text);
 

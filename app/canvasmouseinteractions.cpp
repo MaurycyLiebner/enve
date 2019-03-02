@@ -51,7 +51,7 @@ void Canvas::handleMovePathMousePressEvent() {
     }
 }
 
-void Canvas::addCanvasActionToMenu(QMenu *menu) {
+void Canvas::addSelectedBoxesActions(QMenu * const menu) {
     bool hasVectorPathBox = false;
     for(const auto& box : mSelectedBoxes) {
         if(box->SWT_isVectorPath()) {
@@ -78,415 +78,390 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
         }
     }
     if(hasVectorPathBox || hasGroups) {
-        menu->addAction("Apply Transformation")->setObjectName(
-                    "canvas_apply_transformation");
+        menu->addAction("Apply Transformation", [this]() {
+            applyCurrentTransformation();
+        });
     }
     menu->addSeparator();
-    menu->addAction("Create Link")->setObjectName(
-                "canvas_create_link");
-    menu->addAction("Center Pivot")->setObjectName(
-                "canvas_center_pivot");
+    menu->addAction("Create Link", [this]() {
+        mCurrentBoxesGroup->addContainedBox(createLink());
+    });
+    menu->addAction("Center Pivot", [this]() {
+        centerPivotForSelected();
+    });
     menu->addSeparator();
-    QAction *copyAction = menu->addAction("Copy");
-    copyAction->setObjectName("canvas_copy");
+
+    QAction * const copyAction = menu->addAction("Copy", [this]() {
+        this->copyAction();
+    });
     copyAction->setShortcut(Qt::CTRL + Qt::Key_C);
-    QAction *cutAction = menu->addAction("Cut");
-    cutAction->setObjectName("canvas_cut");
+
+    QAction * const cutAction = menu->addAction("Cut", [this]() {
+        this->cutAction();
+    });
     cutAction->setShortcut(Qt::CTRL + Qt::Key_X);
-    QAction *duplicateAction = menu->addAction("Duplicate");
-    duplicateAction->setObjectName("canvas_duplicate");
+
+    QAction * const duplicateAction = menu->addAction("Duplicate", [this]() {
+        this->duplicateSelectedBoxes();
+    });
     duplicateAction->setShortcut(Qt::CTRL + Qt::Key_D);
-    QAction *deleteAction = menu->addAction("Delete");
-    deleteAction->setObjectName("canvas_delete");
+
+    QAction * const deleteAction = menu->addAction("Delete", [this]() {
+        this->removeSelectedBoxesAndClearList();
+    });
     deleteAction->setShortcut(Qt::Key_Delete);
+
     menu->addSeparator();
-    QAction *groupAction = menu->addAction("Group");
-    groupAction->setObjectName("canvas_group");
+
+    QAction * const groupAction = menu->addAction("Group", [this]() {
+        this->groupSelectedBoxes();
+    });
     groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
 
-    QAction *ungroupAction = menu->addAction("Ungroup");
+
+    QAction * const ungroupAction = menu->addAction("Ungroup", [this]() {
+        this->ungroupSelectedBoxes();
+    });
     ungroupAction->setEnabled(hasGroups);
-    ungroupAction->setObjectName("canvas_ungroup");
     ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+
     menu->addSeparator();
 
-    QMenu *effectsMenu = menu->addMenu("Effects");
-    effectsMenu->addAction("Blur")->setObjectName(
-                "canvas_effects_blur");
-    effectsMenu->addAction("Motion Blur")->setObjectName(
-                "canvas_effects_motion_blur");
-    effectsMenu->addAction("Shadow")->setObjectName(
-                "canvas_effects_shadow");
+    QMenu * const effectsMenu = menu->addMenu("Effects");
+    effectsMenu->addAction("Blur", [this]() {
+        this->applyEffectToSelected<BlurEffect>();
+    });
+    effectsMenu->addAction("Motion Blur", [this]() {
+        this->applySampledMotionBlurToSelected();
+    });
+    effectsMenu->addAction("Shadow", [this]() {
+        this->applyEffectToSelected<ShadowEffect>();
+    });
 //    effectsMenu->addAction("Lines");
 //    effectsMenu->addAction("Circles");
 //    effectsMenu->addAction("Swirl");
 //    effectsMenu->addAction("Oil");
 //    effectsMenu->addAction("Implode");
-    effectsMenu->addAction("Desaturate")->setObjectName(
-                "canvas_effects_desaturate");
-    effectsMenu->addAction("Colorize")->setObjectName(
-                "canvas_effects_colorize");
-    effectsMenu->addAction("Replace Color")->setObjectName(
-                "canvas_effects_replace_color");
-    effectsMenu->addAction("Contrast")->setObjectName(
-                "canvas_effects_contrast");
-    effectsMenu->addAction("Brightness")->setObjectName(
-                "canvas_effects_brightness");
+    effectsMenu->addAction("Desaturate", [this]() {
+        this->applyEffectToSelected<DesaturateEffect>();
+    });
 
-    QMenu *gpuEffectsMenu = menu->addMenu("GPU Effects");
+    effectsMenu->addAction("Colorize", [this]() {
+        this->applyEffectToSelected<ColorizeEffect>();
+    });
+
+    effectsMenu->addAction("Contrast", [this]() {
+        this->applyEffectToSelected<ContrastEffect>();
+    });
+
+    effectsMenu->addAction("Brightness", [this]() {
+        this->applyEffectToSelected<BrightnessEffect>();
+    });
+
+    effectsMenu->addAction("Replace Color", [this]() {
+        this->applyEffectToSelected<ReplaceColorEffect>();
+    });
+
+    QMenu * const gpuEffectsMenu = menu->addMenu("GPU Effects");
     for(const auto& effect : GPURasterEffectCreator::sEffectCreators) {
-        auto newAction = gpuEffectsMenu->addAction(effect->fName);
-        newAction->setObjectName("canvas_gpu_effect");
+        gpuEffectsMenu->addAction(effect->fName, [this, effect]() {
+            applyGPURasterEffectToSelected(effect);
+        });
     }
 
     if(hasPathBox || hasGroups) {
-        QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
-        pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                    "canvas_path_effects_discrete");
-        pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                    "canvas_path_effects_duplicate");
-        pathEffectsMenu->addAction("Length Effect")->setObjectName(
-                    "canvas_path_effects_length");
-        pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
-                    "canvas_path_effects_solidify");
-        pathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                    "canvas_path_effect_sum");
+        QMenu * const pathEffectsMenu = menu->addMenu("Path Effects");
+
+        pathEffectsMenu->addAction("Displace Effect", [this]() {
+            this->applyDiscretePathEffectToSelected();
+        });
+
+        pathEffectsMenu->addAction("Duplicate Effect", [this]() {
+            this->applyDuplicatePathEffectToSelected();
+        });
+
+        pathEffectsMenu->addAction("Length Effect", [this]() {
+            this->applyLengthPathEffectToSelected();
+        });
+
+        pathEffectsMenu->addAction("Solidify Effect", [this]() {
+            this->applySolidifyPathEffectToSelected();
+        });
+
+        pathEffectsMenu->addAction("Operation Effect", [this]() {
+            this->applySumPathEffectToSelected();
+        });
+
         if(hasGroups) {
-            pathEffectsMenu->addAction("Group Sum Effect")->setObjectName(
-                        "canvas_path_effect_group_sum");
+            pathEffectsMenu->addAction("Group Sum Effect", [this]() {
+                this->applyGroupSumPathEffectToSelected();
+            });
         }
 
-        QMenu *fillPathEffectsMenu = menu->addMenu("Fill Effects");
-        fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                    "canvas_fill_effects_discrete");
-        fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                    "canvas_fill_effects_duplicate");
-        fillPathEffectsMenu->addAction("Solidify Effect")->setObjectName(
-                    "canvas_fill_effects_solidify");
-        fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                    "canvas_fill_effect_sum");
+        QMenu * const fillPathEffectsMenu = menu->addMenu("Fill Effects");
 
-        QMenu *outlinePathEffectsMenu = menu->addMenu("Outline Effects");
-        outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                    "canvas_outline_effects_discrete");
-        outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                    "canvas_outline_effects_duplicate");
-        outlinePathEffectsMenu->addAction("Length Effect")->setObjectName(
-                    "canvas_outline_effects_length");
-        outlinePathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                    "canvas_outline_effect_sum");
-        outlinePathEffectsMenu->addAction("Solidify Effect")->setObjectName(
-                    "canvas_outline_effects_solidify");
+        fillPathEffectsMenu->addAction("Displace Effect", [this]() {
+            this->applyDiscreteFillPathEffectToSelected();
+        });
+
+        fillPathEffectsMenu->addAction("Duplicate Effect", [this]() {
+            this->applyDuplicateFillPathEffectToSelected();
+        });
+
+//        fillPathEffectsMenu->addAction("Solidify Effect", [this]() {
+//            this->applySolidifyFillPathEffectToSelected();
+//        });
+
+        fillPathEffectsMenu->addAction("Operation Effect", [this]() {
+            this->applySumFillPathEffectToSelected();
+        });
+
+        QMenu * const outlinePathEffectsMenu = menu->addMenu("Outline Effects");
+        outlinePathEffectsMenu->addAction("Displace Effect", [this]() {
+            this->applyDiscreteOutlinePathEffectToSelected();
+        });
+
+        outlinePathEffectsMenu->addAction("Duplicate Effect", [this]() {
+            this->applyDuplicateOutlinePathEffectToSelected();
+        });
+
+//        outlinePathEffectsMenu->addAction("Length Effect", [this]() {
+//            this->applyLengthOutlinePathEffectToSelected();
+//        });
+
+//        outlinePathEffectsMenu->addAction("Solidify Effect", [this]() {
+//            this->applySolidifyOutlinePathEffectToSelected();
+//        });
+
+//        outlinePathEffectsMenu->addAction("Operation Effect", [this]() {
+//            this->applySumOutlinePathEffectToSelected();
+//        });
     }
 
     for(const auto& box : mSelectedBoxes) {
         if(box->SWT_isPaintBox()) {
-            PaintBox *paintBox = GetAsPtr(box, PaintBox);
+            const auto paintBox = GetAsPtr(box, PaintBox);
             menu->addSeparator();
-            menu->addAction("New Paint Frame")->setObjectName(
-                        "canvas_new_paint_frame");
-            menu->addAction("New Empty Paint Frame")->setObjectName(
-                        "canvas_new_empty_paint_frame");
-            menu->addAction("Setup Animation Frames")->setObjectName(
-                        "canvas_setup_animation_frames");
+            menu->addAction("New Paint Frame", [this]() {
+                for(const auto& box : mSelectedBoxes) {
+                    if(box->SWT_isPaintBox()) {
+                        const auto paintBox = GetAsPtr(box, PaintBox);
+                        paintBox->newPaintFrameOnCurrentFrame();
+                    }
+                }
+            });
+            menu->addAction("New Empty Paint Frame", [this]() {
+                for(const auto& box : mSelectedBoxes) {
+                    if(box->SWT_isPaintBox()) {
+                        PaintBox* paintBox = GetAsPtr(box, PaintBox);
+                        paintBox->newEmptyPaintFrameOnCurrentFrame();
+                    }
+                }
+            });
+            menu->addAction("Setup Animation Frames", [this]() {
+                PaintBoxSettingsDialog dialog;
+                PaintBox* firstPaintBox = GetAsPtr(mSelectedBoxes.first(), PaintBox);
+                int frameStep = firstPaintBox->getFrameStep();
+                int overlapFrames = firstPaintBox->getOverlapFrames();
+                dialog.setOverlapFrames(overlapFrames);
+                dialog.setFrameStep(frameStep);
+                dialog.exec();
+                if(dialog.result() == QDialog::Rejected) return;
+                frameStep = dialog.getFrameStep();
+                overlapFrames = dialog.getOverlapFrames();
+                for(const auto& box : mSelectedBoxes) {
+                    if(box->SWT_isPaintBox()) {
+                        PaintBox* paintBox = GetAsPtr(box, PaintBox);
+                        paintBox->setOverlapFrames(overlapFrames);
+                        paintBox->setFrameStep(frameStep);
+                    }
+                }
+            });
             menu->addSeparator();
             if(paintBox->isAnimated()) {
-                QAction *draftAction = menu->addAction("Draft");
-                draftAction->setObjectName("canvas_draft");
+                QAction * const draftAction = menu->addAction("Draft", [this]() {
+                    for(const auto& box : mSelectedBoxes) {
+                        if(box->SWT_isPaintBox()) {
+                            const auto paintBox = GetAsPtr(box, PaintBox);
+                            paintBox->setIsDraft(!paintBox->isDraft());
+                        }
+                    }
+                });
                 draftAction->setCheckable(true);
                 draftAction->setChecked(paintBox->isDraft());
             }
             menu->addSeparator();
-            menu->addAction("Load From Image")->setObjectName(
-                        "canvas_load_from_img");
+            menu->addAction("Load From Image", [this]() {
+                MainWindow::getInstance()->disableEventFilter();
+                const QString importPath = QFileDialog::getOpenFileName(
+                                                MainWindow::getInstance(),
+                                                "Load From Image", "",
+                                                "Image Files (*.png *.jpg)");
+                MainWindow::getInstance()->enableEventFilter();
+                if(!importPath.isEmpty()) {
+                    QImage img;
+                    if(img.load(importPath)) {
+                        for(const auto& box : mSelectedBoxes) {
+                            if(box->SWT_isPaintBox()) {
+                                const auto paintBox = GetAsPtr(box, PaintBox);
+                                paintBox->loadFromImage(img);
+                            }
+                        }
+                    }
+                }
+            });
+
             break;
         }
     }
 }
 
-bool Canvas::handleSelectedCanvasAction(QAction *selectedAction,
-                                        QWidget* widgetsParent) {
-    Q_UNUSED(widgetsParent);
-    if(selectedAction->objectName() == "canvas_copy") {
-        copyAction();
-    } if(selectedAction->objectName() == "canvas_cut") {
-        cutAction();
-    } if(selectedAction->objectName() == "canvas_duplicate") {
-        duplicateSelectedBoxes();
-    } else if(selectedAction->objectName() == "canvas_delete") {
-        removeSelectedBoxesAndClearList();
-    } else if(selectedAction->objectName() == "canvas_apply_transformation") {
-        applyCurrentTransformationToSelected();
-    } else if(selectedAction->objectName() == "canvas_create_link") {
-        createLinkBoxForSelected();
-    } else if(selectedAction->objectName() == "canvas_group") {
-        groupSelectedBoxes();
-    } else if(selectedAction->objectName() == "canvas_ungroup") {
-        ungroupSelectedBoxes();
-    } else if(selectedAction->objectName() == "canvas_center_pivot") {
-        centerPivotForSelected();
-    } else if(selectedAction->objectName() == "canvas_effects_blur") {
-        applyEffectToSelected<BlurEffect>();
-    } else if(selectedAction->data() == "canvas_effects_motion_blur") {
-        applySampledMotionBlurToSelected();
-    } else if(selectedAction->objectName() == "canvas_effects_shadow") {
-        applyEffectToSelected<ShadowEffect>();
-    } else if(selectedAction->objectName() == "canvas_effects_desaturate") {
-        applyEffectToSelected<DesaturateEffect>();
-    } else if(selectedAction->objectName() == "canvas_effects_colorize") {
-        applyEffectToSelected<ColorizeEffect>();
-    } else if(selectedAction->objectName() == "canvas_effects_contrast") {
-        applyEffectToSelected<ContrastEffect>();
-    } else if(selectedAction->objectName() == "canvas_effects_brightness") {
-        applyEffectToSelected<BrightnessEffect>();
-    } else if(selectedAction->objectName() == "canvas_effects_replace_color") {
-        applyEffectToSelected<ReplaceColorEffect>();
-    } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
-        applyDiscretePathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
-        applyDuplicatePathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_path_effects_length") {
-        applyLengthPathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_path_effects_solidify") {
-        applySolidifyPathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_path_effect_sum") {
-        applySumPathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_path_effect_group_sum") {
-        applyGroupSumPathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_fill_effects_discrete") {
-        applyDiscreteFillPathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_fill_effects_duplicate") {
-        applyDuplicateFillPathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_fill_effect_sum") {
-        applySumFillPathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_outline_effects_discrete") {
-        applyDiscreteOutlinePathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
-        applyDuplicateOutlinePathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_new_paint_frame") {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = GetAsPtr(box, PaintBox);
-                paintBox->newPaintFrameOnCurrentFrame();
-            }
-        }
-    } else if(selectedAction->objectName() == "canvas_new_empty_paint_frame") {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = GetAsPtr(box, PaintBox);
-                paintBox->newEmptyPaintFrameOnCurrentFrame();
-            }
-        }
-    } else if(selectedAction->objectName() == "canvas_setup_animation_frames") {
-        PaintBoxSettingsDialog dialog;
-        PaintBox* firstPaintBox = GetAsPtr(mSelectedBoxes.first(), PaintBox);
-        int frameStep = firstPaintBox->getFrameStep();
-        int overlapFrames = firstPaintBox->getOverlapFrames();
-        dialog.setOverlapFrames(overlapFrames);
-        dialog.setFrameStep(frameStep);
-        dialog.exec();
-        if(dialog.result() == QDialog::Rejected) return true;
-        frameStep = dialog.getFrameStep();
-        overlapFrames = dialog.getOverlapFrames();
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = GetAsPtr(box, PaintBox);
-                paintBox->setOverlapFrames(overlapFrames);
-                paintBox->setFrameStep(frameStep);
-            }
-        }
-    } else if(selectedAction->objectName() == "canvas_draft") {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                PaintBox* paintBox = GetAsPtr(box, PaintBox);
-                paintBox->setIsDraft(selectedAction->isChecked());
-            }
-        }
-    } else if(selectedAction->objectName() == "canvas_load_from_img") {
-        MainWindow::getInstance()->disableEventFilter();
-        QString importPath = QFileDialog::getOpenFileName(
-                                                MainWindow::getInstance(),
-                                                "Load From Image", "",
-                                                "Image Files (*.png *.jpg)");
-        MainWindow::getInstance()->enableEventFilter();
-        if(!importPath.isEmpty()) {
-            QImage img;
-            if(img.load(importPath)) {
-                for(const auto& box : mSelectedBoxes) {
-                    if(box->SWT_isPaintBox()) {
-                        qsptr<PaintBox> paintBox = GetAsSPtr(box, PaintBox);
-                        paintBox->loadFromImage(img);
-                    }
-                }
-            }
-        }
-    } else if(selectedAction->objectName() == "canvas_gpu_effect") {
-        for(const auto& effect : GPURasterEffectCreator::sEffectCreators) {
-            if(effect->fName == selectedAction->text()) {
-                applyGPURasterEffectToSelected(effect);
-            }
-        }
-    } else {
-        return false;
-    }
-    return true;
-}
 #include <QInputDialog>
 #include "PathEffects/patheffect.h"
+void Canvas::addActionsToMenu(QMenu * const menu,
+                              QWidget* const widgetsParent) {
+    Q_UNUSED(widgetsParent);
+    const BoxesClipboardContainer * const clipboard =
+            MainWindow::getBoxesClipboardContainer();
+    if(clipboard) {
+        QAction * const pasteAct = menu->addAction("Paste", this,
+                                                  &Canvas::pasteAction);
+        pasteAct->setShortcut(Qt::CTRL + Qt::Key_V);
+    }
+
+    const auto &listOfCanvas = mCanvasWindow->getCanvasList();
+    if(listOfCanvas.count() > 1) {
+        QMenu * const linkCanvasMenu = menu->addMenu("Link Canvas");
+        for(const auto& canvas : listOfCanvas) {
+            const auto slot = [this, canvas]() {
+                auto newLink = canvas->createLink();
+                mCurrentBoxesGroup->addContainedBox(newLink);
+                newLink->centerPivotPosition();
+            };
+            QAction * const action = linkCanvasMenu->addAction(
+                        canvas->getName(), this, slot);
+            if(canvas == this) {
+                action->setEnabled(false);
+                action->setVisible(false);
+            }
+        }
+    }
+
+    QMenu * const effectsMenu = menu->addMenu("Effects");
+    effectsMenu->addAction("Blur", [this]() {
+        addEffect<BlurEffect>();
+    });
+
+    effectsMenu->addAction("Motion Blur", [this]() {
+        addEffect<SampledMotionBlurEffect>();
+    });
+
+    effectsMenu->addAction("Shadow", [this]() {
+        addEffect<ShadowEffect>();
+    });
+
+    effectsMenu->addAction("Desaturate", [this]() {
+        addEffect<DesaturateEffect>();
+    });
+
+    effectsMenu->addAction("Colorize", [this]() {
+        addEffect<ColorizeEffect>();
+    });
+
+    effectsMenu->addAction("Contrast", [this]() {
+        addEffect<ContrastEffect>();
+    });
+
+    effectsMenu->addAction("Brightness", [this]() {
+        addEffect<BrightnessEffect>();
+    });
+
+    effectsMenu->addAction("Replace Color", [this]() {
+        addEffect<ReplaceColorEffect>();
+    });
+
+    QMenu * const pathEffectsMenu = menu->addMenu("Path Effects");
+    pathEffectsMenu->addAction("Displace Effect", [this]() {
+        addPathEffect(SPtrCreate(DisplacePathEffect)(false));
+    });
+
+    pathEffectsMenu->addAction("Duplicate Effect", [this]() {
+        addPathEffect(SPtrCreate(DuplicatePathEffect)(false));
+    });
+
+    pathEffectsMenu->addAction("Length Effect", [this]() {
+        addPathEffect(SPtrCreate(LengthPathEffect)(false));
+    });
+
+    pathEffectsMenu->addAction("Solidify Effect", [this]() {
+        addPathEffect(SPtrCreate(SolidifyPathEffect)(false));
+    });
+
+//    pathEffectsMenu->addAction("Operation Effect");
+//    pathEffectsMenu->addAction("Group Sum Effect");
+
+    QMenu * const fillPathEffectsMenu = menu->addMenu("Fill Effects");
+
+    fillPathEffectsMenu->addAction("Displace Effect", [this]() {
+        addFillPathEffect(SPtrCreate(DisplacePathEffect)(false));
+    });
+
+    fillPathEffectsMenu->addAction("Duplicate Effect", [this]() {
+        addFillPathEffect(SPtrCreate(DuplicatePathEffect)(false));
+    });
+
+    fillPathEffectsMenu->addAction("Solidify Effect", [this]() {
+        addFillPathEffect(SPtrCreate(SolidifyPathEffect)(false));
+    });
+//    fillPathEffectsMenu->addAction("Operation Effect");
+
+    QMenu * const outlinePathEffectsMenu = menu->addMenu("Outline Effects");
+
+    outlinePathEffectsMenu->addAction("Displace Effect", [this]() {
+        addOutlinePathEffect(SPtrCreate(DisplacePathEffect)(true));
+    });
+
+    outlinePathEffectsMenu->addAction("Duplicate Effect", [this]() {
+        addOutlinePathEffect(SPtrCreate(DuplicatePathEffect)(true));
+    });
+
+    pathEffectsMenu->addAction("Length Effect", [this]() {
+        addOutlinePathEffect(SPtrCreate(LengthPathEffect)(true));
+    });
+
+    outlinePathEffectsMenu->addAction("Solidify Effect", [this]() {
+        addOutlinePathEffect(SPtrCreate(SolidifyPathEffect)(true));
+    });
+
+//    outlinePathEffectsMenu->addAction("Operation Effect");
+
+    menu->addAction("Map to Different Fps...", [this]() {
+        bool ok;
+        const qreal newFps = QInputDialog::getDouble(
+                    mMainWindow, "Map to Different Fps",
+                    "New Fps:", mFps, 1., 999., 2, &ok);
+        if(ok) changeFpsTo(newFps);
+    });
+
+    menu->addAction("Settings...", [this]() {
+        mCanvasWindow->openSettingsWindowForCurrentCanvas();
+    });
+}
+
+
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
         mValueInput.clearAndDisableInput();
     } else {
-        QPointF eventPos = mapCanvasAbsToRel(event->pos());
-        BoundingBox* pressedBox = mCurrentBoxesGroup->getBoxAt(eventPos);
+        const QPointF eventPos = mapCanvasAbsToRel(event->pos());
+        BoundingBox* const pressedBox = mCurrentBoxesGroup->getBoxAt(eventPos);
         if(!pressedBox) {
             clearBoxesSelection();
 
             QMenu menu(mCanvasWindow->getCanvasWidget());
-
-            BoxesClipboardContainer *clipboard =
-                    MainWindow::getBoxesClipboardContainer();
-            if(clipboard) {
-                menu.addAction("Paste")->setShortcut(Qt::CTRL + Qt::Key_V);
-            }
-
-            const QList<qsptr<Canvas>> &listOfCanvas =
-                    mCanvasWindow->getCanvasList();
-            QMenu *linkCanvasMenu = nullptr;
-            if(listOfCanvas.count() > 1) {
-                linkCanvasMenu = menu.addMenu("Link Canvas");
-                for(const auto& canvas : listOfCanvas) {
-                    QAction *action =
-                            linkCanvasMenu->addAction(canvas->getName());
-                    if(canvas == this) {
-                        action->setEnabled(false);
-                        action->setVisible(false);
-                    }
-                }
-            }
-
-            QMenu *effectsMenu = menu.addMenu("Effects");
-            effectsMenu->addAction("Blur")->setObjectName(
-                        "canvas_effects_blur");
-            effectsMenu->addAction("Motion Blur")->setObjectName(
-                        "canvas_effects_motion_blur");
-            effectsMenu->addAction("Shadow")->setObjectName(
-                        "canvas_effects_shadow");
-        //    effectsMenu->addAction("Lines");
-        //    effectsMenu->addAction("Circles");
-        //    effectsMenu->addAction("Swirl");
-        //    effectsMenu->addAction("Oil");
-        //    effectsMenu->addAction("Implode");
-            effectsMenu->addAction("Desaturate")->setObjectName(
-                        "canvas_effects_desaturate");
-            effectsMenu->addAction("Colorize")->setObjectName(
-                        "canvas_effects_colorize");
-            effectsMenu->addAction("Replace Color")->setObjectName(
-                        "canvas_effects_replace_color");
-            effectsMenu->addAction("Contrast")->setObjectName(
-                        "canvas_effects_contrast");
-            effectsMenu->addAction("Brightness")->setObjectName(
-                        "canvas_effects_brightness");
-
-            QMenu *pathEffectsMenu = menu.addMenu("Path Effects");
-            pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                        "canvas_path_effects_discrete");
-            pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                        "canvas_path_effects_duplicate");
-            pathEffectsMenu->addAction("Length Effect")->setObjectName(
-                        "canvas_path_effects_length");
-            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
-                        "canvas_path_effects_solidify");
-            pathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                        "canvas_path_effect_sum");
-            pathEffectsMenu->addAction("Group Sum Effect")->setObjectName(
-                        "canvas_path_effect_group_sum");
-
-            QMenu *fillPathEffectsMenu = menu.addMenu("Fill Effects");
-            fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                        "canvas_fill_effects_discrete");
-            fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                        "canvas_fill_effects_duplicate");
-            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
-                        "canvas_fill_effects_solidify");
-            fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                        "canvas_fill_effect_sum");
-
-            QMenu *outlinePathEffectsMenu = menu.addMenu("Outline Effects");
-            outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                        "canvas_outline_effects_discrete");
-            outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                        "canvas_outline_effects_duplicate");
-            pathEffectsMenu->addAction("Length Effect")->setObjectName(
-                        "canvas_path_effects_length");
-            outlinePathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                        "canvas_outline_effect_sum");
-            pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
-                        "canvas_outline_effects_solidify");
-
-            menu.addAction("Map to Different Fps...")->setObjectName(
-                        "map_to_different_fps");
-
-            menu.addAction("Settings...")->setObjectName("canvas_settings");
-
-            QAction *selectedAction = menu.exec(event->globalPos());
-            if(selectedAction) {
-                if(selectedAction->text() == "Paste") {
-                    pasteAction();
-                } else if(selectedAction->objectName() == "map_to_different_fps") {
-                    bool ok;
-                    qreal newFps = QInputDialog::getDouble(
-                                mMainWindow, "Map to Different Fps",
-                                "New Fps:", mFps, 1., 999., 2, &ok);
-                    if(ok) changeFpsTo(newFps);
-                } else if(selectedAction->objectName()== "canvas_settings") {
-                    mCanvasWindow->openSettingsWindowForCurrentCanvas();
-                } else if(selectedAction->objectName() == "canvas_effects_blur") {
-                    addEffect<BlurEffect>();
-                } else if(selectedAction->objectName() == "canvas_effects_motion_blur") {
-                    addEffect<SampledMotionBlurEffect>();
-                } else if(selectedAction->objectName() == "canvas_effects_shadow") {
-                    addEffect<ShadowEffect>();
-                } else if(selectedAction->objectName() == "canvas_effects_desaturate") {
-                    addEffect<DesaturateEffect>();
-                } else if(selectedAction->objectName() == "canvas_effects_colorize") {
-                    addEffect<ColorizeEffect>();
-                } else if(selectedAction->objectName() == "canvas_effects_contrast") {
-                    addEffect<ContrastEffect>();
-                } else if(selectedAction->objectName() == "canvas_effects_brightness") {
-                    addEffect<BrightnessEffect>();
-                } else if(selectedAction->objectName() == "canvas_effects_replace_color") {
-                    addEffect<ReplaceColorEffect>();
-                } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
-                    addPathEffect(SPtrCreate(DisplacePathEffect)(false));
-                } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
-                    addPathEffect(SPtrCreate(DuplicatePathEffect)(false));
-                } else if(selectedAction->objectName() == "canvas_path_effects_length") {
-                    addPathEffect(SPtrCreate(LengthPathEffect)(false));
-                } else if(selectedAction->objectName() == "canvas_path_effects_solidify") {
-                    addPathEffect(SPtrCreate(SolidifyPathEffect)(false));
-                } else if(selectedAction->objectName() == "canvas_fill_effects_discrete") {
-                    addFillPathEffect(SPtrCreate(DisplacePathEffect)(false));
-                } else if(selectedAction->objectName() == "canvas_fill_effects_duplicate") {
-                    addFillPathEffect(SPtrCreate(DuplicatePathEffect)(false));
-                } else if(selectedAction->objectName() == "canvas_outline_effects_discrete") {
-                    addOutlinePathEffect(SPtrCreate(DisplacePathEffect)(true));
-                } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
-                    addOutlinePathEffect(SPtrCreate(DuplicatePathEffect)(true));
-                } else { // link canvas
-                    const QList<QAction*> &canvasActions =
-                            linkCanvasMenu->actions();
-                    int id = canvasActions.indexOf(selectedAction);
-                    if(id >= 0) {
-                        auto newLink = listOfCanvas.at(id)->createLink();
-                        mCurrentBoxesGroup->addContainedBox(newLink);
-                        GetAsPtr(newLink, InternalLinkCanvas)->centerPivotPosition();
-                    }
-                }
-            } else {
-
-            }
+            addActionsToMenu(&menu, mMainWindow);
+            menu.exec(event->globalPos());
         } else {
             if(!pressedBox->isSelected()) {
                 if(!isShiftPressed()) {
@@ -497,19 +472,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
             QMenu menu(mCanvasWindow->getCanvasWidget());
 
-            pressedBox->addActionsToMenu(&menu);
-            addCanvasActionToMenu(&menu);
-
-            QAction *selectedAction = menu.exec(event->globalPos());
-            if(selectedAction) {
-                if(!handleSelectedCanvasAction(
-                            selectedAction, mMainWindow)) {
-                    pressedBox->handleSelectedCanvasAction(
-                                selectedAction, mMainWindow);
-                }
-            } else {
-
-            }
+            pressedBox->addActionsToMenu(&menu, mMainWindow);
+            addSelectedBoxesActions(&menu);
+            menu.exec(event->globalPos());
         }
     }
 }
