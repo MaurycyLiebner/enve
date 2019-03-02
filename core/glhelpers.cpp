@@ -20,18 +20,18 @@ BlurProgram GL_BLUR_PROGRAM;
 DotProgram GL_DOT_PROGRAM;
 
 void checkGlErrors(const std::string& msg) {
-    GLenum glError = glGetError();
+    const GLenum glError = glGetError();
     if(glError == GL_NO_ERROR) return;
     RuntimeThrow("OpenGL error " + std::to_string(glError) + " " + msg);
 }
 
 void iniTexturedVShaderVBO(QGL33c* gl) {
     float vertices[] = {
-        // positions        // texture coords
-         1.f, -1.f, 0.0f,   1.0f, 0.0f,   // bottom right
-         1.f,  1.f, 0.0f,   1.0f, 1.0f,   // top right
-        -1.f, -1.f, 0.0f,   0.0f, 0.0f,   // bottom left
-        -1.f,  1.f, 0.0f,   0.0f, 1.0f    // top left
+    //  positions  | texture coords
+         1, -1, 0,   1, 0,   // bottom right
+         1,  1, 0,   1, 1,   // top right
+        -1, -1, 0,   0, 0,   // bottom left
+        -1,  1, 0,   0, 1    // top left
     };
 
     gl->glGenBuffers(1, &GL_TEXTURED_SQUARE_VBO);
@@ -116,8 +116,8 @@ void iniProgram(QGL33c* gl,
     std::ifstream vShaderFile;
     std::ifstream fShaderFile;
     // ensure ifstream objects can throw exceptions:
-    vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
         vShaderFile.open(vShaderPath);
@@ -135,10 +135,10 @@ void iniProgram(QGL33c* gl,
     } catch(...) {
         RuntimeThrow("Could not load shader data from file.");
     }
-    const char* vShaderCode = vertexCode.c_str();
-    const char* fShaderCode = fragmentCode.c_str();
+    const char* const vShaderCode = vertexCode.c_str();
+    const char* const fShaderCode = fragmentCode.c_str();
 
-    GLuint vertexShader = gl->glCreateShader(GL_VERTEX_SHADER);
+    const GLuint vertexShader = gl->glCreateShader(GL_VERTEX_SHADER);
     gl->glShaderSource(vertexShader, 1, &vShaderCode, nullptr);
     gl->glCompileShader(vertexShader);
     try {
@@ -147,7 +147,7 @@ void iniProgram(QGL33c* gl,
         RuntimeThrow("Error compiling vertex shader.");
     }
 
-    GLuint fragmentShader = gl->glCreateShader(GL_FRAGMENT_SHADER);
+    const GLuint fragmentShader = gl->glCreateShader(GL_FRAGMENT_SHADER);
     gl->glShaderSource(fragmentShader, 1, &fShaderCode, nullptr);
     gl->glCompileShader(fragmentShader);
     try {
@@ -175,7 +175,6 @@ Texture Texture::createTextureFromImage(QGL33c *gl,
     Texture tex;
     tex.gen(gl);
     tex.loadImage(gl, imagePath);
-
     return tex;
 }
 
@@ -207,20 +206,20 @@ void Texture::gen(QGL33c *gl,
 bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
     int nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load(imagePath.c_str(), &fWidth, &fHeight,
-                                    &nrChannels, 0);
+    unsigned char * const data = stbi_load(imagePath.c_str(),
+                                           &fWidth, &fHeight,
+                                           &nrChannels, 0);
     if(data) {
         gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fWidth, fHeight,
                          0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         gl->glGenerateMipmap(GL_TEXTURE_2D);
     } else {
-        std::string errMsg = "Failed to load texture" + imagePath;
-        ERROUT(errMsg);
-        return false;
+        RuntimeThrow("Failed to load texture" + imagePath);
     }
     stbi_image_free(data);
     return true;
 }
+
 #include "skia/skiahelpers.h"
 sk_sp<SkImage> TextureFrameBuffer::toImage() {
     SkBitmap btmp;
@@ -260,5 +259,5 @@ void TextureFrameBuffer::gen(QGL33c *gl,
                                GL_TEXTURE_2D, fTexture.fID, 0);
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
     if(gl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        RuntimeThrow("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 }

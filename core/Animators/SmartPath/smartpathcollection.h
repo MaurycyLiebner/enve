@@ -9,7 +9,8 @@ class SmartPathCollection : public ComplexAnimator {
 public:
     SmartPathCollection();
 
-private:
+    SmartPathAnimator *createNewPath();
+protected:
     QList<qsptr<SmartPathAnimator>> mPaths;
 };
 

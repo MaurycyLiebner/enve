@@ -9,30 +9,31 @@ ValueInput::ValueInput() {
 void ValueInput::draw(SkCanvas *canvas, const int &y) {
     if(mInputTransformationEnabled) {
         SkPaint paint;
-        SkRect inputRect = SkRect::MakeXYWH(
-                                2*MIN_WIDGET_HEIGHT,
-                                y,
-                                5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+        const SkRect inputRect = SkRect::MakeXYWH(2*MIN_WIDGET_HEIGHT, y,
+                                                  5*MIN_WIDGET_HEIGHT,
+                                                  MIN_WIDGET_HEIGHT);
         paint.setStyle(SkPaint::kFill_Style);
         paint.setColor(SkColorSetARGB(255, 225, 225, 225));
         canvas->drawRect(inputRect, paint);
         QString transStr;
         transStr = mName + ": " + mInputText + "|";
-
-        paint.setTextSize(FONT_HEIGHT);
-        SkRect bounds;
-        paint.measureText(transStr.toStdString().c_str(),
-                          transStr.size()*sizeof(char),
-                          &bounds);
         paint.setColor(SK_ColorBLACK);
-        paint.setTypeface(SkTypeface::MakeDefault());
         paint.setStyle(SkPaint::kFill_Style);
 
-        canvas->drawString(
-               transStr.toStdString().c_str(),
-               inputRect.x() + paint.getTextSize(),
-               inputRect.y() + inputRect.height()*0.5 + bounds.height()*0.2f,
-               paint);
+        SkFont font;
+        font.setSize(FONT_HEIGHT);
+        SkRect bounds;
+        const auto cStr = transStr.toStdString().c_str();
+        font.measureText(cStr,
+                         static_cast<ulong>(transStr.size())*sizeof(char),
+                         SkTextEncoding::kUTF8,
+                         &bounds);
+        font.setTypeface(SkTypeface::MakeDefault());
+
+        canvas->drawString(cStr,
+               inputRect.x() + font.getSize(),
+               inputRect.y() + inputRect.height()*0.5f + bounds.height()*0.2f,
+               font, paint);
     }
 }
 

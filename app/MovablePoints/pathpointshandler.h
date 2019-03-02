@@ -9,6 +9,25 @@ public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv) const;
+    
+    bool getNormalSegmentAtAbsPos(const QPointF &absPos,
+                                  const qreal &canvasScaleInv,
+                                  NormalSegment& target) {
+        qreal minDist = TEN_MIL;
+        NormalSegment * bestSeg = nullptr;
+        for(const auto& point : mPoints) {
+            const auto nSeg = point->getNextNormalSegment();
+            if(!nSeg.isValid()) continue;
+            bestSeg = 
+            auto absSeg = nSeg.getAsAbsSegment();
+            absSeg.minDistanceTo(absPos);
+        }
+        if(!bestSeg) return false;
+        if(minDist > 5) return false;
+        target = bestSeg;
+        return true;
+    }
+
     void selectAndAddContainedPointsToList(
             const QRectF &absRect,
             QList<stdptr<MovablePoint>> &list) const;

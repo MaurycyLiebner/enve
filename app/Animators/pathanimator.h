@@ -18,7 +18,6 @@ class PathAnimator : public ComplexAnimator {
 public:
     PathAnimator(BoundingBox *parentBox);
     PathAnimator();
-    ~PathAnimator();
 
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice * const target) const;

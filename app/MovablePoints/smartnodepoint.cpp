@@ -270,23 +270,28 @@ void SmartNodePoint::drawNodePoint(
     if(MainWindow::isCtrlPressed()) {
         SkPaint paint;
         paint.setAntiAlias(true);
-        paint.setTextSize(FONT_HEIGHT*invScale);
-        SkRect bounds;
-        const auto nodeIdStr = QString::number(mNodeId);
-        const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
-        paint.measureText(QString::number(mNodeId).toStdString().c_str(),
-                          sizeT*sizeof(char), &bounds);
         paint.setColor(SK_ColorBLACK);
+        paint.setStyle(SkPaint::kFill_Style);
+
+        SkFont font;
+        font.setSize(FONT_HEIGHT*invScale);
         const auto fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
                                            SkFontStyle::kNormal_Width,
                                            SkFontStyle::kUpright_Slant);
-        const auto typeFace = SkTypeface::MakeFromName(nullptr, fontStyle);
-        paint.setTypeface(typeFace);
-        paint.setStyle(SkPaint::kFill_Style);
-        canvas->drawString(QString::number(mNodeId).toStdString().c_str(),
+        font.setTypeface(SkTypeface::MakeFromName(nullptr, fontStyle));
+        const auto nodeIdStr = QString::number(mNodeId);
+        const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
+        const auto cStr = nodeIdStr.toStdString().c_str();
+        SkRect bounds;
+        font.measureText(cStr,
+                         sizeT*sizeof(char),
+                         SkTextEncoding::kUTF8,
+                         &bounds);
+
+        canvas->drawString(cStr,
                            absPos.x() + bounds.width()*0.5f,
                            absPos.y() + bounds.height()*0.5f,
-                           paint);
+                           font, paint);
     }
     canvas->restore();
 }

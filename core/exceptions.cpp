@@ -8,9 +8,7 @@ QDebug operator<<(QDebug out, const std::string& str) {
 
 bool isExceptionNested(const std::exception& e) {
     if(auto ne = dynamic_cast<const std::nested_exception*>(std::addressof(e))) {
-        if(ne->nested_ptr()) {
-            return true;
-        }
+        if(ne->nested_ptr()) return true;
     }
     return false;
 }
@@ -34,13 +32,13 @@ void _gPrintException(const std::exception& e,
 }
 
 void gPrintExceptionCritical(const std::exception& e,
-                     QString allText,
-                     const uint& level) {
+                             const QString &allText,
+                             const uint& level) {
     _gPrintException(e, allText, level, false);
 }
 
 void gPrintExceptionFatal(const std::exception& e,
-                             QString allText,
-                             const uint& level) {
+                          const QString &allText,
+                          const uint& level) {
     _gPrintException(e, allText, level, true);
 }

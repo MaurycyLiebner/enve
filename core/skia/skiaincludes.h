@@ -18,6 +18,7 @@
 #include "SkImageFilter.h"
 #include "SkDiscretePathEffect.h"
 #include "SkPathMeasure.h"
+#include "SkFont.h"
 
 #include "gl/GrGLUtil.h"
 

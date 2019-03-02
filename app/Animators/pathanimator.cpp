@@ -13,10 +13,6 @@ PathAnimator::PathAnimator(BoundingBox *parentBox) :
     setParentBox(parentBox);
 }
 
-PathAnimator::~PathAnimator() {
-
-}
-
 void PathAnimator::setParentBox(BoundingBox *parent) {
     mParentBox = parent;
 }
