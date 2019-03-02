@@ -30,8 +30,8 @@ public:
     void removeFromVectorPath();
     void removeApproximate();
 
-    void actionAddPointRelPos(const QPointF &relPos);
-    void actionAddPointAbsPos(const QPointF &absPos);
+    SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
+    SmartNodePoint* actionAddPointAbsPos(const QPointF &absPos);
     void actionConnectToNormalPoint(SmartNodePoint * const point);
     void actionDisconnectFromNormalPoint(SmartNodePoint * const point);
 

@@ -11,6 +11,12 @@ SmartPathCollectionHandler::SmartPathCollectionHandler(
 
 }
 
+SmartNodePoint *SmartPathCollectionHandler::createNewSubPathAtPos(
+        const QPointF &pos) {
+    const auto newHandler = createNewPath();
+    return newHandler->addFirstNode(pos);
+}
+
 PathPointsHandler *SmartPathCollectionHandler::createNewPath() {
     const auto newAnimator = mAnimator->createNewPath();
     const auto newHandler = SPtrCreate(PathPointsHandler)(

@@ -469,12 +469,12 @@ void SmartNodePoint::actionDisconnectFromNormalPoint(
     }
 }
 
-void SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
-    mHandler_k->addNewAtEnd(mNodeId, relPos);
+SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
+    return mHandler_k->addNewAtEnd(mNodeId, relPos);
 }
 
-void SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {
-    actionAddPointRelPos(mapAbsoluteToRelative(absPos));
+SmartNodePoint* SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {
+    return actionAddPointRelPos(mapAbsoluteToRelative(absPos));
 }
 
 void SmartNodePoint::setElementsPos(const QPointF &c0,

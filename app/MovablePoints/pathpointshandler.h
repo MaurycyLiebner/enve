@@ -42,8 +42,8 @@ public:
     // actions on NORMAL
     void setCtrlsMode(const int& nodeId, const CtrlsMode& mode);
     void removeNode(const int& nodeId);
-    void addNewAtEnd(const int& nodeId, const QPointF &relPos);
-
+    SmartNodePoint *addNewAtEnd(const int& nodeId, const QPointF &relPos);
+    SmartNodePoint *addFirstNode(const QPointF &relPos);
     // actions on DISSOLVED
 
     // actions on DUMMY and DISSOLVED
@@ -56,7 +56,6 @@ public:
     void createSegment(const int& node1Id, const int& node2Id);
     void removeSegment(const NormalSegment &segment);
 
-    SmartNodePoint* createNewNodePoint(const int& nodeId);
 
     SmartNodePoint* getPrevNormalNode(const int& startId) const {
         return getPointWithId(mCurrentTarget->prevNormalId(startId));
@@ -77,6 +76,7 @@ protected:
 private:
     void updatePoint(const int& nodeId);
     void updatePoints();
+    SmartNodePoint* createNewNodePoint(const int& nodeId);
 
     QList<stdsptr<SmartNodePoint>> mPoints;
     SmartPath* mCurrentTarget;

@@ -24,8 +24,8 @@ void SmartPath::actionRemoveNormalNode(const int &nodeId) {
 }
 
 int SmartPath::actionAddFirstNode(const QPointF &c0,
-                                 const QPointF &p1,
-                                 const QPointF &c2) {
+                                  const QPointF &p1,
+                                  const QPointF &c2) {
     const int insertId = mNodesList.appendNode(Node(c0, p1, c2));
     mNodesList.insertNodeAfter(insertId, Node(Node::MOVE));
     return insertId;

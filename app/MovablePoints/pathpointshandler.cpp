@@ -92,11 +92,16 @@ void PathPointsHandler::removeNode(const int &nodeId) {
     updatePoints();
 }
 
-void PathPointsHandler::addNewAtEnd(const int &nodeId,
-                                    const QPointF &relPos) {
-    mCurrentTarget->actionAppendNodeAtEndNode(
+SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {
+    const int id = mCurrentTarget->actionAddFirstNode(relPos, relPos, relPos);
+    return createNewNodePoint(id);
+}
+
+SmartNodePoint* PathPointsHandler::addNewAtEnd(const int &nodeId,
+                                               const QPointF &relPos) {
+    const int id = mCurrentTarget->actionAppendNodeAtEndNode(
                 nodeId, {relPos, relPos, relPos});
-    updatePoints();
+    return createNewNodePoint(id);
 }
 
 void PathPointsHandler::promoteToNormal(const int &nodeId) {
