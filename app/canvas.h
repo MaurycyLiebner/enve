@@ -10,6 +10,7 @@
 #include "GUI/canvaswindow.h"
 #include "Animators/coloranimator.h"
 #include "SkPathOps.h"
+#include "MovablePoints/segment.h"
 
 class TextBox;
 class Circle;
@@ -39,6 +40,7 @@ enum CanvasMode : short {
     MOVE_PATH,
     MOVE_POINT,
     ADD_POINT,
+    ADD_SMART_POINT,
     PICK_PAINT_SETTINGS,
     ADD_CIRCLE,
     ADD_RECTANGLE,
@@ -372,7 +374,7 @@ protected:
 //    }
 
     void setCurrentEndPoint(NodePoint *point);
-
+    void setCurrentSmartEndPoint(SmartNodePoint * const point);
     NodePoint *getCurrentPoint();
 
     void handleMovePathMouseRelease();
@@ -653,10 +655,17 @@ protected:
     QList<qptr<BoundingBox>> mSelectedBoxes;
 
     stdptr<MovablePoint> mLastPressedPoint;
-    stdptr<NodePoint> mCurrentEndPoint;
     qptr<BoundingBox> mLastPressedBox;
     qptr<Bone> mLastPressedBone;
     stdsptr<PathPivot> mRotPivot;
+
+    stdptr<VectorPathEdge> mCurrentEdge;
+    stdptr<NodePoint> mCurrentEndPoint;
+
+    stdptr<SmartNodePoint> mCurrentSmartEndPoint;
+
+    NormalSegment mHoveredNormalSegment_d;
+    NormalSegment mCurrentNormalSegment;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
 
@@ -665,7 +674,6 @@ protected:
     bool mXOnlyTransform = false;
     bool mYOnlyTransform = false;
 
-    VectorPathEdge *mCurrentEdge = nullptr;
 
     bool mPreviewing = false;
     bool mRenderingPreview = false;
@@ -710,16 +718,25 @@ protected:
     QPointF mCurrentMouseEventPosAbs;
 
     QRectF mSelectionRect;
-    CanvasMode mCurrentMode = ADD_POINT;
+    CanvasMode mCurrentMode = MOVE_PATH;
 
     void setCtrlPointsEnabled(bool enabled);
-    void handleMovePointMouseMove();
-    void handleMovePathMouseMove();
-    void handleAddPointMouseMove();
-    void handleMovePathMousePressEvent();
     void handleMovePointMousePressEvent();
-    void handleAddPointMouseRelease();
+    void handleMovePointMouseMove();
+
+    void handleMovePathMousePressEvent();
+    void handleMovePathMouseMove();
+
     void handleAddPointMousePress();
+    void handleAddPointMouseMove();
+    void handleAddPointMouseRelease();
+
+    void handleAddSmartPointMousePress();
+    void handleAddSmartPointMouseMove();
+    void handleAddSmartPointMouseRelease();
+
+    void handlePaintLeftButtonMoveEvent(const QMouseEvent * const event);
+    void handlePaintModeMouseRelease();
 
     void updateTransformation();
     void handleMouseRelease();

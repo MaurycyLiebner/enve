@@ -9,11 +9,7 @@
 #include "Animators/transformanimator.h"
 #include "pathpointshandler.h"
 
-NormalSegment::NormalSegment() :
-    NormalSegment(nullptr) {}
-
-NormalSegment::NormalSegment(PathPointsHandler * const handler) :
-    NormalSegment(nullptr, nullptr, handler) {}
+NormalSegment::NormalSegment() {}
 
 NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
                              SmartNodePoint * const lastNode,

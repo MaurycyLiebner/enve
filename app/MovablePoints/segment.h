@@ -31,7 +31,6 @@ public:
         QPointF getRelPosAtT(const qreal &thisT) const;
     };
     NormalSegment();
-    NormalSegment(PathPointsHandler * const handler);
     NormalSegment(SmartNodePoint * const firstNode,
                   SmartNodePoint * const lastNode,
                   PathPointsHandler * const handler);

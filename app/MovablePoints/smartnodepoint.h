@@ -164,21 +164,22 @@ public:
     void afterNextNodeC0P1Changed() {
         mNextNormalSegment.afterChanged();
     }
+
+    bool hasNextPoint() const;
+    bool hasPrevPoint() const;
+    bool hasNextNormalPoint() const;
+    bool hasPrevNormalPoint() const;
 protected:
     SmartNodePoint(const int& nodeId,
                    PathPointsHandler * const handler,
                    SmartPathAnimator * const parentAnimator,
                    BasicTransformAnimator * const parentTransform);
 
-    bool hasNextPoint() const;
-    bool hasPrevPoint() const;
     void setNextPoint(SmartNodePoint * const nextPoint);
     void setPrevPoint(SmartNodePoint * const prevPoint);
     void setPointAsPrev(SmartNodePoint * const pointToSet);
     void setPointAsNext(SmartNodePoint * const pointToSet);
 
-    bool hasNextNormalPoint() const;
-    bool hasPrevNormalPoint() const;
     void setNextNormalPoint(SmartNodePoint * const nextPoint);
     void setPrevNormalPoint(SmartNodePoint * const prevPoint);
     void setPointAsNextNormal(SmartNodePoint * const pointToSet);

@@ -276,7 +276,9 @@ SOURCES += main.cpp\
     MovablePoints/segment.cpp \
     MovablePoints/smartctrlpoint.cpp \
     Animators/PathAnimators/smartpathcollectionhandler.cpp \
-    canvasmouseevents.cpp
+    canvasmouseevents.cpp \
+    canvashandlesmartpath.cpp \
+    Boxes/smartvectorpath.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -503,7 +505,8 @@ HEADERS  += \
     MovablePoints/pathpointshandler.h \
     MovablePoints/segment.h \
     MovablePoints/smartctrlpoint.h \
-    Animators/PathAnimators/smartpathcollectionhandler.h
+    Animators/PathAnimators/smartpathcollectionhandler.h \
+    Boxes/smartvectorpath.h
 
 RESOURCES += \
     resources.qrc

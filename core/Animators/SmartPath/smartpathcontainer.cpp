@@ -37,7 +37,7 @@ int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId,
     if(!endNode.isNormal())
         RuntimeThrow("Invalid node type. "
                      "End nodes should always be NORMAL.");
-    const Node& moveNode = endNode.getNextNodeId();
+    const Node& moveNode = mNodesList.at(endNode.getNextNodeId());
     if(!moveNode.isMove())
         RuntimeThrow("Invalid node type. "
                      "End nodes should have MOVE node as next.");

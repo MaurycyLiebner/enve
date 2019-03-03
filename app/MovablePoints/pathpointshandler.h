@@ -2,6 +2,7 @@
 #define PATHPOINTSHANDLER_H
 #include "Animators/SmartPath/smartpathcontainer.h"
 #include "smartnodepoint.h"
+class Canvas;
 
 class PathPointsHandler : public StdSelfRef {
     friend class StdSelfRef;
@@ -30,6 +31,7 @@ public:
     void selectAndAddContainedPointsToList(
             const QRectF &absRect,
             QList<stdptr<MovablePoint>> &list) const;
+    void selectAllPoints(Canvas * const canvas);
     void drawPoints(SkCanvas * const canvas,
                     const CanvasMode &currentCanvasMode,
                     const SkScalar &invScale,

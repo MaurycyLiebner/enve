@@ -12,6 +12,7 @@ class SmartPathAnimator;
 class MovablePoint;
 class NormalSegment;
 class SmartNodePoint;
+class Canvas;
 enum CanvasMode : short;
 #include "skia/skiaincludes.h"
 
@@ -29,6 +30,7 @@ public:
     void selectAndAddContainedPointsToList(
             const QRectF &absRect,
             QList<stdptr<MovablePoint>> &list) const;
+    void selectAllPoints(Canvas * const canvas);
     void drawPoints(SkCanvas * const canvas,
                     const CanvasMode &currentCanvasMode,
                     const SkScalar &invScale,

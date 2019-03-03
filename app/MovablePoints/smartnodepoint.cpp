@@ -16,8 +16,7 @@ SmartNodePoint::SmartNodePoint(const int& nodeId,
                                SmartPathAnimator * const parentAnimator,
                                BasicTransformAnimator * const parentTransform) :
     NonAnimatedMovablePoint(parentTransform, TYPE_PATH_POINT, 6.5),
-    mHandler_k(handler), mParentAnimator(parentAnimator),
-    mNextNormalSegment(handler) {
+    mHandler_k(handler), mParentAnimator(parentAnimator) {
     setNodeId(nodeId);
     mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);
     mC2Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C2);
@@ -137,7 +136,7 @@ MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
         } else if(mC2Pt->isPointAtAbsPos(absPos, canvasScaleInv)) {
             return mC2Pt.get();
         }
-    } else if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
+    } else if(!isEndPoint() || canvasMode != CanvasMode::ADD_SMART_POINT) {
         return nullptr;
     }
     if(isPointAtAbsPos(absPos, canvasScaleInv)) return this;
@@ -238,10 +237,10 @@ void SmartNodePoint::drawNodePoint(
     drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
 
     if((mode == CanvasMode::MOVE_POINT && isNeighbourNormalSelected()) ||
-       (mode == CanvasMode::ADD_POINT && mSelected)) {
+       (mode == CanvasMode::ADD_SMART_POINT && mSelected)) {
         SkPaint paint;
         paint.setAntiAlias(true);
-        if(mC2Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
+        if(mC2Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
             const SkPoint endAbsPos = qPointToSk(mC2Pt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);
@@ -252,7 +251,7 @@ void SmartNodePoint::drawNodePoint(
             paint.setStrokeWidth(0.75f*invScale);
             canvas->drawLine(absPos, endAbsPos, paint);
         }
-        if(mC0Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
+        if(mC0Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
             const SkPoint startAbsPos = qPointToSk(mC0Pt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);

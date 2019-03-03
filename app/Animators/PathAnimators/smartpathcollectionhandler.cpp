@@ -52,6 +52,12 @@ void SmartPathCollectionHandler::selectAndAddContainedPointsToList(
     }
 }
 
+void SmartPathCollectionHandler::selectAllPoints(Canvas * const canvas) {
+    for(const auto& handler : mPointsHandlers) {
+        handler->selectAllPoints(canvas);
+    }
+}
+
 void SmartPathCollectionHandler::drawPoints(
         SkCanvas * const canvas, const CanvasMode &currentCanvasMode,
         const SkScalar &invScale, const SkMatrix &combinedTransform) const {

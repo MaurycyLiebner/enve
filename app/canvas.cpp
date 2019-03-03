@@ -26,6 +26,7 @@
 #include "Animators/effectanimators.h"
 #include "PixmapEffects/pixmapeffect.h"
 #include "PixmapEffects/rastereffects.h"
+#include "MovablePoints/smartnodepoint.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
@@ -69,8 +70,6 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
 
     mRotPivot = SPtrCreate(PathPivot)(this);
     mRotPivot->hide();
-
-    mCurrentMode = MOVE_PATH;
 
     ca_removeChildAnimator(mTransformAnimator);
 

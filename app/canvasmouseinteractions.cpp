@@ -535,6 +535,8 @@ void Canvas::handleLeftButtonMousePress() {
         }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
         handleAddPointMousePress();
+    } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+        handleAddSmartPointMousePress();
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         handleMovePointMousePressEvent();
     } else if(mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
@@ -693,6 +695,8 @@ void Canvas::cancelCurrentTransform() {
             }
         }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+
+    } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
 
     } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
         //mCanvasWindow->setCanvasMode(MOVE_PATH);
@@ -858,6 +862,42 @@ void Canvas::handleAddPointMousePress() {
     } // pats is not null
 }
 
+
+void Canvas::handleAddPointMouseMove() {
+    if(!mCurrentEndPoint) return;
+    if(mFirstMouseMove) mCurrentEndPoint->startTransform();
+    if(mCurrentEndPoint->hasNextPoint() &&
+       mCurrentEndPoint->hasPreviousPoint()) {
+        if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+           CtrlsMode::CTRLS_CORNER) {
+            mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        }
+        if(mCurrentEndPoint->isSeparateNodePoint()) {
+            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
+        } else {
+            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
+        }
+    } else {
+        if(!mCurrentEndPoint->hasNextPoint() &&
+           !mCurrentEndPoint->hasPreviousPoint()) {
+            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+               CtrlsMode::CTRLS_CORNER) {
+                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+            }
+        } else {
+            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+               CtrlsMode::CTRLS_SYMMETRIC) {
+                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+            }
+        }
+        if(mCurrentEndPoint->hasNextPoint()) {
+            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
+        } else {
+            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
+        }
+    }
+}
+
 void Canvas::handleAddPointMouseRelease() {
     if(mCurrentEndPoint) {
         if(!mFirstMouseMove) mCurrentEndPoint->finishTransform();
@@ -868,6 +908,13 @@ void Canvas::handleAddPointMouseRelease() {
 
 void Canvas::handleMouseRelease() {
     if(mIsMouseGrabbing) releaseMouseAndDontTrack();
+    if(mCurrentEdge) {
+        if(!mFirstMouseMove) mCurrentEdge->finishPassThroughTransform();
+        mHoveredEdge_d = mCurrentEdge;
+        mHoveredEdge_d->generatePainterPath();
+        mCurrentEdge = nullptr;
+        return;
+    }
     if(!mDoubleClick) {
         if(mCurrentMode == CanvasMode::MOVE_POINT ||
            mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
@@ -879,7 +926,7 @@ void Canvas::handleMouseRelease() {
             }/* else if(mCurrentMode == CanvasMode::ADD_BONE) {
                 mCanvasWindow->setCanvasMode(CanvasMode::MOVE_POINT);
             }*/
-        } else if(isMovingPath()) {
+        } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
             if(!mLastPressedPoint) {
                 handleMovePathMouseRelease();
             } else {
@@ -888,6 +935,8 @@ void Canvas::handleMouseRelease() {
             }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseRelease();
+        } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+            handleAddSmartPointMouseRelease();
         } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
             if(mLastPressedBox) {
                 const auto srcPathBox = GetAsPtr(mLastPressedBox, PathBox);
@@ -1010,41 +1059,6 @@ void Canvas::handleMovePathMouseMove() {
     }
 }
 
-void Canvas::handleAddPointMouseMove() {
-    if(!mCurrentEndPoint) return;
-    if(mFirstMouseMove) mCurrentEndPoint->startTransform();
-    if(mCurrentEndPoint->hasNextPoint() &&
-       mCurrentEndPoint->hasPreviousPoint()) {
-        if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-           CtrlsMode::CTRLS_CORNER) {
-            mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-        }
-        if(mCurrentEndPoint->isSeparateNodePoint()) {
-            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
-        } else {
-            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
-        }
-    } else {
-        if(!mCurrentEndPoint->hasNextPoint() &&
-           !mCurrentEndPoint->hasPreviousPoint()) {
-            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-               CtrlsMode::CTRLS_CORNER) {
-                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-            }
-        } else {
-            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-               CtrlsMode::CTRLS_SYMMETRIC) {
-                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
-            }
-        }
-        if(mCurrentEndPoint->hasNextPoint()) {
-            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
-        } else {
-            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
-        }
-    }
-}
-
 void Canvas::updateTransformation() {
     if(mSelecting) {
         moveSecondSelectionPoint(mLastMouseEventPosRel);
@@ -1058,5 +1072,7 @@ void Canvas::updateTransformation() {
         }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
         handleAddPointMouseMove();
+    } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+        handleAddSmartPointMouseMove();
     }
 }

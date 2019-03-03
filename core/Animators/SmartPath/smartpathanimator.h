@@ -186,8 +186,8 @@ public:
 protected:
     SmartPathAnimator();
 private:
-    SmartPath * mPathBeingChanged_d = nullptr;
     SmartPath mBaseValue;
+    SmartPath * mPathBeingChanged_d = &mBaseValue;
 };
 
 #endif // SMARTPATHANIMATOR_H

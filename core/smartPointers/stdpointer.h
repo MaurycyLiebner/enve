@@ -12,7 +12,7 @@ class StdPointer {
         if(wp.expired()) {
             rp = nullptr;
         } else {
-            std::shared_ptr<StdSelfRef> sp = wp.lock();
+            const std::shared_ptr<StdSelfRef> sp = wp.lock();
             rp = sp.get();
         }
     }
@@ -21,7 +21,7 @@ public:
         static_assert(std::is_base_of<StdSelfRef, T>::value,
                       "StdPointer can be used only for StdSelfRef derived classes");
     }
-    inline StdPointer(T *p) : wp(p->template weakRef<T>()), rp(p) {
+    inline StdPointer(T * const p) : wp(p->template weakRef<T>()), rp(p) {
         static_assert(std::is_base_of<StdSelfRef, T>::value,
                       "StdPointer can be used only for StdSelfRef derived classes");
     }

@@ -41,8 +41,23 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
     callUpdateSchedulers();
 }
 
+void Canvas::handlePaintLeftButtonMoveEvent(const QMouseEvent * const event) {
+    for(const auto& box : mSelectedBoxes) {
+        if(box->SWT_isPaintBox()) {
+            const auto paintBox = GetAsPtr(box, PaintBox);
+            paintBox->mouseMoveEvent(mCurrentMouseEventPosRel.x(),
+                                     mCurrentMouseEventPosRel.y(),
+                                     event->timestamp(),
+                                     false, mCurrentBrush);
+        }
+    }
+    callUpdateSchedulers();
+}
+
 void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
     if(isPreviewingOrRendering()) return;
+    setCurrentMouseEventPosAbs(event->pos());
+
     if(!(event->buttons() & Qt::MiddleButton) &&
        !(event->buttons() & Qt::RightButton) &&
        !(event->buttons() & Qt::LeftButton) &&
@@ -53,6 +68,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
 
         updateHoveredElements();
 
+        setLastMouseEventPosAbs(event->pos());
         if(mHoveredPoint_d != lastHoveredPoint ||
            mHoveredBox != lastHoveredBox ||
            mHoveredEdge_d != lastEdge) {
@@ -60,32 +76,16 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         }
         return;
     }
-    setCurrentMouseEventPosAbs(event->pos());
+
     if(event->buttons() & Qt::MiddleButton) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
-        callUpdateSchedulers();
-        return;
-    }
-    if(mCurrentMode == PAINT_MODE && event->buttons() & Qt::LeftButton)  {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                const auto paintBox = GetAsPtr(box, PaintBox);
-                paintBox->mouseMoveEvent(mCurrentMouseEventPosRel.x(),
-                                         mCurrentMouseEventPosRel.y(),
-                                         event->timestamp(),
-                                         false, mCurrentBrush);
-            }
+    } else if(mCurrentMode == PAINT_MODE && event->buttons() & Qt::LeftButton)  {
+        handlePaintLeftButtonMoveEvent(event);
+    } else if(event->buttons() & Qt::LeftButton || mIsMouseGrabbing) {
+        if(mMovesToSkip > 0) {
+            mMovesToSkip--;
+            return;
         }
-        callUpdateSchedulers();
-        return;
-    }
-
-    if(mMovesToSkip > 0) {
-        mMovesToSkip--;
-        return;
-    }
-
-    if(event->buttons() & Qt::LeftButton || mIsMouseGrabbing) {
         if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
             if((mCurrentMode == CanvasMode::MOVE_POINT &&
                 !mHoveredPoint_d && !mHoveredEdge_d) ||
@@ -109,8 +109,10 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
             }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseMove();
+        } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+            handleAddSmartPointMouseMove();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
-            if(isShiftPressed() ) {
+            if(isShiftPressed()) {
                 const qreal lenR = pointToLen(mCurrentMouseEventPosRel -
                                               mLastPressPosRel);
                 mCurrentCircle->moveRadiusesByAbs(QPointF(lenR, lenR));
@@ -135,17 +137,22 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
     callUpdateSchedulers();
 }
 
-void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
-    if(event->button() == Qt::LeftButton) schedulePivotUpdate();
-    if(isPreviewingOrRendering() || event->button() != Qt::LeftButton) return;
-    if(mCurrentMode == PAINT_MODE) {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                const auto paintBox = GetAsPtr(box, PaintBox);
-                paintBox->mouseReleaseEvent();
-            }
+void Canvas::handlePaintModeMouseRelease() {
+    for(const auto& box : mSelectedBoxes) {
+        if(box->SWT_isPaintBox()) {
+            const auto paintBox = GetAsPtr(box, PaintBox);
+            paintBox->mouseReleaseEvent();
         }
-        callUpdateSchedulers();
+    }
+    callUpdateSchedulers();
+}
+
+void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
+    if(isPreviewingOrRendering()) return;
+    if(event->button() != Qt::LeftButton) return;
+    schedulePivotUpdate();
+    if(mCurrentMode == PAINT_MODE) {
+        handlePaintModeMouseRelease();
         return;
     }
     setCurrentMouseEventPosAbs(event->pos());
@@ -154,15 +161,8 @@ void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
     if(mValueInput.inputEnabled()) mFirstMouseMove = false;
     mValueInput.clearAndDisableInput();
 
-    if(mCurrentEdge) {
-        if(!mFirstMouseMove) mCurrentEdge->finishPassThroughTransform();
-        mHoveredEdge_d = mCurrentEdge;
-        mHoveredEdge_d->generatePainterPath();
-        mCurrentEdge = nullptr;
-    } else {
-        handleMouseRelease();
-    }
-    if(mIsMouseGrabbing) releaseMouseAndDontTrack();
+    handleMouseRelease();
+
     mLastPressedBone = nullptr;
     mLastPressedBox = nullptr;
     mHoveredPoint_d = mLastPressedPoint;
@@ -171,7 +171,6 @@ void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
     setLastMouseEventPosAbs(event->pos());
     callUpdateSchedulers();
 }
-
 
 void Canvas::wheelEvent(const QWheelEvent * const event) {
     if(isPreviewingOrRendering()) return;

@@ -343,9 +343,7 @@ void PaintBox::mouseMoveEvent(const qreal &xT,
                               const ulong &time_stamp,
                               const bool &erase,
                               const _SimpleBrushWrapper * const brush) {
-    tabletMoveEvent(xT, yT,
-                    time_stamp, 1.0,
-                    erase, brush);
+    tabletMoveEvent(xT, yT, time_stamp, 1, erase, brush);
 }
 
 void PaintBox::tabletReleaseEvent() {
