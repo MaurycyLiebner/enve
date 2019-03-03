@@ -275,7 +275,8 @@ SOURCES += main.cpp\
     MovablePoints/pathpointshandler.cpp \
     MovablePoints/segment.cpp \
     MovablePoints/smartctrlpoint.cpp \
-    Animators/PathAnimators/smartpathcollectionhandler.cpp
+    Animators/PathAnimators/smartpathcollectionhandler.cpp \
+    canvasmouseevents.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \

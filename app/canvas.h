@@ -706,11 +706,8 @@ protected:
     QPointF mLastMouseEventPosAbs;
     QPointF mLastPressPosAbs;
     QPointF mLastPressPosRel;
-
     QPointF mCurrentMouseEventPosRel;
     QPointF mCurrentMouseEventPosAbs;
-    QPointF mCurrentPressPosAbs;
-    QPointF mCurrentPressPosRel;
 
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
@@ -732,7 +729,6 @@ protected:
     void setLastMouseEventPosAbs(const QPointF &abs);
     void setLastMousePressPosAbs(const QPointF &abs);
     void setCurrentMouseEventPosAbs(const QPointF &abs);
-    void setCurrentMousePressPosAbs(const QPointF &abs);
 };
 
 #endif // CANVAS_H
