@@ -517,20 +517,28 @@ void SmartNodePoint::updateFromNodeData() {
     const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
     setPointAsNext(nextNode);
 
-    if(prevNode->getType() == Node::NORMAL) {
-        setPointAsPrevNormal(prevNode);
+    if(prevNode) {
+        if(prevNode->getType() == Node::NORMAL) {
+            setPointAsPrevNormal(prevNode);
+        } else {
+            const auto prevNormalNode =
+                    mHandler_k->getPrevNormalNode(prevNodeId);
+            setPointAsPrevNormal(prevNormalNode);
+        }
     } else {
-        const auto prevNormalNode =
-                mHandler_k->getPrevNormalNode(prevNodeId);
-        setPointAsPrevNormal(prevNormalNode);
+        setPointAsPrevNormal(nullptr);
     }
 
-    if(nextNode->getType() == Node::NORMAL) {
-        setPointAsNextNormal(nextNode);
+    if(nextNode) {
+        if(nextNode->getType() == Node::NORMAL) {
+            setPointAsNextNormal(nextNode);
+        } else {
+            const auto nextNormalNode =
+                    mHandler_k->getNextNormalNode(nextNodeId);
+            setPointAsNextNormal(nextNormalNode);
+        }
     } else {
-        const auto nextNormalNode =
-                mHandler_k->getNextNormalNode(nextNodeId);
-        setPointAsNextNormal(nextNormalNode);
+        setPointAsNextNormal(nullptr);
     }
 
     updateC0Visibility();

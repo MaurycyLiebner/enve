@@ -198,11 +198,11 @@ private:
     stdsptr<SmartCtrlPoint> mC0Pt;
     stdsptr<SmartCtrlPoint> mC2Pt;
 
-    stdptr<SmartNodePoint> mPrevNormalPoint;
-    stdptr<SmartNodePoint> mNextNormalPoint;
+    SmartNodePoint* mPrevNormalPoint = nullptr;
+    SmartNodePoint* mNextNormalPoint = nullptr;
 
-    stdptr<SmartNodePoint> mPrevPoint;
-    stdptr<SmartNodePoint> mNextPoint;
+    SmartNodePoint* mPrevPoint = nullptr;
+    SmartNodePoint* mNextPoint = nullptr;
 
     void ctrlPointPosChanged(const SmartCtrlPoint * const pointChanged,
                              SmartCtrlPoint * const pointToUpdate);

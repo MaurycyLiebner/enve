@@ -204,112 +204,6 @@ bool Animator::anim_hasNextKey(const Key * const key) {
     return false;
 }
 
-template <class T>
-T* Animator::anim_getKeyAtIndex(const int& id) const {
-    return static_cast<T*>(anim_mKeys.at(id).get());
-}
-
-template <class T>
-T *Animator::anim_getNextKey(const int &relFrame) const {
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        T * const key = anim_getKeyAtIndex<T>(nextId);
-        if(key->getRelFrame() > relFrame) {
-            return key;
-        } else if(key->getRelFrame() == relFrame) {
-            if(nextId + 1 < anim_mKeys.count()) {
-                return anim_getKeyAtIndex<T>(nextId + 1);
-            }
-        }
-    }
-    return nullptr;
-}
-
-template <class T>
-T *Animator::anim_getKeyAtRelFrame(const int &frame) const {
-    if(anim_mKeys.isEmpty()) return nullptr;
-    if(frame > anim_mKeys.last()->getRelFrame()) return nullptr;
-    if(frame < anim_mKeys.first()->getRelFrame()) return nullptr;
-    int minId = 0;
-    int maxId = anim_mKeys.count() - 1;
-    while(maxId - minId > 1) {
-        const int guess = (maxId + minId)/2;
-        if(anim_mKeys.at(guess)->getRelFrame() > frame) {
-            maxId = guess;
-        } else {
-            minId = guess;
-        }
-    }
-    T * const minIdKey = anim_getKeyAtIndex<T>(minId);
-    if(minIdKey->getRelFrame() == frame) return minIdKey;
-    T * const maxIdKey = anim_getKeyAtIndex<T>(maxId);
-    if(maxIdKey->getRelFrame() == frame) return maxIdKey;
-    return nullptr;
-}
-
-template <class T>
-T *Animator::anim_getKeyAtAbsFrame(const int &frame) const {
-    return anim_getKeyAtRelFrame<T>(prp_absFrameToRelFrame(frame));
-}
-
-template <class T>
-T* Animator::anim_getNextKey(const Key * const key) const {
-    const int keyId = anim_getKeyIndex(key);
-    if(keyId == anim_mKeys.count() - 1) return nullptr;
-    return anim_mKeys.at(keyId + 1).get();
-}
-
-template <class T>
-T* Animator::anim_getPrevKey(const Key * const key) const {
-    const int keyId = anim_getKeyIndex(key);
-    if(keyId <= 0) return nullptr;
-    return static_cast<T*>(anim_mKeys.at(keyId - 1).get());
-}
-
-template <class T>
-std::pair<T*, T*> Animator::anim_getPrevAndNextKey(const int &relFrame) const {
-    std::pair<T*, T*> result(nullptr, nullptr);
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        T * const prevKey = anim_getKeyAtIndex<T>(prevId);
-        if(prevKey->getRelFrame() < relFrame) {
-            result.first = prevKey;
-        } else if(prevKey->getRelFrame() == relFrame) {
-            if(prevId > 0) {
-                result.first = anim_getKeyAtIndex<T>(prevId - 1);
-            }
-        }
-        T * const nextKey = anim_getKeyAtIndex<T>(nextId);
-        if(nextKey->getRelFrame() > relFrame) {
-            result.second = prevKey;
-        } else if(nextKey->getRelFrame() == relFrame) {
-            if(nextId + 1 < anim_mKeys.count()) {
-                result.second = anim_getKeyAtIndex<T>(nextId + 1);
-            }
-        }
-    }
-    return result;
-}
-
-template <class T>
-T *Animator::anim_getPrevKey(const int &relFrame) const {
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        T * const key = anim_getKeyAtIndex<T>(prevId);
-        if(key->getRelFrame() < relFrame) {
-            return key;
-        } else if(key->getRelFrame() == relFrame) {
-            if(prevId > 0) {
-                return anim_getKeyAtIndex<T>(prevId - 1);
-            }
-        }
-    }
-    return nullptr;
-}
-
 void Animator::anim_saveCurrentValueAsKey() {}
 
 void Animator::anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
@@ -507,11 +401,6 @@ void Animator::anim_removeAllKeys() {
 void Animator::anim_setKeyOnCurrentFrame(Key* const key) {
     anim_mKeyOnCurrentFrame = key;
     anim_afterKeyOnCurrentFrameChanged(key);
-}
-
-template <class T>
-T *Animator::anim_getKeyOnCurrentFrame() const {
-    return anim_mKeyOnCurrentFrame;
 }
 
 void Animator::anim_getKeysInRect(const QRectF &selectionRect,

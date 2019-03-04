@@ -10,13 +10,13 @@ public:
             return this->getCurrentValue();
         int prevId; int nextId;
         this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId, relFrame);
-        if(nextId == prevId) return this->getKeyAtId(nextId)->getValue();
-        auto prevKey = this->getKeyAtId(prevId);
-        auto nextKey = this->getKeyAtId(nextId);
+        const auto prevKey = this->template anim_getKeyAtIndex<KeyT<T>>(prevId);
+        if(nextId == prevId) return prevKey->getValue();
+        const auto nextKey = this->template anim_getKeyAtIndex<KeyT<T>>(nextId);
         T val;
-        qreal prevFrame = prevKey->getRelFrame();
-        qreal nextFrame = nextKey->getRelFrame();
-        qreal t = (relFrame - prevFrame)/(nextFrame - prevFrame);
+        const qreal prevFrame = prevKey->getRelFrame();
+        const qreal nextFrame = nextKey->getRelFrame();
+        const qreal t = (relFrame - prevFrame)/(nextFrame - prevFrame);
         gInterpolate(prevKey->getValue(), nextKey->getValue(), t, val);
         return val;
     }

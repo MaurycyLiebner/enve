@@ -1,5 +1,6 @@
 #include "graphkey.h"
 #include "qrealpoint.h"
+#include "animator.h"
 
 GraphKey::GraphKey(const int &frame,
                    Animator * const parentAnimator) :

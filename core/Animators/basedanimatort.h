@@ -40,10 +40,12 @@ public:
         if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId,
                                                           frame)) {
             if(nextId == prevId) {
-                return getKeyAtId(nextId)->getValue();
+                return this->template anim_getKeyAtIndex<K>(nextId)->getValue();
             } else {
-                const K * const prevKey = getKeyAtId(prevId);
-                const K * const nextKey = getKeyAtId(nextId);
+                const K * const prevKey =
+                        this->template anim_getKeyAtIndex<K>(prevId);
+                const K * const nextKey =
+                        this->template anim_getKeyAtIndex<K>(nextId);
                 return getValueAtRelFrameK(frame, prevKey, nextKey);
             }
         }
@@ -63,21 +65,16 @@ public:
         return mCurrentValue;
     }
 
-    K* getKeyAtId(const int& id) const {
-        return GetAsPtrTemplated(this->anim_mKeys.at(id), K);
-    }
-
     void anim_saveCurrentValueAsKey() {
         if(!this->anim_mIsRecording) this->anim_setRecording(true);
 
-        if(this->anim_mKeyOnCurrentFrame) {
-            static_cast<K*>(this->anim_mKeyOnCurrentFrame.data())->
-                    setValue(mCurrentValue);
+        const auto currKey = this->template anim_getKeyOnCurrentFrame<K>();
+        if(currKey) {
+            currKey->setValue(mCurrentValue);
         } else {
             auto newKey = SPtrCreateTemplated(K)(
                         mCurrentValue, this->anim_mCurrentRelFrame, this);
-            this->anim_appendKey(GetAsSPtr(newKey, Key));
-            this->anim_mKeyOnCurrentFrame = newKey.get();
+            this->anim_appendKey(newKey);
         }
     }
 

@@ -38,6 +38,8 @@ public:
                     const SkMatrix &combinedTransform) const;
 
     SmartNodePoint* getPointWithId(const int& id) const {
+        if(id < 0) return nullptr;
+        if(id >= mPoints.count()) return nullptr;
         return mPoints.at(id).get();
     }
 

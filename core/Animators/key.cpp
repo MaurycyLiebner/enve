@@ -1,5 +1,6 @@
 #include "key.h"
 #include "qrealpoint.h"
+#include "Animators/animator.h"
 
 Key::Key(Animator * const parentAnimator) :
     Key(0, parentAnimator) {}
@@ -98,6 +99,14 @@ void Key::setRelFrame(const int &frame) {
 
 void Key::setAbsFrame(const int &frame) {
     setRelFrame(mParentAnimator->prp_absFrameToRelFrame(frame));
+}
+
+Key *Key::getNextKey() const {
+    return mParentAnimator->anim_getNextKey(this);
+}
+
+Key *Key::getPrevKey() const {
+    return mParentAnimator->anim_getPrevKey(this);
 }
 
 void Key::afterKeyChanged() {

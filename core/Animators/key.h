@@ -2,11 +2,11 @@
 #define KEY_H
 #include "smartPointers/sharedpointerdefs.h"
 #include "pointhelpers.h"
-#include "Animators/animator.h"
 
 #include <QtCore>
 class QPainter;
 class KeyCloner;
+class Animator;
 
 class KeysClipboardContainer;
 
@@ -71,14 +71,17 @@ public:
     int getRelFrame() const;
     void setAbsFrame(const int &frame);
 
-    template <class T = Key>
+    Key* getNextKey() const;
+    Key* getPrevKey() const;
+
+    template <class T>
     T* getNextKey() const {
-        return static_cast<T*>(mParentAnimator->anim_getNextKey(this));
+        return static_cast<T*>(getNextKey());
     }
 
     template <class T = Key>
     T* getPrevKey() const {
-        return static_cast<T*>(mParentAnimator->anim_getPrevKey(this));
+        return static_cast<T*>(getPrevKey());
     }
 
     bool differesFromNextKey() const {
