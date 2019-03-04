@@ -109,15 +109,6 @@ public:
         }
     }
 
-    void currentlyEditedPathChanged() {
-        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
-        if(spk) {
-            anim_updateAfterChangedKey(spk);
-        } else {
-            prp_updateInfluenceRangeAfterChanged();
-        }
-    }
-
     SmartPath* startPathChange() {
         if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
@@ -126,11 +117,21 @@ public:
         return mPathBeingChanged_d;
     }
 
+    void pathChanged() {
+        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
+        if(spk) {
+            anim_updateAfterChangedKey(spk);
+        } else {
+            prp_updateInfluenceRangeAfterChanged();
+        }
+    }
+
     void cancelPathChange() {
         if(!mPathBeingChanged_d) return;
         mPathBeingChanged_d->restore();
-        if(anim_getKeyOnCurrentFrame()) {
-            anim_updateAfterChangedKey(anim_getKeyOnCurrentFrame());
+        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
+        if(spk) {
+            anim_updateAfterChangedKey(spk);
         } else {
             prp_updateInfluenceRangeAfterChanged();
         }
@@ -138,8 +139,9 @@ public:
 
     void finishPathChange() {
         if(!mPathBeingChanged_d) return;
-        if(anim_getKeyOnCurrentFrame()) {
-            anim_updateAfterChangedKey(anim_getKeyOnCurrentFrame());
+        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
+        if(spk) {
+            anim_updateAfterChangedKey(spk);
         } else {
             prp_updateInfluenceRangeAfterChanged();
         }

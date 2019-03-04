@@ -6,11 +6,10 @@ class SmartCtrlPoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
 public:
     enum Type { C0, C2 };
-    void moveByAbs(const QPointF &absTranslatione);
+    void moveByAbs(const QPointF &absTrans);
     void setRelativePos(const QPointF &relPos);
     void moveToAbs(const QPointF &absPos);
-    //void moveByWithoutUpdatingTheOther(QPointF absTranslation);
-    void moveByRel(const QPointF &relTranslation);
+    void moveByRel(const QPointF &relTrans);
     void startTransform();
     void finishTransform();
     void cancelTransform();
@@ -20,7 +19,6 @@ public:
     bool isHidden() const;
     void scale(const qreal &sx, const qreal &sy);
 
-    void moveToAbsWithoutUpdatingTheOther(const QPointF &absPos);
     void setOtherCtrlPt(SmartCtrlPoint * const ctrlPt);
     void rotate(const qreal &rotate);
 protected:

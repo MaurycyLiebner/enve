@@ -4,6 +4,7 @@
 #include "Boxes/boxesgroup.h"
 #include "pointhelpers.h"
 #include "Animators/SmartPath/smartpathanimator.h"
+#include "Animators/transformanimator.h"
 
 SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
                                const Type& type) :
@@ -17,10 +18,6 @@ void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
     if(mCtrlType == C0) mParentPoint_k->c0Moved(mCurrentPos);
     else mParentPoint_k->c2Moved(mCurrentPos);
-}
-
-void SmartCtrlPoint::moveToAbsWithoutUpdatingTheOther(const QPointF &absPos) {
-    NonAnimatedMovablePoint::moveToAbs(absPos);
 }
 
 void SmartCtrlPoint::rotate(const qreal &rotate) {
@@ -38,8 +35,8 @@ void SmartCtrlPoint::scale(const qreal &sx,
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
 }
 
-void SmartCtrlPoint::moveByAbs(const QPointF &absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) + absTranslatione);
+void SmartCtrlPoint::moveByAbs(const QPointF &absTrans) {
+    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) + absTrans);
 }
 
 void SmartCtrlPoint::moveToAbs(const QPointF& absPos) {
@@ -49,8 +46,8 @@ void SmartCtrlPoint::moveToAbs(const QPointF& absPos) {
     else mParentPoint_k->c2PtPosChanged();
 }
 
-void SmartCtrlPoint::moveByRel(const QPointF &relTranslation) {
-    NonAnimatedMovablePoint::moveByRel(relTranslation);
+void SmartCtrlPoint::moveByRel(const QPointF &relTrans) {
+    NonAnimatedMovablePoint::moveByRel(relTrans);
     if(mOtherCtrlPt_cv->isSelected()) return;
     if(mCtrlType == C0) mParentPoint_k->c0PtPosChanged();
     else mParentPoint_k->c2PtPosChanged();

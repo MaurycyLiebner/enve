@@ -145,7 +145,11 @@ public:
     }
 
     void save() {
-        mSavedList = mNodesList.getList();
+        mSavedList.clear();
+        const int iCount = mNodesList.count();
+        for(int i = 0; i < iCount; i++) {
+            mSavedList.append(mNodesList.at(i));
+        }
     }
 
     void restore() {
@@ -157,7 +161,7 @@ public:
     }
 
     int getNodeCount() const {
-        return mNodesList.getList().count();
+        return mNodesList.count();
     }
 
     void assign(const SmartPath& src) {

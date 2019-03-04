@@ -72,8 +72,8 @@ void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
 }
 
 void SmartPath::actionMoveNodeBetween(const int& movedNodeId,
-                                     const int& prevNodeId,
-                                     const int& nextNodeId) {
+                                      const int& prevNodeId,
+                                      const int& nextNodeId) {
     Node& prevNode = mNodesList.at(prevNodeId);
     if(prevNode.getNextNodeId() != nextNodeId)
         RuntimeThrow("Trying to move between not connected nodes");

@@ -143,16 +143,9 @@ public:
         return mNode_d->getType();
     }
 
-    void c0Moved(const QPointF& c0) {
-        currentPath()->actionSetNormalNodeC0(mNodeId, c0);
-        if(mPrevNormalPoint)
-            mPrevNormalPoint->afterNextNodeC0P1Changed();
-    }
+    void c0Moved(const QPointF& c0);
 
-    void c2Moved(const QPointF& c2) {
-        currentPath()->actionSetNormalNodeC2(mNodeId, c2);
-        mNextNormalSegment.afterChanged();
-    }
+    void c2Moved(const QPointF& c2);
 
     void updateNode() {
         if(!currentPath()) mNode_d = nullptr;

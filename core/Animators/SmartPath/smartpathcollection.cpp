@@ -6,6 +6,7 @@ SmartPathCollection::SmartPathCollection() :
 
 SmartPathAnimator *SmartPathCollection::createNewPath() {
     const auto newPath = SPtrCreate(SmartPathAnimator)();
+    ca_addChildAnimator(newPath);
     mPaths.append(newPath);
     return newPath.get();
 }
