@@ -93,6 +93,9 @@ public:
         return subSegmentAtT(closestT);
     }
 
+    SubSegment getClosestSubSegmentForDummy(const QPointF& relPos,
+                                            qreal& minDist) const;
+
     void afterChanged() const {
         updateDnDPos();
     }

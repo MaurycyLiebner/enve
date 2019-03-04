@@ -115,30 +115,39 @@ void PathPointsHandler::promoteToNormal(const int &nodeId) {
     updatePoint(nodeId);
 }
 
-void PathPointsHandler::moveToClosestSegment(const int &nodeId,
+bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
                                              const QPointF &relPos) {
     NormalSegment::SubSegment minSubSeg{nullptr, nullptr, nullptr};
     qreal minDist = TEN_MIL;
     for(const auto& pt : mPoints) {
         const auto seg = pt->getNextNormalSegment();
         qreal dist;
-        const auto subSeg = seg.getClosestSubSegment(relPos, dist);
+        const auto subSeg = seg.getClosestSubSegmentForDummy(relPos, dist);
         if(dist < minDist) {
             minDist = dist;
             minSubSeg = subSeg;
         }
     }
-    if(!minSubSeg.isValid()) return;
+    qDebug() << "";
+    qDebug() << minDist;
+    if(!minSubSeg.isValid()) return false;
+    qDebug() << "VALID";
     const auto prevPt = minSubSeg.fFirstPt;
     const int prevNodeId = prevPt->getNodeId();
-    if(prevNodeId == nodeId) return;
+    if(prevNodeId == nodeId) return false;
     const auto nextPt = minSubSeg.fLastPt;
     const int nextNodeId = nextPt->getNodeId();
-    if(nextNodeId == nodeId) return;
+    if(nextNodeId == nodeId) return false;
+    const Node * const node = mCurrentTarget->getNodePtr(nodeId);
+    const int oldPrevNodeId = node->getPrevNodeId();
+    const int oldNextNodeId = node->getNextNodeId();
     mCurrentTarget->actionMoveNodeBetween(nodeId, prevNodeId, nextNodeId);
     updatePoint(nodeId);
     updatePoint(prevNodeId);
     updatePoint(nextNodeId);
+    if(oldPrevNodeId != -1) updatePoint(oldPrevNodeId);
+    if(oldNextNodeId != -1) updatePoint(oldNextNodeId);
+    return true;
 }
 
 void PathPointsHandler::divideSegment(const int &node1Id,

@@ -95,7 +95,7 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
         currentPath()->actionSetDissolvedNodeT(mNodeId, mappedT);
         setRelativePosVal(closest.fPos);
     } else if(getType() == Node::DUMMY) {
-        mHandler_k->moveToClosestSegment(mNodeId, relPos);
+        if(!mHandler_k->moveToClosestSegment(mNodeId, relPos)) return;
     }
     mParentAnimator->pathChanged();
 }

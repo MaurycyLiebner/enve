@@ -31,6 +31,31 @@ void NormalSegment::disconnect() const {
     mHandler_k->removeSegment(*this);
 }
 
+NormalSegment::SubSegment NormalSegment::getClosestSubSegmentForDummy(
+        const QPointF &relPos, qreal &minDist) const {
+    auto prevNode = mFirstNode;
+    minDist = TEN_MIL;
+    SubSegment bestSeg{nullptr, nullptr, nullptr};
+    for(const auto nextNode : mInnerDnD) {
+        const auto subSeg = SubSegment{prevNode, nextNode, this};
+        const QPointF halfPos = subSeg.getRelPosAtT(0.5);
+        const qreal dist = pointToLen(halfPos - relPos);
+        if(dist < minDist) {
+            minDist = dist;
+            bestSeg = subSeg;
+        }
+        prevNode = nextNode;
+    }
+    const auto subSeg = SubSegment{prevNode, mLastNode, this};
+    const QPointF halfPos = subSeg.getRelPosAtT(0.5);
+    const qreal dist = pointToLen(halfPos - relPos);
+    if(dist < minDist) {
+        minDist = dist;
+        bestSeg = subSeg;
+    }
+    return bestSeg;
+}
+
 void NormalSegment::updateDnDPos() const {
     for(const auto& inner : mInnerDnD) {
         inner->updateFromNodeData();
@@ -172,10 +197,12 @@ bool NormalSegment::isValid() const {
 }
 
 qreal NormalSegment::SubSegment::getMinT() const {
+    if(fFirstPt == fParentSeg->getFirstNode()) return 0;
     return fFirstPt->getT();
 }
 
 qreal NormalSegment::SubSegment::getMaxT() const {
+    if(fLastPt == fParentSeg->getLastNode()) return 1;
     return fLastPt->getT();
 }
 
