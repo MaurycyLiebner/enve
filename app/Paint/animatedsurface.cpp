@@ -36,8 +36,9 @@ AnimatedSurface::~AnimatedSurface() {}
 
 void AnimatedSurface::currentDataModified() {
     if(anim_hasKeys()) {
-        if(anim_isKeyOnCurrentFrame()) {
-            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        const auto currKey = anim_getKeyOnCurrentFrame();
+        if(currKey) {
+            anim_updateAfterChangedKey(currKey);
         } else {
             Key *key = anim_getPrevKey(anim_mCurrentRelFrame);
             if(!key) {
@@ -51,10 +52,10 @@ void AnimatedSurface::currentDataModified() {
 }
 
 void AnimatedSurface::anim_saveCurrentValueAsKey() {
-    if(anim_isKeyOnCurrentFrame()) return;
+    if(anim_getKeyOnCurrentFrame()) return;
     newEmptyPaintFrame();
-    SurfaceKey *key = GetAsPtr(anim_mKeyOnCurrentFrame, SurfaceKey);
-    SurfaceKey *prevKey = GetAsPtr(anim_getPrevKey(key), SurfaceKey);
+    const auto key = anim_getKeyOnCurrentFrame<SurfaceKey>();
+    SurfaceKey *prevKey = anim_getPrevKey<SurfaceKey>(key);
     TilesData *tiles;
     if(!prevKey) {
         tiles = mCurrentTiles.get();
@@ -282,7 +283,7 @@ void AnimatedSurface::tabletPressEvent(const qreal &xT, const qreal &yT,
                                        const qreal &pressure,
                                        const bool &erase,
                                        const Brush *brush) {
-    if(anim_isRecording() && !anim_isKeyOnCurrentFrame()) {
+    if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
         newEmptyPaintFrame();
     }
     Surface::tabletPressEvent(xT, yT, time_stamp,

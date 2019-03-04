@@ -286,8 +286,6 @@ void GraphKey::setRelFrame(const int &frame) {
     setEndFrameVar(mEndFrame + dFrame);
     setStartFrameVar(mStartFrame + dFrame);
     mRelFrame = frame;
-    if(!mParentAnimator) return;
-    mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }
 
 void GraphKey::setStartValueVar(const qreal &value) {

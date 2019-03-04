@@ -103,7 +103,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
         if(mTarget->SWT_isAnimator()) {
             const auto aTarget = GetAsPtr(mTarget, Animator);
             rec = aTarget->anim_isRecording();
-            key = aTarget->anim_isKeyOnCurrentFrame();
+            key = aTarget->anim_getKeyOnCurrentFrame();
         }
         QDoubleSlider::paint(p,
                     rec ? QColor(255, 200, 200) : QColor(255, 255, 255),
@@ -176,7 +176,7 @@ void QrealAnimatorValueSlider::openContextMenu(
     const auto aTarget = GetAsPtr(mTarget, Animator);
     QMenu menu(this);
 
-    if(aTarget->anim_isKeyOnCurrentFrame()) {
+    if(aTarget->anim_getKeyOnCurrentFrame()) {
         menu.addAction("Delete Keyframe",
                        aTarget,
                        &Animator::anim_deleteCurrentKey);

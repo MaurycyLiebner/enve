@@ -93,10 +93,7 @@ int Key::getRelFrame() const {
 }
 
 void Key::setRelFrame(const int &frame) {
-    if(frame == mRelFrame) return;
     mRelFrame = frame;
-    if(!mParentAnimator) return;
-    mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }
 
 void Key::setAbsFrame(const int &frame) {

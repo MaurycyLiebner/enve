@@ -61,7 +61,7 @@ void GradientPoint::drawSk(SkCanvas *canvas,
     canvas->drawCircle(absPos,
                        scaledRadius, paint);
 
-    if(mAssociatedAnimator_k->anim_isKeyOnCurrentFrame()) {
+    if(mAssociatedAnimator_k->anim_getKeyOnCurrentFrame()) {
         paint.setColor(SK_ColorRED);
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawCircle(absPos,

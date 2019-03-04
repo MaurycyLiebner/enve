@@ -17,15 +17,13 @@ SmartNodePoint::SmartNodePoint(const int& nodeId,
                                BasicTransformAnimator * const parentTransform) :
     NonAnimatedMovablePoint(parentTransform, TYPE_PATH_POINT, 6.5),
     mHandler_k(handler), mParentAnimator(parentAnimator) {
-    setNodeId(nodeId);
     mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);
     mC2Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C2);
 
     mC0Pt->setOtherCtrlPt(mC2Pt.get());
     mC2Pt->setOtherCtrlPt(mC0Pt.get());
 
-    mC0Pt->hide();
-    mC2Pt->hide();
+    setNodeId(nodeId);
 }
 
 void SmartNodePoint::applyTransform(const QMatrix &transform) {
@@ -79,18 +77,18 @@ void SmartNodePoint::finishTransform() {
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     if(getType() == Node::NORMAL) {
         setRelativePosVal(relPos);
-        mTargetPath_d->actionSetNormalNodeP1(mNodeId, mCurrentPos);
+        currentPath()->actionSetNormalNodeP1(mNodeId, mCurrentPos);
         mNextNormalSegment.afterChanged();
         if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
     } else if(getType() == Node::DISSOLVED) {
         const auto parentSeg = mPrevNormalPoint->getNextNormalSegment();
-        const auto tRange = mTargetPath_d->dissolvedTRange(mNodeId);
+        const auto tRange = currentPath()->dissolvedTRange(mNodeId);
         auto seg = parentSeg.getAsRelSegment().tFragment(tRange.fMin,
                                                          tRange.fMax);
         const auto closest = seg.closestPosAndT(relPos);
         const qreal mappedT = gMapTFromFragment(tRange.fMin, tRange.fMax,
                                                 closest.fT);
-        mTargetPath_d->actionSetDissolvedNodeT(mNodeId, mappedT);
+        currentPath()->actionSetDissolvedNodeT(mNodeId, mappedT);
         setRelativePosVal(closest.fPos);
     } else if(getType() == Node::DUMMY) {
         mHandler_k->moveToClosestSegment(mNodeId, relPos);
@@ -98,11 +96,11 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
 }
 
 void SmartNodePoint::removeFromVectorPath() {
-    mTargetPath_d->actionRemoveNormalNode(mNodeId);
+    currentPath()->actionRemoveNormalNode(mNodeId);
 }
 
 void SmartNodePoint::removeApproximate() {
-    mTargetPath_d->actionRemoveNormalNode(mNodeId);
+    currentPath()->actionRemoveNormalNode(mNodeId);
 }
 
 void SmartNodePoint::rectPointsSelection(
@@ -322,7 +320,7 @@ void SmartNodePoint::updateC2Visibility() {
 void SmartNodePoint::setC2Enabled(const bool &enabled) {
     if(enabled == getC2Enabled()) return;
     if(getC2Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-    mTargetPath_d->actionSetNormalNodeC2Enabled(mNodeId, enabled);
+    currentPath()->actionSetNormalNodeC2Enabled(mNodeId, enabled);
     //mParentPath->schedulePathUpdate();
     mParentAnimator->prp_updateInfluenceRangeAfterChanged();
     updateC2Visibility();
@@ -331,7 +329,7 @@ void SmartNodePoint::setC2Enabled(const bool &enabled) {
 void SmartNodePoint::setC0Enabled(const bool &enabled) {
     if(enabled == getC0Enabled()) return;
     if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-    mTargetPath_d->actionSetNormalNodeC0Enabled(mNodeId, enabled);
+    currentPath()->actionSetNormalNodeC0Enabled(mNodeId, enabled);
     //mParentPath->schedulePathUpdate();
     mParentAnimator->prp_updateInfluenceRangeAfterChanged();
     updateC0Visibility();
@@ -379,7 +377,7 @@ bool SmartNodePoint::isSeparateNodePoint() {
 }
 
 void SmartNodePoint::setCtrlsMode(const CtrlsMode &mode) {
-    mTargetPath_d->actionSetNormalNodeCtrlsMode(mNodeId, mode);
+    currentPath()->actionSetNormalNodeCtrlsMode(mNodeId, mode);
     updateFromNodeData();
 
     //mParentPath->schedulePathUpdate();
@@ -418,6 +416,10 @@ void SmartNodePoint::setPointAsPrevNormal(SmartNodePoint * const pointToSet) {
     if(hasPrevNormalPoint()) mPrevNormalPoint->setNextNormalPoint(nullptr);
     setPrevNormalPoint(pointToSet);
     if(pointToSet) pointToSet->setNextNormalPoint(this);
+}
+
+SmartPath *SmartNodePoint::currentPath() const {
+    return mParentAnimator->getCurrentlyEditedPath();
 }
 
 bool SmartNodePoint::hasNextPoint() const {
@@ -498,8 +500,8 @@ void SmartNodePoint::updateFromNodeData() {
         setVisible(true);
     } else if(mNode_d->isDissolved() || mNode_d->isDummy()) {
         if(mNode_d->isDissolved())
-            mTargetPath_d->updateDissolvedNodePosition(mNodeId);
-        else mTargetPath_d->updateDummyNodePosition(mNodeId);
+            currentPath()->updateDissolvedNodePosition(mNodeId);
+        else currentPath()->updateDummyNodePosition(mNodeId);
 
         setRelativePosVal(mNode_d->fP1);
         setVisible(true);

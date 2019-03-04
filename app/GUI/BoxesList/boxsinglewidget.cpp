@@ -732,7 +732,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();
                 const auto animTarget = GetAsPtr(target, Animator);
-                if(animTarget->anim_isKeyOnCurrentFrame()) {
+                if(animTarget->anim_getKeyOnCurrentFrame()) {
                     menu.addAction("Add Key")->setDisabled(true);
                     menu.addAction("Delete Key", [target]() {
                         const auto animTarget = GetAsPtr(target, Animator);

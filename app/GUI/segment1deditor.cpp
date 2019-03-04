@@ -99,7 +99,7 @@ void Segment1DEditor::paintEvent(QPaintEvent *) {
 
     p.setPen(Qt::NoPen);
     if(mCurrentAnimator) {
-        if(mCurrentAnimator->anim_isKeyOnCurrentFrame()) {
+        if(mCurrentAnimator->anim_getKeyOnCurrentFrame()) {
             p.setBrush(Qt::red);
         } else {
             p.setBrush(Qt::black);

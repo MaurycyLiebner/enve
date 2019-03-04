@@ -48,8 +48,8 @@ public:
             const auto prevK2 = anim_getPrevKey(anim_mCurrentRelFrame);
             const auto nextK1 = anim_getNextKey(lastRelFrame);
             const auto nextK2 = anim_getNextKey(anim_mCurrentRelFrame);
-            if(prevK1 == nullptr && prevK2 == nullptr) return;
-            if(nextK1 == nullptr && nextK2 == nullptr) return;
+            if(!prevK1 && !prevK2) return;
+            if(!nextK1 && !nextK2) return;
             this->anim_callFrameChangeUpdater();
         }
     }
@@ -69,11 +69,11 @@ public:
         int nextId;
         if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId,
                                                           frame)) {
+            const auto nextKey = anim_getKeyAtIndex<SmartPathKey>(nextId);
             if(nextId == prevId) {
-                return getKeyAtId(nextId)->getValue().getPathAt();
+                return nextKey->getValue().getPathAt();
             } else {
-                const auto * const prevKey = getKeyAtId(prevId);
-                const auto * const nextKey = getKeyAtId(nextId);
+                const auto prevKey = anim_getKeyAtIndex<SmartPathKey>(prevId);
 
                 const qreal prevFrame = prevKey->getRelFrame();
                 const qreal nextFrame = nextKey->getRelFrame();
@@ -100,25 +100,27 @@ public:
         return mPathBeingChanged_d;
     }
 
+    void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
+        const auto spk = static_cast<SmartPathKey*>(key);
+        if(spk) {
+            mPathBeingChanged_d = &spk->getValue();
+        } else {
+            mPathBeingChanged_d = &mBaseValue;
+        }
+    }
+
     void currentlyEditedPathChanged() {
-        if(anim_mKeyOnCurrentFrame) {
-            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
+        if(spk) {
+            anim_updateAfterChangedKey(spk);
         } else {
             prp_updateInfluenceRangeAfterChanged();
         }
     }
 
     SmartPath* startPathChange() {
-        if(mPathBeingChanged_d) return mPathBeingChanged_d;
-        if(anim_isRecording() && !anim_mKeyOnCurrentFrame) {
+        if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
-        }
-        if(anim_mKeyOnCurrentFrame) {
-            const auto spk = GetAsPtr(anim_mKeyOnCurrentFrame,
-                                      SmartPathKey);
-            mPathBeingChanged_d = &spk->getValue();
-        } else {
-            mPathBeingChanged_d = &mBaseValue;
         }
         mPathBeingChanged_d->save();
         return mPathBeingChanged_d;
@@ -127,40 +129,32 @@ public:
     void cancelPathChange() {
         if(!mPathBeingChanged_d) return;
         mPathBeingChanged_d->restore();
-        if(anim_mKeyOnCurrentFrame) {
-            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        if(anim_getKeyOnCurrentFrame()) {
+            anim_updateAfterChangedKey(anim_getKeyOnCurrentFrame());
         } else {
             prp_updateInfluenceRangeAfterChanged();
         }
-        mPathBeingChanged_d = nullptr;
     }
 
     void finishPathChange() {
         if(!mPathBeingChanged_d) return;
-        if(anim_isKeyOnCurrentFrame()) {
-            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        if(anim_getKeyOnCurrentFrame()) {
+            anim_updateAfterChangedKey(anim_getKeyOnCurrentFrame());
         } else {
             prp_updateInfluenceRangeAfterChanged();
         }
-        mPathBeingChanged_d = nullptr;
-    }
-
-    SmartPathKey* getKeyAtId(const int& id) const {
-        return GetAsPtr(this->anim_mKeys.at(id), SmartPathKey);
     }
 
     void anim_saveCurrentValueAsKey() {
         if(!this->anim_mIsRecording) this->anim_setRecording(true);
 
-        if(this->anim_mKeyOnCurrentFrame) {
-            const auto spk = GetAsPtr(this->anim_mKeyOnCurrentFrame,
-                                      SmartPathKey);
+        const auto spk = this->anim_getKeyOnCurrentFrame<SmartPathKey>();
+        if(spk) {
             spk->assignValue(mBaseValue);
         } else {
             const auto newKey = SPtrCreate(SmartPathKey)(
                         mBaseValue, this->anim_mCurrentRelFrame, this);
-            this->anim_appendKey(GetAsSPtr(newKey, Key));
-            this->anim_mKeyOnCurrentFrame = newKey.get();
+            this->anim_appendKey(newKey);
         }
     }
 

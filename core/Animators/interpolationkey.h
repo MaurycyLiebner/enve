@@ -19,7 +19,7 @@ public:
     void setRelFrame(const int &frame) {
         if(frame == mRelFrame) return;
         const int dFrame = frame - mRelFrame;
-        GraphKey::setRelFrame(frame);
+        mRelFrame = frame;
         mEndValue += dFrame;
         mStartValue += dFrame;
     }

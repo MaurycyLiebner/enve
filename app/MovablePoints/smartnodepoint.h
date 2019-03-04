@@ -80,7 +80,7 @@ public:
 
     SmartPathAnimator *getTargetAnimator() const;
     SmartPath *getTargetPath() const {
-        return mTargetPath_d;
+        return currentPath();
     }
 
     void setC0Enabled(const bool &enabled);
@@ -144,19 +144,19 @@ public:
     }
 
     void c0Moved(const QPointF& c0) {
-        mTargetPath_d->actionSetNormalNodeC0(mNodeId, c0);
+        currentPath()->actionSetNormalNodeC0(mNodeId, c0);
         if(mPrevNormalPoint)
             mPrevNormalPoint->afterNextNodeC0P1Changed();
     }
 
     void c2Moved(const QPointF& c2) {
-        mTargetPath_d->actionSetNormalNodeC2(mNodeId, c2);
+        currentPath()->actionSetNormalNodeC2(mNodeId, c2);
         mNextNormalSegment.afterChanged();
     }
 
     void updateNode() {
-        if(!mTargetPath_d) mNode_d = nullptr;
-        else mNode_d = mTargetPath_d->getNodePtr(mNodeId);
+        if(!currentPath()) mNode_d = nullptr;
+        else mNode_d = currentPath()->getNodePtr(mNodeId);
         updateFromNodeData();
     }
 
@@ -185,11 +185,12 @@ protected:
     void setPointAsNextNormal(SmartNodePoint * const pointToSet);
     void setPointAsPrevNormal(SmartNodePoint * const pointToSet);
 private:
+    SmartPath* currentPath() const;
+
     bool mSeparateNodePoint = false;
     int mNodeId;
     const Node * mNode_d = nullptr;
 
-    SmartPath * mTargetPath_d = nullptr;
     const stdptr<PathPointsHandler> mHandler_k;
     const qptr<SmartPathAnimator> mParentAnimator;
     NormalSegment mNextNormalSegment;

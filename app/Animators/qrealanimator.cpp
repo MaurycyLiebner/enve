@@ -264,8 +264,9 @@ void QrealAnimator::qra_setCurrentValue(qreal newValue) {
 
     if(isZero4Dec(newValue - mCurrentValue)) return;
     mCurrentValue = newValue;
-    if(anim_isKeyOnCurrentFrame()) {
-        qra_saveCurrentValueToKey(GetAsPtr(anim_mKeyOnCurrentFrame, QrealKey));
+    const auto currKey = anim_getKeyOnCurrentFrame<QrealKey>();
+    if(currKey) {
+        qra_saveCurrentValueToKey(currKey);
     } else {
         prp_updateInfluenceRangeAfterChanged();
     }
@@ -334,15 +335,14 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
         return;
     }
 
-    if(!anim_mKeyOnCurrentFrame) {
+    if(!anim_getKeyOnCurrentFrame()) {
         const auto newKey = SPtrCreate(QrealKey)(mCurrentValue,
                                                  anim_mCurrentRelFrame,
                                                  this);
         anim_appendKey(newKey);
-        anim_mKeyOnCurrentFrame = newKey.get();
         graph_updateKeysPath();
     } else {
-        qra_saveCurrentValueToKey(GetAsPtr(anim_mKeyOnCurrentFrame, QrealKey));
+        qra_saveCurrentValueToKey(anim_getKeyOnCurrentFrame<QrealKey>());
     }
 }
 
@@ -355,7 +355,6 @@ void QrealAnimator::anim_removeAllKeys() {
         anim_removeKey(key);
     }
     qra_setCurrentValue(currentValue);
-    anim_mKeyOnCurrentFrame = nullptr;
 }
 
 void QrealAnimator::anim_mergeKeysIfNeeded() {
@@ -510,7 +509,7 @@ void QrealAnimator::qra_incCurrentValue(const qreal &incBy) {
 
 void QrealAnimator::prp_startTransform() {
     if(mTransformed) return;
-    if(anim_mIsRecording && !anim_isKeyOnCurrentFrame()) {
+    if(anim_mIsRecording && !anim_getKeyOnCurrentFrame()) {
         anim_saveCurrentValueAsKey();
     }
     mSavedCurrentValue = mCurrentValue;

@@ -85,12 +85,13 @@ void VectorPathAnimator::revertAllNodeSettings() {
 void VectorPathAnimator::startPathChange() {
     if(mPathChanged) return;
     if(anim_isRecording()) {
-        if(anim_isKeyOnCurrentFrame()) return;
+        if(anim_getKeyOnCurrentFrame()) return;
         anim_saveCurrentValueAsKey();
     }
-    if(anim_isKeyOnCurrentFrame()) {
-        GetAsPK(anim_mKeyOnCurrentFrame)->startPathChange();
-        anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+    const auto currKey = anim_getKeyOnCurrentFrame<PathKey>();
+    if(currKey) {
+        currKey->startPathChange();
+        anim_updateAfterChangedKey(currKey);
     } else {
         PathContainer::startPathChange();
         prp_updateInfluenceRangeAfterChanged();
@@ -100,9 +101,10 @@ void VectorPathAnimator::startPathChange() {
 
 void VectorPathAnimator::cancelPathChange() {
     if(!mPathChanged) return;
-    if(anim_isKeyOnCurrentFrame()) {
-        GetAsPK(anim_mKeyOnCurrentFrame)->cancelPathChange();
-        anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+    const auto currKey = anim_getKeyOnCurrentFrame<PathKey>();
+    if(currKey) {
+        currKey->cancelPathChange();
+        anim_updateAfterChangedKey(currKey);
     } else {
         PathContainer::cancelPathChange();
         prp_updateInfluenceRangeAfterChanged();
@@ -112,9 +114,10 @@ void VectorPathAnimator::cancelPathChange() {
 
 void VectorPathAnimator::finishedPathChange() {
     if(!mPathChanged) return;
-    if(anim_isKeyOnCurrentFrame()) {
-        GetAsPK(anim_mKeyOnCurrentFrame)->finishedPathChange();
-        anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+    const auto currKey = anim_getKeyOnCurrentFrame<PathKey>();
+    if(currKey) {
+        currKey->finishedPathChange();
+        anim_updateAfterChangedKey(currKey);
     } else {
         PathContainer::finishedPathChange();
         prp_updateInfluenceRangeAfterChanged();
@@ -125,9 +128,10 @@ void VectorPathAnimator::finishedPathChange() {
 
 void VectorPathAnimator::setElementPos(const int &index,
                                        const SkPoint &pos) {
-    if(anim_isKeyOnCurrentFrame()) {
-        GetAsPK(anim_mKeyOnCurrentFrame)->setElementPos(index, pos);
-        anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+    const auto currKey = anim_getKeyOnCurrentFrame<PathKey>();
+    if(currKey) {
+        currKey->setElementPos(index, pos);
+        anim_updateAfterChangedKey(currKey);
     } else {
         PathContainer::setElementPos(index, pos);
         prp_updateInfluenceRangeAfterChanged();
@@ -151,16 +155,16 @@ void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) anim_setRecording(true);
 
-    if(anim_mKeyOnCurrentFrame == nullptr) {
+    const auto currKey = anim_getKeyOnCurrentFrame<PathKey>();
+    if(currKey) {
+        anim_saveCurrentValueToKey(currKey);
+    } else {
         auto newKey = SPtrCreate(PathKey)(anim_mCurrentRelFrame,
                                           getPath(),
                                           mElementsPos,
                                           this,
                                           mPathClosed);
         anim_appendKey(newKey);
-        anim_mKeyOnCurrentFrame = newKey.get();
-    } else {
-        anim_saveCurrentValueToKey(GetAsPK(anim_mKeyOnCurrentFrame));
     }
 }
 
@@ -669,7 +673,7 @@ void VectorPathAnimator::drawSelected(SkCanvas *canvas,
                                       const SkMatrix &combinedTransform) {
     Q_UNUSED(combinedTransform);
 
-    const bool keyOnCurrentFrame = anim_isKeyOnCurrentFrame();
+    const bool keyOnCurrentFrame = anim_getKeyOnCurrentFrame();
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             auto point = getNodePtWithNodeId(i);
