@@ -41,6 +41,7 @@ protected:
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
+    Q_OBJECT
 public:
     bool SWT_isSmartPathAnimator() const { return true; }
 
@@ -55,6 +56,7 @@ public:
             if(!prevK1 && !prevK2) return;
             if(!nextK1 && !nextK2) return;
             this->anim_callFrameChangeUpdater();
+            emit pathChangedAfterFrameChange();
         }
     }
 
@@ -183,6 +185,8 @@ public:
         }
         gRead(target, mBaseValue);
     }
+signals:
+    void pathChangedAfterFrameChange();
 protected:
     SmartPathAnimator();
 private:

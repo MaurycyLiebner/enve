@@ -7,9 +7,7 @@
 SmartPathCollectionHandler::SmartPathCollectionHandler(
         BasicTransformAnimator * const parentTransform) :
     mAnimator(SPtrCreate(SmartPathCollection)()),
-    mParentTransform(parentTransform) {
-
-}
+    mParentTransform(parentTransform) {}
 
 SmartNodePoint *SmartPathCollectionHandler::createNewSubPathAtPos(
         const QPointF &pos) {

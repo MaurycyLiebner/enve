@@ -8,6 +8,9 @@ PathPointsHandler::PathPointsHandler(
     mCurrentTarget(targetAnimator->getCurrentlyEditedPath()),
     mTargetAnimator(targetAnimator),
     mParentTransform(parentTransform) {
+    QObject::connect(mTargetAnimator,
+                     &SmartPathAnimator::pathChangedAfterFrameChange,
+                     [this]() { this->updatePoints(); });
     updatePoints();
 }
 
@@ -74,7 +77,7 @@ void PathPointsHandler::updateNextSegmentDnDForPoint(const int &nodeId) {
 }
 
 void PathPointsHandler::updatePoint(const int &nodeId) {
-    mPoints.at(nodeId)->updateFromNodeData();
+    mPoints.at(nodeId)->updateNode();
 }
 
 void PathPointsHandler::updatePoints() {
