@@ -15,7 +15,7 @@ SmartNodePoint::SmartNodePoint(const int& nodeId,
                                PathPointsHandler * const handler,
                                SmartPathAnimator * const parentAnimator,
                                BasicTransformAnimator * const parentTransform) :
-    NonAnimatedMovablePoint(parentTransform, TYPE_PATH_POINT, 6.5),
+    NonAnimatedMovablePoint(parentTransform, TYPE_SMART_PATH_POINT, 6.5),
     mHandler_k(handler), mParentAnimator(parentAnimator) {
     mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);
     mC2Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C2);
@@ -326,18 +326,16 @@ void SmartNodePoint::setC2Enabled(const bool &enabled) {
     if(enabled == getC2Enabled()) return;
     if(getC2Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     currentPath()->actionSetNormalNodeC2Enabled(mNodeId, enabled);
-    //mParentPath->schedulePathUpdate();
-    mParentAnimator->prp_updateInfluenceRangeAfterChanged();
     updateC2Visibility();
+    mParentAnimator->pathChanged();
 }
 
 void SmartNodePoint::setC0Enabled(const bool &enabled) {
     if(enabled == getC0Enabled()) return;
     if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     currentPath()->actionSetNormalNodeC0Enabled(mNodeId, enabled);
-    //mParentPath->schedulePathUpdate();
-    mParentAnimator->prp_updateInfluenceRangeAfterChanged();
     updateC0Visibility();
+    mParentAnimator->pathChanged();
 }
 
 void SmartNodePoint::resetC2() {
@@ -384,8 +382,7 @@ bool SmartNodePoint::isSeparateNodePoint() {
 void SmartNodePoint::setCtrlsMode(const CtrlsMode &mode) {
     currentPath()->actionSetNormalNodeCtrlsMode(mNodeId, mode);
     updateFromNodeData();
-
-    //mParentPath->schedulePathUpdate();
+    mParentAnimator->pathChanged();
 }
 
 bool SmartNodePoint::hasNextNormalPoint() const {

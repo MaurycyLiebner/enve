@@ -134,6 +134,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     clearBonesSelection();
     clearPointsSelection();
     clearCurrentEndPoint();
+    clearCurrentSmartEndPoint();
     clearLastPressedPoint();
     mCurrentBoxesGroup = group;
     connect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
@@ -673,6 +674,7 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
     mHoveredPoint_d = nullptr;
     clearHoveredEdge();
     clearPointsSelection();
+    clearCurrentSmartEndPoint();
     clearCurrentEndPoint();
     clearLastPressedPoint();
     if(mCurrentMode == MOVE_PATH || mCurrentMode == MOVE_POINT) {

@@ -408,6 +408,7 @@ public:
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
     void clearCurrentEndPoint();
+    void clearCurrentSmartEndPoint();
     void clearHoveredEdge();
     void applyPaintSettingToSelected(PaintSetting *setting);
     void setSelectedFillColorMode(const ColorMode &mode);

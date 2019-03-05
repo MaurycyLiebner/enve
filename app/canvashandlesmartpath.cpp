@@ -2,6 +2,10 @@
 #include "MovablePoints/smartnodepoint.h"
 #include "Boxes/smartvectorpath.h"
 
+void Canvas::clearCurrentSmartEndPoint() {
+    setCurrentSmartEndPoint(nullptr);
+}
+
 void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
     if(mCurrentSmartEndPoint) mCurrentSmartEndPoint->deselect();
     if(point) point->select();
@@ -10,7 +14,7 @@ void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
 
 void Canvas::handleAddSmartPointMousePress() {
     if(mCurrentSmartEndPoint ? mCurrentSmartEndPoint->isHidden() : false) {
-        setCurrentEndPoint(nullptr);
+        clearCurrentSmartEndPoint();
     }
     qptr<BoundingBox> test;
 
@@ -88,6 +92,7 @@ void Canvas::handleAddSmartPointMouseRelease() {
     if(mCurrentSmartEndPoint) {
         if(!mFirstMouseMove) mCurrentSmartEndPoint->finishTransform();
         //mCurrentSmartEndPoint->prp_updateInfluenceRangeAfterChanged();
-        if(!mCurrentSmartEndPoint->isEndPoint()) setCurrentEndPoint(nullptr);
+        if(!mCurrentSmartEndPoint->isEndPoint())
+            clearCurrentSmartEndPoint();
     }
 }

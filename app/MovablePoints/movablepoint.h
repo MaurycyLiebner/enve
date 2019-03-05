@@ -15,6 +15,7 @@ class PropertyUpdater;
 
 enum MovablePointType : short {
     TYPE_PATH_POINT,
+    TYPE_SMART_PATH_POINT,
     TYPE_CTRL_POINT,
     TYPE_PIVOT_POINT,
     TYPE_GRADIENT_POINT,
@@ -64,6 +65,7 @@ public:
     void setVisible(const bool &bT);
 
     bool isNodePoint();
+    bool isSmartNodePoint();
     bool isPivotPoint();
     bool isCtrlPoint();
     bool isBonePoint();

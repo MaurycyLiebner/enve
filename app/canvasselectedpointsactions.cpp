@@ -2,6 +2,7 @@
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "MovablePoints/nodepoint.h"
 #include "Animators/pathanimator.h"
+#include "MovablePoints/smartnodepoint.h"
 
 void Canvas::connectPoints() {
     QList<NodePoint*> selectedNodePoints;
@@ -224,6 +225,9 @@ void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
     for(MovablePoint *point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
+            asNodePt->setCtrlsMode(mode);
+        } else if(point->isSmartNodePoint()) {
+            auto asNodePt = GetAsPtr(point, SmartNodePoint);
             asNodePt->setCtrlsMode(mode);
         }
     }
@@ -479,6 +483,7 @@ void Canvas::clearPointsSelectionOrDeselect() {
     } else {
         clearPointsSelection();
         clearCurrentEndPoint();
+        clearCurrentSmartEndPoint();
         clearLastPressedPoint();
     }
 }

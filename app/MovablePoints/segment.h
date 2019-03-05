@@ -102,6 +102,8 @@ public:
 
     qCubicSegment2D getAsAbsSegment() const;
     qCubicSegment2D getAsRelSegment() const;
+
+    void updateDnD();
 private:
     void updateDnDPos() const;
     SubSegment subSegmentAtT(const qreal& t) const;

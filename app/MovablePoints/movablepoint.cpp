@@ -239,6 +239,10 @@ bool MovablePoint::isNodePoint() {
     return mType == MovablePointType::TYPE_PATH_POINT;
 }
 
+bool MovablePoint::isSmartNodePoint() {
+    return mType == MovablePointType::TYPE_SMART_PATH_POINT;
+}
+
 bool MovablePoint::isPivotPoint() {
     return mType == MovablePointType::TYPE_PIVOT_POINT;
 }

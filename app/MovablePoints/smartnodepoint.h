@@ -153,6 +153,9 @@ public:
         updateFromNodeData();
     }
 
+    void updateNextSegmentDnD() {
+        mNextNormalSegment.updateDnD();
+    }
     void updateFromNodeData();
     void afterNextNodeC0P1Changed() {
         mNextNormalSegment.afterChanged();

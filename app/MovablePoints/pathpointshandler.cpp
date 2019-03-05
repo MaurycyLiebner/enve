@@ -69,6 +69,10 @@ SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
     return newPt.get();
 }
 
+void PathPointsHandler::updateNextSegmentDnDForPoint(const int &nodeId) {
+    mPoints.at(nodeId)->updateNextSegmentDnD();
+}
+
 void PathPointsHandler::updatePoint(const int &nodeId) {
     mPoints.at(nodeId)->updateFromNodeData();
 }
@@ -147,6 +151,8 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
     updatePoint(nextNodeId);
     if(oldPrevNodeId != -1) updatePoint(oldPrevNodeId);
     if(oldNextNodeId != -1) updatePoint(oldNextNodeId);
+    if(oldPrevNodeId != -1) updateNextSegmentDnDForPoint(oldPrevNodeId);
+    updateNextSegmentDnDForPoint(prevNodeId);
     return true;
 }
 

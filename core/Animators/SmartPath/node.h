@@ -1,6 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 #include "pointhelpers.h"
+#include "exceptions.h"
 
 struct Node {
     friend class NodeList;
@@ -139,9 +140,9 @@ protected:
         fC2Enabled = enabled;
     }
 
-    Type fType;
     bool fC0Enabled = true;
     bool fC2Enabled = true;
+    Type fType;
     CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 
     int fId = -1;
@@ -149,6 +150,77 @@ protected:
     int fPrevNodeId = -1;
     //! @brief Next connected node id in the list.
     int fNextNodeId = -1;
+};
+#include "smartPointers/stdselfref.h"
+class ListOfNodes {
+public:
+    void append(const Node& nodeBlueprint) {
+        insert(mList.count(), nodeBlueprint);
+    }
+
+    void insert(const int& id, const Node& nodeBlueprint) {
+        Node * const newNode = insertNewNode(id);
+        *newNode = nodeBlueprint;
+    }
+
+    void clear() {
+        mList.clear();
+    }
+
+    Node* at(const int& id) const {
+        if(id < 0 || id >= count())
+            RuntimeThrow("Index out of range.");
+        return mList.at(id).get();
+    }
+
+    int count() const {
+        return mList.count();
+    }
+
+    ListOfNodes& operator=(const ListOfNodes& other) {
+        const int otherCount = other.count();
+        const int thisCount = count();
+        int i = 0;
+        for(; i < otherCount && i < thisCount; i++) {
+            assign(i, *other.at(i));
+        }
+        for(; i < otherCount; i++) {
+            insert(i, *other.at(i));
+        }
+        for(; i < thisCount; i++) {
+            removeAt(i);
+        }
+        return *this;
+    }
+
+    Node * operator[](const int& id) const {
+        return at(id);
+    }
+
+    void removeAt(const int& id) {
+        mList.removeAt(id);
+    }
+
+    void assign(const int& id, const Node& nodeBlueprint) {
+        if(id < 0 || id >= count())
+            RuntimeThrow("Index out of range.");
+        *mList.at(id).get() = nodeBlueprint;
+    }
+
+    auto begin() const {
+        return mList.begin();
+    }
+
+    auto end() const {
+        return mList.end();
+    }
+private:
+    Node* insertNewNode(const int& id) {
+        const auto newNode = stdsptr<Node>(new Node);
+        mList.insert(id, newNode);
+        return newNode.get();
+    }
+    QList<stdsptr<Node>> mList;
 };
 
 #endif // NODE_H

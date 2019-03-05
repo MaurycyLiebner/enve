@@ -19,12 +19,7 @@ NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
     if(mFirstNode) mFirstNodeC2 = mFirstNode->getC2Pt();
     mLastNode = lastNode;
     if(mLastNode) mLastNodeC0 = mLastNode->getC0Pt();
-    if(!mFirstNode || !mLastNode) return;
-    auto currNode = mFirstNode->getNextPoint();
-    while(currNode && currNode != mLastNode) {
-        mInnerDnD << currNode;
-        currNode = currNode->getNextPoint();
-    }
+    updateDnD();
 }
 
 void NormalSegment::disconnect() const {
@@ -165,6 +160,17 @@ qCubicSegment2D NormalSegment::getAsRelSegment() const {
             mFirstNode->getC2Value(),
             mLastNode->getC0Value(),
             mLastNode->getRelativePos()};
+}
+
+void NormalSegment::updateDnD() {
+    mInnerDnD.clear();
+    if(!mFirstNode || !mLastNode) return;
+    auto currNode = mFirstNode->getNextPoint();
+    while(currNode && currNode != mLastNode) {
+        mInnerDnD << currNode;
+        currNode = currNode->getNextPoint();
+    }
+    updateDnDPos();
 }
 
 NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {

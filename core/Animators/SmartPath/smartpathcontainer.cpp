@@ -1,22 +1,22 @@
 ﻿#include "smartpathcontainer.h"
 
 void SmartPath::actionRemoveNormalNode(const int &nodeId) {
-    Node& node = mNodesList.at(nodeId);
-    if(!node.isNormal())
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal())
         RuntimeThrow("Invalid node type. "
                      "Only normal nodes can be removed.");
 
-    Node * currNode = &node;
+    Node * currNode = node;
     while(currNode->hasPreviousNode()) {
         const int prevId = currNode->getPrevNodeId();
-        currNode = &mNodesList.at(prevId);
+        currNode = mNodesList.at(prevId);
         if(currNode->isNormal() || currNode->isMove()) break;
         if(currNode->isDissolved()) currNode->fT *= 0.5;
     }
-    currNode = &node;
+    currNode = node;
     while(currNode->hasNextNode()) {
         const int nextId = currNode->getNextNodeId();
-        currNode = &mNodesList.at(nextId);
+        currNode = mNodesList.at(nextId);
         if(currNode->isNormal() || currNode->isMove()) break;
         if(currNode->isDissolved()) currNode->fT = currNode->fT*0.5 + 0.5;
     }
@@ -33,12 +33,12 @@ int SmartPath::actionAddFirstNode(const QPointF &c0,
 
 int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId,
                                         const NodePointValues &values) {
-    Node& endNode = mNodesList.at(endNodeId);
-    if(!endNode.isNormal())
+    Node * const endNode = mNodesList.at(endNodeId);
+    if(!endNode->isNormal())
         RuntimeThrow("Invalid node type. "
                      "End nodes should always be NORMAL.");
-    const Node& moveNode = mNodesList.at(endNode.getNextNodeId());
-    if(!moveNode.isMove())
+    const Node * const moveNode = mNodesList.at(endNode->getNextNodeId());
+    if(!moveNode->isMove())
         RuntimeThrow("Invalid node type. "
                      "End nodes should have MOVE node as next.");
     return mNodesList.insertNodeAfter(endNodeId,
@@ -74,24 +74,24 @@ void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
 void SmartPath::actionMoveNodeBetween(const int& movedNodeId,
                                       const int& prevNodeId,
                                       const int& nextNodeId) {
-    Node& prevNode = mNodesList.at(prevNodeId);
-    if(prevNode.getNextNodeId() != nextNodeId)
+    Node * const prevNode = mNodesList.at(prevNodeId);
+    if(prevNode->getNextNodeId() != nextNodeId)
         RuntimeThrow("Trying to move between not connected nodes");
     mNodesList.moveNodeAfter(movedNodeId, mNodesList.at(movedNodeId),
                              prevNodeId, prevNode);
 }
 
 void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
-    Node& node1 = mNodesList.at(node1Id);
-    Node& node2 = mNodesList.at(node2Id);
-    if(node1.isMove() || node2.isMove())
+    Node * const node1 = mNodesList.at(node1Id);
+    Node * const node2 = mNodesList.at(node2Id);
+    if(node1->isMove() || node2->isMove())
         RuntimeThrow("Cannot disconnect move node");
     int prevId;
     int nextId;
-    if(node1.getNextNodeId() == node2Id) {
+    if(node1->getNextNodeId() == node2Id) {
         prevId = node1Id;
         nextId = node2Id;
-    } else if(node2.getNextNodeId() == node1Id) {
+    } else if(node2->getNextNodeId() == node1Id) {
         prevId = node2Id;
         nextId = node1Id;
     } else {
@@ -100,41 +100,41 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     mNodesList.insertNodeAfter(prevId, Node(Node::MOVE));
     if(nextId > prevId) nextId++;
 
-    Node& prevNode = mNodesList.at(prevId);
-    if(!prevNode.isNormal()) {
+    Node * const prevNode = mNodesList.at(prevId);
+    if(!prevNode->isNormal()) {
         const int prevNormalIdV = mNodesList.prevNormalId(prevId);
-        Node& prevNormalNode = mNodesList.at(prevNormalIdV);
+        Node * const prevNormalNode = mNodesList.at(prevNormalIdV);
         mNodesList.setNodeType(prevId, prevNode, Node::NORMAL);
-        prevNode.fC0 = prevNormalNode.fC0;
-        prevNode.fP1 = prevNormalNode.fP1;
-        prevNode.fC2 = prevNormalNode.fC2;
+        prevNode->fC0 = prevNormalNode->fC0;
+        prevNode->fP1 = prevNormalNode->fP1;
+        prevNode->fC2 = prevNormalNode->fC2;
 
-        int currNodeId = prevNode.getPrevNodeId();
+        int currNodeId = prevNode->getPrevNodeId();
         while(true) {
             if(currNodeId == -1) break;
-            Node& currNode = mNodesList.at(currNodeId);
-            if(currNode.isNormal() || currNode.isMove()) break;
+            Node * const currNode = mNodesList.at(currNodeId);
+            if(currNode->isNormal() || currNode->isMove()) break;
             mNodesList.setNodeType(currNodeId, currNode, Node::DUMMY);
-            currNodeId = currNode.getPrevNodeId();
+            currNodeId = currNode->getPrevNodeId();
         }
         mNodesList.setNodeType(prevNormalIdV, prevNormalNode, Node::DUMMY);
     }
-    Node& nextNode = mNodesList.at(nextId);
-    if(!nextNode.isNormal()) {
+    Node * const nextNode = mNodesList.at(nextId);
+    if(!nextNode->isNormal()) {
         const int nextNormalIdV = mNodesList.nextNormalId(nextId);
-        Node& nextNormalNode = mNodesList.at(nextNormalIdV);
+        Node * const nextNormalNode = mNodesList.at(nextNormalIdV);
         mNodesList.setNodeType(nextId, nextNode, Node::NORMAL);
-        nextNode.fC0 = nextNormalNode.fC0;
-        nextNode.fP1 = nextNormalNode.fP1;
-        nextNode.fC2 = nextNormalNode.fC2;
+        nextNode->fC0 = nextNormalNode->fC0;
+        nextNode->fP1 = nextNormalNode->fP1;
+        nextNode->fC2 = nextNormalNode->fC2;
 
-        int currNodeId = nextNode.getNextNodeId();
+        int currNodeId = nextNode->getNextNodeId();
         while(true) {
             if(currNodeId == -1) break;
-            Node& currNode = mNodesList.at(currNodeId);
-            if(currNode.isNormal() || currNode.isMove()) break;
+            Node * const currNode = mNodesList.at(currNodeId);
+            if(currNode->isNormal() || currNode->isMove()) break;
             mNodesList.setNodeType(currNodeId, currNode, Node::DUMMY);
-            currNodeId = currNode.getNextNodeId();
+            currNodeId = currNode->getNextNodeId();
         }
         mNodesList.setNodeType(nextNormalIdV, nextNormalNode, Node::DUMMY);
     }
@@ -148,17 +148,17 @@ void SmartPath::actionConnectNodes(const int &node1Id,
         RuntimeThrow("Node is not part of a segment");
     // if closing single segment
     if(moveNode1Id == moveNode2Id) {
-        Node& moveNode = mNodesList.at(moveNode1Id);
-        if(!moveNode.isMove())
+        Node * const moveNode = mNodesList.at(moveNode1Id);
+        if(!moveNode->isMove())
             RuntimeThrow("Trying to connect a closed segment");
         const int firstNodeId = mNodesList.firstSegmentNode(node1Id);
         mNodesList.setNodeType(moveNode1Id, moveNode, Node::DUMMY);
         mNodesList.setNodeNextId(moveNode1Id, moveNode, firstNodeId);
         mNodesList.setNodePrevId(firstNodeId, moveNode1Id);
     } else { // if connecting two seperate segments
-        Node& moveNode1 = mNodesList.at(moveNode1Id);
-        Node& moveNode2 = mNodesList.at(moveNode2Id);
-        if(!moveNode1.isMove() || !moveNode2.isMove())
+        Node * const moveNode1 = mNodesList.at(moveNode1Id);
+        Node * const moveNode2 = mNodesList.at(moveNode2Id);
+        if(!moveNode1->isMove() || !moveNode2->isMove())
             RuntimeThrow("Trying to connect a closed segment");
         RuntimeThrow("Not yet finished");
     }
@@ -236,9 +236,9 @@ NodeList SmartPath::interpolateNodesListWithPrev(
                                   prevWeight);
 }
 
-SmartPath::SmartPath() : SmartPath(QList<Node>()) {}
+SmartPath::SmartPath() : SmartPath(ListOfNodes()) {}
 
-SmartPath::SmartPath(const QList<Node> &list) :
+SmartPath::SmartPath(const ListOfNodes &list) :
     mNodesList(false) {
     mNodesList.setNodeList(list);
 }
@@ -254,15 +254,15 @@ SkPath SmartPath::getPathForNext() const {
 }
 
 bool isEndPointAndShouldBeSplit(const int& nodeId,
-                                const Node& thisNode,
-                                const Node& neighNode,
+                                const Node * const thisNode,
+                                const Node * const neighNode,
                                 const NodeList &thisNodes,
                                 const NodeList &neighNodes) {
     if(!thisNodes.segmentClosed(nodeId)) {
         const int thisLastId = thisNodes.lastSegmentNode(nodeId);
         const int neighLastId = neighNodes.lastSegmentNode(nodeId);
-        if(thisLastId == thisNode.getNextNodeId() &&
-           neighLastId != neighNode.getNextNodeId()) return true;
+        if(thisLastId == thisNode->getNextNodeId() &&
+           neighLastId != neighNode->getNextNodeId()) return true;
         const int thisFirstId = thisNodes.firstSegmentNode(nodeId);
         const int neighFirstId = neighNodes.firstSegmentNode(nodeId);
         if(thisFirstId == nodeId && neighFirstId != nodeId) return true;
@@ -271,15 +271,15 @@ bool isEndPointAndShouldBeSplit(const int& nodeId,
 }
 
 bool shouldSplitThisNode(const int& nodeId,
-                         const Node& thisNode,
-                         const Node& neighNode,
+                         const Node * const thisNode,
+                         const Node * const neighNode,
                          const NodeList &thisNodes,
                          const NodeList &neighNodes) {
-    if(thisNode.isNormal()) {
+    if(thisNode->isNormal()) {
         return isEndPointAndShouldBeSplit(nodeId, thisNode, neighNode,
                                           thisNodes, neighNodes);
-    } else if(thisNode.isDissolved()) {
-        return neighNode.isMove();
+    } else if(thisNode->isDissolved()) {
+        return neighNode->isMove();
 //        return isEndPointAndShouldBeSplit(nodeId, neighNode, thisNode,
 //                                          neighNodes, thisNodes);
     }
@@ -297,13 +297,13 @@ NodeList SmartPath::getNodesListFor(SmartPath * const neighbour) const {
     int iShift = 0;
     for(int i = 0; i <= iMax; i++) {
         const int resI = i + iShift;
-        Node& resultNode = result.at(resI);
-        const Node& neighbourNode = neighNodes.at(i);
-        const Node& thisNode = mNodesList.at(i);
+        Node * const resultNode = result.at(resI);
+        const Node * const neighbourNode = neighNodes.at(i);
+        const Node * const thisNode = mNodesList.at(i);
 
         // Remove nodes if not needed
-        if((neighbourNode.isDummy() || neighbourNode.isDissolved()) &&
-           (thisNode.isDummy() || thisNode.isDissolved())) {
+        if((neighbourNode->isDummy() || neighbourNode->isDissolved()) &&
+           (thisNode->isDummy() || thisNode->isDissolved())) {
             iShift--;
             result.removeNodeFromList(resI);
         }
@@ -311,11 +311,11 @@ NodeList SmartPath::getNodesListFor(SmartPath * const neighbour) const {
         // Create splits for connecting/disconnecting
         if(shouldSplitThisNode(i, thisNode, neighbourNode,
                                mNodesList, neighNodes)) {
-            if(thisNode.isDissolved()) {
+            if(thisNode->isDissolved()) {
                 result.promoteDissolvedNodeToNormal(resI);
                 result.splitNodeAndDisconnect(resI);
                 iShift += 2;
-            } else if(resultNode.isNormal()) {
+            } else if(resultNode->isNormal()) {
                 result.splitNode(resI);
                 iShift++;
             }

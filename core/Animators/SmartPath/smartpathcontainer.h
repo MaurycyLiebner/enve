@@ -41,10 +41,10 @@ public:
     void actionConnectNodes(const int& node1Id, const int& node2Id);
 
     void actionSetDissolvedNodeT(const int& nodeId, const qreal& t) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isDissolved()) RuntimeThrow("Setting dissolved node value "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isDissolved()) RuntimeThrow("Setting dissolved node value "
                                              "on a node of a different type");
-        node.fT = t;
+        node->fT = t;
         updateDissolvedNodePosition(nodeId, node);
     }
 
@@ -52,52 +52,52 @@ public:
                                    const QPointF& c0,
                                    const QPointF& p1,
                                    const QPointF& c2) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node.fC0 = c0;
-        node.fP1 = p1;
-        node.fC2 = c2;
+        node->fC0 = c0;
+        node->fP1 = p1;
+        node->fC2 = c2;
     }
 
     void actionSetNormalNodeP1(const int& nodeId, const QPointF& p1) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node.fP1 = p1;
+        node->fP1 = p1;
     }
 
     void actionSetNormalNodeC0(const int& nodeId, const QPointF& c0) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node.fC0 = c0;
+        node->fC0 = c0;
     }
 
     void actionSetNormalNodeC2(const int& nodeId, const QPointF& c2) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node.fC2 = c2;
+        node->fC2 = c2;
     }
 
     void actionSetNormalNodeCtrlsMode(const int& nodeId, const CtrlsMode& mode) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         mNodesList.setNodeCtrlsMode(nodeId, node, mode);
     }
 
     void actionSetNormalNodeC0Enabled(const int& nodeId, const bool& enabled) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         mNodesList.setNodeC0Enabled(nodeId, node, enabled);
     }
 
     void actionSetNormalNodeC2Enabled(const int& nodeId, const bool& enabled) {
-        Node& node = mNodesList.at(nodeId);
-        if(!node.isNormal()) RuntimeThrow("Setting normal node values "
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         mNodesList.setNodeC2Enabled(nodeId, node, enabled);
     }
@@ -115,7 +115,7 @@ public:
     const Node * getNodePtr(const int& id) const {
         if(id < 0) return nullptr;
         if(id >= mNodesList.count()) return nullptr;
-        return &mNodesList[id];
+        return mNodesList[id];
     }
 
     int prevNormalId(const int &nodeId) const {
@@ -132,7 +132,7 @@ public:
         mNodesList.updateDissolvedNodePosition(nodeId);
     }
 
-    void updateDissolvedNodePosition(const int& nodeId, Node& node) {
+    void updateDissolvedNodePosition(const int& nodeId, Node * const node) {
         mNodesList.updateDissolvedNodePosition(nodeId, node);
     }
 
@@ -140,16 +140,12 @@ public:
         mNodesList.updateDummyNodePosition(nodeId);
     }
 
-    void updateDummyNodePosition(const int& nodeId, Node& node) {
+    void updateDummyNodePosition(const int& nodeId, Node * const node) {
         mNodesList.updateDummyNodePosition(nodeId, node);
     }
 
     void save() {
-        mSavedList.clear();
-        const int iCount = mNodesList.count();
-        for(int i = 0; i < iCount; i++) {
-            mSavedList.append(mNodesList.at(i));
-        }
+        mSavedList = mNodesList.getList();
     }
 
     void restore() {
@@ -180,7 +176,7 @@ public:
         return mNodesList.write(dst);
     }
 protected:
-    SmartPath(const QList<Node> &list);
+    SmartPath(const ListOfNodes &list);
 
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
 
@@ -221,7 +217,7 @@ private:
     SmartPath * mNext = nullptr;
 
     NodeList mNodesList;
-    QList<Node> mSavedList;
+    ListOfNodes mSavedList;
 };
 
 #endif // SMARTPATHCONTAINER_H

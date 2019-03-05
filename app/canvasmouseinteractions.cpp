@@ -491,6 +491,7 @@ void Canvas::handleMovePointMousePressEvent() {
             if(mCurrentEdge) {
                 clearPointsSelection();
                 clearCurrentEndPoint();
+                clearCurrentSmartEndPoint();
                 clearLastPressedPoint();
             }
         }
@@ -740,6 +741,7 @@ void Canvas::handleMovePointMouseRelease() {
                 } else {
                     clearPointsSelection();
                     clearCurrentEndPoint();
+                    clearCurrentSmartEndPoint();
                     clearLastPressedPoint();
                     setCurrentBoxesGroup(pressedBox->getParentGroup());
                     addBoxToSelection(pressedBox);
@@ -756,6 +758,7 @@ void Canvas::handleMovePointMouseRelease() {
                 } else {
                     clearPointsSelection();
                     clearCurrentEndPoint();
+                    clearCurrentSmartEndPoint();
                     clearLastPressedPoint();
                     selectOnlyLastPressedBox();
                 }

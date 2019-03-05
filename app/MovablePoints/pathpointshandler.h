@@ -78,6 +78,7 @@ protected:
         updatePoints();
     }
 private:
+    void updateNextSegmentDnDForPoint(const int& nodeId);
     void updatePoint(const int& nodeId);
     void updatePoints();
     SmartNodePoint* createNewNodePoint(const int& nodeId);

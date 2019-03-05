@@ -9,19 +9,11 @@ class NodeList {
     friend class SmartPath;
     enum Neighbour { NONE, NEXT, PREV, BOTH = NEXT | PREV };
 public:
-    Node& operator[](const int& i) {
+    Node* operator[](const int& i) const {
         return mNodes[i];
     }
 
-    const Node& operator[](const int& i) const {
-        return mNodes[i];
-    }
-
-    Node& at(const int& i) {
-        return mNodes[i];
-    }
-
-    const Node& at(const int& i) const {
+    Node* at(const int& i) const {
         return mNodes[i];
     }
 
@@ -29,14 +21,14 @@ public:
         return mNodes.count();
     }
 
-    void setNodeType(const int& nodeId, const Node::Type& type) {
+    void setNodeType(const int& nodeId, const Node::Type& type) const {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeType(nodeId, mNodes[nodeId], type);
     }
 
-    void setNodeType(const int& nodeId, Node& node,
-                     const Node::Type& type) {
-        node.setType(type);
+    void setNodeType(const int& nodeId, Node * const node,
+                     const Node::Type& type) const {
+        node->setType(type);
         updateAfterNodeChanged(nodeId);
     }
 
@@ -45,10 +37,10 @@ public:
         setNodeCtrlsMode(nodeId, mNodes[nodeId], ctrlsMode);
     }
 
-    void setNodeCtrlsMode(const int& nodeId, Node& node,
+    void setNodeCtrlsMode(const int& nodeId, Node * const node,
                           const CtrlsMode& ctrlsMode) {
         Q_UNUSED(nodeId);
-        node.setCtrlsMode(ctrlsMode);
+        node->setCtrlsMode(ctrlsMode);
         //updateAfterNodeChanged(nodeId);
     }
 
@@ -57,10 +49,10 @@ public:
         setNodeC0Enabled(nodeId, mNodes[nodeId], enabled);
     }
 
-    void setNodeC0Enabled(const int& nodeId, Node& node,
+    void setNodeC0Enabled(const int& nodeId, Node * const node,
                           const bool& enabled) {
         Q_UNUSED(nodeId);
-        node.setC0Enabled(enabled);
+        node->setC0Enabled(enabled);
     }
 
     void setNodeC2Enabled(const int& nodeId, const bool& enabled) {
@@ -68,10 +60,10 @@ public:
         setNodeC2Enabled(nodeId, mNodes[nodeId], enabled);
     }
 
-    void setNodeC2Enabled(const int& nodeId, Node& node,
+    void setNodeC2Enabled(const int& nodeId, Node * const node,
                           const bool& enabled) {
         Q_UNUSED(nodeId);
-        node.setC2Enabled(enabled);
+        node->setC2Enabled(enabled);
     }
 
     void setNodeNextId(const int& nodeId, const int& nextId) {
@@ -79,9 +71,9 @@ public:
         setNodeNextId(nodeId, mNodes[nodeId], nextId);
     }
 
-    void setNodeNextId(const int& nodeId, Node& node,
+    void setNodeNextId(const int& nodeId, Node * const node,
                        const int& nextId) {
-        node.setNextNodeId(nextId);
+        node->setNextNodeId(nextId);
         updateAfterNodeChanged(nodeId);
     }
 
@@ -90,9 +82,9 @@ public:
         setNodePrevId(nodeId, mNodes[nodeId], prevId);
     }
 
-    void setNodePrevId(const int& nodeId, Node& node,
+    void setNodePrevId(const int& nodeId, Node * const node,
                        const int& prevId) {
-        node.setPrevNodeId(prevId);
+        node->setPrevNodeId(prevId);
         updateAfterNodeChanged(nodeId);
     }
 
@@ -102,21 +94,21 @@ public:
         setNodePrevAndNextId(nodeId, mNodes[nodeId], prevId, nextId);
     }
 
-    void setNodePrevAndNextId(const int& nodeId, Node& node,
+    void setNodePrevAndNextId(const int& nodeId, Node * const node,
                               const int& prevId, const int& nextId) {
-        node.setPrevNodeId(prevId);
-        node.setNextNodeId(nextId);
+        node->setPrevNodeId(prevId);
+        node->setNextNodeId(nextId);
         updateAfterNodeChanged(nodeId);
     }
 
-    void updateAfterNodeChanged(const int& nodeId) {
+    void updateAfterNodeChanged(const int& nodeId) const {
         if(mNoUpdates) return;
         updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mPrev) mPrev->updateNodeTypeAfterNeighbourChanged(nodeId);
         if(mNext) mNext->updateNodeTypeAfterNeighbourChanged(nodeId);
     }
 
-    bool updateNodeTypeAfterNeighbourChanged(const int &nodeId);
+    bool updateNodeTypeAfterNeighbourChanged(const int &nodeId) const;
     QList<int> updateAllNodesTypeAfterNeighbourChanged();
 
     int prevNormalId(const int &nodeId) const;
@@ -132,7 +124,7 @@ public:
     bool segmentClosed(const int &nodeId) const;
 
     int insertFirstNode(const Node &nodeBlueprint);
-    void promoteDissolvedNodeToNormal(const int &nodeId, Node &node);
+    void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);
     void promoteDissolvedNodeToNormal(const int &nodeId);
     void splitNode(const int &nodeId);
     void splitNodeAndDisconnect(const int &nodeId);
@@ -148,10 +140,10 @@ public:
         updateAllNodesTypeAfterNeighbourChanged();
     }
 
-    void moveNodeAfter(const int &moveNodeId, Node &moveNode,
-                       const int &afterNodeId, Node &afterNode);
-    void moveNodeBefore(const int &moveNodeId, Node &moveNode,
-                        const int &beforeNodeId, Node &beforeNode);
+    void moveNodeAfter(const int &moveNodeId, Node * const moveNode,
+                       const int &afterNodeId, Node * const afterNode);
+    void moveNodeBefore(const int &moveNodeId, Node * const moveNode,
+                        const int &beforeNodeId, Node * const beforeNode);
 
     int insertNodeBefore(const int &nextId, const Node &nodeBlueprint) {
         return insertNodeBefore(nextId, nodeBlueprint, BOTH);
@@ -162,10 +154,10 @@ public:
     }
 
     void updateDissolvedNodePosition(const int& nodeId);
-    void updateDissolvedNodePosition(const int &nodeId, Node &node);
+    void updateDissolvedNodePosition(const int &nodeId, Node * const node);
 
     void updateDummyNodePosition(const int& nodeId);
-    void updateDummyNodePosition(const int &nodeId, Node &node);
+    void updateDummyNodePosition(const int &nodeId, Node * const node);
 
     int appendNode(const Node &nodeBlueprint) {
         return appendNode(nodeBlueprint, BOTH);
@@ -185,15 +177,17 @@ protected:
     NodeList(const bool& noUpdates = false) :
         mNoUpdates(noUpdates) {}
 
-    NodeList(const QList<Node>& list,
+    NodeList(const ListOfNodes& list,
              const bool& noUpdates = false) :
-        mNoUpdates(noUpdates), mNodes(list) {}
+        mNoUpdates(noUpdates) {
+        mNodes = list;
+    }
 
-    const QList<Node>& getList() const {
+    const ListOfNodes& getList() const {
         return mNodes;
     }
 
-    void setNodeList(const QList<Node>& list) {
+    void setNodeList(const ListOfNodes& list) {
         mNodes = list;
         if(mNoUpdates) return;
         updateAllNodesTypeAfterNeighbourChanged();
@@ -223,12 +217,12 @@ protected:
 private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;
-    Node &insertNodeToList(const int &nodeId, const Node &node);
+    Node *insertNodeToList(const int &nodeId, const Node &node);
 
     const bool mNoUpdates;
     NodeList * mPrev = nullptr;
     NodeList * mNext = nullptr;
-    QList<Node> mNodes;
+    ListOfNodes mNodes;
 };
 
 #endif // NODELIST_H
