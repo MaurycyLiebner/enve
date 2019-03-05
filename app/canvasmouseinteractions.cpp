@@ -1009,7 +1009,7 @@ void Canvas::handleMovePointMouseMove() {
         if(mLastPressedPoint) {
             addPointToSelection(mLastPressedPoint);
 
-            if(mLastPressedPoint->isCtrlPoint() ) {
+            if(mLastPressedPoint->isCtrlPoint()) {
                 if(mFirstMouseMove) mLastPressedPoint->startTransform();
                 mLastPressedPoint->moveByAbs(
                         getMoveByValueForEventPos(mCurrentMouseEventPosRel));

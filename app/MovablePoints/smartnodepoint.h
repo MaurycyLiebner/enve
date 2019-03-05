@@ -93,7 +93,10 @@ public:
 
     NodePointValues getPointValues() const;
 
-    bool isNeighbourNormalSelected();
+    bool isPrevNormalSelected() const;
+    bool isNextNormalSelected() const;
+
+    bool isNeighbourNormalSelected() const;
     //void moveByAbs(const QPointF &absTranslatione);
 
     SmartNodePoint *getConnectedSeparateNodePoint();

@@ -78,16 +78,16 @@ void PathPointsHandler::updatePoint(const int &nodeId) {
 }
 
 void PathPointsHandler::updatePoints() {
-    int j = 0;
-    const int nodeCount = mCurrentTarget->getNodeCount();
-    while(j < mPoints.count() && j < nodeCount) {
-        updatePoint(j++);
+    const int oldCount = mPoints.count();
+    const int newCount = mCurrentTarget->getNodeCount();
+    for(int i = oldCount; i < newCount; i++) {
+        createNewNodePoint(i);
     }
-    while(j < nodeCount) {
-        createNewNodePoint(j++);
+    for(int i = 0; i < oldCount; i++) {
+        updatePoint(i);
     }
-    while(j < mPoints.count()) {
-        mPoints.removeAt(j++);
+    for(int i = newCount; i < oldCount; i++) {
+        mPoints.removeAt(i);
     }
 }
 
@@ -95,15 +95,18 @@ void PathPointsHandler::setCtrlsMode(const int &nodeId,
                                      const CtrlsMode &mode) {
     mCurrentTarget->actionSetNormalNodeCtrlsMode(nodeId, mode);
     updatePoint(nodeId);
+    mTargetAnimator->pathChanged();
 }
 
 void PathPointsHandler::removeNode(const int &nodeId) {
     mCurrentTarget->actionRemoveNormalNode(nodeId);
     updatePoints();
+    mTargetAnimator->pathChanged();
 }
 
 SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {
     const int id = mCurrentTarget->actionAddFirstNode(relPos, relPos, relPos);
+    mTargetAnimator->pathChanged();
     return createNewNodePoint(id);
 }
 
@@ -111,6 +114,7 @@ SmartNodePoint* PathPointsHandler::addNewAtEnd(const int &nodeId,
                                                const QPointF &relPos) {
     const int id = mCurrentTarget->actionAppendNodeAtEndNode(
                 nodeId, {relPos, relPos, relPos});
+    mTargetAnimator->pathChanged();
     return createNewNodePoint(id);
 }
 
@@ -161,12 +165,14 @@ void PathPointsHandler::divideSegment(const int &node1Id,
                                       const qreal &t) {
     mCurrentTarget->actionInsertNodeBetween(node1Id, node2Id, t);
     updatePoints();
+    mTargetAnimator->pathChanged();
 }
 
 void PathPointsHandler::createSegment(const int &node1Id,
                                       const int &node2Id) {
     mCurrentTarget->actionConnectNodes(node1Id, node2Id);
     updatePoints();
+    mTargetAnimator->pathChanged();
 }
 
 void PathPointsHandler::removeSegment(const NormalSegment &segment) {
@@ -178,4 +184,5 @@ void PathPointsHandler::removeSegment(const NormalSegment &segment) {
     const int node2Id = node2->getNodeId();
     mCurrentTarget->actionDisconnectNodes(node1Id, node2Id);
     updatePoints();
+    mTargetAnimator->pathChanged();
 }
