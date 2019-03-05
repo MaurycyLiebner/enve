@@ -154,6 +154,11 @@ protected:
 #include "smartPointers/stdselfref.h"
 class ListOfNodes {
 public:
+    ListOfNodes() {}
+    ListOfNodes(const ListOfNodes& other) {
+        this->operator=(other);
+    }
+
     void append(const Node& nodeBlueprint) {
         insert(mList.count(), nodeBlueprint);
     }

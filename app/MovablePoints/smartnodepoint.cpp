@@ -233,46 +233,60 @@ void SmartNodePoint::drawNodePoint(
         const SkScalar &invScale,
         const bool &keyOnCurrent) {
     canvas->save();
-    const SkColor fillCol = mSelected ?
-                SkColorSetRGB(0, 200, 255) :
-                SkColorSetRGB(170, 240, 255);
+
     const SkPoint absPos = qPointToSk(getAbsolutePos());
-    drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
+    if(getType() == Node::NORMAL) {
+        const SkColor fillCol = mSelected ?
+                    SkColorSetRGB(0, 200, 255) :
+                    SkColorSetRGB(170, 240, 255);
+        drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
 
-    if((mode == CanvasMode::MOVE_POINT && isNextNormalSelected()) ||
-       (mode == CanvasMode::ADD_SMART_POINT && mSelected)) {
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        if(mC2Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
-            const SkPoint endAbsPos = qPointToSk(mC2Pt->getAbsolutePos());
-            paint.setColor(SK_ColorBLACK);
-            paint.setStrokeWidth(1.5f*invScale);
-            paint.setStyle(SkPaint::kStroke_Style);
+        if((mode == CanvasMode::MOVE_POINT && isNextNormalSelected()) ||
+           (mode == CanvasMode::ADD_SMART_POINT && mSelected)) {
+            SkPaint paint;
+            paint.setAntiAlias(true);
+            if(mC2Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
+                const SkPoint endAbsPos = qPointToSk(mC2Pt->getAbsolutePos());
+                paint.setColor(SK_ColorBLACK);
+                paint.setStrokeWidth(1.5f*invScale);
+                paint.setStyle(SkPaint::kStroke_Style);
 
-            canvas->drawLine(absPos, endAbsPos, paint);
-            paint.setColor(SK_ColorWHITE);
-            paint.setStrokeWidth(0.75f*invScale);
-            canvas->drawLine(absPos, endAbsPos, paint);
+                canvas->drawLine(absPos, endAbsPos, paint);
+                paint.setColor(SK_ColorWHITE);
+                paint.setStrokeWidth(0.75f*invScale);
+                canvas->drawLine(absPos, endAbsPos, paint);
+            }
+            mC2Pt->drawSk(canvas, invScale);
         }
-        mC2Pt->drawSk(canvas, invScale);
-    }
-    if((mode == CanvasMode::MOVE_POINT && isPrevNormalSelected()) ||
-       (mode == CanvasMode::ADD_SMART_POINT && mSelected)) {
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        if(mC0Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
-            const SkPoint startAbsPos = qPointToSk(mC0Pt->getAbsolutePos());
-            paint.setColor(SK_ColorBLACK);
-            paint.setStrokeWidth(1.5f*invScale);
-            paint.setStyle(SkPaint::kStroke_Style);
-            canvas->drawLine(absPos, startAbsPos, paint);
+        if((mode == CanvasMode::MOVE_POINT && isPrevNormalSelected()) ||
+           (mode == CanvasMode::ADD_SMART_POINT && mSelected)) {
+            SkPaint paint;
+            paint.setAntiAlias(true);
+            if(mC0Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
+                const SkPoint startAbsPos = qPointToSk(mC0Pt->getAbsolutePos());
+                paint.setColor(SK_ColorBLACK);
+                paint.setStrokeWidth(1.5f*invScale);
+                paint.setStyle(SkPaint::kStroke_Style);
+                canvas->drawLine(absPos, startAbsPos, paint);
 
-            paint.setColor(SK_ColorWHITE);
-            paint.setStrokeWidth(0.75f*invScale);
-            canvas->drawLine(absPos, startAbsPos, paint);
+                paint.setColor(SK_ColorWHITE);
+                paint.setStrokeWidth(0.75f*invScale);
+                canvas->drawLine(absPos, startAbsPos, paint);
+            }
+            mC0Pt->drawSk(canvas, invScale);
         }
-        mC0Pt->drawSk(canvas, invScale);
+    } else if(getType() == Node::DISSOLVED) {
+        const SkColor fillCol = mSelected ?
+                    SkColorSetRGB(255, 0, 0) :
+                    SkColorSetRGB(255, 120, 120);
+        drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
+    } else if(getType() == Node::DUMMY) {
+        const SkColor fillCol = mSelected ?
+                    SkColorSetRGB(255, 255, 255) :
+                    SkColorSetRGB(220, 220, 220);
+        drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
     }
+
     if(MainWindow::isCtrlPressed()) {
         SkPaint paint;
         paint.setAntiAlias(true);
@@ -585,8 +599,14 @@ void SmartNodePoint::updateFromNodeData() {
 
     updateC0Visibility();
     updateC2Visibility();
-    if(getType() == Node::NORMAL) mType = TYPE_SMART_PATH_POINT;
-    else mType = TYPE_CTRL_POINT;
+    const auto type = getType();
+    if(type == Node::NORMAL) {
+        mType = TYPE_SMART_PATH_POINT;
+        mRadius = 6.5;
+    } else {
+        mType = TYPE_CTRL_POINT;
+        mRadius = (type == Node::DISSOLVED ? 5.5 : 4);
+    }
 }
 
 bool SmartNodePoint::isEndPoint() {

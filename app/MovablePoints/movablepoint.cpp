@@ -81,20 +81,19 @@ void MovablePoint::drawOnAbsPosSk(
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
     paint.setStrokeWidth(invScale);
-    canvas->drawCircle(absPos,
-                       scaledRadius, paint);
+    canvas->drawCircle(absPos, scaledRadius, paint);
 
     if(keyOnCurrent) {
+        const SkScalar halfRadius = scaledRadius*0.5f;
+
         paint.setColor(SK_ColorRED);
         paint.setStyle(SkPaint::kFill_Style);
-        canvas->drawCircle(absPos,
-                           scaledRadius*0.5f, paint);
+        canvas->drawCircle(absPos, halfRadius, paint);
 
         paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(0.5);
+        paint.setStrokeWidth(0.5f);
         paint.setColor(SK_ColorBLACK);
-        canvas->drawCircle(absPos,
-                           scaledRadius*0.5f, paint);
+        canvas->drawCircle(absPos, halfRadius, paint);
     }
     canvas->restore();
 }

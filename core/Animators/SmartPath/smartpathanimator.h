@@ -17,11 +17,15 @@ public:
     }
 
     void updateAfterPrevKeyChanged(Key * const prevKey) {
-        mValue.setPrev(&static_cast<SmartPathKey*>(prevKey)->getValue());
+        const auto spk = static_cast<SmartPathKey*>(prevKey);
+        if(prevKey) mValue.setPrev(&spk->getValue());
+        else mValue.setPrev(nullptr);
     }
 
     void updateAfterNextKeyChanged(Key * const nextKey) {
-        mValue.setNext(&static_cast<SmartPathKey*>(nextKey)->getValue());
+        const auto spk = static_cast<SmartPathKey*>(nextKey);
+        if(nextKey) mValue.setNext(&spk->getValue());
+        else mValue.setNext(nullptr);
     }
 
     void assignValue(const SmartPath& value) {
@@ -90,7 +94,7 @@ public:
                 const qreal iFrame = gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
                 const qreal dFrame = nextFrame - prevFrame;
                 const qreal nWeight = (iFrame - prevFrame)/dFrame;
-                return prevKey->getValue().interpolateWithNext(nWeight);
+                return nextKey->getValue().interpolateWithPrev(nWeight);
             }
         }
         return mBaseValue.getPathAt();
