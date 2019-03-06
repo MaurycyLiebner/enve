@@ -119,7 +119,7 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
     for(int i = 0; i < listCount; i++) {
         const Node * const node1 = list1v.at(i);
         const Node * const node2 = list2v.at(i);
-        resultList.append(Node::sInterpolateNormal(*node1, *node2, weight2));
+        resultList.append(Node::sInterpolate(*node1, *node2, weight2));
     }
     return NodeList(resultList);
 }

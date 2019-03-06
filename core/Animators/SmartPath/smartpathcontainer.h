@@ -176,9 +176,10 @@ public:
                              const SmartPath &path2,
                              const qreal &path2Weight,
                              SmartPath& target) {
-        const auto list = NodeList::sInterpolate(path1.getNodesListFor(&path2),
-                                                 path2.getNodesListFor(&path1),
-                                                 path2Weight);
+        const auto list = NodeList::sInterpolate(
+                    path1.getNodesListFor(&path2, false),
+                    path2.getNodesListFor(&path1, false),
+                    path2Weight);
         target.getNodesPtr()->setNodeList(list.getList());
     }
 
@@ -208,19 +209,22 @@ protected:
         return mNodesList;
     }
 
-    NodeList getNodesListForPrev() const {
+    NodeList getNodesListForPrev(const bool& simplify) const {
         if(!mPrev) return mNodesList;
-        return getNodesListFor(mPrev);
+        return getNodesListFor(mPrev, simplify);
     }
 
-    NodeList getNodesListForNext() const {
+    NodeList getNodesListForNext(const bool& simplify) const {
         if(!mNext) return mNodesList;
-        return getNodesListFor(mNext);
+        return getNodesListFor(mNext, simplify);
     }
-    NodeList interpolateNodesListWithNext(const qreal& nextWeight) const;
-    NodeList interpolateNodesListWithPrev(const qreal& prevWeight) const;
+    NodeList interpolateNodesListWithNext(const qreal& nextWeight,
+                                          const bool &simplify) const;
+    NodeList interpolateNodesListWithPrev(const qreal& prevWeight,
+                                          const bool &simplify) const;
 private:
-    NodeList getNodesListFor(const SmartPath * const neighbour) const;
+    NodeList getNodesListFor(const SmartPath * const neighbour,
+                             const bool &simplify) const;
     SkPath getPathFor(const SmartPath * const neighbour) const;
     int insertNodeBetween(const int &prevId, const int &nextId,
                           const Node &nodeBlueprint);

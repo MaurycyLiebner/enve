@@ -231,16 +231,16 @@ ValueRange SmartPath::dissolvedTRange(const int &nodeId) {
 }
 
 NodeList SmartPath::interpolateNodesListWithNext(
-        const qreal &nextWeight) const {
-    return NodeList::sInterpolate(getNodesListForNext(),
-                                  mNext->getNodesListForPrev(),
+        const qreal &nextWeight, const bool& simplify) const {
+    return NodeList::sInterpolate(getNodesListForNext(simplify),
+                                  mNext->getNodesListForPrev(simplify),
                                   nextWeight);
 }
 
 NodeList SmartPath::interpolateNodesListWithPrev(
-        const qreal &prevWeight) const {
-    return NodeList::sInterpolate(getNodesListForPrev(),
-                                  mPrev->getNodesListForNext(),
+        const qreal &prevWeight, const bool &simplify) const {
+    return NodeList::sInterpolate(getNodesListForPrev(simplify),
+                                  mPrev->getNodesListForNext(simplify),
                                   prevWeight);
 }
 
@@ -287,7 +287,8 @@ bool shouldSplitThisNode(const int& nodeId,
     return false;
 }
 
-NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour) const {
+NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour,
+                                    const bool &simplify) const {
     const NodeList& neighNodes = neighbour->getNodesRef();
     NodeList result = mNodesList.createCopy(true);
 
@@ -305,8 +306,13 @@ NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour) const {
         // Remove nodes if not needed
         if((neighbourNode->isDummy() || neighbourNode->isDissolved()) &&
            (thisNode->isDummy() || thisNode->isDissolved())) {
-            iShift--;
-            result.removeNodeFromList(resI);
+            if(simplify) {
+                iShift--;
+                result.removeNodeFromList(resI);
+            } else if(thisNode->isDummy() && neighbourNode->isDissolved()) {
+                resultNode->fT = 0.5;
+                result.setNodeType(resI, resultNode, Node::DISSOLVED);
+            }
         }
 
         // Create splits for connecting/disconnecting
@@ -326,5 +332,5 @@ NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour) const {
 }
 
 SkPath SmartPath::getPathFor(const SmartPath * const neighbour) const {
-    return getNodesListFor(neighbour).toSkPath();
+    return getNodesListFor(neighbour, true).toSkPath();
 }

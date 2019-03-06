@@ -70,6 +70,9 @@ struct Node {
         return fC2Enabled;
     }
 
+    static Node sInterpolate(const Node& node1, const Node& node2,
+                             const qreal &weight2);
+
     static Node sInterpolateNormal(const Node& node1, const Node& node2,
                                    const qreal &weight2);
 
