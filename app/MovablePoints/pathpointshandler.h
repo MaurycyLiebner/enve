@@ -62,29 +62,23 @@ public:
 
 
     SmartNodePoint* getPrevNormalNode(const int& startId) const {
-        return getPointWithId(mCurrentTarget->prevNormalId(startId));
+        return getPointWithId(targetPath()->prevNormalId(startId));
     }
 
     SmartNodePoint* getNextNormalNode(const int& startId) const {
-        return getPointWithId(mCurrentTarget->nextNormalId(startId));
+        return getPointWithId(targetPath()->nextNormalId(startId));
     }
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
-
-    void setCurrentlyEditedPath(SmartPath * const currentTarget) {
-        if(currentTarget == mCurrentTarget) return;
-        mCurrentTarget = currentTarget;
-        updatePoints();
-    }
 private:
     void updateNextSegmentDnDForPoint(const int& nodeId);
     void updatePoint(const int& nodeId);
     void updatePoints();
     SmartNodePoint* createNewNodePoint(const int& nodeId);
+    SmartPath* targetPath() const;
 
     QList<stdsptr<SmartNodePoint>> mPoints;
-    SmartPath* mCurrentTarget;
     SmartPathAnimator * const mTargetAnimator;
     BasicTransformAnimator * const mParentTransform;
     bool mKeyOnCurrentFrame = false;

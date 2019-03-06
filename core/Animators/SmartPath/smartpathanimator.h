@@ -92,12 +92,17 @@ public:
         }
     }
 
-    SmartPath* startPathChange() {
+    void beforeBinaryPathChange() {
+        if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
+            anim_saveCurrentValueAsKey();
+        }
+    }
+
+    void startPathChange() {
         if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
         }
         mPathBeingChanged_d->save();
-        return mPathBeingChanged_d;
     }
 
     void pathChanged() {
@@ -110,7 +115,6 @@ public:
     }
 
     void cancelPathChange() {
-        if(!mPathBeingChanged_d) return;
         mPathBeingChanged_d->restore();
         const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
         if(spk) {
@@ -121,7 +125,6 @@ public:
     }
 
     void finishPathChange() {
-        if(!mPathBeingChanged_d) return;
         const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
         if(spk) {
             anim_updateAfterChangedKey(spk);
