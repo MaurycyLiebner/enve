@@ -18,11 +18,9 @@
 
 SmartVectorPath::SmartVectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH),
-    mHandler(mTransformAnimator.get()) {
+    mHandler(mTransformAnimator.get(), this) {
     setName("Path");
     mPathAnimator = mHandler.getAnimator();
-    mPathAnimator->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
-    mPathAnimator->prp_blockUpdater();
     ca_addChildAnimator(GetAsSPtr(mPathAnimator, Property));
     ca_moveChildBelow(mPathAnimator.data(), mEffectsAnimators.data());
 }

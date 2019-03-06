@@ -12,6 +12,7 @@ class SmartPathAnimator;
 class MovablePoint;
 class NormalSegment;
 class SmartNodePoint;
+class SmartVectorPath;
 class Canvas;
 enum CanvasMode : short;
 #include "skia/skiaincludes.h"
@@ -19,7 +20,8 @@ enum CanvasMode : short;
 class SmartPathCollectionHandler {
 public:
     SmartPathCollectionHandler(
-            BasicTransformAnimator * const parentTransform);
+            BasicTransformAnimator * const parentTransform,
+            SmartVectorPath* const parentPath);
 
     SmartNodePoint *createNewSubPathAtPos(const QPointF& pos);
     NormalSegment getNormalSegmentAtAbsPos(const QPointF &absPos,
@@ -46,6 +48,7 @@ private:
     const qsptr<SmartPathCollection> mAnimator;
     QList<stdsptr<PathPointsHandler>> mPointsHandlers;
     qptr<BasicTransformAnimator> mParentTransform;
+    SmartVectorPath * const mParentPath;
 };
 
 #endif // SMARTPATHCOLLECTIONHANDLER_H

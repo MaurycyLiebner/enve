@@ -12,6 +12,7 @@ public:
     bool SWT_isSmartPathAnimator() const { return true; }
 
     void anim_setAbsFrame(const int &frame) {
+        if(frame == anim_mCurrentAbsFrame) return;
         const int lastRelFrame = anim_mCurrentRelFrame;
         Animator::anim_setAbsFrame(frame);
         if(this->anim_hasKeys()) {
@@ -19,16 +20,20 @@ public:
             const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_mCurrentRelFrame);
             const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);
             const auto nextK2 = anim_getNextKey<SmartPathKey>(anim_mCurrentRelFrame);
-            if(!prevK1 && !prevK2) return;
-            if(!nextK1 && !nextK2) return;
-            if(!anim_getKeyOnCurrentFrame()) {
+            const auto keyAtFrame1 = anim_getKeyAtRelFrame(lastRelFrame);
+            if(!prevK1 && !prevK2 && !keyAtFrame1) return;
+            if(!nextK1 && !nextK2 && !keyAtFrame1) return;
+            if(!prevK2) {
+                mBaseValue.assign(nextK2->getValue());
+            } else if(!nextK2) {
+                mBaseValue.assign(prevK2->getValue());
+            } else {
                 const qreal nWeight =
                         prevKeyWeight(prevK2, nextK2, anim_mCurrentRelFrame);
                 gInterpolate(prevK2->getValue(), nextK2->getValue(),
                              nWeight, mBaseValue);
             }
             this->anim_callFrameChangeUpdater();
-            emit pathChangedAfterFrameChange();
         }
     }
 

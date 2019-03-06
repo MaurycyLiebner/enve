@@ -339,14 +339,14 @@ void gCubicTo(const Node& prevNode, const Node& nextNode,
         result.cubicTo(qPointToSk(first.c1()),
                        qPointToSk(first.c2()),
                        qPointToSk(first.p1()));
-        qDebug() << "Cubic to:" << first.p1();
+        //qDebug() << "Cubic to:" << first.p1();
         seg = div.second;
         lastT = t;
     }
     result.cubicTo(qPointToSk(seg.c1()),
                    qPointToSk(seg.c2()),
                    qPointToSk(seg.p1()));
-    qDebug() << "Cubic to:" << seg.p1();
+    //qDebug() << "Cubic to:" << seg.p1();
     dissolvedTs.clear();
 }
 
@@ -384,7 +384,7 @@ SkPath NodeList::toSkPath() const {
                 if(move) {
                     firstNode = node;
                     currPath.moveTo(qPointToSk(node->fP1));
-                    qDebug() << "Move to:" << node->fP1;
+                    //qDebug() << "Move to:" << node->fP1;
                     move = false;
                 } else {
                     gCubicTo(*prevNormalNode, *node,

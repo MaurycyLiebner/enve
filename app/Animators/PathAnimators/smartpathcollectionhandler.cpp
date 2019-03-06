@@ -3,11 +3,15 @@
 #include "MovablePoints/pathpointshandler.h"
 #include "MovablePoints/segment.h"
 #include "Animators/transformanimator.h"
+#include "Animators/SmartPath/smartpathanimator.h"
+#include "PropertyUpdaters/smartnodepointupdater.h"
 
 SmartPathCollectionHandler::SmartPathCollectionHandler(
-        BasicTransformAnimator * const parentTransform) :
+        BasicTransformAnimator * const parentTransform,
+        SmartVectorPath* const parentPath) :
     mAnimator(SPtrCreate(SmartPathCollection)()),
-    mParentTransform(parentTransform) {}
+    mParentTransform(parentTransform),
+    mParentPath(parentPath) {}
 
 SmartNodePoint *SmartPathCollectionHandler::createNewSubPathAtPos(
         const QPointF &pos) {
@@ -19,6 +23,9 @@ PathPointsHandler *SmartPathCollectionHandler::createNewPath() {
     const auto newAnimator = mAnimator->createNewPath();
     const auto newHandler = SPtrCreate(PathPointsHandler)(
                 newAnimator, mParentTransform);
+    newAnimator->prp_setUpdater(SPtrCreate(SmartNodePointUpdater)(
+                                    mParentPath, newHandler.get()));
+    newAnimator->prp_blockUpdater();
     mPointsHandlers.append(newHandler);
     return newHandler.get();
 }

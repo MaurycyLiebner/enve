@@ -5,13 +5,12 @@ class PathBox;
 
 class NodePointUpdater : public PropertyUpdater {
 public:
-    NodePointUpdater(PathBox *vectorPath);
+    NodePointUpdater(PathBox * const pathBox);
 
     void update();
-
     void frameChangeUpdate();
 private:
-    PathBox *mTarget;
+    PathBox * const mTarget;
 };
 
 #endif // NODEPOINTUPDATER_H

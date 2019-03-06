@@ -68,20 +68,28 @@ public:
     SmartNodePoint* getNextNormalNode(const int& startId) const {
         return getPointWithId(targetPath()->nextNormalId(startId));
     }
+
+    void updateAllPoints();
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
 private:
     void updateNextSegmentDnDForPoint(const int& nodeId);
     void updatePoint(const int& nodeId);
-    void updatePoints();
     SmartNodePoint* createNewNodePoint(const int& nodeId);
     SmartPath* targetPath() const;
+    void blockAllPointsUpdate() {
+        mBlockAllPointsUpdate = true;
+    }
+    void unblockAllPointsUpdate() {
+        mBlockAllPointsUpdate = false;
+    }
 
     QList<stdsptr<SmartNodePoint>> mPoints;
     SmartPathAnimator * const mTargetAnimator;
     BasicTransformAnimator * const mParentTransform;
     bool mKeyOnCurrentFrame = false;
+    bool mBlockAllPointsUpdate = false;
 };
 
 #endif // PATHPOINTSHANDLER_H

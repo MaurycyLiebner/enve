@@ -1,9 +1,8 @@
 #include "nodepointupdater.h"
 #include "Boxes/pathbox.h"
 
-NodePointUpdater::NodePointUpdater(PathBox *vectorPath) {
-    mTarget = vectorPath;
-}
+NodePointUpdater::NodePointUpdater(PathBox * const pathBox) :
+    mTarget(pathBox) {}
 
 void NodePointUpdater::update() {
     mTarget->scheduleUpdate(Animator::USER_CHANGE);

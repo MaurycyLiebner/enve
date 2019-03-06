@@ -157,7 +157,7 @@ void MemoryChecker::checkMajorMemoryPageFault() {
         avgPgFlts += sample;
     }
     avgPgFlts = avgPgFlts/mPgFltSamples.count();
-    qDebug() << "avg pgflts: " << avgPgFlts;
+    //qDebug() << "avg pgflts: " << avgPgFlts;
     if(avgPgFlts > mCurrentMemoryState) {
         if(mCurrentMemoryState == LOW_MEMORY_STATE &&
                 avgPgFlts > VERY_LOW_MEMORY_STATE) {
@@ -169,7 +169,7 @@ void MemoryChecker::checkMajorMemoryPageFault() {
     } else {
         if(mCurrentMemoryState == LOW_MEMORY_STATE) {
             unsigned long long freeMem = getFreeRam();
-            qDebug() << "freemem: " << freeMem;
+            //qDebug() << "freemem: " << freeMem;
 
             if(freeMem > mLowFreeRam) {
                 setCurrentMemoryState(NORMAL_MEMORY_STATE);
