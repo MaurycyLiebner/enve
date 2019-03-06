@@ -12,6 +12,8 @@
 class SmartPath {
 public:
     SmartPath();
+    SmartPath(const SmartPath &list);
+
     void actionRemoveNormalNode(const int& nodeId);
 
     int actionAddFirstNode(const QPointF& c0,
@@ -153,7 +155,7 @@ public:
     }
 
     SmartPath createCopy() const {
-        return SmartPath(mNodesList.getList());
+        return SmartPath(*this);
     }
 
     int getNodeCount() const {
@@ -164,10 +166,22 @@ public:
         mNodesList.setNodeList(src.getNodesRef().getList());
     }
 
-    static bool sDifferent(const SmartPath& path1, const SmartPath& path2) {
+    static bool sDifferent(const SmartPath& path1,
+                           const SmartPath& path2) {
         return NodeList::sDifferent(path1.getNodesRef(),
                                     path2.getNodesRef());
     }
+
+    static void sInterpolate(const SmartPath &path1,
+                             const SmartPath &path2,
+                             const qreal &path2Weight,
+                             SmartPath& target) {
+        const auto list = NodeList::sInterpolate(path1.getNodesListFor(&path2),
+                                                 path2.getNodesListFor(&path1),
+                                                 path2Weight);
+        target.getNodesPtr()->setNodeList(list.getList());
+    }
+
     bool read(QIODevice * const src) {
         return mNodesList.read(src);
     }
@@ -176,8 +190,6 @@ public:
         return mNodesList.write(dst);
     }
 protected:
-    SmartPath(const ListOfNodes &list);
-
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
 
     void removeNodeWithIdAndTellNextToDoSame(const int& nodeId);
@@ -208,8 +220,8 @@ protected:
     NodeList interpolateNodesListWithNext(const qreal& nextWeight) const;
     NodeList interpolateNodesListWithPrev(const qreal& prevWeight) const;
 private:
-    NodeList getNodesListFor(SmartPath * const neighbour) const;
-    SkPath getPathFor(SmartPath * const neighbour) const;
+    NodeList getNodesListFor(const SmartPath * const neighbour) const;
+    SkPath getPathFor(const SmartPath * const neighbour) const;
     int insertNodeBetween(const int &prevId, const int &nextId,
                           const Node &nodeBlueprint);
 

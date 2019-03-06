@@ -1,6 +1,7 @@
 #ifndef BASEDKEYT_H
 #define BASEDKEYT_H
 #include "key.h"
+#include "differsinterpolate.h"
 
 template <typename B, typename T>
 class BasedKeyT : public B {

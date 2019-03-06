@@ -16,7 +16,10 @@ extern void gInterpolate(const qCubicSegment1D& val1,
                          const qreal& t,
                          qCubicSegment1D& val);
 
-
 extern bool gDiffers(const SmartPath& path1, const SmartPath& path2);
+extern void gInterpolate(const SmartPath& path1,
+                         const SmartPath& path2,
+                         const qreal& path2Weight,
+                         SmartPath& target);
 
 #endif // DIFFERSINTERPOLATE_H

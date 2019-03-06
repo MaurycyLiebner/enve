@@ -1,5 +1,13 @@
 ﻿#include "smartpathcontainer.h"
 
+SmartPath::SmartPath() :
+  mNodesList(false) {}
+
+SmartPath::SmartPath(const SmartPath &other) :
+    SmartPath() {
+    mNodesList.setNodeList(other.getNodesRef().getList());
+}
+
 void SmartPath::actionRemoveNormalNode(const int &nodeId) {
     Node * const node = mNodesList.at(nodeId);
     if(!node->isNormal())
@@ -236,13 +244,6 @@ NodeList SmartPath::interpolateNodesListWithPrev(
                                   prevWeight);
 }
 
-SmartPath::SmartPath() : SmartPath(ListOfNodes()) {}
-
-SmartPath::SmartPath(const ListOfNodes &list) :
-    mNodesList(false) {
-    mNodesList.setNodeList(list);
-}
-
 SkPath SmartPath::getPathForPrev() const {
     if(mPrev) return getPathFor(mPrev);
     return mNodesList.toSkPath();
@@ -286,7 +287,7 @@ bool shouldSplitThisNode(const int& nodeId,
     return false;
 }
 
-NodeList SmartPath::getNodesListFor(SmartPath * const neighbour) const {
+NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour) const {
     const NodeList& neighNodes = neighbour->getNodesRef();
     NodeList result = mNodesList.createCopy(true);
 
@@ -324,6 +325,6 @@ NodeList SmartPath::getNodesListFor(SmartPath * const neighbour) const {
     return result;
 }
 
-SkPath SmartPath::getPathFor(SmartPath * const neighbour) const {
+SkPath SmartPath::getPathFor(const SmartPath * const neighbour) const {
     return getNodesListFor(neighbour).toSkPath();
 }

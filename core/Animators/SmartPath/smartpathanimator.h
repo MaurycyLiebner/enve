@@ -1,43 +1,9 @@
 ﻿#ifndef SMARTPATHANIMATOR_H
 #define SMARTPATHANIMATOR_H
-#include "smartpathcontainer.h"
 #include "Animators/interpolationanimatort.h"
 #include "differsinterpolate.h"
 #include "basicreadwrite.h"
-
-class SmartPathKey : public InterpolationKeyT<SmartPath> {
-    friend class StdSelfRef;
-public:
-    void save() {
-        mValue.save();
-    }
-
-    void restore() {
-        mValue.restore();
-    }
-
-    void updateAfterPrevKeyChanged(Key * const prevKey) {
-        const auto spk = static_cast<SmartPathKey*>(prevKey);
-        if(prevKey) mValue.setPrev(&spk->getValue());
-        else mValue.setPrev(nullptr);
-    }
-
-    void updateAfterNextKeyChanged(Key * const nextKey) {
-        const auto spk = static_cast<SmartPathKey*>(nextKey);
-        if(nextKey) mValue.setNext(&spk->getValue());
-        else mValue.setNext(nullptr);
-    }
-
-    void assignValue(const SmartPath& value) {
-        mValue.assign(value);
-    }
-protected:
-    SmartPathKey(const SmartPath& value, const int &relFrame,
-                 Animator * const parentAnimator) :
-        InterpolationKeyT<SmartPath>(value, relFrame, parentAnimator) {}
-    SmartPathKey(Animator * const parentAnimator) :
-        InterpolationKeyT<SmartPath>(parentAnimator) {}
-};
+#include "smartpathkey.h"
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
@@ -49,12 +15,18 @@ public:
         const int lastRelFrame = anim_mCurrentRelFrame;
         Animator::anim_setAbsFrame(frame);
         if(this->anim_hasKeys()) {
-            const auto prevK1 = anim_getPrevKey(lastRelFrame);
-            const auto prevK2 = anim_getPrevKey(anim_mCurrentRelFrame);
-            const auto nextK1 = anim_getNextKey(lastRelFrame);
-            const auto nextK2 = anim_getNextKey(anim_mCurrentRelFrame);
+            const auto prevK1 = anim_getPrevKey<SmartPathKey>(lastRelFrame);
+            const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_mCurrentRelFrame);
+            const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);
+            const auto nextK2 = anim_getNextKey<SmartPathKey>(anim_mCurrentRelFrame);
             if(!prevK1 && !prevK2) return;
             if(!nextK1 && !nextK2) return;
+            if(!anim_getKeyOnCurrentFrame()) {
+                const qreal nWeight =
+                        prevKeyWeight(prevK2, nextK2, anim_mCurrentRelFrame);
+                gInterpolate(prevK2->getValue(), nextK2->getValue(),
+                             nWeight, mBaseValue);
+            }
             this->anim_callFrameChangeUpdater();
             emit pathChangedAfterFrameChange();
         }
@@ -68,6 +40,26 @@ public:
             GraphKey *key, const QrealPointType &type,
             qreal &minValue, qreal &maxValue) const;
 
+    qreal prevKeyWeight(const SmartPathKey * const prevKey,
+                        const SmartPathKey * const nextKey,
+                        const qreal & frame) const {
+        const qreal prevFrame = prevKey->getRelFrame();
+        const qreal nextFrame = nextKey->getRelFrame();
+
+        const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
+                                  prevKey->getEndFrame(),
+                                  nextKey->getStartFrame(),
+                                  qreal(nextKey->getRelFrame())};
+        const qreal t = gTFromX(seg, frame);
+        const qreal p0y = prevKey->getValueForGraph();
+        const qreal p1y = prevKey->getEndValue();
+        const qreal p2y = nextKey->getStartValue();
+        const qreal p3y = nextKey->getValueForGraph();
+        const qreal iFrame = gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
+        const qreal dFrame = nextFrame - prevFrame;
+        const qreal pWeight = (iFrame - prevFrame)/dFrame;
+        return pWeight;
+    }
 
     SkPath getPathAtRelFrame(const qreal &frame) const {
         if(this->anim_mKeys.isEmpty()) return mBaseValue.getPathAt();
@@ -80,23 +72,8 @@ public:
                 return nextKey->getValue().getPathAt();
             } else {
                 const auto prevKey = anim_getKeyAtIndex<SmartPathKey>(prevId);
-
-                const qreal prevFrame = prevKey->getRelFrame();
-                const qreal nextFrame = nextKey->getRelFrame();
-
-                const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                                          prevKey->getEndFrame(),
-                                          nextKey->getStartFrame(),
-                                          qreal(nextKey->getRelFrame())};
-                const qreal t = gTFromX(seg, frame);
-                const qreal p0y = prevKey->getValueForGraph();
-                const qreal p1y = prevKey->getEndValue();
-                const qreal p2y = nextKey->getStartValue();
-                const qreal p3y = nextKey->getValueForGraph();
-                const qreal iFrame = gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
-                const qreal dFrame = nextFrame - prevFrame;
-                const qreal nWeight = (iFrame - prevFrame)/dFrame;
-                return nextKey->getValue().interpolateWithPrev(nWeight);
+                const qreal pWeight = prevKeyWeight(prevKey, nextKey, frame);
+                return nextKey->getValue().interpolateWithPrev(pWeight);
             }
         }
         return mBaseValue.getPathAt();
