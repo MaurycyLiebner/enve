@@ -311,7 +311,7 @@ NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour,
     const NodeList& neighNodes = neighbour->getNodesRef();
     NodeList result = mNodesList.createCopy(true);
 
-    int iMax = neighNodes.count() - 1;
+    const int iMax = neighNodes.count() - 1;
     if(result.count() - 1 != iMax)
         RuntimeThrow("Nodes count does not match");
 

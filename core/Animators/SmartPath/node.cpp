@@ -17,9 +17,9 @@ Node Node::sInterpolate(const Node &node1, const Node &node2,
     else if(node1.isMove() && node2.isMove())
         result = Node(Node::MOVE);
     else RuntimeThrow("Unsupported");
-    if(node1.getNextNodeId() != node2.getNextNodeId() ||
-       node1.getPrevNodeId() != node2.getPrevNodeId())
-        RuntimeThrow("Cannot interpolate neighbours");
+//    if(node1.getNextNodeId() != node2.getNextNodeId() ||
+//       node1.getPrevNodeId() != node2.getPrevNodeId())
+//        RuntimeThrow("Cannot interpolate neighbours");
     result.setNextNodeId(node1.getNextNodeId());
     result.setPrevNodeId(node1.getPrevNodeId());
     return result;

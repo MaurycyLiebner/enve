@@ -86,19 +86,18 @@ void PathPointsHandler::setPointOutdated(const int &nodeId) {
 
 void PathPointsHandler::updateAllPoints() {
     if(mBlockAllPointsUpdate) return;
-    const int oldCount = mPoints.count();
     const int newCount = targetPath()->getNodeCount();
-    for(int i = oldCount; i < newCount; i++) {
-        createNewNodePoint(i);
+    while(newCount < mPoints.count()) {
+        mPoints.removeLast();
     }
-    for(int i = 0; i < oldCount; i++) {
+    for(int i = 0; i < mPoints.count(); i++) {
         setPointOutdated(i);
     }
-    for(int i = 0; i < oldCount; i++) {
+    for(int i = 0; i < mPoints.count(); i++) {
         updatePoint(i);
     }
-    for(int i = newCount; i < oldCount; i++) {
-        mPoints.removeAt(i);
+    while(mPoints.count() < newCount) {
+        createNewNodePoint(mPoints.count());
     }
 }
 
