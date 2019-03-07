@@ -260,13 +260,32 @@ bool isEndPointAndShouldBeSplit(const int& nodeId,
                                 const NodeList &thisNodes,
                                 const NodeList &neighNodes) {
     if(!thisNodes.segmentClosed(nodeId)) {
+        if(neighNodes.segmentClosed(nodeId)) {
+            const int thisFirstId = thisNodes.firstSegmentNode(nodeId);
+            if(thisFirstId == nodeId) return true;
+            const int thisLastId = thisNodes.lastSegmentNode(nodeId);
+            if(thisLastId == thisNode->getNextNodeId()) return true;
+        }
+        // old ?
+        const int thisFirstId = thisNodes.firstSegmentNode(nodeId);
+        const int neighFirstId = neighNodes.firstSegmentNode(nodeId);
+        if(thisFirstId == nodeId && neighFirstId != nodeId) return true;
         const int thisLastId = thisNodes.lastSegmentNode(nodeId);
         const int neighLastId = neighNodes.lastSegmentNode(nodeId);
         if(thisLastId == thisNode->getNextNodeId() &&
            neighLastId != neighNode->getNextNodeId()) return true;
-        const int thisFirstId = thisNodes.firstSegmentNode(nodeId);
-        const int neighFirstId = neighNodes.firstSegmentNode(nodeId);
-        if(thisFirstId == nodeId && neighFirstId != nodeId) return true;
+
+        // new
+//        if(thisFirstId == nodeId) {
+//            const Node * const thisFirstNode = thisNodes.at(thisFirstId);
+//            const Node * neighFirstNode = neighNodes.at(neighFirstId);
+//            if(thisFirstNode->getPrevNodeId() !) return true;
+//        }
+//        if(thisLastId == thisNode->getNextNodeId()) {
+//            const Node * const thisLastNode = thisNodes.at(thisLastId);
+//            const Node * const neighLastNode = neighNodes.at(neighLastId);
+//            if(thisLastNode->isMove() && !neighLastNode->isMove()) return true;
+//        }
     }
     return false;
 }

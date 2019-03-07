@@ -322,12 +322,22 @@ void NodeList::splitNode(const int& nodeId) {
         node->fC2 = node->fP1;
         newNode.fC0 = newNode.fP1;
     }
-    insertNodeAfter(nodeId, newNode);
+    const int nextNormalIdV = nextNormalId(nodeId);
+    if(nextNormalIdV == -1 ? false :
+       nextNormalIdV == firstSegmentNode(nextNormalIdV)) {
+        insertNodeBefore(nextNormalIdV, newNode);
+    } else insertNodeAfter(nodeId, newNode);
 }
 
 void NodeList::splitNodeAndDisconnect(const int& nodeId) {
+    int moveInsertId = nodeId;
+    const int nextNormalIdV = nextNormalId(nodeId);
+    if(nextNormalIdV == -1 ? false :
+       nextNormalIdV == firstSegmentNode(nextNormalIdV)) {
+        moveInsertId++;
+    }
     splitNode(nodeId);
-    insertNodeAfter(nodeId, Node(Node::MOVE));
+    insertNodeAfter(moveInsertId, Node(Node::MOVE));
 }
 
 bool NodeList::nodesConnected(const int& node1Id,
