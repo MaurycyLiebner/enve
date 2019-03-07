@@ -77,7 +77,7 @@ void PathPointsHandler::updateNextSegmentDnDForPoint(const int &nodeId) {
 }
 
 void PathPointsHandler::updatePoint(const int &nodeId) {
-    mPoints.at(nodeId)->updateNode();
+    mPoints.at(nodeId)->setNodeId(nodeId);
 }
 
 void PathPointsHandler::updateAllPoints() {
@@ -146,6 +146,7 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
     qreal minDist = TEN_MIL;
     for(const auto& pt : mPoints) {
         const auto seg = pt->getNextNormalSegment();
+        if(!seg.isValid()) continue;
         qreal dist;
         const auto subSeg = seg.getClosestSubSegmentForDummy(relPos, dist);
         if(dist < minDist) {

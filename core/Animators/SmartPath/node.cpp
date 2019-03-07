@@ -14,6 +14,8 @@ Node Node::sInterpolate(const Node &node1, const Node &node2,
         result = Node(node1.fT*(1 - weight2) + 0.5*weight2);
     else if(node1.isDummy() && node2.isDummy())
         result = Node(Node::DUMMY);
+    else if(node1.isMove() && node2.isMove())
+        result = Node(Node::MOVE);
     else RuntimeThrow("Unsupported");
     if(node1.getNextNodeId() != node2.getNextNodeId() ||
        node1.getPrevNodeId() != node2.getPrevNodeId())

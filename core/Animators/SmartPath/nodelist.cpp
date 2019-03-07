@@ -236,7 +236,7 @@ int NodeList::insertNodeBefore(const int& nextId,
     const int shiftedNextId = nextId + 1;
     Node * const nextNode = mNodes[shiftedNextId];
     moveNodeBefore(insertId, insertedNode, shiftedNextId, nextNode);
-    if(insertedNode->isDissolved())
+    if(nodeBlueprint.isDissolved())
         promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
 }
@@ -244,6 +244,15 @@ int NodeList::insertNodeBefore(const int& nextId,
 int NodeList::insertNodeAfter(const int& prevId,
                               const Node& nodeBlueprint,
                               const Neighbour& neigh) {
+    Node * const prevNode = mNodes[prevId];
+    if(prevNode->getNextNodeId() != -1) {
+        if(prevNode->getType() == Node::NORMAL &&
+           at(prevNode->getNextNodeId())->getType() == Node::MOVE &&
+           nodeBlueprint.getType() != Node::NORMAL &&
+           nodeBlueprint.getType() != Node::MOVE) {
+            return insertNodeBefore(prevId, nodeBlueprint, neigh);
+        }
+    }
     const int insertId = prevId + 1;
     Node * const insertedNode = insertNodeToList(insertId, nodeBlueprint);
     if((neigh & NEXT) && mNext)
@@ -252,8 +261,9 @@ int NodeList::insertNodeAfter(const int& prevId,
         mPrev->insertNodeAfter(prevId, Node(), PREV);
     insertedNode->setPrevNodeId(-1);
     insertedNode->setNextNodeId(-1);
-    Node * const prevNode = mNodes[prevId];
+
     moveNodeAfter(insertId, insertedNode, prevId, prevNode);
+
     if(insertedNode->isDissolved())
         promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
@@ -478,6 +488,9 @@ bool NodeList::updateNodeTypeAfterNeighbourChanged(const int &nodeId) const {
     if(mNoUpdates) return false;
     Node* node = mNodes[nodeId];
     if(node->isNormal() || node->isMove()) return false;
+    const int nodeNextId = node->getNextNodeId();
+    const int nodePrevId = node->getPrevNodeId();
+    if(nodeNextId == -1 || nodePrevId == -1) return false;
     Node::Type prevType = Node::DUMMY;
     Node::Type nextType = Node::DUMMY;
     int prevNextId = -1;
@@ -496,7 +509,6 @@ bool NodeList::updateNodeTypeAfterNeighbourChanged(const int &nodeId) const {
         nextNextId = nextNode->getNextNodeId();
         nextPrevId = nextNode->getPrevNodeId();
     }
-    const int nodeNextId = node->getNextNodeId();
     if(prevType == Node::NORMAL || nextType == Node::NORMAL ||
        prevType == Node::MOVE || nextType == Node::MOVE ||
        ((nodeNextId != nextNextId && nodeNextId != nextPrevId) && nextType != Node::DUMMY) ||

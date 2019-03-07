@@ -23,10 +23,13 @@ public:
             const auto keyAtFrame1 = anim_getKeyAtRelFrame(lastRelFrame);
             if(!prevK1 && !prevK2 && !keyAtFrame1) return;
             if(!nextK1 && !nextK2 && !keyAtFrame1) return;
+            const auto keyAtFrame2 = anim_getKeyOnCurrentFrame<SmartPathKey>();
             if(!prevK2) {
                 mBaseValue.assign(nextK2->getValue());
             } else if(!nextK2) {
                 mBaseValue.assign(prevK2->getValue());
+            } else if(keyAtFrame2) {
+                mBaseValue.assign(keyAtFrame2->getValue());
             } else {
                 const qreal nWeight =
                         prevKeyWeight(prevK2, nextK2, anim_mCurrentRelFrame);

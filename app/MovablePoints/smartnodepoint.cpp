@@ -431,6 +431,8 @@ bool SmartNodePoint::hasPrevNormalPoint() const {
 void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
     if(prevPoint ? prevPoint->getType() != Node::NORMAL : false)
         RuntimeThrow("Only NORMAL nodes supported");
+    if(mPrevNormalPoint == this)
+        RuntimeThrow("Node cannot point to itself");
     mPrevNormalPoint = prevPoint;
     updateC0Visibility();
     //mParentPath->schedulePathUpdate();
@@ -439,6 +441,8 @@ void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
 void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
     if(nextPoint ? nextPoint->getType() != Node::NORMAL : false)
         RuntimeThrow("Only NORMAL nodes supported");
+    if(mNextNormalPoint == this)
+        RuntimeThrow("Node cannot point to itself");
     mNextNormalPoint = nextPoint;
     mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
     updateC2Visibility();
@@ -474,10 +478,14 @@ bool SmartNodePoint::hasPrevPoint() const {
 }
 
 void SmartNodePoint::setPrevPoint(SmartNodePoint * const prevPoint) {
+    if(prevPoint == this)
+        RuntimeThrow("Node cannot point to itself");
     mPrevPoint = prevPoint;
 }
 
 void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
+    if(nextPoint == this)
+        RuntimeThrow("Node cannot point to itself");
     mNextPoint = nextPoint;
 }
 

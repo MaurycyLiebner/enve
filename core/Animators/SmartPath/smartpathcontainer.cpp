@@ -54,8 +54,8 @@ int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId,
 }
 
 int SmartPath::insertNodeBetween(const int& prevId,
-                                const int& nextId,
-                                const Node& nodeBlueprint) {
+                                 const int& nextId,
+                                 const Node& nodeBlueprint) {
     if(!mNodesList.nodesConnected(prevId, nextId))
         RuntimeThrow("Cannot insert between not connected nodes");
     return mNodesList.insertNodeAfter(prevId, nodeBlueprint);
@@ -313,13 +313,12 @@ NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour,
                 resultNode->fT = 0.5;
                 result.setNodeType(resI, resultNode, Node::DISSOLVED);
             }
-        }
-
-        // Create splits for connecting/disconnecting
-        if(shouldSplitThisNode(i, thisNode, neighbourNode,
-                               mNodesList, neighNodes)) {
+        } else if(thisNode->isDissolved() && neighbourNode->isNormal()) {
+            result.promoteDissolvedNodeToNormal(resI, resultNode);
+        } else if(shouldSplitThisNode(i, thisNode, neighbourNode,
+                                      mNodesList, neighNodes)) {
             if(thisNode->isDissolved()) {
-                result.promoteDissolvedNodeToNormal(resI);
+                result.promoteDissolvedNodeToNormal(resI, resultNode);
                 result.splitNodeAndDisconnect(resI);
                 iShift += 2;
             } else if(resultNode->isNormal()) {

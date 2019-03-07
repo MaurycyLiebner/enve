@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
 
     MainWindow w;
 #ifdef QT_DEBUG
-    qint64 pId = QCoreApplication::applicationPid();
-    QProcess *process = new QProcess(&w);
-    process->start("prlimit --data=4500000000 --pid " + QString::number(pId));
+    const qint64 pId = QCoreApplication::applicationPid();
+    QProcess * const process = new QProcess(&w);
+    process->start("prlimit --data=2000000000 --pid " + QString::number(pId));
 #endif
 
     auto prevPath = SmartPath();
