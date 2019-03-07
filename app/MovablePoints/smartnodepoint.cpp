@@ -550,10 +550,27 @@ void SmartNodePoint::c2Moved(const QPointF &c2) {
     mParentAnimator->pathChanged();
 }
 
+void SmartNodePoint::updateFromNodeDataPosOnly() {
+    if(mNode_d->isNormal()) {
+        mC0Pt->setRelativePosVal(mNode_d->fC0);
+        setRelativePosVal(mNode_d->fP1);
+        mC2Pt->setRelativePosVal(mNode_d->fC2);
+    } else if(mNode_d->isDissolved() || mNode_d->isDummy()) {
+        if(mNode_d->isDissolved())
+            currentPath()->updateDissolvedNodePosition(mNodeId);
+        else currentPath()->updateDummyNodePosition(mNodeId);
+
+        setRelativePosVal(mNode_d->fP1);
+    }
+}
+
 void SmartNodePoint::updateFromNodeData() {
+    setPointAsPrev(nullptr);
+    setPointAsNext(nullptr);
+    setPointAsNextNormal(nullptr);
+    setPointAsPrevNormal(nullptr);
     if(!mNode_d) {
-        setPointAsPrev(nullptr);
-        setPointAsNext(nullptr);
+        mOutdated = false;
         return;
     }
 
@@ -575,13 +592,12 @@ void SmartNodePoint::updateFromNodeData() {
 
     const int prevNodeId = mNode_d->getPrevNodeId();
     const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
-    setPointAsPrev(prevNode);
 
     const int nextNodeId = mNode_d->getNextNodeId();
     const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
-    setPointAsNext(nextNode);
 
-    if(prevNode) {
+    if(prevNode ? !prevNode->isOutdated() : false) {
+        setPointAsPrev(prevNode);
         if(prevNode->getType() == Node::NORMAL) {
             setPointAsPrevNormal(prevNode);
         } else {
@@ -590,10 +606,12 @@ void SmartNodePoint::updateFromNodeData() {
             setPointAsPrevNormal(prevNormalNode);
         }
     } else {
+        setPointAsPrev(nullptr);
         setPointAsPrevNormal(nullptr);
     }
 
-    if(nextNode) {
+    if(nextNode ? !nextNode->isOutdated() : false) {
+        setPointAsNext(nextNode);
         if(nextNode->getType() == Node::NORMAL) {
             setPointAsNextNormal(nextNode);
         } else {
@@ -602,6 +620,7 @@ void SmartNodePoint::updateFromNodeData() {
             setPointAsNextNormal(nextNormalNode);
         }
     } else {
+        setPointAsNext(nullptr);
         setPointAsNextNormal(nullptr);
     }
 
@@ -615,6 +634,7 @@ void SmartNodePoint::updateFromNodeData() {
         mType = TYPE_CTRL_POINT;
         mRadius = (type == Node::DISSOLVED ? 5.5 : 4);
     }
+    mOutdated = false;
 }
 
 bool SmartNodePoint::isEndPoint() {

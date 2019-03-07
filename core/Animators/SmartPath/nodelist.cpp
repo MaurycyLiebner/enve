@@ -42,6 +42,7 @@ void NodeList::updateDissolvedNodePosition(const int &nodeId) {
 
 void NodeList::updateDissolvedNodePosition(const int &nodeId,
                                            Node * const node) {
+    if(node->isNormal()) RuntimeThrow("Unsupported node type");
     const int prevId = prevNormalId(nodeId);
     const int nextId = nextNormalId(nodeId);
     const Node * const prevNode = at(prevId);

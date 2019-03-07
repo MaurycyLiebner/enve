@@ -53,7 +53,7 @@ NormalSegment::SubSegment NormalSegment::getClosestSubSegmentForDummy(
 
 void NormalSegment::updateDnDPos() const {
     for(const auto& inner : mInnerDnD) {
-        inner->updateFromNodeData();
+        inner->updateFromNodeDataPosOnly();
     }
 }
 

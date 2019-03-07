@@ -89,6 +89,13 @@ public:
     void resetC2();
 
     void setNodeId(const int &idT);
+    void setOutdated(const bool& outdated) {
+        mOutdated = outdated;
+    }
+
+    const bool& isOutdated() const {
+        return mOutdated;
+    }
     const int &getNodeId();
 
     NodePointValues getPointValues() const;
@@ -160,6 +167,8 @@ public:
         mNextNormalSegment.updateDnD();
     }
     void updateFromNodeData();
+    void updateFromNodeDataPosOnly();
+
     void afterNextNodeC0P1Changed() {
         mNextNormalSegment.afterChanged();
     }
@@ -186,6 +195,7 @@ protected:
 private:
     SmartPath* currentPath() const;
 
+    bool mOutdated = false;
     bool mSeparateNodePoint = false;
     int mNodeId;
     const Node * mNode_d = nullptr;
