@@ -265,7 +265,7 @@ int NodeList::insertNodeAfter(const int& prevId,
 
     moveNodeAfter(insertId, insertedNode, prevId, prevNode);
 
-    if(insertedNode->isDissolved())
+    if(nodeBlueprint.isDissolved())
         promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
 }

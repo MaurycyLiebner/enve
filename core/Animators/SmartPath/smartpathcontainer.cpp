@@ -40,17 +40,22 @@ int SmartPath::actionAddFirstNode(const QPointF &c0,
 }
 
 int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId,
-                                        const NodePointValues &values) {
+                                         const NodePointValues &values) {
     Node * const endNode = mNodesList.at(endNodeId);
     if(!endNode->isNormal())
         RuntimeThrow("Invalid node type. "
                      "End nodes should always be NORMAL.");
-    const Node * const moveNode = mNodesList.at(endNode->getNextNodeId());
-    if(!moveNode->isMove())
-        RuntimeThrow("Invalid node type. "
-                     "End nodes should have MOVE node as next.");
-    return mNodesList.insertNodeAfter(endNodeId,
-                                      Node(values.fC0, values.fP1, values.fC2));
+    const Node * const nextNode = mNodesList.at(endNode->getNextNodeId());
+    if(nextNode->isMove()) {
+        const Node nodeBlueprint(values.fC0, values.fP1, values.fC2);
+        return mNodesList.insertNodeAfter(endNodeId, nodeBlueprint);
+    } else {
+        const Node nodeBlueprint = *endNode;
+        endNode->fC0 = values.fC0;
+        endNode->fP1 = values.fP1;
+        endNode->fC2 = values.fC2;
+        return mNodesList.insertNodeAfter(endNodeId, nodeBlueprint);
+    }
 }
 
 int SmartPath::insertNodeBetween(const int& prevId,

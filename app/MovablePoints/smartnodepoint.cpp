@@ -481,12 +481,34 @@ void SmartNodePoint::setPrevPoint(SmartNodePoint * const prevPoint) {
     if(prevPoint == this)
         RuntimeThrow("Node cannot point to itself");
     mPrevPoint = prevPoint;
+    if(prevPoint) {
+        if(prevPoint->getType() == Node::NORMAL) {
+            setPointAsPrevNormal(prevPoint);
+        } else {
+            const auto prevNormalNode =
+                    mHandler_k->getPrevNormalNode(prevPoint->getNodeId());
+            setPointAsPrevNormal(prevNormalNode);
+        }
+    } else {
+        setPointAsPrevNormal(nullptr);
+    }
 }
 
 void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
     if(nextPoint == this)
         RuntimeThrow("Node cannot point to itself");
     mNextPoint = nextPoint;
+    if(nextPoint) {
+        if(nextPoint->getType() == Node::NORMAL) {
+            setPointAsNextNormal(nextPoint);
+        } else {
+            const auto nextNormalNode =
+                    mHandler_k->getNextNormalNode(nextPoint->getNodeId());
+            setPointAsNextNormal(nextNormalNode);
+        }
+    } else {
+        setNextNormalPoint(nullptr);
+    }
 }
 
 void SmartNodePoint::setPointAsNext(SmartNodePoint * const pointToSet) {
@@ -598,30 +620,14 @@ void SmartNodePoint::updateFromNodeData() {
 
     if(prevNode ? !prevNode->isOutdated() : false) {
         setPointAsPrev(prevNode);
-        if(prevNode->getType() == Node::NORMAL) {
-            setPointAsPrevNormal(prevNode);
-        } else {
-            const auto prevNormalNode =
-                    mHandler_k->getPrevNormalNode(prevNodeId);
-            setPointAsPrevNormal(prevNormalNode);
-        }
     } else {
         setPointAsPrev(nullptr);
-        setPointAsPrevNormal(nullptr);
     }
 
     if(nextNode ? !nextNode->isOutdated() : false) {
         setPointAsNext(nextNode);
-        if(nextNode->getType() == Node::NORMAL) {
-            setPointAsNextNormal(nextNode);
-        } else {
-            const auto nextNormalNode =
-                    mHandler_k->getNextNormalNode(nextNodeId);
-            setPointAsNextNormal(nextNormalNode);
-        }
     } else {
         setPointAsNext(nullptr);
-        setPointAsNextNormal(nullptr);
     }
 
     updateC0Visibility();
