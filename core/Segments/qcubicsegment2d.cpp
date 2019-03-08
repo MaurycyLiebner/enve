@@ -133,11 +133,17 @@ qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
                                      const qreal &maxT,
                                      qreal * const pBestT,
                                      QPointF * const pBestPos) {
-    qreal maxLen = lengthAtT(maxT);
+    const qreal maxLen = lengthAtT(maxT);
     qreal bestT = 0;
     QPointF bestPt = p0();
     qreal minError = DBL_MAX;
-    for(qreal len = lengthAtT(minT); len < maxLen;) { // t ∈ [0., 1.]
+    bool last = false;
+    qreal len = lengthAtT(minT);
+    while(!last) { // t ∈ [0., 1.]
+        if(len > maxLen) {
+            len = maxLen;
+            last = true;
+        }
         qreal t = tAtLength(len);
         QPointF pt = posAtT(t);
         qreal dist = pointToLen(pt - p);
@@ -151,21 +157,21 @@ qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
                     bestT = t;
                     bestPt = pt;
                     minError = dist;
-                    qreal tMinusOne = t - 1;
-                    qreal pow2TMinusOne = pow2(tMinusOne);
-                    qreal pow3TMinusOne = pow3(tMinusOne);
+                    const qreal tMinusOne = t - 1;
+                    const qreal pow2TMinusOne = pow2(tMinusOne);
+                    const qreal pow3TMinusOne = pow3(tMinusOne);
 
-                    qreal v0 = 3*c2x - 3*c2x*t + p1x*t;
-                    qreal v1 = 3*c2y - 3*c2y*t + p1y*t;
+                    const qreal v0 = 3*c2x - 3*c2x*t + p1x*t;
+                    const qreal v1 = 3*c2y - 3*c2y*t + p1y*t;
 
-                    qreal v2 = 3*c1x*pow2TMinusOne + t*v0;
-                    qreal v3 = t*(3*c1y*pow2TMinusOne + t*v1);
+                    const qreal v2 = 3*c1x*pow2TMinusOne + t*v0;
+                    const qreal v3 = t*(3*c1y*pow2TMinusOne + t*v1);
 
-                    qreal v4 = -1 + 4*t - 3*pow2(t);
+                    const qreal v4 = -1 + 4*t - 3*pow2(t);
 
-                    qreal num = pow2(p.x() + p0x*pow3TMinusOne - t*v2) +
+                    const qreal num = pow2(p.x() + p0x*pow3TMinusOne - t*v2) +
                                     pow2(p.y() + p0y*pow3TMinusOne - v3);
-                    qreal den = -6*(p0x*pow2TMinusOne + t*(-2*c2x + 3*c2x*t - p1x*t) +
+                    const qreal den = -6*(p0x*pow2TMinusOne + t*(-2*c2x + 3*c2x*t - p1x*t) +
                                     c1x*v4)*
                                   (-p.x() - p0x*pow3TMinusOne +  t*v2) -
                                  6*(p0y*pow2TMinusOne + t*(-2*c2y + 3*c2y*t - p1y*t) +
@@ -180,7 +186,7 @@ qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
 //                        }
                         break;
                     }
-                    qreal newT = t - num/den;
+                    const qreal newT = t - num/den;
                     pt = posAtT(newT);
                     dist = pointToLen(pt - p);
                     t = newT;

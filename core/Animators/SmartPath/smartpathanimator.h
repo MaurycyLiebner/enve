@@ -21,9 +21,9 @@ public:
             const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);
             const auto nextK2 = anim_getNextKey<SmartPathKey>(anim_mCurrentRelFrame);
             const auto keyAtFrame1 = anim_getKeyAtRelFrame(lastRelFrame);
-            if(!prevK1 && !prevK2 && !keyAtFrame1) return;
-            if(!nextK1 && !nextK2 && !keyAtFrame1) return;
             const auto keyAtFrame2 = anim_getKeyOnCurrentFrame<SmartPathKey>();
+            if(!prevK1 && !prevK2 && !keyAtFrame1 && !keyAtFrame2) return;
+            if(!nextK1 && !nextK2 && !keyAtFrame1 && !keyAtFrame2) return;
             if(!prevK2) {
                 mBaseValue.assign(nextK2->getValue());
             } else if(!nextK2) {
@@ -148,8 +148,18 @@ public:
         if(spk) {
             spk->assignValue(mBaseValue);
         } else {
+            const auto neighs = anim_getPrevAndNextKey<SmartPathKey>(
+                        anim_mCurrentRelFrame);
+            if(neighs.first && neighs.second) {
+                const int newKeyNodeCount = mBaseValue.getNodeCount();
+                const int currentNodeCount = neighs.first->getValue().getNodeCount();
+                if(newKeyNodeCount != currentNodeCount) {
+                    //neighs.first->getValue().prepareForNewNeighBetweenThisAndNext();
+                    //neighs.second->getValue().prepareForNewNeighBetweenThisAndPrev();
+                }
+            }
             const auto newKey = SPtrCreate(SmartPathKey)(
-                        mBaseValue, this->anim_mCurrentRelFrame, this);
+                        mBaseValue, anim_mCurrentRelFrame, this);
             this->anim_appendKey(newKey);
         }
     }
