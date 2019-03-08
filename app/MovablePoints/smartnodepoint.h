@@ -192,6 +192,9 @@ protected:
     void setPrevNormalPoint(SmartNodePoint * const prevPoint);
     void setPointAsNextNormal(SmartNodePoint * const pointToSet);
     void setPointAsPrevNormal(SmartNodePoint * const pointToSet);
+
+    void updatePrevNormalNode();
+    void updateNextNormalNode();
 private:
     SmartPath* currentPath() const;
 

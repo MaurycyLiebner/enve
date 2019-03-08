@@ -481,12 +481,16 @@ void SmartNodePoint::setPrevPoint(SmartNodePoint * const prevPoint) {
     if(prevPoint == this)
         RuntimeThrow("Node cannot point to itself");
     mPrevPoint = prevPoint;
-    if(prevPoint) {
-        if(prevPoint->getType() == Node::NORMAL) {
-            setPointAsPrevNormal(prevPoint);
+    updatePrevNormalNode();
+}
+
+void SmartNodePoint::updatePrevNormalNode() {
+    if(mPrevPoint) {
+        if(mPrevPoint->getType() == Node::NORMAL) {
+            setPointAsPrevNormal(mPrevPoint);
         } else {
             const auto prevNormalNode =
-                    mHandler_k->getPrevNormalNode(prevPoint->getNodeId());
+                    mHandler_k->getPrevNormalNode(mPrevPoint->getNodeId());
             setPointAsPrevNormal(prevNormalNode);
         }
     } else {
@@ -498,12 +502,16 @@ void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
     if(nextPoint == this)
         RuntimeThrow("Node cannot point to itself");
     mNextPoint = nextPoint;
-    if(nextPoint) {
-        if(nextPoint->getType() == Node::NORMAL) {
-            setPointAsNextNormal(nextPoint);
+    updateNextNormalNode();
+}
+
+void SmartNodePoint::updateNextNormalNode() {
+    if(mNextPoint) {
+        if(mNextPoint->getType() == Node::NORMAL) {
+            setPointAsNextNormal(mNextPoint);
         } else {
             const auto nextNormalNode =
-                    mHandler_k->getNextNormalNode(nextPoint->getNodeId());
+                    mHandler_k->getNextNormalNode(mNextPoint->getNodeId());
             setPointAsNextNormal(nextNormalNode);
         }
     } else {

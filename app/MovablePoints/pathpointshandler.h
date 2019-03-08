@@ -66,7 +66,8 @@ public:
     }
 
     SmartNodePoint* getNextNormalNode(const int& startId) const {
-        return getPointWithId(targetPath()->nextNormalId(startId));
+        const int normalId = targetPath()->nextNormalId(startId);
+        return getPointWithId(normalId);
     }
 
     void updateAllPoints();
