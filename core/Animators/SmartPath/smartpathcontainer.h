@@ -190,6 +190,12 @@ public:
     bool write(QIODevice * const dst) const {
         return mNodesList.write(dst);
     }
+    void prepareForNewNeighBetweenThisAndNext() {
+        prepareForNewNeighBetweenThisAnd(mNext);
+    }
+    void prepareForNewNeighBetweenThisAndPrev() {
+        prepareForNewNeighBetweenThisAnd(mPrev);
+    }
 protected:
     void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
 
@@ -228,6 +234,8 @@ private:
     SkPath getPathFor(const SmartPath * const neighbour) const;
     int insertNodeBetween(const int &prevId, const int &nextId,
                           const Node &nodeBlueprint);
+    void prepareForNewNeighBetweenThisAnd(
+            SmartPath * const neighbour);
 
     SmartPath * mPrev = nullptr;
     SmartPath * mNext = nullptr;

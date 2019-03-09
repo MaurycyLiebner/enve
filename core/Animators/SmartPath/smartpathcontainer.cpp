@@ -292,6 +292,55 @@ bool shouldSplitThisNode(const int& nodeId,
     return false;
 }
 
+void SmartPath::prepareForNewNeighBetweenThisAnd(
+        SmartPath * const neighbour) {
+    NodeList& neighNodes = neighbour->getNodesRef();
+    NodeList result = mNodesList.createCopy(true);
+    const bool nextNeigh = neighbour == mNext;
+    if(nextNeigh) {
+        neighNodes.setPrev(&result);
+        mNodesList.setNext(&result);
+        result.setNext(const_cast<NodeList*>(&neighNodes));
+        result.setPrev(&mNodesList);
+    } else {
+        neighNodes.setNext(&result);
+        mNodesList.setPrev(&result);
+        result.setNext(&mNodesList);
+        result.setPrev(const_cast<NodeList*>(&neighNodes));
+    }
+
+    const int iMax = neighNodes.count() - 1;
+    if(result.count() - 1 != iMax)
+        RuntimeThrow("Nodes count does not match");
+
+    int iShift = 0;
+    for(int i = 0; i <= iMax; i++) {
+        const int resI = i + iShift;
+        Node * const resultNode = result.at(resI);
+        const Node * const neighbourNode = neighNodes.at(resI);
+        const Node * const thisNode = mNodesList.at(resI);
+
+        if(shouldSplitThisNode(i, thisNode, neighbourNode,
+                               mNodesList, neighNodes)) {
+            if(thisNode->isDissolved()) {
+                result.promoteDissolvedNodeToNormal(resI, resultNode);
+                result.splitNodeAndDisconnect(resI);
+                iShift += 2;
+            } else if(resultNode->isNormal()) {
+                result.splitNode(resI);
+                iShift++;
+            }
+        }
+    }
+    if(nextNeigh) {
+        neighNodes.setPrev(&mNodesList);
+        mNodesList.setNext(&neighNodes);
+    } else {
+        neighNodes.setNext(&mNodesList);
+        mNodesList.setPrev(&neighNodes);
+    }
+}
+
 NodeList SmartPath::getNodesListFor(const SmartPath * const neighbour,
                                     const bool &simplify) const {
     const NodeList& neighNodes = neighbour->getNodesRef();

@@ -154,7 +154,7 @@ public:
                 const int newKeyNodeCount = mBaseValue.getNodeCount();
                 const int currentNodeCount = neighs.first->getValue().getNodeCount();
                 if(newKeyNodeCount != currentNodeCount) {
-                    //neighs.first->getValue().prepareForNewNeighBetweenThisAndNext();
+                    neighs.first->getValue().prepareForNewNeighBetweenThisAndNext();
                     //neighs.second->getValue().prepareForNewNeighBetweenThisAndPrev();
                 }
             }
