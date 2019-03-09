@@ -20,8 +20,18 @@ Node Node::sInterpolate(const Node &node1, const Node &node2,
 //    if(node1.getNextNodeId() != node2.getNextNodeId() ||
 //       node1.getPrevNodeId() != node2.getPrevNodeId())
 //        RuntimeThrow("Cannot interpolate neighbours");
-    result.setNextNodeId(node1.getNextNodeId());
-    result.setPrevNodeId(node1.getPrevNodeId());
+//    result.setNextNodeId(node1.getNextNodeId());
+//    result.setPrevNodeId(node1.getPrevNodeId());
+    if(node1.getNextNodeId() == -1 || node2.getNextNodeId() == -1) {
+        result.setNextNodeId(-1);
+    } else {
+        result.setNextNodeId(node1.getNextNodeId());
+    }
+    if(node1.getPrevNodeId() == -1 || node2.getPrevNodeId() == -1) {
+        result.setPrevNodeId(-1);
+    } else {
+        result.setPrevNodeId(node1.getPrevNodeId());
+    }
     return result;
 }
 
