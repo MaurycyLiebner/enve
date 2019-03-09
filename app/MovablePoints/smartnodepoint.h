@@ -89,8 +89,12 @@ public:
     void resetC2();
 
     void setNodeId(const int &idT);
-    void setOutdated(const bool& outdated) {
-        mOutdated = outdated;
+    void setOutdated() {
+        mOutdated = true;
+        setPrevPoint(nullptr);
+        setNextPoint(nullptr);
+        setPrevNormalPoint(nullptr);
+        setNextNormalPoint(nullptr);
     }
 
     const bool& isOutdated() const {
@@ -177,6 +181,10 @@ public:
     bool hasPrevPoint() const;
     bool hasNextNormalPoint() const;
     bool hasPrevNormalPoint() const;
+    void afterAllNodesUpdated() {
+        updatePrevNormalNode();
+        updateNextNormalNode();
+    }
 protected:
     SmartNodePoint(const int& nodeId,
                    PathPointsHandler * const handler,

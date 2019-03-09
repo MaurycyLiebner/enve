@@ -481,7 +481,7 @@ void SmartNodePoint::setPrevPoint(SmartNodePoint * const prevPoint) {
     if(prevPoint == this)
         RuntimeThrow("Node cannot point to itself");
     mPrevPoint = prevPoint;
-    updatePrevNormalNode();
+    //updatePrevNormalNode();
 }
 
 void SmartNodePoint::updatePrevNormalNode() {
@@ -502,7 +502,7 @@ void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
     if(nextPoint == this)
         RuntimeThrow("Node cannot point to itself");
     mNextPoint = nextPoint;
-    updateNextNormalNode();
+    //updateNextNormalNode();
 }
 
 void SmartNodePoint::updateNextNormalNode() {
@@ -597,8 +597,6 @@ void SmartNodePoint::updateFromNodeDataPosOnly() {
 void SmartNodePoint::updateFromNodeData() {
     setPointAsPrev(nullptr);
     setPointAsNext(nullptr);
-    setPointAsNextNormal(nullptr);
-    setPointAsPrevNormal(nullptr);
     if(!mNode_d) {
         mOutdated = false;
         return;

@@ -85,7 +85,6 @@ private:
     void unblockAllPointsUpdate() {
         mBlockAllPointsUpdate = false;
     }
-    void setPointOutdated(const int &nodeId);
 
     QList<stdsptr<SmartNodePoint>> mPoints;
     SmartPathAnimator * const mTargetAnimator;

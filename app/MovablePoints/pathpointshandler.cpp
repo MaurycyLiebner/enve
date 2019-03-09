@@ -77,11 +77,9 @@ void PathPointsHandler::updateNextSegmentDnDForPoint(const int &nodeId) {
 }
 
 void PathPointsHandler::updatePoint(const int &nodeId) {
-    mPoints.at(nodeId)->setNodeId(nodeId);
-}
-
-void PathPointsHandler::setPointOutdated(const int &nodeId) {
-    mPoints.at(nodeId)->setOutdated(true);
+    const auto pt = mPoints.at(nodeId);
+    pt->setNodeId(nodeId);
+    pt->afterAllNodesUpdated();
 }
 
 void PathPointsHandler::updateAllPoints() {
@@ -91,13 +89,16 @@ void PathPointsHandler::updateAllPoints() {
         mPoints.removeLast();
     }
     for(int i = 0; i < mPoints.count(); i++) {
-        setPointOutdated(i);
+        mPoints.at(i)->setOutdated();
     }
     for(int i = 0; i < mPoints.count(); i++) {
-        updatePoint(i);
+        mPoints.at(i)->setNodeId(i);
     }
     while(mPoints.count() < newCount) {
         createNewNodePoint(mPoints.count());
+    }
+    for(const auto& pt : mPoints) {
+        pt->afterAllNodesUpdated();
     }
 }
 
@@ -128,13 +129,10 @@ SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {
 
 SmartNodePoint* PathPointsHandler::addNewAtEnd(const int &nodeId,
                                                const QPointF &relPos) {
-    blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     const int id = targetPath()->actionAppendNodeAtEndNode(
                 nodeId, {relPos, relPos, relPos});
     mTargetAnimator->pathChanged();
-    unblockAllPointsUpdate();
-    updatePoint(nodeId);
     return createNewNodePoint(id);
 }
 
