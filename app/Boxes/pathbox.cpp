@@ -131,8 +131,9 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         if(getParentCanvas()->getPathEffectsVisible()) {
             // !!! reversed
             //mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
-            qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-                        prp_relFrameToAbsFrameF(relFrame));
+            const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+            const qreal parentRelFrame =
+                    mParentGroup->prp_absFrameToRelFrameF(absFrame);
             mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->fPath,
                                                 data->fParentBox.data());
             // !!! reversed
@@ -162,7 +163,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             mParentGroup->filterOutlinePathForRelFrame(relFrame, &outline);
         }
         pathData->fOutlinePath = outline;
-        outline.addPath(pathData->fPath);
+        //outline.addPath(pathData->fPath);
     }
 
     if(currentFillPathCompatible) {
@@ -183,10 +184,10 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     fillSettings.fPaintColor = mFillSettings->
             getColorAtRelFrame(relFrame);
     fillSettings.fPaintType = mFillSettings->getPaintType();
-    Gradient *grad = mFillSettings->getGradient();
-    if(grad) {
+    const auto fillGrad = mFillSettings->getGradient();
+    if(fillGrad) {
         fillSettings.updateGradient(
-                    grad->getQGradientStopsAtAbsFrame(
+                    fillGrad->getQGradientStopsAtAbsFrame(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mFillGradientPoints->getStartPointAtRelFrameF(relFrame),
                     mFillGradientPoints->getEndPointAtRelFrameF(relFrame),
@@ -194,7 +195,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
-    auto brushSettings = mStrokeSettings->getBrushSettings();
+    const auto brushSettings = mStrokeSettings->getBrushSettings();
     if(brushSettings) {
         auto brush = brushSettings->getBrush();
         if(brush) {
@@ -202,9 +203,11 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             strokeSettings.fTimeCurve =
                     brushSettings->getTimeAnimator()->
                         getValueAtRelFrame(relFrame);
+            const auto widthAnimator = mStrokeSettings->getStrokeWidthAnimator();
+            const auto width = widthAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
             strokeSettings.fWidthCurve =
                     brushSettings->getWidthAnimator()->
-                        getValueAtRelFrame(relFrame);
+                        getValueAtRelFrame(relFrame)*width;
             strokeSettings.fPressureCurve =
                     brushSettings->getPressureAnimator()->
                         getValueAtRelFrame(relFrame);
@@ -213,10 +216,10 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     strokeSettings.fPaintColor = mStrokeSettings->
             getColorAtRelFrame(relFrame);
     strokeSettings.fPaintType = mStrokeSettings->getPaintType();
-    grad = mStrokeSettings->getGradient();
-    if(grad) {
+    const auto strokeGrad = mStrokeSettings->getGradient();
+    if(strokeGrad) {
         strokeSettings.updateGradient(
-                    grad->getQGradientStopsAtAbsFrame(
+                    strokeGrad->getQGradientStopsAtAbsFrame(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
                     mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),

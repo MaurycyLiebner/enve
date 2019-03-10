@@ -16,9 +16,9 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
 }
 
 void LengthPathEffect::filterPathForRelFrame(const qreal &relFrame,
-                                                 const SkPath &src,
-                                                 SkPath *dst,
-                                                 const bool &) {
+                                             const SkPath &src,
+                                             SkPath *dst,
+                                             const bool &) {
     const qreal lenPer = mLength->getCurrentEffectiveValueAtRelFrame(relFrame);
     if(lenPer < 0.001) {
         *dst = SkPath();
