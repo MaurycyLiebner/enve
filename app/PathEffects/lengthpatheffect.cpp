@@ -40,16 +40,32 @@ void LengthPathEffect::filterPathForRelFrame(const qreal &relFrame,
 
     SkPath result;
     qreal currLen = 0;
-    for(int i = 0; i < paths.count(); i++) {
-        auto& path = paths[i];
-        const qreal pathLen = path.getTotalLength();
-        if(currLen + pathLen > targetLength) {
-            const qreal remLen = targetLength - currLen;
-            result.addPath(path.getFragment(0, remLen/pathLen).toSkPath());
-            break;
+    if(reverse) {
+        for(int i = paths.count() - 1; i >= 0; i++) {
+            auto& path = paths[i];
+            const qreal pathLen = path.getTotalLength();
+            if(currLen + pathLen > targetLength) {
+                const qreal remLen = targetLength - currLen;
+                const qreal remLenFrac = remLen/pathLen;
+                const qreal minLenFrac = CLAMP01(1 - remLenFrac);
+                result.addPath(path.getFragment(minLenFrac, 1).toSkPath());
+                break;
+            }
+            currLen += pathLen;
+            result.addPath(path.toSkPath());
         }
-        currLen += pathLen;
-        result.addPath(path.toSkPath());
+    } else {
+        for(int i = 0; i < paths.count(); i++) {
+            auto& path = paths[i];
+            const qreal pathLen = path.getTotalLength();
+            if(currLen + pathLen > targetLength) {
+                const qreal remLen = targetLength - currLen;
+                result.addPath(path.getFragment(0, remLen/pathLen).toSkPath());
+                break;
+            }
+            currLen += pathLen;
+            result.addPath(path.toSkPath());
+        }
     }
 
     *dst = result;
