@@ -36,7 +36,6 @@ private:
 
         for(int i = 1; i <= iMax; i++) {
             const double t = fStrokePath.tAtLength(i*dLen);
-            qDebug() << i << t;
             const QRect roi = executeMove(brush, surface, t, lenFrag);
             changedRect = changedRect.united(roi);
         }
@@ -48,7 +47,6 @@ private:
                       const double& t,
                       const double& lenFrag) const {
         const QPointF pos = gCubicValueAtT(fStrokePath, t);
-        qDebug() << "MOVE" << pos;
         const qreal pressure = gCubicValueAtT(fPressure, t);
         const qreal xTilt = gCubicValueAtT(fXTilt, t);
         const qreal yTilt = gCubicValueAtT(fYTilt, t);
@@ -76,7 +74,6 @@ private:
     QRect executePress(MyPaintBrush * const brush,
                        MyPaintSurface * const surface) const {
         const QPointF pos = gCubicValueAtT(fStrokePath, 0);
-        qDebug() << "PRESS" << pos;
         const qreal pressure = gCubicValueAtT(fPressure, 0);
         const qreal xTilt = gCubicValueAtT(fXTilt, 0);
         const qreal yTilt = gCubicValueAtT(fYTilt, 0);

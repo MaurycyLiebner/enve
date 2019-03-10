@@ -24,6 +24,7 @@ public:
 //        if(mCurrentAnimator)
 //                disconnect(mCurrentAnimator, nullptr, this, nullptr);
         mCurrentAnimator = animator;
+        updateAfterAnimatorChanged();
     }
 
     void setCurrentSegment(const qCubicSegment1D& seg) {

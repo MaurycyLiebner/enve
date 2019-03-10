@@ -195,6 +195,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mBrushPressureCurveEditor = new Segment1DEditor(0, 1, this);
     mBrushTimeCurveEditor = new Segment1DEditor(0, 2, this);
     mBrushSelectionWidget = new BrushSelectionWidget(this);
+    mBrushSelectionWidget->setMinimumHeight(300);
 
     connect(mBrushSelectionWidget,
             &BrushSelectionWidget::currentBrushChanged,

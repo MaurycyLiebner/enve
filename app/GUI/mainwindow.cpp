@@ -79,12 +79,14 @@ MainWindow::MainWindow(QWidget *parent)
     setCurrentPath("");
 
     mFillStrokeSettingsDock = new QDockWidget(this);
+    const auto fillStrokeSettingsScroll = new ScrollArea(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
-    QLabel *fillStrokeDockLabel = new QLabel("Fill and Stroke", this);
+    fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
+    const auto fillStrokeDockLabel = new QLabel("Fill and Stroke", this);
     fillStrokeDockLabel->setObjectName("dockLabel");
     fillStrokeDockLabel->setAlignment(Qt::AlignCenter);
     mFillStrokeSettingsDock->setTitleBarWidget(fillStrokeDockLabel);
-    mFillStrokeSettingsDock->setWidget(mFillStrokeSettings);
+    mFillStrokeSettingsDock->setWidget(fillStrokeSettingsScroll);
     mFillStrokeSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
                                          QDockWidget::DockWidgetFloatable);
     addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);
@@ -115,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent)
                                     QDockWidget::DockWidgetFloatable);
     mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
     mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
-    QLabel *brushDockLabel = new QLabel("Brush Settings", this);
+    const auto brushDockLabel = new QLabel("Brush Settings", this);
     brushDockLabel->setObjectName("dockLabel");
     brushDockLabel->setAlignment(Qt::AlignCenter);
     mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
@@ -140,7 +142,7 @@ MainWindow::MainWindow(QWidget *parent)
                            QDockWidget::DockWidgetFloatable);
     mLeftDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
     mLeftDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
-    QLabel *leftDockLabel = new QLabel("Current Object", this);
+    const auto leftDockLabel = new QLabel("Current Object", this);
     leftDockLabel->setObjectName("dockLabel");
     leftDockLabel->setAlignment(Qt::AlignCenter);
     mLeftDock->setTitleBarWidget(leftDockLabel);
@@ -154,12 +156,12 @@ MainWindow::MainWindow(QWidget *parent)
             setCurrentTarget(nullptr, SWT_CurrentGroup);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
-            SIGNAL(valueChanged(int)),
-            mObjectSettingsWidget, SLOT(changeVisibleTop(int)));
-    connect(mObjectSettingsScrollArea, SIGNAL(heightChanged(int)),
-            mObjectSettingsWidget, SLOT(changeVisibleHeight(int)));
-    connect(mObjectSettingsScrollArea, SIGNAL(widthChanged(int)),
-            mObjectSettingsWidget, SLOT(setWidth(int)));
+            &QScrollBar::valueChanged,
+            mObjectSettingsWidget, &BoxScrollWidget::changeVisibleTop);
+    connect(mObjectSettingsScrollArea, &ScrollArea::heightChanged,
+            mObjectSettingsWidget, &BoxScrollWidget::changeVisibleHeight);
+    connect(mObjectSettingsScrollArea, &ScrollArea::widthChanged,
+            mObjectSettingsWidget, &BoxScrollWidget::setWidth);
 
     mObjectSettingsScrollArea->verticalScrollBar()->setSingleStep(
                 MIN_WIDGET_HEIGHT);
@@ -176,7 +178,7 @@ MainWindow::MainWindow(QWidget *parent)
     mLeftDock2->setWidget(new FileSourceList(this));
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock2);
 
-    QLabel *leftDock2Label = new QLabel("Files", this);
+    const auto leftDock2Label = new QLabel("Files", this);
     leftDock2Label->setStyleSheet(
                 "QLabel {"
                     "border-top: 0;"

@@ -30,18 +30,21 @@ protected:
                           const K * const prevKey,
                           const K * const nextKey) const {
         T result;
-        const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
+        const qreal prevFrame = prevKey->getRelFrame();
+        const qreal nextFrame = nextKey->getRelFrame();
+        const qCubicSegment1D seg{prevFrame,
                                   prevKey->getEndFrame(),
                                   nextKey->getStartFrame(),
-                                  qreal(nextKey->getRelFrame())};
+                                  nextFrame};
         const qreal t = gTFromX(seg, frame);
         const qreal p0y = prevKey->getValueForGraph();
         const qreal p1y = prevKey->getEndValue();
         const qreal p2y = nextKey->getStartValue();
         const qreal p3y = nextKey->getValueForGraph();
         const qreal iFrame = gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
+        const qreal tEff = (iFrame - prevFrame)/(nextFrame - prevFrame);
         gInterpolate(prevKey->getValue(), nextKey->getValue(),
-                     iFrame, result);
+                     tEff, result);
         return result;
     }
 };

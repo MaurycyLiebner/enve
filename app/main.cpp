@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     QProcess * const process = new QProcess(&w);
     process->start("prlimit --data=2000000000 --pid " + QString::number(pId));
 #endif
-
+/*
     auto prevPath = SmartPath();
     QPointF pt(0, 0);
     prevPath.actionAddFirstNode(pt, pt, pt);
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "DISCONNECT";
     prevPath.actionDisconnectNodes(3, 4);
     nextPath.interpolateWithPrev(0.5);
-    prevPath.interpolateWithNext(0.5);
+    prevPath.interpolateWithNext(0.5);*/
 
     w.show();
 
