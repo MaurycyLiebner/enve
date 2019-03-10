@@ -42,7 +42,8 @@ private:
 };
 
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
-struct GPURasterEffectProgram : public ShaderProgram {
+struct GPURasterEffectProgram {
+    GLuint fId;
     QList<GLint> fArgumentLocs;
     GLint fGPosLoc;
     GLint fTexLocation;

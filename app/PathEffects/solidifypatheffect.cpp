@@ -10,7 +10,7 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mDisplacement);
 }
 
-void SolidifyPathEffect::filterPathForRelFrameF(const qreal &relFrame,
+void SolidifyPathEffect::filterPathForRelFrame(const qreal &relFrame,
                                                 const SkPath &src,
                                                 SkPath *dst,
                                                 const bool &) {

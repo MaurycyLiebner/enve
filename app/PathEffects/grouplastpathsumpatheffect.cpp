@@ -11,7 +11,7 @@ GroupLastPathSumPathEffect::GroupLastPathSumPathEffect(
     mParentGroup = parentGroup;
 }
 
-void GroupLastPathSumPathEffect::filterPathForRelFrameF(const qreal &relFrame,
+void GroupLastPathSumPathEffect::filterPathForRelFrame(const qreal &relFrame,
                                                        const SkPath &src,
                                                        SkPath *dst,
                                                        const bool &groupPathSum) {

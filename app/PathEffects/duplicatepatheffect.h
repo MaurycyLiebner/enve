@@ -8,7 +8,7 @@ class DuplicatePathEffect : public PathEffect {
 public:
     DuplicatePathEffect(const bool &outlinePathEffect);
 
-    void filterPathForRelFrameF(const qreal &relFrame,
+    void filterPathForRelFrame(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath *dst,
                                 const bool &);

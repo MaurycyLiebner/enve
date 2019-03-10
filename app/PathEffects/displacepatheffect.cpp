@@ -40,7 +40,7 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRandomize->setValue(false);
 }
 
-void DisplacePathEffect::filterPathForRelFrameF(const qreal &relFrame,
+void DisplacePathEffect::filterPathForRelFrame(const qreal &relFrame,
                                                 const SkPath &src,
                                                 SkPath *dst, const bool &) {
     dst->reset();

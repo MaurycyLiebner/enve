@@ -3,14 +3,13 @@
 #include "patheffect.h"
 
 class LengthPathEffect : public PathEffect {
-    Q_OBJECT
 public:
     LengthPathEffect(const bool &outlinePathEffect);
 
-    void filterPathForRelFrameF(const qreal &relFrame,
-                                const SkPath &src,
-                                SkPath *dst,
-                                const bool &);
+    void filterPathForRelFrame(const qreal &relFrame,
+                               const SkPath &src,
+                               SkPath *dst,
+                               const bool &);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 private:

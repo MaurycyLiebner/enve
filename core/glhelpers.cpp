@@ -16,9 +16,6 @@ std::string GL_TEXTURED_VERT =
         "/home/ailuropoda/Dev/AniVect/src/shaders/textured.vert";
 GLuint GL_TEXTURED_SQUARE_VBO;
 
-BlurProgram GL_BLUR_PROGRAM;
-DotProgram GL_DOT_PROGRAM;
-
 void checkGlErrors(const std::string& msg) {
     const GLenum glError = glGetError();
     if(glError == GL_NO_ERROR) return;
@@ -59,10 +56,10 @@ void iniTexturedVShaderVAO(QGL33c* gl, GLuint &VAO) {
 void iniPlainVShaderVBO(QGL33c* gl) {
     float vertices[] = {
         // positions
-         1.f, -1.f, 0.0f,   // bottom right
-         1.f,  1.f, 0.0f,   // top right
-        -1.f, -1.f, 0.0f,   // bottom left
-        -1.f,  1.f, 0.0f    // top left
+         1, -1, 0,   // bottom right
+         1,  1, 0,   // top right
+        -1, -1, 0,   // bottom left
+        -1,  1, 0    // top left
     };
 
     gl->glGenBuffers(1, &GL_PLAIN_SQUARE_VBO);

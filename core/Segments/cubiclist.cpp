@@ -87,7 +87,7 @@ CubicList CubicList::getFragmentUnbound(const double &minLenFrac,
     return CubicList(fragSegs);
 }
 
-QList<CubicList> CubicList::makeFromSkPath(const SkPath &src) {
+QList<CubicList> CubicList::sMakeFromSkPath(const SkPath &src) {
     QList<CubicList> result;
     QList<qCubicSegment2D> segs;
 

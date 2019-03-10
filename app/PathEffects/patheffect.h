@@ -35,7 +35,7 @@ public:
 
     const PathEffectType &getEffectType();
 
-    virtual void filterPathForRelFrameF(const qreal &,
+    virtual void filterPathForRelFrame(const qreal &,
                                        const SkPath &,
                                        SkPath *,
                                        const bool &) = 0;

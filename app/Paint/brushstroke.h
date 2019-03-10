@@ -128,12 +128,12 @@ struct BrushStrokeSet {
                                             qCubicSegment1D& widthCurve) {
         QList<BrushStrokeSet> result;
 
-        auto segLists = CubicList::makeFromSkPath(path);
+        auto segLists = CubicList::sMakeFromSkPath(path);
         if(segLists.isEmpty()) return result;
         for(auto& segs : segLists) {
             if(segs.isEmpty()) continue;
             const double minL = 0;
-            const double maxL = 1.3;
+            const double maxL = segs.isClosed() ? 1 + 10/segs.getTotalLength() : 1;
             auto segsT = segs.getFragmentUnbound(minL, maxL);
             result << fromCubicList(segsT, timeCurve,
                                     pressureCurve, widthCurve);

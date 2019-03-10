@@ -17,7 +17,7 @@ public:
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath,
                                               const qreal &scale = 1.);
-    void filterPathForRelFrameF(const qreal &relFrame,
+    void filterPathForRelFrame(const qreal &relFrame,
                                SkPath *srcDstPath,
                                const bool &groupPathSum = false);
     void filterPathForRelFrameUntilGroupSumF(const qreal &relFrame,

@@ -15,7 +15,7 @@ struct CubicList {
     CubicList getFragmentUnbound(const double &minLenFrac,
                                  const double &maxLenFrac);
 
-    static QList<CubicList> makeFromSkPath(const SkPath& src);
+    static QList<CubicList> sMakeFromSkPath(const SkPath& src);
 
     SkPath toSkPath() {
         if(isEmpty()) return SkPath();
@@ -43,6 +43,9 @@ struct CubicList {
     qreal getTotalLength();
 
     bool isEmpty() const;
+    bool isClosed() const {
+        return mClosed;
+    }
 
     qreal minDistanceTo(const QPointF &p,
                         qreal * const pBestT = nullptr,

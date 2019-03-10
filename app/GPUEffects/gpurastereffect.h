@@ -17,7 +17,7 @@ public:
     }
 
     void use(QGL33c * const gl, QJSEngine& engine) {
-        gl->glUseProgram(mProgram.fID);
+        gl->glUseProgram(mProgram.fId);
         for(const auto& uni : mUniformSpecifiers) {
             uni(gl, engine);
         }

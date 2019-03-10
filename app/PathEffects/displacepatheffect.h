@@ -3,15 +3,14 @@
 #include "patheffect.h"
 
 class DisplacePathEffect : public PathEffect {
-    Q_OBJECT
     friend class SelfRef;
 public:
     DisplacePathEffect(const bool &outlinePathEffect);
 
-    void filterPathForRelFrameF(const qreal &relFrame,
-                                const SkPath &src,
-                                SkPath *dst,
-                                const bool &);
+    void filterPathForRelFrame(const qreal &relFrame,
+                               const SkPath &src,
+                               SkPath *dst,
+                               const bool &);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 

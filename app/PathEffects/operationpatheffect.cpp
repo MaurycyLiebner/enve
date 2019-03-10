@@ -18,7 +18,7 @@ OperationPathEffect::OperationPathEffect(PathBox *parentPath,
     ca_addChildAnimator(mOperationType);
 }
 
-void OperationPathEffect::filterPathForRelFrameF(const qreal &relFrame,
+void OperationPathEffect::filterPathForRelFrame(const qreal &relFrame,
                                            const SkPath &src,
                                            SkPath *dst,
                                            const bool &) {

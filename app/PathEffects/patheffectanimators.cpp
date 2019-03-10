@@ -85,7 +85,7 @@ void PathEffectAnimators::filterPathForRelFrameBeforeThicknessF(
         PathEffect *effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() && effectT->isVisible()) {
             SkPath srcPath = dstPath;
-            effectT->filterPathForRelFrameF(relFrame,
+            effectT->filterPathForRelFrame(relFrame,
                                            srcPath,
                                            &dstPath, false);
         }
@@ -93,7 +93,7 @@ void PathEffectAnimators::filterPathForRelFrameBeforeThicknessF(
     *srcDstPath = dstPath;
 }
 
-void PathEffectAnimators::filterPathForRelFrameF(const qreal &relFrame,
+void PathEffectAnimators::filterPathForRelFrame(const qreal &relFrame,
                                                 SkPath *srcDstPath,
                                                 const bool &groupPathSum) {
     SkPath dstPath = *srcDstPath;
@@ -103,7 +103,7 @@ void PathEffectAnimators::filterPathForRelFrameF(const qreal &relFrame,
             continue;
         }
         SkPath srcPath = dstPath;
-        effectT->filterPathForRelFrameF(relFrame,
+        effectT->filterPathForRelFrame(relFrame,
                                        srcPath,
                                        &dstPath,
                                        groupPathSum);
@@ -124,7 +124,7 @@ void PathEffectAnimators::filterPathForRelFrameUntilGroupSumF(
             break;
         }
         SkPath srcPath = dstPath;
-        effectT->filterPathForRelFrameF(relFrame,
+        effectT->filterPathForRelFrame(relFrame,
                                        srcPath,
                                        &dstPath,
                                        false);

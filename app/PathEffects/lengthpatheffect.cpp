@@ -15,124 +15,42 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mReverse);
 }
 
-void LengthPathEffect::filterPathForRelFrameF(const qreal &relFrame,
+void LengthPathEffect::filterPathForRelFrame(const qreal &relFrame,
                                                  const SkPath &src,
                                                  SkPath *dst,
                                                  const bool &) {
-    qreal targetLen = mLength->getCurrentEffectiveValueAtRelFrame(relFrame);
-    if(targetLen < 0.001) {
+    const qreal lenPer = mLength->getCurrentEffectiveValueAtRelFrame(relFrame);
+    if(lenPer < 0.001) {
         *dst = SkPath();
         return;
     }
-    if(targetLen > 99.999) {
+    if(lenPer > 99.999) {
         *dst = src;
         return;
     }
-    QPainterPath dstT = SkPathToQPainterPath(src);
-    if(mReverse->getValue()) {
-        dstT = dstT.toReversed();
+    const qreal lenFrac = lenPer/100;
+    const bool reverse = mReverse->getValue();
+
+    auto paths = CubicList::sMakeFromSkPath(src);
+    qreal totalLength = 0;
+    for(auto& path : paths) {
+        totalLength += path.getTotalLength();
     }
+    const qreal targetLength = lenFrac*totalLength;
 
-    qreal finalLen = dstT.length()*targetLen/100.;
-    QPointF finalPt = dstT.pointAtPercent(targetLen/100.);
-
-    QPointF pt1Pos;
-    QPointF pt1End;
-    QPointF pt2Start;
-    QPointF pt2Pos;
-    qreal pt12T;
-
-    QPainterPath dstT2;
-    bool firstOther = true;
-    QPointF endPt;
-    QPointF startPt;
-
-    QPointF lastPt;
-    bool found = false;
-    for(int i = 0; i < dstT.elementCount(); i++) {
-        const QPainterPath::Element &elem = dstT.elementAt(i);
-        if(elem.isMoveTo()) { // move
-            dstT2.moveTo(elem.x, elem.y);
-            lastPt = QPointF(elem.x, elem.y);
-        } else if(elem.isLineTo()) { // line
-            QPointF nearestPtT;
-            qreal errorT;
-            qreal nearestT;
-            qCubicSegment2D seg(lastPt, lastPt,
-                                QPointF(elem.x, elem.y),
-                                QPointF(elem.x, elem.y));
-            errorT = seg.minDistanceTo(finalPt, &nearestT, &nearestPtT);
-
-            if(errorT < 0.01) {
-                QPainterPath dstT3 = dstT2;
-                dstT3.lineTo(elem.x, elem.y);
-                if(dstT3.length() + 2. > finalLen) {
-                    found = true;
-                    pt1Pos = lastPt;
-                    pt1End = lastPt;
-                    pt2Start = QPointF(elem.x, elem.y);
-                    pt2Pos = QPointF(elem.x, elem.y);
-                    pt12T = nearestT;
-                    break;
-                }
-            }
-            dstT2.lineTo(elem.x, elem.y);
-            lastPt = QPointF(elem.x, elem.y);
-        } else if(elem.isCurveTo()) { // curve
-            endPt = QPointF(elem.x, elem.y);
-            firstOther = true;
-        } else { // other
-            if(firstOther) {
-                startPt = QPointF(elem.x, elem.y);
-            } else {
-                QPointF nearestPtT;
-                qreal errorT;
-                qreal nearestT;
-                qCubicSegment2D seg(lastPt, lastPt,
-                                    QPointF(elem.x, elem.y),
-                                    QPointF(elem.x, elem.y));
-                errorT = seg.minDistanceTo(finalPt, &nearestT, &nearestPtT);
-                if(errorT < 0.01) {
-                    QPainterPath dstT3 = dstT2;
-                    dstT3.cubicTo(endPt, startPt, QPointF(elem.x, elem.y));
-                    if(dstT3.length() + 2. > finalLen) {
-                        found = true;
-                        pt1Pos = lastPt;
-                        pt1End = endPt;
-                        pt2Start = startPt;
-                        pt2Pos = QPointF(elem.x, elem.y);
-                        pt12T = nearestT;
-                        break;
-                    }
-                }
-                dstT2.cubicTo(endPt, startPt, QPointF(elem.x, elem.y));
-                lastPt = QPointF(elem.x, elem.y);
-            }
-            firstOther = !firstOther;
+    SkPath result;
+    qreal currLen = 0;
+    for(int i = 0; i < paths.count(); i++) {
+        auto& path = paths[i];
+        const qreal pathLen = path.getTotalLength();
+        if(currLen + pathLen > targetLength) {
+            const qreal remLen = targetLength - currLen;
+            result.addPath(path.getFragment(0, remLen/pathLen).toSkPath());
+            break;
         }
-    }
-    if(!found) {
-        *dst = src;
-        return;
+        currLen += pathLen;
+        result.addPath(path.toSkPath());
     }
 
-    QPointF newPointPos;
-    QPointF newPointStart;
-    QPointF newPointEnd;
-    VectorPathEdge::getNewRelPosForKnotInsertionAtT(
-                  pt1Pos,
-                  &pt1End,
-                  &pt2Start,
-                  pt2Pos,
-                  &newPointPos,
-                  &newPointStart,
-                  &newPointEnd,
-                  pt12T);
-    dstT2.cubicTo(pt1End, newPointStart, newPointPos);
-
-    if(mReverse->getValue()) {
-        *dst = QPainterPathToSkPath(dstT2.toReversed());
-    } else {
-        *dst = QPainterPathToSkPath(dstT2);
-    }
+    *dst = result;
 }
