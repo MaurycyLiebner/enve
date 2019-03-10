@@ -49,11 +49,15 @@ CubicList CubicList::getFragment(const double &minLenFrac,
         maxI = mSegments.count() - 1; maxT = 1;
     }
     QList<qCubicSegment2D> fragSegs;
-    fragSegs << mSegments[minI].dividedAtT(minT).second;
-    for(int i = minI + 1; i < maxI; i++) {
-        fragSegs << static_cast<qCubicSegment2D>(mSegments[i]);
+    if(minI == maxI) {
+        fragSegs << mSegments[minI].tFragment(minT, maxT);
+    } else {
+        fragSegs << mSegments[minI].dividedAtT(minT).second;
+        for(int i = minI + 1; i < maxI; i++) {
+            fragSegs << static_cast<qCubicSegment2D>(mSegments[i]);
+        }
+        fragSegs << mSegments[maxI].dividedAtT(maxT).first;
     }
-    fragSegs << mSegments[maxI].dividedAtT(maxT).first;
     return CubicList(fragSegs);
 }
 

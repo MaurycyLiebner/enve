@@ -82,7 +82,7 @@ protected:
                             qrealToSkScalar(col.hueF()),
                             qrealToSkScalar(col.saturationF()),
                             qrealToSkScalar(col.valueF()));
-                auto brush = fStrokeSettings.fStrokeBrush->getBrush();
+                const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
                 for(auto& set : brushSet) {
                     surf.execute(brush, set);
                 }

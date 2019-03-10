@@ -1,19 +1,19 @@
 #ifndef SIMPLEMATH_H
 #define SIMPLEMATH_H
-#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
-#define MIN(a, b)  (((a) < (b)) ? (a) : (b))
-#define ROUND(x) ((int) ((x) + 0.5))
+#define MAX(a, b) (a > b ? a : b)
+#define MIN(a, b) (a < b ? a : b)
+#define ROUND(x) ((int)(x + 0.5))
 #define SIGN(x) (x > 0 ? 1 : -1)
-#define SQR(x) ((x)*(x))
-#define CLAMP(x, low, high)  x > high ? high : (x < low ? low : x)
-#define CLAMP01(x)  x > 1 ? 1 : (x < 0 ? 0 : x)
-#define MAX3(a, b, c) ((a)>(b)?MAX((a),(c)):MAX((b),(c)))
-#define MIN3(a, b, c) ((a)<(b)?MIN((a),(c)):MIN((b),(c)))
+#define SQR(x) (x*x)
+#define CLAMP(x, low, high)  (x > high ? high : (x < low ? low : x))
+#define CLAMP01(x)  (x > 1 ? 1 : (x < 0 ? 0 : x))
+#define MAX3(a, b, c) (a > b ? MAX(a,c) : MAX(b, c))
+#define MIN3(a, b, c) (a < b ? MIN(a,c) : MIN(b, c))
 
 #define PIf 3.14159265f
 #define PI 3.14159265358979323846
-#define RadToF 0.5/PI
-#define RadToDeg 180/PI
+#define RadToF (0.5/PI)
+#define RadToDeg (180/PI)
 #define sqrt_3 1.73205080757
 #define sqrt_2 1.41421356237
 #define sqrt_3f 1.73205080757f
@@ -22,8 +22,8 @@
 #define sqrt3     1.73205080757
 #define v2to2div3 1.58740105197
 
-#define pow2(val) val*val
-#define pow3(val) val*val*val
+#define pow2(val) (val*val)
+#define pow3(val) (val*val*val)
 
 #include <QtCore>
 #include "skia/skqtconversions.h"

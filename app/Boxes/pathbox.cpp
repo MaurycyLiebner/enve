@@ -65,12 +65,10 @@ PathBox::PathBox(const BoundingBoxType &type) :
 }
 
 PathBox::~PathBox() {
-    if(mFillSettings->getGradient() != nullptr) {
+    if(mFillSettings->getGradient())
         mFillSettings->getGradient()->removePath(this);
-    }
-    if(mStrokeSettings->getGradient() != nullptr) {
+    if(mStrokeSettings->getGradient())
         mStrokeSettings->getGradient()->removePath(this);
-    }
 }
 
 void PathBox::drawSelectedSk(SkCanvas *canvas,
@@ -120,7 +118,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         }
     }
 
-    auto pathData = GetAsPtr(data, PathBoxRenderData);
+    const auto pathData = GetAsPtr(data, PathBoxRenderData);
     if(currentEditPathCompatible) {
         pathData->fEditPath = mEditPathSk;
     } else {

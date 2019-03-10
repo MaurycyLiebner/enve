@@ -28,17 +28,16 @@ private:
                   const bool& press,
                   double dLen) {
         QRect changedRect;
-        if(press) {
-            changedRect = executePress(brush, surface);
-        }
+        if(press) changedRect = executePress(brush, surface);
         const double totalLength = fStrokePath.length();
         const int iMax = qCeil(totalLength/dLen);
         dLen = totalLength/iMax;
         const double lenFrag = 1./iMax;
 
-        for(int i = 0; i < iMax; i++) {
-            double t = fStrokePath.tAtLength(i*dLen);
-            QRect roi = executeMove(brush, surface, t, lenFrag);
+        for(int i = 1; i <= iMax; i++) {
+            const double t = fStrokePath.tAtLength(i*dLen);
+            qDebug() << i << t;
+            const QRect roi = executeMove(brush, surface, t, lenFrag);
             changedRect = changedRect.united(roi);
         }
         return changedRect;
@@ -48,12 +47,13 @@ private:
                       MyPaintSurface * const surface,
                       const double& t,
                       const double& lenFrag) const {
-        QPointF pos = gCubicValueAtT(fStrokePath, t);
-        qreal pressure = gCubicValueAtT(fPressure, t);
-        qreal xTilt = gCubicValueAtT(fXTilt, t);
-        qreal yTilt = gCubicValueAtT(fYTilt, t);
-        qreal time = gCubicValueAtT(fTimeCurve, t);
-        qreal width = gCubicValueAtT(fWidthCurve, t);
+        const QPointF pos = gCubicValueAtT(fStrokePath, t);
+        qDebug() << "MOVE" << pos;
+        const qreal pressure = gCubicValueAtT(fPressure, t);
+        const qreal xTilt = gCubicValueAtT(fXTilt, t);
+        const qreal yTilt = gCubicValueAtT(fYTilt, t);
+        const qreal time = gCubicValueAtT(fTimeCurve, t);
+        const qreal width = gCubicValueAtT(fWidthCurve, t);
         mypaint_brush_set_base_value(brush,
                                      MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
                                      static_cast<float>(qLn(width)));
@@ -75,10 +75,11 @@ private:
 
     QRect executePress(MyPaintBrush * const brush,
                        MyPaintSurface * const surface) const {
-        QPointF pos = gCubicValueAtT(fStrokePath, 0);
-        qreal pressure = gCubicValueAtT(fPressure, 0);
-        qreal xTilt = gCubicValueAtT(fXTilt, 0);
-        qreal yTilt = gCubicValueAtT(fYTilt, 0);
+        const QPointF pos = gCubicValueAtT(fStrokePath, 0);
+        qDebug() << "PRESS" << pos;
+        const qreal pressure = gCubicValueAtT(fPressure, 0);
+        const qreal xTilt = gCubicValueAtT(fXTilt, 0);
+        const qreal yTilt = gCubicValueAtT(fYTilt, 0);
         //qreal time = gCubicValueAtT(fTimeCurve, t);
 
         mypaint_brush_reset(brush);
@@ -112,7 +113,7 @@ struct BrushStrokeSet {
         auto segsList = segs.getSegments();
         for(auto& seg : segsList) {
             currLen += seg.length();
-            qreal t = currLen/segs.getTotalLength();
+            const qreal t = currLen/segs.getTotalLength();
             set.fStrokes << BrushStroke{seg,
                              pressureCurve.tFragment(lastT, t),
                              DefaultTiltCurve,
@@ -137,10 +138,8 @@ struct BrushStrokeSet {
             const double minL = 0;
             const double maxL = 1.3;
             auto segsT = segs.getFragmentUnbound(minL, maxL);
-            result << fromCubicList(segsT,
-                                    timeCurve,
-                                    pressureCurve,
-                                    widthCurve);
+            result << fromCubicList(segsT, timeCurve,
+                                    pressureCurve, widthCurve);
         }
         return result;
     }
@@ -208,7 +207,7 @@ struct BrushStrokeSet {
         QRect updateRect = fStrokes[0].execute(brush, surface, true, dLen);
         for(int i = 1; i < fStrokes.count(); i++) {
             auto& stroke = fStrokes[i];
-            QRect roi = stroke.execute(brush, surface, false, dLen);
+            const QRect roi = stroke.execute(brush, surface, false, dLen);
             updateRect = updateRect.united(roi);
         }
         return updateRect;
