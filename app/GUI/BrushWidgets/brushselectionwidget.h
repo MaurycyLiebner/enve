@@ -25,7 +25,6 @@ class BrushSelectionWidget : public ItemSelectionWidget<BrushWrapper> {
 public:
     BrushSelectionWidget(QWidget* parent = nullptr);
     ~BrushSelectionWidget() {}
-
 signals:
     void currentBrushChanged(BrushWrapper*);
     void brushBookmarked(BrushWrapper*);

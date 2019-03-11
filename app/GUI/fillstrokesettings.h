@@ -16,6 +16,7 @@
 #include "Animators/paintsettings.h"
 #include "Animators/brushsettings.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
+#include "GUI/BrushWidgets/brushselectionicon.h"
 
 class GradientWidget;
 class MainWindow;
@@ -201,7 +202,7 @@ private:
     QPushButton *mRadialGradientButton;
     QWidget *mGradientTypeWidget;
 
-    BrushSelectionWidget* mBrushSelectionWidget;
+    BrushSelectionIcon* mBrushSelectionWidget;
     Segment1DEditor* mBrushWidthCurveEditor;
     Segment1DEditor* mBrushPressureCurveEditor;
     Segment1DEditor* mBrushTimeCurveEditor;

@@ -36,6 +36,7 @@ public:
     CollectionArea(const QString& name, QWidget* parent);
 
     const QString& getName() const { return mName; }
+    Item* getRandomItem() const;
     Item *getItemWithName(const QString &name) const;
     void setName(const QString& name) { mName = name; }
     ItemWidget<Item>* getWidgetForItem(Item* item) const {
@@ -79,10 +80,17 @@ CollectionArea<Item>::CollectionArea(const QString& name, QWidget *parent) :
     setWidget(mLayoutWidget);
 }
 
+template<class Item>
+Item *CollectionArea<Item>::getRandomItem() const {
+   const auto itemSptr = mItemWidgets.first()->getItem();
+   if(!itemSptr) return nullptr;
+   return itemSptr;
+}
+
 template <class Item>
 Item* CollectionArea<Item>::getItemWithName(const QString &name) const {
     for(const auto& widget : mItemWidgets) {
-        Item* itemSptr = widget->getItem();
+        const auto itemSptr = widget->getItem();
         if(!itemSptr) continue;
         if(itemSptr->getName() != name) continue;
         return itemSptr;

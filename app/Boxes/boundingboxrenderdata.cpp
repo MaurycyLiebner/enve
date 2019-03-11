@@ -44,7 +44,7 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     if(fOpacity < 0.001) return;
     canvas->save();
-    SkScalar invScale = qrealToSkScalar(1/fResolution);
+    const SkScalar invScale = qrealToSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
     renderToImage();
     SkPaint paint;
@@ -90,7 +90,7 @@ void BoundingBoxRenderData::renderToImage() {
         fGlobalBoundingRect = fGlobalBoundingRect.intersected(
                               scale.mapRect(fMaxBoundsRect));
     }
-    QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
+    const QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
             QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
                     qRound(fGlobalBoundingRect.top()/**resolution*/));
     fGlobalBoundingRect.translate(-transF);

@@ -279,7 +279,8 @@ SOURCES += main.cpp\
     canvasmouseevents.cpp \
     canvashandlesmartpath.cpp \
     Boxes/smartvectorpath.cpp \
-    PropertyUpdaters/smartnodepointupdater.cpp
+    PropertyUpdaters/smartnodepointupdater.cpp \
+    GUI/BrushWidgets/brushselectionicon.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -508,7 +509,8 @@ HEADERS  += \
     MovablePoints/smartctrlpoint.h \
     Animators/PathAnimators/smartpathcollectionhandler.h \
     Boxes/smartvectorpath.h \
-    PropertyUpdaters/smartnodepointupdater.h
+    PropertyUpdaters/smartnodepointupdater.h \
+    GUI/BrushWidgets/brushselectionicon.h
 
 RESOURCES += \
     resources.qrc

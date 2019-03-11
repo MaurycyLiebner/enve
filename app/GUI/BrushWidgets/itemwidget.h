@@ -25,6 +25,7 @@ protected:
     bool mHovered = false;
 signals:
     void selected(StdSelfRef*);
+    void leftPressed();
     void rightPressed(StdSelfRef*, QPoint);
 };
 

@@ -1,2 +1,1 @@
 #include "itemselectionwidget.h"
-

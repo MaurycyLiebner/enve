@@ -72,6 +72,11 @@ public:
         if(mCurrentItem) mCurrentItem->deselect();
     }
 
+    void setFirstItem() {
+        if(mChildCollections.empty()) return;
+        setCurrentItem(mChildCollections.first()->getRandomItem());
+    }
+
     Item* getCurrentItem() const {
         return mCurrentItem;
     }

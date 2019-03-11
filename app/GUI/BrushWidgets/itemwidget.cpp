@@ -72,8 +72,8 @@ void ItemWidget<Item>::leaveEvent(QEvent*) {
 
 template <class Item>
 void ItemWidget<Item>::mousePressEvent(QMouseEvent *event) {
-    if(!mItem) return;
     if(event->button() == Qt::LeftButton) {
+        emit leftPressed();
         if(isSelected()) return;
         emit selected(GetAsPtr(mItem, StdSelfRef));
     } else if(event->button() == Qt::RightButton) {
@@ -96,8 +96,7 @@ void ItemWidget<Item>::mousePressEvent(QMouseEvent *event) {
 template <class Item>
 ItemWidget<Item> *ItemWidget<Item>::createWidget(const stdsptr<Item>& itemSptr,
                                                  QWidget *parent) {
-    if(!itemSptr) return nullptr;
-    ItemWidget* newWidget = new ItemWidget(itemSptr, parent);
-    newWidget->setSelected(itemSptr->selected());
+    const auto newWidget = new ItemWidget(itemSptr, parent);
+    newWidget->setSelected(itemSptr ? itemSptr->selected() : false);
     return newWidget;
 }

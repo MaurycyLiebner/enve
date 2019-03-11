@@ -671,7 +671,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     data->fTransform = data->fRelTransform*data->fParentTransform;
     data->fOpacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
     data->fResolution = getParentCanvas()->getResolutionFraction();
-    bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
+    const bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
     if(effectsVisible) {
         data->fEffectsMargin = getEffectsMarginAtRelFrameF(relFrame)*
                 data->fResolution + 2.;
@@ -680,7 +680,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     }
     data->fBlendMode = getBlendMode();
 
-    Canvas* parentCanvas = getParentCanvas();
+    const auto parentCanvas = getParentCanvas();
     data->fMaxBoundsRect = parentCanvas->getMaxBoundsRect();
     if(data->fOpacity > 0.001 && effectsVisible) {
         setupEffectsF(relFrame, data);

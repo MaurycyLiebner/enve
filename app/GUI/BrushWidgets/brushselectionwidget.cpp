@@ -35,11 +35,13 @@ BrushSelectionWidget::BrushSelectionWidget(QWidget* parent) :
     for(const BrushCollectionData& coll : sData) {
         addChildCollection(new BrushCollection(coll, this), coll.fName);
     }
+    if(mChildCollections.isEmpty()) return;
 }
 
 void BrushSelectionWidget::brushSelected(BrushWrapper* wrapper) {
     setCurrentItem(wrapper);
 }
+
 void loadBrushFromFile(const QString &path,
                        BrushCollectionData& coll) {
     QFile dataFile(path);

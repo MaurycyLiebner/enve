@@ -70,11 +70,12 @@ protected:
 //                for(auto& set : brushSet) {
 //                    set.execute(brush->getItem(), &surf, 5);
 //                }
+                auto widthCurve = fStrokeSettings.fWidthCurve*fResolution;
                 auto brushSet = BrushStrokeSet::outlineStrokesForSkPath(
                             pathT,
                             fStrokeSettings.fTimeCurve,
                             fStrokeSettings.fPressureCurve,
-                            fStrokeSettings.fWidthCurve, 5, 5);
+                            widthCurve, 5, 5);
                 QColor col = fStrokeSettings.fPaintColor;
                 col.setRgbF(col.blueF(), col.greenF(),
                             col.redF(), col.alphaF());
