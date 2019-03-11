@@ -103,6 +103,7 @@
         <file alias="fill_gradient_radial.png">pixmaps/icons/fill_gradient_radial.png</file>
         <file alias="draw_dropper_checked.png">pixmaps/icons/draw_dropper_checked.png</file>
         <file alias="fill_brush.png">pixmaps/icons/fill_brush.png</file>
+        <file alias="curve.png">pixmaps/icons/curve.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>

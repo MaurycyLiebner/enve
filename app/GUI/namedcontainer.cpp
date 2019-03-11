@@ -5,11 +5,10 @@ NamedContainer::NamedContainer(const QString& name, QWidget *widget,
                                QWidget *parent) : QWidget(parent) {
     mNameLabel = new QLabel("<center>" + name + "</center>", this);
     mNameLabel->setObjectName("dockLabel");
-    if(vertical) {
-        mLayout = new QVBoxLayout(this);
-    } else {
-        mLayout = new QHBoxLayout(this);
-    }
+    mNameLabel->setSizePolicy(QSizePolicy::MinimumExpanding,
+                              QSizePolicy::Fixed);
+    if(vertical) mLayout = new QVBoxLayout(this);
+    else mLayout = new QHBoxLayout(this);
     mLayout->setSpacing(0);
     mLayout->addWidget(mNameLabel);
     mLayout->addWidget(widget);

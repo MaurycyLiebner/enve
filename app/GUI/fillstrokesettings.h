@@ -17,7 +17,6 @@
 #include "Animators/brushsettings.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "GUI/BrushWidgets/brushselectionicon.h"
-
 class GradientWidget;
 class MainWindow;
 class CanvasWindow;
@@ -25,6 +24,7 @@ class ColorSettingsWidget;
 class QrealAnimatorValueSlider;
 class ActionButton;
 class Segment1DEditor;
+class QDockWidget;
 
 class FillStrokeSettingsWidget : public QWidget {
     Q_OBJECT
@@ -202,7 +202,10 @@ private:
     QPushButton *mRadialGradientButton;
     QWidget *mGradientTypeWidget;
 
-    BrushSelectionIcon* mBrushSelectionWidget;
+    QDockWidget* mBrushSelectionDock;
+    BrushSelectionWidget* mBrushSelectionWidget;
+
+    QDockWidget* mBrushCurvesDock;
     Segment1DEditor* mBrushWidthCurveEditor;
     Segment1DEditor* mBrushPressureCurveEditor;
     Segment1DEditor* mBrushTimeCurveEditor;

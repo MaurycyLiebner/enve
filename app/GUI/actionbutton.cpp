@@ -36,23 +36,17 @@ void ActionButton::leaveEvent(QEvent *) {
     update();
 }
 
-void ActionButton::paintEvent(QPaintEvent *)
-{
+void ActionButton::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
-    if(!isEnabled()) {
-        p.setOpacity(0.5);
-    }
-    if(mChecked) {
-        p.drawImage(0, 0, mCheckedPixmap);
-    } else {
-        p.drawImage(0, 0, mNotCheckedPixmap);
-    }
+    if(!isEnabled()) p.setOpacity(0.5);
+    if(mChecked) p.drawImage(0, 0, mCheckedPixmap);
+    else p.drawImage(0, 0, mNotCheckedPixmap);
     if(isEnabled()) {
         if(mHover) {
             p.setRenderHint(QPainter::Antialiasing);
-            p.setPen(QPen(QColor(255, 255, 255, 125), 2.));
-            p.drawRoundedRect(1., 1., 22., 22., 2.5, 2.5);
+            p.setPen(QPen(QColor(255, 255, 255, 125), 2));
+            p.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.5, 2.5);
         }
     }
 

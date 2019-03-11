@@ -79,14 +79,14 @@ MainWindow::MainWindow(QWidget *parent)
     setCurrentPath("");
 
     mFillStrokeSettingsDock = new QDockWidget(this);
-    const auto fillStrokeSettingsScroll = new ScrollArea(this);
+    //const auto fillStrokeSettingsScroll = new ScrollArea(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
-    fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
+    //fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
     const auto fillStrokeDockLabel = new QLabel("Fill and Stroke", this);
     fillStrokeDockLabel->setObjectName("dockLabel");
     fillStrokeDockLabel->setAlignment(Qt::AlignCenter);
     mFillStrokeSettingsDock->setTitleBarWidget(fillStrokeDockLabel);
-    mFillStrokeSettingsDock->setWidget(fillStrokeSettingsScroll);
+    mFillStrokeSettingsDock->setWidget(mFillStrokeSettings);
     mFillStrokeSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
                                          QDockWidget::DockWidgetFloatable);
     addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);

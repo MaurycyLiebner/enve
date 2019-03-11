@@ -9,6 +9,7 @@
 #include "qdoubleslider.h"
 #include "segment1deditor.h"
 #include "namedcontainer.h"
+#include <QDockWidget>
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     QWidget(parent) {
@@ -191,13 +192,46 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mBrushSettingsWidget = new QWidget(this);
     QVBoxLayout* brushLayout = new QVBoxLayout(mBrushSettingsWidget);
     mBrushSettingsWidget->setLayout(brushLayout);
+
+    const auto brushCurvesWidget = new QWidget(this);
     mBrushWidthCurveEditor = new Segment1DEditor(0, 100, this);
     mBrushPressureCurveEditor = new Segment1DEditor(0, 1, this);
     mBrushTimeCurveEditor = new Segment1DEditor(0, 2, this);
-    mBrushSelectionWidget = new BrushSelectionIcon(this);
+    const auto brushCurvesLayout = new QVBoxLayout;
+    brushCurvesWidget->setLayout(brushCurvesLayout);
+    brushCurvesLayout->addWidget(
+                new NamedContainer("width", mBrushWidthCurveEditor, true, this));
+    brushCurvesLayout->addWidget(
+                new NamedContainer("pressure", mBrushPressureCurveEditor, true, this));
+    brushCurvesLayout->addWidget(
+                new NamedContainer("time", mBrushTimeCurveEditor, true, this));
+    mBrushCurvesDock = new QDockWidget(mMainWindow);
+    mBrushCurvesDock->setFeatures(QDockWidget::DockWidgetMovable |
+                                  QDockWidget::DockWidgetFloatable);
+    const auto brushCurvesLabel = new QLabel("Outline Curves", this);
+    brushCurvesLabel->setObjectName("dockLabel");
+    brushCurvesLabel->setAlignment(Qt::AlignCenter);
+    mBrushCurvesDock->setTitleBarWidget(brushCurvesLabel);
+    const auto brushCurvesScroll = new ScrollArea(mBrushCurvesDock);
+    brushCurvesScroll->setWidget(brushCurvesWidget);
+    mBrushCurvesDock->setWidget(brushCurvesScroll);
+    mMainWindow->addDockWidget(Qt::RightDockWidgetArea, mBrushCurvesDock);
+    mBrushCurvesDock->hide();
+
+    mBrushSelectionDock = new QDockWidget(mMainWindow);
+    mBrushSelectionDock->setFeatures(QDockWidget::DockWidgetMovable |
+                                  QDockWidget::DockWidgetFloatable);
+    const auto brushSelectionLabel = new QLabel("Outline Brush", this);
+    brushSelectionLabel->setObjectName("dockLabel");
+    brushSelectionLabel->setAlignment(Qt::AlignCenter);
+    mBrushSelectionDock->setTitleBarWidget(brushSelectionLabel);
+    mBrushSelectionWidget = new BrushSelectionWidget(this);
+    mBrushSelectionDock->setWidget(mBrushSelectionWidget);
+    mMainWindow->addDockWidget(Qt::RightDockWidgetArea, mBrushSelectionDock);
+    mBrushSelectionDock->hide();
 
     connect(mBrushSelectionWidget,
-            &BrushSelectionIcon::currentBrushChanged,
+            &BrushSelectionWidget::currentBrushChanged,
             this, &FillStrokeSettingsWidget::setStrokeBrush);
     connect(mBrushWidthCurveEditor, &Segment1DEditor::segmentEdited,
             this, &FillStrokeSettingsWidget::setBrushWidthCurve);
@@ -205,14 +239,6 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
             this, &FillStrokeSettingsWidget::setBrushTimeCurve);
     connect(mBrushPressureCurveEditor, &Segment1DEditor::segmentEdited,
             this, &FillStrokeSettingsWidget::setBrushPressureCurve);
-
-    brushLayout->addWidget(mBrushSelectionWidget);
-    brushLayout->addWidget(
-                new NamedContainer("width", mBrushWidthCurveEditor, true, this));
-    brushLayout->addWidget(
-                new NamedContainer("pressure", mBrushPressureCurveEditor, true, this));
-    brushLayout->addWidget(
-                new NamedContainer("time", mBrushTimeCurveEditor, true, this));
 
     mMainLayout->addLayout(mTargetLayout);
     mMainLayout->addLayout(mColorTypeLayout);
@@ -551,60 +577,39 @@ void FillStrokeSettingsWidget::setCapStyle(Qt::PenCapStyle capStyle) {
 }
 
 PaintType FillStrokeSettingsWidget::getCurrentPaintTypeVal() {
-    if(mTarget == FILL) {
-        return mCurrentFillPaintType;
-    } else {
-        return mCurrentStrokePaintType;
-    }
+    if(mTarget == FILL) return mCurrentFillPaintType;
+    else return mCurrentStrokePaintType;
 }
 
 void FillStrokeSettingsWidget::setCurrentPaintTypeVal(const PaintType& paintType) {
-    if(mTarget == FILL) {
-        mCurrentFillPaintType = paintType;
-    } else {
-        mCurrentStrokePaintType = paintType;
-    }
+    if(mTarget == FILL) mCurrentFillPaintType = paintType;
+    else mCurrentStrokePaintType = paintType;
 }
 
 QColor FillStrokeSettingsWidget::getCurrentColorVal() {
-    if(mTarget == FILL) {
-        return mCurrentFillColor;
-    } else {
-        return mCurrentStrokeColor;
-    }
+    if(mTarget == FILL) return mCurrentFillColor;
+    else return mCurrentStrokeColor;
 }
 
 void FillStrokeSettingsWidget::setCurrentColorVal(const QColor& color) {
-    if(mTarget == FILL) {
-        mCurrentFillColor = color;
-    } else {
-        mCurrentStrokeColor = color;
-    }
+    if(mTarget == FILL) mCurrentFillColor = color;
+    else mCurrentStrokeColor = color;
 }
 
 Gradient *FillStrokeSettingsWidget::getCurrentGradientVal() {
-    if(mTarget == FILL) {
-        return mCurrentFillGradient;
-    } else {
-        return mCurrentStrokeGradient;
-    }
+    if(mTarget == FILL) return mCurrentFillGradient;
+    else return mCurrentStrokeGradient;
 }
 
 void FillStrokeSettingsWidget::setCurrentGradientVal(Gradient *gradient) {
-    if(mTarget == FILL) {
-        mCurrentFillGradient = gradient;
-    } else {
-        mCurrentStrokeGradient = gradient;
-    }
+    if(mTarget == FILL) mCurrentFillGradient = gradient;
+    else mCurrentStrokeGradient = gradient;
 }
 
 void FillStrokeSettingsWidget::setCurrentGradientLinearVal(
                                 const bool &linear) {
-    if(mTarget == FILL) {
-        mCurrentFillGradientLinear = linear;
-    } else {
-        mCurrentStrokeGradientLinear = linear;
-    }
+    if(mTarget == FILL) mCurrentFillGradientLinear = linear;
+    else mCurrentStrokeGradientLinear = linear;
 }
 
 void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
@@ -796,6 +801,8 @@ void FillStrokeSettingsWidget::setBrushPaintType() {
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
     mBrushSettingsWidget->show();
+    mBrushCurvesDock->show();
+    mBrushSelectionDock->show();
     if(mTarget == STROKE) mStrokeSettingsWidget->hide();
     setCurrentPaintTypeVal(BRUSHPAINT);
     updateColorAnimator();
@@ -807,6 +814,8 @@ void FillStrokeSettingsWidget::setNoPaintType() {
     mColorsSettingsWidget->hide();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
+    mBrushCurvesDock->hide();
+    mBrushSelectionDock->hide();
     updateColorAnimator();
     if(mTarget == STROKE) mStrokeSettingsWidget->show();
 }
@@ -817,6 +826,8 @@ void FillStrokeSettingsWidget::setFlatPaintType() {
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
+    mBrushCurvesDock->hide();
+    mBrushSelectionDock->hide();
     setCurrentPaintTypeVal(FLATPAINT);
     updateColorAnimator();
     if(mTarget == STROKE) mStrokeSettingsWidget->show();
@@ -835,16 +846,12 @@ void FillStrokeSettingsWidget::setGradientPaintType() {
             mCurrentStrokeGradient = mGradientWidget->getCurrentGradient();
         }
     }
-    if(mColorsSettingsWidget->isHidden()) {
-        mColorsSettingsWidget->show();
-    }
-    if(mGradientWidget->isHidden()) {
-        mGradientWidget->show();
-    }
-    if(mGradientTypeWidget->isHidden()) {
-        mGradientTypeWidget->show();
-    }
+    if(mColorsSettingsWidget->isHidden()) mColorsSettingsWidget->show();
+    if(mGradientWidget->isHidden()) mGradientWidget->show();
+    if(mGradientTypeWidget->isHidden()) mGradientTypeWidget->show();
     mBrushSettingsWidget->hide();
+    mBrushCurvesDock->hide();
+    mBrushSelectionDock->hide();
     updateColorAnimator();
 
     mGradientWidget->update();
