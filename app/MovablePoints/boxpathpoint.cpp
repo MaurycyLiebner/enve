@@ -10,30 +10,27 @@ BoxPathPoint::BoxPathPoint(QPointFAnimator *associatedAnimator,
 void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();
     mSavedAbsPos = getAbsolutePos();
-    BoxTransformAnimator *boxTrans =
-            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
+    const auto boxTrans = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     boxTrans->startPivotTransform();
 }
 
 void BoxPathPoint::finishTransform() {
     MovablePoint::finishTransform();
-    BoxTransformAnimator *boxTrans =
-            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
+    const auto boxTrans = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     boxTrans->finishPivotTransform();
 }
 
 void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
-    QPointF absPos = mSavedAbsPos + absTranslatione;
-    BoxTransformAnimator *boxTrans =
-            GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    boxTrans->getParentBox()->setPivotAbsPos(absPos);
+    const QPointF absPos = mSavedAbsPos + absTranslatione;
+    const auto boxTrans = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
+    const auto parentBox = boxTrans->getParentBox();
+    parentBox->setPivotAutoAdjust(false);
+    parentBox->setPivotAbsPos(absPos);
 }
 
 void BoxPathPoint::drawSk(SkCanvas *canvas,
                           const SkScalar &invScale) {
-    if(isHidden()) {
-        return;
-    }
+    if(isHidden()) return;
     const SkPoint absPos = qPointToSk(getAbsolutePos());
     const SkColor fillCol = mSelected ?
                 SkColorSetRGB(255, 255, 0) :
@@ -45,8 +42,8 @@ void BoxPathPoint::drawSk(SkCanvas *canvas,
     SkPaint paint;
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    SkScalar scaledHalfRadius = qrealToSkScalar(mRadius)*invScale*0.5f;
-    canvas->drawLine(-scaledHalfRadius, 0.f, scaledHalfRadius, 0.f, paint);
-    canvas->drawLine(0.f, -scaledHalfRadius, 0.f, scaledHalfRadius, paint);
+    const SkScalar scaledHalfRadius = qrealToSkScalar(mRadius)*invScale*0.5f;
+    canvas->drawLine(-scaledHalfRadius, 0, scaledHalfRadius, 0, paint);
+    canvas->drawLine(0, -scaledHalfRadius, 0, scaledHalfRadius, paint);
     canvas->restore();
 }

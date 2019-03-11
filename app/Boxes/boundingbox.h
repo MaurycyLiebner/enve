@@ -139,11 +139,8 @@ public:
     virtual PaintSettings *getFillSettings() const;
     virtual StrokeSettings *getStrokeSettings() const;
 
-    void setPivotAbsPos(const QPointF &absPos,
-                        const bool &pivotChanged = true);
-
-    void setPivotRelPos(const QPointF &relPos,
-                        const bool &pivotAutoAdjust = true);
+    void setPivotAbsPos(const QPointF &absPos);
+    void setPivotRelPos(const QPointF &relPos);
 
     virtual void cancelTransform();
     virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
@@ -428,7 +425,6 @@ public:
     bool isSelected() const;
 
     void updateDrawRenderContainerTransform();
-    void setPivotAutoAdjust(const bool &bT);
 
     const BoundingBoxType &getBoxType() const;
 
@@ -446,6 +442,7 @@ public:
 
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
+    void setPivotAutoAdjust(const bool &pivotAutoAdjust);
 protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 

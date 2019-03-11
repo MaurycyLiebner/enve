@@ -330,11 +330,13 @@ BoxesGroup *BoundingBox::getParentGroup() const {
     return mParentGroup;
 }
 
-void BoundingBox::setPivotRelPos(const QPointF &relPos,
-                                 const bool &pivotAutoAdjust) {
-    mPivotAutoAdjust = pivotAutoAdjust;
+void BoundingBox::setPivotRelPos(const QPointF &relPos) {
     mTransformAnimator->setPivotWithoutChangingTransformation(relPos);
     requestGlobalPivotUpdateIfSelected();
+}
+
+void BoundingBox::setPivotAutoAdjust(const bool &pivotAutoAdjust) {
+    mPivotAutoAdjust = pivotAutoAdjust;
 }
 
 void BoundingBox::startPivotTransform() {
@@ -345,9 +347,8 @@ void BoundingBox::finishPivotTransform() {
     mTransformAnimator->finishPivotTransform();
 }
 
-void BoundingBox::setPivotAbsPos(const QPointF &absPos,
-                                 const bool &pivotChanged) {
-    setPivotRelPos(mapAbsPosToRel(absPos), pivotChanged);
+void BoundingBox::setPivotAbsPos(const QPointF &absPos) {
+    setPivotRelPos(mapAbsPosToRel(absPos));
     //updateCombinedTransform();
 }
 
@@ -792,10 +793,6 @@ void BoundingBox::updateDrawRenderContainerTransform() {
                     mTransformAnimator->getCombinedTransform());
     }
 
-}
-
-void BoundingBox::setPivotAutoAdjust(const bool &bT) {
-    mPivotAutoAdjust = bT;
 }
 
 const BoundingBoxType &BoundingBox::getBoxType() const { return mType; }
