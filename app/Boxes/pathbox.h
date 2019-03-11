@@ -89,8 +89,10 @@ protected:
                 }
 
                 fBitmapTMP.reset();
-                fBitmapTMP = surf.toBitmap();
-                fGlobalBoundingRect.translate(-surf.zeroTilePos());
+                const int iMargin = qCeil(fEffectsMargin);
+                fBitmapTMP = surf.toBitmap(iMargin);
+                fGlobalBoundingRect.translate(-surf.zeroTilePos() -
+                                              QPoint(iMargin, iMargin));
             } else {
                 paint.setShader(nullptr);
                 fStrokeSettings.applyPainterSettingsSk(&paint);

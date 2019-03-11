@@ -21,7 +21,7 @@ struct AutoTilesData {
 
     int height() const;
 
-    SkBitmap toBitmap() const;
+    SkBitmap toBitmap(int margin = 0) const;
 
     bool drawOnPixmapZeroTilePivoted(
             SkPixmap &dst, const int& drawX, const int& drawY) const;

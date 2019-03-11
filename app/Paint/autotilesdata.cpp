@@ -114,41 +114,75 @@ int AutoTilesData::height() const {
     return mRowCount*mTileSize;
 }
 
-SkBitmap AutoTilesData::toBitmap() const {
-    const auto info = SkiaHelpers::getPremulBGRAInfo(width(), height());
+SkBitmap AutoTilesData::toBitmap(int margin) const {
+    if(margin < 0) margin = 0;
+    const auto info = SkiaHelpers::getPremulBGRAInfo(width() + 2*margin,
+                                                     height() + 2*margin);
     SkBitmap dst;
     dst.allocPixels(info);
 
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
+
+    if(margin > 0) {
+        for(int y = 0; y < dst.height(); y++) {
+            uint8_t * dstLine1 = dstP + y*dst.width()*4;
+            uint8_t * dstLine2 = dstP + ((y + 1)*dst.width() - margin)*4;
+
+            for(int x = 0; x < margin; x++) {
+                *dstLine1++ = 0;
+                *dstLine1++ = 0;
+                *dstLine1++ = 0;
+                *dstLine1++ = 0;
+
+                *dstLine2++ = 0;
+                *dstLine2++ = 0;
+                *dstLine2++ = 0;
+                *dstLine2++ = 0;
+            }
+        }
+
+        for(int y = 0; y < margin; y++) {
+            uint8_t * dstLine = dstP + (y*dst.width() + margin)*4;
+            for(int x = margin; x < dst.width() - margin; x++) {
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+            }
+        }
+
+        for(int y = dst.height() - margin; y < dst.height(); y++) {
+            uint8_t * dstLine = dstP + (y*dst.width() + margin)*4;
+            for(int x = margin; x < dst.width() - margin; x++) {
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+            }
+        }
+    }
+
+    const uint32_t add_r = (1<<15)/2;
+    const uint32_t add_g = (1<<15)/2;
+    const uint32_t add_b = (1<<15)/2;
+    const uint32_t add_a = (1<<15)/2;
+
     for(int col = 0; col < mColumnCount; col++) {
-        const int x0 = col*mTileSize;
-        const int maxX = qMin(x0 + mTileSize, dst.width());
+        const int x0 = col*mTileSize + margin;
+        const int maxX = qMin(x0 + mTileSize, dst.width() - margin);
         for(int row = 0; row < mRowCount; row++) {
             const uint16_t * const srcP = cGetTile(col, row);
-            const int y0 = row*mTileSize;
-            const int maxY = qMin(y0 + mTileSize, dst.height());
+            const int y0 = row*mTileSize + margin;
+            const int maxY = qMin(y0 + mTileSize, dst.height() - margin);
             for(int y = y0; y < maxY; y++) {
                 uint8_t * dstLine = dstP + (y*dst.width() + x0)*4;
                 const uint16_t * srcLine = srcP + (y - y0)*mTileSize*4;
                 for(int x = x0; x < maxX; x++) {
-                    uint32_t r = *srcLine++;
-                    uint32_t g = *srcLine++;
-                    uint32_t b = *srcLine++;
-                    uint32_t a = *srcLine++;
+                    const uint32_t r = *srcLine++;
+                    const uint32_t g = *srcLine++;
+                    const uint32_t b = *srcLine++;
+                    const uint32_t a = *srcLine++;
 
-                    // un-premultiply alpha (with rounding)
-//                    if(a != 0) {
-//                        r = ((r << 15) + a/2) / a;
-//                        g = ((g << 15) + a/2) / a;
-//                        b = ((b << 15) + a/2) / a;
-//                    } else {
-//                        r = g = b = 0;
-//                    }
-
-                    const uint32_t add_r = (1<<15)/2;
-                    const uint32_t add_g = (1<<15)/2;
-                    const uint32_t add_b = (1<<15)/2;
-                    const uint32_t add_a = (1<<15)/2;
                     *dstLine++ = (r * 255 + add_r) / (1<<15);
                     *dstLine++ = (g * 255 + add_g) / (1<<15);
                     *dstLine++ = (b * 255 + add_b) / (1<<15);

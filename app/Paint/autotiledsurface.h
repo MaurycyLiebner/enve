@@ -76,8 +76,8 @@ struct AutoTiledSurface {
         set.execute(brush, fMyPaintSurface, 5);
     }
 
-    SkBitmap toBitmap() const {
-        return mAutoTilesData.toBitmap();
+    SkBitmap toBitmap(const int& margin = 0) const {
+        return mAutoTilesData.toBitmap(margin);
     }
 
     QPoint zeroTilePos() const {

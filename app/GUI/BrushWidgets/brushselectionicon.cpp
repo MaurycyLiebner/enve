@@ -16,8 +16,8 @@ void BrushSelectionIcon::openDialog() {
     dialog.setLayout(new QVBoxLayout);
     dialog.layout()->addWidget(mSelectionWidget);
     dialog.setMinimumSize(300, 350);
-    connect(mSelectionWidget, &BrushSelectionWidget::currentBrushChanged,
-            &dialog, &QDialog::close);
+//    connect(mSelectionWidget, &BrushSelectionWidget::currentBrushChanged,
+//            &dialog, &QDialog::close);
     dialog.exec();
     mSelectionWidget->setParent(this);
     mSelectionWidget->hide();
