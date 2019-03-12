@@ -12,8 +12,8 @@ public:
     void drawSk(SkCanvas *canvas,
                 const SkScalar &invScale);
 protected:
-    GradientPoint(QPointFAnimator* associatedAnimator,
-                  PathBox *parent);
+    GradientPoint(QPointFAnimator* const associatedAnimator,
+                  PathBox * const parent);
 private:
     QColor mFillColor = QColor(255, 0, 0, 155);
 };

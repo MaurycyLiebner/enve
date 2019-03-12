@@ -29,16 +29,18 @@ PaintSettingsApplier::PaintSettingsApplier(const bool &targetFillSettings,
     mGradient = gradient;
 }
 
-void PaintSettingsApplier::apply(PathBox * const box) const {
-    PaintSettings* paintSettings = nullptr;
-    if(mTargetFillSettings) paintSettings = box->getFillSettings();
-    else paintSettings = box->getStrokeSettings();
+void PaintSettingsApplier::apply(PathBox * const box,
+                                 const bool& applyAll) const {
+    PaintSettings * const paintSettings = mTargetFillSettings ?
+                box->getFillSettings() : box->getStrokeSettings();
     const bool paintTypeChanged = paintSettings->getPaintType() != mPaintType;
     bool gradientChanged = false;
 
-    if(mPaintType == FLATPAINT || mPaintType == BRUSHPAINT) {
+    if(mPaintType == FLATPAINT || mPaintType == BRUSHPAINT || applyAll) {
         mColorSetting.apply(paintSettings->getColorAnimator());
-    } else if(mPaintType == GRADIENTPAINT) {
+    }
+
+    if(mPaintType == GRADIENTPAINT || applyAll) {
         if(paintTypeChanged) gradientChanged = true;
         else {
             gradientChanged = paintSettings->getGradient() == mGradient ||
@@ -64,6 +66,31 @@ void PaintSettingsApplier::apply(PathBox * const box) const {
     }
 }
 
-void PaintSettingsApplier::applyColorSetting(ColorAnimator *animator) const {
+void PaintSettingsApplier::applyColorSetting(
+        ColorAnimator * const animator) const {
     mColorSetting.apply(animator);
+}
+
+StrokeSettingsApplier::StrokeSettingsApplier(const ColorSetting &colorSetting,
+                                             const qreal &width,
+                                             SimpleBrushWrapper * const brush,
+                                             const qCubicSegment1D& widthCurve,
+                                             const qCubicSegment1D& pressureCurve,
+                                             const qCubicSegment1D& timeCurve) :
+    mPaintSettings(true, colorSetting, PaintType::BRUSHPAINT),
+    mWidth(width), mStrokeBrush(brush),
+    mWidthCurve(widthCurve), mPressureCurve(pressureCurve),
+    mTimeCurve(timeCurve) {
+
+}
+
+void StrokeSettingsApplier::apply(PathBox * const box,
+                                  const bool& applyAll) const {
+    mPaintSettings.apply(box, applyAll);
+    box->setStrokeBrush(mStrokeBrush);
+    box->setOutlineCompositionMode(mOutlineCompositionMode);
+    box->setStrokeWidth(mWidth);
+    box->setStrokeBrushWidthCurve(mWidthCurve);
+    box->setStrokeBrushPressureCurve(mPressureCurve);
+    box->setStrokeBrushTimeCurve(mTimeCurve);
 }

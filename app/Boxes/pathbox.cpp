@@ -563,13 +563,10 @@ const SkPath &PathBox::getRelativePath() const { return mPathSk; }
 
 void PathBox::updateFillDrawGradient() {
     if(mFillSettings->getPaintType() == GRADIENTPAINT) {
-        Gradient *gradient = mFillSettings->getGradient();
-
+        const auto gradient = mFillSettings->getGradient();
         mFillGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                        gradient->getLastQGradientStopQColor());
-        if(!mFillGradientPoints->enabled()) {
-            mFillGradientPoints->enable();
-        }
+        if(!mFillGradientPoints->enabled()) mFillGradientPoints->enable();
     } else if(mFillGradientPoints->enabled()) {
         mFillGradientPoints->disable();
     }

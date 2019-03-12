@@ -15,13 +15,10 @@
 Gradient::Gradient() : ComplexAnimator("gradient") {
     prp_setUpdater(SPtrCreate(GradientUpdater)(this));
     prp_blockUpdater();
-    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 Gradient::Gradient(const QColor &color1, const QColor &color2) :
-    ComplexAnimator("gradient") {
-    prp_setUpdater(SPtrCreate(GradientUpdater)(this));
-    prp_blockUpdater();
+    Gradient() {
     addColorToList(color1);
     addColorToList(color2);
     updateQGradientStops(Animator::USER_CHANGE);
@@ -99,15 +96,11 @@ void Gradient::replaceColor(const int &id, const QColor &color) {
     updateQGradientStops(Animator::USER_CHANGE);
 }
 
-bool Gradient::isInPaths(PathBox *path) {
-    return mAffectedPaths.contains(path);
-}
-
-void Gradient::addPath(PathBox *path) {
+void Gradient::addPath(PathBox * const path) {
     mAffectedPaths << path;
 }
 
-void Gradient::removePath(PathBox *path) {
+void Gradient::removePath(PathBox * const path) {
     mAffectedPaths.removeOne(path);
 }
 
@@ -117,7 +110,6 @@ bool Gradient::affectsPaths() {
 
 void Gradient::updatePaths(const UpdateReason &reason) {
     for(const auto& path : mAffectedPaths) {
-        //path->replaceCurrentFrameCache();
         path->updateDrawGradients();
         path->scheduleUpdate(reason);
     }
@@ -130,7 +122,7 @@ void Gradient::updatePaths(const UpdateReason &reason) {
 //    callUpdateSchedulers();
 //}
 
-void Gradient::startColorIdTransform(int id) {
+void Gradient::startColorIdTransform(const int& id) {
     if(mColors.count() <= id || id < 0) return;
     mColors.at(id)->prp_startTransform();
 }
@@ -149,30 +141,16 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal &absFrame) {
 
 void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
     mQGradientStops.clear();
-    const qreal inc = 1./(mColors.length() - 1.);
-    qreal cPos = 0.;
+    const qreal inc = 1./(mColors.length() - 1);
+    qreal cPos = 0;
     for(int i = 0; i < mColors.length(); i++) {
-        mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
+        mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0, 1),
                                     mColors.at(i)->getCurrentColor()) );
         cPos += inc;
     }
     updatePaths(reason);
 }
 
-void Gradient::updateQGradientStopsFinal(const Animator::UpdateReason& reason) {
-    mQGradientStops.clear();
-    const qreal inc = 1./(mColors.length() - 1.);
-    qreal cPos = 0.;
-    for(int i = 0; i < mColors.length(); i++) {
-        mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                               mColors.at(i)->getCurrentColor()) );
-        cPos += inc;
-    }
-    for(const auto& path : mAffectedPaths) {
-        path->updateDrawGradients();
-        path->scheduleUpdate(reason);
-    }
-}
 
 int Gradient::getLoadId() {
     return mLoadId;
@@ -182,16 +160,17 @@ void Gradient::setLoadId(const int &id) {
     mLoadId = id;
 }
 
-PaintSettings::PaintSettings(GradientPoints *grdPts, PathBox *parent) :
+PaintSettings::PaintSettings(GradientPoints * const grdPts,
+                             PathBox * const parent) :
     PaintSettings(grdPts, parent, QColor(255, 255, 255),
                   PaintType::FLATPAINT,  nullptr) {
 }
 
-PaintSettings::PaintSettings(GradientPoints *grdPts,
-                             PathBox *parent,
+PaintSettings::PaintSettings(GradientPoints * const grdPts,
+                             PathBox * const parent,
                              const QColor &colorT,
                              const PaintType &paintTypeT,
-                             Gradient* gradientT) :
+                             Gradient* const gradientT) :
     ComplexAnimator("fill"), mTarget_k(parent) {
     mColor->qra_setCurrentValue(colorT);
     mPaintType = paintTypeT;
@@ -201,26 +180,26 @@ PaintSettings::PaintSettings(GradientPoints *grdPts,
     setGradientPoints(grdPts);
 }
 
-void PaintSettings::setPaintPathTarget(PathBox *path) {
+void PaintSettings::setPaintPathTarget(PathBox * const path) {
     mColor->prp_setUpdater(SPtrCreate(DisplayedFillStrokeSettingsUpdater)(path));
     mColor->prp_blockUpdater();
 }
 
-void PaintSettings::setGradientVar(Gradient* grad) {
-    if(!mGradient.isNull()) {
+void PaintSettings::setGradientVar(Gradient* const grad) {
+    if(grad == mGradient) return;
+    if(mGradient) {
         ca_removeChildAnimator(GetAsSPtr(mGradient, Gradient));
-        ca_removeChildAnimator(
-                    GetAsSPtr(mGradientPoints, GradientPoints));
+        ca_removeChildAnimator(GetAsSPtr(mGradientPoints, GradientPoints));
         mGradient->removePath(mTarget_k);
     }
-    if(!grad) {
-        mGradient.clear();
-    } else {
+    mGradient = grad;
+    if(mGradient) {
         ca_addChildAnimator(GetAsSPtr(grad, Gradient));
         ca_addChildAnimator(GetAsSPtr(mGradientPoints, GradientPoints));
-        mGradient = grad;
         mGradient->addPath(mTarget_k);
     }
+
+    prp_callFinishUpdater();
 }
 
 QColor PaintSettings::getCurrentColor() const {
@@ -241,9 +220,7 @@ Gradient *PaintSettings::getGradient() const {
 
 void PaintSettings::setGradient(Gradient* gradient) {
     if(gradient == mGradient) return;
-
     setGradientVar(gradient);
-
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
 }
 
@@ -276,22 +253,21 @@ ColorAnimator *PaintSettings::getColorAnimator() {
     return mColor.data();
 }
 
-void PaintSettings::setGradientPoints(GradientPoints* gradientPoints) {
+void PaintSettings::setGradientPoints(GradientPoints* const gradientPoints) {
     mGradientPoints = gradientPoints;
 }
 
-StrokeSettings::StrokeSettings(GradientPoints* grdPts,
-                               PathBox *parent) :
+StrokeSettings::StrokeSettings(GradientPoints * const grdPts,
+                               PathBox * const parent) :
     StrokeSettings(grdPts, parent, QColor(0, 0, 0),
                    PaintType::FLATPAINT, nullptr) {}
 
-StrokeSettings::StrokeSettings(GradientPoints *grdPts,
-                               PathBox *parent,
+StrokeSettings::StrokeSettings(GradientPoints * const grdPts,
+                               PathBox * const parent,
                                const QColor &colorT,
                                const PaintType &paintTypeT,
-                               Gradient* gradientT) :
-    PaintSettings(grdPts, parent, colorT,
-                  paintTypeT, gradientT) {
+                               Gradient* const gradientT) :
+    PaintSettings(grdPts, parent, colorT, paintTypeT, gradientT) {
     prp_setName("stroke");
 
     ca_addChildAnimator(mLineWidth);
@@ -300,16 +276,11 @@ StrokeSettings::StrokeSettings(GradientPoints *grdPts,
 void StrokeSettings::showHideChildrenBeforeChaningPaintType(
         const PaintType &newPaintType) {
     PaintSettings::showHideChildrenBeforeChaningPaintType(newPaintType);
-    if(getPaintType() == BRUSHPAINT) {
-        ca_removeChildAnimator(mBrushSettings);
-    }
-
-    if(newPaintType == BRUSHPAINT) {
-        ca_addChildAnimator(mBrushSettings);
-    }
+    if(getPaintType() == BRUSHPAINT) ca_removeChildAnimator(mBrushSettings);
+    if(newPaintType == BRUSHPAINT) ca_addChildAnimator(mBrushSettings);
 }
 
-void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
+void StrokeSettings::setLineWidthUpdaterTarget(PathBox * const path) {
     mLineWidth->prp_setUpdater(SPtrCreate(StrokeWidthUpdater)(path));
     setPaintPathTarget(path);
 }
@@ -326,21 +297,21 @@ void StrokeSettings::setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mJoinStyle = joinStyle;
 }
 
-void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
+void StrokeSettings::setStrokerSettings(QPainterPathStroker * const stroker) {
     stroker->setWidth(mLineWidth->qra_getCurrentValue());
     stroker->setCapStyle(mCapStyle);
     stroker->setJoinStyle(mJoinStyle);
 }
 
-void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
+void StrokeSettings::setStrokerSettingsSk(SkStroke * const stroker) {
     stroker->setWidth(qrealToSkScalar(mLineWidth->qra_getCurrentValue()));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
 void StrokeSettings::setStrokerSettingsForRelFrameSk(const qreal &relFrame,
-                                                     SkStroke *stroker) {
-    qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame);
+                                                     SkStroke * const stroker) {
+    const qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame);
     stroker->setWidth(qrealToSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
@@ -410,16 +381,16 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
     SkPoint gradPoints[nStops];
     SkColor gradColors[nStops];
     SkScalar gradPos[nStops];
-    SkScalar xInc = static_cast<SkScalar>(finalStop.x() - start.x());
-    SkScalar yInc = static_cast<SkScalar>(finalStop.y() - start.y());
+    const SkScalar xInc = static_cast<SkScalar>(finalStop.x() - start.x());
+    const SkScalar yInc = static_cast<SkScalar>(finalStop.y() - start.y());
     SkScalar currX = static_cast<SkScalar>(start.x());
     SkScalar currY = static_cast<SkScalar>(start.y());
-    SkScalar currT = 0.f;
-    SkScalar tInc = 1.f/(nStops - 1);
+    SkScalar currT = 0;
+    const SkScalar tInc = 1.f/(nStops - 1);
 
     for(int i = 0; i < nStops; i++) {
         const QGradientStop &stopT = stops.at(i);
-        QColor col = stopT.second;
+        const QColor col = stopT.second;
         gradPoints[i] = SkPoint::Make(currX, currY);
         gradColors[i] = QColorToSkColor(col);
         gradPos[i] = currT;
@@ -435,16 +406,13 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                                   nStops,
                                                   SkShader::kClamp_TileMode);
     } else {
-        QPointF distPt = finalStop - start;
-        SkScalar radius = static_cast<SkScalar>(
+        const QPointF distPt = finalStop - start;
+        const SkScalar radius = static_cast<SkScalar>(
                     qSqrt(distPt.x()*distPt.x() + distPt.y()*distPt.y()));
         fGradient = SkGradientShader::MakeRadial(
-                        qPointToSk(start),
-                        radius,
-                        gradColors,
-                        gradPos,
-                        nStops,
-                        SkShader::kClamp_TileMode);
+                        qPointToSk(start), radius,
+                        gradColors, gradPos,
+                        nStops, SkShader::kClamp_TileMode);
     }
 }
 

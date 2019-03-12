@@ -65,14 +65,13 @@ void GradientWidget::newGradient(const QColor &color1,
 }
 
 void GradientWidget::newGradient(const int &fromGradientId) {
-    Gradient *fromGradient = mGradients.at(fromGradientId).data();
+    const Gradient * const fromGradient = mGradients.at(fromGradientId).data();
     auto newGradient = SPtrCreate(Gradient)();
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     fromGradient->writeProperty(&buffer);
-    if(buffer.reset() ) {
-        newGradient->readProperty(&buffer);
-    }
+    if(buffer.reset()) newGradient->readProperty(&buffer);
+    else return;
     buffer.close();
     addGradientToList(newGradient);
     setCurrentGradient(mGradients.last().data());

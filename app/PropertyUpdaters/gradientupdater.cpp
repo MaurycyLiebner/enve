@@ -6,11 +6,11 @@ GradientUpdater::GradientUpdater(Gradient *gradient) {
 }
 
 void GradientUpdater::update() {
-    mTarget->updateQGradientStopsFinal(Animator::USER_CHANGE);
+    mTarget->updateQGradientStops(Animator::USER_CHANGE);
 }
 
 void GradientUpdater::finishedChange() {
-    mTarget->updateQGradientStopsFinal(Animator::USER_CHANGE);
+    mTarget->updateQGradientStops(Animator::USER_CHANGE);
 }
 
 void GradientUpdater::frameChangeUpdate() {

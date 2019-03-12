@@ -10,19 +10,13 @@ GradientPointsUpdater::GradientPointsUpdater(const bool &isFill,
 
 void GradientPointsUpdater::update() {
     mTarget->scheduleUpdate(Animator::USER_CHANGE);
-    if(mIsFill) {
-        mTarget->updateFillDrawGradient();
-    } else {
-        mTarget->updateStrokeDrawGradient();
-    }
+    if(mIsFill) mTarget->updateFillDrawGradient();
+    else mTarget->updateStrokeDrawGradient();
     mTarget->scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void GradientPointsUpdater::frameChangeUpdate() {
-    if(mIsFill) {
-        mTarget->updateFillDrawGradient();
-    } else {
-        mTarget->updateStrokeDrawGradient();
-    }
+    if(mIsFill) mTarget->updateFillDrawGradient();
+    else mTarget->updateStrokeDrawGradient();
     mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
 }

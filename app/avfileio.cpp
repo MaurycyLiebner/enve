@@ -545,6 +545,7 @@ void Gradient::readProperty(QIODevice *target) {
         colorAnim->readProperty(target);
         addColorToList(colorAnim);
     }
+    updateQGradientStops(UpdateReason::USER_CHANGE);
 }
 
 void StrokeSettings::writeProperty(QIODevice * const target) const {
