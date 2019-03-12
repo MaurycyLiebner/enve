@@ -70,7 +70,7 @@ void BoxesGroup::iniPathEffects() {
     mPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(false, false, this);
     mPathEffectsAnimators->prp_setName("path effects");
-    mPathEffectsAnimators->prp_setBlockedUpdater(
+    mPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mPathEffectsAnimators);
     mPathEffectsAnimators->SWT_hide();
@@ -78,7 +78,7 @@ void BoxesGroup::iniPathEffects() {
     mFillPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(false, true, this);
     mFillPathEffectsAnimators->prp_setName("fill effects");
-    mFillPathEffectsAnimators->prp_setBlockedUpdater(
+    mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mFillPathEffectsAnimators);
     mFillPathEffectsAnimators->SWT_hide();
@@ -86,7 +86,7 @@ void BoxesGroup::iniPathEffects() {
     mOutlinePathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(true, false, this);
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
-    mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
+    mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
     mOutlinePathEffectsAnimators->SWT_hide();

@@ -48,7 +48,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
             this, SLOT(emitCanvasNameChanged()));
     mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
     ca_addChildAnimator(mBackgroundColor);
-    mBackgroundColor->prp_setUpdater(
+    mBackgroundColor->prp_setInheritedUpdater(
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
     mSoundComposition = qsptr<SoundComposition>::create(this);
     auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();

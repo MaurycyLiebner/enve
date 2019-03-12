@@ -18,8 +18,7 @@ VectorPath::VectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
     setName("Path");
     mPathAnimator = SPtrCreate(PathAnimator)(this);
-    mPathAnimator->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
-    mPathAnimator->prp_blockUpdater();
+    mPathAnimator->prp_setOwnUpdater(SPtrCreate(NodePointUpdater)(this));
     ca_addChildAnimator(mPathAnimator);
     ca_moveChildBelow(mPathAnimator.data(), mEffectsAnimators.data());
 }

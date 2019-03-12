@@ -18,10 +18,10 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mText = SPtrCreate(QStringAnimator)("text");
     ca_addChildAnimator(mText);
     ca_prependChildAnimator(mText.data(), mEffectsAnimators);
-    mText->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
+    mText->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 
     mLinesDist = SPtrCreate(QrealAnimator)(100., 0., 100., 1., "line dist");
-    mLinesDist->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
+    mLinesDist->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 
 #include <QApplication>

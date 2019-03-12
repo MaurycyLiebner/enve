@@ -45,8 +45,6 @@ public:
 
     void setGradientPoints(GradientPoints * const gradientPoints);
 
-    void setPaintPathTarget(PathBox * const path);
-
     void duplicateColorAnimatorFrom(ColorAnimator *source);
 
     void setGradientVar(Gradient * const grad);

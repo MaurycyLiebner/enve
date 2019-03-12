@@ -40,7 +40,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_addChildAnimator(mRadiusAnimator);
     ca_prependChildAnimator(mRadiusAnimator.get(), mEffectsAnimators);
 
-    prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
+    prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 
 void Rectangle::startAllPointsTransform() {

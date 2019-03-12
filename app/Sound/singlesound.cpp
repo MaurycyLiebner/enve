@@ -11,8 +11,7 @@ SingleSound::SingleSound(const QString &path,
     ComplexAnimator("sound") {
     setDurationRect(durRect);
 
-    prp_setUpdater(SPtrCreate(SingleSoundUpdater)(this));
-    prp_blockUpdater();
+    prp_setOwnUpdater(SPtrCreate(SingleSoundUpdater)(this));
 
     ca_addChildAnimator(mVolumeAnimator);
 

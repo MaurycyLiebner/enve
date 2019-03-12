@@ -783,7 +783,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                             const auto randGen = SPtrCreate(RandomQrealGenerator)(0, 9999);
                             const auto updater = GetAsSPtr(qrealTarget->prp_getUpdater(),
                                                      PropertyUpdater);
-                            randGen->prp_setBlockedUpdater(updater);
+                            randGen->prp_setOwnUpdater(updater);
                             qrealTarget->setGenerator(randGen);
                         });
                     }

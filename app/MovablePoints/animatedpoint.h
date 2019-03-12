@@ -35,7 +35,7 @@ public:
 
     void cancelTransform();
 
-    //virtual void prp_setUpdater(AnimatorUpdater *updater);
+    //virtual void prp_setInheritedUpdater(AnimatorUpdater *updater);
 
     virtual void applyTransform(const QMatrix &transform);
 

@@ -14,32 +14,6 @@ public:
     ComplexAnimator(const QString& name);
     ~ComplexAnimator();
 
-    void ca_addChildAnimator(const qsptr<Property> &childAnimator,
-                             const int &id = FrameRange::EMAX);
-    void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
-    void ca_swapChildAnimators(Property *animator1, Property *animator2);
-    void ca_moveChildInList(Property *child, const int &from, const int &to);
-    void ca_moveChildBelow(Property *move, Property *below);
-    void ca_moveChildAbove(Property *move, Property *above);
-
-    void prp_startTransform();
-    void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
-    void anim_setAbsFrame(const int &frame);
-
-    void prp_retrieveSavedValue();
-    void prp_finishTransform();
-    void prp_cancelTransform();
-
-    bool anim_isDescendantRecording() const;
-    QString prp_getValueText();
-
-    bool hasChildAnimators() const;
-
-    void prp_setTransformed(const bool &bT);
-
-    void ca_changeChildAnimatorZ(const int &oldIndex, const int &newIndex);
-    int ca_getNumberOfChildren();
-    Property *ca_getChildAt(const int &i);
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
@@ -51,6 +25,27 @@ public:
 
     bool SWT_isComplexAnimator() const;
 
+    void SWT_setChildrenAncestorDisabled(const bool &bT) {
+        for(const auto& prop : ca_mChildAnimators) {
+            prop->SWT_setAncestorDisabled(bT);
+        }
+    }
+
+    void prp_startTransform();
+    void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
+    void anim_setAbsFrame(const int &frame);
+
+    void prp_retrieveSavedValue();
+    void prp_finishTransform();
+    void prp_cancelTransform();
+    void prp_setTransformed(const bool &bT);
+    QString prp_getValueText();
+
+    void prp_setParentFrameShift(const int &shift,
+                                 ComplexAnimator *parentAnimator = nullptr);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    void anim_saveCurrentValueAsKey();
+    bool anim_isDescendantRecording() const;
     void anim_drawKey(QPainter *p,
                       Key* key,
                       const qreal &pixelsPerFrame,
@@ -58,16 +53,31 @@ public:
                       const int &startFrame,
                       const int &rowHeight,
                       const int &keyRectSize);
+    virtual void ca_removeAllChildAnimators();
+public slots:
+    void anim_setRecording(const bool &rec);
+    virtual void ca_childAnimatorIsRecordingChanged();
+public:
+
+    void ca_addChildAnimator(const qsptr<Property> &childAnimator,
+                             const int &id = FrameRange::EMAX);
+    void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
+    void ca_swapChildAnimators(Property *animator1, Property *animator2);
+    void ca_moveChildInList(Property *child, const int &from, const int &to);
+    void ca_moveChildBelow(Property *move, Property *below);
+    void ca_moveChildAbove(Property *move, Property *above);    
+
+    bool hasChildAnimators() const;
 
 
-    void prp_setParentFrameShift(const int &shift,
-                                 ComplexAnimator *parentAnimator = nullptr);
+    void ca_changeChildAnimatorZ(const int &oldIndex, const int &newIndex);
+    int ca_getNumberOfChildren();
+    Property *ca_getChildAt(const int &i);
+
     int getChildPropertyIndex(Property *child);
 
     void ca_updateDescendatKeyFrame(Key* key);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
-    void anim_saveCurrentValueAsKey();
-    virtual void ca_removeAllChildAnimators();
+
     Property *ca_getFirstDescendantWithName(const QString &name);
 
     template <class T = Property>
@@ -81,21 +91,14 @@ public:
         return nullptr;
     }
 
-    void SWT_setChildrenAncestorDisabled(const bool &bT) {
-        for(const auto& prop : ca_mChildAnimators) {
-            prop->SWT_setAncestorDisabled(bT);
-        }
-    }
 public slots:
     void ca_prependChildAnimator(Property *childAnimator,
                                  const qsptr<Property>& prependWith);
     void ca_replaceChildAnimator(const qsptr<Property> &childAnimator,
                                  const qsptr<Property>& replaceWith);
-    void anim_setRecording(const bool &rec);
 
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
-    virtual void ca_childAnimatorIsRecordingChanged();
 protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(const int &frame);

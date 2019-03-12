@@ -11,7 +11,7 @@ RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
                                            const int &lastFrame) :
     QrealValueEffect("noise") {
     mPeriod = SPtrCreate(QrealAnimator)(10., 1., 999., 1., "period");
-    mPeriod->prp_setBlockedUpdater(
+    mPeriod->prp_setOwnUpdater(
                 SPtrCreate(RandomQrealGeneratorUpdater)(this));
     ca_addChildAnimator(mPeriod);
     mSmoothness = QrealAnimator::create0to1Animator("smoothness");
@@ -26,7 +26,7 @@ RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
     mSeedAssist->setValueRange(0, 9999);
     mSeedAssist->setCurrentValue(0);
     ca_addChildAnimator(mSeedAssist);
-    mSeedAssist->prp_setBlockedUpdater(
+    mSeedAssist->prp_setOwnUpdater(
                 SPtrCreate(RandomQrealGeneratorUpdater)(this));
 
     mFirstFrame = firstFrame;

@@ -28,14 +28,14 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ca_addChildAnimator(mTransformAnimator);
 
     mEffectsAnimators = SPtrCreate(EffectAnimators)(this);
-    mEffectsAnimators->prp_setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
-    mEffectsAnimators->prp_blockUpdater();
+    mEffectsAnimators->prp_setOwnUpdater(
+                SPtrCreate(PixmapEffectUpdater)(this));
     ca_addChildAnimator(mEffectsAnimators);
     mEffectsAnimators->SWT_hide();
 
     mGPUEffectsAnimators = SPtrCreate(GPUEffectAnimators)(this);
-    mGPUEffectsAnimators->prp_setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
-    mGPUEffectsAnimators->prp_blockUpdater();
+    mGPUEffectsAnimators->prp_setOwnUpdater(
+                SPtrCreate(PixmapEffectUpdater)(this));
     ca_addChildAnimator(mGPUEffectsAnimators);
     mGPUEffectsAnimators->SWT_hide();
 

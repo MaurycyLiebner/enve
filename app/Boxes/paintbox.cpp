@@ -10,11 +10,11 @@ PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {
     setName("Paint Box");
     mTopLeftAnimator = SPtrCreate(QPointFAnimator)("bottom right");
-    mTopLeftAnimator->prp_setUpdater(
+    mTopLeftAnimator->prp_setInheritedUpdater(
                 SPtrCreate(PaintBoxSizeUpdaterTL)(this));
 
     mBottomRightAnimator = SPtrCreate(QPointFAnimator)("top left");
-    mBottomRightAnimator->prp_setUpdater(
+    mBottomRightAnimator->prp_setInheritedUpdater(
                 SPtrCreate(PaintBoxSizeUpdaterBR)(this));
 
     mTopLeftPoint = SPtrCreate(AnimatedPoint)(

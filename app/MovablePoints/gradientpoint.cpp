@@ -8,7 +8,7 @@ GradientPoint::GradientPoint(QPointFAnimator * const associatedAnimator,
                              PathBox* const parent) :
     AnimatedPoint(associatedAnimator, parent->getTransformAnimator(),
                   TYPE_GRADIENT_POINT) {
-    mAssociatedAnimator_k->prp_setUpdater(
+    mAssociatedAnimator_k->prp_setInheritedUpdater(
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parent));
 }
 

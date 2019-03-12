@@ -23,9 +23,9 @@ PathPointsHandler *SmartPathCollectionHandler::createNewPath() {
     const auto newAnimator = mAnimator->createNewPath();
     const auto newHandler = SPtrCreate(PathPointsHandler)(
                 newAnimator, mParentTransform);
-    newAnimator->prp_setUpdater(SPtrCreate(SmartNodePointUpdater)(
-                                    mParentPath, newHandler.get()));
-    newAnimator->prp_blockUpdater();
+    newAnimator->prp_setOwnUpdater(
+                SPtrCreate(SmartNodePointUpdater)(
+                    mParentPath, newHandler.get()));
     mPointsHandlers.append(newHandler);
     return newHandler.get();
 }

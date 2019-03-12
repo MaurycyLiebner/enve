@@ -86,7 +86,7 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
                                           const int &id) {
     ca_mChildAnimators.insert(id, childProperty);
     childProperty->setParent(this);
-    childProperty->prp_setUpdater(prp_mUpdater);
+    childProperty->prp_setInheritedUpdater(prp_mUpdater);
     childProperty->prp_setParentFrameShift(prp_getFrameShift());
     connect(childProperty.data(), &Property::prp_updateWholeInfluenceRange,
             this, &Property::prp_updateInfluenceRangeAfterChanged);
@@ -157,7 +157,7 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
 
 void ComplexAnimator::ca_removeChildAnimator(
         const qsptr<Property>& removeAnimator) {
-    removeAnimator->prp_setUpdater(nullptr);
+    removeAnimator->prp_setInheritedUpdater(nullptr);
     if(removeAnimator->SWT_isAnimator()) {
         const auto aRemove = GetAsPtr(removeAnimator, Animator);
         aRemove->anim_removeAllKeysFromComplexAnimator(this);
@@ -252,12 +252,9 @@ void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
     ca_mChildAnimators.move(oldIndex, newIndex);
 }
 
-void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {
-    if(prp_mUpdaterBlocked) return;
-    Animator::prp_setUpdater(updater);
-
+void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater> &updater) {
     for(const auto &property : ca_mChildAnimators) {
-        property->prp_setUpdater(updater);
+        property->prp_setInheritedUpdater(updater);
     }
 }
 

@@ -49,8 +49,8 @@ Circle::Circle() :
                 mVerticalRadiusPoint.get(),
                 mHorizontalRadiusPoint.get());
 
-    prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
-    mCenterAnimator->prp_setUpdater(SPtrCreate(NodePointUpdater)(this));
+    prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
+    mCenterAnimator->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 
 void Circle::startAllPointsTransform() {

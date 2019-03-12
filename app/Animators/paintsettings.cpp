@@ -13,8 +13,7 @@
 #include "PropertyUpdaters/strokewidthupdater.h"
 
 Gradient::Gradient() : ComplexAnimator("gradient") {
-    prp_setUpdater(SPtrCreate(GradientUpdater)(this));
-    prp_blockUpdater();
+    prp_setOwnUpdater(SPtrCreate(GradientUpdater)(this));
 }
 
 Gradient::Gradient(const QColor &color1, const QColor &color2) :
@@ -178,11 +177,8 @@ PaintSettings::PaintSettings(GradientPoints * const grdPts,
 
     ca_addChildAnimator(mColor);
     setGradientPoints(grdPts);
-}
 
-void PaintSettings::setPaintPathTarget(PathBox * const path) {
-    mColor->prp_setUpdater(SPtrCreate(DisplayedFillStrokeSettingsUpdater)(path));
-    mColor->prp_blockUpdater();
+    prp_setOwnUpdater(SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parent));
 }
 
 void PaintSettings::setGradientVar(Gradient* const grad) {
@@ -271,6 +267,7 @@ StrokeSettings::StrokeSettings(GradientPoints * const grdPts,
     prp_setName("stroke");
 
     ca_addChildAnimator(mLineWidth);
+    mLineWidth->prp_setOwnUpdater(SPtrCreate(StrokeWidthUpdater)(parent));
 }
 
 void StrokeSettings::showHideChildrenBeforeChaningPaintType(
@@ -278,11 +275,6 @@ void StrokeSettings::showHideChildrenBeforeChaningPaintType(
     PaintSettings::showHideChildrenBeforeChaningPaintType(newPaintType);
     if(getPaintType() == BRUSHPAINT) ca_removeChildAnimator(mBrushSettings);
     if(newPaintType == BRUSHPAINT) ca_addChildAnimator(mBrushSettings);
-}
-
-void StrokeSettings::setLineWidthUpdaterTarget(PathBox * const path) {
-    mLineWidth->prp_setUpdater(SPtrCreate(StrokeWidthUpdater)(path));
-    setPaintPathTarget(path);
 }
 
 void StrokeSettings::setCurrentStrokeWidth(const qreal &newWidth) {

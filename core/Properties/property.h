@@ -82,7 +82,8 @@ public:
     virtual void prp_startDragging() {}
 
     virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
-    virtual void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
+
+    virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
@@ -110,7 +111,6 @@ public slots:
 
     virtual void prp_updateInfluenceRangeAfterChanged();
 public:
-    void prp_blockUpdater();
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
     int prp_absFrameToRelFrame(const int &absFrame) const;
@@ -120,8 +120,8 @@ public:
     const QString &prp_getName() const;
     void prp_setName(const QString &newName);
 
-    void prp_setBlockedUpdater(const stdsptr<PropertyUpdater> &updater);
-
+    void prp_setOwnUpdater(const stdsptr<PropertyUpdater> &updater);
+    void prp_setInheritedUpdater(const stdsptr<PropertyUpdater> &updater);
 
     bool prp_differencesBetweenRelFrames(const int &frame1,
                                          const int &frame2) const {
@@ -175,7 +175,7 @@ signals:
     void prp_prependWith(Property*, const qsptr<Property>&);
     void beingDeleted();
 protected:
-    bool prp_mUpdaterBlocked = false;
+    bool prp_mOwnUpdater = false;
     int prp_mParentFrameShift = 0;
     stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName = "";

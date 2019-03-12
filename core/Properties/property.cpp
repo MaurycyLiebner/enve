@@ -73,22 +73,16 @@ void Property::prp_setName(const QString &newName) {
 }
 
 void Property::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {
-    if(prp_mUpdaterBlocked) return;
-    if(!updater) {
-        prp_mUpdater.reset();
-    } else {
-        prp_mUpdater = updater;
-    }
+    prp_mUpdater = updater;
 }
 
-void Property::prp_setBlockedUpdater(const stdsptr<PropertyUpdater>& updater) {
-    prp_mUpdaterBlocked = false;
-    prp_setUpdater(updater);
-    prp_blockUpdater();
+void Property::prp_setInheritedUpdater(const stdsptr<PropertyUpdater>& updater) {
+    if(!prp_mOwnUpdater) prp_setUpdater(updater);
 }
 
-void Property::prp_blockUpdater() {
-    prp_mUpdaterBlocked = true;
+void Property::prp_setOwnUpdater(const stdsptr<PropertyUpdater>& updater) {
+    prp_mUpdater = updater;
+    prp_mOwnUpdater = true;
 }
 
 void Property::prp_currentFrameChanged() {

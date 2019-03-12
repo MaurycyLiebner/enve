@@ -25,7 +25,7 @@ NodePoint::NodePoint(VectorPathAnimator *parentAnimator,
     mEndCtrlPt->hide();
 
     //NodePointUpdater *updater = SPtrCreate(NodePointUpdater)(vectorPath);
-    //prp_setUpdater(updater);
+    //prp_setInheritedUpdater(updater);
 }
 
 void NodePoint::applyTransform(const QMatrix &transform) {

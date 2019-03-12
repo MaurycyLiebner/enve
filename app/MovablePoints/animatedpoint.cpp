@@ -56,6 +56,6 @@ void AnimatedPoint::cancelTransform() {
     //setRelativePos(mSavedRelPos, false);
 }
 
-//void AnimatedPoint::prp_setUpdater(AnimatorUpdater *updater) {
-//    prp_setUpdater(updater);
+//void AnimatedPoint::prp_setInheritedUpdater(AnimatorUpdater *updater) {
+//    prp_setInheritedUpdater(updater);
 //}

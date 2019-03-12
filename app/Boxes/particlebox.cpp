@@ -19,7 +19,7 @@ ParticleBox::ParticleBox() :
                 mTopLeftAnimator.data(),
                 mTransformAnimator.data(),
                 TYPE_PATH_POINT);
-    mTopLeftAnimator->prp_setUpdater(
+    mTopLeftAnimator->prp_setInheritedUpdater(
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
 
     mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom right");
@@ -27,7 +27,7 @@ ParticleBox::ParticleBox() :
                 mBottomRightAnimator.data(),
                 mTransformAnimator.data(),
                 TYPE_PATH_POINT);
-    mBottomRightAnimator->prp_setUpdater(
+    mBottomRightAnimator->prp_setInheritedUpdater(
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
 
     ca_prependChildAnimator(mTopLeftAnimator.data(), mEffectsAnimators);
@@ -409,8 +409,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     ca_addChildAnimator(mParticlesOpacityDecay);
     ca_addChildAnimator(mBoxTargetProperty);
 
-    prp_setUpdater(SPtrCreate(ParticlesUpdater)(this));
-    prp_blockUpdater();
+    prp_setOwnUpdater(SPtrCreate(ParticlesUpdater)(this));
 
     scheduleGenerateParticles();
 }
@@ -420,9 +419,9 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
 
     scheduleGenerateParticles();
     if(!parentBox) {
-        mColorAnimator->prp_setUpdater(nullptr);
+        mColorAnimator->prp_setInheritedUpdater(nullptr);
     } else {
-        mColorAnimator->prp_setUpdater(
+        mColorAnimator->prp_setInheritedUpdater(
                     SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parentBox));
     }
 }

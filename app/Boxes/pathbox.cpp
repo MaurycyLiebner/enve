@@ -18,35 +18,35 @@ PathBox::PathBox(const BoundingBoxType &type) :
     mPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(false, false, this);
     mPathEffectsAnimators->prp_setName("path effects");
-    mPathEffectsAnimators->prp_setBlockedUpdater(
+    mPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mFillPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(false, true, this);
     mFillPathEffectsAnimators->prp_setName("fill effects");
-    mFillPathEffectsAnimators->prp_setBlockedUpdater(
+    mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mOutlinePathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(true, false, this);
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
-    mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
+    mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
 //    mPathEffectsAnimators->prp_setName("path effects");
-//    mPathEffectsAnimators->prp_setBlockedUpdater(
+//    mPathEffectsAnimators->prp_setOwnUpdater(
 //                SPtrCreate(PixmapEffectUpdater)(this));
 
 //    mOutlinePathEffectsAnimators->prp_setName("outline path effects");
-//    mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
+//    mOutlinePathEffectsAnimators->prp_setOwnUpdater(
 //                SPtrCreate(PixmapEffectUpdater)(this));
 
     mStrokeGradientPoints = SPtrCreate(GradientPoints)(this);
-    mStrokeGradientPoints->prp_setBlockedUpdater(
+    mStrokeGradientPoints->prp_setOwnUpdater(
                 SPtrCreate(GradientPointsUpdater)(false, this));
 
     mFillGradientPoints = SPtrCreate(GradientPoints)(this);
-    mFillGradientPoints->prp_setBlockedUpdater(
+    mFillGradientPoints->prp_setOwnUpdater(
                 SPtrCreate(GradientPointsUpdater)(true, this));
 
     mFillSettings = SPtrCreate(PaintSettings)(
@@ -60,9 +60,6 @@ PathBox::PathBox(const BoundingBoxType &type) :
     ca_addChildAnimator(mPathEffectsAnimators);
     ca_addChildAnimator(mFillPathEffectsAnimators);
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
-
-    mStrokeSettings->setLineWidthUpdaterTarget(this);
-    mFillSettings->setPaintPathTarget(this);
 }
 
 PathBox::~PathBox() {

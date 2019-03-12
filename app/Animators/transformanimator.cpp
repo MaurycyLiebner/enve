@@ -19,13 +19,13 @@ BasicTransformAnimator::BasicTransformAnimator() :
 
     mScaleAnimator->setCurrentPointValue(QPointF(1, 1));
     mScaleAnimator->setPrefferedValueStep(0.05);
-    mScaleAnimator->prp_setBlockedUpdater(mTransformUpdater);
+    mScaleAnimator->prp_setOwnUpdater(mTransformUpdater);
 
     mRotAnimator->qra_setCurrentValue(0);
-    mRotAnimator->prp_setBlockedUpdater(mTransformUpdater);
+    mRotAnimator->prp_setOwnUpdater(mTransformUpdater);
 
     mPosAnimator->setCurrentPointValue(QPointF(0, 0));
-    mPosAnimator->prp_setBlockedUpdater(mTransformUpdater);
+    mPosAnimator->prp_setOwnUpdater(mTransformUpdater);
 
     ca_addChildAnimator(mPosAnimator);
     ca_addChildAnimator(mRotAnimator);
@@ -256,12 +256,12 @@ BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     mOpacityAnimator = SPtrCreate(QrealAnimator)("opacity");
     mPivotAnimator = SPtrCreate(QPointFAnimator)("pivot");
     mPivotAnimator->setCurrentPointValue(QPointF(0, 0));
-    mPivotAnimator->prp_setBlockedUpdater(mTransformUpdater);
+    mPivotAnimator->prp_setOwnUpdater(mTransformUpdater);
     mOpacityAnimator->qra_setValueRange(0, 100);
     mOpacityAnimator->setPrefferedValueStep(5);
     mOpacityAnimator->qra_setCurrentValue(100);
     mOpacityAnimator->graphFixMinMaxValues();
-    mOpacityAnimator->prp_setBlockedUpdater(mTransformUpdater);
+    mOpacityAnimator->prp_setOwnUpdater(mTransformUpdater);
 
     ca_addChildAnimator(mPivotAnimator);
     ca_addChildAnimator(mOpacityAnimator);
