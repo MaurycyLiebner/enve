@@ -85,7 +85,7 @@ private:
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
     void setCurrentGradient(const int &listId);
-    void setCurrentColorId(int id);
+    void setCurrentColorId(const int &id);
 };
 
 #endif // GRADIENTWIDGET_H

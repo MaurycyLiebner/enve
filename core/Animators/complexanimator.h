@@ -10,11 +10,10 @@ class QrealAnimator;
 class ComplexAnimator : public Animator {
     Q_OBJECT
     friend class SelfRef;
+protected:
+    void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
-    ComplexAnimator(const QString& name);
     ~ComplexAnimator();
-
-
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
                                      const int& visiblePartWidgetId);
@@ -32,7 +31,6 @@ public:
     }
 
     void prp_startTransform();
-    void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
     void anim_setAbsFrame(const int &frame);
 
     void prp_retrieveSavedValue();
@@ -100,6 +98,8 @@ public slots:
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
 protected:
+    ComplexAnimator(const QString& name);
+
     ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(const int &frame);
     bool ca_mChildAnimatorRecording = false;
@@ -109,22 +109,9 @@ protected:
 class ComplexKey : public Key {
     friend class StdSelfRef;
 public:
-    void addAnimatorKey(Key * const key);
-
-    void addOrMergeKey(const stdsptr<Key> &keyAdd);
-
     void deleteKey();
 
-    void removeAnimatorKey(Key * const key);
-
-    bool isEmpty() const;
-
-//    void setRelFrame(const int &frame);
-
     void mergeWith(const stdsptr<Key> &key);
-
-    void margeAllKeysToKey(ComplexKey * const target);
-
     bool isDescendantSelected() const;
 
     void startFrameTransform();
@@ -134,13 +121,22 @@ public:
     bool isSelected() const;
     void addToSelection(QList<qptr<Animator>> &selectedAnimators);
     void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
-
-    bool hasKey(Key *key) const;
-
     bool differsFromKey(Key *otherKey) const;
 
-    int getChildKeysCount() const;
+    void addAnimatorKey(Key * const key);
 
+    void addOrMergeKey(const stdsptr<Key> &keyAdd);
+
+    void removeAnimatorKey(Key * const key);
+
+    bool isEmpty() const;
+
+//    void setRelFrame(const int &frame);
+
+    void margeAllKeysToKey(ComplexKey * const target);
+    bool hasKey(Key *key) const;
+
+    int getChildKeysCount() const;
     bool hasSameKey(Key *otherKey) const;
 protected:
     ComplexKey(const int& absFrame,

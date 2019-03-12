@@ -1,6 +1,7 @@
 #include "paintsettingsapplier.h"
 #include "Animators/coloranimator.h"
 #include "Boxes/pathbox.h"
+#include "Animators/gradient.h"
 
 PaintSettingsApplier::PaintSettingsApplier(const bool &targetFillSettings,
                            const PaintType &paintType) :

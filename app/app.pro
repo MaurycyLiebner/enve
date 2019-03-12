@@ -282,7 +282,8 @@ SOURCES += main.cpp\
     PropertyUpdaters/smartnodepointupdater.cpp \
     GUI/BrushWidgets/brushselectionicon.cpp \
     paintsettingsapplier.cpp \
-    colorsetting.cpp
+    colorsetting.cpp \
+    Animators/gradient.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -514,7 +515,8 @@ HEADERS  += \
     PropertyUpdaters/smartnodepointupdater.h \
     GUI/BrushWidgets/brushselectionicon.h \
     paintsettingsapplier.h \
-    colorsetting.h
+    colorsetting.h \
+    Animators/gradient.h
 
 RESOURCES += \
     resources.qrc

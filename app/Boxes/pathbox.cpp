@@ -12,6 +12,7 @@
 #include "Animators/effectanimators.h"
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
+#include "Animators/gradient.h"
 
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
@@ -559,8 +560,8 @@ VectorPath *PathBox::strokeToVectorPathBox() {
 const SkPath &PathBox::getRelativePath() const { return mPathSk; }
 
 void PathBox::updateFillDrawGradient() {
-    if(mFillSettings->getPaintType() == GRADIENTPAINT) {
-        const auto gradient = mFillSettings->getGradient();
+    const auto gradient = mFillSettings->getGradient();
+    if(mFillSettings->getPaintType() == GRADIENTPAINT && gradient) {
         mFillGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                        gradient->getLastQGradientStopQColor());
         if(!mFillGradientPoints->enabled()) mFillGradientPoints->enable();
@@ -570,15 +571,12 @@ void PathBox::updateFillDrawGradient() {
 }
 
 void PathBox::updateStrokeDrawGradient() {
-    if(mStrokeSettings->getPaintType() == GRADIENTPAINT) {
-        Gradient *gradient = mStrokeSettings->getGradient();
-
+    const auto gradient = mStrokeSettings->getGradient();
+    if(mStrokeSettings->getPaintType() == GRADIENTPAINT && gradient) {
         mStrokeGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                          gradient->getLastQGradientStopQColor());
 
-        if(!mStrokeGradientPoints->enabled()) {
-            mStrokeGradientPoints->enable();
-        }
+        if(!mStrokeGradientPoints->enabled()) mStrokeGradientPoints->enable();
     } else if(mStrokeGradientPoints->enabled()) {
         mStrokeGradientPoints->disable();
     }

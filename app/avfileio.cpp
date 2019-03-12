@@ -12,6 +12,7 @@
 #include "Animators/transformanimator.h"
 #include "Animators/paintsettings.h"
 #include "Animators/pathanimator.h"
+#include "Animators/gradient.h"
 #include "Properties/comboboxproperty.h"
 #include "Properties/intproperty.h"
 #include "PathEffects/patheffectanimators.h"

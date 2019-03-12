@@ -11,6 +11,7 @@
 #include "namedcontainer.h"
 #include <QDockWidget>
 #include "paintsettingsapplier.h"
+#include "Animators/gradient.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     QWidget(parent) {

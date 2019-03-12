@@ -1,5 +1,5 @@
 #include "gradientupdater.h"
-#include "Animators/paintsettings.h"
+#include "Animators/gradient.h"
 
 GradientUpdater::GradientUpdater(Gradient *gradient) {
     mTarget = gradient;

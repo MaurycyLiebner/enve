@@ -2,6 +2,7 @@
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "global.h"
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
+#include "Animators/gradient.h"
 
 CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
                                              QWidget *parent) :
@@ -12,19 +13,19 @@ CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
 }
 
 void CurrentGradientWidget::paintGL() {
-    glClearColor(1.f, 0.f, 0.f, 1.f);
+    glClearColor(1, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(PLAIN_PROGRAM.fID);
     Gradient *gradient = mGradientWidget->getCurrentGradient();
     int nColors = gradient->getColorCount();
     int currentColorId = mGradientWidget->getCurrentColorId();
     mGradientWidget->getCurrentColor();
-    qreal xT = 0.;
-    qreal xInc = static_cast<qreal>(width())/nColors;
+    qreal xT = 0;
+    const qreal xInc = static_cast<qreal>(width())/nColors;
     int hoveredColorId = qFloor(mHoveredX/xInc);
 
     glUniform2f(PLAIN_PROGRAM.fMeshSizeLoc,
-                height()/(3.f*xInc), 1.f/3);
+                height()/static_cast<float>(3*xInc), 1.f/3);
     for(int j = 0; j < nColors; j++) {
         QColor currentColor = gradient->getCurrentColorAt(j);
         glViewport(qRound(xT), 0, qCeil(xInc), height());
@@ -46,14 +47,14 @@ void CurrentGradientWidget::paintGL() {
                                           currentColor.hsvSaturationF(),
                                           currentColor.valueF())) {
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fInnerBorderColorLoc,
-                            1.f, 1.f, 1.f, 1.f);
+                            1, 1, 1, 1);
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc,
-                            0.f, 0.f, 0.f, 1.f);
+                            0, 0, 0, 1);
             } else {
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fInnerBorderColorLoc,
-                            0.f, 0.f, 0.f, 1.f);
+                            0, 0, 0, 1);
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc,
-                            1.f, 1.f, 1.f, 1.f);
+                            1, 1, 1, 1);
             }
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glUseProgram(PLAIN_PROGRAM.fID);
@@ -66,10 +67,10 @@ void CurrentGradientWidget::paintGL() {
                                           currentColor.hsvSaturationF(),
                                           currentColor.valueF())) {
                 glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
-                            1.f, 1.f, 1.f, 1.f);
+                            1, 1, 1, 1);
             } else {
                 glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
-                            0.f, 0.f, 0.f, 1.f);
+                            0, 0, 0, 1);
             }
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glUseProgram(PLAIN_PROGRAM.fID);

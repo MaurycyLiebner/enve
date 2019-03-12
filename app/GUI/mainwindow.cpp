@@ -33,6 +33,7 @@
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "memoryhandler.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
+#include "Animators/gradient.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -1248,10 +1249,8 @@ void MainWindow::setCurrentFrame(const int &frame) {
 }
 
 Gradient *MainWindow::getLoadedGradientById(const int &id) {
-    for(Gradient * const gradient : mLoadedGradientsList) {
-        if(gradient->getLoadId() == id) {
-            return gradient;
-        }
+    for(const auto gradient : mLoadedGradientsList) {
+        if(gradient->getLoadId() == id) return gradient;
     }
     return nullptr;
 }

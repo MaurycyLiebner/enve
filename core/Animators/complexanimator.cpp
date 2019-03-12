@@ -53,7 +53,6 @@ FrameRange ComplexAnimator::prp_getIdenticalRelFrameRange(const int &relFrame) c
     for(const auto& child : ca_mChildAnimators) {
         auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
         range *= childRange;
-        Q_ASSERT(!range.isValid());
         if(range.isUnary()) return range;
     }
 
@@ -67,9 +66,8 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     if(hasChildAnimators()) {
         return Animator::SWT_shouldBeVisible(rules, parentSatisfies,
                                              parentMainTarget);
-    } else {
-        return false;
     }
+    return false;
 }
 
 bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
@@ -171,9 +169,8 @@ void ComplexAnimator::ca_removeChildAnimator(
 }
 
 void ComplexAnimator::ca_removeAllChildAnimators() {
-    for(int i = ca_mChildAnimators.count() - 1; i >= 0; i--) {
+    for(int i = ca_mChildAnimators.count() - 1; i >= 0; i--)
         ca_removeChildAnimator(ca_mChildAnimators.at(i));
-    }
 }
 
 Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
@@ -201,15 +198,13 @@ bool ComplexAnimator::hasChildAnimators() const {
 }
 
 void ComplexAnimator::prp_startTransform() {
-    for(const auto &property : ca_mChildAnimators) {
+    for(const auto &property : ca_mChildAnimators)
         property->prp_startTransform();
-    }
 }
 
 void ComplexAnimator::prp_setTransformed(const bool &bT) {
-    for(const auto &property : ca_mChildAnimators) {
+    for(const auto &property : ca_mChildAnimators)
         property->prp_setTransformed(bT);
-    }
 }
 
 void ComplexAnimator::anim_drawKey(QPainter *p, Key *key,
@@ -218,33 +213,23 @@ void ComplexAnimator::anim_drawKey(QPainter *p, Key *key,
                                    const int &startFrame,
                                    const int &rowHeight,
                                    const int &keyRectSize) {
-    if(key->isSelected()) {
-        p->setBrush(Qt::yellow);
-    } else {
-        p->setBrush(Qt::red);
-    }
-    if(key->isHovered()) {
-        p->setPen(QPen(Qt::black, 1.5));
-    } else {
-        p->setPen(QPen(Qt::black, 0.5));
-    }
+    if(key->isSelected()) p->setBrush(Qt::yellow);
+    else p->setBrush(Qt::red);
+    if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
+    else p->setPen(QPen(Qt::black, 0.5));
     const qreal keySize = keyRectSize*0.7;
-    p->drawEllipse(
-        QRectF(
-            QPointF((key->getRelFrame() - startFrame + 0.5)*
-                    pixelsPerFrame - keySize*0.5,
-                    drawY + (rowHeight -
-                              keySize)*0.5 ),
-            QSizeF(keySize, keySize) ) );
+    const int frameRelToStart = key->getRelFrame() - startFrame;
+    const QPointF keyCenter((frameRelToStart + 0.5)*pixelsPerFrame,
+                            drawY + 0.5*rowHeight);
+    p->drawEllipse(keyCenter, keySize, keySize);
 }
 
 void ComplexAnimator::prp_setParentFrameShift(const int &shift,
                                               ComplexAnimator* parentAnimator) {
     Property::prp_setParentFrameShift(shift, parentAnimator);
     const int thisShift = prp_getFrameShift();
-    for(const auto &property : ca_mChildAnimators) {
+    for(const auto &property : ca_mChildAnimators)
         property->prp_setParentFrameShift(thisShift, this);
-    }
 }
 
 void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
@@ -253,9 +238,9 @@ void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
 }
 
 void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater> &updater) {
-    for(const auto &property : ca_mChildAnimators) {
+    Animator::prp_setUpdater(updater);
+    for(const auto &property : ca_mChildAnimators)
         property->prp_setInheritedUpdater(updater);
-    }
 }
 
 void ComplexAnimator::anim_setAbsFrame(const int &frame) {
@@ -269,21 +254,18 @@ void ComplexAnimator::anim_setAbsFrame(const int &frame) {
 }
 
 void ComplexAnimator::prp_retrieveSavedValue() {
-    for(const auto &property : ca_mChildAnimators) {
+    for(const auto &property : ca_mChildAnimators)
         property->prp_retrieveSavedValue();
-    }
 }
 
 void ComplexAnimator::prp_finishTransform() {
-    for(const auto &property : ca_mChildAnimators) {
+    for(const auto &property : ca_mChildAnimators)
         property->prp_finishTransform();
-    }
 }
 
 void ComplexAnimator::prp_cancelTransform() {
-    for(const auto &property : ca_mChildAnimators) {
+    for(const auto &property : ca_mChildAnimators)
         property->prp_cancelTransform();
-    }
 }
 
 bool ComplexAnimator::anim_isDescendantRecording() const {
@@ -299,9 +281,8 @@ void ComplexAnimator::anim_saveCurrentValueAsKey() {
         anim_setRecording(true);
     } else {
         for(const auto &property : ca_mChildAnimators) {
-            if(property->SWT_isAnimator()) {
+            if(property->SWT_isAnimator())
                 GetAsPtr(property, Animator)->anim_saveCurrentValueAsKey();
-            }
         }
     }
 }
@@ -327,11 +308,8 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     }
     if(childRecordingT != ca_mChildAnimatorRecording) {
         ca_mChildAnimatorRecording = childRecordingT;
-        if(rec != anim_mIsRecording) {
-            anim_setRecordingValue(rec);
-        } else {
-            emit anim_isRecordingChanged();
-        }
+        if(rec != anim_mIsRecording) anim_setRecordingValue(rec);
+        else emit anim_isRecordingChanged();
     } else if(rec != anim_mIsRecording) {
         anim_setRecordingValue(rec);
     }
@@ -351,9 +329,8 @@ void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
     const auto collection = ca_getKeyCollectionAtRelFrame(key->getRelFrame());
     if(!collection) return;
     collection->removeAnimatorKey(key);
-    if(collection->isEmpty()) {
+    if(collection->isEmpty())
         anim_removeKey(GetAsSPtr(collection, ComplexKey));
-    }
 }
 
 ComplexKey::ComplexKey(const int &absFrame,
@@ -378,9 +355,7 @@ void ComplexKey::addOrMergeKey(const stdsptr<Key>& keyAdd) {
 
 void ComplexKey::deleteKey() {
     const auto keys = mKeys;
-    for(const auto& key : keys) {
-        key->deleteKey();
-    }
+    for(const auto& key : keys) key->deleteKey();
 }
 
 void ComplexKey::removeAnimatorKey(Key * const key) {
@@ -448,9 +423,7 @@ bool ComplexKey::isSelected() const {
 }
 
 void ComplexKey::addToSelection(QList<qptr<Animator>> &selectedAnimators) {
-    for(const auto& key : mKeys) {
-        key->addToSelection(selectedAnimators);
-    }
+    for(const auto& key : mKeys) key->addToSelection(selectedAnimators);
 }
 
 bool ComplexKey::hasKey(Key *key) const {
@@ -473,9 +446,8 @@ bool ComplexKey::differsFromKey(Key *otherKey) const {
 }
 
 void ComplexKey::removeFromSelection(QList<qptr<Animator>> &selectedAnimators) {
-    for(const auto& key : mKeys) {
+    for(const auto& key : mKeys)
         key->removeFromSelection(selectedAnimators);
-    }
 }
 
 int ComplexKey::getChildKeysCount() const {

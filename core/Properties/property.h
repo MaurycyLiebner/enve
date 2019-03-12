@@ -56,6 +56,8 @@ private:
 
 class Property : public SingleWidgetTarget {
     Q_OBJECT
+protected:
+    virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 public:
     virtual ~Property() {
         emit beingDeleted();
@@ -82,8 +84,6 @@ public:
     virtual void prp_startDragging() {}
 
     virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
-
-    virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
