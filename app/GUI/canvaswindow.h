@@ -16,7 +16,7 @@ class BoundingBox;
 class BoxesGroup;
 class TaskExecutor;
 class SoundComposition;
-class PaintSetting;
+class PaintSettingsApplier;
 class CanvasWidget;
 class RenderInstanceSettings;
 class _ScheduledTask;
@@ -82,7 +82,7 @@ public:
     void schedulePivotUpdate();
 
     BoxesGroup *getCurrentGroup();
-    void applyPaintSettingToSelected(PaintSetting* setting);
+    void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
 

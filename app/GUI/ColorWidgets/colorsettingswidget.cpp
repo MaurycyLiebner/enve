@@ -319,14 +319,10 @@ void ColorSettingsWidget::emitEditingStartedAlpha() {
 
 void ColorSettingsWidget::emitFullColorChangedSignal() {
     mLastTriggeredCVR = CVR_ALL;
-    if(mTargetAnimator) {
-        mTargetAnimator->prp_startTransform();
-    }
+    if(mTargetAnimator) mTargetAnimator->prp_startTransform();
     updateValuesFromHSV();
     updateAlphaFromSpin();
-    if(mTargetAnimator) {
-        mTargetAnimator->prp_finishTransform();
-    }
+    if(mTargetAnimator) mTargetAnimator->prp_finishTransform();
     emitEditingStartedSignal();
     emitColorChangedSignal();
     emitEditingFinishedSignal();

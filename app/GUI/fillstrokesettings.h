@@ -25,6 +25,7 @@ class QrealAnimatorValueSlider;
 class ActionButton;
 class Segment1DEditor;
 class QDockWidget;
+class ColorSetting;
 
 class FillStrokeSettingsWidget : public QWidget {
     Q_OBJECT

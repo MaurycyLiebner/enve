@@ -2,21 +2,6 @@
 #define COLORVALUERECT_H
 #include "colorwidget.h"
 
-enum CVR_TYPE : short {
-    CVR_RED,
-    CVR_GREEN,
-    CVR_BLUE,
-
-    CVR_HUE,
-    CVR_HSVSATURATION,
-    CVR_VALUE,
-
-    CVR_HSLSATURATION,
-    CVR_LIGHTNESS,
-    CVR_ALPHA,
-    CVR_ALL
-};
-
 class ColorValueRect : public ColorWidget {
     Q_OBJECT
 public:

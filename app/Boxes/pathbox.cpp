@@ -11,6 +11,7 @@
 #include "PropertyUpdaters/gradientpointsupdater.h"
 #include "Animators/effectanimators.h"
 #include "Animators/transformanimator.h"
+#include "paintsettingsapplier.h"
 
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
@@ -195,6 +196,8 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     }
 
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
+    const auto widthAnimator = mStrokeSettings->getStrokeWidthAnimator();
+    strokeSettings.fOutlineWidth = widthAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
     const auto brushSettings = mStrokeSettings->getBrushSettings();
     if(brushSettings) {
         auto brush = brushSettings->getBrush();
@@ -203,11 +206,10 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             strokeSettings.fTimeCurve =
                     brushSettings->getTimeAnimator()->
                         getValueAtRelFrame(relFrame);
-            const auto widthAnimator = mStrokeSettings->getStrokeWidthAnimator();
-            const auto width = widthAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
+
             strokeSettings.fWidthCurve =
                     brushSettings->getWidthAnimator()->
-                        getValueAtRelFrame(relFrame)*width;
+                        getValueAtRelFrame(relFrame)*strokeSettings.fOutlineWidth;
             strokeSettings.fPressureCurve =
                     brushSettings->getPressureAnimator()->
                         getValueAtRelFrame(relFrame);
@@ -493,8 +495,8 @@ void PathBox::drawHoveredSk(SkCanvas *canvas,
     drawHoveredPathSk(canvas, mPathSk, invScale);
 }
 
-void PathBox::applyPaintSetting(PaintSetting *setting) {
-    setting->apply(this);
+void PathBox::applyPaintSetting(const PaintSettingsApplier &setting) {
+    setting.apply(this);
     scheduleUpdate(Animator::USER_CHANGE);
 }
 

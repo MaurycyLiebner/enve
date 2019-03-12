@@ -9,6 +9,7 @@
 #include "Animators/paintsettings.h"
 #include "Animators/transformanimator.h"
 #include "Animators/effectanimators.h"
+#include "paintsettingsapplier.h"
 
 ParticleBox::ParticleBox() :
     BoundingBox(TYPE_PARTICLES) {
@@ -108,10 +109,10 @@ void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     }
 }
 
-void ParticleBox::applyPaintSetting(PaintSetting *setting) {
-    if(setting->targetsFill()) {
+void ParticleBox::applyPaintSetting(const PaintSettingsApplier &setting) {
+    if(setting.targetsFill()) {
         for(const auto& emitter : mEmitters) {
-            setting->applyColorSetting(emitter->getColorAnimator());
+            setting.applyColorSetting(emitter->getColorAnimator());
         }
     }
 }

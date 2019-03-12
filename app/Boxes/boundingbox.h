@@ -17,7 +17,7 @@ class PathEffect;
 class DurationRectangleMovable;
 class PaintSettings;
 class StrokeSettings;
-class PaintSetting;
+class PaintSettingsApplier;
 class EffectAnimators;
 class GPUEffectAnimators;
 class PixmapEffect;
@@ -294,7 +294,7 @@ public:
                            const SkPath &path,
                            const SkScalar &invScale);
 
-    virtual void applyPaintSetting(PaintSetting *setting);
+    virtual void applyPaintSetting(const PaintSettingsApplier &setting);
 
     virtual void setFillColorMode(const ColorMode &colorMode);
     virtual void setStrokeColorMode(const ColorMode &colorMode);

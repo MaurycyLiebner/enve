@@ -140,7 +140,7 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     canvas->restore();
 }
 
-void BoundingBox::applyPaintSetting( PaintSetting *setting) {
+void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     Q_UNUSED(setting);
 }
 

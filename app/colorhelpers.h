@@ -8,6 +8,22 @@ enum ColorMode : short {
     HSLMODE
 };
 
+enum CVR_TYPE : short {
+    CVR_RED,
+    CVR_GREEN,
+    CVR_BLUE,
+
+    CVR_HUE,
+    CVR_HSVSATURATION,
+    CVR_VALUE,
+
+    CVR_HSLSATURATION,
+    CVR_LIGHTNESS,
+    CVR_ALPHA,
+    CVR_ALL,
+    CVR_NONE
+};
+
 extern bool shouldValPointerBeLightHSV(const GLfloat &hue,
                                        const GLfloat &saturation,
                                        const GLfloat &value);

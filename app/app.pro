@@ -280,7 +280,9 @@ SOURCES += main.cpp\
     canvashandlesmartpath.cpp \
     Boxes/smartvectorpath.cpp \
     PropertyUpdaters/smartnodepointupdater.cpp \
-    GUI/BrushWidgets/brushselectionicon.cpp
+    GUI/BrushWidgets/brushselectionicon.cpp \
+    paintsettingsapplier.cpp \
+    colorsetting.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -510,7 +512,9 @@ HEADERS  += \
     Animators/PathAnimators/smartpathcollectionhandler.h \
     Boxes/smartvectorpath.h \
     PropertyUpdaters/smartnodepointupdater.h \
-    GUI/BrushWidgets/brushselectionicon.h
+    GUI/BrushWidgets/brushselectionicon.h \
+    paintsettingsapplier.h \
+    colorsetting.h
 
 RESOURCES += \
     resources.qrc

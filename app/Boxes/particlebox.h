@@ -277,7 +277,7 @@ public:
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<stdptr<MovablePoint>> &list);
-    void applyPaintSetting( PaintSetting *setting);
+    void applyPaintSetting(const PaintSettingsApplier &setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
 

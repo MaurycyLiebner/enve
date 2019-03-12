@@ -451,7 +451,7 @@ void BoxesGroup::startSelectedFillColorTransform() {
     }
 }
 
-void BoxesGroup::applyPaintSetting(PaintSetting *setting) {
+void BoxesGroup::applyPaintSetting(const PaintSettingsApplier &setting) {
     for(const auto& box : mContainedBoxes) {
         box->applyPaintSetting(setting);
     }

@@ -830,7 +830,7 @@ void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth) {
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::applyPaintSettingToSelected(PaintSetting *setting) {
+void CanvasWindow::applyPaintSettingToSelected(const PaintSettingsApplier &setting) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->applyPaintSettingToSelected(setting);
 }

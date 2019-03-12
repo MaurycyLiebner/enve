@@ -410,7 +410,7 @@ public:
     void clearCurrentEndPoint();
     void clearCurrentSmartEndPoint();
     void clearHoveredEdge();
-    void applyPaintSettingToSelected(PaintSetting *setting);
+    void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
     int getCurrentFrame();

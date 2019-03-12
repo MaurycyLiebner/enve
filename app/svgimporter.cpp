@@ -13,6 +13,7 @@
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "GUI/mainwindow.h"
 #include "Animators/transformanimator.h"
+#include "paintsettingsapplier.h"
 
 // '0' is 0x30 and '9' is 0x39
 static bool isDigit(ushort ch) {
@@ -1982,21 +1983,18 @@ void FillSvgAttributes::apply(BoundingBox *box) {
 }
 
 void FillSvgAttributes::apply(BoundingBox *box, const bool& isFill) {
-    stdsptr<PaintSetting> setting;
+    if(!box->SWT_isPathBox()) return;
+    const auto pathBox = GetAsPtr(box, PathBox);
     if(mPaintType == FLATPAINT) {
-        ColorSetting colorSetting =
-                ColorSetting(RGBMODE, CVR_ALL,
-                             mColor.redF(), mColor.greenF(),
-                             mColor.blueF(), mColor.alphaF(),
-                             CST_CHANGE);
-        setting = SPtrCreate(PaintSetting)(isFill, colorSetting);
+        ColorSetting colorSetting(RGBMODE, CVR_ALL,
+                                  mColor.redF(), mColor.greenF(),
+                                  mColor.blueF(), mColor.alphaF(),
+                                  CST_CHANGE);
+        PaintSettingsApplier(isFill, colorSetting).apply(pathBox);
     } else if(mPaintType == GRADIENTPAINT) {
-        setting = SPtrCreate(PaintSetting)(isFill, true, mGradient);
+        PaintSettingsApplier(isFill, true, mGradient).apply(pathBox);
     } else {
-        setting = SPtrCreate(PaintSetting)(isFill, NOPAINT);
-    }
-    if(box->SWT_isPathBox()) {
-        setting->apply(GetAsPtr(box, PathBox));
+        PaintSettingsApplier(isFill, NOPAINT).apply(pathBox);
     }
 }
 

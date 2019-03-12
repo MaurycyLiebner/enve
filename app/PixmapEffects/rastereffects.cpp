@@ -701,13 +701,11 @@ void solarize(const SkBitmap &bitmap, qreal factor) {
 }
 
 void spread(const SkBitmap &bitmap, u32 amount) {
-    if(bitmap.empty() || bitmap.width() < 3 || bitmap.height() < 3)
-        return;
-        uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
+    if(bitmap.empty() || bitmap.width() < 3 || bitmap.height() < 3) return;
+    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *n = new rgba [bitmap.width() * bitmap.height()];
 
-    if(!n)
-        return;
+    if(!n) return;
 
     s32 quantum;
     s32 x_distance, y_distance;
@@ -717,12 +715,10 @@ void spread(const SkBitmap &bitmap, u32 amount) {
 
     quantum = (amount+1) >> 1;
 
-    for(s32 y = 0;y < bitmap.height(); y++)
-    {
+    for(s32 y = 0;y < bitmap.height(); y++) {
         q = n + bitmap.width()*y;
 
-        for(s32 x = 0;x < bitmap.width();x++)
-        {
+        for(s32 x = 0; x < bitmap.width(); x++) {
             x_distance = x + ((rand() & (amount+1))-quantum);
             y_distance = y + ((rand() & (amount+1))-quantum);
             x_distance = F_MIN(x_distance, bitmap.width()-1);
@@ -741,8 +737,7 @@ void spread(const SkBitmap &bitmap, u32 amount) {
 }
 
 void swirl(const SkBitmap &bitmap, qreal degrees, const rgba &background) {
-    if(bitmap.empty())
-        return;
+    if(bitmap.empty()) return;
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     qreal cosine, distance, factor, radius, sine, x_center, x_distance,
             x_scale, y_center, y_distance, y_scale;
@@ -752,8 +747,7 @@ void swirl(const SkBitmap &bitmap, qreal degrees, const rgba &background) {
     rgba *bits = (rgba *)pixels;
     rgba *dest = new rgba [bitmap.width() * bitmap.height()];
 
-    if(!dest)
-        return;
+    if(!dest) return;
 
     memcpy(dest, bitmap.getPixels(), bitmap.width() * bitmap.height() * sizeof(rgba));
 
@@ -774,21 +768,18 @@ void swirl(const SkBitmap &bitmap, qreal degrees, const rgba &background) {
 
     // swirl each row
 
-    for(y = 0;y < bitmap.height();y++)
-    {
+    for(y = 0; y < bitmap.height(); y++) {
         p = bits + bitmap.width() * y;
         q = dest + bitmap.width() * y;
         y_distance = y_scale * (y-y_center);
 
-        for(x = 0;x < bitmap.width();x++)
-        {
+        for(x = 0; x < bitmap.width(); x++) {
             // determine if the pixel is within an ellipse
             *q = *p;
             x_distance = x_scale*(x-x_center);
             distance = x_distance*x_distance+y_distance*y_distance;
 
-            if(distance < (radius*radius))
-            {
+            if(distance < (radius*radius)) {
                 // swirl
                 factor = 1.0 - sqrt(distance)/radius;
                 sine = sin(degrees*factor*factor);
@@ -810,27 +801,22 @@ void swirl(const SkBitmap &bitmap, qreal degrees, const rgba &background) {
     delete [] dest;
 }
 
-void noise(const SkBitmap &bitmap, NoiseType noise_type)
-{
-    if(bitmap.empty())
-        return;
+void noise(const SkBitmap &bitmap, NoiseType noise_type) {
+    if(bitmap.empty()) return;
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     s32 x, y;
     rgba *dest = new rgba [bitmap.width() * bitmap.height()];
 
-    if(!dest)
-        return;
+    if(!dest) return;
 
     rgba *bits;
     rgba *destData;
 
-    for(y = 0;y < bitmap.height();++y)
-    {
+    for(y = 0; y < bitmap.height(); ++y) {
         bits = (rgba *)pixels + bitmap.width() * y;
         destData = dest + bitmap.width() * y;
 
-        for(x = 0;x < bitmap.width();++x)
-        {
+        for(x = 0;x < bitmap.width(); ++x) {
             destData[x].r = generateNoise(bits->r, noise_type);
             destData[x].g = generateNoise(bits->g, noise_type);
             destData[x].b = generateNoise(bits->b, noise_type);
@@ -845,10 +831,8 @@ void noise(const SkBitmap &bitmap, NoiseType noise_type)
     delete [] dest;
 }
 
-void implode(const SkBitmap &bitmap, qreal _factor, const rgba &background)
-{
-    if(bitmap.empty())
-        return;
+void implode(const SkBitmap &bitmap, qreal _factor, const rgba &background) {
+    if(bitmap.empty()) return;
 
     qreal amount, distance, radius;
     qreal x_center, x_distance, x_scale;
@@ -871,33 +855,28 @@ void implode(const SkBitmap &bitmap, qreal _factor, const rgba &background)
 
     if(bitmap.width() > bitmap.height())
         y_scale = (double)bitmap.width()/bitmap.height();
-    else if(bitmap.width() < bitmap.height())
-    {
+    else if(bitmap.width() < bitmap.height()) {
         x_scale = (double)bitmap.height()/bitmap.width();
         radius = y_center;
     }
 
     amount = _factor/10.0;
 
-    if(amount >= 0)
-        amount/=10.0;
+    if(amount >= 0) amount/=10.0;
 
     qreal factor;
 
-    for(y = 0;y < bitmap.height();++y)
-    {
+    for(y = 0;y < bitmap.height();++y) {
         bits = (rgba *)pixels + bitmap.width() * y;
         dest =  n + bitmap.width() * y;
 
         y_distance = y_scale * (y-y_center);
 
-        for(x = 0;x < bitmap.width();++x)
-        {
+        for(x = 0;x < bitmap.width();++x) {
             x_distance = x_scale*(x-x_center);
             distance= x_distance*x_distance+y_distance*y_distance;
 
-            if(distance < (radius*radius))
-            {
+            if(distance < (radius*radius)) {
                 // Implode the pixel.
                 factor = 1.0;
 
@@ -921,8 +900,7 @@ void implode(const SkBitmap &bitmap, qreal _factor, const rgba &background)
     delete [] n;
 }
 
-void despeckle(const SkBitmap &bitmap)
-{
+void despeckle(const SkBitmap &bitmap) {
     if(bitmap.empty())
         return;
 
@@ -930,14 +908,12 @@ void despeckle(const SkBitmap &bitmap)
     u8 *blue_channel, *red_channel, *green_channel, *buffer, *alpha_channel;
     s32 packets;
 
-    static const s32
-                    X[4] = {0, 1, 1,-1},
-                    Y[4] = {1, 0, 1, 1};
+    static const s32 X[4] = {0, 1, 1,-1},
+                     Y[4] = {1, 0, 1, 1};
 
     rgba *n = new rgba [bitmap.width() * bitmap.height()];
 
-    if(!n)
-        return;
+    if(!n) return;
 
     packets = (bitmap.width()+2) * (bitmap.height()+2);
 
@@ -947,8 +923,8 @@ void despeckle(const SkBitmap &bitmap)
     alpha_channel = new u8 [packets];
     buffer = new u8 [packets];
 
-    if(!red_channel || ! green_channel || ! blue_channel || ! alpha_channel || !buffer)
-    {
+    if(!red_channel || !green_channel ||
+       !blue_channel || !alpha_channel || !buffer) {
         if(red_channel)   delete [] red_channel;
         if(green_channel) delete [] green_channel;
         if(blue_channel)  delete [] blue_channel;
@@ -965,13 +941,11 @@ void despeckle(const SkBitmap &bitmap)
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     rgba *bits;
 
-    for(y = 0;y < bitmap.height();++y)
-    {
+    for(y = 0;y < bitmap.height();++y) {
         bits = (rgba *)pixels + bitmap.width()*y;
         ++j;
 
-        for(x = 0;x < bitmap.width();++x)
-        {
+        for(x = 0;x < bitmap.width();++x) {
             red_channel[j] = bits->r;
             green_channel[j] = bits->g;
             blue_channel[j] = bits->b;
@@ -985,8 +959,7 @@ void despeckle(const SkBitmap &bitmap)
     }
 
     // reduce speckle in red channel
-    for(i = 0;i < 4;i++)
-    {
+    for(i = 0;i < 4;i++) {
         hull(X[i],Y[i],1,bitmap.width(),bitmap.height(),red_channel,buffer);
         hull(-X[i],-Y[i],1,bitmap.width(),bitmap.height(),red_channel,buffer);
         hull(-X[i],-Y[i],-1,bitmap.width(),bitmap.height(),red_channel,buffer);
@@ -994,11 +967,9 @@ void despeckle(const SkBitmap &bitmap)
     }
 
     // reduce speckle in green channel
-    for(i = 0;i < packets;i++)
-        buffer[i] = 0;
+    for(i = 0; i < packets; i++) buffer[i] = 0;
 
-    for(i = 0;i < 4;i++)
-    {
+    for(i = 0; i < 4; i++) {
         hull(X[i],Y[i],1,bitmap.width(),bitmap.height(),green_channel,buffer);
         hull(-X[i],-Y[i],1,bitmap.width(),bitmap.height(),green_channel,buffer);
         hull(-X[i],-Y[i],-1,bitmap.width(),bitmap.height(),green_channel,buffer);
@@ -1006,11 +977,9 @@ void despeckle(const SkBitmap &bitmap)
     }
 
     // reduce speckle in blue channel
-    for(i = 0;i < packets;i++)
-        buffer[i] = 0;
+    for(i = 0; i < packets; i++) buffer[i] = 0;
 
-    for(i = 0;i < 4;i++)
-    {
+    for(i = 0; i < 4; i++) {
         hull(X[i],Y[i],1,bitmap.width(),bitmap.height(),blue_channel,buffer);
         hull(-X[i],-Y[i],1,bitmap.width(),bitmap.height(),blue_channel,buffer);
         hull(-X[i],-Y[i],-1,bitmap.width(),bitmap.height(),blue_channel,buffer);
@@ -1020,13 +989,11 @@ void despeckle(const SkBitmap &bitmap)
     // copy color component buffers to despeckled image
     j = bitmap.width()+2;
 
-    for(y = 0;y < bitmap.height();++y)
-    {
+    for(y = 0; y < bitmap.height(); ++y) {
         bits = n + bitmap.width()*y;
         ++j;
 
-        for(x = 0;x < bitmap.width();++x)
-        {
+        for(x = 0; x < bitmap.width(); ++x) {
             *bits = rgba(red_channel[j], green_channel[j], blue_channel[j], alpha_channel[j]);
 
             bits++;
@@ -1175,7 +1142,7 @@ void anim_fast_blur(const SkBitmap &bitmap,
         yw+=w;
     }
 
-    for(x = 0; x<w; x++) {
+    for(x = 0; x < w; x++) {
         yp = -iRadius*w;
 
         yi = qMax(0,yp)+x;
@@ -1259,7 +1226,7 @@ void anim_fast_blur(const SkBitmap &bitmap,
             bsum += b[p1]*fracInf;
             asum += a[p1]*fracInf;
 
-            yi+=w;
+            yi += w;
         }
     }
 
@@ -1311,7 +1278,7 @@ void anim_fast_blur(const SkBitmap &bitmap,
 
     yw = yi = 0;
 
-    for(y = 0; y<h; y++) {
+    for(y = 0; y < h; y++) {
         p = yi * 4;
         rLine[0] = pixels[p];
         rsum = pixels[p]*fracInf;
@@ -1345,7 +1312,6 @@ void anim_fast_blur(const SkBitmap &bitmap,
         asum += pixels[p + 3]*fracInf;
 
         for(x = 0; x < w; x++) {
-
             r[yi] = rsum*divFInv;
             g[yi] = gsum*divFInv;
             b[yi] = bsum*divFInv;
@@ -1394,7 +1360,7 @@ void anim_fast_blur(const SkBitmap &bitmap,
         yw+=w;
     }
 
-    for(x = 0; x<w; x++) {
+    for(x = 0; x < w; x++) {
         yp = -iRadius*w;
 
         yi = qMax(0,yp)+x;
@@ -1434,7 +1400,7 @@ void anim_fast_blur(const SkBitmap &bitmap,
 
 
         yi = x;
-        for(y = 0; y<h; y++) {
+        for(y = 0; y < h; y++) {
             uchar aVal = floorQrealToUChar(asum*divFInv);
             pixels[yi*4]		= qMin(aVal, floorQrealToUChar(rsum*divFInv));
             pixels[yi*4 + 1]	= qMin(aVal, floorQrealToUChar(gsum*divFInv));

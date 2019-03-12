@@ -10,6 +10,7 @@
 #include "segment1deditor.h"
 #include "namedcontainer.h"
 #include <QDockWidget>
+#include "paintsettingsapplier.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     QWidget(parent) {
@@ -490,19 +491,18 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
         currentGradient = mCurrentStrokeGradient;
         currentGradientLinear = mCurrentStrokeGradientLinear;
     }
-    stdsptr<PaintSetting> paintSetting;
+    PaintSettingsApplier paintSetting;
     if(currentPaintType == FLATPAINT) {
-        paintSetting = SPtrCreate(PaintSetting)(isFill, ColorSetting());
+        paintSetting = PaintSettingsApplier(isFill, ColorSetting());
     } else if(currentPaintType == GRADIENTPAINT) {
-        paintSetting = SPtrCreate(PaintSetting)(
+        paintSetting = PaintSettingsApplier(
                     isFill, currentGradientLinear, currentGradient);
     } else if(currentPaintType == BRUSHPAINT) {
-        paintSetting = SPtrCreate(PaintSetting)(isFill, ColorSetting(),
-                                                BRUSHPAINT);
+        paintSetting = PaintSettingsApplier(isFill, ColorSetting(), BRUSHPAINT);
     } else {
-        paintSetting = SPtrCreate(PaintSetting)(isFill, NOPAINT);
+        paintSetting = PaintSettingsApplier(isFill, NOPAINT);
     }
-    mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
 
     mMainWindow->queScheduledTasksAndUpdate();
 }
@@ -524,17 +524,16 @@ void FillStrokeSettingsWidget::colorSettingReceived(
         currentGradient = mCurrentStrokeGradient;
         currentGradientLinear = mCurrentStrokeGradientLinear;
     }
-    stdsptr<PaintSetting> paintSetting;
+    PaintSettingsApplier paintSetting;
     if(currentPaintType == FLATPAINT) {
-        paintSetting = SPtrCreate(PaintSetting)(isFill, colorSetting);
+        paintSetting = PaintSettingsApplier(isFill, colorSetting);
     } else if(currentPaintType == BRUSHPAINT) {
-        paintSetting = SPtrCreate(PaintSetting)(isFill, colorSetting,
-                                                BRUSHPAINT);
+        paintSetting = PaintSettingsApplier(isFill, colorSetting, BRUSHPAINT);
     } else { // GRADIENTPAINT
-        paintSetting = SPtrCreate(PaintSetting)(
+        paintSetting = PaintSettingsApplier(
                     isFill, currentGradientLinear, currentGradient);
     }
-    mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
 }
 
 void FillStrokeSettingsWidget::connectGradient() {
@@ -717,9 +716,9 @@ void FillStrokeSettingsWidget::applyGradient() {
         currentGradient = mCurrentStrokeGradient;
         currentGradientLinear = mCurrentStrokeGradientLinear;
     }
-    auto paintSetting = SPtrCreate(PaintSetting)(
+    const auto paintSetting = PaintSettingsApplier(
                 isFill, currentGradientLinear, currentGradient);
-    mCanvasWindow->applyPaintSettingToSelected(paintSetting.get());
+    mCanvasWindow->applyPaintSettingToSelected(paintSetting);
 }
 
 void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {

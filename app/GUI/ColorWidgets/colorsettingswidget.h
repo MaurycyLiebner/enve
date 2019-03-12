@@ -12,6 +12,7 @@
 #include "GUI/qrealanimatorvalueslider.h"
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettings.h"
+#include "paintsettingsapplier.h"
 
 class ColorLabel;
 class ActionButton;

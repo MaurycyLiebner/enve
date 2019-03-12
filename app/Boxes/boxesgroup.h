@@ -139,7 +139,7 @@ public:
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
-    void applyPaintSetting(PaintSetting *setting);
+    void applyPaintSetting(const PaintSettingsApplier &setting);
 
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);

@@ -286,7 +286,7 @@ void Canvas::getDisplayedFillStrokeSettingsFromLastSelected(
 }
 
 
-void Canvas::applyPaintSettingToSelected(PaintSetting *setting) {
+void Canvas::applyPaintSettingToSelected(const PaintSettingsApplier &setting) {
     for(const auto &box : mSelectedBoxes) {
         box->applyPaintSetting(setting);
     }

@@ -164,7 +164,7 @@ public:
 
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 
-    void applyPaintSetting( PaintSetting *setting);
+    void applyPaintSetting(const PaintSettingsApplier &setting);
 
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
