@@ -24,6 +24,7 @@ public:
                 mCurrentValue = newVal;
                 this->anim_callFrameChangeUpdater();
             }
+            afterValueChanged();
         }
     }
 
@@ -32,9 +33,7 @@ public:
     }
 
     T getValueAtRelFrame(const qreal &frame) const {
-        if(this->anim_mKeys.isEmpty()) {
-            return this->getCurrentValue();
-        }
+        if(this->anim_mKeys.isEmpty()) return this->getCurrentValue();
         int prevId;
         int nextId;
         if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId,
@@ -54,11 +53,9 @@ public:
 
     void setCurrentValue(const T &value) {
         mCurrentValue = value;
-        if(this->anim_isRecording()) {
-            anim_saveCurrentValueAsKey();
-        } else {
-            this->prp_updateInfluenceRangeAfterChanged();
-        }
+        if(this->anim_isRecording()) anim_saveCurrentValueAsKey();
+        else this->prp_updateInfluenceRangeAfterChanged();
+        afterValueChanged();
     }
 
     const T& getCurrentValue() const {
@@ -98,8 +95,8 @@ public:
             this->anim_appendKey(newKey);
         }
         gRead(target, mCurrentValue);
+        afterValueChanged();
     }
-
 protected:
     BasedAnimatorT(const QString& name) : B(name) {}
 
@@ -107,8 +104,11 @@ protected:
                                   const K * const prevKey,
                                   const K * const nextKey) const = 0;
 
+    virtual void afterValueChanged() {}
+
     void updateValueFromCurrentFrame() {
         mCurrentValue = getValueAtAbsFrame(this->anim_mCurrentAbsFrame);
+        afterValueChanged();
     }
 
     T mCurrentValue;

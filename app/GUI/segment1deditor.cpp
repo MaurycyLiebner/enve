@@ -78,7 +78,7 @@ void Segment1DEditor::paintEvent(QPaintEvent *) {
     p.setPen(pen);
 
     for(int i = 0; i <= 10; i++) {
-        QPointF p1 = valueToPos(QPointF(0, mMinY + i*(mMaxY - mMinY)/10));
+        const QPointF p1 = valueToPos(QPointF(0, mMinY + i*(mMaxY - mMinY)/10));
         p.drawLine(QPointF(mMargin, p1.y()),
                    QPointF(width() - mMargin, p1.y()));
     }
@@ -86,10 +86,10 @@ void Segment1DEditor::paintEvent(QPaintEvent *) {
     pen.setColor(Qt::black);
     p.setPen(pen);
     p.drawPath(mCurrentDrawPath);
-    QPointF p0Pos(valueToPos(0, mCurrentSegment.p0()));
-    QPointF c1Pos(valueToPos(1./3, mCurrentSegment.c1()));
-    QPointF c2Pos(valueToPos(2./3, mCurrentSegment.c2()));
-    QPointF p1Pos(valueToPos(1, mCurrentSegment.p1()));
+    const QPointF p0Pos(valueToPos(0, mCurrentSegment.p0()));
+    const QPointF c1Pos(valueToPos(1./3, mCurrentSegment.c1()));
+    const QPointF c2Pos(valueToPos(2./3, mCurrentSegment.c2()));
+    const QPointF p1Pos(valueToPos(1, mCurrentSegment.p1()));
 
     pen.setStyle(Qt::DotLine);
     pen.setColor(Qt::black);
@@ -116,18 +116,18 @@ void Segment1DEditor::paintEvent(QPaintEvent *) {
 }
 
 void Segment1DEditor::mousePressEvent(QMouseEvent *e) {
-    QPointF pos = e->pos();
+    const QPointF pos = e->pos();
     mPressedPos = pos;
     mPressedValue = posToValue(pos);
-    QPointF p0Pos = valueToPos(p0());
-    QPointF c1Pos = valueToPos(c1());
-    QPointF c2Pos = valueToPos(c2());
-    QPointF p1Pos = valueToPos(p1());
+    const QPointF p0Pos = valueToPos(p0());
+    const QPointF c1Pos = valueToPos(c1());
+    const QPointF c2Pos = valueToPos(c2());
+    const QPointF p1Pos = valueToPos(p1());
 
-    qreal p0Dist = pointToLen(p0Pos - pos);
-    qreal c1Dist = pointToLen(c1Pos - pos);
-    qreal c2Dist = pointToLen(c2Pos - pos);
-    qreal p1Dist = pointToLen(p1Pos - pos);
+    const qreal p0Dist = pointToLen(p0Pos - pos);
+    const qreal c1Dist = pointToLen(c1Pos - pos);
+    const qreal c2Dist = pointToLen(c2Pos - pos);
+    const qreal p1Dist = pointToLen(p1Pos - pos);
 
     PressedPt closestPt = P0;
     qreal minDist = p0Dist;
@@ -189,7 +189,7 @@ void Segment1DEditor::mousePressEvent(QMouseEvent *e) {
 
 void Segment1DEditor::mouseMoveEvent(QMouseEvent *e) {
     if(mPressedPt == NONE) return;
-    qreal hig = height() - 2*mPtRad - 2*mMargin - 2*mAddMarginY;
+    const qreal hig = height() - 2*mPtRad - 2*mMargin - 2*mAddMarginY;
     qreal newVal = mPressedPtValue.y() +
             (mPressedPos.y() - e->y())*(mMaxY - mMinY)/hig;
     newVal = CLAMP(newVal, mMinY, mMaxY);

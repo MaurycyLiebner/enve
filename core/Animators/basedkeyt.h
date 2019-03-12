@@ -13,7 +13,11 @@ public:
     }
     T &getValue() { return mValue; }
     const T &getValue() const { return mValue; }
-    void setValue(const T &value) { mValue = value; }
+    void setValue(const T &value) {
+        mValue = value;
+        if(!this->mParentAnimator) return;
+        this->mParentAnimator->anim_updateAfterChangedKey(this);
+    }
     void writeKey(QIODevice *target) {
         B::writeKey(target);
         gWrite(target, mValue);

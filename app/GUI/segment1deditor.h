@@ -21,9 +21,13 @@ public:
     }
 
     void setCurrentAnimator(qCubicSegment1DAnimator * const animator) {
-//        if(mCurrentAnimator)
-//                disconnect(mCurrentAnimator, nullptr, this, nullptr);
+        if(mCurrentAnimator)
+            disconnect(mCurrentAnimator, nullptr, this, nullptr);
         mCurrentAnimator = animator;
+        if(mCurrentAnimator)
+            connect(mCurrentAnimator,
+                    &qCubicSegment1DAnimator::currentValueChanged,
+                    this, &Segment1DEditor::updateAfterAnimatorChanged);
         updateAfterAnimatorChanged();
     }
 
@@ -41,11 +45,6 @@ public:
     void setPointRadius(const qreal& radius) {
         mPtRad = radius;
         clampTopMarginAddMarginY();
-    }
-
-    void updateAfterAnimatorChanged() {
-        if(!mCurrentAnimator) return;
-        setCurrentSegment(mCurrentAnimator->getCurrentValue());
     }
 
     void sendValueToAnimator() {
@@ -87,6 +86,10 @@ signals:
     void segmentEdited(qCubicSegment1D);
     void segmentChanged(qCubicSegment1D);
 public slots:
+    void updateAfterAnimatorChanged() {
+        if(!mCurrentAnimator) return;
+        setCurrentSegment(mCurrentAnimator->getCurrentValue());
+    }
 };
 
 #endif // SEGMENT1DEDITOR_H

@@ -92,7 +92,7 @@ void QrealAnimator::qra_setValueRange(const qreal &minVal,
 
 void QrealAnimator::qra_incAllValues(const qreal &valInc) {
     for(const auto &key : anim_mKeys) {
-        GetAsPtr(key.get(), QrealKey)->incValue(valInc);
+        GetAsPtr(key, QrealKey)->incValue(valInc);
     }
     qra_incCurrentValue(valInc);
 }
@@ -113,8 +113,6 @@ void QrealAnimator::prp_openContextMenu(const QPoint &pos) {
                 anim_setRecording(true);
             }
         }
-    } else {
-
     }
 }
 
@@ -238,9 +236,7 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const qreal &frame,
 }
 
 qreal QrealAnimator::qra_getEffectiveValueAtRelFrame(const qreal &frame) const {
-    if(mRandomGenerator.isNull()) {
-        return qra_getValueAtRelFrame(frame);
-    }
+    if(mRandomGenerator.isNull()) return qra_getValueAtRelFrame(frame);
     const qreal val = qra_getValueAtRelFrame(frame) +
             mRandomGenerator->getDevAtRelFrame(frame);
     return qMin(mMaxPossibleVal, qMax(mMinPossibleVal, val));
@@ -285,8 +281,7 @@ void QrealAnimator::qra_saveCurrentValueToKey(QrealKey *key) {
     qra_saveValueToKey(key, mCurrentValue);
 }
 
-void QrealAnimator::qra_saveValueToKey(const int &frame,
-                                       const qreal &value) {
+void QrealAnimator::qra_saveValueToKey(const int &frame, const qreal &value) {
     const auto keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
     if(!keyAtFrame) {
         auto newKey = SPtrCreate(QrealKey)(value, frame, this);

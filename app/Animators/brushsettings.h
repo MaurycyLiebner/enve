@@ -40,12 +40,13 @@ public:
         mTimeCurve->setCurrentValue(curve);
     }
 private:
+    qsptr<qCubicSegment1DAnimator> mWidthCurve =
+            SPtrCreate(qCubicSegment1DAnimator)("width");
     qsptr<qCubicSegment1DAnimator> mPressureCurve =
             SPtrCreate(qCubicSegment1DAnimator)("pressure");
     qsptr<qCubicSegment1DAnimator> mTimeCurve =
             SPtrCreate(qCubicSegment1DAnimator)("time");
-    qsptr<qCubicSegment1DAnimator> mWidthCurve =
-            SPtrCreate(qCubicSegment1DAnimator)("width");
+
     _SimpleBrushWrapper * mBrush = nullptr;
 };
 

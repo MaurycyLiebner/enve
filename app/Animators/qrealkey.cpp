@@ -41,13 +41,13 @@ void QrealKey::setValue(const qreal& value) {
     setStartValueVar(mStartValue + dVal);
 
     mValue = value;
+    if(!this->mParentAnimator) return;
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
 void QrealKey::finishValueTransform() {
-    if(mParentAnimator) {
+    if(mParentAnimator)
         mParentAnimator->anim_updateAfterChangedKey(this);
-    }
 }
 
 void QrealKey::startValueTransform() {

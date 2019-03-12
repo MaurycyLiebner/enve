@@ -109,7 +109,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
                     rec ? QColor(255, 200, 200) : QColor(255, 255, 255),
                     rec ? QColor(255, 160, 160) : QColor(220, 220, 220),
                     rec && key ? Qt::red : Qt::black);
-        p->setOpacity(1.);
+        p->setOpacity(1);
     }
 }
 
@@ -118,17 +118,16 @@ void QrealAnimatorValueSlider::clearTarget() {
     mTarget = nullptr;
 }
 
-void QrealAnimatorValueSlider::setTarget(
-        QrealAnimator * const animator) {
+void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
     if(animator == mTarget) return;
     clearTarget();
     mTarget = animator;
     if(mTarget) {
         setNumberDecimals(animator->getNumberDecimals());
-        connect(animator, SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(setValueFromAnimator(qreal)));
-        connect(animator, SIGNAL(beingDeleted()),
-                this, SLOT(nullifyAnimator()));
+        connect(animator, &QrealAnimator::valueChangedSignal,
+                this, &QrealAnimatorValueSlider::setValueFromAnimator);
+        connect(animator, &QrealAnimator::beingDeleted,
+                this, &QrealAnimatorValueSlider::nullifyAnimator);
 
         setValueRange(animator->getMinPossibleValue(),
                       animator->getMaxPossibleValue());
@@ -138,16 +137,15 @@ void QrealAnimatorValueSlider::setTarget(
     }
 }
 
-void QrealAnimatorValueSlider::setTarget(
-        IntProperty * const animator) {
+void QrealAnimatorValueSlider::setTarget(IntProperty * const animator) {
     if(animator == mTarget) return;
     clearTarget();
     if(animator) {
         setNumberDecimals(0);
-        connect(animator, SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(setValueFromAnimator(qreal)));
-        connect(animator, SIGNAL(beingDeleted()),
-                this, SLOT(nullifyAnimator()));
+        connect(animator, &IntProperty::valueChangedSignal,
+                this, &QrealAnimatorValueSlider::setValueFromAnimator);
+        connect(animator, &IntProperty::beingDeleted,
+                this, &QrealAnimatorValueSlider::nullifyAnimator);
 
         setValueRange(animator->getMinValue(),
                       animator->getMaxValue());
