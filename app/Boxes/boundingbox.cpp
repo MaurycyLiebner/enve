@@ -170,7 +170,7 @@ Canvas *BoundingBox::getParentCanvas() {
     return mParentGroup->getParentCanvas();
 }
 
-void BoundingBox::reloadCacheHandler() { clearAllCache(); }
+void BoundingBox::reloadCacheHandler() { prp_updateInfluenceRangeAfterChanged(); }
 
 bool BoundingBox::SWT_isBoundingBox() const { return true; }
 
@@ -181,10 +181,6 @@ void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
 void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
     auto visRange = getVisibleAbsFrameRange();
     prp_updateAfterChangedAbsFrameRange(visRange);
-}
-
-void BoundingBox::clearAllCache() {
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void BoundingBox::drawSelectedSk(SkCanvas *canvas,

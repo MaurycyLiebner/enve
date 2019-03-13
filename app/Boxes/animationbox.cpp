@@ -42,7 +42,7 @@ void AnimationBox::reloadCacheHandler() {
         updateDurationRectangleAnimationRange();
     //}
     reloadSound();
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 
     //mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
     scheduleUpdate(Animator::USER_CHANGE);

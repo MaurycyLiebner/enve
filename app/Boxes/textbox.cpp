@@ -29,18 +29,17 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
 
 void TextBox::openTextEditor(QWidget* dialogParent) {
     bool ok;
-    QString text =
+    const QString text =
             QInputDialog::getMultiLineText(
                 dialogParent, getName() + " text",
                 "Text:", mText->getCurrentValue(), &ok);
-    if(ok) {
-        mText->setCurrentValue(text);
-    }
+    if(ok) mText->setCurrentValue(text);
 }
 
 void TextBox::setFont(const QFont &font) {
-    clearAllCache();
     mFont = font;
+    setPathsOutdated();
+    prp_updateInfluenceRangeAfterChanged();
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
@@ -88,7 +87,7 @@ qreal textForQPainterPath(const Qt::Alignment &alignment,
     if(alignment == Qt::AlignCenter) {
         return (maxWidth - lineWidth)*0.5;
     } else if(alignment == Qt::AlignLeft) {
-        return 0.;
+        return 0;
     } else {// if(alignment == Qt::AlignRight) {
         return maxWidth - lineWidth;
     }

@@ -315,8 +315,6 @@ public:
     void decUsedAsTarget();
     void ca_childAnimatorIsRecordingChanged();
 
-    virtual void clearAllCache();
-
     void startPivotTransform();
     void finishPivotTransform();
     bool hasDurationRectangle() const;

@@ -287,7 +287,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
                             effect,
                             effectUnderMouse.get());
             }
-            underMouseAnimator->getParentBox()->clearAllCache();
+            underMouseAnimator->getParentBox()->prp_updateInfluenceRangeAfterChanged();
         }
     } else if(PathEffectMimeData::hasFormat(event->mimeData())) {
         int yPos = event->pos().y();
@@ -297,10 +297,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
         type.targetsFunctionList =
                 QList<SWT_Checker>({&SingleWidgetTarget::SWT_isPathEffect});
         BoxSingleWidget *singleWidgetUnderMouse =
-                getClosestsSingleWidgetWithTargetType(
-                    type,
-                    yPos,
-                    &below);
+                getClosestsSingleWidgetWithTargetType(type, yPos, &below);
         if(!singleWidgetUnderMouse) return;
 
         auto pathEffectMimeData =
@@ -346,7 +343,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
                             effect.get(),
                             effectUnderMouse);
             }
-            underMouseAnimator->getParentBox()->clearAllCache();
+            underMouseAnimator->getParentBox()->prp_updateInfluenceRangeAfterChanged();
         }
     }
     scheduleUpdateVisibleWidgetsContent();

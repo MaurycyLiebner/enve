@@ -143,7 +143,6 @@ public:
 
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
-    void clearAllCache();
     void drawPixmapSk(SkCanvas * const canvas,
                       GrContext * const grContext);
     void setDescendantCurrentGroup(const bool &bT);

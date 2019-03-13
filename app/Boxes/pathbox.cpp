@@ -266,7 +266,7 @@ void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
     mPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mPathEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
@@ -280,7 +280,7 @@ void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
@@ -294,7 +294,7 @@ void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
@@ -306,7 +306,7 @@ void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
         mPathEffectsAnimators->SWT_hide();
     }
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
@@ -318,7 +318,7 @@ void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
         mFillPathEffectsAnimators->SWT_hide();
     }
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
@@ -330,7 +330,7 @@ void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
         mOutlinePathEffectsAnimators->SWT_hide();
     }
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::resetStrokeGradientPointsPos() {
@@ -347,13 +347,13 @@ void PathBox::resetFillGradientPointsPos() {
 
 void PathBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
@@ -365,7 +365,7 @@ void PathBox::setStrokeWidth(const qreal &strokeWidth) {
 void PathBox::setOutlineCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     scheduleUpdate(Animator::USER_CHANGE);
 }
 

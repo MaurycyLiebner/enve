@@ -107,7 +107,7 @@ void BoxesGroup::addPathEffect(const qsptr<PathEffect>& effect) {
     mPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mPathEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -122,7 +122,7 @@ void BoxesGroup::addFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -137,7 +137,7 @@ void BoxesGroup::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -153,7 +153,7 @@ void BoxesGroup::removePathEffect(const qsptr<PathEffect>& effect) {
         mPathEffectsAnimators->SWT_hide();
     }
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -166,7 +166,7 @@ void BoxesGroup::removeFillPathEffect(const qsptr<PathEffect>& effect) {
         mFillPathEffectsAnimators->SWT_hide();
     }
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -179,7 +179,7 @@ void BoxesGroup::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
         mOutlinePathEffectsAnimators->SWT_hide();
     }
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -314,13 +314,6 @@ QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
         }
     }
     return SkRectToQRectF(boundingPaths.computeTightBounds());
-}
-
-void BoxesGroup::clearAllCache() {
-    BoundingBox::clearAllCache();
-    for(const auto &child : mContainedBoxes) {
-        child->clearAllCache();
-    }
 }
 
 bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
@@ -814,7 +807,7 @@ void BoxesGroup::removeContainedBoxFromList(const int &id) {
         }
     }
 
-    box->clearAllCache();
+    box->prp_updateInfluenceRangeAfterChanged();
     if(box->isSelected()) box->removeFromSelection();
     disconnect(box.data(), nullptr, this, nullptr);
 
@@ -883,7 +876,7 @@ void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
                                                     + ca_mChildAnimators.count());
     scheduleUpdate(Animator::USER_CHANGE);
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void BoxesGroup::moveContainedBoxBelow(BoundingBox *boxToMove,

@@ -14,5 +14,5 @@ void PixmapEffectUpdater::frameChangeUpdate() {
 }
 
 void PixmapEffectUpdater::finishedChange() {
-    mTarget->clearAllCache();
+    mTarget->prp_updateInfluenceRangeAfterChanged();
 }
