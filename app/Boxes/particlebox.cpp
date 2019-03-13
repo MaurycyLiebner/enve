@@ -11,8 +11,7 @@
 #include "Animators/effectanimators.h"
 #include "paintsettingsapplier.h"
 
-ParticleBox::ParticleBox() :
-    BoundingBox(TYPE_PARTICLES) {
+ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
     setName("Particle Box");
     mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
     mTopLeftPoint = SPtrCreate(AnimatedPoint)(
@@ -110,11 +109,11 @@ void ParticleBox::updateAfterDurationRectangleRangeChanged() {
 }
 
 void ParticleBox::applyPaintSetting(const PaintSettingsApplier &setting) {
-    if(setting.targetsFill()) {
-        for(const auto& emitter : mEmitters) {
-            setting.applyColorSetting(emitter->getColorAnimator());
-        }
-    }
+//    if(setting.targetsFill()) {
+//        for(const auto& emitter : mEmitters) {
+//            setting.applyColorSetting(emitter->getColorAnimator());
+//        }
+//    }
 }
 
 void ParticleBox::startAllPointsTransform() {

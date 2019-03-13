@@ -4,6 +4,7 @@
 #include <QtXml/QDomDocument>
 #include "GUI/fillstrokesettings.h"
 #include <QtMath>
+#include "paintsettingsapplier.h"
 class VectorPath;
 class Canvas;
 class BoxesGroup;
@@ -76,8 +77,9 @@ public:
     const PaintType &getPaintType() const;
     Gradient *getGradient() const;
 
-    void apply(BoundingBox *box);
-    void apply(BoundingBox *box, const bool &isFill);
+    void apply(BoundingBox * const box) const;
+    void apply(BoundingBox * const box,
+               const PaintSetting::Target& target) const;
 protected:
     QColor mColor = QColor(0, 0, 0);
     PaintType mPaintType = FLATPAINT;//NOPAINT;

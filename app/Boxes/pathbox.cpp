@@ -190,7 +190,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mFillGradientPoints->getStartPointAtRelFrameF(relFrame),
                     mFillGradientPoints->getEndPointAtRelFrameF(relFrame),
-                    mFillSettings->getGradientLinear());
+                    mFillSettings->getGradientType());
     }
 
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
@@ -223,7 +223,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
                         prp_relFrameToAbsFrameF(relFrame)),
                     mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
                     mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
-                    mStrokeSettings->getGradientLinear());
+                    mStrokeSettings->getGradientType());
     }
 }
 
@@ -461,8 +461,8 @@ void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) 
         } else if(paintType == GRADIENTPAINT) {
             mFillSettings->setGradient(
                         fillSettings->getGradient());
-            mFillSettings->setGradientLinear(
-                        fillSettings->getGradientLinear());
+            mFillSettings->setGradientType(
+                        fillSettings->getGradientType());
         }
     }
 }
@@ -480,8 +480,8 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
         } else if(paintType == GRADIENTPAINT) {
             mStrokeSettings->setGradient(
                         strokeSettings->getGradient());
-            mStrokeSettings->setGradientLinear(
-                        strokeSettings->getGradientLinear());
+            mStrokeSettings->setGradientType(
+                        strokeSettings->getGradientType());
         }
         mStrokeSettings->getStrokeWidthAnimator()->qra_setCurrentValue(
                     strokeSettings->getCurrentStrokeWidth());

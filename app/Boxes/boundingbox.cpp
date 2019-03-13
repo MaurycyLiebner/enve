@@ -907,7 +907,7 @@ void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
     mGPUEffectsAnimators->ca_addChildAnimator(rasterEffect);
     //effect->setParentEffectAnimators(mGPUEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
@@ -919,7 +919,7 @@ void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
     mEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mEffectsAnimators.data());
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
@@ -928,7 +928,7 @@ void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
         mEffectsAnimators->SWT_hide();
     }
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 //int BoundingBox::prp_getParentFrameShift() const {
@@ -1244,12 +1244,10 @@ void BoundingBox::scheduleTask(const stdsptr<_ScheduledTask>& task) {
 
 void BoundingBox::setVisibile(const bool &visible) {
     if(mVisible == visible) return;
-    if(mSelected) {
-        removeFromSelection();
-    }
+    if(mSelected) removeFromSelection();
     mVisible = visible;
 
-    clearAllCache();
+    prp_updateInfluenceRangeAfterChanged();
 
     scheduleUpdate(Animator::USER_CHANGE);
 

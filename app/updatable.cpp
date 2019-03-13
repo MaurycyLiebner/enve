@@ -90,7 +90,7 @@ void _Task::clear() {
 void _Task::addDependent(_Task * const updatable) {
     if(!updatable) return;
     if(!finished()) {
-        if(listContainsSharedPtr(updatable, mNextExecutionDependent)) return;
+        if(mNextExecutionDependent.contains(updatable)) return;
         mNextExecutionDependent << updatable;
         updatable->incDependencies();
     }

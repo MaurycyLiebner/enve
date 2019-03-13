@@ -7,6 +7,7 @@
 #include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
 #include "brushsettings.h"
+#include "Animators/gradient.h"
 
 enum PaintType : short {
     NOPAINT,
@@ -20,7 +21,6 @@ class SkStroke;
 
 class GradientPoints;
 
-class Gradient;
 class PaintSettings : public ComplexAnimator {
     friend class SelfRef;
 public:
@@ -50,10 +50,10 @@ public:
     void setGradientVar(Gradient * const grad);
 
     QColor getColorAtRelFrame(const qreal &relFrame) const;
-    const bool &getGradientLinear() { return mGradientLinear; }
-    void setGradientLinear(const bool &linear) {
-        if(mGradientLinear == linear) return;
-        mGradientLinear = linear;
+    const Gradient::Type &getGradientType() { return mGradientType; }
+    void setGradientType(const Gradient::Type &type) {
+        if(mGradientType == type) return;
+        mGradientType = type;
         prp_callFinishUpdater();
     }
 
@@ -68,7 +68,7 @@ protected:
     virtual void showHideChildrenBeforeChaningPaintType(
             const PaintType &newPaintType);
 private:
-    bool mGradientLinear = true;
+    Gradient::Type mGradientType = Gradient::LINEAR;
     PaintType mPaintType = FLATPAINT;
 
     PathBox * const mTarget_k;

@@ -9,6 +9,7 @@ class Gradient : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
 public:
+    enum Type { LINEAR, RADIAL };
     bool SWT_isGradient() const { return true; }
     void prp_startTransform();
     void prp_setParentFrameShift(const int &shift,

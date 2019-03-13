@@ -5,76 +5,156 @@
 #include "Segments/qcubicsegment1d.h"
 #include "GUI/BrushWidgets/brushwidget.h"
 #include <QPainter>
+#include "Boxes/pathbox.h"
+#include "Animators/gradient.h"
 class ColorAnimator;
 class Gradient;
 class PathBox;
 enum PaintType : short;
+class PaintSettings;
+
+class PaintSetting {
+public:
+    enum Target { FILL, OUTLINE };
+    virtual ~PaintSetting() {}
+
+    void apply(PathBox * const target) const {
+        applyToPS(targetPaintSettings(target));
+    }
+protected:
+    PaintSetting(const Target& target) : mTarget(target) {}
+    virtual void applyToPS(PaintSettings * const target) const = 0;
+private:
+    PaintSettings * targetPaintSettings(PathBox * const target) const {
+        return mTarget == FILL ? target->getFillSettings() :
+                                 target->getStrokeSettings();
+    }
+    const Target mTarget;
+};
+
+class ColorPaintSetting : public PaintSetting {
+public:
+    ColorPaintSetting(const Target& target,
+                      const ColorSetting& colorSettings) :
+        PaintSetting(target), mColorSetting(colorSettings) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        mColorSetting.apply(target->getColorAnimator());
+    }
+private:
+    const ColorSetting mColorSetting;
+};
+
+class GradientPaintSetting : public PaintSetting {
+public:
+    GradientPaintSetting(const Target& target,
+                         Gradient * const gradient) :
+        PaintSetting(target), mGradient(gradient) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        target->setGradient(mGradient);
+    }
+private:
+    Gradient * const mGradient;
+};
+
+class GradientTypePaintSetting : public PaintSetting {
+public:
+    GradientTypePaintSetting(const Target& target,
+                             const Gradient::Type& type) :
+        PaintSetting(target), mGradientType(type) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        target->setGradientType(mGradientType);
+    }
+private:
+    const Gradient::Type mGradientType;
+};
+
+class PaintTypePaintSetting : public PaintSetting {
+public:
+    PaintTypePaintSetting(const Target& target,
+                          const PaintType& type) :
+        PaintSetting(target), mPaintType(type) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        target->setPaintType(mPaintType);
+    }
+private:
+    const PaintType mPaintType;
+};
+
+class OutlineWidthPaintSetting : public PaintSetting {
+public:
+    OutlineWidthPaintSetting(const qreal& width) :
+        PaintSetting(OUTLINE), mWidth(width) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        static_cast<StrokeSettings*>(target)->setCurrentStrokeWidth(mWidth);
+    }
+private:
+    const qreal mWidth;
+};
+
+class StrokeBrushPaintSetting : public PaintSetting {
+public:
+    StrokeBrushPaintSetting(SimpleBrushWrapper * const brush) :
+        PaintSetting(OUTLINE), mBrush(brush) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        static_cast<StrokeSettings*>(target)->setStrokeBrush(mBrush);
+    }
+private:
+    SimpleBrushWrapper * const mBrush;
+};
+
+class StrokeWidthCurvePaintSetting : public PaintSetting {
+public:
+    StrokeWidthCurvePaintSetting(const qCubicSegment1D& widthCurve) :
+        PaintSetting(OUTLINE), mWidthCurve(widthCurve) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        static_cast<StrokeSettings*>(target)->setStrokeBrushWidthCurve(mWidthCurve);
+    }
+private:
+    const qCubicSegment1D mWidthCurve;
+};
+
+class StrokePressureCurvePaintSetting : public PaintSetting {
+public:
+    StrokePressureCurvePaintSetting(const qCubicSegment1D& pressureCurve) :
+        PaintSetting(OUTLINE), mPressureCurve(pressureCurve) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        static_cast<StrokeSettings*>(target)->setStrokeBrushPressureCurve(mPressureCurve);
+    }
+private:
+    const qCubicSegment1D mPressureCurve;
+};
+
+class StrokeTimeCurvePaintSetting : public PaintSetting {
+public:
+    StrokeTimeCurvePaintSetting(const qCubicSegment1D& timeCurve) :
+        PaintSetting(OUTLINE), mTimeCurve(timeCurve) {}
+protected:
+    void applyToPS(PaintSettings * const target) const {
+        static_cast<StrokeSettings*>(target)->setStrokeBrushTimeCurve(mTimeCurve);
+    }
+private:
+    const qCubicSegment1D mTimeCurve;
+};
 
 class PaintSettingsApplier {
 public:
-    PaintSettingsApplier() {}
-    PaintSettingsApplier(const bool &targetFillSettings,
-                         const ColorSetting &colorSetting);
+    inline PaintSettingsApplier &operator<< (const stdsptr<PaintSetting> &t)
+    { mSettings << t; return *this; }
 
-    PaintSettingsApplier(const bool &targetFillSettings,
-                         const PaintType& paintType);
-
-    PaintSettingsApplier(const bool &targetFillSettings,
-                         const ColorSetting &colorSetting,
-                         const PaintType& paintType);
-
-    PaintSettingsApplier(const bool &targetFillSettings,
-                         const bool &linearGradient,
-                         Gradient* const gradient);
-
-    void apply(PathBox * const box, const bool &applyAll = true) const;
-
-    void applyColorSetting(ColorAnimator * const animator) const;
-
-    bool targetsFill() const { return mTargetFillSettings; }
+    void apply(PathBox * const target) const {
+        for(const auto& setting : mSettings)
+            setting->apply(target);
+    }
 private:
-    bool mTargetFillSettings;
-    bool mLinearGradient = true;
-    PaintType mPaintType;
-    ColorSetting mColorSetting;
-    qptr<Gradient> mGradient;
-};
-
-class StrokeSettingsApplier {
-public:
-    StrokeSettingsApplier() {}
-    StrokeSettingsApplier(const ColorSetting &colorSetting) :
-        mPaintSettings(true, colorSetting) {}
-
-    StrokeSettingsApplier(const PaintType& paintType) :
-        mPaintSettings(true, paintType) {}
-
-    StrokeSettingsApplier(const ColorSetting &colorSetting,
-                          const PaintType& paintType) :
-        mPaintSettings(true, colorSetting, paintType) {}
-
-    StrokeSettingsApplier(const bool &linearGradient,
-                          Gradient* const gradient) :
-        mPaintSettings(true, linearGradient, gradient) {}
-
-    StrokeSettingsApplier(const ColorSetting &colorSetting,
-                          const qreal &width,
-                          SimpleBrushWrapper * const brush,
-                          const qCubicSegment1D &widthCurve,
-                          const qCubicSegment1D &pressureCurve,
-                          const qCubicSegment1D &timeCurve);
-
-    void apply(PathBox * const box, const bool& applyAll = true) const;
-private:
-    PaintSettingsApplier mPaintSettings;
-    QPainter::CompositionMode mOutlineCompositionMode =
-            QPainter::CompositionMode_Source;
-    qreal mWidth;
-
-    stdptr<SimpleBrushWrapper> mStrokeBrush;
-    qCubicSegment1D mWidthCurve;
-    qCubicSegment1D mPressureCurve;
-    qCubicSegment1D mTimeCurve;
+    QList<stdsptr<PaintSetting>> mSettings;
 };
 
 #endif // PAINTSETTINGSAPPLIER_H

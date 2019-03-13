@@ -17,6 +17,7 @@
 #include "Animators/brushsettings.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "GUI/BrushWidgets/brushselectionicon.h"
+#include "paintsettingsapplier.h"
 class GradientWidget;
 class MainWindow;
 class CanvasWindow;
@@ -71,7 +72,7 @@ private slots:
     void setStrokeTarget();
 
     void setGradient(Gradient* gradient);
-    void setGradientLinear(const bool &linear);
+    void setGradientType(const Gradient::Type &type);
 
     void setBevelJoinStyle();
     void setMiterJoinStyle();
@@ -113,7 +114,7 @@ private:
     void setCapStyle(Qt::PenCapStyle capStyle);
 
 
-    enum { FILL, STROKE } mTarget = FILL;
+    PaintSetting::Target mTarget = PaintSetting::FILL;
 
     //
 
@@ -127,16 +128,13 @@ private:
 
     Gradient *getCurrentGradientVal();
 
-    const bool &getCurrentGradientLinearVal() {
-        if(mTarget == FILL) {
-            return mCurrentFillGradientLinear;
-        } else {
-            return mCurrentStrokeGradientLinear;
-        }
+    const Gradient::Type &getCurrentGradientTypeVal() {
+        if(mTarget == PaintSetting::FILL) return mCurrentFillGradientType;
+        else return mCurrentStrokeGradientType;
     }
 
     void setCurrentGradientVal(Gradient *gradient);
-    void setCurrentGradientLinearVal(const bool &linear);
+    void setCurrentGradientTypeVal(const Gradient::Type &type);
 
     qptr<ColorAnimator> mCurrentFillColorAnimator;
     qptr<ColorAnimator> mCurrentStrokeColorAnimator;
@@ -145,8 +143,8 @@ private:
     QColor mCurrentFillColor;
     QColor mCurrentStrokeColor;
 
-    bool mCurrentStrokeGradientLinear = true;
-    bool mCurrentFillGradientLinear = true;
+    Gradient::Type mCurrentStrokeGradientType = Gradient::LINEAR;
+    Gradient::Type mCurrentFillGradientType = Gradient::LINEAR;
 
     qptr<Gradient> mCurrentStrokeGradient;
     qptr<Gradient> mCurrentFillGradient;

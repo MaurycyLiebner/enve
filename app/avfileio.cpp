@@ -577,7 +577,7 @@ void PaintSettings::writeProperty(QIODevice * const target) const {
     } else {
         gradId = -1;
     }
-    target->write(rcConstChar(&mGradientLinear), sizeof(bool));
+    target->write(rcConstChar(&mGradientType), sizeof(bool));
     target->write(rcConstChar(&gradId), sizeof(int));
 }
 
@@ -586,7 +586,7 @@ void PaintSettings::readProperty(QIODevice *target) {
     mColor->readProperty(target);
     target->read(rcChar(&mPaintType), sizeof(PaintType));
     int gradId;
-    target->read(rcChar(&mGradientLinear), sizeof(bool));
+    target->read(rcChar(&mGradientType), sizeof(bool));
     target->read(rcChar(&gradId), sizeof(int));
     if(gradId != -1) {
         mGradient = MainWindow::getInstance()->getLoadedGradientById(gradId);

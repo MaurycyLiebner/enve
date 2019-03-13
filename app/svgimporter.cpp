@@ -1978,11 +1978,12 @@ const PaintType &FillSvgAttributes::getPaintType() const { return mPaintType; }
 
 Gradient *FillSvgAttributes::getGradient() const { return mGradient; }
 
-void FillSvgAttributes::apply(BoundingBox *box) {
-    apply(box, true);
+void FillSvgAttributes::apply(BoundingBox *box) const {
+    apply(box, PaintSetting::FILL);
 }
 
-void FillSvgAttributes::apply(BoundingBox *box, const bool& isFill) {
+void FillSvgAttributes::apply(BoundingBox * const box,
+                              const PaintSetting::Target& target) const {
     if(!box->SWT_isPathBox()) return;
     const auto pathBox = GetAsPtr(box, PathBox);
     if(mPaintType == FLATPAINT) {
@@ -1990,11 +1991,11 @@ void FillSvgAttributes::apply(BoundingBox *box, const bool& isFill) {
                                   mColor.redF(), mColor.greenF(),
                                   mColor.blueF(), mColor.alphaF(),
                                   CST_CHANGE);
-        PaintSettingsApplier(isFill, colorSetting).apply(pathBox);
+        ColorPaintSetting(target, colorSetting).apply(pathBox);
     } else if(mPaintType == GRADIENTPAINT) {
-        PaintSettingsApplier(isFill, true, mGradient).apply(pathBox);
+        GradientPaintSetting(target, mGradient).apply(pathBox);
     } else {
-        PaintSettingsApplier(isFill, NOPAINT).apply(pathBox);
+        PaintTypePaintSetting(target, NOPAINT).apply(pathBox);
     }
 }
 
@@ -2049,7 +2050,7 @@ void StrokeSvgAttributes::setOutlineCompositionMode(
 
 void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
     box->setStrokeWidth(mLineWidth*scale);
-    FillSvgAttributes::apply(box, false);
+    FillSvgAttributes::apply(box, PaintSetting::OUTLINE);
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
 }
 
