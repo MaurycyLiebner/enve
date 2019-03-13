@@ -21,34 +21,21 @@ class SkStroke;
 
 class GradientPoints;
 
-class PaintSettings : public ComplexAnimator {
-    friend class SelfRef;
+class PaintSettingsAnimator : public ComplexAnimator {
 public:
-    bool SWT_isPaintSettings() const { return true; }
-
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     QColor getCurrentColor() const;
-
     const PaintType &getPaintType() const;
-
     Gradient *getGradient() const;
-
     void setGradient(Gradient *gradient);
-
     void setCurrentColor(const QColor &color);
-
     void setPaintType(const PaintType &paintType);
-
     ColorAnimator *getColorAnimator();
-
     void setGradientPoints(GradientPoints * const gradientPoints);
-
     void duplicateColorAnimatorFrom(ColorAnimator *source);
-
     void setGradientVar(Gradient * const grad);
-
     QColor getColorAtRelFrame(const qreal &relFrame) const;
     const Gradient::Type &getGradientType() { return mGradientType; }
     void setGradientType(const Gradient::Type &type) {
@@ -56,15 +43,18 @@ public:
         mGradientType = type;
         prp_callFinishUpdater();
     }
-
 protected:
-    PaintSettings(GradientPoints * const grdPts, PathBox * const parent);
+    PaintSettingsAnimator(const QString &name,
+                          GradientPoints * const grdPts,
+                          PathBox * const parent);
 
-    PaintSettings(GradientPoints * const grdPts,
-                  PathBox * const parent,
-                  const QColor &colorT,
-                  const PaintType &paintTypeT,
-                  Gradient * const gradientT = nullptr);
+    PaintSettingsAnimator(
+            const QString &name,
+            GradientPoints * const grdPts,
+            PathBox * const parent,
+            const QColor &colorT,
+            const PaintType &paintTypeT,
+            Gradient * const gradientT = nullptr);
     virtual void showHideChildrenBeforeChaningPaintType(
             const PaintType &newPaintType);
 private:
@@ -76,10 +66,28 @@ private:
     qsptr<ColorAnimator> mColor = SPtrCreate(ColorAnimator)();
     qptr<Gradient> mGradient;
 };
+
+class FillSettingsAnimator : public PaintSettingsAnimator {
+    friend class SelfRef;
+public:
+    bool SWT_isFillSettingsAnimator() const { return true; }
+protected:
+    FillSettingsAnimator(GradientPoints * const grdPts,
+                         PathBox * const parent) :
+        PaintSettingsAnimator("fill", grdPts, parent) {}
+
+    FillSettingsAnimator(GradientPoints * const grdPts,
+                         PathBox * const parent,
+                         const QColor &color,
+                         const PaintType &paintType,
+                         Gradient * const gradient = nullptr) :
+        PaintSettingsAnimator("fill", grdPts, parent, color,
+                              paintType, gradient) {}
+};
+
 struct UpdatePaintSettings {
     UpdatePaintSettings(const QColor &paintColorT,
                         const PaintType &paintTypeT);
-
     UpdatePaintSettings();
 
     virtual ~UpdatePaintSettings();
@@ -101,7 +109,6 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
             const QColor &paintColorT,
             const PaintType &paintTypeT,
             const QPainter::CompositionMode &outlineCompositionModeT);
-
     UpdateStrokeSettings();
 
     void applyPainterSettingsSk(SkPaint *paint);
@@ -116,7 +123,7 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
     qCubicSegment1D fWidthCurve;
 };
 
-class StrokeSettings : public PaintSettings {
+class OutlineSettingsAnimator : public PaintSettingsAnimator {
     friend class SelfRef;
 public:
     bool SWT_isStrokeSettings() const { return true; }
@@ -126,7 +133,6 @@ protected:
     void showHideChildrenBeforeChaningPaintType(
                 const PaintType &newPaintType);
 public:
-
     void setCurrentStrokeWidth(const qreal &newWidth);
     void setCapStyle(const Qt::PenCapStyle &capStyle);
     void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
@@ -172,13 +178,14 @@ public:
     void setStrokerSettingsForRelFrameSk(const qreal &relFrame,
                                          SkStroke * const stroker);
 protected:
-    StrokeSettings(GradientPoints * const grdPts, PathBox * const parent);
+    OutlineSettingsAnimator(GradientPoints * const grdPts,
+                            PathBox * const parent);
 
-    StrokeSettings(GradientPoints* const grdPts,
-                   PathBox * const parent,
-                   const QColor &colorT,
-                   const PaintType &paintTypeT,
-                   Gradient* const gradientT = nullptr);
+    OutlineSettingsAnimator(GradientPoints* const grdPts,
+                            PathBox * const parent,
+                            const QColor &color,
+                            const PaintType &paintType,
+                            Gradient* const gradient = nullptr);
 private:
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;

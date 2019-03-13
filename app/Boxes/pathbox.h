@@ -107,12 +107,25 @@ protected:
 
 class PathBox : public BoundingBox {
     friend class SelfRef;
+protected:
+    void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     ~PathBox();
 
-    void resetStrokeGradientPointsPos();
-
-    void resetFillGradientPointsPos();
+    virtual bool differenceInEditPathBetweenFrames(
+            const int& frame1, const int& frame2) const = 0;
+    virtual SkPath getPathAtRelFrameF(const qreal &relFrame) = 0;
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
+    void drawSelectedSk(SkCanvas *canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
+    void addPathEffect(const qsptr<PathEffect> &effect);
+    void addFillPathEffect(const qsptr<PathEffect> &effect);
+    void addOutlinePathEffect(const qsptr<PathEffect> &effect);
+    void removePathEffect(const qsptr<PathEffect> &effect);
+    void removeFillPathEffect(const qsptr<PathEffect> &effect);
+    void removeOutlinePathEffect(const qsptr<PathEffect> &effect);
 
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
@@ -145,22 +158,15 @@ public:
 
     void startSelectedFillColorTransform();
 
-    StrokeSettings *getStrokeSettings() const;
-    PaintSettings *getFillSettings() const;
-    void updateDrawGradients();
-
-    void setOutlineAffectedByScale(const bool &bT);
+    OutlineSettingsAnimator *getStrokeSettings() const;
+    FillSettingsAnimator *getFillSettings() const;
 
     QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
     VectorPath *objectToVectorPathBox();
     VectorPath *strokeToVectorPathBox();
 
-    const SkPath &getRelativePath() const;
     bool relPointInsidePath(const QPointF &relPos) const;
-
-    void duplicatePaintSettingsFrom(PaintSettings *fillSettings,
-                                    StrokeSettings *strokeSettings);
 
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 
@@ -168,8 +174,6 @@ public:
 
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
-    void updateStrokeDrawGradient();
-    void updateFillDrawGradient();
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
@@ -186,33 +190,31 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(PathBoxRenderData)(this);
     }
-    void updateCurrentPreviewDataFromRenderData(BoundingBoxRenderData *renderData);
+    void updateCurrentPreviewDataFromRenderData(
+            BoundingBoxRenderData *renderData);
     void duplicateStrokeSettingsFrom(
-            StrokeSettings *strokeSettings);
+            OutlineSettingsAnimator * const strokeSettings);
     void duplicateFillSettingsFrom(
-            PaintSettings *fillSettings);
+            FillSettingsAnimator * const fillSettings);
     void duplicateStrokeSettingsNotAnimatedFrom(
-            StrokeSettings *strokeSettings);
+            OutlineSettingsAnimator * const strokeSettings);
     void duplicateFillSettingsNotAnimatedFrom(
-            PaintSettings *fillSettings);
+            FillSettingsAnimator * const fillSettings);
+    void duplicatePaintSettingsFrom(FillSettingsAnimator * const fillSettings,
+                                    OutlineSettingsAnimator * const strokeSettings);
+
+    void updateStrokeDrawGradient();
+    void updateFillDrawGradient();
+    const SkPath &getRelativePath() const;
+    void updateDrawGradients();
+    void setOutlineAffectedByScale(const bool &bT);
 
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
-    virtual SkPath getPathAtRelFrameF(const qreal &relFrame) = 0;
+
     SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame);
     SkPath getPathWithEffectsUntilGroupSumAtRelFrameF(const qreal &relFrame);
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
-    void drawSelectedSk(SkCanvas *canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
-    void addPathEffect(const qsptr<PathEffect> &effect);
-    void addFillPathEffect(const qsptr<PathEffect> &effect);
-    void addOutlinePathEffect(const qsptr<PathEffect> &effect);
-    void removePathEffect(const qsptr<PathEffect> &effect);
-    void removeFillPathEffect(const qsptr<PathEffect> &effect);
-    void removeOutlinePathEffect(const qsptr<PathEffect> &effect);
     PathEffectAnimators *getPathEffectsAnimators() {
         return mPathEffectsAnimators.data();
     }
@@ -224,8 +226,6 @@ public:
     }
     void copyPathBoxDataTo(PathBox *targetBox);
 
-    virtual bool differenceInEditPathBetweenFrames(
-            const int& frame1, const int& frame2) const = 0;
     bool differenceInPathBetweenFrames(
             const int& frame1, const int& frame2) const;
     bool differenceInOutlinePathBetweenFrames(
@@ -235,6 +235,9 @@ public:
     void setPathsOutdated() {
         mCurrentPathsOutdated = true;
     }
+
+    void resetStrokeGradientPointsPos();
+    void resetFillGradientPointsPos();
 
     void setOutlinePathOutdated() {
         mCurrentOutlinePathOutdated = true;
@@ -264,7 +267,6 @@ public:
     //    }
 protected:
     PathBox(const BoundingBoxType &type);
-    void getMotionBlurProperties(QList<Property*> &list) const;
 
 //    QDialog* mDialog_TEST = nullptr;
 //    QLabel* mLabel_TEST = nullptr;
@@ -286,8 +288,8 @@ protected:
     qsptr<GradientPoints> mFillGradientPoints;
     qsptr<GradientPoints> mStrokeGradientPoints;
 
-    qsptr<PaintSettings> mFillSettings;
-    qsptr<StrokeSettings> mStrokeSettings;
+    qsptr<FillSettingsAnimator> mFillSettings;
+    qsptr<OutlineSettingsAnimator> mStrokeSettings;
 };
 
 #endif // PATHBOX_H

@@ -274,7 +274,7 @@ NodePoint* Canvas::createNewPointOnLineNearSelected(
 }
 
 void Canvas::getDisplayedFillStrokeSettingsFromLastSelected(
-        PaintSettings*& fillSetings, StrokeSettings*& strokeSettings) {
+        PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings) {
     if(mSelectedBoxes.isEmpty()) {
         fillSetings = nullptr;
         strokeSettings = nullptr;

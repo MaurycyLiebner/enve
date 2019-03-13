@@ -477,11 +477,11 @@ QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
     return mTransformAnimator->mapAbsPosToRel(absPos);
 }
 
-PaintSettings *BoundingBox::getFillSettings() const {
+FillSettingsAnimator *BoundingBox::getFillSettings() const {
     return nullptr;
 }
 
-StrokeSettings *BoundingBox::getStrokeSettings() const {
+OutlineSettingsAnimator *BoundingBox::getStrokeSettings() const {
     return nullptr;
 }
 

@@ -1043,8 +1043,8 @@ void MainWindow::closeEvent(QCloseEvent *e) {
 }
 
 void MainWindow::updateDisplayedFillStrokeSettings() {
-    PaintSettings* fillSettings;
-    StrokeSettings* strokeSettings;
+    PaintSettingsAnimator* fillSettings;
+    OutlineSettingsAnimator* strokeSettings;
     mCanvasWindow->getDisplayedFillStrokeSettingsFromLastSelected(
                 fillSettings, strokeSettings);
     mFillStrokeSettings->setCurrentSettings(

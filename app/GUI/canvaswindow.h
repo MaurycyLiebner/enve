@@ -25,8 +25,8 @@ class ImageBox;
 class SingleSound;
 class VideoBox;
 class Canvas;
-class PaintSettings;
-class StrokeSettings;
+class PaintSettingsAnimator;
+class OutlineSettingsAnimator;
 class _SimpleBrushWrapper;
 #include <QAudioOutput>
 
@@ -161,7 +161,7 @@ public:
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int &dFrame);
     void getDisplayedFillStrokeSettingsFromLastSelected(
-            PaintSettings *&fillSetings, StrokeSettings *&strokeSettings);
+            PaintSettingsAnimator *&fillSetings, OutlineSettingsAnimator *&strokeSettings);
 private:
     void changeCurrentFrameAction(const int &frame);
 

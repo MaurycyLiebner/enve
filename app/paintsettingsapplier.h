@@ -11,7 +11,9 @@ class ColorAnimator;
 class Gradient;
 class PathBox;
 enum PaintType : short;
-class PaintSettings;
+class PaintSettingsAnimator;
+class FillSettingsAnimator;
+class OutlineSettingsAnimator;
 
 class PaintSetting {
 public:
@@ -23,11 +25,11 @@ public:
     }
 protected:
     PaintSetting(const Target& target) : mTarget(target) {}
-    virtual void applyToPS(PaintSettings * const target) const = 0;
+    virtual void applyToPS(PaintSettingsAnimator * const target) const = 0;
 private:
-    PaintSettings * targetPaintSettings(PathBox * const target) const {
-        return mTarget == FILL ? target->getFillSettings() :
-                                 target->getStrokeSettings();
+    PaintSettingsAnimator * targetPaintSettings(PathBox * const target) const {
+        if(mTarget == FILL) return target->getFillSettings();
+        return target->getStrokeSettings();
     }
     const Target mTarget;
 };
@@ -38,7 +40,7 @@ public:
                       const ColorSetting& colorSettings) :
         PaintSetting(target), mColorSetting(colorSettings) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
+    void applyToPS(PaintSettingsAnimator * const target) const {
         mColorSetting.apply(target->getColorAnimator());
     }
 private:
@@ -51,7 +53,7 @@ public:
                          Gradient * const gradient) :
         PaintSetting(target), mGradient(gradient) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
+    void applyToPS(PaintSettingsAnimator * const target) const {
         target->setGradient(mGradient);
     }
 private:
@@ -64,7 +66,7 @@ public:
                              const Gradient::Type& type) :
         PaintSetting(target), mGradientType(type) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
+    void applyToPS(PaintSettingsAnimator * const target) const {
         target->setGradientType(mGradientType);
     }
 private:
@@ -77,7 +79,7 @@ public:
                           const PaintType& type) :
         PaintSetting(target), mPaintType(type) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
+    void applyToPS(PaintSettingsAnimator * const target) const {
         target->setPaintType(mPaintType);
     }
 private:
@@ -89,8 +91,8 @@ public:
     OutlineWidthPaintSetting(const qreal& width) :
         PaintSetting(OUTLINE), mWidth(width) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
-        static_cast<StrokeSettings*>(target)->setCurrentStrokeWidth(mWidth);
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setCurrentStrokeWidth(mWidth);
     }
 private:
     const qreal mWidth;
@@ -101,8 +103,8 @@ public:
     StrokeBrushPaintSetting(SimpleBrushWrapper * const brush) :
         PaintSetting(OUTLINE), mBrush(brush) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
-        static_cast<StrokeSettings*>(target)->setStrokeBrush(mBrush);
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrush(mBrush);
     }
 private:
     SimpleBrushWrapper * const mBrush;
@@ -113,8 +115,8 @@ public:
     StrokeWidthCurvePaintSetting(const qCubicSegment1D& widthCurve) :
         PaintSetting(OUTLINE), mWidthCurve(widthCurve) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
-        static_cast<StrokeSettings*>(target)->setStrokeBrushWidthCurve(mWidthCurve);
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrushWidthCurve(mWidthCurve);
     }
 private:
     const qCubicSegment1D mWidthCurve;
@@ -125,8 +127,8 @@ public:
     StrokePressureCurvePaintSetting(const qCubicSegment1D& pressureCurve) :
         PaintSetting(OUTLINE), mPressureCurve(pressureCurve) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
-        static_cast<StrokeSettings*>(target)->setStrokeBrushPressureCurve(mPressureCurve);
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrushPressureCurve(mPressureCurve);
     }
 private:
     const qCubicSegment1D mPressureCurve;
@@ -137,8 +139,8 @@ public:
     StrokeTimeCurvePaintSetting(const qCubicSegment1D& timeCurve) :
         PaintSetting(OUTLINE), mTimeCurve(timeCurve) {}
 protected:
-    void applyToPS(PaintSettings * const target) const {
-        static_cast<StrokeSettings*>(target)->setStrokeBrushTimeCurve(mTimeCurve);
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrushTimeCurve(mTimeCurve);
     }
 private:
     const qCubicSegment1D mTimeCurve;

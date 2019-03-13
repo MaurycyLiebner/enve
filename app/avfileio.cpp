@@ -549,8 +549,8 @@ void Gradient::readProperty(QIODevice *target) {
     updateQGradientStops(UpdateReason::USER_CHANGE);
 }
 
-void StrokeSettings::writeProperty(QIODevice * const target) const {
-    PaintSettings::writeProperty(target);
+void OutlineSettingsAnimator::writeProperty(QIODevice * const target) const {
+    PaintSettingsAnimator::writeProperty(target);
     mLineWidth->writeProperty(target);
     target->write(rcConstChar(&mCapStyle), sizeof(Qt::PenCapStyle));
     target->write(rcConstChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
@@ -558,8 +558,8 @@ void StrokeSettings::writeProperty(QIODevice * const target) const {
                sizeof(QPainter::CompositionMode));
 }
 
-void StrokeSettings::readProperty(QIODevice *target) {
-    PaintSettings::readProperty(target);
+void OutlineSettingsAnimator::readProperty(QIODevice *target) {
+    PaintSettingsAnimator::readProperty(target);
     mLineWidth->readProperty(target);
     target->read(rcChar(&mCapStyle), sizeof(Qt::PenCapStyle));
     target->read(rcChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
@@ -567,7 +567,7 @@ void StrokeSettings::readProperty(QIODevice *target) {
                 sizeof(QPainter::CompositionMode));
 }
 
-void PaintSettings::writeProperty(QIODevice * const target) const {
+void PaintSettingsAnimator::writeProperty(QIODevice * const target) const {
     mGradientPoints->writeProperty(target);
     mColor->writeProperty(target);
     target->write(rcConstChar(&mPaintType), sizeof(PaintType));
@@ -581,7 +581,7 @@ void PaintSettings::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&gradId), sizeof(int));
 }
 
-void PaintSettings::readProperty(QIODevice *target) {
+void PaintSettingsAnimator::readProperty(QIODevice *target) {
     mGradientPoints->readProperty(target);
     mColor->readProperty(target);
     target->read(rcChar(&mPaintType), sizeof(PaintType));

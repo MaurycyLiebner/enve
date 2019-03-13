@@ -33,16 +33,16 @@ class FillStrokeSettingsWidget : public QWidget {
 public:
     explicit FillStrokeSettingsWidget(MainWindow *parent = nullptr);
 
-    void setCurrentSettings(PaintSettings *fillPaintSettings,
-                            StrokeSettings *strokePaintSettings);
+    void setCurrentSettings(PaintSettingsAnimator *fillPaintSettings,
+                            OutlineSettingsAnimator *strokePaintSettings);
     void updateAfterTargetChanged();
     void setCurrentPaintType(const PaintType &paintType);
 
     GradientWidget *getGradientWidget();
 
     void clearAll();
-    void setFillValuesFromFillSettings(PaintSettings *settings);
-    void setStrokeValuesFromStrokeSettings(StrokeSettings *settings);
+    void setFillValuesFromFillSettings(PaintSettingsAnimator *settings);
+    void setStrokeValuesFromStrokeSettings(OutlineSettingsAnimator *settings);
 
     void setCanvasWindowPtr(CanvasWindow *canvasWidget);
     void updateColorAnimator();

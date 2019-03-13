@@ -851,7 +851,7 @@ void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
 }
 
 void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
-        PaintSettings*& fillSetings, StrokeSettings*& strokeSettings) {
+        PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->getDisplayedFillStrokeSettingsFromLastSelected(
                 fillSetings, strokeSettings);

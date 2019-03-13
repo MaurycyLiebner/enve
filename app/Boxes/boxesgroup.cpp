@@ -668,12 +668,12 @@ void BoxesGroup::ungroup_k() {
     removeFromParent_k();
 }
 
-PaintSettings *BoxesGroup::getFillSettings() const {
+FillSettingsAnimator *BoxesGroup::getFillSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getFillSettings();
 }
 
-StrokeSettings *BoxesGroup::getStrokeSettings() const {
+OutlineSettingsAnimator *BoxesGroup::getStrokeSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getStrokeSettings();
 }

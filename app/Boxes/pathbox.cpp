@@ -50,9 +50,9 @@ PathBox::PathBox(const BoundingBoxType &type) :
     mFillGradientPoints->prp_setOwnUpdater(
                 SPtrCreate(GradientPointsUpdater)(true, this));
 
-    mFillSettings = SPtrCreate(PaintSettings)(
+    mFillSettings = SPtrCreate(FillSettingsAnimator)(
                 mFillGradientPoints.data(), this);
-    mStrokeSettings = SPtrCreate(StrokeSettings)(
+    mStrokeSettings = SPtrCreate(OutlineSettingsAnimator)(
                 mStrokeGradientPoints.data(), this);
     ca_addChildAnimator(mFillSettings);
     ca_addChildAnimator(mStrokeSettings);
@@ -415,13 +415,15 @@ GradientPoints *PathBox::getFillGradientPoints() {
     return mFillGradientPoints.data();
 }
 
-void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
-                                         StrokeSettings *strokeSettings) {
+void PathBox::duplicatePaintSettingsFrom(
+        FillSettingsAnimator * const fillSettings,
+        OutlineSettingsAnimator * const strokeSettings) {
     duplicateFillSettingsFrom(fillSettings);
     duplicateStrokeSettingsFrom(strokeSettings);
 }
 
-void PathBox::duplicateFillSettingsFrom(PaintSettings *fillSettings) {
+void PathBox::duplicateFillSettingsFrom(
+        FillSettingsAnimator * const fillSettings) {
     if(!fillSettings) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
@@ -435,7 +437,8 @@ void PathBox::duplicateFillSettingsFrom(PaintSettings *fillSettings) {
     }
 }
 
-void PathBox::duplicateStrokeSettingsFrom(StrokeSettings *strokeSettings) {
+void PathBox::duplicateStrokeSettingsFrom(
+        OutlineSettingsAnimator * const strokeSettings) {
     if(!strokeSettings) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
@@ -449,7 +452,8 @@ void PathBox::duplicateStrokeSettingsFrom(StrokeSettings *strokeSettings) {
     }
 }
 
-void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) {
+void PathBox::duplicateFillSettingsNotAnimatedFrom(
+        FillSettingsAnimator * const fillSettings) {
     if(!fillSettings) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
@@ -468,7 +472,7 @@ void PathBox::duplicateFillSettingsNotAnimatedFrom(PaintSettings *fillSettings) 
 }
 
 void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
-        StrokeSettings *strokeSettings) {
+        OutlineSettingsAnimator * const strokeSettings) {
     if(!strokeSettings) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
@@ -633,10 +637,10 @@ void PathBox::setOutlineAffectedByScale(const bool &bT) {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-PaintSettings *PathBox::getFillSettings() const {
+FillSettingsAnimator *PathBox::getFillSettings() const {
     return mFillSettings.data();
 }
 
-StrokeSettings *PathBox::getStrokeSettings() const {
+OutlineSettingsAnimator *PathBox::getStrokeSettings() const {
     return mStrokeSettings.data();
 }

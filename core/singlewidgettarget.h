@@ -168,7 +168,7 @@ public:
     virtual bool SWT_isPathEffect() const { return false; }
     virtual bool SWT_isIntAnimator() const { return false; }
     virtual bool SWT_isGradient() const { return false; }
-    virtual bool SWT_isPaintSettings() const { return false; }
+    virtual bool SWT_isFillSettingsAnimator() const { return false; }
     virtual bool SWT_isStrokeSettings() const { return false; }
     virtual bool SWT_isPathAnimator() const { return false; }
     virtual bool SWT_isQPointFAnimator() const { return false; }

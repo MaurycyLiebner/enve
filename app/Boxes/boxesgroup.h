@@ -117,8 +117,8 @@ public:
             box->setStrokeBrushPressureCurve(curve);
         }
     }
-    PaintSettings *getFillSettings() const;
-    StrokeSettings *getStrokeSettings() const;
+    FillSettingsAnimator *getFillSettings() const;
+    OutlineSettingsAnimator *getStrokeSettings() const;
     void updateAllBoxes(const UpdateReason &reason);
 
     QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);

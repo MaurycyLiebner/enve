@@ -415,8 +415,8 @@ void FillStrokeSettingsWidget::setStrokeWidth(const qreal &width) {
 }
 
 void FillStrokeSettingsWidget::setCurrentSettings(
-        PaintSettings *fillPaintSettings,
-        StrokeSettings *strokePaintSettings) {
+        PaintSettingsAnimator *fillPaintSettings,
+        OutlineSettingsAnimator *strokePaintSettings) {
     disconnect(mLineWidthSpin, &QrealAnimatorValueSlider::valueChanged,
                this, &FillStrokeSettingsWidget::setStrokeWidth);
 
@@ -602,7 +602,7 @@ void FillStrokeSettingsWidget::setCurrentGradientTypeVal(
 }
 
 void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
-        PaintSettings *settings) {
+        PaintSettingsAnimator *settings) {
     if(settings) {
         mCurrentFillGradientType = settings->getGradientType();
         mCurrentFillColor = settings->getCurrentColor();
@@ -615,7 +615,7 @@ void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
 }
 
 void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
-        StrokeSettings *settings) {
+        OutlineSettingsAnimator *settings) {
     if(settings) {
         mCurrentStrokeGradientType = settings->getGradientType();
         mCurrentStrokeColor = settings->getCurrentColor();
@@ -718,13 +718,13 @@ PaintSettingsApplier FillStrokeSettingsWidget::getCurrentSettingsApplier() const
 
     if(mCurrentStrokePaintType == BRUSHPAINT) {
         applier << std::make_shared<StrokeBrushPaintSetting>(
-                       PaintSetting::OUTLINE, mCurrentStrokeBrush);
+                       mCurrentStrokeBrush);
         applier << std::make_shared<StrokeWidthCurvePaintSetting>(
-                       PaintSetting::OUTLINE, mCurrentStrokeBrushWidthCurve);
+                       mCurrentStrokeBrushWidthCurve);
         applier << std::make_shared<StrokePressureCurvePaintSetting>(
-                       PaintSetting::OUTLINE, mCurrentStrokeBrushPressureCurve);
+                       mCurrentStrokeBrushPressureCurve);
         applier << std::make_shared<StrokeTimeCurvePaintSetting>(
-                       PaintSetting::OUTLINE, mCurrentStrokeBrushTimeCurve);
+                       mCurrentStrokeBrushTimeCurve);
     }
 
     applier << std::make_shared<PaintTypePaintSetting>(

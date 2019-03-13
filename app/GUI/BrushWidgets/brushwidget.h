@@ -114,13 +114,16 @@ class BrushWrapper : public _SimpleBrushWrapper,
         public ItemWrapper<stdsptr<SimpleBrushWrapper>> {
     friend class StdSelfRef;
 public:
-    static stdsptr<BrushWrapper> createBrushWrapper(const BrushData &brushD, const QString &collectionName);
+    static stdsptr<BrushWrapper> createBrushWrapper(
+            const BrushData &brushD, const QString &collectionName);
 protected:
     BrushWrapper(const QString& name,
                  const QString& collectionName,
                  const stdsptr<SimpleBrushWrapper>& brush,
                  const QImage& icon,
                  const QByteArray &wholeFile);
+private:
+    stdsptr<SimpleBrushWrapper> mTargetBrush;
 };
 
 typedef ItemWidget<BrushWrapper> BrushWidget;

@@ -15,8 +15,8 @@ class MovablePoint;
 class NodePoint;
 class PathEffect;
 class DurationRectangleMovable;
-class PaintSettings;
-class StrokeSettings;
+class FillSettingsAnimator;
+class OutlineSettingsAnimator;
 class PaintSettingsApplier;
 class EffectAnimators;
 class GPUEffectAnimators;
@@ -136,8 +136,8 @@ public:
 
     virtual BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
-    virtual PaintSettings *getFillSettings() const;
-    virtual StrokeSettings *getStrokeSettings() const;
+    virtual FillSettingsAnimator *getFillSettings() const;
+    virtual OutlineSettingsAnimator *getStrokeSettings() const;
 
     void setPivotAbsPos(const QPointF &absPos);
     void setPivotRelPos(const QPointF &relPos);
