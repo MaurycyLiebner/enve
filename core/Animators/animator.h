@@ -77,12 +77,12 @@ protected:
     virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
         Q_UNUSED(key);
     }
-    virtual void anim_drawKey(QPainter *p, Key* key,
-                              const qreal &pixelsPerFrame,
-                              const qreal &drawY,
-                              const int &startFrame,
-                              const int& rowHeight,
-                              const int& keyRectSize);
+    void anim_drawKey(QPainter * const p, Key * const key,
+                      const qreal &pixelsPerFrame,
+                      const qreal &drawY,
+                      const int &startFrame,
+                      const int& rowHeight,
+                      const int& keyRectSize);
 public slots:
     virtual void anim_updateAfterShifted();
     virtual void anim_setRecording(const bool &rec);

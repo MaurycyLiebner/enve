@@ -44,13 +44,6 @@ public:
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void anim_saveCurrentValueAsKey();
     bool anim_isDescendantRecording() const;
-    void anim_drawKey(QPainter *p,
-                      Key* key,
-                      const qreal &pixelsPerFrame,
-                      const qreal &drawY,
-                      const int &startFrame,
-                      const int &rowHeight,
-                      const int &keyRectSize);
     virtual void ca_removeAllChildAnimators();
 public slots:
     void anim_setRecording(const bool &rec);

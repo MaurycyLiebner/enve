@@ -566,30 +566,22 @@ FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
     }
 }
 
-void Animator::anim_drawKey(QPainter *p,
-                            Key *key,
+void Animator::anim_drawKey(QPainter * const p,
+                            Key * const key,
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame,
                             const int &rowHeight,
                             const int &keyRectSize) {
-    if(key->isSelected()) {
-        p->setBrush(Qt::yellow);
-    } else {
-        p->setBrush(Qt::red);
-    }
-    if(key->isHovered()) {
-        p->setPen(QPen(Qt::black, 1.5));
-    } else {
-        p->setPen(QPen(Qt::black, .75));
-    }
-    p->drawEllipse(
-        QRectF(
-            QPointF((key->getRelFrame() - startFrame + 0.5)*
-                    pixelsPerFrame - keyRectSize*0.5,
-                    drawY + (rowHeight -
-                              keyRectSize)*0.5 ),
-            QSize(keyRectSize, keyRectSize) ) );
+    if(key->isSelected()) p->setBrush(Qt::yellow);
+    else p->setBrush(Qt::red);
+    if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
+    else p->setPen(QPen(Qt::black, 0.5));
+    const qreal keyRadius = keyRectSize * (SWT_isComplexAnimator() ? 0.35 : 0.5);
+    const int frameRelToStart = key->getRelFrame() - startFrame;
+    const QPointF keyCenter((frameRelToStart + 0.5)*pixelsPerFrame,
+                            drawY + 0.5*rowHeight);
+    p->drawEllipse(keyCenter, keyRadius, keyRadius);
 }
 
 void Animator::anim_drawKeys(QPainter *p,

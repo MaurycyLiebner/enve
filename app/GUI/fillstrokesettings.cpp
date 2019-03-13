@@ -693,6 +693,46 @@ void FillStrokeSettingsWidget::startTransform(const char *slot) {
     }*/
 }
 
+PaintSettingsApplier FillStrokeSettingsWidget::getCurrentSettingsApplier() const {
+    PaintSettingsApplier applier;
+    if(mCurrentFillPaintType == FLATPAINT ||
+       mCurrentFillPaintType == BRUSHPAINT) {
+        ColorSetting fillColorSetting;
+        applier << std::make_shared<ColorPaintSetting>(
+                       PaintSetting::FILL, fillColorSetting);
+    } else if(mCurrentStrokePaintType == GRADIENTPAINT) {
+
+    }
+
+    applier << std::make_shared<PaintTypePaintSetting>(
+                   PaintSetting::FILL, mCurrentFillPaintType);
+
+    if(mCurrentStrokePaintType == FLATPAINT ||
+       mCurrentStrokePaintType == BRUSHPAINT) {
+        ColorSetting outlineColorSetting;
+        applier << std::make_shared<ColorPaintSetting>(
+                       PaintSetting::OUTLINE, outlineColorSetting);
+    } else if(mCurrentStrokePaintType == GRADIENTPAINT) {
+
+    }
+
+    if(mCurrentStrokePaintType == BRUSHPAINT) {
+        applier << std::make_shared<StrokeBrushPaintSetting>(
+                       PaintSetting::OUTLINE, mCurrentStrokeBrush);
+        applier << std::make_shared<StrokeWidthCurvePaintSetting>(
+                       PaintSetting::OUTLINE, mCurrentStrokeBrushWidthCurve);
+        applier << std::make_shared<StrokePressureCurvePaintSetting>(
+                       PaintSetting::OUTLINE, mCurrentStrokeBrushPressureCurve);
+        applier << std::make_shared<StrokeTimeCurvePaintSetting>(
+                       PaintSetting::OUTLINE, mCurrentStrokeBrushTimeCurve);
+    }
+
+    applier << std::make_shared<PaintTypePaintSetting>(
+                   PaintSetting::OUTLINE, mCurrentStrokePaintType);
+
+    return applier;
+}
+
 void FillStrokeSettingsWidget::applyGradient() {
     Gradient *currentGradient;
     Gradient::Type currentGradientType;

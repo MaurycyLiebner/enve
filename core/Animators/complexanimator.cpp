@@ -207,23 +207,6 @@ void ComplexAnimator::prp_setTransformed(const bool &bT) {
         property->prp_setTransformed(bT);
 }
 
-void ComplexAnimator::anim_drawKey(QPainter *p, Key *key,
-                                   const qreal &pixelsPerFrame,
-                                   const qreal &drawY,
-                                   const int &startFrame,
-                                   const int &rowHeight,
-                                   const int &keyRectSize) {
-    if(key->isSelected()) p->setBrush(Qt::yellow);
-    else p->setBrush(Qt::red);
-    if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
-    else p->setPen(QPen(Qt::black, 0.5));
-    const qreal keySize = keyRectSize*0.7;
-    const int frameRelToStart = key->getRelFrame() - startFrame;
-    const QPointF keyCenter((frameRelToStart + 0.5)*pixelsPerFrame,
-                            drawY + 0.5*rowHeight);
-    p->drawEllipse(keyCenter, keySize, keySize);
-}
-
 void ComplexAnimator::prp_setParentFrameShift(const int &shift,
                                               ComplexAnimator* parentAnimator) {
     Property::prp_setParentFrameShift(shift, parentAnimator);

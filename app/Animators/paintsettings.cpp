@@ -96,6 +96,7 @@ void PaintSettings::setPaintType(const PaintType &paintType) {
     mPaintType = paintType;
     mTarget_k->updateDrawGradients();
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
+    prp_callFinishUpdater();
 }
 
 ColorAnimator *PaintSettings::getColorAnimator() {
@@ -136,10 +137,12 @@ void StrokeSettings::setCurrentStrokeWidth(const qreal &newWidth) {
 
 void StrokeSettings::setCapStyle(const Qt::PenCapStyle &capStyle) {
     mCapStyle = capStyle;
+    prp_callFinishUpdater();
 }
 
 void StrokeSettings::setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mJoinStyle = joinStyle;
+    prp_callFinishUpdater();
 }
 
 void StrokeSettings::setStrokerSettings(QPainterPathStroker * const stroker) {

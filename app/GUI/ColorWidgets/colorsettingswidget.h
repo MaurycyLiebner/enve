@@ -25,6 +25,7 @@ public:
     QColor getCurrentQColor();
     void setCurrentColor(const QColor &color);
     void hideAlphaControlers();
+    ColorSetting getCurrentColorSetting(const ColorSettingType &type) const;
 signals:
     void colorSettingSignal(const ColorSetting&);
     void colorModeChanged(const ColorMode&);

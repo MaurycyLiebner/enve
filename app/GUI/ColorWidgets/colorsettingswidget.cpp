@@ -160,40 +160,41 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
     }
 }
 
-void ColorSettingsWidget::emitColorChangedSignal() {
-    int tabId = mTabWidget->currentIndex();
-    qreal alphaVal = 1.;
-    if(!mAlphaHidden) {
-        alphaVal = aSpin->value();
-    }
+ColorSetting ColorSettingsWidget::getCurrentColorSetting(
+        const ColorSettingType& type) const {
+    const int tabId = mTabWidget->currentIndex();
+    qreal alphaVal = 1;
+    if(!mAlphaHidden) alphaVal = aSpin->value();
     if(tabId == 0) {
-        ColorSetting setting = ColorSetting(
+        return ColorSetting(
                     RGBMODE, mLastTriggeredCVR,
                     rSpin->value(),
                     gSpin->value(),
                     bSpin->value(),
                     alphaVal,
-                    CST_CHANGE, mTargetAnimator);
-        emit colorSettingSignal(setting);
+                    type, mTargetAnimator);
     } else if(tabId == 1) {
-        ColorSetting setting = ColorSetting(
+        return ColorSetting(
                     HSVMODE, mLastTriggeredCVR,
                     hSpin->value(),
                     hsvSSpin->value(),
                     vSpin->value(),
                     alphaVal,
-                    CST_CHANGE, mTargetAnimator);
-        emit colorSettingSignal(setting);
+                    type, mTargetAnimator);
     } else if(tabId == 2) {
-        ColorSetting setting = ColorSetting(
+        return ColorSetting(
                     HSLMODE, mLastTriggeredCVR,
                     hSpin->value(),
                     hslSSpin->value(),
                     lSpin->value(),
                     alphaVal,
-                    CST_CHANGE, mTargetAnimator);
-        emit colorSettingSignal(setting);
+                    type, mTargetAnimator);
     }
+    return ColorSetting();
+}
+
+void ColorSettingsWidget::emitColorChangedSignal() {
+    emit colorSettingSignal(getCurrentColorSetting(CST_CHANGE));
 }
 
 void ColorSettingsWidget::emitEditingFinishedSignal() {
@@ -203,34 +204,7 @@ void ColorSettingsWidget::emitEditingFinishedSignal() {
             mTargetAnimator->prp_finishTransform();
         }
     }
-    if(tabId == 0) {
-        ColorSetting setting = ColorSetting(
-                    RGBMODE, mLastTriggeredCVR,
-                    rSpin->value(),
-                    gSpin->value(),
-                    bSpin->value(),
-                    aSpin->value(),
-                    CST_FINISH, mTargetAnimator);
-        emit colorSettingSignal(setting);
-    } else if(tabId == 1) {
-        ColorSetting setting = ColorSetting(
-                    HSVMODE, mLastTriggeredCVR,
-                    hSpin->value(),
-                    hsvSSpin->value(),
-                    vSpin->value(),
-                    aSpin->value(),
-                    CST_FINISH, mTargetAnimator);
-        emit colorSettingSignal(setting);
-    } else if(tabId == 2) {
-        ColorSetting setting = ColorSetting(
-                    HSLMODE, mLastTriggeredCVR,
-                    hSpin->value(),
-                    hslSSpin->value(),
-                    lSpin->value(),
-                    aSpin->value(),
-                    CST_FINISH, mTargetAnimator);
-        emit colorSettingSignal(setting);
-    }
+    emit colorSettingSignal(getCurrentColorSetting(CST_FINISH));
 }
 
 void ColorSettingsWidget::emitEditingStartedSignal() {
@@ -242,34 +216,7 @@ void ColorSettingsWidget::emitEditingStartedSignal() {
             mTargetAnimator->startVal3Transform();
         }
     }
-    if(tabId == 0) {
-        ColorSetting setting = ColorSetting(
-                    RGBMODE, mLastTriggeredCVR,
-                    rSpin->value(),
-                    gSpin->value(),
-                    bSpin->value(),
-                    aSpin->value(),
-                    CST_START, mTargetAnimator);
-        emit colorSettingSignal(setting);
-    } else if(tabId == 1) {
-        ColorSetting setting = ColorSetting(
-                    HSVMODE, mLastTriggeredCVR,
-                    hSpin->value(),
-                    hsvSSpin->value(),
-                    vSpin->value(),
-                    aSpin->value(),
-                    CST_START, mTargetAnimator);
-        emit colorSettingSignal(setting);
-    } else if(tabId == 2) {
-        ColorSetting setting = ColorSetting(
-                    HSLMODE, mLastTriggeredCVR,
-                    hSpin->value(),
-                    hslSSpin->value(),
-                    lSpin->value(),
-                    aSpin->value(),
-                    CST_START, mTargetAnimator);
-        emit colorSettingSignal(setting);
-    }
+    emit colorSettingSignal(getCurrentColorSetting(CST_START));
 }
 
 void ColorSettingsWidget::emitEditingStartedRed() {

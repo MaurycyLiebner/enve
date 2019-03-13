@@ -102,18 +102,18 @@ void TextBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent)
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     QPainterPath qPath = QPainterPath();
 
-    qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
-    QString textAtFrame = mText->getValueAtRelFrame(relFrame);
-    QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
+    const qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
+    const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
+    const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
-    qreal yT = 0.;
-    qreal maxWidth = 0.;
-    for(QString line : lines) {
-        qreal lineWidth = fm.width(line);
+    qreal yT = 0;
+    qreal maxWidth = 0;
+    for(const auto& line : lines) {
+        const qreal lineWidth = fm.width(line);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
-    for(QString line : lines) {
-        qreal lineWidth = fm.width(line);
+    for(const auto& line : lines) {
+        const qreal lineWidth = fm.width(line);
         qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
                       yT, mFont, line);
         yT += fm.height()*linesDistAtFrame; // changed distance between lines
