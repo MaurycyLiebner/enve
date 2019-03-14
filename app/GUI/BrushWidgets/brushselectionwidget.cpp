@@ -5,6 +5,7 @@
 #include "brushwidget.h"
 #include <QDebug>
 #include <QDockWidget>
+#include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 
 QList<BrushCollectionData> BrushSelectionWidget::sData;
 bool BrushSelectionWidget::sLoaded = false;
@@ -21,8 +22,9 @@ BrushSelectionWidget::BrushSelectionWidget(const int &contextId,
 void BrushSelectionWidget::updateBrushes() {
     const auto& context = sGetContext(mContextId);
     for(const auto& coll : context.fCollections) {
+        const auto tabScroll = new ScrollArea(this);
         const auto tabWidget = new QWidget(this);
-        const auto tabWidgetLay = new FlowLayout(tabWidget);
+        const auto tabWidgetLay = new FlowLayout(tabWidget, 0, 0, 0);
         for(const auto& brush : coll.fBrushes) {
             const auto bWidget = new BrushWidget(brush.get(), tabWidget);
             connect(bWidget, &BrushWidget::selected,
@@ -30,7 +32,8 @@ void BrushSelectionWidget::updateBrushes() {
             tabWidgetLay->addWidget(bWidget);
         }
         tabWidget->setLayout(tabWidgetLay);
-        addTab(tabWidget, coll.fName);
+        tabScroll->setWidget(tabWidget);
+        addTab(tabScroll, coll.fName);
     }
 }
 
@@ -39,11 +42,11 @@ void loadBrushFromFile(const QString &path,
     QFile dataFile(path);
     if(!dataFile.exists()) return;
     if(!dataFile.open(QIODevice::ReadOnly)) return;
-    QByteArray wholeFile = dataFile.readAll();
+    const QByteArray wholeFile = dataFile.readAll();
     const char *data = wholeFile.constData();
     dataFile.close();
 
-    MyPaintBrush* brush = mypaint_brush_new();
+    MyPaintBrush* const brush = mypaint_brush_new();
     if(!mypaint_brush_from_string(brush, data)) {
         mypaint_brush_unref(brush);
         return;
@@ -57,7 +60,7 @@ void loadBrushFromFile(const QString &path,
                            Qt::SmoothTransformation);
     }
 
-    QFileInfo fileInfo(dataFile);
+    const QFileInfo fileInfo(dataFile);
     auto brushWrapper = SPtrCreate(SimpleBrushWrapper)(brush, wholeFile);
     coll.fBrushes.append({ fileInfo.baseName(), brushWrapper,
                            icon, wholeFile });
@@ -67,17 +70,16 @@ void loadCollectionFromDir(
         const QString &mainDirPath,
         QList<BrushCollectionData> &data) {
     BrushCollectionData collection;
-    QDir brushesDir(mainDirPath);
+    const QDir brushesDir(mainDirPath);
     collection.fName = brushesDir.dirName();
-    QDir::Filters filter = QDir::NoDotAndDotDot | QDir::AllEntries;
-    QFileInfoList entryList = brushesDir.entryInfoList(filter);
+    const QDir::Filters filter = QDir::NoDotAndDotDot | QDir::AllEntries;
+    const QFileInfoList entryList = brushesDir.entryInfoList(filter);
     for(const QFileInfo& fileInfo : entryList) {
         if(fileInfo.isDir()) {
             QString collDirPath = fileInfo.absoluteFilePath();
             loadCollectionFromDir(collDirPath, data);
         } else if(fileInfo.completeSuffix() == "myb") {
-            loadBrushFromFile(fileInfo.absoluteFilePath(),
-                              collection);
+            loadBrushFromFile(fileInfo.absoluteFilePath(), collection);
         }
     }
     data << collection;
@@ -85,14 +87,14 @@ void loadCollectionFromDir(
 
 void BrushSelectionWidget::sLoadCollectionsFromDir(
         const QString &mainDirPath) {
-    QDir brushesDir(mainDirPath);
+    const QDir brushesDir(mainDirPath);
     if(!brushesDir.exists()) brushesDir.mkpath(mainDirPath);
-    QDir::Filters filter = QDir::NoDotAndDotDot | QDir::AllEntries;
-    QFileInfoList entryList = brushesDir.entryInfoList(filter);
+    const QDir::Filters filter = QDir::NoDotAndDotDot | QDir::AllEntries;
+    const QFileInfoList entryList = brushesDir.entryInfoList(filter);
     for(const QFileInfo& fileInfo : entryList) {
         if(fileInfo.isDir()) {
-            QString collName = fileInfo.fileName();
-            QString collDirPath = fileInfo.absoluteFilePath();
+            const QString collName = fileInfo.fileName();
+            const QString collDirPath = fileInfo.absoluteFilePath();
             loadCollectionFromDir(collDirPath, sData);
         }
     }

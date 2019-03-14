@@ -13,7 +13,7 @@ public:
     explicit FlowLayout(const int& margin = -1,
                         const int& hSpacing = -1,
                         const int& vSpacing = -1);
-    ~FlowLayout();
+//    ~FlowLayout();
 
     void addItem(QLayoutItem *item) override;
     int horizontalSpacing() const;
