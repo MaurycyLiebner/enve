@@ -16,7 +16,6 @@
 #include "Animators/paintsettings.h"
 #include "Animators/brushsettings.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
-#include "GUI/BrushWidgets/brushselectionicon.h"
 #include "paintsettingsapplier.h"
 class GradientWidget;
 class MainWindow;
@@ -62,7 +61,7 @@ private slots:
     void setLinearGradientFill();
     void setRadialGradientFill();
 
-    void setStrokeBrush(_SimpleBrushWrapper * const brush);
+    void setStrokeBrush(SimpleBrushWrapper * const brush);
     void setBrushTimeCurve(const qCubicSegment1D& seg);
     void setBrushWidthCurve(const qCubicSegment1D& seg);
     void setBrushPressureCurve(const qCubicSegment1D& seg);
@@ -152,7 +151,7 @@ private:
     Qt::PenCapStyle mCurrentCapStyle;
     Qt::PenJoinStyle mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;
-    _SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
+    SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
     qCubicSegment1D mCurrentStrokeBrushWidthCurve;
     qCubicSegment1D mCurrentStrokeBrushTimeCurve;
     qCubicSegment1D mCurrentStrokeBrushPressureCurve;

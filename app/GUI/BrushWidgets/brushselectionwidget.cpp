@@ -2,44 +2,36 @@
 #include <QDir>
 #include <QMenu>
 #include "flowlayout.h"
-#include "brushcollection.h"
+#include "brushwidget.h"
 #include <QDebug>
 #include <QDockWidget>
 
 QList<BrushCollectionData> BrushSelectionWidget::sData;
 bool BrushSelectionWidget::sLoaded = false;
+QList<BrushesContext> BrushSelectionWidget::sBrushContexts;
 
-BrushSelectionWidget::BrushSelectionWidget(QWidget* parent) :
-        ItemSelectionWidget<BrushWrapper>(parent) {
-    //setDefaultItem(nullptr);
-    auto rightPressFunc = [this](ItemSelectionWidgetQObject* selectionWidget,
-                                 CollectionAreaQObject*,
-                                 StdSelfRef* item,
-                                 QPoint globalPos) {
-        if(!item) return;
-        QMenu menu(selectionWidget);
-        menu.addAction("Bookmark");
-        QAction* selectedAction = menu.exec(globalPos);
-        if(!selectedAction) return;
-        if(selectedAction->text() == "Bookmark") {
-            emit this->brushBookmarked(GetAsPtr(item, BrushWrapper));
-        }
-    };
-    setRightPressedFunction(rightPressFunc);
+BrushSelectionWidget::BrushSelectionWidget(const int &contextId,
+                                           QWidget * const parent) :
+    QTabWidget(parent), mContextId(contextId) {
+    setSizePolicy(QSizePolicy::Preferred, sizePolicy().verticalPolicy());
 
-    if(!sLoaded) {
-        QString brushesDir = QDir::homePath() + "/.IsometricEngine/brushes/";
-        sLoadCollectionsFromDir(brushesDir);
-        sLoaded = true;
-    }
-    for(const BrushCollectionData& coll : sData) {
-        addChildCollection(new BrushCollection(coll, this), coll.fName);
-    }
-    if(mChildCollections.isEmpty()) return;
+    updateBrushes();
 }
 
-void BrushSelectionWidget::brushSelected(BrushWrapper* wrapper) {
-    setCurrentItem(wrapper);
+void BrushSelectionWidget::updateBrushes() {
+    const auto& context = sGetContext(mContextId);
+    for(const auto& coll : context.fCollections) {
+        const auto tabWidget = new QWidget(this);
+        const auto tabWidgetLay = new FlowLayout(tabWidget);
+        for(const auto& brush : coll.fBrushes) {
+            const auto bWidget = new BrushWidget(brush.get(), tabWidget);
+            connect(bWidget, &BrushWidget::selected,
+                    this, &BrushSelectionWidget::brushCWrapperSelected);
+            tabWidgetLay->addWidget(bWidget);
+        }
+        tabWidget->setLayout(tabWidgetLay);
+        addTab(tabWidget, coll.fName);
+    }
 }
 
 void loadBrushFromFile(const QString &path,

@@ -204,14 +204,8 @@ SOURCES += main.cpp\
     GUI/durationrectsettingsdialog.cpp \
     GUI/fillstrokesettings.cpp \
     GUI/BrushWidgets/arraywidget.cpp \
-    GUI/BrushWidgets/brusharraywidget.cpp \
-    GUI/BrushWidgets/brushcollection.cpp \
     GUI/BrushWidgets/brushselectionwidget.cpp \
-    GUI/BrushWidgets/brushwidget.cpp \
-    GUI/BrushWidgets/itemselectionwidget.cpp \
-    GUI/BrushWidgets/itemwrapper.cpp \
     GUI/BrushWidgets/flowlayout.cpp \
-    GUI/BrushWidgets/itemwidget.cpp \
     Animators/gradientpoints.cpp \
     MovablePoints/ctrlpoint.cpp \
     MovablePoints/gradientpoint.cpp \
@@ -280,10 +274,12 @@ SOURCES += main.cpp\
     canvashandlesmartpath.cpp \
     Boxes/smartvectorpath.cpp \
     PropertyUpdaters/smartnodepointupdater.cpp \
-    GUI/BrushWidgets/brushselectionicon.cpp \
     paintsettingsapplier.cpp \
     colorsetting.cpp \
-    Animators/gradient.cpp
+    Animators/gradient.cpp \
+    GUI/BrushWidgets/simplebrushwrapper.cpp \
+    GUI/BrushWidgets/brushcontexedwrapper.cpp \
+    GUI/BrushWidgets/brushwidget.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -437,15 +433,8 @@ HEADERS  += \
     GUI/qrealpointvaluedialog.h \
     GUI/renderoutputwidget.h \
     GUI/BrushWidgets/arraywidget.h \
-    GUI/BrushWidgets/brusharraywidget.h \
-    GUI/BrushWidgets/brushcollection.h \
     GUI/BrushWidgets/brushselectionwidget.h \
-    GUI/BrushWidgets/brushwidget.h \
-    GUI/BrushWidgets/collectionarea.h \
-    GUI/BrushWidgets/itemselectionwidget.h \
-    GUI/BrushWidgets/itemwrapper.h \
     GUI/BrushWidgets/flowlayout.h \
-    GUI/BrushWidgets/itemwidget.h \
     Animators/gradientpoints.h \
     MovablePoints/animatedpoint.h \
     MovablePoints/ctrlpoint.h \
@@ -513,10 +502,12 @@ HEADERS  += \
     Animators/PathAnimators/smartpathcollectionhandler.h \
     Boxes/smartvectorpath.h \
     PropertyUpdaters/smartnodepointupdater.h \
-    GUI/BrushWidgets/brushselectionicon.h \
     paintsettingsapplier.h \
     colorsetting.h \
-    Animators/gradient.h
+    Animators/gradient.h \
+    GUI/BrushWidgets/simplebrushwrapper.h \
+    GUI/BrushWidgets/brushcontexedwrapper.h \
+    GUI/BrushWidgets/brushwidget.h
 
 RESOURCES += \
     resources.qrc

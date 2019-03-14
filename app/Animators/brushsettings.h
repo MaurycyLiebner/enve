@@ -2,7 +2,7 @@
 #define BRUSHSETTINGS_H
 #include "Animators/complexanimator.h"
 #include "Animators/qcubicsegment1danimator.h"
-#include "GUI/BrushWidgets/brushwidget.h"
+#include "GUI/BrushWidgets/simplebrushwrapper.h"
 
 class BrushSettings : public ComplexAnimator {
 public:
@@ -20,11 +20,11 @@ public:
         return mTimeCurve.data();
     }
 
-    _SimpleBrushWrapper* getBrush() const {
+    SimpleBrushWrapper* getBrush() const {
         return mBrush;
     }
 
-    void setBrush(_SimpleBrushWrapper * const brush) {
+    void setBrush(SimpleBrushWrapper * const brush) {
         mBrush = brush;
     }
 
@@ -47,7 +47,7 @@ private:
     qsptr<qCubicSegment1DAnimator> mTimeCurve =
             SPtrCreate(qCubicSegment1DAnimator)("time");
 
-    _SimpleBrushWrapper * mBrush = nullptr;
+    SimpleBrushWrapper * mBrush = nullptr;
 };
 
 #endif // BRUSHSETTINGS_H

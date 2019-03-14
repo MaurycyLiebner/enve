@@ -151,7 +151,7 @@ public:
         mBrushSettings->setStrokeBrushWidthCurve(curve);
     }
 
-    void setStrokeBrush(_SimpleBrushWrapper* const brush) {
+    void setStrokeBrush(SimpleBrushWrapper* const brush) {
         mBrushSettings->setBrush(brush);
     }
 

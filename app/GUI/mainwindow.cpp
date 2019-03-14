@@ -123,7 +123,8 @@ MainWindow::MainWindow(QWidget *parent)
     brushDockLabel->setAlignment(Qt::AlignCenter);
     mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
 
-    mBrushSelectionWidget = new BrushSelectionWidget(this);
+    const int ctxt = BrushSelectionWidget::sCreateNewContext();
+    mBrushSelectionWidget = new BrushSelectionWidget(ctxt, this);
     connect(mBrushSelectionWidget, &BrushSelectionWidget::currentBrushChanged,
             mCanvasWindow, &CanvasWindow::setCurrentBrush);
 //    connect(mBrushSettingsWidget,
@@ -849,8 +850,8 @@ bool MainWindow::isAltPressed() {
     return QApplication::keyboardModifiers() & Qt::AltModifier;
 }
 
-_SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
-    return mBrushSelectionWidget->getCurrentItem();
+SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
+    return mBrushSelectionWidget->getCurrentBrush();
 }
 
 void MainWindow::queScheduledTasksAndUpdate() {

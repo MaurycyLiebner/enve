@@ -4,40 +4,106 @@
 class BrushCollection;
 #include <QTabWidget>
 #include <mypaint-brush.h>
-#include "brushwidget.h"
+#include "brushcontexedwrapper.h"
+#include "exceptions.h"
 class FlowLayout;
-#include "itemselectionwidget.h"
-
-struct BrushData {
-    QString fName;
-    stdsptr<SimpleBrushWrapper> fWrapper;
-    QImage fIcon;
-    QByteArray fWholeFile;
-};
 
 struct BrushCollectionData {
     QString fName;
     QList<BrushData> fBrushes;
 };
 
-class BrushSelectionWidget : public ItemSelectionWidget<BrushWrapper> {
+struct BrushContexedCollection {
+    BrushContexedCollection(const BrushCollectionData& raw) {
+        fName = raw.fName;
+        for(const auto& brushRaw : raw.fBrushes) {
+            fBrushes << SPtrCreate(BrushContexedWrapper)(brushRaw);
+        }
+    }
+    QString fName;
+    QList<qsptr<BrushContexedWrapper>> fBrushes;
+};
+
+struct BrushesContext {
+    BrushesContext(const QList<BrushCollectionData>& raw) {
+        for(const auto& coll : raw) {
+            fCollections << BrushContexedCollection(coll);
+        }
+    }
+
+    bool setSelectedWrapper(SimpleBrushWrapper* const wrapper) {
+        for(const auto& coll : fCollections) {
+            for(auto& brush : coll.fBrushes) {
+                if(brush->getSimpleBrush() == wrapper) {
+                    brush->setSelected(true);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    QList<BrushContexedCollection> fCollections;
+};
+
+class BrushSelectionWidget : public QTabWidget {
     Q_OBJECT
 public:
-    BrushSelectionWidget(QWidget* parent = nullptr);
+    BrushSelectionWidget(const int& contextId,
+                         QWidget * const parent = nullptr);
     ~BrushSelectionWidget() {}
+
+    void updateBrushes();
+
+    const int& getContextId() const {
+        return mContextId;
+    }
+
+    static int sCreateNewContext() {
+        if(!sLoaded) {
+            QString brushesDir = QDir::homePath() + "/.IsometricEngine/brushes/";
+            sLoadCollectionsFromDir(brushesDir);
+            sLoaded = true;
+        }
+        const int id = sBrushContexts.count();
+        sBrushContexts << BrushesContext(sData);
+        return id;
+    }
+
+    static void sSetCurrentBrushForContext(
+            const int& contextId,
+            SimpleBrushWrapper* const wrapper) {
+        auto& context = sBrushContexts[contextId];
+        context.setSelectedWrapper(wrapper);
+    }
+
+    SimpleBrushWrapper * getCurrentBrush() {
+        if(mCurrentBrushCWrapper)
+            return mCurrentBrushCWrapper->getSimpleBrush();
+        return nullptr;
+    }
 signals:
-    void currentBrushChanged(BrushWrapper*);
-    void brushBookmarked(BrushWrapper*);
-public slots:
-    void brushSelected(BrushWrapper *wrapper);
-protected:
-    void emitCurrentItemChanged(BrushWrapper* brushWrapper) {
-        emit currentBrushChanged(brushWrapper);
+    void currentBrushChanged(SimpleBrushWrapper*);
+private slots:
+    void brushCWrapperSelected(BrushContexedWrapper * wrapper) {
+        if(mCurrentBrushCWrapper) mCurrentBrushCWrapper->setSelected(false);
+        mCurrentBrushCWrapper = wrapper;
+        emit currentBrushChanged(getCurrentBrush());
     }
 private:
     static void sLoadCollectionsFromDir(const QString& mainDirPath);
     static QList<BrushCollectionData> sData;
     static bool sLoaded;
+    static QList<BrushesContext> sBrushContexts;
+
+    static const BrushesContext& sGetContext(const int& id) {
+        if(id < 0 || id >= sBrushContexts.count())
+            RuntimeThrow("Id does not correspond to any context");
+        return sBrushContexts.at(id);
+    }
+
+    BrushContexedWrapper * mCurrentBrushCWrapper = nullptr;
+    const int mContextId;
 };
 
 #endif // BRUSHSELECTIONWIDGET_H

@@ -1,48 +1,42 @@
 #include "brushwidget.h"
-#include <QFile>
 #include <QPainter>
 #include <QMouseEvent>
-#include <QFileInfo>
-#include "smartPointers/sharedpointerdefs.h"
-#include "brushselectionwidget.h"
 
-BrushWrapper::BrushWrapper(const QString &name,
-                           const QString &collectionName,
-                           const stdsptr<SimpleBrushWrapper> &brush,
-                           const QImage &icon,
-                           const QByteArray &wholeFile)  :
-    _SimpleBrushWrapper(brush->getBrush(), wholeFile),
-    ItemWrapper<stdsptr<SimpleBrushWrapper>>(
-        name, collectionName, brush, icon) {
+BrushWidget::BrushWidget(BrushContexedWrapper * const brushCWrapper,
+                         QWidget * const parent) :
+    QWidget(parent), mBrushCWrapper(brushCWrapper) {
+    setFixedSize(64, 64);
+    connect(brushCWrapper, &BrushContexedWrapper::selectionChanged,
+            this, &BrushWidget::selectionChanged);
 }
 
-stdsptr<BrushWrapper> BrushWrapper::createBrushWrapper(
-        const BrushData& brushD, const QString& collectionName) {
-    return SPtrCreate(BrushWrapper)(brushD.fName,
-                                    collectionName,
-                                    brushD.fWrapper, brushD.fIcon,
-                                    brushD.fWholeFile);
-}
+void BrushWidget::paintEvent(QPaintEvent *) {
+    QPainter p(this);
 
-_SimpleBrushWrapper::_SimpleBrushWrapper(MyPaintBrush * const brush,
-                                         const QByteArray& wholeFile) :
-    mBrush(brush), mWholeFile(wholeFile) {}
+    const auto& brushData = mBrushCWrapper->getBrushData();
+    p.drawImage(QRect(0, 0, width(), height()), brushData.fIcon);
 
-_SimpleBrushWrapper::~_SimpleBrushWrapper() {
-    mypaint_brush_unref(mBrush);
-}
-
-stdsptr<SimpleBrushWrapper> _SimpleBrushWrapper::createDuplicate() {
-    auto brush = mypaint_brush_new();
-    const char *data = mWholeFile.constData();
-
-    if(!mypaint_brush_from_string(brush, data)) {
-        mypaint_brush_unref(brush);
-        return nullptr;
+    if(isSelected()) {
+        if(mHovered) {
+            p.setPen(QPen(Qt::red, 1, Qt::DashLine));
+            p.drawRect(2, 2, width() - 5, height() - 5);
+        }
+        p.setPen(QPen(Qt::red, 2));
+        p.drawRect(1, 1, width() - 2, height() - 2);
+    } else if(mHovered) {
+        p.setPen(QPen(Qt::red, 1, Qt::DashLine));
+        p.drawRect(0, 0, width() - 1, height() - 1);
     }
-    return SPtrCreate(SimpleBrushWrapper)(brush, mWholeFile);
+
+    p.end();
 }
 
-SimpleBrushWrapper::SimpleBrushWrapper(MyPaintBrush * const brush,
-                                       const QByteArray& wholeFile) :
-    _SimpleBrushWrapper(brush, wholeFile) {}
+void BrushWidget::mousePressEvent(QMouseEvent *e) {
+    const auto pressedButton = e->button();
+    if(pressedButton == Qt::RightButton) {
+
+    } else if(pressedButton == Qt::LeftButton) {
+        mBrushCWrapper->setSelected(true);
+    } else return;
+    update();
+}

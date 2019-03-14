@@ -32,7 +32,7 @@ struct BoxesGroupRenderData;
 struct GPURasterEffect;
 enum CanvasMode : short;
 
-class _SimpleBrushWrapper;
+class SimpleBrushWrapper;
 
 enum BoundingBoxType {
     TYPE_VECTOR_PATH,
@@ -182,7 +182,7 @@ public:
     virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     virtual void setStrokeWidth(const qreal &strokeWidth);
 
-    virtual void setStrokeBrush(_SimpleBrushWrapper * const brush) {
+    virtual void setStrokeBrush(SimpleBrushWrapper * const brush) {
         Q_UNUSED(brush);
     }
     virtual void setStrokeBrushWidthCurve(

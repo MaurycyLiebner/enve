@@ -318,7 +318,7 @@ void PaintBox::tabletMoveEvent(const qreal &xT,
                                const ulong &time_stamp,
                                const qreal &pressure,
                                const bool &erase,
-                               const _SimpleBrushWrapper * const brush) {
+                               const SimpleBrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
                         anim_mCurrentRelFrame);
@@ -342,7 +342,7 @@ void PaintBox::mouseMoveEvent(const qreal &xT,
                               const qreal &yT,
                               const ulong &time_stamp,
                               const bool &erase,
-                              const _SimpleBrushWrapper * const brush) {
+                              const SimpleBrushWrapper * const brush) {
     tabletMoveEvent(xT, yT, time_stamp, 1, erase, brush);
 }
 
@@ -356,7 +356,7 @@ void PaintBox::tabletPressEvent(const qreal &xT,
                                 const ulong &time_stamp,
                                 const qreal &pressure,
                                 const bool &erase,
-                                const _SimpleBrushWrapper * const brush) {
+                                const SimpleBrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
                         anim_mCurrentRelFrame);
@@ -373,7 +373,7 @@ void PaintBox::mousePressEvent(const qreal &xT,
                                const qreal &yT,
                                const ulong &timestamp,
                                const qreal &pressure,
-                               const _SimpleBrushWrapper * const brush) {
+                               const SimpleBrushWrapper * const brush) {
     tabletPressEvent(xT, yT, timestamp, pressure, false, brush);
 }
 

@@ -94,7 +94,7 @@ public:
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokeWidth(const qreal &strokeWidth);
-    void setStrokeBrush(_SimpleBrushWrapper * const brush) {
+    void setStrokeBrush(SimpleBrushWrapper * const brush) {
         for(const auto& box : mContainedBoxes) {
             box->setStrokeBrush(brush);
         }

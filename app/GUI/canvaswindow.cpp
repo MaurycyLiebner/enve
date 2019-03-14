@@ -607,7 +607,7 @@ void CanvasWindow::flipVerticalAction() {
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setCurrentBrush(const _SimpleBrushWrapper * const brush) {
+void CanvasWindow::setCurrentBrush(const SimpleBrushWrapper * const brush) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setCurrentBrush(brush);
 }
@@ -797,7 +797,7 @@ void CanvasWindow::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::strokeBrushChanged(_SimpleBrushWrapper * const brush) {
+void CanvasWindow::strokeBrushChanged(SimpleBrushWrapper * const brush) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeBrush(brush);
     queScheduledTasksAndUpdate();

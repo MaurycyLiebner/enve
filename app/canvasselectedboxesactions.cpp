@@ -322,7 +322,7 @@ void Canvas::setSelectedStrokeWidth(const qreal &strokeWidth) {
     }
 }
 
-void Canvas::setSelectedStrokeBrush(_SimpleBrushWrapper * const brush) {
+void Canvas::setSelectedStrokeBrush(SimpleBrushWrapper * const brush) {
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeBrush(brush);
     }

@@ -227,7 +227,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     brushSelectionLabel->setObjectName("dockLabel");
     brushSelectionLabel->setAlignment(Qt::AlignCenter);
     mBrushSelectionDock->setTitleBarWidget(brushSelectionLabel);
-    mBrushSelectionWidget = new BrushSelectionWidget(this);
+    const int ctxt = BrushSelectionWidget::sCreateNewContext();
+    mBrushSelectionWidget = new BrushSelectionWidget(ctxt, this);
     mBrushSelectionDock->setWidget(mBrushSelectionWidget);
     mMainWindow->addDockWidget(Qt::RightDockWidgetArea, mBrushSelectionDock);
     mBrushSelectionDock->hide();
@@ -385,7 +386,7 @@ void FillStrokeSettingsWidget::setTransformFinishEmitter(const char *slot) {
 }
 
 void FillStrokeSettingsWidget::setStrokeBrush(
-        _SimpleBrushWrapper * const brush) {
+        SimpleBrushWrapper * const brush) {
     mCurrentStrokeBrush = brush;
     emitStrokeBrushChanged();
 }
@@ -442,8 +443,9 @@ void FillStrokeSettingsWidget::clearAll() {
 void FillStrokeSettingsWidget::setCurrentBrushSettings(
         BrushSettings * const brushSettings) {
     if(brushSettings) {
-        mBrushSelectionWidget->brushSelected(
-                    static_cast<BrushWrapper*>(brushSettings->getBrush()));
+        BrushSelectionWidget::sSetCurrentBrushForContext(
+                    mBrushSelectionWidget->getContextId(),
+                    brushSettings->getBrush());
         mBrushWidthCurveEditor->setCurrentAnimator(
                     brushSettings->getWidthAnimator());
         mBrushPressureCurveEditor->setCurrentAnimator(

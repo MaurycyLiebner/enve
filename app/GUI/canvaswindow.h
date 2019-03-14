@@ -27,7 +27,7 @@ class VideoBox;
 class Canvas;
 class PaintSettingsAnimator;
 class OutlineSettingsAnimator;
-class _SimpleBrushWrapper;
+class SimpleBrushWrapper;
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow,
@@ -69,7 +69,7 @@ public:
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
     void strokeWidthChanged(const qreal &strokeWidth);
 
-    void strokeBrushChanged(_SimpleBrushWrapper * const brush);
+    void strokeBrushChanged(SimpleBrushWrapper * const brush);
     void strokeBrushPressureCurveChanged(
             const qCubicSegment1D& curve);
     void strokeBrushWidthCurveChanged(
@@ -237,7 +237,7 @@ signals:
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
 public slots:
-    void setCurrentBrush(const _SimpleBrushWrapper * const brush);
+    void setCurrentBrush(const SimpleBrushWrapper * const brush);
 
     void setMovePathMode();
     void setMovePointMode();

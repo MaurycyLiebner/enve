@@ -131,7 +131,7 @@ public:
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokeWidth(const qreal &strokeWidth);
 
-    void setStrokeBrush(_SimpleBrushWrapper * const brush) {
+    void setStrokeBrush(SimpleBrushWrapper * const brush) {
         mStrokeSettings->setStrokeBrush(brush);
         prp_updateInfluenceRangeAfterChanged();
         scheduleUpdate(Animator::USER_CHANGE);

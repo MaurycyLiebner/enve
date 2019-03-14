@@ -179,7 +179,7 @@ public:
     void setSelectedCapStyle(const Qt::PenCapStyle& capStyle);
     void setSelectedJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setSelectedStrokeWidth(const qreal &strokeWidth);
-    void setSelectedStrokeBrush(_SimpleBrushWrapper * const brush);
+    void setSelectedStrokeBrush(SimpleBrushWrapper * const brush);
     void setSelectedStrokeBrushWidthCurve(
             const qCubicSegment1D& curve);
     void setSelectedStrokeBrushTimeCurve(
@@ -353,8 +353,8 @@ public:
 
     bool clipToCanvas() { return mClipToCanvasSize; }
 
-    const _SimpleBrushWrapper * getCurrentBrush() const;
-    void setCurrentBrush(const _SimpleBrushWrapper * const brush) {
+    const SimpleBrushWrapper * getCurrentBrush() const;
+    void setCurrentBrush(const SimpleBrushWrapper * const brush) {
         mCurrentBrush = brush;
     }
 
@@ -609,7 +609,7 @@ private:
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
-    const _SimpleBrushWrapper * mCurrentBrush = nullptr;
+    const SimpleBrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;
