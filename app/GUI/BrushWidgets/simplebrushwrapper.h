@@ -88,12 +88,24 @@ public:
                                      MYPAINT_BRUSH_SETTING_COLORIZE,
                                      0);
     }
+
+    const QString& getBrushName() const {
+        return mBrushName;
+    }
+
+    const QString& getCollectionName() const {
+        return mCollectionName;
+    }
 protected:
-    SimpleBrushWrapper(MyPaintBrush * const brush,
-                        const QByteArray& wholeFile);
+    SimpleBrushWrapper(const QString& collName,
+                       const QString& brushName,
+                       MyPaintBrush * const brush,
+                       const QByteArray& wholeFile);
 private:
-    MyPaintBrush *mBrush;
-    QByteArray mWholeFile;
+    MyPaintBrush * const mBrush;
+    const QByteArray mWholeFile;
+    const QString mCollectionName;
+    const QString mBrushName;
 };
 
 #endif // SIMPLEBRUSHWRAPPER_H

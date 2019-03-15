@@ -445,9 +445,7 @@ void PathBox::duplicateStrokeSettingsFrom(
         QBuffer buffer;
         buffer.open(QIODevice::ReadWrite);
         strokeSettings->writeProperty(&buffer);
-        if(buffer.reset()) {
-            mStrokeSettings->readProperty(&buffer);
-        }
+        if(buffer.reset()) mStrokeSettings->readProperty(&buffer);
         buffer.close();
     }
 }
@@ -481,6 +479,17 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
         if(paintType == FLATPAINT || paintType == BRUSHPAINT) {
             mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
                         strokeSettings->getCurrentColor());
+            if(paintType == BRUSHPAINT) {
+                const auto srcBrushSettings = strokeSettings->getBrushSettings();
+                const auto dstBrushSettings = mStrokeSettings->getBrushSettings();
+                dstBrushSettings->setBrush(srcBrushSettings->getBrush());
+                dstBrushSettings->setStrokeBrushWidthCurve(
+                            srcBrushSettings->getWidthAnimator()->getCurrentValue());
+                dstBrushSettings->setStrokeBrushPressureCurve(
+                            srcBrushSettings->getPressureAnimator()->getCurrentValue());
+                dstBrushSettings->setStrokeBrushTimeCurve(
+                            srcBrushSettings->getTimeAnimator()->getCurrentValue());
+            }
         } else if(paintType == GRADIENTPAINT) {
             mStrokeSettings->setGradient(
                         strokeSettings->getGradient());

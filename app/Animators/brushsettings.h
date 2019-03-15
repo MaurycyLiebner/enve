@@ -39,6 +39,8 @@ public:
     void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
         mTimeCurve->setCurrentValue(curve);
     }
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
 private:
     qsptr<qCubicSegment1DAnimator> mWidthCurve =
             SPtrCreate(qCubicSegment1DAnimator)("width");

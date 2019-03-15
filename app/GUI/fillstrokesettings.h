@@ -46,7 +46,6 @@ public:
     void setCanvasWindowPtr(CanvasWindow *canvasWidget);
     void updateColorAnimator();
     void setCurrentBrushSettings(BrushSettings * const brushSettings);
-    PaintSettingsApplier getCurrentSettingsApplier() const;
 public slots:
     void emitStrokeBrushChanged();
     void emitStrokeBrushWidthCurveChanged();

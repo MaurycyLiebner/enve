@@ -59,9 +59,21 @@ public:
         return mContextId;
     }
 
+    static SimpleBrushWrapper * sGetBrush(const QString& collectionName,
+                                          const QString& brushName) {
+        for(const auto& coll : sData) {
+            if(coll.fName != collectionName) continue;
+            for(const auto& brush : coll.fBrushes) {
+                if(brush.fName == brushName) return brush.fWrapper.get();
+            }
+        }
+        return nullptr;
+    }
+
     static int sCreateNewContext() {
         if(!sLoaded) {
-            QString brushesDir = QDir::homePath() + "/.IsometricEngine/brushes/";
+            const QString brushesDir = QDir::homePath() +
+                    "/.IsometricEngine/brushes/";
             sLoadCollectionsFromDir(brushesDir);
             sLoaded = true;
         }

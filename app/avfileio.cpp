@@ -549,6 +549,25 @@ void Gradient::readProperty(QIODevice *target) {
     updateQGradientStops(UpdateReason::USER_CHANGE);
 }
 
+void BrushSettings::writeProperty(QIODevice * const target) const {
+    mWidthCurve->writeProperty(target);
+    mPressureCurve->writeProperty(target);
+    mTimeCurve->writeProperty(target);
+    gWrite(target, mBrush->getCollectionName());
+    gWrite(target, mBrush->getBrushName());
+}
+
+void BrushSettings::readProperty(QIODevice * target) {
+    mWidthCurve->readProperty(target);
+    mPressureCurve->readProperty(target);
+    mTimeCurve->readProperty(target);
+    QString brushCollection;
+    gRead(target, brushCollection);
+    QString brushName;
+    gRead(target, brushName);
+    mBrush = BrushSelectionWidget::sGetBrush(brushCollection, brushName);
+}
+
 void OutlineSettingsAnimator::writeProperty(QIODevice * const target) const {
     PaintSettingsAnimator::writeProperty(target);
     mLineWidth->writeProperty(target);
@@ -556,6 +575,7 @@ void OutlineSettingsAnimator::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
     target->write(rcConstChar(&mOutlineCompositionMode),
                sizeof(QPainter::CompositionMode));
+    mBrushSettings->writeProperty(target);
 }
 
 void OutlineSettingsAnimator::readProperty(QIODevice *target) {
@@ -565,19 +585,15 @@ void OutlineSettingsAnimator::readProperty(QIODevice *target) {
     target->read(rcChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
     target->read(rcChar(&mOutlineCompositionMode),
                 sizeof(QPainter::CompositionMode));
+    mBrushSettings->readProperty(target);
 }
 
 void PaintSettingsAnimator::writeProperty(QIODevice * const target) const {
     mGradientPoints->writeProperty(target);
     mColor->writeProperty(target);
     target->write(rcConstChar(&mPaintType), sizeof(PaintType));
-    int gradId;
-    if(mGradient) {
-        gradId = mGradient->getLoadId();
-    } else {
-        gradId = -1;
-    }
     target->write(rcConstChar(&mGradientType), sizeof(bool));
+    const int gradId = mGradient ? mGradient->getLoadId() : -1;
     target->write(rcConstChar(&gradId), sizeof(int));
 }
 
