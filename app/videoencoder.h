@@ -5,6 +5,7 @@
 #include "skia/skiaincludes.h"
 #include "updatable.h"
 #include "renderinstancesettings.h"
+#include "framerange.h"
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
@@ -128,6 +129,7 @@ protected:
     bool mUpdateFailed = false;
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
+    FrameRange _mRenderRange;
 
     QList<stdsptr<ImageCacheContainer> > _mContainers;
 };

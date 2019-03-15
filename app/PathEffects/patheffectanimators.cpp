@@ -15,7 +15,7 @@ PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
 
 void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
     if(mParentBox->SWT_isPathBox()) {
-        PathBox *pathBox = GetAsPtr(mParentBox, PathBox);
+        const auto pathBox = GetAsPtr(mParentBox, PathBox);
         if(mIsOutline) {
             pathBox->addOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -24,7 +24,7 @@ void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
             pathBox->addPathEffect(effect);
         }
     } else if(mParentBox->SWT_isBoxesGroup()) {
-        BoxesGroup *groupBox = GetAsPtr(mParentBox, BoxesGroup);
+        const auto groupBox = GetAsPtr(mParentBox, BoxesGroup);
         if(mIsOutline) {
             groupBox->addOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -37,7 +37,7 @@ void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
 
 void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
     if(mParentBox->SWT_isPathBox()) {
-        PathBox *pathBox = GetAsPtr(mParentBox, PathBox);
+        const auto pathBox = GetAsPtr(mParentBox, PathBox);
         if(mIsOutline) {
             pathBox->removeOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -46,7 +46,7 @@ void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
             pathBox->removePathEffect(effect);
         }
     } else if(mParentBox->SWT_isBoxesGroup()) {
-        BoxesGroup *groupBox = GetAsPtr(mParentBox, BoxesGroup);
+        const auto groupBox = GetAsPtr(mParentBox, BoxesGroup);
         if(mIsOutline) {
             groupBox->removeOutlinePathEffect(effect);
         } else if(mIsFill) {

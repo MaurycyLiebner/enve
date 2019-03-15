@@ -15,14 +15,14 @@ extern "C" {
 #include "smartPointers/sharedpointerdefs.h"
 
 struct RenderSettings {
-    qreal resolution = 1.;
-    qreal fps = 24.;
-    AVRational timeBase = { 1, 24 }; // inverse of fps - 1/fps
-    int videoWidth = 0;
-    int videoHeight = 0;
+    qreal fResolution = 1;
+    qreal fFps = 24;
+    AVRational fTimeBase = { 1, 24 }; // inverse of fps - 1/fps
+    int fVideoWidth = 0;
+    int fVideoHeight = 0;
 
-    int minFrame = 0;
-    int maxFrame = 0;
+    int fMinFrame = 0;
+    int fMaxFrame = 0;
 };
 
 struct OutputSettings {

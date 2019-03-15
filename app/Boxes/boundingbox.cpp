@@ -36,7 +36,7 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     mGPUEffectsAnimators = SPtrCreate(GPUEffectAnimators)(this);
     mGPUEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(PixmapEffectUpdater)(this));
-    ca_addChildAnimator(mGPUEffectsAnimators);
+    ca_prependChildAnimator(mEffectsAnimators.data(), mGPUEffectsAnimators);
     mGPUEffectsAnimators->SWT_hide();
 
     mType = type;

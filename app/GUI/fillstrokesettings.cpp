@@ -118,7 +118,10 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mJoinStyleLayout->addWidget(mMiterJointStyleButton);
     mJoinStyleLayout->addWidget(mRoundJoinStyleButton);
 
-    mStrokeSettingsLayout->addLayout(mJoinStyleLayout);
+    mStrokeJoinCapWidget = new QWidget(this);
+    const auto strokeJoinCapLay = new QVBoxLayout(mStrokeJoinCapWidget);
+    mStrokeJoinCapWidget->setLayout(strokeJoinCapLay);
+    strokeJoinCapLay->addLayout(mJoinStyleLayout);
 
     mCapStyleLayout->setSpacing(0);
     mFlatCapStyleButton = new QPushButton(QIcon(":/icons/cap_flat.png"),
@@ -145,7 +148,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mCapStyleLayout->addWidget(mSquareCapStyleButton);
     mCapStyleLayout->addWidget(mRoundCapStyleButton);
 
-    mStrokeSettingsLayout->addLayout(mCapStyleLayout);
+    strokeJoinCapLay->addLayout(mCapStyleLayout);
 
     connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
@@ -153,6 +156,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     connect(mLineWidthSpin, SIGNAL(editingFinished(qreal)),
             this, SLOT(emitStrokeWidthChanged()));
 
+    mStrokeSettingsLayout->addWidget(mStrokeJoinCapWidget);
     mStrokeSettingsWidget->setLayout(mStrokeSettingsLayout);
 
     connect(mFillTargetButton, SIGNAL(released()),
@@ -271,7 +275,7 @@ void FillStrokeSettingsWidget::setRadialGradientFill() {
 }
 
 void FillStrokeSettingsWidget::setGradientFill() {
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->show();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(true);
     mFillBrushButton->setChecked(false);
     mFillFlatButton->setChecked(false);
@@ -280,7 +284,7 @@ void FillStrokeSettingsWidget::setGradientFill() {
 }
 
 void FillStrokeSettingsWidget::setBrushFill() {
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->hide();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->hide();
     mFillBrushButton->setChecked(true);
     mFillGradientButton->setChecked(false);
     mFillFlatButton->setChecked(false);
@@ -289,7 +293,7 @@ void FillStrokeSettingsWidget::setBrushFill() {
 }
 
 void FillStrokeSettingsWidget::setFlatFill() {
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->show();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(false);
     mFillBrushButton->setChecked(false);
     mFillFlatButton->setChecked(true);
@@ -298,7 +302,7 @@ void FillStrokeSettingsWidget::setFlatFill() {
 }
 
 void FillStrokeSettingsWidget::setNoneFill() {
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->show();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(false);
     mFillBrushButton->setChecked(false);
     mFillFlatButton->setChecked(false);
@@ -794,7 +798,7 @@ void FillStrokeSettingsWidget::setBrushPaintType() {
     mBrushSettingsWidget->show();
     mBrushCurvesDock->show();
     mBrushSelectionDock->show();
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->hide();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->hide();
     setCurrentPaintTypeVal(BRUSHPAINT);
     updateColorAnimator();
 }
@@ -808,7 +812,6 @@ void FillStrokeSettingsWidget::setNoPaintType() {
     mBrushCurvesDock->hide();
     mBrushSelectionDock->hide();
     updateColorAnimator();
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->show();
 }
 
 void FillStrokeSettingsWidget::setFlatPaintType() {
@@ -821,7 +824,7 @@ void FillStrokeSettingsWidget::setFlatPaintType() {
     mBrushSelectionDock->hide();
     setCurrentPaintTypeVal(FLATPAINT);
     updateColorAnimator();
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->show();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
 }
 
 void FillStrokeSettingsWidget::setGradientPaintType() {
@@ -846,5 +849,5 @@ void FillStrokeSettingsWidget::setGradientPaintType() {
     updateColorAnimator();
 
     mGradientWidget->update();
-    if(mTarget == PaintSetting::OUTLINE) mStrokeSettingsWidget->show();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
 }

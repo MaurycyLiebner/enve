@@ -101,13 +101,13 @@ static bool add_video_stream(OutputStream *ost,
     /* Put sample parameters. */
     c->bit_rate = outSettings.videoBitrate;//settings->getVideoBitrate();
     /* Resolution must be a multiple of two. */
-    c->width    = renSettings.videoWidth;
-    c->height   = renSettings.videoHeight;
+    c->width    = renSettings.fVideoWidth;
+    c->height   = renSettings.fVideoHeight;
     /* timebase: This is the fundamental unit of time (in seconds) in terms
      * of which frame timestamps are represented. For fixed-fps content,
      * timebase should be 1/framerate and timestamp increments should be
      * identical to 1. */
-    ost->st->time_base = renSettings.timeBase;
+    ost->st->time_base = renSettings.fTimeBase;
     c->time_base       = ost->st->time_base;
 
     c->gop_size      = 12; /* emit one intra frame every twelve frames at most */
@@ -731,7 +731,8 @@ void VideoEncoder::_processUpdate() {
         if(mEncodeVideo && encodeVideoT && avAligned) {
             stdsptr<ImageCacheContainer> cacheCont =
                     _mContainers.at(_mCurrentContainerId);
-            const int nFrames = cacheCont->rangeSpan();
+            const int nFrames =
+                    (cacheCont->getRange()*_mRenderRange).span();
             if(!write_video_frame(mFormatContext, &mVideoStream,
                                   cacheCont->getImageSk(),
                                   &mEncodeVideo, mUpdateError) ) {
@@ -759,6 +760,7 @@ void VideoEncoder::beforeProcessingStarted() {
     _mCurrentContainerId = 0;
     _mCurrentContainerFrame = 0;
     _mContainers.append(mNextContainers);
+    _mRenderRange = {mRenderSettings.fMinFrame, mRenderSettings.fMaxFrame};
     mNextContainers.clear();
     if(!mCurrentlyEncoding) clearContainers();
 }

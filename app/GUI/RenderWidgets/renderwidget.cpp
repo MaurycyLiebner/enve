@@ -104,9 +104,9 @@ void RenderWidget::setRenderedFrame(const int &frame) {
 
 void RenderWidget::render(RenderInstanceSettings *settings) {
     const RenderSettings &renderSettings = settings->getRenderSettings();
-    mRenderProgressBar->setRange(renderSettings.minFrame,
-                                 renderSettings.maxFrame);
-    mRenderProgressBar->setValue(renderSettings.minFrame);
+    mRenderProgressBar->setRange(renderSettings.fMinFrame,
+                                 renderSettings.fMaxFrame);
+    mRenderProgressBar->setValue(renderSettings.fMinFrame);
     mCurrentRenderedSettings = settings;
     emit renderFromSettings(settings);
 }

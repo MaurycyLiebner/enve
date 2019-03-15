@@ -122,8 +122,8 @@ QString OutputSettings::getChannelsLayoutNameStatic(
 
 RenderInstanceSettings::RenderInstanceSettings(Canvas* canvas) {
     setTargetCanvas(canvas);
-    mRenderSettings.minFrame = 0; // !!!
-    mRenderSettings.maxFrame = canvas->getMaxFrame();
+    mRenderSettings.fMinFrame = 0; // !!!
+    mRenderSettings.fMaxFrame = canvas->getMaxFrame();
 }
 
 const QString &RenderInstanceSettings::getName() {
@@ -177,19 +177,18 @@ void RenderInstanceSettings::setRenderSettings(
 void RenderInstanceSettings::renderingAboutToStart() {
     copySettingsFromOutputSettingsProfile();
     mRenderError.clear();
-    mRenderSettings.fps = mTargetCanvas->getFps();
-    mRenderSettings.timeBase = { 1, qRound(mRenderSettings.fps) };
-    mRenderSettings.videoWidth = mTargetCanvas->getCanvasWidth();
-    mRenderSettings.videoHeight = mTargetCanvas->getCanvasHeight();
+    mRenderSettings.fFps = mTargetCanvas->getFps();
+    mRenderSettings.fTimeBase = { 1, qRound(mRenderSettings.fFps) };
+    mRenderSettings.fVideoWidth = mTargetCanvas->getCanvasWidth();
+    mRenderSettings.fVideoHeight = mTargetCanvas->getCanvasHeight();
 }
-
+#include <QSound>
 void RenderInstanceSettings::setCurrentState(
         const RenderInstanceSettings::RenderState &state,
         const QString &text) {
     mState = state;
-    if(mState == ERROR) {
-        mRenderError = text;
-    }
+    if(mState == ERROR) mRenderError = text;
+    //if(mState == FINISHED) QSound::play(":/");
     emit stateChanged();
 }
 

@@ -917,10 +917,10 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
         const RenderSettings &renderSettings = settings->getRenderSettings();
         Canvas *canvas = settings->getTargetCanvas();
         setCurrentCanvas(canvas);
-        changeCurrentFrameAction(renderSettings.minFrame);
+        changeCurrentFrameAction(renderSettings.fMinFrame);
 
-        qreal resolutionFraction = renderSettings.resolution;
-        mMaxRenderFrame = renderSettings.maxFrame;
+        qreal resolutionFraction = renderSettings.fResolution;
+        mMaxRenderFrame = renderSettings.fMaxFrame;
 
         auto cpuFinishedFunc = [this]() {
             nextSaveOutputFrame();
@@ -932,7 +932,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
             mCurrentCanvas->setResolutionFraction(resolutionFraction);
         }
 
-        mCurrentRenderFrame = renderSettings.minFrame;
+        mCurrentRenderFrame = renderSettings.fMinFrame;
         mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
         mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);

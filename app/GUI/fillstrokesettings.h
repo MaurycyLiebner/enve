@@ -175,6 +175,7 @@ private:
     QPushButton *mFillBrushButton = nullptr;
 
     QWidget *mStrokeSettingsWidget;
+    QWidget* mStrokeJoinCapWidget;
     QVBoxLayout *mStrokeSettingsLayout = new QVBoxLayout();
 
     QHBoxLayout *mJoinStyleLayout = new QHBoxLayout();

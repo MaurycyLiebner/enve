@@ -17,13 +17,12 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
 
     mText = SPtrCreate(QStringAnimator)("text");
-    ca_addChildAnimator(mText);
-    ca_prependChildAnimator(mText.data(), mEffectsAnimators);
+    ca_prependChildAnimator(mEffectsAnimators.data(), mText);
     mText->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 
     mLinesDist = SPtrCreate(QrealAnimator)(100, 0, 100, 1, "line dist");
+    ca_prependChildAnimator(mEffectsAnimators.data(), mLinesDist);
     mLinesDist->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
-    ca_addChildAnimator(mLinesDist);
 }
 
 #include <QApplication>

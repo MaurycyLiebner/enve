@@ -266,6 +266,7 @@ void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
     mPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mPathEffectsAnimators.data());
 
+    setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -280,6 +281,7 @@ void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
 
+    setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -294,6 +296,7 @@ void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
 
+    setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -306,6 +309,7 @@ void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
         mPathEffectsAnimators->SWT_hide();
     }
 
+    setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -318,6 +322,7 @@ void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
         mFillPathEffectsAnimators->SWT_hide();
     }
 
+    setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -330,6 +335,7 @@ void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
         mOutlinePathEffectsAnimators->SWT_hide();
     }
 
+    setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -554,7 +560,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
         newPath->loadPathFromSkPath(QPainterPathToSkPath(pathT));
     } else {
         //newPath->loadPathFromSkPath(mEditPathSk);
-        newPath->loadPathFromSkPath(mPathSk);
+        newPath->loadPathFromSkPath(mEditPathSk);
     }
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
