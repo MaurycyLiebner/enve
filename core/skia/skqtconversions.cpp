@@ -100,20 +100,20 @@ QPainterPath SkPathToQPainterPath(const SkPath& path) {
         auto nextVerb = iter.next(pts);
         switch(nextVerb) {
             case SkPath::kMove_Verb: {
-                SkPoint pt = pts[0];
+                const SkPoint pt = pts[0];
                 qPath.moveTo(skPointToQ(pt));
             }
                 break;
             case SkPath::kLine_Verb: {
-                SkPoint pt = pts[1];
+                const SkPoint pt = pts[1];
 
                 qPath.lineTo(skPointToQ(pt));
             }
                 break;
             case SkPath::kCubic_Verb: {
-                SkPoint endPt = pts[1];
-                SkPoint startPt = pts[2];
-                SkPoint targetPt = pts[3];
+                const SkPoint endPt = pts[1];
+                const SkPoint startPt = pts[2];
+                const SkPoint targetPt = pts[3];
                 qPath.cubicTo(skPointToQ(endPt),
                               skPointToQ(startPt),
                               skPointToQ(targetPt));
@@ -123,20 +123,20 @@ QPainterPath SkPathToQPainterPath(const SkPath& path) {
                 qPath.closeSubpath();
                 break;
             case SkPath::kQuad_Verb: {
-                SkPoint ctrlPt = pts[1];
-                SkPoint targetPt = pts[2];
+                const SkPoint ctrlPt = pts[1];
+                const SkPoint targetPt = pts[2];
                 qPath.quadTo(skPointToQ(ctrlPt),
                              skPointToQ(targetPt));
             }
                 break;
             case SkPath::kConic_Verb: {
-                QPointF p0 = qPath.currentPosition();
-                QPointF p1 = skPointToQ(pts[1]);
-                QPointF p2 = skPointToQ(pts[2]);
-                qreal weight = SkScalarToDouble(iter.conicWeight());
+                const QPointF p0 = qPath.currentPosition();
+                const QPointF p1 = skPointToQ(pts[1]);
+                const QPointF p2 = skPointToQ(pts[2]);
+                const qreal weight = SkScalarToDouble(iter.conicWeight());
 
-                qreal u = 4.*weight/(3.*(1. + weight));
-                qPath.cubicTo(p0*(1. - u) + p1*u, p2*(1. - u) + p1*u, p2);
+                const qreal u = 4*weight/(3*(1 + weight));
+                qPath.cubicTo(p0*(1 - u) + p1*u, p2*(1 - u) + p1*u, p2);
             }
             break;
             case SkPath::kDone_Verb:
