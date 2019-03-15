@@ -25,7 +25,7 @@ signals:
     void selected(BrushContexedWrapper*);
 public slots:
     void selectionChanged(bool sel) {
-        if(sel) emit selected(mBrushCWrapper.get());
+        if(sel) emit selected(mBrushCWrapper);
         update();
     }
 private:
@@ -37,7 +37,7 @@ private:
         mBrushCWrapper->setSelected(false);
     }
 
-    const qsptr<BrushContexedWrapper> mBrushCWrapper;
+    const qptr<BrushContexedWrapper> mBrushCWrapper;
     bool mHovered = false;
 };
 

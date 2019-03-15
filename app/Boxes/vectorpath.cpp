@@ -47,7 +47,7 @@ void VectorPath::breakPathsApart_k() {
         mParentGroup->addContainedBox(newPath);
         PathAnimator *pathAnimator = newPath->getPathAnimator();
         pathAnimator->addSinglePathAnimator(path);
-        mPathAnimator->removeSinglePathAnimator(path);
+        mPathAnimator->removeSinglePathAnimator_k(path);
         path->setParentPath(pathAnimator);
     }
     removeFromParent_k();

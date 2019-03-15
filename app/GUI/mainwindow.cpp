@@ -540,7 +540,7 @@ void MainWindow::setupToolBar() {
 
     mPickPaintSettingsMode = new ActionButton(
                 ":/icons/draw_dropper.png",
-                "F5", this);
+                "F4", this);
     mPickPaintSettingsMode->setCheckable(":/icons/draw_dropper_checked.png");
     mToolBar->addWidget(mPickPaintSettingsMode);
 

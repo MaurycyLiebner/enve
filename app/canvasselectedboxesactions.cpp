@@ -909,30 +909,26 @@ void Canvas::selectedPathsCombine() {
     }
     if(!firstVectorPath) {
         auto newPath = SPtrCreate(VectorPath)();
-        addContainedBox(newPath);
+        mCurrentBoxesGroup->addContainedBox(newPath);
         firstVectorPath = newPath.get();
     }
-    QMatrix firstTranf = firstVectorPath->getCombinedTransform();
+    const auto targetVP = firstVectorPath->getPathAnimator();
+    const QMatrix firstTranf = firstVectorPath->getCombinedTransform();
     for(const auto &box : mSelectedBoxes) {
+        if(box == firstVectorPath) continue;
         if(box->SWT_isPathBox()) {
+            VectorPath * boxPath;
             if(box->SWT_isVectorPath()) {
-                if(box == firstVectorPath) continue;
-                VectorPath *boxPath = GetAsPtr(box, VectorPath);
-                QMatrix relTransf = boxPath->getCombinedTransform()*
-                        firstTranf.inverted();
-                boxPath->getPathAnimator()->applyTransformToPoints(relTransf);
-                boxPath->getPathAnimator()->
-                        addAllSinglePathsToAnimator(
-                            firstVectorPath->getPathAnimator());
+                boxPath = GetAsPtr(box, VectorPath);
             } else {
-                VectorPath *boxPath = GetAsPtr(box, VectorPath)->objectToVectorPathBox();
-                QMatrix relTransf = boxPath->getCombinedTransform()*
-                        firstTranf.inverted();
-                boxPath->getPathAnimator()->applyTransformToPoints(relTransf);
-                boxPath->getPathAnimator()->addAllSinglePathsToAnimator(
-                            firstVectorPath->getPathAnimator());
+                boxPath = GetAsPtr(box, PathBox)->objectToVectorPathBox();
             }
-            box->removeFromParent_k();
+            const QMatrix relTransf = boxPath->getCombinedTransform()*
+                    firstTranf.inverted();
+            const auto srcVP = boxPath->getPathAnimator();
+            srcVP->applyTransformToPoints(relTransf);
+            targetVP->moveAllSinglePathsToAnimator_k(srcVP);
+            //box->removeFromParent_k();
         }
     }
 }

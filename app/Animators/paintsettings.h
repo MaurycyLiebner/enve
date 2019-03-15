@@ -74,7 +74,8 @@ public:
 protected:
     FillSettingsAnimator(GradientPoints * const grdPts,
                          PathBox * const parent) :
-        PaintSettingsAnimator("fill", grdPts, parent) {}
+        FillSettingsAnimator(grdPts, parent, QColor(0, 0, 0),
+                             PaintType::NOPAINT, nullptr) {}
 
     FillSettingsAnimator(GradientPoints * const grdPts,
                          PathBox * const parent,

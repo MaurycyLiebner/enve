@@ -32,12 +32,10 @@ void PathAnimator::addSinglePathAnimator(const qsptr<VectorPathAnimator>& path) 
     ca_addChildAnimator(path);
 }
 
-void PathAnimator::removeSinglePathAnimator(const qsptr<VectorPathAnimator>& path) {
+void PathAnimator::removeSinglePathAnimator_k(const qsptr<VectorPathAnimator>& path) {
     if(mSinglePaths.removeOne(path) ) {
         ca_removeChildAnimator(path);
-        if(mSinglePaths.isEmpty()) {
-            mParentBox->removeFromParent_k();
-        }
+        if(mSinglePaths.isEmpty()) mParentBox->removeFromParent_k();
     }
 }
 
@@ -275,11 +273,11 @@ void PathAnimator::revertAllPointsForAllKeys() {
     }
 }
 
-void PathAnimator::addAllSinglePathsToAnimator(PathAnimator *target) {
+void PathAnimator::moveAllSinglePathsToAnimator_k(PathAnimator * const target) {
     while(!mSinglePaths.isEmpty()) {
         qsptr<VectorPathAnimator> path = mSinglePaths.at(0);
         target->addSinglePathAnimator(path);
-        removeSinglePathAnimator(path);
+        removeSinglePathAnimator_k(path);
         path->setParentPath(target);
     }
 }

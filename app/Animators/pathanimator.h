@@ -48,7 +48,7 @@ public:
 
     void setParentBox(BoundingBox *parent);
     void addSinglePathAnimator(const qsptr<VectorPathAnimator> &path);
-    void removeSinglePathAnimator(const qsptr<VectorPathAnimator> &path);
+    void removeSinglePathAnimator_k(const qsptr<VectorPathAnimator> &path);
     void selectAllPoints(Canvas *canvas);
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
@@ -57,7 +57,7 @@ public:
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
     void readVectorPathAnimator(QIODevice *target);
-    void addAllSinglePathsToAnimator(PathAnimator *target);
+    void moveAllSinglePathsToAnimator_k(PathAnimator * const target);
     const QList<qsptr<VectorPathAnimator>> &getSinglePathsList() {
         return mSinglePaths;
     }

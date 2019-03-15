@@ -553,8 +553,8 @@ void BrushSettings::writeProperty(QIODevice * const target) const {
     mWidthCurve->writeProperty(target);
     mPressureCurve->writeProperty(target);
     mTimeCurve->writeProperty(target);
-    gWrite(target, mBrush->getCollectionName());
-    gWrite(target, mBrush->getBrushName());
+    gWrite(target, mBrush ? mBrush->getCollectionName() : "");
+    gWrite(target, mBrush ? mBrush->getBrushName() : "");
 }
 
 void BrushSettings::readProperty(QIODevice * target) {

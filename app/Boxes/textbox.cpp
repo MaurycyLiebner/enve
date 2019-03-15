@@ -12,6 +12,7 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mPivotAutoAdjust = false;
     setName("text");
 
+    mFillSettings->setPaintType(PaintType::FLATPAINT);
     mFillSettings->setCurrentColor(QColor(0, 0, 0));
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
 
@@ -20,8 +21,9 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     ca_prependChildAnimator(mText.data(), mEffectsAnimators);
     mText->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 
-    mLinesDist = SPtrCreate(QrealAnimator)(100., 0., 100., 1., "line dist");
+    mLinesDist = SPtrCreate(QrealAnimator)(100, 0, 100, 1, "line dist");
     mLinesDist->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
+    ca_addChildAnimator(mLinesDist);
 }
 
 #include <QApplication>
@@ -102,7 +104,8 @@ void TextBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent)
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     QPainterPath qPath = QPainterPath();
 
-    const qreal linesDistAtFrame = mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
+    const qreal linesDistAtFrame =
+            mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
     const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);

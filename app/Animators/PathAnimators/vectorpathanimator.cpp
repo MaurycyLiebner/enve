@@ -1065,7 +1065,7 @@ void VectorPathAnimator::updateAfterChangedFromInside() {
 
 void VectorPathAnimator::removeFromParent() {
     if(!mParentPathAnimator) return;
-    mParentPathAnimator->removeSinglePathAnimator(ref<VectorPathAnimator>());
+    mParentPathAnimator->removeSinglePathAnimator_k(ref<VectorPathAnimator>());
 }
 
 NodePoint *VectorPathAnimator::getNodePtWithNodeId(const int &id) {
