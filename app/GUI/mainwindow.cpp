@@ -986,21 +986,22 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
     }
-    QWidget *focusWidget = QApplication::focusWidget();
+    const auto focusWidget = QApplication::focusWidget();
     if(focusWidget) {
         if(focusWidget->property("forceHandleEvent").isValid()) return false;
     }
     if(e->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
-        if(keyEvent->key() == Qt::Key_Delete && focusWidget != nullptr) {
+        const auto keyEvent = static_cast<QKeyEvent*>(e);
+        if(keyEvent->key() == Qt::Key_Delete && focusWidget) {
             mEventFilterDisabled = true;
-            bool widHandled = QCoreApplication::sendEvent(focusWidget, keyEvent);
+            const bool widHandled =
+                    QCoreApplication::sendEvent(focusWidget, keyEvent);
             mEventFilterDisabled = false;
             if(widHandled) return false;
         }
         return processKeyEvent(keyEvent);
     } else if(e->type() == QEvent::ShortcutOverride) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
+        const auto keyEvent = static_cast<QKeyEvent*>(e);
         if(isShiftPressed() && keyEvent->key() == Qt::Key_D) {
             return processKeyEvent(keyEvent);
         }

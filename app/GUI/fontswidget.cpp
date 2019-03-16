@@ -16,8 +16,8 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
                 "QLineEdit:focus {"
                     "background: rgb(255, 255, 255);"
                 "}");
-
-    mFontSizeCombo->setValidator(new QIntValidator(0, 9999, mFontSizeCombo));
+    mFontSizeCombo->setProperty("forceHandleEvent", QVariant(true));
+    mFontSizeCombo->setValidator(new QIntValidator(0, 999, mFontSizeCombo));
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
     connect(mFontFamilyCombo, &QComboBox::currentTextChanged,

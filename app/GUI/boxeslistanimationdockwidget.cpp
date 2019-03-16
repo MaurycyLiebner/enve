@@ -132,11 +132,12 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mResolutionComboBox->setEditable(true);
     mResolutionComboBox->lineEdit()->setInputMask("D00 %");
     mResolutionComboBox->setCurrentText("100 %");
+    mResolutionComboBox->setProperty("forceHandleEvent", QVariant(true));
     mResolutionComboBox->setInsertPolicy(QComboBox::NoInsert);
     mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
-    connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(setResolutionFractionText(QString)));
+    connect(mResolutionComboBox, &QComboBox::currentTextChanged,
+            this, &BoxesListAnimationDockWidget::setResolutionFractionText);
 
     mPlayButton = new ActionButton(
                 ":/icons/renderPreviewButton.png",
@@ -246,7 +247,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
 void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
     text = text.remove(" %");
-    mMainWindow->setResolutionFractionValue(text.toDouble()/100.);
+    qreal res = clamp(text.toDouble(), 1, 200)/100;
+    mMainWindow->setResolutionFractionValue(res);
 }
 
 void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {

@@ -44,10 +44,7 @@ QDoubleSlider::QDoubleSlider(const QString &name,
 }
 
 QDoubleSlider::QDoubleSlider(QWidget *parent) :
-    QDoubleSlider(0., 100., 1., parent)
-{
-
-}
+    QDoubleSlider(0, 100, 1, parent) {}
 
 QDoubleSlider::~QDoubleSlider() {
     removeEventFilter(this);
@@ -123,7 +120,7 @@ void QDoubleSlider::paint(QPainter *p,
     } else if(mRightNeighbour) {
         p->setClipRect(0, 0, width()/2, height());
     }
-    p->drawRoundedRect(boundingRect, 5., 5.);
+    p->drawRoundedRect(boundingRect, 5, 5);
     if(mLeftNeighbour || mRightNeighbour) {
         if(mLeftNeighbour) {
             p->setClipRect(0, 0, width()/2, height());
@@ -137,14 +134,14 @@ void QDoubleSlider::paint(QPainter *p,
         if(mShowValueSlider) {
             p->setPen(Qt::NoPen);
             qreal valWidth = clamp((mValue - mMinValue)*width()/(mMaxValue - mMinValue),
-                                    0., width() - 3.);
+                                    0., width() - 3);
             p->setBrush(sliderFill);
             qreal heightRemoval = qMax(0., MIN_WIDGET_HEIGHT/2 - valWidth)*0.5;
-            p->drawRoundedRect(QRectF(1., 1.,
+            p->drawRoundedRect(QRectF(1, 1,
                                       valWidth,
-                                      height() - 2.).
-                               adjusted(0., heightRemoval,
-                                        0., -heightRemoval), 5., 5.);
+                                      height() - 2).
+                               adjusted(0, heightRemoval,
+                                        0, -heightRemoval), 5, 5.);
         }
         p->setPen(Qt::black);
         if(mShowName) {
@@ -268,7 +265,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
     if(event->type() == QEvent::Paint) {
         return false;
     } else if(event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = (QKeyEvent*)event;
+        const auto keyEvent = static_cast<QKeyEvent*>(event);
         if(keyEvent->key() == Qt::Key_Return ||
            keyEvent->key() == Qt::Key_Enter) {
             finishTextEditing();
@@ -377,7 +374,7 @@ void QDoubleSlider::finishTextEditing() {
 void QDoubleSlider::lineEditingFinished() {
     mLineEdit->setCursor(Qt::ArrowCursor);
     setCursor(Qt::ArrowCursor);
-    QString text = mLineEdit->text();
+    const QString text = mLineEdit->text();
     setValueNoUpdate(QLocale().toDouble(text));
     mLineEdit->releaseMouse();
 

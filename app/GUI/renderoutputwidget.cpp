@@ -48,8 +48,7 @@ RenderOutputWidget::RenderOutputWidget(const qreal &canvasWidth,
     mResolutionComboBox->addItem("25 %");
     mResolutionComboBox->setEditable(true);
     mResolutionComboBox->lineEdit()->setInputMask("D00 %");
-    mResolutionComboBox->lineEdit()->setProperty(
-                "forceHandleEvent", QVariant(true));
+    mResolutionComboBox->setProperty("forceHandleEvent", QVariant(true));
     mResolutionComboBox->setCurrentText("100 %");
     mResolutionComboBox->setInsertPolicy(QComboBox::NoInsert);
     mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
