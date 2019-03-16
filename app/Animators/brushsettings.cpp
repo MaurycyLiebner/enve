@@ -5,7 +5,7 @@ BrushSettings::BrushSettings() : ComplexAnimator("brush settings") {
     ca_addChildAnimator(mPressureCurve);
     ca_addChildAnimator(mTimeCurve);
 
-    mWidthCurve->setCurrentValue(qCubicSegment1D(5));
+    mWidthCurve->setCurrentValue(qCubicSegment1D(1));
     mPressureCurve->setCurrentValue(qCubicSegment1D(1));
     mTimeCurve->setCurrentValue(qCubicSegment1D(1));
 }

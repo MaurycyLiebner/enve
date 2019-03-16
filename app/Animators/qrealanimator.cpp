@@ -132,17 +132,6 @@ void QrealAnimator::setPrefferedValueStep(const qreal &valueStep) {
     mPrefferedValueStep = valueStep;
 }
 
-void QrealAnimator::anim_setRecording(const bool &rec) {
-    if(rec) {
-        anim_setRecordingWithoutChangingKeys(rec);
-        anim_saveCurrentValueAsKey();
-    } else {
-        anim_removeAllKeys();
-        graph_updateKeysPath();
-        anim_setRecordingWithoutChangingKeys(rec);
-    }
-}
-
 void QrealAnimator::graphFixMinMaxValues() {
     mGraphMinMaxValuesFixed = true;
 }

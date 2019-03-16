@@ -129,6 +129,7 @@ void Animator::anim_updateRelFrame() {
 }
 
 void Animator::anim_setRecording(const bool &rec) {
+    if(rec == anim_mIsRecording) return;
     if(rec) {
         anim_setRecordingWithoutChangingKeys(rec);
         anim_saveCurrentValueAsKey();

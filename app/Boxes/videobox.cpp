@@ -13,8 +13,7 @@ extern "C" {
 #include "filesourcescache.h"
 #include "FileCacheHandlers/videocachehandler.h"
 
-VideoBox::VideoBox() :
-    AnimationBox() {
+VideoBox::VideoBox() : AnimationBox() {
     mType = TYPE_VIDEO;
     setName("Video");
 }
@@ -43,12 +42,10 @@ void VideoBox::setParentGroup(BoxesGroup *parent) {
 
 #include <QFileDialog>
 void VideoBox::changeSourceFile(QWidget *dialogParent) {
-    QString importPath = QFileDialog::getOpenFileName(
+    const QString importPath = QFileDialog::getOpenFileName(
                 dialogParent, "Change Source", "",
                 "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
-    if(!importPath.isEmpty()) {
-        setFilePath(importPath);
-    }
+    if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
 FrameRange VideoBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
@@ -116,6 +113,5 @@ void VideoBox::reloadSound() {
                 getParentCanvas()->getSoundComposition()->addSound(mSound);
             }
         }
-    } else {
     }
 }

@@ -51,7 +51,6 @@ public:
     void readProperty(QIODevice *target);
     stdsptr<Key> readKey(QIODevice *target);
 public slots:
-    void anim_setRecording(const bool& rec);
     void anim_saveCurrentValueAsKey();
 protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,

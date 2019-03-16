@@ -589,8 +589,12 @@ void gForEverySegmentInPath(
             lastPos = pt3;
         } break;
         case SkPath::kClose_Verb: {
-//            SkCubicSegment2D seg{lastPos, lastPos, lastMovePos, lastMovePos};
-//            segs << qCubicSegment2D(seg);
+            if(!isZero2Dec(pointToLen(lastPos - lastMovePos))) {
+                SkPath seg;
+                seg.moveTo(lastPos);
+                seg.lineTo(lastMovePos);
+                func(seg);
+            }
         } break;
         case SkPath::kMove_Verb: {
             lastMovePos = pts[0];

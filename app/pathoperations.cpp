@@ -79,7 +79,6 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
 
     SkOpBuilder builder;
     builder.add(src, SkPathOp::kUnion_SkPathOp);
-
     qreal aWidth2 = qAbs(widthT*2);
     SkStroke strokerSk;
     strokerSk.setJoin(SkPaint::kRound_Join);

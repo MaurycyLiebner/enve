@@ -50,7 +50,8 @@ extern bool isZero6Dec(const float &val);
 extern bool isOne4Dec(const float &val);
 extern bool isOne6Dec(const float &val);
 
-extern bool isZero2Dec(qreal val);
+extern bool isZero2Dec(const qreal &val);
+extern bool isZero2Dec(const SkScalar &val);
 
 extern bool isZero1Dec(qreal val);
 

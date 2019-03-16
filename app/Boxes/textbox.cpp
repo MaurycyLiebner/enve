@@ -101,11 +101,20 @@ void TextBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent)
 }
 
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
+    const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
+    SkFont font;
+    font.setTypeface(SkTypeface::MakeFromName(mFont.family().toStdString().c_str(),
+                                              SkFontStyle::Normal()));
+    SkPath result;
+    SkTextUtils::GetPath(textAtFrame.toStdString().c_str(),
+                         static_cast<size_t>(textAtFrame.length()),
+                         SkTextEncoding::kUTF8, 0, 0, font,
+                         &result);
+    return result;
     QPainterPath qPath = QPainterPath();
 
     const qreal linesDistAtFrame =
             mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
-    const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
     const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
     qreal yT = 0;
@@ -114,6 +123,7 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
         const qreal lineWidth = fm.width(line);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
+
     for(const auto& line : lines) {
         const qreal lineWidth = fm.width(line);
         qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),

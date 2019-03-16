@@ -11,9 +11,7 @@ AnimationBox::AnimationBox() :
     setName("Animation");
 
     setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
-//    mFrameAnimator.blockPointer();
-//    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
-    //    mFrameAnimator.setCurrentIntValue(0);
+    mFrameAnimator = SPtrCreate(IntAnimator)("frame");
 }
 
 AnimationBox::~AnimationBox() {
@@ -41,6 +39,10 @@ void AnimationBox::reloadCacheHandler() {
     //if(mParentGroup) {
         updateDurationRectangleAnimationRange();
     //}
+    if(mFrameRemappingEnabled) {
+        const int frameCount = mAnimationCacheHandler->getFramesCount();
+        mFrameAnimator->setIntValueRange(0, frameCount - 1);
+    }
     reloadSound();
     prp_updateInfluenceRangeAfterChanged();
 
@@ -60,14 +62,13 @@ bool AnimationBox::shouldScheduleUpdate() {
 
 int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
     int pixId;
-    const int &absMinAnimation =
+    const int animStartRelFrame =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
-//    if(true) {
-        pixId = (relFrame - absMinAnimation);
-//    } else { // reversed
-//        pixId = mAnimationCacheHandler->getFramesCount() - 1 -
-//                (relFrame - absMinAnimation);
-//    }
+    if(mFrameRemappingEnabled) {
+        pixId = mFrameAnimator->getCurrentIntValueAtRelFrame(relFrame);
+    } else { // reversed
+        pixId = (relFrame - animStartRelFrame);
+    }
 
     if(pixId <= 0) {
         pixId = 0;
@@ -76,6 +77,41 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
     }
 
     return pixId;
+}
+#include "Animators/qrealkey.h"
+#include "Animators/effectanimators.h"
+void AnimationBox::enableFrameRemapping() {
+    if(mFrameRemappingEnabled) return;
+    const int frameCount = mAnimationCacheHandler->getFramesCount();
+    mFrameAnimator->setIntValueRange(0, frameCount - 1);
+    const int animStartRelFrame =
+                getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
+    if(frameCount > 1) {
+        const auto firstFrameKey = SPtrCreate(QrealKey)(0, animStartRelFrame,
+                                                        mFrameAnimator.get());
+        mFrameAnimator->anim_appendKey(firstFrameKey);
+        const auto lastFrameKey = SPtrCreate(QrealKey)(frameCount - 1,
+                                                       animStartRelFrame + frameCount - 1,
+                                                       mFrameAnimator.get());
+        mFrameAnimator->anim_appendKey(lastFrameKey);
+        mFrameAnimator->anim_setRecordingValue(true);
+    } else {
+        mFrameAnimator->setCurrentIntValue(0);
+    }
+    mFrameRemappingEnabled = true;
+    ca_prependChildAnimator(mEffectsAnimators.get(), mFrameAnimator);
+    prp_updateInfluenceRangeAfterChanged();
+    scheduleUpdate(Animator::USER_CHANGE);
+}
+
+void AnimationBox::disableFrameRemapping() {
+    if(!mFrameRemappingEnabled) return;
+    mFrameRemappingEnabled = false;
+    mFrameAnimator->anim_removeAllKeys();
+    mFrameAnimator->anim_setRecordingValue(false);
+    ca_removeChildAnimator(mFrameAnimator);
+    prp_updateInfluenceRangeAfterChanged();
+    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void AnimationBox::anim_setAbsFrame(const int &frame) {
@@ -108,6 +144,16 @@ void AnimationBox::addActionsToMenu(QMenu * const menu,
     menu->addAction("Set Source File...", [this, widgetsParent]() {
         changeSourceFile(widgetsParent);
     });
+
+    const auto fR = menu->addAction("Frame Remapping", [this]() {
+        if(this->mFrameRemappingEnabled) {
+            this->disableFrameRemapping();
+        } else {
+            this->enableFrameRemapping();
+        }
+    });
+    fR->setCheckable(true);
+    fR->setChecked(mFrameRemappingEnabled);
 }
 
 void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(

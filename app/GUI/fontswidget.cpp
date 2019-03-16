@@ -20,14 +20,15 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mFontSizeCombo->setValidator(new QIntValidator(0, 9999, mFontSizeCombo));
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
-    connect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateStylesFromCurrentFamilyAndEmit(QString)));
+    connect(mFontFamilyCombo, &QComboBox::currentTextChanged,
+            this, qOverload<const QString &>(
+                &FontsWidget::updateStylesFromCurrentFamilyAndEmit));
 
-    connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    connect(mFontStyleCombo, &QComboBox::currentTextChanged,
+            this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
 
-    connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitSizeChanged()) );
+    connect(mFontSizeCombo, &QComboBox::currentTextChanged,
+            this, &FontsWidget::emitSizeChanged);
 
     mMainLayout = new QHBoxLayout(this);
     setLayout(mMainLayout);
@@ -39,21 +40,21 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void FontsWidget::updateStylesFromCurrentFamily(const QString &family) {
-    disconnect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-               this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    disconnect(mFontStyleCombo, &QComboBox::currentTextChanged,
+               this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
 
-    QString currentStyle = getCurrentFontStyle();
+    const QString currentStyle = getCurrentFontStyle();
 
     mFontStyleCombo->clear();
-    QStringList styles = mFontDatabase.styles(family);
-    mFontStyleCombo->addItems(styles );
+    const QStringList styles = mFontDatabase.styles(family);
+    mFontStyleCombo->addItems(styles);
 
-    if(styles.contains(currentStyle) ) {
+    if(styles.contains(currentStyle)) {
         mFontStyleCombo->setCurrentText(currentStyle);
     }
 
-    connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    connect(mFontStyleCombo, &QComboBox::currentTextChanged,
+            this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
     updateSizesFromCurrentFamilyAndStyles();
 }
 
@@ -69,15 +70,15 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit() {
 }
 
 void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
-    disconnect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
-               this, SLOT(emitSizeChanged()) );
-    QString currentSize = mFontSizeCombo->currentText();
+    disconnect(mFontSizeCombo, &QComboBox::currentTextChanged,
+               this, &FontsWidget::emitSizeChanged);
+    const QString currentSize = mFontSizeCombo->currentText();
 
     mFontSizeCombo->clear();
-    QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
-                                                 getCurrentFontStyle() );
+    const QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
+                                                       getCurrentFontStyle());
     for(const int &size : sizes) {
-        mFontSizeCombo->addItem(QString::number(size) );
+        mFontSizeCombo->addItem(QString::number(size));
     }
 
     if(currentSize.isEmpty()) {
@@ -85,8 +86,8 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
     } else {
         mFontSizeCombo->setCurrentText(currentSize);
     }
-    connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitSizeChanged()) );
+    connect(mFontSizeCombo, &QComboBox::currentTextChanged,
+            this, &FontsWidget::emitSizeChanged);
 }
 
 void FontsWidget::updateStylesFromCurrentFamilyAndEmit() {
@@ -106,32 +107,34 @@ QString FontsWidget::getCurrentFontFamily() const {
 }
 
 void FontsWidget::setCurrentFontSize(const qreal &size) {
-    disconnect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitSizeChanged()) );
+    disconnect(mFontSizeCombo, &QComboBox::currentTextChanged,
+               this, &FontsWidget::emitSizeChanged);
     mFontSizeCombo->setCurrentText(QString::number(qRound(size)));
-    connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitSizeChanged()) );
+    connect(mFontSizeCombo, &QComboBox::currentTextChanged,
+            this, &FontsWidget::emitSizeChanged);
 }
 
 void FontsWidget::setCurrentFontFamily(const QString &family) {
-    disconnect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),
-               this, SLOT(updateStylesFromCurrentFamilyAndEmit(QString)));
+    disconnect(mFontFamilyCombo, &QComboBox::currentTextChanged,
+               this, qOverload<const QString &>(
+                   &FontsWidget::updateStylesFromCurrentFamilyAndEmit));
     mFontFamilyCombo->setCurrentText(family);
-    connect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateStylesFromCurrentFamilyAndEmit(QString)));
+    connect(mFontFamilyCombo, &QComboBox::currentTextChanged,
+            this, qOverload<const QString &>(
+                &FontsWidget::updateStylesFromCurrentFamilyAndEmit));
     updateStylesFromCurrentFamily(family);
 }
 
 void FontsWidget::setCurrentFontStyle(const QString &style) {
-    disconnect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-               this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    disconnect(mFontStyleCombo, &QComboBox::currentTextChanged,
+               this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
     if(style.isEmpty()) {
         mFontStyleCombo->setCurrentIndex(0);
     } else {
         mFontStyleCombo->setCurrentText(style);
     }
-    connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    connect(mFontStyleCombo, &QComboBox::currentTextChanged,
+            this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
     updateSizesFromCurrentFamilyAndStyles();
 }
 

@@ -78,8 +78,12 @@ bool isZeroOrOne6Dec(const double &val) {
     return false;
 }
 
-bool isZero2Dec(qreal val) {
+bool isZero2Dec(const qreal& val) {
     return qAbs(val) < 0.01;
+}
+
+bool isZero2Dec(const SkScalar &val) {
+    return qAbs(val) < 0.01f;
 }
 
 bool isZero1Dec(qreal val) {

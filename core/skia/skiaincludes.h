@@ -19,6 +19,7 @@
 #include "SkDiscretePathEffect.h"
 #include "SkPathMeasure.h"
 #include "SkFont.h"
+#include "SkTextUtils.h"
 
 #include "gl/GrGLUtil.h"
 

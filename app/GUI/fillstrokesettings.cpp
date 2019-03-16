@@ -200,7 +200,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mBrushSettingsWidget->setLayout(brushLayout);
 
     const auto brushCurvesWidget = new QWidget(this);
-    mBrushWidthCurveEditor = new Segment1DEditor(0, 100, this);
+    mBrushWidthCurveEditor = new Segment1DEditor(0, 1, this);
     mBrushPressureCurveEditor = new Segment1DEditor(0, 1, this);
     mBrushTimeCurveEditor = new Segment1DEditor(0, 2, this);
     const auto brushCurvesLayout = new QVBoxLayout;

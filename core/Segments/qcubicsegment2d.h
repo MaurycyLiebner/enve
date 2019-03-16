@@ -171,8 +171,10 @@ struct qCubicSegment2D {
                 lastPos = pt3;
             } break;
             case SkPath::kClose_Verb: {
-    //            SkCubicSegment2D seg{lastPos, lastPos, lastMovePos, lastMovePos};
-    //            segs << qCubicSegment2D(seg);
+                if(!isZero2Dec(pointToLen(lastPos - lastMovePos))) {
+                    func({lastPos, lastPos, lastMovePos, lastMovePos});
+                    lastPos = lastMovePos;
+                }
             } break;
             case SkPath::kMove_Verb: {
                 lastMovePos = skPointToQ(pts[0]);

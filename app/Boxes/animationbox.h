@@ -42,13 +42,17 @@ public:
     void beforeAddingScheduler();
     bool shouldScheduleUpdate();
     int getAnimationFrameForRelFrame(const int &relFrame);
+
+    void enableFrameRemapping();
+    void disableFrameRemapping();
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
     stdptr<AnimationCacheHandler>mAnimationCacheHandler;
     qreal mFps = 24;
 
-    //IntAnimator mFrameAnimator;
+    bool mFrameRemappingEnabled = false;
+    qsptr<IntAnimator> mFrameAnimator;
 };
 
 #endif // ANIMATIONBOX_H
