@@ -38,7 +38,7 @@ struct qCubicSegment2D {
         mP0 = p; mC1 = p; mC2 = p; mP1 = p;
     }
 
-    qCubicSegment2D() {}
+    qCubicSegment2D() : qCubicSegment2D(QPointF(0, 0)) {}
 
     qCubicSegment2D(const qCubicSegment1D& xSeg,
                     const qCubicSegment1D& ySeg);
@@ -65,6 +65,7 @@ struct qCubicSegment2D {
     qCubicSegment1D ySeg() const;
 
     QPointF posAtT(const qreal& t) const;
+    QPointF posAtLength(const qreal &len);
     qreal tAtPos(const QPointF& pos);
 
     qreal length();
@@ -139,57 +140,29 @@ struct qCubicSegment2D {
 //    static QList<qrealPair> sIntersectionTs(_qCubicSegment2D& seg1,
 //                                            _qCubicSegment2D& seg2);
 
-    static void sForEverySegmentInPath(
-            const SkPath& path,
-            const std::function<void(const qCubicSegment2D&)>& func) {
-        QPointF lastMovePos;
-        QPointF lastPos;
-        SkPath::Iter iter(path, false);
-        for(;;) {
-            SkPoint pts[4];
-            switch(iter.next(pts, true, true)) {
-            case SkPath::kLine_Verb: {
-                QPointF pt1 = skPointToQ(pts[1]);
-                func(qCubicSegment2D(lastPos, lastPos, pt1, pt1));
-                lastPos = pt1;
-            } break;
-            case SkPath::kQuad_Verb: {
-                QPointF pt2 = skPointToQ(pts[2]);
-                func(qCubicSegment2D::fromQuad(lastPos, skPointToQ(pts[1]), pt2));
-                lastPos = pt2;
-            } break;
-            case SkPath::kConic_Verb: {
-                QPointF pt2 = skPointToQ(pts[2]);
-                func(qCubicSegment2D::fromConic(lastPos, skPointToQ(pts[1]), pt2,
-                                                skScalarToQ(iter.conicWeight())));
-                lastPos = pt2;
-            } break;
-            case SkPath::kCubic_Verb: {
-                QPointF pt3 = skPointToQ(pts[3]);
-                func(qCubicSegment2D(lastPos, skPointToQ(pts[1]),
-                                     skPointToQ(pts[2]), pt3));
-                lastPos = pt3;
-            } break;
-            case SkPath::kClose_Verb: {
-                if(!isZero2Dec(pointToLen(lastPos - lastMovePos))) {
-                    func({lastPos, lastPos, lastMovePos, lastMovePos});
-                    lastPos = lastMovePos;
-                }
-            } break;
-            case SkPath::kMove_Verb: {
-                lastMovePos = skPointToQ(pts[0]);
-                lastPos = lastMovePos;
-            } break;
-            case SkPath::kDone_Verb:
-                return;
-            }
-        }
-    }
-
     qCubicSegment2D tFragment(qreal minT, qreal maxT) const;
     qCubicSegment2D lenFragment(const qreal& minLen, const qreal& maxLen);
     qCubicSegment2D lenFracFragment(const qreal& minLenFrac,
                                     const qreal& maxLenFrac);
+
+    bool isLine() const {
+        const qreal arr1 = mP0.x()*(mC1.y() - mC2.y()) +
+                           mC1.x()*(mC2.y() - mP0.y()) +
+                           mC2.x()*(mP0.y() - mC1.y());
+        if(!isZero2Dec(arr1)) return false;
+        const qreal arr2 = mP1.x()*(mC1.y() - mC2.y()) +
+                           mC1.x()*(mC2.y() - mP1.y()) +
+                           mC2.x()*(mP1.y() - mC1.y());
+        if(!isZero2Dec(arr2)) return false;
+        return true;
+    }
+
+    bool isNull() const {
+        if(!isZero2Dec(pointToLen(mP0 - mP1))) return false;
+        if(!isZero2Dec(pointToLen(mP0 - mC1))) return false;
+        if(!isZero2Dec(pointToLen(mP0 - mC2))) return false;
+        return true;
+    }
 private:
     qreal tAtLength(const qreal& length, const qreal& maxLenErr,
                     const qreal& minT, const qreal& maxT);

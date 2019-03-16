@@ -96,6 +96,11 @@ extern void gSmoothyAbsCtrlsForPtBetween(
         const SkPoint &nextP, SkPoint &c1, SkPoint &c2,
         SkScalar smoothness);
 
+extern SkPath gPathToPolyline(const SkPath& path);
+extern void gForEverySegmentInPath(
+        const SkPath& path,
+        const std::function<void(const qCubicSegment2D&)>& func);
+
 extern void gForEverySegmentInPath(
         const SkPath& path,
         const std::function<void(const SkPath&)>& func);

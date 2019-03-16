@@ -1043,6 +1043,7 @@ void CanvasWindow::stopPreview() {
                                           mMaxRenderFrame},
                                          false);
     changeCurrentFrameAction(mSavedCurrentFrame);
+    mCurrentCanvas->setCurrentPreviewContainer(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
     stopAudio();
     requestUpdate();
@@ -1081,7 +1082,7 @@ void CanvasWindow::playPreview() {
                                            maxPreviewFrame,
                                            mCurrentCanvas->getFps());
     startAudio();
-    int mSecInterval = qRound(1000/mCurrentCanvas->getFps());
+    const int mSecInterval = qRound(1000/mCurrentCanvas->getFps());
     mPreviewFPSTimer->setInterval(mSecInterval);
     mPreviewFPSTimer->start();
     MainWindow::getInstance()->previewBeingPlayed();

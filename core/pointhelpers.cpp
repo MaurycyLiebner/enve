@@ -547,6 +547,107 @@ void gSmoothyAbsCtrlsForPtBetween(const SkPoint &lastP,
     smoothyAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothness);
 }
 
+SkPath gPathToPolyline(const SkPath& path) {
+    SkPath result;
+    QPointF lastMovePos;
+    QPointF lastPos;
+    SkPath::Iter iter(path, false);
+    for(;;) {
+        qCubicSegment2D seg;
+        SkPoint pts[4];
+        switch(iter.next(pts, true, true)) {
+        case SkPath::kLine_Verb: {
+            QPointF pt1 = skPointToQ(pts[1]);
+            result.lineTo(pts[1]);
+            lastPos = pt1;
+            continue;
+        }
+        case SkPath::kQuad_Verb: {
+            QPointF pt2 = skPointToQ(pts[2]);
+            seg = qCubicSegment2D::fromQuad(lastPos, skPointToQ(pts[1]), pt2);
+            lastPos = pt2;
+        } break;
+        case SkPath::kConic_Verb: {
+            QPointF pt2 = skPointToQ(pts[2]);
+            seg = qCubicSegment2D::fromConic(lastPos, skPointToQ(pts[1]), pt2,
+                                             skScalarToQ(iter.conicWeight()));
+            lastPos = pt2;
+        } break;
+        case SkPath::kCubic_Verb: {
+            QPointF pt3 = skPointToQ(pts[3]);
+            seg = qCubicSegment2D(lastPos, skPointToQ(pts[1]),
+                                  skPointToQ(pts[2]), pt3);
+            lastPos = pt3;
+        } break;
+        case SkPath::kClose_Verb: {
+            result.close();
+            continue;
+        }
+        case SkPath::kMove_Verb: {
+            result.moveTo(pts[0]);
+            lastMovePos = skPointToQ(pts[0]);
+            lastPos = lastMovePos;
+            continue;
+        }
+        case SkPath::kDone_Verb:
+            return result;
+        }
+        if(!seg.isLine()) {
+            for(qreal len = 10; len < seg.length(); len += 10) {
+                result.lineTo(qPointToSk(seg.posAtLength(len)));
+            }
+        }
+        result.lineTo(qPointToSk(seg.p1()));
+    }
+}
+
+void gForEverySegmentInPath(
+        const SkPath& path,
+        const std::function<void(const qCubicSegment2D&)>& func) {
+    QPointF lastMovePos;
+    QPointF lastPos;
+    SkPath::Iter iter(path, false);
+    for(;;) {
+        SkPoint pts[4];
+        switch(iter.next(pts, true, true)) {
+        case SkPath::kLine_Verb: {
+            QPointF pt1 = skPointToQ(pts[1]);
+            func(qCubicSegment2D(lastPos, lastPos, pt1, pt1));
+            lastPos = pt1;
+        } break;
+        case SkPath::kQuad_Verb: {
+            QPointF pt2 = skPointToQ(pts[2]);
+            func(qCubicSegment2D::fromQuad(lastPos, skPointToQ(pts[1]), pt2));
+            lastPos = pt2;
+        } break;
+        case SkPath::kConic_Verb: {
+            QPointF pt2 = skPointToQ(pts[2]);
+            func(qCubicSegment2D::fromConic(lastPos, skPointToQ(pts[1]), pt2,
+                                            skScalarToQ(iter.conicWeight())));
+            lastPos = pt2;
+        } break;
+        case SkPath::kCubic_Verb: {
+            QPointF pt3 = skPointToQ(pts[3]);
+            func(qCubicSegment2D(lastPos, skPointToQ(pts[1]),
+                                 skPointToQ(pts[2]), pt3));
+            lastPos = pt3;
+        } break;
+        case SkPath::kClose_Verb: {
+            if(!isZero2Dec(pointToLen(lastPos - lastMovePos))) {
+                func({lastPos, lastPos, lastMovePos, lastMovePos});
+                lastPos = lastMovePos;
+            }
+        } break;
+        case SkPath::kMove_Verb: {
+            lastMovePos = skPointToQ(pts[0]);
+            lastPos = lastMovePos;
+        } break;
+        case SkPath::kDone_Verb:
+            return;
+        }
+    }
+}
+
 void gForEverySegmentInPath(
         const SkPath& path,
         const std::function<void(const SkPath&)>& func) {

@@ -105,6 +105,7 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     SkFont font;
     font.setTypeface(SkTypeface::MakeFromName(mFont.family().toStdString().c_str(),
                                               SkFontStyle::Normal()));
+    font.setSize(qrealToSkScalar(mFont.pointSizeF()));
     SkPath result;
     SkTextUtils::GetPath(textAtFrame.toStdString().c_str(),
                          static_cast<size_t>(textAtFrame.length()),

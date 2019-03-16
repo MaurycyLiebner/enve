@@ -19,6 +19,10 @@ qCubicSegment1D qCubicSegment2D::ySeg() const {
     return qCubicSegment1D(mP0.y(), mC1.y(), mC2.y(), mP1.y());
 }
 
+QPointF qCubicSegment2D::posAtLength(const qreal& len) {
+    return posAtT(tAtLength(len));
+}
+
 QPointF qCubicSegment2D::posAtT(const qreal &t) const {
     return qPow(1 - t, 3)*p0() +
             3*qPow(1 - t, 2)*t*c1() +
