@@ -554,8 +554,8 @@ qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
 void loadVectorPath(const QDomElement &pathElement,
                     BoxesGroup *parentGroup,
                     VectorPathSvgAttributes *attributes) {
-    auto vectorPath = SPtrCreate(VectorPath)();
-    QString pathStr = pathElement.attribute("d");
+    const auto vectorPath = SPtrCreate(VectorPath)();
+    const QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
     attributes->apply(vectorPath.get());
     parentGroup->addContainedBox(vectorPath);
@@ -1994,9 +1994,8 @@ void FillSvgAttributes::apply(BoundingBox * const box,
         ColorPaintSetting(target, colorSetting).apply(pathBox);
     } else if(mPaintType == GRADIENTPAINT) {
         GradientPaintSetting(target, mGradient).apply(pathBox);
-    } else {
-        PaintTypePaintSetting(target, NOPAINT).apply(pathBox);
     }
+    PaintTypePaintSetting(target, mPaintType).apply(pathBox);
 }
 
 StrokeSvgAttributes::StrokeSvgAttributes() {}
@@ -2057,30 +2056,28 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
 void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
     box->getTransformAnimator()->setOpacity(mOpacity);
     if(box->SWT_isPathBox()) {
-        PathBox* path = GetAsPtr(box, PathBox);
-        qreal m11 = mRelTransform.m11();
-        qreal m12 = mRelTransform.m12();
-        qreal m21 = mRelTransform.m21();
-        qreal m22 = mRelTransform.m22();
+        const auto path = GetAsPtr(box, PathBox);
+        const qreal m11 = mRelTransform.m11();
+        const qreal m12 = mRelTransform.m12();
+        const qreal m21 = mRelTransform.m21();
+        const qreal m22 = mRelTransform.m22();
 
-        qreal sxAbs = qSqrt(m11*m11 + m21*m21);
-        qreal syAbs = qSqrt(m12*m12 + m22*m22);
-        mStrokeAttributes.apply(path,
-                                (sxAbs + syAbs)*0.5);
+        const qreal sxAbs = qSqrt(m11*m11 + m21*m21);
+        const qreal syAbs = qSqrt(m12*m12 + m22*m22);
+        mStrokeAttributes.apply(path, (sxAbs + syAbs)*0.5);
         mFillAttributes.apply(path);
         if(box->SWT_isTextBox()) {
-            TextBox* text = GetAsPtr(box, TextBox);
+            const auto text = GetAsPtr(box, TextBox);
             text->setFont(mTextAttributes.getFont());
         }
     }
 }
 
 void VectorPathSvgAttributes::apply(VectorPath *path) {
-    PathAnimator* pathAnimator = path->getPathAnimator();
+    PathAnimator* const pathAnimator = path->getPathAnimator();
     for(const auto& separatePath : mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
-        qsptr<VectorPathAnimator> singlePath =
-                SPtrCreate(VectorPathAnimator)(pathAnimator);
+        const auto singlePath = SPtrCreate(VectorPathAnimator)(pathAnimator);
         separatePath->apply(singlePath.get());
         pathAnimator->addSinglePathAnimator(singlePath);
     }
