@@ -184,6 +184,13 @@ public:
     qsptr<BoundingBox> createLink();
     void readChildBoxes(QIODevice *target);
 
+    bool differenceInPathEffectsBetweenFrames(const int &relFrame1,
+                                              const int &relFrame2) const;
+    bool differenceInFillPathEffectsBetweenFrames(const int &relFrame1,
+                                                  const int &relFrame2) const;
+    bool differenceInOutlinePathEffectsBetweenFrames(const int &relFrame1,
+                                                     const int &relFrame2) const;
+
     void addPathEffect(const qsptr<PathEffect>& effect);
     void addFillPathEffect(const qsptr<PathEffect>& effect);
     void addOutlinePathEffect(const qsptr<PathEffect>& effect);
@@ -194,16 +201,16 @@ public:
     void updateAllChildPathBoxes(const UpdateReason &reason);
 
     void filterPathForRelFrame(const qreal &relFrame,
-                               SkPath *srcDstPath,
-                               BoundingBox *box);
+                               SkPath * const srcDstPath,
+                               BoundingBox * const box);
     void filterPathForRelFrameUntilGroupSum(const qreal &relFrame,
-                                            SkPath *srcDstPath);
+                                            SkPath * const srcDstPath);
     void filterOutlinePathBeforeThicknessForRelFrame(const qreal &relFrame,
-                                                     SkPath *srcDstPath);
+                                                     SkPath * const srcDstPath);
     void filterOutlinePathForRelFrame(const qreal &relFrame,
-                                      SkPath *srcDstPath);
+                                      SkPath * const srcDstPath);
     void filterFillPathForRelFrame(const qreal &relFrame,
-                                   SkPath *srcDstPath);
+                                   SkPath * const srcDstPath);
 //    bool anim_nextRelFrameWithKey(const int &relFrame,
 //                                 int &nextRelFrame);
 //    bool anim_prevRelFrameWithKey(const int &relFrame,
@@ -225,7 +232,7 @@ protected:
     //QList<qsptr<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getContainedBoxIndex(BoundingBox *child);
     void iniPathEffects();
-    bool isLastPathBox(PathBox *pathBox);
+    bool isLastPathBox(PathBox * const pathBox);
 signals:
     void setParentAsCurrentGroup();
     void changeChildZSignal(int, int);

@@ -92,6 +92,25 @@ void BoxesGroup::iniPathEffects() {
     mOutlinePathEffectsAnimators->SWT_hide();
 }
 
+bool BoxesGroup::differenceInFillPathEffectsBetweenFrames(const int& relFrame1,
+                                                          const int& relFrame2) const {
+    return mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
+                                                                      relFrame2);
+}
+
+
+bool BoxesGroup::differenceInOutlinePathEffectsBetweenFrames(const int& relFrame1,
+                                                             const int& relFrame2) const {
+    return mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
+                                                                         relFrame2);
+}
+
+bool BoxesGroup::differenceInPathEffectsBetweenFrames(const int& relFrame1,
+                                                      const int& relFrame2) const {
+    return mPathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
+                                                                  relFrame2);
+}
+
 void BoxesGroup::addPathEffect(const qsptr<PathEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
 
@@ -186,6 +205,7 @@ void BoxesGroup::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
 void BoxesGroup::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
     for(const auto& box : mContainedBoxes) {
         if(box->SWT_isPathBox()) {
+            GetAsPtr(box, PathBox)->setPathsOutdated();
             box->scheduleUpdate(reason);
         } else if(box->SWT_isBoxesGroup()) {
             GetAsPtr(box, BoxesGroup)->updateAllChildPathBoxes(reason);
@@ -194,11 +214,12 @@ void BoxesGroup::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
 }
 
 void BoxesGroup::filterPathForRelFrame(const qreal &relFrame,
-                                       SkPath *srcDstPath,
-                                       BoundingBox *box) {
+                                       SkPath * const srcDstPath,
+                                       BoundingBox * const box) {
     if(mParentGroup) {
-        qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-                    prp_relFrameToAbsFrameF(relFrame));
+        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        const qreal parentRelFrame =
+                mParentGroup->prp_absFrameToRelFrameF(absFrame);
         mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
     }
     mPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath,
@@ -211,30 +232,32 @@ void BoxesGroup::filterPathForRelFrame(const qreal &relFrame,
 }
 
 void BoxesGroup::filterPathForRelFrameUntilGroupSum(const qreal &relFrame,
-                                                    SkPath *srcDstPath) {
+                                                    SkPath * const srcDstPath) {
     mPathEffectsAnimators->filterPathForRelFrameUntilGroupSumF(relFrame,
                                                               srcDstPath);
 
     if(!mParentGroup) return;
-    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-                prp_relFrameToAbsFrameF(relFrame));
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+    const qreal parentRelFrame =
+            mParentGroup->prp_absFrameToRelFrameF(absFrame);
     mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, srcDstPath);
 }
 
 void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
-        const qreal &relFrame, SkPath *srcDstPath) {
+        const qreal &relFrame, SkPath * const srcDstPath) {
     mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThicknessF(relFrame,
                                                                        srcDstPath);
     if(!mParentGroup) return;
-    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-                prp_relFrameToAbsFrameF(relFrame));
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+    const qreal parentRelFrame =
+            mParentGroup->prp_absFrameToRelFrameF(absFrame);
     mParentGroup->filterOutlinePathBeforeThicknessForRelFrame(parentRelFrame,
                                                               srcDstPath);
 }
 
-bool BoxesGroup::isLastPathBox(PathBox *pathBox) {
+bool BoxesGroup::isLastPathBox(PathBox * const pathBox) {
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
-        BoundingBox *childAtI = mContainedBoxes.at(i).data();
+        const auto childAtI = mContainedBoxes.at(i).data();
         if(childAtI == pathBox) return true;
         if(childAtI->SWT_isPathBox()) return false;
     }
@@ -242,7 +265,7 @@ bool BoxesGroup::isLastPathBox(PathBox *pathBox) {
 }
 
 void BoxesGroup::filterOutlinePathForRelFrame(const qreal &relFrame,
-                                              SkPath *srcDstPath) {
+                                              SkPath * const srcDstPath) {
     mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
     if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
@@ -251,7 +274,7 @@ void BoxesGroup::filterOutlinePathForRelFrame(const qreal &relFrame,
 }
 
 void BoxesGroup::filterFillPathForRelFrame(const qreal &relFrame,
-                                           SkPath *srcDstPath) {
+                                           SkPath * const srcDstPath) {
     mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
     if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
@@ -817,7 +840,7 @@ void BoxesGroup::removeContainedBoxFromList(const int &id) {
     box->setParentGroup(nullptr);
 
     for(const auto& box : mLinkingBoxes) {
-        auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
+        const auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
         internalLinkGroup->removeContainedBoxFromList(id);
     }
 }
@@ -949,8 +972,8 @@ void BoxesGroupRenderData::renderToImage() {
         fGlobalBoundingRect = fGlobalBoundingRect.intersected(
                     scale.mapRect(fMaxBoundsRect));
     }
-    QSizeF sizeF = fGlobalBoundingRect.size();
-    QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
+    const QSizeF sizeF = fGlobalBoundingRect.size();
+    const QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
             QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
                     qRound(fGlobalBoundingRect.top()/**resolution*/));
     fGlobalBoundingRect.translate(-transF);

@@ -87,6 +87,11 @@ void PathBox::drawSelectedSk(SkCanvas *canvas,
     }
 }
 
+void PathBox::setParentGroup(BoxesGroup *parent) {
+    setPathsOutdated();
+    BoundingBox::setParentGroup(parent);
+}
+
 void PathBox::setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
                             BoundingBoxRenderData* data) {
@@ -535,17 +540,38 @@ void PathBox::copyPathBoxDataTo(PathBox *targetBox) {
 }
 
 bool PathBox::differenceInPathBetweenFrames(const int &frame1, const int &frame2) const {
-    return mPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2);
+    if(mPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
+        return true;
+    if(!mParentGroup) return false;
+    const int absFrame1 = prp_relFrameToAbsFrame(frame1);
+    const int absFrame2 = prp_relFrameToAbsFrame(frame2);
+    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
+    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+    return mParentGroup->differenceInPathEffectsBetweenFrames(pFrame1, pFrame2);
 }
 
 bool PathBox::differenceInOutlinePathBetweenFrames(const int &frame1, const int &frame2) const {
     if(mStrokeSettings->getLineWidthAnimator()->
        prp_differencesBetweenRelFrames(frame1, frame2)) return true;
-    return mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2);
+    if(mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
+        return true;
+    if(!mParentGroup) return false;
+    const int absFrame1 = prp_relFrameToAbsFrame(frame1);
+    const int absFrame2 = prp_relFrameToAbsFrame(frame2);
+    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
+    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+    return mParentGroup->differenceInOutlinePathEffectsBetweenFrames(pFrame1, pFrame2);
 }
 
 bool PathBox::differenceInFillPathBetweenFrames(const int &frame1, const int &frame2) const {
-    return mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2);
+    if(mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
+        return true;
+    if(!mParentGroup) return false;
+    const int absFrame1 = prp_relFrameToAbsFrame(frame1);
+    const int absFrame2 = prp_relFrameToAbsFrame(frame2);
+    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
+    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+    return mParentGroup->differenceInFillPathEffectsBetweenFrames(pFrame1, pFrame2);
 }
 
 #include "circle.h"

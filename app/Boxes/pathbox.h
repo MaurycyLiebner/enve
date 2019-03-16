@@ -115,6 +115,8 @@ public:
     virtual bool differenceInEditPathBetweenFrames(
             const int& frame1, const int& frame2) const = 0;
     virtual SkPath getPathAtRelFrameF(const qreal &relFrame) = 0;
+    void setParentGroup(BoxesGroup *parent);
+
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     void drawSelectedSk(SkCanvas *canvas,
