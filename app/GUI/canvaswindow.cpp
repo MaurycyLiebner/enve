@@ -284,7 +284,7 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     if(hasNoCanvas()) return;
-    CanvasSettingsDialog *dialog =
+    const auto dialog =
             new CanvasSettingsDialog(mCurrentCanvas.data(),
                                      MainWindow::getInstance());
     connect(dialog, &QDialog::accepted, this, [dialog, this]() {

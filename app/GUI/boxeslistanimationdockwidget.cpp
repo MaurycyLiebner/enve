@@ -479,4 +479,6 @@ void BoxesListAnimationDockWidget::setCanvasFrameRange(
     mFrameRangeScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
     setViewedFrameRange(mFrameRangeScrollbar->getFirstViewedFrame(),
                         mFrameRangeScrollbar->getLastViewedFrame());
+    mFrameRangeScrollbar->setCanvasFrameRange(minFrame, maxFrame);
+    mAnimationWidgetScrollbar->setCanvasFrameRange(minFrame, maxFrame);
 }

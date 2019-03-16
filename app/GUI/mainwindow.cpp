@@ -474,7 +474,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
         mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(nullptr);
         return;
     }
-    Canvas* canvas = mCanvasWindow->getCurrentCanvas();
+    const auto canvas = mCanvasWindow->getCurrentCanvas();
     mClipViewToCanvas->setChecked(canvas->clipToCanvas());
     mRasterEffectsVisible->setChecked(canvas->getRasterEffectsVisible());
     mPathEffectsVisible->setChecked(canvas->getPathEffectsVisible());
@@ -738,13 +738,12 @@ void MainWindow::createNewCanvas() {
     qsptr<Canvas> newCanvas =
             SPtrCreate(Canvas)(mCanvasWindow, 1920, 1080, 200);
     newCanvas->setName(defName);
-    CanvasSettingsDialog *dialog =
+    const auto dialog =
             new CanvasSettingsDialog(newCanvas.get(), this);
 
     int dialogRet = dialog->exec();
     if(dialogRet == QDialog::Accepted) {
         dialog->applySettingsToCanvas(newCanvas.get());
-
         addCanvas(newCanvas);
     }
     delete dialog;
