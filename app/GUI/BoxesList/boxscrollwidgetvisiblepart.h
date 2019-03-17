@@ -26,14 +26,12 @@ public:
                           const qreal &pixelsPerFrame,
                           const int &minViewedFrame);
     void getKeysInRect(QRectF selectionRect,
-                       qreal pixelsPerFrame,
+                       const qreal &pixelsPerFrame,
                        QList<Key *> &listKeys);
 
     BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
             const SWT_TargetTypes &type, const int &yPos, bool *isBelow);
     void updateDraggingHighlight();
-    BoxSingleWidget *getClosestsSingleWidgetWithTargetTypeLookBelow(
-            const SWT_TargetTypes &type, const int &yPos, bool *isBelow);
     void stopScrolling();
     DurationRectangleMovable *getRectangleMovableAtPos(
                                         const int &pressX,
@@ -47,6 +45,9 @@ public:
     void setKeysView(KeysView *keysView) {
         mKeysView = keysView;
     }
+    BoxSingleWidget *getBSWAtPos(const int &yPos) const;
+    int getIdAtPos(const int &yPos) const;
+    BoxSingleWidget *getLastVisibleBSW() const;
 protected:
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *event);
@@ -55,7 +56,7 @@ protected:
 
     bool mDragging = false;
 
-    int mCurrentDragPosId = 0;
+    QLine mCurrentDragLine;
     int mLastDragMoveY;
 
     SWT_TargetTypes mLastDragMoveTargetTypes;

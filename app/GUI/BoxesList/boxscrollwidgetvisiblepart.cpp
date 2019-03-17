@@ -30,19 +30,17 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
 
 //    p.fillRect(rect(), Qt::red);
     int currY = MIN_WIDGET_HEIGHT;
-    p.setPen(QPen(QColor(40, 40, 40), 1.));
+    p.setPen(QPen(QColor(40, 40, 40), 1));
     auto parentWidgetT = static_cast<BoxScrollWidget*>(mParentWidget);
     int parentContHeight = parentWidgetT->getContentHeight();
     while(currY < parentContHeight) {
         p.drawLine(0, currY, width(), currY);
-
         currY += MIN_WIDGET_HEIGHT;
     }
 
     if(mDragging) {
-        p.setPen(QPen(Qt::white, 3.));
-        p.drawLine(0, mCurrentDragPosId*MIN_WIDGET_HEIGHT,
-                   width(), mCurrentDragPosId*MIN_WIDGET_HEIGHT);
+        p.setPen(QPen(Qt::white, 3));
+        p.drawLine(mCurrentDragLine);
     }
 
     p.end();
@@ -52,13 +50,12 @@ void BoxScrollWidgetVisiblePart::drawKeys(QPainter *p,
                                           const qreal &pixelsPerFrame,
                                           const int &minViewedFrame,
                                           const int &maxViewedFrame) {
-    //p->setPen(QPen(Qt::black, 1.));
+    //p->setPen(QPen(Qt::black, 1));
     p->setPen(Qt::NoPen);
-    for(QWidget *container : mSingleWidgets) {
-        static_cast<BoxSingleWidget*>(container)->drawKeys(
-                            p, pixelsPerFrame,
-                            container->y(),
-                            minViewedFrame, maxViewedFrame);
+    for(const auto& container : mSingleWidgets) {
+        const auto bsw = static_cast<BoxSingleWidget*>(container);
+        bsw->drawKeys(p, pixelsPerFrame, container->y(),
+                      minViewedFrame, maxViewedFrame);
     }
 }
 
@@ -66,16 +63,15 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
         const int &pressX, const int &pressY,
         const qreal &pixelsPerFrame,
         const int &minViewedFrame) {
-    int remaining = pressY % MIN_WIDGET_HEIGHT;
+    const int remaining = pressY % MIN_WIDGET_HEIGHT;
     if(remaining < (MIN_WIDGET_HEIGHT - KEY_RECT_SIZE)/2 ||
        remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return nullptr;
-    for(QWidget *container : mSingleWidgets) {
-        int containerTop = container->y();
-        int containerBottom = containerTop + container->height();
+    for(const auto& container : mSingleWidgets) {
+        const int containerTop = container->y();
+        const int containerBottom = containerTop + container->height();
         if(containerTop > pressY || containerBottom < pressY) continue;
-        return static_cast<BoxSingleWidget*>(container)->
-                getKeyAtPos(pressX, pixelsPerFrame,
-                            minViewedFrame);
+        const auto bsw = static_cast<BoxSingleWidget*>(container);
+        return bsw->getKeyAtPos(pressX, pixelsPerFrame, minViewedFrame);
     }
     return nullptr;
 }
@@ -85,80 +81,57 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
         const int &pressY,
         const qreal &pixelsPerFrame,
         const int &minViewedFrame) {
-    for(QWidget *container : mSingleWidgets) {
-        int containerTop = container->y();
-        int containerBottom = containerTop + container->height();
+    for(const auto& container : mSingleWidgets) {
+        const int containerTop = container->y();
+        const int containerBottom = containerTop + container->height();
         if(containerTop > pressY || containerBottom < pressY) continue;
-        return static_cast<BoxSingleWidget*>(container)->
-                getRectangleMovableAtPos(pressX, pixelsPerFrame,
-                                         minViewedFrame);
+        const auto bsw = static_cast<BoxSingleWidget*>(container);
+        return bsw->getRectangleMovableAtPos(pressX, pixelsPerFrame,
+                                             minViewedFrame);
     }
     return nullptr;
 }
 
-void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
-        qreal pixelsPerFrame,
+void BoxScrollWidgetVisiblePart::getKeysInRect(
+        QRectF selectionRect,
+        const qreal& pixelsPerFrame,
         QList<Key *>& listKeys) {
     QList<SingleWidgetAbstraction*> abstractions;
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
-    selectionRect.adjust(0.5, 0., 0.5, 0.);
+    selectionRect.adjust(0.5, 0, 0.5, 0);
+    const int minX = qRound(selectionRect.top() - MIN_WIDGET_HEIGHT*0.5);
+    const int minY = qRound(selectionRect.bottom() - MIN_WIDGET_HEIGHT*0.5);
     int currY = 0;
-    int minX = qRound(selectionRect.top() - MIN_WIDGET_HEIGHT*0.5);
-    int minY = qRound(selectionRect.bottom() - MIN_WIDGET_HEIGHT*0.5);
-
     mMainAbstraction->getAbstractions(
             minX, minY, currY, 0, MIN_WIDGET_HEIGHT,
             abstractions, mCurrentRulesCollection, true, false);
 
-    for(SingleWidgetAbstraction *abs : abstractions) {
-        SingleWidgetTarget *target = abs->getTarget();
+    for(const auto& abs : abstractions) {
+        const auto target = abs->getTarget();
         if(target->SWT_isAnimator()) {
-            Animator *anim_target = GetAsPtr(target, Animator);
+            const auto anim_target = GetAsPtr(target, Animator);
             anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
-                                           listKeys, KEY_RECT_SIZE);
+                                            listKeys, KEY_RECT_SIZE);
         }
     }
-//    for(SingleWidget *container : mSingleWidgets) {
-//        int containerTop = container->y();
-//        int containerBottom = containerTop + container->height();
-//        if(containerTop > selectionRect.bottom() ||
-//           containerBottom < selectionRect.top()) continue;
-//        ((BoxSingleWidget*)container)->
-//                getKeysInRect(selectionRect,
-//                              pixelsPerFrame,
-//                              listKeys);
-//    }
 }
 
-BoxSingleWidget *BoxScrollWidgetVisiblePart::
-            getClosestsSingleWidgetWithTargetTypeLookBelow(
-                const SWT_TargetTypes &type,
-                const int &yPos,
-                bool *isBelow) {
-    int idAtYPos = yPos / MIN_WIDGET_HEIGHT;
-    int targetId = (yPos + MIN_WIDGET_HEIGHT/2) /
-                    MIN_WIDGET_HEIGHT;
-    if(idAtYPos < mSingleWidgets.count() &&
-       idAtYPos >= 0) {
-        auto singleWidgetUnderMouse = static_cast<BoxSingleWidget*>(
-                mSingleWidgets.at(idAtYPos));
-        while(singleWidgetUnderMouse->isHidden()) {
-            idAtYPos++;
-            if(idAtYPos >= mSingleWidgets.count()) return nullptr;
-            singleWidgetUnderMouse = static_cast<BoxSingleWidget*>(
-                    mSingleWidgets.at(idAtYPos));
-        }
-        auto targetAbs = singleWidgetUnderMouse->getTargetAbstraction();
-        while(!type.isTargeted(targetAbs->getTarget()) ) {
-            idAtYPos++;
-            if(idAtYPos >= mSingleWidgets.count()) return nullptr;
-            singleWidgetUnderMouse = static_cast<BoxSingleWidget*>(
-                    mSingleWidgets.at(idAtYPos));
-            targetAbs = singleWidgetUnderMouse->getTargetAbstraction();
-        }
-        *isBelow = targetId > idAtYPos;
-        return singleWidgetUnderMouse;
+int BoxScrollWidgetVisiblePart::getIdAtPos(const int& yPos) const {
+    return yPos / MIN_WIDGET_HEIGHT;
+}
+
+BoxSingleWidget * BoxScrollWidgetVisiblePart::getBSWAtPos(const int& yPos) const {
+    const int idAtYPos = getIdAtPos(yPos);
+    if(idAtYPos < 0) return nullptr;
+    if(idAtYPos >= mSingleWidgets.count()) return nullptr;
+    return static_cast<BoxSingleWidget*>(mSingleWidgets.at(idAtYPos));
+}
+
+BoxSingleWidget * BoxScrollWidgetVisiblePart::getLastVisibleBSW() const {
+    for(int i = mSingleWidgets.count() - 1; i >= 0; i--) {
+        const auto bsw = mSingleWidgets.at(i);
+        if(bsw->isVisible()) return static_cast<BoxSingleWidget*>(bsw);
     }
     return nullptr;
 }
@@ -168,36 +141,36 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                 const SWT_TargetTypes &types,
                 const int &yPos,
                 bool *isBelow) {
-    int idAtYPos = yPos / MIN_WIDGET_HEIGHT;
-    int targetId = (yPos + MIN_WIDGET_HEIGHT/2)/
-                    MIN_WIDGET_HEIGHT;
-    if(idAtYPos < mSingleWidgets.count() &&
-       idAtYPos >= 0) {
-        BoxSingleWidget *singleWidgetUnderMouse =
-                static_cast<BoxSingleWidget*>(
-                mSingleWidgets.at(idAtYPos));
-        while(singleWidgetUnderMouse->isHidden()) {
-            idAtYPos--;
-            if(idAtYPos < 0) {
-                return getClosestsSingleWidgetWithTargetTypeLookBelow(
-                            types, yPos, isBelow);
-            }
-            singleWidgetUnderMouse = static_cast<BoxSingleWidget*>(
-                    mSingleWidgets.at(idAtYPos));
+    auto singleWidgetUnderMouse = getBSWAtPos(yPos);
+    if(singleWidgetUnderMouse ? singleWidgetUnderMouse->isVisible() : false) {
+        const auto target = singleWidgetUnderMouse->getTarget();
+        if(types.isTargeted(target)) {
+            *isBelow = 2*(yPos % MIN_WIDGET_HEIGHT) > MIN_WIDGET_HEIGHT;
+            return singleWidgetUnderMouse;
         }
-        while(!types.isTargeted(singleWidgetUnderMouse->getTargetAbstraction()->
-                                getTarget())) {
-            idAtYPos--;
-            if(idAtYPos < 0) {
-                return getClosestsSingleWidgetWithTargetTypeLookBelow(
-                            types, yPos, isBelow);
-            }
-            singleWidgetUnderMouse = static_cast<BoxSingleWidget*>(
-                    mSingleWidgets.at(idAtYPos));
-        }
-        *isBelow = targetId > idAtYPos;
-        return singleWidgetUnderMouse;
     }
+    const int idAtPos = getIdAtPos(yPos);
+    for(int i = idAtPos - 1; i >= 0; i--) {
+        const auto swAbove = static_cast<BoxSingleWidget*>(
+                mSingleWidgets.at(i));
+        if(swAbove->isHidden()) continue;
+        const auto target = swAbove->getTarget();
+        if(types.isTargeted(target)) {
+            *isBelow = true;
+            return swAbove;
+        }
+    }
+    for(int i = idAtPos + 1; i < mSingleWidgets.count(); i++) {
+        const auto swBelow = static_cast<BoxSingleWidget*>(
+                mSingleWidgets.at(i));
+        if(swBelow->isHidden()) break;
+        const auto target = swBelow->getTarget();
+        if(types.isTargeted(target)) {
+            *isBelow = false;
+            return swBelow;
+        }
+    }
+
     return nullptr;
 }
 
@@ -412,7 +385,7 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(QDragMoveEvent *event) {
 void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
     mDragging = false;
     bool below;
-    BoxSingleWidget *singleWidgetUnderMouse =
+    const auto singleWidgetUnderMouse =
             getClosestsSingleWidgetWithTargetType(mLastDragMoveTargetTypes,
                                                   mLastDragMoveY,
                                                   &below);
@@ -420,14 +393,18 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
         int currentDragPosId = singleWidgetUnderMouse->y()/MIN_WIDGET_HEIGHT;
         if(below) {
             //currentDragPosId++;
-            auto targetUnderMouse =
+            const auto targetUnderMouse =
                     singleWidgetUnderMouse->getTargetAbstraction();
             currentDragPosId += targetUnderMouse->getHeight(
                         getCurrentRulesCollection(), true, false,
                         MIN_WIDGET_HEIGHT)/MIN_WIDGET_HEIGHT;
         }
         mDragging = true;
-        mCurrentDragPosId = currentDragPosId;
+
+        mCurrentDragLine = QLine(singleWidgetUnderMouse->x(),
+                                 currentDragPosId*MIN_WIDGET_HEIGHT,
+                                 width(),
+                                 currentDragPosId*MIN_WIDGET_HEIGHT);
     }
     update();
 }

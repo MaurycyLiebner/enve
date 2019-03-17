@@ -33,7 +33,7 @@ void MinimalScrollWidgetVisiblePart::setVisibleHeight(const int &height) {
 }
 
 void MinimalScrollWidgetVisiblePart::updateWidgetsWidth() {
-    for(QWidget *widget : mSingleWidgets) {
+    for(const auto& widget : mSingleWidgets) {
         widget->setFixedWidth(width() - widget->x());
     }
 }
@@ -107,7 +107,7 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
     }
 
     int yT = 0;
-    for(QWidget *widget : mSingleWidgets) {
+    for(const auto& widget : mSingleWidgets) {
         widget->move(widget->x(), yT);
         widget->setFixedWidth(width() - widget->x());
         yT += MIN_WIDGET_HEIGHT;

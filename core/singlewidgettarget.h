@@ -215,7 +215,8 @@ protected:
 };
 
 struct SWT_TargetTypes {
-    bool isTargeted(SingleWidgetTarget *target) const {
+    bool isTargeted(SingleWidgetTarget * const target) const {
+        if(!target) return false;
         for(SWT_Checker func : targetsFunctionList) {
             if((target->*func)()) return true;
         }

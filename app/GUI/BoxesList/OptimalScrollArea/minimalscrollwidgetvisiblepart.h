@@ -4,8 +4,7 @@ class MinimalScrollWidget;
 class SingleWidget;
 #include <QWidget>
 
-class MinimalScrollWidgetVisiblePart :
-        public QWidget {
+class MinimalScrollWidgetVisiblePart : public QWidget {
     Q_OBJECT
 public:
     MinimalScrollWidgetVisiblePart(MinimalScrollWidget *parent = nullptr);

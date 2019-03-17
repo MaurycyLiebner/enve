@@ -4,6 +4,7 @@
 #include <QWidget>
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
+class SingleWidgetTarget;
 
 class SingleWidget : public QWidget {
     Q_OBJECT
@@ -13,7 +14,7 @@ public:
     SingleWidgetAbstraction *getTargetAbstraction() {
         return mTarget;
     }
-
+    SingleWidgetTarget *getTarget() const;
 protected:
     SingleWidgetAbstraction *mTarget;
     ScrollWidgetVisiblePart *mParent;
