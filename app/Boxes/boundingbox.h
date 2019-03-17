@@ -280,8 +280,7 @@ public:
 
     QMimeData *SWT_createMimeData();
 
-    bool isAncestor(BoxesGroup *box) const;
-    bool isAncestor(BoundingBox *box) const;
+    bool isAncestor(const BoundingBox * const box) const;
     void removeFromParent_k();
     void removeFromSelection();
     virtual void moveByAbs(const QPointF &trans);

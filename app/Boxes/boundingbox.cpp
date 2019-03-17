@@ -152,16 +152,10 @@ void BoundingBox::setStrokeColorMode(const ColorMode &colorMode) {
     Q_UNUSED(colorMode);
 }
 
-bool BoundingBox::isAncestor(BoxesGroup *box) const {
-    if(mParentGroup == box) return true;
+bool BoundingBox::isAncestor(const BoundingBox * const box) const {
     if(!mParentGroup) return false;
-    return mParentGroup->isAncestor(box);
-}
-
-bool BoundingBox::isAncestor(BoundingBox *box) const {
-    if(box->SWT_isBoxesGroup()) {
-        return isAncestor(box);
-    }
+    if(mParentGroup == box) return true;
+    if(box->SWT_isBoxesGroup()) return mParentGroup->isAncestor(box);
     return false;
 }
 

@@ -141,8 +141,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                     MIN_WIDGET_HEIGHT;
     if(idAtYPos < mSingleWidgets.count() &&
        idAtYPos >= 0) {
-        BoxSingleWidget *singleWidgetUnderMouse =
-                static_cast<BoxSingleWidget*>(
+        auto singleWidgetUnderMouse = static_cast<BoxSingleWidget*>(
                 mSingleWidgets.at(idAtYPos));
         while(singleWidgetUnderMouse->isHidden()) {
             idAtYPos++;
@@ -150,8 +149,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
             singleWidgetUnderMouse = static_cast<BoxSingleWidget*>(
                     mSingleWidgets.at(idAtYPos));
         }
-        SingleWidgetAbstraction *targetAbs =
-                singleWidgetUnderMouse->getTargetAbstraction();
+        auto targetAbs = singleWidgetUnderMouse->getTargetAbstraction();
         while(!type.isTargeted(targetAbs->getTarget()) ) {
             idAtYPos++;
             if(idAtYPos >= mSingleWidgets.count()) return nullptr;
@@ -215,29 +213,25 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
     stopScrolling();
     mDragging = false;
     if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
-        int yPos = event->pos().y();
+        const int yPos = event->pos().y();
         bool below;
 
         SWT_TargetTypes type;
         type.targetsFunctionList =
                 QList<SWT_Checker>({&SingleWidgetTarget::SWT_isBoundingBox});
-        BoxSingleWidget *singleWidgetUnderMouse =
+        const auto singleWidgetUnderMouse =
                 getClosestsSingleWidgetWithTargetType(
-                    type,
-                    yPos,
-                    &below);
+                    type, yPos, &below);
         if(!singleWidgetUnderMouse) return;
 
         auto bbMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
-        BoundingBox* box = bbMimeData->getTarget();
-        BoundingBox *boxUnderMouse = GetAsPtr(singleWidgetUnderMouse->
+        const auto box = bbMimeData->getTarget();
+        const auto boxUnderMouse = GetAsPtr(singleWidgetUnderMouse->
                  getTargetAbstraction()->getTarget(), BoundingBox);
-
-        BoxesGroup *parentGroup = boxUnderMouse->getParentGroup();
-        if(parentGroup == nullptr ||
-           boxUnderMouse->isAncestor(box)) return;
+        const auto parentGroup = boxUnderMouse->getParentGroup();
+        if(!parentGroup || boxUnderMouse->isAncestor(box)) return;
         if(parentGroup != box->getParentGroup()) {
-            auto boxSPtr = GetAsSPtr(box, BoundingBox);
+            const auto boxSPtr = GetAsSPtr(box, BoundingBox);
             box->getParentGroup()->removeContainedBox_k(boxSPtr);
             parentGroup->addContainedBox(boxSPtr);
             box->applyTransformationInverted(box->getTransformAnimator());
