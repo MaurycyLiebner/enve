@@ -1470,11 +1470,11 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     if(newerSate || closerFrame) {
         mDrawRenderContainer->setSrcRenderData(renderData);
-        const bool currentState =
-                renderData->fBoxStateId == mStateId;
-        const bool currentFrame =
-                renderData->fRelFrame == anim_mCurrentRelFrame;
-        mDrawRenderContainer->setExpired(!currentState || !currentFrame);
+        const bool currentState = renderData->fBoxStateId == mStateId;
+        const bool currentFrame = renderData->fRelFrame == anim_mCurrentRelFrame;
+        const bool expired = !currentState || !currentFrame;
+        mDrawRenderContainer->setExpired(expired);
+        if(expired) updateDrawRenderContainerTransform();
     }
 }
 
