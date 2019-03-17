@@ -186,16 +186,24 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
     stopScrolling();
     mDragging = false;
     const int yPos = event->pos().y();
-    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
-        bool below;
 
-        SWT_TargetTypes type;
+    SWT_TargetTypes type;
+    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
         type.targetsFunctionList =
                 QList<SWT_Checker>({&SingleWidgetTarget::SWT_isBoundingBox});
-        const auto singleWidgetUnderMouse =
-                getClosestsSingleWidgetWithTargetType(type, yPos, &below);
-        if(!singleWidgetUnderMouse) return;
+    } else if(PixmapEffectMimeData::hasFormat(event->mimeData())) {
+        type.targetsFunctionList =
+                QList<SWT_Checker>({&SingleWidgetTarget::SWT_isPixmapEffect});
+    } else if(PathEffectMimeData::hasFormat(event->mimeData())) {
+        type.targetsFunctionList =
+                QList<SWT_Checker>({&SingleWidgetTarget::SWT_isPathEffect});
+    }
+    bool below;
+    const auto singleWidgetUnderMouse =
+            getClosestsSingleWidgetWithTargetType(type, yPos, &below);
+    if(!singleWidgetUnderMouse) return;
 
+    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
         auto bbMimeData = static_cast<const BoundingBoxMimeData*>(event->mimeData());
         const auto box = bbMimeData->getTarget();
         const auto boxUnderMouse = GetAsPtr(singleWidgetUnderMouse->
@@ -218,15 +226,6 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
                         boxUnderMouse);
         }
     } else if(PixmapEffectMimeData::hasFormat(event->mimeData())) {
-        bool below;
-
-        SWT_TargetTypes type;
-        type.targetsFunctionList =
-                QList<SWT_Checker>({&SingleWidgetTarget::SWT_isPixmapEffect});
-        const auto singleWidgetUnderMouse =
-                getClosestsSingleWidgetWithTargetType(type, yPos, &below);
-        if(!singleWidgetUnderMouse) return;
-
         auto peMimeData = static_cast<const PixmapEffectMimeData*>(event->mimeData());
         const auto effect = peMimeData->getTarget();
         auto targetUnderMouse = singleWidgetUnderMouse->getTargetAbstraction()->getTarget();
@@ -252,15 +251,6 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
             underMouseAnimator->getParentBox()->prp_updateInfluenceRangeAfterChanged();
         }
     } else if(PathEffectMimeData::hasFormat(event->mimeData())) {
-        bool below;
-
-        SWT_TargetTypes type;
-        type.targetsFunctionList =
-                QList<SWT_Checker>({&SingleWidgetTarget::SWT_isPathEffect});
-        const auto singleWidgetUnderMouse =
-                getClosestsSingleWidgetWithTargetType(type, yPos, &below);
-        if(!singleWidgetUnderMouse) return;
-
         const auto pathEffectMimeData =
                 static_cast<const PathEffectMimeData*>(event->mimeData());
         const auto effect = GetAsSPtr(pathEffectMimeData->getTarget(), PathEffect);
