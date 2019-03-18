@@ -101,6 +101,10 @@ public:
     int getIdInParent() const {
         return mIdInParent;
     }
+
+    int getChildrenCount() const {
+        return mChildren.count();
+    }
 protected:
     void setParent(SingleWidgetAbstraction * const parent) {
         mParent = parent;

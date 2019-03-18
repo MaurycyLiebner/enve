@@ -142,8 +142,19 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
     BoxSingleWidget * targetBSW = nullptr;
     DropTypes supportedDropTypes = DROP_NONE;
     targetBSW = getBSWAtPos(yPos);
-
-    supportedDropTypes = dropOnBSWSupported(targetBSW);
+    if(targetBSW) {
+        if(targetBSW->isHidden() && mMainAbstraction) {
+            const bool dropToMainAbs =
+                    droppingSupported(mMainAbstraction,
+                                      mMainAbstraction->getChildrenCount());
+            if(dropToMainAbs) {
+                return DropTarget{mMainAbstraction,
+                                  mMainAbstraction->getChildrenCount()};
+            }
+        } else {
+            supportedDropTypes = dropOnBSWSupported(targetBSW);
+        }
+    }
 
     const int idAtPos = getIdAtPos(yPos);
 
@@ -151,6 +162,7 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
         if(supportedDropTypes) break;
         targetBSW = static_cast<BoxSingleWidget*>(
                     mSingleWidgets.at(i));
+        if(targetBSW->isHidden()) continue;
         supportedDropTypes = dropOnBSWSupported(targetBSW) & DROP_ABOVE;
     }
 
@@ -158,6 +170,7 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
         if(supportedDropTypes) break;
         targetBSW = static_cast<BoxSingleWidget*>(
                 mSingleWidgets.at(i));
+        if(targetBSW->isHidden()) break;
         supportedDropTypes = dropOnBSWSupported(targetBSW) & DROP_BELOW;
     }
 
@@ -211,12 +224,15 @@ void BoxScrollWidgetVisiblePart::dragEnterEvent(QDragEnterEvent *event) {
     const auto mimeData = event->mimeData();
     mLastDragMoveY = event->pos().y();
     updateDraggedFromMimeData(mimeData);
+    updateDropTarget();
     //mDragging = true;
     if(mCurrentlyDragged.isValid()) event->acceptProposedAction();
+    update();
 }
 
 void BoxScrollWidgetVisiblePart::dragLeaveEvent(QDragLeaveEvent *event) {
     mCurrentlyDragged.reset();
+    mDropTarget.reset();
     mDragging = false;
     stopScrolling();
 //    if(mScrollTimer->isActive()) {
@@ -228,8 +244,8 @@ void BoxScrollWidgetVisiblePart::dragLeaveEvent(QDragLeaveEvent *event) {
 //            mScrollTimer->setInterval(100);
 //        }
 //    }
-    update();
     event->accept();
+    update();
 }
 
 #include <QDebug>
@@ -256,6 +272,7 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(QDragMoveEvent *event) {
     mLastDragMoveY = yPos;
 
     updateDropTarget();
+    update();
 }
 
 bool BoxScrollWidgetVisiblePart::droppingSupported(
@@ -272,9 +289,11 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
                     draggedAbs->getTarget());
         const auto targetGroup = static_cast<const BoxesGroup*>(
                     targetSWT);
+        if(idInTarget < targetGroup->ca_getNumberOfChildren()) return false;
         const auto currentParent = draggedBox->getParentGroup();
         if(currentParent == targetGroup &&
-           idInTarget == draggedAbs->getIdInParent()) return false;
+           (idInTarget == draggedAbs->getIdInParent() ||
+            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
         if(targetGroup->isAncestor(draggedBox)) return false;
     } else if(mCurrentlyDragged.fType == Dragged::RASTER_EFFECT) {
         if(!targetSWT->SWT_isPixmapEffectAnimators()) return false;
@@ -300,12 +319,10 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
 
     return true;
 }
+
 #define DropTypes_ BoxScrollWidgetVisiblePart::DropTypes
-DropTypes_ BoxScrollWidgetVisiblePart::dropOnBSWSupported(
-        BoxSingleWidget const * const bswUnderMouse) const {
-    if(!bswUnderMouse) return DropType::DROP_NONE;
-    if(bswUnderMouse->isHidden()) return DropType::DROP_NONE;
-    const auto swtUnderMouse = bswUnderMouse->getTarget();
+DropTypes_ BoxScrollWidgetVisiblePart::dropOnSWTSupported(
+        SingleWidgetTarget const * const swtUnderMouse) const {
     if(!swtUnderMouse) return DropType::DROP_NONE;
     const auto absUnderMouse = swtUnderMouse->SWT_getAbstractionForWidget(mId);
     if(!absUnderMouse) return DropType::DROP_NONE;
@@ -320,8 +337,40 @@ DropTypes_ BoxScrollWidgetVisiblePart::dropOnBSWSupported(
            (dropBelow ? DropType::DROP_BELOW : DropType::DROP_NONE);
 }
 
+DropTypes_ BoxScrollWidgetVisiblePart::dropOnBSWSupported(
+        BoxSingleWidget const * const bswUnderMouse) const {
+    if(!bswUnderMouse) return DropType::DROP_NONE;
+    if(bswUnderMouse->isHidden()) return DropType::DROP_NONE;
+    const auto swtUnderMouse = bswUnderMouse->getTarget();
+    return dropOnSWTSupported(swtUnderMouse);
+}
+
+void BoxScrollWidgetVisiblePart::updateDragLine() {
+    mDragging = false;
+    if(!mDropTarget.isValid()) return;
+    int i = -1;
+    for(const auto& widget : mSingleWidgets) {
+        i++;
+        const auto bsw = static_cast<BoxSingleWidget*>(widget);
+        if(bsw->isHidden()) break;
+        const auto abs = bsw->getTargetAbstraction();
+        if(!abs) continue;
+        if(abs->getParent() == mDropTarget.fTargetParent) {
+            int yPos;
+            if(abs->getIdInParent() == mDropTarget.fTargetId) { // above
+                yPos = bsw->y();
+            } else if(abs->getIdInParent() == mDropTarget.fTargetId - 1) { // below
+                yPos = bsw->y() + bsw->height();
+            } else continue;
+            mCurrentDragLine = QLine(bsw->x(), yPos, width(), yPos);
+            mDragging = true;
+        }
+    }
+}
+
 void BoxScrollWidgetVisiblePart::updateDropTarget() {
     mDropTarget = getClosestDropTarget(mLastDragMoveY);
+    updateDragLine();
 }
 
 void BoxScrollWidgetVisiblePart::scrollUp() {
@@ -381,16 +430,18 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         const auto draggedBox = GetAsSPtr(draggedSWT, BoundingBox);
         const auto targetGroup = GetAsPtr(targetSWT, BoxesGroup);
         const auto currentDraggedParent = draggedBox->getParentGroup();
+        const int targetNAnimators = targetGroup->ca_getNumberOfChildren();
         if(currentDraggedParent != targetGroup) {
             currentDraggedParent->removeContainedBox_k(draggedBox);
-            targetGroup->addContainedBoxToListAt(fTargetId, draggedBox);
+            const int boxTargetId = fTargetId - targetNAnimators;
+            targetGroup->addContainedBoxToListAt(boxTargetId, draggedBox);
             draggedBox->applyTransformationInverted(
                         draggedBox->getTransformAnimator());
         } else {
             int targetId = fTargetId;
             if(draggedAbs->getIdInParent() < fTargetId) targetId--;
             currentDraggedParent->moveContainedBoxInList(
-                        draggedBox.get(), targetId);
+                        draggedBox.get(), targetId - targetNAnimators);
         }
     } else if(dragged.fType == Dragged::RASTER_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, PixmapEffect);

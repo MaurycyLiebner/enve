@@ -63,7 +63,7 @@ public:
 
 
     void ca_changeChildAnimatorZ(const int &oldIndex, const int &newIndex);
-    int ca_getNumberOfChildren();
+    int ca_getNumberOfChildren() const;
     Property *ca_getChildAt(const int &i);
 
     int getChildPropertyIndex(Property *child);

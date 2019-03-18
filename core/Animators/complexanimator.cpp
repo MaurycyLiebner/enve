@@ -25,7 +25,7 @@ void ComplexAnimator::ca_replaceChildAnimator(const qsptr<Property>& childAnimat
     ca_addChildAnimator(replaceWith, id);
 }
 
-int ComplexAnimator::ca_getNumberOfChildren() {
+int ComplexAnimator::ca_getNumberOfChildren() const {
     return ca_mChildAnimators.count();
 }
 

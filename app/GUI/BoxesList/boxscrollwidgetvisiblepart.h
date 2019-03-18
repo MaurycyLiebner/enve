@@ -101,12 +101,14 @@ private:
         DROP_BELOW = 4
     };
     typedef int DropTypes;
+    DropTypes dropOnSWTSupported(SingleWidgetTarget const * const swtUnderMouse) const;
     DropTypes dropOnBSWSupported(const BoxSingleWidget * const bswUnderMouse) const;
     DropTarget getClosestDropTarget(const int &yPos) const;
 
     void updateDraggedFromMimeData(const QMimeData * const mimeData);
     bool droppingSupported(const SingleWidgetAbstraction * const targetAbs,
                            const int &idInTarget) const;
+    void updateDragLine();
 signals:
 
 public slots:
