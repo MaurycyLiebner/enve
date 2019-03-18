@@ -1,4 +1,4 @@
-#ifndef BOXSCROLLWIDGETVISIBLEPART_H
+﻿#ifndef BOXSCROLLWIDGETVISIBLEPART_H
 #define BOXSCROLLWIDGETVISIBLEPART_H
 
 #include <QWidget>
@@ -31,7 +31,7 @@ public:
 
     BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
             const SWT_TargetTypes &type, const int &yPos, bool *isBelow);
-    void updateDraggingHighlight();
+    void updateDropTarget();
     void stopScrolling();
     DurationRectangleMovable *getRectangleMovableAtPos(
                                         const int &pressX,
@@ -53,7 +53,7 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
-
+private:
     bool mDragging = false;
 
     QLine mCurrentDragLine;
@@ -62,7 +62,51 @@ protected:
     SWT_TargetTypes mLastDragMoveTargetTypes;
     QTimer *mScrollTimer = nullptr;
     KeysView *mKeysView = nullptr;
+    struct Dragged {
+        SingleWidgetAbstraction * fPtr;
+        enum Type { BOX, RASTER_EFFECT, PATH_EFFECT, NONE } fType;
 
+        bool isValid() const {
+            return fType != NONE && fPtr;
+        }
+
+        void reset() {
+            fPtr = nullptr;
+            fType = NONE;
+        }
+
+    };
+    Dragged mCurrentlyDragged;
+    struct DropTarget {
+        SingleWidgetAbstraction * fTargetParent;
+        int fTargetId;
+
+        bool drop(const Dragged& dragged);
+
+        bool isValid() const {
+            return fTargetId != -1 && fTargetParent;
+        }
+
+        void reset() {
+            fTargetParent = nullptr;
+            fTargetId = -1;
+        }
+    };
+    DropTarget mDropTarget;
+
+    enum DropType {
+        DROP_NONE = 0,
+        DROP_ABOVE = 1,
+        DROP_INTO = 2,
+        DROP_BELOW = 4
+    };
+    typedef int DropTypes;
+    DropTypes dropOnBSWSupported(const BoxSingleWidget * const bswUnderMouse) const;
+    DropTarget getClosestDropTarget(const int &yPos) const;
+
+    void updateDraggedFromMimeData(const QMimeData * const mimeData);
+    bool droppingSupported(const SingleWidgetAbstraction * const targetAbs,
+                           const int &idInTarget) const;
 signals:
 
 public slots:

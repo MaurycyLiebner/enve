@@ -53,22 +53,22 @@ public:
     }
 protected:
     void setupUpdateFuncs() {
-        mUpdateFuncs.contentUpdateIfIsCurrentRule =
+        mUpdateFuncs.fContentUpdateIfIsCurrentRule =
                 [this](const SWT_Rule &rule) {
             scheduleContentUpdateIfIsCurrentRule(rule);
         };
-        mUpdateFuncs.contentUpdateIfIsCurrentTarget =
+        mUpdateFuncs.fContentUpdateIfIsCurrentTarget =
                 [this](SingleWidgetTarget* targetP,
                        const SWT_Target &target) {
             scheduleContentUpdateIfIsCurrentTarget(targetP, target);
         };
-        mUpdateFuncs.contentUpdateIfSearchNotEmpty = [this]() {
+        mUpdateFuncs.fContentUpdateIfSearchNotEmpty = [this]() {
             scheduleContentUpdateIfSearchNotEmpty();
         };
-        mUpdateFuncs.updateParentHeight = [this]() {
+        mUpdateFuncs.fUpdateParentHeight = [this]() {
             scheduleUpdateParentHeight();
         };
-        mUpdateFuncs.updateVisibleWidgetsContent = [this]() {
+        mUpdateFuncs.fUpdateVisibleWidgetsContent = [this]() {
             scheduleUpdateVisibleWidgetsContent();
         };
     }

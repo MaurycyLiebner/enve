@@ -61,7 +61,7 @@ void CanvasWindow::SWT_addChildrenAbstractions(
         const UpdateFuncs &updateFuncs,
         const int& visiblePartWidgetId) {
     for(const auto& child : mCanvasList) {
-        auto abs = child->SWT_getAbstractionForWidget(updateFuncs,
+        auto abs = child->SWT_getOrCreateAbstractionForWidget(updateFuncs,
                                                       visiblePartWidgetId);
         abstraction->addChildAbstraction(abs);
     }

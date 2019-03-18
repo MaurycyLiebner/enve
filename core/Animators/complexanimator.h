@@ -54,6 +54,7 @@ public:
                              const int &id = FrameRange::EMAX);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
+    void ca_moveChildInList(Property *child, const int &to);
     void ca_moveChildInList(Property *child, const int &from, const int &to);
     void ca_moveChildBelow(Property *move, Property *below);
     void ca_moveChildAbove(Property *move, Property *above);    

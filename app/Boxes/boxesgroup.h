@@ -216,6 +216,7 @@ public:
 //    bool anim_prevRelFrameWithKey(const int &relFrame,
 //                                 int &prevRelFrame);
     bool enabledGroupPathSumEffectPresent();
+    void moveContainedBoxInList(BoundingBox *child, const int &to);
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
 

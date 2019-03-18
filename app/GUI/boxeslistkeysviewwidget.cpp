@@ -191,8 +191,8 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     WindowSingleWidgetTarget *window =
             mMainWindow->getCanvasWindow()->getWindowSWT();
     auto visiblePartWidget = mBoxesListWidget->getVisiblePartWidget();
-    window->SWT_getAbstractionForWidget(visiblePartWidget->getUpdateFuncs(),
-                                        visiblePartWidget->getId());
+    window->SWT_getOrCreateAbstractionForWidget(visiblePartWidget->getUpdateFuncs(),
+                                                visiblePartWidget->getId());
     visiblePartWidget->setCurrentRule(SWT_NoRule);
     auto newTarget = window->getCanvasWindow()->getCurrentCanvas();
     visiblePartWidget->setCurrentTarget(newTarget, SWT_CurrentCanvas);

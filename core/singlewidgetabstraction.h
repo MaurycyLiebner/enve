@@ -13,12 +13,12 @@ template <typename T> using stdfunc = std::function<T>;
 typedef std::function<void(SingleWidgetAbstraction*, int)> SetAbsFunc;
 
 struct UpdateFuncs {
-    stdfunc<void(const SWT_Rule &)> contentUpdateIfIsCurrentRule;
+    stdfunc<void(const SWT_Rule &)> fContentUpdateIfIsCurrentRule;
     stdfunc<void(SingleWidgetTarget*, const SWT_Target &)>
-        contentUpdateIfIsCurrentTarget;
-    stdfunc<void()> contentUpdateIfSearchNotEmpty;
-    stdfunc<void()> updateParentHeight;
-    stdfunc<void()> updateVisibleWidgetsContent;
+        fContentUpdateIfIsCurrentTarget;
+    stdfunc<void()> fContentUpdateIfSearchNotEmpty;
+    stdfunc<void()> fUpdateParentHeight;
+    stdfunc<void()> fUpdateVisibleWidgetsContent;
 };
 
 class SingleWidgetAbstraction : public StdSelfRef {
@@ -50,17 +50,18 @@ public:
 
     void setContentVisible(const bool &bT);
 
-    SingleWidgetTarget *getTarget();
+    SingleWidgetTarget *getTarget() const;
 
-    void addChildAbstractionForTarget(SingleWidgetTarget *target);
-    void addChildAbstractionForTargetAt(SingleWidgetTarget *target,
+    void addChildAbstractionForTarget(SingleWidgetTarget * const target);
+    void addChildAbstractionForTargetAt(SingleWidgetTarget * const target,
                                         const int &id);
-    void addChildAbstraction(SingleWidgetAbstraction *abs);
-    void addChildAbstractionAt(SingleWidgetAbstraction *abs,
+    void addChildAbstraction(SingleWidgetAbstraction * const abs);
+    void addChildAbstractionAt(SingleWidgetAbstraction * const abs,
                                const int &id);
 
-    void removeChildAbstractionForTarget(SingleWidgetTarget *target);
-    void removeChildAbstraction(SingleWidgetAbstraction* abs);
+    void removeChildAbstractionForTarget(
+            const SingleWidgetTarget * const target);
+    void removeChildAbstraction(SingleWidgetAbstraction * const abs);
 
     void switchContentVisible();
 
@@ -79,7 +80,7 @@ public:
 
     void scheduleWidgetContentUpdateIfSearchNotEmpty();
     void scheduleWidgetContentUpdateIfIsCurrentTarget(
-            SingleWidgetTarget *targetP,
+            SingleWidgetTarget * const targetP,
             const SWT_Target &target);
 
     void setIsMainTarget(const bool &bT) {
@@ -87,11 +88,26 @@ public:
     }
 
     SingleWidgetAbstraction *getChildAbstractionForTarget(
-            SingleWidgetTarget *target);
+            const SingleWidgetTarget * const target);
 
-    void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
+    void moveChildAbstractionForTargetTo(SingleWidgetTarget * const target,
                                          const int &id);
     void afterContentVisibilityChanged();
+
+    SingleWidgetAbstraction* getParent() const {
+        return mParent;
+    }
+
+    int getIdInParent() const {
+        return mIdInParent;
+    }
+protected:
+    void setParent(SingleWidgetAbstraction * const parent) {
+        mParent = parent;
+    }
+    void setIdInParent(const int& id) {
+        mIdInParent = id;
+    }
 private:
     bool mIsMainTarget = false;
     bool mContentVisible = false;
@@ -99,7 +115,14 @@ private:
     const UpdateFuncs mUpdateFuncs;
     const qptr<SingleWidgetTarget> mTarget;
 
+    void updateChildrenIds(const int& minId, const int& maxId) const {
+        for(int i = minId; i <= maxId; i++) {
+            mChildren.at(i)->setIdInParent(i);
+        }
+    }
     QList<stdptr<SingleWidgetAbstraction>> mChildren;
+    int mIdInParent = -1;
+    stdptr<SingleWidgetAbstraction> mParent;
 };
 
 #endif // SINGLEWIDGETABSTRACTION_H

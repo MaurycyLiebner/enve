@@ -9,16 +9,14 @@ public:
     CanvasWindow* getCanvasWindow() const {
         return mWindow;
     }
-    SingleWidgetAbstraction *SWT_getAbstractionForWidget(
-            const UpdateFuncs &updateFuncs,
-            const int& visiblePartWidgetId);
+
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
                                      const int& visiblePartWidgetId);
 protected:
-    WindowSingleWidgetTarget(CanvasWindow *window);
+    WindowSingleWidgetTarget(CanvasWindow * const window);
 
-    CanvasWindow *mWindow = nullptr;
+    CanvasWindow * const mWindow;
 };
 
 #endif // WINDOWSINGLEWIDGETTARGET_H

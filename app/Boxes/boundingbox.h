@@ -265,18 +265,11 @@ public:
 
     bool SWT_isBoundingBox() const;
 
-    SingleWidgetAbstraction* SWT_getAbstractionForWidget(
-            const UpdateFuncs &updateFuncs,
-            const int& visiblePartWidgetId);
-
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) const;
 
     bool SWT_visibleOnlyIfParentDescendant() const;
-
-    void SWT_addToContextMenu(QMenu *menu);
-    bool SWT_handleContextMenuActionSelected(QAction *selectedAction);
 
     QMimeData *SWT_createMimeData();
 

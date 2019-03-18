@@ -148,6 +148,13 @@ void ComplexAnimator::ca_moveChildBelow(Property *move, Property *below) {
 }
 
 void ComplexAnimator::ca_moveChildInList(Property* child,
+                                         const int &to) {
+    const int from = getChildPropertyIndex(child);
+    if(from == -1) return;
+    ca_moveChildInList(child, from, to);
+}
+
+void ComplexAnimator::ca_moveChildInList(Property* child,
                                          const int &from, const int &to) {
     ca_mChildAnimators.move(from, to);
     SWT_moveChildAbstractionForTargetToInAll(child, to);

@@ -59,22 +59,10 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }
 
-SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
-            const UpdateFuncs &updateFuncs,
-            const int& visiblePartWidgetId) {
-    Q_FOREACH(const stdsptr<SingleWidgetAbstraction> &abs,
-              mSWT_allAbstractions) {
-        if(abs->getParentVisiblePartWidgetId() == visiblePartWidgetId) {
-            return abs.get();
-        }
-    }
-    return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
-}
-
 qsptr<BoundingBox> BoundingBox::createLink() {
     auto linkBox = SPtrCreate(InternalLinkBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
-    return linkBox;
+    return std::move(linkBox);
 }
 
 qsptr<BoundingBox> BoundingBox::createLinkForLinkGroup() {
@@ -1366,29 +1354,6 @@ bool BoundingBox::SWT_visibleOnlyIfParentDescendant() const {
     return false;
 }
 
-void BoundingBox::SWT_addToContextMenu(QMenu *menu) {
-    menu->addAction("Apply Transformation");
-    menu->addAction("Create Link");
-    menu->addAction("Center Pivot");
-    menu->addAction("Copy");
-    menu->addAction("Cut");
-    menu->addAction("Duplicate");
-    menu->addAction("Group");
-    menu->addAction("Ungroup");
-    menu->addAction("Delete");
-
-    QMenu *effectsMenu = menu->addMenu("Effects");
-    effectsMenu->addAction("Blur");
-    effectsMenu->addAction("Shadow");
-//            effectsMenu->addAction("Brush");
-    effectsMenu->addAction("Lines");
-    effectsMenu->addAction("Circles");
-    effectsMenu->addAction("Swirl");
-    effectsMenu->addAction("Oil");
-    effectsMenu->addAction("Implode");
-    effectsMenu->addAction("Desaturate");
-}
-
 void BoundingBox::removeFromParent_k() {
     if(!mParentGroup) return;
     mParentGroup->removeContainedBox_k(ref<BoundingBox>());
@@ -1399,47 +1364,6 @@ void BoundingBox::removeFromSelection() {
         Canvas* parentCanvas = getParentCanvas();
         parentCanvas->removeBoxFromSelection(this);
     }
-}
-
-bool BoundingBox::SWT_handleContextMenuActionSelected(
-        QAction *selectedAction) {
-    if(selectedAction) {
-        if(selectedAction->text() == "Delete") {
-            removeFromParent_k();
-        } else if(selectedAction->text() == "Apply Transformation") {
-            applyCurrentTransformation();
-        } else if(selectedAction->text() == "Create Link") {
-            mParentGroup->addContainedBox(createLink());
-        } else if(selectedAction->text() == "Group") {
-            getParentCanvas()->groupSelectedBoxes();
-            return true;
-//        } else if(selectedAction->text() == "Ungroup") {
-//            ungroupSelected();
-//        } else if(selectedAction->text() == "Center Pivot") {
-//            mCurrentBoxesGroup->centerPivotForSelected();
-//        } else if(selectedAction->text() == "Blur") {
-//            mCurrentBoxesGroup->applyBlurToSelected();
-//        } else if(selectedAction->text() == "Shadow") {
-//            mCurrentBoxesGroup->applyShadowToSelected();
-//        } else if(selectedAction->text() == "Brush") {
-//            mCurrentBoxesGroup->applyBrushEffectToSelected();
-//        } else if(selectedAction->text() == "Lines") {
-//            mCurrentBoxesGroup->applyLinesEffectToSelected();
-//        } else if(selectedAction->text() == "Circles") {
-//            mCurrentBoxesGroup->applyCirclesEffectToSelected();
-//        } else if(selectedAction->text() == "Swirl") {
-//            mCurrentBoxesGroup->applySwirlEffectToSelected();
-//        } else if(selectedAction->text() == "Oil") {
-//            mCurrentBoxesGroup->applyOilEffectToSelected();
-//        } else if(selectedAction->text() == "Implode") {
-//            mCurrentBoxesGroup->applyImplodeEffectToSelected();
-//        } else if(selectedAction->text() == "Desaturate") {
-//            mCurrentBoxesGroup->applyDesaturateEffectToSelected();
-        }
-    } else {
-
-    }
-    return false;
 }
 
 QMimeData *BoundingBox::SWT_createMimeData() {

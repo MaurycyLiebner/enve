@@ -50,31 +50,11 @@ enum SWT_Target : short {
 
 class SingleWidgetTarget : public SelfRef {
 public:
-    SingleWidgetTarget();
-    virtual ~SingleWidgetTarget();
-
-    void SWT_addChildAbstractionForTargetToAll(SingleWidgetTarget *target);
-    void SWT_addChildAbstractionForTargetToAllAt(
-            SingleWidgetTarget *target, const int &id);
-    void SWT_removeChildAbstractionForTargetFromAll(
-            SingleWidgetTarget *target);
-
-    SingleWidgetAbstraction *SWT_createAbstraction(
-            const UpdateFuncs &updateFuncs,
-            const int &visiblePartWidgetId);
-    void SWT_removeAbstractionFromList(
-            const stdsptr<SingleWidgetAbstraction> &abs);
-
+    SingleWidgetTarget() {}
     virtual void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction*,
             const UpdateFuncs &,
             const int&) {}
-
-    virtual SingleWidgetAbstraction* SWT_getAbstractionForWidget(
-            const UpdateFuncs &updateFuncs,
-            const int& visiblePartWidgetId) {
-        return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
-    }
 
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool &parentSatisfies,
@@ -83,77 +63,17 @@ public:
         return parentSatisfies && !parentMainTarget;
     }
 
-    void SWT_scheduleWidgetsContentUpdateWithRule(
-            const SWT_Rule &rule);
-
-    virtual bool SWT_visibleOnlyIfParentDescendant() const {
-        return true;
-    }
-
-    void SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
-    void SWT_scheduleWidgetsContentUpdateWithTarget(
-            SingleWidgetTarget *targetP, const SWT_Target &target);
-
-    void SWT_moveChildAbstractionForTargetToInAll(
-            SingleWidgetTarget *target, const int &id);
-
-    virtual void SWT_addToContextMenu(QMenu *menu) {
-        Q_UNUSED(menu);
-    }
-    virtual bool SWT_handleContextMenuActionSelected(
-            QAction *selectedAction) {
-        Q_UNUSED(selectedAction);
-        return false;
-    }
-
     virtual QMimeData *SWT_createMimeData() {
         return nullptr;
-    }
-
-    bool SWT_isVisible() const {
-        return SWT_mVisible;
-    }
-
-    void SWT_hide() {
-        SWT_setVisible(false);
-    }
-
-    void SWT_show() {
-        SWT_setVisible(true);
-    }
-
-    void SWT_setVisible(const bool &bT) {
-        SWT_mVisible = bT;
-        SWT_afterContentVisibilityChanged();
     }
 
     virtual void SWT_setChildrenAncestorDisabled(const bool &bT) {
         Q_UNUSED(bT);
     }
 
-    void SWT_setDisabled(const bool &disable) {
-        SWT_mDisabled = disable;
-        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
+    virtual bool SWT_visibleOnlyIfParentDescendant() const {
+        return true;
     }
-
-    void SWT_disable() {
-        SWT_setDisabled(true);
-    }
-
-    void SWT_enable() {
-        SWT_setDisabled(false);
-    }
-
-    bool SWT_isDisabled() const {
-        return SWT_mDisabled || SWT_mAncestorDisabled;
-    }
-
-    void SWT_setAncestorDisabled(const bool &bT) {
-        SWT_mAncestorDisabled = bT;
-        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
-    }
-
-    void SWT_afterContentVisibilityChanged();
 
     // Animators
     virtual bool SWT_isAnimator() const { return false; }
@@ -207,23 +127,104 @@ public:
     virtual bool SWT_isIntProperty() const { return false; }
     // Sound
     virtual bool SWT_isSingleSound() const { return false; }
+
+    void SWT_addChildAbstractionForTargetToAll(SingleWidgetTarget *target);
+    void SWT_addChildAbstractionForTargetToAllAt(
+            SingleWidgetTarget *target, const int &id);
+    void SWT_removeChildAbstractionForTargetFromAll(
+            SingleWidgetTarget *target);
+
+    SingleWidgetAbstraction *SWT_createAbstraction(
+            const UpdateFuncs &updateFuncs,
+            const int &visiblePartWidgetId);
+    void SWT_removeAbstractionFromList(
+            const stdsptr<SingleWidgetAbstraction> &abs);
+
+    SingleWidgetAbstraction* SWT_getAbstractionForWidget(
+            const int& visiblePartWidgetId) const {
+        for(const auto& abs : SWT_mAllAbstractions) {
+            if(abs->getParentVisiblePartWidgetId() == visiblePartWidgetId) {
+                return abs.get();
+            }
+        }
+        return nullptr;
+    }
+
+    SingleWidgetAbstraction* SWT_getOrCreateAbstractionForWidget(
+            const UpdateFuncs &updateFuncs,
+            const int& visiblePartWidgetId) {
+        const auto curr = SWT_getAbstractionForWidget(visiblePartWidgetId);
+        if(curr) return curr;
+        return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
+    }
+
+    void SWT_scheduleWidgetsContentUpdateWithRule(
+            const SWT_Rule &rule);
+
+    void SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
+    void SWT_scheduleWidgetsContentUpdateWithTarget(
+            SingleWidgetTarget *targetP, const SWT_Target &target);
+
+    void SWT_moveChildAbstractionForTargetToInAll(
+            SingleWidgetTarget *target, const int &id);
+
+    bool SWT_isVisible() const {
+        return SWT_mVisible;
+    }
+
+    void SWT_hide() {
+        SWT_setVisible(false);
+    }
+
+    void SWT_show() {
+        SWT_setVisible(true);
+    }
+
+    void SWT_setVisible(const bool &bT) {
+        SWT_mVisible = bT;
+        SWT_afterContentVisibilityChanged();
+    }
+
+    void SWT_setDisabled(const bool &disable) {
+        SWT_mDisabled = disable;
+        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
+    }
+
+    void SWT_disable() {
+        SWT_setDisabled(true);
+    }
+
+    void SWT_enable() {
+        SWT_setDisabled(false);
+    }
+
+    bool SWT_isDisabled() const {
+        return SWT_mDisabled || SWT_mAncestorDisabled;
+    }
+
+    void SWT_setAncestorDisabled(const bool &bT) {
+        SWT_mAncestorDisabled = bT;
+        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
+    }
+
+    void SWT_afterContentVisibilityChanged();
 protected:
     bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
-    QList<stdsptr<SingleWidgetAbstraction>> mSWT_allAbstractions;
+    QList<stdsptr<SingleWidgetAbstraction>> SWT_mAllAbstractions;
 };
 
 struct SWT_TargetTypes {
     bool isTargeted(SingleWidgetTarget * const target) const {
         if(!target) return false;
-        for(SWT_Checker func : targetsFunctionList) {
+        for(SWT_Checker func : fTargetsFunctionList) {
             if((target->*func)()) return true;
         }
         return false;
     }
 
-    QList<SWT_Checker> targetsFunctionList;
+    QList<SWT_Checker> fTargetsFunctionList;
 };
 
 #endif // SINGLEWIDGETTARGET_H

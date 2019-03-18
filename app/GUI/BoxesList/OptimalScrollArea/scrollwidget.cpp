@@ -24,7 +24,7 @@ void ScrollWidget::updateAbstraction() {
         mMainAbstraction = nullptr;
     } else {
         int widId = mVisiblePartWidget->getId();
-        mMainAbstraction = mMainTarget->SWT_getAbstractionForWidget(
+        mMainAbstraction = mMainTarget->SWT_getOrCreateAbstractionForWidget(
                     mVisiblePartWidget->getUpdateFuncs(),
                     widId);
         mMainAbstraction->setIsMainTarget(true);

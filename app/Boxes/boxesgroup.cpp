@@ -892,6 +892,13 @@ void BoxesGroup::bringContainedBoxToFrontList(BoundingBox *child) {
 }
 
 void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
+                                        const int &to) {
+    const int from = getContainedBoxIndex(child);
+    if(from == -1) return;
+    moveContainedBoxInList(child, from, to);
+}
+
+void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
                                         const int &from, const int &to) {
     mContainedBoxes.move(from, to);
     updateContainedBoxIds(qMin(from, to), qMax(from, to));
@@ -932,8 +939,8 @@ void BoxesGroup::SWT_addChildrenAbstractions(
 
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto &child = mContainedBoxes.at(i);
-        auto abs = child->SWT_getAbstractionForWidget(updateFuncs,
-                                                      visiblePartWidgetId);
+        auto abs = child->SWT_getOrCreateAbstractionForWidget(updateFuncs,
+                                                              visiblePartWidgetId);
         abstraction->addChildAbstraction(abs);
     }
 }
