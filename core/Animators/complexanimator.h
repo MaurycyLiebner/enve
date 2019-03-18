@@ -49,9 +49,11 @@ public slots:
     void anim_setRecording(const bool &rec);
     virtual void ca_childAnimatorIsRecordingChanged();
 public:
-
+    void ca_addChildAnimator(const qsptr<Property> &childAnimator) {
+        ca_addChildAnimator(childAnimator, ca_getNumberOfChildren());
+    }
     void ca_addChildAnimator(const qsptr<Property> &childAnimator,
-                             const int &id = FrameRange::EMAX);
+                             const int &id);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
     void ca_moveChildInList(Property *child, const int &to);

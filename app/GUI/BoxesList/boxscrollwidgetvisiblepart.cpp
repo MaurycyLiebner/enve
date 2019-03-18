@@ -152,18 +152,25 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
                                   mMainAbstraction->getChildrenCount()};
             }
         } else {
+            if(targetBSW->getTargetAbstraction() == mCurrentlyDragged.fPtr)
+                return {nullptr, DROP_NONE};
             supportedDropTypes = dropOnBSWSupported(targetBSW);
         }
     }
 
     const int idAtPos = getIdAtPos(yPos);
-
+    const int relYPos = yPos % MIN_WIDGET_HEIGHT;
+    bool above = relYPos < MIN_WIDGET_HEIGHT*0.5;
     for(int i = idAtPos - 1; i >= 0; i--) {
         if(supportedDropTypes) break;
         targetBSW = static_cast<BoxSingleWidget*>(
                     mSingleWidgets.at(i));
         if(targetBSW->isHidden()) continue;
-        supportedDropTypes = dropOnBSWSupported(targetBSW) & DROP_ABOVE;
+        if(targetBSW->getTargetAbstraction() == mCurrentlyDragged.fPtr)
+            return {nullptr, DROP_NONE};
+        supportedDropTypes = dropOnBSWSupported(targetBSW) &
+                (DROP_ABOVE | DROP_BELOW);
+        above = false;
     }
 
     for(int i = idAtPos + 1; i < mSingleWidgets.count(); i++) {
@@ -171,7 +178,11 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
         targetBSW = static_cast<BoxSingleWidget*>(
                 mSingleWidgets.at(i));
         if(targetBSW->isHidden()) break;
-        supportedDropTypes = dropOnBSWSupported(targetBSW) & DROP_BELOW;
+        if(targetBSW->getTargetAbstraction() == mCurrentlyDragged.fPtr)
+            return {nullptr, DROP_NONE};
+        supportedDropTypes = dropOnBSWSupported(targetBSW) &
+                (DROP_ABOVE | DROP_BELOW);
+        above = true;
     }
 
     if(!supportedDropTypes) return {nullptr , DROP_NONE};
@@ -180,20 +191,20 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
     if(!targetAbs) return {nullptr , DROP_NONE};
     const bool suppAbove = supportedDropTypes & DROP_ABOVE;
     const bool suppInto = supportedDropTypes & DROP_INTO;
-    const int relYPos = yPos % MIN_WIDGET_HEIGHT;
+    const bool suppBelow = supportedDropTypes & DROP_BELOW;
     if(suppInto) {
         if(qAbs(relYPos - MIN_WIDGET_HEIGHT*0.5) < MIN_WIDGET_HEIGHT*0.5) {
             return DropTarget{targetAbs, 0};
         }
     }
-    const bool above = relYPos < MIN_WIDGET_HEIGHT*0.5;
-    if(above && suppAbove) {
+    if((above || ! suppBelow) && suppAbove) {
         return DropTarget{targetAbs->getParent(),
                           targetAbs->getIdInParent()};
-    } else {
+    } else if(suppBelow) {
         return DropTarget{targetAbs->getParent(),
                           targetAbs->getIdInParent() + 1};
     }
+    return {nullptr , DROP_NONE};
 }
 
 void BoxScrollWidgetVisiblePart::stopScrolling() {
@@ -304,7 +315,8 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
                     targetSWT);
         const auto currentParent = draggedEffect->getParentEffectAnimators();
         if(currentParent == targetParent &&
-           idInTarget == draggedAbs->getIdInParent()) return false;
+           (idInTarget == draggedAbs->getIdInParent() ||
+            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
     } else if(mCurrentlyDragged.fType == Dragged::PATH_EFFECT) {
         if(!targetSWT->SWT_isPathEffectAnimators()) return false;
         const auto draggedAbs = mCurrentlyDragged.fPtr;
@@ -314,7 +326,12 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
                     targetSWT);
         const auto currentParent = draggedEffect->getParentEffectAnimators();
         if(currentParent == targetParent &&
-           idInTarget == draggedAbs->getIdInParent()) return false;
+           (idInTarget == draggedAbs->getIdInParent() ||
+            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
+        qDebug() << targetAbs;
+        qDebug() << "current:" << draggedAbs->getIdInParent();
+        qDebug() << "drop:" << idInTarget;
+        qDebug() << "";
     } else return false;
 
     return true;
@@ -460,15 +477,15 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         const auto draggedEffect = GetAsSPtr(draggedSWT, PathEffect);
         const auto targetParent = static_cast<PathEffectAnimators*>(targetSWT);
         const auto currentParent = draggedEffect->getParentEffectAnimators();
-        if(currentParent->isOutline()) {
-            currentParent->getParentBox()->removeOutlinePathEffect(draggedEffect);
-        } else if(currentParent->isFill()) {
-            currentParent->getParentBox()->removeFillPathEffect(draggedEffect);
-        } else {
-            currentParent->getParentBox()->removePathEffect(draggedEffect);
-        }
 
         if(currentParent != targetParent) {
+            if(currentParent->isOutline()) {
+                currentParent->getParentBox()->removeOutlinePathEffect(draggedEffect);
+            } else if(currentParent->isFill()) {
+                currentParent->getParentBox()->removeFillPathEffect(draggedEffect);
+            } else {
+                currentParent->getParentBox()->removePathEffect(draggedEffect);
+            }
             if(targetParent->isOutline()) {
                 targetParent->getParentBox()->addOutlinePathEffect(draggedEffect);
                 draggedEffect->setIsOutlineEffect(true);
