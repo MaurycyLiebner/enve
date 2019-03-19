@@ -15,7 +15,7 @@ class ScrollArea;
 class ScrollWidget : public MinimalScrollWidget {
     Q_OBJECT
 public:
-    explicit ScrollWidget(ScrollArea *parent = nullptr);
+    explicit ScrollWidget(ScrollArea * const parent);
 
     void updateHeight();
     void setMainTarget(SingleWidgetTarget *target);
@@ -29,7 +29,7 @@ protected:
     int mContentHeight = 0;
     virtual void createVisiblePartWidget();
     qptr<SingleWidgetTarget> mMainTarget;
-    stdptr<SingleWidgetAbstraction>mMainAbstraction;
+    stdptr<SingleWidgetAbstraction> mMainAbstraction;
     ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;
 };
 

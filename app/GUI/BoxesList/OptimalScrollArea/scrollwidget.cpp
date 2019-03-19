@@ -6,11 +6,11 @@
 #include "scrollarea.h"
 #include "global.h"
 
-ScrollWidget::ScrollWidget(ScrollArea *parent) :
+ScrollWidget::ScrollWidget(ScrollArea * const parent) :
     MinimalScrollWidget(parent) {
     //createVisiblePartWidget();
-    connect(parent, SIGNAL(heightChanged(int)),
-            this, SLOT(updateHeightAfterScrollAreaResize(int)));
+    connect(parent, &ScrollArea::heightChanged,
+            this, &ScrollWidget::updateHeightAfterScrollAreaResize);
 }
 
 void ScrollWidget::updateAbstraction() {
@@ -24,9 +24,7 @@ void ScrollWidget::updateAbstraction() {
         mMainAbstraction = nullptr;
     } else {
         int widId = mVisiblePartWidget->getId();
-        mMainAbstraction = mMainTarget->SWT_getOrCreateAbstractionForWidget(
-                    mVisiblePartWidget->getUpdateFuncs(),
-                    widId);
+        mMainAbstraction = mMainTarget->SWT_getAbstractionForWidget(widId);
         mMainAbstraction->setIsMainTarget(true);
     }
     mVisiblePartWidget->setMainAbstraction(mMainAbstraction);

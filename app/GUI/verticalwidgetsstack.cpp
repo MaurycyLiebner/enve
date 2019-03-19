@@ -33,7 +33,6 @@ void BoxesListKeysViewWidgetResizer::displace(int totDy) {
     } else if(newBelowHeight < 2*MIN_WIDGET_HEIGHT) {
         dY = mBelowWidget->height() - 2*MIN_WIDGET_HEIGHT;
     }
-    qDebug() << totDy << dY;
     if(totDy != dY) {
         if(totDy > 0) {
             if(mBelowResizer) {

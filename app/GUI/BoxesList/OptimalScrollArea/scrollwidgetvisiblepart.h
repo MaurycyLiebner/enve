@@ -15,17 +15,13 @@ class ScrollWidgetVisiblePart :
         public MinimalScrollWidgetVisiblePart {
     Q_OBJECT
 public:
-    ScrollWidgetVisiblePart(ScrollWidget *parent = nullptr);
-    ~ScrollWidgetVisiblePart();
-
-    void updateVisibleWidgetsContent();
-
-    void setMainAbstraction(SingleWidgetAbstraction *abs);
+    ScrollWidgetVisiblePart(ScrollWidget * const parent);
 
     virtual QWidget *createNewSingleWidget();
-
+    void updateVisibleWidgetsContent();
     void callUpdaters();
 
+    void setMainAbstraction(SingleWidgetAbstraction *abs);
     void setCurrentRule(const SWT_Rule &rule);
     void setCurrentTarget(SingleWidgetTarget *targetP,
                           const SWT_Target &target);

@@ -26,7 +26,7 @@ public:
     SingleWidgetAbstraction(const qsptr<SingleWidgetTarget>& target,
                             const UpdateFuncs& updateFuncs,
                             const int &visiblePartId);
-    virtual ~SingleWidgetAbstraction();
+    ~SingleWidgetAbstraction();
 
     bool getAbstractions(const int &minY, const int &maxY,
                          int& currY, int currX,
@@ -105,6 +105,8 @@ public:
     int getChildrenCount() const {
         return mChildren.count();
     }
+
+    void removeAlongWithAllChildren_k();
 protected:
     void setParent(SingleWidgetAbstraction * const parent) {
         mParent = parent;

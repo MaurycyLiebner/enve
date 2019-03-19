@@ -15,7 +15,7 @@
 #include "Animators/effectanimators.h"
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
-        ScrollWidget *parent) :
+        ScrollWidget * const parent) :
     ScrollWidgetVisiblePart(parent) {
     setAcceptDrops(true);
     mScrollTimer = new QTimer(this);

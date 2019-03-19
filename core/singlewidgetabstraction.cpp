@@ -176,10 +176,17 @@ void SingleWidgetAbstraction::afterContentVisibilityChanged() {
     mUpdateFuncs.fUpdateVisibleWidgetsContent();
 }
 
+void SingleWidgetAbstraction::removeAlongWithAllChildren_k() {
+    for(const auto& child : mChildren)
+        child->removeAlongWithAllChildren_k();
+    if(mTarget) mTarget->SWT_removeAbstractionFromList(
+                ref<SingleWidgetAbstraction>());
+}
+
 void SingleWidgetAbstraction::addChildAbstractionForTarget(
         SingleWidgetTarget * const target) {
-    auto childAbs = target->SWT_getOrCreateAbstractionForWidget(mUpdateFuncs,
-                                                        mVisiblePartWidgetId);
+    auto childAbs = target->SWT_getOrCreateAbstractionForWidget(
+                mUpdateFuncs, mVisiblePartWidgetId);
     addChildAbstraction(childAbs);
 }
 

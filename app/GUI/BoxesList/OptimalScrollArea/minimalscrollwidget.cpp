@@ -6,7 +6,7 @@
 #include "scrollarea.h"
 #include "global.h"
 
-MinimalScrollWidget::MinimalScrollWidget(ScrollArea *parent) :
+MinimalScrollWidget::MinimalScrollWidget(ScrollArea * const parent) :
     QWidget(parent) {
     mParentScrollArea = parent;
     //createVisiblePartWidget();

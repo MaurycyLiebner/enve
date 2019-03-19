@@ -17,7 +17,7 @@ PaintSettingsAnimator::PaintSettingsAnimator(
         GradientPoints * const grdPts,
         PathBox * const parent) :
     PaintSettingsAnimator(name, grdPts, parent, QColor(255, 255, 255),
-                  PaintType::FLATPAINT,  nullptr) {
+                          PaintType::FLATPAINT,  nullptr) {
 }
 
 PaintSettingsAnimator::PaintSettingsAnimator(
@@ -29,10 +29,9 @@ PaintSettingsAnimator::PaintSettingsAnimator(
         Gradient* const gradientT) :
     ComplexAnimator(name), mTarget_k(parent) {
     mColor->qra_setCurrentValue(colorT);
+    showHideChildrenBeforeChaningPaintType(paintTypeT);
     mPaintType = paintTypeT;
     setGradientVar(gradientT);
-
-    ca_addChildAnimator(mColor);
     setGradientPoints(grdPts);
 
     prp_setOwnUpdater(SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parent));

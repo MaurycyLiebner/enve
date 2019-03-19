@@ -2,8 +2,7 @@
 #define BOXSCROLLAREA_H
 #include "OptimalScrollArea/scrollarea.h"
 
-class BoxScrollArea : public ScrollArea
-{
+class BoxScrollArea : public ScrollArea {
 public:
     BoxScrollArea(QWidget *parent = nullptr);
 protected:

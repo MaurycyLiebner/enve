@@ -101,8 +101,8 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
     mCanvasWindow = new CanvasWindow(this);
-    connect(mMemoryHandler, SIGNAL(allMemoryUsed()),
-            mCanvasWindow, SLOT(outOfMemory()));
+    connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,
+            mCanvasWindow, &CanvasWindow::outOfMemory);
 
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
     connect(mCanvasWindow, &CanvasWindow::changeCurrentFrame,
@@ -150,7 +150,9 @@ MainWindow::MainWindow(QWidget *parent)
     mLeftDock->setTitleBarWidget(leftDockLabel);
 
     mObjectSettingsScrollArea = new ScrollArea(this);
-    mObjectSettingsWidget = new BoxScrollWidget(mObjectSettingsScrollArea);
+    mObjectSettingsWidget = new BoxScrollWidget(
+                mCanvasWindow->getWindowSWT(),
+                mObjectSettingsScrollArea);
     mObjectSettingsScrollArea->setWidget(mObjectSettingsWidget);
     mObjectSettingsWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Selected);

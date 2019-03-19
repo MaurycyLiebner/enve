@@ -9,15 +9,10 @@
 
 int ScrollWidgetVisiblePart::mNextId = 0;
 
-ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(
-        ScrollWidget *parent) :
+ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(ScrollWidget * const parent) :
     MinimalScrollWidgetVisiblePart(parent), mId(mNextId++) {
     mCurrentRulesCollection.rule = SWT_NoRule;
     setupUpdateFuncs();
-}
-
-ScrollWidgetVisiblePart::~ScrollWidgetVisiblePart() {
-    removeInstance(this);
 }
 
 void ScrollWidgetVisiblePart::callUpdaters() {
@@ -39,7 +34,7 @@ void ScrollWidgetVisiblePart::setCurrentRule(
 void ScrollWidgetVisiblePart::setCurrentTarget(
         SingleWidgetTarget* targetP,
         const SWT_Target &target) {
-    mCurrentRulesCollection.target = target;
+    mCurrentRulesCollection.fTarget = target;
     static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
     updateParentHeight();
     updateVisibleWidgetsContent();
@@ -60,7 +55,7 @@ void ScrollWidgetVisiblePart::setAlwaysShowChildren(
 
 void ScrollWidgetVisiblePart::setCurrentSearchText(
         const QString &text) {
-    mCurrentRulesCollection.searchString = text;
+    mCurrentRulesCollection.fSearchString = text;
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
@@ -76,7 +71,7 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
         SingleWidgetTarget* targetP,
         const SWT_Target &target) {
-    if(mCurrentRulesCollection.target == target) {
+    if(mCurrentRulesCollection.fTarget == target) {
         static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
         scheduleUpdateParentHeight();
         scheduleUpdateVisibleWidgetsContent();
@@ -84,7 +79,7 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
-    if(mCurrentRulesCollection.searchString.isEmpty()) return;
+    if(mCurrentRulesCollection.fSearchString.isEmpty()) return;
     scheduleUpdateParentHeight();
     scheduleUpdateVisibleWidgetsContent();
 }
@@ -145,6 +140,6 @@ SWT_RulesCollection::SWT_RulesCollection() {
     type = nullptr;
     rule = SWT_NoRule;
     alwaysShowChildren = false;
-    target = SWT_CurrentCanvas;
-    searchString = "";
+    fTarget = SWT_CurrentCanvas;
+    fSearchString = "";
 }

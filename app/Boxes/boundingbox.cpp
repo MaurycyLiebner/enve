@@ -1342,7 +1342,7 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
         }
     }
     if(satisfies) {
-        const QString &nameSearch = rules.searchString;
+        const QString &nameSearch = rules.fSearchString;
         if(!nameSearch.isEmpty()) {
             satisfies = prp_mName.contains(nameSearch);
         }

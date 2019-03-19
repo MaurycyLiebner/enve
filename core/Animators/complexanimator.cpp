@@ -82,6 +82,7 @@ ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
 
 void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
                                           const int &id) {
+    Q_ASSERT(!ca_mChildAnimators.contains(childProperty));
     ca_mChildAnimators.insert(id, childProperty);
     childProperty->setParent(this);
     childProperty->prp_setInheritedUpdater(prp_mUpdater);

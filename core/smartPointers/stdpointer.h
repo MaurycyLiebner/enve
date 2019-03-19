@@ -21,9 +21,10 @@ public:
         static_assert(std::is_base_of<StdSelfRef, T>::value,
                       "StdPointer can be used only for StdSelfRef derived classes");
     }
-    inline StdPointer(T * const p) : wp(p->template weakRef<T>()), rp(p) {
+    inline StdPointer(T * const p) : rp(p) {
         static_assert(std::is_base_of<StdSelfRef, T>::value,
                       "StdPointer can be used only for StdSelfRef derived classes");
+        if(p) wp = p->template weakRef<T>();
     }
     // compiler-generated copy/move ctor/assignment operators are fine!
     // compiler-generated dtor is fine!
@@ -34,13 +35,10 @@ public:
         other.updateRawPtr();
     }
 
-    inline StdPointer<T> &operator=(T* p) {
+    inline StdPointer<T> &operator=(T* const p) {
         rp = p;
-        if(!p) {
-            wp.reset();
-        } else {
-            wp = static_cast<StdSelfRef*>(p)->weakRef<StdSelfRef>();
-        }
+        if(!p) wp.reset();
+        else wp = static_cast<StdSelfRef*>(p)->weakRef<StdSelfRef>();
         return *this;
     }
 

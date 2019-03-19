@@ -2,6 +2,7 @@
 #define STDSELFREF_H
 #include <QtCore>
 #include <memory>
+#include "exceptions.h"
 template <class T>
 class StdPointer;
 template <class T> using stdsptr = std::shared_ptr<T>;
@@ -61,14 +62,15 @@ protected:
 
     template<class T>
     inline std::shared_ptr<T> ref() const {
-        Q_ASSERT_X(!mThisWeak.expired(), "StdSelfRef::ref",
-                   "Called before initialization");
+        if(mThisWeak.expired())
+            RuntimeThrow("Not initialized, or already deleting");
         return std::static_pointer_cast<T>(
                     std::shared_ptr<StdSelfRef>(mThisWeak));
     }
 
     template<class T>
     inline std::weak_ptr<T> weakRef() const {
+        if(mThisWeak.expired()) return std::weak_ptr<T>();
         return ref<T>();
     }
 

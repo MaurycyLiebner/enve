@@ -11,8 +11,9 @@ QList<MinimalScrollWidgetVisiblePart*>
 MinimalScrollWidgetVisiblePart::mAllInstances;
 
 MinimalScrollWidgetVisiblePart::MinimalScrollWidgetVisiblePart(
-        MinimalScrollWidget *parent) :
+        MinimalScrollWidget * const parent) :
     QWidget(parent) {
+    Q_ASSERT(parent);
     mParentWidget = parent;
     addInstance(this);
 }

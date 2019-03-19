@@ -13,7 +13,7 @@ class KeysView;
 class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart {
     Q_OBJECT
 public:
-    explicit BoxScrollWidgetVisiblePart(ScrollWidget *parent = nullptr);
+    explicit BoxScrollWidgetVisiblePart(ScrollWidget * const parent);
 
     QWidget *createNewSingleWidget();
     void paintEvent(QPaintEvent *);

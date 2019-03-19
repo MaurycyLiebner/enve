@@ -3,6 +3,7 @@
 #include <QPointer>
 #include <QSharedPointer>
 #include <QObject>
+#include "exceptions.h"
 
 template <class T> using qsptr = QSharedPointer<T>;
 template <class T> using qptr = QPointer<T>;
@@ -65,15 +66,14 @@ protected:
 
     template<class T>
     inline QSharedPointer<T> ref() {
-        Q_ASSERT_X(!mThisWeak.isNull(), "SelfRef::ref",
-                   "Called before initialization");
+        if(mThisWeak.isNull())
+            RuntimeThrow("Not initialized, or already deleting");
         return qSharedPointerCast<T>(mThisWeak);
     }
 
     template<class T>
     inline QWeakPointer<T> weakRef() {
-        Q_ASSERT_X(!mThisWeak.isNull(), "SelfRef::weakRef",
-                   "Called before initialization");
+        if(mThisWeak.isNull()) return QWeakPointer<T>();
         return qWeakPointerCast<T>(mThisWeak);
     }
 private:

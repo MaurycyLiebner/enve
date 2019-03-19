@@ -29,16 +29,16 @@ struct SWT_RulesCollection {
                         const QString &searchStringT) {
         rule = ruleT;
         alwaysShowChildren = alwaysShowChildrenT;
-        target = targetT;
+        fTarget = targetT;
         type = typeT;
-        searchString = searchStringT;
+        fSearchString = searchStringT;
     }
 
     SWT_Rule rule;
     bool alwaysShowChildren;
-    SWT_Target target;
+    SWT_Target fTarget;
     SWT_Checker type;
-    QString searchString;
+    QString fSearchString;
 };
 
 enum SWT_Target : short {
@@ -128,15 +128,25 @@ public:
     // Sound
     virtual bool SWT_isSingleSound() const { return false; }
 
-    void SWT_addChildAbstractionForTargetToAll(SingleWidgetTarget *target);
+    void SWT_addChildAbstractionForTargetToAll(
+            SingleWidgetTarget * const target);
     void SWT_addChildAbstractionForTargetToAllAt(
-            SingleWidgetTarget *target, const int &id);
+            SingleWidgetTarget * const target, const int &id);
     void SWT_removeChildAbstractionForTargetFromAll(
-            SingleWidgetTarget *target);
+            SingleWidgetTarget * const target);
+
+
 
     SingleWidgetAbstraction *SWT_createAbstraction(
             const UpdateFuncs &updateFuncs,
             const int &visiblePartWidgetId);
+    void SWT_removeAbstractionForWidget(const int& visiblePartWidgetId) {
+        const auto currSwa = SWT_getAbstractionForWidget(visiblePartWidgetId);
+        if(!currSwa) return;
+        const auto currSwaSPtr = GetAsSPtr(currSwa, SingleWidgetAbstraction);
+        SWT_removeAbstractionFromList(currSwaSPtr);
+    }
+
     void SWT_removeAbstractionFromList(
             const stdsptr<SingleWidgetAbstraction> &abs);
 
@@ -166,7 +176,7 @@ public:
             SingleWidgetTarget *targetP, const SWT_Target &target);
 
     void SWT_moveChildAbstractionForTargetToInAll(
-            SingleWidgetTarget *target, const int &id);
+            SingleWidgetTarget * const target, const int &id);
 
     bool SWT_isVisible() const {
         return SWT_mVisible;

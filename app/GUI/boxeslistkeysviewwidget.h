@@ -6,7 +6,9 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QMenuBar>
+#include "smartPointers/stdselfref.h"
 
+class SingleWidgetAbstraction;
 class AnimationWidgetScrollBar;
 class KeysView;
 class BoxesListAnimationDockWidget;
@@ -25,7 +27,6 @@ public:
     ~BoxesListKeysViewWidget();
 
     void setTopWidget(QWidget *topWidget);
-    bool processFilteredKeyEvent(QKeyEvent *event);
     void connectToFrameWidget(AnimationWidgetScrollBar *frameRange);
     void connectToChangeWidthWidget(
             ChangeWidthWidget *changeWidthWidget);

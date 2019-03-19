@@ -59,7 +59,7 @@ protected:
             const PaintType &newPaintType);
 private:
     Gradient::Type mGradientType = Gradient::LINEAR;
-    PaintType mPaintType = FLATPAINT;
+    PaintType mPaintType = NOPAINT;
 
     PathBox * const mTarget_k;
     qptr<GradientPoints> mGradientPoints;
