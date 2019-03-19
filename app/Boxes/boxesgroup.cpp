@@ -516,6 +516,10 @@ const QList<qsptr<BoundingBox> > &BoxesGroup::getContainedBoxesList() const {
     return mContainedBoxes;
 }
 
+int BoxesGroup::getContainedBoxesCount() const {
+    return mContainedBoxes.count();
+}
+
 qsptr<BoundingBox> BoxesGroup::createLink() {
     auto linkBox = SPtrCreate(InternalLinkGroupBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
@@ -785,7 +789,7 @@ void BoxesGroup::addContainedBoxToListAt(
 
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(
-                child.get(), ca_mChildAnimators.count());
+                child.get(), boxIdToAbstractionId(index));
     child->anim_setAbsFrame(anim_mCurrentAbsFrame);
 
     child->prp_updateInfluenceRangeAfterChanged();
@@ -867,50 +871,49 @@ void BoxesGroup::removeContainedBox_k(const qsptr<BoundingBox>& child) {
     }
 }
 
-void BoxesGroup::increaseContainedBoxZInList(BoundingBox *child) {
+void BoxesGroup::increaseContainedBoxZInList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == mContainedBoxes.count() - 1) return;
     moveContainedBoxInList(child, index, index + 1);
 }
 
-void BoxesGroup::decreaseContainedBoxZInList(BoundingBox *child) {
+void BoxesGroup::decreaseContainedBoxZInList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == 0) return;
     moveContainedBoxInList(child, index, index - 1);
 }
 
-void BoxesGroup::bringContainedBoxToEndList(BoundingBox *child) {
+void BoxesGroup::bringContainedBoxToEndList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == mContainedBoxes.count() - 1) return;
     moveContainedBoxInList(child, index, mContainedBoxes.length() - 1);
 }
 
-void BoxesGroup::bringContainedBoxToFrontList(BoundingBox *child) {
+void BoxesGroup::bringContainedBoxToFrontList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == 0) return;
     moveContainedBoxInList(child, index, 0);
 }
 
-void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
+void BoxesGroup::moveContainedBoxInList(BoundingBox * const child,
                                         const int &to) {
     const int from = getContainedBoxIndex(child);
     if(from == -1) return;
     moveContainedBoxInList(child, from, to);
 }
 
-void BoxesGroup::moveContainedBoxInList(BoundingBox *child,
+void BoxesGroup::moveContainedBoxInList(BoundingBox * const child,
                                         const int &from, const int &to) {
     mContainedBoxes.move(from, to);
     updateContainedBoxIds(qMin(from, to), qMax(from, to));
-    SWT_moveChildAbstractionForTargetToInAll(child, mContainedBoxes.count() - to - 1
-                                                    + ca_mChildAnimators.count());
+    SWT_moveChildAbstractionForTargetToInAll(child, boxIdToAbstractionId(to));
     scheduleUpdate(Animator::USER_CHANGE);
 
     prp_updateInfluenceRangeAfterChanged();
 }
 
-void BoxesGroup::moveContainedBoxBelow(BoundingBox *boxToMove,
-                                       BoundingBox* below) {
+void BoxesGroup::moveContainedBoxBelow(BoundingBox * const boxToMove,
+                                       BoundingBox * const below) {
     const int &indexFrom = getContainedBoxIndex(boxToMove);
     int indexTo = getContainedBoxIndex(below);
     if(indexFrom > indexTo) {
@@ -919,8 +922,8 @@ void BoxesGroup::moveContainedBoxBelow(BoundingBox *boxToMove,
     moveContainedBoxInList(boxToMove, indexFrom, indexTo);
 }
 
-void BoxesGroup::moveContainedBoxAbove(BoundingBox *boxToMove,
-                                       BoundingBox* above) {
+void BoxesGroup::moveContainedBoxAbove(BoundingBox * const boxToMove,
+                                       BoundingBox * const above) {
     const int &indexFrom = getContainedBoxIndex(boxToMove);
     int indexTo = getContainedBoxIndex(above);
     if(indexFrom < indexTo) {

@@ -193,8 +193,17 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
     const bool suppInto = supportedDropTypes & DROP_INTO;
     const bool suppBelow = supportedDropTypes & DROP_BELOW;
     if(suppInto) {
-        if(qAbs(relYPos - MIN_WIDGET_HEIGHT*0.5) < MIN_WIDGET_HEIGHT*0.5) {
-            return DropTarget{targetAbs, 0};
+        //if(qAbs(relYPos - MIN_WIDGET_HEIGHT*0.5) < MIN_WIDGET_HEIGHT*0.5) {
+        if(!above) {
+            int firstId = 0;
+            if(mCurrentlyDragged.fType == Dragged::BOX) {
+                const auto targetUnderMouse = targetAbs->getTarget();
+                if(targetUnderMouse->SWT_isBoxesGroup()) {
+                    const auto bbUnderMouse = GetAsPtr(targetUnderMouse, BoxesGroup);
+                    firstId = bbUnderMouse->ca_getNumberOfChildren();
+                }
+            }
+            return DropTarget{targetAbs, firstId};
         }
     }
     if((above || ! suppBelow) && suppAbove) {
@@ -301,37 +310,34 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
         const auto targetGroup = static_cast<const BoxesGroup*>(
                     targetSWT);
         if(idInTarget < targetGroup->ca_getNumberOfChildren()) return false;
-        const auto currentParent = draggedBox->getParentGroup();
-        if(currentParent == targetGroup &&
-           (idInTarget == draggedAbs->getIdInParent() ||
-            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
+//        const int targetBoxId = targetGroup->abstractionIdToBoxId(idInTarget) + 1;
+//        const auto currentParent = draggedBox->getParentGroup();
+//        if(currentParent == targetGroup &&
+//           (targetBoxId == draggedBox->getZIndex() ||
+//            targetBoxId == draggedBox->getZIndex() + 1)) return false;
         if(targetGroup->isAncestor(draggedBox)) return false;
     } else if(mCurrentlyDragged.fType == Dragged::RASTER_EFFECT) {
         if(!targetSWT->SWT_isPixmapEffectAnimators()) return false;
-        const auto draggedAbs = mCurrentlyDragged.fPtr;
-        const auto draggedEffect = static_cast<PixmapEffect*>(
-                    draggedAbs->getTarget());
-        const auto targetParent = static_cast<const EffectAnimators*>(
-                    targetSWT);
-        const auto currentParent = draggedEffect->getParentEffectAnimators();
-        if(currentParent == targetParent &&
-           (idInTarget == draggedAbs->getIdInParent() ||
-            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
+//        const auto draggedAbs = mCurrentlyDragged.fPtr;
+//        const auto draggedEffect = static_cast<PixmapEffect*>(
+//                    draggedAbs->getTarget());
+//        const auto targetParent = static_cast<const EffectAnimators*>(
+//                    targetSWT);
+//        const auto currentParent = draggedEffect->getParentEffectAnimators();
+//        if(currentParent == targetParent &&
+//           (idInTarget == draggedAbs->getIdInParent() ||
+//            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
     } else if(mCurrentlyDragged.fType == Dragged::PATH_EFFECT) {
         if(!targetSWT->SWT_isPathEffectAnimators()) return false;
-        const auto draggedAbs = mCurrentlyDragged.fPtr;
-        const auto draggedEffect = static_cast<PathEffect*>(
-                    draggedAbs->getTarget());
-        const auto targetParent = static_cast<const PathEffectAnimators*>(
-                    targetSWT);
-        const auto currentParent = draggedEffect->getParentEffectAnimators();
-        if(currentParent == targetParent &&
-           (idInTarget == draggedAbs->getIdInParent() ||
-            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
-        qDebug() << targetAbs;
-        qDebug() << "current:" << draggedAbs->getIdInParent();
-        qDebug() << "drop:" << idInTarget;
-        qDebug() << "";
+//        const auto draggedAbs = mCurrentlyDragged.fPtr;
+//        const auto draggedEffect = static_cast<PathEffect*>(
+//                    draggedAbs->getTarget());
+//        const auto targetParent = static_cast<const PathEffectAnimators*>(
+//                    targetSWT);
+//        const auto currentParent = draggedEffect->getParentEffectAnimators();
+//        if(currentParent == targetParent &&
+//           (idInTarget == draggedAbs->getIdInParent() ||
+//            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
     } else return false;
 
     return true;
@@ -347,7 +353,15 @@ DropTypes_ BoxScrollWidgetVisiblePart::dropOnSWTSupported(
     if(!parentAbs) return DropType::DROP_NONE;
     const int targetIdInParent = absUnderMouse->getIdInParent();
     const bool dropAbove = droppingSupported(parentAbs, targetIdInParent);
-    const bool dropInto = droppingSupported(absUnderMouse, 0);
+    int firstId = 0;
+    if(mCurrentlyDragged.fType == Dragged::BOX) {
+        const auto targetUnderMouse = absUnderMouse->getTarget();
+        if(targetUnderMouse->SWT_isBoxesGroup()) {
+            const auto bbUnderMouse = GetAsPtr(targetUnderMouse, BoxesGroup);
+            firstId = bbUnderMouse->ca_getNumberOfChildren();
+        }
+    }
+    const bool dropInto = droppingSupported(absUnderMouse, firstId);
     const bool dropBelow = droppingSupported(parentAbs, targetIdInParent + 1);
     return (dropAbove ? DropType::DROP_ABOVE : DropType::DROP_NONE) |
            (dropInto ? DropType::DROP_INTO : DropType::DROP_NONE) |
@@ -377,7 +391,11 @@ void BoxScrollWidgetVisiblePart::updateDragLine() {
             if(abs->getIdInParent() == mDropTarget.fTargetId) { // above
                 yPos = bsw->y();
             } else if(abs->getIdInParent() == mDropTarget.fTargetId - 1) { // below
-                yPos = bsw->y() + bsw->height();
+                const auto absParent = abs->getParent();
+                yPos = bsw->y() + abs->getHeight(getCurrentRulesCollection(),
+                                                 true,
+                                                 absParent->isMainTarget(),
+                                                 MIN_WIDGET_HEIGHT);
             } else continue;
             mCurrentDragLine = QLine(bsw->x(), yPos, width(), yPos);
             mDragging = true;
@@ -447,18 +465,20 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         const auto draggedBox = GetAsSPtr(draggedSWT, BoundingBox);
         const auto targetGroup = GetAsPtr(targetSWT, BoxesGroup);
         const auto currentDraggedParent = draggedBox->getParentGroup();
-        const int targetNAnimators = targetGroup->ca_getNumberOfChildren();
+        int boxTargetId = targetGroup->abstractionIdToBoxId(fTargetId) + 1;
         if(currentDraggedParent != targetGroup) {
             currentDraggedParent->removeContainedBox_k(draggedBox);
-            const int boxTargetId = fTargetId - targetNAnimators;
             targetGroup->addContainedBoxToListAt(boxTargetId, draggedBox);
             draggedBox->applyTransformationInverted(
                         draggedBox->getTransformAnimator());
         } else {
-            int targetId = fTargetId;
-            if(draggedAbs->getIdInParent() < fTargetId) targetId--;
+            const int targetBoxId = targetGroup->abstractionIdToBoxId(fTargetId) + 1;
+            if(targetBoxId == draggedBox->getZIndex() ||
+               targetBoxId == draggedBox->getZIndex() + 1) return false;
+
+            if(draggedBox->getZIndex() < boxTargetId) boxTargetId--;
             currentDraggedParent->moveContainedBoxInList(
-                        draggedBox.get(), targetId - targetNAnimators);
+                        draggedBox.get(), boxTargetId);
         }
     } else if(dragged.fType == Dragged::RASTER_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, PixmapEffect);
@@ -468,6 +488,8 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
             targetParent->getParentBox()->addEffect(draggedEffect);
             currentParent->getParentBox()->removeEffect(draggedEffect);
         } else {
+            if(fTargetId == draggedAbs->getIdInParent() ||
+               fTargetId == draggedAbs->getIdInParent() + 1) return false;
             int targetId = fTargetId;
             if(draggedAbs->getIdInParent() < fTargetId) targetId--;
             currentParent->ca_moveChildInList(draggedEffect.get(), fTargetId);
@@ -497,6 +519,8 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
                 draggedEffect->setIsOutlineEffect(false);
             }
         } else {
+            if(fTargetId == draggedAbs->getIdInParent() ||
+               fTargetId == draggedAbs->getIdInParent() + 1) return false;
             int targetId = fTargetId;
             if(draggedAbs->getIdInParent() < fTargetId) targetId--;
             currentParent->ca_moveChildInList(draggedEffect.get(), targetId);
