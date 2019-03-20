@@ -7,25 +7,36 @@ class QMenu;
 class QAction;
 class QMimeData;
 
-enum SWT_Rule : short {
-    SWT_NoRule,
-    SWT_Selected,
-    SWT_Visible,
-    SWT_Invisible,
-    SWT_Locked,
-    SWT_Unlocked,
-    SWT_Animated,
-    SWT_NotAnimated
+enum SWT_BoxRule : short {
+    SWT_BR_ALL,
+    SWT_BR_SELECTED,
+    SWT_BR_VISIBLE,
+    SWT_BR_HIDDEN,
+    SWT_BR_LOCKED,
+    SWT_BR_UNLOCKED,
+    SWT_BR_ANIMATED,
+    SWT_BR_NOT_ANIMATED
 };
 
-typedef bool (SingleWidgetTarget::*SWT_Checker)() const;
+
+enum SWT_Target : short {
+    SWT_TARGET_CURRENT_CANVAS,
+    SWT_TARGET_CURRENT_GROUP,
+    SWT_TARGET_ALL
+};
+
+enum SWT_Type : short {
+    SWT_TYPE_ALL,
+    SWT_TYPE_GRAPHICS,
+    SWT_TYPE_SOUND
+};
 
 struct SWT_RulesCollection {
     SWT_RulesCollection();
-    SWT_RulesCollection(const SWT_Rule &ruleT,
+    SWT_RulesCollection(const SWT_BoxRule &ruleT,
                         const bool &alwaysShowChildrenT,
                         const SWT_Target &targetT,
-                        SWT_Checker typeT,
+                        const SWT_Type& typeT,
                         const QString &searchStringT) {
         fRule = ruleT;
         fAlwaysShowChildren = alwaysShowChildrenT;
@@ -34,19 +45,12 @@ struct SWT_RulesCollection {
         fSearchString = searchStringT;
     }
 
-    SWT_Rule fRule;
+    SWT_BoxRule fRule;
     bool fAlwaysShowChildren;
     SWT_Target fTarget;
-    SWT_Checker fType;
+    SWT_Type fType;
     QString fSearchString;
 };
-
-enum SWT_Target : short {
-    SWT_CurrentCanvas,
-    SWT_CurrentGroup,
-    SWT_All
-};
-
 
 class SingleWidgetTarget : public SelfRef {
 public:
@@ -170,7 +174,7 @@ public:
     }
 
     void SWT_scheduleWidgetsContentUpdateWithRule(
-            const SWT_Rule &rule);
+            const SWT_BoxRule &rule);
 
     void SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
     void SWT_scheduleWidgetsContentUpdateWithTarget(
@@ -224,18 +228,6 @@ protected:
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
     QList<stdsptr<SingleWidgetAbstraction>> SWT_mAllAbstractions;
-};
-
-struct SWT_TargetTypes {
-    bool isTargeted(SingleWidgetTarget * const target) const {
-        if(!target) return false;
-        for(SWT_Checker func : fTargetsFunctionList) {
-            if((target->*func)()) return true;
-        }
-        return false;
-    }
-
-    QList<SWT_Checker> fTargetsFunctionList;
 };
 
 #endif // SINGLEWIDGETTARGET_H

@@ -29,8 +29,6 @@ public:
                        const qreal &pixelsPerFrame,
                        QList<Key *> &listKeys);
 
-    BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
-            const SWT_TargetTypes &type, const int &yPos, bool *isBelow);
     void updateDropTarget();
     void stopScrolling();
     DurationRectangleMovable *getRectangleMovableAtPos(
@@ -59,7 +57,6 @@ private:
     QLine mCurrentDragLine;
     int mLastDragMoveY;
 
-    SWT_TargetTypes mLastDragMoveTargetTypes;
     QTimer *mScrollTimer = nullptr;
     KeysView *mKeysView = nullptr;
     struct Dragged {

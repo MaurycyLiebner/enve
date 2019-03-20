@@ -31,7 +31,8 @@ void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
     }
     //paint->setAntiAlias(true);
     //paint->setFilterQuality(kHigh_SkFilterQuality);
-    SkiaHelpers::drawImageGPU(canvas, mImageSk, mDrawPos.x(), mDrawPos.y(), paint, grContext);
+    SkiaHelpers::drawImageGPU(canvas, mImageSk,
+                              mDrawPos.x(), mDrawPos.y(), paint, grContext);
     //canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
     canvas->restore();
 }

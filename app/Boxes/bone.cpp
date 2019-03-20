@@ -123,13 +123,13 @@ Bone *Bone::createBone(Bone *parentBone) {
 void Bone::deselect() {
     mSelected = false;
 
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_SELECTED);
 }
 
 void Bone::select() {
     mSelected = true;
 
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_SELECTED);
 }
 
 const bool &Bone::isSelected() { return mSelected; }

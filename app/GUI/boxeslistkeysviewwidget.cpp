@@ -71,8 +71,8 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                            &BoxesListKeysViewWidget::setRuleNotAnimated);
     objectsMenu->addAction("Visible", this,
                            &BoxesListKeysViewWidget::setRuleVisible);
-    objectsMenu->addAction("Invisible", this,
-                           &BoxesListKeysViewWidget::setRuleInvisible);
+    objectsMenu->addAction("Hidden", this,
+                           &BoxesListKeysViewWidget::setRuleHidden);
     objectsMenu->addAction("Unlocked", this,
                            &BoxesListKeysViewWidget::setRuleUnloced);
     objectsMenu->addAction("Locked", this,
@@ -160,9 +160,9 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     const auto window = mMainWindow->getCanvasWindow()->getWindowSWT();
     mBoxesListWidget = new BoxScrollWidget(window, mBoxesListScrollArea);
     auto visiblePartWidget = mBoxesListWidget->getVisiblePartWidget();
-    visiblePartWidget->setCurrentRule(SWT_NoRule);
+    visiblePartWidget->setCurrentRule(SWT_BR_ALL);
     auto newTarget = window->getCanvasWindow()->getCurrentCanvas();
-    visiblePartWidget->setCurrentTarget(newTarget, SWT_CurrentCanvas);
+    visiblePartWidget->setCurrentTarget(newTarget, SWT_TARGET_CURRENT_CANVAS);
 
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
     mBoxesListLayout->addWidget(mBoxesListScrollArea);
@@ -285,59 +285,48 @@ void BoxesListKeysViewWidget::removeThis() {
     mBoxesListAnimationDockWidget->removeBoxesListKeysViewWidget(this);
 }
 
-void BoxesListKeysViewWidget::setRuleNone() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_NoRule);
+void BoxesListKeysViewWidget::setBoxRule(const SWT_BoxRule& rule) {
+    mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(rule);
     mMainWindow->queScheduledTasksAndUpdate();
+}
+
+void BoxesListKeysViewWidget::setRuleNone() {
+    setBoxRule(SWT_BR_ALL);
 }
 
 void BoxesListKeysViewWidget::setRuleSelected() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Selected);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setBoxRule(SWT_BR_SELECTED);
 }
 
 void BoxesListKeysViewWidget::setRuleAnimated() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Animated);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setBoxRule(SWT_BR_ANIMATED);
 }
 
 void BoxesListKeysViewWidget::setRuleNotAnimated() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_NotAnimated);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setBoxRule(SWT_BR_NOT_ANIMATED);
 }
 
 void BoxesListKeysViewWidget::setRuleVisible() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Visible);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setBoxRule(SWT_BR_VISIBLE);
 }
 
-void BoxesListKeysViewWidget::setRuleInvisible() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Invisible);
-    mMainWindow->queScheduledTasksAndUpdate();
+void BoxesListKeysViewWidget::setRuleHidden() {
+    setBoxRule(SWT_BR_HIDDEN);
 }
 
 void BoxesListKeysViewWidget::setRuleUnloced() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Unlocked);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setBoxRule(SWT_BR_UNLOCKED);
 }
 
 void BoxesListKeysViewWidget::setRuleLocked() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Locked);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setBoxRule(SWT_BR_LOCKED);
 }
 
 void BoxesListKeysViewWidget::setTargetAll() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getWindowSWT(),
-                SWT_All);
+                SWT_TARGET_ALL);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
@@ -345,7 +334,7 @@ void BoxesListKeysViewWidget::setTargetCurrentCanvas() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getCurrentCanvas(),
-                SWT_CurrentCanvas);
+                SWT_TARGET_CURRENT_CANVAS);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
@@ -353,28 +342,28 @@ void BoxesListKeysViewWidget::setTargetCurrentGroup() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getCurrentGroup(),
-                SWT_CurrentGroup);
+                SWT_TARGET_CURRENT_GROUP);
+    mMainWindow->queScheduledTasksAndUpdate();
+}
+
+void BoxesListKeysViewWidget::setCurrentType(const SWT_Type& type) {
+    mBoxesListWidget->getVisiblePartWidget()->setCurrentType(type);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void BoxesListKeysViewWidget::setTypeAll() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentType(nullptr);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setCurrentType(SWT_TYPE_ALL);
 }
 
 void BoxesListKeysViewWidget::setTypeSound() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentType(&SingleWidgetTarget::SWT_isSingleSound);
-    mMainWindow->queScheduledTasksAndUpdate();
+    setCurrentType(SWT_TYPE_SOUND);
 }
 
 void BoxesListKeysViewWidget::setTypeGraphics() {
-
+    setCurrentType(SWT_TYPE_GRAPHICS);
 }
 
 void BoxesListKeysViewWidget::setSearchText(const QString &text) {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentSearchText(text);
+    mBoxesListWidget->getVisiblePartWidget()->setCurrentSearchText(text);
     mMainWindow->queScheduledTasksAndUpdate();
 }

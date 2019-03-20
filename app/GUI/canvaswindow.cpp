@@ -104,10 +104,10 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     }
     mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
                 currentGroup,
-                SWT_CurrentGroup);
+                SWT_TARGET_CURRENT_GROUP);
     mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
                 mCurrentCanvas.data(),
-                SWT_CurrentCanvas);
+                SWT_TARGET_CURRENT_CANVAS);
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
     queScheduledTasksAndUpdate();
 }

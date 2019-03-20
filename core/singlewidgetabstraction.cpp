@@ -147,7 +147,7 @@ bool SingleWidgetAbstraction::contentVisible() {
 }
 
 void SingleWidgetAbstraction::scheduleWidgetContentUpdateIfIsCurrentRule(
-        const SWT_Rule &rule) {
+        const SWT_BoxRule &rule) {
     mUpdateFuncs.fContentUpdateIfIsCurrentRule(rule);
 }
 

@@ -204,7 +204,8 @@ int SingleSound::prp_getFrameShift() const {
 bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool &parentSatisfies,
                                       const bool &parentMainTarget) const {
-    if(rules.fType == &SingleWidgetTarget::SWT_isSingleSound) return true;
+    if(rules.fType == SWT_TYPE_SOUND) return true;
+    if(rules.fType == SWT_TYPE_GRAPHICS) return false;
     return SingleWidgetTarget::SWT_shouldBeVisible(rules,
                                                    parentSatisfies,
                                                    parentMainTarget);

@@ -22,14 +22,14 @@ public:
     void callUpdaters();
 
     void setMainAbstraction(SingleWidgetAbstraction *abs);
-    void setCurrentRule(const SWT_Rule &rule);
+    void setCurrentRule(const SWT_BoxRule &rule);
     void setCurrentTarget(SingleWidgetTarget *targetP,
                           const SWT_Target &target);
     void setAlwaysShowChildren(const bool &alwaysShowChildren);
     void setCurrentSearchText(const QString &text);
 
-    void scheduleContentUpdateIfIsCurrentRule(const SWT_Rule &rule);
-    bool isCurrentRule(const SWT_Rule &rule);
+    void scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule &rule);
+    bool isCurrentRule(const SWT_BoxRule &rule);
 
     SWT_RulesCollection getCurrentRulesCollection() {
         return mCurrentRulesCollection;
@@ -42,7 +42,7 @@ public:
     void scheduleContentUpdateIfSearchNotEmpty();
     void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
                                                 const SWT_Target &target);
-    void setCurrentType(SWT_Checker type);
+    void setCurrentType(const SWT_Type &type);
     int getId() const { return mId; }
     const UpdateFuncs& getUpdateFuncs() const {
         return mUpdateFuncs;
@@ -50,7 +50,7 @@ public:
 protected:
     void setupUpdateFuncs() {
         mUpdateFuncs.fContentUpdateIfIsCurrentRule =
-                [this](const SWT_Rule &rule) {
+                [this](const SWT_BoxRule &rule) {
             scheduleContentUpdateIfIsCurrentRule(rule);
         };
         mUpdateFuncs.fContentUpdateIfIsCurrentTarget =

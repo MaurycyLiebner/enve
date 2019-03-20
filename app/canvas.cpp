@@ -143,7 +143,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
 
     //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
     SWT_scheduleWidgetsContentUpdateWithTarget(mCurrentBoxesGroup,
-                                               SWT_CurrentGroup);
+                                               SWT_TARGET_CURRENT_GROUP);
 }
 
 void Canvas::drawSelectedSk(SkCanvas *canvas,
@@ -276,24 +276,26 @@ void Canvas::renderSk(SkCanvas * const canvas,
                 !mCurrentPreviewContainerOutdated;
                 //mExpiredPixmap == 0;
         drawTransparencyMesh(canvas, viewRect);
-        if(!drawCanvas) {
+
+
+        if(!mClipToCanvasSize || !drawCanvas) {
+            canvas->saveLayer(nullptr, nullptr);
             paint.setColor(QColorToSkColor(mBackgroundColor->getCurrentColor()));
             canvas->drawRect(viewRect, paint);
-        }
-
-        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
-        canvas->saveLayer(nullptr, nullptr);
-        if(!mClipToCanvasSize || !drawCanvas) {
+            canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
             for(const auto& box : mContainedBoxes) {
                 box->drawPixmapSk(canvas, grContext);
             }
+            canvas->restore();
         }
+        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         if(drawCanvas) {
+            canvas->save();
             SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
+            canvas->restore();
         }
-        canvas->restore();
 #endif
 //        QPen pen = QPen(Qt::black, 1.5);
 //        pen.setCosmetic(true);
@@ -1082,30 +1084,28 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                  const bool &parentMainTarget) const {
     Q_UNUSED(parentSatisfies);
     Q_UNUSED(parentMainTarget);
-    const SWT_Rule &rule = rules.fRule;
+    const SWT_BoxRule &rule = rules.fRule;
     const bool &alwaysShowChildren = rules.fAlwaysShowChildren;
     if(alwaysShowChildren) {
         return false;
     } else {
-        if(!rules.fType) {
-        } else if(rules.fType == &SingleWidgetTarget::SWT_isSingleSound) {
-            return false;
-        }
-        if(rule == SWT_NoRule) {
+        if(rules.fType == SWT_TYPE_SOUND) return false;
+
+        if(rule == SWT_BR_ALL) {
             return true;
-        } else if(rule == SWT_Selected) {
+        } else if(rule == SWT_BR_SELECTED) {
             return false;
-        } else if(rule == SWT_Animated) {
+        } else if(rule == SWT_BR_ANIMATED) {
             return false;
-        } else if(rule == SWT_NotAnimated) {
+        } else if(rule == SWT_BR_NOT_ANIMATED) {
             return false;
-        } else if(rule == SWT_Visible) {
+        } else if(rule == SWT_BR_VISIBLE) {
             return true;
-        } else if(rule == SWT_Invisible) {
+        } else if(rule == SWT_BR_HIDDEN) {
             return false;
-        } else if(rule == SWT_Locked) {
+        } else if(rule == SWT_BR_LOCKED) {
             return false;
-        } else if(rule == SWT_Unlocked) {
+        } else if(rule == SWT_BR_UNLOCKED) {
             return true;
         }
     }

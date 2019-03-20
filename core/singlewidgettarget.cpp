@@ -43,7 +43,7 @@ void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
-        const SWT_Rule &rule) {
+        const SWT_BoxRule &rule) {
     for(const auto& abs : SWT_mAllAbstractions) {
         abs->scheduleWidgetContentUpdateIfIsCurrentRule(rule);
     }

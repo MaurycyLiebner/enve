@@ -4,7 +4,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 class SingleWidgetTarget;
 
-enum SWT_Rule : short;
+enum SWT_BoxRule : short;
 enum SWT_Target : short;
 struct SWT_RulesCollection;
 
@@ -13,7 +13,7 @@ template <typename T> using stdfunc = std::function<T>;
 typedef std::function<void(SingleWidgetAbstraction*, int)> SetAbsFunc;
 
 struct UpdateFuncs {
-    stdfunc<void(const SWT_Rule &)> fContentUpdateIfIsCurrentRule;
+    stdfunc<void(const SWT_BoxRule &)> fContentUpdateIfIsCurrentRule;
     stdfunc<void(SingleWidgetTarget*, const SWT_Target &)>
         fContentUpdateIfIsCurrentTarget;
     stdfunc<void()> fContentUpdateIfSearchNotEmpty;
@@ -72,7 +72,7 @@ public:
     }
 
     void scheduleWidgetContentUpdateIfIsCurrentRule(
-            const SWT_Rule &rule);
+            const SWT_BoxRule &rule);
 
     bool isMainTarget() {
         return mIsMainTarget;

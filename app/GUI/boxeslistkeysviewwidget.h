@@ -18,6 +18,9 @@ class ScrollArea;
 class AnimationDockWidget;
 class BoxScrollWidget;
 
+enum SWT_Type : short;
+enum SWT_BoxRule : short;
+
 class BoxesListKeysViewWidget : public QWidget {
     Q_OBJECT
 public:
@@ -40,7 +43,7 @@ public slots:
     void setRuleAnimated();
     void setRuleNotAnimated();
     void setRuleVisible();
-    void setRuleInvisible();
+    void setRuleHidden();
     void setRuleUnloced();
     void setRuleLocked();
 
@@ -62,6 +65,9 @@ protected slots:
     void addNewBelowThis();
     void removeThis();
 private:
+    void setCurrentType(const SWT_Type &type);
+    void setBoxRule(const SWT_BoxRule &rule);
+
     QHBoxLayout *mMainLayout;
     QVBoxLayout *mBoxesListLayout;
     QVBoxLayout *mKeysViewLayout;

@@ -402,18 +402,6 @@ void BoxScrollWidgetVisiblePart::scrollDown() {
 
 void BoxScrollWidgetVisiblePart::updateDraggedFromMimeData(
         const QMimeData * const mimeData) {
-    if(BoundingBoxMimeData::hasFormat(mimeData)) {
-        mLastDragMoveTargetTypes.fTargetsFunctionList = QList<SWT_Checker>(
-                        {&SingleWidgetTarget::SWT_isBoundingBox,
-                         &SingleWidgetTarget::SWT_isBoxesGroup});
-    } else if(PixmapEffectMimeData::hasFormat(mimeData)) {
-        mLastDragMoveTargetTypes.fTargetsFunctionList = QList<SWT_Checker>(
-                        {&SingleWidgetTarget::SWT_isPixmapEffect});
-    } else if(PathEffectMimeData::hasFormat(mimeData)) {
-        mLastDragMoveTargetTypes.fTargetsFunctionList = QList<SWT_Checker>(
-                        {&SingleWidgetTarget::SWT_isPathEffect});
-    }
-
     const SingleWidgetTarget * swt = nullptr;
     Dragged::Type type = Dragged::NONE;
     if(BoundingBoxMimeData::hasFormat(mimeData)) {

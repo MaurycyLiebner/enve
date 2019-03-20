@@ -11,7 +11,7 @@ int ScrollWidgetVisiblePart::mNextId = 0;
 
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(ScrollWidget * const parent) :
     MinimalScrollWidgetVisiblePart(parent), mId(mNextId++) {
-    mCurrentRulesCollection.fRule = SWT_NoRule;
+    mCurrentRulesCollection.fRule = SWT_BR_ALL;
     setupUpdateFuncs();
 }
 
@@ -25,7 +25,7 @@ void ScrollWidgetVisiblePart::callUpdaters() {
 }
 
 void ScrollWidgetVisiblePart::setCurrentRule(
-        const SWT_Rule &rule) {
+        const SWT_BoxRule &rule) {
     mCurrentRulesCollection.fRule = rule;
     updateParentHeight();
     updateVisibleWidgetsContent();
@@ -40,7 +40,7 @@ void ScrollWidgetVisiblePart::setCurrentTarget(
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setCurrentType(SWT_Checker type) {
+void ScrollWidgetVisiblePart::setCurrentType(const SWT_Type& type) {
     mCurrentRulesCollection.fType = type;
     updateParentHeight();
     updateVisibleWidgetsContent();
@@ -61,7 +61,7 @@ void ScrollWidgetVisiblePart::setCurrentSearchText(
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
-        const SWT_Rule &rule) {
+        const SWT_BoxRule &rule) {
     if(isCurrentRule(rule)) {
         scheduleUpdateParentHeight();
         scheduleUpdateVisibleWidgetsContent();
@@ -84,7 +84,7 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
     scheduleUpdateVisibleWidgetsContent();
 }
 
-bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
+bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_BoxRule &rule) {
     return rule == mCurrentRulesCollection.fRule;
 }
 
@@ -137,9 +137,9 @@ QWidget *ScrollWidgetVisiblePart::createNewSingleWidget() {
 }
 
 SWT_RulesCollection::SWT_RulesCollection() {
-    fType = nullptr;
-    fRule = SWT_NoRule;
+    fType = SWT_TYPE_ALL;
+    fRule = SWT_BR_ALL;
     fAlwaysShowChildren = false;
-    fTarget = SWT_CurrentCanvas;
+    fTarget = SWT_TARGET_CURRENT_CANVAS;
     fSearchString = "";
 }
