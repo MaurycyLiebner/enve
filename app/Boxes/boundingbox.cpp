@@ -19,7 +19,7 @@
 #include "GPUEffects/gpurastereffect.h"
 #include "linkbox.h"
 
-QList<qptr<BoundingBox>> BoundingBox::sLoadedBoxes;
+QList<BoundingBox*> BoundingBox::sLoadedBoxes;
 QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::sFunctionsWaitingForBoxLoad;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :

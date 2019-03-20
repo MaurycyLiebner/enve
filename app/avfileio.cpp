@@ -698,8 +698,7 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     mTransformAnimator->readProperty(target);
     mEffectsAnimators->readProperty(target);
 
-    if(hasDurRect)
-        anim_shiftAllKeys(prp_getFrameShift());
+    if(hasDurRect) anim_shiftAllKeys(prp_getFrameShift());
     BoundingBox::sAddLoadedBox(this);
     mPivotAutoAdjust = pivotAutoAdjust;
 }

@@ -40,17 +40,18 @@ void VectorPath::revertAllPoints() {
 }
 
 void VectorPath::breakPathsApart_k() {
-    QList<qsptr<VectorPathAnimator>> pathsList = mPathAnimator->getSinglePathsList();
+    QList<qsptr<VectorPathAnimator>> pathsList =
+            mPathAnimator->getSinglePathsList();
     for(const auto& path : pathsList) {
-        auto newPath = SPtrCreate(VectorPath)();
+        const auto newPath = SPtrCreate(VectorPath)();
         copyPathBoxDataTo(newPath.get());
         mParentGroup->addContainedBox(newPath);
-        PathAnimator *pathAnimator = newPath->getPathAnimator();
+        const auto pathAnimator = newPath->getPathAnimator();
         pathAnimator->addSinglePathAnimator(path);
         mPathAnimator->removeSinglePathAnimator_k(path);
         path->setParentPath(pathAnimator);
     }
-    removeFromParent_k();
+    //removeFromParent_k();
 }
 
 bool VectorPath::differenceInEditPathBetweenFrames(

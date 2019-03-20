@@ -78,7 +78,7 @@ public:
     static int sGetLoadedBoxesCount();
     static void sClearLoadedBoxes();
 private:
-    static QList<qptr<BoundingBox>> sLoadedBoxes;
+    static QList<BoundingBox*> sLoadedBoxes;
     static QList<stdsptr<FunctionWaitingForBoxLoad>> sFunctionsWaitingForBoxLoad;
 public slots:
     virtual void updateAfterDurationRectangleRangeChanged();
