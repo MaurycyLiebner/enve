@@ -61,24 +61,36 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                 "}");
     mBoxesListMenuBar->addSeparator();
     QMenu * const objectsMenu = mBoxesListMenuBar->addMenu("State");
-    objectsMenu->addAction("All", this, SLOT(setRuleNone()));
-    objectsMenu->addAction("Selected", this, SLOT(setRuleSelected()));
-    objectsMenu->addAction("Animated", this, SLOT(setRuleAnimated()));
-    objectsMenu->addAction("Not Animated", this, SLOT(setRuleNotAnimated()));
-    objectsMenu->addAction("Visible", this, SLOT(setRuleVisible()));
-    objectsMenu->addAction("Invisible", this, SLOT(setRuleInvisible()));
-    objectsMenu->addAction("Unlocked", this, SLOT(setRuleUnloced()));
-    objectsMenu->addAction("Locked", this, SLOT(setRuleLocked()));
+    objectsMenu->addAction("All", this,
+                           &BoxesListKeysViewWidget::setRuleNone);
+    objectsMenu->addAction("Selected", this,
+                           &BoxesListKeysViewWidget::setRuleSelected);
+    objectsMenu->addAction("Animated", this,
+                           &BoxesListKeysViewWidget::setRuleAnimated);
+    objectsMenu->addAction("Not Animated", this,
+                           &BoxesListKeysViewWidget::setRuleNotAnimated);
+    objectsMenu->addAction("Visible", this,
+                           &BoxesListKeysViewWidget::setRuleVisible);
+    objectsMenu->addAction("Invisible", this,
+                           &BoxesListKeysViewWidget::setRuleInvisible);
+    objectsMenu->addAction("Unlocked", this,
+                           &BoxesListKeysViewWidget::setRuleUnloced);
+    objectsMenu->addAction("Locked", this,
+                           &BoxesListKeysViewWidget::setRuleLocked);
 
     QMenu * const targetMenu = mBoxesListMenuBar->addMenu("Target");
-    targetMenu->addAction("All", this, SLOT(setTargetAll()));
+    targetMenu->addAction("All", this,
+                          &BoxesListKeysViewWidget::setTargetAll);
     targetMenu->addAction("Current Canvas", this,
-                          SLOT(setTargetCurrentCanvas()));
+                          &BoxesListKeysViewWidget::setTargetCurrentCanvas);
     targetMenu->addAction("Current Group", this,
-                          SLOT(setTargetCurrentGroup()));
+                          &BoxesListKeysViewWidget::setTargetCurrentGroup);
     QMenu * const typeMenu = mBoxesListMenuBar->addMenu("Type");
-    typeMenu->addAction("All", this, SLOT(setTypeAll()));
-    typeMenu->addAction("Sound", this, SLOT(setTypeSound()));
+    typeMenu->addAction("All", this, &BoxesListKeysViewWidget::setTypeAll);
+    typeMenu->addAction("Graphics", this,
+                        &BoxesListKeysViewWidget::setTypeGraphics);
+    typeMenu->addAction("Sound", this,
+                        &BoxesListKeysViewWidget::setTypeSound);
 
     //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
     mGraphAct = mBoxesListMenuBar->addAction("Graph");
@@ -94,8 +106,10 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                                      "border-bottom: 1px solid black;"
                                   "}");
     mCornerMenuBar->addSeparator();
-    mCornerMenuBar->addAction(" + ", this, SLOT(addNewBelowThis()));
-    mCornerMenuBar->addAction(" - ", this, SLOT(removeThis()));
+    mCornerMenuBar->addAction(" + ", this,
+                              &BoxesListKeysViewWidget::addNewBelowThis);
+    mCornerMenuBar->addAction(" - ", this,
+                              &BoxesListKeysViewWidget::removeThis);
     mCornerMenuBar->addSeparator();
 
     mMenuWidgetsLayout = new QHBoxLayout();
@@ -343,16 +357,20 @@ void BoxesListKeysViewWidget::setTargetCurrentGroup() {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
+void BoxesListKeysViewWidget::setTypeAll() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentType(nullptr);
+    mMainWindow->queScheduledTasksAndUpdate();
+}
+
 void BoxesListKeysViewWidget::setTypeSound() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentType(&SingleWidgetTarget::SWT_isSingleSound);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setTypeAll() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentType(nullptr);
-    mMainWindow->queScheduledTasksAndUpdate();
+void BoxesListKeysViewWidget::setTypeGraphics() {
+
 }
 
 void BoxesListKeysViewWidget::setSearchText(const QString &text) {

@@ -883,7 +883,16 @@ void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
         mGPUEffectsAnimators->SWT_show();
     }
     mGPUEffectsAnimators->ca_addChildAnimator(rasterEffect);
-    //effect->setParentEffectAnimators(mGPUEffectsAnimators.data());
+    rasterEffect->setParentEffectAnimators(mGPUEffectsAnimators.data());
+
+    prp_updateInfluenceRangeAfterChanged();
+}
+
+void BoundingBox::removeGPUEffect(const qsptr<GPURasterEffect>& effect) {
+    mGPUEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mGPUEffectsAnimators->hasChildAnimators()) {
+        mGPUEffectsAnimators->SWT_hide();
+    }
 
     prp_updateInfluenceRangeAfterChanged();
 }
@@ -1291,10 +1300,10 @@ void BoundingBox::setLocked(const bool &bt) {
 bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool &parentSatisfies,
                                       const bool &parentMainTarget) const {
-    const SWT_Rule &rule = rules.rule;
+    const SWT_Rule &rule = rules.fRule;
     bool satisfies = false;
-    bool alwaysShowChildren = rules.alwaysShowChildren;
-    if(rules.type == &SingleWidgetTarget::SWT_isSingleSound) return false;
+    bool alwaysShowChildren = rules.fAlwaysShowChildren;
+    if(rules.fType == &SingleWidgetTarget::SWT_isSingleSound) return false;
     if(alwaysShowChildren) {
         if(rule == SWT_NoRule) {
             satisfies = parentSatisfies;

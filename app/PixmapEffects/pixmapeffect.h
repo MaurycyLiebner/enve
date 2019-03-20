@@ -41,12 +41,15 @@ class PixmapEffect : public ComplexAnimator {
     friend class SelfRef;
 public:
     PixmapEffect(const QString& name, const PixmapEffectType &type);
-
-    bool interrupted();
-
+    virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
+            const qreal &relFrame, BoundingBoxRenderData* data) = 0;
     virtual qreal getMargin();
     virtual qreal getMarginAtRelFrame(const int &);
 
+    bool SWT_isPixmapEffect() const;
+
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
 
     void prp_startDragging();
 
@@ -56,6 +59,8 @@ public:
                                       PixmapEffect *& ptr);
 
     QMimeData *SWT_createMimeData();
+
+    bool interrupted();
 
     template <class T = EffectAnimators>
     T *getParentEffectAnimators() {
@@ -67,18 +72,11 @@ public:
         mParentEffects = parentEffects;
     }
 
-    virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData* data) = 0;
-
-    bool SWT_isPixmapEffect() const;
-
-    virtual void writeProperty(QIODevice * const target) const;
     void switchVisible();
 
     void setVisible(const bool &visible);
 
     const bool &isVisible() const;
-    void readProperty(QIODevice *target);
 public slots:
     void interrupt();
 protected:

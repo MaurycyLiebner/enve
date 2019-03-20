@@ -64,7 +64,9 @@ private:
     KeysView *mKeysView = nullptr;
     struct Dragged {
         SingleWidgetAbstraction * fPtr;
-        enum Type { BOX, RASTER_EFFECT, PATH_EFFECT, NONE } fType;
+        enum Type { BOX,
+                    RASTER_EFFECT, RASTER_GPU_EFFECT, PATH_EFFECT,
+                    NONE } fType;
 
         bool isValid() const {
             return fType != NONE && fPtr;

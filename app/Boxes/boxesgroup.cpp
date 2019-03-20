@@ -951,7 +951,7 @@ void BoxesGroup::SWT_addChildrenAbstractions(
 bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool &parentSatisfies,
                                      const bool &parentMainTarget) const {
-    const SWT_Rule &rule = rules.rule;
+    const SWT_Rule &rule = rules.fRule;
     if(rule == SWT_Selected) {
         return BoundingBox::SWT_shouldBeVisible(rules,
                                                 parentSatisfies,

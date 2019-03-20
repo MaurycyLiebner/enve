@@ -239,8 +239,10 @@ public:
     }
 
     void addEffect(const qsptr<PixmapEffect> &effect);
-    void addGPUEffect(const qsptr<GPURasterEffect> &rasterEffect);
     void removeEffect(const qsptr<PixmapEffect> &effect);
+
+    void addGPUEffect(const qsptr<GPURasterEffect> &rasterEffect);
+    void removeGPUEffect(const qsptr<GPURasterEffect> &effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
     virtual const SkBlendMode &getBlendMode();

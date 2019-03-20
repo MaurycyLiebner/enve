@@ -13,6 +13,7 @@
 #include "GUI/keysview.h"
 #include "PixmapEffects/pixmapeffect.h"
 #include "Animators/effectanimators.h"
+#include "Animators/gpueffectanimators.h"
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
         ScrollWidget * const parent) :
@@ -310,34 +311,13 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
         const auto targetGroup = static_cast<const BoxesGroup*>(
                     targetSWT);
         if(idInTarget < targetGroup->ca_getNumberOfChildren()) return false;
-//        const int targetBoxId = targetGroup->abstractionIdToBoxId(idInTarget) + 1;
-//        const auto currentParent = draggedBox->getParentGroup();
-//        if(currentParent == targetGroup &&
-//           (targetBoxId == draggedBox->getZIndex() ||
-//            targetBoxId == draggedBox->getZIndex() + 1)) return false;
         if(targetGroup->isAncestor(draggedBox)) return false;
     } else if(mCurrentlyDragged.fType == Dragged::RASTER_EFFECT) {
         if(!targetSWT->SWT_isPixmapEffectAnimators()) return false;
-//        const auto draggedAbs = mCurrentlyDragged.fPtr;
-//        const auto draggedEffect = static_cast<PixmapEffect*>(
-//                    draggedAbs->getTarget());
-//        const auto targetParent = static_cast<const EffectAnimators*>(
-//                    targetSWT);
-//        const auto currentParent = draggedEffect->getParentEffectAnimators();
-//        if(currentParent == targetParent &&
-//           (idInTarget == draggedAbs->getIdInParent() ||
-//            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
+    } else if(mCurrentlyDragged.fType == Dragged::RASTER_GPU_EFFECT) {
+        if(!targetSWT->SWT_isRasterGPUEffectAnimators()) return false;
     } else if(mCurrentlyDragged.fType == Dragged::PATH_EFFECT) {
         if(!targetSWT->SWT_isPathEffectAnimators()) return false;
-//        const auto draggedAbs = mCurrentlyDragged.fPtr;
-//        const auto draggedEffect = static_cast<PathEffect*>(
-//                    draggedAbs->getTarget());
-//        const auto targetParent = static_cast<const PathEffectAnimators*>(
-//                    targetSWT);
-//        const auto currentParent = draggedEffect->getParentEffectAnimators();
-//        if(currentParent == targetParent &&
-//           (idInTarget == draggedAbs->getIdInParent() ||
-//            idInTarget == draggedAbs->getIdInParent() + 1)) return false;
     } else return false;
 
     return true;
@@ -487,6 +467,21 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         if(currentParent != targetParent) {
             targetParent->getParentBox()->addEffect(draggedEffect);
             currentParent->getParentBox()->removeEffect(draggedEffect);
+        } else {
+            if(fTargetId == draggedAbs->getIdInParent() ||
+               fTargetId == draggedAbs->getIdInParent() + 1) return false;
+            int targetId = fTargetId;
+            if(draggedAbs->getIdInParent() < fTargetId) targetId--;
+            currentParent->ca_moveChildInList(draggedEffect.get(), fTargetId);
+        }
+        targetParent->getParentBox()->prp_updateInfluenceRangeAfterChanged();
+    } else if(dragged.fType == Dragged::RASTER_GPU_EFFECT) {
+        const auto draggedEffect = GetAsSPtr(draggedSWT, GPURasterEffect);
+        auto targetParent = static_cast<GPUEffectAnimators*>(targetSWT);
+        auto currentParent = draggedEffect->getParentEffectAnimators();
+        if(currentParent != targetParent) {
+            targetParent->getParentBox()->addGPUEffect(draggedEffect);
+            currentParent->getParentBox()->removeGPUEffect(draggedEffect);
         } else {
             if(fTargetId == draggedAbs->getIdInParent() ||
                fTargetId == draggedAbs->getIdInParent() + 1) return false;

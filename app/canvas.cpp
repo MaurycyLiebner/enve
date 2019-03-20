@@ -1082,13 +1082,13 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                  const bool &parentMainTarget) const {
     Q_UNUSED(parentSatisfies);
     Q_UNUSED(parentMainTarget);
-    const SWT_Rule &rule = rules.rule;
-    const bool &alwaysShowChildren = rules.alwaysShowChildren;
+    const SWT_Rule &rule = rules.fRule;
+    const bool &alwaysShowChildren = rules.fAlwaysShowChildren;
     if(alwaysShowChildren) {
         return false;
     } else {
-        if(!rules.type) {
-        } else if(rules.type == &SingleWidgetTarget::SWT_isSingleSound) {
+        if(!rules.fType) {
+        } else if(rules.fType == &SingleWidgetTarget::SWT_isSingleSound) {
             return false;
         }
         if(rule == SWT_NoRule) {

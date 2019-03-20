@@ -27,17 +27,17 @@ struct SWT_RulesCollection {
                         const SWT_Target &targetT,
                         SWT_Checker typeT,
                         const QString &searchStringT) {
-        rule = ruleT;
-        alwaysShowChildren = alwaysShowChildrenT;
+        fRule = ruleT;
+        fAlwaysShowChildren = alwaysShowChildrenT;
         fTarget = targetT;
-        type = typeT;
+        fType = typeT;
         fSearchString = searchStringT;
     }
 
-    SWT_Rule rule;
-    bool alwaysShowChildren;
+    SWT_Rule fRule;
+    bool fAlwaysShowChildren;
     SWT_Target fTarget;
-    SWT_Checker type;
+    SWT_Checker fType;
     QString fSearchString;
 };
 
@@ -82,6 +82,7 @@ public:
     virtual bool SWT_isColorAnimator() const { return false; }
     virtual bool SWT_isComplexAnimator() const { return false; }
     virtual bool SWT_isFakeComplexAnimator() const { return false; }
+    virtual bool SWT_isRasterGPUEffectAnimators() const { return false; }
     virtual bool SWT_isPixmapEffectAnimators() const { return false; }
     virtual bool SWT_isPathEffectAnimators() const { return false; }
     virtual bool SWT_isPixmapEffect() const { return false; }

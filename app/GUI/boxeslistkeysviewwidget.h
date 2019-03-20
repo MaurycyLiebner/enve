@@ -51,8 +51,10 @@ public slots:
     void setSearchText(const QString &text);
     void moveSlider(int val);
 
-    void setTypeSound();
     void setTypeAll();
+    void setTypeGraphics();
+    void setTypeSound();
+
     void setGraphEnabled(const bool &bT);
 protected slots:
     void setBoxesListWidth(const int &width);
