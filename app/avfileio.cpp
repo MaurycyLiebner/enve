@@ -44,38 +44,48 @@
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 #include "basicreadwrite.h"
+
 #define FORMAT_STR "AniVect av"
-#define CREATOR_VERSION "0.1a"
+#define CREATOR_VERSION "0.0a"
 #define CREATOR_APPLICATION "AniVect"
 
-struct FileFooter {
-    enum CompatybilityMode {
-        Compatible,
-        NonCompatible
-    };
-
-    const char formatStr[15] = FORMAT_STR;
-    const char creatorVersion[15] = CREATOR_VERSION;
-    const char creatorApplication[15] = CREATOR_APPLICATION;
-
-    CompatybilityMode combatybilityMode() const {
-        if(!std::strcmp(formatStr, FORMAT_STR)) {
-            return Compatible;
-        }
-        return NonCompatible;
+class FileFooter {
+public:
+    static bool sWrite(QIODevice * const target) {
+        return target->write(rcConstChar(sAVFormat), sizeof(char[15])) &&
+               target->write(rcConstChar(sAppName), sizeof(char[15])) &&
+               target->write(rcConstChar(sAppVersion), sizeof(char[15]));
     }
 
-    void write(QIODevice * const target) const {
-        target->write(rcConstChar(this), sizeof(FileFooter));
-    }
+    static bool sCompatible(QIODevice *target) {
+        const qint64 savedPos = target->pos();
+        const qint64 pos = target->size() -
+                static_cast<qint64>(3*sizeof(char[15]));
+        if(!target->seek(pos)) return false;
 
-    void read(QIODevice *target) {
-        const qint64 pos = target->size() - static_cast<qint64>(sizeof(FileFooter));
-        target->seek(pos);
-        target->read(rcChar(this), sizeof(FileFooter));
-        target->seek(0);
+        char format[15];
+        target->read(rcChar(format), sizeof(char[15]));
+        if(std::strcmp(format, sAVFormat)) return false;
+
+//        char appVersion[15];
+//        target->read(rcChar(appVersion), sizeof(char[15]));
+
+//        char appName[15];
+//        target->read(rcChar(appName), sizeof(char[15]));
+
+        if(!target->seek(savedPos))
+            RuntimeThrow("Could not restore current position for QIODevice.");
+        return true;
     }
+private:
+    static char sAVFormat[15];
+    static char sAppName[15];
+    static char sAppVersion[15];
 };
+
+char FileFooter::sAVFormat[15] = "AniVect av";
+char FileFooter::sAppName[15] = "AniVect";
+char FileFooter::sAppVersion[15] = "0.0";
 
 void BoolProperty::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mValue), sizeof(bool));
@@ -96,7 +106,6 @@ void BoolPropertyContainer::readProperty(QIODevice *target) {
     target->read(rcChar(&value), sizeof(bool));
     setValue(value);
 }
-
 
 void ComboBoxProperty::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mCurrentValue), sizeof(int));
@@ -1413,10 +1422,7 @@ void CanvasWindow::readCanvases(QIODevice *target) {
 void MainWindow::loadAVFile(const QString &path) {
     QFile target(path);
     if(target.open(QIODevice::ReadOnly)) {
-        FileFooter footer;
-        footer.read(&target);
-        if(footer.combatybilityMode() ==
-                FileFooter::CompatybilityMode::Compatible) {
+        if(FileFooter::sCompatible(&target)) {
             auto gradientWidget = mFillStrokeSettings->getGradientWidget();
             gradientWidget->readGradients(&target);
             mCanvasWindow->readCanvases(&target);
@@ -1447,8 +1453,7 @@ void MainWindow::saveToFile(const QString &path) {
         clearLoadedGradientsList();
         gradientWidget->clearGradientsLoadIds();
 
-        FileFooter footer;
-        footer.write(&target);
+        FileFooter::sWrite(&target);
 
         target.close();
     } else {
