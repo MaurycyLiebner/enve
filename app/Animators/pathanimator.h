@@ -49,7 +49,7 @@ public:
     void setParentBox(BoundingBox *parent);
     void addSinglePathAnimator(const qsptr<VectorPathAnimator> &path);
     void removeSinglePathAnimator_k(const qsptr<VectorPathAnimator> &path);
-    void selectAllPoints(Canvas *canvas);
+    void selectAllPoints(Canvas * const canvas);
     SkPath getPathAtRelFrame(const int &relFrame);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
     void shiftAllPoints(const int &by);

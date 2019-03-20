@@ -19,8 +19,8 @@
 #include "GPUEffects/gpurastereffect.h"
 #include "linkbox.h"
 
-QList<qptr<BoundingBox>> BoundingBox::mLoadedBoxes;
-QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::mFunctionsWaitingForBoxLoad;
+QList<qptr<BoundingBox>> BoundingBox::sLoadedBoxes;
+QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::sFunctionsWaitingForBoxLoad;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator("box") {
@@ -282,7 +282,7 @@ bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
     return diffThis || diffInherited;
 }
 
-void BoundingBox::setParentGroup(BoxesGroup *parent) {
+void BoundingBox::setParentGroup(BoxesGroup * const parent) {
     mParentGroup = parent;
     if(!mParentGroup) return;
     mParentTransform = parent->getTransformAnimator();
@@ -604,9 +604,8 @@ void BoundingBox::setRelativePos(const QPointF &relPos) {
 }
 
 void BoundingBox::saveTransformPivotAbsPos(const QPointF &absPivot) {
-    mSavedTransformPivot =
-            mParentTransform->mapAbsPosToRel(absPivot) -
-            mTransformAnimator->getPivot();
+    mSavedTransformPivot = mParentTransform->mapAbsPosToRel(absPivot) -
+                           mTransformAnimator->getPivot();
 }
 
 void BoundingBox::startPosTransform() {
@@ -1182,8 +1181,8 @@ void BoundingBox::clearBoxLoadId() {
     mLoadId = -1;
 }
 
-BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
-    for(const auto& box : mLoadedBoxes) {
+BoundingBox *BoundingBox::sGetLoadedBoxById(const int &loadId) {
+    for(const auto& box : sLoadedBoxes) {
         if(!box) return nullptr;
         if(box->getLoadId() == loadId) {
             return box;
@@ -1192,36 +1191,36 @@ BoundingBox *BoundingBox::getLoadedBoxById(const int &loadId) {
     return nullptr;
 }
 
-void BoundingBox::addFunctionWaitingForBoxLoad(
+void BoundingBox::sAddFunctionWaitingForBoxLoad(
         const stdsptr<FunctionWaitingForBoxLoad> &func) {
-    mFunctionsWaitingForBoxLoad << func;
+    sFunctionsWaitingForBoxLoad << func;
 }
 
-void BoundingBox::addLoadedBox(BoundingBox *box) {
-    mLoadedBoxes << box;
-    for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
-        auto funcT = mFunctionsWaitingForBoxLoad.at(i);
+void BoundingBox::sAddLoadedBox(BoundingBox * const box) {
+    sLoadedBoxes << box;
+    for(int i = 0; i < sFunctionsWaitingForBoxLoad.count(); i++) {
+        auto funcT = sFunctionsWaitingForBoxLoad.at(i);
         if(funcT->loadBoxId == box->getLoadId()) {
             funcT->boxLoaded(box);
-            mFunctionsWaitingForBoxLoad.removeAt(i);
+            sFunctionsWaitingForBoxLoad.removeAt(i);
             i--;
         }
     }
 }
 
-int BoundingBox::getLoadedBoxesCount() {
-    return mLoadedBoxes.count();
+int BoundingBox::sGetLoadedBoxesCount() {
+    return sLoadedBoxes.count();
 }
 
-void BoundingBox::clearLoadedBoxes() {
-    for(const auto& box : mLoadedBoxes) {
+void BoundingBox::sClearLoadedBoxes() {
+    for(const auto& box : sLoadedBoxes) {
         box->clearBoxLoadId();
     }
-    mLoadedBoxes.clear();
-    mFunctionsWaitingForBoxLoad.clear();
+    sLoadedBoxes.clear();
+    sFunctionsWaitingForBoxLoad.clear();
 }
 
-void BoundingBox::selectAllPoints(Canvas *canvas) {
+void BoundingBox::selectAllPoints(Canvas * const canvas) {
     Q_UNUSED(canvas);
 }
 

@@ -50,7 +50,7 @@ void AnimationBox::reloadCacheHandler() {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
-void AnimationBox::setParentGroup(BoxesGroup *parent) {
+void AnimationBox::setParentGroup(BoxesGroup * const parent) {
     BoundingBox::setParentGroup(parent);
     updateDurationRectangleAnimationRange();
 }

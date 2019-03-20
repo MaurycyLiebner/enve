@@ -87,7 +87,7 @@ void PathBox::drawSelectedSk(SkCanvas *canvas,
     }
 }
 
-void PathBox::setParentGroup(BoxesGroup *parent) {
+void PathBox::setParentGroup(BoxesGroup * const parent) {
     setPathsOutdated();
     BoundingBox::setParentGroup(parent);
 }

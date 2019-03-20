@@ -30,7 +30,7 @@ VideoBox::~VideoBox() {
     }
 }
 
-void VideoBox::setParentGroup(BoxesGroup *parent) {
+void VideoBox::setParentGroup(BoxesGroup * const parent) {
     if(mParentGroup && mSound) {
         getParentCanvas()->getSoundComposition()->removeSound(mSound);
     }

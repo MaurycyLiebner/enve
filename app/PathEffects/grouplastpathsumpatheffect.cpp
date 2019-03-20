@@ -42,7 +42,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(const qreal &relFrame,
 }
 
 
-void GroupLastPathSumPathEffect::setParentGroup(BoxesGroup *parent) {
+void GroupLastPathSumPathEffect::setParentGroup(BoxesGroup * const parent) {
     mParentGroup = parent;
 }
 

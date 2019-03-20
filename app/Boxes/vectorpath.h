@@ -44,7 +44,7 @@ public:
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
 
-    void selectAllPoints(Canvas *canvas);
+    void selectAllPoints(Canvas * const canvas);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     void shiftAllPointsForAllKeys(const int &by);

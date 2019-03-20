@@ -38,7 +38,7 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     void afterUpdate();
-    void setParentGroup(BoxesGroup *parent);
+    void setParentGroup(BoxesGroup * const parent);
     void beforeAddingScheduler();
     bool shouldScheduleUpdate();
     int getAnimationFrameForRelFrame(const int &relFrame);

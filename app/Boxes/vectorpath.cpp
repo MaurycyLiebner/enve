@@ -58,7 +58,7 @@ bool VectorPath::differenceInEditPathBetweenFrames(
     return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
-void VectorPath::selectAllPoints(Canvas *canvas) {
+void VectorPath::selectAllPoints(Canvas * const canvas) {
     mPathAnimator->selectAllPoints(canvas);
 }
 

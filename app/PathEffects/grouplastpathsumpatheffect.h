@@ -23,7 +23,7 @@ public:
 //        return true;//mBoxTarget->getTarget() != nullptr;
 //    }
 
-    void setParentGroup(BoxesGroup *parent);
+    void setParentGroup(BoxesGroup * const parent);
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) const;

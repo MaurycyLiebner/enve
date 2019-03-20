@@ -117,7 +117,7 @@ public:
                              const int &targetPtId);
     VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
-    void selectAllPoints(Canvas *canvas);
+    void selectAllPoints(Canvas * const canvas);
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale,

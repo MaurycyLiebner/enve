@@ -583,7 +583,7 @@ void OutlineSettingsAnimator::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mCapStyle), sizeof(Qt::PenCapStyle));
     target->write(rcConstChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
     target->write(rcConstChar(&mOutlineCompositionMode),
-               sizeof(QPainter::CompositionMode));
+                  sizeof(QPainter::CompositionMode));
     mBrushSettings->writeProperty(target);
 }
 
@@ -667,12 +667,11 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
     target->write(rcConstChar(&mVisible), sizeof(bool));
     target->write(rcConstChar(&mLocked), sizeof(bool));
     target->write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
-    bool hasDurRect = mDurationRectangle != nullptr;
+    const bool hasDurRect = mDurationRectangle;
     target->write(rcConstChar(&hasDurRect), sizeof(bool));
 
-    if(hasDurRect) {
+    if(hasDurRect)
         mDurationRectangle->writeDurationRectangle(target);
-    }
 
     mTransformAnimator->writeProperty(target);
     mEffectsAnimators->writeProperty(target);
@@ -699,10 +698,9 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     mTransformAnimator->readProperty(target);
     mEffectsAnimators->readProperty(target);
 
-    if(hasDurRect) {
+    if(hasDurRect)
         anim_shiftAllKeys(prp_getFrameShift());
-    }
-    BoundingBox::addLoadedBox(this);
+    BoundingBox::sAddLoadedBox(this);
     mPivotAutoAdjust = pivotAutoAdjust;
 }
 
@@ -742,7 +740,7 @@ void BoundingBox::readBoundingBoxDataForLink(QIODevice *target) {
 
     mTransformAnimator->readProperty(target);
     mEffectsAnimators->readProperty(target);
-    BoundingBox::addLoadedBox(this);
+    BoundingBox::sAddLoadedBox(this);
 }
 
 void PathEffect::writeProperty(QIODevice * const target) const {
@@ -813,14 +811,14 @@ void SolidifyPathEffect::readProperty(QIODevice *target) {
 }
 
 void BoxTargetProperty::writeProperty(QIODevice * const target) const {
-    BoundingBox *targetBox = mTarget_d.data();
+    const auto targetBox = mTarget_d.data();
     int targetId;
     if(targetBox) {
         targetId = targetBox->getLoadId();
         if(targetId < 0) {
-            targetId = BoundingBox::getLoadedBoxesCount();
+            targetId = BoundingBox::sGetLoadedBoxesCount();
             targetBox->setBoxLoadId(targetId);
-            BoundingBox::addLoadedBox(targetBox);
+            BoundingBox::sAddLoadedBox(targetBox);
         }
     } else {
         targetId = -1;
@@ -831,9 +829,9 @@ void BoxTargetProperty::writeProperty(QIODevice * const target) const {
 void BoxTargetProperty::readProperty(QIODevice *target) {
     int targetId;
     target->read(rcChar(&targetId), sizeof(int));
-    auto targetBox = BoundingBox::getLoadedBoxById(targetId);
+    auto targetBox = BoundingBox::sGetLoadedBoxById(targetId);
     if(!targetBox && targetId >= 0) {
-        BoundingBox::addFunctionWaitingForBoxLoad(
+        BoundingBox::sAddFunctionWaitingForBoxLoad(
                     SPtrCreate(BoxTargetPropertyWaitingForBoxLoad)(targetId, this) );
     } else {
         setTarget(targetBox);
@@ -1185,9 +1183,9 @@ void TextBox::writeBoundingBox(QIODevice *target) {
     PathBox::writeBoundingBox(target);
     mText->writeProperty(target);
     target->write(rcConstChar(&mAlignment), sizeof(Qt::Alignment));
-    qreal fontSize = mFont.pointSizeF();
-    QString fontFamily = mFont.family();
-    QString fontStyle = mFont.styleName();
+    const qreal fontSize = mFont.pointSizeF();
+    const QString fontFamily = mFont.family();
+    const QString fontStyle = mFont.styleName();
     target->write(rcConstChar(&fontSize), sizeof(qreal));
     gWrite(target, fontFamily);
     gWrite(target, fontStyle);
@@ -1359,8 +1357,8 @@ void Brush::writeBrush(QIODevice *write) {
     gWrite(write, collection_name);
 
     for(uchar i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
-        BrushSettingInfo setting_info = brush_settings_info[i];
-        qreal value = getSettingVal(setting_info.setting);
+        const BrushSettingInfo setting_info = brush_settings_info[i];
+        const qreal value = getSettingVal(setting_info.setting);
         write->write(rcConstChar(&value), sizeof(qreal));
     }
 }
@@ -1372,7 +1370,7 @@ void Brush::readBrush(QIODevice *read) {
     for(uchar i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
         qreal value;
         read->read(rcChar(&value), sizeof(qreal));
-        BrushSettingInfo setting_info = brush_settings_info[i];
+        const BrushSettingInfo setting_info = brush_settings_info[i];
         setSetting(setting_info.setting, value);
     }
 }
@@ -1415,7 +1413,7 @@ void CanvasWindow::readCanvases(QIODevice *target) {
     }
     int currentCanvasId;
     target->read(rcChar(&currentCanvasId), sizeof(int));
-    auto currentCanvas = BoundingBox::getLoadedBoxById(currentCanvasId);
+    auto currentCanvas = BoundingBox::sGetLoadedBoxById(currentCanvasId);
     setCurrentCanvas(GetAsPtr(currentCanvas, Canvas));
 }
 
@@ -1429,7 +1427,7 @@ void MainWindow::loadAVFile(const QString &path) {
 
             clearLoadedGradientsList();
             gradientWidget->clearGradientsLoadIds();
-            BoundingBox::clearLoadedBoxes();
+            BoundingBox::sClearLoadedBoxes();
         } else {
             RuntimeThrow("File incompatible or incomplete " + path.toStdString() + ".");
         }
@@ -1461,5 +1459,5 @@ void MainWindow::saveToFile(const QString &path) {
                      path.toStdString() + ".");
     }
 
-    BoundingBox::clearLoadedBoxes();
+    BoundingBox::sClearLoadedBoxes();
 }

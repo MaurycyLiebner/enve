@@ -605,7 +605,7 @@ void VectorPathAnimator::removeNodeAt(const int &nodeId) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
-void VectorPathAnimator::selectAllPoints(Canvas *canvas) {
+void VectorPathAnimator::selectAllPoints(Canvas * const canvas) {
     for(const auto& point : mPoints) {
         canvas->addPointToSelection(point.get());
     }

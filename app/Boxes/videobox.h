@@ -13,7 +13,7 @@ public:
     VideoBox();
     ~VideoBox();
 
-    void setParentGroup(BoxesGroup *parent);
+    void setParentGroup(BoxesGroup * const parent);
     void setFilePath(const QString &path);
     void reloadSound();
 

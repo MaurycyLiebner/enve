@@ -30,7 +30,7 @@ bool SmartVectorPath::differenceInEditPathBetweenFrames(
     return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
-void SmartVectorPath::selectAllPoints(Canvas *canvas) {
+void SmartVectorPath::selectAllPoints(Canvas * const canvas) {
     mHandler.selectAllPoints(canvas);
 }
 

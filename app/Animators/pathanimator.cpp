@@ -198,7 +198,7 @@ SkPath PathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
     return path;
 }
 
-void PathAnimator::selectAllPoints(Canvas *canvas) {
+void PathAnimator::selectAllPoints(Canvas * const canvas) {
     for(const auto& singlePath : mSinglePaths) {
         singlePath->selectAllPoints(canvas);
     }

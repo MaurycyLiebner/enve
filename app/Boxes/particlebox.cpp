@@ -101,8 +101,8 @@ QRectF ParticleBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
 }
 
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
-    int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
-    int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
+    const int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
+    const int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
     for(const auto& emitter : mEmitters) {
         emitter->setFrameRange(minFrame, maxFrame);
     }
