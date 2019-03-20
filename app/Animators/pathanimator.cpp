@@ -274,6 +274,7 @@ void PathAnimator::revertAllPointsForAllKeys() {
 }
 
 void PathAnimator::moveAllSinglePathsToAnimator_k(PathAnimator * const target) {
+    const auto sRef = ref<PathAnimator>();
     while(!mSinglePaths.isEmpty()) {
         qsptr<VectorPathAnimator> path = mSinglePaths.at(0);
         target->addSinglePathAnimator(path);
