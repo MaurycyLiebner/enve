@@ -11,7 +11,7 @@ void EffectAnimators::addEffect(const qsptr<PixmapEffect>& effect) {
 }
 
 qreal EffectAnimators::getEffectsMargin() const {
-    qreal newMargin = 2.;
+    qreal newMargin = 2;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
@@ -45,7 +45,7 @@ qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const 
 
 void EffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
-        BoundingBoxRenderData* data) {
+        BoundingBoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, PixmapEffect);
         if(pixmapEffect->isVisible()) {

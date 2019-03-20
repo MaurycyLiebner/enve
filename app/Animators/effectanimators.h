@@ -15,6 +15,12 @@ struct PixmapEffectRenderData;
 class EffectAnimators : public ComplexAnimator {
     friend class SelfRef;
 public:
+    bool SWT_isPixmapEffectAnimators() const { return true; }
+    void ca_removeAllChildAnimators();
+
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
+
     void addEffect(const qsptr<PixmapEffect> &effect);
 
     qreal getEffectsMargin() const;
@@ -26,17 +32,12 @@ public:
 
     bool hasEffects();
 
-    bool SWT_isPixmapEffectAnimators() const { return true; }
     qreal getEffectsMarginAtRelFrame(const int &relFrame) const;
     qreal getEffectsMarginAtRelFrameF(const qreal &relFrame) const;
 
     void addEffectRenderDataToListF(const qreal &relFrame,
-                                    BoundingBoxRenderData *data);
+                                    BoundingBoxRenderData * const data);
 
-    void ca_removeAllChildAnimators();
-
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
     void readPixmapEffect(QIODevice *target);
 protected:
     EffectAnimators(BoundingBox *parentBox);
