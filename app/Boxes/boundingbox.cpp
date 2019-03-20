@@ -341,7 +341,7 @@ void BoundingBox::select() {
 }
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
-        BoundingBoxRenderData* renderData) {
+        BoundingBoxRenderData * const renderData) {
     mRelBoundingRect = renderData->fRelBoundingRect;
     mRelBoundingRectSk = toSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath = SkPath();

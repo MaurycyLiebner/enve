@@ -22,7 +22,7 @@ qreal EffectAnimators::getEffectsMargin() const {
 }
 
 qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
-    qreal newMargin = 0.;
+    qreal newMargin = 0;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
@@ -33,7 +33,7 @@ qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
 }
 
 qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const {
-    qreal newMargin = 0.;
+    qreal newMargin = 0;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
