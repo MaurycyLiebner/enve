@@ -44,7 +44,7 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     if(fOpacity < 0.001) return;
     canvas->save();
-    const SkScalar invScale = qrealToSkScalar(1/fResolution);
+    const SkScalar invScale = toSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
     renderToImage();
     SkPaint paint;
@@ -104,9 +104,9 @@ void BoundingBoxRenderData::renderToImage() {
     SkCanvas rasterCanvas(fBitmapTMP);//rasterSurface->getCanvas();
     //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
-    rasterCanvas.translate(qrealToSkScalar(-fGlobalBoundingRect.left()),
-                           qrealToSkScalar(-fGlobalBoundingRect.top()));
-    rasterCanvas.concat(QMatrixToSkMatrix(fScaledTransform));
+    rasterCanvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
+                           toSkScalar(-fGlobalBoundingRect.top()));
+    rasterCanvas.concat(toSkMatrix(fScaledTransform));
 
     drawSk(&rasterCanvas);
     // rasterCanvas.flush(); does not use gpu anyway

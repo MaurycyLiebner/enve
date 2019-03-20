@@ -823,7 +823,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
         if(box->SWT_isPathBox()) {
             SkPath boxPath = GetAsPtr(box, PathBox)->getRelativePath();
             QMatrix boxTrans = box->getRelativeTransformAtCurrentFrame();
-            boxPath.transform(QMatrixToSkMatrix(boxTrans));
+            boxPath.transform(toSkMatrix(boxTrans));
             if(first) {
                 builder.add(boxPath, SkPathOp::kUnion_SkPathOp);
                 first = false;

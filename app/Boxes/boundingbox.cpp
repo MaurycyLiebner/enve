@@ -113,7 +113,7 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
                                     const SkScalar &invScale) {
     canvas->save();
     SkPath mappedPath = path;
-    mappedPath.transform(QMatrixToSkMatrix(
+    mappedPath.transform(toSkMatrix(
                              mTransformAnimator->getCombinedTransform()));
     SkPaint paint;
     paint.setAntiAlias(true);
@@ -343,7 +343,7 @@ void BoundingBox::select() {
 void BoundingBox::updateRelBoundingRectFromRenderData(
         BoundingBoxRenderData* renderData) {
     mRelBoundingRect = renderData->fRelBoundingRect;
-    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
+    mRelBoundingRectSk = toSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
@@ -484,7 +484,7 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
     SkPath mappedPath = path;
-    mappedPath.transform(QMatrixToSkMatrix(getCombinedTransform()));
+    mappedPath.transform(toSkMatrix(getCombinedTransform()));
     canvas->drawPath(mappedPath, paint);
     paint.setStrokeWidth(0.75f*invScale);
     paint.setColor(SK_ColorWHITE);

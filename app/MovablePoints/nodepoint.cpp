@@ -96,12 +96,12 @@ void NodePoint::finishTransform() {
         mEndCtrlPt->NonAnimatedMovablePoint::finishTransform();
     }
     mParentPath->finishedPathChange();
-    mParentPath->setElementPos(getPtId(),  qPointToSk(getRelativePos()));
+    mParentPath->setElementPos(getPtId(),  toSkPoint(getRelativePos()));
 }
 
 void NodePoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
-    mParentPath->setElementPos(getPtId(), qPointToSk(relPos));
+    mParentPath->setElementPos(getPtId(), toSkPoint(relPos));
 }
 
 void NodePoint::connectToPoint(NodePoint *point) {
@@ -193,7 +193,7 @@ void NodePoint::moveEndCtrlPtToRelPos(const QPointF &endCtrlPt) {
     if(!isEndCtrlPtEnabled()) {
         setEndCtrlPtEnabled(true);
     }
-    mParentPath->setElementPos(getPtId() + 1, qPointToSk(endCtrlPt));
+    mParentPath->setElementPos(getPtId() + 1, toSkPoint(endCtrlPt));
     mEndCtrlPt->setRelativePos(endCtrlPt);
     ctrlPointPosChanged(mEndCtrlPt.get(), mStartCtrlPt.get());
 }
@@ -202,7 +202,7 @@ void NodePoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
     if(!isStartCtrlPtEnabled()) {
         setStartCtrlPtEnabled(true);
     }
-    mParentPath->setElementPos(getPtId() - 1, qPointToSk(startCtrlPt));
+    mParentPath->setElementPos(getPtId() - 1, toSkPoint(startCtrlPt));
     mStartCtrlPt->setRelativePos(startCtrlPt);
     ctrlPointPosChanged(mStartCtrlPt.get(), mEndCtrlPt.get());
 }
@@ -274,7 +274,7 @@ void NodePoint::drawNodePoint(SkCanvas *canvas,
     const SkColor fillCol = mSelected ?
                 SkColorSetRGB(0, 200, 255) :
                 SkColorSetRGB(170, 240, 255);
-    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    const SkPoint absPos = toSkPoint(getAbsolutePos());
     drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
 
     if((mode == CanvasMode::MOVE_POINT && isNeighbourSelected()) ||
@@ -282,7 +282,7 @@ void NodePoint::drawNodePoint(SkCanvas *canvas,
         SkPaint paint;
         paint.setAntiAlias(true);
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            SkPoint endAbsPos = qPointToSk(
+            SkPoint endAbsPos = toSkPoint(
                         mEndCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);
@@ -294,7 +294,7 @@ void NodePoint::drawNodePoint(SkCanvas *canvas,
             canvas->drawLine(absPos, endAbsPos, paint);
         }
         if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            SkPoint startAbsPos = qPointToSk(
+            SkPoint startAbsPos = toSkPoint(
                         mStartCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);

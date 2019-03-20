@@ -528,5 +528,5 @@ void TileSkDrawer::clearImg() {
 void TileSkDrawerCollection::setHue(const qreal &hueT) {
     QColor qcol;
     qcol.setHsvF(hueT, 1., 1.);
-    hueCol = QColorToSkColor(qcol);
+    hueCol = toSkColor(qcol);
 }

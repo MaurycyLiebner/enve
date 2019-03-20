@@ -30,10 +30,10 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
         SkPath totalPath;
         totalPath.addPath(fFillPath);
         totalPath.addPath(fOutlinePath);
-        fRelBoundingRect = SkRectToQRectF(totalPath.computeTightBounds());
+        fRelBoundingRect = toQRectF(totalPath.computeTightBounds());
     }
     QPointF getCenterPosition() {
-        return SkRectToQRectF(fEditPath.getBounds()).center();
+        return toQRectF(fEditPath.getBounds()).center();
     }
 protected:
     void drawSk(SkCanvas *canvas) {
@@ -64,7 +64,7 @@ protected:
                 trans.translate(-fGlobalBoundingRect.left(),
                                 -fGlobalBoundingRect.top());
                 trans = fScaledTransform*trans;
-                fPath.transform(QMatrixToSkMatrix(trans), &pathT);
+                fPath.transform(toSkMatrix(trans), &pathT);
 //                auto brushSet = BrushStrokeSet::fillStrokesForSkPath(pathT, 5);
 //                brush->setColor(0, 0, 1);
 //                for(auto& set : brushSet) {
@@ -80,9 +80,9 @@ protected:
                 col.setRgbF(col.blueF(), col.greenF(),
                             col.redF(), col.alphaF());
                 fStrokeSettings.fStrokeBrush->setColor(
-                            qrealToSkScalar(col.hueF()),
-                            qrealToSkScalar(col.saturationF()),
-                            qrealToSkScalar(col.valueF()));
+                            toSkScalar(col.hueF()),
+                            toSkScalar(col.saturationF()),
+                            toSkScalar(col.valueF()));
                 const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
                 for(auto& set : brushSet) {
                     surf.execute(brush, set);

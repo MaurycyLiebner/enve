@@ -175,10 +175,10 @@ void VectorPathEdge::cancelPassThroughTransform() {
 
 void VectorPathEdge::generatePainterPath() {
     mSkPath = SkPath();
-    mSkPath.moveTo(qPointToSk(mPoint1->getAbsolutePos()));
-    mSkPath.cubicTo(qPointToSk(mPoint1->getEndCtrlPtAbsPos()),
-                    qPointToSk(mPoint2->getStartCtrlPtAbsPos()),
-                    qPointToSk(mPoint2->getAbsolutePos()));
+    mSkPath.moveTo(toSkPoint(mPoint1->getAbsolutePos()));
+    mSkPath.cubicTo(toSkPoint(mPoint1->getEndCtrlPtAbsPos()),
+                    toSkPoint(mPoint2->getStartCtrlPtAbsPos()),
+                    toSkPoint(mPoint2->getAbsolutePos()));
 }
 
 void VectorPathEdge::drawHoveredSk(SkCanvas *canvas,

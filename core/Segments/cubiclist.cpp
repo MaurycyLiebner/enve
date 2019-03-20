@@ -98,26 +98,26 @@ QList<CubicList> CubicList::sMakeFromSkPath(const SkPath &src) {
         SkPoint pts[4];
         switch(iter.next(pts, true, true)) {
         case SkPath::kLine_Verb: {
-            QPointF pt1 = skPointToQ(pts[1]);
+            QPointF pt1 = toQPointF(pts[1]);
             segs << qCubicSegment2D(lastPos, lastPos, pt1, pt1);
             lastPos = pt1;
         } break;
         case SkPath::kQuad_Verb: {
-            QPointF pt2 = skPointToQ(pts[2]);
-            segs << qCubicSegment2D::fromQuad(lastPos, skPointToQ(pts[1]), pt2);
+            QPointF pt2 = toQPointF(pts[2]);
+            segs << qCubicSegment2D::fromQuad(lastPos, toQPointF(pts[1]), pt2);
             lastPos = pt2;
         } break;
         case SkPath::kConic_Verb: {
-            QPointF pt2 = skPointToQ(pts[2]);
-            segs << qCubicSegment2D::fromConic(lastPos, skPointToQ(pts[1]), pt2,
-                                               skScalarToQ(iter.conicWeight()));
+            QPointF pt2 = toQPointF(pts[2]);
+            segs << qCubicSegment2D::fromConic(lastPos, toQPointF(pts[1]), pt2,
+                                               toQreal(iter.conicWeight()));
             lastPos = pt2;
         } break;
         case SkPath::kCubic_Verb: {
-            QPointF pt3 = skPointToQ(pts[3]);
+            QPointF pt3 = toQPointF(pts[3]);
             segs << qCubicSegment2D(lastPos,
-                                    skPointToQ(pts[1]),
-                                    skPointToQ(pts[2]),
+                                    toQPointF(pts[1]),
+                                    toQPointF(pts[2]),
                                     pt3);
             lastPos = pt3;
         } break;
@@ -130,7 +130,7 @@ QList<CubicList> CubicList::sMakeFromSkPath(const SkPath &src) {
                 result << segs;
                 segs.clear();
             }
-            lastMovePos = skPointToQ(pts[0]);
+            lastMovePos = toQPointF(pts[0]);
             lastPos = lastMovePos;
         } break;
         case SkPath::kDone_Verb: {

@@ -31,7 +31,7 @@ void MovablePoint::drawHovered(SkCanvas *canvas,
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setStrokeWidth(2.f*invScale);
     paint.setColor(SK_ColorRED);
-    canvas->drawCircle(qPointToSk(getAbsolutePos()),
+    canvas->drawCircle(toSkPoint(getAbsolutePos()),
                        static_cast<SkScalar>(mRadius)*invScale, paint);
     //pen.setCosmetic(true);
     //p->setPen(pen);
@@ -104,7 +104,7 @@ void MovablePoint::drawSk(SkCanvas *canvas,
     const SkColor fillCol = mSelected ?
                 SkColorSetRGB(255, 0, 0) :
                 SkColorSetRGB(255, 175, 175);
-    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    const SkPoint absPos = toSkPoint(getAbsolutePos());
     drawOnAbsPosSk(canvas, absPos, invScale, fillCol);
 }
 

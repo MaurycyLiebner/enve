@@ -56,8 +56,8 @@ struct qCubicSegment2D {
 
     SkPath toSkPath() const {
         SkPath path;
-        path.moveTo(qPointToSk(mP0));
-        path.cubicTo(qPointToSk(mC1), qPointToSk(mC2), qPointToSk(mP1));
+        path.moveTo(toSkPoint(mP0));
+        path.cubicTo(toSkPoint(mC1), toSkPoint(mC2), toSkPoint(mP1));
         return path;
     }
 

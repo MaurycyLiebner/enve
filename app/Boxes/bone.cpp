@@ -279,12 +279,12 @@ void Bone::drawOnCanvas(SkCanvas *canvas) {
         paintT.setPathEffect(
                     SkDashPathEffect::Make(intervals,
                                            SK_ARRAY_COUNT(intervals), 1));
-        canvas->drawLine(qPointToSk(rootAbs),
-                         qPointToSk(parentTipAbs),
+        canvas->drawLine(toSkPoint(rootAbs),
+                         toSkPoint(parentTipAbs),
                          paintT);
     }
     SkPath path = getCurrentRelPath();
-    path.transform(QMatrixToSkMatrix(
+    path.transform(toSkMatrix(
                        mTransformAnimator->getCombinedTransform()));
     SkPaint paintT;
     paintT.setColor(SK_ColorWHITE);
@@ -377,7 +377,7 @@ void Bone::drawSelectedSk(SkCanvas *canvas,
     canvas->save();
     if(mSelected) {
         SkPath path = getCurrentRelPath();
-        path.transform(QMatrixToSkMatrix(
+        path.transform(toSkMatrix(
                            mTransformAnimator->getCombinedTransform()));
         SkPaint paintT;
 
@@ -472,7 +472,7 @@ void Bone::drawHoveredOnlyThisPathSk(SkCanvas *canvas,
                                      const SkScalar &invScale) {
     canvas->save();
     SkPath mappedPath = getCurrentRelPath();
-    mappedPath.transform(QMatrixToSkMatrix(
+    mappedPath.transform(toSkMatrix(
                              mTransformAnimator->getCombinedTransform()));
     SkPaint paint;
     paint.setAntiAlias(true);

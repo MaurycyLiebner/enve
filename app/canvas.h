@@ -346,7 +346,7 @@ public:
                                                 BoundingBoxRenderData* data) {
         BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
-        canvasData->fBgColor = QColorToSkColor(mBackgroundColor->getCurrentColor());
+        canvasData->fBgColor = toSkColor(mBackgroundColor->getCurrentColor());
         canvasData->canvasHeight = mHeight*mResolutionFraction;
         canvasData->canvasWidth = mWidth*mResolutionFraction;
     }

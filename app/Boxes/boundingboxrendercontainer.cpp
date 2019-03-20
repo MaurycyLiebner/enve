@@ -13,7 +13,7 @@ void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
                              GrContext * const grContext) {
     if(!mSrcRenderData) return;
     canvas->save();
-    canvas->concat(QMatrixToSkMatrix(mPaintTransform));
+    canvas->concat(toSkMatrix(mPaintTransform));
     if(paint) {
         if(paint->getBlendMode() == SkBlendMode::kDstIn ||
            paint->getBlendMode() == SkBlendMode::kSrcIn ||

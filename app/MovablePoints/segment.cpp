@@ -118,10 +118,10 @@ void NormalSegment::cancelPassThroughTransform() {
 
 void NormalSegment::generateSkPath() {
     mSkPath = SkPath();
-    mSkPath.moveTo(qPointToSk(mFirstNode->getAbsolutePos()));
-    mSkPath.cubicTo(qPointToSk(mFirstNode->getC2AbsPos()),
-                    qPointToSk(mLastNode->getC0AbsPos()),
-                    qPointToSk(mLastNode->getAbsolutePos()));
+    mSkPath.moveTo(toSkPoint(mFirstNode->getAbsolutePos()));
+    mSkPath.cubicTo(toSkPoint(mFirstNode->getC2AbsPos()),
+                    toSkPoint(mLastNode->getC0AbsPos()),
+                    toSkPoint(mLastNode->getAbsolutePos()));
 }
 
 void NormalSegment::drawHoveredSk(SkCanvas * const canvas,

@@ -473,7 +473,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
         const stdsptr<ParticleBoxRenderData> &particleData) {
     EmitterData data;
     auto qcol = mColorAnimator->getColorAtRelFrame(relFrame);
-    data.color = QColorToSkColor(qcol);
+    data.color = toSkColor(qcol);
 
     BoundingBox *targetT = mBoxTargetProperty->getTarget();
     if(!targetT) {
@@ -605,7 +605,7 @@ void ParticleEmitter::generateParticles() {
             newParticle->initializeParticle(i, particlesFrameLifetime,
                                             SkPoint::Make(pos.x() + xTrans,
                                                           pos.y()),
-                                            qPointToSk(partVel),
+                                            toSkPoint(partVel),
                                             partSize);
             notFinishedParticles << newParticle;
         }
@@ -618,7 +618,7 @@ void ParticleEmitter::generateParticles() {
                 particle->generatePathNextFrame(i,
                                                 velocityVar,
                                                 velocityVarPeriod,
-                                                qPointToSk(acceleration),
+                                                toSkPoint(acceleration),
                                                 finalScale,
                                                 finalOpacity,
                                                 decayFrames,

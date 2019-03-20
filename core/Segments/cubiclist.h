@@ -27,14 +27,14 @@ struct CubicList {
             if(first) {
                 first = false;
                 firstPos = cubic.p0();
-                path.moveTo(qPointToSk(firstPos));
+                path.moveTo(toSkPoint(firstPos));
             } else if(pointToLen(cubic.p0() - lastPos) > 0.1)  {
                 firstPos = cubic.p0();
-                path.moveTo(qPointToSk(firstPos));
+                path.moveTo(toSkPoint(firstPos));
             }
-            path.cubicTo(qPointToSk(cubic.c1()),
-                         qPointToSk(cubic.c2()),
-                         qPointToSk(cubic.p1()));
+            path.cubicTo(toSkPoint(cubic.c1()),
+                         toSkPoint(cubic.c2()),
+                         toSkPoint(cubic.p1()));
             lastPos = cubic.p1();
         }
         return path;

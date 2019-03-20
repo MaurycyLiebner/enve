@@ -31,7 +31,7 @@ void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
 void BoxPathPoint::drawSk(SkCanvas *canvas,
                           const SkScalar &invScale) {
     if(isHidden()) return;
-    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    const SkPoint absPos = toSkPoint(getAbsolutePos());
     const SkColor fillCol = mSelected ?
                 SkColorSetRGB(255, 255, 0) :
                 SkColorSetRGB(255, 255, 125);
@@ -42,7 +42,7 @@ void BoxPathPoint::drawSk(SkCanvas *canvas,
     SkPaint paint;
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    const SkScalar scaledHalfRadius = qrealToSkScalar(mRadius)*invScale*0.5f;
+    const SkScalar scaledHalfRadius = toSkScalar(mRadius)*invScale*0.5f;
     canvas->drawLine(-scaledHalfRadius, 0, scaledHalfRadius, 0, paint);
     canvas->drawLine(0, -scaledHalfRadius, 0, scaledHalfRadius, paint);
     canvas->restore();

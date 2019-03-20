@@ -65,7 +65,7 @@ void applyShadow(const SkBitmap &bitmap,
     SkPaint paint;
     paint.setBlendMode(SkBlendMode::kDstIn);
     SkCanvas shadowCanvas(shadowBitmap);
-    shadowCanvas.clear(QColorToSkColor(currentColor));
+    shadowCanvas.clear(toSkColor(currentColor));
     shadowCanvas.drawBitmap(bitmap, 0, 0, &paint);
     shadowCanvas.flush();
 
@@ -84,8 +84,8 @@ void applyShadow(const SkBitmap &bitmap,
     SkCanvas dstCanvas(bitmap);
     paint.setBlendMode(SkBlendMode::kDstOver);
     dstCanvas.drawBitmap(shadowBitmap,
-                         qrealToSkScalar(trans.x()*scale),
-                         qrealToSkScalar(trans.y()*scale),
+                         toSkScalar(trans.x()*scale),
+                         toSkScalar(trans.y()*scale),
                          &paint);
     dstCanvas.flush();
 }

@@ -357,16 +357,16 @@ void gCubicTo(const Node& prevNode, const Node& nextNode,
         const qreal mappedT = gMapTToFragment(lastT, 1, t);
         auto div = seg.dividedAtT(mappedT);
         const auto& first = div.first;
-        result.cubicTo(qPointToSk(first.c1()),
-                       qPointToSk(first.c2()),
-                       qPointToSk(first.p1()));
+        result.cubicTo(toSkPoint(first.c1()),
+                       toSkPoint(first.c2()),
+                       toSkPoint(first.p1()));
         //qDebug() << "Cubic to:" << first.p1();
         seg = div.second;
         lastT = t;
     }
-    result.cubicTo(qPointToSk(seg.c1()),
-                   qPointToSk(seg.c2()),
-                   qPointToSk(seg.p1()));
+    result.cubicTo(toSkPoint(seg.c1()),
+                   toSkPoint(seg.c2()),
+                   toSkPoint(seg.p1()));
     //qDebug() << "Cubic to:" << seg.p1();
     dissolvedTs.clear();
 }
@@ -404,7 +404,7 @@ SkPath NodeList::toSkPath() const {
             else if(node->isNormal()) {
                 if(move) {
                     firstNode = node;
-                    currPath.moveTo(qPointToSk(node->fP1));
+                    currPath.moveTo(toSkPoint(node->fP1));
                     //qDebug() << "Move to:" << node->fP1;
                     move = false;
                 } else {

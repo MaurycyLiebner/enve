@@ -234,7 +234,7 @@ void SmartNodePoint::drawNodePoint(
         const bool &keyOnCurrent) {
     canvas->save();
 
-    const SkPoint absPos = qPointToSk(getAbsolutePos());
+    const SkPoint absPos = toSkPoint(getAbsolutePos());
     if(getType() == Node::NORMAL) {
         const SkColor fillCol = mSelected ?
                     SkColorSetRGB(0, 200, 255) :
@@ -246,7 +246,7 @@ void SmartNodePoint::drawNodePoint(
             SkPaint paint;
             paint.setAntiAlias(true);
             if(mC2Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
-                const SkPoint endAbsPos = qPointToSk(mC2Pt->getAbsolutePos());
+                const SkPoint endAbsPos = toSkPoint(mC2Pt->getAbsolutePos());
                 paint.setColor(SK_ColorBLACK);
                 paint.setStrokeWidth(1.5f*invScale);
                 paint.setStyle(SkPaint::kStroke_Style);
@@ -263,7 +263,7 @@ void SmartNodePoint::drawNodePoint(
             SkPaint paint;
             paint.setAntiAlias(true);
             if(mC0Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
-                const SkPoint startAbsPos = qPointToSk(mC0Pt->getAbsolutePos());
+                const SkPoint startAbsPos = toSkPoint(mC0Pt->getAbsolutePos());
                 paint.setColor(SK_ColorBLACK);
                 paint.setStrokeWidth(1.5f*invScale);
                 paint.setStyle(SkPaint::kStroke_Style);

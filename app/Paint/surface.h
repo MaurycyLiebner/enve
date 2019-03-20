@@ -76,8 +76,8 @@ public:
     virtual void getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers);
 
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
-        canvas->scale(qrealToSkScalar(1./mScale),
-                      qrealToSkScalar(1./mScale));
+        canvas->scale(toSkScalar(1./mScale),
+                      toSkScalar(1./mScale));
         mCurrentTiles->drawSk(canvas, paint);
     }
 

@@ -1115,12 +1115,12 @@ void MainWindow::updateTitle() {
 void MainWindow::openFile() {
     if(askForSaving()) {
         disable();
-        QString openPath = QFileDialog::getOpenFileName(this,
+        const QString openPath = QFileDialog::getOpenFileName(this,
             "Open File", mCurrentFilePath, "AniVect Files (*.av)");
         if(!openPath.isEmpty()) {
             clearAll();
             try {
-                loadAVFile(mCurrentFilePath);
+                loadAVFile(openPath);
                 setCurrentPath(openPath);
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
@@ -1146,13 +1146,13 @@ void MainWindow::saveFile() {
 
 void MainWindow::saveFileAs() {
     disableEventFilter();
-    QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
+    const QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
                                mCurrentFilePath,
                                "AniVect Files (*.av)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {
         try {
-            saveToFile(mCurrentFilePath);
+            saveToFile(saveAs);
             setCurrentPath(saveAs);
             setFileChangedSinceSaving(false);
         } catch(const std::exception& e) {
@@ -1162,7 +1162,7 @@ void MainWindow::saveFileAs() {
 }
 
 void MainWindow::saveBackup() {
-    QString backupPath = "backup/backup_%1.av";
+    const QString backupPath = "backup/backup_%1.av";
     int id = 1;
     QFile backupFile(backupPath.arg(id));
     while(backupFile.exists()) {

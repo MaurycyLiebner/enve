@@ -59,7 +59,7 @@ void gApplyOperationF(const qreal &relFrame, const SkPath &src,
                 getCombinedTransformMatrixAtRelFrameF(
                     relFrame);
     boxPath.transform(
-                QMatrixToSkMatrix(
+                toSkMatrix(
                     pathBoxMatrix*parentBoxMatrix.inverted()));
     if(!Op(src, boxPath, op, dst)) {
         RuntimeThrow("Operation Failed.");
@@ -93,13 +93,13 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
     const auto func = [&builder, &strokerSk, &op](const qCubicSegment2D& seg) {
         qCubicSegment2D segC = seg;
         SkPath lineSeg;
-        lineSeg.moveTo(qPointToSk(seg.p0()));
+        lineSeg.moveTo(toSkPoint(seg.p0()));
         if(!seg.isLine()) {
             for(qreal len = 10; len < segC.length(); len += 10) {
-                lineSeg.lineTo(qPointToSk(segC.posAtLength(len)));
+                lineSeg.lineTo(toSkPoint(segC.posAtLength(len)));
             }
         }
-        lineSeg.lineTo(qPointToSk(seg.p1()));
+        lineSeg.lineTo(toSkPoint(seg.p1()));
         SkPath outline;
         strokerSk.strokePath(lineSeg, &outline);
         builder.add(outline, op);

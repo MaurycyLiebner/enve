@@ -1417,13 +1417,6 @@ void MainWindow::loadAVFile(const QString &path) {
         footer.read(&target);
         if(footer.combatybilityMode() ==
                 FileFooter::CompatybilityMode::Compatible) {
-            QColor qcolT;
-            target.read(rcChar(&qcolT), sizeof(QColor));
-//            mBrushSettingsWidget->setCurrentQColor(qcolT);
-            Brush::setHSV(qcolT.hueF(),
-                          qcolT.saturationF(),
-                          qcolT.valueF());
-//            mBrushSettingsWidget->readBrushesForProject(&target);
             auto gradientWidget = mFillStrokeSettings->getGradientWidget();
             gradientWidget->readGradients(&target);
             mCanvasWindow->readCanvases(&target);
@@ -1446,10 +1439,6 @@ void MainWindow::saveToFile(const QString &path) {
     if(target.exists()) target.remove();
 
     if(target.open(QIODevice::WriteOnly)) {
-//        QColor color = mBrushSettingsWidget->getCurrentQColor();
-//        target.write(rcChar(&color), sizeof(QColor));
-
-//        mBrushSettingsWidget->saveBrushesForProject(&target);
         auto gradientWidget = mFillStrokeSettings->getGradientWidget();
         gradientWidget->setGradientLoadIds();
         gradientWidget->writeGradients(&target);

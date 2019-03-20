@@ -583,7 +583,7 @@ VectorPath *PathBox::objectToVectorPathBox() {
         pathT.addEllipse(QPointF(0, 0),
                          circleT->getCurrentXRadius(),
                          circleT->getCurrentYRadius());
-        newPath->loadPathFromSkPath(QPainterPathToSkPath(pathT));
+        newPath->loadPathFromSkPath(toSkPath(pathT));
     } else {
         //newPath->loadPathFromSkPath(mEditPathSk);
         newPath->loadPathFromSkPath(mEditPathSk);
@@ -644,7 +644,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     }
     mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
     outline.addPath(path);
-    return SkRectToQRectF(outline.computeTightBounds());
+    return toQRectF(outline.computeTightBounds());
 }
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
@@ -662,7 +662,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) const {
-    const SkPoint relPosSk = qPointToSk(relPos);
+    const SkPoint relPosSk = toSkPoint(relPos);
     if(mSkRelBoundingRectPath.contains(relPosSk.x(), relPosSk.y()) ) {
         if(mFillPathSk.contains(relPosSk.x(), relPosSk.y())) {
             return true;

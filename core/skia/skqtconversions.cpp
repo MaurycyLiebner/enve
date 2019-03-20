@@ -1,40 +1,40 @@
 #include "skqtconversions.h"
 
-QRectF SkRectToQRectF(const SkRect &rect) {
-    return QRectF(skScalarToQ(rect.x()),
-                  skScalarToQ(rect.y()),
-                  skScalarToQ(rect.width()),
-                  skScalarToQ(rect.height()));
+QRectF toQRectF(const SkRect &rect) {
+    return QRectF(toQreal(rect.x()),
+                  toQreal(rect.y()),
+                  toQreal(rect.width()),
+                  toQreal(rect.height()));
 }
 
-SkRect QRectFToSkRect(const QRectF &rect) {
-    return SkRect::MakeXYWH(qrealToSkScalar(rect.x()),
-                            qrealToSkScalar(rect.y()),
-                            qrealToSkScalar(rect.width()),
-                            qrealToSkScalar(rect.height()));
+SkRect toSkRect(const QRectF &rect) {
+    return SkRect::MakeXYWH(toSkScalar(rect.x()),
+                            toSkScalar(rect.y()),
+                            toSkScalar(rect.width()),
+                            toSkScalar(rect.height()));
 }
 // m11 - scaleX
 // m12 - skewY
 // m21 - skewX
 // m22 - scaleY
-QMatrix SkMatrixToQMatrix(const SkMatrix &matrix) {
-    return QMatrix(skScalarToQ(matrix.getScaleX()),
-                   skScalarToQ(matrix.getSkewY()),
-                   skScalarToQ(matrix.getSkewX()),
-                   skScalarToQ(matrix.getScaleY()),
-                   skScalarToQ(matrix.getTranslateX()),
-                   skScalarToQ(matrix.getTranslateY()));
+QMatrix toQMatrix(const SkMatrix &matrix) {
+    return QMatrix(toQreal(matrix.getScaleX()),
+                   toQreal(matrix.getSkewY()),
+                   toQreal(matrix.getSkewX()),
+                   toQreal(matrix.getScaleY()),
+                   toQreal(matrix.getTranslateX()),
+                   toQreal(matrix.getTranslateY()));
 }
 
-SkMatrix QMatrixToSkMatrix(const QMatrix &matrix) {
+SkMatrix toSkMatrix(const QMatrix &matrix) {
     SkMatrix skMatrix;
     skMatrix.reset();
-    skMatrix.set(SkMatrix::kMScaleX, qrealToSkScalar(matrix.m11()));
-    skMatrix.set(SkMatrix::kMScaleY, qrealToSkScalar(matrix.m22()));
-    skMatrix.set(SkMatrix::kMSkewX, qrealToSkScalar(matrix.m21()));
-    skMatrix.set(SkMatrix::kMSkewY, qrealToSkScalar(matrix.m12()));
-    skMatrix.set(SkMatrix::kMTransX, qrealToSkScalar(matrix.dx()));
-    skMatrix.set(SkMatrix::kMTransY, qrealToSkScalar(matrix.dy()));
+    skMatrix.set(SkMatrix::kMScaleX, toSkScalar(matrix.m11()));
+    skMatrix.set(SkMatrix::kMScaleY, toSkScalar(matrix.m22()));
+    skMatrix.set(SkMatrix::kMSkewX, toSkScalar(matrix.m21()));
+    skMatrix.set(SkMatrix::kMSkewY, toSkScalar(matrix.m12()));
+    skMatrix.set(SkMatrix::kMTransX, toSkScalar(matrix.dx()));
+    skMatrix.set(SkMatrix::kMTransY, toSkScalar(matrix.dy()));
     return skMatrix;
 }
 
@@ -58,7 +58,7 @@ SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join) {
     return SkPaint::kMiter_Join;
 }
 #include <QPainterPath>
-SkPath QPainterPathToSkPath(const QPainterPath &qPath) {
+SkPath toSkPath(const QPainterPath &qPath) {
     SkPath path;
     bool firstOther = false;
     SkPoint endPt;
@@ -67,23 +67,23 @@ SkPath QPainterPathToSkPath(const QPainterPath &qPath) {
         const QPainterPath::Element &elem = qPath.elementAt(i);
 
         if(elem.isMoveTo()) { // move
-            path.moveTo(qrealToSkScalar(elem.x),
-                        qrealToSkScalar(elem.y));
+            path.moveTo(toSkScalar(elem.x),
+                        toSkScalar(elem.y));
         } else if(elem.isLineTo()) { // line
-            path.lineTo(qrealToSkScalar(elem.x),
-                        qrealToSkScalar(elem.y));
+            path.lineTo(toSkScalar(elem.x),
+                        toSkScalar(elem.y));
         } else if(elem.isCurveTo()) { // curve
-            endPt = SkPoint::Make(qrealToSkScalar(elem.x),
-                                  qrealToSkScalar(elem.y));
+            endPt = SkPoint::Make(toSkScalar(elem.x),
+                                  toSkScalar(elem.y));
             firstOther = true;
         } else { // other
             if(firstOther) {
-                startPt = SkPoint::Make(qrealToSkScalar(elem.x),
-                                        qrealToSkScalar(elem.y));
+                startPt = SkPoint::Make(toSkScalar(elem.x),
+                                        toSkScalar(elem.y));
             } else {
                 path.cubicTo(endPt, startPt,
-                             SkPoint::Make(qrealToSkScalar(elem.x),
-                                           qrealToSkScalar(elem.y)));
+                             SkPoint::Make(toSkScalar(elem.x),
+                                           toSkScalar(elem.y)));
             }
             firstOther = !firstOther;
         }
@@ -91,7 +91,7 @@ SkPath QPainterPathToSkPath(const QPainterPath &qPath) {
     return path;
 }
 
-QPainterPath SkPathToQPainterPath(const SkPath& path) {
+QPainterPath toQPainterPath(const SkPath& path) {
     QPainterPath qPath;
     SkPath::RawIter iter = SkPath::RawIter(path);
 
@@ -101,22 +101,22 @@ QPainterPath SkPathToQPainterPath(const SkPath& path) {
         switch(nextVerb) {
             case SkPath::kMove_Verb: {
                 const SkPoint pt = pts[0];
-                qPath.moveTo(skPointToQ(pt));
+                qPath.moveTo(toQPointF(pt));
             }
                 break;
             case SkPath::kLine_Verb: {
                 const SkPoint pt = pts[1];
 
-                qPath.lineTo(skPointToQ(pt));
+                qPath.lineTo(toQPointF(pt));
             }
                 break;
             case SkPath::kCubic_Verb: {
                 const SkPoint endPt = pts[1];
                 const SkPoint startPt = pts[2];
                 const SkPoint targetPt = pts[3];
-                qPath.cubicTo(skPointToQ(endPt),
-                              skPointToQ(startPt),
-                              skPointToQ(targetPt));
+                qPath.cubicTo(toQPointF(endPt),
+                              toQPointF(startPt),
+                              toQPointF(targetPt));
             }
                 break;
             case SkPath::kClose_Verb:
@@ -125,14 +125,14 @@ QPainterPath SkPathToQPainterPath(const SkPath& path) {
             case SkPath::kQuad_Verb: {
                 const SkPoint ctrlPt = pts[1];
                 const SkPoint targetPt = pts[2];
-                qPath.quadTo(skPointToQ(ctrlPt),
-                             skPointToQ(targetPt));
+                qPath.quadTo(toQPointF(ctrlPt),
+                             toQPointF(targetPt));
             }
                 break;
             case SkPath::kConic_Verb: {
                 const QPointF p0 = qPath.currentPosition();
-                const QPointF p1 = skPointToQ(pts[1]);
-                const QPointF p2 = skPointToQ(pts[2]);
+                const QPointF p1 = toQPointF(pts[1]);
+                const QPointF p2 = toQPointF(pts[2]);
                 const qreal weight = SkScalarToDouble(iter.conicWeight());
 
                 const qreal u = 4*weight/(3*(1 + weight));
@@ -145,48 +145,7 @@ QPainterPath SkPathToQPainterPath(const SkPath& path) {
     }
 }
 
-//SkScalar SkLine::angleTo(const SkLine &l) const {
-//    if(isNull() || l.isNull()) return 0.f;
-//    const SkScalar a1 = angle();
-//    const SkScalar a2 = l.angle();
-
-//    const SkScalar delta = a2 - a1;
-//    const SkScalar delta_normalized = delta < 0 ? delta + 360 : delta;
-
-//    if(qFuzzyCompare(delta, SkScalar(360))) {
-//        return 0;
-//    } else {
-//        return delta_normalized;
-//    }
-//}
-
-//bool SkLine::isNull() const {
-//    return (qFuzzyCompare(pt1.x(), pt2.x()) &&
-//            qFuzzyCompare(pt1.y(), pt2.y())) ? true : false;
-//}
-
-//SkScalar SkLine::angle(const SkLine &l) const {
-//    if(isNull() || l.isNull) return 0.f;
-//    SkScalar cos_line = (dx()*l.dx() + dy()*l.dy()) / (length()*l.length());
-//    SkScalar rad = 0;
-
-//    if(cos_line >= SkScalar(-1.f) &&
-//       cos_line <= SkScalar(1.f)) {
-//        rad = SkScalarACos(cos_line);
-//    }
-//    return SkRadiansToDegrees(rad);
-//}
-
-//bool skRectContainesSkPoint(const SkRect &absRect,
-//                            const SkPoint &pos) {
-//    if(absRect.bottom() < pos.y()) return false;
-//    if(absRect.top() > pos.y()) return false;
-//    if(absRect.right() < pos.x()) return false;
-//    if(absRect.left() > pos.x()) return false;
-//    return true;
-//}
-
-SkColor QColorToSkColor(const QColor &qcol) {
+SkColor toSkColor(const QColor &qcol) {
     return SkColorSetARGB(static_cast<U8CPU>(qcol.alpha()),
                           static_cast<U8CPU>(qcol.red()),
                           static_cast<U8CPU>(qcol.green()),
@@ -194,17 +153,17 @@ SkColor QColorToSkColor(const QColor &qcol) {
 }
 
 void switchSkQ(const QPointF &qPos, SkPoint &skPos) {
-    skPos = qPointToSk(qPos);
+    skPos = toSkPoint(qPos);
 }
 
 void switchSkQ(const SkPoint &skPos, QPointF &qPos) {
-    qPos = skPointToQ(skPos);
+    qPos = toQPointF(skPos);
 }
 
 void switchSkQ(const qreal &q, SkScalar &sk) {
-    sk = qrealToSkScalar(q);
+    sk = toSkScalar(q);
 }
 
 void switchSkQ(const SkScalar &sk, qreal &q) {
-    q = skScalarToQ(sk);
+    q = toQreal(sk);
 }

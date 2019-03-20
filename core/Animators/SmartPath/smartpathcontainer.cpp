@@ -213,7 +213,7 @@ SkPath SmartPath::interpolateWithNext(const qreal &nextWeight) const {
     const SkPath thisPath = getPathForNext();
     const SkPath nextPath = mNext->getPathForPrev();
     const bool ok = thisPath.interpolate(nextPath,
-                                         qrealToSkScalar(nextWeight),
+                                         toSkScalar(nextWeight),
                                          &result);
     if(!ok) RuntimeThrow("Cannot interpolate paths with different verb count");
     return result;
@@ -225,7 +225,7 @@ SkPath SmartPath::interpolateWithPrev(const qreal &prevWeight) const {
     const SkPath thisPath = getPathForPrev();
     const SkPath prevPath = mPrev->getPathForNext();
     const bool ok = thisPath.interpolate(prevPath,
-                                         qrealToSkScalar(prevWeight),
+                                         toSkScalar(prevWeight),
                                          &result);
     if(!ok) RuntimeThrow("Cannot interpolate paths with different verb count");
     return result;

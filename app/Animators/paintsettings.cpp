@@ -156,7 +156,7 @@ void OutlineSettingsAnimator::setStrokerSettings(QPainterPathStroker * const str
 }
 
 void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {
-    stroker->setWidth(qrealToSkScalar(mLineWidth->qra_getCurrentValue()));
+    stroker->setWidth(toSkScalar(mLineWidth->qra_getCurrentValue()));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
@@ -164,7 +164,7 @@ void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {
 void OutlineSettingsAnimator::setStrokerSettingsForRelFrameSk(
         const qreal &relFrame, SkStroke * const stroker) {
     const qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame);
-    stroker->setWidth(qrealToSkScalar(widthT));
+    stroker->setWidth(toSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
@@ -219,7 +219,7 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
         paint->setShader(fGradient);
         paint->setAlpha(255);
     } else if(fPaintType == FLATPAINT) {
-        paint->setColor(QColorToSkColor(fPaintColor));
+        paint->setColor(toSkColor(fPaintColor));
     } else {
         paint->setColor(SkColorSetARGB(0, 0, 0, 0));
     }
@@ -244,7 +244,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         const QGradientStop &stopT = stops.at(i);
         const QColor col = stopT.second;
         gradPoints[i] = SkPoint::Make(currX, currY);
-        gradColors[i] = QColorToSkColor(col);
+        gradColors[i] = toSkColor(col);
         gradPos[i] = currT;
 
         currX += xInc;
@@ -260,7 +260,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         const SkScalar radius = static_cast<SkScalar>(
                     qSqrt(distPt.x()*distPt.x() + distPt.y()*distPt.y()));
         fGradient = SkGradientShader::MakeRadial(
-                        qPointToSk(start), radius,
+                        toSkPoint(start), radius,
                         gradColors, gradPos,
                         nStops, SkShader::kClamp_TileMode);
     }

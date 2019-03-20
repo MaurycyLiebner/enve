@@ -55,7 +55,7 @@ void DrawPath::updateFittedPath() {
 
         p0 = thisNode.pos;
         if(nodeId == 0) {
-            mDrawFitted.moveTo(qPointToSk(p0));
+            mDrawFitted.moveTo(toSkPoint(p0));
         }
         p3 = nextNode.pos;
         int minDataId = thisNode.posId;
@@ -64,9 +64,9 @@ void DrawPath::updateFittedPath() {
         QPointF p2 = p3;
         gBezierLeastSquareV1V2({p0, p1, p2, p3}, mOriginalPoses,
                                minDataId, maxDataId);
-        mDrawFitted.cubicTo(qPointToSk(p1),
-                            qPointToSk(p2),
-                            qPointToSk(p3));
+        mDrawFitted.cubicTo(toSkPoint(p1),
+                            toSkPoint(p2),
+                            toSkPoint(p3));
     }
 }
 

@@ -227,7 +227,7 @@ void Canvas::drawTransparencyMesh(SkCanvas *canvas,
 
 void Canvas::renderSk(SkCanvas * const canvas,
                       GrContext* const grContext) {
-    SkRect viewRect = QRectFToSkRect(getPixBoundingRect());
+    SkRect viewRect = toSkRect(getPixBoundingRect());
 
     SkPaint paint;
     paint.setAntiAlias(true);
@@ -239,114 +239,87 @@ void Canvas::renderSk(SkCanvas * const canvas,
         if(mCurrentPreviewContainer) {
             canvas->save();
 
-            canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+            canvas->concat(toSkMatrix(mCanvasTransformMatrix));
             SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
-#ifdef CPU_ONLY_RENDER
-            mCurrentPreviewContainer->drawSk(canvas, nullptr, nullptr);
-#else
             mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
-#endif
 
             canvas->restore();
         }
     } else {
-        SkScalar invScale = static_cast<SkScalar>(1/mCanvasTransformMatrix.m11());
-#ifdef CPU_ONLY_RENDER
-        drawTransparencyMesh(canvas, viewRect);
-        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
-
-        if(mCurrentPreviewContainer) {
-            canvas->save();
-            SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
-            canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas, nullptr, nullptr);
-            canvas->restore();
-        }
-#else
         if(!mClipToCanvasSize) {
             paint.setColor(SkColorSetARGB(255, 75, 75, 75));
-            canvas->drawRect(QRectFToSkRect(mCanvasTransformMatrix.mapRect(
+            canvas->drawRect(toSkRect(mCanvasTransformMatrix.mapRect(
                                                 getMaxBoundsRect())),
                              paint);
         }
-        bool drawCanvas =
-//                mEffectsAnimators->hasEffects() &&
-                mCurrentPreviewContainer &&
+        const bool drawCanvas = mCurrentPreviewContainer &&
                 !mCurrentPreviewContainerOutdated;
-                //mExpiredPixmap == 0;
         drawTransparencyMesh(canvas, viewRect);
 
 
         if(!mClipToCanvasSize || !drawCanvas) {
             canvas->saveLayer(nullptr, nullptr);
-            paint.setColor(QColorToSkColor(mBackgroundColor->getCurrentColor()));
+            paint.setColor(toSkColor(mBackgroundColor->getCurrentColor()));
             canvas->drawRect(viewRect, paint);
-            canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+            canvas->concat(toSkMatrix(mCanvasTransformMatrix));
             for(const auto& box : mContainedBoxes) {
                 box->drawPixmapSk(canvas, grContext);
             }
             canvas->restore();
         }
-        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+        canvas->concat(toSkMatrix(mCanvasTransformMatrix));
         if(drawCanvas) {
             canvas->save();
-            SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
+            const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
             canvas->restore();
         }
-#endif
-//        QPen pen = QPen(Qt::black, 1.5);
-//        pen.setCosmetic(true);
-//        p->setPen(pen);
-        mCurrentBoxesGroup->drawSelectedSk(canvas, mCurrentMode, invScale);
-        drawSelectedSk(canvas, mCurrentMode, invScale);
+
+        SkScalar invZoom = static_cast<SkScalar>(1/mCanvasTransformMatrix.m11());
+        mCurrentBoxesGroup->drawSelectedSk(canvas, mCurrentMode, invZoom);
+        drawSelectedSk(canvas, mCurrentMode, invZoom);
 
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
 
             if(mRotPivot->isScaling() || mRotPivot->isRotating()) {
-                mRotPivot->drawSk(canvas, invScale);
+                mRotPivot->drawSk(canvas, invZoom);
                 paint.setStyle(SkPaint::kStroke_Style);
                 paint.setColor(SK_ColorBLACK);
-                SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
-                                         MIN_WIDGET_HEIGHT*0.25f*invScale};
+                SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
+                                         MIN_WIDGET_HEIGHT*0.25f*invZoom};
                 paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-                canvas->drawLine(qPointToSk(mRotPivot->getAbsolutePos()),
-                                 qPointToSk(mLastMouseEventPosRel),
+                canvas->drawLine(toSkPoint(mRotPivot->getAbsolutePos()),
+                                 toSkPoint(mLastMouseEventPosRel),
                                  paint);
                 paint.setPathEffect(nullptr);
             } else if(!mIsMouseGrabbing || mRotPivot->isSelected()) {
-                mRotPivot->drawSk(canvas, invScale);
+                mRotPivot->drawSk(canvas, invZoom);
             }
         }
-//        pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
-//        pen.setCosmetic(true);
-//        p->setPen(pen);
+
         if(mSelecting) {
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setColor(SkColorSetARGB(255, 0, 0, 255));
-            paint.setStrokeWidth(2.f*invScale);
-            SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
-                                     MIN_WIDGET_HEIGHT*0.25f*invScale};
+            paint.setStrokeWidth(2.f*invZoom);
+            SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
+                                     MIN_WIDGET_HEIGHT*0.25f*invZoom};
             paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-            canvas->drawRect(QRectFToSkRect(mSelectionRect), paint);
+            canvas->drawRect(toSkRect(mSelectionRect), paint);
             paint.setPathEffect(nullptr);
-            //SkPath selectionPath;
-            //selectionPath.addRect(QRectFToSkRect(mSelectionRect));
-            //canvas->drawPath(selectionPath, paint);
         }
 
         if(mHoveredPoint_d != nullptr) {
-            mHoveredPoint_d->drawHovered(canvas, invScale);
+            mHoveredPoint_d->drawHovered(canvas, invZoom);
         } else if(mHoveredEdge_d != nullptr) {
-            mHoveredEdge_d->drawHoveredSk(canvas, invScale);
+            mHoveredEdge_d->drawHoveredSk(canvas, invZoom);
         } else if(mHoveredBone) {
-            mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invScale);
+            mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invZoom);
         } else if(mHoveredBox) {
             if(!mCurrentEdge) {
-                mHoveredBox->drawHoveredSk(canvas, invScale);
+                mHoveredBox->drawHoveredSk(canvas, invZoom);
             }
         }
         canvas->resetMatrix();
@@ -1256,8 +1229,8 @@ void CanvasRenderData::renderToImage() {
 void CanvasRenderData::drawSk(SkCanvas *canvas) {
     canvas->save();
 
-    canvas->scale(qrealToSkScalar(fResolution),
-                  qrealToSkScalar(fResolution));
+    canvas->scale(toSkScalar(fResolution),
+                  toSkScalar(fResolution));
     for(const auto &renderData : fChildrenRenderData) {
         //box->draw(p);
         renderData->drawRenderedImageForParent(canvas);

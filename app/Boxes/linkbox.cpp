@@ -204,7 +204,7 @@ void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
     BoxesGroup* finalTarget = getFinalTarget();
     auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
     qsptr<Canvas> canvasTarget = GetAsSPtr(finalTarget, Canvas);
-    canvasData->fBgColor = QColorToSkColor(canvasTarget->getBgColorAnimator()->
+    canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
             getColorAtRelFrame(relFrame));
     //qreal res = getParentCanvas()->getResolutionFraction();
     canvasData->canvasHeight = canvasTarget->getCanvasHeight();//*res;
@@ -277,24 +277,24 @@ void LinkCanvasRenderData::renderToImage() {
 
     if(fClipToCanvas) {
         rasterCanvas.save();
-        rasterCanvas.concat(QMatrixToSkMatrix(fScaledTransform));
+        rasterCanvas.concat(toSkMatrix(fScaledTransform));
         SkPaint fillP;
         fillP.setAntiAlias(true);
         fillP.setColor(fBgColor);
-        rasterCanvas.drawRect(QRectFToSkRect(fRelBoundingRect), fillP);
+        rasterCanvas.drawRect(toSkRect(fRelBoundingRect), fillP);
         rasterCanvas.restore();
     }
 
     drawSk(&rasterCanvas);
     if(fClipToCanvas) {
         rasterCanvas.save();
-        rasterCanvas.concat(QMatrixToSkMatrix(fScaledTransform));
+        rasterCanvas.concat(toSkMatrix(fScaledTransform));
         SkPaint paintT;
         paintT.setBlendMode(SkBlendMode::kDstIn);
         paintT.setColor(SK_ColorTRANSPARENT);
         paintT.setAntiAlias(true);
         SkPath path;
-        path.addRect(QRectFToSkRect(fRelBoundingRect));
+        path.addRect(toSkRect(fRelBoundingRect));
         path.toggleInverseFillType();
         rasterCanvas.drawPath(path, paintT);
         rasterCanvas.restore();

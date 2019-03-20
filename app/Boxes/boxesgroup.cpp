@@ -327,16 +327,16 @@ QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
         if(child->isRelFrameVisibleAndInVisibleDurationRect(qRound(childRelFrame))) {
             SkPath childPath;
             childPath.addRect(
-                        QRectFToSkRect(
+                        toSkRect(
                             child->getRelBoundingRectAtRelFrame(childRelFrame)));
             childPath.transform(
-                        QMatrixToSkMatrix(
+                        toSkMatrix(
                             child->getTransformAnimator()->
                             getRelativeTransformAtRelFrameF(childRelFrame)) );
             boundingPaths.addPath(childPath);
         }
     }
-    return SkRectToQRectF(boundingPaths.computeTightBounds());
+    return toQRectF(boundingPaths.computeTightBounds());
 }
 
 bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
@@ -999,7 +999,7 @@ void BoxesGroupRenderData::renderToImage() {
 
     rasterCanvas.translate(static_cast<SkScalar>(-fGlobalBoundingRect.left()),
                            static_cast<SkScalar>(-fGlobalBoundingRect.top()));
-    rasterCanvas.concat(QMatrixToSkMatrix(scale));
+    rasterCanvas.concat(toSkMatrix(scale));
 
     drawSk(&rasterCanvas);
     //rasterCanvas->flush();

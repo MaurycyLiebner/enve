@@ -58,7 +58,7 @@ void SmartVectorPath::drawSelectedSk(SkCanvas *canvas,
         mHandler.drawPoints(canvas,
                             currentCanvasMode,
                             invScale,
-                            QMatrixToSkMatrix(getCombinedTransform()));
+                            toSkMatrix(getCombinedTransform()));
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
             mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);

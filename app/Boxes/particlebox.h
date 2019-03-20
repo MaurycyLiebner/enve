@@ -100,7 +100,7 @@ struct ParticleBoxRenderData : public BoundingBoxRenderData {
 
     void updateRelBoundingRect() {
         BoundingBoxRenderData::updateRelBoundingRect();
-        fClipRect = QRectFToSkRect(fRelBoundingRect);
+        fClipRect = toSkRect(fRelBoundingRect);
     }
 
     QList<EmitterData> fEmittersData;
@@ -113,11 +113,11 @@ private:
             if(emitterData.boxDraw) {
                 canvas->save();
                 canvas->resetMatrix();
-                canvas->translate(qrealToSkScalar(-fGlobalBoundingRect.left()),
-                                  qrealToSkScalar(-fGlobalBoundingRect.top()));
+                canvas->translate(toSkScalar(-fGlobalBoundingRect.left()),
+                                  toSkScalar(-fGlobalBoundingRect.top()));
                 QMatrix scale;
                 scale.scale(fResolution, fResolution);
-                canvas->concat(QMatrixToSkMatrix(scale));
+                canvas->concat(toSkMatrix(scale));
                 emitterData.drawParticles(canvas);
                 canvas->restore();
             } else {

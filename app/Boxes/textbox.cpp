@@ -82,9 +82,9 @@ MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
                                      canvasScaleInv);
 }
 
-qreal textForQPainterPath(const Qt::Alignment &alignment,
-                          const qreal &lineWidth,
-                          const qreal &maxWidth) {
+qreal textLineX(const Qt::Alignment &alignment,
+                const qreal &lineWidth,
+                const qreal &maxWidth) {
     if(alignment == Qt::AlignCenter) {
         return (maxWidth - lineWidth)*0.5;
     } else if(alignment == Qt::AlignLeft) {
@@ -102,40 +102,42 @@ void TextBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent)
 
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
-    SkFont font;
-    font.setTypeface(SkTypeface::MakeFromName(mFont.family().toStdString().c_str(),
-                                              SkFontStyle::Normal()));
-    font.setSize(qrealToSkScalar(mFont.pointSizeF()));
-    SkPath result;
-    SkTextUtils::GetPath(textAtFrame.toStdString().c_str(),
-                         static_cast<size_t>(textAtFrame.length()),
-                         SkTextEncoding::kUTF8, 0, 0, font,
-                         &result);
-    return result;
-    QPainterPath qPath = QPainterPath();
-
     const qreal linesDistAtFrame =
             mLinesDist->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
     const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
-    qreal yT = 0;
     qreal maxWidth = 0;
     for(const auto& line : lines) {
         const qreal lineWidth = fm.width(line);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
 
-    for(const auto& line : lines) {
+    SkFont font;
+    font.setTypeface(SkTypeface::MakeFromName(
+                     mFont.family().toStdString().c_str(),
+                     SkFontStyle::Normal()));
+    font.setSize(toSkScalar(mFont.pointSizeF()));
+    SkPath result;
+    //QPainterPath result;
+    for(int i = 0; i < lines.count(); i++) {
+        const auto& line = lines.at(i);
+        if(line.isEmpty()) continue;
         const qreal lineWidth = fm.width(line);
-        qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
-                      yT, mFont, line);
-        yT += fm.height()*linesDistAtFrame; // changed distance between lines
+        SkPath linePath;
+        const qreal lineX = textLineX(mAlignment, lineWidth, maxWidth);
+        const qreal lineY = i*fm.height()*linesDistAtFrame;
+        const auto lineStd = line.toStdString();
+        const auto lineCStr = lineStd.c_str();
+        SkTextUtils::GetPath(lineCStr,
+                             static_cast<size_t>(line.length()),
+                             SkTextEncoding::kUTF8,
+                             toSkScalar(lineX), toSkScalar(lineY),
+                             font, &linePath);
+        result.addPath(linePath);
+        //result.addText(lineX, lineY, mFont, line);
     }
-
-    // QRectF boundingRect = qPath.boundingRect();
-    // qPath.translate(-boundingRect.center());
-
-    return QPainterPathToSkPath(qPath);
+    //return toSkPath(result);
+    return result;
 }
 
 void TextBox::setCurrentValue(const QString &text) {
