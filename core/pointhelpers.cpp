@@ -9,11 +9,11 @@
 typedef std::complex<double> cmplx;
 
 qCubicSegment1D xSeg(const qCubicSegment2D &seg) {
-    return {seg.p0().x(), seg.c1().x(), seg.c2().x(), seg.p1().x()};
+    return {seg.p0().x(), seg.c1().x(), seg.c2().x(), seg.p3().x()};
 }
 
 qCubicSegment1D ySeg(const qCubicSegment2D &seg) {
-    return {seg.p0().y(), seg.c1().y(), seg.c2().y(), seg.p1().y()};
+    return {seg.p0().y(), seg.c1().y(), seg.c2().y(), seg.p3().y()};
 }
 
 QPointF symmetricToPos(QPointF toMirror,
@@ -295,18 +295,18 @@ qCubicSegment2D gBezierLeastSquareV1V2(const qCubicSegment2D &seg,
         const QPointF &val = vs.at(i);
         const qreal &t = ts.at(i);
         v1XInc += pow(1. - t, 2.)*t*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c2().x()*(1. - t)*pow(t, 2.) -
-                 seg.p1().x()*pow(t, 3.) + val.x());
+                 seg.p3().x()*pow(t, 3.) + val.x());
         v2XInc += (1. - t)*pow(t, 2.)*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c1().x()*pow(1. - t, 2.)*t -
-                 seg.p1().x()*pow(t, 3.) + val.x());
+                 seg.p3().x()*pow(t, 3.) + val.x());
         v1YInc += pow(1. - t, 2.)*t*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c2().y()*(1. - t)*pow(t, 2.) -
-                 seg.p1().y()*pow(t, 3.) + val.y());
+                 seg.p3().y()*pow(t, 3.) + val.y());
         v2YInc += (1. - t)*pow(t, 2.)*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c1().y()*pow(1. - t, 2.)*t -
-                 seg.p1().y()*pow(t, 3.) + val.y());
+                 seg.p3().y()*pow(t, 3.) + val.y());
         v1Dec = (1. - t)*pow(t, 2.)*(3.*t*pow(1. - t, 2.));
         v2Dec = (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
     }
     return qCubicSegment2D(seg.p0(), QPointF(v1XInc/v1Dec, v1YInc/v1Dec),
-                           QPointF(v2XInc/v2Dec, v2YInc/v2Dec), seg.p1());
+                           QPointF(v2XInc/v2Dec, v2YInc/v2Dec), seg.p3());
 }
 
 qCubicSegment2D gBezierLeastSquareV1V2(
@@ -327,20 +327,20 @@ qCubicSegment2D gBezierLeastSquareV1V2(
             qreal t = (static_cast<qreal>(i) - minVs)/(maxVs - minVs);
             //qreal t = getClosestTValueBezier2D(seg.p0, seg.p1, seg.p2, seg.p3, val);
             v1XInc += pow(1. - t, 2.)*t*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c2().x()*(1. - t)*pow(t, 2.) -
-                     seg.p1().x()*pow(t, 3.) + val.x());
+                     seg.p3().x()*pow(t, 3.) + val.x());
             v2XInc += (1. - t)*pow(t, 2.)*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c1().x()*pow(1. - t, 2.)*t -
-                     seg.p1().x()*pow(t, 3.) + val.x());
+                     seg.p3().x()*pow(t, 3.) + val.x());
             v1YInc += pow(1. - t, 2.)*t*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c2().y()*(1. - t)*pow(t, 2.) -
-                     seg.p1().y()*pow(t, 3.) + val.y());
+                     seg.p3().y()*pow(t, 3.) + val.y());
             v2YInc += (1. - t)*pow(t, 2.)*(-seg.p0().y()*pow(1. - t, 3.) - 3.*seg.c1().y()*pow(1. - t, 2.)*t -
-                     seg.p1().y()*pow(t, 3.) + val.y());
+                     seg.p3().y()*pow(t, 3.) + val.y());
             v1Dec += pow(1. - t, 2.)*t*(3.*t*pow(1. - t, 2.));
             v2Dec += (1. - t)*pow(t, 2.)*(3.*(1. - t)*pow(t, 2.));
         }
         v1 = QPointF(v1XInc/v1Dec, v1YInc/v1Dec);
         v2 = QPointF(v2XInc/v2Dec, v2YInc/v2Dec);
     }
-    return {seg.p0(), v1, v2, seg.p1()};
+    return {seg.p0(), v1, v2, seg.p3()};
 }
 
 qreal get1DAccuracyValue(const qreal &x0,
@@ -597,7 +597,7 @@ SkPath gPathToPolyline(const SkPath& path) {
                 result.lineTo(toSkPoint(seg.posAtLength(len)));
             }
         }
-        result.lineTo(toSkPoint(seg.p1()));
+        result.lineTo(toSkPoint(seg.p3()));
     }
 }
 
@@ -708,9 +708,9 @@ void gForEverySegmentInPath(
 }
 
 
-static void Perterb(SkPoint* p,
+static void Perterb(SkPoint * const p,
                     const SkVector& tangent,
-                    SkScalar scale) {
+                    const SkScalar& scale) {
     SkVector normal = tangent;
     SkPointPriv::RotateCCW(&normal);
     normal.setLength(scale);

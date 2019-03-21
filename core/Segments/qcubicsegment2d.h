@@ -6,36 +6,26 @@
 #include "simplemath.h"
 typedef std::pair<qreal, qreal> qrealPair;
 struct qCubicSegment1D;
-#define qCubicVals2D \
-    const qreal& p0x = p0().x(); \
-    const qreal& p0y = p0().y(); \
-    const qreal& c1x = p1().x(); \
-    const qreal& c1y = c1().y(); \
-    const qreal& c2x = c2().x(); \
-    const qreal& c2y = c2().y(); \
-    const qreal& p1x = p1().x(); \
-    const qreal& p1y = p1().y();
 
-#define qCubic1DToNamedVals(seg, add) \
-    const qreal& p##add##0 = seg.p0(); \
-    const qreal& c##add##1 = seg.c1(); \
-    const qreal& c##add##2 = seg.c2(); \
-    const qreal& p##add##1 = seg.p1();
+struct PosAndTan {
+    QPointF fPos;
+    QPointF fTan;
+};
+
+struct PosAndT {
+    qreal fT;
+    QPointF fPos;
+};
 
 struct qCubicSegment2D {
-    struct PosAndT {
-        qreal fT;
-        QPointF fPos;
-    };
-
     typedef std::pair<qCubicSegment2D, qCubicSegment2D> Pair;
     qCubicSegment2D(const QPointF& p0, const QPointF& c1,
                     const QPointF& c2, const QPointF& p1) {
-        mP0 = p0; mC1 = c1; mC2 = c2; mP1 = p1;
+        mP0 = p0; mC1 = c1; mC2 = c2; mP3 = p1;
     }
 
     qCubicSegment2D(const QPointF& p) {
-        mP0 = p; mC1 = p; mC2 = p; mP1 = p;
+        mP0 = p; mC1 = p; mC2 = p; mP3 = p;
     }
 
     qCubicSegment2D() : qCubicSegment2D(QPointF(0, 0)) {}
@@ -57,12 +47,18 @@ struct qCubicSegment2D {
     SkPath toSkPath() const {
         SkPath path;
         path.moveTo(toSkPoint(mP0));
-        path.cubicTo(toSkPoint(mC1), toSkPoint(mC2), toSkPoint(mP1));
+        path.cubicTo(toSkPoint(mC1), toSkPoint(mC2), toSkPoint(mP3));
         return path;
     }
 
     qCubicSegment1D xSeg() const;
     qCubicSegment1D ySeg() const;
+
+    QPointF tanAtLength(const qreal &len);
+    QPointF tanAtT(const qreal &t) const;
+
+    PosAndTan posAndTanAtLength(const qreal& len);
+    PosAndTan posAndTanAtT(const qreal& t) const;
 
     QPointF posAtT(const qreal& t) const;
     QPointF posAtLength(const qreal &len);
@@ -78,12 +74,12 @@ struct qCubicSegment2D {
     const QPointF &p0() const;
     const QPointF &c1() const;
     const QPointF &c2() const;
-    const QPointF &p1() const;
+    const QPointF &p3() const;
 
     void setP0(const QPointF& p0);
     void setC1(const QPointF& c1);
     void setC2(const QPointF& c2);
-    void setP1(const QPointF& p1);
+    void setP3(const QPointF& p3);
 
     qreal tValueForPointClosestTo(const QPointF& p);
     PosAndT closestPosAndT(const QPointF& p);
@@ -107,7 +103,7 @@ struct qCubicSegment2D {
         mP0 = gRotPt(p0(), deg);
         mC1 = gRotPt(c1(), deg);
         mC2 = gRotPt(c2(), deg);
-        mP1 = gRotPt(p1(), deg);
+        mP3 = gRotPt(p3(), deg);
         mLengthUpToDate = false;
     }
 
@@ -121,24 +117,12 @@ struct qCubicSegment2D {
         setP0(gQPointFDisplace(p0(), displ));
         setC1(gQPointFDisplace(c1(), displ));
         setC2(gQPointFDisplace(c2(), displ));
-        setP1(gQPointFDisplace(p1(), displ));
+        setP3(gQPointFDisplace(p3(), displ));
         mLengthUpToDate = false;
     }
 
-    SkPath solidified(const qreal& width) const {
-        SkStroke strokerSk;
-        strokerSk.setJoin(SkPaint::kRound_Join);
-        strokerSk.setCap(SkPaint::kRound_Cap);
-        strokerSk.setWidth(static_cast<SkScalar>(width));
-        SkPath outline;
-        strokerSk.strokePath(toSkPath(), &outline);
-        return outline;
-    }
-
-    // -90 is y direction 0 is x direction
+    //! @brief -90 is y direction 0 is x direction
     qreal tFurthestInDirection(const qreal& deg) const;
-//    static QList<qrealPair> sIntersectionTs(_qCubicSegment2D& seg1,
-//                                            _qCubicSegment2D& seg2);
 
     qCubicSegment2D tFragment(qreal minT, qreal maxT) const;
     qCubicSegment2D lenFragment(const qreal& minLen, const qreal& maxLen);
@@ -150,15 +134,15 @@ struct qCubicSegment2D {
                            mC1.x()*(mC2.y() - mP0.y()) +
                            mC2.x()*(mP0.y() - mC1.y());
         if(!isZero2Dec(arr1)) return false;
-        const qreal arr2 = mP1.x()*(mC1.y() - mC2.y()) +
-                           mC1.x()*(mC2.y() - mP1.y()) +
-                           mC2.x()*(mP1.y() - mC1.y());
+        const qreal arr2 = mP3.x()*(mC1.y() - mC2.y()) +
+                           mC1.x()*(mC2.y() - mP3.y()) +
+                           mC2.x()*(mP3.y() - mC1.y());
         if(!isZero2Dec(arr2)) return false;
         return true;
     }
 
     bool isNull() const {
-        if(!isZero2Dec(pointToLen(mP0 - mP1))) return false;
+        if(!isZero2Dec(pointToLen(mP0 - mP3))) return false;
         if(!isZero2Dec(pointToLen(mP0 - mC1))) return false;
         if(!isZero2Dec(pointToLen(mP0 - mC2))) return false;
         return true;
@@ -174,7 +158,7 @@ private:
     QPointF mP0;
     QPointF mC1;
     QPointF mC2;
-    QPointF mP1;
+    QPointF mP3;
 };
 
 #endif // QCUBICSEGMENT2D_H

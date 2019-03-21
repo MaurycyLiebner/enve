@@ -99,7 +99,7 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
                 lineSeg.lineTo(toSkPoint(segC.posAtLength(len)));
             }
         }
-        lineSeg.lineTo(toSkPoint(seg.p1()));
+        lineSeg.lineTo(toSkPoint(seg.p3()));
         SkPath outline;
         strokerSk.strokePath(lineSeg, &outline);
         builder.add(outline, op);

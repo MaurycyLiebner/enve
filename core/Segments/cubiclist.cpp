@@ -15,20 +15,20 @@ CubicList::CubicList(const CubicList &src) {
     updateClosed();
 }
 
-CubicList CubicList::getFragment(const double &minLenFrac,
-                                 const double &maxLenFrac) {
+CubicList CubicList::getFragment(const qreal &minLenFrac,
+                                 const qreal &maxLenFrac) {
     if(minLenFrac > maxLenFrac) return CubicList();
     //Q_ASSERT(minLenFrac > 0);
     //Q_ASSERT(maxLenFrac < 1);
-    const double minLen = getTotalLength()*CLAMP01(minLenFrac);
-    const double maxLen = getTotalLength()*CLAMP01(maxLenFrac);
-    double minT = 0, maxT = 0;
+    const qreal minLen = getTotalLength()*CLAMP01(minLenFrac);
+    const qreal maxLen = getTotalLength()*CLAMP01(maxLenFrac);
+    qreal minT = 0, maxT = 0;
     int minI = -1, maxI = -1;
-    double currLen = 0;
+    qreal currLen = 0;
     const int iMax = mSegments.count();
     for(int i = 0; i < iMax; i++) {
         auto& seg = mSegments[i];
-        const double lastLen = currLen;
+        const qreal lastLen = currLen;
         currLen += seg.length();
         if(minI < 0) {
             if(currLen > minLen) {
@@ -61,12 +61,12 @@ CubicList CubicList::getFragment(const double &minLenFrac,
     return CubicList(fragSegs);
 }
 
-CubicList CubicList::getFragmentUnbound(const double &minLenFrac,
-                                        const double &maxLenFrac) {
+CubicList CubicList::getFragmentUnbound(const qreal &minLenFrac,
+                                        const qreal &maxLenFrac) {
     if(minLenFrac > maxLenFrac) return CubicList();
-    const double shiftToPos = -floor4Dec(minLenFrac);
-    const double posMinLenFrac = minLenFrac + shiftToPos; // always between 0 and 1
-    const double posMaxLenFrac = maxLenFrac + shiftToPos;
+    const qreal shiftToPos = -floor4Dec(minLenFrac);
+    const qreal posMinLenFrac = minLenFrac + shiftToPos; // always between 0 and 1
+    const qreal posMaxLenFrac = maxLenFrac + shiftToPos;
     if((isZero4Dec(posMinLenFrac) || posMinLenFrac > 0) &&
        (isZero4Dec(posMaxLenFrac) || posMaxLenFrac < 1)) {
         return getFragment(posMinLenFrac, posMaxLenFrac);
@@ -184,7 +184,7 @@ void CubicList::opSmoothOut(const qreal& smoothness) {
         auto& seg = mSegments.last();
         QPointF c1 = prevSeg->c2();
         QPointF c2 = seg.c1();
-        gSmoothyAbsCtrlsForPtBetween(prevSeg->p0(), seg.p0(), seg.p1(),
+        gSmoothyAbsCtrlsForPtBetween(prevSeg->p0(), seg.p0(), seg.p3(),
                                      c1, c2, smoothness);
         lastC2 = c2;
         prevSeg = &seg;
@@ -201,7 +201,7 @@ void CubicList::opSmoothOut(const qreal& smoothness) {
         }
         QPointF c1 = prevSeg->c2();
         QPointF c2 = seg.c1();
-        gSmoothyAbsCtrlsForPtBetween(prevSeg->p0(), seg.p0(), seg.p1(),
+        gSmoothyAbsCtrlsForPtBetween(prevSeg->p0(), seg.p0(), seg.p3(),
                                      c1, c2, smoothness);
         prevSeg->setC1(lastC2);
         prevSeg->setC2(c1);
@@ -212,9 +212,9 @@ void CubicList::opSmoothOut(const qreal& smoothness) {
         auto& seg = mSegments.last();
         QPointF c1;
         if(smoothness > 0) {
-            c1 = (seg.c2() - seg.p1())*(1 - smoothness) + seg.p1();
+            c1 = (seg.c2() - seg.p3())*(1 - smoothness) + seg.p3();
         } else {
-            c1 = (seg.c2() - seg.p1())*(1 + smoothness) + seg.p1();
+            c1 = (seg.c2() - seg.p3())*(1 + smoothness) + seg.p3();
         }
         seg.setC1(lastC2);
         seg.setC2(c1);
@@ -240,29 +240,6 @@ void CubicList::subdivide(const int &sub) {
     }
 }
 
-void CubicList::smoothOutNode(const int &nodeId) {
-    if(nodeId < 0) return;
-    if(nodeId > mSegments.count()) return;
-    int seg1Id = nodeId - 1;
-    int seg2Id = nodeId;
-    if(mClosed) {
-        if(seg1Id == -1) { // first node
-            seg1Id = mSegments.count() - 1;
-        } else if(seg2Id >= mSegments.count()) { // last node
-            seg2Id = 0;
-        }
-        auto& seg1 = mSegments[seg1Id];
-        auto& seg2 = mSegments[seg2Id];
-
-    } else {
-        if(seg1Id == -1) { // first node
-
-        } else if(seg2Id >= mSegments.count()) { // last node
-
-        }
-    }
-}
-
 void CubicList::updateTotalLength() {
     mTotalLengthUpToDate = true;
     mTotalLength = 0;
@@ -280,5 +257,5 @@ void CubicList::updateClosed() {
     const auto& firstSeg = mSegments.first();
     const auto& lastSeg = mSegments.last();
 
-    mClosed = pointToLen(firstSeg.p0() - lastSeg.p1()) < 0.1;
+    mClosed = pointToLen(firstSeg.p0() - lastSeg.p3()) < 0.1;
 }

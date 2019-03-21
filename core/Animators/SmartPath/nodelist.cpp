@@ -292,7 +292,7 @@ void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
     const auto& second = div.second;
     prevNormal->fC2 = first.c1();
     node->fC0 = first.c2();
-    node->fP1 = first.p1();
+    node->fP1 = first.p3();
     node->fC2 = second.c1();
     setNodeType(nodeId, node, Node::NORMAL);
     setNodeCtrlsMode(nodeId, node, CtrlsMode::CTRLS_SMOOTH);
@@ -359,14 +359,14 @@ void gCubicTo(const Node& prevNode, const Node& nextNode,
         const auto& first = div.first;
         result.cubicTo(toSkPoint(first.c1()),
                        toSkPoint(first.c2()),
-                       toSkPoint(first.p1()));
+                       toSkPoint(first.p3()));
         //qDebug() << "Cubic to:" << first.p1();
         seg = div.second;
         lastT = t;
     }
     result.cubicTo(toSkPoint(seg.c1()),
                    toSkPoint(seg.c2()),
-                   toSkPoint(seg.p1()));
+                   toSkPoint(seg.p3()));
     //qDebug() << "Cubic to:" << seg.p1();
     dissolvedTs.clear();
 }

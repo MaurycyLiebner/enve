@@ -107,8 +107,7 @@ struct BrushStrokeSet {
         BrushStrokeSet set;
         qreal currLen = 0;
         qreal lastT = 0;
-        auto segsList = segs.getSegments();
-        for(auto& seg : segsList) {
+        for(auto& seg : segs) {
             currLen += seg.length();
             const qreal t = currLen/segs.getTotalLength();
             set.fStrokes << BrushStroke{seg,
