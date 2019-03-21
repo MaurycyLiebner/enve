@@ -73,12 +73,14 @@ public:
     static void sAddFunctionWaitingForBoxLoad(
             const stdsptr<FunctionWaitingForBoxLoad>& func);
 
+    static void sAddSavedBox(BoundingBox * const box);
     static void sAddLoadedBox(BoundingBox * const box);
     static BoundingBox *sGetLoadedBoxById(const int &loadId);
-    static int sGetLoadedBoxesCount();
-    static void sClearLoadedBoxes();
+    static void sClearReadWriteIds();
+
+    static int sNextReadWriteId;
 private:
-    static QList<BoundingBox*> sLoadedBoxes;
+    static QList<BoundingBox*> sReadWriteBoxesWithId;
     static QList<stdsptr<FunctionWaitingForBoxLoad>> sFunctionsWaitingForBoxLoad;
 public slots:
     virtual void updateAfterDurationRectangleRangeChanged();
@@ -228,9 +230,6 @@ public:
     virtual void scheduleWaitingTasks();
     virtual void queScheduledTasks();
 
-    virtual int setBoxLoadId(const int &loadId);
-    virtual void clearBoxLoadId();
-
     virtual void writeBoundingBox(QIODevice *target);
     virtual void readBoundingBox(QIODevice *target);
 
@@ -264,7 +263,9 @@ public:
 
     void ca_childAnimatorIsRecordingChanged();
 
-    const int &getLoadId() const;
+    int assignReadWriteId();
+    void clearBoxReadWriteId();
+    int getLoadId() const;
 
     void clearParent();
     BoxesGroup *getParentGroup() const;

@@ -660,6 +660,8 @@ void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
 }
 
 void BoundingBox::writeBoundingBox(QIODevice *target) {
+    if(mLoadId < 0) assignReadWriteId();
+
     target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
     gWrite(target, prp_mName);
     target->write(rcConstChar(&mLoadId), sizeof(int));
@@ -675,6 +677,8 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
 
     mTransformAnimator->writeProperty(target);
     mEffectsAnimators->writeProperty(target);
+
+    BoundingBox::sAddSavedBox(this);
 }
 
 void BoundingBox::readBoundingBox(QIODevice *target) {
@@ -699,8 +703,9 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     mEffectsAnimators->readProperty(target);
 
     if(hasDurRect) anim_shiftAllKeys(prp_getFrameShift());
-    BoundingBox::sAddLoadedBox(this);
     mPivotAutoAdjust = pivotAutoAdjust;
+
+    BoundingBox::sAddLoadedBox(this);
 }
 
 void BoundingBox::writeBoundingBoxDataForLink(QIODevice *target) const {
@@ -814,14 +819,8 @@ void BoxTargetProperty::writeProperty(QIODevice * const target) const {
     int targetId;
     if(targetBox) {
         targetId = targetBox->getLoadId();
-        if(targetId < 0) {
-            targetId = BoundingBox::sGetLoadedBoxesCount();
-            targetBox->setBoxLoadId(targetId);
-            BoundingBox::sAddLoadedBox(targetBox);
-        }
-    } else {
-        targetId = -1;
-    }
+        if(targetId < 0) targetId = targetBox->assignReadWriteId();
+    } else targetId = -1;
     target->write(rcConstChar(&targetId), sizeof(int));
 }
 
@@ -1388,9 +1387,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
     int nCanvases = mCanvasList.count();
     target->write(rcConstChar(&nCanvases), sizeof(int));
     int currentCanvasId = -1;
-    int boxLoadId = 0;
     for(const auto &canvas : mCanvasList) {
-        boxLoadId = canvas->setBoxLoadId(boxLoadId);
         canvas->writeBoundingBox(target);
         if(canvas.get() == mCurrentCanvas) {
             currentCanvasId = mCurrentCanvas->getLoadId();
@@ -1398,7 +1395,7 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
     }
     target->write(rcConstChar(&currentCanvasId), sizeof(int));
     for(const auto &canvas : mCanvasList) {
-        canvas->clearBoxLoadId();
+        canvas->clearBoxReadWriteId();
     }
 }
 
@@ -1426,7 +1423,7 @@ void MainWindow::loadAVFile(const QString &path) {
 
             clearLoadedGradientsList();
             gradientWidget->clearGradientsLoadIds();
-            BoundingBox::sClearLoadedBoxes();
+            BoundingBox::sClearReadWriteIds();
         } else {
             RuntimeThrow("File incompatible or incomplete " + path.toStdString() + ".");
         }
@@ -1458,5 +1455,5 @@ void MainWindow::saveToFile(const QString &path) {
                      path.toStdString() + ".");
     }
 
-    BoundingBox::sClearLoadedBoxes();
+    BoundingBox::sClearReadWriteIds();
 }

@@ -132,10 +132,6 @@ public:
                                  ComplexAnimator *parentAnimator);
     void shiftAll(const int &shift);
 
-    int setBoxLoadId(const int &loadId);
-
-    virtual void clearBoxLoadId();
-
     qsptr<BoundingBox> createLink();
 
     void addPathEffect(const qsptr<PathEffect>& effect);

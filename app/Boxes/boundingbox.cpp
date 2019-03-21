@@ -19,8 +19,9 @@
 #include "GPUEffects/gpurastereffect.h"
 #include "linkbox.h"
 
-QList<BoundingBox*> BoundingBox::sLoadedBoxes;
+QList<BoundingBox*> BoundingBox::sReadWriteBoxesWithId;
 QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::sFunctionsWaitingForBoxLoad;
+int BoundingBox::sNextReadWriteId = 0;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator("box") {
@@ -1168,25 +1169,22 @@ void BoundingBox::queScheduledTasks() {
     mScheduledTasks.clear();
 }
 
-const int &BoundingBox::getLoadId() const {
+int BoundingBox::getLoadId() const {
     return mLoadId;
 }
 
-int BoundingBox::setBoxLoadId(const int &loadId) {
-    mLoadId = loadId;
-    return loadId + 1;
+int BoundingBox::assignReadWriteId() {
+    mLoadId = sNextReadWriteId++;
+    return mLoadId;
 }
 
-void BoundingBox::clearBoxLoadId() {
+void BoundingBox::clearBoxReadWriteId() {
     mLoadId = -1;
 }
 
 BoundingBox *BoundingBox::sGetLoadedBoxById(const int &loadId) {
-    for(const auto& box : sLoadedBoxes) {
-        if(!box) return nullptr;
-        if(box->getLoadId() == loadId) {
-            return box;
-        }
+    for(const auto& box : sReadWriteBoxesWithId) {
+        if(box->getLoadId() == loadId) return box;
     }
     return nullptr;
 }
@@ -1196,8 +1194,12 @@ void BoundingBox::sAddFunctionWaitingForBoxLoad(
     sFunctionsWaitingForBoxLoad << func;
 }
 
+void BoundingBox::sAddSavedBox(BoundingBox * const box) {
+    sReadWriteBoxesWithId << box;
+}
+
 void BoundingBox::sAddLoadedBox(BoundingBox * const box) {
-    sLoadedBoxes << box;
+    sReadWriteBoxesWithId << box;
     for(int i = 0; i < sFunctionsWaitingForBoxLoad.count(); i++) {
         auto funcT = sFunctionsWaitingForBoxLoad.at(i);
         if(funcT->loadBoxId == box->getLoadId()) {
@@ -1208,15 +1210,12 @@ void BoundingBox::sAddLoadedBox(BoundingBox * const box) {
     }
 }
 
-int BoundingBox::sGetLoadedBoxesCount() {
-    return sLoadedBoxes.count();
-}
-
-void BoundingBox::sClearLoadedBoxes() {
-    for(const auto& box : sLoadedBoxes) {
-        box->clearBoxLoadId();
+void BoundingBox::sClearReadWriteIds() {
+    for(const auto& box : sReadWriteBoxesWithId) {
+        box->clearBoxReadWriteId();
     }
-    sLoadedBoxes.clear();
+    sNextReadWriteId = 0;
+    sReadWriteBoxesWithId.clear();
     sFunctionsWaitingForBoxLoad.clear();
 }
 

@@ -496,22 +496,6 @@ void BoxesGroup::shiftAll(const int &shift) {
     }
 }
 
-int BoxesGroup::setBoxLoadId(const int &loadId) {
-    int loadIdT = BoundingBox::setBoxLoadId(loadId);
-        for(const auto &child : mContainedBoxes) {
-            loadIdT = child->setBoxLoadId(loadIdT);
-        }
-
-        return loadIdT;
-}
-
-void BoxesGroup::clearBoxLoadId() {
-    BoundingBox::clearBoxLoadId();
-        for(const auto &child : mContainedBoxes) {
-            child->clearBoxLoadId();
-        }
-}
-
 const QList<qsptr<BoundingBox> > &BoxesGroup::getContainedBoxesList() const {
     return mContainedBoxes;
 }
