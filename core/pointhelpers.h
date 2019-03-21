@@ -112,7 +112,7 @@ extern void gGetSmoothAbsCtrlsForPtBetween(
         SkPoint &c1, SkPoint &c2,
         const SkScalar &smoothLen);
 
-extern bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
+extern bool gDisplaceFilterPath(SkPath * const dst, const SkPath& src,
                                 const SkScalar &maxDev,
                                 const SkScalar &segLen,
                                 const SkScalar &smoothness,

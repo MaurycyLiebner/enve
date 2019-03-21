@@ -721,7 +721,7 @@ float randFloat() {
     return static_cast<float>(gRandF(-1, 1));
 }
 
-bool gDisplaceFilterPath(SkPath* dst, const SkPath& src,
+bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
                          const SkScalar &maxDev,
                          const SkScalar &segLen,
                          const SkScalar &smoothness,

@@ -43,6 +43,14 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
 void DisplacePathEffect::filterPathForRelFrame(const qreal &relFrame,
                                                 const SkPath &src,
                                                 SkPath *dst, const bool &) {
+    const qreal qMaxDev = mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame);
+    const qreal qSegLen = mSegLength->qra_getEffectiveValueAtRelFrame(relFrame);
+    const qreal qSmooth = mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame);
+
+    const SkScalar maxDev = toSkScalar(qMaxDev);
+    const SkScalar segLen = toSkScalar(qSegLen);
+    const SkScalar smooth = toSkScalar(qSmooth);
+
     dst->reset();
     qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
     mSeedAssist = qrand() % 999999;
@@ -61,32 +69,20 @@ void DisplacePathEffect::filterPathForRelFrame(const qreal &relFrame,
     }
     if(mSmoothTransform->getValue() && mRandomize->getValue()) {
         SkPath path1;
-        gDisplaceFilterPath(&path1, src,
-                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSeedAssist);
+        gDisplaceFilterPath(&path1, src, maxDev, segLen, smooth, mSeedAssist);
         SkPath path2;
-        qsrand(mSeed->getCurrentIntValue());
-        gDisplaceFilterPath(&path2, src,
-                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
-                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
-                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame + randStep),
-                           nextSeed);
+        qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
+        gDisplaceFilterPath(&path2, src, maxDev, segLen, smooth, nextSeed);
         qreal weight = qAbs(qFloor(relFrame) % randStep)*1./randStep;
-        qreal easing = mEasing->getCurrentEffectiveValueAtRelFrame(relFrame);
+        const qreal easing = mEasing->getCurrentEffectiveValueAtRelFrame(relFrame);
         if(easing > 0.0001) {
             qCubicSegment1D seg(0, easing, 1 - easing, 1);
             qreal tT;
             seg.minDistanceTo(weight, &tT);
-            weight = gCubicValueAtT({0., 0., 1., 1.}, tT);
+            weight = gCubicValueAtT({0, 0, 1, 1}, tT);
         }
-        path1.interpolate(path2, weight, dst);
+        path1.interpolate(path2, toSkScalar(weight), dst);
     } else {
-        gDisplaceFilterPath(dst, src,
-                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
-                           mSeedAssist);
+        gDisplaceFilterPath(dst, src, maxDev, segLen, smooth, mSeedAssist);
     }
 }
