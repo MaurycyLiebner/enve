@@ -7,16 +7,6 @@ class QrealAnimator;
 
 class BoxTargetProperty;
 
-#include "Boxes/boundingbox.h"
-struct BoxTargetPropertyWaitingForBoxLoad : public FunctionWaitingForBoxLoad {
-    BoxTargetPropertyWaitingForBoxLoad(
-            const int &boxIdT, BoxTargetProperty* targetPropertyT);
-
-    void boxLoaded(BoundingBox *box);
-
-    qptr<BoxTargetProperty> targetProperty;
-};
-
 class BoxTargetProperty : public Property {
     Q_OBJECT
 public:

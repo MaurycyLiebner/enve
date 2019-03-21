@@ -5,7 +5,8 @@ SimpleBrushWrapper::SimpleBrushWrapper(const QString &collName,
                                        MyPaintBrush * const brush,
                                        const QByteArray& wholeFile) :
     mBrush(brush), mWholeFile(wholeFile),
-    mCollectionName(collName), mBrushName(brushName) {}
+    mCollectionName(collName), mBrushName(brushName) {
+}
 
 SimpleBrushWrapper::~SimpleBrushWrapper() {
     mypaint_brush_unref(mBrush);

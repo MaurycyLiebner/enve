@@ -93,6 +93,9 @@ protected:
                 fBitmapTMP = surf.toBitmap(iMargin);
                 fGlobalBoundingRect.translate(-surf.zeroTilePos() -
                                               QPoint(iMargin, iMargin));
+                fGlobalBoundingRect.setSize(QSizeF(fBitmapTMP.width(),
+                                                   fBitmapTMP.height()));
+                fixupGlobalBoundingRect();
             } else {
                 paint.setShader(nullptr);
                 fStrokeSettings.applyPainterSettingsSk(&paint);

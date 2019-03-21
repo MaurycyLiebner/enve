@@ -487,9 +487,6 @@ void MainWindow::updateSettingsForCurrentCanvas() {
 }
 
 void MainWindow::replaceClipboard(const stdsptr<ClipboardContainer>& container) {
-    if(mClipboardContainer) {
-        BoundingBox::sClearReadWriteIds();
-    }
     mClipboardContainer = container;
 }
 

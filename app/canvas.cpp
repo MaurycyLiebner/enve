@@ -734,23 +734,24 @@ bool boxesZSort(const qptr<BoundingBox>& box1,
 }
 
 void Canvas::copyAction() {
-    stdsptr<BoxesClipboardContainer> container =
-            SPtrCreate(BoxesClipboardContainer)();
+    const auto container = SPtrCreate(BoxesClipboardContainer)();
     mMainWindow->replaceClipboard(container);
     QBuffer target(container->getBytesArray());
     target.open(QIODevice::WriteOnly);
-    int nBoxes = mSelectedBoxes.count();
-    target.write(rcChar(&nBoxes), sizeof(int));
+    const int nBoxes = mSelectedBoxes.count();
+    target.write(rcConstChar(&nBoxes), sizeof(int));
 
     std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
     for(const auto& box : mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }
     target.close();
+
+    BoundingBox::sClearWriteBoxes();
 }
 
 void Canvas::pasteAction() {
-    BoxesClipboardContainer *container =
+    const auto container =
             static_cast<BoxesClipboardContainer*>(
             mMainWindow->getClipboardContainer(CCT_BOXES));
     if(!container) return;

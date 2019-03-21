@@ -487,6 +487,17 @@ void QrealAnimator::multSavedValueToCurrentValue(const qreal &multBy) {
     qra_setCurrentValue(mSavedCurrentValue * multBy);
 }
 
+void QrealAnimator::qra_setCurrentValueWithoutCallingUpdater(
+        const qreal &newValue) {
+    mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+    emit valueChangedSignal(mCurrentValue);
+}
+
+void QrealAnimator::qra_incCurrentValueWithoutCallingUpdater(
+        const qreal &incBy) {
+    qra_setCurrentValueWithoutCallingUpdater(mCurrentValue + incBy);
+}
+
 void QrealAnimator::qra_incCurrentValue(const qreal &incBy) {
     qra_setCurrentValue(mCurrentValue + incBy);
 }

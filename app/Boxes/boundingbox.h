@@ -7,6 +7,7 @@
 #include "renderdatahandler.h"
 #include "smartPointers/sharedpointerdefs.h"
 #include "colorhelpers.h"
+#include "waitingforboxload.h"
 
 class Canvas;
 
@@ -52,14 +53,6 @@ enum BoundingBoxType {
     TYPE_BONES_BOX
 };
 
-struct FunctionWaitingForBoxLoad : public StdSelfRef {
-    virtual void boxLoaded(BoundingBox *box) = 0;
-    int loadBoxId;
-
-protected:
-    FunctionWaitingForBoxLoad(const int &boxIdT);
-};
-
 typedef PropertyMimeData<BoundingBox,
     InternalMimeData::BOUNDING_BOX> BoundingBoxMimeData;
 
@@ -70,18 +63,24 @@ protected:
     BoundingBox(const BoundingBoxType &type);
 public:
     ~BoundingBox();
-    static void sAddFunctionWaitingForBoxLoad(
-            const stdsptr<FunctionWaitingForBoxLoad>& func);
 
-    static void sAddSavedBox(BoundingBox * const box);
-    static void sAddLoadedBox(BoundingBox * const box);
-    static BoundingBox *sGetLoadedBoxById(const int &loadId);
-    static void sClearReadWriteIds();
+    static BoundingBox *sGetBoxByDocumentId(const int &documentId);
 
-    static int sNextReadWriteId;
+    static void sClearWriteBoxes();
+
+    static void sAddReadBox(BoundingBox * const box);
+    static BoundingBox *sGetBoxByReadId(const int &readId);
+    static void sClearReadBoxes();
+    static void sAddWaitingForBoxLoad(const WaitingForBoxLoad& func);
 private:
-    static QList<BoundingBox*> sReadWriteBoxesWithId;
-    static QList<stdsptr<FunctionWaitingForBoxLoad>> sFunctionsWaitingForBoxLoad;
+    static int sNextDocumentId;
+    static QList<BoundingBox*> sDocumentBoxes;
+
+    static QList<BoundingBox*> sReadBoxes;
+    static QList<WaitingForBoxLoad> sFunctionsWaitingForBoxRead;
+
+    static int sNextWriteId;
+    static QList<BoundingBox*> sBoxesWithWriteIds;
 public slots:
     virtual void updateAfterDurationRectangleRangeChanged();
 
@@ -117,7 +116,6 @@ public:
     virtual void finishAllPointsTransform();
 
     virtual void centerPivotPosition();
-    virtual void setPivotPosition(const QPointF &pos);
     virtual QPointF getRelCenterPosition();
 
     virtual void selectAllPoints(Canvas * const canvas);
@@ -263,9 +261,14 @@ public:
 
     void ca_childAnimatorIsRecordingChanged();
 
-    int assignReadWriteId();
-    void clearBoxReadWriteId();
-    int getLoadId() const;
+    int getDocumentId() const { return mDocumentId; }
+
+    int assignWriteId();
+    void clearWriteId();
+    int getWriteId() const;
+
+    int getReadId() const;
+    void clearReadId();
 
     void clearParent();
     BoxesGroup *getParentGroup() const;
@@ -353,7 +356,7 @@ public:
     bool isAncestor(const BoundingBox * const box) const;
     void removeFromParent_k();
 
-    void copyBoundingBoxDataTo(BoundingBox * const targetBox) const;
+    void copyBoundingBoxDataTo(BoundingBox * const targetBox);
 
 
 //    int prp_getParentFrameShift() const;
@@ -385,9 +388,6 @@ public:
 
     void scheduleTask(const stdsptr<_ScheduledTask> &task);
 
-    void writeBoundingBoxDataForLink(QIODevice *target) const;
-    void readBoundingBoxDataForLink(QIODevice *target);
-
     void addLinkingBox(BoundingBox *box);
     void removeLinkingBox(BoundingBox *box);
     const QList<qptr<BoundingBox>> &getLinkingBoxes() const;
@@ -413,7 +413,9 @@ protected:
     int mZListIndex = 0;
     int mNReasonsNotToApplyUglyTransform = 0;
     int mExpiredPixmap = 0;
-    int mLoadId = -1;
+    int mReadId = -1;
+    int mWriteId = -1;
+    const int mDocumentId;
 
     BoundingBoxType mType;
     SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;

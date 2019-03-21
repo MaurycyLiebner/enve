@@ -75,25 +75,10 @@ void BoundingBoxRenderData::renderToImage() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;
     if(fOpacity < 0.001) return;
-    QMatrix scale;
-    scale.scale(fResolution, fResolution);
-    fScaledTransform = fTransform*scale;
-    //transformRes.scale(resolution, resolution);
-    fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
-    for(const QRectF &rectT : fOtherGlobalRects) {
-        fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
-    }
-    fGlobalBoundingRect = fGlobalBoundingRect.
-            adjusted(-fEffectsMargin, -fEffectsMargin,
-                     fEffectsMargin, fEffectsMargin);
-    if(fMaxBoundsEnabled) {
-        fGlobalBoundingRect = fGlobalBoundingRect.intersected(
-                              scale.mapRect(fMaxBoundsRect));
-    }
-    const QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
-                    qRound(fGlobalBoundingRect.top()/**resolution*/));
-    fGlobalBoundingRect.translate(-transF);
+    fResolutionScale.reset();
+    fResolutionScale.scale(fResolution, fResolution);
+    fScaledTransform = fTransform*fResolutionScale;
+    updateGlobalBoundingRect();
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(
                 qCeil(fGlobalBoundingRect.width()),

@@ -174,7 +174,7 @@ void VectorPathEdge::cancelPassThroughTransform() {
 }
 
 void VectorPathEdge::generatePainterPath() {
-    mSkPath = SkPath();
+    mSkPath.reset();
     mSkPath.moveTo(toSkPoint(mPoint1->getAbsolutePos()));
     mSkPath.cubicTo(toSkPoint(mPoint1->getEndCtrlPtAbsPos()),
                     toSkPoint(mPoint2->getStartCtrlPtAbsPos()),

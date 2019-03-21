@@ -90,6 +90,18 @@ void QPointFAnimator::setValuesRange(const qreal &minVal,
     mYAnimator->qra_setValueRange(minVal, maxVal);
 }
 
+void QPointFAnimator::setCurrentPointValueWithoutCallingUpdater(
+        const QPointF &val) {
+    mXAnimator->qra_setCurrentValueWithoutCallingUpdater(val.x());
+    mYAnimator->qra_setCurrentValueWithoutCallingUpdater(val.y());
+}
+
+void QPointFAnimator::incCurrentValuesWithoutCallingUpdater(
+        const qreal &x, const qreal &y) {
+    mXAnimator->qra_incCurrentValueWithoutCallingUpdater(x);
+    mYAnimator->qra_incCurrentValueWithoutCallingUpdater(y);
+}
+
 void QPointFAnimator::incCurrentValues(const qreal &x,
                                        const qreal &y) {
     mXAnimator->qra_incCurrentValue(x);

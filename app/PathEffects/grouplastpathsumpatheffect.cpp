@@ -20,8 +20,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(const qreal &relFrame,
         return;
     }
     QString operation = "Union";
-    const QList<qsptr<BoundingBox> > &boxList =
-            mParentGroup->getContainedBoxesList();
+    const auto &boxList = mParentGroup->getContainedBoxesList();
     QList<PathBox*> pathBoxes;
     for(const auto& pathBox : boxList) {
         if(pathBox->SWT_isPathBox()) {
@@ -34,7 +33,7 @@ void GroupLastPathSumPathEffect::filterPathForRelFrame(const qreal &relFrame,
     }
     PathBox *lastPath = pathBoxes.takeLast();
     SkPath srcT = src;
-    for(PathBox *pathBox : pathBoxes) {
+    for(const auto& pathBox : pathBoxes) {
         gApplyOperationF(relFrame, srcT, dst, pathBox,
                         lastPath, operation, true);
         srcT = *dst;

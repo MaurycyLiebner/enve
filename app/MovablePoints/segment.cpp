@@ -117,7 +117,7 @@ void NormalSegment::cancelPassThroughTransform() {
 }
 
 void NormalSegment::generateSkPath() {
-    mSkPath = SkPath();
+    mSkPath.reset();
     mSkPath.moveTo(toSkPoint(mFirstNode->getAbsolutePos()));
     mSkPath.cubicTo(toSkPoint(mFirstNode->getC2AbsPos()),
                     toSkPoint(mLastNode->getC0AbsPos()),

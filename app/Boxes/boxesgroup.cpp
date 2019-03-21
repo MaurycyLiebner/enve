@@ -320,7 +320,7 @@ void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {
 }
 
 QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
-    SkPath boundingPaths = SkPath();
+    SkPath boundingPaths;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     for(const auto &child : mContainedBoxes) {
         const qreal childRelFrame = child->prp_absFrameToRelFrameF(absFrame);
@@ -536,15 +536,16 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    auto groupData = GetAsSPtr(data, BoxesGroupRenderData);
+    const auto groupData = GetAsSPtr(data, BoxesGroupRenderData);
     groupData->fChildrenRenderData.clear();
-    qreal childrenEffectsMargin = 0.;
-    qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+    groupData->fOtherGlobalRects.clear();
+    qreal childrenEffectsMargin = 0;
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     if(enabledGroupPathSumEffectPresent()) {
         int idT = 0;
         qsptr<PathBox> lastPathBox;
         for(const auto& box : mContainedBoxes) {
-            qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
+            const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 if(box->SWT_isPathBox()) {
                     idT = groupData->fChildrenRenderData.count();
@@ -559,8 +560,8 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
             }
         }
         if(lastPathBox) {
-            qreal boxRelFrame = lastPathBox->prp_absFrameToRelFrameF(absFrame);
-            auto boxRenderData = SPtrCreate(PathBoxRenderData)(this);
+            const qreal boxRelFrame = lastPathBox->prp_absFrameToRelFrameF(absFrame);
+            const auto boxRenderData = SPtrCreate(PathBoxRenderData)(this);
             lastPathBox->setupBoundingBoxRenderDataForRelFrameF(
                 boxRelFrame, boxRenderData.get());
             boxRenderData->scheduleTask();
@@ -571,7 +572,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
         }
     } else {
         for(const auto& box : mContainedBoxes) {
-            qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
+            const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
             if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 processChildData(box.data(), groupData.get(), boxRelFrame);
 
@@ -945,59 +946,4 @@ bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return BoundingBox::SWT_shouldBeVisible(rules,
                                             parentSatisfies,
                                             parentMainTarget);
-}
-#include "PixmapEffects/rastereffects.h"
-#include "skia/skiahelpers.h"
-void BoxesGroupRenderData::renderToImage() {
-    if(fRenderedToImage) return;
-    fRenderedToImage = true;
-    QMatrix scale;
-    scale.scale(fResolution, fResolution);
-    fScaledTransform = fTransform*scale;
-    //transformRes.scale(resolution, resolution);
-    fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
-    for(const QRectF &rectT : fOtherGlobalRects) {
-        fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
-    }
-    fGlobalBoundingRect = fGlobalBoundingRect.
-            adjusted(-fEffectsMargin, -fEffectsMargin,
-                     fEffectsMargin, fEffectsMargin);
-    if(fMaxBoundsEnabled) {
-        fGlobalBoundingRect = fGlobalBoundingRect.intersected(
-                    scale.mapRect(fMaxBoundsRect));
-    }
-    const QSizeF sizeF = fGlobalBoundingRect.size();
-    const QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
-                    qRound(fGlobalBoundingRect.top()/**resolution*/));
-    fGlobalBoundingRect.translate(-transF);
-    const auto info = SkiaHelpers::getPremulBGRAInfo(
-                qCeil(sizeF.width()), qCeil(sizeF.height()));
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    bitmap.eraseColor(SK_ColorTRANSPARENT);
-
-    //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas rasterCanvas(bitmap);//rasterSurface->getCanvas();
-    //rasterCanvas->clear(SK_ColorTRANSPARENT);
-
-    rasterCanvas.translate(static_cast<SkScalar>(-fGlobalBoundingRect.left()),
-                           static_cast<SkScalar>(-fGlobalBoundingRect.top()));
-    rasterCanvas.concat(toSkMatrix(scale));
-
-    drawSk(&rasterCanvas);
-    //rasterCanvas->flush();
-
-    fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
-                            qRound(fGlobalBoundingRect.top()));
-
-    if(!fPixmapEffects.isEmpty()) {
-        for(const auto& effect : fPixmapEffects) {
-            effect->applyEffectsSk(bitmap, fResolution);
-        }
-        clearPixmapEffects();
-    }
-    bitmap.setImmutable();
-    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
-    bitmap.reset();
 }

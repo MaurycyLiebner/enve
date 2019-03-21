@@ -5,6 +5,8 @@
 
 class QPointFAnimator : public ComplexAnimator {
     friend class SelfRef;
+protected:
+    QPointFAnimator(const QString& name);
 public:
     qreal getXValue();
     qreal getYValue();
@@ -13,6 +15,9 @@ public:
     qreal getYValueAtRelFrame(const qreal &relFrame);
 
     void setCurrentPointValue(const QPointF &val);
+
+    void setCurrentPointValueWithoutCallingUpdater(const QPointF &val);
+    void incCurrentValuesWithoutCallingUpdater(const qreal &x, const qreal &y);
     void incCurrentValues(const qreal &x, const qreal &y);
     void multCurrentValues(qreal sx, qreal sy);
 
@@ -51,8 +56,6 @@ public:
     qreal getEffectiveXValue();
     qreal getEffectiveYValue();
 protected:
-    QPointFAnimator(const QString& name);
-
     qsptr<QrealAnimator> mXAnimator;
     qsptr<QrealAnimator> mYAnimator;
 };

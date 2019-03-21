@@ -37,6 +37,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     uint fBoxStateId = 0;
 
     bool fRenderedToImage = false;
+    QMatrix fResolutionScale;
     QMatrix fScaledTransform;
     QMatrix fTransform;
     QMatrix fParentTransform;
@@ -65,6 +66,29 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     qptr<BoundingBox> fParentBox;
     sk_sp<SkImage> fRenderedImage;
     SkBitmap fBitmapTMP;
+
+    void updateGlobalBoundingRect() {
+        fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
+        fixupGlobalBoundingRect();
+    }
+
+    void fixupGlobalBoundingRect() {
+        for(const QRectF &rectT : fOtherGlobalRects) {
+            fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
+        }
+        fGlobalBoundingRect = fGlobalBoundingRect.
+                adjusted(-fEffectsMargin, -fEffectsMargin,
+                         fEffectsMargin, fEffectsMargin);
+        if(fMaxBoundsEnabled) {
+            const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
+            fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);
+        }
+
+        const auto roundTL = QPointF(qRound(fGlobalBoundingRect.left()),
+                                     qRound(fGlobalBoundingRect.top()));
+        const QPointF transF = fGlobalBoundingRect.topLeft() - roundTL;
+        fGlobalBoundingRect.translate(-transF);
+    }
 
     virtual void updateRelBoundingRect();
     void drawRenderedImageForParent(SkCanvas *canvas);

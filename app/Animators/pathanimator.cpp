@@ -179,7 +179,7 @@ DONE:
 }
 
 SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
-    SkPath path = SkPath();
+    SkPath path;
 
     for(const auto& singlePath : mSinglePaths) {
         path.addPath(singlePath->getPathAtRelFrame(relFrame));
@@ -189,7 +189,7 @@ SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
 }
 
 SkPath PathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
-    SkPath path = SkPath();
+    SkPath path;
 
     for(const auto& singlePath : mSinglePaths) {
         path.addPath(singlePath->getPathAtRelFrameF(relFrame));

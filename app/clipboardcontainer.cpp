@@ -31,6 +31,7 @@ void BoxesClipboardContainer::pasteTo(BoxesGroup* parent) {
     target.open(QIODevice::ReadOnly);
     parent->readChildBoxes(&target);
     target.close();
+    BoundingBox::sClearReadBoxes();
 }
 
 KeysClipboardContainer::KeysClipboardContainer() :
@@ -156,7 +157,6 @@ void PropertyClipboardContainer::paste(Property *targetProperty) {
 }
 
 bool PropertyClipboardContainer::propertyCompatible(Property *target) {
-    QString nameT = target->prp_getName();
     if(mBoxTargetProperty) {
         return target->SWT_isBoxTargetProperty();
     }
@@ -185,15 +185,15 @@ bool PropertyClipboardContainer::propertyCompatible(Property *target) {
     if(mPixmapEffectAnimators) {
         return target->SWT_isPixmapEffectAnimators();
     }
-    if(target->SWT_isPathEffectAnimators()) {
-        return mPathEffect;
+    if(mPathEffect) {
+        return target->SWT_isPathEffectAnimators();
     }
-    if(target->SWT_isPixmapEffectAnimators()) {
-        return mPixmapEffect;
+    if(mPixmapEffect) {
+        return target->SWT_isPixmapEffectAnimators();
     }
     if(mComplexAnimator) {
         return target->SWT_isComplexAnimator() &&
-                nameT == mPropertyName;
+                target->prp_getName() == mPropertyName;
     }
     return false;
 }

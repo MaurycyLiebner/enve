@@ -18,20 +18,19 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
     }
 
     void updateRelBoundingRect() {
-        SkPath boundingPaths = SkPath();
+        SkPath boundingPaths;
         for(const auto &child : fChildrenRenderData) {
+            if(child->fRelBoundingRect.isEmpty()) continue;
             SkPath childPath;
             childPath.addRect(
-                    toSkRect(
-                        child->fRelBoundingRect));
+                    toSkRect(child->fRelBoundingRect));
             childPath.transform(
-                        toSkMatrix(
-                            child->fRelTransform));
+                        toSkMatrix(child->fRelTransform));
             boundingPaths.addPath(childPath);
+            fOtherGlobalRects << child->fGlobalBoundingRect;
         }
         fRelBoundingRect = toQRectF(boundingPaths.computeTightBounds());
     }
-    void renderToImage();
 
     QList<stdsptr<BoundingBoxRenderData>> fChildrenRenderData;
 protected:

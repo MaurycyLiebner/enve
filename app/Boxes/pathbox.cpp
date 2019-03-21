@@ -133,15 +133,12 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
     } else {
         pathData->fPath = pathData->fEditPath;
         if(getParentCanvas()->getPathEffectsVisible()) {
-            // !!! reversed
-            //mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+            mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->fPath);
             const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
             const qreal parentRelFrame =
                     mParentGroup->prp_absFrameToRelFrameF(absFrame);
             mParentGroup->filterPathForRelFrame(parentRelFrame, &pathData->fPath,
                                                 data->fParentBox.data());
-            // !!! reversed
-            mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->fPath);
         }
     }
 
@@ -157,10 +154,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
                         relFrame, &outlineBase);
             SkStroke strokerSk;
             mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
-            outline = SkPath();
             strokerSk.strokePath(outlineBase, &outline);
-        } else {
-            outline = SkPath();
         }
         if(getParentCanvas()->getPathEffectsVisible()) {
             mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
@@ -441,9 +435,7 @@ void PathBox::duplicateFillSettingsFrom(
         QBuffer buffer;
         buffer.open(QIODevice::ReadWrite);
         fillSettings->writeProperty(&buffer);
-        if(buffer.reset()) {
-            mFillSettings->readProperty(&buffer);
-        }
+        if(buffer.reset()) mFillSettings->readProperty(&buffer);
         buffer.close();
     }
 }
@@ -533,10 +525,14 @@ void PathBox::copyPathBoxDataTo(PathBox *targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     PathBox::writeBoundingBox(&buffer);
-    if(buffer.seek(sizeof(BoundingBoxType)) ) {
+    BoundingBox::sClearWriteBoxes();
+
+    if(buffer.seek(sizeof(BoundingBoxType))) {
         targetBox->PathBox::readBoundingBox(&buffer);
     }
     buffer.close();
+
+    BoundingBox::sClearReadBoxes();
 }
 
 bool PathBox::differenceInPathBetweenFrames(const int &frame1, const int &frame2) const {
@@ -637,10 +633,7 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     if(mStrokeSettings->nonZeroLineWidth()) {
         SkStroke strokerSk;
         mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
-        outline = SkPath();
         strokerSk.strokePath(path, &outline);
-    } else {
-        outline = SkPath();
     }
     mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
     outline.addPath(path);

@@ -795,6 +795,7 @@ void Canvas::duplicateSelectedBoxes() {
         box->writeBoundingBox(&target);
     }
     target.close();
+    BoundingBox::sClearWriteBoxes();
 
     clearBoxesSelection();
     container->pasteTo(mCurrentBoxesGroup);

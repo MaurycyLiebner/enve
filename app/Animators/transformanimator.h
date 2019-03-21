@@ -120,13 +120,20 @@ protected:
 };
 
 class BoxTransformAnimator : public BasicTransformAnimator {
+    friend class SelfRef;
+protected:
+    BoxTransformAnimator(BoundingBox * const parent);
 public:
-    BoxTransformAnimator(BoundingBox *parent);
+    bool SWT_isBoxTransformAnimator() const { return true; }
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
+    void updateCombinedTransform(const UpdateReason &reason);
 
-    void resetPivot();
     void reset();
     QMatrix getCurrentTransformationMatrix();
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
+
+    void resetPivot();
 
     void setPivotWithoutChangingTransformation(const QPointF &point);
     QPointF getPivot();
@@ -144,13 +151,10 @@ public:
     void finishPivotTransform();
     QPointF getPivotAbs();
 
-    bool SWT_isBoxTransformAnimator() const { return true; }
-
     qreal getOpacityAtRelFrameF(const qreal &relFrame);
 
-    bool rotOrScaleOrPivotRecording();
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    bool posOrPivotRecording() const;
+    bool rotOrScaleOrPivotRecording() const;
 
     QPointFAnimator *getPivotAnimator() {
         return mPivotAnimator.get();
@@ -159,8 +163,6 @@ public:
     QrealAnimator *getOpacityAnimator() {
         return mOpacityAnimator.get();
     }
-
-    void updateCombinedTransform(const UpdateReason &reason);
 
     BoundingBox *getParentBox() {
         return mParentBox_k;

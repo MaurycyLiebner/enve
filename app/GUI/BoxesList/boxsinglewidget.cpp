@@ -634,6 +634,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     container->setProperty(GetAsPtr(target, Property));
                     MainWindow::getInstance()->replaceClipboard(container);
                 }
+                BoundingBox::sClearWriteBoxes();
             });
             if(clipboard) {
                 if(target->SWT_isBoundingBox()) {

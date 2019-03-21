@@ -279,7 +279,8 @@ SOURCES += main.cpp\
     Animators/gradient.cpp \
     GUI/BrushWidgets/simplebrushwrapper.cpp \
     GUI/BrushWidgets/brushcontexedwrapper.cpp \
-    GUI/BrushWidgets/brushwidget.cpp
+    GUI/BrushWidgets/brushwidget.cpp \
+    Boxes/waitingforboxload.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -507,7 +508,8 @@ HEADERS  += \
     Animators/gradient.h \
     GUI/BrushWidgets/simplebrushwrapper.h \
     GUI/BrushWidgets/brushcontexedwrapper.h \
-    GUI/BrushWidgets/brushwidget.h
+    GUI/BrushWidgets/brushwidget.h \
+    Boxes/waitingforboxload.h
 
 RESOURCES += \
     resources.qrc

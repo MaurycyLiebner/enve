@@ -25,14 +25,3 @@ void BoxTargetProperty::setTarget(BoundingBox* box) {
     prp_updateInfluenceRangeAfterChanged();
     emit targetSet(box);
 }
-
-BoxTargetPropertyWaitingForBoxLoad::BoxTargetPropertyWaitingForBoxLoad(
-        const int &boxIdT, BoxTargetProperty* targetPropertyT) :
-    FunctionWaitingForBoxLoad(boxIdT) {
-    targetProperty = targetPropertyT;
-}
-
-void BoxTargetPropertyWaitingForBoxLoad::boxLoaded(BoundingBox *box) {
-    if(!targetProperty) return;
-    targetProperty->setTarget(box);
-}

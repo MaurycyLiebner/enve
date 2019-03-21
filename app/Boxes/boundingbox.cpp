@@ -19,12 +19,19 @@
 #include "GPUEffects/gpurastereffect.h"
 #include "linkbox.h"
 
-QList<BoundingBox*> BoundingBox::sReadWriteBoxesWithId;
-QList<stdsptr<FunctionWaitingForBoxLoad>> BoundingBox::sFunctionsWaitingForBoxLoad;
-int BoundingBox::sNextReadWriteId = 0;
+int BoundingBox::sNextDocumentId;
+QList<BoundingBox*> BoundingBox::sDocumentBoxes;
+
+QList<BoundingBox*> BoundingBox::sReadBoxes;
+QList<WaitingForBoxLoad> BoundingBox::sFunctionsWaitingForBoxRead;
+
+int BoundingBox::sNextWriteId;
+QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
-    ComplexAnimator("box") {
+    ComplexAnimator("box"), mDocumentId(sNextDocumentId++) {
+    sDocumentBoxes << this;
+
     mTransformAnimator = SPtrCreate(BoxTransformAnimator)(this);
     ca_addChildAnimator(mTransformAnimator);
 
@@ -45,7 +52,16 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     mTransformAnimator->reset();
 }
 
-BoundingBox::~BoundingBox() {}
+BoundingBox::~BoundingBox() {
+    sDocumentBoxes.removeOne(this);
+}
+
+BoundingBox *BoundingBox::sGetBoxByDocumentId(const int &documentId) {
+    for(const auto& box : sDocumentBoxes) {
+        if(box->getDocumentId() == documentId) return box;
+    }
+    return nullptr;
+}
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     Property::prp_updateAfterChangedAbsFrameRange(range);
@@ -91,16 +107,12 @@ void BoundingBox::centerPivotPosition() {
                 getRelCenterPosition());
 }
 
-void BoundingBox::setPivotPosition(const QPointF &pos) {
-    mTransformAnimator->setPivotWithoutChangingTransformation(pos);
-}
-
-void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) const {
+void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    BoundingBox::writeBoundingBoxDataForLink(&buffer);
-    if(buffer.seek(sizeof(BoundingBoxType)) ) {
-        targetBox->BoundingBox::readBoundingBoxDataForLink(&buffer);
+    writeBoundingBox(&buffer);
+    if(buffer.seek(sizeof(BoundingBoxType))) {
+        targetBox->BoundingBox::readBoundingBox(&buffer);
     }
     buffer.close();
 }
@@ -345,11 +357,11 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
         BoundingBoxRenderData * const renderData) {
     mRelBoundingRect = renderData->fRelBoundingRect;
     mRelBoundingRectSk = toSkRect(mRelBoundingRect);
-    mSkRelBoundingRectPath = SkPath();
+    mSkRelBoundingRectPath.reset();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(mPivotAutoAdjust && !anim_isDescendantRecording()) {
-        setPivotPosition(renderData->getCenterPosition());
+    if(mPivotAutoAdjust && !mTransformAnimator->posOrPivotRecording()) {
+        setPivotRelPos(renderData->getCenterPosition());
     }
 }
 
@@ -1169,54 +1181,67 @@ void BoundingBox::queScheduledTasks() {
     mScheduledTasks.clear();
 }
 
-int BoundingBox::getLoadId() const {
-    return mLoadId;
+int BoundingBox::getReadId() const {
+    return mReadId;
 }
 
-int BoundingBox::assignReadWriteId() {
-    mLoadId = sNextReadWriteId++;
-    return mLoadId;
+int BoundingBox::getWriteId() const {
+    return mWriteId;
 }
 
-void BoundingBox::clearBoxReadWriteId() {
-    mLoadId = -1;
+int BoundingBox::assignWriteId() {
+    mWriteId = sNextWriteId++;
+    sBoxesWithWriteIds << this;
+    return mWriteId;
 }
 
-BoundingBox *BoundingBox::sGetLoadedBoxById(const int &loadId) {
-    for(const auto& box : sReadWriteBoxesWithId) {
-        if(box->getLoadId() == loadId) return box;
+void BoundingBox::clearReadId() {
+    mReadId = -1;
+}
+
+void BoundingBox::clearWriteId() {
+    mWriteId = -1;
+}
+
+BoundingBox *BoundingBox::sGetBoxByReadId(const int &readId) {
+    for(const auto& box : sReadBoxes) {
+        if(box->getReadId() == readId) return box;
     }
     return nullptr;
 }
 
-void BoundingBox::sAddFunctionWaitingForBoxLoad(
-        const stdsptr<FunctionWaitingForBoxLoad> &func) {
-    sFunctionsWaitingForBoxLoad << func;
+void BoundingBox::sAddWaitingForBoxLoad(const WaitingForBoxLoad& func) {
+    sFunctionsWaitingForBoxRead << func;
 }
 
-void BoundingBox::sAddSavedBox(BoundingBox * const box) {
-    sReadWriteBoxesWithId << box;
-}
-
-void BoundingBox::sAddLoadedBox(BoundingBox * const box) {
-    sReadWriteBoxesWithId << box;
-    for(int i = 0; i < sFunctionsWaitingForBoxLoad.count(); i++) {
-        auto funcT = sFunctionsWaitingForBoxLoad.at(i);
-        if(funcT->loadBoxId == box->getLoadId()) {
-            funcT->boxLoaded(box);
-            sFunctionsWaitingForBoxLoad.removeAt(i);
+void BoundingBox::sAddReadBox(BoundingBox * const box) {
+    sReadBoxes << box;
+    for(int i = 0; i < sFunctionsWaitingForBoxRead.count(); i++) {
+        auto funcT = sFunctionsWaitingForBoxRead.at(i);
+        if(funcT.boxRead(box)) {
+            sFunctionsWaitingForBoxRead.removeAt(i);
             i--;
         }
     }
 }
 
-void BoundingBox::sClearReadWriteIds() {
-    for(const auto& box : sReadWriteBoxesWithId) {
-        box->clearBoxReadWriteId();
+void BoundingBox::sClearWriteBoxes() {
+    for(const auto& box : sBoxesWithWriteIds) {
+        box->clearWriteId();
     }
-    sNextReadWriteId = 0;
-    sReadWriteBoxesWithId.clear();
-    sFunctionsWaitingForBoxLoad.clear();
+    sNextWriteId = 0;
+    sBoxesWithWriteIds.clear();
+}
+
+void BoundingBox::sClearReadBoxes() {
+    for(const auto& box : sReadBoxes) {
+        box->clearReadId();
+    }
+    sReadBoxes.clear();
+    for(const auto& func : sFunctionsWaitingForBoxRead) {
+        func.boxNeverRead();
+    }
+    sFunctionsWaitingForBoxRead.clear();
 }
 
 void BoundingBox::selectAllPoints(Canvas * const canvas) {
@@ -1406,8 +1431,4 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 FrameRange BoundingBox::getVisibleAbsFrameRange() const {
     if(!mDurationRectangle) return {FrameRange::EMIN, FrameRange::EMAX};
     return mDurationRectangle->getAbsFrameRange();
-}
-
-FunctionWaitingForBoxLoad::FunctionWaitingForBoxLoad(const int &boxIdT) {
-    loadBoxId = boxIdT;
 }

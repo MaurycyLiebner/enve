@@ -26,11 +26,11 @@ public:
                                      value);
     }
 
-    float getValue(const MyPaintBrushSetting& id) const {
+    float getBaseValue(const MyPaintBrushSetting& id) const {
         return mypaint_brush_get_base_value(mBrush, id);
     }
 
-    void setValue(const MyPaintBrushSetting& id, const float& val) const {
+    void setBaseValue(const MyPaintBrushSetting& id, const float& val) const {
         mypaint_brush_set_base_value(mBrush, id, val);
     }
 

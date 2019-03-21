@@ -1,6 +1,7 @@
 #ifndef GROUPLASTPATHSUMPATHEFFECT_H
 #define GROUPLASTPATHSUMPATHEFFECT_H
 #include "patheffect.h"
+class BoxesGroup;
 
 class GroupLastPathSumPathEffect : public PathEffect {
     Q_OBJECT

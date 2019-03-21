@@ -251,7 +251,7 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
     mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()));
 }
 
-BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
+BoxTransformAnimator::BoxTransformAnimator(BoundingBox * const parent) :
     BasicTransformAnimator(), mParentBox_k(parent) {
     mOpacityAnimator = SPtrCreate(QrealAnimator)("opacity");
     mPivotAnimator = SPtrCreate(QPointFAnimator)("pivot");
@@ -325,11 +325,15 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(const QPointF &
 
     futureMatrix.translate(-point.x(), -point.y());
 
-
-    mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
-                               currentMatrix.dy() - futureMatrix.dy());
-
-    mPivotAnimator->setCurrentPointValue(point);
+    const qreal posXInc = currentMatrix.dx() - futureMatrix.dx();
+    const qreal posYInc = currentMatrix.dy() - futureMatrix.dy();
+    if(posOrPivotRecording()) {
+        mPosAnimator->incAllValues(posXInc, posYInc);
+        mPivotAnimator->setCurrentPointValue(point);
+    } else {
+        mPosAnimator->incCurrentValuesWithoutCallingUpdater(posXInc, posYInc);
+        mPivotAnimator->setCurrentPointValueWithoutCallingUpdater(point);
+    }
 }
 
 QPointF BoxTransformAnimator::getPivot() {
@@ -344,7 +348,12 @@ qreal BoxTransformAnimator::getOpacityAtRelFrameF(const qreal &relFrame) {
     return mOpacityAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
 }
 
-bool BoxTransformAnimator::rotOrScaleOrPivotRecording() {
+bool BoxTransformAnimator::posOrPivotRecording() const {
+    return mPosAnimator->anim_isDescendantRecording() ||
+           mPivotAnimator->anim_isDescendantRecording();
+}
+
+bool BoxTransformAnimator::rotOrScaleOrPivotRecording() const {
     return mRotAnimator->anim_isDescendantRecording() ||
            mScaleAnimator->anim_isDescendantRecording() ||
            mPivotAnimator->anim_isDescendantRecording();

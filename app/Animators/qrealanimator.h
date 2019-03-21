@@ -84,6 +84,8 @@ public:
     int qra_getPrevKeyRelFrame(const QrealKey * const key);
     int qra_getNextKeyRelFrame(const QrealKey * const key);
 
+    void qra_setCurrentValueWithoutCallingUpdater(const qreal &newValue);
+    void qra_incCurrentValueWithoutCallingUpdater(const qreal &incBy);
     void qra_incCurrentValue(const qreal &incBy);
 
     void qra_multCurrentValue(const qreal &mult);
