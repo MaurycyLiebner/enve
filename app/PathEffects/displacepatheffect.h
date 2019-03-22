@@ -1,6 +1,6 @@
 #ifndef DISPLACEPATHEFFECT_H
 #define DISPLACEPATHEFFECT_H
-#include "patheffect.h"
+#include "PathEffects/patheffect.h"
 class IntAnimator;
 class BoolPropertyContainer;
 

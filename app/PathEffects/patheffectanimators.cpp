@@ -1,5 +1,5 @@
 #include "patheffectanimators.h"
-#include "patheffect.h"
+#include "PathEffects/patheffect.h"
 #include "Boxes/pathbox.h"
 #include "Boxes/boxesgroup.h"
 #include <QDebug>

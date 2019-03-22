@@ -1,6 +1,6 @@
 #ifndef DUPLICATEPATHEFFECT_H
 #define DUPLICATEPATHEFFECT_H
-#include "patheffect.h"
+#include "PathEffects/patheffect.h"
 class QPointFAnimator;
 
 class DuplicatePathEffect : public PathEffect {

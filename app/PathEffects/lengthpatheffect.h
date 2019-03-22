@@ -1,6 +1,6 @@
 #ifndef LENGTHPATHEFFECT_H
 #define LENGTHPATHEFFECT_H
-#include "patheffect.h"
+#include "PathEffects/patheffect.h"
 
 class LengthPathEffect : public PathEffect {
 public:

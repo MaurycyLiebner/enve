@@ -1,6 +1,6 @@
 #ifndef OPERATIONPATHEFFECT_H
 #define OPERATIONPATHEFFECT_H
-#include "patheffect.h"
+#include "PathEffects/patheffect.h"
 class ComboBoxProperty;
 class BoxTargetProperty;
 

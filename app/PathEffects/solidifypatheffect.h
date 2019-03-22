@@ -1,6 +1,6 @@
 #ifndef SOLIDIFYPATHEFFECT_H
 #define SOLIDIFYPATHEFFECT_H
-#include "patheffect.h"
+#include "PathEffects/patheffect.h"
 
 class SolidifyPathEffect : public PathEffect {
     Q_OBJECT
