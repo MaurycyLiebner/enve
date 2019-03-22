@@ -772,7 +772,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         }
                     });
                 } else if(target->SWT_isQrealAnimator()) {
-                    if(GetAsPtr(target, QrealAnimator)->qra_hasNoise()) {
+                    if(GetAsPtr(target, QrealAnimator)->hasNoise()) {
                         menu.addSeparator();
                         menu.addAction("Remove Noise", [target]() {
                             const auto qrealTarget = GetAsPtr(target, QrealAnimator);

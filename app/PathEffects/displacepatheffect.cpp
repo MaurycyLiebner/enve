@@ -18,11 +18,11 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mSeed->setIntValueRange(0, 9999);
     mSeed->setCurrentIntValue(qrand() % 9999);
 
-    mSegLength->qra_setValueRange(1, 1000);
-    mSegLength->qra_setCurrentValue(20);
+    mSegLength->setValueRange(1, 1000);
+    mSegLength->setCurrentBaseValue(20);
 
-    mMaxDev->qra_setValueRange(0, 1000);
-    mMaxDev->qra_setCurrentValue(20);
+    mMaxDev->setValueRange(0, 1000);
+    mMaxDev->setCurrentBaseValue(20);
 
     mRandomizeStep->setIntValueRange(1, 99);
 
@@ -78,9 +78,9 @@ void DisplacePathEffect::apply(const qreal &relFrame,
         nextSeed = mSeedAssist - 1;
     }
 
-    const qreal qMaxDev = mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame);
-    const qreal qSegLen = mSegLength->qra_getEffectiveValueAtRelFrame(relFrame);
-    const qreal qSmooth = mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame);    
+    const qreal qMaxDev = mMaxDev->getEffectiveValueAtRelFrame(relFrame);
+    const qreal qSegLen = mSegLength->getEffectiveValueAtRelFrame(relFrame);
+    const qreal qSmooth = mSmoothness->getEffectiveValueAtRelFrame(relFrame);    
 
     dst->reset();
 
@@ -95,7 +95,7 @@ void DisplacePathEffect::apply(const qreal &relFrame,
         qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
         gDisplaceFilterPath(&path2, src, maxDev, segLen, smooth, nextSeed);
         qreal weight = qAbs(qFloor(relFrame) % randStep)*1./randStep;
-        const qreal easing = mEasing->getCurrentEffectiveValueAtRelFrame(relFrame);
+        const qreal easing = mEasing->getEffectiveValueAtRelFrame(relFrame);
         if(easing > 0.0001) {
             qCubicSegment1D seg(0, easing, 1 - easing, 1);
             qreal tT;

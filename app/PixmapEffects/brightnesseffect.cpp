@@ -6,8 +6,8 @@ BrightnessEffect::BrightnessEffect(qreal brightness) :
     PixmapEffect("brightness", EFFECT_BRIGHTNESS) {
     mBrightnessAnimator = SPtrCreate(QrealAnimator)("brightness");
 
-    mBrightnessAnimator->qra_setValueRange(-255., 255.);
-    mBrightnessAnimator->qra_setCurrentValue(brightness);
+    mBrightnessAnimator->setValueRange(-255., 255.);
+    mBrightnessAnimator->setCurrentBaseValue(brightness);
     ca_addChildAnimator(mBrightnessAnimator);
 }
 
@@ -16,7 +16,7 @@ stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRe
     auto renderData =
             SPtrCreate(BrightnessEffectRenderData)();
     renderData->brightness =
-            mBrightnessAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mBrightnessAnimator->getEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mBrightnessAnimator->anim_hasKeys();
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

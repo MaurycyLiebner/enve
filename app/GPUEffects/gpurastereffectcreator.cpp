@@ -210,7 +210,7 @@ UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(
         const qreal &relFrame) const {
     auto qa = GetAsPtr(property, QrealAnimator);
     QString propName = property->prp_getName();
-    qreal val = qa->getCurrentEffectiveValueAtRelFrame(relFrame);
+    qreal val = qa->getEffectiveValueAtRelFrame(relFrame);
 
     if(mScript.isEmpty()) {
         return [&loc, &val](QGL33c * const gl, QJSEngine&) {

@@ -16,8 +16,7 @@ struct FrameValue {
 class RandomQrealGenerator : public QrealValueEffect {
     friend class SelfRef;
 public:
-    qreal getDevAtRelFrame(const int &relFrame);
-    qreal getDevAtRelFrameF(const qreal &relFrame);
+    qreal getDevAtRelFrame(const qreal &relFrame);
     void generateData();
     void anim_setAbsFrame(const int &frame);
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;

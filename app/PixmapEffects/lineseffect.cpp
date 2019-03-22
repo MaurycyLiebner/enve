@@ -4,12 +4,12 @@
 LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
     PixmapEffect("lines", EFFECT_LINES) {
     mLinesDistance = SPtrCreate(QrealAnimator)("distance");
-    mLinesDistance->qra_setValueRange(0., 100000.);
-    mLinesDistance->qra_setCurrentValue(linesDistance);
+    mLinesDistance->setValueRange(0., 100000.);
+    mLinesDistance->setCurrentBaseValue(linesDistance);
 
     mLinesWidth = SPtrCreate(QrealAnimator)("width");
-    mLinesWidth->qra_setValueRange(0., 100000.);
-    mLinesWidth->qra_setCurrentValue(linesWidth);
+    mLinesWidth->setValueRange(0., 100000.);
+    mLinesWidth->setCurrentBaseValue(linesWidth);
 
     ca_addChildAnimator(mLinesWidth);
     ca_addChildAnimator(mLinesDistance);
@@ -19,8 +19,8 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
 stdsptr<PixmapEffectRenderData> LinesEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(LinesEffectRenderData)();
-    renderData->linesDistance = mLinesDistance->getCurrentEffectiveValueAtRelFrame(relFrame);
-    renderData->linesWidth = mLinesWidth->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->linesDistance = mLinesDistance->getEffectiveValueAtRelFrame(relFrame);
+    renderData->linesWidth = mLinesWidth->getEffectiveValueAtRelFrame(relFrame);
     renderData->vertical = mVertical;
 
     return GetAsSPtr(renderData, PixmapEffectRenderData);

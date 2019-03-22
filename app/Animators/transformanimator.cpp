@@ -21,7 +21,7 @@ BasicTransformAnimator::BasicTransformAnimator() :
     mScaleAnimator->setPrefferedValueStep(0.05);
     mScaleAnimator->prp_setOwnUpdater(mTransformUpdater);
 
-    mRotAnimator->qra_setCurrentValue(0);
+    mRotAnimator->setCurrentBaseValue(0);
     mRotAnimator->prp_setOwnUpdater(mTransformUpdater);
 
     mPosAnimator->setCurrentPointValue(QPointF(0, 0));
@@ -41,7 +41,7 @@ void BasicTransformAnimator::resetTranslation() {
 }
 
 void BasicTransformAnimator::resetRotation() {
-    mRotAnimator->qra_setCurrentValue(0);
+    mRotAnimator->setCurrentBaseValue(0);
 }
 
 void BasicTransformAnimator::reset() {
@@ -59,7 +59,7 @@ void BasicTransformAnimator::setPosition(const qreal &x, const qreal &y) {
 }
 
 void BasicTransformAnimator::setRotation(const qreal &rot) {
-    mRotAnimator->qra_setCurrentValue(rot);
+    mRotAnimator->setCurrentBaseValue(rot);
 }
 
 void BasicTransformAnimator::startRotTransform() {
@@ -107,7 +107,7 @@ qreal BasicTransformAnimator::dy() {
 }
 
 qreal BasicTransformAnimator::rot() {
-    return mRotAnimator->qra_getCurrentEffectiveValue();
+    return mRotAnimator->getCurrentEffectiveValue();
 }
 
 qreal BasicTransformAnimator::xScale() {
@@ -152,7 +152,7 @@ QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
     matrix.translate(mPosAnimator->getEffectiveXValue(),
                      mPosAnimator->getEffectiveYValue());
 
-    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue());
+    matrix.rotate(mRotAnimator->getCurrentEffectiveValue());
     matrix.scale(mScaleAnimator->getEffectiveXValue(),
                  mScaleAnimator->getEffectiveYValue());
     return matrix;
@@ -164,7 +164,7 @@ QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrameF(
     matrix.translate(mPosAnimator->getEffectiveXValueAtRelFrame(relFrame),
                      mPosAnimator->getEffectiveYValueAtRelFrame(relFrame));
 
-    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrame(relFrame));
+    matrix.rotate(mRotAnimator->getEffectiveValueAtRelFrame(relFrame));
     matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
                  mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame));
     return matrix;
@@ -241,9 +241,9 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
                                                       const QPointF &pivot) {
     QMatrix matrix;
     matrix.translate(pivot.x(), pivot.y());
-    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue());
+    matrix.rotate(mRotAnimator->getCurrentEffectiveValue());
     matrix.scale(sx, sy);
-    matrix.rotate(-mRotAnimator->qra_getCurrentEffectiveValue());
+    matrix.rotate(-mRotAnimator->getCurrentEffectiveValue());
     matrix.translate(-pivot.x() + mPosAnimator->getSavedXValue(),
                      -pivot.y() + mPosAnimator->getSavedYValue());
 
@@ -257,9 +257,9 @@ BoxTransformAnimator::BoxTransformAnimator(BoundingBox * const parent) :
     mPivotAnimator = SPtrCreate(QPointFAnimator)("pivot");
     mPivotAnimator->setCurrentPointValue(QPointF(0, 0));
     mPivotAnimator->prp_setOwnUpdater(mTransformUpdater);
-    mOpacityAnimator->qra_setValueRange(0, 100);
+    mOpacityAnimator->setValueRange(0, 100);
     mOpacityAnimator->setPrefferedValueStep(5);
-    mOpacityAnimator->qra_setCurrentValue(100);
+    mOpacityAnimator->setCurrentBaseValue(100);
     mOpacityAnimator->graphFixMinMaxValues();
     mOpacityAnimator->prp_setOwnUpdater(mTransformUpdater);
 
@@ -287,7 +287,7 @@ void BoxTransformAnimator::startOpacityTransform() {
 }
 
 void BoxTransformAnimator::setOpacity(const qreal &newOpacity) {
-    mOpacityAnimator->qra_setCurrentValue(newOpacity);
+    mOpacityAnimator->setCurrentBaseValue(newOpacity);
 }
 
 void BoxTransformAnimator::startPivotTransform() {
@@ -309,7 +309,7 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(const QPointF &
     currentMatrix.translate(pivotX + mPosAnimator->getEffectiveXValue(),
                             pivotY + mPosAnimator->getEffectiveYValue());
 
-    currentMatrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue());
+    currentMatrix.rotate(mRotAnimator->getCurrentEffectiveValue());
     currentMatrix.scale(mScaleAnimator->getEffectiveXValue(),
                         mScaleAnimator->getEffectiveYValue());
 
@@ -319,7 +319,7 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(const QPointF &
     futureMatrix.translate(point.x() + mPosAnimator->getEffectiveXValue(),
                            point.y() + mPosAnimator->getEffectiveYValue());
 
-    futureMatrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue());
+    futureMatrix.rotate(mRotAnimator->getCurrentEffectiveValue());
     futureMatrix.scale(mScaleAnimator->getEffectiveXValue(),
                        mScaleAnimator->getEffectiveYValue());
 
@@ -345,7 +345,7 @@ QPointF BoxTransformAnimator::getPivotAbs() {
 }
 
 qreal BoxTransformAnimator::getOpacityAtRelFrameF(const qreal &relFrame) {
-    return mOpacityAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
+    return mOpacityAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
 bool BoxTransformAnimator::posOrPivotRecording() const {
@@ -376,7 +376,7 @@ qreal BoxTransformAnimator::getPivotY() {
 }
 
 qreal BoxTransformAnimator::getOpacity() {
-    return mOpacityAnimator->qra_getCurrentValue();
+    return mOpacityAnimator->getCurrentBaseValue();
 }
 
 QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
@@ -386,7 +386,7 @@ QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
     matrix.translate(pivotX + mPosAnimator->getEffectiveXValue(),
                      pivotY + mPosAnimator->getEffectiveYValue());
 
-    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue());
+    matrix.rotate(mRotAnimator->getCurrentEffectiveValue());
     matrix.scale(mScaleAnimator->getEffectiveXValue(),
                  mScaleAnimator->getEffectiveYValue());
 
@@ -402,7 +402,7 @@ QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrameF(
     matrix.translate(pivotX + mPosAnimator->getEffectiveXValueAtRelFrame(relFrame),
                      pivotY + mPosAnimator->getEffectiveYValueAtRelFrame(relFrame));
 
-    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrame(relFrame));
+    matrix.rotate(mRotAnimator->getEffectiveValueAtRelFrame(relFrame));
     matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
                  mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame));
 
@@ -456,7 +456,7 @@ QMatrix BoneTransformAnimator::getCurrentTransformationMatrix() {
     matrix.translate(rootRelPos.x() + mPosAnimator->getEffectiveXValue(),
                      rootRelPos.y() + mPosAnimator->getEffectiveYValue());
 
-    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue());
+    matrix.rotate(mRotAnimator->getCurrentEffectiveValue());
     matrix.scale(mScaleAnimator->getEffectiveXValue(),
                  mScaleAnimator->getEffectiveYValue());
     matrix.translate(-rootRelPos.x(), -rootRelPos.y());
@@ -470,7 +470,7 @@ QMatrix BoneTransformAnimator::getRelativeTransformAtRelFrameF(
     matrix.translate(rootRelPos.x() + mPosAnimator->getEffectiveXValueAtRelFrame(relFrame),
                      rootRelPos.y() + mPosAnimator->getEffectiveYValueAtRelFrame(relFrame));
 
-    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrame(relFrame));
+    matrix.rotate(mRotAnimator->getEffectiveValueAtRelFrame(relFrame));
     matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
                  mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame));
     matrix.translate(-rootRelPos.x(), -rootRelPos.y());

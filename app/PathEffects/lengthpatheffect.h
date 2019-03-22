@@ -3,6 +3,7 @@
 #include "PathEffects/patheffect.h"
 
 class LengthPathEffect : public PathEffect {
+    friend class SelfRef;
 protected:
     LengthPathEffect(const bool &outlinePathEffect);
 public:

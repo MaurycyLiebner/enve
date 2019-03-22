@@ -246,9 +246,9 @@ void CircleRadiusPoint::moveByAbs(const QPointF &absTranslatione) {
 
 void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {
     if(mXBlocked) {
-        mAssociatedAnimator_k->getYAnimator()->qra_setCurrentValue(relPos.y());
+        mAssociatedAnimator_k->getYAnimator()->setCurrentBaseValue(relPos.y());
     } else {
-        mAssociatedAnimator_k->getXAnimator()->qra_setCurrentValue(relPos.x());
+        mAssociatedAnimator_k->getXAnimator()->setCurrentBaseValue(relPos.x());
     }
 }
 

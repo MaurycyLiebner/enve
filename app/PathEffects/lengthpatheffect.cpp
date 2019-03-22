@@ -7,8 +7,8 @@
 LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
     PathEffect("length effect", LENGTH_PATH_EFFECT, outlinePathEffect) {
     mLength = SPtrCreate(QrealAnimator)("segment length");
-    mLength->qra_setValueRange(0, 100);
-    mLength->qra_setCurrentValue(100);
+    mLength->setValueRange(0, 100);
+    mLength->setCurrentBaseValue(100);
 
     mReverse = SPtrCreate(BoolProperty)("reverse");
     mReverse->setValue(false);
@@ -20,7 +20,7 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
 void LengthPathEffect::apply(const qreal &relFrame,
                              const SkPath &src,
                              SkPath * const dst) {
-    const qreal lenPer = mLength->getCurrentEffectiveValueAtRelFrame(relFrame);
+    const qreal lenPer = mLength->getEffectiveValueAtRelFrame(relFrame);
     if(lenPer < 0.001) {
         dst->reset();
         return;

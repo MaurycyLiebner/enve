@@ -6,12 +6,12 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
                              qreal circlesDistance) :
     PixmapEffect("circles", EFFECT_CIRCLES) {
     mCirclesDistance = SPtrCreate(QrealAnimator)("distance");
-    mCirclesDistance->qra_setValueRange(-1000., 1000.);
-    mCirclesDistance->qra_setCurrentValue(circlesDistance);
+    mCirclesDistance->setValueRange(-1000., 1000.);
+    mCirclesDistance->setCurrentBaseValue(circlesDistance);
 
     mCirclesRadius = SPtrCreate(QrealAnimator)("radius");
-    mCirclesRadius->qra_setValueRange(0., 1000.);
-    mCirclesRadius->qra_setCurrentValue(circlesRadius);
+    mCirclesRadius->setValueRange(0., 1000.);
+    mCirclesRadius->setCurrentBaseValue(circlesRadius);
 
     ca_addChildAnimator(mCirclesRadius);
     ca_addChildAnimator(mCirclesDistance);
@@ -21,9 +21,9 @@ stdsptr<PixmapEffectRenderData> CirclesEffect::getPixmapEffectRenderDataForRelFr
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(CirclesEffectRenderData)();
     renderData->circlesDistance =
-            mCirclesDistance->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mCirclesDistance->getEffectiveValueAtRelFrame(relFrame);
     renderData->circlesRadius =
-            mCirclesRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mCirclesRadius->getEffectiveValueAtRelFrame(relFrame);
 
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

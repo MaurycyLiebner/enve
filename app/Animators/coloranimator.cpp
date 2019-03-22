@@ -28,17 +28,17 @@ void ColorAnimator::qra_setCurrentValue(const QColor &colorValue) {
     }
     qreal alpha = colorValue.alphaF();
 
-    mVal1Animator->qra_setCurrentValue(val1);
-    mVal2Animator->qra_setCurrentValue(val2);
-    mVal3Animator->qra_setCurrentValue(val3);
-    mAlphaAnimator->qra_setCurrentValue(alpha);
+    mVal1Animator->setCurrentBaseValue(val1);
+    mVal2Animator->setCurrentBaseValue(val2);
+    mVal3Animator->setCurrentBaseValue(val3);
+    mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
 QColor ColorAnimator::getCurrentColor() const {
-    qreal val1 = mVal1Animator->qra_getCurrentEffectiveValue();
-    qreal val2 = mVal2Animator->qra_getCurrentEffectiveValue();
-    qreal val3 = mVal3Animator->qra_getCurrentEffectiveValue();
-    qreal alpha = mAlphaAnimator->qra_getCurrentEffectiveValue();
+    qreal val1 = mVal1Animator->getCurrentEffectiveValue();
+    qreal val2 = mVal2Animator->getCurrentEffectiveValue();
+    qreal val3 = mVal3Animator->getCurrentEffectiveValue();
+    qreal alpha = mAlphaAnimator->getCurrentEffectiveValue();
 
     QColor color;
     if(mColorMode == RGBMODE) {
@@ -52,10 +52,10 @@ QColor ColorAnimator::getCurrentColor() const {
 }
 
 QColor ColorAnimator::getColorAtRelFrame(const qreal &relFrame) {
-    qreal val1 = mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame);
-    qreal val2 = mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame);
-    qreal val3 = mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame);
-    qreal alpha = mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
+    qreal val1 = mVal1Animator->getEffectiveValueAtRelFrame(relFrame);
+    qreal val2 = mVal2Animator->getEffectiveValueAtRelFrame(relFrame);
+    qreal val3 = mVal3Animator->getEffectiveValueAtRelFrame(relFrame);
+    qreal alpha = mAlphaAnimator->getEffectiveValueAtRelFrame(relFrame);
 
     QColor color;
     if(mColorMode == RGBMODE) {
@@ -102,17 +102,17 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
     }
 
     for(const auto &key : anim_mKeys) {
-        int frame = key->getAbsFrame();
+        const int frame = key->getAbsFrame();
 
-        qreal rF = mVal1Animator->getCurrentValueAtAbsFrameF(frame);
-        qreal gF = mVal2Animator->getCurrentValueAtAbsFrameF(frame);
-        qreal bF = mVal3Animator->getCurrentValueAtAbsFrameF(frame);
+        qreal rF = mVal1Animator->getBaseValueAtAbsFrame(frame);
+        qreal gF = mVal2Animator->getBaseValueAtAbsFrame(frame);
+        qreal bF = mVal3Animator->getBaseValueAtAbsFrame(frame);
 
         foo(rF, gF, bF);
 
-        mVal1Animator->qra_saveValueToKey(frame, rF);
-        mVal2Animator->qra_saveValueToKey(frame, gF);
-        mVal3Animator->qra_saveValueToKey(frame, bF);
+        mVal1Animator->saveValueToKey(frame, rF);
+        mVal2Animator->saveValueToKey(frame, gF);
+        mVal3Animator->saveValueToKey(frame, bF);
     }
 
     if(!anim_mKeys.isEmpty()) {
@@ -120,15 +120,15 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
         mVal2Animator->anim_setRecordingWithoutChangingKeys(true);
         mVal3Animator->anim_setRecordingWithoutChangingKeys(true);
     } else {
-        qreal crF = mVal1Animator->qra_getCurrentValue();
-        qreal cgF = mVal2Animator->qra_getCurrentValue();
-        qreal cbF = mVal3Animator->qra_getCurrentValue();
+        qreal crF = mVal1Animator->getCurrentBaseValue();
+        qreal cgF = mVal2Animator->getCurrentBaseValue();
+        qreal cbF = mVal3Animator->getCurrentBaseValue();
 
         foo(crF, cgF, cbF);
 
-        mVal1Animator->qra_setCurrentValue(crF);
-        mVal2Animator->qra_setCurrentValue(cgF);
-        mVal3Animator->qra_setCurrentValue(cbF);
+        mVal1Animator->setCurrentBaseValue(crF);
+        mVal2Animator->setCurrentBaseValue(cgF);
+        mVal3Animator->setCurrentBaseValue(cbF);
     }
 
     mColorMode = colorMode;
@@ -153,19 +153,19 @@ void ColorAnimator::startAlphaTransform() {
 }
 
 void ColorAnimator::setCurrentVal1Value(const qreal &val1) {
-    mVal1Animator->qra_setCurrentValue(val1);
+    mVal1Animator->setCurrentBaseValue(val1);
 }
 
 void ColorAnimator::setCurrentVal2Value(const qreal &val2) {
-    mVal2Animator->qra_setCurrentValue(val2);
+    mVal2Animator->setCurrentBaseValue(val2);
 }
 
 void ColorAnimator::setCurrentVal3Value(const qreal &val3) {
-    mVal3Animator->qra_setCurrentValue(val3);
+    mVal3Animator->setCurrentBaseValue(val3);
 }
 
 void ColorAnimator::setCurrentAlphaValue(const qreal &alpha) {
-    mAlphaAnimator->qra_setCurrentValue(alpha);
+    mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
 #include <QMenu>

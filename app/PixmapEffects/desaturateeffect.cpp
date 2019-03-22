@@ -5,7 +5,7 @@
 DesaturateEffect::DesaturateEffect() :
     PixmapEffect("desaturate", EFFECT_DESATURATE) {
     mInfluenceAnimator = QrealAnimator::create0to1Animator("factor");
-    mInfluenceAnimator->qra_setCurrentValue(0.2);
+    mInfluenceAnimator->setCurrentBaseValue(0.2);
 
     ca_addChildAnimator(mInfluenceAnimator);
 }
@@ -14,7 +14,7 @@ stdsptr<PixmapEffectRenderData> DesaturateEffect::getPixmapEffectRenderDataForRe
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(DesaturateEffectRenderData)();
     renderData->influence =
-            mInfluenceAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mInfluenceAnimator->getEffectiveValueAtRelFrame(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

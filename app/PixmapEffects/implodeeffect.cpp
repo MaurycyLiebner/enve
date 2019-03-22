@@ -13,7 +13,7 @@ stdsptr<PixmapEffectRenderData> ImplodeEffect::getPixmapEffectRenderDataForRelFr
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ImplodeEffectRenderData)();
     renderData->factor =
-            mFactorAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mFactorAnimator->getEffectiveValueAtRelFrame(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

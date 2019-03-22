@@ -54,7 +54,7 @@ void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mTarget) {
         if(mTarget->SWT_isQrealAnimator()) {
-            GetAsPtr(mTarget, QrealAnimator)->qra_setCurrentValue(value);
+            GetAsPtr(mTarget, QrealAnimator)->setCurrentBaseValue(value);
         } else if(mTarget->SWT_isIntProperty()) {
             GetAsPtr(mTarget, IntProperty)->setCurrentValue(qRound(value));
         }
@@ -66,7 +66,7 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     if(mTarget) {
         mBlockAnimatorSignals = true;
         if(mTarget->SWT_isQrealAnimator()) {
-            GetAsPtr(mTarget, QrealAnimator)->qra_setCurrentValue(value);
+            GetAsPtr(mTarget, QrealAnimator)->setCurrentBaseValue(value);
         } else if(mTarget->SWT_isIntProperty()) {
             GetAsPtr(mTarget, IntProperty)->setCurrentValue(qRound(value));
         }
@@ -133,7 +133,7 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
                       animator->getMaxPossibleValue());
         setPrefferedValueStep(animator->getPrefferedValueStep());
 
-        setDisplayedValue(animator->qra_getCurrentValue());
+        setDisplayedValue(animator->getCurrentBaseValue());
     }
 }
 

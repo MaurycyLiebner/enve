@@ -194,7 +194,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
 
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
     const auto widthAnimator = mStrokeSettings->getStrokeWidthAnimator();
-    strokeSettings.fOutlineWidth = widthAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
+    strokeSettings.fOutlineWidth = widthAnimator->getEffectiveValueAtRelFrame(relFrame);
     const auto brushSettings = mStrokeSettings->getBrushSettings();
     if(brushSettings) {
         auto brush = brushSettings->getBrush();
@@ -485,7 +485,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
             mStrokeSettings->setGradientType(
                         strokeSettings->getGradientType());
         }
-        mStrokeSettings->getStrokeWidthAnimator()->qra_setCurrentValue(
+        mStrokeSettings->getStrokeWidthAnimator()->setCurrentBaseValue(
                     strokeSettings->getCurrentStrokeWidth());
     }
 }

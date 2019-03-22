@@ -13,18 +13,18 @@ protected:
                         const bool &isFill,
                         BoundingBox * const parentPath);
 public:
+    bool SWT_isPathEffectAnimators() const;
+
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
+
     void addEffect(const qsptr<PathEffect> &effect);
     bool hasEffects();
-
-    bool SWT_isPathEffectAnimators() const;
 
     void apply(const qreal &relFrame, SkPath * const srcDstPath);
     void applyBeforeThickness(const qreal &relFrame,
                               SkPath * const srcDstPath);
 
-
-    void readProperty(QIODevice *target);
-    void writeProperty(QIODevice * const target) const;
     void removeEffect(const qsptr<PathEffect>& effect);
     BoundingBox *getParentBox();
     const bool &isOutline() const;

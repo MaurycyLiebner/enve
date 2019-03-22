@@ -19,7 +19,7 @@ QrealAnimator::QrealAnimator(const qreal &iniVal,
                              const qreal &prefferdStep,
                              const QString &name) :
     GraphAnimator(name) {
-    mCurrentValue = iniVal;
+    mCurrentBaseValue = iniVal;
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
     mPrefferedValueStep = prefferdStep;
@@ -83,22 +83,22 @@ void QrealAnimator::graph_getValueConstraints(
     }
 }
 
-void QrealAnimator::qra_setValueRange(const qreal &minVal,
+void QrealAnimator::setValueRange(const qreal &minVal,
                                       const qreal &maxVal) {
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
-    qra_setCurrentValue(mCurrentValue);
+    setCurrentBaseValue(mCurrentBaseValue);
 }
 
-void QrealAnimator::qra_incAllValues(const qreal &valInc) {
+void QrealAnimator::incAllValues(const qreal &valInc) {
     for(const auto &key : anim_mKeys) {
         GetAsPtr(key, QrealKey)->incValue(valInc);
     }
-    qra_incCurrentValue(valInc);
+    incCurrentBaseValue(valInc);
 }
 
 QString QrealAnimator::prp_getValueText() {
-    return QString::number(mCurrentValue, 'f', 2);
+    return QString::number(mCurrentBaseValue, 'f', 2);
 }
 
 void QrealAnimator::prp_openContextMenu(const QPoint &pos) {
@@ -136,30 +136,12 @@ void QrealAnimator::graphFixMinMaxValues() {
     mGraphMinMaxValuesFixed = true;
 }
 
-qreal QrealAnimator::getCurrentValueAtAbsFrameF(const qreal &frame) {
-    return getCurrentValueAtRelFrame(prp_absFrameToRelFrameF(frame));
+qreal QrealAnimator::getEffectiveValueAtAbsFrame(const qreal &frame) const {
+    return getEffectiveValueAtRelFrame(prp_absFrameToRelFrameF(frame));
 }
 
-qreal QrealAnimator::getCurrentValueAtRelFrame(const qreal &frame) const {
-    if(isZero4Dec(frame - anim_mCurrentRelFrame)) return mCurrentValue;
-    return qra_getValueAtRelFrame(frame);
-}
-
-qreal QrealAnimator::getCurrentEffectiveValueAtAbsFrameF(const qreal &frame) {
-    return getCurrentEffectiveValueAtRelFrame(prp_absFrameToRelFrameF(frame));
-}
-
-qreal QrealAnimator::getCurrentEffectiveValueAtRelFrame(const qreal &frame) const {
-    if(mRandomGenerator.isNull()) {
-        return getCurrentValueAtRelFrame(frame);
-    }
-    const qreal val = getCurrentValueAtRelFrame(frame) +
-            mRandomGenerator->getDevAtRelFrameF(frame);
-    return qMin(mMaxPossibleVal, qMax(mMinPossibleVal, val));
-}
-
-qreal QrealAnimator::qra_getValueAtAbsFrame(const qreal &frame) const {
-    return qra_getValueAtRelFrame(prp_absFrameToRelFrameF(frame));
+qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal &frame) const {
+    return getBaseValueAtRelFrame(prp_absFrameToRelFrameF(frame));
 }
 
 QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
@@ -189,11 +171,12 @@ void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
-bool QrealAnimator::qra_hasNoise() {
+bool QrealAnimator::hasNoise() {
     return !mRandomGenerator.isNull();
 }
 
-qreal QrealAnimator::qra_getValueAtRelFrame(const qreal &frame) const {
+qreal QrealAnimator::getBaseValueAtRelFrame(const qreal &frame) const {
+    if(isZero4Dec(frame - anim_mCurrentRelFrame)) return mCurrentBaseValue;
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId, frame)) {
@@ -202,86 +185,79 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const qreal &frame) const {
         } else {
             const QrealKey * const prevKey = getQrealKeyAtId(prevId);
             const QrealKey * const nextKey = getQrealKeyAtId(nextId);
-            return qra_getValueAtRelFrame(frame, prevKey, nextKey);
+
+            const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
+                                      prevKey->getEndFrame(),
+                                      nextKey->getStartFrame(),
+                                      qreal(nextKey->getRelFrame())};
+            const qreal t = gTFromX(seg, frame);
+            const qreal p0y = prevKey->getValue();
+            const qreal p1y = prevKey->getEndValue();
+            const qreal p2y = nextKey->getStartValue();
+            const qreal p3y = nextKey->getValue();
+            return clamp(gCubicValueAtT({p0y, p1y, p2y, p3y}, t),
+                          mMinPossibleVal, mMaxPossibleVal);
         }
     }
-    return mCurrentValue;
+    return mCurrentBaseValue;
 }
 
-qreal QrealAnimator::qra_getValueAtRelFrame(const qreal &frame,
-                                            const QrealKey * const prevKey,
-                                            const QrealKey * const nextKey) const {
-    const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                              prevKey->getEndFrame(),
-                              nextKey->getStartFrame(),
-                              qreal(nextKey->getRelFrame())};
-    const qreal t = gTFromX(seg, frame);
-    const qreal p0y = prevKey->getValue();
-    const qreal p1y = prevKey->getEndValue();
-    const qreal p2y = nextKey->getStartValue();
-    const qreal p3y = nextKey->getValue();
-    return clamp(gCubicValueAtT({p0y, p1y, p2y, p3y}, t),
-                  mMinPossibleVal, mMaxPossibleVal);
-}
-
-qreal QrealAnimator::qra_getEffectiveValueAtRelFrame(const qreal &frame) const {
-    if(mRandomGenerator.isNull()) return qra_getValueAtRelFrame(frame);
-    const qreal val = qra_getValueAtRelFrame(frame) +
+qreal QrealAnimator::getEffectiveValueAtRelFrame(const qreal &frame) const {
+    if(mRandomGenerator.isNull()) return getBaseValueAtRelFrame(frame);
+    const qreal val = getBaseValueAtRelFrame(frame) +
             mRandomGenerator->getDevAtRelFrame(frame);
     return qMin(mMaxPossibleVal, qMax(mMinPossibleVal, val));
 }
 
-qreal QrealAnimator::qra_getCurrentValue() const {
-    return mCurrentValue;
+qreal QrealAnimator::getCurrentBaseValue() const {
+    return mCurrentBaseValue;
 }
 
-qreal QrealAnimator::qra_getCurrentEffectiveValue() {
-    if(mRandomGenerator.isNull()) {
-        return mCurrentValue;
-    }
-    const qreal val = mCurrentValue +
+qreal QrealAnimator::getCurrentEffectiveValue() const {
+    if(mRandomGenerator.isNull()) return mCurrentBaseValue;
+    const qreal val = mCurrentBaseValue +
             mRandomGenerator->getDevAtRelFrame(anim_mCurrentRelFrame);
     return qMin(mMaxPossibleVal, qMax(mMinPossibleVal, val));
 }
 
-void QrealAnimator::qra_setCurrentValue(qreal newValue) {
+void QrealAnimator::setCurrentBaseValue(qreal newValue) {
     newValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
 
-    if(isZero4Dec(newValue - mCurrentValue)) return;
-    mCurrentValue = newValue;
+    if(isZero4Dec(newValue - mCurrentBaseValue)) return;
+    mCurrentBaseValue = newValue;
     const auto currKey = anim_getKeyOnCurrentFrame<QrealKey>();
     if(currKey) {
-        qra_saveCurrentValueToKey(currKey);
+        saveCurrentValueToKey(currKey);
     } else {
         prp_updateInfluenceRangeAfterChanged();
     }
 
-    emit valueChangedSignal(mCurrentValue);
+    emit valueChangedSignal(mCurrentBaseValue);
 
     //anim_updateKeysPath();
 }
 
-void QrealAnimator::qra_updateValueFromCurrentFrame() {
-    mCurrentValue = qra_getValueAtAbsFrame(anim_mCurrentAbsFrame);
-    emit valueChangedSignal(mCurrentValue);
+void QrealAnimator::updateBaseValueFromCurrentFrame() {
+    mCurrentBaseValue = getBaseValueAtAbsFrame(anim_mCurrentAbsFrame);
+    emit valueChangedSignal(mCurrentBaseValue);
 }
 
-void QrealAnimator::qra_saveCurrentValueToKey(QrealKey *key) {
-    qra_saveValueToKey(key, mCurrentValue);
+void QrealAnimator::saveCurrentValueToKey(QrealKey *key) {
+    saveValueToKey(key, mCurrentBaseValue);
 }
 
-void QrealAnimator::qra_saveValueToKey(const int &frame, const qreal &value) {
+void QrealAnimator::saveValueToKey(const int &frame, const qreal &value) {
     const auto keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
     if(!keyAtFrame) {
         auto newKey = SPtrCreate(QrealKey)(value, frame, this);
         anim_appendKey(newKey);
         graph_updateKeysPath();
     } else {
-        qra_saveValueToKey(keyAtFrame, value);
+        saveValueToKey(keyAtFrame, value);
     }
 }
 
-void QrealAnimator::qra_saveValueToKey(QrealKey *key, const qreal &value) {
+void QrealAnimator::saveValueToKey(QrealKey *key, const qreal &value) {
     key->setValue(value);
 
     if(graph_isSelectedForGraph()) {
@@ -292,11 +268,11 @@ void QrealAnimator::qra_saveValueToKey(QrealKey *key, const qreal &value) {
 
 void QrealAnimator::anim_setAbsFrame(const int &frame) {
     Animator::anim_setAbsFrame(frame);
-    const qreal newValue = qra_getValueAtRelFrame(anim_mCurrentRelFrame);
-    if(isZero4Dec(newValue - mCurrentValue)) return;
-    mCurrentValue = newValue;
+    const qreal newValue = getBaseValueAtRelFrame(anim_mCurrentRelFrame);
+    if(isZero4Dec(newValue - mCurrentBaseValue)) return;
+    mCurrentBaseValue = newValue;
 
-    emit valueChangedSignal(mCurrentValue);
+    emit valueChangedSignal(mCurrentBaseValue);
 
     anim_callFrameChangeUpdater();
 }
@@ -304,12 +280,12 @@ void QrealAnimator::anim_setAbsFrame(const int &frame) {
 void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
     const auto keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
     if(!keyAtFrame) {
-        const qreal value = qra_getValueAtAbsFrame(frame);
+        const qreal value = getBaseValueAtAbsFrame(frame);
         const auto newKey = SPtrCreate(QrealKey)(value, frame, this);
         anim_appendKey(newKey);
         graph_updateKeysPath();
     } else {
-        qra_saveCurrentValueToKey(keyAtFrame);
+        saveCurrentValueToKey(keyAtFrame);
     }
 }
 
@@ -320,25 +296,25 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
     }
 
     if(!anim_getKeyOnCurrentFrame()) {
-        const auto newKey = SPtrCreate(QrealKey)(mCurrentValue,
+        const auto newKey = SPtrCreate(QrealKey)(mCurrentBaseValue,
                                                  anim_mCurrentRelFrame,
                                                  this);
         anim_appendKey(newKey);
         graph_updateKeysPath();
     } else {
-        qra_saveCurrentValueToKey(anim_getKeyOnCurrentFrame<QrealKey>());
+        saveCurrentValueToKey(anim_getKeyOnCurrentFrame<QrealKey>());
     }
 }
 
 void QrealAnimator::anim_removeAllKeys() {
     if(anim_mKeys.isEmpty()) return;
-    const qreal currentValue = mCurrentValue;
+    const qreal currentValue = mCurrentBaseValue;
 
     const auto keys = anim_mKeys;
     for(const auto& key : keys) {
         anim_removeKey(key);
     }
-    qra_setCurrentValue(currentValue);
+    setCurrentBaseValue(currentValue);
 }
 
 void QrealAnimator::anim_mergeKeysIfNeeded() {
@@ -371,7 +347,7 @@ void QrealAnimator::graph_updateKeysPath() {
         int keyFrame = key->getAbsFrame();
         qreal keyValue;
         if(keyFrame == anim_mCurrentAbsFrame) {
-            keyValue = mCurrentValue;
+            keyValue = mCurrentBaseValue;
         } else {
             keyValue = qaKey->getValue();
         }
@@ -389,8 +365,8 @@ void QrealAnimator::graph_updateKeysPath() {
         lastKey = qaKey;
     }
     if(!lastKey) {
-        graph_mKeysPath.moveTo(-5000, mCurrentValue);
-        graph_mKeysPath.lineTo(5000, mCurrentValue);
+        graph_mKeysPath.moveTo(-5000, mCurrentBaseValue);
+        graph_mKeysPath.lineTo(5000, mCurrentBaseValue);
     } else {
         graph_mKeysPath.lineTo(5000, lastKey->getValue());
     }
@@ -403,8 +379,8 @@ ValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
     if(anim_mKeys.isEmpty()) {
-        return {mCurrentValue - mPrefferedValueStep,
-                mCurrentValue + mPrefferedValueStep};
+        return {mCurrentBaseValue - mPrefferedValueStep,
+                mCurrentBaseValue + mPrefferedValueStep};
     }
     for(const auto &key : anim_mKeys) {
         const auto qaKey = GetAsPtr(key.get(), QrealKey);
@@ -424,7 +400,7 @@ ValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
         const int &startFrame, const int &endFrame) const {
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
-    if(anim_mKeys.isEmpty()) return {mCurrentValue, mCurrentValue};
+    if(anim_mKeys.isEmpty()) return {mCurrentBaseValue, mCurrentBaseValue};
     bool first = true;
     for(const auto &key : anim_mKeys) {
         const auto qaKey = GetAsPtr(key.get(), QrealKey);
@@ -441,7 +417,7 @@ ValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
     }
     if(first) {
         const int midFrame = (startFrame + endFrame)/2;
-        const qreal value = qra_getValueAtAbsFrame(midFrame);
+        const qreal value = getBaseValueAtAbsFrame(midFrame);
         return {value, value};
     }
     return {minVal, maxVal};
@@ -451,55 +427,31 @@ qreal QrealAnimator::graph_clampGraphValue(const qreal &value) {
     return value;
 }
 
-qreal QrealAnimator::qra_getPrevKeyValue(const QrealKey * const key) {
-    const int keyId = anim_getKeyIndex(key);
-    if(keyId == 0) return key->getValue();
-    return getQrealKeyAtId(keyId - 1)->getValue();
-}
-
-qreal QrealAnimator::qra_getNextKeyValue(const QrealKey * const key) {
-    const int keyId = anim_getKeyIndex(key);
-    if(keyId == anim_mKeys.count() - 1) return key->getValue();
-    return getQrealKeyAtId(keyId + 1)->getValue();
-}
-
-int QrealAnimator::qra_getPrevKeyRelFrame(const QrealKey * const key) {
-    const int keyId = anim_getKeyIndex(key);
-    if(keyId == 0) return key->getRelFrame();
-    return getQrealKeyAtId(keyId - 1)->getRelFrame();
-}
-
-int QrealAnimator::qra_getNextKeyRelFrame(const QrealKey * const key) {
-    const int keyId = anim_getKeyIndex(key);
-    if(keyId == anim_mKeys.count() - 1) return key->getRelFrame();
-    return getQrealKeyAtId(keyId + 1)->getRelFrame();
-}
-
 void QrealAnimator::prp_retrieveSavedValue() {
-    qra_setCurrentValue(mSavedCurrentValue);
+    setCurrentBaseValue(mSavedCurrentValue);
 }
 
 void QrealAnimator::incSavedValueToCurrentValue(const qreal &incBy) {
-    qra_setCurrentValue(mSavedCurrentValue + incBy);
+    setCurrentBaseValue(mSavedCurrentValue + incBy);
 }
 
 void QrealAnimator::multSavedValueToCurrentValue(const qreal &multBy) {
-    qra_setCurrentValue(mSavedCurrentValue * multBy);
+    setCurrentBaseValue(mSavedCurrentValue * multBy);
 }
 
-void QrealAnimator::qra_setCurrentValueWithoutCallingUpdater(
+void QrealAnimator::setCurrentBaseValueNoUpdate(
         const qreal &newValue) {
-    mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
-    emit valueChangedSignal(mCurrentValue);
+    mCurrentBaseValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+    emit valueChangedSignal(mCurrentBaseValue);
 }
 
-void QrealAnimator::qra_incCurrentValueWithoutCallingUpdater(
+void QrealAnimator::incCurrentValueNoUpdate(
         const qreal &incBy) {
-    qra_setCurrentValueWithoutCallingUpdater(mCurrentValue + incBy);
+    setCurrentBaseValueNoUpdate(mCurrentBaseValue + incBy);
 }
 
-void QrealAnimator::qra_incCurrentValue(const qreal &incBy) {
-    qra_setCurrentValue(mCurrentValue + incBy);
+void QrealAnimator::incCurrentBaseValue(const qreal &incBy) {
+    setCurrentBaseValue(mCurrentBaseValue + incBy);
 }
 
 void QrealAnimator::prp_startTransform() {
@@ -507,7 +459,7 @@ void QrealAnimator::prp_startTransform() {
     if(anim_mIsRecording && !anim_getKeyOnCurrentFrame()) {
         anim_saveCurrentValueAsKey();
     }
-    mSavedCurrentValue = mCurrentValue;
+    mSavedCurrentValue = mCurrentBaseValue;
     mTransformed = true;
 }
 
@@ -538,10 +490,10 @@ void QrealAnimator::prp_cancelTransform() {
     }
 }
 
-void QrealAnimator::qra_multCurrentValue(const qreal &mult) {
-    qra_setCurrentValue(mCurrentValue*mult);
+void QrealAnimator::multCurrentBaseValue(const qreal &mult) {
+    setCurrentBaseValue(mCurrentBaseValue*mult);
 }
 
-qreal QrealAnimator::qra_getSavedValue() {
+qreal QrealAnimator::getSavedBaseValue() {
     return mSavedCurrentValue;
 }

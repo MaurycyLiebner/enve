@@ -19,17 +19,17 @@ void BlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
 }
 
 qreal BlurEffect::getMargin() {
-    return mBlurRadius->qra_getCurrentValue();
+    return mBlurRadius->getCurrentBaseValue();
 }
 
 qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
-    return mBlurRadius->qra_getEffectiveValueAtRelFrame(relFrame);
+    return mBlurRadius->getEffectiveValueAtRelFrame(relFrame);
 }
 
 stdsptr<PixmapEffectRenderData> BlurEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(BlurEffectRenderData)();
-    renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
+    renderData->blurRadius = mBlurRadius->getEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mBlurRadius->anim_hasKeys();
     renderData->highQuality = mHighQuality->getValue();
     return GetAsSPtr(renderData, PixmapEffectRenderData);

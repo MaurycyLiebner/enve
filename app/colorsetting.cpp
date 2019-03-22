@@ -95,11 +95,11 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
         if(mChangedValue == CVR_RED || mChangedValue == CVR_HUE) {
             target->startVal1Transform();
 
-            qreal targetVal2 = target->getVal2Animator()->qra_getCurrentValue();
+            qreal targetVal2 = target->getVal2Animator()->getCurrentBaseValue();
             if(qAbs(targetVal2 - mVal2) > 0.001) {
                 target->startVal2Transform();
             }
-            qreal targetVal3 = target->getVal3Animator()->qra_getCurrentValue();
+            qreal targetVal3 = target->getVal3Animator()->getCurrentBaseValue();
             if(qAbs(targetVal3 - mVal3) > 0.001) {
                 target->startVal3Transform();
             }
@@ -108,11 +108,11 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
                   mChangedValue == CVR_HSLSATURATION) {
             target->startVal2Transform();
 
-            qreal targetVal1 = target->getVal1Animator()->qra_getCurrentValue();
+            qreal targetVal1 = target->getVal1Animator()->getCurrentBaseValue();
             if(qAbs(targetVal1 - mVal1) > 0.001) {
                 target->startVal1Transform();
             }
-            qreal targetVal3 = target->getVal3Animator()->qra_getCurrentValue();
+            qreal targetVal3 = target->getVal3Animator()->getCurrentBaseValue();
             if(qAbs(targetVal3 - mVal3) > 0.001) {
                 target->startVal3Transform();
             }
@@ -121,11 +121,11 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
                   mChangedValue == CVR_LIGHTNESS) {
             target->startVal3Transform();
 
-            qreal targetVal1 = target->getVal1Animator()->qra_getCurrentValue();
+            qreal targetVal1 = target->getVal1Animator()->getCurrentBaseValue();
             if(qAbs(targetVal1 - mVal1) > 0.001) {
                 target->startVal1Transform();
             }
-            qreal targetVal2 = target->getVal2Animator()->qra_getCurrentValue();
+            qreal targetVal2 = target->getVal2Animator()->getCurrentBaseValue();
             if(qAbs(targetVal2 - mVal2) > 0.001) {
                 target->startVal2Transform();
             }
@@ -135,7 +135,7 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
         target->startVal2Transform();
         target->startVal3Transform();
     }
-    qreal targetAlpha = target->getAlphaAnimator()->qra_getCurrentValue();
+    qreal targetAlpha = target->getAlphaAnimator()->getCurrentBaseValue();
     if(qAbs(targetAlpha - mAlpha) > 0.001 ||
             mChangedValue == CVR_ALL ||
             mChangedValue == CVR_ALPHA) {

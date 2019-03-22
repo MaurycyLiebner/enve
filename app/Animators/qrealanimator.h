@@ -19,7 +19,7 @@ class QrealAnimator :  public GraphAnimator {
 public:
     ~QrealAnimator();
 
-    void anim_setAbsFrame(const int &frame);
+    bool SWT_isQrealAnimator() const { return true; }
     void prp_retrieveSavedValue();
     void prp_startTransform();
     void prp_finishTransform();
@@ -29,11 +29,12 @@ public:
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
         if(range.inRange(anim_mCurrentRelFrame)) {
-            qra_updateValueFromCurrentFrame();
+            updateBaseValueFromCurrentFrame();
         }
         Animator::prp_updateAfterChangedRelFrameRange(range);
     }
 
+    void anim_setAbsFrame(const int &frame);
     void anim_mergeKeysIfNeeded();
     void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_removeKey(const stdsptr<Key> &keyToRemove);
@@ -46,7 +47,6 @@ public:
 
     qreal graph_clampGraphValue(const qreal &value);
 
-    bool SWT_isQrealAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
     stdsptr<Key> readKey(QIODevice *target);
@@ -58,41 +58,25 @@ protected:
 public:
     void setPrefferedValueStep(const qreal &valueStep);
 
-    void qra_setValueRange(const qreal &minVal,
-                           const qreal &maxVal);
+    void setValueRange(const qreal &minVal, const qreal &maxVal);
 
-    qreal qra_getValueAtAbsFrame(const qreal &frame) const;
-    qreal qra_getCurrentValue() const;
-    qreal qra_getCurrentEffectiveValue();
-    qreal qra_getValueAtRelFrame(const qreal &frame) const;
-    qreal qra_getEffectiveValueAtRelFrame(const qreal &frame) const;
-    qreal getCurrentEffectiveValueAtRelFrame(const qreal &frame) const;
-    qreal getCurrentEffectiveValueAtAbsFrameF(const qreal &frame);
-    qreal qra_getValueAtRelFrame(const qreal &frame,
-                                  const QrealKey * const prevKey,
-                                  const QrealKey * const nextKey) const;
-    qreal getCurrentValueAtRelFrame(const qreal &frame) const;
-    qreal getCurrentValueAtAbsFrameF(const qreal &frame);
+    void setCurrentBaseValue(qreal newValue);
+    void setCurrentBaseValueNoUpdate(const qreal &newValue);
+    void incCurrentBaseValue(const qreal &incBy);
+    void incCurrentValueNoUpdate(const qreal &incBy);
+    void multCurrentBaseValue(const qreal &mult);
 
-    void qra_setCurrentValue(qreal newValue);
-    void qra_saveCurrentValueToKey(QrealKey *key);
-    void qra_saveValueToKey(QrealKey *key, const qreal &value);
+    qreal getCurrentBaseValue() const;
+    qreal getCurrentEffectiveValue() const;
+    qreal getBaseValueAtRelFrame(const qreal &frame) const;
+    qreal getBaseValueAtAbsFrame(const qreal &frame) const;
+    qreal getEffectiveValueAtRelFrame(const qreal &frame) const;
+    qreal getEffectiveValueAtAbsFrame(const qreal &frame) const;
 
+    qreal getSavedBaseValue();
+    void incAllValues(const qreal &valInc);
 
-    qreal qra_getPrevKeyValue(const QrealKey * const key);
-    qreal qra_getNextKeyValue(const QrealKey * const key);
-    int qra_getPrevKeyRelFrame(const QrealKey * const key);
-    int qra_getNextKeyRelFrame(const QrealKey * const key);
-
-    void qra_setCurrentValueWithoutCallingUpdater(const qreal &newValue);
-    void qra_incCurrentValueWithoutCallingUpdater(const qreal &incBy);
-    void qra_incCurrentValue(const qreal &incBy);
-
-    void qra_multCurrentValue(const qreal &mult);
-
-    qreal qra_getSavedValue();
-
-    void qra_incAllValues(const qreal &valInc);
+    void saveValueToKey(QrealKey *key, const qreal &value);
 
     qreal getMinPossibleValue();
     qreal getMaxPossibleValue();
@@ -102,7 +86,7 @@ public:
     void graphFixMinMaxValues();
     void saveValueAtAbsFrameAsKey(const int &frame);
 
-    void qra_saveValueToKey(const int &frame, const qreal &value);
+    void saveValueToKey(const int &frame, const qreal &value);
     void removeThisFromGraphAnimator();
 
     void incSavedValueToCurrentValue(const qreal &incBy);
@@ -115,7 +99,7 @@ public:
 
     void setGenerator(const qsptr<RandomQrealGenerator> &generator);
 
-    bool qra_hasNoise();
+    bool hasNoise();
 
     static auto create0to1Animator(const QString& name) {
         auto anim = SPtrCreate(QrealAnimator)(0., 0., 1., 0.01, name);
@@ -129,6 +113,8 @@ protected:
                   const qreal &maxVal,
                   const qreal &prefferdStep,
                   const QString& name);
+private:
+    void saveCurrentValueToKey(QrealKey *key);
     QrealKey *getQrealKeyAtId(const int &id) const;
 
     bool mGraphMinMaxValuesFixed = false;
@@ -139,13 +125,13 @@ protected:
     qreal mMaxPossibleVal = TEN_MIL;
     qreal mMinPossibleVal = -TEN_MIL;
 
-    qreal mCurrentValue = 0;
+    qreal mCurrentBaseValue = 0;
     qreal mSavedCurrentValue = 0;
 
     qsptr<RandomQrealGenerator> mRandomGenerator;
 
     qreal mPrefferedValueStep = 1;
-    void qra_updateValueFromCurrentFrame();
+    void updateBaseValueFromCurrentFrame();
 signals:
     void valueChangedSignal(qreal);
 };

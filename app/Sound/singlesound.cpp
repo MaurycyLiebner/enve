@@ -165,13 +165,13 @@ void SingleSound::prepareFinalData(const float &fps,
         if(mVolumeAnimator->anim_hasKeys()) {
             int j = 0;
             int frame = 0;
-            qreal volVal = mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame);
+            qreal volVal = mVolumeAnimator->getEffectiveValueAtRelFrame(frame);
             float lastFrameVol = static_cast<float>(volVal*0.01);
             const float volStep = fps/SOUND_SAMPLERATE;
             while(j < mFinalSampleCount) {
                 frame++;
                 float nextFrameVol = static_cast<float>(
-                        mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame)/100.);
+                        mVolumeAnimator->getEffectiveValueAtRelFrame(frame)/100.);
                 float volDiff = (nextFrameVol - lastFrameVol);
                 float currVolFrac = lastFrameVol;
                 for(int i = 0;
@@ -185,7 +185,7 @@ void SingleSound::prepareFinalData(const float &fps,
             }
         } else {
             const float volFrac =
-                    static_cast<float>(mVolumeAnimator->qra_getCurrentValue()/100.);
+                    static_cast<float>(mVolumeAnimator->getCurrentBaseValue()/100.);
             for(int i = 0; i < mFinalSampleCount; i++) {
                 mFinalData[i] = mSrcData[i + minSampleFromSrc]*volFrac;
             }

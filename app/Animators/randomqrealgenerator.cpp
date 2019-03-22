@@ -36,18 +36,18 @@ RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
 
 void RandomQrealGenerator::anim_setAbsFrame(const int &frame) {
     ComplexAnimator::anim_setAbsFrame(frame);
-    if(mMaxDev->qra_getCurrentEffectiveValue() < 0.001) return;
+    if(mMaxDev->getCurrentEffectiveValue() < 0.001) return;
     anim_callFrameChangeUpdater();
 }
 
 FrameRange RandomQrealGenerator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    if(mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame) < 0.001) {
+    if(mMaxDev->getEffectiveValueAtRelFrame(relFrame) < 0.001) {
         return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
     }
     return {relFrame, relFrame};
 }
 
-qreal RandomQrealGenerator::getDevAtRelFrameF(const qreal &relFrame) {
+qreal RandomQrealGenerator::getDevAtRelFrame(const qreal &relFrame) {
 //    if(relFrame > mLastFrame) {
 //        mLastFrame = relFrame;
 //        generateData();
@@ -58,13 +58,13 @@ qreal RandomQrealGenerator::getDevAtRelFrameF(const qreal &relFrame) {
 //    }
     int relFrameRel = qRound(relFrame) % (mLastFrame - 1);
 
-    qreal maxDev = mMaxDev->getCurrentEffectiveValueAtRelFrame(relFrameRel);
+    qreal maxDev = mMaxDev->getEffectiveValueAtRelFrame(relFrameRel);
     int idBefore = getClosestLowerFrameId(0, mFrameValues.count() - 1, relFrameRel);
     const FrameValue &frameValueBefore = mFrameValues.at(idBefore);
     qreal frameBefore = frameValueBefore.frame;
     qreal valueBefore = frameValueBefore.value;
     qreal smoothnessBefore =
-            mSmoothness->qra_getEffectiveValueAtRelFrame(frameBefore);
+            mSmoothness->getEffectiveValueAtRelFrame(frameBefore);
 
     int idAfter = idBefore + 1;
     const FrameValue &frameValueAfter = mFrameValues.at(idAfter);
@@ -86,7 +86,7 @@ qreal RandomQrealGenerator::getDevAtRelFrameF(const qreal &relFrame) {
     if(qAbs(relFrameRel - frameBefore) < 0.01) return valueBefore;
     if(qAbs(relFrameRel - frameAfter) < 0.01) return valueAfter;
     qreal smoothnessAfter =
-            mSmoothness->qra_getEffectiveValueAtRelFrame(frameAfter);
+            mSmoothness->getEffectiveValueAtRelFrame(frameAfter);
 
     qreal t;
     if(smoothnessBefore < 0.001 && smoothnessAfter < 0.001) {
@@ -100,10 +100,6 @@ qreal RandomQrealGenerator::getDevAtRelFrameF(const qreal &relFrame) {
         seg.minDistanceTo(relFrameRel, &t);
     }
     return t*valueAfter + (1 - t)*valueBefore;
-}
-
-qreal RandomQrealGenerator::getDevAtRelFrame(const int &relFrame) {
-    return getDevAtRelFrameF(relFrame);
 }
 
 int RandomQrealGenerator::getClosestLowerFrameId(const int &minId,
@@ -125,7 +121,7 @@ int RandomQrealGenerator::getClosestLowerFrameId(const int &minId,
 qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
     qreal totDeltaX = 0;
     qreal A = 0;
-    qreal prevPeriod = mPeriod->qra_getEffectiveValueAtRelFrame(relFrame);
+    qreal prevPeriod = mPeriod->getEffectiveValueAtRelFrame(relFrame);
     int prevFrame = relFrame;
     int nextFrame = relFrame;
     qreal nextPeriod = prevPeriod;

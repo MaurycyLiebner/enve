@@ -35,9 +35,9 @@ stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataFor
     renderData->alphaT = toColor.alpha();
 
     renderData->tolerance = qRound(mToleranceAnimator->
-            getCurrentEffectiveValueAtRelFrame(relFrame)*255);
+            getEffectiveValueAtRelFrame(relFrame)*255);
     renderData->smoothness = mSmoothnessAnimator->
-            getCurrentEffectiveValueAtRelFrame(relFrame);
+            getEffectiveValueAtRelFrame(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

@@ -5,7 +5,6 @@ class ComboBoxProperty;
 class BoxTargetProperty;
 
 class OperationPathEffect : public PathEffect {
-    Q_OBJECT
     friend class SelfRef;
 protected:
     OperationPathEffect(PathBox * const parentPath,

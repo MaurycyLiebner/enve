@@ -6,16 +6,16 @@ SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
     PixmapEffect("motion blur", EFFECT_MOTION_BLUR) {
     mParentBox = box;
     mOpacity = SPtrCreate(QrealAnimator)("opacity");
-    mOpacity->qra_setValueRange(0., 100.);
-    mOpacity->qra_setCurrentValue(100.);
+    mOpacity->setValueRange(0., 100.);
+    mOpacity->setCurrentBaseValue(100.);
 
     mNumberSamples = SPtrCreate(QrealAnimator)("number of samples");
-    mNumberSamples->qra_setValueRange(0.1, 99.);
-    mNumberSamples->qra_setCurrentValue(1.);
+    mNumberSamples->setValueRange(0.1, 99.);
+    mNumberSamples->setCurrentBaseValue(1.);
 
     mFrameStep = SPtrCreate(QrealAnimator)("frame step");
-    mFrameStep->qra_setValueRange(.1, 9.9);
-    mFrameStep->qra_setCurrentValue(1.);
+    mFrameStep->setValueRange(.1, 9.9);
+    mFrameStep->setCurrentBaseValue(1.);
 
     ca_addChildAnimator(mOpacity);
     ca_addChildAnimator(mNumberSamples);
@@ -28,13 +28,13 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
     if(!data->fParentIsTarget) return nullptr;
     auto renderData = SPtrCreate(SampledMotionBlurEffectRenderData)();
     renderData->opacity =
-            mOpacity->getCurrentEffectiveValueAtRelFrame(relFrame)*0.01;
+            mOpacity->getEffectiveValueAtRelFrame(relFrame)*0.01;
     renderData->numberSamples =
-            mNumberSamples->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mNumberSamples->getEffectiveValueAtRelFrame(relFrame);
     renderData->boxData = data;
 
     int numberFrames = qCeil(renderData->numberSamples);
-    qreal frameStep = mFrameStep->getCurrentEffectiveValueAtRelFrame(relFrame);
+    qreal frameStep = mFrameStep->getEffectiveValueAtRelFrame(relFrame);
     qreal relFrameT = relFrame - numberFrames*frameStep;
     for(int i = 0; i < numberFrames; i++) {
         if(!mParentBox->isRelFrameFVisibleAndInVisibleDurationRect(relFrameT)) {
@@ -64,8 +64,8 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
 
 FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int &relFrame) const {
     auto boxRange = mParentBox->getFirstAndLastIdenticalForMotionBlur(relFrame);
-    int margin = qCeil(mNumberSamples->getCurrentEffectiveValueAtRelFrame(relFrame)*
-                       mFrameStep->getCurrentEffectiveValueAtRelFrame(relFrame));
+    int margin = qCeil(mNumberSamples->getEffectiveValueAtRelFrame(relFrame)*
+                       mFrameStep->getEffectiveValueAtRelFrame(relFrame));
     if(boxRange.fMin == FrameRange::EMIN) {
         if(boxRange.fMax != FrameRange::EMAX) {
             if(boxRange.fMax - margin < relFrame) {

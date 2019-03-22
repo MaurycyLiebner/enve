@@ -6,13 +6,13 @@ stdsptr<PixmapEffectRenderData> ColorizeEffect::getPixmapEffectRenderDataForRelF
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ColorizeEffectRenderData)();
     renderData->hue =
-            mHueAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mHueAnimator->getEffectiveValueAtRelFrame(relFrame);
     renderData->saturation =
-            mSaturationAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mSaturationAnimator->getEffectiveValueAtRelFrame(relFrame);
     renderData->lightness =
-            mLightnessAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mLightnessAnimator->getEffectiveValueAtRelFrame(relFrame);
     renderData->alpha =
-            mAlphaAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mAlphaAnimator->getEffectiveValueAtRelFrame(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

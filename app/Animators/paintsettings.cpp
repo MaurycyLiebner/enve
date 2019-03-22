@@ -136,7 +136,7 @@ void OutlineSettingsAnimator::showHideChildrenBeforeChaningPaintType(
 }
 
 void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal &newWidth) {
-    mLineWidth->qra_setCurrentValue(newWidth);
+    mLineWidth->setCurrentBaseValue(newWidth);
 }
 
 void OutlineSettingsAnimator::setCapStyle(const Qt::PenCapStyle &capStyle) {
@@ -150,27 +150,27 @@ void OutlineSettingsAnimator::setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
 }
 
 void OutlineSettingsAnimator::setStrokerSettings(QPainterPathStroker * const stroker) {
-    stroker->setWidth(mLineWidth->qra_getCurrentValue());
+    stroker->setWidth(mLineWidth->getCurrentBaseValue());
     stroker->setCapStyle(mCapStyle);
     stroker->setJoinStyle(mJoinStyle);
 }
 
 void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {
-    stroker->setWidth(toSkScalar(mLineWidth->qra_getCurrentValue()));
+    stroker->setWidth(toSkScalar(mLineWidth->getCurrentBaseValue()));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
 void OutlineSettingsAnimator::setStrokerSettingsForRelFrameSk(
         const qreal &relFrame, SkStroke * const stroker) {
-    const qreal widthT = mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame);
+    const qreal widthT = mLineWidth->getEffectiveValueAtRelFrame(relFrame);
     stroker->setWidth(toSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
 qreal OutlineSettingsAnimator::getCurrentStrokeWidth() const {
-    return mLineWidth->qra_getCurrentValue();
+    return mLineWidth->getCurrentBaseValue();
 }
 
 Qt::PenCapStyle OutlineSettingsAnimator::getCapStyle() const {
@@ -195,7 +195,7 @@ QPainter::CompositionMode OutlineSettingsAnimator::getOutlineCompositionMode() {
 }
 
 bool OutlineSettingsAnimator::nonZeroLineWidth() {
-    return !isZero4Dec(mLineWidth->qra_getCurrentValue());
+    return !isZero4Dec(mLineWidth->getCurrentBaseValue());
 }
 
 

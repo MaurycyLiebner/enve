@@ -4,8 +4,8 @@
 SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     PathEffect("solidify effect", SOLIDIFY_PATH_EFFECT, outlinePathEffect) {
     mDisplacement = SPtrCreate(QrealAnimator)("displacement");
-    mDisplacement->qra_setValueRange(-999.999, 999.999);
-    mDisplacement->qra_setCurrentValue(5);
+    mDisplacement->setValueRange(-999.999, 999.999);
+    mDisplacement->setCurrentBaseValue(5);
 
     ca_addChildAnimator(mDisplacement);
 }
@@ -13,6 +13,6 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
 void SolidifyPathEffect::apply(const qreal &relFrame,
                                const SkPath &src,
                                SkPath * const dst) {
-    const qreal widthT = mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame);
+    const qreal widthT = mDisplacement->getEffectiveValueAtRelFrame(relFrame);
     gSolidify(widthT, src, dst);
 }

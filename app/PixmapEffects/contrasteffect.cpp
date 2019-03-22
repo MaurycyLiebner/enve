@@ -6,8 +6,8 @@ ContrastEffect::ContrastEffect(qreal contrast) :
     PixmapEffect("contrast", EFFECT_CONTRAST) {
     mContrastAnimator = SPtrCreate(QrealAnimator)("contrast");
 
-    mContrastAnimator->qra_setValueRange(-255., 255.);
-    mContrastAnimator->qra_setCurrentValue(contrast);
+    mContrastAnimator->setValueRange(-255., 255.);
+    mContrastAnimator->setCurrentBaseValue(contrast);
     ca_addChildAnimator(mContrastAnimator);
 }
 
@@ -15,7 +15,7 @@ stdsptr<PixmapEffectRenderData> ContrastEffect::getPixmapEffectRenderDataForRelF
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ContrastEffectRenderData)();
     renderData->contrast =
-            mContrastAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
+            mContrastAnimator->getEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mContrastAnimator->anim_hasKeys();
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

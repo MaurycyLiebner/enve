@@ -80,11 +80,11 @@ void Rectangle::setBottomRightPos(const QPointF &pos) {
 }
 
 void Rectangle::setYRadius(const qreal &radiusY) {
-    mRadiusAnimator->getYAnimator()->qra_setCurrentValue(radiusY);
+    mRadiusAnimator->getYAnimator()->setCurrentBaseValue(radiusY);
 }
 
 void Rectangle::setXRadius(const qreal &radiusX) {
-    mRadiusAnimator->getXAnimator()->qra_setCurrentValue(radiusX);
+    mRadiusAnimator->getXAnimator()->setCurrentBaseValue(radiusX);
 }
 
 void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {

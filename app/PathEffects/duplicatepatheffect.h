@@ -4,7 +4,6 @@
 class QPointFAnimator;
 
 class DuplicatePathEffect : public PathEffect {
-    Q_OBJECT
     friend class SelfRef;
 protected:
     DuplicatePathEffect(const bool &outlinePathEffect);
