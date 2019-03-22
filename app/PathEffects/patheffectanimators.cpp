@@ -6,7 +6,7 @@
 
 PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
                                          const bool &isFill,
-                                         BoundingBox *parentPath) :
+                                         BoundingBox * const parentPath) :
     ComplexAnimator("path effects") {
     mIsOutline = isOutline;
     mIsFill = isFill;

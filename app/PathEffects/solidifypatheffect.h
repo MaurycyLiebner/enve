@@ -3,11 +3,10 @@
 #include "PathEffects/patheffect.h"
 
 class SolidifyPathEffect : public PathEffect {
-    Q_OBJECT
     friend class SelfRef;
-public:
+protected:
     SolidifyPathEffect(const bool &outlinePathEffect);
-
+public:
     void apply(const qreal &relFrame,
                const SkPath &src,
                SkPath * const dst);

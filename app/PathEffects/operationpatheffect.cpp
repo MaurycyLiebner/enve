@@ -4,8 +4,8 @@
 #include "Boxes/pathbox.h"
 #include "pathoperations.h"
 
-OperationPathEffect::OperationPathEffect(PathBox *parentPath,
-                             const bool &outlinePathEffect) :
+OperationPathEffect::OperationPathEffect(PathBox * const parentPath,
+                                         const bool &outlinePathEffect) :
     PathEffect("path operation effect",
                SUM_PATH_EFFECT, outlinePathEffect) {
     mOperationType = SPtrCreate(ComboBoxProperty)(

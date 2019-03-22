@@ -3,9 +3,9 @@
 #include "PathEffects/patheffect.h"
 
 class LengthPathEffect : public PathEffect {
-public:
+protected:
     LengthPathEffect(const bool &outlinePathEffect);
-
+public:
     void apply(const qreal &relFrame,
                const SkPath &src,
                SkPath * const dst);

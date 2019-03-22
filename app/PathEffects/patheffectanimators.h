@@ -8,6 +8,10 @@ class PathBox;
 
 class PathEffectAnimators : public ComplexAnimator {
     friend class SelfRef;
+protected:
+    PathEffectAnimators(const bool &isOutline,
+                        const bool &isFill,
+                        BoundingBox * const parentPath);
 public:
     void addEffect(const qsptr<PathEffect> &effect);
     bool hasEffects();
@@ -26,11 +30,7 @@ public:
     const bool &isOutline() const;
     const bool &isFill() const;
     void readPathEffect(QIODevice *target);
-protected:
-    PathEffectAnimators(const bool &isOutline,
-                        const bool &isFill,
-                        BoundingBox *parentPath);
-
+private:
     bool mIsOutline;
     bool mIsFill;
     qptr<BoundingBox> mParentBox;
