@@ -1,6 +1,8 @@
 #ifndef DISPLACEPATHEFFECT_H
 #define DISPLACEPATHEFFECT_H
 #include "patheffect.h"
+class IntAnimator;
+class BoolPropertyContainer;
 
 class DisplacePathEffect : public PathEffect {
     friend class SelfRef;
@@ -13,18 +15,7 @@ public:
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
-        if(mRandomize->getValue()) {
-            if(mSmoothTransform->getValue()) {
-                return {relFrame, relFrame};
-            } else {
-                int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
-                int min = relFrame - relFrame % frameStep;
-                return {min, min + frameStep};
-            }
-        }
-        return PathEffect::prp_getIdenticalRelFrameRange(relFrame);
-    }
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 private:
     uint32_t mSeedAssist = 0;
 

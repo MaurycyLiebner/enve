@@ -77,8 +77,8 @@ bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
     return true;
 }
 
-void PathEffectAnimators::applyBeforeThicknessF(const qreal &relFrame,
-                                                SkPath *srcDstPath) {
+void PathEffectAnimators::applyBeforeThickness(const qreal &relFrame,
+                                               SkPath * const srcDstPath) {
     SkPath dstPath = *srcDstPath;
     for(const auto& effect : ca_mChildAnimators) {
         const auto& effectT = GetAsPtr(effect, PathEffect);
@@ -91,7 +91,7 @@ void PathEffectAnimators::applyBeforeThicknessF(const qreal &relFrame,
 }
 
 void PathEffectAnimators::apply(const qreal &relFrame,
-                                SkPath *srcDstPath) {
+                                SkPath * const srcDstPath) {
     SkPath dstPath = *srcDstPath;
     for(const auto& effect : ca_mChildAnimators) {
         const auto& effectT = GetAsPtr(effect, PathEffect);

@@ -1,4 +1,6 @@
 #include "displacepatheffect.h"
+#include "Animators/intanimator.h"
+#include "Properties/boolproperty.h"
 #include "pointhelpers.h"
 
 DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
@@ -16,11 +18,11 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mSeed->setIntValueRange(0, 9999);
     mSeed->setCurrentIntValue(qrand() % 9999);
 
-    mSegLength->qra_setValueRange(1., 1000.);
-    mSegLength->qra_setCurrentValue(20.);
+    mSegLength->qra_setValueRange(1, 1000);
+    mSegLength->qra_setCurrentValue(20);
 
-    mMaxDev->qra_setValueRange(0., 1000.);
-    mMaxDev->qra_setCurrentValue(20.);
+    mMaxDev->qra_setValueRange(0, 1000);
+    mMaxDev->qra_setCurrentValue(20);
 
     mRandomizeStep->setIntValueRange(1, 99);
 
@@ -104,4 +106,18 @@ void DisplacePathEffect::apply(const qreal &relFrame,
     } else {
         gDisplaceFilterPath(dst, src, maxDev, segLen, smooth, mSeedAssist);
     }
+}
+
+FrameRange DisplacePathEffect::prp_getIdenticalRelFrameRange(
+        const int &relFrame) const {
+    if(mRandomize->getValue()) {
+        if(mSmoothTransform->getValue()) {
+            return {relFrame, relFrame};
+        } else {
+            const int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+            const int min = relFrame - relFrame % frameStep;
+            return {min, min + frameStep};
+        }
+    }
+    return PathEffect::prp_getIdenticalRelFrameRange(relFrame);
 }

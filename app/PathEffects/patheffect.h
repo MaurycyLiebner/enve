@@ -1,15 +1,8 @@
 #ifndef PATHEFFECT_H
 #define PATHEFFECT_H
 #include "Animators/complexanimator.h"
-#include "Animators/qrealanimator.h"
-#include "Animators/qpointfanimator.h"
-#include "Animators/intanimator.h"
-#include "Properties/boolproperty.h"
-#include "Properties/comboboxproperty.h"
-#include "Animators/intanimator.h"
 #include "skia/skiaincludes.h"
-#include "Properties/boxtargetproperty.h"
-#include "smartPointers/sharedpointerdefs.h"
+class BoolProperty;
 class PathBox;
 class PathEffectAnimators;
 enum PathEffectType : short {

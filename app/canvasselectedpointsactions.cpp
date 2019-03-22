@@ -79,10 +79,10 @@ void Canvas::connectPoints() {
 
 void Canvas::disconnectPoints() {
     QList<NodePoint*> selectedNodePoints;
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
-            NodePoint *nextPoint = asNodePt->getNextPoint();
+            const auto nextPoint = asNodePt->getNextPoint();
             if(!nextPoint) continue;
             if(nextPoint->isSelected()) {
                 selectedNodePoints.append(asNodePt);
@@ -91,10 +91,10 @@ void Canvas::disconnectPoints() {
     }
     if(selectedNodePoints.count() != 1) return;
     clearPointsSelection();
-    for(NodePoint *point : selectedNodePoints) {
-        NodePoint *secondPoint = point->getNextPoint();
-        VectorPathAnimator *parentPath = point->getParentPath();
-        bool wasClosed = parentPath->isClosed();
+    for(const auto& point : selectedNodePoints) {
+        const auto secondPoint = point->getNextPoint();
+        const auto parentPath = point->getParentPath();
+        const bool wasClosed = parentPath->isClosed();
         parentPath->disconnectPoints(point, secondPoint);
         if(wasClosed) {
             addPointToSelection(parentPath->getNodePtWithNodeId(0));
@@ -314,9 +314,7 @@ void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
 }
 
 void Canvas::addPointToSelection(MovablePoint* point) {
-    if(point->isSelected()) {
-        return;
-    }
+    if(point->isSelected()) return;
     point->select();
     mSelectedPoints_d.append(point); schedulePivotUpdate();
 }

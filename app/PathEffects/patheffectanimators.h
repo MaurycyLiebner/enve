@@ -14,13 +14,9 @@ public:
 
     bool SWT_isPathEffectAnimators() const;
 
-    void applyBeforeThickness(const int &relFrame,
-                                              SkPath *srcDstPath,
-                                              const qreal &scale = 1.);
-    void apply(const qreal &relFrame,
-                SkPath *srcDstPath);
-    void applyBeforeThicknessF(const qreal &relFrame,
-                                              SkPath *srcDstPath);
+    void apply(const qreal &relFrame, SkPath * const srcDstPath);
+    void applyBeforeThickness(const qreal &relFrame,
+                              SkPath * const srcDstPath);
 
 
     void readProperty(QIODevice *target);

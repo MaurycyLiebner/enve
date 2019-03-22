@@ -1,12 +1,14 @@
 #include "lengthpatheffect.h"
 #include "edge.h"
 #include "pointhelpers.h"
+#include "Animators/qrealanimator.h"
+#include "Properties/boolproperty.h"
 
 LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
     PathEffect("length effect", LENGTH_PATH_EFFECT, outlinePathEffect) {
     mLength = SPtrCreate(QrealAnimator)("segment length");
-    mLength->qra_setValueRange(0., 100.);
-    mLength->qra_setCurrentValue(100.);
+    mLength->qra_setValueRange(0, 100);
+    mLength->qra_setCurrentValue(100);
 
     mReverse = SPtrCreate(BoolProperty)("reverse");
     mReverse->setValue(false);

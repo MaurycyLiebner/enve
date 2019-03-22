@@ -1,6 +1,8 @@
 #include "operationpatheffect.h"
-#include "pathoperations.h"
+#include "Properties/boxtargetproperty.h"
+#include "Properties/comboboxproperty.h"
 #include "Boxes/pathbox.h"
+#include "pathoperations.h"
 
 OperationPathEffect::OperationPathEffect(PathBox *parentPath,
                              const bool &outlinePathEffect) :

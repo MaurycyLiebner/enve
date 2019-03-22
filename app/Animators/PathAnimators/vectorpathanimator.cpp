@@ -775,7 +775,8 @@ void VectorPathAnimator::getKeysDataForConnection(
     }
 }
 
-VectorPathAnimator * VectorPathAnimator::connectWith(VectorPathAnimator *srcPath) {
+VectorPathAnimator * VectorPathAnimator::connectWith(
+        VectorPathAnimator *srcPath) {
     QList<int> keyFrames;
     QList<QList<SkPoint> > newKeysData;
     QList<const NodeSettings*> newNodeSettings;
@@ -803,7 +804,7 @@ VectorPathAnimator * VectorPathAnimator::connectWith(VectorPathAnimator *srcPath
     for(const auto& posList : newKeysData) {
         int relFrame = keyFrames.at(idT);
         auto newKey = SPtrCreate(PathKey)(relFrame, posList,
-                                                 newAnimator.get(), false);
+                                          newAnimator.get(), false);
         newAnimator->anim_appendKey(newKey);
         idT++;
     }

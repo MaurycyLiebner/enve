@@ -1,6 +1,8 @@
 #ifndef OPERATIONPATHEFFECT_H
 #define OPERATIONPATHEFFECT_H
 #include "patheffect.h"
+class ComboBoxProperty;
+class BoxTargetProperty;
 
 class OperationPathEffect : public PathEffect {
     Q_OBJECT

@@ -148,7 +148,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
         SkPath outline;
         if(mStrokeSettings->nonZeroLineWidth()) {
             SkPath outlineBase = pathData->fPath;
-            mOutlinePathEffectsAnimators->applyBeforeThicknessF(
+            mOutlinePathEffectsAnimators->applyBeforeThickness(
                         relFrame, &outlineBase);
             mParentGroup->filterOutlinePathBeforeThicknessForRelFrame(
                         relFrame, &outlineBase);

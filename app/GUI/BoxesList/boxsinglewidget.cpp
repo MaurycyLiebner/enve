@@ -17,6 +17,7 @@
 #include "Animators/randomqrealgenerator.h"
 #include "Properties/boolproperty.h"
 #include "Properties/intproperty.h"
+#include "Animators/qpointfanimator.h"
 #include "PropertyUpdaters/propertyupdater.h"
 #include "Animators/effectanimators.h"
 #include "PixmapEffects/pixmapeffect.h"
@@ -1222,8 +1223,7 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     int slidersWidth = mValueSlider->minimumWidth() +
             mSecondValueSlider->minimumWidth() + MIN_WIDGET_HEIGHT;
     if(width() - nameRightX > slidersWidth) {
-        QPointFAnimator *pt_target =
-                GetAsPtr(target, QPointFAnimator);
+        const auto pt_target = GetAsPtr(target, QPointFAnimator);
         mValueSlider->setTarget(pt_target->getXAnimator());
         mValueSlider->show();
         mValueSlider->setNeighbouringSliderToTheRight(true);

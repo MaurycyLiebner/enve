@@ -3,6 +3,7 @@
 #include "pathoperations.h"
 #include "skia/skqtconversions.h"
 #include "patheffectanimators.h"
+#include "Properties/boolproperty.h"
 #include <QDrag>
 
 PathEffect::PathEffect(const QString &name,

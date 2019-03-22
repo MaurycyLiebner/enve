@@ -232,7 +232,7 @@ void BoxesGroup::applyPathEffects(const qreal &relFrame,
 
 void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
         const qreal &relFrame, SkPath * const srcDstPath) {
-    mOutlinePathEffectsAnimators->applyBeforeThicknessF(relFrame,
+    mOutlinePathEffectsAnimators->applyBeforeThickness(relFrame,
                                                                        srcDstPath);
     if(!mParentGroup) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
