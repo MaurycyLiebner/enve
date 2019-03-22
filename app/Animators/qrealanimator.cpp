@@ -230,11 +230,8 @@ void QrealAnimator::setCurrentBaseValue(qreal newValue) {
     if(isZero4Dec(newValue - mCurrentBaseValue)) return;
     mCurrentBaseValue = newValue;
     const auto currKey = anim_getKeyOnCurrentFrame<QrealKey>();
-    if(currKey) {
-        saveCurrentValueToKey(currKey);
-    } else {
-        prp_updateInfluenceRangeAfterChanged();
-    }
+    if(currKey) saveCurrentValueToKey(currKey);
+    else prp_updateInfluenceRangeAfterChanged();
 
     emit valueChangedSignal(mCurrentBaseValue);
 
@@ -253,7 +250,7 @@ void QrealAnimator::saveCurrentValueToKey(QrealKey * const key) {
 void QrealAnimator::saveValueToKey(const int &frame, const qreal &value) {
     const auto keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
     if(!keyAtFrame) {
-        auto newKey = SPtrCreate(QrealKey)(value, frame, this);
+        const auto newKey = SPtrCreate(QrealKey)(value, frame, this);
         anim_appendKey(newKey);
         graph_updateKeysPath();
     } else {
@@ -261,7 +258,7 @@ void QrealAnimator::saveValueToKey(const int &frame, const qreal &value) {
     }
 }
 
-void QrealAnimator::saveValueToKey(QrealKey *key, const qreal &value) {
+void QrealAnimator::saveValueToKey(QrealKey * const key, const qreal &value) {
     key->setValue(value);
 
     if(graph_isSelectedForGraph()) {
@@ -380,12 +377,12 @@ ValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     if(mGraphMinMaxValuesFixed) {
         return {mMinPossibleVal, mMaxPossibleVal};
     }
-    qreal minVal = 100000.;
-    qreal maxVal = -100000.;
     if(anim_mKeys.isEmpty()) {
         return {mCurrentBaseValue - mPrefferedValueStep,
                 mCurrentBaseValue + mPrefferedValueStep};
     }
+    qreal minVal = TEN_MIL;
+    qreal maxVal = -TEN_MIL;
     for(const auto &key : anim_mKeys) {
         const auto qaKey = GetAsPtr(key.get(), QrealKey);
         const qreal keyVal = qaKey->getValue();
@@ -402,10 +399,10 @@ ValueRange QrealAnimator::graph_getMinAndMaxValues() const {
 
 ValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
         const int &startFrame, const int &endFrame) const {
-    qreal minVal = 100000.;
-    qreal maxVal = -100000.;
     if(anim_mKeys.isEmpty()) return {mCurrentBaseValue, mCurrentBaseValue};
     bool first = true;
+    qreal minVal = TEN_MIL;
+    qreal maxVal = -TEN_MIL;
     for(const auto &key : anim_mKeys) {
         const auto qaKey = GetAsPtr(key.get(), QrealKey);
         const int keyFrame = key->getAbsFrame();

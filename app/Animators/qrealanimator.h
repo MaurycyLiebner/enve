@@ -76,7 +76,7 @@ public:
     qreal getSavedBaseValue();
     void incAllValues(const qreal &valInc);
 
-    void saveValueToKey(QrealKey *key, const qreal &value);
+    void saveValueToKey(QrealKey * const key, const qreal &value);
 
     qreal getMinPossibleValue();
     qreal getMaxPossibleValue();
@@ -102,7 +102,7 @@ public:
     bool hasNoise();
 
     static auto create0to1Animator(const QString& name) {
-        auto anim = SPtrCreate(QrealAnimator)(0., 0., 1., 0.01, name);
+        auto anim = SPtrCreate(QrealAnimator)(0, 0, 1, 0.01, name);
         anim->graphFixMinMaxValues();
         return anim;
     }
