@@ -239,7 +239,9 @@ void QrealAnimator::setCurrentBaseValue(qreal newValue) {
 }
 
 void QrealAnimator::updateBaseValueFromCurrentFrame() {
-    mCurrentBaseValue = getBaseValueAtAbsFrame(anim_mCurrentAbsFrame);
+    const qreal newValue = calculateBaseValueAtRelFrame(anim_mCurrentRelFrame);
+    if(isZero4Dec(newValue - mCurrentBaseValue)) return;
+    mCurrentBaseValue = newValue;
     emit valueChangedSignal(mCurrentBaseValue);
 }
 
@@ -269,11 +271,7 @@ void QrealAnimator::saveValueToKey(QrealKey * const key, const qreal &value) {
 
 void QrealAnimator::anim_setAbsFrame(const int &frame) {
     Animator::anim_setAbsFrame(frame);
-    const qreal newValue = calculateBaseValueAtRelFrame(anim_mCurrentRelFrame);
-    if(isZero4Dec(newValue - mCurrentBaseValue)) return;
-    mCurrentBaseValue = newValue;
-
-    emit valueChangedSignal(mCurrentBaseValue);
+    updateBaseValueFromCurrentFrame();
 
     anim_callFrameChangeUpdater();
 }
