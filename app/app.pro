@@ -123,7 +123,6 @@ SOURCES += main.cpp\
     filesourcescache.cpp \
     GUI/RenderWidgets/closablecontainer.cpp \
     GUI/RenderWidgets/renderdestinationdialog.cpp \
-    PathEffects/patheffect.cpp \
     PathEffects/patheffectanimators.cpp \
     GUI/BoxesList/coloranimatorbutton.cpp \
     updatable.cpp \
@@ -350,7 +349,6 @@ HEADERS  += \
     global.h \
     GUI/RenderWidgets/closablecontainer.h \
     GUI/RenderWidgets/renderdestinationdialog.h \
-    PathEffects/patheffect.h \
     PathEffects/patheffectanimators.h \
     GUI/BoxesList/coloranimatorbutton.h \
     updatable.h \

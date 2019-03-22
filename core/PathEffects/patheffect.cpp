@@ -1,6 +1,5 @@
 #include "patheffect.h"
 #include "pointhelpers.h"
-#include "pathoperations.h"
 #include "skia/skqtconversions.h"
 #include "Properties/boolproperty.h"
 #include <QDrag>
