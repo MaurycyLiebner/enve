@@ -138,34 +138,24 @@ public:
 
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
-    Property *getParent() const {
-        return mParent;
-    }
 
-    void setParent(Property * const parent) {
-        mParent = parent;
-    }
+    template <class T = ComplexAnimator>
+    T *getParent() const;
+
+    void setParent(ComplexAnimator * const parent);
 
     template <class T = Property>
-    T *getFirstAncestor(bool (Property::*tester)() const) {
-        if(!mParent) return nullptr;
-        if((mParent->*tester)()) return static_cast<T*>(mParent.data());
-        return static_cast<T*>(mParent->getFirstAncestor(tester));
-    }
+    T *getFirstAncestor(bool (Property::*tester)() const) const;
 
     template <class T = Property>
-    T *getFirstAncestor(bool (*tester)(const Property*)) {
-        if(!mParent) return nullptr;
-        if(tester(mParent)) return static_cast<T*>(mParent.data());
-        return static_cast<T*>(mParent->getFirstAncestor(tester));
-    }
+    T *getFirstAncestor(bool (*tester)(const Property*)) const;
 protected:
     Property(const QString &name);
     void prp_currentFrameChanged();
     void prp_callFinishUpdater();
 
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
-    QPointer<Property> mParent;
+    QPointer<ComplexAnimator> mParent;
 signals:
     void prp_updateWholeInfluenceRange();
     void prp_absFrameRangeChanged(const FrameRange &range);

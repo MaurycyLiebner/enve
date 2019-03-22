@@ -481,7 +481,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
     } else if(dragged.fType == Dragged::PATH_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, PathEffect);
         const auto targetParent = static_cast<PathEffectAnimators*>(targetSWT);
-        const auto currentParent = draggedEffect->getParentEffectAnimators();
+        const auto currentParent = draggedEffect->getParent<PathEffectAnimators>();
 
         if(currentParent != targetParent) {
             if(currentParent->isOutline()) {

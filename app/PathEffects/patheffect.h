@@ -29,15 +29,13 @@ public:
     virtual void apply(const qreal &relFrame,
                        const SkPath &src,
                        SkPath * const dst) = 0;
+    virtual bool hasReasonsNotToApplyUglyTransform();
+
     bool SWT_isPathEffect() const;
     QMimeData *SWT_createMimeData();
     void prp_startDragging();
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
-
-
-
-    virtual bool hasReasonsNotToApplyUglyTransform();
 
     const PathEffectType &getEffectType();
     void setIsOutlineEffect(const bool &bT);

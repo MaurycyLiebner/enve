@@ -372,8 +372,8 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 
 bool BoundingBox::shouldScheduleUpdate() {
     if(!mParentGroup) return false;
-    if((isVisibleAndInVisibleDurationRect()) ||
-            (isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame))) {
+    if(isVisibleAndInVisibleDurationRect() ||
+       isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame)) {
         return true;
     }
     return false;

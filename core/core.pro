@@ -106,7 +106,8 @@ SOURCES += \
     nodepointvalues.cpp \
     Animators/SmartPath/smartpathcollection.cpp \
     Animators/SmartPath/smartpathkey.cpp \
-    Animators/interpolationkeyt.cpp
+    Animators/interpolationkeyt.cpp \
+    Properties/boolproperty.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -172,7 +173,8 @@ HEADERS += \
     nodepointvalues.h \
     Animators/SmartPath/smartpathcollection.h \
     Animators/SmartPath/smartpathkey.h \
-    Animators/interpolationkeyt.h
+    Animators/interpolationkeyt.h \
+    Properties/boolproperty.h
 
 unix {
     target.path = /usr/lib

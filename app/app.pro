@@ -108,7 +108,6 @@ SOURCES += main.cpp\
     Sound/soundcomposition.cpp \
     Boxes/boundingboxrendercontainer.cpp \
     durationrectangle.cpp \
-    Properties/boolproperty.cpp \
     GUI/BoxesList/boolpropertywidget.cpp \
     Boxes/imagesequencebox.cpp \
     Boxes/rendercachehandler.cpp \
@@ -335,7 +334,6 @@ HEADERS  += \
     Sound/soundcomposition.h \
     Boxes/boundingboxrendercontainer.h \
     durationrectangle.h \
-    Properties/boolproperty.h \
     GUI/BoxesList/boolpropertywidget.h \
     Boxes/imagesequencebox.h \
     Boxes/rendercachehandler.h \
