@@ -28,9 +28,8 @@ public:
     void prp_openContextMenu(const QPoint &pos);
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
-        if(range.inRange(anim_mCurrentRelFrame)) {
+        if(range.inRange(anim_mCurrentRelFrame))
             updateBaseValueFromCurrentFrame();
-        }
         Animator::prp_updateAfterChangedRelFrameRange(range);
     }
 

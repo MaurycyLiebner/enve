@@ -63,12 +63,12 @@ public:
                                     QList<Key*>& keysList,
                                     const int &keyRectSize);
     virtual void anim_drawKeys(QPainter *p,
-                              const qreal &pixelsPerFrame,
-                              const qreal &drawY,
-                              const int &startFrame,
-                              const int &endFrame,
-                              const int &rowHeight,
-                              const int &keyRectSize);
+                               const qreal &pixelsPerFrame,
+                               const qreal &drawY,
+                               const int &startFrame,
+                               const int &endFrame,
+                               const int &rowHeight,
+                               const int &keyRectSize);
 
     virtual void anim_saveCurrentValueAsKey();
     virtual void anim_addKeyAtRelFrame(const int &relFrame);
@@ -87,7 +87,6 @@ public slots:
     virtual void anim_updateAfterShifted();
     virtual void anim_setRecording(const bool &rec);
 public:
-
     void anim_updateRelFrame();
     void anim_switchRecording();
 
@@ -110,6 +109,9 @@ public:
     T* anim_getPrevKey(const int &relFrame) const;
     template <class T = Key>
     T* anim_getNextKey(const int &relFrame) const;
+
+    int anim_getPrevKeyId(const int &relFrame) const;
+    int anim_getNextKeyId(const int &relFrame) const;
 
     int anim_getNextKeyRelFrame(const Key * const key) const;
     int anim_getPrevKeyRelFrame(const Key * const key) const;
@@ -197,14 +199,13 @@ signals:
     void anim_isRecordingChanged();
 private:
     void anim_setKeyOnCurrentFrame(Key * const key);
-    stdptr<Key> anim_mKeyOnCurrentFrame;
-
     int getInsertIdForKeyRelFrame(const int &relFrame,
                                   const int &min, const int &max) const;
     void anim_afterInsertedKey(const int &insertId,
                                Key * const insertedKey) const;
     void anim_afterRemovedKey(const int &removedId) const;
 
+    stdptr<Key> anim_mKeyOnCurrentFrame;
 };
 
 
@@ -215,24 +216,8 @@ T *Animator::anim_getKeyOnCurrentFrame() const {
 
 template <class T>
 T* Animator::anim_getKeyAtIndex(const int& id) const {
+    if(id < 0 || id >= anim_mKeys.count()) return nullptr;
     return static_cast<T*>(anim_mKeys.at(id).get());
-}
-
-template <class T>
-T *Animator::anim_getNextKey(const int &relFrame) const {
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        T * const key = anim_getKeyAtIndex<T>(nextId);
-        if(key->getRelFrame() > relFrame) {
-            return key;
-        } else if(key->getRelFrame() == relFrame) {
-            if(nextId + 1 < anim_mKeys.count()) {
-                return anim_getKeyAtIndex<T>(nextId + 1);
-            }
-        }
-    }
-    return nullptr;
 }
 
 template <class T>
@@ -263,17 +248,17 @@ T *Animator::anim_getKeyAtAbsFrame(const int &frame) const {
 }
 
 template <class T>
-T* Animator::anim_getNextKey(const Key * const key) const {
-    const int keyId = anim_getKeyIndex(key);
-    if(keyId == anim_mKeys.count() - 1) return nullptr;
-    return anim_mKeys.at(keyId + 1).get();
-}
-
-template <class T>
 T* Animator::anim_getPrevKey(const Key * const key) const {
     const int keyId = anim_getKeyIndex(key);
     if(keyId <= 0) return nullptr;
     return static_cast<T*>(anim_mKeys.at(keyId - 1).get());
+}
+
+template <class T>
+T* Animator::anim_getNextKey(const Key * const key) const {
+    const int keyId = anim_getKeyIndex(key);
+    if(keyId == anim_mKeys.count() - 1) return nullptr;
+    return anim_mKeys.at(keyId + 1).get();
 }
 
 template <class T>
@@ -302,21 +287,47 @@ std::pair<T*, T*> Animator::anim_getPrevAndNextKey(const int &relFrame) const {
     return result;
 }
 
-template <class T>
-T *Animator::anim_getPrevKey(const int &relFrame) const {
+int Animator::anim_getPrevKeyId(const int &relFrame) const {
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        T * const key = anim_getKeyAtIndex<T>(prevId);
+        Key * const key = anim_getKeyAtIndex(prevId);
         if(key->getRelFrame() < relFrame) {
-            return key;
+            return prevId;
         } else if(key->getRelFrame() == relFrame) {
             if(prevId > 0) {
-                return anim_getKeyAtIndex<T>(prevId - 1);
+                return prevId - 1;
             }
         }
     }
-    return nullptr;
+    return -1;
 }
+
+int Animator::anim_getNextKeyId(const int &relFrame) const {
+    int prevId;
+    int nextId;
+    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
+        Key * const key = anim_getKeyAtIndex(nextId);
+        if(key->getRelFrame() > relFrame) {
+            return nextId;
+        } else if(key->getRelFrame() == relFrame) {
+            if(nextId + 1 < anim_mKeys.count()) {
+                return nextId + 1;
+            }
+        }
+    }
+    return -1;
+}
+
+template <class T>
+T *Animator::anim_getPrevKey(const int &relFrame) const {
+    return anim_getKeyAtIndex<T>(anim_getPrevKeyId(relFrame));
+}
+
+template <class T>
+T *Animator::anim_getNextKey(const int &relFrame) const {
+    return anim_getKeyAtIndex<T>(anim_getNextKeyId(relFrame));
+}
+
 
 #endif // ANIMATOR_H

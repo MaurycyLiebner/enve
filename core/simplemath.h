@@ -81,7 +81,7 @@ extern qreal radiansBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
 
 extern qreal clamp(const qreal &val, const qreal &min, const qreal &max);
-
+extern int clamp(const int& val, const int& min, const int& max);
 extern qreal gRandF(const qreal &fMin = 0., const qreal &fMax = 1.);
 extern SkScalar gSkRandF(const SkScalar &fMin = 0.f, const SkScalar &fMax = 1.f);
 extern QPointF symmetricToPos(QPointF toMirror,

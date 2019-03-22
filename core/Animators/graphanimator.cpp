@@ -157,6 +157,17 @@ void GraphAnimator::graph_updateKeysPath() {
     }
 }
 
+void GraphAnimator::graph_updateKeysPath(const FrameRange &relFrameRange) {
+    const int prevKeyId = anim_getPrevKeyId(relFrameRange.fMin);
+    const int nextKeyId = anim_getNextKeyId(relFrameRange.fMax);
+
+    const int maxGraphPathId = graph_mKeyPaths.count() - 1;
+    const int firstGraphPath = clamp(prevKeyId - 1, 0, maxGraphPathId);
+    const int lastGraphPath = clamp(nextKeyId + 1, 0, maxGraphPathId);
+
+
+}
+
 void GraphAnimator::graph_constrainCtrlsFrameValues() {
     GraphKey *lastKey = nullptr;
     for(const auto &key : anim_mKeys) {

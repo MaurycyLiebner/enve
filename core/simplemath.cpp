@@ -30,6 +30,12 @@ qreal clamp(const qreal& val, const qreal& min, const qreal& max) {
     return val;
 }
 
+int clamp(const int& val, const int& min, const int& max) {
+    if(val > max) return max;
+    if(val < min) return min;
+    return val;
+}
+
 bool isZero4Dec(const float val) {
     return abs(val) < 0.0001f;
 }

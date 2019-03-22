@@ -5,9 +5,9 @@
 class GraphKey;
 enum QrealPointType : short;
 class GraphAnimator : public Animator {
-public:
+protected:
     GraphAnimator(const QString& name);
-
+public:
     void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_removeKey(const stdsptr<Key> &keyToRemove);
 
@@ -19,6 +19,8 @@ public:
             const int &startFrame, const int &endFrame) const;
     virtual qreal graph_clampGraphValue(const qreal &value) { return value; }
     virtual void graph_updateKeysPath();
+    virtual void graph_updateKeysPath(const FrameRange& relFrameRange);
+
     virtual void graph_constrainCtrlsFrameValues();
     bool SWT_isGraphAnimator() const { return true; }
 
@@ -80,6 +82,7 @@ public:
     void graph_getSelectedSegments(QList<QList<GraphKey*>> &segments);
 protected:
     QPainterPath graph_mKeysPath;
+    QList<QPainterPath> graph_mKeyPaths;
 private:
     void graph_getFrameConstraints(
             GraphKey *key, const QrealPointType& type,
