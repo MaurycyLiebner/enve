@@ -5,18 +5,12 @@
 #include "SkPathOps.h"
 #include "pointhelpers.h"
 
-void gApplyOperation(const int &relFrame, const SkPath &src,
-                     SkPath *dst, PathBox *srcBox,
-                     PathBox *dstBox, const QString &operation,
-                     const bool &groupSum) {
-    gApplyOperationF(relFrame, src, dst, srcBox,
-                    dstBox, operation, groupSum);
-}
-
-void gApplyOperationF(const qreal &relFrame, const SkPath &src,
-                      SkPath *dst, PathBox *srcBox,
-                      PathBox *dstBox, const QString &operation,
-                      const bool &groupSum) {
+void gApplyOperation(const qreal &relFrame,
+                     const SkPath &src,
+                     SkPath * const dst,
+                     PathBox * const srcBox,
+                     PathBox * const dstBox,
+                     const QString &operation) {
     if(!srcBox) {
         *dst = src;
         return;
@@ -26,11 +20,7 @@ void gApplyOperationF(const qreal &relFrame, const SkPath &src,
     qreal pathBoxRelFrame = srcBox->
             prp_absFrameToRelFrameF(absFrame);
     SkPath boxPath;
-    if(groupSum) {
-        boxPath = srcBox->getPathWithEffectsUntilGroupSumAtRelFrameF(pathBoxRelFrame);
-    } else {
-        boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrameF(pathBoxRelFrame);
-    }
+    boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrameF(pathBoxRelFrame);
     if(src.isEmpty()) {
         *dst = boxPath;
         return;
@@ -66,7 +56,9 @@ void gApplyOperationF(const qreal &relFrame, const SkPath &src,
     }
 }
 
-void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
+void gSolidify(const qreal &widthT,
+               const SkPath &src,
+               SkPath * const dst) {
     if(isZero4Dec(widthT)) {
         *dst = src;
         return;
@@ -79,37 +71,34 @@ void gSolidify(const qreal &widthT, const SkPath &src, SkPath *dst) {
     strokerSk.setCap(SkPaint::kRound_Cap);
     strokerSk.setWidth(static_cast<SkScalar>(aWidth2));
 
-
     SkPath src2 = gPathToPolyline(src);
     SkPath outline;
     strokerSk.strokePath(src2, &outline);
     SkPath result;
     Op(src2, outline, op, dst);
-    return;
 
-
-    SkOpBuilder builder;
-    builder.add(src, SkPathOp::kUnion_SkPathOp);
-    const auto func = [&builder, &strokerSk, &op](const qCubicSegment2D& seg) {
-        qCubicSegment2D segC = seg;
-        SkPath lineSeg;
-        lineSeg.moveTo(toSkPoint(seg.p0()));
-        if(!seg.isLine()) {
-            for(qreal len = 10; len < segC.length(); len += 10) {
-                lineSeg.lineTo(toSkPoint(segC.posAtLength(len)));
-            }
-        }
-        lineSeg.lineTo(toSkPoint(seg.p3()));
-        SkPath outline;
-        strokerSk.strokePath(lineSeg, &outline);
-        builder.add(outline, op);
-    };
-//    const auto func = [&builder, &strokerSk, &op](const SkPath& seg) {
+//    SkOpBuilder builder;
+//    builder.add(src, SkPathOp::kUnion_SkPathOp);
+//    const auto func = [&builder, &strokerSk, &op](const qCubicSegment2D& seg) {
+//        qCubicSegment2D segC = seg;
+//        SkPath lineSeg;
+//        lineSeg.moveTo(toSkPoint(seg.p0()));
+//        if(!seg.isLine()) {
+//            for(qreal len = 10; len < segC.length(); len += 10) {
+//                lineSeg.lineTo(toSkPoint(segC.posAtLength(len)));
+//            }
+//        }
+//        lineSeg.lineTo(toSkPoint(seg.p3()));
 //        SkPath outline;
-//        strokerSk.strokePath(seg, &outline);
+//        strokerSk.strokePath(lineSeg, &outline);
 //        builder.add(outline, op);
 //    };
-    gForEverySegmentInPath(src, func);
+////    const auto func = [&builder, &strokerSk, &op](const SkPath& seg) {
+////        SkPath outline;
+////        strokerSk.strokePath(seg, &outline);
+////        builder.add(outline, op);
+////    };
+//    gForEverySegmentInPath(src, func);
 
-    builder.resolve(dst);
+//    builder.resolve(dst);
 }

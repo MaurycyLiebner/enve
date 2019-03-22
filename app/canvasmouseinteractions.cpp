@@ -188,12 +188,6 @@ void Canvas::addSelectedBoxesActions(QMenu * const menu) {
             this->applySumPathEffectToSelected();
         });
 
-        if(hasGroups) {
-            pathEffectsMenu->addAction("Group Sum Effect", [this]() {
-                this->applyGroupSumPathEffectToSelected();
-            });
-        }
-
         QMenu * const fillPathEffectsMenu = menu->addMenu("Fill Effects");
 
         fillPathEffectsMenu->addAction("Displace Effect", [this]() {

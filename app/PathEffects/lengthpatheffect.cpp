@@ -15,10 +15,9 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mReverse);
 }
 
-void LengthPathEffect::filterPathForRelFrame(const qreal &relFrame,
-                                             const SkPath &src,
-                                             SkPath *dst,
-                                             const bool &) {
+void LengthPathEffect::apply(const qreal &relFrame,
+                             const SkPath &src,
+                             SkPath * const dst) {
     const qreal lenPer = mLength->getCurrentEffectiveValueAtRelFrame(relFrame);
     if(lenPer < 0.001) {
         dst->reset();

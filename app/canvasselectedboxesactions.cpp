@@ -192,14 +192,6 @@ void Canvas::applySumPathEffectToSelected() {
     }
 }
 
-void Canvas::applyGroupSumPathEffectToSelected() {
-    for(const auto &box : mSelectedBoxes) {
-        if(!box->SWT_isBoxesGroup()) continue;
-        auto groupBox = GetAsPtr(box, BoxesGroup);
-        box->addPathEffect(SPtrCreate(GroupLastPathSumPathEffect)(groupBox, false));
-    }
-}
-
 void Canvas::applyDiscreteFillPathEffectToSelected() {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isPathBox() || box->SWT_isBoxesGroup()) {

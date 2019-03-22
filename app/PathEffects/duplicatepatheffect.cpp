@@ -8,10 +8,9 @@ DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mTranslation);
 }
 
-void DuplicatePathEffect::filterPathForRelFrame(const qreal &relFrame,
-                                                 const SkPath &src,
-                                                 SkPath *dst,
-                                                 const bool &) {
+void DuplicatePathEffect::apply(const qreal &relFrame,
+                                const SkPath &src,
+                                SkPath * const dst) {
     *dst = src;
     dst->addPath(src,
                  mTranslation->getEffectiveXValueAtRelFrame(relFrame),

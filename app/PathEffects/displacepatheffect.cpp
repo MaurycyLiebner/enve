@@ -57,12 +57,12 @@ void perterb(PosAndTan& posAndTan, const qreal& dev) {
     posAndTan.fPos += displ;
 }
 
-void DisplacePathEffect::filterPathForRelFrame(const qreal &relFrame,
-                                               const SkPath &src,
-                                               SkPath *dst, const bool &) {
+void DisplacePathEffect::apply(const qreal &relFrame,
+                               const SkPath &src,
+                               SkPath * const dst) {
     qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
     mSeedAssist = qrand() % 999999;
-    int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+    const int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
     uint32_t nextSeed;
     if(mRepeat->getValue()) {
         if((qFloor(relFrame / randStep)) % 2 == 1) {
@@ -78,51 +78,9 @@ void DisplacePathEffect::filterPathForRelFrame(const qreal &relFrame,
 
     const qreal qMaxDev = mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame);
     const qreal qSegLen = mSegLength->qra_getEffectiveValueAtRelFrame(relFrame);
-    const qreal qSmooth = mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame);
+    const qreal qSmooth = mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame);    
 
     dst->reset();
-    auto cubicLists = CubicList::sMakeFromSkPath(src);
-    uint seedContourInc = 0;
-    for(auto& cubicList : cubicLists) {
-        SkPath path;
-        qsrand(mSeedAssist + seedContourInc++);
-        qreal currLen = 0.5*qSegLen;
-        const auto totalLen = cubicList.getTotalLength();
-        const int iMax = qFloor(totalLen/qSegLen);
-        const auto lastSegLenFrac = (totalLen - iMax*qSegLen)/qSegLen;
-        auto firstPosAndTan = cubicList.posAndTanAtLength(currLen);
-        perterb(firstPosAndTan, qMaxDev*gRandF());
-        auto prevPosAndTan = firstPosAndTan;
-        path.moveTo(toSkPoint(prevPosAndTan.fPos));
-        for(int i = 0; i <= iMax; i++) {
-            auto posAndTan = cubicList.posAndTanAtLength(currLen);
-            perterb(posAndTan, qMaxDev*gRandF());
-            if(i == iMax) {
-                const auto sq = lastSegLenFrac*lastSegLenFrac;
-                posAndTan.fPos = sq*posAndTan.fPos +
-                        (1 - sq)*firstPosAndTan.fPos;
-            }
-            const auto c1c2 = posAndTanToC1C2(prevPosAndTan,
-                                              posAndTan,
-                                              qSmooth);
-            path.cubicTo(toSkPoint(c1c2.first),
-                         toSkPoint(c1c2.second),
-                         toSkPoint(posAndTan.fPos));
-            prevPosAndTan = posAndTan;
-            currLen += qSegLen;
-        }
-        if(cubicList.isClosed()) {
-            const auto c1c2 = posAndTanToC1C2(prevPosAndTan,
-                                              firstPosAndTan,
-                                              qSmooth);
-            path.cubicTo(toSkPoint(c1c2.first),
-                         toSkPoint(c1c2.second),
-                         toSkPoint(firstPosAndTan.fPos));
-            path.close();
-        }
-        dst->addPath(path);
-    }
-    return;
 
     const SkScalar maxDev = toSkScalar(qMaxDev);
     const SkScalar segLen = toSkScalar(qSegLen);

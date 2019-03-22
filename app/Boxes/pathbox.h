@@ -218,7 +218,6 @@ public:
     GradientPoints *getStrokeGradientPoints();
 
     SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame);
-    SkPath getPathWithEffectsUntilGroupSumAtRelFrameF(const qreal &relFrame);
 
     PathEffectAnimators *getPathEffectsAnimators() {
         return mPathEffectsAnimators.data();

@@ -721,7 +721,8 @@ float randFloat() {
     return static_cast<float>(gRandF(-1, 1));
 }
 
-bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
+bool gDisplaceFilterPath(SkPath* const dst,
+                         const SkPath& src,
                          const SkScalar &maxDev,
                          const SkScalar &segLen,
                          const SkScalar &smoothness,
@@ -740,14 +741,14 @@ bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
             qsrand(seedAssist + seedContourInc);
             seedContourInc += 100;
             SkScalar length = meas.getLength();
-            if(segLen * 2 > length) {
-                meas.getSegment(0, length, dst, true);  // to short for us to mangle
-                continue;
-            }
-            int nTot = SkScalarCeilToInt(length / segLen);
+//            if(segLen * 2 > length) {
+//                meas.getSegment(0, length, dst, true);  // to short for us to mangle
+//                continue;
+//            }
+            const int nTot = SkScalarCeilToInt(length / segLen);
             int n = nTot;
             SkScalar distance = 0;
-            SkScalar remLen = segLen*nTot - length;
+            const SkScalar remLen = segLen*nTot - length;
             SkPoint firstP;
             if(meas.isClosed()) {
                 n--;
@@ -763,9 +764,8 @@ bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
                 distance += segLen;
                 if(meas.getPosTan(distance, &p, &v)) {
                     if(n == 0) {
-                        SkScalar scaleT = 1 - remLen/segLen;
+                        const SkScalar scaleT = 1 - remLen/segLen;
                         Perterb(&p, v, randFloat() * scale * scaleT);
-
                     } else {
                         Perterb(&p, v, randFloat() * scale);
                     }
@@ -778,7 +778,7 @@ bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
                 while(--n >= 0) {
                     if(meas.getPosTan(distance, &p, &v)) {
                         if(n == 0) {
-                            SkScalar scaleT = 1 - remLen/segLen;
+                            const SkScalar scaleT = 1 - remLen/segLen;
                             Perterb(&p, v, randFloat() * scale * scaleT);
                         } else {
                             Perterb(&p, v, randFloat() * scale);
@@ -805,13 +805,13 @@ bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
             qsrand(seedAssist + seedContourInc);
             seedContourInc += 100;
             const SkScalar length = meas.getLength();
-            if(segLen * 2 > length) {
-                meas.getSegment(0, length, dst, true);  // to short for us to mangle
-                continue;
-            }
+//            if(segLen * 2 > length) {
+//                meas.getSegment(0, length, dst, true);  // to short for us to mangle
+//                continue;
+//            }
             int nTot = SkScalarCeilToInt(length / segLen);
             int n = nTot;
-            SkScalar distance = 0.f;
+            SkScalar distance = 0;
             const SkScalar remLen = segLen*nTot - length;
             const SkScalar smoothLen = smoothness * segLen * 0.5f;
 
@@ -854,7 +854,7 @@ bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
                 distance += segLen;
                 if(meas.getPosTan(distance, &nextP, &v)) {
                     if(n == 0) {
-                        const SkScalar scaleT = 1.f - remLen/segLen;
+                        const SkScalar scaleT = 1 - remLen/segLen;
                         Perterb(&nextP, v, randFloat() * scale * scaleT);
 
                     } else {
@@ -881,7 +881,7 @@ bool gDisplaceFilterPath(SkPath* const dst, const SkPath& src,
                 while(--n >= 0) {
                     if(meas.getPosTan(distance, &nextP, &v)) {
                         if(n == 0) {
-                            const SkScalar scaleT = 1.f - remLen/segLen;
+                            const SkScalar scaleT = 1 - remLen/segLen;
                             Perterb(&nextP, v, randFloat() * scale * scaleT);
                         } else {
                             Perterb(&nextP, v, randFloat() * scale);

@@ -9,10 +9,9 @@ public:
     OperationPathEffect(PathBox *parentPath,
                         const bool &outlinePathEffect);
 
-    void filterPathForRelFrame(const qreal &relFrame,
-                                const SkPath &src,
-                                SkPath *dst,
-                                const bool &);
+    void apply(const qreal &relFrame,
+               const SkPath &src,
+               SkPath * const dst);
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);

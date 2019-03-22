@@ -77,57 +77,29 @@ bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
     return true;
 }
 
-void PathEffectAnimators::filterPathForRelFrameBeforeThicknessF(
-                                                const qreal &relFrame,
+void PathEffectAnimators::applyBeforeThicknessF(const qreal &relFrame,
                                                 SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
     for(const auto& effect : ca_mChildAnimators) {
-        PathEffect *effectT = GetAsPtr(effect, PathEffect);
+        const auto& effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() && effectT->isVisible()) {
             SkPath srcPath = dstPath;
-            effectT->filterPathForRelFrame(relFrame,
-                                           srcPath,
-                                           &dstPath, false);
+            effectT->apply(relFrame, srcPath, &dstPath);
         }
     }
     *srcDstPath = dstPath;
 }
 
-void PathEffectAnimators::filterPathForRelFrame(const qreal &relFrame,
-                                                SkPath *srcDstPath,
-                                                const bool &groupPathSum) {
+void PathEffectAnimators::apply(const qreal &relFrame,
+                                SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
     for(const auto& effect : ca_mChildAnimators) {
-        PathEffect *effectT = GetAsPtr(effect, PathEffect);
+        const auto& effectT = GetAsPtr(effect, PathEffect);
         if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
             continue;
         }
         SkPath srcPath = dstPath;
-        effectT->filterPathForRelFrame(relFrame,
-                                       srcPath,
-                                       &dstPath,
-                                       groupPathSum);
-    }
-    *srcDstPath = dstPath;
-}
-
-void PathEffectAnimators::filterPathForRelFrameUntilGroupSumF(
-                        const qreal &relFrame,
-                        SkPath *srcDstPath) {
-    SkPath dstPath = *srcDstPath;
-    for(const auto& effect : ca_mChildAnimators) {
-        PathEffect *effectT = GetAsPtr(effect, PathEffect);
-        if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
-            continue;
-        }
-        if(effectT->getEffectType() == GROUP_SUM_PATH_EFFECT) {
-            break;
-        }
-        SkPath srcPath = dstPath;
-        effectT->filterPathForRelFrame(relFrame,
-                                       srcPath,
-                                       &dstPath,
-                                       false);
+        effectT->apply(relFrame, srcPath, &dstPath);
     }
     *srcDstPath = dstPath;
 }

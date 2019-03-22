@@ -28,39 +28,35 @@ typedef PropertyMimeData<PathEffect,
 
 class PathEffect : public ComplexAnimator {
     Q_OBJECT
-public:
+protected:
     PathEffect(const QString& name,
                const PathEffectType &type,
                const bool &outlinePathEffect);
+public:
+    virtual void apply(const qreal &relFrame,
+                       const SkPath &src,
+                       SkPath * const dst) = 0;
+    bool SWT_isPathEffect() const;
+    QMimeData *SWT_createMimeData();
+    void prp_startDragging();
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
+
+
+
+    virtual bool hasReasonsNotToApplyUglyTransform();
 
     const PathEffectType &getEffectType();
+    void setIsOutlineEffect(const bool &bT);
 
-    virtual void filterPathForRelFrame(const qreal &,
-                                       const SkPath &,
-                                       SkPath *,
-                                       const bool &) = 0;
-    virtual void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void switchVisible();
+    void setVisible(const bool &bT);
+    const bool &isVisible() const;
 
     bool applyBeforeThickness();
     void setParentEffectAnimators(PathEffectAnimators *parent);
 
     PathEffectAnimators *getParentEffectAnimators();
-
-    QMimeData *SWT_createMimeData();
-
-    bool SWT_isPathEffect() const;
-
-    void setIsOutlineEffect(const bool &bT);
-
-    void switchVisible();
-
-    void setVisible(const bool &bT);
-
-    const bool &isVisible() const;
-
-    virtual bool hasReasonsNotToApplyUglyTransform();
-    void prp_startDragging();
 protected:
     bool mVisible = true;
     bool mOutlineEffect = false;

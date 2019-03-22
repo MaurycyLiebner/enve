@@ -188,11 +188,10 @@ public:
                                                      const int &relFrame2) const;
     void updateAllChildPathBoxes(const UpdateReason &reason);
 
-    void filterPathForRelFrame(const qreal &relFrame,
-                               SkPath * const srcDstPath,
-                               BoundingBox * const box);
-    void filterPathForRelFrameUntilGroupSum(const qreal &relFrame,
-                                            SkPath * const srcDstPath);
+    void applyPathEffects(const qreal &relFrame,
+               SkPath * const srcDstPath,
+               BoundingBox * const box);
+
     void filterOutlinePathBeforeThicknessForRelFrame(const qreal &relFrame,
                                                      SkPath * const srcDstPath);
     void filterOutlinePathForRelFrame(const qreal &relFrame,
@@ -203,7 +202,6 @@ public:
 //                                 int &nextRelFrame);
 //    bool anim_prevRelFrameWithKey(const int &relFrame,
 //                                 int &prevRelFrame);
-    bool enabledGroupPathSumEffectPresent();
     int abstractionIdToBoxId(const int& absId) const {
         if(absId < ca_getNumberOfChildren()) return -1;
         const int revId = absId - ca_getNumberOfChildren();

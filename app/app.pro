@@ -163,7 +163,6 @@ SOURCES += main.cpp\
     PathEffects/duplicatepatheffect.cpp \
     PathEffects/solidifypatheffect.cpp \
     PathEffects/operationpatheffect.cpp \
-    PathEffects/grouplastpathsumpatheffect.cpp \
     PixmapEffects/blureffect.cpp \
     PixmapEffects/shadoweffect.cpp \
     PixmapEffects/lineseffect.cpp \
@@ -392,7 +391,6 @@ HEADERS  += \
     PathEffects/duplicatepatheffect.h \
     PathEffects/solidifypatheffect.h \
     PathEffects/operationpatheffect.h \
-    PathEffects/grouplastpathsumpatheffect.h \
     PixmapEffects/blureffect.h \
     PixmapEffects/shadoweffect.h \
     PixmapEffects/lineseffect.h \

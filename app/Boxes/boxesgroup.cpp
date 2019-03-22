@@ -213,39 +213,26 @@ void BoxesGroup::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
     }
 }
 
-void BoxesGroup::filterPathForRelFrame(const qreal &relFrame,
-                                       SkPath * const srcDstPath,
-                                       BoundingBox * const box) {
+void BoxesGroup::applyPathEffects(const qreal &relFrame,
+                                  SkPath * const srcDstPath,
+                                  BoundingBox * const box) {
     if(mParentGroup) {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         const qreal parentRelFrame =
                 mParentGroup->prp_absFrameToRelFrameF(absFrame);
-        mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
+        mParentGroup->applyPathEffects(parentRelFrame, srcDstPath, box);
     }
-    mPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath,
-                                                 box == this);
+    mPathEffectsAnimators->apply(relFrame, srcDstPath);
 
 //    if(!mParentGroup) return;
 //    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
 //                prp_relFrameToAbsFrameF(relFrame));
-//    mParentGroup->filterPathForRelFrame(parentRelFrame, srcDstPath, box);
-}
-
-void BoxesGroup::filterPathForRelFrameUntilGroupSum(const qreal &relFrame,
-                                                    SkPath * const srcDstPath) {
-    mPathEffectsAnimators->filterPathForRelFrameUntilGroupSumF(relFrame,
-                                                              srcDstPath);
-
-    if(!mParentGroup) return;
-    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    const qreal parentRelFrame =
-            mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->filterPathForRelFrameUntilGroupSum(parentRelFrame, srcDstPath);
+//    mParentGroup->apply(parentRelFrame, srcDstPath, box);
 }
 
 void BoxesGroup::filterOutlinePathBeforeThicknessForRelFrame(
         const qreal &relFrame, SkPath * const srcDstPath) {
-    mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThicknessF(relFrame,
+    mOutlinePathEffectsAnimators->applyBeforeThicknessF(relFrame,
                                                                        srcDstPath);
     if(!mParentGroup) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -266,7 +253,7 @@ bool BoxesGroup::isLastPathBox(PathBox * const pathBox) {
 
 void BoxesGroup::filterOutlinePathForRelFrame(const qreal &relFrame,
                                               SkPath * const srcDstPath) {
-    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
+    mOutlinePathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
@@ -275,18 +262,11 @@ void BoxesGroup::filterOutlinePathForRelFrame(const qreal &relFrame,
 
 void BoxesGroup::filterFillPathForRelFrame(const qreal &relFrame,
                                            SkPath * const srcDstPath) {
-    mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, srcDstPath);
+    mFillPathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
     qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterFillPathForRelFrame(parentRelFrame, srcDstPath);
-}
-
-bool BoxesGroup::enabledGroupPathSumEffectPresent() {
-    for(const auto& effect : mGroupPathSumEffects) {
-        if(effect->isVisible()) return true;
-    }
-    return false;
 }
 
 void BoxesGroup::prp_setParentFrameShift(const int &shift,
@@ -541,45 +521,14 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
     groupData->fOtherGlobalRects.clear();
     qreal childrenEffectsMargin = 0;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    if(enabledGroupPathSumEffectPresent()) {
-        int idT = 0;
-        qsptr<PathBox> lastPathBox;
-        for(const auto& box : mContainedBoxes) {
-            const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-            if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                if(box->SWT_isPathBox()) {
-                    idT = groupData->fChildrenRenderData.count();
-                    lastPathBox = GetAsSPtr(box, PathBox);
-                    continue;
-                }
-                processChildData(box.data(), groupData.get(), boxRelFrame);
+    for(const auto& box : mContainedBoxes) {
+        const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
+        if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
+            processChildData(box.data(), groupData.get(), boxRelFrame);
 
-                childrenEffectsMargin =
-                        qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
-                             childrenEffectsMargin);
-            }
-        }
-        if(lastPathBox) {
-            const qreal boxRelFrame = lastPathBox->prp_absFrameToRelFrameF(absFrame);
-            const auto boxRenderData = SPtrCreate(PathBoxRenderData)(this);
-            lastPathBox->setupBoundingBoxRenderDataForRelFrameF(
-                boxRelFrame, boxRenderData.get());
-            boxRenderData->scheduleTask();
-            boxRenderData->addDependent(data);
-            groupData->fChildrenRenderData.insert(idT,
-                    GetAsSPtr(boxRenderData, BoundingBoxRenderData));
-            boxRenderData->fParentBox = nullptr;
-        }
-    } else {
-        for(const auto& box : mContainedBoxes) {
-            const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-            if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
-                processChildData(box.data(), groupData.get(), boxRelFrame);
-
-                childrenEffectsMargin =
-                        qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
-                             childrenEffectsMargin);
-            }
+            childrenEffectsMargin =
+                    qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
+                         childrenEffectsMargin);
         }
     }
 

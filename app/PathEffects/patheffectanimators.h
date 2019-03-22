@@ -14,15 +14,12 @@ public:
 
     bool SWT_isPathEffectAnimators() const;
 
-    void filterPathForRelFrameBeforeThickness(const int &relFrame,
+    void applyBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath,
                                               const qreal &scale = 1.);
-    void filterPathForRelFrame(const qreal &relFrame,
-                               SkPath *srcDstPath,
-                               const bool &groupPathSum = false);
-    void filterPathForRelFrameUntilGroupSumF(const qreal &relFrame,
-                                            SkPath *srcDstPath);
-    void filterPathForRelFrameBeforeThicknessF(const qreal &relFrame,
+    void apply(const qreal &relFrame,
+                SkPath *srcDstPath);
+    void applyBeforeThicknessF(const qreal &relFrame,
                                               SkPath *srcDstPath);
 
 

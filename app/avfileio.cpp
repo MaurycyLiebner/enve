@@ -843,13 +843,8 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
         pathEffect =
                 SPtrCreate(DuplicatePathEffect)(mIsOutline);
     } else if(typeT == SUM_PATH_EFFECT) {
-        pathEffect =
-                SPtrCreate(OperationPathEffect)(
+        pathEffect = SPtrCreate(OperationPathEffect)(
                     GetAsPtr(mParentBox, PathBox), mIsOutline);
-    } else if(typeT == GROUP_SUM_PATH_EFFECT) {
-        pathEffect =
-                SPtrCreate(GroupLastPathSumPathEffect)(
-                    GetAsPtr(mParentBox, BoxesGroup), mIsOutline);
     } else if(typeT == LENGTH_PATH_EFFECT) {
         pathEffect = SPtrCreate(LengthPathEffect)(mIsOutline);
     } else if(typeT == SOLIDIFY_PATH_EFFECT) {
