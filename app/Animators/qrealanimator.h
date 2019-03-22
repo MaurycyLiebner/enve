@@ -114,7 +114,8 @@ protected:
                   const qreal &prefferdStep,
                   const QString& name);
 private:
-    void saveCurrentValueToKey(QrealKey *key);
+    qreal calculateBaseValueAtRelFrame(const qreal &frame) const;
+    void saveCurrentValueToKey(QrealKey * const key);
     QrealKey *getQrealKeyAtId(const int &id) const;
 
     bool mGraphMinMaxValuesFixed = false;
