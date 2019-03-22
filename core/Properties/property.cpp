@@ -109,22 +109,3 @@ void Property::graphScheduleUpdateAfterKeysChanged() {
 void Property::setParent(ComplexAnimator * const parent) {
     mParent = parent;
 }
-
-template <class T>
-T *Property::getParent() const {
-    return static_cast<T*>(mParent);
-}
-
-template <class T>
-T *Property::getFirstAncestor(bool (Property::*tester)() const) const {
-    if(!mParent) return nullptr;
-    if((mParent->*tester)()) return static_cast<T*>(mParent.data());
-    return static_cast<T*>(mParent->getFirstAncestor(tester));
-}
-
-template <class T>
-T *Property::getFirstAncestor(bool (*tester)(const Property*)) const {
-    if(!mParent) return nullptr;
-    if(tester(mParent)) return static_cast<T*>(mParent.data());
-    return static_cast<T*>(mParent->getFirstAncestor(tester));
-}

@@ -263,7 +263,6 @@ void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
         mPathEffectsAnimators->SWT_show();
     }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(mPathEffectsAnimators.data());
 
     setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
@@ -278,7 +277,6 @@ void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
         mFillPathEffectsAnimators->SWT_show();
     }
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
 
     setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
@@ -293,7 +291,6 @@ void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
         mOutlinePathEffectsAnimators->SWT_show();
     }
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
 
     setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();

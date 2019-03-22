@@ -757,7 +757,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         } else {
                             auto effectTarget = GetAsSPtr(target, PathEffect);
                             const auto parentAnimators =
-                                    effectTarget->getParentEffectAnimators();
+                                    effectTarget->getParent<PathEffectAnimators>();
                             if(parentAnimators->isOutline()) {
                                 parentAnimators->getParentBox()->
                                         removeOutlinePathEffect(effectTarget);

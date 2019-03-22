@@ -4,7 +4,6 @@
 #include "skia/skiaincludes.h"
 class BoolProperty;
 class PathBox;
-class PathEffectAnimators;
 enum PathEffectType : short {
     DISPLACE_PATH_EFFECT,
     DASH_PATH_EFFECT,
@@ -45,15 +44,11 @@ public:
     const bool &isVisible() const;
 
     bool applyBeforeThickness();
-    void setParentEffectAnimators(PathEffectAnimators *parent);
-
-    PathEffectAnimators *getParentEffectAnimators();
 protected:
     bool mVisible = true;
     bool mOutlineEffect = false;
     PathEffectType mPathEffectType;
     qsptr<BoolProperty> mApplyBeforeThickness;
-    qptr<PathEffectAnimators> mParentEffectAnimators;
 };
 
 #endif // PATHEFFECT_H

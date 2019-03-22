@@ -124,7 +124,6 @@ void BoxesGroup::addPathEffect(const qsptr<PathEffect>& effect) {
         mGroupPathSumEffects << effect;
     }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(mPathEffectsAnimators.data());
 
     prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
@@ -139,7 +138,6 @@ void BoxesGroup::addFillPathEffect(const qsptr<PathEffect>& effect) {
         mFillPathEffectsAnimators->SWT_show();
     }
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
 
     prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
@@ -154,7 +152,6 @@ void BoxesGroup::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
         mOutlinePathEffectsAnimators->SWT_show();
     }
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
 
     prp_updateInfluenceRangeAfterChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);

@@ -2,7 +2,6 @@
 #include "pointhelpers.h"
 #include "pathoperations.h"
 #include "skia/skqtconversions.h"
-#include "patheffectanimators.h"
 #include "Properties/boolproperty.h"
 #include <QDrag>
 
@@ -29,14 +28,6 @@ const PathEffectType &PathEffect::getEffectType() {
 bool PathEffect::applyBeforeThickness() {
     if(!mApplyBeforeThickness) return false;
     return mApplyBeforeThickness->getValue();
-}
-
-void PathEffect::setParentEffectAnimators(PathEffectAnimators *parent) {
-    mParentEffectAnimators = parent;
-}
-
-PathEffectAnimators *PathEffect::getParentEffectAnimators() {
-    return mParentEffectAnimators.data();
 }
 
 QMimeData *PathEffect::SWT_createMimeData() {
