@@ -17,7 +17,7 @@ class SmartVectorPath : public PathBox {
 public:
     SmartVectorPath();
 
-    void drawSelectedSk(SkCanvas *canvas,
+    void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 

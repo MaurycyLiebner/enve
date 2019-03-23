@@ -135,20 +135,13 @@ QRectF PaintBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
                   mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
 }
 
-void PaintBox::drawSelectedSk(SkCanvas *canvas,
+void PaintBox::drawCanvasControls(SkCanvas * const canvas,
                               const CanvasMode &currentCanvasMode,
                               const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        drawBoundingRectSk(canvas, invScale);
-        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mTopLeftPoint->drawSk(canvas, invScale);
-            mBottomRightPoint->drawSk(canvas, invScale);
-        } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->
-                    drawSk(canvas, invScale);
-        }
-        canvas->restore();
+    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+        mTopLeftPoint->drawSk(canvas, invScale);
+        mBottomRightPoint->drawSk(canvas, invScale);
     }
 }
 
@@ -250,17 +243,17 @@ void PaintBox::scheduleFinishSizeSetup() {
     mFinishSizeSetupScheduled = true;
 }
 
-void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+void PaintBox::drawPixmapSk(SkCanvas * const canvas,
+                            SkPaint * const paint,
                             GrContext* const grContext) {
     canvas->saveLayer(nullptr, paint);
     BoundingBox::drawPixmapSk(canvas, nullptr, grContext);
     if(mTemporaryHandler) {
-        canvas->concat(
-                toSkMatrix(
-                    mTransformAnimator->getCombinedTransform()) );
-        QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
+        const auto combinedTrans = mTransformAnimator->getCombinedTransform();
+        canvas->concat(toSkMatrix(combinedTrans));
+        const QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
                     anim_getCurrentRelFrame());
-        SkPoint transkSk = toSkPoint(trans);
+        const SkPoint transkSk = toSkPoint(trans);
         canvas->translate(transkSk.x(), transkSk.y());
         mTemporaryHandler->drawSk(canvas, paint);
     }

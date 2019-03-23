@@ -267,7 +267,7 @@ public:
     bool relPointInsidePath(const QPointF &relPos) const;
 
     void addEmitter(const qsptr<ParticleEmitter> &emitter);
-    void drawSelectedSk(SkCanvas *canvas,
+    void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
     void startAllPointsTransform();

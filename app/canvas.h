@@ -399,9 +399,6 @@ public:
     void makeSegmentLine();
     void makeSegmentCurve();
 
-    void drawSelectedSk(SkCanvas *canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                              const CanvasMode &currentMode,
                              const qreal &canvasScaleInv);

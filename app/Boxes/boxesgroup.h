@@ -109,9 +109,7 @@ public:
                       GrContext * const grContext);
 
     bool SWT_isBoxesGroup() const;
-    void drawSelectedSk(SkCanvas *canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
+
     void anim_setAbsFrame(const int &frame);
 
     stdsptr<BoundingBoxRenderData> createRenderData();

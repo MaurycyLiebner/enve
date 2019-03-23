@@ -49,7 +49,8 @@ public:
 
     void finishSizeSetup();
     bool SWT_isPaintBox() const { return true; }
-    void drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+    void drawPixmapSk(SkCanvas * const canvas,
+                      SkPaint * const paint,
                       GrContext * const grContext);
     void scheduleWaitingTasks();
     void renderDataFinished(BoundingBoxRenderData *renderData);
@@ -94,7 +95,7 @@ public:
                                            QList<stdptr<MovablePoint>>& list);
     QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
-    void drawSelectedSk(SkCanvas *canvas,
+    void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
     void startAllPointsTransform();

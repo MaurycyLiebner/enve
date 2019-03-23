@@ -70,20 +70,13 @@ PathBox::~PathBox() {
         mStrokeSettings->getGradient()->removePath(this);
 }
 
-void PathBox::drawSelectedSk(SkCanvas *canvas,
+void PathBox::drawCanvasControls(SkCanvas * const canvas,
                              const CanvasMode &currentCanvasMode,
                              const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        drawBoundingRectSk(canvas, invScale);
-        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
-            mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
-        } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->
-                    drawSk(canvas, invScale);
-        }
-        canvas->restore();
+    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+        mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
+        mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
     }
 }
 
@@ -247,9 +240,9 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
     return pointToReturn;
 }
 
-void PathBox::drawBoundingRectSk(SkCanvas *canvas,
+void PathBox::drawBoundingRect(SkCanvas * const canvas,
                                  const SkScalar &invScale) {
-    BoundingBox::drawBoundingRectSk(canvas, invScale);
+    BoundingBox::drawBoundingRect(canvas, invScale);
     drawAsBoundingRectSk(canvas, mEditPathSk, invScale, false);
 }
 

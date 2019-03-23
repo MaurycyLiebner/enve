@@ -49,25 +49,18 @@ NormalSegment SmartVectorPath::getNormalSegment(
     return mHandler.getNormalSegmentAtAbsPos(absPos, canvasScaleInv);
 }
 
-void SmartVectorPath::drawSelectedSk(SkCanvas *canvas,
+void SmartVectorPath::drawCanvasControls(SkCanvas * const canvas,
                               const CanvasMode &currentCanvasMode,
                               const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        drawBoundingRectSk(canvas, invScale);
-        mHandler.drawPoints(canvas,
-                            currentCanvasMode,
-                            invScale,
-                            toSkMatrix(getCombinedTransform()));
-        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
-            mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
-        } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->
-                    drawSk(canvas, invScale);
-        }
-        canvas->restore();
+    mHandler.drawPoints(canvas,
+                        currentCanvasMode,
+                        invScale,
+                        toSkMatrix(getCombinedTransform()));
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+        mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
+        mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
     }
+    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
 }
 
 MovablePoint *SmartVectorPath::getPointAtAbsPos(const QPointF &absPtPos,

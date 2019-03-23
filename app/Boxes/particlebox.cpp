@@ -122,24 +122,17 @@ void ParticleBox::startAllPointsTransform() {
     startTransform();
 }
 
-void ParticleBox::drawSelectedSk(SkCanvas *canvas,
-                                 const CanvasMode &currentCanvasMode,
-                                 const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        drawBoundingRectSk(canvas, invScale);
-        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mTopLeftPoint->drawSk(canvas, invScale);
-            mBottomRightPoint->drawSk(canvas, invScale);
-            for(const auto& emitter : mEmitters) {
-                MovablePoint *pt = emitter->getPosPoint();
-                pt->drawSk(canvas, invScale);
-            }
-        } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->
-                    drawSk(canvas, invScale);
+void ParticleBox::drawCanvasControls(SkCanvas * const canvas,
+                                     const CanvasMode &currentCanvasMode,
+                                     const SkScalar &invScale) {
+    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+        mTopLeftPoint->drawSk(canvas, invScale);
+        mBottomRightPoint->drawSk(canvas, invScale);
+        for(const auto& emitter : mEmitters) {
+            MovablePoint * const pt = emitter->getPosPoint();
+            pt->drawSk(canvas, invScale);
         }
-        canvas->restore();
     }
 }
 

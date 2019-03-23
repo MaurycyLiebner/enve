@@ -122,7 +122,7 @@ public:
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
-    void drawSelectedSk(SkCanvas *canvas,
+    void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
     void addPathEffect(const qsptr<PathEffect> &effect);
@@ -184,7 +184,7 @@ public:
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
 
-    void drawBoundingRectSk(SkCanvas *canvas,
+    void drawBoundingRect(SkCanvas * const canvas,
                             const SkScalar &invScale);
 
     bool SWT_isPathBox() const { return true; }

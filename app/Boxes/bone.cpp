@@ -40,7 +40,7 @@ void BonesBox::removeBone(const qsptr<Bone>& bone) {
     ca_removeChildAnimator(bone);
 }
 
-void BonesBox::drawPixmapSk(SkCanvas *canvas,
+void BonesBox::drawPixmapSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
     Q_UNUSED(grContext);
     for(const auto& bone : mBones) {
@@ -48,22 +48,19 @@ void BonesBox::drawPixmapSk(SkCanvas *canvas,
     }
 }
 
-void BonesBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+void BonesBox::drawPixmapSk(SkCanvas * const canvas,
+                            SkPaint * const paint,
                             GrContext* const grContext) {
     Q_UNUSED(paint);
     drawPixmapSk(canvas, grContext);
 }
 
-void BonesBox::drawSelectedSk(SkCanvas *canvas,
-                              const CanvasMode &currentCanvasMode,
-                              const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        BoundingBox::drawSelectedSk(canvas, currentCanvasMode, invScale);
-        for(const auto& bone : mBones) {
-            bone->drawSelectedSk(canvas, currentCanvasMode, invScale);
-        }
-        canvas->restore();
+void BonesBox::drawCanvasControls(SkCanvas * const canvas,
+                                  const CanvasMode &currentCanvasMode,
+                                  const SkScalar &invScale) {
+    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
+    for(const auto& bone : mBones) {
+        bone->drawOnCanvas(canvas, currentCanvasMode, invScale);
     }
 }
 
@@ -266,7 +263,7 @@ SkPath Bone::getCurrentRelPath() {
     return path;
 }
 
-void Bone::drawOnCanvas(SkCanvas *canvas) {
+void Bone::drawOnCanvas(SkCanvas * const canvas) {
     if(!mConnectedToParent) {
         QPointF rootAbs = mRootPt->getAbsolutePos();
         QPointF parentTipAbs = mParentBone->getTipPt()->getAbsolutePos();
@@ -371,9 +368,9 @@ MovablePoint *Bone::getPointAtAbsPos(const QPointF &absPtPos,
     return pointToReturn;
 }
 
-void Bone::drawSelectedSk(SkCanvas *canvas,
-                          const CanvasMode &currentCanvasMode,
-                          const SkScalar &invScale) {
+void Bone::drawOnCanvas(SkCanvas * const canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale) {
     canvas->save();
     if(mSelected) {
         SkPath path = getCurrentRelPath();
@@ -393,7 +390,7 @@ void Bone::drawSelectedSk(SkCanvas *canvas,
         mTipPt->drawSk(canvas, invScale);
     }
     for(const auto& boneT : mChildBones) {
-        boneT->drawSelectedSk(canvas, currentCanvasMode, invScale);
+        boneT->drawOnCanvas(canvas, currentCanvasMode, invScale);
     }
     canvas->restore();
 }

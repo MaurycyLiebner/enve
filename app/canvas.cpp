@@ -146,13 +146,6 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
                                                SWT_TARGET_CURRENT_GROUP);
 }
 
-void Canvas::drawSelectedSk(SkCanvas *canvas,
-                            const CanvasMode &currentCanvasMode,
-                            const SkScalar &invScale) {
-    for(const auto& box : mSelectedBoxes) {
-        box->drawSelectedSk(canvas, currentCanvasMode, invScale);
-    }
-}
 #include "Boxes/bone.h"
 void Canvas::updateHoveredBox() {
     mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
@@ -227,20 +220,20 @@ void Canvas::drawTransparencyMesh(SkCanvas *canvas,
 
 void Canvas::renderSk(SkCanvas * const canvas,
                       GrContext* const grContext) {
-    SkRect viewRect = toSkRect(getPixBoundingRect());
+    const SkRect viewRect = toSkRect(getPixBoundingRect());
 
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kFill_Style);
     canvas->clear(SK_ColorBLACK);
 
+    const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {
         drawTransparencyMesh(canvas, viewRect);
         if(mCurrentPreviewContainer) {
             canvas->save();
 
             canvas->concat(toSkMatrix(mCanvasTransformMatrix));
-            SkScalar reversedRes = static_cast<SkScalar>(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
 
@@ -271,15 +264,18 @@ void Canvas::renderSk(SkCanvas * const canvas,
         canvas->concat(toSkMatrix(mCanvasTransformMatrix));
         if(drawCanvas) {
             canvas->save();
-            const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
             canvas->restore();
         }
 
-        SkScalar invZoom = static_cast<SkScalar>(1/mCanvasTransformMatrix.m11());
-        mCurrentBoxesGroup->drawSelectedSk(canvas, mCurrentMode, invZoom);
-        drawSelectedSk(canvas, mCurrentMode, invZoom);
+        const qreal qInvZoom = 1/mCanvasTransformMatrix.m11();
+        const SkScalar invZoom = toSkScalar(qInvZoom);
+        mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
+        for(const auto& box : mSelectedBoxes) {
+            box->drawBoundingRect(canvas, invZoom);
+            box->drawCanvasControls(canvas, mCurrentMode, invZoom);
+        }
 
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
@@ -288,8 +284,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
                 mRotPivot->drawSk(canvas, invZoom);
                 paint.setStyle(SkPaint::kStroke_Style);
                 paint.setColor(SK_ColorBLACK);
-                SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
-                                         MIN_WIDGET_HEIGHT*0.25f*invZoom};
+                const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
+                                               MIN_WIDGET_HEIGHT*0.25f*invZoom};
                 paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
                 canvas->drawLine(toSkPoint(mRotPivot->getAbsolutePos()),
                                  toSkPoint(mLastMouseEventPosRel),
@@ -303,17 +299,17 @@ void Canvas::renderSk(SkCanvas * const canvas,
         if(mSelecting) {
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setColor(SkColorSetARGB(255, 0, 0, 255));
-            paint.setStrokeWidth(2.f*invZoom);
-            SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
-                                     MIN_WIDGET_HEIGHT*0.25f*invZoom};
+            paint.setStrokeWidth(2*invZoom);
+            const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
+                                           MIN_WIDGET_HEIGHT*0.25f*invZoom};
             paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
             canvas->drawRect(toSkRect(mSelectionRect), paint);
             paint.setPathEffect(nullptr);
         }
 
-        if(mHoveredPoint_d != nullptr) {
+        if(mHoveredPoint_d) {
             mHoveredPoint_d->drawHovered(canvas, invZoom);
-        } else if(mHoveredEdge_d != nullptr) {
+        } else if(mHoveredEdge_d) {
             mHoveredEdge_d->drawHoveredSk(canvas, invZoom);
         } else if(mHoveredBone) {
             mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invZoom);
@@ -326,7 +322,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
         if(!mClipToCanvasSize) {
             paint.setStyle(SkPaint::kStroke_Style);
-            paint.setStrokeWidth(2.);
+            paint.setStrokeWidth(2);
             paint.setColor(SK_ColorBLACK);
             canvas->drawRect(viewRect.makeInset(1, 1),
                              paint);

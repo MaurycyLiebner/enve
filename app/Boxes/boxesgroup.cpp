@@ -539,27 +539,13 @@ void BoxesGroup::drawPixmapSk(SkCanvas * const canvas,
         BoundingBox::drawPixmapSk(canvas, grContext);
     } else {
         SkPaint paint;
-        int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
+        const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
         paint.setAlpha(static_cast<U8CPU>(intAlpha));
         paint.setBlendMode(mBlendModeSk);
         canvas->saveLayer(nullptr, &paint);
         for(const auto& box : mContainedBoxes) {
             //box->draw(p);
             box->drawPixmapSk(canvas, grContext);
-        }
-        canvas->restore();
-    }
-}
-
-void BoxesGroup::drawSelectedSk(SkCanvas *canvas,
-                                 const CanvasMode &currentCanvasMode,
-                                 const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        drawBoundingRectSk(canvas, invScale);
-        if(currentCanvasMode == MOVE_PATH && !mIsCurrentGroup) {
-            mTransformAnimator->getPivotMovablePoint()->
-                    drawSk(canvas, invScale);
         }
         canvas->restore();
     }

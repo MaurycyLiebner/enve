@@ -130,14 +130,15 @@ public:
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
                               GrContext* const grContext);
-    virtual void drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+    virtual void drawPixmapSk(SkCanvas * const canvas,
+                              SkPaint * const paint,
                               GrContext* const grContext);
-    virtual void drawSelectedSk(SkCanvas *canvas,
+    virtual void drawCanvasControls(SkCanvas * const canvas,
                                 const CanvasMode &currentCanvasMode,
                                 const SkScalar &invScale);
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const SkScalar &invScale);
-    virtual void drawBoundingRectSk(SkCanvas *canvas,
+    virtual void drawBoundingRect(SkCanvas * const canvas,
                                     const SkScalar &invScale);
 
     virtual const SkPath &getRelBoundingRectPath();

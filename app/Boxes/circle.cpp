@@ -77,24 +77,17 @@ void Circle::setRadius(const qreal &radius) {
     setVerticalRadius(radius);
 }
 
-void Circle::drawSelectedSk(SkCanvas *canvas,
+void Circle::drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode &currentCanvasMode,
                             const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        drawBoundingRectSk(canvas, invScale);
-        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mCenterPoint->drawSk(canvas, invScale);
-            mHorizontalRadiusPoint->drawSk(canvas, invScale);
-            mVerticalRadiusPoint->drawSk(canvas, invScale);
+    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+        mCenterPoint->drawSk(canvas, invScale);
+        mHorizontalRadiusPoint->drawSk(canvas, invScale);
+        mVerticalRadiusPoint->drawSk(canvas, invScale);
 
-            mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
-            mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
-        } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->
-                    drawSk(canvas, invScale);
-        }
-        canvas->restore();
+        mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
+        mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
     }
 }
 

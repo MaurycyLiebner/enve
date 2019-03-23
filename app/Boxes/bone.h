@@ -15,7 +15,7 @@ public:
 
     SkPath getCurrentRelPath();
 
-    void drawOnCanvas(SkCanvas *canvas);
+    void drawOnCanvas(SkCanvas * const canvas);
 
     const QPointF &getRootRelPos();
     const QPointF &getTipRelPos();
@@ -43,9 +43,9 @@ public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const qreal &canvasScaleInv);
 
-    void drawSelectedSk(SkCanvas *canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
+    void drawOnCanvas(SkCanvas * const canvas,
+                      const CanvasMode &currentCanvasMode,
+                      const SkScalar &invScale);
 
     void addChildBone(const qsptr<Bone> &child);
 
@@ -154,10 +154,10 @@ protected:
 class BonesBox : public BoundingBox {
     friend class SelfRef;
 public:
-    void drawPixmapSk(SkCanvas *canvas, GrContext * const grContext);
-    void drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+    void drawPixmapSk(SkCanvas * const canvas, GrContext * const grContext);
+    void drawPixmapSk(SkCanvas * const canvas, SkPaint * const paint,
                       GrContext* const grContext);
-    void drawSelectedSk(SkCanvas *canvas,
+    void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 

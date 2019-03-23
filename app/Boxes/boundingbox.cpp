@@ -177,17 +177,11 @@ void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
     prp_updateAfterChangedAbsFrameRange(visRange);
 }
 
-void BoundingBox::drawSelectedSk(SkCanvas *canvas,
-                                 const CanvasMode &currentCanvasMode,
-                                 const SkScalar &invScale) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        canvas->save();
-        drawBoundingRectSk(canvas, invScale);
-        if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->
-                    drawSk(canvas, invScale);
-        }
-        canvas->restore();
+void BoundingBox::drawCanvasControls(SkCanvas * const canvas,
+                                     const CanvasMode &currentCanvasMode,
+                                     const SkScalar &invScale) {
+    if(currentCanvasMode == MOVE_PATH) {
+        mTransformAnimator->getPivotMovablePoint()->drawSk(canvas, invScale);
     }
 }
 
@@ -198,7 +192,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
         canvas->save();
 
         SkPaint paint;
-        int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
+        const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
         paint.setAlpha(static_cast<U8CPU>(intAlpha));
         paint.setBlendMode(mBlendModeSk);
         //paint.setFilterQuality(kHigh_SkFilterQuality);
@@ -207,7 +201,8 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     }
 }
 
-void BoundingBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
+void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
+                               SkPaint * const paint,
                                GrContext* const grContext) {
     if(mTransformAnimator->getOpacity() < 0.001) { return; }
     //paint->setFilterQuality(kHigh_SkFilterQuality);
@@ -516,8 +511,8 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
     canvas->restore();
 }
 
-void BoundingBox::drawBoundingRectSk(SkCanvas *canvas,
-                                     const SkScalar &invScale) {
+void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
+                                   const SkScalar &invScale) {
     drawAsBoundingRectSk(canvas, mSkRelBoundingRectPath,
                          invScale, true);
 }

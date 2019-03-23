@@ -63,7 +63,7 @@ public:
                                            QList<stdptr<MovablePoint>> &list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
-    void drawSelectedSk(SkCanvas *canvas,
+    void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 

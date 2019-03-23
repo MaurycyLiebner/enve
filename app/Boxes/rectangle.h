@@ -9,7 +9,7 @@ public:
     void moveSizePointByAbs(const QPointF &absTrans);
     void startAllPointsTransform();
 
-    void drawSelectedSk(SkCanvas *canvas,
+    void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 
