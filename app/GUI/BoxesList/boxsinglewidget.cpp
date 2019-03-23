@@ -884,19 +884,16 @@ void BoxSingleWidget::rename() {
     }
 }
 
-void BoxSingleWidget::drawKeys(QPainter *p, const qreal &pixelsPerFrame,
-                               const int &containerTop,
-                               const int &minViewedFrame,
-                               const int &maxViewedFrame) {
+void BoxSingleWidget::drawKeys(QPainter * const p,
+                               const qreal &pixelsPerFrame,
+                               const FrameRange &viewedFrames) {
     if(isHidden()) return;
     auto target = mTarget->getTarget();
     Q_ASSERT(target);
     if(target->SWT_isAnimator()) {
-        Animator *anim_target = static_cast<Animator*>(target);
-        anim_target->anim_drawKeys(p, pixelsPerFrame,
-                                  containerTop,
-                                  minViewedFrame, maxViewedFrame,
-                                  MIN_WIDGET_HEIGHT, KEY_RECT_SIZE);
+        const auto anim_target = static_cast<Animator*>(target);
+        anim_target->drawTimelineControls(p, pixelsPerFrame, viewedFrames,
+                                          MIN_WIDGET_HEIGHT);
     }
 }
 

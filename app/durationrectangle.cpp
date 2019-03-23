@@ -151,12 +151,13 @@ int DurationRectangle::getMaxFrameAsAbsFrame() const {
 void DurationRectangle::draw(QPainter * const p,
                              const QRect& drawRect,
                              const qreal &pixelsPerFrame,
-                             const int &startFrame,
-                             const int &endFrame) {
+                             const FrameRange &absFrameRange) {
     p->save();
 
-    const int firstRelDrawFrame = qMax(startFrame, getMinFrame()) - startFrame;
-    const int lastRelDrawFrame = qMin(endFrame, getMaxFrame()) - startFrame;
+    const int firstRelDrawFrame = qMax(absFrameRange.fMin, getMinFrame()) -
+            absFrameRange.fMin;
+    const int lastRelDrawFrame = qMin(absFrameRange.fMax, getMaxFrame()) -
+            absFrameRange.fMin;
     const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
 
     QRect durRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
@@ -335,21 +336,20 @@ int AnimationRect::getAnimationFrameDuration() {
 void AnimationRect::draw(QPainter * const p,
                          const QRect& drawRect,
                          const qreal &pixelsPerFrame,
-                         const int &startFrame,
-                         const int &endFrame) {
+                         const FrameRange &absFrameRange) {
     p->save();
 
     const int firstRelDrawFrame =
-            qMax(startFrame, getMinAnimationFrame()) - startFrame;
+            qMax(absFrameRange.fMin, getMinAnimationFrame()) - absFrameRange.fMin;
     const int lastRelDrawFrame =
-            qMin(endFrame, getMaxAnimationFrame()) - startFrame;
+            qMin(absFrameRange.fMax, getMaxAnimationFrame()) - absFrameRange.fMin;
     const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
     QRect animDurRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
                       qCeil(drawFrameSpan*pixelsPerFrame), drawRect.height());
 
     p->fillRect(animDurRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
 
-    DurationRectangle::draw(p, drawRect, pixelsPerFrame, startFrame, endFrame);
+    DurationRectangle::draw(p, drawRect, pixelsPerFrame, absFrameRange);
     p->restore();
 }
 

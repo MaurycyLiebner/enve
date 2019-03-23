@@ -139,8 +139,7 @@ public:
     virtual void draw(QPainter * const p,
                       const QRect &drawRect,
                       const qreal &pixelsPerFrame,
-                      const int &startFrame,
-                      const int &endFrame);
+                      const FrameRange &absFrameRange);
 
     virtual DurationRectangleMovable *getMovableAt(
                       const int &pressX,
@@ -185,8 +184,7 @@ public:
     void draw(QPainter * const p,
               const QRect &drawRect,
               const qreal &pixelsPerFrame,
-              const int &startFrame,
-              const int &endFrame);
+              const FrameRange &absFrameRange);
 
     virtual int getMinAnimationFrame() const = 0;
     virtual int getMaxAnimationFrame() const = 0;

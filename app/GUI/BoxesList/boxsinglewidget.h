@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
+#include "framerange.h"
 class QrealAnimatorValueSlider;
 class DurationRectangleMovable;
 class Key;
@@ -39,11 +40,9 @@ public:
     static void clearStaticPixmaps();
 
     void rename();
-    void drawKeys(QPainter *p,
+    void drawKeys(QPainter * const p,
                   const qreal &pixelsPerFrame,
-                  const int &containerTop,
-                  const int &minViewedFrame,
-                  const int &maxViewedFrame);
+                  const FrameRange &viewedFrames);
     Key *getKeyAtPos(const int &pressX,
                      const qreal &pixelsPerFrame,
                      const int &minViewedFrame);

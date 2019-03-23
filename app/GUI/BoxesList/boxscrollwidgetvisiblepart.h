@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "singlewidgettarget.h"
+#include "framerange.h"
 
 class BoxSingleWidget;
 class DurationRectangleMovable;
@@ -17,10 +18,9 @@ public:
 
     QWidget *createNewSingleWidget();
     void paintEvent(QPaintEvent *);
-    void drawKeys(QPainter *p,
+    void drawKeys(QPainter * const p,
                   const qreal &pixelsPerFrame,
-                  const int &minViewedFrame,
-                  const int &maxViewedFrame);
+                  const FrameRange &viewedFrameRange);
     Key *getKeyAtPos(const int &pressX,
                           const int &pressY,
                           const qreal &pixelsPerFrame,

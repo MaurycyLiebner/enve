@@ -27,6 +27,7 @@ public:
         CHILD_USER_CHANGE,
         PARENT_USER_CHANGE
     };
+    virtual void anim_saveCurrentValueAsKey() = 0;
 
     virtual void anim_scaleTime(const int &pivotAbsFrame,
                                 const qreal &scale);
@@ -58,15 +59,11 @@ public:
                                     const qreal &pixelsPerFrame,
                                     QList<Key*>& keysList,
                                     const int &keyRectSize);
-    virtual void anim_drawKeys(QPainter *p,
-                               const qreal &pixelsPerFrame,
-                               const qreal &drawY,
-                               const int &startFrame,
-                               const int &endFrame,
-                               const int &rowHeight,
-                               const int &keyRectSize);
+    void drawTimelineControls(QPainter * const p,
+                              const qreal &pixelsPerFrame,
+                              const FrameRange &absFrameRange,
+                              const int &rowHeight);
 
-    virtual void anim_saveCurrentValueAsKey();
     virtual void anim_addKeyAtRelFrame(const int &relFrame);
     bool SWT_isAnimator() const;
     void prp_startDragging();
@@ -179,14 +176,10 @@ protected:
     QList<stdptr<Key>> anim_mSelectedKeys;
     qsptr<FakeComplexAnimator> mFakeComplexAnimator;
 private:
-    void sortSelectedKeys();
-
     void anim_drawKey(QPainter * const p, Key * const key,
                       const qreal &pixelsPerFrame,
-                      const qreal &drawY,
                       const int &startFrame,
-                      const int& rowHeight,
-                      const int& keyRectSize);
+                      const int& rowHeight);
 
     bool anim_mIsRecording = false;
 

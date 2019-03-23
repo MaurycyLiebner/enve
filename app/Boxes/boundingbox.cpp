@@ -1038,26 +1038,21 @@ DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
                                             minViewedFrame);
 }
 
-void BoundingBox::anim_drawKeys(QPainter *p,
-                               const qreal &pixelsPerFrame,
-                               const qreal &drawY,
-                               const int &startFrame,
-                               const int &endFrame,
-                               const int &rowHeight,
-                               const int &keyRectSize) {
+void BoundingBox::drawTimelineControls(QPainter * const p,
+                                       const qreal &pixelsPerFrame,
+                                       const FrameRange &absFrameRange,
+                                       const int &rowHeight) {
     if(mDurationRectangle) {
         p->save();
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
-        QRect drawRect(0, drawY, (endFrame - startFrame)*pixelsPerFrame,
-                       rowHeight);
-        mDurationRectangle->draw(p, drawRect, pixelsPerFrame,
-                                 startFrame, endFrame);
+        const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
+        const QRect drawRect(0, 0, width, rowHeight);
+        mDurationRectangle->draw(p, drawRect, pixelsPerFrame, absFrameRange);
         p->restore();
     }
 
-    Animator::anim_drawKeys(p, pixelsPerFrame, drawY,
-                           startFrame, endFrame,
-                           rowHeight, keyRectSize);
+    Animator::drawTimelineControls(p, pixelsPerFrame,
+                                   absFrameRange, rowHeight);
 }
 
 void BoundingBox::addPathEffect(const qsptr<PathEffect> &) {}

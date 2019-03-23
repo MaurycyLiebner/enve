@@ -18,26 +18,21 @@ SingleSound::SingleSound(const QString &path,
     setFilePath(path);
 }
 
-void SingleSound::anim_drawKeys(QPainter *p,
-                               const qreal &pixelsPerFrame,
-                               const qreal &drawY,
-                               const int &startFrame,
-                               const int &endFrame,
-                               const int &rowHeight,
-                               const int &keyRectSize) {
+void SingleSound::drawTimelineControls(QPainter * const p,
+                                       const qreal &pixelsPerFrame,
+                                       const FrameRange &absFrameRange,
+                                       const int &rowHeight) {
 //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
 //    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
 //    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
 //    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
 //                frameWidth*pixelsPerFrame - pixelsPerFrame,
 //                BOX_HEIGHT, QColor(0, 0, 255, 125));
-    QRect drawRect(0, drawY, (endFrame - startFrame)*pixelsPerFrame,
-                   rowHeight);
-    mDurationRectangle->draw(p, drawRect,pixelsPerFrame,
-                             startFrame, endFrame);
-    ComplexAnimator::anim_drawKeys(p, pixelsPerFrame, drawY,
-                                  startFrame, endFrame,
-                                  rowHeight, keyRectSize);
+    const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
+    const QRect drawRect(0, 0, width, rowHeight);
+    mDurationRectangle->draw(p, drawRect, pixelsPerFrame, absFrameRange);
+    ComplexAnimator::drawTimelineControls(p, pixelsPerFrame,
+                                          absFrameRange, rowHeight);
 }
 
 FixedLenAnimationRect *SingleSound::getDurationRect() {

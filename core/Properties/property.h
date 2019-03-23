@@ -67,6 +67,17 @@ public:
     virtual int prp_getRelFrameShift() const {
         return 0;
     }
+
+    virtual void drawTimelineControls(QPainter * const p,
+                                      const qreal &pixelsPerFrame,
+                                      const FrameRange &absFrameRange,
+                                      const int &rowHeight) {
+        Q_UNUSED(p);
+        Q_UNUSED(pixelsPerFrame);
+        Q_UNUSED(absFrameRange);
+        Q_UNUSED(rowHeight);
+    }
+
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 

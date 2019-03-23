@@ -335,7 +335,7 @@ void KeysView::paintEvent(QPaintEvent *) {
 
     if(!mGraphViewed) {    
         int currY = MIN_WIDGET_HEIGHT;
-        p.setPen(QPen(QColor(40, 40, 40), 1.));
+        p.setPen(QPen(QColor(40, 40, 40), 1));
         while(currY < height()) {
             p.drawLine(0, currY, width(), currY);
 
@@ -344,7 +344,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     }
     p.translate(MIN_WIDGET_HEIGHT/2, 0);
 
-    p.setPen(QPen(QColor(75, 75, 75), 1.));
+    p.setPen(QPen(QColor(75, 75, 75), 1));
     qreal xT = mPixelsPerFrame*0.5;
     int iInc = 1;
     bool mult5 = true;
@@ -364,21 +364,21 @@ void KeysView::paintEvent(QPaintEvent *) {
 //    }
     minFrame += ceil((-xT)/mPixelsPerFrame);
     minFrame = minFrame - minFrame%iInc - 1;
-    maxFrame += floor((width() - 40. - xT)/mPixelsPerFrame) - maxFrame%iInc;
+    maxFrame += floor((width() - 40 - xT)/mPixelsPerFrame) - maxFrame%iInc;
     for(int i = minFrame; i <= maxFrame; i += iInc) {
         const qreal xTT = xT + (i - mMinViewedFrame + 1)*mPixelsPerFrame;
-        p.drawLine(QPointF(xTT, 0.), QPointF(xTT, height()) );
+        p.drawLine(QPointF(xTT, 0), QPointF(xTT, height()) );
     }
 
     if(mMainWindow->getCurrentFrame() <= maxFrame &&
        mMainWindow->getCurrentFrame() >= minFrame) {
         xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
                 mPixelsPerFrame*0.5;
-        p.setPen(QPen(Qt::darkGray, 2.));
-        p.drawLine(QPointF(xT, 0.), QPointF(xT, height()) );
+        p.setPen(QPen(Qt::darkGray, 2));
+        p.drawLine(QPointF(xT, 0), QPointF(xT, height()) );
     }
 
-    p.setPen(QPen(Qt::black, 1.));
+    p.setPen(QPen(Qt::black, 1));
 
     if(mGraphViewed) {
         p.save();
@@ -390,14 +390,13 @@ void KeysView::paintEvent(QPaintEvent *) {
         const qreal transDFrame = 0.5*MIN_WIDGET_HEIGHT/mPixelsPerFrame;
         const qreal frameAtZeroX = mMinViewedFrame - transDFrame;
         const int frameAtZeroXi = qFloor(frameAtZeroX);
-        p.translate((frameAtZeroXi - mMinViewedFrame)*mPixelsPerFrame, 0.);
-        mBoxesListVisible->drawKeys(&p,
-                                    mPixelsPerFrame,
-                                    frameAtZeroXi,
-                                    qCeil(mMaxViewedFrame + 2*transDFrame));
+        p.translate((frameAtZeroXi - mMinViewedFrame)*mPixelsPerFrame, 0);
+        const int maxFrame = qCeil(mMaxViewedFrame + 2*transDFrame);
+        const FrameRange viewedFrameRange{frameAtZeroXi, maxFrame};
+        mBoxesListVisible->drawKeys(&p, mPixelsPerFrame, viewedFrameRange);
         p.restore();
         if(mSelecting) {
-            p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
+            p.setPen(QPen(Qt::blue, 2, Qt::DotLine));
             p.setBrush(Qt::NoBrush);
             p.drawRect(QRectF((mSelectionRect.x() - mMinViewedFrame)*mPixelsPerFrame,
                               mSelectionRect.y() - mViewedTop,
@@ -410,7 +409,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     mValueInput.draw(&p, height() - MIN_WIDGET_HEIGHT);
     if(hasFocus() ) {
         p.setBrush(Qt::NoBrush);
-        p.setPen(QPen(Qt::red, 4.));
+        p.setPen(QPen(Qt::red, 4));
         p.drawRect(0, 0,
                    width(), height());
     }

@@ -21,13 +21,10 @@ public:
     void prepareFinalData(const float &fps,
                           const int &minAbsFrame,
                           const int &maxAbsFrame);
-    void anim_drawKeys(QPainter *p,
-                      const qreal &pixelsPerFrame,
-                      const qreal &drawY,
-                      const int &startFrame,
-                      const int &endFrame,
-                      const int &rowHeight,
-                      const int &keyRectSize);
+    void drawTimelineControls(QPainter * const p,
+                              const qreal &pixelsPerFrame,
+                              const FrameRange &absFrameRange,
+                              const int &rowHeight);
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
             const int &relX, const int &minViewedFrame,
             const qreal &pixelsPerFrame);

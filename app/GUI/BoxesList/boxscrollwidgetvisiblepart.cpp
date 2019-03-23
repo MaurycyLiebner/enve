@@ -47,17 +47,17 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
     p.end();
 }
 
-void BoxScrollWidgetVisiblePart::drawKeys(QPainter *p,
+void BoxScrollWidgetVisiblePart::drawKeys(QPainter * const p,
                                           const qreal &pixelsPerFrame,
-                                          const int &minViewedFrame,
-                                          const int &maxViewedFrame) {
-    //p->setPen(QPen(Qt::black, 1));
+                                          const FrameRange &viewedFrameRange) {
+    p->save();
     p->setPen(Qt::NoPen);
     for(const auto& container : mSingleWidgets) {
         const auto bsw = static_cast<BoxSingleWidget*>(container);
-        bsw->drawKeys(p, pixelsPerFrame, container->y(),
-                      minViewedFrame, maxViewedFrame);
+        bsw->drawKeys(p, pixelsPerFrame, viewedFrameRange);
+        p->translate(0, container->height());
     }
+    p->restore();
 }
 
 Key *BoxScrollWidgetVisiblePart::getKeyAtPos(

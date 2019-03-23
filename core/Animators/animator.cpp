@@ -17,14 +17,13 @@ void Animator::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
 
 void Animator::anim_shiftAllKeys(const int &shift) {
     for(const auto &key : anim_mKeys) {
-        anim_moveKeyToRelFrame(key.get(),
-                               key->getRelFrame() + shift);
+        anim_moveKeyToRelFrame(key.get(), key->getRelFrame() + shift);
     }
 }
 
 bool Animator::anim_nextRelFrameWithKey(const int &relFrame,
                                        int &nextRelFrame) {
-    Key *key = anim_getNextKey(relFrame);
+    const auto key = anim_getNextKey(relFrame);
     if(!key) return false;
     nextRelFrame = key->getRelFrame();
     return true;
@@ -32,7 +31,7 @@ bool Animator::anim_nextRelFrameWithKey(const int &relFrame,
 
 bool Animator::anim_prevRelFrameWithKey(const int &relFrame,
                                        int &prevRelFrame) {
-    Key *key = anim_getPrevKey(relFrame);
+    const auto key = anim_getPrevKey(relFrame);
     if(!key) return false;
     prevRelFrame = key->getRelFrame();
     return true;
@@ -104,7 +103,7 @@ void Animator::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     emit prp_absFrameRangeChanged(range);
 }
 
-void Animator::anim_updateAfterChangedKey(Key *key) {
+void Animator::anim_updateAfterChangedKey(Key * const key) {
     if(SWT_isComplexAnimator()) return;
     if(!key) {
         prp_updateInfluenceRangeAfterChanged();
@@ -202,8 +201,6 @@ bool Animator::anim_hasNextKey(const Key * const key) {
     if(keyId < anim_mKeys.count() - 1) return true;
     return false;
 }
-
-void Animator::anim_saveCurrentValueAsKey() {}
 
 void Animator::anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
 
@@ -525,36 +522,29 @@ FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
 void Animator::anim_drawKey(QPainter * const p,
                             Key * const key,
                             const qreal &pixelsPerFrame,
-                            const qreal &drawY,
                             const int &startFrame,
-                            const int &rowHeight,
-                            const int &keyRectSize) {
+                            const int &rowHeight) {
     if(key->isSelected()) p->setBrush(Qt::yellow);
     else p->setBrush(Qt::red);
     if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
     else p->setPen(QPen(Qt::black, 0.5));
-    const qreal keyRadius = keyRectSize * (SWT_isComplexAnimator() ? 0.35 : 0.5);
+    const qreal keyRadius = rowHeight * (SWT_isComplexAnimator() ? 0.21 : 0.3);
     const int frameRelToStart = key->getRelFrame() - startFrame;
     const QPointF keyCenter((frameRelToStart + 0.5)*pixelsPerFrame,
-                            drawY + 0.5*rowHeight);
+                            0.5*rowHeight);
     p->drawEllipse(keyCenter, keyRadius, keyRadius);
 }
 
-void Animator::anim_drawKeys(QPainter *p,
-                             const qreal &pixelsPerFrame,
-                             const qreal &drawY,
-                             const int &startFrame,
-                             const int &endFrame,
-                             const int &rowHeight,
-                             const int &keyRectSize) {
+void Animator::drawTimelineControls(QPainter * const p,
+                                    const qreal &pixelsPerFrame,
+                                    const FrameRange &absFrameRange,
+                                    const int &rowHeight) {
     p->save();
-    p->translate(prp_getFrameShift()*pixelsPerFrame, 0.);
+    p->translate(prp_getFrameShift()*pixelsPerFrame, 0);
     for(const auto &key : anim_mKeys) {
-        if(key->getAbsFrame() >= startFrame &&
-           key->getAbsFrame() <= endFrame) {
+        if(absFrameRange.inRange(key->getAbsFrame())) {
             anim_drawKey(p, key.get(), pixelsPerFrame,
-                         drawY, startFrame,
-                         rowHeight, keyRectSize);
+                         absFrameRange.fMin, rowHeight);
         }
     }
     p->restore();
@@ -573,12 +563,6 @@ void Animator::addKeyToSelected(Key *key) {
 void Animator::removeKeyFromSelected(Key *key) {
     key->setSelected(false);
     anim_mSelectedKeys.removeOne(key);
-}
-
-void Animator::sortSelectedKeys() {
-//    std::sort(anim_mSelectedKeys.begin(),
-//              anim_mSelectedKeys.end(),
-//              keysFrameSort);
 }
 
 void Animator::deselectAllKeys() {

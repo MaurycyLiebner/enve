@@ -10,22 +10,17 @@ Property *FakeComplexAnimator::getTarget() {
     return mTarget;
 }
 
-void FakeComplexAnimator::anim_drawKeys(QPainter *p,
-                                       const qreal &pixelsPerFrame,
-                                       const qreal &drawY,
-                                       const int &startFrame,
-                                       const int &endFrame,
-                                       const int &rowHeight,
-                                       const int &keyRectSize) {
+void FakeComplexAnimator::drawTimelineControls(QPainter * const p,
+                                               const qreal &pixelsPerFrame,
+                                               const FrameRange &absFrameRange,
+                                               const int &rowHeight) {
     if(mTarget->SWT_isAnimator()) {
         const auto aTarget = GetAsPtr(mTarget, Animator);
-        aTarget->anim_drawKeys(p, pixelsPerFrame, drawY,
-                              startFrame, endFrame,
-                              rowHeight, keyRectSize);
+        aTarget->drawTimelineControls(p, pixelsPerFrame,
+                                      absFrameRange, rowHeight);
     }
-    ComplexAnimator::anim_drawKeys(p, pixelsPerFrame, drawY,
-                                  startFrame, endFrame,
-                                  rowHeight, keyRectSize);
+    ComplexAnimator::drawTimelineControls(p, pixelsPerFrame,
+                                          absFrameRange, rowHeight);
 }
 
 Key *FakeComplexAnimator::anim_getKeyAtPos(const qreal &relX,
