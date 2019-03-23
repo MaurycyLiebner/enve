@@ -466,9 +466,9 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             newerSate = currentRenderData->fBoxStateId <
                     renderData->fBoxStateId;
             const int finishedFrameDist =
-                    qAbs(anim_mCurrentRelFrame - renderData->fRelFrame);
+                    qAbs(anim_getCurrentRelFrame() - renderData->fRelFrame);
             const int oldFrameDist =
-                    qAbs(anim_mCurrentRelFrame - currentRenderData->fRelFrame);
+                    qAbs(anim_getCurrentRelFrame() - currentRenderData->fRelFrame);
             closerFrame = finishedFrameDist < oldFrameDist;
         }
         if(newerSate || closerFrame) {
@@ -476,7 +476,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             const bool currentState =
                     renderData->fBoxStateId == mStateId;
             const bool currentFrame =
-                    renderData->fRelFrame == anim_mCurrentRelFrame;
+                    renderData->fRelFrame == anim_getCurrentRelFrame();
             mDrawRenderContainer->setExpired(!currentState || !currentFrame);
             mCurrentPreviewContainerOutdated =
                     mDrawRenderContainer->isExpired();
@@ -489,13 +489,13 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
-    if(range.inRange(anim_mCurrentAbsFrame)) {
+    if(range.inRange(anim_getCurrentAbsFrame())) {
         mCurrentPreviewContainerOutdated = true;
     }
     mCacheHandler.clearCacheForRelFrameRange(
                 prp_absRangeToRelRange(range));
     Property::prp_updateAfterChangedAbsFrameRange(range);
-    auto rangeT = prp_getIdenticalRelFrameRange(anim_mCurrentRelFrame);
+    auto rangeT = prp_getIdenticalRelFrameRange(anim_getCurrentRelFrame());
     if(range.overlaps(rangeT)) scheduleUpdate(Animator::USER_CHANGE);
 }
 
@@ -798,11 +798,11 @@ void Canvas::invertSelectionAction() {
 }
 
 void Canvas::anim_setAbsFrame(const int &frame) {
-    if(frame == anim_mCurrentAbsFrame) return;
-    int lastRelFrame = anim_mCurrentRelFrame;
+    if(frame == anim_getCurrentAbsFrame()) return;
+    int lastRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
     ImageCacheContainer * const cont =
-            mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
+            mCacheHandler.getRenderContainerAtRelFrame(anim_getCurrentRelFrame());
     if(cont) {
         if(cont->storesDataInMemory()) { // !!!
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
@@ -813,7 +813,7 @@ void Canvas::anim_setAbsFrame(const int &frame) {
     } else {
         const bool difference =
                 prp_differencesBetweenRelFrames(lastRelFrame,
-                                                anim_mCurrentRelFrame);
+                                                anim_getCurrentRelFrame());
         if(difference) {
             mCurrentPreviewContainerOutdated = true;
         }
@@ -1091,7 +1091,7 @@ void Canvas::setIsCurrentCanvas(const bool &bT) {
 }
 
 int Canvas::getCurrentFrame() {
-    return anim_mCurrentAbsFrame;
+    return anim_getCurrentAbsFrame();
 }
 
 int Canvas::getFrameCount() {

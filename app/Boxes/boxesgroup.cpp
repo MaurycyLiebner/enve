@@ -721,7 +721,7 @@ void BoxesGroup::addContainedBoxToListAt(
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(
                 child.get(), boxIdToAbstractionId(index));
-    child->anim_setAbsFrame(anim_mCurrentAbsFrame);
+    child->anim_setAbsFrame(anim_getCurrentAbsFrame());
 
     child->prp_updateInfluenceRangeAfterChanged();
 

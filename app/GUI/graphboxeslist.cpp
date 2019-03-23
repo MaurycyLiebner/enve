@@ -133,9 +133,10 @@ void KeysView::graphPaint(QPainter *p) {
     transform.scale(mPixelsPerFrame, -mPixelsPerValUnit);
     p->setTransform(QTransform(transform), true);
 
+    const FrameRange viewedRange = {mMinViewedFrame, mMaxViewedFrame};
     for(int i = 0; i < mGraphAnimators.count(); i++) {
         const QColor &col = ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
-        mGraphAnimators.at(i)->graph_drawKeysPath(p, col);
+        mGraphAnimators.at(i)->graph_drawKeysPath(p, col, viewedRange);
     }
     p->setRenderHint(QPainter::Antialiasing, false);
 
@@ -399,13 +400,8 @@ void KeysView::graphDeletePressed() {
             Q_ASSERT(false);
         }
         key->afterKeyChanged();
-        key->getParentAnimator<GraphAnimator>()->graph_updateKeysPath();
     } else {
         deleteSelectedKeys();
-
-        for(const auto& anim : mGraphAnimators) {
-            anim->graph_updateKeysPath();
-        }
     }
     mPressedPoint = nullptr;
 }
@@ -449,9 +445,6 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
             qreal clamedValue = clamp(value, mMinMoveVal, mMaxMoveVal);
             mPressedPoint->moveTo(clampedFrame, clamedValue);
-        }
-        for(const auto& anim : mGraphAnimators) {
-            anim->graph_updateKeysPath();
         }
     }
     mFirstMove = false;
@@ -570,7 +563,6 @@ void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
     animator->graph_incSelectedForGraph();
     updateAnimatorsColors();
     graphUpdateDimensions();
-    animator->graph_updateKeysPath();
     graphResetValueScaleAndMinShown();
 
     mMainWindow->queScheduledTasksAndUpdate();
@@ -608,7 +600,6 @@ void KeysView::graphUpdateAfterKeysChangedIfNeeded() {
 void KeysView::graphUpdateAfterKeysChanged() {
     for(const auto& anim : mGraphAnimators) {
         anim->anim_sortKeys();
-        anim->graph_updateKeysPath();
     }
     graphResetValueScaleAndMinShown();
     graphUpdateDimensions();

@@ -247,7 +247,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
 void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
     text = text.remove(" %");
-    qreal res = clamp(text.toDouble(), 1, 200)/100;
+    const qreal res = clamp(text.toDouble(), 1, 200)/100;
     mMainWindow->setResolutionFractionValue(res);
 }
 

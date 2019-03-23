@@ -198,7 +198,7 @@ void PaintBox::finishSizeSetup() {
     mHeight = heightT;
     if(!mMainHandler) {
         mMainHandler = SPtrCreate(AnimatedSurface)(mWidth, mHeight, 1., this);
-        mMainHandler->setCurrentRelFrame(anim_mCurrentRelFrame);
+        mMainHandler->setCurrentRelFrame(anim_getCurrentRelFrame());
         ca_addChildAnimator(mMainHandler);
     } else {
         mMainHandler->setSize(mWidth, mHeight);
@@ -259,7 +259,7 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint,
                 toSkMatrix(
                     mTransformAnimator->getCombinedTransform()) );
         QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
-                    anim_mCurrentRelFrame);
+                    anim_getCurrentRelFrame());
         SkPoint transkSk = toSkPoint(trans);
         canvas->translate(transkSk.x(), transkSk.y());
         mTemporaryHandler->drawSk(canvas, paint);
@@ -321,7 +321,7 @@ void PaintBox::tabletMoveEvent(const qreal &xT,
                                const SimpleBrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
-                        anim_mCurrentRelFrame);
+                        anim_getCurrentRelFrame());
     int seedT = rand() % 1000;
     srand(seedT);
 //    mMainHandler->tabletMoveEvent(relPos.x(), relPos.y(),
@@ -359,7 +359,7 @@ void PaintBox::tabletPressEvent(const qreal &xT,
                                 const SimpleBrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
             mTopLeftPoint->getRelativePosAtRelFrame(
-                        anim_mCurrentRelFrame);
+                        anim_getCurrentRelFrame());
 
 //    mMainHandler->tabletPressEvent(relPos.x(), relPos.y(),
 //                                   time_stamp, pressure,

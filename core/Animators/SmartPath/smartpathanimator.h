@@ -12,14 +12,14 @@ public:
     bool SWT_isSmartPathAnimator() const { return true; }
 
     void anim_setAbsFrame(const int &frame) {
-        if(frame == anim_mCurrentAbsFrame) return;
-        const int lastRelFrame = anim_mCurrentRelFrame;
+        if(frame == anim_getCurrentAbsFrame()) return;
+        const int lastRelFrame = anim_getCurrentRelFrame();
         Animator::anim_setAbsFrame(frame);
         if(this->anim_hasKeys()) {
             const auto prevK1 = anim_getPrevKey<SmartPathKey>(lastRelFrame);
-            const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_mCurrentRelFrame);
+            const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
             const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);
-            const auto nextK2 = anim_getNextKey<SmartPathKey>(anim_mCurrentRelFrame);
+            const auto nextK2 = anim_getNextKey<SmartPathKey>(anim_getCurrentRelFrame());
             const auto keyAtFrame1 = anim_getKeyAtRelFrame(lastRelFrame);
             const auto keyAtFrame2 = anim_getKeyOnCurrentFrame<SmartPathKey>();
             if(!prevK1 && !prevK2 && !keyAtFrame1 && !keyAtFrame2) return;
@@ -32,7 +32,7 @@ public:
                 mBaseValue.assign(keyAtFrame2->getValue());
             } else {
                 const qreal nWeight =
-                        prevKeyWeight(prevK2, nextK2, anim_mCurrentRelFrame);
+                        prevKeyWeight(prevK2, nextK2, anim_getCurrentRelFrame());
                 gInterpolate(prevK2->getValue(), nextK2->getValue(),
                              nWeight, mBaseValue);
             }
@@ -71,18 +71,24 @@ public:
 
     SkPath getPathAtRelFrame(const qreal &frame) const {
         if(this->anim_mKeys.isEmpty()) return mBaseValue.getPathAt();
-        int prevId;
-        int nextId;
-        if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId,
-                                                          frame)) {
-            const auto nextKey = anim_getKeyAtIndex<SmartPathKey>(nextId);
-            if(nextId == prevId) {
-                return nextKey->getValue().getPathAt();
-            } else {
-                const auto prevKey = anim_getKeyAtIndex<SmartPathKey>(prevId);
-                const qreal pWeight = prevKeyWeight(prevKey, nextKey, frame);
-                return nextKey->getValue().interpolateWithPrev(pWeight);
-            }
+        const auto pn = anim_getPrevAndNextKeyIdForRelFrameF(frame);
+        const int prevId = pn.first;
+        const int nextId = pn.second;
+
+        const auto prevKey = anim_getKeyAtIndex<SmartPathKey>(prevId);
+        const auto nextKey = anim_getKeyAtIndex<SmartPathKey>(nextId);
+        const bool adjKeys = pn.second - pn.first == 1;
+        const auto keyAtRelFrame = adjKeys ?
+                    nullptr :
+                    anim_getKeyAtIndex<SmartPathKey>(pn.first + 1);
+        if(keyAtRelFrame) return keyAtRelFrame->getValue().getPathAt();
+        if(prevKey && nextKey) {
+            const qreal pWeight = prevKeyWeight(prevKey, nextKey, frame);
+            return nextKey->getValue().interpolateWithPrev(pWeight);
+        } else if(!prevKey && nextKey) {
+            return nextKey->getValue().getPathAt();
+        } else if(prevKey && !nextKey) {
+            return prevKey->getValue().getPathAt();
         }
         return mBaseValue.getPathAt();
     }
@@ -142,14 +148,14 @@ public:
     }
 
     void anim_saveCurrentValueAsKey() {
-        if(!this->anim_mIsRecording) this->anim_setRecording(true);
+        if(!this->anim_isRecording()) this->anim_setRecording(true);
 
         const auto spk = this->anim_getKeyOnCurrentFrame<SmartPathKey>();
         if(spk) {
             spk->assignValue(mBaseValue);
         } else {
             const auto neighs = anim_getPrevAndNextKey<SmartPathKey>(
-                        anim_mCurrentRelFrame);
+                        anim_getCurrentRelFrame());
             if(neighs.first && neighs.second) {
                 const int newKeyNodeCount = mBaseValue.getNodeCount();
                 const int currentNodeCount = neighs.first->getValue().getNodeCount();
@@ -159,7 +165,7 @@ public:
                 }
             }
             const auto newKey = SPtrCreate(SmartPathKey)(
-                        mBaseValue, anim_mCurrentRelFrame, this);
+                        mBaseValue, anim_getCurrentRelFrame(), this);
             this->anim_appendKey(newKey);
         }
     }

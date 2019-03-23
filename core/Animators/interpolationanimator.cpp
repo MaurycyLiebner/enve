@@ -7,33 +7,31 @@ InterpolationAnimator::InterpolationAnimator(const QString &name) :
 
 qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
         const qreal &frame) const {
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId, frame) ) {
-        if(nextId == prevId) {
-            return GetAsGK(anim_mKeys.at(nextId))->getRelFrame();
-        } else {
-            GraphKey *prevKey = GetAsGK(anim_mKeys.at(prevId));
-            GraphKey *nextKey = GetAsGK(anim_mKeys.at(nextId));
-            return getInterpolatedFrameAtRelFrame(
-                        frame, prevKey, nextKey);
-        }
-    }
-    return frame;
-}
+    if(anim_mKeys.isEmpty()) return frame;
+    const auto pn = anim_getPrevAndNextKeyIdForRelFrameF(frame);
+    const int prevId = pn.first;
+    const int nextId = pn.second;
 
-qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
-        const qreal &frame, GraphKey *prevKey, GraphKey *nextKey) const {
-    qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                         prevKey->getEndFrame(),
-                         nextKey->getStartFrame(),
-                         qreal(nextKey->getRelFrame())};
-    qreal t = gTFromX(seg, frame);
-    qreal p0y = prevKey->getValueForGraph();
-    qreal p1y = prevKey->getEndValue();
-    qreal p2y = nextKey->getStartValue();
-    qreal p3y = nextKey->getValueForGraph();
-    return gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
+    const bool adjKeys = nextId - prevId == 1;
+    const auto keyAtRelFrame = adjKeys ? nullptr :
+                               anim_getKeyAtIndex(prevId + 1);
+    if(keyAtRelFrame) return frame;
+    const auto prevKey = anim_getKeyAtIndex<GraphKey>(prevId);
+    const auto nextKey = anim_getKeyAtIndex<GraphKey>(nextId);
+    if(!prevKey || !nextKey) {
+        return frame;
+    } else { // if(prevKey && nextKey) {
+        const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
+                                  prevKey->getEndFrame(),
+                                  nextKey->getStartFrame(),
+                                  qreal(nextKey->getRelFrame())};
+        const qreal t = gTFromX(seg, frame);
+        const qreal p0y = prevKey->getValueForGraph();
+        const qreal p1y = prevKey->getEndValue();
+        const qreal p2y = nextKey->getStartValue();
+        const qreal p3y = nextKey->getValueForGraph();
+        return gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
+    }
 }
 
 void InterpolationAnimator::graph_getValueConstraints(

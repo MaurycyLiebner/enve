@@ -111,7 +111,7 @@ public:
                                  const qreal &maxVal);
 protected:
     qreal getEndValueDirectionForGraphForEndValue(const qreal& endVal) const {
-        if(!hasNextKey()) return 0.;
+        if(!hasNextKey()) return 0;
         qreal nextValue = getNextKeyValueForGraph();
         qreal valG = getValueForGraph();
         int dFrame = getNextKeyRelFrame() - mRelFrame;
@@ -119,7 +119,7 @@ protected:
     }
 
     qreal getStartValueDirectionForGraphForStartValue(const qreal& startVal) const {
-        if(!hasPrevKey()) return 0.;
+        if(!hasPrevKey()) return 0;
         qreal prevValue = getPrevKeyValueForGraph();
         qreal valG = getValueForGraph();
         int dFrame = mRelFrame - getPrevKeyRelFrame();
@@ -127,7 +127,7 @@ protected:
     }
 
     qreal getStartValueForGraphStartValueDirection(const qreal& value) const {
-        if(!hasPrevKey()) return 0.;
+        if(!hasPrevKey()) return 0;
         qreal prevValue = getPrevKeyValueForGraph();
         qreal valG = getValueForGraph();
         int dFrame = mRelFrame - getPrevKeyRelFrame();
@@ -135,7 +135,7 @@ protected:
     }
 
     qreal getEndValueForGraphEndValueDirection(const qreal& value) const {
-        if(!hasNextKey()) return 0.;
+        if(!hasNextKey()) return 0;
         qreal nextValue = getNextKeyValueForGraph();
         qreal valG = getValueForGraph();
         int dFrame = getNextKeyRelFrame() - mRelFrame;
@@ -147,11 +147,11 @@ protected:
 
     qreal mSavedStartFrame;
     qreal mSavedEndFrame;
-    qreal mStartFrame = 0.;
-    qreal mEndFrame = 0.;
+    qreal mStartFrame = 0;
+    qreal mEndFrame = 0;
 
-    qreal mStartValue = 0.;
-    qreal mEndValue = 0.;
+    qreal mStartValue = 0;
+    qreal mEndValue = 0;
 
     stdsptr<QrealPoint> mGraphPoint;
     stdsptr<QrealPoint> mStartPoint;

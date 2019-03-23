@@ -98,14 +98,6 @@ void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
     mParentCanvasUndoRedoStack->addUndoRedo(undoRedo);
 }
 
-void Property::graphUpdateAfterKeysChanged() {
-    //mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();
-}
-
-void Property::graphScheduleUpdateAfterKeysChanged() {
-    //mMainWindow->getKeysView()->scheduleGraphUpdateAfterKeysChanged();
-}
-
 void Property::setParent(ComplexAnimator * const parent) {
     mParent = parent;
 }

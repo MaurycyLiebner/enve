@@ -18,6 +18,8 @@ enum CtrlsMode : short;
 
 class Animator : public Property {
     Q_OBJECT
+protected:
+    Animator(const QString &name);
 public:
     enum UpdateReason {
         FRAME_CHANGE,
@@ -26,9 +28,6 @@ public:
         PARENT_USER_CHANGE
     };
 
-    void prp_startDragging();
-    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     virtual void anim_scaleTime(const int &pivotAbsFrame,
                                 const qreal &scale);
 
@@ -49,14 +48,11 @@ public:
     virtual void anim_appendKey(const stdsptr<Key> &newKey);
     virtual void anim_removeKey(const stdsptr<Key>& keyToRemove);
     virtual void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
-    virtual void anim_keyValueChanged(Key *key);
 
     virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                            const int &relX,
                                            const int &minViewedFrame,
                                            const qreal &pixelsPerFrame);
-    virtual bool anim_hasKeys() const;
-    virtual bool anim_isRecording();
     virtual void anim_removeAllKeys();
     virtual void anim_getKeysInRect(const QRectF &selectionRect,
                                     const qreal &pixelsPerFrame,
@@ -73,20 +69,20 @@ public:
     virtual void anim_saveCurrentValueAsKey();
     virtual void anim_addKeyAtRelFrame(const int &relFrame);
     bool SWT_isAnimator() const;
+    void prp_startDragging();
+    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
+    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 protected:
     virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
         Q_UNUSED(key);
     }
-    void anim_drawKey(QPainter * const p, Key * const key,
-                      const qreal &pixelsPerFrame,
-                      const qreal &drawY,
-                      const int &startFrame,
-                      const int& rowHeight,
-                      const int& keyRectSize);
 public slots:
     virtual void anim_updateAfterShifted();
     virtual void anim_setRecording(const bool &rec);
 public:
+    bool anim_hasKeys() const;
+    bool anim_isRecording();
+
     void anim_updateRelFrame();
     void anim_switchRecording();
 
@@ -126,14 +122,15 @@ public:
 
     void anim_setRecordingWithoutChangingKeys(const bool &rec);
 
-    bool anim_getNextAndPreviousKeyIdForRelFrame(
-            int &prevIdP, int &nextIdP, const int &frame) const;
-
+    std::pair<int, int> anim_getPrevAndNextKeyIdForRelFrame(
+            const int &frame) const;
+    std::pair<int, int> anim_getPrevAndNextKeyIdForRelFrameF(
+            const qreal &frame) const;
 
     void anim_setRecordingValue(const bool &rec);
 
-    int anim_getCurrentAbsFrame();
-    int anim_getCurrentRelFrame();
+    int anim_getCurrentRelFrame() const;
+    int anim_getCurrentAbsFrame() const;
 
     void anim_shiftAllKeys(const int &shift);
 
@@ -147,8 +144,6 @@ public:
     void disableFakeComplexAnimatrIfNotNeeded();
     int anim_getPrevKeyRelFrame(const int &relFrame) const;
     int anim_getNextKeyRelFrame(const int &relFrame) const;
-    bool anim_getNextAndPreviousKeyIdForRelFrameF(int &prevIdP, int &nextIdP,
-                                                  const qreal &frame) const;
     bool hasSelectedKeys() const;
 
     void addKeyToSelected(Key* key);
@@ -176,23 +171,28 @@ public:
         return anim_mSelectedKeys;
     }
     int getInsertIdForKeyRelFrame(const int &relFrame) const;
-private:
-    void sortSelectedKeys();
-protected:
-    Animator(const QString &name);
 
     template <class T = Key>
     T* anim_getKeyAtIndex(const int& id) const;
     int anim_getKeyIndex(const Key * const key) const;
+protected:
+    QList<stdsptr<Key>> anim_mKeys;
+    QList<stdptr<Key>> anim_mSelectedKeys;
+    qsptr<FakeComplexAnimator> mFakeComplexAnimator;
+private:
+    void sortSelectedKeys();
+
+    void anim_drawKey(QPainter * const p, Key * const key,
+                      const qreal &pixelsPerFrame,
+                      const qreal &drawY,
+                      const int &startFrame,
+                      const int& rowHeight,
+                      const int& keyRectSize);
 
     bool anim_mIsRecording = false;
 
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
-
-    QList<stdsptr<Key>> anim_mKeys;
-    QList<stdptr<Key>> anim_mSelectedKeys;
-    qsptr<FakeComplexAnimator> mFakeComplexAnimator;
 public slots:
     void anim_deleteCurrentKey();
 signals:
@@ -263,60 +263,12 @@ T* Animator::anim_getNextKey(const Key * const key) const {
 
 template <class T>
 std::pair<T*, T*> Animator::anim_getPrevAndNextKey(const int &relFrame) const {
-    std::pair<T*, T*> result(nullptr, nullptr);
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        T * const prevKey = anim_getKeyAtIndex<T>(prevId);
-        if(prevKey->getRelFrame() < relFrame) {
-            result.first = prevKey;
-        } else if(prevKey->getRelFrame() == relFrame) {
-            if(prevId > 0) {
-                result.first = anim_getKeyAtIndex<T>(prevId - 1);
-            }
-        }
-        T * const nextKey = anim_getKeyAtIndex<T>(nextId);
-        if(nextKey->getRelFrame() > relFrame) {
-            result.second = prevKey;
-        } else if(nextKey->getRelFrame() == relFrame) {
-            if(nextId + 1 < anim_mKeys.count()) {
-                result.second = anim_getKeyAtIndex<T>(nextId + 1);
-            }
-        }
-    }
-    return result;
-}
-
-int Animator::anim_getPrevKeyId(const int &relFrame) const {
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        Key * const key = anim_getKeyAtIndex(prevId);
-        if(key->getRelFrame() < relFrame) {
-            return prevId;
-        } else if(key->getRelFrame() == relFrame) {
-            if(prevId > 0) {
-                return prevId - 1;
-            }
-        }
-    }
-    return -1;
-}
-
-int Animator::anim_getNextKeyId(const int &relFrame) const {
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame)) {
-        Key * const key = anim_getKeyAtIndex(nextId);
-        if(key->getRelFrame() > relFrame) {
-            return nextId;
-        } else if(key->getRelFrame() == relFrame) {
-            if(nextId + 1 < anim_mKeys.count()) {
-                return nextId + 1;
-            }
-        }
-    }
-    return -1;
+    const auto prevNext = anim_getPrevAndNextKeyIdForRelFrame(relFrame);
+    const int prevId = prevNext.first;
+    T * const prevKey = anim_getKeyAtIndex<T>(prevId);
+    const int nextId = prevNext.second;
+    T * const nextKey = anim_getKeyAtIndex<T>(nextId);
+    return {prevKey, nextKey};
 }
 
 template <class T>

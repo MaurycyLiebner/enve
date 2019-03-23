@@ -8,38 +8,38 @@ public:
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
         if(this->anim_mKeys.isEmpty())
             return {FrameRange::EMIN, FrameRange::EMAX};
-        int prevId;
-        int nextId;
-        this->anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame);
+        const auto pn = this->anim_getPrevAndNextKeyIdForRelFrame(relFrame);
+        const int prevId = pn.first;
+        const int nextId = pn.second;
 
-        Key *prevKey = this->anim_mKeys.at(prevId).get();
-        Key *nextKey = this->anim_mKeys.at(nextId).get();
-        Key *prevPrevKey = nextKey;
-        Key *prevNextKey = prevKey;
+        Key *prevKey = this->anim_getKeyAtIndex(prevId);
+        Key *nextKey = this->anim_getKeyAtIndex(nextId);
+        Key *prevPrevKey = prevKey;
+        Key *prevNextKey = nextKey;
 
         int fId = relFrame;
         int lId = relFrame;
 
         while(true) {
-            fId = prevKey->getRelFrame();
-            prevPrevKey = prevKey;
-            prevKey = prevKey->getPrevKey();
             if(!prevKey) {
                 fId = FrameRange::EMIN;
                 break;
             }
             if(prevKey->differsFromKey(prevPrevKey)) break;
+            fId = prevKey->getRelFrame();
+            prevPrevKey = prevKey;
+            prevKey = prevKey->getPrevKey();
         }
 
         while(true) {
-            lId = nextKey->getRelFrame();
-            if(nextKey->differsFromKey(prevNextKey)) break;
-            prevNextKey = nextKey;
-            nextKey = nextKey->getNextKey();
             if(!nextKey) {
                 lId = FrameRange::EMAX;
                 break;
             }
+            lId = nextKey->getRelFrame() - 1;
+            if(nextKey->differsFromKey(prevNextKey)) break;
+            prevNextKey = nextKey;
+            nextKey = nextKey->getNextKey();
         }
 
         return {fId, lId};

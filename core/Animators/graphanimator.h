@@ -8,6 +8,8 @@ class GraphAnimator : public Animator {
 protected:
     GraphAnimator(const QString& name);
 public:
+    bool SWT_isGraphAnimator() const { return true; }
+
     void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_removeKey(const stdsptr<Key> &keyToRemove);
 
@@ -18,17 +20,19 @@ public:
     virtual ValueRange graph_getMinAndMaxValuesBetweenFrames(
             const int &startFrame, const int &endFrame) const;
     virtual qreal graph_clampGraphValue(const qreal &value) { return value; }
-    virtual void graph_updateKeysPath();
-    virtual void graph_updateKeysPath(const FrameRange& relFrameRange);
+    virtual void graph_updateKeyPathWithId(const int& id);
+    void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
+        Animator::prp_updateAfterChangedRelFrameRange(range);
+        graph_updateKeysPath(range);
+    }
+    void graph_constrainCtrlsFrameValues();
 
-    virtual void graph_constrainCtrlsFrameValues();
-    bool SWT_isGraphAnimator() const { return true; }
+    void graph_updateKeysPath(const FrameRange& relFrameRange);
 
     void graph_addKeysInRectToList(const QRectF &frameValueRect,
                                    QList<GraphKey*> &keys);
 
     void graph_incSelectedForGraph() {
-        if(!graph_mSelected) graph_updateKeysPath();
         graph_mSelected++;
     }
 
@@ -62,7 +66,8 @@ public:
     }
 
     void graph_drawKeysPath(QPainter * const p,
-                            const QColor &paintColor) const;
+                            const QColor &paintColor,
+                            const FrameRange &absFrameRange) const;
 
     void graph_getFrameValueConstraints(GraphKey *key,
                                   const QrealPointType& type,
@@ -81,9 +86,10 @@ public:
     void graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode);
     void graph_getSelectedSegments(QList<QList<GraphKey*>> &segments);
 protected:
-    QPainterPath graph_mKeysPath;
     QList<QPainterPath> graph_mKeyPaths;
 private:
+    IdRange graph_relFrameRangeToGraphPathIdRange(
+            const FrameRange &relFrameRange) const;
     void graph_getFrameConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minMoveFrame, qreal &maxMoveFrame) const;

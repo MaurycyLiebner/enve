@@ -40,9 +40,9 @@ void AnimatedSurface::currentDataModified() {
         if(currKey) {
             anim_updateAfterChangedKey(currKey);
         } else {
-            Key *key = anim_getPrevKey(anim_mCurrentRelFrame);
+            Key *key = anim_getPrevKey(anim_getCurrentRelFrame());
             if(!key) {
-                key = anim_getNextKey(anim_mCurrentRelFrame);
+                key = anim_getNextKey(anim_getCurrentRelFrame());
             }
             anim_updateAfterChangedKey(key);
         }
@@ -66,7 +66,7 @@ void AnimatedSurface::anim_saveCurrentValueAsKey() {
 }
 
 void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
-    if(!anim_mIsRecording) {
+    if(!anim_isRecording()) {
         anim_setRecordingValue(true);
     }
     Key *keyAtFrame = anim_getKeyAtRelFrame(relFrame);
@@ -97,73 +97,73 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
 }
 
 void AnimatedSurface::newEmptyPaintFrame() {
-    newEmptyPaintFrame(anim_mCurrentRelFrame);
+    newEmptyPaintFrame(anim_getCurrentRelFrame());
 }
 
 void AnimatedSurface::updateTargetTiles() {
-    mCurrentTiles->setCurrentlyUsed(false);
-    for(const auto& tilesDataT : mDrawTilesData) {
-        tilesDataT->setCurrentlyUsed(false);
-    }
-    mDrawTilesData.clear();
-    mDrawTilesFrames.clear();
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId,
-                                               anim_mCurrentRelFrame)) {
-        SurfaceKey *prevKey = GetAsPtr(anim_mKeys.at(prevId), SurfaceKey);
-        SurfaceKey *nextKey = GetAsPtr(anim_mKeys.at(nextId), SurfaceKey);
+//    mCurrentTiles->setCurrentlyUsed(false);
+//    for(const auto& tilesDataT : mDrawTilesData) {
+//        tilesDataT->setCurrentlyUsed(false);
+//    }
+//    mDrawTilesData.clear();
+//    mDrawTilesFrames.clear();
+//    int prevId;
+//    int nextId;
+//    if(anim_getPrevAndNextKeyIdForRelFrame(prevId, nextId,
+//                                               anim_getCurrentRelFrame())) {
+//        SurfaceKey *prevKey = GetAsPtr(anim_mKeys.at(prevId), SurfaceKey);
+//        SurfaceKey *nextKey = GetAsPtr(anim_mKeys.at(nextId), SurfaceKey);
 
-        TilesData *prevKeyTilesData = prevKey->getTilesData();
-        prevKeyTilesData->setCurrentlyUsed(true);
-        mDrawTilesData.append(GetAsSPtr(prevKeyTilesData, TilesData));
-        mDrawTilesFrames.append(prevKey->getRelFrame());
-        if(mIsDraft) {
-            int idT = prevId - 1;
-            while(idT >= 0) {
-                SurfaceKey *keyT = GetAsPtr(anim_mKeys.at(idT), SurfaceKey);
-                TilesData *keyTTilesData = keyT->getTilesData();
-                keyTTilesData->setCurrentlyUsed(true);
-                mDrawTilesData.prepend(GetAsSPtr(keyTTilesData, TilesData));
-                mDrawTilesFrames.prepend(keyT->getRelFrame());
-                idT--;
-                if(anim_mCurrentRelFrame - keyT->getRelFrame() >=
-                        mOverlapFrames) break;
-            }
-            if(nextKey != prevKey) {
-                TilesData *nextKeyTilesData = nextKey->getTilesData();
-                nextKeyTilesData->setCurrentlyUsed(true);
-                mDrawTilesData.append(GetAsSPtr(nextKeyTilesData, TilesData));
-                mDrawTilesFrames.append(nextKey->getRelFrame());
-            }
-            idT = nextId + 1;
-            while(idT < anim_mKeys.count()) {
-                SurfaceKey *keyT = GetAsPtr(anim_mKeys.at(idT), SurfaceKey);
-                TilesData *keyTTilesData = keyT->getTilesData();
-                keyTTilesData->setCurrentlyUsed(true);
-                mDrawTilesData.append(GetAsSPtr(keyTTilesData, TilesData));
-                mDrawTilesFrames.append(keyT->getRelFrame());
-                idT++;
-                if(keyT->getRelFrame() - anim_mCurrentRelFrame >=
-                        mOverlapFrames) break;
-            }
-        }
+//        TilesData *prevKeyTilesData = prevKey->getTilesData();
+//        prevKeyTilesData->setCurrentlyUsed(true);
+//        mDrawTilesData.append(GetAsSPtr(prevKeyTilesData, TilesData));
+//        mDrawTilesFrames.append(prevKey->getRelFrame());
+//        if(mIsDraft) {
+//            int idT = prevId - 1;
+//            while(idT >= 0) {
+//                SurfaceKey *keyT = GetAsPtr(anim_mKeys.at(idT), SurfaceKey);
+//                TilesData *keyTTilesData = keyT->getTilesData();
+//                keyTTilesData->setCurrentlyUsed(true);
+//                mDrawTilesData.prepend(GetAsSPtr(keyTTilesData, TilesData));
+//                mDrawTilesFrames.prepend(keyT->getRelFrame());
+//                idT--;
+//                if(anim_getCurrentRelFrame() - keyT->getRelFrame() >=
+//                        mOverlapFrames) break;
+//            }
+//            if(nextKey != prevKey) {
+//                TilesData *nextKeyTilesData = nextKey->getTilesData();
+//                nextKeyTilesData->setCurrentlyUsed(true);
+//                mDrawTilesData.append(GetAsSPtr(nextKeyTilesData, TilesData));
+//                mDrawTilesFrames.append(nextKey->getRelFrame());
+//            }
+//            idT = nextId + 1;
+//            while(idT < anim_mKeys.count()) {
+//                SurfaceKey *keyT = GetAsPtr(anim_mKeys.at(idT), SurfaceKey);
+//                TilesData *keyTTilesData = keyT->getTilesData();
+//                keyTTilesData->setCurrentlyUsed(true);
+//                mDrawTilesData.append(GetAsSPtr(keyTTilesData, TilesData));
+//                mDrawTilesFrames.append(keyT->getRelFrame());
+//                idT++;
+//                if(keyT->getRelFrame() - anim_getCurrentRelFrame() >=
+//                        mOverlapFrames) break;
+//            }
+//        }
 
-        int nextDFrame = qAbs(nextKey->getRelFrame() - anim_mCurrentRelFrame);
-        int prevDFrame = qAbs(prevKey->getRelFrame() - anim_mCurrentRelFrame);
+//        int nextDFrame = qAbs(nextKey->getRelFrame() - anim_getCurrentRelFrame());
+//        int prevDFrame = qAbs(prevKey->getRelFrame() - anim_getCurrentRelFrame());
 
-        if(nextDFrame > prevDFrame) {
-            mCurrentTiles = GetAsSPtr(prevKey->getTilesData(), TilesData);
-        } else {
-            mCurrentTiles = GetAsSPtr(nextKey->getTilesData(), TilesData);
-        }
-    }
-    mCurrentTiles->setCurrentlyUsed(true);
+//        if(nextDFrame > prevDFrame) {
+//            mCurrentTiles = GetAsSPtr(prevKey->getTilesData(), TilesData);
+//        } else {
+//            mCurrentTiles = GetAsSPtr(nextKey->getTilesData(), TilesData);
+//        }
+//    }
+//    mCurrentTiles->setCurrentlyUsed(true);
 }
 
 void AnimatedSurface::setCurrentRelFrame(const int &relFrame) {
-    anim_mCurrentRelFrame = relFrame;
-    updateTargetTiles();
+//    anim_getCurrentRelFrame() = relFrame;
+//    updateTargetTiles();
 }
 
 void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers) {
@@ -178,7 +178,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
             const int &relFrame = mDrawTilesFrames.at(i);
             stdsptr<TilesData> tilesData = mDrawTilesData.at(i);
             int neighRelFrame;
-            if(relFrame < anim_mCurrentRelFrame) {
+            if(relFrame < anim_getCurrentRelFrame()) {
                 if(i + 1 < countT) {
                     neighRelFrame = mDrawTilesFrames.at(i + 1);
                 } else {
@@ -207,19 +207,19 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawerCollection> *tileDrawers)
     //                alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
                     qreal alphaT = 0.;
                     if((relFrame < neighRelFrame &&
-                        anim_mCurrentRelFrame >= neighRelFrame) ||
+                        anim_getCurrentRelFrame() >= neighRelFrame) ||
                         (relFrame > neighRelFrame &&
-                         anim_mCurrentRelFrame <= neighRelFrame)) {
-                        alphaT = (qAbs(anim_mCurrentRelFrame - neighRelFrame) + 1)*1./(mOverlapFrames + 1);
+                         anim_getCurrentRelFrame() <= neighRelFrame)) {
+                        alphaT = (qAbs(anim_getCurrentRelFrame() - neighRelFrame) + 1)*1./(mOverlapFrames + 1);
                     }
                     alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
                 }
                 coll.alpha = static_cast<uchar>(alpha);
-                bool hueChange = relFrame != anim_mCurrentRelFrame;
+                bool hueChange = relFrame != anim_getCurrentRelFrame();
                 coll.setHueChangeEnabled(hueChange);
 
                 if(hueChange) {
-                    coll.setHue(relFrame > anim_mCurrentRelFrame ? 0. : 0.5);
+                    coll.setHue(relFrame > anim_getCurrentRelFrame() ? 0. : 0.5);
                 }
             }
 

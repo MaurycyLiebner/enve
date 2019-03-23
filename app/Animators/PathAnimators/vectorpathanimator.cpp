@@ -35,7 +35,7 @@ void VectorPathAnimator::anim_setAbsFrame(const int &frame) {
     Animator::anim_setAbsFrame(frame);
     //setCurrentPath(getPathAtRelFrame(frame));
     if(anim_hasKeys()) {
-        setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+        setElementsFromSkPath(getPathAtRelFrame(anim_getCurrentRelFrame()));
     }
 }
 
@@ -139,7 +139,7 @@ void VectorPathAnimator::setElementPos(const int &index,
 }
 
 void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
-    if(!anim_mIsRecording) anim_setRecording(true);
+    if(!anim_isRecording()) anim_setRecording(true);
 
     auto newKey = GetAsSPtr(anim_getKeyAtRelFrame(relFrame), PathKey);
 
@@ -153,13 +153,13 @@ void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
 }
 
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {
-    if(!anim_mIsRecording) anim_setRecording(true);
+    if(!anim_isRecording()) anim_setRecording(true);
 
     const auto currKey = anim_getKeyOnCurrentFrame<PathKey>();
     if(currKey) {
         anim_saveCurrentValueToKey(currKey);
     } else {
-        auto newKey = SPtrCreate(PathKey)(anim_mCurrentRelFrame,
+        auto newKey = SPtrCreate(PathKey)(anim_getCurrentRelFrame(),
                                           getPath(),
                                           mElementsPos,
                                           this,
@@ -169,68 +169,44 @@ void VectorPathAnimator::anim_saveCurrentValueAsKey() {
 }
 
 SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame) {
-    if(mElementsUpdateNeeded) finalizeNodesRemove();
-    //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
-    SkPath pathToRuturn;
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrame(prevId, nextId, relFrame) ) {
-        if(prevId == nextId) {
-            pathToRuturn = GetAsPK(anim_mKeys.at(prevId))->getPath();
-        } else {
-            const auto prevKey = GetAsPK(anim_mKeys.at(prevId));
-            const auto nextKey = GetAsPK(anim_mKeys.at(nextId));
-            const int prevRelFrame = prevKey->getRelFrame();
-            const int nextRelFrame = nextKey->getRelFrame();
-            const qreal intRelFrame = getInterpolatedFrameAtRelFrame(relFrame);
-            const qreal weight = (intRelFrame - prevRelFrame)/
-                    (nextRelFrame - prevRelFrame);
-            nextKey->getPath().interpolate(
-                        prevKey->getPath(),
-                        toSkScalar(weight),
-                        &pathToRuturn);
-        }
-    } else {
-        pathToRuturn = getPath();
-    }
-
-    if(mElementsUpdateNeeded) {
-        if(relFrame == anim_mCurrentRelFrame) {
-            mElementsUpdateNeeded = false;
-            finalizeNodesRemove();
-            setElementsFromSkPath(pathToRuturn);
-        }
-    }
-
-    return pathToRuturn;
+    return getPathAtRelFrameF(relFrame);
 }
 
 SkPath VectorPathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
     if(mElementsUpdateNeeded) finalizeNodesRemove();
+    //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
     SkPath pathToRuturn;
-    int prevId;
-    int nextId;
-    if(anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId, relFrame) ) {
-        if(prevId == nextId) {
-            pathToRuturn = GetAsPK(anim_mKeys.at(prevId))->getPath();
-        } else {
-            const auto prevKey = GetAsPK(anim_mKeys.at(prevId));
-            const auto nextKey = GetAsPK(anim_mKeys.at(nextId));
-            const int prevRelFrame = prevKey->getRelFrame();
-            const int nextRelFrame = nextKey->getRelFrame();
-            const qreal intRelFrame = getInterpolatedFrameAtRelFrame(relFrame);
-            const qreal weight = (intRelFrame - prevRelFrame)/
-                                 (nextRelFrame - prevRelFrame);
-            nextKey->getPath().interpolate(prevKey->getPath(),
-                                           toSkScalar(weight),
-                                           &pathToRuturn);
-        }
-    } else {
+    const auto pn = anim_getPrevAndNextKeyIdForRelFrameF(relFrame);
+    const int prevId = pn.first;
+    const int nextId = pn.second;
+
+    const auto prevKey = anim_getKeyAtIndex<PathKey>(prevId);
+    const auto nextKey = anim_getKeyAtIndex<PathKey>(nextId);
+    const bool adjKeys = pn.second - pn.first == 1;
+    const auto keyAtRelFrame = adjKeys ? nullptr :
+                               anim_getKeyAtIndex<PathKey>(pn.first + 1);
+    if(keyAtRelFrame) {
+        pathToRuturn = keyAtRelFrame->getPath();
+    } else if(!prevKey && ! nextKey) {
         pathToRuturn = getPath();
+    } else if(!prevKey) {
+        pathToRuturn = nextKey->getPath();
+    } else if(!nextKey) {
+        pathToRuturn = prevKey->getPath();
+    } else { // if(nextKey && prevKey) {
+        const int prevRelFrame = prevKey->getRelFrame();
+        const int nextRelFrame = nextKey->getRelFrame();
+        const qreal intRelFrame = getInterpolatedFrameAtRelFrame(relFrame);
+        const qreal weight = (intRelFrame - prevRelFrame)/
+                (nextRelFrame - prevRelFrame);
+        nextKey->getPath().interpolate(
+                    prevKey->getPath(),
+                    toSkScalar(weight),
+                    &pathToRuturn);
     }
 
     if(mElementsUpdateNeeded) {
-        if(isZero4Dec(relFrame - anim_mCurrentRelFrame)) {
+        if(isZero4Dec(relFrame - anim_getCurrentRelFrame())) {
             mElementsUpdateNeeded = false;
             finalizeNodesRemove();
             setElementsFromSkPath(pathToRuturn);
@@ -463,7 +439,7 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                                                      newPtSmooth);
                 }
             }
-            setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+            setElementsFromSkPath(getPathAtRelFrame(anim_getCurrentRelFrame()));
             return newPoint;
         }
     }
@@ -589,7 +565,7 @@ void VectorPathAnimator::setPathClosed(const bool &bT) {
         GetAsPK(key)->setPathClosed(bT);
     }
     if(anim_hasKeys()) {
-        setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+        setElementsFromSkPath(getPathAtRelFrame(anim_getCurrentRelFrame()));
     }
     prp_updateInfluenceRangeAfterChanged();
 }
@@ -1015,7 +991,7 @@ void VectorPathAnimator::shiftAllPointsForAllKeys(const int &by) {
     for(const auto &key : anim_mKeys) {
         GetAsPK(key)->shiftAllPoints(by);
     }
-    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+    setElementsFromSkPath(getPathAtRelFrame(anim_getCurrentRelFrame()));
 }
 
 void VectorPathAnimator::revertAllPointsForAllKeys() {
@@ -1024,7 +1000,7 @@ void VectorPathAnimator::revertAllPointsForAllKeys() {
     for(const auto &key : anim_mKeys) {
         GetAsPK(key)->revertAllPoints();
     }
-    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+    setElementsFromSkPath(getPathAtRelFrame(anim_getCurrentRelFrame()));
 }
 
 void VectorPathAnimator::shiftAllNodeSettings(const int &by) {
@@ -1043,7 +1019,7 @@ void VectorPathAnimator::shiftAllNodeSettings(const int &by) {
 void VectorPathAnimator::shiftAllPoints(const int &by) {
     PathContainer::shiftAllPoints(by);
     shiftAllNodeSettings(by);
-    if(anim_mIsRecording) {
+    if(anim_isRecording()) {
         anim_saveCurrentValueAsKey();
     } else {
         updateNodePointsFromElements();
@@ -1053,7 +1029,7 @@ void VectorPathAnimator::shiftAllPoints(const int &by) {
 void VectorPathAnimator::revertAllPoints() {
     PathContainer::revertAllPoints();
     revertAllNodeSettings();
-    if(anim_mIsRecording) {
+    if(anim_isRecording()) {
         anim_saveCurrentValueAsKey();
     } else {
         updateNodePointsFromElements();
@@ -1089,7 +1065,7 @@ void VectorPathAnimator::mergeNodes(const int &nodeId1,
         GetAsPK(key)->mergeNodes(nodeId1, nodeId2);
     }
 
-    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+    setElementsFromSkPath(getPathAtRelFrame(anim_getCurrentRelFrame()));
     prp_updateInfluenceRangeAfterChanged();
 }
 

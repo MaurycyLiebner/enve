@@ -66,7 +66,7 @@ void SingleSound::setDurationRect(FixedLenAnimationRect *durRect) {
 
 void SingleSound::updateAfterDurationRectangleShifted() {
     prp_setParentFrameShift(prp_mParentFrameShift);
-    anim_setAbsFrame(anim_mCurrentAbsFrame);
+    anim_setAbsFrame(anim_getCurrentAbsFrame());
     scheduleFinalDataUpdate();
 }
 

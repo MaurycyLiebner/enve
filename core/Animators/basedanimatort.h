@@ -10,7 +10,7 @@ class BasedAnimatorT : public B {
                   "BasedAnimatorT can only be used with Animator derived classes");
 public:
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
-        if(range.inRange(this->anim_mCurrentRelFrame)) {
+        if(range.inRange(this->anim_getCurrentRelFrame())) {
             this->updateValueFromCurrentFrame();
         }
         Animator::prp_updateAfterChangedRelFrameRange(range);
@@ -19,7 +19,7 @@ public:
     void anim_setAbsFrame(const int &frame) {
         Animator::anim_setAbsFrame(frame);
         if(this->anim_hasKeys()) {
-            const T newVal = getValueAtRelFrame(this->anim_mCurrentRelFrame);
+            const T newVal = getValueAtRelFrame(this->anim_getCurrentRelFrame());
             if(gDiffers(newVal, mCurrentValue)) {
                 mCurrentValue = newVal;
                 this->anim_callFrameChangeUpdater();
@@ -34,19 +34,24 @@ public:
 
     T getValueAtRelFrame(const qreal &frame) const {
         if(this->anim_mKeys.isEmpty()) return this->getCurrentValue();
-        int prevId;
-        int nextId;
-        if(this->anim_getNextAndPreviousKeyIdForRelFrameF(prevId, nextId,
-                                                          frame)) {
-            if(nextId == prevId) {
-                return this->template anim_getKeyAtIndex<K>(nextId)->getValue();
-            } else {
-                const K * const prevKey =
-                        this->template anim_getKeyAtIndex<K>(prevId);
-                const K * const nextKey =
-                        this->template anim_getKeyAtIndex<K>(nextId);
-                return getValueAtRelFrameK(frame, prevKey, nextKey);
-            }
+        const auto pn = this->anim_getPrevAndNextKeyIdForRelFrameF(frame);
+        const int prevId = pn.first;
+        const int nextId = pn.second;
+
+        const bool adjKeys = nextId - prevId == 1;
+        const auto keyAtRelFrame = adjKeys ?
+                    nullptr :
+                    this->template anim_getKeyAtIndex<K>(prevId + 1);
+        if(keyAtRelFrame) return keyAtRelFrame->getValue();
+        const auto prevKey = this->template anim_getKeyAtIndex<K>(prevId);
+        const auto nextKey = this->template anim_getKeyAtIndex<K>(nextId);
+
+        if(prevKey && nextKey) {
+            return getValueAtRelFrameK(frame, prevKey, nextKey);
+        } else if(prevKey) {
+            prevKey->getValue();
+        } else if(nextKey) {
+            nextKey->getValue();
         }
         return mCurrentValue;
     }
@@ -63,14 +68,14 @@ public:
     }
 
     void anim_saveCurrentValueAsKey() {
-        if(!this->anim_mIsRecording) this->anim_setRecording(true);
+        if(!this->anim_isRecording()) this->anim_setRecording(true);
 
         const auto currKey = this->template anim_getKeyOnCurrentFrame<K>();
         if(currKey) {
             currKey->setValue(mCurrentValue);
         } else {
             auto newKey = SPtrCreateTemplated(K)(
-                        mCurrentValue, this->anim_mCurrentRelFrame, this);
+                        mCurrentValue, this->anim_getCurrentRelFrame(), this);
             this->anim_appendKey(newKey);
         }
     }
@@ -107,7 +112,7 @@ protected:
     virtual void afterValueChanged() {}
 
     void updateValueFromCurrentFrame() {
-        mCurrentValue = getValueAtAbsFrame(this->anim_mCurrentAbsFrame);
+        mCurrentValue = getValueAtAbsFrame(this->anim_getCurrentAbsFrame());
         afterValueChanged();
     }
 

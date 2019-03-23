@@ -28,18 +28,15 @@ public:
     void prp_openContextMenu(const QPoint &pos);
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
-        if(range.inRange(anim_mCurrentRelFrame))
+        if(range.inRange(anim_getCurrentRelFrame()))
             updateBaseValueFromCurrentFrame();
-        Animator::prp_updateAfterChangedRelFrameRange(range);
+        GraphAnimator::prp_updateAfterChangedRelFrameRange(range);
     }
 
     void anim_setAbsFrame(const int &frame);
-    void anim_mergeKeysIfNeeded();
-    void anim_appendKey(const stdsptr<Key> &newKey);
-    void anim_removeKey(const stdsptr<Key> &keyToRemove);
-    void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
     void anim_removeAllKeys();
-    void graph_updateKeysPath();
+    void graph_updateKeyPathWithId(const int &id);
+
     ValueRange graph_getMinAndMaxValues() const;
     ValueRange graph_getMinAndMaxValuesBetweenFrames(
             const int &startFrame, const int &endFrame) const;
@@ -74,8 +71,6 @@ public:
 
     qreal getSavedBaseValue();
     void incAllValues(const qreal &valInc);
-
-    void saveValueToKey(QrealKey * const key, const qreal &value);
 
     qreal getMinPossibleValue();
     qreal getMaxPossibleValue();
@@ -114,7 +109,6 @@ protected:
                   const QString& name);
 private:
     qreal calculateBaseValueAtRelFrame(const qreal &frame) const;
-    void saveCurrentValueToKey(QrealKey * const key);
     QrealKey *getQrealKeyAtId(const int &id) const;
 
     bool mGraphMinMaxValuesFixed = false;
@@ -131,7 +125,7 @@ private:
     qsptr<RandomQrealGenerator> mRandomGenerator;
 
     qreal mPrefferedValueStep = 1;
-    void updateBaseValueFromCurrentFrame();
+    bool updateBaseValueFromCurrentFrame();
 signals:
     void valueChangedSignal(qreal);
 };

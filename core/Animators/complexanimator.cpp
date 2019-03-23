@@ -100,7 +100,7 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
                 this, &ComplexAnimator::ca_removeDescendantsKey);
         childAnimator->anim_addAllKeysToComplexAnimator(this);
         ca_childAnimatorIsRecordingChanged();
-        childAnimator->anim_setAbsFrame(anim_mCurrentAbsFrame);
+        childAnimator->anim_setAbsFrame(anim_getCurrentAbsFrame());
     }
     connect(childProperty.data(), &Property::prp_absFrameRangeChanged,
             this, &ComplexAnimator::prp_updateAfterChangedAbsFrameRange);
@@ -269,7 +269,7 @@ QString ComplexAnimator::prp_getValueText() {
 }
 
 void ComplexAnimator::anim_saveCurrentValueAsKey() {
-    if(!anim_mIsRecording) {
+    if(!anim_isRecording()) {
         anim_setRecording(true);
     } else {
         for(const auto &property : ca_mChildAnimators) {
@@ -300,9 +300,9 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     }
     if(childRecordingT != ca_mChildAnimatorRecording) {
         ca_mChildAnimatorRecording = childRecordingT;
-        if(rec != anim_mIsRecording) anim_setRecordingValue(rec);
+        if(rec != anim_isRecording()) anim_setRecordingValue(rec);
         else emit anim_isRecordingChanged();
-    } else if(rec != anim_mIsRecording) {
+    } else if(rec != anim_isRecording()) {
         anim_setRecordingValue(rec);
     }
 }

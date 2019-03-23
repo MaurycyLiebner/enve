@@ -80,10 +80,34 @@ extern qreal degreesBetweenVectors(const QPointF &pt1,
 extern qreal radiansBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
 
-extern qreal clamp(const qreal &val, const qreal &min, const qreal &max);
+template <typename T1, typename T2>
+qreal clamp(const qreal &val, const T1 &min, const T2 &max) {
+    static_assert((std::is_same<T1, qreal>::value ||
+                  std::is_same<T1, int>::value) &&
+                  (std::is_same<T2, qreal>::value ||
+                  std::is_same<T2, int>::value),
+                  "qreal can be clamped only with ints and qreals");
+    if(val > max) return max;
+    if(val < min) return min;
+    return val;
+}
+
+template <typename T1, typename T2>
+float clamp(const float &val, const T1 &min, const T2 &max) {
+    static_assert((std::is_same<T1, float>::value ||
+                  std::is_same<T1, int>::value) &&
+                  (std::is_same<T2, float>::value ||
+                  std::is_same<T2, int>::value),
+                  "float can be clamped only with ints and floats");
+    if(val > max) return max;
+    if(val < min) return min;
+    return val;
+}
+
 extern int clamp(const int& val, const int& min, const int& max);
-extern qreal gRandF(const qreal &fMin = 0., const qreal &fMax = 1.);
-extern SkScalar gSkRandF(const SkScalar &fMin = 0.f, const SkScalar &fMax = 1.f);
+
+extern qreal gRandF(const qreal &fMin = 0, const qreal &fMax = 1);
+extern SkScalar gSkRandF(const SkScalar &fMin = 0, const SkScalar &fMax = 1);
 extern QPointF symmetricToPos(QPointF toMirror,
                               QPointF mirrorCenter);
 extern QPointF symmetricToPosNewLen(QPointF toMirror,

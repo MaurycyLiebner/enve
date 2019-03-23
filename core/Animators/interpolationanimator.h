@@ -10,10 +10,6 @@ public:
             GraphKey *key, const QrealPointType& type,
             qreal &minValue, qreal &maxValue) const;
     qreal getInterpolatedFrameAtRelFrame(const qreal &frame) const;
-private:
-    qreal getInterpolatedFrameAtRelFrame(const qreal &frame,
-                                         GraphKey *prevKey,
-                                         GraphKey *nextKey) const;
 };
 
 #endif // INTERPOLATIONANIMATOR_H

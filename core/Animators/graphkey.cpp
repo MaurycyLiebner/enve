@@ -8,9 +8,9 @@ GraphKey::GraphKey(const int &frame,
     mRelFrame = frame;
     mEndFrame = mRelFrame + 5;
     mStartFrame = mRelFrame - 5;
-    mGraphPoint = SPtrCreate(QrealPoint)(KEY_POINT, this, 6.);
-    mStartPoint = SPtrCreate(QrealPoint)(START_POINT, this, 4.);
-    mEndPoint = SPtrCreate(QrealPoint)(END_POINT, this, 4.);
+    mGraphPoint = SPtrCreate(QrealPoint)(KEY_POINT, this, 6);
+    mStartPoint = SPtrCreate(QrealPoint)(START_POINT, this, 4);
+    mEndPoint = SPtrCreate(QrealPoint)(END_POINT, this, 4);
 }
 
 GraphKey::GraphKey(Animator * const parentAnimator) :
@@ -44,31 +44,23 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
     QPointF toPt;
     QrealPoint *targetPt;
     if(type == END_POINT) {
-        fromPt = QPointF(getEndFrame(),
-                         getEndValue());
-        toPt = QPointF(getStartFrame(),
-                       getStartValue());
+        fromPt = QPointF(getEndFrame(), getEndValue());
+        toPt = QPointF(getStartFrame(), getStartValue());
         targetPt = mStartPoint.get();
     } else {
-        toPt = QPointF(getEndFrame(),
-                       getEndValue());
-        fromPt = QPointF(getStartFrame(),
-                         getStartValue());
+        toPt = QPointF(getEndFrame(), getEndValue());
+        fromPt = QPointF(getStartFrame(), getStartValue());
         targetPt = mEndPoint.get();
     }
     QPointF newFrameValue;
+    const QPointF graphPt(mRelFrame, getValueForGraph());
     if(mCtrlsMode == CTRLS_SMOOTH) {
-        QPointF graphPt(mRelFrame, getValueForGraph());
         // mFrame and mValue are of different units chence len is wrong
-        newFrameValue = symmetricToPosNewLen(
-            fromPt,
-            graphPt,
-            pointToLen(toPt - graphPt));
+        newFrameValue = symmetricToPosNewLen(fromPt, graphPt,
+                                             pointToLen(toPt - graphPt));
 
     } else if(mCtrlsMode == CTRLS_SYMMETRIC) {
-        newFrameValue = symmetricToPos(
-            fromPt,
-            QPointF(mRelFrame, getValueForGraph()));
+        newFrameValue = symmetricToPos(fromPt, graphPt);
     }
     targetPt->setValue(newFrameValue.y());
     targetPt->setFrame(newFrameValue.x());
@@ -103,24 +95,22 @@ void GraphKey::drawGraphKey(QPainter *p,
                        const QColor &paintColor) const {
     if(isSelected()) {
         p->save();
-        QPen pen = QPen(Qt::black, 1.5);
+        QPen pen(Qt::black, 1.5);
         pen.setCosmetic(true);
 
-        QPen pen2 = QPen(Qt::white, .75);
+        QPen pen2(Qt::white, .75);
         pen2.setCosmetic(true);
 
-        QPointF thisPos = QPointF(mRelFrame, getValueForGraph());
+        const QPointF thisPos(mRelFrame, getValueForGraph());
         if(getStartEnabledForGraph()) {
-            QPointF startPos = QPointF(getStartFrame(),
-                                       getStartValue());
+            const QPointF startPos(getStartFrame(), getStartValue());
             p->setPen(pen);
             p->drawLine(thisPos, startPos);
             p->setPen(pen2);
             p->drawLine(thisPos, startPos);
         }
         if(getEndEnabledForGraph()) {
-            QPointF endPos = QPointF(getEndFrame(),
-                                     getEndValue());
+            const QPointF endPos(getEndFrame(), getEndValue());
             p->setPen(pen);
             p->drawLine(thisPos, endPos);
             p->setPen(pen2);
@@ -142,45 +132,45 @@ void GraphKey::drawGraphKey(QPainter *p,
 void GraphKey::constrainEndCtrlValue(const qreal &minVal,
                                      const qreal &maxVal) {
     if(!getEndEnabledForGraph()) return;
-    qreal endValue = getEndValue();
+    const qreal endValue = getEndValue();
     if(endValue > minVal && endValue < maxVal) return;
-    qreal newValue = clamp(endValue, minVal, maxVal);
+    const qreal newValue = clamp(endValue, minVal, maxVal);
     mEndPoint->moveTo(getEndFrame(), newValue);
 }
 
 void GraphKey::constrainStartCtrlValue(const qreal &minVal,
                                        const qreal &maxVal) {
     if(!getStartEnabledForGraph()) return;
-    qreal startValue = getStartValue();
+    const qreal startValue = getStartValue();
     if(startValue > minVal && startValue < maxVal) return;
-    qreal newValue = clamp(startValue, minVal, maxVal);
+    const qreal newValue = clamp(startValue, minVal, maxVal);
     mStartPoint->moveTo(getStartFrame(), newValue);
 }
 
 
 void GraphKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
-    qreal endFrame = getEndFrame();
+    const qreal endFrame = getEndFrame();
     if(endFrame < maxFrame || !getEndEnabledForGraph()) return;
-    qreal endValue = getEndValue();
-    qreal value = getValueForGraph();
-    qreal newFrame = clamp(endFrame, mRelFrame, maxFrame);
-    qreal change = (newFrame - mRelFrame)/(endFrame - mRelFrame);
+    const qreal endValue = getEndValue();
+    const qreal value = getValueForGraph();
+    const qreal newFrame = clamp(endFrame, qreal(mRelFrame), qreal(maxFrame));
+    const qreal change = (newFrame - mRelFrame)/(endFrame - mRelFrame);
     mEndPoint->moveTo(newFrame, change*(endValue - value) + value);
 }
 
 void GraphKey::constrainStartCtrlMinFrame(const int &minFrame) {
-    qreal startFrame = getStartFrame();
+    const qreal startFrame = getStartFrame();
     if(startFrame > minFrame || !getStartEnabledForGraph()) return;
-    qreal startValue = getStartValue();
-    qreal value = getValueForGraph();
-    qreal newFrame = clamp(startFrame, minFrame, mRelFrame);
-    qreal change = (mRelFrame - newFrame)/(mRelFrame - startFrame);
+    const qreal startValue = getStartValue();
+    const qreal value = getValueForGraph();
+    const qreal newFrame = clamp(startFrame, qreal(minFrame), qreal(mRelFrame));
+    const qreal change = (mRelFrame - newFrame)/(mRelFrame - startFrame);
     mStartPoint->moveTo(newFrame, change*(startValue - value) + value);
 }
 
 void GraphKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
-    int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
-    bool frameChanged = newFrame != mRelFrame;
+    const int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
+    const bool frameChanged = newFrame != mRelFrame;
     if(!frameChanged) return;
     if(mParentAnimator) {
         mParentAnimator->anim_moveKeyToRelFrame(this, newFrame);
@@ -190,25 +180,25 @@ void GraphKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
 }
 
 bool GraphKey::isInsideRect(const QRectF &valueFrameRect) const {
-    QPointF keyPoint = QPointF(getAbsFrame(), getValueForGraph());
+    const QPointF keyPoint(getAbsFrame(), getValueForGraph());
     return valueFrameRect.contains(keyPoint);
 }
 
 void GraphKey::makeStartAndEndSmooth() {
-    qreal nextKeyVal = getNextKeyValueForGraph();
-    qreal prevKeyVal = getPrevKeyValueForGraph();
-    int nextKeyFrame = getNextKeyRelFrame();
-    int prevKeyFrame = getPrevKeyRelFrame();
+    const qreal nextKeyVal = getNextKeyValueForGraph();
+    const qreal prevKeyVal = getPrevKeyValueForGraph();
+    const int nextKeyFrame = getNextKeyRelFrame();
+    const int prevKeyFrame = getPrevKeyRelFrame();
     qreal valIncPerFrame;
     if(nextKeyFrame == mRelFrame || prevKeyFrame == mRelFrame) {
-        valIncPerFrame = 0.;
+        valIncPerFrame = 0;
     } else {
         valIncPerFrame =
                 (nextKeyVal - prevKeyVal)/(nextKeyFrame - prevKeyFrame);
     }
-    qreal newStartVal = getValueForGraph() +
+    const qreal newStartVal = getValueForGraph() +
             (getStartFrame() - mRelFrame)*valIncPerFrame;
-    qreal newEndVal = getValueForGraph() +
+    const qreal newEndVal = getValueForGraph() +
             (getEndFrame() - mRelFrame)*valIncPerFrame;
     setStartValueForGraph(newStartVal);
     setEndValueForGraph(newEndVal);
@@ -263,16 +253,16 @@ void GraphKey::scaleFrameAndUpdateParentAnimator(
         const int &relativeToFrame,
         const qreal &scaleFactor,
         const bool& useSavedFrame) {
-    int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
-    qreal startRelFrame = useSavedFrame ? mSavedStartFrame : mStartFrame;
-    qreal endRelFrame = useSavedFrame ? mSavedEndFrame : mEndFrame;
+    const int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
+    const qreal startRelFrame = useSavedFrame ? mSavedStartFrame : mStartFrame;
+    const qreal endRelFrame = useSavedFrame ? mSavedEndFrame : mEndFrame;
 
     setStartFrameVar(thisRelFrame + (startRelFrame - thisRelFrame)*scaleFactor);
     setEndFrameVar(thisRelFrame + (endRelFrame - thisRelFrame)*scaleFactor);
 
-    int relativeToRelFrame =
+    const int relativeToRelFrame =
             mParentAnimator->prp_absFrameToRelFrame(relativeToFrame);
-    int newFrame = qRound(relativeToRelFrame +
+    const int newFrame = qRound(relativeToRelFrame +
                           (thisRelFrame - relativeToRelFrame)*scaleFactor);
     if(newFrame != mRelFrame) {
         incFrameAndUpdateParentAnimator(newFrame - mRelFrame);

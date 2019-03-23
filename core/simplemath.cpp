@@ -24,12 +24,6 @@ QPointF scalePointToNewLen(const QPointF& point,
     return point * newLen / pointToLen(point);
 }
 
-qreal clamp(const qreal& val, const qreal& min, const qreal& max) {
-    if(val > max) return max;
-    if(val < min) return min;
-    return val;
-}
-
 int clamp(const int& val, const int& min, const int& max) {
     if(val > max) return max;
     if(val < min) return min;

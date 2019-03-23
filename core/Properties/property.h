@@ -62,6 +62,7 @@ public:
     virtual ~Property() {
         emit beingDeleted();
     }
+    bool SWT_isProperty() const { return true; }
 
     virtual int prp_getRelFrameShift() const {
         return 0;
@@ -99,13 +100,11 @@ public:
     virtual void writeProperty(QIODevice * const device) const {
         Q_UNUSED(device);
     }
-
-    bool SWT_isProperty() const { return true; }
 public slots:
     virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
 
     virtual void prp_updateAfterChangedRelFrameRange(const FrameRange &range) {
-        auto absRange = prp_relRangeToAbsRange(range);
+        const auto absRange = prp_relRangeToAbsRange(range);
         prp_updateAfterChangedAbsFrameRange(absRange);
     }
 
@@ -135,9 +134,6 @@ public:
     //
 
     void addUndoRedo(const stdsptr<UndoRedo> &undoRedo);
-
-    void graphUpdateAfterKeysChanged();
-    void graphScheduleUpdateAfterKeysChanged();
 
     template <class T = ComplexAnimator>
     T *getParent() const {

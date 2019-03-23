@@ -29,7 +29,8 @@ int BoundingBox::sNextWriteId;
 QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
-    ComplexAnimator("box"), mDocumentId(sNextDocumentId++) {
+    ComplexAnimator("box"), mDocumentId(sNextDocumentId++),
+    mType(type) {
     sDocumentBoxes << this;
 
     mTransformAnimator = SPtrCreate(BoxTransformAnimator)(this);
@@ -47,8 +48,6 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ca_prependChildAnimator(mEffectsAnimators.data(), mGPUEffectsAnimators);
     mGPUEffectsAnimators->SWT_hide();
 
-    mType = type;
-
     mTransformAnimator->reset();
 }
 
@@ -65,7 +64,7 @@ BoundingBox *BoundingBox::sGetBoxByDocumentId(const int &documentId) {
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     Property::prp_updateAfterChangedAbsFrameRange(range);
-    if(range.inRange(anim_mCurrentAbsFrame)) {
+    if(range.inRange(anim_getCurrentAbsFrame())) {
         scheduleUpdate(Animator::USER_CHANGE);
     }
 }
@@ -237,10 +236,10 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::anim_setAbsFrame(const int &frame) {
-    int lastRelFrame = anim_mCurrentRelFrame;
+    int lastRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
     bool isInVisRange = isRelFrameInVisibleDurationRect(
-                anim_mCurrentRelFrame);
+                anim_getCurrentRelFrame());
     if(mUpdateDrawOnParentBox != isInVisRange) {
         if(mUpdateDrawOnParentBox) {
             if(mParentGroup) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
@@ -249,7 +248,7 @@ void BoundingBox::anim_setAbsFrame(const int &frame) {
         }
         mUpdateDrawOnParentBox = isInVisRange;
     }
-    if(prp_differencesBetweenRelFrames(lastRelFrame, anim_mCurrentRelFrame)) {
+    if(prp_differencesBetweenRelFrames(lastRelFrame, anim_getCurrentRelFrame())) {
         scheduleUpdate(Animator::FRAME_CHANGE);
     }
 }
@@ -373,14 +372,14 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 bool BoundingBox::shouldScheduleUpdate() {
     if(!mParentGroup) return false;
     if(isVisibleAndInVisibleDurationRect() ||
-       isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame)) {
+       isRelFrameInVisibleDurationRect(anim_getCurrentRelFrame())) {
         return true;
     }
     return false;
 }
 
 void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
-    scheduleUpdate(anim_mCurrentRelFrame, reason);
+    scheduleUpdate(anim_getCurrentRelFrame(), reason);
 }
 
 void BoundingBox::scheduleUpdate(const int &relFrame,
@@ -532,7 +531,7 @@ QMatrix BoundingBox::getCombinedTransform() const {
 }
 
 QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() {
-    return getRelativeTransformAtRelFrameF(anim_mCurrentRelFrame);
+    return getRelativeTransformAtRelFrameF(anim_getCurrentRelFrame());
 }
 
 void BoundingBox::applyTransformation(BoxTransformAnimator *transAnimator) {
@@ -782,7 +781,6 @@ void BoundingBox::updateDrawRenderContainerTransform() {
         mDrawRenderContainer->updatePaintTransformGivenNewCombinedTransform(
                     mTransformAnimator->getCombinedTransform());
     }
-
 }
 
 const BoundingBoxType &BoundingBox::getBoxType() const { return mType; }
@@ -997,7 +995,7 @@ void BoundingBox::setDurationRectangle(
 
 void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_setParentFrameShift(prp_mParentFrameShift);
-    anim_setAbsFrame(anim_mCurrentAbsFrame);
+    anim_setAbsFrame(anim_getCurrentAbsFrame());
     auto visRange = getVisibleAbsFrameRange();
     if(dFrame > 0) {
         visRange.fMin -= dFrame;
@@ -1092,7 +1090,7 @@ const QString &BoundingBox::getName() const {
 }
 
 bool BoundingBox::isVisibleAndInVisibleDurationRect() const {
-    return isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame) && mVisible;
+    return isRelFrameInVisibleDurationRect(anim_getCurrentRelFrame()) && mVisible;
 }
 
 bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
@@ -1413,15 +1411,15 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
         newerSate = currentRenderData->fBoxStateId <
                 renderData->fBoxStateId;
         const int finishedFrameDist =
-                qAbs(anim_mCurrentRelFrame - renderData->fRelFrame);
+                qAbs(anim_getCurrentRelFrame() - renderData->fRelFrame);
         const int oldFrameDist =
-                qAbs(anim_mCurrentRelFrame - currentRenderData->fRelFrame);
+                qAbs(anim_getCurrentRelFrame() - currentRenderData->fRelFrame);
         closerFrame = finishedFrameDist < oldFrameDist;
     }
     if(newerSate || closerFrame) {
         mDrawRenderContainer->setSrcRenderData(renderData);
         const bool currentState = renderData->fBoxStateId == mStateId;
-        const bool currentFrame = renderData->fRelFrame == anim_mCurrentRelFrame;
+        const bool currentFrame = renderData->fRelFrame == anim_getCurrentRelFrame();
         const bool expired = !currentState || !currentFrame;
         mDrawRenderContainer->setExpired(expired);
         if(expired) updateDrawRenderContainerTransform();
