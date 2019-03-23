@@ -74,13 +74,6 @@ bool QrealKey::differsFromKey(Key *key) const {
 }
 
 void QrealKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
-    int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
-    bool frameChanged = newFrame != mRelFrame;
     setValue(frameValueChange.y() + mSavedValue);
-    if(!frameChanged) return;
-    if(mParentAnimator) {
-        mParentAnimator->anim_moveKeyToRelFrame(this, newFrame);
-    } else {
-        setRelFrame(newFrame);
-    }
+    GraphKey::changeFrameAndValueBy(frameValueChange);
 }

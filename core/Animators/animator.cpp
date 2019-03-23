@@ -241,15 +241,6 @@ void Animator::anim_updateAfterShifted() {
     }
 }
 
-bool keysFrameSort(const stdsptr<Key> &key1,
-                   const stdsptr<Key> &key2) {
-    return key1->getAbsFrame() < key2->getAbsFrame();
-}
-
-void Animator::anim_sortKeys() {
-    std::sort(anim_mKeys.begin(), anim_mKeys.end(), keysFrameSort);
-}
-
 int Animator::getInsertIdForKeyRelFrame(const int& relFrame) const {
     return getInsertIdForKeyRelFrame(relFrame, 0, anim_mKeys.count());
 }

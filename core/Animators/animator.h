@@ -116,7 +116,6 @@ public:
     bool anim_hasNextKey(const Key * const key);
 
     void anim_callFrameChangeUpdater();
-    void anim_sortKeys();
 
     void anim_addAllKeysToComplexAnimator(ComplexAnimator *target);
 

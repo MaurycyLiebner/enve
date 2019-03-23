@@ -193,9 +193,7 @@ void KeysView::graphUpdateDimensions() {
     mValueInc = validIncs.first()*incMulti;
     while(true) {
         mValueInc = validIncs.at(currIncId)*incMulti;
-        if(mValueInc*mPixelsPerValUnit < 50.) {
-            break;
-        }
+        if(mValueInc*mPixelsPerValUnit < 50) break;
         currIncId++;
         if(currIncId >= validIncs.count()) {
             currIncId = 0;
@@ -205,7 +203,7 @@ void KeysView::graphUpdateDimensions() {
     }
     mValuePrec = qMax(nDiv - 3, 0);
 
-    graphIncMinShownVal(0.);
+    graphIncMinShownVal(0);
     updatePixelsPerFrame();
 }
 
@@ -417,8 +415,8 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
         qreal frame;
         graphGetValueAndFrameFromPos(mousePos, &value, &frame);
         if(mPressedKeyPoint) {
-            QPointF currentFrameAndValue = QPointF(frame, value);
-            QPointF frameValueChange = currentFrameAndValue -
+            const QPointF currentFrameAndValue(frame, value);
+            const QPointF frameValueChange = currentFrameAndValue -
                     mPressFrameAndValue;
             if(mFirstMove) {
                 for(const auto& anim : mGraphAnimators) {
@@ -431,10 +429,6 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
                     anim->graph_changeSelectedKeysFrameAndValue(frameValueChange);
                 }
             }
-            for(const auto& anim : mGraphAnimators) {
-                if(!anim->hasSelectedKeys()) continue;
-                anim->anim_sortKeys();
-            }
         } else {
             //        if(!mPressedPoint->isEnabled()) {
             //            Key *parentKey = mPressedPoint->getParentKey();
@@ -442,8 +436,8 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             //            parentKey->setStartEnabledForGraph(true);
             //            parentKey->setCtrlsMode(CTRLS_SYMMETRIC);
             //        }
-            qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
-            qreal clamedValue = clamp(value, mMinMoveVal, mMaxMoveVal);
+            const qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
+            const qreal clamedValue = clamp(value, mMinMoveVal, mMaxMoveVal);
             mPressedPoint->moveTo(clampedFrame, clamedValue);
         }
     }
@@ -598,9 +592,6 @@ void KeysView::graphUpdateAfterKeysChangedIfNeeded() {
 }
 
 void KeysView::graphUpdateAfterKeysChanged() {
-    for(const auto& anim : mGraphAnimators) {
-        anim->anim_sortKeys();
-    }
     graphResetValueScaleAndMinShown();
     graphUpdateDimensions();
 }
