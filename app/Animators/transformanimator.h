@@ -76,8 +76,8 @@ public:
 
     bool SWT_isBasicTransformAnimator() const;
 
-    virtual QMatrix getTotalTransformMatrixAtRelFrameF(const qreal &relFrame);
-    QMatrix getParentTotalTransformMatrixAtRelFrameF(const qreal &relFrame);
+    virtual QMatrix getTotalTransformAtRelFrameF(const qreal &relFrame);
+    QMatrix getParentTotalTransformAtRelFrameF(const qreal &relFrame);
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);

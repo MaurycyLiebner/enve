@@ -42,11 +42,11 @@ void gApplyOperation(const qreal &relFrame,
     }
     QMatrix pathBoxMatrix =
             srcBox->getTransformAnimator()->
-                getTotalTransformMatrixAtRelFrameF(
+                getTotalTransformAtRelFrameF(
                     pathBoxRelFrame);
     QMatrix parentBoxMatrix =
             dstBox->getTransformAnimator()->
-                getTotalTransformMatrixAtRelFrameF(
+                getTotalTransformAtRelFrameF(
                     relFrame);
     boxPath.transform(
                 toSkMatrix(

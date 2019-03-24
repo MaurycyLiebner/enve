@@ -401,7 +401,7 @@ public:
     void requestGlobalFillStrokeUpdateIfSelected();
     void setPivotAutoAdjust(const bool &pivotAutoAdjust);
     QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
-    QMatrix getParentTotalTransformMatrixAtRelFrame(const qreal &relFrame);
+    QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
 protected:
     bool mSelected = false;
     bool mInVisibleRange = true;

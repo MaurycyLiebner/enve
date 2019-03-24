@@ -280,9 +280,7 @@ public:
     void updateTotalTransform() {}
 
     QMatrix getTotalTransform() const {
-        QMatrix matrix;
-        matrix.reset();
-        return matrix;
+        return QMatrix();
     }
 
     QMatrix getRelativeTransformAtCurrentFrame() {

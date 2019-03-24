@@ -638,7 +638,7 @@ QMatrix BoundingBox::getTotalTransformAtRelFrame(const qreal& relFrame) {
     return getRelativeTransformAtRelFrameF(relFrame);
 }
 
-QMatrix BoundingBox::getParentTotalTransformMatrixAtRelFrame(
+QMatrix BoundingBox::getParentTotalTransformAtRelFrame(
         const qreal &relFrame) {
     if(mParentGroup) {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -656,7 +656,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     data->fRenderedToImage = false;
     data->fRelTransform = getRelativeTransformAtRelFrameF(relFrame);
     data->fParentTransform =
-            getParentTotalTransformMatrixAtRelFrame(relFrame);
+            getParentTotalTransformAtRelFrame(relFrame);
     data->fTransform = data->fRelTransform*data->fParentTransform;
     data->fOpacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
     data->fResolution = getParentCanvas()->getResolutionFraction();
