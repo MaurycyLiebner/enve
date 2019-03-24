@@ -37,9 +37,9 @@ void RenderContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
     canvas->restore();
 }
 
-void RenderContainer::updatePaintTransformGivenNewCombinedTransform(
-                                    const QMatrix &combinedTransform) {
-    mPaintTransform = mTransform.inverted()*combinedTransform;
+void RenderContainer::updatePaintTransformGivenNewTotalTransform(
+                                    const QMatrix &TotalTransform) {
+    mPaintTransform = mTransform.inverted()*TotalTransform;
     const qreal invRes = 1/mResolutionFraction;
     mPaintTransform.scale(invRes, invRes);
 }

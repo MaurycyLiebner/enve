@@ -36,7 +36,7 @@ public:
     void drawPoints(SkCanvas * const canvas,
                     const CanvasMode &currentCanvasMode,
                     const SkScalar &invScale,
-                    const SkMatrix &combinedTransform) const;
+                    const SkMatrix &TotalTransform) const;
 
     SkPath getPathAtRelFrame(const qreal &relFrame) const;
     SmartPathCollection* getAnimator() const {

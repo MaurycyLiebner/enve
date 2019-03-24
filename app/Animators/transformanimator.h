@@ -69,15 +69,15 @@ public:
                                     const QPointF &pivot);
 
     void updateRelativeTransform(const UpdateReason &reason);
-    const QMatrix &getCombinedTransform() const;
+    const QMatrix &getTotalTransform() const;
     const QMatrix &getRelativeTransform() const;
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
 
     bool SWT_isBasicTransformAnimator() const;
 
-    virtual QMatrix getCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
-    QMatrix getParentCombinedTransformMatrixAtRelFrameF(const qreal &relFrame);
+    virtual QMatrix getTotalTransformMatrixAtRelFrameF(const qreal &relFrame);
+    QMatrix getParentTotalTransformMatrixAtRelFrameF(const qreal &relFrame);
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
@@ -91,7 +91,7 @@ protected:
     QList<qsptr<BasicTransformAnimator>> mChildBoxes;
 
     QMatrix mRelTransform;
-    QMatrix mCombinedTransform;
+    QMatrix mTotalTransform;
 
     qptr<BasicTransformAnimator> mParentTransformAnimator;
 
@@ -101,9 +101,9 @@ protected:
 
     stdsptr<PropertyUpdater> mTransformUpdater;
 public slots:
-    virtual void updateCombinedTransform(const UpdateReason &reason);
+    virtual void updateTotalTransform(const UpdateReason &reason);
 signals:
-    void combinedTransformChanged(const UpdateReason &);
+    void TotalTransformChanged(const UpdateReason &);
 };
 
 class Bone;
@@ -127,7 +127,7 @@ public:
     bool SWT_isBoxTransformAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
-    void updateCombinedTransform(const UpdateReason &reason);
+    void updateTotalTransform(const UpdateReason &reason);
 
     void reset();
     QMatrix getCurrentTransformationMatrix();

@@ -65,10 +65,10 @@ void SmartPathCollectionHandler::selectAllPoints(Canvas * const canvas) {
 
 void SmartPathCollectionHandler::drawPoints(
         SkCanvas * const canvas, const CanvasMode &currentCanvasMode,
-        const SkScalar &invScale, const SkMatrix &combinedTransform) const {
+        const SkScalar &invScale, const SkMatrix &TotalTransform) const {
     for(const auto& handler : mPointsHandlers) {
         handler->drawPoints(canvas, currentCanvasMode,
-                            invScale, combinedTransform);
+                            invScale, TotalTransform);
     }
 }
 

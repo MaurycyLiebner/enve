@@ -82,9 +82,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(canvas) {
         mCurrentCanvas = canvas;
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
-
         mCurrentCanvas->setIsCurrentCanvas(true);
-
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
         emit changeCanvasFrameRange(0, getMaxFrame());

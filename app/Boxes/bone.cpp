@@ -282,7 +282,7 @@ void Bone::drawOnCanvas(SkCanvas * const canvas) {
     }
     SkPath path = getCurrentRelPath();
     path.transform(toSkMatrix(
-                       mTransformAnimator->getCombinedTransform()));
+                       mTransformAnimator->getTotalTransform()));
     SkPaint paintT;
     paintT.setColor(SK_ColorWHITE);
     paintT.setStyle(SkPaint::kFill_Style);
@@ -375,7 +375,7 @@ void Bone::drawOnCanvas(SkCanvas * const canvas,
     if(mSelected) {
         SkPath path = getCurrentRelPath();
         path.transform(toSkMatrix(
-                           mTransformAnimator->getCombinedTransform()));
+                           mTransformAnimator->getTotalTransform()));
         SkPaint paintT;
 
         paintT.setColor(SK_ColorRED);
@@ -470,7 +470,7 @@ void Bone::drawHoveredOnlyThisPathSk(SkCanvas *canvas,
     canvas->save();
     SkPath mappedPath = getCurrentRelPath();
     mappedPath.transform(toSkMatrix(
-                             mTransformAnimator->getCombinedTransform()));
+                             mTransformAnimator->getTotalTransform()));
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setColor(SK_ColorBLACK);

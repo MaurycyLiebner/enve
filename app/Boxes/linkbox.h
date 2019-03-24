@@ -89,7 +89,7 @@ public:
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {
-        if(mParentGroup == nullptr ? false : mParentGroup->SWT_isLinkBox()) {
+        if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
             return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
         } else {
             return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);

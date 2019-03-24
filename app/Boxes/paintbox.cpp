@@ -249,7 +249,7 @@ void PaintBox::drawPixmapSk(SkCanvas * const canvas,
     canvas->saveLayer(nullptr, paint);
     BoundingBox::drawPixmapSk(canvas, nullptr, grContext);
     if(mTemporaryHandler) {
-        const auto combinedTrans = mTransformAnimator->getCombinedTransform();
+        const auto combinedTrans = mTransformAnimator->getTotalTransform();
         canvas->concat(toSkMatrix(combinedTrans));
         const QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
                     anim_getCurrentRelFrame());

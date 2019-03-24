@@ -35,7 +35,7 @@ public:
     void drawPoints(SkCanvas * const canvas,
                     const CanvasMode &currentCanvasMode,
                     const SkScalar &invScale,
-                    const SkMatrix &combinedTransform) const;
+                    const SkMatrix &TotalTransform) const;
 
     SmartNodePoint* getPointWithId(const int& id) const {
         if(id < 0) return nullptr;

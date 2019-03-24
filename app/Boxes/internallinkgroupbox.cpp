@@ -58,9 +58,8 @@ bool InternalLinkGroupBox::SWT_isBoxesGroup() const { return false; }
 
 QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
         const qreal &relFrame) {
-    if(getLinkTarget()->SWT_isLinkBox()) {
-        return BoundingBox::getRelativeTransformAtRelFrameF(relFrame)*
-                getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
+    if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
+        return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
     } else {
         return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
     }

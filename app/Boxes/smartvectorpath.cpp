@@ -55,7 +55,7 @@ void SmartVectorPath::drawCanvasControls(SkCanvas * const canvas,
     mHandler.drawPoints(canvas,
                         currentCanvasMode,
                         invScale,
-                        toSkMatrix(getCombinedTransform()));
+                        toSkMatrix(getTotalTransform()));
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
         mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);

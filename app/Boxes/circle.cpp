@@ -220,7 +220,7 @@ void CircleRadiusPoint::moveByRel(const QPointF &relTranslation) {
 
 //void CircleRadiusPoint::setAbsPosRadius(QPointF pos)
 //{
-//    QMatrix combinedM = mParent->getCombinedTransform();
+//    QMatrix combinedM = mParent->getTotalTransform();
 //    QPointF newPos = combinedM.inverted().map(pos);
 //    if(mXBlocked) {
 //        newPos.setX(getSavedXValue());

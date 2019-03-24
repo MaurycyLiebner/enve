@@ -906,7 +906,7 @@ void Canvas::selectedPathsCombine() {
         firstVectorPath = newPath.get();
     }
     const auto targetVP = firstVectorPath->getPathAnimator();
-    const QMatrix firstTranf = firstVectorPath->getCombinedTransform();
+    const QMatrix firstTranf = firstVectorPath->getTotalTransform();
     for(const auto &box : mSelectedBoxes) {
         if(box == firstVectorPath) continue;
         if(box->SWT_isPathBox()) {
@@ -916,7 +916,7 @@ void Canvas::selectedPathsCombine() {
             } else {
                 boxPath = GetAsPtr(box, PathBox)->objectToVectorPathBox();
             }
-            const QMatrix relTransf = boxPath->getCombinedTransform()*
+            const QMatrix relTransf = boxPath->getTotalTransform()*
                     firstTranf.inverted();
             const auto srcVP = boxPath->getPathAnimator();
             srcVP->applyTransformToPoints(relTransf);

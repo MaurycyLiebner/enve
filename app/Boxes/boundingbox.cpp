@@ -124,7 +124,7 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     canvas->save();
     SkPath mappedPath = path;
     mappedPath.transform(toSkMatrix(
-                             mTransformAnimator->getCombinedTransform()));
+                             mTransformAnimator->getTotalTransform()));
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setColor(SK_ColorBLACK);
@@ -295,7 +295,7 @@ void BoundingBox::setParentGroup(BoxesGroup * const parent) {
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
     anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
-    mTransformAnimator->updateCombinedTransform(Animator::USER_CHANGE);
+    mTransformAnimator->updateTotalTransform(Animator::USER_CHANGE);
 }
 
 void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
@@ -303,7 +303,7 @@ void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
     mParentTransform = parent;
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
-    mTransformAnimator->updateCombinedTransform(Animator::USER_CHANGE);
+    mTransformAnimator->updateTotalTransform(Animator::USER_CHANGE);
 }
 
 void BoundingBox::clearParent() {
@@ -333,7 +333,7 @@ void BoundingBox::finishPivotTransform() {
 
 void BoundingBox::setPivotAbsPos(const QPointF &absPos) {
     setPivotRelPos(mapAbsPosToRel(absPos));
-    //updateCombinedTransform();
+    //updateTotalTransform();
 }
 
 QPointF BoundingBox::getPivotAbsPos() {
@@ -453,7 +453,7 @@ void BoundingBox::deselect() {
 }
 
 bool BoundingBox::isContainedIn(const QRectF &absRect) const {
-    return absRect.contains(getCombinedTransform().mapRect(mRelBoundingRect));
+    return absRect.contains(getTotalTransform().mapRect(mRelBoundingRect));
 }
 
 BoundingBox *BoundingBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
@@ -488,7 +488,7 @@ void BoundingBox::drawOutlineOverlay(SkCanvas * const canvas,
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
     SkPath mappedPath = path;
-    mappedPath.transform(toSkMatrix(getCombinedTransform()));
+    mappedPath.transform(toSkMatrix(getTotalTransform()));
     canvas->drawPath(mappedPath, paint);
     paint.setStrokeWidth(0.75f*invScale);
     paint.setColor(SK_ColorWHITE);
@@ -504,8 +504,8 @@ const SkPath &BoundingBox::getRelBoundingRectPath() {
     return mSkRelBoundingRectPath;
 }
 
-QMatrix BoundingBox::getCombinedTransform() const {
-    return mTransformAnimator->getCombinedTransform();
+QMatrix BoundingBox::getTotalTransform() const {
+    return mTransformAnimator->getTotalTransform();
 }
 
 QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() {
@@ -616,7 +616,7 @@ void BoundingBox::startTransform() {
 
 void BoundingBox::finishTransform() {
     mTransformAnimator->prp_finishTransform();
-    //updateCombinedTransform();
+    //updateTotalTransform();
 }
 
 qreal BoundingBox::getEffectsMarginAtRelFrame(const int &relFrame) {
@@ -627,6 +627,27 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
     return mEffectsAnimators->getEffectsMarginAtRelFrameF(relFrame);
 }
 
+QMatrix BoundingBox::getTotalTransformAtRelFrame(const qreal& relFrame) {
+    if(mParentGroup) {
+        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(absFrame);
+        const auto parentTrans = mParentGroup->getTotalTransformAtRelFrame(parentRelFrame);
+        const auto relTrans = getRelativeTransformAtRelFrameF(relFrame);
+        return relTrans*parentTrans;
+    }
+    return getRelativeTransformAtRelFrameF(relFrame);
+}
+
+QMatrix BoundingBox::getParentTotalTransformMatrixAtRelFrame(
+        const qreal &relFrame) {
+    if(mParentGroup) {
+        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(absFrame);
+        return mParentGroup->getTotalTransformAtRelFrame(parentRelFrame);
+    }
+    return QMatrix();
+}
+
 void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
@@ -634,17 +655,17 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     data->fRelFrame = qRound(relFrame);
     data->fRenderedToImage = false;
     data->fRelTransform = getRelativeTransformAtRelFrameF(relFrame);
-    data->fParentTransform = mTransformAnimator->
-            getParentCombinedTransformMatrixAtRelFrameF(relFrame);
+    data->fParentTransform =
+            getParentTotalTransformMatrixAtRelFrame(relFrame);
     data->fTransform = data->fRelTransform*data->fParentTransform;
     data->fOpacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
     data->fResolution = getParentCanvas()->getResolutionFraction();
     const bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
     if(effectsVisible) {
         data->fEffectsMargin = getEffectsMarginAtRelFrameF(relFrame)*
-                data->fResolution + 2.;
+                data->fResolution + 2;
     } else {
-        data->fEffectsMargin = 2.;
+        data->fEffectsMargin = 2;
     }
     data->fBlendMode = getBlendMode();
 
@@ -719,7 +740,7 @@ MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPtPos,
 
 void BoundingBox::cancelTransform() {
     mTransformAnimator->prp_cancelTransform();
-    //updateCombinedTransform();
+    //updateTotalTransform();
 }
 
 void BoundingBox::moveUp() {
@@ -750,14 +771,14 @@ int BoundingBox::getZIndex() const {
 }
 
 QPointF BoundingBox::getAbsolutePos() const {
-    return QPointF(mTransformAnimator->getCombinedTransform().dx(),
-                   mTransformAnimator->getCombinedTransform().dy());
+    return QPointF(mTransformAnimator->getTotalTransform().dx(),
+                   mTransformAnimator->getTotalTransform().dy());
 }
 
 void BoundingBox::updateDrawRenderContainerTransform() {
     if(mNReasonsNotToApplyUglyTransform == 0) {
-        mDrawRenderContainer->updatePaintTransformGivenNewCombinedTransform(
-                    mTransformAnimator->getCombinedTransform());
+        mDrawRenderContainer->updatePaintTransformGivenNewTotalTransform(
+                    mTransformAnimator->getTotalTransform());
     }
 }
 

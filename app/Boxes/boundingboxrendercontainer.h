@@ -24,8 +24,8 @@ public:
     void drawSk(SkCanvas * const canvas, SkPaint *paint,
                 GrContext* const grContext);
 
-    void updatePaintTransformGivenNewCombinedTransform(
-            const QMatrix &combinedTransform);
+    void updatePaintTransformGivenNewTotalTransform(
+            const QMatrix &TotalTransform);
 
     void setTransform(const QMatrix &transform);
 

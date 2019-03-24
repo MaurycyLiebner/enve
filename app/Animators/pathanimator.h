@@ -37,7 +37,7 @@ public:
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale,
-                      const SkMatrix &combinedTransform);
+                      const SkMatrix &TotalTransform);
 
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<stdptr<MovablePoint>> &list);
@@ -66,7 +66,7 @@ public:
 //                                         const int &relFrame2) {
 //        bool interpolate = mSmoothTransformation->g;
 //    }
-    QMatrix getCombinedTransform();
+    QMatrix getTotalTransform();
 private:
     BoundingBox *mParentBox = nullptr;
     QList<qsptr<VectorPathAnimator>> mSinglePaths;

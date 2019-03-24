@@ -241,12 +241,12 @@ MovablePoint *PathAnimator::getPointAtAbsPos(
 void PathAnimator::drawSelected(SkCanvas *canvas,
                                 const CanvasMode &currentCanvasMode,
                                 const SkScalar &invScale,
-                                const SkMatrix &combinedTransform) {
+                                const SkMatrix &TotalTransform) {
     for(const auto& singlePath : mSinglePaths) {
         singlePath->drawSelected(canvas,
                                  currentCanvasMode,
                                  invScale,
-                                 combinedTransform);
+                                 TotalTransform);
     }
 }
 

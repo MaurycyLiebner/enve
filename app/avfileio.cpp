@@ -1256,8 +1256,8 @@ void PathAnimator::readVectorPathAnimator(QIODevice *target) {
     addSinglePathAnimator(pathAnimator);
 }
 
-QMatrix PathAnimator::getCombinedTransform() {
-    if(mParentBox) mParentBox->getCombinedTransform();
+QMatrix PathAnimator::getTotalTransform() {
+    if(mParentBox) mParentBox->getTotalTransform();
     return QMatrix();
 }
 

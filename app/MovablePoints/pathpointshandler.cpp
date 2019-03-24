@@ -39,8 +39,8 @@ void PathPointsHandler::selectAllPoints(Canvas * const canvas) {
 void PathPointsHandler::drawPoints(SkCanvas * const canvas,
                                    const CanvasMode &currentCanvasMode,
                                    const SkScalar &invScale,
-                                   const SkMatrix &combinedTransform) const {
-    Q_UNUSED(combinedTransform);
+                                   const SkMatrix &TotalTransform) const {
+    Q_UNUSED(TotalTransform);
 
     const bool keyOnCurrentFrame = mKeyOnCurrentFrame;
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {

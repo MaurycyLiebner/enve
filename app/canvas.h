@@ -277,9 +277,9 @@ public:
         return mCurrentBoxesGroup;
     }
 
-    void updateCombinedTransform() {}
+    void updateTotalTransform() {}
 
-    QMatrix getCombinedTransform() const {
+    QMatrix getTotalTransform() const {
         QMatrix matrix;
         matrix.reset();
         return matrix;
@@ -357,9 +357,9 @@ public:
     void setRasterEffectsVisible(const bool &bT) { mRasterEffectsVisible = bT; }
     void setPathEffectsVisible(const bool &bT) { mPathEffectsVisible = bT; }
 protected:
-//    void updateAfterCombinedTransformationChanged() {
+//    void updateAfterTotalTransformationChanged() {
 ////        for(const auto& child : mChildBoxes) {
-////            child->updateCombinedTransformTmp();
+////            child->updateTotalTransformTmp();
 ////            child->scheduleSoftUpdate();
 ////        }
 //    }

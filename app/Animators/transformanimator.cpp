@@ -123,11 +123,11 @@ QPointF BasicTransformAnimator::pos() {
 }
 
 QPointF BasicTransformAnimator::mapAbsPosToRel(const QPointF &absPos) const {
-    return getCombinedTransform().inverted().map(absPos);
+    return getTotalTransform().inverted().map(absPos);
 }
 
 QPointF BasicTransformAnimator::mapRelPosToAbs(const QPointF &relPos) const {
-    return getCombinedTransform().map(relPos);
+    return getTotalTransform().map(relPos);
 }
 
 QPointF BasicTransformAnimator::mapFromParent(const QPointF &parentRelPos) const {
@@ -201,21 +201,21 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
 
 void BasicTransformAnimator::updateRelativeTransform(const UpdateReason &reason) {
     mRelTransform = getCurrentTransformationMatrix();
-    updateCombinedTransform(reason);
+    updateTotalTransform(reason);
 }
 
-void BasicTransformAnimator::updateCombinedTransform(const UpdateReason &reason) {
+void BasicTransformAnimator::updateTotalTransform(const UpdateReason &reason) {
     if(mParentTransformAnimator.isNull()) {
-        mCombinedTransform = mRelTransform;
+        mTotalTransform = mRelTransform;
     } else {
-        mCombinedTransform = mRelTransform *
-                             mParentTransformAnimator->getCombinedTransform();
+        mTotalTransform = mRelTransform *
+                             mParentTransformAnimator->getTotalTransform();
     }
-    emit combinedTransformChanged(reason);
+    emit TotalTransformChanged(reason);
 }
 
-const QMatrix &BasicTransformAnimator::getCombinedTransform() const {
-    return mCombinedTransform;
+const QMatrix &BasicTransformAnimator::getTotalTransform() const {
+    return mTotalTransform;
 }
 
 const QMatrix &BasicTransformAnimator::getRelativeTransform() const {
@@ -226,12 +226,12 @@ void BasicTransformAnimator::setParentTransformAnimator(
         BasicTransformAnimator* parent) {
     if(mParentTransformAnimator)
         disconnect(mParentTransformAnimator,
-                   &BasicTransformAnimator::combinedTransformChanged,
-                   this, &BasicTransformAnimator::updateCombinedTransform);
+                   &BasicTransformAnimator::TotalTransformChanged,
+                   this, &BasicTransformAnimator::updateTotalTransform);
     mParentTransformAnimator = parent;
-    if(parent) connect(parent, &BasicTransformAnimator::combinedTransformChanged,
-                       this, &BasicTransformAnimator::updateCombinedTransform);
-    updateCombinedTransform(Animator::USER_CHANGE);
+    if(parent) connect(parent, &BasicTransformAnimator::TotalTransformChanged,
+                       this, &BasicTransformAnimator::updateTotalTransform);
+    updateTotalTransform(Animator::USER_CHANGE);
 }
 
 bool BasicTransformAnimator::SWT_isBasicTransformAnimator() const { return true; }
@@ -359,8 +359,8 @@ bool BoxTransformAnimator::rotOrScaleOrPivotRecording() const {
            mPivotAnimator->anim_isDescendantRecording();
 }
 
-void BoxTransformAnimator::updateCombinedTransform(const UpdateReason &reason) {
-    BasicTransformAnimator::updateCombinedTransform(reason);
+void BoxTransformAnimator::updateTotalTransform(const UpdateReason &reason) {
+    BasicTransformAnimator::updateTotalTransform(reason);
 
     mParentBox_k->updateDrawRenderContainerTransform();
     mParentBox_k->scheduleUpdate(reason);
@@ -410,7 +410,7 @@ QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrameF(
     return matrix;
 }
 
-QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrameF(
+QMatrix BasicTransformAnimator::getParentTotalTransformMatrixAtRelFrameF(
         const qreal &relFrame) {
     if(mParentTransformAnimator.data() == nullptr) {
         return QMatrix();
@@ -419,7 +419,7 @@ QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrameF(
         const qreal parentRelFrame =
                 mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
         return mParentTransformAnimator->
-                getCombinedTransformMatrixAtRelFrameF(parentRelFrame);
+                getTotalTransformMatrixAtRelFrameF(parentRelFrame);
     }
 }
 
@@ -435,7 +435,7 @@ QrealAnimator *BasicTransformAnimator::getRotAnimator() {
     return mRotAnimator.get();
 }
 
-QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrameF(
+QMatrix BasicTransformAnimator::getTotalTransformMatrixAtRelFrameF(
         const qreal &relFrame) {
     if(mParentTransformAnimator.data()) {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -443,7 +443,7 @@ QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrameF(
                 mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
         return getRelativeTransformAtRelFrameF(relFrame)*
                 mParentTransformAnimator->
-                    getCombinedTransformMatrixAtRelFrameF(parentRelFrame);
+                    getTotalTransformMatrixAtRelFrameF(parentRelFrame);
     } else {
         return getRelativeTransformAtRelFrameF(relFrame);
     }

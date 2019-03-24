@@ -186,7 +186,7 @@ public:
 
     virtual QMatrix getRelativeTransformAtCurrentFrame();
     virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
-    virtual QMatrix getCombinedTransform() const;
+    virtual QMatrix getTotalTransform() const;
     virtual void applyCurrentTransformation();
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
@@ -400,6 +400,8 @@ public:
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
     void setPivotAutoAdjust(const bool &pivotAutoAdjust);
+    QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
+    QMatrix getParentTotalTransformMatrixAtRelFrame(const qreal &relFrame);
 protected:
     bool mSelected = false;
     bool mInVisibleRange = true;

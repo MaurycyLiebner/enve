@@ -52,9 +52,9 @@ void Canvas::connectPoints() {
                 secondSinglePath->revertAllPointsForAllKeys();
             }
             const QMatrix firstMatrix =
-                    firstParentPath->getCombinedTransform();
+                    firstParentPath->getTotalTransform();
             const QMatrix secondMatrix =
-                    secondParentPath->getCombinedTransform();
+                    secondParentPath->getTotalTransform();
             const QMatrix effectiveMatrix =
                     secondMatrix*firstMatrix.inverted();
             secondSinglePath->applyTransformToPoints(effectiveMatrix);
@@ -168,9 +168,9 @@ void Canvas::disconnectPoints() {
 //                secondSinglePath->revertAllPointsForAllKeys();
 //            }
 //            QMatrix firstMatrix =
-//                    firstParentPath->getCombinedTransform();
+//                    firstParentPath->getTotalTransform();
 //            QMatrix secondMatrix =
-//                    secondParentPath->getCombinedTransform();
+//                    secondParentPath->getTotalTransform();
 //            QMatrix effectiveMatrix =
 //                    secondMatrix*firstMatrix.inverted();
 //            secondSinglePath->applyTransformToPoints(effectiveMatrix);
