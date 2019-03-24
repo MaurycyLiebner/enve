@@ -456,7 +456,7 @@ bool BoundingBox::isContainedIn(const QRectF &absRect) const {
     return absRect.contains(getCombinedTransform().mapRect(mRelBoundingRect));
 }
 
-BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
+BoundingBox *BoundingBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
     if(absPointInsidePath(absPos)) return this;
     return nullptr;
 }

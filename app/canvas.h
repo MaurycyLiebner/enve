@@ -11,6 +11,7 @@
 #include "Animators/coloranimator.h"
 #include "SkPathOps.h"
 #include "MovablePoints/segment.h"
+#include "Boxes/canvasrenderdata.h"
 
 class TextBox;
 class Circle;
@@ -56,17 +57,7 @@ enum CanvasMode : short {
 extern bool zLessThan(const qptr<BoundingBox> &box1,
                       const qptr<BoundingBox> &box2);
 
-struct CanvasRenderData : public BoxesGroupRenderData {
-    CanvasRenderData(BoundingBox *parentBoxT);
-    void renderToImage();
-    qreal canvasWidth;
-    qreal canvasHeight;
-    SkColor fBgColor;
-protected:
-    void drawSk(SkCanvas * const canvas);
 
-    void updateRelBoundingRect();
-};
 
 extern bool boxesZSort(const qptr<BoundingBox> &box1,
                        const qptr<BoundingBox> &box2);

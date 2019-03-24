@@ -535,7 +535,7 @@ void Canvas::handleLeftButtonMousePress() {
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         handleMovePointMousePressEvent();
     } else if(mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
-        mLastPressedBox = getPathAtFromAllAncestors(mLastPressPosRel);
+        mLastPressedBox = getBoxAtFromAllDescendents(mLastPressPosRel);
     } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
         const auto newPath = SPtrCreate(Circle)();
         mCurrentBoxesGroup->addContainedBox(newPath);
@@ -727,7 +727,7 @@ void Canvas::handleMovePointMouseRelease() {
                         mCurrentMouseEventPosRel);
             if(!mLastPressedBox ? true : mLastPressedBox->SWT_isBoxesGroup()) {
                 BoundingBox * const pressedBox =
-                        getPathAtFromAllAncestors(mCurrentMouseEventPosRel);
+                        getBoxAtFromAllDescendents(mCurrentMouseEventPosRel);
                 if(!pressedBox) {
                     if(!isShiftPressed()) {
                         clearPointsSelectionOrDeselect();

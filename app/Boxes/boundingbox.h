@@ -148,7 +148,7 @@ public:
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv);
 
-    virtual BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
+    virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
     virtual VectorPathEdge *getEdge(const QPointF &absPos,
                                     const qreal &canvasScaleInv);
     virtual MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

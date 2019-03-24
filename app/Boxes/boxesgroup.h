@@ -2,67 +2,26 @@
 #define BOXESGROUP_H
 #include "Boxes/boundingbox.h"
 
-#define Q_FOREACHBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
-    for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
-
-
-
 class PathBox;
 class PathEffectAnimators;
-
-struct BoxesGroupRenderData : public BoundingBoxRenderData {
-    friend class StdSelfRef;
-    BoxesGroupRenderData(BoundingBox *parentBoxT) :
-        BoundingBoxRenderData(parentBoxT) {
-        mDelayDataSet = true;
-    }
-
-    void updateRelBoundingRect() {
-        SkPath boundingPaths;
-        for(const auto &child : fChildrenRenderData) {
-            if(child->fRelBoundingRect.isEmpty()) continue;
-            SkPath childPath;
-            childPath.addRect(
-                    toSkRect(child->fRelBoundingRect));
-            childPath.transform(
-                        toSkMatrix(child->fRelTransform));
-            boundingPaths.addPath(childPath);
-            fOtherGlobalRects << child->fGlobalBoundingRect;
-        }
-        fRelBoundingRect = toQRectF(boundingPaths.computeTightBounds());
-    }
-
-    QList<stdsptr<BoundingBoxRenderData>> fChildrenRenderData;
-protected:
-    void transformRenderCanvas(SkCanvas& canvas) const {
-        canvas.concat(toSkMatrix(fResolutionScale));
-    }
-
-    void drawSk(SkCanvas * const canvas) {
-        canvas->save();
-        for(const auto &child : fChildrenRenderData) {
-            canvas->save();
-            child->drawRenderedImageForParent(canvas);
-            canvas->restore();
-        }
-
-        canvas->restore();
-    }
-};
 
 class BoxesGroup : public BoundingBox {
     Q_OBJECT
     friend class SelfRef;
-public:
+protected:
     BoxesGroup(const BoundingBoxType& type = TYPE_GROUP);
+public:
     ~BoxesGroup();
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
+
+    bool SWT_isBoxesGroup() const;
+    void anim_setAbsFrame(const int &frame);
     void anim_scaleTime(const int& pivotAbsFrame, const qreal& scale);
     //MovablePoint *getPointAt(const QPointF &absPos, const CanvasMode &currentMode);
 
 
-    BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
+    BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
@@ -112,10 +71,6 @@ public:
     void setStrokeColorMode(const ColorMode &colorMode);
     void drawPixmapSk(SkCanvas * const canvas,
                       GrContext * const grContext);
-
-    bool SWT_isBoxesGroup() const;
-
-    void anim_setAbsFrame(const int &frame);
 
     stdsptr<BoundingBoxRenderData> createRenderData();
 

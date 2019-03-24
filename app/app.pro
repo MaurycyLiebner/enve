@@ -277,7 +277,10 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/simplebrushwrapper.cpp \
     GUI/BrushWidgets/brushcontexedwrapper.cpp \
     GUI/BrushWidgets/brushwidget.cpp \
-    Boxes/waitingforboxload.cpp
+    Boxes/waitingforboxload.cpp \
+    Boxes/boxesgrouprenderdata.cpp \
+    Boxes/canvasrenderdata.cpp \
+    Boxes/linkcanvasrenderdata.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -503,7 +506,10 @@ HEADERS  += \
     GUI/BrushWidgets/simplebrushwrapper.h \
     GUI/BrushWidgets/brushcontexedwrapper.h \
     GUI/BrushWidgets/brushwidget.h \
-    Boxes/waitingforboxload.h
+    Boxes/waitingforboxload.h \
+    Boxes/boxesgrouprenderdata.h \
+    Boxes/canvasrenderdata.h \
+    Boxes/linkcanvasrenderdata.h
 
 RESOURCES += \
     resources.qrc

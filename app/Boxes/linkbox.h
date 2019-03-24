@@ -273,27 +273,7 @@ protected:
             SPtrCreate(BoxTargetProperty)("link target");
 };
 
-struct LinkCanvasRenderData : public CanvasRenderData {
-    friend class StdSelfRef;
-
-    void updateRelBoundingRect() {
-        if(fClipToCanvas) {
-            CanvasRenderData::updateRelBoundingRect();
-        } else {
-            BoxesGroupRenderData::updateRelBoundingRect();
-        }
-    }
-
-    bool fClipToCanvas = false;
-protected:
-    LinkCanvasRenderData(BoundingBox* parentBoxT) :
-        CanvasRenderData(parentBoxT) {}
-
-    void renderToImage();
-};
-
 class InternalLinkCanvas : public InternalLinkGroupBox {
-    Q_OBJECT
     friend class SelfRef;
 public:
     void queScheduledTasks();

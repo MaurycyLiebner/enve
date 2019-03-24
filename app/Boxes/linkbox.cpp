@@ -170,10 +170,10 @@ QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const qreal &relFrame)
     return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }
 
+#include "linkcanvasrenderdata.h"
 InternalLinkCanvas::InternalLinkCanvas(BoxesGroup* linkTarget) :
     InternalLinkGroupBox(linkTarget) {
-    ca_prependChildAnimator(mTransformAnimator.data(),
-                            mClipToCanvas);
+    ca_prependChildAnimator(mTransformAnimator.data(), mClipToCanvas);
 }
 
 void InternalLinkCanvas::queScheduledTasks() {
@@ -235,82 +235,4 @@ stdsptr<BoundingBoxRenderData> InternalLinkCanvas::createRenderData() {
 bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) const {
     if(mClipToCanvas->getValue()) return mRelBoundingRect.contains(relPos);
     return InternalLinkGroupBox::relPointInsidePath(relPos);
-}
-
-void LinkCanvasRenderData::renderToImage() {
-    if(fRenderedToImage) return;
-    fRenderedToImage = true;
-    QMatrix scale;
-    scale.scale(fResolution, fResolution);
-    fScaledTransform = fTransform*scale;
-    //transformRes.scale(resolution, resolution);
-    fGlobalBoundingRect =
-            fScaledTransform.mapRect(fRelBoundingRect).
-            adjusted(-fEffectsMargin, -fEffectsMargin,
-                     fEffectsMargin, fEffectsMargin);
-    if(fMaxBoundsEnabled) {
-        fGlobalBoundingRect = fGlobalBoundingRect.intersected(
-                    scale.mapRect(fMaxBoundsRect));
-    }
-    QSizeF sizeF = fGlobalBoundingRect.size();
-    QPointF transF = fGlobalBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(fGlobalBoundingRect.left()/**resolution*/),
-                    qRound(fGlobalBoundingRect.top()/**resolution*/));
-
-    const auto info = SkiaHelpers::getPremulBGRAInfo(
-                qCeil(sizeF.width()), qCeil(sizeF.height()));
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    bitmap.eraseColor(SK_ColorTRANSPARENT);
-    //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas rasterCanvas(bitmap);//rasterSurface->getCanvas();
-    //rasterCanvas->clear(SK_ColorTRANSPARENT);
-
-    rasterCanvas.translate(static_cast<SkScalar>(-fGlobalBoundingRect.left()),
-                           static_cast<SkScalar>(-fGlobalBoundingRect.top()));
-
-    fGlobalBoundingRect.translate(-transF);
-
-    rasterCanvas.translate(static_cast<SkScalar>(transF.x()),
-                           static_cast<SkScalar>(transF.y()));
-
-    if(fClipToCanvas) {
-        rasterCanvas.save();
-        rasterCanvas.concat(toSkMatrix(fScaledTransform));
-        SkPaint fillP;
-        fillP.setAntiAlias(true);
-        fillP.setColor(fBgColor);
-        rasterCanvas.drawRect(toSkRect(fRelBoundingRect), fillP);
-        rasterCanvas.restore();
-    }
-
-    drawSk(&rasterCanvas);
-    if(fClipToCanvas) {
-        rasterCanvas.save();
-        rasterCanvas.concat(toSkMatrix(fScaledTransform));
-        SkPaint paintT;
-        paintT.setBlendMode(SkBlendMode::kDstIn);
-        paintT.setColor(SK_ColorTRANSPARENT);
-        paintT.setAntiAlias(true);
-        SkPath path;
-        path.addRect(toSkRect(fRelBoundingRect));
-        path.toggleInverseFillType();
-        rasterCanvas.drawPath(path, paintT);
-        rasterCanvas.restore();
-    }
-    rasterCanvas.flush();
-
-    fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
-                             qRound(fGlobalBoundingRect.top()));
-
-    if(!fPixmapEffects.isEmpty()) {
-        for(const auto& effect : fPixmapEffects) {
-            effect->applyEffectsSk(bitmap, fResolution);
-        }
-        clearPixmapEffects();
-    }
-
-    bitmap.setImmutable();
-    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
-    bitmap.reset();
 }

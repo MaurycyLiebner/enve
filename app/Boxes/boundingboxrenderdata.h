@@ -19,15 +19,14 @@ protected:
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 
     virtual void drawSk(SkCanvas * const canvas) = 0;
-
     virtual void transformRenderCanvas(SkCanvas& canvas) const {
         canvas.concat(toSkMatrix(fScaledTransform));
     }
-
     virtual void copyFrom(BoundingBoxRenderData *src);
+    virtual void updateRelBoundingRect();
+
     void scheduleTaskNow();
 public:
-    virtual void updateRelBoundingRect();
     virtual void renderToImage();
     virtual bool allDataReady() { return true; }
     virtual QPointF getCenterPosition() {
@@ -114,9 +113,8 @@ protected:
         for(const QRectF &rectT : fOtherGlobalRects) {
             fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
         }
-        fGlobalBoundingRect = fGlobalBoundingRect.
-                adjusted(-fEffectsMargin, -fEffectsMargin,
-                         fEffectsMargin, fEffectsMargin);
+        fGlobalBoundingRect.adjust(-fEffectsMargin, -fEffectsMargin,
+                                   fEffectsMargin, fEffectsMargin);
         if(fMaxBoundsEnabled) {
             const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
             fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);

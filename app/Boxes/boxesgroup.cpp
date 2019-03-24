@@ -587,14 +587,13 @@ void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mParentGroup->setDescendantCurrentGroup(bT);
 }
 
-BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
+BoundingBox *BoxesGroup::getBoxAtFromAllDescendents(const QPointF &absPos) {
     BoundingBox* boxAtPos = nullptr;
-    //Q_FOREACHBoxInListInverted(mChildren) {
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto& box = mContainedBoxes.at(i);
         if(box->isVisibleAndUnlocked() &&
             box->isVisibleAndInVisibleDurationRect()) {
-            boxAtPos = box->getPathAtFromAllAncestors(absPos);
+            boxAtPos = box->getBoxAtFromAllDescendents(absPos);
             if(boxAtPos) break;
         }
     }
