@@ -374,7 +374,7 @@ void PaintBox::mouseReleaseEvent() {
     tabletReleaseEvent();
 }
 
-void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
+void PaintBoxRenderData::drawSk(SkCanvas * const canvas) {
     //SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->translate(trans.x(), trans.y());

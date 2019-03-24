@@ -41,9 +41,8 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
     fRelBoundingRect = fParentBox->getRelBoundingRectAtRelFrame(fRelFrame);
 }
 
-void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
+void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
     if(fOpacity < 0.001) return;
-    canvas->save();
     const SkScalar invScale = toSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
     renderToImage();
@@ -65,10 +64,7 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
         path.toggleInverseFillType();
         canvas->drawPath(path, paintT);
     }
-    canvas->drawImage(fRenderedImage,
-                      fDrawPos.x(), fDrawPos.y(),
-                      &paint);
-    canvas->restore();
+    canvas->drawImage(fRenderedImage, fDrawPos.x(), fDrawPos.y(), &paint);
 }
 
 void BoundingBoxRenderData::renderToImage() {

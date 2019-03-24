@@ -45,7 +45,7 @@ struct ParticleState {
                              opacityT, pathT);
     }
 
-    void drawSk(SkCanvas *canvas,
+    void drawSk(SkCanvas * const canvas,
                 const SkPaint paint) const {
         if(fSize < 0.f) return;
         SkPaint paintT = paint;
@@ -106,7 +106,7 @@ struct ParticleBoxRenderData : public BoundingBoxRenderData {
     QList<EmitterData> fEmittersData;
     SkRect fClipRect;
 private:
-    void drawSk(SkCanvas *canvas) {
+    void drawSk(SkCanvas * const canvas) {
         canvas->save();
         canvas->clipRect(fClipRect);
         for(const EmitterData &emitterData : fEmittersData) {

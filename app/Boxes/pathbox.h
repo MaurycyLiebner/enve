@@ -36,7 +36,7 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
         return toQRectF(fEditPath.getBounds()).center();
     }
 protected:
-    void drawSk(SkCanvas *canvas) {
+    void drawSk(SkCanvas * const canvas) {
         canvas->save();
 
         SkPaint paint;

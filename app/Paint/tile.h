@@ -60,7 +60,7 @@ struct TileSkDrawer : public _ScheduledTask {
                  const ushort &xT, const ushort &yT);
     ~TileSkDrawer();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr) const;
+    void drawSk(SkCanvas * const canvas, SkPaint *paint = nullptr) const;
 
     void _processUpdate();
 
@@ -91,7 +91,7 @@ struct TileSkDrawerCollection {
     TileSkDrawerCollection() {}
 //    ~TileSkDrawerCollection();
 
-    void drawSk(SkCanvas *canvas) const {
+    void drawSk(SkCanvas * const canvas) const {
         QRectF rect;
         for(TileSkDrawer *drawer : drawers) {
             if(rect.isNull()) {
@@ -292,7 +292,7 @@ public:
 
     void setDabsForDrawer();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint = nullptr);
+    void drawSk(SkCanvas * const canvas, SkPaint *paint = nullptr);
 
     void saveToTmp();
     void clearTmp();

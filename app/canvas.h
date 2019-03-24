@@ -63,7 +63,7 @@ struct CanvasRenderData : public BoxesGroupRenderData {
     qreal canvasHeight;
     SkColor fBgColor;
 protected:
-    void drawSk(SkCanvas *canvas);
+    void drawSk(SkCanvas * const canvas);
 
     void updateRelBoundingRect();
 };

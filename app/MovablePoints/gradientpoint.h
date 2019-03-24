@@ -9,7 +9,7 @@ public:
     void setRelativePos(const QPointF &relPos);
     void moveByRel(const QPointF &relTranslatione);
     void setColor(const QColor &fillColor);
-    void drawSk(SkCanvas *canvas,
+    void drawSk(SkCanvas * const canvas,
                 const SkScalar &invScale);
 protected:
     GradientPoint(QPointFAnimator* const associatedAnimator,

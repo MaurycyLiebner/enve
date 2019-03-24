@@ -29,26 +29,24 @@ int BoundingBox::sNextWriteId;
 QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
-    ComplexAnimator("box"), mDocumentId(sNextDocumentId++),
-    mType(type) {
+    ComplexAnimator("box"),
+    mDocumentId(sNextDocumentId++), mType(type),
+    mTransformAnimator(SPtrCreate(BoxTransformAnimator)(this)),
+    mEffectsAnimators(SPtrCreate(EffectAnimators)(this)),
+    mGPUEffectsAnimators(SPtrCreate(GPUEffectAnimators)(this)) {
     sDocumentBoxes << this;
-
-    mTransformAnimator = SPtrCreate(BoxTransformAnimator)(this);
     ca_addChildAnimator(mTransformAnimator);
+    mTransformAnimator->reset();
 
-    mEffectsAnimators = SPtrCreate(EffectAnimators)(this);
     mEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(PixmapEffectUpdater)(this));
     ca_addChildAnimator(mEffectsAnimators);
     mEffectsAnimators->SWT_hide();
 
-    mGPUEffectsAnimators = SPtrCreate(GPUEffectAnimators)(this);
     mGPUEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(PixmapEffectUpdater)(this));
     ca_prependChildAnimator(mEffectsAnimators.data(), mGPUEffectsAnimators);
     mGPUEffectsAnimators->SWT_hide();
-
-    mTransformAnimator->reset();
 }
 
 BoundingBox::~BoundingBox() {
@@ -231,17 +229,18 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::anim_setAbsFrame(const int &frame) {
-    int lastRelFrame = anim_getCurrentRelFrame();
+    const int lastRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
-    bool isInVisRange = isRelFrameInVisibleDurationRect(
+    const bool isInVisRange = isRelFrameInVisibleDurationRect(
                 anim_getCurrentRelFrame());
-    if(mUpdateDrawOnParentBox != isInVisRange) {
-        if(mUpdateDrawOnParentBox) {
-            if(mParentGroup) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
+    if(mInVisibleRange != isInVisRange) {
+        if(mInVisibleRange) {
+            if(mParentGroup)
+                mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
         } else {
             scheduleUpdate(Animator::FRAME_CHANGE);
         }
-        mUpdateDrawOnParentBox = isInVisRange;
+        mInVisibleRange = isInVisRange;
     }
     if(prp_differencesBetweenRelFrames(lastRelFrame, anim_getCurrentRelFrame())) {
         scheduleUpdate(Animator::FRAME_CHANGE);
@@ -474,16 +473,14 @@ OutlineSettingsAnimator *BoundingBox::getStrokeSettings() const {
     return nullptr;
 }
 
-void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
+void BoundingBox::drawOutlineOverlay(SkCanvas * const canvas,
                                        const SkPath &path,
                                        const SkScalar &invScale,
                                        const bool &dashes) {
-    canvas->save();
-
     SkPaint paint;
     if(dashes) {
-        SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
-                                 MIN_WIDGET_HEIGHT*0.25f*invScale};
+        const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
+                                       MIN_WIDGET_HEIGHT*0.25f*invScale};
         paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
     }
     paint.setAntiAlias(true);
@@ -496,25 +493,11 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
     paint.setStrokeWidth(0.75f*invScale);
     paint.setColor(SK_ColorWHITE);
     canvas->drawPath(mappedPath, paint);
-
-//    SkPaint paint;
-//    SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
-//                             MIN_WIDGET_HEIGHT*0.25f*invScale};
-//    paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-//    paint.setColor(SkColorSetARGB(125, 0, 0, 0));
-//    paint.setStyle(SkPaint::kStroke_Style);
-//    paint.setStrokeWidth(invScale);
-//    SkPath mappedPath = path;
-//    mappedPath.transform(QMatrixToSkMatrix(getCombinedTransform()));
-//    canvas->drawPath(mappedPath, paint);
-
-    canvas->restore();
 }
 
 void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
                                    const SkScalar &invScale) {
-    drawAsBoundingRectSk(canvas, mSkRelBoundingRectPath,
-                         invScale, true);
+    drawOutlineOverlay(canvas, mSkRelBoundingRectPath, invScale, true);
 }
 
 const SkPath &BoundingBox::getRelBoundingRectPath() {

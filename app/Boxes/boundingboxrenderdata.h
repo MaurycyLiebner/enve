@@ -91,7 +91,7 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     }
 
     virtual void updateRelBoundingRect();
-    void drawRenderedImageForParent(SkCanvas *canvas);
+    void drawRenderedImageForParent(SkCanvas * const canvas);
     virtual void renderToImage();
 
     void _processUpdate();
@@ -130,7 +130,7 @@ protected:
     QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;
-    virtual void drawSk(SkCanvas *canvas) = 0;
+    virtual void drawSk(SkCanvas * const canvas) = 0;
 };
 
 class RenderDataCustomizerFunctor : public StdSelfRef {

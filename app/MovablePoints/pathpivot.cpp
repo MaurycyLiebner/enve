@@ -13,7 +13,7 @@ PathPivot::PathPivot(Canvas *parent) :
 //    mRotationPath -= removeEllipse;
 }
 
-void PathPivot::drawSk(SkCanvas *canvas,
+void PathPivot::drawSk(SkCanvas * const canvas,
                        const SkScalar &invScale) {
     SkPoint absPos = toSkPoint(getAbsolutePos());
     if(!isHidden()) {

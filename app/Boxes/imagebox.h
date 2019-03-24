@@ -37,7 +37,7 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
 
     FileCacheHandler *srcCacheHandler;
 private:
-    void drawSk(SkCanvas *canvas) {
+    void drawSk(SkCanvas * const canvas) {
         SkPaint paint;
         //paint.setFilterQuality(kHigh_SkFilterQuality);
         //paint.setAntiAlias(true);

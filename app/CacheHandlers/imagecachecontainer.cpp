@@ -46,7 +46,7 @@ void ImageCacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
     afterDataLoadedFromTmpFile();
 }
 
-void ImageCacheContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
+void ImageCacheContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
                                  GrContext * const grContext) {
     Q_UNUSED(paint);
     Q_UNUSED(grContext);

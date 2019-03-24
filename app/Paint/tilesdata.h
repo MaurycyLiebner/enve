@@ -27,7 +27,7 @@ public:
 
     void saveToTmp();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint);
+    void drawSk(SkCanvas * const canvas, SkPaint *paint);
 
     void setSize(const ushort &width_t,
                  const ushort &height_t);

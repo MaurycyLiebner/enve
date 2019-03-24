@@ -29,7 +29,7 @@ public:
     void finishTransform();
     void startRotating();
     void startScaling();
-    void drawSk(SkCanvas *canvas, const SkScalar &invScale);
+    void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
 protected:
     bool mRotating = false;
     bool mScaling = false;

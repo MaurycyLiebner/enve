@@ -243,7 +243,7 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
 void PathBox::drawBoundingRect(SkCanvas * const canvas,
                                  const SkScalar &invScale) {
     BoundingBox::drawBoundingRect(canvas, invScale);
-    drawAsBoundingRectSk(canvas, mEditPathSk, invScale, false);
+    drawOutlineOverlay(canvas, mEditPathSk, invScale, false);
 }
 
 void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {

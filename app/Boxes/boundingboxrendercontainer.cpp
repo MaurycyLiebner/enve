@@ -9,7 +9,7 @@
 
 RenderContainer::~RenderContainer() {}
 
-void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint,
+void RenderContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
                              GrContext * const grContext) {
     if(!mSrcRenderData) return;
     canvas->save();

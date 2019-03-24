@@ -273,8 +273,10 @@ void Canvas::renderSk(SkCanvas * const canvas,
         const SkScalar invZoom = toSkScalar(qInvZoom);
         mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
         for(const auto& box : mSelectedBoxes) {
+            canvas->save();
             box->drawBoundingRect(canvas, invZoom);
             box->drawCanvasControls(canvas, mCurrentMode, invZoom);
+            canvas->restore();
         }
 
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
@@ -1223,7 +1225,7 @@ void CanvasRenderData::renderToImage() {
     bitmap.reset();
 }
 
-void CanvasRenderData::drawSk(SkCanvas *canvas) {
+void CanvasRenderData::drawSk(SkCanvas * const canvas) {
     canvas->save();
 
     canvas->scale(toSkScalar(fResolution),

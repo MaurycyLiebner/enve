@@ -127,7 +127,7 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
     //}
 }
 
-//void AnimationBox::drawSk(SkCanvas *canvas) {
+//void AnimationBox::drawSk(SkCanvas * const canvas) {
 //    SkPaint paint;
 //    //paint.setFilterQuality(kHigh_SkFilterQuality);
 //    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);

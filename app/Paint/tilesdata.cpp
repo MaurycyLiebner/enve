@@ -68,7 +68,7 @@ void TilesData::saveToTmp() {
     }
 }
 
-void TilesData::drawSk(SkCanvas *canvas, SkPaint *paint) {
+void TilesData::drawSk(SkCanvas * const canvas, SkPaint *paint) {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
             mTiles[j][i]->drawSk(canvas, paint);

@@ -219,7 +219,7 @@ void Tile::setDabsForDrawer() {
     mDabsToPaint.clear();
 }
 
-void Tile::drawSk(SkCanvas *canvas, SkPaint *paint) {
+void Tile::drawSk(SkCanvas * const canvas, SkPaint *paint) {
     canvas->drawBitmap(mTmpDataTileImage, mPosX, mPosY, paint);
     canvas->drawBitmap(mDataTileImage, mPosX, mPosY, paint);
 }
@@ -495,7 +495,7 @@ TileSkDrawer::TileSkDrawer(Tile *parentTileT,
 TileSkDrawer::~TileSkDrawer() {
 }
 
-void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
+void TileSkDrawer::drawSk(SkCanvas * const canvas, SkPaint *paint) const {
     //paint->setAntiAlias(true);
     //paint->setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(tileImg, posX, posY, paint);

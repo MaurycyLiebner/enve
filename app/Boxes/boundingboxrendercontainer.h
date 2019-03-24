@@ -21,7 +21,7 @@ class RenderContainer : public ImageCacheContainer {
 public:
     ~RenderContainer();
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint,
+    void drawSk(SkCanvas * const canvas, SkPaint *paint,
                 GrContext* const grContext);
 
     void updatePaintTransformGivenNewCombinedTransform(

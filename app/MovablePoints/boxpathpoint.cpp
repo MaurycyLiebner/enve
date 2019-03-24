@@ -28,7 +28,7 @@ void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
     parentBox->setPivotAbsPos(absPos);
 }
 
-void BoxPathPoint::drawSk(SkCanvas *canvas,
+void BoxPathPoint::drawSk(SkCanvas * const canvas,
                           const SkScalar &invScale) {
     if(isHidden()) return;
     const SkPoint absPos = toSkPoint(getAbsolutePos());

@@ -38,7 +38,7 @@ public:
 
     QPointF getAbsolutePos() const;
 
-    virtual void drawSk(SkCanvas *canvas,
+    virtual void drawSk(SkCanvas * const canvas,
                         const SkScalar &invScale);
 
     bool isPointAtAbsPos(const QPointF &absPoint,

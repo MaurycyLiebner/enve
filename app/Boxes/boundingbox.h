@@ -330,7 +330,7 @@ public:
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
                            const SkScalar &invScale);
-    void drawAsBoundingRectSk(SkCanvas *canvas,
+    void drawOutlineOverlay(SkCanvas * const canvas,
                               const SkPath &path,
                               const SkScalar &invScale,
                               const bool &dashes);
@@ -402,7 +402,7 @@ public:
     void setPivotAutoAdjust(const bool &pivotAutoAdjust);
 protected:
     bool mSelected = false;
-    bool mUpdateDrawOnParentBox = true;
+    bool mInVisibleRange = true;
     bool mPivotAutoAdjust = true;
     bool mVisible = true;
     bool mLocked = false;
@@ -410,7 +410,6 @@ protected:
 
     int mZListIndex = 0;
     int mNReasonsNotToApplyUglyTransform = 0;
-    int mExpiredPixmap = 0;
     int mReadId = -1;
     int mWriteId = -1;
     const int mDocumentId;
@@ -419,7 +418,6 @@ protected:
     SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;
 
     QPointF mSavedTransformPivot;
-    QPointF mPreviewDrawPos;
 
     QRectF mRelBoundingRect;
     SkRect mRelBoundingRectSk;
@@ -432,14 +430,14 @@ protected:
     QList<qptr<BoundingBox>> mLinkingBoxes;
 
     RenderDataHandler mCurrentRenderDataHandler;
-    stdsptr<RenderContainer> mDrawRenderContainer =
+    const stdsptr<RenderContainer> mDrawRenderContainer =
             SPtrCreate(RenderContainer)();
 
     qsptr<DurationRectangle> mDurationRectangle;
+    const qsptr<BoxTransformAnimator> mTransformAnimator;
 
-    qsptr<EffectAnimators> mEffectsAnimators;
-    qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
-    qsptr<BoxTransformAnimator> mTransformAnimator;
+    const qsptr<EffectAnimators> mEffectsAnimators;
+    const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
 
     QList<stdsptr<_ScheduledTask>> mScheduledTasks;
 private:
