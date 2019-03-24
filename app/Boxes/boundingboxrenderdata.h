@@ -15,11 +15,29 @@ class GPURasterEffectCaller;
 class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public _ScheduledTask {
     friend class StdSelfRef;
+protected:
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 
+    virtual void drawSk(SkCanvas * const canvas) = 0;
+
+    virtual void transformRenderCanvas(SkCanvas& canvas) const {
+        canvas.concat(toSkMatrix(fScaledTransform));
+    }
+
     virtual void copyFrom(BoundingBoxRenderData *src);
-    stdsptr<BoundingBoxRenderData> makeCopy();
-    bool fCopied = false;
+    void scheduleTaskNow();
+public:
+    virtual void updateRelBoundingRect();
+    virtual void renderToImage();
+    virtual bool allDataReady() { return true; }
+    virtual QPointF getCenterPosition() {
+        return fRelBoundingRect.center();
+    }
+
+    void _processUpdate();
+    void beforeProcessingStarted();
+    void afterProcessingFinished();
+    void taskQued();
 
     // gpu
     bool needsGpuProcessing() const {
@@ -28,7 +46,8 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     QList<stdsptr<GPURasterEffectCaller>> fGPUEffects;
     // gpu
 
-
+    stdsptr<BoundingBoxRenderData> makeCopy();
+    bool fCopied = false;
     bool fRelBoundingRectSet = false;
 
     Animator::UpdateReason fReason;
@@ -67,7 +86,26 @@ struct BoundingBoxRenderData : public _ScheduledTask {
     sk_sp<SkImage> fRenderedImage;
     SkBitmap fBitmapTMP;
 
-    void updateGlobalBoundingRect() {
+    void drawRenderedImageForParent(SkCanvas * const canvas);
+
+    void dataSet();
+
+    void clearPixmapEffects() {
+        fPixmapEffects.clear();
+        fEffectsMargin = 0;
+    }
+    void appendRenderCustomizerFunctor(
+            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
+        mRenderDataCustomizerFunctors.append(customizer);
+    }
+
+    void prependRenderCustomizerFunctor(
+            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
+        mRenderDataCustomizerFunctors.prepend(customizer);
+    }
+    bool nullifyBeforeProcessing();
+protected:
+    void updateGlobalFromRelBoundingRect() {
         fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
         fixupGlobalBoundingRect();
     }
@@ -84,53 +122,15 @@ struct BoundingBoxRenderData : public _ScheduledTask {
             fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);
         }
 
-        const auto roundTL = QPointF(qRound(fGlobalBoundingRect.left()),
-                                     qRound(fGlobalBoundingRect.top()));
+        const QPointF roundTL(qRound(fGlobalBoundingRect.left()),
+                              qRound(fGlobalBoundingRect.top()));
         const QPointF transF = fGlobalBoundingRect.topLeft() - roundTL;
         fGlobalBoundingRect.translate(-transF);
     }
 
-    virtual void updateRelBoundingRect();
-    void drawRenderedImageForParent(SkCanvas * const canvas);
-    virtual void renderToImage();
-
-    void _processUpdate();
-
-    void beforeProcessingStarted();
-
-    void afterProcessingFinished();
-
-    void taskQued();
-
-    virtual bool allDataReady() { return true; }
-
-    void dataSet();
-
-    void clearPixmapEffects() {
-        fPixmapEffects.clear();
-        fEffectsMargin = 0;
-    }
-
-    virtual QPointF getCenterPosition() {
-        return fRelBoundingRect.center();
-    }
-
-    void appendRenderCustomizerFunctor(
-            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
-        mRenderDataCustomizerFunctors.append(customizer);
-    }
-
-    void prependRenderCustomizerFunctor(
-            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
-        mRenderDataCustomizerFunctors.prepend(customizer);
-    }
-    bool nullifyBeforeProcessing();
-protected:
-    void scheduleTaskNow();
     QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;
-    virtual void drawSk(SkCanvas * const canvas) = 0;
 };
 
 class RenderDataCustomizerFunctor : public StdSelfRef {

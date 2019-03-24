@@ -26,7 +26,7 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
     }
 
     bool allDataReady() {
-        return fImage.get() != nullptr;
+        return fImage.get();
     }
 
     void updateRelBoundingRect() {

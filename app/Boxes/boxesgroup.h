@@ -34,9 +34,12 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
 
     QList<stdsptr<BoundingBoxRenderData>> fChildrenRenderData;
 protected:
+    void transformRenderCanvas(SkCanvas& canvas) const {
+        canvas.concat(toSkMatrix(fResolutionScale));
+    }
+
     void drawSk(SkCanvas * const canvas) {
         canvas->save();
-        canvas->clear(SK_ColorRED);
         for(const auto &child : fChildrenRenderData) {
             canvas->save();
             child->drawRenderedImageForParent(canvas);

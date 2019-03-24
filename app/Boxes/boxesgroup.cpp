@@ -251,7 +251,7 @@ void BoxesGroup::filterOutlinePathForRelFrame(const qreal &relFrame,
                                               SkPath * const srcDstPath) {
     mOutlinePathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
-    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
+    const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterOutlinePathForRelFrame(parentRelFrame, srcDstPath);
 }
@@ -260,7 +260,7 @@ void BoxesGroup::filterFillPathForRelFrame(const qreal &relFrame,
                                            SkPath * const srcDstPath) {
     mFillPathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
-    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
+    const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
                 prp_relFrameToAbsFrameF(relFrame));
     mParentGroup->filterFillPathForRelFrame(parentRelFrame, srcDstPath);
 }
@@ -268,7 +268,7 @@ void BoxesGroup::filterFillPathForRelFrame(const qreal &relFrame,
 void BoxesGroup::prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator *parentAnimator) {
     ComplexAnimator::prp_setParentFrameShift(shift, parentAnimator);
-    int thisShift = prp_getFrameShift();
+    const int thisShift = prp_getFrameShift();
     for(const auto &child : mContainedBoxes) {
         child->prp_setParentFrameShift(thisShift, this);
     }
@@ -317,7 +317,7 @@ QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
 
 bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
         const int &relFrame1, const int &relFrame2) {
-    auto idRange = BoundingBox::prp_getIdenticalRelFrameRange(relFrame1);
+    const auto idRange = BoundingBox::prp_getIdenticalRelFrameRange(relFrame1);
     const bool diffThis = !idRange.inRange(relFrame2);
     if(mParentGroup == nullptr || diffThis) return diffThis;
     const int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
@@ -622,11 +622,11 @@ OutlineSettingsAnimator *BoxesGroup::getStrokeSettings() const {
 }
 void BoxesGroup::applyCurrentTransformation() {
     mNReasonsNotToApplyUglyTransform++;
-    QPointF absPivot = getPivotAbsPos();
-    qreal rotation = mTransformAnimator->rot();
-    qreal scaleX = mTransformAnimator->xScale();
-    qreal scaleY = mTransformAnimator->yScale();
-    QPointF relTrans = mTransformAnimator->pos();
+    const QPointF absPivot = getPivotAbsPos();
+    const qreal rotation = mTransformAnimator->rot();
+    const qreal scaleX = mTransformAnimator->xScale();
+    const qreal scaleY = mTransformAnimator->yScale();
+    const QPointF relTrans = mTransformAnimator->pos();
     for(const auto& box : mContainedBoxes) {
         box->saveTransformPivotAbsPos(absPivot);
         box->startTransform();

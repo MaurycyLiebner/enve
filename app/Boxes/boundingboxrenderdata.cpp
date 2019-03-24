@@ -74,23 +74,20 @@ void BoundingBoxRenderData::renderToImage() {
     fResolutionScale.reset();
     fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fTransform*fResolutionScale;
-    updateGlobalBoundingRect();
+    updateGlobalFromRelBoundingRect();
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(
                 qCeil(fGlobalBoundingRect.width()),
                 qCeil(fGlobalBoundingRect.height()));
     fBitmapTMP.allocPixels(info);
     fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
-    //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas rasterCanvas(fBitmapTMP);//rasterSurface->getCanvas();
-    //rasterCanvas->clear(SK_ColorTRANSPARENT);
 
+    SkCanvas rasterCanvas(fBitmapTMP);
     rasterCanvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
                            toSkScalar(-fGlobalBoundingRect.top()));
-    rasterCanvas.concat(toSkMatrix(fScaledTransform));
+    transformRenderCanvas(rasterCanvas);
 
     drawSk(&rasterCanvas);
-    // rasterCanvas.flush(); does not use gpu anyway
 
     fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
                              qRound(fGlobalBoundingRect.top()));
