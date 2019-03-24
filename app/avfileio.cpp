@@ -1219,6 +1219,8 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
             box = SPtrCreate(ImageSequenceBox)();
         } else if(boxType == TYPE_INTERNAL_LINK) {
             box = SPtrCreate(InternalLinkBox)(nullptr);
+        } else if(boxType == TYPE_INTERNAL_LINK_GROUP) {
+            box = SPtrCreate(InternalLinkGroupBox)(nullptr);
         } else if(boxType == TYPE_EXTERNAL_LINK) {
             box = SPtrCreate(ExternalLinkBox)();
         } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {

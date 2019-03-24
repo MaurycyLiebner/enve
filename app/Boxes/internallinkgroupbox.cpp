@@ -4,14 +4,9 @@
 #include "boxesgrouprenderdata.h"
 
 InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup* linkTarget) :
-    BoxesGroup(TYPE_INTERNAL_LINK) {
+    BoxesGroup(TYPE_INTERNAL_LINK_GROUP) {
     setLinkTarget(linkTarget);
-    const QList<qsptr<BoundingBox>> &boxesList =
-            linkTarget->getContainedBoxesList();
-    for(const auto& child : boxesList) {
-        qsptr<BoundingBox> newLink = child->createLinkForLinkGroup();
-        addContainedBox(newLink);
-    }
+
     ca_prependChildAnimator(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, &InternalLinkGroupBox::setTargetSlot);
@@ -22,12 +17,10 @@ InternalLinkGroupBox::~InternalLinkGroupBox() {
 }
 
 void InternalLinkGroupBox::writeBoundingBox(QIODevice *target) {
-    BoxesGroup::writeBoundingBox(target);
     mBoxTarget->writeProperty(target);
 }
 
 void InternalLinkGroupBox::readBoundingBox(QIODevice *target) {
-    BoxesGroup::readBoundingBox(target);
     mBoxTarget->readProperty(target);
 }
 
@@ -49,6 +42,7 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelFrameRange(
             }
         }
     }
+    if(!getLinkTarget()) return range;
     auto targetRange = getLinkTarget()->prp_getIdenticalRelFrameRange(relFrame);
 
     return range*targetRange;
@@ -58,7 +52,9 @@ bool InternalLinkGroupBox::SWT_isBoxesGroup() const { return false; }
 
 QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
         const qreal &relFrame) {
-    if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
+    if(!getLinkTarget() || !mParentGroup)
+        return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
+    if(mParentGroup->SWT_isLinkBox()) {
         return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
     } else {
         return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
@@ -67,6 +63,8 @@ QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
 
 void InternalLinkGroupBox::setupEffectsF(const qreal &relFrame,
                                          BoundingBoxRenderData *data) {
+    if(!getLinkTarget() || !mParentGroup)
+        return BoundingBox::setupEffectsF(relFrame, data);
     if(mParentGroup->SWT_isLinkBox()) {
         getLinkTarget()->setupEffectsF(relFrame, data);
     } else {
@@ -75,13 +73,15 @@ void InternalLinkGroupBox::setupEffectsF(const qreal &relFrame,
 }
 
 qreal InternalLinkGroupBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
-if(mParentGroup->SWT_isLinkBox()) {
+    if(!getLinkTarget()) return 0;
+    if(mParentGroup->SWT_isLinkBox()) {
         return getLinkTarget()->getEffectsMarginAtRelFrameF(relFrame);
     }
     return BoxesGroup::getEffectsMarginAtRelFrameF(relFrame);
 }
 
 const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
+    if(!getLinkTarget()) return BoundingBox::getBlendMode();
     if(mParentGroup->SWT_isLinkBox()) {
         return getLinkTarget()->getBlendMode();
     }
@@ -97,6 +97,7 @@ void InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrameF(
 }
 
 BoxesGroup *InternalLinkGroupBox::getFinalTarget() const {
+    if(!getLinkTarget()) return nullptr;
     if(getLinkTarget()->SWT_isLinkBox()) {
         return GetAsPtr(getLinkTarget(), InternalLinkGroupBox)->getFinalTarget();
     }
@@ -104,6 +105,7 @@ BoxesGroup *InternalLinkGroupBox::getFinalTarget() const {
 }
 
 int InternalLinkGroupBox::prp_getRelFrameShift() const {
+    if(!getLinkTarget()) return 0;
     if(getLinkTarget()->SWT_isLinkBox() ||
        (mParentGroup ? mParentGroup->SWT_isLinkBox() : false)) {
         return BoxesGroup::prp_getRelFrameShift() +
@@ -127,16 +129,23 @@ void InternalLinkGroupBox::setLinkTarget(BoxesGroup *linkTarget) {
     if(getLinkTarget()) {
         disconnect(getLinkTarget(), nullptr, this, nullptr);
         getLinkTarget()->removeLinkingBox(this);
+        removeAllContainedBoxes();
     }
-    if(!linkTarget) {
-        setName("empty link");
-        mBoxTarget->setTarget(nullptr);
-    } else {
+    if(linkTarget) {
         setName(linkTarget->getName() + " link");
         mBoxTarget->setTarget(linkTarget);
         linkTarget->addLinkingBox(this);
         connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                 this, &BoundingBox::prp_updateAfterChangedRelFrameRange);
+
+        const auto &boxesList = linkTarget->getContainedBoxesList();
+        for(const auto& child : boxesList) {
+            const auto newLink = child->createLinkForLinkGroup();
+            addContainedBox(newLink);
+        }
+    } else {
+        setName("empty link");
+        mBoxTarget->setTarget(nullptr);
     }
     scheduleUpdate(Animator::USER_CHANGE);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
@@ -144,6 +153,7 @@ void InternalLinkGroupBox::setLinkTarget(BoxesGroup *linkTarget) {
 }
 
 QPointF InternalLinkGroupBox::getRelCenterPosition() {
+    if(!getLinkTarget()) return QPointF();
     return getLinkTarget()->getRelCenterPosition();
 }
 
@@ -152,10 +162,12 @@ BoxesGroup *InternalLinkGroupBox::getLinkTarget() const {
 }
 
 qsptr<BoundingBox> InternalLinkGroupBox::createLink() {
+    if(!getLinkTarget()) return createLink();
     return getLinkTarget()->createLink();
 }
 
 qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
+    if(!getLinkTarget()) return createLink();
     if(mParentGroup->SWT_isLinkBox()) {
         return getLinkTarget()->createLinkForLinkGroup();
     } else {
@@ -172,11 +184,13 @@ bool InternalLinkGroupBox::isRelFrameInVisibleDurationRect(const int &relFrame) 
 }
 
 stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
+    if(!getLinkTarget()) return SPtrCreate(BoundingBoxRenderData)();
     auto renderData = getLinkTarget()->createRenderData();
     renderData->fParentBox = this;
     return renderData;
 }
 
 QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
+    if(!getLinkTarget()) return QRectF();
     return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }

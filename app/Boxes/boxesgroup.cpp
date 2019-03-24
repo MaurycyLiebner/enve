@@ -741,6 +741,12 @@ stdsptr<BoundingBoxRenderData> BoxesGroup::createRenderData() {
     return SPtrCreate(BoxesGroupRenderData)(this);
 }
 
+void BoxesGroup::removeAllContainedBoxes() {
+    while(mContainedBoxes.count() > 0) {
+        removeContainedBox(mContainedBoxes.takeLast());
+    }
+}
+
 void BoxesGroup::removeContainedBoxFromList(const int &id) {
     auto box = mContainedBoxes.takeAt(id);
     if(box->SWT_isBoxesGroup()) {

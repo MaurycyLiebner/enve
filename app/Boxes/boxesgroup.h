@@ -171,6 +171,7 @@ public:
         return revId + ca_getNumberOfChildren();
     }
     int getContainedBoxesCount() const;
+    void removeAllContainedBoxes();
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
 
