@@ -473,8 +473,7 @@ int Animator::anim_getCurrentRelFrame() const {
 }
 
 FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    if(this->anim_mKeys.isEmpty())
-        return {FrameRange::EMIN, FrameRange::EMAX};
+    if(anim_mKeys.isEmpty()) return {FrameRange::EMIN, FrameRange::EMAX};
     const auto pn = anim_getPrevAndNextKeyIdForRelFrame(relFrame);
     const int prevId = pn.first;
     const int nextId = pn.second;

@@ -280,7 +280,9 @@ SOURCES += main.cpp\
     Boxes/waitingforboxload.cpp \
     Boxes/boxesgrouprenderdata.cpp \
     Boxes/canvasrenderdata.cpp \
-    Boxes/linkcanvasrenderdata.cpp
+    Boxes/linkcanvasrenderdata.cpp \
+    Boxes/internallinkcanvas.cpp \
+    Boxes/internallinkgroupbox.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -509,7 +511,9 @@ HEADERS  += \
     Boxes/waitingforboxload.h \
     Boxes/boxesgrouprenderdata.h \
     Boxes/canvasrenderdata.h \
-    Boxes/linkcanvasrenderdata.h
+    Boxes/linkcanvasrenderdata.h \
+    Boxes/internallinkcanvas.h \
+    Boxes/internallinkgroupbox.h
 
 RESOURCES += \
     resources.qrc

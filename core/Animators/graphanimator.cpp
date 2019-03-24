@@ -154,7 +154,7 @@ void GraphAnimator::graph_updateKeyPathWithId(const int& id) {
     } else {
         path.moveTo(-50000, -50000);
         if(nextKey) {
-            path.lineTo(prevKey->getRelFrame(), prevKey->getValueForGraph());
+            path.lineTo(nextKey->getRelFrame(), nextKey->getValueForGraph());
         } else {
             path.lineTo(50000, 50000);
         }

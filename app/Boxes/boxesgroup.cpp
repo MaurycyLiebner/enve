@@ -19,6 +19,7 @@
 #include "Animators/transformanimator.h"
 #include "Animators/effectanimators.h"
 #include "PixmapEffects/pixmapeffect.h"
+#include "Boxes/internallinkgroupbox.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -481,7 +482,7 @@ int BoxesGroup::getContainedBoxesCount() const {
 }
 
 qsptr<BoundingBox> BoxesGroup::createLink() {
-    auto linkBox = SPtrCreate(InternalLinkGroupBox)(this);
+    const auto linkBox = SPtrCreate(InternalLinkGroupBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
     return std::move(linkBox);
 }

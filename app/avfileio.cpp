@@ -44,6 +44,7 @@
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 #include "basicreadwrite.h"
+#include "Boxes/internallinkcanvas.h"
 
 #define FORMAT_STR "AniVect av"
 #define CREATOR_VERSION "0.0a"

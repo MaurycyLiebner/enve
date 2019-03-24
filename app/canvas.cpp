@@ -27,6 +27,7 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "PixmapEffects/rastereffects.h"
 #include "MovablePoints/smartnodepoint.h"
+#include "Boxes/internallinkcanvas.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
@@ -271,7 +272,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
         const qreal qInvZoom = 1/mCanvasTransformMatrix.m11();
         const SkScalar invZoom = toSkScalar(qInvZoom);
-        mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
+        if(!mCurrentBoxesGroup->SWT_isCanvas())
+            mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
         for(const auto& box : mSelectedBoxes) {
             canvas->save();
             box->drawBoundingRect(canvas, invZoom);

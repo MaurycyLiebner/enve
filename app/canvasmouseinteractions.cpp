@@ -80,7 +80,8 @@ void Canvas::addSelectedBoxesActions(QMenu * const menu) {
     }
     menu->addSeparator();
     menu->addAction("Create Link", [this]() {
-        mCurrentBoxesGroup->addContainedBox(createLink());
+        for(const auto& box : mSelectedBoxes)
+            mCurrentBoxesGroup->addContainedBox(box->createLink());
     });
     menu->addAction("Center Pivot", [this]() {
         centerPivotForSelected();
