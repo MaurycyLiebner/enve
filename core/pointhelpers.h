@@ -137,4 +137,7 @@ void gGetValuesForNodeRemoval(
         const QPointF &pC0, const QPointF &pP1, const QPointF &pC2,
         QPointF &nextC0, const QPointF &nextP1,
         qreal t);
+
+QList<SkPath> gBreakApart(const SkPath& src);
+
 #endif // POINTHELPERS_H

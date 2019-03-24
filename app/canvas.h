@@ -453,6 +453,7 @@ public:
     void applySolidifyPathEffectToSelected();
     void applyDiscreteOutlinePathEffectToSelected();
     void applyDuplicateOutlinePathEffectToSelected();
+    void applyOperationPathEffectToSelected();
     void applySumPathEffectToSelected();
 
     const qreal &getFps() const { return mFps; }

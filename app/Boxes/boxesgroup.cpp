@@ -121,9 +121,6 @@ void BoxesGroup::addPathEffect(const qsptr<PathEffect>& effect) {
     if(!mPathEffectsAnimators->hasChildAnimators()) {
         mPathEffectsAnimators->SWT_show();
     }
-    if(effect->getEffectType() == GROUP_SUM_PATH_EFFECT) {
-        mGroupPathSumEffects << effect;
-    }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
 
     prp_updateInfluenceRangeAfterChanged();
@@ -159,9 +156,6 @@ void BoxesGroup::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
 }
 
 void BoxesGroup::removePathEffect(const qsptr<PathEffect>& effect) {
-    if(effect->getEffectType() == GROUP_SUM_PATH_EFFECT) {
-        mGroupPathSumEffects.removeOne(effect);
-    }
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }

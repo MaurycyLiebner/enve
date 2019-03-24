@@ -7,7 +7,7 @@
 OperationPathEffect::OperationPathEffect(PathBox * const parentPath,
                                          const bool &outlinePathEffect) :
     PathEffect("path operation effect",
-               SUM_PATH_EFFECT, outlinePathEffect) {
+               OPERATION_PATH_EFFECT, outlinePathEffect) {
     mOperationType = SPtrCreate(ComboBoxProperty)(
                 "operation type",
                  QStringList() << "Union" <<
@@ -24,7 +24,7 @@ void OperationPathEffect::apply(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath * const dst) {
     const auto pathBox = GetAsPtr(mBoxTarget->getTarget(), PathBox);
-    QString operation = mOperationType->getCurrentValueName();
+    const QString operation = mOperationType->getCurrentValueName();
     gApplyOperation(relFrame, src, dst, pathBox,
-                     mParentPathBox, operation);
+                    mParentPathBox, operation);
 }

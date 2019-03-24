@@ -6,5 +6,6 @@
 #include "PathEffects/lengthpatheffect.h"
 #include "PathEffects/operationpatheffect.h"
 #include "PathEffects/solidifypatheffect.h"
+#include "PathEffects/sumpatheffect.h"
 
 #endif // PATHEFFECTSINCLUDE_H

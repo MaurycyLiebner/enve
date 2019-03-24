@@ -15,10 +15,8 @@ void gApplyOperation(const qreal &relFrame,
         *dst = src;
         return;
     }
-    qreal absFrame = dstBox->
-            prp_relFrameToAbsFrameF(relFrame);
-    qreal pathBoxRelFrame = srcBox->
-            prp_absFrameToRelFrameF(absFrame);
+    const qreal absFrame = dstBox->prp_relFrameToAbsFrameF(relFrame);
+    const qreal pathBoxRelFrame = srcBox->prp_absFrameToRelFrameF(absFrame);
     SkPath boxPath;
     boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrameF(pathBoxRelFrame);
     if(src.isEmpty()) {
@@ -40,20 +38,14 @@ void gApplyOperation(const qreal &relFrame,
     } else { // "Exclusion"
         op = SkPathOp::kXOR_SkPathOp;
     }
-    QMatrix pathBoxMatrix =
-            srcBox->getTransformAnimator()->
-                getTotalTransformAtRelFrameF(
-                    pathBoxRelFrame);
-    QMatrix parentBoxMatrix =
-            dstBox->getTransformAnimator()->
-                getTotalTransformAtRelFrameF(
-                    relFrame);
-    boxPath.transform(
-                toSkMatrix(
-                    pathBoxMatrix*parentBoxMatrix.inverted()));
-    if(!Op(src, boxPath, op, dst)) {
-        RuntimeThrow("Operation Failed.");
-    }
+    const auto srcBoxTrans = srcBox->getTransformAnimator();
+    const QMatrix pathBoxMatrix = srcBoxTrans->
+            getTotalTransformAtRelFrameF(pathBoxRelFrame);
+    const auto dstBoxTrans = dstBox->getTransformAnimator();
+    const QMatrix parentBoxMatrix = dstBoxTrans->
+            getTotalTransformAtRelFrameF(relFrame);
+    boxPath.transform(toSkMatrix(pathBoxMatrix*parentBoxMatrix.inverted()));
+    if(!Op(src, boxPath, op, dst)) RuntimeThrow("Operation Failed.");
 }
 
 void gSolidify(const qreal &widthT,

@@ -184,7 +184,7 @@ bool InternalLinkGroupBox::isRelFrameInVisibleDurationRect(const int &relFrame) 
 }
 
 stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
-    if(!getLinkTarget()) return SPtrCreate(BoundingBoxRenderData)();
+    if(!getLinkTarget()) return nullptr;
     auto renderData = getLinkTarget()->createRenderData();
     renderData->fParentBox = this;
     return renderData;

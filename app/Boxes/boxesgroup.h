@@ -175,7 +175,6 @@ public:
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
 
-    QList<qsptr<PathEffect>> mGroupPathSumEffects;
     qsptr<PathEffectAnimators> mPathEffectsAnimators;
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
     qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;

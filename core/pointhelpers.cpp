@@ -980,3 +980,44 @@ void gGetValuesForNodeRemoval(
     prevC2 = (prevC2 + prevP1*tMinus1)/t;
     nextC0 = (nextP1*t - nextC0)/tMinus1;
 }
+
+QList<SkPath> gBreakApart(const SkPath &src) {
+    QList<SkPath> result;
+
+    SkPath::Iter iter(src, false);
+    SkPath current;
+    for(;;) {
+        SkPoint pts[4];
+        switch(iter.next(pts, true, true)) {
+        case SkPath::kLine_Verb: {
+            current.lineTo(pts[1]);
+        } break;
+        case SkPath::kQuad_Verb: {
+            current.quadTo(pts[1], pts[2]);
+        } break;
+        case SkPath::kConic_Verb: {
+            current.conicTo(pts[1], pts[2], iter.conicWeight());
+        } break;
+        case SkPath::kCubic_Verb: {
+            current.cubicTo(pts[1], pts[2], pts[3]);
+        } break;
+        case SkPath::kClose_Verb: {
+            current.close();
+        } break;
+        case SkPath::kMove_Verb: {
+            if(!current.isEmpty()) {
+                result << current;
+                current.reset();
+            }
+            current.moveTo(pts[0]);
+        } break;
+        case SkPath::kDone_Verb: {
+            if(!current.isEmpty()) {
+                result << current;
+                current.reset();
+            }
+            return result;
+        }
+        }
+    }
+}

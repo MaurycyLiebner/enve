@@ -186,6 +186,10 @@ void Canvas::addSelectedBoxesActions(QMenu * const menu) {
         });
 
         pathEffectsMenu->addAction("Operation Effect", [this]() {
+            this->applyOperationPathEffectToSelected();
+        });
+
+        pathEffectsMenu->addAction("Sum Effect", [this]() {
             this->applySumPathEffectToSelected();
         });
 
@@ -389,6 +393,9 @@ void Canvas::addActionsToMenu(QMenu * const menu,
         addPathEffect(SPtrCreate(SolidifyPathEffect)(false));
     });
 
+    pathEffectsMenu->addAction("Sum Effect", [this]() {
+        addPathEffect(SPtrCreate(SumPathEffect)(false));
+    });
 //    pathEffectsMenu->addAction("Operation Effect");
 //    pathEffectsMenu->addAction("Group Sum Effect");
 
@@ -404,6 +411,10 @@ void Canvas::addActionsToMenu(QMenu * const menu,
 
     fillPathEffectsMenu->addAction("Solidify Effect", [this]() {
         addFillPathEffect(SPtrCreate(SolidifyPathEffect)(false));
+    });
+
+    fillPathEffectsMenu->addAction("Sum Effect", [this]() {
+        addFillPathEffect(SPtrCreate(SumPathEffect)(false));
     });
 //    fillPathEffectsMenu->addAction("Operation Effect");
 
@@ -425,6 +436,9 @@ void Canvas::addActionsToMenu(QMenu * const menu,
         addOutlinePathEffect(SPtrCreate(SolidifyPathEffect)(true));
     });
 
+    outlinePathEffectsMenu->addAction("Sum Effect", [this]() {
+        addOutlinePathEffect(SPtrCreate(SumPathEffect)(true));
+    });
 //    outlinePathEffectsMenu->addAction("Operation Effect");
 
     menu->addAction("Map to Different Fps...", [this]() {

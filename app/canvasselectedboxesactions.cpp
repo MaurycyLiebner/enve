@@ -187,6 +187,13 @@ void Canvas::applySolidifyPathEffectToSelected() {
 void Canvas::applySumPathEffectToSelected() {
     for(const auto &box : mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
+        box->addPathEffect(SPtrCreate(SumPathEffect)(false));
+    }
+}
+
+void Canvas::applyOperationPathEffectToSelected() {
+    for(const auto &box : mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
         auto pathBox = GetAsPtr(box, PathBox);
         box->addPathEffect(SPtrCreate(OperationPathEffect)(pathBox, false));
     }
@@ -825,9 +832,9 @@ VectorPath *Canvas::getPathResultingFromOperation(
             }
         }
     }
-    SkPath resultingPath;
-    builder.resolve(&resultingPath);
-    newPath->loadPathFromSkPath(resultingPath);
+    SkPath resultPath;
+    builder.resolve(&resultPath);
+    newPath->loadPathFromSkPath(resultPath);
     mCurrentBoxesGroup->addContainedBox(newPath);
     return newPath.get();
 }
