@@ -131,7 +131,7 @@ public:
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale,
-                      const SkMatrix &TotalTransform);
+                      const SkMatrix &totalTransform);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<stdptr<MovablePoint>> &list);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

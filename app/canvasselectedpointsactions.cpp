@@ -3,10 +3,34 @@
 #include "MovablePoints/nodepoint.h"
 #include "Animators/pathanimator.h"
 #include "MovablePoints/smartnodepoint.h"
+#include "Animators/SmartPath/smartpathanimator.h"
 
 void Canvas::connectPoints() {
+    QList<SmartNodePoint*> selectedEndPts;
+    for(const auto& point : mSelectedPoints_d) {
+        if(point->isSmartNodePoint()) {
+            auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            if(asNodePt->isEndPoint()) {
+                selectedEndPts.append(asNodePt);
+            }
+        }
+    }
+    if(selectedEndPts.count() == 2) {
+        const auto firstPoint = selectedEndPts.first();
+        const auto secondPoint = selectedEndPts.last();
+        const auto firstTargetAnimator = firstPoint->getTargetAnimator();
+        const auto secondTargetAnimator = secondPoint->getTargetAnimator();
+
+        if(firstTargetAnimator == secondTargetAnimator) {
+            firstTargetAnimator->actionConnectNodes(firstPoint->getNodeId(),
+                                                    secondPoint->getNodeId());
+        } else {
+            RuntimeThrow("NO CODE");
+        }
+    }
+
     QList<NodePoint*> selectedNodePoints;
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             if(asNodePt->isEndPoint()) {
@@ -78,6 +102,22 @@ void Canvas::connectPoints() {
 }
 
 void Canvas::disconnectPoints() {
+    for(const auto& point : mSelectedPoints_d) {
+        if(point->isSmartNodePoint()) {
+            auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            const auto nextPoint = asNodePt->getNextPoint();
+            if(!nextPoint) continue;
+            if(nextPoint->isSelected()) {
+                const auto targetAnimator = nextPoint->getTargetAnimator();
+                if(targetAnimator->isClosed()) {
+                    targetAnimator->actionDisconnectNodes(
+                                asNodePt->getNodeId(), nextPoint->getNodeId());
+                } else {
+                    RuntimeThrow("NO CODE");
+                }
+            }
+        }
+    }
     QList<NodePoint*> selectedNodePoints;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
@@ -106,7 +146,7 @@ void Canvas::disconnectPoints() {
 
 //void Canvas::mergePoints() {
 //    QList<NodePoint*> selectedNodePoints;
-//    for(MovablePoint *point : mSelectedPoints) {
+//    for(const auto& point : mSelectedPoints) {
 //        if(point->isNodePoint()) {
 //            if(((NodePoint*)point)->isEndPoint()) {
 //                selectedNodePoints.append( (NodePoint*) point);
@@ -185,7 +225,7 @@ void Canvas::disconnectPoints() {
 
 void Canvas::mergePoints() {
     QList<NodePoint*> selectedNodePoints;
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             //if(((NodePoint*)point)->isEndPoint()) {
@@ -222,7 +262,7 @@ void Canvas::mergePoints() {
 }
 
 void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             asNodePt->setCtrlsMode(mode);
@@ -234,15 +274,30 @@ void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
 }
 
 void Canvas::makeSelectedPointsSegmentsCurves() {
+    QList<SmartNodePoint*> selectedSNodePoints;
+    for(const auto& point : mSelectedPoints_d) {
+        if(point->isSmartNodePoint()) {
+            const auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            selectedSNodePoints.append(asNodePt);
+        }
+    }
+    for(const auto& selectedPoint : selectedSNodePoints) {
+        SmartNodePoint * const nextPoint = selectedPoint->getNextPoint();
+        SmartNodePoint * const prevPoint = selectedPoint->getPreviousPoint();
+        if(selectedSNodePoints.contains(nextPoint))
+            selectedPoint->setC2Enabled(true);
+        if(selectedSNodePoints.contains(prevPoint))
+            selectedPoint->setC0Enabled(true);
+    }
+
     QList<NodePoint*> selectedNodePoints;
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             selectedNodePoints.append(asNodePt);
         }
     }
-    Q_FOREACH(NodePoint *selectedPoint,
-            selectedNodePoints) {
+    for(const auto& selectedPoint : selectedNodePoints) {
         NodePoint *nextPoint = selectedPoint->getNextPoint();
         NodePoint *prevPoint = selectedPoint->getPreviousPoint();
         if(selectedNodePoints.contains(nextPoint)) {
@@ -255,40 +310,53 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
 }
 
 void Canvas::makeSelectedPointsSegmentsLines() {
+    QList<SmartNodePoint*> selectedSNodePoints;
+    for(const auto& point : mSelectedPoints_d) {
+        if(point->isSmartNodePoint()) {
+            auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            selectedSNodePoints.append(asNodePt);
+        }
+    }
+    for(const auto& selectedPoint : selectedSNodePoints) {
+        SmartNodePoint * const nextPoint = selectedPoint->getNextPoint();
+        SmartNodePoint * const prevPoint = selectedPoint->getPreviousPoint();
+        if(selectedSNodePoints.contains(nextPoint))
+            selectedPoint->setC2Enabled(false);
+        if(selectedSNodePoints.contains(prevPoint))
+            selectedPoint->setC0Enabled(false);
+    }
+
     QList<NodePoint*> selectedNodePoints;
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
             auto asNodePt = GetAsPtr(point, NodePoint);
             selectedNodePoints.append(asNodePt);
         }
     }
-    Q_FOREACH(NodePoint *selectedPoint,
-            selectedNodePoints) {
-        NodePoint *nextPoint = selectedPoint->getNextPoint();
-        NodePoint *prevPoint = selectedPoint->getPreviousPoint();
-        if(selectedNodePoints.contains(nextPoint)) {
+    for(const auto& selectedPoint : selectedNodePoints) {
+        NodePoint * const nextPoint = selectedPoint->getNextPoint();
+        NodePoint * const prevPoint = selectedPoint->getPreviousPoint();
+        if(selectedNodePoints.contains(nextPoint))
             selectedPoint->setEndCtrlPtEnabled(false);
-        }
-        if(selectedNodePoints.contains(prevPoint)) {
+        if(selectedNodePoints.contains(prevPoint))
             selectedPoint->setStartCtrlPtEnabled(false);
-        }
     }
 }
 
 void Canvas::finishSelectedPointsTransform() {
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         point->finishTransform();
     }
 }
 
 void Canvas::startSelectedPointsTransform() {
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         point->startTransform();
     }
 }
 
 void Canvas::cancelSelectedPointsTransform() {
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         point->cancelTransform();
     }
 }
@@ -297,29 +365,29 @@ void Canvas::moveSelectedPointsByAbs(const QPointF &by,
                                      const bool &startTransform) {
     if(startTransform) {
         startSelectedPointsTransform();
-        for(MovablePoint *point : mSelectedPoints_d) {
+        for(const auto& point : mSelectedPoints_d) {
             point->moveByAbs(by);
         }
     } else {
-        for(MovablePoint *point : mSelectedPoints_d) {
+        for(const auto& point : mSelectedPoints_d) {
             point->moveByAbs(by);
         }
     }
 }
 
 void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
-    for(BoundingBox *box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes) {
         box->selectAndAddContainedPointsToList(absRect, mSelectedPoints_d);
     }
 }
 
-void Canvas::addPointToSelection(MovablePoint* point) {
+void Canvas::addPointToSelection(MovablePoint* const point) {
     if(point->isSelected()) return;
     point->select();
     mSelectedPoints_d.append(point); schedulePivotUpdate();
 }
 
-void Canvas::removePointFromSelection(MovablePoint *point) {
+void Canvas::removePointFromSelection(MovablePoint * const point) {
     point->deselect();
     mSelectedPoints_d.removeOne(point); schedulePivotUpdate();
 }
@@ -327,17 +395,17 @@ void Canvas::removePointFromSelection(MovablePoint *point) {
 void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
     if(!BoxesGroup::mCtrlsAlwaysVisible) {
         QList<MovablePoint*> pointsToDeselect;
-        for(MovablePoint* point : mSelectedPoints_d) {
+        for(const auto& point : mSelectedPoints_d) {
             pointsToDeselect << point;
         }
-        for(MovablePoint* point : pointsToDeselect) {
+        for(const auto& point : pointsToDeselect) {
             removePointFromSelection(point);
         }
     }
 }
 
 void Canvas::removeSelectedPointsApproximateAndClearList() {
-    for(MovablePoint* point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         point->deselect();
         point->removeApproximate();
     }
@@ -361,7 +429,7 @@ void Canvas::removeSelectedPointsAndClearList() {
         }
     }
 
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d) {
         point->deselect();
         point->removeFromVectorPath();
     }
@@ -369,13 +437,11 @@ void Canvas::removeSelectedPointsAndClearList() {
 }
 
 void Canvas::clearPointsSelection() {
-    for(MovablePoint *point : mSelectedPoints_d) {
+    for(const auto& point : mSelectedPoints_d)
         point->deselect();
-    }
+
     mSelectedPoints_d.clear();
-    if(mCurrentMode == MOVE_POINT) {
-        schedulePivotUpdate();
-    }
+    if(mCurrentMode == MOVE_POINT) schedulePivotUpdate();
 //    if(mLastPressedPoint) {
 //        mLastPressedPoint->deselect();
 //        mLastPressedPoint = nullptr;
@@ -395,12 +461,12 @@ void Canvas::clearCurrentEndPoint() {
 }
 
 QPointF Canvas::getSelectedPointsAbsPivotPos() {
-    if(mSelectedPoints_d.isEmpty()) return QPointF(0., 0.);
-    QPointF posSum = QPointF(0., 0.);
-    for(MovablePoint *point : mSelectedPoints_d) {
+    if(mSelectedPoints_d.isEmpty()) return QPointF(0, 0);
+    QPointF posSum(0, 0);
+    for(const auto& point : mSelectedPoints_d) {
         posSum += point->getAbsolutePos();
     }
-    qreal invCount = 1./mSelectedPoints_d.length();
+    const qreal invCount = 1./mSelectedPoints_d.length();
     return posSum*invCount;
 }
 
@@ -418,25 +484,25 @@ void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
     if(mSelectedPoints_d.isEmpty()) return;
     if(mLocalPivot) {
         if(startTrans) {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         }
     } else {
         if(startTrans) {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         }
@@ -450,25 +516,25 @@ void Canvas::scaleSelectedPointsBy(const qreal &scaleXBy,
     if(mSelectedPoints_d.isEmpty()) return;
     if(mLocalPivot) {
         if(startTrans) {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy );
             }
         } else {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         }
     } else {
         if(startTrans) {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         } else {
-            for(MovablePoint *point : mSelectedPoints_d) {
+            for(const auto& point : mSelectedPoints_d) {
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         }

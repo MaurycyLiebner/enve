@@ -209,6 +209,12 @@ public:
         }
     }
 
+    void moveNodesToFrontStartingWith(const int& first) {
+        for(int i = first; i < mList.count(); i++) {
+            mList.prepend(mList.takeLast());
+        }
+    }
+
     auto begin() const {
         return mList.begin();
     }

@@ -105,7 +105,7 @@ void NodeList::reverseSegment() {
     mNodes.reverse();
 }
 
-bool NodeList::segmentClosed() const {
+bool NodeList::isClosed() const {
     if(mNodes.isEmpty()) return false;
     return mNodes.last()->getNextNode();
 }
@@ -125,9 +125,8 @@ int NodeList::insertNodeBefore(const int& nextId,
 int NodeList::insertNodeAfter(const int& prevId,
                               const Node& nodeBlueprint) {
     Node * const prevNode = mNodes[prevId];
-    if(prevNode->getNextNode()) {
+    if(prevNode->getNextNode())
         return insertNodeBefore(prevId, nodeBlueprint);
-    }
     const int insertId = prevId + 1;
     Node * const insertedNode = insertNodeToList(insertId, nodeBlueprint);
 
@@ -252,7 +251,7 @@ SkPath NodeList::toSkPath() const {
             RuntimeThrow("Unrecognized node type");
         }
     }
-    if(segmentClosed()) {
+    if(isClosed()) {
         gCubicTo(*prevNormalNode, *firstNode, dissolvedTs, result);
         result.close();
     }

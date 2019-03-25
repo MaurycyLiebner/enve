@@ -257,14 +257,14 @@ bool VectorPathAnimator::getTAndPointsForMouseEdgeInteraction(
                                           NodePoint **prevPoint,
                                           NodePoint **nextPoint,
                                           const qreal &canvasScaleInv) {
-    const QMatrix &TotalTransform = mParentTransform->getTotalTransform();
-    const qreal xScaling = TotalTransform.map(
+    const QMatrix &totalTransform = mParentTransform->getTotalTransform();
+    const qreal xScaling = totalTransform.map(
                         QLineF(0, 0, 1, 0)).length();
-    const qreal yScaling = TotalTransform.map(
+    const qreal yScaling = totalTransform.map(
                         QLineF(0, 0, 0, 1)).length();
     const qreal maxDistX = 4/xScaling*canvasScaleInv;
     const qreal maxDistY = 4/yScaling*canvasScaleInv;
-    const QPointF relPos = TotalTransform.inverted().map(absPos);
+    const QPointF relPos = totalTransform.inverted().map(absPos);
 
 //    if(!mPath.intersects(distRect) ||
 //        mPath.contains(distRect)) {
@@ -608,8 +608,8 @@ void VectorPathAnimator::finishAllPointsTransform() {
 void VectorPathAnimator::drawSelected(SkCanvas *canvas,
                                       const CanvasMode &currentCanvasMode,
                                       const SkScalar &invScale,
-                                      const SkMatrix &TotalTransform) {
-    Q_UNUSED(TotalTransform);
+                                      const SkMatrix &totalTransform) {
+    Q_UNUSED(totalTransform);
 
     const bool keyOnCurrentFrame = anim_getKeyOnCurrentFrame();
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {

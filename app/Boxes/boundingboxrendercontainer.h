@@ -25,7 +25,7 @@ public:
                 GrContext* const grContext);
 
     void updatePaintTransformGivenNewTotalTransform(
-            const QMatrix &TotalTransform);
+            const QMatrix &totalTransform);
 
     void setTransform(const QMatrix &transform);
 

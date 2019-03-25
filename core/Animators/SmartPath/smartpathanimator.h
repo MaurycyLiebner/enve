@@ -24,17 +24,17 @@ public:
             const auto keyAtFrame2 = anim_getKeyOnCurrentFrame<SmartPathKey>();
             if(!prevK1 && !prevK2 && !keyAtFrame1 && !keyAtFrame2) return;
             if(!nextK1 && !nextK2 && !keyAtFrame1 && !keyAtFrame2) return;
-            if(!prevK2) {
-                mBaseValue.assign(nextK2->getValue());
-            } else if(!nextK2) {
-                mBaseValue.assign(prevK2->getValue());
-            } else if(keyAtFrame2) {
+            if(keyAtFrame2) {
                 mBaseValue.assign(keyAtFrame2->getValue());
-            } else {
+            } else if(prevK2 && nextK2) {
                 const qreal nWeight =
                         prevKeyWeight(prevK2, nextK2, anim_getCurrentRelFrame());
                 gInterpolate(prevK2->getValue(), nextK2->getValue(),
                              nWeight, mBaseValue);
+            } else if(prevK2) {
+                mBaseValue.assign(prevK2->getValue());
+            } else if(nextK2) {
+                mBaseValue.assign(nextK2->getValue());
             }
             anim_callFrameChangeUpdater();
         }
@@ -123,6 +123,10 @@ public:
         mPathBeingChanged_d->save();
     }
 
+    bool isClosed() const {
+        return mBaseValue.isClosed();
+    }
+
     void pathChanged() {
         const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
         if(spk) {
@@ -182,6 +186,71 @@ public:
             anim_appendKey(newKey);
         }
         gRead(target, mBaseValue);
+    }
+
+    void actionRemoveNode(const int& nodeId) {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionRemoveNode(nodeId);
+        }
+        mBaseValue.actionRemoveNode(nodeId);
+        prp_updateInfluenceRangeAfterChanged();
+    }
+
+    int actionAddNewAtEnd(const int& nodeId,
+                          const QPointF &relPos) {
+        beforeBinaryPathChange();
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionAppendNodeAtEndNode(nodeId);
+        }
+        const int id = mBaseValue.actionAppendNodeAtEndNode(nodeId);
+        getCurrentlyEditedPath()->actionSetNormalNodeValues(
+                    id, relPos, relPos, relPos);
+        prp_updateInfluenceRangeAfterChanged();
+        return id;
+    }
+
+    int actionAddFirstNode(const QPointF &relPos) {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionAddFirstNode(relPos, relPos, relPos);
+        }
+        const int id = mBaseValue.actionAddFirstNode(relPos, relPos, relPos);
+        prp_updateInfluenceRangeAfterChanged();
+        return id;
+    }
+
+    int actionInsertNodeBetween(const int &node1Id,
+                                const int &node2Id,
+                                const qreal &t) {
+        beforeBinaryPathChange();
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionInsertNodeBetween(node1Id, node2Id, t);
+        }
+        const int id = mBaseValue.actionInsertNodeBetween(node1Id, node2Id, t);
+        getCurrentlyEditedPath()->actionPromoteDissolvedNodeToNormal(id);
+        prp_updateInfluenceRangeAfterChanged();
+        return id;
+    }
+
+    void actionConnectNodes(const int &node1Id, const int &node2Id) {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionConnectNodes(node1Id, node2Id);
+        }
+        mBaseValue.actionConnectNodes(node1Id, node2Id);
+        prp_updateInfluenceRangeAfterChanged();
+    }
+
+    void actionDisconnectNodes(const int &node1Id, const int &node2Id) {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionDisconnectNodes(node1Id, node2Id);
+        }
+        mBaseValue.actionDisconnectNodes(node1Id, node2Id);
+        prp_updateInfluenceRangeAfterChanged();
     }
 signals:
     void pathChangedAfterFrameChange();

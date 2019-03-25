@@ -94,13 +94,18 @@ public:
         setNodeNextId(node, nextId);
     }
 
+    void moveNodesToFrontStartingWith(const int& first) {
+        mNodes.moveNodesToFrontStartingWith(first);
+        updateNodeIds();
+    }
+
     int prevNormalId(const int &nodeId) const;
     int nextNormalId(const int &nodeId) const;
 
     SkPath toSkPath() const;
     void removeNodeFromList(const int &nodeId);
     void reverseSegment();
-    bool segmentClosed() const;
+    bool isClosed() const;
 
     int insertFirstNode(const Node &nodeBlueprint);
     void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);

@@ -14,7 +14,7 @@ public:
     SmartPath();
     SmartPath(const SmartPath &list);
 
-    void actionRemoveNormalNode(const int& nodeId);
+    void actionRemoveNode(const int& nodeId);
 
     int actionAddFirstNode(const QPointF& c0,
                            const QPointF& p1,
@@ -24,6 +24,7 @@ public:
                                const int& prevNodeId,
                                const int& nextNodeId);
 
+    int actionAppendNodeAtEndNode(const int &endNodeId);
     int actionAppendNodeAtEndNode(const int& endNodeId,
                                   const NodePointValues &values);
 
@@ -129,6 +130,10 @@ public:
 
     void updateDissolvedNodePosition(const int& nodeId, Node * const node) {
         mNodesList.updateDissolvedNodePosition(nodeId, node);
+    }
+
+    bool isClosed() const {
+        return mNodesList.isClosed();
     }
 
     void save() {

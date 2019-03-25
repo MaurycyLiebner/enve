@@ -99,11 +99,11 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
 }
 
 void SmartNodePoint::removeFromVectorPath() {
-    currentPath()->actionRemoveNormalNode(mNodeId);
+    currentPath()->actionRemoveNode(mNodeId);
 }
 
 void SmartNodePoint::removeApproximate() {
-    currentPath()->actionRemoveNormalNode(mNodeId);
+    currentPath()->actionRemoveNode(mNodeId);
 }
 
 void SmartNodePoint::rectPointsSelection(

@@ -7,26 +7,25 @@ SmartPath::SmartPath(const SmartPath &other) :
     mNodesList.setNodeList(other.getNodesRef().getList());
 }
 
-void SmartPath::actionRemoveNormalNode(const int &nodeId) {
+void SmartPath::actionRemoveNode(const int &nodeId) {
     Node * const node = mNodesList.at(nodeId);
-    if(!node->isNormal())
-        RuntimeThrow("Invalid node type. "
-                     "Only normal nodes can be removed.");
-
-    Node * currNode = node;
-    while(currNode->getPrevNode()) {
-        const int prevId = currNode->getPrevNodeId();
-        currNode = mNodesList.at(prevId);
-        if(currNode->isNormal()) break;
-        if(currNode->isDissolved()) currNode->fT *= 0.5;
+    if(node->isNormal()) {
+        Node * currNode = node;
+        while(currNode->getPrevNode()) {
+            const int prevId = currNode->getPrevNodeId();
+            currNode = mNodesList.at(prevId);
+            if(currNode->isNormal()) break;
+            if(currNode->isDissolved()) currNode->fT *= 0.5;
+        }
+        currNode = node;
+        while(currNode->getNextNode()) {
+            const int nextId = currNode->getNextNodeId();
+            currNode = mNodesList.at(nextId);
+            if(currNode->isNormal()) break;
+            if(currNode->isDissolved()) currNode->fT = currNode->fT*0.5 + 0.5;
+        }
     }
-    currNode = node;
-    while(currNode->getNextNode()) {
-        const int nextId = currNode->getNextNodeId();
-        currNode = mNodesList.at(nextId);
-        if(currNode->isNormal()) break;
-        if(currNode->isDissolved()) currNode->fT = currNode->fT*0.5 + 0.5;
-    }
+    mNodesList.removeNodeFromList(nodeId);
 }
 
 int SmartPath::actionAddFirstNode(const QPointF &c0,
@@ -36,17 +35,23 @@ int SmartPath::actionAddFirstNode(const QPointF &c0,
     return insertId;
 }
 
+int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId) {
+    Node * const endNode = mNodesList.at(endNodeId);
+    if(!endNode->isNormal())
+        RuntimeThrow("Invalid node type. "
+                     "End nodes should always be NORMAL.");
+    const NodePointValues vals = {endNode->fP1, endNode->fP1, endNode->fP1};
+    return actionAppendNodeAtEndNode(endNodeId, vals);
+}
+
 int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId,
                                          const NodePointValues &values) {
     Node * const endNode = mNodesList.at(endNodeId);
     if(!endNode->isNormal())
         RuntimeThrow("Invalid node type. "
                      "End nodes should always be NORMAL.");
-    const Node nodeBlueprint = *endNode;
-    endNode->fC0 = values.fC0;
-    endNode->fP1 = values.fP1;
-    endNode->fC2 = values.fC2;
-    return mNodesList.insertNodeAfter(endNodeId, nodeBlueprint);
+    return mNodesList.insertNodeAfter(endNodeId,
+                                      Node(values.fC0, values.fP1, values.fC2));
 }
 
 int SmartPath::insertNodeBetween(const int& prevId,
@@ -118,6 +123,13 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
         nextNode->fP1 = nextNormalNode->fP1;
         nextNode->fC2 = nextNormalNode->fC2;
     }
+
+    if(isClosed()) {
+        mNodesList.setNodeNextId(prevNode, -1);
+        mNodesList.setNodePrevId(nextNode, -1);
+
+        mNodesList.moveNodesToFrontStartingWith(nextId);
+    } else RuntimeThrow("NO CODE");
 }
 
 void SmartPath::actionConnectNodes(const int &node1Id, const int &node2Id) {

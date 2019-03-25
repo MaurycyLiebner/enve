@@ -228,9 +228,9 @@ public:
     void removeSelectedBoxesAndClearList();
     void clearBoxesSelection();
     void clearBonesSelection();
-    void removePointFromSelection(MovablePoint *point);
+    void removePointFromSelection(MovablePoint * const point);
     void removeBoxFromSelection(BoundingBox *box);
-    void addPointToSelection(MovablePoint *point);
+    void addPointToSelection(MovablePoint * const point);
     void addBoxToSelection(BoundingBox *box);
     void removeBoneFromSelection(Bone *bone);
     void addBoneToSelection(Bone *bone);
