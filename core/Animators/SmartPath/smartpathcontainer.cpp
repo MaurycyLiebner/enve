@@ -2,9 +2,8 @@
 
 SmartPath::SmartPath() : mNodesList() {}
 
-SmartPath::SmartPath(const SmartPath &other) :
-    SmartPath() {
-    mNodesList.setNodeList(other.getNodesRef().getList());
+SmartPath::SmartPath(const SmartPath &other) {
+    mNodesList.deepCopyNodeList(other.getNodesRef().getList());
 }
 
 void SmartPath::actionRemoveNode(const int &nodeId) {
@@ -124,12 +123,13 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
         nextNode->fC2 = nextNormalNode->fC2;
     }
 
+    mNodesList.setNodeNextId(prevNode, -1);
+    mNodesList.setNodePrevId(nextNode, -1);
     if(isClosed()) {
-        mNodesList.setNodeNextId(prevNode, -1);
-        mNodesList.setNodePrevId(nextNode, -1);
-
         mNodesList.moveNodesToFrontStartingWith(nextId);
-    } else RuntimeThrow("NO CODE");
+    } else {
+        mLastDetached = mNodesList.detachNodesStartingWith(nextId);
+    }
 }
 
 void SmartPath::actionConnectNodes(const int &node1Id, const int &node2Id) {

@@ -306,5 +306,7 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
         const Node * const node2 = list2v.at(i);
         resultList.append(Node::sInterpolate(*node1, *node2, weight2));
     }
-    return NodeList(resultList);
+    NodeList result;
+    result.shallowCopyNodeList(resultList);
+    return result;
 }

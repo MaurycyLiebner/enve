@@ -137,11 +137,11 @@ public:
     }
 
     void save() {
-        mSavedList = mNodesList.getList();
+        mSavedList.deepCopyFrom(mNodesList.getList());
     }
 
     void restore() {
-        mNodesList.setNodeList(mSavedList);
+        mNodesList.deepCopyNodeList(mSavedList);
     }
 
     SmartPath createCopy() const {
@@ -153,7 +153,7 @@ public:
     }
 
     void assign(const SmartPath& src) {
-        mNodesList.setNodeList(src.getNodesRef().getList());
+        mNodesList.deepCopyNodeList(src.getNodesRef().getList());
     }
 
     static bool sDifferent(const SmartPath& path1,
@@ -170,7 +170,13 @@ public:
                     path1.getNodesRef(),
                     path2.getNodesRef(),
                     path2Weight);
-        target.getNodesPtr()->setNodeList(list.getList());
+        target.getNodesPtr()->deepCopyNodeList(list.getList());
+    }
+
+    ListOfNodes getAndClearLastDetached() {
+        ListOfNodes detached;
+        mLastDetached.swap(detached);
+        return detached;
     }
 
     bool read(QIODevice * const src) {
@@ -197,6 +203,8 @@ private:
 
     NodeList mNodesList;
     ListOfNodes mSavedList;
+
+    ListOfNodes mLastDetached;
 };
 
 #endif // SMARTPATHCONTAINER_H

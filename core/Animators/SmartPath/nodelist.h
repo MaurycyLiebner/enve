@@ -9,9 +9,6 @@ class NodeList {
     friend class SmartPath;
 protected:
     NodeList() {}
-    NodeList(const ListOfNodes& list) {
-        mNodes = list;
-    }
 public:
     Node* operator[](const int& i) const {
         return mNodes[i];
@@ -99,6 +96,12 @@ public:
         updateNodeIds();
     }
 
+    ListOfNodes detachNodesStartingWith(const int& first) {
+        const auto detached = mNodes.detachNodesStartingWith(first);
+        updateNodeIds();
+        return detached;
+    }
+
     int prevNormalId(const int &nodeId) const;
     int nextNormalId(const int &nodeId) const;
 
@@ -123,7 +126,9 @@ public:
     void updateDissolvedNodePosition(const int &nodeId, Node * const node);
 
     NodeList createCopy() const {
-        return NodeList(mNodes);
+        NodeList copy;
+        copy.deepCopyNodeList(mNodes);
+        return copy;
     }
 
     bool read(QIODevice * const src);
@@ -133,8 +138,12 @@ protected:
         return mNodes;
     }
 
-    void setNodeList(const ListOfNodes& list) {
-        mNodes = list;
+    void deepCopyNodeList(const ListOfNodes& list) {
+        mNodes.deepCopyFrom(list);
+    }
+
+    void shallowCopyNodeList(const ListOfNodes& list) {
+        mNodes.shallowCopyFrom(list);
     }
 
     int insertNodeBefore(const int &nextId, const Node &nodeBlueprint);
@@ -142,8 +151,8 @@ protected:
     int appendNode(const Node &nodeBlueprint);
 
     static bool sDifferent(const NodeList& list1, const NodeList& list2) {
-        const auto list1v = list1.getList();
-        const auto list2v = list2.getList();
+        const auto& list1v = list1.getList();
+        const auto& list2v = list2.getList();
         if(list1v.count() != list2v.count()) return false;
         for(int i = 0; i < list1.count(); i++) {
             if(list1v.at(i) != list2v.at(i)) return true;

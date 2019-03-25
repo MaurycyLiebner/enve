@@ -28,6 +28,7 @@ void Canvas::connectPoints() {
             RuntimeThrow("NO CODE");
         }
     }
+    clearPointsSelection();
 
     QList<NodePoint*> selectedNodePoints;
     for(const auto& point : mSelectedPoints_d) {
@@ -109,15 +110,15 @@ void Canvas::disconnectPoints() {
             if(!nextPoint) continue;
             if(nextPoint->isSelected()) {
                 const auto targetAnimator = nextPoint->getTargetAnimator();
-                if(targetAnimator->isClosed()) {
-                    targetAnimator->actionDisconnectNodes(
-                                asNodePt->getNodeId(), nextPoint->getNodeId());
-                } else {
-                    RuntimeThrow("NO CODE");
-                }
+                const int prevId = asNodePt->getNodeId();
+                const int nextId = nextPoint->getNodeId();
+                targetAnimator->actionDisconnectNodes(prevId, nextId);
+                break;
             }
         }
     }
+    clearPointsSelection();
+
     QList<NodePoint*> selectedNodePoints;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isNodePoint()) {
@@ -437,8 +438,9 @@ void Canvas::removeSelectedPointsAndClearList() {
 }
 
 void Canvas::clearPointsSelection() {
-    for(const auto& point : mSelectedPoints_d)
-        point->deselect();
+    for(const auto& point : mSelectedPoints_d) {
+        if(point) point->deselect();
+    }
 
     mSelectedPoints_d.clear();
     if(mCurrentMode == MOVE_POINT) schedulePivotUpdate();

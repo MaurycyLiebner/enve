@@ -129,9 +129,6 @@ private:
 class ListOfNodes {
 public:
     ListOfNodes() {}
-    ListOfNodes(const ListOfNodes& other) {
-        this->operator=(other);
-    }
 
     bool isEmpty() const {
         return mList.isEmpty();
@@ -144,12 +141,15 @@ public:
     void insert(const int& id, const Node& nodeBlueprint) {
         Node * const newNode = insertNewNode(id);
         *newNode = nodeBlueprint;
-        newNode->setPrevNode(nullptr);
-        newNode->setNextNode(nullptr);
+        updateNodeNeighs(id);
     }
 
     void clear() {
         mList.clear();
+    }
+
+    void swap(ListOfNodes& other) {
+        mList.swap(other.getList());
     }
 
     Node* at(const int& id) const {
@@ -170,12 +170,16 @@ public:
         return mList.count();
     }
 
-    ListOfNodes& operator=(const ListOfNodes& other) {
+    void shallowCopyFrom(const ListOfNodes& other) {
+        mList = other.getList();
+    }
+
+    void deepCopyFrom(const ListOfNodes& other) {
         const int otherCount = other.count();
         const int thisCount = count();
         int i = 0;
         for(; i < otherCount && i < thisCount; i++) {
-            assign(i, *other.at(i));
+            *mList.at(i).get() = *other.at(i);
         }
         for(; i < otherCount; i++) {
             insert(i, *other.at(i));
@@ -183,7 +187,9 @@ public:
         for(; i < thisCount; i++) {
             removeAt(i);
         }
-        return *this;
+
+        const int jMax = mList.count() - 1;
+        for(int j = 0; j <= jMax; j++) updateNodeNeighs(j);
     }
 
     Node * operator[](const int& id) const {
@@ -192,12 +198,6 @@ public:
 
     void removeAt(const int& id) {
         mList.removeAt(id);
-    }
-
-    void assign(const int& id, const Node& nodeBlueprint) {
-        if(id < 0 || id >= count())
-            RuntimeThrow("Index out of range.");
-        *mList.at(id).get() = nodeBlueprint;
     }
 
     void reverse() {
@@ -215,6 +215,15 @@ public:
         }
     }
 
+    ListOfNodes detachNodesStartingWith(const int& first) {
+        QList<stdsptr<Node>> detached;
+        const int iniCount = mList.count();
+        for(int i = first; i < iniCount; i++) {
+            detached.prepend(mList.takeLast());
+        }
+        return ListOfNodes(detached);
+    }
+
     auto begin() const {
         return mList.begin();
     }
@@ -222,12 +231,32 @@ public:
     auto end() const {
         return mList.end();
     }
+protected:
+    QList<stdsptr<Node>> &getList() {
+        return mList;
+    }
+
+    const QList<stdsptr<Node>> &getList() const {
+        return mList;
+    }
 private:
+    ListOfNodes(const QList<stdsptr<Node>>& list) : mList(list) {}
+
     Node* insertNewNode(const int& id) {
         const auto newNode = stdsptr<Node>(new Node);
         mList.insert(id, newNode);
         return newNode.get();
     }
+
+    void updateNodeNeighs(const int& j) {
+        const int jMax = mList.count() - 1;
+        Node * const prevNode = j == 0 ? nullptr : mList.at(j - 1).get();
+        Node * const nextNode = j == jMax ? nullptr : mList.at(j + 1).get();
+        const auto& jNode = mList.at(j);
+        jNode->setPrevNode(prevNode);
+        jNode->setNextNode(nextNode);
+    }
+
     QList<stdsptr<Node>> mList;
 };
 
