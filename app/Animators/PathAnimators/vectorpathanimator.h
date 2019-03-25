@@ -20,6 +20,13 @@ class VectorPathAnimator : public InterpolationAnimator,
                            public PathContainer {
     Q_OBJECT
     friend class SelfRef;
+protected:
+    VectorPathAnimator(PathAnimator * const pathAnimator);
+    VectorPathAnimator(const QList<const NodeSettings*> &settingsList,
+                       PathAnimator * const pathAnimator);
+    VectorPathAnimator(const QList<const NodeSettings*> &settingsList,
+                       const QList<SkPoint> &posList,
+                       PathAnimator * const pathAnimator);
 public:
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
 
@@ -166,13 +173,6 @@ public:
     int getNodeCount();
 
     const bool &isClosed() const;
-protected:
-    VectorPathAnimator(PathAnimator *pathAnimator);
-    VectorPathAnimator(const QList<const NodeSettings*> &settingsList,
-                       PathAnimator *pathAnimator);
-    VectorPathAnimator(const QList<const NodeSettings *> &settingsList,
-                       const QList<SkPoint> &posList,
-                       PathAnimator *pathAnimator);
 private:
     void revertAllNodeSettings();
     void setFirstPoint(NodePoint *pt);

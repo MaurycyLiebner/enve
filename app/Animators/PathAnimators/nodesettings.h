@@ -16,9 +16,9 @@ struct NodeSettings : public StdSelfRef {
              const bool &endEnabledT,
              const CtrlsMode &ctrlsModeT);
 
-    bool startEnabled = false;
-    bool endEnabled = false;
-    CtrlsMode ctrlsMode;
+    bool fStartEnabled = false;
+    bool fEndEnabled = false;
+    CtrlsMode fCtrlsMode;
 
     void write(QIODevice *target);
     void read(QIODevice *target);

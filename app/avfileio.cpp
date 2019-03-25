@@ -194,18 +194,18 @@ stdsptr<Key> VectorPathAnimator::readKey(QIODevice *target) {
 }
 
 void NodeSettings::write(QIODevice* target) {
-    target->write(rcConstChar(&ctrlsMode),
+    target->write(rcConstChar(&fCtrlsMode),
                  sizeof(CtrlsMode));
-    target->write(rcConstChar(&startEnabled),
+    target->write(rcConstChar(&fStartEnabled),
                  sizeof(bool));
-    target->write(rcConstChar(&endEnabled),
+    target->write(rcConstChar(&fEndEnabled),
                  sizeof(bool));
 }
 
 void NodeSettings::read(QIODevice* target) {
-    target->read(rcChar(&ctrlsMode), sizeof(CtrlsMode));
-    target->read(rcChar(&startEnabled), sizeof(bool));
-    target->read(rcChar(&endEnabled), sizeof(bool));
+    target->read(rcChar(&fCtrlsMode), sizeof(CtrlsMode));
+    target->read(rcChar(&fStartEnabled), sizeof(bool));
+    target->read(rcChar(&fEndEnabled), sizeof(bool));
 }
 
 void VectorPathAnimator::readProperty(QIODevice *target) {

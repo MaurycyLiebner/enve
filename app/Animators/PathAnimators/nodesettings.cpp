@@ -1,7 +1,7 @@
 #include "nodesettings.h"
 #include "pointhelpers.h"
 
-NodeSettings::NodeSettings() : ctrlsMode(CtrlsMode::CTRLS_CORNER) {}
+NodeSettings::NodeSettings() : fCtrlsMode(CtrlsMode::CTRLS_CORNER) {}
 
 NodeSettings::NodeSettings(const NodeSettings *settings) {
     if(!settings) return;
@@ -16,20 +16,20 @@ NodeSettings::NodeSettings(const bool &startEnabledT,
 
 void NodeSettings::copyFrom(const NodeSettings *settings) {
     if(!settings) {
-        startEnabled = false;
-        endEnabled = false;
-        ctrlsMode = CtrlsMode::CTRLS_CORNER;
+        fStartEnabled = false;
+        fEndEnabled = false;
+        fCtrlsMode = CtrlsMode::CTRLS_CORNER;
     } else {
-        startEnabled = settings->startEnabled;
-        endEnabled = settings->endEnabled;
-        ctrlsMode = settings->ctrlsMode;
+        fStartEnabled = settings->fStartEnabled;
+        fEndEnabled = settings->fEndEnabled;
+        fCtrlsMode = settings->fCtrlsMode;
     }
 }
 
 void NodeSettings::set(const bool &startEnabledT,
                        const bool &endEnabledT,
                        const CtrlsMode &ctrlsModeT) {
-    startEnabled = startEnabledT;
-    endEnabled = endEnabledT;
-    ctrlsMode = ctrlsModeT;
+    fStartEnabled = startEnabledT;
+    fEndEnabled = endEnabledT;
+    fCtrlsMode = ctrlsModeT;
 }

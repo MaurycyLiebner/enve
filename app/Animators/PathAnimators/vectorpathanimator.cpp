@@ -7,14 +7,14 @@
 #include "undoredo.h"
 #include "Animators/transformanimator.h"
 
-VectorPathAnimator::VectorPathAnimator(PathAnimator *pathAnimator) :
+VectorPathAnimator::VectorPathAnimator(PathAnimator * const pathAnimator) :
     InterpolationAnimator("path") {
     setParentPath(pathAnimator);
 }
 
 VectorPathAnimator::VectorPathAnimator(
-        const QList<const NodeSettings *> &settingsList,
-        PathAnimator *pathAnimator) :
+        const QList<const NodeSettings*> &settingsList,
+        PathAnimator * const pathAnimator) :
     VectorPathAnimator(pathAnimator) {
     for(const auto& nodeSetting : settingsList) {
         mNodeSettings << SPtrCreate(NodeSettings)(nodeSetting);
@@ -22,9 +22,9 @@ VectorPathAnimator::VectorPathAnimator(
 }
 
 VectorPathAnimator::VectorPathAnimator(
-        const QList<const NodeSettings *> &settingsList,
+        const QList<const NodeSettings*> &settingsList,
         const QList<SkPoint> &posList,
-        PathAnimator *pathAnimator)  :
+        PathAnimator * const pathAnimator)  :
     VectorPathAnimator(settingsList, pathAnimator) {
     mElementsPos = posList;
     updatePath();
@@ -51,13 +51,13 @@ void VectorPathAnimator::anim_saveCurrentValueToKey(PathKey* key) {
 void VectorPathAnimator::setCtrlsModeForNode(const int &nodeId,
                                              const CtrlsMode &mode) {
     NodeSettings* newSettings = mNodeSettings.at(nodeId).get();
-    newSettings->ctrlsMode = mode;
-    newSettings->endEnabled = true;
-    newSettings->startEnabled = true;
+    newSettings->fCtrlsMode = mode;
+    newSettings->fEndEnabled = true;
+    newSettings->fStartEnabled = true;
     int nodePtId = nodeIdToPointId(nodeId);
-    QPointF pos = toQPointF(mElementsPos.at(nodePtId));
-    QPointF startPos = toQPointF(mElementsPos.at(nodePtId - 1)) + pos;
-    QPointF endPos = toQPointF(mElementsPos.at(nodePtId + 1)) + pos;
+    const QPointF pos = toQPointF(mElementsPos.at(nodePtId));
+    const QPointF startPos = toQPointF(mElementsPos.at(nodePtId - 1)) + pos;
+    const QPointF endPos = toQPointF(mElementsPos.at(nodePtId + 1)) + pos;
     QPointF newStartPos;
     QPointF newEndPos;
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
@@ -307,7 +307,7 @@ bool VectorPathAnimator::getTAndPointsForMouseEdgeInteraction(
 
     QPointF nearestPos = relPos + QPointF(maxDistX, maxDistY)*2;
     qreal nearestT = 0.5;
-    qreal nearestError = 1000000.;
+    qreal nearestError = TEN_MIL;
 
     for(const auto& nodePoint : mPoints) {
         const auto edgeT = nodePoint->getNextEdge();
@@ -356,19 +356,17 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                                             &prevPoint, &nextPoint,
                                             canvasScaleInv)) {
         if(pressedT > 0.0001 && pressedT < 0.9999) {
-            int prevNodeId = prevPoint->getNodeId();
-            int newNodeId = prevNodeId + 1;
+            const int prevNodeId = prevPoint->getNodeId();
+            const int newNodeId = prevNodeId + 1;
 
-            NodeSettings *prevNodeSettings =
+            NodeSettings * const prevNodeSettings =
                     getNodeSettingsForNodeId(prevNodeId);
             NodeSettings *nextNodeSettings;
             int nextNodeId;
-            int prevPtId = nodeIdToPointId(prevNodeId);
+            const int prevPtId = nodeIdToPointId(prevNodeId);
             int nextPtId;
             if(nextPoint->getNodeId() == 0) {
-                nextNodeSettings =
-                        getNodeSettingsForNodeId(0);
-
+                nextNodeSettings = getNodeSettingsForNodeId(0);
                 nextNodeId = 0;
                 nextPtId = 1;
             } else {
@@ -384,22 +382,22 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
 
             stdsptr<NodeSettings> newNodeSettings;
             if(adjust) {
-                if(!prevNodeSettings->endEnabled &&
-                   !nextNodeSettings->startEnabled) {
+                if(!prevNodeSettings->fEndEnabled &&
+                   !nextNodeSettings->fStartEnabled) {
                     newNodeSettings = SPtrCreate(NodeSettings)(false, false,
                                                                CTRLS_CORNER);
                 } else {
                     newPtSmooth = true;
                     newNodeSettings = SPtrCreate(NodeSettings)(true, true,
                                                                CTRLS_SMOOTH);
-                    if(prevNodeSettings->ctrlsMode == CTRLS_SYMMETRIC &&
-                       prevNodeSettings->endEnabled &&
-                       prevNodeSettings->startEnabled) {
+                    if(prevNodeSettings->fCtrlsMode == CTRLS_SYMMETRIC &&
+                       prevNodeSettings->fEndEnabled &&
+                       prevNodeSettings->fStartEnabled) {
                         prevNodeSettings->set(true, true, CTRLS_SMOOTH);
                     }
-                    if(nextNodeSettings->ctrlsMode == CTRLS_SYMMETRIC &&
-                       nextNodeSettings->endEnabled &&
-                       nextNodeSettings->startEnabled) {
+                    if(nextNodeSettings->fCtrlsMode == CTRLS_SYMMETRIC &&
+                       nextNodeSettings->fEndEnabled &&
+                       nextNodeSettings->fStartEnabled) {
                         nextNodeSettings->set(true, true, CTRLS_SMOOTH);
                     }
                 }
@@ -417,9 +415,7 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
 
             if(anim_mKeys.isEmpty()) {
                 addNewPointAtTBetweenPts(static_cast<SkScalar>(pressedT),
-                                         prevPtId,
-                                         nextPtId,
-                                         newPtSmooth);
+                                         prevPtId, nextPtId, newPtSmooth);
                 nextPtId = nodeIdToPointId(nextNodeId);
                 prevPoint->setElementsPos(toQPointF(mElementsPos.at(prevPtId - 1)),
                                          toQPointF(mElementsPos.at(prevPtId)),
@@ -544,19 +540,19 @@ void VectorPathAnimator::removeNodeSettingsAt(const int &id) {
 void VectorPathAnimator::setNodeStartEnabled(const int &nodeId,
                                              const bool &enabled) {
     const auto settings = getNodeSettingsForNodeId(nodeId);
-    settings->startEnabled = enabled;
+    settings->fStartEnabled = enabled;
 }
 
 void VectorPathAnimator::setNodeEndEnabled(const int &nodeId,
                                            const bool &enabled) {
     const auto settings = getNodeSettingsForNodeId(nodeId);
-    settings->endEnabled = enabled;
+    settings->fEndEnabled = enabled;
 }
 
 void VectorPathAnimator::setNodeCtrlsMode(const int &nodeId,
                                           const CtrlsMode &ctrlsMode) {
     const auto settings = getNodeSettingsForNodeId(nodeId);
-    settings->ctrlsMode = ctrlsMode;
+    settings->fCtrlsMode = ctrlsMode;
 }
 
 void VectorPathAnimator::setPathClosed(const bool &bT) {
@@ -571,7 +567,7 @@ void VectorPathAnimator::setPathClosed(const bool &bT) {
 }
 
 const CtrlsMode &VectorPathAnimator::getNodeCtrlsMode(const int &nodeId) {
-    return getNodeSettingsForNodeId(nodeId)->ctrlsMode;
+    return getNodeSettingsForNodeId(nodeId)->fCtrlsMode;
 }
 
 void VectorPathAnimator::removeNodeAt(const int &nodeId) {
@@ -869,7 +865,7 @@ NodePoint* VectorPathAnimator::createNewNode(const int &targetNodeId,
                                                     ctrlsMode);
     insertNodeSettingsForNodeId(targetNodeId, newNodeSettings);
 
-    int nodePtId = nodeIdToPointId(targetNodeId) - 1;
+    const int nodePtId = nodeIdToPointId(targetNodeId) - 1;
     addNodeElements(nodePtId,
                     toSkPoint(startRelPos - relPos),
                     toSkPoint(relPos),
@@ -884,9 +880,7 @@ NodePoint* VectorPathAnimator::createNewNode(const int &targetNodeId,
     auto newP = createNodePointAndAppendToList();
 
     newP->setCurrentNodeSettings(newNodeSettings.get());
-    newP->setElementsPos(startRelPos - relPos,
-                         relPos,
-                         endRelPos - relPos);
+    newP->setElementsPos(startRelPos - relPos, relPos, endRelPos - relPos);
     return newP;
 }
 

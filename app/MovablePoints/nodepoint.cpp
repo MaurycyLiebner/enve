@@ -212,7 +212,7 @@ QPointF NodePoint::getStartCtrlPtAbsPos() const {
 }
 
 QPointF NodePoint::getStartCtrlPtValue() const {
-    if(mCurrentNodeSettings->startEnabled) {
+    if(mCurrentNodeSettings->fStartEnabled) {
         return mStartCtrlPt->getRelativePos();
     } else {
         return getRelativePos();
@@ -234,11 +234,11 @@ void NodePoint::ctrlPointPosChanged(const bool &startPtChanged) {
 void NodePoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
                                     CtrlPoint *pointToUpdate) {
     QPointF changedPointPos = pointChanged->getAbsolutePos();
-    if(mCurrentNodeSettings->ctrlsMode ==
+    if(mCurrentNodeSettings->fCtrlsMode ==
             CtrlsMode::CTRLS_SYMMETRIC) {
         pointToUpdate->moveToAbsWithoutUpdatingTheOther(
                     symmetricToAbsPos(changedPointPos));
-    } else if(mCurrentNodeSettings->ctrlsMode ==
+    } else if(mCurrentNodeSettings->fCtrlsMode ==
               CtrlsMode::CTRLS_SMOOTH) {
         if(!isPointZero(changedPointPos) ) {
             pointToUpdate->moveToAbsWithoutUpdatingTheOther(
@@ -255,7 +255,7 @@ QPointF NodePoint::getEndCtrlPtAbsPos() {
 }
 
 QPointF NodePoint::getEndCtrlPtValue() const {
-    if(mCurrentNodeSettings->endEnabled) {
+    if(mCurrentNodeSettings->fEndEnabled) {
         return mEndCtrlPt->getRelativePos();
     } else {
         return getRelativePos();
@@ -282,8 +282,7 @@ void NodePoint::drawNodePoint(SkCanvas *canvas,
         SkPaint paint;
         paint.setAntiAlias(true);
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            SkPoint endAbsPos = toSkPoint(
-                        mEndCtrlPt->getAbsolutePos());
+            const SkPoint endAbsPos = toSkPoint(mEndCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
@@ -294,8 +293,7 @@ void NodePoint::drawNodePoint(SkCanvas *canvas,
             canvas->drawLine(absPos, endAbsPos, paint);
         }
         if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            SkPoint startAbsPos = toSkPoint(
-                        mStartCtrlPt->getAbsolutePos());
+            const SkPoint startAbsPos = toSkPoint(mStartCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5f*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
@@ -369,7 +367,7 @@ void NodePoint::updateStartCtrlPtVisibility() {
     if(!mPreviousPoint) {
         mStartCtrlPt->hide();
     } else {
-        mStartCtrlPt->setVisible(mCurrentNodeSettings->startEnabled);
+        mStartCtrlPt->setVisible(mCurrentNodeSettings->fStartEnabled);
     }
 }
 
@@ -377,27 +375,27 @@ void NodePoint::updateEndCtrlPtVisibility() {
     if(!mNextPoint) {
         mEndCtrlPt->hide();
     } else {
-        mEndCtrlPt->setVisible(mCurrentNodeSettings->endEnabled);
+        mEndCtrlPt->setVisible(mCurrentNodeSettings->fEndEnabled);
     }
 }
 
 void NodePoint::setEndCtrlPtEnabled(const bool &enabled) {
-    if(enabled == mCurrentNodeSettings->endEnabled) return;
-    if(mCurrentNodeSettings->endEnabled) {
+    if(enabled == mCurrentNodeSettings->fEndEnabled) return;
+    if(mCurrentNodeSettings->fEndEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
-    mCurrentNodeSettings->endEnabled = enabled;
+    mCurrentNodeSettings->fEndEnabled = enabled;
     mParentPath->schedulePathUpdate();
     mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateEndCtrlPtVisibility();
 }
 
 void NodePoint::setStartCtrlPtEnabled(const bool &enabled) {
-    if(enabled == mCurrentNodeSettings->startEnabled) return;
-    if(mCurrentNodeSettings->startEnabled) {
+    if(enabled == mCurrentNodeSettings->fStartEnabled) return;
+    if(mCurrentNodeSettings->fStartEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     }
-    mCurrentNodeSettings->startEnabled = enabled;
+    mCurrentNodeSettings->fStartEnabled = enabled;
     mParentPath->schedulePathUpdate();
     mParentPath->prp_updateInfluenceRangeAfterChanged();
     updateStartCtrlPtVisibility();
@@ -426,26 +424,26 @@ NodePointValues NodePoint::getPointValues() const {
 }
 
 CtrlsMode NodePoint::getCurrentCtrlsMode() {
-    return mCurrentNodeSettings->ctrlsMode;
+    return mCurrentNodeSettings->fCtrlsMode;
 }
 
 bool NodePoint::isEndCtrlPtEnabled() {
-    return mCurrentNodeSettings->endEnabled;
+    return mCurrentNodeSettings->fEndEnabled;
 }
 
 bool NodePoint::isStartCtrlPtEnabled() {
-    return mCurrentNodeSettings->startEnabled;
+    return mCurrentNodeSettings->fStartEnabled;
 }
 
 void NodePoint::setCtrlPtEnabled(const bool &enabled,
                                  const bool &isStartPt) {
     if(isStartPt) {
-        if(mCurrentNodeSettings->startEnabled == enabled) {
+        if(mCurrentNodeSettings->fStartEnabled == enabled) {
             return;
         }
         setStartCtrlPtEnabled(enabled);
     } else {
-        if(mCurrentNodeSettings->endEnabled == enabled) {
+        if(mCurrentNodeSettings->fEndEnabled == enabled) {
             return;
         }
         setEndCtrlPtEnabled(enabled);
@@ -474,7 +472,7 @@ bool NodePoint::isSeparateNodePoint() {
 
 void NodePoint::setCtrlsMode(const CtrlsMode &mode) {
     NodeSettings newSettings = *mCurrentNodeSettings;
-    mCurrentNodeSettings->ctrlsMode = mode;
+    mCurrentNodeSettings->fCtrlsMode = mode;
     QPointF newStartPos;
     QPointF newEndPos;
     if(mode == CtrlsMode::CTRLS_SYMMETRIC) {
