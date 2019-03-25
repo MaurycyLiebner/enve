@@ -5,13 +5,12 @@
 
 struct Node {
     friend class NodeList;
+    friend class ListOfNodes;
     enum Type : char {
-        DUMMY, DISSOLVED, NORMAL, MOVE
+        DISSOLVED, NORMAL, NONE
     };
 
-    Node() : Node(DUMMY) {}
-
-    Node(const Type& type) { fType = type; }
+    Node() { fType = NONE; }
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2) {
         fC0 = c0;
@@ -25,33 +24,34 @@ struct Node {
         fType = DISSOLVED;
     }
 
-    bool isMove() const { return fType == MOVE; }
-
     bool isNormal() const { return fType == NORMAL; }
-
-    bool isDummy() const { return fType == DUMMY; }
 
     bool isDissolved() const { return fType == DISSOLVED; }
 
-    const int &getNextNodeId() const {
-        return fNextNodeId;
+    int getPrevNodeId() const {
+        if(!fPrevNode_d) return -1;
+        return fPrevNode_d->getNodeId();
     }
 
-    const int &getPrevNodeId() const {
-        return fPrevNodeId;
+    int getNextNodeId() const {
+        if(!fNextNode_d) return -1;
+        return fNextNode_d->getNodeId();
     }
 
-    const int &getNodeId() const {
+    int getNodeId() const {
         return fId;
     }
 
-    bool hasPreviousNode() const {
-        return getPrevNodeId() >= 0;
+    Node* getPrevNode() const {
+        return fPrevNode_d;
     }
 
-    bool hasNextNode() const {
-        return getNextNodeId() >= 0;
+    Node* getNextNode() const {
+        return fNextNode_d;
     }
+
+    static Node sInterpolate(const Node &node1, const Node &node2,
+                             const qreal &weight2);
 
     QPointF fC0;
     QPointF fP1;
@@ -60,60 +60,28 @@ struct Node {
     //! @brief T value for segment defined by previous and next normal node
     qreal fT;
 
-    const Type& getType() const { return fType; }
-    const CtrlsMode& getCtrlsMode() const { return fCtrlsMode; }
-    const bool& getC0Enabled() const {
+    Type getType() const { return fType; }
+    CtrlsMode getCtrlsMode() const { return fCtrlsMode; }
+    bool getC0Enabled() const {
         return fC0Enabled;
     }
 
-    const bool& getC2Enabled() const {
+    bool getC2Enabled() const {
         return fC2Enabled;
-    }
-
-    static Node sInterpolate(const Node& node1, const Node& node2,
-                             const qreal &weight2);
-
-    static Node sInterpolateNormal(const Node& node1, const Node& node2,
-                                   const qreal &weight2);
-
-    bool operator==(const Node& other) const {
-        if(other.getType() != getType()) return false;
-        if(isDummy() || isMove()) return true;
-        if(getPrevNodeId() != other.getPrevNodeId()) return false;
-        if(getNextNodeId() != other.getNextNodeId()) return false;
-        if(isDissolved()) return isZero6Dec(fT - other.fT);
-        if(isNormal()) {
-            if(getC0Enabled() != other.getC0Enabled()) return false;
-            if(!isZero6Dec(pointToLen(fC0 - other.fC0))) return false;
-            if(!isZero6Dec(pointToLen(fP1 - other.fP1))) return false;
-            if(getC2Enabled() != other.getC2Enabled()) return false;
-            if(!isZero6Dec(pointToLen(fC2 - other.fC2))) return false;
-        }
-        return false;
-    }
-
-    bool operator!=(const Node& other) const {
-        return !this->operator==(other);
     }
 protected:
     void switchPrevAndNext() {
-        const int prevT = fPrevNodeId;
-        fPrevNodeId = fNextNodeId;
-        fNextNodeId = prevT;
+        const auto prevT = fPrevNode_d;
+        fPrevNode_d = fNextNode_d;
+        fNextNode_d = prevT;
     }
 
-    void shiftIdsGreaterThan(const int& greater, const int& shiftBy) {
-        if(fId > greater) fId += shiftBy;
-        if(fPrevNodeId) if(fPrevNodeId > greater) fPrevNodeId += shiftBy;
-        if(fNextNodeId) if(fNextNodeId > greater) fNextNodeId += shiftBy;
+    void setPrevNode(Node* const prevNode) {
+        fPrevNode_d = prevNode;
     }
 
-    void setPrevNodeId(const int& prevNodeId) {
-        fPrevNodeId = prevNodeId;
-    }
-
-    void setNextNodeId(const int& nextNodeId) {
-        fNextNodeId = nextNodeId;
+    void setNextNode(Node* const nextNode) {
+        fNextNode_d = nextNode;
     }
 
     void setNodeId(const int& nodeId) {
@@ -142,7 +110,7 @@ protected:
     void setC2Enabled(const bool& enabled) {
         fC2Enabled = enabled;
     }
-
+private:
     bool fC0Enabled = true;
     bool fC2Enabled = true;
     Type fType;
@@ -150,9 +118,12 @@ protected:
 
     int fId = -1;
     //! @brief Previous connected node id in the list.
-    int fPrevNodeId = -1;
+    Node* fPrevNode_d = nullptr;
     //! @brief Next connected node id in the list.
-    int fNextNodeId = -1;
+    Node* fNextNode_d = nullptr;
+
+    static Node sInterpolateNormal(const Node &node1, const Node &node2,
+                                   const qreal& weight2);
 };
 #include "smartPointers/stdselfref.h"
 class ListOfNodes {
@@ -162,6 +133,10 @@ public:
         this->operator=(other);
     }
 
+    bool isEmpty() const {
+        return mList.isEmpty();
+    }
+
     void append(const Node& nodeBlueprint) {
         insert(mList.count(), nodeBlueprint);
     }
@@ -169,6 +144,8 @@ public:
     void insert(const int& id, const Node& nodeBlueprint) {
         Node * const newNode = insertNewNode(id);
         *newNode = nodeBlueprint;
+        newNode->setPrevNode(nullptr);
+        newNode->setNextNode(nullptr);
     }
 
     void clear() {
@@ -179,6 +156,14 @@ public:
         if(id < 0 || id >= count())
             RuntimeThrow("Index out of range.");
         return mList.at(id).get();
+    }
+
+    Node* first() const {
+        return at(0);
+    }
+
+    Node* last() const {
+        return at(mList.count() - 1);
     }
 
     int count() const {
@@ -213,6 +198,15 @@ public:
         if(id < 0 || id >= count())
             RuntimeThrow("Index out of range.");
         *mList.at(id).get() = nodeBlueprint;
+    }
+
+    void reverse() {
+        const auto cpy = mList;
+        mList.clear();
+        for(const auto& node : cpy) {
+            node->switchPrevAndNext();
+            mList.prepend(node);
+        }
     }
 
     auto begin() const {

@@ -13,11 +13,11 @@ public:
         if(range.inRange(this->anim_getCurrentRelFrame())) {
             this->updateValueFromCurrentFrame();
         }
-        Animator::prp_updateAfterChangedRelFrameRange(range);
+        B::prp_updateAfterChangedRelFrameRange(range);
     }
 
     void anim_setAbsFrame(const int &frame) {
-        Animator::anim_setAbsFrame(frame);
+        B::anim_setAbsFrame(frame);
         if(this->anim_hasKeys()) {
             const T newVal = getValueAtRelFrame(this->anim_getCurrentRelFrame());
             if(gDiffers(newVal, mCurrentValue)) {

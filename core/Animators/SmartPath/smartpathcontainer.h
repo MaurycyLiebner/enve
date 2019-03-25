@@ -87,32 +87,25 @@ public:
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        mNodesList.setNodeCtrlsMode(nodeId, node, mode);
+        mNodesList.setNodeCtrlsMode(node, mode);
     }
 
     void actionSetNormalNodeC0Enabled(const int& nodeId, const bool& enabled) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        mNodesList.setNodeC0Enabled(nodeId, node, enabled);
+        mNodesList.setNodeC0Enabled(node, enabled);
     }
 
     void actionSetNormalNodeC2Enabled(const int& nodeId, const bool& enabled) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        mNodesList.setNodeC2Enabled(nodeId, node, enabled);
+        mNodesList.setNodeC2Enabled(node, enabled);
     }
 
-    void setPrev(SmartPath * const prev);
-    void setNext(SmartPath * const next);
 
     SkPath getPathAt() const;
-    SkPath getPathForPrev() const;
-    SkPath getPathForNext() const;
-
-    SkPath interpolateWithNext(const qreal& nextWeight) const;
-    SkPath interpolateWithPrev(const qreal& prevWeight) const;
 
     const Node * getNodePtr(const int& id) const {
         if(id < 0) return nullptr;
@@ -136,14 +129,6 @@ public:
 
     void updateDissolvedNodePosition(const int& nodeId, Node * const node) {
         mNodesList.updateDissolvedNodePosition(nodeId, node);
-    }
-
-    void updateDummyNodePosition(const int& nodeId) {
-        mNodesList.updateDummyNodePosition(nodeId);
-    }
-
-    void updateDummyNodePosition(const int& nodeId, Node * const node) {
-        mNodesList.updateDummyNodePosition(nodeId, node);
     }
 
     void save() {
@@ -177,8 +162,8 @@ public:
                              const qreal &path2Weight,
                              SmartPath& target) {
         const auto list = NodeList::sInterpolate(
-                    path1.getNodesListFor(&path2, false),
-                    path2.getNodesListFor(&path1, false),
+                    path1.getNodesRef(),
+                    path2.getNodesRef(),
                     path2Weight);
         target.getNodesPtr()->setNodeList(list.getList());
     }
@@ -190,21 +175,7 @@ public:
     bool write(QIODevice * const dst) const {
         return mNodesList.write(dst);
     }
-    void prepareForNewNeighBetweenThisAndNext() {
-        prepareForNewNeighBetweenThisAnd(mNext);
-    }
-    void prepareForNewNeighBetweenThisAndPrev() {
-        prepareForNewNeighBetweenThisAnd(mPrev);
-    }
 protected:
-    void removeNodeWithIdAndTellPrevToDoSame(const int& nodeId);
-
-    void removeNodeWithIdAndTellNextToDoSame(const int& nodeId);
-
-    void updateAllNodesTypeAfterNeighbourChanged() {
-        mNodesList.updateAllNodesTypeAfterNeighbourChanged();
-    }
-
     NodeList *getNodesPtr();
 
     const NodeList& getNodesRef() const {
@@ -214,31 +185,10 @@ protected:
     NodeList& getNodesRef() {
         return mNodesList;
     }
-
-    NodeList getNodesListForPrev(const bool& simplify) const {
-        if(!mPrev) return mNodesList;
-        return getNodesListFor(mPrev, simplify);
-    }
-
-    NodeList getNodesListForNext(const bool& simplify) const {
-        if(!mNext) return mNodesList;
-        return getNodesListFor(mNext, simplify);
-    }
-    NodeList interpolateNodesListWithNext(const qreal& nextWeight,
-                                          const bool &simplify) const;
-    NodeList interpolateNodesListWithPrev(const qreal& prevWeight,
-                                          const bool &simplify) const;
 private:
-    NodeList getNodesListFor(const SmartPath * const neighbour,
-                             const bool &simplify) const;
-    SkPath getPathFor(const SmartPath * const neighbour) const;
     int insertNodeBetween(const int &prevId, const int &nextId,
                           const Node &nodeBlueprint);
-    void prepareForNewNeighBetweenThisAnd(
-            SmartPath * const neighbour);
-
-    SmartPath * mPrev = nullptr;
-    SmartPath * mNext = nullptr;
+    void prepareForNewNeighBetweenThisAnd(SmartPath * const neighbour);
 
     NodeList mNodesList;
     ListOfNodes mSavedList;

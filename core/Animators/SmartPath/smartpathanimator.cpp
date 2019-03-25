@@ -14,5 +14,4 @@ void SmartPathAnimator::graph_getValueConstraints(
     }
 }
 
-SmartPathAnimator::SmartPathAnimator() :
-    GraphAnimator("smart path") {}
+SmartPathAnimator::SmartPathAnimator() : GraphAnimator("path") {}

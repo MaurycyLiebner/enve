@@ -94,8 +94,6 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
                                                 closest.fT);
         currentPath()->actionSetDissolvedNodeT(mNodeId, mappedT);
         setRelativePosVal(closest.fPos);
-    } else if(getType() == Node::DUMMY) {
-        if(!mHandler_k->moveToClosestSegment(mNodeId, relPos)) return;
     }
     mParentAnimator->pathChanged();
 }
@@ -279,11 +277,6 @@ void SmartNodePoint::drawNodePoint(
         const SkColor fillCol = mSelected ?
                     SkColorSetRGB(255, 0, 0) :
                     SkColorSetRGB(255, 120, 120);
-        drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
-    } else if(getType() == Node::DUMMY) {
-        const SkColor fillCol = mSelected ?
-                    SkColorSetRGB(255, 255, 255) :
-                    SkColorSetRGB(220, 220, 220);
         drawOnAbsPosSk(canvas, absPos, invScale, fillCol, keyOnCurrent);
     }
 
@@ -585,11 +578,8 @@ void SmartNodePoint::updateFromNodeDataPosOnly() {
         mC0Pt->setRelativePosVal(mNode_d->fC0);
         setRelativePosVal(mNode_d->fP1);
         mC2Pt->setRelativePosVal(mNode_d->fC2);
-    } else if(mNode_d->isDissolved() || mNode_d->isDummy()) {
-        if(mNode_d->isDissolved())
-            currentPath()->updateDissolvedNodePosition(mNodeId);
-        else currentPath()->updateDummyNodePosition(mNodeId);
-
+    } else if(mNode_d->isDissolved()) {
+        currentPath()->updateDissolvedNodePosition(mNodeId);
         setRelativePosVal(mNode_d->fP1);
     }
 }
@@ -607,10 +597,8 @@ void SmartNodePoint::updateFromNodeData() {
         setRelativePosVal(mNode_d->fP1);
         mC2Pt->setRelativePosVal(mNode_d->fC2);
         setVisible(true);
-    } else if(mNode_d->isDissolved() || mNode_d->isDummy()) {
-        if(mNode_d->isDissolved())
-            currentPath()->updateDissolvedNodePosition(mNodeId);
-        else currentPath()->updateDummyNodePosition(mNodeId);
+    } else if(mNode_d->isDissolved()) {
+        currentPath()->updateDissolvedNodePosition(mNodeId);
 
         setRelativePosVal(mNode_d->fP1);
         setVisible(true);

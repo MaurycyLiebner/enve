@@ -257,35 +257,16 @@ int Animator::getInsertIdForKeyRelFrame(
     return guess;
 }
 
-void Animator::anim_afterInsertedKey(const int& insertId,
-                                     Key * const insertedKey) const {
-    const auto prevKey = insertId == 0 ?
-                nullptr : anim_mKeys.at(insertId - 1).get();
-    const auto nextKey = insertId + 1 >= anim_mKeys.count() ?
-                nullptr : anim_mKeys.at(insertId + 1).get();
-    if(prevKey) prevKey->updateAfterNextKeyChanged(insertedKey);
-    insertedKey->updateAfterNeighbouringKeysChanged(prevKey, nextKey);
-    if(nextKey) nextKey->updateAfterPrevKeyChanged(insertedKey);
-}
-
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     if(!anim_mIsRecording) anim_mIsRecording = true;
     const int insertId = getInsertIdForKeyRelFrame(newKey->getRelFrame());
     anim_mKeys.insert(insertId, newKey);
-    anim_afterInsertedKey(insertId, newKey.get());
     //anim_sortKeys();
     //mergeKeysIfNeeded();
     emit prp_addingKey(newKey.get());
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(newKey.get());
     anim_updateAfterChangedKey(newKey.get());
-}
-
-void Animator::anim_afterRemovedKey(const int& removedId) const {
-    const auto prevKey = anim_getKeyAtIndex(removedId - 1);
-    const auto nextKey = anim_getKeyAtIndex(removedId);
-    if(prevKey) prevKey->updateAfterNextKeyChanged(nextKey);
-    if(nextKey) nextKey->updateAfterPrevKeyChanged(prevKey);
 }
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
@@ -299,7 +280,6 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     emit prp_removingKey(keyPtr);
     const int keyId = anim_getKeyIndex(keyPtr);
     anim_mKeys.removeAt(keyId);
-    anim_afterRemovedKey(keyId);
 
     if(keyToRemove->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(nullptr);

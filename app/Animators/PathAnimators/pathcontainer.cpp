@@ -7,8 +7,7 @@ const SkPoint &PathContainer::getElementPos(const int &index) const {
     return mElementsPos.at(index);
 }
 
-void PathContainer::setElementPos(const int &index,
-                                  const SkPoint &pos) {
+void PathContainer::setElementPos(const int &index, const SkPoint &pos) {
     mElementsPos.replace(index, pos);
     mPathUpdateNeeded = true;
 }
@@ -36,13 +35,13 @@ void PathContainer::removeNodeElements(const int &startPtIndex) {
 
 const SkPath &PathContainer::getPath() {
     if(mPathUpdateNeeded) {
-        updatePath();
+        updatePathFromData();
         mPathUpdateNeeded = false;
     }
     return mPath;
 }
 
-void PathContainer::updatePath() {
+void PathContainer::updatePathFromData() {
     mPath.reset();
     if(mElementsPos.count() < 3) return;
     SkPoint firstPos = mElementsPos.at(1);

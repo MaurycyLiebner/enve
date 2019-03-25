@@ -25,6 +25,10 @@ public:
     void finishTransform();
     void cancelTransform();
 
+    void saveTransformPivotAbsPos(const QPointF &absPivot);
+    void rotateRelativeToSavedPivot(const qreal &rot);
+    void scaleRelativeToSavedPivot(const qreal &sx, const qreal &sy);
+
     void setRelativePos(const QPointF &relPos);
 
     void removeFromVectorPath();
@@ -112,12 +116,7 @@ public:
 
     SmartNodePoint *getConnectedSeparateNodePoint();
 
-    void saveTransformPivotAbsPos(const QPointF &absPivot);
-    void rotateRelativeToSavedPivot(const qreal &rot);
-    void scaleRelativeToSavedPivot(const qreal &sx,
-                                   const qreal &sy);
-
-    const NormalSegment& getNextNormalSegment() {
+    NormalSegment getNextNormalSegment() {
         return mNextNormalSegment;
     }
 
@@ -125,35 +124,35 @@ public:
                         const QPointF &p1,
                         const QPointF &c2);
 
-    const qreal& getT() const {
+    qreal getT() const {
         return mNode_d->fT;
     }
 
-    const QPointF& getC0() const {
+    QPointF getC0() const {
         return mNode_d->fC0;
     }
 
-    const QPointF& getP1() const {
+    QPointF getP1() const {
         return mNode_d->fP1;
     }
 
-    const QPointF& getC2() const {
+    QPointF getC2() const {
         return mNode_d->fC2;
     }
 
-    const bool &getC0Enabled() const {
+    bool getC0Enabled() const {
         return mNode_d->getC0Enabled();
     }
 
-    const bool &getC2Enabled() const {
+    bool getC2Enabled() const {
         return mNode_d->getC2Enabled();
     }
 
-    const CtrlsMode& getCtrlsMode() const {
+    CtrlsMode getCtrlsMode() const {
         return mNode_d->getCtrlsMode();
     }
 
-    const Node::Type& getType() const {
+    Node::Type getType() const {
         return mNode_d->getType();
     }
 

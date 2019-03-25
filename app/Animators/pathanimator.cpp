@@ -192,7 +192,7 @@ SkPath PathAnimator::getPathAtRelFrameF(const qreal &relFrame) {
     SkPath path;
 
     for(const auto& singlePath : mSinglePaths) {
-        path.addPath(singlePath->getPathAtRelFrameF(relFrame));
+        path.addPath(singlePath->getPathAtRelFrame(relFrame));
     }
 
     return path;

@@ -36,7 +36,7 @@ PathKey::PathKey(const int &relFrame,
     mRelFrame = relFrame;
     mElementsPos = elementsPos;
     mPathClosed = closed;
-    updatePath();
+    updatePathFromData();
 }
 
 stdsptr<PathKey> PathKey::createNewKeyFromSubsetForPath(

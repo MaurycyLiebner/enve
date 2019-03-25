@@ -15,7 +15,7 @@ public:
         if(frame == anim_getCurrentAbsFrame()) return;
         const int lastRelFrame = anim_getCurrentRelFrame();
         Animator::anim_setAbsFrame(frame);
-        if(this->anim_hasKeys()) {
+        if(anim_hasKeys()) {
             const auto prevK1 = anim_getPrevKey<SmartPathKey>(lastRelFrame);
             const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
             const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);
@@ -36,12 +36,12 @@ public:
                 gInterpolate(prevK2->getValue(), nextK2->getValue(),
                              nWeight, mBaseValue);
             }
-            this->anim_callFrameChangeUpdater();
+            anim_callFrameChangeUpdater();
         }
     }
 
     SkPath getPathAtAbsFrame(const qreal &frame) const {
-        return getPathAtRelFrame(this->prp_absFrameToRelFrameF(frame));
+        return getPathAtRelFrame(prp_absFrameToRelFrameF(frame));
     }
 
     void graph_getValueConstraints(
@@ -70,7 +70,7 @@ public:
     }
 
     SkPath getPathAtRelFrame(const qreal &frame) const {
-        if(this->anim_mKeys.isEmpty()) return mBaseValue.getPathAt();
+        if(anim_mKeys.isEmpty()) return mBaseValue.getPathAt();
         const auto pn = anim_getPrevAndNextKeyIdForRelFrameF(frame);
         const int prevId = pn.first;
         const int nextId = pn.second;
@@ -83,8 +83,12 @@ public:
                     anim_getKeyAtIndex<SmartPathKey>(pn.first + 1);
         if(keyAtRelFrame) return keyAtRelFrame->getValue().getPathAt();
         if(prevKey && nextKey) {
+            SkPath result;
             const qreal pWeight = prevKeyWeight(prevKey, nextKey, frame);
-            return nextKey->getValue().interpolateWithPrev(pWeight);
+            nextKey->getPath().interpolate(prevKey->getPath(),
+                                           toSkScalar(pWeight),
+                                           &result);
+            return result;
         } else if(!prevKey && nextKey) {
             return nextKey->getValue().getPathAt();
         } else if(prevKey && !nextKey) {
@@ -148,32 +152,22 @@ public:
     }
 
     void anim_saveCurrentValueAsKey() {
-        if(!this->anim_isRecording()) this->anim_setRecording(true);
+        if(!anim_isRecording()) anim_setRecording(true);
 
-        const auto spk = this->anim_getKeyOnCurrentFrame<SmartPathKey>();
+        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
         if(spk) {
             spk->assignValue(mBaseValue);
         } else {
-            const auto neighs = anim_getPrevAndNextKey<SmartPathKey>(
-                        anim_getCurrentRelFrame());
-            if(neighs.first && neighs.second) {
-                const int newKeyNodeCount = mBaseValue.getNodeCount();
-                const int currentNodeCount = neighs.first->getValue().getNodeCount();
-                if(newKeyNodeCount != currentNodeCount) {
-                    neighs.first->getValue().prepareForNewNeighBetweenThisAndNext();
-                    //neighs.second->getValue().prepareForNewNeighBetweenThisAndPrev();
-                }
-            }
             const auto newKey = SPtrCreate(SmartPathKey)(
                         mBaseValue, anim_getCurrentRelFrame(), this);
-            this->anim_appendKey(newKey);
+            anim_appendKey(newKey);
         }
     }
 
     void writeProperty(QIODevice * const target) const {
-        int nKeys = this->anim_mKeys.count();
+        const int nKeys = anim_mKeys.count();
         target->write(rcConstChar(&nKeys), sizeof(int));
-        for(const auto &key : this->anim_mKeys) {
+        for(const auto &key : anim_mKeys) {
             key->writeKey(target);
         }
         gWrite(target, mBaseValue);
@@ -185,7 +179,7 @@ public:
         for(int i = 0; i < nKeys; i++) {
             auto newKey = SPtrCreate(SmartPathKey)(this);
             newKey->readKey(target);
-            this->anim_appendKey(newKey);
+            anim_appendKey(newKey);
         }
         gRead(target, mBaseValue);
     }

@@ -3,36 +3,11 @@
 
 Node Node::sInterpolate(const Node &node1, const Node &node2,
                         const qreal &weight2) {
-    Node result;
     if(node1.isNormal() && node2.isNormal())
-        result = sInterpolateNormal(node1, node2, weight2);
+        return sInterpolateNormal(node1, node2, weight2);
     else if(node1.isDissolved() && node2.isDissolved())
-        result = Node(node1.fT*(1 - weight2) + node2.fT*weight2);
-    else if(node1.isDummy() && node2.isDissolved())
-        result = Node(0.5*(1 - weight2) + node2.fT*weight2);
-    else if(node1.isDissolved() && node2.isDummy())
-        result = Node(node1.fT*(1 - weight2) + 0.5*weight2);
-    else if(node1.isDummy() && node2.isDummy())
-        result = Node(Node::DUMMY);
-    else if(node1.isMove() && node2.isMove())
-        result = Node(Node::MOVE);
-    else RuntimeThrow("Unsupported");
-//    if(node1.getNextNodeId() != node2.getNextNodeId() ||
-//       node1.getPrevNodeId() != node2.getPrevNodeId())
-//        RuntimeThrow("Cannot interpolate neighbours");
-//    result.setNextNodeId(node1.getNextNodeId());
-//    result.setPrevNodeId(node1.getPrevNodeId());
-    if(node1.getNextNodeId() == -1 || node2.getNextNodeId() == -1) {
-        result.setNextNodeId(-1);
-    } else {
-        result.setNextNodeId(node1.getNextNodeId());
-    }
-    if(node1.getPrevNodeId() == -1 || node2.getPrevNodeId() == -1) {
-        result.setPrevNodeId(-1);
-    } else {
-        result.setPrevNodeId(node1.getPrevNodeId());
-    }
-    return result;
+        return Node(node1.fT*(1 - weight2) + node2.fT*weight2);
+    return Node();
 }
 
 Node Node::sInterpolateNormal(const Node &node1, const Node &node2,

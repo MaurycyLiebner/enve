@@ -193,10 +193,6 @@ private:
     void anim_setKeyOnCurrentFrame(Key * const key);
     int getInsertIdForKeyRelFrame(const int &relFrame,
                                   const int &min, const int &max) const;
-    void anim_afterInsertedKey(const int &insertId,
-                               Key * const insertedKey) const;
-    void anim_afterRemovedKey(const int &removedId) const;
-
     stdptr<Key> anim_mKeyOnCurrentFrame;
 };
 

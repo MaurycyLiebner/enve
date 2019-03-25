@@ -224,7 +224,7 @@ void VectorPathAnimator::readProperty(QIODevice *target) {
     }
 
     readPathContainer(target);
-    updateNodePointsFromElements();
+    updateNodePointsFromData();
 }
 
 void Animator::writeSelectedKeys(QIODevice* target) {

@@ -28,6 +28,14 @@ protected:
                        const QList<SkPoint> &posList,
                        PathAnimator * const pathAnimator);
 public:
+    bool SWT_isVectorPathAnimator() const { return true; }
+    void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
+        if(range.inRange(anim_getCurrentRelFrame())) {
+            mElementsUpdateNeeded = true;
+        }
+        InterpolationAnimator::prp_updateAfterChangedRelFrameRange(range);
+    }
+
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
 
     void setPathClosed(const bool &bT);
@@ -51,16 +59,11 @@ public:
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice * const target) const;
 
-    void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
-    void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_saveCurrentValueAsKey();
     void anim_addKeyAtRelFrame(const int &relFrame);
-    void anim_removeKey(const stdsptr<Key> &keyToRemove);
     stdsptr<Key> readKey(QIODevice *target);
-    bool SWT_isVectorPathAnimator() const { return true; }
 
-    SkPath getPathAtRelFrame(const int &relFrame);
-    SkPath getPathAtRelFrameF(const qreal &relFrame);
+    SkPath getPathAtRelFrame(const qreal &relFrame);
 
     NodeSettings *getNodeSettingsForNodeId(const int &nodeId);
 
@@ -92,7 +95,7 @@ public:
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
-    void updateNodePointsFromElements();
+    void updateNodePointsFromData();
     PathAnimator *getParentPathAnimator();
 
     void finalizeNodesRemove();

@@ -105,20 +105,6 @@ public:
         if(!nextKey) return mRelFrame;
         return getNextKey()->getRelFrame();
     }
-
-    virtual void  updateAfterPrevKeyChanged(Key * const prevKey) {
-        Q_UNUSED(prevKey);
-    }
-
-    virtual void  updateAfterNextKeyChanged(Key * const nextKey) {
-        Q_UNUSED(nextKey);
-    }
-
-    void updateAfterNeighbouringKeysChanged(Key * const prevKey,
-                                            Key * const nextKey) {
-        updateAfterPrevKeyChanged(prevKey);
-        updateAfterNextKeyChanged(nextKey);
-    }
 protected:
     virtual void setRelFrame(const int &frame);
     bool mIsSelected = false;

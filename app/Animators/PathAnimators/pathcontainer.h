@@ -22,7 +22,7 @@ public:
                  const SkPoint &endPos);
     void removeElementPosAt(const int &index);
     const SkPath &getPath();
-    void updatePath();
+    void updatePathFromData();
     virtual void setPathClosed(const bool &bT);
     virtual void setElementsFromSkPath(const SkPath &path);
     void clearElements();
