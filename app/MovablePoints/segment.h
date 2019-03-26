@@ -11,6 +11,12 @@ class PathPointsHandler;
 
 class NormalSegment {
 public:
+    bool operator==(const NormalSegment& other) const;
+
+    bool operator!=(const NormalSegment& other) const {
+        return !this->operator==(other);
+    }
+
     struct PointOnSegment {
         qreal fT;
         QPointF fPos;
@@ -57,33 +63,19 @@ public:
 
     bool isValid() const;
 
-    void setFirstAndLastNode(SmartNodePoint * const firstNode,
-                             SmartNodePoint * const lastNode);
-    void reset() {
-        clear();
-    }
+    void reset() { clear(); }
 
-    void clear() {
-        setFirstAndLastNode(nullptr, nullptr);
-    }
+    void clear();
 
     void disconnect() const;
 
-    int nodesCount() const {
-        return mInnerDnD.count() + (mFirstNode ? 1 : 0) + (mLastNode ? 1 : 0);
-    }
+    int nodesCount() const;
 
     int innerNodesCount() const {
         return mInnerDnD.count();
     }
 
-    SmartNodePoint* getNodeAt(const int& id) const {
-        if(id < 0 || id >= nodesCount()) return nullptr;
-        if(id == 0) return mFirstNode;
-        const int innerId = id - 1;
-        if(innerId < mInnerDnD.count()) mInnerDnD.at(innerId);
-        return mLastNode;
-    }
+    SmartNodePoint* getNodeAt(const int& id) const;
 
     SubSegment getClosestSubSegment(const QPointF& relPos,
                                     qreal& minDist) const {
@@ -104,17 +96,25 @@ public:
     qCubicSegment2D getAsRelSegment() const;
 
     void updateDnD();
+
+    qreal closestRelT(const QPointF& relPos) const {
+        return getAsRelSegment().tValueForPointClosestTo(relPos);
+    }
+
+    qreal closestAbsT(const QPointF& absPos) const {
+        return getAsAbsSegment().tValueForPointClosestTo(absPos);
+    }
 private:
     void updateDnDPos() const;
     SubSegment subSegmentAtT(const qreal& t) const;
 
     SkPath mSkPath;
     stdptr<PathPointsHandler> mHandler_k;
-    SmartNodePoint* mFirstNode;
-    SmartCtrlPoint* mFirstNodeC2;
-    QList<SmartNodePoint*> mInnerDnD;
-    SmartCtrlPoint* mLastNodeC0;
-    SmartNodePoint* mLastNode;
+    stdptr<SmartNodePoint> mFirstNode;
+    stdptr<SmartCtrlPoint> mFirstNodeC2;
+    QList<stdptr<SmartNodePoint>> mInnerDnD;
+    stdptr<SmartCtrlPoint> mLastNodeC0;
+    stdptr<SmartNodePoint> mLastNode;
 };
 
 #endif // SEGMENT_H

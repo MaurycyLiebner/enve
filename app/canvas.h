@@ -212,7 +212,8 @@ public:
 
 
     void clearPointsSelectionOrDeselect();
-    VectorPathEdge *getEdgeAt(QPointF absPos);
+    VectorPathEdge *getEdgeAt(const QPointF &absPos) const;
+    NormalSegment getSmartEdgeAt(const QPointF& absPos) const;
 
     void createLinkBoxForSelected();
     void startSelectedPointsTransform();
@@ -651,8 +652,9 @@ protected:
 
     stdptr<SmartNodePoint> mCurrentSmartEndPoint;
 
-    NormalSegment mHoveredNormalSegment_d;
+    NormalSegment mHoveredNormalSegment;
     NormalSegment mCurrentNormalSegment;
+    qreal mCurrentNormalSegmentT;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
 

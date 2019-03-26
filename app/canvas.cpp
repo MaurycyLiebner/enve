@@ -117,7 +117,8 @@ void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
 
-    if(mHoveredEdge_d) mHoveredEdge_d->generatePainterPath();
+    if(mHoveredEdge_d) mHoveredEdge_d->generateSkPath();
+    if(mHoveredNormalSegment.isValid()) mHoveredNormalSegment.generateSkPath();
 }
 
 void Canvas::setCurrentGroupParentAsCurrentGroup() {
@@ -167,9 +168,10 @@ void Canvas::updateHoveredPoint() {
 
 void Canvas::updateHoveredEdge() {
     mHoveredEdge_d = getEdgeAt(mCurrentMouseEventPosRel);
-    if(mHoveredEdge_d != nullptr) {
-        mHoveredEdge_d->generatePainterPath();
-    }
+    if(mHoveredEdge_d) mHoveredEdge_d->generateSkPath();
+
+    mHoveredNormalSegment = getSmartEdgeAt(mCurrentMouseEventPosRel);
+    if(mHoveredNormalSegment.isValid()) mHoveredNormalSegment.generateSkPath();
 }
 
 void Canvas::updateHoveredElements() {
@@ -315,10 +317,12 @@ void Canvas::renderSk(SkCanvas * const canvas,
             mHoveredPoint_d->drawHovered(canvas, invZoom);
         } else if(mHoveredEdge_d) {
             mHoveredEdge_d->drawHoveredSk(canvas, invZoom);
+        } else if(mHoveredNormalSegment.isValid()) {
+            mHoveredNormalSegment.drawHoveredSk(canvas, invZoom);
         } else if(mHoveredBone) {
             mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invZoom);
         } else if(mHoveredBox) {
-            if(!mCurrentEdge) {
+            if(!mCurrentEdge && !mCurrentNormalSegment.isValid()) {
                 mHoveredBox->drawHoveredSk(canvas, invZoom);
             }
         }

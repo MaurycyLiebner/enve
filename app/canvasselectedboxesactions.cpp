@@ -368,16 +368,22 @@ void Canvas::startSelectedFillColorTransform() {
     }
 }
 
-VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
+VectorPathEdge *Canvas::getEdgeAt(const QPointF& absPos) const {
     for(const auto &box : mSelectedBoxes) {
-        if(box->isSelected() ) {
-            VectorPathEdge *pathEdge = box->getEdge(absPos,
-                                                    1./mCanvasTransformMatrix.m11());
-            if(!pathEdge) continue;
-            return pathEdge;
-        }
+        const qreal zoomInv = 1/mCanvasTransformMatrix.m11();
+        const auto pathEdge = box->getEdge(absPos, zoomInv);
+        if(!pathEdge) return pathEdge;
     }
     return nullptr;
+}
+#include "Boxes/smartvectorpath.h"
+NormalSegment Canvas::getSmartEdgeAt(const QPointF& absPos) const {
+    for(const auto &box : mSelectedBoxes) {
+        const qreal zoomInv = 1/mCanvasTransformMatrix.m11();
+        const auto pathEdge = box->getNormalSegment(absPos, zoomInv);
+        if(pathEdge.isValid()) return pathEdge;
+    }
+    return NormalSegment();
 }
 
 void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {

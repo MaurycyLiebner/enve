@@ -8,7 +8,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 #include "colorhelpers.h"
 #include "waitingforboxload.h"
-
+#include "MovablePoints/segment.h"
 class Canvas;
 
 class MovablePoint;
@@ -152,6 +152,12 @@ public:
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
     virtual VectorPathEdge *getEdge(const QPointF &absPos,
                                     const qreal &canvasScaleInv);
+    virtual NormalSegment getNormalSegment(const QPointF &absPos,
+                                           const qreal &canvasScaleInv) {
+        Q_UNUSED(absPos);
+        Q_UNUSED(canvasScaleInv);
+        return NormalSegment();
+    }
     virtual MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                      const CanvasMode &currentCanvasMode,
                                      const qreal &canvasScaleInv);

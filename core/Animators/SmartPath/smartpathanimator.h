@@ -103,11 +103,8 @@ public:
 
     void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
         const auto spk = static_cast<SmartPathKey*>(key);
-        if(spk) {
-            mPathBeingChanged_d = &spk->getValue();
-        } else {
-            mPathBeingChanged_d = &mBaseValue;
-        }
+        if(spk) mPathBeingChanged_d = &spk->getValue();
+        else mPathBeingChanged_d = &mBaseValue;
     }
 
     void beforeBinaryPathChange() {

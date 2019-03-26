@@ -9,6 +9,11 @@
 #include "Animators/transformanimator.h"
 #include "pathpointshandler.h"
 
+bool NormalSegment::operator==(const NormalSegment &other) const {
+    return mFirstNode == other.getFirstNode() &&
+           mLastNode == other.getLastNode();
+}
+
 NormalSegment::NormalSegment() {}
 
 NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
@@ -26,12 +31,24 @@ void NormalSegment::disconnect() const {
     mHandler_k->removeSegment(*this);
 }
 
+int NormalSegment::nodesCount() const {
+    return mInnerDnD.count() + (mFirstNode ? 1 : 0) + (mLastNode ? 1 : 0);
+}
+
+SmartNodePoint *NormalSegment::getNodeAt(const int &id) const {
+    if(id < 0 || id >= nodesCount()) return nullptr;
+    if(id == 0) return mFirstNode;
+    const int innerId = id - 1;
+    if(innerId < mInnerDnD.count()) mInnerDnD.at(innerId);
+    return mLastNode;
+}
+
 NormalSegment::SubSegment NormalSegment::getClosestSubSegmentForDummy(
         const QPointF &relPos, qreal &minDist) const {
     auto prevNode = mFirstNode;
     minDist = TEN_MIL;
     SubSegment bestSeg{nullptr, nullptr, nullptr};
-    for(const auto nextNode : mInnerDnD) {
+    for(const auto &nextNode : mInnerDnD) {
         const auto subSeg = SubSegment{prevNode, nextNode, this};
         const QPointF halfPos = subSeg.getRelPosAtT(0.5);
         const qreal dist = pointToLen(halfPos - relPos);
@@ -52,9 +69,8 @@ NormalSegment::SubSegment NormalSegment::getClosestSubSegmentForDummy(
 }
 
 void NormalSegment::updateDnDPos() const {
-    for(const auto& inner : mInnerDnD) {
+    for(const auto& inner : mInnerDnD)
         inner->updateFromNodeDataPosOnly();
-    }
 }
 
 QPointF NormalSegment::getRelPosAtT(const qreal &t) const {
@@ -178,7 +194,7 @@ NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {
     SmartNodePoint* lastNode = mLastNode;
     qreal firstNodeT = 0;
     qreal lastNodeT = 1;
-    for(const auto inner : mInnerDnD) {
+    for(const auto& inner : mInnerDnD) {
         const qreal innerT = inner->getT();
         if(innerT < t && innerT > firstNodeT) {
             firstNodeT = innerT;
@@ -199,7 +215,16 @@ QPointF NormalSegment::getSlopeVector(const qreal &t) {
 }
 
 bool NormalSegment::isValid() const {
-    return mFirstNode && mLastNode && mHandler_k;
+    return mFirstNode && mFirstNodeC2 &&
+           mLastNodeC0 && mLastNode && mHandler_k;
+}
+
+void NormalSegment::clear() {
+    mFirstNode = nullptr;
+    mFirstNodeC2 = nullptr;
+    mLastNodeC0 = nullptr;
+    mLastNode = nullptr;
+    mInnerDnD.clear();
 }
 
 qreal NormalSegment::SubSegment::getMinT() const {

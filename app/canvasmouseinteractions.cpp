@@ -483,6 +483,7 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
 
 void Canvas::clearHoveredEdge() {
     mHoveredEdge_d = nullptr;
+    mHoveredNormalSegment.reset();
 }
 
 void Canvas::handleMovePointMousePressEvent() {
@@ -496,6 +497,16 @@ void Canvas::handleMovePointMousePressEvent() {
                                         canvasScaleInv);
 
         } else {
+            mCurrentNormalSegment = getSmartEdgeAt(mLastPressPosRel);
+            if(mCurrentNormalSegment.isValid()) {
+                mCurrentNormalSegmentT = mCurrentNormalSegment.closestAbsT(
+                            mLastPressPosRel);
+                clearPointsSelection();
+                clearCurrentEndPoint();
+                clearCurrentSmartEndPoint();
+                clearLastPressedPoint();
+            }
+
             mCurrentEdge = getEdgeAt(mLastPressPosRel);
             if(mCurrentEdge) {
                 clearPointsSelection();
@@ -689,6 +700,8 @@ void Canvas::cancelCurrentTransform() {
     if(mCurrentMode == CanvasMode::MOVE_POINT) {
         if(mCurrentEdge) {
             mCurrentEdge->cancelPassThroughTransform();
+        } else if(mCurrentNormalSegment.isValid()) {
+            mCurrentNormalSegment.cancelPassThroughTransform();
         } else {
             cancelSelectedPointsTransform();
             if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
@@ -920,10 +933,17 @@ void Canvas::handleAddPointMouseRelease() {
 
 void Canvas::handleMouseRelease() {
     if(mIsMouseGrabbing) releaseMouseAndDontTrack();
+    if(mCurrentNormalSegment.isValid()) {
+        if(!mFirstMouseMove) mCurrentNormalSegment.finishPassThroughTransform();
+        mHoveredNormalSegment = mCurrentNormalSegment;
+        mHoveredNormalSegment.generateSkPath();
+        mCurrentNormalSegment.reset();
+        return;
+    }
     if(mCurrentEdge) {
         if(!mFirstMouseMove) mCurrentEdge->finishPassThroughTransform();
         mHoveredEdge_d = mCurrentEdge;
-        mHoveredEdge_d->generatePainterPath();
+        mHoveredEdge_d->generateSkPath();
         mCurrentEdge = nullptr;
         return;
     }
@@ -1014,6 +1034,10 @@ void Canvas::handleMovePointMouseMove() {
     } else if(mCurrentEdge) {
         if(mFirstMouseMove) mCurrentEdge->startPassThroughTransform();
         mCurrentEdge->makePassThroughAbs(mCurrentMouseEventPosRel);
+    } else if(mCurrentNormalSegment.isValid()) {
+        if(mFirstMouseMove) mCurrentNormalSegment.startPassThroughTransform();
+        mCurrentNormalSegment.makePassThroughAbs(mCurrentMouseEventPosRel,
+                                                 mCurrentNormalSegmentT);
     } else {
         if(mLastPressedPoint) {
             addPointToSelection(mLastPressedPoint);

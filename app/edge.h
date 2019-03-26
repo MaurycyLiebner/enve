@@ -54,7 +54,7 @@ public:
 
     void setEditPath(const bool &bT);
 
-    void generatePainterPath();
+    void generateSkPath();
 
     void drawHoveredSk(SkCanvas *canvas,
                        const SkScalar &invScale);

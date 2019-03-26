@@ -16,6 +16,7 @@ class SmartVectorPathEdge;
 class SmartVectorPath : public PathBox {
 public:
     SmartVectorPath();
+    bool SWT_isSmartVectorPath() const { return true; }
 
     void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
@@ -25,7 +26,6 @@ public:
     NormalSegment getNormalSegment(const QPointF &absPos,
                                    const qreal &canvasScaleInv);
 
-    bool SWT_isSmartVectorPath() const { return true; }
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);

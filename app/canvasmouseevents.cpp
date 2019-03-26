@@ -65,13 +65,15 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         const auto lastHoveredBox = mHoveredBox;
         const auto lastEdge = mHoveredEdge_d;
         const auto lastHoveredPoint = mHoveredPoint_d;
+        const auto lastNSegment = mHoveredNormalSegment;
 
         updateHoveredElements();
 
         setLastMouseEventPosAbs(event->pos());
         if(mHoveredPoint_d != lastHoveredPoint ||
            mHoveredBox != lastHoveredBox ||
-           mHoveredEdge_d != lastEdge) {
+           mHoveredEdge_d != lastEdge ||
+           mHoveredNormalSegment != lastNSegment) {
             callUpdateSchedulers();
         }
         return;
@@ -88,7 +90,8 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         }
         if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
             if((mCurrentMode == CanvasMode::MOVE_POINT &&
-                !mHoveredPoint_d && !mHoveredEdge_d) ||
+                !mHoveredPoint_d && !mHoveredEdge_d &&
+                !mHoveredNormalSegment.isValid()) ||
                (mCurrentMode == CanvasMode::MOVE_PATH &&
                 !mHoveredBox && !mHoveredPoint_d)) {
                 startSelectionAtPoint(mLastMouseEventPosRel);
@@ -194,7 +197,8 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
         BoundingBox * const boxAt =
                 mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);
         if(!boxAt) {
-            if(!mHoveredEdge_d && !mHoveredPoint_d) {
+            if(!mHoveredEdge_d && !mHoveredPoint_d &&
+               !mHoveredNormalSegment.isValid()) {
                 if(mCurrentBoxesGroup != this) {
                     setCurrentBoxesGroup(mCurrentBoxesGroup->getParentGroup());
                 }
@@ -215,6 +219,7 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
         }
     } else {
         mCurrentEdge = nullptr;
+        mCurrentNormalSegment.reset();
         updateHoveredElements();
     }
 
