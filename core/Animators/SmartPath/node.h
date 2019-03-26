@@ -104,6 +104,7 @@ public:
     void insert(const int& id, const Node& nodeBlueprint) {
         Node * const newNode = insertNewNode(id);
         *newNode = nodeBlueprint;
+        newNode->setNodeId(id);
     }
 
     void clear() {
@@ -153,6 +154,7 @@ public:
 
     void moveNode(const int& fromId, const int& toId) {
         mList.move(fromId, toId);
+        updateNodeIds(qMin(fromId, toId));
     }
 
     Node * operator[](const int& id) const {
@@ -161,20 +163,25 @@ public:
 
     void removeAt(const int& id) {
         mList.removeAt(id);
+        updateNodeIds(id);
     }
 
     void reverse() {
         const auto cpy = mList;
         mList.clear();
         for(const auto& node : cpy) {
+            const auto oldC0 = node->fC0;
+            node->fC0 = node->fC2;
+            node->fC2 = oldC0;
             mList.prepend(node);
         }
+        updateNodeIds();
     }
 
     void moveNodesToFrontStartingWith(const int& first) {
-        for(int i = first; i < mList.count(); i++) {
+        for(int i = first; i < mList.count(); i++)
             mList.prepend(mList.takeLast());
-        }
+        updateNodeIds();
     }
 
     ListOfNodes detachNodesStartingWith(const int& first) {
@@ -186,11 +193,29 @@ public:
         return ListOfNodes(detached);
     }
 
-    auto begin() const {
+    void appendNodesShallowCopy(const ListOfNodes& src) {
+        if(src.isEmpty()) return;
+        const int oldCount = count();
+        for(const auto& node : src)
+            mList.append(node);
+        updateNodeIds(oldCount);
+    }
+
+    void prependNodesShallowCopy(const ListOfNodes& src) {
+        if(src.isEmpty()) return;
+        for(const auto& node : src)
+            mList.prepend(node);
+        updateNodeIds();
+    }
+
+    typedef QList<stdsptr<Node>>::const_iterator const_iterator;
+    typedef QList<stdsptr<Node>>::iterator iterator;
+
+    const_iterator begin() const {
         return mList.begin();
     }
 
-    auto end() const {
+    const_iterator end() const {
         return mList.end();
     }
 protected:
@@ -202,11 +227,33 @@ protected:
         return mList;
     }
 private:
-    ListOfNodes(const QList<stdsptr<Node>>& list) : mList(list) {}
+    ListOfNodes(const QList<stdsptr<Node>>& list) : mList(list) {
+        updateNodeIds();
+    }
+
+    void updateNodeIds() {
+        updateNodeIds(0);
+    }
+
+    void updateNodeIds(const int& minId) {
+        const int maxId = mList.count() - 1;
+        updateNodeIds(minId, maxId);
+    }
+
+    void updateNodeIds(const int& minId, const int& maxId) {
+        for(int i = minId; i <= maxId; i++)
+            updateNodeId(i);
+    }
+
+    void updateNodeId(const int& id) {
+        Node * const iNode = mList.at(id).get();
+        iNode->setNodeId(id);
+    }
 
     Node* insertNewNode(const int& id) {
         const auto newNode = stdsptr<Node>(new Node);
         mList.insert(id, newNode);
+        newNode->setNodeId(id);
         return newNode.get();
     }
 

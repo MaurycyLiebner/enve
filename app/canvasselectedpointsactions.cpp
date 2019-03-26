@@ -41,8 +41,8 @@ void Canvas::connectPoints() {
     }
 
     if(selectedNodePoints.count() == 2) {
-        NodePoint *firstPoint = selectedNodePoints.first();
-        NodePoint *secondPoint = selectedNodePoints.last();
+        NodePoint * const firstPoint = selectedNodePoints.first();
+        NodePoint * const secondPoint = selectedNodePoints.last();
         if(!firstPoint->isEndPoint() || !secondPoint->isEndPoint()) return;
         clearPointsSelection();
 
@@ -109,10 +109,7 @@ void Canvas::disconnectPoints() {
             const auto nextPoint = asNodePt->getNextPoint();
             if(!nextPoint) continue;
             if(nextPoint->isSelected()) {
-                const auto targetAnimator = nextPoint->getTargetAnimator();
-                const int prevId = asNodePt->getNodeId();
-                const int nextId = nextPoint->getNodeId();
-                targetAnimator->actionDisconnectNodes(prevId, nextId);
+                asNodePt->actionDisconnectFromNormalPoint(nextPoint);
                 break;
             }
         }

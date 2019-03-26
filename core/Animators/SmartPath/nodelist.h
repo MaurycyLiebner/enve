@@ -91,7 +91,7 @@ public:
 
     SkPath toSkPath() const;
     void removeNodeFromList(const int &nodeId);
-    void reverseSegment();
+    void reverse();
     bool isClosed() const;
     void setClosed(const bool& closed) {
         mClosed = closed;
@@ -120,14 +120,12 @@ public:
 protected:
     void moveNodesToFrontStartingWith(const int& first) {
         mNodes.moveNodesToFrontStartingWith(first);
-        updateNodeIds();
     }
 
     NodeList detachNodesStartingWith(const int& first) {
         const auto detachedList = mNodes.detachNodesStartingWith(first);
         NodeList detached;
         detached.shallowCopyNodeList(detachedList);
-        detached.updateNodeIds(first, mNodes.count());
         return detached;
     }
 
@@ -175,8 +173,6 @@ private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;
     Node *insertNodeToList(const int &nodeId, const Node &node);
-    void updateNodeIds();
-    void updateNodeIds(const int &minId, const int &maxId);
 
     ListOfNodes mNodes;
     bool mClosed = false;

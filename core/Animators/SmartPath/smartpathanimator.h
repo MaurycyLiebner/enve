@@ -241,18 +241,36 @@ public:
         prp_updateInfluenceRangeAfterChanged();
     }
 
-    void actionDisconnectNodes(const int &node1Id, const int &node2Id) {
+    void actionDisconnectNodes(const int &node1Id, const int &node2Id);
+
+    bool hasDetached() const {
+        return mBaseValue.hasDetached();
+    }
+
+    qsptr<SmartPathAnimator> createFromDetached() {
+        if(!hasDetached()) return nullptr;
+        const auto baseDetached = mBaseValue.getAndClearLastDetached();
+        SmartPath baseSmartPath;
+        baseSmartPath.assign(baseDetached);
+        const auto newAnim = SPtrCreate(SmartPathAnimator)(
+                    baseSmartPath);
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
-            spKey->getValue().actionDisconnectNodes(node1Id, node2Id);
+            auto& sp = spKey->getValue();
+            const auto keyDetached = sp.getAndClearLastDetached();
+            SmartPath keySmartPath;
+            keySmartPath.assign(keyDetached);
+            const auto newKey = SPtrCreate(SmartPathKey)(
+                        keySmartPath, key->getRelFrame(), newAnim.get());
+            newAnim->anim_appendKey(newKey);
         }
-        mBaseValue.actionDisconnectNodes(node1Id, node2Id);
-        prp_updateInfluenceRangeAfterChanged();
+        return newAnim;
     }
 signals:
     void pathChangedAfterFrameChange();
 protected:
     SmartPathAnimator();
+    SmartPathAnimator(const SmartPath& baseValue);
 private:
     SmartPath mBaseValue;
     SmartPath * mPathBeingChanged_d = &mBaseValue;

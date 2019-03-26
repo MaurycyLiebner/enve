@@ -1,14 +1,16 @@
 #include "pathpointshandler.h"
 #include "canvas.h"
 #include "Animators/SmartPath/smartpathanimator.h"
+#include "Animators/SmartPath/smartpathcollection.h"
+#include "Animators/PathAnimators/smartpathcollectionhandler.h"
 
 PathPointsHandler::PathPointsHandler(
+        SmartPathCollectionHandler * const collectionHandler,
         SmartPathAnimator * const targetAnimator,
         BasicTransformAnimator * const parentTransform) :
+    mCollectionHandler_k(collectionHandler),
     mTargetAnimator(targetAnimator),
-    mParentTransform(parentTransform) {
-    updateAllPoints();
-}
+    mParentTransform(parentTransform) {}
 
 MovablePoint *PathPointsHandler::getPointAtAbsPos(
         const QPointF &absPtPos,
@@ -160,7 +162,6 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
     const auto nextPt = minSubSeg.fLastPt;
     const int nextNodeId = nextPt->getNodeId();
     if(nextNodeId == nodeId) return false;
-    const Node * const node = targetPath()->getNodePtr(nodeId);
 
     const int oldPrevNodeId = targetPath()->prevNodeId(nodeId);
     const int oldNextNodeId = targetPath()->nextNodeId(nodeId);
@@ -197,4 +198,11 @@ void PathPointsHandler::removeSegment(const NormalSegment &segment) {
     const int node1Id = node1->getNodeId();
     const int node2Id = node2->getNodeId();
     mTargetAnimator->actionDisconnectNodes(node1Id, node2Id);
+    if(mTargetAnimator->hasDetached()) {
+        const auto spColl = mTargetAnimator->getParent<SmartPathCollection>();
+        if(!spColl) return;
+        const auto newAnim = mTargetAnimator->createFromDetached();
+        spColl->ca_addChildAnimator(newAnim);
+        mCollectionHandler_k->createHandlerForAnimator(newAnim.get());
+    }
 }

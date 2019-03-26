@@ -21,8 +21,14 @@ SmartNodePoint *SmartPathCollectionHandler::createNewSubPathAtPos(
 
 PathPointsHandler *SmartPathCollectionHandler::createNewPath() {
     const auto newAnimator = mAnimator->createNewPath();
+    return createHandlerForAnimator(newAnimator);
+}
+
+PathPointsHandler *SmartPathCollectionHandler::createHandlerForAnimator(
+        SmartPathAnimator * const newAnimator) {
     const auto newHandler = SPtrCreate(PathPointsHandler)(
-                newAnimator, mParentTransform);
+                this, newAnimator, mParentTransform);
+    newHandler->updateAllPoints();
     newAnimator->prp_setOwnUpdater(
                 SPtrCreate(SmartNodePointUpdater)(
                     mParentPath, newHandler.get()));

@@ -3,6 +3,7 @@
 #include "Animators/SmartPath/smartpathcontainer.h"
 #include "smartnodepoint.h"
 class Canvas;
+class SmartPathCollectionHandler;
 
 class PathPointsHandler : public StdSelfRef {
     friend class StdSelfRef;
@@ -60,7 +61,6 @@ public:
     void createSegment(const int& node1Id, const int& node2Id);
     void removeSegment(const NormalSegment &segment);
 
-
     SmartNodePoint* getPrevNormalNode(const int& startId) const {
         return getPointWithId(targetPath()->prevNormalId(startId));
     }
@@ -72,7 +72,8 @@ public:
 
     void updateAllPoints();
 protected:
-    PathPointsHandler(SmartPathAnimator * const targetAnimator,
+    PathPointsHandler(SmartPathCollectionHandler * const collectionHandler,
+                      SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
 private:
     void updateNextSegmentDnDForPoint(const int& nodeId);
@@ -86,6 +87,7 @@ private:
         mBlockAllPointsUpdate = false;
     }
 
+    SmartPathCollectionHandler * const mCollectionHandler_k;
     QList<stdsptr<SmartNodePoint>> mPoints;
     SmartPathAnimator * const mTargetAnimator;
     BasicTransformAnimator * const mParentTransform;

@@ -10,10 +10,7 @@ public:
     SmartPathCollection();
 
     SmartPathAnimator *createNewPath();
-
     SkPath getPathAtRelFrame(const qreal &relFrame);
-protected:
-    QList<qsptr<SmartPathAnimator>> mPaths;
 };
 
 #endif // SMARTPATHCOLLECTION_H

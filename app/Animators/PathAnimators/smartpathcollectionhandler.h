@@ -18,6 +18,7 @@ enum CanvasMode : short;
 #include "skia/skiaincludes.h"
 
 class SmartPathCollectionHandler {
+    friend class PathPointsHandler;
 public:
     SmartPathCollectionHandler(
             BasicTransformAnimator * const parentTransform,
@@ -42,6 +43,9 @@ public:
     SmartPathCollection* getAnimator() const {
         return mAnimator.get();
     }
+protected:
+    PathPointsHandler *createHandlerForAnimator(
+            SmartPathAnimator * const newAnimator);
 private:
     PathPointsHandler* createNewPath();
 

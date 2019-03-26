@@ -52,30 +52,17 @@ bool NodeList::write(QIODevice * const dst) const {
 
 void NodeList::removeNodeFromList(const int &nodeId) {
     mNodes.removeAt(nodeId);
-    updateNodeIds(nodeId, mNodes.count() - 1);
-}
-
-void NodeList::updateNodeIds() {
-    updateNodeIds(0, mNodes.count() - 1);
-}
-
-void NodeList::updateNodeIds(const int& minId, const int& maxId) {
-    for(int i = minId; i <= maxId; i++) {
-        Node * const iNode = mNodes[i];
-        iNode->setNodeId(i);
-    }
 }
 
 Node *NodeList::insertNodeToList(const int &nodeId, const Node &node) {
     if(nodeId < 0 || nodeId > mNodes.count())
         RuntimeThrow("Wrong insert id");
     mNodes.insert(nodeId, node);
-    updateNodeIds(nodeId, mNodes.count() - 1);
     Node * const insertedNode = mNodes[nodeId];
     return insertedNode;
 }
 
-void NodeList::reverseSegment() {
+void NodeList::reverse() {
     mNodes.reverse();
 }
 
@@ -273,7 +260,6 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
     }
     NodeList result;
     result.shallowCopyNodeList(resultList);
-    result.updateNodeIds();
     result.setClosed(closed);
     return result;
 }

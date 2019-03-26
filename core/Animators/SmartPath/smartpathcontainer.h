@@ -104,6 +104,9 @@ public:
         mNodesList.setNodeC2Enabled(node, enabled);
     }
 
+    bool isEmpty() const {
+        return mNodesList.count() == 0;
+    }
 
     SkPath getPathAt() const;
 
@@ -192,6 +195,10 @@ public:
                     path2.getNodesRef(),
                     path2Weight);
         target.assign(list);
+    }
+
+    bool hasDetached() const {
+        return mLastDetached.count() > 0;
     }
 
     NodeList getAndClearLastDetached() {
