@@ -606,10 +606,10 @@ void SmartNodePoint::updateFromNodeData() {
         setVisible(false);
     }
 
-    const int prevNodeId = mNode_d->getPrevNodeId();
+    const int prevNodeId = currentPath()->prevNodeId(mNode_d->getNodeId());
     const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
 
-    const int nextNodeId = mNode_d->getNextNodeId();
+    const int nextNodeId = currentPath()->nextNodeId(mNode_d->getNodeId());
     const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
 
     if(prevNode ? !prevNode->isOutdated() : false) {

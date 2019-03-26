@@ -2,24 +2,18 @@
 
 SmartPath::SmartPath() : mNodesList() {}
 
-SmartPath::SmartPath(const SmartPath &other) {
-    mNodesList.deepCopyNodeList(other.getNodesRef().getList());
-}
-
 void SmartPath::actionRemoveNode(const int &nodeId) {
     Node * const node = mNodesList.at(nodeId);
     if(node->isNormal()) {
         Node * currNode = node;
-        while(currNode->getPrevNode()) {
-            const int prevId = currNode->getPrevNodeId();
-            currNode = mNodesList.at(prevId);
+        while(mNodesList.prevNode(currNode)) {
+            currNode = mNodesList.prevNode(currNode);
             if(currNode->isNormal()) break;
             if(currNode->isDissolved()) currNode->fT *= 0.5;
         }
         currNode = node;
-        while(currNode->getNextNode()) {
-            const int nextId = currNode->getNextNodeId();
-            currNode = mNodesList.at(nextId);
+        while(mNodesList.nextNode(currNode)) {
+            currNode = mNodesList.nextNode(currNode);
             if(currNode->isNormal()) break;
             if(currNode->isDissolved()) currNode->fT = currNode->fT*0.5 + 0.5;
         }
@@ -67,11 +61,9 @@ int SmartPath::actionInsertNodeBetween(const int &prevId,
     return insertNodeBetween(prevId, nextId, Node(t));
 }
 
-int SmartPath::actionInsertNodeBetween(const int &prevId,
-                                      const int& nextId,
-                                      const QPointF &c0,
-                                      const QPointF &p1,
-                                      const QPointF &c2) {
+int SmartPath::actionInsertNodeBetween(
+        const int &prevId, const int& nextId,
+        const QPointF &c0, const QPointF &p1, const QPointF &c2) {
     return insertNodeBetween(prevId, nextId, Node(c0, p1, c2));
 }
 
@@ -82,22 +74,18 @@ void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
 void SmartPath::actionMoveNodeBetween(const int& movedNodeId,
                                       const int& prevNodeId,
                                       const int& nextNodeId) {
-    Node * const prevNode = mNodesList.at(prevNodeId);
-    if(prevNode->getNextNodeId() != nextNodeId)
+    if(!mNodesList.nodesConnected(prevNodeId, nextNodeId))
         RuntimeThrow("Trying to move between not connected nodes");
-    mNodesList.moveNodeAfter(movedNodeId, mNodesList.at(movedNodeId),
-                             prevNodeId, prevNode);
+    mNodesList.moveNode(movedNodeId, nextNodeId);
 }
 
 void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
-    Node * const node1 = mNodesList.at(node1Id);
-    Node * const node2 = mNodesList.at(node2Id);
     int prevId;
     int nextId;
-    if(node1->getNextNodeId() == node2Id) {
+    if(nextNodeId(node1Id) == node2Id) {
         prevId = node1Id;
         nextId = node2Id;
-    } else if(node2->getNextNodeId() == node1Id) {
+    } else if(nextNodeId(node2Id) == node1Id) {
         prevId = node2Id;
         nextId = node1Id;
     } else {
@@ -106,8 +94,7 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
 
     Node * const prevNode = mNodesList.at(prevId);
     if(!prevNode->isNormal()) {
-        const int prevNormalIdV = mNodesList.prevNormalId(prevId);
-        Node * const prevNormalNode = mNodesList.at(prevNormalIdV);
+        Node * const prevNormalNode = mNodesList.prevNormal(prevId);
         mNodesList.setNodeType(prevNode, Node::NORMAL);
         prevNode->fC0 = prevNormalNode->fC0;
         prevNode->fP1 = prevNormalNode->fP1;
@@ -115,35 +102,26 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     }
     Node * const nextNode = mNodesList.at(nextId);
     if(!nextNode->isNormal()) {
-        const int nextNormalIdV = mNodesList.nextNormalId(nextId);
-        Node * const nextNormalNode = mNodesList.at(nextNormalIdV);
+        Node * const nextNormalNode = mNodesList.nextNormal(nextId);
         mNodesList.setNodeType(nextNode, Node::NORMAL);
         nextNode->fC0 = nextNormalNode->fC0;
         nextNode->fP1 = nextNormalNode->fP1;
         nextNode->fC2 = nextNormalNode->fC2;
     }
 
-    mNodesList.setNodeNextId(prevNode, -1);
-    mNodesList.setNodePrevId(nextNode, -1);
     if(isClosed()) {
         mNodesList.moveNodesToFrontStartingWith(nextId);
+        mNodesList.setClosed(false);
     } else {
         mLastDetached = mNodesList.detachNodesStartingWith(nextId);
     }
 }
 
 void SmartPath::actionConnectNodes(const int &node1Id, const int &node2Id) {
-    if(node1Id == 0) {
-        mNodesList.setNodeNextId(node2Id, node1Id);
-        mNodesList.setNodePrevId(node1Id, node2Id);
-    } else if(node2Id == 0) {
-        mNodesList.setNodeNextId(node1Id, node2Id);
-        mNodesList.setNodePrevId(node2Id, node1Id);
+    if((node1Id == 0 && node2Id == mNodesList.count() - 1) ||
+       (node2Id == 0 && node1Id == mNodesList.count() - 1)) {
+        mNodesList.setClosed(true);
     } else RuntimeThrow("Only first and last node can be connected");
-}
-
-NodeList *SmartPath::getNodesPtr() {
-    return &mNodesList;
 }
 
 SkPath SmartPath::getPathAt() const {

@@ -14,8 +14,8 @@ Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
                               const qreal& weight2) {
     if(!node1.isNormal() || !node2.isNormal())
         RuntimeThrow("Unsupported node type");
-//    if(isZero6Dec(weight2)) return node1;
-//    if(isOne6Dec(weight2)) return node2;
+    //if(isZero6Dec(weight2)) return node1;
+    //if(isOne6Dec(weight2)) return node2;
     const qreal w1 = 1 - weight2;
     Node result(w1*node1.fC0 + weight2*node2.fC0,
                 w1*node1.fP1 + weight2*node2.fP1,

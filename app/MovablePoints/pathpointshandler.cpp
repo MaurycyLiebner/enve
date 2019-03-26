@@ -161,8 +161,9 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
     const int nextNodeId = nextPt->getNodeId();
     if(nextNodeId == nodeId) return false;
     const Node * const node = targetPath()->getNodePtr(nodeId);
-    const int oldPrevNodeId = node->getPrevNodeId();
-    const int oldNextNodeId = node->getNextNodeId();
+
+    const int oldPrevNodeId = targetPath()->prevNodeId(nodeId);
+    const int oldNextNodeId = targetPath()->nextNodeId(nodeId);
     blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionMoveNodeBetween(nodeId, prevNodeId, nextNodeId);

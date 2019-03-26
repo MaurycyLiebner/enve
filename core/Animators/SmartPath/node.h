@@ -28,26 +28,8 @@ struct Node {
 
     bool isDissolved() const { return fType == DISSOLVED; }
 
-    int getPrevNodeId() const {
-        if(!fPrevNode_d) return -1;
-        return fPrevNode_d->getNodeId();
-    }
-
-    int getNextNodeId() const {
-        if(!fNextNode_d) return -1;
-        return fNextNode_d->getNodeId();
-    }
-
     int getNodeId() const {
         return fId;
-    }
-
-    Node* getPrevNode() const {
-        return fPrevNode_d;
-    }
-
-    Node* getNextNode() const {
-        return fNextNode_d;
     }
 
     static Node sInterpolate(const Node &node1, const Node &node2,
@@ -70,20 +52,6 @@ struct Node {
         return fC2Enabled;
     }
 protected:
-    void switchPrevAndNext() {
-        const auto prevT = fPrevNode_d;
-        fPrevNode_d = fNextNode_d;
-        fNextNode_d = prevT;
-    }
-
-    void setPrevNode(Node* const prevNode) {
-        fPrevNode_d = prevNode;
-    }
-
-    void setNextNode(Node* const nextNode) {
-        fNextNode_d = nextNode;
-    }
-
     void setNodeId(const int& nodeId) {
         fId = nodeId;
     }
@@ -114,13 +82,8 @@ private:
     bool fC0Enabled = true;
     bool fC2Enabled = true;
     Type fType;
-    CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
-
     int fId = -1;
-    //! @brief Previous connected node id in the list.
-    Node* fPrevNode_d = nullptr;
-    //! @brief Next connected node id in the list.
-    Node* fNextNode_d = nullptr;
+    CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 
     static Node sInterpolateNormal(const Node &node1, const Node &node2,
                                    const qreal& weight2);
@@ -141,7 +104,6 @@ public:
     void insert(const int& id, const Node& nodeBlueprint) {
         Node * const newNode = insertNewNode(id);
         *newNode = nodeBlueprint;
-        updateNodeNeighs(id);
     }
 
     void clear() {
@@ -187,9 +149,10 @@ public:
         for(; i < thisCount; i++) {
             removeAt(i);
         }
+    }
 
-        const int jMax = mList.count() - 1;
-        for(int j = 0; j <= jMax; j++) updateNodeNeighs(j);
+    void moveNode(const int& fromId, const int& toId) {
+        mList.move(fromId, toId);
     }
 
     Node * operator[](const int& id) const {
@@ -204,7 +167,6 @@ public:
         const auto cpy = mList;
         mList.clear();
         for(const auto& node : cpy) {
-            node->switchPrevAndNext();
             mList.prepend(node);
         }
     }
@@ -246,15 +208,6 @@ private:
         const auto newNode = stdsptr<Node>(new Node);
         mList.insert(id, newNode);
         return newNode.get();
-    }
-
-    void updateNodeNeighs(const int& j) {
-        const int jMax = mList.count() - 1;
-        Node * const prevNode = j == 0 ? nullptr : mList.at(j - 1).get();
-        Node * const nextNode = j == jMax ? nullptr : mList.at(j + 1).get();
-        const auto& jNode = mList.at(j);
-        jNode->setPrevNode(prevNode);
-        jNode->setNextNode(nextNode);
     }
 
     QList<stdsptr<Node>> mList;

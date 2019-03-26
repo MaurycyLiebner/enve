@@ -58,57 +58,44 @@ public:
         node->setC2Enabled(enabled);
     }
 
-    void setNodeNextId(const int& nodeId, const int& nextId) {
-        if(nodeId < 0 || nodeId >= mNodes.count()) return;
-        setNodeNextId(mNodes[nodeId], nextId);
+    Node * prevNode(const Node * const node) const {
+        return prevNode(node->getNodeId());
     }
 
-    void setNodeNextId(Node * const node, const int& nextId) {
-        if(nextId < 0) node->setNextNode(nullptr);
-        else node->setNextNode(mNodes[nextId]);
+    Node * nextNode(const Node * const node) const {
+        return nextNode(node->getNodeId());
     }
 
-    void setNodePrevId(const int& nodeId, const int& prevId) {
-        if(nodeId < 0 || nodeId >= mNodes.count()) return;
-        setNodePrevId(mNodes[nodeId], prevId);
+    Node * prevNode(const int& nodeId) const {
+        if(nodeId > 0) return mNodes[nodeId - 1];
+        if(mClosed) return mNodes.last();
+        return nullptr;
     }
 
-    void setNodePrevId(Node * const node, const int& prevId) {
-        if(prevId < 0) node->setPrevNode(nullptr);
-        else node->setPrevNode(mNodes[prevId]);
+    Node * nextNode(const int& nodeId) const {
+        if(nodeId < mNodes.count() - 1) return mNodes[nodeId + 1];
+        if(mClosed) return mNodes.first();
+        return nullptr;
     }
 
-    void setNodePrevAndNextId(const int& nodeId,
-                              const int& prevId, const int& nextId) {
-        if(nodeId < 0 || nodeId >= mNodes.count()) return;
-        setNodePrevAndNextId(mNodes[nodeId], prevId, nextId);
+    Node * prevNormal(const Node * const node) const {
+        return prevNormal(node->getNodeId());
     }
 
-    void setNodePrevAndNextId(Node * const node,
-                              const int& prevId,
-                              const int& nextId) {
-        setNodePrevId(node, prevId);
-        setNodeNextId(node, nextId);
+    Node * nextNormal(const Node * const node) const {
+        return nextNormal(node->getNodeId());
     }
 
-    void moveNodesToFrontStartingWith(const int& first) {
-        mNodes.moveNodesToFrontStartingWith(first);
-        updateNodeIds();
-    }
-
-    ListOfNodes detachNodesStartingWith(const int& first) {
-        const auto detached = mNodes.detachNodesStartingWith(first);
-        updateNodeIds();
-        return detached;
-    }
-
-    int prevNormalId(const int &nodeId) const;
-    int nextNormalId(const int &nodeId) const;
+    Node * prevNormal(const int &nodeId) const;
+    Node * nextNormal(const int &nodeId) const;
 
     SkPath toSkPath() const;
     void removeNodeFromList(const int &nodeId);
     void reverseSegment();
     bool isClosed() const;
+    void setClosed(const bool& closed) {
+        mClosed = closed;
+    }
 
     int insertFirstNode(const Node &nodeBlueprint);
     void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);
@@ -117,23 +104,44 @@ public:
     void splitNodeAndDisconnect(const int &nodeId);
     bool nodesConnected(const int &node1Id, const int &node2Id) const;
 
-    void moveNodeAfter(const int &moveNodeId, Node * const moveNode,
-                       const int &afterNodeId, Node * const afterNode);
-    void moveNodeBefore(const int &moveNodeId, Node * const moveNode,
-                        const int &beforeNodeId, Node * const beforeNode);
-
+    void moveNode(const int& fromId, const int& toId);
     void updateDissolvedNodePosition(const int& nodeId);
     void updateDissolvedNodePosition(const int &nodeId, Node * const node);
 
-    NodeList createCopy() const {
+    NodeList createDeepCopy() const {
         NodeList copy;
         copy.deepCopyNodeList(mNodes);
+        copy.setClosed(mClosed);
         return copy;
     }
 
     bool read(QIODevice * const src);
     bool write(QIODevice * const dst) const;
 protected:
+    void moveNodesToFrontStartingWith(const int& first) {
+        mNodes.moveNodesToFrontStartingWith(first);
+        updateNodeIds();
+    }
+
+    NodeList detachNodesStartingWith(const int& first) {
+        const auto detachedList = mNodes.detachNodesStartingWith(first);
+        NodeList detached;
+        detached.shallowCopyNodeList(detachedList);
+        detached.updateNodeIds(first, mNodes.count());
+        return detached;
+    }
+
+    void swap(NodeList& other) {
+        mNodes.swap(other.getList());
+        const bool wasClosed = mClosed;
+        mClosed = other.isClosed();
+        other.setClosed(wasClosed);
+    }
+
+    ListOfNodes& getList() {
+        return mNodes;
+    }
+
     const ListOfNodes& getList() const {
         return mNodes;
     }
@@ -168,8 +176,10 @@ private:
     qreal nextT(const int &nodeId) const;
     Node *insertNodeToList(const int &nodeId, const Node &node);
     void updateNodeIds();
+    void updateNodeIds(const int &minId, const int &maxId);
 
     ListOfNodes mNodes;
+    bool mClosed = false;
 };
 
 #endif // NODELIST_H

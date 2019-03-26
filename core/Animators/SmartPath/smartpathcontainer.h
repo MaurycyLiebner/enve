@@ -12,7 +12,6 @@
 class SmartPath {
 public:
     SmartPath();
-    SmartPath(const SmartPath &list);
 
     void actionRemoveNode(const int& nodeId);
 
@@ -114,12 +113,28 @@ public:
         return mNodesList[id];
     }
 
+    int prevNodeId(const int &nodeId) const {
+        const auto node = mNodesList.prevNode(nodeId);
+        if(node) return node->getNodeId();
+        return -1;
+    }
+
+    int nextNodeId(const int &nodeId) const {
+        const auto node = mNodesList.nextNode(nodeId);
+        if(node) return node->getNodeId();
+        return -1;
+    }
+
     int prevNormalId(const int &nodeId) const {
-        return mNodesList.prevNormalId(nodeId);
+        const auto node = mNodesList.prevNormal(nodeId);
+        if(node) return node->getNodeId();
+        return -1;
     }
 
     int nextNormalId(const int &nodeId) const {
-        return mNodesList.nextNormalId(nodeId);
+        const auto node = mNodesList.nextNormal(nodeId);
+        if(node) return node->getNodeId();
+        return -1;
     }
 
     ValueRange dissolvedTRange(const int& nodeId);
@@ -137,15 +152,17 @@ public:
     }
 
     void save() {
-        mSavedList.deepCopyFrom(mNodesList.getList());
+        mSavedList = mNodesList.createDeepCopy();
     }
 
     void restore() {
-        mNodesList.deepCopyNodeList(mSavedList);
+        mNodesList = mSavedList.createDeepCopy();
     }
 
     SmartPath createCopy() const {
-        return SmartPath(*this);
+        SmartPath copy;
+        copy.assign(*this);
+        return copy;
     }
 
     int getNodeCount() const {
@@ -153,7 +170,11 @@ public:
     }
 
     void assign(const SmartPath& src) {
-        mNodesList.deepCopyNodeList(src.getNodesRef().getList());
+        assign(src.getNodesRef());
+    }
+
+    void assign(const NodeList& src) {
+        mNodesList = src.createDeepCopy();
     }
 
     static bool sDifferent(const SmartPath& path1,
@@ -170,11 +191,11 @@ public:
                     path1.getNodesRef(),
                     path2.getNodesRef(),
                     path2Weight);
-        target.getNodesPtr()->deepCopyNodeList(list.getList());
+        target.assign(list);
     }
 
-    ListOfNodes getAndClearLastDetached() {
-        ListOfNodes detached;
+    NodeList getAndClearLastDetached() {
+        NodeList detached;
         mLastDetached.swap(detached);
         return detached;
     }
@@ -187,24 +208,17 @@ public:
         return mNodesList.write(dst);
     }
 protected:
-    NodeList *getNodesPtr();
-
     const NodeList& getNodesRef() const {
-        return mNodesList;
-    }
-
-    NodeList& getNodesRef() {
         return mNodesList;
     }
 private:
     int insertNodeBetween(const int &prevId, const int &nextId,
                           const Node &nodeBlueprint);
-    void prepareForNewNeighBetweenThisAnd(SmartPath * const neighbour);
 
     NodeList mNodesList;
-    ListOfNodes mSavedList;
+    NodeList mSavedList;
 
-    ListOfNodes mLastDetached;
+    NodeList mLastDetached;
 };
 
 #endif // SMARTPATHCONTAINER_H

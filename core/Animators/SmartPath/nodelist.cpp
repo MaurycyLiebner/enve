@@ -10,30 +10,8 @@ qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
                            nextNode.fC0, nextNode.fP1);
 }
 
-void NodeList::moveNodeAfter(const int& moveNodeId, Node * const moveNode,
-                             const int& afterNodeId, Node * const afterNode) {
-    const int movePrevId = moveNode->getPrevNodeId();
-    const int moveNextId = moveNode->getNextNodeId();
-    setNodeNextId(movePrevId, moveNextId);
-    setNodePrevId(moveNextId, movePrevId);
-
-    const int afterNextId = afterNode->getNextNodeId();
-    setNodeNextId(afterNode, moveNodeId);
-    setNodePrevAndNextId(moveNode, afterNodeId, afterNextId);
-    setNodePrevId(afterNextId, moveNodeId);
-}
-
-void NodeList::moveNodeBefore(const int& moveNodeId, Node * const moveNode,
-                              const int& beforeNodeId, Node * const beforeNode) {
-    const int movePrevId = moveNode->getPrevNodeId();
-    const int moveNextId = moveNode->getNextNodeId();
-    setNodeNextId(movePrevId, moveNextId);
-    setNodePrevId(moveNextId, movePrevId);
-
-    const int beforePrevId = beforeNode->getPrevNodeId();
-    setNodePrevId(beforeNode, moveNodeId);
-    setNodePrevAndNextId(moveNode, beforePrevId, beforeNodeId);
-    setNodeNextId(beforePrevId, moveNodeId);
+void NodeList::moveNode(const int& fromId, const int& toId) {
+    mNodes.moveNode(fromId, toId);
 }
 
 void NodeList::updateDissolvedNodePosition(const int &nodeId) {
@@ -43,10 +21,8 @@ void NodeList::updateDissolvedNodePosition(const int &nodeId) {
 void NodeList::updateDissolvedNodePosition(const int &nodeId,
                                            Node * const node) {
     if(node->isNormal()) RuntimeThrow("Unsupported node type");
-    const int prevId = prevNormalId(nodeId);
-    const int nextId = nextNormalId(nodeId);
-    const Node * const prevNode = at(prevId);
-    const Node * const nextNode = at(nextId);
+    const Node * const prevNode = prevNormal(nodeId);
+    const Node * const nextNode = nextNormal(nodeId);
     const auto normalSeg = gSegmentFromNodes(*prevNode, *nextNode);
     node->fP1 = normalSeg.posAtT(node->fT);
 }
@@ -60,44 +36,42 @@ bool NodeList::read(QIODevice * const src) {
         src->read(rcChar(&node), sizeof(Node));
         mNodes.append(node);
     }
+    src->read(rcChar(&mClosed), sizeof(bool));
     return true;
 }
 
 bool NodeList::write(QIODevice * const dst) const {
-    int nNodes = mNodes.count();
+    const int nNodes = mNodes.count();
     dst->write(rcConstChar(&nNodes), sizeof(int));
     for(const auto& node : mNodes) {
         dst->write(rcConstChar(node.get()), sizeof(Node));
     }
+    dst->write(rcConstChar(&mClosed), sizeof(bool));
     return true;
 }
 
 void NodeList::removeNodeFromList(const int &nodeId) {
-    const Node * const nodeToRemove = mNodes.at(nodeId);
-    if(nodeToRemove->getPrevNode()) {
-        setNodeNextId(nodeToRemove->getPrevNodeId(),
-                      nodeToRemove->getNextNodeId());
-    }
-    if(nodeToRemove->getNextNode()) {
-        setNodePrevId(nodeToRemove->getNextNodeId(),
-                      nodeToRemove->getPrevNodeId());
-    }
     mNodes.removeAt(nodeId);
-    updateNodeIds();
+    updateNodeIds(nodeId, mNodes.count() - 1);
 }
 
 void NodeList::updateNodeIds() {
-    for(int i = 0; i < mNodes.count(); i++) {
+    updateNodeIds(0, mNodes.count() - 1);
+}
+
+void NodeList::updateNodeIds(const int& minId, const int& maxId) {
+    for(int i = minId; i <= maxId; i++) {
         Node * const iNode = mNodes[i];
         iNode->setNodeId(i);
     }
 }
 
 Node *NodeList::insertNodeToList(const int &nodeId, const Node &node) {
+    if(nodeId < 0 || nodeId > mNodes.count())
+        RuntimeThrow("Wrong insert id");
     mNodes.insert(nodeId, node);
-    updateNodeIds();
+    updateNodeIds(nodeId, mNodes.count() - 1);
     Node * const insertedNode = mNodes[nodeId];
-    insertedNode->setNodeId(nodeId);
     return insertedNode;
 }
 
@@ -106,17 +80,13 @@ void NodeList::reverseSegment() {
 }
 
 bool NodeList::isClosed() const {
-    if(mNodes.isEmpty()) return false;
-    return mNodes.last()->getNextNode();
+    return mClosed;
 }
 
 int NodeList::insertNodeBefore(const int& nextId,
                                const Node& nodeBlueprint) {
     const int insertId = nextId;
     Node * const insertedNode = insertNodeToList(insertId, nodeBlueprint);
-    const int shiftedNextId = nextId + 1;
-    Node * const nextNode = mNodes[shiftedNextId];
-    moveNodeBefore(insertId, insertedNode, shiftedNextId, nextNode);
     if(nodeBlueprint.isDissolved())
         promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
@@ -124,14 +94,8 @@ int NodeList::insertNodeBefore(const int& nextId,
 
 int NodeList::insertNodeAfter(const int& prevId,
                               const Node& nodeBlueprint) {
-    Node * const prevNode = mNodes[prevId];
-    if(prevNode->getNextNode())
-        return insertNodeBefore(prevId, nodeBlueprint);
     const int insertId = prevId + 1;
     Node * const insertedNode = insertNodeToList(insertId, nodeBlueprint);
-
-    moveNodeAfter(insertId, insertedNode, prevId, prevNode);
-
     if(nodeBlueprint.isDissolved())
         promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
@@ -145,29 +109,27 @@ int NodeList::appendNode(const Node &nodeBlueprint) {
 
 void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
                                             Node * const node) {
-    const int prevNormalIdV = prevNormalId(nodeId);
-    const int nextNormalIdV = nextNormalId(nodeId);
-    Node * const prevNormal = mNodes[prevNormalIdV];
-    Node * const nextNormal = mNodes[nextNormalIdV];
+    Node * const prevNormalV = prevNormal(nodeId);
+    Node * const nextNormalV = nextNormal(nodeId);
 
-    auto seg = gSegmentFromNodes(*prevNormal, *nextNormal);
+    auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
     auto div = seg.dividedAtT(node->fT);
     const auto& first = div.first;
     const auto& second = div.second;
-    prevNormal->fC2 = first.c1();
+    prevNormalV->fC2 = first.c1();
     node->fC0 = first.c2();
     node->fP1 = first.p3();
     node->fC2 = second.c1();
     setNodeType(node, Node::NORMAL);
     setNodeCtrlsMode(node, CtrlsMode::CTRLS_SMOOTH);
-    nextNormal->fC0 = second.c2();
-    for(int i = prevNormalIdV + 1; i < nodeId; i++) {
+    nextNormalV->fC0 = second.c2();
+    for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
             iNode->fT = gMapTToFragment(0, node->fT, iNode->fT);
         }
     }
-    for(int i = nodeId + 1; i < nextNormalIdV; i++) {
+    for(int i = nodeId + 1; i < nextNormalV->getNodeId(); i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
             iNode->fT = gMapTToFragment(node->fT, 1, iNode->fT);
@@ -186,7 +148,7 @@ void NodeList::splitNode(const int& nodeId) {
         node->fC2 = node->fP1;
         newNode.fC0 = newNode.fP1;
     }
-    const int nextNormalIdV = nextNormalId(nodeId);
+    const int nextNormalIdV = nextNormal(nodeId)->getNodeId();
     if(nextNormalIdV == 0) {
         insertNodeBefore(nextNormalIdV, newNode);
     } else insertNodeAfter(nodeId, newNode);
@@ -197,9 +159,11 @@ void NodeList::splitNodeAndDisconnect(const int& nodeId) {
 }
 
 bool NodeList::nodesConnected(const int& node1Id, const int& node2Id) const {
-    const Node * const node1 = mNodes.at(node1Id);
-    if(node1->getNextNodeId() == node2Id) return true;
-    if(node1->getPrevNodeId() == node2Id) return true;
+    if(qAbs(node2Id - node1Id) == 1) return true;
+    const bool oneIsFirst = node1Id == 0 || node2Id == 0;
+    const bool oneIsLast = node1Id == mNodes.count() - 1 ||
+                           node2Id == mNodes.count() - 1;
+    if(mClosed && oneIsFirst && oneIsLast) return true;
     return false;
 }
 
@@ -272,34 +236,35 @@ qreal NodeList::nextT(const int &nodeId) const {
     return node->fT;
 }
 
-int NodeList::prevNormalId(const int& nodeId) const {
-    const Node * currNode = mNodes.at(nodeId);
-    while(currNode->getPrevNode()) {
-        const int currId = currNode->getPrevNodeId();
-        currNode = mNodes.at(currId);
-        if(currNode->isNormal()) return currId;
+Node * NodeList::prevNormal(const int& nodeId) const {
+    Node * currNode = mNodes.at(nodeId);
+    while(prevNode(currNode)) {
+        currNode = prevNode(currNode);
+        if(currNode->isNormal()) return currNode;
     }
-    return -1;
+    return nullptr;
 }
 
-int NodeList::nextNormalId(const int& nodeId) const {
-    const Node * currNode = mNodes.at(nodeId);
-    while(currNode->getNextNode()) {
-        const int currId = currNode->getNextNodeId();
-        currNode = mNodes.at(currId);
-        if(currNode->isNormal()) return currId;
+Node * NodeList::nextNormal(const int& nodeId) const {
+    Node * currNode = mNodes.at(nodeId);
+    while(nextNode(currNode)) {
+        currNode = nextNode(currNode);
+        if(currNode->isNormal()) return currNode;
     }
-    return -1;
+    return nullptr;
 }
 
 NodeList NodeList::sInterpolate(const NodeList &list1,
                                 const NodeList &list2,
                                 const qreal& weight2) {
+    if(list1.count() != list2.count())
+        RuntimeThrow("Cannot interpolate paths with different node count");
+    if(list1.isClosed() != list2.isClosed())
+        RuntimeThrow("Cannot interpolate a closed path with an open path.");
+    const bool closed = list1.isClosed();
     ListOfNodes resultList;
     const auto list1v = list1.getList();
     const auto list2v = list2.getList();
-    if(list1v.count() != list2v.count())
-        RuntimeThrow("Cannot interpolate paths with different node count");
     const int listCount = list1v.count();
     for(int i = 0; i < listCount; i++) {
         const Node * const node1 = list1v.at(i);
@@ -308,5 +273,7 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
     }
     NodeList result;
     result.shallowCopyNodeList(resultList);
+    result.updateNodeIds();
+    result.setClosed(closed);
     return result;
 }
