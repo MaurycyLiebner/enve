@@ -90,6 +90,7 @@ public:
     Node * nextNormal(const int &nodeId) const;
 
     SkPath toSkPath() const;
+    void setPath(const SkPath &path);
     void removeNodeFromList(const int &nodeId);
     void reverse();
     bool isClosed() const;
@@ -113,6 +114,10 @@ public:
         copy.deepCopyNodeList(mNodes);
         copy.setClosed(mClosed);
         return copy;
+    }
+
+    void applyTransform(const QMatrix &transform) {
+        mNodes.applyTransform(transform);
     }
 
     bool read(QIODevice * const src);
@@ -155,6 +160,9 @@ protected:
     int insertNodeBefore(const int &nextId, const Node &nodeBlueprint);
     int insertNodeAfter(const int &prevId, const Node &nodeBlueprint);
     int appendNode(const Node &nodeBlueprint);
+    Node * appendAndGetNode(const Node &nodeBlueprint) {
+        return mNodes[appendNode(nodeBlueprint)];
+    }
 
     static bool sDifferent(const NodeList& list1, const NodeList& list2) {
         const auto& list1v = list1.getList();

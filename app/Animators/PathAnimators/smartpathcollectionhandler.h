@@ -43,6 +43,14 @@ public:
     SmartPathCollection* getAnimator() const {
         return mAnimator.get();
     }
+
+    qsptr<SmartPathAnimator> takeAnimatorAt(const int& id);
+    PathPointsHandler* addAnimator(const qsptr<SmartPathAnimator>& anim);
+
+    void moveAllFrom(SmartPathCollectionHandler * const from);
+
+    void applyTransform(const QMatrix& transform);
+    int numberOfAnimators() const;
 protected:
     PathPointsHandler *createHandlerForAnimator(
             SmartPathAnimator * const newAnimator);

@@ -906,35 +906,62 @@ void Canvas::selectedPathsUnion() {
 #include "Animators/pathanimator.h"
 void Canvas::selectedPathsCombine() {
     if(mSelectedBoxes.isEmpty()) return;
-    VectorPath *firstVectorPath = nullptr;
+    SmartVectorPath *firstVectorPath = nullptr;
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            firstVectorPath = GetAsPtr(box, VectorPath);
+        if(box->SWT_isSmartVectorPath()) {
+            firstVectorPath = GetAsPtr(box, SmartVectorPath);
             break;
         }
     }
     if(!firstVectorPath) {
-        const auto newPath = SPtrCreate(VectorPath)();
+        const auto newPath = SPtrCreate(SmartVectorPath)();
         mCurrentBoxesGroup->addContainedBox(newPath);
         firstVectorPath = newPath.get();
     }
-    const auto targetVP = firstVectorPath->getPathAnimator();
+    const auto targetVP = firstVectorPath->getHandler();
     const QMatrix firstTranf = firstVectorPath->getTotalTransform();
     for(const auto &box : mSelectedBoxes) {
         if(box == firstVectorPath) continue;
-        if(box->SWT_isPathBox()) {
-            VectorPath * boxPath;
-            if(box->SWT_isVectorPath()) {
-                boxPath = GetAsPtr(box, VectorPath);
-            } else {
-                boxPath = GetAsPtr(box, PathBox)->objectToVectorPathBox();
-            }
+        if(box->SWT_isSmartVectorPath()) {
+            const auto boxPath = GetAsPtr(box, SmartVectorPath);
             const QMatrix relTransf = boxPath->getTotalTransform()*
                     firstTranf.inverted();
-            const auto srcVP = boxPath->getPathAnimator();
-            srcVP->applyTransformToPoints(relTransf);
-            targetVP->moveAllSinglePathsToAnimator_k(srcVP);
-            //box->removeFromParent_k();
+            const auto srcVP = boxPath->getHandler();
+            srcVP->applyTransform(relTransf);
+            targetVP->moveAllFrom(srcVP);
+            box->removeFromParent_k();
         }
     }
+//    if(mSelectedBoxes.isEmpty()) return;
+//    VectorPath *firstVectorPath = nullptr;
+//    for(const auto &box : mSelectedBoxes) {
+//        if(box->SWT_isVectorPath()) {
+//            firstVectorPath = GetAsPtr(box, VectorPath);
+//            break;
+//        }
+//    }
+//    if(!firstVectorPath) {
+//        const auto newPath = SPtrCreate(VectorPath)();
+//        mCurrentBoxesGroup->addContainedBox(newPath);
+//        firstVectorPath = newPath.get();
+//    }
+//    const auto targetVP = firstVectorPath->getPathAnimator();
+//    const QMatrix firstTranf = firstVectorPath->getTotalTransform();
+//    for(const auto &box : mSelectedBoxes) {
+//        if(box == firstVectorPath) continue;
+//        if(box->SWT_isPathBox()) {
+//            VectorPath * boxPath;
+//            if(box->SWT_isVectorPath()) {
+//                boxPath = GetAsPtr(box, VectorPath);
+//            } else {
+//                boxPath = GetAsPtr(box, PathBox)->objectToVectorPathBox();
+//            }
+//            const QMatrix relTransf = boxPath->getTotalTransform()*
+//                    firstTranf.inverted();
+//            const auto srcVP = boxPath->getPathAnimator();
+//            srcVP->applyTransformToPoints(relTransf);
+//            targetVP->moveAllSinglePathsToAnimator_k(srcVP);
+//            //box->removeFromParent_k();
+//        }
+//    }
 }

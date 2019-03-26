@@ -3,6 +3,7 @@
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/PathAnimators/smartpathcollectionhandler.h"
+#include "PropertyUpdaters/smartnodepointupdater.h"
 
 PathPointsHandler::PathPointsHandler(
         SmartPathCollectionHandler * const collectionHandler,
@@ -10,7 +11,10 @@ PathPointsHandler::PathPointsHandler(
         BasicTransformAnimator * const parentTransform) :
     mCollectionHandler_k(collectionHandler),
     mTargetAnimator(targetAnimator),
-    mParentTransform(parentTransform) {}
+    mParentTransform(parentTransform) {
+    const auto updater = SPtrCreate(SmartNodePointUpdater)(this);
+    mTargetAnimator->prp_setOwnUpdater(updater);
+}
 
 MovablePoint *PathPointsHandler::getPointAtAbsPos(
         const QPointF &absPtPos,

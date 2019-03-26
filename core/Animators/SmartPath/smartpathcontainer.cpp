@@ -128,6 +128,10 @@ SkPath SmartPath::getPathAt() const {
     return mNodesList.toSkPath();
 }
 
+void SmartPath::setPath(const SkPath &path) {
+    mNodesList.setPath(path);
+}
+
 ValueRange SmartPath::dissolvedTRange(const int &nodeId) {
     return {mNodesList.prevT(nodeId), mNodesList.nextT(nodeId)};
 }

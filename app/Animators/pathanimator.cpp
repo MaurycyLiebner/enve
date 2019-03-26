@@ -62,30 +62,27 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
     for(;;) {
         switch(verbT) {
             case SkPath::kMove_Verb: {
-                SkPoint pt = pts[0];
-                if(singlePathAnimator) {
+                const SkPoint pt = pts[0];
+                if(singlePathAnimator)
                     addSinglePathAnimator(singlePathAnimator);
-                }
                 singlePathAnimator = SPtrCreate(VectorPathAnimator)(this);
                 lastPoint = singlePathAnimator->addNodeRelPos(
-                                        toQPointF(pt),
-                            nullptr);
+                                        toQPointF(pt), nullptr);
                 firstPoint = lastPoint;
             }
                 break;
             case SkPath::kLine_Verb: {
-                SkPoint pt = pts[1];
-                bool sameAsFirstPoint = pointToLen(toQPointF(pt) -
-                                        firstPoint->getRelativePos()) < 0.1;
+                const SkPoint pt = pts[1];
+                const bool sameAsFirstPoint = pointToLen(toQPointF(pt) -
+                                     firstPoint->getRelativePos()) < 0.1;
 
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
                     if(path.countVerbs() > verbId + 1) {
-                        SkPath::Verb nextPathVerb = iter.peek();
-
+                        const SkPath::Verb nextPathVerb = iter.peek();
                         connectOnly = nextPathVerb == SkPath::kMove_Verb ||
-                                nextPathVerb == SkPath::kDone_Verb ||
-                                nextPathVerb == SkPath::kClose_Verb;
+                                      nextPathVerb == SkPath::kDone_Verb ||
+                                      nextPathVerb == SkPath::kClose_Verb;
                     } else {
                         connectOnly = true;
                     }
@@ -102,13 +99,13 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 break;
             case SkPath::kConic_Verb: {
                 ptsT = const_cast<SkPoint*>(conicToQuads.computeQuads(
-                            pts, iter.conicWeight(), 2.f));
+                            pts, iter.conicWeight(), 2));
                 quadsCount = conicToQuads.countQuads();
                 quadId = 0;
             }
                 break;
             case SkPath::kQuad_Verb: {
-                SkPoint ctrlPtT = pts[1];
+                const SkPoint ctrlPtT = pts[1];
                 pts[1] = pts[0] + (ctrlPtT - pts[0])*0.66667f;
                 pts[3] = pts[2];
                 pts[2] = pts[3] + (ctrlPtT - pts[3])*0.66667f;
@@ -116,23 +113,22 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 continue;
             }
             case SkPath::kCubic_Verb: {
-                SkPoint endPt = pts[1];
-                SkPoint startPt = pts[2];
-                SkPoint targetPt = pts[3];
+                const SkPoint endPt = pts[1];
+                const SkPoint startPt = pts[2];
+                const SkPoint targetPt = pts[3];
                 lastPoint->setEndCtrlPtEnabled(true);
                 lastPoint->moveEndCtrlPtToRelPos(
                             toQPointF(endPt));
 
-                bool sameAsFirstPoint = pointToLen(toQPointF(targetPt) -
-                                            firstPoint->getRelativePos()) < 0.1;
+                const bool sameAsFirstPoint = pointToLen(toQPointF(targetPt) -
+                                        firstPoint->getRelativePos()) < 0.1;
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
                     if(path.countVerbs() > verbId + 1) {
-                        SkPath::Verb nextPathVerb = iter.peek();
-
+                        const SkPath::Verb nextPathVerb = iter.peek();
                         connectOnly = nextPathVerb == SkPath::kMove_Verb ||
-                                nextPathVerb == SkPath::kDone_Verb ||
-                                nextPathVerb == SkPath::kClose_Verb;
+                                      nextPathVerb == SkPath::kDone_Verb ||
+                                      nextPathVerb == SkPath::kClose_Verb;
                     } else {
                         connectOnly = true;
                     }
@@ -160,7 +156,7 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 goto DONE;
         }
         if(quadsCount > 0) {
-            int firstPtId = quadId*2;
+            const int firstPtId = quadId*2;
             pts[0] = ptsT[firstPtId];
             pts[1] = ptsT[firstPtId + 1];
             pts[2] = ptsT[firstPtId + 2];
@@ -173,9 +169,8 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
         }
     }
 DONE:
-    if(singlePathAnimator) {
+    if(singlePathAnimator)
         addSinglePathAnimator(singlePathAnimator);
-    }
 }
 
 SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {

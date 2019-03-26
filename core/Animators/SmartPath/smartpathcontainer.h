@@ -109,6 +109,7 @@ public:
     }
 
     SkPath getPathAt() const;
+    void setPath(const SkPath& path);
 
     const Node * getNodePtr(const int& id) const {
         if(id < 0) return nullptr;
@@ -205,6 +206,10 @@ public:
         NodeList detached;
         mLastDetached.swap(detached);
         return detached;
+    }
+
+    void applyTransform(const QMatrix &transform) {
+        mNodesList.applyTransform(transform);
     }
 
     bool read(QIODevice * const src) {

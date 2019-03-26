@@ -252,8 +252,7 @@ public:
         const auto baseDetached = mBaseValue.getAndClearLastDetached();
         SmartPath baseSmartPath;
         baseSmartPath.assign(baseDetached);
-        const auto newAnim = SPtrCreate(SmartPathAnimator)(
-                    baseSmartPath);
+        const auto newAnim = SPtrCreate(SmartPathAnimator)(baseSmartPath);
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             auto& sp = spKey->getValue();
@@ -265,6 +264,15 @@ public:
             newAnim->anim_appendKey(newKey);
         }
         return newAnim;
+    }
+
+
+    void applyTransform(const QMatrix &transform) {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().applyTransform(transform);
+        }
+        mBaseValue.applyTransform(transform);
     }
 signals:
     void pathChangedAfterFrameChange();

@@ -1,4 +1,4 @@
-#ifndef COMPLEXANIMATOR_H
+﻿#ifndef COMPLEXANIMATOR_H
 #define COMPLEXANIMATOR_H
 #include "Animators/animator.h"
 #include "key.h"
@@ -55,7 +55,8 @@ public:
     void ca_addChildAnimator(const qsptr<Property> &childAnimator,
                              const int &id);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
-    void ca_swapChildAnimators(Property *animator1, Property *animator2);
+    void ca_swapChildAnimators(Property * const animator1,
+                               Property * const animator2);
     void ca_moveChildInList(Property *child, const int &to);
     void ca_moveChildInList(Property *child, const int &from, const int &to);
     void ca_moveChildBelow(Property *move, Property *below);
@@ -68,7 +69,7 @@ public:
     int ca_getNumberOfChildren() const;
     Property *ca_getChildAt(const int &i);
 
-    int getChildPropertyIndex(Property *child);
+    int getChildPropertyIndex(Property * const child);
 
     void ca_updateDescendatKeyFrame(Key* key);
 

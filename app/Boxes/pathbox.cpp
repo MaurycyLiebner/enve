@@ -256,9 +256,6 @@ void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
         mPathEffectsAnimators->SWT_show();
     }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
-
-    setPathsOutdated();
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
@@ -270,9 +267,6 @@ void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
         mFillPathEffectsAnimators->SWT_show();
     }
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
-
-    setPathsOutdated();
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
@@ -284,9 +278,6 @@ void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
         mOutlinePathEffectsAnimators->SWT_show();
     }
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
-
-    setPathsOutdated();
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
@@ -297,9 +288,6 @@ void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
     if(!mPathEffectsAnimators->hasChildAnimators()) {
         mPathEffectsAnimators->SWT_hide();
     }
-
-    setPathsOutdated();
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
@@ -310,9 +298,6 @@ void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
     if(!mFillPathEffectsAnimators->hasChildAnimators()) {
         mFillPathEffectsAnimators->SWT_hide();
     }
-
-    setPathsOutdated();
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
@@ -323,9 +308,6 @@ void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
     if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
         mOutlinePathEffectsAnimators->SWT_hide();
     }
-
-    setPathsOutdated();
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathBox::resetStrokeGradientPointsPos() {

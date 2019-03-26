@@ -209,6 +209,97 @@ SkPath NodeList::toSkPath() const {
     return result;
 }
 
+void NodeList::setPath(const SkPath &path) {
+    mNodes.clear();
+    Node * firstNode = nullptr;
+    Node * prevNode = nullptr;
+    SkPath::RawIter iter = SkPath::RawIter(path);
+
+    SkPoint pts[4];
+    int verbId = 0;
+
+    // for converting conics to quads
+    SkAutoConicToQuads conicToQuads;
+    int quadsCount = 0;
+    int quadId = 0;
+    SkPoint *ptsT = nullptr;
+
+    SkPath::Verb verbT = iter.next(pts);
+    for(;;) {
+        switch(verbT) {
+            case SkPath::kMove_Verb: {
+                if(firstNode) return;
+                const QPointF qPt = toQPointF(pts[0]);
+                firstNode = appendAndGetNode(Node(qPt, qPt, qPt));
+                prevNode = firstNode;
+            }
+                break;
+            case SkPath::kLine_Verb: {
+                const QPointF qPt = toQPointF(pts[1]);
+
+                prevNode->setC2Enabled(false);
+                prevNode->fC2 = prevNode->fP1;
+
+                if(iter.peek() == SkPath::kClose_Verb) {
+                    firstNode->setC0Enabled(false);
+                    firstNode->fC0 = firstNode->fP1;
+                } else {
+                    prevNode = appendAndGetNode(Node(qPt, qPt, qPt));
+                }
+            }
+                break;
+            case SkPath::kConic_Verb: {
+                ptsT = const_cast<SkPoint*>(conicToQuads.computeQuads(
+                            pts, iter.conicWeight(), 2));
+                quadsCount = conicToQuads.countQuads();
+                quadId = 0;
+            }
+                break;
+            case SkPath::kQuad_Verb: {
+                const SkPoint ctrlPtT = pts[1];
+                pts[1] = pts[0] + (ctrlPtT - pts[0])*0.66667f;
+                pts[3] = pts[2];
+                pts[2] = pts[3] + (ctrlPtT - pts[3])*0.66667f;
+                verbT = SkPath::kCubic_Verb;
+                continue;
+            }
+            case SkPath::kCubic_Verb: {
+                const QPointF c0Pt = toQPointF(pts[1]);
+                const QPointF c1Pt = toQPointF(pts[2]);
+                const QPointF p2Pt = toQPointF(pts[3]);
+
+                prevNode->setC2Enabled(true);
+                prevNode->fC2 = c0Pt;
+
+                if(iter.peek() == SkPath::kClose_Verb && quadsCount == 0) {
+                    firstNode->setC0Enabled(true);
+                    firstNode->fC0 = c1Pt;
+                } else {
+                    prevNode = appendAndGetNode(Node(c1Pt, p2Pt, p2Pt));
+                }
+            }
+                break;
+            case SkPath::kClose_Verb:
+                setClosed(true);
+                break;
+            case SkPath::kDone_Verb:
+                return;
+        }
+        if(quadsCount > 0) {
+            const int firstPtId = quadId*2;
+            pts[0] = ptsT[firstPtId];
+            pts[1] = ptsT[firstPtId + 1];
+            pts[2] = ptsT[firstPtId + 2];
+            verbT = SkPath::kQuad_Verb;
+            quadId++;
+            quadsCount--;
+        } else {
+            verbT = iter.next(pts);
+            verbId++;
+        }
+    }
+}
+
 qreal NodeList::prevT(const int &nodeId) const {
     if(nodeId == 0) return 0;
     const Node * const node = mNodes.at(nodeId - 1);

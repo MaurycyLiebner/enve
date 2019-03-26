@@ -3,16 +3,12 @@
 #include "MovablePoints/pathpointshandler.h"
 
 SmartNodePointUpdater::SmartNodePointUpdater(
-        SmartVectorPath * const pathBox,
-        PathPointsHandler * const handler) :
-    NodePointUpdater(pathBox), mHandler(handler) {}
+        PathPointsHandler * const handler) : mHandler(handler) {}
 
 void SmartNodePointUpdater::update() {
-    NodePointUpdater::update();
     mHandler->updateAllPoints();
 }
 
 void SmartNodePointUpdater::frameChangeUpdate() {
-    NodePointUpdater::frameChangeUpdate();
     mHandler->updateAllPoints();
 }

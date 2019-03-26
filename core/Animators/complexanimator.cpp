@@ -109,16 +109,13 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
     connect(childProperty.data(), &Property::prp_prependWith,
             this, &ComplexAnimator::ca_prependChildAnimator);
 
-    //updateKeysPath();
-
     SWT_addChildAbstractionForTargetToAllAt(childProperty.get(), id);
+    prp_updateInfluenceRangeAfterChanged();
 }
 
-int ComplexAnimator::getChildPropertyIndex(Property *child) {
+int ComplexAnimator::getChildPropertyIndex(Property * const child) {
     for(int i = 0; i < ca_mChildAnimators.count(); i++) {
-        if(ca_mChildAnimators.at(i) == child) {
-            return i;
-        }
+        if(ca_mChildAnimators.at(i) == child) return i;
     }
     return -1;
 }
@@ -160,6 +157,7 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
                                          const int &from, const int &to) {
     ca_mChildAnimators.move(from, to);
     SWT_moveChildAbstractionForTargetToInAll(child, to);
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void ComplexAnimator::ca_removeChildAnimator(
@@ -175,6 +173,7 @@ void ComplexAnimator::ca_removeChildAnimator(
 
     ca_mChildAnimators.removeAt(getChildPropertyIndex(removeAnimator.get()));
     ca_childAnimatorIsRecordingChanged();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void ComplexAnimator::ca_removeAllChildAnimators() {
@@ -195,11 +194,12 @@ Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
     return nullptr;
 }
 
-void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
-                                            Property *animator2) {
+void ComplexAnimator::ca_swapChildAnimators(Property * const animator1,
+                                            Property * const animator2) {
     const int id1 = getChildPropertyIndex(animator1);
     const int id2 = getChildPropertyIndex(animator2);
     ca_mChildAnimators.swap(id1, id2);
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 bool ComplexAnimator::hasChildAnimators() const {
@@ -227,6 +227,7 @@ void ComplexAnimator::prp_setParentFrameShift(const int &shift,
 void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
                                               const int &newIndex) {
     ca_mChildAnimators.move(oldIndex, newIndex);
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater> &updater) {

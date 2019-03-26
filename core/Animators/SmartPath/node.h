@@ -51,6 +51,12 @@ struct Node {
     bool getC2Enabled() const {
         return fC2Enabled;
     }
+
+    void applyTransform(const QMatrix &transform) {
+        fC0 = transform.map(fC0);
+        fP1 = transform.map(fP1);
+        fC2 = transform.map(fC2);
+    }
 protected:
     void setNodeId(const int& nodeId) {
         fId = nodeId;
@@ -206,6 +212,11 @@ public:
         for(const auto& node : src)
             mList.prepend(node);
         updateNodeIds();
+    }
+
+    void applyTransform(const QMatrix &transform) {
+        for(const auto& node : mList)
+            node->applyTransform(transform);
     }
 
     typedef QList<stdsptr<Node>>::const_iterator const_iterator;

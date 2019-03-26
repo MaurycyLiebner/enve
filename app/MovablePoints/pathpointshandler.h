@@ -71,6 +71,10 @@ public:
     }
 
     void updateAllPoints();
+
+    const SmartPathAnimator * getAnimator() {
+        return mTargetAnimator;
+    }
 protected:
     PathPointsHandler(SmartPathCollectionHandler * const collectionHandler,
                       SmartPathAnimator * const targetAnimator,

@@ -1,13 +1,12 @@
 #ifndef SMARTNODEPOINTUPDATER_H
 #define SMARTNODEPOINTUPDATER_H
-#include "nodepointupdater.h"
+#include "PropertyUpdaters/propertyupdater.h"
 class PathPointsHandler;
 class SmartVectorPath;
 
-class SmartNodePointUpdater : public NodePointUpdater {
+class SmartNodePointUpdater : public PropertyUpdater {
 public:
-    SmartNodePointUpdater(SmartVectorPath * const pathBox,
-                          PathPointsHandler * const handler);
+    SmartNodePointUpdater(PathPointsHandler * const handler);
 
     void update();
     void frameChangeUpdate();
