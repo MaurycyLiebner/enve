@@ -914,7 +914,7 @@ void Canvas::selectedPathsCombine() {
         }
     }
     if(!firstVectorPath) {
-        auto newPath = SPtrCreate(VectorPath)();
+        const auto newPath = SPtrCreate(VectorPath)();
         mCurrentBoxesGroup->addContainedBox(newPath);
         firstVectorPath = newPath.get();
     }

@@ -377,10 +377,10 @@ void MainWindow::setupMenuBar() {
 //                         SLOT(pathsCutAction()));
     mPathMenu->addSeparator();
     mPathMenu->addAction("Combine", mCanvasWindow,
-                         SLOT(pathsCombineAction()))->
+                         &CanvasWindow::pathsCombineAction)->
             setShortcut(Qt::CTRL + Qt::Key_K);
     mPathMenu->addAction("Break Apart", mCanvasWindow,
-                         SLOT(pathsBreakApartAction()))->
+                         &CanvasWindow::pathsBreakApartAction)->
             setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_K);
 
 //    mEffectsMenu = mMenuBar->addMenu("Effects");
