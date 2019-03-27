@@ -492,7 +492,6 @@ void Canvas::handleMovePointMousePressEvent() {
             clearPointsSelection();
             mLastPressedPoint = mHoveredNormalSegment.divideAtAbsPos(
                                         mLastPressPosRel);
-
         } else {
             mCurrentNormalSegment = mHoveredNormalSegment;
             mCurrentNormalSegmentT = mCurrentNormalSegment.closestAbsT(

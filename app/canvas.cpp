@@ -166,17 +166,17 @@ void Canvas::updateHoveredPoint() {
 }
 
 void Canvas::updateHoveredEdge() {
+    if(mCurrentMode != MOVE_POINT) {
+        clearHoveredEdge();
+        return;
+    }
     mHoveredNormalSegment = getSmartEdgeAt(mCurrentMouseEventPosRel);
     if(mHoveredNormalSegment.isValid()) mHoveredNormalSegment.generateSkPath();
 }
 
 void Canvas::updateHoveredElements() {
     updateHoveredPoint();
-    if(mCurrentMode == MOVE_POINT) {
-        updateHoveredEdge();
-    } else {
-        clearHoveredEdge();
-    }
+    if(!mHoveredPoint_d) updateHoveredEdge();
     updateHoveredBox();
 }
 
