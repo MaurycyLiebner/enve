@@ -31,9 +31,11 @@ struct Node {
     int getNodeId() const {
         return fId;
     }
+    static Node sInterpolateNormal(const Node &node1, const Node &node2,
+                                   const qreal& weight2);
 
-    static Node sInterpolate(const Node &node1, const Node &node2,
-                             const qreal &weight2);
+    static Node sInterpolateDissolved(const Node &node1, const Node &node2,
+                                      const qreal &weight2);
 
     QPointF fC0;
     QPointF fP1;
@@ -90,9 +92,6 @@ private:
     Type fType;
     int fId = -1;
     CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
-
-    static Node sInterpolateNormal(const Node &node1, const Node &node2,
-                                   const qreal& weight2);
 };
 #include "smartPointers/stdselfref.h"
 class ListOfNodes {
@@ -103,8 +102,10 @@ public:
         return mList.isEmpty();
     }
 
-    void append(const Node& nodeBlueprint) {
-        insert(mList.count(), nodeBlueprint);
+    int append(const Node& nodeBlueprint) {
+        const int id = mList.count();
+        insert(id, nodeBlueprint);
+        return id;
     }
 
     void insert(const int& id, const Node& nodeBlueprint) {

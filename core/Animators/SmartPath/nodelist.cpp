@@ -341,18 +341,38 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
         RuntimeThrow("Cannot interpolate paths with different node count");
     if(list1.isClosed() != list2.isClosed())
         RuntimeThrow("Cannot interpolate a closed path with an open path.");
-    const bool closed = list1.isClosed();
-    ListOfNodes resultList;
-    const auto list1v = list1.getList();
-    const auto list2v = list2.getList();
+    auto list1Cpy = list1.createDeepCopy();
+    auto list2Cpy = list2.createDeepCopy();
+    const bool closed = list1Cpy.isClosed();
+    const auto list1v = list1Cpy.getList();
+    const auto list2v = list2Cpy.getList();
+    NodeList result;
+    result.setClosed(closed);
+    ListOfNodes& resultList = result.getList();
     const int listCount = list1v.count();
     for(int i = 0; i < listCount; i++) {
         const Node * const node1 = list1v.at(i);
         const Node * const node2 = list2v.at(i);
-        resultList.append(Node::sInterpolate(*node1, *node2, weight2));
+        if(node1->getType() == node2->getType()) continue;
+        if(node1->isDissolved()) {
+            list1Cpy.promoteDissolvedNodeToNormal(i);
+        } else if(node2->isDissolved()) {
+            list2Cpy.promoteDissolvedNodeToNormal(i);
+        } else RuntimeThrow("Nodes with different type should not happen");
     }
-    NodeList result;
-    result.shallowCopyNodeList(resultList);
-    result.setClosed(closed);
+    for(int i = 0; i < listCount; i++) {
+        const Node * const node1 = list1v.at(i);
+        const Node * const node2 = list2v.at(i);
+        if(node1->isNormal() && node2->isNormal()) {
+            const auto normalInter = Node::sInterpolateNormal(
+                        *node1, *node2, weight2);
+            resultList.append(normalInter);
+        } else if(node1->isDissolved() && node2->isDissolved()) {
+            const auto dissInter = Node::sInterpolateDissolved(
+                        *node1, *node2, weight2);
+            resultList.append(dissInter);
+        } else RuntimeThrow("Nodes with different type should not happen");
+    }
+
     return result;
 }

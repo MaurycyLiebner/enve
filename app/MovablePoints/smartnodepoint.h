@@ -184,6 +184,14 @@ public:
         updatePrevNormalNode();
         updateNextNormalNode();
     }
+
+    bool isNormal() const {
+        return getType() == Node::NORMAL;
+    }
+
+    bool isDissolved() const {
+        return getType() == Node::DISSOLVED;
+    }
 protected:
     SmartNodePoint(const int& nodeId,
                    PathPointsHandler * const handler,

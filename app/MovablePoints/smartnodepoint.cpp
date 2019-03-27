@@ -437,7 +437,9 @@ void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
     if(mNextNormalPoint == this)
         RuntimeThrow("Node cannot point to itself");
     mNextNormalPoint = nextPoint;
-    mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
+    if(isNormal() && (nextPoint ? nextPoint->isNormal() : false)) {
+        mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
+    } else mNextNormalSegment.reset();
     updateC2Visibility();
     //mParentPath->schedulePathUpdate();
 }

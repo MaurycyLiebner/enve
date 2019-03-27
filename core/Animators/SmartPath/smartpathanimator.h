@@ -224,12 +224,19 @@ public:
                                 const int &node2Id,
                                 const qreal &t) {
         beforeBinaryPathChange();
+        const auto curr = getCurrentlyEditedPath();
+        if(curr->getNodePtr(node1Id)->getCtrlsMode() == CTRLS_SYMMETRIC) {
+            curr->actionSetNormalNodeCtrlsMode(node1Id, CTRLS_SMOOTH);
+        }
+        if(curr->getNodePtr(node2Id)->getCtrlsMode() == CTRLS_SYMMETRIC) {
+            curr->actionSetNormalNodeCtrlsMode(node2Id, CTRLS_SMOOTH);
+        }
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             spKey->getValue().actionInsertNodeBetween(node1Id, node2Id, t);
         }
         const int id = mBaseValue.actionInsertNodeBetween(node1Id, node2Id, t);
-        getCurrentlyEditedPath()->actionPromoteDissolvedNodeToNormal(id);
+        curr->actionPromoteDissolvedNodeToNormal(id);
         prp_updateInfluenceRangeAfterChanged();
         return id;
     }

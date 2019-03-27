@@ -229,6 +229,12 @@ bool NormalSegment::isValid() const {
            mLastNodeC0 && mLastNode && mHandler_k;
 }
 
+bool NormalSegment::isNormal() const {
+    if(!isValid()) return false;
+    return mFirstNode->getType() == Node::NORMAL &&
+            mLastNode->getType() == Node::NORMAL;
+}
+
 void NormalSegment::clear() {
     mFirstNode = nullptr;
     mFirstNodeC2 = nullptr;

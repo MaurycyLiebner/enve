@@ -1,13 +1,11 @@
 #include "node.h"
 #include "exceptions.h"
 
-Node Node::sInterpolate(const Node &node1, const Node &node2,
+Node Node::sInterpolateDissolved(const Node &node1, const Node &node2,
                         const qreal &weight2) {
-    if(node1.isNormal() && node2.isNormal())
-        return sInterpolateNormal(node1, node2, weight2);
-    else if(node1.isDissolved() && node2.isDissolved())
-        return Node(node1.fT*(1 - weight2) + node2.fT*weight2);
-    return Node();
+    if(!node1.isDissolved() || !node2.isDissolved())
+        RuntimeThrow("Unsupported node type");
+    return Node(node1.fT*(1 - weight2) + node2.fT*weight2);
 }
 
 Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
@@ -26,13 +24,14 @@ Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
     const CtrlsMode node2Ctrls = node2.getCtrlsMode();
     if(node1Ctrls == node2Ctrls) {
         result.setCtrlsMode(node1.getCtrlsMode());
-    } else if((node1Ctrls == CtrlsMode::CTRLS_SYMMETRIC &&
-               node2Ctrls == CtrlsMode::CTRLS_SMOOTH) ||
-              (node1Ctrls == CtrlsMode::CTRLS_SMOOTH &&
-               node2Ctrls == CtrlsMode::CTRLS_SYMMETRIC)) {
+    } else if(node1Ctrls == CtrlsMode::CTRLS_CORNER ||
+              node2Ctrls == CtrlsMode::CTRLS_CORNER) {
+        result.setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    } else if(node1Ctrls == CtrlsMode::CTRLS_SMOOTH ||
+              node2Ctrls == CtrlsMode::CTRLS_SMOOTH) {
         result.setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
     } else {
-        result.setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        result.setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
     }
     return result;
 }

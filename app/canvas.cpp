@@ -171,7 +171,8 @@ void Canvas::updateHoveredEdge() {
         return;
     }
     mHoveredNormalSegment = getSmartEdgeAt(mCurrentMouseEventPosRel);
-    if(mHoveredNormalSegment.isValid()) mHoveredNormalSegment.generateSkPath();
+    if(mHoveredNormalSegment.isValid())
+        mHoveredNormalSegment.generateSkPath();
 }
 
 void Canvas::updateHoveredElements() {

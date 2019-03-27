@@ -181,6 +181,14 @@ public:
         mNodesList = src.createDeepCopy();
     }
 
+    void shallowCopy(const SmartPath& src) {
+        shallowCopy(src.getNodesRef());
+    }
+
+    void shallowCopy(const NodeList& src) {
+        mNodesList = src;
+    }
+
     static bool sDifferent(const SmartPath& path1,
                            const SmartPath& path2) {
         return NodeList::sDifferent(path1.getNodesRef(),
@@ -195,7 +203,7 @@ public:
                     path1.getNodesRef(),
                     path2.getNodesRef(),
                     path2Weight);
-        target.deepCopy(list);
+        target.shallowCopy(list);
     }
 
     bool hasDetached() const {

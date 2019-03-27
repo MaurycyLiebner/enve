@@ -64,6 +64,7 @@ public:
     QPointF getSlopeVector(const qreal &t);
 
     bool isValid() const;
+    bool isNormal() const;
 
     void reset() { clear(); }
 
