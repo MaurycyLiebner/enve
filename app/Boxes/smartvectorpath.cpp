@@ -15,6 +15,7 @@
 #include "Animators/effectanimators.h"
 #include "Animators/transformanimator.h"
 #include "MovablePoints/segment.h"
+#include "Animators/SmartPath/smartpathanimator.h"
 
 SmartVectorPath::SmartVectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH),
@@ -89,4 +90,19 @@ SkPath SmartVectorPath::getPathAtRelFrameF(const qreal &relFrame) {
 void SmartVectorPath::getMotionBlurProperties(QList<Property*> &list) const {
     PathBox::getMotionBlurProperties(list);
     list.append(mPathAnimator);
+}
+
+QList<qsptr<SmartVectorPath>> SmartVectorPath::breakPathsApart_k() {
+    QList<qsptr<SmartVectorPath>> result;
+    const int iMax = mPathAnimator->ca_getNumberOfChildren() - 1;
+    if(iMax < 1) return result;
+    for(int i = iMax; i >= 0; i--) {
+        const auto srcPath = mPathAnimator->ca_takeChildAt<SmartPathAnimator>(i);
+        const auto newPath = SPtrCreate(SmartVectorPath)();
+        copyPathBoxDataTo(newPath.get());
+        newPath->getHandler()->addAnimator(srcPath);
+        result.append(newPath);
+    }
+    removeFromParent_k();
+    return result;
 }

@@ -67,7 +67,21 @@ public:
 
     void ca_changeChildAnimatorZ(const int &oldIndex, const int &newIndex);
     int ca_getNumberOfChildren() const;
-    Property *ca_getChildAt(const int &i);
+
+    template <typename T = Property>
+    T *ca_getChildAt(const int &i) const {
+        if(i < 0 || i >= ca_getNumberOfChildren())
+            RuntimeThrow("Index outside of range");
+        return static_cast<T*>(ca_mChildAnimators.at(i).data());
+    }
+
+    template <typename T = Property>
+    qsptr<T> ca_takeChildAt(const int &i) {
+        if(i < 0 || i >= ca_getNumberOfChildren())
+            RuntimeThrow("Index outside of range");
+        return GetAsSPtrTemplated(ca_mChildAnimators.takeAt(i), T);
+    }
+
 
     int getChildPropertyIndex(Property * const child);
 

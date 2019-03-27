@@ -244,7 +244,7 @@ void MainWindow::setupMenuBar() {
 
     mFileMenu = mMenuBar->addMenu("File");
     mFileMenu->addAction("New...",
-                         this, SLOT(newFile()),
+                         this, &MainWindow::newFile,
                          Qt::CTRL + Qt::Key_N);
     mFileMenu->addAction("Open...",
                          this, &MainWindow::openFile,
@@ -254,10 +254,11 @@ void MainWindow::setupMenuBar() {
                          this, &MainWindow::linkFile,
                          Qt::CTRL + Qt::Key_L);
     mFileMenu->addAction("Import File...",
-                         mCanvasWindow, SLOT(importFile()),
+                         mCanvasWindow,
+                         qOverload<>(&CanvasWindow::importFile),
                          Qt::CTRL + Qt::Key_I);
     mFileMenu->addAction("Import Image Sequence...",
-                         this, SLOT(importImageSequence()));
+                         this, &MainWindow::importImageSequence);
     mFileMenu->addSeparator();
     mFileMenu->addAction("Revert", this, &MainWindow::revert);
     mFileMenu->addSeparator();
@@ -268,7 +269,7 @@ void MainWindow::setupMenuBar() {
                          this, &MainWindow::saveFileAs,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     mFileMenu->addAction("Save Backup",
-                         this, SLOT(saveBackup()));
+                         this, &MainWindow::saveBackup);
     mFileMenu->addSeparator();
     mFileMenu->addAction("Close", this, &MainWindow::closeProject);
     mFileMenu->addSeparator();
@@ -285,31 +286,31 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addAction("Undo History...");
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Cut",
-                         mCanvasWindow, SLOT(cutAction()),
+                         mCanvasWindow, &CanvasWindow::cutAction,
                          Qt::CTRL + Qt::Key_X, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Copy",
-                         mCanvasWindow, SLOT(copyAction()),
+                         mCanvasWindow, &CanvasWindow::copyAction,
                          Qt::CTRL + Qt::Key_C, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Paste",
-                         mCanvasWindow, SLOT(pasteAction()),
+                         mCanvasWindow, &CanvasWindow::pasteAction,
                          Qt::CTRL + Qt::Key_V, mEditMenu));
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Duplicate",
-                         mCanvasWindow, SLOT(duplicateAction()),
+                         mCanvasWindow, &CanvasWindow::duplicateAction,
                          Qt::CTRL + Qt::Key_D, mEditMenu));
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Delete",
-                         mCanvasWindow, SLOT(deleteAction()),
+                         mCanvasWindow, &CanvasWindow::deleteAction,
                          Qt::Key_Delete, mEditMenu));
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Select All",
-                         mCanvasWindow, SLOT(selectAllAction()),
+                         mCanvasWindow, &CanvasWindow::selectAllAction,
                          Qt::Key_A, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Invert Selection",
-                                              mCanvasWindow, SLOT(invertSelectionAction()),
+                                              mCanvasWindow, &CanvasWindow::invertSelectionAction,
                                               Qt::Key_I, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Clear Selection",
-                         mCanvasWindow, SLOT(clearSelectionAction()),
+                         mCanvasWindow, &CanvasWindow::clearSelectionAction,
                          Qt::ALT + Qt::Key_A, mEditMenu));
 
 //    mSelectSameMenu = mEditMenu->addMenu("Select Same");
@@ -323,16 +324,16 @@ void MainWindow::setupMenuBar() {
 
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Raise",
-                           mCanvasWindow, SLOT(raiseAction()),
+                           mCanvasWindow, &CanvasWindow::raiseAction,
                            Qt::Key_PageUp);
     mObjectMenu->addAction("Lower",
-                           mCanvasWindow, SLOT(lowerAction()),
+                           mCanvasWindow, &CanvasWindow::lowerAction,
                            Qt::Key_PageDown);
     mObjectMenu->addAction("Rasie to Top",
-                           mCanvasWindow, SLOT(raiseToTopAction()),
+                           mCanvasWindow, &CanvasWindow::raiseToTopAction,
                            Qt::Key_Home);
     mObjectMenu->addAction("Lower to Bottom",
-                           mCanvasWindow, SLOT(lowerToBottomAction()))->
+                           mCanvasWindow, &CanvasWindow::lowerToBottomAction)->
             setShortcut(Qt::Key_End);
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° CW",
@@ -340,41 +341,41 @@ void MainWindow::setupMenuBar() {
     mObjectMenu->addAction("Rotate 90° CCW",
                            mCanvasWindow, SLOT(rotate90CCWAction()));
     mObjectMenu->addAction("Flip Horizontal", mCanvasWindow,
-                           SLOT(flipHorizontalAction()), Qt::Key_H);
+                           &CanvasWindow::flipHorizontalAction, Qt::Key_H);
     mObjectMenu->addAction("Flip Vertical", mCanvasWindow,
-                           SLOT(flipVerticalAction()), Qt::Key_V);
+                           &CanvasWindow::flipVerticalAction, Qt::Key_V);
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Group", mCanvasWindow,
-                           SLOT(groupSelectedBoxes()),
+                           &CanvasWindow::groupSelectedBoxes,
                            Qt::CTRL + Qt::Key_G);
     mObjectMenu->addAction("Ungroup", mCanvasWindow,
-                           SLOT(ungroupSelectedBoxes()),
+                           &CanvasWindow::ungroupSelectedBoxes,
                            Qt::CTRL + Qt::SHIFT + Qt::Key_G);
 
     mPathMenu = mMenuBar->addMenu("Path");
 
     mPathMenu->addAction("Object to Path", mCanvasWindow,
-                         SLOT(objectsToPathAction()));
+                         &CanvasWindow::objectsToPathAction);
     mPathMenu->addAction("Stroke to Path", mCanvasWindow,
-                         SLOT(strokeToPathAction()));
+                         &CanvasWindow::strokeToPathAction);
     mPathMenu->addSeparator();
     mPathMenu->addAction("Union", mCanvasWindow,
-                         SLOT(pathsUnionAction()))->
+                         &CanvasWindow::pathsUnionAction)->
             setShortcut(Qt::CTRL + Qt::Key_Plus);
     mPathMenu->addAction("Difference", mCanvasWindow,
-                         SLOT(pathsDifferenceAction()))->
+                         &CanvasWindow::pathsDifferenceAction)->
             setShortcut(Qt::CTRL + Qt::Key_Minus);
     mPathMenu->addAction("Intersection", mCanvasWindow,
-                         SLOT(pathsIntersectionAction()))->
+                         &CanvasWindow::pathsIntersectionAction)->
             setShortcut(Qt::CTRL + Qt::Key_Asterisk);
     mPathMenu->addAction("Exclusion", mCanvasWindow,
-                         SLOT(pathsExclusionAction()))->
+                         &CanvasWindow::pathsExclusionAction)->
             setShortcut(Qt::CTRL + Qt::Key_AsciiCircum);
     mPathMenu->addAction("Division", mCanvasWindow,
-                         SLOT(pathsDivisionAction()))->
+                         &CanvasWindow::pathsDivisionAction)->
             setShortcut(Qt::CTRL + Qt::Key_Slash);
 //    mPathMenu->addAction("Cut Path", mCanvas,
-//                         SLOT(pathsCutAction()));
+//                         &CanvasWindow::pathsCutAction);
     mPathMenu->addSeparator();
     mPathMenu->addAction("Combine", mCanvasWindow,
                          &CanvasWindow::pathsCombineAction)->
@@ -456,7 +457,7 @@ void MainWindow::setupMenuBar() {
 
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render",
-                           this, SLOT(addCanvasToRenderQue()));
+                           this, &MainWindow::addCanvasToRenderQue);
 
     setMenuBar(mMenuBar);
 //
@@ -676,54 +677,54 @@ void MainWindow::setupToolBar() {
 }
 
 void MainWindow::connectToolBarActions() {
-    connect(mMovePathMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setMovePathMode()) );
-    connect(mMovePointMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setMovePointMode()) );
-    connect(mAddPointMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setAddPointMode()) );
-    connect(mPickPaintSettingsMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setPickPaintSettingsMode()) );
-    connect(mCircleMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setCircleMode()) );
-    connect(mRectangleMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setRectangleMode()) );
-    connect(mTextMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setTextMode()) );
-    connect(mParticleBoxMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setParticleBoxMode()) );
-    connect(mParticleEmitterMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setParticleEmitterMode()));
-    connect(mPaintBoxMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setPaintBoxMode()));
-    connect(mPaintMode, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(setPaintMode()));
-    connect(mActionConnectPoints, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(connectPointsSlot()) );
-    connect(mActionDisconnectPoints, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(disconnectPointsSlot()) );
-    connect(mActionMergePoints, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(mergePointsSlot()) );
-    connect(mActionSymmetricPointCtrls, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(makePointCtrlsSymmetric()) );
-    connect(mActionSmoothPointCtrls, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(makePointCtrlsSmooth()) );
-    connect(mActionCornerPointCtrls, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(makePointCtrlsCorner()) );
-    connect(mActionLine, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(makeSegmentLine()) );
-    connect(mActionCurve, SIGNAL(pressed()),
-            mCanvasWindow, SLOT(makeSegmentCurve()) );
-    connect(mCurrentCanvasComboBox, SIGNAL(editTextChanged(QString)),
-            mCanvasWindow, SLOT(renameCurrentCanvas(QString)));
-    connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-            mCanvasWindow, SLOT(setCurrentCanvas(int)));
-    connect(mNewCanvasButton, SIGNAL(pressed()),
-            this, SLOT(createNewCanvas()));
-    connect(mFontWidget, SIGNAL(fontSizeChanged(qreal)),
-            mCanvasWindow, SLOT(setFontSize(qreal)) );
-    connect(mFontWidget, SIGNAL(fontFamilyAndStyleChanged(QString, QString)),
-            mCanvasWindow, SLOT(setFontFamilyAndStyle(QString, QString)) );
+    connect(mMovePathMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setMovePathMode );
+    connect(mMovePointMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setMovePointMode );
+    connect(mAddPointMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setAddPointMode );
+    connect(mPickPaintSettingsMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setPickPaintSettingsMode );
+    connect(mCircleMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setCircleMode );
+    connect(mRectangleMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setRectangleMode );
+    connect(mTextMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setTextMode );
+    connect(mParticleBoxMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setParticleBoxMode );
+    connect(mParticleEmitterMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setParticleEmitterMode);
+    connect(mPaintBoxMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setPaintBoxMode);
+    connect(mPaintMode, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::setPaintMode);
+    connect(mActionConnectPoints, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::connectPointsSlot );
+    connect(mActionDisconnectPoints, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::disconnectPointsSlot );
+    connect(mActionMergePoints, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::mergePointsSlot );
+    connect(mActionSymmetricPointCtrls, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::makePointCtrlsSymmetric );
+    connect(mActionSmoothPointCtrls, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::makePointCtrlsSmooth );
+    connect(mActionCornerPointCtrls, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::makePointCtrlsCorner );
+    connect(mActionLine, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::makeSegmentLine );
+    connect(mActionCurve, &ActionButton::pressed,
+            mCanvasWindow, &CanvasWindow::makeSegmentCurve );
+    connect(mCurrentCanvasComboBox, &QComboBox::editTextChanged,
+            mCanvasWindow, &CanvasWindow::renameCurrentCanvas);
+    connect(mCurrentCanvasComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            mCanvasWindow, qOverload<const int&>(&CanvasWindow::setCurrentCanvas));
+    connect(mNewCanvasButton, &QPushButton::pressed,
+            this, &MainWindow::createNewCanvas);
+    connect(mFontWidget, &FontsWidget::fontSizeChanged,
+            mCanvasWindow, &CanvasWindow::setFontSize);
+    connect(mFontWidget, &FontsWidget::fontFamilyAndStyleChanged,
+            mCanvasWindow, &CanvasWindow::setFontFamilyAndStyle);
 }
 
 MainWindow *MainWindow::getInstance() {

@@ -29,11 +29,6 @@ int ComplexAnimator::ca_getNumberOfChildren() const {
     return ca_mChildAnimators.count();
 }
 
-Property *ComplexAnimator::ca_getChildAt(const int &i) {
-    Q_ASSERT(i >= 0 && i < ca_mChildAnimators.count());
-    return ca_mChildAnimators.at(i).data();
-}
-
 #include <QDebug>
 #include "singlewidgetabstraction.h"
 void ComplexAnimator::SWT_addChildrenAbstractions(

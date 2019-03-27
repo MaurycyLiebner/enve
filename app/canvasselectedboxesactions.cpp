@@ -888,10 +888,16 @@ void Canvas::selectedPathsExclusion() {
 
 void Canvas::selectedPathsBreakApart() {
     if(mSelectedBoxes.isEmpty()) return;
+    QList<qsptr<SmartVectorPath>> created;
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            GetAsPtr(box, VectorPath)->breakPathsApart_k();
+        if(box->SWT_isSmartVectorPath()) {
+            const auto path = GetAsPtr(box, SmartVectorPath);
+            created << path->breakPathsApart_k();
         }
+    }
+    for(const auto& path : created) {
+        mCurrentBoxesGroup->addContainedBox(path);
+        addBoxToSelection(path.get());
     }
 }
 

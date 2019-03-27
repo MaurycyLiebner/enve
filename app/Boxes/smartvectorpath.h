@@ -43,6 +43,7 @@ public:
     SmartPathCollectionHandler *getHandler() {
         return &mHandler;
     }
+    QList<qsptr<SmartVectorPath>> breakPathsApart_k();
 protected:
     void getMotionBlurProperties(QList<Property*> &list) const;
     SmartPathCollectionHandler mHandler;
