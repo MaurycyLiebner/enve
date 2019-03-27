@@ -68,16 +68,17 @@ public:
     }
 
     void anim_saveCurrentValueAsKey() {
-        if(!this->anim_isRecording()) this->anim_setRecording(true);
+        if(this->anim_getKeyOnCurrentFrame()) return;
+        auto newKey = SPtrCreateTemplated(K)(
+                    mCurrentValue, this->anim_getCurrentRelFrame(), this);
+        this->anim_appendKey(newKey);
+    }
 
-        const auto currKey = this->template anim_getKeyOnCurrentFrame<K>();
-        if(currKey) {
-            currKey->setValue(mCurrentValue);
-        } else {
-            auto newKey = SPtrCreateTemplated(K)(
-                        mCurrentValue, this->anim_getCurrentRelFrame(), this);
-            this->anim_appendKey(newKey);
-        }
+    void anim_addKeyAtRelFrame(const int& relFrame) {
+        if(this->anim_getKeyAtRelFrame(relFrame)) return;
+        const T value = getValueAtRelFrame(relFrame);
+        const auto newKey = SPtrCreateTemplated(K)(value, relFrame, this);
+        this->anim_appendKey(newKey);
     }
 
     //FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;

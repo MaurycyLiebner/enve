@@ -45,6 +45,14 @@ public:
     void anim_saveCurrentValueAsKey();
     bool anim_isDescendantRecording() const;
     virtual void ca_removeAllChildAnimators();
+
+    void anim_addKeyAtRelFrame(const int& relFrame) {
+        for(const auto &property : ca_mChildAnimators) {
+            if(property->SWT_isAnimator()) {
+                GetAsPtr(property, Animator)->anim_addKeyAtRelFrame(relFrame);
+            }
+        }
+    }
 public slots:
     void anim_setRecording(const bool &rec);
     virtual void ca_childAnimatorIsRecordingChanged();

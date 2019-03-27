@@ -269,32 +269,19 @@ void QrealAnimator::anim_setAbsFrame(const int &frame) {
     if(changed) anim_callFrameChangeUpdater();
 }
 
-void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
-    const auto keyAtFrame = GetAsPtr(anim_getKeyAtAbsFrame(frame), QrealKey);
-    if(keyAtFrame) {
-        keyAtFrame->setValue(mCurrentBaseValue);
-    } else {
-        const qreal value = getBaseValueAtAbsFrame(frame);
-        const auto newKey = SPtrCreate(QrealKey)(value, frame, this);
-        anim_appendKey(newKey);
-    }
+void QrealAnimator::anim_saveCurrentValueAsKey() {
+    if(anim_getKeyOnCurrentFrame()) return;
+    const auto newKey = SPtrCreate(QrealKey)(mCurrentBaseValue,
+                                             anim_getCurrentRelFrame(),
+                                             this);
+    anim_appendKey(newKey);
 }
 
-void QrealAnimator::anim_saveCurrentValueAsKey() {
-    if(!anim_isRecording()) {
-        anim_setRecording(true);
-        return;
-    }
-
-    const auto keyAtCurrentFrame = anim_getKeyOnCurrentFrame<QrealKey>();
-    if(keyAtCurrentFrame) {
-        keyAtCurrentFrame->setValue(mCurrentBaseValue);
-    } else {
-        const auto newKey = SPtrCreate(QrealKey)(mCurrentBaseValue,
-                                                 anim_getCurrentRelFrame(),
-                                                 this);
-        anim_appendKey(newKey);
-    }
+void QrealAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
+    if(anim_getKeyAtRelFrame(relFrame)) return;
+    const qreal value = getBaseValueAtRelFrame(relFrame);
+    const auto newKey = SPtrCreate(QrealKey)(value, relFrame, this);
+    anim_appendKey(newKey);
 }
 
 void QrealAnimator::anim_removeAllKeys() {

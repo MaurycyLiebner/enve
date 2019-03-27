@@ -71,15 +71,14 @@ MovablePoint *SmartVectorPath::getPointAtAbsPos(const QPointF &absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
     if(!pointToReturn) {
-        pointToReturn = mHandler.getPointAtAbsPos(absPtPos,
-                                                  currentCanvasMode,
+        pointToReturn = mHandler.getPointAtAbsPos(absPtPos, currentCanvasMode,
                                                   canvasScaleInv);
     }
     return pointToReturn;
 }
 
-void SmartVectorPath::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                   QList<stdptr<MovablePoint>>& list) {
+void SmartVectorPath::selectAndAddContainedPointsToList(
+        const QRectF &absRect, QList<stdptr<MovablePoint>>& list) {
     mHandler.selectAndAddContainedPointsToList(absRect, list);
 }
 

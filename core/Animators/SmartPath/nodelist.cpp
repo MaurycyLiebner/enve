@@ -82,9 +82,10 @@ int NodeList::insertNodeBefore(const int& nextId,
 int NodeList::insertNodeAfter(const int& prevId,
                               const Node& nodeBlueprint) {
     const int insertId = prevId + 1;
-    Node * const insertedNode = insertNodeToList(insertId, nodeBlueprint);
-    if(nodeBlueprint.isDissolved())
-        promoteDissolvedNodeToNormal(insertId, insertedNode);
+//    Node * const insertedNode =
+    insertNodeToList(insertId, nodeBlueprint);
+//    if(nodeBlueprint.isDissolved())
+//        promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
 }
 
@@ -96,6 +97,7 @@ int NodeList::appendNode(const Node &nodeBlueprint) {
 
 void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
                                             Node * const node) {
+    if(node->isNormal()) return;
     Node * const prevNormalV = prevNormal(nodeId);
     Node * const nextNormalV = nextNormal(nodeId);
 

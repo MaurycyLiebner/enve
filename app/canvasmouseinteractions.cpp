@@ -26,6 +26,7 @@
 #include "GUI/customfpsdialog.h"
 #include "Boxes/vectorpath.h"
 #include "GPUEffects/gpurastereffect.h"
+#include "MovablePoints/smartnodepoint.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -482,41 +483,27 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
 }
 
 void Canvas::clearHoveredEdge() {
-    mHoveredEdge_d = nullptr;
     mHoveredNormalSegment.reset();
 }
 
 void Canvas::handleMovePointMousePressEvent() {
-    if(!mLastPressedPoint) {
+    if(mHoveredNormalSegment.isValid()) {
         if(isCtrlPressed()) {
             clearPointsSelection();
-            const qreal canvasScaleInv = 1/mCanvasTransformMatrix.m11();
-            mLastPressedPoint = createNewPointOnLineNearSelected(
-                                        mLastPressPosRel,
-                                        isShiftPressed(),
-                                        canvasScaleInv);
+            mLastPressedPoint = mHoveredNormalSegment.divideAtAbsPos(
+                                        mLastPressPosRel);
 
         } else {
-            mCurrentNormalSegment = getSmartEdgeAt(mLastPressPosRel);
-            if(mCurrentNormalSegment.isValid()) {
-                mCurrentNormalSegmentT = mCurrentNormalSegment.closestAbsT(
-                            mLastPressPosRel);
-                clearPointsSelection();
-                clearCurrentEndPoint();
-                clearCurrentSmartEndPoint();
-                clearLastPressedPoint();
-            }
-
-            mCurrentEdge = getEdgeAt(mLastPressPosRel);
-            if(mCurrentEdge) {
-                clearPointsSelection();
-                clearCurrentEndPoint();
-                clearCurrentSmartEndPoint();
-                clearLastPressedPoint();
-            }
+            mCurrentNormalSegment = mHoveredNormalSegment;
+            mCurrentNormalSegmentT = mCurrentNormalSegment.closestAbsT(
+                        mLastPressPosRel);
+            clearPointsSelection();
+            clearCurrentEndPoint();
+            clearCurrentSmartEndPoint();
+            clearLastPressedPoint();
         }
         clearHoveredEdge();
-    } else {
+    } else if(mLastPressedPoint) {
         if(mLastPressedPoint->isSelected()) return;
         if(!isShiftPressed() && !mLastPressedPoint->isCtrlPoint()) {
             clearPointsSelection();
@@ -698,9 +685,7 @@ void Canvas::setCurrentMouseEventPosAbs(const QPointF &abs) {
 void Canvas::cancelCurrentTransform() {
     mTransformationFinishedBeforeMouseRelease = true;
     if(mCurrentMode == CanvasMode::MOVE_POINT) {
-        if(mCurrentEdge) {
-            mCurrentEdge->cancelPassThroughTransform();
-        } else if(mCurrentNormalSegment.isValid()) {
+        if(mCurrentNormalSegment.isValid()) {
             mCurrentNormalSegment.cancelPassThroughTransform();
         } else {
             cancelSelectedPointsTransform();
@@ -940,13 +925,6 @@ void Canvas::handleMouseRelease() {
         mCurrentNormalSegment.reset();
         return;
     }
-    if(mCurrentEdge) {
-        if(!mFirstMouseMove) mCurrentEdge->finishPassThroughTransform();
-        mHoveredEdge_d = mCurrentEdge;
-        mHoveredEdge_d->generateSkPath();
-        mCurrentEdge = nullptr;
-        return;
-    }
     if(!mDoubleClick) {
         if(mCurrentMode == CanvasMode::MOVE_POINT ||
            mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
@@ -1031,9 +1009,6 @@ void Canvas::handleMovePointMouseMove() {
                                       mValueInput.getValue(),
                                       mFirstMouseMove,
                                       mCurrentMode);
-    } else if(mCurrentEdge) {
-        if(mFirstMouseMove) mCurrentEdge->startPassThroughTransform();
-        mCurrentEdge->makePassThroughAbs(mCurrentMouseEventPosRel);
     } else if(mCurrentNormalSegment.isValid()) {
         if(mFirstMouseMove) mCurrentNormalSegment.startPassThroughTransform();
         mCurrentNormalSegment.makePassThroughAbs(mCurrentMouseEventPosRel,

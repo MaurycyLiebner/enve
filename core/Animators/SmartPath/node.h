@@ -204,7 +204,7 @@ public:
         const int oldCount = count();
         for(const auto& node : src)
             mList.append(node);
-        updateNodeIds(oldCount);
+        updateNodeIds(oldCount + 1);
     }
 
     void prependNodesShallowCopy(const ListOfNodes& src) {
@@ -264,7 +264,7 @@ private:
     Node* insertNewNode(const int& id) {
         const auto newNode = stdsptr<Node>(new Node);
         mList.insert(id, newNode);
-        newNode->setNodeId(id);
+        updateNodeIds(id);
         return newNode.get();
     }
 

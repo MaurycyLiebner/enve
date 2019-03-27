@@ -64,7 +64,7 @@ public:
                               const FrameRange &absFrameRange,
                               const int &rowHeight);
 
-    virtual void anim_addKeyAtRelFrame(const int &relFrame);
+    virtual void anim_addKeyAtRelFrame(const int &relFrame) = 0;
     bool SWT_isAnimator() const;
     void prp_startDragging();
     void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
@@ -171,6 +171,8 @@ public:
     template <class T = Key>
     T* anim_getKeyAtIndex(const int& id) const;
     int anim_getKeyIndex(const Key * const key) const;
+
+    void anim_coordinateKeysWith(Animator * const other);
 protected:
     QList<stdsptr<Key>> anim_mKeys;
     QList<stdptr<Key>> anim_mSelectedKeys;

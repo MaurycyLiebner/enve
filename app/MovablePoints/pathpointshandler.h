@@ -56,8 +56,8 @@ public:
     bool moveToClosestSegment(const int& nodeId, const QPointF& relPos);
 
     // actions on normal-normal segments
-    void divideSegment(const int& node1Id, const int& node2Id,
-                       const qreal& t);
+    SmartNodePoint *divideSegment(const int& node1Id, const int& node2Id,
+                                  const qreal& t);
     void createSegment(const int& node1Id, const int& node2Id);
     void removeSegment(const NormalSegment &segment);
 

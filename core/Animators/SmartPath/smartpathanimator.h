@@ -24,29 +24,64 @@ public:
             const auto keyAtFrame2 = anim_getKeyOnCurrentFrame<SmartPathKey>();
             if(!prevK1 && !prevK2 && !keyAtFrame1 && !keyAtFrame2) return;
             if(!nextK1 && !nextK2 && !keyAtFrame1 && !keyAtFrame2) return;
-            if(keyAtFrame2) {
-                mBaseValue.assign(keyAtFrame2->getValue());
-            } else if(prevK2 && nextK2) {
-                const qreal nWeight =
-                        prevKeyWeight(prevK2, nextK2, anim_getCurrentRelFrame());
-                gInterpolate(prevK2->getValue(), nextK2->getValue(),
-                             nWeight, mBaseValue);
-            } else if(prevK2) {
-                mBaseValue.assign(prevK2->getValue());
-            } else if(nextK2) {
-                mBaseValue.assign(nextK2->getValue());
-            }
+            deepCopySmartPathFromRelFrame(anim_getCurrentRelFrame(),
+                                          prevK2, nextK2, keyAtFrame2,
+                                          mBaseValue);
             anim_callFrameChangeUpdater();
         }
     }
 
-    SkPath getPathAtAbsFrame(const qreal &frame) const {
-        return getPathAtRelFrame(prp_absFrameToRelFrameF(frame));
+    void anim_addKeyAtRelFrame(const int& relFrame) {
+        if(anim_getKeyAtRelFrame(relFrame)) return;
+        const auto newKey = SPtrCreate(SmartPathKey)(this);
+        newKey->setRelFrame(relFrame);
+        deepCopySmartPathFromRelFrame(relFrame, newKey->getValue());
+        anim_appendKey(newKey);
+    }
+
+    void anim_saveCurrentValueAsKey() {
+        if(anim_getKeyOnCurrentFrame()) return;
+        const auto newKey = SPtrCreate(SmartPathKey)(
+                    mBaseValue, anim_getCurrentRelFrame(), this);
+        anim_appendKey(newKey);
+    }
+
+    void writeProperty(QIODevice * const target) const {
+        const int nKeys = anim_mKeys.count();
+        target->write(rcConstChar(&nKeys), sizeof(int));
+        for(const auto &key : anim_mKeys) {
+            key->writeKey(target);
+        }
+        gWrite(target, mBaseValue);
+    }
+
+    void readProperty(QIODevice *target) {
+        int nKeys;
+        target->read(rcChar(&nKeys), sizeof(int));
+        for(int i = 0; i < nKeys; i++) {
+            auto newKey = SPtrCreate(SmartPathKey)(this);
+            newKey->readKey(target);
+            anim_appendKey(newKey);
+        }
+        gRead(target, mBaseValue);
     }
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType &type,
             qreal &minValue, qreal &maxValue) const;
+
+    void deepCopySmartPathFromRelFrame(const int& relFrame,
+                                       SmartPath &result) const {
+        const auto prevKey = anim_getPrevKey<SmartPathKey>(relFrame);
+        const auto nextKey = anim_getNextKey<SmartPathKey>(relFrame);
+        const auto keyAtFrame = anim_getKeyAtRelFrame<SmartPathKey>(relFrame);
+        deepCopySmartPathFromRelFrame(relFrame, prevKey, nextKey,
+                                      keyAtFrame, result);
+    }
+
+    SkPath getPathAtAbsFrame(const qreal &frame) const {
+        return getPathAtRelFrame(prp_absFrameToRelFrameF(frame));
+    }
 
     qreal prevKeyWeight(const SmartPathKey * const prevKey,
                         const SmartPathKey * const nextKey,
@@ -152,39 +187,6 @@ public:
         }
     }
 
-    void anim_saveCurrentValueAsKey() {
-        if(!anim_isRecording()) anim_setRecording(true);
-
-        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
-        if(spk) {
-            spk->assignValue(mBaseValue);
-        } else {
-            const auto newKey = SPtrCreate(SmartPathKey)(
-                        mBaseValue, anim_getCurrentRelFrame(), this);
-            anim_appendKey(newKey);
-        }
-    }
-
-    void writeProperty(QIODevice * const target) const {
-        const int nKeys = anim_mKeys.count();
-        target->write(rcConstChar(&nKeys), sizeof(int));
-        for(const auto &key : anim_mKeys) {
-            key->writeKey(target);
-        }
-        gWrite(target, mBaseValue);
-    }
-
-    void readProperty(QIODevice *target) {
-        int nKeys;
-        target->read(rcChar(&nKeys), sizeof(int));
-        for(int i = 0; i < nKeys; i++) {
-            auto newKey = SPtrCreate(SmartPathKey)(this);
-            newKey->readKey(target);
-            anim_appendKey(newKey);
-        }
-        gRead(target, mBaseValue);
-    }
-
     void actionRemoveNode(const int& nodeId) {
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
@@ -251,14 +253,14 @@ public:
         if(!hasDetached()) return nullptr;
         const auto baseDetached = mBaseValue.getAndClearLastDetached();
         SmartPath baseSmartPath;
-        baseSmartPath.assign(baseDetached);
+        baseSmartPath.deepCopy(baseDetached);
         const auto newAnim = SPtrCreate(SmartPathAnimator)(baseSmartPath);
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             auto& sp = spKey->getValue();
             const auto keyDetached = sp.getAndClearLastDetached();
             SmartPath keySmartPath;
-            keySmartPath.assign(keyDetached);
+            keySmartPath.deepCopy(keyDetached);
             const auto newKey = SPtrCreate(SmartPathKey)(
                         keySmartPath, key->getRelFrame(), newAnim.get());
             newAnim->anim_appendKey(newKey);
@@ -280,6 +282,26 @@ protected:
     SmartPathAnimator();
     SmartPathAnimator(const SmartPath& baseValue);
 private:
+    void deepCopySmartPathFromRelFrame(const int& relFrame,
+                                 SmartPathKey * const prevKey,
+                                 SmartPathKey * const nextKey,
+                                 SmartPathKey * const keyAtFrame,
+                                 SmartPath &result) const {
+        if(keyAtFrame) {
+            result.deepCopy(keyAtFrame->getValue());
+        } else if(prevKey && nextKey) {
+            const qreal nWeight = prevKeyWeight(prevKey, nextKey, relFrame);
+            gInterpolate(prevKey->getValue(), nextKey->getValue(),
+                         nWeight, result);
+        } else if(prevKey) {
+            result.deepCopy(prevKey->getValue());
+        } else if(nextKey) {
+            result.deepCopy(nextKey->getValue());
+        }
+        if(&result == &mBaseValue) return;
+        result.deepCopy(mBaseValue);
+    }
+
     SmartPath mBaseValue;
     SmartPath * mPathBeingChanged_d = &mBaseValue;
 };

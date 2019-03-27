@@ -15,5 +15,5 @@ void SmartPathKey::restore() {
 }
 
 void SmartPathKey::assignValue(const SmartPath &value) {
-    mValue.assign(value);
+    mValue.deepCopy(value);
 }

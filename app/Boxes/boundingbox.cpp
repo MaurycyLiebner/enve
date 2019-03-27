@@ -528,9 +528,9 @@ void BoundingBox::scale(const qreal &scaleXBy, const qreal &scaleYBy) {
     mTransformAnimator->scale(scaleXBy, scaleYBy);
 }
 
-NodePoint *BoundingBox::createNewPointOnLineNear(const QPointF &absPos,
-                                                 const bool &adjust,
-                                                 const qreal &canvasScaleInv) {
+MovablePoint *BoundingBox::createNewPointOnLineNear(const QPointF &absPos,
+                                                    const bool &adjust,
+                                                    const qreal &canvasScaleInv) {
     Q_UNUSED(absPos);
     Q_UNUSED(adjust);
     Q_UNUSED(canvasScaleInv);

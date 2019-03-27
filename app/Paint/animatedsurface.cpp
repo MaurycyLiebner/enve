@@ -65,6 +65,16 @@ void AnimatedSurface::anim_saveCurrentValueAsKey() {
     key->duplicateTilesContentFrom(tiles);
 }
 
+void AnimatedSurface::anim_addKeyAtRelFrame(const int& relFrame) {
+    if(anim_getKeyAtRelFrame(relFrame)) return;
+    newEmptyPaintFrame(relFrame);
+    const auto key = anim_getKeyOnCurrentFrame<SurfaceKey>();
+    SurfaceKey *prevKey = anim_getPrevKey<SurfaceKey>(key);
+    const auto tiles = prevKey ? prevKey->getTilesData() : mCurrentTiles.get();
+    key->duplicateTilesContentFrom(tiles);
+}
+
+
 void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
     if(!anim_isRecording()) {
         anim_setRecordingValue(true);

@@ -41,6 +41,8 @@ public:
                   SmartNodePoint * const lastNode,
                   PathPointsHandler * const handler);
 
+    SmartNodePoint* divideAtAbsPos(const QPointF& absPos);
+
     QPointF getRelPosAtT(const qreal &t) const;
     QPointF getAbsPosAtT(const qreal &t) const;
 

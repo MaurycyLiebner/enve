@@ -145,9 +145,9 @@ public:
     virtual const SkPath &getRelBoundingRectPath();
     virtual QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
-    virtual NodePoint *createNewPointOnLineNear(const QPointF &absPos,
-                                                const bool &adjust,
-                                                const qreal &canvasScaleInv);
+    virtual MovablePoint *createNewPointOnLineNear(const QPointF &absPos,
+                                                   const bool &adjust,
+                                                   const qreal &canvasScaleInv);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
     virtual VectorPathEdge *getEdge(const QPointF &absPos,

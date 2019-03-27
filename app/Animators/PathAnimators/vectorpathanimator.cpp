@@ -138,33 +138,18 @@ void VectorPathAnimator::setElementPos(const int &index, const SkPoint &pos) {
 }
 
 void VectorPathAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
-    if(!anim_isRecording()) anim_setRecording(true);
-
-    auto newKey = GetAsSPtr(anim_getKeyAtRelFrame(relFrame), PathKey);
-
-    if(!newKey) {
-        newKey = SPtrCreate(PathKey)(relFrame, getPathAtRelFrame(relFrame),
-                                     this, mPathClosed);
-        anim_appendKey(newKey);
-    } else {
-        newKey->setElementsFromSkPath(getPathAtRelFrame(relFrame));
-    }
+    if(anim_getKeyAtRelFrame(relFrame)) return;
+    const auto newKey = SPtrCreate(PathKey)(
+                relFrame, getPathAtRelFrame(relFrame), this, mPathClosed);
+    anim_appendKey(newKey);
 }
 
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {
-    if(!anim_isRecording()) anim_setRecording(true);
-
-    const auto currKey = anim_getKeyOnCurrentFrame<PathKey>();
-    if(currKey) {
-        anim_saveCurrentValueToKey(currKey);
-    } else {
-        auto newKey = SPtrCreate(PathKey)(anim_getCurrentRelFrame(),
-                                          getPath(),
-                                          mElementsPos,
-                                          this,
-                                          mPathClosed);
-        anim_appendKey(newKey);
-    }
+    if(anim_getKeyOnCurrentFrame()) return;
+    auto newKey = SPtrCreate(PathKey)(anim_getCurrentRelFrame(),
+                                      getPath(), mElementsPos,
+                                      this, mPathClosed);
+    anim_appendKey(newKey);
 }
 
 SkPath VectorPathAnimator::getPathAtRelFrame(const qreal &relFrame) {

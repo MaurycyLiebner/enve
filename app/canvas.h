@@ -162,10 +162,6 @@ public:
                          const bool& startTrans);
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
-    NodePoint *createNewPointOnLineNearSelected(
-            const QPointF &absPos, const bool &adjust,
-            const qreal &canvasScaleInv);
-
 
     void setSelectedCapStyle(const Qt::PenCapStyle& capStyle);
     void setSelectedJoinStyle(const Qt::PenJoinStyle &joinStyle);
@@ -635,7 +631,6 @@ protected:
 
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;
-    stdptr<VectorPathEdge> mHoveredEdge_d;
     qptr<Bone> mHoveredBone;
 
     QList<qptr<Bone>> mSelectedBones;
@@ -647,9 +642,7 @@ protected:
     qptr<Bone> mLastPressedBone;
     stdsptr<PathPivot> mRotPivot;
 
-    stdptr<VectorPathEdge> mCurrentEdge;
     stdptr<NodePoint> mCurrentEndPoint;
-
     stdptr<SmartNodePoint> mCurrentSmartEndPoint;
 
     NormalSegment mHoveredNormalSegment;

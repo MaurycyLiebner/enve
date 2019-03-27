@@ -2,7 +2,6 @@
 #define EXCEPTIONS_H
 #include <exception>
 #include <QDebug>
-#include "GL/gl.h"
 #define ERROUT(msg) qDebug() << msg << __LINE__
 
 #define RuntimeThrow(msg) std::throw_with_nested(std::runtime_error(msg))

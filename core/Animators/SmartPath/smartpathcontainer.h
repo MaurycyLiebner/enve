@@ -165,7 +165,7 @@ public:
 
     SmartPath createCopy() const {
         SmartPath copy;
-        copy.assign(*this);
+        copy.deepCopy(*this);
         return copy;
     }
 
@@ -173,11 +173,11 @@ public:
         return mNodesList.count();
     }
 
-    void assign(const SmartPath& src) {
-        assign(src.getNodesRef());
+    void deepCopy(const SmartPath& src) {
+        deepCopy(src.getNodesRef());
     }
 
-    void assign(const NodeList& src) {
+    void deepCopy(const NodeList& src) {
         mNodesList = src.createDeepCopy();
     }
 
@@ -195,7 +195,7 @@ public:
                     path1.getNodesRef(),
                     path2.getNodesRef(),
                     path2Weight);
-        target.assign(list);
+        target.deepCopy(list);
     }
 
     bool hasDetached() const {

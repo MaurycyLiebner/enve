@@ -202,8 +202,6 @@ bool Animator::anim_hasNextKey(const Key * const key) {
     return false;
 }
 
-void Animator::anim_addKeyAtRelFrame(const int &relFrame) { Q_UNUSED(relFrame); }
-
 int Animator::anim_getPrevKeyId(const int &relFrame) const {
     return anim_getPrevAndNextKeyIdForRelFrame(relFrame).first;
 }
@@ -221,6 +219,22 @@ int Animator::anim_getKeyIndex(const Key * const key) const {
         }
     }
     return index;
+}
+
+void Animator::anim_coordinateKeysWith(Animator * const other) {
+    for(const auto& otherKey : other->anim_mKeys) {
+        const int absFrame = otherKey->getAbsFrame();
+        const int relFrame = prp_absFrameToRelFrame(absFrame);
+        if(!anim_getKeyAtRelFrame(relFrame))
+            anim_addKeyAtRelFrame(relFrame);
+    }
+
+    for(const auto& thisKey : anim_mKeys) {
+        const int absFrame = thisKey->getAbsFrame();
+        const int relFrame = other->prp_absFrameToRelFrame(absFrame);
+        if(!other->anim_getKeyAtRelFrame(relFrame))
+            other->anim_addKeyAtRelFrame(relFrame);
+    }
 }
 
 void Animator::anim_deleteCurrentKey() {

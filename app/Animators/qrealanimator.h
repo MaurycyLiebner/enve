@@ -35,6 +35,8 @@ public:
 
     void anim_setAbsFrame(const int &frame);
     void anim_removeAllKeys();
+    void anim_addKeyAtRelFrame(const int& relFrame);
+
     void graph_updateKeyPathWithId(const int &id);
 
     ValueRange graph_getMinAndMaxValues() const;
@@ -78,7 +80,6 @@ public:
     qreal getPrefferedValueStep();
 
     void graphFixMinMaxValues();
-    void saveValueAtAbsFrameAsKey(const int &frame);
 
     void saveValueToKey(const int &frame, const qreal &value);
     void removeThisFromGraphAnimator();

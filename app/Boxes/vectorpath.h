@@ -23,9 +23,9 @@ public:
                         const SkScalar &invScale);
 
 
-    NodePoint *createNewPointOnLineNear(const QPointF &absPos,
-                                        const bool &adjust,
-                                        const qreal &canvasScaleInv);
+    MovablePoint *createNewPointOnLineNear(const QPointF &absPos,
+                                           const bool &adjust,
+                                           const qreal &canvasScaleInv);
 
     void applyCurrentTransformation();
     VectorPathEdge *getEdge(const QPointF &absPos,

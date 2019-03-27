@@ -37,8 +37,7 @@ private:
     stdsptr<TilesData> mTiles;
 };
 
-class AnimatedSurface : public Surface,
-                        public Animator {
+class AnimatedSurface : public Surface, public Animator {
     friend class SelfRef;
 public:
     AnimatedSurface(const ushort &widthT,
@@ -67,6 +66,7 @@ public:
     void currentDataModified();
     bool SWT_isAnimatedSurface() const { return true; }
     void anim_saveCurrentValueAsKey();
+    void anim_addKeyAtRelFrame(const int& relFrame);
     void newEmptyPaintFrame();
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void anim_updateAfterChangedKey(Key * const key);

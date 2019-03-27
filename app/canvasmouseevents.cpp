@@ -63,7 +63,6 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
        !(event->buttons() & Qt::LeftButton) &&
        !mIsMouseGrabbing) {
         const auto lastHoveredBox = mHoveredBox;
-        const auto lastEdge = mHoveredEdge_d;
         const auto lastHoveredPoint = mHoveredPoint_d;
         const auto lastNSegment = mHoveredNormalSegment;
 
@@ -72,7 +71,6 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         setLastMouseEventPosAbs(event->pos());
         if(mHoveredPoint_d != lastHoveredPoint ||
            mHoveredBox != lastHoveredBox ||
-           mHoveredEdge_d != lastEdge ||
            mHoveredNormalSegment != lastNSegment) {
             callUpdateSchedulers();
         }
@@ -90,8 +88,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         }
         if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
             if((mCurrentMode == CanvasMode::MOVE_POINT &&
-                !mHoveredPoint_d && !mHoveredEdge_d &&
-                !mHoveredNormalSegment.isValid()) ||
+                !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) ||
                (mCurrentMode == CanvasMode::MOVE_PATH &&
                 !mHoveredBox && !mHoveredPoint_d)) {
                 startSelectionAtPoint(mLastMouseEventPosRel);
@@ -190,37 +187,27 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
     if(e->modifiers() & Qt::ShiftModifier) return;
     mDoubleClick = true;
 
-    const qreal canvasScaleInv = 1/mCanvasTransformMatrix.m11();
-    mLastPressedPoint = createNewPointOnLineNearSelected(
-                mLastPressPosRel, true, canvasScaleInv);
-    if(!mLastPressedPoint) {
-        BoundingBox * const boxAt =
-                mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);
-        if(!boxAt) {
-            if(!mHoveredEdge_d && !mHoveredPoint_d &&
-               !mHoveredNormalSegment.isValid()) {
-                if(mCurrentBoxesGroup != this) {
-                    setCurrentBoxesGroup(mCurrentBoxesGroup->getParentGroup());
-                }
-            }
-        } else {
-            if(boxAt->SWT_isBoxesGroup()) {
-                setCurrentBoxesGroup(static_cast<BoxesGroup*>(boxAt));
-                updateHoveredElements();
-            } else if((mCurrentMode == MOVE_PATH ||
-                       mCurrentMode == MOVE_POINT) &&
-                      boxAt->SWT_isTextBox()) {
-                releaseMouseAndDontTrack();
-                GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
-            } else if(mCurrentMode == MOVE_PATH &&
-                      boxAt->SWT_isVectorPath()) {
-                mCanvasWindow->setCanvasMode(MOVE_POINT);
+    BoundingBox * const boxAt =
+            mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);
+    if(!boxAt) {
+        if(!mHoveredPoint_d && !mHoveredNormalSegment.isValid()) {
+            if(mCurrentBoxesGroup != this) {
+                setCurrentBoxesGroup(mCurrentBoxesGroup->getParentGroup());
             }
         }
     } else {
-        mCurrentEdge = nullptr;
-        mCurrentNormalSegment.reset();
-        updateHoveredElements();
+        if(boxAt->SWT_isBoxesGroup()) {
+            setCurrentBoxesGroup(static_cast<BoxesGroup*>(boxAt));
+            updateHoveredElements();
+        } else if((mCurrentMode == MOVE_PATH ||
+                   mCurrentMode == MOVE_POINT) &&
+                  boxAt->SWT_isTextBox()) {
+            releaseMouseAndDontTrack();
+            GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
+        } else if(mCurrentMode == MOVE_PATH &&
+                  boxAt->SWT_isVectorPath()) {
+            mCanvasWindow->setCanvasMode(MOVE_POINT);
+        }
     }
 
     callUpdateSchedulers();

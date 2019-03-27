@@ -27,7 +27,7 @@
 #include "gl/GrGLFunctions.h"
 #include "gl/GrGLInterface.h"
 
-#include <GL/gl.h>
+#include <QtGui/qopengl.h>
 
 #include "AddInclude/SkStroke.h"
 #include "AddInclude/SkGeometry.h"

@@ -183,10 +183,11 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
     return true;
 }
 
-void PathPointsHandler::divideSegment(const int &node1Id,
-                                      const int &node2Id,
-                                      const qreal &t) {
-    mTargetAnimator->actionInsertNodeBetween(node1Id, node2Id, t);
+SmartNodePoint* PathPointsHandler::divideSegment(const int &node1Id,
+                                                 const int &node2Id,
+                                                 const qreal &t) {
+    const int id = mTargetAnimator->actionInsertNodeBetween(node1Id, node2Id, t);
+    return mPoints.at(id).get();
 }
 
 void PathPointsHandler::createSegment(const int &node1Id,

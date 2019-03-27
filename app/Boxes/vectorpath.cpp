@@ -63,7 +63,7 @@ void VectorPath::selectAllPoints(Canvas * const canvas) {
     mPathAnimator->selectAllPoints(canvas);
 }
 
-NodePoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
+MovablePoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv) {
     return mPathAnimator->createNewPointOnLineNear(absPos, adjust,

@@ -1,6 +1,5 @@
 #ifndef BRUSH_H
 #define BRUSH_H
-#include "GL/gl.h"
 #include <QString>
 #include <QList>
 

@@ -10,60 +10,46 @@
 bool Canvas::anim_nextRelFrameWithKey(const int &relFrame,
                                      int &nextRelFrame) {
     int thisNext;
-    bool thisHasNext = BoundingBox::anim_nextRelFrameWithKey(relFrame,
-                                                            thisNext);
+    const bool thisHasNext = BoundingBox::anim_nextRelFrameWithKey(
+                relFrame, thisNext);
     int minNextFrame = FrameRange::EMAX;
     for(const auto &box : mSelectedBoxes) {
-        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
+        const int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxNext;
         if(box->anim_nextRelFrameWithKey(boxRelFrame, boxNext)) {
-            int absNext = box->prp_relFrameToAbsFrame(boxNext);
-            if(minNextFrame > absNext) {
-                minNextFrame = absNext;
-            }
+            const int absNext = box->prp_relFrameToAbsFrame(boxNext);
+            if(minNextFrame > absNext) minNextFrame = absNext;
         }
     }
     if(minNextFrame == FrameRange::EMAX) {
-        if(thisHasNext) {
-            nextRelFrame = thisNext;
-        }
+        if(thisHasNext) nextRelFrame = thisNext;
         return thisHasNext;
     }
-    if(thisHasNext) {
-        nextRelFrame = qMin(minNextFrame, thisNext);
-    } else {
-        nextRelFrame = minNextFrame;
-    }
+    if(thisHasNext) nextRelFrame = qMin(minNextFrame, thisNext);
+    else nextRelFrame = minNextFrame;
     return true;
 }
 
 bool Canvas::anim_prevRelFrameWithKey(const int &relFrame,
                                      int &prevRelFrame) {
     int thisPrev;
-    bool thisHasPrev = BoundingBox::anim_prevRelFrameWithKey(relFrame,
-                                                            thisPrev);
+    const bool thisHasPrev = BoundingBox::anim_prevRelFrameWithKey(
+                relFrame, thisPrev);
     int minPrevFrame = FrameRange::EMIN;
     for(const auto &box : mSelectedBoxes) {
-        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
+        const int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
         int boxPrev;
         if(box->anim_prevRelFrameWithKey(boxRelFrame, boxPrev)) {
-            int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
-            if(minPrevFrame < absPrev) {
-                minPrevFrame = absPrev;
-            }
+            const int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
+            if(minPrevFrame < absPrev) minPrevFrame = absPrev;
         }
     }
     if(minPrevFrame == FrameRange::EMIN) {
-        if(thisHasPrev) {
-            prevRelFrame = thisPrev;
-        }
+        if(thisHasPrev) prevRelFrame = thisPrev;
         return thisHasPrev;
     }
-    if(thisHasPrev) {
-        prevRelFrame = qMax(minPrevFrame, thisPrev);
-    } else {
-        prevRelFrame = minPrevFrame;
-    }
+    if(thisHasPrev) prevRelFrame = qMax(minPrevFrame, thisPrev);
+    else prevRelFrame = minPrevFrame;
     return true;
 }
 
@@ -72,7 +58,8 @@ void Canvas::shiftAllPointsForAllKeys(const int &by) {
         if(box->SWT_isVectorPath()) {
             GetAsPtr(box, VectorPath)->shiftAllPointsForAllKeys(by);
         }
-    }}
+    }
+}
 
 void Canvas::revertAllPointsForAllKeys() {
     for(const auto &box : mSelectedBoxes) {
@@ -100,7 +87,7 @@ void Canvas::revertAllPoints() {
 void Canvas::flipSelectedBoxesHorizontally() {
     for(const auto &box : mSelectedBoxes) {
         box->startScaleTransform();
-        box->scale(-1., 1.);
+        box->scale(-1, 1);
         box->finishTransform();
     }
 }
@@ -108,7 +95,7 @@ void Canvas::flipSelectedBoxesHorizontally() {
 void Canvas::flipSelectedBoxesVertically() {
     for(const auto &box : mSelectedBoxes) {
         box->startScaleTransform();
-        box->scale(1., -1.);
+        box->scale(1, -1);
         box->finishTransform();
     }
 }
@@ -194,7 +181,7 @@ void Canvas::applySumPathEffectToSelected() {
 void Canvas::applyOperationPathEffectToSelected() {
     for(const auto &box : mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
-        auto pathBox = GetAsPtr(box, PathBox);
+        const auto pathBox = GetAsPtr(box, PathBox);
         box->addPathEffect(SPtrCreate(OperationPathEffect)(pathBox, false));
     }
 }
@@ -218,8 +205,9 @@ void Canvas::applyDuplicateFillPathEffectToSelected() {
 void Canvas::applySumFillPathEffectToSelected() {
     for(const auto &box : mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
-        auto pathBox = GetAsPtr(box, PathBox);
-        box->addFillPathEffect(SPtrCreate(OperationPathEffect)(pathBox, false));
+        const auto pathBox = GetAsPtr(box, PathBox);
+        const auto effect = SPtrCreate(OperationPathEffect)(pathBox, false);
+        box->addFillPathEffect(effect);
     }
 }
 
@@ -241,35 +229,18 @@ void Canvas::applyDuplicateOutlinePathEffectToSelected() {
 }
 
 void Canvas::resetSelectedTranslation() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->resetTranslation();
-    }
 }
 
 void Canvas::resetSelectedScale() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->resetScale();
-    }
 }
 
 void Canvas::resetSelectedRotation() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->resetRotation();
-    }
-}
-
-NodePoint* Canvas::createNewPointOnLineNearSelected(
-                        const QPointF &absPos,
-                        const bool &adjust,
-                        const qreal &canvasScaleInv) {
-    for(const auto &box : mSelectedBoxes) {
-        NodePoint *point = box->createNewPointOnLineNear(absPos, adjust,
-                                                         canvasScaleInv);
-        if(point) {
-            return point;
-        }
-    }
-    return nullptr;
 }
 
 void Canvas::getDisplayedFillStrokeSettingsFromLastSelected(
@@ -278,7 +249,7 @@ void Canvas::getDisplayedFillStrokeSettingsFromLastSelected(
         fillSetings = nullptr;
         strokeSettings = nullptr;
     } else {
-        auto box = mSelectedBoxes.last();
+        const auto box = mSelectedBoxes.last();
         fillSetings = box->getFillSettings();
         strokeSettings = box->getStrokeSettings();
     }
@@ -436,25 +407,25 @@ void Canvas::rotateSelectedBy(const qreal &rotBy,
     } else {
         if(mLocalPivot) {
             if(startTrans) {
-                for(Bone *bone : mSelectedBones) {
+                for(const auto& bone : mSelectedBones) {
                     bone->startRotTransform();
                     bone->rotateBy(rotBy);
                 }
             } else {
-                for(Bone *bone : mSelectedBones) {
+                for(const auto& bone : mSelectedBones) {
                     bone->rotateBy(rotBy);
                 }
             }
         } else {
             if(startTrans) {
-                for(Bone *bone : mSelectedBones) {
+                for(const auto& bone : mSelectedBones) {
                     bone->startRotTransform();
                     bone->startPosTransform();
                     bone->saveTransformPivotAbsPos(absOrigin);
                     bone->rotateRelativeToSavedPivot(rotBy);
                 }
             } else {
-                for(Bone *bone : mSelectedBones) {
+                for(const auto& bone : mSelectedBones) {
                     bone->rotateRelativeToSavedPivot(rotBy);
                 }
             }
@@ -465,8 +436,7 @@ void Canvas::rotateSelectedBy(const qreal &rotBy,
 void Canvas::scaleSelectedBy(const qreal &scaleBy,
                              const QPointF &absOrigin,
                              const bool &startTrans) {
-    scaleSelectedBy(scaleBy, scaleBy,
-                    absOrigin, startTrans);
+    scaleSelectedBy(scaleBy, scaleBy, absOrigin, startTrans);
 }
 
 void Canvas::scaleSelectedBy(const qreal& scaleXBy,
@@ -504,28 +474,26 @@ void Canvas::scaleSelectedBy(const qreal& scaleXBy,
     } else {
         if(mLocalPivot) {
             if(startTrans) {
-                for(Bone *bone : mSelectedBones) {
+                for(const auto& bone : mSelectedBones) {
                     bone->startScaleTransform();
                     bone->scale(scaleXBy, scaleYBy);
                 }
             } else {
-                for(Bone *bone : mSelectedBones) {
+                for(const auto& bone : mSelectedBones) {
                     bone->scale(scaleXBy, scaleYBy);
                 }
             }
         } else {
             if(startTrans) {
-                for(Bone *bone : mSelectedBones) {
+                for(const auto& bone : mSelectedBones) {
                     bone->startScaleTransform();
                     bone->startPosTransform();
                     bone->saveTransformPivotAbsPos(absOrigin);
-                    bone->scaleRelativeToSavedPivot(scaleXBy,
-                                                    scaleYBy);
+                    bone->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
                 }
             } else {
-                for(Bone *bone : mSelectedBones) {
-                    bone->scaleRelativeToSavedPivot(scaleXBy,
-                                                    scaleYBy);
+                for(const auto& bone : mSelectedBones) {
+                    bone->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
                 }
             }
         }
@@ -533,9 +501,9 @@ void Canvas::scaleSelectedBy(const qreal& scaleXBy,
 }
 
 QPointF Canvas::getSelectedBoxesAbsPivotPos() {
-    if(mSelectedBoxes.isEmpty()) return QPointF(0., 0.);
-    QPointF posSum = QPointF(0., 0.);
-    int count = mSelectedBoxes.length();
+    if(mSelectedBoxes.isEmpty()) return QPointF(0, 0);
+    QPointF posSum = QPointF(0, 0);
+    const int count = mSelectedBoxes.length();
     for(const auto &box : mSelectedBoxes) {
         posSum += box->getPivotAbsPos();
     }
@@ -555,9 +523,8 @@ void Canvas::ungroupSelectedBoxes() {
 }
 
 void Canvas::centerPivotForSelected() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->centerPivotPosition();
-    }
 }
 
 void Canvas::removeSelectedBoxesAndClearList() {
@@ -569,9 +536,7 @@ void Canvas::removeSelectedBoxesAndClearList() {
 }
 
 void Canvas::addBoxToSelection(BoundingBox *box) {
-    if(box->isSelected()) {
-        return;
-    }
+    if(box->isSelected()) return;
     connect(box, &BoundingBox::globalPivotInfluenced,
             this, &Canvas::schedulePivotUpdate);
     connect(box, &BoundingBox::fillStrokeSettingsChanged,
@@ -598,9 +563,7 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
 }
 
 void Canvas::addBoneToSelection(Bone *bone) {
-    if(bone->isSelected()) {
-        return;
-    }
+    if(bone->isSelected()) return;
     bone->select();
     mSelectedBones.append(bone); schedulePivotUpdate();
     //sortSelectedBonesByZAscending();
@@ -612,16 +575,14 @@ void Canvas::removeBoneFromSelection(Bone *bone) {
 }
 
 void Canvas::clearBonesSelection() {
-    for(Bone *bone : mSelectedBones) {
+    for(const auto& bone : mSelectedBones)
         bone->deselect();
-    }
     mSelectedBones.clear(); schedulePivotUpdate();
 }
 
 void Canvas::clearBoxesSelection() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->deselect();
-    }
     mSelectedBoxes.clear(); schedulePivotUpdate();
     mMainWindow->setCurrentBox(nullptr);
 //    if(mLastPressedBox) {
@@ -632,9 +593,8 @@ void Canvas::clearBoxesSelection() {
 
 
 void Canvas::applyCurrentTransformationToSelected() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->applyCurrentTransformation();
-    }
 }
 
 bool zLessThan(const qptr<BoundingBox> &box1, const qptr<BoundingBox> &box2) {
@@ -653,9 +613,8 @@ void Canvas::raiseSelectedBoxesToTop() {
 }
 
 void Canvas::lowerSelectedBoxesToBottom() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->bringToEnd();
-    }
 }
 
 void Canvas::lowerSelectedBoxes() {
@@ -663,10 +622,8 @@ void Canvas::lowerSelectedBoxes() {
     bool lastBoxChanged = true;
     BoundingBox* box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
-        int boxZ = box->getZIndex();
-        if(boxZ - 1 != lastZ || lastBoxChanged) {
-            box->moveDown();
-        }
+        const int boxZ = box->getZIndex();
+        if(boxZ - 1 != lastZ || lastBoxChanged) box->moveDown();
         lastZ = boxZ;
         lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
@@ -676,24 +633,21 @@ void Canvas::raiseSelectedBoxes() {
     int lastZ = -10000;
     bool lastBoxChanged = true;
     for(const auto &box : mSelectedBoxes) {
-        int boxZ = box->getZIndex();
-        if(boxZ + 1 != lastZ || lastBoxChanged) {
-            box->moveUp();
-        }
+        const int boxZ = box->getZIndex();
+        if(boxZ + 1 != lastZ || lastBoxChanged) box->moveUp();
         lastZ = boxZ;
         lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
 }
 
 void Canvas::deselectAllBoxes() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         removeBoxFromSelection(box);
-    }
 }
 
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
-                                 const CanvasMode &currentMode,
-                                 const qreal &canvasScaleInv) {
+                                       const CanvasMode &currentMode,
+                                       const qreal &canvasScaleInv) {
     if(currentMode == MOVE_POINT ||
        currentMode == ADD_POINT ||
        currentMode == ADD_SMART_POINT ||
@@ -704,12 +658,9 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
         }
         MovablePoint *pointAtPos = nullptr;
         for(const auto &box : mSelectedBoxes) {
-            pointAtPos = box->getPointAtAbsPos(absPos,
-                                               currentMode,
+            pointAtPos = box->getPointAtAbsPos(absPos, currentMode,
                                                canvasScaleInv);
-            if(pointAtPos) {
-                break;
-            }
+            if(pointAtPos) break;
         }
         return pointAtPos;
     }
@@ -722,7 +673,7 @@ void Canvas::finishSelectedBoxesTransform() {
             box->finishTransform();
         }
     } else {
-        for(Bone *bone : mSelectedBones) {
+        for(const auto& bone : mSelectedBones) {
             bone->finishTransform();
         }
     }
@@ -734,7 +685,7 @@ void Canvas::cancelSelectedBoxesTransform() {
             box->cancelTransform();
         }
     } else {
-        for(Bone *bone : mSelectedBones) {
+        for(const auto& bone : mSelectedBones) {
             bone->cancelTransform();
         }
     }
@@ -757,12 +708,12 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 void Canvas::moveSelectedBonesByAbs(const QPointF &by,
                                     const bool &startTransform) {
     if(startTransform) {
-        for(Bone *bone : mSelectedBones) {
+        for(const auto& bone : mSelectedBones) {
             bone->startPosTransform();
             bone->moveByAbs(by);
         }
     } else {
-        for(Bone *bone : mSelectedBones) {
+        for(const auto& bone : mSelectedBones) {
             bone->moveByAbs(by);
         }
     }
@@ -792,8 +743,8 @@ void Canvas::duplicateSelectedBoxes() {
             SPtrCreate(BoxesClipboardContainer)();
     QBuffer target(container->getBytesArray());
     target.open(QIODevice::WriteOnly);
-    int nBoxes = mSelectedBoxes.count();
-    target.write(rcChar(&nBoxes), sizeof(int));
+    const int nBoxes = mSelectedBoxes.count();
+    target.write(rcConstChar(&nBoxes), sizeof(int));
 
     std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
     for(const auto &box : mSelectedBoxes) {
@@ -808,10 +759,10 @@ void Canvas::duplicateSelectedBoxes() {
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) return;
-    auto newGroup = SPtrCreate(BoxesGroup)();
+    const auto newGroup = SPtrCreate(BoxesGroup)();
     BoundingBox* box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
-        auto boxSP = GetAsSPtr(box, BoundingBox);
+        const auto boxSP = GetAsSPtr(box, BoundingBox);
         box->removeFromParent_k();
         newGroup->addContainedBox(boxSP);
     }
@@ -828,7 +779,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isPathBox()) {
             SkPath boxPath = GetAsPtr(box, PathBox)->getRelativePath();
-            QMatrix boxTrans = box->getRelativeTransformAtCurrentFrame();
+            const QMatrix boxTrans = box->getRelativeTransformAtCurrentFrame();
             boxPath.transform(toSkMatrix(boxTrans));
             if(first) {
                 builder.add(boxPath, SkPathOp::kUnion_SkPathOp);
@@ -846,8 +797,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
 }
 
 void Canvas::selectedPathsDifference() {
-    VectorPath *newPath =
-            getPathResultingFromOperation(
+    VectorPath * const newPath = getPathResultingFromOperation(
                 SkPathOp::kDifference_SkPathOp);
 
     clearBoxesSelection();
@@ -855,7 +805,7 @@ void Canvas::selectedPathsDifference() {
 }
 
 void Canvas::selectedPathsIntersection() {
-    VectorPath *newPath = getPathResultingFromOperation(
+    VectorPath * const newPath = getPathResultingFromOperation(
                 SkPathOp::kIntersect_SkPathOp);
 
     clearBoxesSelection();
@@ -863,10 +813,10 @@ void Canvas::selectedPathsIntersection() {
 }
 
 void Canvas::selectedPathsDivision() {
-    VectorPath *newPath1 = getPathResultingFromOperation(
+    VectorPath * const newPath1 = getPathResultingFromOperation(
                 SkPathOp::kDifference_SkPathOp);
 
-    VectorPath *newPath2 = getPathResultingFromOperation(
+    VectorPath * const newPath2 = getPathResultingFromOperation(
                 SkPathOp::kIntersect_SkPathOp);
 
     clearBoxesSelection();
@@ -875,9 +825,9 @@ void Canvas::selectedPathsDivision() {
 }
 
 void Canvas::selectedPathsExclusion() {
-    VectorPath *newPath1 = getPathResultingFromOperation(
+    VectorPath * const newPath1 = getPathResultingFromOperation(
                 SkPathOp::kDifference_SkPathOp);
-    VectorPath *newPath2 = getPathResultingFromOperation(
+    VectorPath * const newPath2 = getPathResultingFromOperation(
                 SkPathOp::kReverseDifference_SkPathOp);
 
     clearBoxesSelection();
@@ -902,7 +852,7 @@ void Canvas::selectedPathsBreakApart() {
 }
 
 void Canvas::selectedPathsUnion() {
-    VectorPath *newPath = getPathResultingFromOperation(
+    VectorPath * const newPath = getPathResultingFromOperation(
                 SkPathOp::kUnion_SkPathOp);
 
     clearBoxesSelection();
@@ -938,36 +888,4 @@ void Canvas::selectedPathsCombine() {
             box->removeFromParent_k();
         }
     }
-//    if(mSelectedBoxes.isEmpty()) return;
-//    VectorPath *firstVectorPath = nullptr;
-//    for(const auto &box : mSelectedBoxes) {
-//        if(box->SWT_isVectorPath()) {
-//            firstVectorPath = GetAsPtr(box, VectorPath);
-//            break;
-//        }
-//    }
-//    if(!firstVectorPath) {
-//        const auto newPath = SPtrCreate(VectorPath)();
-//        mCurrentBoxesGroup->addContainedBox(newPath);
-//        firstVectorPath = newPath.get();
-//    }
-//    const auto targetVP = firstVectorPath->getPathAnimator();
-//    const QMatrix firstTranf = firstVectorPath->getTotalTransform();
-//    for(const auto &box : mSelectedBoxes) {
-//        if(box == firstVectorPath) continue;
-//        if(box->SWT_isPathBox()) {
-//            VectorPath * boxPath;
-//            if(box->SWT_isVectorPath()) {
-//                boxPath = GetAsPtr(box, VectorPath);
-//            } else {
-//                boxPath = GetAsPtr(box, PathBox)->objectToVectorPathBox();
-//            }
-//            const QMatrix relTransf = boxPath->getTotalTransform()*
-//                    firstTranf.inverted();
-//            const auto srcVP = boxPath->getPathAnimator();
-//            srcVP->applyTransformToPoints(relTransf);
-//            targetVP->moveAllSinglePathsToAnimator_k(srcVP);
-//            //box->removeFromParent_k();
-//        }
-//    }
 }

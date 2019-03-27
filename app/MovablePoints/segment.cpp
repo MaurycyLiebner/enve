@@ -27,6 +27,13 @@ NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
     updateDnD();
 }
 
+SmartNodePoint *NormalSegment::divideAtAbsPos(const QPointF &absPos) {
+    if(!isValid()) return nullptr;
+    return mHandler_k->divideSegment(mFirstNode->getNodeId(),
+                                     mLastNode->getNodeId(),
+                                     closestAbsT(absPos));
+}
+
 void NormalSegment::disconnect() const {
     mHandler_k->removeSegment(*this);
 }
