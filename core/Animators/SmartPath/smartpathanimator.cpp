@@ -19,7 +19,8 @@ void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
                                               const int &node2Id) {
     for(const auto &key : anim_mKeys) {
         const auto spKey = GetAsPtr(key, SmartPathKey);
-        spKey->getValue().actionDisconnectNodes(node1Id, node2Id);
+        auto& keyPath = spKey->getValue();
+        keyPath.actionDisconnectNodes(node1Id, node2Id);
     }
     mBaseValue.actionDisconnectNodes(node1Id, node2Id);
     prp_updateInfluenceRangeAfterChanged();

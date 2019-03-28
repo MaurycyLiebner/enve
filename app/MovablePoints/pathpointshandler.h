@@ -83,6 +83,7 @@ private:
     void updateNextSegmentDnDForPoint(const int& nodeId);
     void updatePoint(const int& nodeId);
     SmartNodePoint* createNewNodePoint(const int& nodeId);
+    SmartNodePoint* createAndAssignNewNodePoint(const int& nodeId);
     SmartPath* targetPath() const;
     void blockAllPointsUpdate() {
         mBlockAllPointsUpdate = true;

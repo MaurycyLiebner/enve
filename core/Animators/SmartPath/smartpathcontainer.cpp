@@ -95,6 +95,13 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     Node * const prevNode = mNodesList.at(prevId);
     Node * const nextNode = mNodesList.at(nextId);
 
+    if(prevNode->isDissolved()) {
+        actionPromoteDissolvedNodeToNormal(prevId);
+    }
+    if(nextNode->isDissolved()) {
+        actionPromoteDissolvedNodeToNormal(nextId);
+    }
+
     if(isClosed()) {
         mNodesList.moveNodesToFrontStartingWith(nextId);
         mNodesList.setClosed(false);

@@ -215,7 +215,7 @@ public:
         const int oldCount = count();
         for(const auto& node : src)
             mList.append(node);
-        updateNodeIds(oldCount + 1);
+        updateNodeIds(oldCount);
     }
 
     void prependNodesShallowCopy(const ListOfNodes& src) {

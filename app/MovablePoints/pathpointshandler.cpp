@@ -68,10 +68,15 @@ void PathPointsHandler::drawPoints(SkCanvas * const canvas,
 
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
     const auto newPt = SPtrCreate(SmartNodePoint)(
-                targetPath()->getNodePtr(nodeId), this,
-                mTargetAnimator, mParentTransform);
+                this, mTargetAnimator, mParentTransform);
     mPoints.insert(nodeId, newPt);
     return newPt.get();
+}
+
+SmartNodePoint *PathPointsHandler::createAndAssignNewNodePoint(const int &nodeId) {
+    const auto newPt = createNewNodePoint(nodeId);
+    newPt->setNode(targetPath()->getNodePtr(nodeId));
+    return newPt;
 }
 
 SmartPath *PathPointsHandler::targetPath() const {
@@ -85,7 +90,6 @@ void PathPointsHandler::updateNextSegmentDnDForPoint(const int &nodeId) {
 void PathPointsHandler::updatePoint(const int &nodeId) {
     const auto pt = mPoints.at(nodeId);
     pt->setNode(targetPath()->getNodePtr(nodeId));
-    pt->updateNeighNormalNodes();
 }
 
 void PathPointsHandler::updateAllPoints() {
@@ -94,17 +98,12 @@ void PathPointsHandler::updateAllPoints() {
     while(newCount < mPoints.count()) {
         mPoints.removeLast();
     }
-    for(int i = 0; i < mPoints.count(); i++) {
-        mPoints.at(i)->setOutdated();
-    }
-    for(int i = 0; i < mPoints.count(); i++) {
-        mPoints.at(i)->setNode(targetPath()->getNodePtr(i));
-    }
     while(mPoints.count() < newCount) {
         createNewNodePoint(mPoints.count());
     }
-    for(const auto& pt : mPoints) {
-        pt->updateNeighNormalNodes();
+    for(int i = 0; i < mPoints.count(); i++) {
+        auto& pt = mPoints[i];
+        pt->setNode(targetPath()->getNodePtr(i));
     }
 }
 
@@ -126,7 +125,7 @@ SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {
     blockAllPointsUpdate();
     const int id = mTargetAnimator->actionAddFirstNode(relPos);
     unblockAllPointsUpdate();
-    return createNewNodePoint(id);
+    return createAndAssignNewNodePoint(id);
 }
 
 SmartNodePoint* PathPointsHandler::addNewAtEnd(const int &nodeId,
@@ -134,7 +133,7 @@ SmartNodePoint* PathPointsHandler::addNewAtEnd(const int &nodeId,
     blockAllPointsUpdate();
     const int id = mTargetAnimator->actionAddNewAtEnd(nodeId, relPos);
     unblockAllPointsUpdate();
-    return createNewNodePoint(id);
+    return createAndAssignNewNodePoint(id);
 }
 
 void PathPointsHandler::promoteToNormal(const int &nodeId) {

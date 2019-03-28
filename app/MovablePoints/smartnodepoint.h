@@ -93,17 +93,7 @@ public:
     void resetC2();
 
     void setNodeId(const int &idT);
-    void setOutdated() {
-        mOutdated = true;
-        setPrevPoint(nullptr);
-        setNextPoint(nullptr);
-        setPrevNormalPoint(nullptr);
-        setNextNormalPoint(nullptr);
-    }
 
-    bool isOutdated() const {
-        return mOutdated;
-    }
     int getNodeId() const;
 
     NodePointValues getPointValues() const;
@@ -179,10 +169,6 @@ public:
     bool hasPrevPoint() const;
     bool hasNextNormalPoint() const;
     bool hasPrevNormalPoint() const;
-    void updateNeighNormalNodes() {
-        updatePrevNormalNode();
-        updateNextNormalNode();
-    }
 
     bool isNormal() const {
         return getType() == Node::NORMAL;
@@ -198,27 +184,18 @@ public:
 
     const PathPointsHandler * getHandler();
 protected:
-    SmartNodePoint(const Node * const node,
-                   PathPointsHandler * const handler,
+    SmartNodePoint(PathPointsHandler * const handler,
                    SmartPathAnimator * const parentAnimator,
                    BasicTransformAnimator * const parentTransform);
 
     void setNextPoint(SmartNodePoint * const nextPoint);
     void setPrevPoint(SmartNodePoint * const prevPoint);
-    void setPointAsPrev(SmartNodePoint * const pointToSet);
-    void setPointAsNext(SmartNodePoint * const pointToSet);
 
     void setNextNormalPoint(SmartNodePoint * const nextPoint);
     void setPrevNormalPoint(SmartNodePoint * const prevPoint);
-    void setPointAsNextNormal(SmartNodePoint * const pointToSet);
-    void setPointAsPrevNormal(SmartNodePoint * const pointToSet);
-
-    void updatePrevNormalNode();
-    void updateNextNormalNode();
 private:
     SmartPath* currentPath() const;
 
-    bool mOutdated = false;
     bool mSeparateNodePoint = false;
     int mNodeId;
     const Node * mNode_d = nullptr;

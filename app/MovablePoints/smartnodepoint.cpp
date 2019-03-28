@@ -11,8 +11,7 @@
 #include "pathpointshandler.h"
 #include "smartctrlpoint.h"
 
-SmartNodePoint::SmartNodePoint(const Node * const node,
-                               PathPointsHandler * const handler,
+SmartNodePoint::SmartNodePoint(PathPointsHandler * const handler,
                                SmartPathAnimator * const parentAnimator,
                                BasicTransformAnimator * const parentTransform) :
     NonAnimatedMovablePoint(parentTransform, TYPE_SMART_PATH_POINT, 6.5),
@@ -22,8 +21,6 @@ SmartNodePoint::SmartNodePoint(const Node * const node,
 
     mC0Pt->setOtherCtrlPt(mC2Pt.get());
     mC2Pt->setOtherCtrlPt(mC0Pt.get());
-
-    setNode(node);
 }
 
 void SmartNodePoint::applyTransform(const QMatrix &transform) {
@@ -427,36 +424,15 @@ void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
         RuntimeThrow("Node cannot point to itself");
     mPrevNormalPoint = prevPoint;
     updateC0Visibility();
-    //mParentPath->schedulePathUpdate();
 }
 
 void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
-    if(nextPoint ? nextPoint->getType() != Node::NORMAL : false)
-        RuntimeThrow("Only NORMAL nodes supported");
-    if(mNextNormalPoint == this)
-        RuntimeThrow("Node cannot point to itself");
+    if(mNextNormalPoint == this) RuntimeThrow("Node cannot point to itself");
     mNextNormalPoint = nextPoint;
-    if(isNormal() && (nextPoint ? nextPoint->isNormal() : false)) {
+    if(isNormal() && nextPoint) {
         mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
     } else mNextNormalSegment.reset();
     updateC2Visibility();
-    //mParentPath->schedulePathUpdate();
-}
-
-void SmartNodePoint::setPointAsNextNormal(SmartNodePoint * const pointToSet) {
-    if(pointToSet == mNextNormalPoint) return;
-    if(hasNextNormalPoint()) mNextNormalPoint->setPrevNormalPoint(nullptr);
-    setNextNormalPoint(pointToSet);
-    if(pointToSet && getType() == Node::NORMAL)
-        pointToSet->setPrevNormalPoint(this);
-}
-
-void SmartNodePoint::setPointAsPrevNormal(SmartNodePoint * const pointToSet) {
-    if(pointToSet == mPrevNormalPoint) return;
-    if(hasPrevNormalPoint()) mPrevNormalPoint->setNextNormalPoint(nullptr);
-    setPrevNormalPoint(pointToSet);
-    if(pointToSet && getType() == Node::NORMAL)
-        pointToSet->setNextNormalPoint(this);
 }
 
 SmartPath *SmartNodePoint::currentPath() const {
@@ -483,30 +459,6 @@ void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
         RuntimeThrow("Node cannot point to itself");
     mNextPoint = nextPoint;
     //updateNextNormalNode();
-}
-
-void SmartNodePoint::updatePrevNormalNode() {
-    const auto prevNormalNode = mHandler_k->getPrevNormalNode(getNodeId());
-    setPointAsPrevNormal(prevNormalNode);
-}
-
-void SmartNodePoint::updateNextNormalNode() {
-    const auto nextNormalNode = mHandler_k->getNextNormalNode(getNodeId());
-    setPointAsNextNormal(nextNormalNode);
-}
-
-void SmartNodePoint::setPointAsNext(SmartNodePoint * const pointToSet) {
-    if(pointToSet == mNextPoint) return;
-    if(hasNextPoint()) mNextPoint->setPrevPoint(nullptr);
-    setNextPoint(pointToSet);
-    if(pointToSet) pointToSet->setPrevPoint(this);
-}
-
-void SmartNodePoint::setPointAsPrev(SmartNodePoint * const pointToSet) {
-    if(pointToSet == mPrevPoint) return;
-    if(hasPrevPoint()) mPrevPoint->setNextPoint(nullptr);
-    setPrevPoint(pointToSet);
-    if(pointToSet) pointToSet->setNextPoint(this);
 }
 
 bool SmartNodePoint::actionConnectToNormalPoint(
@@ -595,10 +547,11 @@ void SmartNodePoint::updateFromNodeDataPosOnly() {
 }
 
 void SmartNodePoint::updateFromNodeData() {
-    setPointAsPrev(nullptr);
-    setPointAsNext(nullptr);
     if(!mNode_d) {
-        mOutdated = false;
+        setPrevPoint(nullptr);
+        setNextPoint(nullptr);
+        setPrevNormalPoint(nullptr);
+        setNextNormalPoint(nullptr);
         return;
     }
 
@@ -606,21 +559,16 @@ void SmartNodePoint::updateFromNodeData() {
 
     const int prevNodeId = currentPath()->prevNodeId(mNode_d->getNodeId());
     const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
+    setPrevPoint(prevNode);
 
     const int nextNodeId = currentPath()->nextNodeId(mNode_d->getNodeId());
     const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
+    setNextPoint(nextNode);
 
-    if(prevNode ? !prevNode->isOutdated() : false) {
-        setPointAsPrev(prevNode);
-    } else {
-        setPointAsPrev(nullptr);
-    }
-
-    if(nextNode ? !nextNode->isOutdated() : false) {
-        setPointAsNext(nextNode);
-    } else {
-        setPointAsNext(nullptr);
-    }
+    const auto prevNormalNode = mHandler_k->getPrevNormalNode(getNodeId());
+    setPrevNormalPoint(prevNormalNode);
+    const auto nextNormalNode = mHandler_k->getNextNormalNode(getNodeId());
+    setNextNormalPoint(nextNormalNode);
 
     updateC0Visibility();
     updateC2Visibility();
@@ -632,7 +580,6 @@ void SmartNodePoint::updateFromNodeData() {
         mType = TYPE_CTRL_POINT;
         mRadius = (type == Node::DISSOLVED ? 5.5 : 4);
     }
-    mOutdated = false;
 }
 
 bool SmartNodePoint::isEndPoint() {
