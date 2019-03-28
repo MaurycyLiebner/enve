@@ -93,21 +93,7 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     }
 
     Node * const prevNode = mNodesList.at(prevId);
-    if(!prevNode->isNormal()) {
-        Node * const prevNormalNode = mNodesList.prevNormal(prevId);
-        mNodesList.setNodeType(prevNode, Node::NORMAL);
-        prevNode->fC0 = prevNormalNode->fC0;
-        prevNode->fP1 = prevNormalNode->fP1;
-        prevNode->fC2 = prevNormalNode->fC2;
-    }
     Node * const nextNode = mNodesList.at(nextId);
-    if(!nextNode->isNormal()) {
-        Node * const nextNormalNode = mNodesList.nextNormal(nextId);
-        mNodesList.setNodeType(nextNode, Node::NORMAL);
-        nextNode->fC0 = nextNormalNode->fC0;
-        nextNode->fP1 = nextNormalNode->fP1;
-        nextNode->fC2 = nextNormalNode->fC2;
-    }
 
     if(isClosed()) {
         mNodesList.moveNodesToFrontStartingWith(nextId);

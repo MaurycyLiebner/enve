@@ -36,8 +36,8 @@ public:
 
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
     SmartNodePoint* actionAddPointAbsPos(const QPointF &absPos);
-    void actionConnectToNormalPoint(SmartNodePoint * const point);
-    void actionDisconnectFromNormalPoint(SmartNodePoint * const point);
+    bool actionConnectToNormalPoint(SmartNodePoint * const other);
+    void actionDisconnectFromNormalPoint(SmartNodePoint * const other);
 
     //void moveByRel(const QPointF &relTranslation);
 
@@ -129,7 +129,7 @@ public:
     }
 
     QPointF getC0() const {
-        return mNode_d->fC0;
+        return mNode_d->getC0();
     }
 
     QPointF getP1() const {
@@ -137,7 +137,7 @@ public:
     }
 
     QPointF getC2() const {
-        return mNode_d->fC2;
+        return mNode_d->getC2();
     }
 
     bool getC0Enabled() const {
@@ -192,6 +192,12 @@ public:
     bool isDissolved() const {
         return getType() == Node::DISSOLVED;
     }
+
+    const Node* getTargetNode() const {
+        return mNode_d;
+    }
+
+    const PathPointsHandler * getHandler();
 protected:
     SmartNodePoint(const int& nodeId,
                    PathPointsHandler * const handler,

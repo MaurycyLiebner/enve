@@ -13,7 +13,7 @@ class ComplexAnimator : public Animator {
 protected:
     void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
-    ~ComplexAnimator();
+//    ~ComplexAnimator();
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
                                      const int& visiblePartWidgetId);

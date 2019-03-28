@@ -221,20 +221,18 @@ int Animator::anim_getKeyIndex(const Key * const key) const {
     return index;
 }
 
-void Animator::anim_coordinateKeysWith(Animator * const other) {
+void Animator::anim_addKeysWhereOtherHasKeys(const Animator * const other) {
     for(const auto& otherKey : other->anim_mKeys) {
         const int absFrame = otherKey->getAbsFrame();
         const int relFrame = prp_absFrameToRelFrame(absFrame);
         if(!anim_getKeyAtRelFrame(relFrame))
             anim_addKeyAtRelFrame(relFrame);
     }
+}
 
-    for(const auto& thisKey : anim_mKeys) {
-        const int absFrame = thisKey->getAbsFrame();
-        const int relFrame = other->prp_absFrameToRelFrame(absFrame);
-        if(!other->anim_getKeyAtRelFrame(relFrame))
-            other->anim_addKeyAtRelFrame(relFrame);
-    }
+void Animator::anim_coordinateKeysWith(Animator * const other) {
+    anim_addKeysWhereOtherHasKeys(other);
+    other->anim_addKeysWhereOtherHasKeys(this);
 }
 
 void Animator::anim_deleteCurrentKey() {

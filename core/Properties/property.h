@@ -154,14 +154,7 @@ public:
     void setParent(ComplexAnimator * const parent);
 
     template <class T = Property>
-    T *getFirstAncestor(bool (Property::*tester)() const) const {
-        if(!mParent) return nullptr;
-        if((mParent->*tester)()) return static_cast<T*>(mParent.data());
-        return static_cast<T*>(mParent->getFirstAncestor(tester));
-    }
-
-    template <class T = Property>
-    T *getFirstAncestor(bool (*tester)(const Property*)) const {
+    T *getFirstAncestor(const std::function<bool(Property*)>& tester) const {
         if(!mParent) return nullptr;
         if(tester(mParent.data())) return static_cast<T*>(mParent.data());
         return static_cast<T*>(mParent->getFirstAncestor(tester));

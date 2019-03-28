@@ -252,6 +252,44 @@ public:
 
     void actionDisconnectNodes(const int &node1Id, const int &node2Id);
 
+    void actionReverseCurrent() {
+        beforeBinaryPathChange();
+        getCurrentlyEditedPath()->actionReversePath();
+    }
+
+    void actionReverseAll() {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionReversePath();
+        }
+        mBaseValue.actionReversePath();
+        prp_updateInfluenceRangeAfterChanged();
+    }
+
+    void actionAppendMoveAllFrom(SmartPathAnimator * const other) {
+        anim_coordinateKeysWith(other);
+        for(int i = 0; i < anim_mKeys.count(); i++) {
+            const auto thisKey = anim_getKeyAtIndex<SmartPathKey>(i);
+            const auto otherKey = other->anim_getKeyAtIndex<SmartPathKey>(i);
+            thisKey->getValue().actionAppendMoveAllFrom(otherKey->getValue());
+        }
+        mBaseValue.actionAppendMoveAllFrom(other->getBaseValue());
+        prp_updateInfluenceRangeAfterChanged();
+        other->prp_updateInfluenceRangeAfterChanged();
+    }
+
+    void actionPrependMoveAllFrom(SmartPathAnimator * const other) {
+        anim_coordinateKeysWith(other);
+        for(int i = 0; i < anim_mKeys.count(); i++) {
+            const auto thisKey = anim_getKeyAtIndex<SmartPathKey>(i);
+            const auto otherKey = other->anim_getKeyAtIndex<SmartPathKey>(i);
+            thisKey->getValue().actionPrependMoveAllFrom(otherKey->getValue());
+        }
+        mBaseValue.actionPrependMoveAllFrom(other->getBaseValue());
+        prp_updateInfluenceRangeAfterChanged();
+        other->prp_updateInfluenceRangeAfterChanged();
+    }
+
     bool hasDetached() const {
         return mBaseValue.hasDetached();
     }
@@ -288,6 +326,10 @@ signals:
 protected:
     SmartPathAnimator();
     SmartPathAnimator(const SmartPath& baseValue);
+
+    SmartPath& getBaseValue() {
+        return mBaseValue;
+    }
 private:
     void deepCopySmartPathFromRelFrame(const int& relFrame,
                                  SmartPathKey * const prevKey,

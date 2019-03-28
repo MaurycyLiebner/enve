@@ -6,8 +6,8 @@
 
 qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
                                   const Node& nextNode) {
-    return qCubicSegment2D(prevNode.fP1, prevNode.fC2,
-                           nextNode.fC0, nextNode.fP1);
+    return qCubicSegment2D(prevNode.fP1, prevNode.getC2(),
+                           nextNode.getC0(), nextNode.fP1);
 }
 
 void NodeList::moveNode(const int& fromId, const int& toId) {

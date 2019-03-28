@@ -3,7 +3,7 @@
 #include "Boxes/boxesgroup.h"
 #include "Properties/boxtargetproperty.h"
 #include "PathEffects/patheffectanimators.h"
-#include "Animators/pathanimator.h"
+#include "Animators/SmartPath/smartpathcollection.h"
 #include "Properties/boxtargetproperty.h"
 #include "GUI/keysview.h"
 #include "Animators/effectanimators.h"
@@ -135,20 +135,21 @@ void PropertyClipboardContainer::paste(Property *targetProperty) {
                             mTargetBox.data());
             }
         } else if(mPathEffect &&
-           targetProperty->SWT_isPathEffectAnimators()) {
+                  targetProperty->SWT_isPathEffectAnimators()) {
             GetAsPtr(targetProperty, PathEffectAnimators)->readPathEffect(&target);
         } else if(mPixmapEffect &&
-            targetProperty->SWT_isPixmapEffectAnimators()) {
+                  targetProperty->SWT_isPixmapEffectAnimators()) {
             GetAsPtr(targetProperty, EffectAnimators)->readPixmapEffect(&target);
         } else if(mPathEffectAnimators &&
-            targetProperty->SWT_isPathEffectAnimators()) {
+                  targetProperty->SWT_isPathEffectAnimators()) {
             GetAsPtr(targetProperty, PathEffectAnimators)->readProperty(&target);
         } else if(mPixmapEffectAnimators &&
-            targetProperty->SWT_isPixmapEffectAnimators()) {
+                  targetProperty->SWT_isPixmapEffectAnimators()) {
             GetAsPtr(targetProperty, EffectAnimators)->readProperty(&target);
         } else if(mVectorPathAnimator &&
-            targetProperty->SWT_isPathAnimator()) {
-            GetAsPtr(targetProperty, PathAnimator)->readVectorPathAnimator(&target);
+                  targetProperty->SWT_isSmartPathCollection()) {
+            RuntimeThrow("NO CODE");
+            //GetAsPtr(targetProperty, SmartPathCollection)->(&target);
         } else {
             targetProperty->readProperty(&target);
         }
@@ -170,11 +171,11 @@ bool PropertyClipboardContainer::propertyCompatible(Property *target) {
         return target->SWT_isQStringAnimator();
     }
     if(mPathAnimator) {
-        return target->SWT_isPathAnimator();
+        return target->SWT_isSmartPathCollection();
     }
     if(mVectorPathAnimator) {
-        return target->SWT_isPathAnimator() ||
-                target->SWT_isVectorPathAnimator();
+        return target->SWT_isSmartPathCollection() ||
+                target->SWT_isSmartPathAnimator();
     }
     if(mAnimatedSurface) {
         return target->SWT_isAnimatedSurface();
@@ -207,13 +208,13 @@ void PropertyClipboardContainer::setProperty(Property *property) {
     mQrealAnimator = property->SWT_isQrealAnimator();
     mQPointFAnimator = property->SWT_isQPointFAnimator();
     mQStringAnimator = property->SWT_isQStringAnimator();
-    mPathAnimator = property->SWT_isPathAnimator();
+    mPathAnimator = property->SWT_isSmartPathCollection();
     mAnimatedSurface = property->SWT_isAnimatedSurface();
     mComplexAnimator = property->SWT_isComplexAnimator();
     mPathEffectAnimators = property->SWT_isPathEffectAnimators();
     mPixmapEffectAnimators = property->SWT_isPixmapEffectAnimators();
     mPathEffect = property->SWT_isPathEffect();
-    mVectorPathAnimator = property->SWT_isVectorPathAnimator();
+    mVectorPathAnimator = property->SWT_isSmartPathAnimator();
     mPixmapEffect = property->SWT_isPixmapEffect();
     mBoxTargetProperty = property->SWT_isBoxTargetProperty();
     if(mBoxTargetProperty) {

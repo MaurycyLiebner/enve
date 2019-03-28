@@ -6,8 +6,10 @@
 class SmartPathAnimator;
 
 class SmartPathCollection : public ComplexAnimator {
-public:
+protected:
     SmartPathCollection();
+public:
+    bool SWT_isSmartPathCollection() const { return true; }
 
     SmartPathAnimator *createNewPath();
     SkPath getPathAtRelFrame(const qreal &relFrame);

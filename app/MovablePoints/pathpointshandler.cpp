@@ -190,8 +190,7 @@ SmartNodePoint* PathPointsHandler::divideSegment(const int &node1Id,
     return mPoints.at(id).get();
 }
 
-void PathPointsHandler::createSegment(const int &node1Id,
-                                      const int &node2Id) {
+void PathPointsHandler::createSegment(const int &node1Id, const int &node2Id) {
     mTargetAnimator->actionConnectNodes(node1Id, node2Id);
 }
 

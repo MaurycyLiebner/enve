@@ -3,9 +3,9 @@
 
 ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {}
 
-ComplexAnimator::~ComplexAnimator() {
-    anim_removeAllKeys();
-}
+//ComplexAnimator::~ComplexAnimator() {
+//    anim_removeAllKeys();
+//}
 
 void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
                                               const qsptr<Property> &prependWith) {

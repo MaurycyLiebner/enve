@@ -41,6 +41,16 @@ struct Node {
     QPointF fP1;
     QPointF fC2;
 
+    QPointF getC0() const {
+        if(fC0Enabled) return fC0;
+        return fP1;
+    }
+
+    QPointF getC2() const {
+        if(fC2Enabled) return fC2;
+        return fP1;
+    }
+
     //! @brief T value for segment defined by previous and next normal node
     qreal fT;
 

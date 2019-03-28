@@ -25,7 +25,7 @@ enum MovablePointType : short {
 class MovablePoint : public StdSelfRef {
     friend class StdSelfRef;
 public:
-    virtual ~MovablePoint() {}
+    ~MovablePoint() {}
 
     virtual void moveByRel(const QPointF &relTranslation) = 0;
     virtual void applyTransform(const QMatrix &transform) = 0;

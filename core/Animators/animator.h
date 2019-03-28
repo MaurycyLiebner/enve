@@ -173,6 +173,7 @@ public:
     int anim_getKeyIndex(const Key * const key) const;
 
     void anim_coordinateKeysWith(Animator * const other);
+    void anim_addKeysWhereOtherHasKeys(const Animator * const other);
 protected:
     QList<stdsptr<Key>> anim_mKeys;
     QList<stdptr<Key>> anim_mSelectedKeys;

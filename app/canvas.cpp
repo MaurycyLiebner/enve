@@ -614,28 +614,12 @@ void Canvas::startSelectionAtPoint(const QPointF &pos) {
 
 void Canvas::updatePivot() {
     if(mCurrentMode == MOVE_POINT) {
-        if(isPointsSelectionEmpty() || mLocalPivot) {
-            mRotPivot->hide();
-        } else {
-            mRotPivot->show();
-        }
-        if(getPointsSelectionCount() == 1 && !mLocalPivot) {
-            mRotPivot->setAbsolutePos(
-                        getSelectedPointsAbsPivotPos() +
-                            QPointF(0., 20.));
-        } else {
-            mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos());
-        }
+        mRotPivot->setVisible(!isPointsSelectionEmpty() && !mLocalPivot);
+        mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos());
     } else if(mCurrentMode == MOVE_PATH) {
-        if(isSelectionEmpty() ||
-           mLocalPivot) {
-            mRotPivot->hide();
-        } else {
-            mRotPivot->show();
-
-        }
+        mRotPivot->setVisible(!isSelectionEmpty() && !mLocalPivot);
         mRotPivot->setAbsolutePos(getSelectedBoxesAbsPivotPos());
-    }
+    } else mRotPivot->hide();
 }
 
 void Canvas::setCanvasMode(const CanvasMode &mode) {
@@ -648,10 +632,9 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
     clearCurrentSmartEndPoint();
     clearCurrentEndPoint();
     clearLastPressedPoint();
-    if(mCurrentMode == MOVE_PATH || mCurrentMode == MOVE_POINT) {
-        schedulePivotUpdate();
-    }
+    updatePivot();
 }
+
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
     mCanvasWindow->grabMouse();
@@ -970,7 +953,7 @@ void Canvas::fitCanvasToSize() {
 
 void Canvas::moveByRel(const QPointF &trans) {
     QPointF transRel = mapAbsPosToRel(trans) -
-                       mapAbsPosToRel(QPointF(0., 0.));
+                       mapAbsPosToRel(QPointF(0, 0));
 
     mLastPressPosRel = mapAbsPosToRel(mLastPressPosRel);
 

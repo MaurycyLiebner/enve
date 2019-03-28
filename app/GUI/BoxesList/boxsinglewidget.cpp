@@ -447,7 +447,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mValueSlider->setTarget(GetAsPtr(target, IntProperty));
         mValueSlider->show();
     } else if(target->SWT_isComplexAnimator() ||
-              target->SWT_isVectorPathAnimator() ||
+              target->SWT_isSmartPathAnimator() ||
               target->SWT_isAnimatedSurface()) {
         mRecordButton->show();
 
@@ -1127,7 +1127,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                        MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT - 6);
         }
     } else if(target->SWT_isQStringAnimator() ||
-              target->SWT_isVectorPathAnimator() ||
+              target->SWT_isSmartPathAnimator() ||
               target->SWT_isAnimatedSurface() ||
               target->SWT_isQCubicSegment1DAnimator()) {
         Animator *aTarget = GetAsPtr(target, Animator);

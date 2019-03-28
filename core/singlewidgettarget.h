@@ -95,13 +95,12 @@ public:
     virtual bool SWT_isGradient() const { return false; }
     virtual bool SWT_isFillSettingsAnimator() const { return false; }
     virtual bool SWT_isStrokeSettings() const { return false; }
-    virtual bool SWT_isPathAnimator() const { return false; }
+    virtual bool SWT_isSmartPathCollection() const { return false; }
     virtual bool SWT_isQPointFAnimator() const { return false; }
     virtual bool SWT_isQrealAnimator() const { return false; }
     virtual bool SWT_isQStringAnimator() const { return false; }
     virtual bool SWT_isBasicTransformAnimator() const { return false; }
     virtual bool SWT_isBoxTransformAnimator() const { return false; }
-    virtual bool SWT_isVectorPathAnimator() const { return false; }
     virtual bool SWT_isSmartPathAnimator() const { return false; }
     virtual bool SWT_isAnimatedSurface() const { return false; }
     virtual bool SWT_isQCubicSegment1DAnimator() const { return false; }

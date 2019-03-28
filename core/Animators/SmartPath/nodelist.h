@@ -98,6 +98,15 @@ public:
         mClosed = closed;
     }
 
+    void reset() {
+        mClosed = false;
+        mNodes.clear();
+    }
+
+    void clear() {
+        reset();
+    }
+
     int insertFirstNode(const Node &nodeBlueprint);
     void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);
     void promoteDissolvedNodeToNormal(const int &nodeId);
@@ -123,6 +132,14 @@ public:
     bool read(QIODevice * const src);
     bool write(QIODevice * const dst) const;
 protected:
+    void appendShallowCopyFrom(const NodeList& other) {
+        mNodes.appendNodesShallowCopy(other.getList());
+    }
+
+    void prependShallowCopyFrom(const NodeList& other) {
+        mNodes.prependNodesShallowCopy(other.getList());
+    }
+
     void moveNodesToFrontStartingWith(const int& first) {
         mNodes.moveNodesToFrontStartingWith(first);
     }

@@ -11,7 +11,7 @@ void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
     if(point) point->select();
     mCurrentSmartEndPoint = point;
 }
-
+#include "MovablePoints/pathpointshandler.h"
 void Canvas::handleAddSmartPointMousePress() {
     if(mCurrentSmartEndPoint ? mCurrentSmartEndPoint->isHidden() : false) {
         clearCurrentSmartEndPoint();
@@ -41,16 +41,17 @@ void Canvas::handleAddSmartPointMousePress() {
             setCurrentSmartEndPoint(newPoint);
         } else if(!mCurrentSmartEndPoint) {
             setCurrentSmartEndPoint(nodePointUnderMouse);
-        } else {
-            //NodePointUnderMouse->startTransform();
-            if(mCurrentSmartEndPoint->getTargetAnimator() ==
-               nodePointUnderMouse->getTargetAnimator()) {
-                mCurrentSmartEndPoint->actionConnectToNormalPoint(nodePointUnderMouse);
-            } else {
-//                connectPointsFromDifferentPaths(mCurrentSmartEndPoint,
-//                                                nodePointUnderMouse);
+        } else { // mCurrentSmartEndPoint
+            const auto targetNode = nodePointUnderMouse->getTargetNode();
+            const auto handler = nodePointUnderMouse->getHandler();
+            const bool success =
+                    mCurrentSmartEndPoint->actionConnectToNormalPoint(
+                        nodePointUnderMouse);
+            if(success) {
+                const int newTargetId = targetNode->getNodeId();
+                const auto sel = handler->getPointWithId(newTargetId);
+                setCurrentSmartEndPoint(sel);
             }
-            setCurrentSmartEndPoint(nodePointUnderMouse);
         }
     } // pats is not null
 }

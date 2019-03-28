@@ -421,6 +421,10 @@ bool SmartNodePoint::hasPrevNormalPoint() const {
     return mPrevNormalPoint;
 }
 
+const PathPointsHandler *SmartNodePoint::getHandler() {
+    return mHandler_k.data();
+}
+
 void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
     if(prevPoint ? prevPoint->getType() != Node::NORMAL : false)
         RuntimeThrow("Only NORMAL nodes supported");
@@ -528,20 +532,47 @@ void SmartNodePoint::setPointAsPrev(SmartNodePoint * const pointToSet) {
     if(pointToSet) pointToSet->setNextPoint(this);
 }
 
-void SmartNodePoint::actionConnectToNormalPoint(
-        SmartNodePoint * const point) {
-    if(!hasNextNormalPoint()) {
-        mHandler_k->createSegment(mNodeId, point->getNodeId());
-    } else if(!hasPrevNormalPoint()) {
-        mHandler_k->createSegment(point->getNodeId(), mNodeId);
+bool SmartNodePoint::actionConnectToNormalPoint(
+        SmartNodePoint * const other) {
+    const bool thisHasPrev = hasPrevNormalPoint();
+    const bool thisHasNext = hasNextNormalPoint();
+    if(thisHasNext && thisHasPrev) return false;
+    const bool otherHasPrev = other->hasPrevNormalPoint();
+    const bool otherHasNext = other->hasNextNormalPoint();
+    if(otherHasPrev && otherHasNext) return false;
+
+    const auto thisAnim = getTargetAnimator();
+    const auto otherAnim = other->getTargetAnimator();
+    if(!thisAnim || !otherAnim) return false;
+    const bool sameAnim = thisAnim == otherAnim;
+    if(sameAnim) {
+        if(!hasNextNormalPoint()) {
+            mHandler_k->createSegment(mNodeId, other->getNodeId());
+        } else if(!hasPrevNormalPoint()) {
+            mHandler_k->createSegment(other->getNodeId(), mNodeId);
+        } else return false;
+    } else {
+        const auto thisParentAnim = thisAnim->getParent();
+        const auto otherParentAnim = otherAnim->getParent();
+        if(thisParentAnim != otherParentAnim) return false;
+        if(!thisHasNext && !otherHasPrev) {
+            otherAnim->actionPrependMoveAllFrom(thisAnim);
+        } else if(!thisHasPrev && !otherHasNext) {
+            otherAnim->actionAppendMoveAllFrom(thisAnim);
+        } else { // one path has to be reversed to connect
+            thisAnim->actionReverseAll();
+            if(!thisHasPrev) otherAnim->actionPrependMoveAllFrom(thisAnim);
+            else otherAnim->actionAppendMoveAllFrom(thisAnim);
+        }
     }
+    return true;
 }
 
 void SmartNodePoint::actionDisconnectFromNormalPoint(
-        SmartNodePoint * const point) {
-    if(point == mNextNormalPoint) {
+        SmartNodePoint * const other) {
+    if(other == mNextNormalPoint) {
         mHandler_k->removeSegment(mNextNormalSegment);
-    } else if(point == mPrevNormalPoint) {
+    } else if(other == mPrevNormalPoint) {
         mPrevNormalPoint->actionDisconnectFromNormalPoint(this);
     }
 }
@@ -577,9 +608,9 @@ void SmartNodePoint::c2Moved(const QPointF &c2) {
 
 void SmartNodePoint::updateFromNodeDataPosOnly() {
     if(mNode_d->isNormal()) {
-        mC0Pt->setRelativePosVal(mNode_d->fC0);
+        mC0Pt->setRelativePosVal(mNode_d->getC0());
         setRelativePosVal(mNode_d->fP1);
-        mC2Pt->setRelativePosVal(mNode_d->fC2);
+        mC2Pt->setRelativePosVal(mNode_d->getC2());
     } else if(mNode_d->isDissolved()) {
         currentPath()->updateDissolvedNodePosition(mNodeId);
         setRelativePosVal(mNode_d->fP1);
@@ -594,19 +625,7 @@ void SmartNodePoint::updateFromNodeData() {
         return;
     }
 
-    if(mNode_d->isNormal()) {
-        mC0Pt->setRelativePosVal(mNode_d->fC0);
-        setRelativePosVal(mNode_d->fP1);
-        mC2Pt->setRelativePosVal(mNode_d->fC2);
-        setVisible(true);
-    } else if(mNode_d->isDissolved()) {
-        currentPath()->updateDissolvedNodePosition(mNodeId);
-
-        setRelativePosVal(mNode_d->fP1);
-        setVisible(true);
-    } else {
-        setVisible(false);
-    }
+    updateFromNodeDataPosOnly();
 
     const int prevNodeId = currentPath()->prevNodeId(mNode_d->getNodeId());
     const auto prevNode = mHandler_k->getPointWithId(prevNodeId);

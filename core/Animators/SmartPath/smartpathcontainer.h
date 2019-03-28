@@ -100,8 +100,32 @@ public:
     void actionSetNormalNodeC2Enabled(const int& nodeId, const bool& enabled) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+                                           "on a node of a different type");
         mNodesList.setNodeC2Enabled(node, enabled);
+    }
+
+    void actionReversePath() {
+        mNodesList.reverse();
+    }
+
+    void actionAppendMoveAllFrom(SmartPath& other) {
+        mNodesList.appendShallowCopyFrom(other.getNodesRef());
+        other.clear();
+    }
+
+    void actionPrependMoveAllFrom(SmartPath& other) {
+        mNodesList.prependShallowCopyFrom(other.getNodesRef());
+        other.clear();
+    }
+
+    void reset() {
+        mNodesList.clear();
+        mSavedList.clear();
+        mLastDetached.clear();
+    }
+
+    void clear() {
+        reset();
     }
 
     bool isEmpty() const {
