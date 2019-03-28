@@ -6,6 +6,7 @@
 class SmartPathAnimator;
 
 class SmartPathCollection : public ComplexAnimator {
+    friend class SelfRef;
 protected:
     SmartPathCollection();
 public:
