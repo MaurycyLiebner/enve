@@ -101,10 +101,10 @@ public:
         setNextNormalPoint(nullptr);
     }
 
-    const bool& isOutdated() const {
+    bool isOutdated() const {
         return mOutdated;
     }
-    const int &getNodeId();
+    int getNodeId() const;
 
     NodePointValues getPointValues() const;
 
@@ -160,9 +160,8 @@ public:
 
     void c2Moved(const QPointF& c2);
 
-    void updateNode() {
-        if(!currentPath()) mNode_d = nullptr;
-        else mNode_d = currentPath()->getNodePtr(mNodeId);
+    void setNode(const Node * const node) {
+        mNode_d = node;
         updateFromNodeData();
     }
 
@@ -180,7 +179,7 @@ public:
     bool hasPrevPoint() const;
     bool hasNextNormalPoint() const;
     bool hasPrevNormalPoint() const;
-    void afterAllNodesUpdated() {
+    void updateNeighNormalNodes() {
         updatePrevNormalNode();
         updateNextNormalNode();
     }
@@ -199,7 +198,7 @@ public:
 
     const PathPointsHandler * getHandler();
 protected:
-    SmartNodePoint(const int& nodeId,
+    SmartNodePoint(const Node * const node,
                    PathPointsHandler * const handler,
                    SmartPathAnimator * const parentAnimator,
                    BasicTransformAnimator * const parentTransform);

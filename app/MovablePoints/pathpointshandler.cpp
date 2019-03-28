@@ -67,9 +67,9 @@ void PathPointsHandler::drawPoints(SkCanvas * const canvas,
 }
 
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
-    const auto newPt = SPtrCreate(SmartNodePoint)(nodeId, this,
-                                                  mTargetAnimator,
-                                                  mParentTransform);
+    const auto newPt = SPtrCreate(SmartNodePoint)(
+                targetPath()->getNodePtr(nodeId), this,
+                mTargetAnimator, mParentTransform);
     mPoints.insert(nodeId, newPt);
     return newPt.get();
 }
@@ -84,8 +84,8 @@ void PathPointsHandler::updateNextSegmentDnDForPoint(const int &nodeId) {
 
 void PathPointsHandler::updatePoint(const int &nodeId) {
     const auto pt = mPoints.at(nodeId);
-    pt->setNodeId(nodeId);
-    pt->afterAllNodesUpdated();
+    pt->setNode(targetPath()->getNodePtr(nodeId));
+    pt->updateNeighNormalNodes();
 }
 
 void PathPointsHandler::updateAllPoints() {
@@ -98,13 +98,13 @@ void PathPointsHandler::updateAllPoints() {
         mPoints.at(i)->setOutdated();
     }
     for(int i = 0; i < mPoints.count(); i++) {
-        mPoints.at(i)->setNodeId(i);
+        mPoints.at(i)->setNode(targetPath()->getNodePtr(i));
     }
     while(mPoints.count() < newCount) {
         createNewNodePoint(mPoints.count());
     }
     for(const auto& pt : mPoints) {
-        pt->afterAllNodesUpdated();
+        pt->updateNeighNormalNodes();
     }
 }
 
@@ -206,7 +206,6 @@ void PathPointsHandler::removeSegment(const NormalSegment &segment) {
         const auto spColl = mTargetAnimator->getParent<SmartPathCollection>();
         if(!spColl) return;
         const auto newAnim = mTargetAnimator->createFromDetached();
-        spColl->ca_addChildAnimator(newAnim);
-        mCollectionHandler_k->createHandlerForAnimator(newAnim.get());
+        spColl->addPath(newAnim);
     }
 }

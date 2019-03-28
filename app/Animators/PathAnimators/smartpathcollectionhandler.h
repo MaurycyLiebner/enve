@@ -54,6 +54,10 @@ public:
 protected:
     PathPointsHandler *createHandlerForAnimator(
             SmartPathAnimator * const newAnimator);
+    int getHandlerIdForAnimator(const SmartPathAnimator * anim);
+    PathPointsHandler *getHandlerForAnimator(
+            const SmartPathAnimator * anim);
+    void removeHandlerForAnimator(SmartPathAnimator * const anim);
 private:
     PathPointsHandler* createNewPath();
 

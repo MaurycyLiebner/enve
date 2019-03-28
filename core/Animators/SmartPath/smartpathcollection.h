@@ -7,13 +7,22 @@ class SmartPathAnimator;
 
 class SmartPathCollection : public ComplexAnimator {
     friend class SelfRef;
+    Q_OBJECT
 protected:
     SmartPathCollection();
 public:
     bool SWT_isSmartPathCollection() const { return true; }
 
     SmartPathAnimator *createNewPath();
-    SkPath getPathAtRelFrame(const qreal &relFrame);
+    void addPath(const qsptr<SmartPathAnimator>& path);
+    void removePath(const qsptr<SmartPathAnimator>& path);
+
+    SkPath getPathAtRelFrame(const qreal &relFrame) const;
+
+    void applyTransform(const QMatrix &transform) const;
+signals:
+    void pathAdded(SmartPathAnimator*);
+    void pathRemoved(SmartPathAnimator*);
 };
 
 #endif // SMARTPATHCOLLECTION_H

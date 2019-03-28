@@ -16,6 +16,15 @@ SmartPathCollectionHandler::SmartPathCollectionHandler(
     mParentPath(parentPath) {
     const auto updater = SPtrCreate(NodePointUpdater)(mParentPath);
     mAnimator->prp_setOwnUpdater(updater);
+
+    QObject::connect(mAnimator.get(), &SmartPathCollection::pathAdded,
+                     [this](SmartPathAnimator * anim) {
+        createHandlerForAnimator(anim);
+    });
+    QObject::connect(mAnimator.get(), &SmartPathCollection::pathRemoved,
+                     [this](SmartPathAnimator * anim) {
+        removeHandlerForAnimator(anim);
+    });
 }
 
 SmartNodePoint *SmartPathCollectionHandler::createNewSubPathAtPos(
@@ -26,7 +35,7 @@ SmartNodePoint *SmartPathCollectionHandler::createNewSubPathAtPos(
 
 PathPointsHandler *SmartPathCollectionHandler::createNewPath() {
     const auto newAnimator = mAnimator->createNewPath();
-    return createHandlerForAnimator(newAnimator);
+    return getHandlerForAnimator(newAnimator);
 }
 
 PathPointsHandler *SmartPathCollectionHandler::createHandlerForAnimator(
@@ -36,6 +45,22 @@ PathPointsHandler *SmartPathCollectionHandler::createHandlerForAnimator(
     newHandler->updateAllPoints();
     mPointsHandlers.append(newHandler);
     return newHandler.get();
+}
+
+int SmartPathCollectionHandler::getHandlerIdForAnimator(
+        const SmartPathAnimator *anim) {
+    for(int i = 0; i < mPointsHandlers.count(); i++) {
+        const auto& handler = mPointsHandlers.at(i);
+        if(handler->getAnimator() == anim) return i;
+    }
+    return -1;
+}
+
+PathPointsHandler *SmartPathCollectionHandler::getHandlerForAnimator(
+        const SmartPathAnimator *anim) {
+    const int id = getHandlerIdForAnimator(anim);
+    if(id == -1) return nullptr;
+    return mPointsHandlers.at(id).get();
 }
 
 NormalSegment SmartPathCollectionHandler::getNormalSegmentAtAbsPos(
@@ -89,19 +114,21 @@ qsptr<SmartPathAnimator> SmartPathCollectionHandler::takeAnimatorAt(
         const int &id) {
     const auto anim = GetAsSPtr(mAnimator->ca_getChildAt(id),
                                 SmartPathAnimator);
-    mAnimator->ca_removeChildAnimator(anim);
-    for(int i = 0; i < mPointsHandlers.count(); i++) {
-        const auto& handler = mPointsHandlers.at(i);
-        if(handler->getAnimator() == anim)
-            mPointsHandlers.removeAt(i);
-    }
+    mAnimator->removePath(anim);
     return anim;
 }
 
 PathPointsHandler* SmartPathCollectionHandler::addAnimator(
         const qsptr<SmartPathAnimator> &anim) {
-    mAnimator->ca_addChildAnimator(anim);
-    return createHandlerForAnimator(anim.get());
+    mAnimator->addPath(anim);
+    return getHandlerForAnimator(anim.get());
+}
+
+void SmartPathCollectionHandler::removeHandlerForAnimator(
+        SmartPathAnimator * const anim) {
+    const int id = getHandlerIdForAnimator(anim);
+    if(id == -1) return;
+    mPointsHandlers.removeAt(id);
 }
 
 void SmartPathCollectionHandler::moveAllFrom(
@@ -112,12 +139,7 @@ void SmartPathCollectionHandler::moveAllFrom(
 }
 
 void SmartPathCollectionHandler::applyTransform(const QMatrix &transform) {
-    const int iMax = mAnimator->ca_getNumberOfChildren() - 1;
-    for(int i = 0; i <= iMax; i++) {
-        const auto path = GetAsSPtr(mAnimator->ca_getChildAt(i),
-                                    SmartPathAnimator);
-        path->applyTransform(transform);
-    }
+    mAnimator->applyTransform(transform);
 }
 
 int SmartPathCollectionHandler::numberOfAnimators() const {

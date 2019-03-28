@@ -11,7 +11,7 @@
 #include "pathpointshandler.h"
 #include "smartctrlpoint.h"
 
-SmartNodePoint::SmartNodePoint(const int& nodeId,
+SmartNodePoint::SmartNodePoint(const Node * const node,
                                PathPointsHandler * const handler,
                                SmartPathAnimator * const parentAnimator,
                                BasicTransformAnimator * const parentTransform) :
@@ -23,7 +23,7 @@ SmartNodePoint::SmartNodePoint(const int& nodeId,
     mC0Pt->setOtherCtrlPt(mC2Pt.get());
     mC2Pt->setOtherCtrlPt(mC0Pt.get());
 
-    setNodeId(nodeId);
+    setNode(node);
 }
 
 void SmartNodePoint::applyTransform(const QMatrix &transform) {
@@ -77,7 +77,7 @@ void SmartNodePoint::finishTransform() {
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     if(getType() == Node::NORMAL) {
         setRelativePosVal(relPos);
-        currentPath()->actionSetNormalNodeP1(mNodeId, mCurrentPos);
+        currentPath()->actionSetNormalNodeP1(getNodeId(), mCurrentPos);
         mNextNormalSegment.afterChanged();
         if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
 
@@ -86,24 +86,24 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
         mC2Pt->NonAnimatedMovablePoint::moveByRel(change);
     } else if(getType() == Node::DISSOLVED) {
         const auto parentSeg = mPrevNormalPoint->getNextNormalSegment();
-        const auto tRange = currentPath()->dissolvedTRange(mNodeId);
+        const auto tRange = currentPath()->dissolvedTRange(getNodeId());
         auto seg = parentSeg.getAsRelSegment().tFragment(tRange.fMin,
                                                          tRange.fMax);
         const auto closest = seg.closestPosAndT(relPos);
         const qreal mappedT = gMapTFromFragment(tRange.fMin, tRange.fMax,
                                                 closest.fT);
-        currentPath()->actionSetDissolvedNodeT(mNodeId, mappedT);
+        currentPath()->actionSetDissolvedNodeT(getNodeId(), mappedT);
         setRelativePosVal(closest.fPos);
     }
     mParentAnimator->pathChanged();
 }
 
 void SmartNodePoint::removeFromVectorPath() {
-    currentPath()->actionRemoveNode(mNodeId);
+    currentPath()->actionRemoveNode(getNodeId());
 }
 
 void SmartNodePoint::removeApproximate() {
-    currentPath()->actionRemoveNode(mNodeId);
+    currentPath()->actionRemoveNode(getNodeId());
 }
 
 void SmartNodePoint::rectPointsSelection(
@@ -292,7 +292,7 @@ void SmartNodePoint::drawNodePoint(
                                            SkFontStyle::kNormal_Width,
                                            SkFontStyle::kUpright_Slant);
         font.setTypeface(SkTypeface::MakeFromName(nullptr, fontStyle));
-        const auto nodeIdStr = QString::number(mNodeId);
+        const auto nodeIdStr = QString::number(getNodeId());
         const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
         const auto cStr = nodeIdStr.toStdString().c_str();
         SkRect bounds;
@@ -337,7 +337,7 @@ void SmartNodePoint::updateC2Visibility() {
 void SmartNodePoint::setC2Enabled(const bool &enabled) {
     if(enabled == getC2Enabled()) return;
     if(getC2Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-    currentPath()->actionSetNormalNodeC2Enabled(mNodeId, enabled);
+    currentPath()->actionSetNormalNodeC2Enabled(getNodeId(), enabled);
     updateC2Visibility();
     mParentAnimator->pathChanged();
 }
@@ -345,7 +345,7 @@ void SmartNodePoint::setC2Enabled(const bool &enabled) {
 void SmartNodePoint::setC0Enabled(const bool &enabled) {
     if(enabled == getC0Enabled()) return;
     if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-    currentPath()->actionSetNormalNodeC0Enabled(mNodeId, enabled);
+    currentPath()->actionSetNormalNodeC0Enabled(getNodeId(), enabled);
     updateC0Visibility();
     mParentAnimator->pathChanged();
 }
@@ -358,13 +358,8 @@ void SmartNodePoint::resetC0() {
     mC0Pt->setRelativePosStartAndFinish(getRelativePos());
 }
 
-void SmartNodePoint::setNodeId(const int &idT) {
-    mNodeId = idT;
-    updateNode();
-}
-
-const int &SmartNodePoint::getNodeId() {
-    return mNodeId;
+int SmartNodePoint::getNodeId() const {
+    return mNode_d->getNodeId();
 }
 
 NodePointValues SmartNodePoint::getPointValues() const {
@@ -405,7 +400,7 @@ bool SmartNodePoint::isSeparateNodePoint() {
 
 void SmartNodePoint::setCtrlsMode(const CtrlsMode &mode) {
     if(getCtrlsMode() == mode) return;
-    currentPath()->actionSetNormalNodeCtrlsMode(mNodeId, mode);
+    currentPath()->actionSetNormalNodeCtrlsMode(getNodeId(), mode);
     updateFromNodeData();
     mParentAnimator->pathChanged();
     if(mode == CtrlsMode::CTRLS_CORNER) return;
@@ -483,20 +478,6 @@ void SmartNodePoint::setPrevPoint(SmartNodePoint * const prevPoint) {
     //updatePrevNormalNode();
 }
 
-void SmartNodePoint::updatePrevNormalNode() {
-    if(mPrevPoint) {
-        if(mPrevPoint->getType() == Node::NORMAL) {
-            setPointAsPrevNormal(mPrevPoint);
-        } else {
-            const auto prevNormalNode =
-                    mHandler_k->getPrevNormalNode(mPrevPoint->getNodeId());
-            setPointAsPrevNormal(prevNormalNode);
-        }
-    } else {
-        setPointAsPrevNormal(nullptr);
-    }
-}
-
 void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
     if(nextPoint == this)
         RuntimeThrow("Node cannot point to itself");
@@ -504,18 +485,14 @@ void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
     //updateNextNormalNode();
 }
 
+void SmartNodePoint::updatePrevNormalNode() {
+    const auto prevNormalNode = mHandler_k->getPrevNormalNode(getNodeId());
+    setPointAsPrevNormal(prevNormalNode);
+}
+
 void SmartNodePoint::updateNextNormalNode() {
-    if(mNextPoint) {
-        if(mNextPoint->getType() == Node::NORMAL) {
-            setPointAsNextNormal(mNextPoint);
-        } else {
-            const auto nextNormalNode =
-                    mHandler_k->getNextNormalNode(mNextPoint->getNodeId());
-            setPointAsNextNormal(nextNormalNode);
-        }
-    } else {
-        setNextNormalPoint(nullptr);
-    }
+    const auto nextNormalNode = mHandler_k->getNextNormalNode(getNodeId());
+    setPointAsNextNormal(nextNormalNode);
 }
 
 void SmartNodePoint::setPointAsNext(SmartNodePoint * const pointToSet) {
@@ -547,9 +524,9 @@ bool SmartNodePoint::actionConnectToNormalPoint(
     const bool sameAnim = thisAnim == otherAnim;
     if(sameAnim) {
         if(!hasNextNormalPoint()) {
-            mHandler_k->createSegment(mNodeId, other->getNodeId());
+            mHandler_k->createSegment(getNodeId(), other->getNodeId());
         } else if(!hasPrevNormalPoint()) {
-            mHandler_k->createSegment(other->getNodeId(), mNodeId);
+            mHandler_k->createSegment(other->getNodeId(), getNodeId());
         } else return false;
     } else {
         const auto thisParentAnim = thisAnim->getParent();
@@ -578,7 +555,7 @@ void SmartNodePoint::actionDisconnectFromNormalPoint(
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
-    return mHandler_k->addNewAtEnd(mNodeId, relPos);
+    return mHandler_k->addNewAtEnd(getNodeId(), relPos);
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {
@@ -594,14 +571,14 @@ void SmartNodePoint::setElementsPos(const QPointF &c0,
 }
 
 void SmartNodePoint::c0Moved(const QPointF &c0) {
-    currentPath()->actionSetNormalNodeC0(mNodeId, c0);
+    currentPath()->actionSetNormalNodeC0(getNodeId(), c0);
     if(mPrevNormalPoint)
         mPrevNormalPoint->afterNextNodeC0P1Changed();
     mParentAnimator->pathChanged();
 }
 
 void SmartNodePoint::c2Moved(const QPointF &c2) {
-    currentPath()->actionSetNormalNodeC2(mNodeId, c2);
+    currentPath()->actionSetNormalNodeC2(getNodeId(), c2);
     mNextNormalSegment.afterChanged();
     mParentAnimator->pathChanged();
 }
@@ -612,7 +589,7 @@ void SmartNodePoint::updateFromNodeDataPosOnly() {
         setRelativePosVal(mNode_d->fP1);
         mC2Pt->setRelativePosVal(mNode_d->getC2());
     } else if(mNode_d->isDissolved()) {
-        currentPath()->updateDissolvedNodePosition(mNodeId);
+        currentPath()->updateDissolvedNodePosition(getNodeId());
         setRelativePosVal(mNode_d->fP1);
     }
 }
