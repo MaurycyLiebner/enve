@@ -10,7 +10,7 @@ public:
     void update();
     void frameChangeUpdate();
 private:
-    PathBox * const mTarget;
+    const qptr<PathBox> mTarget;
 };
 
 #endif // NODEPOINTUPDATER_H

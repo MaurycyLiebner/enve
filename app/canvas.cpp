@@ -161,12 +161,12 @@ void Canvas::updateHoveredBox() {
 
 void Canvas::updateHoveredPoint() {
     mHoveredPoint_d = getPointAtAbsPos(mCurrentMouseEventPosRel,
-                               mCurrentMode,
-                               1/mCanvasTransformMatrix.m11());
+                                       mCurrentMode,
+                                       1/mCanvasTransformMatrix.m11());
 }
 
 void Canvas::updateHoveredEdge() {
-    if(mCurrentMode != MOVE_POINT) {
+    if(mCurrentMode != MOVE_POINT || mHoveredPoint_d) {
         clearHoveredEdge();
         return;
     }
@@ -177,7 +177,7 @@ void Canvas::updateHoveredEdge() {
 
 void Canvas::updateHoveredElements() {
     updateHoveredPoint();
-    if(!mHoveredPoint_d) updateHoveredEdge();
+    updateHoveredEdge();
     updateHoveredBox();
 }
 
@@ -643,8 +643,7 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
 
     mCurrentMode = mode;
     mSelecting = false;
-    mHoveredPoint_d = nullptr;
-    clearHoveredEdge();
+    updateHoveredElements();
     clearPointsSelection();
     clearCurrentSmartEndPoint();
     clearCurrentEndPoint();

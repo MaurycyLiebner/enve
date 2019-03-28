@@ -5,11 +5,13 @@ NodePointUpdater::NodePointUpdater(PathBox * const pathBox) :
     mTarget(pathBox) {}
 
 void NodePointUpdater::update() {
+    if(!mTarget) return;
     mTarget->scheduleUpdate(Animator::USER_CHANGE);
     mTarget->setPathsOutdated();
 }
 
 void NodePointUpdater::frameChangeUpdate() {
+    if(!mTarget) return;
     mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
     mTarget->setPathsOutdated();
 }
