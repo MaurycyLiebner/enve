@@ -188,6 +188,7 @@ public:
     }
 
     const PathPointsHandler * getHandler();
+    void testNode_TEST();
 protected:
     SmartNodePoint(PathPointsHandler * const handler,
                    SmartPathAnimator * const parentAnimator,

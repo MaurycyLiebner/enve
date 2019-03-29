@@ -93,12 +93,19 @@ void PathPointsHandler::updatePoint(SmartNodePoint * const pt,
     pt->setNode(targetPath()->getNodePtr(nodeId));
 }
 
+void PathPointsHandler::testNode_TEST(const int& nodeId) {
+    const auto& pt = mPoints.at(nodeId);
+    pt->testNode_TEST();
+}
+
 void PathPointsHandler::updateAllPoints() {
     if(mBlockAllPointsUpdate) return;
     const int newCount = targetPath()->getNodeCount();
     while(newCount < mPoints.count()) mPoints.removeLast();
     while(mPoints.count() < newCount) createNewNodePoint(mPoints.count());
     for(int i = 0; i < mPoints.count(); i++) updatePoint(i);
+
+    for(int i = 0; i < mPoints.count(); i++) testNode_TEST(i);
 }
 
 void PathPointsHandler::setCtrlsMode(const int &nodeId,

@@ -418,10 +418,7 @@ const PathPointsHandler *SmartNodePoint::getHandler() {
 }
 
 void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
-    if(prevPoint ? prevPoint->getType() != Node::NORMAL : false)
-        RuntimeThrow("Only NORMAL nodes supported");
-    if(mPrevNormalPoint == this)
-        RuntimeThrow("Node cannot point to itself");
+    if(mPrevNormalPoint == this) RuntimeThrow("Node cannot point to itself");
     mPrevNormalPoint = prevPoint;
     updateC0Visibility();
 }
@@ -540,6 +537,24 @@ void SmartNodePoint::updateFromNodeDataPosOnly() {
         currentPath()->updateDissolvedNodePosition(getNodeId());
         setRelativePosVal(mNode_d->fP1);
     }
+}
+
+void SmartNodePoint::testNode_TEST() {
+    Q_ASSERT(mNode_d);
+
+    const int prevNodeId = currentPath()->prevNodeId(mNode_d->getNodeId());
+    const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
+    Q_ASSERT(prevNode == mPrevPoint);
+
+    const int nextNodeId = currentPath()->nextNodeId(mNode_d->getNodeId());
+    const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
+    Q_ASSERT(nextNode == mNextPoint);
+
+    const auto prevNormalNode = mHandler_k->getPrevNormalNode(getNodeId());
+    Q_ASSERT(prevNormalNode == mPrevNormalPoint);
+
+    const auto nextNormalNode = mHandler_k->getNextNormalNode(getNodeId());
+    Q_ASSERT(nextNormalNode == mNextNormalPoint);
 }
 
 void SmartNodePoint::updateFromNodeData() {

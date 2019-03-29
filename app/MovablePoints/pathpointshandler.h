@@ -88,6 +88,7 @@ private:
     }
     void updatePoint(const int& nodeId);
     void updatePoint(SmartNodePoint * const pt, const int &nodeId);
+    void testNode_TEST(const int &nodeId);
 
     SmartNodePoint* createNewNodePoint(const int& nodeId);
     SmartNodePoint* createAndAssignNewNodePoint(const int& nodeId);

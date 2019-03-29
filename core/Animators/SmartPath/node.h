@@ -138,6 +138,11 @@ public:
         return mList.at(id).get();
     }
 
+    stdsptr<Node> atSPtr(const int& id) const {
+        if(id < 0 || id >= count()) RuntimeThrow("Index out of range.");
+        return mList.at(id);
+    }
+
     Node* first() const {
         return at(0);
     }
@@ -220,8 +225,10 @@ public:
 
     void prependNodesShallowCopy(const ListOfNodes& src) {
         if(src.isEmpty()) return;
-        for(const auto& node : src)
+        for(int i = src.count() - 1; i >= 0; i--) {
+            const auto node = src.atSPtr(i);
             mList.prepend(node);
+        }
         updateNodeIds();
     }
 
