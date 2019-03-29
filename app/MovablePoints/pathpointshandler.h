@@ -80,8 +80,15 @@ protected:
                       SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
 private:
-    void updateNextSegmentDnDForPoint(const int& nodeId);
+    void updatePoints(int min, int max) {
+        const int lastId = mPoints.count() - 1;
+        min = clamp(min, 0, lastId);
+        max = clamp(max, 0, lastId);
+        for(int i = min; i <= max; i++) updatePoint(i);
+    }
     void updatePoint(const int& nodeId);
+    void updatePoint(SmartNodePoint * const pt, const int &nodeId);
+
     SmartNodePoint* createNewNodePoint(const int& nodeId);
     SmartNodePoint* createAndAssignNewNodePoint(const int& nodeId);
     SmartPath* targetPath() const;

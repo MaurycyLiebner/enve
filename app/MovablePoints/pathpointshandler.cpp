@@ -51,13 +51,13 @@ void PathPointsHandler::drawPoints(SkCanvas * const canvas,
     const bool keyOnCurrentFrame = mKeyOnCurrentFrame;
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
-            auto point = mPoints.at(i);
+            const auto& point = mPoints.at(i);
             point->drawNodePoint(canvas, currentCanvasMode, invScale,
                                  keyOnCurrentFrame);
         }
     } else if(currentCanvasMode == CanvasMode::ADD_SMART_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
-            auto point = mPoints.at(i);
+            const auto& point = mPoints.at(i);
             if(point->isEndPoint() || point->isSelected()) {
                 point->drawNodePoint(canvas, currentCanvasMode, invScale,
                                      keyOnCurrentFrame);
@@ -75,7 +75,7 @@ SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
 
 SmartNodePoint *PathPointsHandler::createAndAssignNewNodePoint(const int &nodeId) {
     const auto newPt = createNewNodePoint(nodeId);
-    newPt->setNode(targetPath()->getNodePtr(nodeId));
+    updatePoint(newPt, nodeId);
     return newPt;
 }
 
@@ -83,28 +83,22 @@ SmartPath *PathPointsHandler::targetPath() const {
     return mTargetAnimator->getCurrentlyEditedPath();
 }
 
-void PathPointsHandler::updateNextSegmentDnDForPoint(const int &nodeId) {
-    mPoints.at(nodeId)->updateNextSegmentDnD();
+void PathPointsHandler::updatePoint(const int &nodeId) {
+    const auto& pt = mPoints.at(nodeId);
+    updatePoint(pt.get(), nodeId);
 }
 
-void PathPointsHandler::updatePoint(const int &nodeId) {
-    const auto pt = mPoints.at(nodeId);
+void PathPointsHandler::updatePoint(SmartNodePoint * const pt,
+                                    const int &nodeId) {
     pt->setNode(targetPath()->getNodePtr(nodeId));
 }
 
 void PathPointsHandler::updateAllPoints() {
     if(mBlockAllPointsUpdate) return;
     const int newCount = targetPath()->getNodeCount();
-    while(newCount < mPoints.count()) {
-        mPoints.removeLast();
-    }
-    while(mPoints.count() < newCount) {
-        createNewNodePoint(mPoints.count());
-    }
-    for(int i = 0; i < mPoints.count(); i++) {
-        auto& pt = mPoints[i];
-        pt->setNode(targetPath()->getNodePtr(i));
-    }
+    while(newCount < mPoints.count()) mPoints.removeLast();
+    while(mPoints.count() < newCount) createNewNodePoint(mPoints.count());
+    for(int i = 0; i < mPoints.count(); i++) updatePoint(i);
 }
 
 void PathPointsHandler::setCtrlsMode(const int &nodeId,
@@ -141,7 +135,11 @@ void PathPointsHandler::promoteToNormal(const int &nodeId) {
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionPromoteDissolvedNodeToNormal(nodeId);
     unblockAllPointsUpdate();
-    updatePoint(nodeId);
+
+    const int prevNormalId = targetPath()->prevNormalId(nodeId);
+    const int nextNormalId = targetPath()->nextNormalId(nodeId);
+    updatePoints(qMin(prevNormalId, nextNormalId),
+                 qMax(prevNormalId, nextNormalId));
 }
 
 bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
@@ -166,19 +164,8 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
     const int nextNodeId = nextPt->getNodeId();
     if(nextNodeId == nodeId) return false;
 
-    const int oldPrevNodeId = targetPath()->prevNodeId(nodeId);
-    const int oldNextNodeId = targetPath()->nextNodeId(nodeId);
-    blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionMoveNodeBetween(nodeId, prevNodeId, nextNodeId);
-    updatePoint(nodeId);
-    updatePoint(prevNodeId);
-    updatePoint(nextNodeId);
-    if(oldPrevNodeId != -1) updatePoint(oldPrevNodeId);
-    if(oldNextNodeId != -1) updatePoint(oldNextNodeId);
-    if(oldPrevNodeId != -1) updateNextSegmentDnDForPoint(oldPrevNodeId);
-    updateNextSegmentDnDForPoint(prevNodeId);
-    unblockAllPointsUpdate();
     return true;
 }
 

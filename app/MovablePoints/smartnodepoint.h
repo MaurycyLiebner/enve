@@ -155,9 +155,6 @@ public:
         updateFromNodeData();
     }
 
-    void updateNextSegmentDnD() {
-        mNextNormalSegment.updateDnD();
-    }
     void updateFromNodeData();
     void updateFromNodeDataPosOnly();
 
@@ -180,6 +177,14 @@ public:
 
     const Node* getTargetNode() const {
         return mNode_d;
+    }
+
+    void clear() {
+        mNode_d = nullptr;
+        setPrevPoint(nullptr);
+        setNextPoint(nullptr);
+        setPrevNormalPoint(nullptr);
+        setNextNormalPoint(nullptr);
     }
 
     const PathPointsHandler * getHandler();

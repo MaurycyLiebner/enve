@@ -448,17 +448,13 @@ bool SmartNodePoint::hasPrevPoint() const {
 }
 
 void SmartNodePoint::setPrevPoint(SmartNodePoint * const prevPoint) {
-    if(prevPoint == this)
-        RuntimeThrow("Node cannot point to itself");
+    if(prevPoint == this) RuntimeThrow("Node cannot point to itself");
     mPrevPoint = prevPoint;
-    //updatePrevNormalNode();
 }
 
 void SmartNodePoint::setNextPoint(SmartNodePoint * const nextPoint) {
-    if(nextPoint == this)
-        RuntimeThrow("Node cannot point to itself");
+    if(nextPoint == this) RuntimeThrow("Node cannot point to itself");
     mNextPoint = nextPoint;
-    //updateNextNormalNode();
 }
 
 bool SmartNodePoint::actionConnectToNormalPoint(
@@ -548,10 +544,7 @@ void SmartNodePoint::updateFromNodeDataPosOnly() {
 
 void SmartNodePoint::updateFromNodeData() {
     if(!mNode_d) {
-        setPrevPoint(nullptr);
-        setNextPoint(nullptr);
-        setPrevNormalPoint(nullptr);
-        setNextNormalPoint(nullptr);
+        clear();
         return;
     }
 
@@ -567,6 +560,7 @@ void SmartNodePoint::updateFromNodeData() {
 
     const auto prevNormalNode = mHandler_k->getPrevNormalNode(getNodeId());
     setPrevNormalPoint(prevNormalNode);
+
     const auto nextNormalNode = mHandler_k->getNextNormalNode(getNodeId());
     setNextNormalPoint(nextNormalNode);
 
