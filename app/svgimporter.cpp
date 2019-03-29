@@ -1972,7 +1972,7 @@ void BoxSvgAttributes::apply(BoundingBox *box) {
     }
 }
 
-void VectorPathSvgAttributes::apply(SmartVectorPath *path) {
+void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
     SmartPathCollection* const pathAnimator = path->getPathAnimator();
     for(const auto& separatePath : mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
@@ -2034,9 +2034,11 @@ void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
     }
 }
 
-void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
-                              int large_arc_flag, int sweep_flag,
-                              qreal x, qreal y, qreal curx, qreal cury) {
+void SvgSeparatePath::pathArc(qreal rX, qreal rY,
+                              const qreal &xAxisRotation,
+                              const int &largeArcFlag, const int &sweepFlag,
+                              const qreal &x, const qreal &y,
+                              const qreal &curX, const qreal &curY) {
     qreal sin_th, cos_th;
     qreal a00, a01, a10, a11;
     qreal x0, y0, x1, y1, xc, yc;
@@ -2045,33 +2047,33 @@ void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
     int i, n_segs;
     qreal dx, dy, dx1, dy1, Pr1, Pr2, Px, Py, check;
 
-    rx = qAbs(rx);
-    ry = qAbs(ry);
+    rX = qAbs(rX);
+    rY = qAbs(rY);
 
-    sin_th = qSin(x_axis_rotation * (M_PI / 180.0));
-    cos_th = qCos(x_axis_rotation * (M_PI / 180.0));
+    sin_th = qSin(xAxisRotation * (M_PI / 180.0));
+    cos_th = qCos(xAxisRotation * (M_PI / 180.0));
 
-    dx = (curx - x) / 2.0;
-    dy = (cury - y) / 2.0;
+    dx = (curX - x) / 2.0;
+    dy = (curY - y) / 2.0;
     dx1 =  cos_th * dx + sin_th * dy;
     dy1 = -sin_th * dx + cos_th * dy;
-    Pr1 = rx * rx;
-    Pr2 = ry * ry;
+    Pr1 = rX * rX;
+    Pr2 = rY * rY;
     Px = dx1 * dx1;
     Py = dy1 * dy1;
     /* Spec : check if radii are large enough */
     check = Px / Pr1 + Py / Pr2;
     if(check > 1) {
-        rx = rx * qSqrt(check);
-        ry = ry * qSqrt(check);
+        rX = rX * qSqrt(check);
+        rY = rY * qSqrt(check);
     }
 
-    a00 =  cos_th / rx;
-    a01 =  sin_th / rx;
-    a10 = -sin_th / ry;
-    a11 =  cos_th / ry;
-    x0 = a00 * curx + a01 * cury;
-    y0 = a10 * curx + a11 * cury;
+    a00 =  cos_th / rX;
+    a01 =  sin_th / rX;
+    a10 = -sin_th / rY;
+    a11 =  cos_th / rY;
+    x0 = a00 * curX + a01 * curY;
+    y0 = a10 * curX + a11 * curY;
     x1 = a00 * x + a01 * y;
     y1 = a10 * x + a11 * y;
     /* (x0, y0) is current point in transformed coordinate space.
@@ -2083,7 +2085,7 @@ void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
     sfactor_sq = 1.0 / d - 0.25;
     if(sfactor_sq < 0) sfactor_sq = 0;
     sfactor = qSqrt(sfactor_sq);
-    if(sweep_flag == large_arc_flag) sfactor = -sfactor;
+    if(sweepFlag == largeArcFlag) sfactor = -sfactor;
     xc = 0.5 * (x0 + x1) - sfactor * (y1 - y0);
     yc = 0.5 * (y0 + y1) + sfactor * (x1 - x0);
     /* (xc, yc) is center of the circle. */
@@ -2092,9 +2094,9 @@ void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
     th1 = qAtan2(y1 - yc, x1 - xc);
 
     th_arc = th1 - th0;
-    if(th_arc < 0 && sweep_flag)
+    if(th_arc < 0 && sweepFlag)
         th_arc += 2 * M_PI;
-    else if(th_arc > 0 && !sweep_flag)
+    else if(th_arc > 0 && !sweepFlag)
         th_arc -= 2 * M_PI;
 
     n_segs = qCeil(qAbs(th_arc / (M_PI * 0.5 + 0.001)));
@@ -2103,13 +2105,14 @@ void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
         pathArcSegment(xc, yc,
                        th0 + i * th_arc / n_segs,
                        th0 + (i + 1) * th_arc / n_segs,
-                       rx, ry, x_axis_rotation);
+                       rX, rY, xAxisRotation);
     }
 }
 
-void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc,
-                                     qreal th0, qreal th1,
-                                     qreal rx, qreal ry, qreal xAxisRotation) {
+void SvgSeparatePath::pathArcSegment(const qreal &xc, const qreal &yc,
+                                     const qreal &th0, const qreal &th1,
+                                     const qreal &rx, const qreal &ry,
+                                     const qreal& xAxisRotation) {
     qreal sinTh, cosTh;
     qreal a00, a01, a10, a11;
     qreal x1, y1, x2, y2, x3, y3;
@@ -2172,11 +2175,16 @@ void TextSvgAttributes::setFontAlignment(const Qt::Alignment &alignment) {
 }
 
 SvgNormalNode::SvgNormalNode(const QPointF& p1) {
-    mCtrlsMode = CTRLS_CORNER;
+    mC0 = p1;
     mP1 = p1;
+    mC2 = p1;
 }
 
 void SvgNormalNode::guessCtrlsMode() {
+    if(!mC0Enabled || !mC2Enabled) {
+        mCtrlsMode = CTRLS_CORNER;
+        return;
+    }
     const QLineF startLine(mC0, mP1);
     const QLineF endLine(mP1, mC2);
     qreal angle = startLine.angleTo(endLine);
@@ -2190,16 +2198,14 @@ void SvgNormalNode::guessCtrlsMode() {
 
 void SvgNormalNode::setC0(const QPointF &c0) {
     mC0 = c0;
-    if(isZero1Dec(pointToLen(mC0 - mP1))) return;
-    mC0Enabled = true;
-    if(mC2Enabled) guessCtrlsMode();
+    mC0Enabled = !isZero1Dec(pointToLen(mC0 - mP1));
+    if(mC0Enabled && mC2Enabled) guessCtrlsMode();
 }
 
 void SvgNormalNode::setC2(const QPointF &c2) {
     mC2 = c2;
-    if(isZero1Dec(pointToLen(mC2 - mP1))) return;
-    mC2Enabled = true;
-    if(mC0Enabled) guessCtrlsMode();
+    mC2Enabled = !isZero1Dec(pointToLen(mC2 - mP1));
+    if(mC0Enabled && mC2Enabled) guessCtrlsMode();
 }
 
 CtrlsMode SvgNormalNode::getCtrlsMode() const {

@@ -185,7 +185,7 @@ private:
 
     bool mC0Enabled = false;
     bool mC2Enabled = false;
-    CtrlsMode mCtrlsMode;
+    CtrlsMode mCtrlsMode = CTRLS_CORNER;
     QPointF mC0;
     QPointF mP1;
     QPointF mC2;
@@ -206,18 +206,18 @@ public:
     void lineTo(const QPointF &e);
     void cubicTo(const QPointF &c1, const QPointF &c2, const QPointF &e);
     void quadTo(const QPointF &c, const QPointF &e);
+    void pathArc(qreal rX, qreal rY,
+                 const qreal &xAxisRotation,
+                 const int &largeArcFlag, const int &sweepFlag,
+                 const qreal &x, const qreal &y,
+                 const qreal &curX, const qreal &curY);
 
     void applyTransfromation(const QMatrix &transformation);
-
-    void pathArc(qreal rx, qreal ry,
-                 qreal x_axis_rotation,
-                 int large_arc_flag, int sweep_flag,
-                 qreal x, qreal y,
-                 qreal curx, qreal cury);
 private:
-    void pathArcSegment(qreal xc, qreal yc,
-                        qreal th0, qreal th1,
-                        qreal rx, qreal ry, qreal xAxisRotation);
+    void pathArcSegment(const qreal &xc, const qreal &yc,
+                        const qreal &th0, const qreal &th1,
+                        const qreal &rx, const qreal &ry,
+                        const qreal &xAxisRotation);
 
     void addPoint(const SvgNormalNode &point);
 
@@ -236,7 +236,7 @@ public:
         mSvgSeparatePaths << lastPath;
         return lastPath.get();
     }
-    void apply(SmartVectorPath *path);
+    void apply(SmartVectorPath * const path);
 protected:
     QList<stdsptr<SvgSeparatePath>> mSvgSeparatePaths;
 };
