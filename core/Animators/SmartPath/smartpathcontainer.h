@@ -18,14 +18,15 @@ public:
     int actionAddFirstNode(const QPointF& c0,
                            const QPointF& p1,
                            const QPointF& c2);
+    int actionAddFirstNode(const NormalNodeData &data);
 
     void actionMoveNodeBetween(const int& movedNodeId,
                                const int& prevNodeId,
                                const int& nextNodeId);
 
     int actionAppendNodeAtEndNode(const int &endNodeId);
-    int actionAppendNodeAtEndNode(const int& endNodeId,
-                                  const NodePointValues &values);
+    int actionAppendNodeAtEndNode(const NodePointValues &values);
+    int actionAppendNodeAtEndNode();
 
     int actionInsertNodeBetween(const int &prevId,
                                 const int& nextId,
@@ -60,6 +61,14 @@ public:
         node->fC0 = c0;
         node->fP1 = p1;
         node->fC2 = c2;
+    }
+
+    void actionSetNormalNodeValues(const int& nodeId,
+                                   const NormalNodeData& data) {
+        Node * const node = mNodesList.at(nodeId);
+        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
+                                          "on a node of a different type");
+        node->setNormalData(data);
     }
 
     void actionSetNormalNodeP1(const int& nodeId, const QPointF& p1) {

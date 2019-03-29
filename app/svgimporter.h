@@ -113,13 +113,13 @@ protected:
     qreal mLineWidth = 0.;
 };
 
-class BoundingBoxSvgAttributes {
+class BoxSvgAttributes {
 public:
-    BoundingBoxSvgAttributes();
+    BoxSvgAttributes();
 
-    virtual ~BoundingBoxSvgAttributes();
+    virtual ~BoxSvgAttributes();
 
-    BoundingBoxSvgAttributes &operator*=(const BoundingBoxSvgAttributes &overwritter);
+    BoxSvgAttributes &operator*=(const BoxSvgAttributes &overwritter);
 
     const Qt::FillRule &getFillRule() const;
     const QMatrix &getRelTransform() const;
@@ -158,55 +158,53 @@ protected:
     TextSvgAttributes mTextAttributes;
 };
 
-class SvgNodePoint {
+struct NormalNodeData;
+class SvgNormalNode {
 public:
-    SvgNodePoint(QPointF point);
+    SvgNormalNode(const QPointF &p1);
 
-    void guessCtrlsMode();
-
-    void setStartPoint(const QPointF &startPoint);
-
-    void setEndPoint(const QPointF &endPoint);
+    void setC0(const QPointF &c0);
+    void setP1(const QPointF& p1) {
+        mP1 = p1;
+    }
+    void setC2(const QPointF &c2);
 
     CtrlsMode getCtrlsMode() const;
+    QPointF c0() const;
+    QPointF p1() const;
+    QPointF c2() const;
 
-    QPointF getPoint() const;
-
-    QPointF getStartPoint() const;
-
-    QPointF getEndPoint() const;
-
-    bool getStartPointEnabled() const;
-
-    bool getEndPointEnabled() const;
+    bool getC0Enabled() const;
+    bool getC2Enabled() const;
 
     void applyTransfromation(const QMatrix &transformation);
+
+    NormalNodeData toNormalNodeData() const;
 private:
-    bool mStartPointSet = false;
-    bool mEndPointSet = false;
+    void guessCtrlsMode();
+
+    bool mC0Enabled = false;
+    bool mC2Enabled = false;
     CtrlsMode mCtrlsMode;
-    QPointF mStartPoint;
-    QPointF mEndPoint;
-    QPointF mPoint;
+    QPointF mC0;
+    QPointF mP1;
+    QPointF mC2;
 };
 
 class PathAnimator;
 class VectorPathAnimator;
 class SmartPathAnimator;
-class SvgSeparatePath : public StdSelfRef {
-    friend class StdSelfRef;
+class SvgSeparatePath {
 public:
-    void apply(VectorPathAnimator *path);
-    void apply(SmartPathAnimator *path);
+    SvgSeparatePath() {}
+
+    void apply(SmartPathAnimator * const path);
 
     void closePath();
 
     void moveTo(const QPointF &e);
-
-    void cubicTo(const QPointF &c1, const QPointF &c2, const QPointF &e);
-
     void lineTo(const QPointF &e);
-
+    void cubicTo(const QPointF &c1, const QPointF &c2, const QPointF &e);
     void quadTo(const QPointF &c, const QPointF &e);
 
     void applyTransfromation(const QMatrix &transformation);
@@ -216,38 +214,36 @@ public:
                  int large_arc_flag, int sweep_flag,
                  qreal x, qreal y,
                  qreal curx, qreal cury);
-protected:
-    SvgSeparatePath() {}
 private:
     void pathArcSegment(qreal xc, qreal yc,
                         qreal th0, qreal th1,
                         qreal rx, qreal ry, qreal xAxisRotation);
 
-    void addPoint(const SvgNodePoint &point);
+    void addPoint(const SvgNormalNode &point);
 
     bool mClosedPath = false;
-    SvgNodePoint * mLastPoint = nullptr;
-    QList<SvgNodePoint> mPoints;
+    SvgNormalNode * mLastPoint = nullptr;
+    QList<SvgNormalNode> mPoints;
 };
 
-
-class VectorPathSvgAttributes : public BoundingBoxSvgAttributes {
+class SmartVectorPath;
+class VectorPathSvgAttributes : public BoxSvgAttributes {
 public:
     VectorPathSvgAttributes() {}
 
     SvgSeparatePath *newSeparatePath() {
-        auto lastPath = SPtrCreate(SvgSeparatePath)();
+        auto lastPath = std::make_shared<SvgSeparatePath>();
         mSvgSeparatePaths << lastPath;
         return lastPath.get();
     }
-    void apply(VectorPath *path);
+    void apply(SmartVectorPath *path);
 protected:
     QList<stdsptr<SvgSeparatePath>> mSvgSeparatePaths;
 };
 
 
 extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
-                        BoundingBoxSvgAttributes *parentGroupAttributes);
+                        BoxSvgAttributes *parentGroupAttributes);
 extern qsptr<BoxesGroup> loadSVGFile(const QString &filename);
 /*
 #include <QStringRef>

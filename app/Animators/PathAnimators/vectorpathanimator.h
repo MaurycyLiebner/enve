@@ -12,7 +12,6 @@ class NodePoint;
 class VectorPathEdge;
 class Canvas;
 class MovablePoint;
-class SvgNodePoint;
 class BasicTransformAnimator;
 enum CanvasMode : short;
 

@@ -28,23 +28,26 @@ int SmartPath::actionAddFirstNode(const QPointF &c0,
     return insertId;
 }
 
+int SmartPath::actionAddFirstNode(const NormalNodeData& data) {
+    const int insertId = mNodesList.appendNode(Node(data));
+    return insertId;
+}
+
 int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId) {
     Node * const endNode = mNodesList.at(endNodeId);
     if(!endNode->isNormal())
-        RuntimeThrow("Invalid node type. "
-                     "End nodes should always be NORMAL.");
+        RuntimeThrow("Invalid node type. End nodes should always be NORMAL.");
     const NodePointValues vals = {endNode->fP1, endNode->fP1, endNode->fP1};
-    return actionAppendNodeAtEndNode(endNodeId, vals);
+    return actionAppendNodeAtEndNode(vals);
 }
 
-int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId,
-                                         const NodePointValues &values) {
-    Node * const endNode = mNodesList.at(endNodeId);
-    if(!endNode->isNormal())
-        RuntimeThrow("Invalid node type. "
-                     "End nodes should always be NORMAL.");
-    return mNodesList.insertNodeAfter(endNodeId,
-                                      Node(values.fC0, values.fP1, values.fC2));
+int SmartPath::actionAppendNodeAtEndNode(const NodePointValues &values) {
+    return mNodesList.appendNode(Node(values.fC0, values.fP1, values.fC2));
+}
+
+int SmartPath::actionAppendNodeAtEndNode() {
+    if(mNodesList.count() == 0) RuntimeThrow("Cannot append new node ");
+    return actionAppendNodeAtEndNode(mNodesList.count() - 1);
 }
 
 int SmartPath::insertNodeBetween(const int& prevId,

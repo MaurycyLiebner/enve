@@ -500,7 +500,7 @@ void SmartNodePoint::actionDisconnectFromNormalPoint(
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
-    return mHandler_k->addNewAtEnd(getNodeId(), relPos);
+    return mHandler_k->addNewAtEnd(relPos);
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {

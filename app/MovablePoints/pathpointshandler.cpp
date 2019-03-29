@@ -129,10 +129,9 @@ SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {
     return createAndAssignNewNodePoint(id);
 }
 
-SmartNodePoint* PathPointsHandler::addNewAtEnd(const int &nodeId,
-                                               const QPointF &relPos) {
+SmartNodePoint* PathPointsHandler::addNewAtEnd(const QPointF &relPos) {
     blockAllPointsUpdate();
-    const int id = mTargetAnimator->actionAddNewAtEnd(nodeId, relPos);
+    const int id = mTargetAnimator->actionAddNewAtEnd(relPos);
     unblockAllPointsUpdate();
     return createAndAssignNewNodePoint(id);
 }

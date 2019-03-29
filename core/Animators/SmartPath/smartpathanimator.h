@@ -196,26 +196,36 @@ public:
         prp_updateInfluenceRangeAfterChanged();
     }
 
-    int actionAddNewAtEnd(const int& nodeId,
-                          const QPointF &relPos) {
+    int actionAddNewAtEnd(const QPointF &relPos) {
+        return actionAddNewAtEnd({false, false, CTRLS_SYMMETRIC,
+                                  relPos, relPos, relPos});
+    }
+
+    int actionAddNewAtEnd(const NormalNodeData &data) {
+        if(mBaseValue.getNodeCount() == 0)
+            return actionAddFirstNode(data);
         beforeBinaryPathChange();
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
-            spKey->getValue().actionAppendNodeAtEndNode(nodeId);
+            spKey->getValue().actionAppendNodeAtEndNode();
         }
-        const int id = mBaseValue.actionAppendNodeAtEndNode(nodeId);
-        getCurrentlyEditedPath()->actionSetNormalNodeValues(
-                    id, relPos, relPos, relPos);
+        const int id = mBaseValue.actionAppendNodeAtEndNode();
+        getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
         prp_updateInfluenceRangeAfterChanged();
         return id;
     }
 
     int actionAddFirstNode(const QPointF &relPos) {
+        return actionAddFirstNode({false, false, CTRLS_SYMMETRIC,
+                                   relPos, relPos, relPos});
+    }
+
+    int actionAddFirstNode(const NormalNodeData &data) {
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
-            spKey->getValue().actionAddFirstNode(relPos, relPos, relPos);
+            spKey->getValue().actionAddFirstNode(data);
         }
-        const int id = mBaseValue.actionAddFirstNode(relPos, relPos, relPos);
+        const int id = mBaseValue.actionAddFirstNode(data);
         prp_updateInfluenceRangeAfterChanged();
         return id;
     }
@@ -248,6 +258,10 @@ public:
         }
         mBaseValue.actionConnectNodes(node1Id, node2Id);
         prp_updateInfluenceRangeAfterChanged();
+    }
+
+    void actionClose() {
+        actionConnectNodes(0, mBaseValue.getNodeCount() - 1);
     }
 
     void actionDisconnectNodes(const int &node1Id, const int &node2Id);

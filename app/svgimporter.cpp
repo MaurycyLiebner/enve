@@ -14,7 +14,10 @@
 #include "GUI/mainwindow.h"
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
-
+#include "Boxes/smartvectorpath.h"
+#include "Animators/SmartPath/smartpathcollection.h"
+#include "Animators/SmartPath/smartpathanimator.h"
+#include "MovablePoints/smartnodepoint.h"
 // '0' is 0x30 and '9' is 0x39
 static bool isDigit(ushort ch) {
     static quint16 magic = 0x3ff;
@@ -527,7 +530,7 @@ bool parsePolylineDataFast(const QString &dataStr,
 
 qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
                            BoxesGroup *parentGroup,
-                           BoundingBoxSvgAttributes *attributes) {
+                           BoxSvgAttributes *attributes) {
     QDomNodeList allRootChildNodes = groupElement.childNodes();
     qsptr<BoxesGroup> boxesGroup;
     bool hasTransform = attributes->hasTransform();
@@ -554,7 +557,7 @@ qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
 void loadVectorPath(const QDomElement &pathElement,
                     BoxesGroup *parentGroup,
                     VectorPathSvgAttributes *attributes) {
-    const auto vectorPath = SPtrCreate(VectorPath)();
+    const auto vectorPath = SPtrCreate(SmartVectorPath)();
     const QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
     attributes->apply(vectorPath.get());
@@ -564,9 +567,8 @@ void loadVectorPath(const QDomElement &pathElement,
 void loadPolyline(const QDomElement &pathElement,
                   BoxesGroup *parentGroup,
                   VectorPathSvgAttributes *attributes) {
-    auto vectorPath = SPtrCreate(VectorPath)();
-
-    QString pathStr = pathElement.attribute("points");
+    auto vectorPath = SPtrCreate(SmartVectorPath)();
+    const QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
     attributes->apply(vectorPath.get());
     parentGroup->addContainedBox(vectorPath);
@@ -574,13 +576,13 @@ void loadPolyline(const QDomElement &pathElement,
 
 void loadCircle(const QDomElement &pathElement,
                 BoxesGroup *parentGroup,
-                BoundingBoxSvgAttributes *attributes) {
+                BoxSvgAttributes *attributes) {
 
-    QString cXstr = pathElement.attribute("cx");
-    QString cYstr = pathElement.attribute("cy");
-    QString rStr = pathElement.attribute("r");
-    QString rXstr = pathElement.attribute("rx");
-    QString rYstr = pathElement.attribute("ry");
+    const QString cXstr = pathElement.attribute("cx");
+    const QString cYstr = pathElement.attribute("cy");
+    const QString rStr = pathElement.attribute("r");
+    const QString rXstr = pathElement.attribute("rx");
+    const QString rYstr = pathElement.attribute("ry");
 
     qsptr<Circle> circle;
     if(!rStr.isEmpty()) {
@@ -590,9 +592,7 @@ void loadCircle(const QDomElement &pathElement,
         circle = SPtrCreate(Circle)();
         circle->setHorizontalRadius(rXstr.toDouble());
         circle->setVerticalRadius(rYstr.toDouble());
-    } else {
-        return;
-    }
+    } else return;
 
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
 
@@ -602,28 +602,24 @@ void loadCircle(const QDomElement &pathElement,
 
 void loadRect(const QDomElement &pathElement,
               BoxesGroup *parentGroup,
-              BoundingBoxSvgAttributes *attributes) {
+              BoxSvgAttributes *attributes) {
 
-    QString xStr = pathElement.attribute("x");
-    QString yStr = pathElement.attribute("y");
-    QString wStr = pathElement.attribute("width");
-    QString hStr = pathElement.attribute("height");
+    const QString xStr = pathElement.attribute("x");
+    const QString yStr = pathElement.attribute("y");
+    const QString wStr = pathElement.attribute("width");
+    const QString hStr = pathElement.attribute("height");
     QString rYstr = pathElement.attribute("ry");
     QString rXstr = pathElement.attribute("rx");
 
-    if(rYstr.isEmpty()) {
-        rYstr = rXstr;
-    } else if(rXstr.isEmpty()) {
-        rXstr = rYstr;
-    }
+    if(rXstr.isEmpty() && rYstr.isEmpty()) return;
+    if(rYstr.isEmpty()) rYstr = rXstr;
+    else if(rXstr.isEmpty()) rXstr = rYstr;
 
     auto rect = SPtrCreate(Rectangle)();
 
-    rect->moveByRel(QPointF(xStr.toDouble(),
-                            yStr.toDouble()));
-    rect->setTopLeftPos(QPointF(0., 0.));
-    rect->setBottomRightPos(QPointF(wStr.toDouble(),
-                                    hStr.toDouble()));
+    rect->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
+    rect->setTopLeftPos(QPointF(0, 0));
+    rect->setBottomRightPos(QPointF(wStr.toDouble(), hStr.toDouble()));
     rect->setYRadius(rYstr.toDouble());
     rect->setXRadius(rXstr.toDouble());
 
@@ -634,15 +630,14 @@ void loadRect(const QDomElement &pathElement,
 
 void loadText(const QDomElement &pathElement,
               BoxesGroup *parentGroup,
-              BoundingBoxSvgAttributes *attributes) {
+              BoxSvgAttributes *attributes) {
 
-    QString xStr = pathElement.attribute("x");
-    QString yStr = pathElement.attribute("y");
+    const QString xStr = pathElement.attribute("x");
+    const QString yStr = pathElement.attribute("y");
 
-    auto textBox = SPtrCreate(TextBox)();
+    const auto textBox = SPtrCreate(TextBox)();
 
-    textBox->moveByRel(QPointF(xStr.toDouble(),
-                               yStr.toDouble()));
+    textBox->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
     textBox->setCurrentValue(pathElement.text());
 
     attributes->apply(textBox.data());
@@ -651,10 +646,10 @@ void loadText(const QDomElement &pathElement,
 
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
-                 BoundingBoxSvgAttributes *parentGroupAttributes) {
+                 BoxSvgAttributes *parentGroupAttributes) {
     if(element.tagName() == "g" ||
        element.tagName() == "text") {
-        BoundingBoxSvgAttributes attributes;
+        BoxSvgAttributes attributes;
         attributes *= (*parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         loadBoxesGroup(element, parentGroup, &attributes);
@@ -670,17 +665,17 @@ void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
         loadPolyline(element, parentGroup, &attributes);
     } else if(element.tagName() == "circle" ||
               element.tagName() == "ellipse") {
-        BoundingBoxSvgAttributes attributes;
+        BoxSvgAttributes attributes;
         attributes *= (*parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         loadCircle(element, parentGroup, &attributes);
     } else if(element.tagName() == "rect") {
-        BoundingBoxSvgAttributes attributes;
+        BoxSvgAttributes attributes;
         attributes *= (*parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         loadRect(element, parentGroup, &attributes);
     } else if(element.tagName() == "tspan") {
-        BoundingBoxSvgAttributes attributes;
+        BoxSvgAttributes attributes;
         attributes *= (*parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         loadText(element, parentGroup, &attributes);
@@ -688,10 +683,10 @@ void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
 }
 
 bool getUrlId(const QString &urlStr, QString *id) {
-    QRegExp rx = QRegExp("url\\(\\s*#(.*)\\)", Qt::CaseInsensitive);
+    const QRegExp rx = QRegExp("url\\(\\s*#(.*)\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(urlStr)) {
         rx.indexIn(urlStr);
-        QStringList capturedTxt = rx.capturedTexts();
+        const QStringList capturedTxt = rx.capturedTexts();
         *id = capturedTxt.at(1);
         return true;
     }
@@ -703,14 +698,12 @@ bool getGradientFromString(const QString &colorStr, FillSvgAttributes *target,
                            GradientsSvgCollection *collection) {
     Gradient* gradient = nullptr;
 
-    QRegExp rx = QRegExp("url\\(\\s*(.*)\\s*\\)", Qt::CaseInsensitive);
+    const QRegExp rx = QRegExp("url\\(\\s*(.*)\\s*\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(colorStr)) {
-        QStringList capturedTxt = rx.capturedTexts();
-        QString id = capturedTxt.at(1);
+        const QStringList capturedTxt = rx.capturedTexts();
+        const QString id = capturedTxt.at(1);
         gradient = collection->getGradientWithId(id);
-    } else {
-        return false;
-    }
+    } else return false;
 
     if(gradient) {
         target->setPaintType(GRADIENTPAINT);
@@ -758,17 +751,17 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
     QMatrix matrix;
     if(matrixStr.isEmpty()) return matrix;
 
-    QRegExp rx = QRegExp("matrix\\("
-                         "\\s*(-?\\d+(\\.\\d*)?),"
-                         "\\s*(-?\\d+(\\.\\d*)?),"
-                         "\\s*(-?\\d+(\\.\\d*)?),"
-                         "\\s*(-?\\d+(\\.\\d*)?),"
-                         "\\s*(-?\\d+(\\.\\d*)?),"
-                         "\\s*(-?\\d+(\\.\\d*)?)"
-                         "\\)", Qt::CaseInsensitive);
+    const QRegExp rx("matrix\\("
+                     "\\s*(-?\\d+(\\.\\d*)?),"
+                     "\\s*(-?\\d+(\\.\\d*)?),"
+                     "\\s*(-?\\d+(\\.\\d*)?),"
+                     "\\s*(-?\\d+(\\.\\d*)?),"
+                     "\\s*(-?\\d+(\\.\\d*)?),"
+                     "\\s*(-?\\d+(\\.\\d*)?)"
+                     "\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(matrixStr)) {
         rx.indexIn(matrixStr);
-        QStringList capturedTxt = rx.capturedTexts();
+        const QStringList capturedTxt = rx.capturedTexts();
         matrix.setMatrix(capturedTxt.at(1).toDouble(),
                          capturedTxt.at(3).toDouble(),
                          capturedTxt.at(5).toDouble(),
@@ -776,32 +769,32 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
                          capturedTxt.at(9).toDouble(),
                          capturedTxt.at(11).toDouble());
     } else {
-        QRegExp rx2 = QRegExp("translate\\("
-                             "\\s*(-?\\d+(\\.\\d*)?),"
-                             "\\s*(-?\\d+(\\.\\d*)?)"
-                             "\\)", Qt::CaseInsensitive);
+        const QRegExp rx2("translate\\("
+                          "\\s*(-?\\d+(\\.\\d*)?),"
+                          "\\s*(-?\\d+(\\.\\d*)?)"
+                          "\\)", Qt::CaseInsensitive);
         if(rx2.exactMatch(matrixStr)) {
             rx2.indexIn(matrixStr);
-            QStringList capturedTxt = rx2.capturedTexts();
+            const QStringList capturedTxt = rx2.capturedTexts();
             matrix.translate(capturedTxt.at(1).toDouble(),
                              capturedTxt.at(3).toDouble());
         } else {
-            QRegExp rx3 = QRegExp("scale\\("
-                                 "\\s*(-?\\d+(\\.\\d*)?),"
-                                 "\\s*(-?\\d+(\\.\\d*)?)"
-                                 "\\)", Qt::CaseInsensitive);
+            const QRegExp rx3("scale\\("
+                              "\\s*(-?\\d+(\\.\\d*)?),"
+                              "\\s*(-?\\d+(\\.\\d*)?)"
+                              "\\)", Qt::CaseInsensitive);
             if(rx3.exactMatch(matrixStr)) {
                 rx3.indexIn(matrixStr);
-                QStringList capturedTxt = rx3.capturedTexts();
+                const QStringList capturedTxt = rx3.capturedTexts();
                 matrix.scale(capturedTxt.at(1).toDouble(),
                              capturedTxt.at(3).toDouble());
             } else {
-                QRegExp rx4 = QRegExp("rotate\\("
-                                     "\\s*(-?\\d+(\\.\\d*)?)"
-                                     "\\)", Qt::CaseInsensitive);
+                const QRegExp rx4("rotate\\("
+                                  "\\s*(-?\\d+(\\.\\d*)?)"
+                                  "\\)", Qt::CaseInsensitive);
                 if(rx4.exactMatch(matrixStr)) {
                     rx4.indexIn(matrixStr);
-                    QStringList capturedTxt = rx4.capturedTexts();
+                    const QStringList capturedTxt = rx4.capturedTexts();
                     matrix.rotate(capturedTxt.at(1).toDouble());
                 } else {
                     qDebug() << "getMatrixFromString - could not extract values from string: "
@@ -820,9 +813,9 @@ qsptr<BoxesGroup> loadSVGFile(const QString &filename) {
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
         if(document.setContent(&file) ) {
-            QDomElement rootElement = document.firstChildElement("svg");
+            const QDomElement rootElement = document.firstChildElement("svg");
             if(!rootElement.isNull()) {
-                BoundingBoxSvgAttributes attributes;
+                BoxSvgAttributes attributes;
                 return loadBoxesGroup(rootElement, nullptr, &attributes);
             } else {
                 qDebug() << "File does not have svg root element";
@@ -836,122 +829,39 @@ qsptr<BoxesGroup> loadSVGFile(const QString &filename) {
     return nullptr;
 }
 
-//bool getRotationScaleFromMatrixIfNoShear(const QMatrix &matrix,
-//                                         qreal *rot,
-//                                         qreal *sx, qreal *sy) {
-//    qreal m11 = matrix.m11();
-//    qreal m12 = matrix.m12();
-//    qreal m21 = matrix.m21();
-//    qreal m22 = matrix.m22();
-
-//    bool scalesDifferentSign = (isZero(m11) || isZero(m22)) ?
-//                                m12*m21 > 0. : m11*m22 < 0.;
-//    bool cosSinDifferentSign = (isZero(m11) || isZero(m12)) ?
-//                                (m21*m22 > 0.) != scalesDifferentSign :
-//                                (m11*m12 < 0.) != scalesDifferentSign;
-//    qreal sxAbs = qSqrt(m11*m11 + m21*m21);
-//    qreal syAbs = qSqrt(m12*m12 + m22*m22);
-//    qreal rotT = 0.;
-//    qreal sxT = 1.;
-//    qreal syT = 1.;
-//    for(int i = 0; i < 2; i++) {
-//        sxT = (i == 0) ? -sxAbs : sxAbs;
-//        syT = (i == 0) ?
-//                     ((scalesDifferentSign) ? syAbs : -syAbs) :
-//                     ((scalesDifferentSign) ? -syAbs : syAbs);
-
-//        qreal rotM11T = m11/sxT;
-//        qreal rotM12T = m12/syT;
-//        qreal rotM21T = m21/sxT;
-//        qreal rotM22T = m22/syT;
-
-//        if(!isZero2Dec(rotM11T - rotM22T) ||
-//           !isZero2Dec(rotM12T + rotM21T)) {
-//            return false;
-//        }
-
-//        QPointF rotatedPoint = QMatrix(rotM11T, rotM12T,
-//                                       rotM21T, rotM22T,
-//                                       0., 0.).map(QPointF(1., 0.));
-//        rotT = qAtan2(rotatedPoint.y(), rotatedPoint.x());
-//        if(rotT > 2*PI) rotT -= 2*PI;
-//        if(cosSinDifferentSign) {
-//            if((0.5*PI <= rotT && rotT <= PI) ||
-//               (1.5*PI <= rotT && rotT <= 2.*PI)) {
-//                break;
-//            }
-//        } else {
-//            if((0. <= rotT && rotT <= 0.5*PI) ||
-//               (PI <= rotT && rotT <= 1.5*PI)) {
-//                break;
-//            }
-//        }
-//    }
-
-//    *sx = sxT;
-//    *sy = syT;
-//    *rot = rotT*180./PI;
-
-//    return true;
-//}
-
-//bool getTranslationShearRotationScaleFromMatrix(const QMatrix &matrix,
-//                                                qreal *tx, qreal *ty,
-//                                                qreal *lx, qreal *ly,
-//                                                qreal *rot,
-//                                                qreal *sx, qreal *sy) {
-//    if(getRotationScaleFromMatrixIfNoShear(matrix,
-//                                           rot,
-//                                           sx, sy) ) {
-//        *lx = 0.;
-//        *ly = 0.;
-//        *tx = matrix.dx();
-//        *ty = matrix.dy();
-
-//        return true;
-//    } else {
-//        qreal m11 = matrix.m11();
-//        qreal m12 = matrix.m12();
-//        qreal m21 = matrix.m21();
-//        qreal m22 = matrix.m22();
-
-//        return false;
-//    }
-//}
-
 struct SvgAttribute {
     SvgAttribute(const QString &nameValueStr) {
         QStringList nameValueList = nameValueStr.split(":");
-        name = nameValueList.first();
-        value = nameValueList.last();
+        fName = nameValueList.first();
+        fValue = nameValueList.last();
     }
 
     QString getName() const {
-        return name;
+        return fName;
     }
 
     QString getValue() const {
-        return value;
+        return fValue;
     }
 
-    QString name;
-    QString value;
+    QString fName;
+    QString fValue;
 };
 
 void extractSvgAttributes(const QString &string,
                           QList<SvgAttribute> *attributesList) {
-    QStringList attributesStrList = string.split(";");
+    const QStringList attributesStrList = string.split(";");
     for(const QString &attributeStr : attributesStrList) {
         attributesList->append(SvgAttribute(attributeStr));
     }
 }
 
-BoundingBoxSvgAttributes::BoundingBoxSvgAttributes() {}
+BoxSvgAttributes::BoxSvgAttributes() {}
 
-BoundingBoxSvgAttributes::~BoundingBoxSvgAttributes() {}
+BoxSvgAttributes::~BoxSvgAttributes() {}
 
-BoundingBoxSvgAttributes &BoundingBoxSvgAttributes::operator*=(const BoundingBoxSvgAttributes &overwritter)
-{
+BoxSvgAttributes &BoxSvgAttributes::operator*=(
+        const BoxSvgAttributes &overwritter) {
     mRelTransform = overwritter.getRelTransform();
 
     mFillAttributes *= overwritter.getFillAttributes();
@@ -962,28 +872,39 @@ BoundingBoxSvgAttributes &BoundingBoxSvgAttributes::operator*=(const BoundingBox
     return *this;
 }
 
-const Qt::FillRule &BoundingBoxSvgAttributes::getFillRule() const { return mFillRule; }
+const Qt::FillRule &BoxSvgAttributes::getFillRule() const {
+    return mFillRule;
+}
 
-const QMatrix &BoundingBoxSvgAttributes::getRelTransform() const { return mRelTransform; }
+const QMatrix &BoxSvgAttributes::getRelTransform() const {
+    return mRelTransform;
+}
 
-const FillSvgAttributes &BoundingBoxSvgAttributes::getFillAttributes() const { return mFillAttributes; }
+const FillSvgAttributes &BoxSvgAttributes::getFillAttributes() const {
+    return mFillAttributes;
+}
 
-const StrokeSvgAttributes &BoundingBoxSvgAttributes::getStrokeAttributes() const { return mStrokeAttributes; }
+const StrokeSvgAttributes &BoxSvgAttributes::getStrokeAttributes() const {
+    return mStrokeAttributes;
+}
 
-const TextSvgAttributes &BoundingBoxSvgAttributes::getTextAttributes() const { return mTextAttributes; }
+const TextSvgAttributes &BoxSvgAttributes::getTextAttributes() const {
+    return mTextAttributes;
+}
 
-void BoundingBoxSvgAttributes::setFillAttribute(const QString &value) {
+void BoxSvgAttributes::setFillAttribute(const QString &value) {
     if(value.contains("none")) {
         mFillAttributes.setPaintType(NOPAINT);
     } else if(getFlatColorFromString(value, &mFillAttributes)) {
-    } else if(getGradientFromString(value, &mFillAttributes, new GradientsSvgCollection())) {
+    } else if(getGradientFromString(value, &mFillAttributes,
+                                    new GradientsSvgCollection())) {
     } else {
         qDebug() << "setFillAttribute - format not recognised:" <<
                     endl << value;
     }
 }
 
-void BoundingBoxSvgAttributes::setStrokeAttribute(const QString &value) {
+void BoxSvgAttributes::setStrokeAttribute(const QString &value) {
     if(value.contains("none")) {
         mStrokeAttributes.setPaintType(NOPAINT);
     } else if(getFlatColorFromString(value, &mStrokeAttributes)) {
@@ -993,14 +914,14 @@ void BoundingBoxSvgAttributes::setStrokeAttribute(const QString &value) {
     }
 }
 
-void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
+void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
     QList<SvgAttribute> styleAttributes;
-    QString styleAttributesStr = element.attribute("style");
+    const QString styleAttributesStr = element.attribute("style");
     extractSvgAttributes(styleAttributesStr, &styleAttributes);
     for(const SvgAttribute &attribute : styleAttributes) {
-        QString name = attribute.getName();
+        const QString name = attribute.getName();
         if(name.isEmpty()) continue;
-        QString value = attribute.getValue();
+        const QString value = attribute.getValue();
         if(value == "inherit") continue;
         switch (name.at(0).unicode()) {
         case 'c':
@@ -1127,8 +1048,9 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
                                     mStrokeAttributes.getLineWidth()*
                                     value.toDouble()/100.);
                     } else {
-                        value = value.remove("px");
-                        mStrokeAttributes.setLineWidth(value.toDouble());
+                        QString pxLessValue = value;
+                        pxLessValue.remove("px");
+                        mStrokeAttributes.setLineWidth(pxLessValue.toDouble());
                     }
                 }
             } else if(name == "stop-color") {
@@ -1170,46 +1092,23 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
         }
     }
 
-    QString fillAttributesStr = element.attribute("fill");
-    if(!fillAttributesStr.isEmpty()) {
-        setFillAttribute(fillAttributesStr);
-    }
+    const QString fillAttributesStr = element.attribute("fill");
+    if(!fillAttributesStr.isEmpty()) setFillAttribute(fillAttributesStr);
 
-    QString strokeAttributesStr = element.attribute("stroke");
-    if(!strokeAttributesStr.isEmpty()) {
-        setStrokeAttribute(strokeAttributesStr);
-    }
+    const QString strokeAttributesStr = element.attribute("stroke");
+    if(!strokeAttributesStr.isEmpty()) setStrokeAttribute(strokeAttributesStr);
 
 
-    QString matrixStr = element.attribute("transform");
+    const QString matrixStr = element.attribute("transform");
     if(!matrixStr.isEmpty()) {
         mRelTransform = getMatrixFromString(matrixStr)*mRelTransform;
     }
-//    qreal dX, dY, lX, lY, rot, sX, sY;
-//    if(getTranslationShearRotationScaleFromMatrix(mRelTransform,
-//                                                  &dX, &dY,
-//                                                  &lX, &lY,
-//                                                  &rot,
-//                                                  &sX, &sY)) {
-//        mDx = dX;
-//        mDy = dY;
-//        mRot = rot;
-//        mScaleX = sX;
-//        mScaleY = sY;
-
-//        QMatrix matrix;
-//        matrix.translate(mDx, mDy);
-//        matrix.rotate(mRot);
-//        matrix.scale(mScaleX, mScaleY);
-
-//        mRelTransform = mRelTransform*matrix.inverted();
-//    }
 }
 
-bool BoundingBoxSvgAttributes::hasTransform() const {
+bool BoxSvgAttributes::hasTransform() const {
     return !(isZero4Dec(mRelTransform.dx()) &&
              isZero4Dec(mRelTransform.dy()) &&
-             isZero4Dec(mRelTransform.m11() - 1.) &&
+             isZero4Dec(mRelTransform.m11() - 1) &&
              isZero4Dec(mRelTransform.m22() - 1) &&
              isZero4Dec(mRelTransform.m12()) &&
              isZero4Dec(mRelTransform.m21())); /*&&
@@ -1219,8 +1118,8 @@ bool BoundingBoxSvgAttributes::hasTransform() const {
                  isZero(mRot));*/
 }
 
-void BoundingBoxSvgAttributes::applySingleTransformations(BoundingBox *box) {
-    BoxTransformAnimator *animator = box->getTransformAnimator();
+void BoxSvgAttributes::applySingleTransformations(BoundingBox *box) {
+    BoxTransformAnimator * const animator = box->getTransformAnimator();
     animator->translate(mDx, mDy);
     animator->setScale(mScaleX, mScaleY);
     animator->setRotation(mRot);
@@ -2053,7 +1952,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
 }
 
-void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
+void BoxSvgAttributes::apply(BoundingBox *box) {
     box->getTransformAnimator()->setOpacity(mOpacity);
     if(box->SWT_isPathBox()) {
         const auto path = GetAsPtr(box, PathBox);
@@ -2073,56 +1972,31 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
     }
 }
 
-void VectorPathSvgAttributes::apply(VectorPath *path) {
-    PathAnimator* const pathAnimator = path->getPathAnimator();
+void VectorPathSvgAttributes::apply(SmartVectorPath *path) {
+    SmartPathCollection* const pathAnimator = path->getPathAnimator();
     for(const auto& separatePath : mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
-        const auto singlePath = SPtrCreate(VectorPathAnimator)(pathAnimator);
+        const auto singlePath = SPtrCreate(SmartPathAnimator)();
         separatePath->apply(singlePath.get());
-        pathAnimator->addSinglePathAnimator(singlePath);
+        pathAnimator->addPath(singlePath);
     }
 
-    BoundingBoxSvgAttributes::apply(path);
-}
-#include "Animators/SmartPath/smartpathanimator.h"
-void SvgSeparatePath::apply(SmartPathAnimator *path) {
-//    NodePoint *lastPoint = nullptr;
-//    NodePoint *firstPoint = nullptr;
-//    for(const auto& point : mPoints) {
-//        lastPoint = path->addNodeRelPos(point.get(), lastPoint);
-//        if(!firstPoint) firstPoint = lastPoint;
-//    }
-//    if(mClosedPath) {
-//        lastPoint->connectToPoint(firstPoint);
-//        path->setPathClosed(mClosedPath);
-//    }
+    BoxSvgAttributes::apply(path);
 }
 
-void SvgSeparatePath::apply(VectorPathAnimator *path) {
-    NodePoint *lastPoint = nullptr;
-    NodePoint *firstPoint = nullptr;
+void SvgSeparatePath::apply(SmartPathAnimator * const path) {
     for(const auto& point : mPoints) {
-        lastPoint = path->addNodeRelPos(point.getStartPoint(),
-                                        point.getPoint(),
-                                        point.getEndPoint(),
-                                        point.getStartPointEnabled(),
-                                        point.getEndPointEnabled(),
-                                        point.getCtrlsMode(),
-                                        lastPoint);
-        if(!firstPoint) firstPoint = lastPoint;
+        path->actionAddNewAtEnd(point.toNormalNodeData());
     }
-    if(mClosedPath) {
-        lastPoint->connectToPoint(firstPoint);
-        path->setPathClosed(mClosedPath);
-    }
+    if(mClosedPath) path->actionClose();
 }
 
 void SvgSeparatePath::closePath() {
     auto& firstPt = mPoints.first();
-    const qreal distBetweenEndPts = pointToLen(mLastPoint->getPoint() -
-                                               firstPt.getPoint());
-    if(mLastPoint->getStartPointEnabled() && distBetweenEndPts < 0.1) {
-        firstPt.setStartPoint(mLastPoint->getStartPoint());
+    const qreal distBetweenEndPts = pointToLen(mLastPoint->p1() -
+                                               firstPt.p1());
+    if(mLastPoint->getC0Enabled() && distBetweenEndPts < 0.1) {
+        firstPt.setC0(mLastPoint->c0());
         mPoints.removeLast();
         mLastPoint = &mPoints.last();
     }
@@ -2131,25 +2005,24 @@ void SvgSeparatePath::closePath() {
 }
 
 void SvgSeparatePath::moveTo(const QPointF &e) {
-    addPoint(SvgNodePoint(e));
+    addPoint(SvgNormalNode(e));
 }
 
 void SvgSeparatePath::cubicTo(const QPointF &c1,
                               const QPointF &c2,
                               const QPointF &e) {
-    mLastPoint->setEndPoint(c1);
-    auto newPt = SvgNodePoint(e);
-    newPt.setStartPoint(c2);
+    mLastPoint->setC2(c1);
+    SvgNormalNode newPt(e);
+    newPt.setC0(c2);
     addPoint(newPt);
 }
 
 void SvgSeparatePath::lineTo(const QPointF &e) {
-    auto newPt = SvgNodePoint(e);
-    addPoint(newPt);
+    addPoint(SvgNormalNode(e));
 }
 
 void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
-    const QPointF prev = mLastPoint->getPoint();
+    const QPointF prev = mLastPoint->p1();
     const QPointF c1((prev.x() + 2*c.x()) / 3, (prev.y() + 2*c.y()) / 3);
     const QPointF c2((e.x() + 2*c.x()) / 3, (e.y() + 2*c.y()) / 3);
     cubicTo(c1, c2, e);
@@ -2236,16 +2109,15 @@ void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation,
 
 void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc,
                                      qreal th0, qreal th1,
-                                     qreal rx, qreal ry, qreal xAxisRotation)
-{
+                                     qreal rx, qreal ry, qreal xAxisRotation) {
     qreal sinTh, cosTh;
     qreal a00, a01, a10, a11;
     qreal x1, y1, x2, y2, x3, y3;
     qreal t;
     qreal thHalf;
 
-    sinTh = qSin(xAxisRotation * (M_PI / 180.0));
-    cosTh = qCos(xAxisRotation * (M_PI / 180.0));
+    sinTh = qSin(xAxisRotation * (M_PI / 180));
+    cosTh = qCos(xAxisRotation * (M_PI / 180));
 
     a00 =  cosTh * rx;
     a01 = -sinTh * ry;
@@ -2253,7 +2125,7 @@ void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc,
     a11 =  cosTh * ry;
 
     thHalf = 0.5 * (th1 - th0);
-    t = (8.0 / 3.0) * qSin(thHalf * 0.5) * qSin(thHalf * 0.5) / qSin(thHalf);
+    t = (8. / 3) * qSin(thHalf * 0.5) * qSin(thHalf * 0.5) / qSin(thHalf);
     x1 = xc + qCos(th0) - t * qSin(th0);
     y1 = yc + qSin(th0) + t * qCos(th0);
     x3 = xc + qCos(th1);
@@ -2266,7 +2138,7 @@ void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc,
             QPointF(a00 * x3 + a01 * y3, a10 * x3 + a11 * y3));
 }
 
-void SvgSeparatePath::addPoint(const SvgNodePoint &point) {
+void SvgSeparatePath::addPoint(const SvgNormalNode &point) {
     mPoints << point;
     mLastPoint = &mPoints.last();
 }
@@ -2299,66 +2171,67 @@ void TextSvgAttributes::setFontAlignment(const Qt::Alignment &alignment) {
     mAlignment = alignment;
 }
 
-SvgNodePoint::SvgNodePoint(QPointF point) {
+SvgNormalNode::SvgNormalNode(const QPointF& p1) {
     mCtrlsMode = CTRLS_CORNER;
-    mPoint = point;
+    mP1 = p1;
 }
 
-void SvgNodePoint::guessCtrlsMode() {
-    QPointF startPointRel = mStartPoint - mPoint;
-    QPointF endPointRel = mEndPoint - mPoint;
-    if(isZero1Dec(pointToLen(startPointRel) - pointToLen(endPointRel)) ) {
-        mCtrlsMode = CTRLS_SYMMETRIC;
-    } else {
-        qreal angle = QLineF(mStartPoint, mPoint).
-                angleTo(QLineF(mPoint, mEndPoint));
-        while(angle > 90.) angle -= 180;
-        if(isZero1Dec(angle)) {
-            mCtrlsMode = CTRLS_SMOOTH;
-        }
-    }
+void SvgNormalNode::guessCtrlsMode() {
+    const QLineF startLine(mC0, mP1);
+    const QLineF endLine(mP1, mC2);
+    qreal angle = startLine.angleTo(endLine);
+    while(angle > 90) angle -= 180;
+    if(isZero1Dec(angle)) {
+        const qreal lenDiff = startLine.length() - endLine.length();
+        if(isZero1Dec(lenDiff)) mCtrlsMode = CTRLS_SYMMETRIC;
+        else mCtrlsMode = CTRLS_SMOOTH;
+    } else mCtrlsMode = CTRLS_CORNER;
 }
 
-void SvgNodePoint::setStartPoint(const QPointF &startPoint) {
-    mStartPoint = startPoint;
-    if(isZero1Dec(pointToLen(mStartPoint - mPoint))) return;
-    mStartPointSet = true;
-    if(mEndPointSet) guessCtrlsMode();
+void SvgNormalNode::setC0(const QPointF &c0) {
+    mC0 = c0;
+    if(isZero1Dec(pointToLen(mC0 - mP1))) return;
+    mC0Enabled = true;
+    if(mC2Enabled) guessCtrlsMode();
 }
 
-void SvgNodePoint::setEndPoint(const QPointF &endPoint) {
-    mEndPoint = endPoint;
-    if(isZero1Dec(pointToLen(mEndPoint - mPoint))) return;
-    mEndPointSet = true;
-    if(mStartPointSet) guessCtrlsMode();
+void SvgNormalNode::setC2(const QPointF &c2) {
+    mC2 = c2;
+    if(isZero1Dec(pointToLen(mC2 - mP1))) return;
+    mC2Enabled = true;
+    if(mC0Enabled) guessCtrlsMode();
 }
 
-CtrlsMode SvgNodePoint::getCtrlsMode() const {
+CtrlsMode SvgNormalNode::getCtrlsMode() const {
     return mCtrlsMode;
 }
 
-QPointF SvgNodePoint::getPoint() const {
-    return mPoint;
+QPointF SvgNormalNode::p1() const {
+    return mP1;
 }
 
-QPointF SvgNodePoint::getStartPoint() const {
-    return mStartPoint;
+QPointF SvgNormalNode::c0() const {
+    return mC0;
 }
 
-QPointF SvgNodePoint::getEndPoint() const {
-    return mEndPoint;
+QPointF SvgNormalNode::c2() const {
+    return mC2;
 }
 
-bool SvgNodePoint::getStartPointEnabled() const {
-    return mStartPointSet;
+bool SvgNormalNode::getC0Enabled() const {
+    return mC0Enabled;
 }
 
-bool SvgNodePoint::getEndPointEnabled() const {
-    return mEndPointSet;
+bool SvgNormalNode::getC2Enabled() const {
+    return mC2Enabled;
 }
 
-void SvgNodePoint::applyTransfromation(const QMatrix &transformation) {
-    mPoint = transformation.map(mPoint);
-    mEndPoint = transformation.map(mEndPoint);
-    mStartPoint = transformation.map(mStartPoint);
+void SvgNormalNode::applyTransfromation(const QMatrix &transformation) {
+    mC0 = transformation.map(mC0);
+    mP1 = transformation.map(mP1);
+    mC2 = transformation.map(mC2);
+}
+
+NormalNodeData SvgNormalNode::toNormalNodeData() const {
+    return { mC0Enabled, mC2Enabled, mCtrlsMode, mC0, mP1, mC2 };
 }

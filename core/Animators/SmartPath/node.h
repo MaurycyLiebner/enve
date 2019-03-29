@@ -3,6 +3,15 @@
 #include "pointhelpers.h"
 #include "exceptions.h"
 
+struct NormalNodeData {
+    bool fC0Enabled;
+    bool fC2Enabled;
+    CtrlsMode fCtrlsMode;
+    QPointF fC0;
+    QPointF fP1;
+    QPointF fC2;
+};
+
 struct Node {
     friend class NodeList;
     friend class ListOfNodes;
@@ -11,6 +20,11 @@ struct Node {
     };
 
     Node() { fType = NONE; }
+
+    Node(const NormalNodeData& data) {
+        fType = NORMAL;
+        setNormalData(data);
+    }
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2) {
         fC0 = c0;
@@ -31,6 +45,16 @@ struct Node {
     int getNodeId() const {
         return fId;
     }
+
+    void setNormalData(const NormalNodeData& data) {
+        fC0 = data.fC0;
+        fP1 = data.fP1;
+        fC2 = data.fC2;
+        setC0Enabled(data.fC0Enabled);
+        setC2Enabled(data.fC2Enabled);
+        setCtrlsMode(data.fCtrlsMode);
+    }
+
     static Node sInterpolateNormal(const Node &node1, const Node &node2,
                                    const qreal& weight2);
 
@@ -99,9 +123,10 @@ protected:
 private:
     bool fC0Enabled = true;
     bool fC2Enabled = true;
+    CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+
     Type fType;
     int fId = -1;
-    CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 };
 #include "smartPointers/stdselfref.h"
 class ListOfNodes {
@@ -133,9 +158,7 @@ public:
     }
 
     Node* at(const int& id) const {
-        if(id < 0 || id >= count())
-            RuntimeThrow("Index out of range.");
-        return mList.at(id).get();
+        return atSPtr(id).get();
     }
 
     stdsptr<Node> atSPtr(const int& id) const {
