@@ -99,23 +99,21 @@ void VideoCacheHandler::updateFrameCount() {
 }
 
 void VideoCacheHandler::_processUpdate() {
-    QByteArray pathByteArray = mUpdateFilePath.toLatin1();
-    const char* path = pathByteArray.data();
+    const QByteArray pathByteArray = mUpdateFilePath.toLatin1();
+    const char * const path = pathByteArray.data();
     // get format from audio file
     AVFormatContext *formatContext = avformat_alloc_context();
     if(!formatContext) {
         fprintf(stderr, "Error allocating AVFormatContext\n");
-        return;// -1;
+        return;
     }
     if(avformat_open_input(&formatContext, path, nullptr, nullptr) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
-        return;// -1;
+        return;
     }
     if(avformat_find_stream_info(formatContext, nullptr) < 0) {
-        fprintf(stderr,
-                "Could not retrieve stream info from file '%s'\n",
-                path);
-        return;// -1;
+        fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
+        return;
     }
 
     // Find the index of the first audio stream
@@ -124,8 +122,8 @@ void VideoCacheHandler::_processUpdate() {
     AVCodec *codec = nullptr;
     AVStream *videoStream = nullptr;
     for(uint i = 0; i < formatContext->nb_streams; i++) {
-        AVStream *streamT = formatContext->streams[i];
-        AVCodecParameters *codecParsT = streamT->codecpar;
+        AVStream * const  streamT = formatContext->streams[i];
+        AVCodecParameters * const codecParsT = streamT->codecpar;
         const AVMediaType &mediaType = codecParsT->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
             videoStreamIndex = static_cast<int>(i);
@@ -136,38 +134,36 @@ void VideoCacheHandler::_processUpdate() {
         }
     }
     if(videoStreamIndex == -1) {
-        fprintf(stderr,
-                "Could not retrieve video stream from file '%s'\n",
-                path);
-        return;// -1;
+        fprintf(stderr, "Could not retrieve video stream from file '%s'\n", path);
+        return;
     }
 
     if(!codec) {
         fprintf(stderr, "Unsuported codec\n");
         return;
     }
-    AVCodecContext *codecContext = avcodec_alloc_context3(codec);
+    AVCodecContext * const codecContext = avcodec_alloc_context3(codec);
     if(!codecContext) {
         fprintf(stderr, "Error allocating AVCodecContext\n");
-        return;// -1;
+        return;
     }
     if(avcodec_parameters_to_context(codecContext, codecPars) < 0) {
         fprintf(stderr, "Failed to copy codec params to codec context\n");
-        return;// -1;
+        return;
     }
 
     if(avcodec_open2(codecContext, codec, nullptr) < 0 ) {
         fprintf(stderr, "Failed to open codec\n");
-        return;// -1;
+        return;
     }
-    struct SwsContext *sws = nullptr;
-    sws = sws_getContext(codecContext->width, codecContext->height,
+    struct SwsContext * const sws =
+          sws_getContext(codecContext->width, codecContext->height,
                          codecContext->pix_fmt,
                          codecContext->width, codecContext->height,
                          AV_PIX_FMT_BGRA, SWS_BICUBIC, nullptr, nullptr, nullptr);
 
     // prepare to read data
-    AVPacket *packet = av_packet_alloc();
+    AVPacket * packet = av_packet_alloc();
     if(!packet) {
         fprintf(stderr, "Error allocating AVPacket\n");
         return;// -1;
@@ -180,16 +176,15 @@ void VideoCacheHandler::_processUpdate() {
 
     bool frameReceived = false;
     for(const int &frameId : mFramesBeingLoaded) {
-        int tsms = qRound(frameId * 1000 / mUpdateFps);
+        const int tsms = qRound(frameId * 1000 / mUpdateFps);
 
-        int64_t frame = av_rescale(tsms, videoStream->time_base.den,
-                                   videoStream->time_base.num)/1000;
+        const int64_t frame = av_rescale(tsms, videoStream->time_base.den,
+                                         videoStream->time_base.num)/1000;
 
         if(frameId != 0) {
             if(avformat_seek_file(formatContext, videoStreamIndex, 0,
-                                  frame, frame,
-                    AVSEEK_FLAG_FRAME) < 0) {
-                return;// 0;
+                                  frame, frame, AVSEEK_FLAG_FRAME) < 0) {
+                return;
             }
         }
 
@@ -227,7 +222,8 @@ void VideoCacheHandler::_processUpdate() {
             // calculate PTS:
             pts = av_frame_get_best_effort_timestamp(decodedFrame);
             pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
-            if(pts/1000 > tsms) {
+            const int currFrame = qRound(pts/1000000.*mUpdateFps);
+            if(currFrame == frameId) {
 //                qDebug() << pts/1000 << tsms;
 //                qDebug() << "for" << frameId << "received" << pts*mUpdateFps/1000000;
 //                qDebug() << "seeked" << frame;
