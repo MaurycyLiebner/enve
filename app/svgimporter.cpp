@@ -2084,12 +2084,31 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
 
     BoundingBoxSvgAttributes::apply(path);
 }
+#include "Animators/SmartPath/smartpathanimator.h"
+void SvgSeparatePath::apply(SmartPathAnimator *path) {
+//    NodePoint *lastPoint = nullptr;
+//    NodePoint *firstPoint = nullptr;
+//    for(const auto& point : mPoints) {
+//        lastPoint = path->addNodeRelPos(point.get(), lastPoint);
+//        if(!firstPoint) firstPoint = lastPoint;
+//    }
+//    if(mClosedPath) {
+//        lastPoint->connectToPoint(firstPoint);
+//        path->setPathClosed(mClosedPath);
+//    }
+}
 
 void SvgSeparatePath::apply(VectorPathAnimator *path) {
     NodePoint *lastPoint = nullptr;
     NodePoint *firstPoint = nullptr;
     for(const auto& point : mPoints) {
-        lastPoint = path->addNodeRelPos(point.get(), lastPoint);
+        lastPoint = path->addNodeRelPos(point.getStartPoint(),
+                                        point.getPoint(),
+                                        point.getEndPoint(),
+                                        point.getStartPointEnabled(),
+                                        point.getEndPointEnabled(),
+                                        point.getCtrlsMode(),
+                                        lastPoint);
         if(!firstPoint) firstPoint = lastPoint;
     }
     if(mClosedPath) {
@@ -2099,50 +2118,46 @@ void SvgSeparatePath::apply(VectorPathAnimator *path) {
 }
 
 void SvgSeparatePath::closePath() {
-    qreal distBetweenEndPts = pointToLen(mLastPoint->getPoint() -
-                                         mFirstPoint->getPoint());
+    auto& firstPt = mPoints.first();
+    const qreal distBetweenEndPts = pointToLen(mLastPoint->getPoint() -
+                                               firstPt.getPoint());
     if(mLastPoint->getStartPointEnabled() && distBetweenEndPts < 0.1) {
-        mFirstPoint->setStartPoint(mLastPoint->getStartPoint());
+        firstPt.setStartPoint(mLastPoint->getStartPoint());
         mPoints.removeLast();
-        mLastPoint = mPoints.last().get();
+        mLastPoint = &mPoints.last();
     }
 
     mClosedPath = true;
 }
 
 void SvgSeparatePath::moveTo(const QPointF &e) {
-    auto newPt = SPtrCreate(SvgNodePoint)(e);
-    mFirstPoint = newPt.get();
-    mLastPoint = mFirstPoint;
-    addPoint(newPt);
+    addPoint(SvgNodePoint(e));
 }
 
 void SvgSeparatePath::cubicTo(const QPointF &c1,
                               const QPointF &c2,
                               const QPointF &e) {
     mLastPoint->setEndPoint(c1);
-    auto newPt = SPtrCreate(SvgNodePoint)(e);
-    mLastPoint = newPt.get();
-    mLastPoint->setStartPoint(c2);
+    auto newPt = SvgNodePoint(e);
+    newPt.setStartPoint(c2);
     addPoint(newPt);
 }
 
 void SvgSeparatePath::lineTo(const QPointF &e) {
-    auto newPt = SPtrCreate(SvgNodePoint)(e);
-    mLastPoint = newPt.get();
+    auto newPt = SvgNodePoint(e);
     addPoint(newPt);
 }
 
 void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
-    QPointF prev = mLastPoint->getPoint();
-    QPointF c1((prev.x() + 2*c.x()) / 3, (prev.y() + 2*c.y()) / 3);
-    QPointF c2((e.x() + 2*c.x()) / 3, (e.y() + 2*c.y()) / 3);
+    const QPointF prev = mLastPoint->getPoint();
+    const QPointF c1((prev.x() + 2*c.x()) / 3, (prev.y() + 2*c.y()) / 3);
+    const QPointF c2((e.x() + 2*c.x()) / 3, (e.y() + 2*c.y()) / 3);
     cubicTo(c1, c2, e);
 }
 
 void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
-    for(const auto& point : mPoints) {
-        point->applyTransfromation(transformation);
+    for(auto& point : mPoints) {
+        point.applyTransfromation(transformation);
     }
 }
 
@@ -2251,8 +2266,9 @@ void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc,
             QPointF(a00 * x3 + a01 * y3, a10 * x3 + a11 * y3));
 }
 
-void SvgSeparatePath::addPoint(const stdsptr<SvgNodePoint> &point) {
+void SvgSeparatePath::addPoint(const SvgNodePoint &point) {
     mPoints << point;
+    mLastPoint = &mPoints.last();
 }
 
 TextSvgAttributes::TextSvgAttributes() {}

@@ -139,15 +139,15 @@ public:
 protected:
     Qt::FillRule mFillRule = Qt::OddEvenFill;
 
-    qreal mDx = 0.;
-    qreal mDy = 0.;
-    qreal mScaleX = 1.;
-    qreal mScaleY = 1.;
-    qreal mShearX = 0.;
-    qreal mShearY = 0.;
-    qreal mRot = 0.;
+    qreal mDx = 0;
+    qreal mDy = 0;
+    qreal mScaleX = 1;
+    qreal mScaleY = 1;
+    qreal mShearX = 0;
+    qreal mShearY = 0;
+    qreal mRot = 0;
 
-    qreal mOpacity = 100.;
+    qreal mOpacity = 100;
 
     QMatrix mRelTransform;
 
@@ -158,7 +158,7 @@ protected:
     TextSvgAttributes mTextAttributes;
 };
 
-class SvgNodePoint : public StdSelfRef {
+class SvgNodePoint {
 public:
     SvgNodePoint(QPointF point);
 
@@ -192,10 +192,12 @@ private:
 
 class PathAnimator;
 class VectorPathAnimator;
+class SmartPathAnimator;
 class SvgSeparatePath : public StdSelfRef {
     friend class StdSelfRef;
 public:
     void apply(VectorPathAnimator *path);
+    void apply(SmartPathAnimator *path);
 
     void closePath();
 
@@ -209,13 +211,10 @@ public:
 
     void applyTransfromation(const QMatrix &transformation);
 
-    void pathArc(qreal rx,
-                 qreal ry,
+    void pathArc(qreal rx, qreal ry,
                  qreal x_axis_rotation,
-                 int large_arc_flag,
-                 int sweep_flag,
-                 qreal x,
-                 qreal y,
+                 int large_arc_flag, int sweep_flag,
+                 qreal x, qreal y,
                  qreal curx, qreal cury);
 protected:
     SvgSeparatePath() {}
@@ -224,12 +223,11 @@ private:
                         qreal th0, qreal th1,
                         qreal rx, qreal ry, qreal xAxisRotation);
 
-    void addPoint(const stdsptr<SvgNodePoint>& point);
+    void addPoint(const SvgNodePoint &point);
 
     bool mClosedPath = false;
-    stdptr<SvgNodePoint>mFirstPoint;
-    stdptr<SvgNodePoint>mLastPoint;
-    QList<stdsptr<SvgNodePoint>> mPoints;
+    SvgNodePoint * mLastPoint = nullptr;
+    QList<SvgNodePoint> mPoints;
 };
 
 

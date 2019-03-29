@@ -891,17 +891,6 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
 }
 
 NodePoint *VectorPathAnimator::addNodeRelPos(
-        const SvgNodePoint* svgPoint, NodePoint* targetPt) {
-    return addNodeRelPos(svgPoint->getStartPoint(),
-                         svgPoint->getPoint(),
-                         svgPoint->getEndPoint(),
-                         svgPoint->getStartPointEnabled(),
-                         svgPoint->getEndPointEnabled(),
-                         svgPoint->getCtrlsMode(),
-                         targetPt);
-}
-
-NodePoint *VectorPathAnimator::addNodeRelPos(
         const QPointF &startRelPos,
         const QPointF &relPos,
         const QPointF &endRelPos,

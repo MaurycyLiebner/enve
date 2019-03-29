@@ -100,8 +100,6 @@ public:
 
     void finalizeNodesRemove();
 
-    NodePoint *addNodeRelPos(const SvgNodePoint *svgPoint,
-                             NodePoint *targetPt);
     NodePoint *addNodeAbsPos(const QPointF &absPos,
                              NodePoint *targetPt);
     NodePoint *addNodeRelPos(const QPointF &relPos,
