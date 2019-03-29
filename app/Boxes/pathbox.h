@@ -9,15 +9,15 @@
 #include "Paint/autotiledsurface.h"
 #include "GUI/BrushWidgets/brushwidget.h"
 #include <mypaint-brush.h>
+class SmartVectorPath;
 class GradientPoints;
 class SkStroke;
 class PathEffectAnimators;
 class PathEffect;
 
 struct PathBoxRenderData : public BoundingBoxRenderData {
-    PathBoxRenderData(BoundingBox *parentBoxT) :
-        BoundingBoxRenderData(parentBoxT) {
-    }
+    PathBoxRenderData(BoundingBox * const parentBoxT) :
+        BoundingBoxRenderData(parentBoxT) {}
 
     SkPath fEditPath;
     SkPath fPath;
@@ -168,8 +168,8 @@ public:
 
     QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
-    VectorPath *objectToVectorPathBox();
-    VectorPath *strokeToVectorPathBox();
+    SmartVectorPath *objectToVectorPathBox();
+    SmartVectorPath *strokeToVectorPathBox();
 
     bool relPointInsidePath(const QPointF &relPos) const;
 

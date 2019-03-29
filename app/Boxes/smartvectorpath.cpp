@@ -7,8 +7,6 @@
 #include "MovablePoints/pathpivot.h"
 #include "pointhelpers.h"
 #include "PropertyUpdaters/nodepointupdater.h"
-#include "MovablePoints/nodepoint.h"
-#include "Animators/pathanimator.h"
 #include "Animators/PathAnimators/smartpathcollectionhandler.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/gradientpoints.h"

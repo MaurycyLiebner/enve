@@ -267,12 +267,6 @@ void BoundingBox::startSelectedStrokeColorTransform() {}
 
 void BoundingBox::startSelectedFillColorTransform() {}
 
-VectorPathEdge *BoundingBox::getEdge(const QPointF &absPos, const qreal &canvasScaleInv) {
-    Q_UNUSED(absPos);
-    Q_UNUSED(canvasScaleInv);
-    return nullptr;
-}
-
 bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
         const int &relFrame1, const int &relFrame2) {
     bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
@@ -865,9 +859,9 @@ BoxTransformAnimator *BoundingBox::getTransformAnimator() {
     return mTransformAnimator.get();
 }
 
-VectorPath *BoundingBox::objectToVectorPathBox() { return nullptr; }
+SmartVectorPath *BoundingBox::objectToVectorPathBox() { return nullptr; }
 
-VectorPath *BoundingBox::strokeToVectorPathBox() { return nullptr; }
+SmartVectorPath *BoundingBox::strokeToVectorPathBox() { return nullptr; }
 
 void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
     Canvas* parentCanvas = getParentCanvas();

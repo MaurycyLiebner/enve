@@ -77,8 +77,6 @@ public:
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
     void selectOnlyLastPressedBone();
-    void connectPointsFromDifferentPaths(NodePoint *pointSrc,
-                                         NodePoint *pointDest);
 
     void repaintIfNeeded();
     void setCanvasMode(const CanvasMode &mode);
@@ -208,7 +206,6 @@ public:
 
 
     void clearPointsSelectionOrDeselect();
-    VectorPathEdge *getEdgeAt(const QPointF &absPos) const;
     NormalSegment getSmartEdgeAt(const QPointF& absPos) const;
 
     void createLinkBoxForSelected();
@@ -359,7 +356,6 @@ protected:
 ////        }
 //    }
 
-    void setCurrentEndPoint(NodePoint *point);
     void setCurrentSmartEndPoint(SmartNodePoint * const point);
     NodePoint *getCurrentPoint();
 
@@ -390,7 +386,6 @@ public:
                              const qreal &canvasScaleInv);
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
-    void clearCurrentEndPoint();
     void clearCurrentSmartEndPoint();
     void clearHoveredEdge();
     void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
@@ -605,7 +600,7 @@ protected:
     qsptr<ColorAnimator> mBackgroundColor =
             SPtrCreate(ColorAnimator)();
 
-    VectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
+    SmartVectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
 
     void sortSelectedBoxesByZAscending();
 
@@ -642,7 +637,6 @@ protected:
     qptr<Bone> mLastPressedBone;
     stdsptr<PathPivot> mRotPivot;
 
-    stdptr<NodePoint> mCurrentEndPoint;
     stdptr<SmartNodePoint> mCurrentSmartEndPoint;
 
     NormalSegment mHoveredNormalSegment;
@@ -708,10 +702,6 @@ protected:
 
     void handleMovePathMousePressEvent();
     void handleMovePathMouseMove();
-
-    void handleAddPointMousePress();
-    void handleAddPointMouseMove();
-    void handleAddPointMouseRelease();
 
     void handleAddSmartPointMousePress();
     void handleAddSmartPointMouseMove();

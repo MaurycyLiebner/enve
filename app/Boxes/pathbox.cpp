@@ -6,7 +6,6 @@
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
 #include "canvas.h"
-#include "vectorpath.h"
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "PropertyUpdaters/gradientpointsupdater.h"
 #include "Animators/effectanimators.h"
@@ -532,27 +531,29 @@ bool PathBox::differenceInFillPathBetweenFrames(const int &frame1, const int &fr
 }
 
 #include "circle.h"
-VectorPath *PathBox::objectToVectorPathBox() {
-    auto newPath = SPtrCreate(VectorPath)();
+#include "Boxes/smartvectorpath.h"
+
+SmartVectorPath *PathBox::objectToVectorPathBox() {
+    auto newPath = SPtrCreate(SmartVectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
         const auto circleT = GetAsPtr(this, Circle);
         pathT.addEllipse(QPointF(0, 0),
                          circleT->getCurrentXRadius(),
                          circleT->getCurrentYRadius());
-        newPath->loadPathFromSkPath(toSkPath(pathT));
+        //newPath->loadPathFromSkPath(toSkPath(pathT));
     } else {
         //newPath->loadPathFromSkPath(mEditPathSk);
-        newPath->loadPathFromSkPath(mEditPathSk);
+        //newPath->loadPathFromSkPath(mEditPathSk);
     }
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
     return newPath.get();
 }
-
-VectorPath *PathBox::strokeToVectorPathBox() {
+SmartVectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return nullptr;
-    auto newPath = SPtrCreate(VectorPath)();
+    const auto newPath = SPtrCreate(SmartVectorPath)();
+    //newPath->loadPathFromSkPath(mOutlinePathSk);
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
     return newPath.get();

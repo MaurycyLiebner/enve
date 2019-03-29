@@ -7,14 +7,12 @@
 #include "GUI/mainwindow.h"
 #include "MovablePoints/pathpivot.h"
 #include "Boxes/imagebox.h"
-#include "edge.h"
 #include "Sound/soundcomposition.h"
 #include "Boxes/textbox.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "Sound/singlesound.h"
 #include "global.h"
 #include "pointhelpers.h"
-#include "MovablePoints/nodepoint.h"
 #include "Boxes/linkbox.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
@@ -134,7 +132,6 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     clearBoxesSelection();
     clearBonesSelection();
     clearPointsSelection();
-    clearCurrentEndPoint();
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
     mCurrentBoxesGroup = group;
@@ -630,7 +627,6 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
     updateHoveredElements();
     clearPointsSelection();
     clearCurrentSmartEndPoint();
-    clearCurrentEndPoint();
     clearLastPressedPoint();
     updatePivot();
 }
@@ -907,12 +903,6 @@ void Canvas::selectAllPointsAction() {
     }
 }
 
-void Canvas::setCurrentEndPoint(NodePoint *point) {
-    if(mCurrentEndPoint) mCurrentEndPoint->deselect();
-    if(point) point->select();
-    mCurrentEndPoint = point;
-}
-
 void Canvas::selectOnlyLastPressedBone() {
     clearBonesSelection();
     if(mLastPressedBone)
@@ -973,66 +963,6 @@ void Canvas::moveByRel(const QPointF &trans) {
 //    BoxesGroup::anim_setAbsFrame(currentFrame);
 //    //mSoundComposition->getSoundsAnimatorContainer()->anim_setAbsFrame(currentFrame);
 //}
-
-void getMirroredCtrlPtAbsPos(bool mirror,
-                             NodePoint *point,
-                             QPointF *startCtrlPtPos,
-                             QPointF *endCtrlPtPos) {
-    if(mirror) {
-        *startCtrlPtPos = point->getEndCtrlPtAbsPos();
-        *endCtrlPtPos = point->getStartCtrlPtAbsPos();
-    } else {
-        *startCtrlPtPos = point->getStartCtrlPtAbsPos();
-        *endCtrlPtPos = point->getEndCtrlPtAbsPos();
-    }
-}
-
-void Canvas::connectPointsFromDifferentPaths(NodePoint *pointSrc,
-                                             NodePoint *pointDest) {
-    Q_UNUSED(pointSrc)
-    Q_UNUSED(pointDest)
-//    if(pointSrc->getParentPath() == pointDest->getParentPath()) {
-//        return;
-//    }
-//    VectorPathAnimator *pathSrc = pointSrc->getParentPath();
-//    VectorPathAnimator *pathDest = pointDest->getParentPath();
-//    setCurrentEndPoint(pointDest);
-//    if(pointSrc->hasNextPoint()) {
-//        NodePoint *point = pointSrc;
-//        bool mirror = pointDest->hasNextPoint();
-//        while(point != nullptr) {
-//            QPointF startCtrlPtPos;
-//            QPointF endCtrlPtPos;
-//            getMirroredCtrlPtAbsPos(mirror, point,
-//                                    &startCtrlPtPos, &endCtrlPtPos);
-//            NodePoint *newPoint = new NodePoint(pathDest);
-//            newPoint->setAbsolutePos(point->getAbsolutePos());
-//            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
-//            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
-
-//            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
-//            point = point->getNextPoint();
-//        }
-//    } else {
-//        NodePoint *point = pointSrc;
-//        bool mirror = pointDest->hasPreviousPoint();
-//        while(point != nullptr) {
-//            QPointF startCtrlPtPos;
-//            QPointF endCtrlPtPos;
-//            getMirroredCtrlPtAbsPos(mirror, point,
-//                                    &startCtrlPtPos, &endCtrlPtPos);
-
-//            NodePoint *newPoint = new NodePoint(pathDest);
-//            newPoint->setAbsolutePos(point->getAbsolutePos());
-//            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
-//            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
-
-//            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
-//            point = point->getPreviousPoint();
-//        }
-//    }
-    //mCurrentBoxesGroup->removeChild(pathSrc->getParentBox());
-}
 
 bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                  const bool &parentSatisfies,

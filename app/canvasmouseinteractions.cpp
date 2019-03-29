@@ -7,16 +7,13 @@
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
 #include "Boxes/linkbox.h"
-#include "edge.h"
-#include "MovablePoints/nodepoint.h"
-#include "Animators/pathanimator.h"
 #include "pointhelpers.h"
 #include "Boxes/particlebox.h"
 #include "clipboardcontainer.h"
 #include "GUI/mainwindow.h"
 #include "Boxes/paintbox.h"
 #include "Paint/brush.h"
-#include "Animators/PathAnimators/vectorpathanimator.h"
+#include "Boxes/bone.h"
 #include "GUI/fontswidget.h"
 #include "Boxes/bone.h"
 #include "PathEffects/patheffectsinclude.h"
@@ -24,7 +21,6 @@
 #include <QFileDialog>
 #include "GUI/paintboxsettingsdialog.h"
 #include "GUI/customfpsdialog.h"
-#include "Boxes/vectorpath.h"
 #include "GPUEffects/gpurastereffect.h"
 #include "MovablePoints/smartnodepoint.h"
 
@@ -497,7 +493,6 @@ void Canvas::handleMovePointMousePressEvent() {
             mCurrentNormalSegmentT = mCurrentNormalSegment.closestAbsT(
                         mLastPressPosRel);
             clearPointsSelection();
-            clearCurrentEndPoint();
             clearCurrentSmartEndPoint();
             clearLastPressedPoint();
         }
@@ -540,8 +535,6 @@ void Canvas::handleLeftButtonMousePress() {
         } else {
             handleMovePathMousePressEvent();
         }
-    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-        handleAddPointMousePress();
     } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
         handleAddSmartPointMousePress();
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
@@ -746,7 +739,6 @@ void Canvas::handleMovePointMouseRelease() {
                     }
                 } else {
                     clearPointsSelection();
-                    clearCurrentEndPoint();
                     clearCurrentSmartEndPoint();
                     clearLastPressedPoint();
                     setCurrentBoxesGroup(pressedBox->getParentGroup());
@@ -763,7 +755,6 @@ void Canvas::handleMovePointMouseRelease() {
                     }
                 } else {
                     clearPointsSelection();
-                    clearCurrentEndPoint();
                     clearCurrentSmartEndPoint();
                     clearLastPressedPoint();
                     selectOnlyLastPressedBox();
@@ -779,7 +770,6 @@ void Canvas::handleMovePointMouseRelease() {
         }
     }
 }
-
 
 void Canvas::handleMovePathMouseRelease() {
     if(mRotPivot->isSelected()) {
@@ -823,98 +813,6 @@ void Canvas::handleMovePathMouseRelease() {
     }
 }
 
-void Canvas::handleAddPointMousePress() {
-    if(mCurrentEndPoint ? mCurrentEndPoint->isHidden() : false) {
-        setCurrentEndPoint(nullptr);
-    }
-    qptr<BoundingBox> test;
-
-    auto nodePointUnderMouse = GetAsPtr(mLastPressedPoint, NodePoint);
-    if(nodePointUnderMouse ? !nodePointUnderMouse->isEndPoint() : false) {
-        nodePointUnderMouse = nullptr;
-    }
-    if(nodePointUnderMouse == mCurrentEndPoint &&
-            nodePointUnderMouse) return;
-    if(!mCurrentEndPoint && !nodePointUnderMouse) {
-        const auto newPath = SPtrCreate(VectorPath)();
-        mCurrentBoxesGroup->addContainedBox(newPath);
-        clearBoxesSelection();
-        addBoxToSelection(newPath.get());
-        PathAnimator * const newPathAnimator = newPath->getPathAnimator();
-        const auto newSinglePath =
-                SPtrCreate(VectorPathAnimator)(newPathAnimator);
-        setCurrentEndPoint(newSinglePath->
-                            addNodeAbsPos(mLastMouseEventPosRel,
-                                          mCurrentEndPoint) );
-        newPathAnimator->addSinglePathAnimator(newSinglePath);
-    } else {
-        if(!nodePointUnderMouse) {
-            NodePoint * const newPoint =
-                    mCurrentEndPoint->addPointAbsPos(mLastMouseEventPosRel);
-            //newPoint->startTransform();
-            setCurrentEndPoint(newPoint);
-        } else if(!mCurrentEndPoint) {
-            setCurrentEndPoint(nodePointUnderMouse);
-        } else {
-            //NodePointUnderMouse->startTransform();
-            if(mCurrentEndPoint->getParentPath() ==
-               nodePointUnderMouse->getParentPath()) {
-                mCurrentEndPoint->connectToPoint(nodePointUnderMouse);
-                mCurrentEndPoint->getParentPath()->setPathClosed(true);
-            }
-            else {
-                connectPointsFromDifferentPaths(mCurrentEndPoint,
-                                                nodePointUnderMouse);
-            }
-            setCurrentEndPoint(nodePointUnderMouse);
-        }
-    } // pats is not null
-}
-
-
-void Canvas::handleAddPointMouseMove() {
-    if(!mCurrentEndPoint) return;
-    if(mFirstMouseMove) mCurrentEndPoint->startTransform();
-    if(mCurrentEndPoint->hasNextPoint() &&
-       mCurrentEndPoint->hasPreviousPoint()) {
-        if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-           CtrlsMode::CTRLS_CORNER) {
-            mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-        }
-        if(mCurrentEndPoint->isSeparateNodePoint()) {
-            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
-        } else {
-            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
-        }
-    } else {
-        if(!mCurrentEndPoint->hasNextPoint() &&
-           !mCurrentEndPoint->hasPreviousPoint()) {
-            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-               CtrlsMode::CTRLS_CORNER) {
-                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-            }
-        } else {
-            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-               CtrlsMode::CTRLS_SYMMETRIC) {
-                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
-            }
-        }
-        if(mCurrentEndPoint->hasNextPoint()) {
-            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
-        } else {
-            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
-        }
-    }
-}
-
-void Canvas::handleAddPointMouseRelease() {
-    if(mCurrentEndPoint) {
-        if(!mFirstMouseMove) mCurrentEndPoint->finishTransform();
-        //mCurrentEndPoint->prp_updateInfluenceRangeAfterChanged();
-        if(!mCurrentEndPoint->isEndPoint()) setCurrentEndPoint(nullptr);
-    }
-}
-
 void Canvas::handleMouseRelease() {
     if(mIsMouseGrabbing) releaseMouseAndDontTrack();
     if(mCurrentNormalSegment.isValid()) {
@@ -942,8 +840,6 @@ void Canvas::handleMouseRelease() {
                 handleMovePointMouseRelease();
                 clearPointsSelection();
             }
-        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-            handleAddPointMouseRelease();
         } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
             handleAddSmartPointMouseRelease();
         } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
@@ -1080,8 +976,6 @@ void Canvas::updateTransformation() {
         } else {
             handleMovePointMouseMove();
         }
-    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-        handleAddPointMouseMove();
     } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
         handleAddSmartPointMouseMove();
     }

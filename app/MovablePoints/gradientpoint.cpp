@@ -1,6 +1,6 @@
 #include "gradientpoint.h"
-#include "Boxes/vectorpath.h"
 #include "pointhelpers.h"
+#include "Boxes/pathbox.h"
 #include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 #include "Animators/transformanimator.h"
 
@@ -15,13 +15,13 @@ GradientPoint::GradientPoint(QPointFAnimator * const associatedAnimator,
 void GradientPoint::setRelativePos(const QPointF &relPos) {
     AnimatedPoint::setRelativePos(relPos);
     const auto boxParent = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    GetAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
+    GetAsPtr(boxParent->getParentBox(), PathBox)->updateDrawGradients();
 }
 
 void GradientPoint::moveByRel(const QPointF &relTranslatione) {
     AnimatedPoint::moveByRel(relTranslatione);
     const auto boxParent = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    GetAsPtr(boxParent->getParentBox(), VectorPath)->updateDrawGradients();
+    GetAsPtr(boxParent->getParentBox(), PathBox)->updateDrawGradients();
 }
 
 void GradientPoint::setColor(const QColor &fillColor) {

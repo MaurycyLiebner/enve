@@ -8,9 +8,6 @@
 #include "Boxes/bone.h"
 
 #include "MovablePoints/pathpivot.h"
-#include "MovablePoints/nodepoint.h"
-
-#include "edge.h"
 
 void Canvas::mousePressEvent(const QMouseEvent * const event) {
     if(isPreviewingOrRendering()) return;
@@ -107,8 +104,6 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
             } else {
                 handleMovePointMouseMove();
             }
-        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-            handleAddPointMouseMove();
         } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
             handleAddSmartPointMouseMove();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {

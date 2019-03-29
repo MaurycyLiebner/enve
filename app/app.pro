@@ -70,12 +70,10 @@ SOURCES += main.cpp\
     Animators/transformanimator.cpp \
     Animators/boolanimator.cpp \
     Animators/coloranimator.cpp \
-    Animators/pathanimator.cpp \
     Animators/qstringanimator.cpp \
     Animators/qpointfanimator.cpp \
     Boxes/circle.cpp \
     Boxes/textbox.cpp \
-    Boxes/vectorpath.cpp \
     Boxes/rectangle.cpp \
     Boxes/imagebox.cpp \
     Animators/intanimator.cpp \
@@ -102,7 +100,6 @@ SOURCES += main.cpp\
     canvasselectedboxesactions.cpp \
     clipboardcontainer.cpp \
     Animators/paintsettings.cpp \
-    edge.cpp \
     Boxes/videobox.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
@@ -135,8 +132,6 @@ SOURCES += main.cpp\
     Paint/tile.cpp \
     Boxes/paintbox.cpp \
     Paint/animatedsurface.cpp \
-    Animators/PathAnimators/pathkey.cpp \
-    Animators/PathAnimators/vectorpathanimator.cpp \
     avfileio.cpp \
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
@@ -204,11 +199,9 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/brushselectionwidget.cpp \
     GUI/BrushWidgets/flowlayout.cpp \
     Animators/gradientpoints.cpp \
-    MovablePoints/ctrlpoint.cpp \
     MovablePoints/gradientpoint.cpp \
     MovablePoints/boxpathpoint.cpp \
     MovablePoints/animatedpoint.cpp \
-    MovablePoints/nodepoint.cpp \
     MovablePoints/pathpivot.cpp \
     MovablePoints/movablepoint.cpp \
     PropertyUpdaters/transformupdater.cpp \
@@ -231,8 +224,6 @@ SOURCES += main.cpp\
     colorhelpers.cpp \
     Animators/qrealanimatorcreator.cpp \
     Animators/gpueffectanimators.cpp \
-    Animators/PathAnimators/pathcontainer.cpp \
-    Animators/PathAnimators/nodesettings.cpp \
     GPUEffects/gpurastereffect.cpp \
     GPUEffects/gpupostprocessor.cpp \
     GPUEffects/gpurastereffectcreator.cpp \
@@ -312,10 +303,8 @@ HEADERS  += \
     Boxes/boxesgroup.h \
     Boxes/imagebox.h \
     Boxes/pathbox.h \
-    Animators/pathanimator.h \
     Boxes/rectangle.h \
     Boxes/textbox.h \
-    Boxes/vectorpath.h \
     Animators/effectanimators.h \
     Boxes/animationbox.h \
     pathoperations.h \
@@ -333,7 +322,6 @@ HEADERS  += \
     GUI/BoxesList/boxeslistactionbutton.h \
     clipboardcontainer.h \
     Animators/paintsettings.h \
-    edge.h \
     Boxes/videobox.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
@@ -367,8 +355,6 @@ HEADERS  += \
     Paint/tile.h \
     Boxes/paintbox.h \
     Paint/animatedsurface.h \
-    Animators/PathAnimators/pathkey.h \
-    Animators/PathAnimators/vectorpathanimator.h \
     avfileio.h \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
@@ -438,9 +424,7 @@ HEADERS  += \
     GUI/BrushWidgets/flowlayout.h \
     Animators/gradientpoints.h \
     MovablePoints/animatedpoint.h \
-    MovablePoints/ctrlpoint.h \
     MovablePoints/pathpivot.h \
-    MovablePoints/nodepoint.h \
     MovablePoints/movablepoint.h \
     MovablePoints/gradientpoint.h \
     MovablePoints/boxpathpoint.h \
@@ -465,8 +449,6 @@ HEADERS  += \
     Animators/qrealanimatorcreator.h \
     Animators/intanimatorcreator.h \
     Animators/gpueffectanimators.h \
-    Animators/PathAnimators/pathcontainer.h \
-    Animators/PathAnimators/nodesettings.h \
     GPUEffects/gpurastereffect.h \
     GPUEffects/gpupostprocessor.h \
     GPUEffects/gpurastereffectcreator.h \

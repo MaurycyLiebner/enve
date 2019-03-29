@@ -2,7 +2,6 @@
 #include "undoredo.h"
 #include <QPainter>
 #include <QDebug>
-#include "Animators/pathanimator.h"
 #include "canvas.h"
 #include "pointhelpers.h"
 #include "Animators/SmartPath/smartpathanimator.h"

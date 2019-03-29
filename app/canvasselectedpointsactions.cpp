@@ -1,7 +1,4 @@
 #include "canvas.h"
-#include "Animators/PathAnimators/vectorpathanimator.h"
-#include "MovablePoints/nodepoint.h"
-#include "Animators/pathanimator.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "MovablePoints/pathpointshandler.h"
@@ -52,49 +49,46 @@ void Canvas::disconnectPoints() {
 }
 
 void Canvas::mergePoints() {
-    QList<NodePoint*> selectedNodePoints;
-    for(const auto& point : mSelectedPoints_d) {
-        if(point->isNodePoint()) {
-            auto asNodePt = GetAsPtr(point, NodePoint);
-            //if(((NodePoint*)point)->isEndPoint()) {
-                selectedNodePoints.append(asNodePt);
-            //}
-        }
-    }
-    if(selectedNodePoints.count() == 2) {
-        NodePoint *firstPoint = selectedNodePoints.first();
-        NodePoint *secondPoint = selectedNodePoints.last();
-        bool vailable = false;
-        vailable = vailable || (firstPoint->isEndPoint() &&
-                                secondPoint->isEndPoint());
-        vailable = vailable || (firstPoint->getPreviousPoint() == secondPoint);
-        vailable = vailable || (firstPoint->getNextPoint() == secondPoint);
-        if(!vailable) return;
-        clearPointsSelection();
+//    QList<NodePoint*> selectedNodePoints;
+//    for(const auto& point : mSelectedPoints_d) {
+//        if(point->isNodePoint()) {
+//            auto asNodePt = GetAsPtr(point, NodePoint);
+//            //if(((NodePoint*)point)->isEndPoint()) {
+//                selectedNodePoints.append(asNodePt);
+//            //}
+//        }
+//    }
+//    if(selectedNodePoints.count() == 2) {
+//        NodePoint *firstPoint = selectedNodePoints.first();
+//        NodePoint *secondPoint = selectedNodePoints.last();
+//        bool vailable = false;
+//        vailable = vailable || (firstPoint->isEndPoint() &&
+//                                secondPoint->isEndPoint());
+//        vailable = vailable || (firstPoint->getPreviousPoint() == secondPoint);
+//        vailable = vailable || (firstPoint->getNextPoint() == secondPoint);
+//        if(!vailable) return;
+//        clearPointsSelection();
 
-        if(firstPoint->getPreviousPoint() != secondPoint &&
-           firstPoint->getNextPoint() != secondPoint) {
-            addPointToSelection(firstPoint);
-            addPointToSelection(secondPoint);
-            connectPoints();
-            mergePoints();
-            return;
-        }
-        int selectNodeId = qMin(firstPoint->getNodeId(),
-                                secondPoint->getNodeId());
-        VectorPathAnimator *parentPath = firstPoint->getParentPath();
-        parentPath->mergeNodes(firstPoint->getNodeId(),
-                               secondPoint->getNodeId());
-        addPointToSelection(parentPath->getNodePtWithNodeId(selectNodeId));
-    }
+//        if(firstPoint->getPreviousPoint() != secondPoint &&
+//           firstPoint->getNextPoint() != secondPoint) {
+//            addPointToSelection(firstPoint);
+//            addPointToSelection(secondPoint);
+//            connectPoints();
+//            mergePoints();
+//            return;
+//        }
+//        int selectNodeId = qMin(firstPoint->getNodeId(),
+//                                secondPoint->getNodeId());
+//        VectorPathAnimator *parentPath = firstPoint->getParentPath();
+//        parentPath->mergeNodes(firstPoint->getNodeId(),
+//                               secondPoint->getNodeId());
+//        addPointToSelection(parentPath->getNodePtWithNodeId(selectNodeId));
+//    }
 }
 
 void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
     for(const auto& point : mSelectedPoints_d) {
-        if(point->isNodePoint()) {
-            auto asNodePt = GetAsPtr(point, NodePoint);
-            asNodePt->setCtrlsMode(mode);
-        } else if(point->isSmartNodePoint()) {
+        if(point->isSmartNodePoint()) {
             auto asNodePt = GetAsPtr(point, SmartNodePoint);
             asNodePt->setCtrlsMode(mode);
         }
@@ -117,24 +111,6 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
         if(selectedSNodePoints.contains(prevPoint))
             selectedPoint->setC0Enabled(true);
     }
-
-    QList<NodePoint*> selectedNodePoints;
-    for(const auto& point : mSelectedPoints_d) {
-        if(point->isNodePoint()) {
-            auto asNodePt = GetAsPtr(point, NodePoint);
-            selectedNodePoints.append(asNodePt);
-        }
-    }
-    for(const auto& selectedPoint : selectedNodePoints) {
-        NodePoint *nextPoint = selectedPoint->getNextPoint();
-        NodePoint *prevPoint = selectedPoint->getPreviousPoint();
-        if(selectedNodePoints.contains(nextPoint)) {
-            selectedPoint->setEndCtrlPtEnabled(true);
-        }
-        if(selectedNodePoints.contains(prevPoint)) {
-            selectedPoint->setStartCtrlPtEnabled(true);
-        }
-    }
 }
 
 void Canvas::makeSelectedPointsSegmentsLines() {
@@ -152,22 +128,6 @@ void Canvas::makeSelectedPointsSegmentsLines() {
             selectedPoint->setC2Enabled(false);
         if(selectedSNodePoints.contains(prevPoint))
             selectedPoint->setC0Enabled(false);
-    }
-
-    QList<NodePoint*> selectedNodePoints;
-    for(const auto& point : mSelectedPoints_d) {
-        if(point->isNodePoint()) {
-            auto asNodePt = GetAsPtr(point, NodePoint);
-            selectedNodePoints.append(asNodePt);
-        }
-    }
-    for(const auto& selectedPoint : selectedNodePoints) {
-        NodePoint * const nextPoint = selectedPoint->getNextPoint();
-        NodePoint * const prevPoint = selectedPoint->getPreviousPoint();
-        if(selectedNodePoints.contains(nextPoint))
-            selectedPoint->setEndCtrlPtEnabled(false);
-        if(selectedNodePoints.contains(prevPoint))
-            selectedPoint->setStartCtrlPtEnabled(false);
     }
 }
 
@@ -285,10 +245,6 @@ void Canvas::clearLastPressedPoint() {
     }
 }
 
-void Canvas::clearCurrentEndPoint() {
-    setCurrentEndPoint(nullptr);
-}
-
 QPointF Canvas::getSelectedPointsAbsPivotPos() {
     if(mSelectedPoints_d.isEmpty()) return QPointF(0, 0);
     QPointF posSum(0, 0);
@@ -375,7 +331,6 @@ void Canvas::clearPointsSelectionOrDeselect() {
         deselectAllBoxes();
     } else {
         clearPointsSelection();
-        clearCurrentEndPoint();
         clearCurrentSmartEndPoint();
         clearLastPressedPoint();
     }

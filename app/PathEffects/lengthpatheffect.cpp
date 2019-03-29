@@ -1,5 +1,4 @@
 #include "lengthpatheffect.h"
-#include "edge.h"
 #include "pointhelpers.h"
 #include "Animators/qrealanimator.h"
 #include "Properties/boolproperty.h"

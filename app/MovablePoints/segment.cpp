@@ -3,7 +3,6 @@
 #include "MovablePoints/smartctrlpoint.h"
 #include "Boxes/boundingbox.h"
 #include "global.h"
-#include "Animators/PathAnimators/vectorpathanimator.h"
 #include "pointhelpers.h"
 #include "GUI/mainwindow.h"
 #include "Animators/transformanimator.h"

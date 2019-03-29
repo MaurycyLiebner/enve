@@ -5,8 +5,6 @@
 #include "segment.h"
 #include "Animators/SmartPath/smartpathcontainer.h"
 class UndoRedoStack;
-struct NodeSettings;
-class VectorPath;
 class SkCanvas;
 class SmartCtrlPoint;
 class PathPointsHandler;

@@ -2,10 +2,9 @@
 #include "GUI/mainwindow.h"
 #include "MovablePoints/pathpivot.h"
 #include "Boxes/bone.h"
-#include "MovablePoints/pathpivot.h"
-#include "Boxes/vectorpath.h"
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
+#include "Boxes/smartvectorpath.h"
 
 bool Canvas::anim_nextRelFrameWithKey(const int &relFrame,
                                      int &nextRelFrame) {
@@ -55,31 +54,32 @@ bool Canvas::anim_prevRelFrameWithKey(const int &relFrame,
 
 void Canvas::shiftAllPointsForAllKeys(const int &by) {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            GetAsPtr(box, VectorPath)->shiftAllPointsForAllKeys(by);
+        if(box->SWT_isSmartVectorPath()) {
+            //GetAsPtr(box, SmartVectorPath)->shiftAllPointsForAllKeys(by);
         }
     }
 }
 
 void Canvas::revertAllPointsForAllKeys() {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            GetAsPtr(box, VectorPath)->revertAllPointsForAllKeys();
+        if(box->SWT_isSmartVectorPath()) {
+            //GetAsPtr(box, SmartVectorPath)->revertAllPointsForAllKeys();
         }
-    }}
+    }
+}
 
 void Canvas::shiftAllPoints(const int &by) {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            GetAsPtr(box, VectorPath)->shiftAllPoints(by);
+        if(box->SWT_isSmartVectorPath()) {
+            //GetAsPtr(box, SmartVectorPath)->shiftAllPoints(by);
         }
     }
 }
 
 void Canvas::revertAllPoints() {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            GetAsPtr(box, VectorPath)->revertAllPoints();
+        if(box->SWT_isSmartVectorPath()) {
+            //GetAsPtr(box, SmartVectorPath)->revertAllPoints();
         }
     }
 }
@@ -339,14 +339,6 @@ void Canvas::startSelectedFillColorTransform() {
     }
 }
 
-VectorPathEdge *Canvas::getEdgeAt(const QPointF& absPos) const {
-    for(const auto &box : mSelectedBoxes) {
-        const qreal zoomInv = 1/mCanvasTransformMatrix.m11();
-        const auto pathEdge = box->getEdge(absPos, zoomInv);
-        if(!pathEdge) return pathEdge;
-    }
-    return nullptr;
-}
 #include "Boxes/smartvectorpath.h"
 NormalSegment Canvas::getSmartEdgeAt(const QPointF& absPos) const {
     for(const auto &box : mSelectedBoxes) {
@@ -771,9 +763,9 @@ void Canvas::groupSelectedBoxes() {
     addBoxToSelection(newGroup.get());
 }
 
-VectorPath *Canvas::getPathResultingFromOperation(
+SmartVectorPath *Canvas::getPathResultingFromOperation(
         const SkPathOp& pathOp) {
-    auto newPath = SPtrCreate(VectorPath)();
+    auto newPath = SPtrCreate(SmartVectorPath)();
     SkOpBuilder builder;
     bool first = true;
     for(const auto &box : mSelectedBoxes) {
@@ -791,13 +783,13 @@ VectorPath *Canvas::getPathResultingFromOperation(
     }
     SkPath resultPath;
     builder.resolve(&resultPath);
-    newPath->loadPathFromSkPath(resultPath);
+    //newPath->loadPathFromSkPath(resultPath);
     mCurrentBoxesGroup->addContainedBox(newPath);
     return newPath.get();
 }
 
 void Canvas::selectedPathsDifference() {
-    VectorPath * const newPath = getPathResultingFromOperation(
+    SmartVectorPath * const newPath = getPathResultingFromOperation(
                 SkPathOp::kDifference_SkPathOp);
 
     clearBoxesSelection();
@@ -805,7 +797,7 @@ void Canvas::selectedPathsDifference() {
 }
 
 void Canvas::selectedPathsIntersection() {
-    VectorPath * const newPath = getPathResultingFromOperation(
+    SmartVectorPath * const newPath = getPathResultingFromOperation(
                 SkPathOp::kIntersect_SkPathOp);
 
     clearBoxesSelection();
@@ -813,10 +805,10 @@ void Canvas::selectedPathsIntersection() {
 }
 
 void Canvas::selectedPathsDivision() {
-    VectorPath * const newPath1 = getPathResultingFromOperation(
+    SmartVectorPath * const newPath1 = getPathResultingFromOperation(
                 SkPathOp::kDifference_SkPathOp);
 
-    VectorPath * const newPath2 = getPathResultingFromOperation(
+    SmartVectorPath * const newPath2 = getPathResultingFromOperation(
                 SkPathOp::kIntersect_SkPathOp);
 
     clearBoxesSelection();
@@ -825,9 +817,9 @@ void Canvas::selectedPathsDivision() {
 }
 
 void Canvas::selectedPathsExclusion() {
-    VectorPath * const newPath1 = getPathResultingFromOperation(
+    SmartVectorPath * const newPath1 = getPathResultingFromOperation(
                 SkPathOp::kDifference_SkPathOp);
-    VectorPath * const newPath2 = getPathResultingFromOperation(
+    SmartVectorPath * const newPath2 = getPathResultingFromOperation(
                 SkPathOp::kReverseDifference_SkPathOp);
 
     clearBoxesSelection();
@@ -852,14 +844,13 @@ void Canvas::selectedPathsBreakApart() {
 }
 
 void Canvas::selectedPathsUnion() {
-    VectorPath * const newPath = getPathResultingFromOperation(
+    SmartVectorPath * const newPath = getPathResultingFromOperation(
                 SkPathOp::kUnion_SkPathOp);
 
     clearBoxesSelection();
     addBoxToSelection(newPath);
 }
 
-#include "Animators/pathanimator.h"
 void Canvas::selectedPathsCombine() {
     if(mSelectedBoxes.isEmpty()) return;
     SmartVectorPath *firstVectorPath = nullptr;

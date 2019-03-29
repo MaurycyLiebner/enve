@@ -13,7 +13,6 @@ class Canvas;
 
 class MovablePoint;
 
-class NodePoint;
 class PathEffect;
 class DurationRectangleMovable;
 class FillSettingsAnimator;
@@ -26,8 +25,7 @@ class BoxTransformAnimator;
 class BasicTransformAnimator;
 
 class BoxesGroup;
-class VectorPathEdge;
-class VectorPath;
+class SmartVectorPath;
 class DurationRectangle;
 struct BoxesGroupRenderData;
 struct GPURasterEffect;
@@ -95,8 +93,8 @@ public:
     virtual qsptr<BoundingBox> createLink();
     virtual qsptr<BoundingBox> createLinkForLinkGroup();
 
-    virtual VectorPath *objectToVectorPathBox();
-    virtual VectorPath *strokeToVectorPathBox();
+    virtual SmartVectorPath *objectToVectorPathBox();
+    virtual SmartVectorPath *strokeToVectorPathBox();
 
     virtual void moveByRel(const QPointF &trans);
     virtual void moveByAbs(const QPointF &trans);
@@ -150,8 +148,7 @@ public:
                                                    const qreal &canvasScaleInv);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
-    virtual VectorPathEdge *getEdge(const QPointF &absPos,
-                                    const qreal &canvasScaleInv);
+
     virtual NormalSegment getNormalSegment(const QPointF &absPos,
                                            const qreal &canvasScaleInv) {
         Q_UNUSED(absPos);

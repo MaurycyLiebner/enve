@@ -2,7 +2,6 @@
 #include "undoredo.h"
 #include <QApplication>
 #include "GUI/mainwindow.h"
-#include "MovablePoints/ctrlpoint.h"
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
 #include "GUI/BoxesList/boxscrollwidget.h"

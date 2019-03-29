@@ -1,5 +1,4 @@
 #include "movablepoint.h"
-#include "Boxes/vectorpath.h"
 #include "global.h"
 #include "undoredo.h"
 #include "Boxes/boxesgroup.h"

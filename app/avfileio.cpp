@@ -1,7 +1,5 @@
 #include "avfileio.h"
 #include <fstream>
-#include "Animators/PathAnimators/pathkey.h"
-#include "Animators/PathAnimators/vectorpathanimator.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/randomqrealgenerator.h"
 #include "Animators/qpointfanimator.h"
@@ -11,7 +9,7 @@
 #include "Animators/qstringanimator.h"
 #include "Animators/transformanimator.h"
 #include "Animators/paintsettings.h"
-#include "Animators/pathanimator.h"
+#include "Animators/qrealanimator.h"
 #include "Animators/gradient.h"
 #include "Properties/comboboxproperty.h"
 #include "Properties/intproperty.h"
@@ -20,7 +18,6 @@
 #include "Boxes/boundingbox.h"
 #include "Boxes/pathbox.h"
 #include "Boxes/boxesgroup.h"
-#include "Boxes/vectorpath.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/circle.h"
 #include "Boxes/imagebox.h"
@@ -45,6 +42,7 @@
 #include "PixmapEffects/pixmapeffectsinclude.h"
 #include "basicreadwrite.h"
 #include "Boxes/internallinkcanvas.h"
+#include "Boxes/smartvectorpath.h"
 
 #define FORMAT_STR "AniVect av"
 #define CREATOR_VERSION "0.0a"
@@ -134,97 +132,6 @@ void Key::writeKey(QIODevice *target) {
 
 void Key::readKey(QIODevice *target) {
     target->read(rcChar(&mRelFrame), sizeof(int));
-}
-
-void PathContainer::writePathContainer(QIODevice * const target) const {
-    const int nPts = mElementsPos.count();
-    target->write(rcConstChar(&nPts), sizeof(int)); // number pts
-    for(const SkPoint &pos : mElementsPos) {
-        SkScalar xT, yT;
-        xT = pos.x(); yT = pos.y();
-        target->write(rcConstChar(&xT), sizeof(SkScalar));
-        target->write(rcConstChar(&yT), sizeof(SkScalar));
-    }
-    target->write(rcConstChar(&mPathClosed), sizeof(bool));
-}
-
-void PathContainer::readPathContainer(QIODevice *target) {
-    int nPts;
-    target->read(rcChar(&nPts), sizeof(int));
-    for(int i = 0; i < nPts; i++) {
-        SkScalar xT, yT;
-        target->read(rcChar(&xT), sizeof(SkScalar));
-        target->read(rcChar(&yT), sizeof(SkScalar));
-        mElementsPos.append(SkPoint::Make(xT, yT));
-    }
-    target->read(rcChar(&mPathClosed), sizeof(bool));
-    mPathUpdateNeeded = true;
-}
-
-void PathKey::writeKey(QIODevice *target) {
-    Key::writeKey(target);
-    writePathContainer(target);
-}
-
-void PathKey::readKey(QIODevice *target) {
-    Key::readKey(target);
-    readPathContainer(target);
-}
-
-void VectorPathAnimator::writeProperty(QIODevice * const target) const {
-    const int nNodes = mNodeSettings.count();
-    target->write(rcConstChar(&nNodes), sizeof(int));
-    for(const auto &nodeSettings : mNodeSettings) {
-        nodeSettings->write(target);
-    }
-
-    const int nKeys = anim_mKeys.count();
-    target->write(rcConstChar(&nKeys), sizeof(int));
-    for(const auto &key : anim_mKeys) {
-        key->writeKey(target);
-    }
-
-    writePathContainer(target);
-}
-
-stdsptr<Key> VectorPathAnimator::readKey(QIODevice *target) {
-    const auto newKey = SPtrCreate(PathKey)(this);
-    newKey->readKey(target);
-    return std::move(newKey);
-}
-
-void NodeSettings::write(QIODevice* target) {
-    target->write(rcConstChar(&fCtrlsMode),
-                 sizeof(CtrlsMode));
-    target->write(rcConstChar(&fStartEnabled),
-                 sizeof(bool));
-    target->write(rcConstChar(&fEndEnabled),
-                 sizeof(bool));
-}
-
-void NodeSettings::read(QIODevice* target) {
-    target->read(rcChar(&fCtrlsMode), sizeof(CtrlsMode));
-    target->read(rcChar(&fStartEnabled), sizeof(bool));
-    target->read(rcChar(&fEndEnabled), sizeof(bool));
-}
-
-void VectorPathAnimator::readProperty(QIODevice *target) {
-    int nNodes;
-    target->read(rcChar(&nNodes), sizeof(int));
-    for(int i = 0; i < nNodes; i++) {
-        auto nodeSettings = SPtrCreate(NodeSettings)();
-        nodeSettings->read(target);
-        insertNodeSettingsForNodeId(i, nodeSettings);
-    }
-
-    int nKeys;
-    target->read(rcChar(&nKeys), sizeof(int));
-    for(int i = 0; i < nKeys; i++) {
-        anim_appendKey(readKey(target));
-    }
-
-    readPathContainer(target);
-    updateNodePointsFromData();
 }
 
 void Animator::writeSelectedKeys(QIODevice* target) {
@@ -1200,7 +1107,7 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
         BoundingBoxType boxType;
         target->read(rcChar(&boxType), sizeof(BoundingBoxType));
         if(boxType == TYPE_VECTOR_PATH) {
-            box = SPtrCreate(VectorPath)();
+            box = SPtrCreate(SmartVectorPath)();
         } else if(boxType == TYPE_IMAGE) {
             box = SPtrCreate(ImageBox)();
         } else if(boxType == TYPE_TEXT) {
@@ -1244,43 +1151,6 @@ void BoxesGroup::readBoundingBox(QIODevice *target) {
     mFillPathEffectsAnimators->readProperty(target);
     mOutlinePathEffectsAnimators->readProperty(target);
     readChildBoxes(target);
-}
-
-void PathAnimator::writeProperty(QIODevice * const target) const {
-    int nPaths = mSinglePaths.count();
-    target->write(rcConstChar(&nPaths), sizeof(int));
-    for(const auto& pathAnimator : mSinglePaths) {
-        pathAnimator->writeProperty(target);
-    }
-}
-
-void PathAnimator::readVectorPathAnimator(QIODevice *target) {
-    auto pathAnimator = SPtrCreate(VectorPathAnimator)(this);
-    pathAnimator->readProperty(target);
-    addSinglePathAnimator(pathAnimator);
-}
-
-QMatrix PathAnimator::getTotalTransform() {
-    if(mParentBox) mParentBox->getTotalTransform();
-    return QMatrix();
-}
-
-void PathAnimator::readProperty(QIODevice *target) {
-    int nPaths;
-    target->read(rcChar(&nPaths), sizeof(int));
-    for(int i = 0; i < nPaths; i++) {
-        readVectorPathAnimator(target);
-    }
-}
-
-void VectorPath::writeBoundingBox(QIODevice *target) {
-    PathBox::writeBoundingBox(target);
-    mPathAnimator->writeProperty(target);
-}
-
-void VectorPath::readBoundingBox(QIODevice *target) {
-    PathBox::readBoundingBox(target);
-    mPathAnimator->readProperty(target);
 }
 
 void Canvas::writeBoundingBox(QIODevice *target) {
