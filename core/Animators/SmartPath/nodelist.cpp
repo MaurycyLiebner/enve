@@ -147,6 +147,18 @@ void NodeList::splitNodeAndDisconnect(const int& nodeId) {
     splitNode(nodeId);
 }
 
+void NodeList::mergeNodes(const int &node1Id, const int &node2Id) {
+    if(!nodesConnected(node1Id, node2Id))
+        RuntimeThrow("Only neighbouring connected nodes can be merged");
+    const int resId = qMin(node1Id, node2Id);
+    const int otherId = qMax(node1Id, node2Id);
+    Node * const resultingNode = at(resId);
+    Node * const otherNode = at(otherId);
+    *resultingNode = Node::sInterpolateNormal(*resultingNode, *otherNode, 0.5);
+    resultingNode->setNodeId(node1Id);
+    removeNodeFromList(node2Id);
+}
+
 bool NodeList::nodesConnected(const int& node1Id, const int& node2Id) const {
     if(qAbs(node2Id - node1Id) == 1) return true;
     const bool oneIsFirst = node1Id == 0 || node2Id == 0;
@@ -317,18 +329,22 @@ qreal NodeList::nextT(const int &nodeId) const {
 }
 
 Node * NodeList::prevNormal(const int& nodeId) const {
+    if(mNodes.count() <= 1) return nullptr;
     Node * currNode = mNodes.at(nodeId);
     while(prevNode(currNode)) {
         currNode = prevNode(currNode);
+        if(currNode->getNodeId() == nodeId) return nullptr;
         if(currNode->isNormal()) return currNode;
     }
     return nullptr;
 }
 
 Node * NodeList::nextNormal(const int& nodeId) const {
+    if(mNodes.count() <= 1) return nullptr;
     Node * currNode = mNodes.at(nodeId);
     while(nextNode(currNode)) {
         currNode = nextNode(currNode);
+        if(currNode->getNodeId() == nodeId) return nullptr;
         if(currNode->isNormal()) return currNode;
     }
     return nullptr;

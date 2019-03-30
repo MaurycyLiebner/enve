@@ -260,6 +260,15 @@ public:
         prp_updateInfluenceRangeAfterChanged();
     }
 
+    void actionMergeNodes(const int &node1Id, const int &node2Id) {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = GetAsPtr(key, SmartPathKey);
+            spKey->getValue().actionMergeNodes(node1Id, node2Id);
+        }
+        mBaseValue.actionMergeNodes(node1Id, node2Id);
+        prp_updateInfluenceRangeAfterChanged();
+    }
+
     void actionClose() {
         actionConnectNodes(0, mBaseValue.getNodeCount() - 1);
     }

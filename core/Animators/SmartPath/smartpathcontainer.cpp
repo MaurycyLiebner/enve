@@ -120,6 +120,10 @@ void SmartPath::actionConnectNodes(const int &node1Id, const int &node2Id) {
     } else RuntimeThrow("Only first and last node can be connected");
 }
 
+void SmartPath::actionMergeNodes(const int &node1Id, const int &node2Id) {
+    mNodesList.mergeNodes(node1Id, node2Id);
+}
+
 SkPath SmartPath::getPathAt() const {
     return mNodesList.toSkPath();
 }

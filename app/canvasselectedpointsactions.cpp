@@ -49,41 +49,36 @@ void Canvas::disconnectPoints() {
 }
 
 void Canvas::mergePoints() {
-//    QList<NodePoint*> selectedNodePoints;
-//    for(const auto& point : mSelectedPoints_d) {
-//        if(point->isNodePoint()) {
-//            auto asNodePt = GetAsPtr(point, NodePoint);
-//            //if(((NodePoint*)point)->isEndPoint()) {
-//                selectedNodePoints.append(asNodePt);
-//            //}
-//        }
-//    }
-//    if(selectedNodePoints.count() == 2) {
-//        NodePoint *firstPoint = selectedNodePoints.first();
-//        NodePoint *secondPoint = selectedNodePoints.last();
-//        bool vailable = false;
-//        vailable = vailable || (firstPoint->isEndPoint() &&
-//                                secondPoint->isEndPoint());
-//        vailable = vailable || (firstPoint->getPreviousPoint() == secondPoint);
-//        vailable = vailable || (firstPoint->getNextPoint() == secondPoint);
-//        if(!vailable) return;
-//        clearPointsSelection();
-
-//        if(firstPoint->getPreviousPoint() != secondPoint &&
-//           firstPoint->getNextPoint() != secondPoint) {
-//            addPointToSelection(firstPoint);
-//            addPointToSelection(secondPoint);
-//            connectPoints();
-//            mergePoints();
-//            return;
-//        }
-//        int selectNodeId = qMin(firstPoint->getNodeId(),
-//                                secondPoint->getNodeId());
-//        VectorPathAnimator *parentPath = firstPoint->getParentPath();
-//        parentPath->mergeNodes(firstPoint->getNodeId(),
-//                               secondPoint->getNodeId());
-//        addPointToSelection(parentPath->getNodePtWithNodeId(selectNodeId));
-//    }
+    QList<SmartNodePoint*> selectedNodePoints;
+    for(const auto& point : mSelectedPoints_d) {
+        if(point->isSmartNodePoint()) {
+            const auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            selectedNodePoints.append(asNodePt);
+        }
+    }
+    if(selectedNodePoints.count() == 2) {
+        std::sort(selectedNodePoints.begin(), selectedNodePoints.end(),
+                  [](const SmartNodePoint * const v1,
+                     const SmartNodePoint * const v2) {
+            return v1->getNodeId() < v2->getNodeId();
+        });
+        const auto firstPoint = selectedNodePoints.first();
+        const auto secondPoint = selectedNodePoints.last();
+        bool vailable = false;
+        vailable = vailable || (firstPoint->isEndPoint() &&
+                                secondPoint->isEndPoint());
+        const bool ends = firstPoint->isEndPoint() && secondPoint->isEndPoint();
+        const bool neigh = firstPoint->getPreviousPoint() == secondPoint ||
+                           firstPoint->getNextPoint() == secondPoint;
+        if(!ends && !neigh) return;
+        if(ends) {
+            connectPoints();
+            mergePoints();
+            return;
+        }
+        removePointFromSelection(secondPoint);
+        firstPoint->actionMergeWithNormalPoint(secondPoint);
+    }
 }
 
 void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {

@@ -55,6 +55,8 @@ public:
     void promoteToNormal(const int& nodeId);
     bool moveToClosestSegment(const int& nodeId, const QPointF& relPos);
 
+    void mergeNodes(const int& nodeId1, const int& nodeId2);
+
     // actions on normal-normal segments
     SmartNodePoint *divideSegment(const int& node1Id, const int& node2Id,
                                   const qreal& t);

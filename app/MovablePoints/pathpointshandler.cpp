@@ -175,6 +175,10 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
     return true;
 }
 
+void PathPointsHandler::mergeNodes(const int &nodeId1, const int &nodeId2) {
+    mTargetAnimator->actionMergeNodes(nodeId1, nodeId2);
+}
+
 SmartNodePoint* PathPointsHandler::divideSegment(const int &node1Id,
                                                  const int &node2Id,
                                                  const qreal &t) {

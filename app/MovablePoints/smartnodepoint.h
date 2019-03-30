@@ -36,6 +36,7 @@ public:
     SmartNodePoint* actionAddPointAbsPos(const QPointF &absPos);
     bool actionConnectToNormalPoint(SmartNodePoint * const other);
     void actionDisconnectFromNormalPoint(SmartNodePoint * const other);
+    void actionMergeWithNormalPoint(SmartNodePoint * const other);
 
     //void moveByRel(const QPointF &relTranslation);
 

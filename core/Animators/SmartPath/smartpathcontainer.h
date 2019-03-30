@@ -126,6 +126,7 @@ public:
         mNodesList.prependShallowCopyFrom(other.getNodesRef());
         other.clear();
     }
+    void actionMergeNodes(const int &node1Id, const int &node2Id);
 
     void reset() {
         mNodesList.clear();

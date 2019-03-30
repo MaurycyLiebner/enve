@@ -498,6 +498,12 @@ void SmartNodePoint::actionDisconnectFromNormalPoint(
     }
 }
 
+void SmartNodePoint::actionMergeWithNormalPoint(SmartNodePoint * const other) {
+    if(other == mNextNormalPoint || other == mPrevNormalPoint) {
+        mHandler_k->mergeNodes(getNodeId(), other->getNodeId());
+    }
+}
+
 SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
     return mHandler_k->addNewAtEnd(relPos);
 }

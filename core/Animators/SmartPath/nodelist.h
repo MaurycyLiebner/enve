@@ -67,12 +67,14 @@ public:
     }
 
     Node * prevNode(const int& nodeId) const {
+        if(mNodes.count() <= 1) return nullptr;
         if(nodeId > 0) return mNodes[nodeId - 1];
         if(mClosed) return mNodes.last();
         return nullptr;
     }
 
     Node * nextNode(const int& nodeId) const {
+        if(mNodes.count() <= 1) return nullptr;
         if(nodeId < mNodes.count() - 1) return mNodes[nodeId + 1];
         if(mClosed) return mNodes.first();
         return nullptr;
@@ -112,6 +114,7 @@ public:
     void promoteDissolvedNodeToNormal(const int &nodeId);
     void splitNode(const int &nodeId);
     void splitNodeAndDisconnect(const int &nodeId);
+    void mergeNodes(const int &node1Id, const int &node2Id);
     bool nodesConnected(const int &node1Id, const int &node2Id) const;
 
     void moveNode(const int& fromId, const int& toId);
