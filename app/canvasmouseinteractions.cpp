@@ -499,10 +499,10 @@ void Canvas::handleMovePointMousePressEvent() {
         clearHoveredEdge();
     } else if(mLastPressedPoint) {
         if(mLastPressedPoint->isSelected()) return;
-        if(!isShiftPressed() && !mLastPressedPoint->isCtrlPoint()) {
+        if(!isShiftPressed() && mLastPressedPoint->selectionEnabled()) {
             clearPointsSelection();
         }
-        if(mLastPressedPoint->isCtrlPoint()) {
+        if(!mLastPressedPoint->selectionEnabled()) {
             addPointToSelection(mLastPressedPoint);
         }
     }
@@ -764,7 +764,7 @@ void Canvas::handleMovePointMouseRelease() {
     } else {
         finishSelectedPointsTransform();
         if(mLastPressedPoint) {
-            if(mLastPressedPoint->isCtrlPoint()) {
+            if(!mLastPressedPoint->selectionEnabled()) {
                 removePointFromSelection(mLastPressedPoint);
             }
         }
@@ -923,15 +923,17 @@ void Canvas::handleMovePointMouseMove() {
                     const int selId = nodePt->moveToClosestSegment(
                                 mCurrentMouseEventPosRel);
                     const auto handler = nodePt->getHandler();
+                    const auto dissPt = handler->getPointWithId(selId);
                     if(nodePt->getNodeId() != selId) {
                         removePointFromSelection(nodePt);
-                        addPointToSelection(handler->getPointWithId(selId));
+                        addPointToSelection(dissPt);
                     }
+                    mLastPressedPoint = dissPt;
                     return;
                 }
             }
 
-            if(mLastPressedPoint->isCtrlPoint()) {
+            if(!mLastPressedPoint->selectionEnabled()) {
                 if(mFirstMouseMove) mLastPressedPoint->startTransform();
                 mLastPressedPoint->moveByAbs(
                         getMoveByValueForEventPos(mCurrentMouseEventPosRel));

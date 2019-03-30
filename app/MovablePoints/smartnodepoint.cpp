@@ -110,6 +110,7 @@ void SmartNodePoint::removeApproximate() {
 
 void SmartNodePoint::rectPointsSelection(
         const QRectF &absRect, QList<stdptr<MovablePoint>> &list) {
+    if(!selectionEnabled()) return;
     if(!isSelected()) {
         if(isContainedInRect(absRect)) {
             select();
@@ -576,10 +577,8 @@ void SmartNodePoint::updateFromNodeData() {
     updateC2Visibility();
     const auto type = getType();
     if(type == Node::NORMAL) {
-        mType = TYPE_SMART_PATH_POINT;
         mRadius = 6.5;
     } else {
-        mType = TYPE_CTRL_POINT;
         mRadius = (type == Node::DISSOLVED ? 5.5 : 4);
     }
 }

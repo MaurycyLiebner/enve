@@ -32,14 +32,21 @@ public:
     virtual void setRelativePos(const QPointF &relPos) = 0;
     virtual QPointF getRelativePos() const = 0;
 
+    virtual void moveToAbs(const QPointF& absPos);
+    virtual void moveByAbs(const QPointF &absTranslatione);
+
     virtual void startTransform();
     virtual void finishTransform();
     virtual void cancelTransform() {}
 
-    QPointF getAbsolutePos() const;
-
     virtual void drawSk(SkCanvas * const canvas,
                         const SkScalar &invScale);
+
+    virtual bool selectionEnabled() const {
+        return true;
+    }
+
+    QPointF getAbsolutePos() const;
 
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);
@@ -48,8 +55,6 @@ public:
     BasicTransformAnimator *getParentTransform();
 
     bool isContainedInRect(const QRectF &absRect);
-    virtual void moveToAbs(const QPointF& absPos);
-    virtual void moveByAbs(const QPointF &absTranslatione);
 
     virtual void removeApproximate() {}
 

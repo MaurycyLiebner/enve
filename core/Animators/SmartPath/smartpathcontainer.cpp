@@ -79,7 +79,8 @@ void SmartPath::actionMoveNodeBetween(const int& movedNodeId,
                                       const int& nextNodeId) {
     if(!mNodesList.nodesConnected(prevNodeId, nextNodeId))
         RuntimeThrow("Trying to move between not connected nodes");
-    mNodesList.moveNode(movedNodeId, nextNodeId);
+    const int targetId = (movedNodeId < prevNodeId ? prevNodeId : nextNodeId);
+    mNodesList.moveNode(movedNodeId, targetId);
 }
 
 void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {

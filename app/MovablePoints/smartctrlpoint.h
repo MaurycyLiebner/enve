@@ -18,7 +18,9 @@ public:
 
     bool isHidden() const;
     void scale(const qreal &sx, const qreal &sy);
-
+    bool selectionEnabled() const {
+        return false;
+    }
     void setOtherCtrlPt(SmartCtrlPoint * const ctrlPt);
     void rotate(const qreal &rotate);
 protected:

@@ -32,6 +32,10 @@ public:
     void removeFromVectorPath();
     void removeApproximate();
 
+    bool selectionEnabled() const {
+        return isNormal();
+    }
+
     int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
     SmartNodePoint* actionAddPointAbsPos(const QPointF &absPos);

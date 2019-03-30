@@ -567,7 +567,7 @@ void Canvas::schedulePivotUpdate() {
         mRotPivot->isScaling() ||
         mRotPivot->isSelected()) return;
     if(mLastPressedPoint) {
-        if(mLastPressedPoint->isCtrlPoint()) return;
+        if(!mLastPressedPoint->selectionEnabled()) return;
     }
     mPivotUpdateNeeded = true;
 }
