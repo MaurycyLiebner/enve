@@ -95,6 +95,30 @@ int NodeList::appendNode(const Node &nodeBlueprint) {
     return insertId;
 }
 
+void NodeList::demoteNormalNodeToDissolved(const int& nodeId) {
+    demoteNormalNodeToDissolved(nodeId, at(nodeId));
+}
+
+void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
+                                           Node * const node) {
+    if(node->isDissolved()) return;
+    Node * const prevNormalV = prevNormal(nodeId);
+    Node * const nextNormalV = nextNormal(nodeId);
+    if(!prevNormalV || !nextNormalV) return;
+
+    setNodeType(node, Node::DISSOLVED);
+    node->setT(0.5);
+    for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
+        Node * const iNode = mNodes[i];
+        if(iNode->isDissolved()) iNode->setT(iNode->t()*0.5);
+    }
+    for(int i = nodeId + 1; i < nextNormalV->getNodeId(); i++) {
+        Node * const iNode = mNodes[i];
+        if(iNode->isDissolved()) iNode->setT(iNode->t()*0.5 + 0.5);
+    }
+    updateDissolvedNodePosition(nodeId);
+}
+
 void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
                                             Node * const node) {
     if(node->isNormal()) return;

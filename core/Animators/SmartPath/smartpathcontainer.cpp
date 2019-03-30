@@ -74,6 +74,10 @@ void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
     mNodesList.promoteDissolvedNodeToNormal(nodeId);
 }
 
+void SmartPath::actionDemoteToDissolved(const int &nodeId) {
+    mNodesList.demoteNormalNodeToDissolved(nodeId);
+}
+
 void SmartPath::actionMoveNodeBetween(const int& movedNodeId,
                                       const int& prevNodeId,
                                       const int& nextNodeId) {

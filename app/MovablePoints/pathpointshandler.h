@@ -53,6 +53,7 @@ public:
 
     // actions on DUMMY and DISSOLVED
     void promoteToNormal(const int& nodeId);
+    void demoteToDissolved(const int& nodeId);
     int moveToClosestSegment(const int& nodeId, const QPointF& relPos);
 
     void mergeNodes(const int& nodeId1, const int& nodeId2);

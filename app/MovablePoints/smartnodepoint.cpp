@@ -511,6 +511,14 @@ void SmartNodePoint::actionMergeWithNormalPoint(SmartNodePoint * const other) {
     }
 }
 
+void SmartNodePoint::actionPromoteToNormal() {
+    return mHandler_k->promoteToNormal(getNodeId());
+}
+
+void SmartNodePoint::actionDemoteToDissolved() {
+    return mHandler_k->demoteToDissolved(getNodeId());
+}
+
 SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
     return mHandler_k->addNewAtEnd(relPos);
 }

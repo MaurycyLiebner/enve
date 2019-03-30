@@ -42,6 +42,8 @@ public:
     bool actionConnectToNormalPoint(SmartNodePoint * const other);
     void actionDisconnectFromNormalPoint(SmartNodePoint * const other);
     void actionMergeWithNormalPoint(SmartNodePoint * const other);
+    void actionPromoteToNormal();
+    void actionDemoteToDissolved();
 
     //void moveByRel(const QPointF &relTranslation);
 

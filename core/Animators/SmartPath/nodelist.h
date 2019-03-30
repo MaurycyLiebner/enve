@@ -110,8 +110,13 @@ public:
     }
 
     int insertFirstNode(const Node &nodeBlueprint);
-    void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);
+
     void promoteDissolvedNodeToNormal(const int &nodeId);
+    void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);
+
+    void demoteNormalNodeToDissolved(const int& nodeId);
+    void demoteNormalNodeToDissolved(const int &nodeId, Node * const node);
+
     void splitNode(const int &nodeId);
     void splitNodeAndDisconnect(const int &nodeId);
     void mergeNodes(const int &node1Id, const int &node2Id);

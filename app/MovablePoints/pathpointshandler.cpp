@@ -141,6 +141,18 @@ void PathPointsHandler::promoteToNormal(const int &nodeId) {
                  qMax(prevNormalId, nextNormalId));
 }
 
+void PathPointsHandler::demoteToDissolved(const int &nodeId) {
+    const int prevNormalId = targetPath()->prevNormalId(nodeId);
+    const int nextNormalId = targetPath()->nextNormalId(nodeId);
+    blockAllPointsUpdate();
+    mTargetAnimator->beforeBinaryPathChange();
+    targetPath()->actionDemoteToDissolved(nodeId);
+    unblockAllPointsUpdate();
+
+    updatePoints(qMin(prevNormalId, nextNormalId),
+                 qMax(prevNormalId, nextNormalId));
+}
+
 int PathPointsHandler::moveToClosestSegment(const int &nodeId,
                                             const QPointF &relPos) {
     NormalSegment::SubSegment minSubSeg{nullptr, nullptr, nullptr};
