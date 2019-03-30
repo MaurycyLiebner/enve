@@ -53,7 +53,7 @@ public:
 
     // actions on DUMMY and DISSOLVED
     void promoteToNormal(const int& nodeId);
-    bool moveToClosestSegment(const int& nodeId, const QPointF& relPos);
+    int moveToClosestSegment(const int& nodeId, const QPointF& relPos);
 
     void mergeNodes(const int& nodeId1, const int& nodeId2);
 
@@ -90,7 +90,6 @@ private:
     }
     void updatePoint(const int& nodeId);
     void updatePoint(SmartNodePoint * const pt, const int &nodeId);
-    void testNode_TEST(const int &nodeId);
 
     SmartNodePoint* createNewNodePoint(const int& nodeId);
     SmartNodePoint* createAndAssignNewNodePoint(const int& nodeId);

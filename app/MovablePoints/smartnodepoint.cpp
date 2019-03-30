@@ -70,6 +70,12 @@ void SmartNodePoint::finishTransform() {
     mParentAnimator->finishPathChange();
 }
 
+int SmartNodePoint::moveToClosestSegment(const QPointF &absPos) {
+    const QPointF relPos = mapAbsoluteToRelative(absPos);
+    return mHandler_k->moveToClosestSegment(getNodeId(), relPos);
+}
+
+#include <QApplication>
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     if(getType() == Node::NORMAL) {
         setRelativePosVal(relPos);
@@ -535,31 +541,13 @@ void SmartNodePoint::c2Moved(const QPointF &c2) {
 
 void SmartNodePoint::updateFromNodeDataPosOnly() {
     if(mNode_d->isNormal()) {
-        mC0Pt->setRelativePosVal(mNode_d->getC0());
-        setRelativePosVal(mNode_d->fP1);
-        mC2Pt->setRelativePosVal(mNode_d->getC2());
+        mC0Pt->setRelativePosVal(mNode_d->c0());
+        setRelativePosVal(mNode_d->p1());
+        mC2Pt->setRelativePosVal(mNode_d->c2());
     } else if(mNode_d->isDissolved()) {
         currentPath()->updateDissolvedNodePosition(getNodeId());
-        setRelativePosVal(mNode_d->fP1);
+        setRelativePosVal(mNode_d->p1());
     }
-}
-
-void SmartNodePoint::testNode_TEST() {
-    Q_ASSERT(mNode_d);
-
-    const int prevNodeId = currentPath()->prevNodeId(mNode_d->getNodeId());
-    const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
-    Q_ASSERT(prevNode == mPrevPoint);
-
-    const int nextNodeId = currentPath()->nextNodeId(mNode_d->getNodeId());
-    const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
-    Q_ASSERT(nextNode == mNextPoint);
-
-    const auto prevNormalNode = mHandler_k->getPrevNormalNode(getNodeId());
-    Q_ASSERT(prevNormalNode == mPrevNormalPoint);
-
-    const auto nextNormalNode = mHandler_k->getNextNormalNode(getNodeId());
-    Q_ASSERT(nextNormalNode == mNextNormalPoint);
 }
 
 void SmartNodePoint::updateFromNodeData() {

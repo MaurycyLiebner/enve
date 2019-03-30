@@ -6,8 +6,8 @@
 
 qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
                                   const Node& nextNode) {
-    return qCubicSegment2D(prevNode.fP1, prevNode.getC2(),
-                           nextNode.getC0(), nextNode.fP1);
+    return qCubicSegment2D(prevNode.p1(), prevNode.c2(),
+                           nextNode.c0(), nextNode.p1());
 }
 
 void NodeList::moveNode(const int& fromId, const int& toId) {
@@ -24,7 +24,7 @@ void NodeList::updateDissolvedNodePosition(const int &nodeId,
     const Node * const prevNode = prevNormal(nodeId);
     const Node * const nextNode = nextNormal(nodeId);
     const auto normalSeg = gSegmentFromNodes(*prevNode, *nextNode);
-    node->fP1 = normalSeg.posAtT(node->fT);
+    node->mP1 = normalSeg.posAtT(node->mT);
 }
 
 bool NodeList::read(QIODevice * const src) {
@@ -102,26 +102,26 @@ void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
     Node * const nextNormalV = nextNormal(nodeId);
 
     auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
-    auto div = seg.dividedAtT(node->fT);
+    auto div = seg.dividedAtT(node->mT);
     const auto& first = div.first;
     const auto& second = div.second;
-    prevNormalV->fC2 = first.c1();
-    node->fC0 = first.c2();
-    node->fP1 = first.p3();
-    node->fC2 = second.c1();
+    prevNormalV->mC2 = first.c1();
+    node->mC0 = first.c2();
+    node->mP1 = first.p3();
+    node->mC2 = second.c1();
     setNodeType(node, Node::NORMAL);
     setNodeCtrlsMode(node, CtrlsMode::CTRLS_SMOOTH);
-    nextNormalV->fC0 = second.c2();
+    nextNormalV->mC0 = second.c2();
     for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
-            iNode->fT = gMapTToFragment(0, node->fT, iNode->fT);
+            iNode->mT = gMapTToFragment(0, node->mT, iNode->mT);
         }
     }
     for(int i = nodeId + 1; i < nextNormalV->getNodeId(); i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
-            iNode->fT = gMapTToFragment(node->fT, 1, iNode->fT);
+            iNode->mT = gMapTToFragment(node->mT, 1, iNode->mT);
         }
     }
 }
@@ -134,8 +134,8 @@ void NodeList::splitNode(const int& nodeId) {
     Node * const node = mNodes[nodeId];
     Node newNode = *node;
     if(node->isNormal()) {
-        node->fC2 = node->fP1;
-        newNode.fC0 = newNode.fP1;
+        node->mC2 = node->mP1;
+        newNode.mC0 = newNode.mP1;
     }
     const int nextNormalIdV = nextNormal(nodeId)->getNodeId();
     if(nextNormalIdV == 0) {
@@ -170,8 +170,8 @@ bool NodeList::nodesConnected(const int& node1Id, const int& node2Id) const {
 
 void gCubicTo(const Node& prevNode, const Node& nextNode,
               QList<qreal>& dissolvedTs, SkPath& result) {
-    qCubicSegment2D seg(prevNode.fP1, prevNode.fC2,
-                        nextNode.fC0, nextNode.fP1);
+    qCubicSegment2D seg(prevNode.p1(), prevNode.c2(),
+                        nextNode.c0(), nextNode.p1());
     qreal lastT = 0;
     for(const qreal& t : dissolvedTs) {
         const qreal mappedT = gMapTToFragment(lastT, 1, t);
@@ -201,11 +201,11 @@ SkPath NodeList::toSkPath() const {
 
     bool move = true;
     for(const auto& node : mNodes) {
-        if(node->isDissolved()) dissolvedTs << node->fT;
+        if(node->isDissolved()) dissolvedTs << node->t();
         else if(node->isNormal()) {
             if(move) {
                 firstNode = node.get();
-                result.moveTo(toSkPoint(node->fP1));
+                result.moveTo(toSkPoint(node->p1()));
                 move = false;
             } else {
                 gCubicTo(*prevNormalNode, *node,
@@ -252,11 +252,11 @@ void NodeList::setPath(const SkPath &path) {
                 const QPointF qPt = toQPointF(pts[1]);
 
                 prevNode->setC2Enabled(false);
-                prevNode->fC2 = prevNode->fP1;
+                prevNode->mC2 = prevNode->mP1;
 
                 if(iter.peek() == SkPath::kClose_Verb) {
                     firstNode->setC0Enabled(false);
-                    firstNode->fC0 = firstNode->fP1;
+                    firstNode->mC0 = firstNode->mP1;
                 } else {
                     prevNode = appendAndGetNode(Node(qPt, qPt, qPt));
                 }
@@ -283,11 +283,11 @@ void NodeList::setPath(const SkPath &path) {
                 const QPointF p2Pt = toQPointF(pts[3]);
 
                 prevNode->setC2Enabled(true);
-                prevNode->fC2 = c0Pt;
+                prevNode->mC2 = c0Pt;
 
                 if(iter.peek() == SkPath::kClose_Verb && quadsCount == 0) {
                     firstNode->setC0Enabled(true);
-                    firstNode->fC0 = c1Pt;
+                    firstNode->mC0 = c1Pt;
                 } else {
                     prevNode = appendAndGetNode(Node(c1Pt, p2Pt, p2Pt));
                 }
@@ -318,14 +318,14 @@ qreal NodeList::prevT(const int &nodeId) const {
     if(nodeId == 0) return 0;
     const Node * const node = mNodes.at(nodeId - 1);
     if(node->isNormal()) return 0;
-    return node->fT;
+    return node->mT;
 }
 
 qreal NodeList::nextT(const int &nodeId) const {
     if(nodeId == mNodes.count() - 1) return 1;
     const Node * const node = mNodes.at(nodeId + 1);
     if(node->isNormal()) return 1;
-    return node->fT;
+    return node->mT;
 }
 
 Node * NodeList::prevNormal(const int& nodeId) const {

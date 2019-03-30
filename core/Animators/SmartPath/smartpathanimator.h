@@ -269,6 +269,15 @@ public:
         prp_updateInfluenceRangeAfterChanged();
     }
 
+    void actionMoveNodeBetween(const int& nodeId,
+                               const int& prevNodeId,
+                               const int& nextNodeId) {
+        beforeBinaryPathChange();
+        getCurrentlyEditedPath()->actionMoveNodeBetween(
+                    nodeId, prevNodeId, nextNodeId);
+        pathChanged();
+    }
+
     void actionClose() {
         actionConnectNodes(0, mBaseValue.getNodeCount() - 1);
     }
@@ -278,6 +287,7 @@ public:
     void actionReverseCurrent() {
         beforeBinaryPathChange();
         getCurrentlyEditedPath()->actionReversePath();
+        pathChanged();
     }
 
     void actionReverseAll() {

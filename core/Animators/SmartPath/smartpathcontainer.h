@@ -1,4 +1,4 @@
-﻿#ifndef SMARTPATHCONTAINER_H
+#ifndef SMARTPATHCONTAINER_H
 #define SMARTPATHCONTAINER_H
 #include "simplemath.h"
 #include "skia/skiaincludes.h"
@@ -47,7 +47,7 @@ public:
         Node * const node = mNodesList.at(nodeId);
         if(!node->isDissolved()) RuntimeThrow("Setting dissolved node value "
                                              "on a node of a different type");
-        node->fT = t;
+        node->setT(t);
         updateDissolvedNodePosition(nodeId, node);
     }
 
@@ -58,9 +58,9 @@ public:
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node->fC0 = c0;
-        node->fP1 = p1;
-        node->fC2 = c2;
+        node->setC0(c0);
+        node->setP1(p1);
+        node->setC2(c2);
     }
 
     void actionSetNormalNodeValues(const int& nodeId,
@@ -75,21 +75,21 @@ public:
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node->fP1 = p1;
+        node->setP1(p1);
     }
 
     void actionSetNormalNodeC0(const int& nodeId, const QPointF& c0) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node->fC0 = c0;
+        node->setC0(c0);
     }
 
     void actionSetNormalNodeC2(const int& nodeId, const QPointF& c2) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
-        node->fC2 = c2;
+        node->setC2(c2);
     }
 
     void actionSetNormalNodeCtrlsMode(const int& nodeId, const CtrlsMode& mode) {

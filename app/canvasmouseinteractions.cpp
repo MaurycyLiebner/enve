@@ -891,7 +891,9 @@ QPointF Canvas::getMoveByValueForEventPos(const QPointF &eventPos) {
     else if(mXOnlyTransform) moveByPoint.setY(0);
     return moveByPoint;
 }
-
+#include <QApplication>
+#include "MovablePoints/smartctrlpoint.h"
+#include "MovablePoints/pathpointshandler.h"
 void Canvas::handleMovePointMouseMove() {
     if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) mRotPivot->startTransform();
@@ -912,15 +914,29 @@ void Canvas::handleMovePointMouseMove() {
         if(mLastPressedPoint) {
             addPointToSelection(mLastPressedPoint);
 
+            const auto keyMods = QApplication::queryKeyboardModifiers();
+            const bool ctrlPressed = keyMods.testFlag(Qt::ControlModifier);
+            if(ctrlPressed && mLastPressedPoint->isSmartNodePoint()) {
+                const auto nodePt = GetAsPtr(mLastPressedPoint,
+                                             SmartNodePoint);
+                if(nodePt->isDissolved()) {
+                    const int selId = nodePt->moveToClosestSegment(
+                                mCurrentMouseEventPosRel);
+                    const auto handler = nodePt->getHandler();
+                    if(nodePt->getNodeId() != selId) {
+                        removePointFromSelection(nodePt);
+                        addPointToSelection(handler->getPointWithId(selId));
+                    }
+                    return;
+                }
+            }
+
             if(mLastPressedPoint->isCtrlPoint()) {
                 if(mFirstMouseMove) mLastPressedPoint->startTransform();
                 mLastPressedPoint->moveByAbs(
                         getMoveByValueForEventPos(mCurrentMouseEventPosRel));
-                return;//
-            }/* else {
-                mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
-                                                         mFirstMouseMove);
-            }*/
+                return;
+            }
         }
         moveSelectedPointsByAbs(
                     getMoveByValueForEventPos(mCurrentMouseEventPosRel),

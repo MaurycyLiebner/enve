@@ -32,6 +32,7 @@ public:
     void removeFromVectorPath();
     void removeApproximate();
 
+    int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
     SmartNodePoint* actionAddPointAbsPos(const QPointF &absPos);
     bool actionConnectToNormalPoint(SmartNodePoint * const other);
@@ -114,19 +115,19 @@ public:
                         const QPointF &c2);
 
     qreal getT() const {
-        return mNode_d->fT;
+        return mNode_d->t();
     }
 
     QPointF getC0() const {
-        return mNode_d->getC0();
+        return mNode_d->c0();
     }
 
     QPointF getP1() const {
-        return mNode_d->fP1;
+        return mNode_d->p1();
     }
 
     QPointF getC2() const {
-        return mNode_d->getC2();
+        return mNode_d->c2();
     }
 
     bool getC0Enabled() const {
@@ -141,7 +142,7 @@ public:
         return mNode_d->getCtrlsMode();
     }
 
-    Node::Type getType() const {
+    Node::NodeType getType() const {
         return mNode_d->getType();
     }
 
@@ -187,7 +188,6 @@ public:
     }
 
     const PathPointsHandler * getHandler();
-    void testNode_TEST();
 protected:
     SmartNodePoint(PathPointsHandler * const handler,
                    SmartPathAnimator * const parentAnimator,
@@ -202,7 +202,6 @@ private:
     SmartPath* currentPath() const;
 
     bool mSeparateNodePoint = false;
-    int mNodeId;
     const Node * mNode_d = nullptr;
 
     const stdptr<PathPointsHandler> mHandler_k;

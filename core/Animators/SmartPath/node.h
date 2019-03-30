@@ -15,41 +15,41 @@ struct NormalNodeData {
 struct Node {
     friend class NodeList;
     friend class ListOfNodes;
-    enum Type : char {
+    enum NodeType : char {
         DISSOLVED, NORMAL, NONE
     };
 
-    Node() { fType = NONE; }
+    Node() { mType = NONE; }
 
     Node(const NormalNodeData& data) {
-        fType = NORMAL;
+        mType = NORMAL;
         setNormalData(data);
     }
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2) {
-        fC0 = c0;
-        fP1 = p1;
-        fC2 = c2;
-        fType = NORMAL;
+        mC0 = c0;
+        mP1 = p1;
+        mC2 = c2;
+        mType = NORMAL;
     }
 
     Node(const qreal& t) {
-        fT = t;
-        fType = DISSOLVED;
+        mT = t;
+        mType = DISSOLVED;
     }
 
-    bool isNormal() const { return fType == NORMAL; }
+    bool isNormal() const { return mType == NORMAL; }
 
-    bool isDissolved() const { return fType == DISSOLVED; }
+    bool isDissolved() const { return mType == DISSOLVED; }
 
     int getNodeId() const {
-        return fId;
+        return mId;
     }
 
     void setNormalData(const NormalNodeData& data) {
-        fC0 = data.fC0;
-        fP1 = data.fP1;
-        fC2 = data.fC2;
+        mC0 = data.fC0;
+        mP1 = data.fP1;
+        mC2 = data.fC2;
         setC0Enabled(data.fC0Enabled);
         setC2Enabled(data.fC2Enabled);
         setCtrlsMode(data.fCtrlsMode);
@@ -61,72 +61,93 @@ struct Node {
     static Node sInterpolateDissolved(const Node &node1, const Node &node2,
                                       const qreal &weight2);
 
-    QPointF fC0;
-    QPointF fP1;
-    QPointF fC2;
-
-    QPointF getC0() const {
-        if(fC0Enabled) return fC0;
-        return fP1;
+    QPointF c0() const {
+        if(mC0Enabled) return mC0;
+        return mP1;
     }
 
-    QPointF getC2() const {
-        if(fC2Enabled) return fC2;
-        return fP1;
+    QPointF p1() const {
+        return mP1;
     }
 
-    //! @brief T value for segment defined by previous and next normal node
-    qreal fT;
+    QPointF c2() const {
+        if(mC2Enabled) return mC2;
+        return mP1;
+    }
 
-    Type getType() const { return fType; }
-    CtrlsMode getCtrlsMode() const { return fCtrlsMode; }
+    qreal t() const {
+        return mT;
+    }
+
+    void setC0(const QPointF& c0) {
+        mC0 = c0;
+    }
+
+    void setC2(const QPointF& c2) {
+        mC2 = c2;
+    }
+
+    void setP1(const QPointF& p1) {
+        mP1 = p1;
+    }
+
+    void setT(const qreal& t) {
+        mT = t;
+    }
+
+    NodeType getType() const { return mType; }
+    CtrlsMode getCtrlsMode() const { return mCtrlsMode; }
     bool getC0Enabled() const {
-        return fC0Enabled;
+        return mC0Enabled;
     }
 
     bool getC2Enabled() const {
-        return fC2Enabled;
+        return mC2Enabled;
     }
 
     void applyTransform(const QMatrix &transform) {
-        fC0 = transform.map(fC0);
-        fP1 = transform.map(fP1);
-        fC2 = transform.map(fC2);
+        mC0 = transform.map(mC0);
+        mP1 = transform.map(mP1);
+        mC2 = transform.map(mC2);
     }
 protected:
     void setNodeId(const int& nodeId) {
-        fId = nodeId;
+        mId = nodeId;
     }
 
-    void setType(const Type& type) {
-        fType = type;
+    void setType(const NodeType& type) {
+        mType = type;
     }
 
     void setCtrlsMode(const CtrlsMode& ctrlsMode) {
-        fCtrlsMode = ctrlsMode;
+        mCtrlsMode = ctrlsMode;
         if(ctrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-            gGetCtrlsSymmetricPos(fC0, fP1, fC2, fC0, fC2);
+            gGetCtrlsSymmetricPos(mC0, mP1, mC2, mC0, mC2);
         } else if(ctrlsMode == CtrlsMode::CTRLS_SMOOTH) {
-            gGetCtrlsSmoothPos(fC0, fP1, fC2, fC0, fC2);
+            gGetCtrlsSmoothPos(mC0, mP1, mC2, mC0, mC2);
         } else return;
         setC0Enabled(true);
         setC2Enabled(true);
     }
 
     void setC0Enabled(const bool& enabled) {
-        fC0Enabled = enabled;
+        mC0Enabled = enabled;
     }
 
     void setC2Enabled(const bool& enabled) {
-        fC2Enabled = enabled;
+        mC2Enabled = enabled;
     }
 private:
-    bool fC0Enabled = true;
-    bool fC2Enabled = true;
-    CtrlsMode fCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
-
-    Type fType;
-    int fId = -1;
+    bool mC0Enabled = true;
+    bool mC2Enabled = true;
+    NodeType mType;
+    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+    int mId = -1;
+    //! @brief T value for segment defined by previous and next normal node
+    qreal mT;
+    QPointF mC0;
+    QPointF mP1;
+    QPointF mC2;
 };
 #include "smartPointers/stdselfref.h"
 class ListOfNodes {
@@ -215,9 +236,9 @@ public:
         const auto cpy = mList;
         mList.clear();
         for(const auto& node : cpy) {
-            const auto oldC0 = node->fC0;
-            node->fC0 = node->fC2;
-            node->fC2 = oldC0;
+            const auto oldC0 = node->c0();
+            node->setC0(node->c2());
+            node->setC2(oldC0);
             mList.prepend(node);
         }
         updateNodeIds();

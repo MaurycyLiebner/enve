@@ -93,19 +93,12 @@ void PathPointsHandler::updatePoint(SmartNodePoint * const pt,
     pt->setNode(targetPath()->getNodePtr(nodeId));
 }
 
-void PathPointsHandler::testNode_TEST(const int& nodeId) {
-    const auto& pt = mPoints.at(nodeId);
-    pt->testNode_TEST();
-}
-
 void PathPointsHandler::updateAllPoints() {
     if(mBlockAllPointsUpdate) return;
     const int newCount = targetPath()->getNodeCount();
     while(newCount < mPoints.count()) mPoints.removeLast();
     while(mPoints.count() < newCount) createNewNodePoint(mPoints.count());
     for(int i = 0; i < mPoints.count(); i++) updatePoint(i);
-
-    for(int i = 0; i < mPoints.count(); i++) testNode_TEST(i);
 }
 
 void PathPointsHandler::setCtrlsMode(const int &nodeId,
@@ -148,8 +141,8 @@ void PathPointsHandler::promoteToNormal(const int &nodeId) {
                  qMax(prevNormalId, nextNormalId));
 }
 
-bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
-                                             const QPointF &relPos) {
+int PathPointsHandler::moveToClosestSegment(const int &nodeId,
+                                            const QPointF &relPos) {
     NormalSegment::SubSegment minSubSeg{nullptr, nullptr, nullptr};
     qreal minDist = TEN_MIL;
     for(const auto& pt : mPoints) {
@@ -162,17 +155,16 @@ bool PathPointsHandler::moveToClosestSegment(const int &nodeId,
             minSubSeg = subSeg;
         }
     }
-    if(!minSubSeg.isValid()) return false;
+    if(!minSubSeg.isValid()) return nodeId;
     const auto prevPt = minSubSeg.fFirstPt;
     const int prevNodeId = prevPt->getNodeId();
-    if(prevNodeId == nodeId) return false;
+    if(prevNodeId == nodeId) return nodeId;
     const auto nextPt = minSubSeg.fLastPt;
     const int nextNodeId = nextPt->getNodeId();
-    if(nextNodeId == nodeId) return false;
+    if(nextNodeId == nodeId) return nodeId;
 
-    mTargetAnimator->beforeBinaryPathChange();
-    targetPath()->actionMoveNodeBetween(nodeId, prevNodeId, nextNodeId);
-    return true;
+    mTargetAnimator->actionMoveNodeBetween(nodeId, prevNodeId, nextNodeId);
+    return (nodeId < prevNodeId ? prevNodeId : nextNodeId);
 }
 
 void PathPointsHandler::mergeNodes(const int &nodeId1, const int &nodeId2) {

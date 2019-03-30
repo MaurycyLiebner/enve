@@ -9,13 +9,13 @@ void SmartPath::actionRemoveNode(const int &nodeId) {
         while(mNodesList.prevNode(currNode)) {
             currNode = mNodesList.prevNode(currNode);
             if(currNode->isNormal()) break;
-            if(currNode->isDissolved()) currNode->fT *= 0.5;
+            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5);
         }
         currNode = node;
         while(mNodesList.nextNode(currNode)) {
             currNode = mNodesList.nextNode(currNode);
             if(currNode->isNormal()) break;
-            if(currNode->isDissolved()) currNode->fT = currNode->fT*0.5 + 0.5;
+            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5 + 0.5);
         }
     }
     mNodesList.removeNodeFromList(nodeId);
@@ -37,7 +37,7 @@ int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId) {
     Node * const endNode = mNodesList.at(endNodeId);
     if(!endNode->isNormal())
         RuntimeThrow("Invalid node type. End nodes should always be NORMAL.");
-    const NodePointValues vals = {endNode->fP1, endNode->fP1, endNode->fP1};
+    const NodePointValues vals = {endNode->p1(), endNode->p1(), endNode->p1()};
     return actionAppendNodeAtEndNode(vals);
 }
 
@@ -98,12 +98,10 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     Node * const prevNode = mNodesList.at(prevId);
     Node * const nextNode = mNodesList.at(nextId);
 
-    if(prevNode->isDissolved()) {
+    if(prevNode->isDissolved())
         actionPromoteDissolvedNodeToNormal(prevId);
-    }
-    if(nextNode->isDissolved()) {
+    if(nextNode->isDissolved())
         actionPromoteDissolvedNodeToNormal(nextId);
-    }
 
     if(isClosed()) {
         mNodesList.moveNodesToFrontStartingWith(nextId);
