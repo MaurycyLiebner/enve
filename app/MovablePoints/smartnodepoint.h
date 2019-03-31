@@ -36,6 +36,8 @@ public:
         return isNormal();
     }
 
+    void canvasContextMenu(PointTypeMenu * const menu);
+
     int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
     SmartNodePoint* actionAddPointAbsPos(const QPointF &absPos);

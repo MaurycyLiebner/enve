@@ -89,8 +89,8 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     } else if(getType() == Node::DISSOLVED) {
         const auto parentSeg = mPrevNormalPoint->getNextNormalSegment();
         const auto tRange = currentPath()->dissolvedTRange(getNodeId());
-        auto seg = parentSeg.getAsRelSegment().tFragment(tRange.fMin,
-                                                         tRange.fMax);
+        const auto parentRelSeg = parentSeg.getAsRelSegment();
+        auto seg = parentRelSeg.tFragment(tRange.fMin, tRange.fMax);
         const auto closest = seg.closestPosAndT(relPos);
         const qreal mappedT = gMapTFromFragment(tRange.fMin, tRange.fMax,
                                                 closest.fT);
@@ -106,6 +106,20 @@ void SmartNodePoint::removeFromVectorPath() {
 
 void SmartNodePoint::removeApproximate() {
     currentPath()->actionRemoveNode(getNodeId());
+}
+#include "pointtypemenu.h"
+void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
+    if(isNormal() && !isEndPoint()) {
+        std::function<void(SmartNodePoint*)> op = [](SmartNodePoint * pt) {
+            pt->actionDemoteToDissolved();
+        };
+        menu->addPlainAction("Demote to dissolved", op);
+    } else if(isDissolved()) {
+        std::function<void(SmartNodePoint*)> op = [](SmartNodePoint * pt) {
+            pt->actionPromoteToNormal();
+        };
+        menu->addPlainAction("Promote to normal", op);
+    }
 }
 
 void SmartNodePoint::rectPointsSelection(

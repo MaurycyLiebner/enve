@@ -451,28 +451,45 @@ void Canvas::addActionsToMenu(QMenu * const menu,
     });
 }
 
-
+#include "pointtypemenu.h"
 void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
         mValueInput.clearAndDisableInput();
     } else {
-        const QPointF eventPos = mapCanvasAbsToRel(event->pos());
-        BoundingBox* const pressedBox = mCurrentBoxesGroup->getBoxAt(eventPos);
-        if(!pressedBox) {
-            clearBoxesSelection();
-            QMenu menu(mCanvasWindow->getCanvasWidget());
-            addActionsToMenu(&menu, mMainWindow);
-            menu.exec(event->globalPos());
-        } else {
-            if(!pressedBox->isSelected()) {
+        mLastPressedBox = mHoveredBox;
+        mLastPressedPoint = mHoveredPoint_d;
+        if(mLastPressedPoint) {
+            QMenu qMenu;
+            PointTypeMenu menu(&qMenu, this);
+            if(mLastPressedPoint->selectionEnabled()) {
+                if(!mLastPressedPoint->isSelected()) {
+                    clearPointsSelection();
+                    addPointToSelection(mLastPressedPoint);
+                }
+                for(const auto& pt : mSelectedPoints_d) {
+                    if(menu.hasActionsForPointType(pt)) continue;
+                    pt->canvasContextMenu(&menu);
+                    menu.addedActionsForPointType(pt);
+                }
+            } else {
+                mLastPressedPoint->canvasContextMenu(&menu);
+            }
+            qMenu.exec(event->globalPos());
+        } else if(mLastPressedBox) {
+            if(!mLastPressedBox->isSelected()) {
                 if(!isShiftPressed()) clearBoxesSelection();
-                addBoxToSelection(pressedBox);
+                addBoxToSelection(mLastPressedBox);
             }
 
             QMenu menu(mCanvasWindow->getCanvasWidget());
-            pressedBox->addActionsToMenu(&menu, mMainWindow);
+            mLastPressedBox->addActionsToMenu(&menu, mMainWindow);
             addSelectedBoxesActions(&menu);
+            menu.exec(event->globalPos());
+        } else {
+            clearBoxesSelection();
+            QMenu menu(mCanvasWindow->getCanvasWidget());
+            addActionsToMenu(&menu, mMainWindow);
             menu.exec(event->globalPos());
         }
     }

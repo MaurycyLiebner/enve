@@ -26,6 +26,7 @@
 #include "PixmapEffects/rastereffects.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "Boxes/internallinkcanvas.h"
+#include "pointtypemenu.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
@@ -104,7 +105,7 @@ QRectF Canvas::getPixBoundingRect() {
 }
 
 void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
-    QPointF transPoint = -mapCanvasAbsToRel(absOrigin);
+    const QPointF transPoint = -mapCanvasAbsToRel(absOrigin);
 
     mCanvasTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mCanvasTransformMatrix.scale(scaleBy, scaleBy);

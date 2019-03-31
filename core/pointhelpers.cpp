@@ -939,7 +939,7 @@ qreal gMapTFromFragment(const qreal &minAbsT,
     const qreal tFrag = maxAbsT - minAbsT;
     if(isZero6Dec(tFrag)) return minAbsT;
     if(tFrag < 0) RuntimeThrow("Cannot map to negative range");
-    return minAbsT + relT*tFrag + maxAbsT - 1;
+    return minAbsT + relT*tFrag;
 }
 
 void gGetValuesForNodeInsertion(

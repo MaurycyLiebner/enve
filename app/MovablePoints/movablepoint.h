@@ -21,7 +21,7 @@ enum MovablePointType : short {
     TYPE_GRADIENT_POINT,
     TYPE_BONE_POINT
 };
-
+class PointTypeMenu;
 class MovablePoint : public StdSelfRef {
     friend class StdSelfRef;
 public:
@@ -35,6 +35,11 @@ public:
     virtual void moveToAbs(const QPointF& absPos);
     virtual void moveByAbs(const QPointF &absTranslatione);
 
+    virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
+    virtual void scaleRelativeToSavedPivot(const qreal &sx, const qreal &sy);
+    virtual void rotateRelativeToSavedPivot(const qreal &rot);
+    virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
+
     virtual void startTransform();
     virtual void finishTransform();
     virtual void cancelTransform() {}
@@ -44,6 +49,13 @@ public:
 
     virtual bool selectionEnabled() const {
         return true;
+    }
+    virtual void removeApproximate() {}
+    virtual void removeFromVectorPath();
+    virtual bool isHidden() const;
+
+    virtual void canvasContextMenu(PointTypeMenu * const menu) {
+        Q_UNUSED(menu);
     }
 
     QPointF getAbsolutePos() const;
@@ -56,16 +68,12 @@ public:
 
     bool isContainedInRect(const QRectF &absRect);
 
-    virtual void removeApproximate() {}
 
     void select();
     void deselect();
 
-    virtual void removeFromVectorPath();
-
     void hide();
     void show();
-    virtual bool isHidden() const;
     bool isVisible() const;
     void setVisible(const bool &bT);
 
@@ -77,17 +85,11 @@ public:
 
     void rotateBy(const qreal &rot);
     void scale(const qreal &scaleBy);
-    virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
-    virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     void setRadius(const qreal& radius);
 
     qreal getRadius();
     void moveToRel(const QPointF &relPos);
-    virtual void scaleRelativeToSavedPivot(const qreal &sx,
-                                           const qreal &sy);
-    virtual void rotateRelativeToSavedPivot(const qreal &rot);
-
 
     void drawHovered(SkCanvas *canvas,
                      const SkScalar &invScale);

@@ -274,7 +274,8 @@ SOURCES += main.cpp\
     Boxes/linkcanvasrenderdata.cpp \
     Boxes/internallinkcanvas.cpp \
     Boxes/internallinkgroupbox.cpp \
-    PathEffects/sumpatheffect.cpp
+    PathEffects/sumpatheffect.cpp \
+    pointtypemenu.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -497,7 +498,8 @@ HEADERS  += \
     Boxes/linkcanvasrenderdata.h \
     Boxes/internallinkcanvas.h \
     Boxes/internallinkgroupbox.h \
-    PathEffects/sumpatheffect.h
+    PathEffects/sumpatheffect.h \
+    pointtypemenu.h
 
 RESOURCES += \
     resources.qrc

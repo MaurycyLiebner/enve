@@ -11,7 +11,9 @@
 #include "Animators/coloranimator.h"
 #include "SkPathOps.h"
 #include "MovablePoints/segment.h"
+#include "MovablePoints/movablepoint.h"
 #include "Boxes/canvasrenderdata.h"
+#include <QAction>
 
 class TextBox;
 class Circle;
@@ -126,6 +128,22 @@ public:
     void makeSelectedPointsSegmentsCurves();
     void makeSelectedPointsSegmentsLines();
 
+    template <class T = MovablePoint>
+    void execOpOnSelectedPoints(const std::function<void(T*)> &op) {
+        if(mLastPressedPoint) {
+            if(!mLastPressedPoint->selectionEnabled()) {
+                const auto ptT = dynamic_cast<T*>(mLastPressedPoint.data());
+                if(ptT) {
+                    op(ptT);
+                    return;
+                }
+            }
+        }
+        for(const auto& pt : mSelectedPoints_d) {
+            const auto ptT = dynamic_cast<T*>(pt.data());
+            if(ptT) op(ptT);
+        }
+    }
     void updateSelectedPointsAfterCtrlsVisiblityChanged();
     void removeSelectedPointsApproximateAndClearList();
     void centerPivotForSelected();
