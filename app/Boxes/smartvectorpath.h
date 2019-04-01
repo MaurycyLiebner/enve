@@ -35,8 +35,8 @@ public:
 
 
     void selectAllPoints(Canvas * const canvas);
-    void writeBoundingBox(QIODevice *target) {}
-    void readBoundingBox(QIODevice *target) {}
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
 
     bool differenceInEditPathBetweenFrames(const int& frame1,
                                            const int& frame2) const;

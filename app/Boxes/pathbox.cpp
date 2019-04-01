@@ -534,6 +534,7 @@ bool PathBox::differenceInFillPathBetweenFrames(const int &frame1, const int &fr
 #include "Boxes/smartvectorpath.h"
 
 SmartVectorPath *PathBox::objectToVectorPathBox() {
+    if(SWT_isSmartVectorPath()) return nullptr;
     auto newPath = SPtrCreate(SmartVectorPath)();
     if(SWT_isCircle()) {
         QPainterPath pathT;
@@ -549,6 +550,7 @@ SmartVectorPath *PathBox::objectToVectorPathBox() {
     mParentGroup->addContainedBox(newPath);
     return newPath.get();
 }
+
 SmartVectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return nullptr;
     const auto newPath = SPtrCreate(SmartVectorPath)();

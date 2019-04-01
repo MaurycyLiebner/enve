@@ -14,6 +14,22 @@ protected:
 public:
     bool SWT_isSmartPathCollection() const { return true; }
 
+    void readProperty(QIODevice *device) {
+       int nPaths;
+       device->read(rcChar(&nPaths), sizeof(int));
+       for(int i = 0; i < nPaths; i++)
+           createNewPath()->readProperty(device);
+    }
+
+    void writeProperty(QIODevice * const device) const {
+        const int nPaths = ca_getNumberOfChildren();
+        device->write(rcConstChar(&nPaths), sizeof(int));
+        for(int i = 0; i < nPaths; i++) {
+            const auto path = ca_getChildAt<SmartPathAnimator>(i);
+            path->writeProperty(device);
+        }
+    }
+
     template<typename... Args>
     SmartPathAnimator *createNewPath(Args && ...arguments) {
         const auto newPath = SPtrCreate(SmartPathAnimator)(arguments...);

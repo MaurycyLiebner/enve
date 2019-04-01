@@ -797,6 +797,15 @@ void PathBox::readBoundingBox(QIODevice *target) {
     mFillSettings->readProperty(target);
     mStrokeSettings->readProperty(target);
 }
+#include "Animators/SmartPath/smartpathcollection.h"
+void SmartVectorPath::writeBoundingBox(QIODevice *target) {
+    PathBox::writeBoundingBox(target);
+    mPathAnimator->writeProperty(target);
+}
+void SmartVectorPath::readBoundingBox(QIODevice *target) {
+    PathBox::readBoundingBox(target);
+    mPathAnimator->readProperty(target);
+}
 
 void ParticleEmitter::writeProperty(QIODevice * const target) const {
     mColorAnimator->writeProperty(target);
