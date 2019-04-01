@@ -1,14 +1,7 @@
 #include "smartpathcollection.h"
-#include "Animators/SmartPath/smartpathanimator.h"
 
 SmartPathCollection::SmartPathCollection() :
     ComplexAnimator("paths") {}
-
-SmartPathAnimator *SmartPathCollection::createNewPath() {
-    const auto newPath = SPtrCreate(SmartPathAnimator)();
-    addPath(newPath);
-    return newPath.get();
-}
 
 void SmartPathCollection::addPath(const qsptr<SmartPathAnimator> &path) {
     ca_addChildAnimator(path);
@@ -35,4 +28,9 @@ void SmartPathCollection::applyTransform(const QMatrix &transform) const {
         const auto path = ca_getChildAt<SmartPathAnimator>(i);
         path->applyTransform(transform);
     }
+}
+
+void SmartPathCollection::loadSkPath(const SkPath &path) {
+    QList<SkPath> paths = gBreakApart(path);
+    for(const auto& sPath : paths) createNewPath(sPath);
 }

@@ -29,6 +29,10 @@ bool SmartVectorPath::differenceInEditPathBetweenFrames(
     return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
+void SmartVectorPath::loadSkPath(const SkPath &path) {
+    mPathAnimator->loadSkPath(path);
+}
+
 SmartPathCollection *SmartVectorPath::getPathAnimator() {
     return mPathAnimator.data();
 }

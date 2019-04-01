@@ -40,6 +40,9 @@ public:
 
     bool differenceInEditPathBetweenFrames(const int& frame1,
                                            const int& frame2) const;
+
+    void loadSkPath(const SkPath& path);
+
     SmartPathCollectionHandler *getHandler() {
         return &mHandler;
     }

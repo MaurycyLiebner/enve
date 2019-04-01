@@ -541,10 +541,9 @@ SmartVectorPath *PathBox::objectToVectorPathBox() {
         pathT.addEllipse(QPointF(0, 0),
                          circleT->getCurrentXRadius(),
                          circleT->getCurrentYRadius());
-        //newPath->loadPathFromSkPath(toSkPath(pathT));
+        newPath->loadSkPath(toSkPath(pathT));
     } else {
-        //newPath->loadPathFromSkPath(mEditPathSk);
-        //newPath->loadPathFromSkPath(mEditPathSk);
+        newPath->loadSkPath(mEditPathSk);
     }
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
@@ -553,7 +552,7 @@ SmartVectorPath *PathBox::objectToVectorPathBox() {
 SmartVectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return nullptr;
     const auto newPath = SPtrCreate(SmartVectorPath)();
-    //newPath->loadPathFromSkPath(mOutlinePathSk);
+    newPath->loadSkPath(mOutlinePathSk);
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
     return newPath.get();

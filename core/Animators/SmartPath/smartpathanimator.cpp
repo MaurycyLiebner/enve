@@ -29,5 +29,10 @@ void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
 SmartPathAnimator::SmartPathAnimator() :
     GraphAnimator("path") {}
 
+SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
+    SmartPathAnimator() {
+    mBaseValue.setPath(path);
+}
+
 SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
     GraphAnimator("path"), mBaseValue(baseValue) {}

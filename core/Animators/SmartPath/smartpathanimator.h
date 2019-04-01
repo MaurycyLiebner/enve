@@ -358,6 +358,7 @@ signals:
     void pathChangedAfterFrameChange();
 protected:
     SmartPathAnimator();
+    SmartPathAnimator(const SkPath& path);
     SmartPathAnimator(const SmartPath& baseValue);
 
     SmartPath& getBaseValue() {
