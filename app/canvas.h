@@ -149,7 +149,6 @@ public:
         }
     }
     void updateSelectedPointsAfterCtrlsVisiblityChanged();
-    void removeSelectedPointsApproximateAndClearList();
     void centerPivotForSelected();
     void resetSelectedScale();
     void resetSelectedTranslation();

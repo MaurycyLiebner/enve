@@ -17,35 +17,23 @@ class QPointFAnimator;
 
 class AnimatedPoint : public MovablePoint {
     friend class StdSelfRef;
-public:
-    ~AnimatedPoint() {}
+public:    
+    QPointF getRelativePos() const final;
+    void setRelativePos(const QPointF &relPos);
+    void moveByRel(const QPointF &relTranslation);
 
     void startTransform();
     void finishTransform();
-
-    QPointF getRelativePos() const;
-
-    void moveByRel(const QPointF &relTranslation);
-
-    virtual void removeApproximate() {}
-
-    virtual void removeFromVectorPath() {}
-
-    void setRelativePos(const QPointF &relPos);
-
     void cancelTransform();
 
-    //virtual void prp_setInheritedUpdater(AnimatorUpdater *updater);
-
-    virtual void applyTransform(const QMatrix &transform);
+    virtual void applyTransform(const QMatrix &transform) final;
 
     QPointF getRelativePosAtRelFrame(const qreal &frame) const;
 protected:
-    AnimatedPoint(
-            QPointFAnimator* associatedAnimator,
-            BasicTransformAnimator *parentTransform,
-            const MovablePointType &type,
-            const qreal &radius = 5.);
+    AnimatedPoint(QPointFAnimator* associatedAnimator,
+                  BasicTransformAnimator *parentTransform,
+                  const MovablePointType &type,
+                  const qreal &radius = 5);
 
     QPointFAnimator* const mAssociatedAnimator_k;
 };

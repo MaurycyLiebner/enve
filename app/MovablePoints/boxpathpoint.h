@@ -11,7 +11,7 @@ public:
 
     void startTransform();
     void finishTransform();
-    void moveByAbs(const QPointF &absTranslatione);
+    void moveByAbs(const QPointF &absTrans);
     void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
 private:
     QPointF mSavedAbsPos;

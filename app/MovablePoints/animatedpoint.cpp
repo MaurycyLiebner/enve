@@ -21,7 +21,7 @@ void AnimatedPoint::startTransform() {
 }
 
 void AnimatedPoint::applyTransform(const QMatrix &transform) {
-    QPointF point = mAssociatedAnimator_k->getCurrentPointValue();
+    const QPointF point = mAssociatedAnimator_k->getCurrentPointValue();
     mAssociatedAnimator_k->setCurrentPointValue(transform.map(point));
 }
 

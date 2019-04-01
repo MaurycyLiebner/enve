@@ -10,7 +10,7 @@ void NonAnimatedMovablePoint::applyTransform(const QMatrix &transform) {
 }
 
 void NonAnimatedMovablePoint::setRelativePos(const QPointF &relPos) {
-    setRelativePosVal(relPos);
+    mCurrentPos = relPos;
 }
 
 QPointF NonAnimatedMovablePoint::getRelativePos() const {

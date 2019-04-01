@@ -15,7 +15,7 @@ public:
     void startTransform();
 
     void finishTransform();
-    void moveByAbs(const QPointF &absTranslatione);
+    void moveByAbs(const QPointF &absTrans);
 protected:
     CircleCenterPoint(QPointFAnimator *associatedAnimator,
                       BasicTransformAnimator *parent,
@@ -30,7 +30,7 @@ class CircleRadiusPoint : public AnimatedPoint {
 public:
     void moveByRel(const QPointF &relTranslation);
 //    void setAbsPosRadius(QPointF pos);
-    void moveByAbs(const QPointF &absTranslatione);
+    void moveByAbs(const QPointF &absTrans);
 
     void startTransform();
     void finishTransform();

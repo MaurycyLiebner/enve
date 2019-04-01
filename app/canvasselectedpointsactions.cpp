@@ -187,14 +187,6 @@ void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
     }
 }
 
-void Canvas::removeSelectedPointsApproximateAndClearList() {
-    for(const auto& point : mSelectedPoints_d) {
-        point->deselect();
-        point->removeApproximate();
-    }
-    mSelectedPoints_d.clear(); schedulePivotUpdate();
-}
-
 void Canvas::removeSelectedPointsAndClearList() {
     if(mIsMouseGrabbing) {
         if(!BoxesGroup::mCtrlsAlwaysVisible ||

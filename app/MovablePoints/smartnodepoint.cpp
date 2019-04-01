@@ -22,12 +22,6 @@ SmartNodePoint::SmartNodePoint(PathPointsHandler * const handler,
     mC2Pt->setOtherCtrlPt(mC0Pt.get());
 }
 
-void SmartNodePoint::applyTransform(const QMatrix &transform) {
-    mC0Pt->applyTransform(transform);
-    mC2Pt->applyTransform(transform);
-    NonAnimatedMovablePoint::applyTransform(transform);
-}
-
 void SmartNodePoint::startTransform() {
     NonAnimatedMovablePoint::startTransform();
     if(!mC0Pt->isSelected()) mC0Pt->NonAnimatedMovablePoint::startTransform();
@@ -78,7 +72,7 @@ int SmartNodePoint::moveToClosestSegment(const QPointF &absPos) {
 #include <QApplication>
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     if(getType() == Node::NORMAL) {
-        setRelativePosVal(relPos);
+        NonAnimatedMovablePoint::setRelativePos(relPos);
         currentPath()->actionSetNormalNodeP1(getNodeId(), getRelativePos());
         mNextNormalSegment.afterChanged();
         if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
@@ -95,7 +89,7 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
         const qreal mappedT = gMapTFromFragment(tRange.fMin, tRange.fMax,
                                                 closest.fT);
         currentPath()->actionSetDissolvedNodeT(getNodeId(), mappedT);
-        setRelativePosVal(closest.fPos);
+        NonAnimatedMovablePoint::setRelativePos(closest.fPos);
     }
     mParentAnimator->pathChanged();
 }
@@ -104,9 +98,6 @@ void SmartNodePoint::removeFromVectorPath() {
     currentPath()->actionRemoveNode(getNodeId());
 }
 
-void SmartNodePoint::removeApproximate() {
-    currentPath()->actionRemoveNode(getNodeId());
-}
 #include "pointtypemenu.h"
 void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
     if(isNormal() && !isEndPoint()) {
@@ -541,14 +532,6 @@ SmartNodePoint* SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {
     return actionAddPointRelPos(mapAbsoluteToRelative(absPos));
 }
 
-void SmartNodePoint::setElementsPos(const QPointF &c0,
-                                    const QPointF &p1,
-                                    const QPointF &c2) {
-    setRelativePosVal(p1);
-    mC0Pt->setRelativePosVal(c0 + p1);
-    mC2Pt->setRelativePosVal(c2 + p1);
-}
-
 void SmartNodePoint::c0Moved(const QPointF &c0) {
     currentPath()->actionSetNormalNodeC0(getNodeId(), c0);
     if(mPrevNormalPoint)
@@ -564,12 +547,12 @@ void SmartNodePoint::c2Moved(const QPointF &c2) {
 
 void SmartNodePoint::updateFromNodeDataPosOnly() {
     if(mNode_d->isNormal()) {
-        mC0Pt->setRelativePosVal(mNode_d->c0());
-        setRelativePosVal(mNode_d->p1());
-        mC2Pt->setRelativePosVal(mNode_d->c2());
+        mC0Pt->NonAnimatedMovablePoint::setRelativePos(mNode_d->c0());
+        NonAnimatedMovablePoint::setRelativePos(mNode_d->p1());
+        mC2Pt->NonAnimatedMovablePoint::setRelativePos(mNode_d->c2());
     } else if(mNode_d->isDissolved()) {
         currentPath()->updateDissolvedNodePosition(getNodeId());
-        setRelativePosVal(mNode_d->p1());
+        NonAnimatedMovablePoint::setRelativePos(mNode_d->p1());
     }
 }
 

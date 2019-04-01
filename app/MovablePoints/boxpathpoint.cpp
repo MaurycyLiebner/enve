@@ -20,8 +20,8 @@ void BoxPathPoint::finishTransform() {
     boxTrans->finishPivotTransform();
 }
 
-void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
-    const QPointF absPos = mSavedAbsPos + absTranslatione;
+void BoxPathPoint::moveByAbs(const QPointF &absTrans) {
+    const QPointF absPos = mSavedAbsPos + absTrans;
     const auto boxTrans = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
     const auto parentBox = boxTrans->getParentBox();
     parentBox->setPivotAutoAdjust(false);

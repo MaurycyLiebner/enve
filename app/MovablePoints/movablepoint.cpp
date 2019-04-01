@@ -134,11 +134,9 @@ void MovablePoint::rotateRelativeToSavedPivot(const qreal &rot) {
 void MovablePoint::scaleRelativeToSavedPivot(const qreal &sx,
                                              const qreal &sy) {
     QMatrix mat;
-    mat.translate(mSavedTransformPivot.x(),
-                  mSavedTransformPivot.y());
+    mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
     mat.scale(sx, sy);
-    mat.translate(-mSavedTransformPivot.x(),
-                  -mSavedTransformPivot.y());
+    mat.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
     moveToRel(mat.map(mSavedRelPos));
 }
 
@@ -171,9 +169,9 @@ void MovablePoint::moveToRel(const QPointF &relPos) {
     moveByRel(relPos - mSavedRelPos);
 }
 
-void MovablePoint::moveByAbs(const QPointF &absTranslatione) {
+void MovablePoint::moveByAbs(const QPointF &absTrans) {
     moveToAbs(mapRelativeToAbsolute(mSavedRelPos) +
-              absTranslatione);
+              absTrans);
 }
 
 void MovablePoint::moveToAbs(const QPointF& absPos) {
@@ -203,10 +201,6 @@ void MovablePoint::select() {
 
 void MovablePoint::deselect() {
     mSelected = false;
-}
-
-void MovablePoint::removeFromVectorPath() {
-
 }
 
 void MovablePoint::hide() {

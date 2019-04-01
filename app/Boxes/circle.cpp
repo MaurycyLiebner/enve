@@ -185,8 +185,8 @@ void CircleCenterPoint::moveByRel(const QPointF &relTranslatione) {
                                       relTranslatione.y());
 }
 
-void CircleCenterPoint::moveByAbs(const QPointF &absTranslatione) {
-    mParentTransform_cv->moveByAbs(absTranslatione);
+void CircleCenterPoint::moveByAbs(const QPointF &absTrans) {
+    mParentTransform_cv->moveByAbs(absTrans);
 }
 
 void CircleCenterPoint::startTransform() {
@@ -230,11 +230,11 @@ void CircleRadiusPoint::moveByRel(const QPointF &relTranslation) {
 //    setRelativePos(newPos, false );
 //}
 
-void CircleRadiusPoint::moveByAbs(const QPointF &absTranslatione) {
+void CircleRadiusPoint::moveByAbs(const QPointF &absTrans) {
     if(mCenterPoint_cv->isSelected() ) return;
-    MovablePoint::moveByAbs(absTranslatione);
+    MovablePoint::moveByAbs(absTrans);
     //setCurrentValue(mSavedRelPos);
-    //setAbsPosRadius(getAbsolutePos() + absTranslatione);
+    //setAbsPosRadius(getAbsolutePos() + absTrans);
 }
 
 void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {

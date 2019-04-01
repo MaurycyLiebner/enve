@@ -17,8 +17,6 @@ class SmartNodePoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
     friend class NormalSegment;
 public:
-    void applyTransform(const QMatrix &transform);
-
     void startTransform();
     void finishTransform();
     void cancelTransform();
@@ -30,7 +28,6 @@ public:
     void setRelativePos(const QPointF &relPos);
 
     void removeFromVectorPath();
-    void removeApproximate();
 
     bool selectionEnabled() const {
         return isNormal();
@@ -110,17 +107,13 @@ public:
     bool isNextNormalSelected() const;
 
     bool isNeighbourNormalSelected() const;
-    //void moveByAbs(const QPointF &absTranslatione);
+    //void moveByAbs(const QPointF &absTrans);
 
     SmartNodePoint *getConnectedSeparateNodePoint();
 
     NormalSegment getNextNormalSegment() {
         return mNextNormalSegment;
     }
-
-    void setElementsPos(const QPointF &c0,
-                        const QPointF &p1,
-                        const QPointF &c2);
 
     qreal getT() const {
         return mNode_d->t();

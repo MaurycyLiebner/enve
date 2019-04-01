@@ -224,10 +224,10 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
     MovablePoint* pointToReturn = nullptr;
     if(currentCanvasMode == MOVE_POINT) {
         pointToReturn = mStrokeGradientPoints->getPointAt(absPtPos,
-                                                              canvasScaleInv);
+                                                          canvasScaleInv);
         if(!pointToReturn) {
             pointToReturn = mFillGradientPoints->getPointAt(absPtPos,
-                                                                canvasScaleInv);
+                                                            canvasScaleInv);
         }
     } else if(currentCanvasMode == MOVE_PATH) {
         MovablePoint* pivotMovable =

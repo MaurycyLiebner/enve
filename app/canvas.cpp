@@ -696,11 +696,7 @@ bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
 
 void Canvas::deleteAction() {
     if(mCurrentMode == MOVE_POINT) {
-        if(isShiftPressed()) {
-            removeSelectedPointsApproximateAndClearList();
-        } else {
-            removeSelectedPointsAndClearList();
-        }
+        removeSelectedPointsAndClearList();
     } else if(mCurrentMode == MOVE_PATH) {
         removeSelectedBoxesAndClearList();
     }

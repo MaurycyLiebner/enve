@@ -27,13 +27,13 @@ class MovablePoint : public StdSelfRef {
 public:
     ~MovablePoint() {}
 
+    virtual QPointF getRelativePos() const = 0;
+    virtual void setRelativePos(const QPointF &relPos) = 0;
     virtual void moveByRel(const QPointF &relTranslation) = 0;
     virtual void applyTransform(const QMatrix &transform) = 0;
-    virtual void setRelativePos(const QPointF &relPos) = 0;
-    virtual QPointF getRelativePos() const = 0;
 
     virtual void moveToAbs(const QPointF& absPos);
-    virtual void moveByAbs(const QPointF &absTranslatione);
+    virtual void moveByAbs(const QPointF &absTrans);
 
     virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
     virtual void scaleRelativeToSavedPivot(const qreal &sx, const qreal &sy);
@@ -50,8 +50,7 @@ public:
     virtual bool selectionEnabled() const {
         return true;
     }
-    virtual void removeApproximate() {}
-    virtual void removeFromVectorPath();
+    virtual void removeFromVectorPath() {}
     virtual bool isHidden() const;
 
     virtual void canvasContextMenu(PointTypeMenu * const menu) {

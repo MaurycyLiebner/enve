@@ -10,16 +10,12 @@ protected:
                             const qreal &radius = 7.5);
 public:
     void setRelativePos(const QPointF &relPos);
-    QPointF getRelativePos() const;
+    QPointF getRelativePos() const final;
     void moveByRel(const QPointF &relTranslation);
 
     void cancelTransform();
 
-    void applyTransform(const QMatrix &transform);
-
-    void setRelativePosVal(const QPointF &relPos) {
-        mCurrentPos = relPos;
-    }
+    void applyTransform(const QMatrix &transform) final;
 private:
     QPointF mCurrentPos;
 };

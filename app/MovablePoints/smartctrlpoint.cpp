@@ -14,7 +14,7 @@ SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
 }
 
 void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
-    setRelativePosVal(relPos);
+    NonAnimatedMovablePoint::setRelativePos(relPos);
     if(mCtrlType == C0) mParentPoint_k->c0Moved(getRelativePos());
     else mParentPoint_k->c2Moved(getRelativePos());
 }
