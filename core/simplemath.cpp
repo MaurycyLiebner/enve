@@ -20,8 +20,9 @@ SkScalar pointToLen(SkPoint point) {
 
 QPointF scalePointToNewLen(const QPointF& point,
                            const qreal& newLen) {
-    if(isPointZero(point)) return point;
-    return point * newLen / pointToLen(point);
+    const qreal currLen = pointToLen(point);
+    if(isZero4Dec(currLen)) return QPointF(0, 0);
+    return point * newLen / currLen;
 }
 
 int clamp(const int& val, const int& min, const int& max) {

@@ -76,12 +76,6 @@ public:
     bool isSeparateNodePoint();
 
     void setCtrlsMode(const CtrlsMode &mode);
-    QPointF symmetricToAbsPos(const QPointF &absPosToMirror);
-    QPointF symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
-                                    const qreal &newLen);
-    void c0PtPosChanged();
-    void c2PtPosChanged();
-
     void moveC2ToAbsPos(const QPointF &c2);
     void moveC0ToAbsPos(const QPointF &c0);
     void moveC2ToRelPos(const QPointF &c2);
@@ -201,6 +195,7 @@ protected:
     void setPrevNormalPoint(SmartNodePoint * const prevPoint);
 private:
     SmartPath* currentPath() const;
+    void updateCtrlPtPos(SmartCtrlPoint * const pointToUpdate);
 
     bool mSeparateNodePoint = false;
     const Node * mNode_d = nullptr;
@@ -217,9 +212,6 @@ private:
 
     SmartNodePoint* mPrevPoint = nullptr;
     SmartNodePoint* mNextPoint = nullptr;
-
-    void ctrlPointPosChanged(const SmartCtrlPoint * const pointChanged,
-                             SmartCtrlPoint * const pointToUpdate);
 };
 
 #endif // SMARTNODEPOINT_H

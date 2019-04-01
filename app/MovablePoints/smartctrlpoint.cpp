@@ -38,20 +38,6 @@ void SmartCtrlPoint::moveByAbs(const QPointF &absTrans) {
     moveToAbs(mapRelativeToAbsolute(mSavedRelPos) + absTrans);
 }
 
-void SmartCtrlPoint::moveToAbs(const QPointF& absPos) {
-    NonAnimatedMovablePoint::moveToAbs(absPos);
-    if(mOtherCtrlPt_cv->isSelected()) return;
-    if(mCtrlType == C0) mParentPoint_k->c0PtPosChanged();
-    else mParentPoint_k->c2PtPosChanged();
-}
-
-void SmartCtrlPoint::moveByRel(const QPointF &relTrans) {
-    NonAnimatedMovablePoint::moveByRel(relTrans);
-    if(mOtherCtrlPt_cv->isSelected()) return;
-    if(mCtrlType == C0) mParentPoint_k->c0PtPosChanged();
-    else mParentPoint_k->c2PtPosChanged();
-}
-
 void SmartCtrlPoint::startTransform() {
     NonAnimatedMovablePoint::startTransform();
     //mParentPoint->NonAnimatedMovablePoint::startTransform();

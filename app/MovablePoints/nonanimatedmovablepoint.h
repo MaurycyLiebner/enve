@@ -9,12 +9,11 @@ protected:
                             const MovablePointType &type,
                             const qreal &radius = 7.5);
 public:
-    void setRelativePos(const QPointF &relPos);
     QPointF getRelativePos() const final;
+    void setRelativePos(const QPointF &relPos);
     void moveByRel(const QPointF &relTranslation);
 
     void cancelTransform();
-
     void applyTransform(const QMatrix &transform) final;
 private:
     QPointF mCurrentPos;

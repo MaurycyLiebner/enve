@@ -16,27 +16,25 @@ qCubicSegment1D ySeg(const qCubicSegment2D &seg) {
     return {seg.p0().y(), seg.c1().y(), seg.c2().y(), seg.p3().y()};
 }
 
-QPointF symmetricToPos(QPointF toMirror,
-                       QPointF mirrorCenter) {
-    QPointF posDist = toMirror - mirrorCenter;
+QPointF symmetricToPos(const QPointF& toMirror,
+                       const QPointF& mirrorCenter) {
+    const QPointF posDist = toMirror - mirrorCenter;
     return mirrorCenter - posDist;
 }
 
-QPointF symmetricToPosNewLen(QPointF toMirror,
-                             QPointF mirrorCenter,
-                             qreal newLen) {
-    QPointF posDist = toMirror - mirrorCenter;
+QPointF symmetricToPosNewLen(const QPointF& toMirror,
+                             const QPointF& mirrorCenter,
+                             const qreal& newLen) {
+    const QPointF posDist = toMirror - mirrorCenter;
     return mirrorCenter - scalePointToNewLen(posDist, newLen);
 }
 
-QPointF gCubicValueAtT(const qCubicSegment2D &seg,
-                           const qreal &t) {
+QPointF gCubicValueAtT(const qCubicSegment2D &seg, const qreal &t) {
     return QPointF(gCubicValueAtT(xSeg(seg), t),
                    gCubicValueAtT(ySeg(seg), t));
 }
 
-qreal gCubicValueAtT(const qCubicSegment1D &seg,
-                         const qreal& t) {
+qreal gCubicValueAtT(const qCubicSegment1D &seg, const qreal& t) {
     return qPow(1 - t, 3)*seg.p0() +
             3*qPow(1 - t, 2)*t*seg.c1() +
             3*(1 - t)*t*t*seg.c2() +

@@ -108,11 +108,11 @@ extern int clamp(const int& val, const int& min, const int& max);
 
 extern qreal gRandF(const qreal &fMin = 0, const qreal &fMax = 1);
 extern SkScalar gSkRandF(const SkScalar &fMin = 0, const SkScalar &fMax = 1);
-extern QPointF symmetricToPos(QPointF toMirror,
-                              QPointF mirrorCenter);
-extern QPointF symmetricToPosNewLen(QPointF toMirror,
-                                    QPointF mirrorCenter,
-                                    qreal newLen);
+extern QPointF symmetricToPos(const QPointF &toMirror,
+                              const QPointF &mirrorCenter);
+extern QPointF symmetricToPosNewLen(const QPointF& toMirror,
+                                    const QPointF& mirrorCenter,
+                                    const qreal& newLen);
 extern qreal pointToLen(QPointF point);
 extern SkScalar pointToLen(SkPoint point);
 extern QPointF scalePointToNewLen(const QPointF &point,

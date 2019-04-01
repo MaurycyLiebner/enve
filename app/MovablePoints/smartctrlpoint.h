@@ -8,8 +8,6 @@ public:
     enum Type { C0, C2 };
     void moveByAbs(const QPointF &absTrans);
     void setRelativePos(const QPointF &relPos);
-    void moveToAbs(const QPointF &absPos);
-    void moveByRel(const QPointF &relTrans);
     void startTransform();
     void finishTransform();
     void cancelTransform();
