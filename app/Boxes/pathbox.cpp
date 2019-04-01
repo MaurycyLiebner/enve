@@ -223,10 +223,10 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
                                         const qreal &canvasScaleInv) {
     MovablePoint* pointToReturn = nullptr;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
+        pointToReturn = mStrokeGradientPoints->getPointAt(absPtPos,
                                                               canvasScaleInv);
         if(!pointToReturn) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
+            pointToReturn = mFillGradientPoints->getPointAt(absPtPos,
                                                                 canvasScaleInv);
         }
     } else if(currentCanvasMode == MOVE_PATH) {

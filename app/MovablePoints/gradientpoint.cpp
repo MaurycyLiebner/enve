@@ -7,22 +7,7 @@
 GradientPoint::GradientPoint(QPointFAnimator * const associatedAnimator,
                              PathBox* const parent) :
     AnimatedPoint(associatedAnimator, parent->getTransformAnimator(),
-                  TYPE_GRADIENT_POINT) {
-    mAssociatedAnimator_k->prp_setInheritedUpdater(
-                SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parent));
-}
-
-void GradientPoint::setRelativePos(const QPointF &relPos) {
-    AnimatedPoint::setRelativePos(relPos);
-    const auto boxParent = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    GetAsPtr(boxParent->getParentBox(), PathBox)->updateDrawGradients();
-}
-
-void GradientPoint::moveByRel(const QPointF &relTranslatione) {
-    AnimatedPoint::moveByRel(relTranslatione);
-    const auto boxParent = GetAsPtr(mParentTransform_cv, BoxTransformAnimator);
-    GetAsPtr(boxParent->getParentBox(), PathBox)->updateDrawGradients();
-}
+                  TYPE_GRADIENT_POINT) {}
 
 void GradientPoint::setColor(const QColor &fillColor) {
     mFillColor = fillColor;

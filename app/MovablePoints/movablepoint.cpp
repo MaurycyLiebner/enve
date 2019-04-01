@@ -11,7 +11,7 @@ MovablePoint::MovablePoint(BasicTransformAnimator* parentTransform,
                            const qreal &radius) {
     mType = type;
     mRadius = radius;
-    setParentTransformAnimator(parentTransform);
+    mParentTransform_cv = parentTransform;
 }
 
 void MovablePoint::startTransform() {
@@ -39,9 +39,7 @@ void MovablePoint::drawHovered(SkCanvas *canvas,
 }
 
 void MovablePoint::finishTransform() {
-    if(mTransformStarted) {
-        mTransformStarted = false;
-    }
+    if(mTransformStarted) mTransformStarted = false;
 }
 
 void MovablePoint::setAbsolutePos(const QPointF &pos) {

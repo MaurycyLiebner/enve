@@ -68,7 +68,6 @@ public:
 
     bool isContainedInRect(const QRectF &absRect);
 
-
     void select();
     void deselect();
 
@@ -97,17 +96,7 @@ public:
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
 
-    void setRelativePosStartAndFinish(const QPointF &relPos) {
-        //startTransform();
-        setRelativePos(relPos);
-        //finishTransform();
-    }
     const QPointF &getSavedRelPos() const;
-
-    void setParentTransformAnimator(
-            BasicTransformAnimator *parentTransform) {
-        mParentTransform_cv = parentTransform;
-    }
 
     bool isSelected() const { return mSelected; }
 protected:

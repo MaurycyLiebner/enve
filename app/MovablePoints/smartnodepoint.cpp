@@ -368,11 +368,11 @@ void SmartNodePoint::setC0Enabled(const bool &enabled) {
 }
 
 void SmartNodePoint::resetC2() {
-    mC2Pt->setRelativePosStartAndFinish(getRelativePos());
+    mC2Pt->setRelativePos(getRelativePos());
 }
 
 void SmartNodePoint::resetC0() {
-    mC0Pt->setRelativePosStartAndFinish(getRelativePos());
+    mC0Pt->setRelativePos(getRelativePos());
 }
 
 int SmartNodePoint::getNodeId() const {

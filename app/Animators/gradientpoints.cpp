@@ -54,8 +54,8 @@ void GradientPoints::drawGradientPointsSk(SkCanvas *canvas,
     }
 }
 
-MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos,
-                                             const qreal &canvasScaleInv) {
+MovablePoint *GradientPoints::getPointAt(const QPointF &absPos,
+                                         const qreal &canvasScaleInv) {
     if(mEnabled) {
         if(mStartPoint->isPointAtAbsPos(absPos, canvasScaleInv) ) {
             return mStartPoint.get();

@@ -17,8 +17,8 @@ public:
     void drawGradientPointsSk(SkCanvas *canvas,
                               const SkScalar &invScale);
 
-    MovablePoint *qra_getPointAt(const QPointF &absPos,
-                                 const qreal &canvasScaleInv);
+    MovablePoint *getPointAt(const QPointF &absPos,
+                             const qreal &canvasScaleInv);
 
     void setColors(const QColor &startColor, const QColor &endColor);
 
