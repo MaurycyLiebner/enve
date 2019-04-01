@@ -29,7 +29,7 @@ public:
 
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
-
+    virtual void moveByRel(const QPointF &relTranslation) = 0;
     virtual void applyTransform(const QMatrix &transform) = 0;
 
     virtual void moveToAbs(const QPointF& absPos);
@@ -58,13 +58,10 @@ public:
     }
 
     QPointF getAbsolutePos() const;
+
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);
     void setAbsolutePos(const QPointF &pos);
-
-    void moveByRel(const QPointF &relTranslation) {
-        setRelativePos(mSavedRelPos + relTranslation);
-    }
 
     BasicTransformAnimator *getParentTransform();
 
