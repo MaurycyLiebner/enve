@@ -12,6 +12,12 @@ qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
 
 void NodeList::moveNode(const int& fromId, const int& toId) {
     mNodes.moveNode(fromId, toId);
+    Node * const node = at(toId);
+    if(node->isDissolved()) {
+        const qreal prevTV = prevT(toId);
+        const qreal tFrag = nextT(toId) - prevTV;
+        node->setT(0.5*tFrag + prevTV);
+    }
 }
 
 void NodeList::updateDissolvedNodePosition(const int &nodeId) {
@@ -139,13 +145,13 @@ void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
     for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
-            iNode->mT = gMapTToFragment(0, node->mT, iNode->mT);
+            iNode->mT = gMapTToFragment(0, node->t(), iNode->mT);
         }
     }
     for(int i = nodeId + 1; i < nextNormalV->getNodeId(); i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
-            iNode->mT = gMapTToFragment(node->mT, 1, iNode->mT);
+            iNode->mT = gMapTToFragment(node->t(), 1, iNode->mT);
         }
     }
 }
@@ -342,14 +348,14 @@ qreal NodeList::prevT(const int &nodeId) const {
     if(nodeId == 0) return 0;
     const Node * const node = mNodes.at(nodeId - 1);
     if(node->isNormal()) return 0;
-    return node->mT;
+    return node->t();
 }
 
 qreal NodeList::nextT(const int &nodeId) const {
     if(nodeId == mNodes.count() - 1) return 1;
     const Node * const node = mNodes.at(nodeId + 1);
     if(node->isNormal()) return 1;
-    return node->mT;
+    return node->t();
 }
 
 Node * NodeList::prevNormal(const int& nodeId) const {

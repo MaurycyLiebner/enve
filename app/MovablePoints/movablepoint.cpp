@@ -252,7 +252,3 @@ bool MovablePoint::isCtrlPoint() {
 bool MovablePoint::isBonePoint() {
     return mType == MovablePointType::TYPE_BONE_POINT;
 }
-
-void NonAnimatedMovablePoint::setRelativePosVal(const QPointF &relPos) {
-    mCurrentPos = relPos;
-}

@@ -1,6 +1,6 @@
 #ifndef SMARTCTRLPOINT_H
 #define SMARTCTRLPOINT_H
-#include "movablepoint.h"
+#include "nonanimatedmovablepoint.h"
 class SmartNodePoint;
 class SmartCtrlPoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;

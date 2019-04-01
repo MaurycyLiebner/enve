@@ -1,7 +1,7 @@
 #ifndef BONE_H
 #define BONE_H
 #include "boundingbox.h"
-#include "MovablePoints/movablepoint.h"
+#include "MovablePoints/nonanimatedmovablepoint.h"
 #include "Animators/transformanimator.h"
 class BonePt;
 class BonesBox;

@@ -15,8 +15,8 @@ SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
 
 void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
-    if(mCtrlType == C0) mParentPoint_k->c0Moved(mCurrentPos);
-    else mParentPoint_k->c2Moved(mCurrentPos);
+    if(mCtrlType == C0) mParentPoint_k->c0Moved(getRelativePos());
+    else mParentPoint_k->c2Moved(getRelativePos());
 }
 
 void SmartCtrlPoint::rotate(const qreal &rotate) {

@@ -143,14 +143,14 @@ void PathPointsHandler::promoteToNormal(const int &nodeId) {
 }
 
 void PathPointsHandler::demoteToDissolved(const int &nodeId) {
-    const int prevNormalId = targetPath()->prevNormalId(nodeId);
-    const int nextNormalId = targetPath()->nextNormalId(nodeId);
     blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionDemoteToDissolved(nodeId);
     unblockAllPointsUpdate();
     mTargetAnimator->pathChanged();
 
+    const int prevNormalId = targetPath()->prevNormalId(nodeId);
+    const int nextNormalId = targetPath()->nextNormalId(nodeId);
     updatePoints(qMin(prevNormalId, nextNormalId),
                  qMax(prevNormalId, nextNormalId));
 }

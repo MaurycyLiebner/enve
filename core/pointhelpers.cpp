@@ -925,12 +925,9 @@ qreal gMapTToFragment(const qreal &minAbsT,
                       const qreal &maxAbsT,
                       const qreal &absT) {
     const qreal tFrag = maxAbsT - minAbsT;
-    if(isZero6Dec(tFrag)) {
-        if(isZero4Dec(absT - minAbsT)) return 0.5;
-        RuntimeThrow("Cannot map to zero range");
-    }
+    if(isZero6Dec(tFrag)) RuntimeThrow("Cannot map to zero range");
     if(tFrag < 0) RuntimeThrow("Cannot map to negative range");
-    return (absT - minAbsT + (1 - maxAbsT))/tFrag;
+    return (absT - minAbsT)/tFrag;
 }
 
 qreal gMapTFromFragment(const qreal &minAbsT,

@@ -130,39 +130,4 @@ protected:
                         const SkColor &fillColor,
                         const bool &keyOnCurrent = false);
 };
-
-class NonAnimatedMovablePoint : public MovablePoint {
-    friend class StdSelfRef;
-public:
-    void applyTransform(const QMatrix &transform) {
-        setRelativePosVal(transform.map(mCurrentPos));
-    }
-
-    void setRelativePos(const QPointF &relPos) {
-        setRelativePosVal(relPos);
-    }
-
-    virtual void setRelativePosVal(const QPointF &relPos);
-
-    QPointF getRelativePos() const {
-        return mCurrentPos;
-    }
-
-    void moveByRel(const QPointF &relTranslation) {
-        setRelativePos(mSavedRelPos + relTranslation);
-    }
-
-    void cancelTransform() {
-        setRelativePos(mSavedRelPos);
-    }
-protected:
-    NonAnimatedMovablePoint(BasicTransformAnimator* parentTransform,
-                            const MovablePointType &type,
-                            const qreal &radius = 7.5) :
-        MovablePoint(parentTransform, type, radius) {
-
-    }
-
-    QPointF mCurrentPos;
-};
 #endif // MOVABLEPOINT_H

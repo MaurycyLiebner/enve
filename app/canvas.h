@@ -135,13 +135,17 @@ public:
                 const auto ptT = dynamic_cast<T*>(mLastPressedPoint.data());
                 if(ptT) {
                     op(ptT);
+                    if(ptT->selectionEnabled()) addPointToSelection(ptT);
                     return;
                 }
             }
         }
         for(const auto& pt : mSelectedPoints_d) {
             const auto ptT = dynamic_cast<T*>(pt.data());
-            if(ptT) op(ptT);
+            if(ptT) {
+                op(ptT);
+                if(!ptT->selectionEnabled()) removePointFromSelection(ptT);
+            }
         }
     }
     void updateSelectedPointsAfterCtrlsVisiblityChanged();

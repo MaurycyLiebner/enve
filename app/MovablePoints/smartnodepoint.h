@@ -1,6 +1,6 @@
 ﻿#ifndef SMARTNODEPOINT_H
 #define SMARTNODEPOINT_H
-#include "movablepoint.h"
+#include "nonanimatedmovablepoint.h"
 #include "nodepointvalues.h"
 #include "segment.h"
 #include "Animators/SmartPath/smartpathcontainer.h"

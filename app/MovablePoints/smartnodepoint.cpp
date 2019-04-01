@@ -79,7 +79,7 @@ int SmartNodePoint::moveToClosestSegment(const QPointF &absPos) {
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     if(getType() == Node::NORMAL) {
         setRelativePosVal(relPos);
-        currentPath()->actionSetNormalNodeP1(getNodeId(), mCurrentPos);
+        currentPath()->actionSetNormalNodeP1(getNodeId(), getRelativePos());
         mNextNormalSegment.afterChanged();
         if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
 
