@@ -6,11 +6,11 @@ NonAnimatedMovablePoint::NonAnimatedMovablePoint(
     MovablePoint(parentTransform, type, radius) {}
 
 void NonAnimatedMovablePoint::setRelativePos(const QPointF &relPos) {
-    mCurrentPos = relPos;
+    setValue(relPos);
 }
 
 QPointF NonAnimatedMovablePoint::getRelativePos() const {
-    return mCurrentPos;
+    return getValue();
 }
 
 void NonAnimatedMovablePoint::cancelTransform() {

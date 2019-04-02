@@ -24,12 +24,32 @@ public:
     void startTransform();
     void finishTransform();
     void cancelTransform();
+
+    QPointFAnimator * getAnimator() const {
+        return mAssociatedAnimator_k;
+    }
+
+    QrealAnimator * getXAnimator() const {
+        return mAssociatedAnimator_k->getXAnimator();
+    }
+
+    QrealAnimator * getYAnimator() const {
+        return mAssociatedAnimator_k->getYAnimator();
+    }
 protected:
-    AnimatedPoint(QPointFAnimator* associatedAnimator,
-                  BasicTransformAnimator *parentTransform,
+    AnimatedPoint(QPointFAnimator * const associatedAnimator,
+                  BasicTransformAnimator * const parentTransform,
                   const MovablePointType &type,
                   const qreal &radius = 5);
 
+    void setValue(const QPointF& value) {
+        mAssociatedAnimator_k->setBaseValue(value);
+    }
+
+    QPointF getValue() const {
+        return mAssociatedAnimator_k->getBaseValue();
+    }
+private:
     QPointFAnimator* const mAssociatedAnimator_k;
 };
 

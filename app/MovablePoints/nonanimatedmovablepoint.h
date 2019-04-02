@@ -13,7 +13,10 @@ public:
     void setRelativePos(const QPointF &relPos);
 
     void cancelTransform();
+
+    QPointF getValue() const { return mValue; }
+    void setValue(const QPointF& value) { mValue = value; }
 private:
-    QPointF mCurrentPos;
+    QPointF mValue;
 };
 #endif // NONANIMATEDMOVABLEPOINT_H

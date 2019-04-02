@@ -185,10 +185,8 @@ QPointF CircleRadiusPoint::getRelativePos() const {
 void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {
     const QPointF centerPos = mCenterPoint->getRelativePos();
     if(mXBlocked) {
-        mAssociatedAnimator_k->setBaseValue(
-                    QPointF(0, relPos.y() - centerPos.y()));
+        setValue(QPointF(0, relPos.y() - centerPos.y()));
     } else {
-        mAssociatedAnimator_k->setBaseValue(
-                    QPointF(relPos.x() - centerPos.x(), 0));
+        setValue(QPointF(relPos.x() - centerPos.x(), 0));
     }
 }
