@@ -4,46 +4,17 @@
 
 enum CanvasMode : short;
 
-class CircleCenterPoint : public AnimatedPoint {
-    friend class StdSelfRef;
-public:
-    void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
-                                        MovablePoint* horizontalPoint);
-
-    void moveByRel(const QPointF &relTranslatione);
-
-    void startTransform();
-
-    void finishTransform();
-    void moveByAbs(const QPointF &absTrans);
-protected:
-    CircleCenterPoint(QPointFAnimator *associatedAnimator,
-                      BasicTransformAnimator *parent,
-                      const MovablePointType &type);
-private:
-    stdptr<MovablePoint>mVerticalPoint_cv;
-    stdptr<MovablePoint>mHorizontalPoint_cv;
-};
-
 class CircleRadiusPoint : public AnimatedPoint {
     friend class StdSelfRef;
 public:
-    void moveByRel(const QPointF &relTranslation);
-//    void setAbsPosRadius(QPointF pos);
-    void moveByAbs(const QPointF &absTrans);
-
-    void startTransform();
-    void finishTransform();
     void setRelativePos(const QPointF &relPos);
 protected:
-    CircleRadiusPoint(QPointFAnimator *associatedAnimator,
-                      BasicTransformAnimator *parent,
+    CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
+                      BasicTransformAnimator * const parent,
                       const MovablePointType &type,
-                      const bool &blockX,
-                      MovablePoint *centerPoint);
+                      const bool &blockX);
 private:
     bool mXBlocked = false;
-    stdptr<MovablePoint> mCenterPoint_cv;
 };
 
 #include "Boxes/pathbox.h"
@@ -51,17 +22,11 @@ private:
 class Circle : public PathBox {
     friend class SelfRef;
 public:
-    void setVerticalRadius(const qreal &verticalRadius);
-    void setHorizontalRadius(const qreal &horizontalRadius);
-    void setRadius(const qreal &radius);
-
-    MovablePoint *getPointAtAbsPos(
-                             const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode,
-                             const qreal &canvasScaleInv);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                                   const CanvasMode &currentCanvasMode,
+                                   const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<stdptr<MovablePoint>> &list);
-    void moveRadiusesByAbs(const QPointF &absTrans);
 
     void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
@@ -74,17 +39,22 @@ public:
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 
-    qreal getCurrentXRadius();
-    qreal getCurrentYRadius();
-
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;
+
+    void setVerticalRadius(const qreal &verticalRadius);
+    void setHorizontalRadius(const qreal &horizontalRadius);
+    void setRadius(const qreal &radius);
+    void moveRadiusesByAbs(const QPointF &absTrans);
+
+    qreal getCurrentXRadius();
+    qreal getCurrentYRadius();
 protected:
     Circle();
 
     void getMotionBlurProperties(QList<Property*> &list) const;
 
-    stdsptr<CircleCenterPoint> mCenterPoint;
+    stdsptr<AnimatedPoint> mCenterPoint;
     stdsptr<CircleRadiusPoint> mHorizontalRadiusPoint;
     stdsptr<CircleRadiusPoint> mVerticalRadiusPoint;
 

@@ -26,8 +26,7 @@ void SmartCtrlPoint::rotate(const qreal &rotate) {
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
 }
 
-void SmartCtrlPoint::scale(const qreal &sx,
-                      const qreal &sy) {
+void SmartCtrlPoint::scale(const qreal &sx, const qreal &sy) {
     const QPointF savedValue = mSavedRelPos - mParentPoint_k->getSavedRelPos();
     QMatrix mat;
     mat.scale(sx, sy);

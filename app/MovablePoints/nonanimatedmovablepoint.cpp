@@ -17,10 +17,6 @@ QPointF NonAnimatedMovablePoint::getRelativePos() const {
     return mCurrentPos;
 }
 
-void NonAnimatedMovablePoint::moveByRel(const QPointF &relTranslation) {
-    setRelativePos(mSavedRelPos + relTranslation);
-}
-
 void NonAnimatedMovablePoint::cancelTransform() {
     setRelativePos(mSavedRelPos);
 }

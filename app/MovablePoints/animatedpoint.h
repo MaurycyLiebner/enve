@@ -20,7 +20,6 @@ class AnimatedPoint : public MovablePoint {
 public:    
     QPointF getRelativePos() const final;
     void setRelativePos(const QPointF &relPos);
-    void moveByRel(const QPointF &relTranslation);
 
     void startTransform();
     void finishTransform();

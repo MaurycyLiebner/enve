@@ -55,7 +55,8 @@ bool Canvas::anim_prevRelFrameWithKey(const int &relFrame,
 void Canvas::shiftAllPointsForAllKeys(const int &by) {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
-            //GetAsPtr(box, SmartVectorPath)->shiftAllPointsForAllKeys(by);
+//            const auto svp = GetAsPtr(box, SmartVectorPath);
+//            svp->shiftAllPointsForAllKeys(by);
         }
     }
 }

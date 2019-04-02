@@ -44,12 +44,6 @@ QPointF AnimatedPoint::getRelativePosAtRelFrame(const qreal &frame) const {
     return mAssociatedAnimator_k->getCurrentPointValueAtRelFrame(frame);
 }
 
-
-void AnimatedPoint::moveByRel(const QPointF &relTranslation) {
-    mAssociatedAnimator_k->incSavedValueToCurrentValue(relTranslation.x(),
-                                                       relTranslation.y());
-}
-
 void AnimatedPoint::cancelTransform() {
     mAssociatedAnimator_k->prp_cancelTransform();
     //setRelativePos(mSavedRelPos, false);

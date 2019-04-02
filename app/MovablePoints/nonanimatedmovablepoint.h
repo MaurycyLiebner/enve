@@ -11,7 +11,6 @@ protected:
 public:
     QPointF getRelativePos() const final;
     void setRelativePos(const QPointF &relPos);
-    void moveByRel(const QPointF &relTranslation) final;
 
     void cancelTransform();
     void applyTransform(const QMatrix &transform) final;

@@ -78,8 +78,8 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
         if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
 
         const QPointF change = relPos - mSavedRelPos;
-        mC0Pt->NonAnimatedMovablePoint::moveByRel(change);
-        mC2Pt->NonAnimatedMovablePoint::moveByRel(change);
+        mC0Pt->moveByRel(change);
+        mC2Pt->moveByRel(change);
     } else if(getType() == Node::DISSOLVED) {
         const auto parentSeg = mPrevNormalPoint->getNextNormalSegment();
         const auto tRange = currentPath()->dissolvedTRange(getNodeId());
