@@ -14,13 +14,14 @@ Circle::Circle() :
     mCenterPoint = SPtrCreate(AnimatedPoint)(mCenterAnimator.get(),
                                              mTransformAnimator.get(),
                                              TYPE_PATH_POINT);
-    mCenterPoint->setRelativePos(QPointF(0., 0.));
+    mCenterPoint->setRelativePos(QPointF(0, 0));
 
     mHorizontalRadiusAnimator =
             SPtrCreate(QPointFAnimator)("horizontal radius");
     mHorizontalRadiusPoint =
             SPtrCreate(CircleRadiusPoint)(mHorizontalRadiusAnimator.get(),
                                           mTransformAnimator.get(),
+                                          mCenterPoint.get(),
                                           TYPE_PATH_POINT, false);
     mHorizontalRadiusPoint->setRelativePos(QPointF(10, 0));
 
@@ -29,6 +30,7 @@ Circle::Circle() :
     mVerticalRadiusPoint =
             SPtrCreate(CircleRadiusPoint)(mVerticalRadiusAnimator.get(),
                                           mTransformAnimator.get(),
+                                          mCenterPoint.get(),
                                           TYPE_PATH_POINT, true);
     mVerticalRadiusPoint->setRelativePos(QPointF(0, 10));
 
@@ -36,7 +38,6 @@ Circle::Circle() :
     ca_addChildAnimator(GetAsSPtr(hXAnimator, QrealAnimator));
     ca_prependChildAnimator(hXAnimator, mEffectsAnimators);
     hXAnimator->prp_setName("horizontal radius");
-    std::make_shared<QrealAnimator>();
     QrealAnimator *vYAnimator = mVerticalRadiusAnimator->getYAnimator();
     ca_addChildAnimator(GetAsSPtr(vYAnimator, QrealAnimator));
     ca_prependChildAnimator(vYAnimator, mEffectsAnimators);
@@ -59,12 +60,15 @@ void Circle::moveRadiusesByAbs(const QPointF &absTrans) {
 }
 
 void Circle::setVerticalRadius(const qreal &verticalRadius) {
-    mVerticalRadiusPoint->setRelativePos(QPointF(0., verticalRadius) );
+    const QPointF centerPos = mCenterPoint->getRelativePos();
+    mVerticalRadiusPoint->setRelativePos(
+                centerPos + QPointF(0, verticalRadius));
 }
 
-void Circle::setHorizontalRadius(const qreal &horizontalRadius)
-{
-    mHorizontalRadiusPoint->setRelativePos(QPointF(horizontalRadius, 0.) );
+void Circle::setHorizontalRadius(const qreal &horizontalRadius) {
+    const QPointF centerPos = mCenterPoint->getRelativePos();
+    mHorizontalRadiusPoint->setRelativePos(
+                centerPos + QPointF(horizontalRadius, 0));
 }
 
 void Circle::setRadius(const qreal &radius) {
@@ -73,8 +77,8 @@ void Circle::setRadius(const qreal &radius) {
 }
 
 void Circle::drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &currentCanvasMode,
-                            const SkScalar &invScale) {
+                                const CanvasMode &currentCanvasMode,
+                                const SkScalar &invScale) {
     BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         mCenterPoint->drawSk(canvas, invScale);
@@ -95,10 +99,10 @@ MovablePoint *Circle::getPointAtAbsPos(const QPointF &absPtPos,
                                                          currentCanvasMode,
                                                          canvasScaleInv);
     if(!pointToReturn) {
-        if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
+        if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return mHorizontalRadiusPoint.get();
         }
-        if(mVerticalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
+        if(mVerticalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return mVerticalRadiusPoint.get();
         }
         if(mCenterPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
@@ -136,7 +140,7 @@ SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
     const SkScalar yRadius = static_cast<SkScalar>(
                 mVerticalRadiusAnimator->getEffectiveYValueAtRelFrame(relFrame));
     SkRect rect = SkRect::MakeXYWH(-xRadius, -yRadius, 2*xRadius, 2*yRadius);
-    const QPointF center = mCenterAnimator->getCurrentEffectivePointValue();
+    const QPointF center = mCenterAnimator->getEffectiveValue();
     rect.offset(toSkPoint(center));
     SkPath path;
     path.addOval(rect);
@@ -166,16 +170,19 @@ bool Circle::differenceInEditPathBetweenFrames(
 
 CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                                      BasicTransformAnimator * const parent,
+                                     AnimatedPoint * const centerPoint,
                                      const MovablePointType &type,
                                      const bool &blockX) :
-    AnimatedPoint(associatedAnimator, parent, type) {
-    mXBlocked = blockX;
-}
+    AnimatedPoint(associatedAnimator, parent, type),
+    mXBlocked(blockX), mCenterPoint(centerPoint) {}
 
 void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {
+    const QPointF centerPos = mCenterPoint->getRelativePos();
     if(mXBlocked) {
-        mAssociatedAnimator_k->getYAnimator()->setCurrentBaseValue(relPos.y());
+        mAssociatedAnimator_k->setBaseValue(
+                    QPointF(centerPos.x(), relPos.y()));
     } else {
-        mAssociatedAnimator_k->getXAnimator()->setCurrentBaseValue(relPos.x());
+        mAssociatedAnimator_k->setBaseValue(
+                    QPointF(relPos.x(), centerPos.y()));
     }
 }

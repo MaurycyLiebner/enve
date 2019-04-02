@@ -24,10 +24,6 @@ public:
     void startTransform();
     void finishTransform();
     void cancelTransform();
-
-    virtual void applyTransform(const QMatrix &transform) final;
-
-    QPointF getRelativePosAtRelFrame(const qreal &frame) const;
 protected:
     AnimatedPoint(QPointFAnimator* associatedAnimator,
                   BasicTransformAnimator *parentTransform,

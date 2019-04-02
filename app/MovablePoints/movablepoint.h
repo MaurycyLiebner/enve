@@ -29,7 +29,6 @@ public:
 
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
-    virtual void applyTransform(const QMatrix &transform) = 0;
 
     virtual void moveToAbs(const QPointF& absPos);
     virtual void moveByAbs(const QPointF &absTrans);
@@ -84,7 +83,9 @@ public:
 
     void rotateBy(const qreal &rot);
     void scale(const qreal &scaleBy);
-
+    void applyTransform(const QMatrix &transform) {
+        setRelativePos(transform.map(getRelativePos()));
+    }
     void setRadius(const qreal& radius);
 
     qreal getRadius();

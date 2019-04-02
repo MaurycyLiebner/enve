@@ -21,7 +21,7 @@ ShadowEffect::ShadowEffect() :
     mBlurRadius->setValueRange(0., 1000.);
     ca_addChildAnimator(mBlurRadius);
 
-    mTranslation->setCurrentPointValue(QPointF(0., 0.));
+    mTranslation->setBaseValue(QPointF(0., 0.));
     mTranslation->setValuesRange(-1000., 1000.);
     ca_addChildAnimator(mTranslation);
 
@@ -46,7 +46,7 @@ stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFra
     renderData->highQuality = mHighQuality->getValue();
     renderData->color = mColor->getColorAtRelFrame(relFrame);
     renderData->translation = mTranslation->
-            getCurrentEffectivePointValueAtRelFrame(relFrame);
+            getEffectiveValueAtRelFrame(relFrame);
     renderData->opacity = mOpacity->getEffectiveValueAtRelFrame(relFrame)/100.;
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
@@ -103,10 +103,10 @@ void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
 
 qreal ShadowEffect::getMargin() {
     return mBlurRadius->getCurrentBaseValue() +
-            pointToLen(mTranslation->getCurrentEffectivePointValue());
+            pointToLen(mTranslation->getEffectiveValue());
 }
 
 qreal ShadowEffect::getMarginAtRelFrame(const int &relFrame) {
     return mBlurRadius->getEffectiveValueAtRelFrame(relFrame) +
-            pointToLen(mTranslation->getCurrentEffectivePointValueAtRelFrame(relFrame));
+            pointToLen(mTranslation->getEffectiveValueAtRelFrame(relFrame));
 }

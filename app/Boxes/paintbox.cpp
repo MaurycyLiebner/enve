@@ -27,7 +27,7 @@ PaintBox::PaintBox() :
 
 PaintBox::PaintBox(const ushort &canvasWidthT,
                    const ushort &canvasHeightT) : PaintBox() {
-    mBottomRightAnimator->setCurrentPointValue(
+    mBottomRightAnimator->setBaseValue(
                 QPointF(canvasWidthT, canvasHeightT));
     finishSizeSetup();
 }
@@ -131,8 +131,8 @@ void PaintBox::selectAndAddContainedPointsToList(
 }
 
 QRectF PaintBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
-    return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
-                  mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
+    return QRectF(mTopLeftAnimator->getEffectiveValueAtRelFrame(relFrame),
+                  mBottomRightAnimator->getEffectiveValueAtRelFrame(relFrame));
 }
 
 void PaintBox::drawCanvasControls(SkCanvas * const canvas,
@@ -180,8 +180,8 @@ MovablePoint *PaintBox::getBottomRightPoint() {
 }
 
 void PaintBox::finishSizeSetup() {
-    QPointF tL = mTopLeftAnimator->getCurrentPointValue();
-    QPointF bR = mBottomRightAnimator->getCurrentPointValue();
+    QPointF tL = mTopLeftAnimator->getBaseValue();
+    QPointF bR = mBottomRightAnimator->getBaseValue();
     QPointF sizeT = bR - tL;
     if(sizeT.x() < 1. || sizeT.y() < 1.) return;
     ushort widthT = qRound(sizeT.x());
@@ -204,8 +204,8 @@ void PaintBox::finishSizeSetup() {
 }
 
 void PaintBox::finishSizeAndPosSetup() {
-    QPointF trans = mTopLeftAnimator->getCurrentPointValue() -
-            mTopLeftAnimator->getSavedPointValue();
+    QPointF trans = mTopLeftAnimator->getBaseValue() -
+            mTopLeftAnimator->getSavedValue();
     int dX = -qRound(trans.x());
     int dY = -qRound(trans.y());
     if(dX < 0 && dY < 0) {
@@ -251,8 +251,7 @@ void PaintBox::drawPixmapSk(SkCanvas * const canvas,
     if(mTemporaryHandler) {
         const auto combinedTrans = mTransformAnimator->getTotalTransform();
         canvas->concat(toSkMatrix(combinedTrans));
-        const QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
-                    anim_getCurrentRelFrame());
+        const QPointF trans = mTopLeftAnimator->getEffectiveValueAtRelFrame(anim_getCurrentRelFrame());
         const SkPoint transkSk = toSkPoint(trans);
         canvas->translate(transkSk.x(), transkSk.y());
         mTemporaryHandler->drawSk(canvas, paint);
@@ -295,9 +294,9 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrameF(
     }
     QPointF topLeft;
     if(mTopLeftAnimator->getBeingTransformed()) {
-        topLeft = mTopLeftAnimator->getSavedPointValue();
+        topLeft = mTopLeftAnimator->getSavedValue();
     } else {
-        topLeft = mTopLeftPoint->getRelativePosAtRelFrame(relFrame);
+        topLeft = mTopLeftAnimator->getEffectiveValueAtRelFrame(relFrame);
     }
     paintData->trans = toSkPoint(topLeft);
 }
@@ -313,8 +312,7 @@ void PaintBox::tabletMoveEvent(const qreal &xT,
                                const bool &erase,
                                const SimpleBrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
-            mTopLeftPoint->getRelativePosAtRelFrame(
-                        anim_getCurrentRelFrame());
+            mTopLeftAnimator->getEffectiveValueAtRelFrame(anim_getCurrentRelFrame());
     int seedT = rand() % 1000;
     srand(seedT);
 //    mMainHandler->tabletMoveEvent(relPos.x(), relPos.y(),
@@ -351,7 +349,7 @@ void PaintBox::tabletPressEvent(const qreal &xT,
                                 const bool &erase,
                                 const SimpleBrushWrapper * const brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
-            mTopLeftPoint->getRelativePosAtRelFrame(
+            mTopLeftAnimator->getEffectiveValueAtRelFrame(
                         anim_getCurrentRelFrame());
 
 //    mMainHandler->tabletPressEvent(relPos.x(), relPos.y(),
@@ -378,7 +376,5 @@ void PaintBoxRenderData::drawSk(SkCanvas * const canvas) {
     //SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->translate(trans.x(), trans.y());
-    for(const TileSkDrawerCollection &tile : tileDrawers) {
-        tile.drawSk(canvas);
-    }
+    for(const auto &tile : tileDrawers) tile.drawSk(canvas);
 }

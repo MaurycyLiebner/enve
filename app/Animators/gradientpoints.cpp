@@ -67,19 +67,19 @@ MovablePoint *GradientPoints::getPointAt(const QPointF &absPos,
 }
 
 QPointF GradientPoints::getStartPointAtRelFrame(const int &relFrame) {
-    return mStartAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
+    return mStartAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrame(const int &relFrame) {
-    return mEndAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
+    return mEndAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
 QPointF GradientPoints::getStartPointAtRelFrameF(const qreal &relFrame) {
-    return mStartAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
+    return mStartAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrameF(const qreal &relFrame) {
-    return mEndAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
+    return mEndAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
 void GradientPoints::setColors(const QColor& startColor,

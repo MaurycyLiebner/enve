@@ -5,10 +5,6 @@ NonAnimatedMovablePoint::NonAnimatedMovablePoint(
         const MovablePointType &type, const qreal &radius) :
     MovablePoint(parentTransform, type, radius) {}
 
-void NonAnimatedMovablePoint::applyTransform(const QMatrix &transform) {
-    mCurrentPos = transform.map(mCurrentPos);
-}
-
 void NonAnimatedMovablePoint::setRelativePos(const QPointF &relPos) {
     mCurrentPos = relPos;
 }

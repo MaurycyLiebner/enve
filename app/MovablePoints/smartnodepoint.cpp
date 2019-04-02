@@ -37,8 +37,8 @@ void SmartNodePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
 
 void SmartNodePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     NonAnimatedMovablePoint::rotateRelativeToSavedPivot(rot);
-    if(!mC0Pt->isSelected()) mC0Pt->rotate(rot);
-    if(!mC2Pt->isSelected()) mC2Pt->rotate(rot);
+    if(!mC0Pt->isSelected()) mC0Pt->rotateRelativeToSavedPivot(rot);
+    if(!mC2Pt->isSelected()) mC2Pt->rotateRelativeToSavedPivot(rot);
 }
 
 void SmartNodePoint::scaleRelativeToSavedPivot(const qreal &sx,

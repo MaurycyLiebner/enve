@@ -6,8 +6,9 @@ class SmartCtrlPoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
 public:
     enum Type { C0, C2 };
-    void moveByAbs(const QPointF &absTrans);
     void setRelativePos(const QPointF &relPos);
+    void rotateRelativeToSavedPivot(const qreal &rotate);
+
     void startTransform();
     void finishTransform();
     void cancelTransform();
@@ -20,7 +21,6 @@ public:
         return false;
     }
     void setOtherCtrlPt(SmartCtrlPoint * const ctrlPt);
-    void rotate(const qreal &rotate);
 protected:
     SmartCtrlPoint(SmartNodePoint * const parentPoint,
                    const Type &type);

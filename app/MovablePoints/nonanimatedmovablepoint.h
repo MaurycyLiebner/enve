@@ -13,7 +13,6 @@ public:
     void setRelativePos(const QPointF &relPos);
 
     void cancelTransform();
-    void applyTransform(const QMatrix &transform) final;
 private:
     QPointF mCurrentPos;
 };

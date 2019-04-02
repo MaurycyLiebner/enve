@@ -96,8 +96,8 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 bool ParticleBox::SWT_isParticleBox() const { return true; }
 
 QRectF ParticleBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
-    return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
-                  mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
+    return QRectF(mTopLeftAnimator->getEffectiveValueAtRelFrame(relFrame),
+                  mBottomRightAnimator->getEffectiveValueAtRelFrame(relFrame));
 }
 
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
@@ -340,7 +340,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mIniVelocityAngleVar->setCurrentBaseValue(15.);
 
     mAcceleration->setValuesRange(-100., 100.);
-    mAcceleration->setCurrentPointValue(QPointF(0., 9.8));
+    mAcceleration->setBaseValue(QPointF(0., 9.8));
 
     mParticlesPerSecond->setValueRange(0., 10000.);
     mParticlesPerSecond->setCurrentBaseValue(120);
@@ -526,7 +526,7 @@ void ParticleEmitter::generateParticles() {
     bool reuseParticle = nReuseParticles > 0;
 
     int totalNeededParticles = 0;
-    QPointF lastPos = mPos->getCurrentEffectivePointValueAtRelFrame(mMinFrame);
+    QPointF lastPos = mPos->getEffectiveValueAtRelFrame(mMinFrame);
     for(int i = mMinFrame; i < mMaxFrame; i++) {
         qreal srcVelInfl =
                 mSrcVelInfl->getEffectiveValueAtRelFrame(i);
@@ -543,7 +543,7 @@ void ParticleEmitter::generateParticles() {
         int particlesFrameLifetime = qRound(
                     mParticlesFrameLifetime->getEffectiveValueAtRelFrame(i));
         QPointF pos =
-                mPos->getCurrentEffectivePointValueAtRelFrame(i);
+                mPos->getEffectiveValueAtRelFrame(i);
         qreal width =
                 mWidth->getEffectiveValueAtRelFrame(i);
         qreal velocityVar =
@@ -551,7 +551,7 @@ void ParticleEmitter::generateParticles() {
         qreal velocityVarPeriod =
                 mVelocityRandomVarPeriod->getEffectiveValueAtRelFrame(i);
         QPointF acceleration =
-                mAcceleration->getCurrentEffectivePointValueAtRelFrame(i)/24.;
+                mAcceleration->getEffectiveValueAtRelFrame(i)/24.;
         qreal finalScale =
                 mParticlesSizeDecay->getEffectiveValueAtRelFrame(i);
         qreal finalOpacity =

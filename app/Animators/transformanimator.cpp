@@ -17,14 +17,14 @@ BasicTransformAnimator::BasicTransformAnimator() :
 
     mTransformUpdater = SPtrCreate(TransformUpdater)(this);
 
-    mScaleAnimator->setCurrentPointValue(QPointF(1, 1));
+    mScaleAnimator->setBaseValue(QPointF(1, 1));
     mScaleAnimator->setPrefferedValueStep(0.05);
     mScaleAnimator->prp_setOwnUpdater(mTransformUpdater);
 
     mRotAnimator->setCurrentBaseValue(0);
     mRotAnimator->prp_setOwnUpdater(mTransformUpdater);
 
-    mPosAnimator->setCurrentPointValue(QPointF(0, 0));
+    mPosAnimator->setBaseValue(QPointF(0, 0));
     mPosAnimator->prp_setOwnUpdater(mTransformUpdater);
 
     ca_addChildAnimator(mPosAnimator);
@@ -33,11 +33,11 @@ BasicTransformAnimator::BasicTransformAnimator() :
 }
 
 void BasicTransformAnimator::resetScale() {
-    mScaleAnimator->setCurrentPointValue(QPointF(1, 1));
+    mScaleAnimator->setBaseValue(QPointF(1, 1));
 }
 
 void BasicTransformAnimator::resetTranslation() {
-    mPosAnimator->setCurrentPointValue(QPointF(0, 0));
+    mPosAnimator->setBaseValue(QPointF(0, 0));
 }
 
 void BasicTransformAnimator::resetRotation() {
@@ -51,11 +51,11 @@ void BasicTransformAnimator::reset() {
 }
 
 void BasicTransformAnimator::setScale(const qreal &sx, const qreal &sy) {
-    mScaleAnimator->setCurrentPointValue(QPointF(sx, sy));
+    mScaleAnimator->setBaseValue(QPointF(sx, sy));
 }
 
 void BasicTransformAnimator::setPosition(const qreal &x, const qreal &y) {
-    mPosAnimator->setCurrentPointValue(QPointF(x, y));
+    mPosAnimator->setBaseValue(QPointF(x, y));
 }
 
 void BasicTransformAnimator::setRotation(const qreal &rot) {
@@ -91,7 +91,7 @@ void BasicTransformAnimator::moveRelativeToSavedValue(const qreal &dX, const qre
 }
 
 void BasicTransformAnimator::translate(const qreal &dX, const qreal &dY) {
-    mPosAnimator->incCurrentValues(dX, dY);
+    mPosAnimator->incBaseValues(dX, dY);
 }
 
 void BasicTransformAnimator::scale(const qreal &sx, const qreal &sy) {
@@ -119,7 +119,7 @@ qreal BasicTransformAnimator::yScale() {
 }
 
 QPointF BasicTransformAnimator::pos() {
-    return mPosAnimator->getCurrentEffectivePointValue();
+    return mPosAnimator->getEffectiveValue();
 }
 
 QPointF BasicTransformAnimator::mapAbsPosToRel(const QPointF &absPos) const {
@@ -171,7 +171,7 @@ QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrameF(
 }
 
 void BasicTransformAnimator::moveByAbs(const QPointF &absTrans) {
-    const auto savedRelPos = mPosAnimator->getSavedPointValue();
+    const auto savedRelPos = mPosAnimator->getSavedValue();
     const auto savedAbsPos = mParentTransformAnimator->mapRelPosToAbs(savedRelPos);
     moveToAbs(savedAbsPos + absTrans);
 }
@@ -185,7 +185,7 @@ void BasicTransformAnimator::setAbsolutePos(const QPointF &pos) {
 }
 
 void BasicTransformAnimator::setRelativePos(const QPointF &relPos) {
-    mPosAnimator->setCurrentPointValue(relPos);
+    mPosAnimator->setBaseValue(relPos);
 }
 
 void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
@@ -196,7 +196,7 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
     matrix.translate(-pivot.x() + mPosAnimator->getSavedXValue(),
                      -pivot.y() + mPosAnimator->getSavedYValue());
     rotateRelativeToSavedValue(rotRel);
-    mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()));
+    mPosAnimator->setBaseValue(QPointF(matrix.dx(), matrix.dy()));
 }
 
 void BasicTransformAnimator::updateRelativeTransform(const UpdateReason &reason) {
@@ -248,14 +248,14 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
                      -pivot.y() + mPosAnimator->getSavedYValue());
 
     scale(sx, sy);
-    mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()));
+    mPosAnimator->setBaseValue(QPointF(matrix.dx(), matrix.dy()));
 }
 
 BoxTransformAnimator::BoxTransformAnimator(BoundingBox * const parent) :
     BasicTransformAnimator(), mParentBox_k(parent) {
     mOpacityAnimator = SPtrCreate(QrealAnimator)("opacity");
     mPivotAnimator = SPtrCreate(QPointFAnimator)("pivot");
-    mPivotAnimator->setCurrentPointValue(QPointF(0, 0));
+    mPivotAnimator->setBaseValue(QPointF(0, 0));
     mPivotAnimator->prp_setOwnUpdater(mTransformUpdater);
     mOpacityAnimator->setValueRange(0, 100);
     mOpacityAnimator->setPrefferedValueStep(5);
@@ -274,7 +274,7 @@ MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
 }
 
 void BoxTransformAnimator::resetPivot() {
-    mPivotAnimator->setCurrentPointValue(QPointF(0, 0));
+    mPivotAnimator->setBaseValue(QPointF(0, 0));
 }
 
 void BoxTransformAnimator::reset() {
@@ -328,16 +328,16 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(const QPointF &
     const qreal posXInc = currentMatrix.dx() - futureMatrix.dx();
     const qreal posYInc = currentMatrix.dy() - futureMatrix.dy();
     if(posOrPivotRecording()) {
-        mPosAnimator->incAllValues(posXInc, posYInc);
-        mPivotAnimator->setCurrentPointValue(point);
+        mPosAnimator->incAllBaseValues(posXInc, posYInc);
+        mPivotAnimator->setBaseValue(point);
     } else {
-        mPosAnimator->incCurrentValuesWithoutCallingUpdater(posXInc, posYInc);
-        mPivotAnimator->setCurrentPointValueWithoutCallingUpdater(point);
+        mPosAnimator->incBaseValuesWithoutCallingUpdater(posXInc, posYInc);
+        mPivotAnimator->setBaseValueWithoutCallingUpdater(point);
     }
 }
 
 QPointF BoxTransformAnimator::getPivot() {
-    return mPivotAnimator->getCurrentEffectivePointValue();
+    return mPivotAnimator->getEffectiveValue();
 }
 
 QPointF BoxTransformAnimator::getPivotAbs() {

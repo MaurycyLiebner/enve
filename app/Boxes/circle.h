@@ -6,21 +6,25 @@ enum CanvasMode : short;
 
 class CircleRadiusPoint : public AnimatedPoint {
     friend class StdSelfRef;
-public:
-    void setRelativePos(const QPointF &relPos);
 protected:
     CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                       BasicTransformAnimator * const parent,
+                      AnimatedPoint * const centerPoint,
                       const MovablePointType &type,
                       const bool &blockX);
+public:
+    void setRelativePos(const QPointF &relPos);
 private:
-    bool mXBlocked = false;
+    const bool mXBlocked = false;
+    const stdptr<AnimatedPoint> mCenterPoint;
 };
 
 #include "Boxes/pathbox.h"
 
 class Circle : public PathBox {
     friend class SelfRef;
+protected:
+    Circle();
 public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
@@ -50,10 +54,8 @@ public:
     qreal getCurrentXRadius();
     qreal getCurrentYRadius();
 protected:
-    Circle();
-
     void getMotionBlurProperties(QList<Property*> &list) const;
-
+private:
     stdsptr<AnimatedPoint> mCenterPoint;
     stdsptr<CircleRadiusPoint> mHorizontalRadiusPoint;
     stdsptr<CircleRadiusPoint> mVerticalRadiusPoint;

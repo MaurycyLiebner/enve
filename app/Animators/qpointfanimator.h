@@ -8,24 +8,22 @@ class QPointFAnimator : public ComplexAnimator {
 protected:
     QPointFAnimator(const QString& name);
 public:
-    qreal getXValue();
-    qreal getYValue();
+    bool SWT_isQPointFAnimator() const { return true; }
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
 
-    qreal getXValueAtRelFrame(const qreal &relFrame);
-    qreal getYValueAtRelFrame(const qreal &relFrame);
+    void setBaseValue(const QPointF &val);
 
-    void setCurrentPointValue(const QPointF &val);
+    void setBaseValueWithoutCallingUpdater(const QPointF &val);
+    void incBaseValuesWithoutCallingUpdater(const qreal &x, const qreal &y);
+    void incBaseValues(const qreal &x, const qreal &y);
+    void multCurrentValues(const qreal &sx, const qreal &sy);
 
-    void setCurrentPointValueWithoutCallingUpdater(const QPointF &val);
-    void incCurrentValuesWithoutCallingUpdater(const qreal &x, const qreal &y);
-    void incCurrentValues(const qreal &x, const qreal &y);
-    void multCurrentValues(qreal sx, qreal sy);
-
-    QPointF getSavedPointValue();
+    QPointF getSavedValue();
     qreal getSavedXValue();
     qreal getSavedYValue();
 
-    void incAllValues(const qreal &x, const qreal &y);
+    void incAllBaseValues(const qreal &x, const qreal &y);
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();
@@ -35,26 +33,25 @@ public:
     void incSavedValueToCurrentValue(const qreal &incXBy,
                                      const qreal &incYBy);
 
-    void setValuesRange(const qreal &minVal,
-                        const qreal &maxVal);
-    QPointF getCurrentPointValue() const;
-    QPointF getCurrentPointValueAtAbsFrameF(const qreal &frame) const;
-    QPointF getCurrentPointValueAtRelFrame(const qreal &frame) const;
+    void setValuesRange(const qreal &minVal, const qreal &maxVal);
+
+    QPointF getBaseValue() const;
+    QPointF getBaseValueAtAbsFrame(const qreal &frame) const;
+    QPointF getBaseValueAtRelFrame(const qreal &frame) const;
 
     void setPrefferedValueStep(const qreal &valueStep);
 
-    bool SWT_isQPointFAnimator() const { return true; }
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
-
     bool getBeingTransformed();
-    QPointF getCurrentEffectivePointValueAtAbsFrameF(const qreal &frame) const;
-    QPointF getCurrentEffectivePointValueAtRelFrame(const qreal &frame) const;
-    QPointF getCurrentEffectivePointValue() const;
-    qreal getEffectiveXValueAtRelFrame(const qreal &relFrame);
-    qreal getEffectiveYValueAtRelFrame(const qreal &relFrame);
+
+    QPointF getEffectiveValue() const;
+    QPointF getEffectiveValueAtAbsFrame(const qreal &frame) const;
+    QPointF getEffectiveValueAtRelFrame(const qreal &frame) const;
+
     qreal getEffectiveXValue();
+    qreal getEffectiveXValueAtRelFrame(const qreal &relFrame);
+
     qreal getEffectiveYValue();
+    qreal getEffectiveYValueAtRelFrame(const qreal &relFrame);
 protected:
     qsptr<QrealAnimator> mXAnimator;
     qsptr<QrealAnimator> mYAnimator;

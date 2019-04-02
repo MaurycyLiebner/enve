@@ -170,8 +170,7 @@ void MovablePoint::moveToRel(const QPointF &relPos) {
 }
 
 void MovablePoint::moveByAbs(const QPointF &absTrans) {
-    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) +
-              absTrans);
+    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) + absTrans);
 }
 
 void MovablePoint::moveToAbs(const QPointF& absPos) {

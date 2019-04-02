@@ -59,12 +59,12 @@ SkPath Rectangle::getPathAtRelFrameF(const qreal &relFrame) {
     SkPath path;
     const SkPoint topLeft =
             toSkPoint(mTopLeftAnimator->
-                                getCurrentEffectivePointValueAtRelFrame(relFrame));
+                                getEffectiveValueAtRelFrame(relFrame));
     const SkPoint bottomRight =
             toSkPoint(mBottomRightAnimator->
-                                getCurrentEffectivePointValueAtRelFrame(relFrame));
+                                getEffectiveValueAtRelFrame(relFrame));
     const QPointF radiusAtFrame =
-            mRadiusAnimator->getCurrentEffectivePointValueAtRelFrame(relFrame);
+            mRadiusAnimator->getEffectiveValueAtRelFrame(relFrame);
     path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
                                        bottomRight.x(), bottomRight.y()),
                       radiusAtFrame.x(), radiusAtFrame.y());
