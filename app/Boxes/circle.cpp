@@ -14,7 +14,11 @@ Circle::Circle() :
     mCenterPoint = SPtrCreate(AnimatedPoint)(mCenterAnimator.get(),
                                              mTransformAnimator.get(),
                                              TYPE_PATH_POINT);
+    mCenterPoint->disableSelection();
     mCenterPoint->setRelativePos(QPointF(0, 0));
+    mCenterAnimator->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
+    ca_addChildAnimator(mCenterAnimator);
+    ca_prependChildAnimator(mCenterAnimator.get(), mEffectsAnimators);
 
     mHorizontalRadiusAnimator =
             SPtrCreate(QPointFAnimator)("horizontal radius");
@@ -24,6 +28,10 @@ Circle::Circle() :
                                           mCenterPoint.get(),
                                           TYPE_PATH_POINT, false);
     mHorizontalRadiusPoint->setRelativePos(QPointF(10, 0));
+    QrealAnimator *hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
+    ca_addChildAnimator(GetAsSPtr(hXAnimator, QrealAnimator));
+    ca_prependChildAnimator(hXAnimator, mEffectsAnimators);
+    hXAnimator->prp_setName("horizontal radius");
 
     mVerticalRadiusAnimator =
             SPtrCreate(QPointFAnimator)("vertical radius");
@@ -33,20 +41,11 @@ Circle::Circle() :
                                           mCenterPoint.get(),
                                           TYPE_PATH_POINT, true);
     mVerticalRadiusPoint->setRelativePos(QPointF(0, 10));
-
-    QrealAnimator *hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
-    ca_addChildAnimator(GetAsSPtr(hXAnimator, QrealAnimator));
-    ca_prependChildAnimator(hXAnimator, mEffectsAnimators);
-    hXAnimator->prp_setName("horizontal radius");
     QrealAnimator *vYAnimator = mVerticalRadiusAnimator->getYAnimator();
     ca_addChildAnimator(GetAsSPtr(vYAnimator, QrealAnimator));
     ca_prependChildAnimator(vYAnimator, mEffectsAnimators);
     vYAnimator->prp_setName("vertical radius");
     prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
-    mCenterAnimator->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
-    ca_addChildAnimator(mCenterAnimator);
-    ca_prependChildAnimator(mCenterAnimator.get(), mEffectsAnimators);
-    mCenterAnimator->prp_setName("center");
 }
 
 void Circle::startAllPointsTransform() {
@@ -174,15 +173,22 @@ CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                                      const MovablePointType &type,
                                      const bool &blockX) :
     AnimatedPoint(associatedAnimator, parent, type),
-    mXBlocked(blockX), mCenterPoint(centerPoint) {}
+    mXBlocked(blockX), mCenterPoint(centerPoint) {
+    disableSelection();
+}
+
+QPointF CircleRadiusPoint::getRelativePos() const {
+    const QPointF centerPos = mCenterPoint->getRelativePos();
+    return AnimatedPoint::getRelativePos() + centerPos;
+}
 
 void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {
     const QPointF centerPos = mCenterPoint->getRelativePos();
     if(mXBlocked) {
         mAssociatedAnimator_k->setBaseValue(
-                    QPointF(centerPos.x(), relPos.y()));
+                    QPointF(0, relPos.y() - centerPos.y()));
     } else {
         mAssociatedAnimator_k->setBaseValue(
-                    QPointF(relPos.x(), centerPos.y()));
+                    QPointF(relPos.x() - centerPos.x(), 0));
     }
 }

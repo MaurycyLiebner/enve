@@ -18,7 +18,7 @@ class QPointFAnimator;
 class AnimatedPoint : public MovablePoint {
     friend class StdSelfRef;
 public:    
-    QPointF getRelativePos() const final;
+    QPointF getRelativePos() const;
     void setRelativePos(const QPointF &relPos);
 
     void startTransform();

@@ -585,6 +585,7 @@ void SmartNodePoint::updateFromNodeData() {
     } else {
         mRadius = (type == Node::DISSOLVED ? 5.5 : 4);
     }
+    setSelectionEnabled(type == Node::NORMAL);
 }
 
 bool SmartNodePoint::isEndPoint() {

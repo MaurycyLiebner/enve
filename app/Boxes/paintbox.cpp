@@ -204,7 +204,7 @@ void PaintBox::finishSizeSetup() {
 }
 
 void PaintBox::finishSizeAndPosSetup() {
-    QPointF trans = mTopLeftAnimator->getBaseValue() -
+    const QPointF trans = mTopLeftAnimator->getBaseValue() -
             mTopLeftAnimator->getSavedValue();
     int dX = -qRound(trans.x());
     int dY = -qRound(trans.y());

@@ -45,9 +45,6 @@ public:
     virtual void drawSk(SkCanvas * const canvas,
                         const SkScalar &invScale);
 
-    virtual bool selectionEnabled() const {
-        return true;
-    }
     virtual void removeFromVectorPath() {}
     virtual bool isHidden() const;
 
@@ -100,11 +97,28 @@ public:
     const QPointF &getSavedRelPos() const;
 
     bool isSelected() const { return mSelected; }
+
+    bool selectionEnabled() const {
+        return mSelectionEnabled;
+    }
+
+    void enableSelection() {
+        setSelectionEnabled(true);
+    }
+
+    void disableSelection() {
+        setSelectionEnabled(false);
+    }
+
+    void setSelectionEnabled(const bool& enabled) {
+        mSelectionEnabled = enabled;
+    }
 protected:
     MovablePoint(BasicTransformAnimator* parentTransform,
                  const MovablePointType &type,
                  const qreal &radius = 7.5);
 
+    bool mSelectionEnabled = true;
     bool mSelected = false;
     bool mTransformStarted = false;
     bool mHidden = false;

@@ -29,10 +29,6 @@ public:
 
     void removeFromVectorPath();
 
-    bool selectionEnabled() const {
-        return isNormal();
-    }
-
     void canvasContextMenu(PointTypeMenu * const menu);
 
     int moveToClosestSegment(const QPointF &absPos);

@@ -13,6 +13,7 @@ protected:
                       const MovablePointType &type,
                       const bool &blockX);
 public:
+    QPointF getRelativePos() const;
     void setRelativePos(const QPointF &relPos);
 private:
     const bool mXBlocked = false;
