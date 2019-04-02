@@ -2,8 +2,6 @@
 
 PropertyUpdater::PropertyUpdater() {}
 
-PropertyUpdater::~PropertyUpdater() {}
-
 void PropertyUpdater::update() {}
 
 void PropertyUpdater::frameChangeUpdate() {

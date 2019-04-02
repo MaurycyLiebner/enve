@@ -18,6 +18,8 @@
 #include "Animators/transformanimator.h"
 #include "GPUEffects/gpurastereffect.h"
 #include "linkbox.h"
+#include "PropertyUpdaters/transformupdater.h"
+#include "PropertyUpdaters/boxpathpointupdater.h"
 
 int BoundingBox::sNextDocumentId;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -37,6 +39,12 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     sDocumentBoxes << this;
     ca_addChildAnimator(mTransformAnimator);
     mTransformAnimator->reset();
+    mTransformAnimator->prp_setOwnUpdater(SPtrCreate(TransformUpdater)(
+                                              mTransformAnimator.get()));
+    const auto pivotAnim = mTransformAnimator->getPivotAnimator();
+    const auto pivotUpdater = SPtrCreate(BoxPathPointUpdater)(
+                mTransformAnimator.get(), this);
+    pivotAnim->prp_setOwnUpdater(pivotUpdater);
 
     mEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(PixmapEffectUpdater)(this));
@@ -327,7 +335,6 @@ void BoundingBox::finishPivotTransform() {
 
 void BoundingBox::setPivotAbsPos(const QPointF &absPos) {
     setPivotRelPos(mapAbsPosToRel(absPos));
-    //updateTotalTransform();
 }
 
 QPointF BoundingBox::getPivotAbsPos() {
@@ -652,6 +659,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
     data->fParentTransform =
             getParentTotalTransformAtRelFrame(relFrame);
     data->fTransform = data->fRelTransform*data->fParentTransform;
+
     data->fOpacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
     data->fResolution = getParentCanvas()->getResolutionFraction();
     const bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
@@ -837,15 +845,11 @@ DurationRectangle *BoundingBox::getDurationRectangle() {
 }
 
 void BoundingBox::requestGlobalFillStrokeUpdateIfSelected() {
-    if(isSelected()) {
-        emit fillStrokeSettingsChanged();
-    }
+    if(isSelected()) emit fillStrokeSettingsChanged();
 }
 
 void BoundingBox::requestGlobalPivotUpdateIfSelected() {
-    if(isSelected()) {
-        emit globalPivotInfluenced();
-    }
+    if(isSelected()) emit globalPivotInfluenced();
 }
 
 void BoundingBox::getMotionBlurProperties(QList<Property*> &list) const {
@@ -953,7 +957,7 @@ void BoundingBox::shiftAll(const int &shift) {
 }
 
 QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {
-    return mTransformAnimator->getRelativeTransformAtRelFrameF(relFrame);
+    return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
 }
 
 int BoundingBox::prp_getRelFrameShift() const {

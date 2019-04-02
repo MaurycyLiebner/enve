@@ -158,16 +158,20 @@ void MovablePoint::scale(const qreal &scaleXBy,
     setRelativePos(scaleMatrix.map(mSavedRelPos));
 }
 
-void MovablePoint::moveToRel(const QPointF &relPos) {
-    moveByRel(relPos - mSavedRelPos);
+void MovablePoint::moveToAbs(const QPointF& absPos) {
+    setAbsolutePos(absPos);
 }
 
 void MovablePoint::moveByAbs(const QPointF &absTrans) {
     moveToAbs(mapRelativeToAbsolute(mSavedRelPos) + absTrans);
 }
 
-void MovablePoint::moveToAbs(const QPointF& absPos) {
-    setAbsolutePos(absPos);
+void MovablePoint::moveToRel(const QPointF &relPos) {
+    moveByRel(relPos - mSavedRelPos);
+}
+
+void MovablePoint::moveByRel(const QPointF &relTranslation) {
+    setRelativePos(mSavedRelPos + relTranslation);
 }
 
 void MovablePoint::scale(const qreal &scaleBy) {
@@ -181,11 +185,6 @@ void MovablePoint::setRadius(const qreal& radius) {
 qreal MovablePoint::getRadius() {
     return mRadius;
 }
-
-//void MovablePoint::saveTransformPivot(QPointF absPivot)
-//{
-//    mSavedTransformPivot = -mParent->mapAbsPosToRel(absPivot);
-//}
 
 void MovablePoint::select() {
     mSelected = true;

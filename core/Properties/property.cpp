@@ -81,7 +81,7 @@ void Property::prp_setInheritedUpdater(const stdsptr<PropertyUpdater>& updater) 
 }
 
 void Property::prp_setOwnUpdater(const stdsptr<PropertyUpdater>& updater) {
-    prp_mUpdater = updater;
+    prp_setUpdater(updater);
     prp_mOwnUpdater = true;
 }
 

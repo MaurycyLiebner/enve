@@ -41,7 +41,7 @@ public:
     void moveRelativeToSavedValue(const qreal &dX,
                                   const qreal &dY);
     virtual QMatrix getCurrentTransformationMatrix();
-    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
+    virtual QMatrix getRelativeTransformAtRelFrame(const qreal &relFrame);
 
     qreal dx();
     qreal dy();
@@ -51,15 +51,11 @@ public:
     QPointF pos();
 
     QPointF mapAbsPosToRel(const QPointF &absPos) const;
-
     QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
     QPointF mapFromParent(const QPointF &parentRelPos) const;
-
     SkPoint mapAbsPosToRel(const SkPoint &absPos) const;
-
     SkPoint mapRelPosToAbs(const SkPoint &relPos) const;
-
     SkPoint mapFromParent(const SkPoint &parentRelPos) const;
 
     void scaleRelativeToSavedValue(const qreal &sx,
@@ -77,15 +73,13 @@ public:
     bool SWT_isBasicTransformAnimator() const;
 
     virtual QMatrix getTotalTransformAtRelFrameF(const qreal &relFrame);
-    QMatrix getParentTotalTransformAtRelFrameF(const qreal &relFrame);
+    QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
     QPointFAnimator *getPosAnimator();
-
     QPointFAnimator *getScaleAnimator();
-
     QrealAnimator *getRotAnimator();
 protected:
     QList<qsptr<BasicTransformAnimator>> mChildBoxes;
@@ -98,8 +92,6 @@ protected:
     qsptr<QPointFAnimator> mPosAnimator;
     qsptr<QPointFAnimator> mScaleAnimator;
     qsptr<QrealAnimator> mRotAnimator;
-
-    stdsptr<PropertyUpdater> mTransformUpdater;
 public slots:
     virtual void updateTotalTransform(const UpdateReason &reason);
 signals:
@@ -118,13 +110,13 @@ public:
 
     void reset();
     QMatrix getCurrentTransformationMatrix();
-    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
+    QMatrix getRelativeTransformAtRelFrame(const qreal &relFrame);
 
     void resetPivot();
 
     void setPivotWithoutChangingTransformation(const QPointF &point);
-    QPointF getPivot();
 
+    QPointF getPivot();
     qreal getPivotX();
     qreal getPivotY();
 

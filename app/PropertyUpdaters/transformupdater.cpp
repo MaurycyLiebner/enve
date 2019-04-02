@@ -1,9 +1,8 @@
 #include "transformupdater.h"
 #include "Animators/transformanimator.h"
 
-TransformUpdater::TransformUpdater(BasicTransformAnimator *transformAnimator) {
-    mTarget = transformAnimator;
-}
+TransformUpdater::TransformUpdater(BasicTransformAnimator * const target) :
+    mTarget(target) {}
 
 void TransformUpdater::update() {
     mTarget->updateRelativeTransform(Animator::USER_CHANGE);

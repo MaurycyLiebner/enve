@@ -4,13 +4,20 @@
 #include "Animators/transformanimator.h"
 
 BoxPathPoint::BoxPathPoint(QPointFAnimator * const associatedAnimator,
-                           BoxTransformAnimator * const box) :
-    AnimatedPoint(associatedAnimator, box, TYPE_PIVOT_POINT, 7),
-    mBoxTransform_cv(box) {}
+                           BoxTransformAnimator * const boxTrans) :
+    AnimatedPoint(associatedAnimator, boxTrans, TYPE_PIVOT_POINT, 7),
+    mBoxTransform_cv(boxTrans) {}
+
+void BoxPathPoint::setRelativePos(const QPointF &relPos) {
+    const auto boxTrans = GetAsPtr(mBoxTransform_cv, BoxTransformAnimator);
+    const auto parentBox = boxTrans->getParentBox();
+    parentBox->setPivotAutoAdjust(false);
+    parentBox->setPivotRelPos(relPos);
+}
 
 void BoxPathPoint::startTransform() {
-    MovablePoint::startTransform();
     mSavedAbsPos = getAbsolutePos();
+    MovablePoint::startTransform();
     const auto boxTrans = GetAsPtr(mBoxTransform_cv, BoxTransformAnimator);
     boxTrans->startPivotTransform();
 }
@@ -18,14 +25,6 @@ void BoxPathPoint::startTransform() {
 void BoxPathPoint::finishTransform() {
     const auto boxTrans = GetAsPtr(mBoxTransform_cv, BoxTransformAnimator);
     boxTrans->finishPivotTransform();
-}
-
-void BoxPathPoint::moveByAbs(const QPointF &absTrans) {
-    const QPointF absPos = mSavedAbsPos + absTrans;
-    const auto boxTrans = GetAsPtr(mBoxTransform_cv, BoxTransformAnimator);
-    const auto parentBox = boxTrans->getParentBox();
-    parentBox->setPivotAutoAdjust(false);
-    parentBox->setPivotAbsPos(absPos);
 }
 
 void BoxPathPoint::drawSk(SkCanvas * const canvas,

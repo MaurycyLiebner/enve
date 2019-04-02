@@ -31,9 +31,6 @@ public:
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
 
-    virtual void moveToAbs(const QPointF& absPos);
-    virtual void moveByAbs(const QPointF &absTrans);
-
     virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
     virtual void scaleRelativeToSavedPivot(const qreal &sx, const qreal &sy);
     virtual void rotateRelativeToSavedPivot(const qreal &rot);
@@ -53,9 +50,10 @@ public:
         Q_UNUSED(menu);
     }
 
-    void moveByRel(const QPointF &relTranslation) {
-        setRelativePos(mSavedRelPos + relTranslation);
-    }
+    void moveToAbs(const QPointF& absPos);
+    void moveByAbs(const QPointF &absTrans);
+    void moveToRel(const QPointF &relPos);
+    void moveByRel(const QPointF &relTranslation);
     QPointF getAbsolutePos() const;
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);
@@ -86,7 +84,6 @@ public:
     void setRadius(const qreal& radius);
     qreal getRadius();
 
-    void moveToRel(const QPointF &relPos);
 
     void drawHovered(SkCanvas * const canvas,
                      const SkScalar &invScale);

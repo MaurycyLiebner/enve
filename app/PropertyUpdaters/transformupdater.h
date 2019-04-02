@@ -4,14 +4,16 @@
 class BasicTransformAnimator;
 
 class TransformUpdater : public PropertyUpdater {
+    friend class StdSelfRef;
+protected:
+    TransformUpdater(BasicTransformAnimator * const target);
 public:
-    TransformUpdater(BasicTransformAnimator *transformAnimator);
     void update();
     void finishedChange();
 
     void frameChangeUpdate();
 private:
-    BasicTransformAnimator *mTarget;
+    BasicTransformAnimator * const mTarget;
 };
 
 #endif // TRANSFORMUPDATER_H

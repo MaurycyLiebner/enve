@@ -5,7 +5,6 @@
 class PropertyUpdater : public StdSelfRef {
 public:
     PropertyUpdater();
-    virtual ~PropertyUpdater();
 
     virtual void update();
     virtual void frameChangeUpdate();

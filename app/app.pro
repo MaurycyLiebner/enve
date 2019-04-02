@@ -275,7 +275,8 @@ SOURCES += main.cpp\
     Boxes/internallinkgroupbox.cpp \
     PathEffects/sumpatheffect.cpp \
     pointtypemenu.cpp \
-    MovablePoints/nonanimatedmovablepoint.cpp
+    MovablePoints/nonanimatedmovablepoint.cpp \
+    PropertyUpdaters/boxpathpointupdater.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -499,7 +500,8 @@ HEADERS  += \
     Boxes/internallinkgroupbox.h \
     PathEffects/sumpatheffect.h \
     pointtypemenu.h \
-    MovablePoints/nonanimatedmovablepoint.h
+    MovablePoints/nonanimatedmovablepoint.h \
+    PropertyUpdaters/boxpathpointupdater.h
 
 RESOURCES += \
     resources.qrc

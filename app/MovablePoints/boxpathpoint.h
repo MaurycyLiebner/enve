@@ -7,15 +7,17 @@ class BoxPathPoint : public AnimatedPoint {
     friend class StdSelfRef;
 protected:
     BoxPathPoint(QPointFAnimator * const associatedAnimator,
-                 BoxTransformAnimator * const box);
+                 BoxTransformAnimator * const boxTrans);
 public:
+    void setRelativePos(const QPointF& relPos);
+
     void startTransform();
     void finishTransform();
-    void moveByAbs(const QPointF &absTrans);
+
     void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
 private:
+    BoxTransformAnimator * const mBoxTransform_cv;
     QPointF mSavedAbsPos;
-    BoxTransformAnimator * mBoxTransform_cv;
 };
 
 #endif // BOXPATHPOINT_H
