@@ -1,7 +1,6 @@
 #include "canvas.h"
 #include "GUI/mainwindow.h"
 #include "MovablePoints/pathpivot.h"
-#include "Boxes/bone.h"
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 #include "Boxes/smartvectorpath.h"
@@ -371,56 +370,28 @@ void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {
 void Canvas::rotateSelectedBy(const qreal &rotBy,
                               const QPointF &absOrigin,
                               const bool &startTrans) {
-    if(mSelectedBones.isEmpty()) {
-        if(mLocalPivot) {
-            if(startTrans) {
-                for(const auto &box : mSelectedBoxes) {
-                    box->startRotTransform();
-                    box->rotateBy(rotBy);
-                }
-            } else {
-                for(const auto &box : mSelectedBoxes) {
-                    box->rotateBy(rotBy);
-                }
+    if(mLocalPivot) {
+        if(startTrans) {
+            for(const auto &box : mSelectedBoxes) {
+                box->startRotTransform();
+                box->rotateBy(rotBy);
             }
         } else {
-            if(startTrans) {
-                for(const auto &box : mSelectedBoxes) {
-                    box->startRotTransform();
-                    box->startPosTransform();
-                    box->saveTransformPivotAbsPos(absOrigin);
-                    box->rotateRelativeToSavedPivot(rotBy);
-                }
-            } else {
-                for(const auto &box : mSelectedBoxes) {
-                    box->rotateRelativeToSavedPivot(rotBy);
-                }
+            for(const auto &box : mSelectedBoxes) {
+                box->rotateBy(rotBy);
             }
         }
     } else {
-        if(mLocalPivot) {
-            if(startTrans) {
-                for(const auto& bone : mSelectedBones) {
-                    bone->startRotTransform();
-                    bone->rotateBy(rotBy);
-                }
-            } else {
-                for(const auto& bone : mSelectedBones) {
-                    bone->rotateBy(rotBy);
-                }
+        if(startTrans) {
+            for(const auto &box : mSelectedBoxes) {
+                box->startRotTransform();
+                box->startPosTransform();
+                box->saveTransformPivotAbsPos(absOrigin);
+                box->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
-            if(startTrans) {
-                for(const auto& bone : mSelectedBones) {
-                    bone->startRotTransform();
-                    bone->startPosTransform();
-                    bone->saveTransformPivotAbsPos(absOrigin);
-                    bone->rotateRelativeToSavedPivot(rotBy);
-                }
-            } else {
-                for(const auto& bone : mSelectedBones) {
-                    bone->rotateRelativeToSavedPivot(rotBy);
-                }
+            for(const auto &box : mSelectedBoxes) {
+                box->rotateRelativeToSavedPivot(rotBy);
             }
         }
     }
@@ -436,58 +407,28 @@ void Canvas::scaleSelectedBy(const qreal& scaleXBy,
                              const qreal& scaleYBy,
                              const QPointF& absOrigin,
                              const bool& startTrans) {
-    if(mSelectedBones.isEmpty()) {
-        if(mLocalPivot) {
-            if(startTrans) {
-                for(const auto &box : mSelectedBoxes) {
-                    box->startScaleTransform();
-                    box->scale(scaleXBy, scaleYBy);
-                }
-            } else {
-                for(const auto &box : mSelectedBoxes) {
-                    box->scale(scaleXBy, scaleYBy);
-                }
+    if(mLocalPivot) {
+        if(startTrans) {
+            for(const auto &box : mSelectedBoxes) {
+                box->startScaleTransform();
+                box->scale(scaleXBy, scaleYBy);
             }
         } else {
-            if(startTrans) {
-                for(const auto &box : mSelectedBoxes) {
-                    box->startScaleTransform();
-                    box->startPosTransform();
-                    box->saveTransformPivotAbsPos(absOrigin);
-                    box->scaleRelativeToSavedPivot(scaleXBy,
-                                                   scaleYBy);
-                }
-            } else {
-                for(const auto &box : mSelectedBoxes) {
-                    box->scaleRelativeToSavedPivot(scaleXBy,
-                                                   scaleYBy);
-                }
+            for(const auto &box : mSelectedBoxes) {
+                box->scale(scaleXBy, scaleYBy);
             }
         }
     } else {
-        if(mLocalPivot) {
-            if(startTrans) {
-                for(const auto& bone : mSelectedBones) {
-                    bone->startScaleTransform();
-                    bone->scale(scaleXBy, scaleYBy);
-                }
-            } else {
-                for(const auto& bone : mSelectedBones) {
-                    bone->scale(scaleXBy, scaleYBy);
-                }
+        if(startTrans) {
+            for(const auto &box : mSelectedBoxes) {
+                box->startScaleTransform();
+                box->startPosTransform();
+                box->saveTransformPivotAbsPos(absOrigin);
+                box->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         } else {
-            if(startTrans) {
-                for(const auto& bone : mSelectedBones) {
-                    bone->startScaleTransform();
-                    bone->startPosTransform();
-                    bone->saveTransformPivotAbsPos(absOrigin);
-                    bone->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
-                }
-            } else {
-                for(const auto& bone : mSelectedBones) {
-                    bone->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
-                }
+            for(const auto &box : mSelectedBoxes) {
+                box->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         }
     }
@@ -553,24 +494,6 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
     } else {
         mMainWindow->setCurrentBox(mSelectedBoxes.last());
     }
-}
-
-void Canvas::addBoneToSelection(Bone *bone) {
-    if(bone->isSelected()) return;
-    bone->select();
-    mSelectedBones.append(bone); schedulePivotUpdate();
-    //sortSelectedBonesByZAscending();
-}
-
-void Canvas::removeBoneFromSelection(Bone *bone) {
-    bone->deselect();
-    mSelectedBones.removeOne(bone); schedulePivotUpdate();
-}
-
-void Canvas::clearBonesSelection() {
-    for(const auto& bone : mSelectedBones)
-        bone->deselect();
-    mSelectedBones.clear(); schedulePivotUpdate();
 }
 
 void Canvas::clearBoxesSelection() {
@@ -644,8 +567,7 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
     if(currentMode == MOVE_POINT ||
        currentMode == ADD_POINT ||
        currentMode == ADD_SMART_POINT ||
-       currentMode == MOVE_PATH ||
-       currentMode == ADD_BONE) {
+       currentMode == MOVE_PATH) {
         if(mRotPivot->isPointAtAbsPos(absPos, canvasScaleInv)) {
             return mRotPivot.get();
         }
@@ -661,26 +583,14 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
 }
 
 void Canvas::finishSelectedBoxesTransform() {
-    if(mSelectedBones.isEmpty()) {
-        for(const auto &box : mSelectedBoxes) {
-            box->finishTransform();
-        }
-    } else {
-        for(const auto& bone : mSelectedBones) {
-            bone->finishTransform();
-        }
+    for(const auto &box : mSelectedBoxes) {
+        box->finishTransform();
     }
 }
 
 void Canvas::cancelSelectedBoxesTransform() {
-    if(mSelectedBones.isEmpty()) {
-        for(const auto &box : mSelectedBoxes) {
-            box->cancelTransform();
-        }
-    } else {
-        for(const auto& bone : mSelectedBones) {
-            bone->cancelTransform();
-        }
+    for(const auto &box : mSelectedBoxes) {
+        box->cancelTransform();
     }
 }
 
@@ -697,21 +607,6 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
         }
     }
 }
-
-void Canvas::moveSelectedBonesByAbs(const QPointF &by,
-                                    const bool &startTransform) {
-    if(startTransform) {
-        for(const auto& bone : mSelectedBones) {
-            bone->startPosTransform();
-            bone->moveByAbs(by);
-        }
-    } else {
-        for(const auto& bone : mSelectedBones) {
-            bone->moveByAbs(by);
-        }
-    }
-}
-
 
 //QPointF BoxesGroup::getRelCenterPosition() {
 //    QPointF posSum = QPointF(0., 0.);

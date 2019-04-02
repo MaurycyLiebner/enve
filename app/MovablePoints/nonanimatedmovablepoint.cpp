@@ -14,5 +14,5 @@ QPointF NonAnimatedMovablePoint::getRelativePos() const {
 }
 
 void NonAnimatedMovablePoint::cancelTransform() {
-    setRelativePos(mSavedRelPos);
+    setRelativePos(getSavedRelPos());
 }

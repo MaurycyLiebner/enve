@@ -17,7 +17,7 @@ void PathPivot::drawSk(SkCanvas * const canvas,
                        const SkScalar &invScale) {
     SkPoint absPos = toSkPoint(getAbsolutePos());
     if(!isHidden()) {
-        const SkColor fillCol = mSelected ?
+        const SkColor fillCol = isSelected() ?
                     SkColorSetRGB(0, 255, 0) :
                     SkColorSetRGB(125, 255, 125);
         const SkPoint absPos = toSkPoint(getAbsolutePos());
@@ -29,17 +29,10 @@ void PathPivot::drawSk(SkCanvas * const canvas,
     SkPaint paint;
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    SkScalar scaledHalfRadius = static_cast<SkScalar>(mRadius)*invScale*0.5f;
-    canvas->drawLine(-scaledHalfRadius, 0.f, scaledHalfRadius, 0.f, paint);
-    canvas->drawLine(0.f, -scaledHalfRadius, 0.f, scaledHalfRadius, paint);
+    SkScalar scaledHalfRadius = toSkScalar(getRadius()*0.5)*invScale;
+    canvas->drawLine(-scaledHalfRadius, 0, scaledHalfRadius, 0, paint);
+    canvas->drawLine(0, -scaledHalfRadius, 0, scaledHalfRadius, paint);
     canvas->restore();
-}
-
-void PathPivot::finishTransform() {
-    if(!mTransformStarted) {
-        return;
-    }
-    mTransformStarted = false;
 }
 
 bool PathPivot::isRotating() {
@@ -52,7 +45,7 @@ bool PathPivot::isScaling() {
 
 void PathPivot::startRotating() {
     mRotating = true;
-    mLastDRot = 0.;
+    mLastDRot = 0;
     mRotHalfCycles = 0;
 }
 
@@ -62,16 +55,11 @@ void PathPivot::startScaling() {
 
 bool PathPivot::handleMousePress(const QPointF &absPressPos,
                                  const qreal &canvasInvScale) {
-    if(mHidden) return false;
+    if(isHidden()) return false;
     if(isPointAtAbsPos(absPressPos, canvasInvScale)) {
         select();
         return true;
-    }/* else {
-        if(isRotationPathAt(absPressPos) ) {
-            startRotating();
-            return true;
-        }
-    }*/
+    }
     return false;
 }
 

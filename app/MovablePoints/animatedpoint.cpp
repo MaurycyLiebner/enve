@@ -23,13 +23,12 @@ QPointF AnimatedPoint::getRelativePos() const {
 }
 
 void AnimatedPoint::startTransform() {
-    MovablePoint::startTransform();
     mAssociatedAnimator_k->prp_startTransform();
+    MovablePoint::startTransform();
 }
 
 void AnimatedPoint::finishTransform() {
-    if(mTransformStarted) mAssociatedAnimator_k->prp_finishTransform();
-    MovablePoint::finishTransform();
+    mAssociatedAnimator_k->prp_finishTransform();
 }
 
 void AnimatedPoint::cancelTransform() {

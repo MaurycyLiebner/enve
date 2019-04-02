@@ -27,7 +27,6 @@ class Brush;
 class NodePoint;
 class UndoRedoStack;
 class ExternalLinkBox;
-class Bone;
 struct GPURasterEffectCreator;
 
 #define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? nullptr : (list).at( (index) ))
@@ -51,8 +50,7 @@ enum CanvasMode : short {
     ADD_PARTICLE_BOX,
     ADD_PARTICLE_EMITTER,
     ADD_PAINT_BOX,
-    PAINT_MODE,
-    ADD_BONE
+    PAINT_MODE
 };
 
 
@@ -78,7 +76,6 @@ public:
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
-    void selectOnlyLastPressedBone();
 
     void repaintIfNeeded();
     void setCanvasMode(const CanvasMode &mode);
@@ -110,8 +107,6 @@ public:
     void moveSelectedPointsByAbs(const QPointF &by,
                                  const bool &startTransform);
     void moveSelectedBoxesByAbs(const QPointF &by,
-                                const bool &startTransform);
-    void moveSelectedBonesByAbs(const QPointF &by,
                                 const bool &startTransform);
     void groupSelectedBoxes();
 
@@ -242,13 +237,10 @@ public:
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
     void clearBoxesSelection();
-    void clearBonesSelection();
     void removePointFromSelection(MovablePoint * const point);
     void removeBoxFromSelection(BoundingBox *box);
     void addPointToSelection(MovablePoint * const point);
     void addBoxToSelection(BoundingBox *box);
-    void removeBoneFromSelection(Bone *bone);
-    void addBoneToSelection(Bone *bone);
 
     void clearPointsSelection();
     void raiseSelectedBoxesToTop();
@@ -424,12 +416,6 @@ public:
 
     void setLocalPivot(const bool &localPivot) {
         mLocalPivot = localPivot;
-        updatePivot();
-    }
-
-    void setBonesSelectionEnabled(const bool &bT) {
-        mBonesSelectionEnabled = bT;
-        clearBonesSelection();
         updatePivot();
     }
 
@@ -629,7 +615,6 @@ protected:
     qsptr<SoundComposition> mSoundComposition;
 
     bool mLocalPivot = false;
-    bool mBonesSelectionEnabled = false;
     bool mIsCurrentCanvas = true;
     int mMaxFrame = 0;
 
@@ -647,15 +632,12 @@ protected:
 
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;
-    qptr<Bone> mHoveredBone;
 
-    QList<qptr<Bone>> mSelectedBones;
     QList<stdptr<MovablePoint>> mSelectedPoints_d;
     QList<qptr<BoundingBox>> mSelectedBoxes;
 
     stdptr<MovablePoint> mLastPressedPoint;
     qptr<BoundingBox> mLastPressedBox;
-    qptr<Bone> mLastPressedBone;
     stdsptr<PathPivot> mRotPivot;
 
     stdptr<SmartNodePoint> mCurrentSmartEndPoint;

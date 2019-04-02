@@ -102,7 +102,6 @@ public:
     void updateHoveredElements();
 
     void setLocalPivot(const bool &bT);
-    void setBonesSelectionEnabled(const bool &bT);
 
     void importFile(const QString &path,
                     const QPointF &relDropPos = QPointF(0, 0));

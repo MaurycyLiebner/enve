@@ -48,8 +48,7 @@ enum BoundingBoxType {
     TYPE_PARTICLES,
     TYPE_VIDEO,
     TYPE_IMAGESQUENCE,
-    TYPE_PAINT,
-    TYPE_BONES_BOX
+    TYPE_PAINT
 };
 
 typedef PropertyMimeData<BoundingBox,

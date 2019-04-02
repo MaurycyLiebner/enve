@@ -6,16 +6,13 @@
 #include "pointhelpers.h"
 #include "Animators/transformanimator.h"
 
-MovablePoint::MovablePoint(BasicTransformAnimator* parentTransform,
+MovablePoint::MovablePoint(BasicTransformAnimator * const parentTransform,
                            const MovablePointType &type,
-                           const qreal &radius) {
-    mType = type;
-    mRadius = radius;
-    mParentTransform_cv = parentTransform;
-}
+                           const qreal &radius) :
+    mType(type), mRadius(radius),
+    mParentTransform_cv(parentTransform) {}
 
 void MovablePoint::startTransform() {
-    mTransformStarted = true;
     mSavedRelPos = getRelativePos();
 }
 
@@ -23,12 +20,12 @@ const QPointF &MovablePoint::getSavedRelPos() const {
     return mSavedRelPos;
 }
 
-void MovablePoint::drawHovered(SkCanvas *canvas,
+void MovablePoint::drawHovered(SkCanvas * const canvas,
                                const SkScalar &invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kStroke_Style);
-    paint.setStrokeWidth(2.f*invScale);
+    paint.setStrokeWidth(2*invScale);
     paint.setColor(SK_ColorRED);
     canvas->drawCircle(toSkPoint(getAbsolutePos()),
                        static_cast<SkScalar>(mRadius)*invScale, paint);
@@ -36,10 +33,6 @@ void MovablePoint::drawHovered(SkCanvas *canvas,
     //p->setPen(pen);
 //    drawCosmeticEllipse(p, getAbsolutePos(),
 //                        mRadius, mRadius);
-}
-
-void MovablePoint::finishTransform() {
-    if(mTransformStarted) mTransformStarted = false;
 }
 
 void MovablePoint::setAbsolutePos(const QPointF &pos) {
@@ -238,8 +231,4 @@ bool MovablePoint::isPivotPoint() {
 
 bool MovablePoint::isCtrlPoint() {
     return mType == MovablePointType::TYPE_CTRL_POINT;
-}
-
-bool MovablePoint::isBonePoint() {
-    return mType == MovablePointType::TYPE_BONE_POINT;
 }

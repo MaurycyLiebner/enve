@@ -8,10 +8,8 @@
 SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
                                const Type& type) :
     NonAnimatedMovablePoint(parentPoint->getParentTransform(),
-                 MovablePointType::TYPE_CTRL_POINT, 5),
-    mCtrlType(type), mParentPoint_k(parentPoint) {
-    mParentTransform_cv = mParentPoint_k->getParentTransform();
-}
+                            MovablePointType::TYPE_CTRL_POINT, 5),
+    mCtrlType(type), mParentPoint_k(parentPoint) {}
 
 void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
     NonAnimatedMovablePoint::setRelativePos(relPos);
@@ -20,14 +18,14 @@ void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
 }
 
 void SmartCtrlPoint::rotateRelativeToSavedPivot(const qreal &rotate) {
-    const QPointF savedValue = mSavedRelPos - mParentPoint_k->getSavedRelPos();
+    const QPointF savedValue = getSavedRelPos() - mParentPoint_k->getSavedRelPos();
     QMatrix mat;
     mat.rotate(rotate);
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
 }
 
 void SmartCtrlPoint::scale(const qreal &sx, const qreal &sy) {
-    const QPointF savedValue = mSavedRelPos - mParentPoint_k->getSavedRelPos();
+    const QPointF savedValue = getSavedRelPos() - mParentPoint_k->getSavedRelPos();
     QMatrix mat;
     mat.scale(sx, sy);
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
@@ -42,7 +40,6 @@ void SmartCtrlPoint::startTransform() {
 }
 
 void SmartCtrlPoint::finishTransform() {
-    NonAnimatedMovablePoint::finishTransform();
     if(mParentPoint_k->getCtrlsMode() != CTRLS_CORNER) {
         mOtherCtrlPt_cv->NonAnimatedMovablePoint::finishTransform();
     }

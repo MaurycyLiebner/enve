@@ -13,9 +13,7 @@
 #include "GUI/mainwindow.h"
 #include "Boxes/paintbox.h"
 #include "Paint/brush.h"
-#include "Boxes/bone.h"
 #include "GUI/fontswidget.h"
-#include "Boxes/bone.h"
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 #include <QFileDialog>
@@ -26,18 +24,9 @@
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
-    mLastPressedBone = nullptr;
     if(!mLastPressedBox) {
         if(!isShiftPressed()) clearBoxesSelection();
     } else {
-        if(mLastPressedBox->SWT_isBonesBox()) {
-            if(mBonesSelectionEnabled) {
-                mLastPressedBone = GetAsPtr(mLastPressedBox, BonesBox)->
-                        getBoneAtAbsPos(mLastMouseEventPosRel);
-                if(!isShiftPressed()) clearBonesSelection();
-                return;
-            }
-        }
         if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
             clearBoxesSelection();
         }
@@ -623,52 +612,6 @@ void Canvas::handleLeftButtonMousePress() {
         mLastPressedPoint = paintBox->getBottomRightPoint();
         addPointToSelection(mLastPressedPoint);
         mLastPressedPoint->startTransform();
-    } else if(mCurrentMode == CanvasMode::ADD_BONE) {
-        //setCanvasMode(CanvasMode::MOVE_POINT);
-        BonePt *bonePt = nullptr;
-
-        if(mLastPressedPoint) {
-            if(mLastPressedPoint->isBonePoint()) {
-                bonePt = GetAsPtr(mLastPressedPoint, BonePt);
-                if(!bonePt->getTipBone()) {
-                    mLastMouseEventPosRel = bonePt->getAbsolutePos();
-                    bonePt = nullptr;
-                }
-            }
-        }
-        Bone *newBone = nullptr;
-        if(!bonePt) {
-            qsptr<BonesBox> boneBox;
-            if(mSelectedBoxes.count() > 0) {
-                BoundingBox * const lastSelected = mSelectedBoxes.last();
-                if(lastSelected->SWT_isBonesBox()) {
-                    boneBox = GetAsSPtr(lastSelected, BonesBox);
-
-                    newBone = Bone::createBone(boneBox.data());
-
-                    newBone->getRootPt()->setAbsolutePos(
-                                mLastMouseEventPosRel);
-                    newBone->getTipPt()->setAbsolutePos(
-                                mLastMouseEventPosRel);
-                }
-            }
-            if(!boneBox) {
-                boneBox = SPtrCreate(BonesBox)();
-                mCurrentBoxesGroup->addContainedBox(boneBox);
-                boneBox->setAbsolutePos(mLastMouseEventPosRel);
-                clearBoxesSelection();
-                addBoxToSelection(boneBox.get());
-                newBone = Bone::createBone(boneBox.data());
-            }
-        } else {
-            Bone * const boneT = bonePt->getTipBone();
-            newBone = Bone::createBone(boneT);
-        }
-        clearPointsSelection();
-
-        mLastPressedPoint = newBone->getTipPt();
-        addPointToSelection(mLastPressedPoint);
-        mLastPressedPoint->startTransform();
     }
 }
 
@@ -798,28 +741,13 @@ void Canvas::handleMovePathMouseRelease() {
     } else if(mFirstMouseMove) {
         mSelecting = false;
         if(isShiftPressed() && mLastPressedBox) {
-            if(mLastPressedBone) {
-                if(mLastPressedBone->isSelected()) {
-                    removeBoneFromSelection(mLastPressedBone);
-                } else {
-                    addBoneToSelection(mLastPressedBone);
-                }
+            if(mLastPressedBox->isSelected()) {
+                removeBoxFromSelection(mLastPressedBox);
             } else {
-                if(mLastPressedBox->isSelected()) {
-                    removeBoxFromSelection(mLastPressedBox);
-                } else {
-                    addBoxToSelection(mLastPressedBox);
-                }
+                addBoxToSelection(mLastPressedBox);
             }
         } else {
-            if(mLastPressedBone) {
-                if(!mLastPressedBox->isSelected()) {
-                    addBoxToSelection(mLastPressedBox);
-                }
-                selectOnlyLastPressedBone();
-            } else {
-                selectOnlyLastPressedBox();
-            }
+            selectOnlyLastPressedBox();
         }
     } else if(mSelecting) {
         moveSecondSelectionPoint(mCurrentMouseEventPosRel);
@@ -842,14 +770,11 @@ void Canvas::handleMouseRelease() {
     if(!mDoubleClick) {
         if(mCurrentMode == CanvasMode::MOVE_POINT ||
            mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
-           mCurrentMode == CanvasMode::ADD_PAINT_BOX ||
-           mCurrentMode == CanvasMode::ADD_BONE) {
+           mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             handleMovePointMouseRelease();
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
                 mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
-            }/* else if(mCurrentMode == CanvasMode::ADD_BONE) {
-                mCanvasWindow->setCanvasMode(CanvasMode::MOVE_POINT);
-            }*/
+            }
         } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
             if(!mLastPressedPoint) {
                 handleMovePathMouseRelease();
@@ -980,23 +905,10 @@ void Canvas::handleMovePathMouseMove() {
         if(mLastPressedBox) {
             addBoxToSelection(mLastPressedBox);
             mLastPressedBox = nullptr;
-            if(mLastPressedBone) {
-                addBoneToSelection(mLastPressedBone);
-                mLastPressedBone = nullptr;
-            }
         }
 
-        if(mSelectedBones.isEmpty()) {
-            moveSelectedBoxesByAbs(
-                        getMoveByValueForEventPos(
-                            mCurrentMouseEventPosRel),
-                        mFirstMouseMove);
-        } else {
-            moveSelectedBonesByAbs(
-                        getMoveByValueForEventPos(
-                            mCurrentMouseEventPosRel),
-                        mFirstMouseMove);
-        }
+        const auto moveBy = getMoveByValueForEventPos(mCurrentMouseEventPosRel);
+        moveSelectedBoxesByAbs(moveBy, mFirstMouseMove);
     }
 }
 

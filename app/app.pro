@@ -142,7 +142,6 @@ SOURCES += main.cpp\
     Animators/qrealvalueeffect.cpp \
     Properties/intproperty.cpp \
     windowsinglewidgettarget.cpp \
-    Boxes/bone.cpp \
     drawpath.cpp \
     videoencoder.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
@@ -367,7 +366,6 @@ HEADERS  += \
     Animators/qrealvalueeffect.h \
     Properties/intproperty.h \
     windowsinglewidgettarget.h \
-    Boxes/bone.h \
     drawpath.h \
     videoencoder.h \
     GUI/RenderWidgets/rendersettingsdialog.h \

@@ -26,7 +26,6 @@ public:
                          const qreal &inputTransformationValue,
                          const bool &startTransform,
                          const CanvasMode &mode);
-    void finishTransform();
     void startRotating();
     void startScaling();
     void drawSk(SkCanvas * const canvas, const SkScalar &invScale);

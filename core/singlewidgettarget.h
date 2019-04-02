@@ -108,8 +108,6 @@ public:
     virtual bool SWT_isCanvas() const { return false; }
     virtual bool SWT_isAnimationBox() const { return false; }
     virtual bool SWT_isBoundingBox() const { return false; }
-    virtual bool SWT_isBonesBox() const { return false; }
-    virtual bool SWT_isBone() const { return false; }
     virtual bool SWT_isBoxesGroup() const { return false; }
     virtual bool SWT_isCircle() const { return false; }
     virtual bool SWT_isImageBox() const { return false; }

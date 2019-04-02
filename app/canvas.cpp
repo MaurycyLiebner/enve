@@ -27,6 +27,7 @@
 #include "MovablePoints/smartnodepoint.h"
 #include "Boxes/internallinkcanvas.h"
 #include "pointtypemenu.h"
+#include "Animators/transformanimator.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
@@ -131,7 +132,6 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
                    this, &Canvas::setCurrentGroupParentAsCurrentGroup);
     }
     clearBoxesSelection();
-    clearBonesSelection();
     clearPointsSelection();
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
@@ -145,16 +145,8 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
                                                SWT_TARGET_CURRENT_GROUP);
 }
 
-#include "Boxes/bone.h"
 void Canvas::updateHoveredBox() {
     mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
-    mHoveredBone = nullptr;
-    if(mHoveredBox && mBonesSelectionEnabled) {
-        if(mHoveredBox->SWT_isBonesBox()) {
-            mHoveredBone = GetAsPtr(mHoveredBox, BonesBox)->getBoneAtAbsPos(
-                        mCurrentMouseEventPosRel);
-        }
-    }
 }
 
 void Canvas::updateHoveredPoint() {
@@ -312,8 +304,6 @@ void Canvas::renderSk(SkCanvas * const canvas,
             mHoveredPoint_d->drawHovered(canvas, invZoom);
         } else if(mHoveredNormalSegment.isValid()) {
             mHoveredNormalSegment.drawHoveredSk(canvas, invZoom);
-        } else if(mHoveredBone) {
-            mHoveredBone->drawHoveredOnlyThisPathSk(canvas, invZoom);
         } else if(mHoveredBox) {
             if(!mCurrentNormalSegment.isValid()) {
                 mHoveredBox->drawHoveredSk(canvas, invZoom);
@@ -804,7 +794,6 @@ void Canvas::clearSelectionAction() {
     if(mCurrentMode == MOVE_POINT) {
         clearPointsSelection();
     } else {//if(mCurrentMode == MOVE_PATH) {
-        clearBonesSelection();
         clearPointsSelection();
         clearBoxesSelection();
     }
@@ -817,17 +806,9 @@ void Canvas::clearParentForSelected() {
 }
 
 void Canvas::setParentToLastSelected() {
-    if(!mSelectedBones.isEmpty()) {
-        Bone *bone = mSelectedBones.last();
-        BasicTransformAnimator *trans = bone->getTransformAnimator();
-        auto box = bone->getParentBox();
-        for(const auto& boxT : mSelectedBoxes) {
-            if(boxT == box) continue;
-            boxT->setParentTransform(trans);
-        }
-    } else if(mSelectedBoxes.count() > 1) {
+    if(mSelectedBoxes.count() > 1) {
         const auto& lastBox = mSelectedBoxes.last();
-        auto trans = lastBox->getTransformAnimator();
+        const auto trans = lastBox->getTransformAnimator();
         for(int i = 0; i < mSelectedBoxes.count() - 1; i++) {
             mSelectedBoxes.at(i)->setParentTransform(trans);
         }
@@ -898,12 +879,6 @@ void Canvas::selectAllPointsAction() {
     for(const auto& box : mSelectedBoxes) {
         box->selectAllPoints(this);
     }
-}
-
-void Canvas::selectOnlyLastPressedBone() {
-    clearBonesSelection();
-    if(mLastPressedBone)
-        addBoneToSelection(mLastPressedBone);
 }
 
 void Canvas::selectOnlyLastPressedBox() {

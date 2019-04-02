@@ -18,15 +18,16 @@ enum MovablePointType : short {
     TYPE_SMART_PATH_POINT,
     TYPE_CTRL_POINT,
     TYPE_PIVOT_POINT,
-    TYPE_GRADIENT_POINT,
-    TYPE_BONE_POINT
+    TYPE_GRADIENT_POINT
 };
 class PointTypeMenu;
 class MovablePoint : public StdSelfRef {
     friend class StdSelfRef;
+protected:
+    MovablePoint(BasicTransformAnimator * const parentTransform,
+                 const MovablePointType &type,
+                 const qreal &radius = 7.5);
 public:
-    ~MovablePoint() {}
-
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
 
@@ -39,7 +40,7 @@ public:
     virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     virtual void startTransform();
-    virtual void finishTransform();
+    virtual void finishTransform() {}
     virtual void cancelTransform() {}
 
     virtual void drawSk(SkCanvas * const canvas,
@@ -76,7 +77,6 @@ public:
     bool isSmartNodePoint();
     bool isPivotPoint();
     bool isCtrlPoint();
-    bool isBonePoint();
 
     void rotateBy(const qreal &rot);
     void scale(const qreal &scaleBy);
@@ -84,11 +84,11 @@ public:
         setRelativePos(transform.map(getRelativePos()));
     }
     void setRadius(const qreal& radius);
-
     qreal getRadius();
+
     void moveToRel(const QPointF &relPos);
 
-    void drawHovered(SkCanvas *canvas,
+    void drawHovered(SkCanvas * const canvas,
                      const SkScalar &invScale);
 
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
@@ -114,24 +114,20 @@ public:
         mSelectionEnabled = enabled;
     }
 protected:
-    MovablePoint(BasicTransformAnimator* parentTransform,
-                 const MovablePointType &type,
-                 const qreal &radius = 7.5);
-
-    bool mSelectionEnabled = true;
-    bool mSelected = false;
-    bool mTransformStarted = false;
-    bool mHidden = false;
-    MovablePointType mType;
-    qreal mRadius;
-    QPointF mSavedTransformPivot;
-    QPointF mSavedRelPos;
-    BasicTransformAnimator* mParentTransform_cv = nullptr;
-
     void drawOnAbsPosSk(SkCanvas * const canvas,
                         const SkPoint &absPos,
                         const SkScalar &invScale,
                         const SkColor &fillColor,
                         const bool &keyOnCurrent = false);
+private:
+    bool mSelectionEnabled = true;
+    bool mSelected = false;
+    bool mTransformStarted = false;
+    bool mHidden = false;
+    const MovablePointType mType;
+    qreal mRadius;
+    QPointF mSavedTransformPivot;
+    QPointF mSavedRelPos;
+    BasicTransformAnimator * const mParentTransform_cv;
 };
 #endif // MOVABLEPOINT_H

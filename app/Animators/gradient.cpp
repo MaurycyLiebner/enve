@@ -102,13 +102,6 @@ bool Gradient::affectsPaths() {
     return !mAffectedPaths.isEmpty();
 }
 
-//void Gradient::finishTransform() {
-//    ComplexAnimator::finishTransform();
-//    //addUndoRedo(new ChangeGradientColorsUndoRedo(savedColors, colors, this));
-//    //savedColors = colors;
-//    callUpdateSchedulers();
-//}
-
 void Gradient::startColorIdTransform(const int& id) {
     if(mColors.count() <= id || id < 0) return;
     mColors.at(id)->prp_startTransform();

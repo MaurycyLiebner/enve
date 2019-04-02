@@ -56,11 +56,6 @@ void SmartNodePoint::cancelTransform() {
 }
 
 void SmartNodePoint::finishTransform() {
-    NonAnimatedMovablePoint::finishTransform();
-    if(!mC0Pt->isSelected())
-        mC0Pt->NonAnimatedMovablePoint::finishTransform();
-    if(!mC2Pt->isSelected())
-        mC2Pt->NonAnimatedMovablePoint::finishTransform();
     mParentAnimator->finishPathChange();
 }
 
@@ -77,7 +72,7 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
         mNextNormalSegment.afterChanged();
         if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
 
-        const QPointF change = relPos - mSavedRelPos;
+        const QPointF change = relPos - getSavedRelPos();
         mC0Pt->moveByRel(change);
         mC2Pt->moveByRel(change);
     } else if(getType() == Node::DISSOLVED) {
@@ -243,13 +238,13 @@ void SmartNodePoint::drawNodePoint(
     const SkPoint skAbsPos = toSkPoint(qAbsPos);
 
     if(getType() == Node::NORMAL) {
-        const SkColor fillCol = mSelected ?
+        const SkColor fillCol = isSelected() ?
                     SkColorSetRGB(0, 200, 255) :
                     SkColorSetRGB(170, 240, 255);
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
 
         if((mode == CanvasMode::MOVE_POINT && isNextNormalSelected()) ||
-           (mode == CanvasMode::ADD_SMART_POINT && mSelected)) {
+           (mode == CanvasMode::ADD_SMART_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
             if(mC2Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
@@ -259,7 +254,7 @@ void SmartNodePoint::drawNodePoint(
             mC2Pt->drawSk(canvas, invScale);
         }
         if((mode == CanvasMode::MOVE_POINT && isPrevNormalSelected()) ||
-           (mode == CanvasMode::ADD_SMART_POINT && mSelected)) {
+           (mode == CanvasMode::ADD_SMART_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
             if(mC0Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
@@ -269,7 +264,7 @@ void SmartNodePoint::drawNodePoint(
             mC0Pt->drawSk(canvas, invScale);
         }
     } else if(getType() == Node::DISSOLVED) {
-        const SkColor fillCol = mSelected ?
+        const SkColor fillCol = isSelected() ?
                     SkColorSetRGB(255, 0, 0) :
                     SkColorSetRGB(255, 120, 120);
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
@@ -580,11 +575,8 @@ void SmartNodePoint::updateFromNodeData() {
     updateC0Visibility();
     updateC2Visibility();
     const auto type = getType();
-    if(type == Node::NORMAL) {
-        mRadius = 6.5;
-    } else {
-        mRadius = (type == Node::DISSOLVED ? 5.5 : 4);
-    }
+    if(type == Node::NORMAL) setRadius(6.5);
+    else setRadius(type == Node::DISSOLVED ? 5.5 : 4);
     setSelectionEnabled(type == Node::NORMAL);
 }
 

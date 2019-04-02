@@ -5,7 +5,6 @@
 #include "Boxes/textbox.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/circle.h"
-#include "Boxes/bone.h"
 
 #include "MovablePoints/pathpivot.h"
 
@@ -95,8 +94,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
             moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||
                   mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
-                  mCurrentMode == CanvasMode::ADD_PAINT_BOX ||
-                  mCurrentMode == CanvasMode::ADD_BONE) {
+                  mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             handleMovePointMouseMove();
         } else if(isMovingPath()) {
             if(!mLastPressedPoint) {
@@ -158,7 +156,6 @@ void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
 
     handleMouseRelease();
 
-    mLastPressedBone = nullptr;
     mLastPressedBox = nullptr;
     mHoveredPoint_d = mLastPressedPoint;
     mLastPressedPoint = nullptr;

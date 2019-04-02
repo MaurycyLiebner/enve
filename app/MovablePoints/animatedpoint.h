@@ -17,6 +17,11 @@ class QPointFAnimator;
 
 class AnimatedPoint : public MovablePoint {
     friend class StdSelfRef;
+protected:
+    AnimatedPoint(QPointFAnimator * const associatedAnimator,
+                  BasicTransformAnimator * const parentTransform,
+                  const MovablePointType &type,
+                  const qreal &radius = 5);
 public:    
     QPointF getRelativePos() const;
     void setRelativePos(const QPointF &relPos);
@@ -37,11 +42,6 @@ public:
         return mAssociatedAnimator_k->getYAnimator();
     }
 protected:
-    AnimatedPoint(QPointFAnimator * const associatedAnimator,
-                  BasicTransformAnimator * const parentTransform,
-                  const MovablePointType &type,
-                  const qreal &radius = 5);
-
     void setValue(const QPointF& value) {
         mAssociatedAnimator_k->setBaseValue(value);
     }

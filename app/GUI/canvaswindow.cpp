@@ -331,8 +331,6 @@ bool CanvasWindow::handleCanvasModeChangeKeyPress(QKeyEvent *event) {
         setCanvasMode(CanvasMode::ADD_PAINT_BOX);
     } else if(event->key() == Qt::Key_F12) {
         setCanvasMode(CanvasMode::PAINT_MODE);
-    //} else if(event->key() == Qt::Key_F13) {
-        //setCanvasMode(CanvasMode::ADD_BONE);
     } else {
         return false;
     }
@@ -1195,11 +1193,6 @@ void CanvasWindow::updateHoveredElements() {
 void CanvasWindow::setLocalPivot(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setLocalPivot(bT);
-}
-
-void CanvasWindow::setBonesSelectionEnabled(const bool &bT) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setBonesSelectionEnabled(bT);
 }
 
 const int BufferSize = 32768;

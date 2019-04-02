@@ -40,8 +40,6 @@ public:
     void removePath(PathBox * const path);
     bool affectsPaths();
 
-    //void finishTransform();
-
     void updateQGradientStops(const UpdateReason &reason);
 
     int getLoadId();

@@ -106,19 +106,6 @@ signals:
     void TotalTransformChanged(const UpdateReason &);
 };
 
-class Bone;
-class BoneTransformAnimator : public BasicTransformAnimator {
-public:
-    BoneTransformAnimator(Bone *parentBone) {
-        mParentBone = parentBone;
-    }
-
-    QMatrix getCurrentTransformationMatrix();
-    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
-protected:
-    Bone *mParentBone = nullptr;
-};
-
 class BoxTransformAnimator : public BasicTransformAnimator {
     friend class SelfRef;
 protected:
