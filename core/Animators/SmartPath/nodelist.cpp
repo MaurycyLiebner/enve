@@ -101,6 +101,60 @@ int NodeList::appendNode(const Node &nodeBlueprint) {
     return insertId;
 }
 
+void NodeList::approximateBeforeDemoteOrRemoval(
+        const qreal& nodeT,
+        Node * const node,
+        Node * const prevNormalV,
+        Node * const nextNormalV) {
+    if(!node || !prevNormalV || !nextNormalV) return;
+    if(!prevNormalV->getC0Enabled()) prevNormalV->setC0Enabled(true);
+    if(!nextNormalV->getC2Enabled()) nextNormalV->setC2Enabled(true);
+
+    const auto prevSeg = gSegmentFromNodes(*prevNormalV, *node);
+    const QPointF midPrevPt = prevSeg.posAtT(0.5);
+
+    const auto nextSeg = gSegmentFromNodes(*node, *nextNormalV);
+    const QPointF midNextPt = nextSeg.posAtT(0.5);
+
+    auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
+    seg.makePassThroughRel(node->p1(), nodeT);
+    seg.makePassThroughRel(midPrevPt, nodeT*0.5);
+    seg.makePassThroughRel(midNextPt, nodeT + 0.5*(1 - nodeT));
+    seg.makePassThroughRel(node->p1(), nodeT);
+
+    prevNormalV->setC2(seg.c1());
+    nextNormalV->setC0(seg.c2());
+}
+
+void NodeList::removeNode(const int &nodeId, const bool &approx) {
+    removeNode(nodeId, at(nodeId), approx);
+}
+
+void NodeList::removeNode(const int& nodeId, Node * const node,
+                          const bool& approx) {
+    if(node->isNormal()) {
+        if(approx) {
+            Node * const prevNormalV = prevNormal(nodeId);
+            Node * const nextNormalV = nextNormal(nodeId);
+            approximateBeforeDemoteOrRemoval(0.5, node,
+                                             prevNormalV, nextNormalV);
+        }
+        Node * currNode = node;
+        while(prevNode(currNode)) {
+            currNode = prevNode(currNode);
+            if(currNode->isNormal()) break;
+            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5);
+        }
+        currNode = node;
+        while(nextNode(currNode)) {
+            currNode = nextNode(currNode);
+            if(currNode->isNormal()) break;
+            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5 + 0.5);
+        }
+    }
+    removeNodeFromList(nodeId);
+}
+
 void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
                                            const bool& approx) {
     demoteNormalNodeToDissolved(nodeId, at(nodeId), approx);
@@ -118,23 +172,8 @@ void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
     const qreal dissT = 0.5;
     node->setT(dissT);
     if(approx) {
-        if(!prevNormalV->getC0Enabled()) prevNormalV->setC0Enabled(true);
-        if(!nextNormalV->getC2Enabled()) nextNormalV->setC2Enabled(true);
-
-        const auto prevSeg = gSegmentFromNodes(*prevNormalV, *node);
-        const QPointF midPrevPt = prevSeg.posAtT(0.5);
-
-        const auto nextSeg = gSegmentFromNodes(*node, *nextNormalV);
-        const QPointF midNextPt = nextSeg.posAtT(0.5);
-
-        auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
-        seg.makePassThroughRel(node->p1(), dissT);
-        seg.makePassThroughRel(midPrevPt, dissT*0.5);
-        seg.makePassThroughRel(midNextPt, dissT + 0.5*(1 - dissT));
-        seg.makePassThroughRel(node->p1(), dissT);
-
-        prevNormalV->setC2(seg.c1());
-        nextNormalV->setC0(seg.c2());
+        approximateBeforeDemoteOrRemoval(dissT, node,
+                                         prevNormalV, nextNormalV);
     }
     for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
         Node * const iNode = mNodes[i];

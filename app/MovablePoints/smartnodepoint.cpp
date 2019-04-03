@@ -89,26 +89,41 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
     mParentAnimator->pathChanged();
 }
 
-void SmartNodePoint::removeFromVectorPath() {
-    currentPath()->actionRemoveNode(getNodeId());
+void SmartNodePoint::remove() {
+    actionRemove(false);
 }
 
 #include "pointtypemenu.h"
 void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
-    if(isNormal() && !isEndPoint()) {
-        std::function<void(SmartNodePoint*)> op = [](SmartNodePoint * pt) {
-            pt->actionDemoteToDissolved(false);
+    if(isNormal()) {
+        if(!isEndPoint()) {
+            PointTypeMenu::PlainOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
+                pt->actionDemoteToDissolved(false);
+            };
+            menu->addPlainAction("Demote to dissolved", op);
+            PointTypeMenu::PlainOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
+                pt->actionDemoteToDissolved(true);
+            };
+            menu->addPlainAction("Demote to dissolved approx.", opApprox);
+            menu->addSeparator();
+        }
+        PointTypeMenu::PlainOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
+            pt->actionRemove(false);
         };
-        menu->addPlainAction("Demote to dissolved", op);
-        std::function<void(SmartNodePoint*)> opApprox = [](SmartNodePoint * pt) {
-            pt->actionDemoteToDissolved(true);
+        menu->addPlainAction("Remove", op);
+        PointTypeMenu::PlainOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
+            pt->actionRemove(true);
         };
-        menu->addPlainAction("Demote to dissolved approx.", opApprox);
-    } else if(isDissolved()) {
-        std::function<void(SmartNodePoint*)> op = [](SmartNodePoint * pt) {
+        menu->addPlainAction("Remove approx.", opApprox);
+    } else { //if(isDissolved()) {
+        PointTypeMenu::PlainOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
             pt->actionPromoteToNormal();
         };
         menu->addPlainAction("Promote to normal", op);
+        PointTypeMenu::PlainOp<SmartNodePoint> rOp = [](SmartNodePoint * pt) {
+            pt->actionRemove(false);
+        };
+        menu->addPlainAction("Remove", rOp);
     }
 }
 
@@ -508,6 +523,10 @@ void SmartNodePoint::actionPromoteToNormal() {
 
 void SmartNodePoint::actionDemoteToDissolved(const bool& approx) {
     return mHandler_k->demoteToDissolved(getNodeId(), approx);
+}
+
+void SmartNodePoint::actionRemove(const bool &approx) {
+    return mHandler_k->removeNode(getNodeId(), approx);
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {

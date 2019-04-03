@@ -60,7 +60,7 @@ void SmartCtrlPoint::setOtherCtrlPt(SmartCtrlPoint * const ctrlPt) {
     mOtherCtrlPt_cv = ctrlPt;
 }
 
-void SmartCtrlPoint::removeFromVectorPath() {
+void SmartCtrlPoint::remove() {
     if(mCtrlType == C0) mParentPoint_k->setC0Enabled(false);
     else mParentPoint_k->setC2Enabled(false);
 }

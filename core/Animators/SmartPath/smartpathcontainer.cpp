@@ -2,23 +2,8 @@
 
 SmartPath::SmartPath() : mNodesList() {}
 
-void SmartPath::actionRemoveNode(const int &nodeId) {
-    Node * const node = mNodesList.at(nodeId);
-    if(node->isNormal()) {
-        Node * currNode = node;
-        while(mNodesList.prevNode(currNode)) {
-            currNode = mNodesList.prevNode(currNode);
-            if(currNode->isNormal()) break;
-            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5);
-        }
-        currNode = node;
-        while(mNodesList.nextNode(currNode)) {
-            currNode = mNodesList.nextNode(currNode);
-            if(currNode->isNormal()) break;
-            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5 + 0.5);
-        }
-    }
-    mNodesList.removeNodeFromList(nodeId);
+void SmartPath::actionRemoveNode(const int &nodeId, const bool &approx) {
+    mNodesList.removeNode(nodeId, approx);
 }
 
 int SmartPath::actionAddFirstNode(const QPointF &c0,

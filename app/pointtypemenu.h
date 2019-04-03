@@ -10,12 +10,15 @@ class MovablePoint;
 class PointTypeMenu {
     friend class Canvas;
 public:
+    template <class T> using PlainOp = std::function<void(T*)>;
+    template <class T> using CheckOp = std::function<void(T*, bool)>;
+
     PointTypeMenu(QMenu * const targetMenu, Canvas * const targetCanvas) :
         mTargetMenu(targetMenu), mTargetCanvas(targetCanvas) {}
 
     template <class T>
     QAction* addCheckableAction(const QString& text, const bool& checked,
-                            const std::function<void(T*, bool)>& op) {
+                                const CheckOp<T>& op) {
         QAction * const qAction = mTargetMenu->addAction(text);
         qAction->setCheckable(true);
         qAction->setChecked(checked);
@@ -27,7 +30,7 @@ public:
     }
 
     template <class T>
-    QAction* addPlainAction(const QString& text, const std::function<void(T*)>& op) {
+    QAction* addPlainAction(const QString& text, const PlainOp<T>& op) {
         QAction * const qAction = mTargetMenu->addAction(text);
         connectPlainAction(qAction, op);
         return qAction;
@@ -38,6 +41,10 @@ public:
         const auto child = std::make_shared<PointTypeMenu>(qMenu, mTargetCanvas);
         mChildMenus.append(child);
         return child.get();
+    }
+
+    void addSeparator() {
+        mTargetMenu->addSeparator();
     }
 
     bool isEmpty() {

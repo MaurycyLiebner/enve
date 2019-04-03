@@ -13,7 +13,7 @@ public:
     void finishTransform();
     void cancelTransform();
 
-    void removeFromVectorPath();
+    void remove();
 
     bool isHidden() const;
     void scale(const qreal &sx, const qreal &sy);

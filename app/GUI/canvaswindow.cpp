@@ -973,10 +973,10 @@ void CanvasWindow::renderPreview() {
     mMaxRenderFrame = getMaxFrame();
     setRendering(true);
 
+    MainWindow::getInstance()->previewBeingRendered();
     if(TaskScheduler::sAllQuedCPUTasksFinished()) {
         nextPreviewRenderFrame();
     }
-    MainWindow::getInstance()->previewBeingRendered();
 }
 
 void CanvasWindow::interruptPreview() {

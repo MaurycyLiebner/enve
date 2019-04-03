@@ -27,7 +27,7 @@ public:
 
     void setRelativePos(const QPointF &relPos);
 
-    void removeFromVectorPath();
+    void remove();
 
     void canvasContextMenu(PointTypeMenu * const menu);
 
@@ -39,6 +39,7 @@ public:
     void actionMergeWithNormalPoint(SmartNodePoint * const other);
     void actionPromoteToNormal();
     void actionDemoteToDissolved(const bool &approx);
+    void actionRemove(const bool& approx);
 
     //void moveByRel(const QPointF &relTranslation);
 

@@ -111,8 +111,9 @@ void PathPointsHandler::setCtrlsMode(const int &nodeId,
     unblockAllPointsUpdate();
 }
 
-void PathPointsHandler::removeNode(const int &nodeId) {
-    mTargetAnimator->actionRemoveNode(nodeId);
+void PathPointsHandler::removeNode(const int &nodeId,
+                                   const bool &approx) {
+    mTargetAnimator->actionRemoveNode(nodeId, approx);
 }
 
 SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {

@@ -13,7 +13,7 @@ class SmartPath {
 public:
     SmartPath();
 
-    void actionRemoveNode(const int& nodeId);
+    void actionRemoveNode(const int& nodeId, const bool &approx);
 
     int actionAddFirstNode(const QPointF& c0,
                            const QPointF& p1,

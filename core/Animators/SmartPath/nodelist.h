@@ -114,6 +114,10 @@ public:
     void promoteDissolvedNodeToNormal(const int &nodeId);
     void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);
 
+    void removeNode(const int &nodeId, const bool &approx);
+    void removeNode(const int &nodeId, Node * const node,
+                    const bool &approx);
+
     void demoteNormalNodeToDissolved(const int& nodeId, const bool &approx);
     void demoteNormalNodeToDissolved(const int &nodeId, Node * const node,
                                      const bool &approx);
@@ -207,6 +211,10 @@ private:
     qreal prevT(const int &nodeId) const;
     qreal nextT(const int &nodeId) const;
     Node *insertNodeToList(const int &nodeId, const Node &node);
+    void approximateBeforeDemoteOrRemoval(const qreal &nodeT,
+                                          Node * const node,
+                                          Node * const prevNormalV,
+                                          Node * const nextNormalV);
 
     ListOfNodes mNodes;
     bool mClosed = false;

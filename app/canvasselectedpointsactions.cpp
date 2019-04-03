@@ -195,7 +195,7 @@ void Canvas::removeSelectedPointsAndClearList() {
                 if(mLastPressedPoint->isCtrlPoint()) {
                     mLastPressedPoint->cancelTransform();
                     mLastPressedPoint->deselect();
-                    mLastPressedPoint->removeFromVectorPath();
+                    mLastPressedPoint->remove();
                     mSelectedPoints_d.removeOne(mLastPressedPoint);
                     schedulePivotUpdate();
                     return;
@@ -206,7 +206,7 @@ void Canvas::removeSelectedPointsAndClearList() {
 
     for(const auto& point : mSelectedPoints_d) {
         point->deselect();
-        point->removeFromVectorPath();
+        point->remove();
     }
     mSelectedPoints_d.clear(); schedulePivotUpdate();
 }

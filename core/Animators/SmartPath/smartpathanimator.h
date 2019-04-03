@@ -187,12 +187,12 @@ public:
         }
     }
 
-    void actionRemoveNode(const int& nodeId) {
+    void actionRemoveNode(const int& nodeId, const bool &approx) {
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
-            spKey->getValue().actionRemoveNode(nodeId);
+            spKey->getValue().actionRemoveNode(nodeId, approx);
         }
-        mBaseValue.actionRemoveNode(nodeId);
+        mBaseValue.actionRemoveNode(nodeId, approx);
         prp_updateInfluenceRangeAfterChanged();
     }
 

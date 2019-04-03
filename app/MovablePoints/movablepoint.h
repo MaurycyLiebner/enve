@@ -43,7 +43,7 @@ public:
     virtual void drawSk(SkCanvas * const canvas,
                         const SkScalar &invScale);
 
-    virtual void removeFromVectorPath() {}
+    virtual void remove() {}
     virtual bool isHidden() const;
 
     virtual void canvasContextMenu(PointTypeMenu * const menu) {
