@@ -97,9 +97,13 @@ void SmartNodePoint::removeFromVectorPath() {
 void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
     if(isNormal() && !isEndPoint()) {
         std::function<void(SmartNodePoint*)> op = [](SmartNodePoint * pt) {
-            pt->actionDemoteToDissolved();
+            pt->actionDemoteToDissolved(false);
         };
         menu->addPlainAction("Demote to dissolved", op);
+        std::function<void(SmartNodePoint*)> opApprox = [](SmartNodePoint * pt) {
+            pt->actionDemoteToDissolved(true);
+        };
+        menu->addPlainAction("Demote to dissolved approx.", opApprox);
     } else if(isDissolved()) {
         std::function<void(SmartNodePoint*)> op = [](SmartNodePoint * pt) {
             pt->actionPromoteToNormal();
@@ -502,8 +506,8 @@ void SmartNodePoint::actionPromoteToNormal() {
     return mHandler_k->promoteToNormal(getNodeId());
 }
 
-void SmartNodePoint::actionDemoteToDissolved() {
-    return mHandler_k->demoteToDissolved(getNodeId());
+void SmartNodePoint::actionDemoteToDissolved(const bool& approx) {
+    return mHandler_k->demoteToDissolved(getNodeId(), approx);
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {

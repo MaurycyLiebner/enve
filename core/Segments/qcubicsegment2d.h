@@ -107,6 +107,16 @@ struct qCubicSegment2D {
         mLengthUpToDate = false;
     }
 
+    void makePassThroughRel(const QPointF &relPos, const qreal &t) {
+        const qreal oneMinusT = 1 - t;
+        QPointF dPos = relPos - posAtT(t);
+        while(pointToLen(dPos) > 1) {
+            setC1(c1() + oneMinusT*dPos);
+            setC2(c2() + t*dPos);
+            dPos = relPos - posAtT(t);
+        }
+    }
+
     qCubicSegment2D randomDisplaced(const qreal &displ) {
         qCubicSegment2D result(*this);
         result.randomDisplace(displ);

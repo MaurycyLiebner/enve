@@ -59,8 +59,8 @@ int SmartPath::insertNodeBetween(const int& prevId,
 }
 
 int SmartPath::actionInsertNodeBetween(const int &prevId,
-                                      const int& nextId,
-                                      const qreal& t) {
+                                       const int& nextId,
+                                       const qreal& t) {
     return insertNodeBetween(prevId, nextId, Node(t));
 }
 
@@ -74,8 +74,8 @@ void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
     mNodesList.promoteDissolvedNodeToNormal(nodeId);
 }
 
-void SmartPath::actionDemoteToDissolved(const int &nodeId) {
-    mNodesList.demoteNormalNodeToDissolved(nodeId);
+void SmartPath::actionDemoteToDissolved(const int &nodeId, const bool& approx) {
+    mNodesList.demoteNormalNodeToDissolved(nodeId, approx);
 }
 
 void SmartPath::actionMoveNodeBetween(const int& movedNodeId,

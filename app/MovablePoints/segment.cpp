@@ -95,14 +95,7 @@ void NormalSegment::makePassThroughAbs(const QPointF &absPos, const qreal& t) {
     if(!mFirstNode->getC2Enabled()) mFirstNode->setC2Enabled(true);
 
     auto absSeg = getAsAbsSegment();
-
-    QPointF dPos = absPos - gCubicValueAtT(absSeg, t);
-    while(pointToLen(dPos) > 1) {
-        absSeg.setC1(absSeg.c1() + (1 - t)*dPos);
-        absSeg.setC2(absSeg.c2() + t*dPos);
-
-        dPos = absPos - gCubicValueAtT(absSeg, t);
-    }
+    absSeg.makePassThroughRel(absPos, t);
 
     mFirstNodeC2->moveToAbs(absSeg.c1());
     mLastNodeC0->moveToAbs(absSeg.c2());
@@ -113,14 +106,7 @@ void NormalSegment::makePassThroughRel(const QPointF &relPos, const qreal &t) {
     if(!mFirstNode->getC2Enabled()) mFirstNode->setC2Enabled(true);
 
     auto relSeg = getAsRelSegment();
-
-    QPointF dPos = relPos - gCubicValueAtT(relSeg, t);
-    while(pointToLen(dPos) > 1) {
-        relSeg.setC1(relSeg.c1() + (1 - t)*dPos);
-        relSeg.setC2(relSeg.c2() + t*dPos);
-
-        dPos = relPos - gCubicValueAtT(relSeg, t);
-    }
+    relSeg.makePassThroughRel(relPos, t);
 
     mFirstNodeC2->moveToRel(relSeg.c1());
     mLastNodeC0->moveToRel(relSeg.c2());

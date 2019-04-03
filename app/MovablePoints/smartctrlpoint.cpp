@@ -9,7 +9,9 @@ SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
                                const Type& type) :
     NonAnimatedMovablePoint(parentPoint->getParentTransform(),
                             MovablePointType::TYPE_CTRL_POINT, 5),
-    mCtrlType(type), mParentPoint_k(parentPoint) {}
+    mCtrlType(type), mParentPoint_k(parentPoint) {
+    disableSelection();
+}
 
 void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
     NonAnimatedMovablePoint::setRelativePos(relPos);

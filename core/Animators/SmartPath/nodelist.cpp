@@ -101,26 +101,40 @@ int NodeList::appendNode(const Node &nodeBlueprint) {
     return insertId;
 }
 
-void NodeList::demoteNormalNodeToDissolved(const int& nodeId) {
-    demoteNormalNodeToDissolved(nodeId, at(nodeId));
+void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
+                                           const bool& approx) {
+    demoteNormalNodeToDissolved(nodeId, at(nodeId), approx);
 }
 
 void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
-                                           Node * const node) {
+                                           Node * const node,
+                                           const bool& approx) {
     if(node->isDissolved()) return;
     Node * const prevNormalV = prevNormal(nodeId);
     Node * const nextNormalV = nextNormal(nodeId);
     if(!prevNormalV || !nextNormalV) return;
 
     setNodeType(node, Node::DISSOLVED);
-    node->setT(0.5);
+    const qreal dissT = 0.5;
+    node->setT(dissT);
+    if(approx) {
+        if(!prevNormalV->getC0Enabled()) prevNormalV->setC0Enabled(true);
+        if(!nextNormalV->getC2Enabled()) nextNormalV->setC2Enabled(true);
+
+        auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
+        seg.makePassThroughRel(node->p1(), dissT);
+
+        prevNormalV->setC2(seg.c1());
+        nextNormalV->setC0(seg.c2());
+    }
     for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
         Node * const iNode = mNodes[i];
-        if(iNode->isDissolved()) iNode->setT(iNode->t()*0.5);
+        if(iNode->isDissolved()) iNode->setT(iNode->t()*dissT);
     }
+    const qreal oneMinusDissT = 1 - dissT;
     for(int i = nodeId + 1; i < nextNormalV->getNodeId(); i++) {
         Node * const iNode = mNodes[i];
-        if(iNode->isDissolved()) iNode->setT(iNode->t()*0.5 + 0.5);
+        if(iNode->isDissolved()) iNode->setT(iNode->t()*oneMinusDissT + dissT);
     }
     updateDissolvedNodePosition(nodeId);
 }

@@ -38,7 +38,7 @@ public:
                                 const qreal& t);
 
     void actionPromoteDissolvedNodeToNormal(const int& nodeId);
-    void actionDemoteToDissolved(const int &nodeId);
+    void actionDemoteToDissolved(const int &nodeId, const bool &approx);
 
     void actionDisconnectNodes(const int& node1Id, const int& node2Id);
 
