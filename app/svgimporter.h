@@ -13,16 +13,11 @@ enum CtrlsMode : short;
 
 class TextSvgAttributes {
 public:
-    TextSvgAttributes();
-
-    TextSvgAttributes &operator*=(const TextSvgAttributes &overwritter);
+    TextSvgAttributes() {}
 
     void setFontFamily(const QString &family);
-
     void setFontSize(const int &size);
-
     void setFontStyle(const QFont::Style &style);
-
     void setFontWeight(const int &weight);
 
     void setFontAlignment(const Qt::Alignment &alignment);
@@ -61,9 +56,7 @@ private:
 
 class FillSvgAttributes {
 public:
-    FillSvgAttributes();
-
-    FillSvgAttributes &operator*=(const FillSvgAttributes &overwritter);
+    FillSvgAttributes() {}
 
     void setColor(const QColor &val);
 
@@ -88,9 +81,8 @@ protected:
 
 class StrokeSvgAttributes : public FillSvgAttributes {
 public:
-    StrokeSvgAttributes();
+    StrokeSvgAttributes() {}
 
-    StrokeSvgAttributes &operator*=(const StrokeSvgAttributes &overwritter);
     const qreal &getLineWidth() const;
     const Qt::PenCapStyle &getCapStyle() const;
     const Qt::PenJoinStyle &getJoinStyle() const;
@@ -104,7 +96,7 @@ public:
 
     void setOutlineCompositionMode(const QPainter::CompositionMode &compMode);
 
-    void apply(BoundingBox *box, const qreal &scale);
+    void apply(BoundingBox *box, const qreal &scale) const;
 protected:
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
@@ -115,11 +107,11 @@ protected:
 
 class BoxSvgAttributes {
 public:
-    BoxSvgAttributes();
+    BoxSvgAttributes() {}
 
-    virtual ~BoxSvgAttributes();
+    virtual ~BoxSvgAttributes() {}
 
-    BoxSvgAttributes &operator*=(const BoxSvgAttributes &overwritter);
+    void setParent(const BoxSvgAttributes &parent);
 
     const Qt::FillRule &getFillRule() const;
     const QMatrix &getRelTransform() const;
@@ -133,7 +125,7 @@ public:
 
     void applySingleTransformations(BoundingBox *box);
 
-    void apply(BoundingBox *box);
+    void apply(BoundingBox *box) const;
     void setFillAttribute(const QString &value);
     void setStrokeAttribute(const QString &value);
 protected:
@@ -243,7 +235,7 @@ protected:
 
 
 extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
-                        BoxSvgAttributes *parentGroupAttributes);
+                        const BoxSvgAttributes &parentGroupAttributes);
 extern qsptr<BoxesGroup> loadSVGFile(const QString &filename);
 /*
 #include <QStringRef>

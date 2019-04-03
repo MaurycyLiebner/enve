@@ -526,14 +526,14 @@ bool parsePolylineDataFast(const QString &dataStr,
 
 qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
                            BoxesGroup *parentGroup,
-                           BoxSvgAttributes *attributes) {
+                           const BoxSvgAttributes &attributes) {
     QDomNodeList allRootChildNodes = groupElement.childNodes();
     qsptr<BoxesGroup> boxesGroup;
-    bool hasTransform = attributes->hasTransform();
+    bool hasTransform = attributes.hasTransform();
     if(allRootChildNodes.count() > 1 ||
        hasTransform || parentGroup == nullptr) {
         boxesGroup = SPtrCreate(BoxesGroup)();
-        attributes->apply(boxesGroup.get());
+        attributes.apply(boxesGroup.get());
         if(parentGroup) {
             parentGroup->addContainedBox(boxesGroup);
         }
@@ -642,39 +642,31 @@ void loadText(const QDomElement &pathElement,
 
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
-                 BoxSvgAttributes *parentGroupAttributes) {
-    if(element.tagName() == "g" ||
-       element.tagName() == "text") {
-        BoxSvgAttributes attributes;
-        attributes *= (*parentGroupAttributes);
-        attributes.loadBoundingBoxAttributes(element);
-        loadBoxesGroup(element, parentGroup, &attributes);
-    } else if(element.tagName() == "path") {
+                 const BoxSvgAttributes &parentGroupAttributes) {
+    if(element.tagName() == "path" || element.tagName() == "path") {
         VectorPathSvgAttributes attributes;
-        attributes *= (*parentGroupAttributes);
+        attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
-        loadVectorPath(element, parentGroup, &attributes);
-    } else if(element.tagName() == "polyline") {
-        VectorPathSvgAttributes attributes;
-        attributes *= (*parentGroupAttributes);
-        attributes.loadBoundingBoxAttributes(element);
-        loadPolyline(element, parentGroup, &attributes);
-    } else if(element.tagName() == "circle" ||
-              element.tagName() == "ellipse") {
+        if(element.tagName() == "path") {
+            loadVectorPath(element, parentGroup, &attributes);
+        } else { // if(element.tagName() == "polyline") {
+            loadPolyline(element, parentGroup, &attributes);
+        }
+    } else {
         BoxSvgAttributes attributes;
-        attributes *= (*parentGroupAttributes);
+        attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
-        loadCircle(element, parentGroup, &attributes);
-    } else if(element.tagName() == "rect") {
-        BoxSvgAttributes attributes;
-        attributes *= (*parentGroupAttributes);
-        attributes.loadBoundingBoxAttributes(element);
-        loadRect(element, parentGroup, &attributes);
-    } else if(element.tagName() == "tspan") {
-        BoxSvgAttributes attributes;
-        attributes *= (*parentGroupAttributes);
-        attributes.loadBoundingBoxAttributes(element);
-        loadText(element, parentGroup, &attributes);
+        if(element.tagName() == "g" ||
+           element.tagName() == "text") {
+            loadBoxesGroup(element, parentGroup, attributes);
+        } else if(element.tagName() == "circle" ||
+                  element.tagName() == "ellipse") {
+            loadCircle(element, parentGroup, &attributes);
+        } else if(element.tagName() == "rect") {
+            loadRect(element, parentGroup, &attributes);
+        } else if(element.tagName() == "tspan") {
+            loadText(element, parentGroup, &attributes);
+        }
     }
 }
 
@@ -812,7 +804,7 @@ qsptr<BoxesGroup> loadSVGFile(const QString &filename) {
             const QDomElement rootElement = document.firstChildElement("svg");
             if(!rootElement.isNull()) {
                 BoxSvgAttributes attributes;
-                return loadBoxesGroup(rootElement, nullptr, &attributes);
+                return loadBoxesGroup(rootElement, nullptr, attributes);
             } else {
                 qDebug() << "File does not have svg root element";
             }
@@ -852,20 +844,11 @@ void extractSvgAttributes(const QString &string,
     }
 }
 
-BoxSvgAttributes::BoxSvgAttributes() {}
-
-BoxSvgAttributes::~BoxSvgAttributes() {}
-
-BoxSvgAttributes &BoxSvgAttributes::operator*=(
-        const BoxSvgAttributes &overwritter) {
-    mRelTransform = overwritter.getRelTransform();
-
-    mFillAttributes *= overwritter.getFillAttributes();
-    mStrokeAttributes *= overwritter.getStrokeAttributes();
-    mTextAttributes *= overwritter.getTextAttributes();
-    mFillRule = overwritter.getFillRule();
-
-    return *this;
+void BoxSvgAttributes::setParent(const BoxSvgAttributes &parent) {
+    mFillAttributes = parent.getFillAttributes();
+    mStrokeAttributes = parent.getStrokeAttributes();
+    mTextAttributes = parent.getTextAttributes();
+    mFillRule = parent.getFillRule();
 }
 
 const Qt::FillRule &BoxSvgAttributes::getFillRule() const {
@@ -1838,15 +1821,6 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
     return true;
 }*/
 #include "Animators/paintsettings.h"
-FillSvgAttributes::FillSvgAttributes() {}
-
-FillSvgAttributes &FillSvgAttributes::operator*=(
-        const FillSvgAttributes &overwritter) {
-    setColor(overwritter.getColor());
-    setPaintType(overwritter.getPaintType());
-    setGradient(overwritter.getGradient());
-    return *this;
-}
 
 void FillSvgAttributes::setColor(const QColor &val) {
     mColor = val;
@@ -1893,21 +1867,6 @@ void FillSvgAttributes::apply(BoundingBox * const box,
     PaintTypePaintSetting(target, mPaintType).apply(pathBox);
 }
 
-StrokeSvgAttributes::StrokeSvgAttributes() {}
-
-StrokeSvgAttributes &StrokeSvgAttributes::operator*=(
-        const StrokeSvgAttributes &overwritter) {
-    setColor(overwritter.getColor());
-    setGradient(overwritter.getGradient());
-    setPaintType(overwritter.getPaintType());
-
-    setLineWidth(overwritter.getLineWidth());
-    setCapStyle(overwritter.getCapStyle());
-    setJoinStyle(overwritter.getJoinStyle());
-    setOutlineCompositionMode(overwritter.getOutlineCompositionMode());
-    return *this;
-}
-
 const qreal &StrokeSvgAttributes::getLineWidth() const {
     return mLineWidth;
 }
@@ -1942,13 +1901,13 @@ void StrokeSvgAttributes::setOutlineCompositionMode(
     mOutlineCompositionMode = compMode;
 }
 
-void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) {
+void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) const {
     box->setStrokeWidth(mLineWidth*scale);
     FillSvgAttributes::apply(box, PaintSetting::OUTLINE);
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
 }
 
-void BoxSvgAttributes::apply(BoundingBox *box) {
+void BoxSvgAttributes::apply(BoundingBox *box) const {
     box->getTransformAnimator()->setOpacity(mOpacity);
     if(box->SWT_isPathBox()) {
         const auto path = GetAsPtr(box, PathBox);
@@ -1965,6 +1924,15 @@ void BoxSvgAttributes::apply(BoundingBox *box) {
             const auto text = GetAsPtr(box, TextBox);
             text->setFont(mTextAttributes.getFont());
         }
+    }
+    if(!box->SWT_isSmartVectorPath()) {
+        const qreal scaleX = mRelTransform.m11();
+        const qreal scaleY = mRelTransform.m22();
+        const qreal dX = mRelTransform.dx();
+        const qreal dY = mRelTransform.dy();
+        const auto transAnim = box->getTransformAnimator();
+        transAnim->setScale(scaleX, scaleY);
+        transAnim->translate(dX, dY);
     }
 }
 
@@ -2140,14 +2108,6 @@ void SvgSeparatePath::pathArcSegment(const qreal &xc, const qreal &yc,
 void SvgSeparatePath::addPoint(const SvgNormalNode &point) {
     mPoints << point;
     mLastPoint = &mPoints.last();
-}
-
-TextSvgAttributes::TextSvgAttributes() {}
-
-TextSvgAttributes &TextSvgAttributes::operator*=(
-        const TextSvgAttributes &overwritter) {
-    mFont = overwritter.getFont();
-    return *this;
 }
 
 void TextSvgAttributes::setFontFamily(const QString &family) {
