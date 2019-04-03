@@ -121,7 +121,16 @@ void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
         if(!prevNormalV->getC0Enabled()) prevNormalV->setC0Enabled(true);
         if(!nextNormalV->getC2Enabled()) nextNormalV->setC2Enabled(true);
 
+        const auto prevSeg = gSegmentFromNodes(*prevNormalV, *node);
+        const QPointF midPrevPt = prevSeg.posAtT(0.5);
+
+        const auto nextSeg = gSegmentFromNodes(*node, *nextNormalV);
+        const QPointF midNextPt = nextSeg.posAtT(0.5);
+
         auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
+        seg.makePassThroughRel(node->p1(), dissT);
+        seg.makePassThroughRel(midPrevPt, dissT*0.5);
+        seg.makePassThroughRel(midNextPt, dissT + 0.5*(1 - dissT));
         seg.makePassThroughRel(node->p1(), dissT);
 
         prevNormalV->setC2(seg.c1());
