@@ -88,19 +88,19 @@ qreal qCubicSegment2D::lengthFracAtT(qreal t) {
 qCubicSegment2D::Pair qCubicSegment2D::dividedAtT(qreal t) const {
     t = CLAMP(t, 0, 1);
     if(isZero6Dec(t)) return { qCubicSegment2D(mP0), *this };
-    if(isZero6Dec(t - 1)) return { *this, qCubicSegment2D(mP3) };
-    qreal oneMinusT = 1 - t;
-    QPointF P0_1 = p0()*oneMinusT + c1()*t;
-    QPointF P1_2 = c1()*oneMinusT + c2()*t;
-    QPointF P2_3 = c2()*oneMinusT + p3()*t;
+    if(isOne6Dec(t)) return { *this, qCubicSegment2D(mP3) };
+    const qreal oneMinusT = 1 - t;
+    const QPointF P0_1 = p0()*oneMinusT + c1()*t;
+    const QPointF P1_2 = c1()*oneMinusT + c2()*t;
+    const QPointF P2_3 = c2()*oneMinusT + p3()*t;
 
-    QPointF P01_12 = P0_1*oneMinusT + P1_2*t;
-    QPointF P12_23 = P1_2*oneMinusT + P2_3*t;
+    const QPointF P01_12 = P0_1*oneMinusT + P1_2*t;
+    const QPointF P12_23 = P1_2*oneMinusT + P2_3*t;
 
-    QPointF P0112_1223 = P01_12*oneMinusT + P12_23*t;
+    const QPointF P0112_1223 = P01_12*oneMinusT + P12_23*t;
 
-    qCubicSegment2D seg1(p0(), P0_1, P01_12, P0112_1223);
-    qCubicSegment2D seg2(P0112_1223, P12_23, P2_3, p3());
+    const qCubicSegment2D seg1(p0(), P0_1, P01_12, P0112_1223);
+    const qCubicSegment2D seg2(P0112_1223, P12_23, P2_3, p3());
 
     return {seg1, seg2};
 }

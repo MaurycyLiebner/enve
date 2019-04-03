@@ -380,9 +380,10 @@ private:
             result.deepCopy(prevKey->getValue());
         } else if(nextKey) {
             result.deepCopy(nextKey->getValue());
+        } else {
+            if(&result == &mBaseValue) return;
+            result.deepCopy(mBaseValue);
         }
-        if(&result == &mBaseValue) return;
-        result.deepCopy(mBaseValue);
     }
 
     SmartPath mBaseValue;

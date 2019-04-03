@@ -131,27 +131,29 @@ void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
     Node * const prevNormalV = prevNormal(nodeId);
     Node * const nextNormalV = nextNormal(nodeId);
 
-    auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
-    auto div = seg.dividedAtT(node->mT);
+    const auto seg = gSegmentFromNodes(*prevNormalV, *nextNormalV);
+    const auto div = seg.dividedAtT(node->t());
     const auto& first = div.first;
     const auto& second = div.second;
-    prevNormalV->mC2 = first.c1();
-    node->mC0 = first.c2();
-    node->mP1 = first.p3();
-    node->mC2 = second.c1();
+    prevNormalV->setC2(first.c1());
+    node->setC0(first.c2());
+    node->setP1(first.p3());
+    node->setC2(second.c1());
     setNodeType(node, Node::NORMAL);
     setNodeCtrlsMode(node, CtrlsMode::CTRLS_SMOOTH);
-    nextNormalV->mC0 = second.c2();
+    nextNormalV->setC0(second.c2());
     for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
-            iNode->mT = gMapTToFragment(0, node->t(), iNode->mT);
+            const qreal iT = gMapTToFragment(0, node->t(), iNode->t());
+            iNode->setT(iT);
         }
     }
     for(int i = nodeId + 1; i < nextNormalV->getNodeId(); i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {
-            iNode->mT = gMapTToFragment(node->t(), 1, iNode->mT);
+            const qreal iT = gMapTToFragment(node->t(), 1, iNode->t());
+            iNode->setT(iT);
         }
     }
 }
@@ -390,15 +392,13 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
     auto list1Cpy = list1.createDeepCopy();
     auto list2Cpy = list2.createDeepCopy();
     const bool closed = list1Cpy.isClosed();
-    const auto list1v = list1Cpy.getList();
-    const auto list2v = list2Cpy.getList();
     NodeList result;
     result.setClosed(closed);
     ListOfNodes& resultList = result.getList();
-    const int listCount = list1v.count();
+    const int listCount = list1Cpy.count();
     for(int i = 0; i < listCount; i++) {
-        const Node * const node1 = list1v.at(i);
-        const Node * const node2 = list2v.at(i);
+        const Node * const node1 = list1Cpy.at(i);
+        const Node * const node2 = list2Cpy.at(i);
         if(node1->getType() == node2->getType()) continue;
         if(node1->isDissolved()) {
             list1Cpy.promoteDissolvedNodeToNormal(i);
@@ -407,8 +407,8 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
         } else RuntimeThrow("Nodes with different type should not happen");
     }
     for(int i = 0; i < listCount; i++) {
-        const Node * const node1 = list1v.at(i);
-        const Node * const node2 = list2v.at(i);
+        const Node * const node1 = list1Cpy.at(i);
+        const Node * const node2 = list2Cpy.at(i);
         if(node1->isNormal() && node2->isNormal()) {
             const auto normalInter = Node::sInterpolateNormal(
                         *node1, *node2, weight2);

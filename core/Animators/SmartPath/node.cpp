@@ -5,7 +5,8 @@ Node Node::sInterpolateDissolved(const Node &node1, const Node &node2,
                         const qreal &weight2) {
     if(!node1.isDissolved() || !node2.isDissolved())
         RuntimeThrow("Unsupported node type");
-    return Node(node1.mT*(1 - weight2) + node2.mT*weight2);
+    const qreal w1 = 1 - weight2;
+    return Node(w1*node1.t() + weight2*node2.t());
 }
 
 Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
