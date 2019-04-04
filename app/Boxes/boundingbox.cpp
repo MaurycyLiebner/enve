@@ -179,7 +179,7 @@ void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
 }
 
 void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
-    auto visRange = getVisibleAbsFrameRange();
+    const auto visRange = getVisibleAbsFrameRange();
     prp_updateAfterChangedAbsFrameRange(visRange);
 }
 

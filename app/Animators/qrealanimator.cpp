@@ -27,8 +27,6 @@ QrealAnimator::QrealAnimator(const qreal &iniVal,
 
 QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 
-QrealAnimator::~QrealAnimator() {}
-
 void QrealAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType &type,
         qreal &minMoveValue, qreal &maxMoveValue) const {

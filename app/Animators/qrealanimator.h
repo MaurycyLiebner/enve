@@ -17,8 +17,6 @@ class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
     friend class SelfRef;
 public:
-    ~QrealAnimator();
-
     bool SWT_isQrealAnimator() const { return true; }
     void prp_retrieveSavedValue();
     void prp_startTransform();

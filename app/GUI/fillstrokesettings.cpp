@@ -1,4 +1,4 @@
-#include "fillstrokesettings.h"
+﻿#include "fillstrokesettings.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "mainwindow.h"
 #include "undoredo.h"
@@ -266,12 +266,10 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
 
 void FillStrokeSettingsWidget::setLinearGradientFill() {
     setGradientType(Gradient::LINEAR);
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void FillStrokeSettingsWidget::setRadialGradientFill() {
     setGradientType(Gradient::RADIAL);
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void FillStrokeSettingsWidget::setGradientFill() {
@@ -341,8 +339,9 @@ void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode &mode) {
 void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
         mGradientWidget->setCurrentGradient(getCurrentGradientVal(), false);
-        mLinearGradientButton->setChecked(getCurrentGradientTypeVal());
-        mRadialGradientButton->setChecked(!getCurrentGradientTypeVal());
+        const auto gradType = getCurrentGradientTypeVal();
+        mLinearGradientButton->setChecked(gradType == Gradient::LINEAR);
+        mRadialGradientButton->setChecked(gradType == Gradient::RADIAL);
     }
     setCurrentPaintType(getCurrentPaintTypeVal());
     if(getCurrentPaintTypeVal() == NOPAINT) {
@@ -506,8 +505,6 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
     }
     paintSetting << std::make_shared<PaintTypePaintSetting>(mTarget, currentPaintType);
     mCanvasWindow->applyPaintSettingToSelected(paintSetting);
-
-    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(

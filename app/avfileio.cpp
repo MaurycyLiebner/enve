@@ -517,13 +517,15 @@ void PaintSettingsAnimator::writeProperty(QIODevice * const target) const {
 void PaintSettingsAnimator::readProperty(QIODevice *target) {
     mGradientPoints->readProperty(target);
     mColor->readProperty(target);
-    target->read(rcChar(&mPaintType), sizeof(PaintType));
+    PaintType paintType;
+    target->read(rcChar(&paintType), sizeof(PaintType));
     int gradId;
     target->read(rcChar(&mGradientType), sizeof(bool));
     target->read(rcChar(&gradId), sizeof(int));
     if(gradId != -1) {
         mGradient = MainWindow::getInstance()->getLoadedGradientById(gradId);
     }
+    setPaintType(paintType);
 }
 
 void DurationRectangle::writeDurationRectangle(QIODevice *target) {

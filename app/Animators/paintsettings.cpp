@@ -17,8 +17,7 @@ PaintSettingsAnimator::PaintSettingsAnimator(
         GradientPoints * const grdPts,
         PathBox * const parent) :
     PaintSettingsAnimator(name, grdPts, parent, QColor(255, 255, 255),
-                          PaintType::FLATPAINT,  nullptr) {
-}
+                          PaintType::FLATPAINT,  nullptr) {}
 
 PaintSettingsAnimator::PaintSettingsAnimator(
         const QString& name,
@@ -228,7 +227,7 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
 void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                          const QPointF &start,
                                          const QPointF &finalStop,
-                                         const bool &linearGradient) {
+                                         const Gradient::Type &gradientType) {
     int nStops = stops.count();
     SkPoint gradPoints[nStops];
     SkColor gradColors[nStops];
@@ -251,16 +250,15 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         currY += yInc;
         currT += tInc;
     }
-    if(linearGradient) {
+    if(gradientType == Gradient::LINEAR) {
         fGradient = SkGradientShader::MakeLinear(gradPoints, gradColors,
                                                  gradPos, nStops,
                                                  SkShader::kClamp_TileMode);
     } else {
         const QPointF distPt = finalStop - start;
-        const SkScalar radius = static_cast<SkScalar>(
-                    qSqrt(distPt.x()*distPt.x() + distPt.y()*distPt.y()));
+        const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
         fGradient = SkGradientShader::MakeRadial(
-                        toSkPoint(start), radius,
+                        toSkPoint(start), toSkScalar(radius),
                         gradColors, gradPos,
                         nStops, SkShader::kClamp_TileMode);
     }

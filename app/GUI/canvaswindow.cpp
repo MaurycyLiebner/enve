@@ -828,16 +828,19 @@ void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth) {
 void CanvasWindow::applyPaintSettingToSelected(const PaintSettingsApplier &setting) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->applyPaintSettingToSelected(setting);
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setSelectedFillColorMode(const ColorMode &mode) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFillColorMode(mode);
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeColorMode(mode);
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {

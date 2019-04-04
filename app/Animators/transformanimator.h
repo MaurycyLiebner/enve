@@ -113,12 +113,13 @@ public:
     QMatrix getRelativeTransformAtRelFrame(const qreal &relFrame);
 
     void resetPivot();
-
     void setPivotWithoutChangingTransformation(const QPointF &point);
 
     QPointF getPivot();
     qreal getPivotX();
     qreal getPivotY();
+
+    void setShear(const qreal& shearX, const qreal& shearY);
 
     qreal getOpacity();
 
@@ -135,6 +136,10 @@ public:
     bool posOrPivotRecording() const;
     bool rotOrScaleOrPivotRecording() const;
 
+    QPointFAnimator *getShearAnimator() {
+        return mShearAnimator.get();
+    }
+
     QPointFAnimator *getPivotAnimator() {
         return mPivotAnimator.get();
     }
@@ -149,8 +154,10 @@ public:
 private:
     bool mPivotAutoAdjust = true;
     BoundingBox * const mParentBox_k;
+
     stdsptr<BoxPathPoint> mPivotPoint;
     qsptr<QPointFAnimator> mPivotAnimator;
+    qsptr<QPointFAnimator> mShearAnimator;
     qsptr<QrealAnimator> mOpacityAnimator;
 };
 

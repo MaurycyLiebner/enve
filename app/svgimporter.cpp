@@ -134,7 +134,7 @@ static void parseNumbersArray(const QChar *&str,
 }
 
 bool parsePathDataFast(const QString &dataStr,
-                       VectorPathSvgAttributes *attributes) {
+                       VectorPathSvgAttributes &attributes) {
     qreal x0 = 0, y0 = 0;              // starting point
     qreal x = 0, y = 0;                // current point
     char lastMode = 0;
@@ -171,7 +171,7 @@ bool parsePathDataFast(const QString &dataStr,
                 y = y0 = num[1] + offsetY;
                 num += 2;
                 count -= 2;
-                lastPath = attributes->newSeparatePath();
+                lastPath = attributes.newSeparatePath();
                 lastPath->moveTo(QPointF(x0, y0));
 
                  // As per 1.2  spec 8.3.2 The "moveto" commands
@@ -190,7 +190,7 @@ bool parsePathDataFast(const QString &dataStr,
                 y = y0 = num[1];
                 num += 2;
                 count -= 2;
-                lastPath = attributes->newSeparatePath();
+                lastPath = attributes.newSeparatePath();
                 lastPath->moveTo(QPointF(x0, y0));
 
                 // As per 1.2  spec 8.3.2 The "moveto" commands
@@ -479,7 +479,7 @@ bool parsePathDataFast(const QString &dataStr,
 
 
 bool parsePolylineDataFast(const QString &dataStr,
-                       VectorPathSvgAttributes *attributes) {
+                           VectorPathSvgAttributes &attributes) {
     qreal x0 = 0, y0 = 0;              // starting point
     qreal x = 0, y = 0;                // current point
     const QChar *str = dataStr.constData();
@@ -513,7 +513,7 @@ bool parsePolylineDataFast(const QString &dataStr,
             if(first) {
                 x0 = x;
                 y0 = y;
-                lastPath = attributes->newSeparatePath();
+                lastPath = attributes.newSeparatePath();
                 lastPath->moveTo(QPointF(x0, y0));
                 first = false;
             } else {
@@ -529,20 +529,18 @@ qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
                            const BoxSvgAttributes &attributes) {
     QDomNodeList allRootChildNodes = groupElement.childNodes();
     qsptr<BoxesGroup> boxesGroup;
-    bool hasTransform = attributes.hasTransform();
+    const bool hasTransform = attributes.hasTransform();
     if(allRootChildNodes.count() > 1 ||
        hasTransform || parentGroup == nullptr) {
         boxesGroup = SPtrCreate(BoxesGroup)();
         attributes.apply(boxesGroup.get());
-        if(parentGroup) {
-            parentGroup->addContainedBox(boxesGroup);
-        }
+        if(parentGroup) parentGroup->addContainedBox(boxesGroup);
     } else {
         boxesGroup = GetAsSPtr(parentGroup, BoxesGroup);
     }
 
     for(int i = 0; i < allRootChildNodes.count(); i++) {
-        QDomNode iNode = allRootChildNodes.at(i);
+        const QDomNode iNode = allRootChildNodes.at(i);
         if(iNode.isElement()) {
             loadElement(iNode.toElement(), boxesGroup.get(), attributes);
         }
@@ -552,27 +550,27 @@ qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
 
 void loadVectorPath(const QDomElement &pathElement,
                     BoxesGroup *parentGroup,
-                    VectorPathSvgAttributes *attributes) {
+                    VectorPathSvgAttributes& attributes) {
     const auto vectorPath = SPtrCreate(SmartVectorPath)();
     const QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
-    attributes->apply(vectorPath.get());
+    attributes.apply(vectorPath.get());
     parentGroup->addContainedBox(vectorPath);
 }
 
 void loadPolyline(const QDomElement &pathElement,
                   BoxesGroup *parentGroup,
-                  VectorPathSvgAttributes *attributes) {
+                  VectorPathSvgAttributes &attributes) {
     auto vectorPath = SPtrCreate(SmartVectorPath)();
     const QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
-    attributes->apply(vectorPath.get());
+    attributes.apply(vectorPath.get());
     parentGroup->addContainedBox(vectorPath);
 }
 
 void loadCircle(const QDomElement &pathElement,
                 BoxesGroup *parentGroup,
-                BoxSvgAttributes *attributes) {
+                const BoxSvgAttributes &attributes) {
 
     const QString cXstr = pathElement.attribute("cx");
     const QString cYstr = pathElement.attribute("cy");
@@ -592,13 +590,13 @@ void loadCircle(const QDomElement &pathElement,
 
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
 
-    attributes->apply(circle.data());
+    attributes.apply(circle.data());
     parentGroup->addContainedBox(circle);
 }
 
 void loadRect(const QDomElement &pathElement,
               BoxesGroup *parentGroup,
-              BoxSvgAttributes *attributes) {
+              const BoxSvgAttributes &attributes) {
 
     const QString xStr = pathElement.attribute("x");
     const QString yStr = pathElement.attribute("y");
@@ -619,14 +617,14 @@ void loadRect(const QDomElement &pathElement,
     rect->setYRadius(rYstr.toDouble());
     rect->setXRadius(rXstr.toDouble());
 
-    attributes->apply(rect.data());
+    attributes.apply(rect.data());
     parentGroup->addContainedBox(rect);
 }
 
 
 void loadText(const QDomElement &pathElement,
               BoxesGroup *parentGroup,
-              BoxSvgAttributes *attributes) {
+              const BoxSvgAttributes &attributes) {
 
     const QString xStr = pathElement.attribute("x");
     const QString yStr = pathElement.attribute("y");
@@ -636,7 +634,7 @@ void loadText(const QDomElement &pathElement,
     textBox->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
     textBox->setCurrentValue(pathElement.text());
 
-    attributes->apply(textBox.data());
+    attributes.apply(textBox.data());
     parentGroup->addContainedBox(textBox);
 }
 
@@ -648,9 +646,9 @@ void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
         attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         if(element.tagName() == "path") {
-            loadVectorPath(element, parentGroup, &attributes);
+            loadVectorPath(element, parentGroup, attributes);
         } else { // if(element.tagName() == "polyline") {
-            loadPolyline(element, parentGroup, &attributes);
+            loadPolyline(element, parentGroup, attributes);
         }
     } else {
         BoxSvgAttributes attributes;
@@ -661,11 +659,11 @@ void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
             loadBoxesGroup(element, parentGroup, attributes);
         } else if(element.tagName() == "circle" ||
                   element.tagName() == "ellipse") {
-            loadCircle(element, parentGroup, &attributes);
+            loadCircle(element, parentGroup, attributes);
         } else if(element.tagName() == "rect") {
-            loadRect(element, parentGroup, &attributes);
+            loadRect(element, parentGroup, attributes);
         } else if(element.tagName() == "tspan") {
-            loadText(element, parentGroup, &attributes);
+            loadText(element, parentGroup, attributes);
         }
     }
 }
@@ -1082,6 +1080,8 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
     if(!matrixStr.isEmpty()) {
         mRelTransform = getMatrixFromString(matrixStr)*mRelTransform;
     }
+
+    decomposeTransformMatrix();
 }
 
 bool BoxSvgAttributes::hasTransform() const {
@@ -1090,18 +1090,64 @@ bool BoxSvgAttributes::hasTransform() const {
              isZero4Dec(mRelTransform.m11() - 1) &&
              isZero4Dec(mRelTransform.m22() - 1) &&
              isZero4Dec(mRelTransform.m12()) &&
-             isZero4Dec(mRelTransform.m21())); /*&&
-                 isZero(mDx) && isZero(mDy) &&
-                 isZero(mScaleX - 1.) && isZero(mScaleY - 1.) &&
-                 isZero(mShearX) && isZero(mShearY) &&
-                 isZero(mRot));*/
+             isZero4Dec(mRelTransform.m21()));
 }
 
-void BoxSvgAttributes::applySingleTransformations(BoundingBox *box) {
-    BoxTransformAnimator * const animator = box->getTransformAnimator();
-    animator->translate(mDx, mDy);
-    animator->setScale(mScaleX, mScaleY);
-    animator->setRotation(mRot);
+void BoxSvgAttributes::decomposeTransformMatrix() {
+    const qreal m11 = mRelTransform.m11();
+    const qreal m12 = mRelTransform.m12();
+    const qreal m21 = mRelTransform.m21();
+    const qreal m22 = mRelTransform.m22();
+
+    const qreal delta = m11 * m22 - m21 * m12;
+
+    // Apply the QR-like decomposition.
+    if(!isZero4Dec(m11) || !isZero4Dec(m21)) {
+        const qreal r = sqrt(m11 * m11 + m21 * m21);
+        const qreal rotRad = m21 > 0 ? acos(m11 / r) : -acos(m11 / r);
+        mRot = rotRad*180/PI;
+        mScaleX = r;
+        mScaleY = delta/r;
+        mShearX = atan((m11 * m12 + m21 * m22) / (r * r));
+        mShearY = 0;
+    } else if(!isZero4Dec(m12) || !isZero4Dec(m22)) {
+        const qreal s = sqrt(m12 * m12 + m22 * m22);
+        const qreal rotRad = m22 > 0 ? acos(-m12 / s) : -acos(-m12 / s);
+        mRot = 90 - rotRad*180/PI;
+        mScaleX = delta/s;
+        mScaleY = s;
+        mShearX = 0;
+        mShearY = atan((m11 * m12 + m21 * m22) / (s * s));
+    } else {
+        mRot = 0;
+        mScaleX = 0;
+        mScaleY = 0;
+        mShearX = 0;
+        mShearY = 0;
+    }
+
+    mDx = mRelTransform.dx();
+    mDy = mRelTransform.dy();
+
+//    mDx = mRelTransform.dx();
+//    mDy = mRelTransform.dy();
+
+//    const qreal sxAbs = qSqrt(m11*m11 + m21*m21);
+//    const qreal syAbs = qSqrt(m12*m12 + m22*m22);
+//    mScaleX = m11 > 0 ? sxAbs : -sxAbs;
+//    mScaleY = m22 > 0 ? syAbs : -syAbs;
+
+//    const qreal nM12oM11 = -m12/m11;
+//    const qreal m21oM22 = m21/m22;
+//    const bool hasShear = !isZero4Dec(nM12oM11 - m21oM22);
+
+//    if(hasShear) {
+//        mHasRemTrans = true;
+
+//        return;
+//    }
+
+//    mRot = atan2(-m12, m11)*180/PI;
 }
 
 /*
@@ -1925,21 +1971,16 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
             text->setFont(mTextAttributes.getFont());
         }
     }
-    if(!box->SWT_isSmartVectorPath()) {
-        const qreal scaleX = mRelTransform.m11();
-        const qreal scaleY = mRelTransform.m22();
-        const qreal dX = mRelTransform.dx();
-        const qreal dY = mRelTransform.dy();
-        const auto transAnim = box->getTransformAnimator();
-        transAnim->setScale(scaleX, scaleY);
-        transAnim->translate(dX, dY);
-    }
+    const auto transAnim = box->getTransformAnimator();
+    transAnim->translate(mDx, mDy);
+    transAnim->setScale(mScaleX, mScaleY);
+    transAnim->setRotation(mRot);
+    transAnim->setShear(mShearX, mShearY);
 }
 
 void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
     SmartPathCollection* const pathAnimator = path->getPathAnimator();
     for(const auto& separatePath : mSvgSeparatePaths) {
-        separatePath->applyTransfromation(mRelTransform);
         const auto singlePath = SPtrCreate(SmartPathAnimator)();
         separatePath->apply(singlePath.get());
         pathAnimator->addPath(singlePath);
@@ -2003,69 +2044,61 @@ void SvgSeparatePath::pathArc(qreal rX, qreal rY,
                               const int &largeArcFlag, const int &sweepFlag,
                               const qreal &x, const qreal &y,
                               const qreal &curX, const qreal &curY) {
-    qreal sin_th, cos_th;
-    qreal a00, a01, a10, a11;
-    qreal x0, y0, x1, y1, xc, yc;
-    qreal d, sfactor, sfactor_sq;
-    qreal th0, th1, th_arc;
-    int i, n_segs;
-    qreal dx, dy, dx1, dy1, Pr1, Pr2, Px, Py, check;
-
     rX = qAbs(rX);
     rY = qAbs(rY);
 
-    sin_th = qSin(xAxisRotation * (M_PI / 180.0));
-    cos_th = qCos(xAxisRotation * (M_PI / 180.0));
+    const qreal sin_th = qSin(xAxisRotation * (M_PI / 180));
+    const qreal cos_th = qCos(xAxisRotation * (M_PI / 180));
 
-    dx = (curX - x) / 2.0;
-    dy = (curY - y) / 2.0;
-    dx1 =  cos_th * dx + sin_th * dy;
-    dy1 = -sin_th * dx + cos_th * dy;
-    Pr1 = rX * rX;
-    Pr2 = rY * rY;
-    Px = dx1 * dx1;
-    Py = dy1 * dy1;
+    const qreal dx = (curX - x) / 2;
+    const qreal dy = (curY - y) / 2;
+    const qreal dx1 =  cos_th * dx + sin_th * dy;
+    const qreal dy1 = -sin_th * dx + cos_th * dy;
+    const qreal Pr1 = rX * rX;
+    const qreal Pr2 = rY * rY;
+    const qreal Px = dx1 * dx1;
+    const qreal Py = dy1 * dy1;
     /* Spec : check if radii are large enough */
-    check = Px / Pr1 + Py / Pr2;
+    const qreal check = Px / Pr1 + Py / Pr2;
     if(check > 1) {
         rX = rX * qSqrt(check);
         rY = rY * qSqrt(check);
     }
 
-    a00 =  cos_th / rX;
-    a01 =  sin_th / rX;
-    a10 = -sin_th / rY;
-    a11 =  cos_th / rY;
-    x0 = a00 * curX + a01 * curY;
-    y0 = a10 * curX + a11 * curY;
-    x1 = a00 * x + a01 * y;
-    y1 = a10 * x + a11 * y;
+    const qreal a00 =  cos_th / rX;
+    const qreal a01 =  sin_th / rX;
+    const qreal a10 = -sin_th / rY;
+    const qreal a11 =  cos_th / rY;
+    const qreal x0 = a00 * curX + a01 * curY;
+    const qreal y0 = a10 * curX + a11 * curY;
+    const qreal x1 = a00 * x + a01 * y;
+    const qreal y1 = a10 * x + a11 * y;
     /* (x0, y0) is current point in transformed coordinate space.
            (x1, y1) is new point in transformed coordinate space.
 
            The arc fits a unit-radius circle in this space.
         */
-    d = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0);
-    sfactor_sq = 1.0 / d - 0.25;
+    const qreal d = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0);
+    qreal sfactor_sq = 1 / d - 0.25;
     if(sfactor_sq < 0) sfactor_sq = 0;
-    sfactor = qSqrt(sfactor_sq);
+    qreal sfactor = qSqrt(sfactor_sq);
     if(sweepFlag == largeArcFlag) sfactor = -sfactor;
-    xc = 0.5 * (x0 + x1) - sfactor * (y1 - y0);
-    yc = 0.5 * (y0 + y1) + sfactor * (x1 - x0);
+    const qreal xc = 0.5 * (x0 + x1) - sfactor * (y1 - y0);
+    const qreal yc = 0.5 * (y0 + y1) + sfactor * (x1 - x0);
     /* (xc, yc) is center of the circle. */
 
-    th0 = qAtan2(y0 - yc, x0 - xc);
-    th1 = qAtan2(y1 - yc, x1 - xc);
+    const qreal th0 = qAtan2(y0 - yc, x0 - xc);
+    const qreal th1 = qAtan2(y1 - yc, x1 - xc);
 
-    th_arc = th1 - th0;
+    qreal th_arc = th1 - th0;
     if(th_arc < 0 && sweepFlag)
         th_arc += 2 * M_PI;
     else if(th_arc > 0 && !sweepFlag)
         th_arc -= 2 * M_PI;
 
-    n_segs = qCeil(qAbs(th_arc / (M_PI * 0.5 + 0.001)));
+    const int n_segs = qCeil(qAbs(th_arc / (M_PI * 0.5 + 0.001)));
 
-    for(i = 0; i < n_segs; i++) {
+    for(int i = 0; i < n_segs; i++) {
         pathArcSegment(xc, yc,
                        th0 + i * th_arc / n_segs,
                        th0 + (i + 1) * th_arc / n_segs,
@@ -2077,28 +2110,27 @@ void SvgSeparatePath::pathArcSegment(const qreal &xc, const qreal &yc,
                                      const qreal &th0, const qreal &th1,
                                      const qreal &rx, const qreal &ry,
                                      const qreal& xAxisRotation) {
-    qreal sinTh, cosTh;
-    qreal a00, a01, a10, a11;
-    qreal x1, y1, x2, y2, x3, y3;
-    qreal t;
-    qreal thHalf;
+    const qreal sinTh = qSin(xAxisRotation * (M_PI / 180));
+    const qreal cosTh = qCos(xAxisRotation * (M_PI / 180));
 
-    sinTh = qSin(xAxisRotation * (M_PI / 180));
-    cosTh = qCos(xAxisRotation * (M_PI / 180));
+    const qreal a00 =  cosTh * rx;
+    const qreal a01 = -sinTh * ry;
+    const qreal a10 =  sinTh * rx;
+    const qreal a11 =  cosTh * ry;
 
-    a00 =  cosTh * rx;
-    a01 = -sinTh * ry;
-    a10 =  sinTh * rx;
-    a11 =  cosTh * ry;
-
-    thHalf = 0.5 * (th1 - th0);
-    t = (8. / 3) * qSin(thHalf * 0.5) * qSin(thHalf * 0.5) / qSin(thHalf);
-    x1 = xc + qCos(th0) - t * qSin(th0);
-    y1 = yc + qSin(th0) + t * qCos(th0);
-    x3 = xc + qCos(th1);
-    y3 = yc + qSin(th1);
-    x2 = x3 + t * qSin(th1);
-    y2 = y3 - t * qCos(th1);
+    const qreal thHalf = 0.5 * (th1 - th0);
+    const qreal sinThHalf05 = qSin(thHalf * 0.5);
+    const qreal t = 8 * sinThHalf05 * sinThHalf05 / qSin(thHalf) / 3;
+    const qreal cosTh0 = qCos(th0);
+    const qreal cosTh1 = qCos(th1);
+    const qreal sinTh0 = qSin(th0);
+    const qreal sinTh1 = qSin(th1);
+    const qreal x1 = xc + cosTh0 - t * sinTh0;
+    const qreal y1 = yc + sinTh0 + t * cosTh0;
+    const qreal x3 = xc + cosTh1;
+    const qreal y3 = yc + sinTh1;
+    const qreal x2 = x3 + t * sinTh1;
+    const qreal y2 = y3 - t * cosTh1;
 
     cubicTo(QPointF(a00 * x1 + a01 * y1, a10 * x1 + a11 * y1),
             QPointF(a00 * x2 + a01 * y2, a10 * x2 + a11 * y2),

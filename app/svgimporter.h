@@ -123,12 +123,12 @@ public:
 
     bool hasTransform() const;
 
-    void applySingleTransformations(BoundingBox *box);
-
     void apply(BoundingBox *box) const;
     void setFillAttribute(const QString &value);
     void setStrokeAttribute(const QString &value);
 protected:
+    void decomposeTransformMatrix();
+
     Qt::FillRule mFillRule = Qt::OddEvenFill;
 
     qreal mDx = 0;

@@ -111,6 +111,7 @@ protected:
 class PathBox : public BoundingBox {
     friend class SelfRef;
 protected:
+    PathBox(const BoundingBoxType &type);
     void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     ~PathBox();
@@ -123,8 +124,8 @@ public:
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     void drawCanvasControls(SkCanvas * const canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
+                            const CanvasMode &currentCanvasMode,
+                            const SkScalar &invScale);
     void addPathEffect(const qsptr<PathEffect> &effect);
     void addFillPathEffect(const qsptr<PathEffect> &effect);
     void addOutlinePathEffect(const qsptr<PathEffect> &effect);
@@ -246,35 +247,7 @@ public:
     void setOutlinePathOutdated() {
         mCurrentOutlinePathOutdated = true;
     }
-
-//    void updateDialog_TEST() {
-//        if(!mDialog_TEST) {
-//            mDialog_TEST = new QDialog();
-//            mDialog_TEST->open();
-//            mDialog_TEST->setLayout(new QVBoxLayout());
-//            mLabel_TEST = new QLabel();
-//            mDialog_TEST->layout()->addWidget(mLabel_TEST);
-//        }
-//        QPixmap pix(200, 200);
-//        pix.fill(Qt::white);
-//        QPainter p(&pix);
-//        p.setPen(Qt::NoPen);
-//        p.setBrush(Qt::red);
-//        p.drawPath(SkPathToQPainterPath(mFillPathSk));
-//        p.setBrush(Qt::black);
-//        auto oPath = SkPathToQPainterPath(mOutlinePathSk);
-//        oPath.setFillRule(Qt::WindingFill);
-//        p.drawPath(oPath);
-//        p.end();
-
-//        mLabel_TEST->setPixmap(pix);
-    //    }
 protected:
-    PathBox(const BoundingBoxType &type);
-
-//    QDialog* mDialog_TEST = nullptr;
-//    QLabel* mLabel_TEST = nullptr;
-
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;
     bool mCurrentOutlinePathOutdated = true;

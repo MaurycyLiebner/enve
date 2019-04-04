@@ -22,6 +22,21 @@ class SkStroke;
 class GradientPoints;
 
 class PaintSettingsAnimator : public ComplexAnimator {
+protected:
+    PaintSettingsAnimator(const QString &name,
+                          GradientPoints * const grdPts,
+                          PathBox * const parent);
+
+    PaintSettingsAnimator(
+            const QString &name,
+            GradientPoints * const grdPts,
+            PathBox * const parent,
+            const QColor &colorT,
+            const PaintType &paintTypeT,
+            Gradient * const gradientT = nullptr);
+
+    virtual void showHideChildrenBeforeChaningPaintType(
+            const PaintType &newPaintType);
 public:
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
@@ -37,26 +52,12 @@ public:
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void setGradientVar(Gradient * const grad);
     QColor getColorAtRelFrame(const qreal &relFrame) const;
-    const Gradient::Type &getGradientType() { return mGradientType; }
+    Gradient::Type getGradientType() { return mGradientType; }
     void setGradientType(const Gradient::Type &type) {
         if(mGradientType == type) return;
         mGradientType = type;
         prp_callFinishUpdater();
     }
-protected:
-    PaintSettingsAnimator(const QString &name,
-                          GradientPoints * const grdPts,
-                          PathBox * const parent);
-
-    PaintSettingsAnimator(
-            const QString &name,
-            GradientPoints * const grdPts,
-            PathBox * const parent,
-            const QColor &colorT,
-            const PaintType &paintTypeT,
-            Gradient * const gradientT = nullptr);
-    virtual void showHideChildrenBeforeChaningPaintType(
-            const PaintType &newPaintType);
 private:
     Gradient::Type mGradientType = Gradient::LINEAR;
     PaintType mPaintType = NOPAINT;
@@ -98,7 +99,7 @@ struct UpdatePaintSettings {
     void updateGradient(const QGradientStops &stops,
                         const QPointF &start,
                         const QPointF &finalStop,
-                        const bool &linearGradient = true);
+                        const Gradient::Type &gradientType);
     PaintType fPaintType;
     QColor fPaintColor;
     sk_sp<SkShader> fGradient;

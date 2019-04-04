@@ -55,8 +55,7 @@ PathBox::PathBox(const BoundingBoxType &type) :
                 mStrokeGradientPoints.data(), this);
     ca_addChildAnimator(mFillSettings);
     ca_addChildAnimator(mStrokeSettings);
-    ca_moveChildAbove(mEffectsAnimators.data(),
-                      mStrokeSettings.data());
+    ca_moveChildAbove(mEffectsAnimators.data(), mStrokeSettings.data());
     ca_addChildAnimator(mPathEffectsAnimators);
     ca_addChildAnimator(mFillPathEffectsAnimators);
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
@@ -70,8 +69,8 @@ PathBox::~PathBox() {
 }
 
 void PathBox::drawCanvasControls(SkCanvas * const canvas,
-                             const CanvasMode &currentCanvasMode,
-                             const SkScalar &invScale) {
+                                 const CanvasMode &currentCanvasMode,
+                                 const SkScalar &invScale) {
     BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
@@ -230,7 +229,7 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
                                                             canvasScaleInv);
         }
     } else if(currentCanvasMode == MOVE_PATH) {
-        MovablePoint* pivotMovable =
+        MovablePoint* const pivotMovable =
                 mTransformAnimator->getPivotMovablePoint();
         if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return pivotMovable;
@@ -240,7 +239,7 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void PathBox::drawBoundingRect(SkCanvas * const canvas,
-                                 const SkScalar &invScale) {
+                               const SkScalar &invScale) {
     BoundingBox::drawBoundingRect(canvas, invScale);
     drawOutlineOverlay(canvas, mEditPathSk, invScale, false);
 }
@@ -470,7 +469,6 @@ void PathBox::drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale) {
 
 void PathBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     setting.apply(this);
-    scheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PathBox::setFillColorMode(const ColorMode &colorMode) {
