@@ -14,7 +14,7 @@ public:
     void removeContainer(MinimalCacheContainer *cont);
     void containerUpdated(MinimalCacheContainer *cont);
 
-    static MemoryHandler *getInstance() { return mInstance; }
+    static MemoryHandler *sGetInstance() { return sInstance; }
     void incMemoryScheduledToRemove(const int &mem) {
         mMemoryScheduledToRemove += mem;
     }
@@ -26,9 +26,10 @@ public slots:
                     const unsigned long long &minFreeBytes);
     void memoryChecked(const int& memKb, const int &totMemKb);
 private:
+    bool mHddCache = true;
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     long long mMemoryScheduledToRemove = 0;
-    static MemoryHandler *mInstance;
+    static MemoryHandler *sInstance;
     QTimer *mTimer;
     QThread *mMemoryChekerThread;
     MemoryChecker *mMemoryChecker;

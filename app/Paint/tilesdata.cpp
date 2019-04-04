@@ -307,7 +307,7 @@ void TilesData::setCurrentlyUsed(const bool &used) {
     if(mCurrentlyUsed == used) return;
     mCurrentlyUsed = used;
     if(used) {
-        MemoryHandler::getInstance()->removeContainer(this);
+        MemoryHandler::sGetInstance()->removeContainer(this);
         if(mNoDataInMemory) {
             if(mDataStoredInTmpFile) {
                 loadDataFromTmpFile();
@@ -316,7 +316,7 @@ void TilesData::setCurrentlyUsed(const bool &used) {
             }
         }
     } else if(!mNoDataInMemory) {
-        MemoryHandler::getInstance()->addContainer(this);
+        MemoryHandler::sGetInstance()->addContainer(this);
     }
 }
 

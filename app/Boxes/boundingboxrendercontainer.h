@@ -10,7 +10,6 @@ class BoundingBox;
 #include "framerange.h"
 #include "CacheHandlers/minimalcachehandler.h"
 #include "CacheHandlers/imagecachecontainer.h"
-class QTemporaryFile;
 class Canvas;
 
 class RenderCacheHandler;
@@ -18,9 +17,9 @@ struct BoundingBoxRenderData;
 
 class RenderContainer : public ImageCacheContainer {
     friend class StdSelfRef;
+protected:
+    RenderContainer() : ImageCacheContainer({0, 0}, nullptr) {}
 public:
-    ~RenderContainer();
-
     void drawSk(SkCanvas * const canvas, SkPaint *paint,
                 GrContext* const grContext);
 
@@ -55,7 +54,6 @@ public:
     }
 protected:
     bool mExpired = false;
-    RenderContainer() : ImageCacheContainer({0, 0}, nullptr) {}
     int mRelFrame = 0;
     qreal mResolutionFraction;
     SkPoint mDrawPos;

@@ -8,6 +8,15 @@ class _ScheduledTask;
 template <typename T>
 class HDDCachableRangeContainer :
         public RangeCacheContainer {
+protected:
+    typedef MinimalCacheHandler<T> Handler;
+    HDDCachableRangeContainer() :
+        mParentCacheHandler_k(nullptr) {}
+    HDDCachableRangeContainer(const FrameRange &range, Handler * const parent) :
+        RangeCacheContainer(range), mParentCacheHandler_k(parent) {}
+    virtual stdsptr<_HDDTask> createTmpFileDataSaver() = 0;
+    virtual stdsptr<_HDDTask> createTmpFileDataLoader() = 0;
+    virtual void clearDataAfterSaved() = 0;
 public:
     ~HDDCachableRangeContainer() {
         scheduleDeleteTmpFile();
@@ -28,8 +37,7 @@ public:
     }
 
     bool cacheAndFree() {
-        if(mBlocked || mNoDataInMemory ||
-           mSavingToFile || mLoadingFromFile) return false;
+        if(mBlocked || mNoDataInMemory || mSavingToFile) return false;
         if(!mParentCacheHandler_k) return false;
         saveToTmpFile();
         return true;
@@ -39,15 +47,15 @@ public:
         if(bT == mBlocked) return;
         mBlocked = bT;
         if(bT) {
-            MemoryHandler::getInstance()->removeContainer(this);
+            MemoryHandler::sGetInstance()->removeContainer(this);
             scheduleLoadFromTmpFile();
         } else {
-            MemoryHandler::getInstance()->addContainer(this);
+            MemoryHandler::sGetInstance()->addContainer(this);
         }
     }
 
     bool freeAndRemove() {
-        if(mBlocked || mNoDataInMemory) return false;
+        if(mBlocked || mSavingToFile) return false;
         if(!mParentCacheHandler_k) return false;
         mParentCacheHandler_k->removeRenderContainer(ref<T>());
         return true;
@@ -62,10 +70,10 @@ public:
     }
 
     void saveToTmpFile() {
-        if(mSavingToFile || mLoadingFromFile) return;
+        if(mSavingToFile || mNoDataInMemory) return;
         mMemSizeAwaitingSave = getByteCount();
-        MemoryHandler::getInstance()->incMemoryScheduledToRemove(mMemSizeAwaitingSave);
-        MemoryHandler::getInstance()->removeContainer(this);
+        MemoryHandler::sGetInstance()->incMemoryScheduledToRemove(mMemSizeAwaitingSave);
+        MemoryHandler::sGetInstance()->removeContainer(this);
         mSavingToFile = true;
         mNoDataInMemory = true;
         mCancelAfterSaveDataClear = false;
@@ -73,23 +81,22 @@ public:
         mSavingUpdatable->scheduleTask();
     }
 
-    void setDataSavedToTmpFile(
-            const qsptr<QTemporaryFile> &tmpFile) {
-        mSavingUpdatable = nullptr;
+    void setDataSavedToTmpFile(const qsptr<QTemporaryFile> &tmpFile) {
+        mSavingUpdatable.reset();
         mTmpFile = tmpFile;
         mSavingToFile = false;
         if(mCancelAfterSaveDataClear) {
             mNoDataInMemory = false;
             mCancelAfterSaveDataClear = false;
             if(!mBlocked) {
-                MemoryHandler::getInstance()->addContainer(this);
+                MemoryHandler::sGetInstance()->addContainer(this);
             }
             return;
         } else {
             mNoDataInMemory = true;
         }
         clearDataAfterSaved();
-        MemoryHandler::getInstance()->incMemoryScheduledToRemove(
+        MemoryHandler::sGetInstance()->incMemoryScheduledToRemove(
                     -mMemSizeAwaitingSave);
     }
 
@@ -97,22 +104,12 @@ public:
         return !mNoDataInMemory;
     }
 protected:
-    typedef MinimalCacheHandler<T> Handler;
-    HDDCachableRangeContainer() :
-        mParentCacheHandler_k(nullptr) {}
-    HDDCachableRangeContainer(const FrameRange &range,
-                              Handler * const parent) :
-        RangeCacheContainer(range), mParentCacheHandler_k(parent) {}
-    virtual stdsptr<_HDDTask> createTmpFileDataSaver() = 0;
-    virtual stdsptr<_HDDTask> createTmpFileDataLoader() = 0;
-    virtual void clearDataAfterSaved() = 0;
-
     void afterDataLoadedFromTmpFile() {
         mLoadingFromFile = false;
         mNoDataInMemory = false;
-        mLoadingUpdatable = nullptr;
+        mLoadingUpdatable.reset();
         if(!mBlocked) {
-            MemoryHandler::getInstance()->addContainer(this);
+            MemoryHandler::sGetInstance()->addContainer(this);
         }
     }
 

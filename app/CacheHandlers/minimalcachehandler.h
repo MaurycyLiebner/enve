@@ -140,7 +140,7 @@ public:
         for(int i = mRenderContainers.count() - 1; i >= firstId; i--) {
             T *cont = mRenderContainers.at(i).get();
             if(cont->handledByMemoryHandler()) {
-                MemoryHandler::getInstance()->containerUpdated(cont);
+                MemoryHandler::sGetInstance()->containerUpdated(cont);
             }
         }
     }

@@ -3,10 +3,10 @@
 #include "smartPointers/stdselfref.h"
 
 class MinimalCacheContainer : public StdSelfRef {
+protected:
+    MinimalCacheContainer();
 public:
     ~MinimalCacheContainer();
-
-    bool cacheFreeAndRemoveFromMemoryHandler();
 
     virtual bool cacheAndFree() = 0;
     virtual bool freeAndRemove() = 0;
@@ -17,6 +17,8 @@ public:
         mBlocked = bT;
     }
 
+    bool cacheFreeAndRemoveFromMemoryHandler();
+
     void setHandledByMemoryHanlder(const bool &bT) {
         mHandledByMemoryHandler = bT;
     }
@@ -25,8 +27,6 @@ public:
         return mHandledByMemoryHandler;
     }
 protected:
-    MinimalCacheContainer();
-
     bool mHandledByMemoryHandler = false;
     bool mBlocked = false;
 };

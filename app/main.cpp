@@ -21,11 +21,11 @@ int main(int argc, char *argv[]) {
     Application a(argc, argv);
 
     MainWindow w;
-#ifdef QT_DEBUG
-    const qint64 pId = QCoreApplication::applicationPid();
-    QProcess * const process = new QProcess(&w);
-    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
-#endif
+//#ifdef QT_DEBUG
+//    const qint64 pId = QCoreApplication::applicationPid();
+//    QProcess * const process = new QProcess(&w);
+//    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
+//#endif
 /*
     auto prevPath = SmartPath();
     QPointF pt(0, 0);

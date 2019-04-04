@@ -7,8 +7,6 @@
 #include "canvas.h"
 #include "skia/skiahelpers.h"
 
-RenderContainer::~RenderContainer() {}
-
 void RenderContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
                              GrContext * const grContext) {
     if(!mSrcRenderData) return;
@@ -76,5 +74,5 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.reset();
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
     mSrcRenderData = GetAsSPtr(data, BoundingBoxRenderData);
-    MemoryHandler::getInstance()->containerUpdated(this);
+    MemoryHandler::sGetInstance()->containerUpdated(this);
 }

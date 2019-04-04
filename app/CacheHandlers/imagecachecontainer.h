@@ -8,6 +8,16 @@ class ImageCacheContainer :
         public HDDCachableRangeContainer<ImageCacheContainer> {
     friend class StdSelfRef;
     typedef HDDCachableRangeContainer<ImageCacheContainer> Base;
+protected:
+    ImageCacheContainer();
+    ImageCacheContainer(const FrameRange& range,
+                        Handler * const parent);
+    ImageCacheContainer(const sk_sp<SkImage>& img,
+                        const FrameRange &range,
+                        Handler * const parent);
+    stdsptr<_HDDTask> createTmpFileDataSaver();
+    stdsptr<_HDDTask> createTmpFileDataLoader();
+    void clearDataAfterSaved();
 public:
     int getByteCount();
 
@@ -21,17 +31,6 @@ public:
 
     void setLoadTargetCanvas(Canvas *canvas);
 protected:
-    ImageCacheContainer();
-    ImageCacheContainer(const FrameRange& range,
-                        Handler * const parent);
-    ImageCacheContainer(const sk_sp<SkImage>& img,
-                        const FrameRange &range,
-                        Handler * const parent);
-protected:
-    stdsptr<_HDDTask> createTmpFileDataSaver();
-    stdsptr<_HDDTask> createTmpFileDataLoader();
-    void clearDataAfterSaved();
-
     qptr<Canvas> mTmpLoadTargetCanvas;
     sk_sp<SkImage> mImageSk;
 };

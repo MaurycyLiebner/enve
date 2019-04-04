@@ -63,11 +63,13 @@ void CacheContainerTmpFileDataSaver::_processUpdate() {
 void CacheContainerTmpFileDataSaver::afterProcessingFinished() {
     if(mSavingFailed) {
         if(!mTargetCont->freeAndRemove()) {
-
+            RuntimeThrow("Failed to save a temporary file, "
+                         "and target cannot be removed");
         }
     } else {
         mTargetCont->setDataSavedToTmpFile(mTmpFile);
     }
+    mImage.reset();
 }
 
 void CacheContainerTmpFileDataDeleter::_processUpdate() {

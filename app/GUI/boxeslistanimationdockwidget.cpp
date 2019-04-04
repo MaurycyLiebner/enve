@@ -92,7 +92,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
                                                             10, MIN_WIDGET_HEIGHT,
                                                             false,
                                                             false, this);
-    connect(MemoryHandler::getInstance(), &MemoryHandler::memoryFreed,
+    connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
             mAnimationWidgetScrollbar,
             qOverload<>(&AnimationWidgetScrollBar::update));
     mAnimationWidgetScrollbar->setTopBorderVisible(false);

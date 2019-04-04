@@ -2,17 +2,17 @@
 #include "memoryhandler.h"
 
 MinimalCacheContainer::MinimalCacheContainer() {
-    MemoryHandler::getInstance()->addContainer(this);
+    MemoryHandler::sGetInstance()->addContainer(this);
 }
 
 MinimalCacheContainer::~MinimalCacheContainer() {
-    if(!MemoryHandler::getInstance()) return;
-    MemoryHandler::getInstance()->removeContainer(this);
+    if(!MemoryHandler::sGetInstance()) return;
+    MemoryHandler::sGetInstance()->removeContainer(this);
 }
 
 bool MinimalCacheContainer::cacheFreeAndRemoveFromMemoryHandler() {
     if(cacheAndFree()) {
-        MemoryHandler::getInstance()->removeContainer(this);
+        MemoryHandler::sGetInstance()->removeContainer(this);
         return true;
     }
     return false;

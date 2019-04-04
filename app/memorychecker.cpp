@@ -31,8 +31,8 @@ MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
     mInstance = this;
 
     mTotalRam = getTotalRam();
-    mLowFreeRam = 800000000;
-    mVeryLowFreeRam = 500000000;
+    mVeryLowFreeRam = 15*mTotalRam/100;
+    mLowFreeRam = 20*mTotalRam/100;
 }
 
 void MemoryChecker::setCurrentMemoryState(const MemoryState &state) {
