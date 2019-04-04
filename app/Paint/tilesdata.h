@@ -40,7 +40,6 @@ public:
 
     void dataChanged();
 
-    bool cacheAndFree();
     bool freeAndRemove();
 
     int getByteCount();

@@ -8,16 +8,15 @@ protected:
 public:
     ~MinimalCacheContainer();
 
-    virtual bool cacheAndFree() = 0;
     virtual bool freeAndRemove() = 0;
-
+    virtual bool freeFromMemory() {
+        return freeAndRemove();
+    }
     virtual int getByteCount() = 0;
 
     virtual void setBlocked(const bool &bT) {
         mBlocked = bT;
     }
-
-    bool cacheFreeAndRemoveFromMemoryHandler();
 
     void setHandledByMemoryHanlder(const bool &bT) {
         mHandledByMemoryHandler = bT;

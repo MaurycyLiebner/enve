@@ -328,7 +328,7 @@ _ScheduledTask* VideoCacheHandler::scheduleFrameLoad(
         const int &frame) {
     if(mFramesCount <= 0 || frame >= mFramesCount) return nullptr;
     if(mFramesLoadScheduled.contains(frame) ||
-            mFramesBeingLoadedGUI.contains(frame)) return this;
+       mFramesBeingLoadedGUI.contains(frame)) return this;
     //    qDebug() << "schedule frame load: " << frame;
     ImageCacheContainer *contAtFrame =
             mFramesCache.getRenderContainerAtRelFrame(frame);

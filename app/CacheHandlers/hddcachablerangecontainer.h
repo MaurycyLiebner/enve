@@ -6,8 +6,7 @@
 class _ScheduledTask;
 
 template <typename T>
-class HDDCachableRangeContainer :
-        public RangeCacheContainer {
+class HDDCachableRangeContainer : public RangeCacheContainer {
 protected:
     typedef MinimalCacheHandler<T> Handler;
     HDDCachableRangeContainer() :
@@ -19,45 +18,43 @@ protected:
     virtual void clearDataAfterSaved() = 0;
 public:
     ~HDDCachableRangeContainer() {
-        scheduleDeleteTmpFile();
+        if(mTmpFile) scheduleDeleteTmpFile();
     }
 
     _ScheduledTask* scheduleLoadFromTmpFile() {
-        if(mSavingToFile) {
-            mCancelAfterSaveDataClear = true;
-            return mSavingUpdatable.get();
-        }
-        if(!mNoDataInMemory) return nullptr;
-        if(mLoadingFromFile) return mLoadingUpdatable.get();
+        if(!mNoDataInMemory || !mTmpFile) return nullptr;
+        if(mLoadingUpdatable) return mLoadingUpdatable.get();
 
-        mLoadingFromFile = true;
         mLoadingUpdatable = createTmpFileDataLoader();
         mLoadingUpdatable->scheduleTask();
         return mLoadingUpdatable.get();
-    }
-
-    bool cacheAndFree() {
-        if(mBlocked || mNoDataInMemory || mSavingToFile) return false;
-        if(!mParentCacheHandler_k) return false;
-        saveToTmpFile();
-        return true;
     }
 
     void setBlocked(const bool &bT) {
         if(bT == mBlocked) return;
         mBlocked = bT;
         if(bT) {
-            MemoryHandler::sGetInstance()->removeContainer(this);
-            scheduleLoadFromTmpFile();
+            if(mNoDataInMemory) {
+                scheduleLoadFromTmpFile();
+            } else {
+                MemoryHandler::sGetInstance()->removeContainer(this);
+            }
         } else {
             MemoryHandler::sGetInstance()->addContainer(this);
         }
     }
 
     bool freeAndRemove() {
-        if(mBlocked || mSavingToFile) return false;
-        if(!mParentCacheHandler_k) return false;
+        if(mBlocked) return false;
         mParentCacheHandler_k->removeRenderContainer(ref<T>());
+        return true;
+    }
+
+    bool freeFromMemory() {
+        if(mTmpFile) {
+            if(!mBlocked) MemoryHandler::sGetInstance()->removeContainer(this);
+            clearDataAfterSaved();
+        } else return freeAndRemove();
         return true;
     }
 
@@ -70,13 +67,7 @@ public:
     }
 
     void saveToTmpFile() {
-        if(mSavingToFile || mNoDataInMemory) return;
-        mMemSizeAwaitingSave = getByteCount();
-        MemoryHandler::sGetInstance()->incMemoryScheduledToRemove(mMemSizeAwaitingSave);
-        MemoryHandler::sGetInstance()->removeContainer(this);
-        mSavingToFile = true;
-        mNoDataInMemory = true;
-        mCancelAfterSaveDataClear = false;
+        if(mSavingUpdatable || mTmpFile) return;
         mSavingUpdatable = createTmpFileDataSaver();
         mSavingUpdatable->scheduleTask();
     }
@@ -84,20 +75,6 @@ public:
     void setDataSavedToTmpFile(const qsptr<QTemporaryFile> &tmpFile) {
         mSavingUpdatable.reset();
         mTmpFile = tmpFile;
-        mSavingToFile = false;
-        if(mCancelAfterSaveDataClear) {
-            mNoDataInMemory = false;
-            mCancelAfterSaveDataClear = false;
-            if(!mBlocked) {
-                MemoryHandler::sGetInstance()->addContainer(this);
-            }
-            return;
-        } else {
-            mNoDataInMemory = true;
-        }
-        clearDataAfterSaved();
-        MemoryHandler::sGetInstance()->incMemoryScheduledToRemove(
-                    -mMemSizeAwaitingSave);
     }
 
     bool storesDataInMemory() const {
@@ -105,19 +82,17 @@ public:
     }
 protected:
     void afterDataLoadedFromTmpFile() {
-        mLoadingFromFile = false;
         mNoDataInMemory = false;
         mLoadingUpdatable.reset();
-        if(!mBlocked) {
-            MemoryHandler::sGetInstance()->addContainer(this);
-        }
+        if(!mBlocked) MemoryHandler::sGetInstance()->addContainer(this);
     }
 
     void afterDataReplaced() {
         if(mNoDataInMemory) {
             mNoDataInMemory = false;
-            scheduleDeleteTmpFile();
+            if(!mBlocked) MemoryHandler::sGetInstance()->addContainer(this);
         }
+        if(mTmpFile) scheduleDeleteTmpFile();
     }
 
     stdsptr<_ScheduledTask> mLoadingUpdatable;
@@ -125,12 +100,8 @@ protected:
 
     qsptr<QTemporaryFile> mTmpFile;
 
-    bool mCancelAfterSaveDataClear = false;
-    bool mSavingToFile = false;
-    bool mLoadingFromFile = false;
     bool mNoDataInMemory = false;
 
-    int mMemSizeAwaitingSave = 0;
     Handler * const mParentCacheHandler_k;
 };
 

@@ -142,14 +142,10 @@ void MemoryChecker::checkMajorMemoryPageFault() {
     }
     const int relPgFlt = pgFlts - mLastPgFlts;
     mLastPgFlts = pgFlts;
-    if(mPgFltSamples.count() == 3) {
-        mPgFltSamples.removeFirst();
-    }
+    if(mPgFltSamples.count() == 3) mPgFltSamples.removeFirst();
     mPgFltSamples << relPgFlt;
     int avgPgFlts = 0;
-    for(const int &sample : mPgFltSamples) {
-        avgPgFlts += sample;
-    }
+    for(const int &sample : mPgFltSamples) avgPgFlts += sample;
     avgPgFlts = avgPgFlts/mPgFltSamples.count();
     if(avgPgFlts > mCurrentMemoryState) {
         if(mCurrentMemoryState == LOW_MEMORY_STATE &&

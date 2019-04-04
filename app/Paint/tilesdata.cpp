@@ -347,22 +347,6 @@ void TilesData::afterSavedToTmpFile() {
     mDataStoredInTmpFile = true;
 }
 
-bool TilesData::cacheAndFree() {
-    if(mNoDataInMemory) return false;
-    if(!mDataStoredInTmpFile) {
-        if(_writeTilesDataToTmp()) {
-            mNoDataInMemory = true;
-            afterSavedToTmpFile();
-        } else {
-            return false;
-        }
-//        MainWindow::getInstance()->getCanvasWindow()->
-//                addUpdatableAwaitingUpdate(
-//                    new SaveTilesDataToTmpFileExec(this));
-    }
-    return true;
-}
-
 bool TilesData::freeAndRemove() {
     return false;
 }

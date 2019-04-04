@@ -56,8 +56,6 @@ void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
 void MemoryHandler::freeMemory(const MemoryState &state,
                                const unsigned long long &minFreeBytes) {
     if(state != mCurrentMemoryState) {
-//        qDebug() << "set state: " << state;
-        //bool worsend = state > mCurrentMemoryState;
         if(state == NORMAL_MEMORY_STATE) {
             disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
             connect(mTimer, &QTimer::timeout,
@@ -65,51 +63,23 @@ void MemoryHandler::freeMemory(const MemoryState &state,
             mTimer->setInterval(1000);
         } else if(mCurrentMemoryState == NORMAL_MEMORY_STATE) {
             disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
-
             connect(mTimer, &QTimer::timeout,
-                    mMemoryChecker, &MemoryChecker::checkMemory);
-//            connect(mTimer, &QTimer::timeout,
-//                    mMemoryChecker, &MemoryChecker::checkMajorMemoryPageFault);
-
+                    mMemoryChecker, &MemoryChecker::checkMajorMemoryPageFault);
             mTimer->setInterval(500);
         }
         mCurrentMemoryState = state;
     }
 
     long long memToFree = static_cast<long long>(minFreeBytes);
-    if(state <= LOW_MEMORY_STATE) {
-        memToFree -= mMemoryScheduledToRemove;
-    }
     if(memToFree <= 0) return;
-    int unfreeable = 0;
-    const bool firstCache = state <= LOW_MEMORY_STATE && mHddCache;
-    while(memToFree > 0 && mContainers.count() > unfreeable) {
+    while(memToFree > 0 && !mContainers.isEmpty()) {
         const auto cont = mContainers.takeFirst();
-        const int byteCount = cont->getByteCount();
-        if(firstCache) {
-            if(cont->cacheAndFree()) {
-                memToFree -= byteCount;
-            } else {
-                unfreeable++;
-                mContainers << cont;
-            }
-        } else {
-            if(cont->freeAndRemove()) {
-                memToFree -= byteCount;
-            } else {
-                unfreeable++;
-                mContainers << cont;
-            }
-        }
+        memToFree -= cont->getByteCount();
+        cont->freeAndRemove();
     }
-    //emit allMemoryUsed();
-    if(memToFree > 0 || state >= LOW_MEMORY_STATE) {
+    if(memToFree > 0 || state >= LOW_MEMORY_STATE)
         emit allMemoryUsed();
-    }
     emit memoryFreed();
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
-    //MallocExtension::instance()->ReleaseToSystem(bytes - memToFree);
-    //MallocExtension::instance()->ReleaseFreeMemory();
 }
 
 void MemoryHandler::memoryChecked(const int &memKb, const int& totMemKb) {
