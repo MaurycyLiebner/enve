@@ -16,20 +16,14 @@ MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
     mMemoryChecker = new MemoryChecker();
     mMemoryChecker->moveToThread(mMemoryChekerThread);
     qRegisterMetaType<MemoryState>();
-    connect(mMemoryChecker,
-            SIGNAL(handleMemoryState(const MemoryState &,
-                                     const unsigned long long &)),
-            this,
-            SLOT(freeMemory(const MemoryState &,
-                            const unsigned long long &)) );
-    connect(mMemoryChecker,
-            SIGNAL(memoryChecked(const int &, const int &)),
-            this,
-            SLOT(memoryChecked(const int &, const int &)) );
+    connect(mMemoryChecker, &MemoryChecker::handleMemoryState,
+            this, &MemoryHandler::freeMemory);
+    connect(mMemoryChecker, &MemoryChecker::memoryChecked,
+            this, &MemoryHandler::memoryChecked);
 
     mTimer = new QTimer(this);
-    connect(mTimer, SIGNAL(timeout()),
-            mMemoryChecker, SLOT(checkMemory()) );
+    connect(mTimer, &QTimer::timeout,
+            mMemoryChecker, &MemoryChecker::checkMemory);
     mTimer->start(500);
     mMemoryChekerThread->start();
 }
@@ -66,13 +60,13 @@ void MemoryHandler::freeMemory(const MemoryState &state,
         //bool worsend = state > mCurrentMemoryState;
         if(state == NORMAL_MEMORY_STATE) {
             disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
-            connect(mTimer, SIGNAL(timeout()),
-                    mMemoryChecker, SLOT(checkMemory()) );
+            connect(mTimer, &QTimer::timeout,
+                    mMemoryChecker, &MemoryChecker::checkMemory);
             mTimer->setInterval(1000);
         } else if(mCurrentMemoryState == NORMAL_MEMORY_STATE) {
             disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
-            connect(mTimer, SIGNAL(timeout()),
-                    mMemoryChecker, SLOT(checkMajorMemoryPageFault()) );
+            connect(mTimer, &QTimer::timeout,
+                    mMemoryChecker, &MemoryChecker::checkMajorMemoryPageFault);
             mTimer->setInterval(500);
         }
         mCurrentMemoryState = state;

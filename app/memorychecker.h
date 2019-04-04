@@ -15,38 +15,22 @@ extern unsigned long long getFreeRam();
 class MemoryChecker : public QObject {
     Q_OBJECT
 public:
-    explicit MemoryChecker(QObject *parent = nullptr);
+    explicit MemoryChecker(QObject * const parent = nullptr);
     static MemoryChecker *getInstance() { return mInstance; }
-//    void decUsedMemory(const unsigned long long &used) {
-//        mUsedRam -= used;
-//    }
-
-//    void incUsedMemory(const unsigned long long &used) {
-//        mUsedRam += used;
-//    }
-    unsigned long long getLowFreeRam() {
-        return mLowFreeRam;
-    }
-
-    void setCurrentMemoryState(const MemoryState &state);
 private:
+    void setCurrentMemoryState(const MemoryState &state);
+
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     int mLastPgFlts = -1;
 
-    unsigned long long mTotalRam = 0ULL;
-    unsigned long long mLowFreeRam = 0ULL;
-    unsigned long long mVeryLowFreeRam = 0ULL;
+    unsigned long long mTotalRam = 0;
+    unsigned long long mLowFreeRam = 0;
+    unsigned long long mVeryLowFreeRam = 0;
     QTimer *mTimer;
 
-//    unsigned long long mUsedRam = 0ULL;
-//    unsigned long long mLeaveUnused = 1500000000ULL;
-
-//    unsigned long long mFreeRam;
-//    unsigned long long mTotalRam;
-//    unsigned long long mMemUnit;
     static MemoryChecker *mInstance;
     QList<int> mPgFltSamples;
-private slots:
+public slots:
     void checkMemory();
     void checkMajorMemoryPageFault();
 signals:

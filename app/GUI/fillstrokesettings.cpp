@@ -17,7 +17,6 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     QWidget(parent) {
     //setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mMainWindow = parent;
-    mUndoRedoSaveTimer = new QTimer(this);
 
     mGradientWidget = new GradientWidget(this, mMainWindow);
     mStrokeSettingsWidget = new QWidget(this);
@@ -196,7 +195,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mGradientTypeWidget->setLayout(mGradientTypeLayout);
 
     mBrushSettingsWidget = new QWidget(this);
-    QVBoxLayout* brushLayout = new QVBoxLayout(mBrushSettingsWidget);
+    const auto brushLayout = new QVBoxLayout(mBrushSettingsWidget);
     mBrushSettingsWidget->setLayout(brushLayout);
 
     const auto brushCurvesWidget = new QWidget(this);
@@ -369,23 +368,10 @@ void FillStrokeSettingsWidget::updateAfterTargetChanged() {
 
 void FillStrokeSettingsWidget::setCurrentPaintType(
         const PaintType &paintType) {
-    if(paintType == NOPAINT) {
-        setNoPaintType();
-    } else if(paintType == FLATPAINT) {
-        setFlatPaintType();
-    } else if(paintType == BRUSHPAINT) {
-        setBrushPaintType();
-    } else {
-        setGradientPaintType();
-    }
-}
-
-void FillStrokeSettingsWidget::setTransformFinishEmitter(const char *slot) {
-    mUndoRedoSaveTimer->disconnect();
-    connect(mUndoRedoSaveTimer, &QTimer::timeout,
-            this, &FillStrokeSettingsWidget::finishTransform);
-    connect(mUndoRedoSaveTimer, SIGNAL(timeout()),
-            this, slot);
+    if(paintType == NOPAINT) setNoPaintType();
+    else if(paintType == FLATPAINT) setFlatPaintType();
+    else if(paintType == BRUSHPAINT) setBrushPaintType();
+    else setGradientPaintType();
 }
 
 void FillStrokeSettingsWidget::setStrokeBrush(
@@ -479,17 +465,14 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
         RuntimeThrow("Invalid fill type.");
     }
 
-    bool isFill;
     PaintType currentPaintType;
     Gradient *currentGradient;
     Gradient::Type currentGradientType;
     if(mTarget == PaintSetting::FILL) {
-        isFill = true;
         currentPaintType = mCurrentFillPaintType;
         currentGradient = mCurrentFillGradient;
         currentGradientType = mCurrentFillGradientType;
     } else {
-        isFill = false;
         currentPaintType = mCurrentStrokePaintType;
         currentGradient = mCurrentStrokeGradient;
         currentGradientType = mCurrentStrokeGradientType;
@@ -509,21 +492,6 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
 
 void FillStrokeSettingsWidget::colorSettingReceived(
         const ColorSetting &colorSetting) {
-    bool isFill;
-    PaintType currentPaintType;
-    Gradient *currentGradient;
-    bool currentGradientType;
-    if(mTarget == PaintSetting::FILL) {
-        isFill = true;
-        currentPaintType = mCurrentFillPaintType;
-        currentGradient = mCurrentFillGradient;
-        currentGradientType = mCurrentFillGradientType;
-    } else {
-        isFill = false;
-        currentPaintType = mCurrentStrokePaintType;
-        currentGradient = mCurrentStrokeGradient;
-        currentGradientType = mCurrentStrokeGradientType;
-    }
     PaintSettingsApplier paintSetting;
     paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
     mCanvasWindow->applyPaintSettingToSelected(paintSetting);
@@ -675,27 +643,6 @@ void FillStrokeSettingsWidget::emitJoinStyleChanged() {
     mCanvasWindow->strokeJoinStyleChanged(mCurrentJoinStyle);
 }
 
-void FillStrokeSettingsWidget::finishTransform() {
-    if(mTransormStarted) mTransormStarted = false;
-}
-
-void FillStrokeSettingsWidget::startTransform(const char *slot) {
-    if(!mTransormStarted) {
-        mTransormStarted = true;
-        setTransformFinishEmitter(slot);
-    }
-    waitToSaveChanges();
-    /*if(mCurrentPaintType == GRADIENTPAINT) {
-        mGradientWidget->startGradientTransform();
-    } else {
-        if(mTargetId == 0) {
-            emit startFillSettingsTransform();
-        } else {
-            emit startStrokeSettingsTransform();
-        }
-    }*/
-}
-
 void FillStrokeSettingsWidget::applyGradient() {
     Gradient *currentGradient;
     Gradient::Type currentGradientType;
@@ -754,17 +701,6 @@ void FillStrokeSettingsWidget::setSquareCapStyle() {
 void FillStrokeSettingsWidget::setRoundCapStyle() {
     setCapStyle(Qt::RoundCap);
     emitCapStyleChanged();
-}
-
-void FillStrokeSettingsWidget::waitToSaveChanges() {
-    if(mUndoRedoSaveTimer->isActive()) {
-        mUndoRedoSaveTimer->setInterval(50);
-        return;
-    }
-    mUndoRedoSaveTimer->stop();
-    mUndoRedoSaveTimer->setInterval(50);
-    mUndoRedoSaveTimer->setSingleShot(true);
-    mUndoRedoSaveTimer->start();
 }
 
 void FillStrokeSettingsWidget::setFillTarget() {

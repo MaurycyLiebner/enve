@@ -81,11 +81,6 @@ private slots:
     void setSquareCapStyle();
     void setRoundCapStyle();
 
-    void waitToSaveChanges();
-
-    void finishTransform();
-    void startTransform(const char *slot);
-
     void setGradientFill();
     void setBrushFill();
     void setFlatFill();
@@ -95,15 +90,12 @@ private slots:
     void colorSettingReceived(const ColorSetting &colorSetting);
     void setCurrentColorMode(const ColorMode &mode);
 private:
-    void setTransformFinishEmitter(const char *slot);
     void applyGradient();
 
     CanvasWindow *mCanvasWindow;
 
     MainWindow *mMainWindow;
     bool mTransormStarted = false;
-
-    QTimer *mUndoRedoSaveTimer = nullptr;
 
     void connectGradient();
     void disconnectGradient();

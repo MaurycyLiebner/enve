@@ -5,30 +5,29 @@
 #include <QDebug>
 #include <stdio.h>
 #include <stdlib.h>
+#include "exceptions.h"
 
 MemoryChecker *MemoryChecker::mInstance;
 
 unsigned long long getTotalRam() {
-    FILE *meminfo = fopen("/proc/meminfo", "r");
-    if(!meminfo) return 0;
+    FILE * const meminfo = fopen("/proc/meminfo", "r");
+    if(meminfo) {
+        char line[256];
 
-    char line[256];
-
-    while(fgets(line, sizeof(line), meminfo)) {
-        int ram;
-        if(sscanf(line, "MemTotal: %d kB", &ram) == 1) {
-            fclose(meminfo);
-            return (unsigned long long)ram*1000ULL;
+        while(fgets(line, sizeof(line), meminfo)) {
+            int ram;
+            if(sscanf(line, "MemTotal: %d kB", &ram) == 1) {
+                fclose(meminfo);
+                return static_cast<unsigned long long>(ram)*1000;
+            }
         }
+        fclose(meminfo);
+        RuntimeThrow("Failed to properly parse /proc/meminfo for total memory check");
     }
-
-    // If we got here, then we couldn't find the proper line in the meminfo file:
-    // do something appropriate like return an error code, throw an exception, etc.
-    fclose(meminfo);
-    return 0;
+    RuntimeThrow("Failed to open /proc/meminfo for total memory check");
 }
 
-MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
+MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
     mInstance = this;
 
     mTotalRam = getTotalRam();
@@ -38,8 +37,6 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
 
 void MemoryChecker::setCurrentMemoryState(const MemoryState &state) {
     if(state == mCurrentMemoryState) return;
-//    qDebug() << "set state: " << state;
-    //bool worsend = state > mCurrentMemoryState;
     if(state == NORMAL_MEMORY_STATE) {
         mPgFltSamples.clear();
         mLastPgFlts = -1;
@@ -48,12 +45,12 @@ void MemoryChecker::setCurrentMemoryState(const MemoryState &state) {
 }
 
 unsigned long long getFreeRam() {
-    unsigned long long unmapped = 0ULL;
+    unsigned long long unmapped = 0;
     char buffer[1000];
     MallocExtension::instance()->GetStats(buffer, 1000);
 
-    QString allText = QString::fromUtf8(buffer);
-    QStringList lines = allText.split(QRegExp("\n|\r\n|\r"));
+    const QString allText = QString::fromUtf8(buffer);
+    const QStringList lines = allText.split(QRegExp("\n|\r\n|\r"));
     if(lines.count() > 9) {
         QString extract = lines.at(9);
         extract = extract.split('(').first();
@@ -72,40 +69,37 @@ unsigned long long getFreeRam() {
         }
     }
 
-    FILE *meminfo = fopen("/proc/meminfo", "r");
-    if(!meminfo) return 0;
+    FILE * const meminfo = fopen("/proc/meminfo", "r");
+    if(meminfo) {
+        char line[256];
+        unsigned long long ramULL = 0;
+        int found = 0;
+        while(fgets(line, sizeof(line), meminfo)) {
+            int ram;
+            if(sscanf(line, "MemFree: %d kB", &ram) == 1) {
+                ramULL += static_cast<unsigned long long>(ram)*1000;
+                found++;
+            } else if(sscanf(line, "Cached: %d kB", &ram) == 1) {
+                ramULL += static_cast<unsigned long long>(ram)*1000;
+                found++;
+            } else if(sscanf(line, "Buffers: %d kB", &ram) == 1) {
+                ramULL += static_cast<unsigned long long>(ram)*1000;
+                found++;
+            }
 
-    char line[256];
-    unsigned long long ramULL = 0;
-    int found = 0;
-    while(fgets(line, sizeof(line), meminfo)) {
-        int ram;
-        if(sscanf(line, "MemFree: %d kB", &ram) == 1) {
-            ramULL += (unsigned long long)ram*1000ULL;
-            found++;
-        } else if(sscanf(line, "Cached: %d kB", &ram) == 1) {
-            ramULL += (unsigned long long)ram*1000ULL;
-            found++;
-        } else if(sscanf(line, "Buffers: %d kB", &ram) == 1) {
-            ramULL += (unsigned long long)ram*1000ULL;
-            found++;
+            if(found >= 3) {
+                fclose(meminfo);
+                return ramULL + unmapped;
+            }
         }
-
-        if(found >= 3) {
-            fclose(meminfo);
-            return ramULL + unmapped;
-        }
+        fclose(meminfo);
+        RuntimeThrow("Failed to properly parse /proc/meminfo for free memory check");
     }
-
-    // If we got here, then we couldn't find the proper line in the meminfo file:
-    // do something appropriate like return an error code, throw an exception, etc.
-    fclose(meminfo);
-    return ramULL + unmapped;
+    RuntimeThrow("Failed to open /proc/meminfo for free memory check");
 }
 
 void MemoryChecker::checkMemory() {
-    unsigned long long freeMem = getFreeRam();
-    //qDebug() << "freemem: " << freeMem;
+    const auto freeMem = getFreeRam();
 
     if(freeMem < mLowFreeRam) {
         if(freeMem < mVeryLowFreeRam) {
@@ -113,40 +107,40 @@ void MemoryChecker::checkMemory() {
         } else {
             emit handleMemoryState(LOW_MEMORY_STATE, mLowFreeRam - freeMem);
         }
-        //setCurrentMemoryState(LOW_MEMORY_STATE);
     }
 
-    emit memoryChecked((int)(freeMem/1000ULL), (int)(mTotalRam/1000ULL));
+    const int freeMB = static_cast<int>(freeMem/1000);
+    const int totalMB = static_cast<int>(mTotalRam/1000);
+
+    emit memoryChecked(freeMB, totalMB);
 }
 
-unsigned long long getMajorPageFaults() {
-    FILE *meminfo = fopen("/proc/vmstat", "r");
-    if(!meminfo) return 0;
-
-    char line[256];
-    while(fgets(line, sizeof(line), meminfo)) {
-        int pgFlts;
-        if(sscanf(line, "pgmajfault %d", &pgFlts) == 1) {
-            fclose(meminfo);
-            return pgFlts;
+int getMajorPageFaults() {
+    FILE * const meminfo = fopen("/proc/vmstat", "r");
+    if(meminfo) {
+        char line[256];
+        while(fgets(line, sizeof(line), meminfo)) {
+            int pgFlts;
+            if(sscanf(line, "pgmajfault %d", &pgFlts) == 1) {
+                fclose(meminfo);
+                return pgFlts;
+            }
         }
+        fclose(meminfo);
+        RuntimeThrow("Failed to properly parse /proc/vmstat for page faults check");
     }
-
-    // If we got here, then we couldn't find the proper line in the meminfo file:
-    // do something appropriate like return an error code, throw an exception, etc.
-    fclose(meminfo);
-    return 0;
+    RuntimeThrow("Failed to open /proc/vmstat for page faults check");
 }
 
 void MemoryChecker::checkMajorMemoryPageFault() {
-    bool firstSample = mLastPgFlts == -1;
-    int pgFlts = getMajorPageFaults();
+    const bool firstSample = mLastPgFlts == -1;
+    const int pgFlts = getMajorPageFaults();
 
     if(firstSample) {
         mLastPgFlts = pgFlts;
         return;
     }
-    int relPgFlt = pgFlts - mLastPgFlts;
+    const int relPgFlt = pgFlts - mLastPgFlts;
     mLastPgFlts = pgFlts;
     if(mPgFltSamples.count() == 3) {
         mPgFltSamples.removeFirst();
@@ -157,7 +151,6 @@ void MemoryChecker::checkMajorMemoryPageFault() {
         avgPgFlts += sample;
     }
     avgPgFlts = avgPgFlts/mPgFltSamples.count();
-    //qDebug() << "avg pgflts: " << avgPgFlts;
     if(avgPgFlts > mCurrentMemoryState) {
         if(mCurrentMemoryState == LOW_MEMORY_STATE &&
                 avgPgFlts > VERY_LOW_MEMORY_STATE) {
@@ -168,9 +161,7 @@ void MemoryChecker::checkMajorMemoryPageFault() {
         }
     } else {
         if(mCurrentMemoryState == LOW_MEMORY_STATE) {
-            unsigned long long freeMem = getFreeRam();
-            //qDebug() << "freemem: " << freeMem;
-
+            const auto freeMem = getFreeRam();
             if(freeMem > mLowFreeRam) {
                 setCurrentMemoryState(NORMAL_MEMORY_STATE);
                 return;
