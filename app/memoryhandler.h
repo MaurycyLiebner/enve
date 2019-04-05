@@ -1,4 +1,4 @@
-#ifndef MEMORYHANDLER_H
+﻿#ifndef MEMORYHANDLER_H
 #define MEMORYHANDLER_H
 #include <QThread>
 #include "memorychecker.h"
@@ -7,12 +7,12 @@ class MinimalCacheContainer;
 class MemoryHandler : public QObject {
     Q_OBJECT
 public:
-    explicit MemoryHandler(QObject *parent = nullptr);
+    explicit MemoryHandler(QObject * const parent = nullptr);
     ~MemoryHandler();
 
-    void addContainer(MinimalCacheContainer *cont);
-    void removeContainer(MinimalCacheContainer *cont);
-    void containerUpdated(MinimalCacheContainer *cont);
+    void addContainer(MinimalCacheContainer * const cont);
+    void removeContainer(MinimalCacheContainer * const cont);
+    void containerUpdated(MinimalCacheContainer * const cont);
 
     static MemoryHandler *sGetInstance() { return sInstance; }
 signals:
@@ -23,7 +23,6 @@ public slots:
                     const unsigned long long &minFreeBytes);
     void memoryChecked(const int& memKb, const int &totMemKb);
 private:
-    bool mHddCache = true;
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     static MemoryHandler *sInstance;
     QTimer *mTimer;

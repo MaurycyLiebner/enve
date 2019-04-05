@@ -9,7 +9,7 @@
 MemoryHandler *MemoryHandler::sInstance;
 Q_DECLARE_METATYPE(MemoryState)
 
-MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
+MemoryHandler::MemoryHandler(QObject * const parent) : QObject(parent) {
     sInstance = this;
 
     mMemoryChekerThread = new QThread(this);
@@ -35,15 +35,15 @@ MemoryHandler::~MemoryHandler() {
     delete mMemoryChecker;
 }
 
-void MemoryHandler::addContainer(MinimalCacheContainer *cont) {
+void MemoryHandler::addContainer(MinimalCacheContainer * const cont) {
     mContainers << cont;
 }
 
-void MemoryHandler::removeContainer(MinimalCacheContainer *cont) {
+void MemoryHandler::removeContainer(MinimalCacheContainer * const cont) {
     mContainers.removeOne(cont);
 }
 
-void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
+void MemoryHandler::containerUpdated(MinimalCacheContainer * const cont) {
     removeContainer(cont);
     addContainer(cont);
 }
@@ -70,7 +70,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
     while(memToFree > 0 && !mContainers.isEmpty()) {
         const auto cont = mContainers.takeFirst();
         memToFree -= cont->getByteCount();
-        cont->freeAndRemove_k();
+        cont->freeFromMemory_k();
     }
     if(memToFree > 0 || state >= LOW_MEMORY_STATE)
         emit allMemoryUsed();
@@ -78,8 +78,8 @@ void MemoryHandler::freeMemory(const MemoryState &state,
 }
 
 void MemoryHandler::memoryChecked(const int &memKb, const int& totMemKb) {
-    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
+    const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
     if(!usageWidget) return;
-    MainWindow::getInstance()->getUsageWidget()->setTotalRam(totMemKb/1000000.);
-    MainWindow::getInstance()->getUsageWidget()->setRamUsage(-memKb/1000000.);
+    usageWidget->setTotalRam(totMemKb/1000000.);
+    usageWidget->setRamUsage(-memKb/1000000.);
 }

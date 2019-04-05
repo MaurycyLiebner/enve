@@ -99,7 +99,7 @@ public:
 protected:
     stdsptr<_HDDTask> createTmpFileDataSaver();
     stdsptr<_HDDTask> createTmpFileDataLoader();
-    void clearDataAfterSaved();
+    void clearMemory();
 
     stdsptr<Samples> mSamples;
 };

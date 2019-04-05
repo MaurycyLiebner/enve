@@ -31,7 +31,7 @@ protected:
     SoundContainerTmpFileDataSaver(const stdsptr<Samples> &samples,
                                    SoundCacheContainer *target);
 
-    bool mSavingFailed = false;
+    bool mSavingSuccessful = false;
     const stdptr<SoundCacheContainer> mTargetCont;
     stdsptr<Samples> mSamples;
     qsptr<QTemporaryFile> mTmpFile;

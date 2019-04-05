@@ -41,17 +41,12 @@ void SoundContainerTmpFileDataSaver::_processUpdate() {
         mTmpFile->write(rcChar(mSamples->fData), writeBytes);
 
         mTmpFile->close();
+        mSavingSuccessful = true;
     } else {
-        mSavingFailed = true;
+        mSavingSuccessful = false;
     }
 }
 
 void SoundContainerTmpFileDataSaver::afterProcessingFinished() {
-    if(mSavingFailed) {
-        if(!mTargetCont->freeAndRemove_k()) {
-
-        }
-    } else {
-        mTargetCont->setDataSavedToTmpFile(mTmpFile);
-    }
+    if(mSavingSuccessful) mTargetCont->setDataSavedToTmpFile(mTmpFile);
 }
