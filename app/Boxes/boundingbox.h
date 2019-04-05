@@ -378,7 +378,7 @@ public:
     DurationRectangle *getDurationRectangle();
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame) const;
     bool isRelFrameFVisibleAndInVisibleDurationRect(const qreal &relFrame) const;
-    bool prp_differencesBetweenRelFramesIncludingInherited(
+    bool diffsIncludingInherited(
             const int &relFrame1, const int &relFrame2);
 
     BoundingBoxRenderData *getCurrentRenderData(const int &relFrame);

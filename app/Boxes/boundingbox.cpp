@@ -275,17 +275,16 @@ void BoundingBox::startSelectedStrokeColorTransform() {}
 
 void BoundingBox::startSelectedFillColorTransform() {}
 
-bool BoundingBox::prp_differencesBetweenRelFramesIncludingInherited(
+bool BoundingBox::diffsIncludingInherited(
         const int &relFrame1, const int &relFrame2) {
-    bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
+    const bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
     if(!mParentGroup || diffThis) return diffThis;
-    int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
-    int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
-    int parentRelFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+    const int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
+    const int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
+    const int parentRelFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
+    const int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
 
-    bool diffInherited =
-            mParentGroup->prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
+    const bool diffInherited = mParentGroup->diffsAffectingContainedBoxes(
                 parentRelFrame1, parentRelFrame2);
     return diffThis || diffInherited;
 }
@@ -430,7 +429,7 @@ BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
         currentRenderData = mDrawRenderContainer.getSrcRenderData();
         if(!currentRenderData) return nullptr;
 //        if(currentRenderData->fRelFrame == relFrame) {
-        if(!prp_differencesBetweenRelFramesIncludingInherited(
+        if(!diffsIncludingInherited(
                     currentRenderData->fRelFrame, relFrame)) {
             auto copy = currentRenderData->makeCopy();
             copy->fRelFrame = relFrame;

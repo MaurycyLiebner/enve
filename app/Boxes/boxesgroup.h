@@ -133,7 +133,7 @@ public:
 
     void schedulerProccessed();
 
-    bool prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
+    bool diffsAffectingContainedBoxes(
             const int &relFrame1, const int &relFrame2);
     const QList<qsptr<BoundingBox> > &getContainedBoxesList() const;
     void readChildBoxes(QIODevice *target);

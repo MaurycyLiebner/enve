@@ -309,7 +309,7 @@ QRectF BoxesGroup::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     return toQRectF(boundingPaths.computeTightBounds());
 }
 
-bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
+bool BoxesGroup::diffsAffectingContainedBoxes(
         const int &relFrame1, const int &relFrame2) {
     const auto idRange = BoundingBox::prp_getIdenticalRelFrameRange(relFrame1);
     const bool diffThis = !idRange.inRange(relFrame2);
@@ -320,7 +320,7 @@ bool BoxesGroup::prp_differencesBetweenRelFramesIncludingInheritedExcludingConta
     const int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
 
     const bool diffInherited =
-            mParentGroup->prp_differencesBetweenRelFramesIncludingInheritedExcludingContainedBoxes(
+            mParentGroup->diffsAffectingContainedBoxes(
                 parentRelFrame1, parentRelFrame2);
     return diffThis || diffInherited;
 }

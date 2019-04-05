@@ -21,7 +21,6 @@ private:
     void setCurrentMemoryState(const MemoryState &state);
 
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
-    int mLastPgFlts = -1;
 
     unsigned long long mTotalRam = 0;
     unsigned long long mLowFreeRam = 0;
@@ -29,10 +28,8 @@ private:
     QTimer *mTimer;
 
     static MemoryChecker *mInstance;
-    QList<int> mPgFltSamples;
 public slots:
     void checkMemory();
-    void checkMajorMemoryPageFault();
 signals:
     void memoryChecked(const int&, const int&);
     void handleMemoryState(const MemoryState &,

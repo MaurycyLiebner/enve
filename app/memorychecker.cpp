@@ -6,8 +6,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "exceptions.h"
-
+#include <fstream>
+#include <unistd.h>
 MemoryChecker *MemoryChecker::mInstance;
+
+void getProcessUsedRam(double& vm_usage, double& resident_set) {
+    vm_usage = 0;
+    resident_set = 0;
+
+    // the two fields we want
+    unsigned long vsize;
+    long rss;
+    {
+        std::string ignore;
+        std::ifstream ifs("/proc/self/stat", std::ios_base::in);
+        ifs >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
+                >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
+                >> ignore >> ignore >> vsize >> rss;
+    }
+
+    // in case x86-64 is configured to use 2MB pages
+    const long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024;
+    vm_usage = vsize / 1024.;
+    resident_set = rss * page_size_kb;
+}
 
 unsigned long long getTotalRam() {
     FILE * const meminfo = fopen("/proc/meminfo", "r");
@@ -37,10 +59,6 @@ MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
 
 void MemoryChecker::setCurrentMemoryState(const MemoryState &state) {
     if(state == mCurrentMemoryState) return;
-    if(state == NORMAL_MEMORY_STATE) {
-        mPgFltSamples.clear();
-        mLastPgFlts = -1;
-    }
     mCurrentMemoryState = state;
 }
 
@@ -102,10 +120,11 @@ void MemoryChecker::checkMemory() {
     const auto freeMem = getFreeRam();
 
     if(freeMem < mLowFreeRam) {
+        const auto toFree = mLowFreeRam - freeMem;
         if(freeMem < mVeryLowFreeRam) {
-            emit handleMemoryState(VERY_LOW_MEMORY_STATE, mLowFreeRam - freeMem);
+            emit handleMemoryState(VERY_LOW_MEMORY_STATE, toFree);
         } else {
-            emit handleMemoryState(LOW_MEMORY_STATE, mLowFreeRam - freeMem);
+            emit handleMemoryState(LOW_MEMORY_STATE, toFree);
         }
     }
 
@@ -113,61 +132,4 @@ void MemoryChecker::checkMemory() {
     const int totalMB = static_cast<int>(mTotalRam/1000);
 
     emit memoryChecked(freeMB, totalMB);
-}
-
-int getMajorPageFaults() {
-    FILE * const meminfo = fopen("/proc/vmstat", "r");
-    if(meminfo) {
-        char line[256];
-        while(fgets(line, sizeof(line), meminfo)) {
-            int pgFlts;
-            if(sscanf(line, "pgmajfault %d", &pgFlts) == 1) {
-                fclose(meminfo);
-                return pgFlts;
-            }
-        }
-        fclose(meminfo);
-        RuntimeThrow("Failed to properly parse /proc/vmstat for page faults check");
-    }
-    RuntimeThrow("Failed to open /proc/vmstat for page faults check");
-}
-
-void MemoryChecker::checkMajorMemoryPageFault() {
-    const bool firstSample = mLastPgFlts == -1;
-    const int pgFlts = getMajorPageFaults();
-
-    if(firstSample) {
-        mLastPgFlts = pgFlts;
-        return;
-    }
-    const int relPgFlt = pgFlts - mLastPgFlts;
-    mLastPgFlts = pgFlts;
-    if(mPgFltSamples.count() == 3) mPgFltSamples.removeFirst();
-    mPgFltSamples << relPgFlt;
-    int avgPgFlts = 0;
-    for(const int &sample : mPgFltSamples) avgPgFlts += sample;
-    avgPgFlts = avgPgFlts/mPgFltSamples.count();
-    if(avgPgFlts > mCurrentMemoryState) {
-        if(mCurrentMemoryState == LOW_MEMORY_STATE &&
-                avgPgFlts > VERY_LOW_MEMORY_STATE) {
-            setCurrentMemoryState(VERY_LOW_MEMORY_STATE);
-        } else if(mCurrentMemoryState == VERY_LOW_MEMORY_STATE &&
-                  avgPgFlts > CRITICAL_MEMORY_STATE) {
-            setCurrentMemoryState(CRITICAL_MEMORY_STATE);
-        }
-    } else {
-        if(mCurrentMemoryState == LOW_MEMORY_STATE) {
-            const auto freeMem = getFreeRam();
-            if(freeMem > mLowFreeRam) {
-                setCurrentMemoryState(NORMAL_MEMORY_STATE);
-                return;
-            }
-        } else if(mCurrentMemoryState == VERY_LOW_MEMORY_STATE) {
-            setCurrentMemoryState(LOW_MEMORY_STATE);
-        } else if(mCurrentMemoryState == CRITICAL_MEMORY_STATE) {
-            setCurrentMemoryState(VERY_LOW_MEMORY_STATE);
-        }
-    }
-
-    emit handleMemoryState(mCurrentMemoryState, mLowFreeRam);
 }

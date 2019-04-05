@@ -24,7 +24,7 @@ MemoryHandler::MemoryHandler(QObject * const parent) : QObject(parent) {
     mTimer = new QTimer(this);
     connect(mTimer, &QTimer::timeout,
             mMemoryChecker, &MemoryChecker::checkMemory);
-    mTimer->start(500);
+    mTimer->start(1000);
     mMemoryChekerThread->start();
 }
 
@@ -52,14 +52,8 @@ void MemoryHandler::freeMemory(const MemoryState &state,
                                const unsigned long long &minFreeBytes) {
     if(state != mCurrentMemoryState) {
         if(state == NORMAL_MEMORY_STATE) {
-            disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
-            connect(mTimer, &QTimer::timeout,
-                    mMemoryChecker, &MemoryChecker::checkMemory);
             mTimer->setInterval(1000);
         } else if(mCurrentMemoryState == NORMAL_MEMORY_STATE) {
-            disconnect(mTimer, nullptr, mMemoryChecker, nullptr);
-            connect(mTimer, &QTimer::timeout,
-                    mMemoryChecker, &MemoryChecker::checkMajorMemoryPageFault);
             mTimer->setInterval(500);
         }
         mCurrentMemoryState = state;
@@ -72,8 +66,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
         memToFree -= cont->getByteCount();
         cont->freeFromMemory_k();
     }
-    if(memToFree > 0 || state >= LOW_MEMORY_STATE)
-        emit allMemoryUsed();
+    if(memToFree > 0 || state > LOW_MEMORY_STATE) emit allMemoryUsed();
     emit memoryFreed();
 }
 
