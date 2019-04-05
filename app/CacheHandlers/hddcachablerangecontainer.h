@@ -8,10 +8,10 @@ class _ScheduledTask;
 template <typename T>
 class HDDCachableRangeContainer : public RangeCacheContainer {
 protected:
-    typedef MinimalCacheHandler<T> Handler;
     HDDCachableRangeContainer() :
         mParentCacheHandler_k(nullptr) {}
-    HDDCachableRangeContainer(const FrameRange &range, Handler * const parent) :
+    HDDCachableRangeContainer(const FrameRange &range,
+                              RangeCacheHandler * const parent) :
         RangeCacheContainer(range), mParentCacheHandler_k(parent) {}
     virtual stdsptr<_HDDTask> createTmpFileDataSaver() = 0;
     virtual stdsptr<_HDDTask> createTmpFileDataLoader() = 0;
@@ -22,7 +22,7 @@ public:
     }
 
     _ScheduledTask* scheduleLoadFromTmpFile() {
-        if(!mNoDataInMemory || !mTmpFile) return nullptr;
+        if(storesDataInMemory() || !mTmpFile) return nullptr;
         if(mLoadingUpdatable) return mLoadingUpdatable.get();
 
         mLoadingUpdatable = createTmpFileDataLoader();
@@ -30,31 +30,18 @@ public:
         return mLoadingUpdatable.get();
     }
 
-    void setBlocked(const bool &bT) {
-        if(bT == mBlocked) return;
-        mBlocked = bT;
-        if(bT) {
-            if(mNoDataInMemory) {
-                scheduleLoadFromTmpFile();
-            } else {
-                MemoryHandler::sGetInstance()->removeContainer(this);
-            }
-        } else {
-            MemoryHandler::sGetInstance()->addContainer(this);
-        }
-    }
-
-    bool freeAndRemove() {
-        if(mBlocked) return false;
+    bool freeAndRemove_k() {
+        if(blocked()) return false;
         mParentCacheHandler_k->removeRenderContainer(ref<T>());
         return true;
     }
 
-    bool freeFromMemory() {
+    bool freeFromMemory_k() {
+        if(blocked()) return false;
         if(mTmpFile) {
-            if(!mBlocked) MemoryHandler::sGetInstance()->removeContainer(this);
+            if(!blocked()) removeFromMemoryManagment();
             clearDataAfterSaved();
-        } else return freeAndRemove();
+        } else return freeAndRemove_k();
         return true;
     }
 
@@ -77,32 +64,25 @@ public:
         mTmpFile = tmpFile;
     }
 
-    bool storesDataInMemory() const {
-        return !mNoDataInMemory;
-    }
 protected:
     void afterDataLoadedFromTmpFile() {
-        mNoDataInMemory = false;
+        setDataInMemory(true);
         mLoadingUpdatable.reset();
-        if(!mBlocked) MemoryHandler::sGetInstance()->addContainer(this);
+        if(!blocked()) addToMemoryManagment();
     }
 
     void afterDataReplaced() {
-        if(mNoDataInMemory) {
-            mNoDataInMemory = false;
-            if(!mBlocked) MemoryHandler::sGetInstance()->addContainer(this);
-        }
+        setDataInMemory(true);
+        updateInMemoryManagment();
         if(mTmpFile) scheduleDeleteTmpFile();
     }
 
+    qsptr<QTemporaryFile> mTmpFile;
+private:
     stdsptr<_ScheduledTask> mLoadingUpdatable;
     stdsptr<_ScheduledTask> mSavingUpdatable;
 
-    qsptr<QTemporaryFile> mTmpFile;
-
-    bool mNoDataInMemory = false;
-
-    Handler * const mParentCacheHandler_k;
+    RangeCacheHandler * const mParentCacheHandler_k;
 };
 
 #endif // HDDCACHABLERANGECONTAINER_H

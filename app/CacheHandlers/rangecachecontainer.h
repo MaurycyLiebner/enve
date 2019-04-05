@@ -5,11 +5,11 @@
 
 class RangeCacheContainer : public MinimalCacheContainer {
 public:
-    const int &getRangeMin() const;
+    int getRangeMin() const;
     const FrameRange& getRange() const {
         return mRange;
     }
-    const int &getRangeMax() const;
+    int getRangeMax() const;
     int rangeSpan() const {
         return mRange.span();
     }
@@ -19,12 +19,21 @@ public:
     void setRangeMin(const int &min);
     void setRange(const FrameRange &range);
     bool inRange(const int &unary) const;
+
+    void setDataInMemory(const bool& dataInMemory) {
+        mDataInMemory = dataInMemory;
+    }
+
+    bool storesDataInMemory() const {
+        return mDataInMemory;
+    }
 protected:
     RangeCacheContainer() {}
     RangeCacheContainer(const FrameRange &range) :
         mRange(range) {}
 private:
     FrameRange mRange{0, 0};
+    bool mDataInMemory = false;
 };
 
 #endif // RANGECACHECONTAINER_H

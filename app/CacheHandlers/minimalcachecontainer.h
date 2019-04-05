@@ -8,24 +8,31 @@ protected:
 public:
     ~MinimalCacheContainer();
 
-    virtual bool freeAndRemove() = 0;
-    virtual bool freeFromMemory() {
-        return freeAndRemove();
+    virtual bool freeAndRemove_k() = 0;
+    virtual bool freeFromMemory_k() {
+        return freeAndRemove_k();
     }
     virtual int getByteCount() = 0;
 
-    virtual void setBlocked(const bool &bT) {
+    void setBlocked(const bool &bT) {
+        if(bT == mBlocked) return;
         mBlocked = bT;
+        if(mBlocked) removeFromMemoryManagment();
+        else addToMemoryManagment();
     }
 
-    void setHandledByMemoryHanlder(const bool &bT) {
-        mHandledByMemoryHandler = bT;
-    }
-
-    const bool &handledByMemoryHandler() {
+    bool handledByMemoryHandler() const {
         return mHandledByMemoryHandler;
     }
+
+    bool blocked() const {
+        return mBlocked;
+    }
 protected:
+    void addToMemoryManagment();
+    void removeFromMemoryManagment();
+    void updateInMemoryManagment();
+private:
     bool mHandledByMemoryHandler = false;
     bool mBlocked = false;
 };

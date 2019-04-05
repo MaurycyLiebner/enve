@@ -6,12 +6,12 @@
 ImageCacheContainer::ImageCacheContainer() : Base() {}
 
 ImageCacheContainer::ImageCacheContainer(const FrameRange &range,
-                                         Handler * const parent) :
+                                         RangeCacheHandler * const parent) :
     Base(range, parent) {}
 
 ImageCacheContainer::ImageCacheContainer(const sk_sp<SkImage> &img,
                                          const FrameRange &range,
-                                         Handler * const parent) :
+                                         RangeCacheHandler * const parent) :
     ImageCacheContainer(range, parent) {
     replaceImageSk(img);
 }
@@ -36,7 +36,7 @@ sk_sp<SkImage> ImageCacheContainer::getImageSk() {
 }
 
 void ImageCacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
-    mImageSk = img;
+    replaceImageSk(img);
 
     if(mTmpLoadTargetCanvas) {
         mTmpLoadTargetCanvas->setCurrentPreviewContainer(
@@ -59,6 +59,7 @@ void ImageCacheContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
 
 void ImageCacheContainer::clearDataAfterSaved() {
     mImageSk.reset();
+    setDataInMemory(false);
 }
 
 void ImageCacheContainer::setLoadTargetCanvas(Canvas *canvas) {

@@ -5,10 +5,7 @@ template <typename T>
 class HDDCachableRangeContainer;
 
 template <typename T>
-class HDDCachableCacheHandler : public MinimalCacheHandler<T> {
-    static_assert(std::is_base_of<HDDCachableRangeContainer<T>, T>::value,
-                  "HDDCachableCacheHandler can be used only with HDDCachableRangeContainer derived classes");
-
+class HDDCachableCacheHandler : public RangeCacheHandler {
 public:
     int getFirstEmptyOrCachedFrameAfterFrame(
             const int &frame,
@@ -16,7 +13,7 @@ public:
         int currFrame = frame + 1;
         T *cont = nullptr;
         while(true) {
-            cont = this->getRenderContainerAtRelFrame(currFrame);
+            cont = this->getRenderContainerAtRelFrame<T>(currFrame);
             if(!cont) break;
             if(!cont->storesDataInMemory()) break;
             currFrame = cont->getRangeMax() + 1;

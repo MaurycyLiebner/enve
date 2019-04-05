@@ -347,7 +347,7 @@ void TilesData::afterSavedToTmpFile() {
     mDataStoredInTmpFile = true;
 }
 
-bool TilesData::freeAndRemove() {
+bool TilesData::freeAndRemove_k() {
     return false;
 }
 

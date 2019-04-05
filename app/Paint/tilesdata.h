@@ -40,7 +40,7 @@ public:
 
     void dataChanged();
 
-    bool freeAndRemove();
+    bool freeAndRemove_k();
 
     int getByteCount();
 

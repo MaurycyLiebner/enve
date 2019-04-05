@@ -21,7 +21,8 @@ protected:
         float * data = nullptr;
         gDecodeSoundDataRange(mFilePath.toLatin1().data(), range, data);
         auto samples = SPtrCreate(Samples)(data, range.span());
-        createNewRenderContainerAtRelFrame(range, samples);
+        createNewRenderContainerAtRelFrame
+                <SoundCacheContainer>(range, samples);
     }
 
     void merge(const stdptrSCC& a, const stdptrSCC& b) {
@@ -30,7 +31,7 @@ protected:
         stdptrSCC bS = b;
         removeRenderContainer(a);
         removeRenderContainer(b);
-        auto cont = SoundCacheContainer::sCreateMerge(aS, bS, this);
+        const auto cont = SoundCacheContainer::sCreateMerge(aS, bS, this);
         auto frameRange = cont->getRange();
         int contId = getRenderContainterInsertIdAtRelFrame(frameRange.fMin);
         mRenderContainers.insert(contId, cont);
@@ -42,7 +43,8 @@ protected:
             const auto& b = mRenderContainers.at(i + 1);
 
             if(a->getRange().neighbours(b->getRange())) {
-                merge(a, b); i--;
+                merge(GetAsSPtr(a, SoundCacheContainer),
+                      GetAsSPtr(b, SoundCacheContainer)); i--;
             }
         }
     }

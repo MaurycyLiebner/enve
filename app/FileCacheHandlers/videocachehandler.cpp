@@ -19,16 +19,16 @@ VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
 }
 
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
-    ImageCacheContainer *cont = mFramesCache.getRenderContainerAtRelFrame(relFrame);
+    const auto cont = mFramesCache.getRenderContainerAtRelFrame
+            <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     //cont->neededInMemory();
     return cont->getImageSk();
 }
 
 sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int& relFrame) {
-    ImageCacheContainer *cont =
-            mFramesCache.getRenderContainerAtOrBeforeRelFrame(
-                relFrame);
+    const auto cont = mFramesCache.getRenderContainerAtOrBeforeRelFrame
+            <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     //cont->neededInMemory();
     return cont->getImageSk();
@@ -286,12 +286,14 @@ void VideoCacheHandler::afterProcessingFinished() {
         int frameId = mFramesBeingLoaded.at(i);
         sk_sp<SkImage> imgT = mLoadedFrames.at(i);
         if(imgT) {
-            mFramesCache.createNewRenderContainerAtRelFrame(frameId, imgT);
+            mFramesCache.createNewRenderContainerAtRelFrame
+                    <ImageCacheContainer>(frameId, imgT);
         } else {
             mFramesCount = frameId;
             for(const auto &box : mDependentBoxes) {
                 if(!box) continue;
-                GetAsPtr(box, VideoBox)->updateDurationRectangleAnimationRange();
+                const auto vidBox = GetAsPtr(box, VideoBox);
+                vidBox->updateDurationRectangleAnimationRange();
             }
         }
     }
@@ -330,8 +332,8 @@ _ScheduledTask* VideoCacheHandler::scheduleFrameLoad(
     if(mFramesLoadScheduled.contains(frame) ||
        mFramesBeingLoadedGUI.contains(frame)) return this;
     //    qDebug() << "schedule frame load: " << frame;
-    ImageCacheContainer *contAtFrame =
-            mFramesCache.getRenderContainerAtRelFrame(frame);
+    const auto contAtFrame = mFramesCache.getRenderContainerAtRelFrame
+            <ImageCacheContainer>(frame);
     if(contAtFrame) {
         return contAtFrame->scheduleLoadFromTmpFile();
     } else {

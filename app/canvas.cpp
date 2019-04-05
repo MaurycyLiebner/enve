@@ -421,6 +421,9 @@ void Canvas::setLoadingPreviewContainer(
     }
     mLoadingPreviewContainer = cont;
     cont->setLoadTargetCanvas(this);
+    if(!cont->storesDataInMemory()) {
+        cont->scheduleLoadFromTmpFile();
+    }
     mLoadingPreviewContainer->setBlocked(true);
 }
 
@@ -437,12 +440,13 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     //qDebug() << renderData->fRelFrame;
     auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
-    auto cont = mCacheHandler.getRenderContainerAtRelFrame(range.fMin);
+    auto cont = mCacheHandler.getRenderContainerAtRelFrame
+            <ImageCacheContainer>(range.fMin);
     if(cont) {
         cont->replaceImageSk(renderData->fRenderedImage);
     } else {
-        cont = mCacheHandler.createNewRenderContainerAtRelFrame(
-                    range, renderData->fRenderedImage);
+        cont = mCacheHandler.createNewRenderContainerAtRelFrame
+                <ImageCacheContainer>(range, renderData->fRenderedImage);
     }
     //cont->setRelFrameRange(range);
     if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
@@ -765,8 +769,8 @@ void Canvas::anim_setAbsFrame(const int &frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
     int lastRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
-    ImageCacheContainer * const cont =
-            mCacheHandler.getRenderContainerAtRelFrame(anim_getCurrentRelFrame());
+    const auto cont = mCacheHandler.getRenderContainerAtRelFrame
+            <ImageCacheContainer>(anim_getCurrentRelFrame());
     if(cont) {
         if(cont->storesDataInMemory()) { // !!!
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));

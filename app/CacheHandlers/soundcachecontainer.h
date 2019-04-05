@@ -22,6 +22,12 @@ class SoundCacheContainer :
     friend class StdSelfRef;
     typedef HDDCachableRangeContainer<SoundCacheContainer> Base;
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
+protected:
+    SoundCacheContainer(const FrameRange &range,
+                        RangeCacheHandler * const parent);
+    SoundCacheContainer(const stdsptr<Samples>& samples,
+                        const FrameRange &range,
+                        RangeCacheHandler * const parent);
 public:
     int getByteCount() {
         if(!mSamples) return 0;
@@ -36,7 +42,7 @@ public:
     }
 
     void setDataLoadedFromTmpFile(const stdsptr<Samples> &samples) {
-        mSamples = samples;
+        replaceSamples(samples);
         afterDataLoadedFromTmpFile();
     }
 
@@ -50,7 +56,7 @@ public:
     static stdptrSCC sCreateMerge(
             const stdptrSCC& a,
             const stdptrSCC& b,
-            Handler * const parent) {
+            RangeCacheHandler * const parent) {
         const bool aFirst = a->getRange() < b->getRange();
         const auto& first = aFirst ? a : b;
         const auto& second = aFirst ? b : a;
@@ -62,7 +68,7 @@ public:
     //! @brief Provided list has to be an array of neighbours.
     //! Assumes all data is stored in memory (not cached to HDD)
     static stdptrSCC sCreateMerge(const QList<stdptrSCC>& toMerge,
-                                  Handler * const parent) {
+                                  RangeCacheHandler * const parent) {
         if(toMerge.isEmpty()) return nullptr;
         SampleRange lastRange = toMerge.first()->getRange();
         Q_ASSERT(toMerge.first()->storesDataInMemory());
@@ -90,12 +96,6 @@ public:
         return SPtrCreate(SoundCacheContainer)(samples, newRange,
                                                parent);
     }
-protected:
-    SoundCacheContainer(const FrameRange &range,
-                        Handler * const parent);
-    SoundCacheContainer(const stdsptr<Samples>& samples,
-                        const FrameRange &range,
-                        Handler * const parent);
 protected:
     stdsptr<_HDDTask> createTmpFileDataSaver();
     stdsptr<_HDDTask> createTmpFileDataLoader();

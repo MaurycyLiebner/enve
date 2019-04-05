@@ -48,7 +48,7 @@ void SoundContainerTmpFileDataSaver::_processUpdate() {
 
 void SoundContainerTmpFileDataSaver::afterProcessingFinished() {
     if(mSavingFailed) {
-        if(!mTargetCont->freeAndRemove()) {
+        if(!mTargetCont->freeAndRemove_k()) {
 
         }
     } else {

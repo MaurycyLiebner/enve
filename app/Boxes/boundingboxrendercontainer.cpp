@@ -63,9 +63,6 @@ const qreal &RenderContainer::getResolutionFraction() const {
 }
 
 void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
-    mNoDataInMemory = false;
-    scheduleDeleteTmpFile();
-
     mTransform = data->fTransform;
     mResolutionFraction = data->fResolution;
     mImageSk = data->fRenderedImage;
@@ -74,5 +71,5 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.reset();
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
     mSrcRenderData = GetAsSPtr(data, BoundingBoxRenderData);
-    MemoryHandler::sGetInstance()->containerUpdated(this);
+    afterDataReplaced();
 }

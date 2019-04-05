@@ -11,10 +11,10 @@ class ImageCacheContainer :
 protected:
     ImageCacheContainer();
     ImageCacheContainer(const FrameRange& range,
-                        Handler * const parent);
+                        RangeCacheHandler * const parent);
     ImageCacheContainer(const sk_sp<SkImage>& img,
                         const FrameRange &range,
-                        Handler * const parent);
+                        RangeCacheHandler * const parent);
     stdsptr<_HDDTask> createTmpFileDataSaver();
     stdsptr<_HDDTask> createTmpFileDataLoader();
     void clearDataAfterSaved();

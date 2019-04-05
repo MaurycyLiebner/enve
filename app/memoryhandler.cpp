@@ -36,16 +36,11 @@ MemoryHandler::~MemoryHandler() {
 }
 
 void MemoryHandler::addContainer(MinimalCacheContainer *cont) {
-    if(cont->handledByMemoryHandler()) return;
     mContainers << cont;
-    cont->setHandledByMemoryHanlder(true);
 }
 
 void MemoryHandler::removeContainer(MinimalCacheContainer *cont) {
-    if(cont->handledByMemoryHandler()) {
-        mContainers.removeOne(cont);
-        cont->setHandledByMemoryHanlder(false);
-    }
+    mContainers.removeOne(cont);
 }
 
 void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
@@ -75,7 +70,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
     while(memToFree > 0 && !mContainers.isEmpty()) {
         const auto cont = mContainers.takeFirst();
         memToFree -= cont->getByteCount();
-        cont->freeAndRemove();
+        cont->freeAndRemove_k();
     }
     if(memToFree > 0 || state >= LOW_MEMORY_STATE)
         emit allMemoryUsed();

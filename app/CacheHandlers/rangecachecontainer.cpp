@@ -1,10 +1,10 @@
 #include "rangecachecontainer.h"
 
-const int &RangeCacheContainer::getRangeMin() const {
+int RangeCacheContainer::getRangeMin() const {
     return mRange.fMin;
 }
 
-const int &RangeCacheContainer::getRangeMax() const {
+int RangeCacheContainer::getRangeMax() const {
     return mRange.fMax;
 }
 
