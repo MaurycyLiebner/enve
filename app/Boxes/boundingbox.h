@@ -435,8 +435,7 @@ protected:
     QList<qptr<BoundingBox>> mLinkingBoxes;
 
     RenderDataHandler mCurrentRenderDataHandler;
-    const stdsptr<RenderContainer> mDrawRenderContainer =
-            SPtrCreate(RenderContainer)();
+    RenderContainer mDrawRenderContainer;
 
     qsptr<DurationRectangle> mDurationRectangle;
     const qsptr<BoxTransformAnimator> mTransformAnimator;

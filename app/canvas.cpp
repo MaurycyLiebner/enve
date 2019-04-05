@@ -450,7 +450,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     //cont->setRelFrameRange(range);
     if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
-        auto currentRenderData = mDrawRenderContainer->getSrcRenderData();
+        auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
         bool newerSate = true;
         bool closerFrame = true;
         if(currentRenderData) {
@@ -463,14 +463,14 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             closerFrame = finishedFrameDist < oldFrameDist;
         }
         if(newerSate || closerFrame) {
-            mDrawRenderContainer->setSrcRenderData(renderData);
+            mDrawRenderContainer.setSrcRenderData(renderData);
             const bool currentState =
                     renderData->fBoxStateId == mStateId;
             const bool currentFrame =
                     renderData->fRelFrame == anim_getCurrentRelFrame();
-            mDrawRenderContainer->setExpired(!currentState || !currentFrame);
+            mDrawRenderContainer.setExpired(!currentState || !currentFrame);
             mCurrentPreviewContainerOutdated =
-                    mDrawRenderContainer->isExpired();
+                    mDrawRenderContainer.isExpired();
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
         }
     } else if(mPreviewing) {

@@ -212,7 +212,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                GrContext* const grContext) {
     if(mTransformAnimator->getOpacity() < 0.001) { return; }
     //paint->setFilterQuality(kHigh_SkFilterQuality);
-    mDrawRenderContainer->drawSk(canvas, paint, grContext);
+    mDrawRenderContainer.drawSk(canvas, paint, grContext);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
@@ -381,7 +381,7 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
                                  const UpdateReason& reason) {
     if(!shouldScheduleUpdate()) return;
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
-    mDrawRenderContainer->setExpired(true);
+    mDrawRenderContainer.setExpired(true);
     auto currentRenderData = getCurrentRenderData(relFrame);
     if(currentRenderData) {
         if(currentRenderData->fRedo) return;
@@ -426,8 +426,8 @@ BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
     BoundingBoxRenderData* currentRenderData =
             mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
     if(!currentRenderData) {
-        if(mDrawRenderContainer->isExpired()) return nullptr;
-        currentRenderData = mDrawRenderContainer->getSrcRenderData();
+        if(mDrawRenderContainer.isExpired()) return nullptr;
+        currentRenderData = mDrawRenderContainer.getSrcRenderData();
         if(!currentRenderData) return nullptr;
 //        if(currentRenderData->fRelFrame == relFrame) {
         if(!prp_differencesBetweenRelFramesIncludingInherited(
@@ -779,7 +779,7 @@ QPointF BoundingBox::getAbsolutePos() const {
 
 void BoundingBox::updateDrawRenderContainerTransform() {
     if(mNReasonsNotToApplyUglyTransform == 0) {
-        mDrawRenderContainer->updatePaintTransformGivenNewTotalTransform(
+        mDrawRenderContainer.updatePaintTransformGivenNewTotalTransform(
                     mTransformAnimator->getTotalTransform());
     }
 }
@@ -1396,7 +1396,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(renderData->fRedo) {
         scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
-    auto currentRenderData = mDrawRenderContainer->getSrcRenderData();
+    auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
     bool newerSate = true;
     bool closerFrame = true;
     if(currentRenderData) {
@@ -1409,11 +1409,11 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
         closerFrame = finishedFrameDist < oldFrameDist;
     }
     if(newerSate || closerFrame) {
-        mDrawRenderContainer->setSrcRenderData(renderData);
+        mDrawRenderContainer.setSrcRenderData(renderData);
         const bool currentState = renderData->fBoxStateId == mStateId;
         const bool currentFrame = renderData->fRelFrame == anim_getCurrentRelFrame();
         const bool expired = !currentState || !currentFrame;
-        mDrawRenderContainer->setExpired(expired);
+        mDrawRenderContainer.setExpired(expired);
         if(expired) updateDrawRenderContainerTransform();
     }
 }

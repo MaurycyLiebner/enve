@@ -15,11 +15,10 @@ class Canvas;
 class RenderCacheHandler;
 struct BoundingBoxRenderData;
 
-class RenderContainer : public ImageCacheContainer {
-    friend class StdSelfRef;
-protected:
-    RenderContainer() : ImageCacheContainer({0, 0}, nullptr) {}
+class RenderContainer {
 public:
+    RenderContainer() {}
+
     void drawSk(SkCanvas * const canvas, SkPaint *paint,
                 GrContext* const grContext);
 
@@ -60,6 +59,7 @@ protected:
     QMatrix mTransform;
     QMatrix mPaintTransform;
     stdsptr<BoundingBoxRenderData> mSrcRenderData;
+    sk_sp<SkImage> mImageSk;
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H
