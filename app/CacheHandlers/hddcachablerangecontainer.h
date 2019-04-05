@@ -9,8 +9,6 @@ template <typename T>
 class HDDCachableRangeContainer : public RangeCacheContainer {
     friend class SoundContainerTmpFileDataSaver;
 protected:
-    HDDCachableRangeContainer() :
-        mParentCacheHandler_k(nullptr) {}
     HDDCachableRangeContainer(const FrameRange &range,
                               RangeCacheHandler * const parent) :
         RangeCacheContainer(range), mParentCacheHandler_k(parent) {}

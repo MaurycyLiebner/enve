@@ -3,6 +3,8 @@
 #include "hddcachablerangecontainer.h"
 
 struct Samples : public StdSelfRef {
+    friend class StdSelfRef;
+protected:
     Samples() : fData(nullptr), fSamplesCount(0) {}
 
     Samples(const int& size) :
@@ -11,7 +13,7 @@ struct Samples : public StdSelfRef {
 
     Samples(float * const data, const int& size) :
         fData(data), fSamplesCount(size) {}
-
+public:
     ~Samples() { free(fData); }
     float * const fData;
     const int fSamplesCount;

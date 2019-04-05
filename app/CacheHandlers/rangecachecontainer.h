@@ -4,6 +4,8 @@
 #include "minimalcachecontainer.h"
 
 class RangeCacheContainer : public MinimalCacheContainer {
+protected:
+    RangeCacheContainer(const FrameRange &range) : mRange(range) {}
 public:
     int getRangeMin() const;
     const FrameRange& getRange() const {
@@ -27,12 +29,8 @@ public:
     bool storesDataInMemory() const {
         return mDataInMemory;
     }
-protected:
-    RangeCacheContainer() {}
-    RangeCacheContainer(const FrameRange &range) :
-        mRange(range) {}
 private:
-    FrameRange mRange{0, 0};
+    FrameRange mRange;
     bool mDataInMemory = false;
 };
 

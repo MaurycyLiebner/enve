@@ -9,7 +9,6 @@ class ImageCacheContainer :
     friend class StdSelfRef;
     typedef HDDCachableRangeContainer<ImageCacheContainer> Base;
 protected:
-    ImageCacheContainer();
     ImageCacheContainer(const FrameRange& range,
                         RangeCacheHandler * const parent);
     ImageCacheContainer(const sk_sp<SkImage>& img,

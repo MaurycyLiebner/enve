@@ -8,8 +8,7 @@ template <typename T>
 class HDDCachableCacheHandler : public RangeCacheHandler {
 public:
     int getFirstEmptyOrCachedFrameAfterFrame(
-            const int &frame,
-            T **contP = nullptr) const {
+            const int &frame, T **contP = nullptr) const {
         int currFrame = frame + 1;
         T *cont = nullptr;
         while(true) {
@@ -20,17 +19,6 @@ public:
         }
         if(contP) *contP = cont;
         return currFrame;
-    }
-
-    int getNumberNotCachedBeforeRelFrame(const int &relFrame) const {
-        int nNotCached = 0;
-        int firstId = this->getRenderContainerIdAtOrBeforeRelFrame(relFrame - 1);
-        for(int i = 0; i < firstId; i++) {
-            if(this->mRenderContainers.at(i)->storesDataInMemory()) {
-                nNotCached++;
-            }
-        }
-        return nNotCached;
     }
 };
 

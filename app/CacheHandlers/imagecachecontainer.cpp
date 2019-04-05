@@ -3,8 +3,6 @@
 #include "canvas.h"
 #include "skia/skiahelpers.h"
 
-ImageCacheContainer::ImageCacheContainer() : Base() {}
-
 ImageCacheContainer::ImageCacheContainer(const FrameRange &range,
                                          RangeCacheHandler * const parent) :
     Base(range, parent) {}
