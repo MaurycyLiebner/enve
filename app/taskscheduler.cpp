@@ -152,7 +152,8 @@ void TaskScheduler::processNextQuedHDDTask(
         }
     }
 }
-
+#include "GUI/usagewidget.h"
+#include "GUI/mainwindow.h"
 void TaskScheduler::processNextQuedCPUTask(
         const int &finishedThreadId,
         _ScheduledTask *const finishedTask) {
@@ -187,9 +188,10 @@ void TaskScheduler::processNextQuedCPUTask(
                 i--;
                 //return;
                 if(mFreeCPUThreads.isEmpty() || mQuedCPUTasks.isEmpty()) {
-//                    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
-//                    if(usageWidget)
-//                        usageWidget->setThreadsUsage(mThreadsUsed);
+#ifdef QT_DEBUG
+                    auto usageWidget = MainWindow::getInstance()->getUsageWidget();
+                    usageWidget->setThreadsUsage(mBusyCPUThreads.count());
+#endif
                     return;
                 }
                 threadId = mFreeCPUThreads.takeFirst();
@@ -197,9 +199,10 @@ void TaskScheduler::processNextQuedCPUTask(
         }
 
         mFreeCPUThreads << threadId;
-        //callAllQuedCPUTasksFinishedFunc();
+        callAllQuedCPUTasksFinishedFunc(); // !!!
     }
-//    UsageWidget* usageWidget = MainWindow::getInstance()->getUsageWidget();
-//    if(!usageWidget) return;
-//    usageWidget->setThreadsUsage(mThreadsUsed);
+#ifdef QT_DEBUG
+    auto usageWidget = MainWindow::getInstance()->getUsageWidget();
+    usageWidget->setThreadsUsage(mBusyCPUThreads.count());
+#endif
 }

@@ -150,7 +150,7 @@ void BoundingBoxRenderData::scheduleTaskNow() {
         clear();
         return;
     }
-    fParentBox->scheduleTask(GetAsSPtr(this, _ScheduledTask));
+    fParentBox->scheduleTask(ref<_ScheduledTask>());
 }
 
 void BoundingBoxRenderData::dataSet() {
