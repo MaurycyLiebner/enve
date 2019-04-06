@@ -52,25 +52,17 @@ public:
     VideoEncoder();
 
     void startNewEncoding(RenderInstanceSettings *settings) {
-        if(!mCurrentlyEncoding) {
-            startEncoding(settings);
-        }
+        if(!mCurrentlyEncoding) startEncoding(settings);
     }
 
     void interruptCurrentEncoding() {
-        if(!mBeingProcessed && !mTaskScheduled && !mTaskQued) {
-            interrupEncoding();
-        } else {
-            mInterruptEncoding = true;
-        }
+        if(isActive()) mInterruptEncoding = true;
+        else interrupEncoding();
     }
 
     void finishCurrentEncoding() {
-        if(!mBeingProcessed && !mTaskScheduled && !mTaskQued) {
-            finishEncodingSuccess();
-        } else {
-            mEncodingFinished = true;
-        }
+        if(isActive()) mEncodingFinished = true;
+        else finishEncodingSuccess();
     }
 
     void addContainer(const stdsptr<ImageCacheContainer> &cont);
@@ -87,7 +79,7 @@ public:
     static void sFinishEncoding();
     static bool sEncodingSuccessfulyStarted();
 
-    bool shouldUpdate() { return !mTaskQued && mCurrentlyEncoding; }
+    bool canSchedule() { return mState != QUED && mCurrentlyEncoding; }
 
     VideoEncoderEmitter *getEmitter() {
         return &mEmitter;

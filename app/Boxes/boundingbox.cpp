@@ -384,8 +384,8 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
     auto currentRenderData = getCurrentRenderData(relFrame);
     if(currentRenderData) {
         if(currentRenderData->fRedo) return;
-        if(reason == UpdateReason::FRAME_CHANGE) return;
-        currentRenderData->fRedo = currentRenderData->isQued();
+        if(reason != UpdateReason::FRAME_CHANGE)
+            currentRenderData->fRedo = currentRenderData->isQued();
         return;
     }
     currentRenderData = updateCurrentRenderData(relFrame, reason);

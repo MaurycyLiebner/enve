@@ -2,33 +2,25 @@
 #include "GUI/mainwindow.h"
 #include "taskexecutor.h"
 
-void _ScheduledTask::beforeProcessingStarted() {
-    _Task::beforeProcessingStarted();
-    mTaskQued = false;
-}
+_Task::State _ScheduledTask::SCHEDULED =
+        static_cast<_Task::State>(State::CREATED + 1);
+_Task::State _ScheduledTask::QUED =
+        static_cast<_Task::State>(_ScheduledTask::SCHEDULED + 1);
 
 void _ScheduledTask::taskQued() {
-    mTaskQued = true;
-    mTaskScheduled = false;
+    mState = QUED;
 }
 
 bool _ScheduledTask::scheduleTask() {
-    if(!shouldUpdate() || mTaskScheduled) return false;
+    if(!canSchedule() || mState == SCHEDULED) return false;
 
-    mFinished = false;
-    mTaskScheduled = true;
+    mState = SCHEDULED;
     scheduleTaskNow();
     return true;
 }
 
 void _ScheduledTask::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->scheduleCPUTask(ref<_ScheduledTask>());
-}
-
-void _ScheduledTask::clear() {
-    mTaskScheduled = false;
-    mTaskQued = false;
-    _Task::clear();
 }
 
 void _HDDTask::scheduleTaskNow() {
@@ -43,15 +35,14 @@ void _Task::setCurrentTaskExecutor(TaskExecutor *taskExecutor) {
 
 void _Task::beforeProcessingStarted() {
     mSelfRef = ref<_Task>();
-    mBeingProcessed = true;
+    mState = PROCESSING;
     Q_ASSERT(mCurrentExecutionDependent.isEmpty());
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
 }
 
 void _Task::finishedProcessing() {
-    mFinished = true;
-    mBeingProcessed = false;
+    mState = FINISHED;
     mCurrentTaskExecutor = nullptr;
     tellDependentThatFinished();
     afterProcessingFinished();
@@ -62,7 +53,7 @@ void _Task::afterProcessingFinished() {
 
 }
 
-bool _Task::isBeingProcessed() { return mBeingProcessed; }
+bool _Task::isBeingProcessed() { return mState == PROCESSING; }
 
 void _Task::waitTillProcessed() {
     if(!mCurrentTaskExecutor) return;
@@ -76,14 +67,13 @@ void _Task::waitTillProcessed() {
 }
 
 bool _Task::readyToBeProcessed() {
-    return mNDependancies == 0 && !mBeingProcessed;
+    return mNDependancies == 0 && mState != PROCESSING;
 }
 
 void _Task::clear() {
-    mFinished = false;
+    mState = CREATED;
     tellDependentThatFinished();
     tellNextDependentThatFinished();
-    mBeingProcessed = false;
     mSelfRef.reset();
 }
 
@@ -96,7 +86,7 @@ void _Task::addDependent(_Task * const updatable) {
     }
 }
 
-bool _Task::finished() { return mFinished; }
+bool _Task::finished() { return mState == FINISHED; }
 
 void _Task::decDependencies() {
     mNDependancies--;

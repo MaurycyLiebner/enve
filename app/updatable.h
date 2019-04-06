@@ -1,4 +1,4 @@
-#ifndef UPDATABLE_H
+﻿#ifndef UPDATABLE_H
 #define UPDATABLE_H
 #include <QList>
 #include <QEventLoop>
@@ -7,11 +7,19 @@ class TaskExecutor;
 
 class _Task : public StdSelfRef {
 public:
+    enum State {
+        CREATED = 0,
+        PROCESSING = 10,
+        FINISHED = 20
+    };
+
     _Task();
     ~_Task() {
         tellDependentThatFinished();
         tellNextDependentThatFinished();
     }
+
+    bool isActive() { return mState != CREATED && mState != FINISHED; }
 
     void setCurrentTaskExecutor(TaskExecutor *taskExecutor);
 
@@ -38,14 +46,14 @@ public:
 protected:
     virtual void afterProcessingFinished();
 
-    bool mFinished = false;
-    bool mBeingProcessed = false;
+    State mState = CREATED;
 
     QPointer<TaskExecutor> mCurrentTaskExecutor;
     stdsptr<_Task> mSelfRef;
 private:
     void tellDependentThatFinished();
     void tellNextDependentThatFinished();
+
     int mNDependancies = 0;
     QList<stdptr<_Task>> mNextExecutionDependent;
     QList<stdptr<_Task>> mCurrentExecutionDependent;
@@ -53,30 +61,23 @@ private:
 
 class _ScheduledTask : public _Task {
 public:
-    _ScheduledTask() {
-        mFinished = true;
-    }
-
-    void beforeProcessingStarted();
+    _ScheduledTask() {}
 
     virtual void taskQued();
 
     bool scheduleTask();
 
-    virtual bool shouldUpdate() {
+    virtual bool canSchedule() {
         return true;
     }
 
-    bool isQued() { return mTaskQued; }
-    bool isScheduled() { return mTaskScheduled; }
-
-    void clear();
+    bool isQued() { return mState == QUED; }
+    bool isScheduled() { return mState == SCHEDULED; }
 
     virtual bool needsGpuProcessing() const { return false; }
 protected:
+    static State SCHEDULED, QUED;
     virtual void scheduleTaskNow();
-    bool mTaskScheduled = false;
-    bool mTaskQued = false;
 };
 
 class _HDDTask : public _ScheduledTask {
