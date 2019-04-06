@@ -188,7 +188,7 @@ void TaskScheduler::processNextQuedCPUTask(
             }
         }
 
-        if(!mFreeCPUThreads.isEmpty()) callAllQuedCPUTasksFinishedFunc();
+        if(!mFreeCPUThreads.isEmpty()) callFreeThreadsForCPUTasksAvailableFunc();
     }
 #ifdef QT_DEBUG
     auto usageWidget = MainWindow::getInstance()->getUsageWidget();

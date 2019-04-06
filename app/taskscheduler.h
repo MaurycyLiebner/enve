@@ -11,6 +11,10 @@ public:
     TaskScheduler();
     ~TaskScheduler();
     static TaskScheduler * sGetInstance() { return sInstance; }
+    static void sSetFreeThreadsForCPUTasksAvailableFunc(
+            const std::function<void(void)>& func) {
+        sInstance->setFreeThreadsForCPUTasksAvailableFunc(func);
+    }
     static void sSetAllQuedCPUTasksFinishedFunc(
             const std::function<void(void)>& func) {
         sInstance->setAllQuedCPUTasksFinishedFunc(func);
@@ -100,6 +104,11 @@ public:
             const int &finishedThreadId,
             _ScheduledTask * const finishedTask);
 
+    void setFreeThreadsForCPUTasksAvailableFunc(
+            const std::function<void(void)>& func) {
+        mFreeThreadsForCPUTasksAvailableFunc = func;
+    }
+
     void setAllQuedCPUTasksFinishedFunc(
             const std::function<void(void)>& func) {
         mAllQuedCPUTasksFinishedFunc = func;
@@ -149,6 +158,12 @@ private:
 
     void tryProcessingNextQuedHDDTask();
 
+    void callFreeThreadsForCPUTasksAvailableFunc() const {
+        if(mFreeThreadsForCPUTasksAvailableFunc) {
+            mFreeThreadsForCPUTasksAvailableFunc();
+        }
+    }
+
     void callAllQuedCPUTasksFinishedFunc() const {
         if(mAllQuedCPUTasksFinishedFunc) {
             mAllQuedCPUTasksFinishedFunc();
@@ -187,6 +202,7 @@ private:
     TaskExecutor *mHDDExecutor = nullptr;
     QList<TaskExecutor*> mCPUTaskExecutors;
 
+    std::function<void(void)> mFreeThreadsForCPUTasksAvailableFunc;
     std::function<void(void)> mAllQuedCPUTasksFinishedFunc;
     std::function<void(void)> mAllQuedHDDTasksFinishedFunc;
     std::function<void(void)> mAllQuedTasksFinishedFunc;

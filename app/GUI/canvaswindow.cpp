@@ -920,10 +920,11 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
         qreal resolutionFraction = renderSettings.fResolution;
         mMaxRenderFrame = renderSettings.fMaxFrame;
 
-        auto cpuFinishedFunc = [this]() {
+        const auto nextFrameFunc = [this]() {
             nextSaveOutputFrame();
         };
-        TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(cpuFinishedFunc);
+        TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(nextFrameFunc);
+        TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
 
         mCurrentCanvas->fitCanvasToSize();
         if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.00001) {
@@ -941,10 +942,11 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 }
 
 void CanvasWindow::nextCurrentRenderFrame() {
-    int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler().
+    auto& cacheHandler = mCurrentCanvas->getCacheHandler();
+    int newCurrentRenderFrame = cacheHandler.
             getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
     if(newCurrentRenderFrame < mMaxRenderFrame) {
-        auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(
+        const auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(
                     newCurrentRenderFrame);
         if(mCurrentRenderFrame >= range.fMin) {
             newCurrentRenderFrame = range.fMax + 1;
@@ -953,23 +955,24 @@ void CanvasWindow::nextCurrentRenderFrame() {
         }
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
-        mCurrentCanvas->getCacheHandler().
+        cacheHandler.
             setContainersInFrameRangeBlocked({mCurrentRenderFrame + 1,
                                               newCurrentRenderFrame - 1},
                                              true);
     }
 
     mCurrentRenderFrame = newCurrentRenderFrame;
-    if(mCurrentRenderFrame < mMaxRenderFrame)
+    if(mCurrentRenderFrame <= mMaxRenderFrame)
         changeCurrentFrameAction(mCurrentRenderFrame);
 }
 
 void CanvasWindow::renderPreview() {
     if(hasNoCanvas()) return;
-    auto cpuFinishedFunc = [this]() {
+    const auto nextFrameFunc = [this]() {
         nextPreviewRenderFrame();
     };
-    TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(cpuFinishedFunc);
+    TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(nextFrameFunc);
+    TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
 
     mSavedCurrentFrame = getCurrentFrame();
     mCurrentRenderFrame = mSavedCurrentFrame;
@@ -992,16 +995,8 @@ void CanvasWindow::interruptPreview() {
 
 void CanvasWindow::outOfMemory() {
     if(mRenderingPreview) {
-        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
-            playPreview();
-        } else {
-            auto allFinishedFunc = [this]() {
-                playPreview();
-                TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(nullptr);
-            };
-            TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(allFinishedFunc);
-            TaskScheduler::sClearTasks();
-        }
+        TaskScheduler::sClearTasks();
+        playPreview();
     }
 }
 
@@ -1062,6 +1057,19 @@ void CanvasWindow::resumePreview() {
     }
 }
 
+void CanvasWindow::playPreviewAfterAllTasksCompleted() {
+    if(mRenderingPreview) {
+        if(TaskScheduler::sAllQuedTasksFinished()) {
+            playPreview();
+        } else {
+            const auto allFinishedFunc = [this]() {
+                playPreview();
+            };
+            TaskScheduler::sSetAllQuedTasksFinishedFunc(allFinishedFunc);
+        }
+    }
+}
+
 void CanvasWindow::playPreview() {
     if(hasNoCanvas()) return;
     //changeCurrentFrameAction(mSavedCurrentFrame);
@@ -1090,10 +1098,10 @@ void CanvasWindow::playPreview() {
 void CanvasWindow::nextPreviewRenderFrame() {
     if(!mRenderingPreview) return;
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        playPreview();
+        playPreviewAfterAllTasksCompleted();
     } else {
         nextCurrentRenderFrame();
-        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
+        if(TaskScheduler::sAllQuedTasksFinished()) {
             nextPreviewRenderFrame();
         }
     }

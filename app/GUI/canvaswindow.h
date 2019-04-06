@@ -163,6 +163,7 @@ public:
             PaintSettingsAnimator *&fillSetings, OutlineSettingsAnimator *&strokeSettings);
 private:
     void changeCurrentFrameAction(const int &frame);
+    void playPreviewAfterAllTasksCompleted();
 
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
