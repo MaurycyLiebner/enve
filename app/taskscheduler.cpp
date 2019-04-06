@@ -11,8 +11,8 @@ TaskScheduler::TaskScheduler() {
     sInstance = this;
     int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
-        QThread *taskExecutorThread = new QThread(this);
-        TaskExecutor *taskExecutor = new TaskExecutor(i);
+        const auto taskExecutorThread = new QThread(this);
+        const auto taskExecutor = new TaskExecutor(i);
         taskExecutor->moveToThread(taskExecutorThread);
         connect(taskExecutor, &TaskExecutor::finishedUpdating,
                 this, &TaskScheduler::processNextQuedCPUTask);

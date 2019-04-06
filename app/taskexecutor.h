@@ -8,7 +8,7 @@ class TaskExecutor : public QObject {
     Q_OBJECT
 public:
     explicit TaskExecutor(const int &id,
-                            QObject *parent = nullptr);
+                            QObject * const parent = nullptr);
 
 signals:
     void finishedUpdating(int, _ScheduledTask*);

@@ -429,8 +429,7 @@ BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
         currentRenderData = mDrawRenderContainer.getSrcRenderData();
         if(!currentRenderData) return nullptr;
 //        if(currentRenderData->fRelFrame == relFrame) {
-        if(!diffsIncludingInherited(
-                    currentRenderData->fRelFrame, relFrame)) {
+        if(!diffsIncludingInherited(currentRenderData->fRelFrame, relFrame)) {
             auto copy = currentRenderData->makeCopy();
             copy->fRelFrame = relFrame;
             mCurrentRenderDataHandler.addItemAtRelFrame(copy);

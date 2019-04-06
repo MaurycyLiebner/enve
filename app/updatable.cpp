@@ -49,12 +49,6 @@ void _Task::finishedProcessing() {
     mSelfRef.reset();
 }
 
-void _Task::afterProcessingFinished() {
-
-}
-
-bool _Task::isBeingProcessed() { return mState == PROCESSING; }
-
 void _Task::waitTillProcessed() {
     if(!mCurrentTaskExecutor) return;
     {
@@ -79,7 +73,7 @@ void _Task::clear() {
 
 void _Task::addDependent(_Task * const updatable) {
     if(!updatable) return;
-    if(!finished()) {
+    if(mState != FINISHED) {
         if(mNextExecutionDependent.contains(updatable)) return;
         mNextExecutionDependent << updatable;
         updatable->incDependencies();

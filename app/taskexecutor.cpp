@@ -1,12 +1,12 @@
 #include "taskexecutor.h"
 
-TaskExecutor::TaskExecutor(const int &id, QObject *parent) :
+TaskExecutor::TaskExecutor(const int &id, QObject * const parent) :
     QObject(parent) {
     mId = id;
 }
 
 void TaskExecutor::updateUpdatable(_ScheduledTask * const updatable,
-                                     const int &targetId) {
+                                   const int &targetId) {
     if(targetId == mId) {
         //auto start = std::chrono::steady_clock::now();
         //qDebug() << "started " << targetId;

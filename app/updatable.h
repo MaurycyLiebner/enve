@@ -6,14 +6,18 @@
 class TaskExecutor;
 
 class _Task : public StdSelfRef {
+protected:
+    _Task();
+
+    virtual void afterProcessingFinished() {}
 public:
-    enum State {
-        CREATED = 0,
-        PROCESSING = 10,
-        FINISHED = 20
+    enum State : char {
+        CANCELED = 0,
+        CREATED = 1,
+        PROCESSING = 4,
+        FINISHED = 5
     };
 
-    _Task();
     ~_Task() {
         tellDependentThatFinished();
         tellNextDependentThatFinished();
@@ -29,8 +33,6 @@ public:
 
     void finishedProcessing();
 
-    bool isBeingProcessed();
-
     void waitTillProcessed();
 
     bool readyToBeProcessed();
@@ -43,9 +45,15 @@ public:
 
     void decDependencies();
     void incDependencies();
-protected:
-    virtual void afterProcessingFinished();
 
+    void setState(const State& state) {
+        mState = state;
+    }
+
+    State getState() const {
+        return mState;
+    }
+protected:
     State mState = CREATED;
 
     QPointer<TaskExecutor> mCurrentTaskExecutor;

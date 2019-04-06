@@ -65,10 +65,26 @@ public:
     void queScheduledHDDTasks();
 
     void clearTasks() {
+        for(const auto& cpuTask : mScheduledCPUTasks) {
+            cpuTask->setState(_Task::CANCELED);
+        }
         mScheduledCPUTasks.clear();
+
+        for(const auto& hddTask : mScheduledHDDTasks) {
+            hddTask->setState(_Task::CANCELED);
+        }
         mScheduledHDDTasks.clear();
+
+        for(const auto& cpuTask : mQuedCPUTasks) {
+            cpuTask->setState(_Task::CANCELED);
+        }
         mQuedCPUTasks.clear();
+
+        for(const auto& hddTask : mQuedHDDTasks) {
+            hddTask->setState(_Task::CANCELED);
+        }
         mQuedHDDTasks.clear();
+
         if(!mHDDThreadBusy) {
             callAllQuedHDDTasksFinishedFunc();
         }
