@@ -5,27 +5,24 @@
 
 class InternalLinkCanvas : public InternalLinkGroupBox {
     friend class SelfRef;
+protected:
+    InternalLinkCanvas(BoxesGroup * const linkTarget);
 public:
-    void queScheduledTasks();
-
     void writeBoundingBox(QIODevice *target);
-
     void readBoundingBox(QIODevice *target);
-
-    void scheduleWaitingTasks();
 
     void setupBoundingBoxRenderDataForRelFrameF(
                             const qreal &relFrame,
                             BoundingBoxRenderData* data);
-    bool clipToCanvas();
 
     qsptr<BoundingBox> createLinkForLinkGroup();
 
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     bool relPointInsidePath(const QPointF &relPos) const;
-protected:
-    InternalLinkCanvas(BoxesGroup* linkTarget);
+
+    bool clipToCanvas();
+private:
     qsptr<BoolProperty> mClipToCanvas =
             SPtrCreate(BoolProperty)("clip");
 };

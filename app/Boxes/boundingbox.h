@@ -448,6 +448,7 @@ private:
     void updateRelBoundingRectFromRenderData(
             BoundingBoxRenderData * const renderData);
     FrameRange getVisibleAbsFrameRange() const;
+    void cancelWaitingTasks();
 signals:
     void nameChanged(QString);
     void scheduledUpdate();

@@ -67,9 +67,17 @@ stdsptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
 
 void InternalLinkBox::setupBoundingBoxRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData *data) {
-    if(getLinkTarget())
-        getLinkTarget()->setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    const auto linkTarget = getLinkTarget();
+    if(linkTarget) {
+        linkTarget->setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    }
+
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    if(linkTarget) {
+        const qreal targetMargin =
+                linkTarget->getEffectsMarginAtRelFrameF(relFrame);
+        data->fEffectsMargin += targetMargin*data->fResolution;
+    }
 }
 
 QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {

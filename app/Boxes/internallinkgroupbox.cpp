@@ -90,10 +90,18 @@ const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
 
 void InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData *data) {
-    if(getLinkTarget())
-        getLinkTarget()->BoundingBox::
+    const auto linkTarget = getLinkTarget();
+    if(linkTarget) {
+        linkTarget->BoundingBox::
                 setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    }
+
     BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    if(linkTarget) {
+        const qreal targetMargin =
+                linkTarget->getEffectsMarginAtRelFrameF(relFrame);
+        data->fEffectsMargin += targetMargin*data->fResolution;
+    }
 }
 
 BoxesGroup *InternalLinkGroupBox::getFinalTarget() const {

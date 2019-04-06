@@ -379,6 +379,9 @@ void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
 void BoundingBox::scheduleUpdate(const int &relFrame,
                                  const UpdateReason& reason) {
     if(!shouldScheduleUpdate()) return;
+    const auto parentCanvas = getParentCanvas();
+    if(!parentCanvas) return;
+    if(!parentCanvas->isPreviewingOrRendering()) cancelWaitingTasks();
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
     mDrawRenderContainer.setExpired(true);
     auto currentRenderData = getCurrentRenderData(relFrame);
@@ -1153,6 +1156,13 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
     auto parentRange = mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
 
     return range*parentRange;
+}
+
+void BoundingBox::cancelWaitingTasks() {
+    for(const auto &task : mScheduledTasks) {
+        task->setState(_Task::CANCELED);
+    }
+    mScheduledTasks.clear();
 }
 
 void BoundingBox::scheduleWaitingTasks() {

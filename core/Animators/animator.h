@@ -24,8 +24,7 @@ public:
     enum UpdateReason {
         FRAME_CHANGE,
         USER_CHANGE,
-        CHILD_USER_CHANGE,
-        PARENT_USER_CHANGE
+        CHILD_USER_CHANGE
     };
     virtual void anim_saveCurrentValueAsKey() = 0;
 

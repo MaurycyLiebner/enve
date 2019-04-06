@@ -3,14 +3,9 @@
 #include "Animators/transformanimator.h"
 #include "canvas.h"
 
-InternalLinkCanvas::InternalLinkCanvas(BoxesGroup* linkTarget) :
+InternalLinkCanvas::InternalLinkCanvas(BoxesGroup * const linkTarget) :
     InternalLinkGroupBox(linkTarget) {
     ca_prependChildAnimator(mTransformAnimator.data(), mClipToCanvas);
-}
-
-void InternalLinkCanvas::queScheduledTasks() {
-    getLinkTarget()->queScheduledTasks();
-    BoxesGroup::queScheduledTasks();
 }
 
 void InternalLinkCanvas::writeBoundingBox(QIODevice *target) {
@@ -21,11 +16,6 @@ void InternalLinkCanvas::writeBoundingBox(QIODevice *target) {
 void InternalLinkCanvas::readBoundingBox(QIODevice *target) {
     InternalLinkGroupBox::readBoundingBox(target);
     mClipToCanvas->readProperty(target);
-}
-
-void InternalLinkCanvas::scheduleWaitingTasks() {
-    getLinkTarget()->scheduleWaitingTasks();
-    BoxesGroup::scheduleWaitingTasks();
 }
 
 void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(

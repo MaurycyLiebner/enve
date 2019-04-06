@@ -37,7 +37,9 @@ void CanvasRenderData::drawSk(SkCanvas * const canvas) {
 
     canvas->scale(toSkScalar(fResolution), toSkScalar(fResolution));
     for(const auto &renderData : fChildrenRenderData) {
+        canvas->save();
         renderData->drawRenderedImageForParent(canvas);
+        canvas->restore();
     }
 
     canvas->restore();
