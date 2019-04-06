@@ -157,6 +157,7 @@ void TaskScheduler::processNextQuedHDDTask(
 void TaskScheduler::processNextQuedCPUTask(
         const int &finishedThreadId,
         _ScheduledTask *const finishedTask) {
+    mFreeCPUThreads << finishedThreadId;
     if(finishedTask) {
         mBusyCPUThreads.removeOne(finishedThreadId);
         if(finishedTask->needsGpuProcessing()) {
@@ -169,37 +170,25 @@ void TaskScheduler::processNextQuedCPUTask(
         }
     }
     if(mQuedCPUTasks.isEmpty()) {
-        mFreeCPUThreads << finishedThreadId;
         callAllQuedCPUTasksFinishedFunc();
-        if(mGpuPostProcessor.hasFinished()) {
+        if(mGpuPostProcessor.hasFinished())
             emit finishedAllQuedTasks();
-        }
-    } else {
-        int threadId = finishedThreadId;
+    } else if(!mFreeCPUThreads.isEmpty()) {
         for(int i = 0; i < mQuedCPUTasks.count(); i++) {
-            auto updatablaT = mQuedCPUTasks.at(i).get();
+            const auto updatablaT = mQuedCPUTasks.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
+                const int threadId = mFreeCPUThreads.takeLast();
                 updatablaT->setCurrentTaskExecutor(
                             mCPUTaskExecutors.at(threadId));
                 updatablaT->beforeProcessingStarted();
-                mQuedCPUTasks.removeAt(i);
+                mQuedCPUTasks.removeAt(i--);
                 emit processCPUTask(updatablaT, threadId);
                 mBusyCPUThreads << threadId;
-                i--;
-                //return;
-                if(mFreeCPUThreads.isEmpty() || mQuedCPUTasks.isEmpty()) {
-#ifdef QT_DEBUG
-                    auto usageWidget = MainWindow::getInstance()->getUsageWidget();
-                    usageWidget->setThreadsUsage(mBusyCPUThreads.count());
-#endif
-                    return;
-                }
-                threadId = mFreeCPUThreads.takeFirst();
+                if(mFreeCPUThreads.isEmpty()) break;
             }
         }
 
-        mFreeCPUThreads << threadId;
-        callAllQuedCPUTasksFinishedFunc(); // !!!
+        if(!mFreeCPUThreads.isEmpty()) callAllQuedCPUTasksFinishedFunc();
     }
 #ifdef QT_DEBUG
     auto usageWidget = MainWindow::getInstance()->getUsageWidget();

@@ -472,6 +472,8 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             mCurrentPreviewContainerOutdated =
                     mDrawRenderContainer.isExpired();
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
+        } else if(mRenderingOutput || mRenderingPreview) {
+            cont->setBlocked(true);
         }
     } else if(mPreviewing) {
         cont->setBlocked(true);
