@@ -36,7 +36,7 @@ sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtOrBeforeFrame(
 }
 
 void ImageSequenceCacheHandler::updateFrameCount() {
-    mFramesCount = mFramePaths.count();
+    mFrameCount = mFramePaths.count();
 }
 
 void ImageSequenceCacheHandler::clearCache() {

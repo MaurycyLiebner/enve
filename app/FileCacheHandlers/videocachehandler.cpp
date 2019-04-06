@@ -1,14 +1,7 @@
 #include "videocachehandler.h"
 #include "Boxes/boundingboxrendercontainer.h"
 #include "Boxes/videobox.h"
-extern "C" {
-    #include <libavutil/opt.h>
-    #include <libavcodec/avcodec.h>
-    #include <libavformat/avformat.h>
-    #include <libswresample/swresample.h>
-    #include <libswscale/swscale.h>
-    #include <libavutil/imgutils.h>
-}
+
 #include <QFileDialog>
 #include "GUI/mainwindow.h"
 #include "filesourcescache.h"
@@ -71,23 +64,24 @@ void VideoCacheHandler::updateFrameCount() {
             if(mTimeBaseDen != 0) {
                 mFps = static_cast<qreal>(mTimeBaseNum/mTimeBaseDen);
             }
-            mFramesCount = vidStream->nb_frames;
+            mFrameCount = static_cast<int>(vidStream->nb_frames);
             // try something else if retrieving frame count failed
-            if(mFramesCount <= 0) {
+            if(mFrameCount <= 0) {
                 if(vidStream->r_frame_rate.den &&
                     vidStream->r_frame_rate.num) {
                     mTimeBaseDen = vidStream->r_frame_rate.den;
                     mTimeBaseNum = vidStream->r_frame_rate.num;
                     if(mTimeBaseDen == 0) {
-                        mFramesCount = 0;
+                        mFrameCount = 0;
                         break;
                     } else {
                         mFps = mTimeBaseNum/static_cast<qreal>(mTimeBaseDen);
                     }
-                    int64_t duration = format->duration + (format->duration <= INT64_MAX - 5000 ? 5000 : 0);
-                    mFramesCount = qFloor(duration*mFps/AV_TIME_BASE);
+                    const int64_t duration = format->duration +
+                            (format->duration <= INT64_MAX - 5000 ? 5000 : 0);
+                    mFrameCount = qFloor(duration*mFps/AV_TIME_BASE);
                 } else {
-                    mFramesCount = 0;
+                    mFrameCount = 0;
                     break;
                 }
             }
@@ -174,8 +168,8 @@ void VideoCacheHandler::_processUpdate() {
         return;// -1;
     }
 
-    bool frameReceived = false;
     for(const int &frameId : mFramesBeingLoaded) {
+        bool frameReceived = false;
         const int tsms = qRound(frameId * 1000 / mUpdateFps);
 
         const int64_t frame = av_rescale(tsms, videoStream->time_base.den,
@@ -248,13 +242,11 @@ void VideoCacheHandler::_processUpdate() {
             uint8_t *dstSk[] = { static_cast<unsigned char*>(addr) };
             int linesizesSk[4];
 
-            av_image_fill_linesizes(linesizesSk,
-                                    AV_PIX_FMT_BGRA,
+            av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_BGRA,
                                     decodedFrame->width);
 
             sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
-                      0, codecContext->height,
-                      dstSk, linesizesSk);
+                      0, codecContext->height, dstSk, linesizesSk);
 
             mLoadedFrames << SkImage::MakeFromBitmap(bitmap);
         } else {
@@ -289,7 +281,7 @@ void VideoCacheHandler::afterProcessingFinished() {
             mFramesCache.createNewRenderContainerAtRelFrame
                     <ImageCacheContainer>(frameId, imgT);
         } else {
-            mFramesCount = frameId;
+            mFrameCount = frameId;
             for(const auto &box : mDependentBoxes) {
                 if(!box) continue;
                 const auto vidBox = GetAsPtr(box, VideoBox);
@@ -308,13 +300,13 @@ void VideoCacheHandler::clearCache() {
 }
 
 void VideoCacheHandler::replace() {
-    QString importPath = QFileDialog::getOpenFileName(
+    const QString importPath = QFileDialog::getOpenFileName(
                 MainWindow::getInstance(),
                 "Replace Video Source " + mFilePath, "",
                 "Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     MainWindow::getInstance()->enableEventFilter();
     if(!importPath.isEmpty()) {
-        QFile file(importPath);
+        const QFile file(importPath);
         if(!file.exists()) return;
         if(hasVideoExt(importPath)) {
             mFilePath = importPath;
@@ -328,7 +320,7 @@ const qreal &VideoCacheHandler::getFps() { return mFps; }
 
 _ScheduledTask* VideoCacheHandler::scheduleFrameLoad(
         const int &frame) {
-    if(mFramesCount <= 0 || frame >= mFramesCount) return nullptr;
+    if(mFrameCount <= 0 || frame >= mFrameCount) return nullptr;
     if(mFramesLoadScheduled.contains(frame) ||
        mFramesBeingLoadedGUI.contains(frame)) return this;
     //    qDebug() << "schedule frame load: " << frame;
