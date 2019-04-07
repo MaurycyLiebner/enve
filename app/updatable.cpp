@@ -3,9 +3,9 @@
 #include "taskexecutor.h"
 
 _Task::State _ScheduledTask::SCHEDULED =
-        static_cast<_Task::State>(State::CREATED + 1);
+        static_cast<_Task::State>(2);
 _Task::State _ScheduledTask::QUED =
-        static_cast<_Task::State>(_ScheduledTask::SCHEDULED + 1);
+        static_cast<_Task::State>(3);
 
 void _ScheduledTask::taskQued() {
     mState = QUED;

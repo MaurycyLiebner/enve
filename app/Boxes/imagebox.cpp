@@ -5,20 +5,17 @@
 #include "filesourcescache.h"
 #include "FileCacheHandlers/imagecachehandler.h"
 
-ImageBox::ImageBox() :
-    BoundingBox(TYPE_IMAGE) {
+ImageBox::ImageBox() : BoundingBox(TYPE_IMAGE) {
     setName("Image");
 }
 
-ImageBox::ImageBox(const QString &filePath) :
-    ImageBox() {
+ImageBox::ImageBox(const QString &filePath) : ImageBox() {
     setFilePath(filePath);
 }
 
 ImageBox::~ImageBox() {
-    if(mImgCacheHandler) {
+    if(mImgCacheHandler)
         mImgCacheHandler->removeDependentBox(this);
-    }
 }
 
 void ImageBox::setFilePath(const QString &path) {
@@ -26,11 +23,11 @@ void ImageBox::setFilePath(const QString &path) {
     if(mImgCacheHandler) {
         mImgCacheHandler->removeDependentBox(this);
     }
-    auto handlerT = FileSourcesCache::getHandlerForFilePath(path);
+    const auto handlerT = FileSourcesCache::getHandlerForFilePath(path);
     mImgCacheHandler = GetAsPtr(handlerT, ImageCacheHandler);
 
     if(!mImgCacheHandler) {
-        QFile file(path);
+        const QFile file(path);
         if(file.exists()) {
             mImgCacheHandler = FileSourcesCache::
                     createNewHandler<ImageCacheHandler>(path);
@@ -57,20 +54,19 @@ void ImageBox::changeSourceFile(QWidget* dialogParent) {
                                             dialogParent,
                                             "Change Source", "",
                                             "Image Files (*.png *.jpg)");
-    if(!importPath.isEmpty()) {
-        setFilePath(importPath);
-    }
+    if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
 void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
                                     const qreal &relFrame,
                                     BoundingBoxRenderData* data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
-    auto imgData = GetAsPtr(data, ImageBoxRenderData);
-    imgData->fImage = mImgCacheHandler->getImageCopy();
-    if(!imgData->fImage) {
-        mImgCacheHandler->scheduleTask();
-        mImgCacheHandler->addDependent(imgData);
+    const auto imgData = GetAsPtr(data, ImageBoxRenderData);
+    if(mImgCacheHandler->hasImage()) {
+        imgData->fImage = mImgCacheHandler->getImageCopy();
+    } else {
+        const auto loader = mImgCacheHandler->scheduleLoad();
+        loader->addDependent(imgData);
     }
 }
 

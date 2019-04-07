@@ -7,13 +7,18 @@ ImageCacheHandler::ImageCacheHandler(const QString &filePath,
     mVisibleInListWidgets = visibleSeparatly;
 }
 
-void ImageCacheHandler::_processUpdate() {
-    sk_sp<SkData> data = SkData::MakeFromFileName(
-                mFilePath.toLocal8Bit().data());
-    mUpdateImage = SkImage::MakeFromEncoded(data);
+ImageLoader::ImageLoader(const QString &filePath,
+                         ImageCacheHandler * const handler) :
+    mTargetHandler(handler), mFilePath(filePath) {
+
 }
 
-void ImageCacheHandler::afterProcessingFinished() {
-    mImage = mUpdateImage;
-    mUpdateImage.reset();
+void ImageLoader::_processUpdate() {
+    const sk_sp<SkData> data = SkData::MakeFromFileName(
+                mFilePath.toLocal8Bit().data());
+    mImage = SkImage::MakeFromEncoded(data);
+}
+
+void ImageLoader::afterProcessingFinished() {
+    mTargetHandler->setImage(mImage);
 }

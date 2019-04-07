@@ -3,21 +3,21 @@
 #include "updatable.h"
 class BoundingBox;
 
-class FileCacheHandler : public _HDDTask {
-public:
+class FileCacheHandler : public StdSelfRef {
+protected:
     FileCacheHandler(const QString &filePath,
                      const bool &visibleInListWidgets = true);
+public:
+    virtual void clearCache();
+    virtual void replace() {}
 
     const QString &getFilePath() {
         return mFilePath;
     }
 
-    virtual void clearCache();
-
     void scheduleUpdateForAllDependent();
-    void addDependentBox(BoundingBox *dependent);
-    void removeDependentBox(BoundingBox *dependent);
-    virtual void replace() {}
+    void addDependentBox(BoundingBox * const dependent);
+    void removeDependentBox(BoundingBox * const dependent);
     void setVisibleInListWidgets(const bool &bT);
 
     bool isFileMissing() {

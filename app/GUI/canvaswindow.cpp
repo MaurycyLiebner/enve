@@ -1313,11 +1313,11 @@ void CanvasWindow::importFile(const QString &path,
         if(isVectorExt(extension)) {
             importedBox = loadSVGFile(path);
         } else if(isImageExt(extension)) {
-            auto imgBox = SPtrCreate(ImageBox)();
+            const auto imgBox = SPtrCreate(ImageBox)();
             importedBox = GetAsSPtr(imgBox, BoundingBox);
             imgBox->setFilePath(path);
         } else if(isVideoExt(extension)) {
-            auto vidBox = SPtrCreate(VideoBox)();
+            const auto vidBox = SPtrCreate(VideoBox)();
             importedBox = GetAsSPtr(vidBox, BoundingBox);
             vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {

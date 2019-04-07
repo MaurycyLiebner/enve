@@ -18,8 +18,7 @@ VideoBox::VideoBox() : AnimationBox() {
     setName("Video");
 }
 
-VideoBox::VideoBox(const QString &filePath) :
-    VideoBox() {
+VideoBox::VideoBox(const QString &filePath) : VideoBox() {
     setFilePath(filePath);
 }
 

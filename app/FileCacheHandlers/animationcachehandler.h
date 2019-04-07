@@ -7,8 +7,6 @@ class AnimationCacheHandler : public FileCacheHandler {
 protected:
     AnimationCacheHandler(const QString &filePath);
     AnimationCacheHandler();
-
-    virtual void updateFrameCount() = 0;
 public:
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
     virtual sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame) = 0;

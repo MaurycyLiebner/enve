@@ -49,24 +49,26 @@ private:
 };
 
 class ImageBox : public BoundingBox {
-public:
+    friend class SelfRef;
+protected:
     ImageBox();
     ImageBox(const QString &filePath);
+public:
     ~ImageBox();
-
-    void setFilePath(const QString &path);
 
     bool SWT_isImageBox() const { return true; }
     void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
-    void changeSourceFile(QWidget *dialogParent);
 
     void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);
     stdsptr<BoundingBoxRenderData> createRenderData();
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
+
+    void changeSourceFile(QWidget *dialogParent);
+    void setFilePath(const QString &path);
 private:
-    stdptr<ImageCacheHandler>mImgCacheHandler;
+    stdptr<ImageCacheHandler> mImgCacheHandler;
     QString mImageFilePath;
 };
 

@@ -48,6 +48,7 @@ void ImageSequenceCacheHandler::clearCache() {
 
 _ScheduledTask *ImageSequenceCacheHandler::scheduleFrameLoad(
         const int &frame) {
-    auto imageHandler = mFrameImageHandlers.at(frame);
-    return imageHandler;
+    const auto& imageHandler = mFrameImageHandlers.at(frame);
+    if(imageHandler->hasImage()) return nullptr;
+    return imageHandler->scheduleLoad();
 }

@@ -13,7 +13,12 @@ extern "C" {
 }
 
 struct VideoStreamsData {
+    QString fPath;
     bool fOpened = false;
+    qreal fFps = 0;
+    int fTimeBaseNum = 0;
+    int fTimeBaseDen = 1;
+    int fFrameCount = 0;
     AVFormatContext *fFormatContext = nullptr;
     int fVideoStreamIndex = -1;
     AVStream * fVideoStream = nullptr;
@@ -22,90 +27,20 @@ struct VideoStreamsData {
     AVCodecContext * fCodecContext = nullptr;
     struct SwsContext * fSwsContext = nullptr;
 
-    void open(const char * const path) {
-        fFormatContext = avformat_alloc_context();
-        if(!fFormatContext) {
-            fprintf(stderr, "Error allocating AVFormatContext\n");
-            return;
-        }
-        if(avformat_open_input(&fFormatContext, path, nullptr, nullptr) != 0) {
-            fprintf(stderr, "Could not open file '%s'\n", path);
-            return;
-        }
-        if(avformat_find_stream_info(fFormatContext, nullptr) < 0) {
-            fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
-            return;
-        }
-
-        // Find the index of the first audio stream
-        int videoStreamIndex = -1;
-        AVCodecParameters *codecPars = nullptr;
-        AVCodec *codec = nullptr;
-        AVStream *videoStream = nullptr;
-        for(uint i = 0; i < fFormatContext->nb_streams; i++) {
-            AVStream * const  streamT = fFormatContext->streams[i];
-            AVCodecParameters * const codecParsT = streamT->codecpar;
-            const AVMediaType &mediaType = codecParsT->codec_type;
-            if(mediaType == AVMEDIA_TYPE_VIDEO) {
-                videoStreamIndex = static_cast<int>(i);
-                codecPars = codecParsT;
-                codec = avcodec_find_decoder(codecPars->codec_id);
-                videoStream = fFormatContext->streams[videoStreamIndex];
-                break;
-            }
-        }
-        if(videoStreamIndex == -1) {
-            fprintf(stderr, "Could not retrieve video stream from file '%s'\n", path);
-            return;
-        }
-
-        if(!codec) {
-            fprintf(stderr, "Unsuported codec\n");
-            return;
-        }
-        fCodecContext = avcodec_alloc_context3(codec);
-        if(!fCodecContext) {
-            fprintf(stderr, "Error allocating AVCodecContext\n");
-            return;
-        }
-        if(avcodec_parameters_to_context(fCodecContext, codecPars) < 0) {
-            fprintf(stderr, "Failed to copy codec params to codec context\n");
-            return;
-        }
-
-        if(avcodec_open2(fCodecContext, codec, nullptr) < 0 ) {
-            fprintf(stderr, "Failed to open codec\n");
-            return;
-        }
-        fSwsContext =
-              sws_getContext(fCodecContext->width, fCodecContext->height,
-                             fCodecContext->pix_fmt,
-                             fCodecContext->width, fCodecContext->height,
-                             AV_PIX_FMT_BGRA, SWS_BICUBIC, nullptr, nullptr, nullptr);
-
-        fPacket = av_packet_alloc();
-        if(!fPacket) {
-            fprintf(stderr, "Error allocating AVPacket\n");
-            return;
-        }
-        fDecodedFrame = av_frame_alloc();
-        if(!fDecodedFrame) {
-            fprintf(stderr, "Error allocating AVFrame\n");
-            return;
-        }
-
-        fOpened = true;
+    void open(const QString& path) {
+        fPath = path;
+        open();
     }
 
     void close() {
         fOpened = false;
 
-        avformat_close_input(&fFormatContext);
-        av_packet_free(&fPacket);
-        sws_freeContext(fSwsContext);
-        avcodec_close(fCodecContext);
-        av_frame_free(&fDecodedFrame);
-        avformat_free_context(fFormatContext);
+        if(fFormatContext) avformat_close_input(&fFormatContext);
+        if(fPacket) av_packet_free(&fPacket);
+        if(fSwsContext) sws_freeContext(fSwsContext);
+        if(fCodecContext) avcodec_close(fCodecContext);
+        if(fDecodedFrame) av_frame_free(&fDecodedFrame);
+        if(fFormatContext) avformat_free_context(fFormatContext);
 
         fFormatContext = nullptr;
         fVideoStreamIndex = -1;
@@ -115,15 +50,100 @@ struct VideoStreamsData {
         fCodecContext = nullptr;
         fSwsContext = nullptr;
     }
-};
 
+private:
+    void open() {
+        const QByteArray stringByteArray = fPath.toLatin1();
+        const char * const path = stringByteArray.constData();
+        try {
+            open(path);
+        } catch(...) {
+            close();
+            RuntimeThrow("Failed to setup video stream for '" + path + "'.");
+        }
+    }
+
+    void open(const char * const path) {
+        fFormatContext = avformat_alloc_context();
+        if(!fFormatContext) RuntimeThrow("Error allocating AVFormatContext");
+        if(avformat_open_input(&fFormatContext, path, nullptr, nullptr) != 0) {
+            RuntimeThrow("Could not open file");
+        }
+        if(avformat_find_stream_info(fFormatContext, nullptr) < 0) {
+            RuntimeThrow("Could not retrieve stream info");
+        }
+
+        // Find the index of the first audio stream
+        fVideoStreamIndex = -1;
+        const AVCodecParameters *vidCodecPars = nullptr;
+        const AVCodec *vidCodec = nullptr;
+        fVideoStream = nullptr;
+        for(uint i = 0; i < fFormatContext->nb_streams; i++) {
+            const AVStream * const  iStream = fFormatContext->streams[i];
+            const AVCodecParameters * const iCodecPars = iStream->codecpar;
+            const AVMediaType &iMediaType = iCodecPars->codec_type;
+            if(iMediaType == AVMEDIA_TYPE_VIDEO) {
+                fVideoStreamIndex = static_cast<int>(i);
+                vidCodecPars = iCodecPars;
+                vidCodec = avcodec_find_decoder(vidCodecPars->codec_id);
+                fVideoStream = fFormatContext->streams[fVideoStreamIndex];
+                fTimeBaseDen = fVideoStream->avg_frame_rate.den;
+                fTimeBaseNum = fVideoStream->avg_frame_rate.num;
+                if(fTimeBaseDen == 0)
+                    RuntimeThrow("Invalid video frame rate denominator (0)");
+                fFps = static_cast<qreal>(fTimeBaseNum)/fTimeBaseDen;
+                if(fVideoStream->nb_frames > 0) {
+                    fFrameCount = static_cast<int>(fVideoStream->nb_frames);
+                } else {
+                    const int64_t duration = fFormatContext->duration +
+                            (fFormatContext->duration <= INT64_MAX - 5000 ? 5000 : 0);
+                    fFrameCount = qFloor(duration*fFps/AV_TIME_BASE);
+                }
+                break;
+            }
+        }
+        if(fVideoStreamIndex == -1)
+            RuntimeThrow("Could not retrieve video stream");
+        if(!vidCodec) RuntimeThrow("Unsuported codec");
+
+        fCodecContext = avcodec_alloc_context3(vidCodec);
+        if(!fCodecContext) RuntimeThrow("Error allocating AVCodecContext");
+        if(avcodec_parameters_to_context(fCodecContext, vidCodecPars) < 0) {
+            RuntimeThrow("Failed to copy codec params to codec context");
+        }
+
+        if(avcodec_open2(fCodecContext, vidCodec, nullptr) < 0) {
+            RuntimeThrow("Failed to open codec");
+        }
+        fSwsContext =
+              sws_getContext(fCodecContext->width, fCodecContext->height,
+                             fCodecContext->pix_fmt,
+                             fCodecContext->width, fCodecContext->height,
+                             AV_PIX_FMT_BGRA, SWS_BICUBIC,
+                             nullptr, nullptr, nullptr);
+
+        fPacket = av_packet_alloc();
+        if(!fPacket) RuntimeThrow("Error allocating AVPacket");
+        fDecodedFrame = av_frame_alloc();
+        if(!fDecodedFrame) RuntimeThrow("Error allocating AVFrame");
+
+        fOpened = true;
+    }
+};
+class VideoCacheHandler;
 class VideoFrameLoader : public _HDDTask {
+    friend class StdSelfRef;
 protected:
-    VideoFrameLoader(const VideoStreamsData * const openedVideo,
-                     const int& frameId, const qreal& fps) :
-        mOpenedVideo(openedVideo), mFrameId(frameId), mFps(fps) {
+    VideoFrameLoader(VideoCacheHandler * const cacheHandler,
+                     const VideoStreamsData * const openedVideo,
+                     const int& frameId) :
+        mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
+        mFrameId(frameId) {
 
     }
+
+    void afterProcessingFinished();
+    void afterCanceled();
 public:
     void _processUpdate() {
         readFrame();
@@ -139,9 +159,9 @@ private:
         const auto decodedFrame = mOpenedVideo->fDecodedFrame;
         const auto codecContext = mOpenedVideo->fCodecContext;
         const auto swsContext = mOpenedVideo->fSwsContext;
+        const qreal fps = mOpenedVideo->fFps;
 
-        bool frameReceived = false;
-        const int tsms = qRound(mFrameId * 1000 / mFps);
+        const int tsms = qRound(mFrameId * 1000 / fps);
 
         const int64_t frame = av_rescale(tsms, videoStream->time_base.den,
                                          videoStream->time_base.num)/1000;
@@ -156,7 +176,7 @@ private:
         avcodec_flush_buffers(codecContext);
 
         int64_t pts = 0;
-
+        bool frameReceived = false;
         while(true) {
             if(av_read_frame(formatContext, packet) < 0) {
                 break;
@@ -187,7 +207,7 @@ private:
             // calculate PTS:
             pts = av_frame_get_best_effort_timestamp(decodedFrame);
             pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
-            const int currFrame = qRound(pts/1000000.*mFps);
+            const int currFrame = qRound(pts/1000000.*fps);
             if(currFrame == mFrameId) {
 //                qDebug() << pts/1000 << tsms;
 //                qDebug() << "for" << frameId << "received" << pts*mUpdateFps/1000000;
@@ -227,9 +247,9 @@ private:
         av_packet_unref(packet);
     }
 
+    VideoCacheHandler * const mCacheHandler;
     const VideoStreamsData * const mOpenedVideo;
     const int mFrameId;
-    const qreal mFps;
     sk_sp<SkImage> mLoadedFrame;
 };
 
@@ -237,39 +257,50 @@ class VideoCacheHandler : public AnimationCacheHandler {
     friend class StdSelfRef;
 protected:
     VideoCacheHandler(const QString &filePath);
-
-    void updateFrameCount();
 public:
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
     _ScheduledTask *scheduleFrameLoad(const int &frame);
 
-    void beforeProcessingStarted();
-
-    void _processUpdate();
-
-    void afterProcessingFinished();
-
     void clearCache();
-
     void replace();
 
-    const qreal &getFps();
+    void frameLoaderFinished(const int &frame,
+                             const sk_sp<SkImage>& image);
+    void frameLoaderCanceled(const int &frameId) {
+        removeFrameLoader(frameId);
+    }
 protected:
-    int mTimeBaseDen = 1;
-    int mTimeBaseNum = 24;
-    int mUpdateTimeBaseDen = 1;
-    int mUpdateTimeBaseNum = 24;
+    VideoFrameLoader * getFrameLoader(const int& frame) {
+        if(mFrameCount <= 0 || frame >= mFrameCount) return nullptr;
+        const int id = mFramesBeingLoaded.indexOf(frame);
+        if(id >= 0) return mFrameLoaders.at(id).get();
+        return nullptr;
+    }
 
-    qreal mFps = 24;
-    qreal mUpdateFps = 24;
+    VideoFrameLoader * addFrameLoader(const int& frame) {
+        mFramesBeingLoaded << frame;
+        const auto loader = SPtrCreate(VideoFrameLoader)(
+                    this, &mVideoStreamsData, frame);
+        mFrameLoaders << loader;
+        return loader.get();
+    }
 
-    QList<int> mFramesLoadScheduled;
+    void removeFrameLoader(const int& frame) {
+        const int id = mFramesBeingLoaded.indexOf(frame);
+        mFramesBeingLoaded.removeAt(id);
+        mFrameLoaders.removeAt(id);
+    }
 
-    QList<int> mFramesBeingLoadedGUI;
+    void openVideoStream() {
+        mVideoStreamsData.open(mFilePath);
+        mFrameCount = mVideoStreamsData.fFrameCount;
+    }
+
     QList<int> mFramesBeingLoaded;
-    QList<sk_sp<SkImage>> mLoadedFrames;
+    QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
 
+    VideoStreamsData mVideoStreamsData;
     RenderCacheHandler mFramesCache;
 };
 

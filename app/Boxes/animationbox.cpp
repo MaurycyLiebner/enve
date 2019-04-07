@@ -166,7 +166,7 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
     imageData->animationFrame = animationFrame;
     imageData->fImage = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
     if(!imageData->fImage) {
-        auto upd = mAnimationCacheHandler->scheduleFrameLoad(animationFrame);
+        const auto upd = mAnimationCacheHandler->scheduleFrameLoad(animationFrame);
         if(upd) upd->addDependent(imageData);
     }
 }

@@ -10,6 +10,7 @@ protected:
     _Task();
 
     virtual void afterProcessingFinished() {}
+    virtual void afterCanceled() {}
 public:
     enum State : char {
         CANCELED = 0,
@@ -23,21 +24,18 @@ public:
         tellNextDependentThatFinished();
     }
 
-    bool isActive() { return mState != CREATED && mState != FINISHED; }
+    virtual void beforeProcessingStarted();
+    virtual void _processUpdate() = 0;
+    virtual void clear();
 
+    bool isActive() { return mState != CREATED && mState != FINISHED; }
     void setCurrentTaskExecutor(TaskExecutor *taskExecutor);
 
-    virtual void beforeProcessingStarted();
-
-    virtual void _processUpdate() = 0;
-
     void finishedProcessing();
+    bool readyToBeProcessed();
 
     void waitTillProcessed();
 
-    bool readyToBeProcessed();
-
-    virtual void clear();
 
     void addDependent(_Task * const updatable);
 
@@ -48,6 +46,7 @@ public:
 
     void setState(const State& state) {
         mState = state;
+        if(state == CANCELED) afterCanceled();
     }
 
     State getState() const {

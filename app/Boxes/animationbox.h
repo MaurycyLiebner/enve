@@ -48,7 +48,7 @@ public:
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
-    stdptr<AnimationCacheHandler>mAnimationCacheHandler;
+    stdptr<AnimationCacheHandler> mAnimationCacheHandler;
     qreal mFps = 24;
 
     bool mFrameRemappingEnabled = false;
