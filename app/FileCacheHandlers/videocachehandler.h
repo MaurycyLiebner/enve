@@ -87,8 +87,8 @@ private:
                 vidCodecPars = iCodecPars;
                 vidCodec = avcodec_find_decoder(vidCodecPars->codec_id);
                 fVideoStream = fFormatContext->streams[fVideoStreamIndex];
-                fTimeBaseDen = fVideoStream->avg_frame_rate.den;
-                fTimeBaseNum = fVideoStream->avg_frame_rate.num;
+                fTimeBaseDen = fVideoStream->r_frame_rate.den; //avg_frame_rate ??
+                fTimeBaseNum = fVideoStream->r_frame_rate.num; //avg_frame_rate ??
                 if(fTimeBaseDen == 0)
                     RuntimeThrow("Invalid video frame rate denominator (0)");
                 fFps = static_cast<qreal>(fTimeBaseNum)/fTimeBaseDen;
@@ -161,12 +161,13 @@ private:
         const auto swsContext = mOpenedVideo->fSwsContext;
         const qreal fps = mOpenedVideo->fFps;
 
-        const int tsms = qRound(mFrameId * 1000 / fps);
-
-        const int64_t frame = av_rescale(tsms, videoStream->time_base.den,
-                                         videoStream->time_base.num)/1000;
-
         if(mFrameId != 0) {
+            //const int tsms = qRound(mFrameId * 1000 / fps);
+            const int64_t frame = static_cast<int64_t>(mFrameId);
+    //        const int64_t frame = av_rescale(tsms, videoStream->time_base.den,
+    //                                         videoStream->time_base.num)/1000;
+//            av_seek_frame(formatContext, videoStreamIndex,
+//                          frame, AVSEEK_FLAG_FRAME);
             if(avformat_seek_file(formatContext, videoStreamIndex, 0,
                                   frame, frame, AVSEEK_FLAG_FRAME) < 0) {
                 return;

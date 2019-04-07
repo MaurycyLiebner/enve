@@ -56,7 +56,7 @@ void AnimationBox::setParentGroup(BoxesGroup * const parent) {
 }
 
 bool AnimationBox::shouldScheduleUpdate() {
-    if(mAnimationCacheHandler == nullptr || mParentGroup == nullptr) return false;
+    if(!mAnimationCacheHandler || !mParentGroup) return false;
     return BoundingBox::shouldScheduleUpdate();
 }
 

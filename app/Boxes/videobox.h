@@ -7,14 +7,14 @@
 class SingleSound;
 
 class VideoBox : public AnimationBox {
-    Q_OBJECT
-public:
+    friend class SelfRef;
+protected:
     VideoBox(const QString &filePath);
     VideoBox();
+public:
     ~VideoBox();
 
     void setParentGroup(BoxesGroup * const parent);
-    void setFilePath(const QString &path);
     void reloadSound();
 
     bool SWT_isVideoBox() const { return true; }
@@ -23,6 +23,8 @@ public:
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
+
+    void setFilePath(const QString &path);
 protected:
     void updateFrameCount(const char *path);
 private:

@@ -19,16 +19,15 @@ struct AnimationBoxRenderData : public ImageBoxRenderData {
 };
 
 class AnimationBox : public BoundingBox {
-    Q_OBJECT
-public:
+    friend class SelfRef;
+protected:
     AnimationBox();
+public:
     ~AnimationBox();
     void anim_setAbsFrame(const int &frame);
 
-    void updateDurationRectangleAnimationRange();
     void reloadCacheHandler();
     virtual void reloadSound() {}
-    FixedLenAnimationRect *getAnimationDurationRect();
 
     bool SWT_isAnimationBox() const { return true; }
     void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
@@ -36,16 +35,18 @@ public:
     void setupBoundingBoxRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData* data);
     stdsptr<BoundingBoxRenderData> createRenderData();
+    void setParentGroup(BoxesGroup * const parent);
+    bool shouldScheduleUpdate();
+
+    FixedLenAnimationRect *getAnimationDurationRect();
+    void updateDurationRectangleAnimationRange();
 
     void afterUpdate();
-    void setParentGroup(BoxesGroup * const parent);
     void beforeAddingScheduler();
-    bool shouldScheduleUpdate();
     int getAnimationFrameForRelFrame(const int &relFrame);
 
     void enableFrameRemapping();
     void disableFrameRemapping();
-public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
     stdptr<AnimationCacheHandler> mAnimationCacheHandler;
