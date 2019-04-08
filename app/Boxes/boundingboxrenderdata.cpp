@@ -154,15 +154,13 @@ void BoundingBoxRenderData::scheduleTaskNow() {
 }
 
 void BoundingBoxRenderData::dataSet() {
-    if(allDataReady()) {
-        mDataSet = true;
-        if(!fRelBoundingRectSet) {
-            fRelBoundingRectSet = true;
-            updateRelBoundingRect();
-        }
-        if(!fParentBox || !fParentIsTarget) return;
-        fParentBox->updateCurrentPreviewDataFromRenderData(this);
+    mDataSet = true;
+    if(!fRelBoundingRectSet) {
+        fRelBoundingRectSet = true;
+        updateRelBoundingRect();
     }
+    if(!fParentBox || !fParentIsTarget) return;
+    fParentBox->updateCurrentPreviewDataFromRenderData(this);
 }
 
 bool BoundingBoxRenderData::nullifyBeforeProcessing() {
@@ -205,6 +203,6 @@ MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal &opacity) {
     mOpacity = opacity;
 }
 
-void MultiplyOpacityCustomizer::customize(BoundingBoxRenderData *data) {
+void MultiplyOpacityCustomizer::customize(BoundingBoxRenderData * const data) {
     data->fOpacity *= mOpacity;
 }

@@ -6,45 +6,35 @@ class FileCacheHandler;
 class ImageCacheHandler;
 
 struct ImageBoxRenderData : public BoundingBoxRenderData {
-    ImageBoxRenderData(FileCacheHandler *cacheHandler,
-                       BoundingBox *parentBoxT) :
+    ImageBoxRenderData(FileCacheHandler * const cacheHandler,
+                       BoundingBox * const parentBoxT) :
         BoundingBoxRenderData(parentBoxT) {
         mDelayDataSet = true;
-        srcCacheHandler = cacheHandler;
+        fSrcCacheHandler = cacheHandler;
     }
 
     virtual void loadImageFromHandler();
 
     void beforeProcessingStarted() {
-        if(!allDataReady()) {
-            loadImageFromHandler();
-        }
+        if(!fImage) loadImageFromHandler();
         BoundingBoxRenderData::beforeProcessingStarted();
-        if(fImage.get() == nullptr) {
-            qDebug() << "ImageBoxRenderData::beforeUpdate() - no image to render";
-        }
-    }
-
-    bool allDataReady() {
-        return fImage.get();
     }
 
     void updateRelBoundingRect() {
-        fRelBoundingRect = QRectF(0., 0., fImage->width(), fImage->height());
+        if(fImage) fRelBoundingRect =
+                QRectF(0, 0, fImage->width(), fImage->height());
+        else fRelBoundingRect = QRectF(0, 0, 0, 0);
     }
 
     sk_sp<SkImage> fImage;
 
-    FileCacheHandler *srcCacheHandler;
+    FileCacheHandler *fSrcCacheHandler;
 private:
     void drawSk(SkCanvas * const canvas) {
         SkPaint paint;
         //paint.setFilterQuality(kHigh_SkFilterQuality);
         //paint.setAntiAlias(true);
-        if(!fImage) {
-            qDebug() << "ImageBoxRenderData::drawSk() - no image to draw";
-        }
-        canvas->drawImage(fImage, 0, 0, &paint);
+        if(fImage) canvas->drawImage(fImage, 0, 0, &paint);
     }
 };
 

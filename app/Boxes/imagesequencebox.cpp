@@ -11,13 +11,13 @@ ImageSequenceBox::ImageSequenceBox() :
 
 void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     mListOfFrames = listOfFrames;
-    if(mAnimationCacheHandler) {
-        mAnimationCacheHandler->removeDependentBox(this);
+    if(mFramesCache) {
+        mFramesCache->removeDependentBox(this);
     }
-    mAnimationCacheHandler = FileSourcesCache::
+    mFramesCache = FileSourcesCache::
             createNewHandler<ImageSequenceCacheHandler>(
                 mListOfFrames);
-    mAnimationCacheHandler->addDependentBox(this);
+    mFramesCache->addDependentBox(this);
 
     reloadCacheHandler();
 }

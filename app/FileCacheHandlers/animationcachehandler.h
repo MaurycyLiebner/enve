@@ -23,7 +23,6 @@ public:
     }
 
     int getFrameCount() { return mFrameCount; }
-
 protected:
     int mFrameCount = 0;
 };

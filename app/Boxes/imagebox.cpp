@@ -76,5 +76,5 @@ stdsptr<BoundingBoxRenderData> ImageBox::createRenderData() {
 
 #include "filesourcescache.h"
 void ImageBoxRenderData::loadImageFromHandler() {
-    fImage = GetAsPtr(srcCacheHandler, ImageCacheHandler)->getImageCopy();
+    fImage = GetAsPtr(fSrcCacheHandler, ImageCacheHandler)->getImageCopy();
 }

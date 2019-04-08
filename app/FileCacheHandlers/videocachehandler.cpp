@@ -15,7 +15,6 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     const auto cont = mFramesCache.getRenderContainerAtRelFrame
             <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
-    //cont->neededInMemory();
     return cont->getImageSk();
 }
 
@@ -23,7 +22,6 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int& relFrame) {
     const auto cont = mFramesCache.getRenderContainerAtOrBeforeRelFrame
             <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
-    //cont->neededInMemory();
     return cont->getImageSk();
 }
 
@@ -66,6 +64,8 @@ void VideoCacheHandler::replace() {
 }
 
 _ScheduledTask* VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+    if(frame < 0 || frame >= mFrameCount)
+        RuntimeThrow("Frame outside of range " + std::to_string(frame));
     const auto currLoader = getFrameLoader(frame);
     if(currLoader) return currLoader;
     const auto contAtFrame = mFramesCache.getRenderContainerAtRelFrame

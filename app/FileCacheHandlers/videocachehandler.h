@@ -138,9 +138,7 @@ protected:
                      const VideoStreamsData * const openedVideo,
                      const int& frameId) :
         mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
-        mFrameId(frameId) {
-
-    }
+        mFrameId(frameId) {}
 
     void afterProcessingFinished();
     void afterCanceled();
@@ -161,16 +159,21 @@ private:
         const auto swsContext = mOpenedVideo->fSwsContext;
         const qreal fps = mOpenedVideo->fFps;
 
-        if(mFrameId != 0) {
-            //const int tsms = qRound(mFrameId * 1000 / fps);
-            const int64_t frame = static_cast<int64_t>(mFrameId);
-    //        const int64_t frame = av_rescale(tsms, videoStream->time_base.den,
-    //                                         videoStream->time_base.num)/1000;
-//            av_seek_frame(formatContext, videoStreamIndex,
-//                          frame, AVSEEK_FLAG_FRAME);
-            if(avformat_seek_file(formatContext, videoStreamIndex, 0,
-                                  frame, frame, AVSEEK_FLAG_FRAME) < 0) {
-                return;
+        if(mFrameId == 0)
+            avformat_seek_file(formatContext, videoStreamIndex,
+                               INT64_MIN, 0, INT64_MAX, 0);
+        else {
+            const int64_t tsms = qRound(mFrameId * 1000 / fps);
+            int64_t tm = av_rescale(tsms, videoStream->time_base.den,
+                                    videoStream->time_base.num)/1000;
+            const int64_t tsms0 = qRound((mFrameId - 2*fps)* 1000 / fps);
+            int64_t tm0 = av_rescale(tsms0, videoStream->time_base.den,
+                                     videoStream->time_base.num)/1000;
+            if(avformat_seek_file(formatContext, videoStreamIndex, tm0,
+                                  tm, tm, AVSEEK_FLAG_FRAME) < 0) {
+                qDebug() << "Failed to seek to " << mFrameId;
+                avformat_seek_file(formatContext, videoStreamIndex,
+                                   INT64_MIN, 0, INT64_MAX, 0);
             }
         }
 
@@ -190,7 +193,9 @@ private:
                         return;
                     }
                     response = avcodec_receive_frame(codecContext, decodedFrame);
-                    if(response == AVERROR(EAGAIN) || response == AVERROR_EOF) {
+                    if(response == AVERROR_EOF) {
+                        return;
+                    } else if(response == AVERROR(EAGAIN)) {
                         av_packet_unref(packet);
                         continue;
                     } else if(response < 0) {
@@ -202,24 +207,18 @@ private:
                     av_packet_unref(packet);
                     continue;
                 }
-                //if(frameId == 0) break;
             }
 
             // calculate PTS:
             pts = av_frame_get_best_effort_timestamp(decodedFrame);
             pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
             const int currFrame = qRound(pts/1000000.*fps);
-            if(currFrame == mFrameId) {
-//                qDebug() << pts/1000 << tsms;
-//                qDebug() << "for" << frameId << "received" << pts*mUpdateFps/1000000;
-//                qDebug() << "seeked" << frame;
+            if(currFrame >= mFrameId) {
                 frameReceived = true;
                 break;
             }
             av_frame_unref(decodedFrame);
         }
-
-    // SKIA
 
         if(frameReceived) {
             const auto info = SkiaHelpers::getPremulBGRAInfo(
@@ -231,7 +230,7 @@ private:
             bitmap.peekPixels(&pixmap);
 
             void * const addr = pixmap.writable_addr();
-            uint8_t *dstSk[] = { static_cast<unsigned char*>(addr) };
+            uint8_t * const dstSk[] = { static_cast<unsigned char*>(addr) };
             int linesizesSk[4];
 
             av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_BGRA,

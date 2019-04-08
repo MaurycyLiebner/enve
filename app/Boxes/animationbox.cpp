@@ -15,7 +15,7 @@ AnimationBox::AnimationBox() :
 }
 
 AnimationBox::~AnimationBox() {
-    mAnimationCacheHandler->removeDependentBox(this);
+    mFramesCache->removeDependentBox(this);
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
@@ -28,7 +28,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 
     auto oldRange = getAnimationDurationRect()->getRelFrameRange();
     getAnimationDurationRect()->setAnimationFrameDuration(
-            mAnimationCacheHandler->getFrameCount());
+            mFramesCache->getFrameCount());
     auto newRange = getAnimationDurationRect()->getRelFrameRange();
 
     prp_updateAfterChangedRelFrameRange({oldRange.fMin, newRange.fMin});
@@ -40,7 +40,7 @@ void AnimationBox::reloadCacheHandler() {
         updateDurationRectangleAnimationRange();
     //}
     if(mFrameRemappingEnabled) {
-        const int frameCount = mAnimationCacheHandler->getFrameCount();
+        const int frameCount = mFramesCache->getFrameCount();
         mFrameAnimator->setIntValueRange(0, frameCount - 1);
     }
     reloadSound();
@@ -56,7 +56,7 @@ void AnimationBox::setParentGroup(BoxesGroup * const parent) {
 }
 
 bool AnimationBox::shouldScheduleUpdate() {
-    if(!mAnimationCacheHandler || !mParentGroup) return false;
+    if(!mFramesCache || !mParentGroup) return false;
     return BoundingBox::shouldScheduleUpdate();
 }
 
@@ -66,14 +66,14 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
     if(mFrameRemappingEnabled) {
         pixId = mFrameAnimator->getCurrentIntValueAtRelFrame(relFrame);
-    } else { // reversed
-        pixId = (relFrame - animStartRelFrame);
+    } else {
+        pixId = relFrame - animStartRelFrame;
     }
 
     if(pixId <= 0) {
         pixId = 0;
-    } else if(pixId > mAnimationCacheHandler->getFrameCount() - 1) {
-        pixId = mAnimationCacheHandler->getFrameCount() - 1;
+    } else if(pixId > mFramesCache->getFrameCount() - 1) {
+        pixId = mFramesCache->getFrameCount() - 1;
     }
 
     return pixId;
@@ -82,7 +82,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
 #include "Animators/effectanimators.h"
 void AnimationBox::enableFrameRemapping() {
     if(mFrameRemappingEnabled) return;
-    const int frameCount = mAnimationCacheHandler->getFrameCount();
+    const int frameCount = mFramesCache->getFrameCount();
     mFrameAnimator->setIntValueRange(0, frameCount - 1);
     const int animStartRelFrame =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
@@ -116,7 +116,7 @@ void AnimationBox::disableFrameRemapping() {
 
 void AnimationBox::anim_setAbsFrame(const int &frame) {
     BoundingBox::anim_setAbsFrame(frame);
-    if(!mAnimationCacheHandler) return;
+    if(!mFramesCache) return;
 
     mNewCurrentFrameUpdateNeeded = true;
 
@@ -136,8 +136,8 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
 void AnimationBox::addActionsToMenu(QMenu * const menu,
                                     QWidget* const widgetsParent) {
     menu->addAction("Reload", [this]() {
-        if(mAnimationCacheHandler) {
-            mAnimationCacheHandler->clearCache();
+        if(mFramesCache) {
+            mFramesCache->clearCache();
         }
     });
 
@@ -159,23 +159,20 @@ void AnimationBox::addActionsToMenu(QMenu * const menu,
 void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
                                 const qreal &relFrame,
                                 BoundingBoxRenderData* data) {
-    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
-                                                       data);
+    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     const int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
     imageData->animationFrame = animationFrame;
-    imageData->fImage = mAnimationCacheHandler->getFrameCopyAtFrame(animationFrame);
-    if(!imageData->fImage) {
-        const auto upd = mAnimationCacheHandler->scheduleFrameLoad(animationFrame);
-        if(upd) upd->addDependent(imageData);
-    }
+    const auto upd = mFramesCache->scheduleFrameLoad(animationFrame);
+    if(upd) upd->addDependent(imageData);
+    else imageData->fImage = mFramesCache->getFrameCopyAtFrame(animationFrame);
 }
 
 stdsptr<BoundingBoxRenderData> AnimationBox::createRenderData() {
-    return SPtrCreate(AnimationBoxRenderData)(mAnimationCacheHandler, this);
+    return SPtrCreate(AnimationBoxRenderData)(mFramesCache, this);
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    fImage = GetAsPtr(srcCacheHandler, AnimationCacheHandler)->
+    fImage = GetAsPtr(fSrcCacheHandler, AnimationCacheHandler)->
             getFrameCopyAtOrBeforeFrame(animationFrame);
 }

@@ -28,7 +28,6 @@ protected:
     void scheduleTaskNow();
 public:
     virtual void renderToImage();
-    virtual bool allDataReady() { return true; }
     virtual QPointF getCenterPosition() {
         return fRelBoundingRect.center();
     }
@@ -151,7 +150,7 @@ protected:
 class MultiplyTransformCustomizer : public RenderDataCustomizerFunctor {
 public:
     MultiplyTransformCustomizer(const QMatrix &transform,
-                                const qreal &opacity = 1.);
+                                const qreal &opacity = 1);
 
     void customize(BoundingBoxRenderData *data);
 protected:
@@ -163,7 +162,7 @@ class MultiplyOpacityCustomizer : public RenderDataCustomizerFunctor {
 public:
     MultiplyOpacityCustomizer(const qreal &opacity);
 
-    void customize(BoundingBoxRenderData *data);
+    void customize(BoundingBoxRenderData * const data);
 protected:
     qreal mOpacity;
 };

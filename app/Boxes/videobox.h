@@ -25,8 +25,6 @@ public:
     void readBoundingBox(QIODevice *target);
 
     void setFilePath(const QString &path);
-protected:
-    void updateFrameCount(const char *path);
 private:
     qsptr<SingleSound> mSound;
     QString mSrcFilePath;
