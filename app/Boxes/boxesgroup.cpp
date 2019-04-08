@@ -259,13 +259,11 @@ void BoxesGroup::filterFillPathForRelFrame(const qreal &relFrame,
     mParentGroup->filterFillPathForRelFrame(parentRelFrame, srcDstPath);
 }
 
-void BoxesGroup::prp_setParentFrameShift(const int &shift,
-                                         ComplexAnimator *parentAnimator) {
-    ComplexAnimator::prp_setParentFrameShift(shift, parentAnimator);
+void BoxesGroup::prp_afterFrameShiftChanged() {
+    ComplexAnimator::prp_afterFrameShiftChanged();
     const int thisShift = prp_getFrameShift();
-    for(const auto &child : mContainedBoxes) {
+    for(const auto &child : mContainedBoxes)
         child->prp_setParentFrameShift(thisShift, this);
-    }
 }
 
 void BoxesGroup::scheduleWaitingTasks() {

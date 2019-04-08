@@ -99,6 +99,7 @@ public:
 
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
+    virtual void prp_afterFrameShiftChanged() {}
     virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
         Q_UNUSED(relFrame);
         return {FrameRange::EMIN, FrameRange::EMAX};

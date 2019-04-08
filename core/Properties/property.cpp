@@ -32,6 +32,7 @@ void Property::prp_setParentFrameShift(const int &shift,
                                        ComplexAnimator *parentAnimator) {
     Q_UNUSED(parentAnimator);
     prp_mParentFrameShift = shift;
+    prp_afterFrameShiftChanged();
 }
 
 FrameRange Property::prp_relRangeToAbsRange(const FrameRange& range) const {

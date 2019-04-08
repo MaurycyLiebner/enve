@@ -32,6 +32,10 @@ struct _ValueRange {
         return fMax - fMin + 1;
     }
 
+    _ValueRange<T> shifted(const T& by) const {
+        return {fMin + by, fMax + by};
+    }
+
     bool overlaps(const _ValueRange<T>& b) const {
         return !this->operator*(b).isValid();
     }
@@ -77,11 +81,9 @@ struct _ValueRange {
     }
 
     _ValueRange<T> operator+(const _ValueRange<T>& b) const {
-        Q_ASSERT(neighbours(b));
         return {qMin(this->fMin, b.fMin), qMax(this->fMax, b.fMax)};
     }
     _ValueRange<T>& operator+=(const _ValueRange<T>& b) {
-        Q_ASSERT(neighbours(b));
         this->fMin = qMin(this->fMin, b.fMin);
         this->fMax = qMax(this->fMax, b.fMax);
         return *this;

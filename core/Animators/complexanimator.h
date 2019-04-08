@@ -39,8 +39,8 @@ public:
     void prp_setTransformed(const bool &bT);
     QString prp_getValueText();
 
-    void prp_setParentFrameShift(const int &shift,
-                                 ComplexAnimator *parentAnimator = nullptr);
+    void prp_afterFrameShiftChanged();
+
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     void anim_saveCurrentValueAsKey();
     bool anim_isDescendantRecording() const;

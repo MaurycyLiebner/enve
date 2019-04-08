@@ -458,7 +458,7 @@ public slots:
     void scheduleUpdate(const UpdateReason &reason);
     void scheduleUpdate(const int& relFrame, const UpdateReason &reason);
 
-    void updateAfterDurationRectangleShifted(const int &dFrame = 0);
+    void updateAfterDurationRectangleShifted(const int &dFrame);
     void updateAfterDurationMinFrameChangedBy(const int &by);
     void updateAfterDurationMaxFrameChangedBy(const int &by);
 };

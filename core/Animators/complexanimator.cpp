@@ -211,9 +211,7 @@ void ComplexAnimator::prp_setTransformed(const bool &bT) {
         property->prp_setTransformed(bT);
 }
 
-void ComplexAnimator::prp_setParentFrameShift(const int &shift,
-                                              ComplexAnimator* parentAnimator) {
-    Property::prp_setParentFrameShift(shift, parentAnimator);
+void ComplexAnimator::prp_afterFrameShiftChanged() {
     const int thisShift = prp_getFrameShift();
     for(const auto &property : ca_mChildAnimators)
         property->prp_setParentFrameShift(thisShift, this);

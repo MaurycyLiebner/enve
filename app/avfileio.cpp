@@ -604,7 +604,7 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     if(hasDurRect) {
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(target);
-        updateAfterDurationRectangleShifted();
+        updateAfterDurationRectangleShifted(0);
     }
 
     mTransformAnimator->readProperty(target);

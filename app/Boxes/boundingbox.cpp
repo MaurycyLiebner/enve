@@ -243,8 +243,7 @@ void BoundingBox::anim_setAbsFrame(const int &frame) {
                 anim_getCurrentRelFrame());
     if(mInVisibleRange != isInVisRange) {
         if(mInVisibleRange) {
-            if(mParentGroup)
-                mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
+            if(mParentGroup) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
         } else {
             scheduleUpdate(Animator::FRAME_CHANGE);
         }
@@ -869,7 +868,7 @@ SmartVectorPath *BoundingBox::objectToVectorPathBox() { return nullptr; }
 SmartVectorPath *BoundingBox::strokeToVectorPathBox() { return nullptr; }
 
 void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
-    Canvas* parentCanvas = getParentCanvas();
+    const auto parentCanvas = getParentCanvas();
     if(shiftPressed) {
         if(mSelected) {
             parentCanvas->removeBoxFromSelection(this);
@@ -935,14 +934,13 @@ void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
 //}
 
 bool BoundingBox::hasDurationRectangle() const {
-    return mDurationRectangle != nullptr;
+    return mDurationRectangle;
 }
 
 void BoundingBox::createDurationRectangle() {
-    qsptr<DurationRectangle> durRect =
-            SPtrCreate(DurationRectangle)(this);
+    const auto durRect = SPtrCreate(DurationRectangle)(this);
     durRect->setMinFrame(0);
-    Canvas* parentCanvas = getParentCanvas();
+    const auto parentCanvas = getParentCanvas();
     if(parentCanvas) {
         durRect->setFramesDuration(getParentCanvas()->getFrameCount());
     }
@@ -950,11 +948,8 @@ void BoundingBox::createDurationRectangle() {
 }
 
 void BoundingBox::shiftAll(const int &shift) {
-    if(hasDurationRectangle()) {
-        mDurationRectangle->changeFramePosBy(shift);
-    } else {
-        anim_shiftAllKeys(shift);
-    }
+    if(hasDurationRectangle()) mDurationRectangle->changeFramePosBy(shift);
+    else anim_shiftAllKeys(shift);
 }
 
 QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {
@@ -974,7 +969,7 @@ void BoundingBox::setDurationRectangle(
     }
     qsptr<DurationRectangle> oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
-    updateAfterDurationRectangleShifted();
+    updateAfterDurationRectangleShifted(0);
     if(!mDurationRectangle) {
         shiftAll(oldDurRect->getFrameShift());
         return;
@@ -992,38 +987,31 @@ void BoundingBox::setDurationRectangle(
 }
 
 void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
-    prp_setParentFrameShift(prp_mParentFrameShift);
+    prp_afterFrameShiftChanged();
+    const auto newRange = getVisibleAbsFrameRange();
+    const auto oldRange = newRange.shifted(-dFrame);
+    prp_updateAfterChangedAbsFrameRange(newRange + oldRange);
     anim_setAbsFrame(anim_getCurrentAbsFrame());
-    auto visRange = getVisibleAbsFrameRange();
-    if(dFrame > 0) {
-        visRange.fMin -= dFrame;
-    } else {
-        visRange.fMax -= dFrame;
-    }
-    prp_updateAfterChangedAbsFrameRange(visRange);
 }
 
 void BoundingBox::updateAfterDurationMinFrameChangedBy(const int &by) {
-    auto visRange = getVisibleAbsFrameRange();
-    if(by > 0) {
-        visRange.fMin -= by;
-        visRange.fMax = visRange.fMin - 1;
-    } else {
-        visRange.fMax = visRange.fMin - by - 1;
-    }
-    prp_updateAfterChangedAbsFrameRange(visRange);
+    const auto newRange = getVisibleAbsFrameRange();
+    const int newMin = newRange.fMin;
+    const int oldMin = newRange.fMin - by;
+
+    const int min = qMin(newMin, oldMin);
+    const int max = qMax(newMin, oldMin);
+    prp_updateAfterChangedAbsFrameRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
-    auto visRange = getVisibleAbsFrameRange();
+    const auto newRange = getVisibleAbsFrameRange();
+    const int newMax = newRange.fMax;
+    const int oldMax = newRange.fMax - by;
 
-    if(by > 0) {
-        visRange.fMin = visRange.fMax - by + 1;
-    } else {
-        visRange.fMin = visRange.fMax + 1;
-        visRange.fMax -= by;
-    }
-    prp_updateAfterChangedAbsFrameRange(visRange);
+    const int min = qMin(newMax, oldMax);
+    const int max = qMax(newMax, oldMax);
+    prp_updateAfterChangedAbsFrameRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationRectangleRangeChanged() {}
@@ -1094,8 +1082,8 @@ bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
 
 bool BoundingBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) const {
     if(!mDurationRectangle) return true;
-    return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
-           relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
+    return qRound(relFrame) <= mDurationRectangle->getMaxFrameAsRelFrame() &&
+           qRound(relFrame) >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
 bool BoundingBox::isRelFrameVisibleAndInVisibleDurationRect(

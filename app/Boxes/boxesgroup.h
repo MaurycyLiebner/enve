@@ -85,8 +85,8 @@ public:
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
-    void prp_setParentFrameShift(const int &shift,
-                                 ComplexAnimator *parentAnimator);
+
+    void prp_afterFrameShiftChanged();
     void shiftAll(const int &shift);
 
     qsptr<BoundingBox> createLink();
