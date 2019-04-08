@@ -488,6 +488,8 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
                 prp_absRangeToRelRange(range));
     Property::prp_updateAfterChangedAbsFrameRange(range);
     auto rangeT = prp_getIdenticalRelFrameRange(anim_getCurrentRelFrame());
+    auto cont = mCacheHandler.getRenderContainerAtRelFrame(anim_getCurrentRelFrame());
+    if(cont) cont->setRange(rangeT);
     if(range.overlaps(rangeT)) scheduleUpdate(Animator::USER_CHANGE);
 }
 

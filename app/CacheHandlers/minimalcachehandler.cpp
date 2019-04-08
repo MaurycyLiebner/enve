@@ -148,7 +148,10 @@ int RangeCacheHandler::getRenderContainerIdAtOrAfterRelFrame(const int &frame) c
     return id;
 }
 
-void RangeCacheHandler::drawCacheOnTimeline(QPainter * const p, const QRect drawRect, const int &startFrame, const int &endFrame) const {
+void RangeCacheHandler::drawCacheOnTimeline(QPainter * const p,
+                                            const QRect drawRect,
+                                            const int &startFrame,
+                                            const int &endFrame) const {
     if(startFrame > endFrame) return;
     p->setBrush(QColor(0, 255, 0, 75));
     p->setPen(Qt::NoPen);
