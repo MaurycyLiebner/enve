@@ -6,10 +6,7 @@
 #include "GUI/mainwindow.h"
 #include "filesourcescache.h"
 
-VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
-    AnimationCacheHandler(filePath) {
-    openVideoStream();
-}
+VideoCacheHandler::VideoCacheHandler() {}
 
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     const auto cont = mFramesCache.getRenderContainerAtRelFrame
@@ -56,9 +53,11 @@ void VideoCacheHandler::replace() {
         const QFile file(importPath);
         if(!file.exists()) return;
         if(hasVideoExt(importPath)) {
-            mFilePath = importPath;
-            openVideoStream();
-            clearCache();
+            try {
+                setFilePath(importPath);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         }
     }
 }

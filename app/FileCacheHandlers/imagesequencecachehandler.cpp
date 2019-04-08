@@ -11,8 +11,7 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
         if(imgCacheHandler) {
             mFrameImageHandlers << GetAsPtr(imgCacheHandler, ImageCacheHandler);
         } else {
-            auto newHandler = FileSourcesCache::
-                    createNewHandler<ImageCacheHandler>(path, false);
+            auto newHandler = FileSourcesCache::createNewHandler<ImageCacheHandler>(path);
             mFrameImageHandlers << newHandler;
         }
     }
@@ -46,8 +45,7 @@ void ImageSequenceCacheHandler::clearCache() {
     FileCacheHandler::clearCache();
 }
 
-_ScheduledTask *ImageSequenceCacheHandler::scheduleFrameLoad(
-        const int &frame) {
+_ScheduledTask *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
     const auto& imageHandler = mFrameImageHandlers.at(frame);
     if(imageHandler->hasImage()) return nullptr;
     return imageHandler->scheduleLoad();

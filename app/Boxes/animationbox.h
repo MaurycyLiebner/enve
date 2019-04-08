@@ -49,7 +49,7 @@ public:
     void disableFrameRemapping();
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
-    stdptr<AnimationCacheHandler> mFramesCache;
+    stdptr<AnimationCacheHandler> mSrcFramesCache;
     qreal mFps = 24;
 
     bool mFrameRemappingEnabled = false;

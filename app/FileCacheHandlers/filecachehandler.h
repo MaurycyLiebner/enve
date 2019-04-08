@@ -5,11 +5,16 @@ class BoundingBox;
 
 class FileCacheHandler : public StdSelfRef {
 protected:
-    FileCacheHandler(const QString &filePath,
-                     const bool &visibleInListWidgets = true);
+    FileCacheHandler();
 public:
     virtual void clearCache();
     virtual void replace() {}
+
+    virtual void setFilePath(const QString &path) {
+        mFilePath = path;
+        const QFile file(mFilePath);
+        mFileMissing = !file.exists();
+    }
 
     const QString &getFilePath() {
         return mFilePath;
@@ -18,17 +23,14 @@ public:
     void scheduleUpdateForAllDependent();
     void addDependentBox(BoundingBox * const dependent);
     void removeDependentBox(BoundingBox * const dependent);
-    void setVisibleInListWidgets(const bool &bT);
 
     bool isFileMissing() {
         return mFileMissing;
     }
 protected:
     bool mFileMissing = false;
-    bool mVisibleInListWidgets;
     QList<qptr<BoundingBox>> mDependentBoxes;
     QString mFilePath;
-    QString mUpdateFilePath;
 };
 
 #endif // FILECACHEHANDLER_H

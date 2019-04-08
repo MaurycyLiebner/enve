@@ -2,23 +2,7 @@
 #include "Boxes/boundingbox.h"
 #include "filesourcescache.h"
 
-FileCacheHandler::FileCacheHandler(const QString &filePath,
-                                   const bool &visibleInListWidgets) {
-    mVisibleInListWidgets = visibleInListWidgets;
-    mFilePath = filePath;
-    const QFile file(mFilePath);
-    mFileMissing = !file.exists();
-}
-
-void FileCacheHandler::setVisibleInListWidgets(const bool &bT) {
-    if(bT == mVisibleInListWidgets) return;
-    mVisibleInListWidgets = bT;
-    if(bT) {
-        FileSourcesCache::addHandlerToListWidgets(this);
-    } else {
-        FileSourcesCache::removeHandlerFromListWidgets(this);
-    }
-}
+FileCacheHandler::FileCacheHandler() {}
 
 void FileCacheHandler::clearCache() {
     const QFile file(mFilePath);

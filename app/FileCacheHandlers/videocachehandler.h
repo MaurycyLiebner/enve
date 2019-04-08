@@ -28,8 +28,13 @@ struct VideoStreamsData {
     struct SwsContext * fSwsContext = nullptr;
 
     void open(const QString& path) {
-        fPath = path;
-        open();
+        try {
+            fPath = path;
+            open();
+        } catch(...) {
+            fPath.clear();
+            RuntimeThrow("Failed to set video file path to '" + path.toStdString() + "'.");
+        }
     }
 
     void close() {
@@ -53,8 +58,8 @@ struct VideoStreamsData {
 
 private:
     void open() {
-        const QByteArray stringByteArray = fPath.toLatin1();
-        const char * const path = stringByteArray.constData();
+        const auto stdString = fPath.toStdString();
+        const char * const path = stdString.c_str();
         try {
             open(path);
         } catch(...) {
@@ -161,7 +166,7 @@ private:
 
         if(mFrameId == 0)
             avformat_seek_file(formatContext, videoStreamIndex,
-                               INT64_MIN, 0, INT64_MAX, 0);
+                               INT64_MIN, 0, 0, 0);
         else {
             const int64_t tsms = qRound(mFrameId * 1000 / fps);
             int64_t tm = av_rescale(tsms, videoStream->time_base.den,
@@ -214,6 +219,7 @@ private:
             pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
             const int currFrame = qRound(pts/1000000.*fps);
             if(currFrame >= mFrameId) {
+                if(currFrame > mFrameId) qDebug() << QString::number(currFrame) + " instead of " + QString::number(mFrameId);
                 frameReceived = true;
                 break;
             }
@@ -256,7 +262,7 @@ private:
 class VideoCacheHandler : public AnimationCacheHandler {
     friend class StdSelfRef;
 protected:
-    VideoCacheHandler(const QString &filePath);
+    VideoCacheHandler();
 public:
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
@@ -264,6 +270,12 @@ public:
 
     void clearCache();
     void replace();
+
+    void setFilePath(const QString& path) { // throw
+        clearCache();
+        AnimationCacheHandler::setFilePath(path);
+        openVideoStream();
+    }
 
     void frameLoaderFinished(const int &frame,
                              const sk_sp<SkImage>& image);

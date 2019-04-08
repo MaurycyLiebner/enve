@@ -26,15 +26,6 @@ void ImageBox::setFilePath(const QString &path) {
     const auto handlerT = FileSourcesCache::getHandlerForFilePath(path);
     mImgCacheHandler = GetAsPtr(handlerT, ImageCacheHandler);
 
-    if(!mImgCacheHandler) {
-        const QFile file(path);
-        if(file.exists()) {
-            mImgCacheHandler = FileSourcesCache::
-                    createNewHandler<ImageCacheHandler>(path);
-        }
-    } else {
-        mImgCacheHandler->setVisibleInListWidgets(true);
-    }
     prp_setName(path.split("/").last());
     mImgCacheHandler->addDependentBox(this);
     prp_updateInfluenceRangeAfterChanged();

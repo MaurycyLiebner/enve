@@ -1314,11 +1314,11 @@ void CanvasWindow::importFile(const QString &path,
             importedBox = loadSVGFile(path);
         } else if(isImageExt(extension)) {
             const auto imgBox = SPtrCreate(ImageBox)();
-            importedBox = GetAsSPtr(imgBox, BoundingBox);
+            importedBox = imgBox;
             imgBox->setFilePath(path);
         } else if(isVideoExt(extension)) {
             const auto vidBox = SPtrCreate(VideoBox)();
-            importedBox = GetAsSPtr(vidBox, BoundingBox);
+            importedBox = vidBox;
             vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {
             MainWindow::getInstance()->loadAVFile(path);
@@ -1330,8 +1330,7 @@ void CanvasWindow::importFile(const QString &path,
         mCurrentCanvas->unblockUndoRedo();
 
         if(importedBox) {
-            mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(
-                        importedBox);
+            mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(importedBox);
             QPointF trans = relDropPos;
             trans -= importedBox->mapRelPosToAbs(
                         importedBox->getRelCenterPosition());

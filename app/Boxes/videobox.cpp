@@ -56,19 +56,14 @@ FrameRange VideoBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
 
 void VideoBox::setFilePath(const QString &path) {
     mSrcFilePath = path;
-    if(mFramesCache)
-        mFramesCache->removeDependentBox(this);
-    auto currentHandler =
-            FileSourcesCache::getHandlerForFilePath(mSrcFilePath);
+    if(mSrcFramesCache) mSrcFramesCache->removeDependentBox(this);
+    mSrcFramesCache.clear();
+
+    auto currentHandler = FileSourcesCache::getHandlerForFilePath(mSrcFilePath);
     if(currentHandler) {
-        mFramesCache =
-                GetAsPtr(currentHandler, AnimationCacheHandler);
-    } else {
-        auto newHandler = FileSourcesCache::
-                createNewHandler<VideoCacheHandler>(mSrcFilePath);
-        mFramesCache = newHandler;
+        mSrcFramesCache = GetAsPtr(currentHandler, AnimationCacheHandler);
+        mSrcFramesCache->addDependentBox(this);
     }
-    mFramesCache->addDependentBox(this);
     //getAnimationDurationRect()->setCacheHandler(mAnimationCacheHandler);
     reloadCacheHandler();
 }

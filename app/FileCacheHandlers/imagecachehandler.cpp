@@ -1,10 +1,8 @@
 #include "imagecachehandler.h"
 #include "filecachehandler.h"
 
-ImageCacheHandler::ImageCacheHandler(const QString &filePath,
-                                     const bool &visibleSeparatly) :
-    FileCacheHandler(filePath) {
-    mVisibleInListWidgets = visibleSeparatly;
+ImageCacheHandler::ImageCacheHandler(const QString &filePath) {
+    setFilePath(filePath);
 }
 
 ImageLoader::ImageLoader(const QString &filePath,

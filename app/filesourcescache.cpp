@@ -37,15 +37,22 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
             return handler.get();
         }
     }
-    QString ext = filePath.split(".").last();
+    const QString ext = filePath.split(".").last();
+    FileCacheHandler * handler = nullptr;
     if(isVideoExt(ext)) {
-        return FileSourcesCache::
-                createNewHandler<VideoCacheHandler>(filePath);
+        handler = FileSourcesCache::createNewHandler<VideoCacheHandler>();
+        try {
+            handler->setFilePath(filePath);
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+            const auto handlerSPtr = GetAsSPtr(handler, FileCacheHandler);
+            FileSourcesCache::removeHandler(handlerSPtr);
+            return nullptr;
+        }
     } else if(isImageExt(ext)) {
-        return FileSourcesCache::
-                createNewHandler<ImageCacheHandler>(filePath);
+        handler = FileSourcesCache::createNewHandler<ImageCacheHandler>(filePath);
     }
-    return nullptr;
+    return handler;
 }
 
 void FileSourcesCache::removeHandler(const stdsptr<FileCacheHandler>& handler) {
