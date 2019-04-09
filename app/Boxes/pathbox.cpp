@@ -201,6 +201,9 @@ void PathBox::setupBoundingBoxRenderDataForRelFrameF(
             strokeSettings.fPressureCurve =
                     brushSettings->getPressureAnimator()->
                         getValueAtRelFrame(relFrame);
+            strokeSettings.fSpacingCurve =
+                    brushSettings->getSpacingAnimator()->
+                        getValueAtRelFrame(relFrame);
         }
     }
     strokeSettings.fPaintColor = mStrokeSettings->
@@ -449,6 +452,8 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
                             srcBrushSettings->getWidthAnimator()->getCurrentValue());
                 dstBrushSettings->setStrokeBrushPressureCurve(
                             srcBrushSettings->getPressureAnimator()->getCurrentValue());
+                dstBrushSettings->setStrokeBrushSpacingCurve(
+                            srcBrushSettings->getSpacingAnimator()->getCurrentValue());
                 dstBrushSettings->setStrokeBrushTimeCurve(
                             srcBrushSettings->getTimeAnimator()->getCurrentValue());
             }

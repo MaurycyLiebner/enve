@@ -14,7 +14,7 @@
 #include "Animators/gradient.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
-    QWidget(parent) {
+    QTabWidget(parent) {
     //setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mMainWindow = parent;
 
@@ -31,7 +31,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
                 QIcon(":/icons/properties_stroke_paint.png"),
                 "Stroke", this);
     mStrokeTargetButton->setObjectName("rightButton");
-    setLayout(mMainLayout);
+    mFillAndStrokeWidget = new QWidget(this);
+    mFillAndStrokeWidget->setLayout(mMainLayout);
     mMainLayout->setAlignment(Qt::AlignTop);
 
     mColorTypeLayout = new QHBoxLayout();
@@ -194,13 +195,10 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mGradientTypeWidget->setContentsMargins(0, 0, 0, 0);
     mGradientTypeWidget->setLayout(mGradientTypeLayout);
 
-    mBrushSettingsWidget = new QWidget(this);
-    const auto brushLayout = new QVBoxLayout(mBrushSettingsWidget);
-    mBrushSettingsWidget->setLayout(brushLayout);
-
     const auto brushCurvesWidget = new QWidget(this);
     mBrushWidthCurveEditor = new Segment1DEditor(0, 1, this);
     mBrushPressureCurveEditor = new Segment1DEditor(0, 1, this);
+    mBrushSpacingCurveEditor = new Segment1DEditor(0, 50, this);
     mBrushTimeCurveEditor = new Segment1DEditor(0, 2, this);
     const auto brushCurvesLayout = new QVBoxLayout;
     brushCurvesWidget->setLayout(brushCurvesLayout);
@@ -209,32 +207,15 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     brushCurvesLayout->addWidget(
                 new NamedContainer("pressure", mBrushPressureCurveEditor, true, this));
     brushCurvesLayout->addWidget(
+                new NamedContainer("spacing", mBrushSpacingCurveEditor, true, this));
+    brushCurvesLayout->addWidget(
                 new NamedContainer("time", mBrushTimeCurveEditor, true, this));
-    mBrushCurvesDock = new QDockWidget(mMainWindow);
-    mBrushCurvesDock->setFeatures(QDockWidget::DockWidgetMovable |
-                                  QDockWidget::DockWidgetFloatable);
-    const auto brushCurvesLabel = new QLabel("Outline Curves", this);
-    brushCurvesLabel->setObjectName("dockLabel");
-    brushCurvesLabel->setAlignment(Qt::AlignCenter);
-    mBrushCurvesDock->setTitleBarWidget(brushCurvesLabel);
-    const auto brushCurvesScroll = new ScrollArea(mBrushCurvesDock);
+    const auto brushCurvesScroll = new ScrollArea(this);
     brushCurvesScroll->setWidget(brushCurvesWidget);
-    mBrushCurvesDock->setWidget(brushCurvesScroll);
-    mMainWindow->addDockWidget(Qt::RightDockWidgetArea, mBrushCurvesDock);
-    mBrushCurvesDock->hide();
+    mBrushSettingsWidget = brushCurvesScroll;
 
-    mBrushSelectionDock = new QDockWidget(mMainWindow);
-    mBrushSelectionDock->setFeatures(QDockWidget::DockWidgetMovable |
-                                  QDockWidget::DockWidgetFloatable);
-    const auto brushSelectionLabel = new QLabel("Outline Brush", this);
-    brushSelectionLabel->setObjectName("dockLabel");
-    brushSelectionLabel->setAlignment(Qt::AlignCenter);
-    mBrushSelectionDock->setTitleBarWidget(brushSelectionLabel);
     const int ctxt = BrushSelectionWidget::sCreateNewContext();
     mBrushSelectionWidget = new BrushSelectionWidget(ctxt, this);
-    mBrushSelectionDock->setWidget(mBrushSelectionWidget);
-    mMainWindow->addDockWidget(Qt::RightDockWidgetArea, mBrushSelectionDock);
-    mBrushSelectionDock->hide();
 
     connect(mBrushSelectionWidget,
             &BrushSelectionWidget::currentBrushChanged,
@@ -245,6 +226,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
             this, &FillStrokeSettingsWidget::setBrushTimeCurve);
     connect(mBrushPressureCurveEditor, &Segment1DEditor::segmentEdited,
             this, &FillStrokeSettingsWidget::setBrushPressureCurve);
+    connect(mBrushSpacingCurveEditor, &Segment1DEditor::segmentEdited,
+            this, &FillStrokeSettingsWidget::setBrushSpacingCurve);
 
     mMainLayout->addLayout(mTargetLayout);
     mMainLayout->addLayout(mColorTypeLayout);
@@ -252,9 +235,15 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mMainLayout->addWidget(mStrokeSettingsWidget);
     mMainLayout->addWidget(mGradientWidget);
     mMainLayout->addWidget(mColorsSettingsWidget);
-    mMainLayout->addWidget(mBrushSettingsWidget);
 
+    setTabPosition(QTabWidget::South);
     mMainLayout->addStretch(1);
+
+    const auto fillAndStrokeArea = new ScrollArea(this);
+    fillAndStrokeArea->setWidget(mFillAndStrokeWidget);
+    addTab(fillAndStrokeArea, "Fill and Stroke");
+    addTab(mBrushSelectionWidget, "Stroke Brush");
+    addTab(mBrushSettingsWidget, "Stroke Curves");
 
     mGradientTypeWidget->hide();
 
@@ -380,6 +369,12 @@ void FillStrokeSettingsWidget::setStrokeBrush(
     emitStrokeBrushChanged();
 }
 
+void FillStrokeSettingsWidget::setBrushSpacingCurve(
+        const qCubicSegment1D& seg) {
+    mCurrentStrokeBrushSpacingCurve = seg;
+    emitStrokeBrushSpacingCurveChanged();
+}
+
 void FillStrokeSettingsWidget::setBrushPressureCurve(
         const qCubicSegment1D& seg) {
     mCurrentStrokeBrushPressureCurve = seg;
@@ -439,11 +434,14 @@ void FillStrokeSettingsWidget::setCurrentBrushSettings(
                     brushSettings->getWidthAnimator());
         mBrushPressureCurveEditor->setCurrentAnimator(
                     brushSettings->getPressureAnimator());
+        mBrushSpacingCurveEditor->setCurrentAnimator(
+                    brushSettings->getSpacingAnimator());
         mBrushTimeCurveEditor->setCurrentAnimator(
                     brushSettings->getTimeAnimator());
     } else {
         mBrushWidthCurveEditor->setCurrentAnimator(nullptr);
         mBrushPressureCurveEditor->setCurrentAnimator(nullptr);
+        mBrushSpacingCurveEditor->setCurrentAnimator(nullptr);
         mBrushTimeCurveEditor->setCurrentAnimator(nullptr);
     }
 }
@@ -623,6 +621,10 @@ void FillStrokeSettingsWidget::emitStrokeBrushTimeCurveChanged() {
     mCanvasWindow->strokeBrushTimeCurveChanged(mCurrentStrokeBrushTimeCurve);
 }
 
+void FillStrokeSettingsWidget::emitStrokeBrushSpacingCurveChanged() {
+    mCanvasWindow->strokeBrushSpacingCurveChanged(mCurrentStrokeBrushSpacingCurve);
+}
+
 void FillStrokeSettingsWidget::emitStrokeBrushPressureCurveChanged() {
     mCanvasWindow->strokeBrushPressureCurveChanged(mCurrentStrokeBrushPressureCurve);
 }
@@ -728,9 +730,7 @@ void FillStrokeSettingsWidget::setBrushPaintType() {
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
-    mBrushSettingsWidget->show();
-    mBrushCurvesDock->show();
-    mBrushSelectionDock->show();
+    tabBar()->show();
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->hide();
     setCurrentPaintTypeVal(BRUSHPAINT);
     updateColorAnimator();
@@ -738,23 +738,21 @@ void FillStrokeSettingsWidget::setBrushPaintType() {
 
 void FillStrokeSettingsWidget::setNoPaintType() {
     setCurrentPaintTypeVal(NOPAINT);
-    mBrushSettingsWidget->hide();
     mColorsSettingsWidget->hide();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
-    mBrushCurvesDock->hide();
-    mBrushSelectionDock->hide();
+    tabBar()->hide();
+    setCurrentIndex(0);
     updateColorAnimator();
 }
 
 void FillStrokeSettingsWidget::setFlatPaintType() {
     disconnectGradient();
-    mBrushSettingsWidget->hide();
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
-    mBrushCurvesDock->hide();
-    mBrushSelectionDock->hide();
+    tabBar()->hide();
+    setCurrentIndex(0);
     setCurrentPaintTypeVal(FLATPAINT);
     updateColorAnimator();
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
@@ -776,9 +774,8 @@ void FillStrokeSettingsWidget::setGradientPaintType() {
     if(mColorsSettingsWidget->isHidden()) mColorsSettingsWidget->show();
     if(mGradientWidget->isHidden()) mGradientWidget->show();
     if(mGradientTypeWidget->isHidden()) mGradientTypeWidget->show();
-    mBrushSettingsWidget->hide();
-    mBrushCurvesDock->hide();
-    mBrushSelectionDock->hide();
+    tabBar()->hide();
+    setCurrentIndex(0);
     updateColorAnimator();
 
     mGradientWidget->update();

@@ -313,6 +313,12 @@ void Canvas::setSelectedStrokeBrushTimeCurve(
     }
 }
 
+void Canvas::setSelectedStrokeBrushSpacingCurve(
+        const qCubicSegment1D& curve) {
+    for(const auto &box : mSelectedBoxes) {
+        box->setStrokeBrushSpacingCurve(curve);
+    }
+}
 
 void Canvas::setSelectedStrokeBrushPressureCurve(
         const qCubicSegment1D& curve) {

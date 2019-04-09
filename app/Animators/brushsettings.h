@@ -16,6 +16,10 @@ public:
         return mPressureCurve.data();
     }
 
+    qCubicSegment1DAnimator * getSpacingAnimator() const {
+        return mSpacingCurve.data();
+    }
+
     qCubicSegment1DAnimator * getTimeAnimator() const {
         return mTimeCurve.data();
     }
@@ -36,6 +40,10 @@ public:
         mPressureCurve->setCurrentValue(curve);
     }
 
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
+        mSpacingCurve->setCurrentValue(curve);
+    }
+
     void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
         mTimeCurve->setCurrentValue(curve);
     }
@@ -46,6 +54,8 @@ private:
             SPtrCreate(qCubicSegment1DAnimator)("width");
     qsptr<qCubicSegment1DAnimator> mPressureCurve =
             SPtrCreate(qCubicSegment1DAnimator)("pressure");
+    qsptr<qCubicSegment1DAnimator> mSpacingCurve =
+            SPtrCreate(qCubicSegment1DAnimator)("spacing");
     qsptr<qCubicSegment1DAnimator> mTimeCurve =
             SPtrCreate(qCubicSegment1DAnimator)("time");
 

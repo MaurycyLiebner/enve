@@ -70,6 +70,8 @@ public:
     void strokeWidthChanged(const qreal &strokeWidth);
 
     void strokeBrushChanged(SimpleBrushWrapper * const brush);
+    void strokeBrushSpacingCurveChanged(
+            const qCubicSegment1D& curve);
     void strokeBrushPressureCurveChanged(
             const qCubicSegment1D& curve);
     void strokeBrushWidthCurveChanged(

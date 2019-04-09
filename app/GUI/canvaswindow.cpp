@@ -812,6 +812,13 @@ void CanvasWindow::strokeBrushTimeCurveChanged(
     queScheduledTasksAndUpdate();
 }
 
+void CanvasWindow::strokeBrushSpacingCurveChanged(
+        const qCubicSegment1D& curve) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setSelectedStrokeBrushSpacingCurve(curve);
+    queScheduledTasksAndUpdate();
+}
+
 void CanvasWindow::strokeBrushPressureCurveChanged(
         const qCubicSegment1D& curve) {
     if(hasNoCanvas()) return;

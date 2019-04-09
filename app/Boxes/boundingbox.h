@@ -180,6 +180,10 @@ public:
             const qCubicSegment1D& curve) {
         Q_UNUSED(curve);
     }
+    virtual void setStrokeBrushSpacingCurve(
+            const qCubicSegment1D& curve) {
+        Q_UNUSED(curve);
+    }
 
     virtual void startSelectedStrokeWidthTransform();
     virtual void startSelectedStrokeColorTransform();

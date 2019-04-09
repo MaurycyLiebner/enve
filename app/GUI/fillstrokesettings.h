@@ -27,7 +27,7 @@ class Segment1DEditor;
 class QDockWidget;
 class ColorSetting;
 
-class FillStrokeSettingsWidget : public QWidget {
+class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT
 public:
     explicit FillStrokeSettingsWidget(MainWindow *parent = nullptr);
@@ -50,6 +50,7 @@ public slots:
     void emitStrokeBrushChanged();
     void emitStrokeBrushWidthCurveChanged();
     void emitStrokeBrushTimeCurveChanged();
+    void emitStrokeBrushSpacingCurveChanged();
     void emitStrokeBrushPressureCurveChanged();
 
     void emitStrokeWidthChanged();
@@ -64,6 +65,7 @@ private slots:
     void setBrushTimeCurve(const qCubicSegment1D& seg);
     void setBrushWidthCurve(const qCubicSegment1D& seg);
     void setBrushPressureCurve(const qCubicSegment1D& seg);
+    void setBrushSpacingCurve(const qCubicSegment1D& seg);
     void setStrokeWidth(const qreal &width);
 
     void colorTypeSet(const PaintType &type);
@@ -146,6 +148,7 @@ private:
     qCubicSegment1D mCurrentStrokeBrushWidthCurve;
     qCubicSegment1D mCurrentStrokeBrushTimeCurve;
     qCubicSegment1D mCurrentStrokeBrushPressureCurve;
+    qCubicSegment1D mCurrentStrokeBrushSpacingCurve;
 
     //
 
@@ -193,14 +196,15 @@ private:
     QPushButton *mRadialGradientButton;
     QWidget *mGradientTypeWidget;
 
-    QDockWidget* mBrushSelectionDock;
+    QWidget *mFillAndStrokeWidget;
+
     BrushSelectionWidget* mBrushSelectionWidget;
 
-    QDockWidget* mBrushCurvesDock;
+    QWidget* mBrushSettingsWidget;
     Segment1DEditor* mBrushWidthCurveEditor;
     Segment1DEditor* mBrushPressureCurveEditor;
+    Segment1DEditor* mBrushSpacingCurveEditor;
     Segment1DEditor* mBrushTimeCurveEditor;
-    QWidget* mBrushSettingsWidget;
 };
 
 #endif // FILLSTROKESETTINGS_H

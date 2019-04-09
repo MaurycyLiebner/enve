@@ -123,6 +123,7 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
     qCubicSegment1D fTimeCurve;
     qCubicSegment1D fPressureCurve;
     qCubicSegment1D fWidthCurve;
+    qCubicSegment1D fSpacingCurve;
 };
 
 class OutlineSettingsAnimator : public PaintSettingsAnimator {
@@ -140,6 +141,10 @@ public:
     void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokerSettings(QPainterPathStroker * const stroker);
     void setStrokerSettingsSk(SkStroke * const stroker);
+
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushSpacingCurve(curve);
+    }
 
     void setStrokeBrushPressureCurve(const qCubicSegment1D& curve) {
         mBrushSettings->setStrokeBrushPressureCurve(curve);

@@ -75,7 +75,7 @@ protected:
                             pathT,
                             fStrokeSettings.fTimeCurve,
                             fStrokeSettings.fPressureCurve,
-                            widthCurve, 5, 5);
+                            widthCurve, fStrokeSettings.fSpacingCurve, 5, 5);
                 QColor col = fStrokeSettings.fPaintColor;
                 col.setRgbF(col.blueF(), col.greenF(),
                             col.redF(), col.alphaF());
@@ -84,9 +84,7 @@ protected:
                             toSkScalar(col.saturationF()),
                             toSkScalar(col.valueF()));
                 const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
-                for(auto& set : brushSet) {
-                    surf.execute(brush, set);
-                }
+                for(auto& set : brushSet) surf.execute(brush, set);
 
                 fBitmapTMP.reset();
                 const int iMargin = qCeil(fEffectsMargin);
@@ -153,6 +151,10 @@ public:
     void setStrokeBrushPressureCurve(
             const qCubicSegment1D& curve) {
         mStrokeSettings->setStrokeBrushPressureCurve(curve);
+    }
+    void setStrokeBrushSpacingCurve(
+            const qCubicSegment1D& curve) {
+        mStrokeSettings->setStrokeBrushSpacingCurve(curve);
     }
 
     void setOutlineCompositionMode(

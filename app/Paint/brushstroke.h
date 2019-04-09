@@ -22,6 +22,7 @@ struct BrushStroke {
     qCubicSegment1D fYTilt;
     qCubicSegment1D fTimeCurve;
     qCubicSegment1D fWidthCurve;
+    qCubicSegment1D fSpacingCurve;
 private:
     QRect execute(MyPaintBrush * const brush,
                   MyPaintSurface * const surface,
@@ -52,6 +53,11 @@ private:
         const qreal yTilt = fYTilt.valAtT(t);
         const qreal time = fTimeCurve.valAtT(t);
         const qreal width = fWidthCurve.valAtT(t);
+        const qreal spacing = fSpacingCurve.valAtT(t);
+
+        mypaint_brush_set_base_value(brush,
+                                     MYPAINT_BRUSH_SETTING_DABS_PER_ACTUAL_RADIUS,
+                                     static_cast<float>(spacing));
         mypaint_brush_set_base_value(brush,
                                      MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
                                      static_cast<float>(qLn(width)));
@@ -103,7 +109,8 @@ struct BrushStrokeSet {
     static BrushStrokeSet fromCubicList(CubicList& segs,
                                         qCubicSegment1D& timeCurve,
                                         qCubicSegment1D& pressureCurve,
-                                        qCubicSegment1D& widthCurve) {
+                                        qCubicSegment1D& widthCurve,
+                                        qCubicSegment1D& spacingCurve) {
         BrushStrokeSet set;
         qreal currLen = 0;
         qreal lastT = 0;
@@ -115,7 +122,8 @@ struct BrushStrokeSet {
                              DefaultTiltCurve,
                              DefaultTiltCurve,
                              timeCurve.tFragment(lastT, t),
-                             widthCurve.tFragment(lastT, t)};
+                             widthCurve.tFragment(lastT, t),
+                             spacingCurve.tFragment(lastT, t)};
             lastT = t;
         }
         return set;
@@ -124,7 +132,8 @@ struct BrushStrokeSet {
     static QList<BrushStrokeSet> fromSkPath(const SkPath& path,
                                             qCubicSegment1D& timeCurve,
                                             qCubicSegment1D& pressureCurve,
-                                            qCubicSegment1D& widthCurve) {
+                                            qCubicSegment1D& widthCurve,
+                                            qCubicSegment1D& spacingCurve) {
         QList<BrushStrokeSet> result;
 
         auto segLists = CubicList::sMakeFromSkPath(path);
@@ -135,7 +144,7 @@ struct BrushStrokeSet {
             const double maxL = segs.isClosed() ? 1 + 10/segs.getTotalLength() : 1;
             auto segsT = segs.getFragmentUnbound(minL, maxL);
             result << fromCubicList(segsT, timeCurve,
-                                    pressureCurve, widthCurve);
+                                    pressureCurve, widthCurve, spacingCurve);
         }
         return result;
     }
@@ -145,6 +154,7 @@ struct BrushStrokeSet {
             qCubicSegment1D& timeCurve,
             qCubicSegment1D& pressureCurve,
             qCubicSegment1D& widthCurve,
+            qCubicSegment1D& spacingCurve,
             const qreal& distInc) {
         auto pathBounds = path.getBounds();
         int maxI = qMax(qCeil(static_cast<double>(pathBounds.width())/distInc),
@@ -158,10 +168,9 @@ struct BrushStrokeSet {
 //                                1, 100, 1, 1);
             for(int j = 0; j < 10; j++) {
                 if(strokePath.isEmpty()) continue;
-                result << BrushStrokeSet::fromSkPath(strokePath,
-                                                     timeCurve,
-                                                     pressureCurve,
-                                                     widthCurve);
+                result << BrushStrokeSet::fromSkPath(strokePath, timeCurve,
+                                                     pressureCurve, widthCurve,
+                                                     spacingCurve);
             }
             //strokePath = gSmoothyPath(strokePath, 1/*static_cast<float>(i - 1)/maxI*/);
 
@@ -174,13 +183,12 @@ struct BrushStrokeSet {
             qCubicSegment1D& timeCurve,
             qCubicSegment1D& pressureCurve,
             qCubicSegment1D& widthCurve,
+            qCubicSegment1D& spacingCurve,
             const qreal& distInc,
             const qreal& outlineWidth) {
         QList<BrushStrokeSet> result;
-        result << BrushStrokeSet::fromSkPath(path,
-                                             timeCurve,
-                                             pressureCurve,
-                                             widthCurve);
+        result << BrushStrokeSet::fromSkPath(path, timeCurve, pressureCurve,
+                                             widthCurve, spacingCurve);
         qreal halfWidth = 0.5*outlineWidth;
         qreal min = -halfWidth + distInc*0.5;
         qreal max = halfWidth - distInc*0.5;
@@ -191,7 +199,8 @@ struct BrushStrokeSet {
             result << BrushStrokeSet::fromSkPath(strokePath,
                                                  timeCurve,
                                                  pressureCurve,
-                                                 widthCurve);
+                                                 widthCurve,
+                                                 spacingCurve);
         }
         return result;
     }

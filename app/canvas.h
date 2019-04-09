@@ -187,6 +187,8 @@ public:
             const qCubicSegment1D& curve);
     void setSelectedStrokeBrushPressureCurve(
             const qCubicSegment1D& curve);
+    void setSelectedStrokeBrushSpacingCurve(
+            const qCubicSegment1D& curve);
 
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();

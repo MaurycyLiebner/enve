@@ -43,6 +43,10 @@ public:
         for(const auto& box : mContainedBoxes)
             box->setStrokeBrushPressureCurve(curve);
     }
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
+        for(const auto& box : mContainedBoxes)
+            box->setStrokeBrushSpacingCurve(curve);
+    }
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;
     void updateAllBoxes(const UpdateReason &reason);
