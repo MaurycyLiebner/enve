@@ -26,12 +26,12 @@ struct AutoTiledSurface {
     void _startRequest(MyPaintTileRequest * const request);
     void _endRequest(MyPaintTileRequest * const request);
 
-    void paintPressEvent(MyPaintBrush * const brush,
-                         const QPointF& pos,
-                         const double& dTime,
-                         const double& pressure,
-                         const double& xtilt,
-                         const double& ytilt) {
+    MyPaintRectangle paintPressEvent(MyPaintBrush * const brush,
+                                     const QPointF& pos,
+                                     const double& dTime,
+                                     const double& pressure,
+                                     const double& xtilt,
+                                     const double& ytilt) {
         mypaint_brush_reset(brush);
         mypaint_brush_new_stroke(brush);
 
@@ -48,14 +48,15 @@ struct AutoTiledSurface {
                                 static_cast<float>(0));
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
+        return roi;
     }
 
-    void paintMoveEvent(MyPaintBrush * const brush,
-                        const QPointF &pos,
-                        const double& dTime,
-                        const double& pressure,
-                        const double& xtilt,
-                        const double& ytilt) {
+    MyPaintRectangle paintMoveEvent(MyPaintBrush * const brush,
+                                    const QPointF &pos,
+                                    const double& dTime,
+                                    const double& pressure,
+                                    const double& xtilt,
+                                    const double& ytilt) {
         mypaint_surface_begin_atomic(fMyPaintSurface);
         mypaint_brush_stroke_to(brush,
                                 fMyPaintSurface,
@@ -69,10 +70,10 @@ struct AutoTiledSurface {
                                 static_cast<float>(0));
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
+        return roi;
     }
 
-    void execute(MyPaintBrush * const brush,
-                 BrushStrokeSet& set) {
+    void execute(MyPaintBrush * const brush, BrushStrokeSet& set) {
         set.execute(brush, fMyPaintSurface, 5);
     }
 

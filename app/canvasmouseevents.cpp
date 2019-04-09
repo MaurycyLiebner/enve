@@ -18,10 +18,7 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
         if(event->button() == Qt::LeftButton) {
             const auto target = mPaintDrawable.getTarget();
             if(target) {
-                target->paintPressEvent(mCurrentBrush->getBrush(),
-                                        mLastMouseEventPosRel,
-                                        event->timestamp(), 0.5,
-                                        0, 0);
+                paintPress(event->timestamp(), 0.5, 0, 0);
             }
         }
     } else {
@@ -36,13 +33,7 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
 }
 
 void Canvas::handlePaintLeftButtonMoveEvent(const QMouseEvent * const event) {
-    const auto target = mPaintDrawable.getTarget();
-    if(target) {
-        target->paintMoveEvent(mCurrentBrush->getBrush(),
-                               mLastMouseEventPosRel,
-                               event->timestamp(), 1,
-                               0, 0);
-    }
+    paintMove(event->timestamp(), 1, 0, 0);
     callUpdateSchedulers();
 }
 
@@ -197,24 +188,13 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
         if(e->button() == Qt::LeftButton) {
             mStylusDrawing = true;
 
-
-            const auto target = mPaintDrawable.getTarget();
-            if(target) {
-                target->paintPressEvent(mCurrentBrush->getBrush(),
-                                        mLastMouseEventPosRel,
-                                        e->timestamp(), e->pressure(),
-                                        e->xTilt(), e->yTilt());
-            }
+            paintPress(e->timestamp(), e->pressure(),
+                       e->xTilt(), e->yTilt());
         }
     } else if(e->type() == QEvent::TabletRelease) {
     } else if(mStylusDrawing) {
-        const auto target = mPaintDrawable.getTarget();
-        if(target) {
-            target->paintMoveEvent(mCurrentBrush->getBrush(),
-                                    mLastMouseEventPosRel,
-                                    e->timestamp(), e->pressure(),
-                                    e->xTilt(), e->yTilt());
-        }
+        paintMove(e->timestamp(), e->pressure(),
+                  e->xTilt(), e->yTilt());
     } // else if
     setLastMouseEventPosAbs(absPos);
     callUpdateSchedulers();

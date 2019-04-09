@@ -145,19 +145,19 @@ private:
     }
 
     QRect pixRectToTileRect(const QRect& pixRect) const {
-        const int widthRem = pixRect.width() % MYPAINT_TILE_SIZE ? 1 : 0;
-        const int heightRem = pixRect.height() % MYPAINT_TILE_SIZE ? 1 : 0;
-        return QRect(pixRect.x()/MYPAINT_TILE_SIZE,
-                     pixRect.y()/MYPAINT_TILE_SIZE,
+        const int widthRem = (pixRect.width() % MYPAINT_TILE_SIZE) ? 2 : 1;
+        const int heightRem = (pixRect.height() % MYPAINT_TILE_SIZE) ? 2 : 1;
+        return QRect(qFloor(static_cast<qreal>(pixRect.x())/MYPAINT_TILE_SIZE),
+                     qFloor(static_cast<qreal>(pixRect.y())/MYPAINT_TILE_SIZE),
                      pixRect.width()/MYPAINT_TILE_SIZE + widthRem,
                      pixRect.height()/MYPAINT_TILE_SIZE + heightRem);
     }
 
     AutoTiledSurface * mTarget = nullptr;
-    int mRowCount;
-    int mColumnCount;
-    int mZeroTileRow;
-    int mZeroTileCol;
+    int mRowCount = 0;
+    int mColumnCount = 0;
+    int mZeroTileRow = 0;
+    int mZeroTileCol = 0;
     QList<QList<sk_sp<SkImage>>> mTileImgs;
 };
 

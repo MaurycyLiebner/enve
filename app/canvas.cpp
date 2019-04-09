@@ -33,6 +33,9 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
                const int &frameCount, const qreal &fps) :
     BoxesGroup(TYPE_CANVAS) {
+    mPaintDrawableBox = this;
+    mPaintDrawable.setTarget(new AutoTiledSurface());
+
     mMainWindow = MainWindow::getInstance();
     setCurrentBrush(mMainWindow->getCurrentBrush());
     std::function<bool(int)> changeFrameFunc =
@@ -99,10 +102,8 @@ void Canvas::setResolutionFraction(const qreal &percent) {
 }
 
 QRectF Canvas::getPixBoundingRect() {
-    return QRectF(mCanvasTransform.dx(),
-                  mCanvasTransform.dy(),
-                  mVisibleWidth,
-                  mVisibleHeight);
+    return QRectF(mCanvasTransform.dx(), mCanvasTransform.dy(),
+                  mVisibleWidth, mVisibleHeight);
 }
 
 void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
@@ -280,8 +281,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
                                                MIN_WIDGET_HEIGHT*0.25f*invZoom};
                 paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
                 canvas->drawLine(toSkPoint(mRotPivot->getAbsolutePos()),
-                                 toSkPoint(mLastMouseEventPosRel),
-                                 paint);
+                                 toSkPoint(mLastMouseEventPosRel), paint);
                 paint.setPathEffect(nullptr);
             } else if(!mIsMouseGrabbing || mRotPivot->isSelected()) {
                 mRotPivot->drawSk(canvas, invZoom);
@@ -308,25 +308,26 @@ void Canvas::renderSk(SkCanvas * const canvas,
                 mHoveredBox->drawHoveredSk(canvas, invZoom);
             }
         }
+
+        if(mPaintDrawableBox) {
+            const QRect widRect(0, 0, mCanvasWidget->width(),
+                                mCanvasWidget->height());
+            const auto canvasRect = mCanvasTransform.inverted().mapRect(widRect);
+            const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
+            const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
+            const auto absPos = mPaintDrawableBox->getAbsolutePos();
+            mPaintDrawable.drawOnCanvas(canvas, relDRect, absPos.toPoint());
+        }
+
         canvas->resetMatrix();
 
         if(!mClipToCanvasSize) {
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setStrokeWidth(2);
             paint.setColor(SK_ColorBLACK);
-            canvas->drawRect(viewRect.makeInset(1, 1),
-                             paint);
+            canvas->drawRect(viewRect.makeInset(1, 1), paint);
         }
         mValueInput.draw(canvas, mCanvasWidget->height() - MIN_WIDGET_HEIGHT);
-
-        if(mPaintDrawableBox) {
-            const auto canvasRect = mCanvasTransform.inverted().mapRect(
-                        getPixBoundingRect());
-            const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
-            const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
-            const auto absPos = mPaintDrawableBox->getAbsolutePos();
-            mPaintDrawable.drawOnCanvas(canvas, relDRect.toRect(), absPos.toPoint());
-        }
     }
 
     if(mCanvasWindow->hasFocus()) {
@@ -1088,6 +1089,37 @@ bool Canvas::isAltPressed() {
 
 bool Canvas::isAltPressed(QKeyEvent *event) {
     return event->modifiers() & Qt::AltModifier;
+}
+
+void Canvas::paintPress(const ulong ts, const qreal &pressure,
+                        const qreal &xTilt, const qreal &yTilt) {
+    const auto target = mPaintDrawable.getTarget();
+    if(target) {
+        const auto roi =
+                target->paintPressEvent(mCurrentBrush->getBrush(),
+                                        mLastMouseEventPosRel,
+                                        1, pressure,
+                                        xTilt, yTilt);
+        const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
+        mPaintDrawable.updatePixelRectImgs(qRoi);
+    }
+    mLastTs = ts;
+}
+
+void Canvas::paintMove(const ulong ts, const qreal &pressure,
+                       const qreal &xTilt, const qreal &yTilt) {
+    const auto target = mPaintDrawable.getTarget();
+    if(target) {
+        const double dt = (ts - mLastTs);
+        const auto roi =
+                target->paintMoveEvent(mCurrentBrush->getBrush(),
+                                       mLastMouseEventPosRel,
+                                       dt/1000, pressure,
+                                       xTilt, yTilt);
+        const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
+        mPaintDrawable.updatePixelRectImgs(qRoi);
+    }
+    mLastTs = ts;
 }
 
 SoundComposition *Canvas::getSoundComposition() {

@@ -597,6 +597,12 @@ private:
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
+    void paintPress(const ulong ts, const qreal& pressure,
+                    const qreal& xTilt, const qreal& yTilt);
+    void paintMove(const ulong ts, const qreal& pressure,
+                   const qreal& xTilt, const qreal& yTilt);
+
+    ulong mLastTs;
     BoundingBox * mPaintDrawableBox = nullptr;
     DrawableAutoTiledSurface mPaintDrawable;
 
