@@ -99,8 +99,8 @@ void Canvas::setResolutionFraction(const qreal &percent) {
 }
 
 QRectF Canvas::getPixBoundingRect() {
-    return QRectF(mCanvasTransformMatrix.dx(),
-                  mCanvasTransformMatrix.dy(),
+    return QRectF(mCanvasTransform.dx(),
+                  mCanvasTransform.dy(),
                   mVisibleWidth,
                   mVisibleHeight);
 }
@@ -108,14 +108,14 @@ QRectF Canvas::getPixBoundingRect() {
 void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
     const QPointF transPoint = -mapCanvasAbsToRel(absOrigin);
 
-    mCanvasTransformMatrix.translate(-transPoint.x(), -transPoint.y());
-    mCanvasTransformMatrix.scale(scaleBy, scaleBy);
-    mCanvasTransformMatrix.translate(transPoint.x(), transPoint.y());
+    mCanvasTransform.translate(-transPoint.x(), -transPoint.y());
+    mCanvasTransform.scale(scaleBy, scaleBy);
+    mCanvasTransform.translate(transPoint.x(), transPoint.y());
 
-    mLastPressPosAbs = mCanvasTransformMatrix.map(mLastPressPosRel);
+    mLastPressPosAbs = mCanvasTransform.map(mLastPressPosRel);
 
-    mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
-    mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
+    mVisibleHeight = mCanvasTransform.m22()*mHeight;
+    mVisibleWidth = mCanvasTransform.m11()*mWidth;
 
     if(mHoveredNormalSegment.isValid()) mHoveredNormalSegment.generateSkPath();
 }
@@ -152,7 +152,7 @@ void Canvas::updateHoveredBox() {
 void Canvas::updateHoveredPoint() {
     mHoveredPoint_d = getPointAtAbsPos(mCurrentMouseEventPosRel,
                                        mCurrentMode,
-                                       1/mCanvasTransformMatrix.m11());
+                                       1/mCanvasTransform.m11());
 }
 
 void Canvas::updateHoveredEdge() {
@@ -181,7 +181,7 @@ void Canvas::drawTransparencyMesh(SkCanvas *canvas,
         SkScalar currX = viewRect.left();
         SkScalar currY = viewRect.top();
         SkScalar widthT = static_cast<SkScalar>(
-                    MIN_WIDGET_HEIGHT*0.5*mCanvasTransformMatrix.m11());
+                    MIN_WIDGET_HEIGHT*0.5*mCanvasTransform.m11());
         SkScalar heightT = widthT;
         bool isOdd = false;
         while(currY < viewRect.bottom()) {
@@ -223,7 +223,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         if(mCurrentPreviewContainer) {
             canvas->save();
 
-            canvas->concat(toSkMatrix(mCanvasTransformMatrix));
+            canvas->concat(toSkMatrix(mCanvasTransform));
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
 
@@ -232,9 +232,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
     } else {
         if(!mClipToCanvasSize) {
             paint.setColor(SkColorSetARGB(255, 75, 75, 75));
-            canvas->drawRect(toSkRect(mCanvasTransformMatrix.mapRect(
-                                                getMaxBoundsRect())),
-                             paint);
+            const auto bgRect = mCanvasTransform.mapRect(getMaxBoundsRect());
+            canvas->drawRect(toSkRect(bgRect), paint);
         }
         const bool drawCanvas = mCurrentPreviewContainer &&
                 !mCurrentPreviewContainerOutdated;
@@ -245,13 +244,13 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->saveLayer(nullptr, nullptr);
             paint.setColor(toSkColor(mBackgroundColor->getCurrentColor()));
             canvas->drawRect(viewRect, paint);
-            canvas->concat(toSkMatrix(mCanvasTransformMatrix));
+            canvas->concat(toSkMatrix(mCanvasTransform));
             for(const auto& box : mContainedBoxes) {
                 box->drawPixmapSk(canvas, grContext);
             }
             canvas->restore();
         }
-        canvas->concat(toSkMatrix(mCanvasTransformMatrix));
+        canvas->concat(toSkMatrix(mCanvasTransform));
         if(drawCanvas) {
             canvas->save();
             canvas->scale(reversedRes, reversedRes);
@@ -259,7 +258,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->restore();
         }
 
-        const qreal qInvZoom = 1/mCanvasTransformMatrix.m11();
+        const qreal qInvZoom = 1/mCanvasTransform.m11();
         const SkScalar invZoom = toSkScalar(qInvZoom);
         if(!mCurrentBoxesGroup->SWT_isCanvas())
             mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
@@ -901,7 +900,7 @@ void Canvas::selectOnlyLastPressedPoint() {
 }
 
 void Canvas::resetTransormation() {
-    mCanvasTransformMatrix.reset();
+    mCanvasTransform.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
     moveByRel(QPointF((mCanvasWidget->width() - mVisibleWidth)*0.5,
@@ -910,7 +909,7 @@ void Canvas::resetTransormation() {
 }
 
 void Canvas::fitCanvasToSize() {
-    mCanvasTransformMatrix.reset();
+    mCanvasTransform.reset();
     mVisibleHeight = mHeight + MIN_WIDGET_HEIGHT;
     mVisibleWidth = mWidth + MIN_WIDGET_HEIGHT;
     qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
@@ -926,9 +925,9 @@ void Canvas::moveByRel(const QPointF &trans) {
 
     mLastPressPosRel = mapAbsPosToRel(mLastPressPosRel);
 
-    mCanvasTransformMatrix.translate(transRel.x(), transRel.y());
+    mCanvasTransform.translate(transRel.x(), transRel.y());
 
-    mLastPressPosRel = mCanvasTransformMatrix.map(mLastPressPosRel);
+    mLastPressPosRel = mCanvasTransform.map(mLastPressPosRel);
     schedulePivotUpdate();
 }
 

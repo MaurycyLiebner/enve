@@ -276,7 +276,8 @@ SOURCES += main.cpp\
     PathEffects/sumpatheffect.cpp \
     pointtypemenu.cpp \
     MovablePoints/nonanimatedmovablepoint.cpp \
-    PropertyUpdaters/boxpathpointupdater.cpp
+    PropertyUpdaters/boxpathpointupdater.cpp \
+    Paint/drawableautotiledsurface.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -501,7 +502,8 @@ HEADERS  += \
     PathEffects/sumpatheffect.h \
     pointtypemenu.h \
     MovablePoints/nonanimatedmovablepoint.h \
-    PropertyUpdaters/boxpathpointupdater.h
+    PropertyUpdaters/boxpathpointupdater.h \
+    Paint/drawableautotiledsurface.h
 
 RESOURCES += \
     resources.qrc

@@ -1172,7 +1172,7 @@ void Canvas::writeBoundingBox(QIODevice *target) {
     target->write(rcConstChar(&mFps), sizeof(qreal));
     mBackgroundColor->writeProperty(target);
     target->write(rcConstChar(&mMaxFrame), sizeof(int));
-    target->write(rcConstChar(&mCanvasTransformMatrix),
+    target->write(rcConstChar(&mCanvasTransform),
                   sizeof(QMatrix));
 }
 
@@ -1185,9 +1185,9 @@ void Canvas::readBoundingBox(QIODevice *target) {
     target->read(rcChar(&mFps), sizeof(qreal));
     mBackgroundColor->readProperty(target);
     target->read(rcChar(&mMaxFrame), sizeof(int));
-    target->read(rcChar(&mCanvasTransformMatrix), sizeof(QMatrix));
-    mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
-    mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
+    target->read(rcChar(&mCanvasTransform), sizeof(QMatrix));
+    mVisibleHeight = mCanvasTransform.m22()*mHeight;
+    mVisibleWidth = mCanvasTransform.m11()*mWidth;
 }
 
 void GradientWidget::writeGradients(QIODevice *target) {

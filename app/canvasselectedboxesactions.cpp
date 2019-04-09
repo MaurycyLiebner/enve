@@ -342,7 +342,7 @@ void Canvas::startSelectedFillColorTransform() {
 #include "Boxes/smartvectorpath.h"
 NormalSegment Canvas::getSmartEdgeAt(const QPointF& absPos) const {
     for(const auto &box : mSelectedBoxes) {
-        const qreal zoomInv = 1/mCanvasTransformMatrix.m11();
+        const qreal zoomInv = 1/mCanvasTransform.m11();
         const auto pathEdge = box->getNormalSegment(absPos, zoomInv);
         if(pathEdge.isValid()) return pathEdge;
     }

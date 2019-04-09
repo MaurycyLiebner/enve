@@ -7,7 +7,7 @@
 #include "autotiledsurface.h"
 
 void autoTiledSurfaceFree(MyPaintSurface *surface) {
-    AutoTiledSurface *self = (AutoTiledSurface*)surface;
+    const auto self = reinterpret_cast<AutoTiledSurface*>(surface);
     self->_free();
 }
 
@@ -42,7 +42,8 @@ void AutoTiledSurface::loadBitmap(const SkBitmap& src) {
 
 void AutoTiledSurface::_startRequest(MyPaintTileRequest * const request) {
     //qDebug() << request->tx << request->ty;
-    request->buffer = mAutoTilesData.getTileRelToZero(
+    mAutoTilesData.stretchToTile(request->tx, request->ty);
+    request->buffer = mAutoTilesData.getTile(
                 request->tx, request->ty);
 }
 

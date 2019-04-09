@@ -60,8 +60,8 @@ void GLWindow::resizeEvent(QResizeEvent *) {
 void GLWindow::iniRasterEffectPrograms() {
     QDirIterator dirIt(QDir::homePath() + "/.AniVect/GPURasterEffects", QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) {
-        QString path = dirIt.next();
-        QFileInfo fileInfo(path);
+        const QString path = dirIt.next();
+        const QFileInfo fileInfo(path);
         if(!fileInfo.isFile()) continue;
         if(fileInfo.suffix() != "gre") continue;
         try {
@@ -74,7 +74,7 @@ void GLWindow::iniRasterEffectPrograms() {
 }
 
 void GLWindow::initialize() {
-    glClearColor(1.f, 1.f, 1.f, 1.f);
+    glClearColor(1, 1, 1, 1);
 
     //Set blending
     glEnable(GL_BLEND);

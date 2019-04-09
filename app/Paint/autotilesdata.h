@@ -13,36 +13,56 @@ struct AutoTilesData {
 
     void reset();
 
-    uint16_t* getTileRelToZero(const int& relCol, const int& relRow);
-
-    uint16_t* cGetTile(const int& col, const int& row) const;
+    void stretchToTile(const int& tx, const int& ty);
+    uint16_t* getTile(const int& tx, const int& ty) const;
 
     int width() const;
-
     int height() const;
 
+    SkBitmap tileToBitmap(const int& tx, const int& ty);
     SkBitmap toBitmap(int margin = 0) const;
 
-    bool drawOnPixmapZeroTilePivoted(
-            SkPixmap &dst, const int& drawX, const int& drawY) const;
+    bool drawOnPixmap(SkPixmap &dst, int drawX, int drawY) const;
 
-    bool drawOnPixmap(
-            SkPixmap &dst, const int& drawX, const int& drawY) const;
+    QPoint zeroTile() const {
+        return QPoint(mZeroTileCol, mZeroTileRow);
+    }
 
     QPoint zeroTilePos() const {
-        return QPoint(mZeroTileCol*mTileSize, mZeroTileRow*mTileSize);
+        return zeroTile()*mTileSize;
+    }
+
+    QRect pixelBoundingRect() const {
+        return tileRectToPixRect(tileBoundingRect());
+    }
+
+    QRect tileBoundingRect() const {
+        return QRect(-mZeroTileCol, -mZeroTileRow,
+                     mColumnCount, mRowCount);
+    }
+
+    QRect tileRectToPixRect(const QRect& tileRect) const {
+        return QRect(tileRect.x()*mTileSize,
+                     tileRect.y()*mTileSize,
+                     tileRect.width()*mTileSize,
+                     tileRect.height()*mTileSize);
+    }
+
+    QRect pixRectToTileRect(const QRect& pixRect) const {
+        const int widthRem = pixRect.width() % mTileSize ? 1 : 0;
+        const int heightRem = pixRect.height() % mTileSize ? 1 : 0;
+        return QRect(pixRect.x()/mTileSize,
+                     pixRect.y()/mTileSize,
+                     pixRect.width()/mTileSize + widthRem,
+                     pixRect.height()/mTileSize + heightRem);
     }
 private:
-    void stretchToIncludeRel(const int& relCol, const int& relRow);
+    uint16_t* getTileByIndex(const int& colId, const int& rowId) const;
 
     QList<uint16_t*> newColumn();
-
     void prependRows(const int& count);
-
     void appendRows(const int& count);
-
     void prependColumns(const int& count);
-
     void appendColumns(const int& count);
 
     int mZeroTileCol = 0;

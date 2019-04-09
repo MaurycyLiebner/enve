@@ -529,7 +529,7 @@ void Canvas::handleLeftButtonMousePress() {
     mFirstMouseMove = true;
 
     mLastPressPosRel = mLastMouseEventPosRel;
-    const qreal canvasScaleInv = 1/mCanvasTransformMatrix.m11();
+    const qreal canvasScaleInv = 1/mCanvasTransform.m11();
     mLastPressedPoint = getPointAtAbsPos(mLastMouseEventPosRel,
                                          mCurrentMode, canvasScaleInv);
 
@@ -616,7 +616,7 @@ void Canvas::handleLeftButtonMousePress() {
 }
 
 QPointF Canvas::mapCanvasAbsToRel(const QPointF &pos) {
-    return mCanvasTransformMatrix.inverted().map(pos);
+    return mCanvasTransform.inverted().map(pos);
 }
 
 void Canvas::setLastMouseEventPosAbs(const QPointF &abs) {

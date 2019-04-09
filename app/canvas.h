@@ -611,7 +611,7 @@ protected:
 
     void sortSelectedBoxesByZAscending();
 
-    QMatrix mCanvasTransformMatrix;
+    QMatrix mCanvasTransform;
     qsptr<SoundComposition> mSoundComposition;
 
     bool mLocalPivot = false;
