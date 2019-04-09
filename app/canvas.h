@@ -13,6 +13,7 @@
 #include "MovablePoints/segment.h"
 #include "MovablePoints/movablepoint.h"
 #include "Boxes/canvasrenderdata.h"
+#include "Paint/drawableautotiledsurface.h"
 #include <QAction>
 
 class TextBox;
@@ -596,6 +597,9 @@ private:
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
+    BoundingBox * mPaintDrawableBox = nullptr;
+    DrawableAutoTiledSurface mPaintDrawable;
+
     const SimpleBrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
@@ -713,7 +717,6 @@ protected:
     void handleAddSmartPointMouseRelease();
 
     void handlePaintLeftButtonMoveEvent(const QMouseEvent * const event);
-    void handlePaintModeMouseRelease();
 
     void updateTransformation();
     void handleMouseRelease();

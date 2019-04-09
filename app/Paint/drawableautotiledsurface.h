@@ -7,9 +7,13 @@ public:
     DrawableAutoTiledSurface();
 
     void drawOnCanvas(SkCanvas * const canvas,
-                       const QRect &minPixSrc,
-                       const QPoint &dst,
-                       SkPaint * const paint = nullptr) const;
+                      const QRect &minPixSrc,
+                      const QPoint &dst,
+                      SkPaint * const paint = nullptr) const;
+
+    AutoTiledSurface * getTarget() const {
+        return mTarget;
+    }
 
     void updateTileImages() {
         if(mTarget) updateTileRectImgs(mTarget->tileBoundingRect());
@@ -46,6 +50,10 @@ public:
         if(mTarget == target) return;
         mTarget = target;
         updateTileImages();
+    }
+
+    QRect pixelBoundingRect() const {
+        return tileRectToPixRect(tileBoundingRect());
     }
 private:
     void stretchToTileImg(const int &tx, const int &ty) {
@@ -122,10 +130,6 @@ private:
 
     QPoint zeroTilePos() const {
         return zeroTile()*MYPAINT_TILE_SIZE;
-    }
-
-    QRect pixelBoundingRect() const {
-        return tileRectToPixRect(tileBoundingRect());
     }
 
     QRect tileBoundingRect() const {

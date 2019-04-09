@@ -16,14 +16,12 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
     if(mCurrentMode == PAINT_MODE) {
         if(mStylusDrawing) return;
         if(event->button() == Qt::LeftButton) {
-            for(const auto& box : mSelectedBoxes) {
-                if(box->SWT_isPaintBox()) {
-                    const auto paintBox = GetAsPtr(box, PaintBox);
-                    paintBox->mousePressEvent(mLastMouseEventPosRel.x(),
-                                         mLastMouseEventPosRel.y(),
-                                         event->timestamp(), 0.5,
-                                         mCurrentBrush);
-                }
+            const auto target = mPaintDrawable.getTarget();
+            if(target) {
+                target->paintPressEvent(mCurrentBrush->getBrush(),
+                                        mLastMouseEventPosRel,
+                                        event->timestamp(), 0.5,
+                                        0, 0);
             }
         }
     } else {
@@ -38,14 +36,12 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
 }
 
 void Canvas::handlePaintLeftButtonMoveEvent(const QMouseEvent * const event) {
-    for(const auto& box : mSelectedBoxes) {
-        if(box->SWT_isPaintBox()) {
-            const auto paintBox = GetAsPtr(box, PaintBox);
-            paintBox->mouseMoveEvent(mCurrentMouseEventPosRel.x(),
-                                     mCurrentMouseEventPosRel.y(),
-                                     event->timestamp(),
-                                     false, mCurrentBrush);
-        }
+    const auto target = mPaintDrawable.getTarget();
+    if(target) {
+        target->paintMoveEvent(mCurrentBrush->getBrush(),
+                               mLastMouseEventPosRel,
+                               event->timestamp(), 1,
+                               0, 0);
     }
     callUpdateSchedulers();
 }
@@ -130,24 +126,11 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
     callUpdateSchedulers();
 }
 
-void Canvas::handlePaintModeMouseRelease() {
-    for(const auto& box : mSelectedBoxes) {
-        if(box->SWT_isPaintBox()) {
-            const auto paintBox = GetAsPtr(box, PaintBox);
-            paintBox->mouseReleaseEvent();
-        }
-    }
-    callUpdateSchedulers();
-}
-
 void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
     if(isPreviewingOrRendering()) return;
     if(event->button() != Qt::LeftButton) return;
     schedulePivotUpdate();
-    if(mCurrentMode == PAINT_MODE) {
-        handlePaintModeMouseRelease();
-        return;
-    }
+    if(mCurrentMode == PAINT_MODE) return;
     setCurrentMouseEventPosAbs(event->pos());
     mXOnlyTransform = false;
     mYOnlyTransform = false;
@@ -214,38 +197,23 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
         if(e->button() == Qt::LeftButton) {
             mStylusDrawing = true;
 
-            for(const auto& box : mSelectedBoxes) {
-                if(box->SWT_isPaintBox()) {
-                    const auto paintBox = GetAsPtr(box, PaintBox);
-                    paintBox->mousePressEvent(mLastMouseEventPosRel.x(),
-                                         mLastMouseEventPosRel.y(),
-                                         e->timestamp(),
-                                         e->pressure(),
-                                         mCurrentBrush);
-                }
+
+            const auto target = mPaintDrawable.getTarget();
+            if(target) {
+                target->paintPressEvent(mCurrentBrush->getBrush(),
+                                        mLastMouseEventPosRel,
+                                        e->timestamp(), e->pressure(),
+                                        e->xTilt(), e->yTilt());
             }
         }
     } else if(e->type() == QEvent::TabletRelease) {
-        if(e->button() == Qt::LeftButton) {
-            mStylusDrawing = false;
-            for(const auto& box : mSelectedBoxes) {
-                if(box->SWT_isPaintBox()) {
-                    const auto paintBox = GetAsPtr(box, PaintBox);
-                    paintBox->mouseReleaseEvent();
-                }
-            }
-        }
     } else if(mStylusDrawing) {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                const auto paintBox = GetAsPtr(box, PaintBox);
-                paintBox->tabletMoveEvent(mLastMouseEventPosRel.x(),
-                                      mLastMouseEventPosRel.y(),
-                                      e->timestamp(),
-                                      e->pressure(),
-                                      e->pointerType() == QTabletEvent::Eraser,
-                                      mCurrentBrush);
-            }
+        const auto target = mPaintDrawable.getTarget();
+        if(target) {
+            target->paintMoveEvent(mCurrentBrush->getBrush(),
+                                    mLastMouseEventPosRel,
+                                    e->timestamp(), e->pressure(),
+                                    e->xTilt(), e->yTilt());
         }
     } // else if
     setLastMouseEventPosAbs(absPos);

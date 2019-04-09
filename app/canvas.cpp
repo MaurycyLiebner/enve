@@ -318,7 +318,16 @@ void Canvas::renderSk(SkCanvas * const canvas,
                              paint);
         }
         mValueInput.draw(canvas, mCanvasWidget->height() - MIN_WIDGET_HEIGHT);
-    }    
+
+        if(mPaintDrawableBox) {
+            const auto canvasRect = mCanvasTransform.inverted().mapRect(
+                        getPixBoundingRect());
+            const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
+            const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
+            const auto absPos = mPaintDrawableBox->getAbsolutePos();
+            mPaintDrawable.drawOnCanvas(canvas, relDRect.toRect(), absPos.toPoint());
+        }
+    }
 
     if(mCanvasWindow->hasFocus()) {
         paint.setColor(SK_ColorRED);
