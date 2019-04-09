@@ -2,38 +2,52 @@
 #define DRAWABLEAUTOTILEDSURFACE_H
 #include "autotiledsurface.h"
 
-class DrawableAutoTiledSurface : public AutoTiledSurface {
+class DrawableAutoTiledSurface {
 public:
     DrawableAutoTiledSurface();
 
     void drawOnCanvas(SkCanvas * const canvas,
-                       const QRect &minSrc,
+                       const QRect &minPixSrc,
                        const QPoint &dst,
                        SkPaint * const paint = nullptr) const;
 
-    void updateTileImg(const int& tx, const int& ty) {
-        auto btmp = mAutoTilesData.tileToBitmap(tx, ty);
-        btmp.setImmutable();
-        const auto img = SkImage::MakeFromBitmap(btmp);
-        btmp.reset();
-
-        const auto zeroTile = mAutoTilesData.zeroTile();
-        const auto tileId = QPoint(tx, ty) + zeroTile;
-        mTileImgs[tileId.x()].replace(tileId.y(), img);
+    void updateTileImages() {
+        if(mTarget) updateTileRectImgs(mTarget->tileBoundingRect());
+        else mTileImgs.clear();
     }
 
-    void updateTileRectImgs(const QRect& tileRect) {
+    void updateTileRectImgs(QRect tileRect) {
+        if(!mTarget) return;
+        const QRect maxRect = mTarget->tileBoundingRect();
+        if(!maxRect.intersects(tileRect)) return;
+        tileRect = maxRect.intersected(tileRect);
+        const auto min = tileRect.topLeft();
+        const auto max = tileRect.bottomRight();
+        stretchToTileImg(min.x(), min.y());
+        stretchToTileImg(max.x(), max.y());
         for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
             for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
-                updateTileImg(tx, ty);
+                auto btmp = mTarget->tileToBitmap(tx, ty);
+                btmp.setImmutable();
+                const auto img = SkImage::MakeFromBitmap(btmp);
+                btmp.reset();
+
+                const auto tileId = QPoint(tx, ty) + zeroTile();
+                mTileImgs[tileId.x()].replace(tileId.y(), img);
             }
         }
     }
 
     void updatePixelRectImgs(const QRect& pixRect) {
-        updateTileRectImgs(mAutoTilesData.pixRectToTileRect(pixRect));
+        updateTileRectImgs(pixRectToTileRect(pixRect));
     }
 
+    void setTarget(AutoTiledSurface * const target) {
+        if(mTarget == target) return;
+        mTarget = target;
+        updateTileImages();
+    }
+private:
     void stretchToTileImg(const int &tx, const int &ty) {
         const int colId = tx + mZeroTileCol;
         const int rowId = ty + mZeroTileRow;
@@ -49,7 +63,7 @@ public:
             appendImgColumns(qAbs(colId - mColumnCount + 1));
         }
     }
-private:
+
     QList<sk_sp<SkImage>> newImgColumn() {
         QList<sk_sp<SkImage>> col;
         for(int j = 0; j < mRowCount; j++) {
@@ -93,8 +107,8 @@ private:
     }
 
     SkImage * imageForTile(const int &tx, const int &ty) const {
-        const auto zeroTile = mAutoTilesData.zeroTile();
-        return imageForTileId(tx + zeroTile.x(), ty + zeroTile.y());
+        const auto zeroTileV = zeroTile();
+        return imageForTileId(tx + zeroTileV.x(), ty + zeroTileV.y());
     }
 
     SkImage * imageForTileId(const int &colId,
@@ -102,6 +116,40 @@ private:
         return mTileImgs.at(colId).at(rowId).get();
     }
 
+    QPoint zeroTile() const {
+        return QPoint(mZeroTileCol, mZeroTileRow);
+    }
+
+    QPoint zeroTilePos() const {
+        return zeroTile()*MYPAINT_TILE_SIZE;
+    }
+
+    QRect pixelBoundingRect() const {
+        return tileRectToPixRect(tileBoundingRect());
+    }
+
+    QRect tileBoundingRect() const {
+        return QRect(-mZeroTileCol, -mZeroTileRow,
+                     mColumnCount, mRowCount);
+    }
+
+    QRect tileRectToPixRect(const QRect& tileRect) const {
+        return QRect(tileRect.x()*MYPAINT_TILE_SIZE,
+                     tileRect.y()*MYPAINT_TILE_SIZE,
+                     tileRect.width()*MYPAINT_TILE_SIZE,
+                     tileRect.height()*MYPAINT_TILE_SIZE);
+    }
+
+    QRect pixRectToTileRect(const QRect& pixRect) const {
+        const int widthRem = pixRect.width() % MYPAINT_TILE_SIZE ? 1 : 0;
+        const int heightRem = pixRect.height() % MYPAINT_TILE_SIZE ? 1 : 0;
+        return QRect(pixRect.x()/MYPAINT_TILE_SIZE,
+                     pixRect.y()/MYPAINT_TILE_SIZE,
+                     pixRect.width()/MYPAINT_TILE_SIZE + widthRem,
+                     pixRect.height()/MYPAINT_TILE_SIZE + heightRem);
+    }
+
+    AutoTiledSurface * mTarget = nullptr;
     int mRowCount;
     int mColumnCount;
     int mZeroTileRow;

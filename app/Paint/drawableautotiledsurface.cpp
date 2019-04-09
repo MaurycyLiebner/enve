@@ -1,21 +1,15 @@
 #include "drawableautotiledsurface.h"
 
-void drawableRequestStart(MyPaintTiledSurface *tiled_surface,
-                          MyPaintTileRequest *request) {
-    const auto self = reinterpret_cast<DrawableAutoTiledSurface*>(tiled_surface);
-    self->stretchToTileImg(request->tx, request->ty);
-    self->_startRequest(request);
-}
-
-DrawableAutoTiledSurface::DrawableAutoTiledSurface() {
-    fParent.tile_request_start = drawableRequestStart;
-}
+DrawableAutoTiledSurface::DrawableAutoTiledSurface() {}
 
 void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
-                                            const QRect &minSrc,
+                                            const QRect &minPixSrc,
                                             const QPoint &dst,
                                             SkPaint * const paint) const {
-    const auto tileRect = mAutoTilesData.pixRectToTileRect(minSrc);
+    const QRect maxRect = tileBoundingRect();
+    const QRect tileSrc = pixRectToTileRect(minPixSrc);
+    if(!tileSrc.intersects(maxRect)) return;
+    const auto tileRect = tileSrc.intersected(maxRect);
     for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
         const SkScalar drawX = dst.x() + tx*MYPAINT_TILE_SIZE;
         for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {

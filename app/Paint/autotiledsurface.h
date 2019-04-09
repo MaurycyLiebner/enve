@@ -65,8 +65,8 @@ struct AutoTiledSurface {
                                 static_cast<float>(xtilt),
                                 static_cast<float>(ytilt),
                                 dTime,
-                                static_cast<float>(1.),
-                                static_cast<float>(0.));
+                                static_cast<float>(1),
+                                static_cast<float>(0));
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
     }
@@ -76,12 +76,23 @@ struct AutoTiledSurface {
         set.execute(brush, fMyPaintSurface, 5);
     }
 
+    SkBitmap tileToBitmap(const int& tx, const int& ty) {
+        return mAutoTilesData.tileToBitmap(tx, ty);
+    }
     SkBitmap toBitmap(const int& margin = 0) const {
         return mAutoTilesData.toBitmap(margin);
     }
 
     QPoint zeroTilePos() const {
         return mAutoTilesData.zeroTilePos();
+    }
+
+    QRect pixelBoundingRect() const {
+        return mAutoTilesData.pixelBoundingRect();
+    }
+
+    QRect tileBoundingRect() const {
+        return mAutoTilesData.tileBoundingRect();
     }
 protected:
     MyPaintTiledSurface fParent;

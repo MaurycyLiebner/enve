@@ -13,13 +13,13 @@ void autoTiledSurfaceFree(MyPaintSurface *surface) {
 
 void autoTiledSurfaceRequestStart(MyPaintTiledSurface *tiled_surface,
                                   MyPaintTileRequest *request) {
-    AutoTiledSurface *self = (AutoTiledSurface*)tiled_surface;
+    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
     self->_startRequest(request);
 }
 
 void autoTiledSurfaceRequestEnd(MyPaintTiledSurface *tiled_surface,
                                 MyPaintTileRequest *request) {
-    AutoTiledSurface *self = (AutoTiledSurface*)tiled_surface;
+    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
     self->_endRequest(request);
 }
 
