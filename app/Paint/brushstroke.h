@@ -46,12 +46,12 @@ private:
                       MyPaintSurface * const surface,
                       const double& t,
                       const double& lenFrag) const {
-        const QPointF pos = gCubicValueAtT(fStrokePath, t);
-        const qreal pressure = gCubicValueAtT(fPressure, t);
-        const qreal xTilt = gCubicValueAtT(fXTilt, t);
-        const qreal yTilt = gCubicValueAtT(fYTilt, t);
-        const qreal time = gCubicValueAtT(fTimeCurve, t);
-        const qreal width = gCubicValueAtT(fWidthCurve, t);
+        const QPointF pos = fStrokePath.posAtT(t);
+        const qreal pressure = fPressure.valAtT(t);
+        const qreal xTilt = fXTilt.valAtT(t);
+        const qreal yTilt = fYTilt.valAtT(t);
+        const qreal time = fTimeCurve.valAtT(t);
+        const qreal width = fWidthCurve.valAtT(t);
         mypaint_brush_set_base_value(brush,
                                      MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
                                      static_cast<float>(qLn(width)));
@@ -64,8 +64,8 @@ private:
                                 static_cast<float>(xTilt),
                                 static_cast<float>(yTilt),
                                 time*lenFrag,
-                                static_cast<float>(1.),
-                                static_cast<float>(0.));
+                                static_cast<float>(1),
+                                static_cast<float>(0));
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(surface, &roi);
         return QRect(roi.x, roi.y, roi.width, roi.height);
@@ -73,10 +73,10 @@ private:
 
     QRect executePress(MyPaintBrush * const brush,
                        MyPaintSurface * const surface) const {
-        const QPointF pos = gCubicValueAtT(fStrokePath, 0);
-        const qreal pressure = gCubicValueAtT(fPressure, 0);
-        const qreal xTilt = gCubicValueAtT(fXTilt, 0);
-        const qreal yTilt = gCubicValueAtT(fYTilt, 0);
+        const QPointF pos = fStrokePath.p0();
+        const qreal pressure = fPressure.p0();
+        const qreal xTilt = fXTilt.p0();
+        const qreal yTilt = fYTilt.p0();
         //qreal time = gCubicValueAtT(fTimeCurve, t);
 
         mypaint_brush_reset(brush);
@@ -90,9 +90,9 @@ private:
                                 static_cast<float>(pressure),
                                 static_cast<float>(xTilt),
                                 static_cast<float>(yTilt),
-                                1,
-                                static_cast<float>(1.),
-                                static_cast<float>(0.));
+                                0.1,
+                                static_cast<float>(1),
+                                static_cast<float>(0));
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(surface, &roi);
         return QRect(roi.x, roi.y, roi.width, roi.height);
