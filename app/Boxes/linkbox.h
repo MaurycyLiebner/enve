@@ -70,7 +70,7 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
     void setupRenderData(const qreal &relFrame,
-                                                BoundingBoxRenderData* data);
+                                                BoundingBoxRenderData * const data);
     const SkBlendMode &getBlendMode() {
         if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getBlendMode();

@@ -13,7 +13,7 @@ public:
 
     void setupRenderData(
                             const qreal &relFrame,
-                            BoundingBoxRenderData* data);
+                            BoundingBoxRenderData * const data);
 
     qsptr<BoundingBox> createLinkForLinkGroup();
 

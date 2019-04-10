@@ -83,11 +83,9 @@ void PathBox::setParentGroup(BoxesGroup * const parent) {
     BoundingBox::setParentGroup(parent);
 }
 
-void PathBox::setupRenderData(
-                            const qreal &relFrame,
-                            BoundingBoxRenderData* data) {
-    BoundingBox::setupRenderData(relFrame,
-                                                        data);
+void PathBox::setupRenderData(const qreal &relFrame,
+                              BoundingBoxRenderData * const data) {
+    BoundingBox::setupRenderData(relFrame, data);
 
     bool currentEditPathCompatible = false;
     bool currentPathCompatible = false;
@@ -653,7 +651,6 @@ void PathBox::addPathEffectsActionToMenu(BoxTypeMenu * const menu,
 }
 
 void PathBox::addActionsToMenu(BoxTypeMenu * const menu) {
-    BoundingBox::addActionsToMenu(menu);
     const auto pathEffectsMenu = menu->addMenu("Path Effects");
     addPathEffectsActionToMenu(pathEffectsMenu,
                                &PathBox::addPathEffect, false);
@@ -665,6 +662,8 @@ void PathBox::addActionsToMenu(BoxTypeMenu * const menu) {
     const auto outlinePathEffectsMenu = menu->addMenu("Outline Effects");
     addPathEffectsActionToMenu(outlinePathEffectsMenu,
                                &PathBox::addOutlinePathEffect, true);
+
+    BoundingBox::addActionsToMenu(menu);
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) const {

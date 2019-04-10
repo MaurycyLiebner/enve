@@ -31,7 +31,7 @@ public:
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData* data);
+            const qreal &relFrame, BoundingBoxRenderData * const data);
 protected:
     SampledMotionBlurEffect(BoundingBox *box = nullptr);
 private:

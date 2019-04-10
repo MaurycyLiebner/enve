@@ -27,7 +27,7 @@ public:
     qreal getEffectsMarginAtRelFrameF(const qreal &relFrame) const;
 
     void addEffectRenderDataToListF(const qreal &relFrame,
-                                    BoundingBoxRenderData *data);
+                                    BoundingBoxRenderData * const data);
 
 
     //void writeProperty(QIODevice * const target) const;

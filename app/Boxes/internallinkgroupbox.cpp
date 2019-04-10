@@ -62,7 +62,7 @@ QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
 }
 
 void InternalLinkGroupBox::setupEffectsF(const qreal &relFrame,
-                                         BoundingBoxRenderData *data) {
+                                         BoundingBoxRenderData * const data) {
     if(!getLinkTarget() || !mParentGroup)
         return BoundingBox::setupEffectsF(relFrame, data);
     if(mParentGroup->SWT_isLinkBox()) {
@@ -88,8 +88,8 @@ const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
     return BoundingBox::getBlendMode();
 }
 
-void InternalLinkGroupBox::setupRenderData(
-        const qreal &relFrame, BoundingBoxRenderData *data) {
+void InternalLinkGroupBox::setupRenderData(const qreal &relFrame,
+                                           BoundingBoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) {
         linkTarget->BoundingBox::

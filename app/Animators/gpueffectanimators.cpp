@@ -45,7 +45,7 @@ qreal GPUEffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) con
 
 void GPUEffectAnimators::addEffectRenderDataToListF(
         const qreal &relFrame,
-        BoundingBoxRenderData* data) {
+        BoundingBoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, GPURasterEffect);
         if(pixmapEffect->isVisible()) {

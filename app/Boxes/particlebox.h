@@ -288,7 +288,7 @@ public:
     }
 
     void setupRenderData(const qreal &relFrame,
-                                               BoundingBoxRenderData* data) {
+                         BoundingBoxRenderData * const data) {
         BoundingBox::setupRenderData(relFrame, data);
         auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
         particleData->fEmittersData.clear();

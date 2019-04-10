@@ -133,8 +133,8 @@ protected:
 class RenderDataCustomizerFunctor : public StdSelfRef {
 public:
     RenderDataCustomizerFunctor();
-    virtual void customize(BoundingBoxRenderData *data) = 0;
-    void operator()(BoundingBoxRenderData* data);
+    virtual void customize(BoundingBoxRenderData * const data) = 0;
+    void operator()(BoundingBoxRenderData * const data);
 };
 
 class ReplaceTransformDisplacementCustomizer : public RenderDataCustomizerFunctor {
@@ -142,7 +142,7 @@ public:
     ReplaceTransformDisplacementCustomizer(const qreal &dx,
                                            const qreal &dy);
 
-    void customize(BoundingBoxRenderData *data);
+    void customize(BoundingBoxRenderData * const data);
 protected:
     qreal mDx, mDy;
 };
@@ -152,7 +152,7 @@ public:
     MultiplyTransformCustomizer(const QMatrix &transform,
                                 const qreal &opacity = 1);
 
-    void customize(BoundingBoxRenderData *data);
+    void customize(BoundingBoxRenderData * const data);
 protected:
     QMatrix mTransform;
     qreal mOpacity = 1;

@@ -125,11 +125,31 @@ public:
     void makeSelectedPointsSegmentsLines();
 
     template <class T = BoundingBox>
+    void execOpOnSelectedBoxes(const std::function<void(QList<T*>)> &op) {
+        QList<T*> all;
+        for(const auto& box : mSelectedBoxes) {
+            const auto boxT = dynamic_cast<T*>(box.data());
+            if(boxT) all << boxT;
+        }
+        op(all);
+    }
+
+    template <class T = BoundingBox>
     void execOpOnSelectedBoxes(const std::function<void(T*)> &op) {
         for(const auto& box : mSelectedBoxes) {
             const auto boxT = dynamic_cast<T*>(box.data());
             if(boxT) op(boxT);
         }
+    }
+
+    template <class T = MovablePoint>
+    void execOpOnSelectedPoints(const std::function<void(QList<T*>)> &op) {
+        QList<T*> all;
+        for(const auto& pt : mSelectedPoints_d) {
+            const auto ptT = dynamic_cast<T*>(pt.data());
+            if(ptT) all << ptT;
+        }
+        op(all);
     }
 
     template <class T = MovablePoint>
@@ -351,7 +371,7 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     void setupRenderData(const qreal &relFrame,
-                                                BoundingBoxRenderData* data) {
+                         BoundingBoxRenderData * const data) {
         BoxesGroup::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getCurrentColor());

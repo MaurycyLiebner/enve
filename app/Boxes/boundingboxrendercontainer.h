@@ -35,7 +35,7 @@ public:
 
     const qreal &getResolutionFraction() const;
 
-    void setSrcRenderData(BoundingBoxRenderData *data);
+    void setSrcRenderData(BoundingBoxRenderData * const data);
     const int& getRelFrame() const {
         return mRelFrame;
     }

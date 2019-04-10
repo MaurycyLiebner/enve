@@ -32,8 +32,8 @@ public:
     bool SWT_isAnimationBox() const { return true; }
     void addActionsToMenu(BoxTypeMenu * const menu);
     virtual void changeSourceFile(QWidget* dialogParent) = 0;
-    void setupRenderData(
-            const qreal &relFrame, BoundingBoxRenderData* data);
+    void setupRenderData(const qreal &relFrame,
+                         BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
     void setParentGroup(BoxesGroup * const parent);
     bool shouldScheduleUpdate();

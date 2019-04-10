@@ -77,7 +77,7 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     void setupRenderData(const qreal &relFrame,
-                         BoundingBoxRenderData* data);
+                         BoundingBoxRenderData * const data);
     void addActionsToMenu(BoxTypeMenu * const menu);
 
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;

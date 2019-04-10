@@ -42,7 +42,7 @@ class PixmapEffect : public ComplexAnimator {
 public:
     PixmapEffect(const QString& name, const PixmapEffectType &type);
     virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData* data) = 0;
+            const qreal &relFrame, BoundingBoxRenderData * const data) = 0;
     virtual qreal getMargin();
     virtual qreal getMarginAtRelFrame(const int &);
 

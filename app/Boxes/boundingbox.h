@@ -218,8 +218,8 @@ public:
     virtual void addActionsToMenu(BoxTypeMenu * const menu);
 
     virtual stdsptr<BoundingBoxRenderData> createRenderData();
-    virtual void setupRenderData(
-            const qreal &relFrame, BoundingBoxRenderData *data);
+    virtual void setupRenderData(const qreal &relFrame,
+                                 BoundingBoxRenderData * const data);
     virtual void renderDataFinished(BoundingBoxRenderData *renderData);
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData* renderData);
@@ -242,9 +242,9 @@ public:
     virtual void readBoundingBox(QIODevice *target);
 
     virtual void setupEffectsF(const qreal &relFrame,
-                               BoundingBoxRenderData* data);
+                               BoundingBoxRenderData * const data);
     virtual void setupGPUEffectsF(const qreal &relFrame,
-                                  BoundingBoxRenderData *data);
+                                  BoundingBoxRenderData * const data);
     virtual const SkBlendMode &getBlendMode();
 
     bool SWT_isBoundingBox() const;

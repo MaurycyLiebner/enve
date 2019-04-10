@@ -130,11 +130,9 @@ void BoundingBoxRenderData::afterProcessingFinished() {
 void BoundingBoxRenderData::taskQued() {
     if(fParentBox) {
         if(fUseCustomRelFrame) {
-            fParentBox->setupRenderData(
-                        fCustomRelFrame, this);
+            fParentBox->setupRenderData(fCustomRelFrame, this);
         } else {
-            fParentBox->setupRenderData(
-                        fRelFrame, this);
+            fParentBox->setupRenderData(fRelFrame, this);
         }
         for(const auto& customizer : mRenderDataCustomizerFunctors) {
             (*customizer)(this);
@@ -170,7 +168,7 @@ bool BoundingBoxRenderData::nullifyBeforeProcessing() {
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
 
-void RenderDataCustomizerFunctor::operator()(BoundingBoxRenderData* data) {
+void RenderDataCustomizerFunctor::operator()(BoundingBoxRenderData * const data) {
     customize(data);
 }
 
@@ -181,7 +179,7 @@ ReplaceTransformDisplacementCustomizer::ReplaceTransformDisplacementCustomizer(
 }
 
 void ReplaceTransformDisplacementCustomizer::customize(
-        BoundingBoxRenderData* data) {
+        BoundingBoxRenderData * const data) {
     QMatrix transformT = data->fTransform;
     data->fTransform.setMatrix(transformT.m11(), transformT.m12(),
                               transformT.m21(), transformT.m22(),
@@ -194,7 +192,7 @@ MultiplyTransformCustomizer::MultiplyTransformCustomizer(
     mOpacity = opacity;
 }
 
-void MultiplyTransformCustomizer::customize(BoundingBoxRenderData *data) {
+void MultiplyTransformCustomizer::customize(BoundingBoxRenderData * const data) {
     data->fTransform = mTransform*data->fTransform;
     data->fOpacity *= mOpacity;
 }

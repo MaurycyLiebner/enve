@@ -193,7 +193,7 @@ public:
     bool SWT_isPathBox() const { return true; }
 
     void setupRenderData(const qreal &relFrame,
-                         BoundingBoxRenderData* data);
+                         BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(PathBoxRenderData)(this);
     }

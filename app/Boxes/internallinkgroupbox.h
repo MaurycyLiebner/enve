@@ -31,15 +31,14 @@ public:
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 
     void setupEffectsF(const qreal &relFrame,
-                       BoundingBoxRenderData* data);
+                       BoundingBoxRenderData * const data);
 
     qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
 
     const SkBlendMode &getBlendMode();
 
-    void setupRenderData(
-                            const qreal &relFrame,
-                            BoundingBoxRenderData* data);
+    void setupRenderData(const qreal &relFrame,
+                         BoundingBoxRenderData * const data);
 
     int prp_getRelFrameShift() const;
 

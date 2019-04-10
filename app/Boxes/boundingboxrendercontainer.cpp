@@ -62,7 +62,7 @@ const qreal &RenderContainer::getResolutionFraction() const {
     return mResolutionFraction;
 }
 
-void RenderContainer::setSrcRenderData(BoundingBoxRenderData *data) {
+void RenderContainer::setSrcRenderData(BoundingBoxRenderData * const data) {
     mTransform = data->fTransform;
     mResolutionFraction = data->fResolution;
     mImageSk = data->fRenderedImage;

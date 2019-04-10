@@ -66,7 +66,7 @@ stdsptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
 }
 
 void InternalLinkBox::setupRenderData(
-        const qreal &relFrame, BoundingBoxRenderData *data) {
+        const qreal &relFrame, BoundingBoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) {
         linkTarget->setupRenderData(relFrame, data);

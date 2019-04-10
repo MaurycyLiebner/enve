@@ -141,7 +141,6 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
 //}
 #include "typemenu.h"
 void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
-    BoundingBox::addActionsToMenu(menu);
     const auto widget = menu->getParentWidget();
 
     const BoxTypeMenu::PlainOp<AnimationBox> reloadOp =
@@ -163,10 +162,12 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     };
     menu->addCheckableAction("Set Source File...",
                              mFrameRemappingEnabled, remapOp);
+
+    BoundingBox::addActionsToMenu(menu);
 }
 
 void AnimationBox::setupRenderData(const qreal &relFrame,
-                                   BoundingBoxRenderData* data) {
+                                   BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     const int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));

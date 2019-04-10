@@ -50,7 +50,7 @@ public:
     void addActionsToMenu(BoxTypeMenu * const menu);
 
     void setupRenderData(const qreal &relFrame,
-                         BoundingBoxRenderData* data);
+                         BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);

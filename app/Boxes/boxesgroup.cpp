@@ -500,9 +500,8 @@ void processChildData(BoundingBox* child,
     parentData->fChildrenRenderData << boxRenderData;
 }
 
-void BoxesGroup::setupRenderData(
-                        const qreal &relFrame,
-                        BoundingBoxRenderData* data) {
+void BoxesGroup::setupRenderData(const qreal &relFrame,
+                                 BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto groupData = GetAsSPtr(data, BoxesGroupRenderData);
     groupData->fChildrenRenderData.clear();
@@ -614,12 +613,12 @@ OutlineSettingsAnimator *BoxesGroup::getStrokeSettings() const {
 
 #include "typemenu.h"
 void BoxesGroup::addActionsToMenu(BoxTypeMenu * const menu) {
-    BoundingBox::addActionsToMenu(menu);
     const auto ungroupAction = menu->addPlainAction<BoxesGroup>(
                 "Ungroup", [](BoxesGroup * box) {
         box->ungroup_k();
     });
     ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+    BoundingBox::addActionsToMenu(menu);
 }
 
 void BoxesGroup::selectAllBoxesFromBoxesGroup() {

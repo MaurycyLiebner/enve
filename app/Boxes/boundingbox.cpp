@@ -681,9 +681,8 @@ QMatrix BoundingBox::getParentTotalTransformAtRelFrame(
     return QMatrix();
 }
 
-void BoundingBox::setupRenderData(
-                        const qreal &relFrame,
-                        BoundingBoxRenderData* data) {
+void BoundingBox::setupRenderData(const qreal &relFrame,
+                                  BoundingBoxRenderData * const data) {
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fRenderedToImage = false;
@@ -717,12 +716,12 @@ void BoundingBox::setupRenderData(
 stdsptr<BoundingBoxRenderData> BoundingBox::createRenderData() { return nullptr; }
 
 void BoundingBox::setupEffectsF(const qreal &relFrame,
-                                BoundingBoxRenderData *data) {
+                                BoundingBoxRenderData * const data) {
     mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
 
 void BoundingBox::setupGPUEffectsF(const qreal &relFrame,
-                                   BoundingBoxRenderData *data) {
+                                   BoundingBoxRenderData * const data) {
     mGPUEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
 }
 

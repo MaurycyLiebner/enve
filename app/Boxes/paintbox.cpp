@@ -8,7 +8,7 @@ PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
 }
 
 void PaintBox::setupRenderData(
-        const qreal &relFrame, BoundingBoxRenderData* data) {
+        const qreal &relFrame, BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     auto paintData = GetAsSPtr(data, PaintBoxRenderData);
 }
@@ -20,7 +20,6 @@ stdsptr<BoundingBoxRenderData> PaintBox::createRenderData() {
 #include <QFileDialog>
 #include "typemenu.h"
 void PaintBox::addActionsToMenu(BoxTypeMenu * const menu) {
-    BoundingBox::addActionsToMenu(menu);
     const auto widget = menu->getParentWidget();
     BoxTypeMenu::PlainOp<PaintBox> op = [widget](PaintBox * box) {
         const QString importPath = QFileDialog::getOpenFileName(
@@ -35,6 +34,8 @@ void PaintBox::addActionsToMenu(BoxTypeMenu * const menu) {
         }
     };
     menu->addPlainAction("Load From Image", op);
+
+    BoundingBox::addActionsToMenu(menu);
 }
 
 void PaintBoxRenderData::drawSk(SkCanvas * const canvas) {

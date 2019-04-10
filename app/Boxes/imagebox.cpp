@@ -36,7 +36,6 @@ void ImageBox::reload() {
 }
 #include "typemenu.h"
 void ImageBox::addActionsToMenu(BoxTypeMenu * const menu) {
-    BoundingBox::addActionsToMenu(menu);
     const auto widget = menu->getParentWidget();
 
     const BoxTypeMenu::PlainOp<ImageBox> reloadOp =
@@ -50,6 +49,8 @@ void ImageBox::addActionsToMenu(BoxTypeMenu * const menu) {
         box->changeSourceFile(widget);
     };
     menu->addPlainAction("Set Source File...", setSrcOp);
+
+    BoundingBox::addActionsToMenu(menu);
 }
 
 void ImageBox::changeSourceFile(QWidget* dialogParent) {
@@ -60,7 +61,7 @@ void ImageBox::changeSourceFile(QWidget* dialogParent) {
 }
 
 void ImageBox::setupRenderData(const qreal &relFrame,
-                               BoundingBoxRenderData* data) {
+                               BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imgData = GetAsPtr(data, ImageBoxRenderData);
     if(mImgCacheHandler->hasImage()) {

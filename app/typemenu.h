@@ -13,6 +13,7 @@ class TypeMenu {
 public:
     template <class T> using PlainOp = std::function<void(T*)>;
     template <class T> using CheckOp = std::function<void(T*, bool)>;
+    template <class T> using AllOp = std::function<void(QList<T*>)>;
 
     TypeMenu(QMenu * const targetMenu, Canvas * const targetCanvas,
              QWidget * const parent) :
@@ -29,20 +30,22 @@ public:
         const PlainOp<T> plainOp = [op, checked](T* pt) {
             op(pt, checked);
         };
-        connectPlainAction(qAction, plainOp);
+        connectAction(qAction, plainOp);
         return qAction;
     }
 
     template <class T>
     QAction* addPlainAction(const QString& text, const PlainOp<T>& op) {
         QAction * const qAction = mTargetMenu->addAction(text);
-        connectPlainAction(qAction, op);
+        connectAction(qAction, op);
         return qAction;
     }
 
-    template <class T, class U>
-    QAction* addPlainAction(const QString& text, const U& op) {
-        return addPlainAction(text, static_cast<PlainOp<T>>(op));
+    template <class T>
+    QAction* addAllAction(const QString& text, const AllOp<T>& op) {
+        QAction * const qAction = mTargetMenu->addAction(text);
+        connectAllAction(qAction, op);
+        return qAction;
     }
 
     TTypeMenu * addMenu(const QString& title) {
@@ -79,10 +82,10 @@ protected:
         return mTypeIndex.contains(std::type_index(typeid(obj)));
     }
 private:
-    template <typename T>
-    void connectPlainAction(BoundingBox * const,
-                            QAction * const qAction,
-                            const std::function<void(T*)>& op) {
+    template <typename U>
+    void connectAction(BoundingBox * const,
+                       QAction * const qAction,
+                       const U& op) {
         const auto targetCanvas = mTargetCanvas;
         const auto canvasOp = [op, targetCanvas]() {
             targetCanvas->execOpOnSelectedBoxes(op);
@@ -90,10 +93,10 @@ private:
         QObject::connect(qAction, &QAction::triggered, canvasOp);
     }
 
-    template <typename T>
-    void connectPlainAction(MovablePoint * const,
-                            QAction * const qAction,
-                            const std::function<void(T*)>& op) {
+    template <typename U>
+    void connectAction(MovablePoint * const,
+                       QAction * const qAction,
+                       const U& op) {
         const auto targetCanvas = mTargetCanvas;
         const auto canvasOp = [op, targetCanvas]() {
             targetCanvas->execOpOnSelectedPoints(op);
@@ -102,9 +105,15 @@ private:
     }
 
     template <class T>
-    void connectPlainAction(QAction * const qAction,
-                            const std::function<void(T*)>& op) {
-        connectPlainAction(static_cast<T*>(nullptr), qAction, op);
+    void connectAction(QAction * const qAction,
+                       const PlainOp<T>& op) {
+        connectAction(static_cast<T*>(nullptr), qAction, op);
+    }
+
+    template <class T>
+    void connectAction(QAction * const qAction,
+                       const AllOp<T>& op) {
+        connectAction(static_cast<T*>(nullptr), qAction, op);
     }
 
     QMenu * const mTargetMenu;
