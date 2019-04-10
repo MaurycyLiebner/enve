@@ -20,7 +20,10 @@ enum MovablePointType : short {
     TYPE_PIVOT_POINT,
     TYPE_GRADIENT_POINT
 };
-class PointTypeMenu;
+class MovablePoint;
+template<typename T> class TypeMenu;
+typedef TypeMenu<MovablePoint> PointTypeMenu;
+
 class MovablePoint : public StdSelfRef {
     friend class StdSelfRef;
 protected:

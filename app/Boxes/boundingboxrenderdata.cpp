@@ -130,10 +130,10 @@ void BoundingBoxRenderData::afterProcessingFinished() {
 void BoundingBoxRenderData::taskQued() {
     if(fParentBox) {
         if(fUseCustomRelFrame) {
-            fParentBox->setupBoundingBoxRenderDataForRelFrameF(
+            fParentBox->setupRenderData(
                         fCustomRelFrame, this);
         } else {
-            fParentBox->setupBoundingBoxRenderDataForRelFrameF(
+            fParentBox->setupRenderData(
                         fRelFrame, this);
         }
         for(const auto& customizer : mRenderDataCustomizerFunctors) {

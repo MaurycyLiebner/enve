@@ -649,7 +649,7 @@ QMatrix BoundingBox::getParentTotalTransformAtRelFrame(
     return QMatrix();
 }
 
-void BoundingBox::setupBoundingBoxRenderDataForRelFrameF(
+void BoundingBox::setupRenderData(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
     data->fBoxStateId = mStateId;

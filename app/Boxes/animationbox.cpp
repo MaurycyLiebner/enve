@@ -160,10 +160,10 @@ void AnimationBox::addActionsToMenu(QMenu * const menu,
     fR->setChecked(mFrameRemappingEnabled);
 }
 
-void AnimationBox::setupBoundingBoxRenderDataForRelFrameF(
+void AnimationBox::setupRenderData(
                                 const qreal &relFrame,
                                 BoundingBoxRenderData* data) {
-    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    BoundingBox::setupRenderData(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     const int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
     imageData->animationFrame = animationFrame;

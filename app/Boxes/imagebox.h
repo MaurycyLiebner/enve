@@ -49,7 +49,7 @@ public:
     bool SWT_isImageBox() const { return true; }
     void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
 
-    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+    void setupRenderData(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);
     stdsptr<BoundingBoxRenderData> createRenderData();
     void writeBoundingBox(QIODevice *target);

@@ -11,7 +11,7 @@ public:
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 
-    void setupBoundingBoxRenderDataForRelFrameF(
+    void setupRenderData(
                             const qreal &relFrame,
                             BoundingBoxRenderData* data);
 

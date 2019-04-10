@@ -655,25 +655,6 @@ void applyUNoise(qreal noise_t,
 #include <QString>
 #include <QFile>
 #include <QTextStream>
-#include "Paint/brush.h"
-void saveBrushDataAsFile(Brush *brush_t, QString file_path_t) {
-    QFile file(file_path_t);
-    file.open(QFile::WriteOnly);
-    file.resize(0);
-    brush_t->writeBrush(&file);
-    file.close();
-}
-
-void saveBrushDataAsFile(Brush *brush_t,
-                         QString collection_name,
-                         QString brush_name) {
-    brush_name = brush_name.replace(" ", "_").toLower();
-    QFile file("brushes/" + collection_name + "/" + brush_name + ".avb");
-    file.open(QFile::WriteOnly);
-    file.resize(0);
-    brush_t->writeBrush(&file);
-    file.close();
-}
 
 ushort getFreeRamMB() {
     struct sysinfo info_t;

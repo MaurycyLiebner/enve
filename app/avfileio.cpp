@@ -27,8 +27,6 @@
 #include "Boxes/imagesequencebox.h"
 #include "Boxes/linkbox.h"
 #include "Boxes/paintbox.h"
-#include "Paint/surface.h"
-#include "Paint/animatedsurface.h"
 //#include "GUI/BrushWidgets/brushsettingswidget.h"
 #include "canvas.h"
 #include "durationrectangle.h"
@@ -927,128 +925,12 @@ void VideoBox::readBoundingBox(QIODevice *target) {
     setFilePath(path);
 }
 
-bool Tile::writeTile(QIODevice *target) {
-    return target->write(rcConstChar(mData),
-                         TILE_DIM*TILE_DIM*4*sizeof(uchar)) > 0;
-}
-
-void Tile::readTile(QIODevice *target) {
-    target->read(rcChar(mData), TILE_DIM*TILE_DIM*4*sizeof(uchar));
-    copyDataToDrawer();
-}
-
-bool TilesData::writeTilesData(QIODevice *target) {
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            bool writeSuccess = mTiles[j][i]->writeTile(target);
-            if(!writeSuccess) return false;
-        }
-    }
-    return true;
-}
-
-void TilesData::writeTilesDataFromMemoryOrTmp(QIODevice *target) {
-    target->write(rcConstChar(&mWidth), sizeof(ushort));
-    target->write(rcConstChar(&mHeight), sizeof(ushort));
-    bool noDataInMemory = !mDataStoredInTmpFile && mNoDataInMemory;
-    target->write(rcConstChar(&noDataInMemory), sizeof(bool));
-    if(mNoDataInMemory) {
-        if(mDataStoredInTmpFile) {
-            target->write(mTmpFile->readAll());
-        }
-    } else {
-        writeTilesData(target);
-    }
-}
-
-void TilesData::readTilesData(QIODevice *target) {
-    ushort width;
-    ushort height;
-    target->read(rcChar(&width), sizeof(ushort));
-    target->read(rcChar(&height), sizeof(ushort));
-    target->read(rcChar(&mNoDataInMemory), sizeof(bool));
-    setSize(width, height);
-    if(mNoDataInMemory) return;
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->readTile(target);
-        }
-    }
-}
-
-void Surface::writeSurface(QIODevice *target) {
-    target->write(rcConstChar(&mWidth), sizeof(int));
-    target->write(rcConstChar(&mHeight), sizeof(int));
-    mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
-}
-
-void Surface::readSurface(QIODevice *target) {
-    target->read(rcChar(&mWidth), sizeof(int));
-    target->read(rcChar(&mHeight), sizeof(int));
-    mCurrentTiles->readTilesData(target);
-}
-
-void SurfaceKey::writeKey(QIODevice *target) {
-    Key::writeKey(target);
-    mTiles->writeTilesDataFromMemoryOrTmp(target);
-}
-
-void SurfaceKey::readKey(QIODevice *target) {
-    Key::readKey(target);
-    mTiles->readTilesData(target);
-}
-
-void AnimatedSurface::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mIsDraft), sizeof(bool));
-    target->write(rcConstChar(&mWidth), sizeof(ushort));
-    target->write(rcConstChar(&mHeight), sizeof(ushort));
-    int nKeys = anim_mKeys.count();
-    target->write(rcConstChar(&nKeys), sizeof(int));
-    if(nKeys == 0) {
-        mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
-    } else {
-        for(const auto &key : anim_mKeys) {
-            key->writeKey(target);
-        }
-    }
-}
-
-stdsptr<Key> AnimatedSurface::readKey(QIODevice *target) {
-    auto newKey = SPtrCreate(SurfaceKey)(this);
-    newKey->setTiles(SPtrCreate(TilesData)(0, 0, true));
-    newKey->readKey(target);
-    return std::move(newKey);
-}
-
-void AnimatedSurface::readProperty(QIODevice *target) {
-    target->read(rcChar(&mIsDraft), sizeof(bool));
-    target->read(rcChar(&mWidth), sizeof(ushort));
-    target->read(rcChar(&mHeight), sizeof(ushort));
-    int nKeys;
-    target->read(rcChar(&nKeys), sizeof(int));
-    if(nKeys == 0) {
-        mCurrentTiles->readTilesData(target);
-    } else {
-        for(int i = 0; i < nKeys; i++) {
-            anim_appendKey(readKey(target));
-        }
-    }
-    setSize(mParentBox->getWidth(), mParentBox->getHeight());
-}
-
 void PaintBox::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
-    mTopLeftAnimator->writeProperty(target);
-    mBottomRightAnimator->writeProperty(target);
-    mMainHandler->writeProperty(target);
 }
 
 void PaintBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
-    mTopLeftAnimator->readProperty(target);
-    mBottomRightAnimator->readProperty(target);
-    finishSizeSetup();
-    mMainHandler->readProperty(target);
 }
 
 void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
@@ -1206,29 +1088,6 @@ void GradientWidget::readGradients(QIODevice *target) {
         gradient->readProperty(target);
         addGradientToList(gradient);
         MainWindow::getInstance()->addLoadedGradient(gradient.get());
-    }
-}
-
-void Brush::writeBrush(QIODevice *write) {
-    gWrite(write, brush_name);
-    gWrite(write, collection_name);
-
-    for(uchar i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
-        const BrushSettingInfo setting_info = brush_settings_info[i];
-        const qreal value = getSettingVal(setting_info.setting);
-        write->write(rcConstChar(&value), sizeof(qreal));
-    }
-}
-
-void Brush::readBrush(QIODevice *read) {
-    gRead(read, brush_name);
-    gRead(read, collection_name);
-
-    for(uchar i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
-        qreal value;
-        read->read(rcChar(&value), sizeof(qreal));
-        const BrushSettingInfo setting_info = brush_settings_info[i];
-        setSetting(setting_info.setting, value);
     }
 }
 

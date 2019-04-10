@@ -16,7 +16,6 @@
 #include "Boxes/linkbox.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
-#include "Paint/brush.h"
 #include <QFile>
 #include "renderinstancesettings.h"
 #include "videoencoder.h"
@@ -688,10 +687,8 @@ bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
         updateTransformation();
     } else if(event->key() == Qt::Key_N) {
         for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPaintBox()) {
-                PaintBox *paintBox = GetAsPtr(box, PaintBox);
-                paintBox->newEmptyPaintFrameOnCurrentFrame();
-            }
+            const auto paintBox = GetAsPtr(box, PaintBox);
+            //paintBox->newEmptyPaintFrameOnCurrentFrame();
         }
     } else {
         return false;

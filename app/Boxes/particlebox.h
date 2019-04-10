@@ -287,9 +287,9 @@ public:
         return SPtrCreate(ParticleBoxRenderData)(this);
     }
 
-    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+    void setupRenderData(const qreal &relFrame,
                                                BoundingBoxRenderData* data) {
-        BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+        BoundingBox::setupRenderData(relFrame, data);
         auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
         particleData->fEmittersData.clear();
         for(const auto& emitter : mEmitters) {

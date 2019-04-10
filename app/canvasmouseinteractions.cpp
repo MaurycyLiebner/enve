@@ -12,7 +12,6 @@
 #include "clipboardcontainer.h"
 #include "GUI/mainwindow.h"
 #include "Boxes/paintbox.h"
-#include "Paint/brush.h"
 #include "GUI/fontswidget.h"
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
@@ -223,75 +222,25 @@ void Canvas::addSelectedBoxesActions(QMenu * const menu) {
         if(box->SWT_isPaintBox()) {
             const auto paintBox = GetAsPtr(box, PaintBox);
             menu->addSeparator();
-            menu->addAction("New Paint Frame", [this]() {
-                for(const auto& box : mSelectedBoxes) {
-                    if(box->SWT_isPaintBox()) {
-                        const auto paintBox = GetAsPtr(box, PaintBox);
-                        paintBox->newPaintFrameOnCurrentFrame();
-                    }
-                }
-            });
-            menu->addAction("New Empty Paint Frame", [this]() {
-                for(const auto& box : mSelectedBoxes) {
-                    if(box->SWT_isPaintBox()) {
-                        PaintBox* paintBox = GetAsPtr(box, PaintBox);
-                        paintBox->newEmptyPaintFrameOnCurrentFrame();
-                    }
-                }
-            });
-            menu->addAction("Setup Animation Frames", [this]() {
-                PaintBoxSettingsDialog dialog;
-                const auto firstPaintBox =
-                        GetAsPtr(mSelectedBoxes.first(), PaintBox);
-                int frameStep = firstPaintBox->getFrameStep();
-                int overlapFrames = firstPaintBox->getOverlapFrames();
-                dialog.setOverlapFrames(overlapFrames);
-                dialog.setFrameStep(frameStep);
-                dialog.exec();
-                if(dialog.result() == QDialog::Rejected) return;
-                frameStep = dialog.getFrameStep();
-                overlapFrames = dialog.getOverlapFrames();
-                for(const auto& box : mSelectedBoxes) {
-                    if(box->SWT_isPaintBox()) {
-                        const auto paintBox = GetAsPtr(box, PaintBox);
-                        paintBox->setOverlapFrames(overlapFrames);
-                        paintBox->setFrameStep(frameStep);
-                    }
-                }
-            });
-            menu->addSeparator();
-            if(paintBox->isAnimated()) {
-                QAction * const draftAction = menu->addAction("Draft", [this]() {
-                    for(const auto& box : mSelectedBoxes) {
-                        if(box->SWT_isPaintBox()) {
-                            const auto paintBox = GetAsPtr(box, PaintBox);
-                            paintBox->setIsDraft(!paintBox->isDraft());
-                        }
-                    }
-                });
-                draftAction->setCheckable(true);
-                draftAction->setChecked(paintBox->isDraft());
-            }
-            menu->addSeparator();
-            menu->addAction("Load From Image", [this]() {
-                MainWindow::getInstance()->disableEventFilter();
-                const QString importPath = QFileDialog::getOpenFileName(
-                                                MainWindow::getInstance(),
-                                                "Load From Image", "",
-                                                "Image Files (*.png *.jpg)");
-                MainWindow::getInstance()->enableEventFilter();
-                if(!importPath.isEmpty()) {
-                    QImage img;
-                    if(img.load(importPath)) {
-                        for(const auto& box : mSelectedBoxes) {
-                            if(box->SWT_isPaintBox()) {
-                                const auto paintBox = GetAsPtr(box, PaintBox);
-                                paintBox->loadFromImage(img);
-                            }
-                        }
-                    }
-                }
-            });
+//            menu->addAction("Load From Image", [this]() {
+//                MainWindow::getInstance()->disableEventFilter();
+//                const QString importPath = QFileDialog::getOpenFileName(
+//                                                MainWindow::getInstance(),
+//                                                "Load From Image", "",
+//                                                "Image Files (*.png *.jpg)");
+//                MainWindow::getInstance()->enableEventFilter();
+//                if(!importPath.isEmpty()) {
+//                    QImage img;
+//                    if(img.load(importPath)) {
+//                        for(const auto& box : mSelectedBoxes) {
+//                            if(box->SWT_isPaintBox()) {
+//                                const auto paintBox = GetAsPtr(box, PaintBox);
+//                                paintBox->loadFromImage(img);
+//                            }
+//                        }
+//                    }
+//                }
+//            });
 
             break;
         }
@@ -457,9 +406,9 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
                     addPointToSelection(mLastPressedPoint);
                 }
                 for(const auto& pt : mSelectedPoints_d) {
-                    if(menu.hasActionsForPointType(pt)) continue;
+                    if(menu.hasActionsForType(pt)) continue;
                     pt->canvasContextMenu(&menu);
-                    menu.addedActionsForPointType(pt);
+                    menu.addedActionsForType(pt);
                 }
             } else {
                 mLastPressedPoint->canvasContextMenu(&menu);
@@ -608,10 +557,6 @@ void Canvas::handleLeftButtonMousePress() {
         clearBoxesSelection();
         clearPointsSelection();
         addBoxToSelection(paintBox.get());
-
-        mLastPressedPoint = paintBox->getBottomRightPoint();
-        addPointToSelection(mLastPressedPoint);
-        mLastPressedPoint->startTransform();
     }
 }
 

@@ -48,10 +48,10 @@ void ImageBox::changeSourceFile(QWidget* dialogParent) {
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
-void ImageBox::setupBoundingBoxRenderDataForRelFrameF(
+void ImageBox::setupRenderData(
                                     const qreal &relFrame,
                                     BoundingBoxRenderData* data) {
-    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    BoundingBox::setupRenderData(relFrame, data);
     const auto imgData = GetAsPtr(data, ImageBoxRenderData);
     if(mImgCacheHandler->hasImage()) {
         imgData->fImage = mImgCacheHandler->getImageCopy();

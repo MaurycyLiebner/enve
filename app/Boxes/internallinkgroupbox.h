@@ -37,7 +37,7 @@ public:
 
     const SkBlendMode &getBlendMode();
 
-    void setupBoundingBoxRenderDataForRelFrameF(
+    void setupRenderData(
                             const qreal &relFrame,
                             BoundingBoxRenderData* data);
 

@@ -500,10 +500,10 @@ void processChildData(BoundingBox* child,
     parentData->fChildrenRenderData << boxRenderData;
 }
 
-void BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(
+void BoxesGroup::setupRenderData(
                         const qreal &relFrame,
                         BoundingBoxRenderData* data) {
-    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    BoundingBox::setupRenderData(relFrame, data);
     const auto groupData = GetAsSPtr(data, BoxesGroupRenderData);
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();

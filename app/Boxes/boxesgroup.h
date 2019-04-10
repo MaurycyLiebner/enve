@@ -78,7 +78,7 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
 
-    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+    void setupRenderData(const qreal &relFrame,
                                                 BoundingBoxRenderData* data);
 
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;

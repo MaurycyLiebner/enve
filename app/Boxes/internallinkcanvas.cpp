@@ -18,9 +18,9 @@ void InternalLinkCanvas::readBoundingBox(QIODevice *target) {
     mClipToCanvas->readProperty(target);
 }
 
-void InternalLinkCanvas::setupBoundingBoxRenderDataForRelFrameF(
+void InternalLinkCanvas::setupRenderData(
         const qreal &relFrame, BoundingBoxRenderData* data) {
-    InternalLinkGroupBox::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+    InternalLinkGroupBox::setupRenderData(relFrame, data);
 
     BoxesGroup* finalTarget = getFinalTarget();
     auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);

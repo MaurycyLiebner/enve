@@ -127,15 +127,10 @@ SOURCES += main.cpp\
     Properties/boxtargetproperty.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
-    Paint/brush.cpp \
-    Paint/surface.cpp \
-    Paint/tile.cpp \
     Boxes/paintbox.cpp \
-    Paint/animatedsurface.cpp \
     avfileio.cpp \
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
-    Paint/tilesdata.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
     Properties/comboboxproperty.cpp \
     Animators/randomqrealgenerator.cpp \
@@ -214,7 +209,6 @@ SOURCES += main.cpp\
     PropertyUpdaters/gradientpointsupdater.cpp \
     PropertyUpdaters/singlesoundupdater.cpp \
     PropertyUpdaters/randomqrealgeneratorupdater.cpp \
-    PropertyUpdaters/paintboxsizeupdaters.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
     PixmapEffects/rastereffects.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
@@ -277,7 +271,8 @@ SOURCES += main.cpp\
     pointtypemenu.cpp \
     MovablePoints/nonanimatedmovablepoint.cpp \
     PropertyUpdaters/boxpathpointupdater.cpp \
-    Paint/drawableautotiledsurface.cpp
+    Paint/drawableautotiledsurface.cpp \
+    typemenu.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -353,15 +348,10 @@ HEADERS  += \
     Properties/boxtargetproperty.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
-    Paint/brush.h \
-    Paint/surface.h \
-    Paint/tile.h \
     Boxes/paintbox.h \
-    Paint/animatedsurface.h \
     avfileio.h \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
-    Paint/tilesdata.h \
     GUI/BoxesList/boxscrollarea.h \
     Properties/comboboxproperty.h \
     Animators/randomqrealgenerator.h \
@@ -441,7 +431,6 @@ HEADERS  += \
     PropertyUpdaters/gradientpointsupdater.h \
     PropertyUpdaters/singlesoundupdater.h \
     PropertyUpdaters/randomqrealgeneratorupdater.h \
-    PropertyUpdaters/paintboxsizeupdaters.h \
     PropertyUpdaters/groupallpathsupdater.h \
     PixmapEffects/rastereffects.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
@@ -503,7 +492,8 @@ HEADERS  += \
     pointtypemenu.h \
     MovablePoints/nonanimatedmovablepoint.h \
     PropertyUpdaters/boxpathpointupdater.h \
-    Paint/drawableautotiledsurface.h
+    Paint/drawableautotiledsurface.h \
+    typemenu.h
 
 RESOURCES += \
     resources.qrc

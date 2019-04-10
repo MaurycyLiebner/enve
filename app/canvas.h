@@ -124,8 +124,23 @@ public:
     void makeSelectedPointsSegmentsCurves();
     void makeSelectedPointsSegmentsLines();
 
+    template <class T>
+    void execOpOnSelected(const std::function<void(T*)> &op) {
+        const bool isPt = std::is_base_of<MovablePoint, T>::value;
+        if(isPt) {
+            execOpOnSelectedPoints(op);
+            return;
+        }
+        const bool isBox = std::is_base_of<BoundingBox, T>::value;
+        if(isBox) {
+            execOpOnSelectedPoints(op);
+            return;
+        }
+    }
+
     template <class T = MovablePoint>
     void execOpOnSelectedPoints(const std::function<void(T*)> &op) {
+
         if(mLastPressedPoint) {
             if(!mLastPressedPoint->selectionEnabled()) {
                 const auto ptT = dynamic_cast<T*>(mLastPressedPoint.data());
@@ -144,6 +159,7 @@ public:
             }
         }
     }
+
     void updateSelectedPointsAfterCtrlsVisiblityChanged();
     void centerPivotForSelected();
     void resetSelectedScale();
@@ -341,9 +357,9 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
 
-    void setupBoundingBoxRenderDataForRelFrameF(const qreal &relFrame,
+    void setupRenderData(const qreal &relFrame,
                                                 BoundingBoxRenderData* data) {
-        BoxesGroup::setupBoundingBoxRenderDataForRelFrameF(relFrame, data);
+        BoxesGroup::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getCurrentColor());
         canvasData->canvasHeight = mHeight*mResolutionFraction;

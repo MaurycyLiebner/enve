@@ -83,10 +83,10 @@ void PathBox::setParentGroup(BoxesGroup * const parent) {
     BoundingBox::setParentGroup(parent);
 }
 
-void PathBox::setupBoundingBoxRenderDataForRelFrameF(
+void PathBox::setupRenderData(
                             const qreal &relFrame,
                             BoundingBoxRenderData* data) {
-    BoundingBox::setupBoundingBoxRenderDataForRelFrameF(relFrame,
+    BoundingBox::setupRenderData(relFrame,
                                                         data);
 
     bool currentEditPathCompatible = false;

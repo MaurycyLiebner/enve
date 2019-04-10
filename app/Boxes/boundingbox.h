@@ -216,7 +216,7 @@ public:
                                   QWidget* const widgetsParent);
 
     virtual stdsptr<BoundingBoxRenderData> createRenderData();
-    virtual void setupBoundingBoxRenderDataForRelFrameF(
+    virtual void setupRenderData(
             const qreal &relFrame, BoundingBoxRenderData *data);
     virtual void renderDataFinished(BoundingBoxRenderData *renderData);
     virtual void updateCurrentPreviewDataFromRenderData(
