@@ -41,6 +41,15 @@ void SmartVectorPath::selectAllPoints(Canvas * const canvas) {
     mHandler.selectAllPoints(canvas);
 }
 
+#include "typemenu.h"
+void SmartVectorPath::addActionsToMenu(BoxTypeMenu * const menu) {
+    PathBox::addActionsToMenu(menu);
+    BoxTypeMenu::PlainOp<SmartVectorPath> op = [](SmartVectorPath * box) {
+        box->applyCurrentTransformation();
+    };
+    menu->addPlainAction("Apply Transformation", op);
+}
+
 void SmartVectorPath::applyCurrentTransformation() {
     mNReasonsNotToApplyUglyTransform++;
 //    mPathAnimator->applyTransformToPoints(

@@ -192,14 +192,16 @@ public:
 
     bool SWT_isPathBox() const { return true; }
 
-    void setupRenderData(
-                                const qreal &relFrame,
-                                BoundingBoxRenderData* data);
+    void setupRenderData(const qreal &relFrame,
+                         BoundingBoxRenderData* data);
     stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(PathBoxRenderData)(this);
     }
     void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData *renderData);
+
+    void addActionsToMenu(BoxTypeMenu * const menu);
+
     void duplicateStrokeSettingsFrom(
             OutlineSettingsAnimator * const strokeSettings);
     void duplicateFillSettingsFrom(
@@ -269,6 +271,16 @@ protected:
 
     qsptr<FillSettingsAnimator> mFillSettings;
     qsptr<OutlineSettingsAnimator> mStrokeSettings;
+private:
+    template<typename T, typename U>
+    void addPathEffectActionToMenu(const QString& text,
+                                   BoxTypeMenu * const menu,
+                                   const U& adder,
+                                   const bool& outline);
+    template <typename U>
+    void addPathEffectsActionToMenu(BoxTypeMenu * const menu,
+                                    const U& adder,
+                                    const bool& outline);
 };
 
 #endif // PATHBOX_H

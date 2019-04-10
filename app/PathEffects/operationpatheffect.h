@@ -7,8 +7,7 @@ class BoxTargetProperty;
 class OperationPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    OperationPathEffect(PathBox * const parentPath,
-                        const bool &outlinePathEffect);
+    OperationPathEffect(const bool &outlinePathEffect);
 public:
     void apply(const qreal &relFrame,
                const SkPath &src,
@@ -21,7 +20,6 @@ public:
         return true;//mBoxTarget->getTarget() != nullptr;
     }
 private:
-    qptr<PathBox> mParentPathBox;
     qsptr<ComboBoxProperty> mOperationType;
     qsptr<BoxTargetProperty> mBoxTarget;
 };

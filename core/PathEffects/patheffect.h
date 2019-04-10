@@ -4,6 +4,7 @@
 #include "skia/skiaincludes.h"
 class BoolProperty;
 class PathBox;
+class BoundingBox;
 enum PathEffectType : short {
     DISPLACE_PATH_EFFECT,
     DASH_PATH_EFFECT,

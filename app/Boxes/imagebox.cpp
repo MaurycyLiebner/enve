@@ -31,26 +31,36 @@ void ImageBox::setFilePath(const QString &path) {
     prp_updateInfluenceRangeAfterChanged();
 }
 
-void ImageBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent) {
-    menu->addAction("Reload", [this]() {
-        if(mImgCacheHandler) mImgCacheHandler->clearCache();
-    });
-    menu->addAction("Set Source File...", [this, widgetsParent]() {
-        changeSourceFile(widgetsParent);
-    });
+void ImageBox::reload() {
+    if(mImgCacheHandler) mImgCacheHandler->clearCache();
+}
+#include "typemenu.h"
+void ImageBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    BoundingBox::addActionsToMenu(menu);
+    const auto widget = menu->getParentWidget();
+
+    const BoxTypeMenu::PlainOp<ImageBox> reloadOp =
+    [](ImageBox * box) {
+        box->reload();
+    };
+    menu->addPlainAction("Reload", reloadOp);
+
+    const BoxTypeMenu::PlainOp<ImageBox> setSrcOp =
+    [widget](ImageBox * box) {
+        box->changeSourceFile(widget);
+    };
+    menu->addPlainAction("Set Source File...", setSrcOp);
 }
 
 void ImageBox::changeSourceFile(QWidget* dialogParent) {
-    QString importPath = QFileDialog::getOpenFileName(
-                                            dialogParent,
-                                            "Change Source", "",
+    QString importPath = QFileDialog::getOpenFileName(dialogParent,
+                                            "Change Source", mImageFilePath,
                                             "Image Files (*.png *.jpg)");
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
-void ImageBox::setupRenderData(
-                                    const qreal &relFrame,
-                                    BoundingBoxRenderData* data) {
+void ImageBox::setupRenderData(const qreal &relFrame,
+                               BoundingBoxRenderData* data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imgData = GetAsPtr(data, ImageBoxRenderData);
     if(mImgCacheHandler->hasImage()) {

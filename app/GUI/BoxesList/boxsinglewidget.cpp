@@ -23,6 +23,8 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "Boxes/pathbox.h"
 
+#include "typemenu.h"
+
 QPixmap* BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap* BoxSingleWidget::INVISIBLE_PIXMAP;
 QPixmap* BoxSingleWidget::HIDE_CHILDREN;
@@ -729,8 +731,9 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 menu.addSeparator();
                 const auto boxTarget = GetAsPtr(target, BoundingBox);
                 QMenu * const canvasMenu = menu.addMenu("Canvas");
-                boxTarget->addActionsToMenu(canvasMenu, this);
-                boxTarget->getParentCanvas()->addSelectedBoxesActions(canvasMenu);
+                const auto canvas = boxTarget->getParentCanvas();
+                BoxTypeMenu bMenu(canvasMenu, canvas, this);
+                canvas->addSelectedBoxesActions(canvasMenu);
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();
                 const auto animTarget = GetAsPtr(target, Animator);

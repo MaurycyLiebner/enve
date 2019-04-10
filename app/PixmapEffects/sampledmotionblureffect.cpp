@@ -6,16 +6,16 @@ SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
     PixmapEffect("motion blur", EFFECT_MOTION_BLUR) {
     mParentBox = box;
     mOpacity = SPtrCreate(QrealAnimator)("opacity");
-    mOpacity->setValueRange(0., 100.);
-    mOpacity->setCurrentBaseValue(100.);
+    mOpacity->setValueRange(0, 100);
+    mOpacity->setCurrentBaseValue(100);
 
     mNumberSamples = SPtrCreate(QrealAnimator)("number of samples");
-    mNumberSamples->setValueRange(0.1, 99.);
-    mNumberSamples->setCurrentBaseValue(1.);
+    mNumberSamples->setValueRange(0.1, 99);
+    mNumberSamples->setCurrentBaseValue(1);
 
     mFrameStep = SPtrCreate(QrealAnimator)("frame step");
     mFrameStep->setValueRange(.1, 9.9);
-    mFrameStep->setCurrentBaseValue(1.);
+    mFrameStep->setCurrentBaseValue(1);
 
     ca_addChildAnimator(mOpacity);
     ca_addChildAnimator(mNumberSamples);

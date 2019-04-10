@@ -751,8 +751,7 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
         pathEffect =
                 SPtrCreate(DuplicatePathEffect)(mIsOutline);
     } else if(typeT == OPERATION_PATH_EFFECT) {
-        pathEffect = SPtrCreate(OperationPathEffect)(
-                    GetAsPtr(mParentBox, PathBox), mIsOutline);
+        pathEffect = SPtrCreate(OperationPathEffect)(mIsOutline);
     } else if(typeT == LENGTH_PATH_EFFECT) {
         pathEffect = SPtrCreate(LengthPathEffect)(mIsOutline);
     } else if(typeT == SOLIDIFY_PATH_EFFECT) {

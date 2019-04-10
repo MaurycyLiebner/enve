@@ -6,8 +6,7 @@
 #include "imagebox.h"
 #include "undoredo.h"
 
-AnimationBox::AnimationBox() :
-    BoundingBox(TYPE_IMAGE) {
+AnimationBox::AnimationBox() : BoundingBox(TYPE_IMAGE) {
     setName("Animation");
 
     setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
@@ -118,6 +117,10 @@ void AnimationBox::disableFrameRemapping() {
     scheduleUpdate(Animator::USER_CHANGE);
 }
 
+void AnimationBox::reload() {
+    if(mSrcFramesCache) mSrcFramesCache->clearCache();
+}
+
 void AnimationBox::anim_setAbsFrame(const int &frame) {
     BoundingBox::anim_setAbsFrame(frame);
     if(!mSrcFramesCache) return;
@@ -136,33 +139,34 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
 //    //paint.setFilterQuality(kHigh_SkFilterQuality);
 //    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
 //}
+#include "typemenu.h"
+void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    BoundingBox::addActionsToMenu(menu);
+    const auto widget = menu->getParentWidget();
 
-void AnimationBox::addActionsToMenu(QMenu * const menu,
-                                    QWidget* const widgetsParent) {
-    menu->addAction("Reload", [this]() {
-        if(mSrcFramesCache) {
-            mSrcFramesCache->clearCache();
-        }
-    });
+    const BoxTypeMenu::PlainOp<AnimationBox> reloadOp =
+    [](AnimationBox * box) {
+        box->reload();
+    };
+    menu->addPlainAction("Reload", reloadOp);
 
-    menu->addAction("Set Source File...", [this, widgetsParent]() {
-        changeSourceFile(widgetsParent);
-    });
+    const BoxTypeMenu::PlainOp<AnimationBox> setSrcOp =
+    [widget](AnimationBox * box) {
+        box->changeSourceFile(widget);
+    };
+    menu->addPlainAction("Set Source File...", setSrcOp);
 
-    const auto fR = menu->addAction("Frame Remapping", [this]() {
-        if(this->mFrameRemappingEnabled) {
-            this->disableFrameRemapping();
-        } else {
-            this->enableFrameRemapping();
-        }
-    });
-    fR->setCheckable(true);
-    fR->setChecked(mFrameRemappingEnabled);
+    const BoxTypeMenu::CheckOp<AnimationBox> remapOp =
+    [](AnimationBox * box, bool checked) {
+        if(checked) box->enableFrameRemapping();
+        else box->disableFrameRemapping();
+    };
+    menu->addCheckableAction("Set Source File...",
+                             mFrameRemappingEnabled, remapOp);
 }
 
-void AnimationBox::setupRenderData(
-                                const qreal &relFrame,
-                                BoundingBoxRenderData* data) {
+void AnimationBox::setupRenderData(const qreal &relFrame,
+                                   BoundingBoxRenderData* data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     const int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));

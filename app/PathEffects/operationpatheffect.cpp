@@ -4,8 +4,7 @@
 #include "Boxes/pathbox.h"
 #include "pathoperations.h"
 
-OperationPathEffect::OperationPathEffect(PathBox * const parentPath,
-                                         const bool &outlinePathEffect) :
+OperationPathEffect::OperationPathEffect(const bool &outlinePathEffect) :
     PathEffect("path operation effect",
                OPERATION_PATH_EFFECT, outlinePathEffect) {
     mOperationType = SPtrCreate(ComboBoxProperty)(
@@ -13,8 +12,7 @@ OperationPathEffect::OperationPathEffect(PathBox * const parentPath,
                  QStringList() << "Union" <<
                  "Difference" << "Intersection" <<
                  "Exclusion");
-    mBoxTarget = SPtrCreate(BoxTargetProperty)("sum with");
-    mParentPathBox = parentPath;
+    mBoxTarget = SPtrCreate(BoxTargetProperty)("target");
 
     ca_addChildAnimator(mBoxTarget);
     ca_addChildAnimator(mOperationType);
@@ -25,6 +23,10 @@ void OperationPathEffect::apply(const qreal &relFrame,
                                 SkPath * const dst) {
     const auto pathBox = GetAsPtr(mBoxTarget->getTarget(), PathBox);
     const QString operation = mOperationType->getCurrentValueName();
+    const auto idBox = [](Property * prop) {
+        return prop->SWT_isBoundingBox();
+    };
+    const auto parentBox = getFirstAncestor<BoundingBox>(idBox);
     gApplyOperation(relFrame, src, dst, pathBox,
-                    mParentPathBox, operation);
+                    GetAsPtr(parentBox, PathBox), operation);
 }

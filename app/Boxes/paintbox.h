@@ -21,11 +21,14 @@ protected:
     PaintBox();
 public:
     bool SWT_isPaintBox() const { return true; }
-    void setupRenderData(const qreal &relFrame, BoundingBoxRenderData* data);
+    void setupRenderData(const qreal &relFrame,
+                         BoundingBoxRenderData* data);
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
+
+    void addActionsToMenu(BoxTypeMenu * const menu);
 private:
 };
 

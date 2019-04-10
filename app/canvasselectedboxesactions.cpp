@@ -182,7 +182,7 @@ void Canvas::applyOperationPathEffectToSelected() {
     for(const auto &box : mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
         const auto pathBox = GetAsPtr(box, PathBox);
-        box->addPathEffect(SPtrCreate(OperationPathEffect)(pathBox, false));
+        box->addPathEffect(SPtrCreate(OperationPathEffect)(false));
     }
 }
 
@@ -206,7 +206,7 @@ void Canvas::applySumFillPathEffectToSelected() {
     for(const auto &box : mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
         const auto pathBox = GetAsPtr(box, PathBox);
-        const auto effect = SPtrCreate(OperationPathEffect)(pathBox, false);
+        const auto effect = SPtrCreate(OperationPathEffect)(false);
         box->addFillPathEffect(effect);
     }
 }
@@ -515,8 +515,6 @@ void Canvas::clearBoxesSelection() {
 
 
 void Canvas::applyCurrentTransformationToSelected() {
-    for(const auto &box : mSelectedBoxes)
-        box->applyCurrentTransformation();
 }
 
 bool zLessThan(const qptr<BoundingBox> &box1, const qptr<BoundingBox> &box2) {

@@ -53,8 +53,6 @@ public:
 
     QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
 
-    void applyCurrentTransformation();
-
     bool relPointInsidePath(const QPointF &relPos) const;
 //    QPointF getRelCenterPosition();
 
@@ -79,7 +77,8 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     void setupRenderData(const qreal &relFrame,
-                                                BoundingBoxRenderData* data);
+                         BoundingBoxRenderData* data);
+    void addActionsToMenu(BoxTypeMenu * const menu);
 
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
     FrameRange getFirstAndLastIdenticalForMotionBlur(

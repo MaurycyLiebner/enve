@@ -611,30 +611,15 @@ OutlineSettingsAnimator *BoxesGroup::getStrokeSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getStrokeSettings();
 }
-void BoxesGroup::applyCurrentTransformation() {
-    mNReasonsNotToApplyUglyTransform++;
-    const QPointF absPivot = getPivotAbsPos();
-    const qreal rotation = mTransformAnimator->rot();
-    const qreal scaleX = mTransformAnimator->xScale();
-    const qreal scaleY = mTransformAnimator->yScale();
-    const QPointF relTrans = mTransformAnimator->pos();
-    for(const auto& box : mContainedBoxes) {
-        box->saveTransformPivotAbsPos(absPivot);
-        box->startTransform();
-        box->rotateRelativeToSavedPivot(rotation);
-        box->finishTransform();
-        box->startTransform();
-        box->scaleRelativeToSavedPivot(scaleX, scaleY);
-        box->finishTransform();
-        box->startPosTransform();
-        box->moveByRel(relTrans);
-        box->finishTransform();
-    }
 
-    mTransformAnimator->resetRotation();
-    mTransformAnimator->resetScale();
-    mTransformAnimator->resetTranslation();
-    mNReasonsNotToApplyUglyTransform--;
+#include "typemenu.h"
+void BoxesGroup::addActionsToMenu(BoxTypeMenu * const menu) {
+    BoundingBox::addActionsToMenu(menu);
+    const auto ungroupAction = menu->addPlainAction<BoxesGroup>(
+                "Ungroup", [](BoxesGroup * box) {
+        box->ungroup_k();
+    });
+    ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
 }
 
 void BoxesGroup::selectAllBoxesFromBoxesGroup() {

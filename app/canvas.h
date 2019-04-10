@@ -124,23 +124,16 @@ public:
     void makeSelectedPointsSegmentsCurves();
     void makeSelectedPointsSegmentsLines();
 
-    template <class T>
-    void execOpOnSelected(const std::function<void(T*)> &op) {
-        const bool isPt = std::is_base_of<MovablePoint, T>::value;
-        if(isPt) {
-            execOpOnSelectedPoints(op);
-            return;
-        }
-        const bool isBox = std::is_base_of<BoundingBox, T>::value;
-        if(isBox) {
-            execOpOnSelectedPoints(op);
-            return;
+    template <class T = BoundingBox>
+    void execOpOnSelectedBoxes(const std::function<void(T*)> &op) {
+        for(const auto& box : mSelectedBoxes) {
+            const auto boxT = dynamic_cast<T*>(box.data());
+            if(boxT) op(boxT);
         }
     }
 
     template <class T = MovablePoint>
     void execOpOnSelectedPoints(const std::function<void(T*)> &op) {
-
         if(mLastPressedPoint) {
             if(!mLastPressedPoint->selectionEnabled()) {
                 const auto ptT = dynamic_cast<T*>(mLastPressedPoint.data());
@@ -501,8 +494,8 @@ public:
     bool SWT_isCanvas() const { return true; }
 
     void addSelectedBoxesActions(QMenu * const menu);
-    void addActionsToMenu(QMenu * const menu, QWidget * const widgetsParent);
-
+    void addActionsToMenu(BoxTypeMenu * const menu) { Q_UNUSED(menu); }
+    void addActionsToMenu(QMenu* const menu);
 
     void deleteAction();
     void copyAction();

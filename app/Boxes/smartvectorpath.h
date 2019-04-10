@@ -21,8 +21,7 @@ public:
     void drawCanvasControls(SkCanvas * const canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
-
-    void applyCurrentTransformation();
+    void addActionsToMenu(BoxTypeMenu * const menu);
     NormalSegment getNormalSegment(const QPointF &absPos,
                                    const qreal &canvasScaleInv);
 
@@ -40,6 +39,7 @@ public:
 
     bool differenceInEditPathBetweenFrames(const int& frame1,
                                            const int& frame2) const;
+    void applyCurrentTransformation();
 
     void loadSkPath(const SkPath& path);
 

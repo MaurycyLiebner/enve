@@ -19,7 +19,7 @@ private:
 class SampledMotionBlurEffect : public PixmapEffect {
     friend class SelfRef;
 public:
-    qreal getMargin() { return 0.; }
+    qreal getMargin() { return 0; }
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);

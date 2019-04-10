@@ -30,7 +30,7 @@ public:
     virtual void reloadSound() {}
 
     bool SWT_isAnimationBox() const { return true; }
-    void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
+    void addActionsToMenu(BoxTypeMenu * const menu);
     virtual void changeSourceFile(QWidget* dialogParent) = 0;
     void setupRenderData(
             const qreal &relFrame, BoundingBoxRenderData* data);
@@ -47,6 +47,8 @@ public:
 
     void enableFrameRemapping();
     void disableFrameRemapping();
+
+    void reload();
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
     stdptr<AnimationCacheHandler> mSrcFramesCache;

@@ -54,6 +54,10 @@ enum BoundingBoxType {
 typedef PropertyMimeData<BoundingBox,
     InternalMimeData::BOUNDING_BOX> BoundingBoxMimeData;
 
+class BoundingBox;
+template<typename T> class TypeMenu;
+typedef TypeMenu<BoundingBox> BoxTypeMenu;
+
 class BoundingBox : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
@@ -194,7 +198,6 @@ public:
     virtual QMatrix getRelativeTransformAtCurrentFrame();
     virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
     virtual QMatrix getTotalTransform() const;
-    virtual void applyCurrentTransformation();
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
     virtual Canvas *getParentCanvas();
@@ -212,8 +215,7 @@ public:
     virtual void removeFillPathEffect(const qsptr<PathEffect>&);
     virtual void removeOutlinePathEffect(const qsptr<PathEffect>&);
 
-    virtual void addActionsToMenu(QMenu * const menu,
-                                  QWidget* const widgetsParent);
+    virtual void addActionsToMenu(BoxTypeMenu * const menu);
 
     virtual stdsptr<BoundingBoxRenderData> createRenderData();
     virtual void setupRenderData(

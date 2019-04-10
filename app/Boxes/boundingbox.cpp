@@ -570,7 +570,39 @@ QRectF BoundingBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
     return getRelBoundingRect();
 }
 
-void BoundingBox::applyCurrentTransformation() {}
+#include "typemenu.h"
+#include "PixmapEffects/pixmapeffectsinclude.h"
+template <typename T>
+void addEffectAction(const QString& text,
+                     BoxTypeMenu * const menu) {
+    const BoxTypeMenu::PlainOp<BoundingBox> op = [](BoundingBox * box) {
+        box->addEffect<T>();
+    };
+    menu->addPlainAction(text, op);
+}
+
+void BoundingBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    const auto effectsMenu = menu->addMenu("Effects");
+    addEffectAction<BlurEffect>("Blur", effectsMenu);
+    addEffectAction<SampledMotionBlurEffect>("Motion Blur", effectsMenu);
+    addEffectAction<ShadowEffect>("Shadow", effectsMenu);
+    addEffectAction<DesaturateEffect>("Desaturate", effectsMenu);
+    addEffectAction<ColorizeEffect>("Colorize", effectsMenu);
+    addEffectAction<ContrastEffect>("Contrast", effectsMenu);
+    addEffectAction<BrightnessEffect>("Brightness", effectsMenu);
+    addEffectAction<ReplaceColorEffect>("Replace Color", effectsMenu);
+
+    const auto gpuEffectsMenu = menu->addMenu("GPU Effects");
+    for(const auto& creator : GPURasterEffectCreator::sEffectCreators) {
+        const BoxTypeMenu::PlainOp<BoundingBox> op =
+        [creator](BoundingBox * box) {
+            const auto effect = GetAsSPtr(creator->create(), GPURasterEffect);
+            box->addGPUEffect(effect);
+        };
+        gpuEffectsMenu->addPlainAction(creator->fName, op);
+    }
+}
+
 
 void BoundingBox::moveByAbs(const QPointF &trans) {
     mTransformAnimator->moveByAbs(trans);
@@ -1052,12 +1084,6 @@ void BoundingBox::removePathEffect(const qsptr<PathEffect> &) {}
 void BoundingBox::removeFillPathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::removeOutlinePathEffect(const qsptr<PathEffect> &) {}
-
-void BoundingBox::addActionsToMenu(QMenu * const menu,
-                                   QWidget* const widgetsParent) {
-    Q_UNUSED(menu);
-    Q_UNUSED(widgetsParent);
-}
 
 void BoundingBox::setName(const QString &name) {
     if(name == prp_mName) return;

@@ -8,6 +8,16 @@ class TextBox : public PathBox {
 public:
     TextBox();
 
+    bool SWT_isTextBox() const { return true; }
+    void addActionsToMenu(BoxTypeMenu * const menu);
+    SkPath getPathAtRelFrameF(const qreal &relFrame);
+
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
+
+    bool differenceInEditPathBetweenFrames(
+                const int& frame1, const int& frame2) const;
+
     void setFont(const QFont &font);
     void setSelectedFontSize(const qreal &size);
     void setSelectedFontFamilyAndStyle(const QString &fontFamily,
@@ -30,16 +40,7 @@ public:
         scheduleUpdate(Animator::USER_CHANGE);
     }
 
-    bool SWT_isTextBox() const { return true; }
-    void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
-    SkPath getPathAtRelFrameF(const qreal &relFrame);
     void setCurrentValue(const QString &text);
-
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
-
-    bool differenceInEditPathBetweenFrames(
-                const int& frame1, const int& frame2) const;
 private:
     Qt::Alignment mAlignment = Qt::AlignLeft;
     QFont mFont;

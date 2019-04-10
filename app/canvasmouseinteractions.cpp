@@ -33,36 +33,6 @@ void Canvas::handleMovePathMousePressEvent() {
 }
 
 void Canvas::addSelectedBoxesActions(QMenu * const menu) {
-    bool hasVectorPathBox = false;
-    for(const auto& box : mSelectedBoxes) {
-        if(box->SWT_isVectorPath()) {
-            hasVectorPathBox = true;
-            break;
-        }
-    }
-    bool hasGroups = false;
-    for(const auto& box : mSelectedBoxes) {
-        if(box->SWT_isBoxesGroup()) {
-            hasGroups = true;
-            break;
-        }
-    }
-    bool hasPathBox = false;
-    if(hasVectorPathBox) {
-        hasPathBox = true;
-    } else {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isPathBox()) {
-                hasPathBox = true;
-                break;
-            }
-        }
-    }
-    if(hasVectorPathBox || hasGroups) {
-        menu->addAction("Apply Transformation", [this]() {
-            applyCurrentTransformation();
-        });
-    }
     menu->addSeparator();
     menu->addAction("Create Link", [this]() {
         for(const auto& box : mSelectedBoxes)
@@ -99,159 +69,11 @@ void Canvas::addSelectedBoxesActions(QMenu * const menu) {
         this->groupSelectedBoxes();
     });
     groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
-
-
-    QAction * const ungroupAction = menu->addAction("Ungroup", [this]() {
-        this->ungroupSelectedBoxes();
-    });
-    ungroupAction->setEnabled(hasGroups);
-    ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
-
-    menu->addSeparator();
-
-    QMenu * const effectsMenu = menu->addMenu("Effects");
-    effectsMenu->addAction("Blur", [this]() {
-        this->applyEffectToSelected<BlurEffect>();
-    });
-    effectsMenu->addAction("Motion Blur", [this]() {
-        this->applySampledMotionBlurToSelected();
-    });
-    effectsMenu->addAction("Shadow", [this]() {
-        this->applyEffectToSelected<ShadowEffect>();
-    });
-//    effectsMenu->addAction("Lines");
-//    effectsMenu->addAction("Circles");
-//    effectsMenu->addAction("Swirl");
-//    effectsMenu->addAction("Oil");
-//    effectsMenu->addAction("Implode");
-    effectsMenu->addAction("Desaturate", [this]() {
-        this->applyEffectToSelected<DesaturateEffect>();
-    });
-
-    effectsMenu->addAction("Colorize", [this]() {
-        this->applyEffectToSelected<ColorizeEffect>();
-    });
-
-    effectsMenu->addAction("Contrast", [this]() {
-        this->applyEffectToSelected<ContrastEffect>();
-    });
-
-    effectsMenu->addAction("Brightness", [this]() {
-        this->applyEffectToSelected<BrightnessEffect>();
-    });
-
-    effectsMenu->addAction("Replace Color", [this]() {
-        this->applyEffectToSelected<ReplaceColorEffect>();
-    });
-
-    QMenu * const gpuEffectsMenu = menu->addMenu("GPU Effects");
-    for(const auto& effect : GPURasterEffectCreator::sEffectCreators) {
-        gpuEffectsMenu->addAction(effect->fName, [this, effect]() {
-            applyGPURasterEffectToSelected(effect);
-        });
-    }
-
-    if(hasPathBox || hasGroups) {
-        QMenu * const pathEffectsMenu = menu->addMenu("Path Effects");
-
-        pathEffectsMenu->addAction("Displace Effect", [this]() {
-            this->applyDiscretePathEffectToSelected();
-        });
-
-        pathEffectsMenu->addAction("Duplicate Effect", [this]() {
-            this->applyDuplicatePathEffectToSelected();
-        });
-
-        pathEffectsMenu->addAction("Length Effect", [this]() {
-            this->applyLengthPathEffectToSelected();
-        });
-
-        pathEffectsMenu->addAction("Solidify Effect", [this]() {
-            this->applySolidifyPathEffectToSelected();
-        });
-
-        pathEffectsMenu->addAction("Operation Effect", [this]() {
-            this->applyOperationPathEffectToSelected();
-        });
-
-        pathEffectsMenu->addAction("Sum Effect", [this]() {
-            this->applySumPathEffectToSelected();
-        });
-
-        QMenu * const fillPathEffectsMenu = menu->addMenu("Fill Effects");
-
-        fillPathEffectsMenu->addAction("Displace Effect", [this]() {
-            this->applyDiscreteFillPathEffectToSelected();
-        });
-
-        fillPathEffectsMenu->addAction("Duplicate Effect", [this]() {
-            this->applyDuplicateFillPathEffectToSelected();
-        });
-
-//        fillPathEffectsMenu->addAction("Solidify Effect", [this]() {
-//            this->applySolidifyFillPathEffectToSelected();
-//        });
-
-        fillPathEffectsMenu->addAction("Operation Effect", [this]() {
-            this->applySumFillPathEffectToSelected();
-        });
-
-        QMenu * const outlinePathEffectsMenu = menu->addMenu("Outline Effects");
-        outlinePathEffectsMenu->addAction("Displace Effect", [this]() {
-            this->applyDiscreteOutlinePathEffectToSelected();
-        });
-
-        outlinePathEffectsMenu->addAction("Duplicate Effect", [this]() {
-            this->applyDuplicateOutlinePathEffectToSelected();
-        });
-
-//        outlinePathEffectsMenu->addAction("Length Effect", [this]() {
-//            this->applyLengthOutlinePathEffectToSelected();
-//        });
-
-//        outlinePathEffectsMenu->addAction("Solidify Effect", [this]() {
-//            this->applySolidifyOutlinePathEffectToSelected();
-//        });
-
-//        outlinePathEffectsMenu->addAction("Operation Effect", [this]() {
-//            this->applySumOutlinePathEffectToSelected();
-//        });
-    }
-
-    for(const auto& box : mSelectedBoxes) {
-        if(box->SWT_isPaintBox()) {
-            const auto paintBox = GetAsPtr(box, PaintBox);
-            menu->addSeparator();
-//            menu->addAction("Load From Image", [this]() {
-//                MainWindow::getInstance()->disableEventFilter();
-//                const QString importPath = QFileDialog::getOpenFileName(
-//                                                MainWindow::getInstance(),
-//                                                "Load From Image", "",
-//                                                "Image Files (*.png *.jpg)");
-//                MainWindow::getInstance()->enableEventFilter();
-//                if(!importPath.isEmpty()) {
-//                    QImage img;
-//                    if(img.load(importPath)) {
-//                        for(const auto& box : mSelectedBoxes) {
-//                            if(box->SWT_isPaintBox()) {
-//                                const auto paintBox = GetAsPtr(box, PaintBox);
-//                                paintBox->loadFromImage(img);
-//                            }
-//                        }
-//                    }
-//                }
-//            });
-
-            break;
-        }
-    }
 }
 
 #include <QInputDialog>
 #include "PathEffects/patheffect.h"
-void Canvas::addActionsToMenu(QMenu * const menu,
-                              QWidget* const widgetsParent) {
-    Q_UNUSED(widgetsParent);
+void Canvas::addActionsToMenu(QMenu * const menu) {
     const BoxesClipboardContainer * const clipboard =
             MainWindow::getBoxesClipboardContainer();
     if(clipboard) {
@@ -380,7 +202,7 @@ void Canvas::addActionsToMenu(QMenu * const menu,
         bool ok;
         const qreal newFps = QInputDialog::getDouble(
                     mMainWindow, "Map to Different Fps",
-                    "New Fps:", mFps, 1., 999., 2, &ok);
+                    "New Fps:", mFps, 1, 999, 2, &ok);
         if(ok) changeFpsTo(newFps);
     });
 
@@ -399,10 +221,10 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
         mLastPressedPoint = mHoveredPoint_d;
         if(mLastPressedPoint) {
             QMenu qMenu;
-            PointTypeMenu menu(&qMenu, this);
+            PointTypeMenu menu(&qMenu, this, mMainWindow);
             if(mLastPressedPoint->selectionEnabled()) {
                 if(!mLastPressedPoint->isSelected()) {
-                    clearPointsSelection();
+                    if(!isShiftPressed()) clearPointsSelection();
                     addPointToSelection(mLastPressedPoint);
                 }
                 for(const auto& pt : mSelectedPoints_d) {
@@ -420,14 +242,20 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
                 addBoxToSelection(mLastPressedBox);
             }
 
-            QMenu menu(mCanvasWindow->getCanvasWidget());
-            mLastPressedBox->addActionsToMenu(&menu, mMainWindow);
-            addSelectedBoxesActions(&menu);
-            menu.exec(event->globalPos());
+            QMenu qMenu;
+            addSelectedBoxesActions(&qMenu);
+            BoxTypeMenu menu(&qMenu, this, mMainWindow);
+            for(const auto& box : mSelectedBoxes) {
+                if(menu.hasActionsForType(box)) continue;
+                box->addActionsToMenu(&menu);
+                menu.addedActionsForType(box);
+            }
+            qMenu.exec(event->globalPos());
         } else {
+            clearPointsSelection();
             clearBoxesSelection();
             QMenu menu(mCanvasWindow->getCanvasWidget());
-            addActionsToMenu(&menu, mMainWindow);
+            addActionsToMenu(&menu);
             menu.exec(event->globalPos());
         }
     }

@@ -47,16 +47,18 @@ public:
     ~ImageBox();
 
     bool SWT_isImageBox() const { return true; }
-    void addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent);
+    void addActionsToMenu(BoxTypeMenu * const menu);
 
     void setupRenderData(const qreal &relFrame,
-                                                BoundingBoxRenderData* data);
+                         BoundingBoxRenderData* data);
     stdsptr<BoundingBoxRenderData> createRenderData();
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 
     void changeSourceFile(QWidget *dialogParent);
     void setFilePath(const QString &path);
+
+    void reload();
 private:
     stdptr<ImageCacheHandler> mImgCacheHandler;
     QString mImageFilePath;

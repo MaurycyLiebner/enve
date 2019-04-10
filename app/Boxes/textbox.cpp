@@ -7,6 +7,7 @@
 #include "Animators/qstringanimator.h"
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/effectanimators.h"
+#include "typemenu.h"
 
 TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mPivotAutoAdjust = false;
@@ -94,10 +95,13 @@ qreal textLineX(const Qt::Alignment &alignment,
     }
 }
 
-void TextBox::addActionsToMenu(QMenu * const menu, QWidget* const widgetsParent) {
-    menu->addAction("Set Text...", [this, widgetsParent]() {
-        openTextEditor(widgetsParent);
-    });
+void TextBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    PathBox::addActionsToMenu(menu);
+    const auto widget = menu->getParentWidget();
+    BoxTypeMenu::PlainOp<TextBox> op = [widget](TextBox * box) {
+        box->openTextEditor(widget);
+    };
+    menu->addPlainAction("Set Text...", op);
 }
 
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
