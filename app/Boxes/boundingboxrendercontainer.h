@@ -58,6 +58,7 @@ protected:
     SkPoint mDrawPos;
     QMatrix mTransform;
     QMatrix mPaintTransform;
+    QMatrix mRenderTransform;
     stdsptr<BoundingBoxRenderData> mSrcRenderData;
     sk_sp<SkImage> mImageSk;
 };

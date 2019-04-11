@@ -10,7 +10,7 @@ void CanvasRenderData::renderToImage() {
     fRenderedToImage = true;
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(
-                qCeil(canvasWidth), qCeil(canvasHeight));
+                qCeil(fCanvasWidth), qCeil(fCanvasHeight));
     SkBitmap bitmap;
     bitmap.allocPixels(info);
     bitmap.eraseColor(fBgColor);
@@ -20,8 +20,8 @@ void CanvasRenderData::renderToImage() {
     drawSk(&rasterCanvas);
     rasterCanvas.flush();
 
-    if(!fPixmapEffects.isEmpty()) {
-        for(const auto& effect : fPixmapEffects) {
+    if(!fRasterEffects.isEmpty()) {
+        for(const auto& effect : fRasterEffects) {
             effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
@@ -46,5 +46,5 @@ void CanvasRenderData::drawSk(SkCanvas * const canvas) {
 }
 
 void CanvasRenderData::updateRelBoundingRect() {
-    fRelBoundingRect = QRectF(0, 0, canvasWidth, canvasHeight);
+    fRelBoundingRect = QRectF(0, 0, fCanvasWidth, fCanvasHeight);
 }

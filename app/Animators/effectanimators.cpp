@@ -52,7 +52,7 @@ void EffectAnimators::addEffectRenderDataToListF(
             stdsptr<PixmapEffectRenderData> effectRenderData =
                     pixmapEffect->getPixmapEffectRenderDataForRelFrameF(relFrame, data);
             if(!effectRenderData) continue;
-            data->fPixmapEffects.append(effectRenderData);
+            data->fRasterEffects.append(effectRenderData);
         }
     }
 }

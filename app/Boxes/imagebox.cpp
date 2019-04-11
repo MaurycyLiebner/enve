@@ -66,6 +66,12 @@ void ImageBox::setupRenderData(const qreal &relFrame,
     const auto imgData = GetAsPtr(data, ImageBoxRenderData);
     if(mImgCacheHandler->hasImage()) {
         imgData->fImage = mImgCacheHandler->getImageCopy();
+
+        if(data->fRasterEffects.isEmpty() &&
+           data->fGPUEffects.isEmpty()) {
+            imgData->setupWhenNoRenderingNeeded(
+                        imgData->fImage, imgData->fTransform);
+        }
     } else {
         const auto loader = mImgCacheHandler->scheduleLoad();
         loader->addDependent(imgData);

@@ -76,7 +76,7 @@ void TaskScheduler::scheduleHDDTask(const stdsptr<_ScheduledTask>& task) {
 
 void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
     if(!task->isQued()) task->taskQued();
-
+    if(task->finished()) return;
     mQuedCPUTasks << task;
     tryProcessingNextQuedCPUTask();
 }

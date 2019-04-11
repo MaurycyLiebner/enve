@@ -375,8 +375,8 @@ public:
         BoxesGroup::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getCurrentColor());
-        canvasData->canvasHeight = mHeight*mResolutionFraction;
-        canvasData->canvasWidth = mWidth*mResolutionFraction;
+        canvasData->fCanvasHeight = mHeight*mResolutionFraction;
+        canvasData->fCanvasWidth = mWidth*mResolutionFraction;
     }
 
     bool clipToCanvas() { return mClipToCanvasSize; }

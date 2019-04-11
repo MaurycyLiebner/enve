@@ -18,6 +18,7 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fRelFrame = src->fRelFrame;
     fRelBoundingRect = src->fRelBoundingRect;
     fRelTransform = src->fRelTransform;
+    fRenderTransform = src->fRenderTransform;
     fRenderedToImage = src->fRenderedToImage;
     fBlendMode = src->fBlendMode;
     fDrawPos = src->fDrawPos;
@@ -45,6 +46,7 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     if(fOpacity < 0.001) return;
     const SkScalar invScale = toSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
+    canvas->concat(toSkMatrix(fRenderTransform));
     renderToImage();
     SkPaint paint;
     paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
@@ -89,11 +91,8 @@ void BoundingBoxRenderData::renderToImage() {
 
     drawSk(&rasterCanvas);
 
-    fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
-                             qRound(fGlobalBoundingRect.top()));
-
-    if(!fPixmapEffects.isEmpty()) {
-        for(const auto& effect : fPixmapEffects) {
+    if(!fRasterEffects.isEmpty()) {
+        for(const auto& effect : fRasterEffects) {
             effect->applyEffectsSk(fBitmapTMP, fResolution);
         }
         clearPixmapEffects();
@@ -128,6 +127,7 @@ void BoundingBoxRenderData::afterProcessingFinished() {
 }
 
 void BoundingBoxRenderData::taskQued() {
+    mDataSet = false;
     if(fParentBox) {
         if(fUseCustomRelFrame) {
             fParentBox->setupRenderData(fCustomRelFrame, this);
@@ -138,7 +138,6 @@ void BoundingBoxRenderData::taskQued() {
             (*customizer)(this);
         }
     }
-    mDataSet = false;
     if(!mDelayDataSet) dataSet();
     _ScheduledTask::taskQued();
 }
@@ -152,6 +151,7 @@ void BoundingBoxRenderData::scheduleTaskNow() {
 }
 
 void BoundingBoxRenderData::dataSet() {
+    if(mDataSet) return;
     mDataSet = true;
     if(!fRelBoundingRectSet) {
         fRelBoundingRectSet = true;

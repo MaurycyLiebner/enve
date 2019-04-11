@@ -228,8 +228,7 @@ void BoxesGroup::filterOutlinePathBeforeThickness(
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal parentRelFrame =
             mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->filterOutlinePathBeforeThickness(parentRelFrame,
-                                                              srcDstPath);
+    mParentGroup->filterOutlinePathBeforeThickness(parentRelFrame, srcDstPath);
 }
 
 bool BoxesGroup::isLastPathBox(PathBox * const pathBox) {

@@ -54,11 +54,14 @@ public:
     uint fBoxStateId = 0;
 
     bool fRenderedToImage = false;
+
     QMatrix fResolutionScale;
     QMatrix fScaledTransform;
     QMatrix fTransform;
     QMatrix fParentTransform;
     QMatrix fRelTransform;
+    QMatrix fRenderTransform;
+
     QRectF fRelBoundingRect;
     QRectF fGlobalBoundingRect;
     qreal fOpacity = 1;
@@ -73,7 +76,7 @@ public:
     stdptr<BoundingBoxRenderData> fMotionBlurTarget;
     // for motion blur
 
-    QList<stdsptr<PixmapEffectRenderData>> fPixmapEffects;
+    QList<stdsptr<PixmapEffectRenderData>> fRasterEffects;
     SkPoint fDrawPos = SkPoint::Make(0, 0);
     SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
     QRectF fMaxBoundsRect;
@@ -89,9 +92,24 @@ public:
     void dataSet();
 
     void clearPixmapEffects() {
-        fPixmapEffects.clear();
+        fRasterEffects.clear();
         fEffectsMargin = 0;
     }
+
+    void setupWhenNoRenderingNeeded(const sk_sp<SkImage> image,
+                                    const QMatrix& renderTransform) {
+        fRenderedImage = image;
+        fRenderTransform = renderTransform;
+        updateRelBoundingRect();
+        updateGlobalFromRelBoundingRect();
+        dataSet();
+        fResolutionScale.reset();
+        fResolutionScale.scale(fResolution, fResolution);
+        fScaledTransform = fTransform*fResolutionScale;
+        fRenderedToImage = true;
+        finishedProcessing();
+    }
+
     void appendRenderCustomizerFunctor(
             const stdsptr<RenderDataCustomizerFunctor>& customizer) {
         mRenderDataCustomizerFunctors.append(customizer);
@@ -106,6 +124,8 @@ protected:
     void updateGlobalFromRelBoundingRect() {
         fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
         fixupGlobalBoundingRect();
+        fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
+                                 qRound(fGlobalBoundingRect.top()));
     }
 
     void fixupGlobalBoundingRect() {

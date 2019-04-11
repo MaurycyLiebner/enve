@@ -4,12 +4,11 @@
 struct CanvasRenderData : public BoxesGroupRenderData {
     CanvasRenderData(BoundingBox * const parentBoxT);
     void renderToImage();
-    qreal canvasWidth;
-    qreal canvasHeight;
+    qreal fCanvasWidth;
+    qreal fCanvasHeight;
     SkColor fBgColor;
 protected:
     void drawSk(SkCanvas * const canvas);
-
     void updateRelBoundingRect();
 };
 

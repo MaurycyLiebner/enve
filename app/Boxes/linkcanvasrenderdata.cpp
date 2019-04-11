@@ -50,8 +50,8 @@ void LinkCanvasRenderData::renderToImage() {
     fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
                              qRound(fGlobalBoundingRect.top()));
 
-    if(!fPixmapEffects.isEmpty()) {
-        for(const auto& effect : fPixmapEffects) {
+    if(!fRasterEffects.isEmpty()) {
+        for(const auto& effect : fRasterEffects) {
             effect->applyEffectsSk(fBitmapTMP, fResolution);
         }
         clearPixmapEffects();

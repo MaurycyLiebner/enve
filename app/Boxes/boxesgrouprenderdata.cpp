@@ -6,14 +6,11 @@ BoxesGroupRenderData::BoxesGroupRenderData(BoundingBox * const parentBoxT) :
 }
 
 void BoxesGroupRenderData::drawSk(SkCanvas * const canvas) {
-    canvas->save();
     for(const auto &child : fChildrenRenderData) {
         canvas->save();
         child->drawRenderedImageForParent(canvas);
         canvas->restore();
     }
-
-    canvas->restore();
 }
 
 void BoxesGroupRenderData::transformRenderCanvas(SkCanvas &canvas) const {

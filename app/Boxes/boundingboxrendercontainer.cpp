@@ -40,6 +40,7 @@ void RenderContainer::updatePaintTransformGivenNewTotalTransform(
     mPaintTransform = mTransform.inverted()*totalTransform;
     const qreal invRes = 1/mResolutionFraction;
     mPaintTransform.scale(invRes, invRes);
+    mPaintTransform = mRenderTransform*mPaintTransform;
 }
 
 void RenderContainer::setTransform(const QMatrix &transform) {
@@ -70,5 +71,7 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData * const data) {
     mRelFrame = data->fRelFrame;
     mPaintTransform.reset();
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
+    mRenderTransform = data->fRenderTransform;
+    mPaintTransform = mRenderTransform*mPaintTransform;
     mSrcRenderData = GetAsSPtr(data, BoundingBoxRenderData);
 }
