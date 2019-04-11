@@ -175,14 +175,16 @@ void TaskScheduler::processNextQuedCPUTask(
             emit finishedAllQuedTasks();
     } else if(!mFreeCPUThreads.isEmpty()) {
         for(int i = 0; i < mQuedCPUTasks.count(); i++) {
-            const auto updatablaT = mQuedCPUTasks.at(i).get();
-            if(updatablaT->readyToBeProcessed()) {
-                const int threadId = mFreeCPUThreads.takeLast();
-                updatablaT->setCurrentTaskExecutor(
-                            mCPUTaskExecutors.at(threadId));
-                updatablaT->beforeProcessingStarted();
+            const auto task = mQuedCPUTasks.at(i);
+            if(task->readyToBeProcessed()) {
                 mQuedCPUTasks.removeAt(i--);
-                emit processCPUTask(updatablaT, threadId);
+                if(task->finished()) continue;
+                task->beforeProcessingStarted();
+                if(task->finished()) continue;
+                const int threadId = mFreeCPUThreads.takeLast();
+                task->setCurrentTaskExecutor(
+                            mCPUTaskExecutors.at(threadId));
+                emit processCPUTask(task.get(), threadId);
                 mBusyCPUThreads << threadId;
                 if(mFreeCPUThreads.isEmpty()) break;
             }

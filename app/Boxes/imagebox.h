@@ -18,6 +18,10 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
     void beforeProcessingStarted() {
         if(!fImage) loadImageFromHandler();
         BoundingBoxRenderData::beforeProcessingStarted();
+        if(fRasterEffects.isEmpty() &&
+           fGPUEffects.isEmpty()) {
+            setupWhenNoRenderingNeeded(fImage, fTransform);
+        }
     }
 
     void updateRelBoundingRect() {
