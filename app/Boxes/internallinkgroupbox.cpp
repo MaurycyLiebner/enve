@@ -198,7 +198,7 @@ stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
     return renderData;
 }
 
-QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
+QRectF InternalLinkGroupBox::getRelBoundingRect(const qreal &relFrame) {
     if(!getLinkTarget()) return QRectF();
-    return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
+    return getLinkTarget()->getRelBoundingRect(relFrame);
 }

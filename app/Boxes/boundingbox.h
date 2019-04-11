@@ -144,7 +144,7 @@ public:
                                     const SkScalar &invScale);
 
     virtual const SkPath &getRelBoundingRectPath();
-    virtual QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
+    virtual QRectF getRelBoundingRect(const qreal &relFrame);
 
     virtual MovablePoint *createNewPointOnLineNear(const QPointF &absPos,
                                                    const bool &adjust,

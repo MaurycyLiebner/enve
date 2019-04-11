@@ -565,7 +565,7 @@ QRectF BoundingBox::getRelBoundingRect() const {
     return mRelBoundingRect;
 }
 
-QRectF BoundingBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
+QRectF BoundingBox::getRelBoundingRect(const qreal &relFrame) {
     Q_UNUSED(relFrame);
     return getRelBoundingRect();
 }

@@ -85,7 +85,7 @@ public:
         return margin;
     }
 
-    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal &relFrame);
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {

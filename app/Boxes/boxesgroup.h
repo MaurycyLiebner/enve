@@ -51,7 +51,7 @@ public:
     OutlineSettingsAnimator *getStrokeSettings() const;
     void updateAllBoxes(const UpdateReason &reason);
 
-    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal &relFrame);
 
     bool relPointInsidePath(const QPointF &relPos) const;
 //    QPointF getRelCenterPosition();
@@ -153,11 +153,11 @@ public:
                SkPath * const srcDstPath,
                BoundingBox * const box);
 
-    void filterOutlinePathBeforeThicknessForRelFrame(const qreal &relFrame,
+    void filterOutlinePathBeforeThickness(const qreal &relFrame,
                                                      SkPath * const srcDstPath);
-    void filterOutlinePathForRelFrame(const qreal &relFrame,
+    void filterOutlinePath(const qreal &relFrame,
                                       SkPath * const srcDstPath);
-    void filterFillPathForRelFrame(const qreal &relFrame,
+    void filterFillPath(const qreal &relFrame,
                                    SkPath * const srcDstPath);
 //    bool anim_nextRelFrameWithKey(const int &relFrame,
 //                                 int &nextRelFrame);

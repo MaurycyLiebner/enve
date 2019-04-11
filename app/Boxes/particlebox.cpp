@@ -95,7 +95,7 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 
 bool ParticleBox::SWT_isParticleBox() const { return true; }
 
-QRectF ParticleBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
+QRectF ParticleBox::getRelBoundingRect(const qreal &relFrame) {
     return QRectF(mTopLeftAnimator->getEffectiveValueAtRelFrame(relFrame),
                   mBottomRightAnimator->getEffectiveValueAtRelFrame(relFrame));
 }

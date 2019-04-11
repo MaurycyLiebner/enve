@@ -38,7 +38,7 @@ stdsptr<BoundingBoxRenderData> BoundingBoxRenderData::makeCopy() {
 
 void BoundingBoxRenderData::updateRelBoundingRect() {
     if(!fParentBox) return;
-    fRelBoundingRect = fParentBox->getRelBoundingRectAtRelFrame(fRelFrame);
+    fRelBoundingRect = fParentBox->getRelBoundingRect(fRelFrame);
 }
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {

@@ -23,7 +23,7 @@ public:
     bool isRelFrameInVisibleDurationRect(const int &relFrame) const;
 
     stdsptr<BoundingBoxRenderData> createRenderData();
-    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal &relFrame);
     FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
 
     bool SWT_isBoxesGroup() const;

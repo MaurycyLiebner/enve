@@ -80,9 +80,9 @@ void InternalLinkBox::setupRenderData(
     }
 }
 
-QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
+QRectF InternalLinkBox::getRelBoundingRect(const qreal &relFrame) {
     if(!getLinkTarget()) return QRectF();
-    return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
+    return getLinkTarget()->getRelBoundingRect(relFrame);
 }
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &relPos) const {

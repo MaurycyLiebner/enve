@@ -169,7 +169,7 @@ public:
     OutlineSettingsAnimator *getStrokeSettings() const;
     FillSettingsAnimator *getFillSettings() const;
 
-    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal &relFrame);
 
     SmartVectorPath *objectToVectorPathBox();
     SmartVectorPath *strokeToVectorPathBox();

@@ -139,7 +139,7 @@ void PathBox::setupRenderData(const qreal &relFrame,
             SkPath outlineBase = pathData->fPath;
             mOutlinePathEffectsAnimators->applyBeforeThickness(
                         relFrame, &outlineBase);
-            mParentGroup->filterOutlinePathBeforeThicknessForRelFrame(
+            mParentGroup->filterOutlinePathBeforeThickness(
                         relFrame, &outlineBase);
             SkStroke strokerSk;
             mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
@@ -147,7 +147,7 @@ void PathBox::setupRenderData(const qreal &relFrame,
         }
         if(getParentCanvas()->getPathEffectsVisible()) {
             mOutlinePathEffectsAnimators->apply(relFrame, &outline);
-            mParentGroup->filterOutlinePathForRelFrame(relFrame, &outline);
+            mParentGroup->filterOutlinePath(relFrame, &outline);
         }
         pathData->fOutlinePath = outline;
         //outline.addPath(pathData->fPath);
@@ -158,7 +158,7 @@ void PathBox::setupRenderData(const qreal &relFrame,
     } else {
         pathData->fFillPath = pathData->fPath;
         mFillPathEffectsAnimators->apply(relFrame, &pathData->fPath);
-        mParentGroup->filterFillPathForRelFrame(relFrame, &pathData->fPath);
+        mParentGroup->filterFillPath(relFrame, &pathData->fPath);
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
@@ -591,7 +591,7 @@ void PathBox::updateDrawGradients() {
     updateStrokeDrawGradient();
 }
 
-QRectF PathBox::getRelBoundingRectAtRelFrame(const qreal &relFrame) {
+QRectF PathBox::getRelBoundingRect(const qreal &relFrame) {
     const SkPath path = getPathAtRelFrameF(relFrame);
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {

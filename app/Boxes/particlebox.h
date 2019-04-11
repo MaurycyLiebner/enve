@@ -299,7 +299,7 @@ public:
         }
     }
 
-    QRectF getRelBoundingRectAtRelFrame(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal &relFrame);
 
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 

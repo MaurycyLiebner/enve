@@ -541,7 +541,7 @@ public:
 
     void tabletEvent(const QTabletEvent * const e,
                      const QPointF &absPos);
-    QRectF getRelBoundingRectAtRelFrame(const qreal &);
+    QRectF getRelBoundingRect(const qreal &);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
     bool anim_prevRelFrameWithKey(const int &relFrame, int &prevRelFrame);
