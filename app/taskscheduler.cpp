@@ -97,13 +97,12 @@ void TaskScheduler::queScheduledCPUTasks() {
 void TaskScheduler::queScheduledHDDTasks() {
     if(!mHDDThreadBusy) {
         for(int i = 0; i < mScheduledHDDTasks.count(); i++) {
-            const auto &task = mScheduledHDDTasks.at(i);
+            const auto &task = mScheduledHDDTasks.takeAt(i);
             if(!task->isQued()) task->taskQued();
 
             mQuedHDDTasks << task;
             tryProcessingNextQuedHDDTask();
         }
-        mScheduledHDDTasks.clear();
     }
 }
 
@@ -143,10 +142,9 @@ void TaskScheduler::processNextQuedHDDTask(
             if(task->readyToBeProcessed()) {
                 task->setCurrentTaskExecutor(mHDDExecutor);
                 task->beforeProcessingStarted();
-                emit processHDDTask(task, mCPUTaskExecutors.count());
-                mQuedHDDTasks.takeAt(i);
-                i--;
+                mQuedHDDTasks.removeAt(i--);
                 mHDDThreadBusy = true;
+                emit processHDDTask(task, mCPUTaskExecutors.count());
                 return;
             }
         }

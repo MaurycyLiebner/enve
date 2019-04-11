@@ -145,6 +145,9 @@ protected:
         mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
         mFrameId(frameId) {}
 
+    void beforeProcessingStarted() {
+        _HDDTask::beforeProcessingStarted();
+    }
     void afterProcessingFinished();
     void afterCanceled();
 public:
