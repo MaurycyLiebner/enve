@@ -66,12 +66,13 @@ extern bool boxesZSort(const qptr<BoundingBox> &box1,
 class Canvas : public BoxesGroup {
     Q_OBJECT
     friend class SelfRef;
-public:
+protected:
     explicit Canvas(CanvasWindow *canvasWidget,
                     const int &canvasWidth = 1920,
                     const int &canvasHeight = 1080,
                     const int &frameCount = 200,
-                    const qreal &fps = 24.);
+                    const qreal &fps = 24);
+public:
     ~Canvas();
 
     QRectF getPixBoundingRect();

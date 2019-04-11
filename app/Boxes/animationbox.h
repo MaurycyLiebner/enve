@@ -15,7 +15,7 @@ struct AnimationBoxRenderData : public ImageBoxRenderData {
     }
 
     void loadImageFromHandler();
-    int animationFrame;
+    int fAnimationFrame;
 };
 
 class AnimationBox : public BoundingBox {

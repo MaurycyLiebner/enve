@@ -284,13 +284,15 @@ public:
     }
 protected:
     VideoFrameLoader * getFrameLoader(const int& frame) {
-        if(mFrameCount <= 0 || frame >= mFrameCount) return nullptr;
         const int id = mFramesBeingLoaded.indexOf(frame);
         if(id >= 0) return mFrameLoaders.at(id).get();
         return nullptr;
     }
 
     VideoFrameLoader * addFrameLoader(const int& frame) {
+        if(mFramesBeingLoaded.contains(frame) ||
+           getFrameAtFrame(frame))
+            RuntimeThrow("Trying to unnecessarily reload video frame");
         mFramesBeingLoaded << frame;
         const auto loader = SPtrCreate(VideoFrameLoader)(
                     this, &mVideoStreamsData, frame);

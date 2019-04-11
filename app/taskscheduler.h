@@ -5,6 +5,119 @@
 #include "GPUEffects/gpupostprocessor.h"
 class Canvas;
 
+template <typename T>
+class MultipleList {
+public:
+    class Iterator {
+    public:
+        Iterator(const int& id, MultipleList& target) :
+            mId(id), mTarget(target) {}
+        inline T &operator*() const { return mTarget.at(mId); }
+        inline Iterator &operator++() { mId++; return *this; }
+        inline bool operator==(const Iterator& other)
+        { return mId == other.getId(); }
+        inline bool operator!=(const Iterator& other)
+        { return !operator==(other); }
+    protected:
+        int getId() const { return mId; }
+    private:
+        int mId;
+        MultipleList& mTarget;
+    };
+
+    int listCount() const {
+        return mLists.count();
+    }
+
+    bool isEmpty() const {
+        return mLists.isEmpty();
+    }
+
+    int count() const {
+        int count = 0;
+        for(const auto& list : mLists)
+            count += list.count();
+        return count;
+    }
+
+    void clear() {
+        mLists.clear();
+    }
+
+    inline T &at(const int& id) {
+        int rId = id;
+        for(auto& list : mLists) {
+            const int lCount = list.count();
+            if(rId < lCount) return list.operator[](rId);
+            rId -= lCount;
+        }
+        RuntimeThrow("Index outside range");
+    }
+
+    inline void removeAt(const int& id) {
+        int rId = id;
+        for(int lId = 0; lId < mLists.count(); lId++) {
+            auto& list = mLists[lId];
+            const int lCount = list.count();
+            if(rId < lCount) {
+                list.removeAt(rId);
+                if(list.isEmpty()) removeEmptiedList(list, lId);
+                return;
+            }
+            rId -= lCount;
+        }
+        RuntimeThrow("Index outside range");
+    }
+
+    inline T takeAt(const int& id) {
+        int rId = id;
+        for(int lId = 0; lId < mLists.count(); lId++) {
+            auto& list = mLists[lId];
+            const int lCount = list.count();
+            if(rId < lCount) {
+                if(list.count() == 1) {
+                    T result = list.at(rId);
+                    removeEmptiedList(list, lId);
+                    return result;
+                }
+                return list.takeAt(rId);
+            }
+            rId -= lCount;
+        }
+        RuntimeThrow("Index outside range");
+    }
+
+    inline void append(const T& t) {
+        mCurrentList->append(t);
+    }
+
+    inline MultipleList &operator<< (const T &t)
+    { append(t); return *this; }
+
+    void beginList() {
+        if(mCurrentList) endList();
+        mLists << QList<T>();
+        mCurrentList = &mLists.last();
+    }
+
+    void endList() {
+        if(!mCurrentList) return;
+        if(mCurrentList->isEmpty()) mLists.removeLast();
+        mCurrentList = nullptr;
+    }
+
+    Iterator begin() { return Iterator(0, *this); }
+    Iterator end() { return Iterator(count(), *this); }
+private:
+    void removeEmptiedList(const QList<T>& list, const int& listId) {
+        if(&list == mCurrentList) return;;
+        mLists.removeAt(listId);
+    }
+
+    QList<QList<T>> mLists;
+    QList<T> * mCurrentList = nullptr;
+};
+
 class TaskScheduler : public QObject {
     Q_OBJECT
 public:
@@ -79,10 +192,10 @@ public:
         }
         mScheduledHDDTasks.clear();
 
-        for(const auto& cpuTask : mQuedCPUTasks) {
+        for(const auto& cpuTask : mQuedCPUTasks2) {
             cpuTask->setState(_Task::CANCELED);
         }
-        mQuedCPUTasks.clear();
+        mQuedCPUTasks2.clear();
 
         for(const auto& hddTask : mQuedHDDTasks) {
             hddTask->setState(_Task::CANCELED);
@@ -133,7 +246,7 @@ public:
     }
 
     bool allQuedCPUTasksFinished() const {
-        return mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty();
+        return mBusyCPUThreads.isEmpty() && mQuedCPUTasks2.isEmpty();
     }
 
     bool allQuedHDDTasksFinished() const {
@@ -191,8 +304,12 @@ private:
 
     bool mHDDThreadBusy = false;
 
+    MultipleList<stdsptr<_ScheduledTask>> mScheduledCPUTasks2;
+    MultipleList<stdsptr<_ScheduledTask>> mQuedCPUTasks2;
+    MultipleList<stdsptr<_ScheduledTask>> mScheduledHDDTasks2;
+    MultipleList<stdsptr<_ScheduledTask>> mQuedHDDTasks2;
+
     QList<stdsptr<_ScheduledTask>> mScheduledCPUTasks;
-    QList<stdsptr<_ScheduledTask>> mQuedCPUTasks;
     QList<stdsptr<_ScheduledTask>> mScheduledHDDTasks;
     QList<stdsptr<_ScheduledTask>> mQuedHDDTasks;
 

@@ -77,27 +77,27 @@ void TaskScheduler::scheduleHDDTask(const stdsptr<_ScheduledTask>& task) {
 void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
     if(!task->isQued()) task->taskQued();
     if(task->finished()) return;
-    mQuedCPUTasks << task;
+    mQuedCPUTasks2 << task;
     tryProcessingNextQuedCPUTask();
 }
 
 void TaskScheduler::queScheduledCPUTasks() {
-    // if(mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty()) { !!! failes when creating BoxesGroup
-    if(mBusyCPUThreads.isEmpty()) {
-        if(mCurrentCanvas) {
-            mCurrentCanvas->scheduleWaitingTasks();
-            mCurrentCanvas->queScheduledTasks();
-        }
-        for(const auto &task : mScheduledCPUTasks) {
-            queCPUTask(task);
-        }
-        mScheduledCPUTasks.clear();
+    if(mQuedCPUTasks2.listCount() >= mCPUTaskExecutors.count()) return;
+    mQuedCPUTasks2.beginList();
+    if(mCurrentCanvas) {
+        mCurrentCanvas->scheduleWaitingTasks();
+        mCurrentCanvas->queScheduledTasks();
     }
+    for(const auto &task : mScheduledCPUTasks) queCPUTask(task);
+    mQuedCPUTasks2.endList();
+
+    mScheduledCPUTasks.clear();
 }
 
 void TaskScheduler::queScheduledHDDTasks() {
     if(!mHDDThreadBusy) {
-        for(const auto &task : mScheduledHDDTasks) {
+        for(int i = 0; i < mScheduledHDDTasks.count(); i++) {
+            const auto &task = mScheduledHDDTasks.at(i);
             if(!task->isQued()) task->taskQued();
 
             mQuedHDDTasks << task;
@@ -126,7 +126,7 @@ void TaskScheduler::processNextQuedHDDTask(
     if(mHDDThreadBusy && !finishedTask) return;
     mHDDThreadBusy = false;
     if(finishedTask) finishedTask->finishedProcessing();
-    if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks.isEmpty()) {
+    if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks2.isEmpty()) {
         processNextQuedCPUTask(mFreeCPUThreads.takeFirst(), nullptr);
     }
     if(mQuedHDDTasks.isEmpty()) {
@@ -169,15 +169,15 @@ void TaskScheduler::processNextQuedCPUTask(
             finishedTask->finishedProcessing();
         }
     }
-    if(mQuedCPUTasks.isEmpty()) {
+    if(mQuedCPUTasks2.isEmpty()) {
         callAllQuedCPUTasksFinishedFunc();
         if(mGpuPostProcessor.hasFinished())
             emit finishedAllQuedTasks();
     } else if(!mFreeCPUThreads.isEmpty()) {
-        for(int i = 0; i < mQuedCPUTasks.count(); i++) {
-            const auto task = mQuedCPUTasks.at(i);
+        for(int i = 0; i < mQuedCPUTasks2.count(); i++) {
+            const auto task = mQuedCPUTasks2.at(i);
             if(task->readyToBeProcessed()) {
-                mQuedCPUTasks.removeAt(i--);
+                mQuedCPUTasks2.removeAt(i--);
                 if(task->finished()) continue;
                 task->beforeProcessingStarted();
                 if(task->finished()) continue;

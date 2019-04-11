@@ -171,7 +171,7 @@ void AnimationBox::setupRenderData(const qreal &relFrame,
     BoundingBox::setupRenderData(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     const int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
-    imageData->animationFrame = animationFrame;
+    imageData->fAnimationFrame = animationFrame;
     const auto upd = mSrcFramesCache->scheduleFrameLoad(animationFrame);
     if(upd) upd->addDependent(imageData);
     else imageData->fImage = mSrcFramesCache->getFrameCopyAtFrame(animationFrame);
@@ -183,5 +183,5 @@ stdsptr<BoundingBoxRenderData> AnimationBox::createRenderData() {
 
 void AnimationBoxRenderData::loadImageFromHandler() {
     fImage = GetAsPtr(fSrcCacheHandler, AnimationCacheHandler)->
-            getFrameCopyAtOrBeforeFrame(animationFrame);
+            getFrameCopyAtOrBeforeFrame(fAnimationFrame);
 }
