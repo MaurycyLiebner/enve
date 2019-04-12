@@ -445,24 +445,22 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(renderData->fRedo) {
         scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
-    //qDebug() << renderData->fRelFrame;
-    auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
+    const auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
     auto cont = mCacheHandler.getRenderContainerAtRelFrame
             <ImageCacheContainer>(range.fMin);
     if(cont) {
         cont->replaceImageSk(renderData->fRenderedImage);
+        cont->setRange(range);
     } else {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame
                 <ImageCacheContainer>(range, renderData->fRenderedImage);
     }
-    //cont->setRelFrameRange(range);
     if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
         auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
         bool newerSate = true;
         bool closerFrame = true;
         if(currentRenderData) {
-            newerSate = currentRenderData->fBoxStateId <
-                    renderData->fBoxStateId;
+            newerSate = currentRenderData->fBoxStateId < renderData->fBoxStateId;
             const int finishedFrameDist =
                     qAbs(anim_getCurrentRelFrame() - renderData->fRelFrame);
             const int oldFrameDist =

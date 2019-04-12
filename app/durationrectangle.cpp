@@ -295,38 +295,44 @@ int AnimationRect::getMinAnimationFrameAsAbsFrame() const {
 }
 
 void AnimationRect::setAnimationFrameDuration(const int &frameDuration) {
-    int oldMinFrame = getMinFrame();
-    int oldMaxFrame = getMaxFrame();
-    int oldMinAnimationFrame = getMinAnimationFrame();
-    int oldMaxAnimationFrame = getMaxAnimationFrame();
+    const int oldMinFrame = getMinFrame();
+    const int oldMaxFrame = getMaxFrame();
+    const int oldMinAnimFrame = getMinAnimationFrame();
+    const int oldMaxAnimFrame = getMaxAnimationFrame();
 
     setMaxAnimationFrame(getMinAnimationFrame() + frameDuration - 1);
 
-    int newMinFrame = getMinFrame();
-    int newMaxFrame = getMaxFrame();
-    int newMinAnimationFrame = getMinAnimationFrame();
-    int newMaxAnimationFrame = getMaxAnimationFrame();
-    int minMinFrame = qMin(oldMinFrame, newMinFrame);
-    int maxMinFrame = qMax(oldMinFrame, newMinFrame);
-    int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
-    int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
-    mChildProperty->prp_updateAfterChangedRelFrameRange(
-                            {minMinFrame, maxMinFrame});
-    mChildProperty->prp_updateAfterChangedRelFrameRange(
-                            {minMaxFrame, maxMaxFrame});
+    const int newMinFrame = getMinFrame();
+    const int newMaxFrame = getMaxFrame();
+    const int newMinAnimFrame = getMinAnimationFrame();
+    const int newMaxAnimFrame = getMaxAnimationFrame();
 
-    int minMinAnimationFrame = qMin(oldMinAnimationFrame,
-                                    newMinAnimationFrame);
-    int maxMinAnimationFrame = qMax(oldMinAnimationFrame,
-                                    newMinAnimationFrame);
-    int minMaxAnimationFrame = qMin(oldMaxAnimationFrame,
-                                    newMaxAnimationFrame);
-    int maxMaxAnimationFrame = qMax(oldMaxAnimationFrame,
-                                    newMaxAnimationFrame);
-    mChildProperty->prp_updateAfterChangedRelFrameRange(
-                {minMinAnimationFrame, maxMinAnimationFrame});
-    mChildProperty->prp_updateAfterChangedRelFrameRange(
-                {minMaxAnimationFrame, maxMaxAnimationFrame});
+    if(oldMinFrame != newMinFrame) {
+        const int minMinFrame = qMin(oldMinFrame, newMinFrame);
+        const int maxMinFrame = qMax(oldMinFrame, newMinFrame);
+        mChildProperty->prp_updateAfterChangedRelFrameRange(
+                                {minMinFrame + 1, maxMinFrame});
+    }
+    if(oldMaxFrame != newMaxFrame) {
+        const int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
+        const int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
+        mChildProperty->prp_updateAfterChangedRelFrameRange(
+                                {minMaxFrame, maxMaxFrame - 1});
+    }
+
+    if(oldMinAnimFrame != newMinAnimFrame) {
+        const int minMinAnimFrame = qMin(oldMinAnimFrame, newMinAnimFrame);
+        const int maxMinAnimFrame = qMax(oldMinAnimFrame, newMinAnimFrame);
+        mChildProperty->prp_updateAfterChangedRelFrameRange(
+                    {minMinAnimFrame, maxMinAnimFrame - 1});
+    }
+
+    if(oldMaxAnimFrame != newMaxAnimFrame) {
+        const int minMaxAnimFrame = qMin(oldMaxAnimFrame, newMaxAnimFrame);
+        const int maxMaxAnimFrame = qMax(oldMaxAnimFrame, newMaxAnimFrame);
+        mChildProperty->prp_updateAfterChangedRelFrameRange(
+                    {minMaxAnimFrame + 1, maxMaxAnimFrame});
+    }
 }
 
 int AnimationRect::getAnimationFrameDuration() {
