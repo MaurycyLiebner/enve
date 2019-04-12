@@ -118,7 +118,7 @@ protected:
     int mEncodeAudio = 0;
 
     std::exception_ptr mUpdateException;
-    QString mUpdateError;
+
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
     FrameRange _mRenderRange;

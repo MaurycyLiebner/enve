@@ -34,9 +34,9 @@ void _Task::setCurrentTaskExecutor(TaskExecutor *taskExecutor) {
 }
 
 void _Task::beforeProcessingStarted() {
+    Q_ASSERT(mCurrentExecutionDependent.isEmpty());
     mSelfRef = ref<_Task>();
     mState = PROCESSING;
-    Q_ASSERT(mCurrentExecutionDependent.isEmpty());
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
 }
@@ -61,7 +61,7 @@ void _Task::waitTillProcessed() {
 }
 
 bool _Task::readyToBeProcessed() {
-    return mNDependancies == 0 && mState != PROCESSING;
+    return mNDependancies == 0;
 }
 
 void _Task::clear() {

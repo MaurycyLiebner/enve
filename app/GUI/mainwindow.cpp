@@ -861,20 +861,8 @@ void MainWindow::queScheduledTasksAndUpdate() {
         }
     }
 
-    //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
     mTaskScheduler.queScheduledCPUTasks();
     mTaskScheduler.queScheduledHDDTasks();
-//    if(mCanvasWindow->shouldProcessAwaitingSchedulers()) {
-//        mCanvasWindow->processSchedulers();
-//        foreach(const stdsptr<_ScheduledTask> &updatable,
-//                mUpdateSchedulers) {
-//            if(!updatable->isAwaitingUpdate()) {
-//                updatable->schedulerProccessed();
-//            }
-//            mCanvasWindow->queCPUTask(updatable);
-//        }
-//        mUpdateSchedulers.clear();
-//    }
 
     mCanvasWindow->updateHoveredElements();
     mCanvasWindow->updatePivotIfNeeded();

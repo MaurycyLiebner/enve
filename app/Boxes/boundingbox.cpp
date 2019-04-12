@@ -1186,10 +1186,8 @@ void BoundingBox::scheduleWaitingTasks() {
 
 void BoundingBox::queScheduledTasks() {
     const auto taskScheduler = TaskScheduler::sGetInstance();
-    for(int i = 0; i < mScheduledTasks.count(); i++) {
-    //for(const auto &task : mScheduledTasks) {
-        taskScheduler->queCPUTask(mScheduledTasks.at(i));
-    }
+    for(const auto& task : mScheduledTasks)
+        taskScheduler->scheduleCPUTask(task);
 
     mScheduledTasks.clear();
 }

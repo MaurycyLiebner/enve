@@ -603,8 +603,8 @@ void VideoEncoder::_processUpdate() {
         }
         if(mEncodeVideo && encodeVideoT && avAligned) {
             const auto cacheCont = _mContainers.at(_mCurrentContainerId);
-            const int nFrames =
-                    (cacheCont->getRange()*_mRenderRange).span();
+            const auto contRage = cacheCont->getRange()*_mRenderRange;
+            const int nFrames = contRage.span();
             try {
                 write_video_frame(mFormatContext, &mVideoStream,
                                   cacheCont->getImageSk(), &mEncodeVideo);
@@ -642,6 +642,8 @@ void VideoEncoder::afterProcessingFinished() {
     bool firstT = true;
     for(int i = _mCurrentContainerId - 1; i >= 0; i--) {
         const auto &cont = _mContainers.at(i);
+        qDebug() << "{" << cont->getRange().fMin << "," <<
+                           cont->getRange().fMax << "}";
         if(firstT) {
             auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
             currCanvas->setCurrentPreviewContainer(cont, true);
@@ -651,10 +653,8 @@ void VideoEncoder::afterProcessingFinished() {
         }
         _mContainers.removeAt(i);
     }
-    if(mEncodingFinished ||
-       mInterruptEncoding ||
-       mUpdateException ||
-       (!mEncodeAudio && !mEncodeVideo)) {
+    if(mEncodingFinished || mInterruptEncoding ||
+       mUpdateException || (!mEncodeAudio && !mEncodeVideo)) {
         if(mInterruptEncoding) {
             mRenderInstanceSettings->setCurrentState(
                         RenderInstanceSettings::NONE);
@@ -667,6 +667,7 @@ void VideoEncoder::afterProcessingFinished() {
             finishEncodingNow();
             mEmitter.encodingFailed();
         } else {
+            qDebug() << "FINISHED";
             finishEncodingSuccess();
         }
     }

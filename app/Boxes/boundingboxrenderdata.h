@@ -98,16 +98,11 @@ public:
 
     void setupWhenNoRenderingNeeded(const sk_sp<SkImage> image,
                                     const QMatrix& renderTransform) {
-        fRenderedImage = image;
         fRenderTransform = renderTransform;
         updateRelBoundingRect();
         updateGlobalFromRelBoundingRect();
-        dataSet();
-        fResolutionScale.reset();
-        fResolutionScale.scale(fResolution, fResolution);
-        fScaledTransform = fTransform*fResolutionScale;
+        fRenderedImage = image;
         fRenderedToImage = true;
-        finishedProcessing();
     }
 
     void appendRenderCustomizerFunctor(
@@ -122,6 +117,9 @@ public:
     bool nullifyBeforeProcessing();
 protected:
     void updateGlobalFromRelBoundingRect() {
+        fResolutionScale.reset();
+        fResolutionScale.scale(fResolution, fResolution);
+        fScaledTransform = fTransform*fResolutionScale;
         fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
         fixupGlobalBoundingRect();
         fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),

@@ -164,15 +164,13 @@ void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
     for(int i = firstVisibleId;
         i < mCacheList.count() &&
         idP < mSingleWidgets.count(); i++) {
-        FileSourceWidget *fsw = ((FileSourceWidget*)mSingleWidgets.at(idP));
+        const auto fsw = static_cast<FileSourceWidget*>(mSingleWidgets.at(idP));
         fsw->setTargetCache(mCacheList.at(i));
         fsw->show();
         idP++;
     }
 
-    for(int i = idP; i < mSingleWidgets.count(); i++) {
-        mSingleWidgets.at(i)->hide();
-    }
+    for(const auto& wid : mSingleWidgets) wid->hide();
 }
 
 QWidget *FileSourceListVisibleWidget::createNewSingleWidget() {
@@ -188,11 +186,9 @@ void FileSourceListVisibleWidget::addCacheHandlerToList(
 void FileSourceListVisibleWidget::removeCacheHandlerFromList(
         FileCacheHandler *handler) {
     for(int i = 0; i < mCacheList.count(); i++) {
-        FileCacheHandlerAbstraction *abs = mCacheList.at(i);
+        const auto& abs = mCacheList.at(i);
         if(abs->target == handler) {
-            if(abs->selected) {
-                removeFromSelectedList(abs);
-            }
+            if(abs->selected) removeFromSelectedList(abs);
             mCacheList.removeAt(i);
             scheduleContentUpdate();
             return;
@@ -209,7 +205,7 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
     QAction *selected_action = menu.exec(globalPos);
     if(selected_action != nullptr) {
         if(selected_action->text() == "reload") {
-            for(FileCacheHandlerAbstraction *abs : mSelectedList) {
+            for(const auto& abs : mSelectedList) {
                 abs->target->clearCache();
             }
         } else if(selected_action->text() == "replace...") {
@@ -226,13 +222,12 @@ FileSourceList::FileSourceList(QWidget *parent) : ScrollArea(parent) {
     mScrollWidget = new FileSourceListScrollWidget(this);
     setWidget(mScrollWidget);
 
-    connect(verticalScrollBar(),
-            SIGNAL(valueChanged(int)),
-            mScrollWidget, SLOT(changeVisibleTop(int)));
-    connect(this, SIGNAL(heightChanged(int)),
-            mScrollWidget, SLOT(changeVisibleHeight(int)));
-    connect(this, SIGNAL(widthChanged(int)),
-            mScrollWidget, SLOT(setWidth(int)));
+    connect(verticalScrollBar(), &QScrollBar::valueChanged,
+            mScrollWidget, &FileSourceListScrollWidget::changeVisibleTop);
+    connect(this, &FileSourceList::heightChanged,
+            mScrollWidget, &FileSourceListScrollWidget::changeVisibleHeight);
+    connect(this, &FileSourceList::widthChanged,
+            mScrollWidget, &FileSourceListScrollWidget::setWidth);
 
     verticalScrollBar()->setSingleStep(MIN_WIDGET_HEIGHT);
     setAcceptDrops(true);
@@ -240,11 +235,11 @@ FileSourceList::FileSourceList(QWidget *parent) : ScrollArea(parent) {
 
 void FileSourceList::dropEvent(QDropEvent *event) {
     if(event->mimeData()->hasUrls()) {
-        QList<QUrl> urlList = event->mimeData()->urls();
+        const QList<QUrl> urlList = event->mimeData()->urls();
         for(const QUrl &url : urlList) {
             if(url.isLocalFile()) {
-                QString urlStr = url.toLocalFile();
-                QString ext = urlStr.split(".").last();
+                const QString urlStr = url.toLocalFile();
+                const QString ext = urlStr.split(".").last();
                 if(isVideoExt(ext) || isImageExt(ext)) {
                     FileSourcesCache::getHandlerForFilePath(urlStr);
                 }

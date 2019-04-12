@@ -15,7 +15,7 @@ TaskScheduler::TaskScheduler() {
         const auto taskExecutor = new TaskExecutor(i);
         taskExecutor->moveToThread(taskExecutorThread);
         connect(taskExecutor, &TaskExecutor::finishedUpdating,
-                this, &TaskScheduler::processNextQuedCPUTask);
+                this, &TaskScheduler::afterCPUTaskFinished);
         connect(this, &TaskScheduler::processCPUTask,
                 taskExecutor, &TaskExecutor::updateUpdatable);
 
@@ -48,8 +48,6 @@ TaskScheduler::~TaskScheduler() {
     for(const auto& taskExecutor : mCPUTaskExecutors) {
         delete taskExecutor;
     }
-//    mFileControlerThread->quit();
-//    mFileControlerThread->wait();
     delete mHDDExecutor;
 }
 
@@ -77,21 +75,20 @@ void TaskScheduler::scheduleHDDTask(const stdsptr<_ScheduledTask>& task) {
 void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
     if(!task->isQued()) task->taskQued();
     if(task->finished()) return;
-    mQuedCPUTasks2 << task;
-    tryProcessingNextQuedCPUTask();
+    mQuedCPUTasks << task;
+    processNextQuedCPUTask();
 }
 
 void TaskScheduler::queScheduledCPUTasks() {
-    if(mQuedCPUTasks2.listCount() >= mCPUTaskExecutors.count()) return;
-    mQuedCPUTasks2.beginList();
+    if(mQuedCPUTasks.listCount() >= mCPUTaskExecutors.count()) return;
+    mQuedCPUTasks.beginList();
     if(mCurrentCanvas) {
         mCurrentCanvas->scheduleWaitingTasks();
         mCurrentCanvas->queScheduledTasks();
     }
-    for(const auto &task : mScheduledCPUTasks) queCPUTask(task);
-    mQuedCPUTasks2.endList();
-
-    mScheduledCPUTasks.clear();
+    while(!mScheduledCPUTasks.isEmpty())
+        queCPUTask(mScheduledCPUTasks.takeLast());
+    mQuedCPUTasks.endList();
 }
 
 void TaskScheduler::queScheduledHDDTasks() {
@@ -113,9 +110,7 @@ void TaskScheduler::tryProcessingNextQuedHDDTask() {
 }
 
 void TaskScheduler::tryProcessingNextQuedCPUTask() {
-    if(!mFreeCPUThreads.isEmpty()) {
-        processNextQuedCPUTask(mFreeCPUThreads.takeFirst(), nullptr);
-    }
+    if(!mFreeCPUThreads.isEmpty()) processNextQuedCPUTask();
 }
 
 void TaskScheduler::processNextQuedHDDTask(
@@ -125,8 +120,8 @@ void TaskScheduler::processNextQuedHDDTask(
     if(mHDDThreadBusy && !finishedTask) return;
     mHDDThreadBusy = false;
     if(finishedTask) finishedTask->finishedProcessing();
-    if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks2.isEmpty()) {
-        processNextQuedCPUTask(mFreeCPUThreads.takeFirst(), nullptr);
+    if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks.isEmpty()) {
+        processNextQuedCPUTask();
     }
     if(mQuedHDDTasks.isEmpty()) {
         callAllQuedHDDTasksFinishedFunc();
@@ -152,9 +147,9 @@ void TaskScheduler::processNextQuedHDDTask(
 }
 #include "GUI/usagewidget.h"
 #include "GUI/mainwindow.h"
-void TaskScheduler::processNextQuedCPUTask(
+void TaskScheduler::afterCPUTaskFinished(
         const int &finishedThreadId,
-        _ScheduledTask *const finishedTask) {
+        _ScheduledTask * const finishedTask) {
     mFreeCPUThreads << finishedThreadId;
     if(finishedTask) {
         mBusyCPUThreads.removeOne(finishedThreadId);
@@ -167,18 +162,20 @@ void TaskScheduler::processNextQuedCPUTask(
             finishedTask->finishedProcessing();
         }
     }
-    if(mQuedCPUTasks2.isEmpty()) {
+    processNextQuedCPUTask();
+}
+
+void TaskScheduler::processNextQuedCPUTask() {
+    if(mQuedCPUTasks.isEmpty()) {
         callAllQuedCPUTasksFinishedFunc();
         if(mGpuPostProcessor.hasFinished())
             emit finishedAllQuedTasks();
     } else if(!mFreeCPUThreads.isEmpty()) {
-        for(int i = 0; i < mQuedCPUTasks2.count(); i++) {
-            const auto task = mQuedCPUTasks2.at(i);
+        for(int i = 0; i < mQuedCPUTasks.count(); i++) {
+            const auto task = mQuedCPUTasks.at(i);
             if(task->readyToBeProcessed()) {
-                mQuedCPUTasks2.removeAt(i--);
-                if(task->finished()) continue;
+                mQuedCPUTasks.removeAt(i--);
                 task->beforeProcessingStarted();
-                if(task->finished()) continue;
                 const int threadId = mFreeCPUThreads.takeLast();
                 task->setCurrentTaskExecutor(
                             mCPUTaskExecutors.at(threadId));
@@ -188,7 +185,8 @@ void TaskScheduler::processNextQuedCPUTask(
             }
         }
 
-        if(!mFreeCPUThreads.isEmpty()) callFreeThreadsForCPUTasksAvailableFunc();
+        if(!mFreeCPUThreads.isEmpty())
+            callFreeThreadsForCPUTasksAvailableFunc();
     }
 #ifdef QT_DEBUG
     auto usageWidget = MainWindow::getInstance()->getUsageWidget();

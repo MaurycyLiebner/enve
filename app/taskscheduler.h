@@ -174,7 +174,6 @@ public:
 
     void initializeGPU();
 
-    void queCPUTask(const stdsptr<_ScheduledTask> &task);
     void scheduleCPUTask(const stdsptr<_ScheduledTask> &task);
     void scheduleHDDTask(const stdsptr<_ScheduledTask> &task);
 
@@ -192,10 +191,10 @@ public:
         }
         mScheduledHDDTasks.clear();
 
-        for(const auto& cpuTask : mQuedCPUTasks2) {
+        for(const auto& cpuTask : mQuedCPUTasks) {
             cpuTask->setState(_Task::CANCELED);
         }
-        mQuedCPUTasks2.clear();
+        mQuedCPUTasks.clear();
 
         for(const auto& hddTask : mQuedHDDTasks) {
             hddTask->setState(_Task::CANCELED);
@@ -213,9 +212,10 @@ public:
     void processNextQuedHDDTask(
             const int &finishedThreadId,
             _ScheduledTask * const finishedTask);
-    void processNextQuedCPUTask(
+    void afterCPUTaskFinished(
             const int &finishedThreadId,
             _ScheduledTask * const finishedTask);
+    void processNextQuedCPUTask();
 
     void setFreeThreadsForCPUTasksAvailableFunc(
             const std::function<void(void)>& func) {
@@ -246,7 +246,7 @@ public:
     }
 
     bool allQuedCPUTasksFinished() const {
-        return mBusyCPUThreads.isEmpty() && mQuedCPUTasks2.isEmpty();
+        return mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty();
     }
 
     bool allQuedHDDTasksFinished() const {
@@ -269,6 +269,7 @@ private slots:
 private:
     static TaskScheduler* sInstance;
 
+    void queCPUTask(const stdsptr<_ScheduledTask> &task);
     void tryProcessingNextQuedHDDTask();
 
     void callFreeThreadsForCPUTasksAvailableFunc() const {
@@ -304,9 +305,7 @@ private:
 
     bool mHDDThreadBusy = false;
 
-    MultipleList<stdsptr<_ScheduledTask>> mScheduledCPUTasks2;
-    MultipleList<stdsptr<_ScheduledTask>> mQuedCPUTasks2;
-    MultipleList<stdsptr<_ScheduledTask>> mScheduledHDDTasks2;
+    MultipleList<stdsptr<_ScheduledTask>> mQuedCPUTasks;
     MultipleList<stdsptr<_ScheduledTask>> mQuedHDDTasks2;
 
     QList<stdsptr<_ScheduledTask>> mScheduledCPUTasks;

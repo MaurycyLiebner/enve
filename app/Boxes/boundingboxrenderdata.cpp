@@ -73,9 +73,6 @@ void BoundingBoxRenderData::renderToImage() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;
     if(fOpacity < 0.001) return;
-    fResolutionScale.reset();
-    fResolutionScale.scale(fResolution, fResolution);
-    fScaledTransform = fTransform*fResolutionScale;
     updateGlobalFromRelBoundingRect();
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(
