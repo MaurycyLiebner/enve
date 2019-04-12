@@ -80,6 +80,7 @@ void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
 
 void TaskScheduler::queScheduledCPUTasks() {
     if(mQuedCPUTasks.listCount() >= mCPUTaskExecutors.count()) return;
+    mCPUQueing = true;
     mQuedCPUTasks.beginList();
     if(mCurrentCanvas) {
         mCurrentCanvas->scheduleWaitingTasks();
@@ -88,6 +89,9 @@ void TaskScheduler::queScheduledCPUTasks() {
     while(!mScheduledCPUTasks.isEmpty())
         queCPUTask(mScheduledCPUTasks.takeLast());
     mQuedCPUTasks.endList();
+    mCPUQueing = false;
+
+    if(!mQuedCPUTasks.isEmpty()) processNextQuedCPUTask();
 }
 
 void TaskScheduler::queScheduledHDDTasks() {
@@ -165,7 +169,7 @@ void TaskScheduler::afterCPUTaskFinished(
 }
 
 void TaskScheduler::processNextQuedCPUTask() {
-    if(mQuedCPUTasks.isEmpty()) {
+    if(mQuedCPUTasks.isEmpty() && !mCPUQueing) {
         callAllQuedCPUTasksFinishedFunc();
         if(mGpuPostProcessor.hasFinished())
             emit finishedAllQuedTasks();
@@ -184,7 +188,7 @@ void TaskScheduler::processNextQuedCPUTask() {
             }
         }
 
-        if(!mFreeCPUThreads.isEmpty())
+        if(!mFreeCPUThreads.isEmpty() && !mCPUQueing)
             callFreeThreadsForCPUTasksAvailableFunc();
     }
 #ifdef QT_DEBUG
