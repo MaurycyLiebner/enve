@@ -7,6 +7,21 @@ class Canvas;
 
 template <typename T>
 class MultipleList {
+    class SingleList {
+    public:
+        void setCurrent(const bool& current) { mIsCurrent = current; }
+        inline void append(const T& t) { mList.append(t); }
+        inline bool isCurrent() const { return mIsCurrent; }
+        inline bool isEmpty() const { return mList.isEmpty(); }
+        inline int count() const { return mList.count(); }
+        inline T& at(const int& id) { return mList[id]; }
+        inline const T& at(const int& id) const { return mList.at(id); }
+        inline T takeAt(const int& id) { return mList.takeAt(id); }
+        inline void removeAt(const int& id) { mList.removeAt(id); }
+    private:
+        bool mIsCurrent = false;
+        QList<T> mList;
+    };
 public:
     class Iterator {
     public:
@@ -48,7 +63,7 @@ public:
         int rId = id;
         for(auto& list : mLists) {
             const int lCount = list.count();
-            if(rId < lCount) return list.operator[](rId);
+            if(rId < lCount) return list.at(rId);
             rId -= lCount;
         }
         RuntimeThrow("Index outside range");
@@ -95,27 +110,31 @@ public:
     { append(t); return *this; }
 
     void beginList() {
-        if(mCurrentList) endList();
-        mLists << QList<T>();
+        if(mCurrentList) mCurrentLists << mCurrentList;
+        mLists << SingleList();
         mCurrentList = &mLists.last();
+        mCurrentList->setCurrent(true);
     }
 
     void endList() {
         if(!mCurrentList) return;
+        mCurrentList->setCurrent(false);
         if(mCurrentList->isEmpty()) mLists.removeLast();
-        mCurrentList = nullptr;
+        if(mCurrentLists.isEmpty()) mCurrentList = nullptr;
+        else mCurrentList = mCurrentLists.takeLast();
     }
 
     Iterator begin() { return Iterator(0, *this); }
     Iterator end() { return Iterator(count(), *this); }
 private:
-    void removeEmptiedList(const QList<T>& list, const int& listId) {
-        if(&list == mCurrentList) return;;
+    void removeEmptiedList(const SingleList& list, const int& listId) {
+        if(list.isCurrent()) return;
         mLists.removeAt(listId);
     }
 
-    QList<QList<T>> mLists;
-    QList<T> * mCurrentList = nullptr;
+    QList<SingleList> mLists;
+    QList<SingleList*> mCurrentLists;
+    SingleList * mCurrentList = nullptr;
 };
 
 class TaskScheduler : public QObject {
@@ -175,9 +194,10 @@ public:
     void initializeGPU();
 
     void scheduleCPUTask(const stdsptr<_ScheduledTask> &task);
-    void scheduleHDDTask(const stdsptr<_ScheduledTask> &task);
-
+    void queCPUTask(const stdsptr<_ScheduledTask> &task);
     void queScheduledCPUTasks();
+
+    void scheduleHDDTask(const stdsptr<_ScheduledTask> &task);
     void queScheduledHDDTasks();
 
     void clearTasks() {
@@ -269,7 +289,6 @@ private slots:
 private:
     static TaskScheduler* sInstance;
 
-    void queCPUTask(const stdsptr<_ScheduledTask> &task);
     void tryProcessingNextQuedHDDTask();
 
     void callFreeThreadsForCPUTasksAvailableFunc() const {

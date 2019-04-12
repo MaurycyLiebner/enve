@@ -74,9 +74,8 @@ void TaskScheduler::scheduleHDDTask(const stdsptr<_ScheduledTask>& task) {
 
 void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
     if(!task->isQued()) task->taskQued();
-    if(task->finished()) return;
     mQuedCPUTasks << task;
-    processNextQuedCPUTask();
+    if(task->readyToBeProcessed()) processNextQuedCPUTask();
 }
 
 void TaskScheduler::queScheduledCPUTasks() {
@@ -177,8 +176,8 @@ void TaskScheduler::processNextQuedCPUTask() {
                 mQuedCPUTasks.removeAt(i--);
                 task->beforeProcessingStarted();
                 const int threadId = mFreeCPUThreads.takeLast();
-                task->setCurrentTaskExecutor(
-                            mCPUTaskExecutors.at(threadId));
+                const auto executor = mCPUTaskExecutors.at(threadId);
+                task->setCurrentTaskExecutor(executor);
                 emit processCPUTask(task.get(), threadId);
                 mBusyCPUThreads << threadId;
                 if(mFreeCPUThreads.isEmpty()) break;

@@ -1186,10 +1186,10 @@ void BoundingBox::scheduleWaitingTasks() {
 
 void BoundingBox::queScheduledTasks() {
     const auto taskScheduler = TaskScheduler::sGetInstance();
-    for(const auto& task : mScheduledTasks)
-        taskScheduler->scheduleCPUTask(task);
-
-    mScheduledTasks.clear();
+    QList<stdsptr<_ScheduledTask>> scheduled;
+    mScheduledTasks.swap(scheduled);
+    for(const auto& task : scheduled)
+        taskScheduler->queCPUTask(task);
 }
 
 int BoundingBox::getReadId() const {
