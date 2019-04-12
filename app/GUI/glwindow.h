@@ -18,9 +18,6 @@ public:
 protected:
     void initialize();
     void renderNow();
-    virtual void qRender(QPainter *p) {
-        Q_UNUSED(p);
-    }
 
     virtual void renderSk(SkCanvas * const canvas,
                           GrContext * const grContext) = 0;
@@ -38,7 +35,6 @@ protected:
 
     GrGLFramebufferInfo mFbInfo;
     QOpenGLContext *mContext = nullptr;
-    //QOpenGLPaintDevice *mDevice = nullptr;
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);

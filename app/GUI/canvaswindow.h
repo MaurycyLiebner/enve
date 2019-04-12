@@ -212,7 +212,6 @@ private:
     QByteArray mAudioBuffer;
     // AUDIO
 
-    void qRender(QPainter *p);
     void renderSk(SkCanvas * const canvas,
                   GrContext * const grContext);
     void tabletEvent(QTabletEvent *e);

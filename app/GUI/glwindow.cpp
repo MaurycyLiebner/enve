@@ -167,43 +167,12 @@ void GLWindow::renderNow() {
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
-
     glViewport(0, 0, width(), height());
 
-    //mCanvas->save();
-    //draw(mCanvas);
     renderSk(mCanvas, mGrContext.get());
-//    SkPaint paint;
-//    SkPoint gradPoints[2];
-//    gradPoints[0] = SkPoint::Make(0.f, 0.f);
-//    gradPoints[1] = SkPoint::Make(width(), 0.f);
-//    SkColor gradColors[2];
-//    gradColors[0] = SkColorSetARGB(255, 0, 0, 0);
-//    gradColors[1] = SkColorSetARGB(0, 125, 125, 125);
-//    SkScalar gradPos[2];
-//    gradPos[0] = 0.f;
-//    gradPos[1] = 1.f;
-
-//    paint.setShader(SkGradientShader::MakeLinear(gradPoints,
-//                                                 gradColors,
-//                                                 gradPos, 2,
-//                                                 SkShader::kClamp_TileMode));
-//    paint.setAntiAlias(true);
-
-//    mCanvas->drawRect(SkRect::MakeWH(width(), height()), paint);
-
-    //mCanvas->restore();
     mCanvas->flush();
 
-//    if(!mDevice) mDevice = new QOpenGLPaintDevice;
-
-//    mDevice->setSize(size());
-
-//    QPainter painter(mDevice);
-//    qRender(&painter);
-
     mContext->swapBuffers(this);
-
     mContext->doneCurrent();
 }
 

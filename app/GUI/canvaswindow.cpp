@@ -230,11 +230,6 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
     renameCanvas(mCurrentCanvas.data(), newName);
 }
 
-void CanvasWindow::qRender(QPainter *p) {
-    Q_UNUSED(p);
-    if(!mCurrentCanvas) return;
-    //mCurrentCanvas->drawInputText(p);
-}
 #include "glhelpers.h"
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
