@@ -22,7 +22,7 @@ void _gPrintException(const std::exception& e,
     qCritical() << std::to_string(level) + ") " << e.what();
     try {
         if(!isExceptionNested(e)) {
-            QMessageBox(QMessageBox::Critical, "Critical Error", allText).exec();
+            gPrintException(fatal, allText);
             if(!fatal) return;
         }
         std::rethrow_if_nested(e);
@@ -31,14 +31,46 @@ void _gPrintException(const std::exception& e,
     } catch(...) {}
 }
 
-void gPrintExceptionCritical(const std::exception& e,
-                             const QString &allText,
-                             const uint& level) {
-    _gPrintException(e, allText, level, false);
+void gPrintExceptionCritical(const std::exception& e) {
+    _gPrintException(e, "", 0, false);
 }
 
-void gPrintExceptionFatal(const std::exception& e,
-                          const QString &allText,
-                          const uint& level) {
-    _gPrintException(e, allText, level, true);
+void gPrintExceptionFatal(const std::exception& e) {
+    _gPrintException(e, "", 0, true);
+}
+
+QString gAllTextFromException(const std::exception &e,
+                              QString allText,
+                              const uint &level) {
+    allText = (allText.isEmpty() ? "" : allText + "\n") +
+            (std::to_string(level) + ") ").c_str() + e.what();
+    qCritical() << std::to_string(level) + ") " << e.what();
+    try {
+        if(!isExceptionNested(e))  return allText;
+        std::rethrow_if_nested(e);
+    } catch(const std::exception& ne) {
+        gAllTextFromException(ne, allText, level + 1);
+    } catch(...) {}
+    return allText;
+}
+
+void gPrintException(const bool& fatal, const QString &allText) {
+    const QString txt = fatal ? "Fatal" : "Critical";
+    QMessageBox(QMessageBox::Critical, txt + " Error", allText).exec();
+}
+
+void gPrintExceptionCritical(const std::exception_ptr &eptr) {
+    try {
+        if(eptr) std::rethrow_exception(eptr);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
+}
+
+void gPrintExceptionFatal(const std::exception_ptr &eptr) {
+    try {
+        if(eptr) std::rethrow_exception(eptr);
+    } catch(const std::exception& e) {
+        gPrintExceptionFatal(e);
+    }
 }

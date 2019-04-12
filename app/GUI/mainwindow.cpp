@@ -222,7 +222,7 @@ MainWindow::MainWindow(QWidget *parent)
     try {
         mTaskScheduler.initializeGPU();
     } catch(const std::exception& e) {
-        gPrintExceptionFatal(e, "Failed to initialize gpu for post-processing.\n");
+        gPrintExceptionFatal(e);
     }
 
     connect(&mTaskScheduler, &TaskScheduler::finishedAllQuedTasks,

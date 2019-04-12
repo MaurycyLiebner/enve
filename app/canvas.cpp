@@ -499,30 +499,6 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     if(range.overlaps(rangeT)) scheduleUpdate(Animator::USER_CHANGE);
 }
 
-//void Canvas::updatePixmaps() {
-//    renderCurrentFrameToPreview();
-//}
-
-
-void Canvas::renderCurrentFrameToOutput(const RenderInstanceSettings &renderDest) {
-    Q_UNUSED(renderDest);
-    return;
-//    QString fileName = renderDest.getOutputDestination();
-//    sk_sp<SkData> data = mCurrentPreviewContainer->getImageSk()->
-//            encodeToData(SkEncodedImageFormat::kPNG, 100);
-//    QFile file;
-//    fileName.remove(".png");
-//    fileName += QString::number(anim_mCurrentAbsFrame) + ".png";
-//    file.setFileName(fileName);
-//    if(file.open(QIODevice::WriteOnly) ) {
-//        file.write(static_cast<const char*>(data->data()),
-//                   static_cast<qint64>(data->size()));
-//        file.flush();
-//        file.close();
-//    }
-//    data->unref();
-}
-
 qsptr<BoundingBox> Canvas::createLink() {
     return SPtrCreate(InternalLinkCanvas)(this);
 }

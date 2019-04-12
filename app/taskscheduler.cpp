@@ -56,8 +56,8 @@ TaskScheduler::~TaskScheduler() {
 void TaskScheduler::initializeGPU() {
     try {
         mGpuPostProcessor.initialize();
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e, "Failed to initialize gpu for post-processing.");
+    } catch(...) {
+        RuntimeThrow("Failed to initialize gpu for post-processing.");
     }
 
     connect(&mGpuPostProcessor, &GpuPostProcessor::finished,

@@ -94,8 +94,8 @@ protected:
     void interrupEncoding();
     void finishEncodingSuccess();
     void finishEncodingNow();
-    void startEncoding(RenderInstanceSettings *settings);
-    bool startEncodingNow(QString &error);
+    void startEncoding(RenderInstanceSettings * const settings);
+    void startEncodingNow();
 
     bool mEncodingSuccesfull = false;
     bool mEncodingFinished = false;
@@ -117,8 +117,8 @@ protected:
     int mEncodeVideo = 0;
     int mEncodeAudio = 0;
 
+    std::exception_ptr mUpdateException;
     QString mUpdateError;
-    bool mUpdateFailed = false;
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
     FrameRange _mRenderRange;

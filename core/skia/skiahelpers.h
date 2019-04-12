@@ -13,6 +13,10 @@ namespace SkiaHelpers {
                       GrContext* const context);
     SkImageInfo getPremulBGRAInfo(const int& width,
                                   const int& height);
+    void saveImage(const QString& fileName,
+                   const sk_sp<SkImage>& img,
+                   const SkEncodedImageFormat& format = SkEncodedImageFormat::kPNG,
+                   const int& quality = 100);
 }
 
 #endif // SKIAHELPERS_H
