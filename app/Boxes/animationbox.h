@@ -50,7 +50,6 @@ public:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
     stdptr<AnimationCacheHandler> mSrcFramesCache;
-    qreal mFps = 24;
 
     bool mFrameRemappingEnabled = false;
     qsptr<IntAnimator> mFrameAnimator;

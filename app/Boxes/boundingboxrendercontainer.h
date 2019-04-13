@@ -19,21 +19,12 @@ class RenderContainer {
 public:
     RenderContainer() {}
 
-    void drawSk(SkCanvas * const canvas, SkPaint *paint,
+    void drawSk(SkCanvas * const canvas,
+                SkPaint * const paint,
                 GrContext* const grContext);
 
     void updatePaintTransformGivenNewTotalTransform(
             const QMatrix &totalTransform);
-
-    void setTransform(const QMatrix &transform);
-
-    const QMatrix &getTransform() const;
-
-    const QMatrix &getPaintTransform() const;
-
-    const SkPoint &getDrawpos() const;
-
-    const qreal &getResolutionFraction() const;
 
     void setSrcRenderData(BoundingBoxRenderData * const data);
     const int& getRelFrame() const {
@@ -55,9 +46,10 @@ protected:
     bool mExpired = false;
     int mRelFrame = 0;
     qreal mResolutionFraction;
-    SkPoint mDrawPos;
+    QPoint mDrawPos;
     QMatrix mTransform;
     QMatrix mPaintTransform;
+    QMatrix mRenderTransform;
     stdsptr<BoundingBoxRenderData> mSrcRenderData;
     sk_sp<SkImage> mImageSk;
 };

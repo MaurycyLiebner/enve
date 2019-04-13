@@ -18,6 +18,7 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fRelFrame = src->fRelFrame;
     fRelBoundingRect = src->fRelBoundingRect;
     fRelTransform = src->fRelTransform;
+    fRenderTransform = src->fRenderTransform;
     fRenderedToImage = src->fRenderedToImage;
     fBlendMode = src->fBlendMode;
     fDrawPos = src->fDrawPos;
@@ -45,6 +46,7 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     if(fOpacity < 0.001) return;
     const SkScalar invScale = toSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
+    canvas->concat(toSkMatrix(fRenderTransform));
     renderToImage();
     SkPaint paint;
     paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
@@ -156,9 +158,45 @@ void BoundingBoxRenderData::dataSet() {
     fParentBox->updateCurrentPreviewDataFromRenderData(this);
 }
 
+void BoundingBoxRenderData::setupDirectDraw(const sk_sp<SkImage>& image) {
+    fRenderTransform = fTransform;
+    updateRelBoundingRect();
+    updateGlobalFromRelBoundingRect();
+    fRenderTransform.translate(-fDrawPos.x(), -fDrawPos.y());
+    fRenderedImage = image;
+    fRenderedToImage = true;
+}
+
 bool BoundingBoxRenderData::nullifyBeforeProcessing() {
     return fReason != BoundingBox::USER_CHANGE &&
             fReason != BoundingBox::CHILD_USER_CHANGE;
+}
+
+void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {
+    fResolutionScale.reset();
+    fResolutionScale.scale(fResolution, fResolution);
+    fScaledTransform = fTransform*fResolutionScale;
+    fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
+    fixupGlobalBoundingRect();
+    fDrawPos = {qRound(fGlobalBoundingRect.left()),
+                qRound(fGlobalBoundingRect.top())};
+}
+
+void BoundingBoxRenderData::fixupGlobalBoundingRect() {
+    for(const QRectF &rectT : fOtherGlobalRects) {
+        fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
+    }
+    fGlobalBoundingRect.adjust(-fEffectsMargin, -fEffectsMargin,
+                               fEffectsMargin, fEffectsMargin);
+    if(fMaxBoundsEnabled) {
+        const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
+        fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);
+    }
+
+    const QPointF roundTL(qRound(fGlobalBoundingRect.left()),
+                          qRound(fGlobalBoundingRect.top()));
+    const QPointF transF = fGlobalBoundingRect.topLeft() - roundTL;
+    fGlobalBoundingRect.translate(-transF);
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
@@ -177,8 +215,8 @@ void ReplaceTransformDisplacementCustomizer::customize(
         BoundingBoxRenderData * const data) {
     QMatrix transformT = data->fTransform;
     data->fTransform.setMatrix(transformT.m11(), transformT.m12(),
-                              transformT.m21(), transformT.m22(),
-                              mDx, mDy);
+                               transformT.m21(), transformT.m22(),
+                               mDx, mDy);
 }
 
 MultiplyTransformCustomizer::MultiplyTransformCustomizer(

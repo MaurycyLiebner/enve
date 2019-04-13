@@ -88,8 +88,9 @@ void AnimationBox::enableFrameRemapping() {
         const auto firstFrameKey = SPtrCreate(QrealKey)(0, animStartRelFrame,
                                                         mFrameAnimator.get());
         mFrameAnimator->anim_appendKey(firstFrameKey);
-        const auto lastFrameKey = SPtrCreate(QrealKey)(frameCount - 1,
-                                                       animStartRelFrame + frameCount - 1,
+        const int value = frameCount - 1;
+        const int frame = animStartRelFrame + frameCount - 1;
+        const auto lastFrameKey = SPtrCreate(QrealKey)(value, frame,
                                                        mFrameAnimator.get());
         mFrameAnimator->anim_appendKey(lastFrameKey);
         mFrameAnimator->anim_setRecordingValue(true);

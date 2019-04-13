@@ -7,7 +7,8 @@
 #include "canvas.h"
 #include "skia/skiahelpers.h"
 
-void RenderContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
+void RenderContainer::drawSk(SkCanvas * const canvas,
+                             SkPaint * const paint,
                              GrContext * const grContext) {
     if(!mSrcRenderData) return;
     canvas->save();
@@ -40,26 +41,7 @@ void RenderContainer::updatePaintTransformGivenNewTotalTransform(
     mPaintTransform = mTransform.inverted()*totalTransform;
     const qreal invRes = 1/mResolutionFraction;
     mPaintTransform.scale(invRes, invRes);
-}
-
-void RenderContainer::setTransform(const QMatrix &transform) {
-    mTransform = transform;
-}
-
-const QMatrix &RenderContainer::getTransform() const {
-    return mTransform;
-}
-
-const QMatrix &RenderContainer::getPaintTransform() const {
-    return mPaintTransform;
-}
-
-const SkPoint &RenderContainer::getDrawpos() const {
-    return mDrawPos;
-}
-
-const qreal &RenderContainer::getResolutionFraction() const {
-    return mResolutionFraction;
+    mPaintTransform = mRenderTransform*mPaintTransform;
 }
 
 void RenderContainer::setSrcRenderData(BoundingBoxRenderData * const data) {
@@ -70,5 +52,7 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData * const data) {
     mRelFrame = data->fRelFrame;
     mPaintTransform.reset();
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
+    mRenderTransform = data->fRenderTransform;
+    mPaintTransform = mRenderTransform*mPaintTransform;
     mSrcRenderData = GetAsSPtr(data, BoundingBoxRenderData);
 }

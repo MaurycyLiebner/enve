@@ -44,9 +44,6 @@ void LinkCanvasRenderData::renderToImage() {
     }
     rasterCanvas.flush();
 
-    fDrawPos = SkPoint::Make(qRound(fGlobalBoundingRect.left()),
-                             qRound(fGlobalBoundingRect.top()));
-
     if(!fRasterEffects.isEmpty()) {
         for(const auto& effect : fRasterEffects) {
             effect->applyEffectsSk(fBitmapTMP, fResolution);

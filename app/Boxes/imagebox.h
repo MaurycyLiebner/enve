@@ -20,7 +20,7 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
         BoundingBoxRenderData::beforeProcessingStarted();
         if(fRasterEffects.isEmpty() &&
            fGPUEffects.isEmpty()) {
-            setupWhenNoRenderingNeeded(fImage, fTransform);
+            setupDirectDraw(fImage);
         }
     }
 
