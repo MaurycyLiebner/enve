@@ -12,7 +12,7 @@ void _ScheduledTask::taskQued() {
 }
 
 bool _ScheduledTask::scheduleTask() {
-    if(!canSchedule() || mState == SCHEDULED) return false;
+    if(mState == SCHEDULED) return false;
 
     mState = SCHEDULED;
     scheduleTaskNow();

@@ -47,7 +47,7 @@ signals:
     void encodingFailed();
 };
 
-class VideoEncoder : public _ScheduledTask {
+class VideoEncoder : public _HDDTask {
 public:
     VideoEncoder();
 
@@ -78,8 +78,6 @@ public:
     static void sAddCacheContainerToEncoder(const stdsptr<ImageCacheContainer> &cont);
     static void sFinishEncoding();
     static bool sEncodingSuccessfulyStarted();
-
-    bool canSchedule() { return mState != QUED && mCurrentlyEncoding; }
 
     VideoEncoderEmitter *getEmitter() {
         return &mEmitter;
@@ -123,7 +121,7 @@ protected:
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
     FrameRange _mRenderRange;
 
-    QList<stdsptr<ImageCacheContainer> > _mContainers;
+    QList<stdsptr<ImageCacheContainer>> _mContainers;
 };
 
 #endif // VIDEOENCODER_H

@@ -69,10 +69,6 @@ public:
 
     bool scheduleTask();
 
-    virtual bool canSchedule() {
-        return true;
-    }
-
     bool isQued() { return mState == QUED; }
     bool isScheduled() { return mState == SCHEDULED; }
 
