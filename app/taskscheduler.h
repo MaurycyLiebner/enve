@@ -14,81 +14,52 @@ public:
     Que& operator=(const Que&) = delete;
 
     ~Que() {
-        for(const auto& cpuTask : mQued) {
+        for(const auto& cpuTask : mQued)
             cpuTask->setState(_Task::CANCELED);
-            cpuTask->takeParentQue();
-        }
-        for(const auto& cpuTask : mProcessing) {
-            cpuTask->setState(_Task::CANCELED);
-            cpuTask->takeParentQue();
-        }
     }
 protected:
     int countQued() const { return mQued.count(); }
-    bool quedEmpty() const { return countQued() == 0; }
+    bool allDone() const { return countQued() == 0; }
     void addTask(const stdsptr<_ScheduledTask>& task) {
-        mQued << task;
-        task->setParentQue(this);
-    }
-    _ScheduledTask* takeQuedForProcessing() {
         for(int i = 0; i < mQued.count(); i++) {
-            const auto task = mQued.at(i);
-            if(task->readyToBeProcessed()) {
-                mProcessing << task;
-                mQued.removeAt(i);
-                return task.get();
-            }
+            const auto& iTask = mQued.at(i);
+            if(iTask == task) Q_ASSERT(false);
+        }
+        mQued << task;
+    }
+
+    stdsptr<_ScheduledTask> takeQuedForProcessing() {
+        for(int i = 0; i < mQued.count(); i++) {
+            const auto& task = mQued.at(i);
+            if(task->readyToBeProcessed()) return mQued.takeAt(i);
         }
         return nullptr;
     }
-
-    bool allDone() const { return quedEmpty() && mProcessing.isEmpty(); }
-
-    void taskDone(_ScheduledTask * const task) {
-        int i = 0;
-        for(const auto& iTask : mProcessing) {
-            if(iTask.get() == task) {
-                mProcessing.removeAt(i);
-                return;
-            }
-            i++;
-        }
-        RuntimeThrow("Task was not part of the que");
-    }
 private:
     QList<stdsptr<_ScheduledTask>> mQued;
-    QList<stdsptr<_ScheduledTask>> mProcessing;
 };
 
 class QueHandler {
 public:
-    int countQues() const {
-        return mQues.count();
-    }
-
-    bool isEmpty() const {
-        return mQues.isEmpty();
-    }
+    int countQues() const { return mQues.count(); }
+    bool isEmpty() const { return mQues.isEmpty(); }
 
     void clear() {
         mQues.clear();
         mCurrentQue = nullptr;
     }
 
-    _ScheduledTask* takeQuedForProcessing() {
+    stdsptr<_ScheduledTask> takeQuedForProcessing() {
         int queId = 0;
         for(const auto& que : mQues) {
             const auto task = que->takeQuedForProcessing();
-            if(task) return task;
+            if(task) {
+                if(que->allDone()) queDone(que.get(), queId);
+                return task;
+            }
             queId++;
         }
         return nullptr;
-    }
-
-    void taskDone(_ScheduledTask * const task,
-                  Que * const parentQue) {
-        parentQue->taskDone(task);
-        if(parentQue->allDone()) queDone(parentQue);
     }
 
     void beginQue() {
@@ -108,14 +79,9 @@ public:
         mCurrentQue = nullptr;
     }
 private:
-    void queDone(const Que * const que) {
+    void queDone(const Que * const que, const int& queId) {
         if(que == mCurrentQue) return;
-        for(int i = 0; i < mQues.count(); i++) {
-            if(mQues.at(i).get() == que) {
-                mQues.removeAt(i);
-                return;
-            }
-        }
+        mQues.removeAt(queId);
     }
 
     QList<stdsptr<Que>> mQues;
@@ -211,11 +177,11 @@ public:
         }
     }
 
-    void afterHDDTaskFinished(_ScheduledTask * const finishedTask,
+    void afterHDDTaskFinished(const stdsptr<_ScheduledTask>& finishedTask,
                               ExecController * const controller);
     void processNextQuedHDDTask();
 
-    void afterCPUTaskFinished(_ScheduledTask * const task,
+    void afterCPUTaskFinished(const stdsptr<_ScheduledTask>& task,
                               ExecController * const controller);
     void processNextQuedCPUTask();
 
@@ -270,11 +236,10 @@ signals:
     void processCPUTask(_ScheduledTask*, int);
     void processHDDTask(_ScheduledTask*, int);
     void finishedAllQuedTasks();
-private slots:
-    void tryProcessingNextQuedCPUTask();
 private:
     static TaskScheduler* sInstance;
 
+    void tryProcessingNextQuedCPUTask();
     void tryProcessingNextQuedHDDTask();
 
     void callFreeThreadsForCPUTasksAvailableFunc() const {

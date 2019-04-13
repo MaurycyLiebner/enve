@@ -29,8 +29,9 @@ public:
         mExecutorThread->start();
     }
 
-    void processTask(_ScheduledTask * task) {
-        emit processTaskSignal(task);
+    void processTask(const stdsptr<_ScheduledTask>& task) {
+        mCurrentTask = task;
+        emit processTaskSignal(task.get());
     }
 
     void quit() {
@@ -48,12 +49,15 @@ public:
     }
 signals:
     void processTaskSignal(_ScheduledTask*);
-    void finishedTaskSignal(_ScheduledTask*, ExecController*);
-private slots:
-    void finishedTask(_ScheduledTask* task) {
+    void finishedTaskSignal(stdsptr<_ScheduledTask>, ExecController*);
+private:
+    void finishedTask() {
+        const auto task = mCurrentTask;
+        mCurrentTask.reset();
         emit finishedTaskSignal(task, this);
     }
-private:
+
+    stdsptr<_ScheduledTask> mCurrentTask;
     TaskExecutor * const mExecutor;
     QThread * const mExecutorThread;
 };

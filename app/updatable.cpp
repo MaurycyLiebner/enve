@@ -31,7 +31,6 @@ _Task::_Task() {}
 
 void _Task::beforeProcessingStarted() {
     Q_ASSERT(mCurrentExecutionDependent.isEmpty());
-    mSelfRef = ref<_Task>();
     mState = PROCESSING;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
@@ -41,7 +40,6 @@ void _Task::finishedProcessing() {
     mState = FINISHED;
     tellDependentThatFinished();
     afterProcessingFinished();
-    mSelfRef.reset();
 }
 
 bool _Task::readyToBeProcessed() {
@@ -52,7 +50,6 @@ void _Task::clear() {
     mState = CREATED;
     tellDependentThatFinished();
     tellNextDependentThatFinished();
-    mSelfRef.reset();
 }
 
 void _Task::addDependent(_Task * const updatable) {

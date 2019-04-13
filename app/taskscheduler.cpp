@@ -61,7 +61,6 @@ void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
 }
 
 void TaskScheduler::queScheduledCPUTasks() {
-    if(mQuedCPUTasks.countQues() >= mCPUTaskExecutors.count()) return;
     mCPUQueing = true;
     mQuedCPUTasks.beginQue();
     if(mCurrentCanvas) {
@@ -97,7 +96,7 @@ void TaskScheduler::tryProcessingNextQuedCPUTask() {
 }
 
 void TaskScheduler::afterHDDTaskFinished(
-        _ScheduledTask * const finishedTask,
+        const stdsptr<_ScheduledTask>& finishedTask,
         ExecController * const controller) {
     Q_UNUSED(controller);
     if(mHDDThreadBusy && !finishedTask) return;
@@ -120,7 +119,7 @@ void TaskScheduler::processNextQuedHDDTask() {
 //        }
     } else {
         for(int i = 0; i < mQuedHDDTasks.count(); i++) {
-            auto task = mQuedHDDTasks.at(i).get();
+            const auto task = mQuedHDDTasks.at(i);
             if(task->readyToBeProcessed()) {
                 task->beforeProcessingStarted();
                 mQuedHDDTasks.removeAt(i--);
@@ -134,7 +133,7 @@ void TaskScheduler::processNextQuedHDDTask() {
 #include "GUI/usagewidget.h"
 #include "GUI/mainwindow.h"
 void TaskScheduler::afterCPUTaskFinished(
-        _ScheduledTask * const task,
+        const stdsptr<_ScheduledTask>& task,
         ExecController * const controller) {
     mFreeCPUExecs << controller;
     if(task) {
@@ -148,8 +147,6 @@ void TaskScheduler::afterCPUTaskFinished(
                 task->finishedProcessing();
             }
         }
-        const auto parentQue = task->takeParentQue();
-        if(parentQue) mQuedCPUTasks.taskDone(task, parentQue);
     }
     processNextQuedCPUTask();
 }
@@ -169,7 +166,10 @@ void TaskScheduler::processNextQuedCPUTask() {
             } else break;
         }
 
-        if(!mFreeCPUExecs.isEmpty() && !mCPUQueing)
+        const int nQues = mQuedCPUTasks.countQues();
+        const int maxQues = mCPUTaskExecutors.count();
+        const bool overflowed = nQues >= maxQues;
+        if(!mFreeCPUExecs.isEmpty() && !mCPUQueing && !overflowed)
             callFreeThreadsForCPUTasksAvailableFunc();
     }
 #ifdef QT_DEBUG

@@ -50,8 +50,6 @@ public:
     }
 protected:
     State mState = CREATED;
-
-    stdsptr<_Task> mSelfRef;
 private:
     void tellDependentThatFinished();
     void tellNextDependentThatFinished();
@@ -81,18 +79,6 @@ public:
     virtual bool needsGpuProcessing() const { return false; }
 protected:
     static State SCHEDULED, QUED;
-
-    void setParentQue(Que * const que) {
-        mParentQue = que;
-    }
-
-    Que * takeParentQue() {
-        const auto que = mParentQue;
-        mParentQue = nullptr;
-        return que;
-    }
-
-    Que * mParentQue = nullptr;
     virtual void scheduleTaskNow();
 };
 
