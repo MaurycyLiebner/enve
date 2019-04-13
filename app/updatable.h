@@ -60,8 +60,10 @@ private:
     QList<stdptr<_Task>> mNextExecutionDependent;
     QList<stdptr<_Task>> mCurrentExecutionDependent;
 };
-
+class Que;
 class _ScheduledTask : public _Task {
+    friend class TaskScheduler;
+    friend class Que;
 public:
     _ScheduledTask() {}
 
@@ -79,6 +81,18 @@ public:
     virtual bool needsGpuProcessing() const { return false; }
 protected:
     static State SCHEDULED, QUED;
+
+    void setParentQue(Que * const que) {
+        mParentQue = que;
+    }
+
+    Que * takeParentQue() {
+        const auto que = mParentQue;
+        mParentQue = nullptr;
+        return que;
+    }
+
+    Que * mParentQue = nullptr;
     virtual void scheduleTaskNow();
 };
 

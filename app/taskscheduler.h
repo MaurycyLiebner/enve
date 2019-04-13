@@ -6,117 +6,120 @@
 class Canvas;
 class ExecController;
 
-template <typename T>
-class MultipleList {
+class Que {
+    friend class QueHandler;
 public:
-    class Iterator {
-    public:
-        Iterator(const int& id, MultipleList& target) :
-            mId(id), mTarget(target) {}
-        inline T &operator*() const { return mTarget.at(mId); }
-        inline Iterator &operator++() { mId++; return *this; }
-        inline bool operator==(const Iterator& other)
-        { return mId == other.getId(); }
-        inline bool operator!=(const Iterator& other)
-        { return !operator==(other); }
-    protected:
-        int getId() const { return mId; }
-    private:
-        int mId;
-        MultipleList& mTarget;
-    };
+    explicit Que() {}
+    Que(const Que&) = delete;
+    Que& operator=(const Que&) = delete;
 
-    int listCount() const {
-        return mLists.count();
+    ~Que() {
+        for(const auto& cpuTask : mQued) {
+            cpuTask->setState(_Task::CANCELED);
+            cpuTask->takeParentQue();
+        }
+        for(const auto& cpuTask : mProcessing) {
+            cpuTask->setState(_Task::CANCELED);
+            cpuTask->takeParentQue();
+        }
+    }
+protected:
+    int countQued() const { return mQued.count(); }
+    bool quedEmpty() const { return countQued() == 0; }
+    void addTask(const stdsptr<_ScheduledTask>& task) {
+        mQued << task;
+        task->setParentQue(this);
+    }
+    _ScheduledTask* takeQuedForProcessing() {
+        for(int i = 0; i < mQued.count(); i++) {
+            const auto task = mQued.at(i);
+            if(task->readyToBeProcessed()) {
+                mProcessing << task;
+                mQued.removeAt(i);
+                return task.get();
+            }
+        }
+        return nullptr;
+    }
+
+    bool allDone() const { return quedEmpty() && mProcessing.isEmpty(); }
+
+    void taskDone(_ScheduledTask * const task) {
+        int i = 0;
+        for(const auto& iTask : mProcessing) {
+            if(iTask.get() == task) {
+                mProcessing.removeAt(i);
+                return;
+            }
+            i++;
+        }
+        RuntimeThrow("Task was not part of the que");
+    }
+private:
+    QList<stdsptr<_ScheduledTask>> mQued;
+    QList<stdsptr<_ScheduledTask>> mProcessing;
+};
+
+class QueHandler {
+public:
+    int countQues() const {
+        return mQues.count();
     }
 
     bool isEmpty() const {
-        return mLists.isEmpty();
-    }
-
-    int count() const {
-        int count = 0;
-        for(const auto& list : mLists)
-            count += list.count();
-        return count;
+        return mQues.isEmpty();
     }
 
     void clear() {
-        mLists.clear();
+        mQues.clear();
+        mCurrentQue = nullptr;
     }
 
-    inline T &at(const int& id) {
-        int rId = id;
-        for(auto& list : mLists) {
-            const int lCount = list.count();
-            if(rId < lCount) return list[rId];
-            rId -= lCount;
+    _ScheduledTask* takeQuedForProcessing() {
+        int queId = 0;
+        for(const auto& que : mQues) {
+            const auto task = que->takeQuedForProcessing();
+            if(task) return task;
+            queId++;
         }
-        RuntimeThrow("Index outside range");
+        return nullptr;
     }
 
-    inline void removeAt(const int& id) {
-        int rId = id;
-        for(int lId = 0; lId < mLists.count(); lId++) {
-            auto& list = mLists[lId];
-            const int lCount = list.count();
-            if(rId < lCount) {
-                list.removeAt(rId);
-                if(list.isEmpty()) removeEmptiedList(list, lId);
+    void taskDone(_ScheduledTask * const task,
+                  Que * const parentQue) {
+        parentQue->taskDone(task);
+        if(parentQue->allDone()) queDone(parentQue);
+    }
+
+    void beginQue() {
+        if(mCurrentQue) RuntimeThrow("Previous list not ended");
+        mQues << std::make_shared<Que>();
+        mCurrentQue = mQues.last().get();
+    }
+
+    void addTask(const stdsptr<_ScheduledTask>& task) {
+        if(!mCurrentQue) RuntimeThrow("Cannot add task when there is no active que.");
+        mCurrentQue->addTask(task);
+    }
+
+    void endQue() {
+        if(!mCurrentQue) return;
+        if(mCurrentQue->allDone()) mQues.removeLast();
+        mCurrentQue = nullptr;
+    }
+private:
+    void queDone(const Que * const que) {
+        if(que == mCurrentQue) return;
+        for(int i = 0; i < mQues.count(); i++) {
+            if(mQues.at(i).get() == que) {
+                mQues.removeAt(i);
                 return;
             }
-            rId -= lCount;
         }
-        RuntimeThrow("Index outside range");
     }
 
-    inline T takeAt(const int& id) {
-        int rId = id;
-        for(int lId = 0; lId < mLists.count(); lId++) {
-            auto& list = mLists[lId];
-            const int lCount = list.count();
-            if(rId < lCount) {
-                if(list.count() == 1) {
-                    T result = list.at(rId);
-                    removeEmptiedList(list, lId);
-                    return result;
-                }
-                return list.takeAt(rId);
-            }
-            rId -= lCount;
-        }
-        RuntimeThrow("Index outside range");
-    }
-
-    inline void append(const T& t) {
-        mCurrentList->append(t);
-    }
-
-    inline MultipleList &operator<< (const T &t)
-    { append(t); return *this; }
-
-    void beginList() {
-        if(mCurrentList) RuntimeThrow("Previous list not ended");
-        mLists << QList<T>();
-        mCurrentList = &mLists.last();
-    }
-
-    void endList() {
-        if(!mCurrentList) return;
-        if(mCurrentList->isEmpty()) mLists.removeLast();
-        mCurrentList = nullptr;
-    }
-
-    Iterator begin() { return Iterator(0, *this); }
-    Iterator end() { return Iterator(count(), *this); }
-private:
-    void removeEmptiedList(const QList<T>& list, const int& listId) {
-        if(&list == mCurrentList) return;
-        mLists.removeAt(listId);
-    }
-
-    QList<QList<T>> mLists;
-    QList<T> * mCurrentList = nullptr;
+    QList<stdsptr<Que>> mQues;
+    Que * mCurrentQue = nullptr;
 };
 
 class TaskScheduler : public QObject {
@@ -193,9 +196,6 @@ public:
         }
         mScheduledHDDTasks.clear();
 
-        for(const auto& cpuTask : mQuedCPUTasks) {
-            cpuTask->setState(_Task::CANCELED);
-        }
         mQuedCPUTasks.clear();
 
         for(const auto& hddTask : mQuedHDDTasks) {
@@ -215,7 +215,7 @@ public:
                               ExecController * const controller);
     void processNextQuedHDDTask();
 
-    void afterCPUTaskFinished(_ScheduledTask * const finishedTask,
+    void afterCPUTaskFinished(_ScheduledTask * const task,
                               ExecController * const controller);
     void processNextQuedCPUTask();
 
@@ -264,7 +264,7 @@ public:
     }
 
     int busyCPUThreads() const {
-        return mCPUTaskExecutors.count() - mFreeCPUThreads.count();
+        return mCPUTaskExecutors.count() - mFreeCPUExecs.count();
     }
 signals:
     void processCPUTask(_ScheduledTask*, int);
@@ -305,13 +305,12 @@ private:
         }
     }
 
-    QList<ExecController*> mFreeCPUThreads;
+    QList<ExecController*> mFreeCPUExecs;
 
     bool mHDDThreadBusy = false;
 
     bool mCPUQueing = false;
-    MultipleList<stdsptr<_ScheduledTask>> mQuedCPUTasks;
-    MultipleList<stdsptr<_ScheduledTask>> mQuedHDDTasks2;
+    QueHandler mQuedCPUTasks;
 
     QList<stdsptr<_ScheduledTask>> mScheduledCPUTasks;
     QList<stdsptr<_ScheduledTask>> mScheduledHDDTasks;
