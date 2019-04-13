@@ -4,6 +4,7 @@
 #include "updatable.h"
 #include "GPUEffects/gpupostprocessor.h"
 class Canvas;
+class ExecController;
 
 template <typename T>
 class MultipleList {
@@ -205,17 +206,17 @@ public:
         if(!mHDDThreadBusy) {
             callAllQuedHDDTasksFinishedFunc();
         }
-        if(mBusyCPUThreads.isEmpty()) {
+        if(!CPUTasksBeingProcessed()) {
             callAllQuedCPUTasksFinishedFunc();
         }
     }
 
-    void processNextQuedHDDTask(
-            const int &finishedThreadId,
-            _ScheduledTask * const finishedTask);
-    void afterCPUTaskFinished(
-            const int &finishedThreadId,
-            _ScheduledTask * const finishedTask);
+    void afterHDDTaskFinished(_ScheduledTask * const finishedTask,
+                              ExecController * const controller);
+    void processNextQuedHDDTask();
+
+    void afterCPUTaskFinished(_ScheduledTask * const finishedTask,
+                              ExecController * const controller);
     void processNextQuedCPUTask();
 
     void setFreeThreadsForCPUTasksAvailableFunc(
@@ -247,7 +248,7 @@ public:
     }
 
     bool allQuedCPUTasksFinished() const {
-        return mBusyCPUThreads.isEmpty() && mQuedCPUTasks.isEmpty();
+        return !CPUTasksBeingProcessed() && mQuedCPUTasks.isEmpty();
     }
 
     bool allQuedHDDTasksFinished() const {
@@ -255,11 +256,15 @@ public:
     }
 
     bool CPUTasksBeingProcessed() const {
-        return !mBusyCPUThreads.isEmpty();
+        return busyCPUThreads() > 0;
     }
 
     bool HDDTaskBeingProcessed() const {
         return !mHDDThreadBusy;
+    }
+
+    int busyCPUThreads() const {
+        return mCPUTaskExecutors.count() - mFreeCPUThreads.count();
     }
 signals:
     void processCPUTask(_ScheduledTask*, int);
@@ -300,8 +305,7 @@ private:
         }
     }
 
-    QList<int> mFreeCPUThreads;
-    QList<int> mBusyCPUThreads;
+    QList<ExecController*> mFreeCPUThreads;
 
     bool mHDDThreadBusy = false;
 
@@ -313,11 +317,8 @@ private:
     QList<stdsptr<_ScheduledTask>> mScheduledHDDTasks;
     QList<stdsptr<_ScheduledTask>> mQuedHDDTasks;
 
-    QList<QThread*> mExecutorThreads;
-    QThread *mHDDExecutorThread;
-
-    TaskExecutor *mHDDExecutor = nullptr;
-    QList<TaskExecutor*> mCPUTaskExecutors;
+    ExecController *mHDDExecutor = nullptr;
+    QList<ExecController*> mCPUTaskExecutors;
 
     std::function<void(void)> mFreeThreadsForCPUTasksAvailableFunc;
     std::function<void(void)> mAllQuedCPUTasksFinishedFunc;

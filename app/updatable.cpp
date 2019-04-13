@@ -29,10 +29,6 @@ void _HDDTask::scheduleTaskNow() {
 
 _Task::_Task() {}
 
-void _Task::setCurrentTaskExecutor(TaskExecutor *taskExecutor) {
-    mCurrentTaskExecutor = taskExecutor;
-}
-
 void _Task::beforeProcessingStarted() {
     Q_ASSERT(mCurrentExecutionDependent.isEmpty());
     mSelfRef = ref<_Task>();
@@ -43,21 +39,9 @@ void _Task::beforeProcessingStarted() {
 
 void _Task::finishedProcessing() {
     mState = FINISHED;
-    mCurrentTaskExecutor = nullptr;
     tellDependentThatFinished();
     afterProcessingFinished();
     mSelfRef.reset();
-}
-
-void _Task::waitTillProcessed() {
-    if(!mCurrentTaskExecutor) return;
-    {
-        QEventLoop loop;
-        QObject::connect(
-                    mCurrentTaskExecutor, &TaskExecutor::finishedUpdating,
-                    &loop, &QEventLoop::quit);
-        loop.exec();
-    }
 }
 
 bool _Task::readyToBeProcessed() {

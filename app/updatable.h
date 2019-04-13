@@ -29,13 +29,9 @@ public:
     virtual void clear();
 
     bool isActive() { return mState != CREATED && mState != FINISHED; }
-    void setCurrentTaskExecutor(TaskExecutor *taskExecutor);
 
     void finishedProcessing();
     bool readyToBeProcessed();
-
-    void waitTillProcessed();
-
 
     void addDependent(_Task * const updatable);
 
@@ -55,7 +51,6 @@ public:
 protected:
     State mState = CREATED;
 
-    QPointer<TaskExecutor> mCurrentTaskExecutor;
     stdsptr<_Task> mSelfRef;
 private:
     void tellDependentThatFinished();

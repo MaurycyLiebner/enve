@@ -232,7 +232,7 @@ private:
     int mMaxPreviewFrame;
     int mCurrentPreviewFrame;
 signals:
-    void updateUpdatable(_ScheduledTask*, int);
+    void processTask(_ScheduledTask*, int);
     void updateFileUpdatable(_ScheduledTask*, int);
 
     void changeCurrentFrame(int);
