@@ -5,24 +5,26 @@
 #include <QThread>
 #include "updatable.h"
 
+class TaskExecutor : public QObject {
+    Q_OBJECT
+public:
+    explicit TaskExecutor();
+signals:
+    void finishedTask(_ScheduledTask*);
+public slots:
+    void processTask(_ScheduledTask* task);
+};
+
 class ExecController : public QObject {
     Q_OBJECT
-
-    class TaskExecutor : public QObject {
-        Q_OBJECT
-    public:
-        explicit TaskExecutor();
-    signals:
-        void finishedTask(_ScheduledTask*);
-    public slots:
-        void processTask(_ScheduledTask* task);
-    };
 public:
     ExecController(QObject * const parent = nullptr) : QObject(parent),
-        mExecutor(new TaskExecutor()),
+        mExecutor(new TaskExecutor),
         mExecutorThread(new QThread(this)) {
         connect(this, &ExecController::processTaskSignal,
                 mExecutor, &TaskExecutor::processTask);
+        connect(mExecutor, &TaskExecutor::finishedTask,
+                this, &ExecController::finishedTask);
         mExecutor->moveToThread(mExecutorThread);
         mExecutorThread->start();
     }

@@ -1,8 +1,8 @@
 #include "taskexecutor.h"
 
-ExecController::TaskExecutor::TaskExecutor() {}
+TaskExecutor::TaskExecutor() {}
 
-void ExecController::TaskExecutor::processTask(_ScheduledTask* task) {
+void TaskExecutor::processTask(_ScheduledTask* task) {
     task->_processUpdate();
     emit finishedTask(task);
 }
