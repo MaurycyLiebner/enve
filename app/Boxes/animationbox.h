@@ -10,9 +10,7 @@ class AnimationCacheHandler;
 struct AnimationBoxRenderData : public ImageBoxRenderData {
     AnimationBoxRenderData(FileCacheHandler *cacheHandler,
                            BoundingBox *parentBox) :
-        ImageBoxRenderData(cacheHandler, parentBox) {
-
-    }
+        ImageBoxRenderData(cacheHandler, parentBox) {}
 
     void loadImageFromHandler();
     int fAnimationFrame;

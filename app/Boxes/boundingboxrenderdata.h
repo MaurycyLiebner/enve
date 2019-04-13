@@ -60,7 +60,6 @@ public:
     QMatrix fTransform;
     QMatrix fParentTransform;
     QMatrix fRelTransform;
-    QMatrix fRenderTransform;
 
     QRectF fRelBoundingRect;
     QRectF fGlobalBoundingRect;
@@ -98,7 +97,6 @@ public:
 
     void setupWhenNoRenderingNeeded(const sk_sp<SkImage> image,
                                     const QMatrix& renderTransform) {
-        fRenderTransform = renderTransform;
         updateRelBoundingRect();
         updateGlobalFromRelBoundingRect();
         fRenderedImage = image;
