@@ -13,7 +13,7 @@ void VideoEncoder::addContainer(
     if(!cont) return;
     cont->setBlocked(true);
     mNextContainers.append(cont);
-    scheduleTask();
+    if(getState() != PROCESSING) scheduleTask();
 }
 
 static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
@@ -179,7 +179,7 @@ static AVFrame *getVideoFrame(OutputStream * const ost,
 static void writeVideoFrame(AVFormatContext * const oc,
                             OutputStream * const ost,
                             const sk_sp<SkImage> &image,
-                            int * const encodeVideo) {
+                            bool * const encodeVideo) {
     AVCodecContext * const c = ost->enc;
 
     AVFrame * frame;
@@ -200,19 +200,20 @@ static void writeVideoFrame(AVFormatContext * const oc,
         av_init_packet(&pkt);
 
         const int recRet = avcodec_receive_packet(c, &pkt);
-        if(recRet < 0 && recRet != AVERROR(EAGAIN) && recRet != AVERROR_EOF) {
-            RuntimeThrow("Error encoding a video frame");
-        } else if(recRet >= 0) {
+        if(recRet >= 0) {
             av_packet_rescale_ts(&pkt, c->time_base, ost->st->time_base);
             pkt.stream_index = ost->st->index;
 
             /* Write the compressed frame to the media file. */
             const int interRet = av_interleaved_write_frame(oc, &pkt);
             if(interRet < 0) RuntimeThrow("Error while writing video frame");
+        } else if(recRet == AVERROR(EAGAIN) || recRet == AVERROR_EOF) {
+            *encodeVideo = ret != AVERROR_EOF;
+            break;
+        } else {
+            RuntimeThrow("Error encoding a video frame " + std::to_string(recRet));
         }
     }
-
-    *encodeVideo = ret != AVERROR_EOF;
 }
 
 static void closeStream(OutputStream * const ost) {
@@ -315,11 +316,11 @@ static void openAudio(AVCodec * const codec, OutputStream * const ost) {
     const int nb_samples = varFS ? 10000 : c->frame_size;
 
     ost->frame = allocAudioFrame(c->sample_fmt, c->channel_layout,
-                                   c->sample_rate, nb_samples);
+                                 c->sample_rate, nb_samples);
     if(!ost->frame) RuntimeThrow("Could not alloc audio frame");
 
     ost->tmp_frame = allocAudioFrame(AV_SAMPLE_FMT_S16, AV_CH_LAYOUT_STEREO,
-                                       44100, nb_samples); // !!!
+                                     44100, nb_samples); // !!!
     if(!ost->tmp_frame) RuntimeThrow("Could not alloc temporary audio frame");
 
     /* copy the stream parameters to the muxer */
@@ -356,7 +357,7 @@ static AVFrame *getAudioFrame(OutputStream * const ost) {
 static void encodeAudioFrame(AVFormatContext * const oc,
                              OutputStream * const ost,
                              AVFrame * const frame,
-                             int * const encodeAudio) {
+                             bool * const encodeAudio) {
     const int ret = avcodec_send_frame(ost->enc, frame);
     if(ret < 0) RuntimeThrow("Error submitting a frame for encoding");
 
@@ -366,28 +367,27 @@ static void encodeAudioFrame(AVFormatContext * const oc,
         av_init_packet(&pkt);
 
         const int recRet = avcodec_receive_packet(ost->enc, &pkt);
-        if(recRet < 0 && recRet != AVERROR(EAGAIN) && recRet != AVERROR_EOF) {
-            RuntimeThrow("Error encoding a video frame");
-        } else if(recRet >= 0) {
+        if(recRet >= 0) {
             av_packet_rescale_ts(&pkt, ost->enc->time_base, ost->st->time_base);
             pkt.stream_index = ost->st->index;
 
             /* Write the compressed frame to the media file. */
             const int interRet = av_interleaved_write_frame(oc, &pkt);
             if(interRet < 0) RuntimeThrow("Error while writing video frame");
-        } else break;
+        } else if(recRet == AVERROR(EAGAIN) || recRet == AVERROR_EOF) {
+            *encodeAudio = recRet == AVERROR(EAGAIN);
+            break;
+        } else {
+            RuntimeThrow("Error encoding a video frame");
+        }
     }
-
-    *encodeAudio |= ret == AVERROR_EOF;
 }
 
 static void processAudioStream(AVFormatContext * const oc,
                                OutputStream * const ost,
-                               int * const audioEnabled) {
-    int gotOutput = 0;
-
+                               bool * const audioEnabled) {
     AVFrame * const frame = getAudioFrame(ost);
-    gotOutput |= !!frame;
+    bool gotOutput = frame;
 
     /* feed the data to lavr */
     if(frame) {
@@ -605,7 +605,7 @@ void VideoEncoder::_processUpdate() {
             const int nFrames = contRage.span();
             try {
                 writeVideoFrame(mFormatContext, &mVideoStream,
-                                  cacheCont->getImageSk(), &mEncodeVideo);
+                                cacheCont->getImageSk(), &mEncodeVideo);
             } catch(...) {
                 mUpdateException = std::current_exception();
             }
@@ -617,8 +617,7 @@ void VideoEncoder::_processUpdate() {
             }
         } else if(mEncodeAudio) {
             try {
-                processAudioStream(mFormatContext, &mAudioStream,
-                                     &mEncodeAudio);
+                processAudioStream(mFormatContext, &mAudioStream, &mEncodeAudio);
             } catch(...) {
                 mUpdateException = std::current_exception();
             }

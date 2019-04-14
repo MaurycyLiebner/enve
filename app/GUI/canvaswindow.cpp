@@ -1129,16 +1129,23 @@ void CanvasWindow::nextPreviewFrame() {
 
 void CanvasWindow::nextSaveOutputFrame() {
     //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
-    if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        mCurrentRenderSettings = nullptr;
+    if(mCurrentRenderFrame > mMaxRenderFrame) {
         TaskScheduler::sClearAllFinishedFuncs();
-        mCurrentCanvas->setOutputRendering(false);
-        changeCurrentFrameAction(mSavedCurrentFrame);
-        if(qAbs(mSavedResolutionFraction -
-                mCurrentCanvas->getResolutionFraction()) > 0.1) {
-            mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
+        const auto allFinishedFunc = [this]() {
+            mCurrentRenderSettings = nullptr;
+            mCurrentCanvas->setOutputRendering(false);
+            changeCurrentFrameAction(mSavedCurrentFrame);
+            if(qAbs(mSavedResolutionFraction -
+                    mCurrentCanvas->getResolutionFraction()) > 0.1) {
+                mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
+            }
+            VideoEncoder::sFinishEncoding();
+        };
+        if(TaskScheduler::sAllQuedTasksFinished()) {
+            allFinishedFunc();
+        } else {
+            TaskScheduler::sSetAllQuedTasksFinishedFunc(allFinishedFunc);
         }
-        VideoEncoder::sFinishEncoding();
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
         auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(mCurrentRenderFrame);

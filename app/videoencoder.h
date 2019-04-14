@@ -47,11 +47,29 @@ signals:
     void encodingFailed();
 };
 
-class VideoEncoder : public _HDDTask {
-public:
-    VideoEncoder();
+//class FrameEncoder : public _HDDTask {
+//protected:
+//    FrameEncoder(const stdsptr<ImageCacheContainer>& frame) {
+//        frame->setBlocked(true);
+//    }
 
-    void startNewEncoding(RenderInstanceSettings *settings) {
+//    ~FrameEncoder() {
+//        mFrame->setBlocked(false);
+//    }
+//public:
+//    void _processUpdate() {
+
+//    }
+//private:
+//    const stdsptr<ImageCacheContainer> mFrame;
+//};
+
+class VideoEncoder : public _HDDTask {
+    friend class StdSelfRef;
+protected:
+    VideoEncoder();
+public:
+    void startNewEncoding(RenderInstanceSettings * const settings) {
         if(!mCurrentlyEncoding) startEncoding(settings);
     }
 
@@ -104,7 +122,7 @@ protected:
     AVFormatContext *mFormatContext = nullptr;
     AVOutputFormat *mOutputFormat = nullptr;
     bool mCurrentlyEncoding = false;
-    QList<stdsptr<ImageCacheContainer> > mNextContainers;
+    QList<stdsptr<ImageCacheContainer>> mNextContainers;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;
@@ -112,8 +130,8 @@ protected:
     QByteArray mPathByteArray;
     bool mHaveVideo = 0;
     bool mHaveAudio = 0;
-    int mEncodeVideo = 0;
-    int mEncodeAudio = 0;
+    bool mEncodeVideo = 0;
+    bool mEncodeAudio = 0;
 
     std::exception_ptr mUpdateException;
 
