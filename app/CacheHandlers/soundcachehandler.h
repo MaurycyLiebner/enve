@@ -8,7 +8,7 @@ class SoundCacheHandler : public HDDCachableCacheHandler<SoundCacheContainer> {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 public:
     void rangeNeeded(const SampleRange& range) {
-        setContainersInFrameRangeBlocked(range, true);
+        blockConts(range, true);
         auto missings = getMissingRanges(range);
         if(missings.isEmpty()) return;
         for(const auto& missing : missings) {
@@ -21,7 +21,7 @@ protected:
         float * data = nullptr;
         gDecodeSoundDataRange(mFilePath.toLatin1().data(), range, data);
         auto samples = SPtrCreate(Samples)(data, range.span());
-        createNewRenderContainerAtRelFrame
+        createNew
                 <SoundCacheContainer>(range, samples);
     }
 
@@ -33,7 +33,7 @@ protected:
         removeRenderContainer(b);
         const auto cont = SoundCacheContainer::sCreateMerge(aS, bS, this);
         auto frameRange = cont->getRange();
-        int contId = getRenderContainterInsertIdAtRelFrame(frameRange.fMin);
+        int contId = insertIdForRelFrame(frameRange.fMin);
         mRenderContainers.insert(contId, cont);
     }
 

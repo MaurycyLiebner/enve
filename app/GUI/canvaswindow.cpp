@@ -396,7 +396,7 @@ bool CanvasWindow::handleZValueKeyPress(QKeyEvent *event) {
 
 bool CanvasWindow::handleParentChangeKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
-              event->key() == Qt::Key_P) {
+       event->key() == Qt::Key_P) {
         mCurrentCanvas->setParentToLastSelected();
     } else if(event->modifiers() & Qt::AltModifier &&
               event->key() == Qt::Key_P) {
@@ -409,7 +409,7 @@ bool CanvasWindow::handleParentChangeKeyPress(QKeyEvent *event) {
 
 bool CanvasWindow::handleGroupChangeKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
-              event->key() == Qt::Key_G) {
+       event->key() == Qt::Key_G) {
        if(event->modifiers() & Qt::ShiftModifier) {
            ungroupSelectedBoxes();
        } else {
@@ -437,8 +437,7 @@ bool CanvasWindow::handleResetTransformKeyPress(QKeyEvent *event) {
 
 bool CanvasWindow::handleRevertPathKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
-              (event->key() == Qt::Key_Up ||
-               event->key() == Qt::Key_Down)) {
+       (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down)) {
        if(event->modifiers() & Qt::ShiftModifier) {
            mCurrentCanvas->revertAllPointsForAllKeys();
        } else {
@@ -915,11 +914,11 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
 
         mCurrentRenderSettings = settings;
         const RenderSettings &renderSettings = settings->getRenderSettings();
-        Canvas *canvas = settings->getTargetCanvas();
+        Canvas * const canvas = settings->getTargetCanvas();
         setCurrentCanvas(canvas);
         changeCurrentFrameAction(renderSettings.fMinFrame);
 
-        qreal resolutionFraction = renderSettings.fResolution;
+        const qreal resolutionFraction = renderSettings.fResolution;
         mMaxRenderFrame = renderSettings.fMaxFrame;
 
         const auto nextFrameFunc = [this]() {
@@ -929,15 +928,18 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
         TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
 
         mCurrentCanvas->fitCanvasToSize();
-        if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.00001) {
+        if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
             mCurrentCanvas->setResolutionFraction(resolutionFraction);
         }
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
         mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
-        mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {
+            const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
+            const auto cont = cacheHandler.atRelFrame(mCurrentRenderFrame);
+            VideoEncoder::sAddCacheContainerToEncoder(
+                        GetAsSPtr(cont, ImageCacheContainer));
             nextSaveOutputFrame();
         }
     }
@@ -957,10 +959,9 @@ void CanvasWindow::nextCurrentRenderFrame() {
         }
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
-        cacheHandler.
-            setContainersInFrameRangeBlocked({mCurrentRenderFrame + 1,
-                                              newCurrentRenderFrame - 1},
-                                             true);
+        const int minBlock = mCurrentRenderFrame + 1;
+        const int maxBlock = newCurrentRenderFrame - 1;
+        cacheHandler.blockConts({minBlock, maxBlock}, true);
     }
 
     mCurrentRenderFrame = newCurrentRenderFrame;
@@ -1016,10 +1017,8 @@ void CanvasWindow::interruptPreviewRendering() {
     setRendering(false);
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
-    mCurrentCanvas->getCacheHandler().
-        setContainersInFrameRangeBlocked({mSavedCurrentFrame + 1,
-                                          mMaxRenderFrame},
-                                         false);
+    auto& cacheHandler = mCurrentCanvas->getCacheHandler();
+    cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
     changeCurrentFrameAction(mSavedCurrentFrame);
     MainWindow::getInstance()->previewFinished();
 }
@@ -1033,10 +1032,8 @@ void CanvasWindow::interruptOutputRendering() {
 
 void CanvasWindow::stopPreview() {
     setPreviewing(false);
-    mCurrentCanvas->getCacheHandler().
-        setContainersInFrameRangeBlocked({mSavedCurrentFrame + 1,
-                                          mMaxRenderFrame},
-                                         false);
+    auto& cacheHandler = mCurrentCanvas->getCacheHandler();
+    cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
     changeCurrentFrameAction(mSavedCurrentFrame);
     mCurrentCanvas->setCurrentPreviewContainer(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
@@ -1149,7 +1146,16 @@ void CanvasWindow::nextSaveOutputFrame() {
         }
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
+        const int oldRenderFrame = mCurrentRenderFrame;
         nextCurrentRenderFrame();
+        if(mCurrentRenderFrame - oldRenderFrame > 1) {
+            const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
+            for(int i = oldRenderFrame + 1; i < mCurrentRenderFrame; i++) {
+                const auto cont = cacheHandler.atRelFrame(i);
+                VideoEncoder::sAddCacheContainerToEncoder(
+                            GetAsSPtr(cont, ImageCacheContainer));
+            }
+        }
     }
 }
 

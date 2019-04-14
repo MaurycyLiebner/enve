@@ -12,7 +12,7 @@ public:
         int currFrame = frame + 1;
         T *cont = nullptr;
         while(true) {
-            cont = this->getRenderContainerAtRelFrame<T>(currFrame);
+            cont = this->atRelFrame<T>(currFrame);
             if(!cont) break;
             if(!cont->storesDataInMemory()) break;
             currFrame = cont->getRangeMax() + 1;

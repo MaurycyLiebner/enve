@@ -73,8 +73,6 @@ protected:
                     const int &frameCount = 200,
                     const qreal &fps = 24);
 public:
-    ~Canvas();
-
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
@@ -84,7 +82,7 @@ public:
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
     void setPointCtrlsMode(const CtrlsMode& mode);
-    void setCurrentBoxesGroup(BoxesGroup *group);
+    void setCurrentBoxesGroup(BoxesGroup * const group);
 
     void updatePivot();
 

@@ -6,7 +6,7 @@ void RangeCacheHandler::removeRenderContainer(
     mRenderContainers.removeOne(cont);
 }
 
-int RangeCacheHandler::getRenderContainterInsertIdAtRelFrame(
+int RangeCacheHandler::insertIdForRelFrame(
         const int &relFrame) const {
     int minId = 0;
     int maxId = mRenderContainers.count();
@@ -28,7 +28,7 @@ int RangeCacheHandler::getRenderContainterInsertIdAtRelFrame(
     return 0;
 }
 
-bool RangeCacheHandler::getRenderContainterIdAtRelFrame(const int &relFrame, int *id) const {
+bool RangeCacheHandler::idAtRelFrame(const int &relFrame, int *id) const {
     int minId = 0;
     int maxId = mRenderContainers.count() - 1;
 
@@ -66,23 +66,24 @@ int RangeCacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) const {
     int currFrame = frame + 1;
     RCC *cont = nullptr;
     while(true) {
-        cont = getRenderContainerAtRelFrame(currFrame);
+        cont = atRelFrame(currFrame);
         if(!cont) return currFrame;
         currFrame = cont->getRangeMax() + 1;
     }
 }
 
-int RangeCacheHandler::getFirstEmptyFrameAtOrAfterFrame(const int &frame) const {
+int RangeCacheHandler::firstEmptyFrameAtOrAfterFrame(const int &frame) const {
     int currFrame = frame;
     RCC *cont = nullptr;
     while(true) {
-        cont = getRenderContainerAtRelFrame(currFrame);
+        cont = atRelFrame(currFrame);
         if(!cont) return currFrame;
         currFrame = cont->getRangeMax() + 1;
     }
 }
 
-void RangeCacheHandler::setContainersInFrameRangeBlocked(const FrameRange &range, const bool &blocked) {
+void RangeCacheHandler::blockConts(
+        const FrameRange &range, const bool &blocked) {
     IdRange idRange = rangeToListIdRange(range);
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
         mRenderContainers.at(i)->setBlocked(blocked);
@@ -94,14 +95,14 @@ void RangeCacheHandler::clearCache() {
 }
 
 void RangeCacheHandler::cacheDataBeforeRelFrame(const int &relFrame) {
-    int lastId = getRenderContainerIdAtOrBeforeRelFrame(relFrame);
+    const int lastId = idAtOrBeforeRelFrame(relFrame);
     for(int i = 0; i < lastId; i++) {
         mRenderContainers.at(i)->freeAndRemove_k();
     }
 }
 
 void RangeCacheHandler::cacheDataAfterRelFrame(const int &relFrame) {
-    int firstId = getRenderContainerIdAtOrAfterRelFrame(relFrame);
+    const int firstId = idAtOrAfterRelFrame(relFrame);
     for(int i = firstId; i < mRenderContainers.count(); i++) {
         mRenderContainers.at(i)->freeAndRemove_k();
     }
@@ -117,33 +118,23 @@ void RangeCacheHandler::cacheLastContainer() {
     mRenderContainers.last()->freeAndRemove_k();
 }
 
-int RangeCacheHandler::getContainerCountAfterRelFrame(const int &relFrame) const {
-    int firstId = getRenderContainerIdAtOrAfterRelFrame(relFrame + 1);
+int RangeCacheHandler::countAfterRelFrame(const int &relFrame) const {
+    int firstId = idAtOrAfterRelFrame(relFrame + 1);
     return mRenderContainers.count() - firstId;
 }
 
-void RangeCacheHandler::updateAllAfterFrameInMemoryHandler(const int &relFrame) {
-    int firstId = getRenderContainerIdAtOrAfterRelFrame(relFrame + 1);
-    for(int i = mRenderContainers.count() - 1; i >= firstId; i--) {
-        RCC *cont = mRenderContainers.at(i).get();
-        if(cont->handledByMemoryHandler()) {
-            MemoryHandler::sGetInstance()->containerUpdated(cont);
-        }
-    }
-}
-
-int RangeCacheHandler::getRenderContainerIdAtOrBeforeRelFrame(const int &frame) const {
+int RangeCacheHandler::idAtOrBeforeRelFrame(const int &frame) const {
     int id;
-    if(!getRenderContainterIdAtRelFrame(frame, &id)) {
-        id = getRenderContainterInsertIdAtRelFrame(frame) - 1;
+    if(!idAtRelFrame(frame, &id)) {
+        id = insertIdForRelFrame(frame) - 1;
     }
     return id;
 }
 
-int RangeCacheHandler::getRenderContainerIdAtOrAfterRelFrame(const int &frame) const {
+int RangeCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
     int id;
-    if(!getRenderContainterIdAtRelFrame(frame, &id)) {
-        id = getRenderContainterInsertIdAtRelFrame(frame);
+    if(!idAtRelFrame(frame, &id)) {
+        id = insertIdForRelFrame(frame);
     }
     return id;
 }
@@ -193,14 +184,14 @@ void RangeCacheHandler::drawCacheOnTimeline(QPainter * const p,
     }
 }
 
-void RangeCacheHandler::clearCacheForRelFrameRange(const FrameRange &range) {
+void RangeCacheHandler::clearRelRange(const FrameRange &range) {
     int minId;
-    if(!getRenderContainterIdAtRelFrame(range.fMin, &minId)) {
-        minId = getRenderContainterInsertIdAtRelFrame(range.fMin);
+    if(!idAtRelFrame(range.fMin, &minId)) {
+        minId = insertIdForRelFrame(range.fMin);
     }
     int maxId;
-    if(!getRenderContainterIdAtRelFrame(range.fMax, &maxId)) {
-        maxId = getRenderContainterInsertIdAtRelFrame(range.fMax) - 1;
+    if(!idAtRelFrame(range.fMax, &maxId)) {
+        maxId = insertIdForRelFrame(range.fMax) - 1;
     }
     for(int i = minId; i <= maxId; i++) {
         mRenderContainers.removeAt(minId);
@@ -211,7 +202,7 @@ QList<FrameRange> RangeCacheHandler::getMissingRanges(const FrameRange &range) c
     QList<FrameRange> result;
     int currentFrame = range.fMin;
     while(currentFrame <= range.fMax) {
-        auto cont = getRenderContainerAtOrAfterRelFrame(currentFrame);
+        auto cont = atOrAfterRelFrame(currentFrame);
         if(!cont) {
             result.append({currentFrame, range.fMax});
             break;
@@ -229,12 +220,12 @@ QList<FrameRange> RangeCacheHandler::getMissingRanges(const FrameRange &range) c
 
 IdRange RangeCacheHandler::rangeToListIdRange(const FrameRange &range) {
     int minId;
-    if(!getRenderContainterIdAtRelFrame(range.fMin, &minId)) {
-        minId = getRenderContainterInsertIdAtRelFrame(range.fMin);
+    if(!idAtRelFrame(range.fMin, &minId)) {
+        minId = insertIdForRelFrame(range.fMin);
     }
     int maxId;
-    if(!getRenderContainterIdAtRelFrame(range.fMax, &maxId)) {
-        maxId = getRenderContainterInsertIdAtRelFrame(range.fMax) - 1;
+    if(!idAtRelFrame(range.fMax, &maxId)) {
+        maxId = insertIdForRelFrame(range.fMax) - 1;
     }
     return {minId, maxId};
 }

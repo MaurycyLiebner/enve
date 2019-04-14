@@ -82,8 +82,6 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     //setCanvasMode(MOVE_PATH);
 }
 
-Canvas::~Canvas() {}
-
 QRectF Canvas::getRelBoundingRect(const qreal &) {
     return QRectF(0, 0, mWidth, mHeight);
 }
@@ -125,7 +123,7 @@ void Canvas::setCurrentGroupParentAsCurrentGroup() {
 }
 
 #include "GUI/BoxesList/boxscrollwidget.h"
-void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
+void Canvas::setCurrentBoxesGroup(BoxesGroup * const group) {
     if(mCurrentBoxesGroup) {
         mCurrentBoxesGroup->setIsCurrentGroup_k(false);
         disconnect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
@@ -380,7 +378,7 @@ void Canvas::setOutputRendering(const bool &bT) {
 }
 
 void Canvas::setCurrentPreviewContainer(const int& relFrame) {
-    auto cont = mCacheHandler.getRenderContainerAtRelFrame(relFrame);
+    auto cont = mCacheHandler.atRelFrame(relFrame);
     setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
 }
 
@@ -435,13 +433,13 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
         scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
     }
     const auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
-    auto cont = mCacheHandler.getRenderContainerAtRelFrame
+    auto cont = mCacheHandler.atRelFrame
             <ImageCacheContainer>(range.fMin);
     if(cont) {
         cont->replaceImageSk(renderData->fRenderedImage);
         cont->setRange(range);
     } else {
-        cont = mCacheHandler.createNewRenderContainerAtRelFrame
+        cont = mCacheHandler.createNew
                 <ImageCacheContainer>(range, renderData->fRenderedImage);
     }
     if(mRenderingOutput) {
@@ -480,11 +478,11 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     if(range.inRange(anim_getCurrentAbsFrame())) {
         mCurrentPreviewContainerOutdated = true;
     }
-    mCacheHandler.clearCacheForRelFrameRange(
+    mCacheHandler.clearRelRange(
                 prp_absRangeToRelRange(range));
     Property::prp_updateAfterChangedAbsFrameRange(range);
     auto rangeT = prp_getIdenticalRelFrameRange(anim_getCurrentRelFrame());
-    auto cont = mCacheHandler.getRenderContainerAtRelFrame(anim_getCurrentRelFrame());
+    auto cont = mCacheHandler.atRelFrame(anim_getCurrentRelFrame());
     if(cont) cont->setRange(rangeT);
     if(range.overlaps(rangeT)) scheduleUpdate(Animator::USER_CHANGE);
 }
@@ -742,7 +740,7 @@ void Canvas::anim_setAbsFrame(const int &frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
     int lastRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
-    const auto cont = mCacheHandler.getRenderContainerAtRelFrame
+    const auto cont = mCacheHandler.atRelFrame
             <ImageCacheContainer>(anim_getCurrentRelFrame());
     if(cont) {
         if(cont->storesDataInMemory()) { // !!!
@@ -963,57 +961,48 @@ int Canvas::getMaxFrame() {
 }
 
 void Canvas::startDurationRectPosTransformForAllSelected() {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->startDurationRectPosTransform();
-    }
 }
 
 void Canvas::finishDurationRectPosTransformForAllSelected() {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->finishDurationRectPosTransform();
-    }
 }
 
 void Canvas::moveDurationRectForAllSelected(const int &dFrame) {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->moveDurationRect(dFrame);
-    }
 }
 
 void Canvas::startMinFramePosTransformForAllSelected() {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->startMinFramePosTransform();
-    }
 }
 
 void Canvas::finishMinFramePosTransformForAllSelected() {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->finishMinFramePosTransform();
-    }
 }
 
 void Canvas::moveMinFrameForAllSelected(const int &dFrame) {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->moveMinFrame(dFrame);
-    }
 }
 
 void Canvas::startMaxFramePosTransformForAllSelected() {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->startMaxFramePosTransform();
-    }
 }
 
 void Canvas::finishMaxFramePosTransformForAllSelected() {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->finishMaxFramePosTransform();
-    }
 }
 
 void Canvas::moveMaxFrameForAllSelected(const int &dFrame) {
-    for(const auto& box : mSelectedBoxes) {
+    for(const auto& box : mSelectedBoxes)
         box->moveMaxFrame(dFrame);
-    }
 }
 
 void Canvas::blockUndoRedo() {

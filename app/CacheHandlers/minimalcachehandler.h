@@ -14,17 +14,17 @@ class RangeCacheHandler {
 public:
     void removeRenderContainer(const stdsptr<RCC>& cont);
 
-    int getRenderContainterInsertIdAtRelFrame(
+    int insertIdForRelFrame(
                         const int &relFrame) const;
 
-    bool getRenderContainterIdAtRelFrame(const int &relFrame,
+    bool idAtRelFrame(const int &relFrame,
                                          int *id) const;
 
     int getFirstEmptyFrameAfterFrame(const int &frame) const;
 
-    int getFirstEmptyFrameAtOrAfterFrame(const int &frame) const;
+    int firstEmptyFrameAtOrAfterFrame(const int &frame) const;
 
-    void setContainersInFrameRangeBlocked(const FrameRange &range,
+    void blockConts(const FrameRange &range,
                                           const bool &blocked);
 
     void clearCache();
@@ -37,26 +37,23 @@ public:
 
     void cacheLastContainer();
 
-    int getContainerCountAfterRelFrame(const int &relFrame) const;
-
-
-    void updateAllAfterFrameInMemoryHandler(const int &relFrame);
+    int countAfterRelFrame(const int &relFrame) const;
 
     template <typename T = RCC>
-    T *getRenderContainerAtRelFrame(const int &frame) const {
+    T *atRelFrame(const int &frame) const {
         int id;
-        if(getRenderContainterIdAtRelFrame(frame, &id)) {
+        if(idAtRelFrame(frame, &id)) {
             return static_cast<T*>(mRenderContainers.at(id).get());
         }
         return nullptr;
     }
 
-    int getRenderContainerIdAtOrBeforeRelFrame(const int &frame) const;
+    int idAtOrBeforeRelFrame(const int &frame) const;
     template <typename T = RCC>
-    T *getRenderContainerAtOrBeforeRelFrame(const int &frame) const {
-        T *cont = getRenderContainerAtRelFrame<T>(frame);
+    T *atOrBeforeRelFrame(const int &frame) const {
+        T *cont = atRelFrame<T>(frame);
         if(!cont) {
-            int id = getRenderContainterInsertIdAtRelFrame(frame) - 1;
+            int id = insertIdForRelFrame(frame) - 1;
             if(id >= 0 && id < mRenderContainers.length()) {
                 cont = static_cast<T*>(mRenderContainers.at(id).get());
             }
@@ -65,13 +62,13 @@ public:
     }
 
 
-    int getRenderContainerIdAtOrAfterRelFrame(const int &frame) const;
+    int idAtOrAfterRelFrame(const int &frame) const;
 
     template <typename T = RCC>
-    T *getRenderContainerAtOrAfterRelFrame(const int &frame) const {
-        T *cont = getRenderContainerAtRelFrame<T>(frame);
+    T *atOrAfterRelFrame(const int &frame) const {
+        T *cont = atRelFrame<T>(frame);
         if(!cont) {
-            int id = getRenderContainterInsertIdAtRelFrame(frame);
+            int id = insertIdForRelFrame(frame);
             if(id >= 0 && id < mRenderContainers.length()) {
                 cont = static_cast<T*>(mRenderContainers.at(id).get());
             }
@@ -85,25 +82,22 @@ public:
                              const int &startFrame,
                              const int &endFrame) const;
 
-    void clearCacheForRelFrameRange(const FrameRange& range);
+    void clearRelRange(const FrameRange& range);
 
     template<typename T, typename... Args>
-    T *createNewRenderContainerAtRelFrame(
-            const FrameRange &frameRange, Args && ...args) {
+    T *createNew(const FrameRange &frameRange, Args && ...args) {
         static_assert(std::is_base_of<RCC, T>::value,
                       "MinimalCacheHandler can be used only with "
                       "MinimalCacheContainer derived classes");
-        auto cont = SPtrCreateTemplated(T)(args..., frameRange, this);
-        int contId = getRenderContainterInsertIdAtRelFrame(frameRange.fMin);
+        const auto cont = SPtrCreateTemplated(T)(args..., frameRange, this);
+        const int contId = insertIdForRelFrame(frameRange.fMin);
         mRenderContainers.insert(contId, cont);
         return cont.get();
     }
 
     template<typename T, typename... Args>
-    T *createNewRenderContainerAtRelFrame(
-            const int &relFrame, Args && ...args) {
-        return createNewRenderContainerAtRelFrame<T>(
-                {relFrame, relFrame}, args...);
+    T *createNew(const int &relFrame, Args && ...args) {
+        return createNew<T>({relFrame, relFrame}, args...);
     }
 
     QList<FrameRange> getMissingRanges(const FrameRange& range) const;
