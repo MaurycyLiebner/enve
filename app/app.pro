@@ -272,7 +272,9 @@ SOURCES += main.cpp\
     MovablePoints/nonanimatedmovablepoint.cpp \
     PropertyUpdaters/boxpathpointupdater.cpp \
     Paint/drawableautotiledsurface.cpp \
-    typemenu.cpp
+    typemenu.cpp \
+    FileCacheHandlers/videoframeloader.cpp \
+    FileCacheHandlers/videostreamsdata.cpp
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -493,7 +495,9 @@ HEADERS  += \
     MovablePoints/nonanimatedmovablepoint.h \
     PropertyUpdaters/boxpathpointupdater.h \
     Paint/drawableautotiledsurface.h \
-    typemenu.h
+    typemenu.h \
+    FileCacheHandlers/videoframeloader.h \
+    FileCacheHandlers/videostreamsdata.h
 
 RESOURCES += \
     resources.qrc

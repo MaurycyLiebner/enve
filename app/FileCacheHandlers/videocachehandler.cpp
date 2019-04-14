@@ -25,8 +25,7 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int& relFrame) {
 void VideoCacheHandler::frameLoaderFinished(const int& frame,
                                             const sk_sp<SkImage>& image) {
     if(image) {
-        mFramesCache.createNew
-                <ImageCacheContainer>(frame, image);
+        mFramesCache.createNew<ImageCacheContainer>(frame, image);
     } else {
         mFrameCount = frame;
         for(const auto &box : mDependentBoxes) {
@@ -73,14 +72,4 @@ _ScheduledTask* VideoCacheHandler::scheduleFrameLoad(const int &frame) {
     const auto loader = addFrameLoader(frame);
     loader->scheduleTask();
     return loader;
-}
-
-void VideoFrameLoader::afterProcessingFinished() {
-    mCacheHandler->frameLoaderFinished(mFrameId, mLoadedFrame);
-    _HDDTask::afterProcessingFinished();
-}
-
-void VideoFrameLoader::afterCanceled() {
-    mCacheHandler->frameLoaderCanceled(mFrameId);
-    _HDDTask::afterCanceled();
 }
