@@ -17,6 +17,8 @@ namespace SkiaHelpers {
                    const sk_sp<SkImage>& img,
                    const SkEncodedImageFormat& format = SkEncodedImageFormat::kPNG,
                    const int& quality = 100);
+
+    sk_sp<SkImage> transferDataToSkImage(SkBitmap& bitmap);
 }
 
 #endif // SKIAHELPERS_H

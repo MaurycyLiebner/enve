@@ -94,9 +94,7 @@ void BoundingBoxRenderData::renderToImage() {
         }
         clearPixmapEffects();
     }
-    fBitmapTMP.setImmutable();
-    fRenderedImage = SkImage::MakeFromBitmap(fBitmapTMP);
-    fBitmapTMP.reset();
+    fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
 }
 
 void BoundingBoxRenderData::_processUpdate() {

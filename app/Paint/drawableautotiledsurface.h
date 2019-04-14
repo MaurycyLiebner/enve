@@ -1,6 +1,7 @@
 #ifndef DRAWABLEAUTOTILEDSURFACE_H
 #define DRAWABLEAUTOTILEDSURFACE_H
 #include "autotiledsurface.h"
+#include "skia/skiahelpers.h"
 
 class DrawableAutoTiledSurface {
 public:
@@ -32,9 +33,7 @@ public:
         for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
             for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
                 auto btmp = mTarget->tileToBitmap(tx, ty);
-                btmp.setImmutable();
-                const auto img = SkImage::MakeFromBitmap(btmp);
-                btmp.reset();
+                const auto img = SkiaHelpers::transferDataToSkImage(btmp);
 
                 const auto tileId = QPoint(tx, ty) + zeroTile();
                 mTileImgs[tileId.x()].replace(tileId.y(), img);

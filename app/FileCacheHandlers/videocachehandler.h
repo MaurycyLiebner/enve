@@ -174,7 +174,7 @@ private:
             avformat_seek_file(formatContext, videoStreamIndex,
                                INT64_MIN, 0, 0, 0);
         else {
-            const int64_t tsms = qFloor((mFrameId - 0.5*fps) * 1000 / fps);
+            const int64_t tsms = qFloor((mFrameId - 1) * 1000 / fps);
             const int64_t tm = av_rescale(tsms, videoStream->time_base.den,
                                           videoStream->time_base.num)/1000;
             if(avformat_seek_file(formatContext, videoStreamIndex, tm0,
@@ -248,9 +248,7 @@ private:
             sws_scale(swsContext, decodedFrame->data, decodedFrame->linesize,
                       0, codecContext->height, dstSk, linesizesSk);
 
-            bitmap.setImmutable();
-            mLoadedFrame = SkImage::MakeFromBitmap(bitmap);
-            bitmap.reset();
+            mLoadedFrame = SkiaHelpers::transferDataToSkImage(bitmap);
         } else {
             mLoadedFrame.reset();
         }

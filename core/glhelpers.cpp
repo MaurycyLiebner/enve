@@ -224,8 +224,7 @@ sk_sp<SkImage> TextureFrameBuffer::toImage() {
     btmp.allocPixels(info);
     glReadPixels(0, 0, fWidth, fHeight,
                  GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
-    btmp.setImmutable();
-    return SkImage::MakeFromBitmap(btmp);
+    return SkiaHelpers::transferDataToSkImage(btmp);
 }
 
 void TextureFrameBuffer::deleteTexture(QGL33c *gl) {

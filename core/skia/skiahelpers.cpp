@@ -47,3 +47,10 @@ void SkiaHelpers::saveImage(const QString &fileName,
                                       fileName.toStdString());
     } else RuntimeThrow("Could not open file " + fileName.toStdString());
 }
+
+sk_sp<SkImage> SkiaHelpers::transferDataToSkImage(SkBitmap &bitmap) {
+    bitmap.setImmutable();
+    const auto result = SkImage::MakeFromBitmap(bitmap);
+    bitmap.reset();
+    return result;
+}

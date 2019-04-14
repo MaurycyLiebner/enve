@@ -27,9 +27,7 @@ void CanvasRenderData::renderToImage() {
         clearPixmapEffects();
     }
 
-    bitmap.setImmutable();
-    fRenderedImage = SkImage::MakeFromBitmap(bitmap);
-    bitmap.reset();
+    fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
 }
 
 void CanvasRenderData::drawSk(SkCanvas * const canvas) {

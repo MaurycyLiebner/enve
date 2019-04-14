@@ -20,7 +20,7 @@ void CacheContainerTmpFileDataLoader::_processUpdate() {
         const qint64 readBytes = width*height*4*
                 static_cast<qint64>(sizeof(uchar));
         mTmpFile->read(scChar(btmp.getPixels()), readBytes);
-        mImage = SkImage::MakeFromBitmap(btmp);
+        mImage = SkiaHelpers::transferDataToSkImage(btmp);
 
         mTmpFile->close();
     }

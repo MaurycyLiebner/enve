@@ -51,7 +51,5 @@ void LinkCanvasRenderData::renderToImage() {
         clearPixmapEffects();
     }
 
-    fBitmapTMP.setImmutable();
-    fRenderedImage = SkImage::MakeFromBitmap(fBitmapTMP);
-    fBitmapTMP.reset();
+    fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
 }
