@@ -167,16 +167,16 @@ private:
         const auto swsContext = mOpenedVideo->fSwsContext;
         const qreal fps = mOpenedVideo->fFps;
 
-        if(mFrameId == 0)
+        const int64_t tsms0 = qFloor((mFrameId - fps) * 1000 / fps);
+        const int64_t tm0 = av_rescale(tsms0, videoStream->time_base.den,
+                                       videoStream->time_base.num)/1000;
+        if(tm0 <= 0)
             avformat_seek_file(formatContext, videoStreamIndex,
                                INT64_MIN, 0, 0, 0);
         else {
-            const int64_t tsms = qRound(mFrameId * 1000 / fps);
-            int64_t tm = av_rescale(tsms, videoStream->time_base.den,
-                                    videoStream->time_base.num)/1000;
-            const int64_t tsms0 = qRound((mFrameId - 2*fps)* 1000 / fps);
-            int64_t tm0 = av_rescale(tsms0, videoStream->time_base.den,
-                                     videoStream->time_base.num)/1000;
+            const int64_t tsms = qFloor((mFrameId - 0.5*fps) * 1000 / fps);
+            const int64_t tm = av_rescale(tsms, videoStream->time_base.den,
+                                          videoStream->time_base.num)/1000;
             if(avformat_seek_file(formatContext, videoStreamIndex, tm0,
                                   tm, tm, AVSEEK_FLAG_FRAME) < 0) {
                 qDebug() << "Failed to seek to " << mFrameId;
@@ -186,27 +186,25 @@ private:
         }
 
         avcodec_flush_buffers(codecContext);
-
         int64_t pts = 0;
         bool frameReceived = false;
         while(true) {
             if(av_read_frame(formatContext, packet) < 0) {
                 break;
             } else {
-                int response = 0;
                 if(packet->stream_index == videoStreamIndex) {
-                    response = avcodec_send_packet(codecContext, packet);
-                    if(response < 0) {
+                    const int sendRet = avcodec_send_packet(codecContext, packet);
+                    if(sendRet < 0) {
                         fprintf(stderr, "Sending packet to the decoder failed\n");
                         return;
                     }
-                    response = avcodec_receive_frame(codecContext, decodedFrame);
-                    if(response == AVERROR_EOF) {
+                    const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
+                    if(recRet == AVERROR_EOF) {
                         return;
-                    } else if(response == AVERROR(EAGAIN)) {
+                    } else if(recRet == AVERROR(EAGAIN)) {
                         av_packet_unref(packet);
                         continue;
-                    } else if(response < 0) {
+                    } else if(recRet < 0) {
                         fprintf(stderr, "Did not receive frame from the decoder\n");
                         return;
                     }
@@ -222,7 +220,9 @@ private:
             pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
             const int currFrame = qRound(pts/1000000.*fps);
             if(currFrame >= mFrameId) {
-                if(currFrame > mFrameId) qDebug() << QString::number(currFrame) + " instead of " + QString::number(mFrameId);
+                if(currFrame > mFrameId)
+                    qDebug() << QString::number(currFrame) +
+                                " instead of " + QString::number(mFrameId);
                 frameReceived = true;
                 break;
             }
@@ -248,7 +248,9 @@ private:
             sws_scale(swsContext, decodedFrame->data, decodedFrame->linesize,
                       0, codecContext->height, dstSk, linesizesSk);
 
+            bitmap.setImmutable();
             mLoadedFrame = SkImage::MakeFromBitmap(bitmap);
+            bitmap.reset();
         } else {
             mLoadedFrame.reset();
         }
