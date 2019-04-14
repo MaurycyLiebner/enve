@@ -907,7 +907,7 @@ BoxesGroup *CanvasWindow::getCurrentGroup() {
     return mCurrentCanvas->getCurrentBoxesGroup();
 }
 
-void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
+void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
     VideoEncoder::sStartEncoding(settings);
     if(VideoEncoder::sEncodingSuccessfulyStarted()) {
         mSavedCurrentFrame = getCurrentFrame();
@@ -1140,6 +1140,7 @@ void CanvasWindow::nextSaveOutputFrame() {
                 mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
             }
             VideoEncoder::sFinishEncoding();
+            TaskScheduler::sClearAllFinishedFuncs();
         };
         if(TaskScheduler::sAllQuedTasksFinished()) {
             allFinishedFunc();
@@ -1148,15 +1149,7 @@ void CanvasWindow::nextSaveOutputFrame() {
         }
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
-        auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(mCurrentRenderFrame);
-        if(range.fMax > mMaxRenderFrame) range.fMax = mMaxRenderFrame;
-        mCurrentRenderFrame = range.fMax + 1;
-        //mCurrentRenderFrame++;
-        changeCurrentFrameAction(mCurrentRenderFrame);
-        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
-            // mCurrentCanvas->setCurrentPreviewContainer(); !!!
-            nextSaveOutputFrame();
-        }
+        nextCurrentRenderFrame();
     }
 }
 

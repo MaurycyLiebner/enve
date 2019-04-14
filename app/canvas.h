@@ -463,11 +463,8 @@ public:
         return mCacheHandler;
     }
 
-    void setCurrentPreviewContainer(const int& relFrame,
-                                    const bool &frameEncoded = false);
-    void setCurrentPreviewContainer(
-            const stdsptr<ImageCacheContainer> &cont,
-            const bool &frameEncoded = false);
+    void setCurrentPreviewContainer(const int& relFrame);
+    void setCurrentPreviewContainer(const stdsptr<ImageCacheContainer> &cont);
     void setLoadingPreviewContainer(
             const stdsptr<ImageCacheContainer> &cont);
 

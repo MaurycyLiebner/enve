@@ -79,6 +79,7 @@ public:
     }
 
     void finishCurrentEncoding() {
+        if(!mCurrentlyEncoding) return;
         if(isActive()) mEncodingFinished = true;
         else finishEncodingSuccess();
     }

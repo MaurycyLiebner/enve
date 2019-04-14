@@ -379,23 +379,12 @@ void Canvas::setOutputRendering(const bool &bT) {
     mRenderingOutput = bT;
 }
 
-void Canvas::setCurrentPreviewContainer(const int& relFrame,
-                                        const bool &frameEncoded) {
+void Canvas::setCurrentPreviewContainer(const int& relFrame) {
     auto cont = mCacheHandler.getRenderContainerAtRelFrame(relFrame);
-    setCurrentPreviewContainer(
-                GetAsSPtr(cont, ImageCacheContainer),
-                frameEncoded);
+    setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
 }
 
-void Canvas::setCurrentPreviewContainer(
-        const stdsptr<ImageCacheContainer>& cont,
-        const bool &frameEncoded) {
-    if(mRenderingOutput && !frameEncoded) {
-        auto range = prp_getIdenticalRelFrameRange(cont->getRangeMin());
-        cont->setRangeMax(range.fMax);
-        VideoEncoder::sAddCacheContainerToEncoder(cont);
-        return;
-    }
+void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont) {
     setLoadingPreviewContainer(nullptr);
     if(cont == mCurrentPreviewContainer) return;
     if(mCurrentPreviewContainer) {
@@ -455,7 +444,12 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame
                 <ImageCacheContainer>(range, renderData->fRenderedImage);
     }
-    if(mRenderingPreview || mRenderingOutput || !mPreviewing) {
+    if(mRenderingOutput) {
+        VideoEncoder::sAddCacheContainerToEncoder(
+                    GetAsSPtr(cont, ImageCacheContainer));
+    } else if(mPreviewing) {
+        cont->setBlocked(true);
+    } else {
         auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
         bool newerSate = true;
         bool closerFrame = true;
@@ -477,11 +471,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             mCurrentPreviewContainerOutdated =
                     mDrawRenderContainer.isExpired();
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
-        } else if(mRenderingOutput || mRenderingPreview) {
-            cont->setBlocked(true);
         }
-    } else if(mPreviewing) {
-        cont->setBlocked(true);
     }
     callUpdateSchedulers();
 }

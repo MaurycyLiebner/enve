@@ -111,9 +111,10 @@ public:
         sInstance->setAllQuedTasksFinishedFunc(func);
     }
     static void sClearAllFinishedFuncs() {
-        sInstance->setAllQuedTasksFinishedFunc(nullptr);
-        sInstance->setAllQuedCPUTasksFinishedFunc(nullptr);
-        sInstance->setAllQuedHDDTasksFinishedFunc(nullptr);
+        sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
+        sSetAllQuedCPUTasksFinishedFunc(nullptr);
+        sSetAllQuedHDDTasksFinishedFunc(nullptr);
+        sSetAllQuedTasksFinishedFunc(nullptr);
     }
     static bool sAllQuedTasksFinished() {
         return sInstance->allQuedTasksFinished();

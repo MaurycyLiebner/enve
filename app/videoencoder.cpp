@@ -546,6 +546,7 @@ void VideoEncoder::finishEncodingSuccess() {
     mEncodingSuccesfull = true;
     finishEncodingNow();
     mEmitter.encodingFinished();
+    qDebug() << "FINISHED";
 }
 
 void VideoEncoder::finishEncodingNow() {
@@ -629,9 +630,8 @@ void VideoEncoder::beforeProcessingStarted() {
     _HDDTask::beforeProcessingStarted();
     _mCurrentContainerId = 0;
     _mCurrentContainerFrame = 0;
-    _mContainers.append(mNextContainers);
+    _mContainers.swap(mNextContainers);
     _mRenderRange = {mRenderSettings.fMinFrame, mRenderSettings.fMaxFrame};
-    mNextContainers.clear();
     if(!mCurrentlyEncoding) clearContainers();
 }
 
@@ -643,31 +643,27 @@ void VideoEncoder::afterProcessingFinished() {
                            cont->getRange().fMax << "}";
         if(firstT) {
             auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
-            currCanvas->setCurrentPreviewContainer(cont, true);
+            currCanvas->setCurrentPreviewContainer(cont);
             firstT = false;
         } else {
             cont->setBlocked(false);
         }
-        _mContainers.removeAt(i);
     }
-    if(mEncodingFinished || mInterruptEncoding ||
-       mUpdateException || (!mEncodeAudio && !mEncodeVideo)) {
-        if(mInterruptEncoding) {
-            mRenderInstanceSettings->setCurrentState(
-                        RenderInstanceSettings::NONE);
-            interrupEncoding();
-            mInterruptEncoding = false;
-        } else if(mUpdateException) {
-            gPrintExceptionCritical(mUpdateException);
-            mRenderInstanceSettings->setCurrentState(
-                        RenderInstanceSettings::ERROR, "Error");
-            finishEncodingNow();
-            mEmitter.encodingFailed();
-        } else {
-            qDebug() << "FINISHED";
-            finishEncodingSuccess();
-        }
-    }
+    _mContainers.clear();
+
+    if(mInterruptEncoding) {
+        mRenderInstanceSettings->setCurrentState(
+                    RenderInstanceSettings::NONE);
+        interrupEncoding();
+        mInterruptEncoding = false;
+    } else if(mUpdateException) {
+        gPrintExceptionCritical(mUpdateException);
+        mRenderInstanceSettings->setCurrentState(
+                    RenderInstanceSettings::ERROR, "Error");
+        finishEncodingNow();
+        mEmitter.encodingFailed();
+    } else if(mEncodingFinished) finishEncodingSuccess();
+    else if(!mNextContainers.isEmpty()) scheduleTask();
 }
 
 VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {

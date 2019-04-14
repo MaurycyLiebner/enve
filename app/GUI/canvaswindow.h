@@ -300,7 +300,7 @@ public slots:
     void pausePreview();
     void resumePreview();
     void renderPreview();
-    void renderFromSettings(RenderInstanceSettings *settings);
+    void renderFromSettings(RenderInstanceSettings * const settings);
 
     void importFile();
 
