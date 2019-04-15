@@ -1,7 +1,6 @@
 #ifndef BOXPATHPOINT_H
 #define BOXPATHPOINT_H
 #include "animatedpoint.h"
-class BoundingBox;
 class BoxTransformAnimator;
 class BoxPathPoint : public AnimatedPoint {
     friend class StdSelfRef;
@@ -17,7 +16,6 @@ public:
     void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
 private:
     BoxTransformAnimator * const mBoxTransform_cv;
-    QPointF mSavedAbsPos;
 };
 
 #endif // BOXPATHPOINT_H

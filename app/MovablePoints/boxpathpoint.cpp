@@ -1,5 +1,4 @@
 #include "boxpathpoint.h"
-#include "Boxes/boundingbox.h"
 #include "pointhelpers.h"
 #include "Animators/transformanimator.h"
 
@@ -9,22 +8,17 @@ BoxPathPoint::BoxPathPoint(QPointFAnimator * const associatedAnimator,
     mBoxTransform_cv(boxTrans) {}
 
 void BoxPathPoint::setRelativePos(const QPointF &relPos) {
-    const auto boxTrans = GetAsPtr(mBoxTransform_cv, BoxTransformAnimator);
-    const auto parentBox = boxTrans->getParentBox();
-    parentBox->setPivotAutoAdjust(false);
-    parentBox->setPivotRelPos(relPos);
+    mBoxTransform_cv->setPivotAutoAdjust(false);
+    mBoxTransform_cv->setPivotWithoutChangingTransformation(relPos);
 }
 
 void BoxPathPoint::startTransform() {
-    mSavedAbsPos = getAbsolutePos();
     MovablePoint::startTransform();
-    const auto boxTrans = GetAsPtr(mBoxTransform_cv, BoxTransformAnimator);
-    boxTrans->startPivotTransform();
+    mBoxTransform_cv->startPivotTransform();
 }
 
 void BoxPathPoint::finishTransform() {
-    const auto boxTrans = GetAsPtr(mBoxTransform_cv, BoxTransformAnimator);
-    boxTrans->finishPivotTransform();
+    mBoxTransform_cv->finishPivotTransform();
 }
 
 void BoxPathPoint::drawSk(SkCanvas * const canvas,

@@ -4,7 +4,6 @@
 #include "Animators/complexanimator.h"
 #include "skia/skiaincludes.h"
 
-class BoundingBox;
 class TransformUpdater;
 class BoxPathPoint;
 class MovablePoint;
@@ -101,7 +100,7 @@ signals:
 class BoxTransformAnimator : public BasicTransformAnimator {
     friend class SelfRef;
 protected:
-    BoxTransformAnimator(BoundingBox * const parent);
+    BoxTransformAnimator();
 public:
     bool SWT_isBoxTransformAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
@@ -147,12 +146,15 @@ public:
         return mOpacityAnimator.get();
     }
 
-    BoundingBox *getParentBox() {
-        return mParentBox_k;
+    void setPivotAutoAdjust(const bool& autoAdjust) {
+        mPivotAutoAdjust = autoAdjust;
+    }
+
+    bool getPivotAutoadjust() const {
+        return mPivotAutoAdjust;
     }
 private:
     bool mPivotAutoAdjust = true;
-    BoundingBox * const mParentBox_k;
 
     stdsptr<BoxPathPoint> mPivotPoint;
     qsptr<QPointFAnimator> mPivotAnimator;

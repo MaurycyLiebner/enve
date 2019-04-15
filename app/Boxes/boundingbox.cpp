@@ -33,7 +33,7 @@ QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator("box"),
     mDocumentId(sNextDocumentId++), mType(type),
-    mTransformAnimator(SPtrCreate(BoxTransformAnimator)(this)),
+    mTransformAnimator(SPtrCreate(BoxTransformAnimator)()),
     mEffectsAnimators(SPtrCreate(EffectAnimators)(this)),
     mGPUEffectsAnimators(SPtrCreate(GPUEffectAnimators)(this)) {
     sDocumentBoxes << this;
@@ -329,10 +329,6 @@ void BoundingBox::setPivotRelPos(const QPointF &relPos) {
     requestGlobalPivotUpdateIfSelected();
 }
 
-void BoundingBox::setPivotAutoAdjust(const bool &pivotAutoAdjust) {
-    mPivotAutoAdjust = pivotAutoAdjust;
-}
-
 void BoundingBox::startPivotTransform() {
     mTransformAnimator->startPivotTransform();
 }
@@ -362,7 +358,8 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath.reset();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(mPivotAutoAdjust && !mTransformAnimator->posOrPivotRecording()) {
+    if(mTransformAnimator->getPivotAutoadjust() &&
+       !mTransformAnimator->posOrPivotRecording()) {
         setPivotRelPos(renderData->getCenterPosition());
     }
 }

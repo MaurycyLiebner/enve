@@ -8,9 +8,10 @@
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/effectanimators.h"
 #include "typemenu.h"
+#include "Animators/transformanimator.h"
 
 TextBox::TextBox() : PathBox(TYPE_TEXT) {
-    mPivotAutoAdjust = false;
+    mTransformAnimator->setPivotAutoAdjust(false);
     setName("text");
 
     mFillSettings->setPaintType(PaintType::FLATPAINT);

@@ -408,13 +408,11 @@ public:
 
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
-    void setPivotAutoAdjust(const bool &pivotAutoAdjust);
     QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
 protected:
     bool mSelected = false;
     bool mInVisibleRange = true;
-    bool mPivotAutoAdjust = true;
     bool mVisible = true;
     bool mLocked = false;
     uint mStateId = 0;

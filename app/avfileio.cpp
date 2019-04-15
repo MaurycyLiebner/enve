@@ -424,13 +424,20 @@ void BoxTransformAnimator::writeProperty(QIODevice * const target) const {
     BasicTransformAnimator::writeProperty(target);
     mOpacityAnimator->writeProperty(target);
     mPivotAnimator->writeProperty(target);
+    target->write(rcConstChar(&mPivotAutoAdjust), sizeof(bool));
 }
 
 void BoxTransformAnimator::readProperty(QIODevice *target) {
+    // pivot will be read anyway, so temporarly disable adjusting
+    mPivotAutoAdjust = false;
     BasicTransformAnimator::readProperty(target);
     mOpacityAnimator->readProperty(target);
     mPivotAnimator->readProperty(target);
+    bool pivotAutoAdjust;
+    target->read(rcChar(&pivotAutoAdjust), sizeof(bool));
+
     updateRelativeTransform(Animator::USER_CHANGE);
+    mPivotAutoAdjust = pivotAutoAdjust;
 }
 
 void GradientPoints::writeProperty(QIODevice * const target) const {
@@ -573,7 +580,6 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
     target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
     gWrite(target, prp_mName);
     target->write(rcConstChar(&mWriteId), sizeof(int));
-    target->write(rcConstChar(&mPivotAutoAdjust), sizeof(bool));
     target->write(rcConstChar(&mVisible), sizeof(bool));
     target->write(rcConstChar(&mLocked), sizeof(bool));
     target->write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
@@ -588,11 +594,8 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
 }
 
 void BoundingBox::readBoundingBox(QIODevice *target) {
-    mPivotAutoAdjust = false; // pivot will be read anyway, so temporarly disable adjusting
     gRead(target, prp_mName);
     target->read(rcChar(&mReadId), sizeof(int));
-    bool pivotAutoAdjust;
-    target->read(rcChar(&pivotAutoAdjust), sizeof(bool));
     target->read(rcChar(&mVisible), sizeof(bool));
     target->read(rcChar(&mLocked), sizeof(bool));
     target->read(rcChar(&mBlendModeSk), sizeof(SkBlendMode));
@@ -609,7 +612,6 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     mEffectsAnimators->readProperty(target);
 
     if(hasDurRect) anim_shiftAllKeys(prp_getFrameShift());
-    mPivotAutoAdjust = pivotAutoAdjust;
 
     BoundingBox::sAddReadBox(this);
 }

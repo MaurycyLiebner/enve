@@ -4,11 +4,9 @@
 #include "PropertyUpdaters/transformupdater.h"
 #include "qrealanimator.h"
 #include "transformanimator.h"
-#include "Boxes/boundingbox.h"
 #include "Animators/qpointfanimator.h"
 #include "MovablePoints/animatedpoint.h"
 #include "skia/skqtconversions.h"
-#include "PropertyUpdaters/boxpathpointupdater.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     ComplexAnimator("transformation") {
@@ -246,8 +244,46 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
     mPosAnimator->setBaseValue(QPointF(matrix.dx(), matrix.dy()));
 }
 
-BoxTransformAnimator::BoxTransformAnimator(BoundingBox * const parent) :
-    BasicTransformAnimator(), mParentBox_k(parent) {
+QMatrix BasicTransformAnimator::getParentTotalTransformAtRelFrame(
+        const qreal &relFrame) {
+    if(mParentTransformAnimator.data() == nullptr) {
+        return QMatrix();
+    } else {
+        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        const qreal parentRelFrame =
+                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
+        return mParentTransformAnimator->
+                getTotalTransformAtRelFrameF(parentRelFrame);
+    }
+}
+
+QPointFAnimator *BasicTransformAnimator::getPosAnimator() {
+    return mPosAnimator.get();
+}
+
+QPointFAnimator *BasicTransformAnimator::getScaleAnimator() {
+    return mScaleAnimator.get();
+}
+
+QrealAnimator *BasicTransformAnimator::getRotAnimator() {
+    return mRotAnimator.get();
+}
+
+QMatrix BasicTransformAnimator::getTotalTransformAtRelFrameF(
+        const qreal &relFrame) {
+    if(mParentTransformAnimator.data()) {
+        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        const qreal parentRelFrame =
+                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
+        return getRelativeTransformAtRelFrame(relFrame)*
+                mParentTransformAnimator->
+                    getTotalTransformAtRelFrameF(parentRelFrame);
+    } else {
+        return getRelativeTransformAtRelFrame(relFrame);
+    }
+}
+
+BoxTransformAnimator::BoxTransformAnimator() {
     mShearAnimator = SPtrCreate(QPointFAnimator)("shear");
     mShearAnimator->setBaseValue(QPointF(0, 0));
 
@@ -398,43 +434,4 @@ QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrame(
 
     matrix.translate(-pivotX, -pivotY);
     return matrix;
-}
-
-QMatrix BasicTransformAnimator::getParentTotalTransformAtRelFrame(
-        const qreal &relFrame) {
-    if(mParentTransformAnimator.data() == nullptr) {
-        return QMatrix();
-    } else {
-        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        const qreal parentRelFrame =
-                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
-        return mParentTransformAnimator->
-                getTotalTransformAtRelFrameF(parentRelFrame);
-    }
-}
-
-QPointFAnimator *BasicTransformAnimator::getPosAnimator() {
-    return mPosAnimator.get();
-}
-
-QPointFAnimator *BasicTransformAnimator::getScaleAnimator() {
-    return mScaleAnimator.get();
-}
-
-QrealAnimator *BasicTransformAnimator::getRotAnimator() {
-    return mRotAnimator.get();
-}
-
-QMatrix BasicTransformAnimator::getTotalTransformAtRelFrameF(
-        const qreal &relFrame) {
-    if(mParentTransformAnimator.data()) {
-        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        const qreal parentRelFrame =
-                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
-        return getRelativeTransformAtRelFrame(relFrame)*
-                mParentTransformAnimator->
-                    getTotalTransformAtRelFrameF(parentRelFrame);
-    } else {
-        return getRelativeTransformAtRelFrame(relFrame);
-    }
 }
