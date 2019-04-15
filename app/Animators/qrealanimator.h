@@ -37,8 +37,8 @@ public:
 
     void graph_updateKeyPathWithId(const int &id);
 
-    ValueRange graph_getMinAndMaxValues() const;
-    ValueRange graph_getMinAndMaxValuesBetweenFrames(
+    qValueRange graph_getMinAndMaxValues() const;
+    qValueRange graph_getMinAndMaxValuesBetweenFrames(
             const int &startFrame, const int &endFrame) const;
 
     qreal graph_clampGraphValue(const qreal &value);

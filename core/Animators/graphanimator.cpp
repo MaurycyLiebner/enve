@@ -216,7 +216,7 @@ QrealPoint *GraphAnimator::graph_getPointAt(const qreal &value,
     return point;
 }
 
-ValueRange GraphAnimator::graph_getMinAndMaxValues() const {
+qValueRange GraphAnimator::graph_getMinAndMaxValues() const {
     if(anim_mKeys.isEmpty()) return {0, 0};
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
@@ -234,7 +234,7 @@ ValueRange GraphAnimator::graph_getMinAndMaxValues() const {
     return {minVal - margin, maxVal + margin};
 }
 
-ValueRange GraphAnimator::graph_getMinAndMaxValuesBetweenFrames(
+qValueRange GraphAnimator::graph_getMinAndMaxValuesBetweenFrames(
         const int &startFrame, const int &endFrame) const {
     if(!anim_mKeys.isEmpty()) {
         qreal minVal = 100000.;

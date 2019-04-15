@@ -120,6 +120,6 @@ void SmartPath::setPath(const SkPath &path) {
     mNodesList.setPath(path);
 }
 
-ValueRange SmartPath::dissolvedTRange(const int &nodeId) {
+qValueRange SmartPath::dissolvedTRange(const int &nodeId) {
     return {mNodesList.prevT(nodeId), mNodesList.nextT(nodeId)};
 }

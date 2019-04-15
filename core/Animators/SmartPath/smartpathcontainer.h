@@ -176,7 +176,7 @@ public:
         return -1;
     }
 
-    ValueRange dissolvedTRange(const int& nodeId);
+    qValueRange dissolvedTRange(const int& nodeId);
 
     void updateDissolvedNodePosition(const int& nodeId) {
         mNodesList.updateDissolvedNodePosition(nodeId);

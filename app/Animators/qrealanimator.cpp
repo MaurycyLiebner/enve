@@ -323,7 +323,7 @@ void QrealAnimator::graph_updateKeyPathWithId(const int& id) {
     }
 }
 
-ValueRange QrealAnimator::graph_getMinAndMaxValues() const {
+qValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     if(mGraphMinMaxValuesFixed) {
         return {mMinPossibleVal, mMaxPossibleVal};
     }
@@ -347,7 +347,7 @@ ValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     return {minVal - mPrefferedValueStep, maxVal + mPrefferedValueStep};
 }
 
-ValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
+qValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
         const int &startFrame, const int &endFrame) const {
     if(anim_mKeys.isEmpty()) return {mCurrentBaseValue, mCurrentBaseValue};
     bool first = true;

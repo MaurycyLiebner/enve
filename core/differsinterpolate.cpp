@@ -34,3 +34,10 @@ void gInterpolate(const SmartPath &path1, const SmartPath &path2,
                   const qreal &path2Weight, SmartPath &target) {
     SmartPath::sInterpolate(path1, path2, path2Weight, target);
 }
+
+#include "Animators/polylineanimator.h"
+template <uchar PROPS>
+void gInterpolate(const Polyline<PROPS> &path1, const Polyline<PROPS> &path2,
+                  const qreal &path2Weight, Polyline<PROPS> &target) {
+
+}

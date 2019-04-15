@@ -16,8 +16,8 @@ public:
     virtual void graph_getValueConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minMoveValue, qreal &maxMoveValue) const = 0;
-    virtual ValueRange graph_getMinAndMaxValues() const;
-    virtual ValueRange graph_getMinAndMaxValuesBetweenFrames(
+    virtual qValueRange graph_getMinAndMaxValues() const;
+    virtual qValueRange graph_getMinAndMaxValuesBetweenFrames(
             const int &startFrame, const int &endFrame) const;
     virtual qreal graph_clampGraphValue(const qreal &value) { return value; }
     virtual void graph_updateKeyPathWithId(const int& id);
