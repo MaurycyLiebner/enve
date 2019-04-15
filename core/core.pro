@@ -108,7 +108,8 @@ SOURCES += \
     Animators/SmartPath/smartpathkey.cpp \
     Animators/interpolationkeyt.cpp \
     Properties/boolproperty.cpp \
-    PathEffects/patheffect.cpp
+    PathEffects/patheffect.cpp \
+    Animators/polylineanimator.cpp
 
 HEADERS += \
         core_global.h \ 
@@ -176,7 +177,8 @@ HEADERS += \
     Animators/SmartPath/smartpathkey.h \
     Animators/interpolationkeyt.h \
     Properties/boolproperty.h \
-    PathEffects/patheffect.h
+    PathEffects/patheffect.h \
+    Animators/polylineanimator.h
 
 unix {
     target.path = /usr/lib

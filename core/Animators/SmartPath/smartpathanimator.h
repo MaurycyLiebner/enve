@@ -8,6 +8,10 @@
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
     Q_OBJECT
+protected:
+    SmartPathAnimator();
+    SmartPathAnimator(const SkPath& path);
+    SmartPathAnimator(const SmartPath& baseValue);
 public:
     bool SWT_isSmartPathAnimator() const { return true; }
 
@@ -357,19 +361,15 @@ public:
 signals:
     void pathChangedAfterFrameChange();
 protected:
-    SmartPathAnimator();
-    SmartPathAnimator(const SkPath& path);
-    SmartPathAnimator(const SmartPath& baseValue);
-
     SmartPath& getBaseValue() {
         return mBaseValue;
     }
 private:
     void deepCopySmartPathFromRelFrame(const int& relFrame,
-                                 SmartPathKey * const prevKey,
-                                 SmartPathKey * const nextKey,
-                                 SmartPathKey * const keyAtFrame,
-                                 SmartPath &result) const {
+                                       SmartPathKey * const prevKey,
+                                       SmartPathKey * const nextKey,
+                                       SmartPathKey * const keyAtFrame,
+                                       SmartPath &result) const {
         if(keyAtFrame) {
             result.deepCopy(keyAtFrame->getValue());
         } else if(prevKey && nextKey) {
