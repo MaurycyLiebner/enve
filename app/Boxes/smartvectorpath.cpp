@@ -66,12 +66,10 @@ NormalSegment SmartVectorPath::getNormalSegment(
 }
 
 void SmartVectorPath::drawCanvasControls(SkCanvas * const canvas,
-                              const CanvasMode &currentCanvasMode,
-                              const SkScalar &invScale) {
-    mHandler.drawPoints(canvas,
-                        currentCanvasMode,
-                        invScale,
-                        toSkMatrix(getTotalTransform()));
+                                         const CanvasMode &currentCanvasMode,
+                                         const SkScalar &invScale) {
+    mHandler.drawPoints(canvas, currentCanvasMode,
+                        invScale, toSkMatrix(getTotalTransform()));
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
         mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);

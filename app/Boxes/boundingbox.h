@@ -455,6 +455,7 @@ private:
             BoundingBoxRenderData * const renderData);
     FrameRange getVisibleAbsFrameRange() const;
     void cancelWaitingTasks();
+    void afterTotalTransformChanged(const UpdateReason &reason);
 signals:
     void nameChanged(QString);
     void scheduledUpdate();

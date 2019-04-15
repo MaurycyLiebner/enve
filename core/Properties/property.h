@@ -11,6 +11,7 @@ class Key;
 class QPainter;
 class PropertyUpdater;
 class UndoRedoStack;
+enum CanvasMode : short;
 
 //! @brief Use only as base class for PropertyMimeData.
 class InternalMimeData : public QMimeData {
@@ -76,6 +77,14 @@ public:
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(absFrameRange);
         Q_UNUSED(rowHeight);
+    }
+
+    virtual void drawCanvasControls(SkCanvas * const canvas,
+                                    const CanvasMode &currentCanvasMode,
+                                    const SkScalar &invScale) {
+        Q_UNUSED(canvas);
+        Q_UNUSED(currentCanvasMode);
+        Q_UNUSED(invScale);
     }
 
     virtual int prp_getFrameShift() const;

@@ -55,6 +55,10 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
                 SPtrCreate(PixmapEffectUpdater)(this));
     ca_prependChildAnimator(mEffectsAnimators.data(), mGPUEffectsAnimators);
     mGPUEffectsAnimators->SWT_hide();
+
+    connect(mTransformAnimator.get(),
+            &BoxTransformAnimator::totalTransformChanged,
+            this, &BoundingBox::afterTotalTransformChanged);
 }
 
 BoundingBox::~BoundingBox() {
@@ -304,6 +308,12 @@ void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
     mTransformAnimator->updateTotalTransform(Animator::USER_CHANGE);
+}
+
+void BoundingBox::afterTotalTransformChanged(const UpdateReason &reason) {
+    updateDrawRenderContainerTransform();
+    scheduleUpdate(reason);
+    requestGlobalPivotUpdateIfSelected();
 }
 
 void BoundingBox::clearParent() {
@@ -1068,8 +1078,7 @@ void BoundingBox::drawTimelineControls(QPainter * const p,
         p->restore();
     }
 
-    Animator::drawTimelineControls(p, pixelsPerFrame,
-                                   absFrameRange, rowHeight);
+    Animator::drawTimelineControls(p, pixelsPerFrame, absFrameRange, rowHeight);
 }
 
 void BoundingBox::addPathEffect(const qsptr<PathEffect> &) {}

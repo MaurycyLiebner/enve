@@ -93,9 +93,9 @@ protected:
     qsptr<QPointFAnimator> mScaleAnimator;
     qsptr<QrealAnimator> mRotAnimator;
 public slots:
-    virtual void updateTotalTransform(const UpdateReason &reason);
+    void updateTotalTransform(const UpdateReason &reason);
 signals:
-    void TotalTransformChanged(const UpdateReason &);
+    void totalTransformChanged(const UpdateReason &);
 };
 
 class BoxTransformAnimator : public BasicTransformAnimator {
@@ -106,7 +106,6 @@ public:
     bool SWT_isBoxTransformAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
-    void updateTotalTransform(const UpdateReason &reason);
 
     void reset();
     QMatrix getCurrentTransformationMatrix();

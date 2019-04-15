@@ -206,7 +206,7 @@ void BasicTransformAnimator::updateTotalTransform(const UpdateReason &reason) {
         mTotalTransform = mRelTransform *
                              mParentTransformAnimator->getTotalTransform();
     }
-    emit TotalTransformChanged(reason);
+    emit totalTransformChanged(reason);
 }
 
 const QMatrix &BasicTransformAnimator::getTotalTransform() const {
@@ -221,10 +221,10 @@ void BasicTransformAnimator::setParentTransformAnimator(
         BasicTransformAnimator* parent) {
     if(mParentTransformAnimator)
         disconnect(mParentTransformAnimator,
-                   &BasicTransformAnimator::TotalTransformChanged,
+                   &BasicTransformAnimator::totalTransformChanged,
                    this, &BasicTransformAnimator::updateTotalTransform);
     mParentTransformAnimator = parent;
-    if(parent) connect(parent, &BasicTransformAnimator::TotalTransformChanged,
+    if(parent) connect(parent, &BasicTransformAnimator::totalTransformChanged,
                        this, &BasicTransformAnimator::updateTotalTransform);
     updateTotalTransform(Animator::USER_CHANGE);
 }
@@ -347,14 +347,6 @@ bool BoxTransformAnimator::rotOrScaleOrPivotRecording() const {
     return mRotAnimator->anim_isDescendantRecording() ||
            mScaleAnimator->anim_isDescendantRecording() ||
            mPivotAnimator->anim_isDescendantRecording();
-}
-
-void BoxTransformAnimator::updateTotalTransform(const UpdateReason &reason) {
-    BasicTransformAnimator::updateTotalTransform(reason);
-
-    mParentBox_k->updateDrawRenderContainerTransform();
-    mParentBox_k->scheduleUpdate(reason);
-    mParentBox_k->requestGlobalPivotUpdateIfSelected();
 }
 
 qreal BoxTransformAnimator::getPivotX() {
