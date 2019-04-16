@@ -17,6 +17,7 @@
 #include "linkbox.h"
 #include "PropertyUpdaters/transformupdater.h"
 #include "PropertyUpdaters/boxpathpointupdater.h"
+#include "Animators/qpointfanimator.h"
 
 int BoundingBox::sNextDocumentId;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;

@@ -5,6 +5,7 @@ class MainWindow;
 #include "singlewidgettarget.h"
 #include "glhelpers.h"
 #include "framerange.h"
+#include "MovablePoints/pointshandler.h"
 
 class ComplexAnimator;
 class Key;
@@ -179,6 +180,10 @@ public:
 protected:
     void prp_currentFrameChanged();
     void prp_callFinishUpdater();
+
+    void setPointsHandler(const stdsptr<PointsHandler>& handler) {
+        mPointsHandler = handler;
+    }
 signals:
     void prp_updateWholeInfluenceRange();
     void prp_absFrameRangeChanged(const FrameRange &range);
@@ -194,6 +199,7 @@ protected:
     QString prp_mName = "";
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     QPointer<Property> mParent;
+    stdsptr<PointsHandler> mPointsHandler;
 };
 
 #endif // PROPERTY_H

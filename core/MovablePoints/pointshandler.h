@@ -3,6 +3,8 @@
 #include "movablepoint.h"
 #include "smartPointers/stdselfref.h"
 
+enum CanvasMode : short;
+
 class PointsHandler : public StdSelfRef {
     friend class StdSelfRef;
 protected:
