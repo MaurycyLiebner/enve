@@ -11,12 +11,23 @@ class QPointFAnimator;
 
 class BasicTransformAnimator : public ComplexAnimator {
     Q_OBJECT
-public:
+    friend class SeflRef;
+protected:
     BasicTransformAnimator();
+public:
+    virtual void reset();
+    virtual QMatrix getCurrentTransform();
+    virtual QMatrix getRelativeTransform(const qreal &relFrame);
+    virtual QMatrix getTotalTransformAtRelFrameF(const qreal &relFrame);
+
+    bool SWT_isBasicTransformAnimator() const;
+
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
+
     void resetScale();
     void resetTranslation();
     void resetRotation();
-    virtual void reset();
 
     void setScale(const qreal &sx, const qreal &sy);
     void setPosition(const qreal &x, const qreal &y);
@@ -39,8 +50,6 @@ public:
     void scale(const qreal &sx, const qreal &sy);
     void moveRelativeToSavedValue(const qreal &dX,
                                   const qreal &dY);
-    virtual QMatrix getCurrentTransformationMatrix();
-    virtual QMatrix getRelativeTransformAtRelFrame(const qreal &relFrame);
 
     qreal dx();
     qreal dy();
@@ -69,13 +78,7 @@ public:
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
 
-    bool SWT_isBasicTransformAnimator() const;
-
-    virtual QMatrix getTotalTransformAtRelFrameF(const qreal &relFrame);
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
-
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
 
     QPointFAnimator *getPosAnimator();
     QPointFAnimator *getScaleAnimator();
@@ -102,16 +105,16 @@ class BoxTransformAnimator : public BasicTransformAnimator {
 protected:
     BoxTransformAnimator();
 public:
+    void reset();
+    QMatrix getCurrentTransform();
+    QMatrix getRelativeTransform(const qreal &relFrame);
+
     bool SWT_isBoxTransformAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    void reset();
-    QMatrix getCurrentTransformationMatrix();
-    QMatrix getRelativeTransformAtRelFrame(const qreal &relFrame);
-
     void resetPivot();
-    void setPivotWithoutChangingTransformation(const QPointF &point);
+    void setPivotFixedTransform(const QPointF &point);
 
     QPointF getPivot();
     qreal getPivotX();
@@ -129,7 +132,7 @@ public:
     void finishPivotTransform();
     QPointF getPivotAbs();
 
-    qreal getOpacityAtRelFrameF(const qreal &relFrame);
+    qreal getOpacity(const qreal &relFrame);
 
     bool posOrPivotRecording() const;
     bool rotOrScaleOrPivotRecording() const;

@@ -112,7 +112,7 @@ QPointF BoundingBox::getRelCenterPosition() {
 }
 
 void BoundingBox::centerPivotPosition() {
-    mTransformAnimator->setPivotWithoutChangingTransformation(
+    mTransformAnimator->setPivotFixedTransform(
                 getRelCenterPosition());
 }
 
@@ -325,7 +325,7 @@ BoxesGroup *BoundingBox::getParentGroup() const {
 }
 
 void BoundingBox::setPivotRelPos(const QPointF &relPos) {
-    mTransformAnimator->setPivotWithoutChangingTransformation(relPos);
+    mTransformAnimator->setPivotFixedTransform(relPos);
     requestGlobalPivotUpdateIfSelected();
 }
 
@@ -698,7 +698,7 @@ void BoundingBox::setupRenderData(const qreal &relFrame,
             getParentTotalTransformAtRelFrame(relFrame);
     data->fTransform = data->fRelTransform*data->fParentTransform;
 
-    data->fOpacity = mTransformAnimator->getOpacityAtRelFrameF(relFrame);
+    data->fOpacity = mTransformAnimator->getOpacity(relFrame);
     data->fResolution = getParentCanvas()->getResolutionFraction();
     const bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
     if(effectsVisible) {
@@ -991,7 +991,7 @@ void BoundingBox::shiftAll(const int &shift) {
 }
 
 QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {
-    return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
+    return mTransformAnimator->getRelativeTransform(relFrame);
 }
 
 int BoundingBox::prp_getRelFrameShift() const {

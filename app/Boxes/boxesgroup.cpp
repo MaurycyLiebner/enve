@@ -299,7 +299,7 @@ QRectF BoxesGroup::getRelBoundingRect(const qreal &relFrame) {
             childPath.transform(
                         toSkMatrix(
                             child->getTransformAnimator()->
-                            getRelativeTransformAtRelFrame(childRelFrame)) );
+                            getRelativeTransform(childRelFrame)) );
             boundingPaths.addPath(childPath);
         }
     }

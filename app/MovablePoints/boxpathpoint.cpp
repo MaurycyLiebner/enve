@@ -9,7 +9,7 @@ BoxPathPoint::BoxPathPoint(QPointFAnimator * const associatedAnimator,
 
 void BoxPathPoint::setRelativePos(const QPointF &relPos) {
     mBoxTransform_cv->setPivotAutoAdjust(false);
-    mBoxTransform_cv->setPivotWithoutChangingTransformation(relPos);
+    mBoxTransform_cv->setPivotFixedTransform(relPos);
 }
 
 void BoxPathPoint::startTransform() {

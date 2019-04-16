@@ -1,5 +1,3 @@
-#include "undoredo.h"
-#include <QDebug>
 #include "MovablePoints/boxpathpoint.h"
 #include "PropertyUpdaters/transformupdater.h"
 #include "qrealanimator.h"
@@ -140,7 +138,7 @@ SkPoint BasicTransformAnimator::mapFromParent(const SkPoint &parentRelPos) const
     return toSkPoint(mapFromParent(toQPointF(parentRelPos)));
 }
 
-QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
+QMatrix BasicTransformAnimator::getCurrentTransform() {
     QMatrix matrix;
     matrix.translate(mPosAnimator->getEffectiveXValue(),
                      mPosAnimator->getEffectiveYValue());
@@ -151,7 +149,7 @@ QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
     return matrix;
 }
 
-QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrame(
+QMatrix BasicTransformAnimator::getRelativeTransform(
                                     const qreal &relFrame) {
     QMatrix matrix;
     matrix.translate(mPosAnimator->getEffectiveXValueAtRelFrame(relFrame),
@@ -193,7 +191,7 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
 }
 
 void BasicTransformAnimator::updateRelativeTransform(const UpdateReason &reason) {
-    mRelTransform = getCurrentTransformationMatrix();
+    mRelTransform = getCurrentTransform();
     updateTotalTransform(reason);
 }
 
@@ -275,11 +273,11 @@ QMatrix BasicTransformAnimator::getTotalTransformAtRelFrameF(
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         const qreal parentRelFrame =
                 mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
-        return getRelativeTransformAtRelFrame(relFrame)*
+        return getRelativeTransform(relFrame)*
                 mParentTransformAnimator->
                     getTotalTransformAtRelFrameF(parentRelFrame);
     } else {
-        return getRelativeTransformAtRelFrame(relFrame);
+        return getRelativeTransform(relFrame);
     }
 }
 
@@ -336,9 +334,9 @@ void BoxTransformAnimator::finishPivotTransform() {
     mPivotAnimator->prp_finishTransform();
 }
 
-void BoxTransformAnimator::setPivotWithoutChangingTransformation(
+void BoxTransformAnimator::setPivotFixedTransform(
         const QPointF &point) {
-    const QMatrix currentMatrix = getCurrentTransformationMatrix();
+    const QMatrix currentMatrix = getCurrentTransform();
     QMatrix futureMatrix;
     futureMatrix.translate(point.x() + mPosAnimator->getEffectiveXValue(),
                            point.y() + mPosAnimator->getEffectiveYValue());
@@ -370,7 +368,7 @@ QPointF BoxTransformAnimator::getPivotAbs() {
     return mPivotPoint->getAbsolutePos();
 }
 
-qreal BoxTransformAnimator::getOpacityAtRelFrameF(const qreal &relFrame) {
+qreal BoxTransformAnimator::getOpacity(const qreal &relFrame) {
     return mOpacityAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
@@ -401,7 +399,7 @@ qreal BoxTransformAnimator::getOpacity() {
     return mOpacityAnimator->getCurrentBaseValue();
 }
 
-QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
+QMatrix BoxTransformAnimator::getCurrentTransform() {
     const qreal pivotX = mPivotAnimator->getEffectiveXValue();
     const qreal pivotY = mPivotAnimator->getEffectiveYValue();
     QMatrix matrix;
@@ -418,7 +416,7 @@ QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
     return matrix;
 }
 
-QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrame(
+QMatrix BoxTransformAnimator::getRelativeTransform(
                                     const qreal &relFrame) {
     const qreal pivotX = mPivotAnimator->getEffectiveXValueAtRelFrame(relFrame);
     const qreal pivotY = mPivotAnimator->getEffectiveYValueAtRelFrame(relFrame);
