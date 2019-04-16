@@ -1,7 +1,7 @@
 ﻿#ifndef PAINTSETTINGS_H
 #define PAINTSETTINGS_H
 
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 #include "coloranimator.h"
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"

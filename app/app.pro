@@ -67,17 +67,14 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     svgimporter.cpp \
-    Animators/transformanimator.cpp \
     Animators/boolanimator.cpp \
     Animators/coloranimator.cpp \
     Animators/qstringanimator.cpp \
-    Animators/qpointfanimator.cpp \
     Boxes/circle.cpp \
     Boxes/textbox.cpp \
     Boxes/rectangle.cpp \
     Boxes/imagebox.cpp \
     Animators/intanimator.cpp \
-    Animators/qrealanimator.cpp \
     Boxes/pathbox.cpp \
     Boxes/boundingbox.cpp \
     Boxes/boxesgroup.cpp \
@@ -132,10 +129,6 @@ SOURCES += main.cpp\
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
-    Properties/comboboxproperty.cpp \
-    Animators/randomqrealgenerator.cpp \
-    Animators/qrealvalueeffect.cpp \
-    Properties/intproperty.cpp \
     windowsinglewidgettarget.cpp \
     drawpath.cpp \
     videoencoder.cpp \
@@ -194,11 +187,7 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/flowlayout.cpp \
     Animators/gradientpoints.cpp \
     MovablePoints/gradientpoint.cpp \
-    MovablePoints/boxpathpoint.cpp \
-    MovablePoints/animatedpoint.cpp \
     MovablePoints/pathpivot.cpp \
-    MovablePoints/movablepoint.cpp \
-    PropertyUpdaters/transformupdater.cpp \
     PropertyUpdaters/nodepointupdater.cpp \
     PropertyUpdaters/gradientupdater.cpp \
     PropertyUpdaters/strokewidthupdater.cpp \
@@ -208,7 +197,6 @@ SOURCES += main.cpp\
     PropertyUpdaters/particlesupdater.cpp \
     PropertyUpdaters/gradientpointsupdater.cpp \
     PropertyUpdaters/singlesoundupdater.cpp \
-    PropertyUpdaters/randomqrealgeneratorupdater.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
     PixmapEffects/rastereffects.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
@@ -225,7 +213,6 @@ SOURCES += main.cpp\
     GUI/namedcontainer.cpp \
     Animators/brushsettings.cpp \
     Animators/qcubicsegment1danimator.cpp \
-    Animators/qrealkey.cpp \
     Paint/autotiledsurface.cpp \
     Paint/brushstroke.cpp \
     Paint/colorconversions.cpp \
@@ -269,7 +256,6 @@ SOURCES += main.cpp\
     Boxes/internallinkgroupbox.cpp \
     PathEffects/sumpatheffect.cpp \
     pointtypemenu.cpp \
-    MovablePoints/nonanimatedmovablepoint.cpp \
     PropertyUpdaters/boxpathpointupdater.cpp \
     Paint/drawableautotiledsurface.cpp \
     typemenu.cpp \
@@ -292,10 +278,7 @@ HEADERS  += \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \
-    Animators/transformanimator.h \
     Animators/coloranimator.h \
-    Animators/qrealanimator.h \
-    Animators/qpointfanimator.h \
     Animators/boolanimator.h \
     Animators/intanimator.h \
     Boxes/circle.h \
@@ -355,10 +338,6 @@ HEADERS  += \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
     GUI/BoxesList/boxscrollarea.h \
-    Properties/comboboxproperty.h \
-    Animators/randomqrealgenerator.h \
-    Animators/qrealvalueeffect.h \
-    Properties/intproperty.h \
     windowsinglewidgettarget.h \
     drawpath.h \
     videoencoder.h \
@@ -417,12 +396,8 @@ HEADERS  += \
     GUI/BrushWidgets/brushselectionwidget.h \
     GUI/BrushWidgets/flowlayout.h \
     Animators/gradientpoints.h \
-    MovablePoints/animatedpoint.h \
     MovablePoints/pathpivot.h \
-    MovablePoints/movablepoint.h \
     MovablePoints/gradientpoint.h \
-    MovablePoints/boxpathpoint.h \
-    PropertyUpdaters/transformupdater.h \
     PropertyUpdaters/nodepointupdater.h \
     PropertyUpdaters/gradientupdater.h \
     PropertyUpdaters/strokewidthupdater.h \
@@ -432,7 +407,6 @@ HEADERS  += \
     PropertyUpdaters/particlesupdater.h \
     PropertyUpdaters/gradientpointsupdater.h \
     PropertyUpdaters/singlesoundupdater.h \
-    PropertyUpdaters/randomqrealgeneratorupdater.h \
     PropertyUpdaters/groupallpathsupdater.h \
     PixmapEffects/rastereffects.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
@@ -450,7 +424,6 @@ HEADERS  += \
     GUI/namedcontainer.h \
     Animators/brushsettings.h \
     Animators/qcubicsegment1danimator.h \
-    Animators/qrealkey.h \
     Paint/autotiledsurface.h \
     Paint/brushstroke.h \
     Paint/colorconversions.h \
@@ -492,7 +465,6 @@ HEADERS  += \
     Boxes/internallinkgroupbox.h \
     PathEffects/sumpatheffect.h \
     pointtypemenu.h \
-    MovablePoints/nonanimatedmovablepoint.h \
     PropertyUpdaters/boxpathpointupdater.h \
     Paint/drawableautotiledsurface.h \
     typemenu.h \

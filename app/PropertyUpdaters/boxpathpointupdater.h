@@ -1,6 +1,6 @@
 #ifndef BOXPATHPOINTUPDATER_H
 #define BOXPATHPOINTUPDATER_H
-#include "transformupdater.h"
+#include "PropertyUpdaters/transformupdater.h"
 
 class BoxPathPoint;
 class BoundingBox;

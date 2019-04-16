@@ -1,7 +1,6 @@
 #include "Animators/qrealkey.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/complexanimator.h"
-#include "clipboardcontainer.h"
 #include "Animators/qrealpoint.h"
 
 QrealKey::QrealKey(const qreal &value, const int &frame,

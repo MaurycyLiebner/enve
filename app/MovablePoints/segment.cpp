@@ -1,11 +1,7 @@
 ﻿#include "segment.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "MovablePoints/smartctrlpoint.h"
-#include "Boxes/boundingbox.h"
-#include "global.h"
 #include "pointhelpers.h"
-#include "GUI/mainwindow.h"
-#include "Animators/transformanimator.h"
 #include "pathpointshandler.h"
 
 bool NormalSegment::operator==(const NormalSegment &other) const {

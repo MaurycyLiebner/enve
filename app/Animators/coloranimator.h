@@ -3,7 +3,7 @@
 
 #include "Animators/complexanimator.h"
 #include "colorhelpers.h"
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 
 class ColorAnimator : public ComplexAnimator {
     Q_OBJECT

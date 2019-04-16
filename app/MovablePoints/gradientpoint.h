@@ -1,6 +1,6 @@
 #ifndef GRADIENTPOINT_H
 #define GRADIENTPOINT_H
-#include "animatedpoint.h"
+#include "MovablePoints/animatedpoint.h"
 class PathBox;
 
 class GradientPoint : public AnimatedPoint {

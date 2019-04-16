@@ -1,6 +1,6 @@
 #ifndef QREALANIMATORCREATOR_H
 #define QREALANIMATORCREATOR_H
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 #include "Properties/propertycreator.h"
 #include "glhelpers.h"
 

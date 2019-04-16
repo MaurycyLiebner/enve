@@ -1,6 +1,6 @@
 ﻿#ifndef SMARTNODEPOINT_H
 #define SMARTNODEPOINT_H
-#include "nonanimatedmovablepoint.h"
+#include "MovablePoints/nonanimatedmovablepoint.h"
 #include "nodepointvalues.h"
 #include "segment.h"
 #include "Animators/SmartPath/smartpathcontainer.h"
@@ -16,6 +16,10 @@ enum CtrlsMode : short;
 class SmartNodePoint : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
     friend class NormalSegment;
+protected:
+    SmartNodePoint(PathPointsHandler * const handler,
+                   SmartPathAnimator * const parentAnimator,
+                   BasicTransformAnimator * const parentTransform);
 public:
     void startTransform();
     void finishTransform();
@@ -181,10 +185,6 @@ public:
 
     const PathPointsHandler * getHandler();
 protected:
-    SmartNodePoint(PathPointsHandler * const handler,
-                   SmartPathAnimator * const parentAnimator,
-                   BasicTransformAnimator * const parentTransform);
-
     void setNextPoint(SmartNodePoint * const nextPoint);
     void setPrevPoint(SmartNodePoint * const prevPoint);
 

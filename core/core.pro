@@ -58,11 +58,15 @@ SOURCES += \
     singlewidgettarget.cpp \
     singlewidgetabstraction.cpp \
     Properties/property.cpp \
+    Properties/comboboxproperty.cpp \
+    Properties/intproperty.cpp \
     Animators/complexanimator.cpp \
     Animators/animator.cpp \
     Animators/fakecomplexanimator.cpp \
     Animators/key.cpp \
     PropertyUpdaters/propertyupdater.cpp \
+    PropertyUpdaters/transformupdater.cpp \
+    PropertyUpdaters/randomqrealgeneratorupdater.cpp \
     undoredo.cpp \
     Properties/propertycreator.cpp \
     exceptions.cpp \
@@ -109,10 +113,20 @@ SOURCES += \
     Animators/interpolationkeyt.cpp \
     Properties/boolproperty.cpp \
     PathEffects/patheffect.cpp \
-    Animators/polylineanimator.cpp
+    Animators/polylineanimator.cpp \
+    Animators/transformanimator.cpp \
+    Animators/qrealanimator.cpp \
+    Animators/qrealkey.cpp \
+    Animators/randomqrealgenerator.cpp \
+    Animators/qrealvalueeffect.cpp \
+    Animators/qpointfanimator.cpp \
+    MovablePoints/movablepoint.cpp \
+    MovablePoints/nonanimatedmovablepoint.cpp \
+    MovablePoints/animatedpoint.cpp \
+    MovablePoints/boxpathpoint.cpp
 
 HEADERS += \
-        core_global.h \ 
+    core_global.h \
     smartPointers/stdpointer.h \
     smartPointers/selfref.h \
     smartPointers/stdselfref.h \
@@ -120,11 +134,15 @@ HEADERS += \
     singlewidgettarget.h \
     singlewidgetabstraction.h \
     Properties/property.h \
+    Properties/comboboxproperty.h \
+    Properties/intproperty.h \
     Animators/key.h \
     Animators/complexanimator.h \
     Animators/fakecomplexanimator.h \
     Animators/animator.h \
     PropertyUpdaters/propertyupdater.h \
+    PropertyUpdaters/transformupdater.h \
+    PropertyUpdaters/randomqrealgeneratorupdater.h \
     undoredo.h \
     Properties/propertycreator.h \
     exceptions.h \
@@ -178,7 +196,17 @@ HEADERS += \
     Animators/interpolationkeyt.h \
     Properties/boolproperty.h \
     PathEffects/patheffect.h \
-    Animators/polylineanimator.h
+    Animators/polylineanimator.h \
+    Animators/transformanimator.h \
+    Animators/qrealanimator.h \
+    Animators/qrealkey.h \
+    Animators/randomqrealgenerator.h \
+    Animators/qrealvalueeffect.h \
+    Animators/qpointfanimator.h \
+    MovablePoints/movablepoint.h \
+    MovablePoints/nonanimatedmovablepoint.h \
+    MovablePoints/animatedpoint.h \
+    MovablePoints/boxpathpoint.h
 
 unix {
     target.path = /usr/lib

@@ -7,6 +7,10 @@ class SmartPathCollectionHandler;
 
 class PathPointsHandler : public StdSelfRef {
     friend class StdSelfRef;
+protected:
+    PathPointsHandler(SmartPathCollectionHandler * const collectionHandler,
+                      SmartPathAnimator * const targetAnimator,
+                      BasicTransformAnimator * const parentTransform);
 public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
@@ -78,10 +82,6 @@ public:
     const SmartPathAnimator * getAnimator() {
         return mTargetAnimator;
     }
-protected:
-    PathPointsHandler(SmartPathCollectionHandler * const collectionHandler,
-                      SmartPathAnimator * const targetAnimator,
-                      BasicTransformAnimator * const parentTransform);
 private:
     void updatePoints(int min, int max) {
         const int lastId = mPoints.count() - 1;
