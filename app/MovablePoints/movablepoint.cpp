@@ -1,7 +1,4 @@
 #include "movablepoint.h"
-#include "global.h"
-#include "undoredo.h"
-#include "Boxes/boxesgroup.h"
 #include "skia/skqtconversions.h"
 #include "pointhelpers.h"
 #include "Animators/transformanimator.h"

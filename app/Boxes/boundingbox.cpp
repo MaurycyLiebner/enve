@@ -1,9 +1,6 @@
 #include "Boxes/boundingbox.h"
-#include "canvas.h"
-#include "undoredo.h"
 #include "Boxes/boxesgroup.h"
-#include <QDebug>
-#include <QMenu>
+#include "canvas.h"
 #include "singlewidgetabstraction.h"
 #include "durationrectangle.h"
 #include "pointhelpers.h"
@@ -38,9 +35,8 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     mGPUEffectsAnimators(SPtrCreate(GPUEffectAnimators)(this)) {
     sDocumentBoxes << this;
     ca_addChildAnimator(mTransformAnimator);
-    mTransformAnimator->reset();
-    mTransformAnimator->prp_setOwnUpdater(SPtrCreate(TransformUpdater)(
-                                              mTransformAnimator.get()));
+    mTransformAnimator->prp_setOwnUpdater(
+                SPtrCreate(TransformUpdater)(mTransformAnimator.get()));
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
     const auto pivotUpdater = SPtrCreate(BoxPathPointUpdater)(
                 mTransformAnimator.get(), this);
@@ -482,9 +478,9 @@ OutlineSettingsAnimator *BoundingBox::getStrokeSettings() const {
 }
 
 void BoundingBox::drawOutlineOverlay(SkCanvas * const canvas,
-                                       const SkPath &path,
-                                       const SkScalar &invScale,
-                                       const bool &dashes) {
+                                     const SkPath &path,
+                                     const SkScalar &invScale,
+                                     const bool &dashes) {
     SkPaint paint;
     if(dashes) {
         const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
@@ -1328,9 +1324,7 @@ void BoundingBox::unlock() {
 
 void BoundingBox::setLocked(const bool &bt) {
     if(bt == mLocked) return;
-    if(mSelected) {
-        getParentCanvas()->removeBoxFromSelection(this);
-    }
+    if(mSelected) getParentCanvas()->removeBoxFromSelection(this);
     mLocked = bt;
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_LOCKED);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_UNLOCKED);
@@ -1409,7 +1403,7 @@ void BoundingBox::removeFromParent_k() {
 
 void BoundingBox::removeFromSelection() {
     if(mSelected) {
-        Canvas* parentCanvas = getParentCanvas();
+        Canvas* const parentCanvas = getParentCanvas();
         parentCanvas->removeBoxFromSelection(this);
     }
 }

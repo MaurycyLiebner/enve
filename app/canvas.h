@@ -482,14 +482,6 @@ public:
         return mPreviewing || mRenderingPreview || mRenderingOutput;
     }
     QPointF mapCanvasAbsToRel(const QPointF &pos);
-    void applyDiscretePathEffectToSelected();
-    void applyDuplicatePathEffectToSelected();
-    void applyLengthPathEffectToSelected();
-    void applySolidifyPathEffectToSelected();
-    void applyDiscreteOutlinePathEffectToSelected();
-    void applyDuplicateOutlinePathEffectToSelected();
-    void applyOperationPathEffectToSelected();
-    void applySumPathEffectToSelected();
 
     const qreal &getFps() const { return mFps; }
     void setFps(const qreal &fps) { mFps = fps; }
@@ -550,9 +542,7 @@ public:
     void readBoundingBox(QIODevice *target);
     bool anim_prevRelFrameWithKey(const int &relFrame, int &prevRelFrame);
     bool anim_nextRelFrameWithKey(const int &relFrame, int &nextRelFrame);
-    void applyDiscreteFillPathEffectToSelected();
-    void applyDuplicateFillPathEffectToSelected();
-    void applySumFillPathEffectToSelected();
+
     void shiftAllPointsForAllKeys(const int &by);
     void revertAllPointsForAllKeys();
     void shiftAllPoints(const int &by);
@@ -596,15 +586,6 @@ public:
     void blockUndoRedo();
     void unblockUndoRedo();
 
-    void applyGPURasterEffectToSelected(
-            const stdsptr<GPURasterEffectCreator> &creator);
-
-    template <class T>
-    void applyEffectToSelected() {
-        for(const auto& box : mSelectedBoxes) {
-            box->addEffect<T>();
-        }
-    }
     void setParentToLastSelected();
     void clearParentForSelected();
     bool startRotatingAction(const QPointF &cursorPos);
