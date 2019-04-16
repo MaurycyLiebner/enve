@@ -162,7 +162,7 @@ void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {
 
 void OutlineSettingsAnimator::setStrokerSettingsForRelFrameSk(
         const qreal &relFrame, SkStroke * const stroker) {
-    const qreal widthT = mLineWidth->getEffectiveValueAtRelFrame(relFrame);
+    const qreal widthT = mLineWidth->getEffectiveValue(relFrame);
     stroker->setWidth(toSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));

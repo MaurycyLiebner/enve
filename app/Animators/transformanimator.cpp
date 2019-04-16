@@ -152,12 +152,12 @@ QMatrix BasicTransformAnimator::getCurrentTransform() {
 QMatrix BasicTransformAnimator::getRelativeTransform(
                                     const qreal &relFrame) {
     QMatrix matrix;
-    matrix.translate(mPosAnimator->getEffectiveXValueAtRelFrame(relFrame),
-                     mPosAnimator->getEffectiveYValueAtRelFrame(relFrame));
+    matrix.translate(mPosAnimator->getEffectiveXValue(relFrame),
+                     mPosAnimator->getEffectiveYValue(relFrame));
 
-    matrix.rotate(mRotAnimator->getEffectiveValueAtRelFrame(relFrame));
-    matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
-                 mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame));
+    matrix.rotate(mRotAnimator->getEffectiveValue(relFrame));
+    matrix.scale(mScaleAnimator->getEffectiveXValue(relFrame),
+                 mScaleAnimator->getEffectiveYValue(relFrame));
     return matrix;
 }
 
@@ -369,7 +369,7 @@ QPointF BoxTransformAnimator::getPivotAbs() {
 }
 
 qreal BoxTransformAnimator::getOpacity(const qreal &relFrame) {
-    return mOpacityAnimator->getEffectiveValueAtRelFrame(relFrame);
+    return mOpacityAnimator->getEffectiveValue(relFrame);
 }
 
 bool BoxTransformAnimator::posOrPivotRecording() const {
@@ -418,17 +418,17 @@ QMatrix BoxTransformAnimator::getCurrentTransform() {
 
 QMatrix BoxTransformAnimator::getRelativeTransform(
                                     const qreal &relFrame) {
-    const qreal pivotX = mPivotAnimator->getEffectiveXValueAtRelFrame(relFrame);
-    const qreal pivotY = mPivotAnimator->getEffectiveYValueAtRelFrame(relFrame);
+    const qreal pivotX = mPivotAnimator->getEffectiveXValue(relFrame);
+    const qreal pivotY = mPivotAnimator->getEffectiveYValue(relFrame);
     QMatrix matrix;
-    matrix.translate(pivotX + mPosAnimator->getEffectiveXValueAtRelFrame(relFrame),
-                     pivotY + mPosAnimator->getEffectiveYValueAtRelFrame(relFrame));
+    matrix.translate(pivotX + mPosAnimator->getEffectiveXValue(relFrame),
+                     pivotY + mPosAnimator->getEffectiveYValue(relFrame));
 
-    matrix.rotate(mRotAnimator->getEffectiveValueAtRelFrame(relFrame));
-    matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
-                 mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame));
-    matrix.shear(mShearAnimator->getEffectiveXValueAtRelFrame(relFrame),
-                 mShearAnimator->getEffectiveYValueAtRelFrame(relFrame));
+    matrix.rotate(mRotAnimator->getEffectiveValue(relFrame));
+    matrix.scale(mScaleAnimator->getEffectiveXValue(relFrame),
+                 mScaleAnimator->getEffectiveYValue(relFrame));
+    matrix.shear(mShearAnimator->getEffectiveXValue(relFrame),
+                 mShearAnimator->getEffectiveYValue(relFrame));
 
     matrix.translate(-pivotX, -pivotY);
     return matrix;

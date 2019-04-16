@@ -41,7 +41,7 @@ void RandomQrealGenerator::anim_setAbsFrame(const int &frame) {
 }
 
 FrameRange RandomQrealGenerator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    if(mMaxDev->getEffectiveValueAtRelFrame(relFrame) < 0.001) {
+    if(mMaxDev->getEffectiveValue(relFrame) < 0.001) {
         return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
     }
     return {relFrame, relFrame};
@@ -58,13 +58,13 @@ qreal RandomQrealGenerator::getDevAtRelFrame(const qreal &relFrame) {
 //    }
     int relFrameRel = qRound(relFrame) % (mLastFrame - 1);
 
-    qreal maxDev = mMaxDev->getEffectiveValueAtRelFrame(relFrameRel);
+    qreal maxDev = mMaxDev->getEffectiveValue(relFrameRel);
     int idBefore = getClosestLowerFrameId(0, mFrameValues.count() - 1, relFrameRel);
     const FrameValue &frameValueBefore = mFrameValues.at(idBefore);
     qreal frameBefore = frameValueBefore.frame;
     qreal valueBefore = frameValueBefore.value;
     qreal smoothnessBefore =
-            mSmoothness->getEffectiveValueAtRelFrame(frameBefore);
+            mSmoothness->getEffectiveValue(frameBefore);
 
     int idAfter = idBefore + 1;
     const FrameValue &frameValueAfter = mFrameValues.at(idAfter);
@@ -86,7 +86,7 @@ qreal RandomQrealGenerator::getDevAtRelFrame(const qreal &relFrame) {
     if(qAbs(relFrameRel - frameBefore) < 0.01) return valueBefore;
     if(qAbs(relFrameRel - frameAfter) < 0.01) return valueAfter;
     qreal smoothnessAfter =
-            mSmoothness->getEffectiveValueAtRelFrame(frameAfter);
+            mSmoothness->getEffectiveValue(frameAfter);
 
     qreal t;
     if(smoothnessBefore < 0.001 && smoothnessAfter < 0.001) {
@@ -121,7 +121,7 @@ int RandomQrealGenerator::getClosestLowerFrameId(const int &minId,
 qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
     qreal totDeltaX = 0;
     qreal A = 0;
-    qreal prevPeriod = mPeriod->getEffectiveValueAtRelFrame(relFrame);
+    qreal prevPeriod = mPeriod->getEffectiveValue(relFrame);
     int prevFrame = relFrame;
     int nextFrame = relFrame;
     qreal nextPeriod = prevPeriod;

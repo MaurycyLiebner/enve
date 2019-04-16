@@ -19,7 +19,7 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
 void LengthPathEffect::apply(const qreal &relFrame,
                              const SkPath &src,
                              SkPath * const dst) {
-    const qreal lenPer = mLength->getEffectiveValueAtRelFrame(relFrame);
+    const qreal lenPer = mLength->getEffectiveValue(relFrame);
     if(lenPer < 0.001) {
         dst->reset();
         return;

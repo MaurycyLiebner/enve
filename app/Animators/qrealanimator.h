@@ -1,21 +1,20 @@
 #ifndef VALUEANIMATORS_H
 #define VALUEANIMATORS_H
-#include <QPointF>
-#include <QList>
-#include <QPainter>
-#include <QMouseEvent>
-#include "float.h"
 #include "Animators/graphanimator.h"
 class QrealKey;
 class QrealPoint;
-class QrealAnimatorValueSlider;
 class RandomQrealGenerator;
-
-#include <QDoubleSpinBox>
 
 class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
     friend class SelfRef;
+protected:
+    QrealAnimator(const QString& name);
+    QrealAnimator(const qreal &iniVal,
+                  const qreal &minVal,
+                  const qreal &maxVal,
+                  const qreal &prefferdStep,
+                  const QString& name);
 public:
     bool SWT_isQrealAnimator() const { return true; }
     void prp_retrieveSavedValue();
@@ -23,7 +22,6 @@ public:
     void prp_finishTransform();
     void prp_cancelTransform();
     QString prp_getValueText();
-    void prp_openContextMenu(const QPoint &pos);
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
         if(range.inRange(anim_getCurrentRelFrame()))
@@ -64,9 +62,9 @@ public:
 
     qreal getCurrentBaseValue() const;
     qreal getCurrentEffectiveValue() const;
-    qreal getBaseValueAtRelFrame(const qreal &frame) const;
+    qreal getBaseValue(const qreal &relFrame) const;
     qreal getBaseValueAtAbsFrame(const qreal &frame) const;
-    qreal getEffectiveValueAtRelFrame(const qreal &frame) const;
+    qreal getEffectiveValue(const qreal &relFrame) const;
     qreal getEffectiveValueAtAbsFrame(const qreal &frame) const;
 
     qreal getSavedBaseValue();
@@ -99,13 +97,6 @@ public:
         anim->graphFixMinMaxValues();
         return anim;
     }
-protected:
-    QrealAnimator(const QString& name);
-    QrealAnimator(const qreal &iniVal,
-                  const qreal &minVal,
-                  const qreal &maxVal,
-                  const qreal &prefferdStep,
-                  const QString& name);
 private:
     qreal calculateBaseValueAtRelFrame(const qreal &frame) const;
     QrealKey *getQrealKeyAtId(const int &id) const;

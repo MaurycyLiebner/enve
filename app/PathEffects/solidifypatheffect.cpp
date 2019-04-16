@@ -14,6 +14,6 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
 void SolidifyPathEffect::apply(const qreal &relFrame,
                                const SkPath &src,
                                SkPath * const dst) {
-    const qreal widthT = mDisplacement->getEffectiveValueAtRelFrame(relFrame);
+    const qreal widthT = mDisplacement->getEffectiveValue(relFrame);
     gSolidify(widthT, src, dst);
 }

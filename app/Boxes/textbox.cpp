@@ -108,7 +108,7 @@ void TextBox::addActionsToMenu(BoxTypeMenu * const menu) {
 SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
     const qreal linesDistAtFrame =
-            mLinesDist->getEffectiveValueAtRelFrame(relFrame)*0.01;
+            mLinesDist->getEffectiveValue(relFrame)*0.01;
     const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
     qreal maxWidth = 0;

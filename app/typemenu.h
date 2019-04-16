@@ -126,5 +126,6 @@ private:
 
 typedef TypeMenu<MovablePoint> PointTypeMenu;
 typedef TypeMenu<BoundingBox> BoxTypeMenu;
+typedef  TypeMenu<Property> PropertyTypeMenu;
 
 #endif // TYPEMENU_H

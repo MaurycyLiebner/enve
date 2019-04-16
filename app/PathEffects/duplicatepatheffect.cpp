@@ -12,7 +12,7 @@ void DuplicatePathEffect::apply(const qreal &relFrame,
                                 const SkPath &src,
                                 SkPath * const dst) {
     *dst = src;
-    const qreal qX = mTranslation->getEffectiveXValueAtRelFrame(relFrame);
-    const qreal qY = mTranslation->getEffectiveYValueAtRelFrame(relFrame);
+    const qreal qX = mTranslation->getEffectiveXValue(relFrame);
+    const qreal qY = mTranslation->getEffectiveYValue(relFrame);
     dst->addPath(src, toSkScalar(qX), toSkScalar(qY));
 }

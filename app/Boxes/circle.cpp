@@ -135,9 +135,9 @@ void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
 
 SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
     const SkScalar xRadius = static_cast<SkScalar>(
-                mHorizontalRadiusAnimator->getEffectiveXValueAtRelFrame(relFrame));
+                mHorizontalRadiusAnimator->getEffectiveXValue(relFrame));
     const SkScalar yRadius = static_cast<SkScalar>(
-                mVerticalRadiusAnimator->getEffectiveYValueAtRelFrame(relFrame));
+                mVerticalRadiusAnimator->getEffectiveYValue(relFrame));
     SkRect rect = SkRect::MakeXYWH(-xRadius, -yRadius, 2*xRadius, 2*yRadius);
     const QPointF center = mCenterAnimator->getEffectiveValue();
     rect.offset(toSkPoint(center));

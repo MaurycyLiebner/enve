@@ -41,13 +41,13 @@ ShadowEffect::ShadowEffect() :
 stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ShadowEffectRenderData)();
-    renderData->blurRadius = mBlurRadius->getEffectiveValueAtRelFrame(relFrame);
+    renderData->blurRadius = mBlurRadius->getEffectiveValue(relFrame);
     renderData->hasKeys = mBlurRadius->anim_hasKeys();
     renderData->highQuality = mHighQuality->getValue();
     renderData->color = mColor->getColorAtRelFrame(relFrame);
     renderData->translation = mTranslation->
             getEffectiveValueAtRelFrame(relFrame);
-    renderData->opacity = mOpacity->getEffectiveValueAtRelFrame(relFrame)/100.;
+    renderData->opacity = mOpacity->getEffectiveValue(relFrame)/100.;
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
@@ -107,6 +107,6 @@ qreal ShadowEffect::getMargin() {
 }
 
 qreal ShadowEffect::getMarginAtRelFrame(const int &relFrame) {
-    return mBlurRadius->getEffectiveValueAtRelFrame(relFrame) +
+    return mBlurRadius->getEffectiveValue(relFrame) +
             pointToLen(mTranslation->getEffectiveValueAtRelFrame(relFrame));
 }

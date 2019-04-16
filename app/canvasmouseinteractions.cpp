@@ -20,6 +20,7 @@
 #include "GUI/customfpsdialog.h"
 #include "GPUEffects/gpurastereffect.h"
 #include "MovablePoints/smartnodepoint.h"
+#include "pointtypemenu.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -32,43 +33,50 @@ void Canvas::handleMovePathMousePressEvent() {
     }
 }
 
-void Canvas::addSelectedBoxesActions(QMenu * const menu) {
-    menu->addSeparator();
-    menu->addAction("Create Link", [this]() {
+void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
+    qMenu->addSeparator();
+    qMenu->addAction("Create Link", [this]() {
         for(const auto& box : mSelectedBoxes)
             mCurrentBoxesGroup->addContainedBox(box->createLink());
     });
-    menu->addAction("Center Pivot", [this]() {
+    qMenu->addAction("Center Pivot", [this]() {
         centerPivotForSelected();
     });
-    menu->addSeparator();
+    qMenu->addSeparator();
 
-    QAction * const copyAction = menu->addAction("Copy", [this]() {
+    QAction * const copyAction = qMenu->addAction("Copy", [this]() {
         this->copyAction();
     });
     copyAction->setShortcut(Qt::CTRL + Qt::Key_C);
 
-    QAction * const cutAction = menu->addAction("Cut", [this]() {
+    QAction * const cutAction = qMenu->addAction("Cut", [this]() {
         this->cutAction();
     });
     cutAction->setShortcut(Qt::CTRL + Qt::Key_X);
 
-    QAction * const duplicateAction = menu->addAction("Duplicate", [this]() {
+    QAction * const duplicateAction = qMenu->addAction("Duplicate", [this]() {
         this->duplicateSelectedBoxes();
     });
     duplicateAction->setShortcut(Qt::CTRL + Qt::Key_D);
 
-    QAction * const deleteAction = menu->addAction("Delete", [this]() {
+    QAction * const deleteAction = qMenu->addAction("Delete", [this]() {
         this->removeSelectedBoxesAndClearList();
     });
     deleteAction->setShortcut(Qt::Key_Delete);
 
-    menu->addSeparator();
+    qMenu->addSeparator();
 
-    QAction * const groupAction = menu->addAction("Group", [this]() {
+    QAction * const groupAction = qMenu->addAction("Group", [this]() {
         this->groupSelectedBoxes();
     });
     groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
+
+    BoxTypeMenu menu(&qMenu, this, mMainWindow);
+    for(const auto& box : mSelectedBoxes) {
+        if(menu.hasActionsForType(box)) continue;
+        box->addActionsToMenu(&menu);
+        menu.addedActionsForType(box);
+    }
 }
 
 #include <QInputDialog>
@@ -211,7 +219,6 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
     });
 }
 
-#include "pointtypemenu.h"
 void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
@@ -244,12 +251,6 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
 
             QMenu qMenu;
             addSelectedBoxesActions(&qMenu);
-            BoxTypeMenu menu(&qMenu, this, mMainWindow);
-            for(const auto& box : mSelectedBoxes) {
-                if(menu.hasActionsForType(box)) continue;
-                box->addActionsToMenu(&menu);
-                menu.addedActionsForType(box);
-            }
             qMenu.exec(event->globalPos());
         } else {
             clearPointsSelection();

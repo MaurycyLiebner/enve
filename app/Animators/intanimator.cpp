@@ -16,11 +16,11 @@ int IntAnimator::getCurrentIntValue() const {
 }
 
 int IntAnimator::getCurrentIntValueAtRelFrame(const qreal &relFrame) const {
-    return qRound(getBaseValueAtRelFrame(relFrame));
+    return qRound(getBaseValue(relFrame));
 }
 
 int IntAnimator::getCurrentIntEffectiveValueAtRelFrame(const qreal &relFrame) const {
-    return qRound(getEffectiveValueAtRelFrame(relFrame));
+    return qRound(getEffectiveValue(relFrame));
 }
 
 void IntAnimator::setCurrentIntValue(const int &value) {

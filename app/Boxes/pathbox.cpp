@@ -183,7 +183,7 @@ void PathBox::setupRenderData(const qreal &relFrame,
 
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
     const auto widthAnimator = mStrokeSettings->getStrokeWidthAnimator();
-    strokeSettings.fOutlineWidth = widthAnimator->getEffectiveValueAtRelFrame(relFrame);
+    strokeSettings.fOutlineWidth = widthAnimator->getEffectiveValue(relFrame);
     const auto brushSettings = mStrokeSettings->getBrushSettings();
     if(brushSettings) {
         auto brush = brushSettings->getBrush();

@@ -14,7 +14,7 @@ stdsptr<PixmapEffectRenderData> DesaturateEffect::getPixmapEffectRenderDataForRe
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(DesaturateEffectRenderData)();
     renderData->influence =
-            mInfluenceAnimator->getEffectiveValueAtRelFrame(relFrame);
+            mInfluenceAnimator->getEffectiveValue(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 

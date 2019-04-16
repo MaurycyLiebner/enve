@@ -51,10 +51,10 @@ public:
     QPointF getEffectiveValueAtRelFrame(const qreal &frame) const;
 
     qreal getEffectiveXValue();
-    qreal getEffectiveXValueAtRelFrame(const qreal &relFrame);
+    qreal getEffectiveXValue(const qreal &relFrame);
 
     qreal getEffectiveYValue();
-    qreal getEffectiveYValueAtRelFrame(const qreal &relFrame);
+    qreal getEffectiveYValue(const qreal &relFrame);
 protected:
     qsptr<QrealAnimator> mXAnimator;
     qsptr<QrealAnimator> mYAnimator;

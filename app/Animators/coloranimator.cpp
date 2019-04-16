@@ -52,10 +52,10 @@ QColor ColorAnimator::getCurrentColor() const {
 }
 
 QColor ColorAnimator::getColorAtRelFrame(const qreal &relFrame) {
-    qreal val1 = mVal1Animator->getEffectiveValueAtRelFrame(relFrame);
-    qreal val2 = mVal2Animator->getEffectiveValueAtRelFrame(relFrame);
-    qreal val3 = mVal3Animator->getEffectiveValueAtRelFrame(relFrame);
-    qreal alpha = mAlphaAnimator->getEffectiveValueAtRelFrame(relFrame);
+    qreal val1 = mVal1Animator->getEffectiveValue(relFrame);
+    qreal val2 = mVal2Animator->getEffectiveValue(relFrame);
+    qreal val3 = mVal3Animator->getEffectiveValue(relFrame);
+    qreal alpha = mAlphaAnimator->getEffectiveValue(relFrame);
 
     QColor color;
     if(mColorMode == RGBMODE) {

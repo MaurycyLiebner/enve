@@ -16,7 +16,7 @@ stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRe
     auto renderData =
             SPtrCreate(BrightnessEffectRenderData)();
     renderData->brightness =
-            mBrightnessAnimator->getEffectiveValueAtRelFrame(relFrame);
+            mBrightnessAnimator->getEffectiveValue(relFrame);
     renderData->hasKeys = mBrightnessAnimator->anim_hasKeys();
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

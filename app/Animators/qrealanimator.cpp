@@ -1,13 +1,5 @@
 #include "Animators/qrealanimator.h"
-#include <QPainter>
-#include <QDebug>
-#include <QApplication>
-#include "GUI/mainwindow.h"
-#include "GUI/animationdockwidget.h"
 #include <QMenu>
-#include "GUI/qrealanimatorvalueslider.h"
-#include <QWidgetAction>
-#include "GUI/BoxesList/boxsinglewidget.h"
 #include "Animators/qrealpoint.h"
 #include "Animators/qrealkey.h"
 #include "randomqrealgenerator.h"
@@ -81,8 +73,7 @@ void QrealAnimator::graph_getValueConstraints(
     }
 }
 
-void QrealAnimator::setValueRange(const qreal &minVal,
-                                  const qreal &maxVal) {
+void QrealAnimator::setValueRange(const qreal &minVal, const qreal &maxVal) {
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
     setCurrentBaseValue(mCurrentBaseValue);
@@ -97,21 +88,6 @@ void QrealAnimator::incAllValues(const qreal &valInc) {
 
 QString QrealAnimator::prp_getValueText() {
     return QString::number(mCurrentBaseValue, 'f', 2);
-}
-
-void QrealAnimator::prp_openContextMenu(const QPoint &pos) {
-    QMenu menu;
-    menu.addAction("Add Key");
-    const QAction * const selectedAction = menu.exec(pos);
-    if(selectedAction) {
-        if(selectedAction->text() == "Add Key") {
-            if(anim_isRecording()) {
-                anim_saveCurrentValueAsKey();
-            } else {
-                anim_setRecording(true);
-            }
-        }
-    }
 }
 
 qreal QrealAnimator::getMinPossibleValue() {
@@ -135,11 +111,11 @@ void QrealAnimator::graphFixMinMaxValues() {
 }
 
 qreal QrealAnimator::getEffectiveValueAtAbsFrame(const qreal &frame) const {
-    return getEffectiveValueAtRelFrame(prp_absFrameToRelFrameF(frame));
+    return getEffectiveValue(prp_absFrameToRelFrameF(frame));
 }
 
 qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal &frame) const {
-    return getBaseValueAtRelFrame(prp_absFrameToRelFrameF(frame));
+    return getBaseValue(prp_absFrameToRelFrameF(frame));
 }
 
 QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
@@ -206,15 +182,16 @@ qreal QrealAnimator::calculateBaseValueAtRelFrame(const qreal &frame) const {
     return mCurrentBaseValue;
 }
 
-qreal QrealAnimator::getBaseValueAtRelFrame(const qreal &frame) const {
-    if(isZero4Dec(frame - anim_getCurrentRelFrame())) return mCurrentBaseValue;
-    return calculateBaseValueAtRelFrame(frame);
+qreal QrealAnimator::getBaseValue(const qreal &relFrame) const {
+    if(isZero4Dec(relFrame - anim_getCurrentRelFrame()))
+        return mCurrentBaseValue;
+    return calculateBaseValueAtRelFrame(relFrame);
 }
 
-qreal QrealAnimator::getEffectiveValueAtRelFrame(const qreal &frame) const {
-    if(mRandomGenerator.isNull()) return getBaseValueAtRelFrame(frame);
-    const qreal val = getBaseValueAtRelFrame(frame) +
-            mRandomGenerator->getDevAtRelFrame(frame);
+qreal QrealAnimator::getEffectiveValue(const qreal &relFrame) const {
+    if(mRandomGenerator.isNull()) return getBaseValue(relFrame);
+    const qreal val = getBaseValue(relFrame) +
+            mRandomGenerator->getDevAtRelFrame(relFrame);
     return qMin(mMaxPossibleVal, qMax(mMinPossibleVal, val));
 }
 
@@ -277,7 +254,7 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
 
 void QrealAnimator::anim_addKeyAtRelFrame(const int& relFrame) {
     if(anim_getKeyAtRelFrame(relFrame)) return;
-    const qreal value = getBaseValueAtRelFrame(relFrame);
+    const qreal value = getBaseValue(relFrame);
     const auto newKey = SPtrCreate(QrealKey)(value, relFrame, this);
     anim_appendKey(newKey);
 }
