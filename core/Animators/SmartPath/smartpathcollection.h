@@ -39,6 +39,12 @@ public:
 
     void addPath(const qsptr<SmartPathAnimator>& path);
     void removePath(const qsptr<SmartPathAnimator>& path);
+    void moveAllFrom(SmartPathCollection * const from) {
+        const int iMax = from->ca_getNumberOfChildren() - 1;
+        for(int i = iMax; i >= 0; i--)
+            addPath(from->ca_takeChildAt<SmartPathAnimator>(i));
+    }
+
 
     SkPath getPathAtRelFrame(const qreal &relFrame) const;
 

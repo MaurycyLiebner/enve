@@ -123,7 +123,8 @@ SOURCES += \
     MovablePoints/movablepoint.cpp \
     MovablePoints/nonanimatedmovablepoint.cpp \
     MovablePoints/animatedpoint.cpp \
-    MovablePoints/boxpathpoint.cpp
+    MovablePoints/boxpathpoint.cpp \
+    MovablePoints/pointshandler.cpp
 
 HEADERS += \
     core_global.h \
@@ -206,7 +207,8 @@ HEADERS += \
     MovablePoints/movablepoint.h \
     MovablePoints/nonanimatedmovablepoint.h \
     MovablePoints/animatedpoint.h \
-    MovablePoints/boxpathpoint.h
+    MovablePoints/boxpathpoint.h \
+    MovablePoints/pointshandler.h
 
 unix {
     target.path = /usr/lib

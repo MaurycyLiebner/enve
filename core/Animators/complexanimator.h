@@ -63,6 +63,12 @@ public:
     void ca_addChildAnimator(const qsptr<Property> &childAnimator,
                              const int &id);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
+    template <class T>
+    qsptr<T> ca_takeChildAnimator(Property * const prop) {
+        const auto prpSPtr = GetAsSPtrTemplated(prop, T);
+        ca_removeChildAnimator(prpSPtr);
+        return prpSPtr;
+    }
     void ca_swapChildAnimators(Property * const animator1,
                                Property * const animator2);
     void ca_moveChildInList(Property *child, const int &to);

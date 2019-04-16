@@ -107,7 +107,7 @@ bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
 }
 
 bool MovablePoint::isContainedInRect(const QRectF &absRect) {
-    if(isHidden() || isCtrlPoint()) return false;
+    if(isHidden() || !selectionEnabled()) return false;
     return absRect.contains(getAbsolutePos());
 }
 
