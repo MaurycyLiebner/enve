@@ -55,14 +55,17 @@ private:
     const QPointer<T> mTarget;
 };
 
+class Property;
+template<typename T> class TypeMenu;
+typedef TypeMenu<Property> PropertyTypeMenu;
+
 class Property : public SingleWidgetTarget {
     Q_OBJECT
 protected:
-    virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
+    Property(const QString &name);
 public:
-    virtual ~Property() {
-        emit beingDeleted();
-    }
+    ~Property() { emit beingDeleted(); }
+
     bool SWT_isProperty() const { return true; }
 
     virtual int prp_getRelFrameShift() const {
@@ -87,6 +90,10 @@ public:
         Q_UNUSED(invScale);
     }
 
+    virtual void addActionsToMenu(PropertyTypeMenu * const menu) {
+        Q_UNUSED(menu);
+    }
+
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 
@@ -99,8 +106,6 @@ public:
     virtual void prp_retrieveSavedValue() {}
 
     virtual QString prp_getValueText() { return ""; }
-
-    virtual void prp_openContextMenu(const QPoint &pos) { Q_UNUSED(pos); }
 
     virtual void prp_startDragging() {}
 
@@ -130,6 +135,8 @@ public slots:
     }
 
     virtual void prp_updateInfluenceRangeAfterChanged();
+protected:
+    virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 public:
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
@@ -170,7 +177,6 @@ public:
         return static_cast<T*>(mParent->getFirstAncestor(tester));
     }
 protected:
-    Property(const QString &name);
     void prp_currentFrameChanged();
     void prp_callFinishUpdater();
 signals:

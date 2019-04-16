@@ -172,6 +172,16 @@ public:
         }
     }
 
+    template <class T = Property>
+    void execOpOnSelectedProperties(const std::function<void(T*)> &op) {
+
+    }
+
+    template <class T = Property>
+    void execOpOnSelectedProperties(const std::function<void(QList<T*>)> &op) {
+
+    }
+
     void updateSelectedPointsAfterCtrlsVisiblityChanged();
     void centerPivotForSelected();
     void resetSelectedScale();

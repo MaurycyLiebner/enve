@@ -8,7 +8,15 @@
 class ColorAnimator : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
+protected:
+    ColorAnimator(const QString& name = "color");
 public:
+    bool SWT_isColorAnimator() const { return true; }
+
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
+    void addActionsToMenu(PropertyTypeMenu * const menu);
+
     void qra_setCurrentValue(const QColor &qcolorValue);
 
     QColor getCurrentColor() const;
@@ -24,8 +32,6 @@ public:
     void setCurrentVal2Value(const qreal &val2);
     void setCurrentVal3Value(const qreal &val3);
     void setCurrentAlphaValue(const qreal &alpha);
-
-    void prp_openContextMenu(const QPoint &pos);
 
     void duplicateVal1AnimatorFrom(QrealAnimator *source);
     void duplicateVal2AnimatorFrom(QrealAnimator *source);
@@ -51,13 +57,6 @@ public:
     QrealAnimator *getAlphaAnimator() {
         return mAlphaAnimator.get();
     }
-
-    bool SWT_isColorAnimator() const { return true; }
-
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
-protected:
-    ColorAnimator(const QString& name = "color");
 private:
     ColorMode mColorMode = RGBMODE;
 

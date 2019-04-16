@@ -1,6 +1,6 @@
 #include "Animators/coloranimator.h"
 #include "colorhelpers.h"
-#include <QDebug>
+#include "pointtypemenu.h"
 
 ColorAnimator::ColorAnimator(const QString &name) : ComplexAnimator(name) {
     setColorMode(RGBMODE);
@@ -168,13 +168,8 @@ void ColorAnimator::setCurrentAlphaValue(const qreal &alpha) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
-#include <QMenu>
-void ColorAnimator::prp_openContextMenu(const QPoint &pos) {
-    QMenu menu;
-    menu.addAction("Add Key");
-
-    QMenu colorModeMenu;
-    colorModeMenu.setTitle("Color Mode");
+void ColorAnimator::addActionsToMenu(PropertyTypeMenu * const menu) {
+    const auto colorModeMenu = menu->addMenu("Color Mode");
 
     QAction *rgbAction = new QAction("RGB");
     rgbAction->setCheckable(true);
@@ -188,22 +183,24 @@ void ColorAnimator::prp_openContextMenu(const QPoint &pos) {
     hslAction->setCheckable(true);
     hslAction->setChecked(mColorMode == HSLMODE);
 
-    colorModeMenu.addAction(rgbAction);
-    colorModeMenu.addAction(hsvAction);
-    colorModeMenu.addAction(hslAction);
-    menu.addMenu(&colorModeMenu);
-    QAction *selected_action = menu.exec(pos);
-    if(selected_action != nullptr) {
-        if(selected_action->text() == "Add Key") {
-            anim_saveCurrentValueAsKey();
-        } else if(selected_action == rgbAction) {
-            setColorMode(RGBMODE);
-        } else if(selected_action == hsvAction) {
-            setColorMode(HSVMODE);
-        } else if(selected_action == hslAction) {
-            setColorMode(HSLMODE);
-        }
-    } else {
+    const PropertyTypeMenu::CheckOp<ColorAnimator> rgbOp =
+    [](ColorAnimator * anim, bool checked) {
+        Q_UNUSED(checked);
+        anim->setColorMode(RGBMODE);
+    };
+    colorModeMenu->addCheckableAction("RGB", mColorMode == RGBMODE, rgbOp);
 
-    }
+    const PropertyTypeMenu::CheckOp<ColorAnimator> hsvOp =
+    [](ColorAnimator * anim, bool checked) {
+        Q_UNUSED(checked);
+        anim->setColorMode(RGBMODE);
+    };
+    colorModeMenu->addCheckableAction("HSV", mColorMode == HSVMODE, hsvOp);
+
+    const PropertyTypeMenu::CheckOp<ColorAnimator> hslOp =
+    [](ColorAnimator * anim, bool checked) {
+        Q_UNUSED(checked);
+        anim->setColorMode(RGBMODE);
+    };
+    colorModeMenu->addCheckableAction("HSL", mColorMode == HSLMODE, hslOp);
 }

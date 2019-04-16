@@ -541,6 +541,21 @@ void Animator::drawTimelineControls(QPainter * const p,
     p->restore();
 }
 
+void Animator::addActionsToMenu(PropertyTypeMenu * const menu) {
+    if(anim_getKeyOnCurrentFrame()) {
+        menu->addpl("Add Key")->setDisabled(true);
+        menu->addAction("Delete Key", [target]() {
+            const auto animTarget = GetAsPtr(target, Animator);
+            animTarget->anim_deleteCurrentKey();
+        });
+    } else {
+        menu->addAction("Add Key", [target]() {
+            const auto animTarget = GetAsPtr(target, Animator);
+            animTarget->anim_saveCurrentValueAsKey();
+        });
+        menu->addpl("Delete Key")->setDisabled(true);
+    }
+}
 
 bool Animator::hasSelectedKeys() const {
     return !anim_mSelectedKeys.isEmpty();

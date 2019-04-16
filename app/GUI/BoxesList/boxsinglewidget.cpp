@@ -736,20 +736,6 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 canvas->addSelectedBoxesActions(canvasMenu);
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();
-                const auto animTarget = GetAsPtr(target, Animator);
-                if(animTarget->anim_getKeyOnCurrentFrame()) {
-                    menu.addAction("Add Key")->setDisabled(true);
-                    menu.addAction("Delete Key", [target]() {
-                        const auto animTarget = GetAsPtr(target, Animator);
-                        animTarget->anim_deleteCurrentKey();
-                    });
-                } else {
-                    menu.addAction("Add Key", [target]() {
-                        const auto animTarget = GetAsPtr(target, Animator);
-                        animTarget->anim_saveCurrentValueAsKey();
-                    });
-                    menu.addAction("Delete Key")->setDisabled(true);
-                }
                 if(target->SWT_isPixmapEffect() || target->SWT_isPathEffect()) {
                     menu.addSeparator();
                     menu.addAction("Delete Effect", [target]() {

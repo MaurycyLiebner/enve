@@ -63,6 +63,8 @@ public:
                               const FrameRange &absFrameRange,
                               const int &rowHeight);
 
+    void addActionsToMenu(PropertyTypeMenu * const menu);
+
     virtual void anim_addKeyAtRelFrame(const int &relFrame) = 0;
     bool SWT_isAnimator() const;
     void prp_startDragging();

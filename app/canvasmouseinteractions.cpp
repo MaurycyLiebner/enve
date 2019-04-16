@@ -71,7 +71,7 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
     });
     groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
 
-    BoxTypeMenu menu(&qMenu, this, mMainWindow);
+    BoxTypeMenu menu(qMenu, this, mMainWindow);
     for(const auto& box : mSelectedBoxes) {
         if(menu.hasActionsForType(box)) continue;
         box->addActionsToMenu(&menu);

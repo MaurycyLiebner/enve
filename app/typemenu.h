@@ -15,7 +15,8 @@ public:
     template <class T> using CheckOp = std::function<void(T*, bool)>;
     template <class T> using AllOp = std::function<void(QList<T*>)>;
 
-    TypeMenu(QMenu * const targetMenu, Canvas * const targetCanvas,
+    TypeMenu(QMenu * const targetMenu,
+             Canvas * const targetCanvas,
              QWidget * const parent) :
         mTargetMenu(targetMenu),
         mTargetCanvas(targetCanvas),
@@ -83,8 +84,7 @@ protected:
     }
 private:
     template <typename U>
-    void connectAction(BoundingBox * const,
-                       QAction * const qAction,
+    void connectAction(BoundingBox * const, QAction * const qAction,
                        const U& op) {
         const auto targetCanvas = mTargetCanvas;
         const auto canvasOp = [op, targetCanvas]() {
@@ -94,8 +94,7 @@ private:
     }
 
     template <typename U>
-    void connectAction(MovablePoint * const,
-                       QAction * const qAction,
+    void connectAction(MovablePoint * const, QAction * const qAction,
                        const U& op) {
         const auto targetCanvas = mTargetCanvas;
         const auto canvasOp = [op, targetCanvas]() {
@@ -104,15 +103,23 @@ private:
         QObject::connect(qAction, &QAction::triggered, canvasOp);
     }
 
+    template <typename U>
+    void connectAction(Property * const, QAction * const qAction,
+                       const U& op) {
+        const auto targetCanvas = mTargetCanvas;
+        const auto canvasOp = [op, targetCanvas]() {
+            targetCanvas->execOpOnSelectedProperties(op);
+        };
+        QObject::connect(qAction, &QAction::triggered, canvasOp);
+    }
+
     template <class T>
-    void connectAction(QAction * const qAction,
-                       const PlainOp<T>& op) {
+    void connectAction(QAction * const qAction, const PlainOp<T>& op) {
         connectAction(static_cast<T*>(nullptr), qAction, op);
     }
 
     template <class T>
-    void connectAction(QAction * const qAction,
-                       const AllOp<T>& op) {
+    void connectAction(QAction * const qAction, const AllOp<T>& op) {
         connectAction(static_cast<T*>(nullptr), qAction, op);
     }
 
