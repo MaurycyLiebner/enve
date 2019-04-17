@@ -412,11 +412,11 @@ public:
     QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
 
-    void addCanvasProp(Property * const prop) {
-        mCanvasProps.append(prop);
-    }
-    void removeCanvasProp(Property * const prop) {
-        mCanvasProps.removeOne(prop);
+    void updateCanvasProps() {
+        mCanvasProps.clear();
+        ca_execOnDescendants([this](Property * prop) {
+            if(prop->drawsOnCanvas()) mCanvasProps.append(prop);
+        });
     }
 protected:
     bool mSelected = false;
@@ -456,7 +456,7 @@ protected:
     const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
 
     QList<stdsptr<_ScheduledTask>> mScheduledTasks;
-    QList<stdptr<Property>> mCanvasProps;
+    QList<qptr<Property>> mCanvasProps;
 private:
     void updateRelBoundingRectFromRenderData(
             BoundingBoxRenderData * const renderData);

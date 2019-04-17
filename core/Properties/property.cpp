@@ -94,16 +94,13 @@ void Property::prp_callFinishUpdater() {
     if(prp_mUpdater) prp_mUpdater->finishedChange();
 }
 
-void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
-    if(handler == mPointsHandler) return;
-    mPointsHandler = handler;
+void Property::enabledDrawingOnCanvas() {
+    mDrawOnCanvas = true;
+    if(mParent) mParent->updateCanvasProps();
+}
 
-    const auto pBox = getFirstAncestor<BoundingBox>();
-    if(mPointsHandler) {
-        pBox->addCanvasProp(this);
-    } else {
-        pBox->removeCanvasProp(this);
-    }
+void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
+    mPointsHandler = handler;
 }
 
 void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {

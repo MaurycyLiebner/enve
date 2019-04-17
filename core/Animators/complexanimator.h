@@ -103,6 +103,15 @@ public:
 
     Property *ca_getFirstDescendantWithName(const QString &name);
 
+    void ca_execOnDescendants(const std::function<void(Property*)>& op) const {
+        for(const auto& child : ca_mChildAnimators) {
+            op(child.get());
+            if(child->SWT_isComplexAnimator()) {
+                GetAsPtr(child, ComplexAnimator)->ca_execOnDescendants(op);
+            }
+        }
+    }
+
     template <class T = Property>
     T *getPropertyIfIsTheOnlyOne(bool (Property::*tester)() const) {
         if(ca_mChildAnimators.count() == 1) {
@@ -113,7 +122,6 @@ public:
         }
         return nullptr;
     }
-
 public slots:
     void ca_prependChildAnimator(Property *childAnimator,
                                  const qsptr<Property>& prependWith);

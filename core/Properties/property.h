@@ -186,6 +186,14 @@ public:
         return mParent->getFirstAncestor<T>();
     }
 
+    virtual void updateCanvasProps() {
+        if(mParent) mParent->updateCanvasProps();
+    }
+
+    bool drawsOnCanvas() const {
+        return mDrawOnCanvas;
+    }
+
     PointsHandler * getPointsHandler() const {
         return mPointsHandler.get();
     }
@@ -193,6 +201,7 @@ protected:
     void prp_currentFrameChanged();
     void prp_callFinishUpdater();
 
+    void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:
     void prp_updateWholeInfluenceRange();
@@ -204,6 +213,7 @@ signals:
     void beingDeleted();
 protected:
     bool prp_mOwnUpdater = false;
+    bool mDrawOnCanvas = false;
     int prp_mParentFrameShift = 0;
     stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName = "";
