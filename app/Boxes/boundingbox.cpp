@@ -185,13 +185,21 @@ void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
 }
 
 void BoundingBox::drawCanvasControls(SkCanvas * const canvas,
-                                     const CanvasMode &currentCanvasMode,
+                                     const CanvasMode &mode,
                                      const SkScalar &invScale) {
     for(const auto& prop : mCanvasProps)
-        prop->drawCanvasControls(canvas, currentCanvasMode, invScale);
-    if(currentCanvasMode == MOVE_PATH) {
-        mTransformAnimator->getPivotMovablePoint()->drawSk(canvas, invScale);
+        prop->drawCanvasControls(canvas, mode, invScale);
+}
+
+MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
+                                            const CanvasMode &mode,
+                                            const qreal &invScale) {
+
+    for(const auto& prop : mCanvasProps) {
+        const auto pt = prop->getPointAtAbsPos(absPos, mode, invScale);
+        if(pt) return pt;
     }
+    return nullptr;
 }
 
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
@@ -763,18 +771,6 @@ bool BoundingBox::relPointInsidePath(const QPointF &relPos) const {
 
 bool BoundingBox::absPointInsidePath(const QPointF &absPoint) {
     return relPointInsidePath(mapAbsPosToRel(absPoint));
-}
-
-MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPtPos,
-                                            const CanvasMode &currentCanvasMode,
-                                            const qreal &canvasScaleInv) {
-    if(currentCanvasMode == MOVE_PATH) {
-        MovablePoint* pivotMovable = mTransformAnimator->getPivotMovablePoint();
-        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return pivotMovable;
-        }
-    }
-    return nullptr;
 }
 
 void BoundingBox::cancelTransform() {

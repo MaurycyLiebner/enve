@@ -13,6 +13,10 @@ public:
     void startTransform();
     void finishTransform();
 
+    bool isVisible(const CanvasMode& mode) const {
+        return mode == MOVE_PATH;
+    }
+
     void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
 private:
     BoxTransformAnimator * const mBoxTransform_cv;

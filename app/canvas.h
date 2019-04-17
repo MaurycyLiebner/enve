@@ -39,22 +39,6 @@ struct GPURasterEffectCreator;
 
 enum CtrlsMode : short;
 
-enum CanvasMode : short {
-    MOVE_PATH,
-    MOVE_POINT,
-    ADD_POINT,
-    ADD_SMART_POINT,
-    PICK_PAINT_SETTINGS,
-    ADD_CIRCLE,
-    ADD_RECTANGLE,
-    ADD_TEXT,
-    ADD_PARTICLE_BOX,
-    ADD_PARTICLE_EMITTER,
-    ADD_PAINT_BOX,
-    PAINT_MODE
-};
-
-
 extern bool zLessThan(const qptr<BoundingBox> &box1,
                       const qptr<BoundingBox> &box2);
 

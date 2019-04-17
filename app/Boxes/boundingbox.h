@@ -135,7 +135,7 @@ public:
                               SkPaint * const paint,
                               GrContext* const grContext);
     void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &currentCanvasMode,
+                            const CanvasMode &mode,
                             const SkScalar &invScale);
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const SkScalar &invScale);
@@ -157,9 +157,9 @@ public:
         Q_UNUSED(canvasScaleInv);
         return NormalSegment();
     }
-    virtual MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
-                                     const CanvasMode &currentCanvasMode,
-                                     const qreal &canvasScaleInv);
+    virtual MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                                           const CanvasMode &currentCanvasMode,
+                                           const qreal &invScale);
 
     virtual FillSettingsAnimator *getFillSettings() const;
     virtual OutlineSettingsAnimator *getStrokeSettings() const;

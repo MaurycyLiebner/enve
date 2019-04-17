@@ -129,7 +129,7 @@ private:
     bool mSelectionEnabled = true;
     bool mSelected = false;
     bool mTransformStarted = false;
-    bool mVisible = false;
+    bool mVisible = true;
     const MovablePointType mType;
     qreal mRadius;
     QPointF mSavedTransformPivot;

@@ -294,11 +294,13 @@ BoxTransformAnimator::BoxTransformAnimator() {
     mOpacityAnimator->setCurrentBaseValue(100);
     mOpacityAnimator->graphFixMinMaxValues();
 
-    mPivotPoint = SPtrCreate(BoxPathPoint)(mPivotAnimator.get(), this);
-
     ca_addChildAnimator(mShearAnimator);
     ca_addChildAnimator(mPivotAnimator);
     ca_addChildAnimator(mOpacityAnimator);
+
+    setPointsHandler(SPtrCreate(PointsHandler)());
+    mPointsHandler->createAppendNewPt<BoxPathPoint>(mPivotAnimator.get(), this);
+    enabledDrawingOnCanvas();
 }
 
 MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
@@ -365,7 +367,7 @@ QPointF BoxTransformAnimator::getPivot() {
 }
 
 QPointF BoxTransformAnimator::getPivotAbs() {
-    return mPivotPoint->getAbsolutePos();
+    return mapRelPosToAbs(mPivotAnimator->getEffectiveValue());
 }
 
 qreal BoxTransformAnimator::getOpacity(const qreal &relFrame) {

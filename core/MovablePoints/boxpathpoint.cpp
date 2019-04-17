@@ -5,7 +5,9 @@
 BoxPathPoint::BoxPathPoint(QPointFAnimator * const associatedAnimator,
                            BoxTransformAnimator * const boxTrans) :
     AnimatedPoint(associatedAnimator, boxTrans, TYPE_PIVOT_POINT, 7),
-    mBoxTransform_cv(boxTrans) {}
+    mBoxTransform_cv(boxTrans) {
+    setSelectionEnabled(false);
+}
 
 void BoxPathPoint::setRelativePos(const QPointF &relPos) {
     mBoxTransform_cv->setPivotAutoAdjust(false);

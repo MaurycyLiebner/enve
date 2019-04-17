@@ -232,9 +232,9 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
     } else if(currentCanvasMode == MOVE_PATH) {
         MovablePoint* const pivotMovable =
                 mTransformAnimator->getPivotMovablePoint();
-        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return pivotMovable;
-        }
+//        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+//            return pivotMovable;
+//        }
     }
     return pointToReturn;
 }

@@ -11,6 +11,7 @@ class ComplexAnimator : public Animator {
     Q_OBJECT
     friend class SelfRef;
 protected:
+    ComplexAnimator(const QString& name);
     void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
 //    ~ComplexAnimator();
@@ -131,8 +132,6 @@ public slots:
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
 protected:
-    ComplexAnimator(const QString& name);
-
     ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(const int &frame);
     bool ca_mChildAnimatorRecording = false;

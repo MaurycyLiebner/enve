@@ -12,7 +12,20 @@ class Key;
 class QPainter;
 class PropertyUpdater;
 class UndoRedoStack;
-enum CanvasMode : short;
+enum CanvasMode : short {
+    MOVE_PATH,
+    MOVE_POINT,
+    ADD_POINT,
+    ADD_SMART_POINT,
+    PICK_PAINT_SETTINGS,
+    ADD_CIRCLE,
+    ADD_RECTANGLE,
+    ADD_TEXT,
+    ADD_PARTICLE_BOX,
+    ADD_PARTICLE_EMITTER,
+    ADD_PAINT_BOX,
+    PAINT_MODE
+};
 
 //! @brief Use only as base class for PropertyMimeData.
 class InternalMimeData : public QMimeData {
@@ -188,6 +201,13 @@ public:
 
     PointsHandler * getPointsHandler() const {
         return mPointsHandler.get();
+    }
+
+    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                                   const CanvasMode &mode,
+                                   const qreal &invScale) {
+        if(!mPointsHandler) return nullptr;
+        return mPointsHandler->getPointAtAbsPos(absPos, mode, invScale);
     }
 protected:
     void prp_currentFrameChanged();

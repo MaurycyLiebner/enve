@@ -11,24 +11,24 @@ protected:
     PointsHandler();
 public:
     template <class T, typename... Args>
-    T *createNewPt(const int& id, Args && ...args) {
+    T *createInsertNewPt(const int& id, Args && ...args) {
         const auto newPt = SPtrCreateTemplated(T)(args...);
         mPts.insert(id, newPt);
         return newPt.get();
     }
 
     template <class T, typename... Args>
-    T *createNewPt(Args && ...args) {
-        return createNewPt<T>(mPts.count(), args...);
+    T *createAppendNewPt(Args && ...args) {
+        return createInsertNewPt<T>(mPts.count(), args...);
     }
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const qreal &canvasScaleInv,
-                                   const CanvasMode &mode) {
+                                   const CanvasMode &mode,
+                                   const qreal &invScale) {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
             if(pt->isHidden(mode)) continue;
-            if(pt->isPointAtAbsPos(absPos, canvasScaleInv))
+            if(pt->isPointAtAbsPos(absPos, invScale))
                 return pt.get();
         }
         return nullptr;
