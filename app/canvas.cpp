@@ -710,9 +710,7 @@ void Canvas::duplicateAction() {
 
 void Canvas::selectAllAction() {
     if(mCurrentMode == MOVE_POINT) {
-        for(const auto& box : mSelectedBoxes) {
-            box->selectAllPoints(this);
-        }
+        selectAllPointsAction();
     } else {//if(mCurrentMode == MOVE_PATH) {
         selectAllBoxesFromBoxesGroup();
     }
@@ -721,9 +719,7 @@ void Canvas::selectAllAction() {
 void Canvas::invertSelectionAction() {
     if(mCurrentMode == MOVE_POINT) {
         QList<stdptr<MovablePoint>> selectedPts = mSelectedPoints_d;
-        for(const auto& box : mSelectedBoxes) {
-            box->selectAllPoints(this);
-        }
+        selectAllPointsAction();
         for(const auto& pt : selectedPts) {
             removePointFromSelection(pt);
         }
@@ -851,9 +847,8 @@ void Canvas::deselectAllBoxesAction() {
 }
 
 void Canvas::selectAllPointsAction() {
-    for(const auto& box : mSelectedBoxes) {
-        box->selectAllPoints(this);
-    }
+    for(const auto& box : mSelectedBoxes)
+        box->selectAllCanvasPts(mSelectedPoints_d);
 }
 
 void Canvas::selectOnlyLastPressedBox() {

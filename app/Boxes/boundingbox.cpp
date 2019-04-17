@@ -1257,8 +1257,12 @@ void BoundingBox::sClearReadBoxes() {
     sFunctionsWaitingForBoxRead.clear();
 }
 
-void BoundingBox::selectAllPoints(Canvas * const canvas) {
-    Q_UNUSED(canvas);
+void BoundingBox::selectAllCanvasPts(QList<stdptr<MovablePoint> > &selection) {
+    for(const auto& desc : mCanvasProps) {
+        const auto handler = desc->getPointsHandler();
+        if(!handler) continue;
+        handler->addAllPointsToSelection(selection);
+    }
 }
 
 void BoundingBox::scheduleTask(const stdsptr<_ScheduledTask>& task) {

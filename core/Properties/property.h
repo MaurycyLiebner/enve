@@ -175,15 +175,25 @@ public:
     T *getFirstAncestor(const std::function<bool(Property*)>& tester) const {
         if(!mParent) return nullptr;
         if(tester(mParent.data())) return static_cast<T*>(mParent.data());
-        return static_cast<T*>(mParent->getFirstAncestor(tester));
+        return mParent->getFirstAncestor<T>(tester);
+    }
+
+    template <class T = Property>
+    T *getFirstAncestor() const {
+        if(!mParent) return nullptr;
+        const auto target = dynamic_cast<T*>(mParent.data());
+        if(target) target;
+        return mParent->getFirstAncestor<T>();
+    }
+
+    PointsHandler * getPointsHandler() const {
+        return mPointsHandler.get();
     }
 protected:
     void prp_currentFrameChanged();
     void prp_callFinishUpdater();
 
-    void setPointsHandler(const stdsptr<PointsHandler>& handler) {
-        mPointsHandler = handler;
-    }
+    void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:
     void prp_updateWholeInfluenceRange();
     void prp_absFrameRangeChanged(const FrameRange &range);

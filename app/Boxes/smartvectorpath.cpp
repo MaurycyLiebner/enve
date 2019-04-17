@@ -37,10 +37,6 @@ SmartPathCollection *SmartVectorPath::getPathAnimator() {
     return mPathAnimator.data();
 }
 
-void SmartVectorPath::selectAllPoints(Canvas * const canvas) {
-    mHandler.selectAllPoints(canvas);
-}
-
 #include "typemenu.h"
 void SmartVectorPath::addActionsToMenu(BoxTypeMenu * const menu) {
     PathBox::addActionsToMenu(menu);

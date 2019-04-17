@@ -32,8 +32,6 @@ public:
                                            QList<stdptr<MovablePoint>> &list);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
-
-    void selectAllPoints(Canvas * const canvas);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 

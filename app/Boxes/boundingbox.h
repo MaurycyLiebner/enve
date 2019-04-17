@@ -120,7 +120,6 @@ public:
     virtual void centerPivotPosition();
     virtual QPointF getRelCenterPosition();
 
-    virtual void selectAllPoints(Canvas * const canvas);
     virtual void selectAndAddContainedPointsToList(
             const QRectF &, QList<stdptr<MovablePoint>>&);
     virtual bool relPointInsidePath(const QPointF &relPos) const;
@@ -268,6 +267,8 @@ public:
 
     void ca_childAnimatorIsRecordingChanged();
 
+    void selectAllCanvasPts(QList<stdptr<MovablePoint>> &selection);
+
     int getDocumentId() const { return mDocumentId; }
 
     int assignWriteId();
@@ -410,6 +411,13 @@ public:
     void requestGlobalFillStrokeUpdateIfSelected();
     QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
+
+    void addCanvasProp(Property * const prop) {
+        mCanvasProps.append(prop);
+    }
+    void removeCanvasProp(Property * const prop) {
+        mCanvasProps.removeOne(prop);
+    }
 protected:
     bool mSelected = false;
     bool mInVisibleRange = true;
@@ -448,6 +456,7 @@ protected:
     const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
 
     QList<stdsptr<_ScheduledTask>> mScheduledTasks;
+    QList<stdptr<Property>> mCanvasProps;
 private:
     void updateRelBoundingRectFromRenderData(
             BoundingBoxRenderData * const renderData);

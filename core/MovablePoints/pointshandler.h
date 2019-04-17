@@ -37,19 +37,26 @@ public:
         return nullptr;
     }
 
-    void allPointsForSelection(QList<stdptr<MovablePoint>> &list) {
+    void addAllPointsToSelection(
+            QList<stdptr<MovablePoint>> &selection) {
         for(const auto& pt : mPts) {
             if(pt->isHidden() || !pt->isSelected()) continue;
-            if(pt->selectionEnabled()) list << pt.get();
+            if(pt->selectionEnabled()) {
+                pt->select();
+                selection << pt.get();
+            }
         }
     }
 
-    void pointsInRectForSelection(const QRectF &absRect,
-                                  QList<stdptr<MovablePoint>> &list) const {
+    void addInRectForSelection(const QRectF &absRect,
+                               QList<stdptr<MovablePoint>> &selection) const {
         for(const auto& pt : mPts) {
             if(!pt->selectionEnabled()) continue;
             if(pt->isSelected() && pt->isHidden()) continue;
-            if(pt->isContainedInRect(absRect)) list.append(pt.get());
+            if(pt->isContainedInRect(absRect)) {
+                pt->select();
+                selection.append(pt.get());
+            }
         }
     }
 
