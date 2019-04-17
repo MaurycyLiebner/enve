@@ -267,7 +267,8 @@ public:
 
     void ca_childAnimatorIsRecordingChanged();
 
-    void selectAllCanvasPts(QList<stdptr<MovablePoint>> &selection);
+    void selectAllCanvasPts(QList<stdptr<MovablePoint>> &selection,
+                            const CanvasMode &mode);
 
     int getDocumentId() const { return mDocumentId; }
 

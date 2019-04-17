@@ -848,7 +848,7 @@ void Canvas::deselectAllBoxesAction() {
 
 void Canvas::selectAllPointsAction() {
     for(const auto& box : mSelectedBoxes)
-        box->selectAllCanvasPts(mSelectedPoints_d);
+        box->selectAllCanvasPts(mSelectedPoints_d, mCurrentMode);
 }
 
 void Canvas::selectOnlyLastPressedBox() {

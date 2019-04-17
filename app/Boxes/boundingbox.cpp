@@ -1259,11 +1259,12 @@ void BoundingBox::sClearReadBoxes() {
     sFunctionsWaitingForBoxRead.clear();
 }
 
-void BoundingBox::selectAllCanvasPts(QList<stdptr<MovablePoint> > &selection) {
+void BoundingBox::selectAllCanvasPts(QList<stdptr<MovablePoint> > &selection,
+                                     const CanvasMode& mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();
         if(!handler) continue;
-        handler->addAllPointsToSelection(selection);
+        handler->addAllPointsToSelection(selection, mode);
     }
 }
 

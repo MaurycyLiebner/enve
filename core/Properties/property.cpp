@@ -6,6 +6,19 @@
 Property::Property(const QString& name) :
     prp_mName(name) {}
 
+void Property::drawCanvasControls(SkCanvas * const canvas,
+                                  const CanvasMode &mode,
+                                  const SkScalar &invScale) {
+    if(mPointsHandler) {
+        bool key;
+        if(SWT_isAnimator()) {
+            const auto asAnim = GetAsPtr(this, Animator);
+            key = asAnim->anim_getKeyOnCurrentFrame();
+        } else key = false;
+        mPointsHandler->drawPoints(canvas, invScale, key, mode);
+    }
+}
+
 void Property::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     prp_currentFrameChanged();
     emit prp_absFrameRangeChanged(range);
