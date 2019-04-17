@@ -418,8 +418,8 @@ public:
     void makeSegmentCurve();
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                             const CanvasMode &currentMode,
-                             const qreal &canvasScaleInv);
+                                   const CanvasMode &mode,
+                                   const qreal &invScale);
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
     void clearCurrentSmartEndPoint();

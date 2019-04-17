@@ -160,7 +160,8 @@ void Canvas::moveSelectedPointsByAbs(const QPointF &by,
 
 void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
     for(const auto& box : mSelectedBoxes) {
-        box->selectAndAddContainedPointsToList(absRect, mSelectedPoints_d);
+        box->selectAndAddContainedPointsToList(absRect, mSelectedPoints_d,
+                                               mCurrentMode);
     }
 }
 

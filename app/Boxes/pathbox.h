@@ -121,9 +121,6 @@ public:
 
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
-    void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &currentCanvasMode,
-                            const SkScalar &invScale);
     void addPathEffect(const qsptr<PathEffect> &effect);
     void addFillPathEffect(const qsptr<PathEffect> &effect);
     void addOutlinePathEffect(const qsptr<PathEffect> &effect);
@@ -182,10 +179,6 @@ public:
 
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
-
-    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
-                                   const CanvasMode &currentCanvasMode,
-                                   const qreal &canvasScaleInv);
 
     void drawBoundingRect(SkCanvas * const canvas,
                             const SkScalar &invScale);

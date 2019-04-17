@@ -61,36 +61,6 @@ NormalSegment SmartVectorPath::getNormalSegment(
     return mHandler.getNormalSegmentAtAbsPos(absPos, canvasScaleInv);
 }
 
-void SmartVectorPath::drawCanvasControls(SkCanvas * const canvas,
-                                         const CanvasMode &currentCanvasMode,
-                                         const SkScalar &invScale) {
-    mHandler.drawPoints(canvas, currentCanvasMode,
-                        invScale, toSkMatrix(getTotalTransform()));
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
-        mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
-    }
-    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
-}
-
-MovablePoint *SmartVectorPath::getPointAtAbsPos(const QPointF &absPtPos,
-                                     const CanvasMode &currentCanvasMode,
-                                     const qreal &canvasScaleInv) {
-    MovablePoint* pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
-                                                            currentCanvasMode,
-                                                            canvasScaleInv);
-    if(!pointToReturn) {
-        pointToReturn = mHandler.getPointAtAbsPos(absPtPos, currentCanvasMode,
-                                                  canvasScaleInv);
-    }
-    return pointToReturn;
-}
-
-void SmartVectorPath::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<stdptr<MovablePoint>>& list) {
-    mHandler.selectAndAddContainedPointsToList(absRect, list);
-}
-
 SkPath SmartVectorPath::getPathAtRelFrameF(const qreal &relFrame) {
      return mHandler.getPathAtRelFrame(relFrame);
 }

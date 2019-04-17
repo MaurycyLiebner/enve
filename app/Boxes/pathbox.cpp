@@ -68,16 +68,6 @@ PathBox::~PathBox() {
         mStrokeSettings->getGradient()->removePath(this);
 }
 
-void PathBox::drawCanvasControls(SkCanvas * const canvas,
-                                 const CanvasMode &currentCanvasMode,
-                                 const SkScalar &invScale) {
-    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
-        mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
-    }
-}
-
 void PathBox::setParentGroup(BoxesGroup * const parent) {
     setPathsOutdated();
     BoundingBox::setParentGroup(parent);
@@ -216,27 +206,6 @@ void PathBox::setupRenderData(const qreal &relFrame,
                     mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
                     mStrokeSettings->getGradientType());
     }
-}
-
-MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
-                                        const CanvasMode &currentCanvasMode,
-                                        const qreal &canvasScaleInv) {
-    MovablePoint* pointToReturn = nullptr;
-    if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->getPointAt(absPtPos,
-                                                          canvasScaleInv);
-        if(!pointToReturn) {
-            pointToReturn = mFillGradientPoints->getPointAt(absPtPos,
-                                                            canvasScaleInv);
-        }
-    } else if(currentCanvasMode == MOVE_PATH) {
-        MovablePoint* const pivotMovable =
-                mTransformAnimator->getPivotMovablePoint();
-//        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-//            return pivotMovable;
-//        }
-    }
-    return pointToReturn;
 }
 
 void PathBox::drawBoundingRect(SkCanvas * const canvas,

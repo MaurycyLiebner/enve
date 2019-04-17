@@ -267,16 +267,8 @@ public:
     bool relPointInsidePath(const QPointF &relPos) const;
 
     void addEmitter(const qsptr<ParticleEmitter> &emitter);
-    void drawCanvasControls(SkCanvas * const canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
     void startAllPointsTransform();
 
-    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode,
-                             const qreal &canvasScaleInv);
-    void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<stdptr<MovablePoint>> &list);
     void applyPaintSetting(const PaintSettingsApplier &setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);

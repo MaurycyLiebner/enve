@@ -27,16 +27,6 @@ class Circle : public PathBox {
 protected:
     Circle();
 public:
-    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
-                                   const CanvasMode &currentCanvasMode,
-                                   const qreal &canvasScaleInv);
-    void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<stdptr<MovablePoint>> &list);
-
-    void drawCanvasControls(SkCanvas * const canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
-
     bool SWT_isCircle() const;
 
     void startAllPointsTransform();

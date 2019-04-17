@@ -122,69 +122,6 @@ void ParticleBox::startAllPointsTransform() {
     startTransform();
 }
 
-void ParticleBox::drawCanvasControls(SkCanvas * const canvas,
-                                     const CanvasMode &currentCanvasMode,
-                                     const SkScalar &invScale) {
-    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        mTopLeftPoint->drawSk(canvas, invScale);
-        mBottomRightPoint->drawSk(canvas, invScale);
-        for(const auto& emitter : mEmitters) {
-            MovablePoint * const pt = emitter->getPosPoint();
-            pt->drawSk(canvas, invScale);
-        }
-    }
-}
-
-MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
-                                      const CanvasMode &currentCanvasMode,
-                                      const qreal &canvasScaleInv) {
-    if(currentCanvasMode == MOVE_POINT) {
-        if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mTopLeftPoint.get();
-        }
-        if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-            return mBottomRightPoint.get();
-        }
-        for(const auto& emitter : mEmitters) {
-            MovablePoint *pt = emitter->getPosPoint();
-            if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-                return pt;
-            }
-        }
-    } else if(currentCanvasMode == MOVE_PATH) {
-        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
-        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return pivotMovable;
-        }
-    }
-
-    return nullptr;
-}
-
-void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                    QList<stdptr<MovablePoint>> &list) {
-    if(!mTopLeftPoint->isSelected()) {
-        if(mTopLeftPoint->isContainedInRect(absRect)) {
-            mTopLeftPoint->select();
-            list.append(mTopLeftPoint.get());
-        }
-    }
-    if(!mBottomRightPoint->isSelected()) {
-        if(mBottomRightPoint->isContainedInRect(absRect)) {
-            mBottomRightPoint->select();
-            list.append(mBottomRightPoint.get());
-        }
-    }
-    for(const auto& emitter : mEmitters) {
-        MovablePoint *pt = emitter->getPosPoint();
-        if(pt->isContainedInRect(absRect)) {
-            pt->select();
-            list.append(pt);
-        }
-    }
-}
-
 MovablePoint *ParticleBox::getBottomRightPoint() {
     return mBottomRightPoint.get();
 }

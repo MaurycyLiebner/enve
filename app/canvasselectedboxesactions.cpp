@@ -463,19 +463,16 @@ void Canvas::deselectAllBoxes() {
 }
 
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
-                                       const CanvasMode &currentMode,
-                                       const qreal &canvasScaleInv) {
-    if(currentMode == MOVE_POINT ||
-       currentMode == ADD_POINT ||
-       currentMode == ADD_SMART_POINT ||
-       currentMode == MOVE_PATH) {
-        if(mRotPivot->isPointAtAbsPos(absPos, canvasScaleInv)) {
+                                       const CanvasMode &mode,
+                                       const qreal &invScale) {
+    if(mode == MOVE_POINT || mode == ADD_POINT ||
+       mode == ADD_SMART_POINT ||  mode == MOVE_PATH) {
+        if(mRotPivot->isPointAtAbsPos(absPos, invScale)) {
             return mRotPivot.get();
         }
         MovablePoint *pointAtPos = nullptr;
         for(const auto &box : mSelectedBoxes) {
-            pointAtPos = box->getPointAtAbsPos(absPos, currentMode,
-                                               canvasScaleInv);
+            pointAtPos = box->getPointAtAbsPos(absPos, mode, invScale);
             if(pointAtPos) break;
         }
         return pointAtPos;

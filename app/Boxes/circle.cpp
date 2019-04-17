@@ -75,63 +75,7 @@ void Circle::setRadius(const qreal &radius) {
     setVerticalRadius(radius);
 }
 
-void Circle::drawCanvasControls(SkCanvas * const canvas,
-                                const CanvasMode &currentCanvasMode,
-                                const SkScalar &invScale) {
-    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        mCenterPoint->drawSk(canvas, invScale);
-        mHorizontalRadiusPoint->drawSk(canvas, invScale);
-        mVerticalRadiusPoint->drawSk(canvas, invScale);
-
-        mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
-        mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
-    }
-}
-
 bool Circle::SWT_isCircle() const { return true; }
-
-MovablePoint *Circle::getPointAtAbsPos(const QPointF &absPtPos,
-                                       const CanvasMode &currentCanvasMode,
-                                       const qreal &canvasScaleInv) {
-    const auto pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
-                                                         currentCanvasMode,
-                                                         canvasScaleInv);
-    if(!pointToReturn) {
-        if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mHorizontalRadiusPoint.get();
-        }
-        if(mVerticalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mVerticalRadiusPoint.get();
-        }
-        if(mCenterPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mCenterPoint.get();
-        }
-    }
-    return pointToReturn;
-}
-
-void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                               QList<stdptr<MovablePoint>> &list) {
-    if(!mCenterPoint->isSelected()) {
-        if(mCenterPoint->isContainedInRect(absRect)) {
-            mCenterPoint->select();
-            list.append(mCenterPoint.get());
-        }
-    }
-    if(!mHorizontalRadiusPoint->isSelected()) {
-        if(mHorizontalRadiusPoint->isContainedInRect(absRect)) {
-            mHorizontalRadiusPoint->select();
-            list.append(mHorizontalRadiusPoint.get());
-        }
-    }
-    if(!mVerticalRadiusPoint->isSelected()) {
-        if(mVerticalRadiusPoint->isContainedInRect(absRect)) {
-            mVerticalRadiusPoint->select();
-            list.append(mVerticalRadiusPoint.get());
-        }
-    }
-}
 
 SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
     const SkScalar xRadius = static_cast<SkScalar>(

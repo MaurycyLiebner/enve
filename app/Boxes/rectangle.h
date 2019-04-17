@@ -9,16 +9,6 @@ public:
     void moveSizePointByAbs(const QPointF &absTrans);
     void startAllPointsTransform();
 
-    void drawCanvasControls(SkCanvas * const canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
-
-    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode,
-                             const qreal &canvasScaleInv);
-    void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<stdptr<MovablePoint>> &list);
-
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
 

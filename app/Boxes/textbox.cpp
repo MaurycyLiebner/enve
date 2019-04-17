@@ -76,14 +76,6 @@ QString TextBox::getCurrentValue() {
     return mText->getCurrentValue();
 }
 
-MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
-                                        const CanvasMode &currentCanvasMode,
-                                        const qreal &canvasScaleInv) {
-    return PathBox::getPointAtAbsPos(absPtPos,
-                                     currentCanvasMode,
-                                     canvasScaleInv);
-}
-
 qreal textLineX(const Qt::Alignment &alignment,
                 const qreal &lineWidth,
                 const qreal &maxWidth) {

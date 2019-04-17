@@ -18,18 +18,10 @@ public:
     SmartVectorPath();
     bool SWT_isSmartVectorPath() const { return true; }
 
-    void drawCanvasControls(SkCanvas * const canvas,
-                        const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
     void addActionsToMenu(BoxTypeMenu * const menu);
     NormalSegment getNormalSegment(const QPointF &absPos,
                                    const qreal &canvasScaleInv);
 
-    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
-                                   const CanvasMode &currentCanvasMode,
-                                   const qreal &canvasScaleInv);
-    void selectAndAddContainedPointsToList(const QRectF &absRect,
-                                           QList<stdptr<MovablePoint>> &list);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
     void writeBoundingBox(QIODevice *target);

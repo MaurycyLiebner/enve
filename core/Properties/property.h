@@ -202,13 +202,6 @@ public:
     PointsHandler * getPointsHandler() const {
         return mPointsHandler.get();
     }
-
-    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &mode,
-                                   const qreal &invScale) {
-        if(!mPointsHandler) return nullptr;
-        return mPointsHandler->getPointAtAbsPos(absPos, mode, invScale);
-    }
 protected:
     void prp_currentFrameChanged();
     void prp_callFinishUpdater();

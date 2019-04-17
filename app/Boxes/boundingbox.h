@@ -121,7 +121,9 @@ public:
     virtual QPointF getRelCenterPosition();
 
     virtual void selectAndAddContainedPointsToList(
-            const QRectF &, QList<stdptr<MovablePoint>>&);
+            const QRectF &absRect, QList<stdptr<MovablePoint>> &selection,
+            const CanvasMode& mode);
+
     virtual bool relPointInsidePath(const QPointF &relPos) const;
 
     virtual void setFont(const QFont &);
@@ -157,9 +159,9 @@ public:
         Q_UNUSED(canvasScaleInv);
         return NormalSegment();
     }
-    virtual MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                           const CanvasMode &currentCanvasMode,
-                                           const qreal &invScale);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                                   const CanvasMode &mode,
+                                   const qreal &invScale);
 
     virtual FillSettingsAnimator *getFillSettings() const;
     virtual OutlineSettingsAnimator *getStrokeSettings() const;

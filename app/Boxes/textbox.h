@@ -29,9 +29,6 @@ public:
     QString getCurrentValue();
 
     void openTextEditor(QWidget* dialogParent);
-    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode,
-                             const qreal &canvasScaleInv);
 //    QRectF getTextRect();
     void setPathText(bool pathText);
 

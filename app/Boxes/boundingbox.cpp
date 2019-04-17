@@ -196,7 +196,9 @@ MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
                                             const qreal &invScale) {
 
     for(const auto& prop : mCanvasProps) {
-        const auto pt = prop->getPointAtAbsPos(absPos, mode, invScale);
+        const auto handler = prop->getPointsHandler();
+        if(!handler) continue;
+        const auto pt = mPointsHandler->getPointAtAbsPos(absPos, mode, invScale);
         if(pt) return pt;
     }
     return nullptr;
@@ -798,9 +800,6 @@ void BoundingBox::setZListIndex(const int &z) {
     mZListIndex = z;
 }
 
-void BoundingBox::selectAndAddContainedPointsToList(
-        const QRectF &, QList<stdptr<MovablePoint>> &) {}
-
 int BoundingBox::getZIndex() const {
     return mZListIndex;
 }
@@ -1253,6 +1252,16 @@ void BoundingBox::sClearReadBoxes() {
         func.boxNeverRead();
     }
     sFunctionsWaitingForBoxRead.clear();
+}
+
+void BoundingBox::selectAndAddContainedPointsToList(
+        const QRectF &absRect, QList<stdptr<MovablePoint>> &selection,
+        const CanvasMode& mode) {
+    for(const auto& desc : mCanvasProps) {
+        const auto handler = desc->getPointsHandler();
+        if(!handler) continue;
+        handler->addInRectForSelection(absRect, selection, mode);
+    }
 }
 
 void BoundingBox::selectAllCanvasPts(QList<stdptr<MovablePoint> > &selection,

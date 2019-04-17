@@ -95,53 +95,6 @@ MovablePoint *Rectangle::getBottomRightPoint() {
     return mBottomRightPoint.get();
 }
 
-void Rectangle::drawCanvasControls(SkCanvas * const canvas,
-                               const CanvasMode &currentCanvasMode,
-                               const SkScalar &invScale) {
-    BoundingBox::drawCanvasControls(canvas, currentCanvasMode, invScale);
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        mTopLeftPoint->drawSk(canvas, invScale);
-        mBottomRightPoint->drawSk(canvas, invScale);
-
-        mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
-        mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
-    }
-}
-
-
-MovablePoint *Rectangle::getPointAtAbsPos(const QPointF &absPtPos,
-                                    const CanvasMode &currentCanvasMode,
-                                    const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
-                                                            currentCanvasMode,
-                                                            canvasScaleInv);
-    if(!pointToReturn) {
-        if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return mTopLeftPoint.get();
-        }
-        if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-            return mBottomRightPoint.get();
-        }
-    }
-    return pointToReturn;
-}
-
-void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                  QList<stdptr<MovablePoint>>& list) {
-    if(!mTopLeftPoint->isSelected()) {
-        if(mTopLeftPoint->isContainedInRect(absRect)) {
-            mTopLeftPoint->select();
-            list.append(mTopLeftPoint.get());
-        }
-    }
-    if(!mBottomRightPoint->isSelected()) {
-        if(mBottomRightPoint->isContainedInRect(absRect)) {
-            mBottomRightPoint->select();
-            list.append(mBottomRightPoint.get());
-        }
-    }
-}
-
 void Rectangle::getMotionBlurProperties(QList<Property*> &list) const {
     PathBox::getMotionBlurProperties(list);
     list.append(mTopLeftAnimator.get());
