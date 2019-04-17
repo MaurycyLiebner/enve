@@ -411,14 +411,14 @@ public:
     void requestGlobalFillStrokeUpdateIfSelected();
     QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
-
+protected:
     void updateCanvasProps() {
         mCanvasProps.clear();
         ca_execOnDescendants([this](Property * prop) {
             if(prop->drawsOnCanvas()) mCanvasProps.append(prop);
         });
     }
-protected:
+
     bool mSelected = false;
     bool mInVisibleRange = true;
     bool mVisible = true;

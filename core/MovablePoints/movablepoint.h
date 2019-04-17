@@ -9,7 +9,7 @@
 class BoundingBox;
 class NodePoint;
 class BasicTransformAnimator;
-
+enum CanvasMode : short;
 class PropertyUpdater;
 
 enum MovablePointType : short {
@@ -46,7 +46,11 @@ public:
                         const SkScalar &invScale);
 
     virtual void remove() {}
-    virtual bool isHidden() const;
+    virtual bool isVisible() const;
+    virtual bool isVisible(const CanvasMode& mode) const {
+        Q_UNUSED(mode);
+        return isVisible();
+    }
 
     virtual void canvasContextMenu(PointTypeMenu * const menu) {
         Q_UNUSED(menu);
@@ -70,7 +74,10 @@ public:
 
     void hide();
     void show();
-    bool isVisible() const;
+    bool isHidden() const;
+    bool isHidden(const CanvasMode& mode) const {
+        return !isVisible(mode);
+    }
     void setVisible(const bool &bT);
 
     bool isNodePoint();
@@ -122,7 +129,7 @@ private:
     bool mSelectionEnabled = true;
     bool mSelected = false;
     bool mTransformStarted = false;
-    bool mHidden = false;
+    bool mVisible = false;
     const MovablePointType mType;
     qreal mRadius;
     QPointF mSavedTransformPivot;

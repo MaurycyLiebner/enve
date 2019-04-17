@@ -19,7 +19,7 @@ public:
 
     void remove();
 
-    bool isHidden() const;
+    bool isVisible() const;
     void scale(const qreal &sx, const qreal &sy);
 
     void setOtherCtrlPt(SmartCtrlPoint * const ctrlPt);

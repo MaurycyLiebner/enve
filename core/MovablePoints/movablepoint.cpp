@@ -192,20 +192,20 @@ void MovablePoint::deselect() {
 }
 
 void MovablePoint::hide() {
-    mHidden = true;
+    mVisible = false;
     deselect();
 }
 
 void MovablePoint::show() {
-    mHidden = false;
+    mVisible = true;
 }
 
 bool MovablePoint::isHidden() const {
-    return mHidden;
+    return !isVisible();
 }
 
 bool MovablePoint::isVisible() const {
-    return !isHidden();
+    return mVisible;
 }
 
 void MovablePoint::setVisible(const bool &bT) {

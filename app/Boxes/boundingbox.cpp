@@ -187,6 +187,8 @@ void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
 void BoundingBox::drawCanvasControls(SkCanvas * const canvas,
                                      const CanvasMode &currentCanvasMode,
                                      const SkScalar &invScale) {
+    for(const auto& prop : mCanvasProps)
+        prop->drawCanvasControls(canvas, currentCanvasMode, invScale);
     if(currentCanvasMode == MOVE_PATH) {
         mTransformAnimator->getPivotMovablePoint()->drawSk(canvas, invScale);
     }

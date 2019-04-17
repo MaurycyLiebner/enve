@@ -186,10 +186,6 @@ public:
         return mParent->getFirstAncestor<T>();
     }
 
-    virtual void updateCanvasProps() {
-        if(mParent) mParent->updateCanvasProps();
-    }
-
     bool drawsOnCanvas() const {
         return mDrawOnCanvas;
     }
@@ -201,6 +197,9 @@ protected:
     void prp_currentFrameChanged();
     void prp_callFinishUpdater();
 
+    virtual void updateCanvasProps() {
+        if(mParent) mParent->updateCanvasProps();
+    }
     void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:

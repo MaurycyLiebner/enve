@@ -10,10 +10,6 @@ class PointsHandler : public StdSelfRef {
 protected:
     PointsHandler();
 public:
-    virtual void afterCanvasModeChanged(const CanvasMode &mode) {
-        Q_UNUSED(mode);
-    }
-
     template <class T, typename... Args>
     T *createNewPt(const int& id, Args && ...args) {
         const auto newPt = SPtrCreateTemplated(T)(args...);
@@ -27,20 +23,21 @@ public:
     }
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const qreal &canvasScaleInv) {
+                                   const qreal &canvasScaleInv,
+                                   const CanvasMode &mode) {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
-            if(pt->isHidden()) continue;
+            if(pt->isHidden(mode)) continue;
             if(pt->isPointAtAbsPos(absPos, canvasScaleInv))
                 return pt.get();
         }
         return nullptr;
     }
 
-    void addAllPointsToSelection(
-            QList<stdptr<MovablePoint>> &selection) {
+    void addAllPointsToSelection(QList<stdptr<MovablePoint>> &selection,
+                                 const CanvasMode &mode) {
         for(const auto& pt : mPts) {
-            if(pt->isHidden() || !pt->isSelected()) continue;
+            if(pt->isSelected() || pt->isHidden(mode)) continue;
             if(pt->selectionEnabled()) {
                 pt->select();
                 selection << pt.get();
@@ -49,10 +46,11 @@ public:
     }
 
     void addInRectForSelection(const QRectF &absRect,
-                               QList<stdptr<MovablePoint>> &selection) const {
+                               QList<stdptr<MovablePoint>> &selection,
+                               const CanvasMode &mode) const {
         for(const auto& pt : mPts) {
             if(!pt->selectionEnabled()) continue;
-            if(pt->isSelected() && pt->isHidden()) continue;
+            if(pt->isSelected() || pt->isHidden(mode)) continue;
             if(pt->isContainedInRect(absRect)) {
                 pt->select();
                 selection.append(pt.get());
@@ -62,10 +60,11 @@ public:
 
     void drawPoints(SkCanvas * const canvas,
                     const SkScalar &invScale,
-                    const bool& keyOnCurrentFrame) const {
+                    const bool& keyOnCurrentFrame,
+                    const CanvasMode &mode) const {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
-            if(pt->isVisible()) pt->drawSk(canvas, invScale);
+            if(pt->isVisible(mode)) pt->drawSk(canvas, invScale);
         }
     }
 

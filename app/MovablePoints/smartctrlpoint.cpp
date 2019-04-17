@@ -65,10 +65,10 @@ void SmartCtrlPoint::remove() {
     else mParentPoint_k->setC2Enabled(false);
 }
 
-bool SmartCtrlPoint::isHidden() const {
-    if(mCtrlType == C0) return NonAnimatedMovablePoint::isHidden() ||
-                               !mParentPoint_k->isPrevNormalSelected();
-    if(mCtrlType == C2) return NonAnimatedMovablePoint::isHidden() ||
-                               !mParentPoint_k->isNextNormalSelected();
-    return true;
+bool SmartCtrlPoint::isVisible() const {
+    if(mCtrlType == C0) return NonAnimatedMovablePoint::isVisible() &&
+                               mParentPoint_k->isPrevNormalSelected();
+    if(mCtrlType == C2) return NonAnimatedMovablePoint::isVisible() &&
+                               mParentPoint_k->isNextNormalSelected();
+    return false;
 }
