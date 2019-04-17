@@ -12,6 +12,8 @@ void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
     mCurrentSmartEndPoint = point;
 }
 #include "MovablePoints/pathpointshandler.h"
+#include "Animators/SmartPath/smartpathcollection.h"
+
 void Canvas::handleAddSmartPointMousePress() {
     if(mCurrentSmartEndPoint ? mCurrentSmartEndPoint->isHidden() : false) {
         clearCurrentSmartEndPoint();
@@ -29,7 +31,7 @@ void Canvas::handleAddSmartPointMousePress() {
         mCurrentBoxesGroup->addContainedBox(newPath);
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
-        const auto newHandler = newPath->getHandler();
+        const auto newHandler = newPath->getPathAnimator();
         const auto node = newHandler->createNewSubPathAtPos(
                     mLastMouseEventPosRel);
         setCurrentSmartEndPoint(node);

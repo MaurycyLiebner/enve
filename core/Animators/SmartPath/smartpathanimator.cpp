@@ -15,12 +15,6 @@ void SmartPathAnimator::graph_getValueConstraints(
     }
 }
 
-void SmartPathAnimator::drawCanvasControls(SkCanvas * const canvas,
-                                           const CanvasMode &currentCanvasMode,
-                                           const SkScalar &invScale) {
-
-}
-
 void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
                                               const int &node2Id) {
     for(const auto &key : anim_mKeys) {

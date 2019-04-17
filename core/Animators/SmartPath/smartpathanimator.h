@@ -74,10 +74,6 @@ public:
             GraphKey *key, const QrealPointType &type,
             qreal &minValue, qreal &maxValue) const;
 
-    void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &currentCanvasMode,
-                            const SkScalar &invScale);
-
     void deepCopySmartPathFromRelFrame(const int& relFrame,
                                        SmartPath &result) const {
         const auto prevKey = anim_getPrevKey<SmartPathKey>(relFrame);

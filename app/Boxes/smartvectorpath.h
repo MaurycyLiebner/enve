@@ -33,10 +33,6 @@ public:
 
     void loadSkPath(const SkPath& path);
 
-    SmartPathCollectionHandler *getHandler() {
-        return &mHandler;
-    }
-
     SmartPathCollection *getPathAnimator();
 
     QList<qsptr<SmartVectorPath>> breakPathsApart_k();

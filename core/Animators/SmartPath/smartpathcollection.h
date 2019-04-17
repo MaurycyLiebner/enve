@@ -5,6 +5,7 @@
 #include "Animators/SmartPath/smartpathanimator.h"
 
 class SmartPathAnimator;
+class SmartNodePoint;
 
 class SmartPathCollection : public ComplexAnimator {
     friend class SelfRef;
@@ -35,6 +36,11 @@ public:
         const auto newPath = SPtrCreate(SmartPathAnimator)(arguments...);
         addPath(newPath);
         return newPath.get();
+    }
+
+    SmartNodePoint * createNewSubPathAtPos(const QPointF &pos) {
+        const auto newPath = createNewPath();
+        return nullptr; newPath->actionAddFirstNode(pos);
     }
 
     void addPath(const qsptr<SmartPathAnimator>& path);

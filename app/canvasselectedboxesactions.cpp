@@ -4,6 +4,7 @@
 #include "PathEffects/patheffectsinclude.h"
 #include "PixmapEffects/pixmapeffectsinclude.h"
 #include "Boxes/smartvectorpath.h"
+#include "Animators/SmartPath/smartpathcollection.h"
 
 bool Canvas::anim_nextRelFrameWithKey(const int &relFrame,
                                      int &nextRelFrame) {
@@ -659,7 +660,7 @@ void Canvas::selectedPathsCombine() {
         mCurrentBoxesGroup->addContainedBox(newPath);
         firstVectorPath = newPath.get();
     }
-    const auto targetVP = firstVectorPath->getHandler();
+    const auto targetVP = firstVectorPath->getPathAnimator();
     const QMatrix firstTranf = firstVectorPath->getTotalTransform();
     for(const auto &box : mSelectedBoxes) {
         if(box == firstVectorPath) continue;
@@ -667,7 +668,7 @@ void Canvas::selectedPathsCombine() {
             const auto boxPath = GetAsPtr(box, SmartVectorPath);
             const QMatrix relTransf = boxPath->getTotalTransform()*
                     firstTranf.inverted();
-            const auto srcVP = boxPath->getHandler();
+            const auto srcVP = boxPath->getPathAnimator();
             srcVP->applyTransform(relTransf);
             targetVP->moveAllFrom(srcVP);
             box->removeFromParent_k();

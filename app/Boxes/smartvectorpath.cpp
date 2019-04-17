@@ -62,7 +62,7 @@ NormalSegment SmartVectorPath::getNormalSegment(
 }
 
 SkPath SmartVectorPath::getPathAtRelFrameF(const qreal &relFrame) {
-     return mHandler.getPathAtRelFrame(relFrame);
+     return mPathAnimator->getPathAtRelFrame(relFrame);
 }
 
 void SmartVectorPath::getMotionBlurProperties(QList<Property*> &list) const {
