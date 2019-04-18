@@ -1,6 +1,7 @@
 #include "smartpathanimator.h"
 #include "../qrealpoint.h"
 #include "smartpathcollection.h"
+#include "MovablePoints/pathpointshandler.h"
 
 void SmartPathAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType &type,
@@ -27,7 +28,9 @@ void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
 }
 
 SmartPathAnimator::SmartPathAnimator() :
-    GraphAnimator("path") {}
+    GraphAnimator("path") {
+    setPointsHandler(SPtrCreate(PathPointsHandler)(this));
+}
 
 SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
     SmartPathAnimator() {
@@ -35,4 +38,6 @@ SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
 }
 
 SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
-    GraphAnimator("path"), mBaseValue(baseValue) {}
+    SmartPathAnimator() {
+    mBaseValue = baseValue;
+}

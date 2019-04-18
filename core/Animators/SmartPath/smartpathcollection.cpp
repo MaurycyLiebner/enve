@@ -13,6 +13,16 @@ void SmartPathCollection::removePath(const qsptr<SmartPathAnimator> &path) {
     emit pathRemoved(path.get());
 }
 
+NormalSegment SmartPathCollection::getNormalSegmentAtAbsPos(
+        const QPointF &absPos, const qreal &invScale) {
+    for(const auto& child : ca_mChildAnimators) {
+        const auto path = GetAsPtr(child, SmartPathAnimator);
+        const auto seg = path->getNormalSegmentAtAbsPos(absPos, invScale);
+        if(seg.isValid()) return seg;
+    }
+    return NormalSegment();
+}
+
 SkPath SmartPathCollection::getPathAtRelFrame(const qreal &relFrame) const {
     SkPath result;
     for(const auto& child : ca_mChildAnimators) {

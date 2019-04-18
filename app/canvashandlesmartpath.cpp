@@ -51,7 +51,7 @@ void Canvas::handleAddSmartPointMousePress() {
                         nodePointUnderMouse);
             if(success) {
                 const int newTargetId = targetNode->getNodeId();
-                const auto sel = handler->getPointWithId(newTargetId);
+                const auto sel = handler->getPointWithId<SmartNodePoint>(newTargetId);
                 setCurrentSmartEndPoint(sel);
             }
         }

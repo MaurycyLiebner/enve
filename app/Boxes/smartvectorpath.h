@@ -3,7 +3,7 @@
 #include <QPainterPath>
 #include <QLinearGradient>
 #include "pathbox.h"
-#include "Animators/PathAnimators/smartpathcollectionhandler.h"
+#include "Animators/SmartPath/smartpathcollection.h"
 
 class NodePoint;
 class BoxesGroup;
@@ -14,8 +14,10 @@ enum CanvasMode : short;
 class SmartVectorPathEdge;
 
 class SmartVectorPath : public PathBox {
-public:
+    friend class SelfRef;
+protected:
     SmartVectorPath();
+public:
     bool SWT_isSmartVectorPath() const { return true; }
 
     void addActionsToMenu(BoxTypeMenu * const menu);
@@ -38,8 +40,7 @@ public:
     QList<qsptr<SmartVectorPath>> breakPathsApart_k();
 protected:
     void getMotionBlurProperties(QList<Property*> &list) const;
-    SmartPathCollectionHandler mHandler;
-    qptr<SmartPathCollection> mPathAnimator;
+    qsptr<SmartPathCollection> mPathAnimator;
 };
 
 #endif // SMARTSmartVectorPath_H

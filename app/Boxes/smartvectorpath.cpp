@@ -16,10 +16,11 @@
 #include "Animators/SmartPath/smartpathanimator.h"
 
 SmartVectorPath::SmartVectorPath() :
-    PathBox(BoundingBoxType::TYPE_VECTOR_PATH),
-    mHandler(mTransformAnimator.get(), this) {
+    PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
     setName("Path");
-    mPathAnimator = mHandler.getAnimator();
+    mPathAnimator = SPtrCreate(SmartPathCollection)();
+    const auto updater = SPtrCreate(NodePointUpdater)(this);
+    mPathAnimator->prp_setOwnUpdater(updater);
     ca_addChildAnimator(GetAsSPtr(mPathAnimator, Property));
     ca_moveChildBelow(mPathAnimator.data(), mEffectsAnimators.data());
 }
@@ -58,7 +59,7 @@ void SmartVectorPath::applyCurrentTransformation() {
 
 NormalSegment SmartVectorPath::getNormalSegment(
         const QPointF &absPos, const qreal &canvasScaleInv) {
-    return mHandler.getNormalSegmentAtAbsPos(absPos, canvasScaleInv);
+    return mPathAnimator->getNormalSegmentAtAbsPos(absPos, canvasScaleInv);
 }
 
 SkPath SmartVectorPath::getPathAtRelFrameF(const qreal &relFrame) {
@@ -67,7 +68,7 @@ SkPath SmartVectorPath::getPathAtRelFrameF(const qreal &relFrame) {
 
 void SmartVectorPath::getMotionBlurProperties(QList<Property*> &list) const {
     PathBox::getMotionBlurProperties(list);
-    list.append(mPathAnimator);
+    list.append(mPathAnimator.get());
 }
 
 QList<qsptr<SmartVectorPath>> SmartVectorPath::breakPathsApart_k() {
