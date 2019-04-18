@@ -312,8 +312,8 @@ void Canvas::handleLeftButtonMousePress() {
                                          mCurrentMode, canvasScaleInv);
 
     if(mRotPivot->handleMousePress(mLastMouseEventPosRel,
-                                   canvasScaleInv)) return;
-    if(mCurrentMode == CanvasMode::MOVE_PATH) {
+                                   mCurrentMode, canvasScaleInv)) return;
+    if(mCurrentMode == CanvasMode::MOVE_BOX) {
         if(mHoveredPoint_d) {
             handleMovePointMousePressEvent();
         } else {
@@ -419,7 +419,7 @@ void Canvas::cancelCurrentTransform() {
                 mRotPivot->handleMouseRelease();
             }
         }
-    } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
+    } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
         if(mRotPivot->isSelected()) {
             mRotPivot->cancelTransform();
         } else {
@@ -549,7 +549,7 @@ void Canvas::handleMouseRelease() {
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
                 mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
             }
-        } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
+        } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
             if(!mLastPressedPoint) {
                 handleMovePathMouseRelease();
             } else {

@@ -110,14 +110,25 @@ void MovablePoint::setTransform(BasicTransformAnimator * const trans) {
 }
 
 bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
-                                   const qreal &canvasScaleInv) {
-    if(isHidden()) return false;
+                                   const CanvasMode &mode,
+                                   const qreal &invScale) {
+    if(isHidden(mode)) return false;
     const QPointF dist = getAbsolutePos() - absPoint;
-    return pointToLen(dist) < mRadius*canvasScaleInv;
+    return pointToLen(dist) < mRadius*invScale;
+}
+
+void MovablePoint::rectPointsSelection(const QRectF &absRect,
+                                       const CanvasMode &mode,
+                                       QList<stdptr<MovablePoint>> &list) {
+    if(!selectionEnabled()) return;
+    if(isHidden(mode)) return;
+    if(isContainedInRect(absRect)) {
+        select();
+        list << this;
+    }
 }
 
 bool MovablePoint::isContainedInRect(const QRectF &absRect) {
-    if(isHidden() || !selectionEnabled()) return false;
     return absRect.contains(getAbsolutePos());
 }
 
@@ -200,28 +211,6 @@ void MovablePoint::select() {
 
 void MovablePoint::deselect() {
     mSelected = false;
-}
-
-void MovablePoint::hide() {
-    mVisible = false;
-    deselect();
-}
-
-void MovablePoint::show() {
-    mVisible = true;
-}
-
-bool MovablePoint::isHidden() const {
-    return !isVisible();
-}
-
-bool MovablePoint::isVisible() const {
-    return mVisible;
-}
-
-void MovablePoint::setVisible(const bool &bT) {
-    if(bT) show();
-    else hide();
 }
 
 bool MovablePoint::isNodePoint() {

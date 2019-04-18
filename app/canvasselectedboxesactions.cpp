@@ -348,7 +348,7 @@ QPointF Canvas::getSelectedBoxesAbsPivotPos() {
     return posSum/count;
 }
 
-bool Canvas::isSelectionEmpty() {
+bool Canvas::isBoxSelectionEmpty() {
     return mSelectedBoxes.isEmpty();
 }
 
@@ -467,16 +467,14 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
                                        const CanvasMode &mode,
                                        const qreal &invScale) {
     if(mode == MOVE_POINT || mode == ADD_POINT ||
-       mode == ADD_POINT ||  mode == MOVE_PATH) {
-        if(mRotPivot->isPointAtAbsPos(absPos, invScale)) {
+       mode == ADD_POINT ||  mode == MOVE_BOX) {
+        if(mRotPivot->isPointAtAbsPos(absPos, mode, invScale)) {
             return mRotPivot.get();
         }
-        MovablePoint *pointAtPos = nullptr;
         for(const auto &box : mSelectedBoxes) {
-            pointAtPos = box->getPointAtAbsPos(absPos, mode, invScale);
-            if(pointAtPos) break;
+            const auto pointAtPos = box->getPointAtAbsPos(absPos, mode, invScale);
+            if(pointAtPos) return pointAtPos;
         }
-        return pointAtPos;
     }
     return nullptr;
 }

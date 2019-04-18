@@ -72,7 +72,6 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     mIsCurrentGroup = true;
 
     mRotPivot = SPtrCreate(PathPivot)(this);
-    mRotPivot->hide();
 
     ca_removeChildAnimator(mTransformAnimator);
 
@@ -267,7 +266,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->restore();
         }
 
-        if(mCurrentMode == CanvasMode::MOVE_PATH ||
+        if(mCurrentMode == CanvasMode::MOVE_BOX ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
 
             if(mRotPivot->isScaling() || mRotPivot->isRotating()) {
@@ -358,7 +357,7 @@ void Canvas::decBrushRadius() {
 }
 
 bool Canvas::isMovingPath() {
-    return mCurrentMode == CanvasMode::MOVE_PATH;
+    return mCurrentMode == CanvasMode::MOVE_BOX;
 }
 
 QSize Canvas::getCanvasSize() {
@@ -579,12 +578,10 @@ void Canvas::startSelectionAtPoint(const QPointF &pos) {
 
 void Canvas::updatePivot() {
     if(mCurrentMode == MOVE_POINT) {
-        mRotPivot->setVisible(!isPointsSelectionEmpty() && !mLocalPivot);
         mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos());
-    } else if(mCurrentMode == MOVE_PATH) {
-        mRotPivot->setVisible(!isSelectionEmpty() && !mLocalPivot);
+    } else if(mCurrentMode == MOVE_BOX) {
         mRotPivot->setAbsolutePos(getSelectedBoxesAbsPivotPos());
-    } else mRotPivot->hide();
+    }
 }
 
 void Canvas::setCanvasMode(const CanvasMode &mode) {
@@ -662,7 +659,7 @@ bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
 void Canvas::deleteAction() {
     if(mCurrentMode == MOVE_POINT) {
         removeSelectedPointsAndClearList();
-    } else if(mCurrentMode == MOVE_PATH) {
+    } else if(mCurrentMode == MOVE_BOX) {
         removeSelectedBoxesAndClearList();
     }
 }

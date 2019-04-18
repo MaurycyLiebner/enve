@@ -7,15 +7,15 @@ void Canvas::clearCurrentSmartEndPoint() {
 }
 
 void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
-    if(mCurrentSmartEndPoint) mCurrentSmartEndPoint->deselect();
+    if(mLastEndPoint) mLastEndPoint->deselect();
     if(point) point->select();
-    mCurrentSmartEndPoint = point;
+    mLastEndPoint = point;
 }
 #include "MovablePoints/pathpointshandler.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 
 void Canvas::handleAddSmartPointMousePress() {
-    if(mCurrentSmartEndPoint ? mCurrentSmartEndPoint->isHidden() : false) {
+    if(mLastEndPoint ? mLastEndPoint->isHidden(mCurrentMode) : false) {
         clearCurrentSmartEndPoint();
     }
     qptr<BoundingBox> test;
@@ -24,9 +24,9 @@ void Canvas::handleAddSmartPointMousePress() {
     if(nodePointUnderMouse ? !nodePointUnderMouse->isEndPoint() : false) {
         nodePointUnderMouse = nullptr;
     }
-    if(nodePointUnderMouse == mCurrentSmartEndPoint &&
+    if(nodePointUnderMouse == mLastEndPoint &&
             nodePointUnderMouse) return;
-    if(!mCurrentSmartEndPoint && !nodePointUnderMouse) {
+    if(!mLastEndPoint && !nodePointUnderMouse) {
         const auto newPath = SPtrCreate(SmartVectorPath)();
         mCurrentBoxesGroup->addContainedBox(newPath);
         clearBoxesSelection();
@@ -38,16 +38,16 @@ void Canvas::handleAddSmartPointMousePress() {
     } else {
         if(!nodePointUnderMouse) {
             SmartNodePoint * const newPoint =
-                    mCurrentSmartEndPoint->actionAddPointAbsPos(mLastMouseEventPosRel);
+                    mLastEndPoint->actionAddPointAbsPos(mLastMouseEventPosRel);
             //newPoint->startTransform();
             setCurrentSmartEndPoint(newPoint);
-        } else if(!mCurrentSmartEndPoint) {
+        } else if(!mLastEndPoint) {
             setCurrentSmartEndPoint(nodePointUnderMouse);
         } else { // mCurrentSmartEndPoint
             const auto targetNode = nodePointUnderMouse->getTargetNode();
             const auto handler = nodePointUnderMouse->getHandler();
             const bool success =
-                    mCurrentSmartEndPoint->actionConnectToNormalPoint(
+                    mLastEndPoint->actionConnectToNormalPoint(
                         nodePointUnderMouse);
             if(success) {
                 const int newTargetId = targetNode->getNodeId();
@@ -60,42 +60,42 @@ void Canvas::handleAddSmartPointMousePress() {
 
 
 void Canvas::handleAddSmartPointMouseMove() {
-    if(!mCurrentSmartEndPoint) return;
-    if(mFirstMouseMove) mCurrentSmartEndPoint->startTransform();
-    if(mCurrentSmartEndPoint->hasNextNormalPoint() &&
-       mCurrentSmartEndPoint->hasPrevNormalPoint()) {
-        if(mCurrentSmartEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_CORNER) {
-            mCurrentSmartEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    if(!mLastEndPoint) return;
+    if(mFirstMouseMove) mLastEndPoint->startTransform();
+    if(mLastEndPoint->hasNextNormalPoint() &&
+       mLastEndPoint->hasPrevNormalPoint()) {
+        if(mLastEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_CORNER) {
+            mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
         }
-        if(mCurrentSmartEndPoint->isSeparateNodePoint()) {
-            mCurrentSmartEndPoint->moveC0ToAbsPos(mLastMouseEventPosRel);
+        if(mLastEndPoint->isSeparateNodePoint()) {
+            mLastEndPoint->moveC0ToAbsPos(mLastMouseEventPosRel);
         } else {
-            mCurrentSmartEndPoint->moveC2ToAbsPos(mLastMouseEventPosRel);
+            mLastEndPoint->moveC2ToAbsPos(mLastMouseEventPosRel);
         }
     } else {
-        if(!mCurrentSmartEndPoint->hasNextNormalPoint() &&
-           !mCurrentSmartEndPoint->hasPrevNormalPoint()) {
-            if(mCurrentSmartEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_CORNER) {
-                mCurrentSmartEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        if(!mLastEndPoint->hasNextNormalPoint() &&
+           !mLastEndPoint->hasPrevNormalPoint()) {
+            if(mLastEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_CORNER) {
+                mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
             }
         } else {
-            if(mCurrentSmartEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_SYMMETRIC) {
-                mCurrentSmartEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+            if(mLastEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_SYMMETRIC) {
+                mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
             }
         }
-        if(mCurrentSmartEndPoint->hasNextNormalPoint()) {
-            mCurrentSmartEndPoint->moveC0ToAbsPos(mLastMouseEventPosRel);
+        if(mLastEndPoint->hasNextNormalPoint()) {
+            mLastEndPoint->moveC0ToAbsPos(mLastMouseEventPosRel);
         } else {
-            mCurrentSmartEndPoint->moveC2ToAbsPos(mLastMouseEventPosRel);
+            mLastEndPoint->moveC2ToAbsPos(mLastMouseEventPosRel);
         }
     }
 }
 
 void Canvas::handleAddSmartPointMouseRelease() {
-    if(mCurrentSmartEndPoint) {
-        if(!mFirstMouseMove) mCurrentSmartEndPoint->finishTransform();
+    if(mLastEndPoint) {
+        if(!mFirstMouseMove) mLastEndPoint->finishTransform();
         //mCurrentSmartEndPoint->prp_updateInfluenceRangeAfterChanged();
-        if(!mCurrentSmartEndPoint->isEndPoint())
+        if(!mLastEndPoint->isEndPoint())
             clearCurrentSmartEndPoint();
     }
 }

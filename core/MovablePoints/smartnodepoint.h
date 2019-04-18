@@ -35,12 +35,9 @@ public:
     void canvasContextMenu(PointTypeMenu * const menu);
 
     bool isVisible(const CanvasMode& mode) const {
-        if(!NonAnimatedMovablePoint::isVisible()) return false;
-        if(mode == CanvasMode::MOVE_POINT) {
-            return true;
-        } else if(mode == CanvasMode::ADD_POINT) {
+        if(mode == CanvasMode::MOVE_POINT) return true;
+        else if(mode == CanvasMode::ADD_POINT)
             return isEndPoint() || isSelected();
-        }
         return false;
     }
 
@@ -75,12 +72,8 @@ public:
     bool isEndPoint() const;
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &canvasMode,
-                                   const qreal &canvasScaleInv);
-    void rectPointsSelection(const QRectF &absRect,
-                             QList<stdptr<MovablePoint>> &list);
-    void updateC0Visibility();
-    void updateC2Visibility();
+                                   const CanvasMode &mode,
+                                   const qreal &invScale);
 
     void setSeparateNodePoint(const bool &separateNodePoint);
     bool isSeparateNodePoint();

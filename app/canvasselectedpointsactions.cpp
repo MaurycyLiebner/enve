@@ -243,7 +243,7 @@ QPointF Canvas::getSelectedPointsAbsPivotPos() {
     return posSum*invCount;
 }
 
-bool Canvas::isPointsSelectionEmpty() {
+bool Canvas::isPointSelectionEmpty() {
     return mSelectedPoints_d.isEmpty();
 }
 

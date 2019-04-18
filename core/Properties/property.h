@@ -15,7 +15,7 @@ class UndoRedoStack;
 class BasicTransformAnimator;
 class BoxTransformAnimator;
 enum CanvasMode : short {
-    MOVE_PATH,
+    MOVE_BOX,
     MOVE_POINT,
     ADD_POINT,
     PICK_PAINT_SETTINGS,

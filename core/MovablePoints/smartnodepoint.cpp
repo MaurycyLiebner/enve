@@ -126,43 +126,19 @@ void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
     }
 }
 
-void SmartNodePoint::rectPointsSelection(
-        const QRectF &absRect, QList<stdptr<MovablePoint>> &list) {
-    if(!selectionEnabled()) return;
-    if(!isSelected()) {
-        if(isContainedInRect(absRect)) {
-            select();
-            list.append(this);
-        }
-    }
-    if(!mC2Pt->isSelected()) {
-        if(mC2Pt->isContainedInRect(absRect)) {
-            mC2Pt->select();
-            list.append(mC2Pt.get());
-        }
-    }
-    if(!mC0Pt->isSelected()) {
-        if(mC0Pt->isContainedInRect(absRect)) {
-            mC0Pt->select();
-            list.append(mC0Pt.get());
-        }
-    }
-}
-
 MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
-                                          const CanvasMode &canvasMode,
-                                          const qreal &canvasScaleInv) {
-    if(canvasMode == CanvasMode::MOVE_POINT) {
-        if(mC0Pt->isPointAtAbsPos(absPos, canvasScaleInv)) {
+                                               const CanvasMode &mode,
+                                               const qreal &invScale) {
+    if(mode == CanvasMode::MOVE_POINT) {
+        if(mC0Pt->isPointAtAbsPos(absPos, mode, invScale)) {
             return mC0Pt.get();
-        } else if(mC2Pt->isPointAtAbsPos(absPos, canvasScaleInv)) {
+        } else if(mC2Pt->isPointAtAbsPos(absPos, mode, invScale)) {
             return mC2Pt.get();
         }
-    } else if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
+    } else if(!isEndPoint() || mode != CanvasMode::ADD_POINT) {
         return nullptr;
     }
-    if(isPointAtAbsPos(absPos, canvasScaleInv)) return this;
-    return nullptr;
+    return MovablePoint::getPointAtAbsPos(absPos, mode, invScale);
 }
 
 void SmartNodePoint::moveC0ToAbsPos(const QPointF &c0) {
@@ -263,21 +239,21 @@ void SmartNodePoint::drawSk(
            (mode == CanvasMode::ADD_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
-            if(mC2Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            if(mC2Pt->isVisible(mode) || mode == CanvasMode::ADD_POINT) {
                 drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
+                mC2Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
             }
-            mC2Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
         }
         if((mode == CanvasMode::MOVE_POINT && isPrevNormalSelected()) ||
            (mode == CanvasMode::ADD_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
-            if(mC0Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            if(mC0Pt->isVisible(mode) || mode == CanvasMode::ADD_POINT) {
                 drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
+                mC0Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
             }
-            mC0Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
         }
     } else if(getType() == Node::DISSOLVED) {
         const SkColor fillCol = isSelected() ?
@@ -327,23 +303,10 @@ SmartNodePoint *SmartNodePoint::getConnectedSeparateNodePoint() {
     return mPrevNormalPoint->getConnectedSeparateNodePoint();
 }
 
-void SmartNodePoint::updateC0Visibility() {
-    if(!mPrevNormalPoint) mC0Pt->hide();
-    else mC0Pt->setVisible(mNode_d->getC0Enabled() &&
-                           mNode_d->isNormal());
-}
-
-void SmartNodePoint::updateC2Visibility() {
-    if(!mNextNormalPoint) mC2Pt->hide();
-    else mC2Pt->setVisible(mNode_d->getC2Enabled() &&
-                           mNode_d->isNormal());
-}
-
 void SmartNodePoint::setC2Enabled(const bool &enabled) {
     if(enabled == getC2Enabled()) return;
     if(getC2Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     currentPath()->actionSetNormalNodeC2Enabled(getNodeId(), enabled);
-    updateC2Visibility();
     mParentAnimator->pathChanged();
 }
 
@@ -351,7 +314,6 @@ void SmartNodePoint::setC0Enabled(const bool &enabled) {
     if(enabled == getC0Enabled()) return;
     if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     currentPath()->actionSetNormalNodeC0Enabled(getNodeId(), enabled);
-    updateC0Visibility();
     mParentAnimator->pathChanged();
 }
 
@@ -428,7 +390,6 @@ const PathPointsHandler *SmartNodePoint::getHandler() {
 void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
     if(mPrevNormalPoint == this) RuntimeThrow("Node cannot point to itself");
     mPrevNormalPoint = prevPoint;
-    updateC0Visibility();
 }
 
 void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
@@ -437,7 +398,6 @@ void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
     if(isNormal() && nextPoint) {
         mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
     } else mNextNormalSegment.reset();
-    updateC2Visibility();
 }
 
 SmartPath *SmartNodePoint::currentPath() const {
@@ -591,8 +551,6 @@ void SmartNodePoint::updateFromNodeData() {
     const auto nextNormalNode = mHandler_k->getNextNormalNode(getNodeId());
     setNextNormalPoint(nextNormalNode);
 
-    updateC0Visibility();
-    updateC2Visibility();
     const auto type = getType();
     if(type == Node::NORMAL) setRadius(6.5);
     else setRadius(type == Node::DISSOLVED ? 5.5 : 4);

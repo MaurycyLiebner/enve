@@ -48,15 +48,25 @@ public:
                         const bool &keyOnCurrent);
 
     virtual void remove() {}
-    virtual bool isVisible() const;
     virtual bool isVisible(const CanvasMode& mode) const {
         Q_UNUSED(mode);
-        return isVisible();
+        return true;
     }
 
     virtual void canvasContextMenu(PointTypeMenu * const menu) {
         Q_UNUSED(menu);
     }
+
+    virtual MovablePoint * getPointAtAbsPos(const QPointF &absPos,
+                                            const CanvasMode &mode,
+                                            const qreal &invScale) {
+        if(isPointAtAbsPos(absPos, mode, invScale)) return this;
+        return nullptr;
+    }
+
+    virtual void rectPointsSelection(const QRectF &absRect,
+                                     const CanvasMode &mode,
+                                     QList<stdptr<MovablePoint>> &list);
 
     void moveToAbs(const QPointF& absPos);
     void moveByAbs(const QPointF &absTrans);
@@ -64,7 +74,8 @@ public:
     void moveByRel(const QPointF &relTranslation);
     QPointF getAbsolutePos() const;
     bool isPointAtAbsPos(const QPointF &absPoint,
-                         const qreal &canvasScaleInv);
+                         const CanvasMode &mode,
+                         const qreal &invScale);
     void setAbsolutePos(const QPointF &pos);
 
     BasicTransformAnimator *getTransform();
@@ -75,13 +86,9 @@ public:
     void select();
     void deselect();
 
-    void hide();
-    void show();
-    bool isHidden() const;
     bool isHidden(const CanvasMode& mode) const {
         return !isVisible(mode);
     }
-    void setVisible(const bool &bT);
 
     bool isNodePoint();
     bool isSmartNodePoint();
@@ -95,7 +102,6 @@ public:
     }
     void setRadius(const qreal& radius);
     qreal getRadius();
-
 
     void drawHovered(SkCanvas * const canvas,
                      const SkScalar &invScale);
@@ -132,7 +138,6 @@ private:
     bool mSelectionEnabled = true;
     bool mSelected = false;
     bool mTransformStarted = false;
-    bool mVisible = true;
     const MovablePointType mType;
     qreal mRadius = 5;
     QPointF mPivot;

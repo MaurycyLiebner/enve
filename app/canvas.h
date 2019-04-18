@@ -133,7 +133,7 @@ public:
                           const bool &startTrans);
 
     QPointF getSelectedBoxesAbsPivotPos();
-    bool isSelectionEmpty();
+    bool isBoxSelectionEmpty();
 
     void ungroupSelectedBoxes();
     void scaleSelectedBy(const qreal& scaleBy,
@@ -175,7 +175,7 @@ public:
 
     void applyCurrentTransformationToSelected();
     QPointF getSelectedPointsAbsPivotPos();
-    bool isPointsSelectionEmpty();
+    bool isPointSelectionEmpty();
     void scaleSelectedPointsBy(const qreal &scaleXBy,
                                const qreal &scaleYBy,
                                const QPointF &absOrigin,
@@ -386,7 +386,7 @@ public:
         updatePivot();
     }
 
-    const bool &getPivotLocal() {
+    bool getPivotLocal() {
         return mLocalPivot;
     }
 
@@ -590,7 +590,7 @@ protected:
     qptr<BoundingBox> mLastPressedBox;
     stdsptr<PathPivot> mRotPivot;
 
-    stdptr<SmartNodePoint> mCurrentSmartEndPoint;
+    stdptr<SmartNodePoint> mLastEndPoint;
 
     NormalSegment mHoveredNormalSegment;
     NormalSegment mCurrentNormalSegment;
@@ -647,7 +647,7 @@ protected:
     QPointF mCurrentMouseEventPosAbs;
 
     QRectF mSelectionRect;
-    CanvasMode mCurrentMode = MOVE_PATH;
+    CanvasMode mCurrentMode = MOVE_BOX;
 
     void setCtrlPointsEnabled(bool enabled);
     void handleMovePointMousePressEvent();

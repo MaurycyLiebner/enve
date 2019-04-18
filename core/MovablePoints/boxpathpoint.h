@@ -14,7 +14,7 @@ public:
     void finishTransform();
 
     bool isVisible(const CanvasMode& mode) const {
-        return mode == MOVE_PATH;
+        return mode == MOVE_BOX;
     }
 
     void drawSk(SkCanvas * const canvas,

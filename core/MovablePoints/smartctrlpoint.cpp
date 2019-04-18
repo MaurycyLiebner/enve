@@ -64,10 +64,12 @@ void SmartCtrlPoint::remove() {
     else mParentPoint_k->setC2Enabled(false);
 }
 
-bool SmartCtrlPoint::isVisible() const {
-    if(mCtrlType == C0) return NonAnimatedMovablePoint::isVisible() &&
+bool SmartCtrlPoint::isVisible(const CanvasMode& mode) const {
+    if(mParentPoint_k->isDissolved() ||
+       mParentPoint_k->isHidden(mode)) return false;
+    if(mCtrlType == C0) return mParentPoint_k->getC0Enabled() &&
                                mParentPoint_k->isPrevNormalSelected();
-    if(mCtrlType == C2) return NonAnimatedMovablePoint::isVisible() &&
+    if(mCtrlType == C2) return mParentPoint_k->getC2Enabled() &&
                                mParentPoint_k->isNextNormalSelected();
     return false;
 }

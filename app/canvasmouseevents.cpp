@@ -72,7 +72,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
             if((mCurrentMode == CanvasMode::MOVE_POINT &&
                 !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) ||
-               (mCurrentMode == CanvasMode::MOVE_PATH &&
+               (mCurrentMode == CanvasMode::MOVE_BOX &&
                 !mHoveredBox && !mHoveredPoint_d)) {
                 startSelectionAtPoint(mLastMouseEventPosRel);
             }
@@ -165,12 +165,12 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
         if(boxAt->SWT_isBoxesGroup()) {
             setCurrentBoxesGroup(static_cast<BoxesGroup*>(boxAt));
             updateHoveredElements();
-        } else if((mCurrentMode == MOVE_PATH ||
+        } else if((mCurrentMode == MOVE_BOX ||
                    mCurrentMode == MOVE_POINT) &&
                   boxAt->SWT_isTextBox()) {
             releaseMouseAndDontTrack();
             GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
-        } else if(mCurrentMode == MOVE_PATH &&
+        } else if(mCurrentMode == MOVE_BOX &&
                   boxAt->SWT_isVectorPath()) {
             mCanvasWindow->setCanvasMode(MOVE_POINT);
         }

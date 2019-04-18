@@ -133,7 +133,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
         return;
     }
 
-    if(mode == MOVE_PATH) {
+    if(mode == MOVE_BOX) {
         setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mode == MOVE_POINT) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-node.xpm"), 0, 0) );
@@ -162,7 +162,7 @@ void CanvasWindow::queScheduledTasksAndUpdate() {
 }
 
 void CanvasWindow::setMovePathMode() {
-    setCanvasMode(MOVE_PATH);
+    setCanvasMode(MOVE_BOX);
 }
 
 void CanvasWindow::setMovePointMode() {
@@ -304,7 +304,7 @@ void CanvasWindow::rotate90CW() {
 
 bool CanvasWindow::handleCanvasModeChangeKeyPress(QKeyEvent *event) {
     if(event->key() == Qt::Key_F1) {
-        setCanvasMode(CanvasMode::MOVE_PATH);
+        setCanvasMode(CanvasMode::MOVE_BOX);
     } else if(event->key() == Qt::Key_F2) {
         setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(event->key() == Qt::Key_F3) {
@@ -466,7 +466,7 @@ bool CanvasWindow::handleSelectAllKeyPress(QKeyEvent* event) {
     if(event->key() == Qt::Key_A && !isMouseGrabber()) {
         bool altPressed = event->modifiers() & Qt::AltModifier;
         auto currentMode = mCurrentCanvas->getCurrentCanvasMode();
-        if(currentMode == MOVE_PATH) {
+        if(currentMode == MOVE_BOX) {
             if(altPressed) {
                mCurrentCanvas->deselectAllBoxesAction();
            } else {

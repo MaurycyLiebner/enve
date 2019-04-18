@@ -784,7 +784,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     if(mCanvasWindow->hasNoCanvas()) return;
     const CanvasMode &currentMode =
             mCanvasWindow->getCurrentCanvas()->getCurrentCanvasMode();
-    mMovePathMode->setChecked(currentMode == MOVE_PATH);
+    mMovePathMode->setChecked(currentMode == MOVE_BOX);
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
     mAddPointMode->setChecked(currentMode == ADD_POINT);
     mPickPaintSettingsMode->setChecked(currentMode == PICK_PAINT_SETTINGS);

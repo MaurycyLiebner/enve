@@ -18,10 +18,9 @@ void PathPivot::drawSk(SkCanvas * const canvas,
                        const CanvasMode &mode,
                        const SkScalar &invScale,
                        const bool &keyOnCurrent) {
-    Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
     const SkPoint absPos = toSkPoint(getAbsolutePos());
-    if(!isHidden()) {
+    if(isVisible(mode)) {
         const SkColor fillCol = isSelected() ?
                     SkColorSetRGB(0, 255, 0) :
                     SkColorSetRGB(125, 255, 125);
@@ -38,6 +37,13 @@ void PathPivot::drawSk(SkCanvas * const canvas,
     canvas->drawLine(-scaledHalfRadius, 0, scaledHalfRadius, 0, paint);
     canvas->drawLine(0, -scaledHalfRadius, 0, scaledHalfRadius, paint);
     canvas->restore();
+}
+
+bool PathPivot::isVisible(const CanvasMode &mode) const {
+    if(mCanvas->getPivotLocal()) return false;
+    if(mode == MOVE_POINT) return !mCanvas->isPointSelectionEmpty();
+    else if(mode == MOVE_BOX) return !mCanvas->isBoxSelectionEmpty();
+    return false;
 }
 
 bool PathPivot::isRotating() {
@@ -58,10 +64,10 @@ void PathPivot::startScaling() {
     mScaling = true;
 }
 
-bool PathPivot::handleMousePress(const QPointF &absPressPos,
-                                 const qreal &canvasInvScale) {
-    if(isHidden()) return false;
-    if(isPointAtAbsPos(absPressPos, canvasInvScale)) {
+bool PathPivot::handleMousePress(const QPointF &absPos,
+                                 const CanvasMode &mode,
+                                 const qreal &invScale) {
+    if(isPointAtAbsPos(absPos, mode, invScale)) {
         select();
         return true;
     }
@@ -129,7 +135,7 @@ bool PathPivot::handleMouseMove(const QPointF &moveDestAbs,
             rot = d_rot + mRotHalfCycles*180.;
         }
 
-        if(mode == CanvasMode::MOVE_PATH) {
+        if(mode == CanvasMode::MOVE_BOX) {
             mCanvas->rotateSelectedBy(rot, absPos, startTransform);
         } else {
             mCanvas->rotateSelectedPointsBy(rot, absPos, startTransform);
@@ -159,7 +165,7 @@ bool PathPivot::handleMouseMove(const QPointF &moveDestAbs,
             scaleY = scaleBy;
         }
 
-        if(mode == CanvasMode::MOVE_PATH) {
+        if(mode == CanvasMode::MOVE_BOX) {
             mCanvas->scaleSelectedBy(scaleX, scaleY, absPos, startTransform);
         } else {
             mCanvas->scaleSelectedPointsBy(scaleX, scaleY, absPos, startTransform);

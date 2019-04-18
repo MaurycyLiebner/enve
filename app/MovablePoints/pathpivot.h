@@ -14,12 +14,14 @@ protected:
 public:
     void drawSk(SkCanvas * const canvas, const CanvasMode &mode,
                 const SkScalar &invScale, const bool &keyOnCurrent);
+    bool isVisible(const CanvasMode& mode) const;
     //void setRelativePos(const QPointF &relPos);
 
     bool isRotating();
     bool isScaling();
-    bool handleMousePress(const QPointF &absPressPos,
-                          const qreal &canvasInvScale);
+    bool handleMousePress(const QPointF &absPos,
+                          const CanvasMode &mode,
+                          const qreal &invScale);
     bool handleMouseRelease();
     bool handleMouseMove(const QPointF &moveDestAbs,
                          const QPointF &pressPos,

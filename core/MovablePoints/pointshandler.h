@@ -28,9 +28,8 @@ public:
                                    const qreal &invScale) {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
-            if(pt->isHidden(mode)) continue;
-            if(pt->isPointAtAbsPos(absPos, invScale))
-                return pt.get();
+            const auto at = pt->getPointAtAbsPos(absPos, mode, invScale);
+            if(at) return at;
         }
         return nullptr;
     }
@@ -52,10 +51,7 @@ public:
         for(const auto& pt : mPts) {
             if(!pt->selectionEnabled()) continue;
             if(pt->isSelected() || pt->isHidden(mode)) continue;
-            if(pt->isContainedInRect(absRect)) {
-                pt->select();
-                selection.append(pt.get());
-            }
+            pt->rectPointsSelection(absRect, mode, selection);
         }
     }
 
