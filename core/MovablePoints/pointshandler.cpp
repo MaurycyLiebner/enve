@@ -1,6 +1,5 @@
 #include "pointshandler.h"
 
-PointsHandler::PointsHandler()
-{
+PointsHandler::PointsHandler() {
 
 }

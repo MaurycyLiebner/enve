@@ -36,7 +36,6 @@ public:
     void selectAndAddContainedPointsToList(
             const QRectF &absRect,
             QList<stdptr<MovablePoint>> &list) const;
-    void selectAllPoints(Canvas * const canvas);
     void drawPoints(SkCanvas * const canvas,
                     const CanvasMode &currentCanvasMode,
                     const SkScalar &invScale,

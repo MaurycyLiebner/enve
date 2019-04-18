@@ -4,11 +4,16 @@
 
 AnimatedPoint::AnimatedPoint(
         QPointFAnimator * const associatedAnimator,
-        BasicTransformAnimator* const parentTransform,
-        const MovablePointType &type,
-        const qreal &radius) :
-    MovablePoint(parentTransform, type, radius),
+        const MovablePointType &type) :
+    MovablePoint(type),
     mAssociatedAnimator_k(associatedAnimator) {}
+
+AnimatedPoint::AnimatedPoint(QPointFAnimator * const associatedAnimator,
+                             BasicTransformAnimator * const trans,
+                             const MovablePointType &type) :
+    AnimatedPoint(associatedAnimator, type) {
+    setTransform(trans);
+}
 
 void AnimatedPoint::setRelativePos(const QPointF &relPos) {
     setValue(relPos);

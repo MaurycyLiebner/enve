@@ -7,8 +7,8 @@
 
 SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
                                const Type& type) :
-    NonAnimatedMovablePoint(parentPoint->getParentTransform(),
-                            MovablePointType::TYPE_CTRL_POINT, 5),
+    NonAnimatedMovablePoint(parentPoint->getTransform(),
+                            MovablePointType::TYPE_CTRL_POINT),
     mCtrlType(type), mParentPoint_k(parentPoint) {
     disableSelection();
 }

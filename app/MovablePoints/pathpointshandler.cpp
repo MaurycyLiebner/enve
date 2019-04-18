@@ -36,12 +36,6 @@ void PathPointsHandler::selectAndAddContainedPointsToList(
     }
 }
 
-void PathPointsHandler::selectAllPoints(Canvas * const canvas) {
-    for(const auto& point : mPoints) {
-        canvas->addPointToSelection(point.get());
-    }
-}
-
 void PathPointsHandler::drawPoints(SkCanvas * const canvas,
                                    const CanvasMode &currentCanvasMode,
                                    const SkScalar &invScale,
@@ -88,8 +82,7 @@ void PathPointsHandler::updatePoint(const int &nodeId) {
     updatePoint(pt.get(), nodeId);
 }
 
-void PathPointsHandler::updatePoint(SmartNodePoint * const pt,
-                                    const int &nodeId) {
+void PathPointsHandler::updatePoint(SmartNodePoint * const pt, const int &nodeId) {
     pt->setNode(targetPath()->getNodePtr(nodeId));
 }
 

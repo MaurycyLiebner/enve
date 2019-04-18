@@ -18,8 +18,6 @@ public:
     }
 
     void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
-private:
-    BoxTransformAnimator * const mBoxTransform_cv;
 };
 
 #endif // BOXPATHPOINT_H

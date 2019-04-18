@@ -12,6 +12,8 @@ class Key;
 class QPainter;
 class PropertyUpdater;
 class UndoRedoStack;
+class BasicTransformAnimator;
+class BoxTransformAnimator;
 enum CanvasMode : short {
     MOVE_PATH,
     MOVE_POINT,
@@ -135,6 +137,11 @@ public:
 
     virtual void writeProperty(QIODevice * const device) const {
         Q_UNUSED(device);
+    }
+
+    virtual BasicTransformAnimator *getTransformAnimator() {
+        if(mParent) return mParent->getTransformAnimator();
+        return nullptr;
     }
 public slots:
     virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);

@@ -1,9 +1,13 @@
 #include "nonanimatedmovablepoint.h"
 
+NonAnimatedMovablePoint::NonAnimatedMovablePoint(const MovablePointType &type) :
+    MovablePoint(type) {}
+
 NonAnimatedMovablePoint::NonAnimatedMovablePoint(
-        BasicTransformAnimator * const parentTransform,
-        const MovablePointType &type, const qreal &radius) :
-    MovablePoint(parentTransform, type, radius) {}
+        BasicTransformAnimator * const trans,
+        const MovablePointType &type) : NonAnimatedMovablePoint(type) {
+    setTransform(trans);
+}
 
 void NonAnimatedMovablePoint::setRelativePos(const QPointF &relPos) {
     setValue(relPos);

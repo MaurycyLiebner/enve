@@ -1954,7 +1954,6 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) const {
 }
 
 void BoxSvgAttributes::apply(BoundingBox *box) const {
-    box->getTransformAnimator()->setOpacity(mOpacity);
     if(box->SWT_isPathBox()) {
         const auto path = GetAsPtr(box, PathBox);
         const qreal m11 = mRelTransform.m11();
@@ -1971,7 +1970,8 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
             text->setFont(mTextAttributes.getFont());
         }
     }
-    const auto transAnim = box->getTransformAnimator();
+    const auto transAnim = box->getBoxTransformAnimator();
+    transAnim->setOpacity(mOpacity);
     transAnim->translate(mDx, mDy);
     transAnim->setScale(mScaleX, mScaleY);
     transAnim->setRotation(mRot);

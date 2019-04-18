@@ -14,6 +14,7 @@ Circle::Circle() :
     mCenterPoint = SPtrCreate(AnimatedPoint)(mCenterAnimator.get(),
                                              mTransformAnimator.get(),
                                              TYPE_PATH_POINT);
+
     mCenterPoint->disableSelection();
     mCenterPoint->setRelativePos(QPointF(0, 0));
     mCenterAnimator->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
@@ -116,8 +117,9 @@ CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                                      AnimatedPoint * const centerPoint,
                                      const MovablePointType &type,
                                      const bool &blockX) :
-    AnimatedPoint(associatedAnimator, parent, type),
+    AnimatedPoint(associatedAnimator, type),
     mXBlocked(blockX), mCenterPoint(centerPoint) {
+    setTransform(parent);
     disableSelection();
 }
 

@@ -4,23 +4,27 @@
 
 BoxPathPoint::BoxPathPoint(QPointFAnimator * const associatedAnimator,
                            BoxTransformAnimator * const boxTrans) :
-    AnimatedPoint(associatedAnimator, boxTrans, TYPE_PIVOT_POINT, 7),
-    mBoxTransform_cv(boxTrans) {
+    AnimatedPoint(associatedAnimator, TYPE_PIVOT_POINT) {
+    setRadius(7);
+    setTransform(boxTrans);
     setSelectionEnabled(false);
 }
 
 void BoxPathPoint::setRelativePos(const QPointF &relPos) {
-    mBoxTransform_cv->setPivotAutoAdjust(false);
-    mBoxTransform_cv->setPivotFixedTransform(relPos);
+    const auto bTrans = GetAsPtr(getTransform(), BoxTransformAnimator);
+    bTrans->setPivotAutoAdjust(false);
+    bTrans->setPivotFixedTransform(relPos);
 }
 
 void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();
-    mBoxTransform_cv->startPivotTransform();
+    const auto bTrans = GetAsPtr(getTransform(), BoxTransformAnimator);
+    bTrans->startPivotTransform();
 }
 
 void BoxPathPoint::finishTransform() {
-    mBoxTransform_cv->finishPivotTransform();
+    const auto bTrans = GetAsPtr(getTransform(), BoxTransformAnimator);
+    bTrans->finishPivotTransform();
 }
 
 void BoxPathPoint::drawSk(SkCanvas * const canvas,

@@ -123,4 +123,5 @@ void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
 
 void Property::setParent(ComplexAnimator * const parent) {
     mParent = parent;
+    if(mPointsHandler) mPointsHandler->setTransform(getTransformAnimator());
 }

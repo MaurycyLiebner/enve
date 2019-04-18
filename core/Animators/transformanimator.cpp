@@ -298,9 +298,9 @@ BoxTransformAnimator::BoxTransformAnimator() {
     ca_addChildAnimator(mPivotAnimator);
     ca_addChildAnimator(mOpacityAnimator);
 
+    enabledDrawingOnCanvas();
     setPointsHandler(SPtrCreate(PointsHandler)());
     mPointsHandler->createAppendNewPt<BoxPathPoint>(mPivotAnimator.get(), this);
-    enabledDrawingOnCanvas();
 }
 
 MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {

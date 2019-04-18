@@ -3,11 +3,13 @@
 #include "pointhelpers.h"
 #include "Animators/transformanimator.h"
 
-MovablePoint::MovablePoint(BasicTransformAnimator * const parentTransform,
-                           const MovablePointType &type,
-                           const qreal &radius) :
-    mType(type), mRadius(radius),
-    mParentTransform_cv(parentTransform) {}
+MovablePoint::MovablePoint(const MovablePointType &type) : mType(type) {}
+
+MovablePoint::MovablePoint(BasicTransformAnimator * const trans,
+                           const MovablePointType &type) :
+    MovablePoint(type) {
+    setTransform(trans);
+}
 
 void MovablePoint::startTransform() {
     mSavedRelPos = getRelativePos();
@@ -33,15 +35,18 @@ void MovablePoint::drawHovered(SkCanvas * const canvas,
 }
 
 void MovablePoint::setAbsolutePos(const QPointF &pos) {
-    setRelativePos(mParentTransform_cv->mapAbsPosToRel(pos));
+    if(mTrans_cv) setRelativePos(mTrans_cv->mapAbsPosToRel(pos));
+    else setRelativePos(pos);
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(const QPointF &relPos) const {
-    return mParentTransform_cv->mapRelPosToAbs(relPos);
+    if(mTrans_cv) return mTrans_cv->mapRelPosToAbs(relPos);
+    else return relPos;
 }
 
 QPointF MovablePoint::mapAbsoluteToRelative(const QPointF &absPos) const {
-    return mParentTransform_cv->mapAbsPosToRel(absPos);
+    if(mTrans_cv) return mTrans_cv->mapAbsPosToRel(absPos);
+    else return absPos;
 }
 
 QPointF MovablePoint::getAbsolutePos() const {
@@ -95,8 +100,12 @@ void MovablePoint::drawSk(SkCanvas * const canvas,
     drawOnAbsPosSk(canvas, absPos, invScale, fillCol);
 }
 
-BasicTransformAnimator *MovablePoint::getParentTransform() {
-    return mParentTransform_cv;
+BasicTransformAnimator *MovablePoint::getTransform() {
+    return mTrans_cv;
+}
+
+void MovablePoint::setTransform(BasicTransformAnimator * const trans) {
+    mTrans_cv = trans;
 }
 
 bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
@@ -113,45 +122,46 @@ bool MovablePoint::isContainedInRect(const QRectF &absRect) {
 
 void MovablePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     QMatrix mat;
-    mat.translate(mSavedTransformPivot.x(),
-                  mSavedTransformPivot.y());
+    mat.translate(mPivot.x(),
+                  mPivot.y());
     mat.rotate(rot);
-    mat.translate(-mSavedTransformPivot.x(),
-                  -mSavedTransformPivot.y());
+    mat.translate(-mPivot.x(),
+                  -mPivot.y());
     moveToRel(mat.map(mSavedRelPos));
 }
 
 void MovablePoint::scaleRelativeToSavedPivot(const qreal &sx,
                                              const qreal &sy) {
     QMatrix mat;
-    mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    mat.translate(mPivot.x(), mPivot.y());
     mat.scale(sx, sy);
-    mat.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    mat.translate(-mPivot.x(), -mPivot.y());
     moveToRel(mat.map(mSavedRelPos));
 }
 
 void MovablePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
-    mSavedTransformPivot = mParentTransform_cv->mapAbsPosToRel(absPivot);
+    if(mTrans_cv) mPivot = mTrans_cv->mapAbsPosToRel(absPivot);
+    else mPivot = absPivot;
 }
 
 void MovablePoint::rotateBy(const qreal &rot) {
     QMatrix rotMatrix;
-    rotMatrix.translate(-mSavedTransformPivot.x(),
-                        -mSavedTransformPivot.y());
+    rotMatrix.translate(-mPivot.x(),
+                        -mPivot.y());
     rotMatrix.rotate(rot);
-    rotMatrix.translate(mSavedTransformPivot.x(),
-                        mSavedTransformPivot.y());
+    rotMatrix.translate(mPivot.x(),
+                        mPivot.y());
     setRelativePos(rotMatrix.map(mSavedRelPos));
 }
 
 void MovablePoint::scale(const qreal &scaleXBy,
                          const qreal &scaleYBy) {
     QMatrix scaleMatrix;
-    scaleMatrix.translate(-mSavedTransformPivot.x(),
-                          -mSavedTransformPivot.y());
+    scaleMatrix.translate(-mPivot.x(),
+                          -mPivot.y());
     scaleMatrix.scale(scaleXBy, scaleYBy);
-    scaleMatrix.translate(mSavedTransformPivot.x(),
-                          mSavedTransformPivot.y());
+    scaleMatrix.translate(mPivot.x(),
+                          mPivot.y());
     setRelativePos(scaleMatrix.map(mSavedRelPos));
 }
 

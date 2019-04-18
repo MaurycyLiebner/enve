@@ -198,7 +198,7 @@ MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
     for(const auto& prop : mCanvasProps) {
         const auto handler = prop->getPointsHandler();
         if(!handler) continue;
-        const auto pt = mPointsHandler->getPointAtAbsPos(absPos, mode, invScale);
+        const auto pt = handler->getPointAtAbsPos(absPos, mode, invScale);
         if(pt) return pt;
     }
     return nullptr;
@@ -529,29 +529,12 @@ QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() {
     return getRelativeTransformAtRelFrameF(anim_getCurrentRelFrame());
 }
 
-void BoundingBox::applyTransformation(BoxTransformAnimator *transAnimator) {
-    Q_UNUSED(transAnimator);
-}
-
-void BoundingBox::applyTransformationInverted(BoxTransformAnimator *transAnimator) {
-    Q_UNUSED(transAnimator);
-}
-
 void BoundingBox::scale(const qreal &scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
 void BoundingBox::scale(const qreal &scaleXBy, const qreal &scaleYBy) {
     mTransformAnimator->scale(scaleXBy, scaleYBy);
-}
-
-MovablePoint *BoundingBox::createNewPointOnLineNear(const QPointF &absPos,
-                                                    const bool &adjust,
-                                                    const qreal &canvasScaleInv) {
-    Q_UNUSED(absPos);
-    Q_UNUSED(adjust);
-    Q_UNUSED(canvasScaleInv);
-    return nullptr;
 }
 
 void BoundingBox::rotateBy(const qreal &rot) {
@@ -891,7 +874,11 @@ void BoundingBox::getMotionBlurProperties(QList<Property*> &list) const {
     list.append(mTransformAnimator->getRotAnimator());
 }
 
-BoxTransformAnimator *BoundingBox::getTransformAnimator() {
+BasicTransformAnimator *BoundingBox::getTransformAnimator() {
+    return getBoxTransformAnimator();
+}
+
+BoxTransformAnimator *BoundingBox::getBoxTransformAnimator() {
     return mTransformAnimator.get();
 }
 

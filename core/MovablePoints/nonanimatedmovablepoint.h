@@ -5,9 +5,9 @@
 class NonAnimatedMovablePoint : public MovablePoint {
     friend class StdSelfRef;
 protected:
-    NonAnimatedMovablePoint(BasicTransformAnimator * const parentTransform,
-                            const MovablePointType &type,
-                            const qreal &radius = 7.5);
+    NonAnimatedMovablePoint(const MovablePointType &type);
+    NonAnimatedMovablePoint(BasicTransformAnimator * const trans,
+                            const MovablePointType &type);
 public:
     QPointF getRelativePos() const;
     void setRelativePos(const QPointF &relPos);

@@ -78,7 +78,7 @@ QList<qsptr<SmartVectorPath>> SmartVectorPath::breakPathsApart_k() {
         const auto srcPath = mPathAnimator->ca_takeChildAt<SmartPathAnimator>(i);
         const auto newPath = SPtrCreate(SmartVectorPath)();
         copyPathBoxDataTo(newPath.get());
-        newPath->getHandler()->addAnimator(srcPath);
+        newPath->getPathAnimator()->addPath(srcPath);
         result.append(newPath);
     }
     removeFromParent_k();

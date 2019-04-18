@@ -2,7 +2,7 @@
 #define POINTSHANDLER_H
 #include "movablepoint.h"
 #include "smartPointers/stdselfref.h"
-
+class BoxTransformAnimator;
 enum CanvasMode : short;
 
 class PointsHandler : public StdSelfRef {
@@ -13,6 +13,7 @@ public:
     template <class T, typename... Args>
     T *createInsertNewPt(const int& id, Args && ...args) {
         const auto newPt = SPtrCreateTemplated(T)(args...);
+        newPt->setTransform(mTrans);
         mPts.insert(id, newPt);
         return newPt.get();
     }
@@ -84,7 +85,14 @@ public:
     void move(const int& from, const int& to) {
         mPts.move(from, to);
     }
+
+    void setTransform(BasicTransformAnimator * const trans) {
+        if(trans == mTrans) return;
+        for(const auto& pt : mPts) pt->setTransform(trans);
+        mTrans = trans;
+    }
 private:
+    BasicTransformAnimator * mTrans = nullptr;
     QList<stdsptr<MovablePoint>> mPts;
 };
 

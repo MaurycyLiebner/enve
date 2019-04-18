@@ -26,9 +26,9 @@ typedef TypeMenu<MovablePoint> PointTypeMenu;
 class MovablePoint : public StdSelfRef {
     friend class StdSelfRef;
 protected:
-    MovablePoint(BasicTransformAnimator * const parentTransform,
-                 const MovablePointType &type,
-                 const qreal &radius = 7.5);
+    MovablePoint(const MovablePointType &type);
+    MovablePoint(BasicTransformAnimator * const trans,
+                 const MovablePointType &type);
 public:
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
@@ -65,7 +65,8 @@ public:
                          const qreal &canvasScaleInv);
     void setAbsolutePos(const QPointF &pos);
 
-    BasicTransformAnimator *getParentTransform();
+    BasicTransformAnimator *getTransform();
+    void setTransform(BasicTransformAnimator * const trans);
 
     bool isContainedInRect(const QRectF &absRect);
 
@@ -131,9 +132,9 @@ private:
     bool mTransformStarted = false;
     bool mVisible = true;
     const MovablePointType mType;
-    qreal mRadius;
-    QPointF mSavedTransformPivot;
+    qreal mRadius = 5;
+    QPointF mPivot;
     QPointF mSavedRelPos;
-    BasicTransformAnimator * const mParentTransform_cv;
+    BasicTransformAnimator * mTrans_cv = nullptr;
 };
 #endif // MOVABLEPOINT_H

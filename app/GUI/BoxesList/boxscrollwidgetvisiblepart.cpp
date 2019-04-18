@@ -437,8 +437,6 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         if(currentDraggedParent != targetGroup) {
             currentDraggedParent->removeContainedBox_k(draggedBox);
             targetGroup->addContainedBoxToListAt(boxTargetId, draggedBox);
-            draggedBox->applyTransformationInverted(
-                        draggedBox->getTransformAnimator());
         } else {
             const int targetBoxId = targetGroup->abstractionIdToBoxId(fTargetId) + 1;
             if(targetBoxId == draggedBox->getZIndex() ||

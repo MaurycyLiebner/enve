@@ -13,8 +13,10 @@
 SmartNodePoint::SmartNodePoint(PathPointsHandler * const handler,
                                SmartPathAnimator * const parentAnimator,
                                BasicTransformAnimator * const parentTransform) :
-    NonAnimatedMovablePoint(parentTransform, TYPE_SMART_PATH_POINT, 6.5),
+    NonAnimatedMovablePoint(parentTransform, TYPE_SMART_PATH_POINT),
     mHandler_k(handler), mParentAnimator(parentAnimator) {
+    setRadius(6.5);
+
     mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);
     mC2Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C2);
 

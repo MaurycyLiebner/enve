@@ -5,7 +5,8 @@
 
 PathPivot::PathPivot(Canvas *parent) :
     NonAnimatedMovablePoint(parent->getTransformAnimator(),
-                            TYPE_PIVOT_POINT, 7.) {
+                            TYPE_PIVOT_POINT) {
+    setRadius(7);
     mCanvas = parent;
 //    mRotationPath.addEllipse(QPointF(0., 0.), 50., 50.);
 //    QPainterPath removeEllipse;

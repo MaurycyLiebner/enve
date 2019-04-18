@@ -593,7 +593,6 @@ BoundingBox *BoxesGroup::getBoxAtFromAllDescendents(const QPointF &absPos) {
 void BoxesGroup::ungroup_k() {
     //clearBoxesSelection();
     for(auto box : mContainedBoxes) {
-        box->applyTransformation(mTransformAnimator.data());
         removeContainedBox(box);
         mParentGroup->addContainedBox(box);
     }

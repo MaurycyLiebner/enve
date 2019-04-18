@@ -84,7 +84,9 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
     childProperty->prp_setInheritedUpdater(prp_mUpdater);
     childProperty->prp_setParentFrameShift(prp_getFrameShift());
     if(childProperty->drawsOnCanvas() ||
-       childProperty->SWT_isComplexAnimator()) updateCanvasProps();
+       childProperty->SWT_isComplexAnimator()) {
+        updateCanvasProps();
+    }
     connect(childProperty.data(), &Property::prp_updateWholeInfluenceRange,
             this, &Property::prp_updateInfluenceRangeAfterChanged);
     if(childProperty->SWT_isAnimator()) {
@@ -170,7 +172,9 @@ void ComplexAnimator::ca_removeChildAnimator(
 
     ca_mChildAnimators.removeAt(getChildPropertyIndex(removeAnimator.get()));
     if(removeAnimator->drawsOnCanvas() ||
-       removeAnimator->SWT_isComplexAnimator()) updateCanvasProps();
+       removeAnimator->SWT_isComplexAnimator()) {
+        updateCanvasProps();
+    }
     ca_childAnimatorIsRecordingChanged();
     prp_updateInfluenceRangeAfterChanged();
 }

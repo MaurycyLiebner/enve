@@ -13,6 +13,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     mTopLeftPoint = SPtrCreate(AnimatedPoint)(
                 mTopLeftAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
+
     mTopLeftPoint->setRelativePos(QPointF(0., 0.));
 
     mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom left");

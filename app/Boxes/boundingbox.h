@@ -147,10 +147,6 @@ public:
     virtual const SkPath &getRelBoundingRectPath();
     virtual QRectF getRelBoundingRect(const qreal &relFrame);
 
-    virtual MovablePoint *createNewPointOnLineNear(const QPointF &absPos,
-                                                   const bool &adjust,
-                                                   const qreal &canvasScaleInv);
-
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
     virtual NormalSegment getNormalSegment(const QPointF &absPos,
@@ -288,9 +284,6 @@ public:
 
     bool isContainedIn(const QRectF &absRect) const;
 
-    void applyTransformation(BoxTransformAnimator *transAnimator);
-    void applyTransformationInverted(BoxTransformAnimator *transAnimator);
-
     QPointF getPivotAbsPos();
     QPointF getAbsolutePos() const;
     bool absPointInsidePath(const QPointF &absPos);
@@ -338,7 +331,8 @@ public:
     void resetTranslation();
     void resetRotation();
 
-    BoxTransformAnimator *getTransformAnimator();
+    BasicTransformAnimator *getTransformAnimator();
+    BoxTransformAnimator *getBoxTransformAnimator();
     QRectF getRelBoundingRect() const;
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,

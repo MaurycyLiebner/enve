@@ -7,7 +7,6 @@
 class UndoRedoStack;
 class SkCanvas;
 class SmartCtrlPoint;
-class PathPointsHandler;
 class SmartPathAnimator;
 
 enum CanvasMode : short;
