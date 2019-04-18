@@ -1,5 +1,4 @@
 #include "smartnodepointupdater.h"
-#include "Boxes/smartvectorpath.h"
 #include "MovablePoints/pathpointshandler.h"
 
 SmartNodePointUpdater::SmartNodePointUpdater(

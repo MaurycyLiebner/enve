@@ -1,5 +1,4 @@
 #include "pathpointshandler.h"
-#include "canvas.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "PropertyUpdaters/smartnodepointupdater.h"

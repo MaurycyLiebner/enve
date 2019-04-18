@@ -67,6 +67,7 @@ SOURCES += \
     PropertyUpdaters/propertyupdater.cpp \
     PropertyUpdaters/transformupdater.cpp \
     PropertyUpdaters/randomqrealgeneratorupdater.cpp \
+    PropertyUpdaters/smartnodepointupdater.cpp \
     undoredo.cpp \
     Properties/propertycreator.cpp \
     exceptions.cpp \
@@ -128,7 +129,9 @@ SOURCES += \
     MovablePoints/segment.cpp \
     MovablePoints/smartctrlpoint.cpp \
     MovablePoints/pointshandler.cpp \
-    MovablePoints/pathpointshandler.cpp
+    MovablePoints/pathpointshandler.cpp \
+    canvasbase.cpp \
+    typemenu.cpp
 
 HEADERS += \
     core_global.h \
@@ -148,6 +151,7 @@ HEADERS += \
     PropertyUpdaters/propertyupdater.h \
     PropertyUpdaters/transformupdater.h \
     PropertyUpdaters/randomqrealgeneratorupdater.h \
+    PropertyUpdaters/smartnodepointupdater.h \
     undoredo.h \
     Properties/propertycreator.h \
     exceptions.h \
@@ -216,7 +220,10 @@ HEADERS += \
     MovablePoints/segment.h \
     MovablePoints/smartctrlpoint.h \
     MovablePoints/pointshandler.h \
-    MovablePoints/pathpointshandler.h
+    MovablePoints/pathpointshandler.h \
+    canvasbase.h \
+    typemenu.h \
+    pointtypemenu.h
 
 unix {
     target.path = /usr/lib

@@ -233,14 +233,10 @@ SOURCES += main.cpp\
     CacheHandlers/hddcachablecachehandler.cpp \
     CacheHandlers/minimalcachehandler.cpp \
     CacheHandlers/soundcachehandler.cpp \
-    MovablePoints/smartnodepoint.cpp \
-    MovablePoints/segment.cpp \
-    MovablePoints/smartctrlpoint.cpp \
     Animators/PathAnimators/smartpathcollectionhandler.cpp \
     canvasmouseevents.cpp \
     canvashandlesmartpath.cpp \
     Boxes/smartvectorpath.cpp \
-    PropertyUpdaters/smartnodepointupdater.cpp \
     paintsettingsapplier.cpp \
     colorsetting.cpp \
     Animators/gradient.cpp \
@@ -254,12 +250,11 @@ SOURCES += main.cpp\
     Boxes/internallinkcanvas.cpp \
     Boxes/internallinkgroupbox.cpp \
     PathEffects/sumpatheffect.cpp \
-    pointtypemenu.cpp \
     PropertyUpdaters/boxpathpointupdater.cpp \
     Paint/drawableautotiledsurface.cpp \
-    typemenu.cpp \
     FileCacheHandlers/videoframeloader.cpp \
     FileCacheHandlers/videostreamsdata.cpp
+
 HEADERS  += \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -445,7 +440,6 @@ HEADERS  += \
     CacheHandlers/soundcachehandler.h \
     Animators/PathAnimators/smartpathcollectionhandler.h \
     Boxes/smartvectorpath.h \
-    PropertyUpdaters/smartnodepointupdater.h \
     paintsettingsapplier.h \
     colorsetting.h \
     Animators/gradient.h \
@@ -459,10 +453,9 @@ HEADERS  += \
     Boxes/internallinkcanvas.h \
     Boxes/internallinkgroupbox.h \
     PathEffects/sumpatheffect.h \
-    pointtypemenu.h \
+    boxtypemenu.h \
     PropertyUpdaters/boxpathpointupdater.h \
     Paint/drawableautotiledsurface.h \
-    typemenu.h \
     FileCacheHandlers/videoframeloader.h \
     FileCacheHandlers/videostreamsdata.h
 

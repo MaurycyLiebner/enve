@@ -4,7 +4,11 @@
 #include <QMenu>
 #include <typeindex>
 #include "smartPointers/sharedpointerdefs.h"
-#include "canvas.h"
+#include "canvasbase.h"
+
+class Property;
+class MovablePoint;
+class BoundingBox;
 
 template <typename Type>
 class TypeMenu {
@@ -16,7 +20,7 @@ public:
     template <class T> using AllOp = std::function<void(QList<T*>)>;
 
     TypeMenu(QMenu * const targetMenu,
-             Canvas * const targetCanvas,
+             CanvasBase * const targetCanvas,
              QWidget * const parent) :
         mTargetMenu(targetMenu),
         mTargetCanvas(targetCanvas),
@@ -124,14 +128,13 @@ private:
     }
 
     QMenu * const mTargetMenu;
-    Canvas * const mTargetCanvas;
+    CanvasBase * const mTargetCanvas;
     QWidget * const mParentWidget;
 
     QList<stdsptr<TTypeMenu>> mChildMenus;
     QList<std::type_index> mTypeIndex;
 };
 
-typedef TypeMenu<MovablePoint> PointTypeMenu;
 typedef TypeMenu<BoundingBox> BoxTypeMenu;
 typedef  TypeMenu<Property> PropertyTypeMenu;
 

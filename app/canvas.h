@@ -14,6 +14,7 @@
 #include "MovablePoints/movablepoint.h"
 #include "Boxes/canvasrenderdata.h"
 #include "Paint/drawableautotiledsurface.h"
+#include "canvasbase.h"
 #include <QAction>
 
 class TextBox;
@@ -47,7 +48,7 @@ extern bool zLessThan(const qptr<BoundingBox> &box1,
 extern bool boxesZSort(const qptr<BoundingBox> &box1,
                        const qptr<BoundingBox> &box2);
 
-class Canvas : public BoxesGroup {
+class Canvas : public BoxesGroup, public CanvasBase {
     Q_OBJECT
     friend class SelfRef;
 protected:
@@ -106,65 +107,6 @@ public:
     void selectedPathsExclusion();
     void makeSelectedPointsSegmentsCurves();
     void makeSelectedPointsSegmentsLines();
-
-    template <class T = BoundingBox>
-    void execOpOnSelectedBoxes(const std::function<void(QList<T*>)> &op) {
-        QList<T*> all;
-        for(const auto& box : mSelectedBoxes) {
-            const auto boxT = dynamic_cast<T*>(box.data());
-            if(boxT) all << boxT;
-        }
-        op(all);
-    }
-
-    template <class T = BoundingBox>
-    void execOpOnSelectedBoxes(const std::function<void(T*)> &op) {
-        for(const auto& box : mSelectedBoxes) {
-            const auto boxT = dynamic_cast<T*>(box.data());
-            if(boxT) op(boxT);
-        }
-    }
-
-    template <class T = MovablePoint>
-    void execOpOnSelectedPoints(const std::function<void(QList<T*>)> &op) {
-        QList<T*> all;
-        for(const auto& pt : mSelectedPoints_d) {
-            const auto ptT = dynamic_cast<T*>(pt.data());
-            if(ptT) all << ptT;
-        }
-        op(all);
-    }
-
-    template <class T = MovablePoint>
-    void execOpOnSelectedPoints(const std::function<void(T*)> &op) {
-        if(mLastPressedPoint) {
-            if(!mLastPressedPoint->selectionEnabled()) {
-                const auto ptT = dynamic_cast<T*>(mLastPressedPoint.data());
-                if(ptT) {
-                    op(ptT);
-                    if(ptT->selectionEnabled()) addPointToSelection(ptT);
-                    return;
-                }
-            }
-        }
-        for(const auto& pt : mSelectedPoints_d) {
-            const auto ptT = dynamic_cast<T*>(pt.data());
-            if(ptT) {
-                op(ptT);
-                if(!ptT->selectionEnabled()) removePointFromSelection(ptT);
-            }
-        }
-    }
-
-    template <class T = Property>
-    void execOpOnSelectedProperties(const std::function<void(T*)> &op) {
-
-    }
-
-    template <class T = Property>
-    void execOpOnSelectedProperties(const std::function<void(QList<T*>)> &op) {
-
-    }
 
     void updateSelectedPointsAfterCtrlsVisiblityChanged();
     void centerPivotForSelected();
@@ -259,11 +201,13 @@ public:
     void setSelectedFontSize(const qreal& size);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
-    void clearBoxesSelection();
-    void removePointFromSelection(MovablePoint * const point);
-    void removeBoxFromSelection(BoundingBox *box);
-    void addPointToSelection(MovablePoint * const point);
+
     void addBoxToSelection(BoundingBox *box);
+    void removeBoxFromSelection(BoundingBox *box);
+    void clearBoxesSelection();
+
+    void addPointToSelection(MovablePoint * const point);
+    void removePointFromSelection(MovablePoint * const point);
 
     void clearPointsSelection();
     void raiseSelectedBoxesToTop();
@@ -643,10 +587,6 @@ protected:
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;
 
-    QList<stdptr<MovablePoint>> mSelectedPoints_d;
-    QList<qptr<BoundingBox>> mSelectedBoxes;
-
-    stdptr<MovablePoint> mLastPressedPoint;
     qptr<BoundingBox> mLastPressedBox;
     stdsptr<PathPivot> mRotPivot;
 

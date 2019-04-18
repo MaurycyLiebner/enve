@@ -2,7 +2,6 @@
 #define SMARTNODEPOINTUPDATER_H
 #include "PropertyUpdaters/propertyupdater.h"
 class PathPointsHandler;
-class SmartVectorPath;
 
 class SmartNodePointUpdater : public PropertyUpdater {
 public:
