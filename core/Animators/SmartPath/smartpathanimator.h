@@ -4,6 +4,7 @@
 #include "differsinterpolate.h"
 #include "basicreadwrite.h"
 #include "smartpathkey.h"
+#include "MovablePoints/segment.h"
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
@@ -358,6 +359,9 @@ public:
         }
         mBaseValue.applyTransform(transform);
     }
+
+    NormalSegment getNormalSegmentAtAbsPos(
+            const QPointF &absPos, const qreal &invScale);
 signals:
     void pathChangedAfterFrameChange();
 protected:

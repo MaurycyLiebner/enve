@@ -39,10 +39,7 @@ public:
         return newPath.get();
     }
 
-    SmartNodePoint * createNewSubPathAtPos(const QPointF &pos) {
-        const auto newPath = createNewPath();
-        return nullptr; newPath->actionAddFirstNode(pos);
-    }
+    SmartNodePoint * createNewSubPathAtPos(const QPointF &pos);
 
     void addPath(const qsptr<SmartPathAnimator>& path);
     void removePath(const qsptr<SmartPathAnimator>& path);

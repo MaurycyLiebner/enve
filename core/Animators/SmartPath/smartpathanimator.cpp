@@ -3,6 +3,21 @@
 #include "smartpathcollection.h"
 #include "MovablePoints/pathpointshandler.h"
 
+SmartPathAnimator::SmartPathAnimator() :
+    GraphAnimator("path") {
+    setPointsHandler(SPtrCreate(PathPointsHandler)(this));
+}
+
+SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
+    SmartPathAnimator() {
+    mBaseValue.setPath(path);
+}
+
+SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
+    SmartPathAnimator() {
+    mBaseValue = baseValue;
+}
+
 void SmartPathAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType &type,
         qreal &minValue, qreal &maxValue) const {
@@ -27,17 +42,8 @@ void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
     prp_updateInfluenceRangeAfterChanged();
 }
 
-SmartPathAnimator::SmartPathAnimator() :
-    GraphAnimator("path") {
-    setPointsHandler(SPtrCreate(PathPointsHandler)(this));
-}
-
-SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
-    SmartPathAnimator() {
-    mBaseValue.setPath(path);
-}
-
-SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
-    SmartPathAnimator() {
-    mBaseValue = baseValue;
+NormalSegment SmartPathAnimator::getNormalSegmentAtAbsPos(
+        const QPointF &absPos, const qreal &invScale) {
+    const auto handler = GetAsPtr(mPointsHandler, PathPointsHandler);
+    return handler->getNormalSegmentAtAbsPos(absPos, invScale);
 }

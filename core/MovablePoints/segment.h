@@ -9,6 +9,11 @@ class PathPointsHandler;
 #include "Segments/qcubicsegment2d.h"
 #include "pointhelpers.h"
 
+class Segment {
+public:
+
+};
+
 class NormalSegment {
 public:
     bool operator==(const NormalSegment& other) const;

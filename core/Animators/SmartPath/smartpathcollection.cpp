@@ -1,7 +1,15 @@
 #include "smartpathcollection.h"
+#include "MovablePoints/pathpointshandler.h"
 
 SmartPathCollection::SmartPathCollection() :
     ComplexAnimator("paths") {}
+
+SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &pos) {
+    const auto newPath = createNewPath();
+    const auto handler = GetAsPtr(newPath->getPointsHandler(),
+                                  PathPointsHandler);
+    return handler->addFirstNode(pos);
+}
 
 void SmartPathCollection::addPath(const qsptr<SmartPathAnimator> &path) {
     ca_addChildAnimator(path);
