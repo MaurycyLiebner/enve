@@ -41,7 +41,7 @@ PathPointsHandler *SmartPathCollectionHandler::createNewPath() {
 PathPointsHandler *SmartPathCollectionHandler::createHandlerForAnimator(
         SmartPathAnimator * const newAnimator) {
     const auto newHandler = SPtrCreate(PathPointsHandler)(
-                this, newAnimator, mParentTransform);
+                newAnimator, mParentTransform);
     newHandler->updateAllPoints();
     mPointsHandlers.append(newHandler);
     return newHandler.get();
@@ -87,12 +87,6 @@ void SmartPathCollectionHandler::selectAndAddContainedPointsToList(
         const QRectF &absRect, QList<stdptr<MovablePoint>> &list) const {
     for(const auto& handler : mPointsHandlers) {
         handler->selectAndAddContainedPointsToList(absRect, list);
-    }
-}
-
-void SmartPathCollectionHandler::selectAllPoints(Canvas * const canvas) {
-    for(const auto& handler : mPointsHandlers) {
-        handler->selectAllPoints(canvas);
     }
 }
 

@@ -2,14 +2,11 @@
 #include "canvas.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "Animators/SmartPath/smartpathcollection.h"
-#include "Animators/PathAnimators/smartpathcollectionhandler.h"
 #include "PropertyUpdaters/smartnodepointupdater.h"
 
 PathPointsHandler::PathPointsHandler(
-        SmartPathCollectionHandler * const collectionHandler,
         SmartPathAnimator * const targetAnimator,
         BasicTransformAnimator * const parentTransform) :
-    mCollectionHandler_k(collectionHandler),
     mTargetAnimator(targetAnimator),
     mParentTransform(parentTransform) {
     const auto updater = SPtrCreate(SmartNodePointUpdater)(this);

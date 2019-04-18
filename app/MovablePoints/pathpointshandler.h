@@ -8,8 +8,7 @@ class SmartPathCollectionHandler;
 class PathPointsHandler : public StdSelfRef {
     friend class StdSelfRef;
 protected:
-    PathPointsHandler(SmartPathCollectionHandler * const collectionHandler,
-                      SmartPathAnimator * const targetAnimator,
+    PathPointsHandler(SmartPathAnimator * const targetAnimator,
                       BasicTransformAnimator * const parentTransform);
 public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
@@ -101,7 +100,6 @@ private:
         mBlockAllPointsUpdate = false;
     }
 
-    SmartPathCollectionHandler * const mCollectionHandler_k;
     QList<stdsptr<SmartNodePoint>> mPoints;
     SmartPathAnimator * const mTargetAnimator;
     BasicTransformAnimator * const mParentTransform;
