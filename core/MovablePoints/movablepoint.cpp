@@ -90,9 +90,10 @@ void MovablePoint::drawOnAbsPosSk(
     canvas->restore();
 }
 
-void MovablePoint::drawSk(SkCanvas * const canvas,
-                          const SkScalar &invScale) {
-    if(isHidden()) return;
+void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
+                          const SkScalar &invScale, const bool &keyOnCurrent) {
+    Q_UNUSED(mode);
+    Q_UNUSED(keyOnCurrent);
     const SkColor fillCol = mSelected ?
                 SkColorSetRGB(255, 0, 0) :
                 SkColorSetRGB(255, 175, 175);

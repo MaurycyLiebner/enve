@@ -27,9 +27,10 @@ void BoxPathPoint::finishTransform() {
     bTrans->finishPivotTransform();
 }
 
-void BoxPathPoint::drawSk(SkCanvas * const canvas,
-                          const SkScalar &invScale) {
-    if(isHidden()) return;
+void BoxPathPoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
+                          const SkScalar &invScale, const bool &keyOnCurrent) {
+    Q_UNUSED(mode);
+    Q_UNUSED(keyOnCurrent);
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     const SkColor fillCol = isSelected() ?
                 SkColorSetRGB(255, 255, 0) :

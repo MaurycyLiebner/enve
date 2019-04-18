@@ -14,8 +14,8 @@ public:
 
     void disable();
 
-    void drawGradientPointsSk(SkCanvas *canvas,
-                              const SkScalar &invScale);
+    void drawGradientPointsSk(SkCanvas *canvas, const CanvasMode &mode,
+                              const SkScalar &invScale, const bool &keyOnCurrent);
 
     MovablePoint *getPointAt(const QPointF &absPos,
                              const qreal &canvasScaleInv);

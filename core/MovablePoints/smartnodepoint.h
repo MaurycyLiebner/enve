@@ -35,12 +35,19 @@ public:
     void canvasContextMenu(PointTypeMenu * const menu);
 
     bool isVisible(const CanvasMode& mode) const {
+        if(!NonAnimatedMovablePoint::isVisible()) return false;
         if(mode == CanvasMode::MOVE_POINT) {
             return true;
-        } else if(mode == CanvasMode::ADD_SMART_POINT) {
+        } else if(mode == CanvasMode::ADD_POINT) {
             return isEndPoint() || isSelected();
         }
+        return false;
     }
+
+    void drawSk(SkCanvas * const canvas,
+                const CanvasMode &mode,
+                const SkScalar &invScale,
+                const bool &keyOnCurrent);
 
     int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
@@ -61,11 +68,6 @@ public:
     QPointF getC2AbsPos();
     QPointF getC2Value() const;
     SmartCtrlPoint *getC2Pt();
-
-    void drawNodePoint(SkCanvas * const canvas,
-                       const CanvasMode &mode,
-                       const SkScalar &invScale,
-                       const bool &keyOnCurrent);
 
     SmartNodePoint *getNextPoint();
     SmartNodePoint *getPreviousPoint();

@@ -271,7 +271,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
            mCurrentMode == CanvasMode::MOVE_POINT) {
 
             if(mRotPivot->isScaling() || mRotPivot->isRotating()) {
-                mRotPivot->drawSk(canvas, invZoom);
+                mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
                 paint.setStyle(SkPaint::kStroke_Style);
                 paint.setColor(SK_ColorBLACK);
                 const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
@@ -281,7 +281,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
                                  toSkPoint(mLastMouseEventPosRel), paint);
                 paint.setPathEffect(nullptr);
             } else if(!mIsMouseGrabbing || mRotPivot->isSelected()) {
-                mRotPivot->drawSk(canvas, invZoom);
+                mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
             }
         }
 

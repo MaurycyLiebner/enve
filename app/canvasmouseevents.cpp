@@ -89,7 +89,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
             } else {
                 handleMovePointMouseMove();
             }
-        } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddSmartPointMouseMove();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
             if(isShiftPressed()) {

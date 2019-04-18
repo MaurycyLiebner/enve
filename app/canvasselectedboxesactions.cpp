@@ -467,7 +467,7 @@ MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
                                        const CanvasMode &mode,
                                        const qreal &invScale) {
     if(mode == MOVE_POINT || mode == ADD_POINT ||
-       mode == ADD_SMART_POINT ||  mode == MOVE_PATH) {
+       mode == ADD_POINT ||  mode == MOVE_PATH) {
         if(mRotPivot->isPointAtAbsPos(absPos, invScale)) {
             return mRotPivot.get();
         }

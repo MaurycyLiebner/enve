@@ -15,8 +15,12 @@ PathPivot::PathPivot(Canvas *parent) :
 }
 
 void PathPivot::drawSk(SkCanvas * const canvas,
-                       const SkScalar &invScale) {
-    SkPoint absPos = toSkPoint(getAbsolutePos());
+                       const CanvasMode &mode,
+                       const SkScalar &invScale,
+                       const bool &keyOnCurrent) {
+    Q_UNUSED(mode);
+    Q_UNUSED(keyOnCurrent);
+    const SkPoint absPos = toSkPoint(getAbsolutePos());
     if(!isHidden()) {
         const SkColor fillCol = isSelected() ?
                     SkColorSetRGB(0, 255, 0) :

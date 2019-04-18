@@ -12,7 +12,8 @@ class PathPivot : public NonAnimatedMovablePoint {
 protected:
     PathPivot(Canvas*  const parent);
 public:
-    void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
+    void drawSk(SkCanvas * const canvas, const CanvasMode &mode,
+                const SkScalar &invScale, const bool &keyOnCurrent);
     //void setRelativePos(const QPointF &relPos);
 
     bool isRotating();

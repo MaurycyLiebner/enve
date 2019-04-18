@@ -13,8 +13,9 @@ void GradientPoint::setColor(const QColor &fillColor) {
     mFillColor = fillColor;
 }
 
-void GradientPoint::drawSk(SkCanvas * const canvas, const SkScalar &invScale) {
-    if(isHidden()) return;
+void GradientPoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
+                           const SkScalar &invScale, const bool &keyOnCurrent) {
+    Q_UNUSED(mode);
 
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     canvas->save();
@@ -37,7 +38,7 @@ void GradientPoint::drawSk(SkCanvas * const canvas, const SkScalar &invScale) {
     paint.setStrokeWidth(0.75f*invScale);
     canvas->drawCircle(absPos, scaledRadius, paint);
 
-    if(getAnimator()->anim_getKeyOnCurrentFrame()) {
+    if(keyOnCurrent) {
         paint.setColor(SK_ColorRED);
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawCircle(absPos, scaledRadius*0.5f, paint);

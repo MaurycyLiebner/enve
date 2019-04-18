@@ -319,7 +319,7 @@ void Canvas::handleLeftButtonMousePress() {
         } else {
             handleMovePathMousePressEvent();
         }
-    } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
         handleAddSmartPointMousePress();
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         handleMovePointMousePressEvent();
@@ -430,7 +430,7 @@ void Canvas::cancelCurrentTransform() {
         }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
 
-    } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
 
     } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
         //mCanvasWindow->setCanvasMode(MOVE_PATH);
@@ -556,7 +556,7 @@ void Canvas::handleMouseRelease() {
                 handleMovePointMouseRelease();
                 clearPointsSelection();
             }
-        } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddSmartPointMouseRelease();
         } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
             if(mLastPressedBox) {
@@ -697,7 +697,7 @@ void Canvas::updateTransformation() {
         } else {
             handleMovePointMouseMove();
         }
-    } else if(mCurrentMode == CanvasMode::ADD_SMART_POINT) {
+    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
         handleAddSmartPointMouseMove();
     }
 }

@@ -309,7 +309,7 @@ bool CanvasWindow::handleCanvasModeChangeKeyPress(QKeyEvent *event) {
         setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(event->key() == Qt::Key_F3) {
             //setCanvasMode(CanvasMode::ADD_POINT);
-       setCanvasMode(CanvasMode::ADD_SMART_POINT);
+       setCanvasMode(CanvasMode::ADD_POINT);
     } else if(event->key() == Qt::Key_F4) {
         setCanvasMode(CanvasMode::PICK_PAINT_SETTINGS);
     } else if(event->key() == Qt::Key_F6) {

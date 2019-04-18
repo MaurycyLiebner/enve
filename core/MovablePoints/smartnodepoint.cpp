@@ -158,7 +158,7 @@ MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
         } else if(mC2Pt->isPointAtAbsPos(absPos, canvasScaleInv)) {
             return mC2Pt.get();
         }
-    } else if(!isEndPoint() || canvasMode != CanvasMode::ADD_SMART_POINT) {
+    } else if(!isEndPoint() || canvasMode != CanvasMode::ADD_POINT) {
         return nullptr;
     }
     if(isPointAtAbsPos(absPos, canvasScaleInv)) return this;
@@ -245,13 +245,11 @@ void drawCtrlPtLine(SkCanvas * const canvas,
     }
 }
 
-void SmartNodePoint::drawNodePoint(
+void SmartNodePoint::drawSk(
         SkCanvas * const canvas,
         const CanvasMode &mode,
         const SkScalar &invScale,
         const bool &keyOnCurrent) {
-    canvas->save();
-
     const QPointF qAbsPos = getAbsolutePos();
     const SkPoint skAbsPos = toSkPoint(qAbsPos);
 
@@ -262,24 +260,24 @@ void SmartNodePoint::drawNodePoint(
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
 
         if((mode == CanvasMode::MOVE_POINT && isNextNormalSelected()) ||
-           (mode == CanvasMode::ADD_SMART_POINT && isSelected())) {
+           (mode == CanvasMode::ADD_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
-            if(mC2Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
+            if(mC2Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
                 drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
             }
-            mC2Pt->drawSk(canvas, invScale);
+            mC2Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
         }
         if((mode == CanvasMode::MOVE_POINT && isPrevNormalSelected()) ||
-           (mode == CanvasMode::ADD_SMART_POINT && isSelected())) {
+           (mode == CanvasMode::ADD_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
-            if(mC0Pt->isVisible() || mode == CanvasMode::ADD_SMART_POINT) {
+            if(mC0Pt->isVisible() || mode == CanvasMode::ADD_POINT) {
                 drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
             }
-            mC0Pt->drawSk(canvas, invScale);
+            mC0Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
         }
     } else if(getType() == Node::DISSOLVED) {
         const SkColor fillCol = isSelected() ?
@@ -314,7 +312,6 @@ void SmartNodePoint::drawNodePoint(
 //                           skAbsPos.y() + bounds.height()*0.5f,
 //                           font, paint);
 //    }
-    canvas->restore();
 }
 
 SmartNodePoint* SmartNodePoint::getNextPoint() {

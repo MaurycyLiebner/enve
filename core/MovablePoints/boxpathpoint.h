@@ -17,7 +17,10 @@ public:
         return mode == MOVE_PATH;
     }
 
-    void drawSk(SkCanvas * const canvas, const SkScalar &invScale);
+    void drawSk(SkCanvas * const canvas,
+                const CanvasMode &mode,
+                const SkScalar &invScale,
+                const bool &keyOnCurrent);
 };
 
 #endif // BOXPATHPOINT_H

@@ -65,7 +65,8 @@ public:
                     const CanvasMode &mode) const {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
-            if(pt->isVisible(mode)) pt->drawSk(canvas, invScale);
+            if(pt->isVisible(mode))
+                pt->drawSk(canvas, mode, invScale, keyOnCurrentFrame);
         }
     }
 

@@ -43,7 +43,9 @@ public:
     virtual void cancelTransform() {}
 
     virtual void drawSk(SkCanvas * const canvas,
-                        const SkScalar &invScale);
+                        const CanvasMode &mode,
+                        const SkScalar &invScale,
+                        const bool &keyOnCurrent);
 
     virtual void remove() {}
     virtual bool isVisible() const;

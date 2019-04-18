@@ -18,7 +18,6 @@ enum CanvasMode : short {
     MOVE_PATH,
     MOVE_POINT,
     ADD_POINT,
-    ADD_SMART_POINT,
     PICK_PAINT_SETTINGS,
     ADD_CIRCLE,
     ADD_RECTANGLE,
