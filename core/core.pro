@@ -124,7 +124,11 @@ SOURCES += \
     MovablePoints/nonanimatedmovablepoint.cpp \
     MovablePoints/animatedpoint.cpp \
     MovablePoints/boxpathpoint.cpp \
-    MovablePoints/pointshandler.cpp
+    MovablePoints/smartnodepoint.cpp \
+    MovablePoints/segment.cpp \
+    MovablePoints/smartctrlpoint.cpp \
+    MovablePoints/pointshandler.cpp \
+    MovablePoints/pathpointshandler.cpp
 
 HEADERS += \
     core_global.h \
@@ -208,7 +212,11 @@ HEADERS += \
     MovablePoints/nonanimatedmovablepoint.h \
     MovablePoints/animatedpoint.h \
     MovablePoints/boxpathpoint.h \
-    MovablePoints/pointshandler.h
+    MovablePoints/smartnodepoint.h \
+    MovablePoints/segment.h \
+    MovablePoints/smartctrlpoint.h \
+    MovablePoints/pointshandler.h \
+    MovablePoints/pathpointshandler.h
 
 unix {
     target.path = /usr/lib

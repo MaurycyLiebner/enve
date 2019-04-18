@@ -2,13 +2,12 @@
 #include "undoredo.h"
 #include <QPainter>
 #include <QDebug>
-#include "canvas.h"
 #include "pointhelpers.h"
 #include "Animators/SmartPath/smartpathanimator.h"
-#include "GUI/mainwindow.h"
-#include "global.h"
 #include "pathpointshandler.h"
+#include "Animators/complexanimator.h"
 #include "smartctrlpoint.h"
+#include "pointtypemenu.h"
 
 SmartNodePoint::SmartNodePoint(PathPointsHandler * const handler,
                                SmartPathAnimator * const parentAnimator,
@@ -95,7 +94,6 @@ void SmartNodePoint::remove() {
     actionRemove(false);
 }
 
-#include "pointtypemenu.h"
 void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
     if(isNormal()) {
         if(!isEndPoint()) {
@@ -291,32 +289,32 @@ void SmartNodePoint::drawNodePoint(
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
     }
 
-    if(MainWindow::isCtrlPressed()) {
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        paint.setColor(SK_ColorBLACK);
-        paint.setStyle(SkPaint::kFill_Style);
+//    if(MainWindow::isCtrlPressed()) {
+//        SkPaint paint;
+//        paint.setAntiAlias(true);
+//        paint.setColor(SK_ColorBLACK);
+//        paint.setStyle(SkPaint::kFill_Style);
 
-        SkFont font;
-        font.setSize(FONT_HEIGHT*invScale);
-        const auto fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
-                                           SkFontStyle::kNormal_Width,
-                                           SkFontStyle::kUpright_Slant);
-        font.setTypeface(SkTypeface::MakeFromName(nullptr, fontStyle));
-        const auto nodeIdStr = QString::number(getNodeId());
-        const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
-        const auto cStr = nodeIdStr.toStdString().c_str();
-        SkRect bounds;
-        font.measureText(cStr,
-                         sizeT*sizeof(char),
-                         SkTextEncoding::kUTF8,
-                         &bounds);
+//        SkFont font;
+//        font.setSize(FONT_HEIGHT*invScale);
+//        const auto fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
+//                                           SkFontStyle::kNormal_Width,
+//                                           SkFontStyle::kUpright_Slant);
+//        font.setTypeface(SkTypeface::MakeFromName(nullptr, fontStyle));
+//        const auto nodeIdStr = QString::number(getNodeId());
+//        const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
+//        const auto cStr = nodeIdStr.toStdString().c_str();
+//        SkRect bounds;
+//        font.measureText(cStr,
+//                         sizeT*sizeof(char),
+//                         SkTextEncoding::kUTF8,
+//                         &bounds);
 
-        canvas->drawString(cStr,
-                           skAbsPos.x() + bounds.width()*0.5f,
-                           skAbsPos.y() + bounds.height()*0.5f,
-                           font, paint);
-    }
+//        canvas->drawString(cStr,
+//                           skAbsPos.x() + bounds.width()*0.5f,
+//                           skAbsPos.y() + bounds.height()*0.5f,
+//                           font, paint);
+//    }
     canvas->restore();
 }
 

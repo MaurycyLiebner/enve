@@ -234,7 +234,6 @@ SOURCES += main.cpp\
     CacheHandlers/minimalcachehandler.cpp \
     CacheHandlers/soundcachehandler.cpp \
     MovablePoints/smartnodepoint.cpp \
-    MovablePoints/pathpointshandler.cpp \
     MovablePoints/segment.cpp \
     MovablePoints/smartctrlpoint.cpp \
     Animators/PathAnimators/smartpathcollectionhandler.cpp \
@@ -444,10 +443,6 @@ HEADERS  += \
     CacheHandlers/hddcachablecachehandler.h \
     CacheHandlers/minimalcachehandler.h \
     CacheHandlers/soundcachehandler.h \
-    MovablePoints/smartnodepoint.h \
-    MovablePoints/pathpointshandler.h \
-    MovablePoints/segment.h \
-    MovablePoints/smartctrlpoint.h \
     Animators/PathAnimators/smartpathcollectionhandler.h \
     Boxes/smartvectorpath.h \
     PropertyUpdaters/smartnodepointupdater.h \

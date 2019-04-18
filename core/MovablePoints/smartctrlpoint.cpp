@@ -1,6 +1,5 @@
 #include "smartctrlpoint.h"
 #include "smartnodepoint.h"
-#include "Boxes/boxesgroup.h"
 #include "pointhelpers.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "Animators/transformanimator.h"
