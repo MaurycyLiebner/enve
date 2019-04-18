@@ -4,63 +4,14 @@
 #include "PropertyUpdaters/smartnodepointupdater.h"
 
 PathPointsHandler::PathPointsHandler(
-        SmartPathAnimator * const targetAnimator,
-        BasicTransformAnimator * const parentTransform) :
-    mTargetAnimator(targetAnimator),
-    mParentTransform(parentTransform) {
+        SmartPathAnimator * const targetAnimator) :
+    mTargetAnimator(targetAnimator) {
     const auto updater = SPtrCreate(SmartNodePointUpdater)(this);
     mTargetAnimator->prp_setOwnUpdater(updater);
 }
 
-MovablePoint *PathPointsHandler::getPointAtAbsPos(
-        const QPointF &absPtPos,
-        const CanvasMode &currentCanvasMode,
-        const qreal &canvasScaleInv) const {
-    for(const auto& point : mPoints) {
-        const auto pointToReturn = point->getPointAtAbsPos(
-                    absPtPos, currentCanvasMode, canvasScaleInv);
-        if(!pointToReturn) continue;
-        return pointToReturn;
-    }
-    return nullptr;
-}
-
-void PathPointsHandler::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<stdptr<MovablePoint>> &list) const {
-    for(const auto& point : mPoints) {
-        point->rectPointsSelection(absRect, list);
-    }
-}
-
-void PathPointsHandler::drawPoints(SkCanvas * const canvas,
-                                   const CanvasMode &currentCanvasMode,
-                                   const SkScalar &invScale,
-                                   const SkMatrix &totalTransform) const {
-    Q_UNUSED(totalTransform);
-
-    const bool keyOnCurrentFrame = mKeyOnCurrentFrame;
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        for(int i = mPoints.count() - 1; i >= 0; i--) {
-            const auto& point = mPoints.at(i);
-            point->drawNodePoint(canvas, currentCanvasMode, invScale,
-                                 keyOnCurrentFrame);
-        }
-    } else if(currentCanvasMode == CanvasMode::ADD_SMART_POINT) {
-        for(int i = mPoints.count() - 1; i >= 0; i--) {
-            const auto& point = mPoints.at(i);
-            if(point->isEndPoint() || point->isSelected()) {
-                point->drawNodePoint(canvas, currentCanvasMode, invScale,
-                                     keyOnCurrentFrame);
-            }
-        }
-    }
-}
-
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
-    const auto newPt = SPtrCreate(SmartNodePoint)(
-                this, mTargetAnimator, mParentTransform);
-    mPoints.insert(nodeId, newPt);
-    return newPt.get();
+    return createInsertNewPt<SmartNodePoint>(nodeId, this, mTargetAnimator);
 }
 
 SmartNodePoint *PathPointsHandler::createAndAssignNewNodePoint(const int &nodeId) {
@@ -74,8 +25,8 @@ SmartPath *PathPointsHandler::targetPath() const {
 }
 
 void PathPointsHandler::updatePoint(const int &nodeId) {
-    const auto& pt = mPoints.at(nodeId);
-    updatePoint(pt.get(), nodeId);
+    const auto pt = getPointWithId<SmartNodePoint>(nodeId);
+    updatePoint(pt, nodeId);
 }
 
 void PathPointsHandler::updatePoint(SmartNodePoint * const pt, const int &nodeId) {
@@ -85,9 +36,9 @@ void PathPointsHandler::updatePoint(SmartNodePoint * const pt, const int &nodeId
 void PathPointsHandler::updateAllPoints() {
     if(mBlockAllPointsUpdate) return;
     const int newCount = targetPath()->getNodeCount();
-    while(newCount < mPoints.count()) mPoints.removeLast();
-    while(mPoints.count() < newCount) createNewNodePoint(mPoints.count());
-    for(int i = 0; i < mPoints.count(); i++) updatePoint(i);
+    while(newCount < count()) removeLast();
+    while(count() < newCount) createNewNodePoint(count());
+    for(int i = 0; i < count(); i++) updatePoint(i);
 }
 
 void PathPointsHandler::setCtrlsMode(const int &nodeId,
@@ -150,7 +101,8 @@ int PathPointsHandler::moveToClosestSegment(const int &nodeId,
                                             const QPointF &relPos) {
     NormalSegment::SubSegment minSubSeg{nullptr, nullptr, nullptr};
     qreal minDist = TEN_MIL;
-    for(const auto& pt : mPoints) {
+    for(int i = 0; i < count(); i++) {
+        const auto pt = getPointWithId<SmartNodePoint>(i);
         const auto seg = pt->getNextNormalSegment();
         if(!seg.isValid()) continue;
         qreal dist;
@@ -180,7 +132,7 @@ SmartNodePoint* PathPointsHandler::divideSegment(const int &node1Id,
                                                  const int &node2Id,
                                                  const qreal &t) {
     const int id = mTargetAnimator->actionInsertNodeBetween(node1Id, node2Id, t);
-    return mPoints.at(id).get();
+    return getPointWithId<SmartNodePoint>(id);
 }
 
 void PathPointsHandler::createSegment(const int &node1Id, const int &node2Id) {

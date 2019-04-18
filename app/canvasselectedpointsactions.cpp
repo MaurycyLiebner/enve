@@ -24,10 +24,10 @@ void Canvas::connectPoints() {
         if(success) {
             clearPointsSelection();
             const int targetId1 = node1->getNodeId();
-            const auto sel1 = handler->getPointWithId(targetId1);
+            const auto sel1 = handler->getPointWithId<SmartNodePoint>(targetId1);
             addPointToSelection(sel1);
             const int targetId2 = node2->getNodeId();
-            const auto sel2 = handler->getPointWithId(targetId2);
+            const auto sel2 = handler->getPointWithId<SmartNodePoint>(targetId2);
             addPointToSelection(sel2);
         }
     }

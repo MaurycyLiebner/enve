@@ -639,7 +639,7 @@ void Canvas::handleMovePointMouseMove() {
                     const int selId = nodePt->moveToClosestSegment(
                                 mCurrentMouseEventPosRel);
                     const auto handler = nodePt->getHandler();
-                    const auto dissPt = handler->getPointWithId(selId);
+                    const auto dissPt = handler->getPointWithId<SmartNodePoint>(selId);
                     if(nodePt->getNodeId() != selId) {
                         removePointFromSelection(nodePt);
                         addPointToSelection(dissPt);

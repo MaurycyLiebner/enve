@@ -4,6 +4,7 @@
 #include "nodepointvalues.h"
 #include "segment.h"
 #include "Animators/SmartPath/smartpathcontainer.h"
+#include "Properties/property.h"
 class UndoRedoStack;
 class SkCanvas;
 class SmartCtrlPoint;
@@ -17,8 +18,7 @@ class SmartNodePoint : public NonAnimatedMovablePoint {
     friend class NormalSegment;
 protected:
     SmartNodePoint(PathPointsHandler * const handler,
-                   SmartPathAnimator * const parentAnimator,
-                   BasicTransformAnimator * const parentTransform);
+                   SmartPathAnimator * const parentAnimator);
 public:
     void startTransform();
     void finishTransform();
@@ -33,6 +33,14 @@ public:
     void remove();
 
     void canvasContextMenu(PointTypeMenu * const menu);
+
+    bool isVisible(const CanvasMode& mode) const {
+        if(mode == CanvasMode::MOVE_POINT) {
+            return true;
+        } else if(mode == CanvasMode::ADD_SMART_POINT) {
+            return isEndPoint() || isSelected();
+        }
+    }
 
     int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
@@ -62,7 +70,7 @@ public:
     SmartNodePoint *getNextPoint();
     SmartNodePoint *getPreviousPoint();
 
-    bool isEndPoint();
+    bool isEndPoint() const;
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &canvasMode,

@@ -10,9 +10,8 @@
 #include "pointtypemenu.h"
 
 SmartNodePoint::SmartNodePoint(PathPointsHandler * const handler,
-                               SmartPathAnimator * const parentAnimator,
-                               BasicTransformAnimator * const parentTransform) :
-    NonAnimatedMovablePoint(parentTransform, TYPE_SMART_PATH_POINT),
+                               SmartPathAnimator * const parentAnimator) :
+    NonAnimatedMovablePoint(TYPE_SMART_PATH_POINT),
     mHandler_k(handler), mParentAnimator(parentAnimator) {
     setRadius(6.5);
 
@@ -582,11 +581,11 @@ void SmartNodePoint::updateFromNodeData() {
     updateFromNodeDataPosOnly();
 
     const int prevNodeId = currentPath()->prevNodeId(mNode_d->getNodeId());
-    const auto prevNode = mHandler_k->getPointWithId(prevNodeId);
+    const auto prevNode = mHandler_k->getPointWithId<SmartNodePoint>(prevNodeId);
     setPrevPoint(prevNode);
 
     const int nextNodeId = currentPath()->nextNodeId(mNode_d->getNodeId());
-    const auto nextNode = mHandler_k->getPointWithId(nextNodeId);
+    const auto nextNode = mHandler_k->getPointWithId<SmartNodePoint>(nextNodeId);
     setNextPoint(nextNode);
 
     const auto prevNormalNode = mHandler_k->getPrevNormalNode(getNodeId());
@@ -603,6 +602,6 @@ void SmartNodePoint::updateFromNodeData() {
     setSelectionEnabled(type == Node::NORMAL);
 }
 
-bool SmartNodePoint::isEndPoint() {
+bool SmartNodePoint::isEndPoint() const {
     return !mPrevNormalPoint || !mNextNormalPoint;
 }

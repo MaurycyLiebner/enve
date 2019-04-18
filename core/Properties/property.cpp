@@ -114,6 +114,7 @@ void Property::enabledDrawingOnCanvas() {
 
 void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
     mPointsHandler = handler;
+    if(mPointsHandler) mPointsHandler->setTransform(getTransformAnimator());
 }
 
 void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {

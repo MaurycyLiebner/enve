@@ -76,6 +76,7 @@ public:
         return static_cast<T*>(mPts.at(id).get());
     }
 
+    void removeLast() { mPts.removeLast(); }
     void removeAt(const int& id) { mPts.removeAt(id); }
     void clear() { mPts.clear(); }
 
@@ -91,6 +92,14 @@ public:
         for(const auto& pt : mPts) pt->setTransform(trans);
         mTrans = trans;
     }
+//protected:
+//    QList<stdsptr<MovablePoint>>::const_iterator begin() const {
+//        return mPts.begin();
+//    }
+
+//    QList<stdsptr<MovablePoint>>::const_iterator end() const {
+//        return mPts.end();
+//    }
 private:
     BasicTransformAnimator * mTrans = nullptr;
     QList<stdsptr<MovablePoint>> mPts;
