@@ -35,9 +35,12 @@ void gInterpolate(const SmartPath &path1, const SmartPath &path2,
     SmartPath::sInterpolate(path1, path2, path2Weight, target);
 }
 
-#include "Animators/polylineanimator.h"
-template <uchar PROPS>
-void gInterpolate(const Polyline<PROPS> &path1, const Polyline<PROPS> &path2,
-                  const qreal &path2Weight, Polyline<PROPS> &target) {
+#include "brushpolyline.h"
+bool gDiffers(const BrushPolyline& path1, const BrushPolyline& path2) {
+    return true;
+}
 
+void gInterpolate(const BrushPolyline &path1, const BrushPolyline &path2,
+                  const qreal &path2Weight, BrushPolyline &target) {
+    target = BrushPolyline::sInterpolate(path1, path2, path2Weight).first;
 }

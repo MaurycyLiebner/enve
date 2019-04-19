@@ -23,13 +23,11 @@ extern void gInterpolate(const SmartPath& path1,
                          const qreal& path2Weight,
                          SmartPath& target);
 
-template <uchar PROPS>
-class Polyline;
-
-template <uchar PROPS>
-extern void gInterpolate(const Polyline<PROPS>& path1,
-                         const Polyline<PROPS>& path2,
+class BrushPolyline;
+extern bool gDiffers(const BrushPolyline& path1, const BrushPolyline& path2);
+extern void gInterpolate(const BrushPolyline& path1,
+                         const BrushPolyline& path2,
                          const qreal& path2Weight,
-                         Polyline<PROPS>& target);
+                         BrushPolyline& target);
 
 #endif // DIFFERSINTERPOLATE_H

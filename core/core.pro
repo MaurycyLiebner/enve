@@ -131,7 +131,12 @@ SOURCES += \
     MovablePoints/pointshandler.cpp \
     MovablePoints/pathpointshandler.cpp \
     canvasbase.cpp \
-    typemenu.cpp
+    typemenu.cpp \
+    polyline.cpp \
+    brushpolyline.cpp \
+    Animators/brushpolylineanimator.cpp \
+    MovablePoints/polylinepoint.cpp \
+    MovablePoints/brushpolypoint.cpp
 
 HEADERS += \
     core_global.h \
@@ -223,7 +228,12 @@ HEADERS += \
     MovablePoints/pathpointshandler.h \
     canvasbase.h \
     typemenu.h \
-    pointtypemenu.h
+    pointtypemenu.h \
+    polyline.h \
+    brushpolyline.h \
+    Animators/brushpolylineanimator.h \
+    MovablePoints/polylinepoint.h \
+    MovablePoints/brushpolypoint.h
 
 unix {
     target.path = /usr/lib

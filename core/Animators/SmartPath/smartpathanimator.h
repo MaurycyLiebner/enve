@@ -147,6 +147,10 @@ public:
         else mPathBeingChanged_d = &mBaseValue;
     }
 
+    bool isClosed() const {
+        return mBaseValue.isClosed();
+    }
+
     void beforeBinaryPathChange() {
         if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
@@ -158,10 +162,6 @@ public:
             anim_saveCurrentValueAsKey();
         }
         mPathBeingChanged_d->save();
-    }
-
-    bool isClosed() const {
-        return mBaseValue.isClosed();
     }
 
     void pathChanged() {

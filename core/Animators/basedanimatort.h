@@ -8,6 +8,8 @@ template <typename B, typename K, typename T>
 class BasedAnimatorT : public B {
     static_assert(std::is_base_of<Animator, B>::value,
                   "BasedAnimatorT can only be used with Animator derived classes");
+protected:
+    BasedAnimatorT(const QString& name) : B(name) {}
 public:
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
         if(range.inRange(this->anim_getCurrentRelFrame())) {
@@ -104,8 +106,6 @@ public:
         afterValueChanged();
     }
 protected:
-    BasedAnimatorT(const QString& name) : B(name) {}
-
     virtual T getValueAtRelFrameK(const qreal &frame,
                                   const K * const prevKey,
                                   const K * const nextKey) const = 0;

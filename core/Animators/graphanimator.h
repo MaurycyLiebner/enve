@@ -8,11 +8,6 @@ class GraphAnimator : public Animator {
 protected:
     GraphAnimator(const QString& name);
 public:
-    bool SWT_isGraphAnimator() const { return true; }
-
-    void anim_appendKey(const stdsptr<Key> &newKey);
-    void anim_removeKey(const stdsptr<Key> &keyToRemove);
-
     virtual void graph_getValueConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minMoveValue, qreal &maxMoveValue) const = 0;
@@ -21,6 +16,12 @@ public:
             const int &startFrame, const int &endFrame) const;
     virtual qreal graph_clampGraphValue(const qreal &value) { return value; }
     virtual void graph_updateKeyPathWithId(const int& id);
+
+    bool SWT_isGraphAnimator() const { return true; }
+
+    void anim_appendKey(const stdsptr<Key> &newKey);
+    void anim_removeKey(const stdsptr<Key> &keyToRemove);
+
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
         Animator::prp_updateAfterChangedRelFrameRange(range);
         graph_updateKeysPath(range);

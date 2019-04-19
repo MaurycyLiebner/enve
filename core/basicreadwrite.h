@@ -5,6 +5,7 @@
 #include "castmacros.h"
 struct qCubicSegment1D;
 class SmartPath;
+class BrushPolyline;
 
 extern bool gRead(QIODevice* src, QString& targetStr);
 extern bool gWrite(QIODevice* dst, const QString& strToWrite);
@@ -17,4 +18,7 @@ extern bool gWrite(QIODevice* dst, const qCubicSegment1D& value);
 
 extern bool gRead(QIODevice* src, SmartPath& value);
 extern bool gWrite(QIODevice* dst, const SmartPath& value);
+
+extern bool gRead(QIODevice* src, BrushPolyline& value);
+extern bool gWrite(QIODevice* dst, const BrushPolyline& value);
 #endif // BASICREADWRITE_H

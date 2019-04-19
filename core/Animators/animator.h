@@ -26,6 +26,7 @@ public:
         USER_CHANGE,
         CHILD_USER_CHANGE
     };
+
     virtual void anim_saveCurrentValueAsKey() = 0;
 
     virtual void anim_scaleTime(const int &pivotAbsFrame,
