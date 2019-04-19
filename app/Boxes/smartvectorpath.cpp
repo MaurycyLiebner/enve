@@ -7,7 +7,6 @@
 #include "MovablePoints/pathpivot.h"
 #include "pointhelpers.h"
 #include "PropertyUpdaters/nodepointupdater.h"
-#include "Animators/PathAnimators/smartpathcollectionhandler.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/gradientpoints.h"
 #include "Animators/effectanimators.h"
@@ -55,11 +54,6 @@ void SmartVectorPath::applyCurrentTransformation() {
     mTransformAnimator->reset();
     centerPivotPosition();
     mNReasonsNotToApplyUglyTransform--;
-}
-
-NormalSegment SmartVectorPath::getNormalSegment(
-        const QPointF &absPos, const qreal &canvasScaleInv) {
-    return mPathAnimator->getNormalSegmentAtAbsPos(absPos, canvasScaleInv);
 }
 
 SkPath SmartVectorPath::getPathAtRelFrameF(const qreal &relFrame) {

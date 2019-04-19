@@ -149,15 +149,11 @@ public:
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
-    virtual NormalSegment getNormalSegment(const QPointF &absPos,
-                                           const qreal &canvasScaleInv) {
-        Q_UNUSED(absPos);
-        Q_UNUSED(canvasScaleInv);
-        return NormalSegment();
-    }
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &mode,
-                                   const qreal &invScale);
+                                   const qreal &invScale) const;
+    NormalSegment getNormalSegment(const QPointF &absPos,
+                                   const qreal &invScale) const;
 
     virtual FillSettingsAnimator *getFillSettings() const;
     virtual OutlineSettingsAnimator *getStrokeSettings() const;

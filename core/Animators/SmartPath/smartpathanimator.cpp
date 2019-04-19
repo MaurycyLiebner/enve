@@ -41,9 +41,3 @@ void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
     mBaseValue.actionDisconnectNodes(node1Id, node2Id);
     prp_updateInfluenceRangeAfterChanged();
 }
-
-NormalSegment SmartPathAnimator::getNormalSegmentAtAbsPos(
-        const QPointF &absPos, const qreal &invScale) {
-    const auto handler = GetAsPtr(mPointsHandler, PathPointsHandler);
-    return handler->getNormalSegmentAtAbsPos(absPos, invScale);
-}

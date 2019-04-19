@@ -11,9 +11,9 @@ class PathPointsHandler : public PointsHandler {
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator);
 public:
-    NormalSegment getNormalSegmentAtAbsPos(const QPointF &absPos,
-                                           const qreal &canvasScaleInv) const {
-        qreal minDist = 5*canvasScaleInv;
+    NormalSegment getNormalSegment(const QPointF &absPos,
+                                   const qreal &invScale) const {
+        qreal minDist = 5*invScale;
         NormalSegment bestSeg;
         for(int i = 0; i < count(); i++) {
             const auto point = getPointWithId<SmartNodePoint>(i);

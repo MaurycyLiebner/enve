@@ -307,12 +307,12 @@ void Canvas::handleLeftButtonMousePress() {
     mFirstMouseMove = true;
 
     mLastPressPosRel = mLastMouseEventPosRel;
-    const qreal canvasScaleInv = 1/mCanvasTransform.m11();
+    const qreal invScale = 1/mCanvasTransform.m11();
     mLastPressedPoint = getPointAtAbsPos(mLastMouseEventPosRel,
-                                         mCurrentMode, canvasScaleInv);
+                                         mCurrentMode, invScale);
 
     if(mRotPivot->handleMousePress(mLastMouseEventPosRel,
-                                   mCurrentMode, canvasScaleInv)) return;
+                                   mCurrentMode, invScale)) return;
     if(mCurrentMode == CanvasMode::MOVE_BOX) {
         if(mHoveredPoint_d) {
             handleMovePointMousePressEvent();

@@ -233,7 +233,6 @@ SOURCES += main.cpp\
     CacheHandlers/hddcachablecachehandler.cpp \
     CacheHandlers/minimalcachehandler.cpp \
     CacheHandlers/soundcachehandler.cpp \
-    Animators/PathAnimators/smartpathcollectionhandler.cpp \
     canvasmouseevents.cpp \
     canvashandlesmartpath.cpp \
     Boxes/smartvectorpath.cpp \
@@ -438,7 +437,6 @@ HEADERS  += \
     CacheHandlers/hddcachablecachehandler.h \
     CacheHandlers/minimalcachehandler.h \
     CacheHandlers/soundcachehandler.h \
-    Animators/PathAnimators/smartpathcollectionhandler.h \
     Boxes/smartvectorpath.h \
     paintsettingsapplier.h \
     colorsetting.h \

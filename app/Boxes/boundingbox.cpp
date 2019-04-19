@@ -18,6 +18,7 @@
 #include "PropertyUpdaters/transformupdater.h"
 #include "PropertyUpdaters/boxpathpointupdater.h"
 #include "Animators/qpointfanimator.h"
+#include "MovablePoints/pathpointshandler.h"
 
 int BoundingBox::sNextDocumentId;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -193,7 +194,7 @@ void BoundingBox::drawCanvasControls(SkCanvas * const canvas,
 
 MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
                                             const CanvasMode &mode,
-                                            const qreal &invScale) {
+                                            const qreal &invScale) const {
 
     for(const auto& prop : mCanvasProps) {
         const auto handler = prop->getPointsHandler();
@@ -202,6 +203,19 @@ MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
         if(pt) return pt;
     }
     return nullptr;
+}
+
+NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
+                                            const qreal &invScale) const {
+    for(const auto& prop : mCanvasProps) {
+        const auto handler = prop->getPointsHandler();
+        if(!handler) continue;
+        const auto pathHandler = dynamic_cast<PathPointsHandler*>(handler);
+        if(!pathHandler) continue;
+        const auto seg = pathHandler->getNormalSegment(absPos, invScale);
+        if(seg.isValid()) return seg;
+    }
+    return NormalSegment();
 }
 
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,

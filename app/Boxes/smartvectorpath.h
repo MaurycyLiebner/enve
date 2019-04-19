@@ -21,8 +21,6 @@ public:
     bool SWT_isSmartVectorPath() const { return true; }
 
     void addActionsToMenu(BoxTypeMenu * const menu);
-    NormalSegment getNormalSegment(const QPointF &absPos,
-                                   const qreal &canvasScaleInv);
 
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 

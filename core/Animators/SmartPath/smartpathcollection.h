@@ -49,9 +49,6 @@ public:
             addPath(from->ca_takeChildAt<SmartPathAnimator>(i));
     }
 
-    NormalSegment getNormalSegmentAtAbsPos(
-            const QPointF &absPos, const qreal &invScale);
-
     SkPath getPathAtRelFrame(const qreal &relFrame) const;
 
     void applyTransform(const QMatrix &transform) const;

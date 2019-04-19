@@ -359,9 +359,6 @@ public:
         }
         mBaseValue.applyTransform(transform);
     }
-
-    NormalSegment getNormalSegmentAtAbsPos(
-            const QPointF &absPos, const qreal &invScale);
 signals:
     void pathChangedAfterFrameChange();
 protected:
