@@ -521,8 +521,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCheckBox->hide();
 
         clearAndHideValueAnimators();
-    } else if(target->SWT_isQStringAnimator() ||
-              target->SWT_isQCubicSegment1DAnimator()) {
+    } else {/*if(target->SWT_isQStringAnimator() ||
+              target->SWT_isQCubicSegment1DAnimator()) {*/
         mRecordButton->show();
 
         mContentButton->show();

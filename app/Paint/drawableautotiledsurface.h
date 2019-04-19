@@ -17,8 +17,7 @@ public:
     }
 
     void updateTileImages() {
-        if(mTarget) updateTileRectImgs(mTarget->tileBoundingRect());
-        else mTileImgs.clear();
+        updateTileRectImgs(mTarget->tileBoundingRect());
     }
 
     void updateTileRectImgs(QRect tileRect) {
@@ -48,6 +47,13 @@ public:
     void setTarget(AutoTiledSurface * const target) {
         if(mTarget == target) return;
         mTarget = target;
+
+        mTileImgs.clear();
+        mRowCount = 0;
+        mColumnCount = 0;
+        mZeroTileRow = 0;
+        mZeroTileCol = 0;
+
         updateTileImages();
     }
 
