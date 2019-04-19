@@ -38,6 +38,7 @@ private:
 };
 
 class AnimatedSurface : public GraphAnimator {
+    Q_OBJECT
     friend class SelfRef;
     //typedef InterpolationKeyT<AutoTiledSurface> ASKey;
 protected:
@@ -107,16 +108,16 @@ public:
 
     void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
         const auto spk = static_cast<ASKey*>(key);
-        if(spk) mCurrent_d = &spk->getValue();
+        if(spk) setCurrent(&spk->getValue());
         else {
             const auto relFrame = anim_getCurrentRelFrame();
             const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
             if(prevNextKey.first) {
-                mCurrent_d = &prevNextKey.first->getValue();
+                setCurrent(&prevNextKey.first->getValue());
             } else if(prevNextKey.second) {
-                mCurrent_d = &prevNextKey.second->getValue();
+                setCurrent(&prevNextKey.second->getValue());
             } else {
-                mCurrent_d = &mBaseValue;
+                setCurrent(&mBaseValue);
             }
         }
     }
@@ -137,7 +138,15 @@ public:
     AutoTiledSurface * getCurrentSurface() {
         return mCurrent_d;
     }
+signals:
+    void currentSurfaceChanged(AutoTiledSurface*);
 private:
+    void setCurrent(AutoTiledSurface * const surf) {
+        if(mCurrent_d == surf) return;
+        mCurrent_d = surf;
+        emit currentSurfaceChanged(mCurrent_d);
+    }
+
     AutoTiledSurface mBaseValue;
     AutoTiledSurface * mCurrent_d = &mBaseValue;
 };

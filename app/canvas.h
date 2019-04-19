@@ -17,6 +17,7 @@
 #include "canvasbase.h"
 #include <QAction>
 
+class AnimatedSurface;
 class PaintBox;
 class TextBox;
 class Circle;
@@ -206,6 +207,7 @@ public:
     void addBoxToSelection(BoundingBox *box);
     void removeBoxFromSelection(BoundingBox *box);
     void clearBoxesSelection();
+    void clearBoxesSelectionList();
 
     void addPointToSelection(MovablePoint * const point);
     void removePointFromSelection(MovablePoint * const point);
@@ -537,6 +539,8 @@ private:
     bool isCtrlPressed(QKeyEvent *event);
     bool isAltPressed();
     bool isAltPressed(QKeyEvent *event);
+
+    void setPaintBox(PaintBox * const box);
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
@@ -547,6 +551,7 @@ protected:
 
     ulong mLastTs;
     PaintBox * mPaintDrawableBox = nullptr;
+    AnimatedSurface * mPaintAnimSurface = nullptr;
     DrawableAutoTiledSurface mPaintDrawable;
 
     const SimpleBrushWrapper * mCurrentBrush = nullptr;

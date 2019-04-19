@@ -594,8 +594,26 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
     updatePivot();
     if(mCurrentMode == PAINT_MODE) {
         if(mSelectedBoxes.isEmpty()) return;
+        setPaintBox(GetAsPtr(mSelectedBoxes.last(), PaintBox));
+    } else if(mPaintDrawableBox) {
+        setPaintBox(nullptr);
+    }
+}
+
+void Canvas::setPaintBox(PaintBox * const box) {
+    if(box) {
         mPaintDrawableBox = GetAsPtr(mSelectedBoxes.last(), PaintBox);
-        mPaintDrawable.setTarget(mPaintDrawableBox->getCurrentSurface());
+        mPaintAnimSurface = mPaintDrawableBox->getSurface();
+        connect(mPaintAnimSurface, &AnimatedSurface::currentSurfaceChanged,
+                [this](AutoTiledSurface * surf) {
+            mPaintDrawable.setTarget(surf);
+        });
+        mPaintDrawable.setTarget(mPaintAnimSurface->getCurrentSurface());
+    } else if(mPaintDrawableBox) {
+        mPaintDrawableBox = nullptr;
+        disconnect(mPaintAnimSurface, nullptr, nullptr, nullptr);
+        mPaintAnimSurface = nullptr;
+        mPaintDrawable.setTarget(nullptr);
     }
 }
 
@@ -1038,6 +1056,10 @@ bool Canvas::isAltPressed(QKeyEvent *event) {
 
 void Canvas::paintPress(const ulong ts, const qreal &pressure,
                         const qreal &xTilt, const qreal &yTilt) {
+    if(mPaintAnimSurface) {
+        if(mPaintAnimSurface->anim_isRecording())
+            mPaintAnimSurface->anim_saveCurrentValueAsKey();
+    }
     const auto target = mPaintDrawable.getTarget();
     if(target) {
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();

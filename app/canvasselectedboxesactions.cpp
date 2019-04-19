@@ -370,9 +370,9 @@ void Canvas::removeSelectedBoxesAndClearList() {
         //box->deselect();
         box->removeFromParent_k();
     }
-    mSelectedBoxes.clear(); schedulePivotUpdate();
+    clearBoxesSelectionList(); schedulePivotUpdate();
 }
-
+#include "Boxes/paintbox.h"
 void Canvas::addBoxToSelection(BoundingBox *box) {
     if(box->isSelected()) return;
     connect(box, &BoundingBox::globalPivotInfluenced,
@@ -381,6 +381,11 @@ void Canvas::addBoxToSelection(BoundingBox *box) {
             this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
     box->select();
     mSelectedBoxes.append(box); schedulePivotUpdate();
+    if(mCurrentMode == PAINT_MODE) {
+        if(!mPaintDrawableBox) {
+            setPaintBox(GetAsPtr(box, PaintBox));
+        }
+    }
     sortSelectedBoxesByZAscending();
     //setCurrentFillStrokeSettingsFromBox(box);
     mMainWindow->setCurrentBox(box);
@@ -393,6 +398,13 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
                this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
     box->deselect();
     mSelectedBoxes.removeOne(box); schedulePivotUpdate();
+    if(mCurrentMode == PAINT_MODE) {
+        if(mSelectedBoxes.isEmpty()) {
+            setPaintBox(nullptr);
+        } else {
+            setPaintBox(GetAsPtr(mSelectedBoxes.last(), PaintBox));
+        }
+    }
     if(mSelectedBoxes.isEmpty()) {
         mMainWindow->setCurrentBox(nullptr);
     } else {
@@ -403,14 +415,18 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
 void Canvas::clearBoxesSelection() {
     for(const auto &box : mSelectedBoxes)
         box->deselect();
-    mSelectedBoxes.clear(); schedulePivotUpdate();
+    clearBoxesSelectionList(); schedulePivotUpdate();
     mMainWindow->setCurrentBox(nullptr);
 //    if(mLastPressedBox) {
 //        mLastPressedBox->deselect();
 //        mLastPressedBox = nullptr;
-//    }
+    //    }
 }
 
+void Canvas::clearBoxesSelectionList() {
+    if(mCurrentMode == PAINT_MODE) setPaintBox(nullptr);
+    mSelectedBoxes.clear();
+}
 
 void Canvas::applyCurrentTransformationToSelected() {
 }
@@ -552,7 +568,7 @@ void Canvas::groupSelectedBoxes() {
         newGroup->addContainedBox(boxSP);
     }
     mCurrentBoxesGroup->addContainedBox(newGroup);
-    mSelectedBoxes.clear(); schedulePivotUpdate();
+    clearBoxesSelectionList(); schedulePivotUpdate();
     addBoxToSelection(newGroup.get());
 }
 

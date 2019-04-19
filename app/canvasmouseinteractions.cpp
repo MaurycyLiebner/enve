@@ -543,8 +543,7 @@ void Canvas::handleMouseRelease() {
     }
     if(!mDoubleClick) {
         if(mCurrentMode == CanvasMode::MOVE_POINT ||
-           mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
-           mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
+           mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseRelease();
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
                 mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
@@ -593,6 +592,8 @@ void Canvas::handleMouseRelease() {
             if(mCurrentTextBox) {
                 mCurrentTextBox->openTextEditor(mMainWindow);
             }
+        } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
+            mCanvasWindow->setCanvasMode(CanvasMode::PAINT_MODE);
         }
     }
 }

@@ -31,8 +31,8 @@ public:
 
     void addActionsToMenu(BoxTypeMenu * const menu);
 
-    AutoTiledSurface * getCurrentSurface() const {
-        return mSurface->getCurrentSurface();
+    AnimatedSurface * getSurface() const {
+        return mSurface.get();
     }
 private:
     qsptr<AnimatedSurface> mSurface;
