@@ -129,10 +129,12 @@ public:
     }
 
     bool getC0Enabled() const {
+        if(!mPrevNormalPoint) return false;
         return mNode_d->getC0Enabled();
     }
 
     bool getC2Enabled() const {
+        if(!mNextNormalPoint) return false;
         return mNode_d->getC2Enabled();
     }
 

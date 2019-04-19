@@ -706,22 +706,21 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         });
                     }
                 } else {
-                    if(clipboard->propertyCompatible(
-                                GetAsPtr(target, Property))) {
-                        menu.addAction("Paste", [target]() {
+                    const auto prop = GetAsPtr(target, Property);
+                    if(clipboard->propertyCompatible(prop)) {
+                        menu.addAction("Paste", [prop]() {
                             auto clipboard = MainWindow::getPropertyClipboardContainer();
-                            clipboard->paste(GetAsPtr(target, Property));
+                            clipboard->paste(prop);
                         });
-                        if(target->SWT_isAnimator()) {
-                            menu.addAction("Clear and Paste", [target]() {
+                        if(prop->SWT_isAnimator()) {
+                            menu.addAction("Clear and Paste", [prop]() {
                                 auto clipboard = MainWindow::getPropertyClipboardContainer();
-                                auto targetProperty = GetAsPtr(target, Property);
-                                clipboard->clearAndPaste(targetProperty);
+                                clipboard->clearAndPaste(prop);
                             });
                         }
                     } else {
                         menu.addAction("Paste")->setDisabled(true);
-                        if(target->SWT_isAnimator()) {
+                        if(prop->SWT_isAnimator()) {
                             menu.addAction("Clear and Paste")->setDisabled(true);
                         }
                     }

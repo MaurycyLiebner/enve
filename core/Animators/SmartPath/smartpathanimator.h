@@ -8,7 +8,6 @@
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
-    Q_OBJECT
 protected:
     SmartPathAnimator();
     SmartPathAnimator(const SkPath& path);
@@ -60,16 +59,7 @@ public:
         gWrite(target, mBaseValue);
     }
 
-    void readProperty(QIODevice *target) {
-        int nKeys;
-        target->read(rcChar(&nKeys), sizeof(int));
-        for(int i = 0; i < nKeys; i++) {
-            auto newKey = SPtrCreate(SmartPathKey)(this);
-            newKey->readKey(target);
-            anim_appendKey(newKey);
-        }
-        gRead(target, mBaseValue);
-    }
+    void readProperty(QIODevice *target);
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType &type,
@@ -314,6 +304,7 @@ public:
         mBaseValue.actionAppendMoveAllFrom(other->getBaseValue());
         prp_updateInfluenceRangeAfterChanged();
         other->prp_updateInfluenceRangeAfterChanged();
+        updateAllPoints();
     }
 
     void actionPrependMoveAllFrom(SmartPathAnimator * const other) {
@@ -326,6 +317,7 @@ public:
         mBaseValue.actionPrependMoveAllFrom(other->getBaseValue());
         prp_updateInfluenceRangeAfterChanged();
         other->prp_updateInfluenceRangeAfterChanged();
+        updateAllPoints();
     }
 
     bool hasDetached() const {
@@ -358,14 +350,15 @@ public:
             spKey->getValue().applyTransform(transform);
         }
         mBaseValue.applyTransform(transform);
+        updateAllPoints();
     }
-signals:
-    void pathChangedAfterFrameChange();
 protected:
     SmartPath& getBaseValue() {
         return mBaseValue;
     }
 private:
+    void updateAllPoints();
+
     void deepCopySmartPathFromRelFrame(const int& relFrame,
                                        SmartPathKey * const prevKey,
                                        SmartPathKey * const nextKey,

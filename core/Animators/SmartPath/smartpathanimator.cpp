@@ -11,11 +11,25 @@ SmartPathAnimator::SmartPathAnimator() :
 SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
     SmartPathAnimator() {
     mBaseValue.setPath(path);
+    updateAllPoints();
 }
 
 SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
     SmartPathAnimator() {
     mBaseValue = baseValue;
+    updateAllPoints();
+}
+
+void SmartPathAnimator::readProperty(QIODevice *target) {
+    int nKeys;
+    target->read(rcChar(&nKeys), sizeof(int));
+    for(int i = 0; i < nKeys; i++) {
+        auto newKey = SPtrCreate(SmartPathKey)(this);
+        newKey->readKey(target);
+        anim_appendKey(newKey);
+    }
+    gRead(target, mBaseValue);
+    updateAllPoints();
 }
 
 void SmartPathAnimator::graph_getValueConstraints(
@@ -40,4 +54,10 @@ void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
     }
     mBaseValue.actionDisconnectNodes(node1Id, node2Id);
     prp_updateInfluenceRangeAfterChanged();
+}
+
+void SmartPathAnimator::updateAllPoints() {
+    const auto handler = getPointsHandler();
+    const auto pathHandler = GetAsPtr(handler, PathPointsHandler);
+    pathHandler->updateAllPoints();
 }
