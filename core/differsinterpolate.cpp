@@ -37,7 +37,7 @@ void gInterpolate(const SmartPath &path1, const SmartPath &path2,
 
 #include "brushpolyline.h"
 bool gDiffers(const BrushPolyline& path1, const BrushPolyline& path2) {
-    return true;
+    return &path1 != &path2;
 }
 
 void gInterpolate(const BrushPolyline &path1, const BrushPolyline &path2,

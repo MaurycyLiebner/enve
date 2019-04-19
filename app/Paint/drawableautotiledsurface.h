@@ -128,7 +128,7 @@ private:
     }
 
     QPoint zeroTilePos() const {
-        return zeroTile()*MYPAINT_TILE_SIZE;
+        return zeroTile()*TILE_SIZE;
     }
 
     QRect tileBoundingRect() const {
@@ -137,19 +137,19 @@ private:
     }
 
     QRect tileRectToPixRect(const QRect& tileRect) const {
-        return QRect(tileRect.x()*MYPAINT_TILE_SIZE,
-                     tileRect.y()*MYPAINT_TILE_SIZE,
-                     tileRect.width()*MYPAINT_TILE_SIZE,
-                     tileRect.height()*MYPAINT_TILE_SIZE);
+        return QRect(tileRect.x()*TILE_SIZE,
+                     tileRect.y()*TILE_SIZE,
+                     tileRect.width()*TILE_SIZE,
+                     tileRect.height()*TILE_SIZE);
     }
 
     QRect pixRectToTileRect(const QRect& pixRect) const {
-        const int widthRem = (pixRect.width() % MYPAINT_TILE_SIZE) ? 2 : 1;
-        const int heightRem = (pixRect.height() % MYPAINT_TILE_SIZE) ? 2 : 1;
-        return QRect(qFloor(static_cast<qreal>(pixRect.x())/MYPAINT_TILE_SIZE),
-                     qFloor(static_cast<qreal>(pixRect.y())/MYPAINT_TILE_SIZE),
-                     pixRect.width()/MYPAINT_TILE_SIZE + widthRem,
-                     pixRect.height()/MYPAINT_TILE_SIZE + heightRem);
+        const int widthRem = (pixRect.width() % TILE_SIZE) ? 2 : 1;
+        const int heightRem = (pixRect.height() % TILE_SIZE) ? 2 : 1;
+        return QRect(qFloor(static_cast<qreal>(pixRect.x())/TILE_SIZE),
+                     qFloor(static_cast<qreal>(pixRect.y())/TILE_SIZE),
+                     pixRect.width()/TILE_SIZE + widthRem,
+                     pixRect.height()/TILE_SIZE + heightRem);
     }
 
     AutoTiledSurface * mTarget = nullptr;

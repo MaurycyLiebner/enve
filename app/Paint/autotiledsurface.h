@@ -1,4 +1,4 @@
-#ifndef FIXEDTILEDSURFACE_H
+﻿#ifndef FIXEDTILEDSURFACE_H
 #define FIXEDTILEDSURFACE_H
 
 #include <mypaint-config.h>
@@ -12,12 +12,23 @@
 #include "autotilesdata.h"
 #include "brushstroke.h"
 
+class AutoTiledSurface;
+extern bool gRead(QIODevice* src, AutoTiledSurface& value);
+extern bool gWrite(QIODevice* dst, const AutoTiledSurface& value);
+extern bool gDiffers(const AutoTiledSurface& surf1,
+                     const AutoTiledSurface& surf2);
+extern void gInterpolate(const AutoTiledSurface& surf1,
+                         const AutoTiledSurface& surf2,
+                         const qreal& surf2Weight,
+                         AutoTiledSurface& target);
+
 struct AutoTiledSurface {
     friend struct BrushStroke;
     friend struct BrushStrokeSet;
 
     ~AutoTiledSurface();
     AutoTiledSurface();
+
     void loadBitmap(const SkBitmap &src);
 
     void _free() {
@@ -94,6 +105,10 @@ struct AutoTiledSurface {
 
     QRect tileBoundingRect() const {
         return mAutoTilesData.tileBoundingRect();
+    }
+
+    const AutoTilesData& getTileData() const {
+        return mAutoTilesData;
     }
 protected:
     MyPaintTiledSurface fParent;

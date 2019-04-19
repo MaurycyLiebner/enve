@@ -17,6 +17,7 @@
 #include "canvasbase.h"
 #include <QAction>
 
+class PaintBox;
 class TextBox;
 class Circle;
 class ParticleBox;
@@ -545,7 +546,7 @@ protected:
                    const qreal& xTilt, const qreal& yTilt);
 
     ulong mLastTs;
-    BoundingBox * mPaintDrawableBox = nullptr;
+    PaintBox * mPaintDrawableBox = nullptr;
     DrawableAutoTiledSurface mPaintDrawable;
 
     const SimpleBrushWrapper * mCurrentBrush = nullptr;

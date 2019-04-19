@@ -4,12 +4,25 @@
 #include <QList>
 #include "skia/skiaincludes.h"
 
+#ifndef TILE_SIZE
+    #define TILE_SIZE 64
+#endif
+
+#ifndef TILE_SPIXEL_SIZE
+    #define TILE_SPIXEL_SIZE 16384 //TILE_SIZE*TILE_SIZE*4
+#endif
+
 struct AutoTilesData {
-    AutoTilesData(const int& tileSize);
+    AutoTilesData();
+    AutoTilesData(const AutoTilesData& other);
+    ~AutoTilesData();
+
+    AutoTilesData& operator=(const AutoTilesData& other) {
+        copyFrom(other);
+        return *this;
+    }
 
     void loadBitmap(const SkBitmap& src);
-
-    ~AutoTilesData();
 
     void reset();
 
@@ -29,7 +42,7 @@ struct AutoTilesData {
     }
 
     QPoint zeroTilePos() const {
-        return zeroTile()*mTileSize;
+        return zeroTile()*TILE_SIZE;
     }
 
     QRect pixelBoundingRect() const {
@@ -42,23 +55,24 @@ struct AutoTilesData {
     }
 
     QRect tileRectToPixRect(const QRect& tileRect) const {
-        return QRect(tileRect.x()*mTileSize,
-                     tileRect.y()*mTileSize,
-                     tileRect.width()*mTileSize,
-                     tileRect.height()*mTileSize);
+        return QRect(tileRect.x()*TILE_SIZE,
+                     tileRect.y()*TILE_SIZE,
+                     tileRect.width()*TILE_SIZE,
+                     tileRect.height()*TILE_SIZE);
     }
 
     QRect pixRectToTileRect(const QRect& pixRect) const {
-        const int widthRem = pixRect.width() % mTileSize ? 1 : 0;
-        const int heightRem = pixRect.height() % mTileSize ? 1 : 0;
-        return QRect(pixRect.x()/mTileSize,
-                     pixRect.y()/mTileSize,
-                     pixRect.width()/mTileSize + widthRem,
-                     pixRect.height()/mTileSize + heightRem);
+        const int widthRem = pixRect.width() % TILE_SIZE ? 1 : 0;
+        const int heightRem = pixRect.height() % TILE_SIZE ? 1 : 0;
+        return QRect(pixRect.x()/TILE_SIZE,
+                     pixRect.y()/TILE_SIZE,
+                     pixRect.width()/TILE_SIZE + widthRem,
+                     pixRect.height()/TILE_SIZE + heightRem);
     }
-private:
+protected:
     uint16_t* getTileByIndex(const int& colId, const int& rowId) const;
-
+private:
+    void copyFrom(const AutoTilesData &other);
     QList<uint16_t*> newColumn();
     void prependRows(const int& count);
     void appendRows(const int& count);
@@ -69,9 +83,6 @@ private:
     int mZeroTileRow = 0;
     int mColumnCount = 0;
     int mRowCount = 0;
-
-    const int mTileSize;
-    const size_t mTilePixSize;
     QList<QList<uint16_t*>> mColumns;
 };
 

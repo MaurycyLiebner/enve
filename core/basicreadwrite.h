@@ -6,6 +6,7 @@
 struct qCubicSegment1D;
 class SmartPath;
 class BrushPolyline;
+class AutoTiledSurface;
 
 extern bool gRead(QIODevice* src, QString& targetStr);
 extern bool gWrite(QIODevice* dst, const QString& strToWrite);

@@ -59,8 +59,6 @@ void MovablePoint::drawOnAbsPosSk(
         const SkScalar &invScale,
         const SkColor& fillColor,
         const bool &keyOnCurrent) {
-    canvas->save();
-
     const SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;
 
     SkPaint paint;
@@ -87,7 +85,6 @@ void MovablePoint::drawOnAbsPosSk(
         paint.setColor(SK_ColorBLACK);
         canvas->drawCircle(absPos, halfRadius, paint);
     }
-    canvas->restore();
 }
 
 void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,

@@ -290,6 +290,12 @@ void SmartNodePoint::drawSk(
 //    }
 }
 
+void SmartNodePoint::setTransform(BasicTransformAnimator * const trans) {
+    MovablePoint::setTransform(trans);
+    mC0Pt->setTransform(trans);
+    mC2Pt->setTransform(trans);
+}
+
 SmartNodePoint* SmartNodePoint::getNextPoint() {
     return mNextPoint;
 }

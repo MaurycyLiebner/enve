@@ -45,6 +45,10 @@ public:
                 const CanvasMode &mode,
                 const SkScalar &invScale,
                 const bool &keyOnCurrent);
+    void setTransform(BasicTransformAnimator * const trans);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                                   const CanvasMode &mode,
+                                   const qreal &invScale);
 
     int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
@@ -70,10 +74,6 @@ public:
     SmartNodePoint *getPreviousPoint();
 
     bool isEndPoint() const;
-
-    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &mode,
-                                   const qreal &invScale);
 
     void setSeparateNodePoint(const bool &separateNodePoint);
     bool isSeparateNodePoint();

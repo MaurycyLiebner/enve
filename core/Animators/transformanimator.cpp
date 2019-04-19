@@ -284,6 +284,7 @@ QMatrix BasicTransformAnimator::getTotalTransformAtRelFrameF(
 BoxTransformAnimator::BoxTransformAnimator() {
     mShearAnimator = SPtrCreate(QPointFAnimator)("shear");
     mShearAnimator->setBaseValue(QPointF(0, 0));
+    mShearAnimator->setValuesRange(-1, 1);
 
     mPivotAnimator = SPtrCreate(QPointFAnimator)("pivot");
     mPivotAnimator->setBaseValue(QPointF(0, 0));

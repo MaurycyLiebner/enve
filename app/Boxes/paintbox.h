@@ -1,6 +1,7 @@
 #ifndef PAINTBOX_H
 #define PAINTBOX_H
 #include "boundingbox.h"
+#include "Paint/animatedsurface.h"
 class QPointFAnimator;
 class AnimatedPoint;
 class SimpleBrushWrapper;
@@ -29,7 +30,12 @@ public:
     void readBoundingBox(QIODevice *target);
 
     void addActionsToMenu(BoxTypeMenu * const menu);
+
+    AutoTiledSurface * getCurrentSurface() const {
+        return mSurface->getCurrentSurface();
+    }
 private:
+    qsptr<AnimatedSurface> mSurface;
 };
 
 #endif // PAINTBOX_H

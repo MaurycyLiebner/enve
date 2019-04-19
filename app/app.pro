@@ -252,7 +252,8 @@ SOURCES += main.cpp\
     PropertyUpdaters/boxpathpointupdater.cpp \
     Paint/drawableautotiledsurface.cpp \
     FileCacheHandlers/videoframeloader.cpp \
-    FileCacheHandlers/videostreamsdata.cpp
+    FileCacheHandlers/videostreamsdata.cpp \
+    Paint/animatedsurface.cpp
 
 HEADERS  += \
     canvas.h \
@@ -455,7 +456,8 @@ HEADERS  += \
     PropertyUpdaters/boxpathpointupdater.h \
     Paint/drawableautotiledsurface.h \
     FileCacheHandlers/videoframeloader.h \
-    FileCacheHandlers/videostreamsdata.h
+    FileCacheHandlers/videostreamsdata.h \
+    Paint/animatedsurface.h
 
 RESOURCES += \
     resources.qrc

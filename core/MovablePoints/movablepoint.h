@@ -68,6 +68,8 @@ public:
                                      const CanvasMode &mode,
                                      QList<stdptr<MovablePoint>> &list);
 
+    virtual void setTransform(BasicTransformAnimator * const trans);
+
     void moveToAbs(const QPointF& absPos);
     void moveByAbs(const QPointF &absTrans);
     void moveToRel(const QPointF &relPos);
@@ -79,7 +81,6 @@ public:
     void setAbsolutePos(const QPointF &pos);
 
     BasicTransformAnimator *getTransform();
-    void setTransform(BasicTransformAnimator * const trans);
 
     bool isContainedInRect(const QRectF &absRect);
 

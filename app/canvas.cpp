@@ -32,9 +32,6 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
                const int &frameCount, const qreal &fps) :
     BoxesGroup(TYPE_CANVAS) {
-    mPaintDrawableBox = this;
-    mPaintDrawable.setTarget(new AutoTiledSurface());
-
     mMainWindow = MainWindow::getInstance();
     setCurrentBrush(mMainWindow->getCurrentBrush());
     std::function<bool(int)> changeFrameFunc =
@@ -311,7 +308,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
             const auto canvasRect = mCanvasTransform.inverted().mapRect(widRect);
             const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
             const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
-            const auto absPos = mPaintDrawableBox->getAbsolutePos();
+            const auto absPos = QPointF(0, 0);//mPaintDrawableBox->getAbsolutePos();
+            canvas->concat(toSkMatrix(pDrawTrans));
             mPaintDrawable.drawOnCanvas(canvas, relDRect, absPos.toPoint());
         }
 
@@ -594,6 +592,11 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
     updatePivot();
+    if(mCurrentMode == PAINT_MODE) {
+        if(mSelectedBoxes.isEmpty()) return;
+        mPaintDrawableBox = GetAsPtr(mSelectedBoxes.last(), PaintBox);
+        mPaintDrawable.setTarget(mPaintDrawableBox->getCurrentSurface());
+    }
 }
 
 void Canvas::grabMouseAndTrack() {
@@ -1037,9 +1040,11 @@ void Canvas::paintPress(const ulong ts, const qreal &pressure,
                         const qreal &xTilt, const qreal &yTilt) {
     const auto target = mPaintDrawable.getTarget();
     if(target) {
+        const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
+        const auto pos = pDrawTrans.inverted().map(mLastMouseEventPosRel);
         const auto roi =
                 target->paintPressEvent(mCurrentBrush->getBrush(),
-                                        mLastMouseEventPosRel,
+                                        pos,
                                         1, pressure,
                                         xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
@@ -1053,9 +1058,11 @@ void Canvas::paintMove(const ulong ts, const qreal &pressure,
     const auto target = mPaintDrawable.getTarget();
     if(target) {
         const double dt = (ts - mLastTs);
+        const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
+        const auto pos = pDrawTrans.inverted().map(mLastMouseEventPosRel);
         const auto roi =
                 target->paintMoveEvent(mCurrentBrush->getBrush(),
-                                       mLastMouseEventPosRel,
+                                       pos,
                                        dt/1000, pressure,
                                        xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
