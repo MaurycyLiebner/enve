@@ -78,27 +78,6 @@ public:
         return getPathAtRelFrame(prp_absFrameToRelFrameF(frame));
     }
 
-    qreal prevKeyWeight(const SmartPathKey * const prevKey,
-                        const SmartPathKey * const nextKey,
-                        const qreal & frame) const {
-        const qreal prevFrame = prevKey->getRelFrame();
-        const qreal nextFrame = nextKey->getRelFrame();
-
-        const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                                  prevKey->getEndFrame(),
-                                  nextKey->getStartFrame(),
-                                  qreal(nextKey->getRelFrame())};
-        const qreal t = gTFromX(seg, frame);
-        const qreal p0y = prevKey->getValueForGraph();
-        const qreal p1y = prevKey->getEndValue();
-        const qreal p2y = nextKey->getStartValue();
-        const qreal p3y = nextKey->getValueForGraph();
-        const qreal iFrame = gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
-        const qreal dFrame = nextFrame - prevFrame;
-        const qreal pWeight = (iFrame - prevFrame)/dFrame;
-        return pWeight;
-    }
-
     SkPath getPathAtRelFrame(const qreal &frame) const {
         if(anim_mKeys.isEmpty()) return mBaseValue.getPathAt();
         const auto pn = anim_getPrevAndNextKeyIdForRelFrameF(frame);

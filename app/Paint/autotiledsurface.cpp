@@ -6,23 +6,6 @@
 #include "colorconversions.h"
 #include "autotiledsurface.h"
 
-bool gRead(QIODevice *src, AutoTiledSurface &value) {
-    return true;
-}
-
-bool gWrite(QIODevice *dst, const AutoTiledSurface &value) {
-    return true;
-}
-
-bool gDiffers(const AutoTiledSurface &surf1, const AutoTiledSurface &surf2) {
-    return &surf1 != &surf2;
-}
-
-void gInterpolate(const AutoTiledSurface &surf1, const AutoTiledSurface &surf2,
-                  const qreal &surf2Weight, AutoTiledSurface &target)  {
-
-}
-
 void autoTiledSurfaceFree(MyPaintSurface *surface) {
     const auto self = reinterpret_cast<AutoTiledSurface*>(surface);
     self->_free();
@@ -46,6 +29,11 @@ AutoTiledSurface::AutoTiledSurface() {
                                autoTiledSurfaceRequestStart,
                                autoTiledSurfaceRequestEnd);
     fParent.parent.destroy = autoTiledSurfaceFree;
+}
+
+AutoTiledSurface::AutoTiledSurface(const AutoTiledSurface &other) :
+    AutoTiledSurface() {
+    mAutoTilesData = other.getTileData();
 }
 
 AutoTiledSurface::~AutoTiledSurface() {

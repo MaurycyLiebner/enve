@@ -87,6 +87,10 @@ public:
     void graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode);
     void graph_getSelectedSegments(QList<QList<GraphKey*>> &segments);
 protected:
+    qreal prevKeyWeight(const GraphKey * const prevKey,
+                        const GraphKey * const nextKey,
+                        const qreal & frame) const;
+
     QList<QPainterPath> graph_mKeyPaths;
 private:
     IdRange graph_relFrameRangeToGraphPathIdRange(

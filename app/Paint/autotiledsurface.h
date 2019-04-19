@@ -12,22 +12,19 @@
 #include "autotilesdata.h"
 #include "brushstroke.h"
 
-class AutoTiledSurface;
-extern bool gRead(QIODevice* src, AutoTiledSurface& value);
-extern bool gWrite(QIODevice* dst, const AutoTiledSurface& value);
-extern bool gDiffers(const AutoTiledSurface& surf1,
-                     const AutoTiledSurface& surf2);
-extern void gInterpolate(const AutoTiledSurface& surf1,
-                         const AutoTiledSurface& surf2,
-                         const qreal& surf2Weight,
-                         AutoTiledSurface& target);
-
 struct AutoTiledSurface {
     friend struct BrushStroke;
     friend struct BrushStrokeSet;
 
-    ~AutoTiledSurface();
     AutoTiledSurface();
+    AutoTiledSurface(const AutoTiledSurface& other);
+
+    ~AutoTiledSurface();
+
+    AutoTiledSurface& operator=(const AutoTiledSurface& other) {
+        mAutoTilesData = other.getTileData();
+        return *this;
+    }
 
     void loadBitmap(const SkBitmap &src);
 
