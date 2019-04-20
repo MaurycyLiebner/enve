@@ -14,18 +14,15 @@ class RangeCacheHandler {
 public:
     void removeRenderContainer(const stdsptr<RCC>& cont);
 
-    int insertIdForRelFrame(
-                        const int &relFrame) const;
+    int insertIdForRelFrame(const int &relFrame) const;
 
-    bool idAtRelFrame(const int &relFrame,
-                                         int *id) const;
+    bool idAtRelFrame(const int &relFrame, int *id) const;
 
     int getFirstEmptyFrameAfterFrame(const int &frame) const;
 
     int firstEmptyFrameAtOrAfterFrame(const int &frame) const;
 
-    void blockConts(const FrameRange &range,
-                                          const bool &blocked);
+    void blockConts(const FrameRange &range, const bool &blocked);
 
     void clearCache();
 

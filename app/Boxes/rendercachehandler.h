@@ -12,7 +12,7 @@
 
 class QPainter;
 
-class RenderCacheHandler : public HDDCachableCacheHandler<ImageCacheContainer> {
+class RenderCacheHandler : public HDDCachableCacheHandler {
 public:
 };
 

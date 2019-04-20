@@ -4,7 +4,7 @@
 #include "CacheHandlers/soundcachecontainer.h"
 #include "Decode/audiodecode.h"
 
-class SoundCacheHandler : public HDDCachableCacheHandler<SoundCacheContainer> {
+class SoundCacheHandler : public HDDCachableCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 public:
     void rangeNeeded(const SampleRange& range) {
@@ -21,8 +21,7 @@ protected:
         float * data = nullptr;
         gDecodeSoundDataRange(mFilePath.toLatin1().data(), range, data);
         auto samples = SPtrCreate(Samples)(data, range.span());
-        createNew
-                <SoundCacheContainer>(range, samples);
+        createNew<SoundCacheContainer>(range, samples);
     }
 
     void merge(const stdptrSCC& a, const stdptrSCC& b) {

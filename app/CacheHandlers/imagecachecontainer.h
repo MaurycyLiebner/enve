@@ -4,16 +4,14 @@
 #include "hddcachablerangecontainer.h"
 class Canvas;
 
-class ImageCacheContainer :
-        public HDDCachableRangeContainer<ImageCacheContainer> {
+class ImageCacheContainer : public HDDCachableRangeContainer {
     friend class StdSelfRef;
-    typedef HDDCachableRangeContainer<ImageCacheContainer> Base;
 protected:
     ImageCacheContainer(const FrameRange& range,
-                        RangeCacheHandler * const parent);
+                        HDDCachableCacheHandler * const parent);
     ImageCacheContainer(const sk_sp<SkImage>& img,
                         const FrameRange &range,
-                        RangeCacheHandler * const parent);
+                        HDDCachableCacheHandler * const parent);
     stdsptr<_HDDTask> createTmpFileDataSaver();
     stdsptr<_HDDTask> createTmpFileDataLoader();
     int clearMemory();

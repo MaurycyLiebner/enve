@@ -2,12 +2,12 @@
 #include "soundtmpfilehandlers.h"
 
 SoundCacheContainer::SoundCacheContainer(const FrameRange &range,
-                                         RangeCacheHandler * const parent) :
-    Base(range, parent) {}
+                                         HDDCachableCacheHandler * const parent) :
+    HDDCachableRangeContainer(range, parent) {}
 
 SoundCacheContainer::SoundCacheContainer(const stdsptr<Samples>& samples,
                                          const FrameRange &range,
-                                         RangeCacheHandler * const parent) :
+                                         HDDCachableCacheHandler * const parent) :
     SoundCacheContainer(range, parent) {
     replaceSamples(samples);
 }
@@ -24,6 +24,5 @@ stdsptr<_HDDTask> SoundCacheContainer::createTmpFileDataLoader() {
 int SoundCacheContainer::clearMemory() {
     const int bytes = getByteCount();
     mSamples.reset();
-    setDataInMemory(false);
     return bytes;
 }

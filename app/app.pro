@@ -457,7 +457,8 @@ HEADERS  += \
     Paint/drawableautotiledsurface.h \
     FileCacheHandlers/videoframeloader.h \
     FileCacheHandlers/videostreamsdata.h \
-    Paint/animatedsurface.h
+    Paint/animatedsurface.h \
+    CacheHandlers/hddcachablecontainer.h
 
 RESOURCES += \
     resources.qrc

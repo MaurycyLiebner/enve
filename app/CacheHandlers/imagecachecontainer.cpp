@@ -4,12 +4,12 @@
 #include "skia/skiahelpers.h"
 
 ImageCacheContainer::ImageCacheContainer(const FrameRange &range,
-                                         RangeCacheHandler * const parent) :
-    Base(range, parent) {}
+                                         HDDCachableCacheHandler * const parent) :
+    HDDCachableRangeContainer(range, parent) {}
 
 ImageCacheContainer::ImageCacheContainer(const sk_sp<SkImage> &img,
                                          const FrameRange &range,
-                                         RangeCacheHandler * const parent) :
+                                         HDDCachableCacheHandler * const parent) :
     ImageCacheContainer(range, parent) {
     replaceImageSk(img);
 }
@@ -58,7 +58,6 @@ void ImageCacheContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
 int ImageCacheContainer::clearMemory() {
     const int bytes = getByteCount();
     mImageSk.reset();
-    setDataInMemory(false);
     return bytes;
 }
 

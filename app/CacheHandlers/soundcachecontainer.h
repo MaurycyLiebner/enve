@@ -19,17 +19,15 @@ public:
     const int fSamplesCount;
 };
 
-class SoundCacheContainer :
-        public HDDCachableRangeContainer<SoundCacheContainer> {
+class SoundCacheContainer : public HDDCachableRangeContainer {
     friend class StdSelfRef;
-    typedef HDDCachableRangeContainer<SoundCacheContainer> Base;
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 protected:
     SoundCacheContainer(const FrameRange &range,
-                        RangeCacheHandler * const parent);
+                        HDDCachableCacheHandler * const parent);
     SoundCacheContainer(const stdsptr<Samples>& samples,
                         const FrameRange &range,
-                        RangeCacheHandler * const parent);
+                        HDDCachableCacheHandler * const parent);
 public:
     int getByteCount() {
         if(!mSamples) return 0;
@@ -58,7 +56,7 @@ public:
     static stdptrSCC sCreateMerge(
             const stdptrSCC& a,
             const stdptrSCC& b,
-            RangeCacheHandler * const parent) {
+            HDDCachableCacheHandler * const parent) {
         const bool aFirst = a->getRange() < b->getRange();
         const auto& first = aFirst ? a : b;
         const auto& second = aFirst ? b : a;
@@ -70,7 +68,7 @@ public:
     //! @brief Provided list has to be an array of neighbours.
     //! Assumes all data is stored in memory (not cached to HDD)
     static stdptrSCC sCreateMerge(const QList<stdptrSCC>& toMerge,
-                                  RangeCacheHandler * const parent) {
+                                  HDDCachableCacheHandler * const parent) {
         if(toMerge.isEmpty()) return nullptr;
         SampleRange lastRange = toMerge.first()->getRange();
         Q_ASSERT(toMerge.first()->storesDataInMemory());
