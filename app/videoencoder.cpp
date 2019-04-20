@@ -608,7 +608,7 @@ void VideoEncoder::_processUpdate() {
                 writeVideoFrame(mFormatContext, &mVideoStream,
                                 cacheCont->getImageSk(), &mEncodeVideo);
             } catch(...) {
-                mUpdateException = std::current_exception();
+                RuntimeThrow("Failed to write video frame");
             }
             _mCurrentContainerFrame++;
             if(_mCurrentContainerFrame >= nFrames) {
@@ -620,7 +620,7 @@ void VideoEncoder::_processUpdate() {
             try {
                 processAudioStream(mFormatContext, &mAudioStream, &mEncodeAudio);
             } catch(...) {
-                mUpdateException = std::current_exception();
+                RuntimeThrow("Failed to process audio stream");
             }
         }
     }
@@ -656,8 +656,8 @@ void VideoEncoder::afterProcessingFinished() {
                     RenderInstanceSettings::NONE);
         interrupEncoding();
         mInterruptEncoding = false;
-    } else if(mUpdateException) {
-        gPrintExceptionCritical(mUpdateException);
+    } else if(unhandledException()) {
+        gPrintExceptionCritical(handleException());
         mRenderInstanceSettings->setCurrentState(
                     RenderInstanceSettings::ERROR, "Error");
         finishEncodingNow();

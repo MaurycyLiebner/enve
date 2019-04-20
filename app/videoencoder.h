@@ -134,8 +134,6 @@ protected:
     bool mEncodeVideo = 0;
     bool mEncodeAudio = 0;
 
-    std::exception_ptr mUpdateException;
-
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
     FrameRange _mRenderRange;

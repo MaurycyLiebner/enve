@@ -40,6 +40,9 @@ void _Task::finishedProcessing() {
     mState = FINISHED;
     tellDependentThatFinished();
     afterProcessingFinished();
+    if(unhandledException()) {
+        gPrintExceptionCritical(handleException());
+    }
 }
 
 bool _Task::readyToBeProcessed() {

@@ -4,45 +4,84 @@
 #include <QTemporaryFile>
 #include "skia/skiaincludes.h"
 class ImageCacheContainer;
-class CacheContainerTmpFileDataLoader : public _HDDTask {
+
+class TmpFileDataSaver : public _HDDTask {
     friend class StdSelfRef;
-public:
-    void _processUpdate();
-
-    void afterProcessingFinished();
 protected:
-    CacheContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
-                                    ImageCacheContainer *target);
+    TmpFileDataSaver();
 
-    const stdptr<ImageCacheContainer> mTargetCont;
+    virtual void writeToFile(QIODevice * const file) = 0;
+public:
+    void _processUpdate() {
+        mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
+        if(mTmpFile->open()) {
+            writeToFile(mTmpFile.get());
+            mTmpFile->close();
+        } else {
+            RuntimeThrow("Could not open temporary file for writing.");
+        }
+    }
+protected:
     qsptr<QTemporaryFile> mTmpFile;
-    sk_sp<SkImage> mImage;
 };
 
-class CacheContainerTmpFileDataSaver : public _HDDTask {
+class TmpFileDataLoader : public _HDDTask {
+    friend class StdSelfRef;
+protected:
+    TmpFileDataLoader(const qsptr<QTemporaryFile> &file);
+
+    virtual void readFromFile(QIODevice * const file) = 0;
+public:
+    void _processUpdate() {
+        if(mTmpFile->open()) {
+            readFromFile(mTmpFile.get());
+            mTmpFile->close();
+        } else {
+            RuntimeThrow("Could not open temporary file for reading.");
+        }
+    }
+private:
+    qsptr<QTemporaryFile> mTmpFile;
+};
+
+class TmpFileDataDeleter : public _HDDTask {
     friend class StdSelfRef;
 public:
-    void _processUpdate();
+    void _processUpdate() {
+        mTmpFile.reset();
+    }
+protected:
+    TmpFileDataDeleter(const qsptr<QTemporaryFile> &file) {
+        mTmpFile = file;
+    }
+    qsptr<QTemporaryFile> mTmpFile;
+};
+
+class CacheContainerTmpFileDataSaver : public TmpFileDataSaver {
+    friend class StdSelfRef;
+public:
+    void writeToFile(QIODevice * const file);
 
     void afterProcessingFinished();
 protected:
     CacheContainerTmpFileDataSaver(const sk_sp<SkImage> &image,
                                    ImageCacheContainer *target);
 
-    bool mSavingFailed = false;
     const stdptr<ImageCacheContainer> mTargetCont;
     sk_sp<SkImage> mImage;
-    qsptr<QTemporaryFile> mTmpFile;
 };
 
-class CacheContainerTmpFileDataDeleter : public _HDDTask {
+class CacheContainerTmpFileDataLoader : public TmpFileDataLoader {
     friend class StdSelfRef;
-public:
-    void _processUpdate();
 protected:
-    CacheContainerTmpFileDataDeleter(const qsptr<QTemporaryFile> &file) {
-        mTmpFile = file;
-    }
-    qsptr<QTemporaryFile> mTmpFile;
+    CacheContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
+                                    ImageCacheContainer * const target);
+
+    void readFromFile(QIODevice * const file);
+    void afterProcessingFinished();
+private:
+    const stdptr<ImageCacheContainer> mTargetCont;
+    sk_sp<SkImage> mImage;
 };
+
 #endif // TMPFILEHANDLERS_H

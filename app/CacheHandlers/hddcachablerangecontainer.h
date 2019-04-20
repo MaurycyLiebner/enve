@@ -34,7 +34,7 @@ public:
     _ScheduledTask* scheduleDeleteTmpFile() {
         if(!mTmpFile) return nullptr;
         const auto updatable =
-                SPtrCreate(CacheContainerTmpFileDataDeleter)(mTmpFile);
+                SPtrCreate(TmpFileDataDeleter)(mTmpFile);
         mTmpFile.reset();
         updatable->scheduleTask();
         return updatable.get();

@@ -48,6 +48,20 @@ public:
     State getState() const {
         return mState;
     }
+
+    void setException(const std::exception_ptr& exception) {
+        mUpdateException = exception;
+    }
+
+    bool unhandledException() const {
+        return static_cast<bool>(mUpdateException);
+    }
+
+    std::exception_ptr handleException() {
+        std::exception_ptr exc;
+        mUpdateException.swap(exc);
+        return exc;
+    }
 protected:
     State mState = CREATED;
 private:
@@ -55,6 +69,7 @@ private:
     void tellNextDependentThatFinished();
 
     int mNDependancies = 0;
+    std::exception_ptr mUpdateException;
     QList<stdptr<_Task>> mNextExecutionDependent;
     QList<stdptr<_Task>> mCurrentExecutionDependent;
 };
