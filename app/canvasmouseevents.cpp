@@ -16,10 +16,7 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
     if(mCurrentMode == PAINT_MODE) {
         if(mStylusDrawing) return;
         if(event->button() == Qt::LeftButton) {
-            const auto target = mPaintDrawable.getTarget();
-            if(target) {
-                paintPress(event->timestamp(), 0.5, 0, 0);
-            }
+            paintPress(event->timestamp(), 0.5, 0, 0);
         }
     } else {
         if(event->button() == Qt::LeftButton) {
@@ -29,11 +26,6 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
         }
     }
 
-    callUpdateSchedulers();
-}
-
-void Canvas::handlePaintLeftButtonMoveEvent(const QMouseEvent * const event) {
-    paintMove(event->timestamp(), 1, 0, 0);
     callUpdateSchedulers();
 }
 
@@ -63,7 +55,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
     if(event->buttons() & Qt::MiddleButton) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
     } else if(mCurrentMode == PAINT_MODE && event->buttons() & Qt::LeftButton)  {
-        handlePaintLeftButtonMoveEvent(event);
+        paintMove(event->timestamp(), 1, 0, 0);
     } else if(event->buttons() & Qt::LeftButton || mIsMouseGrabbing) {
         if(mMovesToSkip > 0) {
             mMovesToSkip--;

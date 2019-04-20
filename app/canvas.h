@@ -552,7 +552,7 @@ protected:
     ulong mLastTs;
     PaintBox * mPaintDrawableBox = nullptr;
     AnimatedSurface * mPaintAnimSurface = nullptr;
-    DrawableAutoTiledSurface mPaintDrawable;
+    DrawableAutoTiledSurface * mPaintDrawable = nullptr;
 
     const SimpleBrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
@@ -665,8 +665,6 @@ protected:
     void handleAddSmartPointMousePress();
     void handleAddSmartPointMouseMove();
     void handleAddSmartPointMouseRelease();
-
-    void handlePaintLeftButtonMoveEvent(const QMouseEvent * const event);
 
     void updateTransformation();
     void handleMouseRelease();

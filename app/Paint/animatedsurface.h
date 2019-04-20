@@ -2,14 +2,14 @@
 #define ANIMATEDSURFACE_H
 #include "Animators/graphanimator.h"
 #include "Animators/interpolationkeyt.h"
-#include "autotiledsurface.h"
+#include "drawableautotiledsurface.h"
 #include "Animators/qrealpoint.h"
 class AnimatedSurface;
 class ASKey : public GraphKey {
     friend class StdSelfRef;
 protected:
     ASKey(const int& frame, AnimatedSurface * const parent);
-    ASKey(const AutoTiledSurface& value,
+    ASKey(const DrawableAutoTiledSurface &value,
           const int& frame, AnimatedSurface * const parent);
 public:
     bool differsFromKey(Key * const key) const {
@@ -32,9 +32,9 @@ public:
         this->mStartValue += dFrame;
     }
 
-    AutoTiledSurface& getValue() { return mValue; }
+    DrawableAutoTiledSurface& dSurface() { return mValue; }
 private:
-    AutoTiledSurface mValue;
+    DrawableAutoTiledSurface mValue;
 };
 
 class AnimatedSurface : public GraphAnimator {
@@ -95,10 +95,10 @@ public:
         const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
         stdsptr<ASKey> newKey;
         if(prevNextKey.first) {
-            const auto& value = prevNextKey.first->getValue();
+            const auto& value = prevNextKey.first->dSurface();
             newKey = SPtrCreate(ASKey)(value, relFrame, this);
         } else if(prevNextKey.second) {
-            const auto& value = prevNextKey.second->getValue();
+            const auto& value = prevNextKey.second->dSurface();
             newKey = SPtrCreate(ASKey)(value, relFrame, this);
         } else {
             newKey = SPtrCreate(ASKey)(mBaseValue, relFrame, this);
@@ -108,14 +108,14 @@ public:
 
     void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
         const auto spk = static_cast<ASKey*>(key);
-        if(spk) setCurrent(&spk->getValue());
+        if(spk) setCurrent(&spk->dSurface());
         else {
             const auto relFrame = anim_getCurrentRelFrame();
             const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
             if(prevNextKey.first) {
-                setCurrent(&prevNextKey.first->getValue());
+                setCurrent(&prevNextKey.first->dSurface());
             } else if(prevNextKey.second) {
-                setCurrent(&prevNextKey.second->getValue());
+                setCurrent(&prevNextKey.second->dSurface());
             } else {
                 setCurrent(&mBaseValue);
             }
@@ -135,20 +135,20 @@ public:
         }
     }
 
-    AutoTiledSurface * getCurrentSurface() {
+    DrawableAutoTiledSurface * getCurrentSurface() {
         return mCurrent_d;
     }
 signals:
-    void currentSurfaceChanged(AutoTiledSurface*);
+    void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:
-    void setCurrent(AutoTiledSurface * const surf) {
+    void setCurrent(DrawableAutoTiledSurface * const surf) {
         if(mCurrent_d == surf) return;
         mCurrent_d = surf;
         emit currentSurfaceChanged(mCurrent_d);
     }
 
-    AutoTiledSurface mBaseValue;
-    AutoTiledSurface * mCurrent_d = &mBaseValue;
+    DrawableAutoTiledSurface mBaseValue;
+    DrawableAutoTiledSurface * mCurrent_d = &mBaseValue;
 };
 
 #endif // ANIMATEDSURFACE_H

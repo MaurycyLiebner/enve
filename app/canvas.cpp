@@ -310,7 +310,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
             const auto absPos = QPointF(0, 0);//mPaintDrawableBox->getAbsolutePos();
             canvas->concat(toSkMatrix(pDrawTrans));
-            mPaintDrawable.drawOnCanvas(canvas, absPos.toPoint(), &relDRect);
+            mPaintDrawable->drawOnCanvas(canvas, absPos.toPoint(), &relDRect);
         }
 
         canvas->resetMatrix();
@@ -605,15 +605,15 @@ void Canvas::setPaintBox(PaintBox * const box) {
         mPaintDrawableBox = GetAsPtr(mSelectedBoxes.last(), PaintBox);
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
         connect(mPaintAnimSurface, &AnimatedSurface::currentSurfaceChanged,
-                [this](AutoTiledSurface * surf) {
-            mPaintDrawable.setTarget(surf);
+                [this](DrawableAutoTiledSurface * surf) {
+            mPaintDrawable = surf;
         });
-        mPaintDrawable.setTarget(mPaintAnimSurface->getCurrentSurface());
+        mPaintDrawable = mPaintAnimSurface->getCurrentSurface();
     } else if(mPaintDrawableBox) {
         mPaintDrawableBox = nullptr;
         disconnect(mPaintAnimSurface, nullptr, nullptr, nullptr);
         mPaintAnimSurface = nullptr;
-        mPaintDrawable.setTarget(nullptr);
+        mPaintDrawable = nullptr;
     }
 }
 
@@ -1060,35 +1060,33 @@ void Canvas::paintPress(const ulong ts, const qreal &pressure,
         if(mPaintAnimSurface->anim_isRecording())
             mPaintAnimSurface->anim_saveCurrentValueAsKey();
     }
-    const auto target = mPaintDrawable.getTarget();
-    if(target) {
+
+    if(mPaintDrawable && mCurrentBrush) {
+        auto& target = mPaintDrawable->surface();
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
         const auto pos = pDrawTrans.inverted().map(mLastMouseEventPosRel);
         const auto roi =
-                target->paintPressEvent(mCurrentBrush->getBrush(),
-                                        pos,
-                                        1, pressure,
-                                        xTilt, yTilt);
+                target.paintPressEvent(mCurrentBrush->getBrush(),
+                                       pos, 1, pressure, xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
-        mPaintDrawable.updatePixelRectImgs(qRoi);
+        mPaintDrawable->updatePixelRectImgs(qRoi);
+        mLastTs = ts;
     }
-    mLastTs = ts;
 }
 
 void Canvas::paintMove(const ulong ts, const qreal &pressure,
                        const qreal &xTilt, const qreal &yTilt) {
-    const auto target = mPaintDrawable.getTarget();
-    if(target) {
+    if(mPaintDrawable && mCurrentBrush) {
+        auto& target = mPaintDrawable->surface();
         const double dt = (ts - mLastTs);
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
         const auto pos = pDrawTrans.inverted().map(mLastMouseEventPosRel);
         const auto roi =
-                target->paintMoveEvent(mCurrentBrush->getBrush(),
-                                       pos,
-                                       dt/1000, pressure,
-                                       xTilt, yTilt);
+                target.paintMoveEvent(mCurrentBrush->getBrush(),
+                                      pos, dt/1000, pressure,
+                                      xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
-        mPaintDrawable.updatePixelRectImgs(qRoi);
+        mPaintDrawable->updatePixelRectImgs(qRoi);
     }
     mLastTs = ts;
 }
