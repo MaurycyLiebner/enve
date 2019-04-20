@@ -67,9 +67,15 @@ void ImageCacheContainer::setLoadTargetCanvas(Canvas *canvas) {
 }
 
 stdsptr<_HDDTask> ImageCacheContainer::createTmpFileDataSaver() {
-    return SPtrCreate(CacheContainerTmpFileDataSaver)(mImageSk, this);
+    const ImgTmpFileDataSaver::Func func = [this](qsptr<QTemporaryFile> tmpFile) {
+        setDataSavedToTmpFile(tmpFile);
+    };
+    return SPtrCreate(ImgTmpFileDataSaver)(mImageSk, func);
 }
 
 stdsptr<_HDDTask> ImageCacheContainer::createTmpFileDataLoader() {
-    return SPtrCreate(CacheContainerTmpFileDataLoader)(mTmpFile, this);
+    const ImgTmpFileDataLoader::Func func = [this](sk_sp<SkImage> img) {
+        setDataLoadedFromTmpFile(img);
+    };
+    return SPtrCreate(ImgTmpFileDataLoader)(mTmpFile, func);
 }

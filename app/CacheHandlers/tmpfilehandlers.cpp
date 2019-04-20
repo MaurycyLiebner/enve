@@ -3,13 +3,7 @@
 #include "castmacros.h"
 #include "skia/skiahelpers.h"
 
-CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
-        const sk_sp<SkImage> &image,
-        ImageCacheContainer *target) : mTargetCont(target) {
-    mImage = image;
-}
-
-void CacheContainerTmpFileDataSaver::writeToFile(QIODevice * const file) {
+void ImgTmpFileDataSaver::writeToFile(QIODevice * const file) {
     SkPixmap pix;
     if(!mImage->peekPixels(&pix)) {
         if(!mImage->makeRasterImage()->peekPixels(&pix)) {
@@ -25,16 +19,7 @@ void CacheContainerTmpFileDataSaver::writeToFile(QIODevice * const file) {
     file->write(rcConstChar(pix.writable_addr()), writeBytes);
 }
 
-void CacheContainerTmpFileDataSaver::afterProcessingFinished() {
-    mTargetCont->setDataSavedToTmpFile(mTmpFile);
-}
-
-CacheContainerTmpFileDataLoader::CacheContainerTmpFileDataLoader(
-        const qsptr<QTemporaryFile> &file,
-        ImageCacheContainer * const target) :
-    TmpFileDataLoader(file), mTargetCont(target) {}
-
-void CacheContainerTmpFileDataLoader::readFromFile(QIODevice * const file) {
+void ImgTmpFileDataLoader::readFromFile(QIODevice * const file) {
     int width, height;
     file->read(rcChar(&width), sizeof(int));
     file->read(rcChar(&height), sizeof(int));
@@ -45,8 +30,4 @@ void CacheContainerTmpFileDataLoader::readFromFile(QIODevice * const file) {
             static_cast<qint64>(sizeof(uchar));
     file->read(scChar(btmp.getPixels()), readBytes);
     mImage = SkiaHelpers::transferDataToSkImage(btmp);
-}
-
-void CacheContainerTmpFileDataLoader::afterProcessingFinished() {
-    mTargetCont->setDataLoadedFromTmpFile(mImage);
 }

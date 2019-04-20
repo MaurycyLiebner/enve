@@ -8,7 +8,7 @@ class ImageCacheContainer;
 class TmpFileDataSaver : public _HDDTask {
     friend class StdSelfRef;
 protected:
-    TmpFileDataSaver();
+    TmpFileDataSaver() {}
 
     virtual void writeToFile(QIODevice * const file) = 0;
 public:
@@ -28,7 +28,8 @@ protected:
 class TmpFileDataLoader : public _HDDTask {
     friend class StdSelfRef;
 protected:
-    TmpFileDataLoader(const qsptr<QTemporaryFile> &file);
+    TmpFileDataLoader(const qsptr<QTemporaryFile> &file) :
+        mTmpFile(file) {}
 
     virtual void readFromFile(QIODevice * const file) = 0;
 public:
@@ -41,47 +42,55 @@ public:
         }
     }
 private:
-    qsptr<QTemporaryFile> mTmpFile;
+    const qsptr<QTemporaryFile> mTmpFile;
 };
 
 class TmpFileDataDeleter : public _HDDTask {
     friend class StdSelfRef;
+protected:
+    TmpFileDataDeleter(const qsptr<QTemporaryFile> &file) :
+        mTmpFile(file) {}
 public:
     void _processUpdate() {
         mTmpFile.reset();
     }
-protected:
-    TmpFileDataDeleter(const qsptr<QTemporaryFile> &file) {
-        mTmpFile = file;
-    }
+private:
     qsptr<QTemporaryFile> mTmpFile;
 };
-
-class CacheContainerTmpFileDataSaver : public TmpFileDataSaver {
+class ImgTmpFileDataSaver : public TmpFileDataSaver {
     friend class StdSelfRef;
 public:
-    void writeToFile(QIODevice * const file);
-
-    void afterProcessingFinished();
+    typedef std::function<void(qsptr<QTemporaryFile>)> Func;
 protected:
-    CacheContainerTmpFileDataSaver(const sk_sp<SkImage> &image,
-                                   ImageCacheContainer *target);
+    ImgTmpFileDataSaver(const sk_sp<SkImage> &image,
+                        const Func& finishedFunc) :
+        mImage(image), mFinishedFunc(finishedFunc) {}
 
-    const stdptr<ImageCacheContainer> mTargetCont;
-    sk_sp<SkImage> mImage;
+    void writeToFile(QIODevice * const file);
+    void afterProcessingFinished() {
+        if(mFinishedFunc) mFinishedFunc(mTmpFile);
+    }
+private:
+    const sk_sp<SkImage> mImage;
+    const Func mFinishedFunc;
 };
 
-class CacheContainerTmpFileDataLoader : public TmpFileDataLoader {
+class ImgTmpFileDataLoader : public TmpFileDataLoader {
     friend class StdSelfRef;
+public:
+    typedef std::function<void(sk_sp<SkImage>)> Func;
 protected:
-    CacheContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
-                                    ImageCacheContainer * const target);
+    ImgTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
+                         const Func& finishedFunc) :
+        TmpFileDataLoader(file), mFinishedFunc(finishedFunc) {}
 
     void readFromFile(QIODevice * const file);
-    void afterProcessingFinished();
+    void afterProcessingFinished() {
+        if(mFinishedFunc) mFinishedFunc(mImage);
+    }
 private:
-    const stdptr<ImageCacheContainer> mTargetCont;
     sk_sp<SkImage> mImage;
+    const Func mFinishedFunc;
 };
 
 #endif // TMPFILEHANDLERS_H
