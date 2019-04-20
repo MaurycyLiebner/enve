@@ -2,8 +2,9 @@
 #define DRAWABLEAUTOTILEDSURFACE_H
 #include "autotiledsurface.h"
 #include "skia/skiahelpers.h"
+#include "CacheHandlers/minimalcachecontainer.h"
 
-class DrawableAutoTiledSurface {
+class DrawableAutoTiledSurface : public MinimalCacheContainer {
 public:
     DrawableAutoTiledSurface();
     DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) {
@@ -12,7 +13,19 @@ public:
 
     DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) {
         mSurface = other.surface();
+        clearImgs();
         return *this;
+    }
+
+    int getByteCount() {
+        const int spixels = mColumnCount*mRowCount*TILE_SPIXEL_SIZE;
+        return spixels*static_cast<int>(sizeof(uint16_t));
+    }
+
+    int freeAndRemove_k() {
+        const int bytes = getByteCount();
+        clearImgs();
+        return bytes;
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
@@ -64,6 +77,14 @@ public:
         return tileRectToPixRect(tileBoundingRect());
     }
 private:
+    void clearImgs() {
+        mTileImgs.clear();
+        mZeroTileCol = 0;
+        mZeroTileRow = 0;
+        mColumnCount = 0;
+        mRowCount = 0;
+    }
+
     void stretchToTileImg(const int &tx, const int &ty) {
         const int colId = tx + mZeroTileCol;
         const int rowId = ty + mZeroTileRow;

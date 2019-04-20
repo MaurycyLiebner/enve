@@ -8,11 +8,11 @@ protected:
 public:
     ~MinimalCacheContainer();
 
-    virtual bool freeAndRemove_k() = 0;
-    virtual bool freeFromMemory_k() {
+    virtual int freeAndRemove_k() = 0;
+    virtual int getByteCount() = 0;
+    virtual int freeFromMemory_k() {
         return freeAndRemove_k();
     }
-    virtual int getByteCount() = 0;
 
     void setBlocked(const bool &bT) {
         if(bT == mBlocked) return;

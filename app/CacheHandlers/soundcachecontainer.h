@@ -101,7 +101,7 @@ public:
 protected:
     stdsptr<_HDDTask> createTmpFileDataSaver();
     stdsptr<_HDDTask> createTmpFileDataLoader();
-    void clearMemory();
+    int clearMemory();
 
     stdsptr<Samples> mSamples;
 };

@@ -16,7 +16,7 @@ protected:
                         RangeCacheHandler * const parent);
     stdsptr<_HDDTask> createTmpFileDataSaver();
     stdsptr<_HDDTask> createTmpFileDataLoader();
-    void clearMemory();
+    int clearMemory();
 public:
     int getByteCount();
 

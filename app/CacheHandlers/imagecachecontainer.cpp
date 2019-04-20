@@ -55,9 +55,11 @@ void ImageCacheContainer::drawSk(SkCanvas * const canvas, SkPaint *paint,
     //canvas->drawImage(mImageSk, 0, 0/*, &paint*/);
 }
 
-void ImageCacheContainer::clearMemory() {
+int ImageCacheContainer::clearMemory() {
+    const int bytes = getByteCount();
     mImageSk.reset();
     setDataInMemory(false);
+    return bytes;
 }
 
 void ImageCacheContainer::setLoadTargetCanvas(Canvas *canvas) {

@@ -21,7 +21,9 @@ stdsptr<_HDDTask> SoundCacheContainer::createTmpFileDataLoader() {
 }
 
 
-void SoundCacheContainer::clearMemory() {
+int SoundCacheContainer::clearMemory() {
+    const int bytes = getByteCount();
     mSamples.reset();
     setDataInMemory(false);
+    return bytes;
 }

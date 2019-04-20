@@ -14,25 +14,21 @@ protected:
         RangeCacheContainer(range), mParentCacheHandler_k(parent) {}
     virtual stdsptr<_HDDTask> createTmpFileDataSaver() = 0;
     virtual stdsptr<_HDDTask> createTmpFileDataLoader() = 0;
-    virtual void clearMemory() = 0;
+    virtual int clearMemory() = 0;
 public:
     ~HDDCachableRangeContainer() {
         if(mTmpFile) scheduleDeleteTmpFile();
     }
 
-    bool freeAndRemove_k() {
-        if(blocked()) return false;
+    int freeAndRemove_k() {
+        const int bytes = getByteCount();
         mParentCacheHandler_k->removeRenderContainer(ref<T>());
-        return true;
+        return bytes;
     }
 
-    bool freeFromMemory_k() {
-        if(blocked()) return false;
-        if(mTmpFile) {
-            if(!blocked()) removeFromMemoryManagment();
-            clearMemory();
-        } else return freeAndRemove_k();
-        return true;
+    int freeFromMemory_k() {
+        if(mTmpFile) return clearMemory();
+        else return freeAndRemove_k();
     }
 
     _ScheduledTask* scheduleDeleteTmpFile() {
