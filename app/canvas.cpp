@@ -310,7 +310,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
             const auto absPos = QPointF(0, 0);//mPaintDrawableBox->getAbsolutePos();
             canvas->concat(toSkMatrix(pDrawTrans));
-            mPaintDrawable.drawOnCanvas(canvas, relDRect, absPos.toPoint());
+            mPaintDrawable.drawOnCanvas(canvas, absPos.toPoint(), &relDRect);
         }
 
         canvas->resetMatrix();

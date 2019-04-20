@@ -8,9 +8,14 @@ public:
     DrawableAutoTiledSurface();
 
     void drawOnCanvas(SkCanvas * const canvas,
-                      const QRect &minPixSrc,
                       const QPoint &dst,
+                      const QRect * const minPixSrc = nullptr,
                       SkPaint * const paint = nullptr) const;
+    void drawOnCanvas(SkCanvas * const canvas,
+                      const QPoint &dst,
+                      SkPaint * const paint) const {
+        drawOnCanvas(canvas, dst, nullptr, paint);
+    }
 
     AutoTiledSurface * getTarget() const {
         return mTarget;
@@ -124,8 +129,7 @@ private:
         return imageForTileId(tx + zeroTileV.x(), ty + zeroTileV.y());
     }
 
-    SkImage * imageForTileId(const int &colId,
-                             const int &rowId) const {
+    SkImage * imageForTileId(const int &colId, const int &rowId) const {
         return mTileImgs.at(colId).at(rowId).get();
     }
 
