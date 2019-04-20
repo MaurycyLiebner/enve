@@ -4,14 +4,14 @@
 #include "tmpfilehandlers.h"
 class _ScheduledTask;
 
-class HDDCachableContainer : public MinimalCacheContainer {
+class HDDCachable : public CacheContainer {
 protected:
-    HDDCachableContainer(const bool& persist) : mPersistData(persist) {}
+    HDDCachable() {}
     virtual int clearMemory() = 0;
     virtual stdsptr<_HDDTask> createTmpFileDataSaver() = 0;
     virtual stdsptr<_HDDTask> createTmpFileDataLoader() = 0;
 public:
-    ~HDDCachableContainer() {
+    ~HDDCachable() {
         if(mTmpFile) scheduleDeleteTmpFile();
     }
 
@@ -20,8 +20,7 @@ public:
             const int bytes = clearMemory();
             setDataInMemory(false);
             return bytes;
-        } else if(mPersistData) return 0;
-        else return freeAndRemove_k();
+        } else return freeAndRemove_k();
     }
 
     _ScheduledTask* scheduleDeleteTmpFile() {
@@ -70,16 +69,31 @@ protected:
         if(mTmpFile) scheduleDeleteTmpFile();
     }
 
-    qsptr<QTemporaryFile> mTmpFile;
-private:
     void setDataInMemory(const bool& dataInMemory) {
         mDataInMemory = dataInMemory;
     }
 
-    const bool mPersistData;
+    qsptr<QTemporaryFile> mTmpFile;
+private:
     bool mDataInMemory = false;
     stdsptr<_ScheduledTask> mLoadingUpdatable;
     stdsptr<_ScheduledTask> mSavingUpdatable;
+};
+
+class HDDCachablePersistent : public HDDCachable {
+protected:
+    HDDCachablePersistent() {}
+public:
+    int freeAndRemove_k() { return 0; }
+
+    int freeFromMemory_k() {
+        if(mTmpFile) {
+            const int bytes = clearMemory();
+            setDataInMemory(false);
+            return bytes;
+        }
+        return 0;
+    }
 };
 
 #endif // HDDCACHABLECONTAINER_H

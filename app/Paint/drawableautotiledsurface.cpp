@@ -1,6 +1,7 @@
 #include "drawableautotiledsurface.h"
 
-DrawableAutoTiledSurface::DrawableAutoTiledSurface() {}
+DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
+    HDDCachable(false) {}
 
 void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
                                             const QPoint &dst,

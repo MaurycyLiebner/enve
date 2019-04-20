@@ -35,15 +35,15 @@ MemoryHandler::~MemoryHandler() {
     delete mMemoryChecker;
 }
 
-void MemoryHandler::addContainer(MinimalCacheContainer * const cont) {
+void MemoryHandler::addContainer(CacheContainer * const cont) {
     mContainers << cont;
 }
 
-void MemoryHandler::removeContainer(MinimalCacheContainer * const cont) {
+void MemoryHandler::removeContainer(CacheContainer * const cont) {
     mContainers.removeOne(cont);
 }
 
-void MemoryHandler::containerUpdated(MinimalCacheContainer * const cont) {
+void MemoryHandler::containerUpdated(CacheContainer * const cont) {
     removeContainer(cont);
     addContainer(cont);
 }

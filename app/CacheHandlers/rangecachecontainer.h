@@ -3,7 +3,7 @@
 #include "framerange.h"
 #include "minimalcachecontainer.h"
 
-class RangeCacheContainer : public MinimalCacheContainer {
+class RangeCacheContainer : public CacheContainer {
 protected:
     RangeCacheContainer(const FrameRange &range) : mRange(range) {}
 public:

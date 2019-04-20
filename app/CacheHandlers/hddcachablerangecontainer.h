@@ -6,12 +6,12 @@
 class _ScheduledTask;
 class HDDCachableCacheHandler;
 
-class HDDCachableRangeContainer : public HDDCachableContainer {
+class HDDCachableRangeContainer : public HDDCachable {
     friend class SoundContainerTmpFileDataSaver;
 protected:
     HDDCachableRangeContainer(const FrameRange &range,
                               HDDCachableCacheHandler * const parent) :
-        HDDCachableContainer(false), mRange(range), mParentCacheHandler_k(parent) {}
+        mRange(range), mParentCacheHandler_k(parent) {}
     virtual int clearMemory() = 0;
 public:
     int freeAndRemove_k();

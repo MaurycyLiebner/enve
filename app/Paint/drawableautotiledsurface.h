@@ -2,19 +2,22 @@
 #define DRAWABLEAUTOTILEDSURFACE_H
 #include "autotiledsurface.h"
 #include "skia/skiahelpers.h"
-#include "CacheHandlers/minimalcachecontainer.h"
+#include "CacheHandlers/hddcachablecontainer.h"
 
-class DrawableAutoTiledSurface : public MinimalCacheContainer {
-public:
+class DrawableAutoTiledSurface : public HDDCachablePersistent {
+protected:
     DrawableAutoTiledSurface();
-    DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) {
+    DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) :
+        DrawableAutoTiledSurface() {
         mSurface = other.surface();
     }
 
-    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) {
-        mSurface = other.surface();
-        clearImgs();
-        return *this;
+    stdsptr<_HDDTask> createTmpFileDataSaver() {
+
+    }
+
+    stdsptr<_HDDTask> createTmpFileDataLoader() {
+
     }
 
     int getByteCount() {
@@ -22,10 +25,16 @@ public:
         return spixels*static_cast<int>(sizeof(uint16_t));
     }
 
-    int freeAndRemove_k() {
+    int clearMemory() {
         const int bytes = getByteCount();
         clearImgs();
         return bytes;
+    }
+public:
+    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) {
+        mSurface = other.surface();
+        clearImgs();
+        return *this;
     }
 
     void drawOnCanvas(SkCanvas * const canvas,

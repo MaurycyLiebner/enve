@@ -1,28 +1,28 @@
 #include "minimalcachecontainer.h"
 #include "memoryhandler.h"
 
-MinimalCacheContainer::MinimalCacheContainer() {
+CacheContainer::CacheContainer() {
     addToMemoryManagment();
 }
 
-MinimalCacheContainer::~MinimalCacheContainer() {
+CacheContainer::~CacheContainer() {
     if(!MemoryHandler::sGetInstance()) return;
     removeFromMemoryManagment();
 }
 
-void MinimalCacheContainer::addToMemoryManagment() {
+void CacheContainer::addToMemoryManagment() {
     if(mHandledByMemoryHandler || mBlocked) return;
     MemoryHandler::sGetInstance()->addContainer(this);
     mHandledByMemoryHandler = true;
 }
 
-void MinimalCacheContainer::removeFromMemoryManagment() {
+void CacheContainer::removeFromMemoryManagment() {
     if(!mHandledByMemoryHandler) return;
     MemoryHandler::sGetInstance()->removeContainer(this);
     mHandledByMemoryHandler = false;
 }
 
-void MinimalCacheContainer::updateInMemoryManagment() {
+void CacheContainer::updateInMemoryManagment() {
     if(!mHandledByMemoryHandler) addToMemoryManagment();
     else MemoryHandler::sGetInstance()->containerUpdated(this);
 }

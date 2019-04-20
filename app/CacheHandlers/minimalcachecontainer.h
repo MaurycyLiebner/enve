@@ -2,11 +2,11 @@
 #define MINIMALCACHECONTAINER_H
 #include "smartPointers/stdselfref.h"
 
-class MinimalCacheContainer : public StdSelfRef {
+class CacheContainer : public StdSelfRef {
 protected:
-    MinimalCacheContainer();
+    CacheContainer();
 public:
-    ~MinimalCacheContainer();
+    ~CacheContainer();
 
     virtual int freeAndRemove_k() = 0;
     virtual int getByteCount() = 0;
