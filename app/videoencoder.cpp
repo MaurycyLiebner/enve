@@ -626,8 +626,7 @@ void VideoEncoder::_processUpdate() {
     }
 }
 
-void VideoEncoder::beforeProcessingStarted() {
-    _HDDTask::beforeProcessingStarted();
+void VideoEncoder::beforeProcessing() {
     _mCurrentContainerId = 0;
     _mCurrentContainerFrame = 0;
     _mContainers.swap(mNextContainers);
@@ -635,7 +634,7 @@ void VideoEncoder::beforeProcessingStarted() {
     if(!mCurrentlyEncoding) clearContainers();
 }
 
-void VideoEncoder::afterProcessingFinished() {
+void VideoEncoder::afterProcessing() {
     bool firstT = true;
     for(int i = _mCurrentContainerId - 1; i >= 0; i--) {
         const auto &cont = _mContainers.at(i);

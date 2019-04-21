@@ -102,9 +102,9 @@ void VideoFrameLoader::readFrame() {
     av_packet_unref(packet);
 }
 
-void VideoFrameLoader::afterProcessingFinished() {
+void VideoFrameLoader::afterProcessing() {
     mCacheHandler->frameLoaderFinished(mFrameId, mLoadedFrame);
-    _HDDTask::afterProcessingFinished();
+    _HDDTask::afterProcessing();
 }
 
 void VideoFrameLoader::afterCanceled() {

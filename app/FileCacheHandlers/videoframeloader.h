@@ -22,7 +22,7 @@ protected:
         mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
         mFrameId(frameId) {}
 
-    void afterProcessingFinished();
+    void afterProcessing();
     void afterCanceled();
 public:
     void _processUpdate() {

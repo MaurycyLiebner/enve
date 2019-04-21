@@ -20,7 +20,7 @@ void SoundContainerTmpFileDataLoader::_processUpdate() {
     }
 }
 
-void SoundContainerTmpFileDataLoader::afterProcessingFinished() {
+void SoundContainerTmpFileDataLoader::afterProcessing() {
     mTargetCont->setDataLoadedFromTmpFile(mSamples);
 }
 
@@ -47,6 +47,6 @@ void SoundContainerTmpFileDataSaver::_processUpdate() {
     }
 }
 
-void SoundContainerTmpFileDataSaver::afterProcessingFinished() {
+void SoundContainerTmpFileDataSaver::afterProcessing() {
     if(mSavingSuccessful) mTargetCont->setDataSavedToTmpFile(mTmpFile);
 }

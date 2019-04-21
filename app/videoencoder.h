@@ -86,8 +86,8 @@ public:
 
     void addContainer(const stdsptr<ImageCacheContainer> &cont);
     void _processUpdate();
-    void beforeProcessingStarted();
-    void afterProcessingFinished();
+    void beforeProcessing();
+    void afterProcessing();
 
     static VideoEncoder *mVideoEncoderInstance;
     static VideoEncoderEmitter *getVideoEncoderEmitter();

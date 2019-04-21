@@ -33,8 +33,8 @@ public:
     }
 
     void _processUpdate();
-    void beforeProcessingStarted();
-    void afterProcessingFinished();
+    void beforeProcessing();
+    void afterProcessing();
     void taskQued();
 
     // gpu

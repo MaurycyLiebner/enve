@@ -121,7 +121,7 @@ void TaskScheduler::processNextQuedHDDTask() {
         for(int i = 0; i < mQuedHDDTasks.count(); i++) {
             const auto task = mQuedHDDTasks.at(i);
             if(task->readyToBeProcessed()) {
-                task->beforeProcessingStarted();
+                task->aboutToProcess();
                 mQuedHDDTasks.removeAt(i--);
                 mHDDThreadBusy = true;
                 mHDDExecutor->processTask(task);
@@ -160,7 +160,7 @@ void TaskScheduler::processNextQuedCPUTask() {
         while(!mFreeCPUExecs.isEmpty()) {
             const auto task = mQuedCPUTasks.takeQuedForProcessing();
             if(task) {
-                task->beforeProcessingStarted();
+                task->aboutToProcess();
                 const auto executor = mFreeCPUExecs.takeLast();
                 executor->processTask(task);
             } else break;

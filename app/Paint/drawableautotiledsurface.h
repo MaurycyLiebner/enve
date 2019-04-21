@@ -30,7 +30,7 @@ protected:
         mImages(images), mFinishedFunc(finishedFunc) {}
 
     void writeToFile(QIODevice * const file);
-    void afterProcessingFinished() {
+    void afterProcessing() {
         if(mFinishedFunc) mFinishedFunc(mTmpFile);
     }
 private:
@@ -48,7 +48,7 @@ protected:
         TmpFileDataLoader(file), mFinishedFunc(finishedFunc) {}
 
     void readFromFile(QIODevice * const file);
-    void afterProcessingFinished() {
+    void afterProcessing() {
         if(mFinishedFunc) mFinishedFunc(mTileImgs);
     }
 private:

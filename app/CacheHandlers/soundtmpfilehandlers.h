@@ -11,7 +11,7 @@ class SoundContainerTmpFileDataLoader : public _HDDTask {
 public:
     void _processUpdate();
 
-    void afterProcessingFinished();
+    void afterProcessing();
 protected:
     SoundContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
                                     SoundCacheContainer *target);
@@ -26,7 +26,7 @@ class SoundContainerTmpFileDataSaver : public _HDDTask {
 public:
     void _processUpdate();
 
-    void afterProcessingFinished();
+    void afterProcessing();
 protected:
     SoundContainerTmpFileDataSaver(const stdsptr<Samples> &samples,
                                    SoundCacheContainer *target);

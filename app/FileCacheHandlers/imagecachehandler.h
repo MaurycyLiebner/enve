@@ -10,7 +10,7 @@ protected:
                 ImageCacheHandler * const handler);
 public:
     void _processUpdate();
-    void afterProcessingFinished();
+    void afterProcessing();
 private:
     ImageCacheHandler * const mTargetHandler;
     const QString mFilePath;

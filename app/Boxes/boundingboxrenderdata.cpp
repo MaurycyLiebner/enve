@@ -101,17 +101,15 @@ void BoundingBoxRenderData::_processUpdate() {
     renderToImage();
 }
 
-void BoundingBoxRenderData::beforeProcessingStarted() {
+void BoundingBoxRenderData::beforeProcessing() {
     if(!mDataSet) dataSet();
-
-    Task::beforeProcessingStarted();
 
     if(!fParentBox || !fParentIsTarget) return;
     if(nullifyBeforeProcessing())
         fParentBox->nullifyCurrentRenderData(fRelFrame);
 }
 
-void BoundingBoxRenderData::afterProcessingFinished() {
+void BoundingBoxRenderData::afterProcessing() {
     if(fMotionBlurTarget) {
         fMotionBlurTarget->fOtherGlobalRects << fGlobalBoundingRect;
     }

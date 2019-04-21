@@ -14,16 +14,17 @@ void Task::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
 }
 
-void Task::beforeProcessingStarted() {
+void Task::aboutToProcess() {
     mState = PROCESSING;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
+    beforeProcessing();
 }
 
 void Task::finishedProcessing() {
     mState = FINISHED;
     tellDependentThatFinished();
-    afterProcessingFinished();
+    afterProcessing();
     if(unhandledException()) {
         gPrintExceptionCritical(handleException());
     }

@@ -17,6 +17,6 @@ void ImageLoader::_processUpdate() {
     mImage = SkImage::MakeFromEncoded(data);
 }
 
-void ImageLoader::afterProcessingFinished() {
+void ImageLoader::afterProcessing() {
     mTargetHandler->setImage(mImage);
 }

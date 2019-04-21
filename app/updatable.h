@@ -13,7 +13,8 @@ class Task : public StdSelfRef {
 protected:
     Task() {}
 
-    virtual void afterProcessingFinished() {}
+    virtual void beforeProcessing() {}
+    virtual void afterProcessing() {}
     virtual void afterCanceled() {}
     virtual void scheduleTaskNow();
 public:
@@ -28,7 +29,6 @@ public:
 
     virtual void _processUpdate() = 0;
     virtual bool needsGpuProcessing() const { return false; }
-    virtual void beforeProcessingStarted();
     virtual void clear();
     virtual void taskQued() { mState = QUED; }
 
@@ -43,6 +43,7 @@ public:
 
     bool isActive() { return mState != CREATED && mState != FINISHED; }
 
+    void aboutToProcess();
     void finishedProcessing();
     bool readyToBeProcessed();
 
@@ -96,8 +97,8 @@ protected:
 class CustomCPUTask : public Task {
     friend class StdSelfRef;
 public:
-    void beforeProcessingStarted() {
-        Task::beforeProcessingStarted();
+    void beforeProcessing() {
+        Task::beforeProcessing();
         if(mBefore) mBefore();
     }
 
@@ -106,7 +107,7 @@ public:
     }
 
 protected:
-    void afterProcessingFinished() {
+    void afterProcessing() {
         if(mAfter) mAfter();
     }
 

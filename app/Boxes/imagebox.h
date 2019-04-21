@@ -15,9 +15,9 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
 
     virtual void loadImageFromHandler();
 
-    void beforeProcessingStarted() {
+    void beforeProcessing() {
         if(!fImage) loadImageFromHandler();
-        BoundingBoxRenderData::beforeProcessingStarted();
+        BoundingBoxRenderData::beforeProcessing();
         if(fRasterEffects.isEmpty() &&
            fGPUEffects.isEmpty()) {
             setupDirectDraw(fImage);
