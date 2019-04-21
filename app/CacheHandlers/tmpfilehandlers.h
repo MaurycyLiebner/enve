@@ -57,6 +57,7 @@ public:
 private:
     qsptr<QTemporaryFile> mTmpFile;
 };
+
 class ImgTmpFileDataSaver : public TmpFileDataSaver {
     friend class StdSelfRef;
 public:

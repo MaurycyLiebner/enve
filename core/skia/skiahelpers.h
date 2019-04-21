@@ -2,6 +2,9 @@
 #define SKIAHELPERS_H
 
 #include "skiaincludes.h"
+#include "exceptions.h"
+#include <QIODevice>
+#include "castmacros.h"
 
 namespace SkiaHelpers {
     sk_sp<SkImage> makeSkImageCopy(const sk_sp<SkImage>& img);
@@ -19,6 +22,10 @@ namespace SkiaHelpers {
                    const int& quality = 100);
 
     sk_sp<SkImage> transferDataToSkImage(SkBitmap& bitmap);
+
+    void writeImg(const sk_sp<SkImage>& img, QIODevice * const file);
+
+    sk_sp<SkImage> readImg(QIODevice * const file);
 }
 
 #endif // SKIAHELPERS_H

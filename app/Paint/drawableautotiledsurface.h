@@ -4,7 +4,61 @@
 #include "skia/skiahelpers.h"
 #include "CacheHandlers/hddcachablecontainer.h"
 
+struct TileImgs {
+    int fRowCount = 0;
+    int fColumnCount = 0;
+    int fZeroTileRow = 0;
+    int fZeroTileCol = 0;
+    QList<QList<sk_sp<SkImage>>> fImgs;
+
+    void clear() {
+        fImgs.clear();
+        fZeroTileCol = 0;
+        fZeroTileRow = 0;
+        fColumnCount = 0;
+        fRowCount = 0;
+    }
+};
+
+class TilesTmpFileDataSaver : public TmpFileDataSaver {
+    friend class StdSelfRef;
+public:
+    typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
+protected:
+    TilesTmpFileDataSaver(const TileImgs &images,
+                          const Func& finishedFunc) :
+        mImages(images), mFinishedFunc(finishedFunc) {}
+
+    void writeToFile(QIODevice * const file);
+    void afterProcessingFinished() {
+        if(mFinishedFunc) mFinishedFunc(mTmpFile);
+    }
+private:
+    const TileImgs mImages;
+    const Func mFinishedFunc;
+};
+
+class TilesTmpFileDataLoader : public TmpFileDataLoader {
+    friend class StdSelfRef;
+public:
+    typedef std::function<void(const TileImgs&)> Func;
+protected:
+    TilesTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
+                           const Func& finishedFunc) :
+        TmpFileDataLoader(file), mFinishedFunc(finishedFunc) {}
+
+    void readFromFile(QIODevice * const file);
+    void afterProcessingFinished() {
+        if(mFinishedFunc) mFinishedFunc(mTileImgs);
+    }
+private:
+    TileImgs mTileImgs;
+    const Func mFinishedFunc;
+};
+
 class DrawableAutoTiledSurface : public HDDCachablePersistent {
+    friend class StdSelfRef;
+    typedef  QList<QList<sk_sp<SkImage>>> Tiles;
 protected:
     DrawableAutoTiledSurface();
     DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) :
@@ -13,11 +67,19 @@ protected:
     }
 
     stdsptr<_HDDTask> createTmpFileDataSaver() {
-
+        const TilesTmpFileDataSaver::Func func =
+            [this](const qsptr<QTemporaryFile>& tmpFile) {
+                setDataSavedToTmpFile(tmpFile);
+            };
+        return SPtrCreate(TilesTmpFileDataSaver)(mTileImgs, func);
     }
 
     stdsptr<_HDDTask> createTmpFileDataLoader() {
-
+        const TilesTmpFileDataLoader::Func func =
+            [this](const TileImgs& tiles) {
+                setTileImgs(tiles);
+            };
+        return SPtrCreate(TilesTmpFileDataLoader)(mTmpFile, func);
     }
 
     int getByteCount() {
@@ -73,7 +135,7 @@ public:
                 const auto img = SkiaHelpers::transferDataToSkImage(btmp);
 
                 const auto tileId = QPoint(tx, ty) + zeroTile();
-                mTileImgs[tileId.x()].replace(tileId.y(), img);
+                mImgs[tileId.x()].replace(tileId.y(), img);
             }
         }
     }
@@ -86,12 +148,12 @@ public:
         return tileRectToPixRect(tileBoundingRect());
     }
 private:
+    void setTileImgs(const TileImgs& tiles) {
+        mTileImgs = tiles;
+    }
+
     void clearImgs() {
         mTileImgs.clear();
-        mZeroTileCol = 0;
-        mZeroTileRow = 0;
-        mColumnCount = 0;
-        mRowCount = 0;
     }
 
     void stretchToTileImg(const int &tx, const int &ty) {
@@ -119,7 +181,7 @@ private:
     }
 
     void prependImgRows(const int &count) {
-        for(auto& col : mTileImgs) {
+        for(auto& col : mImgs) {
             for(int i = 0; i < count; i++) {
                 col.prepend(sk_sp<SkImage>());
             }
@@ -129,7 +191,7 @@ private:
     }
 
     void appendImgRows(const int &count) {
-        for(auto& col : mTileImgs) {
+        for(auto& col : mImgs) {
             for(int i = 0; i < count; i++) {
                 col.append(sk_sp<SkImage>());
             }
@@ -139,7 +201,7 @@ private:
 
     void prependImgColumns(const int &count) {
         for(int i = 0; i < count; i++) {
-            mTileImgs.prepend(newImgColumn());
+            mImgs.prepend(newImgColumn());
         }
         mColumnCount += count;
         mZeroTileCol += count;
@@ -147,7 +209,7 @@ private:
 
     void appendImgColumns(const int &count) {
         for(int i = 0; i < count; i++) {
-            mTileImgs.append(newImgColumn());
+            mImgs.append(newImgColumn());
         }
         mColumnCount += count;
     }
@@ -158,7 +220,7 @@ private:
     }
 
     SkImage * imageForTileId(const int &colId, const int &rowId) const {
-        return mTileImgs.at(colId).at(rowId).get();
+        return mImgs.at(colId).at(rowId).get();
     }
 
     QPoint zeroTile() const {
@@ -191,11 +253,12 @@ private:
     }
 
     AutoTiledSurface mSurface;
-    int mRowCount = 0;
-    int mColumnCount = 0;
-    int mZeroTileRow = 0;
-    int mZeroTileCol = 0;
-    QList<QList<sk_sp<SkImage>>> mTileImgs;
+    TileImgs mTileImgs;
+    int &mRowCount;
+    int &mColumnCount;
+    int &mZeroTileRow;
+    int &mZeroTileCol;
+    Tiles &mImgs;
 };
 
 #endif // DRAWABLEAUTOTILEDSURFACE_H

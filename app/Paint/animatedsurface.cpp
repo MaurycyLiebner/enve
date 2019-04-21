@@ -1,10 +1,13 @@
 #include "animatedsurface.h"
 
-AnimatedSurface::AnimatedSurface() : GraphAnimator("canvas") {}
+AnimatedSurface::AnimatedSurface() : GraphAnimator("canvas"),
+    mBaseValue(SPtrCreate(DrawableAutoTiledSurface)()),
+    mCurrent_d(mBaseValue.get()) {}
 
 ASKey::ASKey(const int &frame, AnimatedSurface * const parent) :
     GraphKey(frame, parent) {}
 
 ASKey::ASKey(const DrawableAutoTiledSurface &value,
              const int &frame, AnimatedSurface * const parent) :
-    GraphKey(frame, parent), mValue(value) {}
+    GraphKey(frame, parent),
+    mValue(SPtrCreate(DrawableAutoTiledSurface)(value)) {}

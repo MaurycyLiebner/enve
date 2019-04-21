@@ -32,9 +32,9 @@ public:
         this->mStartValue += dFrame;
     }
 
-    DrawableAutoTiledSurface& dSurface() { return mValue; }
+    DrawableAutoTiledSurface& dSurface() { return *mValue.get(); }
 private:
-    DrawableAutoTiledSurface mValue;
+    const stdsptr<DrawableAutoTiledSurface> mValue;
 };
 
 class AnimatedSurface : public GraphAnimator {
@@ -101,7 +101,7 @@ public:
             const auto& value = prevNextKey.second->dSurface();
             newKey = SPtrCreate(ASKey)(value, relFrame, this);
         } else {
-            newKey = SPtrCreate(ASKey)(mBaseValue, relFrame, this);
+            newKey = SPtrCreate(ASKey)(*mBaseValue.get(), relFrame, this);
         }
         anim_appendKey(newKey);
     }
@@ -117,7 +117,7 @@ public:
             } else if(prevNextKey.second) {
                 setCurrent(&prevNextKey.second->dSurface());
             } else {
-                setCurrent(&mBaseValue);
+                setCurrent(mBaseValue.get());
             }
         }
     }
@@ -147,8 +147,8 @@ private:
         emit currentSurfaceChanged(mCurrent_d);
     }
 
-    DrawableAutoTiledSurface mBaseValue;
-    DrawableAutoTiledSurface * mCurrent_d = &mBaseValue;
+    const stdsptr<DrawableAutoTiledSurface> mBaseValue;
+    DrawableAutoTiledSurface * mCurrent_d = nullptr;
 };
 
 #endif // ANIMATEDSURFACE_H

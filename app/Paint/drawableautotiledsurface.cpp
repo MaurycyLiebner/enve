@@ -1,7 +1,13 @@
 #include "drawableautotiledsurface.h"
+#include "castmacros.h"
+#include "skia/skiahelpers.h"
 
 DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
-    HDDCachable(false) {}
+    mRowCount(mTileImgs.fRowCount),
+    mColumnCount(mTileImgs.fColumnCount),
+    mZeroTileRow(mTileImgs.fZeroTileRow),
+    mZeroTileCol(mTileImgs.fZeroTileCol),
+    mImgs(mTileImgs.fImgs) {}
 
 void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
                                             const QPoint &dst,
@@ -22,5 +28,29 @@ void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
             const SkScalar drawY = dst.y() + ty*TILE_SIZE;
             canvas->drawImage(img, drawX, drawY, paint);
         }
+    }
+}
+
+void TilesTmpFileDataSaver::writeToFile(QIODevice * const file) {
+    file->write(rcConstChar(&mImages.fRowCount), sizeof(int));
+    file->write(rcConstChar(&mImages.fColumnCount), sizeof(int));
+    file->write(rcConstChar(&mImages.fZeroTileRow), sizeof(int));
+    file->write(rcConstChar(&mImages.fZeroTileCol), sizeof(int));
+    for(const auto& col : mImages.fImgs) {
+        for(const auto& tile : col)
+            SkiaHelpers::writeImg(tile, file);
+    }
+}
+
+void TilesTmpFileDataLoader::readFromFile(QIODevice * const file) {
+    file->read(rcChar(&mTileImgs.fRowCount), sizeof(int));
+    file->read(rcChar(&mTileImgs.fColumnCount), sizeof(int));
+    file->read(rcChar(&mTileImgs.fZeroTileRow), sizeof(int));
+    file->read(rcChar(&mTileImgs.fZeroTileCol), sizeof(int));
+    for(int i = 0; i < mTileImgs.fColumnCount; i++) {
+        mTileImgs.fImgs.append(QList<sk_sp<SkImage>>());
+        auto& col = mTileImgs.fImgs.last();
+        for(int j = 0; j < mTileImgs.fZeroTileRow; j++)
+            col.append(SkiaHelpers::readImg(file));
     }
 }
