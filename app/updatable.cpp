@@ -15,7 +15,6 @@ void Task::scheduleTaskNow() {
 }
 
 void Task::beforeProcessingStarted() {
-    Q_ASSERT(mCurrentExecutionDependent.isEmpty());
     mState = PROCESSING;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
