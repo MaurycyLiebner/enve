@@ -46,15 +46,15 @@ void TaskScheduler::initializeGPU() {
             this, &TaskScheduler::finishedAllQuedTasks);
 }
 
-void TaskScheduler::scheduleCPUTask(const stdsptr<_ScheduledTask>& task) {
+void TaskScheduler::scheduleCPUTask(const stdsptr<Task>& task) {
     mScheduledCPUTasks << task;
 }
 
-void TaskScheduler::scheduleHDDTask(const stdsptr<_ScheduledTask>& task) {
+void TaskScheduler::scheduleHDDTask(const stdsptr<Task>& task) {
     mScheduledHDDTasks << task;
 }
 
-void TaskScheduler::queCPUTask(const stdsptr<_ScheduledTask>& task) {
+void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
     if(!task->isQued()) task->taskQued();
     mQuedCPUTasks.addTask(task);
     if(task->readyToBeProcessed()) processNextQuedCPUTask();
@@ -96,7 +96,7 @@ void TaskScheduler::tryProcessingNextQuedCPUTask() {
 }
 
 void TaskScheduler::afterHDDTaskFinished(
-        const stdsptr<_ScheduledTask>& finishedTask,
+        const stdsptr<Task>& finishedTask,
         ExecController * const controller) {
     Q_UNUSED(controller);
     if(mHDDThreadBusy && !finishedTask) return;
@@ -133,11 +133,11 @@ void TaskScheduler::processNextQuedHDDTask() {
 #include "GUI/usagewidget.h"
 #include "GUI/mainwindow.h"
 void TaskScheduler::afterCPUTaskFinished(
-        const stdsptr<_ScheduledTask>& task,
+        const stdsptr<Task>& task,
         ExecController * const controller) {
     mFreeCPUExecs << controller;
     if(task) {
-        if(task->getState() != _Task::CANCELED) {
+        if(task->getState() != Task::CANCELED) {
             if(task->needsGpuProcessing()) {
                 const auto gpuProcess =
                         SPtrCreate(BoxRenderDataScheduledPostProcess)(

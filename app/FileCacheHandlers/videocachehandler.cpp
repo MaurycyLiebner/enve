@@ -61,7 +61,7 @@ void VideoCacheHandler::replace() {
     }
 }
 
-_ScheduledTask* VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+Task* VideoCacheHandler::scheduleFrameLoad(const int &frame) {
     if(frame < 0 || frame >= mFrameCount)
         RuntimeThrow("Frame outside of range " + std::to_string(frame));
     const auto currLoader = getFrameLoader(frame);

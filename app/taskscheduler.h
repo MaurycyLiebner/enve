@@ -15,12 +15,12 @@ public:
 
     ~Que() {
         for(const auto& cpuTask : mQued)
-            cpuTask->setState(_Task::CANCELED);
+            cpuTask->setState(Task::CANCELED);
     }
 protected:
     int countQued() const { return mQued.count(); }
     bool allDone() const { return countQued() == 0; }
-    void addTask(const stdsptr<_ScheduledTask>& task) {
+    void addTask(const stdsptr<Task>& task) {
         for(int i = 0; i < mQued.count(); i++) {
             const auto& iTask = mQued.at(i);
             if(iTask == task) Q_ASSERT(false);
@@ -28,7 +28,7 @@ protected:
         mQued << task;
     }
 
-    stdsptr<_ScheduledTask> takeQuedForProcessing() {
+    stdsptr<Task> takeQuedForProcessing() {
         for(int i = 0; i < mQued.count(); i++) {
             const auto& task = mQued.at(i);
             if(task->readyToBeProcessed()) return mQued.takeAt(i);
@@ -36,7 +36,7 @@ protected:
         return nullptr;
     }
 private:
-    QList<stdsptr<_ScheduledTask>> mQued;
+    QList<stdsptr<Task>> mQued;
 };
 
 class QueHandler {
@@ -49,7 +49,7 @@ public:
         mCurrentQue = nullptr;
     }
 
-    stdsptr<_ScheduledTask> takeQuedForProcessing() {
+    stdsptr<Task> takeQuedForProcessing() {
         int queId = 0;
         for(const auto& que : mQues) {
             const auto task = que->takeQuedForProcessing();
@@ -68,7 +68,7 @@ public:
         mCurrentQue = mQues.last().get();
     }
 
-    void addTask(const stdsptr<_ScheduledTask>& task) {
+    void addTask(const stdsptr<Task>& task) {
         if(!mCurrentQue) RuntimeThrow("Cannot add task when there is no active que.");
         mCurrentQue->addTask(task);
     }
@@ -145,28 +145,28 @@ public:
 
     void initializeGPU();
 
-    void scheduleCPUTask(const stdsptr<_ScheduledTask> &task);
-    void queCPUTask(const stdsptr<_ScheduledTask> &task);
+    void scheduleCPUTask(const stdsptr<Task> &task);
+    void queCPUTask(const stdsptr<Task> &task);
     void queScheduledCPUTasks();
 
-    void scheduleHDDTask(const stdsptr<_ScheduledTask> &task);
+    void scheduleHDDTask(const stdsptr<Task> &task);
     void queScheduledHDDTasks();
 
     void clearTasks() {
         for(const auto& cpuTask : mScheduledCPUTasks) {
-            cpuTask->setState(_Task::CANCELED);
+            cpuTask->setState(Task::CANCELED);
         }
         mScheduledCPUTasks.clear();
 
         for(const auto& hddTask : mScheduledHDDTasks) {
-            hddTask->setState(_Task::CANCELED);
+            hddTask->setState(Task::CANCELED);
         }
         mScheduledHDDTasks.clear();
 
         mQuedCPUTasks.clear();
 
         for(const auto& hddTask : mQuedHDDTasks) {
-            hddTask->setState(_Task::CANCELED);
+            hddTask->setState(Task::CANCELED);
         }
         mQuedHDDTasks.clear();
 
@@ -178,11 +178,11 @@ public:
         }
     }
 
-    void afterHDDTaskFinished(const stdsptr<_ScheduledTask>& finishedTask,
+    void afterHDDTaskFinished(const stdsptr<Task>& finishedTask,
                               ExecController * const controller);
     void processNextQuedHDDTask();
 
-    void afterCPUTaskFinished(const stdsptr<_ScheduledTask>& task,
+    void afterCPUTaskFinished(const stdsptr<Task>& task,
                               ExecController * const controller);
     void processNextQuedCPUTask();
 
@@ -234,8 +234,8 @@ public:
         return mCPUTaskExecutors.count() - mFreeCPUExecs.count();
     }
 signals:
-    void processCPUTask(_ScheduledTask*, int);
-    void processHDDTask(_ScheduledTask*, int);
+    void processCPUTask(Task*, int);
+    void processHDDTask(Task*, int);
     void finishedAllQuedTasks();
 private:
     static TaskScheduler* sInstance;
@@ -278,9 +278,9 @@ private:
     bool mCPUQueing = false;
     QueHandler mQuedCPUTasks;
 
-    QList<stdsptr<_ScheduledTask>> mScheduledCPUTasks;
-    QList<stdsptr<_ScheduledTask>> mScheduledHDDTasks;
-    QList<stdsptr<_ScheduledTask>> mQuedHDDTasks;
+    QList<stdsptr<Task>> mScheduledCPUTasks;
+    QList<stdsptr<Task>> mScheduledHDDTasks;
+    QList<stdsptr<Task>> mQuedHDDTasks;
 
     ExecController *mHDDExecutor = nullptr;
     QList<ExecController*> mCPUTaskExecutors;

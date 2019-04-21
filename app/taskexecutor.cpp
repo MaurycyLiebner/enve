@@ -2,7 +2,7 @@
 
 TaskExecutor::TaskExecutor() {}
 
-void TaskExecutor::processTask(_ScheduledTask* task) {
+void TaskExecutor::processTask(Task* task) {
     try {
         task->_processUpdate();
     } catch(...) {

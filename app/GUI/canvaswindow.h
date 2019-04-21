@@ -19,8 +19,7 @@ class SoundComposition;
 class PaintSettingsApplier;
 class CanvasWidget;
 class RenderInstanceSettings;
-class _ScheduledTask;
-class _Task;
+class Task;
 class ImageBox;
 class SingleSound;
 class VideoBox;
@@ -232,8 +231,8 @@ private:
     int mMaxPreviewFrame;
     int mCurrentPreviewFrame;
 signals:
-    void processTask(_ScheduledTask*, int);
-    void updateFileUpdatable(_ScheduledTask*, int);
+    void processTask(Task*, int);
+    void updateFileUpdatable(Task*, int);
 
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);

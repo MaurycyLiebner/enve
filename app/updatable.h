@@ -5,35 +5,48 @@
 #include "smartPointers/sharedpointerdefs.h"
 class TaskExecutor;
 
-class _Task : public StdSelfRef {
+class Que;
+
+class Task : public StdSelfRef {
+    friend class TaskScheduler;
+    friend class Que;
 protected:
-    _Task();
+    Task() {}
 
     virtual void afterProcessingFinished() {}
     virtual void afterCanceled() {}
+    virtual void scheduleTaskNow();
 public:
     enum State : char {
-        CANCELED = 0,
-        CREATED = 1,
-        PROCESSING = 4,
-        FINISHED = 5
+        CANCELED,
+        CREATED,
+        SCHEDULED,
+        QUED,
+        PROCESSING,
+        FINISHED
     };
 
-    ~_Task() {
+    virtual void _processUpdate() = 0;
+    virtual bool needsGpuProcessing() const { return false; }
+    virtual void beforeProcessingStarted();
+    virtual void clear();
+    virtual void taskQued() { mState = QUED; }
+
+    bool scheduleTask();
+    bool isQued() { return mState == QUED; }
+    bool isScheduled() { return mState == SCHEDULED; }
+
+    ~Task() {
         tellDependentThatFinished();
         tellNextDependentThatFinished();
     }
-
-    virtual void beforeProcessingStarted();
-    virtual void _processUpdate() = 0;
-    virtual void clear();
 
     bool isActive() { return mState != CREATED && mState != FINISHED; }
 
     void finishedProcessing();
     bool readyToBeProcessed();
 
-    void addDependent(_Task * const updatable);
+    void addDependent(Task * const updatable);
 
     bool finished();
 
@@ -70,40 +83,21 @@ private:
 
     int mNDependancies = 0;
     std::exception_ptr mUpdateException;
-    QList<stdptr<_Task>> mNextExecutionDependent;
-    QList<stdptr<_Task>> mCurrentExecutionDependent;
-};
-class Que;
-class _ScheduledTask : public _Task {
-    friend class TaskScheduler;
-    friend class Que;
-public:
-    _ScheduledTask() {}
-
-    virtual void taskQued();
-
-    bool scheduleTask();
-
-    bool isQued() { return mState == QUED; }
-    bool isScheduled() { return mState == SCHEDULED; }
-
-    virtual bool needsGpuProcessing() const { return false; }
-protected:
-    static State SCHEDULED, QUED;
-    virtual void scheduleTaskNow();
+    QList<stdptr<Task>> mNextExecutionDependent;
+    QList<stdptr<Task>> mCurrentExecutionDependent;
 };
 
-class _HDDTask : public _ScheduledTask {
+class _HDDTask : public Task {
     friend class StdSelfRef;
 protected:
     void scheduleTaskNow();
 };
 
-class CustomCPUTask : public _ScheduledTask {
+class CustomCPUTask : public Task {
     friend class StdSelfRef;
 public:
     void beforeProcessingStarted() {
-        _ScheduledTask::beforeProcessingStarted();
+        Task::beforeProcessingStarted();
         if(mBefore) mBefore();
     }
 

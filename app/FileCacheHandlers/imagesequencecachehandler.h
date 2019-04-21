@@ -15,7 +15,7 @@ public:
 
     void clearCache();
 
-    _ScheduledTask* scheduleFrameLoad(const int &frame);
+    Task* scheduleFrameLoad(const int &frame);
 protected:
     ImageSequenceCacheHandler(const QStringList &framePaths);
 

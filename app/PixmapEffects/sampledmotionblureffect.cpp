@@ -46,8 +46,7 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
             relFrameT += frameStep;
             continue;
         }
-        stdsptr<BoundingBoxRenderData> sampleRenderData =
-                mParentBox->createRenderData();
+        const auto sampleRenderData = mParentBox->createRenderData();
         //mParentBox->setupRenderData(i, sampleRenderData);
         sampleRenderData->fParentIsTarget = false;
         sampleRenderData->fUseCustomRelFrame = true;

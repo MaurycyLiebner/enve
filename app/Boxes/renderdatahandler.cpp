@@ -17,7 +17,7 @@ BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int &frame) {
     int id;
     if(getItemIdAtRelFrame(frame, &id)) {
         const auto item = mItems.at(id).get();
-        if(item->getState() == _Task::CANCELED) mItems.removeAt(id);
+        if(item->getState() == Task::CANCELED) mItems.removeAt(id);
         else return item;
     }
     return nullptr;

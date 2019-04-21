@@ -2,7 +2,7 @@
 #define HDDCACHABLECONTAINER_H
 #include "minimalcachecontainer.h"
 #include "tmpfilehandlers.h"
-class _ScheduledTask;
+class Task;
 
 class HDDCachable : public CacheContainer {
 protected:
@@ -23,7 +23,7 @@ public:
         } else return freeAndRemove_k();
     }
 
-    _ScheduledTask* scheduleDeleteTmpFile() {
+    Task* scheduleDeleteTmpFile() {
         if(!mTmpFile) return nullptr;
         const auto updatable =
                 SPtrCreate(TmpFileDataDeleter)(mTmpFile);
@@ -32,14 +32,14 @@ public:
         return updatable.get();
     }
 
-    _ScheduledTask* saveToTmpFile() {
+    Task* saveToTmpFile() {
         if(mSavingUpdatable || mTmpFile) return nullptr;
         mSavingUpdatable = createTmpFileDataSaver();
         mSavingUpdatable->scheduleTask();
         return mSavingUpdatable.get();
     }
 
-    _ScheduledTask* scheduleLoadFromTmpFile() {
+    Task* scheduleLoadFromTmpFile() {
         if(storesDataInMemory() || !mTmpFile) return nullptr;
         if(mLoadingUpdatable) return mLoadingUpdatable.get();
 
@@ -76,8 +76,8 @@ protected:
     qsptr<QTemporaryFile> mTmpFile;
 private:
     bool mDataInMemory = false;
-    stdsptr<_ScheduledTask> mLoadingUpdatable;
-    stdsptr<_ScheduledTask> mSavingUpdatable;
+    stdsptr<Task> mLoadingUpdatable;
+    stdsptr<Task> mSavingUpdatable;
 };
 
 class HDDCachablePersistent : public HDDCachable {

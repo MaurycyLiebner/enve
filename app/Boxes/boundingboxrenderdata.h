@@ -13,7 +13,7 @@ class GPURasterEffectCaller;
 #include "smartPointers/sharedpointerdefs.h"
 
 class RenderDataCustomizerFunctor;
-struct BoundingBoxRenderData : public _ScheduledTask {
+struct BoundingBoxRenderData : public Task {
     friend class StdSelfRef;
 protected:
     BoundingBoxRenderData(BoundingBox *parentBoxT);

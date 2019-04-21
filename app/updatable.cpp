@@ -2,16 +2,7 @@
 #include "GUI/mainwindow.h"
 #include "taskexecutor.h"
 
-_Task::State _ScheduledTask::SCHEDULED =
-        static_cast<_Task::State>(2);
-_Task::State _ScheduledTask::QUED =
-        static_cast<_Task::State>(3);
-
-void _ScheduledTask::taskQued() {
-    mState = QUED;
-}
-
-bool _ScheduledTask::scheduleTask() {
+bool Task::scheduleTask() {
     if(mState == SCHEDULED) return false;
 
     mState = SCHEDULED;
@@ -19,24 +10,18 @@ bool _ScheduledTask::scheduleTask() {
     return true;
 }
 
-void _ScheduledTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<_ScheduledTask>());
+void Task::scheduleTaskNow() {
+    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
 }
 
-void _HDDTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleHDDTask(ref<_ScheduledTask>());
-}
-
-_Task::_Task() {}
-
-void _Task::beforeProcessingStarted() {
+void Task::beforeProcessingStarted() {
     Q_ASSERT(mCurrentExecutionDependent.isEmpty());
     mState = PROCESSING;
     mCurrentExecutionDependent = mNextExecutionDependent;
     mNextExecutionDependent.clear();
 }
 
-void _Task::finishedProcessing() {
+void Task::finishedProcessing() {
     mState = FINISHED;
     tellDependentThatFinished();
     afterProcessingFinished();
@@ -45,17 +30,17 @@ void _Task::finishedProcessing() {
     }
 }
 
-bool _Task::readyToBeProcessed() {
+bool Task::readyToBeProcessed() {
     return mNDependancies == 0;
 }
 
-void _Task::clear() {
+void Task::clear() {
     mState = CREATED;
     tellDependentThatFinished();
     tellNextDependentThatFinished();
 }
 
-void _Task::addDependent(_Task * const updatable) {
+void Task::addDependent(Task * const updatable) {
     if(!updatable) return;
     if(mState != FINISHED) {
         if(mNextExecutionDependent.contains(updatable)) return;
@@ -64,26 +49,30 @@ void _Task::addDependent(_Task * const updatable) {
     }
 }
 
-bool _Task::finished() { return mState == FINISHED; }
+bool Task::finished() { return mState == FINISHED; }
 
-void _Task::decDependencies() {
+void Task::decDependencies() {
     mNDependancies--;
 }
 
-void _Task::incDependencies() {
+void Task::incDependencies() {
     mNDependancies++;
 }
 
-void _Task::tellDependentThatFinished() {
+void Task::tellDependentThatFinished() {
     for(const auto& dependent : mCurrentExecutionDependent) {
         if(dependent) dependent->decDependencies();
     }
     mCurrentExecutionDependent.clear();
 }
 
-void _Task::tellNextDependentThatFinished() {
+void Task::tellNextDependentThatFinished() {
     for(const auto& dependent : mNextExecutionDependent) {
         if(dependent) dependent->decDependencies();
     }
     mNextExecutionDependent.clear();
+}
+
+void _HDDTask::scheduleTaskNow() {
+    TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
 }

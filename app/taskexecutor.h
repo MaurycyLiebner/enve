@@ -10,9 +10,9 @@ class TaskExecutor : public QObject {
 public:
     explicit TaskExecutor();
 signals:
-    void finishedTask(_ScheduledTask*);
+    void finishedTask(Task*);
 public slots:
-    void processTask(_ScheduledTask* task);
+    void processTask(Task* task);
 };
 
 class ExecController : public QObject {
@@ -29,7 +29,7 @@ public:
         mExecutorThread->start();
     }
 
-    void processTask(const stdsptr<_ScheduledTask>& task) {
+    void processTask(const stdsptr<Task>& task) {
         mCurrentTask = task;
         emit processTaskSignal(task.get());
     }
@@ -48,8 +48,8 @@ public:
 //        }
     }
 signals:
-    void processTaskSignal(_ScheduledTask*);
-    void finishedTaskSignal(stdsptr<_ScheduledTask>, ExecController*);
+    void processTaskSignal(Task*);
+    void finishedTaskSignal(stdsptr<Task>, ExecController*);
 private:
     void finishedTask() {
         const auto task = mCurrentTask;
@@ -57,7 +57,7 @@ private:
         emit finishedTaskSignal(task, this);
     }
 
-    stdsptr<_ScheduledTask> mCurrentTask;
+    stdsptr<Task> mCurrentTask;
     TaskExecutor * const mExecutor;
     QThread * const mExecutorThread;
 };

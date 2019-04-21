@@ -11,7 +11,7 @@ protected:
 public:
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
-    _ScheduledTask *scheduleFrameLoad(const int &frame);
+    Task *scheduleFrameLoad(const int &frame);
 
     void clearCache();
     void replace();

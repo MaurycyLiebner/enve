@@ -104,7 +104,7 @@ void BoundingBoxRenderData::_processUpdate() {
 void BoundingBoxRenderData::beforeProcessingStarted() {
     if(!mDataSet) dataSet();
 
-    _ScheduledTask::beforeProcessingStarted();
+    Task::beforeProcessingStarted();
 
     if(!fParentBox || !fParentIsTarget) return;
     if(nullifyBeforeProcessing())
@@ -134,7 +134,7 @@ void BoundingBoxRenderData::taskQued() {
         }
     }
     if(!mDelayDataSet) dataSet();
-    _ScheduledTask::taskQued();
+    Task::taskQued();
 }
 
 void BoundingBoxRenderData::scheduleTaskNow() {
@@ -142,7 +142,7 @@ void BoundingBoxRenderData::scheduleTaskNow() {
         clear();
         return;
     }
-    fParentBox->scheduleTask(ref<_ScheduledTask>());
+    fParentBox->scheduleTask(ref<Task>());
 }
 
 void BoundingBoxRenderData::dataSet() {

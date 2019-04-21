@@ -9,7 +9,7 @@ protected:
 public:
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
     virtual sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame) = 0;
-    virtual _ScheduledTask* scheduleFrameLoad(const int &frame) = 0;
+    virtual Task* scheduleFrameLoad(const int &frame) = 0;
 
     sk_sp<SkImage> getFrameCopyAtFrame(const int &relFrame) {
         const sk_sp<SkImage> imageToCopy = getFrameAtFrame(relFrame);

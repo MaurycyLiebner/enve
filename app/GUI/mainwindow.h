@@ -25,7 +25,7 @@ class BrushSelectionWidget;
 class Canvas;
 class CanvasWindow;
 class MemoryHandler;
-class _ScheduledTask;
+class Task;
 
 class ObjectSettingsWidget;
 class BoxScrollWidget;

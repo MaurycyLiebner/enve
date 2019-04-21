@@ -1174,7 +1174,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
 
 void BoundingBox::cancelWaitingTasks() {
     for(const auto &task : mScheduledTasks) {
-        task->setState(_Task::CANCELED);
+        task->setState(Task::CANCELED);
     }
     mScheduledTasks.clear();
 }
@@ -1274,7 +1274,7 @@ void BoundingBox::selectAllCanvasPts(QList<stdptr<MovablePoint> > &selection,
     }
 }
 
-void BoundingBox::scheduleTask(const stdsptr<_ScheduledTask>& task) {
+void BoundingBox::scheduleTask(const stdsptr<Task>& task) {
     mScheduledTasks << task;
 }
 
