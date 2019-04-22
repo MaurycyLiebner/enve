@@ -1173,16 +1173,14 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
 }
 
 void BoundingBox::cancelWaitingTasks() {
-    for(const auto &task : mScheduledTasks) {
-        task->setState(Task::CANCELED);
-    }
+    for(const auto &task : mScheduledTasks)
+        task->cancel();
     mScheduledTasks.clear();
 }
 
 void BoundingBox::scheduleWaitingTasks() {
-    for(const auto &task : mScheduledTasks) {
+    for(const auto &task : mScheduledTasks)
         task->taskQued();
-    }
 }
 
 void BoundingBox::queScheduledTasks() {

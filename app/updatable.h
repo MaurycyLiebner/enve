@@ -53,9 +53,9 @@ public:
     void decDependencies();
     void incDependencies();
 
-    void setState(const State& state) {
-        mState = state;
-        if(state == CANCELED) afterCanceled();
+    void cancel() {
+        mState = CANCELED;
+        afterCanceled();
     }
 
     State getState() const {

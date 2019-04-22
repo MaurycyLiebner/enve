@@ -14,8 +14,7 @@ public:
     Que& operator=(const Que&) = delete;
 
     ~Que() {
-        for(const auto& cpuTask : mQued)
-            cpuTask->setState(Task::CANCELED);
+        for(const auto& cpuTask : mQued) cpuTask->cancel();
     }
 protected:
     int countQued() const { return mQued.count(); }
@@ -153,21 +152,18 @@ public:
     void queScheduledHDDTasks();
 
     void clearTasks() {
-        for(const auto& cpuTask : mScheduledCPUTasks) {
-            cpuTask->setState(Task::CANCELED);
-        }
+        for(const auto& cpuTask : mScheduledCPUTasks)
+            cpuTask->cancel();
         mScheduledCPUTasks.clear();
 
-        for(const auto& hddTask : mScheduledHDDTasks) {
-            hddTask->setState(Task::CANCELED);
-        }
+        for(const auto& hddTask : mScheduledHDDTasks)
+            hddTask->cancel();
         mScheduledHDDTasks.clear();
 
         mQuedCPUTasks.clear();
 
-        for(const auto& hddTask : mQuedHDDTasks) {
-            hddTask->setState(Task::CANCELED);
-        }
+        for(const auto& hddTask : mQuedHDDTasks)
+            hddTask->cancel();
         mQuedHDDTasks.clear();
 
         if(!mHDDThreadBusy) {

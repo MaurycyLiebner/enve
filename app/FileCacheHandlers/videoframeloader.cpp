@@ -1,4 +1,4 @@
-#include "videoframeloader.h"
+﻿#include "videoframeloader.h"
 #include "videocachehandler.h"
 
 void VideoFrameLoader::readFrame() {
@@ -104,10 +104,8 @@ void VideoFrameLoader::readFrame() {
 
 void VideoFrameLoader::afterProcessing() {
     mCacheHandler->frameLoaderFinished(mFrameId, mLoadedFrame);
-    HDDTask::afterProcessing();
 }
 
 void VideoFrameLoader::afterCanceled() {
     mCacheHandler->frameLoaderCanceled(mFrameId);
-    HDDTask::afterCanceled();
 }
