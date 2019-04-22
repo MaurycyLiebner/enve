@@ -3,13 +3,13 @@
 #include "skia/skiahelpers.h"
 #include "filecachehandler.h"
 class ImageCacheHandler;
-class ImageLoader : public _HDDTask {
+class ImageLoader : public HDDTask {
     friend class StdSelfRef;
 protected:
     ImageLoader(const QString &filePath,
                 ImageCacheHandler * const handler);
 public:
-    void _processUpdate();
+    void processTask();
     void afterProcessing();
 private:
     ImageCacheHandler * const mTargetHandler;

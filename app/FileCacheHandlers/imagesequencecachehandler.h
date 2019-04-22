@@ -11,7 +11,7 @@ public:
 
     void updateFrameCount();
 
-    void _processUpdate() {}
+    void processTask() {}
 
     void clearCache();
 

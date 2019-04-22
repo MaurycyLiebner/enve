@@ -2,7 +2,7 @@
 #include "skia/skiahelpers.h"
 #include "PixmapEffects/pixmapeffect.h"
 
-void LinkCanvasRenderData::renderToImage() {
+void LinkCanvasRenderData::processTask() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;
     if(fOpacity < 0.001) return;

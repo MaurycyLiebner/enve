@@ -18,27 +18,29 @@ struct BoundingBoxRenderData : public Task {
 protected:
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 
+    virtual void setupRenderData() {}
     virtual void drawSk(SkCanvas * const canvas) = 0;
     virtual void transformRenderCanvas(SkCanvas& canvas) const {
+        canvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
+                         toSkScalar(-fGlobalBoundingRect.top()));
         canvas.concat(toSkMatrix(fScaledTransform));
     }
     virtual void copyFrom(BoundingBoxRenderData *src);
     virtual void updateRelBoundingRect();
 
-    void scheduleTaskNow();
+    void scheduleTaskNow() final;
 public:
-    virtual void renderToImage();
     virtual QPointF getCenterPosition() {
         return fRelBoundingRect.center();
     }
 
-    void _processUpdate();
-    void beforeProcessing();
-    void afterProcessing();
-    void taskQued();
+    void processTask();
+    void beforeProcessing() final;
+    void afterProcessing() final;
+    void taskQued() final;
 
     // gpu
-    bool needsGpuProcessing() const {
+    bool needsGpuProcessing() const final {
         return !fGPUEffects.isEmpty();
     }
     QList<stdsptr<GPURasterEffectCaller>> fGPUEffects;

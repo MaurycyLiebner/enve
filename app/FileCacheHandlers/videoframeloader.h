@@ -13,7 +13,7 @@ extern "C" {
 
 class VideoCacheHandler;
 struct VideoStreamsData;
-class VideoFrameLoader : public _HDDTask {
+class VideoFrameLoader : public HDDTask {
     friend class StdSelfRef;
 protected:
     VideoFrameLoader(VideoCacheHandler * const cacheHandler,
@@ -25,7 +25,7 @@ protected:
     void afterProcessing();
     void afterCanceled();
 public:
-    void _processUpdate() {
+    void processTask() {
         readFrame();
     }
 private:

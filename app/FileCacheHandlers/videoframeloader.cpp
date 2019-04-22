@@ -104,10 +104,10 @@ void VideoFrameLoader::readFrame() {
 
 void VideoFrameLoader::afterProcessing() {
     mCacheHandler->frameLoaderFinished(mFrameId, mLoadedFrame);
-    _HDDTask::afterProcessing();
+    HDDTask::afterProcessing();
 }
 
 void VideoFrameLoader::afterCanceled() {
     mCacheHandler->frameLoaderCanceled(mFrameId);
-    _HDDTask::afterCanceled();
+    HDDTask::afterCanceled();
 }

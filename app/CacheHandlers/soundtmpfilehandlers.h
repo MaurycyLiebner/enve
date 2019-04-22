@@ -6,10 +6,10 @@
 #include <QTemporaryFile>
 #include "skia/skiaincludes.h"
 class SoundCacheContainer;
-class SoundContainerTmpFileDataLoader : public _HDDTask {
+class SoundContainerTmpFileDataLoader : public HDDTask {
     friend class StdSelfRef;
 public:
-    void _processUpdate();
+    void processTask();
 
     void afterProcessing();
 protected:
@@ -21,10 +21,10 @@ protected:
     stdsptr<Samples> mSamples;
 };
 
-class SoundContainerTmpFileDataSaver : public _HDDTask {
+class SoundContainerTmpFileDataSaver : public HDDTask {
     friend class StdSelfRef;
 public:
-    void _processUpdate();
+    void processTask();
 
     void afterProcessing();
 protected:

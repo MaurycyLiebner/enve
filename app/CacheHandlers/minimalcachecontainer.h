@@ -8,10 +8,12 @@ protected:
 public:
     ~CacheContainer();
 
-    virtual int freeAndRemove_k() = 0;
+    virtual void noDataLeft_k() = 0;
     virtual int getByteCount() = 0;
-    virtual int freeFromMemory_k() {
-        return freeAndRemove_k();
+    virtual int free_RAM_k() {
+        const int bytes = getByteCount();
+        noDataLeft_k();
+        return bytes;
     }
 
     void setBlocked(const bool &bT) {

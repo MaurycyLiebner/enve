@@ -69,6 +69,8 @@ struct AutoTilesData {
                      pixRect.width()/TILE_SIZE + widthRem,
                      pixRect.height()/TILE_SIZE + heightRem);
     }
+
+    bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }
 protected:
     uint16_t* getTileByIndex(const int& colId, const int& rowId) const;
 private:

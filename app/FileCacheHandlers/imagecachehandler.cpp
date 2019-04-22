@@ -11,7 +11,7 @@ ImageLoader::ImageLoader(const QString &filePath,
 
 }
 
-void ImageLoader::_processUpdate() {
+void ImageLoader::processTask() {
     const sk_sp<SkData> data = SkData::MakeFromFileName(
                 mFilePath.toLocal8Bit().data());
     mImage = SkImage::MakeFromEncoded(data);

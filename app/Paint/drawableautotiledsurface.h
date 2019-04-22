@@ -11,6 +11,8 @@ struct TileImgs {
     int fZeroTileCol = 0;
     QList<QList<sk_sp<SkImage>>> fImgs;
 
+    bool isEmpty() const { return fImgs.isEmpty(); }
+
     void clear() {
         fImgs.clear();
         fZeroTileCol = 0;
@@ -66,7 +68,7 @@ protected:
         mSurface = other.surface();
     }
 
-    stdsptr<_HDDTask> createTmpFileDataSaver() {
+    stdsptr<HDDTask> createTmpFileDataSaver() {
         const TilesTmpFileDataSaver::Func func =
             [this](const qsptr<QTemporaryFile>& tmpFile) {
                 setDataSavedToTmpFile(tmpFile);
@@ -74,7 +76,7 @@ protected:
         return SPtrCreate(TilesTmpFileDataSaver)(mTileImgs, func);
     }
 
-    stdsptr<_HDDTask> createTmpFileDataLoader() {
+    stdsptr<HDDTask> createTmpFileDataLoader() {
         const TilesTmpFileDataLoader::Func func =
             [this](const TileImgs& tiles) {
                 setTileImgs(tiles);
@@ -124,6 +126,7 @@ public:
     void updateTileRectImgs(QRect tileRect) {
         const QRect maxRect = mSurface.tileBoundingRect();
         if(!maxRect.intersects(tileRect)) return;
+        if(mTmpFile) scheduleDeleteTmpFile();
         tileRect = maxRect.intersected(tileRect);
         const auto min = tileRect.topLeft();
         const auto max = tileRect.bottomRight();

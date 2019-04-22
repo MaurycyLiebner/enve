@@ -13,10 +13,10 @@ class Task : public StdSelfRef {
 protected:
     Task() {}
 
+    virtual void scheduleTaskNow() = 0;
     virtual void beforeProcessing() {}
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
-    virtual void scheduleTaskNow();
 public:
     enum State : char {
         CANCELED,
@@ -27,7 +27,7 @@ public:
         FINISHED
     };
 
-    virtual void _processUpdate() = 0;
+    virtual void processTask() = 0;
     virtual bool needsGpuProcessing() const { return false; }
     virtual void clear();
     virtual void taskQued() { mState = QUED; }
@@ -88,26 +88,31 @@ private:
     QList<stdptr<Task>> mCurrentExecutionDependent;
 };
 
-class _HDDTask : public Task {
+class CPUTask : public Task {
     friend class StdSelfRef;
 protected:
-    void scheduleTaskNow();
+    void scheduleTaskNow() final;
+};
+
+class HDDTask : public Task {
+    friend class StdSelfRef;
+protected:
+    void scheduleTaskNow() final;
 };
 
 class CustomCPUTask : public Task {
     friend class StdSelfRef;
 public:
-    void beforeProcessing() {
-        Task::beforeProcessing();
+    void beforeProcessing() final {
         if(mBefore) mBefore();
     }
 
-    void _processUpdate() {
+    void processTask() final {
         if(mRun) mRun();
     }
 
 protected:
-    void afterProcessing() {
+    void afterProcessing() final {
         if(mAfter) mAfter();
     }
 

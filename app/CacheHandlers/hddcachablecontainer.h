@@ -8,19 +8,18 @@ class HDDCachable : public CacheContainer {
 protected:
     HDDCachable() {}
     virtual int clearMemory() = 0;
-    virtual stdsptr<_HDDTask> createTmpFileDataSaver() = 0;
-    virtual stdsptr<_HDDTask> createTmpFileDataLoader() = 0;
+    virtual stdsptr<HDDTask> createTmpFileDataSaver() = 0;
+    virtual stdsptr<HDDTask> createTmpFileDataLoader() = 0;
 public:
     ~HDDCachable() {
         if(mTmpFile) scheduleDeleteTmpFile();
     }
 
-    int freeFromMemory_k() {
-        if(mTmpFile) {
-            const int bytes = clearMemory();
-            setDataInMemory(false);
-            return bytes;
-        } else return freeAndRemove_k();
+    int free_RAM_k() final {
+        const int bytes = clearMemory();
+        if(mTmpFile) setDataInMemory(false);
+        else noDataLeft_k();
+        return bytes;
     }
 
     Task* scheduleDeleteTmpFile() {
@@ -84,16 +83,7 @@ class HDDCachablePersistent : public HDDCachable {
 protected:
     HDDCachablePersistent() {}
 public:
-    int freeAndRemove_k() { return 0; }
-
-    int freeFromMemory_k() {
-        if(mTmpFile) {
-            const int bytes = clearMemory();
-            setDataInMemory(false);
-            return bytes;
-        }
-        return 0;
-    }
+    void noDataLeft_k() final {}
 };
 
 #endif // HDDCACHABLECONTAINER_H

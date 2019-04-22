@@ -3,7 +3,7 @@
 #include "boxesgrouprenderdata.h"
 struct CanvasRenderData : public BoxesGroupRenderData {
     CanvasRenderData(BoundingBox * const parentBoxT);
-    void renderToImage();
+    void processTask();
     qreal fCanvasWidth;
     qreal fCanvasHeight;
     SkColor fBgColor;

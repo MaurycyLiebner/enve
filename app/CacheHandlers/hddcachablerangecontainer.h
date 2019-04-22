@@ -14,7 +14,7 @@ protected:
         mRange(range), mParentCacheHandler_k(parent) {}
     virtual int clearMemory() = 0;
 public:
-    int freeAndRemove_k();
+    void noDataLeft_k() final;
 
     int getRangeMin() const;
     const FrameRange& getRange() const {

@@ -4,7 +4,7 @@ TaskExecutor::TaskExecutor() {}
 
 void TaskExecutor::processTask(Task* task) {
     try {
-        task->_processUpdate();
+        task->processTask();
     } catch(...) {
         task->setException(std::current_exception());
     }

@@ -10,10 +10,6 @@ bool Task::scheduleTask() {
     return true;
 }
 
-void Task::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
-}
-
 void Task::aboutToProcess() {
     mState = PROCESSING;
     mCurrentExecutionDependent = mNextExecutionDependent;
@@ -73,6 +69,10 @@ void Task::tellNextDependentThatFinished() {
     mNextExecutionDependent.clear();
 }
 
-void _HDDTask::scheduleTaskNow() {
+void CPUTask::scheduleTaskNow() {
+    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
+}
+
+void HDDTask::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
 }

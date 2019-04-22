@@ -14,6 +14,8 @@ void BoxesGroupRenderData::drawSk(SkCanvas * const canvas) {
 }
 
 void BoxesGroupRenderData::transformRenderCanvas(SkCanvas &canvas) const {
+    canvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
+                     toSkScalar(-fGlobalBoundingRect.top()));
     canvas.concat(toSkMatrix(fResolutionScale));
 }
 

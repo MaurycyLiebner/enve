@@ -47,7 +47,6 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     const SkScalar invScale = toSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
     canvas->concat(toSkMatrix(fRenderTransform));
-    renderToImage();
     SkPaint paint;
     paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
     paint.setBlendMode(fBlendMode);
@@ -69,7 +68,7 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     canvas->drawImage(fRenderedImage, fDrawPos.x(), fDrawPos.y(), &paint);
 }
 
-void BoundingBoxRenderData::renderToImage() {
+void BoundingBoxRenderData::processTask() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;
     if(fOpacity < 0.001) return;
@@ -82,8 +81,6 @@ void BoundingBoxRenderData::renderToImage() {
     fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
 
     SkCanvas rasterCanvas(fBitmapTMP);
-    rasterCanvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
-                           toSkScalar(-fGlobalBoundingRect.top()));
     transformRenderCanvas(rasterCanvas);
 
     drawSk(&rasterCanvas);
@@ -97,11 +94,8 @@ void BoundingBoxRenderData::renderToImage() {
     fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
 }
 
-void BoundingBoxRenderData::_processUpdate() {
-    renderToImage();
-}
-
 void BoundingBoxRenderData::beforeProcessing() {
+    setupRenderData();
     if(!mDataSet) dataSet();
 
     if(!fParentBox || !fParentIsTarget) return;
@@ -114,7 +108,6 @@ void BoundingBoxRenderData::afterProcessing() {
         fMotionBlurTarget->fOtherGlobalRects << fGlobalBoundingRect;
     }
     if(fParentBox && fParentIsTarget) {
-        //qDebug() << fParentBox->prp_getName();
         fParentBox->renderDataFinished(this);
     }
 }

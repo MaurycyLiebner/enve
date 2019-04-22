@@ -97,8 +97,8 @@ public:
                                                parent);
     }
 protected:
-    stdsptr<_HDDTask> createTmpFileDataSaver();
-    stdsptr<_HDDTask> createTmpFileDataLoader();
+    stdsptr<HDDTask> createTmpFileDataSaver();
+    stdsptr<HDDTask> createTmpFileDataLoader();
     int clearMemory();
 
     stdsptr<Samples> mSamples;

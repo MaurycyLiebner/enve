@@ -10,7 +10,7 @@ protected:
 
     void drawSk(SkCanvas * const canvas);
 
-    void transformRenderCanvas(SkCanvas& canvas) const;
+    void transformRenderCanvas(SkCanvas& canvas) const final;
 
     void updateRelBoundingRect();
 };

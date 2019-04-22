@@ -97,25 +97,25 @@ void RangeCacheHandler::clearCache() {
 void RangeCacheHandler::cacheDataBeforeRelFrame(const int &relFrame) {
     const int lastId = idAtOrBeforeRelFrame(relFrame);
     for(int i = 0; i < lastId; i++) {
-        mRenderContainers.at(i)->freeAndRemove_k();
+        mRenderContainers.at(i)->noDataLeft_k();
     }
 }
 
 void RangeCacheHandler::cacheDataAfterRelFrame(const int &relFrame) {
     const int firstId = idAtOrAfterRelFrame(relFrame);
     for(int i = firstId; i < mRenderContainers.count(); i++) {
-        mRenderContainers.at(i)->freeAndRemove_k();
+        mRenderContainers.at(i)->noDataLeft_k();
     }
 }
 
 void RangeCacheHandler::cacheFirstContainer() {
     if(mRenderContainers.isEmpty()) return;
-    mRenderContainers.first()->freeAndRemove_k();
+    mRenderContainers.first()->noDataLeft_k();
 }
 
 void RangeCacheHandler::cacheLastContainer() {
     if(mRenderContainers.isEmpty()) return;
-    mRenderContainers.last()->freeAndRemove_k();
+    mRenderContainers.last()->noDataLeft_k();
 }
 
 int RangeCacheHandler::countAfterRelFrame(const int &relFrame) const {

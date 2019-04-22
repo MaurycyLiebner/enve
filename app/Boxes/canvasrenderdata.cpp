@@ -5,7 +5,7 @@
 CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
     BoxesGroupRenderData(parentBoxT) {}
 
-void CanvasRenderData::renderToImage() {
+void CanvasRenderData::processTask() {
     if(fRenderedToImage) return;
     fRenderedToImage = true;
 

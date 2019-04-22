@@ -12,11 +12,11 @@ SoundCacheContainer::SoundCacheContainer(const stdsptr<Samples>& samples,
     replaceSamples(samples);
 }
 
-stdsptr<_HDDTask> SoundCacheContainer::createTmpFileDataSaver() {
+stdsptr<HDDTask> SoundCacheContainer::createTmpFileDataSaver() {
     return SPtrCreate(SoundContainerTmpFileDataSaver)(mSamples, this);
 }
 
-stdsptr<_HDDTask> SoundCacheContainer::createTmpFileDataLoader() {
+stdsptr<HDDTask> SoundCacheContainer::createTmpFileDataLoader() {
     return SPtrCreate(SoundContainerTmpFileDataLoader)(mTmpFile, this);
 }
 

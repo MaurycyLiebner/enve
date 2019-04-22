@@ -589,7 +589,7 @@ void VideoEncoder::clearContainers() {
     _mContainers.clear();
 }
 
-void VideoEncoder::_processUpdate() {
+void VideoEncoder::processTask() {
     bool encodeVideoT = !_mContainers.isEmpty(); // local encode
     bool encodeAudioT = true; // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {

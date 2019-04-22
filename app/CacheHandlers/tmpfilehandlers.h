@@ -5,14 +5,14 @@
 #include "skia/skiaincludes.h"
 class ImageCacheContainer;
 
-class TmpFileDataSaver : public _HDDTask {
+class TmpFileDataSaver : public HDDTask {
     friend class StdSelfRef;
 protected:
     TmpFileDataSaver() {}
 
     virtual void writeToFile(QIODevice * const file) = 0;
 public:
-    void _processUpdate() {
+    void processTask() {
         mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
         if(mTmpFile->open()) {
             writeToFile(mTmpFile.get());
@@ -25,7 +25,7 @@ protected:
     qsptr<QTemporaryFile> mTmpFile;
 };
 
-class TmpFileDataLoader : public _HDDTask {
+class TmpFileDataLoader : public HDDTask {
     friend class StdSelfRef;
 protected:
     TmpFileDataLoader(const qsptr<QTemporaryFile> &file) :
@@ -33,7 +33,7 @@ protected:
 
     virtual void readFromFile(QIODevice * const file) = 0;
 public:
-    void _processUpdate() {
+    void processTask() {
         if(mTmpFile->open()) {
             readFromFile(mTmpFile.get());
             mTmpFile->close();
@@ -45,13 +45,13 @@ private:
     const qsptr<QTemporaryFile> mTmpFile;
 };
 
-class TmpFileDataDeleter : public _HDDTask {
+class TmpFileDataDeleter : public HDDTask {
     friend class StdSelfRef;
 protected:
     TmpFileDataDeleter(const qsptr<QTemporaryFile> &file) :
         mTmpFile(file) {}
 public:
-    void _processUpdate() {
+    void processTask() {
         mTmpFile.reset();
     }
 private:

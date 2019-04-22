@@ -1,11 +1,9 @@
 #include "hddcachablerangecontainer.h"
 #include "hddcachablecachehandler.h"
 
-int HDDCachableRangeContainer::freeAndRemove_k() {
-    const int bytes = getByteCount();
+void HDDCachableRangeContainer::noDataLeft_k() {
     const auto thisRef = ref<HDDCachableRangeContainer>();
     mParentCacheHandler_k->removeRenderContainer(thisRef);
-    return bytes;
 }
 
 int HDDCachableRangeContainer::getRangeMin() const {

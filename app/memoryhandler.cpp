@@ -63,7 +63,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
     if(memToFree <= 0) return;
     while(memToFree > 0 && !mContainers.isEmpty()) {
         const auto cont = mContainers.takeFirst();
-        memToFree -= cont->freeFromMemory_k();
+        memToFree -= cont->free_RAM_k();
     }
     if(memToFree > 0 || state > LOW_MEMORY_STATE) emit allMemoryUsed();
     emit memoryFreed();

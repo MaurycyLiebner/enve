@@ -12,8 +12,8 @@ protected:
     ImageCacheContainer(const sk_sp<SkImage>& img,
                         const FrameRange &range,
                         HDDCachableCacheHandler * const parent);
-    stdsptr<_HDDTask> createTmpFileDataSaver();
-    stdsptr<_HDDTask> createTmpFileDataLoader();
+    stdsptr<HDDTask> createTmpFileDataSaver();
+    stdsptr<HDDTask> createTmpFileDataLoader();
     int clearMemory();
 public:
     int getByteCount();

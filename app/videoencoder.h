@@ -47,7 +47,7 @@ signals:
     void encodingFailed();
 };
 
-//class FrameEncoder : public _HDDTask {
+//class FrameEncoder : public HDDTask {
 //protected:
 //    FrameEncoder(const stdsptr<ImageCacheContainer>& frame) {
 //        frame->setBlocked(true);
@@ -57,14 +57,14 @@ signals:
 //        mFrame->setBlocked(false);
 //    }
 //public:
-//    void _processUpdate() {
+//    void processTask() {
 
 //    }
 //private:
 //    const stdsptr<ImageCacheContainer> mFrame;
 //};
 
-class VideoEncoder : public _HDDTask {
+class VideoEncoder : public HDDTask {
     friend class StdSelfRef;
 protected:
     VideoEncoder();
@@ -85,7 +85,7 @@ public:
     }
 
     void addContainer(const stdsptr<ImageCacheContainer> &cont);
-    void _processUpdate();
+    void processTask();
     void beforeProcessing();
     void afterProcessing();
 
