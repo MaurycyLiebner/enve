@@ -37,7 +37,7 @@ public:
     bool isScheduled() { return mState == SCHEDULED; }
 
     ~Task() {
-        tellDependentThatFinished();
+        cancelDependent();
     }
 
     bool isActive() { return mState != CREATED && mState != FINISHED; }
@@ -79,6 +79,7 @@ protected:
     State mState = CREATED;
 private:
     void tellDependentThatFinished();
+    void cancelDependent();
 
     int mNDependancies = 0;
     QList<stdptr<Task>> mDependent;

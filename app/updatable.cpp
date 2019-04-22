@@ -16,10 +16,12 @@ void Task::aboutToProcess() {
 
 void Task::finishedProcessing() {
     mState = FINISHED;
-    tellDependentThatFinished();
     afterProcessing();
     if(unhandledException()) {
         gPrintExceptionCritical(handleException());
+        cancelDependent();
+    } else {
+        tellDependentThatFinished();
     }
 }
 
@@ -49,6 +51,13 @@ void Task::incDependencies() {
 void Task::tellDependentThatFinished() {
     for(const auto& dependent : mDependent) {
         if(dependent) dependent->decDependencies();
+    }
+    mDependent.clear();
+}
+
+void Task::cancelDependent() {
+    for(const auto& dependent : mDependent) {
+        if(dependent) dependent->cancel();
     }
     mDependent.clear();
 }
