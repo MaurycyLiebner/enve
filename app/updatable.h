@@ -19,17 +19,17 @@ protected:
     virtual void afterCanceled() {}
 public:
     enum State : char {
-        CANCELED,
         CREATED,
         SCHEDULED,
         QUED,
         PROCESSING,
-        FINISHED
+        FINISHED,
+        CANCELED,
+        FAILED
     };
 
     virtual void processTask() = 0;
     virtual bool needsGpuProcessing() const { return false; }
-    virtual void clear();
     virtual void taskQued() { mState = QUED; }
 
     bool scheduleTask();
@@ -38,7 +38,6 @@ public:
 
     ~Task() {
         tellDependentThatFinished();
-        tellNextDependentThatFinished();
     }
 
     bool isActive() { return mState != CREATED && mState != FINISHED; }
@@ -80,12 +79,10 @@ protected:
     State mState = CREATED;
 private:
     void tellDependentThatFinished();
-    void tellNextDependentThatFinished();
 
     int mNDependancies = 0;
+    QList<stdptr<Task>> mDependent;
     std::exception_ptr mUpdateException;
-    QList<stdptr<Task>> mNextExecutionDependent;
-    QList<stdptr<Task>> mCurrentExecutionDependent;
 };
 
 class CPUTask : public Task {

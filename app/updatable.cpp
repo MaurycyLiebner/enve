@@ -4,7 +4,6 @@
 
 bool Task::scheduleTask() {
     if(mState == SCHEDULED) return false;
-
     mState = SCHEDULED;
     scheduleTaskNow();
     return true;
@@ -12,8 +11,6 @@ bool Task::scheduleTask() {
 
 void Task::aboutToProcess() {
     mState = PROCESSING;
-    mCurrentExecutionDependent = mNextExecutionDependent;
-    mNextExecutionDependent.clear();
     beforeProcessing();
 }
 
@@ -30,17 +27,11 @@ bool Task::readyToBeProcessed() {
     return mNDependancies == 0;
 }
 
-void Task::clear() {
-    mState = CREATED;
-    tellDependentThatFinished();
-    tellNextDependentThatFinished();
-}
-
 void Task::addDependent(Task * const updatable) {
     if(!updatable) return;
     if(mState != FINISHED) {
-        if(mNextExecutionDependent.contains(updatable)) return;
-        mNextExecutionDependent << updatable;
+        if(mDependent.contains(updatable)) return;
+        mDependent << updatable;
         updatable->incDependencies();
     }
 }
@@ -56,17 +47,10 @@ void Task::incDependencies() {
 }
 
 void Task::tellDependentThatFinished() {
-    for(const auto& dependent : mCurrentExecutionDependent) {
+    for(const auto& dependent : mDependent) {
         if(dependent) dependent->decDependencies();
     }
-    mCurrentExecutionDependent.clear();
-}
-
-void Task::tellNextDependentThatFinished() {
-    for(const auto& dependent : mNextExecutionDependent) {
-        if(dependent) dependent->decDependencies();
-    }
-    mNextExecutionDependent.clear();
+    mDependent.clear();
 }
 
 void CPUTask::scheduleTaskNow() {

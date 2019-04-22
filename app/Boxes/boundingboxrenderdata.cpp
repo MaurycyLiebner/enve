@@ -129,11 +129,7 @@ void BoundingBoxRenderData::taskQued() {
 }
 
 void BoundingBoxRenderData::scheduleTaskNow() {
-    if(!fParentBox) {
-        clear();
-        return;
-    }
-    fParentBox->scheduleTask(ref<Task>());
+    if(fParentBox) fParentBox->scheduleTask(ref<Task>());
 }
 
 void BoundingBoxRenderData::dataSet() {
@@ -158,7 +154,7 @@ void BoundingBoxRenderData::setupDirectDraw(const sk_sp<SkImage>& image) {
 
 bool BoundingBoxRenderData::nullifyBeforeProcessing() {
     return fReason != BoundingBox::USER_CHANGE &&
-            fReason != BoundingBox::CHILD_USER_CHANGE;
+           fReason != BoundingBox::CHILD_USER_CHANGE;
 }
 
 void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {
