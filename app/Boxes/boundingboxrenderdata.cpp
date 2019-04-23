@@ -153,8 +153,7 @@ void BoundingBoxRenderData::setupDirectDraw(const sk_sp<SkImage>& image) {
 }
 
 bool BoundingBoxRenderData::nullifyBeforeProcessing() {
-    return fReason != BoundingBox::USER_CHANGE &&
-           fReason != BoundingBox::CHILD_USER_CHANGE;
+    return fReason == BoundingBox::FRAME_CHANGE;
 }
 
 void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {

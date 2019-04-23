@@ -733,6 +733,12 @@ SkPoint randPt(const SkPoint& pt, const float& dev) {
     return randPt(pt, -dev, dev);
 }
 
+SkPoint randPt(const float& dev) {
+    const auto xR = randFloat(-dev, dev);
+    const auto yR = randFloat(-dev, dev);
+    return SkPoint::Make(xR, yR);
+}
+
 void gDisplaceFilterPath(SkPath* const dst,
                          const SkPath& src,
                          const SkScalar &maxDev,
@@ -740,38 +746,41 @@ void gDisplaceFilterPath(SkPath* const dst,
     dst->reset();
     uint32_t seedContourInc = 0;
     SkPath::Iter iter(src, false);
+    SkPath::Iter nextIter(src, false);
+    SkPoint pts[4];
+    SkPoint firstDisp;
+    nextIter.next(pts, true, true);
+    SkPoint prevDisp;
     for(;;) {
-        qCubicSegment2D seg;
-        SkPoint pts[4];
+        const auto nextVerb = nextIter.next(pts, true, true);
+        const auto disp = nextVerb == SkPath::kClose_Verb ?
+                    firstDisp : randPt(maxDev);
         switch(iter.next(pts, true, true)) {
         case SkPath::kLine_Verb: {
-            dst->lineTo(randPt(pts[1], maxDev));
-            continue;
-        }
+            dst->lineTo(pts[1] + disp);
+        } break;
         case SkPath::kQuad_Verb: {
-            dst->quadTo(randPt(pts[1], maxDev), randPt(pts[2], maxDev));
+            dst->quadTo(pts[1] + (prevDisp + disp)*0.5f, pts[2] + disp);
         } break;
         case SkPath::kConic_Verb: {
-            dst->conicTo(randPt(pts[1], maxDev), randPt(pts[2], maxDev),
-                         iter.conicWeight());
+            dst->conicTo(pts[1] + prevDisp, pts[2] + disp, iter.conicWeight());
         } break;
         case SkPath::kCubic_Verb: {
-            dst->cubicTo(randPt(pts[1], maxDev), randPt(pts[2], maxDev),
-                         randPt(pts[3], maxDev));
+            dst->cubicTo(pts[1] + prevDisp, pts[2] + disp, pts[3] + disp);
         } break;
         case SkPath::kClose_Verb: {
             dst->close();
-            continue;
-        }
+        } break;
         case SkPath::kMove_Verb: {
             qsrand(seedAssist + seedContourInc);
             seedContourInc += 100;
-            dst->moveTo(randPt(pts[0], maxDev));
-            continue;
-        }
+            firstDisp = disp;
+            dst->moveTo(pts[0] + disp);
+        } break;
         case SkPath::kDone_Verb:
             return;
         }
+        prevDisp = disp;
     }
 
 }

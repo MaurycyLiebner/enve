@@ -52,7 +52,6 @@ public:
 
     Animator::UpdateReason fReason;
 
-    bool fRedo = false;
     uint fBoxStateId = 0;
 
     bool fRenderedToImage = false;

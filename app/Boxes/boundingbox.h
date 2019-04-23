@@ -404,6 +404,13 @@ public:
     void requestGlobalFillStrokeUpdateIfSelected();
     QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
+
+    void scheduleUpdate(const UpdateReason &reason);
+    void scheduleUpdate(const int& relFrame, const UpdateReason &reason);
+
+    void updateAfterDurationRectangleShifted(const int &dFrame);
+    void updateAfterDurationMinFrameChangedBy(const int &by);
+    void updateAfterDurationMaxFrameChangedBy(const int &by);
 protected:
     void updateCanvasProps() {
         mCanvasProps.clear();
@@ -461,13 +468,6 @@ signals:
     void scheduledUpdate();
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();
-public slots:
-    void scheduleUpdate(const UpdateReason &reason);
-    void scheduleUpdate(const int& relFrame, const UpdateReason &reason);
-
-    void updateAfterDurationRectangleShifted(const int &dFrame);
-    void updateAfterDurationMinFrameChangedBy(const int &by);
-    void updateAfterDurationMaxFrameChangedBy(const int &by);
 };
 
 

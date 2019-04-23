@@ -426,9 +426,6 @@ FrameRange Canvas::prp_getIdenticalRelFrameRange(const int &relFrame) const {
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
-    if(renderData->fRedo) {
-        scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
-    }
     const auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
     auto cont = mCacheHandler.atRelFrame
             <ImageCacheContainer>(range.fMin);

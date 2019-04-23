@@ -410,16 +410,14 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
     if(!shouldScheduleUpdate()) return;
     const auto parentCanvas = getParentCanvas();
     if(!parentCanvas) return;
-    if(!parentCanvas->isPreviewingOrRendering()) cancelWaitingTasks();
+    if(!parentCanvas->isPreviewingOrRendering()) {
+        if(!mScheduledTasks.isEmpty()) return;
+        //cancelWaitingTasks();
+    }
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
     mDrawRenderContainer.setExpired(true);
     auto currentRenderData = getCurrentRenderData(relFrame);
-    if(currentRenderData) {
-        if(currentRenderData->fRedo) return;
-        if(reason != UpdateReason::FRAME_CHANGE)
-            currentRenderData->fRedo = currentRenderData->isQued();
-        return;
-    }
+    if(currentRenderData) return;
     currentRenderData = updateCurrentRenderData(relFrame, reason);
     auto currentReason = currentRenderData->fReason;
     if(reason == USER_CHANGE &&
@@ -430,7 +428,6 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
               currentReason == FRAME_CHANGE) {
         currentRenderData->fReason = reason;
     }
-    currentRenderData->fRedo = false;
     currentRenderData->scheduleTask();
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
@@ -1433,9 +1430,6 @@ QMimeData *BoundingBox::SWT_createMimeData() {
 }
 
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
-    if(renderData->fRedo) {
-        scheduleUpdate(renderData->fRelFrame, Animator::USER_CHANGE);
-    }
     auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
     bool newerSate = true;
     bool closerFrame = true;
