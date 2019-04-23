@@ -80,10 +80,10 @@ void BoundingBoxRenderData::processTask() {
     fBitmapTMP.allocPixels(info);
     fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
 
-    SkCanvas rasterCanvas(fBitmapTMP);
-    transformRenderCanvas(rasterCanvas);
+    SkCanvas canvas(fBitmapTMP);
+    transformRenderCanvas(canvas);
 
-    drawSk(&rasterCanvas);
+    drawSk(&canvas);
 
     if(!fRasterEffects.isEmpty()) {
         for(const auto& effect : fRasterEffects) {

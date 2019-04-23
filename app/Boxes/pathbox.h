@@ -37,8 +37,6 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
     }
 protected:
     void drawSk(SkCanvas * const canvas) {
-        canvas->save();
-
         SkPaint paint;
         paint.setAntiAlias(true);
         paint.setStyle(SkPaint::kFill_Style);
@@ -51,11 +49,7 @@ protected:
         if(!fOutlinePath.isEmpty()) {
             if(fStrokeSettings.fPaintType == PaintType::BRUSHPAINT
                     /*strokeSettings.fStrokeBrush*/) {
-                if(!fStrokeSettings.fStrokeBrush) {
-                    canvas->restore();
-                    return;
-                }
-                canvas->resetMatrix();
+                if(!fStrokeSettings.fStrokeBrush) return;
                 AutoTiledSurface surf;
                 surf.loadBitmap(fBitmapTMP);
 
@@ -101,8 +95,6 @@ protected:
                 canvas->drawPath(fOutlinePath, paint);
             }
         }
-
-        canvas->restore();
     }
 };
 

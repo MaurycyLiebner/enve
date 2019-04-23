@@ -60,7 +60,15 @@ void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
     if(task->readyToBeProcessed()) processNextQuedCPUTask();
 }
 
+bool TaskScheduler::shouldQueMoreCPUTasks() {
+    const int nQues = mQuedCPUTasks.countQues();
+    const int maxQues = mCPUTaskExecutors.count();
+    const bool overflowed = nQues >= maxQues;
+    return !mFreeCPUExecs.isEmpty() && !mCPUQueing && !overflowed;
+}
+
 void TaskScheduler::queScheduledCPUTasks() {
+    if(!shouldQueMoreCPUTasks()) return;
     mCPUQueing = true;
     mQuedCPUTasks.beginQue();
     if(mCurrentCanvas) {
@@ -166,10 +174,7 @@ void TaskScheduler::processNextQuedCPUTask() {
             } else break;
         }
 
-        const int nQues = mQuedCPUTasks.countQues();
-        const int maxQues = mCPUTaskExecutors.count();
-        const bool overflowed = nQues >= maxQues;
-        if(!mFreeCPUExecs.isEmpty() && !mCPUQueing && !overflowed)
+        if(shouldQueMoreCPUTasks())
             callFreeThreadsForCPUTasksAvailableFunc();
     }
 #ifdef QT_DEBUG

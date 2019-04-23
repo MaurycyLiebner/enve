@@ -464,7 +464,7 @@ void Gradient::readProperty(QIODevice *target) {
     int nColors;
     target->read(rcChar(&nColors), sizeof(int));
     for(int i = 0; i < nColors; i++) {
-        auto colorAnim = SPtrCreate(ColorAnimator)();
+        const auto colorAnim = SPtrCreate(ColorAnimator)();
         colorAnim->readProperty(target);
         addColorToList(colorAnim);
     }
@@ -474,6 +474,7 @@ void Gradient::readProperty(QIODevice *target) {
 void BrushSettings::writeProperty(QIODevice * const target) const {
     mWidthCurve->writeProperty(target);
     mPressureCurve->writeProperty(target);
+    mSpacingCurve->writeProperty(target);
     mTimeCurve->writeProperty(target);
     gWrite(target, mBrush ? mBrush->getCollectionName() : "");
     gWrite(target, mBrush ? mBrush->getBrushName() : "");
@@ -482,11 +483,10 @@ void BrushSettings::writeProperty(QIODevice * const target) const {
 void BrushSettings::readProperty(QIODevice * target) {
     mWidthCurve->readProperty(target);
     mPressureCurve->readProperty(target);
+    mSpacingCurve->readProperty(target);
     mTimeCurve->readProperty(target);
-    QString brushCollection;
-    gRead(target, brushCollection);
-    QString brushName;
-    gRead(target, brushName);
+    const QString brushCollection = gReadString(target);
+    const QString brushName = gReadString(target);
     mBrush = BrushSelectionWidget::sGetBrush(brushCollection, brushName);
 }
 

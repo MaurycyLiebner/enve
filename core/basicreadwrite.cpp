@@ -1,24 +1,23 @@
 #include "basicreadwrite.h"
 
-bool gRead(QIODevice* src, QString& targetStr) {
+QString gReadString(QIODevice *src) {
+    QString result;
     uint nChars;
-    bool err = 1 > src->read(rcChar(&nChars),
-                             sizeof(uint));
-    if(err) return false;
+    src->read(rcChar(&nChars), sizeof(uint));
     if(nChars == 0) {
-        targetStr = "";
+        result = "";
     } else {
-        ushort *chars = new ushort[nChars];
-        err = 1 > src->read(rcChar(chars),
-                            nChars*sizeof(ushort));
-        if(err) {
-            targetStr = "";
-        } else {
-            targetStr = QString::fromUtf16(chars, static_cast<int>(nChars));
-        }
+        ushort * const chars = new ushort[nChars];
+        src->read(rcChar(chars), nChars*sizeof(ushort));
+        result = QString::fromUtf16(chars, static_cast<int>(nChars));
         delete[] chars;
     }
-    return err;
+    return result;
+}
+
+bool gRead(QIODevice* src, QString& targetStr) {
+    targetStr = gReadString(src);
+    return true;
 }
 
 bool gWrite(QIODevice* dst, const QString& strToWrite) {
