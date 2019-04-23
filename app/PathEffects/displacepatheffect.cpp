@@ -132,7 +132,9 @@ FrameRange DisplacePathEffect::prp_getIdenticalRelFrameRange(
         } else {
             const int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
             const int min = relFrame - relFrame % frameStep;
-            return {min, min + frameStep};
+            const auto otherRange = PathEffect::prp_getIdenticalRelFrameRange(relFrame);
+            const FrameRange stepRange{min, min + frameStep - 1};
+            return stepRange*otherRange;
         }
     }
     return PathEffect::prp_getIdenticalRelFrameRange(relFrame);
