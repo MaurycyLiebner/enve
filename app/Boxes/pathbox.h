@@ -83,6 +83,7 @@ protected:
                 fBitmapTMP.reset();
                 const int iMargin = qCeil(fEffectsMargin);
                 fBitmapTMP = surf.toBitmap(iMargin);
+
                 fGlobalBoundingRect.translate(-surf.zeroTilePos() -
                                               QPoint(iMargin, iMargin));
                 fGlobalBoundingRect.setSize(QSizeF(fBitmapTMP.width(),

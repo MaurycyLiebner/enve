@@ -163,8 +163,6 @@ void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {
     fScaledTransform = fTransform*fResolutionScale;
     fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
     fixupGlobalBoundingRect();
-    fDrawPos = {qRound(fGlobalBoundingRect.left()),
-                qRound(fGlobalBoundingRect.top())};
 }
 
 void BoundingBoxRenderData::fixupGlobalBoundingRect() {
@@ -182,6 +180,8 @@ void BoundingBoxRenderData::fixupGlobalBoundingRect() {
                           qRound(fGlobalBoundingRect.top()));
     const QPointF transF = fGlobalBoundingRect.topLeft() - roundTL;
     fGlobalBoundingRect.translate(-transF);
+    fDrawPos = {qRound(fGlobalBoundingRect.left()),
+                qRound(fGlobalBoundingRect.top())};
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
