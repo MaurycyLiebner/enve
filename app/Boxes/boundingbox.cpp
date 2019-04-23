@@ -57,6 +57,8 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     connect(mTransformAnimator.get(),
             &BoxTransformAnimator::totalTransformChanged,
             this, &BoundingBox::afterTotalTransformChanged);
+
+    mTransformAnimator->setPivotAutoAdjust(false);
 }
 
 BoundingBox::~BoundingBox() {

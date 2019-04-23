@@ -802,9 +802,9 @@ bool gDisplaceFilterPath(SkPath* const dst,
     uint32_t seedContourInc = 0;
     if(smoothness < 0.001f) {
         do {
-            qsrand(seedAssist + seedContourInc);
+            qsrand(seedAssist + seedContourInc); randFloat();
             seedContourInc += 100;
-            SkScalar length = meas.getLength();
+            const SkScalar length = meas.getLength();
 //            if(segLen * 2 > length) {
 //                meas.getSegment(0, length, dst, true);  // to short for us to mangle
 //                continue;
@@ -820,7 +820,7 @@ bool gDisplaceFilterPath(SkPath* const dst,
             }
 
             if(meas.getPosTan(distance, &p, &v)) {
-                //Perterb(&p, v, randFloat() * scale);
+                Perterb(&p, v, randFloat() * scale);
                 dst->moveTo(p);
                 firstP = p;
             }
