@@ -161,10 +161,6 @@ void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {
     fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fTransform*fResolutionScale;
     fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
-    fixupGlobalBoundingRect();
-}
-
-void BoundingBoxRenderData::fixupGlobalBoundingRect() {
     for(const QRectF &rectT : fOtherGlobalRects) {
         fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
     }
@@ -174,7 +170,10 @@ void BoundingBoxRenderData::fixupGlobalBoundingRect() {
         const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
         fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);
     }
+    fixupGlobalBoundingRect();
+}
 
+void BoundingBoxRenderData::fixupGlobalBoundingRect() {
     const QPointF roundTL(qRound(fGlobalBoundingRect.left()),
                           qRound(fGlobalBoundingRect.top()));
     const QPointF transF = fGlobalBoundingRect.topLeft() - roundTL;

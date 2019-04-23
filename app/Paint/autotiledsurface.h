@@ -108,7 +108,7 @@ struct AutoTiledSurface {
         return mAutoTilesData;
     }
 
-    bool isEmpty() const { mAutoTilesData.isEmpty(); }
+    bool isEmpty() const { return mAutoTilesData.isEmpty(); }
 protected:
     MyPaintTiledSurface fParent;
     MyPaintSurface* fMyPaintSurface = nullptr;

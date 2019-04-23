@@ -93,12 +93,10 @@ void BoolProperty::readProperty(QIODevice *target) {
 }
 
 void BoolPropertyContainer::writeProperty(QIODevice * const target) const {
-    ComplexAnimator::writeProperty(target);
     target->write(rcConstChar(&mValue), sizeof(bool));
 }
 
 void BoolPropertyContainer::readProperty(QIODevice *target) {
-    ComplexAnimator::readProperty(target);
     bool value;
     target->read(rcChar(&value), sizeof(bool));
     setValue(value);
@@ -631,6 +629,7 @@ void DisplacePathEffect::writeProperty(QIODevice * const target) const {
     mMaxDev->writeProperty(target);
     mSmoothness->writeProperty(target);
     mRandomize->writeProperty(target);
+    mLengthBased->writeProperty(target);
     mRandomizeStep->writeProperty(target);
     mSmoothTransform->writeProperty(target);
     mEasing->writeProperty(target);
@@ -644,6 +643,7 @@ void DisplacePathEffect::readProperty(QIODevice *target) {
     mMaxDev->readProperty(target);
     mSmoothness->readProperty(target);
     mRandomize->readProperty(target);
+    mLengthBased->readProperty(target);
     mRandomizeStep->readProperty(target);
     mSmoothTransform->readProperty(target);
     mEasing->readProperty(target);
