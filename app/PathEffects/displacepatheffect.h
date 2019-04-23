@@ -9,8 +9,7 @@ class DisplacePathEffect : public PathEffect {
 protected:
     DisplacePathEffect(const bool &outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
-               const SkPath &src,
+    void apply(const qreal &relFrame, const SkPath &src,
                SkPath * const dst);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
@@ -19,15 +18,17 @@ public:
 private:
     uint32_t mSeedAssist = 0;
 
-    qsptr<QrealAnimator> mSegLength;
     qsptr<QrealAnimator> mMaxDev;
-    qsptr<QrealAnimator> mSmoothness;
     qsptr<BoolPropertyContainer> mRandomize;
+    qsptr<BoolPropertyContainer> mLengthBased;
     qsptr<IntAnimator> mRandomizeStep;
     qsptr<BoolPropertyContainer> mSmoothTransform;
     qsptr<QrealAnimator> mEasing;
     qsptr<IntAnimator> mSeed;
     qsptr<BoolProperty> mRepeat;
+
+    qsptr<QrealAnimator> mSegLength;
+    qsptr<QrealAnimator> mSmoothness;
 };
 
 #endif // DISPLACEPATHEFFECT_H

@@ -52,6 +52,7 @@ TARGET = AniVect
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    Boxes/patheffectsmenu.cpp \
     canvas.cpp \
     canvasmouseinteractions.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
@@ -256,6 +257,7 @@ SOURCES += main.cpp\
     Paint/animatedsurface.cpp
 
 HEADERS  += \
+    Boxes/patheffectsmenu.h \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \

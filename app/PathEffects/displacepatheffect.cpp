@@ -9,6 +9,7 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
     mSmoothness = QrealAnimator::create0to1Animator("smoothness");
     mRandomize = SPtrCreate(BoolPropertyContainer)("randomize");
+    mLengthBased = SPtrCreate(BoolPropertyContainer)("length inc");
     mRandomizeStep = SPtrCreate(IntAnimator)("randomize step");
     mSmoothTransform = SPtrCreate(BoolPropertyContainer)("smooth progression");
     mEasing = QrealAnimator::create0to1Animator("ease in/out");
@@ -29,10 +30,13 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRepeat->setValue(false);
 
     ca_addChildAnimator(mSeed);
-    ca_addChildAnimator(mSegLength);
     ca_addChildAnimator(mMaxDev);
-    ca_addChildAnimator(mSmoothness);
     ca_addChildAnimator(mRandomize);
+    ca_addChildAnimator(mLengthBased);
+
+    mLengthBased->ca_addChildAnimator(mSegLength);
+    mLengthBased->ca_addChildAnimator(mSmoothness);
+    mLengthBased->setValue(false);
 
     mRandomize->ca_addChildAnimator(mRandomizeStep);
     mRandomize->ca_addChildAnimator(mSmoothTransform);
@@ -90,10 +94,18 @@ void DisplacePathEffect::apply(const qreal &relFrame,
 
     if(mSmoothTransform->getValue() && mRandomize->getValue()) {
         SkPath path1;
-        gDisplaceFilterPath(&path1, src, maxDev, segLen, smooth, mSeedAssist);
+        if(mLengthBased->getValue()) {
+            gDisplaceFilterPath(&path1, src, maxDev, segLen, smooth, mSeedAssist);
+        } else {
+            gDisplaceFilterPath(&path1, src, maxDev, mSeedAssist);
+        }
         SkPath path2;
         qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
-        gDisplaceFilterPath(&path2, src, maxDev, segLen, smooth, nextSeed);
+        if(mLengthBased->getValue()) {
+            gDisplaceFilterPath(&path2, src, maxDev, segLen, smooth, nextSeed);
+        } else {
+            gDisplaceFilterPath(&path2, src, maxDev, nextSeed);
+        }
         qreal weight = qAbs(qFloor(relFrame) % randStep)*1./randStep;
         const qreal easing = mEasing->getEffectiveValue(relFrame);
         if(easing > 0.0001) {
@@ -104,7 +116,11 @@ void DisplacePathEffect::apply(const qreal &relFrame,
         }
         path1.interpolate(path2, toSkScalar(weight), dst);
     } else {
-        gDisplaceFilterPath(dst, src, maxDev, segLen, smooth, mSeedAssist);
+        if(mLengthBased->getValue()) {
+            gDisplaceFilterPath(dst, src, maxDev, segLen, smooth, mSeedAssist);
+        } else {
+            gDisplaceFilterPath(dst, src, maxDev, mSeedAssist);
+        }
     }
 }
 

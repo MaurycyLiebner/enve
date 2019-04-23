@@ -186,8 +186,6 @@ public:
     void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData *renderData);
 
-    void addActionsToMenu(BoxTypeMenu * const menu);
-
     void duplicateStrokeSettingsFrom(
             OutlineSettingsAnimator * const strokeSettings);
     void duplicateFillSettingsFrom(
@@ -219,7 +217,7 @@ public:
     PathEffectAnimators *getOutlinePathEffectsAnimators() {
         return mOutlinePathEffectsAnimators.data();
     }
-    void copyPathBoxDataTo(PathBox *targetBox);
+    void copyPathBoxDataTo(PathBox * const targetBox);
 
     bool differenceInPathBetweenFrames(
             const int& frame1, const int& frame2) const;
@@ -257,16 +255,6 @@ protected:
 
     qsptr<FillSettingsAnimator> mFillSettings;
     qsptr<OutlineSettingsAnimator> mStrokeSettings;
-private:
-    template<typename T, typename U>
-    void addPathEffectActionToMenu(const QString& text,
-                                   BoxTypeMenu * const menu,
-                                   const U& adder,
-                                   const bool& outline);
-    template <typename U>
-    void addPathEffectsActionToMenu(BoxTypeMenu * const menu,
-                                    const U& adder,
-                                    const bool& outline);
 };
 
 #endif // PATHBOX_H

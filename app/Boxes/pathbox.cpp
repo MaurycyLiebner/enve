@@ -337,7 +337,6 @@ SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame) {
     return path;
 }
 
-
 void PathBox::getMotionBlurProperties(QList<Property*> &list) const {
     BoundingBox::getMotionBlurProperties(list);
     list.append(mPathEffectsAnimators.get());
@@ -451,7 +450,7 @@ void PathBox::setStrokeColorMode(const ColorMode &colorMode) {
     mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
 
-void PathBox::copyPathBoxDataTo(PathBox *targetBox) {
+void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     PathBox::writeBoundingBox(&buffer);
@@ -585,54 +584,6 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
     mCurrentOutlinePathOutdated = false;
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);
 //    updateDialog_TEST();
-}
-
-#include "typemenu.h"
-#include "PathEffects/patheffectsinclude.h"
-
-template <typename T, typename U>
-void PathBox::addPathEffectActionToMenu(
-        const QString& text,
-        BoxTypeMenu * const menu,
-        const U& adder,
-        const bool& outline) {
-    menu->addPlainAction<PathBox>(text, [adder, outline](PathBox * box) {
-        (box->*adder)(SPtrCreateTemplated(T)(outline));
-    });
-}
-
-template <typename U>
-void PathBox::addPathEffectsActionToMenu(BoxTypeMenu * const menu,
-                                         const U &adder,
-                                         const bool &outline) {
-    addPathEffectActionToMenu<DisplacePathEffect>(
-                "Displace", menu, adder, outline);
-    addPathEffectActionToMenu<DuplicatePathEffect>(
-                "Duplicate", menu, adder, outline);
-    addPathEffectActionToMenu<LengthPathEffect>(
-                "Length", menu, adder, outline);
-    addPathEffectActionToMenu<SolidifyPathEffect>(
-                "Solidify", menu, adder, outline);
-    addPathEffectActionToMenu<OperationPathEffect>(
-                "Operation", menu, adder, outline);
-    addPathEffectActionToMenu<SumPathEffect>(
-                "Sum", menu, adder, outline);
-}
-
-void PathBox::addActionsToMenu(BoxTypeMenu * const menu) {
-    const auto pathEffectsMenu = menu->addMenu("Path Effects");
-    addPathEffectsActionToMenu(pathEffectsMenu,
-                               &PathBox::addPathEffect, false);
-
-    const auto fillPathEffectsMenu = menu->addMenu("Fill Effects");
-    addPathEffectsActionToMenu(fillPathEffectsMenu,
-                               &PathBox::addFillPathEffect, false);
-
-    const auto outlinePathEffectsMenu = menu->addMenu("Outline Effects");
-    addPathEffectsActionToMenu(outlinePathEffectsMenu,
-                               &PathBox::addOutlinePathEffect, true);
-
-    BoundingBox::addActionsToMenu(menu);
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) const {

@@ -593,8 +593,14 @@ void addEffectAction(const QString& text,
     };
     menu->addPlainAction(text, op);
 }
-
+#include "patheffectsmenu.h"
 void BoundingBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    menu->addSeparator();
+
+    PathEffectsMenu::addPathEffectsToActionMenu(menu);
+
+    menu->addSeparator();
+
     const auto effectsMenu = menu->addMenu("Effects");
     addEffectAction<BlurEffect>("Blur", effectsMenu);
     addEffectAction<SampledMotionBlurEffect>("Motion Blur", effectsMenu);
@@ -614,6 +620,8 @@ void BoundingBox::addActionsToMenu(BoxTypeMenu * const menu) {
         };
         gpuEffectsMenu->addPlainAction(creator->fName, op);
     }
+
+    menu->addSeparator();
 }
 
 

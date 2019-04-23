@@ -719,6 +719,63 @@ float randFloat() {
     return static_cast<float>(gRandF(-1, 1));
 }
 
+float randFloat(const float& min, const float& max) {
+    return static_cast<float>(gRandF(min, max));
+}
+
+SkPoint randPt(const SkPoint& pt, const float& min, const float& max) {
+    const auto xR = randFloat(min, max);
+    const auto yR = randFloat(min, max);
+    return SkPoint::Make(pt.x() + xR, pt.y() + yR);
+}
+
+SkPoint randPt(const SkPoint& pt, const float& dev) {
+    return randPt(pt, -dev, dev);
+}
+
+void gDisplaceFilterPath(SkPath* const dst,
+                         const SkPath& src,
+                         const SkScalar &maxDev,
+                         const uint32_t &seedAssist) {
+    dst->reset();
+    uint32_t seedContourInc = 0;
+    SkPath::Iter iter(src, false);
+    for(;;) {
+        qCubicSegment2D seg;
+        SkPoint pts[4];
+        switch(iter.next(pts, true, true)) {
+        case SkPath::kLine_Verb: {
+            dst->lineTo(randPt(pts[1], maxDev));
+            continue;
+        }
+        case SkPath::kQuad_Verb: {
+            dst->quadTo(randPt(pts[1], maxDev), randPt(pts[2], maxDev));
+        } break;
+        case SkPath::kConic_Verb: {
+            dst->conicTo(randPt(pts[1], maxDev), randPt(pts[2], maxDev),
+                         iter.conicWeight());
+        } break;
+        case SkPath::kCubic_Verb: {
+            dst->cubicTo(randPt(pts[1], maxDev), randPt(pts[2], maxDev),
+                         randPt(pts[3], maxDev));
+        } break;
+        case SkPath::kClose_Verb: {
+            dst->close();
+            continue;
+        }
+        case SkPath::kMove_Verb: {
+            qsrand(seedAssist + seedContourInc);
+            seedContourInc += 100;
+            dst->moveTo(randPt(pts[0], maxDev));
+            continue;
+        }
+        case SkPath::kDone_Verb:
+            return;
+        }
+    }
+
+}
+
 bool gDisplaceFilterPath(SkPath* const dst,
                          const SkPath& src,
                          const SkScalar &maxDev,
@@ -733,7 +790,7 @@ bool gDisplaceFilterPath(SkPath* const dst,
     SkPoint p;
     SkVector v;
 
-    uint32_t seedContourInc = 0;;
+    uint32_t seedContourInc = 0;
     if(smoothness < 0.001f) {
         do {
             qsrand(seedAssist + seedContourInc);
