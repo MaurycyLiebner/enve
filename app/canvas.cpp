@@ -240,7 +240,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->drawRect(viewRect, paint);
             canvas->concat(toSkMatrix(mCanvasTransform));
             for(const auto& box : mContainedBoxes) {
-                box->drawPixmapSk(canvas, grContext);
+                if(box->isVisibleAndInVisibleDurationRect())
+                    box->drawPixmapSk(canvas, grContext);
             }
             canvas->restore();
         }

@@ -735,6 +735,19 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 canvas->addSelectedBoxesActions(canvasMenu);
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();
+                const auto animTarget = GetAsPtr(target, Animator);
+                if(animTarget->anim_getKeyOnCurrentFrame()) {
+                    menu.addAction("Add Key")->setDisabled(true);
+                    menu.addAction("Delete Key", [animTarget]() {
+                        animTarget->anim_deleteCurrentKey();
+                    });
+                } else {
+                    menu.addAction("Add Key", [animTarget]() {
+                        animTarget->anim_saveCurrentValueAsKey();
+                    });
+                    menu.addAction("Delete Key")->setDisabled(true);
+                }
+                menu.addSeparator();
                 if(target->SWT_isPixmapEffect() || target->SWT_isPathEffect()) {
                     menu.addSeparator();
                     menu.addAction("Delete Effect", [target]() {
@@ -760,19 +773,18 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         }
                     });
                 } else if(target->SWT_isQrealAnimator()) {
-                    if(GetAsPtr(target, QrealAnimator)->hasNoise()) {
+                    const auto qrealTarget = GetAsPtr(target, QrealAnimator);
+                    if(qrealTarget->hasNoise()) {
                         menu.addSeparator();
-                        menu.addAction("Remove Noise", [target]() {
-                            const auto qrealTarget = GetAsPtr(target, QrealAnimator);
+                        menu.addAction("Remove Noise", [qrealTarget]() {
                             qrealTarget->setGenerator(nullptr);
                         });
                     } else {
                         menu.addSeparator();
-                        menu.addAction("Add Noise", [target]() {
-                            const auto qrealTarget = GetAsPtr(target, QrealAnimator);
+                        menu.addAction("Add Noise", [qrealTarget]() {
                             const auto randGen = SPtrCreate(RandomQrealGenerator)(0, 9999);
                             const auto updater = GetAsSPtr(qrealTarget->prp_getUpdater(),
-                                                     PropertyUpdater);
+                                                           PropertyUpdater);
                             randGen->prp_setOwnUpdater(updater);
                             qrealTarget->setGenerator(randGen);
                         });

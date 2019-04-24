@@ -69,7 +69,7 @@ void applyShadow(const SkBitmap &bitmap,
     shadowCanvas.drawBitmap(bitmap, 0, 0, &paint);
     shadowCanvas.flush();
 
-    if(opacity > 1.) {
+    if(opacity > 1) {
         RasterEffects::applyBlur(shadowBitmap, scale,
                   blurRadius, highQuality,
                   hasKeys, opacity);

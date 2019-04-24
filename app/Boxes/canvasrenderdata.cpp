@@ -11,10 +11,9 @@ void CanvasRenderData::processTask() {
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(
                 qCeil(fCanvasWidth), qCeil(fCanvasHeight));
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    bitmap.eraseColor(fBgColor);
-    SkCanvas rasterCanvas(bitmap);
+    fBitmapTMP.allocPixels(info);
+    fBitmapTMP.eraseColor(fBgColor);
+    SkCanvas rasterCanvas(fBitmapTMP);
     //rasterCanvas->clear(bgColor);
 
     drawSk(&rasterCanvas);
@@ -22,12 +21,12 @@ void CanvasRenderData::processTask() {
 
     if(!fRasterEffects.isEmpty()) {
         for(const auto& effect : fRasterEffects) {
-            effect->applyEffectsSk(bitmap, fResolution);
+            effect->applyEffectsSk(fBitmapTMP, fResolution);
         }
         clearPixmapEffects();
     }
 
-    fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
+    fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
 }
 
 void CanvasRenderData::drawSk(SkCanvas * const canvas) {

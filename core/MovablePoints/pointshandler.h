@@ -84,6 +84,10 @@ public:
         mPts.move(from, to);
     }
 
+    BasicTransformAnimator * transform() const {
+        return mTrans;
+    }
+
     void setTransform(BasicTransformAnimator * const trans) {
         if(trans == mTrans) return;
         for(const auto& pt : mPts) pt->setTransform(trans);

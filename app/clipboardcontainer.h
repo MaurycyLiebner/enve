@@ -35,7 +35,7 @@ private:
 class BoxesClipboardContainer : public ClipboardContainer {
     friend class StdSelfRef;
 public:
-    void pasteTo(BoxesGroup *parent);
+    void pasteTo(BoxesGroup * const parent);
 protected:
     BoxesClipboardContainer();
 private:

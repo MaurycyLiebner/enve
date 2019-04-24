@@ -534,7 +534,8 @@ void BoxesGroup::drawPixmapSk(SkCanvas * const canvas,
         canvas->saveLayer(nullptr, &paint);
         for(const auto& box : mContainedBoxes) {
             //box->draw(p);
-            box->drawPixmapSk(canvas, grContext);
+            if(box->isVisibleAndInVisibleDurationRect())
+                box->drawPixmapSk(canvas, grContext);
         }
         canvas->restore();
     }

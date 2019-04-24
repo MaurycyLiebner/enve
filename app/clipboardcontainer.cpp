@@ -25,13 +25,23 @@ QByteArray *ClipboardContainer::getBytesArray() {
 
 BoxesClipboardContainer::BoxesClipboardContainer() :
     ClipboardContainer(CCT_BOXES) {}
-
-void BoxesClipboardContainer::pasteTo(BoxesGroup* parent) {
+#include "canvas.h"
+void BoxesClipboardContainer::pasteTo(BoxesGroup* const parent) {
+    const int oldCount = parent->getContainedBoxesCount();
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
     parent->readChildBoxes(&target);
     target.close();
     BoundingBox::sClearReadBoxes();
+    const int newCount = parent->getContainedBoxesCount();
+    const auto parentCanvas = parent->getParentCanvas();
+    if(parentCanvas) {
+        const auto& list = parent->getContainedBoxesList();
+        for(int i = oldCount; i < newCount; i++) {
+            const auto& box = list.at(i);
+            parentCanvas->addBoxToSelection(box.get());
+        }
+    }
 }
 
 KeysClipboardContainer::KeysClipboardContainer() :

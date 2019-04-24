@@ -144,9 +144,9 @@ void BoundingBoxRenderData::dataSet() {
 }
 
 void BoundingBoxRenderData::setupDirectDraw(const sk_sp<SkImage>& image) {
-    fRenderTransform = fTransform;
     updateRelBoundingRect();
     updateGlobalFromRelBoundingRect();
+    fRenderTransform = fScaledTransform;
     fRenderTransform.translate(-fDrawPos.x(), -fDrawPos.y());
     fRenderedImage = image;
     fRenderedToImage = true;

@@ -303,7 +303,7 @@ void Canvas::handleLeftButtonMousePress() {
     grabMouseAndTrack();
 
     mDoubleClick = false;
-    mMovesToSkip = 2;
+    //mMovesToSkip = 2;
     mFirstMouseMove = true;
 
     mLastPressPosRel = mLastMouseEventPosRel;

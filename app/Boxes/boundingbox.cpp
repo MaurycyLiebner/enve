@@ -222,24 +222,19 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
 
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                GrContext * const grContext) {
-    if(isVisibleAndInVisibleDurationRect() &&
-        mTransformAnimator->getOpacity() > 0.001) {
-        canvas->save();
-
-        SkPaint paint;
-        const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
-        paint.setAlpha(static_cast<U8CPU>(intAlpha));
-        paint.setBlendMode(mBlendModeSk);
-        //paint.setFilterQuality(kHigh_SkFilterQuality);
-        drawPixmapSk(canvas, &paint, grContext);
-        canvas->restore();
-    }
+    if(mTransformAnimator->getOpacity() < 0.001) return;
+    SkPaint paint;
+    const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
+    paint.setAlpha(static_cast<U8CPU>(intAlpha));
+    paint.setBlendMode(mBlendModeSk);
+    //paint.setFilterQuality(kHigh_SkFilterQuality);
+    drawPixmapSk(canvas, &paint, grContext);
 }
 
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                SkPaint * const paint,
                                GrContext* const grContext) {
-    if(mTransformAnimator->getOpacity() < 0.001) { return; }
+    if(mTransformAnimator->getOpacity() < 0.001) return;
     //paint->setFilterQuality(kHigh_SkFilterQuality);
     mDrawRenderContainer.drawSk(canvas, paint, grContext);
 }
@@ -372,7 +367,6 @@ QPointF BoundingBox::getPivotAbsPos() {
 
 void BoundingBox::select() {
     mSelected = true;
-
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_SELECTED);
 }
 
@@ -396,10 +390,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 
 bool BoundingBox::shouldScheduleUpdate() {
     if(!mParentGroup) return false;
-    if(isVisibleAndInVisibleDurationRect() ||
-       isRelFrameInVisibleDurationRect(anim_getCurrentRelFrame())) {
-        return true;
-    }
+    if(isVisibleAndInVisibleDurationRect()) return true;
     return false;
 }
 
@@ -1290,14 +1281,14 @@ void BoundingBox::setVisibile(const bool &visible) {
 
     prp_updateInfluenceRangeAfterChanged();
 
-    scheduleUpdate(Animator::USER_CHANGE);
+    if(mVisible) scheduleUpdate(Animator::USER_CHANGE);
+    else if(mParentGroup) mParentGroup->scheduleUpdate(Animator::CHILD_USER_CHANGE);
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_VISIBLE);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_HIDDEN);
-    for(BoundingBox* box : mLinkingBoxes) {
-        if(box->isParentLinkBox()) {
+    for(const auto&  box : mLinkingBoxes) {
+        if(box->isParentLinkBox())
             box->setVisibile(visible);
-        }
     }
 }
 
