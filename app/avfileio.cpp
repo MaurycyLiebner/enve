@@ -1051,6 +1051,8 @@ void BoxesGroup::readBoundingBox(QIODevice *target) {
 
 void Canvas::writeBoundingBox(QIODevice *target) {
     BoxesGroup::writeBoundingBox(target);
+    const int currFrame = getCurrentFrame();
+    target->write(rcConstChar(&currFrame), sizeof(int));
     target->write(rcConstChar(&mClipToCanvasSize), sizeof(bool));
     target->write(rcConstChar(&mWidth), sizeof(int));
     target->write(rcConstChar(&mHeight), sizeof(int));
@@ -1064,6 +1066,8 @@ void Canvas::writeBoundingBox(QIODevice *target) {
 void Canvas::readBoundingBox(QIODevice *target) {
     target->read(rcChar(&mType), sizeof(BoundingBoxType));
     BoxesGroup::readBoundingBox(target);
+    int currFrame;
+    target->read(rcChar(&currFrame), sizeof(int));
     target->read(rcChar(&mClipToCanvasSize), sizeof(bool));
     target->read(rcChar(&mWidth), sizeof(int));
     target->read(rcChar(&mHeight), sizeof(int));
@@ -1073,6 +1077,7 @@ void Canvas::readBoundingBox(QIODevice *target) {
     target->read(rcChar(&mCanvasTransform), sizeof(QMatrix));
     mVisibleHeight = mCanvasTransform.m22()*mHeight;
     mVisibleWidth = mCanvasTransform.m11()*mWidth;
+    anim_setAbsFrame(currFrame);
 }
 
 void GradientWidget::writeGradients(QIODevice *target) {

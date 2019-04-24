@@ -72,7 +72,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
 
     ca_removeChildAnimator(mTransformAnimator);
 
-    anim_setAbsFrame(0);
+    //anim_setAbsFrame(0);
 
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);

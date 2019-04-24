@@ -404,8 +404,9 @@ void BoundingBox::scheduleUpdate(const int &relFrame,
     const auto parentCanvas = getParentCanvas();
     if(!parentCanvas) return;
     if(!parentCanvas->isPreviewingOrRendering()) {
-        if(!mScheduledTasks.isEmpty()) return;
-        //cancelWaitingTasks();
+        if(!mScheduledTasks.isEmpty() &&
+            reason != UpdateReason::FRAME_CHANGE) return;
+        cancelWaitingTasks();
     }
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
     mDrawRenderContainer.setExpired(true);

@@ -395,8 +395,6 @@ public:
 
     int getMaxFrame();
 
-    void beforeCurrentFrameRender();
-    void afterCurrentFrameRender();
     //void updatePixmaps();
     RenderCacheHandler& getCacheHandler() {
         return mCacheHandler;
