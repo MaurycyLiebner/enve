@@ -129,7 +129,7 @@ void BoundingBoxRenderData::taskQued() {
 }
 
 void BoundingBoxRenderData::scheduleTaskNow() {
-    if(fParentBox) fParentBox->scheduleTask(ref<Task>());
+    if(fParentBox) fParentBox->scheduleTask(ref<BoundingBoxRenderData>());
 }
 
 void BoundingBoxRenderData::afterCanceled() {

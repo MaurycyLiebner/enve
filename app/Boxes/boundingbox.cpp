@@ -1267,7 +1267,7 @@ void BoundingBox::selectAllCanvasPts(QList<stdptr<MovablePoint> > &selection,
     }
 }
 
-void BoundingBox::scheduleTask(const stdsptr<Task>& task) {
+void BoundingBox::scheduleTask(const stdsptr<BoundingBoxRenderData>& task) {
     mScheduledTasks << task;
 }
 

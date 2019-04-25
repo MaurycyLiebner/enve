@@ -387,7 +387,7 @@ public:
     void nullifyCurrentRenderData(const int& relFrame);
     void updateDrawRenderContainerTransform();
 
-    void scheduleTask(const stdsptr<Task> &task);
+    void scheduleTask(const stdsptr<BoundingBoxRenderData> &task);
 
     void addLinkingBox(BoundingBox *box);
     void removeLinkingBox(BoundingBox *box);
@@ -454,7 +454,7 @@ protected:
     const qsptr<EffectAnimators> mEffectsAnimators;
     const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
 
-    QList<stdsptr<Task>> mScheduledTasks;
+    QList<stdsptr<BoundingBoxRenderData>> mScheduledTasks;
     QList<qptr<Property>> mCanvasProps;
 private:
     void updateRelBoundingRectFromRenderData(
