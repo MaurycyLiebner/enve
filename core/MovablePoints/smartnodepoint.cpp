@@ -525,6 +525,7 @@ void SmartNodePoint::c2Moved(const QPointF &c2) {
 }
 
 void SmartNodePoint::updateFromNodeDataPosOnly() {
+    if(!mNode_d) return;
     if(mNode_d->isNormal()) {
         mC0Pt->NonAnimatedMovablePoint::setRelativePos(mNode_d->c0());
         NonAnimatedMovablePoint::setRelativePos(mNode_d->p1());
