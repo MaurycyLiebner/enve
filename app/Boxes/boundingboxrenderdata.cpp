@@ -132,6 +132,11 @@ void BoundingBoxRenderData::scheduleTaskNow() {
     if(fParentBox) fParentBox->scheduleTask(ref<Task>());
 }
 
+void BoundingBoxRenderData::afterCanceled() {
+    if(fRefInParent && fParentBox)
+        fParentBox->nullifyCurrentRenderData(fRelFrame);
+}
+
 void BoundingBoxRenderData::dataSet() {
     if(mDataSet) return;
     mDataSet = true;

@@ -55,6 +55,7 @@ public:
 
     void cancel() {
         mState = CANCELED;
+        cancelDependent();
         afterCanceled();
     }
 

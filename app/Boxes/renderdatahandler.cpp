@@ -7,7 +7,7 @@ bool RenderDataHandler::removeItem(const stdsptr<BoundingBoxRenderData>& item) {
 bool RenderDataHandler::removeItemAtRelFrame(const int &frame) {
     int id;
     if(getItemIdAtRelFrame(frame, &id)) {
-        mItems.removeAt(id);
+        mItems.takeAt(id)->fRefInParent = false;
         return true;
     }
     return false;
@@ -17,15 +17,16 @@ BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int &frame) {
     int id;
     if(getItemIdAtRelFrame(frame, &id)) {
         const auto item = mItems.at(id).get();
-        if(item->getState() == Task::CANCELED) mItems.removeAt(id);
-        else return item;
+        return item;
     }
     return nullptr;
 }
 
-void RenderDataHandler::addItemAtRelFrame(const stdsptr<BoundingBoxRenderData>& item) {
+void RenderDataHandler::addItemAtRelFrame(
+        const stdsptr<BoundingBoxRenderData>& item) {
     const int itemId = getItemInsertIdAtRelFrame(item->fRelFrame);
     mItems.insert(itemId, item);
+    item->fRefInParent = true;
 }
 
 int RenderDataHandler::getItemInsertIdAtRelFrame(const int &relFrame) {

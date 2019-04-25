@@ -18,8 +18,8 @@ struct BoundingBoxRenderData : public Task {
 protected:
     BoundingBoxRenderData(BoundingBox *parentBoxT);
 
-    virtual void setupRenderData() {}
     virtual void drawSk(SkCanvas * const canvas) = 0;
+    virtual void setupRenderData() {}
     virtual void transformRenderCanvas(SkCanvas& canvas) const {
         canvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
                          toSkScalar(-fGlobalBoundingRect.top()));
@@ -29,6 +29,7 @@ protected:
     virtual void updateRelBoundingRect();
 
     void scheduleTaskNow() final;
+    void afterCanceled();
 public:
     virtual QPointF getCenterPosition() {
         return fRelBoundingRect.center();
@@ -84,6 +85,7 @@ public:
     bool fMaxBoundsEnabled = true;
 
     bool fParentIsTarget = true;
+    bool fRefInParent = false;
     qptr<BoundingBox> fParentBox;
     sk_sp<SkImage> fRenderedImage;
     SkBitmap fBitmapTMP;

@@ -406,7 +406,6 @@ public:
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
 
     void scheduleUpdate(const UpdateReason &reason);
-    void scheduleUpdate(const int& relFrame, const UpdateReason &reason);
 
     void updateAfterDurationRectangleShifted(const int &dFrame);
     void updateAfterDurationMinFrameChangedBy(const int &by);

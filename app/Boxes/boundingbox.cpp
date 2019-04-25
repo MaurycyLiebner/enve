@@ -261,19 +261,19 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::anim_setAbsFrame(const int &frame) {
-    const int lastRelFrame = anim_getCurrentRelFrame();
+    const int oldRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
-    const bool isInVisRange = isRelFrameInVisibleDurationRect(
-                anim_getCurrentRelFrame());
+    const int newRelFrame = anim_getCurrentRelFrame();
+
+    const bool isInVisRange = isRelFrameInVisibleDurationRect(newRelFrame);
     if(mInVisibleRange != isInVisRange) {
-        if(mInVisibleRange) {
-            if(mParentGroup) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
-        } else {
-            scheduleUpdate(Animator::FRAME_CHANGE);
-        }
         mInVisibleRange = isInVisRange;
-    }
-    if(prp_differencesBetweenRelFrames(lastRelFrame, anim_getCurrentRelFrame())) {
+        if(mInVisibleRange) {
+            scheduleUpdate(Animator::FRAME_CHANGE);
+        } else {
+            if(mParentGroup) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
+        }
+    } else if(prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame)) {
         scheduleUpdate(Animator::FRAME_CHANGE);
     }
 }
@@ -394,22 +394,18 @@ bool BoundingBox::shouldScheduleUpdate() {
     return false;
 }
 
-void BoundingBox::scheduleUpdate(const UpdateReason &reason) {
-    scheduleUpdate(anim_getCurrentRelFrame(), reason);
-}
-
-void BoundingBox::scheduleUpdate(const int &relFrame,
-                                 const UpdateReason& reason) {
+void BoundingBox::scheduleUpdate(const UpdateReason& reason) {
     if(!shouldScheduleUpdate()) return;
     const auto parentCanvas = getParentCanvas();
     if(!parentCanvas) return;
     if(!parentCanvas->isPreviewingOrRendering()) {
         if(!mScheduledTasks.isEmpty() &&
             reason != UpdateReason::FRAME_CHANGE) return;
-        cancelWaitingTasks();
+        //cancelWaitingTasks();
     }
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
     mDrawRenderContainer.setExpired(true);
+    const int relFrame = anim_getCurrentRelFrame();
     auto currentRenderData = getCurrentRenderData(relFrame);
     if(currentRenderData) return;
     currentRenderData = updateCurrentRenderData(relFrame, reason);
@@ -971,11 +967,13 @@ bool BoundingBox::hasDurationRectangle() const {
 
 void BoundingBox::createDurationRectangle() {
     const auto durRect = SPtrCreate(DurationRectangle)(this);
-    durRect->setMinFrame(0);
-    const auto parentCanvas = getParentCanvas();
-    if(parentCanvas) {
-        durRect->setFramesDuration(getParentCanvas()->getFrameCount());
-    }
+//    durRect->setMinFrame(0);
+//    const auto parentCanvas = getParentCanvas();
+//    if(parentCanvas) {
+//        durRect->setFramesDuration(getParentCanvas()->getFrameCount());
+//    }
+    durRect->setMinFrame(anim_getCurrentRelFrame() - 5);
+    durRect->setFramesDuration(10);
     setDurationRectangle(durRect);
 }
 
@@ -1096,7 +1094,7 @@ const QString &BoundingBox::getName() const {
 }
 
 bool BoundingBox::isVisibleAndInVisibleDurationRect() const {
-    return isRelFrameInVisibleDurationRect(anim_getCurrentRelFrame()) && mVisible;
+    return mInVisibleRange && mVisible;
 }
 
 bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
@@ -1125,8 +1123,7 @@ FrameRange BoundingBox::prp_getIdenticalRelFrameRange(const int &relFrame) const
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
             return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
-        }
-        if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+        } else if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
             return {mDurationRectangle->getMaxFrameAsRelFrame() + 1,
                         FrameRange::EMAX};
         } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
@@ -1172,8 +1169,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
 }
 
 void BoundingBox::cancelWaitingTasks() {
-    for(const auto &task : mScheduledTasks)
-        task->cancel();
+    for(const auto &task : mScheduledTasks) task->cancel();
     mScheduledTasks.clear();
 }
 
