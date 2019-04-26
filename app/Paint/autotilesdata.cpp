@@ -49,22 +49,10 @@ void AutoTilesData::loadBitmap(const SkBitmap &src) {
                 const uint8_t * srcLine = srcP + (y*src.width() + x0)*4;
                 uint16_t* dstLine = tileP + (y - y0)*TILE_SIZE*4;
                 for(int x = x0; x < maxX; x++) {
-                    uint32_t r = *srcLine++;
-                    uint32_t g = *srcLine++;
-                    uint32_t b = *srcLine++;
-                    uint32_t a = *srcLine++;
-
-                    // convert to fixed point (with rounding)
-                    r = (r * (1<<15) + 255/2) / 255;
-                    g = (g * (1<<15) + 255/2) / 255;
-                    b = (b * (1<<15) + 255/2) / 255;
-                    a = (a * (1<<15) + 255/2) / 255;
-
-                    // premultiply alpha (with rounding), save back
-                    *dstLine++ = (r * a + (1<<15)/2) / (1<<15);
-                    *dstLine++ = (g * a + (1<<15)/2) / (1<<15);
-                    *dstLine++ = (b * a + (1<<15)/2) / (1<<15);
-                    *dstLine++ = a;
+                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
+                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
+                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
+                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
                 }
             }
             colRows << tileP;
