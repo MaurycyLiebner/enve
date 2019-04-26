@@ -6,10 +6,10 @@ StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path) {
 }
 
 void StrokeWidthUpdater::update() {
-    mTarget->scheduleUpdate(Animator::USER_CHANGE);
+    mTarget->planScheduleUpdate(Animator::USER_CHANGE);
     mTarget->setOutlinePathOutdated();
 }
 
 void StrokeWidthUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate(Animator::FRAME_CHANGE);
+    mTarget->planScheduleUpdate(Animator::FRAME_CHANGE);
 }

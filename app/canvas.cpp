@@ -479,7 +479,7 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     auto rangeT = prp_getIdenticalRelFrameRange(anim_getCurrentRelFrame());
     auto cont = mCacheHandler.atRelFrame(anim_getCurrentRelFrame());
     if(cont) cont->setRange(rangeT);
-    if(range.overlaps(rangeT)) scheduleUpdate(Animator::USER_CHANGE);
+    if(range.overlaps(rangeT)) planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 qsptr<BoundingBox> Canvas::createLink() {
@@ -768,7 +768,7 @@ void Canvas::anim_setAbsFrame(const int &frame) {
         if(difference) {
             mCurrentPreviewContainerOutdated = true;
         }
-        if(difference) scheduleUpdate(Animator::FRAME_CHANGE);
+        if(difference) planScheduleUpdate(Animator::FRAME_CHANGE);
     }
 
     for(const auto &box : mContainedBoxes) {

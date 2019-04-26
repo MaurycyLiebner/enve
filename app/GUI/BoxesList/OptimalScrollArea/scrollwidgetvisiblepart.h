@@ -62,10 +62,10 @@ protected:
             scheduleContentUpdateIfSearchNotEmpty();
         };
         mUpdateFuncs.fUpdateParentHeight = [this]() {
-            scheduleUpdateParentHeight();
+            planScheduleUpdateParentHeight();
         };
         mUpdateFuncs.fUpdateVisibleWidgetsContent = [this]() {
-            scheduleUpdateVisibleWidgetsContent();
+            planScheduleUpdateVisibleWidgetsContent();
         };
     }
 

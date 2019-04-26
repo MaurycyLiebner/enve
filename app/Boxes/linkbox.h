@@ -56,7 +56,7 @@ public:
             connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                     this, &BoundingBox::prp_updateAfterChangedRelFrameRange);
         }
-        scheduleUpdate(Animator::USER_CHANGE);
+        planScheduleUpdate(Animator::USER_CHANGE);
         connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
                 this, &InternalLinkBox::setTargetSlot);
     }

@@ -232,7 +232,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
     updateDropTarget();
     if(mCurrentlyDragged.isValid() && mDropTarget.isValid()) {
         if(mDropTarget.drop(mCurrentlyDragged)) {
-            scheduleUpdateVisibleWidgetsContent();
+            planScheduleUpdateVisibleWidgetsContent();
             MainWindow::getInstance()->queScheduledTasksAndUpdate();
         } else update();
     }

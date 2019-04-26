@@ -43,7 +43,7 @@ void TextBox::setFont(const QFont &font) {
     mFont = font;
     setPathsOutdated();
     prp_updateInfluenceRangeAfterChanged();
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void TextBox::setSelectedFontSize(const qreal &size) {

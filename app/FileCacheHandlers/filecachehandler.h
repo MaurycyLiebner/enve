@@ -20,7 +20,7 @@ public:
         return mFilePath;
     }
 
-    void scheduleUpdateForAllDependent();
+    void planScheduleUpdateForAllDependent();
     void addDependentBox(BoundingBox * const dependent);
     void removeDependentBox(BoundingBox * const dependent);
 

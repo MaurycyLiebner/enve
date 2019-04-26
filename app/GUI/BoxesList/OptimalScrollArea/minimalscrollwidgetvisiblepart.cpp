@@ -65,11 +65,11 @@ void MinimalScrollWidgetVisiblePart::removeInstance(
 }
 
 void MinimalScrollWidgetVisiblePart::scheduleContentUpdate() {
-    scheduleUpdateParentHeight();
-    scheduleUpdateVisibleWidgetsContent();
+    planScheduleUpdateParentHeight();
+    planScheduleUpdateVisibleWidgetsContent();
 }
 
-void MinimalScrollWidgetVisiblePart::scheduleUpdateVisibleWidgetsContent() {
+void MinimalScrollWidgetVisiblePart::planScheduleUpdateVisibleWidgetsContent() {
     mVisibleWidgetsContentUpdateScheduled = true;
 }
 
@@ -80,7 +80,7 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgetsContentIfNeeded() {
     }
 }
 
-void MinimalScrollWidgetVisiblePart::scheduleUpdateParentHeight() {
+void MinimalScrollWidgetVisiblePart::planScheduleUpdateParentHeight() {
     mParentHeightUpdateScheduled = true;
 }
 

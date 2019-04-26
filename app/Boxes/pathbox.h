@@ -128,7 +128,7 @@ public:
     void setStrokeBrush(SimpleBrushWrapper * const brush) {
         mStrokeSettings->setStrokeBrush(brush);
         prp_updateInfluenceRangeAfterChanged();
-        scheduleUpdate(Animator::USER_CHANGE);
+        planScheduleUpdate(Animator::USER_CHANGE);
     }
     void setStrokeBrushWidthCurve(
             const qCubicSegment1D& curve) {

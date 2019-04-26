@@ -51,7 +51,7 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
 
 void ParticleBox::anim_setAbsFrame(const int &frame) {
     BoundingBox::anim_setAbsFrame(frame);
-    scheduleUpdate(Animator::FRAME_CHANGE);
+    planScheduleUpdate(Animator::FRAME_CHANGE);
 }
 
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) const {
@@ -71,13 +71,13 @@ bool ParticleBox::relPointInsidePath(const QPointF &relPos) const {
 void ParticleBox::addEmitter(const qsptr<ParticleEmitter>& emitter) {
     mEmitters << emitter;
     ca_addChildAnimator(emitter);
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void ParticleBox::removeEmitter(const qsptr<ParticleEmitter>& emitter) {
     mEmitters.removeOne(emitter);
     ca_removeChildAnimator(emitter);
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 FrameRange ParticleBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
@@ -358,7 +358,7 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
 void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
     mParentBox_k->prp_updateInfluenceRangeAfterChanged();
-    mParentBox_k->scheduleUpdate(Animator::USER_CHANGE);
+    mParentBox_k->planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void ParticleEmitter::setMinFrame(const int &minFrame) {

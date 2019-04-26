@@ -16,7 +16,7 @@ ExternalLinkBox::ExternalLinkBox() : BoxesGroup() {
 void ExternalLinkBox::reload() {
 
 
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void ExternalLinkBox::changeSrc(QWidget* dialogParent) {

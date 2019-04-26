@@ -34,7 +34,7 @@ public:
                          BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
     void setParentGroup(BoxesGroup * const parent);
-    bool shouldScheduleUpdate();
+    bool shouldPlanScheduleUpdate();
 
     FixedLenAnimationRect *getAnimationDurationRect();
     void updateDurationRectangleAnimationRange();

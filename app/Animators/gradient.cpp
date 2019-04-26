@@ -130,7 +130,7 @@ void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
     }
     for(const auto& path : mAffectedPaths) {
         path->updateDrawGradients();
-        path->scheduleUpdate(reason);
+        path->planScheduleUpdate(reason);
     }
 }
 

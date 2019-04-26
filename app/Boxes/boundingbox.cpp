@@ -75,7 +75,7 @@ BoundingBox *BoundingBox::sGetBoxByDocumentId(const int &documentId) {
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     Property::prp_updateAfterChangedAbsFrameRange(range);
     if(range.inRange(anim_getCurrentAbsFrame())) {
-        scheduleUpdate(Animator::USER_CHANGE);
+        planScheduleUpdate(Animator::USER_CHANGE);
     }
 }
 
@@ -179,7 +179,7 @@ void BoundingBox::reloadCacheHandler() { prp_updateInfluenceRangeAfterChanged();
 bool BoundingBox::SWT_isBoundingBox() const { return true; }
 
 void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
-    scheduleUpdate(reason);
+    planScheduleUpdate(reason);
 }
 
 void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
@@ -269,12 +269,12 @@ void BoundingBox::anim_setAbsFrame(const int &frame) {
     if(mInVisibleRange != isInVisRange) {
         mInVisibleRange = isInVisRange;
         if(mInVisibleRange) {
-            scheduleUpdate(Animator::FRAME_CHANGE);
+            planScheduleUpdate(Animator::FRAME_CHANGE);
         } else {
-            if(mParentGroup) mParentGroup->scheduleUpdate(Animator::FRAME_CHANGE);
+            if(mParentGroup) mParentGroup->planScheduleUpdate(Animator::FRAME_CHANGE);
         }
     } else if(prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame)) {
-        scheduleUpdate(Animator::FRAME_CHANGE);
+        planScheduleUpdate(Animator::FRAME_CHANGE);
     }
 }
 
@@ -332,7 +332,7 @@ void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
 
 void BoundingBox::afterTotalTransformChanged(const UpdateReason &reason) {
     updateDrawRenderContainerTransform();
-    scheduleUpdate(reason);
+    planScheduleUpdate(reason);
     requestGlobalPivotUpdateIfSelected();
 }
 
@@ -388,44 +388,41 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
     updateRelBoundingRectFromRenderData(renderData);
 }
 
-bool BoundingBox::shouldScheduleUpdate() {
+bool BoundingBox::shouldPlanScheduleUpdate() {
     if(!mParentGroup) return false;
     if(isVisibleAndInVisibleDurationRect()) return true;
     return false;
 }
 
-void BoundingBox::scheduleUpdate(const UpdateReason& reason) {
-    if(!shouldScheduleUpdate()) return;
-    const auto parentCanvas = getParentCanvas();
-    if(!parentCanvas) return;
-    if(!parentCanvas->isPreviewingOrRendering()) {
-        if(!mScheduledTasks.isEmpty() &&
-            reason != UpdateReason::FRAME_CHANGE) return;
-        //cancelWaitingTasks();
+void BoundingBox::planScheduleUpdate(const UpdateReason& reason) {
+    if(!shouldPlanScheduleUpdate()) return;
+    if(mParentGroup) {
+        mParentGroup->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
     }
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
     mDrawRenderContainer.setExpired(true);
+    if(mSchedulePlanned) {
+        mPlannedReason = qMax(reason, mPlannedReason);
+        return;
+    }
+    mSchedulePlanned = true;
+    mPlannedReason = reason;
+
+    const auto parentCanvas = getParentCanvas();
+    if(!parentCanvas) return;
+    if(parentCanvas->isPreviewingOrRendering()) {
+        scheduleUpdate();
+    }
+}
+
+void BoundingBox::scheduleUpdate() {
+    if(!mSchedulePlanned) return;
+    mSchedulePlanned = false;
     const int relFrame = anim_getCurrentRelFrame();
     auto currentRenderData = getCurrentRenderData(relFrame);
     if(currentRenderData) return;
-    currentRenderData = updateCurrentRenderData(relFrame, reason);
-    auto currentReason = currentRenderData->fReason;
-    if(reason == USER_CHANGE &&
-            (currentReason == CHILD_USER_CHANGE ||
-             currentReason == FRAME_CHANGE)) {
-        currentRenderData->fReason = reason;
-    } else if(reason == CHILD_USER_CHANGE &&
-              currentReason == FRAME_CHANGE) {
-        currentRenderData->fReason = reason;
-    }
+    currentRenderData = updateCurrentRenderData(relFrame, mPlannedReason);
     currentRenderData->scheduleTask();
-
-    //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
-
-    if(mParentGroup) {
-        mParentGroup->scheduleUpdate(reason == USER_CHANGE ?
-                                         CHILD_USER_CHANGE : reason);
-    }
 
     emit scheduledUpdate();
 }
@@ -1174,6 +1171,7 @@ void BoundingBox::cancelWaitingTasks() {
 }
 
 void BoundingBox::scheduleWaitingTasks() {
+    scheduleUpdate();
     for(const auto &task : mScheduledTasks)
         task->taskQued();
 }
@@ -1278,8 +1276,8 @@ void BoundingBox::setVisibile(const bool &visible) {
 
     prp_updateInfluenceRangeAfterChanged();
 
-    if(mVisible) scheduleUpdate(Animator::USER_CHANGE);
-    else if(mParentGroup) mParentGroup->scheduleUpdate(Animator::CHILD_USER_CHANGE);
+    if(mVisible) planScheduleUpdate(Animator::USER_CHANGE);
+    else if(mParentGroup) mParentGroup->planScheduleUpdate(Animator::CHILD_USER_CHANGE);
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_VISIBLE);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_HIDDEN);

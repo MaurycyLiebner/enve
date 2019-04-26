@@ -6,6 +6,6 @@ AnimationBoxFrameUpdater::AnimationBoxFrameUpdater(AnimationBox *target) {
 }
 
 void AnimationBoxFrameUpdater::update() {
-    mTarget->scheduleUpdate(Animator::USER_CHANGE);
+    mTarget->planScheduleUpdate(Animator::USER_CHANGE);
     mTarget->updateDurationRectangleAnimationRange();
 }

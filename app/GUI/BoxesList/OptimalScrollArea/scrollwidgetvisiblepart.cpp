@@ -63,8 +63,8 @@ void ScrollWidgetVisiblePart::setCurrentSearchText(
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
         const SWT_BoxRule &rule) {
     if(isCurrentRule(rule)) {
-        scheduleUpdateParentHeight();
-        scheduleUpdateVisibleWidgetsContent();
+        planScheduleUpdateParentHeight();
+        planScheduleUpdateVisibleWidgetsContent();
     }
 }
 
@@ -73,15 +73,15 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
         const SWT_Target &target) {
     if(mCurrentRulesCollection.fTarget == target) {
         static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
-        scheduleUpdateParentHeight();
-        scheduleUpdateVisibleWidgetsContent();
+        planScheduleUpdateParentHeight();
+        planScheduleUpdateVisibleWidgetsContent();
     }
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
     if(mCurrentRulesCollection.fSearchString.isEmpty()) return;
-    scheduleUpdateParentHeight();
-    scheduleUpdateVisibleWidgetsContent();
+    planScheduleUpdateParentHeight();
+    planScheduleUpdateVisibleWidgetsContent();
 }
 
 bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_BoxRule &rule) {
@@ -125,7 +125,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 void ScrollWidgetVisiblePart::setMainAbstraction(
         SingleWidgetAbstraction* abs) {
     mMainAbstraction = abs;
-    scheduleUpdateVisibleWidgetsContent();
+    planScheduleUpdateVisibleWidgetsContent();
 //    if(!abs) return;
 //    abs->setContentVisible(true);
 //    updateVisibleWidgetsContent();

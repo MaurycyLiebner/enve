@@ -45,7 +45,7 @@ void AnimationBox::reloadCacheHandler() {
     prp_updateInfluenceRangeAfterChanged();
 
     //mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void AnimationBox::setParentGroup(BoxesGroup * const parent) {
@@ -53,9 +53,9 @@ void AnimationBox::setParentGroup(BoxesGroup * const parent) {
     updateDurationRectangleAnimationRange();
 }
 
-bool AnimationBox::shouldScheduleUpdate() {
+bool AnimationBox::shouldPlanScheduleUpdate() {
     if(!mSrcFramesCache || !mParentGroup) return false;
-    return BoundingBox::shouldScheduleUpdate();
+    return BoundingBox::shouldPlanScheduleUpdate();
 }
 
 int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
@@ -100,7 +100,7 @@ void AnimationBox::enableFrameRemapping() {
     mFrameRemappingEnabled = true;
     ca_prependChildAnimator(mEffectsAnimators.get(), mFrameAnimator);
     prp_updateInfluenceRangeAfterChanged();
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void AnimationBox::disableFrameRemapping() {
@@ -110,7 +110,7 @@ void AnimationBox::disableFrameRemapping() {
     mFrameAnimator->anim_setRecordingValue(false);
     ca_removeChildAnimator(mFrameAnimator);
     prp_updateInfluenceRangeAfterChanged();
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void AnimationBox::reload() {
@@ -124,9 +124,9 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
     mNewCurrentFrameUpdateNeeded = true;
 
     //if(!mWaitingForSchedulerToBeProcessed) {
-        //scheduleUpdate();
+        //planScheduleUpdate();
     //} else {
-        scheduleUpdate(Animator::FRAME_CHANGE);
+        planScheduleUpdate(Animator::FRAME_CHANGE);
     //}
 }
 

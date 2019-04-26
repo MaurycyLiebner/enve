@@ -197,7 +197,7 @@ void BoxesGroup::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
     for(const auto& box : mContainedBoxes) {
         if(box->SWT_isPathBox()) {
             GetAsPtr(box, PathBox)->setPathsOutdated();
-            box->scheduleUpdate(reason);
+            box->planScheduleUpdate(reason);
         } else if(box->SWT_isBoxesGroup()) {
             GetAsPtr(box, BoxesGroup)->updateAllChildPathBoxes(reason);
         }
@@ -283,7 +283,7 @@ void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {
     for(const auto &child : mContainedBoxes) {
         child->updateAllBoxes(reason);
     }
-    scheduleUpdate(reason);
+    planScheduleUpdate(reason);
 }
 
 QRectF BoxesGroup::getRelBoundingRect(const qreal &relFrame) {
@@ -573,7 +573,7 @@ bool BoxesGroup::SWT_isBoxesGroup() const { return true; }
 
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
-    if(!bT) scheduleUpdate(Animator::USER_CHANGE);
+    if(!bT) planScheduleUpdate(Animator::USER_CHANGE);
     if(!mParentGroup) return;
     mParentGroup->setDescendantCurrentGroup(bT);
 }
@@ -803,7 +803,7 @@ void BoxesGroup::moveContainedBoxInList(BoundingBox * const child,
     mContainedBoxes.move(from, to);
     updateContainedBoxIds(qMin(from, to), qMax(from, to));
     SWT_moveChildAbstractionForTargetToInAll(child, boxIdToAbstractionId(to));
-    scheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(Animator::USER_CHANGE);
 
     prp_updateInfluenceRangeAfterChanged();
 }

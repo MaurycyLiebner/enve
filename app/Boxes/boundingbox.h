@@ -227,7 +227,7 @@ public:
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int &relFrame, const bool &takeAncestorsIntoAccount = true);
 
-    virtual bool shouldScheduleUpdate();
+    virtual bool shouldPlanScheduleUpdate();
     virtual void scheduleWaitingTasks();
     virtual void queScheduledTasks();
 
@@ -405,7 +405,7 @@ public:
     QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
     QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
 
-    void scheduleUpdate(const UpdateReason &reason);
+    void planScheduleUpdate(const UpdateReason &reason);
 
     void updateAfterDurationRectangleShifted(const int &dFrame);
     void updateAfterDurationMinFrameChangedBy(const int &by);
@@ -454,9 +454,12 @@ protected:
     const qsptr<EffectAnimators> mEffectsAnimators;
     const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
 
+    bool mSchedulePlanned = false;
+    UpdateReason mPlannedReason;
     QList<stdsptr<BoundingBoxRenderData>> mScheduledTasks;
     QList<qptr<Property>> mCanvasProps;
 private:
+    void scheduleUpdate();
     void updateRelBoundingRectFromRenderData(
             BoundingBoxRenderData * const renderData);
     FrameRange getVisibleAbsFrameRange() const;
