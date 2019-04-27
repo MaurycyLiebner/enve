@@ -247,7 +247,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
             auto container = getSelectedKeysClipboardContainer();
             int lowestKey = FrameRange::EMAX;
             for(const auto& anim : mSelectedKeysAnimators) {
-                int animLowest = anim->getLowestAbsFrameForSelectedKey();
+                const int animLowest = anim->getLowestAbsFrameForSelectedKey();
                 if(animLowest < lowestKey) {
                     lowestKey = animLowest;
                 }
@@ -283,12 +283,8 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
             for(const auto& anim : mSelectedKeysAnimators) {
                 anim->incSelectedKeysFrame(-1);
             }
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
+        } else return false;
+    } else return false;
     return true;
 }
 
@@ -567,12 +563,14 @@ void KeysView::handleMouseMove(const QPoint &pos,
 
                     if(dDFrame != 0) {
                         mMoveDFrame = dFrame;
-                        if(mLastPressedDurationRectangleMovable->isDurationRect()) {
-                            canvasWindow->moveDurationRectForAllSelected(dDFrame);
-                        } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
-                            canvasWindow->moveMaxFrameForAllSelected(dDFrame);
-                        } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
-                            canvasWindow->moveMinFrameForAllSelected(dDFrame);
+                        if(mLastPressedDurationRectangleMovable) {
+                            if(mLastPressedDurationRectangleMovable->isDurationRect()) {
+                                canvasWindow->moveDurationRectForAllSelected(dDFrame);
+                            } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
+                                canvasWindow->moveMaxFrameForAllSelected(dDFrame);
+                            } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
+                                canvasWindow->moveMinFrameForAllSelected(dDFrame);
+                            }
                         }
 //                        mLastPressedDurationRectangleMovable->changeFramePosBy(
 //                                    dDFrame);

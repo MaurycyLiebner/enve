@@ -308,7 +308,7 @@ QRectF BoxesGroup::getRelBoundingRect(const qreal &relFrame) {
 
 bool BoxesGroup::diffsAffectingContainedBoxes(
         const int &relFrame1, const int &relFrame2) {
-    const auto idRange = BoundingBox::prp_getIdenticalRelFrameRange(relFrame1);
+    const auto idRange = BoundingBox::prp_getIdenticalRelRange(relFrame1);
     const bool diffThis = !idRange.inRange(relFrame2);
     if(mParentGroup == nullptr || diffThis) return diffThis;
     const int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
@@ -322,12 +322,12 @@ bool BoxesGroup::diffsAffectingContainedBoxes(
     return diffThis || diffInherited;
 }
 
-FrameRange BoxesGroup::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    auto range = BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
+FrameRange BoxesGroup::prp_getIdenticalRelRange(const int &relFrame) const {
+    auto range = BoundingBox::prp_getIdenticalRelRange(relFrame);
     const int absFrame = prp_relFrameToAbsFrame(relFrame);
     for(const auto &child : mContainedBoxes) {
         if(range.isUnary()) return range;
-        auto childRange = child->prp_getIdenticalRelFrameRange(
+        auto childRange = child->prp_getIdenticalRelRange(
                     child->prp_absFrameToRelFrame(absFrame));
         auto childAbsRange = child->prp_relRangeToAbsRange(childRange);
         auto childParentRange = prp_absRangeToRelRange(childAbsRange);
@@ -346,7 +346,7 @@ FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
             getMotionBlurProperties(propertiesT);
             for(const auto& child : propertiesT) {
                 if(range.isUnary()) return range;
-                auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
+                auto childRange = child->prp_getIdenticalRelRange(relFrame);
                 range *= childRange;
             }
 

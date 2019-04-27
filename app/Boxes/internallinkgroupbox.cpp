@@ -28,12 +28,12 @@ void InternalLinkGroupBox::readBoundingBox(QIODevice *target) {
 //    return mLinkTarget->relPointInsidePath(point);
 //}
 
-FrameRange InternalLinkGroupBox::prp_getIdenticalRelFrameRange(
+FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
         const int &relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            range *= BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
+            range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheRight();
@@ -43,7 +43,7 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelFrameRange(
         }
     }
     if(!getLinkTarget()) return range;
-    auto targetRange = getLinkTarget()->prp_getIdenticalRelFrameRange(relFrame);
+    auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
 
     return range*targetRange;
 }

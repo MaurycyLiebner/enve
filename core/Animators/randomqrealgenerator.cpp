@@ -40,9 +40,9 @@ void RandomQrealGenerator::anim_setAbsFrame(const int &frame) {
     anim_callFrameChangeUpdater();
 }
 
-FrameRange RandomQrealGenerator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
+FrameRange RandomQrealGenerator::prp_getIdenticalRelRange(const int &relFrame) const {
     if(mMaxDev->getEffectiveValue(relFrame) < 0.001) {
-        return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
+        return ComplexAnimator::prp_getIdenticalRelRange(relFrame);
     }
     return {relFrame, relFrame};
 }

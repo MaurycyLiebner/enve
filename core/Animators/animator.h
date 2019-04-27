@@ -70,7 +70,7 @@ public:
     bool SWT_isAnimator() const;
     void prp_startDragging();
     void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 protected:
     virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
         Q_UNUSED(key);

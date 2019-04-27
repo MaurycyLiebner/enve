@@ -295,7 +295,7 @@ public:
 
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 public slots:

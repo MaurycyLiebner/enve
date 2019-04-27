@@ -272,6 +272,12 @@ int Animator::getInsertIdForKeyRelFrame(
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     if(!anim_mIsRecording) anim_mIsRecording = true;
     const int insertId = getInsertIdForKeyRelFrame(newKey->getRelFrame());
+    if(insertId < anim_mKeys.count()) {
+        const auto& currKey = anim_mKeys.at(insertId);
+        const int currRelFrame = currKey->getRelFrame();
+        if(currRelFrame == newKey->getRelFrame())
+            anim_removeKey(currKey);
+    }
     anim_mKeys.insert(insertId, newKey);
     //anim_sortKeys();
     //mergeKeysIfNeeded();
@@ -464,7 +470,7 @@ int Animator::anim_getCurrentRelFrame() const {
     return anim_mCurrentRelFrame;
 }
 
-FrameRange Animator::prp_getIdenticalRelFrameRange(const int &relFrame) const {
+FrameRange Animator::prp_getIdenticalRelRange(const int &relFrame) const {
     if(anim_mKeys.isEmpty()) return {FrameRange::EMIN, FrameRange::EMAX};
     const auto pn = anim_getPrevAndNextKeyIdForRelFrame(relFrame);
     const int prevId = pn.first;

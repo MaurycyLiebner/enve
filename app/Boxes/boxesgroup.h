@@ -80,7 +80,7 @@ public:
                          BoundingBoxRenderData * const data);
     void addActionsToMenu(BoxTypeMenu * const menu);
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int &relFrame, const bool &takeAncestorsIntoAccount = true);
     void scheduleWaitingTasks();

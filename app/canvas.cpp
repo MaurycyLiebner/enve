@@ -420,14 +420,14 @@ void Canvas::setLoadingPreviewContainer(
     mLoadingPreviewContainer->setBlocked(true);
 }
 
-FrameRange Canvas::prp_getIdenticalRelFrameRange(const int &relFrame) const {
-    const auto groupRange = BoxesGroup::prp_getIdenticalRelFrameRange(relFrame);
+FrameRange Canvas::prp_getIdenticalRelRange(const int &relFrame) const {
+    const auto groupRange = BoxesGroup::prp_getIdenticalRelRange(relFrame);
     //FrameRange canvasRange{0, mMaxFrame};
     return groupRange;//*canvasRange;
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
-    const auto range = prp_getIdenticalRelFrameRange(renderData->fRelFrame);
+    const auto range = prp_getIdenticalRelRange(renderData->fRelFrame);
     auto cont = mCacheHandler.atRelFrame
             <ImageCacheContainer>(range.fMin);
     if(cont) {
@@ -476,7 +476,7 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
     mCacheHandler.clearRelRange(
                 prp_absRangeToRelRange(range));
     Property::prp_updateAfterChangedAbsFrameRange(range);
-    auto rangeT = prp_getIdenticalRelFrameRange(anim_getCurrentRelFrame());
+    auto rangeT = prp_getIdenticalRelRange(anim_getCurrentRelFrame());
     auto cont = mCacheHandler.atRelFrame(anim_getCurrentRelFrame());
     if(cont) cont->setRange(rangeT);
     if(range.overlaps(rangeT)) planScheduleUpdate(Animator::USER_CHANGE);

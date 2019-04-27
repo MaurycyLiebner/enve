@@ -42,7 +42,7 @@ public:
 
     void prp_afterFrameShiftChanged();
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     void anim_saveCurrentValueAsKey();
     bool anim_isDescendantRecording() const;
     virtual void ca_removeAllChildAnimators();

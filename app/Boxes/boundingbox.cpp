@@ -265,15 +265,7 @@ void BoundingBox::anim_setAbsFrame(const int &frame) {
     ComplexAnimator::anim_setAbsFrame(frame);
     const int newRelFrame = anim_getCurrentRelFrame();
 
-    const bool isInVisRange = isRelFrameInVisibleDurationRect(newRelFrame);
-    if(mInVisibleRange != isInVisRange) {
-        mInVisibleRange = isInVisRange;
-        if(mInVisibleRange) {
-            planScheduleUpdate(Animator::FRAME_CHANGE);
-        } else {
-            if(mParentGroup) mParentGroup->planScheduleUpdate(Animator::FRAME_CHANGE);
-        }
-    } else if(prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame)) {
+    if(prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame)) {
         planScheduleUpdate(Animator::FRAME_CHANGE);
     }
 }
@@ -1116,17 +1108,20 @@ bool BoundingBox::isRelFrameFVisibleAndInVisibleDurationRect(
     return isRelFrameFInVisibleDurationRect(relFrame) && mVisible;
 }
 
-FrameRange BoundingBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
+FrameRange BoundingBox::prp_getIdenticalRelRange(const int &relFrame) const {
     if(mVisible) {
-        if(isRelFrameInVisibleDurationRect(relFrame)) {
-            return ComplexAnimator::prp_getIdenticalRelFrameRange(relFrame);
-        } else if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-            return {mDurationRectangle->getMaxFrameAsRelFrame() + 1,
-                        FrameRange::EMAX};
-        } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
-            return {FrameRange::EMIN,
-                    mDurationRectangle->getMinFrameAsRelFrame() - 1};
+        const auto cRange = ComplexAnimator::prp_getIdenticalRelRange(relFrame);
+        if(mDurationRectangle) {
+            const auto dRange = mDurationRectangle->getRelFrameRange();
+            if(relFrame > dRange.fMax) {
+                return {mDurationRectangle->getMaxFrameAsRelFrame() + 1,
+                            FrameRange::EMAX};
+            } else if(relFrame < dRange.fMin) {
+                return {FrameRange::EMIN,
+                        mDurationRectangle->getMinFrameAsRelFrame() - 1};
+            } else return cRange*dRange;
         }
+        return cRange;
     }
     return {FrameRange::EMIN, FrameRange::EMAX};
 }
@@ -1141,7 +1136,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
             getMotionBlurProperties(propertiesT);
             for(const auto& child : propertiesT) {
                 if(range.isUnary()) break;
-                auto childRange = child->prp_getIdenticalRelFrameRange(relFrame);
+                auto childRange = child->prp_getIdenticalRelRange(relFrame);
                 range *= childRange;
             }
 

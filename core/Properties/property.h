@@ -125,7 +125,7 @@ public:
     virtual void prp_setParentFrameShift(const int &shift,
                                          ComplexAnimator* parentAnimator = nullptr);
     virtual void prp_afterFrameShiftChanged() {}
-    virtual FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const {
+    virtual FrameRange prp_getIdenticalRelRange(const int &relFrame) const {
         Q_UNUSED(relFrame);
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
@@ -168,7 +168,7 @@ public:
 
     bool prp_differencesBetweenRelFrames(const int &frame1,
                                          const int &frame2) const {
-        return !prp_getIdenticalRelFrameRange(frame1).inRange(frame2);
+        return !prp_getIdenticalRelRange(frame1).inRange(frame2);
     }
 
     PropertyUpdater *prp_getUpdater() const {

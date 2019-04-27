@@ -457,7 +457,7 @@ public:
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     void setPickingFromPath(const bool &pickFill,
                             const bool &pickStroke) {
         mPickFillFromPath = pickFill;

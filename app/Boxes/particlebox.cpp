@@ -80,11 +80,11 @@ void ParticleBox::removeEmitter(const qsptr<ParticleEmitter>& emitter) {
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-FrameRange ParticleBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
+FrameRange ParticleBox::prp_getIdenticalRelRange(const int &relFrame) const {
     if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
         return {relFrame, relFrame};
     }
-    return BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
+    return BoundingBox::prp_getIdenticalRelRange(relFrame);
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {

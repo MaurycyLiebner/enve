@@ -86,9 +86,9 @@ FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int
     return boxRange;
 }
 
-FrameRange SampledMotionBlurEffect::prp_getIdenticalRelFrameRange(const int &relFrame) const {
+FrameRange SampledMotionBlurEffect::prp_getIdenticalRelRange(const int &relFrame) const {
     auto boxRange = getParentBoxFirstLastMarginAjusted(relFrame);
-    auto effectRange = PixmapEffect::prp_getIdenticalRelFrameRange(relFrame);
+    auto effectRange = PixmapEffect::prp_getIdenticalRelRange(relFrame);
     return boxRange*effectRange;
 }
 

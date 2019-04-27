@@ -83,7 +83,7 @@ public:
         this->anim_appendKey(newKey);
     }
 
-    //FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    //FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 
     void writeProperty(QIODevice * const target) const {
         int nKeys = this->anim_mKeys.count();
@@ -104,6 +104,12 @@ public:
         }
         gRead(target, mCurrentValue);
         afterValueChanged();
+    }
+
+    stdsptr<Key> readKey(QIODevice *target) {
+        auto newKey = SPtrCreateTemplated(K)(this);
+        newKey->readKey(target);
+        return std::move(newKey);
     }
 protected:
     virtual T getValueAtRelFrameK(const qreal &frame,

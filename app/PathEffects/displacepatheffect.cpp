@@ -124,7 +124,7 @@ void DisplacePathEffect::apply(const qreal &relFrame,
     }
 }
 
-FrameRange DisplacePathEffect::prp_getIdenticalRelFrameRange(
+FrameRange DisplacePathEffect::prp_getIdenticalRelRange(
         const int &relFrame) const {
     if(mRandomize->getValue()) {
         if(mSmoothTransform->getValue()) {
@@ -132,10 +132,10 @@ FrameRange DisplacePathEffect::prp_getIdenticalRelFrameRange(
         } else {
             const int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
             const int min = relFrame - relFrame % frameStep;
-            const auto otherRange = PathEffect::prp_getIdenticalRelFrameRange(relFrame);
+            const auto otherRange = PathEffect::prp_getIdenticalRelRange(relFrame);
             const FrameRange stepRange{min, min + frameStep - 1};
             return stepRange*otherRange;
         }
     }
-    return PathEffect::prp_getIdenticalRelFrameRange(relFrame);
+    return PathEffect::prp_getIdenticalRelRange(relFrame);
 }

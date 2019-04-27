@@ -102,11 +102,11 @@ bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) co
             getLinkTarget()->isRelFrameFInVisibleDurationRect(relFrame);
 }
 
-FrameRange InternalLinkBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
+FrameRange InternalLinkBox::prp_getIdenticalRelRange(const int &relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            range *= BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
+            range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheRight();
@@ -115,7 +115,7 @@ FrameRange InternalLinkBox::prp_getIdenticalRelFrameRange(const int &relFrame) c
             }
         }
     }
-    auto targetRange = getLinkTarget()->prp_getIdenticalRelFrameRange(relFrame);
+    auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
 
     return range*targetRange;
 }

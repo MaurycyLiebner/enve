@@ -28,7 +28,7 @@ public:
         mParentBox = box;
     }
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal &relFrame, BoundingBoxRenderData * const data);

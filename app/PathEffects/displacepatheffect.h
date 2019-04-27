@@ -14,7 +14,7 @@ public:
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 private:
     uint32_t mSeedAssist = 0;
 

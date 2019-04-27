@@ -6,10 +6,10 @@ typedef KeyT<QString> QStringKey;
 
 class QStringAnimator : public SteppedAnimator<QString> {
     friend class SelfRef;
-public:
-    bool SWT_isQStringAnimator() const { return true; }
 protected:
     QStringAnimator(const QString& name);
+public:
+    bool SWT_isQStringAnimator() const { return true; }
 };
 
 #endif // QSTRINGANIMATOR_H

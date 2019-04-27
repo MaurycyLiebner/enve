@@ -247,7 +247,7 @@ public:
     bool SWT_visibleOnlyIfParentDescendant() const;
     QMimeData *SWT_createMimeData();
 
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     int prp_getRelFrameShift() const;
 
     void anim_setAbsFrame(const int &frame);

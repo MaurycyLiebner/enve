@@ -86,7 +86,7 @@ public:
     }
 
     QRectF getRelBoundingRect(const qreal &relFrame);
-    FrameRange prp_getIdenticalRelFrameRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {
         if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {

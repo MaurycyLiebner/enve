@@ -47,11 +47,11 @@ void VideoBox::changeSourceFile(QWidget *dialogParent) {
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
-FrameRange VideoBox::prp_getIdenticalRelFrameRange(const int &relFrame) const {
+FrameRange VideoBox::prp_getIdenticalRelRange(const int &relFrame) const {
     if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
         return {relFrame, relFrame};
     }
-    return BoundingBox::prp_getIdenticalRelFrameRange(relFrame);
+    return BoundingBox::prp_getIdenticalRelRange(relFrame);
 }
 
 void VideoBox::setFilePath(const QString &path) {

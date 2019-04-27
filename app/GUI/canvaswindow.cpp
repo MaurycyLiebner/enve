@@ -525,13 +525,14 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(handleStartTransformKeyPress(event)) return true;
     if(handleSelectAllKeyPress(event)) return true;
     if(handleShiftKeysKeyPress(event)) return true;
+
     if(event->key() == Qt::Key_I && !isMouseGrabber()) {
         invertSelectionAction();
     } else if(event->key() == Qt::Key_W) {
         mCurrentCanvas->incBrushRadius();
     } else if(event->key() == Qt::Key_Q) {
         mCurrentCanvas->decBrushRadius();
-    }
+    } else return false;
 
     return true;
 }
@@ -950,7 +951,7 @@ void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = cacheHandler.
             getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
     if(newCurrentRenderFrame < mMaxRenderFrame) {
-        const auto range = mCurrentCanvas->prp_getIdenticalRelFrameRange(
+        const auto range = mCurrentCanvas->prp_getIdenticalRelRange(
                     newCurrentRenderFrame);
         if(mCurrentRenderFrame >= range.fMin) {
             newCurrentRenderFrame = range.fMax + 1;
