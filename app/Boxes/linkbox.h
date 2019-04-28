@@ -95,8 +95,8 @@ public:
             return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
         }
     }
-    bool isRelFrameInVisibleDurationRect(const int &relFrame) const;
-    bool isRelFrameFInVisibleDurationRect(const qreal &relFrame) const;
+    bool isFrameInDurationRect(const int &relFrame) const;
+    bool isFrameFInDurationRect(const qreal &relFrame) const;
     BoundingBox *getLinkTarget() const;
 public slots:
     void setTargetSlot(BoundingBox *target) {

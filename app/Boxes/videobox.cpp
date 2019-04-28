@@ -48,7 +48,7 @@ void VideoBox::changeSourceFile(QWidget *dialogParent) {
 }
 
 FrameRange VideoBox::prp_getIdenticalRelRange(const int &relFrame) const {
-    if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
+    if(isVisibleAndInDurationRect(relFrame)) {
         return {relFrame, relFrame};
     }
     return BoundingBox::prp_getIdenticalRelRange(relFrame);

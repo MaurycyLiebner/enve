@@ -428,14 +428,17 @@ FrameRange Canvas::prp_getIdenticalRelRange(const int &relFrame) const {
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     const auto range = prp_getIdenticalRelRange(renderData->fRelFrame);
-    auto cont = mCacheHandler.atRelFrame
-            <ImageCacheContainer>(range.fMin);
+//    for(int i = range.fMin; i <= range.fMax; i++) {
+//        const auto path = "/home/ailuropoda/Documents/kom/rend/" + QString::number(i) + ".png";
+//        SkiaHelpers::saveImage(path, renderData->fRenderedImage);
+//    }
+    auto cont = mCacheHandler.atRelFrame<ImageCacheContainer>(range.fMin);
     if(cont) {
         cont->replaceImageSk(renderData->fRenderedImage);
         cont->setRange(range);
     } else {
-        cont = mCacheHandler.createNew
-                <ImageCacheContainer>(range, renderData->fRenderedImage);
+        cont = mCacheHandler.createNew<ImageCacheContainer>(
+                    range, renderData->fRenderedImage);
     }
     if(mRenderingOutput) {
         VideoEncoder::sAddCacheContainerToEncoder(

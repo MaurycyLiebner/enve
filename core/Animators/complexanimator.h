@@ -15,6 +15,11 @@ protected:
     void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
 //    ~ComplexAnimator();
+    stdsptr<Key> readKey(QIODevice *target) final {
+        Q_UNUSED(target);
+        return nullptr;
+    }
+
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
                                      const int& visiblePartWidgetId);

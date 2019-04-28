@@ -28,6 +28,7 @@ public:
     };
 
     virtual void anim_saveCurrentValueAsKey() = 0;
+    virtual stdsptr<Key> readKey(QIODevice *target) = 0;
 
     virtual void anim_scaleTime(const int &pivotAbsFrame,
                                 const qreal &scale);
@@ -36,7 +37,6 @@ public:
                                           int &prevRelFrame);
     virtual bool anim_nextRelFrameWithKey(const int &relFrame,
                                           int &nextRelFrame);
-    virtual stdsptr<Key> readKey(QIODevice *target);
     virtual Key *anim_getKeyAtPos(const qreal &relX,
                                  const int &minViewedFrame,
                                  const qreal &pixelsPerFrame,

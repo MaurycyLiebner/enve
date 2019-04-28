@@ -19,12 +19,24 @@ void CanvasRenderData::processTask() {
     drawSk(&rasterCanvas);
     rasterCanvas.flush();
 
+    uint8_t* src = static_cast<uint8_t*>(fBitmapTMP.getPixels());
+    const int iMax = fBitmapTMP.width()*fBitmapTMP.height();
+    for(int i = 0; i < iMax; i++) {
+        const uint8_t newAlpha = 255 - *src;
+        *(src++) = 0;
+        *(src++) = 0;
+        *(src++) = 0;
+        *(src++) = newAlpha;
+    }
+
     if(!fRasterEffects.isEmpty()) {
         for(const auto& effect : fRasterEffects) {
             effect->applyEffectsSk(fBitmapTMP, fResolution);
         }
         clearPixmapEffects();
     }
+
+    rasterCanvas.drawColor(SK_ColorWHITE, SkBlendMode::kDstOver);
 
     fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
 }

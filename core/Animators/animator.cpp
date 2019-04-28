@@ -37,11 +37,6 @@ bool Animator::anim_prevRelFrameWithKey(const int &relFrame,
     return true;
 }
 
-stdsptr<Key> Animator::readKey(QIODevice *target) {
-    Q_UNUSED(target);
-    return nullptr;
-}
-
 bool Animator::hasFakeComplexAnimator() {
     return !mFakeComplexAnimator.isNull();
 }

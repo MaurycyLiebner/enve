@@ -559,15 +559,15 @@ void Canvas::duplicateSelectedBoxes() {
 }
 
 void Canvas::groupSelectedBoxes() {
-    if(mSelectedBoxes.count() == 0) return;
+    if(mSelectedBoxes.isEmpty()) return;
     const auto newGroup = SPtrCreate(BoxesGroup)();
+    mCurrentBoxesGroup->addContainedBox(newGroup);
     BoundingBox* box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
         const auto boxSP = GetAsSPtr(box, BoundingBox);
         box->removeFromParent_k();
         newGroup->addContainedBox(boxSP);
     }
-    mCurrentBoxesGroup->addContainedBox(newGroup);
     clearBoxesSelectionList(); schedulePivotUpdate();
     addBoxToSelection(newGroup.get());
 }

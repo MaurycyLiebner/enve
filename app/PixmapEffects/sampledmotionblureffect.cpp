@@ -37,7 +37,7 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
     qreal frameStep = mFrameStep->getEffectiveValue(relFrame);
     qreal relFrameT = relFrame - numberFrames*frameStep;
     for(int i = 0; i < numberFrames; i++) {
-        if(!mParentBox->isRelFrameFVisibleAndInVisibleDurationRect(relFrameT)) {
+        if(!mParentBox->isFrameFVisibleAndInDurationRect(relFrameT)) {
             if(i == numberFrames - 1) {
                 renderData->numberSamples = qRound(renderData->numberSamples - 0.500001);
             } else {

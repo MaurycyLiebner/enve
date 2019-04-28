@@ -452,7 +452,7 @@ public:
     void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
     bool shouldPlanScheduleUpdate() {
         return (isVisibleAndInVisibleDurationRect() ||
-               isRelFrameInVisibleDurationRect(anim_getCurrentRelFrame())) &&
+               isFrameInDurationRect(anim_getCurrentRelFrame())) &&
                mCurrentPreviewContainerOutdated;
     }
 

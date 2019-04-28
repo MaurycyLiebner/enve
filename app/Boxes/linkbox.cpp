@@ -90,22 +90,22 @@ bool InternalLinkBox::relPointInsidePath(const QPointF &relPos) const {
     return getLinkTarget()->relPointInsidePath(relPos);
 }
 
-bool InternalLinkBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
+bool InternalLinkBox::isFrameInDurationRect(const int &relFrame) const {
     if(!getLinkTarget()) return false;
-    return BoundingBox::isRelFrameInVisibleDurationRect(relFrame) &&
-            getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
+    return BoundingBox::isFrameInDurationRect(relFrame) &&
+            getLinkTarget()->isFrameInDurationRect(relFrame);
 }
 
-bool InternalLinkBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) const {
+bool InternalLinkBox::isFrameFInDurationRect(const qreal &relFrame) const {
     if(!getLinkTarget()) return false;
-    return BoundingBox::isRelFrameFInVisibleDurationRect(relFrame) &&
-            getLinkTarget()->isRelFrameFInVisibleDurationRect(relFrame);
+    return BoundingBox::isFrameFInDurationRect(relFrame) &&
+            getLinkTarget()->isFrameFInDurationRect(relFrame);
 }
 
 FrameRange InternalLinkBox::prp_getIdenticalRelRange(const int &relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
-        if(isRelFrameInVisibleDurationRect(relFrame)) {
+        if(isFrameInDurationRect(relFrame)) {
             range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {

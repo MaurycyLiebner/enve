@@ -20,7 +20,7 @@ public:
     qsptr<BoundingBox> createLink();
     qsptr<BoundingBox> createLinkForLinkGroup();
 
-    bool isRelFrameInVisibleDurationRect(const int &relFrame) const;
+    bool isFrameInDurationRect(const int &relFrame) const;
 
     stdsptr<BoundingBoxRenderData> createRenderData();
     QRectF getRelBoundingRect(const qreal &relFrame);

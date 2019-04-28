@@ -62,7 +62,8 @@ void ValueInput::updateInputValue() {
     } else {
         //mFirstMouseMove = false;
         mInputTransformationEnabled = true;
-        mInputTransformationValue = mInputText.toDouble();
+        if(mInputText == "-") mInputTransformationValue = -1;
+        else mInputTransformationValue = mInputText.toDouble();
     }
 }
 #include <QKeyEvent>

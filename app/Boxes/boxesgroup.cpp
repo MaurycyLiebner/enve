@@ -291,7 +291,7 @@ QRectF BoxesGroup::getRelBoundingRect(const qreal &relFrame) {
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     for(const auto &child : mContainedBoxes) {
         const qreal childRelFrame = child->prp_absFrameToRelFrameF(absFrame);
-        if(child->isRelFrameVisibleAndInVisibleDurationRect(qRound(childRelFrame))) {
+        if(child->isVisibleAndInDurationRect(qRound(childRelFrame))) {
             SkPath childPath;
             childPath.addRect(
                         toSkRect(
@@ -341,7 +341,7 @@ FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
         const int &relFrame, const bool &takeAncestorsIntoAccount) {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
-        if(isRelFrameInVisibleDurationRect(relFrame)) {
+        if(isFrameInDurationRect(relFrame)) {
             QList<Property*> propertiesT;
             getMotionBlurProperties(propertiesT);
             for(const auto& child : propertiesT) {
@@ -509,7 +509,7 @@ void BoxesGroup::setupRenderData(const qreal &relFrame,
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     for(const auto& box : mContainedBoxes) {
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-        if(box->isRelFrameFVisibleAndInVisibleDurationRect(boxRelFrame)) {
+        if(box->isFrameFVisibleAndInDurationRect(boxRelFrame)) {
             processChildData(box.data(), groupData.get(), boxRelFrame);
 
             childrenEffectsMargin =

@@ -8,6 +8,7 @@ class AnimatedSurface;
 class ASKey : public GraphKey {
     friend class StdSelfRef;
 protected:
+    ASKey(AnimatedSurface * const parent);
     ASKey(const int& frame, AnimatedSurface * const parent);
     ASKey(const DrawableAutoTiledSurface &value,
           const int& frame, AnimatedSurface * const parent);
@@ -85,6 +86,12 @@ public:
             canvas->restore();
         }
     };
+
+    stdsptr<Key> readKey(QIODevice *target) {
+        auto newKey = SPtrCreate(ASKey)(this);
+        newKey->readKey(target);
+        return std::move(newKey);
+    }
 
     void anim_saveCurrentValueAsKey() {
         anim_addKeyAtRelFrame(anim_getCurrentRelFrame());

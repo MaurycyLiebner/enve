@@ -1083,29 +1083,29 @@ const QString &BoundingBox::getName() const {
 }
 
 bool BoundingBox::isVisibleAndInVisibleDurationRect() const {
-    return mInVisibleRange && mVisible;
+    return isFrameInDurationRect(anim_getCurrentRelFrame()) && mVisible;
 }
 
-bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) const {
+bool BoundingBox::isFrameInDurationRect(const int &relFrame) const {
     if(!mDurationRectangle) return true;
     return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
-bool BoundingBox::isRelFrameFInVisibleDurationRect(const qreal &relFrame) const {
+bool BoundingBox::isFrameFInDurationRect(const qreal &relFrame) const {
     if(!mDurationRectangle) return true;
     return qRound(relFrame) <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            qRound(relFrame) >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
-bool BoundingBox::isRelFrameVisibleAndInVisibleDurationRect(
+bool BoundingBox::isVisibleAndInDurationRect(
         const int &relFrame) const {
-    return isRelFrameInVisibleDurationRect(relFrame) && mVisible;
+    return isFrameInDurationRect(relFrame) && mVisible;
 }
 
-bool BoundingBox::isRelFrameFVisibleAndInVisibleDurationRect(
+bool BoundingBox::isFrameFVisibleAndInDurationRect(
         const qreal &relFrame) const {
-    return isRelFrameFInVisibleDurationRect(relFrame) && mVisible;
+    return isFrameFInDurationRect(relFrame) && mVisible;
 }
 
 FrameRange BoundingBox::prp_getIdenticalRelRange(const int &relFrame) const {
@@ -1131,7 +1131,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
         const int &relFrame, const bool &takeAncestorsIntoAccount) {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
-        if(isRelFrameInVisibleDurationRect(relFrame)) {
+        if(isFrameInDurationRect(relFrame)) {
             QList<Property*> propertiesT;
             getMotionBlurProperties(propertiesT);
             for(const auto& child : propertiesT) {
@@ -1272,7 +1272,9 @@ void BoundingBox::setVisibile(const bool &visible) {
     prp_updateInfluenceRangeAfterChanged();
 
     if(mVisible) planScheduleUpdate(Animator::USER_CHANGE);
-    else if(mParentGroup) mParentGroup->planScheduleUpdate(Animator::CHILD_USER_CHANGE);
+    else if(mParentGroup) {
+        mParentGroup->planScheduleUpdate(Animator::CHILD_USER_CHANGE);
+    }
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_VISIBLE);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_HIDDEN);

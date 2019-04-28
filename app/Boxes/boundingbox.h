@@ -220,8 +220,8 @@ public:
     virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
     virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
 
-    virtual bool isRelFrameInVisibleDurationRect(const int &relFrame) const;
-    virtual bool isRelFrameFInVisibleDurationRect(const qreal &relFrame) const;
+    virtual bool isFrameInDurationRect(const int &relFrame) const;
+    virtual bool isFrameFInDurationRect(const qreal &relFrame) const;
     virtual void shiftAll(const int &shift);
 
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
@@ -376,8 +376,8 @@ public:
     void finishMaxFramePosTransform();
     void moveMaxFrame(const int &dFrame);
     DurationRectangle *getDurationRectangle();
-    bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame) const;
-    bool isRelFrameFVisibleAndInVisibleDurationRect(const qreal &relFrame) const;
+    bool isVisibleAndInDurationRect(const int &relFrame) const;
+    bool isFrameFVisibleAndInDurationRect(const qreal &relFrame) const;
     bool diffsIncludingInherited(
             const int &relFrame1, const int &relFrame2);
 
