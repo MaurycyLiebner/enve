@@ -189,6 +189,11 @@ public:
     virtual int getMinAnimationFrame() const = 0;
     virtual int getMaxAnimationFrame() const = 0;
 
+    FrameRange getAnimationRange() const {
+        return { getMinAnimationFrameAsRelFrame(),
+                 getMaxAnimationFrameAsRelFrame()};
+    }
+
     int getMaxAnimationFrameAsRelFrame() const;
     int getMinAnimationFrameAsRelFrame() const;
 

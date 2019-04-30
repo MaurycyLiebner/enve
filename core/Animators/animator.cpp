@@ -267,12 +267,12 @@ int Animator::getInsertIdForKeyRelFrame(
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     if(!anim_mIsRecording) anim_mIsRecording = true;
     const int insertId = getInsertIdForKeyRelFrame(newKey->getRelFrame());
-    if(insertId < anim_mKeys.count()) {
-        const auto& currKey = anim_mKeys.at(insertId);
-        const int currRelFrame = currKey->getRelFrame();
-        if(currRelFrame == newKey->getRelFrame())
-            anim_removeKey(currKey);
-    }
+//    if(insertId < anim_mKeys.count()) {
+//        const auto& currKey = anim_mKeys.at(insertId);
+//        const int currRelFrame = currKey->getRelFrame();
+//        if(currRelFrame == newKey->getRelFrame())
+//            anim_removeKey(currKey);
+//    }
     anim_mKeys.insert(insertId, newKey);
     //anim_sortKeys();
     //mergeKeysIfNeeded();

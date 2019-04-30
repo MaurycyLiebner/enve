@@ -936,8 +936,23 @@ void PaintBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
 }
 
-void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
+void AnimationBox::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
+    target->write(rcConstChar(&mFrameRemappingEnabled), sizeof(bool));
+    mFrameAnimator->writeProperty(target);
+}
+
+void AnimationBox::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
+    bool frameRemapping;
+    target->read(rcChar(&frameRemapping), sizeof(bool));
+    mFrameAnimator->readProperty(target);
+    if(frameRemapping) enableFrameRemapping();
+    else disableFrameRemapping();
+}
+
+void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
+    AnimationBox::writeBoundingBox(target);
     int nFrames = mListOfFrames.count();
     target->write(rcConstChar(&nFrames), sizeof(int));
     for(const QString &frame : mListOfFrames) {
@@ -946,14 +961,14 @@ void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
 }
 
 void ImageSequenceBox::readBoundingBox(QIODevice *target) {
-    BoundingBox::readBoundingBox(target);
+    AnimationBox::readBoundingBox(target);
     int nFrames;
     target->read(rcChar(&nFrames), sizeof(int));
+    QStringList frames;
     for(int i = 0; i < nFrames; i++) {
-        QString frame;
-        gRead(target, frame);
-        mListOfFrames << frame;
+        frames << gReadString(target);
     }
+    setListOfFrames(frames);
 }
 
 void TextBox::writeBoundingBox(QIODevice *target) {

@@ -13,8 +13,7 @@ extern "C" {
 #include "filesourcescache.h"
 #include "FileCacheHandlers/videocachehandler.h"
 
-VideoBox::VideoBox() : AnimationBox() {
-    mType = TYPE_VIDEO;
+VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     setName("Video");
 }
 
@@ -45,13 +44,6 @@ void VideoBox::changeSourceFile(QWidget *dialogParent) {
                 dialogParent, "Change Source", "",
                 "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     if(!importPath.isEmpty()) setFilePath(importPath);
-}
-
-FrameRange VideoBox::prp_getIdenticalRelRange(const int &relFrame) const {
-    if(isVisibleAndInDurationRect(relFrame)) {
-        return {relFrame, relFrame};
-    }
-    return BoundingBox::prp_getIdenticalRelRange(relFrame);
 }
 
 void VideoBox::setFilePath(const QString &path) {

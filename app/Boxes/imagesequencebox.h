@@ -3,8 +3,10 @@
 #include "animationbox.h"
 
 class ImageSequenceBox : public AnimationBox {
-public:
+    friend class SelfRef;
+protected:
     ImageSequenceBox();
+public:
     void setListOfFrames(const QStringList &listOfFrames);
 
     bool SWT_isImageSequenceBox() const { return true; }

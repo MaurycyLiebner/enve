@@ -20,7 +20,6 @@ public:
     bool SWT_isVideoBox() const { return true; }
     void changeSourceFile(QWidget* dialogParent);
 
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
 

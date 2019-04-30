@@ -4,8 +4,7 @@
 #include "GUI/mainwindow.h"
 #include <QFileDialog>
 
-ImageSequenceBox::ImageSequenceBox() :
-    AnimationBox() {
+ImageSequenceBox::ImageSequenceBox() : AnimationBox(TYPE_IMAGESQUENCE) {
     setName("Image Sequence");
 }
 

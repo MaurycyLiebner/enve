@@ -6,7 +6,7 @@
 #include "imagebox.h"
 #include "undoredo.h"
 
-AnimationBox::AnimationBox() : BoundingBox(TYPE_IMAGE) {
+AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
     setName("Animation");
 
     setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
@@ -17,7 +17,7 @@ AnimationBox::~AnimationBox() {
     mSrcFramesCache->removeDependentBox(this);
 }
 
-FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
+FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
     return GetAsPtr(mDurationRectangle, FixedLenAnimationRect);
 }
 
@@ -130,6 +130,18 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
     //}
 }
 
+FrameRange AnimationBox::prp_getIdenticalRelRange(const int &relFrame) const {
+    if(isVisibleAndInDurationRect(relFrame)) {
+        const auto animDur = getAnimationDurationRect();
+        if(animDur) {
+            const auto animRange = animDur->getAnimationRange();
+            if(animRange.inRange(relFrame))
+                return {relFrame, relFrame};
+        }
+    }
+    return BoundingBox::prp_getIdenticalRelRange(relFrame);
+}
+
 //void AnimationBox::drawSk(SkCanvas * const canvas) {
 //    SkPaint paint;
 //    //paint.setFilterQuality(kHigh_SkFilterQuality);
@@ -156,7 +168,7 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
         if(checked) box->enableFrameRemapping();
         else box->disableFrameRemapping();
     };
-    menu->addCheckableAction("Set Source File...",
+    menu->addCheckableAction("Frame Remapping",
                              mFrameRemappingEnabled, remapOp);
 
     BoundingBox::addActionsToMenu(menu);

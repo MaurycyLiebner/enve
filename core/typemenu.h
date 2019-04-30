@@ -33,7 +33,7 @@ public:
         qAction->setCheckable(true);
         qAction->setChecked(checked);
         const PlainOp<T> plainOp = [op, checked](T* pt) {
-            op(pt, checked);
+            op(pt, !checked);
         };
         connectAction(qAction, plainOp);
         return qAction;

@@ -19,10 +19,12 @@ struct AnimationBoxRenderData : public ImageBoxRenderData {
 class AnimationBox : public BoundingBox {
     friend class SelfRef;
 protected:
-    AnimationBox();
+    AnimationBox(const BoundingBoxType &type);
 public:
     ~AnimationBox();
     void anim_setAbsFrame(const int &frame);
+
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 
     void reloadCacheHandler();
     virtual void reloadSound() {}
@@ -36,7 +38,10 @@ public:
     void setParentGroup(BoxesGroup * const parent);
     bool shouldPlanScheduleUpdate();
 
-    FixedLenAnimationRect *getAnimationDurationRect();
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
+
+    FixedLenAnimationRect *getAnimationDurationRect() const;
     void updateDurationRectangleAnimationRange();
 
     void afterUpdate();
