@@ -19,11 +19,9 @@ public:
 
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
-    virtual ~Key() {}
 
     virtual void startFrameTransform();
     virtual void finishFrameTransform();
-    virtual void mergeWith(const stdsptr<Key>& key) { key->removeFromAnimator(); }
 
     virtual void deleteKey() {
         removeFromAnimator();
@@ -114,20 +112,6 @@ protected:
     int mSavedRelFrame;
 
     QPointer<Animator> mParentAnimator;
-};
-
-struct KeyPair {
-    KeyPair(Key* key1T, Key* key2T) {
-        key1 = key1T;
-        key2 = key2T;
-    }
-
-    void merge() const {
-        key1->mergeWith(GetAsSPtr(key2, Key));
-    }
-
-    Key* key1;
-    Key* key2;
 };
 
 #endif // KEY_H

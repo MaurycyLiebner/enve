@@ -333,16 +333,6 @@ void ComplexKey::addAnimatorKey(Key * const key) {
     mKeys << key;
 }
 
-void ComplexKey::addOrMergeKey(const stdsptr<Key>& keyAdd) {
-    for(const auto& key : mKeys) {
-        if(key->getParentAnimator() == keyAdd->getParentAnimator() ) {
-            key->mergeWith(keyAdd);
-            return;
-        }
-    }
-    addAnimatorKey(keyAdd.get());
-}
-
 void ComplexKey::deleteKey() {
     const auto keys = mKeys;
     for(const auto& key : keys) key->deleteKey();
@@ -365,17 +355,9 @@ bool ComplexKey::isEmpty() const {
 //    }
 //}
 
-void ComplexKey::mergeWith(const stdsptr<Key>& key) {
-    GetAsPtr(key, ComplexKey)->margeAllKeysToKey(this);
-    key->removeFromAnimator();
-}
-
-void ComplexKey::margeAllKeysToKey(ComplexKey * const target) {
-    const auto keys = mKeys;
-    for(const auto& key : keys) {
-        removeAnimatorKey(key);
-        target->addOrMergeKey(GetAsSPtr(key, Key));
-    }
+void ComplexKey::moveAllKeysTo(ComplexKey * const target) {
+    target->mKeys << mKeys;
+    mKeys.clear();
 }
 
 bool ComplexKey::isDescendantSelected() const {

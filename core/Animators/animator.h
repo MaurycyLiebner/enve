@@ -20,6 +20,10 @@ class Animator : public Property {
     Q_OBJECT
 protected:
     Animator(const QString &name);
+
+    virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
+        Q_UNUSED(key);
+    }
 public:
     enum UpdateReason {
         FRAME_CHANGE,
@@ -27,6 +31,7 @@ public:
         USER_CHANGE
     };
 
+    virtual void anim_addKeyAtRelFrame(const int &relFrame) = 0;
     virtual void anim_saveCurrentValueAsKey() = 0;
     virtual stdsptr<Key> readKey(QIODevice *target) = 0;
 
@@ -45,10 +50,9 @@ public:
     virtual void anim_updateAfterChangedKey(Key * const key);
     virtual void anim_setAbsFrame(const int &frame);
     virtual bool anim_isDescendantRecording() const;
-    virtual void anim_mergeKeysIfNeeded();
+
     virtual void anim_appendKey(const stdsptr<Key> &newKey);
     virtual void anim_removeKey(const stdsptr<Key>& keyToRemove);
-    virtual void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
 
     virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                            const int &relX,
@@ -59,6 +63,9 @@ public:
                                     const qreal &pixelsPerFrame,
                                     QList<Key*>& keysList,
                                     const int &keyRectSize);
+    virtual void anim_updateAfterShifted();
+    virtual void anim_setRecording(const bool &rec);
+
     void drawTimelineControls(QPainter * const p,
                               const qreal &pixelsPerFrame,
                               const FrameRange &absFrameRange,
@@ -66,19 +73,13 @@ public:
 
     void addActionsToMenu(PropertyTypeMenu * const menu);
 
-    virtual void anim_addKeyAtRelFrame(const int &relFrame) = 0;
     bool SWT_isAnimator() const;
     void prp_startDragging();
     void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
-protected:
-    virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
-        Q_UNUSED(key);
-    }
-public slots:
-    virtual void anim_updateAfterShifted();
-    virtual void anim_setRecording(const bool &rec);
 public:
+    void anim_mergeKeysIfNeeded();
+
     bool anim_hasKeys() const;
     bool anim_isRecording();
 
@@ -130,6 +131,7 @@ public:
     int anim_getCurrentRelFrame() const;
     int anim_getCurrentAbsFrame() const;
 
+    void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
     void anim_shiftAllKeys(const int &shift);
 
     bool hasFakeComplexAnimator();
@@ -162,6 +164,7 @@ public:
     void startSelectedKeysTransform();
 
     void deleteSelectedKeys();
+    void anim_deleteCurrentKey();
 
     int getLowestAbsFrameForSelectedKey();
 
@@ -190,8 +193,6 @@ private:
 
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
-public slots:
-    void anim_deleteCurrentKey();
 signals:
     void anim_isRecordingChanged();
 private:

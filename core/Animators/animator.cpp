@@ -141,6 +141,14 @@ bool Animator::anim_isDescendantRecording() const { return anim_mIsRecording; }
 
 void Animator::prp_startDragging() {}
 
+struct KeyPair {
+    KeyPair(Key * const key1, Key * const key2) :
+        fKey1(key1), fKey2(key2) {}
+
+    Key * const fKey1;
+    Key * const fKey2;
+};
+
 void Animator::anim_mergeKeysIfNeeded() {
     Key* lastKey = nullptr;
     QList<KeyPair> keyPairsToMerge;
@@ -159,7 +167,12 @@ void Animator::anim_mergeKeysIfNeeded() {
         lastKey = keyPtr;
     }
     for(const KeyPair& keyPair : keyPairsToMerge) {
-        keyPair.merge();
+        if(SWT_isComplexAnimator()) {
+            const auto cKey1 = GetAsPtr(keyPair.fKey1, ComplexKey);
+            const auto cKey2 = GetAsPtr(keyPair.fKey2, ComplexKey);
+            cKey2->moveAllKeysTo(cKey1);
+        }
+        anim_removeKey(GetAsSPtr(keyPair.fKey2, Key));
     }
 }
 
@@ -267,15 +280,22 @@ int Animator::getInsertIdForKeyRelFrame(
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     if(!anim_mIsRecording) anim_mIsRecording = true;
     const int insertId = getInsertIdForKeyRelFrame(newKey->getRelFrame());
-//    if(insertId < anim_mKeys.count()) {
-//        const auto& currKey = anim_mKeys.at(insertId);
-//        const int currRelFrame = currKey->getRelFrame();
-//        if(currRelFrame == newKey->getRelFrame())
-//            anim_removeKey(currKey);
+//    if(mode == AppendMode::REPLACE) {
+//        if(insertId < anim_mKeys.count()) {
+//            const auto& currKey = anim_mKeys.at(insertId);
+//            const int currRelFrame = currKey->getRelFrame();
+//            if(currRelFrame == newKey->getRelFrame()) {
+//                if(SWT_isComplexAnimator()) {
+//                    const auto newCKey = GetAsPtr(newKey, ComplexKey);
+//                    const auto currCKey = GetAsPtr(currKey, ComplexKey);
+//                    currCKey->moveAllKeysTo(newCKey);
+//                }
+//                anim_removeKey(currKey);
+//            }
+//        }
 //    }
     anim_mKeys.insert(insertId, newKey);
-    //anim_sortKeys();
-    //mergeKeysIfNeeded();
+
     emit prp_addingKey(newKey.get());
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(newKey.get());
@@ -285,19 +305,24 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     Key * const keyPtr = keyToRemove.get();
 
-    int prevKeyRelFrame = anim_getPrevKeyRelFrame(keyPtr);
-    if(prevKeyRelFrame != FrameRange::EMIN) prevKeyRelFrame++;
-    int nextKeyRelFrame = anim_getNextKeyRelFrame(keyPtr);
-    if(nextKeyRelFrame != FrameRange::EMAX) nextKeyRelFrame--;
+    const int rFrame = keyToRemove->getRelFrame();
 
     emit prp_removingKey(keyPtr);
     const int keyId = anim_getKeyIndex(keyPtr);
     anim_mKeys.removeAt(keyId);
 
-    if(keyToRemove->getRelFrame() == anim_mCurrentRelFrame)
+    if(rFrame == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(nullptr);
 
-    prp_updateAfterChangedRelFrameRange({prevKeyRelFrame, nextKeyRelFrame});
+    const int prevKeyRelFrame = anim_getPrevKeyRelFrame(rFrame);
+    const int nextKeyRelFrame = anim_getNextKeyRelFrame(rFrame);
+    const int affectedMin = prevKeyRelFrame == FrameRange::EMIN ?
+                FrameRange::EMIN :
+                qMin(prevKeyRelFrame + 1, rFrame);
+    const int affectedMax = nextKeyRelFrame == FrameRange::EMAX ?
+                FrameRange::EMAX :
+                qMax(nextKeyRelFrame - 1, rFrame);
+    prp_updateAfterChangedRelFrameRange({affectedMin, affectedMax});
 }
 
 void Animator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
@@ -591,7 +616,8 @@ void Animator::selectAllKeys() {
 
 void Animator::incSelectedKeysFrame(const int &dFrame) {
     for(const auto& key : anim_mSelectedKeys) {
-        key->incFrameAndUpdateParentAnimator(dFrame);
+        const int newFrame = key->getRelFrame() + dFrame;
+        anim_moveKeyToRelFrame(key, newFrame);
     }
 }
 

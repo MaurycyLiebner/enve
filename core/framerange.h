@@ -4,7 +4,8 @@
 #define TEN_MIL 10000000
 //! @brief Inclusive range
 struct iValueRange {
-    enum Extrema { EMIN = -TEN_MIL, EMAX = TEN_MIL };
+    static int EMIN;
+    static int EMAX;
 
     int fMin; //! @brief Inclusive range min
     int fMax; //! @brief Inclusive range max

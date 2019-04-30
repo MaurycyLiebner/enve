@@ -147,8 +147,6 @@ class ComplexKey : public Key {
     friend class StdSelfRef;
 public:
     void deleteKey();
-
-    void mergeWith(const stdsptr<Key> &key);
     bool isDescendantSelected() const;
 
     void startFrameTransform();
@@ -162,15 +160,13 @@ public:
 
     void addAnimatorKey(Key * const key);
 
-    void addOrMergeKey(const stdsptr<Key> &keyAdd);
-
     void removeAnimatorKey(Key * const key);
 
     bool isEmpty() const;
 
 //    void setRelFrame(const int &frame);
 
-    void margeAllKeysToKey(ComplexKey * const target);
+    void moveAllKeysTo(ComplexKey * const target);
     bool hasKey(Key *key) const;
 
     int getChildKeysCount() const;
