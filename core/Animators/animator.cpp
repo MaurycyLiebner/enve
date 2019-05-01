@@ -304,25 +304,10 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     Key * const keyPtr = keyToRemove.get();
-
-    const int rFrame = keyToRemove->getRelFrame();
-
-    emit prp_removingKey(keyPtr);
     const int keyId = anim_getKeyIndex(keyPtr);
     anim_mKeys.removeAt(keyId);
 
-    if(rFrame == anim_mCurrentRelFrame)
-        anim_setKeyOnCurrentFrame(nullptr);
-
-    const int prevKeyRelFrame = anim_getPrevKeyRelFrame(rFrame);
-    const int nextKeyRelFrame = anim_getNextKeyRelFrame(rFrame);
-    const int affectedMin = prevKeyRelFrame == FrameRange::EMIN ?
-                FrameRange::EMIN :
-                qMin(prevKeyRelFrame + 1, rFrame);
-    const int affectedMax = nextKeyRelFrame == FrameRange::EMAX ?
-                FrameRange::EMAX :
-                qMax(nextKeyRelFrame - 1, rFrame);
-    prp_updateAfterChangedRelFrameRange({affectedMin, affectedMax});
+    afterKeyRemoved(keyPtr);
 }
 
 void Animator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
@@ -658,4 +643,35 @@ int Animator::getLowestAbsFrameForSelectedKey() {
         }
     }
     return lowestKey;
+}
+
+void Animator::OverlappingKeys::merge() {
+    if(mKeys.isEmpty()) return;
+    Key * target = nullptr;
+    for(const auto& iKey : mKeys) {
+        if(iKey->isDescendantSelected()) {
+            target = iKey.get();
+            break;
+        }
+    }
+    if(!target) target = mKeys.last().get();
+
+    if(mAnimator->SWT_isComplexAnimator()) {
+        const auto cTarget = GetAsPtr(target, ComplexKey);
+        for(int i = 0; i < mKeys.count(); i++) {
+            const auto& iKey = mKeys.at(i);
+            if(iKey.get() == target) continue;
+            const auto cKey = GetAsSPtr(iKey, ComplexKey);
+            cKey->moveAllKeysTo(cTarget);
+            mAnimator->afterKeyRemoved(cKey.get());
+            mKeys.removeAt(i--);
+        }
+    } else {
+        for(int i = 0; i < mKeys.count(); i++) {
+            const auto& iKey = mKeys.at(i);
+            if(iKey.get() == target) continue;
+            mAnimator->afterKeyRemoved(iKey.get());
+            mKeys.removeAt(i--);
+        }
+    }
 }

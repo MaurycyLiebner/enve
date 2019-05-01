@@ -10,6 +10,7 @@ class QIODevice;
 
 class ComplexAnimator;
 class Key;
+class ComplexKey;
 class QrealPoint;
 class QPainter;
 class DurationRectangleMovable;
@@ -18,6 +19,7 @@ enum CtrlsMode : short;
 
 class Animator : public Property {
     Q_OBJECT
+    friend class OverlappingKeys;
 protected:
     Animator(const QString &name);
 
@@ -25,6 +27,213 @@ protected:
         Q_UNUSED(key);
     }
 public:
+    class OverlappingKeys {
+    public:
+        OverlappingKeys(const stdsptr<Key>& key) {
+            mKeys << key;
+        }
+
+        int getFrame() const {
+            const auto key = getKey();
+            if(key) return key->getRelFrame();
+            return 0;
+        }
+
+        Key * getKey() const {
+            if(mKeys.isEmpty()) return nullptr;
+            for(const auto& iKey : mKeys) {
+                if(iKey->isDescendantSelected()) return iKey.get();
+            }
+            return mKeys.last().get();
+        }
+
+        bool isEmpty() const {
+            return mKeys.isEmpty();
+        }
+
+        void removeKey(const stdsptr<Key>& key) {
+            for(int i = 0; i < mKeys.count(); i++) {
+                const auto& iKey = mKeys.at(i);
+                if(iKey.get() == key.get()) {
+                    mKeys.removeAt(i);
+                    break;
+                }
+            }
+        }
+
+        void addKey(const stdsptr<Key>& key) {
+            mKeys.append(key);
+        }
+
+        void merge();
+    private:
+        Animator * mAnimator;
+        QList<stdsptr<Key>> mKeys;
+    };
+
+    class OverlappingKeyList {
+    public:
+        class const_iterator {
+        public:
+            const_iterator(const int& id,
+                           const QList<OverlappingKeys> * const list) :
+                mList(list) {
+                setId(id);
+            }
+
+            const_iterator& operator++() {
+                setId(mId + 1);
+                return *this;
+            }
+
+            bool operator!=(const const_iterator& other) const {
+                return this->mId != other.mId;
+            }
+
+            const Key * operator->() const {
+                return mKey;
+            }
+
+            const Key &operator*() const { return *mKey; }
+        protected:
+            int mId;
+        private:
+            void setId(const int& id) {
+                mId = id;
+                if(mId > 0 && mId < mList->count()) {
+                    mKey = mList->at(mId).getKey();
+                } else mKey = nullptr;
+            }
+            const QList<OverlappingKeys> * mList = nullptr;
+            const Key * mKey = nullptr;
+        };
+
+        class iterator {
+        public:
+            iterator(const int& id,
+                     const QList<OverlappingKeys> * const list) :
+                mList(list) {
+                setId(id);
+            }
+
+            iterator& operator++() {
+                setId(mId + 1);
+                return *this;
+            }
+
+            bool operator!=(const iterator& other) const {
+                return this->mId != other.mId;
+            }
+
+            Key * operator->() const {
+                return mKey;
+            }
+
+            Key &operator*() const { return *mKey; }
+        protected:
+            int mId;
+        private:
+            void setId(const int& id) {
+                mId = id;
+                if(mId > 0 && mId < mList->count()) {
+                    mKey = mList->at(mId).getKey();
+                } else mKey = nullptr;
+            }
+            const QList<OverlappingKeys> * mList = nullptr;
+            Key * mKey = nullptr;
+        };
+
+        const_iterator begin() const {
+            return const_iterator(0, &mList);
+        }
+
+        const_iterator end() const {
+            return const_iterator(mList.count(), &mList);
+        }
+
+        iterator begin() {
+            return iterator(0, &mList);
+        }
+
+        iterator end() {
+            return iterator(mList.count(), &mList);
+        }
+
+        int count() const {
+            return mList.count();
+        }
+
+        bool isEmpty() const {
+            return mList.isEmpty();
+        }
+
+        int add(const stdsptr<Key>& key) {
+            const int relFrame = key->getRelFrame();
+            const int insertId = getIdForRelFrame(relFrame);
+            auto& ovrlp = mList[insertId];
+            if(ovrlp.getFrame() == relFrame) ovrlp.addKey(key);
+            else mList.insert(insertId, OverlappingKeys(key));
+            return insertId;
+        }
+
+        void remove(const stdsptr<Key>& key) {
+            const int relFrame = key->getRelFrame();
+            const int removeId = getIdForRelFrame(relFrame);
+            auto& ovrlp = mList[removeId];
+            if(ovrlp.getFrame() == relFrame) {
+                ovrlp.removeKey(key);
+                if(ovrlp.isEmpty()) mList.removeAt(removeId);
+            }
+        }
+
+        template <class T = Key>
+        T * atId(const int& id) const {
+            if(id < 0) return nullptr;
+            if(id >= mList.count()) return nullptr;
+            return static_cast<T*>(mList.at(id).getKey());
+        }
+
+        template <class T = Key>
+        T * atRelFrame(const int& relFrame) const {
+            const int id = getIdForRelFrame(relFrame);
+            const auto kAtId = atId<T>(id);
+            if(!kAtId) return nullptr;
+            if(kAtId->getRelFrame() == relFrame) return kAtId;
+            return nullptr;
+        }
+
+        template <class T = Key>
+        T * first() {
+            return atId<T>(0);
+        }
+
+        template <class T = Key>
+        T * last() {
+            return atId<T>(mList.count() - 1);
+        }
+    private:
+        int getIdForRelFrame(const int& relFrame) const {
+            return getIdForRelFrame(relFrame, 0, mList.count() - 1);
+        }
+
+        int getIdForRelFrame(const int& relFrame,
+                             const int& min, const int& max) const {
+            if(min >= max) return min;
+            const int guess = (max + min)/2;
+            const Key * const key = mList.at(guess).getKey();
+            const int guessFrame = key->getRelFrame();
+            if(guessFrame > relFrame) {
+                return getIdForRelFrame(relFrame, min, guess);
+            } else if(guessFrame < relFrame) {
+                return getIdForRelFrame(relFrame, guess + 1, max);
+            }
+            // guessFrame == relFrame
+            return guess;
+        }
+
+        QList<OverlappingKeys> mList;
+    };
+
     enum UpdateReason {
         FRAME_CHANGE,
         CHILD_USER_CHANGE,
@@ -177,6 +386,24 @@ public:
     void anim_coordinateKeysWith(Animator * const other);
     void anim_addKeysWhereOtherHasKeys(const Animator * const other);
 protected:
+    void afterKeyRemoved(Key * const keyPtr) {
+        const int rFrame = keyPtr->getRelFrame();
+
+        emit prp_removingKey(keyPtr);
+        if(rFrame == anim_mCurrentRelFrame)
+            anim_setKeyOnCurrentFrame(nullptr);
+
+        const int prevKeyRelFrame = anim_getPrevKeyRelFrame(rFrame);
+        const int nextKeyRelFrame = anim_getNextKeyRelFrame(rFrame);
+        const int affectedMin = prevKeyRelFrame == FrameRange::EMIN ?
+                    FrameRange::EMIN :
+                    qMin(prevKeyRelFrame + 1, rFrame);
+        const int affectedMax = nextKeyRelFrame == FrameRange::EMAX ?
+                    FrameRange::EMAX :
+                    qMax(nextKeyRelFrame - 1, rFrame);
+        prp_updateAfterChangedRelFrameRange({affectedMin, affectedMax});
+    }
+
     QList<stdsptr<Key>> anim_mKeys;
     QList<stdptr<Key>> anim_mSelectedKeys;
     qsptr<FakeComplexAnimator> mFakeComplexAnimator;
