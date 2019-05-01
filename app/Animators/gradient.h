@@ -17,7 +17,7 @@ public:
         Q_UNUSED(shift);
         if(!parentAnimator) return;
         for(const auto &key : anim_mKeys) {
-            parentAnimator->ca_updateDescendatKeyFrame(key.get());
+            parentAnimator->ca_updateDescendatKeyFrame(key);
         }
     }
 

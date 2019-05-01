@@ -99,7 +99,6 @@ public:
     }
 private:
     qreal calculateBaseValueAtRelFrame(const qreal &frame) const;
-    QrealKey *getQrealKeyAtId(const int &id) const;
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;

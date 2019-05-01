@@ -94,13 +94,13 @@ void GraphAnimator::graph_getFrameConstraints(
     if(keyId == anim_mKeys.count() - 1) {
         endMaxMoveFrame = keyFrame + 5000.;
     } else {
-        endMaxMoveFrame = anim_mKeys.at(keyId + 1)->getAbsFrame();
+        endMaxMoveFrame = anim_mKeys.atId(keyId + 1)->getAbsFrame();
     }
 
     if(keyId == 0) {
         startMinMoveFrame = keyFrame - 5000.;
     } else {
-        Key *prevKey = anim_mKeys.at(keyId - 1).get();
+        Key *prevKey = anim_mKeys.atId(keyId - 1);
         startMinMoveFrame = prevKey->getAbsFrame();
     }
 

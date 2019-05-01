@@ -118,10 +118,6 @@ qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal &frame) const {
     return getBaseValue(prp_absFrameToRelFrameF(frame));
 }
 
-QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
-    return GetAsPtr(anim_mKeys.at(id), QrealKey);
-}
-
 void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
     if(generator == mRandomGenerator.data()) return;
     if(!generator) {
@@ -265,7 +261,7 @@ void QrealAnimator::anim_removeAllKeys() {
 
     const auto keys = anim_mKeys;
     for(const auto& key : keys) {
-        anim_removeKey(key);
+        anim_removeKey(GetAsSPtr(key, Key));
     }
     setCurrentBaseValue(currentValue);
 }
@@ -311,7 +307,7 @@ qValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     qreal minVal = TEN_MIL;
     qreal maxVal = -TEN_MIL;
     for(const auto &key : anim_mKeys) {
-        const auto qaKey = GetAsPtr(key.get(), QrealKey);
+        const auto qaKey = GetAsPtr(key, QrealKey);
         const qreal keyVal = qaKey->getValue();
         const qreal startVal = qaKey->getStartValue();
         const qreal endVal = qaKey->getEndValue();
@@ -331,7 +327,7 @@ qValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
     qreal minVal = TEN_MIL;
     qreal maxVal = -TEN_MIL;
     for(const auto &key : anim_mKeys) {
-        const auto qaKey = GetAsPtr(key.get(), QrealKey);
+        const auto qaKey = GetAsPtr(key, QrealKey);
         const int keyFrame = key->getAbsFrame();
         if(keyFrame > endFrame || keyFrame < startFrame) continue;
         if(first) first = false;
