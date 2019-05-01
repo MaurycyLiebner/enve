@@ -151,7 +151,7 @@ bool QrealAnimator::hasNoise() {
 
 qreal QrealAnimator::calculateBaseValueAtRelFrame(const qreal &frame) const {
     if(anim_mKeys.isEmpty()) return mCurrentBaseValue;
-    const auto pn = anim_getPrevAndNextKeyIdForRelFrameF(frame);
+    const auto pn = anim_getPrevAndNextKeyIdF(frame);
     const int prevId = pn.first;
     const int nextId = pn.second;
 

@@ -36,7 +36,7 @@ public:
 
     T getValueAtRelFrame(const qreal &frame) const {
         if(this->anim_mKeys.isEmpty()) return this->getCurrentValue();
-        const auto pn = this->anim_getPrevAndNextKeyIdForRelFrameF(frame);
+        const auto pn = this->anim_getPrevAndNextKeyIdF(frame);
         const int prevId = pn.first;
         const int nextId = pn.second;
 

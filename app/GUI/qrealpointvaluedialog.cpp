@@ -33,41 +33,36 @@ QrealPointValueDialog::QrealPointValueDialog(QrealPoint *point,
     mSavedFrame = mPoint->getFrame();
     resetValue();
 
-    connect(mOkButton, SIGNAL(pressed()),
-            this, SLOT(ok()) );
-    connect(mCancelButton, SIGNAL(pressed()),
-            this, SLOT(cancel()) );
-    connect(mFrameSpinBox, SIGNAL(valueChanged(double)),
-            this, SLOT(setFrame(double)) );
-    connect(mValueSpinBox, SIGNAL(valueChanged(double)),
-            this, SLOT(setValue(double)) );
+    connect(mOkButton, &QPushButton::pressed,
+            this, &QrealPointValueDialog::ok);
+    connect(mCancelButton, &QPushButton::pressed,
+            this, &QrealPointValueDialog::cancel);
+    connect(mFrameSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &QrealPointValueDialog::setFrame);
+    connect(mValueSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &QrealPointValueDialog::setValue);
 }
 
-void QrealPointValueDialog::setValue(double value)
-{
+void QrealPointValueDialog::setValue(double value) {
     mPoint->setValue(value);
     emit repaintSignal();
 }
 
-void QrealPointValueDialog::setFrame(double frame)
-{
+void QrealPointValueDialog::setFrame(double frame) {
     mPoint->setFrame(frame);
     emit repaintSignal();
 }
 
-void QrealPointValueDialog::cancel()
-{
+void QrealPointValueDialog::cancel() {
     resetValue();
     close();
 }
 
-void QrealPointValueDialog::ok()
-{
+void QrealPointValueDialog::ok() {
     close();
 }
 
-void QrealPointValueDialog::resetValue()
-{
+void QrealPointValueDialog::resetValue() {
     mValueSpinBox->setValue(mSavedValue);
     mFrameSpinBox->setValue(mSavedFrame);
     setValue(mSavedValue);

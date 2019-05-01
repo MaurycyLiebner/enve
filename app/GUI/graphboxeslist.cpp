@@ -318,7 +318,6 @@ void KeysView::graphMouseRelease() {
 //                    key->finishValueTransform();
                 }
             }
-            graphMergeKeysIfNeeded();
         } else {
             mPressedPoint->setSelected(false);
         }
@@ -446,24 +445,7 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
 
 void KeysView::graphMousePressEvent(const QPoint &eventPos,
                                     const Qt::MouseButton &eventButton) {
-    if(eventButton == Qt::RightButton) {
-        qreal value;
-        qreal frame;
-        graphGetValueAndFrameFromPos(eventPos, &value, &frame);
-        QrealPoint *point = nullptr;
-        for(const auto& anim : mGraphAnimators) {
-            point = anim->graph_getPointAt(value, frame,
-                                         mPixelsPerFrame, mPixelsPerValUnit);
-            if(point) break;
-        }
-        if(!point) return;
-        QrealPointValueDialog *dialog = new QrealPointValueDialog(point, this);
-        dialog->show();
-        connect(dialog, &QrealPointValueDialog::repaintSignal,
-                this, &KeysView::graphUpdateAfterKeysChangedAndRepaint);
-        connect(dialog, &QrealPointValueDialog::finished,
-                this, &KeysView::graphMergeKeysIfNeeded);
-    } else if(eventButton == Qt::MiddleButton) {
+    if(eventButton == Qt::MiddleButton) {
         graphMiddlePress(eventPos);
     } else {
         graphMousePress(eventPos);
@@ -594,10 +576,4 @@ void KeysView::graphUpdateAfterKeysChangedIfNeeded() {
 void KeysView::graphUpdateAfterKeysChanged() {
     graphResetValueScaleAndMinShown();
     graphUpdateDimensions();
-}
-
-void KeysView::graphMergeKeysIfNeeded() {
-    for(const auto& anim : mGraphAnimators) {
-        anim->anim_mergeKeysIfNeeded();
-    }
 }

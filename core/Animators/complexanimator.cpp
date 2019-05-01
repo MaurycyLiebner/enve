@@ -67,14 +67,6 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
 
-ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(const int &frame) {
-    return GetAsPtr(anim_getKeyAtAbsFrame(frame), ComplexKey);
-}
-
-ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
-    return GetAsPtr(anim_getKeyAtRelFrame(frame), ComplexKey);
-}
-
 void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
                                           const int &id) {
     if(ca_mChildAnimators.contains(childProperty))
@@ -306,7 +298,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
 }
 
 void ComplexAnimator::ca_addDescendantsKey(Key * const key) {
-    auto collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());
+    auto collection = anim_getKeyAtAbsFrame<ComplexKey>(key->getAbsFrame());
     if(!collection) {
         auto newCollection = SPtrCreate(ComplexKey)(key->getAbsFrame(), this);
         collection = newCollection.get();
@@ -316,7 +308,7 @@ void ComplexAnimator::ca_addDescendantsKey(Key * const key) {
 }
 
 void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
-    const auto collection = ca_getKeyCollectionAtRelFrame(key->getRelFrame());
+    const auto collection = anim_getKeyAtRelFrame<ComplexKey>(key->getRelFrame());
     if(!collection) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty())

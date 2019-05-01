@@ -9,7 +9,7 @@ public:
         if(Animator::anim_mKeys.isEmpty())
             return this->getCurrentValue();
         int prevId; int nextId;
-        this->anim_getPrevAndNextKeyIdForRelFrameF(prevId, nextId, relFrame);
+        this->anim_getPrevAndNextKeyIdF(prevId, nextId, relFrame);
         const auto prevKey = this->template anim_getKeyAtIndex<KeyT<T>>(prevId);
         if(nextId == prevId) return prevKey->getValue();
         const auto nextKey = this->template anim_getKeyAtIndex<KeyT<T>>(nextId);

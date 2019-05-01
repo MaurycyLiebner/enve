@@ -6,13 +6,12 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
-class QrealPointValueDialog : public QDialog
-{
+class QrealPointValueDialog : public QDialog {
     Q_OBJECT
 public:
     QrealPointValueDialog(QrealPoint *point, QWidget *parent);
 
-private slots:
+private:
     void setValue(double value);
     void setFrame(double frame);
     void cancel();

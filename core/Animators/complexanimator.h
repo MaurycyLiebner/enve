@@ -102,7 +102,6 @@ public:
         return GetAsSPtrTemplated(ca_mChildAnimators.takeAt(i), T);
     }
 
-
     int getChildPropertyIndex(Property * const child);
 
     void ca_updateDescendatKeyFrame(Key* key);
@@ -137,8 +136,6 @@ public slots:
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
 protected:
-    ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
-    ComplexKey *ca_getKeyCollectionAtRelFrame(const int &frame);
     bool ca_mChildAnimatorRecording = false;
     QList<qsptr<Property>> ca_mChildAnimators;
 };

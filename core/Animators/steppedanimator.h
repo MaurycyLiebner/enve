@@ -11,7 +11,7 @@ public:
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const {
         if(this->anim_mKeys.isEmpty())
             return {FrameRange::EMIN, FrameRange::EMAX};
-        const auto pn = this->anim_getPrevAndNextKeyIdForRelFrame(relFrame);
+        const auto pn = this->anim_getPrevAndNextKeyId(relFrame);
         const int prevId = pn.first;
         const int nextId = pn.second;
 

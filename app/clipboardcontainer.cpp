@@ -95,13 +95,8 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
             rKeys.append(key.get());
             if(selectPasted) keysView->addKeyToSelection(key.get());
         }
+        if(merge) animator->anim_mergeKeysIfNeeded();
         keysId++;
-    }
-    if(merge) {
-        for(const auto &animData : mAnimatorData) {
-            Animator * const animator = animData.first;
-            if(animator) animator->anim_mergeKeysIfNeeded();
-        }
     }
 }
 

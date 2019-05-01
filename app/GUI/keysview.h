@@ -115,7 +115,6 @@ public slots:
     void graphUpdateAfterKeysChangedAndRepaint();
 
     void graphUpdateAfterKeysChanged();
-    void graphMergeKeysIfNeeded();
 
     void setFramesRange(const int &startFrame,
                         const int &endFrame);

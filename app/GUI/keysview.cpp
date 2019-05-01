@@ -147,7 +147,6 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 if(!mFirstMove) {
                     for(const auto& anim : mSelectedKeysAnimators) {
                         anim->cancelSelectedKeysTransform();
-                        anim->anim_mergeKeysIfNeeded();
                     }
                 }
 
@@ -638,7 +637,6 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 }
                 for(const auto& anim : mSelectedKeysAnimators) {
                     anim->finishSelectedKeysTransform();
-                    anim->anim_mergeKeysIfNeeded();
                 }
 
                 mMoveDFrame = 0;

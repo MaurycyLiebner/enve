@@ -47,7 +47,6 @@ public:
                                  const qreal &pixelsPerFrame,
                                  const int &keyRectSize);
     virtual void anim_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
-    virtual void anim_updateAfterChangedKey(Key * const key);
     virtual void anim_setAbsFrame(const int &frame);
     virtual bool anim_isDescendantRecording() const;
 
@@ -79,6 +78,7 @@ public:
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 public:
     void anim_mergeKeysIfNeeded();
+    void anim_updateAfterChangedKey(Key * const key);
 
     bool anim_hasKeys() const;
     bool anim_isRecording();
@@ -88,7 +88,6 @@ public:
 
     bool anim_getClosestsKeyOccupiedRelFrame(const int &frame,
                                              int &closest);
-    void anim_updateKeyOnCurrrentFrame();
     template <class T = Key>
     T* anim_getKeyOnCurrentFrame() const;
     template <class T = Key>
@@ -121,10 +120,8 @@ public:
 
     void anim_setRecordingWithoutChangingKeys(const bool &rec);
 
-    std::pair<int, int> anim_getPrevAndNextKeyIdForRelFrame(
-            const int &frame) const;
-    std::pair<int, int> anim_getPrevAndNextKeyIdForRelFrameF(
-            const qreal &frame) const;
+    std::pair<int, int> anim_getPrevAndNextKeyId(const int &relFrame) const;
+    std::pair<int, int> anim_getPrevAndNextKeyIdF(const qreal &relFrame) const;
 
     void anim_setRecordingValue(const bool &rec);
 
@@ -196,6 +193,7 @@ private:
 signals:
     void anim_isRecordingChanged();
 private:
+    void anim_updateKeyOnCurrrentFrame();
     void anim_setKeyOnCurrentFrame(Key * const key);
     int getInsertIdForKeyRelFrame(const int &relFrame,
                                   const int &min, const int &max) const;
@@ -257,7 +255,7 @@ T* Animator::anim_getNextKey(const Key * const key) const {
 
 template <class T>
 std::pair<T*, T*> Animator::anim_getPrevAndNextKey(const int &relFrame) const {
-    const auto prevNext = anim_getPrevAndNextKeyIdForRelFrame(relFrame);
+    const auto prevNext = anim_getPrevAndNextKeyId(relFrame);
     const int prevId = prevNext.first;
     T * const prevKey = anim_getKeyAtIndex<T>(prevId);
     const int nextId = prevNext.second;

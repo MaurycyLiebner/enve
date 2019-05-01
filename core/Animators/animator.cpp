@@ -145,8 +145,8 @@ struct KeyPair {
     KeyPair(Key * const key1, Key * const key2) :
         fKey1(key1), fKey2(key2) {}
 
-    Key * const fKey1;
-    Key * const fKey2;
+    Key * fKey1;
+    Key * fKey2;
 };
 
 void Animator::anim_mergeKeysIfNeeded() {
@@ -211,11 +211,11 @@ bool Animator::anim_hasNextKey(const Key * const key) {
 }
 
 int Animator::anim_getPrevKeyId(const int &relFrame) const {
-    return anim_getPrevAndNextKeyIdForRelFrame(relFrame).first;
+    return anim_getPrevAndNextKeyId(relFrame).first;
 }
 
 int Animator::anim_getNextKeyId(const int &relFrame) const {
-    return anim_getPrevAndNextKeyIdForRelFrame(relFrame).second;
+    return anim_getPrevAndNextKeyId(relFrame).second;
 }
 
 
@@ -333,7 +333,8 @@ void Animator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
 }
 
 void Animator::anim_updateKeyOnCurrrentFrame() {
-    anim_setKeyOnCurrentFrame(anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame));
+    const auto key = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
+    anim_setKeyOnCurrentFrame(key);
 }
 
 DurationRectangleMovable *Animator::anim_getRectangleMovableAtPos(
@@ -439,30 +440,25 @@ void Animator::anim_getKeysInRect(const QRectF &selectionRect,
     }
 }
 
-std::pair<int, int> Animator::anim_getPrevAndNextKeyIdForRelFrame(
-        const int &frame) const {
+std::pair<int, int> Animator::anim_getPrevAndNextKeyId(
+        const int &relFrame) const {
     if(anim_mKeys.isEmpty()) return {-1, -1};
     const int lastKeyId = anim_mKeys.count() - 1;
     const int lastKeyRelFrame = anim_mKeys.last()->getRelFrame();
-    if(frame > lastKeyRelFrame) {
-        return {lastKeyId, lastKeyId + 1};
-    } else if(frame == lastKeyRelFrame) {
-        return {lastKeyId - 1, lastKeyId + 1};
-    }
+    if(relFrame > lastKeyRelFrame) return {lastKeyId, lastKeyId + 1};
+    if(relFrame == lastKeyRelFrame) return {lastKeyId - 1, lastKeyId + 1};
     const int firstKeyRelFrame = anim_mKeys.first()->getRelFrame();
-    if(frame < firstKeyRelFrame) {
-        return {-1, 0};
-    } else if(frame == firstKeyRelFrame) {
-        return {-1, 1};
-    }
+    if(relFrame < firstKeyRelFrame) return {-1, 0};
+    if(relFrame == firstKeyRelFrame) return {-1, 1};
+
     int minId = 0;
     int maxId = lastKeyId;
     while(maxId - minId > 1) {
         const int guess = (maxId + minId)/2;
         const int keyFrame = anim_mKeys.at(guess)->getRelFrame();
-        if(keyFrame > frame) {
+        if(keyFrame > relFrame) {
             maxId = guess;
-        } else if(keyFrame < frame) {
+        } else if(keyFrame < relFrame) {
             minId = guess;
         } else {
             return { guess - 1, guess + 1 };
@@ -471,14 +467,13 @@ std::pair<int, int> Animator::anim_getPrevAndNextKeyIdForRelFrame(
     return {minId, maxId};
 }
 
-std::pair<int, int> Animator::anim_getPrevAndNextKeyIdForRelFrameF(
-        const qreal &frame) const {
-    if(isInteger4Dec(frame))
-        return anim_getPrevAndNextKeyIdForRelFrame(qRound(frame));
-    const int fFrame = qFloor(frame);
-    const int next = anim_getPrevAndNextKeyIdForRelFrame(fFrame).second;
-    const int cFrame = qCeil(frame);
-    const int prev = anim_getPrevAndNextKeyIdForRelFrame(cFrame).first;
+std::pair<int, int> Animator::anim_getPrevAndNextKeyIdF(const qreal &relFrame) const {
+    if(isInteger4Dec(relFrame))
+        return anim_getPrevAndNextKeyId(qRound(relFrame));
+    const int fFrame = qFloor(relFrame);
+    const int next = anim_getPrevAndNextKeyId(fFrame).second;
+    const int cFrame = qCeil(relFrame);
+    const int prev = anim_getPrevAndNextKeyId(cFrame).first;
     return {prev, next};
 }
 
@@ -492,7 +487,7 @@ int Animator::anim_getCurrentRelFrame() const {
 
 FrameRange Animator::prp_getIdenticalRelRange(const int &relFrame) const {
     if(anim_mKeys.isEmpty()) return {FrameRange::EMIN, FrameRange::EMAX};
-    const auto pn = anim_getPrevAndNextKeyIdForRelFrame(relFrame);
+    const auto pn = anim_getPrevAndNextKeyId(relFrame);
     const int prevId = pn.first;
     const int nextId = pn.second;
 
@@ -638,6 +633,7 @@ void Animator::finishSelectedKeysTransform() {
     for(const auto& key : anim_mSelectedKeys) {
         key->finishFrameTransform();
     }
+    anim_mergeKeysIfNeeded();
 }
 
 void Animator::startSelectedKeysTransform() {
