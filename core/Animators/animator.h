@@ -192,6 +192,12 @@ public:
             return idForRelFrame(relFrame, 0, mList.count());
         }
 
+        void mergeAll() {
+            for(int i = 0; i < mList.count(); i++) {
+                auto& iOKey = mList[i];
+                iOKey.merge();
+            }
+        }
     private:
         int idForRelFrame(const int& relFrame,
                           const int& min, const int& max) const {
@@ -364,22 +370,15 @@ public:
     void anim_coordinateKeysWith(Animator * const other);
     void anim_addKeysWhereOtherHasKeys(const Animator * const other);
 protected:
-    void afterKeyRemoved(Key * const keyPtr) {
-        const int rFrame = keyPtr->getRelFrame();
+    void readKeys(QIODevice *target);
+    void writeKeys(QIODevice *target) const;
 
-        emit prp_removingKey(keyPtr);
-        if(rFrame == anim_mCurrentRelFrame)
-            anim_setKeyOnCurrentFrame(nullptr);
-
-        const int prevKeyRelFrame = anim_getPrevKeyRelFrame(rFrame);
-        const int nextKeyRelFrame = anim_getNextKeyRelFrame(rFrame);
-        const int affectedMin = prevKeyRelFrame == FrameRange::EMIN ?
-                    FrameRange::EMIN :
-                    qMin(prevKeyRelFrame + 1, rFrame);
-        const int affectedMax = nextKeyRelFrame == FrameRange::EMAX ?
-                    FrameRange::EMAX :
-                    qMax(nextKeyRelFrame - 1, rFrame);
-        prp_updateAfterChangedRelFrameRange({affectedMin, affectedMax});
+    IdRange frameRangeToKeyIdRange(const FrameRange& relRange) const {
+        int min = anim_getPrevKeyId(relRange.fMin + 1);
+        int max = anim_getNextKeyId(relRange.fMax - 1);
+        if(min == -1) min = 0;
+        if(max == -1) max = anim_mKeys.count() - 1;
+        return {min, max};
     }
 
     OverlappingKeyList anim_mKeys;

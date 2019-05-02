@@ -86,22 +86,12 @@ public:
     //FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 
     void writeProperty(QIODevice * const target) const {
-        int nKeys = this->anim_mKeys.count();
-        target->write(rcConstChar(&nKeys), sizeof(int));
-        for(const auto &key : this->anim_mKeys) {
-            key->writeKey(target);
-        }
+        this->writeKeys(target);
         gWrite(target, mCurrentValue);
     }
 
     void readProperty(QIODevice *target) {
-        int nKeys;
-        target->read(rcChar(&nKeys), sizeof(int));
-        for(int i = 0; i < nKeys; i++) {
-            auto newKey = SPtrCreateTemplated(K)(this);
-            newKey->readKey(target);
-            this->anim_appendKey(newKey);
-        }
+        this->readKeys(target);
         gRead(target, mCurrentValue);
         afterValueChanged();
     }

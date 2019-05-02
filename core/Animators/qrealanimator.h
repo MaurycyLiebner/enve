@@ -33,7 +33,9 @@ public:
     void anim_removeAllKeys();
     void anim_addKeyAtRelFrame(const int& relFrame);
 
-    void graph_updateKeyPathWithId(const int &id);
+    QPainterPath graph_getPathForSegment(
+            const GraphKey * const prevKey,
+            const GraphKey * const nextKey) const;
 
     qValueRange graph_getMinAndMaxValues() const;
     qValueRange graph_getMinAndMaxValuesBetweenFrames(

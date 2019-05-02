@@ -266,27 +266,25 @@ void QrealAnimator::anim_removeAllKeys() {
     setCurrentBaseValue(currentValue);
 }
 
-void QrealAnimator::graph_updateKeyPathWithId(const int& id) {
-    if(id < 0 || id >= graph_mKeyPaths.count()) return;
-    const auto prevKey = anim_getKeyAtIndex<QrealKey>(id - 1);
-    const auto nextKey = anim_getKeyAtIndex<QrealKey>(id);
-    QPainterPath& path = graph_mKeyPaths[id];
-    path = QPainterPath();
+QPainterPath QrealAnimator::graph_getPathForSegment(
+        const GraphKey * const prevKey,
+        const GraphKey * const nextKey) const {
+    QPainterPath path;
     if(prevKey) {
-        path.moveTo(prevKey->getRelFrame(), prevKey->getValue());
+        path.moveTo(prevKey->getRelFrame(), prevKey->getValueForGraph());
         if(nextKey) {
             path.cubicTo(QPointF(prevKey->getEndFrame(),
                                  prevKey->getEndValue()),
                          QPointF(nextKey->getStartFrame(),
                                  nextKey->getStartValue()),
                          QPointF(nextKey->getRelFrame(),
-                                 nextKey->getValue()));
+                                 nextKey->getValueForGraph()));
         } else {
-            path.lineTo(50000, prevKey->getValue());
+            path.lineTo(50000, prevKey->getValueForGraph());
         }
     } else {
         if(nextKey) {
-            const qreal nextVal = nextKey->getValue();
+            const qreal nextVal = nextKey->getValueForGraph();
             path.moveTo(-50000, nextVal);
             path.lineTo(nextKey->getRelFrame(), nextVal);
         } else {
@@ -294,6 +292,7 @@ void QrealAnimator::graph_updateKeyPathWithId(const int& id) {
             path.lineTo(50000, mCurrentBaseValue);
         }
     }
+    return path;
 }
 
 qValueRange QrealAnimator::graph_getMinAndMaxValues() const {

@@ -136,7 +136,9 @@ void KeysView::graphPaint(QPainter *p) {
     const FrameRange viewedRange = {mMinViewedFrame, mMaxViewedFrame};
     for(int i = 0; i < mGraphAnimators.count(); i++) {
         const QColor &col = ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
+        p->save();
         mGraphAnimators.at(i)->graph_drawKeysPath(p, col, viewedRange);
+        p->restore();
     }
     p->setRenderHint(QPainter::Antialiasing, false);
 

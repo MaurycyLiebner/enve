@@ -2,21 +2,11 @@
 #include "graphkey.h"
 #include "qrealpoint.h"
 
-GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {
-    graph_mKeyPaths.append(QPainterPath());
-}
+GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {}
 
 void GraphAnimator::anim_appendKey(const stdsptr<Key>& newKey) {
-    const int keyId = getInsertIdForKeyRelFrame(newKey->getRelFrame());
-    graph_mKeyPaths.insert(keyId + 1, QPainterPath());
     Animator::anim_appendKey(newKey);
     graph_constrainCtrlsFrameValues();
-}
-
-void GraphAnimator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
-    const int keyId = anim_getKeyIndex(keyToRemove.get()) + 1;
-    graph_mKeyPaths.removeAt(keyId);
-    Animator::anim_removeKey(keyToRemove);
 }
 
 void GraphAnimator::graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
@@ -52,11 +42,10 @@ void GraphAnimator::graph_enableCtrlPtsForSelected() {
 void GraphAnimator::graph_drawKeysPath(QPainter * const p,
                                        const QColor &paintColor,
                                        const FrameRange& absFrameRange) const {
-    p->save();
-
     const auto relFrameRange = prp_absRangeToRelRange(absFrameRange);
     const auto idRange = graph_relFrameRangeToGraphPathIdRange(relFrameRange);
-    QPen pen = QPen(Qt::black, 4);
+    if(idRange.fMin == -1 || idRange.fMax == -1) return;
+    QPen pen(Qt::black, 4);
     pen.setCosmetic(true);
     p->setPen(pen);
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
@@ -70,11 +59,10 @@ void GraphAnimator::graph_drawKeysPath(QPainter * const p,
     }
 
     p->setPen(Qt::NoPen);
-    for(const auto &key : anim_mKeys) {
-        GetAsGK(key)->drawGraphKey(p, paintColor);
-    }
 
-    p->restore();
+    for(int i = idRange.fMin; i < idRange.fMax; i++) {
+        anim_getKeyAtIndex<GraphKey>(i)->drawGraphKey(p, paintColor);
+    }
 }
 
 void GraphAnimator::graph_getFrameConstraints(
@@ -133,14 +121,18 @@ void GraphAnimator::graph_getFrameValueConstraints(
     graph_getValueConstraints(key, type, minMoveValue, maxMoveValue);
 }
 
-void GraphAnimator::graph_updateKeyPathWithId(const int& id) {
-    if(id < 0 || id >= graph_mKeyPaths.count()) return;
-    const auto prevKey = anim_getKeyAtIndex<GraphKey>(id - 1);
-    const auto nextKey = anim_getKeyAtIndex<GraphKey>(id);
-    QPainterPath& path = graph_mKeyPaths[id];
-    path = QPainterPath();
+IdRange GraphAnimator::graph_relFrameRangeToGraphPathIdRange(
+        const FrameRange &relFrameRange) const {
+    return {idForFrame(relFrameRange.fMin), idForFrame(relFrameRange.fMax)};
+}
+
+QPainterPath GraphAnimator::graph_getPathForSegment(
+        const GraphKey * const prevKey,
+        const GraphKey * const nextKey) const {
+    QPainterPath path;
     if(prevKey) {
-        path.moveTo(prevKey->getRelFrame(), prevKey->getValueForGraph());
+        path.moveTo(prevKey->getRelFrame(),
+                    prevKey->getValueForGraph());
         if(nextKey) {
             path.cubicTo(QPointF(prevKey->getEndFrame(),
                                  prevKey->getEndValue()),
@@ -154,29 +146,35 @@ void GraphAnimator::graph_updateKeyPathWithId(const int& id) {
     } else {
         path.moveTo(-50000, -50000);
         if(nextKey) {
-            path.lineTo(nextKey->getRelFrame(), nextKey->getValueForGraph());
+            path.lineTo(nextKey->getRelFrame(),
+                        nextKey->getValueForGraph());
         } else {
             path.lineTo(50000, 50000);
         }
     }
-}
-
-IdRange GraphAnimator::graph_relFrameRangeToGraphPathIdRange(
-        const FrameRange &relFrameRange) const {
-    const int firstKeyId = anim_getPrevKeyId(relFrameRange.fMin + 1);
-    const int lastKeyId = anim_getNextKeyId(relFrameRange.fMax - 1);
-
-    const int maxGraphPathId = graph_mKeyPaths.count() - 1;
-    const int firstGraphPathId = clamp(firstKeyId + 1, 0, maxGraphPathId);
-    const int lastGraphPathId = clamp(lastKeyId, firstGraphPathId,
-                                      maxGraphPathId);
-    return {firstGraphPathId, lastGraphPathId};
+    return path;
 }
 
 void GraphAnimator::graph_updateKeysPath(const FrameRange &relFrameRange) {
-    const auto idRange = graph_relFrameRangeToGraphPathIdRange(relFrameRange);
-    for(int i = idRange.fMin; i <= idRange.fMax; i++) {
-        graph_updateKeyPathWithId(i);
+    const auto prevKeyId = anim_getPrevKeyId(relFrameRange.fMin);
+    auto prevKey = anim_getKeyAtIndex<GraphKey>(prevKeyId);
+    int lastKeyId = anim_getNextKeyId(relFrameRange.fMax);
+    if(lastKeyId == -1) lastKeyId = anim_mKeys.count();
+
+    const auto removeRange = graph_relFrameRangeToGraphPathIdRange(relFrameRange);
+    for(int i = removeRange.fMax; i >= removeRange.fMin; i--) {
+        graph_mKeyPaths.removeAt(i);
+    }
+
+    int currPathIndex = clamp(removeRange.fMin, 0, graph_mKeyPaths.count());
+    for(int i = prevKeyId + 1; i <= lastKeyId; i++) {
+        const auto iKey = anim_getKeyAtIndex<GraphKey>(i);
+        const auto path = graph_getPathForSegment(prevKey, iKey);
+        const int prevRelFrame = prevKey ? prevKey->getRelFrame() : FrameRange::EMIN;
+        const int iRelFrame = iKey ? iKey->getRelFrame() : FrameRange::EMAX;
+        const GraphPath graphPath{path, prevRelFrame, iRelFrame};
+        graph_mKeyPaths.insert(currPathIndex++, graphPath);
+        prevKey = iKey;
     }
 }
 

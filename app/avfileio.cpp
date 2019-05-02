@@ -165,12 +165,7 @@ void QrealKey::readKey(QIODevice *target) {
 }
 
 void QrealAnimator::writeProperty(QIODevice * const target) const {
-    const int nKeys = anim_mKeys.count();
-    target->write(rcConstChar(&nKeys), sizeof(int));
-    for(const auto &key : anim_mKeys) {
-        key->writeKey(target);
-    }
-
+    writeKeys(target);
     target->write(rcConstChar(&mCurrentBaseValue), sizeof(qreal));
 
     const bool hasRandomGenerator = !mRandomGenerator.isNull();
@@ -200,11 +195,7 @@ void RandomQrealGenerator::readProperty(QIODevice *target) {
 }
 
 void QrealAnimator::readProperty(QIODevice *target) {
-    int nKeys;
-    target->read(rcChar(&nKeys), sizeof(int));
-    for(int i = 0; i < nKeys; i++) {
-        anim_appendKey(readKey(target));
-    }
+    readKeys(target);
 
     qreal val;
     target->read(rcChar(&val), sizeof(qreal));
