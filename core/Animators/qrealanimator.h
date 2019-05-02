@@ -17,7 +17,6 @@ protected:
                   const QString& name);
 public:
     bool SWT_isQrealAnimator() const { return true; }
-    void prp_retrieveSavedValue();
     void prp_startTransform();
     void prp_finishTransform();
     void prp_cancelTransform();

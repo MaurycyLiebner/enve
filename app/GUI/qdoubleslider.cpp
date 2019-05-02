@@ -27,8 +27,8 @@ QDoubleSlider::QDoubleSlider(const qreal &minVal, const qreal &maxVal,
     mLineEdit->setValidator(mValidator);
     mLineEdit->hide();
 
-    connect(mLineEdit, SIGNAL(editingFinished()),
-            this, SLOT(lineEditingFinished()));
+    connect(mLineEdit, &QLineEdit::editingFinished,
+            this, &QDoubleSlider::lineEditingFinished);
 
     fitWidthToContent();
     setContentsMargins(0, 0, 0, 0);

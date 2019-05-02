@@ -350,10 +350,6 @@ qreal QrealAnimator::graph_clampGraphValue(const qreal &value) {
     return value;
 }
 
-void QrealAnimator::prp_retrieveSavedValue() {
-    setCurrentBaseValue(mSavedCurrentValue);
-}
-
 void QrealAnimator::incSavedValueToCurrentValue(const qreal &incBy) {
     setCurrentBaseValue(mSavedCurrentValue + incBy);
 }
@@ -391,11 +387,7 @@ void QrealAnimator::prp_finishTransform() {
 //        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
 //                                                 mCurrentValue,
 //                                                 this) );
-        if(anim_isRecording()) {
-            anim_saveCurrentValueAsKey();
-        } else {
-            prp_updateInfluenceRangeAfterChanged();
-        }
+
         mTransformed = false;
 
         prp_callFinishUpdater();
@@ -405,8 +397,8 @@ void QrealAnimator::prp_finishTransform() {
 void QrealAnimator::prp_cancelTransform() {
     if(mTransformed) {
         mTransformed = false;
-        prp_retrieveSavedValue();
-        prp_callFinishUpdater();
+        setCurrentBaseValue(mSavedCurrentValue);
+        prp_callUpdater();
     }
 }
 

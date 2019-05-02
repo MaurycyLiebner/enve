@@ -39,7 +39,6 @@ public:
     void prp_startTransform();
     void anim_setAbsFrame(const int &frame);
 
-    void prp_retrieveSavedValue();
     void prp_finishTransform();
     void prp_cancelTransform();
     void prp_setTransformed(const bool &bT);

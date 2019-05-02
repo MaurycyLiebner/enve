@@ -94,7 +94,7 @@ int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
 }
 
 void Animator::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
-    if(range.inRange(anim_mCurrentAbsFrame)) prp_currentFrameChanged();
+    if(range.inRange(anim_mCurrentAbsFrame)) prp_callUpdater();
     emit prp_absFrameRangeChanged(range);
 }
 

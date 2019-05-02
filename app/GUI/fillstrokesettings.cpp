@@ -42,30 +42,30 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
                 "None", this);
     mFillNoneButton->setCheckable(true);
     mFillNoneButton->setObjectName("leftButton");
-    connect(mFillNoneButton, SIGNAL(released()),
-            this, SLOT(setNoneFill()));
+    connect(mFillNoneButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setNoneFill);
     mFillFlatButton = new QPushButton(
                 QIcon(":/icons/fill_flat.png"),
                 "Flat", this);
     mFillFlatButton->setCheckable(true);
     mFillFlatButton->setObjectName("middleButton");
-    connect(mFillFlatButton, SIGNAL(released()),
-            this, SLOT(setFlatFill()));
+    connect(mFillFlatButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setFlatFill);
     mFillGradientButton = new QPushButton(
                 QIcon(":/icons/fill_gradient.png"),
                 "Gradient", this);
     mFillGradientButton->setCheckable(true);
     mFillGradientButton->setObjectName("rightButton");
-    connect(mFillGradientButton, SIGNAL(released()),
-            this, SLOT(setGradientFill()));
+    connect(mFillGradientButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setGradientFill);
 
     mFillBrushButton = new QPushButton(
                 QIcon(":/icons/fill_brush.png"),
                 "Brush", this);
     mFillBrushButton->setCheckable(true);
     mFillBrushButton->setObjectName("middleButton");
-    connect(mFillBrushButton, SIGNAL(released()),
-            this, SLOT(setBrushFill()));
+    connect(mFillBrushButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setBrushFill);
 
     mColorTypeLayout->addWidget(mFillNoneButton);
     mColorTypeLayout->addWidget(mFillFlatButton);
@@ -106,12 +106,12 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mBevelJoinStyleButton->setCheckable(true);
     mMiterJointStyleButton->setCheckable(true);
     mRoundJoinStyleButton->setCheckable(true);
-    connect(mBevelJoinStyleButton, SIGNAL(released()),
-            this, SLOT(setBevelJoinStyle()) );
-    connect(mMiterJointStyleButton, SIGNAL(released()),
-            this, SLOT(setMiterJoinStyle()) );
-    connect(mRoundJoinStyleButton, SIGNAL(released()),
-            this, SLOT(setRoundJoinStyle()) );
+    connect(mBevelJoinStyleButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setBevelJoinStyle);
+    connect(mMiterJointStyleButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setMiterJoinStyle);
+    connect(mRoundJoinStyleButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setRoundJoinStyle);
 
     mJoinStyleLayout->addWidget(new QLabel("Join:", this));
     mJoinStyleLayout->addWidget(mBevelJoinStyleButton);
@@ -136,12 +136,12 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mFlatCapStyleButton->setCheckable(true);
     mSquareCapStyleButton->setCheckable(true);
     mRoundCapStyleButton->setCheckable(true);
-    connect(mFlatCapStyleButton, SIGNAL(released()),
-            this, SLOT(setFlatCapStyle()) );
-    connect(mSquareCapStyleButton, SIGNAL(released()),
-            this, SLOT(setSquareCapStyle()) );
-    connect(mRoundCapStyleButton, SIGNAL(released()),
-            this, SLOT(setRoundCapStyle()) );
+    connect(mFlatCapStyleButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setFlatCapStyle);
+    connect(mSquareCapStyleButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setSquareCapStyle);
+    connect(mRoundCapStyleButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setRoundCapStyle);
 
     mCapStyleLayout->addWidget(new QLabel("Cap:", this));
     mCapStyleLayout->addWidget(mFlatCapStyleButton);
@@ -150,26 +150,25 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
 
     strokeJoinCapLay->addLayout(mCapStyleLayout);
 
-    connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
-            this, SLOT(setStrokeWidth(qreal)));
+    connect(mLineWidthSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &FillStrokeSettingsWidget::setStrokeWidth);
 
-    connect(mLineWidthSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitStrokeWidthChanged()));
+    connect(mLineWidthSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &FillStrokeSettingsWidget::emitStrokeWidthChanged);
 
     mStrokeSettingsLayout->addWidget(mStrokeJoinCapWidget);
     mStrokeSettingsWidget->setLayout(mStrokeSettingsLayout);
 
-    connect(mFillTargetButton, SIGNAL(released()),
-            this, SLOT(setFillTarget()) );
-    connect(mStrokeTargetButton, SIGNAL(released()),
-            this, SLOT(setStrokeTarget()) );
+    connect(mFillTargetButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setFillTarget);
+    connect(mStrokeTargetButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setStrokeTarget);
 
-    connect(mColorsSettingsWidget,
-            SIGNAL(colorSettingSignal(ColorSetting)),
-            this, SLOT(colorSettingReceived(ColorSetting)));
+    connect(mColorsSettingsWidget, &ColorSettingsWidget::colorSettingSignal,
+            this, &FillStrokeSettingsWidget::colorSettingReceived);
 
-    connect(mColorsSettingsWidget, SIGNAL(colorModeChanged(ColorMode)),
-            this, SLOT(setCurrentColorMode(ColorMode)));
+    connect(mColorsSettingsWidget, &ColorSettingsWidget::colorModeChanged,
+            this, &FillStrokeSettingsWidget::setCurrentColorMode);
 
     mGradientTypeLayout = new QHBoxLayout();
     mGradientTypeLayout->setSpacing(0);
@@ -178,8 +177,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
                 "Linear", this);
     mLinearGradientButton->setCheckable(true);
     mLinearGradientButton->setObjectName("leftButton");
-    connect(mLinearGradientButton, SIGNAL(released()),
-            this, SLOT(setLinearGradientFill()));
+    connect(mLinearGradientButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setLinearGradientFill);
 
     mRadialGradientButton = new QPushButton(
                 QIcon(":/icons/fill_gradient_radial.png"),
@@ -318,7 +317,7 @@ void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode &mode) {
         }
     } else {
         if(mCurrentStrokePaintType == FLATPAINT ||
-                mCurrentStrokePaintType == BRUSHPAINT) {
+           mCurrentStrokePaintType == BRUSHPAINT) {
             mCanvasWindow->setSelectedStrokeColorMode(mode);
         }
     }

@@ -4,6 +4,20 @@
 #include "exceptions.h"
 #include "basicreadwrite.h"
 
+template <uchar SIZE>
+class BitChecker {
+public:
+    bool allZeros() {
+        const uchar * ptr = mBytes;
+        for(int i = 0; i < SIZE; i++) {
+            if(*(ptr++) != 0) return false;
+        }
+        return true;
+    }
+private:
+    uchar mBytes[SIZE];
+};
+
 template <uchar PROPS, uchar VALS = 2 + PROPS>
 struct PolylinePt {
     qreal fVals[VALS];
@@ -73,9 +87,9 @@ public:
         const auto begin = mPts.begin() + minId;
         const auto end = mPts.begin() + maxId + 1;
 
-        QPointF lastPos = reinterpret_cast<const QPointF&>(begin);
+        QPointF lastPos = reinterpret_cast<const QPointF&>(*begin);
         for(auto it = begin + 1; it != end; ++it) {
-            const QPointF ptPos = reinterpret_cast<QPointF&>(it);
+            const QPointF ptPos = reinterpret_cast<const QPointF&>(*it);
             len += pointToLen(lastPos - ptPos);
         }
         return len;
@@ -85,7 +99,7 @@ public:
         qreal currLen = 0;
         QPointF lastPos = reinterpret_cast<const QPointF&>(*mPts.begin());
         for(auto it = mPts.begin() + 1; it != mPts.end(); ++it) {
-            const QPointF ptPos = reinterpret_cast<QPointF&>(it);
+            const QPointF ptPos = reinterpret_cast<const QPointF&>(*it);
             currLen += pointToLen(lastPos - ptPos);
             if(currLen > len) return static_cast<int>(it - mPts.begin()) - 1;
         }
@@ -233,7 +247,6 @@ public:
         const int size = mPts.count();
         dst->write(rcConstChar(&size), sizeof(int));
         for(int i = 0; i < size; i++) {
-            PolylinePt<PROPS> node;
             dst->write(rcConstChar(&mPts.at(i)), sizeof(PolylinePt<PROPS>));
         }
         dst->write(rcConstChar(&mClosed), sizeof(bool));

@@ -44,8 +44,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     };
     mUndoRedoStack = SPtrCreate(UndoRedoStack)(changeFrameFunc);
     mFps = fps;
-    connect(this, SIGNAL(nameChanged(QString)),
-            this, SLOT(emitCanvasNameChanged()));
+    connect(this, &Canvas::nameChanged, this, &Canvas::emitCanvasNameChanged);
     mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
     ca_addChildAnimator(mBackgroundColor);
     mBackgroundColor->prp_setInheritedUpdater(

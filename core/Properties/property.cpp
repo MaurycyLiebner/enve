@@ -20,12 +20,12 @@ void Property::drawCanvasControls(SkCanvas * const canvas,
 }
 
 void Property::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
-    prp_currentFrameChanged();
+    prp_callUpdater();
     emit prp_absFrameRangeChanged(range);
 }
 
 void Property::prp_updateInfluenceRangeAfterChanged() {
-    prp_currentFrameChanged();
+    prp_callUpdater();
     emit prp_updateWholeInfluenceRange();
 }
 
@@ -99,7 +99,7 @@ void Property::prp_setOwnUpdater(const stdsptr<PropertyUpdater>& updater) {
     prp_mOwnUpdater = true;
 }
 
-void Property::prp_currentFrameChanged() {
+void Property::prp_callUpdater() {
     if(prp_mUpdater) prp_mUpdater->update();
 }
 

@@ -239,11 +239,6 @@ void ComplexAnimator::anim_setAbsFrame(const int &frame) {
     }
 }
 
-void ComplexAnimator::prp_retrieveSavedValue() {
-    for(const auto &property : ca_mChildAnimators)
-        property->prp_retrieveSavedValue();
-}
-
 void ComplexAnimator::prp_finishTransform() {
     for(const auto &property : ca_mChildAnimators)
         property->prp_finishTransform();

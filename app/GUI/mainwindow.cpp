@@ -394,20 +394,20 @@ void MainWindow::setupMenuBar() {
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);
     mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
-    connect(mClipViewToCanvas, SIGNAL(toggled(bool)),
-            mCanvasWindow, SLOT(setClipToCanvas(bool)));
+    connect(mClipViewToCanvas, &QAction::toggled,
+            mCanvasWindow, &CanvasWindow::setClipToCanvas);
 
     mRasterEffectsVisible = mViewMenu->addAction("Raster Effects");
     mRasterEffectsVisible->setCheckable(true);
     mRasterEffectsVisible->setChecked(true);
-    connect(mRasterEffectsVisible, SIGNAL(toggled(bool)),
-            mCanvasWindow, SLOT(setRasterEffectsVisible(bool)));
+    connect(mRasterEffectsVisible, &QAction::toggled,
+            mCanvasWindow, &CanvasWindow::setRasterEffectsVisible);
 
     mPathEffectsVisible = mViewMenu->addAction("Path Effects");
     mPathEffectsVisible->setCheckable(true);
     mPathEffectsVisible->setChecked(true);
-    connect(mPathEffectsVisible, SIGNAL(toggled(bool)),
-            mCanvasWindow, SLOT(setPathEffectsVisible(bool)));
+    connect(mPathEffectsVisible, &QAction::toggled,
+            mCanvasWindow, &CanvasWindow::setPathEffectsVisible);
 
 
     mPanelsMenu = mViewMenu->addMenu("Docks");
@@ -417,47 +417,43 @@ void MainWindow::setupMenuBar() {
     mCurrentObjectDock->setChecked(true);
     mCurrentObjectDock->setShortcut(QKeySequence(Qt::Key_O));
 
-    connect(mCurrentObjectDock, SIGNAL(toggled(bool)),
-            mLeftDock, SLOT(setVisible(bool)));
+    connect(mCurrentObjectDock, &QAction::toggled,
+            mLeftDock, &QDockWidget::setVisible);
 
     mFilesDock = mPanelsMenu->addAction("Files");
     mFilesDock->setCheckable(true);
     mFilesDock->setChecked(true);
     mFilesDock->setShortcut(QKeySequence(Qt::Key_F));
 
-    connect(mFilesDock, SIGNAL(toggled(bool)),
-            mLeftDock2, SLOT(setVisible(bool)));
+    connect(mFilesDock, &QAction::toggled,
+            mLeftDock2, &QDockWidget::setVisible);
 
     mObjectsAndAnimationsDock = mPanelsMenu->addAction("Objects and Animations");
     mObjectsAndAnimationsDock->setCheckable(true);
     mObjectsAndAnimationsDock->setChecked(true);
     mObjectsAndAnimationsDock->setShortcut(QKeySequence(Qt::Key_T));
 
-    connect(mObjectsAndAnimationsDock, SIGNAL(toggled(bool)),
-            mBottomDock,
-            SLOT(setVisible(bool)));
+    connect(mObjectsAndAnimationsDock, &QAction::toggled,
+            mBottomDock, &QDockWidget::setVisible);
 
     mFillAndStrokeSettingsDock = mPanelsMenu->addAction("Fill and Stroke");
     mFillAndStrokeSettingsDock->setCheckable(true);
     mFillAndStrokeSettingsDock->setChecked(true);
     mFillAndStrokeSettingsDock->setShortcut(QKeySequence(Qt::Key_E));
 
-    connect(mFillAndStrokeSettingsDock, SIGNAL(toggled(bool)),
-            mFillStrokeSettingsDock,
-            SLOT(setVisible(bool)));
+    connect(mFillAndStrokeSettingsDock, &QAction::toggled,
+            mFillStrokeSettingsDock, &QDockWidget::setVisible);
 
     mBrushSettingsDockAction = mPanelsMenu->addAction("Brush Settings");
     mBrushSettingsDockAction->setCheckable(true);
     mBrushSettingsDockAction->setChecked(false);
     mBrushSettingsDockAction->setShortcut(QKeySequence(Qt::Key_B));
 
-    connect(mBrushSettingsDockAction, SIGNAL(toggled(bool)),
-            mBrushSettingsDock,
-            SLOT(setVisible(bool)));
+    connect(mBrushSettingsDockAction, &QAction::toggled,
+            mBrushSettingsDock, &QDockWidget::setVisible);
 
     mRenderMenu = mMenuBar->addMenu("Render");
-    mRenderMenu->addAction("Render",
-                           this, &MainWindow::addCanvasToRenderQue);
+    mRenderMenu->addAction("Render", this, &MainWindow::addCanvasToRenderQue);
 
     setMenuBar(mMenuBar);
 //

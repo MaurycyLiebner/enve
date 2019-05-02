@@ -114,8 +114,6 @@ public:
 
     virtual void prp_finishTransform() {}
 
-    virtual void prp_retrieveSavedValue() {}
-
     virtual QString prp_getValueText() { return ""; }
 
     virtual void prp_startDragging() {}
@@ -142,7 +140,7 @@ public:
         if(mParent) return mParent->getTransformAnimator();
         return nullptr;
     }
-public slots:
+
     virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
 
     virtual void prp_updateAfterChangedRelFrameRange(const FrameRange &range) {
@@ -209,7 +207,7 @@ public:
         return mPointsHandler.get();
     }
 protected:
-    void prp_currentFrameChanged();
+    void prp_callUpdater();
     void prp_callFinishUpdater();
 
     virtual void updateCanvasProps() {
