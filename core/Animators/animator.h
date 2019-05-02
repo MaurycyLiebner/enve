@@ -239,12 +239,10 @@ public:
                                  const int &minViewedFrame,
                                  const qreal &pixelsPerFrame,
                                  const int &keyRectSize);
-    virtual void anim_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     virtual void anim_setAbsFrame(const int &frame);
     virtual bool anim_isDescendantRecording() const;
 
     virtual void anim_appendKey(const stdsptr<Key> &newKey);
-    virtual void anim_removeKey(const stdsptr<Key>& keyToRemove);
 
     virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                            const int &relX,
@@ -258,6 +256,8 @@ public:
     virtual void anim_updateAfterShifted();
     virtual void anim_setRecording(const bool &rec);
 
+    bool SWT_isAnimator() const { return true; }
+
     void drawTimelineControls(QPainter * const p,
                               const qreal &pixelsPerFrame,
                               const FrameRange &absFrameRange,
@@ -265,11 +265,12 @@ public:
 
     void addActionsToMenu(PropertyTypeMenu * const menu);
 
-    bool SWT_isAnimator() const;
     void prp_startDragging();
     void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 public:
+    void anim_removeKey(const stdsptr<Key>& keyToRemove);
+    void anim_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     void anim_mergeKeysIfNeeded();
     void anim_updateAfterChangedKey(Key * const key);
 

@@ -375,8 +375,6 @@ void Animator::anim_setRecordingValue(const bool &rec) {
     emit anim_isRecordingChanged();
 }
 
-bool Animator::SWT_isAnimator() const { return true; }
-
 bool Animator::anim_isRecording() {
     return anim_mIsRecording;
 }
