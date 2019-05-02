@@ -7,7 +7,7 @@
 #include "PropertyUpdaters/propertyupdater.h"
 #include "qrealpoint.h"
 
-Animator::Animator(const QString& name) : Property(name) {}
+Animator::Animator(const QString& name) : Property(name), anim_mKeys(this) {}
 
 void Animator::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
     for(const auto &key : anim_mKeys) {

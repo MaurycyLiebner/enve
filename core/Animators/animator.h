@@ -75,6 +75,9 @@ public:
 
     class OverlappingKeyList {
     public:
+        OverlappingKeyList(Animator * const animator) :
+            mAnimator(animator) {}
+
         class iterator {
         public:
             iterator(const int& id,
@@ -126,11 +129,11 @@ public:
             const int relFrame = key->getRelFrame();
             const int insertId = idForRelFrame(relFrame);
             if(insertId < 0 || insertId >= mList.count()) {
-                mList.insert(insertId, OverlappingKeys(key));
+                mList.insert(insertId, OverlappingKeys(key, mAnimator));
             } else {
                 auto& ovrlp = mList[insertId];
                 if(ovrlp.getFrame() == relFrame) ovrlp.addKey(key);
-                else mList.insert(insertId, OverlappingKeys(key));
+                else mList.insert(insertId, OverlappingKeys(key, mAnimator));
             }
             return insertId;
         }
@@ -186,7 +189,7 @@ public:
         }
 
         int idForRelFrame(const int& relFrame) const {
-            return idForRelFrame(relFrame, 0, mList.count() - 1);
+            return idForRelFrame(relFrame, 0, mList.count());
         }
 
     private:
@@ -205,6 +208,7 @@ public:
             return guess;
         }
 
+        Animator * const mAnimator;
         QList<OverlappingKeys> mList;
     };
 
