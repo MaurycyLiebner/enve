@@ -21,13 +21,7 @@ SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
 }
 
 void SmartPathAnimator::readProperty(QIODevice *target) {
-    int nKeys;
-    target->read(rcChar(&nKeys), sizeof(int));
-    for(int i = 0; i < nKeys; i++) {
-        auto newKey = SPtrCreate(SmartPathKey)(this);
-        newKey->readKey(target);
-        anim_appendKey(newKey);
-    }
+    readKeys(target);
     gRead(target, mBaseValue);
     updateAllPoints();
 }

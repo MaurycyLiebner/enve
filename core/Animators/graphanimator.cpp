@@ -2,11 +2,11 @@
 #include "graphkey.h"
 #include "qrealpoint.h"
 
-GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {}
+GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {
+    connect(this, &Animator::prp_addingKey, [this](Key * key) {
 
-void GraphAnimator::anim_appendKey(const stdsptr<Key>& newKey) {
-    Animator::anim_appendKey(newKey);
-    graph_constrainCtrlsFrameValues();
+        graph_constrainCtrlsFrameValues();
+    });
 }
 
 void GraphAnimator::graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
@@ -73,22 +73,22 @@ void GraphAnimator::graph_getFrameConstraints(
         maxMoveFrame = DBL_MAX;
         return;
     }
-    qreal keyFrame = key->getAbsFrame();
+    const qreal keyFrame = key->getAbsFrame();
 
     qreal startMinMoveFrame;
     qreal endMaxMoveFrame;
-    int keyId = anim_getKeyIndex(key);
+    const int keyId = anim_getKeyIndex(key);
 
     if(keyId == anim_mKeys.count() - 1) {
-        endMaxMoveFrame = keyFrame + 5000.;
+        endMaxMoveFrame = keyFrame + 5000;
     } else {
         endMaxMoveFrame = anim_mKeys.atId(keyId + 1)->getAbsFrame();
     }
 
     if(keyId == 0) {
-        startMinMoveFrame = keyFrame - 5000.;
+        startMinMoveFrame = keyFrame - 5000;
     } else {
-        Key *prevKey = anim_mKeys.atId(keyId - 1);
+        const auto& prevKey = anim_mKeys.atId(keyId - 1);
         startMinMoveFrame = prevKey->getAbsFrame();
     }
 
@@ -192,7 +192,7 @@ void GraphAnimator::graph_constrainCtrlsFrameValues() {
             gKey->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
             qreal startMin; qreal startMax;
             graph_getValueConstraints(gKey, QrealPointType::START_POINT,
-                                        startMin, startMax);
+                                      startMin, startMax);
             gKey->constrainStartCtrlValue(startMin, startMax);
         }
         lastKey = gKey;

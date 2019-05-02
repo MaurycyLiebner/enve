@@ -72,7 +72,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
         target.open(QIODevice::ReadOnly);
         target.read(rcChar(&nKeys), sizeof(int));
         for(int i = 0; i < nKeys; i++) {
-            stdsptr<Key> keyT = animator->readKey(&target);
+            const auto keyT = animator->readKey(&target);
             if(keyT->getAbsFrame() < firstKeyFrame) {
                 firstKeyFrame = keyT->getAbsFrame();
             }

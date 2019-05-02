@@ -29,8 +29,6 @@ public:
 
     bool SWT_isGraphAnimator() const { return true; }
 
-    void anim_appendKey(const stdsptr<Key> &newKey);
-
     void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
         Animator::prp_updateAfterChangedRelFrameRange(range);
         graph_updateKeysPath(range);
