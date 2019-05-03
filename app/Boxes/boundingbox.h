@@ -333,10 +333,6 @@ public:
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
                            const SkScalar &invScale);
-    void drawOutlineOverlay(SkCanvas * const canvas,
-                              const SkPath &path,
-                              const SkScalar &invScale,
-                              const bool &dashes);
 
     template <class T>
     void addEffect() {

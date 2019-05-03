@@ -26,6 +26,28 @@ namespace SkiaHelpers {
     void writeImg(const sk_sp<SkImage>& img, QIODevice * const file);
 
     sk_sp<SkImage> readImg(QIODevice * const file);
+
+    void drawOutlineOverlay(SkCanvas * const canvas,
+                            const SkPath &path,
+                            const SkScalar &invScale);
+
+    void drawOutlineOverlay(SkCanvas * const canvas,
+                            const SkPath &path,
+                            const SkScalar &invScale,
+                            const SkMatrix& transform);
+
+    void drawOutlineOverlay(SkCanvas * const canvas,
+                            const SkPath &path,
+                            const SkScalar &invScale,
+                            const bool &dashes,
+                            const SkScalar &intervalSize);
+
+    void drawOutlineOverlay(SkCanvas * const canvas,
+                            const SkPath &path,
+                            const SkScalar &invScale,
+                            const SkMatrix& transform,
+                            const bool &dashes,
+                            const SkScalar& intervalSize);
 }
 
 #endif // SKIAHELPERS_H

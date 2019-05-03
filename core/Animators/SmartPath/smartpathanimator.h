@@ -15,6 +15,13 @@ protected:
 public:
     bool SWT_isSmartPathAnimator() const { return true; }
 
+    void drawCanvasControls(SkCanvas * const canvas,
+                            const CanvasMode &mode,
+                            const SkScalar &invScale) {
+
+        Property::drawCanvasControls(canvas, mode, invScale);
+    }
+
     void anim_setAbsFrame(const int &frame) {
         if(frame == anim_getCurrentAbsFrame()) return;
         const int lastRelFrame = anim_getCurrentRelFrame();

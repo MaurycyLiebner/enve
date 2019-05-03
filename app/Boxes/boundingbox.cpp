@@ -480,31 +480,10 @@ OutlineSettingsAnimator *BoundingBox::getStrokeSettings() const {
     return nullptr;
 }
 
-void BoundingBox::drawOutlineOverlay(SkCanvas * const canvas,
-                                     const SkPath &path,
-                                     const SkScalar &invScale,
-                                     const bool &dashes) {
-    SkPaint paint;
-    if(dashes) {
-        const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
-                                       MIN_WIDGET_HEIGHT*0.25f*invScale};
-        paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-    }
-    paint.setAntiAlias(true);
-    paint.setStrokeWidth(1.5f*invScale);
-    paint.setStyle(SkPaint::kStroke_Style);
-    paint.setColor(SK_ColorBLACK);
-    SkPath mappedPath = path;
-    mappedPath.transform(toSkMatrix(getTotalTransform()));
-    canvas->drawPath(mappedPath, paint);
-    paint.setStrokeWidth(0.75f*invScale);
-    paint.setColor(SK_ColorWHITE);
-    canvas->drawPath(mappedPath, paint);
-}
-
 void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
                                    const SkScalar &invScale) {
-    drawOutlineOverlay(canvas, mSkRelBoundingRectPath, invScale, true);
+    SkiaHelpers::drawOutlineOverlay(canvas, mSkRelBoundingRectPath,
+                                    invScale, true, MIN_WIDGET_HEIGHT*0.25f);
 }
 
 const SkPath &BoundingBox::getRelBoundingRectPath() {

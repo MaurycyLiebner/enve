@@ -211,7 +211,7 @@ void PathBox::setupRenderData(const qreal &relFrame,
 void PathBox::drawBoundingRect(SkCanvas * const canvas,
                                const SkScalar &invScale) {
     BoundingBox::drawBoundingRect(canvas, invScale);
-    drawOutlineOverlay(canvas, mEditPathSk, invScale, false);
+    SkiaHelpers::drawOutlineOverlay(canvas, mEditPathSk, invScale);
 }
 
 void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {

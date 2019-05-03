@@ -84,3 +84,49 @@ sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
     file->read(scChar(btmp.getPixels()), readBytes);
     return SkiaHelpers::transferDataToSkImage(btmp);
 }
+
+void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
+                                     const SkPath &path,
+                                     const SkScalar &invScale) {
+    drawOutlineOverlay(canvas, path, invScale, false, 0);
+}
+
+void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
+                                     const SkPath &path,
+                                     const SkScalar &invScale,
+                                     const SkMatrix& transform) {
+    drawOutlineOverlay(canvas, path, invScale, transform, false, 0);
+}
+
+void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
+                                     const SkPath &path,
+                                     const SkScalar &invScale,
+                                     const bool &dashes,
+                                     const SkScalar& intervalSize) {
+    SkPaint paint;
+    if(dashes) {
+        const SkScalar intervals[2] = {intervalSize*invScale,
+                                       intervalSize*invScale};
+        paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+    }
+    paint.setAntiAlias(true);
+    paint.setStrokeWidth(1.5f*invScale);
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setColor(SK_ColorBLACK);
+    canvas->drawPath(path, paint);
+    paint.setStrokeWidth(0.75f*invScale);
+    paint.setColor(SK_ColorWHITE);
+    canvas->drawPath(path, paint);
+}
+
+void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
+                                     const SkPath &path,
+                                     const SkScalar &invScale,
+                                     const SkMatrix& transform,
+                                     const bool &dashes,
+                                     const SkScalar &intervalSize) {
+    SkPath mappedPath = path;
+    mappedPath.transform(transform);
+    drawOutlineOverlay(canvas, mappedPath, invScale,
+                       dashes, intervalSize);
+}
