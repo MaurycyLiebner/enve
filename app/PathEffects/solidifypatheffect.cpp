@@ -9,6 +9,8 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     mDisplacement->setCurrentBaseValue(5);
 
     ca_addChildAnimator(mDisplacement);
+
+    setPropertyForGUI(mDisplacement.get());
 }
 
 void SolidifyPathEffect::apply(const qreal &relFrame,

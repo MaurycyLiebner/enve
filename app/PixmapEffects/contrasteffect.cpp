@@ -6,9 +6,11 @@ ContrastEffect::ContrastEffect(qreal contrast) :
     PixmapEffect("contrast", EFFECT_CONTRAST) {
     mContrastAnimator = SPtrCreate(QrealAnimator)("contrast");
 
-    mContrastAnimator->setValueRange(-255., 255.);
+    mContrastAnimator->setValueRange(-255, 255);
     mContrastAnimator->setCurrentBaseValue(contrast);
     ca_addChildAnimator(mContrastAnimator);
+
+    setPropertyForGUI(mContrastAnimator.get());
 }
 
 stdsptr<PixmapEffectRenderData> ContrastEffect::getPixmapEffectRenderDataForRelFrameF(

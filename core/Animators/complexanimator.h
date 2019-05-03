@@ -8,7 +8,6 @@ class KeysClipboardContainer;
 class QrealAnimator;
 
 class ComplexAnimator : public Animator {
-    Q_OBJECT
     friend class SelfRef;
 protected:
     ComplexAnimator(const QString& name);
@@ -58,7 +57,7 @@ public:
             }
         }
     }
-public slots:
+
     void anim_setRecording(const bool &rec);
     virtual void ca_childAnimatorIsRecordingChanged();
 public:
@@ -116,17 +115,14 @@ public:
         }
     }
 
-    template <class T = Property>
-    T *getPropertyIfIsTheOnlyOne(bool (Property::*tester)() const) {
-        if(ca_mChildAnimators.count() == 1) {
-            Property* prop = ca_mChildAnimators.first().get();
-            if((prop->*tester)()) {
-                return static_cast<T*>(prop);
-            }
-        }
-        return nullptr;
+    Property* getPropertyForGUI() const {
+        return mPropertyGUI;
     }
-public slots:
+
+    void setPropertyForGUI(Property * const prop) {
+        mPropertyGUI = prop;
+    }
+
     void ca_prependChildAnimator(Property *childAnimator,
                                  const qsptr<Property>& prependWith);
     void ca_replaceChildAnimator(const qsptr<Property> &childAnimator,
@@ -135,6 +131,7 @@ public slots:
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
 protected:
+    qptr<Property> mPropertyGUI;
     bool ca_mChildAnimatorRecording = false;
     QList<qsptr<Property>> ca_mChildAnimators;
 };

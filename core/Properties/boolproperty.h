@@ -3,36 +3,32 @@
 #include "Properties/property.h"
 
 class BoolProperty : public Property {
-    Q_OBJECT
     friend class SelfRef;
+protected:
+    BoolProperty(const QString& name);
 public:
     bool getValue();
 
     bool SWT_isBoolProperty() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
-public slots:
     void setValue(const bool &value);
-protected:
-    BoolProperty(const QString& name);
 private:
     bool mValue = false;
 };
 
 #include "Animators/complexanimator.h"
 class BoolPropertyContainer : public ComplexAnimator {
-    Q_OBJECT
     friend class SelfRef;
+protected:
+    BoolPropertyContainer(const QString& name);
 public:
     bool getValue();
 
     bool SWT_isBoolPropertyContainer() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
-public slots:
     void setValue(const bool &value);
-protected:
-    BoolPropertyContainer(const QString& name);
 private:
     bool mValue = false;
 };

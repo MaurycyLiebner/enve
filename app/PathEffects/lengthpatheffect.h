@@ -1,14 +1,13 @@
 #ifndef LENGTHPATHEFFECT_H
 #define LENGTHPATHEFFECT_H
 #include "PathEffects/patheffect.h"
-
-class LengthPathEffect : public PathEffect {
+class __attribute__ ((deprecated("Use SubPathEffect instead")))
+      LengthPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
     LengthPathEffect(const bool &outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
-               const SkPath &src,
+    void apply(const qreal &relFrame, const SkPath &src,
                SkPath * const dst);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);

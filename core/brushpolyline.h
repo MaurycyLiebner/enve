@@ -83,7 +83,7 @@ public:
         int mNSamples = 1;
     };
 
-    static std::pair<BrushPolyline, BrushPolyline> sInterpolate(
+    static BrushPolyline sInterpolate(
             const BrushPolyline& ply1, const BrushPolyline& ply2,
             const qreal& weight2) {
         const auto path1Range = ply1.tRange();
@@ -100,7 +100,7 @@ public:
             auto ply2Part = ply2.mid(iPath2Range);
             ply1Part.remesh(5);
             ply2Part.remesh(5);
-            return {ply1Part, ply2Part};
+            return ply1Part;
         }
 
         if(iPath2Range.fMin < iPath1Range.fMin) { // path 1 has less before
@@ -123,7 +123,7 @@ public:
             pt = pt*weight1 + pt2*weight2;
         }
         ply1Part.remesh(5);
-        return {ply1Part, BrushPolyline()};
+        return ply1Part;
     }
 
     BrushPolyline mid(const qValueRange& range) const {

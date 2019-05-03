@@ -12,7 +12,8 @@ enum PathEffectType : short {
     SOLIDIFY_PATH_EFFECT,
     OPERATION_PATH_EFFECT,
     LENGTH_PATH_EFFECT,
-    SUM_PATH_EFFECT
+    SUM_PATH_EFFECT,
+    SUB_PATH_EFFECT
 };
 class PathEffect;
 

@@ -6,9 +6,11 @@ BrightnessEffect::BrightnessEffect(qreal brightness) :
     PixmapEffect("brightness", EFFECT_BRIGHTNESS) {
     mBrightnessAnimator = SPtrCreate(QrealAnimator)("brightness");
 
-    mBrightnessAnimator->setValueRange(-255., 255.);
+    mBrightnessAnimator->setValueRange(-255, 255);
     mBrightnessAnimator->setCurrentBaseValue(brightness);
     ca_addChildAnimator(mBrightnessAnimator);
+
+    setPropertyForGUI(mBrightnessAnimator.get());
 }
 
 stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRelFrameF(

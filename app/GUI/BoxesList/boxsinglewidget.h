@@ -17,6 +17,7 @@ class BoxTargetWidget;
 class BoxesListActionButton;
 class BoolPropertyWidget;
 class ComboBoxProperty;
+class ColorAnimator;
 
 class BoxSingleWidget : public SingleWidget {
     Q_OBJECT
@@ -88,6 +89,8 @@ private slots:
     void openColorSettingsDialog();
     void setCompositionMode(const int &id);
 private:
+    ColorAnimator* getColorTarget() const;
+
     QPoint mDragStartPos;
 
     BoxesListActionButton *mRecordButton;

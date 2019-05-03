@@ -54,6 +54,14 @@ public:
     void setPrefferedValueStep(const qreal &valueStep);
 
     void setValueRange(const qreal &minVal, const qreal &maxVal);
+    void setMinValue(const qreal &minVal) {
+        mMinPossibleVal = minVal;
+        setCurrentBaseValue(mCurrentBaseValue);
+    }
+    void setMaxValue(const qreal &maxVal) {
+        mMaxPossibleVal = maxVal;
+        setCurrentBaseValue(mCurrentBaseValue);
+    }
 
     void setCurrentBaseValue(qreal newValue);
     void setCurrentBaseValueNoUpdate(const qreal &newValue);

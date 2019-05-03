@@ -8,6 +8,8 @@ DesaturateEffect::DesaturateEffect() :
     mInfluenceAnimator->setCurrentBaseValue(0.2);
 
     ca_addChildAnimator(mInfluenceAnimator);
+
+    setPropertyForGUI(mInfluenceAnimator.get());
 }
 
 stdsptr<PixmapEffectRenderData> DesaturateEffect::getPixmapEffectRenderDataForRelFrameF(

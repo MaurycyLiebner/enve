@@ -14,6 +14,8 @@ LengthPathEffect::LengthPathEffect(const bool &outlinePathEffect) :
 
     ca_addChildAnimator(mLength);
     ca_addChildAnimator(mReverse);
+
+    setPropertyForGUI(mLength.get());
 }
 
 void LengthPathEffect::apply(const qreal &relFrame,
@@ -41,7 +43,7 @@ void LengthPathEffect::apply(const qreal &relFrame,
     SkPath result;
     qreal currLen = 0;
     if(reverse) {
-        for(int i = paths.count() - 1; i >= 0; i++) {
+        for(int i = paths.count() - 1; i >= 0; i--) {
             auto& path = paths[i];
             const qreal pathLen = path.getTotalLength();
             if(currLen + pathLen > targetLength) {

@@ -59,23 +59,23 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 
     mRecordButton = new BoxesListActionButton(this);
     mMainLayout->addWidget(mRecordButton);
-    connect(mRecordButton, SIGNAL(pressed()),
-            this, SLOT(switchRecordingAction()));
+    connect(mRecordButton, &BoxesListActionButton::pressed,
+            this, &BoxSingleWidget::switchRecordingAction);
 
     mContentButton = new BoxesListActionButton(this);
     mMainLayout->addWidget(mContentButton);
-    connect(mContentButton, SIGNAL(pressed()),
-            this, SLOT(switchContentVisibleAction()));
+    connect(mContentButton, &BoxesListActionButton::pressed,
+            this, &BoxSingleWidget::switchContentVisibleAction);
 
     mVisibleButton = new BoxesListActionButton(this);
     mMainLayout->addWidget(mVisibleButton);
-    connect(mVisibleButton, SIGNAL(pressed()),
-            this, SLOT(switchBoxVisibleAction()));
+    connect(mVisibleButton, &BoxesListActionButton::pressed,
+            this, &BoxSingleWidget::switchBoxVisibleAction);
 
     mLockedButton = new BoxesListActionButton(this);
     mMainLayout->addWidget(mLockedButton);
-    connect(mLockedButton, SIGNAL(pressed()),
-            this, SLOT(switchBoxLockedAction()));
+    connect(mLockedButton, &BoxesListActionButton::pressed,
+            this, &BoxSingleWidget::switchBoxLockedAction);
 
     mFillWidget = new QWidget(this);
     mMainLayout->addWidget(mFillWidget);
@@ -89,8 +89,8 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 
     mColorButton = new BoxesListActionButton(this);
     mMainLayout->addWidget(mColorButton, Qt::AlignRight);
-    connect(mColorButton, SIGNAL(pressed()),
-            this, SLOT(openColorSettingsDialog()));
+    connect(mColorButton, &BoxesListActionButton::pressed,
+            this, &BoxSingleWidget::openColorSettingsDialog);
 
     mPropertyComboBox = new QComboBox(this);
     mMainLayout->addWidget(mPropertyComboBox);
@@ -160,8 +160,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
                                     "Luminosity");
     mCompositionModeCombo->insertSeparator(10);
     mCompositionModeCombo->insertSeparator(22);
-    connect(mCompositionModeCombo,
-            qOverload<int>(&QComboBox::activated),
+    connect(mCompositionModeCombo, qOverload<int>(&QComboBox::activated),
             this, &BoxSingleWidget::setCompositionMode);
     mCompositionModeCombo->setSizePolicy(QSizePolicy::Maximum,
                     mCompositionModeCombo->sizePolicy().horizontalPolicy());
@@ -250,6 +249,18 @@ void BoxSingleWidget::setCompositionMode(const int &id) {
         boxTarget->setBlendModeSk(idToBlendModeSk(id));
     }
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
+}
+
+ColorAnimator *BoxSingleWidget::getColorTarget() const {
+    const auto swt = mTarget->getTarget();
+    ColorAnimator * color = nullptr;
+    if(swt->SWT_isColorAnimator()) {
+        color = GetAsPtr(mTarget->getTarget(), ColorAnimator);
+    } else if(swt->SWT_isComplexAnimator()) {
+        const auto ca = GetAsPtr(mTarget->getTarget(), ComplexAnimator);
+        color = GetAsPtr(ca->getPropertyForGUI(), ColorAnimator);
+    }
+    return color;
 }
 
 void BoxSingleWidget::setBlendMode(const SkBlendMode &mode) {
@@ -477,28 +488,25 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->hide();
         mCheckBox->hide();
 
-        if(target->SWT_isComplexAnimator() &&
-            !abs->contentVisible()) {
+        clearAndHideValueAnimators();
+        if(target->SWT_isComplexAnimator() && !abs->contentVisible()) {
             if(target->SWT_isQPointFAnimator()) {
                 updateValueSlidersForQPointFAnimator();
             } else {
-                ComplexAnimator *ca_target =
-                        GetAsPtr(target, ComplexAnimator);
-                QrealAnimator *qatarget =
-                        ca_target->getPropertyIfIsTheOnlyOne<QrealAnimator>(
-                            &Property::SWT_isQrealAnimator);
-                if(!qatarget) {
-                    clearAndHideValueAnimators();
-                } else {
-                    mValueSlider->setTarget(qatarget);
-                    mValueSlider->show();
-                    mValueSlider->setNeighbouringSliderToTheRight(false);
-                    mSecondValueSlider->hide();
-                    mSecondValueSlider->clearTarget();
+                const auto ca_target = GetAsPtr(target, ComplexAnimator);
+                Property * const guiProp = ca_target->getPropertyForGUI();
+                if(guiProp) {
+                    if(guiProp->SWT_isQrealAnimator()) {
+                        mValueSlider->setTarget(GetAsPtr(guiProp, QrealAnimator));
+                        mValueSlider->show();
+                        mValueSlider->setNeighbouringSliderToTheRight(false);
+                        mSecondValueSlider->hide();
+                        mSecondValueSlider->clearTarget();
+                    } else if(guiProp->SWT_isColorAnimator()) {
+                        mColorButton->show();
+                    }
                 }
             }
-        } else {
-            clearAndHideValueAnimators();
         }
     } else if(target->SWT_isBoxTargetProperty()) {
         mRecordButton->hide();
@@ -1120,8 +1128,9 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
         p.setPen(Qt::white);
 
-        if(target->SWT_isColorAnimator()) {
-            ColorAnimator *colTarget = GetAsPtr(caTarget, ColorAnimator);
+        const auto colorTarget = getColorTarget();
+        if(colorTarget) {
+            const auto colTarget = GetAsPtr(colorTarget, ColorAnimator);
             p.setBrush(colTarget->getCurrentColor());
             p.drawRect(mColorButton->x(), 3,
                        MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT - 6);
@@ -1198,15 +1207,15 @@ void BoxSingleWidget::switchBoxLockedAction() {
 }
 
 void BoxSingleWidget::openColorSettingsDialog() {
-    QDialog *dialog = new QDialog(MainWindow::getInstance());
+    ColorAnimator * color = getColorTarget();
+    if(!color) return;
+    const auto dialog = new QDialog(MainWindow::getInstance());
     dialog->setLayout(new QVBoxLayout(dialog));
-    ColorSettingsWidget *colorSettingsWidget =
-            new ColorSettingsWidget(dialog);
-    colorSettingsWidget->setColorAnimatorTarget(
-                GetAsPtr(mTarget->getTarget(), ColorAnimator));
+    const auto colorSettingsWidget = new ColorSettingsWidget(dialog);
+    colorSettingsWidget->setColorAnimatorTarget(color);
     dialog->layout()->addWidget(colorSettingsWidget);
-    connect(MainWindow::getInstance(), SIGNAL(updateAll()),
-            dialog, SLOT(update()));
+    connect(MainWindow::getInstance(), &MainWindow::updateAll,
+            dialog, qOverload<>(&QDialog::update));
 
     dialog->show();
 }

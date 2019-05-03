@@ -11,6 +11,8 @@ BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
 
     ca_addChildAnimator(mHighQuality);
     ca_addChildAnimator(mBlurRadius);
+
+    setPropertyForGUI(mBlurRadius.get());
 }
 
 void BlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,

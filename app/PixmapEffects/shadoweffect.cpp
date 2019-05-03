@@ -13,24 +13,26 @@ ShadowEffect::ShadowEffect() :
     mColor = SPtrCreate(ColorAnimator)();
     mTranslation = SPtrCreate(QPointFAnimator)("translation");
 
-    mBlurRadius->setCurrentBaseValue(10.);
+    mBlurRadius->setCurrentBaseValue(10);
 
     mHighQuality->setValue(false);
     ca_addChildAnimator(mHighQuality);
 
-    mBlurRadius->setValueRange(0., 1000.);
+    mBlurRadius->setValueRange(0, 1000);
     ca_addChildAnimator(mBlurRadius);
 
-    mTranslation->setBaseValue(QPointF(0., 0.));
-    mTranslation->setValuesRange(-1000., 1000.);
+    mTranslation->setBaseValue(QPointF(0, 0));
+    mTranslation->setValuesRange(-1000, 1000);
     ca_addChildAnimator(mTranslation);
 
     mColor->qra_setCurrentValue(Qt::black);
     ca_addChildAnimator(mColor);
 
-    mOpacity->setValueRange(0., 1000.);
-    mOpacity->setCurrentBaseValue(100.);
+    mOpacity->setValueRange(0, 1000);
+    mOpacity->setCurrentBaseValue(100);
     ca_addChildAnimator(mOpacity);
+
+    setPropertyForGUI(mColor.get());
 //    mScale.setCurrentValue(1.);
 //    mScale.setName("scale");
 //    mScale.blockPointer();
@@ -58,7 +60,7 @@ void applyShadow(const SkBitmap &bitmap,
                  const QPointF &trans,
                  const bool &hasKeys,
                  const bool &highQuality,
-                 const qreal &opacity = 1.) {
+                 const qreal &opacity = 1) {
     SkBitmap shadowBitmap;
     shadowBitmap.allocPixels(bitmap.info());
 
