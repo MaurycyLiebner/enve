@@ -62,7 +62,88 @@ private:
 
 template <uchar PROPS>
 class Polyline {
+    friend class iterator;
 public:
+    class iterator {
+    public:
+        iterator(Polyline<PROPS> * const polyline) :
+            iterator(0, polyline) {}
+        iterator(const int& id, Polyline<PROPS> * const polyline) :
+            mId(id), mPolyline(polyline), mPt(mPolyline->mPts[id]) {
+            updateNextMoveId();
+        }
+
+        iterator& operator++() {
+            return this->operator+=(1);
+        }
+
+        iterator& operator+=(int inc) {
+            inc = clamp(inc + mId, 0, mPolyline->count() - 1) - mId;
+            mId += inc;
+            mPt += inc;
+            if(mId > mNextMoveId || inc < 0) updateNextMoveId();
+            return *this;
+        }
+
+        iterator& operator--() {
+            return this->operator-=(1);
+        }
+
+        iterator& operator-=(const int& inc) {
+            return operator+=(-inc);
+        }
+
+        bool operator==(const iterator& other) const {
+            return this->mId == other.mId;
+        }
+
+        bool operator!=(const iterator& other) const {
+            return this->mId != other.mId;
+        }
+
+        PolylinePt<PROPS> * pt() const {
+            return mPt;
+        }
+
+        bool next() {
+            if(!hasNext()) return false;
+            this->operator++();
+        }
+
+        bool prev() {
+            if(!hasPrev()) return false;
+            this->operator--();
+        }
+
+        bool hasNext() const {
+            return mId < mPolyline->count() - 1;
+        }
+
+        bool hasPrev() const {
+            return mId > 0;
+        }
+
+        bool isMove() {
+            return mId == mNextMoveId;
+        }
+    protected:
+        int mId;
+    private:
+        void updateNextMoveId() {
+            for(const auto& id : mPolyline->mMovePtIds) {
+                if(id >= mId) {
+                    mNextMoveId = id;
+                    return;
+                }
+            }
+            mNextMoveId = mPolyline->count();
+        }
+
+        int mNextMoveId;
+        Polyline<PROPS> * mPolyline;
+        PolylinePt<PROPS> * mPt;
+    };
+
     Polyline() {}
     Polyline(const QVector<PolylinePt<PROPS>>& src) : mPts(src) {}
     int count() const {
@@ -229,7 +310,7 @@ public:
     auto begin() const { return mPts.begin(); }
     auto end() const { return mPts.end(); }
 
-    bool read(QIODevice * src) {
+    void read(QIODevice * src) {
         int size;
         src->read(rcChar(&size), sizeof(int));
         mPts.clear();
@@ -239,21 +320,34 @@ public:
             src->read(rcChar(&pt), sizeof(PolylinePt<PROPS>));
             mPts.append(pt);
         }
+        int sizeM;
+        src->read(rcChar(&sizeM), sizeof(int));
+        mMovePtIds.clear();
+        mMovePtIds.reserve(sizeM);
+        for(int i = 0; i < sizeM; i++) {
+            int id;
+            src->read(rcChar(&id), sizeof(int));
+            mMovePtIds.append(id);
+        }
         src->read(rcChar(&mClosed), sizeof(bool));
-        return true;
     }
 
-    bool write(QIODevice * dst) const {
+    void write(QIODevice * dst) const {
         const int size = mPts.count();
         dst->write(rcConstChar(&size), sizeof(int));
         for(int i = 0; i < size; i++) {
             dst->write(rcConstChar(&mPts.at(i)), sizeof(PolylinePt<PROPS>));
         }
+        const int sizeM = mMovePtIds.count();
+        dst->write(rcConstChar(&sizeM), sizeof(int));
+        for(int i = 0; i < sizeM; i++) {
+            dst->write(rcConstChar(&mMovePtIds.at(i)), sizeof(int));
+        }
         dst->write(rcConstChar(&mClosed), sizeof(bool));
-        return true;
     }
 protected:
     QVector<PolylinePt<PROPS>> mPts;
+    QList<int> mMovePtIds;
 private:
     QVector<PolylinePt<PROPS>> mSavedPts;
     bool mClosed = false;
