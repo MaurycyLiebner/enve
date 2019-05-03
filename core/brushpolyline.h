@@ -24,7 +24,15 @@ struct BrushPt {
 class BrushPolyline : public Polyline<3> {
 public:
     BrushPolyline() {}
-    BrushPolyline(const QVector<PolylinePt<3>> & src) : Polyline<3>(src) {}
+    BrushPolyline(const BrushPolyline & src,
+                  const int& minId, const int& maxId) {
+        mPts = src.mPts.mid(minId, maxId - minId + 1);
+        for(const auto& moveId : src.mMovePtIds) {
+            if(moveId < minId) continue;
+            if(moveId > maxId) break;
+            mMovePtIds.append(moveId);
+        }
+    }
 
     class Stroker {
         struct StrokerPt {
@@ -129,11 +137,17 @@ public:
         return ply;
     }
 
+    BrushPolyline mid(const int& minId) const {
+        const int maxId = mPts.count() - 1;
+        return mid(minId, maxId - minId + 1);
+    }
+
+
     BrushPolyline mid(int minId, int maxId) const {
         minId = clamp(minId, 0, mPts.count() - 1);
         maxId = clamp(maxId, 0, mPts.count() - 1);
         if(minId > maxId) return BrushPolyline();
-        return BrushPolyline(mPts.mid(minId, maxId - minId + 1));
+        return BrushPolyline(*this, minId, maxId);
     }
 
     void addPtAtT(const qreal& t) {
@@ -288,8 +302,8 @@ public:
             const qreal srcLen = src.length();
             const qreal srcBLen = srcLen*bLenFrac;
             const int closingId = src.idBeforeLength(srcBLen);
-            replace(minId, -1, BrushPolyline(src.mPts.mid(0, closingId + 1)));
-            replace(0, maxId, BrushPolyline(src.mPts.mid(closingId + 1)));
+            replace(minId, -1, src.mid(0, closingId + 1));
+            replace(0, maxId, src.mid(closingId + 1));
             return;
         }
         const qreal minT = tAtId(minId);

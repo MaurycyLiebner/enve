@@ -269,7 +269,7 @@ public:
     };
 
     Polyline() {}
-    Polyline(const QVector<PolylinePt<PROPS>>& src) : mPts(src) {}
+//    Polyline(const QVector<PolylinePt<PROPS>>& src) : mPts(src) {}
     int count() const {
         return mPts.count();
     }
