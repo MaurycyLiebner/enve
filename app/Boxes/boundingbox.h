@@ -182,7 +182,6 @@ public:
 
     virtual QMatrix getRelativeTransformAtCurrentFrame();
     virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
-    virtual QMatrix getTotalTransform() const;
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
     virtual Canvas *getParentCanvas();
@@ -246,6 +245,7 @@ public:
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
             const int &relX, const int &minViewedFrame,
             const qreal &pixelsPerFrame);
+    QMatrix getTotalTransform() const;
     void drawTimelineControls(QPainter * const p,
                               const qreal &pixelsPerFrame,
                               const FrameRange &absFrameRange,
@@ -327,8 +327,8 @@ public:
     void resetTranslation();
     void resetRotation();
 
-    BasicTransformAnimator *getTransformAnimator();
-    BoxTransformAnimator *getBoxTransformAnimator();
+    BasicTransformAnimator *getTransformAnimator() const;
+    BoxTransformAnimator *getBoxTransformAnimator() const;
     QRectF getRelBoundingRect() const;
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,

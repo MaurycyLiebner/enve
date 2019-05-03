@@ -483,7 +483,8 @@ OutlineSettingsAnimator *BoundingBox::getStrokeSettings() const {
 void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
                                    const SkScalar &invScale) {
     SkiaHelpers::drawOutlineOverlay(canvas, mSkRelBoundingRectPath,
-                                    invScale, true, MIN_WIDGET_HEIGHT*0.25f);
+                                    invScale, toSkMatrix(getTotalTransform()),
+                                    true, MIN_WIDGET_HEIGHT*0.25f);
 }
 
 const SkPath &BoundingBox::getRelBoundingRectPath() {
@@ -851,11 +852,11 @@ void BoundingBox::getMotionBlurProperties(QList<Property*> &list) const {
     list.append(mTransformAnimator->getRotAnimator());
 }
 
-BasicTransformAnimator *BoundingBox::getTransformAnimator() {
+BasicTransformAnimator *BoundingBox::getTransformAnimator() const {
     return getBoxTransformAnimator();
 }
 
-BoxTransformAnimator *BoundingBox::getBoxTransformAnimator() {
+BoxTransformAnimator *BoundingBox::getBoxTransformAnimator() const {
     return mTransformAnimator.get();
 }
 

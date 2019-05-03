@@ -2,6 +2,7 @@
 #include "Animators/complexanimator.h"
 #include "PropertyUpdaters/propertyupdater.h"
 #include "undoredo.h"
+#include "Animators/transformanimator.h"
 
 Property::Property(const QString& name) :
     prp_mName(name) {}
@@ -48,9 +49,15 @@ void Property::prp_setParentFrameShift(const int &shift,
     prp_afterFrameShiftChanged();
 }
 
+QMatrix Property::getTransform() const {
+    const auto trans = getTransformAnimator();
+    if(trans) return trans->getTotalTransform();
+    return QMatrix();
+}
+
 FrameRange Property::prp_relRangeToAbsRange(const FrameRange& range) const {
     return {prp_relFrameToAbsFrame(range.fMin),
-            prp_relFrameToAbsFrame(range.fMax)};
+                prp_relFrameToAbsFrame(range.fMax)};
 }
 
 FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {

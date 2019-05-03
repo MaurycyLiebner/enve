@@ -20,7 +20,8 @@ public:
                             const CanvasMode &mode,
                             const SkScalar &invScale) {
         const auto path = getCurrentlyEditedPath()->getPathAt();
-        SkiaHelpers::drawOutlineOverlay(canvas, path, invScale);
+        SkiaHelpers::drawOutlineOverlay(canvas, path, invScale,
+                                        toSkMatrix(getTransform()));
         Property::drawCanvasControls(canvas, mode, invScale);
     }
 

@@ -136,7 +136,9 @@ public:
         Q_UNUSED(device);
     }
 
-    virtual BasicTransformAnimator *getTransformAnimator() {
+    QMatrix getTransform() const;
+
+    virtual BasicTransformAnimator *getTransformAnimator() const {
         if(mParent) return mParent->getTransformAnimator();
         return nullptr;
     }
