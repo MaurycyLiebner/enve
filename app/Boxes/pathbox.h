@@ -173,9 +173,6 @@ public:
     void setFillColorMode(const ColorMode &colorMode);
     void setStrokeColorMode(const ColorMode &colorMode);
 
-    void drawBoundingRect(SkCanvas * const canvas,
-                            const SkScalar &invScale);
-
     bool SWT_isPathBox() const { return true; }
 
     void setupRenderData(const qreal &relFrame,

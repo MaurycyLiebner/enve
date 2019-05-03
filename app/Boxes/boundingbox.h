@@ -141,19 +141,11 @@ public:
                             const SkScalar &invScale);
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const SkScalar &invScale);
-    virtual void drawBoundingRect(SkCanvas * const canvas,
-                                  const SkScalar &invScale);
 
     virtual const SkPath &getRelBoundingRectPath();
     virtual QRectF getRelBoundingRect(const qreal &relFrame);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
-
-    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &mode,
-                                   const qreal &invScale) const;
-    NormalSegment getNormalSegment(const QPointF &absPos,
-                                   const qreal &invScale) const;
 
     virtual FillSettingsAnimator *getFillSettings() const;
     virtual OutlineSettingsAnimator *getStrokeSettings() const;
@@ -260,6 +252,14 @@ public:
                               const int &rowHeight);
 
     void ca_childAnimatorIsRecordingChanged();
+
+    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                                   const CanvasMode &mode,
+                                   const qreal &invScale) const;
+    NormalSegment getNormalSegment(const QPointF &absPos,
+                                   const qreal &invScale) const;
+    void drawBoundingRect(SkCanvas * const canvas,
+                         const SkScalar &invScale);
 
     void selectAllCanvasPts(QList<stdptr<MovablePoint>> &selection,
                             const CanvasMode &mode);

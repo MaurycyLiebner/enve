@@ -5,6 +5,7 @@
 #include "basicreadwrite.h"
 #include "smartpathkey.h"
 #include "MovablePoints/segment.h"
+#include "skia/skiahelpers.h"
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
@@ -18,7 +19,8 @@ public:
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode &mode,
                             const SkScalar &invScale) {
-
+        const auto path = getCurrentlyEditedPath()->getPathAt();
+        SkiaHelpers::drawOutlineOverlay(canvas, path, invScale);
         Property::drawCanvasControls(canvas, mode, invScale);
     }
 

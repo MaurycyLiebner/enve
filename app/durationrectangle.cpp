@@ -20,11 +20,9 @@ DurationRectangleMovable *DurationRectangleMovable::getMovableAt(
                                 const int &pressX,
                                 const qreal &pixelsPerFrame,
                                 const int &minViewedFrame) {
-    int pressedDFrame = qRound(minViewedFrame + pressX/pixelsPerFrame);
-    int thisDFrame = mFramePos - minViewedFrame;
-    if(thisDFrame == pressedDFrame) {
-        return this;
-    }
+    const int pressedDFrame = qRound(minViewedFrame + pressX/pixelsPerFrame);
+    const int thisDFrame = mFramePos - minViewedFrame;
+    if(thisDFrame == pressedDFrame) return this;
     return nullptr;
 }
 
@@ -166,11 +164,8 @@ void DurationRectangle::draw(QPainter * const p,
     QColor fillColor;
     bool selected = isSelected();
 
-    if(selected) {
-        fillColor = QColor(50, 50, 255, 120);
-    } else {
-        fillColor = QColor(0, 0, 255, 120);
-    }
+    if(selected) fillColor = QColor(50, 50, 255, 120);
+    else fillColor = QColor(0, 0, 255, 120);
 
     p->fillRect(durRect.adjusted(0, 1, 0, -1), fillColor);
     if(mHovered) {
@@ -178,17 +173,11 @@ void DurationRectangle::draw(QPainter * const p,
         p->drawRect(durRect);
     }
 
-    if(mMinFrame.isHovered()) {
-        p->setPen(QPen(Qt::white));
-    } else {
-        p->setPen(QPen(Qt::black));
-    }
+    if(mMinFrame.isHovered()) p->setPen(QPen(Qt::white));
+    else p->setPen(QPen(Qt::black));
     p->drawLine(durRect.topLeft(), durRect.bottomLeft());
-    if(mMaxFrame.isHovered()) {
-        p->setPen(QPen(Qt::white));
-    } else {
-        p->setPen(QPen(Qt::black));
-    }
+    if(mMaxFrame.isHovered()) p->setPen(QPen(Qt::white));
+    else p->setPen(QPen(Qt::black));
     p->drawLine(durRect.topRight(), durRect.bottomRight());
 //    p->setPen(Qt::black);
 //    p->setBrush(Qt::NoBrush);
@@ -202,13 +191,9 @@ DurationRectangleMovable *DurationRectangle::getMovableAt(
                                           const int &minViewedFrame) {
     qreal startX = (getMinFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
     qreal endX = (getMaxFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
-    if(qAbs(pressX - startX) < 5.) {
-        return &mMinFrame;
-    } else if(qAbs(pressX - endX) < 5.) {
-        return &mMaxFrame;
-    } else if(pressX > startX && pressX < endX) {
-        return this;
-    }
+    if(qAbs(pressX - startX) < 5) return &mMinFrame;
+    else if(qAbs(pressX - endX) < 5) return &mMaxFrame;
+    else if(pressX > startX && pressX < endX) return this;
     return nullptr;
 }
 
