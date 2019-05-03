@@ -20,14 +20,13 @@ void Property::drawCanvasControls(SkCanvas * const canvas,
     }
 }
 
-void Property::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
+void Property::prp_afterChangedAbsRange(const FrameRange &range) {
     prp_callUpdater();
     emit prp_absFrameRangeChanged(range);
 }
 
-void Property::prp_updateInfluenceRangeAfterChanged() {
-    prp_callUpdater();
-    emit prp_updateWholeInfluenceRange();
+void Property::prp_afterWholeInfluenceRangeChanged() {
+    prp_afterChangedAbsRange({FrameRange::EMIN, FrameRange::EMAX});
 }
 
 const QString &Property::prp_getName() const {

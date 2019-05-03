@@ -42,7 +42,7 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
 void TextBox::setFont(const QFont &font) {
     mFont = font;
     setPathsOutdated();
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 

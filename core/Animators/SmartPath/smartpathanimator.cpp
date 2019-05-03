@@ -23,6 +23,7 @@ SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
 void SmartPathAnimator::readProperty(QIODevice *target) {
     readKeys(target);
     gRead(target, mBaseValue);
+    prp_afterWholeInfluenceRangeChanged();
     updateAllPoints();
 }
 
@@ -47,7 +48,7 @@ void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
         keyPath.actionDisconnectNodes(node1Id, node2Id);
     }
     mBaseValue.actionDisconnectNodes(node1Id, node2Id);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void SmartPathAnimator::updateAllPoints() {

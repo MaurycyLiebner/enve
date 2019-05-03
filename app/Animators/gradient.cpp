@@ -63,7 +63,7 @@ void Gradient::swapColors(const int &id1, const int &id2) {
                           mColors.at(id2).get());
     mColors.swap(id1, id2);
     updateQGradientStops(Animator::USER_CHANGE);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void Gradient::removeColor(const int &id) {
@@ -75,19 +75,19 @@ void Gradient::removeColor(const qsptr<ColorAnimator>& color) {
     emit resetGradientWidgetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
     updateQGradientStops(Animator::USER_CHANGE);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void Gradient::addColor(const QColor &color) {
     addColorToList(color);
     updateQGradientStops(Animator::USER_CHANGE);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void Gradient::replaceColor(const int &id, const QColor &color) {
     mColors.at(id)->qra_setCurrentValue(color);
     updateQGradientStops(Animator::USER_CHANGE);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void Gradient::addPath(PathBox * const path) {

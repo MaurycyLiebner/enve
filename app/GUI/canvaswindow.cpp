@@ -887,7 +887,7 @@ void CanvasWindow::setPathEffectsVisible(const bool &bT) {
 void CanvasWindow::setResolutionFraction(const qreal &percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionFraction(percent);
-    mCurrentCanvas->prp_updateInfluenceRangeAfterChanged();
+    mCurrentCanvas->prp_afterWholeInfluenceRangeChanged();
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     queScheduledTasksAndUpdate();
 }

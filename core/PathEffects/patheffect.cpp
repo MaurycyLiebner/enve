@@ -54,7 +54,7 @@ void PathEffect::switchVisible() {
 void PathEffect::setVisible(const bool &bT) {
     if(bT == mVisible) return;
     mVisible = bT;
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 const bool &PathEffect::isVisible() const {

@@ -80,7 +80,7 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
         updateCanvasProps();
     }
     connect(childProperty.data(), &Property::prp_updateWholeInfluenceRange,
-            this, &Property::prp_updateInfluenceRangeAfterChanged);
+            this, &Property::prp_afterWholeInfluenceRangeChanged);
     if(childProperty->SWT_isAnimator()) {
         const auto childAnimator = GetAsPtr(childProperty, Animator);
         connect(childAnimator, &Animator::anim_isRecordingChanged,
@@ -94,14 +94,14 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
         childAnimator->anim_setAbsFrame(anim_getCurrentAbsFrame());
     }
     connect(childProperty.data(), &Property::prp_absFrameRangeChanged,
-            this, &ComplexAnimator::prp_updateAfterChangedAbsFrameRange);
+            this, &ComplexAnimator::prp_afterChangedAbsRange);
     connect(childProperty.data(), &Property::prp_replaceWith,
             this, &ComplexAnimator::ca_replaceChildAnimator);
     connect(childProperty.data(), &Property::prp_prependWith,
             this, &ComplexAnimator::ca_prependChildAnimator);
 
     SWT_addChildAbstractionForTargetToAllAt(childProperty.get(), id);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 int ComplexAnimator::getChildPropertyIndex(Property * const child) {
@@ -148,7 +148,7 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
                                          const int &from, const int &to) {
     ca_mChildAnimators.move(from, to);
     SWT_moveChildAbstractionForTargetToInAll(child, to);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void ComplexAnimator::ca_removeChildAnimator(
@@ -168,7 +168,7 @@ void ComplexAnimator::ca_removeChildAnimator(
         updateCanvasProps();
     }
     ca_childAnimatorIsRecordingChanged();
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void ComplexAnimator::ca_removeAllChildAnimators() {
@@ -194,7 +194,7 @@ void ComplexAnimator::ca_swapChildAnimators(Property * const animator1,
     const int id1 = getChildPropertyIndex(animator1);
     const int id2 = getChildPropertyIndex(animator2);
     ca_mChildAnimators.swap(id1, id2);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 bool ComplexAnimator::hasChildAnimators() const {
@@ -220,7 +220,7 @@ void ComplexAnimator::prp_afterFrameShiftChanged() {
 void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
                                               const int &newIndex) {
     ca_mChildAnimators.move(oldIndex, newIndex);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater> &updater) {

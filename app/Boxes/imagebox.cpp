@@ -28,7 +28,7 @@ void ImageBox::setFilePath(const QString &path) {
 
     prp_setName(path.split("/").last());
     mImgCacheHandler->addDependentBox(this);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void ImageBox::reload() {

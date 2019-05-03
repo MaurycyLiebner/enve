@@ -72,9 +72,11 @@ BoundingBox *BoundingBox::sGetBoxByDocumentId(const int &documentId) {
     return nullptr;
 }
 
-void BoundingBox::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
-    Property::prp_updateAfterChangedAbsFrameRange(range);
-    if(range.inRange(anim_getCurrentAbsFrame())) {
+void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range) {
+    const auto visRange = getVisibleAbsFrameRange();
+    const auto croppedRange = visRange*range;
+    Property::prp_afterChangedAbsRange(croppedRange);
+    if(croppedRange.inRange(anim_getCurrentAbsFrame())) {
         planScheduleUpdate(Animator::USER_CHANGE);
     }
 }
@@ -174,17 +176,12 @@ Canvas *BoundingBox::getParentCanvas() {
     return mParentGroup->getParentCanvas();
 }
 
-void BoundingBox::reloadCacheHandler() { prp_updateInfluenceRangeAfterChanged(); }
+void BoundingBox::reloadCacheHandler() { prp_afterWholeInfluenceRangeChanged(); }
 
 bool BoundingBox::SWT_isBoundingBox() const { return true; }
 
 void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
     planScheduleUpdate(reason);
-}
-
-void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
-    const auto visRange = getVisibleAbsFrameRange();
-    prp_updateAfterChangedAbsFrameRange(visRange);
 }
 
 void BoundingBox::drawCanvasControls(SkCanvas * const canvas,
@@ -241,7 +238,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
     mBlendModeSk = blendMode;
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 const SkBlendMode &BoundingBox::getBlendMode() {
@@ -889,7 +886,7 @@ void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
     mGPUEffectsAnimators->ca_addChildAnimator(rasterEffect);
     rasterEffect->setParentEffectAnimators(mGPUEffectsAnimators.data());
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void BoundingBox::removeGPUEffect(const qsptr<GPURasterEffect>& effect) {
@@ -898,7 +895,7 @@ void BoundingBox::removeGPUEffect(const qsptr<GPURasterEffect>& effect) {
         mGPUEffectsAnimators->SWT_hide();
     }
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
@@ -910,7 +907,7 @@ void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
     mEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mEffectsAnimators.data());
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
@@ -919,7 +916,7 @@ void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
         mEffectsAnimators->SWT_hide();
     }
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 //int BoundingBox::prp_getParentFrameShift() const {
@@ -989,7 +986,7 @@ void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_afterFrameShiftChanged();
     const auto newRange = getVisibleAbsFrameRange();
     const auto oldRange = newRange.shifted(-dFrame);
-    prp_updateAfterChangedAbsFrameRange(newRange + oldRange);
+    prp_afterChangedAbsRange(newRange + oldRange);
     anim_setAbsFrame(anim_getCurrentAbsFrame());
 }
 
@@ -1000,7 +997,7 @@ void BoundingBox::updateAfterDurationMinFrameChangedBy(const int &by) {
 
     const int min = qMin(newMin, oldMin);
     const int max = qMax(newMin, oldMin);
-    prp_updateAfterChangedAbsFrameRange({min, max});
+    prp_afterChangedAbsRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
@@ -1010,7 +1007,7 @@ void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
 
     const int min = qMin(newMax, oldMax);
     const int max = qMax(newMax, oldMax);
-    prp_updateAfterChangedAbsFrameRange({min, max});
+    prp_afterChangedAbsRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationRectangleRangeChanged() {}
@@ -1249,7 +1246,7 @@ void BoundingBox::setVisibile(const bool &visible) {
     if(mSelected) removeFromSelection();
     mVisible = visible;
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 
     if(mVisible) planScheduleUpdate(Animator::USER_CHANGE);
     else if(mParentGroup) {

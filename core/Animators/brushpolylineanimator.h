@@ -69,7 +69,7 @@ public:
         if(spk) {
             anim_updateAfterChangedKey(spk);
         } else {
-            prp_updateInfluenceRangeAfterChanged();
+            prp_afterWholeInfluenceRangeChanged();
         }
     }
 
@@ -79,7 +79,7 @@ public:
         if(spk) {
             anim_updateAfterChangedKey(spk);
         } else {
-            prp_updateInfluenceRangeAfterChanged();
+            prp_afterWholeInfluenceRangeChanged();
         }
     }
 
@@ -88,7 +88,7 @@ public:
         if(spk) {
             anim_updateAfterChangedKey(spk);
         } else {
-            prp_updateInfluenceRangeAfterChanged();
+            prp_afterWholeInfluenceRangeChanged();
         }
     }
 

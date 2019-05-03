@@ -94,7 +94,7 @@ void Canvas::handleAddSmartPointMouseMove() {
 void Canvas::handleAddSmartPointMouseRelease() {
     if(mLastEndPoint) {
         if(!mFirstMouseMove) mLastEndPoint->finishTransform();
-        //mCurrentSmartEndPoint->prp_updateInfluenceRangeAfterChanged();
+        //mCurrentSmartEndPoint->prp_afterWholeInfluenceRangeChanged();
         if(!mLastEndPoint->isEndPoint())
             clearCurrentSmartEndPoint();
     }

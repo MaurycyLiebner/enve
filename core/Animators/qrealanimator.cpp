@@ -138,7 +138,7 @@ void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
         mRandomGenerator = GetAsSPtr(generator, RandomQrealGenerator);
     }
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 bool QrealAnimator::hasNoise() {
@@ -209,7 +209,7 @@ void QrealAnimator::setCurrentBaseValue(qreal newValue) {
     mCurrentBaseValue = newValue;
     const auto currKey = anim_getKeyOnCurrentFrame<QrealKey>();
     if(currKey) currKey->setValue(mCurrentBaseValue);
-    else prp_updateInfluenceRangeAfterChanged();
+    else prp_afterWholeInfluenceRangeChanged();
 
     emit valueChangedSignal(mCurrentBaseValue);
 

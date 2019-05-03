@@ -72,7 +72,7 @@ public:
     void addActionsToMenu(PropertyTypeMenu * const menu);
 
     void prp_startDragging();
-    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
+    void prp_afterChangedAbsRange(const FrameRange &range);
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 public:
     void anim_appendKey(const stdsptr<Key> &newKey);

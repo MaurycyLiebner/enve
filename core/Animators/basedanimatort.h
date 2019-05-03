@@ -11,11 +11,11 @@ class BasedAnimatorT : public B {
 protected:
     BasedAnimatorT(const QString& name) : B(name) {}
 public:
-    void prp_updateAfterChangedRelFrameRange(const FrameRange& range) {
-        if(range.inRange(this->anim_getCurrentRelFrame())) {
+    void prp_afterChangedAbsRange(const FrameRange& range) {
+        if(range.inRange(this->anim_getCurrentAbsFrame())) {
             this->updateValueFromCurrentFrame();
         }
-        B::prp_updateAfterChangedRelFrameRange(range);
+        B::prp_afterChangedAbsRange(range);
     }
 
     void anim_setAbsFrame(const int &frame) {
@@ -61,7 +61,7 @@ public:
     void setCurrentValue(const T &value) {
         mCurrentValue = value;
         if(this->anim_isRecording()) anim_saveCurrentValueAsKey();
-        else this->prp_updateInfluenceRangeAfterChanged();
+        else this->prp_afterWholeInfluenceRangeChanged();
         afterValueChanged();
     }
 

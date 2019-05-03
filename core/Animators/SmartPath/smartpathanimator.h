@@ -19,17 +19,23 @@ public:
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode &mode,
                             const SkScalar &invScale) {
-        const auto path = getCurrentlyEditedPath()->getPathAt();
-        SkiaHelpers::drawOutlineOverlay(canvas, path, invScale,
+        SkiaHelpers::drawOutlineOverlay(canvas, mCurrentPath, invScale,
                                         toSkMatrix(getTransform()));
         Property::drawCanvasControls(canvas, mode, invScale);
+    }
+
+    void prp_afterChangedAbsRange(const FrameRange &range) {
+        GraphAnimator::prp_afterChangedAbsRange(range);
+        if(range.inRange(anim_getCurrentAbsFrame()))
+            mPathUpToDate = false;
     }
 
     void anim_setAbsFrame(const int &frame) {
         if(frame == anim_getCurrentAbsFrame()) return;
         const int lastRelFrame = anim_getCurrentRelFrame();
         Animator::anim_setAbsFrame(frame);
-        if(anim_hasKeys()) {
+        const bool diff = prp_differencesBetweenRelFrames(frame, lastRelFrame);
+        if(anim_hasKeys() && diff) {
             const auto prevK1 = anim_getPrevKey<SmartPathKey>(lastRelFrame);
             const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
             const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);
@@ -42,6 +48,7 @@ public:
                                           prevK2, nextK2, keyAtFrame2,
                                           mBaseValue);
             anim_callFrameChangeUpdater();
+            mPathUpToDate = false;
         }
     }
 
@@ -67,11 +74,7 @@ public:
     }
 
     void writeProperty(QIODevice * const target) const {
-        const int nKeys = anim_mKeys.count();
-        target->write(rcConstChar(&nKeys), sizeof(int));
-        for(const auto &key : anim_mKeys) {
-            key->writeKey(target);
-        }
+        writeKeys(target);
         gWrite(target, mBaseValue);
     }
 
@@ -80,6 +83,12 @@ public:
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType &type,
             qreal &minValue, qreal &maxValue) const;
+
+    void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
+        const auto spk = static_cast<SmartPathKey*>(key);
+        if(spk) mPathBeingChanged_d = &spk->getValue();
+        else mPathBeingChanged_d = &mBaseValue;
+    }
 
     void deepCopySmartPathFromRelFrame(const int& relFrame,
                                        SmartPath &result) const {
@@ -90,12 +99,14 @@ public:
                                       keyAtFrame, result);
     }
 
-    SkPath getPathAtAbsFrame(const qreal &frame) const {
+    SkPath getPathAtAbsFrame(const qreal &frame) {
         return getPathAtRelFrame(prp_absFrameToRelFrameF(frame));
     }
 
-    SkPath getPathAtRelFrame(const qreal &frame) const {
-        if(anim_mKeys.isEmpty()) return mBaseValue.getPathAt();
+    SkPath getPathAtRelFrame(const qreal &frame) {
+        const auto diff = prp_differencesBetweenRelFrames(
+                    qRound(frame), anim_getCurrentRelFrame());
+        if(!diff) return getCurrentPath();
         const auto pn = anim_getPrevAndNextKeyIdF(frame);
         const int prevId = pn.first;
         const int nextId = pn.second;
@@ -126,12 +137,6 @@ public:
         return mPathBeingChanged_d;
     }
 
-    void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
-        const auto spk = static_cast<SmartPathKey*>(key);
-        if(spk) mPathBeingChanged_d = &spk->getValue();
-        else mPathBeingChanged_d = &mBaseValue;
-    }
-
     bool isClosed() const {
         return mBaseValue.isClosed();
     }
@@ -154,7 +159,7 @@ public:
         if(spk) {
             anim_updateAfterChangedKey(spk);
         } else {
-            prp_updateInfluenceRangeAfterChanged();
+            prp_afterWholeInfluenceRangeChanged();
         }
     }
 
@@ -164,17 +169,12 @@ public:
         if(spk) {
             anim_updateAfterChangedKey(spk);
         } else {
-            prp_updateInfluenceRangeAfterChanged();
+            prp_afterWholeInfluenceRangeChanged();
         }
     }
 
     void finishPathChange() {
-        const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
-        if(spk) {
-            anim_updateAfterChangedKey(spk);
-        } else {
-            prp_updateInfluenceRangeAfterChanged();
-        }
+        pathChanged();
     }
 
     void actionRemoveNode(const int& nodeId, const bool &approx) {
@@ -183,7 +183,7 @@ public:
             spKey->getValue().actionRemoveNode(nodeId, approx);
         }
         mBaseValue.actionRemoveNode(nodeId, approx);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
     }
 
     int actionAddNewAtEnd(const QPointF &relPos) {
@@ -201,7 +201,7 @@ public:
         }
         const int id = mBaseValue.actionAppendNodeAtEndNode();
         getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
         return id;
     }
 
@@ -216,7 +216,7 @@ public:
             spKey->getValue().actionAddFirstNode(data);
         }
         const int id = mBaseValue.actionAddFirstNode(data);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
         return id;
     }
 
@@ -237,7 +237,7 @@ public:
         }
         const int id = mBaseValue.actionInsertNodeBetween(node1Id, node2Id, t);
         curr->actionPromoteDissolvedNodeToNormal(id);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
         return id;
     }
 
@@ -247,7 +247,7 @@ public:
             spKey->getValue().actionConnectNodes(node1Id, node2Id);
         }
         mBaseValue.actionConnectNodes(node1Id, node2Id);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
     }
 
     void actionMergeNodes(const int &node1Id, const int &node2Id) {
@@ -256,7 +256,7 @@ public:
             spKey->getValue().actionMergeNodes(node1Id, node2Id);
         }
         mBaseValue.actionMergeNodes(node1Id, node2Id);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
     }
 
     void actionMoveNodeBetween(const int& nodeId,
@@ -286,7 +286,7 @@ public:
             spKey->getValue().actionReversePath();
         }
         mBaseValue.actionReversePath();
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
     }
 
     void actionAppendMoveAllFrom(SmartPathAnimator * const other) {
@@ -297,8 +297,8 @@ public:
             thisKey->getValue().actionAppendMoveAllFrom(otherKey->getValue());
         }
         mBaseValue.actionAppendMoveAllFrom(other->getBaseValue());
-        prp_updateInfluenceRangeAfterChanged();
-        other->prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
+        other->prp_afterWholeInfluenceRangeChanged();
         updateAllPoints();
     }
 
@@ -310,8 +310,8 @@ public:
             thisKey->getValue().actionPrependMoveAllFrom(otherKey->getValue());
         }
         mBaseValue.actionPrependMoveAllFrom(other->getBaseValue());
-        prp_updateInfluenceRangeAfterChanged();
-        other->prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
+        other->prp_afterWholeInfluenceRangeChanged();
         updateAllPoints();
     }
 
@@ -347,6 +347,14 @@ public:
         mBaseValue.applyTransform(transform);
         updateAllPoints();
     }
+
+    const SkPath& getCurrentPath() {
+        if(!mPathUpToDate) {
+            mCurrentPath = getCurrentlyEditedPath()->getPathAt();
+            mPathUpToDate = true;
+        }
+        return mCurrentPath;
+    }
 protected:
     SmartPath& getBaseValue() {
         return mBaseValue;
@@ -375,6 +383,8 @@ private:
         }
     }
 
+    bool mPathUpToDate = true;
+    SkPath mCurrentPath;
     SmartPath mBaseValue;
     SmartPath * mPathBeingChanged_d = &mBaseValue;
 };

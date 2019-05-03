@@ -14,7 +14,7 @@ void IntProperty::setCurrentValue(const int &value) {
     if(newValue == mValue) return;
 
     mValue = newValue;
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 
     emit valueChangedSignal(mValue);
 }

@@ -42,7 +42,7 @@ void AnimationBox::reloadCacheHandler() {
         mFrameAnimator->setIntValueRange(0, frameCount - 1);
     }
     reloadSound();
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 
     //mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
     planScheduleUpdate(Animator::USER_CHANGE);
@@ -98,7 +98,7 @@ void AnimationBox::enableFrameRemapping() {
     }
     mFrameRemappingEnabled = true;
     ca_prependChildAnimator(mEffectsAnimators.get(), mFrameAnimator);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
@@ -108,7 +108,7 @@ void AnimationBox::disableFrameRemapping() {
     mFrameAnimator->anim_removeAllKeys();
     mFrameAnimator->anim_setRecordingValue(false);
     ca_removeChildAnimator(mFrameAnimator);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 

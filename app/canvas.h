@@ -352,11 +352,11 @@ signals:
     void canvasNameChanged(Canvas *, QString);
 private slots:
     void emitCanvasNameChanged();
-public slots:
+public:
     void scheduleDisplayedFillStrokeSettingsUpdate();
 
-    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
-public:
+    void prp_afterChangedAbsRange(const FrameRange &range);
+
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();

@@ -54,7 +54,7 @@ public:
             mBoxTarget->setTarget(linkTarget);
             linkTarget->addLinkingBox(this);
             connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
-                    this, &BoundingBox::prp_updateAfterChangedRelFrameRange);
+                    this, &BoundingBox::prp_afterChangedAbsRange);
         }
         planScheduleUpdate(Animator::USER_CHANGE);
         connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,

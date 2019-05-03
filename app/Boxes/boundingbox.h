@@ -83,14 +83,10 @@ private:
 
     static int sNextWriteId;
     static QList<BoundingBox*> sBoxesWithWriteIds;
-public slots:
-    virtual void updateAfterDurationRectangleRangeChanged();
-
-    void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
-    void prp_updateInfluenceRangeAfterChanged();
 protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 public:
+    virtual void updateAfterDurationRectangleRangeChanged();
     virtual void setParentGroup(BoxesGroup * const parent);
 
     virtual qsptr<BoundingBox> createLink();
@@ -136,9 +132,6 @@ public:
     virtual void drawPixmapSk(SkCanvas * const canvas,
                               SkPaint * const paint,
                               GrContext* const grContext);
-    void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &mode,
-                            const SkScalar &invScale);
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const SkScalar &invScale);
 
@@ -237,6 +230,11 @@ public:
                              const bool &parentMainTarget) const;
     bool SWT_visibleOnlyIfParentDescendant() const;
     QMimeData *SWT_createMimeData();
+
+    void prp_afterChangedAbsRange(const FrameRange &range);
+    void drawCanvasControls(SkCanvas * const canvas,
+                            const CanvasMode &mode,
+                            const SkScalar &invScale);
 
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     int prp_getRelFrameShift() const;

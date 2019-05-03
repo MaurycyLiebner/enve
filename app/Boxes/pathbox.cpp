@@ -286,13 +286,13 @@ void PathBox::resetFillGradientPointsPos() {
 
 void PathBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
@@ -304,7 +304,7 @@ void PathBox::setStrokeWidth(const qreal &strokeWidth) {
 void PathBox::setOutlineCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 

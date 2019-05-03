@@ -472,13 +472,12 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     callUpdateSchedulers();
 }
 
-void Canvas::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
+void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
     if(range.inRange(anim_getCurrentAbsFrame())) {
         mCurrentPreviewContainerOutdated = true;
     }
-    mCacheHandler.clearRelRange(
-                prp_absRangeToRelRange(range));
-    Property::prp_updateAfterChangedAbsFrameRange(range);
+    mCacheHandler.clearRelRange(prp_absRangeToRelRange(range));
+    Property::prp_afterChangedAbsRange(range);
     auto rangeT = prp_getIdenticalRelRange(anim_getCurrentRelFrame());
     auto cont = mCacheHandler.atRelFrame(anim_getCurrentRelFrame());
     if(cont) cont->setRange(rangeT);

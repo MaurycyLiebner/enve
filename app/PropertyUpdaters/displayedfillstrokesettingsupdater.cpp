@@ -15,5 +15,5 @@ void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
 }
 
 void DisplayedFillStrokeSettingsUpdater::finishedChange() {
-    mTarget->prp_updateInfluenceRangeAfterChanged();
+    mTarget->prp_afterWholeInfluenceRangeChanged();
 }

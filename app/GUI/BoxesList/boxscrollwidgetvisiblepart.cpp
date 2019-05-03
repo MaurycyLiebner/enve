@@ -460,7 +460,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
             if(draggedAbs->getIdInParent() < fTargetId) targetId--;
             currentParent->ca_moveChildInList(draggedEffect.get(), fTargetId);
         }
-        targetParent->prp_updateInfluenceRangeAfterChanged();
+        targetParent->prp_afterWholeInfluenceRangeChanged();
     } else if(dragged.fType == Dragged::RASTER_GPU_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, GPURasterEffect);
         auto targetParent = static_cast<GPUEffectAnimators*>(targetSWT);
@@ -475,7 +475,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
             if(draggedAbs->getIdInParent() < fTargetId) targetId--;
             currentParent->ca_moveChildInList(draggedEffect.get(), fTargetId);
         }
-        draggedEffect->prp_updateInfluenceRangeAfterChanged();
+        draggedEffect->prp_afterWholeInfluenceRangeChanged();
     } else if(dragged.fType == Dragged::PATH_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, PathEffect);
         const auto targetParent = static_cast<PathEffectAnimators*>(targetSWT);
@@ -506,7 +506,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
             if(draggedAbs->getIdInParent() < fTargetId) targetId--;
             currentParent->ca_moveChildInList(draggedEffect.get(), targetId);
         }
-        draggedEffect->prp_updateInfluenceRangeAfterChanged();
+        draggedEffect->prp_afterWholeInfluenceRangeChanged();
     } else return false;
     return true;
 }

@@ -175,5 +175,5 @@ void RandomQrealGenerator::generateData() {
         mFrameValues << FrameValue(currFrame, gRandF(0., 1.));
         currFrame += getDeltaX(currFrame);
     }
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }

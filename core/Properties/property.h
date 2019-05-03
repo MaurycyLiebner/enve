@@ -143,17 +143,17 @@ public:
         return nullptr;
     }
 
-    virtual void prp_updateAfterChangedAbsFrameRange(const FrameRange &range);
-
-    virtual void prp_updateAfterChangedRelFrameRange(const FrameRange &range) {
-        const auto absRange = prp_relRangeToAbsRange(range);
-        prp_updateAfterChangedAbsFrameRange(absRange);
-    }
-
-    virtual void prp_updateInfluenceRangeAfterChanged();
+    virtual void prp_afterChangedAbsRange(const FrameRange &range);
 protected:
     virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 public:
+    void prp_afterWholeInfluenceRangeChanged();
+
+    void prp_afterChangedRelRange(const FrameRange &range) {
+        const auto absRange = prp_relRangeToAbsRange(range);
+        prp_afterChangedAbsRange(absRange);
+    }
+
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
     int prp_absFrameToRelFrame(const int &absFrame) const;

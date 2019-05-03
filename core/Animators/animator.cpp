@@ -93,7 +93,7 @@ int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
     return nextKey->getRelFrame();
 }
 
-void Animator::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
+void Animator::prp_afterChangedAbsRange(const FrameRange &range) {
     if(range.inRange(anim_mCurrentAbsFrame)) prp_callUpdater();
     emit prp_absFrameRangeChanged(range);
 }
@@ -101,14 +101,14 @@ void Animator::prp_updateAfterChangedAbsFrameRange(const FrameRange &range) {
 void Animator::anim_updateAfterChangedKey(Key * const key) {
     if(SWT_isComplexAnimator()) return;
     if(!key) {
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
         return;
     }
     int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
     if(prevKeyRelFrame != FrameRange::EMIN) prevKeyRelFrame++;
     int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
     if(nextKeyRelFrame != FrameRange::EMAX) nextKeyRelFrame--;
-    prp_updateAfterChangedRelFrameRange({prevKeyRelFrame, nextKeyRelFrame});
+    prp_afterChangedRelRange({prevKeyRelFrame, nextKeyRelFrame});
 }
 
 void Animator::anim_setAbsFrame(const int &frame) {
@@ -295,7 +295,7 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     const int affectedMax = nextKeyRelFrame == FrameRange::EMAX ?
                 FrameRange::EMAX :
                 qMax(nextKeyRelFrame - 1, rFrame);
-    prp_updateAfterChangedRelFrameRange({affectedMin, affectedMax});
+    prp_afterChangedRelRange({affectedMin, affectedMax});
 }
 
 void Animator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {

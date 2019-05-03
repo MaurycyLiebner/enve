@@ -122,7 +122,7 @@ void BoxesGroup::addPathEffect(const qsptr<PathEffect>& effect) {
     }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -136,7 +136,7 @@ void BoxesGroup::addFillPathEffect(const qsptr<PathEffect>& effect) {
     }
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -150,7 +150,7 @@ void BoxesGroup::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     }
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -163,7 +163,7 @@ void BoxesGroup::removePathEffect(const qsptr<PathEffect>& effect) {
         mPathEffectsAnimators->SWT_hide();
     }
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -176,7 +176,7 @@ void BoxesGroup::removeFillPathEffect(const qsptr<PathEffect>& effect) {
         mFillPathEffectsAnimators->SWT_hide();
     }
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -189,7 +189,7 @@ void BoxesGroup::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
         mOutlinePathEffectsAnimators->SWT_hide();
     }
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
@@ -672,9 +672,8 @@ void BoxesGroup::addContainedBoxToListAt(
         const qsptr<BoundingBox>& child) {
     mContainedBoxes.insert(index, GetAsSPtr(child, BoundingBox));
     child->setParentGroup(this);
-    connect(child.data(),
-            &BoundingBox::prp_absFrameRangeChanged,
-            this, &BoundingBox::prp_updateAfterChangedAbsFrameRange);
+    connect(child.data(), &BoundingBox::prp_absFrameRangeChanged,
+            this, &BoundingBox::prp_afterChangedAbsRange);
     updateContainedBoxIds(index);
 
     //SWT_addChildAbstractionForTargetToAll(child);
@@ -682,7 +681,7 @@ void BoxesGroup::addContainedBoxToListAt(
                 child.get(), boxIdToAbstractionId(index));
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
 
-    child->prp_updateInfluenceRangeAfterChanged();
+    child->prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& box : mLinkingBoxes) {
         auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
@@ -730,7 +729,7 @@ void BoxesGroup::removeContainedBoxFromList(const int &id) {
         }
     }
 
-    box->prp_updateInfluenceRangeAfterChanged();
+    box->prp_afterWholeInfluenceRangeChanged();
     if(box->isSelected()) box->removeFromSelection();
     disconnect(box.data(), nullptr, this, nullptr);
 
@@ -805,7 +804,7 @@ void BoxesGroup::moveContainedBoxInList(BoundingBox * const child,
     SWT_moveChildAbstractionForTargetToInAll(child, boxIdToAbstractionId(to));
     planScheduleUpdate(Animator::USER_CHANGE);
 
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void BoxesGroup::moveContainedBoxBelow(BoundingBox * const boxToMove,

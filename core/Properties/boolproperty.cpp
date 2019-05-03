@@ -9,7 +9,7 @@ bool BoolProperty::getValue() {
 
 void BoolProperty::setValue(const bool &value) {
     mValue = value;
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 
@@ -22,7 +22,7 @@ bool BoolPropertyContainer::getValue() {
 
 void BoolPropertyContainer::setValue(const bool &value) {
     mValue = value;
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& prop : ca_mChildAnimators) {
         //prop->SWT_setVisible(value);

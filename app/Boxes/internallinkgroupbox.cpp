@@ -144,7 +144,7 @@ void InternalLinkGroupBox::setLinkTarget(BoxesGroup *linkTarget) {
         mBoxTarget->setTarget(linkTarget);
         linkTarget->addLinkingBox(this);
         connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
-                this, &BoundingBox::prp_updateAfterChangedRelFrameRange);
+                this, &BoundingBox::prp_afterChangedRelRange);
 
         const auto &boxesList = linkTarget->getContainedBoxesList();
         for(const auto& child : boxesList) {

@@ -22,6 +22,6 @@ void BoxTargetProperty::setTarget(BoundingBox* box) {
 //        QObject::connect(mTarget_d, SIGNAL(scheduledUpdate()),
 //                         this, SLOT(prp_callUpdater()));
     }
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
     emit targetSet(box);
 }

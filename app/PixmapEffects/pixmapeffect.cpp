@@ -42,7 +42,7 @@ void PixmapEffect::switchVisible() {
 void PixmapEffect::setVisible(const bool &visible) {
     if(visible == mVisible) return;
     mVisible = visible;
-    prp_updateInfluenceRangeAfterChanged();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 const bool &PixmapEffect::isVisible() const {

@@ -28,7 +28,7 @@ public slots:
         if(mCurrentValue == id) return;
         mCurrentValue = id;
         emit valueChanged(id);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
     }
 private:
     int mCurrentValue = 0;

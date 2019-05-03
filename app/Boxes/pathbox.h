@@ -127,7 +127,7 @@ public:
 
     void setStrokeBrush(SimpleBrushWrapper * const brush) {
         mStrokeSettings->setStrokeBrush(brush);
-        prp_updateInfluenceRangeAfterChanged();
+        prp_afterWholeInfluenceRangeChanged();
         planScheduleUpdate(Animator::USER_CHANGE);
     }
     void setStrokeBrushWidthCurve(

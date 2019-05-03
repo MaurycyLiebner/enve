@@ -14,5 +14,5 @@ void PixmapEffectUpdater::frameChangeUpdate() {
 }
 
 void PixmapEffectUpdater::finishedChange() {
-    mTarget->prp_updateInfluenceRangeAfterChanged();
+    mTarget->prp_afterWholeInfluenceRangeChanged();
 }

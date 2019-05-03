@@ -357,7 +357,7 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
 
 void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
-    mParentBox_k->prp_updateInfluenceRangeAfterChanged();
+    mParentBox_k->prp_afterWholeInfluenceRangeChanged();
     mParentBox_k->planScheduleUpdate(Animator::USER_CHANGE);
 }
 
