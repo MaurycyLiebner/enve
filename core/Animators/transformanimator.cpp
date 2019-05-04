@@ -418,8 +418,7 @@ QMatrix BoxTransformAnimator::getCurrentTransform() {
     return matrix;
 }
 
-QMatrix BoxTransformAnimator::getRelativeTransform(
-                                    const qreal &relFrame) {
+QMatrix BoxTransformAnimator::getRelativeTransform(const qreal &relFrame) {
     const qreal pivotX = mPivotAnimator->getEffectiveXValue(relFrame);
     const qreal pivotY = mPivotAnimator->getEffectiveYValue(relFrame);
     QMatrix matrix;

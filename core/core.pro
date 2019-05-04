@@ -67,7 +67,6 @@ SOURCES += \
     Animators/key.cpp \
     PropertyUpdaters/propertyupdater.cpp \
     PropertyUpdaters/transformupdater.cpp \
-    PropertyUpdaters/randomqrealgeneratorupdater.cpp \
     PropertyUpdaters/smartnodepointupdater.cpp \
     undoredo.cpp \
     Properties/propertycreator.cpp \
@@ -157,7 +156,6 @@ HEADERS += \
     Animators/intanimator.h \
     PropertyUpdaters/propertyupdater.h \
     PropertyUpdaters/transformupdater.h \
-    PropertyUpdaters/randomqrealgeneratorupdater.h \
     PropertyUpdaters/smartnodepointupdater.h \
     undoredo.h \
     Properties/propertycreator.h \

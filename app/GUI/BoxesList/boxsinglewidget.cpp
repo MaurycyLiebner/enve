@@ -682,7 +682,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     } else {
                         menu.addSeparator();
                         menu.addAction("Add Noise", [qrealTarget]() {
-                            const auto randGen = SPtrCreate(RandomQrealGenerator)(0, 9999);
+                            const auto randGen = SPtrCreate(RandomQrealGenerator)();
                             const auto updater = GetAsSPtr(qrealTarget->prp_getUpdater(),
                                                            PropertyUpdater);
                             randGen->prp_setOwnUpdater(updater);

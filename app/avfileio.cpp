@@ -180,18 +180,17 @@ stdsptr<Key> QrealAnimator::readKey(QIODevice *target) {
 }
 
 void RandomQrealGenerator::writeProperty(QIODevice * const target) const {
-    mPeriod->writeProperty(target);
+    mTime->writeProperty(target);
     mSmoothness->writeProperty(target);
     mMaxDev->writeProperty(target);
     mType->writeProperty(target);
 }
 
 void RandomQrealGenerator::readProperty(QIODevice *target) {
-    mPeriod->readProperty(target);
+    mTime->readProperty(target);
     mSmoothness->readProperty(target);
     mMaxDev->readProperty(target);
     mType->readProperty(target);
-    generateData();
 }
 
 void QrealAnimator::readProperty(QIODevice *target) {
@@ -203,7 +202,7 @@ void QrealAnimator::readProperty(QIODevice *target) {
     bool hasRandomGenerator;
     target->read(rcChar(&hasRandomGenerator), sizeof(bool));
     if(hasRandomGenerator) {
-        auto generator = SPtrCreate(RandomQrealGenerator)(0, 9999);
+        auto generator = SPtrCreate(RandomQrealGenerator)();
         generator->readProperty(target);
         setGenerator(generator);
     }
