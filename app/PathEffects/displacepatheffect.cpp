@@ -66,8 +66,7 @@ void perterb(PosAndTan& posAndTan, const qreal& dev) {
 void DisplacePathEffect::apply(const qreal &relFrame,
                                const SkPath &src,
                                SkPath * const dst) {
-    qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
-    mSeedAssist = qrand() % 999999;
+    mSeedAssist = static_cast<uint>(mSeed->getCurrentIntValue());
     const int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
     uint32_t nextSeed;
     if(mRepeat->getValue()) {
@@ -100,7 +99,6 @@ void DisplacePathEffect::apply(const qreal &relFrame,
             gDisplaceFilterPath(&path1, src, maxDev, mSeedAssist);
         }
         SkPath path2;
-        qsrand(static_cast<uint>(mSeed->getCurrentIntValue()));
         if(mLengthBased->getValue()) {
             gDisplaceFilterPath(&path2, src, maxDev, segLen, smooth, nextSeed);
         } else {

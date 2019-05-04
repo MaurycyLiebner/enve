@@ -380,10 +380,12 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeCombo->setCurrentIndex(
             blendModeToIntSk(boxPtr->getBlendMode()));
         updateCompositionBoxVisible();
-    } else if(target->SWT_isBoolProperty() ||
-              target->SWT_isBoolPropertyContainer()) {
+    } else if(target->SWT_isBoolProperty()) {
         mCheckBox->show();
         mCheckBox->setTarget(GetAsPtr(target, BoolProperty));
+    } else if(target->SWT_isBoolPropertyContainer()) {
+        mCheckBox->show();
+        mCheckBox->setTarget(GetAsPtr(target, BoolPropertyContainer));
     } else if(target->SWT_isComboBoxProperty()) {
         disconnect(mPropertyComboBox, nullptr, nullptr, nullptr);
         if(mLastComboBoxProperty.data() != nullptr) {
@@ -905,7 +907,6 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
         name = propTarget->prp_getName();
         if(!fakeComplexAnimator) nameX += MIN_WIDGET_HEIGHT;
-        if(!target->SWT_isAnimator()) nameX += MIN_WIDGET_HEIGHT;
 
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
@@ -933,18 +934,22 @@ void BoxSingleWidget::switchContentVisibleAction() {
 }
 
 void BoxSingleWidget::switchRecordingAction() {
-    Animator *target = GetAsPtr(mTarget->getTarget(), Animator);
-    if(target->SWT_isFakeComplexAnimator()) {
-        auto fcaTarget = GetAsPtr(target, FakeComplexAnimator);
-        target = GetAsPtr(fcaTarget->getTarget(), Animator);
+    const auto target = mTarget->getTarget();
+    if(!target) return;
+    if(!target->SWT_isAnimator()) return;
+    auto aTarget = GetAsPtr(target, Animator);
+    if(aTarget->SWT_isFakeComplexAnimator()) {
+        auto fcaTarget = GetAsPtr(aTarget, FakeComplexAnimator);
+        aTarget = GetAsPtr(fcaTarget->getTarget(), Animator);
     }
-    target->anim_switchRecording();
+    aTarget->anim_switchRecording();
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
 }
 
 void BoxSingleWidget::switchBoxVisibleAction() {
-    SingleWidgetTarget *target = mTarget->getTarget();
+    const auto target = mTarget->getTarget();
+    if(!target) return;
     if(target->SWT_isBoundingBox()) {
         GetAsPtr(target, BoundingBox)->switchVisible();
     } else if(target->SWT_isPixmapEffect()) {

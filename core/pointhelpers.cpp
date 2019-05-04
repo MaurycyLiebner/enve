@@ -715,27 +715,30 @@ static void Perterb(SkPoint * const p,
     *p += normal;
 }
 
-float randFloat() {
-    return static_cast<float>(gRandF(-1, 1));
+float randFloat(QRandomGenerator& gen) {
+    return static_cast<float>(gen.generateDouble()*2 - 1);
 }
 
-float randFloat(const float& min, const float& max) {
-    return static_cast<float>(gRandF(min, max));
+float randFloat(QRandomGenerator& gen,
+                const float& min, const float& max) {
+    return static_cast<float>(gen.generateDouble())*(max - min) + min;
 }
 
-SkPoint randPt(const SkPoint& pt, const float& min, const float& max) {
-    const auto xR = randFloat(min, max);
-    const auto yR = randFloat(min, max);
+SkPoint randPt(QRandomGenerator& gen, const SkPoint& pt,
+               const float& min, const float& max) {
+    const auto xR = randFloat(gen, min, max);
+    const auto yR = randFloat(gen, min, max);
     return SkPoint::Make(pt.x() + xR, pt.y() + yR);
 }
 
-SkPoint randPt(const SkPoint& pt, const float& dev) {
-    return randPt(pt, -dev, dev);
+SkPoint randPt(QRandomGenerator& gen,
+               const SkPoint& pt, const float& dev) {
+    return randPt(gen, pt, -dev, dev);
 }
 
-SkPoint randPt(const float& dev) {
-    const auto xR = randFloat(-dev, dev);
-    const auto yR = randFloat(-dev, dev);
+SkPoint randPt(QRandomGenerator& gen, const float& dev) {
+    const auto xR = randFloat(gen, -dev, dev);
+    const auto yR = randFloat(gen, -dev, dev);
     return SkPoint::Make(xR, yR);
 }
 
@@ -744,6 +747,8 @@ void gDisplaceFilterPath(SkPath* const dst,
                          const SkScalar &maxDev,
                          const uint32_t &seedAssist) {
     dst->reset();
+    QRandomGenerator gen;
+
     uint32_t seedContourInc = 0;
     SkPath::Iter iter(src, false);
     SkPath::Iter nextIter(src, false);
@@ -754,7 +759,7 @@ void gDisplaceFilterPath(SkPath* const dst,
     for(;;) {
         const auto nextVerb = nextIter.next(pts, true, true);
         const auto disp = nextVerb == SkPath::kClose_Verb ?
-                    firstDisp : randPt(maxDev);
+                    firstDisp : randPt(gen, maxDev);
         switch(iter.next(pts, true, true)) {
         case SkPath::kLine_Verb: {
             dst->lineTo(pts[1] + disp);
@@ -772,11 +777,13 @@ void gDisplaceFilterPath(SkPath* const dst,
             dst->close();
         } break;
         case SkPath::kMove_Verb: {
-            qsrand(seedAssist + seedContourInc);
+            gen.seed(seedAssist + seedContourInc);
             seedContourInc += 100;
-            firstDisp = disp;
-            dst->moveTo(pts[0] + disp);
-        } break;
+            firstDisp = randPt(gen, maxDev);
+            dst->moveTo(pts[0] + firstDisp);
+            prevDisp = firstDisp;
+            continue;
+        }
         case SkPath::kDone_Verb:
             return;
         }
@@ -793,6 +800,8 @@ bool gDisplaceFilterPath(SkPath* const dst,
                          const uint32_t &seedAssist) {
     if(segLen < 0.01f) return false;
     dst->reset();
+
+    QRandomGenerator gen;
     SkPathMeasure meas(src, false);
 
     const SkScalar scale = maxDev;
@@ -802,7 +811,7 @@ bool gDisplaceFilterPath(SkPath* const dst,
     uint32_t seedContourInc = 0;
     if(smoothness < 0.001f) {
         do {
-            qsrand(seedAssist + seedContourInc); randFloat();
+            gen.seed(seedAssist + seedContourInc); randFloat(gen); randFloat(gen);
             seedContourInc += 100;
             const SkScalar length = meas.getLength();
 //            if(segLen * 2 > length) {
@@ -820,7 +829,7 @@ bool gDisplaceFilterPath(SkPath* const dst,
             }
 
             if(meas.getPosTan(distance, &p, &v)) {
-                Perterb(&p, v, randFloat() * scale);
+                Perterb(&p, v, randFloat(gen) * scale);
                 dst->moveTo(p);
                 firstP = p;
             }
@@ -829,9 +838,9 @@ bool gDisplaceFilterPath(SkPath* const dst,
                 if(meas.getPosTan(distance, &p, &v)) {
                     if(n == 0) {
                         const SkScalar scaleT = 1 - remLen/segLen;
-                        Perterb(&p, v, randFloat() * scale * scaleT);
+                        Perterb(&p, v, randFloat(gen) * scale * scaleT);
                     } else {
-                        Perterb(&p, v, randFloat() * scale);
+                        Perterb(&p, v, randFloat(gen) * scale);
                     }
                     dst->lineTo(p);
                 }
@@ -843,9 +852,9 @@ bool gDisplaceFilterPath(SkPath* const dst,
                     if(meas.getPosTan(distance, &p, &v)) {
                         if(n == 0) {
                             const SkScalar scaleT = 1 - remLen/segLen;
-                            Perterb(&p, v, randFloat() * scale * scaleT);
+                            Perterb(&p, v, randFloat(gen) * scale * scaleT);
                         } else {
-                            Perterb(&p, v, randFloat() * scale);
+                            Perterb(&p, v, randFloat(gen) * scale);
                         }
                         dst->lineTo(p);
                     }
@@ -866,7 +875,7 @@ bool gDisplaceFilterPath(SkPath* const dst,
         SkPoint c2;
 
         do {
-            qsrand(seedAssist + seedContourInc);
+            gen.seed(seedAssist + seedContourInc);
             seedContourInc += 100;
             const SkScalar length = meas.getLength();
 //            if(segLen * 2 > length) {
@@ -892,13 +901,13 @@ bool gDisplaceFilterPath(SkPath* const dst,
             if(meas.isClosed()) {
                 distance += segLen;
                 if(meas.getPosTan(distance, &currP, &v)) {
-                    Perterb(&currP, v, randFloat() * scale);
+                    Perterb(&currP, v, randFloat(gen) * scale);
                     n--;
                     secondP = currP;
                 }
                 distance += segLen;
                 if(meas.getPosTan(distance, &nextP, &v)) {
-                    Perterb(&nextP, v, randFloat() * scale);
+                    Perterb(&nextP, v, randFloat(gen) * scale);
                     n--;
                     thirdP = nextP;
 
@@ -919,10 +928,10 @@ bool gDisplaceFilterPath(SkPath* const dst,
                 if(meas.getPosTan(distance, &nextP, &v)) {
                     if(n == 0) {
                         const SkScalar scaleT = 1 - remLen/segLen;
-                        Perterb(&nextP, v, randFloat() * scale * scaleT);
+                        Perterb(&nextP, v, randFloat(gen) * scale * scaleT);
 
                     } else {
-                        Perterb(&nextP, v, randFloat() * scale);
+                        Perterb(&nextP, v, randFloat(gen) * scale);
                     }
                     gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
 
@@ -946,9 +955,9 @@ bool gDisplaceFilterPath(SkPath* const dst,
                     if(meas.getPosTan(distance, &nextP, &v)) {
                         if(n == 0) {
                             const SkScalar scaleT = 1 - remLen/segLen;
-                            Perterb(&nextP, v, randFloat() * scale * scaleT);
+                            Perterb(&nextP, v, randFloat(gen) * scale * scaleT);
                         } else {
-                            Perterb(&nextP, v, randFloat() * scale);
+                            Perterb(&nextP, v, randFloat(gen) * scale);
                         }
                         gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
 
