@@ -36,7 +36,7 @@ QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
 QPixmap* BoxSingleWidget::ANIMATOR_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
-bool BoxSingleWidget::mStaticPixmapsLoaded = false;
+bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 
 #include "global.h"
 #include "GUI/mainwindow.h"
@@ -359,71 +359,32 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                                target->SWT_isPathEffect() ||
                                target->SWT_isPixmapEffect());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
-    if(target->SWT_isBoxesGroup()) {
-        clearColorButton();
+    mRecordButton->show();
 
-        mCompositionModeVisible = true;
-        auto boxTarget = GetAsPtr(target, BoundingBox);
-        mCompositionModeCombo->setCurrentIndex(
-                    blendModeToIntSk(boxTarget->getBlendMode()));
-        updateCompositionBoxVisible();
-        mPropertyComboBox->hide();
+    mCompositionModeCombo->hide();
+    mPropertyComboBox->hide();
 
-        mBoxTargetWidget->hide();
-        mCheckBox->hide();
+    mCompositionModeVisible = false;
 
-        clearAndHideValueAnimators();
-    } else if(target->SWT_isBoundingBox()) {
+    mBoxTargetWidget->hide();
+    mCheckBox->hide();
+
+    clearColorButton();
+    clearAndHideValueAnimators();
+
+    if(target->SWT_isBoundingBox()) {
+        mRecordButton->hide();
         const auto boxPtr = GetAsPtr(target, BoundingBox);
-
-        clearColorButton();
-        mPropertyComboBox->hide();
 
         mCompositionModeVisible = true;
         mCompositionModeCombo->setCurrentIndex(
             blendModeToIntSk(boxPtr->getBlendMode()));
         updateCompositionBoxVisible();
-
-        mBoxTargetWidget->hide();
-        mCheckBox->hide();
-
-        clearAndHideValueAnimators();
-    } else if(target->SWT_isBoolProperty()) {
-        clearColorButton();
-
-        mPropertyComboBox->hide();
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-
+    } else if(target->SWT_isBoolProperty() ||
+              target->SWT_isBoolPropertyContainer()) {
         mCheckBox->show();
         mCheckBox->setTarget(GetAsPtr(target, BoolProperty));
-
-        clearAndHideValueAnimators();
-    } else if(target->SWT_isBoolPropertyContainer()) {
-        clearColorButton();
-
-        mPropertyComboBox->hide();
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-
-        mCheckBox->show();
-        mCheckBox->setTarget(GetAsPtr(target, BoolPropertyContainer));
-
-        clearAndHideValueAnimators();
     } else if(target->SWT_isComboBoxProperty()) {
-        clearColorButton();
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-
         disconnect(mPropertyComboBox, nullptr, nullptr, nullptr);
         if(mLastComboBoxProperty.data() != nullptr) {
             disconnect(mLastComboBoxProperty.data(), nullptr,
@@ -445,53 +406,17 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                 qOverload<int>(&QComboBox::activated),
                 MainWindow::getInstance(),
                 &MainWindow::queScheduledTasksAndUpdate);
-        clearAndHideValueAnimators();
-    } else if(target->SWT_isQrealAnimator()) {
-        clearColorButton();
-        mPropertyComboBox->hide();
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-        mCheckBox->hide();
-
-        mValueSlider->setTarget(GetAsPtr(target, QrealAnimator));
+    } else if(target->SWT_isIntProperty() || target->SWT_isQrealAnimator()) {
+        if(target->SWT_isQrealAnimator())
+            mValueSlider->setTarget(GetAsPtr(target, QrealAnimator));
+        else mValueSlider->setTarget(GetAsPtr(target, IntProperty));
         mValueSlider->show();
         mValueSlider->setNeighbouringSliderToTheRight(false);
-        mSecondValueSlider->hide();
-        mSecondValueSlider->clearTarget();
-    } else if(target->SWT_isIntProperty()) {
-        clearColorButton();
-        mPropertyComboBox->hide();
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-        mCheckBox->hide();
-
-        mValueSlider->setTarget(GetAsPtr(target, IntProperty));
-        mValueSlider->show();
-    } else if(target->SWT_isComplexAnimator() ||
-              target->SWT_isSmartPathAnimator() ||
-              target->SWT_isAnimatedSurface()) {
-        mPropertyComboBox->hide();
-
+    } else if(target->SWT_isComplexAnimator()) {
         if(target->SWT_isColorAnimator()) {
             mColorButton->setColorTarget(GetAsPtr(target, ColorAnimator));
             mColorButton->show();
-        } else {
-            clearColorButton();
         }
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-        mCheckBox->hide();
-
-        clearAndHideValueAnimators();
         if(target->SWT_isComplexAnimator() && !abs->contentVisible()) {
             if(target->SWT_isQPointFAnimator()) {
                 updateValueSlidersForQPointFAnimator();
@@ -513,36 +438,14 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
             }
         }
     } else if(target->SWT_isBoxTargetProperty()) {
-        clearColorButton();
-        mPropertyComboBox->hide();
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
         mBoxTargetWidget->show();
         mBoxTargetWidget->setTargetProperty(
                     GetAsPtr(target, BoxTargetProperty));
-        mCheckBox->hide();
-
-        clearAndHideValueAnimators();
-    } else {/*if(target->SWT_isQStringAnimator() ||
-              target->SWT_isQCubicSegment1DAnimator()) {*/
-        clearColorButton();
-
-        mCompositionModeCombo->hide();
-        mPropertyComboBox->hide();
-
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-        mCheckBox->hide();
-
-        clearAndHideValueAnimators();
     }
 }
 
 void BoxSingleWidget::loadStaticPixmaps() {
-    if(mStaticPixmapsLoaded) return;
+    if(sStaticPixmapsLoaded) return;
     VISIBLE_PIXMAP = new QPixmap(":/icons/visible.png");
     INVISIBLE_PIXMAP = new QPixmap(":/icons/hidden.png");
     HIDE_CHILDREN = new QPixmap(":/icons/list_hide_children.png");
@@ -559,11 +462,11 @@ void BoxSingleWidget::loadStaticPixmaps() {
                 ":/icons/not_recording.png");
     ANIMATOR_DESCENDANT_RECORDING = new QPixmap(
                 ":/icons/desc_recording.png");
-    mStaticPixmapsLoaded = true;
+    sStaticPixmapsLoaded = true;
 }
 
 void BoxSingleWidget::clearStaticPixmaps() {
-    if(!mStaticPixmapsLoaded) return;
+    if(!sStaticPixmapsLoaded) return;
     delete VISIBLE_PIXMAP;
     delete INVISIBLE_PIXMAP;
     delete HIDE_CHILDREN;
@@ -866,9 +769,9 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
 void BoxSingleWidget::rename() {
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isBoundingBox()) {
-        auto boxTarget = GetAsPtr(target, BoundingBox);
+        const auto boxTarget = GetAsPtr(target, BoundingBox);
         bool ok;
-        QString text = QInputDialog::getText(this, tr("New name dialog"),
+        const QString text = QInputDialog::getText(this, tr("New name dialog"),
                                              tr("Name:"), QLineEdit::Normal,
                                              boxTarget->getName(), &ok);
         if(ok) {
@@ -882,8 +785,7 @@ void BoxSingleWidget::drawKeys(QPainter * const p,
                                const qreal &pixelsPerFrame,
                                const FrameRange &viewedFrames) {
     if(isHidden()) return;
-    auto target = mTarget->getTarget();
-    Q_ASSERT(target);
+    const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
         anim_target->drawTimelineControls(p, pixelsPerFrame, viewedFrames,
@@ -895,10 +797,9 @@ Key* BoxSingleWidget::getKeyAtPos(const int &pressX,
                                   const qreal &pixelsPerFrame,
                                   const int &minViewedFrame) {
     if(isHidden()) return nullptr;
-    auto target = mTarget->getTarget();
-    Q_ASSERT(target);
+    const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
-        auto anim_target = static_cast<Animator*>(target);
+        const auto anim_target = static_cast<Animator*>(target);
         return anim_target->anim_getKeyAtPos(pressX,
                                             minViewedFrame,
                                             pixelsPerFrame,
@@ -912,10 +813,9 @@ DurationRectangleMovable* BoxSingleWidget::getRectangleMovableAtPos(
                             const qreal &pixelsPerFrame,
                             const int &minViewedFrame) {
     if(isHidden()) return nullptr;
-    auto target = mTarget->getTarget();
-    Q_ASSERT(target);
+    const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
-        auto anim_target = static_cast<Animator*>(target);
+        const auto anim_target = static_cast<Animator*>(target);
         return anim_target->anim_getRectangleMovableAtPos(
                                     pressX,
                                     minViewedFrame,
@@ -928,10 +828,9 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
                                     const qreal &pixelsPerFrame,
                                     QList<Key*>& listKeys) {
     if(isHidden()) return;
-    auto target = mTarget->getTarget();
-    Q_ASSERT(target);
+    const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
-        auto anim_target = static_cast<Animator*>(target);
+        const auto anim_target = static_cast<Animator*>(target);
 
         anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                        listKeys, KEY_RECT_SIZE);

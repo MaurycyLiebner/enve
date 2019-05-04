@@ -283,11 +283,12 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
         if(isChildDescRec) childRecordingT = true;
         if(!isChildRec) rec = false;
     }
+    rec = rec && childRecordingT;
     if(childRecordingT != ca_mChildAnimatorRecording) {
         ca_mChildAnimatorRecording = childRecordingT;
-        if(rec != anim_isRecording()) anim_setRecordingValue(rec);
-        else emit anim_isRecordingChanged();
-    } else if(rec != anim_isRecording()) {
+        if(rec == anim_isRecording()) emit anim_isRecordingChanged();
+    }
+    if(rec != anim_isRecording()) {
         anim_setRecordingValue(rec);
     }
 }

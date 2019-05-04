@@ -1,7 +1,6 @@
 #include "intproperty.h"
 
-IntProperty::IntProperty(const QString &name) : Property(name) {
-}
+IntProperty::IntProperty(const QString &name) : Property(name) {}
 
 void IntProperty::setValueRange(const int &minValue,
                                 const int &maxValue) {

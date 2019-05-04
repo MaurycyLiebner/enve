@@ -1,6 +1,6 @@
 #ifndef INTANIMATORCREATOR_H
 #define INTANIMATORCREATOR_H
-#include "intanimator.h"
+#include "Animators/intanimator.h"
 #include "Properties/propertycreator.h"
 #include "glhelpers.h"
 

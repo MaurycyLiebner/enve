@@ -62,6 +62,7 @@ SOURCES += \
     Properties/intproperty.cpp \
     Animators/complexanimator.cpp \
     Animators/animator.cpp \
+    Animators/intanimator.cpp \
     Animators/fakecomplexanimator.cpp \
     Animators/key.cpp \
     PropertyUpdaters/propertyupdater.cpp \
@@ -153,6 +154,7 @@ HEADERS += \
     Animators/complexanimator.h \
     Animators/fakecomplexanimator.h \
     Animators/animator.h \
+    Animators/intanimator.h \
     PropertyUpdaters/propertyupdater.h \
     PropertyUpdaters/transformupdater.h \
     PropertyUpdaters/randomqrealgeneratorupdater.h \

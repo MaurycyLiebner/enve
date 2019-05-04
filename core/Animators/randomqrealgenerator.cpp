@@ -5,26 +5,26 @@
 #include "pointhelpers.h"
 #include "PropertyUpdaters/randomqrealgeneratorupdater.h"
 #include "Properties/comboboxproperty.h"
-#include "Properties/intproperty.h"
+#include "Animators/intanimator.h"
 
 RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
                                            const int &lastFrame) :
     QrealValueEffect("noise") {
-    mPeriod = SPtrCreate(QrealAnimator)(10., 1., 999., 1., "period");
+    mPeriod = SPtrCreate(QrealAnimator)(10, 1, 999, 1, "period");
     mPeriod->prp_setOwnUpdater(
                 SPtrCreate(RandomQrealGeneratorUpdater)(this));
     ca_addChildAnimator(mPeriod);
     mSmoothness = QrealAnimator::create0to1Animator("smoothness");
     ca_addChildAnimator(mSmoothness);
-    mMaxDev = SPtrCreate(QrealAnimator)(0., 0., 999., 1., "amplitude");
+    mMaxDev = SPtrCreate(QrealAnimator)(0, 0, 999, 1, "amplitude");
     ca_addChildAnimator(mMaxDev);
     mType = SPtrCreate(ComboBoxProperty)("type",
                 QStringList() << "add" << "subtract" << "overlay");
     ca_addChildAnimator(mType);
 
-    mSeedAssist = SPtrCreate(IntProperty)("seed");
+    mSeedAssist = SPtrCreate(IntAnimator)("seed");
     mSeedAssist->setValueRange(0, 9999);
-    mSeedAssist->setCurrentValue(0);
+    mSeedAssist->setCurrentIntValue(0);
     ca_addChildAnimator(mSeedAssist);
     mSeedAssist->prp_setOwnUpdater(
                 SPtrCreate(RandomQrealGeneratorUpdater)(this));
@@ -167,12 +167,12 @@ qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
 }
 
 void RandomQrealGenerator::generateData() {
-    qsrand(mSeedAssist->getValue());
+    qsrand(mSeedAssist->getCurrentIntValue());
     mFrameValues.clear();
     qreal currFrame = mFirstFrame;
     while(currFrame < mLastFrame) {
         //qreal maxDev = mMaxDev->qra_getValueAtRelFrame(currFrame);
-        mFrameValues << FrameValue(currFrame, gRandF(0., 1.));
+        mFrameValues << FrameValue(currFrame, gRandF(0, 1));
         currFrame += getDeltaX(currFrame);
     }
     prp_afterWholeInfluenceRangeChanged();

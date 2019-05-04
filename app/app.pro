@@ -76,7 +76,6 @@ SOURCES += main.cpp\
     Boxes/textbox.cpp \
     Boxes/rectangle.cpp \
     Boxes/imagebox.cpp \
-    Animators/intanimator.cpp \
     Boxes/pathbox.cpp \
     Boxes/boundingbox.cpp \
     Boxes/boxesgroup.cpp \
@@ -278,7 +277,6 @@ HEADERS  += \
     Animators/qstringanimator.h \
     Animators/coloranimator.h \
     Animators/boolanimator.h \
-    Animators/intanimator.h \
     Boxes/circle.h \
     Boxes/boundingbox.h \
     Boxes/boxesgroup.h \

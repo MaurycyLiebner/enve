@@ -269,7 +269,7 @@ int Animator::getInsertIdForKeyRelFrame(
 }
 
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
-    if(!anim_mIsRecording) anim_mIsRecording = true;
+    if(!SWT_isComplexAnimator()) anim_setRecordingValue(true);
     anim_mKeys.add(newKey);
     emit prp_addingKey(newKey.get());
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)

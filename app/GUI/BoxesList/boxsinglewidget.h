@@ -38,7 +38,7 @@ public:
     static QPixmap* ANIMATOR_RECORDING;
     static QPixmap* ANIMATOR_NOT_RECORDING;
     static QPixmap* ANIMATOR_DESCENDANT_RECORDING;
-    static bool mStaticPixmapsLoaded;
+    static bool sStaticPixmapsLoaded;
     static void loadStaticPixmaps();
     static void clearStaticPixmaps();
 
