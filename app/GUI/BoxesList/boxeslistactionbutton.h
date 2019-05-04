@@ -3,11 +3,10 @@
 
 #include <QWidget>
 
-class BoxesListActionButton : public QWidget
-{
+class BoxesListActionButton : public QWidget {
     Q_OBJECT
 public:
-    BoxesListActionButton(QWidget *parent = nullptr);
+    BoxesListActionButton(QWidget * const parent = nullptr);
 protected:
     void mousePressEvent(QMouseEvent *);
     void enterEvent(QEvent *);
@@ -16,7 +15,21 @@ protected:
     bool mHover = false;
 signals:
     void pressed();
-public slots:
 };
+#include <functional>
+class PixmapActionButton : public BoxesListActionButton {
+public:
+    PixmapActionButton(QWidget * const parent = nullptr) :
+        BoxesListActionButton(parent) {}
+
+    void setPixmapChooser(const std::function<QPixmap*()>& func) {
+        mPixmapChooser = func;
+    }
+protected:
+    void paintEvent(QPaintEvent*);
+private:
+    std::function<QPixmap*()> mPixmapChooser;
+};
+
 
 #endif // BOXESLISTACTIONBUTTON_H

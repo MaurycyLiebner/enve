@@ -1,20 +1,20 @@
 #ifndef COLORANIMATORBUTTON_H
 #define COLORANIMATORBUTTON_H
 #include "boxeslistactionbutton.h"
+#include "smartPointers/selfref.h"
 class ColorAnimator;
 
 class ColorAnimatorButton : public BoxesListActionButton {
-    Q_OBJECT
 public:
-    ColorAnimatorButton(ColorAnimator *colorTarget,
-                        QWidget *parent = nullptr);
+    ColorAnimatorButton(ColorAnimator * const colorTarget,
+                        QWidget * const parent = nullptr);
 
-
+    void setColorTarget(ColorAnimator * const target);
     void openColorSettingsDialog();
 protected:
     void paintEvent(QPaintEvent *);
-    void mousePressEvent(QMouseEvent *);
-    ColorAnimator *mColorTarget = nullptr;
+private:
+    qptr<ColorAnimator> mColorTarget;
 };
 
 #endif // COLORANIMATORBUTTON_H

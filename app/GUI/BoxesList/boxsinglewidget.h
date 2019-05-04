@@ -15,12 +15,13 @@ class DurationRectangleMovable;
 class Key;
 class BoxTargetWidget;
 class BoxesListActionButton;
+class PixmapActionButton;
 class BoolPropertyWidget;
 class ComboBoxProperty;
 class ColorAnimator;
+class ColorAnimatorButton;
 
 class BoxSingleWidget : public SingleWidget {
-    Q_OBJECT
 public:
     explicit BoxSingleWidget(ScrollWidgetVisiblePart *parent = nullptr);
 
@@ -36,6 +37,7 @@ public:
     static QPixmap* ANIMATOR_CHILDREN_HIDDEN;
     static QPixmap* ANIMATOR_RECORDING;
     static QPixmap* ANIMATOR_NOT_RECORDING;
+    static QPixmap* ANIMATOR_DESCENDANT_RECORDING;
     static bool mStaticPixmapsLoaded;
     static void loadStaticPixmaps();
     static void clearStaticPixmaps();
@@ -75,9 +77,9 @@ protected:
     void updateCompositionBoxVisible();
     void clearAndHideValueAnimators();
     void updateValueSlidersForQPointFAnimator();
-signals:
+private:
+    void clearColorButton();
 
-private slots:
     void clearSelected() {
         setSelected(false);
     }
@@ -86,18 +88,16 @@ private slots:
     void switchBoxLockedAction();
 
     void switchBoxVisibleAction();
-    void openColorSettingsDialog();
     void setCompositionMode(const int &id);
-private:
     ColorAnimator* getColorTarget() const;
 
     QPoint mDragStartPos;
 
-    BoxesListActionButton *mRecordButton;
-    BoxesListActionButton *mContentButton;
-    BoxesListActionButton *mVisibleButton;
-    BoxesListActionButton *mLockedButton;
-    BoxesListActionButton *mColorButton;
+    PixmapActionButton *mRecordButton;
+    PixmapActionButton *mContentButton;
+    PixmapActionButton *mVisibleButton;
+    PixmapActionButton *mLockedButton;
+    ColorAnimatorButton *mColorButton;
     BoxTargetWidget *mBoxTargetWidget;
 
     qptr<ComboBoxProperty> mLastComboBoxProperty;

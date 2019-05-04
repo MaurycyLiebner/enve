@@ -35,17 +35,24 @@ QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE;
 QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
 QPixmap* BoxSingleWidget::ANIMATOR_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
+QPixmap* BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
 bool BoxSingleWidget::mStaticPixmapsLoaded = false;
 
 #include "global.h"
 #include "GUI/mainwindow.h"
-#include <QInputDialog>
-#include <QMenu>
 #include "clipboardcontainer.h"
 #include "durationrectangle.h"
 #include "boxeslistactionbutton.h"
+#include "coloranimatorbutton.h"
+#include "canvas.h"
+#include "PathEffects/patheffect.h"
+#include "PathEffects/patheffectanimators.h"
+#include "Animators/fakecomplexanimator.h"
+
 #include <QApplication>
 #include <QDrag>
+#include <QMenu>
+#include <QInputDialog>
 
 BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     SingleWidget(parent) {
@@ -57,22 +64,86 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mMainLayout->setMargin(0);
     mMainLayout->setAlignment(Qt::AlignLeft);
 
-    mRecordButton = new BoxesListActionButton(this);
+    mRecordButton = new PixmapActionButton(this);
+    mRecordButton->setPixmapChooser([this]() {
+        if(!mTarget) return static_cast<QPixmap*>(nullptr);
+        const auto target = mTarget->getTarget();
+        if(target->SWT_isBoundingBox()) {
+            return static_cast<QPixmap*>(nullptr);
+        } else if(target->SWT_isComplexAnimator()) {
+            const auto caTarget = GetAsPtr(target, ComplexAnimator);
+            if(caTarget->anim_isRecording()) {
+                return BoxSingleWidget::ANIMATOR_RECORDING;
+            } else {
+                if(caTarget->anim_isDescendantRecording()) {
+                    return BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
+                } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
+            }
+        } else if(target->SWT_isAnimator()) {
+            if(GetAsPtr(target, Animator)->anim_isRecording()) {
+                return BoxSingleWidget::ANIMATOR_RECORDING;
+            } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
+        } else return static_cast<QPixmap*>(nullptr);
+    });
+
     mMainLayout->addWidget(mRecordButton);
     connect(mRecordButton, &BoxesListActionButton::pressed,
             this, &BoxSingleWidget::switchRecordingAction);
 
-    mContentButton = new BoxesListActionButton(this);
+    mContentButton = new PixmapActionButton(this);
+    mContentButton->setPixmapChooser([this]() {
+        if(!mTarget) return static_cast<QPixmap*>(nullptr);
+        const auto target = mTarget->getTarget();
+        if(target->SWT_isBoundingBox()) {
+            if(mTarget->contentVisible()) {
+                return BoxSingleWidget::HIDE_CHILDREN;
+            } else return BoxSingleWidget::SHOW_CHILDREN;
+        } else {
+            if(mTarget->contentVisible()) {
+                return BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE;
+            } else {
+                return BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
+            }
+        }
+    });
+
     mMainLayout->addWidget(mContentButton);
     connect(mContentButton, &BoxesListActionButton::pressed,
             this, &BoxSingleWidget::switchContentVisibleAction);
 
-    mVisibleButton = new BoxesListActionButton(this);
+    mVisibleButton = new PixmapActionButton(this);
+    mVisibleButton->setPixmapChooser([this]() {
+        if(!mTarget) return static_cast<QPixmap*>(nullptr);
+        const auto target = mTarget->getTarget();
+        if(target->SWT_isBoundingBox()) {
+            if(GetAsPtr(target, BoundingBox)->isVisible()) {
+                return BoxSingleWidget::VISIBLE_PIXMAP;
+            } else return BoxSingleWidget::INVISIBLE_PIXMAP;
+        } else if(target->SWT_isPixmapEffect()) {
+            if(GetAsPtr(target, PixmapEffect)->isVisible()) {
+                return BoxSingleWidget::VISIBLE_PIXMAP;
+            } else return BoxSingleWidget::INVISIBLE_PIXMAP;
+        } else if(target->SWT_isPathEffect()) {
+            if(GetAsPtr(target, PathEffect)->isVisible()) {
+                return BoxSingleWidget::VISIBLE_PIXMAP;
+            } else return BoxSingleWidget::INVISIBLE_PIXMAP;
+        } else return static_cast<QPixmap*>(nullptr);
+    });
     mMainLayout->addWidget(mVisibleButton);
     connect(mVisibleButton, &BoxesListActionButton::pressed,
             this, &BoxSingleWidget::switchBoxVisibleAction);
 
-    mLockedButton = new BoxesListActionButton(this);
+    mLockedButton = new PixmapActionButton(this);
+    mLockedButton->setPixmapChooser([this]() {
+        if(!mTarget) return static_cast<QPixmap*>(nullptr);
+        const auto target = mTarget->getTarget();
+        if(target->SWT_isBoundingBox()) {
+            if(GetAsPtr(target, BoundingBox)->isLocked()) {
+                return BoxSingleWidget::LOCKED_PIXMAP;
+            } else return BoxSingleWidget::UNLOCKED_PIXMAP;
+        } else return static_cast<QPixmap*>(nullptr);
+    });
+
     mMainLayout->addWidget(mLockedButton);
     connect(mLockedButton, &BoxesListActionButton::pressed,
             this, &BoxSingleWidget::switchBoxLockedAction);
@@ -87,10 +158,10 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mSecondValueSlider = new QrealAnimatorValueSlider(nullptr, this);
     mMainLayout->addWidget(mSecondValueSlider, Qt::AlignRight);
 
-    mColorButton = new BoxesListActionButton(this);
+    mColorButton = new ColorAnimatorButton(nullptr, this);
     mMainLayout->addWidget(mColorButton, Qt::AlignRight);
-    connect(mColorButton, &BoxesListActionButton::pressed,
-            this, &BoxSingleWidget::openColorSettingsDialog);
+    mColorButton->setFixedHeight(mColorButton->height() - 6);
+    mColorButton->setContentsMargins(0, 3, 0, 3);
 
     mPropertyComboBox = new QComboBox(this);
     mMainLayout->addWidget(mPropertyComboBox);
@@ -275,29 +346,21 @@ void BoxSingleWidget::clearAndHideValueAnimators() {
     mSecondValueSlider->hide();
 }
 
-#include "Animators/fakecomplexanimator.h"
 void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     SingleWidget::setTargetAbstraction(abs);
     SingleWidgetTarget *target = abs->getTarget();
 
-    bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
-    if(fakeComplexAnimator) {
+    mContentButton->setVisible(target->SWT_isComplexAnimator());
+    if(target->SWT_isFakeComplexAnimator()) {
         target = GetAsPtr(target, FakeComplexAnimator)->getTarget();
     }
+    mRecordButton->setVisible(target->SWT_isAnimator());
+    mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
+                               target->SWT_isPathEffect() ||
+                               target->SWT_isPixmapEffect());
+    mLockedButton->setVisible(target->SWT_isBoundingBox());
     if(target->SWT_isBoxesGroup()) {
-        //BoxesGroup *bg_target = (BoxesGroup*)target;
-
-        //setName(bg_target->getName());
-
-        mRecordButton->hide();
-
-        mContentButton->show();
-
-        mVisibleButton->show();
-
-        mLockedButton->show();
-
-        mColorButton->hide();
+        clearColorButton();
 
         mCompositionModeVisible = true;
         auto boxTarget = GetAsPtr(target, BoundingBox);
@@ -311,22 +374,14 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         clearAndHideValueAnimators();
     } else if(target->SWT_isBoundingBox()) {
-        //BoundingBox *bb_target = (BoundingBox*)target;
+        const auto boxPtr = GetAsPtr(target, BoundingBox);
 
-        mRecordButton->hide();
-
-        mContentButton->show();
-
-        mVisibleButton->show();
-
-        mLockedButton->show();
-
-        mColorButton->hide();
+        clearColorButton();
         mPropertyComboBox->hide();
 
         mCompositionModeVisible = true;
         mCompositionModeCombo->setCurrentIndex(
-            blendModeToIntSk(GetAsPtr(target, BoundingBox)->getBlendMode()) );
+            blendModeToIntSk(boxPtr->getBlendMode()));
         updateCompositionBoxVisible();
 
         mBoxTargetWidget->hide();
@@ -334,15 +389,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         clearAndHideValueAnimators();
     } else if(target->SWT_isBoolProperty()) {
-        mRecordButton->hide();
-
-        mContentButton->hide();
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-
-        mColorButton->hide();
+        clearColorButton();
 
         mPropertyComboBox->hide();
 
@@ -356,16 +403,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         clearAndHideValueAnimators();
     } else if(target->SWT_isBoolPropertyContainer()) {
-
-        mRecordButton->show();
-
-        mContentButton->show();
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-
-        mColorButton->hide();
+        clearColorButton();
 
         mPropertyComboBox->hide();
 
@@ -379,15 +417,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         clearAndHideValueAnimators();
     } else if(target->SWT_isComboBoxProperty()) {
-        mRecordButton->hide();
-
-        mContentButton->hide();
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-
-        mColorButton->hide();
+        clearColorButton();
 
         mCompositionModeCombo->hide();
         mCompositionModeVisible = false;
@@ -417,15 +447,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                 &MainWindow::queScheduledTasksAndUpdate);
         clearAndHideValueAnimators();
     } else if(target->SWT_isQrealAnimator()) {
-        mRecordButton->show();
-
-        mContentButton->setVisible(fakeComplexAnimator);
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-
-        mColorButton->hide();
+        clearColorButton();
         mPropertyComboBox->hide();
 
         mCompositionModeCombo->hide();
@@ -440,15 +462,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mSecondValueSlider->hide();
         mSecondValueSlider->clearTarget();
     } else if(target->SWT_isIntProperty()) {
-        mRecordButton->hide();
-
-        mContentButton->setVisible(fakeComplexAnimator);
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-
-        mColorButton->hide();
+        clearColorButton();
         mPropertyComboBox->hide();
 
         mCompositionModeCombo->hide();
@@ -462,24 +476,13 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     } else if(target->SWT_isComplexAnimator() ||
               target->SWT_isSmartPathAnimator() ||
               target->SWT_isAnimatedSurface()) {
-        mRecordButton->show();
-
-        mContentButton->show();
-
-        if(target->SWT_isPixmapEffect() ||
-            target->SWT_isPathEffect()) {
-            mVisibleButton->show();
-        } else {
-            mVisibleButton->hide();
-        }
-
-        mLockedButton->hide();
         mPropertyComboBox->hide();
 
         if(target->SWT_isColorAnimator()) {
+            mColorButton->setColorTarget(GetAsPtr(target, ColorAnimator));
             mColorButton->show();
         } else {
-            mColorButton->hide();
+            clearColorButton();
         }
 
         mCompositionModeCombo->hide();
@@ -503,21 +506,14 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                         mSecondValueSlider->hide();
                         mSecondValueSlider->clearTarget();
                     } else if(guiProp->SWT_isColorAnimator()) {
+                        mColorButton->setColorTarget(GetAsPtr(guiProp, ColorAnimator));
                         mColorButton->show();
                     }
                 }
             }
         }
     } else if(target->SWT_isBoxTargetProperty()) {
-        mRecordButton->hide();
-
-        mContentButton->hide();
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-
-        mColorButton->hide();
+        clearColorButton();
         mPropertyComboBox->hide();
 
         mCompositionModeCombo->hide();
@@ -531,14 +527,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         clearAndHideValueAnimators();
     } else {/*if(target->SWT_isQStringAnimator() ||
               target->SWT_isQCubicSegment1DAnimator()) {*/
-        mRecordButton->show();
-
-        mContentButton->show();
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-        mColorButton->hide();
+        clearColorButton();
 
         mCompositionModeCombo->hide();
         mPropertyComboBox->hide();
@@ -568,6 +557,8 @@ void BoxSingleWidget::loadStaticPixmaps() {
                 ":/icons/recording.png");
     ANIMATOR_NOT_RECORDING = new QPixmap(
                 ":/icons/not_recording.png");
+    ANIMATOR_DESCENDANT_RECORDING = new QPixmap(
+                ":/icons/desc_recording.png");
     mStaticPixmapsLoaded = true;
 }
 
@@ -583,10 +574,8 @@ void BoxSingleWidget::clearStaticPixmaps() {
     delete ANIMATOR_CHILDREN_HIDDEN;
     delete ANIMATOR_RECORDING;
     delete ANIMATOR_NOT_RECORDING;
+    delete ANIMATOR_DESCENDANT_RECORDING;
 }
-#include "canvas.h"
-#include "PathEffects/patheffect.h"
-#include "PathEffects/patheffectanimators.h"
 
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     if(isTargetDisabled()) return;
@@ -815,25 +804,22 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 bool BoxSingleWidget::isTargetDisabled() {
-    if(!mTarget) {
-        return true;
-    }
+    if(!mTarget) return true;
     return mTarget->getTarget()->SWT_isDisabled();
 }
 
 void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
-    if(!(event->buttons() & Qt::LeftButton)) {
-        return;
-    }
+    if(!(event->buttons() & Qt::LeftButton)) return;
     if(isTargetDisabled()) return;
     if((event->pos() - mDragStartPos).manhattanLength()
          < QApplication::startDragDistance()) {
         return;
     }
-    QDrag *drag = new QDrag(this);
-    connect(drag, SIGNAL(destroyed(QObject*)), this, SLOT(clearSelected()));
+    const auto drag = new QDrag(this);
+    connect(drag, &QDrag::destroyed,
+            this, &BoxSingleWidget::clearSelected);
 
-    QMimeData *mimeData = mTarget->getTarget()->SWT_createMimeData();
+    const auto mimeData = mTarget->getTarget()->SWT_createMimeData();
     if(!mimeData) return;
     setSelected(true);
     drag->setMimeData(mimeData);
@@ -952,16 +938,6 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
     }
 }
 
-void drawPixmapCentered(QPainter *p,
-                        const QRect &boundingRect,
-                        const QPixmap &pixmap) {
-    int widthDiff = boundingRect.width() - pixmap.width();
-    int heightDiff = boundingRect.height() - pixmap.height();
-    int x = widthDiff/2 + boundingRect.x();
-    int y = heightDiff/2 + boundingRect.y();
-    p->drawPixmap(x, y, pixmap);
-}
-
 int BoxSingleWidget::getOptimalNameRightX() {
     if(!mTarget) return 0;
     auto target = mTarget->getTarget();
@@ -994,7 +970,6 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(!mTarget) return;
     QPainter p(this);
     auto target = mTarget->getTarget();
-    Q_ASSERT(target);
     if(target->SWT_isDisabled()) {
         p.setOpacity(.5);
     }
@@ -1006,161 +981,43 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     int nameX = mFillWidget->x();
     QString name;
     if(target->SWT_isBoundingBox()) {
-        BoundingBox *bb_target = static_cast<BoundingBox*>(target);
+        const auto bb_target = static_cast<BoundingBox*>(target);
 
         nameX += MIN_WIDGET_HEIGHT/4;
         name = bb_target->getName();
 
         p.fillRect(rect(), QColor(0, 0, 0, 50));
 
-        if(mTarget->contentVisible()) {
-            drawPixmapCentered(&p, mContentButton->geometry(),
-                               *BoxSingleWidget::HIDE_CHILDREN);
-        } else {
-            drawPixmapCentered(&p, mContentButton->geometry(),
-                               *BoxSingleWidget::SHOW_CHILDREN);
-        }
-
-        if(bb_target->isVisible()) {
-            drawPixmapCentered(&p, mVisibleButton->geometry(),
-                               *BoxSingleWidget::VISIBLE_PIXMAP);
-        } else {
-            drawPixmapCentered(&p, mVisibleButton->geometry(),
-                               *BoxSingleWidget::INVISIBLE_PIXMAP);
-        }
-
-        if(bb_target->isLocked()) {
-            drawPixmapCentered(&p, mLockedButton->geometry(),
-                               *BoxSingleWidget::LOCKED_PIXMAP);
-        } else {
-            drawPixmapCentered(&p, mLockedButton->geometry(),
-                               *BoxSingleWidget::UNLOCKED_PIXMAP);
-        }
-
         if(bb_target->isSelected()) {
-            p.fillRect(mFillWidget->geometry(),
-                       QColor(180, 180, 180));
+            p.fillRect(mFillWidget->geometry(), QColor(180, 180, 180));
             p.setPen(Qt::black);
         } else {
             p.setPen(Qt::white);
         }
-//        QFont font = p.font();
-//        font.setBold(true);
-//        p.setFont(font);
-    } /*else if(type == SWT_BoxesGroup) {
-    } */else if(target->SWT_isGraphAnimator()) {
-        auto graphAnim = static_cast<GraphAnimator*>(target);
-        if(graphAnim->graph_isCurrentAnimator(mParent)) {
-            p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
-                       MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
-                       graphAnim->graph_getAnimatorColor(mParent));
-        }
-        name = graphAnim->prp_getName();
-        if(fakeComplexAnimator) {
-            if(mTarget->contentVisible()) {
-                drawPixmapCentered(&p, mContentButton->geometry(),
-                                   *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
-            } else {
-                drawPixmapCentered(&p, mContentButton->geometry(),
-                                   *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
+    } else if(!target->SWT_isComplexAnimator()) {
+        const auto propTarget = static_cast<Property*>(target);
+        if(target->SWT_isGraphAnimator()) {
+            auto graphAnim = static_cast<GraphAnimator*>(target);
+            if(graphAnim->graph_isCurrentAnimator(mParent)) {
+                p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
+                           MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
+                           graphAnim->graph_getAnimatorColor(mParent));
             }
-        } else {
-            nameX += MIN_WIDGET_HEIGHT;
         }
-        if(graphAnim->anim_isRecording()) {
-            drawPixmapCentered(&p, mRecordButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_RECORDING);
-        } else {
-            drawPixmapCentered(&p, mRecordButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
-        }
+        name = propTarget->prp_getName();
+        if(!fakeComplexAnimator) nameX += MIN_WIDGET_HEIGHT;
+        if(!target->SWT_isAnimator()) nameX += MIN_WIDGET_HEIGHT;
 
         p.setPen(Qt::white);
-    } else if(target->SWT_isComplexAnimator()) {
+    } else { //if(target->SWT_isComplexAnimator()) {
         ComplexAnimator *caTarget = GetAsPtr(target, ComplexAnimator);
         name = caTarget->prp_getName();
 
-        if(caTarget->anim_isRecording()) {
-            drawPixmapCentered(&p, mRecordButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_RECORDING);
-        } else {
-            drawPixmapCentered(&p, mRecordButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
-            if(caTarget->anim_isDescendantRecording()) {
-                p.save();
-                p.setRenderHint(QPainter::Antialiasing);
-                p.setBrush(Qt::red);
-                p.setPen(Qt::NoPen);
-                p.drawEllipse(QPointF(MIN_WIDGET_HEIGHT/2,
-                                      MIN_WIDGET_HEIGHT/2),
-                              0.125*MIN_WIDGET_HEIGHT,
-                              0.125*MIN_WIDGET_HEIGHT);
-                p.restore();
-            }
-        }
-
-        if(target->SWT_isPixmapEffect()) {
-            if(GetAsPtr(target, PixmapEffect)->isVisible()) {
-                drawPixmapCentered(&p, mVisibleButton->geometry(),
-                                   *BoxSingleWidget::VISIBLE_PIXMAP);
-            } else {
-                drawPixmapCentered(&p, mVisibleButton->geometry(),
-                                   *BoxSingleWidget::INVISIBLE_PIXMAP);
-            }
-        } else if(target->SWT_isPathEffect()) {
-            if(GetAsPtr(target, PathEffect)->isVisible()) {
-                drawPixmapCentered(&p, mVisibleButton->geometry(),
-                                   *BoxSingleWidget::VISIBLE_PIXMAP);
-            } else {
-                drawPixmapCentered(&p, mVisibleButton->geometry(),
-                                   *BoxSingleWidget::INVISIBLE_PIXMAP);
-            }
-        }
-
-        if(caTarget->hasChildAnimators()) {
-            if(mTarget->contentVisible()) {
-                drawPixmapCentered(&p, mContentButton->geometry(),
-                                   *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
-            } else {
-                drawPixmapCentered(&p, mContentButton->geometry(),
-                                   *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
-            }
-        }
         p.setPen(Qt::white);
-
-        const auto colorTarget = getColorTarget();
-        if(colorTarget) {
-            const auto colTarget = GetAsPtr(colorTarget, ColorAnimator);
-            p.setBrush(colTarget->getCurrentColor());
-            p.drawRect(mColorButton->x(), 3,
-                       MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT - 6);
-        }
-    } else if(target->SWT_isQStringAnimator() ||
-              target->SWT_isSmartPathAnimator() ||
-              target->SWT_isAnimatedSurface() ||
-              target->SWT_isQCubicSegment1DAnimator()) {
-        Animator *aTarget = GetAsPtr(target, Animator);
-        name = aTarget->prp_getName();
-
-        if(aTarget->anim_isRecording()) {
-            drawPixmapCentered(&p, mRecordButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_RECORDING);
-        } else {
-            drawPixmapCentered(&p, mRecordButton->geometry(),
-                               *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
-        }
-     } else if(target->SWT_isBoxTargetProperty()) {
-        nameX += 2*MIN_WIDGET_HEIGHT;
-        name = GetAsPtr(target, BoxTargetProperty)->prp_getName();
-    } else {//if(target->SWT_isBoolProperty()) {
-        nameX += 2*MIN_WIDGET_HEIGHT;
-        name = GetAsPtr(target, Property)->prp_getName();
     }
 
-    p.drawText(QRect(nameX, 0,
-                     width() - nameX -
-                     MIN_WIDGET_HEIGHT,
-                     MIN_WIDGET_HEIGHT),
+    p.drawText(QRect(nameX, 0, width() - nameX -
+                     MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT),
                name, QTextOption(Qt::AlignVCenter));
     if(mSelected) {
         p.setBrush(Qt::NoBrush);
@@ -1206,20 +1063,6 @@ void BoxSingleWidget::switchBoxLockedAction() {
     update();
 }
 
-void BoxSingleWidget::openColorSettingsDialog() {
-    ColorAnimator * color = getColorTarget();
-    if(!color) return;
-    const auto dialog = new QDialog(MainWindow::getInstance());
-    dialog->setLayout(new QVBoxLayout(dialog));
-    const auto colorSettingsWidget = new ColorSettingsWidget(dialog);
-    colorSettingsWidget->setColorAnimatorTarget(color);
-    dialog->layout()->addWidget(colorSettingsWidget);
-    connect(MainWindow::getInstance(), &MainWindow::updateAll,
-            dialog, qOverload<>(&QDialog::update));
-
-    dialog->show();
-}
-
 void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     if(!mTarget) return;
     SingleWidgetTarget *target = mTarget->getTarget();
@@ -1239,6 +1082,11 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     } else {
         clearAndHideValueAnimators();
     }
+}
+
+void BoxSingleWidget::clearColorButton() {
+    mColorButton->setColorTarget(nullptr);
+    mColorButton->hide();
 }
 
 void BoxSingleWidget::updateCompositionBoxVisible() {

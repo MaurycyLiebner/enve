@@ -5,18 +5,36 @@
 #include <QDialog>
 #include "GUI/mainwindow.h"
 
-ColorAnimatorButton::ColorAnimatorButton(ColorAnimator *colorTarget,
-                                         QWidget *parent) :
+ColorAnimatorButton::ColorAnimatorButton(ColorAnimator * const colorTarget,
+                                         QWidget * const parent) :
     BoxesListActionButton(parent) {
-    mColorTarget = colorTarget;
-    if(colorTarget) {
-        connect(colorTarget->getVal1Animator(),
+    setColorTarget(colorTarget);
+
+    connect(this, &BoxesListActionButton::pressed,
+            this, &ColorAnimatorButton::openColorSettingsDialog);
+}
+
+void ColorAnimatorButton::setColorTarget(ColorAnimator * const target) {
+    if(mColorTarget) {
+        disconnect(mColorTarget->getVal1Animator(),
+                   &QrealAnimator::valueChangedSignal,
+                   this, qOverload<>(&ColorAnimatorButton::update));
+        disconnect(mColorTarget->getVal2Animator(),
+                  &QrealAnimator::valueChangedSignal,
+                   this, qOverload<>(&ColorAnimatorButton::update));
+        disconnect(mColorTarget->getVal3Animator(),
+                   &QrealAnimator::valueChangedSignal,
+                   this, qOverload<>(&ColorAnimatorButton::update));
+    }
+    mColorTarget = target;
+    if(target) {
+        connect(target->getVal1Animator(),
                 &QrealAnimator::valueChangedSignal,
                 this, qOverload<>(&ColorAnimatorButton::update));
-        connect(colorTarget->getVal2Animator(),
+        connect(target->getVal2Animator(),
                 &QrealAnimator::valueChangedSignal,
                 this, qOverload<>(&ColorAnimatorButton::update));
-        connect(colorTarget->getVal3Animator(),
+        connect(target->getVal3Animator(),
                 &QrealAnimator::valueChangedSignal,
                 this, qOverload<>(&ColorAnimatorButton::update));
     }
@@ -25,24 +43,17 @@ ColorAnimatorButton::ColorAnimatorButton(ColorAnimator *colorTarget,
 void ColorAnimatorButton::paintEvent(QPaintEvent *) {
     if(!mColorTarget) return;
     QPainter p(this);
-    if(mHover) {
-        p.setPen(Qt::red);
-    } else {
-        p.setPen(Qt::white);
-    }
+    if(mHover) p.setPen(Qt::red);
+    else p.setPen(Qt::white);
     p.setBrush(mColorTarget->getCurrentColor());
     p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
-void ColorAnimatorButton::mousePressEvent(QMouseEvent *) {
-    openColorSettingsDialog();
-}
-
 void ColorAnimatorButton::openColorSettingsDialog() {
-    QDialog *dialog = new QDialog(MainWindow::getInstance());
+    if(!mColorTarget) return;
+    const auto dialog = new QDialog(MainWindow::getInstance());
     dialog->setLayout(new QVBoxLayout(dialog));
-    ColorSettingsWidget *colorSettingsWidget =
-            new ColorSettingsWidget(dialog);
+    const auto colorSettingsWidget = new ColorSettingsWidget(dialog);
     colorSettingsWidget->setColorAnimatorTarget(mColorTarget);
     dialog->layout()->addWidget(colorSettingsWidget);
     connect(MainWindow::getInstance(), &MainWindow::updateAll,

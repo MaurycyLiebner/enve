@@ -2,8 +2,7 @@
 #include <QPainter>
 #include "global.h"
 
-BoxesListActionButton::BoxesListActionButton(
-        QWidget *parent) :
+BoxesListActionButton::BoxesListActionButton(QWidget * const parent) :
     QWidget(parent) {
     setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
 }
@@ -20,4 +19,14 @@ void BoxesListActionButton::enterEvent(QEvent *) {
 void BoxesListActionButton::leaveEvent(QEvent *) {
     mHover = false;
     update();
+}
+
+void PixmapActionButton::paintEvent(QPaintEvent *) {
+    if(!mPixmapChooser) return;
+    const auto pix = mPixmapChooser();
+    if(!pix) return;
+
+    QPainter p(this);
+    p.drawPixmap(0, 0, *pix);
+    p.end();
 }
