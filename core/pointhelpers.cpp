@@ -811,22 +811,14 @@ bool gDisplaceFilterPath(SkPath* const dst,
     uint32_t seedContourInc = 0;
     if(smoothness < 0.001f) {
         do {
-            gen.seed(seedAssist + seedContourInc); randFloat(gen); randFloat(gen);
+            gen.seed(seedAssist + seedContourInc);
             seedContourInc += 100;
             const SkScalar length = meas.getLength();
-//            if(segLen * 2 > length) {
-//                meas.getSegment(0, length, dst, true);  // to short for us to mangle
-//                continue;
-//            }
             const int nTot = SkScalarCeilToInt(length / segLen);
             int n = nTot;
-            SkScalar distance = 0;
             const SkScalar remLen = segLen*nTot - length;
+            SkScalar distance = 0;
             SkPoint firstP;
-            if(meas.isClosed()) {
-                n--;
-                distance += (length + segLen)*0.5f;
-            }
 
             if(meas.getPosTan(distance, &p, &v)) {
                 Perterb(&p, v, randFloat(gen) * scale);
@@ -836,37 +828,18 @@ bool gDisplaceFilterPath(SkPath* const dst,
             while(--n >= 0) {
                 distance += segLen;
                 if(meas.getPosTan(distance, &p, &v)) {
+                    Perterb(&p, v, randFloat(gen) * scale);
                     if(n == 0) {
                         const SkScalar scaleT = 1 - remLen/segLen;
-                        Perterb(&p, v, randFloat(gen) * scale * scaleT);
-                    } else {
-                        Perterb(&p, v, randFloat(gen) * scale);
+                        p = p*scaleT + firstP*(1 - scaleT);
                     }
                     dst->lineTo(p);
                 }
-                if(distance + segLen > length) break;
             }
-            if(meas.isClosed()) {
-                distance = distance + segLen - length;
-                while(--n >= 0) {
-                    if(meas.getPosTan(distance, &p, &v)) {
-                        if(n == 0) {
-                            const SkScalar scaleT = 1 - remLen/segLen;
-                            Perterb(&p, v, randFloat(gen) * scale * scaleT);
-                        } else {
-                            Perterb(&p, v, randFloat(gen) * scale);
-                        }
-                        dst->lineTo(p);
-                    }
-                    distance += segLen;
-                }
-                dst->close();
-            }
+            if(meas.isClosed()) dst->close();
         } while(meas.nextContour());
     } else {
         SkPoint firstP;
-        SkPoint secondP;
-        SkPoint thirdP;
         SkPoint lastP;
         SkPoint nextP;
         SkPoint currP;
@@ -875,119 +848,40 @@ bool gDisplaceFilterPath(SkPath* const dst,
         SkPoint c2;
 
         do {
-            gen.seed(seedAssist + seedContourInc);
+            gen.seed(seedAssist + seedContourInc); randFloat(gen);
             seedContourInc += 100;
             const SkScalar length = meas.getLength();
-//            if(segLen * 2 > length) {
-//                meas.getSegment(0, length, dst, true);  // to short for us to mangle
-//                continue;
-//            }
-            int nTot = SkScalarCeilToInt(length / segLen);
+            const int nTot = SkScalarCeilToInt(length / segLen);
             int n = nTot;
             SkScalar distance = 0;
             const SkScalar remLen = segLen*nTot - length;
             const SkScalar smoothLen = smoothness * segLen * 0.5f;
 
-            if(meas.isClosed()) {
-                n--;
-                distance += (length + segLen)*0.5f;
-            }
+            if(meas.getPosTan(distance, &p, &v)) {
+                Perterb(&p, v, randFloat(gen) * scale);
+                dst->moveTo(p);
 
-            if(meas.getPosTan(distance, &firstP, &v)) {
-                //Perterb(&firstP, v, randFloat() * scale);
+                firstP = p;
                 lastP = firstP;
             }
 
-            if(meas.isClosed()) {
-                distance += segLen;
-                if(meas.getPosTan(distance, &currP, &v)) {
-                    Perterb(&currP, v, randFloat(gen) * scale);
-                    n--;
-                    secondP = currP;
-                }
-                distance += segLen;
-                if(meas.getPosTan(distance, &nextP, &v)) {
-                    Perterb(&nextP, v, randFloat(gen) * scale);
-                    n--;
-                    thirdP = nextP;
-
-                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
-
-                    lastC1 = c1;
-
-                    lastP = currP;
-                    currP = nextP;
-                }
-            } else {
-                currP = lastP;
-                lastC1 = currP;
-            }
-            dst->moveTo(lastP);
             while(--n >= 0) {
                 distance += segLen;
                 if(meas.getPosTan(distance, &nextP, &v)) {
+                    Perterb(&nextP, v, randFloat(gen) * scale);
                     if(n == 0) {
                         const SkScalar scaleT = 1 - remLen/segLen;
-                        Perterb(&nextP, v, randFloat(gen) * scale * scaleT);
-
-                    } else {
-                        Perterb(&nextP, v, randFloat(gen) * scale);
+                        nextP = nextP*scaleT + firstP*(1 - scaleT);
                     }
-                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
-
-
+                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP,
+                                                   c1, c2, smoothLen);
                     dst->cubicTo(lastC1, c2, currP);
-                    lastC1 = c1;
 
+                    lastC1 = c1;
                     lastP = currP;
                     currP = nextP;
                 }
                 if(distance + segLen > length) break;
-            }
-
-//            nextP = firstP;
-//            getC1AndC2(lastP, currP, nextP,
-//                       &c1, &c2, smoothLen);
-//            dst->cubicTo(lastC1, c2, currP);
-            if(meas.isClosed()) {
-                distance = distance + segLen - length;
-                while(--n >= 0) {
-                    if(meas.getPosTan(distance, &nextP, &v)) {
-                        if(n == 0) {
-                            const SkScalar scaleT = 1 - remLen/segLen;
-                            Perterb(&nextP, v, randFloat(gen) * scale * scaleT);
-                        } else {
-                            Perterb(&nextP, v, randFloat(gen) * scale);
-                        }
-                        gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
-
-
-                        dst->cubicTo(lastC1, c2, currP);
-                        lastC1 = c1;
-
-                        lastP = currP;
-                        currP = nextP;
-                    }
-                    distance += segLen;
-                }
-                lastC1 = c1;
-
-//                lastP = currP;
-//                currP = nextP;
-                nextP = firstP;
-
-                gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
-
-                dst->cubicTo(lastC1, c2, currP);
-                lastC1 = c1;
-
-                lastP = currP;
-                currP = nextP;
-                nextP = secondP;
-                gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothLen);
-                dst->cubicTo(lastC1, c2, currP);
-
-                dst->close();
             }
         } while(meas.nextContour());
     }
