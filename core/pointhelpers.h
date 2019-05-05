@@ -105,12 +105,11 @@ extern void gForEverySegmentInPath(
         const SkPath& path,
         const std::function<void(const SkPath&)>& func);
 
-extern void gGetSmoothAbsCtrlsForPtBetween(
-        const SkPoint &lastP,
-        const SkPoint &currP,
-        const SkPoint &nextP,
-        SkPoint &c1, SkPoint &c2,
-        const SkScalar &smoothLen);
+extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &prevP,
+                                           const SkPoint &currP,
+                                           const SkPoint &nextP,
+                                           SkPoint &c1, SkPoint &c2,
+                                           const SkScalar &smoothLen);
 
 extern void gDisplaceFilterPath(SkPath* const dst,
                                 const SkPath& src,
