@@ -822,9 +822,8 @@ bool gDisplaceFilterPath(SkPath* const dst,
         SkScalar dist = 0;
         for(int i = 0; i < nTot; i++) {
             auto& pt = pts[i];
-            if(i == nTot - 1) {
-                pt = pts[0];
-            } else {
+            if(i == nTot - 1) pt = pts[0];
+            else {
                 if(meas.getPosTan(dist += segLen, &pt, &v)) {
                     Perterb(&pt, v, randFloat(gen) * maxDev);
                 }
@@ -841,13 +840,13 @@ bool gDisplaceFilterPath(SkPath* const dst,
 
         if(!zeroSmooth) {
             const auto& prevPrevPt = pts[nTot - 2];
-            const int prevId = nTot - 1;
-            const auto& prevPt = pts[prevId];
-            const auto& nextPt = pts[1];
-            cPts[prevId*2 + 1] = prevPt;
-            cPts[0] = prevPt;
-            gGetSmoothAbsCtrlsForPtBetween(prevPrevPt, prevPt, nextPt,
-                                           cPts[prevId*2], cPts[1], smoothness);
+            const int lastId = nTot - 1;
+            const auto& lastPt = pts[lastId];
+            const auto& secondPt = pts[1];
+            cPts[lastId*2 + 1] = lastPt;
+            cPts[0] = lastPt;
+            gGetSmoothAbsCtrlsForPtBetween(prevPrevPt, lastPt, secondPt,
+                                           cPts[lastId*2], cPts[1], smoothness);
         }
 
         {
@@ -860,32 +859,38 @@ bool gDisplaceFilterPath(SkPath* const dst,
             const SkPoint& last = pts[lastId];
 
             SkPoint currLastCtrlAfter;
+            SkPoint currLastCtrlBefore;
             if(zeroSmooth) {
                 currLastCtrlAfter = currLast;
+                currLastCtrlBefore = currLast;
             } else {
-                SkPoint ignore;
-                gGetSmoothAbsCtrlsForPtBetween(pts[beforeCurrLastId], currLast, last,
-                                               ignore, currLastCtrlAfter, smoothness);
+                gGetSmoothAbsCtrlsForPtBetween(
+                            pts[beforeCurrLastId], currLast, last,
+                            currLastCtrlBefore, currLastCtrlAfter, smoothness);
             }
 
             SkPoint lastCtrlBefore;
+            SkPoint lastCtrlAfter;
             if(zeroSmooth) {
                 lastCtrlBefore = last;
             } else {
-                SkPoint ignore;
-                gGetSmoothAbsCtrlsForPtBetween(currLast, last, pts[1],
-                                               lastCtrlBefore, ignore, smoothness);
+                gGetSmoothAbsCtrlsForPtBetween(
+                            currLast, last, pts[1],
+                            lastCtrlBefore, lastCtrlAfter, smoothness);
             }
 
             const qCubicSegment2D seg(toQPointF(currLast),
                                       toQPointF(currLastCtrlAfter),
                                       toQPointF(lastCtrlBefore),
                                       toQPointF(last));
-            const auto div = seg.dividedAtT(static_cast<double>(1 - endPtFrac));
+            const auto div = seg.dividedAtT(0.5 + 0.5*static_cast<double>(1 - endPtFrac));
 
             pts[fragId] = pts[fragId]*endPtFrac +
                     toSkPoint(div.first.p3())*(1 - endPtFrac);
             if(!zeroSmooth) {
+                cPts[currLastId*2] = (cPts[currLastId*2]*endPtFrac +
+                        currLastCtrlBefore*(1 - endPtFrac))*smoothness +
+                        pts[currLastId]*(1 - smoothness);
                 cPts[currLastId*2 + 1] = (cPts[currLastId*2 + 1]*endPtFrac +
                         toSkPoint(div.first.c1())*(1 - endPtFrac))*smoothness +
                         pts[currLastId]*(1 - smoothness);
@@ -899,6 +904,9 @@ bool gDisplaceFilterPath(SkPath* const dst,
 
                 cPts[lastId*2] = (cPts[lastId*2]*endPtFrac +
                         toSkPoint(div.second.c2())*(1 - endPtFrac))*smoothness +
+                        pts[lastId]*(1 - smoothness);
+                cPts[1] = (cPts[1]*endPtFrac +
+                        lastCtrlAfter*(1 - endPtFrac))*smoothness +
                         pts[lastId]*(1 - smoothness);
             }
         }
