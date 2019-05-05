@@ -839,50 +839,71 @@ bool gDisplaceFilterPath(SkPath* const dst,
             if(meas.isClosed()) dst->close();
         } while(meas.nextContour());
     } else {
-        SkPoint firstP;
-        SkPoint lastP;
-        SkPoint nextP;
-        SkPoint currP;
-        SkPoint lastC1;
-        SkPoint c1;
-        SkPoint c2;
-
         do {
             gen.seed(seedAssist + seedContourInc); randFloat(gen);
             seedContourInc += 100;
             const SkScalar length = meas.getLength();
-            const int nTot = SkScalarCeilToInt(length / segLen);
-            int n = nTot;
-            SkScalar distance = 0;
-            const SkScalar remLen = segLen*nTot - length;
+            const SkScalar midLen = length * 0.5f;
+
+            const int nSide = SkScalarFloorToInt(midLen / segLen);
+            const int nTot = 1 + nSide + 1 + nSide + 1;;
             const SkScalar smoothLen = smoothness * segLen * 0.5f;
-
-            if(meas.getPosTan(distance, &p, &v)) {
-                Perterb(&p, v, randFloat(gen) * scale);
-                dst->moveTo(p);
-
-                firstP = p;
-                lastP = firstP;
+            const SkScalar remLen = midLen - nSide*segLen;
+            const SkScalar endPtFrac = remLen/segLen;
+            const int middle = nSide + 1;
+            std::vector<SkPoint> pts(static_cast<uint>(nTot));
+            SkPoint first;
+            if(meas.getPosTan(0, &first, &v)) {
+                Perterb(&first, v, randFloat(gen) * scale);
             }
-
-            while(--n >= 0) {
-                distance += segLen;
-                if(meas.getPosTan(distance, &nextP, &v)) {
-                    Perterb(&nextP, v, randFloat(gen) * scale);
-                    if(n == 0) {
-                        const SkScalar scaleT = 1 - remLen/segLen;
-                        nextP = nextP*scaleT + firstP*(1 - scaleT);
+            const int iMax = meas.isClosed() ? nSide : nSide + 1;
+            for(int i = 0; i <= iMax; i++) {
+                for(int j = -1; j < 2 && (i > 0 || j == -1); j += 2) {
+                    const int relId = j*i;
+                    const int id = middle + relId;
+                    const SkScalar dist = midLen + relId*segLen;
+                    SkPoint& pt = pts[static_cast<uint>(id)];
+                    if(meas.getPosTan(dist, &pt, &v)) {
+                        if(!meas.isClosed()) {
+                            if(i == nSide + 1) {
+                                Perterb(&pt, v, randFloat(gen) * scale * endPtFrac);
+                                continue;
+                            }
+                        }
+                        Perterb(&pt, v, randFloat(gen) * scale);
                     }
-                    gGetSmoothAbsCtrlsForPtBetween(lastP, currP, nextP,
-                                                   c1, c2, smoothLen);
-                    dst->cubicTo(lastC1, c2, currP);
-
-                    lastC1 = c1;
-                    lastP = currP;
-                    currP = nextP;
                 }
-                if(distance + segLen > length) break;
             }
+
+            if(meas.isClosed()) {
+                pts.front() = first;
+                pts.back() = first;
+                pts[1] = pts[1]*endPtFrac + pts[0]*(1 - endPtFrac);
+                const uint nTotM2 = static_cast<uint>(nTot - 2);
+                const uint nTotM1 = static_cast<uint>(nTot - 1);
+                pts[nTotM2] = pts[nTotM2]*endPtFrac + pts[nTotM1]*(1 - endPtFrac);
+            }
+
+            auto prevIt = meas.isClosed() ? pts.end() - 2 : pts.begin();
+            auto currIt = pts.begin();
+            auto nextIt = pts.begin() + 1;
+            SkPoint lastC1;
+            for(int i = 0; i < nTot; i++, prevIt++, currIt++, nextIt++) {
+                if(i == 1) prevIt = pts.begin();
+                else if(i == nTot - 1)
+                    nextIt = meas.isClosed() ? pts.begin() : pts.end();
+
+                SkPoint c1;
+                SkPoint c2;
+                gGetSmoothAbsCtrlsForPtBetween(*prevIt, *currIt, *nextIt,
+                                               c1, c2, smoothLen);
+                if(i == 0) dst->moveTo(*currIt);
+                else dst->cubicTo(lastC1, c2, *currIt);
+
+                lastC1 = c1;
+            }
+
+            if(meas.isClosed()) dst->close();
         } while(meas.nextContour());
     }
     return true;
