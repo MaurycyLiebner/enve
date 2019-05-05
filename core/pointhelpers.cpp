@@ -792,6 +792,207 @@ void gDisplaceFilterPath(SkPath* const dst,
 
 }
 
+void displaceClosedPath(SkPathMeasure &meas,
+                        SkPath* const dst,
+                        const uint32_t& seed,
+                        const SkScalar& segLen,
+                        const SkScalar& maxDev,
+                        const SkScalar& smoothness) {
+    const bool zeroSmooth = smoothness < 0.001f;
+    QRandomGenerator gen(seed);
+    const SkScalar length = meas.getLength();
+
+    const int nTot = SkScalarCeilToInt(length / segLen);
+    if(nTot < 2) return;
+
+    const SkScalar remLen = length - (nTot - 1)*segLen;
+    const SkScalar endPtFrac = remLen/segLen;
+    QVector<SkPoint> pts(nTot);
+    QVector<SkPoint> cPts(zeroSmooth ? 1 : nTot*2);
+    SkScalar dist = 0;
+    for(int i = 0; i < nTot; i++) {
+        auto& pt = pts[i];
+        if(i == nTot - 1) pt = pts[0];
+        else {
+            SkVector v;
+            if(meas.getPosTan(dist += segLen, &pt, &v)) {
+                Perterb(&pt, v, randFloat(gen) * maxDev);
+            }
+        }
+        if(i > 1 && !zeroSmooth) {
+            const auto& prevPrevPt = pts[i - 2];
+            const int prevId = i - 1;
+            const auto& prevPt = pts[prevId];
+            const auto& nextPt = pt;
+            gGetSmoothAbsCtrlsForPtBetween(prevPrevPt, prevPt, nextPt,
+                                           cPts[prevId*2], cPts[prevId*2 + 1], smoothness);
+        }
+    }
+
+    if(!zeroSmooth) {
+        const auto& prevPrevPt = pts[nTot - 2];
+        const int lastId = nTot - 1;
+        const auto& lastPt = pts[lastId];
+        const auto& secondPt = pts[1];
+        cPts[lastId*2 + 1] = lastPt;
+        cPts[0] = lastPt;
+        gGetSmoothAbsCtrlsForPtBetween(prevPrevPt, lastPt, secondPt,
+                                       cPts[lastId*2], cPts[1], smoothness);
+    }
+
+    {
+        const int beforeCurrLastId = nTot - 4 < 0 ? 2*nTot - 4 : nTot - 4;
+        const int currLastId = nTot - 3 < 0 ? 2*nTot - 3 : nTot - 3;
+        const int fragId = nTot - 2; // nTot !< 2
+        const int lastId = nTot - 1;
+
+        const SkPoint& currLast = pts[currLastId];
+        const SkPoint& last = pts[lastId];
+
+        SkPoint currLastCtrlAfter;
+        SkPoint currLastCtrlBefore;
+        if(zeroSmooth) {
+            currLastCtrlAfter = currLast;
+            currLastCtrlBefore = currLast;
+        } else {
+            gGetSmoothAbsCtrlsForPtBetween(
+                        pts[beforeCurrLastId], currLast, last,
+                        currLastCtrlBefore, currLastCtrlAfter, smoothness);
+        }
+
+        SkPoint lastCtrlBefore;
+        SkPoint lastCtrlAfter;
+        if(zeroSmooth) {
+            lastCtrlBefore = last;
+        } else {
+            gGetSmoothAbsCtrlsForPtBetween(
+                        currLast, last, pts[1],
+                        lastCtrlBefore, lastCtrlAfter, smoothness);
+        }
+
+        const qCubicSegment2D seg(toQPointF(currLast),
+                                  toQPointF(currLastCtrlAfter),
+                                  toQPointF(lastCtrlBefore),
+                                  toQPointF(last));
+        const auto div = seg.dividedAtT(0.5 + 0.5*static_cast<double>(1 - endPtFrac));
+
+        pts[fragId] = pts[fragId]*endPtFrac +
+                toSkPoint(div.first.p3())*(1 - endPtFrac);
+        if(!zeroSmooth) {
+            cPts[currLastId*2] = (cPts[currLastId*2]*endPtFrac +
+                    currLastCtrlBefore*(1 - endPtFrac))*smoothness +
+                    pts[currLastId]*(1 - smoothness);
+            cPts[currLastId*2 + 1] = (cPts[currLastId*2 + 1]*endPtFrac +
+                    toSkPoint(div.first.c1())*(1 - endPtFrac))*smoothness +
+                    pts[currLastId]*(1 - smoothness);
+
+            cPts[fragId*2] = (cPts[fragId*2]*endPtFrac +
+                    toSkPoint(div.first.c2())*(1 - endPtFrac))*smoothness +
+                    pts[fragId]*(1 - smoothness);
+            cPts[fragId*2 + 1] = (cPts[fragId*2 + 1]*endPtFrac +
+                    toSkPoint(div.second.c1())*(1 - endPtFrac))*smoothness +
+                    pts[fragId]*(1 - smoothness);
+
+            cPts[lastId*2] = (cPts[lastId*2]*endPtFrac +
+                    toSkPoint(div.second.c2())*(1 - endPtFrac))*smoothness +
+                    pts[lastId]*(1 - smoothness);
+            cPts[1] = (cPts[1]*endPtFrac +
+                    lastCtrlAfter*(1 - endPtFrac))*smoothness +
+                    pts[lastId]*(1 - smoothness);
+        }
+    }
+
+    auto currIt = pts.begin();
+    if(zeroSmooth) {
+        for(int i = 0; i < nTot; i++, currIt++) {
+            if(i == 0) dst->moveTo(pts[i]);
+            else dst->lineTo(pts[i]);
+        }
+    } else {
+        for(int i = 0; i < nTot; i++, currIt++) {
+            if(i == 0) dst->moveTo(pts[i]);
+            else dst->cubicTo(cPts[i*2 - 1], cPts[i*2], pts[i]);
+        }
+    }
+
+    dst->close();
+}
+
+void displaceOpenedPath(SkPathMeasure &meas,
+                        SkPath* const dst,
+                        const uint32_t& seed,
+                        const SkScalar& segLen,
+                        const SkScalar& maxDev,
+                        const SkScalar& smoothness) {
+    const bool zeroSmooth = smoothness < 0.001f;
+    QRandomGenerator gen(seed);
+    const SkScalar length = meas.getLength();
+    const SkScalar halfLength = length * 0.5f;
+
+    const int nSide = SkScalarCeilToInt(halfLength / segLen);
+    const int nTot = nSide + 1 + nSide;
+    const int middleId = nSide;
+    if(nTot < 2) return;
+
+    const SkScalar remLen = halfLength - (nSide - 1)*segLen;
+    const SkScalar endPtFrac = remLen/segLen;
+
+    QVector<SkPoint> pts(nTot);
+    QVector<SkPoint> cPts(zeroSmooth ? 1 : nTot*2);
+
+    SkScalar rand1 = 0;
+    SkScalar randNTotM2 = 0;
+
+    for(int i = 0; i <= nSide; i++) {
+        for(int j = -1; j < 2 && (i != 0 || j == -1); j += 2) {
+            const int ptId = middleId + i*j;
+            auto& pt = pts[ptId];
+            SkVector v;
+            if(meas.getPosTan(halfLength + j*i*segLen, &pt, &v)) {
+                SkScalar rand = randFloat(gen);
+                if(ptId == 1) rand1 = rand;
+                else if(ptId == nTot - 2) randNTotM2 = rand;
+                else if(ptId == 0) rand = rand*endPtFrac + rand1*(1 - endPtFrac);
+                else if(ptId == nTot - 1) rand = rand*endPtFrac + randNTotM2*(1 - endPtFrac);
+                Perterb(&pt, v, rand * maxDev);
+            }
+            if(i > 0 && !zeroSmooth) {
+                const int currId = ptId - 1*j;
+                const auto& prevPt = pts[currId - 1];
+                const auto& currPt = pts[currId];
+                const auto& nextPt = pts[currId + 1];
+                gGetSmoothAbsCtrlsForPtBetween(prevPt, currPt, nextPt,
+                                               cPts[currId*2], cPts[currId*2 + 1], smoothness);
+            }
+        }
+    }
+
+    if(!zeroSmooth) {
+        for(int j = -1; j < 2; j += 2) {
+            const int ptId = j == -1 ? 0 : nTot - 1;
+            const auto& currPt = pts[ptId];
+            const auto& prevPt = j == -1 ? currPt : pts[ptId - 1];
+            const auto& nextPt = j == -1 ? pts[ptId + 1] : currPt;
+
+            gGetSmoothAbsCtrlsForPtBetween(prevPt, currPt, nextPt,
+                                           cPts[2*ptId], cPts[2*ptId + 1], smoothness);
+        }
+    }
+
+    auto currIt = pts.begin();
+    if(zeroSmooth) {
+        for(int i = 0; i < nTot; i++, currIt++) {
+            if(i == 0) dst->moveTo(pts[i]);
+            else dst->lineTo(pts[i]);
+        }
+    } else {
+        for(int i = 0; i < nTot; i++, currIt++) {
+            if(i == 0) dst->moveTo(pts[i]);
+            else dst->cubicTo(cPts[i*2 - 1], cPts[i*2], pts[i]);
+        }
+    }
+}
+
 bool gDisplaceFilterPath(SkPath* const dst,
                          const SkPath& src,
                          const SkScalar &maxDev,
@@ -803,128 +1004,18 @@ bool gDisplaceFilterPath(SkPath* const dst,
 
     QRandomGenerator gen;
     SkPathMeasure meas(src, false);
-    SkVector v;
 
-    const bool zeroSmooth = smoothness < 0.001f;
     uint32_t seedContourInc = 0;
     do {
-        QRandomGenerator gen(seedAssist + seedContourInc);
-        seedContourInc += 100;
-        const SkScalar length = meas.getLength();
-
-        const int nTot = SkScalarCeilToInt(length / segLen);
-        if(nTot < 2) continue;
-
-        const SkScalar remLen = length - (nTot - 1)*segLen;
-        const SkScalar endPtFrac = remLen/segLen;
-        QVector<SkPoint> pts(nTot);
-        QVector<SkPoint> cPts(zeroSmooth ? 1 : nTot*2);
-        SkScalar dist = 0;
-        for(int i = 0; i < nTot; i++) {
-            auto& pt = pts[i];
-            if(i == nTot - 1) pt = pts[0];
-            else {
-                if(meas.getPosTan(dist += segLen, &pt, &v)) {
-                    Perterb(&pt, v, randFloat(gen) * maxDev);
-                }
-            }
-            if(i > 1 && !zeroSmooth) {
-                const auto& prevPrevPt = pts[i - 2];
-                const int prevId = i - 1;
-                const auto& prevPt = pts[prevId];
-                const auto& nextPt = pt;
-                gGetSmoothAbsCtrlsForPtBetween(prevPrevPt, prevPt, nextPt,
-                                               cPts[prevId*2], cPts[prevId*2 + 1], smoothness);
-            }
-        }
-
-        if(!zeroSmooth) {
-            const auto& prevPrevPt = pts[nTot - 2];
-            const int lastId = nTot - 1;
-            const auto& lastPt = pts[lastId];
-            const auto& secondPt = pts[1];
-            cPts[lastId*2 + 1] = lastPt;
-            cPts[0] = lastPt;
-            gGetSmoothAbsCtrlsForPtBetween(prevPrevPt, lastPt, secondPt,
-                                           cPts[lastId*2], cPts[1], smoothness);
-        }
-
-        {
-            const int beforeCurrLastId = nTot - 4 < 0 ? 2*nTot - 4 : nTot - 4;
-            const int currLastId = nTot - 3 < 0 ? 2*nTot - 3 : nTot - 3;
-            const int fragId = nTot - 2; // nTot !< 2
-            const int lastId = nTot - 1;
-
-            const SkPoint& currLast = pts[currLastId];
-            const SkPoint& last = pts[lastId];
-
-            SkPoint currLastCtrlAfter;
-            SkPoint currLastCtrlBefore;
-            if(zeroSmooth) {
-                currLastCtrlAfter = currLast;
-                currLastCtrlBefore = currLast;
-            } else {
-                gGetSmoothAbsCtrlsForPtBetween(
-                            pts[beforeCurrLastId], currLast, last,
-                            currLastCtrlBefore, currLastCtrlAfter, smoothness);
-            }
-
-            SkPoint lastCtrlBefore;
-            SkPoint lastCtrlAfter;
-            if(zeroSmooth) {
-                lastCtrlBefore = last;
-            } else {
-                gGetSmoothAbsCtrlsForPtBetween(
-                            currLast, last, pts[1],
-                            lastCtrlBefore, lastCtrlAfter, smoothness);
-            }
-
-            const qCubicSegment2D seg(toQPointF(currLast),
-                                      toQPointF(currLastCtrlAfter),
-                                      toQPointF(lastCtrlBefore),
-                                      toQPointF(last));
-            const auto div = seg.dividedAtT(0.5 + 0.5*static_cast<double>(1 - endPtFrac));
-
-            pts[fragId] = pts[fragId]*endPtFrac +
-                    toSkPoint(div.first.p3())*(1 - endPtFrac);
-            if(!zeroSmooth) {
-                cPts[currLastId*2] = (cPts[currLastId*2]*endPtFrac +
-                        currLastCtrlBefore*(1 - endPtFrac))*smoothness +
-                        pts[currLastId]*(1 - smoothness);
-                cPts[currLastId*2 + 1] = (cPts[currLastId*2 + 1]*endPtFrac +
-                        toSkPoint(div.first.c1())*(1 - endPtFrac))*smoothness +
-                        pts[currLastId]*(1 - smoothness);
-
-                cPts[fragId*2] = (cPts[fragId*2]*endPtFrac +
-                        toSkPoint(div.first.c2())*(1 - endPtFrac))*smoothness +
-                        pts[fragId]*(1 - smoothness);
-                cPts[fragId*2 + 1] = (cPts[fragId*2 + 1]*endPtFrac +
-                        toSkPoint(div.second.c1())*(1 - endPtFrac))*smoothness +
-                        pts[fragId]*(1 - smoothness);
-
-                cPts[lastId*2] = (cPts[lastId*2]*endPtFrac +
-                        toSkPoint(div.second.c2())*(1 - endPtFrac))*smoothness +
-                        pts[lastId]*(1 - smoothness);
-                cPts[1] = (cPts[1]*endPtFrac +
-                        lastCtrlAfter*(1 - endPtFrac))*smoothness +
-                        pts[lastId]*(1 - smoothness);
-            }
-        }
-
-        auto currIt = pts.begin();
-        if(zeroSmooth) {
-            for(int i = 0; i < nTot; i++, currIt++) {
-                if(i == 0) dst->moveTo(pts[i]);
-                else dst->lineTo(pts[i]);
-            }
+        if(meas.isClosed()) {
+            displaceClosedPath(meas, dst, seedAssist + seedContourInc,
+                               segLen, maxDev, smoothness);
         } else {
-            for(int i = 0; i < nTot; i++, currIt++) {
-                if(i == 0) dst->moveTo(pts[i]);
-                else dst->cubicTo(cPts[i*2 - 1], cPts[i*2], pts[i]);
-            }
+            displaceOpenedPath(meas, dst, seedAssist + seedContourInc,
+                               segLen, maxDev, smoothness);
         }
 
-        dst->close();
+        seedContourInc += 100;
     } while(meas.nextContour());
     return true;
 }
