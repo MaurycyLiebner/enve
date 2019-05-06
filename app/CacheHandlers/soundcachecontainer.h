@@ -7,15 +7,15 @@ class SoundCacheContainer : public HDDCachableRangeContainer {
     friend class StdSelfRef;
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 protected:
-    SoundCacheContainer(const iValueRange &frame,
+    SoundCacheContainer(const iValueRange &second,
                         HDDCachableCacheHandler * const parent);
     SoundCacheContainer(const stdsptr<Samples>& samples,
-                        const iValueRange &frame,
+                        const iValueRange &second,
                         HDDCachableCacheHandler * const parent);
 public:
     int getByteCount() {
         if(!mSamples) return 0;
-        return mSamples->fSamplesCount*static_cast<int>(sizeof(float));
+        return mSamples->fSampleRange.span()*static_cast<int>(sizeof(float));
     }
 
     stdsptr<Samples> getSamples() { return mSamples; }

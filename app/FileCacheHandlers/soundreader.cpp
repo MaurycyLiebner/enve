@@ -22,7 +22,7 @@ void SoundReader::readFrame() {
     const auto decodedFrame = mOpenedAudio->fDecodedFrame;
     const auto codecContext = mOpenedAudio->fCodecContext;
     const auto swrContext = mOpenedAudio->fSwrContext;
-    const qreal fps = mOpenedAudio->fFps;
+    //const qreal fps = mOpenedAudio->fFps;
 
     const int64_t tsms = qFloor(mSecondId * 1000 - 1);
     const int64_t tm = av_rescale(tsms, audioStream->time_base.den,
@@ -44,9 +44,10 @@ void SoundReader::readFrame() {
 
     avcodec_flush_buffers(codecContext);
     int64_t pts = 0;
-    bool firstSample = true;
+    bool firstFrame = true;
     int currentSample = 0;
     float * audioData = nullptr;
+    SampleRange audioDataRange{mSampleRange.fMin, mSampleRange.fMin - 1};
     int nSamples = 0;
     while(true) {
         if(av_read_frame(formatContext, packet) < 0) {
@@ -83,11 +84,7 @@ void SoundReader::readFrame() {
             if(currSecond > mSecondId)
                 qDebug() << QString::number(currSecond) +
                             " instead of " + QString::number(mSecondId);
-            if(firstSample) {
-                firstSample = false;
-                pts = av_rescale_q(pts, audioStream->time_base, AV_TIME_BASE_Q);
-                currentSample = pts*SOUND_SAMPLERATE/1000000;
-            }
+
             // resample frames
             float *buffer;
             av_samples_alloc((uint8_t**)&buffer, nullptr, 1,
@@ -98,12 +95,14 @@ void SoundReader::readFrame() {
                         (const uint8_t**)decodedFrame->data,
                         decodedFrame->nb_samples);
             // append resampled frames to data
-            int firstRelSample = 0;
-            int nSamplesInRange = nSamplesT;
-            if(mSampleRange.fMin > currentSample) {
-                firstRelSample = mSampleRange.fMin - currentSample;
-                nSamplesInRange -= firstRelSample;
+            if(firstFrame) {
+                pts = av_rescale_q(pts, audioStream->time_base, AV_TIME_BASE_Q);
+                currentSample = pts*SOUND_SAMPLERATE/1000000;
             }
+            const SampleRange frameSampleRange{currentSample, nSamplesT};
+            const SampleRange neededSampleRange = mSampleRange*frameSampleRange;
+            const int firstRelSample = neededSampleRange.fMin - frameSampleRange.fMin;
+            const int nSamplesInRange = neededSampleRange.span();
             if(nSamplesInRange > 0) {
                 const int newNSamples = nSamples + nSamplesInRange;
                 const ulong newAudioDataSize = static_cast<ulong>(newNSamples) * sizeof(float);
@@ -113,17 +112,20 @@ void SoundReader::readFrame() {
                 float * const dst = audioData + nSamples;
                 memcpy(dst, src, static_cast<ulong>(nSamplesInRange) * sizeof(float));
                 nSamples = newNSamples;
+                if(firstFrame) audioDataRange = neededSampleRange;
+                else audioDataRange += neededSampleRange;
             }
 
             av_freep(&((uint8_t**)&buffer)[0]);
 
             currentSample += nSamplesT;
+            firstFrame = false;
             if(currentSample >= mSampleRange.fMax) break;
-            mSamples = SPtrCreate(Samples)(audioData, mSampleRange.span());
-            break;
         }
         av_frame_unref(decodedFrame);
     }
+
+    mSamples = SPtrCreate(Samples)(audioData, audioDataRange);
 
     av_frame_unref(decodedFrame);
     av_packet_unref(packet);

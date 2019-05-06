@@ -1,14 +1,14 @@
 #include "soundcachecontainer.h"
 #include "soundtmpfilehandlers.h"
 
-SoundCacheContainer::SoundCacheContainer(const iValueRange &frame,
+SoundCacheContainer::SoundCacheContainer(const iValueRange &second,
                                          HDDCachableCacheHandler * const parent) :
-    HDDCachableRangeContainer(frame, parent) {}
+    HDDCachableRangeContainer(second, parent) {}
 
 SoundCacheContainer::SoundCacheContainer(const stdsptr<Samples>& samples,
-                                         const iValueRange &frame,
+                                         const iValueRange &second,
                                          HDDCachableCacheHandler * const parent) :
-    SoundCacheContainer(frame, parent) {
+    SoundCacheContainer(second, parent) {
     replaceSamples(samples);
 }
 

@@ -153,9 +153,7 @@ void SingleSound::prepareFinalData(const float &fps,
 
         mFinalSampleCount = static_cast<int>(maxSampleFromSrc - minSampleFromSrc);
         qDebug() << minSampleFromSrc << maxSampleFromSrc << mFinalSampleCount;
-        ulong dataSize = static_cast<ulong>(mFinalSampleCount)*sizeof(float);
-        void* data = malloc(dataSize);
-        mFinalData = static_cast<float*>(data);
+        mFinalData = new float[static_cast<size_t>(mFinalSampleCount)];
         if(mVolumeAnimator->anim_hasKeys()) {
             int j = 0;
             int frame = 0;

@@ -23,7 +23,7 @@ struct iValueRange {
     }
 
     int span() const {
-        return fMax - fMin + 1;
+        return qMax(0, fMax - fMin + 1);
     }
 
     iValueRange shifted(const int& by) const {
@@ -99,7 +99,7 @@ struct qValueRange {
     }
 
     qreal span() const {
-        return fMax - fMin;
+        return qMax(0., fMax - fMin);
     }
 
     qValueRange shifted(const qreal& by) const {

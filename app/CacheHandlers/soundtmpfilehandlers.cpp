@@ -10,11 +10,13 @@ SoundContainerTmpFileDataLoader::SoundContainerTmpFileDataLoader(
 
 void SoundContainerTmpFileDataLoader::processTask() {
     if(mTmpFile->open()) {
-        int size;
-        mTmpFile->read(rcChar(&size), sizeof(int));
-        mSamples = SPtrCreate(Samples)(size);
-        mTmpFile->read(rcChar(mSamples->fData),
-                       size*static_cast<qint64>(sizeof(float)));
+        SampleRange sampleRange;
+        mTmpFile->read(rcChar(&sampleRange), sizeof(SampleRange));
+        const size_t size = static_cast<size_t>(sampleRange.span());
+        float * data = new float[size];
+        mTmpFile->read(rcChar(data),
+                       static_cast<qint64>(size*sizeof(float)));
+        mSamples = SPtrCreate(Samples)(data, sampleRange);
 
         mTmpFile->close();
     }
@@ -34,11 +36,11 @@ void SoundContainerTmpFileDataSaver::processTask() {
     // mSavingFailed = true; return; // NO TMP FILES !!!
     mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
     if(mTmpFile->open()) {
-        mTmpFile->write(rcConstChar(&mSamples->fSamplesCount),
-                        sizeof(int));
-        const qint64 writeBytes = mSamples->fSamplesCount*
-                static_cast<qint64>(sizeof(float));
-        mTmpFile->write(rcChar(mSamples->fData), writeBytes);
+        mTmpFile->write(rcConstChar(&mSamples->fSampleRange),
+                        sizeof(SampleRange));
+        const size_t size = static_cast<size_t>(mSamples->fSampleRange.span());
+        mTmpFile->write(rcChar(mSamples->fData),
+                        static_cast<qint64>(size*sizeof(float)));
 
         mTmpFile->close();
         mSavingSuccessful = true;
