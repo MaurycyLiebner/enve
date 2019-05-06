@@ -377,7 +377,7 @@ QPointF gClosestPointOnRect(const QRectF &rect,
         QPointF pt = gGetClosestPointOnLineSegment(rect.bottomLeft(),
                                                   rect.bottomRight(),
                                                   point);
-        qreal dist = pointToLen(pt - point);
+        const qreal dist = pointToLen(pt - point);
         if(dist < minDist) {
             minDist = dist;
             bestPos = pt;
@@ -385,9 +385,9 @@ QPointF gClosestPointOnRect(const QRectF &rect,
     } else if(point.y() < rect.top()) {
         // check top
         QPointF pt = gGetClosestPointOnLineSegment(rect.topLeft(),
-                                                  rect.topRight(),
-                                                  point);
-        qreal dist = pointToLen(pt - point);
+                                                   rect.topRight(),
+                                                   point);
+        const qreal dist = pointToLen(pt - point);
         if(dist < minDist) {
             minDist = dist;
             bestPos = pt;
@@ -397,9 +397,9 @@ QPointF gClosestPointOnRect(const QRectF &rect,
     if(point.x() > rect.right()) {
         // check right
         QPointF pt = gGetClosestPointOnLineSegment(rect.topRight(),
-                                                  rect.bottomRight(),
-                                                  point);
-        qreal dist = pointToLen(pt - point);
+                                                   rect.bottomRight(),
+                                                   point);
+        const qreal dist = pointToLen(pt - point);
         if(dist < minDist) {
             minDist = dist;
             bestPos = pt;
@@ -409,7 +409,7 @@ QPointF gClosestPointOnRect(const QRectF &rect,
         QPointF pt = gGetClosestPointOnLineSegment(rect.bottomLeft(),
                                                   rect.topLeft(),
                                                   point);
-        qreal dist = pointToLen(pt - point);
+        const qreal dist = pointToLen(pt - point);
         if(dist < minDist) {
             minDist = dist;
             bestPos = pt;
@@ -555,24 +555,24 @@ SkPath gPathToPolyline(const SkPath& path) {
         SkPoint pts[4];
         switch(iter.next(pts, true, true)) {
         case SkPath::kLine_Verb: {
-            QPointF pt1 = toQPointF(pts[1]);
+            const QPointF pt1 = toQPointF(pts[1]);
             result.lineTo(pts[1]);
             lastPos = pt1;
             continue;
         }
         case SkPath::kQuad_Verb: {
-            QPointF pt2 = toQPointF(pts[2]);
+            const QPointF pt2 = toQPointF(pts[2]);
             seg = qCubicSegment2D::fromQuad(lastPos, toQPointF(pts[1]), pt2);
             lastPos = pt2;
         } break;
         case SkPath::kConic_Verb: {
-            QPointF pt2 = toQPointF(pts[2]);
+            const QPointF pt2 = toQPointF(pts[2]);
             seg = qCubicSegment2D::fromConic(lastPos, toQPointF(pts[1]), pt2,
                                              toQreal(iter.conicWeight()));
             lastPos = pt2;
         } break;
         case SkPath::kCubic_Verb: {
-            QPointF pt3 = toQPointF(pts[3]);
+            const QPointF pt3 = toQPointF(pts[3]);
             seg = qCubicSegment2D(lastPos, toQPointF(pts[1]),
                                   toQPointF(pts[2]), pt3);
             lastPos = pt3;
@@ -609,23 +609,23 @@ void gForEverySegmentInPath(
         SkPoint pts[4];
         switch(iter.next(pts, true, true)) {
         case SkPath::kLine_Verb: {
-            QPointF pt1 = toQPointF(pts[1]);
+            const QPointF pt1 = toQPointF(pts[1]);
             func(qCubicSegment2D(lastPos, lastPos, pt1, pt1));
             lastPos = pt1;
         } break;
         case SkPath::kQuad_Verb: {
-            QPointF pt2 = toQPointF(pts[2]);
+            const QPointF pt2 = toQPointF(pts[2]);
             func(qCubicSegment2D::fromQuad(lastPos, toQPointF(pts[1]), pt2));
             lastPos = pt2;
         } break;
         case SkPath::kConic_Verb: {
-            QPointF pt2 = toQPointF(pts[2]);
+            const QPointF pt2 = toQPointF(pts[2]);
             func(qCubicSegment2D::fromConic(lastPos, toQPointF(pts[1]), pt2,
                                             toQreal(iter.conicWeight())));
             lastPos = pt2;
         } break;
         case SkPath::kCubic_Verb: {
-            QPointF pt3 = toQPointF(pts[3]);
+            const QPointF pt3 = toQPointF(pts[3]);
             func(qCubicSegment2D(lastPos, toQPointF(pts[1]),
                                  toQPointF(pts[2]), pt3));
             lastPos = pt3;
