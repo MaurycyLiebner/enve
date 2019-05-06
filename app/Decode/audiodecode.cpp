@@ -28,7 +28,7 @@ int gDecodeSoundDataRange(const char* path,
         AVStream *streamT = format->streams[i];
         const AVMediaType &mediaType = streamT->codecpar->codec_type;
         if(mediaType == AVMEDIA_TYPE_AUDIO) {
-            audioStreamIndex = i;
+            audioStreamIndex = static_cast<int>(i);
             break;
         }
     }
@@ -52,7 +52,8 @@ int gDecodeSoundDataRange(const char* path,
     // prepare resampler
     swr = swr_alloc();
     av_opt_set_int(swr, "in_channel_count",  audioCodec->channels, 0);
-    av_opt_set_int(swr, "out_channel_count", 1, 0);
+    av_opt_set_int(swr, "out_channel_c
+                   swr_init(fSwrContext);ount", 1, 0);
     av_opt_set_int(swr, "in_channel_layout",  audioCodec->channel_layout, 0);
     av_opt_set_int(swr, "out_channel_layout", AV_CH_LAYOUT_MONO, 0);
     av_opt_set_int(swr, "in_sample_rate", audioCodec->sample_rate, 0);

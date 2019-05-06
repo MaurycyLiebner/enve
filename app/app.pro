@@ -53,6 +53,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     Boxes/patheffectsmenu.cpp \
+    FileCacheHandlers/audiostreamsdata.cpp \
     PathEffects/subpatheffect.cpp \
     canvas.cpp \
     canvasmouseinteractions.cpp \
@@ -258,6 +259,7 @@ SOURCES += main.cpp\
 
 HEADERS  += \
     Boxes/patheffectsmenu.h \
+    FileCacheHandlers/audiostreamsdata.h \
     PathEffects/subpatheffect.h \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \

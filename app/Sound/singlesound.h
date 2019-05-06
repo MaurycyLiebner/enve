@@ -15,6 +15,10 @@ public:
     void setFilePath(const QString &path);
     void reloadDataFromFile();
 
+    int getSampleRate() const {
+        return mSampleRate;
+    }
+
     int getStartAbsFrame() const;
     int getSampleCount() const;
     const float *getFinalData() const;
@@ -50,6 +54,8 @@ private:
     int mFinalSampleCount = 0;
 
     QString mPath;
+
+    int mSampleRate;
 
     float *mSrcData = nullptr;
     float *mFinalData = nullptr;

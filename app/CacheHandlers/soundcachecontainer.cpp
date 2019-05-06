@@ -1,14 +1,14 @@
 #include "soundcachecontainer.h"
 #include "soundtmpfilehandlers.h"
 
-SoundCacheContainer::SoundCacheContainer(const FrameRange &range,
+SoundCacheContainer::SoundCacheContainer(const int &frame,
                                          HDDCachableCacheHandler * const parent) :
-    HDDCachableRangeContainer(range, parent) {}
+    HDDCachableRangeContainer({frame, frame}, parent) {}
 
 SoundCacheContainer::SoundCacheContainer(const stdsptr<Samples>& samples,
-                                         const FrameRange &range,
+                                         const int &frame,
                                          HDDCachableCacheHandler * const parent) :
-    SoundCacheContainer(range, parent) {
+    SoundCacheContainer(frame, parent) {
     replaceSamples(samples);
 }
 
@@ -19,7 +19,6 @@ stdsptr<HDDTask> SoundCacheContainer::createTmpFileDataSaver() {
 stdsptr<HDDTask> SoundCacheContainer::createTmpFileDataLoader() {
     return SPtrCreate(SoundContainerTmpFileDataLoader)(mTmpFile, this);
 }
-
 
 int SoundCacheContainer::clearMemory() {
     const int bytes = getByteCount();

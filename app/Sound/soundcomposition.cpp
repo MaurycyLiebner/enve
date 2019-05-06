@@ -27,16 +27,6 @@ void SoundComposition::generateData(const int &startAbsFrame,
     for(uint i = 0; i < nSamples; i++) {
         data[i] = 0;
     }
-//    int size;
-//    decode_audio_file("/home/ailuropoda/lektor.wav",
-//                      SAMPLERATE,
-//                      &data1,
-//                      &size);
-//    float *data = new float[nSamples];
-//    for(int i = 0; i < nSamples; i++) {
-//        data[i] = data1[i];
-//    }
-//    free(data1);
 
     for(const auto &sound : mSounds) {
         sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);

@@ -3,52 +3,60 @@
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "Decode/audiodecode.h"
+class SoundCacheHandler;
+
+class SoundReader : public HDDTask {
+    friend class StdSelfRef;
+protected:
+    SoundReader(SoundCacheHandler * const cacheHandler,
+                AudioStreamsData * const openedAudio,
+                const int& secondId, const SampleRange& sampleRange) :
+        mCacheHandler(cacheHandler), mOpenedAudio(openedAudio),
+        mSecondId(secondId), mSampleRange(sampleRange) {}
+
+    void afterProcessing() {
+        mCacheHandler->createNew<SoundCacheContainer>(mSamples, mSecondId);
+    }
+
+    void afterCanceled() {
+        mCacheHandler->frameLoaderCanceled(mSecondId);
+    }
+
+public:
+    void processTask() {
+        readFrame();
+    }
+private:
+    void readFrame() {
+        float * data = nullptr;
+        gDecodeSoundDataRange(mFilePath.toLatin1().data(), mSampleRange, data);
+        mSamples = SPtrCreate(Samples)(data, mSampleRange.span());
+    }
+
+    SoundCacheHandler * const mCacheHandler;
+    const AudioStreamsData * const mOpenedAudio;
+    const int mSecondId;
+    const SampleRange mSampleRange;
+    stdsptr<Samples> mSamples;
+};
 
 class SoundCacheHandler : public HDDCachableCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 public:
-    void rangeNeeded(const SampleRange& range) {
-        blockConts(range, true);
-        auto missings = getMissingRanges(range);
-        if(missings.isEmpty()) return;
-        for(const auto& missing : missings) {
-            loadSampleRange(missing);
-        }
-        mergeAdjecent();
-    }
+
 protected:
-    void loadSampleRange(const SampleRange& range) {
-        float * data = nullptr;
-        gDecodeSoundDataRange(mFilePath.toLatin1().data(), range, data);
-        auto samples = SPtrCreate(Samples)(data, range.span());
-        createNew<SoundCacheContainer>(range, samples);
-    }
-
-    void merge(const stdptrSCC& a, const stdptrSCC& b) {
-        Q_ASSERT(a->getRange().neighbours(b->getRange()));
-        stdptrSCC aS = a;
-        stdptrSCC bS = b;
-        removeRenderContainer(a);
-        removeRenderContainer(b);
-        const auto cont = SoundCacheContainer::sCreateMerge(aS, bS, this);
-        auto frameRange = cont->getRange();
-        int contId = insertIdForRelFrame(frameRange.fMin);
-        mRenderContainers.insert(contId, cont);
-    }
-
-    void mergeAdjecent() {
-        for(int i = 0; i < mRenderContainers.count() - 1; i++) {
-            const auto& a = mRenderContainers.at(i);
-            const auto& b = mRenderContainers.at(i + 1);
-
-            if(a->getRange().neighbours(b->getRange())) {
-                merge(GetAsSPtr(a, SoundCacheContainer),
-                      GetAsSPtr(b, SoundCacheContainer)); i--;
-            }
-        }
+    void loadSamples(const int& secondId) {
+        const int sR = mSingleSound->getSampleRate();
+        const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
+        const auto reader = SPtrCreate(SoundReader)(this, mAudioStreamsData,
+                                                    secondId, range);
+        reader->scheduleTask();
     }
 
     const QString mFilePath;
+
+private:
+    const SingleSound * const mSingleSound;
 };
 
 #endif // SOUNDCACHEHANDLER_H
