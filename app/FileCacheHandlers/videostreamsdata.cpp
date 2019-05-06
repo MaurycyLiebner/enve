@@ -63,6 +63,7 @@ void VideoStreamsData::open(const char * const path) {
     const AVCodecParameters *vidCodecPars = nullptr;
     const AVCodec *vidCodec = nullptr;
     fVideoStream = nullptr;
+    bool hasAudio = false;
     for(uint i = 0; i < fFormatContext->nb_streams; i++) {
         const AVStream * const  iStream = fFormatContext->streams[i];
         const AVCodecParameters * const iCodecPars = iStream->codecpar;
@@ -85,7 +86,7 @@ void VideoStreamsData::open(const char * const path) {
                 fFrameCount = qFloor(duration*fFps/AV_TIME_BASE);
             }
             break;
-        }
+        } else if(iMediaType == AVMEDIA_TYPE_AUDIO) hasAudio = true;
     }
     if(fVideoStreamIndex == -1)
         RuntimeThrow("Could not retrieve video stream");
@@ -113,4 +114,8 @@ void VideoStreamsData::open(const char * const path) {
     if(!fDecodedFrame) RuntimeThrow("Error allocating AVFrame");
 
     fOpened = true;
+
+    if(hasAudio) {
+        fAudioData = AudioStreamsData::sOpen(fPath, fFormatContext);
+    }
 }

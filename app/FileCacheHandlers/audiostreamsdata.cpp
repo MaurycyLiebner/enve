@@ -1,11 +1,30 @@
 #include "audiostreamsdata.h"
 #include "Sound/soundcomposition.h"
 
+stdsptr<const AudioStreamsData> AudioStreamsData::sOpen(
+        const QString &path, AVFormatContext * const formatContext) {
+    const auto result = std::shared_ptr<AudioStreamsData>(
+                new AudioStreamsData, AudioStreamsData::sDestroy);
+    result->open(path, formatContext);
+    return result;
+}
+
 stdsptr<const AudioStreamsData> AudioStreamsData::sOpen(const QString &path) {
     const auto result = std::shared_ptr<AudioStreamsData>(
                 new AudioStreamsData, AudioStreamsData::sDestroy);
     result->open(path);
     return result;
+}
+
+void AudioStreamsData::open(const QString &path,
+                            AVFormatContext * const formatContext) {
+    try {
+        fPath = path;
+        open(formatContext);
+    } catch(...) {
+        fPath.clear();
+        RuntimeThrow("Failed to set audio file path to '" + path.toStdString() + "'.");
+    }
 }
 
 void AudioStreamsData::open(const QString &path) {
@@ -50,15 +69,19 @@ void AudioStreamsData::open() {
 }
 
 void AudioStreamsData::open(const char * const path) {
-    fFormatContext = avformat_alloc_context();
-    if(!fFormatContext) RuntimeThrow("Error allocating AVFormatContext");
-    if(avformat_open_input(&fFormatContext, path, nullptr, nullptr) != 0) {
+    auto formatContext = avformat_alloc_context();
+    if(!formatContext) RuntimeThrow("Error allocating AVFormatContext");
+    if(avformat_open_input(&formatContext, path, nullptr, nullptr) != 0) {
         RuntimeThrow("Could not open file");
     }
-    if(avformat_find_stream_info(fFormatContext, nullptr) < 0) {
+    if(avformat_find_stream_info(formatContext, nullptr) < 0) {
         RuntimeThrow("Could not retrieve stream info");
     }
+    open(formatContext);
+}
 
+void AudioStreamsData::open(AVFormatContext * const formatContext) {
+    fFormatContext = formatContext;
     // Find the index of the first audio stream
     fAudioStreamIndex = -1;
     const AVCodecParameters *audCodecPars = nullptr;

@@ -1,6 +1,6 @@
 #ifndef AUDIOSTREAMSDATA_H
 #define AUDIOSTREAMSDATA_H
-#include "videoframeloader.h"
+#include "soundreader.h"
 
 struct AudioStreamsData {
 private:
@@ -13,6 +13,11 @@ private:
     static void sDestroy(AudioStreamsData * const p) {
         delete p;
     }
+protected:
+    friend struct VideoStreamsData;
+    static stdsptr<const AudioStreamsData> sOpen(
+            const QString& path,
+            AVFormatContext * const formatContext);
 public:
     QString fPath;
     bool fOpened = false;
@@ -30,9 +35,12 @@ public:
 
     static stdsptr<const AudioStreamsData> sOpen(const QString& path);
 private:
+    void open(const QString& path, AVFormatContext * const formatContext);
     void open(const QString& path);
-    void open(const char * const path);
     void open();
+    void open(const char * const path);
+    void open(AVFormatContext * const formatContext);
+
     void close();
 };
 

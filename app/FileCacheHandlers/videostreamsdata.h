@@ -1,6 +1,7 @@
 #ifndef VIDEOSTREAMSDATA_H
 #define VIDEOSTREAMSDATA_H
 #include "videoframeloader.h"
+#include "audiostreamsdata.h"
 
 struct VideoStreamsData {
 private:
@@ -28,11 +29,13 @@ public:
     AVCodecContext * fCodecContext = nullptr;
     struct SwsContext * fSwsContext = nullptr;
 
+    stdsptr<const AudioStreamsData> fAudioData;
+
     static stdsptr<const VideoStreamsData> sOpen(const QString& path);
 private:
     void open(const QString& path);
-    void open(const char * const path);
     void open();
+    void open(const char * const path);
     void close();
 };
 #endif // VIDEOSTREAMSDATA_H
