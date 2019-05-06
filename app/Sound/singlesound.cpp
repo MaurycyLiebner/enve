@@ -86,7 +86,6 @@ void SingleSound::scheduleFinalDataUpdate() {
     mFinalDataUpdateNeeded = true;
 }
 
-
 void SingleSound::setFilePath(const QString &path) {
     mPath = path;
     reloadDataFromFile();
