@@ -69,3 +69,51 @@ void CPUTask::scheduleTaskNow() {
 void HDDTask::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
 }
+
+void ContainerTask::scheduleTaskNow() {
+    scheduleReadyChildren();
+    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
+}
+
+void ContainerTask::scheduleReadyChildren() {
+    for(int i = 0; i < mCPUTasks.count(); i++) {
+        const auto iTask = mCPUTasks.at(i);
+        if(iTask->readyToBeProcessed()) {
+            mProcessingTasks << iTask;
+            const auto cTask = SPtrCreate(CustomTask)(
+            [iTask]() {
+                iTask->aboutToProcess();
+            },
+            [iTask]() {
+                iTask->processTask();
+            },
+            [iTask, this]() {
+                iTask->afterProcessingAsContainerStep();
+                scheduleReadyChildren();
+            });
+            cTask->addDependent(this);
+            TaskScheduler::sGetInstance()->scheduleCPUTask(cTask);
+            mCPUTasks.removeAt(i);
+        }
+    }
+    for(int i = 0; i < mHDDTasks.count(); i++) {
+        const auto& iTask = mHDDTasks.at(i);
+        if(iTask->readyToBeProcessed()) {
+            mProcessingTasks << iTask;
+            const auto cTask = SPtrCreate(CustomTask)(
+            [iTask]() {
+                iTask->aboutToProcess();
+            },
+            [iTask]() {
+                iTask->processTask();
+            },
+            [iTask, this]() {
+                iTask->afterProcessingAsContainerStep();
+                scheduleReadyChildren();
+            });
+            cTask->addDependent(this);
+            TaskScheduler::sGetInstance()->scheduleHDDTask(cTask);
+            mHDDTasks.removeAt(i);
+        }
+    }
+}

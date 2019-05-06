@@ -15,6 +15,9 @@ protected:
 
     virtual void scheduleTaskNow() = 0;
     virtual void beforeProcessing() {}
+    //! @brief For intermediate tasks called after
+    //! all other tasks in the parent ContainerTask finished,
+    //! for all others called just after finishing
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
 public:
@@ -31,6 +34,10 @@ public:
     virtual void processTask() = 0;
     virtual bool needsGpuProcessing() const { return false; }
     virtual void taskQued() { mState = QUED; }
+    //! @brief  For children tasks of a ContainerTask.
+    //! Can pass results only to a single task.
+    //! Do NOT use for passing results to main thread cache/handlers/boxes etc.
+    virtual void afterProcessingAsContainerStep() {}
 
     bool scheduleTask();
     bool isQued() { return mState == QUED; }
@@ -99,7 +106,37 @@ protected:
     void scheduleTaskNow() final;
 };
 
-class CustomCPUTask : public Task {
+class ContainerTask : public Task {
+    friend class StdSelfRef;
+public:
+    void scheduleTaskNow() final;
+
+    void beforeProcessing() final {}
+
+    void processTask() final {}
+
+    void addCPUTask(const stdsptr<Task>& task) {
+        mCPUTasks << task;
+    }
+
+    void addHDDTask(const stdsptr<Task>& task) {
+        mHDDTasks << task;
+    }
+protected:
+    void afterProcessing() final {
+        for(const auto& task : mProcessingTasks)
+            task->finishedProcessing();
+    }
+private:
+    void scheduleReadyChildren();
+
+    QList<stdsptr<Task>> mProcessingTasks;
+
+    QList<stdsptr<Task>> mCPUTasks;
+    QList<stdsptr<Task>> mHDDTasks;
+};
+
+class CustomTask : public Task {
     friend class StdSelfRef;
 public:
     void beforeProcessing() final {
@@ -115,7 +152,7 @@ protected:
         if(mAfter) mAfter();
     }
 
-    CustomCPUTask(const std::function<void(void)>& before,
+    CustomTask(const std::function<void(void)>& before,
                   const std::function<void(void)>& run,
                   const std::function<void(void)>& after) :
         mBefore(before), mRun(run), mAfter(after) {}
