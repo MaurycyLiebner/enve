@@ -16,6 +16,84 @@ protected:
                   const qreal &prefferdStep,
                   const QString& name);
 public:
+    class Snapshot {
+        struct KeySnaphot {
+            qreal fC0Frame;
+            qreal fC0Value;
+
+            int fFrame;
+            qreal fValue;
+
+            qreal fC1Frame;
+            qreal fC1Value;
+        };
+    public:
+        Snapshot() {}
+        Snapshot(const qreal& currentValue) : mCurrentValue(currentValue) {}
+
+        void appendKey(const QrealKey * const key);
+
+        qreal getValue(const qreal& relFrame) const {
+            const KeySnaphot * prevKey = nullptr;
+            const KeySnaphot * nextKey = nullptr;
+
+            getPrevAndNextKey(relFrame, prevKey, nextKey);
+
+            if(prevKey && nextKey) {
+                const qCubicSegment2D seg{{qreal(prevKey->fFrame), prevKey->fValue},
+                                          {prevKey->fC1Frame, prevKey->fC1Value},
+                                          {nextKey->fC0Frame, nextKey->fC0Value},
+                                          {qreal(nextKey->fFrame), nextKey->fValue}};
+                auto frameSeg =  seg.xSeg();
+                const qreal t = frameSeg.tAtLength(relFrame - frameSeg.p0());
+                const auto valSeg = seg.ySeg();
+                return valSeg.valAtT(t);
+            } else if(prevKey) {
+                return prevKey->fValue;
+            } else if(nextKey) {
+                return nextKey->fValue;
+            }
+            return mCurrentValue;
+        }
+    private:
+        void getPrevAndNextKey(const qreal& relFrame,
+                               KeySnaphot const *& prevKey,
+                               KeySnaphot const *& nextKey) const {
+            getPrevAndNextKey(relFrame, prevKey, nextKey, 0, mKeys.count() - 1);
+        }
+
+        void getPrevAndNextKey(const qreal& relFrame,
+                               KeySnaphot const *& prevKey,
+                               KeySnaphot const *& nextKey,
+                               const int& minId, const int& maxId) const {
+            if(maxId < minId) return;
+            if(maxId - minId == 0) {
+                prevKey = &mKeys[minId];
+                return;
+            } else if(maxId - minId == 1) {
+                const auto minKey = &mKeys[minId];
+                const auto maxKey = &mKeys[maxId];
+                prevKey = maxKey->fFrame > relFrame ? minKey : nullptr;
+                nextKey = minKey->fFrame < relFrame ? maxKey : nullptr;
+                return;
+            }
+            const int guessId = (minId + maxId)/2;
+            const auto& guessKey = &mKeys[guessId];
+            if(guessKey->fFrame > relFrame) {
+                getPrevAndNextKey(relFrame, prevKey, nextKey, minId, guessId);
+                return;
+            } else if(guessKey->fFrame > relFrame) {
+                getPrevAndNextKey(relFrame, prevKey, nextKey, guessId, maxId);
+                return;
+            }
+            prevKey = guessKey;
+            return;
+        }
+
+        qreal mCurrentValue;
+        QList<KeySnaphot> mKeys;
+    };
+
     bool SWT_isQrealAnimator() const { return true; }
     void prp_startTransform();
     void prp_finishTransform();
@@ -51,6 +129,8 @@ protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
                                    qreal &minMoveValue, qreal &maxMoveValue) const;
 public:
+    Snapshot makeSnapshot() const;
+
     void setPrefferedValueStep(const qreal &valueStep);
 
     void setValueRange(const qreal &minVal, const qreal &maxVal);

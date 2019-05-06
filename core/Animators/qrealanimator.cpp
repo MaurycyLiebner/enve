@@ -73,6 +73,15 @@ void QrealAnimator::graph_getValueConstraints(
     }
 }
 
+QrealAnimator::Snapshot QrealAnimator::makeSnapshot() const {
+    Snapshot snapshot(mCurrentBaseValue);
+    for(const auto& key : anim_mKeys) {
+        const auto qaKey = GetAsPtr(key, QrealKey);
+        snapshot.appendKey(qaKey);
+    }
+    return snapshot;
+}
+
 void QrealAnimator::setValueRange(const qreal &minVal, const qreal &maxVal) {
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
@@ -408,4 +417,10 @@ void QrealAnimator::multCurrentBaseValue(const qreal &mult) {
 
 qreal QrealAnimator::getSavedBaseValue() {
     return mSavedCurrentValue;
+}
+
+void QrealAnimator::Snapshot::appendKey(const QrealKey * const key) {
+    mKeys.append({key->getStartFrame(), key->getStartValue(),
+                  key->getRelFrame(), key->getValue(),
+                  key->getEndFrame(), key->getEndValue()});
 }

@@ -80,7 +80,7 @@ void ContainerTask::scheduleReadyChildren() {
         const auto iTask = mCPUTasks.at(i);
         if(iTask->readyToBeProcessed()) {
             mProcessingTasks << iTask;
-            const auto cTask = SPtrCreate(CustomTask)(
+            const auto cTask = SPtrCreate(CustomCPUTask)(
             [iTask]() {
                 iTask->aboutToProcess();
             },
@@ -92,7 +92,7 @@ void ContainerTask::scheduleReadyChildren() {
                 scheduleReadyChildren();
             });
             cTask->addDependent(this);
-            TaskScheduler::sGetInstance()->scheduleCPUTask(cTask);
+            cTask->scheduleTask();
             mCPUTasks.removeAt(i);
         }
     }
@@ -100,7 +100,7 @@ void ContainerTask::scheduleReadyChildren() {
         const auto& iTask = mHDDTasks.at(i);
         if(iTask->readyToBeProcessed()) {
             mProcessingTasks << iTask;
-            const auto cTask = SPtrCreate(CustomTask)(
+            const auto cTask = SPtrCreate(CustomHDDTask)(
             [iTask]() {
                 iTask->aboutToProcess();
             },
@@ -112,7 +112,7 @@ void ContainerTask::scheduleReadyChildren() {
                 scheduleReadyChildren();
             });
             cTask->addDependent(this);
-            TaskScheduler::sGetInstance()->scheduleHDDTask(cTask);
+            cTask->scheduleTask();
             mHDDTasks.removeAt(i);
         }
     }

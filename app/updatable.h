@@ -136,7 +136,7 @@ private:
     QList<stdsptr<Task>> mHDDTasks;
 };
 
-class CustomTask : public Task {
+class CustomCPUTask : public CPUTask {
     friend class StdSelfRef;
 public:
     void beforeProcessing() final {
@@ -152,7 +152,33 @@ protected:
         if(mAfter) mAfter();
     }
 
-    CustomTask(const std::function<void(void)>& before,
+    CustomCPUTask(const std::function<void(void)>& before,
+                  const std::function<void(void)>& run,
+                  const std::function<void(void)>& after) :
+        mBefore(before), mRun(run), mAfter(after) {}
+private:
+    const std::function<void(void)> mBefore;
+    const std::function<void(void)> mRun;
+    const std::function<void(void)> mAfter;
+};
+
+class CustomHDDTask : public HDDTask {
+    friend class StdSelfRef;
+public:
+    void beforeProcessing() final {
+        if(mBefore) mBefore();
+    }
+
+    void processTask() final {
+        if(mRun) mRun();
+    }
+
+protected:
+    void afterProcessing() final {
+        if(mAfter) mAfter();
+    }
+
+    CustomHDDTask(const std::function<void(void)>& before,
                   const std::function<void(void)>& run,
                   const std::function<void(void)>& after) :
         mBefore(before), mRun(run), mAfter(after) {}

@@ -16,7 +16,7 @@ qreal qCubicSegment1D::length() {
 
 qreal qCubicSegment1D::tAtLength(const qreal &len) {
     if(isZero6Dec(len) || len < 0) return 0;
-    qreal totLen = length();
+    const qreal totLen = length();
     if(isZero6Dec(len - totLen) || len > totLen) return 1;
     return tAtLength(len, 0.01, 0, 1);
 }
