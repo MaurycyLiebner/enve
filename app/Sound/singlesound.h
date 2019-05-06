@@ -46,6 +46,10 @@ public:
 
     void setDurationRect(FixedLenAnimationRect * const durRect);
     FixedLenAnimationRect *getDurationRect();
+
+    qreal getVolumeAtRelFrame(const qreal& relFrame) const {
+        return mVolumeAnimator->getEffectiveValue(relFrame);
+    }
 private:
     void updateAfterDurationRectangleShifted();
 
@@ -58,7 +62,7 @@ private:
 
     QString mPath;
 
-    int mSampleRate;
+    int mSampleRate = 44100;
 
     float *mSrcData = nullptr;
     float *mFinalData = nullptr;

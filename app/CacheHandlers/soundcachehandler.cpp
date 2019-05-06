@@ -19,7 +19,7 @@ void SoundCacheHandler::secondLoaderFinished(
 }
 
 Task *SoundCacheHandler::scheduleSecondLoad(const int &secondId) {
-    if(secondId < 0 || secondId >= mSecondCount)
+    if(secondId < 0 || secondId >= mAudioStreamsData->fDurationSec)
         RuntimeThrow("Second outside of range " + std::to_string(secondId));
     const auto currLoader = getSecondLoader(secondId);
     if(currLoader) return currLoader;

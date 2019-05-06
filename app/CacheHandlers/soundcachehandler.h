@@ -48,11 +48,7 @@ protected:
 private:
     void openAudioStream() {
         mAudioStreamsData = AudioStreamsData::sOpen(mFilePath);
-        mSecondCount = mAudioStreamsData->fDurationSec;
     }
-
-    int mSecondCount;
-    QString mFilePath;
 
     QList<int> mSecondsBeingLoaded;
     QList<stdsptr<SoundReader>> mSecondLoaders;

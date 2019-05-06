@@ -2,6 +2,7 @@
 #include "singlesound.h"
 #include "castmacros.h"
 #include "canvas.h"
+#include "CacheHandlers/soundcachecontainer.h"
 
 SoundComposition::SoundComposition(Canvas * const parent) :
     QIODevice(parent), mParent(parent) {
@@ -98,17 +99,35 @@ ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {
     return mSoundsAnimatorContainer.get();
 }
 
-qint64 SoundComposition::readData(char *data, qint64 len) {
+qint64 SoundComposition::readData(char *data, qint64 maxLen) {
     qint64 total = 0;
-    if(!mBuffer.isEmpty()) {
-        while(len - total > 0) {
-            const qint64 chunk = qMin((mBuffer.size() - mPos), len - total);
-            memcpy(data + total, mBuffer.constData() + mPos,
-                   static_cast<size_t>(chunk));
-            mPos = (mPos + chunk) % mBuffer.size();
-            total += chunk;
-        }
+    const SampleRange readSamples{static_cast<int>(mPos),
+                                  static_cast<int>(mPos + maxLen/sizeof(float))};
+    while(maxLen - total > 0) {
+        const int secondId = mPos/SOUND_SAMPLERATE;
+        const auto cont = mSecondsCache.atOrAfterRelFrame<SoundCacheContainer>(secondId);
+        if(!cont) break;
+        const auto contSampleRange = cont->getSamples()->fSampleRange;
+        const auto secondData = cont->getSamplesData();
+        const SampleRange samplesToRead = readSamples*contSampleRange;
+        const SampleRange contRelRange =
+                samplesToRead.shifted(-contSampleRange.fMin);
+        const qint64 chunk = contRelRange.span()*sizeof(float);
+        memcpy(data + total, secondData + contRelRange.fMin,
+               static_cast<size_t>(chunk));
+        mPos = mPos + chunk;
+        total += chunk;
     }
+
+//    if(!mBuffer.isEmpty()) {
+//        while(maxlen - total > 0) {
+//            const qint64 chunk = qMin((mBuffer.size() - mPos), maxlen - total);
+//            memcpy(data + total, mBuffer.constData() + mPos,
+//                   static_cast<size_t>(chunk));
+//            mPos = (mPos + chunk) % mBuffer.size();
+//            total += chunk;
+//        }
+//    }
     return total;
 }
 
