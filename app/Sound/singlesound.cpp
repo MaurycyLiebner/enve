@@ -7,7 +7,7 @@
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 
 SingleSound::SingleSound(const QString &path,
-                         FixedLenAnimationRect *durRect) :
+                         FixedLenAnimationRect * const durRect) :
     ComplexAnimator("sound") {
     setDurationRect(durRect);
 
@@ -39,7 +39,7 @@ FixedLenAnimationRect *SingleSound::getDurationRect() {
     return mDurationRectangle;
 }
 
-void SingleSound::setDurationRect(FixedLenAnimationRect *durRect) {
+void SingleSound::setDurationRect(FixedLenAnimationRect * const durRect) {
     if(mDurationRectangle) {
         delete mDurationRectangle;
     }

@@ -218,7 +218,6 @@ protected:
     void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:
-    void prp_updateWholeInfluenceRange();
     void prp_absFrameRangeChanged(const FrameRange &range);
     void prp_removingKey(Key*);
     void prp_addingKey(Key*);

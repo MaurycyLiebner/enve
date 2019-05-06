@@ -2,6 +2,7 @@
 #define SOUNDCOMPOSITION_H
 
 #include "Animators/complexanimator.h"
+#include "CacheHandlers/hddcachablecachehandler.h"
 
 #include <math.h>
 
@@ -16,11 +17,12 @@
 #include <QSlider>
 #include <QTimer>
 class SingleSound;
+class Canvas;
 const int SOUND_SAMPLERATE = 44100;
 
 class SoundComposition : public QIODevice {
 public:
-    SoundComposition(QObject *parent);
+    SoundComposition(Canvas * const parent);
 
     void start();
     void stop();
@@ -40,11 +42,19 @@ public:
     void addSoundAnimator(const qsptr<SingleSound> &sound);
     void removeSoundAnimator(const qsptr<SingleSound> &sound);
 private:
+    void frameRangeChanged(const FrameRange &range);
+
+    void secondRangeChanged(const iValueRange &range) {
+        mSecondsCache.clearRelRange(range);
+    }
+
+    const Canvas * const mParent;
     QByteArray mBuffer;
     qint64 mPos;
     qsptr<ComplexAnimator> mSoundsAnimatorContainer =
             SPtrCreate(ComplexAnimator)("sounds");
     QList<qsptr<SingleSound>> mSounds;
+    HDDCachableCacheHandler mSecondsCache;
 };
 
 #endif // SOUNDCOMPOSITION_H

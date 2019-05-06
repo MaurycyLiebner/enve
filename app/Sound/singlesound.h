@@ -5,13 +5,26 @@
 class FixedLenAnimationRect;
 
 class SingleSound : public ComplexAnimator {
-    Q_OBJECT
-public:
+    friend class SelfRef;
+protected:
     SingleSound(const QString &path,
-                FixedLenAnimationRect *durRect = nullptr);
+                FixedLenAnimationRect * const durRect = nullptr);
+public:
+    bool SWT_isSingleSound() const { return true; }
 
-    void setDurationRect(FixedLenAnimationRect *durRect);
+    void drawTimelineControls(QPainter * const p,
+                              const qreal &pixelsPerFrame,
+                              const FrameRange &absFrameRange,
+                              const int &rowHeight);
+    DurationRectangleMovable *anim_getRectangleMovableAtPos(
+            const int &relX, const int &minViewedFrame,
+            const qreal &pixelsPerFrame);
 
+    int prp_getFrameShift() const;
+
+    bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                             const bool &parentSatisfies,
+                             const bool &parentMainTarget) const;
     void setFilePath(const QString &path);
     void reloadDataFromFile();
 
@@ -25,27 +38,17 @@ public:
     void prepareFinalData(const float &fps,
                           const int &minAbsFrame,
                           const int &maxAbsFrame);
-    void drawTimelineControls(QPainter * const p,
-                              const qreal &pixelsPerFrame,
-                              const FrameRange &absFrameRange,
-                              const int &rowHeight);
-    DurationRectangleMovable *anim_getRectangleMovableAtPos(
-            const int &relX, const int &minViewedFrame,
-            const qreal &pixelsPerFrame);
+
+    void scheduleFinalDataUpdate();
     void updateFinalDataIfNeeded(const qreal &fps,
                                  const int &minAbsFrame,
                                  const int &maxAbsFrame);
-    int prp_getFrameShift() const;
 
-    bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                             const bool &parentSatisfies,
-                             const bool &parentMainTarget) const;
+    void setDurationRect(FixedLenAnimationRect * const durRect);
     FixedLenAnimationRect *getDurationRect();
-public slots:
-    void scheduleFinalDataUpdate();
-private slots:
-    void updateAfterDurationRectangleShifted();
 private:
+    void updateAfterDurationRectangleShifted();
+
     bool mFinalDataUpdateNeeded = false;
     bool mOwnDurationRectangle;
 
@@ -63,7 +66,7 @@ private:
     FixedLenAnimationRect *mDurationRectangle = nullptr;
 
     qsptr<QrealAnimator> mVolumeAnimator =
-            SPtrCreate(QrealAnimator)(100., 0., 200., 1., "volume");
+            SPtrCreate(QrealAnimator)(100, 0, 200, 1, "volume");
 };
 
 #endif // SINGLESOUND_H

@@ -1,9 +1,14 @@
 #include "soundcomposition.h"
 #include "singlesound.h"
 #include "castmacros.h"
+#include "canvas.h"
 
-SoundComposition::SoundComposition(QObject *parent) :
-    QIODevice(parent) {}
+SoundComposition::SoundComposition(Canvas * const parent) :
+    QIODevice(parent), mParent(parent) {
+    connect(mSoundsAnimatorContainer.get(),
+            &Property::prp_absFrameRangeChanged,
+            this, &SoundComposition::frameRangeChanged);
+}
 
 void SoundComposition::start() {
     open(QIODevice::ReadOnly);
@@ -82,6 +87,11 @@ void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
     if(mSounds.removeOne(sound)) {
         mSoundsAnimatorContainer->ca_removeChildAnimator(sound);
     }
+}
+
+void SoundComposition::frameRangeChanged(const FrameRange &range) {
+    const qreal fps = mParent->getFps();
+    secondRangeChanged({qFloor(range.fMin/fps), qCeil(range.fMax/fps)});
 }
 
 ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {

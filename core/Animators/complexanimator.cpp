@@ -79,8 +79,10 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
        childProperty->SWT_isComplexAnimator()) {
         updateCanvasProps();
     }
-    connect(childProperty.data(), &Property::prp_updateWholeInfluenceRange,
-            this, &Property::prp_afterWholeInfluenceRangeChanged);
+
+    const bool changeInfluence = !(SWT_isBoundingBox() &&
+                                   childProperty->SWT_isSingleSound());
+
     if(childProperty->SWT_isAnimator()) {
         const auto childAnimator = GetAsPtr(childProperty, Animator);
         connect(childAnimator, &Animator::anim_isRecordingChanged,
@@ -93,15 +95,17 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
         ca_childAnimatorIsRecordingChanged();
         childAnimator->anim_setAbsFrame(anim_getCurrentAbsFrame());
     }
-    connect(childProperty.data(), &Property::prp_absFrameRangeChanged,
-            this, &ComplexAnimator::prp_afterChangedAbsRange);
+    if(changeInfluence){
+        connect(childProperty.data(), &Property::prp_absFrameRangeChanged,
+                this, &ComplexAnimator::prp_afterChangedAbsRange);
+    }
     connect(childProperty.data(), &Property::prp_replaceWith,
             this, &ComplexAnimator::ca_replaceChildAnimator);
     connect(childProperty.data(), &Property::prp_prependWith,
             this, &ComplexAnimator::ca_prependChildAnimator);
 
     SWT_addChildAbstractionForTargetToAllAt(childProperty.get(), id);
-    prp_afterWholeInfluenceRangeChanged();
+    if(changeInfluence) prp_afterWholeInfluenceRangeChanged();
 }
 
 int ComplexAnimator::getChildPropertyIndex(Property * const child) {

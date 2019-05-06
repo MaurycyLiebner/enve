@@ -269,15 +269,17 @@ int Animator::getInsertIdForKeyRelFrame(
 }
 
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
-    if(!SWT_isComplexAnimator()) anim_setRecordingValue(true);
+    const bool isComplex = SWT_isComplexAnimator();
+    if(!isComplex) anim_setRecordingValue(true);
     anim_mKeys.add(newKey);
     emit prp_addingKey(newKey.get());
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(newKey.get());
-    anim_updateAfterChangedKey(newKey.get());
+    if(!isComplex) anim_updateAfterChangedKey(newKey.get());
 }
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
+    const bool isComplex = SWT_isComplexAnimator();
     Key * const keyPtr = keyToRemove.get();
     anim_mKeys.remove(keyToRemove);
 
@@ -287,6 +289,7 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     if(rFrame == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(nullptr);
 
+    if(isComplex) return;
     const int prevKeyRelFrame = anim_getPrevKeyRelFrame(rFrame);
     const int nextKeyRelFrame = anim_getNextKeyRelFrame(rFrame);
     const int affectedMin = prevKeyRelFrame == FrameRange::EMIN ?

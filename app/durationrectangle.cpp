@@ -83,25 +83,25 @@ DurationRectangle::DurationRectangle(Property *childProp) :
     mMinFrame.setMinPos(-1000000);
     mMaxFrame.setMinPos(-1000000);
     mMaxFrame.setMaxPos(1000000);
-    connect(&mMinFrame, SIGNAL(posChanged(int)),
-            &mMaxFrame, SLOT(setMinPos(int)));
-    connect(&mMaxFrame, SIGNAL(posChanged(int)),
-            &mMinFrame, SLOT(setMaxPos(int)));
+    connect(&mMinFrame, &DurationRectangleMovable::posChanged,
+            &mMaxFrame, &DurationRectangleMovable::setMinPos);
+    connect(&mMaxFrame, &DurationRectangleMovable::posChanged,
+            &mMinFrame, &DurationRectangleMovable::setMaxPos);
 
-    connect(&mMinFrame, SIGNAL(posChanged(int)),
-            this, SIGNAL(rangeChanged()));
-    connect(&mMaxFrame, SIGNAL(posChanged(int)),
-            this, SIGNAL(rangeChanged()));
+    connect(&mMinFrame, &DurationRectangleMovable::posChanged,
+            this, &DurationRectangle::rangeChanged);
+    connect(&mMaxFrame, &DurationRectangleMovable::posChanged,
+            this, &DurationRectangle::rangeChanged);
 
-    connect(&mMinFrame, SIGNAL(finishedTransform()),
-            this, SIGNAL(finishedRangeChange()));
-    connect(&mMaxFrame, SIGNAL(finishedTransform()),
-            this, SIGNAL(finishedRangeChange()));
+    connect(&mMinFrame, &DurationRectangleMovable::finishedTransform,
+            this, &DurationRectangle::finishedRangeChange);
+    connect(&mMaxFrame, &DurationRectangleMovable::finishedTransform,
+            this, &DurationRectangle::finishedRangeChange);
 
-    connect(&mMinFrame, SIGNAL(posChangedBy(int)),
-            this, SIGNAL(minFrameChangedBy(int)));
-    connect(&mMaxFrame, SIGNAL(posChangedBy(int)),
-            this, SIGNAL(maxFrameChangedBy(int)));
+    connect(&mMinFrame, &DurationRectangleMovable::posChangedBy,
+            this, &DurationRectangle::minFrameChangedBy);
+    connect(&mMaxFrame, &DurationRectangleMovable::posChangedBy,
+            this, &DurationRectangle::maxFrameChangedBy);
 }
 
 void DurationRectangle::setFramesDuration(const int &duration) {
