@@ -14,7 +14,7 @@ void SoundReader::afterCanceled() {
 
 void SoundReader::readFrame() {
     if(!mOpenedAudio->fOpened)
-        RuntimeThrow("Cannot read frame from closed VideoStream");
+        RuntimeThrow("Cannot read frame from closed AudioStream");
     const auto formatContext = mOpenedAudio->fFormatContext;
     const auto audioStreamIndex = mOpenedAudio->fAudioStreamIndex;
     const auto audioStream = mOpenedAudio->fAudioStream;

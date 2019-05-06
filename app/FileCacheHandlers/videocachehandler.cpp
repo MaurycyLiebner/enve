@@ -6,8 +6,6 @@
 #include "GUI/mainwindow.h"
 #include "filesourcescache.h"
 
-VideoCacheHandler::VideoCacheHandler() {}
-
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     const auto cont = mFramesCache.atRelFrame
             <ImageCacheContainer>(relFrame);

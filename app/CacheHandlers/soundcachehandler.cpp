@@ -38,7 +38,7 @@ SoundReader *SoundCacheHandler::addSecondLoader(const int &secondId) {
     mSecondsBeingLoaded << secondId;
     const int sR = mSingleSound->getSampleRate();
     const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
-    const auto reader = SPtrCreate(SoundReader)(this, mAudioStreamsData.get(),
+    const auto reader = SPtrCreate(SoundReader)(this, mAudioStreamsData,
                                                 secondId, range);
     mSecondLoaders << reader;
     return reader.get();

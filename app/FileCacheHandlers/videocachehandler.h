@@ -7,7 +7,7 @@
 class VideoCacheHandler : public AnimationCacheHandler {
     friend class StdSelfRef;
 protected:
-    VideoCacheHandler();
+    VideoCacheHandler() {}
 public:
     sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int &relFrame);
@@ -40,7 +40,7 @@ protected:
             RuntimeThrow("Trying to unnecessarily reload video frame");
         mFramesBeingLoaded << frame;
         const auto loader = SPtrCreate(VideoFrameLoader)(
-                    this, &mVideoStreamsData, frame);
+                    this, mVideoStreamsData, frame);
         mFrameLoaders << loader;
         return loader.get();
     }
@@ -52,14 +52,14 @@ protected:
     }
 
     void openVideoStream() {
-        mVideoStreamsData.open(mFilePath);
-        mFrameCount = mVideoStreamsData.fFrameCount;
+        mVideoStreamsData = VideoStreamsData::sOpen(mFilePath);
+        mFrameCount = mVideoStreamsData->fFrameCount;
     }
 private:
     QList<int> mFramesBeingLoaded;
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
 
-    VideoStreamsData mVideoStreamsData;
+    stdsptr<const VideoStreamsData> mVideoStreamsData;
     RenderCacheHandler mFramesCache;
 };
 

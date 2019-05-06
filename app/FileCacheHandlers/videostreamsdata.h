@@ -3,6 +3,17 @@
 #include "videoframeloader.h"
 
 struct VideoStreamsData {
+private:
+    explicit VideoStreamsData() {}
+
+    ~VideoStreamsData() {
+        if(fOpened) close();
+    }
+
+    static void sDestroy(VideoStreamsData * const p) {
+        delete p;
+    }
+public:
     QString fPath;
     bool fOpened = false;
     qreal fFps = 0;
@@ -17,10 +28,11 @@ struct VideoStreamsData {
     AVCodecContext * fCodecContext = nullptr;
     struct SwsContext * fSwsContext = nullptr;
 
-    void open(const QString& path);
-    void close();
+    static stdsptr<const VideoStreamsData> sOpen(const QString& path);
 private:
-    void open();
+    void open(const QString& path);
     void open(const char * const path);
+    void open();
+    void close();
 };
 #endif // VIDEOSTREAMSDATA_H

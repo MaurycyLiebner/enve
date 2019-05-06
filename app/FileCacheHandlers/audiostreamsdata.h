@@ -5,8 +5,7 @@
 struct AudioStreamsData {
 private:
     explicit AudioStreamsData() {}
-    AudioStreamsData(const AudioStreamsData &) = delete;
-    const AudioStreamsData &operator =(const AudioStreamsData &) = delete;
+
     ~AudioStreamsData() {
         if(fOpened) close();
     }
