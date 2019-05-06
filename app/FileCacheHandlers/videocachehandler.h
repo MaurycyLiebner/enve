@@ -55,7 +55,7 @@ protected:
         mVideoStreamsData.open(mFilePath);
         mFrameCount = mVideoStreamsData.fFrameCount;
     }
-
+private:
     QList<int> mFramesBeingLoaded;
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
 

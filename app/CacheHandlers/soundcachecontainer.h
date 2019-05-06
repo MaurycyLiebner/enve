@@ -1,32 +1,16 @@
 #ifndef SOUNDCACHECONTAINER_H
 #define SOUNDCACHECONTAINER_H
 #include "hddcachablerangecontainer.h"
-
-struct Samples : public StdSelfRef {
-    friend class StdSelfRef;
-protected:
-    Samples() : fData(nullptr), fSamplesCount(0) {}
-
-    Samples(const int& size) :
-        fData(static_cast<float*>(malloc(static_cast<size_t>(size)*sizeof(float)))),
-        fSamplesCount(size) {}
-
-    Samples(float * const data, const int& size) :
-        fData(data), fSamplesCount(size) {}
-public:
-    ~Samples() { free(fData); }
-    float * const fData;
-    const int fSamplesCount;
-};
+#include "CacheHandlers/samples.h"
 
 class SoundCacheContainer : public HDDCachableRangeContainer {
     friend class StdSelfRef;
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 protected:
-    SoundCacheContainer(const int &frame,
+    SoundCacheContainer(const iValueRange &frame,
                         HDDCachableCacheHandler * const parent);
     SoundCacheContainer(const stdsptr<Samples>& samples,
-                        const int &frame,
+                        const iValueRange &frame,
                         HDDCachableCacheHandler * const parent);
 public:
     int getByteCount() {

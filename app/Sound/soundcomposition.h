@@ -19,7 +19,6 @@ class SingleSound;
 const int SOUND_SAMPLERATE = 44100;
 
 class SoundComposition : public QIODevice {
-    Q_OBJECT
 public:
     SoundComposition(QObject *parent);
 
