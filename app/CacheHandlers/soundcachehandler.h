@@ -31,8 +31,6 @@ public:
         removeSecondLoader(secondId);
     }
 protected:
-    void loadSamples(const int& secondId);
-
     SoundReader * getSecondLoader(const int& second) {
         const int id = mSecondsBeingLoaded.indexOf(second);
         if(id >= 0) return mSecondLoaders.at(id).get();
@@ -49,8 +47,8 @@ protected:
 
 private:
     void openAudioStream() {
-        mAudioStreamsData.open(mFilePath);
-        mSecondCount = mAudioStreamsData.fDurationSec;
+        mAudioStreamsData = AudioStreamsData::sOpen(mFilePath);
+        mSecondCount = mAudioStreamsData->fDurationSec;
     }
 
     int mSecondCount;
@@ -58,8 +56,7 @@ private:
 
     QList<int> mSecondsBeingLoaded;
     QList<stdsptr<SoundReader>> mSecondLoaders;
-
-    AudioStreamsData mAudioStreamsData;
+    stdsptr<const AudioStreamsData> mAudioStreamsData;
     const SingleSound * const mSingleSound;
 
     HDDCachableCacheHandler mSecondsCache;

@@ -1,6 +1,13 @@
 #include "audiostreamsdata.h"
 #include "Sound/soundcomposition.h"
 
+stdsptr<const AudioStreamsData> AudioStreamsData::sOpen(const QString &path) {
+    const auto result = std::shared_ptr<AudioStreamsData>(
+                new AudioStreamsData, AudioStreamsData::sDestroy);
+    result->open(path);
+    return result;
+}
+
 void AudioStreamsData::open(const QString &path) {
     try {
         fPath = path;
@@ -31,6 +38,7 @@ void AudioStreamsData::close() {
 }
 
 void AudioStreamsData::open() {
+    if(fOpened) return;
     const auto stdString = fPath.toStdString();
     const char * const path = stdString.c_str();
     try {

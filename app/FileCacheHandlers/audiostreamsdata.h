@@ -3,6 +3,18 @@
 #include "videoframeloader.h"
 
 struct AudioStreamsData {
+private:
+    explicit AudioStreamsData() {}
+    AudioStreamsData(const AudioStreamsData &) = delete;
+    const AudioStreamsData &operator =(const AudioStreamsData &) = delete;
+    ~AudioStreamsData() {
+        if(fOpened) close();
+    }
+
+    static void sDestroy(AudioStreamsData * const p) {
+        delete p;
+    }
+public:
     QString fPath;
     bool fOpened = false;
     qreal fFps = 0;
@@ -17,11 +29,12 @@ struct AudioStreamsData {
     AVCodecContext * fCodecContext = nullptr;
     struct SwrContext * fSwrContext = nullptr;
 
-    void open(const QString& path);
-    void close();
+    static stdsptr<const AudioStreamsData> sOpen(const QString& path);
 private:
-    void open();
+    void open(const QString& path);
     void open(const char * const path);
+    void open();
+    void close();
 };
 
 #endif // AUDIOSTREAMSDATA_H

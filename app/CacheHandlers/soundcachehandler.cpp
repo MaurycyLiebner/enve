@@ -31,14 +31,6 @@ Task *SoundCacheHandler::scheduleSecondLoad(const int &secondId) {
     return loader;
 }
 
-void SoundCacheHandler::loadSamples(const int &secondId) {
-    const int sR = mSingleSound->getSampleRate();
-    const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
-    const auto reader = SPtrCreate(SoundReader)(this, &mAudioStreamsData,
-                                                secondId, range);
-    reader->scheduleTask();
-}
-
 SoundReader *SoundCacheHandler::addSecondLoader(const int &secondId) {
     if(mSecondsBeingLoaded.contains(secondId) ||
             getSamplesForSecond(secondId))
@@ -46,7 +38,7 @@ SoundReader *SoundCacheHandler::addSecondLoader(const int &secondId) {
     mSecondsBeingLoaded << secondId;
     const int sR = mSingleSound->getSampleRate();
     const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
-    const auto reader = SPtrCreate(SoundReader)(this, &mAudioStreamsData,
+    const auto reader = SPtrCreate(SoundReader)(this, mAudioStreamsData.get(),
                                                 secondId, range);
     mSecondLoaders << reader;
     return reader.get();

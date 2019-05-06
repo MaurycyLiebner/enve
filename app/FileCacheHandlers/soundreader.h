@@ -19,7 +19,7 @@ class SoundReader : public HDDTask {
     friend class StdSelfRef;
 protected:
     SoundReader(SoundCacheHandler * const cacheHandler,
-                AudioStreamsData * const openedAudio,
+                const AudioStreamsData * const openedAudio,
                 const int& secondId, const SampleRange& sampleRange) :
         mCacheHandler(cacheHandler), mOpenedAudio(openedAudio),
         mSecondId(secondId), mSampleRange(sampleRange) {}
