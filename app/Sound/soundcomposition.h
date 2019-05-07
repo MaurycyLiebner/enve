@@ -57,6 +57,7 @@ private:
         mSecondsCache.clearRelRange(range);
     }
 
+    QList<int> mProcessingSeconds;
     const Canvas * const mParent;
     QByteArray mBuffer;
     qint64 mPos;

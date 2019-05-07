@@ -93,6 +93,7 @@ void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
 
 void SoundComposition::secondFinished(const int &secondId,
                                       const stdsptr<Samples> &samples) {
+    mProcessingSeconds.removeOne(secondId);
     if(!samples) return;
     mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
 }
@@ -104,15 +105,17 @@ SoundMerger *SoundComposition::scheduleFrame(const int &frameId) {
 
 SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
     if(mSounds.isEmpty()) return nullptr;
+    if(mProcessingSeconds.contains(secondId)) return nullptr;
     if(mSecondsCache.atRelFrame(secondId)) return nullptr;
+    mProcessingSeconds.append(secondId);
     const SampleRange sampleRange = {secondId*SOUND_SAMPLERATE,
-                                     secondId*(SOUND_SAMPLERATE + 1) - 1};
+                                     (secondId + 1)*SOUND_SAMPLERATE - 1};
     const auto task = SPtrCreate(SoundMerger)(secondId, sampleRange, this);
     for(const auto &sound : mSounds) {
         const auto secs = sound->absSecondToRelSeconds(secondId);
         for(int i = secs.fMin; i <= secs.fMax; i++) {
             auto reader = sound->getSecondReader(i);
-            if(reader) reader = sound->addSecondReader(i, task.get());
+            if(!reader) reader = sound->addSecondReader(i, task.get());
             reader->addSingleSound(sound->getSampleShift(),
                                    sound->absSampleRange());
         }
