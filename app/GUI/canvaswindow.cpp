@@ -1084,9 +1084,7 @@ void CanvasWindow::playPreview() {
 
     setRendering(false);
     setPreviewing(true);
-    mCurrentSoundComposition->generateData(minPreviewFrame,
-                                           maxPreviewFrame,
-                                           mCurrentCanvas->getFps());
+
     startAudio();
     const int mSecInterval = qRound(1000/mCurrentCanvas->getFps());
     mPreviewFPSTimer->setInterval(mSecInterval);
@@ -1240,7 +1238,7 @@ void CanvasWindow::initializeAudio() {
 }
 
 void CanvasWindow::startAudio() {
-    mCurrentSoundComposition->start();
+    mCurrentSoundComposition->start(mCurrentPreviewFrame);
     mAudioIOOutput = mAudioOutput->start();
 }
 

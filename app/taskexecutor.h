@@ -30,6 +30,7 @@ public:
     }
 
     void processTask(const stdsptr<Task>& task) {
+        if(mCurrentTask) Q_ASSERT(false);//RuntimeThrow("Previous task did not finish yet");
         mCurrentTask = task;
         emit processTaskSignal(task.get());
     }
@@ -52,8 +53,8 @@ signals:
     void finishedTaskSignal(stdsptr<Task>, ExecController*);
 private:
     void finishedTask() {
-        const auto task = mCurrentTask;
-        mCurrentTask.reset();
+        stdsptr<Task> task;
+        task.swap(mCurrentTask);
         emit finishedTaskSignal(task, this);
     }
 

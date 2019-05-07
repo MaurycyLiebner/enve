@@ -107,7 +107,6 @@ void TaskScheduler::afterHDDTaskFinished(
         const stdsptr<Task>& finishedTask,
         ExecController * const controller) {
     Q_UNUSED(controller);
-    if(mHDDThreadBusy && !finishedTask) return;
     mHDDThreadBusy = false;
     if(finishedTask) finishedTask->finishedProcessing();
     if(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
@@ -117,6 +116,7 @@ void TaskScheduler::afterHDDTaskFinished(
 }
 
 void TaskScheduler::processNextQuedHDDTask() {
+    if(mHDDThreadBusy) return;
     if(mQuedHDDTasks.isEmpty()) {
         callAllQuedHDDTasksFinishedFunc();
 //        if(!mRenderingPreview) {

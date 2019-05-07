@@ -42,16 +42,12 @@ FixedLenAnimationRect *SingleSound::getDurationRect() const {
 #include "canvas.h"
 
 int SingleSound::getSampleShift() const{
-    const auto parentCanvas = getFirstAncestor<Canvas>();
-    if(!parentCanvas) return 0;
-    const qreal fps = parentCanvas->getFps();
+    const qreal fps = getCanvasFPS();
     return qRound(prp_getFrameShift()*(SOUND_SAMPLERATE/fps));
 }
 
 SampleRange SingleSound::relSampleRange() const {
-    const auto parentCanvas = getFirstAncestor<Canvas>();
-    if(!parentCanvas) return {0, -1};
-    const qreal fps = parentCanvas->getFps();
+    const qreal fps = getCanvasFPS();
     const auto durRect = getDurationRect();
     const auto relFrameRange = durRect->getRelFrameRange();
     const auto qRelFrameRange = qValueRange{qreal(relFrameRange.fMin),
@@ -61,9 +57,7 @@ SampleRange SingleSound::relSampleRange() const {
 }
 
 SampleRange SingleSound::absSampleRange() const {
-    const auto parentCanvas = getFirstAncestor<Canvas>();
-    if(!parentCanvas) return {0, -1};
-    const qreal fps = parentCanvas->getFps();
+    const qreal fps = getCanvasFPS();
     const auto durRect = getDurationRect();
     const auto absFrameRange = durRect->getAbsFrameRange();
     const auto qAbsFrameRange = qValueRange{qreal(absFrameRange.fMin),
@@ -73,13 +67,26 @@ SampleRange SingleSound::absSampleRange() const {
 }
 
 iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
-    const auto parentCanvas = getFirstAncestor<Canvas>();
-    if(!parentCanvas) return {0, -1};
-    const qreal fps = parentCanvas->getFps();
+    const qreal fps = getCanvasFPS();
     const qreal qFirstSecond = prp_getFrameShift()/fps + absSecond;
+    if(isInteger4Dec(qFirstSecond)) {
+        const int round = qRound(qFirstSecond);
+        return {round, round};
+    }
     const int firstSecond = qFloor(qFirstSecond);
     const int lastSecond = qCeil(qFirstSecond + 1);
     return {firstSecond, lastSecond};
+}
+
+qreal SingleSound::getCanvasFPS() const {
+    auto parentCanvas = getFirstAncestor<Canvas>();
+    if(!parentCanvas) {
+        const auto box = getFirstAncestor<BoundingBox>();
+        if(!box) return 1;
+        parentCanvas = box->getParentCanvas();
+        if(!parentCanvas) return 1;
+    }
+    return parentCanvas->getFps();
 }
 
 void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {
@@ -128,31 +135,13 @@ void SingleSound::scheduleFinalDataUpdate() {
 
 void SingleSound::setFilePath(const QString &path) {
     mPath = path;
-    reloadDataFromFile();
-}
-
-void SingleSound::reloadDataFromFile() {
-    if(mSrcData) {
-        free(mSrcData);
-        mSrcData = nullptr;
-        mSrcSampleCount = 0;
-    }
-    if(!mPath.isEmpty()) {
-        if(QFile(mPath).exists()) {
-            SampleRange dataRange{0, 10*SOUND_SAMPLERATE};
-            gDecodeSoundDataRange(mPath.toLatin1().data(),
-                                  dataRange, mSrcData);
-            mSrcSampleCount = dataRange.fMax - dataRange.fMin + 1;
-//            decode_audio_file(mPath.toLatin1().data(), SOUND_SAMPLERATE,
-//                              &mSrcData, &mSrcSampleCount);
-        }
-    }
+    mCacheHandler->setFilePath(path);
     if(mOwnDurationRectangle) {
-        mDurationRectangle->setAnimationFrameDuration(
-                    qCeil(mSrcSampleCount*24./SOUND_SAMPLERATE));
+        const int secs = mCacheHandler->durationSec();
+        const qreal fps = getCanvasFPS();
+        const int frames = qCeil(secs*fps);
+        mDurationRectangle->setAnimationFrameDuration(frames);
     }
-
-    scheduleFinalDataUpdate();
 }
 
 int SingleSound::getStartAbsFrame() const {

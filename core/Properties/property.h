@@ -197,7 +197,7 @@ public:
     T *getFirstAncestor() const {
         if(!mParent) return nullptr;
         const auto target = dynamic_cast<T*>(mParent.data());
-        if(target) target;
+        if(target) return target;
         return mParent->getFirstAncestor<T>();
     }
 

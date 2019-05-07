@@ -26,16 +26,11 @@ class SoundComposition : public QIODevice {
 public:
     SoundComposition(Canvas * const parent);
 
-    void start();
+    void start(const int &startFrame);
     void stop();
 
     qint64 readData(char *data, qint64 maxLen);
     qint64 writeData(const char *data, qint64 len);
-    qint64 bytesAvailable() const;
-
-    void generateData(const int &startAbsFrame,
-                      const int &endAbsFrame,
-                      const qreal &fps);
 
     void addSound(const qsptr<SingleSound> &sound);
     void removeSound(const qsptr<SingleSound> &sound);
@@ -59,7 +54,6 @@ private:
 
     QList<int> mProcessingSeconds;
     const Canvas * const mParent;
-    QByteArray mBuffer;
     qint64 mPos;
     qsptr<ComplexAnimator> mSoundsAnimatorContainer =
             SPtrCreate(ComplexAnimator)("sounds");

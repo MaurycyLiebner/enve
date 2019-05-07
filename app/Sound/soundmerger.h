@@ -28,7 +28,7 @@ protected:
 public:
     void processTask() {
         mSamples = SPtrCreate(Samples)(mSampleRange);
-        float * const & dst = mSamples->fData;
+        const auto& dst = mSamples->fData;
         memset(dst, 0, mSamples->fSampleRange.span()*sizeof(float));
         for(const auto& sound : mSounds) {
             const auto& srcSamples = sound.fSamples;
@@ -38,7 +38,7 @@ public:
             const SampleRange srcNeededAbsRange =
                     srcAbsRange*mSampleRange;
             const SampleRange srcNeededRelRange =
-                    srcNeededAbsRange.shifted(-srcAbsShift);
+                    srcNeededAbsRange.shifted(-srcSamples->fSampleRange.fMin - srcAbsShift);
 
             const SampleRange dstAbsRange = srcNeededAbsRange;
             const SampleRange dstRelRange = dstAbsRange.shifted(-mSampleRange.fMin);

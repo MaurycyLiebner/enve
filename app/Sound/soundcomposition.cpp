@@ -12,64 +12,13 @@ SoundComposition::SoundComposition(Canvas * const parent) :
             this, &SoundComposition::frameRangeChanged);
 }
 
-void SoundComposition::start() {
+void SoundComposition::start(const int& startFrame) {
+    mPos = qRound(startFrame/mParent->getFps()*SOUND_SAMPLERATE);
     open(QIODevice::ReadOnly);
 }
 
 void SoundComposition::stop() {
-    mPos = 0;
     close();
-    mBuffer.clear();
-}
-
-void SoundComposition::generateData(const int &startAbsFrame,
-                                    const int &endAbsFrame,
-                                    const qreal &fps) {
-    if(mSounds.isEmpty()) return;
-
-    uint nSamples = static_cast<uint>(
-                qCeil((endAbsFrame - startAbsFrame)*SOUND_SAMPLERATE/fps));
-    //float *data1 = nullptr;
-    float *data = new float[nSamples];
-    for(uint i = 0; i < nSamples; i++) {
-        data[i] = 0;
-    }
-
-    for(const auto &sound : mSounds) {
-        sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);
-        const int &soundStartFrame = sound->getStartAbsFrame();
-        const int &soundSampleCount = sound->getSampleCount();
-        int firstSampleFromSound;
-        int sampleCountNeeded;
-        int firstTargetSample;
-        int samplesInSoundFrameRange =
-                        qCeil((endAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps);
-
-        if(soundStartFrame >= startAbsFrame) {
-            firstTargetSample =
-                        qRound((soundStartFrame - startAbsFrame)*SOUND_SAMPLERATE/fps);
-            firstSampleFromSound = 0;
-            sampleCountNeeded = qMin(soundSampleCount,
-                                     samplesInSoundFrameRange);
-        } else {
-            firstTargetSample = 0;
-            firstSampleFromSound =
-                        qRound((startAbsFrame - soundStartFrame)*SOUND_SAMPLERATE/fps);
-            sampleCountNeeded = qMin(soundSampleCount - firstSampleFromSound,
-                                     samplesInSoundFrameRange);
-        }
-        if(sampleCountNeeded <= 0) continue;
-        const int lastSampleFromSound = firstSampleFromSound + sampleCountNeeded;
-        int currTargetSample = firstTargetSample;
-        const float *soundData = sound->getFinalData();
-        for(int i = firstSampleFromSound; i < lastSampleFromSound; i++) {
-            data[currTargetSample] = data[currTargetSample] + soundData[i];
-            currTargetSample++;
-        }
-    }
-
-    mBuffer.setRawData(rcChar(data), nSamples*sizeof(float));
-    mPos = 0;
 }
 
 void SoundComposition::addSound(const qsptr<SingleSound>& sound) {
@@ -93,9 +42,10 @@ void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
 
 void SoundComposition::secondFinished(const int &secondId,
                                       const stdsptr<Samples> &samples) {
+    qDebug() << "sec finished" << secondId << (samples != nullptr);
     mProcessingSeconds.removeOne(secondId);
     if(!samples) return;
-    mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
+    mSecondsCache.createNew<SoundCacheContainer>(secondId, samples)->setBlocked(true);
 }
 
 SoundMerger *SoundComposition::scheduleFrame(const int &frameId) {
@@ -121,6 +71,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
         }
     }
     task->scheduleTask();
+    qDebug() << "sec scheduled" << secondId;
     return task.get();
 }
 
@@ -137,31 +88,25 @@ qint64 SoundComposition::readData(char *data, qint64 maxLen) {
     qint64 total = 0;
     const SampleRange readSamples{static_cast<int>(mPos),
                                   static_cast<int>(mPos + maxLen/sizeof(float))};
-    while(maxLen - total > 0) {
+    while(maxLen > total) {
         const int secondId = mPos/SOUND_SAMPLERATE;
-        const auto cont = mSecondsCache.atOrAfterRelFrame<SoundCacheContainer>(secondId);
+        const auto cont = mSecondsCache.atRelFrame<SoundCacheContainer>(secondId);
         if(!cont) break;
         const auto contSampleRange = cont->getSamples()->fSampleRange;
         const auto secondData = cont->getSamplesData();
+        if(!secondData) break;
         const SampleRange samplesToRead = readSamples*contSampleRange;
         const SampleRange contRelRange =
                 samplesToRead.shifted(-contSampleRange.fMin);
-        const qint64 chunk = contRelRange.span()*sizeof(float);
+        const int nSamples = contRelRange.span();
+        const qint64 chunk = qMin(maxLen - total,
+                                  static_cast<qint64>(nSamples*sizeof(float)));
         memcpy(data + total, secondData + contRelRange.fMin,
                static_cast<size_t>(chunk));
-        mPos = mPos + chunk;
+        mPos += nSamples;
         total += chunk;
     }
 
-//    if(!mBuffer.isEmpty()) {
-//        while(maxlen - total > 0) {
-//            const qint64 chunk = qMin((mBuffer.size() - mPos), maxlen - total);
-//            memcpy(data + total, mBuffer.constData() + mPos,
-//                   static_cast<size_t>(chunk));
-//            mPos = (mPos + chunk) % mBuffer.size();
-//            total += chunk;
-//        }
-//    }
     return total;
 }
 
@@ -170,8 +115,4 @@ qint64 SoundComposition::writeData(const char *data, qint64 len) {
     Q_UNUSED(len);
 
     return 0;
-}
-
-qint64 SoundComposition::bytesAvailable() const {
-    return mBuffer.size() + QIODevice::bytesAvailable();
 }

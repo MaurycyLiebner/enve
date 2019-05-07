@@ -13,8 +13,8 @@ class SoundCacheHandler : public FileCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
     friend class StdSelfRef;
 public:
-    void clearCache();
-    void replace();
+//    void clearCache();
+//    void replace();
 
     void setFilePath(const QString& path) { // throw
         clearCache();
@@ -38,6 +38,11 @@ public:
 
     SoundReaderForMerger * addSecondReader(const int& secondId,
                                            SoundMerger * const merger);
+
+    int durationSec() const {
+        if(!mAudioStreamsData) return 0;
+        return mAudioStreamsData->fDurationSec;
+    }
 protected:
     void removeSecondReader(const int& second) {
         const int id = mSecondsBeingRead.indexOf(second);

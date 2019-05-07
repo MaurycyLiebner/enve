@@ -13,6 +13,9 @@ protected:
                         const iValueRange &second,
                         HDDCachableCacheHandler * const parent);
 public:
+    ~SoundCacheContainer() {
+        qDebug() << "deleted" << getRangeMin();
+    }
     int getByteCount() {
         if(!mSamples) return 0;
         return mSamples->fSampleRange.span()*static_cast<int>(sizeof(float));

@@ -49,6 +49,7 @@ void SkiaHelpers::saveImage(const QString &fileName,
 }
 
 sk_sp<SkImage> SkiaHelpers::transferDataToSkImage(SkBitmap &bitmap) {
+    if(bitmap.empty()) return sk_sp<SkImage>();
     bitmap.setImmutable();
     const auto result = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();

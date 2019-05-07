@@ -67,7 +67,7 @@ void VideoFrameLoader::readFrame() {
         const int currFrame = qRound(pts/1000000.*fps);
         if(currFrame >= mFrameId) {
             if(currFrame > mFrameId)
-                qDebug() << QString::number(currFrame) +
+                qDebug() << "video" << QString::number(currFrame) +
                             " instead of " + QString::number(mFrameId);
             frameReceived = true;
             break;

@@ -88,19 +88,17 @@ void AudioStreamsData::open(AVFormatContext * const formatContext) {
     const AVCodec *audCodec = nullptr;
     fAudioStream = nullptr;
     for(uint i = 0; i < fFormatContext->nb_streams; i++) {
-        const AVStream * const  iStream = fFormatContext->streams[i];
+        AVStream * const  iStream = fFormatContext->streams[i];
         const AVCodecParameters * const iCodecPars = iStream->codecpar;
         const AVMediaType &iMediaType = iCodecPars->codec_type;
         if(iMediaType == AVMEDIA_TYPE_AUDIO) {
             fAudioStreamIndex = static_cast<int>(i);
             audCodecPars = iCodecPars;
             audCodec = avcodec_find_decoder(audCodecPars->codec_id);
-            fAudioStream = fFormatContext->streams[fAudioStreamIndex];
-            fTimeBaseDen = fAudioStream->r_frame_rate.den; //avg_frame_rate ??
-            fTimeBaseNum = fAudioStream->r_frame_rate.num; //avg_frame_rate ??
-            if(fTimeBaseDen == 0)
-                RuntimeThrow("Invalid audio frame rate denominator (0)");
-            fFps = static_cast<qreal>(fTimeBaseNum)/fTimeBaseDen;
+            fAudioStream = iStream;
+            fDurationSec = fAudioStream->duration*
+                    fAudioStream->time_base.num/fAudioStream->time_base.den;
+            qDebug() << "duration " << fDurationSec;
             break;
         }
     }
@@ -117,11 +115,7 @@ void AudioStreamsData::open(AVFormatContext * const formatContext) {
     if(avcodec_open2(fCodecContext, audCodec, nullptr) < 0) {
         RuntimeThrow("Failed to open codec");
     }
-
     const auto sampleFormat = static_cast<AVSampleFormat>(audCodecPars->format);
-    const int samplePerFrame = qFloor(audCodecPars->sample_rate/fFps);
-    av_samples_get_buffer_size(nullptr, audCodecPars->channels,
-                               samplePerFrame, sampleFormat, 0);
 
     fSwrContext = swr_alloc();
     av_opt_set_int(fSwrContext, "in_channel_count",  audCodecPars->channels, 0);

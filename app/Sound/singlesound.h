@@ -27,7 +27,6 @@ public:
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) const;
     void setFilePath(const QString &path);
-    void reloadDataFromFile();
 
     int getStartAbsFrame() const;
     int getSampleCount() const;
@@ -62,6 +61,7 @@ public:
     SampleRange absSampleRange() const;
     iValueRange absSecondToRelSeconds(const int& absSecond);
 private:
+    qreal getCanvasFPS() const;
     void updateAfterDurationRectangleShifted();
 
     bool mFinalDataUpdateNeeded = false;
@@ -73,7 +73,8 @@ private:
 
     QString mPath;
 
-    stdsptr<SoundCacheHandler> mCacheHandler;
+    stdsptr<SoundCacheHandler> mCacheHandler =
+            SPtrCreate(SoundCacheHandler)();
 
     float *mSrcData = nullptr;
     float *mFinalData = nullptr;

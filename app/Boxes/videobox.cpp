@@ -89,8 +89,7 @@ bool hasSound(const char* path) {
 
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
-        if(mSound) {
-            mSound->reloadDataFromFile();
+        if(mSound) { // !!!
         } else {
             const auto flar = GetAsSPtr(mDurationRectangle,
                                         FixedLenAnimationRect);
