@@ -9,37 +9,25 @@ stdsptr<Samples> SoundCacheHandler::getSamplesForSecond(const int &secondId) {
     return cont->getSamples();
 }
 
-void SoundCacheHandler::secondLoaderFinished(
+void SoundCacheHandler::secondReaderFinished(
         const int& secondId,
         const stdsptr<Samples>& samples) {
     if(samples) {
         mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
     }
-    removeSecondLoader(secondId);
+    removeSecondReader(secondId);
 }
 
-Task *SoundCacheHandler::scheduleSecondLoad(const int &secondId) {
-    if(secondId < 0 || secondId >= mAudioStreamsData->fDurationSec)
-        RuntimeThrow("Second outside of range " + std::to_string(secondId));
-    const auto currLoader = getSecondLoader(secondId);
-    if(currLoader) return currLoader;
-    const auto contAtFrame = mSecondsCache.atRelFrame
-            <SoundCacheContainer>(secondId);
-    if(contAtFrame) return contAtFrame->scheduleLoadFromTmpFile();
-    const auto loader = addSecondLoader(secondId);
-    loader->scheduleTask();
-    return loader;
-}
-
-SoundReader *SoundCacheHandler::addSecondLoader(const int &secondId) {
-    if(mSecondsBeingLoaded.contains(secondId) ||
-            getSamplesForSecond(secondId))
+SoundReaderForMerger *SoundCacheHandler::addSecondReader(
+        const int &secondId, SoundMerger * const merger) {
+    if(mSecondsBeingRead.contains(secondId) ||
+       getSamplesForSecond(secondId))
         RuntimeThrow("Trying to unnecessarily reload video frame");
-    mSecondsBeingLoaded << secondId;
-    const int sR = mSingleSound->getSampleRate();
+    mSecondsBeingRead << secondId;
+    const int sR = 44100;
     const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
-    const auto reader = SPtrCreate(SoundReader)(this, mAudioStreamsData,
-                                                secondId, range);
-    mSecondLoaders << reader;
+    const auto reader = SPtrCreate(SoundReaderForMerger)(
+                this, mAudioStreamsData, secondId, range, merger);
+    mSecondReaders << reader;
     return reader.get();
 }

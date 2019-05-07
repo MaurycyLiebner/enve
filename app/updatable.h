@@ -108,26 +108,30 @@ protected:
 
 class ContainerTask : public Task {
     friend class StdSelfRef;
+protected:
+    ContainerTask() {}
 public:
     void scheduleTaskNow() final;
 
-    void beforeProcessing() final {}
-
-    void processTask() final {}
-
     void addCPUTask(const stdsptr<Task>& task) {
         mCPUTasks << task;
+        incDependencies();
     }
 
     void addHDDTask(const stdsptr<Task>& task) {
         mHDDTasks << task;
+        incDependencies();
     }
 protected:
-    void afterProcessing() final {
+    void afterProcessing() {
         for(const auto& task : mProcessingTasks)
             task->finishedProcessing();
     }
 private:
+    void afterSubTaskFinished() {
+        decDependencies();
+        scheduleReadyChildren();
+    }
     void scheduleReadyChildren();
 
     QList<stdsptr<Task>> mProcessingTasks;

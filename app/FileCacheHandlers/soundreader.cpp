@@ -5,11 +5,11 @@
 #include "Sound/soundcomposition.h"
 
 void SoundReader::afterProcessing() {
-    mCacheHandler->secondLoaderFinished(mSecondId, mSamples);
+    mCacheHandler->secondReaderFinished(mSecondId, mSamples);
 }
 
 void SoundReader::afterCanceled() {
-    mCacheHandler->secondLoaderCanceled(mSecondId);
+    mCacheHandler->secondReaderCanceled(mSecondId);
 }
 
 void SoundReader::readFrame() {
@@ -129,4 +129,10 @@ void SoundReader::readFrame() {
 
     av_frame_unref(decodedFrame);
     av_packet_unref(packet);
+}
+
+#include "Sound/soundmerger.h"
+void SoundReaderForMerger::afterProcessingAsContainerStep() {
+    for(const auto& ssRange : mSSAbsRanges)
+        mMerger->addSoundToMerge({ssRange, getSamples()});
 }

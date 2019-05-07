@@ -3,6 +3,7 @@
 
 #include "Animators/complexanimator.h"
 #include "CacheHandlers/hddcachablecachehandler.h"
+#include "CacheHandlers/samples.h"
 
 #include <math.h>
 
@@ -41,6 +42,9 @@ public:
     ComplexAnimator *getSoundsAnimatorContainer();
     void addSoundAnimator(const qsptr<SingleSound> &sound);
     void removeSoundAnimator(const qsptr<SingleSound> &sound);
+
+    void secondFinished(const int& secondId,
+                        const stdsptr<Samples>& samples);
 private:
     void frameRangeChanged(const FrameRange &range);
 

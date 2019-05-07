@@ -23,26 +23,26 @@ public:
     }
 
     stdsptr<Samples> getSamplesForSecond(const int &secondId);
-    Task *scheduleSecondLoad(const int &secondId);
 
-    void secondLoaderFinished(const int& secondId,
+    void secondReaderFinished(const int& secondId,
                               const stdsptr<Samples>& samples);
-    void secondLoaderCanceled(const int &secondId) {
-        removeSecondLoader(secondId);
+    void secondReaderCanceled(const int &secondId) {
+        removeSecondReader(secondId);
     }
-protected:
-    SoundReader * getSecondLoader(const int& second) {
-        const int id = mSecondsBeingLoaded.indexOf(second);
-        if(id >= 0) return mSecondLoaders.at(id).get();
+
+    SoundReaderForMerger * getSecondReader(const int& second) {
+        const int id = mSecondsBeingRead.indexOf(second);
+        if(id >= 0) return mSecondReaders.at(id).get();
         return nullptr;
     }
 
-    SoundReader * addSecondLoader(const int& secondId);
-
-    void removeSecondLoader(const int& second) {
-        const int id = mSecondsBeingLoaded.indexOf(second);
-        mSecondsBeingLoaded.removeAt(id);
-        mSecondLoaders.removeAt(id);
+    SoundReaderForMerger * addSecondReader(const int& secondId,
+                                           SoundMerger * const merger);
+protected:
+    void removeSecondReader(const int& second) {
+        const int id = mSecondsBeingRead.indexOf(second);
+        mSecondsBeingRead.removeAt(id);
+        mSecondReaders.removeAt(id);
     }
 
 private:
@@ -50,10 +50,9 @@ private:
         mAudioStreamsData = AudioStreamsData::sOpen(mFilePath);
     }
 
-    QList<int> mSecondsBeingLoaded;
-    QList<stdsptr<SoundReader>> mSecondLoaders;
+    QList<int> mSecondsBeingRead;
+    QList<stdsptr<SoundReaderForMerger>> mSecondReaders;
     stdsptr<const AudioStreamsData> mAudioStreamsData;
-    const SingleSound * const mSingleSound;
 
     HDDCachableCacheHandler mSecondsCache;
 };

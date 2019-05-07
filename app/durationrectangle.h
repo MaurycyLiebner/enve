@@ -234,7 +234,6 @@ protected:
 };
 
 class FixedLenAnimationRect : public AnimationRect {
-    Q_OBJECT
 public:
     FixedLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
         mType = FIXED_LEN_ANIMATION_LEN;

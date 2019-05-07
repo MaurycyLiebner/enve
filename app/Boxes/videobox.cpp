@@ -92,7 +92,8 @@ void VideoBox::reloadSound() {
         if(mSound) {
             mSound->reloadDataFromFile();
         } else {
-            auto flar = GetAsPtr(mDurationRectangle, FixedLenAnimationRect);
+            const auto flar = GetAsSPtr(mDurationRectangle,
+                                        FixedLenAnimationRect);
             mSound = SPtrCreate(SingleSound)(mSrcFilePath, flar);
             ca_addChildAnimator(mSound);
             const auto parentCanvas = getParentCanvas();

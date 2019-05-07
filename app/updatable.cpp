@@ -89,9 +89,8 @@ void ContainerTask::scheduleReadyChildren() {
             },
             [iTask, this]() {
                 iTask->afterProcessingAsContainerStep();
-                scheduleReadyChildren();
+                afterSubTaskFinished();
             });
-            cTask->addDependent(this);
             cTask->scheduleTask();
             mCPUTasks.removeAt(i);
         }
@@ -109,9 +108,8 @@ void ContainerTask::scheduleReadyChildren() {
             },
             [iTask, this]() {
                 iTask->afterProcessingAsContainerStep();
-                scheduleReadyChildren();
+                afterSubTaskFinished();
             });
-            cTask->addDependent(this);
             cTask->scheduleTask();
             mHDDTasks.removeAt(i);
         }

@@ -8,7 +8,7 @@ class SingleSound : public ComplexAnimator {
     friend class SelfRef;
 protected:
     SingleSound(const QString &path,
-                FixedLenAnimationRect * const durRect = nullptr);
+                const qsptr<FixedLenAnimationRect> &durRect = nullptr);
 public:
     bool SWT_isSingleSound() const { return true; }
 
@@ -44,7 +44,7 @@ public:
                                  const int &minAbsFrame,
                                  const int &maxAbsFrame);
 
-    void setDurationRect(FixedLenAnimationRect * const durRect);
+    void setDurationRect(const qsptr<FixedLenAnimationRect> &durRect);
     FixedLenAnimationRect *getDurationRect();
 
     qreal getVolumeAtRelFrame(const qreal& relFrame) const {
@@ -67,7 +67,7 @@ private:
     float *mSrcData = nullptr;
     float *mFinalData = nullptr;
 
-    FixedLenAnimationRect *mDurationRectangle = nullptr;
+    qsptr<FixedLenAnimationRect> mDurationRectangle;
 
     qsptr<QrealAnimator> mVolumeAnimator =
             SPtrCreate(QrealAnimator)(100, 0, 200, 1, "volume");

@@ -90,6 +90,12 @@ void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
     }
 }
 
+void SoundComposition::secondFinished(const int &secondId,
+                                      const stdsptr<Samples> &samples) {
+    if(!samples) return;
+    mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
+}
+
 void SoundComposition::frameRangeChanged(const FrameRange &range) {
     const qreal fps = mParent->getFps();
     secondRangeChanged({qFloor(range.fMin/fps), qCeil(range.fMax/fps)});

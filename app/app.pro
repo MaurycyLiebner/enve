@@ -56,6 +56,7 @@ SOURCES += main.cpp\
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
     PathEffects/subpatheffect.cpp \
+    Sound/soundmerger.cpp \
     canvas.cpp \
     canvasmouseinteractions.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
@@ -264,6 +265,7 @@ HEADERS  += \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
     PathEffects/subpatheffect.h \
+    Sound/soundmerger.h \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \

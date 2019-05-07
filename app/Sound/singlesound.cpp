@@ -7,7 +7,7 @@
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 
 SingleSound::SingleSound(const QString &path,
-                         FixedLenAnimationRect * const durRect) :
+                         const qsptr<FixedLenAnimationRect>& durRect) :
     ComplexAnimator("sound") {
     setDurationRect(durRect);
 
@@ -36,26 +36,23 @@ void SingleSound::drawTimelineControls(QPainter * const p,
 }
 
 FixedLenAnimationRect *SingleSound::getDurationRect() {
-    return mDurationRectangle;
+    return mDurationRectangle.get();
 }
 
-void SingleSound::setDurationRect(FixedLenAnimationRect * const durRect) {
-    if(mDurationRectangle) {
-        delete mDurationRectangle;
-    }
+void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {
     if(!durRect) {
         mOwnDurationRectangle = true;
-        mDurationRectangle = new FixedLenAnimationRect(this);
+        mDurationRectangle = SPtrCreate(FixedLenAnimationRect)(this);
         mDurationRectangle->setBindToAnimationFrameRange();
-        connect(mDurationRectangle, &DurationRectangle::posChanged,
+        connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
                 this, &SingleSound::anim_updateAfterShifted);
     } else {
         mOwnDurationRectangle = false;
         mDurationRectangle = durRect;
     }
-    connect(mDurationRectangle, &DurationRectangle::rangeChanged,
+    connect(mDurationRectangle.get(), &DurationRectangle::rangeChanged,
             this, &SingleSound::scheduleFinalDataUpdate);
-    connect(mDurationRectangle, &DurationRectangle::posChanged,
+    connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
             this, &SingleSound::updateAfterDurationRectangleShifted);
 }
 
