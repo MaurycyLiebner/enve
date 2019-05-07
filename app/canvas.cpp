@@ -776,6 +776,7 @@ void Canvas::anim_setAbsFrame(const int &frame) {
     for(const auto &box : mContainedBoxes) {
         box->anim_setAbsFrame(frame);
     }
+    mSoundComposition->scheduleFrame(frame);
     mUndoRedoStack->setFrame(frame);
 }
 

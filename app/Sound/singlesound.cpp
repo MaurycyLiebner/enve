@@ -35,8 +35,51 @@ void SingleSound::drawTimelineControls(QPainter * const p,
                                           absFrameRange, rowHeight);
 }
 
-FixedLenAnimationRect *SingleSound::getDurationRect() {
+FixedLenAnimationRect *SingleSound::getDurationRect() const {
     return mDurationRectangle.get();
+}
+
+#include "canvas.h"
+
+int SingleSound::getSampleShift() const{
+    const auto parentCanvas = getFirstAncestor<Canvas>();
+    if(!parentCanvas) return 0;
+    const qreal fps = parentCanvas->getFps();
+    return qRound(prp_getFrameShift()*(SOUND_SAMPLERATE/fps));
+}
+
+SampleRange SingleSound::relSampleRange() const {
+    const auto parentCanvas = getFirstAncestor<Canvas>();
+    if(!parentCanvas) return {0, -1};
+    const qreal fps = parentCanvas->getFps();
+    const auto durRect = getDurationRect();
+    const auto relFrameRange = durRect->getRelFrameRange();
+    const auto qRelFrameRange = qValueRange{qreal(relFrameRange.fMin),
+                                            qreal(relFrameRange.fMax)};
+    const auto qSampleRange = qRelFrameRange*(SOUND_SAMPLERATE/fps);
+    return {qFloor(qSampleRange.fMin), qCeil(qSampleRange.fMax)};
+}
+
+SampleRange SingleSound::absSampleRange() const {
+    const auto parentCanvas = getFirstAncestor<Canvas>();
+    if(!parentCanvas) return {0, -1};
+    const qreal fps = parentCanvas->getFps();
+    const auto durRect = getDurationRect();
+    const auto absFrameRange = durRect->getAbsFrameRange();
+    const auto qAbsFrameRange = qValueRange{qreal(absFrameRange.fMin),
+                                            qreal(absFrameRange.fMax)};
+    const auto qSampleRange = qAbsFrameRange*(SOUND_SAMPLERATE/fps);
+    return {qFloor(qSampleRange.fMin), qCeil(qSampleRange.fMax)};
+}
+
+iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
+    const auto parentCanvas = getFirstAncestor<Canvas>();
+    if(!parentCanvas) return {0, -1};
+    const qreal fps = parentCanvas->getFps();
+    const qreal qFirstSecond = prp_getFrameShift()/fps + absSecond;
+    const int firstSecond = qFloor(qFirstSecond);
+    const int lastSecond = qCeil(qFirstSecond + 1);
+    return {firstSecond, lastSecond};
 }
 
 void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {

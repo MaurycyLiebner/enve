@@ -28,6 +28,7 @@ SoundReaderForMerger *SoundCacheHandler::addSecondReader(
     const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
     const auto reader = SPtrCreate(SoundReaderForMerger)(
                 this, mAudioStreamsData, secondId, range, merger);
+    merger->addHDDTask(reader);
     mSecondReaders << reader;
     return reader.get();
 }

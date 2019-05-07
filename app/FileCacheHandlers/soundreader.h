@@ -48,6 +48,10 @@ private:
 #include "Sound/soundmerger.h"
 class SoundReaderForMerger : public SoundReader {
     friend class StdSelfRef;
+    struct SingleSound {
+        int fSampleShift;
+        SampleRange fSamplesRange;
+    };
 protected:
     SoundReaderForMerger(SoundCacheHandler * const cacheHandler,
                          const stdsptr<const AudioStreamsData>& openedAudio,
@@ -58,11 +62,12 @@ protected:
 public:
     void afterProcessingAsContainerStep() final;
 
-    void addSSAbsRange(const SampleRange& sampleRange) {
-        mSSAbsRanges << sampleRange;
+    void addSingleSound(const int& sampleShift,
+                        const SampleRange& absRange) {
+        mSSAbsRanges.append({sampleShift, absRange});
     }
 private:
-    QList<SampleRange> mSSAbsRanges;
+    QList<SingleSound> mSSAbsRanges;
     const stdptr<SoundMerger> mMerger;
 };
 #endif // SOUNDREADER_H

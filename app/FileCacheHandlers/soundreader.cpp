@@ -133,6 +133,7 @@ void SoundReader::readFrame() {
 
 #include "Sound/soundmerger.h"
 void SoundReaderForMerger::afterProcessingAsContainerStep() {
-    for(const auto& ssRange : mSSAbsRanges)
-        mMerger->addSoundToMerge({ssRange, getSamples()});
+    for(const auto& ss : mSSAbsRanges)
+        mMerger->addSoundToMerge({ss.fSampleShift, ss.fSamplesRange,
+                                  getSamples()});
 }

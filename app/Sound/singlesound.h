@@ -2,6 +2,7 @@
 #define SINGLESOUND_H
 #include "Animators/complexanimator.h"
 #include "Animators/qrealanimator.h"
+#include "CacheHandlers/soundcachehandler.h"
 class FixedLenAnimationRect;
 
 class SingleSound : public ComplexAnimator {
@@ -28,10 +29,6 @@ public:
     void setFilePath(const QString &path);
     void reloadDataFromFile();
 
-    int getSampleRate() const {
-        return mSampleRate;
-    }
-
     int getStartAbsFrame() const;
     int getSampleCount() const;
     const float *getFinalData() const;
@@ -45,11 +42,25 @@ public:
                                  const int &maxAbsFrame);
 
     void setDurationRect(const qsptr<FixedLenAnimationRect> &durRect);
-    FixedLenAnimationRect *getDurationRect();
+    FixedLenAnimationRect *getDurationRect() const;
 
     qreal getVolumeAtRelFrame(const qreal& relFrame) const {
         return mVolumeAnimator->getEffectiveValue(relFrame);
     }
+
+    SoundReaderForMerger * getSecondReader(const int& relSecondId) {
+        return mCacheHandler->getSecondReader(relSecondId);
+    }
+
+    SoundReaderForMerger * addSecondReader(const int& relSecondId,
+                                           SoundMerger * const merger) {
+        return mCacheHandler->addSecondReader(relSecondId, merger);
+    }
+
+    int getSampleShift() const;
+    SampleRange relSampleRange() const;
+    SampleRange absSampleRange() const;
+    iValueRange absSecondToRelSeconds(const int& absSecond);
 private:
     void updateAfterDurationRectangleShifted();
 
@@ -62,7 +73,7 @@ private:
 
     QString mPath;
 
-    int mSampleRate = 44100;
+    stdsptr<SoundCacheHandler> mCacheHandler;
 
     float *mSrcData = nullptr;
     float *mFinalData = nullptr;

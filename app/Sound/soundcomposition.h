@@ -19,6 +19,7 @@
 #include <QTimer>
 class SingleSound;
 class Canvas;
+class SoundMerger;
 const int SOUND_SAMPLERATE = 44100;
 
 class SoundComposition : public QIODevice {
@@ -45,7 +46,11 @@ public:
 
     void secondFinished(const int& secondId,
                         const stdsptr<Samples>& samples);
+
+    SoundMerger * scheduleFrame(const int& frameId);
 private:
+    SoundMerger * scheduleSecond(const int& secondId);
+
     void frameRangeChanged(const FrameRange &range);
 
     void secondRangeChanged(const iValueRange &range) {

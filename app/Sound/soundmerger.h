@@ -5,6 +5,7 @@
 #include "soundcomposition.h"
 
 struct SingleSoundData {
+    int fSampleShift;
     SampleRange fSSAbsRange;
     stdsptr<Samples> fSamples;
 };
@@ -12,7 +13,12 @@ struct SingleSoundData {
 class SoundMerger : public ContainerTask {
     friend class StdSelfRef;
 protected:
-    SoundMerger();
+    SoundMerger(const int& secondId, const SampleRange& sampleRange,
+                SoundComposition* const composition) :
+        mSecondId(secondId), mSampleRange(sampleRange),
+        mComposition(composition) {
+
+    }
 
     void afterProcessing() {
         ContainerTask::afterProcessing();
@@ -26,7 +32,7 @@ public:
         memset(dst, 0, mSamples->fSampleRange.span()*sizeof(float));
         for(const auto& sound : mSounds) {
             const auto& srcSamples = sound.fSamples;
-            const int srcAbsShift = sound.fSSAbsRange.fMin;
+            const int srcAbsShift = sound.fSampleShift;
             const SampleRange srcAbsRange =
                     srcSamples->fSampleRange.shifted(srcAbsShift)*sound.fSSAbsRange;
             const SampleRange srcNeededAbsRange =
@@ -55,7 +61,7 @@ private:
     const SampleRange mSampleRange;
     stdsptr<Samples> mSamples;
     QList<SingleSoundData> mSounds;
-    qptr<SoundComposition> mComposition;
+    const qptr<SoundComposition> mComposition;
 };
 
 #endif // SOUNDMERGER_H

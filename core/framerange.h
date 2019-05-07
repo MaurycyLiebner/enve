@@ -89,7 +89,6 @@ struct qValueRange {
     qreal fMin;
     qreal fMax;
 
-
     bool isValid() const {
         return fMax < fMin;
     }
@@ -115,6 +114,10 @@ struct qValueRange {
         auto maxT = fMax;
         fMax = fMin;
         fMin = maxT;
+    }
+
+    qValueRange operator/(const qreal& b) const {
+        return {this->fMin/b, this->fMax/b};
     }
 
     qValueRange operator*(const qreal& b) const {
