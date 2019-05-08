@@ -240,7 +240,7 @@ public:
     int prp_getRelFrameShift() const;
 
     void anim_setAbsFrame(const int &frame);
-    DurationRectangleMovable *anim_getRectangleMovableAtPos(
+    DurationRectangleMovable *anim_getTimelineMovable(
             const int &relX, const int &minViewedFrame,
             const qreal &pixelsPerFrame);
     QMatrix getTotalTransform() const;

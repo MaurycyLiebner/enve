@@ -72,7 +72,6 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     svgimporter.cpp \
-    Animators/boolanimator.cpp \
     Animators/coloranimator.cpp \
     Animators/qstringanimator.cpp \
     Boxes/circle.cpp \
@@ -283,7 +282,6 @@ HEADERS  += \
     keypoint.h \
     Animators/qstringanimator.h \
     Animators/coloranimator.h \
-    Animators/boolanimator.h \
     Boxes/circle.h \
     Boxes/boundingbox.h \
     Boxes/boxesgroup.h \

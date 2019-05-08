@@ -50,7 +50,7 @@ public:
     virtual void anim_setAbsFrame(const int &frame);
     virtual bool anim_isDescendantRecording() const;
 
-    virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
+    virtual DurationRectangleMovable *anim_getTimelineMovable(
                                            const int &relX,
                                            const int &minViewedFrame,
                                            const qreal &pixelsPerFrame);

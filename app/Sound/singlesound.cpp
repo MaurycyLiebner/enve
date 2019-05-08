@@ -15,6 +15,14 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     ca_addChildAnimator(mVolumeAnimator);
 }
 
+DurationRectangleMovable *SingleSound::anim_getTimelineMovable(
+        const int &relX, const int &minViewedFrame,
+        const qreal &pixelsPerFrame) {
+    if(!mDurationRectangle) return nullptr;
+    return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
+                                            minViewedFrame);
+}
+
 void SingleSound::drawTimelineControls(QPainter * const p,
                                        const qreal &pixelsPerFrame,
                                        const FrameRange &absFrameRange,
@@ -25,9 +33,14 @@ void SingleSound::drawTimelineControls(QPainter * const p,
 //    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
 //                frameWidth*pixelsPerFrame - pixelsPerFrame,
 //                BOX_HEIGHT, QColor(0, 0, 255, 125));
-    const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
-    const QRect drawRect(0, 0, width, rowHeight);
-    mDurationRectangle->draw(p, drawRect, pixelsPerFrame, absFrameRange);
+    if(mDurationRectangle) {
+        p->save();
+        p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
+        const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
+        const QRect drawRect(0, 0, width, rowHeight);
+        mDurationRectangle->draw(p, drawRect, pixelsPerFrame, absFrameRange);
+        p->restore();
+    }
     ComplexAnimator::drawTimelineControls(p, pixelsPerFrame,
                                           absFrameRange, rowHeight);
 }
@@ -107,14 +120,6 @@ void SingleSound::updateAfterDurationRectangleShifted() {
     prp_afterFrameShiftChanged();
     anim_setAbsFrame(anim_getCurrentAbsFrame());
     scheduleFinalDataUpdate();
-}
-
-DurationRectangleMovable *SingleSound::anim_getRectangleMovableAtPos(
-                            const int &relX,
-                            const int &minViewedFrame,
-                            const qreal &pixelsPerFrame) {
-    return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
-                                            minViewedFrame);
 }
 
 void SingleSound::updateFinalDataIfNeeded(const qreal &fps,
@@ -211,12 +216,11 @@ void SingleSound::prepareFinalData(const float &fps,
     }
 }
 
-int SingleSound::prp_getFrameShift() const {
+int SingleSound::prp_getRelFrameShift() const {
     if(mOwnDurationRectangle) {
-        return mDurationRectangle->getFrameShift() +
-                Animator::prp_getFrameShift();
+        return mDurationRectangle->getFrameShift();
     }
-    return Animator::prp_getFrameShift();
+    return 0;
 }
 
 bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,

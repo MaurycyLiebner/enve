@@ -313,7 +313,7 @@ void Animator::anim_updateKeyOnCurrrentFrame() {
     anim_setKeyOnCurrentFrame(key);
 }
 
-DurationRectangleMovable *Animator::anim_getRectangleMovableAtPos(
+DurationRectangleMovable *Animator::anim_getTimelineMovable(
         const int &relX, const int &minViewedFrame, const qreal &pixelsPerFrame) {
     Q_UNUSED(relX);
     Q_UNUSED(minViewedFrame);

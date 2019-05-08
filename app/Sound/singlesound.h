@@ -12,15 +12,15 @@ protected:
 public:
     bool SWT_isSingleSound() const { return true; }
 
+    DurationRectangleMovable *anim_getTimelineMovable(
+            const int &relX, const int &minViewedFrame,
+            const qreal &pixelsPerFrame);
     void drawTimelineControls(QPainter * const p,
                               const qreal &pixelsPerFrame,
                               const FrameRange &absFrameRange,
                               const int &rowHeight);
-    DurationRectangleMovable *anim_getRectangleMovableAtPos(
-            const int &relX, const int &minViewedFrame,
-            const qreal &pixelsPerFrame);
 
-    int prp_getFrameShift() const;
+    int prp_getRelFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,

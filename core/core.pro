@@ -65,6 +65,7 @@ SOURCES += \
     Animators/intanimator.cpp \
     Animators/fakecomplexanimator.cpp \
     Animators/key.cpp \
+    Animators/boolanimator.cpp \
     PropertyUpdaters/propertyupdater.cpp \
     PropertyUpdaters/transformupdater.cpp \
     PropertyUpdaters/smartnodepointupdater.cpp \
@@ -154,6 +155,7 @@ HEADERS += \
     Animators/fakecomplexanimator.h \
     Animators/animator.h \
     Animators/intanimator.h \
+    Animators/boolanimator.h \
     PropertyUpdaters/propertyupdater.h \
     PropertyUpdaters/transformupdater.h \
     PropertyUpdaters/smartnodepointupdater.h \

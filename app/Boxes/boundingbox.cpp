@@ -1012,7 +1012,7 @@ void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
 
 void BoundingBox::updateAfterDurationRectangleRangeChanged() {}
 
-DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
+DurationRectangleMovable *BoundingBox::anim_getTimelineMovable(
         const int &relX, const int &minViewedFrame,
         const qreal &pixelsPerFrame) {
     if(!mDurationRectangle) return nullptr;
@@ -1033,7 +1033,8 @@ void BoundingBox::drawTimelineControls(QPainter * const p,
         p->restore();
     }
 
-    Animator::drawTimelineControls(p, pixelsPerFrame, absFrameRange, rowHeight);
+    ComplexAnimator::drawTimelineControls(p, pixelsPerFrame,
+                                          absFrameRange, rowHeight);
 }
 
 void BoundingBox::addPathEffect(const qsptr<PathEffect> &) {}

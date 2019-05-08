@@ -818,7 +818,7 @@ DurationRectangleMovable* BoxSingleWidget::getRectangleMovableAtPos(
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
-        return anim_target->anim_getRectangleMovableAtPos(
+        return anim_target->anim_getTimelineMovable(
                                     pressX,
                                     minViewedFrame,
                                     pixelsPerFrame);
