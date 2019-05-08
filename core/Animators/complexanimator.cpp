@@ -46,7 +46,7 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 FrameRange ComplexAnimator::prp_getIdenticalRelRange(const int &relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     for(const auto& child : ca_mChildAnimators) {
-        auto childRange = child->prp_getIdenticalRelRange(relFrame);
+        const auto childRange = child->prp_getIdenticalRelRange(relFrame);
         range *= childRange;
         if(range.isUnary()) return range;
     }
@@ -105,7 +105,11 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
             this, &ComplexAnimator::ca_prependChildAnimator);
 
     SWT_addChildAbstractionForTargetToAllAt(childProperty.get(), id);
-    if(changeInfluence) prp_afterWholeInfluenceRangeChanged();
+    if(changeInfluence) {
+        const auto childRange = childProperty->prp_absInfluenceRange();
+        const auto changedRange = childRange*prp_absInfluenceRange();
+        prp_afterChangedAbsRange(changedRange);
+    }
 }
 
 int ComplexAnimator::getChildPropertyIndex(Property * const child) {
@@ -157,6 +161,9 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
 
 void ComplexAnimator::ca_removeChildAnimator(
         const qsptr<Property>& removeAnimator) {
+    const bool changeInfluence = !(SWT_isBoundingBox() &&
+                                   removeAnimator->SWT_isSingleSound());
+    const auto childRange = removeAnimator->prp_absInfluenceRange();
     removeAnimator->prp_setInheritedUpdater(nullptr);
     if(removeAnimator->SWT_isAnimator()) {
         const auto aRemove = GetAsPtr(removeAnimator, Animator);
@@ -172,7 +179,11 @@ void ComplexAnimator::ca_removeChildAnimator(
         updateCanvasProps();
     }
     ca_childAnimatorIsRecordingChanged();
-    prp_afterWholeInfluenceRangeChanged();
+
+    if(changeInfluence) {
+        const auto changedRange = childRange*prp_absInfluenceRange();
+        prp_afterChangedAbsRange(changedRange);
+    }
 }
 
 void ComplexAnimator::ca_removeAllChildAnimators() {

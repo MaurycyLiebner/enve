@@ -23,11 +23,19 @@ void SoundComposition::stop() {
 }
 
 void SoundComposition::addSound(const qsptr<SingleSound>& sound) {
+    connect(sound.get(),
+            &Property::prp_absFrameRangeChanged,
+            this, &SoundComposition::frameRangeChanged);
     mSounds.append(sound);
+    frameRangeChanged(sound->prp_absInfluenceRange());
 }
 
 void SoundComposition::removeSound(const qsptr<SingleSound>& sound) {
+    disconnect(sound.get(),
+               &Property::prp_absFrameRangeChanged,
+               this, &SoundComposition::frameRangeChanged);
     mSounds.removeOne(sound);
+    frameRangeChanged(sound->prp_absInfluenceRange());
 }
 
 void SoundComposition::addSoundAnimator(const qsptr<SingleSound>& sound) {

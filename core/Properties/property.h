@@ -171,6 +171,14 @@ public:
         return !prp_getIdenticalRelRange(frame1).inRange(frame2);
     }
 
+    FrameRange prp_absInfluenceRange() const {
+        return prp_relRangeToAbsRange(prp_relInfluenceRange());
+    }
+
+    virtual FrameRange prp_relInfluenceRange() const {
+        return {FrameRange::EMIN, FrameRange::EMAX};
+    }
+
     PropertyUpdater *prp_getUpdater() const {
         return prp_mUpdater.get();
     }

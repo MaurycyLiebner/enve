@@ -27,6 +27,10 @@ public:
     void frameLoaderCanceled(const int &frameId) {
         removeFrameLoader(frameId);
     }
+
+    const RenderCacheHandler& getCacheHandler() const {
+        return mFramesCache;
+    }
 protected:
     VideoFrameLoader * getFrameLoader(const int& frame) {
         const int id = mFramesBeingLoaded.indexOf(frame);

@@ -35,7 +35,7 @@ public:
         const int lastRelFrame = anim_getCurrentRelFrame();
         Animator::anim_setAbsFrame(frame);
         const bool diff = prp_differencesBetweenRelFrames(frame, lastRelFrame);
-        if(anim_hasKeys() && diff) {
+        if(diff) {
             const auto prevK1 = anim_getPrevKey<SmartPathKey>(lastRelFrame);
             const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
             const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);

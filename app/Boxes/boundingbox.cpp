@@ -191,6 +191,12 @@ void BoundingBox::drawCanvasControls(SkCanvas * const canvas,
         prop->drawCanvasControls(canvas, mode, invScale);
 }
 
+FrameRange BoundingBox::prp_relInfluenceRange() const {
+    if(mDurationRectangle)
+        return mDurationRectangle->getAbsFrameRange();
+    return ComplexAnimator::prp_relInfluenceRange();
+}
+
 MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
                                             const CanvasMode &mode,
                                             const qreal &invScale) const {

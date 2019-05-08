@@ -25,6 +25,8 @@ protected:
     InterpolationKeyT(const T &value, const int &frame,
                       Animator * const parentAnimator) :
         GraphKeyT<T>(value, frame, parentAnimator) {}
+    InterpolationKeyT(const int &frame, Animator * const parentAnimator) :
+        GraphKeyT<T>(frame, parentAnimator) {}
     InterpolationKeyT(Animator * const parentAnimator) :
         GraphKeyT<T>(parentAnimator) {}
 };

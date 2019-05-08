@@ -159,7 +159,7 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
         if(afterMaxFrame > endFrame) afterMaxFrame = endFrame + 1;
         if(minFrame < startFrame) minFrame = startFrame;
 
-        int dFrame = minFrame - startFrame;
+        const int dFrame = minFrame - startFrame;
         int xT = qRound(dFrame*pixelsPerFrame);
 
         int widthT = qRound(pixelsPerFrame*(afterMaxFrame - minFrame));

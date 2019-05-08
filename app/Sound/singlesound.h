@@ -21,10 +21,14 @@ public:
                               const int &rowHeight);
 
     int prp_getRelFrameShift() const;
+    int prp_getParentFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) const;
+
+    FrameRange prp_relInfluenceRange() const;
+
     void setFilePath(const QString &path);
 
     int getStartAbsFrame() const;

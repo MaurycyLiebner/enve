@@ -158,13 +158,18 @@ void DurationRectangle::draw(QPainter * const p,
             absFrameRange.fMin;
     const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
 
-    QRect durRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
-                  qCeil(drawFrameSpan*pixelsPerFrame), drawRect.height());
+    const QRect durRect(qFloor(firstRelDrawFrame*pixelsPerFrame),
+                        drawRect.y(),
+                        qCeil(drawFrameSpan*pixelsPerFrame),
+                        drawRect.height());
+
+    if(mCacheHandler)
+        mCacheHandler->drawCacheOnTimeline(p, drawRect,
+                                           absFrameRange.fMin - mFramePos,
+                                           absFrameRange.fMax - mFramePos);
 
     QColor fillColor;
-    bool selected = isSelected();
-
-    if(selected) fillColor = QColor(50, 50, 255, 120);
+    if(isSelected()) fillColor = QColor(50, 50, 255, 120);
     else fillColor = QColor(0, 0, 255, 120);
 
     p->fillRect(durRect.adjusted(0, 1, 0, -1), fillColor);
@@ -179,6 +184,7 @@ void DurationRectangle::draw(QPainter * const p,
     if(mMaxFrame.isHovered()) p->setPen(QPen(Qt::white));
     else p->setPen(QPen(Qt::black));
     p->drawLine(durRect.topRight(), durRect.bottomRight());
+
 //    p->setPen(Qt::black);
 //    p->setBrush(Qt::NoBrush);
     //p->drawRect(drawRect);

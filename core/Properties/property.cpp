@@ -26,7 +26,7 @@ void Property::prp_afterChangedAbsRange(const FrameRange &range) {
 }
 
 void Property::prp_afterWholeInfluenceRangeChanged() {
-    prp_afterChangedAbsRange({FrameRange::EMIN, FrameRange::EMAX});
+    prp_afterChangedAbsRange(prp_absInfluenceRange());
 }
 
 const QString &Property::prp_getName() const {

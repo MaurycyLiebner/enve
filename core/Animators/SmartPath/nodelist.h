@@ -195,13 +195,14 @@ protected:
     }
 
     static bool sDifferent(const NodeList& list1, const NodeList& list2) {
-        const auto& list1v = list1.getList();
-        const auto& list2v = list2.getList();
-        if(list1v.count() != list2v.count()) return false;
-        for(int i = 0; i < list1.count(); i++) {
-            if(list1v.at(i) != list2v.at(i)) return true;
-        }
-        return false;
+        return true;
+//        const auto& list1v = list1.getList();
+//        const auto& list2v = list2.getList();
+//        if(list1v.count() != list2v.count()) return true;
+//        for(int i = 0; i < list1.count(); i++) {
+//            if(list1v.at(i) != list2v.at(i)) return true;
+//        }
+//        return false;
     }
 
     static NodeList sInterpolate(const NodeList &list1,

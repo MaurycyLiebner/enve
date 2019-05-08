@@ -6,6 +6,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 #include "framerange.h"
 class Property;
+class HDDCachableCacheHandler;
 
 class DurationRectangleMovable : public SelfRef {
     Q_OBJECT
@@ -163,6 +164,10 @@ public:
     void finishMaxFramePosTransform();
     void startMaxFramePosTransform();
 
+    void setCacheHandler(const HDDCachableCacheHandler * const handler) {
+        mCacheHandler = handler;
+    }
+
     virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
 signals:
     void minFrameChangedBy(int);
@@ -170,6 +175,7 @@ signals:
     void rangeChanged();
     void finishedRangeChange();
 protected:
+    const HDDCachableCacheHandler * mCacheHandler = nullptr;
     DurationRectangleMovable mMinFrame;
     DurationRectangleMovable mMaxFrame;
 };

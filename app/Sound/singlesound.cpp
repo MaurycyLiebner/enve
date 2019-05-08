@@ -217,9 +217,14 @@ void SingleSound::prepareFinalData(const float &fps,
 }
 
 int SingleSound::prp_getRelFrameShift() const {
-    if(mOwnDurationRectangle) {
+    if(mOwnDurationRectangle)
         return mDurationRectangle->getFrameShift();
-    }
+    return 0;
+}
+
+int SingleSound::prp_getParentFrameShift() const {
+    if(mOwnDurationRectangle)
+        return ComplexAnimator::prp_getParentFrameShift();
     return 0;
 }
 
@@ -231,6 +236,10 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return SingleWidgetTarget::SWT_shouldBeVisible(rules,
                                                    parentSatisfies,
                                                    parentMainTarget);
+}
+
+FrameRange SingleSound::prp_relInfluenceRange() const {
+    return mDurationRectangle->getAbsFrameRange();
 }
 
 const float *SingleSound::getFinalData() const {

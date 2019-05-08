@@ -84,13 +84,13 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     if(mCurrentCanvas) {
         const int soundHeight = MIN_WIDGET_HEIGHT/3;
         const int rasterHeight = MIN_WIDGET_HEIGHT - soundHeight;
-        const QRect rasterRect(0, 0, width()/* - 2*MIN_WIDGET_HEIGHT*/,
+        const QRect rasterRect(0, 0, width() - 2*MIN_WIDGET_HEIGHT,
                                rasterHeight);
         const auto& rasterCache = mCurrentCanvas->getCacheHandler();
         rasterCache.drawCacheOnTimeline(&p, rasterRect, mMinFrame, mMaxFrame);
 
         const qreal fps = mCurrentCanvas->getFps();
-        const QRect soundRect(0, rasterHeight, width()/* - 2*MIN_WIDGET_HEIGHT*/,
+        const QRect soundRect(0, rasterHeight, width() - 2*MIN_WIDGET_HEIGHT,
                               soundHeight);
         const auto& soundCache = mCurrentCanvas->getSoundCacheHandler();
         soundCache.drawCacheOnTimeline(&p, soundRect,

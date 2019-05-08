@@ -236,6 +236,7 @@ public:
                             const CanvasMode &mode,
                             const SkScalar &invScale);
 
+    FrameRange prp_relInfluenceRange() const;
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
     int prp_getRelFrameShift() const;
 
@@ -243,13 +244,14 @@ public:
     DurationRectangleMovable *anim_getTimelineMovable(
             const int &relX, const int &minViewedFrame,
             const qreal &pixelsPerFrame);
-    QMatrix getTotalTransform() const;
     void drawTimelineControls(QPainter * const p,
                               const qreal &pixelsPerFrame,
                               const FrameRange &absFrameRange,
                               const int &rowHeight);
 
     void ca_childAnimatorIsRecordingChanged();
+
+    QMatrix getTotalTransform() const;
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &mode,
