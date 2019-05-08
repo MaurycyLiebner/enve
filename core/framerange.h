@@ -15,7 +15,7 @@ struct iValueRange {
     }
 
     bool isValid() const {
-        return fMax < fMin;
+        return fMax >= fMin;
     }
 
     bool inRange(const int& val) const {
@@ -90,7 +90,7 @@ struct qValueRange {
     qreal fMax;
 
     bool isValid() const {
-        return fMax < fMin;
+        return fMax > fMin;
     }
 
     bool inRange(const qreal& val) const {

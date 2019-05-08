@@ -98,7 +98,6 @@ void AudioStreamsData::open(AVFormatContext * const formatContext) {
             fAudioStream = iStream;
             fDurationSec = fAudioStream->duration*
                     fAudioStream->time_base.num/fAudioStream->time_base.den;
-            qDebug() << "duration " << fDurationSec;
             break;
         }
     }

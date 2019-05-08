@@ -42,6 +42,12 @@ public:
     void secondFinished(const int& secondId,
                         const stdsptr<Samples>& samples);
 
+    void startBlockingAtFrame(const int& frame);
+    void blockUpToFrame(const int& frame);
+
+    void unblockAll();
+
+    void scheduleFrameRange(const FrameRange& range);
     SoundMerger * scheduleFrame(const int& frameId);
 private:
     SoundMerger * scheduleSecond(const int& secondId);
@@ -52,6 +58,7 @@ private:
         mSecondsCache.clearRelRange(range);
     }
 
+    iValueRange mBlockRange{0, -1};
     QList<int> mProcessingSeconds;
     const Canvas * const mParent;
     qint64 mPos;

@@ -22,40 +22,22 @@ void SoundReader::readFrame() {
     const auto decodedFrame = mOpenedAudio->fDecodedFrame;
     const auto codecContext = mOpenedAudio->fCodecContext;
     const auto swrContext = mOpenedAudio->fSwrContext;
-    //const qreal fps = mOpenedAudio->fFps;
 
-//    const int64_t tsms = qFloor(mSecondId * 1000 - 1);
-//    const int64_t tm = av_rescale(tsms, audioStream->time_base.den,
-//                                  audioStream->time_base.num)/1000;
-//    if(tm <= 0)
-//        avformat_seek_file(formatContext, audioStreamIndex,
-//                           INT64_MIN, 0, 0, 0);
-//    else {
-//        const int64_t tsms0 = qFloor((mSecondId - 1) * 1000);
-//        const int64_t tm0 = av_rescale(tsms0, audioStream->time_base.den,
-//                                       audioStream->time_base.num)/1000;
-//        if(avformat_seek_file(formatContext, audioStreamIndex, tm0,
-//                              tm, tm, AVSEEK_FLAG_FRAME) < 0) {
-//            qDebug() << "Failed to seek to " << mSecondId;
-//            avformat_seek_file(formatContext, audioStreamIndex,
-//                               INT64_MIN, 0, INT64_MAX, 0);
-//        }
-//    }
-
-    int minFrameTsms = mSampleRange.fMin * 1000 / SOUND_SAMPLERATE - 1;
-
-    const int64_t seekFrame = av_rescale(minFrameTsms,
-                                   audioStream->time_base.den,
-                                   audioStream->time_base.num)/1000;
-
-    if(mSampleRange.fMin <= 0) {
+    const int64_t tsms = qFloor(mSecondId * 1000 - 1);
+    const int64_t tm = av_rescale(tsms, audioStream->time_base.den,
+                                  audioStream->time_base.num)/1000;
+    if(tm <= 0)
         avformat_seek_file(formatContext, audioStreamIndex,
                            INT64_MIN, 0, 0, 0);
-    } else {
-        if(avformat_seek_file(formatContext, audioStreamIndex, 0,
-                              seekFrame, seekFrame,
-                AVSEEK_FLAG_FRAME) < 0) {
+    else {
+        const int64_t tsms0 = qFloor((mSecondId - 1) * 1000);
+        const int64_t tm0 = av_rescale(tsms0, audioStream->time_base.den,
+                                       audioStream->time_base.num)/1000;
+        if(avformat_seek_file(formatContext, audioStreamIndex, tm0,
+                              tm, tm, AVSEEK_FLAG_FRAME) < 0) {
             qDebug() << "Failed to seek to " << mSecondId;
+            avformat_seek_file(formatContext, audioStreamIndex,
+                               INT64_MIN, 0, INT64_MAX, 0);
         }
     }
 

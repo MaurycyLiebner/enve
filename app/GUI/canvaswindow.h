@@ -200,7 +200,7 @@ private:
     void initializeAudio();
     void startAudio();
     void stopAudio();
-    void volumeChanged(int value);
+    void volumeChanged(const int &value);
 
     QAudioDeviceInfo mAudioDevice;
     qptr<SoundComposition> mCurrentSoundComposition;

@@ -19,6 +19,7 @@ void SoundComposition::start(const int& startFrame) {
 
 void SoundComposition::stop() {
     close();
+    unblockAll();
 }
 
 void SoundComposition::addSound(const qsptr<SingleSound>& sound) {
@@ -42,10 +43,41 @@ void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
 
 void SoundComposition::secondFinished(const int &secondId,
                                       const stdsptr<Samples> &samples) {
-    qDebug() << "sec finished" << secondId << (samples != nullptr);
     mProcessingSeconds.removeOne(secondId);
     if(!samples) return;
-    mSecondsCache.createNew<SoundCacheContainer>(secondId, samples)->setBlocked(true);
+    const auto cont = mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
+    if(mBlockRange.inRange(secondId)) cont->setBlocked(true);
+}
+
+void SoundComposition::startBlockingAtFrame(const int &frame) {
+    if(mBlockRange.isValid()) unblockAll();
+    const qreal fps = mParent->getFps();
+    const int sec = qFloor(frame/fps);
+    mBlockRange = {sec, sec};
+    mSecondsCache.blockConts(mBlockRange, true);
+}
+
+void SoundComposition::blockUpToFrame(const int &frame) {
+    const qreal fps = mParent->getFps();
+    const int sec = qFloor(frame/fps);
+    if(sec < mBlockRange.fMax) {
+        mSecondsCache.blockConts({sec + 1, mBlockRange.fMax}, false);
+    } else mSecondsCache.blockConts({mBlockRange.fMax + 1, sec}, true);
+    mBlockRange.fMax = sec;
+}
+
+void SoundComposition::unblockAll() {
+    if(mBlockRange.isValid())
+        mSecondsCache.blockConts(mBlockRange, false);
+    mBlockRange = {0, -1};
+}
+
+void SoundComposition::scheduleFrameRange(const FrameRange &range) {
+    const qreal fps = mParent->getFps();
+    const int minSec = qFloor(range.fMin/fps);
+    const int maxSec = qCeil(range.fMax/fps);
+    for(int i = minSec; i <= maxSec; i++)
+        scheduleSecond(i);
 }
 
 SoundMerger *SoundComposition::scheduleFrame(const int &frameId) {
@@ -71,7 +103,6 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
         }
     }
     task->scheduleTask();
-    qDebug() << "sec scheduled" << secondId;
     return task.get();
 }
 

@@ -934,6 +934,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
         }
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
+        mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
         mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {
@@ -964,8 +965,12 @@ void CanvasWindow::nextCurrentRenderFrame() {
         const int maxBlock = newCurrentRenderFrame - 1;
         cacheHandler.blockConts({minBlock, maxBlock}, true);
     }
+    const FrameRange newSoundRange = {mCurrentRenderFrame, newCurrentRenderFrame};
+    mCurrentSoundComposition->scheduleFrameRange(newSoundRange);
+    mCurrentSoundComposition->blockUpToFrame(newCurrentRenderFrame);
 
     mCurrentRenderFrame = newCurrentRenderFrame;
+
     if(mCurrentRenderFrame <= mMaxRenderFrame)
         changeCurrentFrameAction(mCurrentRenderFrame);
 }
@@ -980,6 +985,8 @@ void CanvasWindow::renderPreview() {
 
     mSavedCurrentFrame = getCurrentFrame();
     mCurrentRenderFrame = mSavedCurrentFrame;
+    mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
+
     mMaxRenderFrame = getMaxFrame();
     setRendering(true);
 
@@ -1135,6 +1142,7 @@ void CanvasWindow::nextSaveOutputFrame() {
                     mCurrentCanvas->getResolutionFraction()) > 0.1) {
                 mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
             }
+            mCurrentSoundComposition->unblockAll();
             VideoEncoder::sFinishEncoding();
             TaskScheduler::sClearAllFinishedFuncs();
         };
@@ -1251,10 +1259,8 @@ void CanvasWindow::stopAudio() {
     mCurrentSoundComposition->stop();
 }
 
-void CanvasWindow::volumeChanged(int value) {
-    if(mAudioOutput) {
-        mAudioOutput->setVolume(qreal(value/100.));
-    }
+void CanvasWindow::volumeChanged(const int& value) {
+    if(mAudioOutput) mAudioOutput->setVolume(qreal(value/100.));
 }
 
 void CanvasWindow::pushTimerExpired() {
