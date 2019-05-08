@@ -431,7 +431,7 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
         Canvas* canvas) {
     if(!canvas) {
-        mAnimationWidgetScrollbar->setCacheHandler(nullptr);
+        mAnimationWidgetScrollbar->setCurrentCanvas(nullptr);
     } else {
         disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
                    this, SLOT(setResolutionFractionText(QString)));
@@ -439,7 +439,7 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                     QString::number(canvas->getResolutionFraction()*100.) + " %");
         connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
                 this, SLOT(setResolutionFractionText(QString)));
-        mAnimationWidgetScrollbar->setCacheHandler(&canvas->getCacheHandler());
+        mAnimationWidgetScrollbar->setCurrentCanvas(canvas);
     }
 }
 

@@ -974,6 +974,10 @@ int Canvas::getMaxFrame() {
     return mMaxFrame;
 }
 
+HDDCachableCacheHandler &Canvas::getSoundCacheHandler() {
+    return mSoundComposition->getCacheHandler();
+}
+
 void Canvas::startDurationRectPosTransformForAllSelected() {
     for(const auto& box : mSelectedBoxes)
         box->startDurationRectPosTransform();

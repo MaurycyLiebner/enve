@@ -49,6 +49,9 @@ public:
 
     void scheduleFrameRange(const FrameRange& range);
     SoundMerger * scheduleFrame(const int& frameId);
+    HDDCachableCacheHandler& getCacheHandler() {
+        return mSecondsCache;
+    }
 private:
     SoundMerger * scheduleSecond(const int& secondId);
 

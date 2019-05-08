@@ -400,6 +400,8 @@ public:
         return mCacheHandler;
     }
 
+    HDDCachableCacheHandler& getSoundCacheHandler();
+
     void setCurrentPreviewContainer(const int& relFrame);
     void setCurrentPreviewContainer(const stdsptr<ImageCacheContainer> &cont);
     void setLoadingPreviewContainer(

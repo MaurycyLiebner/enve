@@ -33,8 +33,8 @@ void AnimationWidgetScrollBar::setTopBorderVisible(const bool &bT) {
     mTopBorderVisible = bT;
 }
 
-void AnimationWidgetScrollBar::setCacheHandler(RenderCacheHandler *handler) {
-    mCacheHandler_d = handler;
+void AnimationWidgetScrollBar::setCurrentCanvas(Canvas * const canvas) {
+    mCurrentCanvas = canvas;
 }
 
 #include "Boxes/rendercachehandler.h"
@@ -81,11 +81,21 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
 //               2*MIN_WIDGET_HEIGHT - MIN_WIDGET_HEIGHT/2, height(),
 //               QColor(30, 30, 30));
 
-    if(mCacheHandler_d) {
-        const QRect cacheRect(0, 0, width() - 2*MIN_WIDGET_HEIGHT,
-                              MIN_WIDGET_HEIGHT);
-        mCacheHandler_d->drawCacheOnTimeline(&p, cacheRect,
-                                             mMinFrame, mMaxFrame);
+    if(mCurrentCanvas) {
+        const int soundHeight = MIN_WIDGET_HEIGHT/3;
+        const int rasterHeight = MIN_WIDGET_HEIGHT - soundHeight;
+        const QRect rasterRect(0, 0, width()/* - 2*MIN_WIDGET_HEIGHT*/,
+                               rasterHeight);
+        const auto& rasterCache = mCurrentCanvas->getCacheHandler();
+        rasterCache.drawCacheOnTimeline(&p, rasterRect, mMinFrame, mMaxFrame);
+
+        const qreal fps = mCurrentCanvas->getFps();
+        const QRect soundRect(0, rasterHeight, width()/* - 2*MIN_WIDGET_HEIGHT*/,
+                              soundHeight);
+        const auto& soundCache = mCurrentCanvas->getSoundCacheHandler();
+        soundCache.drawCacheOnTimeline(&p, soundRect,
+                                       qFloor(mMinFrame/fps),
+                                       qCeil(mMaxFrame/fps));
     }
 
     p.setPen(Qt::white);
