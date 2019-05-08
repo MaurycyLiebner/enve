@@ -96,10 +96,16 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
     for(const auto &sound : mSounds) {
         const auto secs = sound->absSecondToRelSeconds(secondId);
         for(int i = secs.fMin; i <= secs.fMax; i++) {
-            auto reader = sound->getSecondReader(i);
-            if(!reader) reader = sound->addSecondReader(i, task.get());
-            reader->addSingleSound(sound->getSampleShift(),
-                                   sound->absSampleRange());
+            const auto samples = sound->getSamplesForSecond(i);
+            if(samples) {
+                task->addSoundToMerge({sound->getSampleShift(),
+                                       sound->absSampleRange(),
+                                       samples});
+            } else {
+                const auto reader = sound->getSecondReader(i, task.get());
+                reader->addSingleSound(sound->getSampleShift(),
+                                       sound->absSampleRange());
+            }
         }
     }
     task->scheduleTask();

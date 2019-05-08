@@ -959,6 +959,7 @@ void CanvasWindow::nextCurrentRenderFrame() {
         } else {
             newCurrentRenderFrame = range.fMin;
         }
+        newCurrentRenderFrame = qMin(mMaxRenderFrame, newCurrentRenderFrame);
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         const int minBlock = mCurrentRenderFrame + 1;

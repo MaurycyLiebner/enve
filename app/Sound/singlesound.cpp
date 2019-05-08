@@ -6,16 +6,13 @@
 #include "Decode/audiodecode.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 
-SingleSound::SingleSound(const QString &path,
-                         const qsptr<FixedLenAnimationRect>& durRect) :
+SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     ComplexAnimator("sound") {
     setDurationRect(durRect);
 
     prp_setOwnUpdater(SPtrCreate(SingleSoundUpdater)(this));
 
     ca_addChildAnimator(mVolumeAnimator);
-
-    setFilePath(path);
 }
 
 void SingleSound::drawTimelineControls(QPainter * const p,

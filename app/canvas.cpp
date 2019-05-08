@@ -511,15 +511,16 @@ VideoBox* Canvas::createVideoForPath(const QString &path) {
 
 #include "Boxes/linkbox.h"
 ExternalLinkBox* Canvas::createLinkToFileWithPath(const QString &path) {
-    auto extLinkBox = SPtrCreate(ExternalLinkBox)();
+    const auto extLinkBox = SPtrCreate(ExternalLinkBox)();
     extLinkBox->setSrc(path);
     mCurrentBoxesGroup->addContainedBox(extLinkBox);
     return extLinkBox.get();
 }
 
 SingleSound* Canvas::createSoundForPath(const QString &path) {
-    auto singleSound = SPtrCreate(SingleSound)(path);
+    const auto singleSound = SPtrCreate(SingleSound)();
     getSoundComposition()->addSoundAnimator(singleSound);
+    singleSound->setFilePath(path);
     return singleSound.get();
 }
 

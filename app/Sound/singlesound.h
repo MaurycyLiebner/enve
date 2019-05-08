@@ -8,8 +8,7 @@ class FixedLenAnimationRect;
 class SingleSound : public ComplexAnimator {
     friend class SelfRef;
 protected:
-    SingleSound(const QString &path,
-                const qsptr<FixedLenAnimationRect> &durRect = nullptr);
+    SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);
 public:
     bool SWT_isSingleSound() const { return true; }
 
@@ -47,13 +46,15 @@ public:
         return mVolumeAnimator->getEffectiveValue(relFrame);
     }
 
-    SoundReaderForMerger * getSecondReader(const int& relSecondId) {
-        return mCacheHandler->getSecondReader(relSecondId);
+    SoundReaderForMerger * getSecondReader(const int& relSecondId,
+                                           SoundMerger * const merger) {
+        const auto reader = mCacheHandler->getSecondReader(relSecondId);
+        if(!reader) return mCacheHandler->addSecondReader(relSecondId, merger);
+        return reader;
     }
 
-    SoundReaderForMerger * addSecondReader(const int& relSecondId,
-                                           SoundMerger * const merger) {
-        return mCacheHandler->addSecondReader(relSecondId, merger);
+    stdsptr<Samples> getSamplesForSecond(const int& relSecondId) {
+        return mCacheHandler->getSamplesForSecond(relSecondId);
     }
 
     int getSampleShift() const;
