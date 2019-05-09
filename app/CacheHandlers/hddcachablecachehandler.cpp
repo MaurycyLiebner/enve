@@ -160,7 +160,7 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
     p->setPen(Qt::NoPen);
 
     int lastDrawnFrame = uStartFrame;
-    int lastDrawX = 0;
+    int lastDrawX = drawRect.x();
     bool lastStoresInMemory = true;
     const int iMin = qMax(0, insertIdForRelFrame(uStartFrame) - 1);
     for(int i = iMin; i < mRenderContainers.count(); i++) {
@@ -171,7 +171,7 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
         if(minFrame > uEndFrame + 1) break;
 
         const int dFrame = minFrame - uStartFrame;
-        int xT = qRound(dFrame*pixelsPerFrame);
+        int xT = qRound(dFrame*pixelsPerFrame) + drawRect.x();
 
         int widthT = qRound(pixelsPerFrame*(afterMaxFrame - minFrame));
         if(lastDrawnFrame == minFrame) {

@@ -82,19 +82,25 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
 //               QColor(30, 30, 30));
 
     if(mCurrentCanvas) {
+        const int f0 = -qCeil(MIN_WIDGET_HEIGHT/pixPerFrame/2);
+        const int x0 = qRound(f0*pixPerFrame);
+
+        const int f1 = qCeil(2*MIN_WIDGET_HEIGHT/pixPerFrame);
+        const int w1 = qRound(f1*pixPerFrame);
+
         const int soundHeight = MIN_WIDGET_HEIGHT/3;
         const int rasterHeight = MIN_WIDGET_HEIGHT - soundHeight;
-        const QRect rasterRect(0, 0, width() - 2*MIN_WIDGET_HEIGHT,
+        const QRect rasterRect(x0, 0, width() - 2*MIN_WIDGET_HEIGHT + w1 - x0,
                                rasterHeight);
         const auto& rasterCache = mCurrentCanvas->getCacheHandler();
-        rasterCache.drawCacheOnTimeline(&p, rasterRect, mMinFrame, mMaxFrame);
+        rasterCache.drawCacheOnTimeline(&p, rasterRect, mMinFrame + f0, mMaxFrame + f1);
 
         const qreal fps = mCurrentCanvas->getFps();
-        const QRect soundRect(0, rasterHeight, width() - 2*MIN_WIDGET_HEIGHT,
+        const QRect soundRect(x0, rasterHeight, width() - 2*MIN_WIDGET_HEIGHT + w1 - x0,
                               soundHeight);
         const auto& soundCache = mCurrentCanvas->getSoundCacheHandler();
         soundCache.drawCacheOnTimeline(&p, soundRect,
-                                       mMinFrame, mMaxFrame, fps);
+                                       mMinFrame + f0, mMaxFrame + f1, fps);
     }
 
     p.setPen(Qt::white);
