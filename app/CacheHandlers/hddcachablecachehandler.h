@@ -83,7 +83,7 @@ public:
 
 
     void drawCacheOnTimeline(QPainter * const p,
-                             const QRect drawRect,
+                             const QRectF &drawRect,
                              const int &startFrame,
                              const int &endFrame,
                              const qreal &unit = 1) const;

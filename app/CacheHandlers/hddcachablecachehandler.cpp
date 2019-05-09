@@ -139,39 +139,38 @@ int HDDCachableCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
 }
 #include "pointhelpers.h"
 void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
-                                                  const QRect drawRect,
+                                                  const QRectF& drawRect,
                                                   const int &startFrame,
                                                   const int &endFrame,
                                                   const qreal& unit) const {
     if(startFrame > endFrame) return;
     p->save();
     const qreal quStartFrame = startFrame/unit;
-    const qreal quEndFrame = endFrame/unit;
     const int uStartFrame = isInteger4Dec(quStartFrame) ?
                 qRound(quStartFrame): qFloor(quStartFrame);
-    const int uEndFrame = isInteger4Dec(quEndFrame) ?
-                qRound(quEndFrame): qCeil(quEndFrame);
-    const qreal pixelsPerFrame = drawRect.width()*unit/
+    const qreal pixelsPerFrame = drawRect.width()/
             (endFrame - startFrame + 1);
-    if(!isOne4Dec(unit))
-        p->translate((uStartFrame - quStartFrame)*pixelsPerFrame, 0);
+//    if(!isOne4Dec(unit))
+//        p->translate((uStartFrame - quStartFrame)*pixelsPerFrame, 0);
 
     p->setBrush(QColor(0, 255, 0, 75));
     p->setPen(Qt::NoPen);
 
     int lastDrawnFrame = uStartFrame;
-    int lastDrawX = drawRect.x();
+    int lastDrawX = qRound(drawRect.x());
     bool lastStoresInMemory = true;
     const int iMin = qMax(0, insertIdForRelFrame(uStartFrame) - 1);
     for(int i = iMin; i < mRenderContainers.count(); i++) {
         const auto &cont  = mRenderContainers.at(i);
-        const int afterMaxFrame = qMin(uEndFrame + 1, cont->getRangeMax() + 1);
-        if(afterMaxFrame < uStartFrame) continue;
-        const int minFrame = qMax(uStartFrame - 1, cont->getRangeMin());
-        if(minFrame > uEndFrame + 1) break;
+        const int minFrame = qMax(startFrame - 1,
+                                  qRound(cont->getRangeMin()*unit));
+        if(minFrame > endFrame + 1) break;
+        const int afterMaxFrame = qMin(endFrame + 1,
+                                       qRound((cont->getRangeMax() + 1)*unit));
+        if(afterMaxFrame < startFrame) continue;
 
-        const int dFrame = minFrame - uStartFrame;
-        int xT = qRound(dFrame*pixelsPerFrame) + drawRect.x();
+        const int dFrame = minFrame - startFrame;
+        int xT = qRound(dFrame*pixelsPerFrame + drawRect.x());
 
         int widthT = qRound(pixelsPerFrame*(afterMaxFrame - minFrame));
         if(lastDrawnFrame == minFrame) {
@@ -188,7 +187,8 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
             lastStoresInMemory = storesInMemory;
         }
 
-        p->drawRect(xT, drawRect.top(), widthT, drawRect.height());
+        p->drawRect(xT, qRound(drawRect.top()),
+                    widthT, qRound(drawRect.height()));
         lastDrawnFrame = afterMaxFrame;
         lastDrawX = xT + widthT;
     }
