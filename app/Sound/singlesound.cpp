@@ -35,7 +35,8 @@ void SingleSound::drawTimelineControls(QPainter * const p,
 //                BOX_HEIGHT, QColor(0, 0, 255, 125));
     if(mDurationRectangle) {
         p->save();
-        p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
+        if(mOwnDurationRectangle)
+            p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
         const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
         const QRect drawRect(0, 0, width, rowHeight);
         mDurationRectangle->draw(p, drawRect, getCanvasFPS(),
@@ -79,13 +80,13 @@ SampleRange SingleSound::absSampleRange() const {
 
 iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
     const qreal fps = getCanvasFPS();
-    const qreal qFirstSecond = prp_getFrameShift()/fps + absSecond;
+    const qreal qFirstSecond = prp_absFrameToRelFrameF(absSecond*fps)/fps;
     if(isInteger4Dec(qFirstSecond)) {
         const int round = qRound(qFirstSecond);
         return {round, round};
     }
     const int firstSecond = qFloor(qFirstSecond);
-    const int lastSecond = qCeil(qFirstSecond + 1);
+    const int lastSecond = qCeil(qFirstSecond);
     return {firstSecond, lastSecond};
 }
 
@@ -222,12 +223,6 @@ void SingleSound::prepareFinalData(const float &fps,
 int SingleSound::prp_getRelFrameShift() const {
     if(mOwnDurationRectangle)
         return mDurationRectangle->getFrameShift();
-    return 0;
-}
-
-int SingleSound::prp_getParentFrameShift() const {
-    if(mOwnDurationRectangle)
-        return ComplexAnimator::prp_getParentFrameShift();
     return 0;
 }
 

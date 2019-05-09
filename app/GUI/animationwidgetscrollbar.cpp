@@ -40,41 +40,47 @@ void AnimationWidgetScrollBar::setCurrentCanvas(Canvas * const canvas) {
 #include "Boxes/rendercachehandler.h"
 void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     QPainter p(this);
-    p.save();
     p.fillRect(rect(), QColor(60, 60, 60));
 
-    int dFrame = mMaxFrame - mMinFrame;
-    if(!mRange) dFrame++;
+    const int dFrame = mMaxFrame - mMinFrame + (mRange ? 0 : 1);
     const qreal pixPerFrame = (width() - 2.*MIN_WIDGET_HEIGHT)/dFrame;
+
     const int f0 = -qCeil(0.5*MIN_WIDGET_HEIGHT/pixPerFrame);
+    const int minFrame = mMinFrame + f0;
     const qreal x0 = f0*pixPerFrame + MIN_WIDGET_HEIGHT*0.5;
 
     const int f1 = qCeil(1.5*MIN_WIDGET_HEIGHT/pixPerFrame);
+    const int maxFrame = mMaxFrame + f1;
     const qreal w1 = width() - 1.5*MIN_WIDGET_HEIGHT + f1*pixPerFrame - x0;
 
-    const int minFrame = mMinFrame + f0;
-    const int maxFrame = mMaxFrame + f1;
+    QRect canvasMinRect;
+    canvasMinRect.setLeft(qRound(x0));
+    canvasMinRect.setTop(0);
+    const int cRightFrames = mMinCanvasFrame - minFrame;
+    canvasMinRect.setRight(qRound(x0 + cRightFrames*pixPerFrame));
+    canvasMinRect.setBottom(height());
+    p.fillRect(canvasMinRect, QColor(30, 30, 30));
 
-    const int canvasMaxX = qMax(0., (mMaxCanvasFrame - minFrame +
-                            (mRange ? 0 : 1))*pixPerFrame + x0);
-
-    p.fillRect(x0, 0, (mMinCanvasFrame - minFrame)*pixPerFrame, height(), QColor(30, 30, 30));
-    p.fillRect(canvasMaxX, 0, width(), height(), QColor(30, 30, 30));
+    QRect canvasMaxRect;
+    const int cLeftFrames = mMaxCanvasFrame - minFrame + (mRange ? 0 : 1);
+    const qreal left = cLeftFrames*pixPerFrame + x0;
+    canvasMaxRect.setLeft(qMax(0, qRound(left)));
+    canvasMaxRect.setTop(0);
+    canvasMaxRect.setWidth(width());
+    canvasMaxRect.setBottom(height());
+    p.fillRect(canvasMaxRect, QColor(30, 30, 30));
 
     QColor col = mHandleColor;
     if(mPressed) {
         col.setHsv(col.hue(), col.saturation(), qMin(255, col.value() + 40));
     }
-
-    p.fillRect(QRectF((mFirstViewedFrame - minFrame)*pixPerFrame + x0, 0,
-                      mViewedFramesSpan*pixPerFrame, height()), col);
-
-//    p.fillRect(-MIN_WIDGET_HEIGHT/2, 0,
-//               MIN_WIDGET_HEIGHT/2, height(),
-//               QColor(30, 30, 30));
-//    p.fillRect(width() - 2*MIN_WIDGET_HEIGHT, 0,
-//               2*MIN_WIDGET_HEIGHT - MIN_WIDGET_HEIGHT/2, height(),
-//               QColor(30, 30, 30));
+    QRect handleRect;
+    const int hLeftFrames = mFirstViewedFrame - minFrame;
+    handleRect.setLeft(qRound(hLeftFrames*pixPerFrame + x0));
+    handleRect.setTop(0);
+    handleRect.setWidth(qRound(mViewedFramesSpan*pixPerFrame));
+    handleRect.setBottom(height());
+    p.fillRect(handleRect, col);
 
     if(mCurrentCanvas) {
         const int soundHeight = MIN_WIDGET_HEIGHT/3;
@@ -103,10 +109,10 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
         }
         divInc++;
     }
-    qreal inc = frameInc*pixPerFrame;
+    const qreal inc = frameInc*pixPerFrame;
 
-    int minMod = minFrame%frameInc;
-    qreal xL = (-minMod + (mRange ? 0. : 0.5) )*pixPerFrame;
+    const int minMod = minFrame%frameInc;
+    qreal xL = (-minMod + (mRange ? 0. : 0.5))*pixPerFrame + x0;
     int currentFrame = minFrame - minMod;
     if(!mRange) {
         while(xL < 70) {
@@ -115,38 +121,30 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
         }
     }
 
-    qreal halfHeight = height()*0.5;
-    qreal qorterHeight = height()*0.25;
-    qreal threeFourthsHeight = height()*0.75;
-    qreal fullHeight = height();
+    const qreal halfHeight = height()*0.5;
+    const qreal quarterHeight = height()*0.25;
+    const qreal threeFourthsHeight = height()*0.75;
     const qreal maxX = width() + MIN_WIDGET_HEIGHT;
     while(xL < maxX) {
-//        p.drawLine(QPointF(xL, 0.), QPointF(xL, qorterHeight - 2 ));
-        p.drawText(QRectF(xL - inc, qorterHeight, 2*inc, halfHeight),
+        p.drawText(QRectF(xL - inc, quarterHeight, 2*inc, halfHeight),
                    Qt::AlignCenter, QString::number(currentFrame));
         p.drawLine(QPointF(xL, threeFourthsHeight + 2),
-                   QPointF(xL, fullHeight ));
+                   QPointF(xL, height()));
         xL += inc;
         currentFrame += frameInc;
     }
 
-//    p.setPen(QPen(Qt::white, 2.));
-//    p.drawLine(1, 0, 1, fullHeight);
-
-    p.setPen(QPen(Qt::white, 1.));
+    p.setPen(QPen(Qt::white, 1));
     if(!mRange) {
-        p.drawText(QRectF(MIN_WIDGET_HEIGHT/2, 0,
-                          5*MIN_WIDGET_HEIGHT, fullHeight),
-                   Qt::AlignVCenter | Qt::AlignLeft,
+        const QRectF textRect(MIN_WIDGET_HEIGHT/2, 0,
+                              5*MIN_WIDGET_HEIGHT, height());
+        p.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft,
                    QString::number(mFirstViewedFrame));
     }
 
-    p.restore();
     p.setPen(QPen(Qt::black, 1));
     p.drawLine(0, height() - 1, width(), height() - 1);
-    if(mTopBorderVisible) {
-        p.drawLine(0, 0, width(), 0);
-    }
+    if(mTopBorderVisible) p.drawLine(0, 0, width(), 0);
 
     p.end();
 }
@@ -167,11 +165,8 @@ int AnimationWidgetScrollBar::getMinFrame() {
 void AnimationWidgetScrollBar::wheelEvent(QWheelEvent *event) {
     if(mRange) {
         int newFramesSpan = mViewedFramesSpan;
-        if(event->delta() > 0) {
-            newFramesSpan -= mSpanInc;
-        } else {
-            newFramesSpan += mSpanInc;
-        }
+        if(event->delta() > 0) newFramesSpan -= mSpanInc;
+        else newFramesSpan += mSpanInc;
         setFramesSpan(newFramesSpan);
     } else {
         if(event->delta() < 0) {
@@ -211,11 +206,11 @@ void AnimationWidgetScrollBar::mousePressEvent(QMouseEvent *event) {
         menu.addSeparator();
 
         QAction *timeAction = new QAction("Display Time", this);
-        timeAction->setEnabled(!mDisplayTime);
+        timeAction->setChecked(mDisplayTime);
         menu.addAction(timeAction);
 
         QAction *framesAction = new QAction("Display Frames", this);
-        framesAction->setEnabled(mDisplayTime);
+        framesAction->setChecked(!mDisplayTime);
         menu.addAction(framesAction);
 
         QAction* selectedAction = menu.exec(event->globalPos());

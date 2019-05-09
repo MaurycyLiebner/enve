@@ -21,7 +21,6 @@ public:
                               const int &rowHeight);
 
     int prp_getRelFrameShift() const;
-    int prp_getParentFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
@@ -52,6 +51,8 @@ public:
 
     SoundReaderForMerger * getSecondReader(const int& relSecondId,
                                            SoundMerger * const merger) {
+        const int maxSec = mCacheHandler->durationSec() - 1;
+        if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
         const auto reader = mCacheHandler->getSecondReader(relSecondId);
         if(!reader) return mCacheHandler->addSecondReader(relSecondId, merger);
         return reader;

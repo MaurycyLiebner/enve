@@ -82,8 +82,8 @@ void SoundComposition::unblockAll() {
 
 void SoundComposition::scheduleFrameRange(const FrameRange &range) {
     const qreal fps = mParent->getFps();
-    const int minSec = qFloor(range.fMin/fps);
-    const int maxSec = qCeil(range.fMax/fps);
+    const int minSec = qFloor((range.fMin + 1)/fps);
+    const int maxSec = qFloor((range.fMax + 1)/fps);
     for(int i = minSec; i <= maxSec; i++)
         scheduleSecond(i);
 }
@@ -111,6 +111,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
                                        samples});
             } else {
                 const auto reader = sound->getSecondReader(i, task.get());
+                if(!reader) continue;
                 reader->addSingleSound(sound->getSampleShift(),
                                        sound->absSampleRange());
             }
@@ -134,7 +135,7 @@ qint64 SoundComposition::readData(char *data, qint64 maxLen) {
     const SampleRange readSamples{static_cast<int>(mPos),
                                   static_cast<int>(mPos + maxLen/sizeof(float))};
     while(maxLen > total) {
-        const int secondId = mPos/SOUND_SAMPLERATE;
+        const int secondId = static_cast<int>(mPos/SOUND_SAMPLERATE);
         const auto cont = mSecondsCache.atRelFrame<SoundCacheContainer>(secondId);
         if(!cont) break;
         const auto contSampleRange = cont->getSamples()->fSampleRange;
