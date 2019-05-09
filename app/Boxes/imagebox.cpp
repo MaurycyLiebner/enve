@@ -23,8 +23,7 @@ void ImageBox::setFilePath(const QString &path) {
     if(mImgCacheHandler) {
         mImgCacheHandler->removeDependentBox(this);
     }
-    const auto handlerT = FileSourcesCache::getHandlerForFilePath(path);
-    mImgCacheHandler = GetAsPtr(handlerT, ImageCacheHandler);
+    mImgCacheHandler = FileSourcesCache::getHandlerForFilePath<ImageCacheHandler>(path);
 
     prp_setName(path.split("/").last());
     mImgCacheHandler->addDependentBox(this);

@@ -26,8 +26,8 @@ namespace FileSourcesCache {
             FileSourceListVisibleWidget *wid);
     void removeFileSourceListVisibleWidget(
             FileSourceListVisibleWidget *wid);
-    FileCacheHandler *getHandlerForFilePath(
-            const QString &filePath);
+    template<typename T>
+    T *getHandlerForFilePath(const QString &filePath);
     void clearAll();
     int getFileCacheListCount();
 
@@ -52,5 +52,25 @@ namespace FileSourcesCache {
         QList<stdsptr<FileCacheHandler>> mFileCacheHandlers;
     }
 };
+
+template<typename T>
+T *FileSourcesCache::getHandlerForFilePath(const QString &filePath) {
+    for(const auto &handler : mFileCacheHandlers) {
+        if(handler->getFilePath() == filePath) {
+            const auto handlerT = dynamic_cast<T*>(handler.get());
+            if(handlerT) return handlerT;
+        }
+    }
+    const auto handler = FileSourcesCache::createNewHandler<T>();
+    try {
+        handler->setFilePath(filePath);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+        const auto handlerSPtr = GetAsSPtr(handler, FileCacheHandler);
+        FileSourcesCache::removeHandler(handlerSPtr);
+        return nullptr;
+    }
+    return handler;
+}
 
 #endif // FILESOURCESCACHE_H

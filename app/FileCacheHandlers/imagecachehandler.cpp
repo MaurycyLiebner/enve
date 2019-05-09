@@ -1,9 +1,7 @@
 #include "imagecachehandler.h"
 #include "filecachehandler.h"
 
-ImageCacheHandler::ImageCacheHandler(const QString &filePath) {
-    setFilePath(filePath);
-}
+ImageCacheHandler::ImageCacheHandler() {}
 
 ImageLoader::ImageLoader(const QString &filePath,
                          ImageCacheHandler * const handler) :

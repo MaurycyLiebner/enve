@@ -25,45 +25,20 @@ void FileSourcesCache::addHandlerToHandlersList(
 }
 
 void FileSourcesCache::addHandlerToListWidgets(FileCacheHandler *handlerPtr) {
-    for(FileSourceListVisibleWidget *wid : mFileSourceListVisibleWidgets) {
+    for(const auto& wid : mFileSourceListVisibleWidgets) {
         wid->addCacheHandlerToList(handlerPtr);
     }
 }
 
-FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
-        const QString &filePath) {
-    for(const auto &handler : mFileCacheHandlers) {
-        if(handler->getFilePath() == filePath) {
-            return handler.get();
-        }
-    }
-    const QString ext = filePath.split(".").last();
-    FileCacheHandler * handler = nullptr;
-    if(isVideoExt(ext)) {
-        handler = FileSourcesCache::createNewHandler<VideoCacheHandler>();
-        try {
-            handler->setFilePath(filePath);
-        } catch(const std::exception& e) {
-            gPrintExceptionCritical(e);
-            const auto handlerSPtr = GetAsSPtr(handler, FileCacheHandler);
-            FileSourcesCache::removeHandler(handlerSPtr);
-            return nullptr;
-        }
-    } else if(isImageExt(ext)) {
-        handler = FileSourcesCache::createNewHandler<ImageCacheHandler>(filePath);
-    }
-    return handler;
-}
-
 void FileSourcesCache::removeHandler(const stdsptr<FileCacheHandler>& handler) {
     mFileCacheHandlers.removeOne(handler);
-    for(FileSourceListVisibleWidget *wid : mFileSourceListVisibleWidgets) {
+    for(const auto& wid : mFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handler.get());
     }
 }
 
 void FileSourcesCache::removeHandlerFromListWidgets(FileCacheHandler *handlerPtr) {
-    for(FileSourceListVisibleWidget *wid : mFileSourceListVisibleWidgets) {
+    for(const auto& wid : mFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handlerPtr);
     }
 }

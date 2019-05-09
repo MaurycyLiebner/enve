@@ -5,15 +5,9 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
         const QStringList &framePaths) {
     mFramePaths = framePaths;
     for(const QString &path : framePaths) {
-        auto imgCacheHandler = GetAsPtr(
-                FileSourcesCache::getHandlerForFilePath(path),
-                    ImageCacheHandler);
-        if(imgCacheHandler) {
-            mFrameImageHandlers << GetAsPtr(imgCacheHandler, ImageCacheHandler);
-        } else {
-            auto newHandler = FileSourcesCache::createNewHandler<ImageCacheHandler>(path);
-            mFrameImageHandlers << newHandler;
-        }
+        auto imgCacheHandler = FileSourcesCache::getHandlerForFilePath
+                <ImageCacheHandler>(path);
+        if(imgCacheHandler) mFrameImageHandlers << imgCacheHandler;
     }
     updateFrameCount();
 }

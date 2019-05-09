@@ -51,7 +51,7 @@ void VideoBox::setFilePath(const QString &path) {
     if(mSrcFramesCache) mSrcFramesCache->removeDependentBox(this);
     mSrcFramesCache.clear();
 
-    auto currentHandler = FileSourcesCache::getHandlerForFilePath(mSrcFilePath);
+    auto currentHandler = FileSourcesCache::getHandlerForFilePath<VideoCacheHandler>(mSrcFilePath);
     if(currentHandler) {
         mSrcFramesCache = GetAsPtr(currentHandler, AnimationCacheHandler);
         mSrcFramesCache->addDependentBox(this);

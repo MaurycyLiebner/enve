@@ -14,8 +14,7 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
         mSrcFramesCache->removeDependentBox(this);
     }
     mSrcFramesCache = FileSourcesCache::
-            createNewHandler<ImageSequenceCacheHandler>(
-                mListOfFrames);
+            createNewHandler<ImageSequenceCacheHandler>(mListOfFrames);
     mSrcFramesCache->addDependentBox(this);
 
     reloadCacheHandler();

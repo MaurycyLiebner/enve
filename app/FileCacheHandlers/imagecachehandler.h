@@ -21,7 +21,7 @@ class ImageCacheHandler : public FileCacheHandler {
     friend class StdSelfRef;
     friend class ImageLoader;
 protected:
-    ImageCacheHandler(const QString &filePath);
+    ImageCacheHandler();
 public:
     void clearCache() {
         mImage.reset();

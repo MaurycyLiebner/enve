@@ -6,6 +6,8 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QDrag>
+#include "FileCacheHandlers/videocachehandler.h"
+#include "FileCacheHandlers/imagecachehandler.h"
 
 FileSourceWidget::FileSourceWidget(FileSourceListVisibleWidget *parent) :
     QWidget(parent) {
@@ -43,7 +45,7 @@ void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
 
 
 void FileSourceWidget::paintEvent(QPaintEvent *) {
-    if(mTargetCache == nullptr || width() <= 2*MIN_WIDGET_HEIGHT) return;
+    if(!mTargetCache || width() <= 2*MIN_WIDGET_HEIGHT) return;
     QPainter p(this);
 
     QString wholeString = mTargetCache->getFilePath();
@@ -160,6 +162,8 @@ FileSourceListVisibleWidget::~FileSourceListVisibleWidget() {
 void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
     int firstVisibleId = mVisibleTop/MIN_WIDGET_HEIGHT;
 
+    for(const auto& wid : mSingleWidgets) wid->hide();
+
     int idP = 0;
     for(int i = firstVisibleId;
         i < mCacheList.count() &&
@@ -169,8 +173,6 @@ void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
         fsw->show();
         idP++;
     }
-
-    for(const auto& wid : mSingleWidgets) wid->hide();
 }
 
 QWidget *FileSourceListVisibleWidget::createNewSingleWidget() {
@@ -240,8 +242,10 @@ void FileSourceList::dropEvent(QDropEvent *event) {
             if(url.isLocalFile()) {
                 const QString urlStr = url.toLocalFile();
                 const QString ext = urlStr.split(".").last();
-                if(isVideoExt(ext) || isImageExt(ext)) {
-                    FileSourcesCache::getHandlerForFilePath(urlStr);
+                if(isVideoExt(ext)) {
+                    FileSourcesCache::getHandlerForFilePath<VideoCacheHandler>(urlStr);
+                } else if(isImageExt(ext)) {
+                    FileSourcesCache::getHandlerForFilePath<ImageCacheHandler>(urlStr);
                 }
             }
         }
