@@ -12,6 +12,15 @@ protected:
 
     Samples(float * const data, const SampleRange& range) :
         fData(data), fSampleRange(range) {}
+
+    Samples(const Samples * const src) :
+        Samples(src->fSampleRange) {
+        const auto bytes = static_cast<ulong>(fSampleRange.span())*sizeof(float);
+        memcpy(fData, src->fData, bytes);
+    }
+
+    Samples(const stdsptr<Samples>& src) :
+        Samples(src.get()) {}
 public:
     ~Samples() { delete[] fData; }
     float * const fData;

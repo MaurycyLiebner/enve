@@ -17,19 +17,74 @@ protected:
                   const QString& name);
 public:
     class Snapshot {
+        friend class Iterator;
         struct KeySnaphot {
             qreal fC0Frame;
             qreal fC0Value;
 
-            int fFrame;
+            qreal fFrame;
             qreal fValue;
 
             qreal fC1Frame;
             qreal fC1Value;
         };
     public:
+        class Iterator {
+            Iterator(const qreal& startFrame, const qreal& sampleStep) :
+                mSampleFrameStep(sampleStep) {
+                mInvFrameSpan = 1/sampleStep;
+                mPrevFrame = startFrame - sampleStep;
+                mNextFrame = startFrame;
+                mCurrentFrame = startFrame;
+                updateSamples();
+            }
+
+
+            qreal getValueAndProgress(const qreal& progress) {
+                if(mStaticValue) return mPrevValue;
+                const qreal fracNext = (mCurrentFrame - mPrevFrame)*mInvFrameSpan;
+                const qreal result = (mNextValue - mPrevValue)*fracNext + mPrevValue;
+                mCurrentFrame += progress;
+                if(mCurrentFrame > mNextFrame ||
+                   mCurrentFrame < mPrevFrame) updateSamples();
+                return result;
+            }
+        private:
+            void updateSamples() {
+                if(mSnapshot->mKeys.isEmpty()) {
+                    mPrevFrame = -TEN_MIL;
+                    mNextFrame = TEN_MIL;
+                    mPrevValue = mSnapshot->mCurrentValue;
+                    mNextValue = mPrevValue;
+                    mStaticValue = true;
+                } else {
+                    mPrevFrame += mSampleFrameStep;
+                    mNextFrame += mSampleFrameStep;
+                    mPrevValue = mSnapshot->getValue(mPrevFrame);
+                    mNextValue = mSnapshot->getValue(mNextFrame);
+                }
+            }
+
+            bool mStaticValue;
+            qreal mSampleFrameStep;
+            qreal mInvFrameSpan;
+            qreal mPrevFrame;
+            qreal mNextFrame;
+            qreal mPrevValue;
+            qreal mNextValue;
+            qreal mCurrentFrame;
+            const Snapshot * mSnapshot;
+        };
+
         Snapshot() {}
-        Snapshot(const qreal& currentValue) : mCurrentValue(currentValue) {}
+        Snapshot(const qreal& currentValue) :
+            Snapshot(currentValue, 1, 1) {}
+        Snapshot(const qreal& currentValue,
+                 const qreal& frameMultiplier,
+                 const qreal& valueMultiplier) :
+            mCurrentValue(currentValue),
+            mFrameMultiplier(frameMultiplier),
+            mValueMultiplier(valueMultiplier) {}
 
         void appendKey(const QrealKey * const key);
 
@@ -55,7 +110,7 @@ public:
             }
             return mCurrentValue;
         }
-    private:
+    protected:
         void getPrevAndNextKey(const qreal& relFrame,
                                KeySnaphot const *& prevKey,
                                KeySnaphot const *& nextKey) const {
@@ -90,8 +145,42 @@ public:
             return;
         }
 
+        void getPrevAndNextKeyId(const qreal& relFrame,
+                                 int & prevKey, int & nextKey) const {
+            getPrevAndNextKeyId(relFrame, prevKey, nextKey, 0, mKeys.count() - 1);
+        }
+
+        void getPrevAndNextKeyId(const qreal& relFrame,
+                                 int & prevKey, int & nextKey,
+                                 const int& minId, const int& maxId) const {
+            if(maxId < minId) return;
+            if(maxId - minId == 0) {
+                prevKey = minId;
+                return;
+            } else if(maxId - minId == 1) {
+                const auto minKey = &mKeys[minId];
+                const auto maxKey = &mKeys[maxId];
+                prevKey = maxKey->fFrame > relFrame ? minId : -1;
+                nextKey = minKey->fFrame < relFrame ? maxId : -1;
+                return;
+            }
+            const int guessId = (minId + maxId)/2;
+            const auto& guessKey = &mKeys[guessId];
+            if(guessKey->fFrame > relFrame) {
+                getPrevAndNextKeyId(relFrame, prevKey, nextKey, minId, guessId);
+                return;
+            } else if(guessKey->fFrame > relFrame) {
+                getPrevAndNextKeyId(relFrame, prevKey, nextKey, guessId, maxId);
+                return;
+            }
+            prevKey = guessId;
+            return;
+        }
         qreal mCurrentValue;
         QList<KeySnaphot> mKeys;
+
+        qreal mFrameMultiplier;
+        qreal mValueMultiplier;
     };
 
     bool SWT_isQrealAnimator() const { return true; }
@@ -129,7 +218,11 @@ protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
                                    qreal &minMoveValue, qreal &maxMoveValue) const;
 public:
-    Snapshot makeSnapshot() const;
+    Snapshot makeSnapshot(const qreal& frameMultiplier = 1,
+                          const qreal& valueMultiplier = 1) const;
+    Snapshot makeSnapshot(const int& minFrame, const int& maxFrame,
+                          const qreal& frameMultiplier = 1,
+                          const qreal& valueMultiplier = 1) const;
 
     void setPrefferedValueStep(const qreal &valueStep);
 

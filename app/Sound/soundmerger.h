@@ -3,11 +3,13 @@
 #include "updatable.h"
 #include "CacheHandlers/samples.h"
 #include "soundcomposition.h"
+#include "Animators/qrealanimator.h"
 
 struct SingleSoundData {
     int fSampleShift;
     SampleRange fSSAbsRange;
     stdsptr<Samples> fSamples;
+    QrealAnimator::Snapshot fVolume;
 };
 
 class SoundMerger : public ContainerTask {

@@ -108,7 +108,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
             if(samples) {
                 task->addSoundToMerge({sound->getSampleShift(),
                                        sound->absSampleRange(),
-                                       samples});
+                                       SPtrCreate(Samples)(samples)});
             } else {
                 const auto reader = sound->getSecondReader(i, task.get());
                 if(!reader) continue;
