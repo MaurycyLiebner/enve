@@ -30,18 +30,6 @@ public:
 
     void setFilePath(const QString &path);
 
-    int getStartAbsFrame() const;
-    int getSampleCount() const;
-    const float *getFinalData() const;
-    void prepareFinalData(const float &fps,
-                          const int &minAbsFrame,
-                          const int &maxAbsFrame);
-
-    void scheduleFinalDataUpdate();
-    void updateFinalDataIfNeeded(const qreal &fps,
-                                 const int &minAbsFrame,
-                                 const int &maxAbsFrame);
-
     void setDurationRect(const qsptr<FixedLenAnimationRect> &durRect);
     FixedLenAnimationRect *getDurationRect() const;
 
@@ -73,21 +61,9 @@ public:
 private:
     qreal getCanvasFPS() const;
     void updateAfterDurationRectangleShifted();
-
-    bool mFinalDataUpdateNeeded = false;
     bool mOwnDurationRectangle;
 
-    int mFinalAbsStartFrame = 0;
-    int mSrcSampleCount = 0;
-    int mFinalSampleCount = 0;
-
-    QString mPath;
-
-    stdsptr<SoundCacheHandler> mCacheHandler =
-            SPtrCreate(SoundCacheHandler)();
-
-    float *mSrcData = nullptr;
-    float *mFinalData = nullptr;
+    stdptr<SoundCacheHandler> mCacheHandler;
 
     qsptr<FixedLenAnimationRect> mDurationRectangle;
 

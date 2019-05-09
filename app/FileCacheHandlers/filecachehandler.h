@@ -24,9 +24,7 @@ public:
     void addDependentBox(BoundingBox * const dependent);
     void removeDependentBox(BoundingBox * const dependent);
 
-    bool isFileMissing() {
-        return mFileMissing;
-    }
+    bool isFileMissing() { return mFileMissing; }
 protected:
     bool mFileMissing = false;
     QList<qptr<BoundingBox>> mDependentBoxes;

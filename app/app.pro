@@ -199,7 +199,6 @@ SOURCES += main.cpp\
     PropertyUpdaters/animationboxframeupdater.cpp \
     PropertyUpdaters/particlesupdater.cpp \
     PropertyUpdaters/gradientpointsupdater.cpp \
-    PropertyUpdaters/singlesoundupdater.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
     PixmapEffects/rastereffects.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
@@ -407,7 +406,6 @@ HEADERS  += \
     PropertyUpdaters/animationboxframeupdater.h \
     PropertyUpdaters/particlesupdater.h \
     PropertyUpdaters/gradientpointsupdater.h \
-    PropertyUpdaters/singlesoundupdater.h \
     PropertyUpdaters/groupallpathsupdater.h \
     PixmapEffects/rastereffects.h \
     GUI/ColorWidgets/colorwidgetshaders.h \

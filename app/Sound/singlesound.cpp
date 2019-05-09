@@ -1,17 +1,13 @@
 #include "singlesound.h"
 #include "soundcomposition.h"
 #include "durationrectangle.h"
-#include "PropertyUpdaters/singlesoundupdater.h"
 #include "filesourcescache.h"
 #include "Decode/audiodecode.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     ComplexAnimator("sound") {
-    setDurationRect(durRect);
-
-    prp_setOwnUpdater(SPtrCreate(SingleSoundUpdater)(this));
-
+    setDurationRect(durRect);    
     ca_addChildAnimator(mVolumeAnimator);
 }
 
@@ -114,7 +110,7 @@ void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {
         mDurationRectangle = durRect;
     }
     connect(mDurationRectangle.get(), &DurationRectangle::rangeChanged,
-            this, &SingleSound::scheduleFinalDataUpdate);
+            this, &SingleSound::prp_afterWholeInfluenceRangeChanged);
     connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
             this, &SingleSound::updateAfterDurationRectangleShifted);
     mDurationRectangle->setSoundCacheHandler(&getCacheHandler());
@@ -123,100 +119,17 @@ void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {
 void SingleSound::updateAfterDurationRectangleShifted() {
     prp_afterFrameShiftChanged();
     anim_setAbsFrame(anim_getCurrentAbsFrame());
-    scheduleFinalDataUpdate();
-}
-
-void SingleSound::updateFinalDataIfNeeded(const qreal &fps,
-                                          const int &minAbsFrame,
-                                          const int &maxAbsFrame) {
-    if(mFinalDataUpdateNeeded) {
-        prepareFinalData(static_cast<float>(fps), minAbsFrame, maxAbsFrame);
-        mFinalDataUpdateNeeded = false;
-    }
-}
-
-void SingleSound::scheduleFinalDataUpdate() {
-    mFinalDataUpdateNeeded = true;
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void SingleSound::setFilePath(const QString &path) {
-    mPath = path;
-    mCacheHandler->setFilePath(path);
+    mCacheHandler = FileSourcesCache::getHandlerForFilePath
+            <SoundCacheHandler>(path);
     if(mOwnDurationRectangle) {
-        const int secs = mCacheHandler->durationSec();
+        const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
         const qreal fps = getCanvasFPS();
         const int frames = qCeil(secs*fps);
         mDurationRectangle->setAnimationFrameDuration(frames);
-    }
-}
-
-int SingleSound::getStartAbsFrame() const {
-    return mFinalAbsStartFrame;
-}
-
-int SingleSound::getSampleCount() const {
-    return mFinalSampleCount;
-}
-
-void SingleSound::prepareFinalData(const float &fps,
-                                   const int &minAbsFrame,
-                                   const int &maxAbsFrame) {
-    if(mFinalData) free(mFinalData);
-    if(!mSrcData) {
-        mFinalData = nullptr;
-        mFinalSampleCount = 0;
-    } else {
-        mFinalAbsStartFrame =
-            qMax(minAbsFrame,
-                   qMax(mDurationRectangle->getMinFrameAsAbsFrame(),
-                        mDurationRectangle->getMinAnimationFrameAsAbsFrame()) );
-        int finalMaxAbsFrame =
-            qMin(maxAbsFrame,
-                   qMin(mDurationRectangle->getMaxFrameAsAbsFrame(),
-                        mDurationRectangle->getMaxAnimationFrameAsAbsFrame()) );
-        qDebug() << "sound abs frame range:" << mFinalAbsStartFrame << finalMaxAbsFrame;
-        int finalMinRelFrame = prp_absFrameToRelFrame(mFinalAbsStartFrame);
-        int finalMaxRelFrame = prp_absFrameToRelFrame(finalMaxAbsFrame);
-        qDebug() << "sound rel frame range:" << finalMinRelFrame << finalMaxRelFrame;
-
-        int minSampleFromSrc = static_cast<int>(
-                    floor(finalMinRelFrame*SOUND_SAMPLERATE/fps));
-        int maxSamplePlayed = static_cast<int>(
-                    ceil(finalMaxRelFrame*SOUND_SAMPLERATE/fps));
-        int maxSampleFromSrc = std::min(mSrcSampleCount, maxSamplePlayed);
-
-
-        mFinalSampleCount = static_cast<int>(maxSampleFromSrc - minSampleFromSrc);
-        qDebug() << minSampleFromSrc << maxSampleFromSrc << mFinalSampleCount;
-        mFinalData = new float[static_cast<size_t>(mFinalSampleCount)];
-        if(mVolumeAnimator->anim_hasKeys()) {
-            int j = 0;
-            int frame = 0;
-            qreal volVal = mVolumeAnimator->getEffectiveValue(frame);
-            float lastFrameVol = static_cast<float>(volVal*0.01);
-            const float volStep = fps/SOUND_SAMPLERATE;
-            while(j < mFinalSampleCount) {
-                frame++;
-                float nextFrameVol = static_cast<float>(
-                        mVolumeAnimator->getEffectiveValue(frame)/100.);
-                float volDiff = (nextFrameVol - lastFrameVol);
-                float currVolFrac = lastFrameVol;
-                for(int i = 0;
-                    i < SOUND_SAMPLERATE/fps && j < mFinalSampleCount;
-                    i++, j++) {
-                    currVolFrac += volStep*volDiff;
-                    mFinalData[j] = static_cast<float>(mSrcData[j + minSampleFromSrc]*
-                                            currVolFrac);
-                }
-                lastFrameVol = nextFrameVol;
-            }
-        } else {
-            const float volFrac =
-                    static_cast<float>(mVolumeAnimator->getCurrentBaseValue()/100.);
-            for(int i = 0; i < mFinalSampleCount; i++) {
-                mFinalData[i] = mSrcData[i + minSampleFromSrc]*volFrac;
-            }
-        }
     }
 }
 
@@ -238,8 +151,4 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 FrameRange SingleSound::prp_relInfluenceRange() const {
     return mDurationRectangle->getAbsFrameRange();
-}
-
-const float *SingleSound::getFinalData() const {
-    return mFinalData;
 }

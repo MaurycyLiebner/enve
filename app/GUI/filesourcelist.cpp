@@ -56,16 +56,13 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     bool addDots = false;
     while(wholeWidth > width() - 1.5*MIN_WIDGET_HEIGHT) {
         addDots = true;
-        int guessLen =
-                (width() - 1.5*MIN_WIDGET_HEIGHT -
-                 p.fontMetrics().width("..."))*
-                wholeString.count()/wholeWidth;
+        const int dotsW = p.fontMetrics().width("...");
+        const int spaceForLetters = int(width() - 1.5*MIN_WIDGET_HEIGHT - dotsW);
+        const int guessLen = spaceForLetters*wholeString.count()/wholeWidth;
         wholeString = wholeString.right(guessLen);
         wholeWidth = p.fontMetrics().width("..." + wholeString);
     }
-    if(addDots) {
-        wholeString = "..." + wholeString;
-    }
+    if(addDots) wholeString = "..." + wholeString;
 
     if(mTargetCache->selected) {
         p.fillRect(QRect(0.5*MIN_WIDGET_HEIGHT, 0,
@@ -74,9 +71,7 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
                    QColor(180, 180, 180));
         p.setPen(Qt::black);
     }
-    if(mTargetCache->isFileMissing()) {
-        p.setPen(Qt::red);
-    }
+    if(mTargetCache->isFileMissing()) p.setPen(Qt::red);
 
     p.drawText(rect().adjusted(MIN_WIDGET_HEIGHT, 0,
                                -0.5*MIN_WIDGET_HEIGHT, 0),
