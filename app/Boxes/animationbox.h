@@ -38,8 +38,8 @@ public:
     void setParentGroup(BoxesGroup * const parent);
     bool shouldPlanScheduleUpdate();
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
 
     FixedLenAnimationRect *getAnimationDurationRect() const;
     void updateDurationRectangleAnimationRange();

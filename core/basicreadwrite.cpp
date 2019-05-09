@@ -4,14 +4,19 @@ QString gReadString(QIODevice *src) {
     QString result;
     uint nChars;
     src->read(rcChar(&nChars), sizeof(uint));
-    if(nChars == 0) {
-        result = "";
-    } else {
+    if(nChars == 0) result = "";
+    else {
         ushort * const chars = new ushort[nChars];
         src->read(rcChar(chars), nChars*sizeof(ushort));
         result = QString::fromUtf16(chars, static_cast<int>(nChars));
         delete[] chars;
     }
+    return result;
+}
+
+bool gReadBool(QIODevice * src) {
+    bool result;
+    gRead(src, result);
     return result;
 }
 

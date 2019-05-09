@@ -7,7 +7,7 @@
 
 SoundComposition::SoundComposition(Canvas * const parent) :
     QIODevice(parent), mParent(parent) {
-    connect(mSoundsAnimatorContainer.get(),
+    connect(mSoundsContainer.get(),
             &Property::prp_absFrameRangeChanged,
             this, &SoundComposition::frameRangeChanged);
 }
@@ -40,12 +40,12 @@ void SoundComposition::removeSound(const qsptr<SingleSound>& sound) {
 
 void SoundComposition::addSoundAnimator(const qsptr<SingleSound>& sound) {
     addSound(sound);
-    mSoundsAnimatorContainer->ca_addChildAnimator(sound);
+    mSoundsContainer->ca_addChildAnimator(sound);
 }
 
 void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
     if(mSounds.removeOne(sound)) {
-        mSoundsAnimatorContainer->ca_removeChildAnimator(sound);
+        mSoundsContainer->ca_removeChildAnimator(sound);
     }
 }
 
@@ -127,7 +127,7 @@ void SoundComposition::frameRangeChanged(const FrameRange &range) {
 }
 
 ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {
-    return mSoundsAnimatorContainer.get();
+    return mSoundsContainer.get();
 }
 
 qint64 SoundComposition::readData(char *data, qint64 maxLen) {
@@ -161,4 +161,24 @@ qint64 SoundComposition::writeData(const char *data, qint64 len) {
     Q_UNUSED(len);
 
     return 0;
+}
+
+#include "basicreadwrite.h"
+void SoundComposition::writeSounds(QIODevice * const target) const {
+    const int soundCount = mSoundsContainer->ca_getNumberOfChildren();
+    target->write(rcConstChar(&soundCount), sizeof(int));
+    for(int i = 0; i < soundCount; i++) {
+        const auto iSound = mSoundsContainer->ca_getChildAt<SingleSound>(i);
+        iSound->writeProperty(target);
+    }
+}
+
+void SoundComposition::readSounds(QIODevice * const target) {
+    int soundCount;
+    target->read(rcChar(&soundCount), sizeof(int));
+    for(int i = 0; i < soundCount; i++) {
+        const auto iSound = SPtrCreate(SingleSound)();
+        iSound->readProperty(target);
+        addSoundAnimator(iSound);
+    }
 }

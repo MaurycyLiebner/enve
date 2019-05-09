@@ -150,8 +150,8 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
         addPathEffect(SPtrCreate(DuplicatePathEffect)(false));
     });
 
-    pathEffectsMenu->addAction("Length Effect", [this]() {
-        addPathEffect(SPtrCreate(LengthPathEffect)(false));
+    pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
+        addPathEffect(SPtrCreate(SubPathEffect)(false));
     });
 
     pathEffectsMenu->addAction("Solidify Effect", [this]() {
@@ -193,8 +193,8 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
         addOutlinePathEffect(SPtrCreate(DuplicatePathEffect)(true));
     });
 
-    pathEffectsMenu->addAction("Length Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(LengthPathEffect)(true));
+    pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
+        addOutlinePathEffect(SPtrCreate(SubPathEffect)(true));
     });
 
     outlinePathEffectsMenu->addAction("Solidify Effect", [this]() {

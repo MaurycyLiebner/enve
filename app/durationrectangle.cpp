@@ -446,9 +446,7 @@ void FixedLenAnimationRect::setBindToAnimationFrameRange() {
 
 void FixedLenAnimationRect::setMinAnimationFrame(const int &minAnimationFrame) {
     mMinAnimationFrame = minAnimationFrame;
-    if(mBoundToAnimation) {
-        bindToAnimationFrameRange();
-    }
+    if(mBoundToAnimation) bindToAnimationFrameRange();
 }
 
 void FixedLenAnimationRect::setMaxAnimationFrame(const int &maxAnimationFrame) {
@@ -476,8 +474,6 @@ void FixedLenAnimationRect::changeFramePosBy(const int &change) {
     mMaxFrame.setMinPos(getMinFrame());
     mMaxFrame.changeFramePosByWithoutSignal(change);
     mMinFrame.setMaxPos(getMaxFrame());
-    if(mBoundToAnimation) {
-        bindToAnimationFrameRange();
-    }
+    if(mBoundToAnimation) bindToAnimationFrameRange();
     DurationRectangleMovable::changeFramePosBy(change);
 }

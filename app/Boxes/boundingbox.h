@@ -215,8 +215,8 @@ public:
     virtual void scheduleWaitingTasks();
     virtual void queScheduledTasks();
 
-    virtual void writeBoundingBox(QIODevice *target);
-    virtual void readBoundingBox(QIODevice *target);
+    virtual void writeBoundingBox(QIODevice * const target);
+    virtual void readBoundingBox(QIODevice * const target);
 
     virtual void setupEffectsF(const qreal &relFrame,
                                BoundingBoxRenderData * const data);

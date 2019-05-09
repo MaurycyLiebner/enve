@@ -12,8 +12,8 @@ public:
     void addActionsToMenu(BoxTypeMenu * const menu);
     SkPath getPathAtRelFrameF(const qreal &relFrame);
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
 
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;

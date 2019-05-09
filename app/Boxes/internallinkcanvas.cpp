@@ -8,12 +8,12 @@ InternalLinkCanvas::InternalLinkCanvas(BoxesGroup * const linkTarget) :
     ca_prependChildAnimator(mTransformAnimator.data(), mClipToCanvas);
 }
 
-void InternalLinkCanvas::writeBoundingBox(QIODevice *target) {
+void InternalLinkCanvas::writeBoundingBox(QIODevice * const target) {
     InternalLinkGroupBox::writeBoundingBox(target);
     mClipToCanvas->writeProperty(target);
 }
 
-void InternalLinkCanvas::readBoundingBox(QIODevice *target) {
+void InternalLinkCanvas::readBoundingBox(QIODevice * const target) {
     InternalLinkGroupBox::readBoundingBox(target);
     mClipToCanvas->readProperty(target);
 }

@@ -9,6 +9,7 @@ class BrushPolyline;
 class AutoTiledSurface;
 
 extern QString gReadString(QIODevice * src);
+extern bool gReadBool(QIODevice * src);
 
 extern bool gRead(QIODevice* src, QString& targetStr);
 extern bool gWrite(QIODevice* dst, const QString& strToWrite);

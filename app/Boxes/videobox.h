@@ -20,8 +20,8 @@ public:
     bool SWT_isVideoBox() const { return true; }
     void changeSourceFile(QWidget* dialogParent);
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
 
     void setFilePath(const QString &path);
 private:

@@ -16,11 +16,11 @@ InternalLinkGroupBox::~InternalLinkGroupBox() {
     setLinkTarget(nullptr);
 }
 
-void InternalLinkGroupBox::writeBoundingBox(QIODevice *target) {
+void InternalLinkGroupBox::writeBoundingBox(QIODevice * const target) {
     mBoxTarget->writeProperty(target);
 }
 
-void InternalLinkGroupBox::readBoundingBox(QIODevice *target) {
+void InternalLinkGroupBox::readBoundingBox(QIODevice * const target) {
     mBoxTarget->readProperty(target);
 }
 

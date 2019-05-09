@@ -17,8 +17,8 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
                 "Displace", menu, adder, outline);
     addPathEffectActionToMenu<DuplicatePathEffect>(
                 "Duplicate", menu, adder, outline);
-    addPathEffectActionToMenu<LengthPathEffect>(
-                "Length", menu, adder, outline);
+    addPathEffectActionToMenu<SubPathEffect>(
+                "Sub-Path", menu, adder, outline);
     addPathEffectActionToMenu<SolidifyPathEffect>(
                 "Solidify", menu, adder, outline);
     addPathEffectActionToMenu<OperationPathEffect>(

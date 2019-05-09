@@ -123,8 +123,9 @@ void SingleSound::updateAfterDurationRectangleShifted() {
 }
 
 void SingleSound::setFilePath(const QString &path) {
-    mCacheHandler = FileSourcesCache::getHandlerForFilePath
-            <SoundCacheHandler>(path);
+    if(path.isEmpty()) mCacheHandler.clear();
+    else mCacheHandler = FileSourcesCache::getHandlerForFilePath
+                <SoundCacheHandler>(path);
     if(mOwnDurationRectangle) {
         const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
         const qreal fps = getCanvasFPS();
@@ -151,4 +152,18 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 FrameRange SingleSound::prp_relInfluenceRange() const {
     return mDurationRectangle->getAbsFrameRange();
+}
+
+#include "basicreadwrite.h"
+void SingleSound::writeProperty(QIODevice * const target) const {
+    const auto filePath = mCacheHandler ? mCacheHandler->getFilePath() : "";
+    gWrite(target, filePath);
+    mVolumeAnimator->writeProperty(target);
+    mDurationRectangle->writeDurationRectangle(target);
+}
+
+void SingleSound::readProperty(QIODevice * const target) {
+    const QString filePath = gReadString(target);
+    mVolumeAnimator->readProperty(target);
+    mDurationRectangle->readDurationRectangle(target);
 }

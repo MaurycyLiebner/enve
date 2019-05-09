@@ -26,8 +26,8 @@ public:
                          BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
 
     void addActionsToMenu(BoxTypeMenu * const menu);
 

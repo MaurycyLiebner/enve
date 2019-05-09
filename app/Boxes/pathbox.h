@@ -112,8 +112,8 @@ public:
     virtual SkPath getPathAtRelFrameF(const qreal &relFrame) = 0;
     void setParentGroup(BoxesGroup * const parent);
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
     void addPathEffect(const qsptr<PathEffect> &effect);
     void addFillPathEffect(const qsptr<PathEffect> &effect);
     void addOutlinePathEffect(const qsptr<PathEffect> &effect);

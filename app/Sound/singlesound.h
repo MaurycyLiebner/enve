@@ -28,6 +28,9 @@ public:
 
     FrameRange prp_relInfluenceRange() const;
 
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice * const target);
+
     void setFilePath(const QString &path);
 
     void setDurationRect(const qsptr<FixedLenAnimationRect> &durRect);

@@ -41,6 +41,7 @@
 #include "basicreadwrite.h"
 #include "Boxes/internallinkcanvas.h"
 #include "Boxes/smartvectorpath.h"
+#include "Sound/singlesound.h"
 
 #define FORMAT_STR "AniVect av"
 #define CREATOR_VERSION "0.0a"
@@ -564,7 +565,7 @@ void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
     setMaxAnimationFrame(maxFrame);
 }
 
-void BoundingBox::writeBoundingBox(QIODevice *target) {
+void BoundingBox::writeBoundingBox(QIODevice * const target) {
     if(mWriteId < 0) assignWriteId();
 
     target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
@@ -583,7 +584,7 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
     mEffectsAnimators->writeProperty(target);
 }
 
-void BoundingBox::readBoundingBox(QIODevice *target) {
+void BoundingBox::readBoundingBox(QIODevice * const target) {
     gRead(target, prp_mName);
     target->read(rcChar(&mReadId), sizeof(int));
     target->read(rcChar(&mVisible), sizeof(bool));
@@ -775,7 +776,7 @@ void PathEffectAnimators::readProperty(QIODevice *target) {
     }
 }
 
-void PathBox::writeBoundingBox(QIODevice *target) {
+void PathBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     mPathEffectsAnimators->writeProperty(target);
     mFillPathEffectsAnimators->writeProperty(target);
@@ -786,7 +787,7 @@ void PathBox::writeBoundingBox(QIODevice *target) {
     mStrokeSettings->writeProperty(target);
 }
 
-void PathBox::readBoundingBox(QIODevice *target) {
+void PathBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     mPathEffectsAnimators->readProperty(target);
     mFillPathEffectsAnimators->readProperty(target);
@@ -797,11 +798,11 @@ void PathBox::readBoundingBox(QIODevice *target) {
     mStrokeSettings->readProperty(target);
 }
 #include "Animators/SmartPath/smartpathcollection.h"
-void SmartVectorPath::writeBoundingBox(QIODevice *target) {
+void SmartVectorPath::writeBoundingBox(QIODevice * const target) {
     PathBox::writeBoundingBox(target);
     mPathAnimator->writeProperty(target);
 }
-void SmartVectorPath::readBoundingBox(QIODevice *target) {
+void SmartVectorPath::readBoundingBox(QIODevice * const target) {
     PathBox::readBoundingBox(target);
     mPathAnimator->readProperty(target);
 }
@@ -850,7 +851,7 @@ void ParticleEmitter::readProperty(QIODevice *target) {
     mParticlesOpacityDecay->readProperty(target);
 }
 
-void ParticleBox::writeBoundingBox(QIODevice *target) {
+void ParticleBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     mTopLeftAnimator->writeProperty(target);
     mBottomRightAnimator->writeProperty(target);
@@ -861,7 +862,7 @@ void ParticleBox::writeBoundingBox(QIODevice *target) {
     }
 }
 
-void ParticleBox::readBoundingBox(QIODevice *target) {
+void ParticleBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     mTopLeftAnimator->readProperty(target);
     mBottomRightAnimator->readProperty(target);
@@ -874,71 +875,79 @@ void ParticleBox::readBoundingBox(QIODevice *target) {
     }
 }
 
-void ImageBox::writeBoundingBox(QIODevice *target) {
+void ImageBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     gWrite(target, mImageFilePath);
 }
 
-void ImageBox::readBoundingBox(QIODevice *target) {
+void ImageBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     QString path;
     gRead(target, path);
     setFilePath(path);
 }
 
-void Circle::writeBoundingBox(QIODevice *target) {
+void Circle::writeBoundingBox(QIODevice * const target) {
     PathBox::writeBoundingBox(target);
     mHorizontalRadiusAnimator->writeProperty(target);
     mVerticalRadiusAnimator->writeProperty(target);
 }
 
-void Circle::readBoundingBox(QIODevice *target) {
+void Circle::readBoundingBox(QIODevice * const target) {
     PathBox::readBoundingBox(target);
     mHorizontalRadiusAnimator->readProperty(target);
     mVerticalRadiusAnimator->readProperty(target);
 }
 
-void Rectangle::writeBoundingBox(QIODevice *target) {
+void Rectangle::writeBoundingBox(QIODevice * const target) {
     PathBox::writeBoundingBox(target);
     mRadiusAnimator->writeProperty(target);
     mTopLeftAnimator->writeProperty(target);
     mBottomRightAnimator->writeProperty(target);
 }
 
-void Rectangle::readBoundingBox(QIODevice *target) {
+void Rectangle::readBoundingBox(QIODevice * const target) {
     PathBox::readBoundingBox(target);
     mRadiusAnimator->readProperty(target);
     mTopLeftAnimator->readProperty(target);
     mBottomRightAnimator->readProperty(target);
 }
 
-void VideoBox::writeBoundingBox(QIODevice *target) {
+void VideoBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     gWrite(target, mSrcFilePath);
+    const bool hasSound = mSound;
+    gWrite(target, hasSound);
+    if(hasSound) mSound->writeProperty(target);
 }
 
-void VideoBox::readBoundingBox(QIODevice *target) {
+void VideoBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     QString path;
     gRead(target, path);
     setFilePath(path);
+//    const bool hasSound = gReadBool(target);
+//    if(hasSound) {
+//        if(!mSound) mSound = SPtrCreate(SingleSound)();
+//        mSound->readProperty(target);
+//    }
 }
 
-void PaintBox::writeBoundingBox(QIODevice *target) {
+void PaintBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
 }
 
-void PaintBox::readBoundingBox(QIODevice *target) {
+void PaintBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
 }
 
-void AnimationBox::writeBoundingBox(QIODevice *target) {
+void AnimationBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     target->write(rcConstChar(&mFrameRemappingEnabled), sizeof(bool));
     mFrameAnimator->writeProperty(target);
 }
 
-void AnimationBox::readBoundingBox(QIODevice *target) {
+void AnimationBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     bool frameRemapping;
     target->read(rcChar(&frameRemapping), sizeof(bool));
@@ -947,7 +956,7 @@ void AnimationBox::readBoundingBox(QIODevice *target) {
     else disableFrameRemapping();
 }
 
-void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
+void ImageSequenceBox::writeBoundingBox(QIODevice * const target) {
     AnimationBox::writeBoundingBox(target);
     int nFrames = mListOfFrames.count();
     target->write(rcConstChar(&nFrames), sizeof(int));
@@ -956,7 +965,7 @@ void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
     }
 }
 
-void ImageSequenceBox::readBoundingBox(QIODevice *target) {
+void ImageSequenceBox::readBoundingBox(QIODevice * const target) {
     AnimationBox::readBoundingBox(target);
     int nFrames;
     target->read(rcChar(&nFrames), sizeof(int));
@@ -967,7 +976,7 @@ void ImageSequenceBox::readBoundingBox(QIODevice *target) {
     setListOfFrames(frames);
 }
 
-void TextBox::writeBoundingBox(QIODevice *target) {
+void TextBox::writeBoundingBox(QIODevice * const target) {
     PathBox::writeBoundingBox(target);
     mText->writeProperty(target);
     target->write(rcConstChar(&mAlignment), sizeof(Qt::Alignment));
@@ -979,7 +988,7 @@ void TextBox::writeBoundingBox(QIODevice *target) {
     gWrite(target, fontStyle);
 }
 
-void TextBox::readBoundingBox(QIODevice *target) {
+void TextBox::readBoundingBox(QIODevice * const target) {
     PathBox::readBoundingBox(target);
     mText->readProperty(target);
     target->read(rcChar(&mAlignment), sizeof(Qt::Alignment));
@@ -994,7 +1003,7 @@ void TextBox::readBoundingBox(QIODevice *target) {
     mFont.setStyleName(fontStyle);
 }
 
-void BoxesGroup::writeBoundingBox(QIODevice *target) {
+void BoxesGroup::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     mPathEffectsAnimators->writeProperty(target);
     mFillPathEffectsAnimators->writeProperty(target);
@@ -1052,7 +1061,7 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
     }
 }
 
-void BoxesGroup::readBoundingBox(QIODevice *target) {
+void BoxesGroup::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     mPathEffectsAnimators->readProperty(target);
     mFillPathEffectsAnimators->readProperty(target);
@@ -1060,7 +1069,7 @@ void BoxesGroup::readBoundingBox(QIODevice *target) {
     readChildBoxes(target);
 }
 
-void Canvas::writeBoundingBox(QIODevice *target) {
+void Canvas::writeBoundingBox(QIODevice * const target) {
     BoxesGroup::writeBoundingBox(target);
     const int currFrame = getCurrentFrame();
     target->write(rcConstChar(&currFrame), sizeof(int));
@@ -1072,9 +1081,10 @@ void Canvas::writeBoundingBox(QIODevice *target) {
     target->write(rcConstChar(&mMaxFrame), sizeof(int));
     target->write(rcConstChar(&mCanvasTransform),
                   sizeof(QMatrix));
+    mSoundComposition->writeSounds(target);
 }
 
-void Canvas::readBoundingBox(QIODevice *target) {
+void Canvas::readBoundingBox(QIODevice * const target) {
     target->read(rcChar(&mType), sizeof(BoundingBoxType));
     BoxesGroup::readBoundingBox(target);
     int currFrame;
@@ -1089,6 +1099,7 @@ void Canvas::readBoundingBox(QIODevice *target) {
     mVisibleHeight = mCanvasTransform.m22()*mHeight;
     mVisibleWidth = mCanvasTransform.m11()*mWidth;
     anim_setAbsFrame(currFrame);
+    //mSoundComposition->readSounds(target);
 }
 
 void GradientWidget::writeGradients(QIODevice *target) {

@@ -32,6 +32,10 @@ public:
     qint64 readData(char *data, qint64 maxLen);
     qint64 writeData(const char *data, qint64 len);
 
+    void writeSounds(QIODevice * const target) const;
+
+    void readSounds(QIODevice * const target);
+
     void addSound(const qsptr<SingleSound> &sound);
     void removeSound(const qsptr<SingleSound> &sound);
 
@@ -65,7 +69,7 @@ private:
     QList<int> mProcessingSeconds;
     const Canvas * const mParent;
     qint64 mPos;
-    qsptr<ComplexAnimator> mSoundsAnimatorContainer =
+    qsptr<ComplexAnimator> mSoundsContainer =
             SPtrCreate(ComplexAnimator)("sounds");
     QList<qsptr<SingleSound>> mSounds;
     HDDCachableCacheHandler mSecondsCache;

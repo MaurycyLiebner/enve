@@ -86,8 +86,8 @@ public:
     void scheduleWaitingTasks();
     void queScheduledTasks();
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
 
     void prp_afterFrameShiftChanged();
     void shiftAll(const int &shift);

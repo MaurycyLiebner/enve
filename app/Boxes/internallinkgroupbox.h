@@ -12,8 +12,8 @@ public:
     ~InternalLinkGroupBox();
     bool SWT_isLinkBox() const;
 
-    void writeBoundingBox(QIODevice *target);
-    void readBoundingBox(QIODevice *target);
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
     //bool relPointInsidePath(const QPointF &relPos);
     QPointF getRelCenterPosition();
 
