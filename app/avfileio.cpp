@@ -926,11 +926,11 @@ void VideoBox::readBoundingBox(QIODevice * const target) {
     QString path;
     gRead(target, path);
     setFilePath(path);
-//    const bool hasSound = gReadBool(target);
-//    if(hasSound) {
-//        if(!mSound) mSound = SPtrCreate(SingleSound)();
-//        mSound->readProperty(target);
-//    }
+    const bool hasSound = gReadBool(target);
+    if(hasSound) {
+        if(!mSound) mSound = SPtrCreate(SingleSound)();
+        mSound->readProperty(target);
+    }
 }
 
 void PaintBox::writeBoundingBox(QIODevice * const target) {
@@ -1099,7 +1099,7 @@ void Canvas::readBoundingBox(QIODevice * const target) {
     mVisibleHeight = mCanvasTransform.m22()*mHeight;
     mVisibleWidth = mCanvasTransform.m11()*mWidth;
     anim_setAbsFrame(currFrame);
-    //mSoundComposition->readSounds(target);
+    mSoundComposition->readSounds(target);
 }
 
 void GradientWidget::writeGradients(QIODevice *target) {

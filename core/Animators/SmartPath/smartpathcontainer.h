@@ -224,12 +224,6 @@ public:
         mNodesList = src;
     }
 
-    static bool sDifferent(const SmartPath& path1,
-                           const SmartPath& path2) {
-        return NodeList::sDifferent(path1.getNodesRef(),
-                                    path2.getNodesRef());
-    }
-
     static void sInterpolate(const SmartPath &path1,
                              const SmartPath &path2,
                              const qreal &path2Weight,

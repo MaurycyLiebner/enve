@@ -136,7 +136,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
 
     p.setPen(QPen(Qt::white, 1));
     if(!mRange) {
-        const QRectF textRect(MIN_WIDGET_HEIGHT/2, 0,
+        const QRectF textRect(MIN_WIDGET_HEIGHT, 0,
                               5*MIN_WIDGET_HEIGHT, height());
         p.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft,
                    QString::number(mFirstViewedFrame));

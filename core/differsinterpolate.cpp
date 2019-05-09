@@ -27,7 +27,7 @@ void gInterpolate(const qCubicSegment1D &val1,
 }
 
 bool gDiffers(const SmartPath &path1, const SmartPath &path2) {
-    return SmartPath::sDifferent(path1, path2);
+    return &path1 != &path2;
 }
 
 void gInterpolate(const SmartPath &path1, const SmartPath &path2,
