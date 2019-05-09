@@ -43,6 +43,10 @@ public:
         if(!mAudioStreamsData) return 0;
         return mAudioStreamsData->fDurationSec;
     }
+
+    const HDDCachableCacheHandler& getCacheHandler() const {
+        return mSecondsCache;
+    }
 protected:
     void removeSecondReader(const int& second) {
         const int id = mSecondsBeingRead.indexOf(second);

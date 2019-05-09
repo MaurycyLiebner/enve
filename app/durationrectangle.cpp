@@ -148,6 +148,7 @@ int DurationRectangle::getMaxFrameAsAbsFrame() const {
 
 void DurationRectangle::draw(QPainter * const p,
                              const QRect& drawRect,
+                             const qreal& fps,
                              const qreal &pixelsPerFrame,
                              const FrameRange &absFrameRange) {
     p->save();
@@ -163,10 +164,28 @@ void DurationRectangle::draw(QPainter * const p,
                         qCeil(drawFrameSpan*pixelsPerFrame),
                         drawRect.height());
 
-    if(mCacheHandler)
-        mCacheHandler->drawCacheOnTimeline(p, drawRect,
-                                           absFrameRange.fMin - mFramePos,
-                                           absFrameRange.fMax - mFramePos);
+    const int rectStartFrame = absFrameRange.fMin - mFramePos;
+    const int rectEndFrame = absFrameRange.fMax - mFramePos;
+    if(mRasterCacheHandler && mSoundCacheHandler) {
+        const int soundHeight = drawRect.height()/3;
+        const int rasterHeight = drawRect.height() - soundHeight;
+        const QRect rasterRect(0, 0, drawRect.width(), rasterHeight);
+        mRasterCacheHandler->drawCacheOnTimeline(p, rasterRect,
+                                                 rectStartFrame,
+                                                 rectEndFrame);
+        const QRect soundRect(0, rasterHeight, drawRect.width(), soundHeight);
+        mSoundCacheHandler->drawCacheOnTimeline(p, soundRect,
+                                                rectStartFrame,
+                                                rectEndFrame, fps);
+    } else if(mRasterCacheHandler) {
+        mRasterCacheHandler->drawCacheOnTimeline(p, drawRect,
+                                                 rectStartFrame,
+                                                 rectEndFrame);
+    } else if(mSoundCacheHandler) {
+        mSoundCacheHandler->drawCacheOnTimeline(p, drawRect,
+                                                rectStartFrame,
+                                                rectEndFrame, fps);
+    }
 
     QColor fillColor;
     if(isSelected()) fillColor = QColor(50, 50, 255, 120);
@@ -195,8 +214,8 @@ DurationRectangleMovable *DurationRectangle::getMovableAt(
                                           const int &pressX,
                                           const qreal &pixelsPerFrame,
                                           const int &minViewedFrame) {
-    qreal startX = (getMinFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
-    qreal endX = (getMaxFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
+    const qreal startX = (getMinFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
+    const qreal endX = (getMaxFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
     if(qAbs(pressX - startX) < 5) return &mMinFrame;
     else if(qAbs(pressX - endX) < 5) return &mMaxFrame;
     else if(pressX > startX && pressX < endX) return this;
@@ -243,13 +262,13 @@ void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
 
     if(dialog) {
         if(dialog->result() == QDialog::Accepted) {
-            int newMinFrame = getMinFrame();
-            int newMaxFrame = getMaxFrame();
+            const int newMinFrame = getMinFrame();
+            const int newMaxFrame = getMaxFrame();
 
-            int minMinFrame = qMin(oldMinFrame, newMinFrame);
-            int maxMinFrame = qMax(oldMinFrame, newMinFrame);
-            int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
-            int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
+            const int minMinFrame = qMin(oldMinFrame, newMinFrame);
+            const int maxMinFrame = qMax(oldMinFrame, newMinFrame);
+            const int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
+            const int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
             mChildProperty->prp_afterChangedRelRange(
                                     {minMinFrame, maxMinFrame});
             mChildProperty->prp_afterChangedRelRange(
@@ -332,6 +351,7 @@ int AnimationRect::getAnimationFrameDuration() {
 
 void AnimationRect::draw(QPainter * const p,
                          const QRect& drawRect,
+                         const qreal &fps,
                          const qreal &pixelsPerFrame,
                          const FrameRange &absFrameRange) {
     p->save();
@@ -346,7 +366,7 @@ void AnimationRect::draw(QPainter * const p,
 
     p->fillRect(animDurRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
 
-    DurationRectangle::draw(p, drawRect, pixelsPerFrame, absFrameRange);
+    DurationRectangle::draw(p, drawRect, fps, pixelsPerFrame, absFrameRange);
     p->restore();
 }
 

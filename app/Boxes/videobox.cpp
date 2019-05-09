@@ -56,10 +56,10 @@ void VideoBox::setFilePath(const QString &path) {
         mSrcFramesCache = GetAsPtr(currentHandler, AnimationCacheHandler);
         mSrcFramesCache->addDependentBox(this);
         const auto videoHandler = GetAsPtr(currentHandler, VideoCacheHandler);
-        getAnimationDurationRect()->setCacheHandler(
+        getAnimationDurationRect()->setRasterCacheHandler(
                     &videoHandler->getCacheHandler());
     } else {
-        getAnimationDurationRect()->setCacheHandler(nullptr);
+        getAnimationDurationRect()->setRasterCacheHandler(nullptr);
 
     }
 
@@ -96,6 +96,7 @@ bool hasSound(const char* path) {
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
         if(mSound) { // !!!
+            mSound->setFilePath(mSrcFilePath);
         } else {
             const auto flar = GetAsSPtr(mDurationRectangle,
                                         FixedLenAnimationRect);
@@ -107,5 +108,10 @@ void VideoBox::reloadSound() {
                 parentCanvas->getSoundComposition()->addSound(mSound);
             }
         }
+        mDurationRectangle->setSoundCacheHandler(
+                    &mSound->getCacheHandler());
+    } else {
+        mSound.reset();
+        mDurationRectangle->setSoundCacheHandler(nullptr);
     }
 }

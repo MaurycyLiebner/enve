@@ -65,6 +65,10 @@ public:
     SampleRange relSampleRange() const;
     SampleRange absSampleRange() const;
     iValueRange absSecondToRelSeconds(const int& absSecond);
+
+    const HDDCachableCacheHandler& getCacheHandler() const {
+        return mCacheHandler->getCacheHandler();
+    }
 private:
     qreal getCanvasFPS() const;
     void updateAfterDurationRectangleShifted();

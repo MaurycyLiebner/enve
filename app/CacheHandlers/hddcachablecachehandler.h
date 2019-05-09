@@ -85,7 +85,8 @@ public:
     void drawCacheOnTimeline(QPainter * const p,
                              const QRect drawRect,
                              const int &startFrame,
-                             const int &endFrame) const;
+                             const int &endFrame,
+                             const qreal &unit = 1) const;
 
     void clearRelRange(const FrameRange& range);
 

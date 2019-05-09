@@ -139,6 +139,7 @@ public:
 
     virtual void draw(QPainter * const p,
                       const QRect &drawRect,
+                      const qreal &fps,
                       const qreal &pixelsPerFrame,
                       const FrameRange &absFrameRange);
 
@@ -164,8 +165,12 @@ public:
     void finishMaxFramePosTransform();
     void startMaxFramePosTransform();
 
-    void setCacheHandler(const HDDCachableCacheHandler * const handler) {
-        mCacheHandler = handler;
+    void setRasterCacheHandler(const HDDCachableCacheHandler * const handler) {
+        mRasterCacheHandler = handler;
+    }
+
+    void setSoundCacheHandler(const HDDCachableCacheHandler * const handler) {
+        mSoundCacheHandler = handler;
     }
 
     virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
@@ -175,7 +180,8 @@ signals:
     void rangeChanged();
     void finishedRangeChange();
 protected:
-    const HDDCachableCacheHandler * mCacheHandler = nullptr;
+    const HDDCachableCacheHandler * mRasterCacheHandler = nullptr;
+    const HDDCachableCacheHandler * mSoundCacheHandler = nullptr;
     DurationRectangleMovable mMinFrame;
     DurationRectangleMovable mMaxFrame;
 };
@@ -189,6 +195,7 @@ public:
 
     void draw(QPainter * const p,
               const QRect &drawRect,
+              const qreal &fps,
               const qreal &pixelsPerFrame,
               const FrameRange &absFrameRange);
 

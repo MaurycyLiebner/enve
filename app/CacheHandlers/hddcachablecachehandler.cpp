@@ -15,7 +15,7 @@ int HDDCachableCacheHandler::insertIdForRelFrame(
         const auto& cont = mRenderContainers.at(guess);
         const int contFrame = cont->getRangeMin();
         if(contFrame == relFrame)
-            RuntimeThrow("Frame already occupied by different container");
+            return guess;
         if(contFrame > relFrame) {
             if(guess == maxId) return minId;
             maxId = guess;
@@ -137,29 +137,40 @@ int HDDCachableCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
     }
     return id;
 }
-
+#include "pointhelpers.h"
 void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
-                                            const QRect drawRect,
-                                            const int &startFrame,
-                                            const int &endFrame) const {
+                                                  const QRect drawRect,
+                                                  const int &startFrame,
+                                                  const int &endFrame,
+                                                  const qreal& unit) const {
     if(startFrame > endFrame) return;
+    p->save();
+    const qreal quStartFrame = startFrame/unit;
+    const qreal quEndFrame = endFrame/unit;
+    const int uStartFrame = isInteger4Dec(quStartFrame) ?
+                qRound(quStartFrame): qFloor(quStartFrame);
+    const int uEndFrame = isInteger4Dec(quEndFrame) ?
+                qRound(quEndFrame): qCeil(quEndFrame);
+    const qreal pixelsPerFrame = drawRect.width()*unit/
+            (endFrame - startFrame + 1);
+    if(!isOne4Dec(unit))
+        p->translate((uStartFrame - quStartFrame)*pixelsPerFrame, 0);
+
     p->setBrush(QColor(0, 255, 0, 75));
     p->setPen(Qt::NoPen);
-    const qreal pixelsPerFrame = static_cast<qreal>(drawRect.width())/
-            (endFrame - startFrame + 1);
-    int lastDrawnFrame = startFrame;
+
+    int lastDrawnFrame = uStartFrame;
     int lastDrawX = 0;
     bool lastStoresInMemory = true;
-    for(const auto &cont : mRenderContainers) {
-        int afterMaxFrame = cont->getRangeMax() + 1;
-        if(afterMaxFrame < startFrame) continue;
-        int minFrame = cont->getRangeMin();
-        if(minFrame > endFrame + 1) return;
+    const int iMin = qMax(0, insertIdForRelFrame(uStartFrame) - 1);
+    for(int i = iMin; i < mRenderContainers.count(); i++) {
+        const auto &cont  = mRenderContainers.at(i);
+        const int afterMaxFrame = qMin(uEndFrame + 1, cont->getRangeMax() + 1);
+        if(afterMaxFrame < uStartFrame) continue;
+        const int minFrame = qMax(uStartFrame - 1, cont->getRangeMin());
+        if(minFrame > uEndFrame + 1) break;
 
-        if(afterMaxFrame > endFrame) afterMaxFrame = endFrame + 1;
-        if(minFrame < startFrame) minFrame = startFrame;
-
-        const int dFrame = minFrame - startFrame;
+        const int dFrame = minFrame - uStartFrame;
         int xT = qRound(dFrame*pixelsPerFrame);
 
         int widthT = qRound(pixelsPerFrame*(afterMaxFrame - minFrame));
@@ -181,6 +192,7 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
         lastDrawnFrame = afterMaxFrame;
         lastDrawX = xT + widthT;
     }
+    p->restore();
 }
 
 void HDDCachableCacheHandler::clearRelRange(const FrameRange &range) {

@@ -47,7 +47,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     if(!mRange) dFrame++;
     const qreal pixPerFrame =
             static_cast<qreal>(width() - 2*MIN_WIDGET_HEIGHT)/dFrame;
-    p.translate(MIN_WIDGET_HEIGHT/2, 0.);
+    p.translate(MIN_WIDGET_HEIGHT/2, 0);
 
     const int canvasMinX = (mMinCanvasFrame - mMinFrame)*pixPerFrame;
     const int canvasMaxX = (mMaxCanvasFrame - mMinFrame +
@@ -94,8 +94,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
                               soundHeight);
         const auto& soundCache = mCurrentCanvas->getSoundCacheHandler();
         soundCache.drawCacheOnTimeline(&p, soundRect,
-                                       qFloor(mMinFrame/fps),
-                                       qCeil(mMaxFrame/fps));
+                                       mMinFrame, mMaxFrame, fps);
     }
 
     p.setPen(Qt::white);

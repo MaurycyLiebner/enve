@@ -38,7 +38,8 @@ void SingleSound::drawTimelineControls(QPainter * const p,
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
         const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
         const QRect drawRect(0, 0, width, rowHeight);
-        mDurationRectangle->draw(p, drawRect, pixelsPerFrame, absFrameRange);
+        mDurationRectangle->draw(p, drawRect, getCanvasFPS(),
+                                 pixelsPerFrame, absFrameRange);
         p->restore();
     }
     ComplexAnimator::drawTimelineControls(p, pixelsPerFrame,
@@ -100,6 +101,7 @@ qreal SingleSound::getCanvasFPS() const {
 }
 
 void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {
+    if(mDurationRectangle) mDurationRectangle->setSoundCacheHandler(nullptr);
     if(!durRect) {
         mOwnDurationRectangle = true;
         mDurationRectangle = SPtrCreate(FixedLenAnimationRect)(this);
@@ -114,6 +116,7 @@ void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {
             this, &SingleSound::scheduleFinalDataUpdate);
     connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
             this, &SingleSound::updateAfterDurationRectangleShifted);
+    mDurationRectangle->setSoundCacheHandler(&getCacheHandler());
 }
 
 void SingleSound::updateAfterDurationRectangleShifted() {
