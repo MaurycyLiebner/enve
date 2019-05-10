@@ -62,7 +62,7 @@ public:
         return &mCacheHandler->getCacheHandler();
     }
 
-    qreal getSpeed() const { return 2; }
+    qreal getSpeed() const { return 1; }
     QrealAnimator::Snapshot getVolumeSnap() const {
         return mVolumeAnimator->makeSnapshot(
                     SOUND_SAMPLERATE/getCanvasFPS(), 0.01);

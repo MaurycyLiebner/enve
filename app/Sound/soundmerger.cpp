@@ -26,16 +26,6 @@ void SoundMerger::processTask() {
         const SampleRange dstNeededAbsRange = dstAbsRange*srcNeededAbsRange;
         const SampleRange dstRelRange = dstNeededAbsRange.shifted(-mSampleRange.fMin);
 
-//        VAL_AND_NAME(smplsRelRange);
-//        VAL_AND_NAME(smplsSpeedRelRange);
-//        VAL_AND_NAME(smplsAbsRange);
-//        VAL_AND_NAME(srcAbsRange);
-//        VAL_AND_NAME(srcNeededAbsRange);
-//        VAL_AND_NAME(srcNeededRelRange);
-//        VAL_AND_NAME(dstAbsRange);
-//        VAL_AND_NAME(dstNeededAbsRange);
-//        VAL_AND_NAME(dstRelRange);
-
         if(!dstRelRange.isValid()) continue;
         if(!srcNeededRelRange.isValid()) continue;
 
@@ -62,27 +52,27 @@ void SoundMerger::processTask() {
             if(!swr_is_initialized(swrContext)) {
                 RuntimeThrow("Resampler has not been properly initialized");
             }
-            float *buffer;
-            const int res = av_samples_alloc((uint8_t**)&buffer,
+            uint8_t** buffer = nullptr;
+            const int res = av_samples_alloc(buffer,
                                              nullptr, 1, sampleRate,
                                              AV_SAMPLE_FMT_FLT, 0);
             if(res < 0) RuntimeThrow("Resampling output buffer alloc failed");
             int nSamples =
                     swr_convert(swrContext,
-                                (uint8_t**)(&buffer),
+                                buffer,
                                 sampleRate,
                                 (const uint8_t**)&srcSamples->fData,
                                 SOUND_SAMPLERATE);
             if(nSamples < 0) RuntimeThrow("Resampling failed");
             nSamples = qMin(nSamples, dstRelRange.span());
             nSamples = qMin(nSamples, srcNeededRelRange.span());
-            float * const & src = buffer;
+            float * const & src = reinterpret_cast<float*>(buffer);
             for(int i = 0; i < nSamples; i++) {
                 const int dstId = dstRelRange.fMin + i;
                 const int srcId = srcNeededRelRange.fMin + i;
                 dst[dstId] += src[srcId];
             }
-            av_freep(&((uint8_t**)(&buffer))[0]);
+            av_freep(buffer);
         }
     }
 }
