@@ -10,18 +10,16 @@ void SoundMerger::processTask() {
         const qreal& speed = sound.fSpeed;
 
         const SampleRange smplsRelRange = srcSamples->fSampleRange;
-        const SampleRange smplsAbsRange = smplsRelRange.shifted(sound.fSampleShift);
-        const SampleRange srcAbsRange = smplsAbsRange*
-                SampleRange{qRound(sound.fSSAbsRange.fMin*speed), qRound(sound.fSSAbsRange.fMax*speed)};
-        const SampleRange srcNeededAbsRange = srcAbsRange*
-                SampleRange{qRound(mSampleRange.fMin*speed), qRound(mSampleRange.fMax*speed)};
-        const int absToRel = -srcSamples->fSampleRange.fMin - sound.fSampleShift;
-        const SampleRange srcNeededRelRange =
-                srcNeededAbsRange.shifted(absToRel);
+        const SampleRange smplsSpeedRelRange{qRound(smplsRelRange.fMin/speed),
+                                             qRound(smplsRelRange.fMax/speed)};
+        const SampleRange smplsAbsRange = smplsSpeedRelRange.shifted(sound.fSampleShift);
+        const SampleRange srcAbsRange = smplsAbsRange*sound.fSSAbsRange;
+        const SampleRange srcNeededAbsRange = srcAbsRange*mSampleRange;
+        const int absToRel = -qRound(srcSamples->fSampleRange.fMin/speed) - sound.fSampleShift;
+        const SampleRange srcNeededRelRange = srcNeededAbsRange.shifted(absToRel);
 
         const SampleRange dstAbsRange = mSampleRange;
-        const SampleRange dstNeededAbsRange = dstAbsRange*
-                SampleRange{qRound(srcNeededAbsRange.fMin/speed), qRound(srcNeededAbsRange.fMax/speed)};
+        const SampleRange dstNeededAbsRange = dstAbsRange*srcNeededAbsRange;
         const SampleRange dstRelRange = dstNeededAbsRange.shifted(-mSampleRange.fMin);
         if(!dstRelRange.isValid()) continue;
         if(!srcNeededRelRange.isValid()) continue;
