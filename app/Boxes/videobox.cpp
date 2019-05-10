@@ -95,21 +95,17 @@ bool hasSound(const char* path) {
 
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
-        if(mSound) { // !!!
-            mSound->setFilePath(mSrcFilePath);
-        } else {
+        if(!mSound) { // !!!
             const auto flar = GetAsSPtr(mDurationRectangle,
                                         FixedLenAnimationRect);
             mSound = SPtrCreate(SingleSound)(flar);
             ca_addChildAnimator(mSound);
-            mSound->setFilePath(mSrcFilePath);
             const auto parentCanvas = getParentCanvas();
             if(parentCanvas) {
                 parentCanvas->getSoundComposition()->addSound(mSound);
             }
         }
-        mDurationRectangle->setSoundCacheHandler(
-                    &mSound->getCacheHandler());
+        mSound->setFilePath(mSrcFilePath);
     } else {
         mSound.reset();
         mDurationRectangle->setSoundCacheHandler(nullptr);

@@ -36,8 +36,7 @@ public:
         return nullptr;
     }
 
-    SoundReaderForMerger * addSecondReader(const int& secondId,
-                                           SoundMerger * const merger);
+    SoundReaderForMerger * addSecondReader(const int& secondId);
 
     int durationSec() const {
         if(!mAudioStreamsData) return 0;

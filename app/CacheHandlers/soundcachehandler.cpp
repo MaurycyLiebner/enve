@@ -19,7 +19,7 @@ void SoundCacheHandler::secondReaderFinished(
 }
 
 SoundReaderForMerger *SoundCacheHandler::addSecondReader(
-        const int &secondId, SoundMerger * const merger) {
+        const int &secondId) {
     if(mSecondsBeingRead.contains(secondId) ||
        getSamplesForSecond(secondId))
         RuntimeThrow("Trying to unnecessarily reload video frame");
@@ -27,8 +27,8 @@ SoundReaderForMerger *SoundCacheHandler::addSecondReader(
     const int sR = 44100;
     const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
     const auto reader = SPtrCreate(SoundReaderForMerger)(
-                this, mAudioStreamsData, secondId, range, merger);
-    merger->addHDDTask(reader);
+                this, mAudioStreamsData, secondId, range);
     mSecondReaders << reader;
+    reader->scheduleTask();
     return reader.get();
 }

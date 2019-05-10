@@ -51,23 +51,29 @@ class SoundReaderForMerger : public SoundReader {
     struct SingleSound {
         int fSampleShift;
         SampleRange fSamplesRange;
+        QrealAnimator::Snapshot fVolume;
+        qreal fSpeed;
     };
 protected:
     SoundReaderForMerger(SoundCacheHandler * const cacheHandler,
                          const stdsptr<const AudioStreamsData>& openedAudio,
-                         const int& secondId, const SampleRange& sampleRange,
-                         SoundMerger * const merger) :
-        SoundReader(cacheHandler, openedAudio, secondId, sampleRange),
-        mMerger(merger) {}
-public:
-    void afterProcessingAsContainerStep() final;
+                         const int& secondId, const SampleRange& sampleRange) :
+        SoundReader(cacheHandler, openedAudio, secondId, sampleRange) {}
 
+    void afterProcessing();
+public:
     void addSingleSound(const int& sampleShift,
-                        const SampleRange& absRange) {
-        mSSAbsRanges.append({sampleShift, absRange});
+                        const SampleRange& absRange,
+                        const QrealAnimator::Snapshot& volume,
+                        const qreal& speed) {
+        mSSAbsRanges.append({sampleShift, absRange, volume, speed});
+    }
+
+    void addMerger(SoundMerger * const merger) {
+        mMergers << merger;
     }
 private:
     QList<SingleSound> mSSAbsRanges;
-    const stdptr<SoundMerger> mMerger;
+    QList<stdptr<SoundMerger>> mMergers;
 };
 #endif // SOUNDREADER_H

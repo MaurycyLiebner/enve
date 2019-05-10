@@ -40,12 +40,11 @@ public:
         return mVolumeAnimator->getEffectiveValue(relFrame);
     }
 
-    SoundReaderForMerger * getSecondReader(const int& relSecondId,
-                                           SoundMerger * const merger) {
+    SoundReaderForMerger * getSecondReader(const int& relSecondId) {
         const int maxSec = mCacheHandler->durationSec() - 1;
         if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
         const auto reader = mCacheHandler->getSecondReader(relSecondId);
-        if(!reader) return mCacheHandler->addSecondReader(relSecondId, merger);
+        if(!reader) return mCacheHandler->addSecondReader(relSecondId);
         return reader;
     }
 
@@ -58,8 +57,15 @@ public:
     SampleRange absSampleRange() const;
     iValueRange absSecondToRelSeconds(const int& absSecond);
 
-    const HDDCachableCacheHandler& getCacheHandler() const {
-        return mCacheHandler->getCacheHandler();
+    const HDDCachableCacheHandler* getCacheHandler() const {
+        if(!mCacheHandler) return nullptr;
+        return &mCacheHandler->getCacheHandler();
+    }
+
+    qreal getSpeed() const { return 2; }
+    QrealAnimator::Snapshot getVolumeSnap() const {
+        return mVolumeAnimator->makeSnapshot(
+                    SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
     }
 private:
     qreal getCanvasFPS() const;

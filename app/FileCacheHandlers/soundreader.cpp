@@ -35,7 +35,6 @@ void SoundReader::readFrame() {
                                        audioStream->time_base.num)/1000;
         if(avformat_seek_file(formatContext, audioStreamIndex, tm0,
                               tm, tm, AVSEEK_FLAG_FRAME) < 0) {
-            qDebug() << "Failed to seek to " << mSecondId;
             avformat_seek_file(formatContext, audioStreamIndex,
                                INT64_MIN, 0, INT64_MAX, 0);
         }
@@ -53,20 +52,15 @@ void SoundReader::readFrame() {
         } else {
             if(packet->stream_index == audioStreamIndex) {
                 const int sendRet = avcodec_send_packet(codecContext, packet);
-                if(sendRet < 0) {
-                    fprintf(stderr, "Sending packet to the decoder failed\n");
-                    return;
-                }
+                if(sendRet < 0)
+                    RuntimeThrow("Sending packet to the decoder failed");
                 const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
-                if(recRet == AVERROR_EOF) {
-                    return;
-                } else if(recRet == AVERROR(EAGAIN)) {
+                if(recRet == AVERROR_EOF) return;
+                else if(recRet == AVERROR(EAGAIN)) {
                     av_packet_unref(packet);
                     continue;
-                } else if(recRet < 0) {
-                    fprintf(stderr, "Did not receive frame from the decoder\n");
-                    return;
-                }
+                } else if(recRet < 0)
+                    RuntimeThrow("Did not receive frame from the decoder");
                 av_packet_unref(packet);
             } else {
                 av_packet_unref(packet);
@@ -83,13 +77,18 @@ void SoundReader::readFrame() {
         if(currentSample + decodedFrame->nb_samples >= mSecondId*SOUND_SAMPLERATE) {
             // resample frames
             float *buffer;
-            av_samples_alloc((uint8_t**)&buffer, nullptr, 1,
-                             decodedFrame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
-            const int nSamplesT = swr_convert(
-                        swrContext, (uint8_t**)&buffer,
-                        decodedFrame->nb_samples,
-                        (const uint8_t**)decodedFrame->data,
-                        decodedFrame->nb_samples);
+            const int res = av_samples_alloc((uint8_t**)&buffer, nullptr, 1,
+                                             decodedFrame->nb_samples,
+                                             AV_SAMPLE_FMT_FLT, 0);
+            if(res < 0) RuntimeThrow("Resampling output buffer alloc failed");
+
+            const int nSamplesT =
+                    swr_convert(swrContext,
+                                (uint8_t**)(&buffer),
+                                decodedFrame->nb_samples,
+                                (const uint8_t**)decodedFrame->data,
+                                decodedFrame->nb_samples);
+            if(nSamples < 0) RuntimeThrow("Resampling failed");
             // append resampled frames to data
             const SampleRange frameSampleRange{currentSample, currentSample + nSamplesT - 1};
             const SampleRange neededSampleRange = mSampleRange*frameSampleRange;
@@ -108,7 +107,7 @@ void SoundReader::readFrame() {
                 else audioDataRange += neededSampleRange;
             }
 
-            av_freep(&((uint8_t**)&buffer)[0]);
+            av_freep(&(reinterpret_cast<uint8_t**>(&buffer))[0]);
 
             currentSample += nSamplesT;
             firstFrame = false;
@@ -124,8 +123,13 @@ void SoundReader::readFrame() {
 }
 
 #include "Sound/soundmerger.h"
-void SoundReaderForMerger::afterProcessingAsContainerStep() {
-    for(const auto& ss : mSSAbsRanges)
-        mMerger->addSoundToMerge({ss.fSampleShift, ss.fSamplesRange,
-                                  getSamples()});
+void SoundReaderForMerger::afterProcessing() {
+    SoundReader::afterProcessing();
+    for(const auto& merger : mMergers) {
+        for(const auto& ss : mSSAbsRanges) {
+            merger->addSoundToMerge({ss.fSampleShift, ss.fSamplesRange,
+                                     ss.fVolume, ss.fSpeed,
+                                     SPtrCreate(Samples)(getSamples())});
+        }
+    }
 }
