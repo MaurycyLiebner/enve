@@ -70,6 +70,10 @@ public:
     const Type &getType() {
         return mType;
     }
+
+    Property * getChildProperty() {
+        return mChildProperty;
+    }
 public slots:
     void setMaxPos(const int &maxPos);
 
@@ -90,7 +94,7 @@ protected:
 class DurationRectangle : public DurationRectangleMovable {
     Q_OBJECT
 public:
-    DurationRectangle(Property *childProp);
+    DurationRectangle(Property * const childProp);
 
     int getFrameShift() {
         return getFramePos();

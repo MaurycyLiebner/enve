@@ -69,7 +69,7 @@ void DurationRectangleMovable::setMinPos(const int &minPos) {
     mMinPos = minPos + 1;
 }
 
-DurationRectangle::DurationRectangle(Property *childProp) :
+DurationRectangle::DurationRectangle(Property * const childProp) :
     DurationRectangleMovable(DURATION_RECT) {
     mChildProperty = childProp;
 

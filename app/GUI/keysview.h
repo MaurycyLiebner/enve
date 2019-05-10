@@ -163,7 +163,7 @@ private:
 
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
-    QPointer<DurationRectangleMovable> mLastPressedDurationRectangleMovable;
+    QPointer<DurationRectangleMovable> mLastPressedMovable;
     Key *mLastPressedKey = nullptr;
     bool mFirstMove = false;
     int mMoveDFrame = 0;

@@ -111,12 +111,12 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                                                       mPixelsPerFrame,
                                                       mMinViewedFrame);
             if(!mLastPressedKey) {
-                mLastPressedDurationRectangleMovable =
+                mLastPressedMovable =
                         mBoxesListVisible->getRectangleMovableAtPos(
                                             posU.x(), posU.y(),
                                             mPixelsPerFrame,
                                             mMinViewedFrame);
-                if(!mLastPressedDurationRectangleMovable) {
+                if(!mLastPressedMovable) {
                     mSelecting = true;
                     const qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
                     const QPointF xFramePos(posUXFrame,
@@ -545,30 +545,41 @@ void KeysView::handleMouseMove(const QPoint &pos,
                 } else if(mMovingRect) {
                     auto canvasWindow = mMainWindow->getCanvasWindow();
                     if(mFirstMove) {
-                        if(mLastPressedDurationRectangleMovable) {
-                            if(!mLastPressedDurationRectangleMovable->isSelected()) {
-                                mLastPressedDurationRectangleMovable->pressed(
+                        if(mLastPressedMovable) {
+                            if(!mLastPressedMovable->isSelected()) {
+                                mLastPressedMovable->pressed(
                                             mMainWindow->isShiftPressed());
                             }
-                            if(mLastPressedDurationRectangleMovable->isDurationRect()) {
-                                canvasWindow->startDurationRectPosTransformForAllSelected();
-                            } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
-                                canvasWindow->startMaxFramePosTransformForAllSelected();
-                            } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
-                                canvasWindow->startMinFramePosTransformForAllSelected();
+
+                            const auto childProp = mLastPressedMovable->getChildProperty();
+                            if(childProp->SWT_isBoundingBox()) {
+                                if(mLastPressedMovable->isDurationRect()) {
+                                    canvasWindow->startDurationRectPosTransformForAllSelected();
+                                } else if(mLastPressedMovable->isMaxFrame()) {
+                                    canvasWindow->startMaxFramePosTransformForAllSelected();
+                                } else if(mLastPressedMovable->isMinFrame()) {
+                                    canvasWindow->startMinFramePosTransformForAllSelected();
+                                }
+                            } else {
+                                mLastPressedMovable->startPosTransform();
                             }
                         }
                     }
 
                     if(dDFrame != 0) {
                         mMoveDFrame = dFrame;
-                        if(mLastPressedDurationRectangleMovable) {
-                            if(mLastPressedDurationRectangleMovable->isDurationRect()) {
-                                canvasWindow->moveDurationRectForAllSelected(dDFrame);
-                            } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
-                                canvasWindow->moveMaxFrameForAllSelected(dDFrame);
-                            } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
-                                canvasWindow->moveMinFrameForAllSelected(dDFrame);
+                        if(mLastPressedMovable) {
+                            const auto childProp = mLastPressedMovable->getChildProperty();
+                            if(childProp->SWT_isBoundingBox()) {
+                                if(mLastPressedMovable->isDurationRect()) {
+                                    canvasWindow->moveDurationRectForAllSelected(dDFrame);
+                                } else if(mLastPressedMovable->isMaxFrame()) {
+                                    canvasWindow->moveMaxFrameForAllSelected(dDFrame);
+                                } else if(mLastPressedMovable->isMinFrame()) {
+                                    canvasWindow->moveMinFrameForAllSelected(dDFrame);
+                                }
+                            } else {
+                                mLastPressedMovable->changeFramePosBy(dDFrame);
                             }
                         }
 //                        mLastPressedDurationRectangleMovable->changeFramePosBy(
@@ -647,20 +658,25 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 //releaseMouse();
             } else if(mMovingRect) {
                 if(mFirstMove) {
-                    if(mLastPressedDurationRectangleMovable) {
-                        mLastPressedDurationRectangleMovable->pressed(
+                    if(mLastPressedMovable) {
+                        mLastPressedMovable->pressed(
                                     mMainWindow->isShiftPressed());
                     }
                 } else {
                     mMoveDFrame = 0;
                     mMovingRect = false;
                     auto canvasWindow = mMainWindow->getCanvasWindow();
-                    if(mLastPressedDurationRectangleMovable->isDurationRect()) {
-                        canvasWindow->finishDurationRectPosTransformForAllSelected();
-                    } else if(mLastPressedDurationRectangleMovable->isMinFrame()) {
-                        canvasWindow->finishMinFramePosTransformForAllSelected();
-                    } else if(mLastPressedDurationRectangleMovable->isMaxFrame()) {
-                        canvasWindow->finishMaxFramePosTransformForAllSelected();
+                    const auto childProp = mLastPressedMovable->getChildProperty();
+                    if(childProp->SWT_isBoundingBox()) {
+                        if(mLastPressedMovable->isDurationRect()) {
+                            canvasWindow->finishDurationRectPosTransformForAllSelected();
+                        } else if(mLastPressedMovable->isMinFrame()) {
+                            canvasWindow->finishMinFramePosTransformForAllSelected();
+                        } else if(mLastPressedMovable->isMaxFrame()) {
+                            canvasWindow->finishMaxFramePosTransformForAllSelected();
+                        }
+                    } else {
+                        mLastPressedMovable->finishPosTransform();
                     }
                 }
             }
