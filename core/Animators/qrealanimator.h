@@ -30,28 +30,37 @@ public:
         };
     public:
         class Iterator {
-            Iterator(const qreal& startFrame, const qreal& sampleStep) :
+        public:
+            Iterator(const qreal& startFrame, const qreal& sampleStep,
+                     const Snapshot * const snap) :
                 mSampleFrameStep(sampleStep) {
                 mInvFrameSpan = 1/sampleStep;
                 mPrevFrame = startFrame - sampleStep;
                 mNextFrame = startFrame;
                 mCurrentFrame = startFrame;
+                mSnapshot = snap;
                 updateSamples();
             }
 
-
             qreal getValueAndProgress(const qreal& progress) {
                 if(mStaticValue) return mPrevValue;
-                const qreal fracNext = (mCurrentFrame - mPrevFrame)*mInvFrameSpan;
-                const qreal result = (mNextValue - mPrevValue)*fracNext + mPrevValue;
+                qreal result;
+                if(mInterpolate) {
+                    const qreal fracNext = (mCurrentFrame - mPrevFrame)*mInvFrameSpan;
+                    result = (mNextValue - mPrevValue)*fracNext + mPrevValue;
+                } else result = mPrevValue;
                 mCurrentFrame += progress;
                 if(mCurrentFrame > mNextFrame ||
                    mCurrentFrame < mPrevFrame) updateSamples();
                 return result;
             }
+
+            bool staticValue() const {
+                return mStaticValue;
+            }
         private:
             void updateSamples() {
-                if(mSnapshot->mKeys.isEmpty()) {
+                if(mSnapshot->mKeys.count() < 2) {
                     mPrevFrame = -TEN_MIL;
                     mNextFrame = TEN_MIL;
                     mPrevValue = mSnapshot->mCurrentValue;
@@ -62,9 +71,11 @@ public:
                     mNextFrame += mSampleFrameStep;
                     mPrevValue = mSnapshot->getValue(mPrevFrame);
                     mNextValue = mSnapshot->getValue(mNextFrame);
+                    mInterpolate = !isZero4Dec(mNextValue - mPrevValue);
                 }
             }
 
+            bool mInterpolate;
             bool mStaticValue;
             qreal mSampleFrameStep;
             qreal mInvFrameSpan;
@@ -82,7 +93,7 @@ public:
         Snapshot(const qreal& currentValue,
                  const qreal& frameMultiplier,
                  const qreal& valueMultiplier) :
-            mCurrentValue(currentValue),
+            mCurrentValue(currentValue*valueMultiplier),
             mFrameMultiplier(frameMultiplier),
             mValueMultiplier(valueMultiplier) {}
 

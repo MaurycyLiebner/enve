@@ -90,8 +90,8 @@ QrealAnimator::Snapshot QrealAnimator::makeSnapshot(
         const qreal &valueMultiplier) const {
     const int prevKeyId = anim_getPrevKeyId(minFrame);
     const int nextKeyId = anim_getNextKeyId(maxFrame);
-    const int minI = clamp(prevKeyId, 0, anim_mKeys.count());
-    const int maxI = clamp(nextKeyId, 0, anim_mKeys.count());
+    const int minI = clamp(prevKeyId, 0, anim_mKeys.count() - 1);
+    const int maxI = clamp(nextKeyId, 0, anim_mKeys.count() - 1);
     Snapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
     for(int i = minI; i <= maxI; i++) {
         const auto iKey = anim_mKeys.atId<QrealKey>(i);

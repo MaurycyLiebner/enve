@@ -1,9 +1,29 @@
 #include "soundmerger.h"
-QDebug operator<< (QDebug d, const SampleRange &model) {
-    d << model.fMin << ',' << model.fMax;
-    return d;
+
+void mergeData(const float * const & src,
+               const SampleRange& srcRange,
+               float * const & dst,
+               const SampleRange& dstRange,
+               int nSamples,
+               QrealAnimator::Snapshot::Iterator volIt) {
+    nSamples = qMin(qMin(nSamples, dstRange.span()), srcRange.span());
+    if(volIt.staticValue()) {
+        const qreal vol = volIt.getValueAndProgress(1);
+        for(int i = 0; i < nSamples; i++) {
+            const int dstId = dstRange.fMin + i;
+            const int srcId = srcRange.fMin + i;
+            dst[dstId] += static_cast<float>(qreal(src[srcId])*vol);
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const int dstId = dstRange.fMin + i;
+            const int srcId = srcRange.fMin + i;
+            const qreal vol = volIt.getValueAndProgress(1);
+            dst[dstId] += static_cast<float>(qreal(src[srcId])*vol);
+        }
+    }
 }
-#define VAL_AND_NAME(var) qDebug() << #var << var;
+
 void SoundMerger::processTask() {
     mSamples = SPtrCreate(Samples)(mSampleRange);
     const auto& dst = mSamples->fData;
@@ -28,15 +48,12 @@ void SoundMerger::processTask() {
 
         if(!dstRelRange.isValid()) continue;
         if(!srcNeededRelRange.isValid()) continue;
-
+        const int firstVolSample = dstNeededAbsRange.fMin - sound.fSampleShift;
+        QrealAnimator::Snapshot::Iterator volIt(firstVolSample, 1000, &sound.fVolume);
         if(isOne4Dec(speed)) {
             const int nSamples = qMin(srcNeededRelRange.span(), dstRelRange.span());
-            float * const & src = srcSamples->fData;
-            for(int i = 0; i < nSamples; i++) {
-                const int dstId = dstRelRange.fMin + i;
-                const int srcId = srcNeededRelRange.fMin + i;
-                dst[dstId] += src[srcId];
-            }
+            const float * const & src = srcSamples->fData;
+            mergeData(src, srcNeededRelRange, dst, dstRelRange, nSamples, volIt);
         } else {
             const int sampleRate = qRound(SOUND_SAMPLERATE/speed);
             struct SwrContext * swrContext = swr_alloc();
@@ -64,14 +81,8 @@ void SoundMerger::processTask() {
                                 (const uint8_t**)&srcSamples->fData,
                                 SOUND_SAMPLERATE);
             if(nSamples < 0) RuntimeThrow("Resampling failed");
-            nSamples = qMin(nSamples, dstRelRange.span());
-            nSamples = qMin(nSamples, srcNeededRelRange.span());
-            float * const & src = reinterpret_cast<float*>(buffer);
-            for(int i = 0; i < nSamples; i++) {
-                const int dstId = dstRelRange.fMin + i;
-                const int srcId = srcNeededRelRange.fMin + i;
-                dst[dstId] += src[srcId];
-            }
+            const float * const & src = reinterpret_cast<float*>(buffer);
+            mergeData(src, srcNeededRelRange, dst, dstRelRange, nSamples, volIt);
             av_freep(buffer);
         }
     }
