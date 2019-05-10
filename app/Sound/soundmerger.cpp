@@ -1,5 +1,9 @@
 #include "soundmerger.h"
-
+QDebug operator<< (QDebug d, const SampleRange &model) {
+    d << model.fMin << ',' << model.fMax;
+    return d;
+}
+#define VAL_AND_NAME(var) qDebug() << #var << var;
 void SoundMerger::processTask() {
     mSamples = SPtrCreate(Samples)(mSampleRange);
     const auto& dst = mSamples->fData;
@@ -21,13 +25,24 @@ void SoundMerger::processTask() {
         const SampleRange dstAbsRange = mSampleRange;
         const SampleRange dstNeededAbsRange = dstAbsRange*srcNeededAbsRange;
         const SampleRange dstRelRange = dstNeededAbsRange.shifted(-mSampleRange.fMin);
+
+//        VAL_AND_NAME(smplsRelRange);
+//        VAL_AND_NAME(smplsSpeedRelRange);
+//        VAL_AND_NAME(smplsAbsRange);
+//        VAL_AND_NAME(srcAbsRange);
+//        VAL_AND_NAME(srcNeededAbsRange);
+//        VAL_AND_NAME(srcNeededRelRange);
+//        VAL_AND_NAME(dstAbsRange);
+//        VAL_AND_NAME(dstNeededAbsRange);
+//        VAL_AND_NAME(dstRelRange);
+
         if(!dstRelRange.isValid()) continue;
         if(!srcNeededRelRange.isValid()) continue;
 
         if(isOne4Dec(speed)) {
-            const int nSamples = srcNeededRelRange.span(); // == dstRelRange.span()
+            const int nSamples = qMin(srcNeededRelRange.span(), dstRelRange.span());
             float * const & src = srcSamples->fData;
-            for(int i = 0; i < nSamples && i < dstSamples; i++) {
+            for(int i = 0; i < nSamples; i++) {
                 const int dstId = dstRelRange.fMin + i;
                 const int srcId = srcNeededRelRange.fMin + i;
                 dst[dstId] += src[srcId];
@@ -52,15 +67,17 @@ void SoundMerger::processTask() {
                                              nullptr, 1, sampleRate,
                                              AV_SAMPLE_FMT_FLT, 0);
             if(res < 0) RuntimeThrow("Resampling output buffer alloc failed");
-            const int nSamples =
+            int nSamples =
                     swr_convert(swrContext,
                                 (uint8_t**)(&buffer),
                                 sampleRate,
                                 (const uint8_t**)&srcSamples->fData,
                                 SOUND_SAMPLERATE);
             if(nSamples < 0) RuntimeThrow("Resampling failed");
+            nSamples = qMin(nSamples, dstRelRange.span());
+            nSamples = qMin(nSamples, srcNeededRelRange.span());
             float * const & src = buffer;
-            for(int i = 0; i < nSamples && i < dstSamples; i++) {
+            for(int i = 0; i < nSamples; i++) {
                 const int dstId = dstRelRange.fMin + i;
                 const int srcId = srcNeededRelRange.fMin + i;
                 dst[dstId] += src[srcId];
