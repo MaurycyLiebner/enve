@@ -68,12 +68,22 @@ public:
                     SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
     }
 
-    void updateDurationRectLength();
+
+    bool isEnabled() const {
+        return mEnabled;
+    }
+    void setEnabled(const bool& enable) {
+        mEnabled = enable;
+    }
 private:
+    iValueRange absSecondToRelSecondsAbsStretch(const int& absSecond);
+    void updateDurationRectLength();
+
     qreal getCanvasFPS() const;
     void updateAfterDurationRectangleShifted();
     bool mOwnDurationRectangle;
 
+    bool mEnabled = true;
     qreal mStretch = 1;
     stdptr<SoundCacheHandler> mCacheHandler;
     qsptr<FixedLenAnimationRect> mDurationRectangle;

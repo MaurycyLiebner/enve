@@ -88,12 +88,22 @@ SampleRange SingleSound::absSampleRange() const {
 }
 
 iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
+    if(mStretch < 0) {
+        const auto absStretch = absSecondToRelSecondsAbsStretch(absSecond);
+        const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
+        return {secs - absStretch.fMax, secs - absStretch.fMin};
+    }
+    return absSecondToRelSecondsAbsStretch(absSecond);
+}
+
+iValueRange SingleSound::absSecondToRelSecondsAbsStretch(const int &absSecond) {
     const qreal fps = getCanvasFPS();
-    const qreal speed = isZero6Dec(mStretch) ? TEN_MIL : 1/mStretch;
+    const qreal stretch = qAbs(mStretch);
+    const qreal speed = isZero6Dec(stretch) ? TEN_MIL : 1/stretch;
     const qreal qFirstSecond = prp_absFrameToRelFrameF(absSecond*fps)*speed/fps;
     if(isInteger4Dec(qFirstSecond)) {
         const int round = qRound(qFirstSecond);
-        if(isOne4Dec(mStretch) || mStretch > 1) {
+        if(isOne4Dec(stretch) || stretch > 1) {
             return {round, round};
         }
         const qreal qLast = qFirstSecond + speed - 1;

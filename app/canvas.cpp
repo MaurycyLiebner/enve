@@ -504,7 +504,8 @@ ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 
 #include "Boxes/videobox.h"
 VideoBox* Canvas::createVideoForPath(const QString &path) {
-    auto vidBox = SPtrCreate(VideoBox)(path);
+    const auto vidBox = SPtrCreate(VideoBox)();
+    vidBox->setFilePath(path);
     mCurrentBoxesGroup->addContainedBox(vidBox);
     return vidBox.get();
 }

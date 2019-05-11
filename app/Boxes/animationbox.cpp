@@ -22,13 +22,15 @@ FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
-    //qreal fpsRatio = getParentCanvas()->getFps()/mFps;
-    //qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
-
-    int frameCount;
-    if(mSrcFramesCache) frameCount = mSrcFramesCache->getFrameCount();
-    else frameCount = 0;
-    getAnimationDurationRect()->setAnimationFrameDuration(frameCount);
+    if(mFrameRemappingEnabled) {
+        getAnimationDurationRect()->setAnimationFrameDuration(0);
+    } else {
+        int frameCount;
+        if(mSrcFramesCache) frameCount = mSrcFramesCache->getFrameCount();
+        else frameCount = 0;
+        const int nFrames = qRound(frameCount*qAbs(mStretch));
+        getAnimationDurationRect()->setAnimationFrameDuration(nFrames);
+    }
 }
 
 void AnimationBox::reloadCacheHandler() {
@@ -59,23 +61,27 @@ bool AnimationBox::shouldPlanScheduleUpdate() {
 }
 
 int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
-    int pixId;
+    const int lastFrameId = mSrcFramesCache->getFrameCount() - 1;
     const int animStartRelFrame =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
+    int pixId;
     if(mFrameRemappingEnabled) {
         pixId = mFrameAnimator->getCurrentIntValueAtRelFrame(relFrame);
     } else {
-        pixId = relFrame - animStartRelFrame;
+        if(isZero6Dec(mStretch)) {
+            pixId = lastFrameId;
+        } else {
+            pixId = qRound((relFrame - animStartRelFrame)/qAbs(mStretch));
+            if(mStretch < 0) pixId = lastFrameId - pixId;
+        }
     }
 
-    if(pixId <= 0) {
-        pixId = 0;
-    } else if(pixId > mSrcFramesCache->getFrameCount() - 1) {
-        pixId = mSrcFramesCache->getFrameCount() - 1;
-    }
+    if(pixId < 0) pixId = 0;
+    else if(pixId > lastFrameId) pixId = lastFrameId;
 
     return pixId;
 }
+
 #include "Animators/qrealkey.h"
 #include "Animators/effectanimators.h"
 void AnimationBox::enableFrameRemapping() {
@@ -100,6 +106,7 @@ void AnimationBox::enableFrameRemapping() {
     ca_prependChildAnimator(mEffectsAnimators.get(), mFrameAnimator);
     prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
+    updateDurationRectangleAnimationRange();
 }
 
 void AnimationBox::disableFrameRemapping() {
@@ -110,6 +117,7 @@ void AnimationBox::disableFrameRemapping() {
     ca_removeChildAnimator(mFrameAnimator);
     prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
+    updateDurationRectangleAnimationRange();
 }
 
 void AnimationBox::reload() {

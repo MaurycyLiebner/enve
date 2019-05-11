@@ -17,10 +17,6 @@ VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     setName("Video");
 }
 
-VideoBox::VideoBox(const QString &filePath) : VideoBox() {
-    setFilePath(filePath);
-}
-
 VideoBox::~VideoBox() {
     auto parentCanvas = getParentCanvas();
     if(parentCanvas && mSound) {
@@ -30,11 +26,17 @@ VideoBox::~VideoBox() {
 
 void VideoBox::setParentGroup(BoxesGroup * const parent) {
     if(mParentGroup && mSound) {
-        getParentCanvas()->getSoundComposition()->removeSound(mSound);
+        const auto parentCanvas = getParentCanvas();
+        if(parentCanvas) {
+            parentCanvas->getSoundComposition()->removeSound(mSound);
+        }
     }
     AnimationBox::setParentGroup(parent);
     if(mParentGroup && mSound) {
-        getParentCanvas()->getSoundComposition()->addSound(mSound);
+        const auto parentCanvas = getParentCanvas();
+        if(parentCanvas) {
+            getParentCanvas()->getSoundComposition()->addSound(mSound);
+        }
     }
 }
 
@@ -44,6 +46,18 @@ void VideoBox::changeSourceFile(QWidget *dialogParent) {
                 dialogParent, "Change Source", "",
                 "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     if(!importPath.isEmpty()) setFilePath(importPath);
+}
+
+void VideoBox::setStretch(const qreal &stretch) {
+    AnimationBox::setStretch(stretch);
+    mSound->setStretch(stretch);
+}
+
+void VideoBox::setSoundEnabled(const bool &enable) {
+    if(mSoundEnabled == enable) return;
+    mSoundEnabled = enable;
+    if(!mSound) return;
+    mSound->setEnabled(enable);
 }
 
 void VideoBox::setFilePath(const QString &path) {
@@ -104,6 +118,7 @@ void VideoBox::reloadSound() {
             if(parentCanvas) {
                 parentCanvas->getSoundComposition()->addSound(mSound);
             }
+            mSound->setEnabled(mSoundEnabled);
         }
         mSound->setFilePath(mSrcFilePath);
     } else {

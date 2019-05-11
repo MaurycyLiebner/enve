@@ -9,7 +9,6 @@ class SingleSound;
 class VideoBox : public AnimationBox {
     friend class SelfRef;
 protected:
-    VideoBox(const QString &filePath);
     VideoBox();
 public:
     ~VideoBox();
@@ -23,8 +22,16 @@ public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
+    void setStretch(const qreal& stretch);
+
+    void enableSound() { setSoundEnabled(true); }
+    void disableSound() { setSoundEnabled(false); }
+
+    void setSoundEnabled(const bool& enable);
+
     void setFilePath(const QString &path);
 private:
+    bool mSoundEnabled = true;
     qsptr<SingleSound> mSound;
     QString mSrcFilePath;
 };

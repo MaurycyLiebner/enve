@@ -102,6 +102,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
                                      (secondId + 1)*SOUND_SAMPLERATE - 1};
     const auto task = SPtrCreate(SoundMerger)(secondId, sampleRange, this);
     for(const auto &sound : mSounds) {
+        if(!sound->isEnabled()) continue;
         const auto secs = sound->absSecondToRelSeconds(secondId);
         for(int i = secs.fMin; i <= secs.fMax; i++) {
             const auto samples = sound->getSamplesForSecond(i);

@@ -51,8 +51,16 @@ public:
     void enableFrameRemapping();
     void disableFrameRemapping();
 
+    virtual void setStretch(const qreal& stretch) {
+        mStretch = stretch;
+        updateDurationRectangleAnimationRange();
+    }
+    qreal getStretch() const { return mStretch; }
+
     void reload();
 protected:
+    qreal mStretch = 1;
+
     bool mNewCurrentFrameUpdateNeeded = false;
     stdptr<AnimationCacheHandler> mSrcFramesCache;
 
